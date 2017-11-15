@@ -31,6 +31,13 @@
 include the sqlrclientwrapper.h file.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+</tt></pre>
+
 </blockquote>
 <p>You'll also need to link against the sqlrclientwrapper, sqlrclient and 
 rudiments libraries.</p>
@@ -45,16 +52,34 @@ rudiments libraries.</p>
 this (assuming you're using the GNU C compiler on Linux or Unix):</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>gcc <font color="#990000">-</font>I<font color="#990000">/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>include <font color="#990000">-</font><font color="#008080">c</font> myprogram<font color="#990000">.</font>c</tt></pre>
+
 </blockquote>
 <p>The command to compile your .o file to an executable will look something like
 this (assuming you're using the GNU C++ compiler on Linux or Unix):</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>g<font color="#990000">++</font> <font color="#990000">-</font>o <font color="#008080">myprogram</font> myprogram<font color="#990000">.</font>o <font color="#990000">-</font>L<font color="#990000">/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib <font color="#990000">-</font>lsqlrclientwrapper <font color="#990000">-</font>lsqlrclient <font color="#990000">-</font>lrudiments</tt></pre>
+
 </blockquote>
 <p>Note that g++ was used to link, not gcc.  You could alternatively link using
 gcc like this:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>gcc <font color="#990000">-</font>o <font color="#008080">myprogram</font> myprogram<font color="#990000">.</font>o <font color="#990000">-</font>L<font color="#990000">/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib <font color="#990000">-</font>lsqlrclientwrapper <font color="#990000">-</font>lsqlrclient <font color="#990000">-</font>lrudiments <font color="#990000">-</font>lstdc<font color="#990000">++</font></tt></pre>
+
 </blockquote>
 <p>When using the C API, it is important to compile the .c files to object code
 using the C compiler before linking them using the C++ compiler.  
@@ -70,6 +95,23 @@ ensures that C style symbols will be generated for function calls.</p>
 use.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+
+        <font color="#990000">...</font> execute <font color="#008080">some</font> queries <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>After calling the constructor, a session is established when the first 
 query is run.</p>
@@ -87,6 +129,37 @@ session.</p>
 <p>Call sqlrcur_sendQuery() or sqlrcur_sendFileQuery() to run a query.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+
+        <font color="#990000">...</font> <b><font color="#0000FF">do</font></b> some stuff that takes a <font color="#008080">short</font> time <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_sendFileQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"/usr/local/myprogram/sql"</font><font color="#990000">,</font><font color="#FF0000">"myquery.sql"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <font color="#990000">...</font> <b><font color="#0000FF">do</font></b> some stuff that takes a <font color="#008080">long</font> time <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_other_table"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>Note the call to sqlrcon_endSession() after the call to sqlrcur_sendFileQuery().
 Since the program does some stuff that takes a long time between that query and
@@ -146,6 +219,27 @@ directly to the database.</p>
 query failed.  You can find out why by calling sqlrcur_errorMessage().</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font><b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_nonexistant_table"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%s</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_errorMessage</font></b><font color="#990000">(</font>cur<font color="#990000">));</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <br/><a name="bindvars"/><h2>Substitution and Bind Variables</h2>
 
@@ -166,6 +260,31 @@ you have to supply precision and scale for the number.  See
 scale.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from mytable $(whereclause)"</font><font color="#990000">)</font>
+        <b><font color="#000000">sqlrcur_substitution</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"whereclause"</font><font color="#990000">,</font><font color="#FF0000">"where stringcol=:stringval and integercol&gt;:integerval and floatcol&gt;floatval"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBind</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"stringval"</font><font color="#990000">,</font><font color="#FF0000">"true"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBind</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"integerval"</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBind</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"floatval"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>If you are curious how many bind variables have been declared in a query,
 you can call countBindVariables() after preparing the query.</p>
@@ -175,6 +294,39 @@ want to retrieve data from function calls.  To facilitate this, SQL Relay
 provides functions for defining and retrieving output bind variables.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBind</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"integer1"</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBind</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"integer2"</font><font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBind</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"float1"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBind</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"float2"</font><font color="#990000">,</font><font color="#993399">2.2</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBind</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"integer3"</font><font color="#990000">,</font><font color="#993399">30</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"result1"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_defineOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"result2"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_defineOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"result3"</font><font color="#990000">,</font><font color="#993399">100</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <font color="#008080">int64_t</font>    result1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"result1"</font><font color="#990000">);</font>
+        <font color="#009900">double</font>     result2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"result2"</font><font color="#990000">);</font>
+        <font color="#009900">char</font>       <font color="#990000">*</font>result3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"result3"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something with <font color="#008080">the</font> result <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>The getOutputBindString() function returns a NULL value as an empty string.  
 If you would it to come back as a NULL instead, you can call the 
@@ -184,12 +336,78 @@ call getNullsAsEmptyStrings().</p>
 <p>You can insert data into BLOB and CLOB columns using the inputBindBlob(), inputBindClob() functions.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"create table images (image blob, description clob)"</font><font color="#990000">);</font>
+
+        <font color="#009900">unsigned</font> <font color="#009900">char</font>   imagedata<font color="#990000">[</font><font color="#993399">40000</font><font color="#990000">];</font>
+        <font color="#009900">unsigned</font> <font color="#009900">long</font>   imagelength<font color="#990000">;</font>
+
+        <font color="#990000">...</font> read an image from a file into imagedata and the length of the
+                file <font color="#008080">into</font> imagelength <font color="#990000">...</font>
+
+        <font color="#009900">unsigned</font> <font color="#009900">char</font>   description<font color="#990000">[</font><font color="#993399">40000</font><font color="#990000">];</font>
+        <font color="#009900">unsigned</font> <font color="#009900">long</font>   desclength<font color="#990000">;</font>
+
+        <font color="#990000">...</font> read a description from a file into description and the length of
+                the file <font color="#008080">into</font> desclength <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"insert into images values (:image,:desc)"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBindBlob</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"image"</font><font color="#990000">,</font>imagedata<font color="#990000">,</font>imagelength<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBindClob</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"desc"</font><font color="#990000">,</font>description<font color="#990000">,</font>desclength<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>Likewise, you can retreive BLOB or CLOB data using
 defineOutputBindBlob()/getOutputBindBlob() and
 defineOutputBindClob()/getOutputBindClob().</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"begin  select image into :image from images;  select description into :desc from images;  end;"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_defineOutputBindBlob</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"image"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_defineOutputBindClob</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"desc"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <font color="#009900">char</font>    <font color="#990000">*</font>image<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindBlob</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"image"</font><font color="#990000">);</font>
+        <font color="#009900">long</font>    imagelength<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindLength</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"image"</font><font color="#990000">);</font>
+
+        <font color="#009900">char</font>    <font color="#990000">*</font>desc<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindClob</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"desc"</font><font color="#990000">);</font>
+        <font color="#009900">char</font>    <font color="#990000">*</font>desclength<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindLength</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"desc"</font><font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something with image <font color="#008080">and</font> desc <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>Sometimes it's convenient to bind a bunch of variables that may or may not 
 actually be in the query.  For example, if you are building a web based
@@ -209,6 +427,41 @@ over and over without re-preparing it.  If your backend database natively
 supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from mytable where mycolumn&gt;:value"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"value"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_clearBinds</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"value"</font><font color="#990000">,</font><font color="#993399">5</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_clearBinds</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"value"</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <br/><a name="fields"/><h2>Accessing Fields in the Result Set</h2>
 
@@ -216,6 +469,35 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 sqlrcur_getFieldByIndex() functions are useful for processing result sets.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">int</font>        row<font color="#990000">,</font>col<font color="#990000">;</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> row<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_rowCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                        <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%s,"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>row<font color="#990000">,</font>col<font color="#990000">));</font>
+                <font color="#FF0000">}</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>The sqlrcur_getFieldByName() and sqlrcur_getFieldByIndex() functions return
 strings.  If you would like to get a field as a long or double, you can use
@@ -226,6 +508,36 @@ sqlrcur_getFieldAsDoubleByName()/sqlrcur_getFieldAsDoubleByIndex().</p>
 the fields in the row.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">int</font>        row<font color="#990000">,</font>col<font color="#990000">;</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> row<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_rowCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                <font color="#009900">char</font>    <font color="#990000">**</font>rowarray<font color="#990000">=</font><b><font color="#000000">sqlrcur_getRow</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>row<font color="#990000">);</font>
+                <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                        <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%s,"</font><font color="#990000">,</font>rowarray<font color="#990000">[</font>col<font color="#990000">]);</font>
+                <font color="#FF0000">}</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>The sqlrcur_getFieldByIndex(), sqlrcur_getFieldByName() and sqlrcur_getRow() 
 functions return NULL fields as empty strings.  If you would like them to come 
@@ -267,6 +579,56 @@ the number of rows returned so far.  The sqlrcur_firstRowIndex() function return
 the index of the first row of the currently buffered chunk.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">int</font>     done<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+        <font color="#009900">int</font>     row<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+        <font color="#009900">int</font>     col<font color="#990000">;</font>
+        <font color="#009900">char</font>    <font color="#990000">*</font>field<font color="#990000">;</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_setResultSetBufferSize</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">5</font><font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+
+        <b><font color="#0000FF">while</font></b> <font color="#990000">(!</font>done<font color="#990000">)</font> <font color="#FF0000">{</font>
+                <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                        <b><font color="#0000FF">if</font></b> <font color="#990000">(</font>field<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>row<font color="#990000">,</font>col<font color="#990000">))</font> <font color="#FF0000">{</font>
+                                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%s,"</font><font color="#990000">,</font>field<font color="#990000">);</font>
+                        <font color="#FF0000">}</font> <b><font color="#0000FF">else</font></b> <font color="#FF0000">{</font>
+                                done<font color="#990000">=</font><font color="#993399">1</font><font color="#990000">;</font>
+                        <font color="#FF0000">}</font>
+                <font color="#FF0000">}</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+                row<font color="#990000">++;</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_other_table"</font><font color="#990000">);</font>
+
+        <font color="#990000">...</font> process <font color="#008080">this</font> query<font color="#FF0000">'s result set in chunks also ...</font>
+
+<font color="#FF0000">        sqlrcur_setResultSetBufferSize(cur,0);</font>
+
+<font color="#FF0000">        sqlrcur_sendQuery(cur,"select * from my_third_table");</font>
+
+<font color="#FF0000">        ... process this query'</font>s result set all <font color="#008080">at</font> once <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <a name="cursors"/><h2>Cursors</h2>
 
@@ -278,6 +640,41 @@ iterate through its result set, inserting rows into another table, using only
 <p>For example:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">;</font>
+        <font color="#008080">sqlrcur</font>      cursor1<font color="#990000">;</font>
+        <font color="#008080">sqlrcur</font>      cursor2<font color="#990000">;</font>
+        <font color="#009900">int</font>          index<font color="#990000">;</font>
+
+        con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        cursor1<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+        cursor2<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_setResultSetBufferSize</font></b><font color="#990000">(</font>cursor1<font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cursor1<font color="#990000">,</font><font color="#FF0000">"select * from my_huge_table"</font><font color="#990000">);</font>
+
+        index<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
+        <b><font color="#0000FF">while</font></b> <font color="#990000">(!</font><b><font color="#000000">sqlrcur_endOfResultSet</font></b><font color="#990000">(</font>cursor1<font color="#990000">))</font> <font color="#FF0000">{</font>
+                <b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cursor2<font color="#990000">,</font><font color="#FF0000">"insert into my_other_table values (:1,:2,:3)"</font><font color="#990000">);</font>
+                <b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cursor2<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cursor1<font color="#990000">,</font>index<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">));</font>
+                <b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cursor2<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cursor1<font color="#990000">,</font>index<font color="#990000">,</font><font color="#993399">2</font><font color="#990000">));</font>
+                <b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cursor2<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cursor1<font color="#990000">,</font>index<font color="#990000">,</font><font color="#993399">3</font><font color="#990000">));</font>
+                <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cursor2<font color="#990000">);</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cursor2<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cursor1<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>If you are using stored procedures with Oracle, a stored
 procedure can execute a query and return a cursor.  A cursor bind variable can
@@ -286,6 +683,42 @@ cursor.  All of this can be accomplished using defineOutputBindCursor(),
 getOutputBindCursor() and fetchFromOutputBindCursor().</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">int</font>        i<font color="#990000">,</font>j<font color="#990000">;</font>
+
+        <font color="#008080">sqlrcon</font>         con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>         cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"begin  :curs:=sp_mytable; end;"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_defineOutputBindCursor</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"curs"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <font color="#008080">sqlrcur</font>         bindcur<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindCursor</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"curs"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_fetchFromBindCursor</font></b><font color="#990000">(</font>bindcur<font color="#990000">);</font>
+
+        <i><font color="#9A1900">// print fields from table</font></i>
+        <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> i<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_rowCount</font></b><font color="#990000">(</font>bindcur<font color="#990000">);</font> i<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>j<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> j<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>bindcur<font color="#990000">);</font> j<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                        <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%s,"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>bindcur<font color="#990000">,</font>i<font color="#990000">,</font>j<font color="#990000">));</font>
+                <font color="#FF0000">}</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>bindcur<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>The number of cursors simultaneously available per-connection is set at 
 compile time and defaults to 5.</p>
@@ -303,6 +736,46 @@ support these attributes.  If a database doesn't support an attribute, it is
 always returned as false.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">int</font>        i<font color="#990000">;</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> i<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> i<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Name:          %s</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnName</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Type:          %s</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnType</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Length:        %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnLength</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Precision:     %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnPrecision</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Scale:         %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnScale</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Longest Field: %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getLongest</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Nullable:      %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnIsNullable</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Primary Key:   %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnIsPrimaryKey</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Unique:        %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnIsUnique</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Part of Key:   %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnIsPartOfKey</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Unsigned:      %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnIsUnsigned</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Zero Filled:   %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnIsZeroFilled</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Binary:        %d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnIsBinary</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Auth Increment:%d</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnIsAutoIncrement</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>Some databases force column names to upper case, others force column names
 to lower case, and others still support mixed-case column names.  Sometimes,
@@ -313,6 +786,52 @@ cause column names to be returned in the same case as they are defined in the
 database.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">int</font>        i<font color="#990000">;</font>
+
+        <font color="#008080">sqlrcon</font>         con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>         cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <i><font color="#9A1900">// column names will be forced to upper case</font></i>
+        <b><font color="#000000">sqlrcur_upperCaseColumnNames</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_endQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> i<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> i<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Name:   %s</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnName</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+        <font color="#FF0000">}</font>
+
+        <i><font color="#9A1900">// column names will be forced to lower case</font></i>
+        <b><font color="#000000">sqlrcur_lowerCaseColumnNames</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_endQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> i<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> i<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Name:   %s</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnName</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+        <font color="#FF0000">}</font>
+
+        <i><font color="#9A1900">// column names will be the same as they are in the database</font></i>
+        <b><font color="#000000">sqlrcur_mixedCaseColumnNames</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_endQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> i<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> i<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"Name:   %s</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getColumnName</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>i<font color="#990000">));</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <br/><a name="storedprocedures"/><h2>Stored Procedures</h2>
 
@@ -347,92 +866,260 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> is
+begin
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"begin testproc(:in1,:in2,:in3); end;"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
+begin
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
+        suspend<font color="#990000">;</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <h4>DB2</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
+begin
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">void</font> as <font color="#FF0000">'</font>
+<font color="#FF0000">begin</font>
+<font color="#FF0000">        insert into mytable values ($1,$2,$3);</font>
+<font color="#FF0000">        return;</font>
+<font color="#FF0000">end;'</font> language plpgsql
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select testfunc($1,$2,$3)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+</tt></pre>
+
 </blockquote>
 <h4>MySQL</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+begin
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h3>Single Values</h3>
 
@@ -451,15 +1138,44 @@ Oracle calls these functions.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> returns number is
+begin
+        <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select testproc(:in1,:in2,:in3) from dual"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <p>Here is an example where the value is returned through an output
 parameter.</p>
@@ -467,15 +1183,45 @@ parameter.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">)</font> as
+begin
+        out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"begin testproc(:in1,:in2,:in3,:out1); end;"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">int64_t</font>    result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
@@ -486,26 +1232,73 @@ itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
+        select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">)</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">int64_t</font>    result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using an output bind variable.  Note that in Firebird, input and
@@ -514,10 +1307,30 @@ output bind variable is 1 rather than 4, even though there were 3 input bind
 variables.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">int64_t</font>    result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>DB2</h4>
 
@@ -527,30 +1340,95 @@ than as return values of the procedure itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> language sql
+begin
+        <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
+end
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"call testproc(?,?,?,?)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"4"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">int64_t</font>    result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"4"</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">int</font> as <font color="#FF0000">'</font>
+<font color="#FF0000">declare</font>
+<font color="#FF0000">        in1 int;</font>
+<font color="#FF0000">        in2 float;</font>
+<font color="#FF0000">        in3 char(20);</font>
+<font color="#FF0000">begin</font>
+<font color="#FF0000">        in1:=$1;</font>
+<font color="#FF0000">        return;</font>
+<font color="#FF0000">end;</font>
+<font color="#FF0000">'</font> language plpgsql
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from testfunc(1,2,3)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+</tt></pre>
+
 </blockquote>
 <h4>MySQL</h4>
 
@@ -559,32 +1437,80 @@ following.</p>
 <p>To create the function, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the function from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select testfunc(?,?,?)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the function, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <p>A single value can be returned in the result set of a MySQL procedure.</p>
 
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execeute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select testproc()"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <p>A single value can be returned using the output variable of a MySQL
 procedure.</p>
@@ -592,15 +1518,39 @@ procedure.</p>
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execeute the procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"set @out1=0"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"call testproc(@out1)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select @out1"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>result<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h3>Multiple Values</h3>
 
@@ -618,41 +1568,138 @@ itself, but the rest must be returned through output parameters.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">,</font> out2 <font color="#008080">out</font> number<font color="#990000">,</font> out3 <font color="#008080">out</font> varchar2<font color="#990000">)</font> is
+begin
+        out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
+        out2<font color="#990000">:=</font>in2<font color="#990000">;</font>
+        out3<font color="#990000">:=</font>in3<font color="#990000">;</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out2"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out3"</font><font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">int64_t</font> out1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+<font color="#009900">double</font>  out2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out2"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out3"</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#008080">int</font> output<font color="#990000">,</font> @out2 <font color="#008080">int</font> output<font color="#990000">,</font> @out3 <font color="#009900">int</font> output as
+        select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">),</font>
+                @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">),</font>
+                @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">)</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out2"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out3"</font><font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">int64_t</font> out1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+<font color="#009900">double</font>  out2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out2"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"out3"</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>Firebird</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">,</font> <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
+begin
+        out1<font color="#990000">=</font>in1<font color="#990000">;</font>
+        out2<font color="#990000">=</font>in2<font color="#990000">;</font>
+        out3<font color="#990000">=</font>in3<font color="#990000">;</font>
+        suspend<font color="#990000">;</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
 using a output bind variables.  Note that in Firebird, input and
@@ -661,40 +1708,135 @@ first output bind variable is 1 rather than 4, even though there were 3 input
 bind variables.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">int64_t</font> out1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">);</font>
+<font color="#009900">double</font>  out2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>DB2</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">double</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
+begin
+        <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
+        <font color="#008080">set</font> out2 <font color="#990000">=</font> in2<font color="#990000">;</font>
+        <font color="#008080">set</font> out3 <font color="#990000">=</font> in3<font color="#990000">;</font>
+end
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"call testproc(?,?,?,?,?,?)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"4"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"5"</font><font color="#990000">);</font>
+sqlrcur_defineOutputBindString<font color="#990000">-(</font>cur<font color="#990000">,</font><font color="#FF0000">"6"</font><font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">int64_t</font> out1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindInteger</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"4"</font><font color="#990000">);</font>
+<font color="#009900">double</font>  out2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"5"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"6"</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>Postgresql</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">record</font> as <font color="#FF0000">'</font>
+<font color="#FF0000">declare</font>
+<font color="#FF0000">        output record;</font>
+<font color="#FF0000">begin</font>
+<font color="#FF0000">        select $1,$2,$3 into output;</font>
+<font color="#FF0000">        return output;</font>
+<font color="#FF0000">end;</font>
+<font color="#FF0000">'</font> language plpgsql
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from testfunc(1,2,3) as (col1 int, col2 float, col3 char(20))"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+</tt></pre>
+
 </blockquote>
 <h4>MySQL</h4>
 
@@ -704,17 +1846,45 @@ set of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindLong</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindDouble</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_inputBindString</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
 
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <p>Here's how you can get multiple values from the output variables
 of a MySQL procedure.</p>
@@ -722,15 +1892,41 @@ of a MySQL procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"set @out1=0, @out2=0.0, @out3=''"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"call testproc(@out1,@out3,@out3)"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select @out1,@out2,@out3"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out1<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out2<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>out3<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h3>Result Sets</h3>
 
@@ -743,30 +1939,98 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create or replace package types as
+        type cursorType is <font color="#008080">ref</font> cursor<font color="#990000">;</font>
+end<font color="#990000">;</font>
+
+create function testproc <font color="#008080">return</font> types<font color="#990000">.</font>cursortype is
+        <font color="#008080">l_cursor</font>    types<font color="#990000">.</font>cursorType<font color="#990000">;</font>
+begin
+        <font color="#008080">open</font> l_cursor <font color="#008080">for</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font>
+        <b><font color="#0000FF">return</font></b> l_cursor<font color="#990000">;</font>
+end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_prepareQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"begin  :curs:=testproc; end;"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_defineOutputBindCursor</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"curs"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_executeQuery</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+<font color="#008080">sqlrcur</font> bindcur<font color="#990000">=</font><b><font color="#000000">sqlrcur_getOutputBindCursor</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"curs"</font><font color="#990000">);</font>
+<b><font color="#000000">sqlrcur_fetchFromBindCursor</font></b><font color="#990000">(</font>bindcur<font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field00<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>bindcur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field01<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>bindcur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field02<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>bindcur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field10<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>bindcur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field11<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>bindcur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field12<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>bindcur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop function testproc
+drop package types
+</tt></pre>
+
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create procedure testproc <font color="#008080">as</font> select <font color="#990000">*</font> from testtable
+</tt></pre>
+
 </blockquote>
 <p>To exceute the stored procedure from an SQL Relay program, ue code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field00<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field01<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field02<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field10<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field11<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field12<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><h4>Firebird</h4>
 
@@ -786,15 +2050,50 @@ that return result sets.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">()</font> returns setof <font color="#008080">record</font> as <font color="#FF0000">'</font>
+<font color="#FF0000">        declare output record;</font>
+<font color="#FF0000">begin</font>
+<font color="#FF0000">        for output in select * from mytable loop</font>
+<font color="#FF0000">                return next output;</font>
+<font color="#FF0000">        end loop;</font>
+<font color="#FF0000">        return;</font>
+<font color="#FF0000">end;</font>
+<font color="#FF0000">'</font> language plpgsql
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from testfunc() as (testint int, testfloat float, testchar char(40))"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field00<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field01<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field02<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field10<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field11<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field12<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop function testfunc
+</tt></pre>
+
 </blockquote>
 <h4>MySQL</h4>
 
@@ -807,15 +2106,42 @@ currently SQL Relay can only fetch the first result set.</p>
 the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
+
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
 following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"call testproc()"</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field00<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field01<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field02<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field10<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field11<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#009900">char</font>    <font color="#990000">*</font>field12<font color="#990000">=</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
+
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>drop procedure testproc
+</tt></pre>
+
 </blockquote>
 <br/><a name="caching"/><h2>Caching The Result Set</h2>
 
@@ -828,46 +2154,164 @@ just open the file for each page of the report.</p>
 <p>First page:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">char</font>       <font color="#990000">*</font>filename<font color="#990000">;</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+	<font color="#990000">...</font> generate a unique <font color="#008080">file</font> name <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_cacheToFile</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>filename<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_setCacheTtl</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#993399">600</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_cacheOff</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <font color="#990000">...</font> pass the filename to the <font color="#008080">next</font> page <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>Second page:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">int</font>        row<font color="#990000">,</font>col<font color="#990000">;</font>
+
+        <font color="#990000">...</font> get the filename from the <font color="#008080">previous</font> page <font color="#990000">...</font>
+
+        <font color="#990000">...</font> get the page to display from the <font color="#008080">previous</font> page <font color="#990000">...</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_openCachedResultSet</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>filename<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>row<font color="#990000">=</font>pagetodisplay<font color="#990000">*</font><font color="#993399">20</font><font color="#990000">;</font> row<font color="#990000">&lt;(</font>pagetodisplay<font color="#990000">+</font><font color="#993399">1</font><font color="#990000">)*</font><font color="#993399">20</font><font color="#990000">;</font> row<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>col<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> col<font color="#990000">&lt;</font><b><font color="#000000">sqlrcur_colCount</font></b><font color="#990000">(</font>cur<font color="#990000">);</font> col<font color="#990000">++)</font> <font color="#FF0000">{</font>
+                        <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"%s,"</font><font color="#990000">,</font><b><font color="#000000">sqlrcur_getFieldByIndex</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>row<font color="#990000">,</font>col<font color="#990000">));</font>
+                <font color="#FF0000">}</font>
+                <b><font color="#000000">printf</font></b><font color="#990000">(</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
+        <font color="#FF0000">}</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>For result-set caching to be effective, the sqlr-cachemanager process must be enabled and running on the client system.  The sqlr-cachemanager scans the cache periodically and deletes cached result sets whos ttl's have expired.  If it is not running, stale result sets persist beyond their intended ttl's.</p>
 
 <p>To enable the sqlr-cachemanager at boot on systemd platforms:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>systemctl <font color="#008080">enable</font> sqlrcachemanager<font color="#990000">.</font>service</tt></pre>
+
 </blockquote>
 <p>To start the sqlr-cachemanager on systemd platforms:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>systemctl <font color="#008080">start</font> sqlrcachemanager<font color="#990000">.</font>service</tt></pre>
+
 </blockquote>
 <p>To enable the sqlr-cachemanager at boot on most non-systemd platforms, you must create a symlink into the /etc/rc2.d or /etc/rc3.d directory.  Eg:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>cd <font color="#990000">/</font>etc<font color="#990000">/</font>rc2<font color="#990000">.</font>d
+ln <font color="#990000">-</font>s <font color="#990000">../</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager S15sqlrcachemanager</tt></pre>
+
   <p>or</p>
+
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>cd <font color="#990000">/</font>etc<font color="#990000">/</font>rc3<font color="#990000">.</font>d
+ln <font color="#990000">-</font>s <font color="#990000">../</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager S15sqlrcachemanager</tt></pre>
 
 </blockquote>
 <p>To start the sqlr-cachemanager on most non-systemd platforms:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">/</font>etc<font color="#990000">/</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager start</tt></pre>
+
 </blockquote>
 <p>To enable the sqlr-cachemanager at boot on FreeBSD platforms, edit /etc/rc.conf and add a line like:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager_enable<font color="#990000">=</font>YES</tt></pre>
+
 </blockquote>
 <p>To enable the sqlr-cachemanager at boot on NetBSD platforms, edit /etc/rc.conf and add a line like:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager<font color="#990000">=</font>YES</tt></pre>
+
 </blockquote>
 <p>To enable the sqlr-cachemanager at boot on OpenBSD platforms, edit /etc/rc.conf and add a line like:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager_flags<font color="#990000">=</font>YES</tt></pre>
+
 </blockquote>
 <p>To start the sqlr-cachemanager on BSD platforms:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">/</font>etc<font color="#990000">/</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager start</tt></pre>
+
 </blockquote>
 <br/><a name="suspending"/><h2>Suspending and Resuming Sessions</h2>
 
@@ -878,10 +2322,64 @@ is possible.</p>
 <p>First page:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#009900">int</font>        port<font color="#990000">;</font>
+        <font color="#009900">char</font>       <font color="#990000">*</font>socket<font color="#990000">;</font>
+        <font color="#009900">int</font>        rs<font color="#990000">;</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"insert into my_table values (1,2,3)"</font><font color="#990000">);</font>
+	<b><font color="#000000">sqlrcur_suspendResultSet</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_suspendSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+	rs<font color="#990000">=</font><b><font color="#000000">sqlrcur_getResultSetId</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        port<font color="#990000">=</font><b><font color="#000000">getConnectionPort</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        socket<font color="#990000">=</font><b><font color="#000000">getConnectionSocket</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+
+        <font color="#990000">...</font> pass <font color="#008080">the</font> rs<font color="#990000">,</font> port and socket to the <font color="#008080">next</font> page <font color="#990000">...</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>Second page:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;sqlrelay/sqlrclientwrapper.h&gt;</font>
+<b><font color="#000080">#include</font></b> <font color="#FF0000">&lt;stdio.h&gt;</font>
+
+<b><font color="#000000">main</font></b><font color="#990000">()</font> <font color="#FF0000">{</font>
+
+        <font color="#990000">...</font> <font color="#008080">get</font> rs<font color="#990000">,</font> port and socket from <font color="#008080">previous</font> page <font color="#990000">...</font>
+
+        <font color="#008080">sqlrcon</font>      con<font color="#990000">=</font><b><font color="#000000">sqlrcon_alloc</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+        <font color="#008080">sqlrcur</font>      cur<font color="#990000">=</font><b><font color="#000000">sqlrcur_alloc</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcon_resumeSession</font></b><font color="#990000">(</font>con<font color="#990000">,</font>port<font color="#990000">,</font>socket<font color="#990000">);</font>
+	<b><font color="#000000">sqlrcur_resumeResultSet</font></b><font color="#990000">(</font>cur<font color="#990000">,</font>rs<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcur_sendQuery</font></b><font color="#990000">(</font>cur<font color="#990000">,</font><font color="#FF0000">"commit"</font><font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_endSession</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+
+        <b><font color="#000000">sqlrcur_free</font></b><font color="#990000">(</font>cur<font color="#990000">);</font>
+        <b><font color="#000000">sqlrcon_free</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
+<font color="#FF0000">}</font>
+</tt></pre>
+
 </blockquote>
 <p>You can also distribute the processing of a result set across a series of
 pages using suspended sessions.  If you're buffering a result set in chunks
