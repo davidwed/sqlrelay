@@ -1889,17 +1889,25 @@ bool odbccursor::outputBind(const char *variable,
 	outdatebind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
-	// This ought to bind an empty string, but instead it binds valuesize
-	// spaces (as if I was specifying SQL_CHAR instead of SQL_VARCHAR).
+	// HACK:
+	// Pass in an empty string, rather than the NULL that would be passed
+	// in if SQL_PARAM_OUTPUT were used.
+	//
+	// Most apps only use the output feature and don't care what is passed
+	// in.  Most of the rest of the apps want an empty string to be passed
+	// in.  The rest of the apps want a particular value, and they're out
+	// of luck anyway.  We'll pass in an empty string to satisfy the largest
+	// number of apps that we can.
+	//
+	// Ultimately, we need legitimate input/output bind support.
 	bytestring::zero(value,valuesize);
-	outisnull[pos-1]=valuesize;
+	outisnull[pos-1]=0;
 
 	erg=SQLBindParameter(stmt,
 				pos,
+				//SQL_PARAM_OUTPUT,
 				SQL_PARAM_INPUT_OUTPUT,
 				SQL_C_CHAR,
-				//SQL_CHAR,
-				//0,
 				SQL_VARCHAR,
 				valuesize,
 				0,
