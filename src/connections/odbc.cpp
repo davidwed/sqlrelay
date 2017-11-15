@@ -1889,12 +1889,19 @@ bool odbccursor::outputBind(const char *variable,
 	outdatebind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
+	// This ought to bind an empty string, but instead it binds valuesize
+	// spaces (as if I was specifying SQL_CHAR instead of SQL_VARCHAR).
+	bytestring::zero(value,valuesize);
+	outisnull[pos-1]=valuesize;
+
 	erg=SQLBindParameter(stmt,
 				pos,
-				SQL_PARAM_OUTPUT,
+				SQL_PARAM_INPUT_OUTPUT,
 				SQL_C_CHAR,
-				SQL_CHAR,
-				0,
+				//SQL_CHAR,
+				//0,
+				SQL_VARCHAR,
+				valuesize,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
