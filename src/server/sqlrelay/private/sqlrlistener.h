@@ -36,6 +36,8 @@
 					thread *thr);
 		void    errorClientSession(filedescriptor *clientsock,
 					int64_t errnum, const char *err);
+		bool	semWait(int32_t index, thread *thr,
+					bool withundo, bool *timeout);
 		bool	acquireShmAccess(thread *thr, bool *timeout);
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection(thread *thr,
@@ -72,7 +74,7 @@
 
 		void		setMaxListeners(uint32_t maxlisteners);
 		void		incrementMaxListenersErrors();
-		void		incrementConnectedClientCount();
+		void		incrementConnectedClientCount(thread *thr);
 		void		decrementConnectedClientCount();
 		uint32_t	incrementForkedListeners();
 		uint32_t	decrementForkedListeners();

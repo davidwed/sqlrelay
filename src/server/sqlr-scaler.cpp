@@ -573,9 +573,9 @@ bool scaler::openMoreConnections() {
 
 	// if we were signalled by the listener, signal
 	// the listener back so that it can keep going
-	if (waitresult) {
+	/*if (waitresult) {
 		semset->signal(7);
-	}
+	}*/
 
 	// do we need to open more connections?
 	if (connectedclients<currentconnections ||
