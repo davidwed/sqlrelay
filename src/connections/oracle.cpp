@@ -573,7 +573,6 @@ bool oracleconnection::tempTableTruncateBeforeDrop() {
 #endif
 
 bool oracleconnection::logIn(const char **error, const char **warning) {
-return false;
 
 	// get user/password
 	const char	*user=cont->getUser();
