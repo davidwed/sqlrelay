@@ -87,6 +87,9 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	setOutputBindCount(0);
 	pvt->_outbindvars=new sqlrserverbindvar[
 				conn->cont->getConfig()->getMaxBindCount()];
+	setInputOutputBindCount(0);
+	pvt->_inoutbindvars=new sqlrserverbindvar[
+				conn->cont->getConfig()->getMaxBindCount()];
 
 	pvt->_totalrowsfetched=0;
 
@@ -145,6 +148,7 @@ sqlrservercursor::~sqlrservercursor() {
 	delete pvt->_querytree;
 	delete[] pvt->_inbindvars;
 	delete[] pvt->_outbindvars;
+	delete[] pvt->_inoutbindvars;
 	delete pvt->_customquerycursor;
 	delete[] pvt->_error;
 	deallocateFieldPointers();

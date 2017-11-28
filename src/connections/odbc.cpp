@@ -201,11 +201,14 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
 		int16_t		**outisnullptr;
+		int16_t		**inoutisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
 		SQLLEN		*outisnull;
+		SQLLEN		*inoutisnull;
 		SQLLEN		sqlnulldata;
 		#else
 		SQLINTEGER	*outisnull;
+		SQLINTEGER	*inoutisnull;
 		SQLINTEGER	sqlnulldata;
 		#endif
 
@@ -1569,15 +1572,20 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	outdatebind=new datebind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
+	inoutisnullptr=new int16_t *[maxbindcount];
 	#ifdef SQLBINDPARAMETER_SQLLEN
 	outisnull=new SQLLEN[maxbindcount];
+	inoutisnull=new SQLLEN[maxbindcount];
 	#else
 	outisnull=new SQLINTEGER[maxbindcount];
+	inoutisnull=new SQLINTEGER[maxbindcount];
 	#endif
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
+		inoutisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
@@ -1588,7 +1596,9 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 odbccursor::~odbccursor() {
 	delete[] outdatebind;
 	delete[] outisnullptr;
+	delete[] inoutisnullptr;
 	delete[] outisnull;
+	delete[] inoutisnull;
 	deallocateResultSetBuffers();
 }
 
@@ -1632,6 +1642,7 @@ void odbccursor::deallocateResultSetBuffers() {
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
+stdoutput.printf("prepare: %s\n",query);
 
 	// initialize column count
 	initializeColCounts();
@@ -1885,6 +1896,7 @@ bool odbccursor::outputBind(const char *variable,
 				char *value, 
 				uint32_t valuesize, 
 				int16_t *isnull) {
+stdoutput.printf("outputBind(%s)\n",variable);
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
@@ -1894,23 +1906,8 @@ bool odbccursor::outputBind(const char *variable,
 	outdatebind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
-	// HACK:
-	// Pass in an empty string, rather than the NULL that would be passed
-	// in if SQL_PARAM_OUTPUT were used.
-	//
-	// Most apps only use the output feature and don't care what is passed
-	// in.  Most of the rest of the apps want an empty string to be passed
-	// in.  The rest of the apps want a particular value, and they're out
-	// of luck anyway.  We'll pass in an empty string to satisfy the largest
-	// number of apps that we can.
-	//
-	// Ultimately, we need legitimate input/output bind support.
-	bytestring::zero(value,valuesize);
-	outisnull[pos-1]=0;
-
 	erg=SQLBindParameter(stmt,
 				pos,
-				//SQL_PARAM_OUTPUT,
 				SQL_PARAM_INPUT_OUTPUT,
 				SQL_C_CHAR,
 				SQL_VARCHAR,
@@ -2032,16 +2029,25 @@ bool odbccursor::inputOutputBind(const char *variable,
 				char *value, 
 				uint32_t valuesize, 
 				int16_t *isnull) {
+stdoutput.printf("inputOutputBind(%s)\n",variable);
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		return false;
 	}
 
-	outdatebind[pos-1]=NULL;
-	outisnullptr[pos-1]=isnull;
+	//outdatebind[pos-1]=NULL;
+	inoutisnullptr[pos-1]=isnull;
 
-	outisnull[pos-1]=charstring::length(value);
+	uint32_t i=0;
+	do {
+		if (value[i]=='\0') {
+			break;
+		}
+		i++;
+	} while (i<valuesize);
+stdoutput.printf("input/output bind: %d,%d\n",valuesize,i);
+	inoutisnull[pos-1]=i;
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -2052,7 +2058,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
-				&(outisnull[pos-1]));
+				&(inoutisnull[pos-1]));
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2069,6 +2075,7 @@ bool odbccursor::bindValueIsNull(uint16_t isnull) {
 }
 
 bool odbccursor::executeQuery(const char *query, uint32_t length) {
+stdoutput.printf("execute...\n");
 
 	// initialize counts
 	initializeRowCounts();
@@ -2115,6 +2122,11 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		}
 		if (outisnullptr[i]) {
 			*(outisnullptr[i])=outisnull[i];
+		}
+	}
+	for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+		if (inoutisnullptr[i]) {
+			*(inoutisnullptr[i])=inoutisnull[i];
 		}
 	}
 
@@ -2653,6 +2665,8 @@ void odbccursor::closeResultSet() {
 		outdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutisnullptr[i]=NULL;
+		inoutisnull[i]=0;
 	}
 
 	if (!conn->cont->getMaxColumnCount()) {

@@ -2967,10 +2967,11 @@ void sqlrcursor::sendInputOutputBinds() {
 			(*pvt->_inoutbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_NULL) {
 			pvt->_cs->write((*pvt->_inoutbindvars)[i].valuesize);
-			if ((*pvt->_inbindvars)[i].valuesize>0) {
+			if ((*pvt->_inoutbindvars)[i].valuesize>0) {
 				pvt->_cs->write(
-					(*pvt->_inbindvars)[i].value.stringval,
-					(size_t)(*pvt->_inbindvars)[i].
+					(*pvt->_inoutbindvars)[i].
+							value.stringval,
+					(size_t)(*pvt->_inoutbindvars)[i].
 								valuesize);
 			}
 		}
@@ -3013,6 +3014,9 @@ void sqlrcursor::sendInputOutputBinds() {
 						SQLRCLIENTBINDVARTYPE_CLOB ||
 				(*pvt->_inoutbindvars)[i].type==
 						SQLRCLIENTBINDVARTYPE_NULL) {
+				pvt->_sqlrc->debugPrint("=");
+				pvt->_sqlrc->debugPrint(
+					(*pvt->_inbindvars)[i].value.stringval);
 				pvt->_sqlrc->debugPrint("(");
 				pvt->_sqlrc->debugPrint((int64_t)
 					(*pvt->_inoutbindvars)[i].valuesize);

@@ -10022,6 +10022,7 @@ static SQLRETURN SQLR_InputOutputBindParameter(
 		case SQL_C_CHAR:
 		case SQL_C_BIT:
 			debugPrintf("  valuetype: SQL_C_CHAR/SQL_C_BIT\n");
+			debugPrintf("  value: \"%s\"\n",parametervalue);
 			stmt->cur->defineInputOutputBindString(parametername,
 						(const char *)parametervalue,
 								bufferlength);

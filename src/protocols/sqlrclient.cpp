@@ -1808,6 +1808,7 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
 			return false;
 		}
+stdoutput.printf("variable: %s\n",bv->variable);
 
 		// get the size of the value
 		if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
@@ -1825,9 +1826,11 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 							bv->valuesize+1);
 
 			// get the bind value
+stdoutput.printf("reading...\n");
 			ssize_t	result=clientsock->read(bv->value.stringval,
 							bv->valuesize,
 							idleclienttimeout,0);
+stdoutput.printf("done reading\n");
 			if ((uint32_t)result!=(uint32_t)(bv->valuesize)) {
 				bv->value.stringval[0]='\0';
 				const char	*info="get binds failed: "
