@@ -410,6 +410,30 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		closeLobOutputBind(sqlrservercursor *cursor,
 								uint16_t index);
 
+		// input/output bind variables
+		void		setInputOutputBindCount(
+						sqlrservercursor *cursor,
+						uint16_t inoutbindcount);
+		uint16_t	getInputOutputBindCount(
+						sqlrservercursor *cursor);
+		sqlrserverbindvar	*getInputOutputBinds(
+						sqlrservercursor *cursor);
+		bool		getLobInputOutputBindLength(
+						sqlrservercursor *cursor,
+						uint16_t index,
+						uint64_t *length);
+		bool		getLobInputOutputBindSegment(
+						sqlrservercursor *cursor,
+						uint16_t index,
+						char *buffer,
+						uint64_t buffersize,
+						uint64_t offset,
+						uint64_t charstoread,
+						uint64_t *charsread);
+		void		closeLobInputOutputBind(
+						sqlrservercursor *cursor,
+						uint16_t index);
+
 		// custom queries
 		bool		isCustomQuery(sqlrservercursor *cursor);
 		sqlrservercursor	*useCustomQueryCursor(
@@ -957,6 +981,52 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 							uint64_t charstoread,
 							uint64_t *charsread);
 		virtual void	closeLobOutputBind(uint16_t index);
+		virtual	bool	inputOutputBind(const char *variable, 
+						uint16_t variablesize,
+						char *value,
+						uint32_t valuesize,
+						int16_t *isnull);
+		virtual	bool	inputOutputBind(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		virtual	bool	inputOutputBind(const char *variable, 
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
+		virtual bool	inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						int32_t *microsecond,
+						const char **tz,
+						bool *isnegative,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
+		virtual	bool	inputOutputBindBlob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
+		virtual	bool	inputOutputBindClob(const char *variable, 
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull);
+		virtual bool	getLobInputOutputBindLength(uint16_t index,
+							uint64_t *length);
+		virtual bool	getLobInputOutputBindSegment(uint16_t index,
+							char *buffer,
+							uint64_t buffersize,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread);
+		virtual void	closeLobInputOutputBind(uint16_t index);
 		virtual void	checkForTempTable(const char *query,
 							uint32_t length);
 		virtual	const char	*truncateTableQuery();
@@ -1024,13 +1094,20 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 
 		bool		fakeInputBinds();
 
-		void		setInputBindCount(uint16_t inbindcount);
+		void		setInputBindCount(
+					uint16_t inbindcount);
 		uint16_t	getInputBindCount();
 		sqlrserverbindvar	*getInputBinds();
 
-		void		setOutputBindCount(uint16_t outbindcount);
+		void		setOutputBindCount(
+					uint16_t outbindcount);
 		uint16_t	getOutputBindCount();
 		sqlrserverbindvar	*getOutputBinds();
+
+		void		setInputOutputBindCount(
+					uint16_t inoutbindcount);
+		uint16_t	getInputOutputBindCount();
+		sqlrserverbindvar	*getInputOutputBinds();
 
 		void	performSubstitution(stringbuffer *buffer,
 							int16_t index);

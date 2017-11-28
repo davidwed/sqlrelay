@@ -6436,28 +6436,6 @@ bool sqlrservercontroller::isCustomQuery(sqlrservercursor *cursor) {
 	return cursor->isCustomQuery();
 }
 
-bool sqlrservercontroller::getLobOutputBindLength(sqlrservercursor *cursor,
-							uint16_t index,
-							uint64_t *length) {
-	return cursor->getLobOutputBindLength(index,length);
-}
-
-bool sqlrservercontroller::getLobOutputBindSegment(sqlrservercursor *cursor,
-							uint16_t index,
-							char *buffer,
-							uint64_t buffersize,
-							uint64_t offset,
-							uint64_t charstoread,
-							uint64_t *charsread) {
-	return cursor->getLobOutputBindSegment(index,buffer,buffersize,
-						offset,charstoread,charsread);
-}
-
-void sqlrservercontroller::closeLobOutputBind(sqlrservercursor *cursor,
-							uint16_t index) {
-	cursor->closeLobOutputBind(index);
-}
-
 bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 
 	// set state
@@ -6776,7 +6754,8 @@ uint16_t sqlrservercontroller::getInputBindCount(sqlrservercursor *cursor) {
 	return cursor->getInputBindCount();
 }
 
-sqlrserverbindvar *sqlrservercontroller::getInputBinds(sqlrservercursor *cursor) {
+sqlrserverbindvar *sqlrservercontroller::getInputBinds(
+						sqlrservercursor *cursor) {
 	return cursor->getInputBinds();
 }
 
@@ -6789,8 +6768,70 @@ uint16_t sqlrservercontroller::getOutputBindCount(sqlrservercursor *cursor) {
 	return cursor->getOutputBindCount();
 }
 
-sqlrserverbindvar *sqlrservercontroller::getOutputBinds(sqlrservercursor *cursor) {
+sqlrserverbindvar *sqlrservercontroller::getOutputBinds(
+						sqlrservercursor *cursor) {
 	return cursor->getOutputBinds();
+}
+
+bool sqlrservercontroller::getLobOutputBindLength(sqlrservercursor *cursor,
+							uint16_t index,
+							uint64_t *length) {
+	return cursor->getLobOutputBindLength(index,length);
+}
+
+bool sqlrservercontroller::getLobOutputBindSegment(sqlrservercursor *cursor,
+							uint16_t index,
+							char *buffer,
+							uint64_t buffersize,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread) {
+	return cursor->getLobOutputBindSegment(index,buffer,buffersize,
+						offset,charstoread,charsread);
+}
+
+void sqlrservercontroller::closeLobOutputBind(sqlrservercursor *cursor,
+							uint16_t index) {
+	cursor->closeLobOutputBind(index);
+}
+
+void sqlrservercontroller::setInputOutputBindCount(sqlrservercursor *cursor,
+						uint16_t outbindcount) {
+	cursor->setInputOutputBindCount(outbindcount);
+}
+
+uint16_t sqlrservercontroller::getInputOutputBindCount(
+						sqlrservercursor *cursor) {
+	return cursor->getInputOutputBindCount();
+}
+
+sqlrserverbindvar *sqlrservercontroller::getInputOutputBinds(
+						sqlrservercursor *cursor) {
+	return cursor->getInputOutputBinds();
+}
+
+bool sqlrservercontroller::getLobInputOutputBindLength(
+						sqlrservercursor *cursor,
+						uint16_t index,
+						uint64_t *length) {
+	return cursor->getLobInputOutputBindLength(index,length);
+}
+
+bool sqlrservercontroller::getLobInputOutputBindSegment(
+						sqlrservercursor *cursor,
+						uint16_t index,
+						char *buffer,
+						uint64_t buffersize,
+						uint64_t offset,
+						uint64_t charstoread,
+						uint64_t *charsread) {
+	return cursor->getLobInputOutputBindSegment(index,buffer,buffersize,
+						offset,charstoread,charsread);
+}
+
+void sqlrservercontroller::closeLobInputOutputBind(sqlrservercursor *cursor,
+							uint16_t index) {
+	cursor->closeLobInputOutputBind(index);
 }
 
 bool sqlrservercontroller::open(sqlrservercursor *cursor) {

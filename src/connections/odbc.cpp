@@ -134,6 +134,11 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
+		bool		inputOutputBind(const char *variable, 
+						uint16_t variablesize,
+						char *value, 
+						uint32_t valuesize,
+						int16_t *isnull);
 		int16_t		nonNullBindValue();
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(uint16_t isnull);
@@ -2018,6 +2023,35 @@ bool odbccursor::outputBind(const char *variable,
 				0,
 				buffer,
 				0,
+				&(outisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputOutputBind(const char *variable, 
+				uint16_t variablesize,
+				char *value, 
+				uint32_t valuesize, 
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	outdatebind[pos-1]=NULL;
+	outisnullptr[pos-1]=isnull;
+
+	outisnull[pos-1]=charstring::length(value);
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_CHAR,
+				SQL_VARCHAR,
+				valuesize,
+				0,
+				(SQLPOINTER)value,
+				valuesize,
 				&(outisnull[pos-1]));
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }

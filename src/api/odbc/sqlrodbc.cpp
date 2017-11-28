@@ -9936,6 +9936,191 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 					SQLSMALLINT parameterscale,
 					SQLPOINTER parametervalue,
 					SQLLEN bufferlength,
+					SQLLEN *strlen_or_ind);
+
+static SQLRETURN SQLR_InputOutputBindParameter(
+					SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT valuetype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN bufferlength,
+					SQLLEN *strlen_or_ind) {
+	debugFunction();
+
+	// FIXME:
+	// Currently, SQL Relay only supports string input/output binds.
+	// Handle various other types as output binds for now.
+	switch (valuetype) {
+		case SQL_C_LONG:
+		case SQL_C_SBIGINT:
+		case SQL_C_UBIGINT:
+		case SQL_C_SHORT:
+		case SQL_C_TINYINT:
+		case SQL_C_SLONG:
+		case SQL_C_SSHORT:
+		case SQL_C_STINYINT:
+		//case SQL_C_BOOKMARK:
+		//	(dup of SQL_C_ULONG)
+		case SQL_C_ULONG:
+		case SQL_C_USHORT:
+		case SQL_C_UTINYINT:
+		case SQL_C_FLOAT:
+		case SQL_C_DOUBLE:
+		case SQL_C_DATE:
+		case SQL_C_TYPE_DATE:
+		case SQL_C_TIME:
+		case SQL_C_TYPE_TIME:
+		case SQL_C_TIMESTAMP:
+		case SQL_C_TYPE_TIMESTAMP:
+		//case SQL_C_VARBOOKMARK:
+		//	(dup of SQL_C_BINARY)
+		case SQL_C_BINARY:
+			return SQLR_OutputBindParameter(
+					statementhandle,
+					parameternumber,
+					valuetype,
+					lengthprecision,
+					parameterscale,
+					parametervalue,
+					bufferlength,
+					strlen_or_ind);
+	}
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("  NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	SQLRETURN	retval=SQL_SUCCESS;
+
+	// convert parameternumber to a string
+	char	*parametername=charstring::parseNumber(parameternumber);
+
+	debugPrintf("  parametername: %s\n",parametername);
+	debugPrintf("  parameternumber: %d\n",parameternumber);
+	debugPrintf("  valuetype: %d\n",valuetype);
+	debugPrintf("  lengthprecision: %lld\n",(uint64_t)lengthprecision);
+	debugPrintf("  parameterscale: %d\n",parameterscale);
+	debugPrintf("  bufferlength: %lld\n",(uint64_t)bufferlength);
+	debugPrintf("  strlen_or_ind: %lld\n",(uint64_t)strlen_or_ind);
+
+	// store the output bind for later
+	outputbind	*ob=new outputbind;
+	ob->parameternumber=parameternumber;
+	ob->valuetype=valuetype;
+	ob->lengthprecision=lengthprecision;
+	ob->parameterscale=parameterscale;
+	ob->parametervalue=parametervalue;
+	ob->bufferlength=bufferlength;
+	ob->strlen_or_ind=strlen_or_ind;
+	stmt->outputbinds.setValue(parameternumber,ob);
+
+	switch (valuetype) {
+		case SQL_C_CHAR:
+		case SQL_C_BIT:
+			debugPrintf("  valuetype: SQL_C_CHAR/SQL_C_BIT\n");
+			stmt->cur->defineInputOutputBindString(parametername,
+						(const char *)parametervalue,
+								bufferlength);
+			break;
+		case SQL_C_LONG:
+		case SQL_C_SBIGINT:
+		case SQL_C_UBIGINT:
+		case SQL_C_SHORT:
+		case SQL_C_TINYINT:
+		case SQL_C_SLONG:
+		case SQL_C_SSHORT:
+		case SQL_C_STINYINT:
+		//case SQL_C_BOOKMARK:
+		//	(dup of SQL_C_ULONG)
+		case SQL_C_ULONG:
+		case SQL_C_USHORT:
+		case SQL_C_UTINYINT:
+			debugPrintf("  valuetype: SQL_C_(INT of some kind)\n");
+			//stmt->cur->defineInputOutputBindInteger(parametername);
+			break;
+		case SQL_C_FLOAT:
+		case SQL_C_DOUBLE:
+			debugPrintf("  valuetype: SQL_C_FLOAT/SQL_C_DOUBLE\n");
+			//stmt->cur->defineInputOutputBindDouble(parametername);
+			break;
+		case SQL_C_NUMERIC:
+			debugPrintf("  valuetype: SQL_C_NUMERIC\n");
+			// bind as a string, the result will be parsed
+			stmt->cur->defineInputOutputBindString(parametername,
+						(const char *)parametervalue,
+								128);
+			break;
+		case SQL_C_DATE:
+		case SQL_C_TYPE_DATE:
+			debugPrintf("  valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
+			//stmt->cur->defineInputOutputBindDate(parametername);
+			break;
+		case SQL_C_TIME:
+		case SQL_C_TYPE_TIME:
+			debugPrintf("  valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
+			//stmt->cur->defineInputOutputBindDate(parametername);
+			break;
+		case SQL_C_TIMESTAMP:
+		case SQL_C_TYPE_TIMESTAMP:
+			debugPrintf("  valuetype: "
+				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
+			//stmt->cur->defineInputOutputBindDate(parametername);
+			break;
+		case SQL_C_INTERVAL_YEAR:
+		case SQL_C_INTERVAL_MONTH:
+		case SQL_C_INTERVAL_DAY:
+		case SQL_C_INTERVAL_HOUR:
+		case SQL_C_INTERVAL_MINUTE:
+		case SQL_C_INTERVAL_SECOND:
+		case SQL_C_INTERVAL_YEAR_TO_MONTH:
+		case SQL_C_INTERVAL_DAY_TO_HOUR:
+		case SQL_C_INTERVAL_DAY_TO_MINUTE:
+		case SQL_C_INTERVAL_DAY_TO_SECOND:
+		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+		case SQL_C_INTERVAL_HOUR_TO_SECOND:
+		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+			debugPrintf("  valuetype: SQL_C_INTERVAL_XXX\n");
+			// bind as a string, the result will be parsed
+			stmt->cur->defineInputOutputBindString(parametername,
+						(const char *)parametervalue,
+								128);
+			break;
+		//case SQL_C_VARBOOKMARK:
+		//	(dup of SQL_C_BINARY)
+		case SQL_C_BINARY:
+			debugPrintf("  valuetype: "
+				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
+			//stmt->cur->defineInputOutputBindBlob(parametername);
+			break;
+		case SQL_C_GUID:
+			debugPrintf("  valuetype: SQL_C_GUID\n");
+			// bind as a string, the result will be parsed
+			stmt->cur->defineInputOutputBindString(parametername,
+						(const char *)parametervalue,
+								128);
+			break;
+		default:
+			debugPrintf("  invalid valuetype\n");
+			retval=SQL_ERROR;
+			break;
+	}
+
+	delete[] parametername;
+
+	return retval;
+}
+
+static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT valuetype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN bufferlength,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
 
@@ -10092,11 +10277,7 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 		case SQL_PARAM_INPUT_OUTPUT:
 			debugPrintf("  inputoutputtype: "
 						"SQL_PARAM_INPUT_OUTPUT\n");
-			// FIXME: SQL Relay doesn't currently support in/out
-			// params, and some apps pass output params as in/out.
-			// So, for now we'll just pass an in/out param as an
-			// out param.
-			return SQLR_OutputBindParameter(statementhandle,
+			return SQLR_InputOutputBindParameter(statementhandle,
 							parameternumber,
 							valuetype,
 							lengthprecision,
