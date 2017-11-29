@@ -1336,6 +1336,7 @@ void sqlrcursor::deleteVariables() {
 	deleteSubstitutionVariables();
 	deleteInputBindVariables();
 	deleteOutputBindVariables();
+	deleteInputOutputBindVariables();
 }
 
 void sqlrcursor::deleteSubstitutionVariables() {
@@ -1914,7 +1915,7 @@ const char *sqlrcursor::getOutputBindString(const char *variable) {
 				(*pvt->_outbindvars)[i].variable,variable) &&
 				((*pvt->_outbindvars)[i].type==
 						SQLRCLIENTBINDVARTYPE_STRING ||
-				(*pvt->_inoutbindvars)[i].type==
+				(*pvt->_outbindvars)[i].type==
 						SQLRCLIENTBINDVARTYPE_NULL)) {
 				return (*pvt->_outbindvars)[i].value.stringval;
 			}
@@ -3013,6 +3014,9 @@ void sqlrcursor::sendInputOutputBinds() {
 					break;
 				case SQLRCLIENTBINDVARTYPE_CLOB:
 					bindtype="(CLOB)";
+					break;
+				case SQLRCLIENTBINDVARTYPE_CURSOR:
+					bindtype="(CURSOR)";
 					break;
 			}
 			pvt->_sqlrc->debugPrint(bindtype);

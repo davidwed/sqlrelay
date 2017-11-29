@@ -2586,14 +2586,9 @@ void sqlrprotocol_sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 	}
 
 	// run through the output bind values, sending them back
-	// FIXME: inefficient
-	//for (uint16_t i=0; i<cont->getOutputBindCount(cursor); i++) {
-	for (uint16_t i=0; i<maxbindcount; i++) {
+	for (uint16_t i=0; i<cont->getOutputBindCount(cursor); i++) {
 
 		sqlrserverbindvar	*bv=&(cont->getOutputBinds(cursor)[i]);
-		if (!bv) {
-			continue;
-		}
 
 		if (cont->logEnabled() || cont->notificationsEnabled()) {
 			debugstr.clear();
@@ -2825,15 +2820,10 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 	}
 
 	// run through the input/output bind values, sending them back
-	// FIXME: inefficient
-	//for (uint16_t i=0; i<cont->getInputOutputBindCount(cursor); i++) {
-	for (uint16_t i=0; i<maxbindcount; i++) {
+	for (uint16_t i=0; i<cont->getInputOutputBindCount(cursor); i++) {
 
 		sqlrserverbindvar	*bv=
 				&(cont->getInputOutputBinds(cursor)[i]);
-		if (!bv) {
-			continue;
-		}
 
 		if (cont->logEnabled() || cont->notificationsEnabled()) {
 			debugstr.clear();
