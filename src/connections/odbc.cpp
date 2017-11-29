@@ -1680,6 +1680,7 @@ bool odbccursor::allocateStatementHandle() {
 		#else
 		SQLFreeStmt(stmt,SQL_DROP);
 		#endif
+		stmt=NULL;
 	}
 
 	#if (ODBCVER >= 0x0300)
@@ -2651,7 +2652,9 @@ bool odbccursor::getLobFieldSegment(uint32_t col,
 }
 
 void odbccursor::closeResultSet() {
-	//SQLCloseCursor(stmt);
+	if (stmt) {
+		SQLCloseCursor(stmt);
+	}
 
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
