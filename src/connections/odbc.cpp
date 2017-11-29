@@ -3126,7 +3126,8 @@ void odbccursor::closeResultSet() {
 	 * SQLExecute().
 	 * George Carrette suggests wrapping it in the "if (stmt)".  I think I
 	 * tried that before too, but I'm not sure.
-	 * For now this is commented out, but it needs to be revisited. */
+	 * For now this is commented out, but it needs to be revisited.
+	 * Intellisoft's version has this uncommented, and it appears to work.*/
 	/*if (stmt) {
 		SQLCloseCursor(stmt);
 		// The msdn.microsoft.com documentation says that this call
