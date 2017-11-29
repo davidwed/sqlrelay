@@ -3463,6 +3463,77 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 			}
 		}
 	}
+
+	for (int16_t inout=0;
+		inout<cursor->getInputOutputBindCount(); inout++) {
+
+		bind=&cursor->getInputOutputBinds()[inout];
+
+		// bind the value to the variable
+		if (bind->type==SQLRSERVERBINDVARTYPE_STRING ||
+				bind->type==SQLRSERVERBINDVARTYPE_NULL) {
+			if (!cursor->inputOutputBind(
+					bind->variable,
+					bind->variablesize,
+					bind->value.stringval,
+					bind->valuesize+1,
+					&bind->isnull)) {
+				return false;
+			}
+		}
+		// FIXME: implement this
+		/*else if (bind->type==SQLRSERVERBINDVARTYPE_INTEGER) {
+			if (!cursor->outputBind(
+					bind->variable,
+					bind->variablesize,
+					&bind->value.integerval,
+					&bind->isnull)) {
+				return false;
+			}
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
+			if (!cursor->outputBind(
+					bind->variable,
+					bind->variablesize,
+					&bind->value.doubleval.value,
+					&bind->value.doubleval.precision,
+					&bind->value.doubleval.scale,
+					&bind->isnull)) {
+				return false;
+			}
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DATE) {
+			if (!cursor->outputBind(
+					bind->variable,
+					bind->variablesize,
+					&bind->value.dateval.year,
+					&bind->value.dateval.month,
+					&bind->value.dateval.day,
+					&bind->value.dateval.hour,
+					&bind->value.dateval.minute,
+					&bind->value.dateval.second,
+					&bind->value.dateval.microsecond,
+					(const char **)&bind->value.dateval.tz,
+					&bind->value.dateval.isnegative,
+					bind->value.dateval.buffer,
+					bind->value.dateval.buffersize,
+					&bind->isnull)) {
+				return false;
+			}
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_BLOB) {
+			if (!cursor->outputBindBlob(
+					bind->variable,
+					bind->variablesize,inout,
+					&bind->isnull)) {
+				return false;
+			}
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_CLOB) {
+			if (!cursor->outputBindClob(
+					bind->variable,
+					bind->variablesize,inout,
+					&bind->isnull)) {
+				return false;
+			}
+		}*/
+	}
 	return true;
 }
 

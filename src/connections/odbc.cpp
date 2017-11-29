@@ -1642,7 +1642,6 @@ void odbccursor::deallocateResultSetBuffers() {
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
-stdoutput.printf("prepare: %s\n",query);
 
 	// initialize column count
 	initializeColCounts();
@@ -1896,7 +1895,6 @@ bool odbccursor::outputBind(const char *variable,
 				char *value, 
 				uint32_t valuesize, 
 				int16_t *isnull) {
-stdoutput.printf("outputBind(%s)\n",variable);
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
@@ -2029,7 +2027,6 @@ bool odbccursor::inputOutputBind(const char *variable,
 				char *value, 
 				uint32_t valuesize, 
 				int16_t *isnull) {
-stdoutput.printf("inputOutputBind(%s)\n",variable);
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
@@ -2039,15 +2036,8 @@ stdoutput.printf("inputOutputBind(%s)\n",variable);
 	//outdatebind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
-	uint32_t i=0;
-	do {
-		if (value[i]=='\0') {
-			break;
-		}
-		i++;
-	} while (i<valuesize);
-stdoutput.printf("input/output bind: %d,%d\n",valuesize,i);
-	inoutisnull[pos-1]=i;
+	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
+				sqlnulldata:charstring::length(value);
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -2075,7 +2065,6 @@ bool odbccursor::bindValueIsNull(uint16_t isnull) {
 }
 
 bool odbccursor::executeQuery(const char *query, uint32_t length) {
-stdoutput.printf("execute...\n");
 
 	// initialize counts
 	initializeRowCounts();
@@ -2106,7 +2095,9 @@ stdoutput.printf("execute...\n");
 	}
 
 	// convert date output binds and copy out isnulls
-	for (uint16_t i=0; i<getOutputBindCount(); i++) {
+	//for (uint16_t i=0; i<getOutputBindCount(); i++) {
+	// FIXME: inefficient
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -2124,7 +2115,9 @@ stdoutput.printf("execute...\n");
 			*(outisnullptr[i])=outisnull[i];
 		}
 	}
-	for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+	//for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+	// FIXME: inefficient
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		if (inoutisnullptr[i]) {
 			*(inoutisnullptr[i])=inoutisnull[i];
 		}

@@ -1890,7 +1890,12 @@ void sqlrcursor::defineInputOutputBindGeneric(const char *variable,
 	bv->type=type;
 	if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 		bv->value.stringval=new char[valuesize+1];
-		charstring::copy(bv->value.stringval,value,valuesize);
+		if (value) {
+			charstring::copy(bv->value.stringval,value,valuesize);
+		} else {
+			bv->value.stringval[0]='\0';
+			bv->type=SQLRCLIENTBINDVARTYPE_NULL;
+		}
 	} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB ||
 				bv->type==SQLRCLIENTBINDVARTYPE_CLOB) {
 		// FIXME: initialize....
@@ -1907,8 +1912,10 @@ const char *sqlrcursor::getOutputBindString(const char *variable) {
 		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable) &&
-				(*pvt->_outbindvars)[i].type==
-						SQLRCLIENTBINDVARTYPE_STRING) {
+				((*pvt->_outbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_STRING ||
+				(*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_NULL)) {
 				return (*pvt->_outbindvars)[i].value.stringval;
 			}
 		}
@@ -2049,8 +2056,10 @@ const char *sqlrcursor::getInputOutputBindString(const char *variable) {
 		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
 			if (!charstring::compare(
 				(*pvt->_inoutbindvars)[i].variable,variable) &&
+				((*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_STRING ||
 				(*pvt->_inoutbindvars)[i].type==
-						SQLRCLIENTBINDVARTYPE_STRING) {
+						SQLRCLIENTBINDVARTYPE_NULL)) {
 				return (*pvt->_inoutbindvars)[i].
 							value.stringval;
 			}
@@ -2959,13 +2968,14 @@ void sqlrcursor::sendInputOutputBinds() {
 							(size_t)size);
 		pvt->_cs->write((uint16_t)(*pvt->_inoutbindvars)[i].type);
 		if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_NULL) {
+			pvt->_cs->write((*pvt->_inoutbindvars)[i].valuesize);
+		} else if ((*pvt->_inoutbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_STRING ||
 			(*pvt->_inoutbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_BLOB ||
 			(*pvt->_inoutbindvars)[i].type==
-					SQLRCLIENTBINDVARTYPE_CLOB ||
-			(*pvt->_inoutbindvars)[i].type==
-					SQLRCLIENTBINDVARTYPE_NULL) {
+					SQLRCLIENTBINDVARTYPE_CLOB) {
 			pvt->_cs->write((*pvt->_inoutbindvars)[i].valuesize);
 			if ((*pvt->_inoutbindvars)[i].valuesize>0) {
 				pvt->_cs->write(
@@ -3016,7 +3026,8 @@ void sqlrcursor::sendInputOutputBinds() {
 						SQLRCLIENTBINDVARTYPE_NULL) {
 				pvt->_sqlrc->debugPrint("=");
 				pvt->_sqlrc->debugPrint(
-					(*pvt->_inbindvars)[i].value.stringval);
+					(*pvt->_inoutbindvars)[i].
+							value.stringval);
 				pvt->_sqlrc->debugPrint("(");
 				pvt->_sqlrc->debugPrint((int64_t)
 					(*pvt->_inoutbindvars)[i].valuesize);
@@ -4290,6 +4301,12 @@ bool sqlrcursor::parseInputOutputBinds() {
 				pvt->_sqlrc->debugPrint(
 						"	NULL output bind\n");
 				pvt->_sqlrc->debugPreEnd();
+			}
+
+			if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_NULL) {
+				(*pvt->_inoutbindvars)[count].type=
+						SQLRCLIENTBINDVARTYPE_STRING;
 			}
 
 			// handle a null value

@@ -1808,10 +1808,25 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
 			return false;
 		}
-stdoutput.printf("variable: %s\n",bv->variable);
 
 		// get the size of the value
-		if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
+		if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
+			bv->type=SQLRSERVERBINDVARTYPE_STRING;
+			bv->value.stringval=NULL;
+			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
+				return false;
+			}
+			// This must be a allocated and cleared because oracle
+			// gets angry if these aren't initialized to NULL's.
+			// It's possible that just the first character needs to
+			// be NULL, but for now I'm just going to go ahead and
+			// use allocateAndClear.
+			bv->value.stringval=
+				(char *)bindpool->allocateAndClear(
+							bv->valuesize+1);
+			bv->isnull=cont->nullBindValue();
+			cont->raiseDebugMessageEvent("NULL");
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
 			bv->value.stringval=NULL;
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
@@ -1826,11 +1841,9 @@ stdoutput.printf("variable: %s\n",bv->variable);
 							bv->valuesize+1);
 
 			// get the bind value
-stdoutput.printf("reading...\n");
 			ssize_t	result=clientsock->read(bv->value.stringval,
 							bv->valuesize,
 							idleclienttimeout,0);
-stdoutput.printf("done reading\n");
 			if ((uint32_t)result!=(uint32_t)(bv->valuesize)) {
 				bv->value.stringval[0]='\0';
 				const char	*info="get binds failed: "
@@ -1841,9 +1854,11 @@ stdoutput.printf("done reading\n");
 				return false;
 			}
 			bv->value.stringval[bv->valuesize]='\0';
+			bv->isnull=cont->nonNullBindValue();
 			cont->raiseDebugMessageEvent("STRING");
 		} /*else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			cont->raiseDebugMessageEvent("INTEGER");
+			bv->isnull=cont->nonNullBindValue();
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 			cont->raiseDebugMessageEvent("DOUBLE");
 			// these don't typically get set, but they get used
@@ -1851,6 +1866,7 @@ stdoutput.printf("done reading\n");
 			// initialize them
 			bv->value.doubleval.precision=0;
 			bv->value.doubleval.scale=0;
+			bv->isnull=cont->nonNullBindValue();
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
 			cont->raiseDebugMessageEvent("DATE");
 			bv->value.dateval.year=0;
@@ -1868,6 +1884,7 @@ stdoutput.printf("done reading\n");
 			bv->value.dateval.buffer=
 				(char *)bindpool->allocate(
 						bv->value.dateval.buffersize);
+			bv->isnull=cont->nonNullBindValue();
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB ||
 					bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
@@ -1878,11 +1895,9 @@ stdoutput.printf("done reading\n");
 			} else if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 				cont->raiseDebugMessageEvent("CLOB");
 			}
+			bv->isnull=cont->nonNullBindValue();
 		}*/
 		// FIXME: long, double, date, lob...
-
-		// init the null indicator
-		bv->isnull=cont->nonNullBindValue();
 	}
 
 	cont->raiseDebugMessageEvent("done getting input/output binds");
@@ -2571,9 +2586,14 @@ void sqlrprotocol_sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 	}
 
 	// run through the output bind values, sending them back
-	for (uint16_t i=0; i<cont->getOutputBindCount(cursor); i++) {
+	// FIXME: inefficient
+	//for (uint16_t i=0; i<cont->getOutputBindCount(cursor); i++) {
+	for (uint16_t i=0; i<maxbindcount; i++) {
 
 		sqlrserverbindvar	*bv=&(cont->getOutputBinds(cursor)[i]);
+		if (!bv) {
+			continue;
+		}
 
 		if (cont->logEnabled() || cont->notificationsEnabled()) {
 			debugstr.clear();
@@ -2805,10 +2825,15 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 	}
 
 	// run through the input/output bind values, sending them back
-	for (uint16_t i=0; i<cont->getInputOutputBindCount(cursor); i++) {
+	// FIXME: inefficient
+	//for (uint16_t i=0; i<cont->getInputOutputBindCount(cursor); i++) {
+	for (uint16_t i=0; i<maxbindcount; i++) {
 
 		sqlrserverbindvar	*bv=
 				&(cont->getInputOutputBinds(cursor)[i]);
+		if (!bv) {
+			continue;
+		}
 
 		if (cont->logEnabled() || cont->notificationsEnabled()) {
 			debugstr.clear();
@@ -2816,7 +2841,7 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 			debugstr.append(":");
 		}
 
-		/*if (cont->bindValueIsNull(bv->isnull)) {
+		if (cont->bindValueIsNull(bv->isnull)) {
 
 			if (cont->logEnabled() ||
 				cont->notificationsEnabled()) {
@@ -2825,7 +2850,7 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 
 			clientsock->write((uint16_t)NULL_DATA);
 
-		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
+		} else /*if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
 
 			if (cont->logEnabled() ||
 				cont->notificationsEnabled()) {
