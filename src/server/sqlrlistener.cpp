@@ -315,6 +315,17 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	pvt->_maxlisteners=pvt->_cfg->getMaxListeners();
 	pvt->_listenertimeout=pvt->_cfg->getListenerTimeout();
 
+	// if dynamic scaling is enabled then we need to adjust the
+	// listenertimeout to accomodate attempts to start connections, plus
+	// a little grace
+	uint64_t	mintimeout=DEFAULT_CONNECTION_START_ATTEMPTS*
+					(DEFAULT_CONNECTION_START_TIMEOUT+2);
+	if (pvt->_dynamicscaling &&
+			pvt->_listenertimeout &&
+			pvt->_listenertimeout<mintimeout) {
+		pvt->_listenertimeout=mintimeout;
+	}
+
 	setHandoffMethod();
 
 	setSessionHandlerMethod();
@@ -1042,9 +1053,11 @@ void sqlrlistener::listen() {
 	}
 
 	for(;;) {
-		// FIXME: this can return true/false, should we do anything
-		// with that?
-		handleTraffic(waitForTraffic());
+		error::clearError();
+		if (!handleTraffic(waitForTraffic()) &&
+			error::getErrorNumber()==EMFILE) {
+			snooze::macrosnooze(1);
+		}
 	}
 }
 
@@ -1572,16 +1585,28 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 	return retval;
 }
 
-bool sqlrlistener::acquireShmAccess(thread *thr, bool *timeout) {
+bool sqlrlistener::semWait(int32_t index, thread *thr,
+					bool withundo, bool *timeout) {
 
-	raiseDebugMessageEvent("acquiring exclusive shm access");
+	// If dynamic scaling is enabled then we need to adjust the
+	// listenertimeout.  In all cases where semWait() is called, the scaler
+	// could be off trying to start connections, or connections could be
+	// slow to start.  So, we must wait long enough to accommodate that,
+	// plus a little grace.  If listenertimeout is too short, then it needs
+	// to be made longer.
+	// FIXME: arguably, this should just be done at startup...
 
-	// Loop, waiting.  Bail if timeout occurred
 	bool	result=true;
 	*timeout=false;
 	if (pvt->_listenertimeout>0 &&
 			pvt->_semset->supportsTimedSemaphoreOperations()) {
-		result=pvt->_semset->waitWithUndo(1,pvt->_listenertimeout,0);
+		if (withundo) {
+			result=pvt->_semset->waitWithUndo(
+					index,pvt->_listenertimeout,0);
+		} else {
+			result=pvt->_semset->wait(
+					index,pvt->_listenertimeout,0);
+		}
 		*timeout=(!result && error::getErrorNumber()==EAGAIN);
 	} else if (pvt->_listenertimeout>0 &&
 			!thr && sys::signalsInterruptSystemCalls()) {
@@ -1594,25 +1619,38 @@ bool sqlrlistener::acquireShmAccess(thread *thr, bool *timeout) {
 		alarmrang=0;
 		signalmanager::alarm(pvt->_listenertimeout);
 		do {
-			result=pvt->_semset->waitWithUndo(1);
+			if (withundo) {
+				result=pvt->_semset->waitWithUndo(index);
+			} else {
+				result=pvt->_semset->wait(index);
+			}
 		} while (!result && error::getErrorNumber()==EINTR &&
 							alarmrang!=1);
 		*timeout=(alarmrang==1);
 		signalmanager::alarm(0);
 		pvt->_semset->retryInterruptedOperations();
 	} else {
-		result=pvt->_semset->waitWithUndo(1);
+		if (withundo) {
+			result=pvt->_semset->waitWithUndo(index);
+		} else {
+			result=pvt->_semset->wait(index);
+		}
 	}
 
-	// handle alarm...
-	if (*timeout) {
-		raiseDebugMessageEvent("timeout occured");
-		return false;
-	}
+	return result;
+}
 
-	// handle general failure...
-	if (!result) {
-		raiseDebugMessageEvent("failed to acquire exclusive shm access");
+bool sqlrlistener::acquireShmAccess(thread *thr, bool *timeout) {
+
+	raiseDebugMessageEvent("acquiring exclusive shm access");
+
+	if (!semWait(1,thr,true,timeout)) {
+		if (*timeout) {
+			raiseDebugMessageEvent("timeout occured");
+		} else {
+			raiseDebugMessageEvent("failed to acquire "
+						"exclusive shm access");
+		}
 		return false;
 	}
 
@@ -1661,61 +1699,13 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 
 	raiseDebugMessageEvent("waiting for an available connection");
 
-	// If dynamic scaling is enabled then we need a timeout here.  Without
-	// one, if a spawned connection fails to start, then the wait() below
-	// will hang forever.  The timeout needs to be at least as long as the
-	// scaler will wait, plus a little grace.
-	uint64_t	oldlt=pvt->_listenertimeout;
-	uint64_t	scalertimeout=DEFAULT_CONNECTION_START_ATTEMPTS*
-					(DEFAULT_CONNECTION_START_TIMEOUT+2);
-	if (pvt->_dynamicscaling && pvt->_listenertimeout<scalertimeout) {
-		pvt->_listenertimeout=scalertimeout;
-	}
-
-	// Loop, waiting.  Bail if timeout occurred
-	// FIXME: Some of the listenertimeout might have already been consumed
-	// by acquireShmAccess().  Arguably, we should wait for the remaining
-	// listenertimeout here, rather than the entire listenertimeout.
-	bool	result=true;
-	*timeout=false;
-	if (pvt->_listenertimeout>0 &&
-			pvt->_semset->supportsTimedSemaphoreOperations()) {
-		result=pvt->_semset->wait(2,pvt->_listenertimeout,0);
-		*timeout=(!result && error::getErrorNumber()==EAGAIN);
-	} else if (pvt->_listenertimeout>0 &&
-			!thr && sys::signalsInterruptSystemCalls()) {
-		// We can't use this when using threads because alarmrang isn't
-		// thread-local and there's no way to make it be.  Also, the
-		// alarm doesn't reliably interrupt the wait() when it's called
-		// from a thread, at least not on Linux.  Hopefully platforms
-		// that supports threads also supports timed semaphore ops.
-		pvt->_semset->dontRetryInterruptedOperations();
-		alarmrang=0;
-		signalmanager::alarm(pvt->_listenertimeout);
-		do {
-			result=pvt->_semset->wait(2);
-		} while (!result && error::getErrorNumber()==EINTR &&
-							alarmrang!=1);
-		*timeout=(alarmrang==1);
-		signalmanager::alarm(0);
-		pvt->_semset->retryInterruptedOperations();
-	} else {
-		result=pvt->_semset->wait(2);
-	}
-
-	// restore the original timeout
-	pvt->_listenertimeout=oldlt;
-
-	// handle alarm...
-	if (*timeout) {
-		raiseDebugMessageEvent("timeout occured");
-		return false;
-	}
-
-	// handle general failure...
-	if (!result) {
-		raiseInternalErrorEvent("general failure waiting "
-					"for available connection");
+	if (!semWait(2,thr,false,timeout)) {
+		if (*timeout) {
+			raiseDebugMessageEvent("timeout occured");
+		} else {
+			raiseInternalErrorEvent("general failure waiting "
+						"for available connection");
+		}
 		return false;
 	}
 
@@ -1724,12 +1714,12 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 	// Reset this semaphore to 0.
 	// It can get left incremented if a sqlr-connection process is killed
 	// between calls to signalListenerToRead() and
-	// waitForListenerToFinishReading().  It's ok to reset it here because
-	// no one except this process has access to this semaphore at this time
+	// waitForListenerToFinishReading().  It's safe to reset it here
 	// because of the lock on semaphore 1.
 	pvt->_semset->setValue(2,0);
 
-	raiseDebugMessageEvent("succeeded in waiting for an available connection");
+	raiseDebugMessageEvent("succeeded in waiting for "
+				"an available connection");
 	return true;
 }
 
@@ -2224,11 +2214,14 @@ void sqlrlistener::incrementConnectedClientCount() {
 				dt.getEpoch();
 	}
 
+	if (!pvt->_semset->signalWithUndo(5)) {
+		// FIXME: bail somehow
+	}
+
+	// The scaler loops, looking to see if it has to do anything, and then
+	// sleeping for a short bit if it doesn't, before looping again.
 	// If the system supports timed semaphore ops then the scaler can be
-	// jogged into running on-demand, and we can do that here.  If the 
-	// sytem does not support timed semaphore ops then the scaler will
-	// just loop periodically on its own and we shouldn't attempt to
-	// jog it.
+	// jogged into immediate action though, so we'll do that here.
 	if (pvt->_semset->supportsTimedSemaphoreOperations()) {
 
 		// signal the scaler to evaluate the connection count
@@ -2238,17 +2231,6 @@ void sqlrlistener::incrementConnectedClientCount() {
 			// FIXME: bail somehow
 		}
 		raiseDebugMessageEvent("finished signalling the scaler...");
-
-		// wait for the scaler
-		raiseDebugMessageEvent("waiting for the scaler...");
-		if (!pvt->_semset->wait(7)) {
-			// FIXME: bail somehow
-		}
-		raiseDebugMessageEvent("finished waiting for the scaler...");
-	}
-
-	if (!pvt->_semset->signalWithUndo(5)) {
-		// FIXME: bail somehow
 	}
 
 	raiseDebugMessageEvent("finished incrementing connected client count");

@@ -1,4 +1,4 @@
-# $Id: tcldoc_scanner.tcl,v 1.1 2012-01-05 22:36:52 mused Exp $
+# $Id: tcldoc_scanner.tcl,v 1.1 2012/01/05 22:36:52 mused Exp $
 
 #//#
 # Handles scanning of file-level and procedure-level comments.

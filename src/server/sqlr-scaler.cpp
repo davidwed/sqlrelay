@@ -560,12 +560,6 @@ bool scaler::openMoreConnections() {
 	uint32_t	connectedclients=getConnectedClientCount();
 	uint32_t	currentconnections=getConnectionCount();
 
-	// if we were signalled by the listener, signal
-	// the listener back so that it can keep going
-	if (waitresult) {
-		semset->signal(7);
-	}
-
 	// do we need to open more connections?
 	if (connectedclients<currentconnections ||
 		(connectedclients-currentconnections)<=maxqueuelength) {

@@ -3121,21 +3121,14 @@ bool odbccursor::nextResultSet(bool *nextresultsetavailable) {
 
 void odbccursor::closeResultSet() {
 
-	/* FIXME:  This code originally just called SQLCloseCursor(stmt) but
-	 * that caused and "Invalid cursor state" error at the next
-	 * SQLExecute().
-	 * George Carrette suggests wrapping it in the "if (stmt)".  I think I
-	 * tried that before too, but I'm not sure.
-	 * For now this is commented out, but it needs to be revisited.
-	 * Intellisoft's version has this uncommented, and it appears to work.*/
-	/*if (stmt) {
+	if (stmt) {
 		SQLCloseCursor(stmt);
 		// The msdn.microsoft.com documentation says that this call
 		// is equivalent to SQLFreeStmt with SQL_CLOSE.  If so, then
 		// we should be able to set stmt to NULL here.  But, if we do,
 		// then we get SQLExecute.c][170]Error: SQL_INVALID_HANDLE.
 		// So apparently the microsoft documentation is wrong.
-	}*/
+	}
 
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];

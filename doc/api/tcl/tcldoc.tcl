@@ -1,5 +1,5 @@
 #!/usr/bin/tclsh
-# $Id: tcldoc.tcl,v 1.1 2012-01-05 22:36:52 mused Exp $
+# $Id: tcldoc.tcl,v 1.1 2012/01/05 22:36:52 mused Exp $
 
 #//#
 # TclDoc parses the declarations and documentation comments in a set

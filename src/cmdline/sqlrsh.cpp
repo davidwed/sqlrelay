@@ -1331,10 +1331,10 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 				if (isFloatTypeChar(fieldtype)) {
 					double	fd=sqlrcur->getFieldAsDouble(row,col);
 					if (isNonScaleFloatTypeChar(fieldtype)) {
-						int	precision=sqlrcur->getColumnPrecision(col);
+						int32_t	precision=sqlrcur->getColumnPrecision(col);
 						// here precision is a number of bits, but printf %g wants digits.
 						// FIXME: precision should actually be the number of digits, not bits...
-						int	digits=ceil(precision/3.33);
+						int32_t	digits=(int32_t)(ceil(precision/3.33));
 						charstring::printf(&numberfieldbuffer[0],sizeof(numberfieldbuffer),"%.*g",digits,fd);
 					} else {
 						int	scale=sqlrcur->getColumnScale(col);

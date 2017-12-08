@@ -1623,7 +1623,12 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		{"tlsdepth",(char *)"0",0},
 		{"db",(char *)"",0},
 		{"connecttime",(char *)"",0},
-		{"autocommit",(char *)"1",0},
+		// FIXME: sort this out...  George Carrette suggests this to
+		// make SQL Relay consistent with other PDO drivers, but the
+		// change makes it inconsistent with SQL Relay drivers for
+		// other languages...
+		//{"autocommit",(char *)"1",0},
+		{"autocommit",(char *)"0",0},
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
