@@ -314,6 +314,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	raiseIntegrityViolationEvent(const char *info);
 		void	raiseTranslationFailureEvent(sqlrservercursor *cursor,
 							const char *info);
+		void	raiseParseFailureEvent(sqlrservercursor *cursor,
+							const char *info);
 
 
 		// cursor api...
@@ -1305,6 +1307,7 @@ enum sqlrevent_t {
 	SQLREVENT_SCHEDULE_VIOLATION,
 	SQLREVENT_INTEGRITY_VIOLATION,
 	SQLREVENT_TRANSLATION_FAILURE,
+	SQLREVENT_PARSE_FAILURE,
 	SQLREVENT_INVALID_EVENT
 };
 

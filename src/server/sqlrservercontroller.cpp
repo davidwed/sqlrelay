@@ -6372,6 +6372,22 @@ void sqlrservercontroller::raiseTranslationFailureEvent(
 	}
 }
 
+void sqlrservercontroller::raiseParseFailureEvent(
+						sqlrservercursor *cursor,
+						const char *info) {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,cursor,
+					SQLRLOGGER_LOGLEVEL_ERROR,
+					SQLREVENT_PARSE_FAILURE,
+					info);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,cursor,
+					SQLREVENT_PARSE_FAILURE,
+					info);
+	}
+}
+
 void sqlrservercontroller::alarmHandler(int32_t signum) {
 	alarmrang=1;
 }

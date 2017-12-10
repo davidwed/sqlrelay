@@ -214,6 +214,9 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 			if (!pvt->_tree) {
 				if (!sqlrp->parse(query)) {
+					sqlrcon->cont->
+						raiseParseFailureEvent(
+								sqlrcur,query);
 					return false;
 				}
 				pvt->_tree=sqlrp->getTree();
@@ -267,6 +270,10 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 		translatedquery->append(query);
 		if (sqlrp->parse(translatedquery->getString())) {
 			pvt->_tree=sqlrp->getTree();
+		} else {
+			sqlrcon->cont->raiseParseFailureEvent(sqlrcur,
+						translatedquery->getString());
+			// FIXME: shouldn't I return false if this happens?
 		}
 	}
 

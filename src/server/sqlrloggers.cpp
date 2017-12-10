@@ -209,6 +209,7 @@ static const char *eventtypes[]={
 	"SCHEDULE_VIOLATION",
 	"INTEGRITY_VIOLATION",
 	"TRANSLATION_FAILURE",
+	"PARSE_FAILURE",
 	NULL
 };
 
