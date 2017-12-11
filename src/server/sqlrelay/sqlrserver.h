@@ -745,6 +745,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 
 		virtual bool		getLastInsertId(uint64_t *id);
 		virtual const char	*getLastInsertIdQuery();
+		virtual const char	*noopQuery();
 
 		virtual bool		setIsolationLevel(const char *isolevel);
 		virtual const char	*setIsolationLevelQuery();

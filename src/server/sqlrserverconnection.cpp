@@ -479,6 +479,10 @@ const char *sqlrserverconnection::getLastInsertIdQuery() {
 	return NULL;
 }
 
+const char *sqlrserverconnection::noopQuery() {
+	return "select 1 where 0=1";
+}
+
 bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
 
 	// if no isolation level was passed in then bail

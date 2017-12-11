@@ -136,6 +136,7 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
+		const char	*noopQuery();
 
 		ub4		stmtmode;
 
@@ -1957,6 +1958,10 @@ const char *oracleconnection::getCurrentDatabaseQuery() {
 
 const char *oracleconnection::getLastInsertIdQuery() {
 	return lastinsertidquery;
+}
+
+const char *oracleconnection::noopQuery() {
+	return "begin null; end;";
 }
 
 oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :

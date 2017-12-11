@@ -601,6 +601,10 @@ void sqlrservercursor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
 	// by default, do nothing
+	*field=NULL;
+	*fieldlength=0;
+	*blob=false;
+	*null=false;
 }
 
 bool sqlrservercursor::getLobFieldLength(uint32_t col, uint64_t *length) {

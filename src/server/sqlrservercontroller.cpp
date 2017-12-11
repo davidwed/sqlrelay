@@ -2759,6 +2759,11 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 		return false;
 	}
 
+	// replace with a noop if the query is empty
+	if (!translatedquery->getStringLength()) {
+		translatedquery->append(pvt->_conn->noopQuery());
+	}
+
 	// write the translated query to the cursor's query buffer
 	// so it'll be there if we decide to re-execute it later
 	charstring::copy(cursor->getQueryBuffer(),

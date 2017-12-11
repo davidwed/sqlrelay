@@ -336,6 +336,15 @@ int	main(int argc, char **argv) {
 	printf("\n\n");
 
 
+	printf("SQLRNOOP: \n");
+	checkSuccess(cur->sendQuery("sqlrnoop"),1);
+	checkSuccess(cur->colCount(),0);
+	checkSuccess(cur->rowCount(),0);
+	checkSuccess(cur->affectedRows(),0);
+	checkSuccess(cur->getField(0,(uint32_t)0),"");
+	printf("\n");
+
+
 	printf("SESSION QUERIES: Date Format\n");
 	checkSuccess(cur->sendQuery("select sysdate from dual"),1);
 	datetime	dt;
