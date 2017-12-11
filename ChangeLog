@@ -16,6 +16,7 @@
 	added initial support for queries that return multiple result sets
 	... various odbc connection module improvements ...
 	added parse failed event
+	updated normalize translation to remove spaces around :=
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

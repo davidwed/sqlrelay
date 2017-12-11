@@ -319,7 +319,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		if (
 			(*ptr==' ' &&
 			(character::inSet(*(ptr+1),symbols) ||
-			character::inSet(*(ptr-1),symbols))) &&
+			character::inSet(*(ptr-1),symbols) ||
+			!charstring::compare(ptr+1,":=",2))) &&
 
 			// actually, - and ! also require special handling
 			// because they can be unary operators and we don't
