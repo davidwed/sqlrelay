@@ -3637,6 +3637,9 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// (re)get the query now that it's been translated
 	query=cursor->getQueryBuffer();
 	querylen=cursor->getQueryLength();
+	if (enabletranslations && pvt->_sqlrt && pvt->_debugsql) {
+		stdoutput.printf("translated:\n%.*s\n\n",querylen,query);
+	}
 
 	// fake input binds if this specific query doesn't support them
 	if (!cursor->supportsNativeBinds(query,querylen)) {
