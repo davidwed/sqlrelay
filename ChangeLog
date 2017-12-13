@@ -18,6 +18,8 @@
 	added parse failed event
 	updated normalize translation to remove spaces around :=
 	added noop query framework
+	added "patterns" query translation
+	added debug="sql"
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

@@ -144,6 +144,7 @@ class sqlrservercontrollerprivate {
 	namevaluepairs	*_inbindmappings;
 	namevaluepairs	*_outbindmappings;
 
+	bool		_debugsql;
 	bool		_debugsqlrparser;
 	bool		_debugsqlrtranslation;
 	bool		_debugsqlrfilters;
@@ -458,6 +459,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_maxbindcount=pvt->_cfg->getMaxBindCount();
 	pvt->_maxerrorlength=pvt->_cfg->getMaxErrorLength();
 	pvt->_idleclienttimeout=pvt->_cfg->getIdleClientTimeout();
+	pvt->_debugsql=pvt->_cfg->getDebugSql();
 
 	// get password encryptions
 	xmldomnode	*pwdencs=pvt->_cfg->getPasswordEncryptions();
@@ -2031,6 +2033,11 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 }
 
 bool sqlrservercontroller::autoCommitOn() {
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("autocommit off\n\n");
+	}
+
 	pvt->_autocommitforthissession=true;
 	if (pvt->_conn->autoCommitOn()) {
 		pvt->_intransaction=false;
@@ -2040,6 +2047,11 @@ bool sqlrservercontroller::autoCommitOn() {
 }
 
 bool sqlrservercontroller::autoCommitOff() {
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("autocommit off\n\n");
+	}
+
 	pvt->_autocommitforthissession=false;
 	if (pvt->_conn->autoCommitOff()) {
 		// if the db doesn't support transaction blocks (oracle,
@@ -2052,6 +2064,11 @@ bool sqlrservercontroller::autoCommitOff() {
 }
 
 bool sqlrservercontroller::begin() {
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("begin\n\n");
+	}
+
 	// if we're faking transaction blocks, do that,
 	// otherwise run an actual begin query
 	if ((pvt->_faketransactionblocks)?
@@ -2079,6 +2096,11 @@ bool sqlrservercontroller::beginFakeTransactionBlock() {
 }
 
 bool sqlrservercontroller::commit() {
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("commit\n\n");
+	}
+
 	if (pvt->_conn->commit()) {
 		endFakeTransactionBlock();
 		if (!pvt->_autocommitforthissession) {
@@ -2104,6 +2126,11 @@ bool sqlrservercontroller::endFakeTransactionBlock() {
 }
 
 bool sqlrservercontroller::rollback() {
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("rollback\n\n");
+	}
+
 	if (pvt->_conn->rollback()) {
 		endFakeTransactionBlock();
 		if (!pvt->_autocommitforthissession) {
@@ -3483,6 +3510,10 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						uint32_t querylen,
 						bool enabletranslations,
 						bool enablefilters) {
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("%.*s\n\n",querylen,query);
+	}
 
 	// The standard paradigm is:
 	//

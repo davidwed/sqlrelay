@@ -74,6 +74,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getAllowedIps();
 		const char	*getDeniedIps();
 		const char	*getDebug();
+		bool		getDebugSql();
 		bool		getDebugParser();
 		bool		getDebugTranslations();
 		bool		getDebugFilters();
@@ -193,6 +194,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*allowedips;
 		const char	*deniedips;
 		const char	*debug;
+		bool		debugsql;
 		bool		debugparser;
 		bool		debugtranslations;
 		bool		debugfilters;
@@ -323,6 +325,7 @@ void sqlrconfig_xmldom::init() {
 	allowedips=DEFAULT_DENIEDIPS;
 	deniedips=DEFAULT_DENIEDIPS;
 	debug=DEFAULT_DEBUG;
+	debugsql=charstring::contains(debug,"sql");
 	debugparser=charstring::contains(debug,"parser");
 	debugtranslations=charstring::contains(debug,"translations");
 	debugfilters=charstring::contains(debug,"filters");
@@ -560,6 +563,10 @@ const char *sqlrconfig_xmldom::getDeniedIps() {
 
 const char *sqlrconfig_xmldom::getDebug() {
 	return debug;
+}
+
+bool sqlrconfig_xmldom::getDebugSql() {
+	return debugsql;
 }
 
 bool sqlrconfig_xmldom::getDebugParser() {
@@ -1674,6 +1681,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	attr=instance->getAttribute("debug");
 	if (!attr->isNullNode()) {
 		debug=attr->getValue();
+		debugsql=charstring::contains(debug,"sql");
 		debugparser=charstring::contains(debug,"parser");
 		debugtranslations=charstring::contains(debug,"translations");
 		debugfilters=charstring::contains(debug,"filters");

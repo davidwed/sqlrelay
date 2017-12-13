@@ -177,6 +177,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual const char	*getDeniedIps()=0;
 
 		virtual const char	*getDebug()=0;
+		virtual bool		getDebugSql()=0;
 		virtual bool		getDebugParser()=0;
 		virtual bool		getDebugTranslations()=0;
 		virtual bool		getDebugFilters()=0;
