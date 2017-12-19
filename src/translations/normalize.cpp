@@ -525,11 +525,14 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 		// until we find the end-quote...
 		do {
 
-			// if we found escaped quotes ('' or "")...
+			// if we found escaped quotes ('' or "" or \' or \")...
+			// FIXME: most db's support either '' or \' but not both
 			if (*ptr==quote && *(ptr+1)==quote) {
 				sb->write(*ptr)->write(*ptr);
 				ptr=ptr+2;
-
+			} else if (*ptr=='\\' && *(ptr+1)==quote) {
+				sb->write(*(ptr+1))->write(*(ptr+1));
+				ptr=ptr+2;
 			} else
 
 			// if we didn't find escaped quotes...
