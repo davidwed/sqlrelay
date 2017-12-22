@@ -20,6 +20,8 @@
 	added noop query framework
 	added "patterns" query translation
 	added debug="sql"
+	fixed subtle bug in normalize translation that could cause problems
+		with empty strings
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

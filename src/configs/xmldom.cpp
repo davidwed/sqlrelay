@@ -75,6 +75,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getDeniedIps();
 		const char	*getDebug();
 		bool		getDebugSql();
+		bool		getDebugErrors();
 		bool		getDebugParser();
 		bool		getDebugTranslations();
 		bool		getDebugFilters();

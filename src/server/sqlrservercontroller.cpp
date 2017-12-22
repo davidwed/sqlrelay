@@ -2035,6 +2035,10 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 bool sqlrservercontroller::autoCommitOn() {
 
 	if (pvt->_debugsql) {
+		stdoutput.printf("===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("autocommit off\n\n");
 	}
 
@@ -2049,6 +2053,10 @@ bool sqlrservercontroller::autoCommitOn() {
 bool sqlrservercontroller::autoCommitOff() {
 
 	if (pvt->_debugsql) {
+		stdoutput.printf("===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("autocommit off\n\n");
 	}
 
@@ -2066,6 +2074,10 @@ bool sqlrservercontroller::autoCommitOff() {
 bool sqlrservercontroller::begin() {
 
 	if (pvt->_debugsql) {
+		stdoutput.printf("===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("begin\n\n");
 	}
 
@@ -2098,6 +2110,10 @@ bool sqlrservercontroller::beginFakeTransactionBlock() {
 bool sqlrservercontroller::commit() {
 
 	if (pvt->_debugsql) {
+		stdoutput.printf("===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("commit\n\n");
 	}
 
@@ -2128,6 +2144,10 @@ bool sqlrservercontroller::endFakeTransactionBlock() {
 bool sqlrservercontroller::rollback() {
 
 	if (pvt->_debugsql) {
+		stdoutput.printf("===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("rollback\n\n");
 	}
 
@@ -2299,6 +2319,12 @@ void sqlrservercontroller::saveError() {
 	pvt->_conn->setErrorLength(errorlength);
 	pvt->_conn->setErrorNumber(errorcode);
 	pvt->_conn->setLiveConnection(liveconnection);
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("ERROR:\n%d: %.*s\n\n",
+					errorcode,errorlength,
+					pvt->_conn->getErrorBuffer());
+	}
 }
 
 void sqlrservercontroller::saveErrorFromCursor(sqlrservercursor *cursor) {
@@ -3512,7 +3538,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						bool enablefilters) {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("%.*s\n\n",querylen,query);
+		stdoutput.printf("===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
+		stdoutput.printf("query:\n%.*s\n\n",querylen,query);
 	}
 
 	// The standard paradigm is:
@@ -6602,6 +6632,12 @@ void sqlrservercontroller::saveError(sqlrservercursor *cursor) {
 	cursor->setErrorLength(errorlength);
 	cursor->setErrorNumber(errorcode);
 	cursor->setLiveConnection(liveconnection);
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("ERROR:\n%d: %.*s\n\n",
+					errorcode,errorlength,
+					cursor->getErrorBuffer());
+	}
 }
 
 void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,

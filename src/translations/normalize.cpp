@@ -533,9 +533,10 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 			} else if (*ptr=='\\' && *(ptr+1)==quote) {
 				sb->write(*(ptr+1))->write(*(ptr+1));
 				ptr=ptr+2;
-			} else
+			} else if (*ptr!=quote)
 
-			// if we didn't find escaped quotes...
+			// if we didn't find escaped quotes
+			// or an empty string...
 			{
 				sb->write(*ptr);
 				ptr++;
