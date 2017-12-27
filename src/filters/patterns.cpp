@@ -113,6 +113,7 @@ bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
 	}
 
 	// split the string on single-quotes if necessary
+	// FIXME: what about backslash-escaped quotes?
 	char		**parts=NULL;
 	uint64_t	partcount=0;
 	if (hasscope) {

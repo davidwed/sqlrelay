@@ -15,11 +15,15 @@ enum scope_t {
 };
 
 struct pattern_t {
-	const char		*pattern;
-	regularexpression	*re;
+	const char		*match;
+	regularexpression	*matchre;
+	bool			matchglobal;
+	const char		*from;
+	regularexpression	*fromre;
+	bool			replaceglobal;
+	const char		*to;
 	bool			ignorecase;
 	scope_t			scope;
-	const char		*replacement;
 };
 
 class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
@@ -33,6 +37,11 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 					const char *query,
 					stringbuffer *translatedquery);
 	private:
+
+		void	applyPattern(const char *str,
+					pattern_t *pc,
+					stringbuffer *outbuffer);
+
 		pattern_t	*p;
 		uint32_t	patterncount;
 		bool		hasscope;
@@ -73,16 +82,34 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 	for (xmldomnode *c=parameters->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
 
-		const char	*pattern=c->getAttributeValue("pattern");
-		p[i].pattern=pattern;
-		p[i].re=NULL;
+		p[i].matchre=NULL;
+		p[i].matchglobal=true;
+		p[i].fromre=NULL;
+		p[i].replaceglobal=true;
 		p[i].ignorecase=false;
+
+		const char	*from=c->getAttributeValue("from");
+		p[i].from=from;
+
+		const char	*match=c->getAttributeValue("match");
+		p[i].match=match;
 
 		const char	*type=c->getAttributeValue("type");
 		if (!charstring::compareIgnoringCase(type,"regex")) {
-			p[i].re=new regularexpression();
-			p[i].re->compile(pattern);
-			p[i].re->study();
+			if (!charstring::isNullOrEmpty(match)) {
+				p[i].matchre=new regularexpression();
+				p[i].matchre->compile(match);
+				p[i].matchre->study();
+				p[i].matchglobal=
+					!charstring::isNo(
+					c->getAttributeValue("matchglobal"));
+			}
+			p[i].fromre=new regularexpression();
+			p[i].fromre->compile(from);
+			p[i].fromre->study();
+			p[i].replaceglobal=
+				!charstring::isNo(
+				c->getAttributeValue("replaceglobal"));
 		} else if (!charstring::compareIgnoringCase(type,"cistring")) {
 			p[i].ignorecase=true;
 		}
@@ -100,14 +127,15 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 			p[i].scope=SCOPE_QUERY;
 		}
 
-		p[i].replacement=c->getFirstChild("text")->getValue();
+		p[i].to=c->getAttributeValue("to");
 		i++;
 	}
 }
 
 sqlrtranslation_patterns::~sqlrtranslation_patterns() {
 	for (uint32_t i=0; i<patterncount; i++) {
-		delete p[i].re;
+		delete p[i].matchre;
+		delete p[i].fromre;
 	}
 	delete[] p;
 }
@@ -122,61 +150,39 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
+	if (debug) {
+		stdoutput.printf("original query:\n\"%s\"\n\n",query);
+	}
+
 	// split the string on single-quotes if necessary
+	// FIXME: what about backslash-escaped quotes
 	char		**parts=NULL;
 	uint64_t	partcount=0;
 	if (hasscope) {
 		charstring::split(query,"'",false,&parts,&partcount);
 	}
 
-	// run through the patterns until one of them matches...
-	bool		match=false;
-	uint32_t	matchindex=0;
-	for (uint32_t i=0; i<patterncount && !match; i++) {
+	// run through the patterns
+	stringbuffer	querybuffer1;
+	stringbuffer	querybuffer2;
+	for (uint32_t i=0; i<patterncount; i++) {
 
+		// choose which buffer to write to and clear it
+		stringbuffer	*outbuffer=&querybuffer1;
+		if (i%2) {
+			outbuffer=&querybuffer2;
+		}
+		if (i==patterncount-1) {
+			outbuffer=translatedquery;
+		}
+		outbuffer->clear();
+
+		// get the current pattern
 		pattern_t	*pc=&(p[i]);
 
 		// match against the entire query, if necessary...
 		if (pc->scope==SCOPE_QUERY) {
-
-			// handle regex patterns
-			if (pc->re && pc->re->match(query)) {
-
-				match=true;
-				matchindex=i;
-
-			// handle string patterns
-			} else {
-
-				// if case is ignored then lowercase everything
-				const char	*qry=query;
-				const char	*ptrn=pc->pattern;
-				char		*lowquery=NULL;
-				char		*lowpattern=NULL;
-				if (pc->ignorecase) {
-
-					lowquery=charstring::duplicate(query);
-					for (char *cq=lowquery; *cq; cq++) {
-						*cq=character::toLowerCase(*cq);
-					}
-					qry=lowquery;
-
-					lowpattern=charstring::duplicate(
-								pc->pattern);
-					for (char *cp=lowpattern; *cp; cp++) {
-						*cp=character::toLowerCase(*cp);
-					}
-					ptrn=lowpattern;
-				}
-
-				// compare
-				match=charstring::contains(qry,ptrn);
-				matchindex=i;
-
-				// clean up
-				delete[] lowquery;
-				delete[] lowpattern;
-			}
+			applyPattern(query,pc,outbuffer);
 			continue;
 		}
 
@@ -191,68 +197,9 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// check every other part...
-		for (uint64_t j=start; j<partcount && !match; j=j+2) {
-
-			// handle regex patterns
-			if (pc->re && pc->re->match(parts[j])) {
-
-				match=true;
-				matchindex=i;
-
-			// handle string patterns
-			} else {
-
-				// if case is ignored then lowercase everything
-				const char	*prt=parts[j];
-				const char	*ptrn=pc->pattern;
-				char		*lowpart=NULL;
-				char		*lowpattern=NULL;
-				if (pc->ignorecase) {
-
-					lowpart=charstring::duplicate(parts[j]);
-					for (char *cq=lowpart; *cq; cq++) {
-						*cq=character::toLowerCase(*cq);
-					}
-					prt=lowpart;
-
-
-					lowpattern=charstring::duplicate(
-								pc->pattern);
-					for (char *cp=lowpattern; *cp; cp++) {
-						*cp=character::toLowerCase(*cp);
-					}
-					ptrn=lowpattern;
-				}
-
-				// compare
-				match=charstring::contains(prt,ptrn);
-				matchindex=i;
-
-				// clean up
-				delete[] lowpart;
-				delete[] lowpattern;
-			}
+		for (uint64_t j=start; j<partcount; j=j+2) {
+			applyPattern(parts[j],pc,outbuffer);
 		}
-	}
-
-	// apply match
-	if (match) {
-		if (debug) {
-			stdoutput.printf("original query:\n\"%s\"\n",
-						query);
-			stdoutput.printf("matched pattern:\n\"%s\"\n",
-						p[matchindex].pattern);
-			stdoutput.printf("translated to:\n\"%s\"\n\n",
-						p[matchindex].replacement);
-		}
-		translatedquery->append(p[matchindex].replacement);
-	} else {
-		if (debug) {
-			stdoutput.printf("original query:\n\"%s\"\n",
-						query);
-			stdoutput.printf("didn't match any patterns\n\n");
-		}
-		translatedquery->append(query);
 	}
 
 	// clean up
@@ -262,6 +209,88 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 	delete[] parts;
 
 	return true;
+}
+
+void sqlrtranslation_patterns::applyPattern(const char *str,
+						pattern_t *pc,
+						stringbuffer *outbuffer) {
+
+	ssize_t		pcfromlen=(debug)?charstring::length(pc->from):0;
+	const char	*fromellipses="";
+	if (pcfromlen>77) {
+		pcfromlen=74;
+		fromellipses="...";
+	}
+	ssize_t		pctolen=(debug)?charstring::length(pc->to):0;
+	const char	*toellipses="";
+	if (pctolen>77) {
+		pctolen=74;
+		toellipses="...";
+	}
+
+	char	*convstr=NULL;
+
+	if (pc->matchre) {
+		if (debug) {
+			stdoutput.printf("applying "
+					"match:\n\"%s\"\n"
+					"from:\n\"%.*s%s\"\n"
+					"to:\n\"%.*s%s\"\n\n",
+					pc->match,
+					pcfromlen,pc->from,fromellipses,
+					pctolen,pc->to,toellipses);
+		}
+		convstr=charstring::replace(str,
+					pc->matchre,
+					pc->matchglobal,
+					pc->fromre,
+					pc->to,
+					pc->replaceglobal);
+	} else if (pc->fromre) {
+		if (debug) {
+			stdoutput.printf("applying regex "
+					"from:\n\"%.*s%s\"\n"
+					"to:\n\"%.*s%s\"\n\n",
+					pcfromlen,pc->from,fromellipses,
+					pctolen,pc->to,toellipses);
+		}
+		convstr=charstring::replace(str,
+					pc->fromre,
+					pc->to,
+					pc->replaceglobal);
+	} else if (!pc->ignorecase) {
+		if (debug) {
+			stdoutput.printf("applying string "
+					"from:\n\"%.*s%s\"\n"
+					"to:\n\"%.*s%s\"\n\n",
+					pcfromlen,pc->from,fromellipses,
+					pctolen,pc->to,toellipses);
+		}
+		convstr=charstring::replace(str,pc->from,pc->to);
+	} else {
+		if (debug) {
+			stdoutput.printf("applying case-insensitive string "
+					"from:\n\"%.*s%s\"\n"
+					"to:\n\"%.*s%s\"\n\n",
+					pcfromlen,pc->from,fromellipses,
+					pctolen,pc->to,toellipses);
+		}
+		char	*lowstr=charstring::duplicate(str);
+		charstring::lower(lowstr);
+		char	*lowfrom=charstring::duplicate(pc->from);
+		charstring::lower(lowfrom);
+		convstr=charstring::replace(lowstr,lowfrom,pc->to);
+		delete[] lowstr;
+		delete[] lowfrom;
+	}
+
+	outbuffer->append(convstr);
+	delete[] convstr;
+
+	if (debug) {
+		stdoutput.printf("translated to:\n\"%s\"\n\n",
+						outbuffer->getString());
+	}
 }
 
 extern "C" {
