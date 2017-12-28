@@ -44,7 +44,6 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 
 		pattern_t	*p;
 		uint32_t	patterncount;
-		bool		hasscope;
 
 		bool	enabled;
 
@@ -61,7 +60,6 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 
 	p=NULL;
 	patterncount=0;
-	hasscope=false;
 
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -118,11 +116,9 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 		if (!charstring::compareIgnoringCase(
 						scope,"outsidequotes")) {
 			p[i].scope=SCOPE_OUTSIDE_QUOTES;
-			hasscope=true;
 		} else if (!charstring::compareIgnoringCase(
 						scope,"insidequotes")) {
 			p[i].scope=SCOPE_INSIDE_QUOTES;
-			hasscope=true;
 		} else {
 			p[i].scope=SCOPE_QUERY;
 		}
@@ -154,14 +150,6 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 		stdoutput.printf("original query:\n\"%s\"\n\n",query);
 	}
 
-	// split the string on single-quotes if necessary
-	// FIXME: what about backslash-escaped quotes
-	char		**parts=NULL;
-	uint64_t	partcount=0;
-	if (hasscope) {
-		charstring::split(query,"'",false,&parts,&partcount);
-	}
-
 	// run through the patterns
 	stringbuffer	querybuffer1;
 	stringbuffer	querybuffer2;
@@ -182,31 +170,49 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 
 		// match against the entire query, if necessary...
 		if (pc->scope==SCOPE_QUERY) {
+
 			applyPattern(query,pc,outbuffer);
-			continue;
+
+		} else {
+
+			// split the string on single-quotes
+			// FIXME: what about backslash-escaped quotes
+			char		**parts=NULL;
+			uint64_t	partcount=0;
+			charstring::split(query,"'",false,&parts,&partcount);
+
+			// If we're looking at the query outside of quoted
+			// strings, then that ought to be the even numbered
+			// parts.  Otherwise it'll be the odd numbered parts.
+			// However, if the query starts with a single-quote
+			// (which a valid query wouldn't, but who knows...)
+			// then flip the logic.
+			bool	mod=0;
+			if (pc->scope==SCOPE_INSIDE_QUOTES && query[0]!='\'') {
+				mod=1;
+			}
+
+			// check every other part...
+			for (uint64_t j=0; j<partcount; j++) {
+				if (j%2==mod) {
+					applyPattern(parts[j],pc,outbuffer);
+				} else {
+					outbuffer->append('\'');
+					outbuffer->append(parts[j]);
+					outbuffer->append('\'');
+				}
+			}
+
+			// clean up
+			for (uint32_t k=0; k<partcount; k++) {
+				delete[] parts[k];
+			}
+			delete[] parts;
 		}
 
-		// If we're looking at the query outside of quoted strings,
-		// then that ought to be the even numbered parts.  Otherwise
-		// it'll be the odd numbered parts.  However, if the query
-		// starts with a single-quote (which a valid query wouldn't,
-		// but who knows...) then flip the logic.
-		uint64_t	start=0;
-		if (pc->scope==SCOPE_INSIDE_QUOTES && query[0]!='\'') {
-			start=1;
-		}
-
-		// check every other part...
-		for (uint64_t j=start; j<partcount; j=j+2) {
-			applyPattern(parts[j],pc,outbuffer);
-		}
+		// reset input
+		query=outbuffer->getString();
 	}
-
-	// clean up
-	for (uint32_t k=0; k<partcount; k++) {
-		delete[] parts[k];
-	}
-	delete[] parts;
 
 	return true;
 }
