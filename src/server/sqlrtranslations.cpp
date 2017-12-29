@@ -21,6 +21,7 @@ class sqlrtranslationplugin {
 	public:
 		sqlrtranslation	*tr;
 		dynamiclib	*dl;
+		const char	*module;
 };
 
 class sqlrdatabaseobject {
@@ -171,6 +172,7 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	sqlrtranslationplugin	*sqltp=new sqlrtranslationplugin;
 	sqltp->tr=tr;
 	sqltp->dl=dl;
+	sqltp->module=module;
 	pvt->_tlist.append(sqltp);
 }
 
@@ -195,7 +197,8 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 						node; node=node->getNext()) {
 
 		if (pvt->_debug) {
-			stdoutput.printf("\nrunning translation...\n\n");
+			stdoutput.printf("\nrunning translation:  %s...\n\n",
+						node->getValue()->module);
 		}
 
 		sqlrtranslation	*tr=node->getValue()->tr;
@@ -264,6 +267,15 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 	if (pvt->_tree) {
 		if (!sqlrp->write(translatedquery)) {
+			if (pvt->_debug) {
+				stdoutput.printf("current query tree:\n");
+				if (pvt->_tree) {
+					pvt->_tree->getRootNode()->
+						print(&stdoutput);
+				}
+				stdoutput.printf("\n");
+				stdoutput.printf("\nfinal write failed\n\n");
+			}
 			return false;
 		}
 	} else {
