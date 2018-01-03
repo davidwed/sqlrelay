@@ -3,7 +3,9 @@ Forked from git://git.code.sf.net/p/sqlrelay/sqlrelay ( http://sqlrelay.sourcefo
 SQL Relay
 
     SQL Relay is a powerful database connection management solution.
-    With SQL Relay, you can speed up and enhance the scalability of database-driven web-based applications, access databases from unsupported platforms, throttle database access, distribute load over clustered or replicated databases, route queries and migrate applications from one database to another.
+    With SQL Relay, you can speed up and enhance the scalability of database-driven web-based applications, access databases from
+    unsupported platforms, throttle database access, distribute load over clustered or replicated databases, route queries and 
+    migrate applications from one database to another.
 
 Advantages
 
