@@ -187,26 +187,28 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 			// However, if the query starts with a single-quote
 			// (which a valid query wouldn't, but who knows...)
 			// then flip the logic.
-			bool	mod=0;
-			if (pc->scope==SCOPE_INSIDE_QUOTES && query[0]!='\'') {
-				mod=1;
-			}
+			bool	mod=(query[0]!='\'');
 
 			// check every other part...
 			for (uint64_t j=0; j<partcount; j++) {
-				if (j%2==mod) {
-					applyPattern(parts[j],pc,outbuffer);
-				} else {
-					outbuffer->append('\'');
-					outbuffer->append(parts[j]);
+				bool	quoted=(j%2==mod);
+				if (quoted) {
 					outbuffer->append('\'');
 				}
+				if ((quoted &&
+					pc->scope==SCOPE_INSIDE_QUOTES) ||
+					pc->scope==SCOPE_OUTSIDE_QUOTES) {
+					applyPattern(parts[j],pc,outbuffer);
+				} else {
+					outbuffer->append(parts[j]);
+				}
+				if (quoted) {
+					outbuffer->append('\'');
+				}
+				delete[] parts[j];
 			}
 
 			// clean up
-			for (uint32_t k=0; k<partcount; k++) {
-				delete[] parts[k];
-			}
 			delete[] parts;
 		}
 
