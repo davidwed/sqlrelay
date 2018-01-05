@@ -301,7 +301,6 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		setIsolationLevel(const char *isolevel);
 		const char	*dbHostNameQuery();
 		const char	*dbIpAddressQuery();
-		const char	*noopQuery();
 
 
 		SQLRETURN	erg;
@@ -1861,10 +1860,6 @@ const char *odbcconnection::dbHostNameQuery() {
 const char *odbcconnection::dbIpAddressQuery() {
 	// FIXME: only works with MS SQL Server
 	return "SELECT CAST(SERVERPROPERTY('ComputerNamePhysicalNetBIOS') as varchar(64))";
-}
-
-const char *odbcconnection::noopQuery() {
-	return "";
 }
 
 odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :

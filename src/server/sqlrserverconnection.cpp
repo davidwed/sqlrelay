@@ -480,7 +480,7 @@ const char *sqlrserverconnection::getLastInsertIdQuery() {
 }
 
 const char *sqlrserverconnection::noopQuery() {
-	return "select 1 where 0=1";
+	return "";
 }
 
 bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
