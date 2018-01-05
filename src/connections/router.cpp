@@ -83,6 +83,7 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		const char	*selectDatabaseQuery();
 		char		*getCurrentDatabase();
 		bool		getLastInsertId(uint64_t *id);
+		const char	*noopQuery();
 		void		endSession();
 
 		void	route(bool *routed, bool *err);
@@ -995,6 +996,10 @@ bool routerconnection::getLastInsertId(uint64_t *id) {
 	}
 	*id=currentcon->getLastInsertId();
 	return (*id!=0);
+}
+
+const char *routerconnection::noopQuery() {
+	return "";
 }
 
 void routerconnection::endSession() {

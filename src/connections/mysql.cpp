@@ -198,6 +198,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*getCurrentDatabaseQuery();
 		const char	*setIsolationLevelQuery();
 		bool		getLastInsertId(uint64_t *id);
+		const char	*noopQuery();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		supportsAutoCommit();
@@ -662,6 +663,10 @@ const char *mysqlconnection::setIsolationLevelQuery() {
 bool mysqlconnection::getLastInsertId(uint64_t *id) {
 	*id=mysql_insert_id(mysqlptr);
 	return true;
+}
+
+const char *mysqlconnection::noopQuery() {
+	return "begin; end;";
 }
 
 bool mysqlconnection::isTransactional() {

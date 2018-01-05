@@ -57,6 +57,7 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 		bool		selectDatabase(const char *database);
 		char		*getCurrentDatabase();
 		bool		getLastInsertId(uint64_t *id);
+		const char	*noopQuery();
 		#ifdef SQLITE3
 		char		*duplicate(const char *str);
 		#endif
@@ -370,6 +371,10 @@ char *sqliteconnection::getCurrentDatabase() {
 bool sqliteconnection::getLastInsertId(uint64_t *id) {
 	*id=sqlite3_last_insert_rowid(sqliteptr);
 	return true;
+}
+
+const char *sqliteconnection::noopQuery() {
+	return "pragma noop";
 }
 
 #ifndef SQLITE_TRANSACTIONAL

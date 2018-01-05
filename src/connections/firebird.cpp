@@ -248,6 +248,7 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 						const char *table, bool wild);
 		const char	*bindFormat();
 		const char	*getLastInsertIdQuery();
+		const char	*noopQuery();
 
 		char		dpb[256];
 		short		dpblength;
@@ -724,6 +725,10 @@ const char *firebirdconnection::bindFormat() {
 
 const char *firebirdconnection::getLastInsertIdQuery() {
 	return lastinsertidquery;
+}
+
+const char *firebirdconnection::noopQuery() {
+	return "execute block as begin end";
 }
 
 firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :

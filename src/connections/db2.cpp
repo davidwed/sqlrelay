@@ -261,6 +261,7 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
 		const char	*setIsolationLevelQuery();
+		const char	*noopQuery();
 		const char	*bindFormat();
 
 		SQLHENV		env;
@@ -722,6 +723,10 @@ const char *db2connection::getLastInsertIdQuery() {
 
 const char *db2connection::setIsolationLevelQuery() {
         return "set current isolation %s";
+}
+
+const char *db2connection::noopQuery() {
+	return "begin end;";
 }
 
 db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :

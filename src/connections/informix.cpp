@@ -204,6 +204,8 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		uint64_t	totalrows;
 		uint64_t	rownumber;
 
+		bool		noop;
+
 		stringbuffer	errormsg;
 
 		informixconnection	*informixconn;
@@ -248,6 +250,7 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
 		const char	*setIsolationLevelQuery();
+		const char	*noopQuery();
 		const char	*bindFormat();
 
 		SQLHENV		env;
@@ -760,6 +763,10 @@ const char *informixconnection::setIsolationLevelQuery() {
         return "set isolation %s";
 }
 
+const char *informixconnection::noopQuery() {
+        return "noop";
+}
+
 informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	informixconn=(informixconnection *)conn;
@@ -880,6 +887,12 @@ bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// initialize column count
 	ncols=0;
+
+	// handle noops
+	noop=!charstring::compare(query,"noop");
+	if (noop) {
+		return true;
+	}
 
 	// prepare the query
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -1312,6 +1325,11 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 	totalinrowgroup=0;
 	totalrows=0;
 
+	// handle noops
+	if (noop) {
+		return true;
+	}
+
 	// execute the query
 	erg=SQLExecute(stmt);
 	if (erg!=SQL_SUCCESS &&
@@ -1650,6 +1668,10 @@ bool informixcursor::skipRow() {
 }
 
 bool informixcursor::fetchRow() {
+
+	if (noop) {
+		return false;
+	}
 
 	if (rowgroupindex==conn->cont->getFetchAtOnce()) {
 		rowgroupindex=0;

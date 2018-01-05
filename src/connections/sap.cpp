@@ -44,6 +44,7 @@ class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
+		const char	*noopQuery();
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
 		char		bindVariablePrefix();
@@ -657,6 +658,10 @@ const char *sapconnection::getCurrentDatabaseQuery() {
 
 const char *sapconnection::getLastInsertIdQuery() {
 	return "select @@identity";
+}
+
+const char *sapconnection::noopQuery() {
+	return "waitfor delay '0:0'";
 }
 
 const char *sapconnection::bindFormat() {

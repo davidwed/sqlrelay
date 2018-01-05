@@ -49,6 +49,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getCurrentDatabaseQuery();
 		bool		getLastInsertId(uint64_t *id);
 		const char	*getLastInsertIdQuery();
+		const char	*noopQuery();
 		const char	*bindFormat();
 
 		dictionary< int32_t, char *>	datatypes;
@@ -620,6 +621,10 @@ bool postgresqlconnection::getLastInsertId(uint64_t *id) {
 
 const char *postgresqlconnection::getLastInsertIdQuery() {
 	return lastinsertidquery;
+}
+
+const char *postgresqlconnection::noopQuery() {
+	return "do language plpgsql $$declare dummy int; begin end$$";
 }
 
 const char *postgresqlconnection::bindFormat() {
