@@ -161,6 +161,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		bindValueIsNull(int16_t isnull);
 		void		setFakeInputBinds(bool fake);
 		bool		getFakeInputBinds();
+		memorypool	*getBindPool();
 		memorypool	*getBindMappingsPool();
 
 		// fetch info

@@ -9,6 +9,9 @@ all: $(DROPINTESTTARGETS)
 mysql.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) $< $(OUT)$@
 
+bind.lo: bind.cpp
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) $< $(OUT)$@
+
 mysql.obj: mysql.cpp
 	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) mysql.cpp 
 
@@ -38,6 +41,9 @@ oracle.obj: oracle.cpp
 
 mysql: mysql.cpp mysql.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
+
+bind: bind.cpp bind.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) bind.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
 
 mysqldatetodatetime: mysqldatetodatetime.cpp mysqldatetodatetime.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysqldatetodatetime.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)

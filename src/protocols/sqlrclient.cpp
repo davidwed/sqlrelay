@@ -246,7 +246,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	maxstringbindvaluelength=
 			cont->getConfig()->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cont->getConfig()->getMaxLobBindValueLength();
-	bindpool=new memorypool(512,128,100);
+	bindpool=cont->getBindPool();
 	lazyfetch=false;
 	maxerrorlength=cont->getConfig()->getMaxErrorLength();
 	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
@@ -375,12 +375,11 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 
 sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
 	debugFunction();
-	delete bindpool;
 	delete[] clientinfo;
 }
 
 clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
-						filedescriptor *cs) {
+							filedescriptor *cs) {
 	debugFunction();
 
 	clientsock=cs;

@@ -140,6 +140,7 @@ class sqlrservercontrollerprivate {
 	uint64_t		_serversockincount;
 	unixsocketserver	*_serversockun;
 
+	memorypool	*_bindpool;
 	memorypool	*_bindmappingspool;
 	namevaluepairs	*_inbindmappings;
 	namevaluepairs	*_outbindmappings;
@@ -298,6 +299,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_relogintime=0;
 
 	// maybe someday these parameters will be configurable
+	pvt->_bindpool=new memorypool(512,128,100);
 	pvt->_bindmappingspool=new memorypool(512,128,100);
 	pvt->_inbindmappings=new namevaluepairs;
 	pvt->_outbindmappings=new namevaluepairs;
@@ -375,6 +377,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 		file::remove(pvt->_unixsocket.getString());
 	}
 
+	delete pvt->_bindpool;
 	delete pvt->_bindmappingspool;
 	delete pvt->_inbindmappings;
 	delete pvt->_outbindmappings;
@@ -6483,6 +6486,10 @@ const char *sqlrservercontroller::identify() {
 
 const char *sqlrservercontroller::dbVersion() {
 	return pvt->_conn->dbVersion();
+}
+
+memorypool *sqlrservercontroller::getBindPool() {
+	return pvt->_bindpool;
 }
 
 memorypool *sqlrservercontroller::getBindMappingsPool() {

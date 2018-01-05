@@ -22,6 +22,9 @@
 	added debug="sql"
 	fixed subtle bug in normalize translation that could cause problems
 		with empty strings
+	moved the memorypool used by the sqlrclient protocol module to
+		allocate memory for bind variables into the
+		sqlrservercontroller and exposed it to modules
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields
