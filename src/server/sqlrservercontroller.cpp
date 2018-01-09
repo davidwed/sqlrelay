@@ -2042,7 +2042,8 @@ bool sqlrservercontroller::autoCommitOn() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("autocommit off\n\n");
+		stdoutput.printf("%d: autocommit off\n\n",
+					process::getProcessId());
 	}
 
 	pvt->_autocommitforthissession=true;
@@ -2060,7 +2061,8 @@ bool sqlrservercontroller::autoCommitOff() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("autocommit off\n\n");
+		stdoutput.printf("%d: autocommit off\n\n",
+					process::getProcessId());
 	}
 
 	pvt->_autocommitforthissession=false;
@@ -2081,7 +2083,8 @@ bool sqlrservercontroller::begin() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("begin\n\n");
+		stdoutput.printf("%d: begin\n\n",
+					process::getProcessId());
 	}
 
 	// if we're faking transaction blocks, do that,
@@ -2117,7 +2120,8 @@ bool sqlrservercontroller::commit() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("commit\n\n");
+		stdoutput.printf("%d: commit\n\n",
+					process::getProcessId());
 	}
 
 	if (pvt->_conn->commit()) {
@@ -2151,7 +2155,8 @@ bool sqlrservercontroller::rollback() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("rollback\n\n");
+		stdoutput.printf("%d: rollback\n\n",
+					process::getProcessId());
 	}
 
 	if (pvt->_conn->rollback()) {
@@ -2324,7 +2329,8 @@ void sqlrservercontroller::saveError() {
 	pvt->_conn->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("ERROR:\n%d: %.*s\n\n",
+		stdoutput.printf("%d: ERROR:\n%d: %.*s\n\n",
+					process::getProcessId(),
 					errorcode,errorlength,
 					pvt->_conn->getErrorBuffer());
 	}
@@ -3545,7 +3551,8 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("query:\n%.*s\n\n",querylen,query);
+		stdoutput.printf("%d: query:\n%.*s\n\n",
+				process::getProcessId(),querylen,query);
 	}
 
 	// The standard paradigm is:
@@ -3671,7 +3678,8 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	query=cursor->getQueryBuffer();
 	querylen=cursor->getQueryLength();
 	if (enabletranslations && pvt->_sqlrt && pvt->_debugsql) {
-		stdoutput.printf("translated:\n%.*s\n\n",querylen,query);
+		stdoutput.printf("%d: translated:\n%.*s\n\n",
+					process::getProcessId(),querylen,query);
 	}
 
 	// fake input binds if this specific query doesn't support them
@@ -6641,7 +6649,8 @@ void sqlrservercontroller::saveError(sqlrservercursor *cursor) {
 	cursor->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("ERROR:\n%d: %.*s\n\n",
+		stdoutput.printf("%d: ERROR:\n%d: %.*s\n\n",
+					process::getProcessId(),
 					errorcode,errorlength,
 					cursor->getErrorBuffer());
 	}
