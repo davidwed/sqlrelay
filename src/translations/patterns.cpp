@@ -176,7 +176,8 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 		} else {
 
 			// split the string on single-quotes
-			// FIXME: what about backslash-escaped quotes
+			// (NOTE: this presumes that backslash-escaped quotes
+			// have been normalized by the normalize translation)
 			char		**parts=NULL;
 			uint64_t	partcount=0;
 			charstring::split(query,"'",false,&parts,&partcount);

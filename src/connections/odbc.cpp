@@ -1841,7 +1841,7 @@ void odbcconnection::errorMessage(char *errorbuffer,
 #endif
 
 bool odbcconnection::isLiveConnection(SQLCHAR *state) {
-	// TODO: Gain access to the dbc, and if ODBC 3.5 see if
+	// TODO: Gain access to the dbc, and in ODBC 3.5 see if
 	// SQL_ATTR_CONNECTION_DEAD is SQL_CD_TRUE.
 	return bytestring::compare("08S01",state,5) &&
 		bytestring::compare("08003",state,5);
