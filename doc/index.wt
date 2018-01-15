@@ -57,17 +57,17 @@ Guides and references for SQL Relay administration.
 Getting-started guides for various databases supported by SQL Relay.
 
 {{{#!td
- [http://systems.firstworks.com/p/getting-started-with-oracle.html Oracle][[br]]
- [http://systems.firstworks.com/p/getting.html SAP/Sybase][[br]]
- [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html IBM DB2][[br]]
- [http://systems.firstworks.com/p/getting-started-with-mysql.html MySQL][[br]]
- [http://systems.firstworks.com/p/blog-page_51.html PostgreSQL][[br]]
+ [http://software.firstworks.com/p/getting-started-with-oracle.html Oracle][[br]]
+ [http://software.firstworks.com/p/getting.html SAP/Sybase][[br]]
+ [http://software.firstworks.com/p/getting-started-with-ibm-db2.html IBM DB2][[br]]
+ [http://software.firstworks.com/p/getting-started-with-mysql.html MySQL][[br]]
+ [http://software.firstworks.com/p/blog-page_51.html PostgreSQL][[br]]
 }}}
 {{{#!td
- [http://systems.firstworks.com/p/getting-started-with-firebird.html Firebird][[br]]
- [http://systems.firstworks.com/p/getting-started-with-sqlite.html SQLite][[br]]
- [http://systems.firstworks.com/p/blog-page_8.html MS Access (on non-MS platforms)][[br]]
- [http://systems.firstworks.com/p/blog-page_65.html ODBC (non-MS platforms)][[br]]
+ [http://software.firstworks.com/p/getting-started-with-firebird.html Firebird][[br]]
+ [http://software.firstworks.com/p/getting-started-with-sqlite.html SQLite][[br]]
+ [http://software.firstworks.com/p/blog-page_8.html MS Access (on non-MS platforms)][[br]]
+ [http://software.firstworks.com/p/blog-page_65.html ODBC (non-MS platforms)][[br]]
 }}}
 }}}
 
