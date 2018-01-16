@@ -213,7 +213,7 @@ plus the maximum number of whole number digits your variable could contain.
 For instance, if you plan on storing values between 0 and 255, accurate to
 3 decimal places, then you should use scale 3 and precision 6.</p>
 
-<p>Note, however, that the scale of a bind variable will not always be
+Note, however, that the scale of a bind variable will not always be
 preserved.  If you use a bind variable to insert a floating point number into a
 column with smaller scale than you specified for your number, your number will
 be rounded down upon insertion.  For instance, if you pass in 1.2999 with scale
@@ -222,7 +222,5 @@ insert will succeed but your number will be rounded up to 1.3.  Similarly, if
 you use a bind variable to pass a floating point number into a comparison, it
 will be converted to have the same scale as the value it is being compared to,
 which could cause rounding to occur.
-</p>
-
 </body>
 </html>

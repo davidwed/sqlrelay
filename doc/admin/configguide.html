@@ -16,7 +16,7 @@
       <li><a href="#db-mssql-odbc">Microsoft SQL Server (using ODBC)</a></li>
       <li><a href="#db-mssql-freetds">Microsoft SQL Server (using FreeTDS)</a></li>
       <li><a href="#db-sap">SAP/Sybase (using the native SAP/Sybase library)</a></li>
-      <li><a href="#db-sapfreetds">SAP/Sybase (using the FreeTDS)</a></li>
+      <li><a href="#db-sap-freetds">SAP/Sybase (using the FreeTDS)</a></li>
       <li><a href="#db-db2">IBM DB2</a></li>
       <li><a href="#db-informix">Informix</a></li>
       <li><a href="#db-mysql">MySQL</a></li>
@@ -53,7 +53,7 @@
     <li><a href="#cluster">Load-Balancing and Fail-Over With Replicated Databases or Database Clusters</a></li>
     <li><a href="#rac">Already-Load-Balanced Databases</a></li>
     <li><a href="#masterslave">Master-Slave Query Routing</a></li>
-    <li><a href="#frontend">Front-End Load-Balancing and Fail-Over</a></li>
+    <li><a href="#frontendlb">Front-End Load-Balancing and Fail-Over</a></li>
   </ul>
 
   <li><a href="#authoptions">Authentication/Authorization Options</a></li>
@@ -67,7 +67,15 @@
 
   <li><a href="#security">Security Features</a></li>
   <ul>
-    <li><a href="#krbtls">Kerberos/Active Directory and TLS/SSL Encryption and Authentication</a></li>
+    <li><a href="#frontendencryption">Front-End Encryption and Secure Authentication</a></li>
+    <li><a href="#backendencryption">Back-End Encryption and Secure Authentication</a></li>
+    <ul>
+      <li><a href="#backendenc-oracle">Oracle</a></li>
+      <li><a href="#backendenc-mssql-freetds">Microsoft SQL Server (using FreeTDS)</a></li>
+      <li><a href="#backendenc-mysql">MySQL</a></li>
+      <li><a href="#backendenc-postgresql">PostgreSQL</a></li>
+    </ul>
+
     <li><a href="#runas">Run-As User and Group</a></li>
     <li><a href="#deniedallowedips">Denied/Allowed IP Addresses</a></li>
     <li><a href="#pwdenc">Password Encryption</a></li>
@@ -453,7 +461,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-sapsybase.html">Getting Started With SAP/Sybase</a> for general assistance installing and configuring an SAP/Sybase database.</p>
 
-<br/><a name="db-sapfreetds"/><h4>SAP/Sybase (using FreeTDS)</h4>
+<br/><a name="db-sap-freetds"/><h4>SAP/Sybase (using FreeTDS)</h4>
 
 <p>The native SAP/Sybase library is available on Windows and on some Linux/Unix platforms.</p>
 
@@ -1675,7 +1683,7 @@ sqlr-start -id router
 </pre>
 
 </blockquote>
-<br/><br/><a name="frontend"/><h3>Front-End Load-Balancing and Fail-Over</h3>
+<br/><br/><a name="frontendlb"/><h3>Front-End Load-Balancing and Fail-Over</h3>
 
 <p>If you are building out a high availability environment, or if your pool of application servers is just sufficiently large, you might want to set up a pool of SQL Relay servers between your application servers and the database.</p>
 
@@ -1791,7 +1799,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <br/><a name="krb"/><h3>Kerberos and Active Directory Encryption and Authentication</h3>
 
-<p>SQL Relay supports Kerberos encryption and authentication.</p>
+<p>SQL Relay supports Kerberos encryption and authentication between the SQL Relay client and SQL Relay Server.</p>
 
 <p>When Kerberos encryption and authentication is used:</p>
 
@@ -1897,7 +1905,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><a name="tls"/><h3>TLS/SSL Encryption and Authentication</h3>
 
-<p>SQL Relay supports TLS/SSL encryption and authentication.</p>
+<p>SQL Relay supports TLS/SSL encryption and authentication between the SQL Relay client and SQL Relay Server.</p>
 
 <p>When TLS/SSL encryption and authentication is used:</p>
 
@@ -2088,9 +2096,484 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>SQL Relay offers several features to enhance security.</p>
 
-<br/><a name="krbtls"/><h3>Kerberos/Active Directory and TLS/SSL Encryption and Authentication</h3>
+<br/><a name="frontendencryption"/><h3>Front-End Encryption and Secure Authentication</h3>
 
-<p>As mentioned in the <a href="#authoptions">Authentication/Authorization Options</a> section above, SQL Relay supports <a href="#krb">Kerberos and Active Directory Encryption and Authentication</a> and <a href="#tls">TLS/SSL Encryption and Authentication</a>.</p>
+<p>As mentioned in the <a href="#authoptions">Authentication/Authorization Options</a> section above, SQL Relay supports <a href="#krb">Kerberos and Active Directory Encryption and Authentication</a> and <a href="#tls">TLS/SSL Encryption and Authentication</a> between the SQL Relay client and SQL Relay server.</p>
+
+<br/><a name="backendencryption"/><h3>Back-End Encryption and Secure Authentication</h3>
+
+<p>SQL Relay also supports TLS/SSL Encryption and Authentication between the SQL Relay server and some databases.</p>
+
+<p>The configuration details differ between databases though.</p>
+
+<br/><a name="backendenc-oracle"/><h3>Oracle</h3>
+
+<p>Modern Oracle databases support the following TLS/SSL features:</p>
+
+<ul>
+  <li>Encryption</li>
+  <li>Certificate Validation</li>
+  <li>Distinguished Name Validation</li>
+  <li>Mutual Authentication</li>
+</ul>
+
+<p>Configuring SQL Relay to use TLS/SSL encryption and authentication with an Oracle database involves:</p>
+
+<ul>
+  <li>Configuring SQL*Net on the database server to support secure connections</li>
+  <li>Configuring SQL*Net on the SQL Relay server to support secure connections</li>
+  <li>Telling SQL Relay to use an oracle_sid that refers to a secure connection</li>
+</ul>
+
+<p>Most of the configuration on the SQL Relay server is done outside of SQL Relay itself.</p>
+
+<p>Configuring SQL*Net involves setting up Oracle Wallets, which is a relatively complex process.  See <a target="_blank" href="http://software.firstworks.com/p/oracle-tlsssl-encryption-tutorials.html">Oracle TLS/SSL Encryption Tutorials</a> for more information.  Once that is done though, the SQL Relay configuration is relatively simple.</p>
+
+<p>In this example, orcltls refers to a TLS/SSL-secured entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora):</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_home=/u01/app/oracle/product/12.1.0;oracle_sid=orcltls"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example, there is no tnsnames.ora file, so the oracle_sid is set directly to a tnsnames-style expression that describes a TLS/SSL-secured connection:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCPS)(HOST = testhost)(PORT = 2484)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)))"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>Note the TCPS protocol and port 2848.  Also note that the SERVICE_NAME is still set to orcl, rather than orcltls.</p>
+
+<p>This example adds distinguished name validation:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCPS)(HOST = testhost)(PORT = 2484)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)) (SECURITY = (SSL_SERVER_CERT_DN = "</font><font color="#009900">CN</font><font color="#990000">=</font><font color="#FF0000">testhost.yourdomain.com")))"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this case, the database server's certificate is expected to present the distinguished name: CN=testhost.yourdomain.com</p>
+
+<br/><a name="backendenc-mssql-freetds"/><h3>Microsoft SQL Server (using FreeTDS)</h3>
+
+<p>Modern Microsoft SQL Server databases support the following TLS/SSL features:</p>
+
+<ul>
+  <li>Encryption</li>
+  <li>Certificate Validation</li>
+  <li>Common Name Validation</li>
+</ul>
+
+<p>Microsoft SQL Server does not support Mutual Authentication over TLS/SSL.</p>
+
+<p>Configuring SQL Relay to use TLS/SSL encryption and authentication with a Microsoft SQL Server database using FreeTDS involves:</p>
+
+<ul>
+  <li>Installing a certificate and key on the database server</li>
+  <li>Configuring FreeTDS on the SQL Relay server to support secure connections</li>
+  <li>Telling SQL Relay to use a FreeTDS server entry that refers to a secure connection</li>
+</ul>
+
+<p>Modern Microsoft SQL Server databases support encryption by default, and enable it upon request.  However, a certificate must be installed on the database server to support authentication.  This process can be tricky because SQL Server places some specific requirements on the certificate:</p>
+
+<ul>
+  <li>The common name MUST match the fully qualified domain name of the database server (host name + primary DNS suffix).</li>
+  <ul>
+    <li>...but Windows servers are commonly configured without a primary DNS suffix.</li>
+  </ul>
+
+  <li>The Enhanced Key Usage property MUST include Server Authentication.</li>
+  <ul>
+    <li>Or, in openssl terms: the extendedKeyUsage extension must include serverAuth in the extfile used to generate the certificate signing request.</li>
+  </ul>
+
+</ul>
+
+<p>See <a target="_blank" href="http://software.firstworks.com/p/tlsssl-encryption-with-ms-sql-server.html">TLS/SSL Encryption with MS SQL Server and FreeTDS</a> for more information.</p>
+
+<p>Most of the configuration on the SQL Relay server is done outside of SQL Relay itself, in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf).</p>
+
+<p>In this example, FreeTDS is configured to require an encrypted connection to the database:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> testhost
+	port <font color="#990000">=</font> <font color="#993399">1433</font>
+	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">7.1</font>
+	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font>
+	encryption <font color="#990000">=</font> require</tt></pre>
+
+</blockquote>
+<p>Note that the tds version is 7.1 or higher.  Version 7.0 doesn't support encryption.</p>
+
+<p>In this example, FreeTDS is also configured to validate the database server's certificate against the CA cert /etc/ca.pem (but does not validate the common name):</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> testhost
+	port <font color="#990000">=</font> <font color="#993399">1433</font>
+	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">7.1</font>
+	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font>
+	encryption <font color="#990000">=</font> require
+	<font color="#008080">ca</font> file <font color="#990000">=</font> <font color="#990000">/</font>etc<font color="#990000">/</font>ca<font color="#990000">.</font>pem
+	check <font color="#008080">certificate</font> hostname <font color="#990000">=</font> no</tt></pre>
+
+</blockquote>
+<p>In this example, FreeTDS is also configured to validate that the common name in the database server's certificate matches the database server's host name:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> testhost<font color="#990000">.</font>yourdomain<font color="#990000">.</font>com
+	port <font color="#990000">=</font> <font color="#993399">1433</font>
+	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">7.1</font>
+	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font>
+	encryption <font color="#990000">=</font> require
+	<font color="#008080">ca</font> file <font color="#990000">=</font> <font color="#990000">/</font>etc<font color="#990000">/</font>ca<font color="#990000">.</font>pem
+	check <font color="#008080">certificate</font> hostname <font color="#990000">=</font> yes</tt></pre>
+
+</blockquote>
+<p>Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.</p>
+
+<p>The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, TESTDB refers to the FreeTDS TESTDB entry configured above:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"freetds"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<br/><br/><a name="backendenc-mysql"/><h3>MySQL</h3>
+
+<p>Modern MySQL databases support the following TLS/SSL features:</p>
+
+<ul>
+  <li>Encryption</li>
+  <li>Certificate Validation</li>
+  <li>Common Name Validation</li>
+</ul>
+
+<p>MySQL does not support Mutual Authentication over TLS/SSL.</p>
+
+<p>Configuring SQL Relay to use TLS/SSL encryption and authentication with a MySQL database involves:</p>
+
+<ul>
+  <li>Installing a certificate and key on the database server</li>
+  <li>Configuring the SQL Relay server to support encryption and/or authentication</li>
+  <li>Installing CA certs and revocation lists, as necessary, on the SQL Relay server</li>
+</ul>
+
+<p>MySQL has supported TLS/SSL encryption and authentication since version 4.0, and encryption has been enabled by default since version 5.7.  Older versions require host configuration to enable encryption though, and a certificate must be installed on the database server to support authentication.  See <a target="_blank" href="https://dev.mysql.com/doc/refman/5.7/en/encrypted-connections.html">Using Encrypted Connections</a> for more information.</p>
+
+<p>On the SQL Relay server, most of the configuration is done in the SQL Relay configuration file, in the string attribute of the connection tag.</p>
+
+<p>The following example requires an encrypted connection:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb;sslmode=require"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The following connection string options are supported:</p>
+
+<ul>
+  <li><b>sslmode</b> - The ssl mode of the connection.</li>
+  <ul>
+    <li>disable - Don't use an encrypted connection.</li>
+    <li>prefer - Use an encrypted connection if the database supports it.</li>
+    <li>require - Require an encrypted connection.</li>
+    <li>verify-ca - Require an encrypted connection and validate the server's certificate.</li>
+    <li>verify-full - Require an encrypted connection, validate the server's certificate, and validate that the common name in the server's certificate matches the server's host name.</li>
+  </ul>
+
+  <li><b>tlsversion</b> - the TLS version to use</li>
+  <ul>
+    <li>TLSv1</li>
+    <li>TLSv1.1</li>
+    <li>TLSv1.2</li>
+    <li>Any more recent version of TLS, as supported by and enabled in the underlying MySQL client/server.</li>
+    <li>If left blank or omitted, then the highest supported version is negotiated.</li>
+  </ul>
+
+  <li><b>sslkey</b> - The full path name of an ssl key file (eg. /etc/certs/key.pem).</li>
+  <li><b>sslcert</b> - The full path name of an ssl certificate file (eg. /etc/certs/cert.pem).</li>
+  <li><b>sslcipher</b> - A list of permissable ciphers to use for SSL encryption.  Only necessary if you want to restrict which cipers to use.</li>
+  <li><b>sslca</b> - The full path name of an SSL CA certificate to add to the list of trusted CA certificates to validate the host's certificate against (eg. /etc/certs/ca.pem).</li>
+  <li><b>sslcapath</b> - The full path name to a directory that contains a set of trusted SSL CA certificates to add to the list of trusted CA certificates to validate the host's certificate against (eg. /etc/certs/ca).</li>
+  <li><b>sslcrl</b> - The full path name of an SSL certificate revocation list (eg. /etc/certs/crl.pem).</li>
+  <li><b>sslcrlpath</b> - The full path name of a directory that contains a set of SSL certificate revocation lists (eg. /etc/certs/crl).</li>
+</ul>
+
+<p>The following example also validates the database server's certificate against the CA cert /etc/ca.pem (but does not validate the common name):</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb;sslmode=verify-ca;sslca=/etc/ca.pem"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The following example also validates that the common name in the database server's certificate matches the database server's host name:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost.yourdomain.com;db=testdb;sslmode=verify-full;sslca=/etc/ca.pem"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.</p>
+
+<br/><a name="backendenc-postgresql"/><h3>PostgreSQL</h3>
+
+<p>Modern PostgreSQL databases support the following TLS/SSL features:</p>
+
+<ul>
+  <li>Encryption</li>
+  <li>Certificate Validation</li>
+  <li>Common Name Validation</li>
+  <li>Mutual Authentication</li>
+</ul>
+
+<p>Configuring SQL Relay to use TLS/SSL encryption and authentication with a PostgreSQL database involves:</p>
+
+<ul>
+  <li>Configuring the database server to support secure connections</li>
+  <li>Installing a certificate on the database server</li>
+  <li>Configuring the SQL Relay server to support secure connections</li>
+  <li>Installing a certificate on the SQL Relay server</li>
+  <li>Configuring the database server to support encryption and/or authentication</li>
+  <li>Installing certificate, key, CA certs, and revocation lists, as necessary, on the database server</li>
+  <li>Configuring the SQL Relay server to support encryption and/or authentication</li>
+  <li>Installing certificate, key, CA certs, and revocation lists, as necessary, on the SQL Relay server</li>
+</ul>
+
+<p>PostgreSQL has supported TLS/SSL encryption and authentication since at least version 7.1.  Enabling encryption and/or authentication is straightforward.  See <a target="_blank" href="https://www.postgresql.org/docs/9.6/static/ssl-tcp.html">Secure TCP/IP Connections with SSL</a> for more information.</p>
+
+<p>On the SQL Relay server, most of the configuration is done by adding an <b>sslmode</b> parameter to the string attribute of the connection tag, in the SQL Relay configuration file.</p>
+
+<p>The following example requires an encrypted connection:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb;sslmode=require"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The following <b>sslmode</b> options are supported:</p>
+
+<ul>
+  <li>disable - Don't use an encrypted connection.</li>
+  <li>allow - Allow an encrypted connection if the database supports it.</li>
+  <li>prefer - Use an encrypted connection if the database supports it.</li>
+  <li>require - Require an encrypted connection.</li>
+  <li>verify-ca - Require an encrypted connection and validate the server's certificate.</li>
+  <li>verify-full - Require an encrypted connection, validate the server's certificate, and validate that the common name in the server's certificate matches the server's host name.</li>
+</ul>
+
+<p>If <b>sslmode</b> is set to any value other than disable, then certificate and key files must be present as:</p>
+
+<ul>
+  <li>~/.postgresql/postgresql.crt</li>
+  <li>~/.postgresql/postgresql.key</li>
+</ul>
+
+<p>(where ~/ refers to the home directory of the user that sqlrelay is configured to run as)</p>
+
+<p>If <b>sslmode</b> is set to verify-ca or verify-full then a CA cert file must be present as:</p>
+
+<ul>
+  <li>~/.postgresql/root.crt</li>
+</ul>
+
+<p>Optionally, a certificate revocation list may also be present as:</p>
+
+<ul>
+  <li>~/.postgresql/root.crl</li>
+</ul>
+
+<p>See <a target="_blank" href="http://www.postgresql.org/docs/devel/static/libpq-ssl.html#LIBPQ-SSL-FILE-USAGE">SSL Client File Usage</a> for more information about file names and locations.</p>
+
+<p>The following example also validates the database server's certificate (but does not validate the common name):</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb;sslmode=verify-ca"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The following example also validates that the common name in the database server's certificate matches the database server's host name:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost.yourdomain.com;db=testdb;sslmode=verify-full"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.</p>
 
 <br/><a name="runas"/><h3>Run-As User and Group</h3>
 

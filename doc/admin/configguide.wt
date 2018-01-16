@@ -7,7 +7,7 @@
   * [#db-mssql-odbc Microsoft SQL Server (using ODBC)]
   * [#db-mssql-freetds Microsoft SQL Server (using FreeTDS)]
   * [#db-sap SAP/Sybase (using the native SAP/Sybase library)]
-  * [#db-sapfreetds SAP/Sybase (using the FreeTDS)]
+  * [#db-sap-freetds SAP/Sybase (using the FreeTDS)]
   * [#db-db2 IBM DB2]
   * [#db-informix Informix]
   * [#db-mysql MySQL]
@@ -33,7 +33,7 @@
  * [#cluster Load-Balancing and Fail-Over With Replicated Databases or Database Clusters]
  * [#rac Already-Load-Balanced Databases]
  * [#masterslave Master-Slave Query Routing]
- * [#frontend Front-End Load-Balancing and Fail-Over]
+ * [#frontendlb Front-End Load-Balancing and Fail-Over]
 * [#authoptions Authentication/Authorization Options]
  * [#userlistauth User List Auth]
  * [#dbauth Database Auth]
@@ -41,7 +41,12 @@
  * [#krb Kerberos and Active Directory Encryption and Authentication]
  * [#tls TLS/SSL Encryption and Authentication]
 * [#security Security Features]
- * [#krbtls Kerberos/Active Directory and TLS/SSL Encryption and Authentication]
+ * [#frontendencryption Front-End Encryption and Secure Authentication]
+ * [#backendencryption Back-End Encryption and Secure Authentication]
+  * [#backendenc-oracle Oracle]
+  * [#backendenc-mssql-freetds Microsoft SQL Server (using FreeTDS)]
+  * [#backendenc-mysql MySQL]
+  * [#backendenc-postgresql PostgreSQL]
  * [#runas Run-As User and Group]
  * [#deniedallowedips Denied/Allowed IP Addresses]
  * [#pwdenc Password Encryption]
@@ -320,7 +325,7 @@ See the [configreference.html#sap SQL Relay Configuration Reference] for other v
 
 See [http://software.firstworks.com/p/getting-started-with-sapsybase.html Getting Started With SAP/Sybase] for general assistance installing and configuring an SAP/Sybase database.
 
-[[br]][=#db-sapfreetds]
+[[br]][=#db-sap-freetds]
 ==== SAP/Sybase (using !FreeTDS) ====
 
 The native SAP/Sybase library is available on Windows and on some Linux/Unix platforms.
@@ -1114,7 +1119,7 @@ sqlrsh -host sqlrserver -user routeruser -password routerpassword
 }}}
 
 
-[[br]][=#frontend]
+[[br]][=#frontendlb]
 === Front-End Load-Balancing and Fail-Over ===
 
 If you are building out a high availability environment, or if your pool of application servers is just sufficiently large, you might want to set up a pool of SQL Relay servers between your application servers and the database.
@@ -1202,7 +1207,7 @@ To enable proxied auth, omit the list of user/passwords and configure authtier="
 [[br]][=#krb]
 === Kerberos and Active Directory Encryption and Authentication ===
 
-SQL Relay supports Kerberos encryption and authentication.
+SQL Relay supports Kerberos encryption and authentication between the SQL Relay client and SQL Relay Server.
 
 When Kerberos encryption and authentication is used:
 
@@ -1284,7 +1289,7 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 [[br]][=#tls]
 === TLS/SSL Encryption and Authentication ===
 
-SQL Relay supports TLS/SSL encryption and authentication.
+SQL Relay supports TLS/SSL encryption and authentication between the SQL Relay client and SQL Relay Server.
 
 When TLS/SSL encryption and authentication is used:
 
@@ -1446,10 +1451,297 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 
 SQL Relay offers several features to enhance security.
 
-[[br]][=#krbtls]
-=== Kerberos/Active Directory and TLS/SSL Encryption and Authentication ===
+[[br]][=#frontendencryption]
+=== Front-End Encryption and Secure Authentication ===
 
-As mentioned in the [#authoptions Authentication/Authorization Options] section above, SQL Relay supports [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication].
+As mentioned in the [#authoptions Authentication/Authorization Options] section above, SQL Relay supports [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication] between the SQL Relay client and SQL Relay server.
+
+[[br]][=#backendencryption]
+=== Back-End Encryption and Secure Authentication ===
+
+SQL Relay also supports TLS/SSL Encryption and Authentication between the SQL Relay server and some databases.
+
+The configuration details differ between databases though.
+
+[[br]][=#backendenc-oracle]
+=== Oracle ===
+
+Modern Oracle databases support the following TLS/SSL features:
+
+* Encryption
+* Certificate Validation
+* Distinguished Name Validation
+* Mutual Authentication
+
+Configuring SQL Relay to use TLS/SSL encryption and authentication with an Oracle database involves:
+
+* Configuring SQL*Net on the database server to support secure connections
+* Configuring SQL*Net on the SQL Relay server to support secure connections
+* Telling SQL Relay to use an oracle_sid that refers to a secure connection
+
+Most of the configuration on the SQL Relay server is done outside of SQL Relay itself.
+
+Configuring SQL*Net involves setting up Oracle Wallets, which is a relatively complex process.  See [http://software.firstworks.com/p/oracle-tlsssl-encryption-tutorials.html Oracle TLS/SSL Encryption Tutorials] for more information.  Once that is done though, the SQL Relay configuration is relatively simple.
+
+In this example, orcltls refers to a TLS/SSL-secured entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora):
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-oracle-tls.conf@
+}}}
+}}}
+
+In this example, there is no tnsnames.ora file, so the oracle_sid is set directly to a tnsnames-style expression that describes a TLS/SSL-secured connection:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-oracle-sid-tls.conf@
+}}}
+}}}
+
+Note the TCPS protocol and port 2848.  Also note that the SERVICE_NAME is still set to orcl, rather than orcltls.
+
+This example adds distinguished name validation:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-oracle-sid-tls-dn.conf@
+}}}
+}}}
+
+In this case, the database server's certificate is expected to present the distinguished name: CN=testhost.yourdomain.com
+
+[[br]][=#backendenc-mssql-freetds]
+=== Microsoft SQL Server (using !FreeTDS) ===
+
+Modern Microsoft SQL Server databases support the following TLS/SSL features:
+
+* Encryption
+* Certificate Validation
+* Common Name Validation
+
+Microsoft SQL Server does not support Mutual Authentication over TLS/SSL.
+
+Configuring SQL Relay to use TLS/SSL encryption and authentication with a Microsoft SQL Server database using !FreeTDS involves:
+
+* Installing a certificate and key on the database server
+* Configuring !FreeTDS on the SQL Relay server to support secure connections
+* Telling SQL Relay to use a !FreeTDS server entry that refers to a secure connection
+
+Modern Microsoft SQL Server databases support encryption by default, and enable it upon request.  However, a certificate must be installed on the database server to support authentication.  This process can be tricky because SQL Server places some specific requirements on the certificate:
+
+* The common name MUST match the fully qualified domain name of the database server (host name + primary DNS suffix).
+ * ...but Windows servers are commonly configured without a primary DNS suffix.
+* The Enhanced Key Usage property MUST include Server Authentication.
+ * Or, in openssl terms: the extendedKeyUsage extension must include serverAuth in the extfile used to generate the certificate signing request.
+
+See [http://software.firstworks.com/p/tlsssl-encryption-with-ms-sql-server.html  TLS/SSL Encryption with MS SQL Server and FreeTDS] for more information.
+
+Most of the configuration on the SQL Relay server is done outside of SQL Relay itself, in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf).
+
+In this example, !FreeTDS is configured to require an encrypted connection to the database:
+
+{{{#!blockquote
+{{{#!code
+[TESTDB]
+	host = testhost
+	port = 1433
+	tds version = 7.1
+	client charset = UTF-8
+	encryption = require
+}}}
+}}}
+
+Note that the tds version is 7.1 or higher.  Version 7.0 doesn't support encryption.
+
+In this example, !FreeTDS is also configured to validate the database server's certificate against the CA cert /etc/ca.pem (but does not validate the common name):
+
+{{{#!blockquote
+{{{#!code
+[TESTDB]
+	host = testhost
+	port = 1433
+	tds version = 7.1
+	client charset = UTF-8
+	encryption = require
+	ca file = /etc/ca.pem
+	check certificate hostname = no
+}}}
+}}}
+
+In this example, !FreeTDS is also configured to validate that the common name in the database server's certificate matches the database server's host name:
+
+{{{#!blockquote
+{{{#!code
+[TESTDB]
+	host = testhost.yourdomain.com
+	port = 1433
+	tds version = 7.1
+	client charset = UTF-8
+	encryption = require
+	ca file = /etc/ca.pem
+	check certificate hostname = yes
+}}}
+}}}
+
+Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
+
+The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, TESTDB refers to the !FreeTDS TESTDB entry configured above:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mssql-freetds.conf@
+}}}
+}}}
+
+
+[[br]][=#backendenc-mysql]
+=== !MySQL ===
+
+Modern !MySQL databases support the following TLS/SSL features:
+
+* Encryption
+* Certificate Validation
+* Common Name Validation
+
+!MySQL does not support Mutual Authentication over TLS/SSL.
+
+Configuring SQL Relay to use TLS/SSL encryption and authentication with a !MySQL database involves:
+
+* Installing a certificate and key on the database server
+* Configuring the SQL Relay server to support encryption and/or authentication
+* Installing CA certs and revocation lists, as necessary, on the SQL Relay server
+
+!MySQL has supported TLS/SSL encryption and authentication since version 4.0, and encryption has been enabled by default since version 5.7.  Older versions require host configuration to enable encryption though, and a certificate must be installed on the database server to support authentication.  See [https://dev.mysql.com/doc/refman/5.7/en/encrypted-connections.html Using Encrypted Connections] for more information.
+
+On the SQL Relay server, most of the configuration is done in the SQL Relay configuration file, in the string attribute of the connection tag.
+
+The following example requires an encrypted connection:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysql-tls.conf@
+}}}
+}}}
+
+The following connection string options are supported:
+
+* '''sslmode''' - The ssl mode of the connection.
+ * disable - Don't use an encrypted connection.
+ * prefer - Use an encrypted connection if the database supports it.
+ * require - Require an encrypted connection.
+ * verify-ca - Require an encrypted connection and validate the server's certificate.
+ * verify-full - Require an encrypted connection, validate the server's certificate, and validate that the common name in the server's certificate matches the server's host name.
+* '''tlsversion''' - the TLS version to use
+ * TLSv1
+ * TLSv1.1
+ * TLSv1.2
+ * Any more recent version of TLS, as supported by and enabled in the underlying !MySQL client/server.
+ * If left blank or omitted, then the highest supported version is negotiated.
+* '''sslkey''' - The full path name of an ssl key file (eg. /etc/certs/key.pem).
+* '''sslcert''' - The full path name of an ssl certificate file (eg. /etc/certs/cert.pem).
+* '''sslcipher''' - A list of permissable ciphers to use for SSL encryption.  Only necessary if you want to restrict which cipers to use.
+* '''sslca''' - The full path name of an SSL CA certificate to add to the list of trusted CA certificates to validate the host's certificate against (eg. /etc/certs/ca.pem).
+* '''sslcapath''' - The full path name to a directory that contains a set of trusted SSL CA certificates to add to the list of trusted CA certificates to validate the host's certificate against (eg. /etc/certs/ca).
+* '''sslcrl''' - The full path name of an SSL certificate revocation list (eg. /etc/certs/crl.pem).
+* '''sslcrlpath''' - The full path name of a directory that contains a set of SSL certificate revocation lists (eg. /etc/certs/crl).
+
+The following example also validates the database server's certificate against the CA cert /etc/ca.pem (but does not validate the common name):
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysql-tls-verify-ca.conf@
+}}}
+}}}
+
+The following example also validates that the common name in the database server's certificate matches the database server's host name:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysql-tls-verify-full.conf@
+}}}
+}}}
+
+Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
+
+[[br]][=#backendenc-postgresql]
+=== !PostgreSQL ===
+
+Modern !PostgreSQL databases support the following TLS/SSL features:
+
+* Encryption
+* Certificate Validation
+* Common Name Validation
+* Mutual Authentication
+
+Configuring SQL Relay to use TLS/SSL encryption and authentication with a !PostgreSQL database involves:
+
+* Configuring the database server to support secure connections
+* Installing a certificate on the database server
+* Configuring the SQL Relay server to support secure connections
+* Installing a certificate on the SQL Relay server
+
+* Configuring the database server to support encryption and/or authentication
+* Installing certificate, key, CA certs, and revocation lists, as necessary, on the database server
+* Configuring the SQL Relay server to support encryption and/or authentication
+* Installing certificate, key, CA certs, and revocation lists, as necessary, on the SQL Relay server
+
+!PostgreSQL has supported TLS/SSL encryption and authentication since at least version 7.1.  Enabling encryption and/or authentication is straightforward.  See [https://www.postgresql.org/docs/9.6/static/ssl-tcp.html Secure TCP/IP Connections with SSL] for more information.
+
+On the SQL Relay server, most of the configuration is done by adding an '''sslmode''' parameter to the string attribute of the connection tag, in the SQL Relay configuration file.
+
+The following example requires an encrypted connection:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresql-tls.conf@
+}}}
+}}}
+
+The following '''sslmode''' options are supported:
+
+* disable - Don't use an encrypted connection.
+* allow - Allow an encrypted connection if the database supports it.
+* prefer - Use an encrypted connection if the database supports it.
+* require - Require an encrypted connection.
+* verify-ca - Require an encrypted connection and validate the server's certificate.
+* verify-full - Require an encrypted connection, validate the server's certificate, and validate that the common name in the server's certificate matches the server's host name.
+
+If '''sslmode''' is set to any value other than disable, then certificate and key files must be present as:
+
+* ~/.postgresql/postgresql.crt
+* ~/.postgresql/postgresql.key
+
+(where ~/ refers to the home directory of the user that sqlrelay is configured to run as)
+
+If '''sslmode''' is set to verify-ca or verify-full then a CA cert file must be present as:
+
+* ~/.postgresql/root.crt
+
+Optionally, a certificate revocation list may also be present as:
+
+* ~/.postgresql/root.crl
+
+See [http://www.postgresql.org/docs/devel/static/libpq-ssl.html#LIBPQ-SSL-FILE-USAGE SSL Client File Usage] for more information about file names and locations.
+
+The following example also validates the database server's certificate (but does not validate the common name):
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresql-tls-verify-ca.conf@
+}}}
+}}}
+
+The following example also validates that the common name in the database server's certificate matches the database server's host name:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresql-tls-verify-full.conf@
+}}}
+}}}
+
+Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
+
 
 [[br]][=#runas]
 === Run-As User and Group ===
