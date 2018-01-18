@@ -36,7 +36,7 @@ GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native 
 
 Microsoft Visual Studio and Microsoft Visual Studio Express toolchains are supported on Windows.  Versions 2005 and greater should work.  The nmake utility is also required, but it's provided by Visual Studio.
 
-You also need to install the Rudiments library.  The library is available at [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net] and instructions for building and installing it are available at [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
+You also need to install the Rudiments library.  You can download the most current Source Distribution of Rudiments from [http://rudiments.sourceforge.net/download.html rudiments.sourceforge.net].  Instructions for building and installing it are available at [http://rudiments.sourceforge.net/rudiments/installing.html Installing Rudiments].
 
 To build the non-C/C++ API's, you need to install one or more of
 [http://www.perl.org Perl], 
@@ -86,7 +86,7 @@ See [prerequisites.html Installing SQL Relay Prerequisites] for detailed informa
 [=#downloading]
 == Downloading SQL Relay ==
 
-You can download the most current source distribution of SQL Relay from [http://sqlrelay.sourceforge.net sqlrelay.sourceforge.net].
+You can download the most current Source Distribution of SQL Relay from [http://sqlrelay.sourceforge.net/download.html sqlrelay.sourceforge.net].
 
 For Linux or Unix installations, download the tar.gz file.
 

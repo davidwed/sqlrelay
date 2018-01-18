@@ -210,7 +210,7 @@ See [http://software.firstworks.com/p/getting-started-with-oracle.html Getting S
 
 On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] for some versions of Linux.
 
-In this example, SQL Relay is configured to connect to a ODBC database.
+In this example, SQL Relay is configured to connect to a Microsoft SQL Server database using ODBC.
 
 {{{#!blockquote
 {{{#!code
@@ -513,7 +513,7 @@ SQL Relay supports most popular databases natively, but ODBC can be used to acce
 
 On Windows platforms, ODBC is commonly used to access Microsoft SQL Server and Microsoft Access databases.  On some Linux platforms, the [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] is also commonly used to access Microsoft SQL Server databases, as an alternative to [http://www.freetds.org FreeTDS].  Many other database vendors provide ODBC drivers for Windows and Linux platforms though.
 
-In this example, SQL Relay is configured to connect to a ODBC database.
+In this example, SQL Relay is configured to connect to an ODBC database.
 
 {{{#!blockquote
 {{{#!code

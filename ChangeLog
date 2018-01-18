@@ -25,6 +25,7 @@
 	moved the memorypool used by the sqlrclient protocol module to
 		allocate memory for bind variables into the
 		sqlrservercontroller and exposed it to modules
+	added docs for tls/ssl backend enc/auth
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields
