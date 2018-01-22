@@ -126,6 +126,23 @@ void sqlrserverconnection::handleConnectString() {
 		}
 	}
 	cont->setMaxFieldLength(maxfieldlength);
+
+	// query timeout
+	int64_t		querytimeout=0;
+	const char	*qto=cont->getConnectStringValue("querytimeout");
+	if (mfl) {
+		querytimeout=charstring::toInteger(qto);
+		if (querytimeout<0) {
+			querytimeout=0;
+		}
+	}
+	cont->setQueryTimeout(querytimeout);
+
+	// execute-direct
+	cont->setExecuteDirect(
+		!charstring::compare(
+			cont->getConnectStringValue("executedirect"),
+			"yes"));
 }
 
 bool sqlrserverconnection::changeUser(const char *newuser,

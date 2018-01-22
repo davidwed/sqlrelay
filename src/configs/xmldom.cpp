@@ -77,6 +77,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugSql();
 		bool		getDebugErrors();
 		bool		getDebugParser();
+		bool		getDebugDirectives();
 		bool		getDebugTranslations();
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
@@ -114,6 +115,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 
 		xmldomnode	*getListeners();
 		xmldomnode	*getParser();
+		xmldomnode	*getDirectives();
 		xmldomnode	*getTranslations();
 		xmldomnode	*getFilters();
 		xmldomnode	*getResultSetTranslations();
@@ -197,6 +199,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*debug;
 		bool		debugsql;
 		bool		debugparser;
+		bool		debugdirectives;
 		bool		debugtranslations;
 		bool		debugfilters;
 		bool		debugtriggers;
@@ -234,6 +237,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 
 		xmldomnode	*listenersxml;
 		xmldomnode	*parserxml;
+		xmldomnode	*directivesxml;
 		xmldomnode	*translationsxml;
 		xmldomnode	*filtersxml;
 		xmldomnode	*resultsettranslationsxml;
@@ -328,6 +332,7 @@ void sqlrconfig_xmldom::init() {
 	debug=DEFAULT_DEBUG;
 	debugsql=charstring::contains(debug,"sql");
 	debugparser=charstring::contains(debug,"parser");
+	debugdirectives=charstring::contains(debug,"directives");
 	debugtranslations=charstring::contains(debug,"translations");
 	debugfilters=charstring::contains(debug,"filters");
 	debugtriggers=charstring::contains(debug,"triggers");
@@ -574,6 +579,10 @@ bool sqlrconfig_xmldom::getDebugParser() {
 	return debugparser;
 }
 
+bool sqlrconfig_xmldom::getDebugDirectives() {
+	return debugdirectives;
+}
+
 bool sqlrconfig_xmldom::getDebugTranslations() {
 	return debugtranslations;
 }
@@ -712,6 +721,10 @@ xmldomnode *sqlrconfig_xmldom::getListeners() {
 
 xmldomnode *sqlrconfig_xmldom::getParser() {
 	return parserxml;
+}
+
+xmldomnode *sqlrconfig_xmldom::getDirectives() {
+	return directivesxml;
 }
 
 xmldomnode *sqlrconfig_xmldom::getTranslations() {
@@ -1778,6 +1791,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	// xmls...
 	listenersxml=instance->getFirstTagChild("listeners");
 	parserxml=instance->getFirstTagChild("parser");
+	directivesxml=instance->getFirstTagChild("directives");
 	translationsxml=instance->getFirstTagChild("translations");
 	filtersxml=instance->getFirstTagChild("filters");
 	resultsettranslationsxml=instance->getFirstTagChild(

@@ -35,6 +35,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrcredentials.cpp \
 	sqlrauths.cpp \
 	sqlrauth.cpp \
+	sqlrdirectives.cpp \
+	sqlrdirective.cpp \
 	$(STATICPLUGINSRCS)
 
 LIBSQLRSERVERLOBJS = \
@@ -69,7 +71,9 @@ LIBSQLRSERVERLOBJS = \
 	sqlrpwdenc.$(OBJ) \
 	sqlrcredentials.$(OBJ) \
 	sqlrauths.$(OBJ) \
-	sqlrauth.$(OBJ)
+	sqlrauth.$(OBJ) \
+	sqlrdirectives.$(OBJ) \
+	sqlrdirective.$(OBJ)
 
 .SUFFIXES: .lo .cpp.in
 
@@ -265,6 +269,22 @@ sqlrauthassignments.cpp: sqlrauthassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
+sqlrdirectivedeclarations.cpp: sqlrdirectivedeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../directives/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrdirectiveassignments.cpp: sqlrdirectiveassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../directives/*.$(OBJ)`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
 sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../translations/*.$(OBJ)`; \
@@ -392,6 +412,8 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private/sqlrserverincludes.h
 	$(CP) sqlrelay/private/sqlrshm.h $(includedir)/sqlrelay/private/sqlrshm.h
 	$(CP) sqlrelay/private/sqlrtlscredentials.h $(includedir)/sqlrelay/private/sqlrtlscredentials.h
+	$(CP) sqlrelay/private/sqlrdirective.h $(includedir)/sqlrelay/private/sqlrdirective.h
+	$(CP) sqlrelay/private/sqlrdirectives.h $(includedir)/sqlrelay/private/sqlrdirectives.h
 	$(CP) sqlrelay/private/sqlrtranslation.h $(includedir)/sqlrelay/private/sqlrtranslation.h
 	$(CP) sqlrelay/private/sqlrtranslations.h $(includedir)/sqlrelay/private/sqlrtranslations.h
 	$(CP) sqlrelay/private/sqlrtrigger.h $(includedir)/sqlrelay/private/sqlrtrigger.h

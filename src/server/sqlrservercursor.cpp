@@ -69,6 +69,10 @@ class sqlrservercursorprivate {
 		uint64_t	*_fieldlengths;
 		bool		*_blobs;
 		bool		*_nulls;
+
+		uint64_t	_querytimeout;
+		bool		_executedirect;
+		bool		_executerpc;
 };
 
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
@@ -136,6 +140,10 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	if (colcount) {
 		allocateFieldPointers(colcount);
 	}
+
+	pvt->_querytimeout=conn->cont->getQueryTimeout();
+	pvt->_executedirect=conn->cont->getExecuteDirect();
+	pvt->_executerpc=false;
 }
 
 sqlrservercursor::~sqlrservercursor() {
@@ -1172,4 +1180,28 @@ void sqlrservercursor::getFieldPointers(const char ***fieldnames,
 	*fieldlengths=pvt->_fieldlengths;
 	*blobs=pvt->_blobs;
 	*nulls=pvt->_nulls;
+}
+
+void sqlrservercursor::setQueryTimeout(bool querytimeout) {
+	pvt->_querytimeout=querytimeout;
+}
+
+bool sqlrservercursor::getQueryTimeout() {
+	return pvt->_querytimeout;
+}
+
+void sqlrservercursor::setExecuteDirect(bool executedirect) {
+	pvt->_executedirect=executedirect;
+}
+
+bool sqlrservercursor::getExecuteDirect() {
+	return pvt->_executedirect;
+}
+
+void sqlrservercursor::setExecuteRpc(bool executerpc) {
+	pvt->_executerpc=executerpc;
+}
+
+bool sqlrservercursor::getExecuteRpc() {
+	return pvt->_executerpc;
 }

@@ -1399,13 +1399,13 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 		if (bindcursor) {
 			success=cont->fetchFromBindCursor(cursor);
 		} else if (reexecute) {
-			success=cont->executeQuery(cursor,true,true,true);
+			success=cont->executeQuery(cursor,true,true,true,true);
 		} else {
 			success=(cont->prepareQuery(cursor,
 					cont->getQueryBuffer(cursor),
 					cont->getQueryLength(cursor),
-					true,true) &&
-				cont->executeQuery(cursor,true,true,true));
+					true,true,true) &&
+				cont->executeQuery(cursor,true,true,true,true));
 		}
 
 		// get the skip and fetch parameters here so everything can be

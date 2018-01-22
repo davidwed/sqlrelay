@@ -52,6 +52,7 @@
 
 		void	translateBindVariablesFromMappings(
 						sqlrservercursor *cursor);
+		bool	applyDirectives(sqlrservercursor *cursor);
 		bool	translateQuery(sqlrservercursor *cursor);
 		bool	translateQueryWithParser(sqlrservercursor *cursor,
 						stringbuffer *translatedquery);

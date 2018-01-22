@@ -82,6 +82,7 @@ class sqlrservercontrollerprivate {
 
 	sqlrprotocols			*_sqlrpr;
 	sqlrparser			*_sqlrp;
+	sqlrdirectives			*_sqlrd;
 	sqlrtranslations		*_sqlrt;
 	sqlrfilters			*_sqlrf;
 	sqlrresultsettranslations	*_sqlrrst;
@@ -147,7 +148,8 @@ class sqlrservercontrollerprivate {
 
 	bool		_debugsql;
 	bool		_debugsqlrparser;
-	bool		_debugsqlrtranslation;
+	bool		_debugsqlrdirectives;
+	bool		_debugsqlrtranslations;
 	bool		_debugsqlrfilters;
 	bool		_debugbindtranslation;
 	bool		_debugsqlrresultsettranslation;
@@ -195,6 +197,9 @@ class sqlrservercontrollerprivate {
 	uint32_t	_fetchatonce;
 	uint32_t	_maxcolumncount;
 	uint32_t	_maxfieldlength;
+
+	uint64_t	_querytimeout;
+	bool		_executedirect;
 
 	int64_t		_loggedinsec;
 	int64_t		_loggedinusec;
@@ -292,6 +297,9 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_maxcolumncount=0;
 	pvt->_maxfieldlength=0;
 
+	pvt->_querytimeout=0;
+	pvt->_executedirect=false;
+
 	pvt->_connected=false;
 	pvt->_inclientsession=false;
 	pvt->_loggedin=false;
@@ -306,6 +314,7 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_sqlrpr=NULL;
 	pvt->_sqlrp=NULL;
+	pvt->_sqlrd=NULL;
 	pvt->_sqlrt=NULL;
 	pvt->_sqlrf=NULL;
 	pvt->_sqlrrst=NULL;
@@ -320,7 +329,8 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_decrypteddbpassword=NULL;
 
-	pvt->_debugsqlrtranslation=false;
+	pvt->_debugsqlrdirectives=false;
+	pvt->_debugsqlrtranslations=false;
 	pvt->_debugsqlrfilters=false;
 	pvt->_debugbindtranslation=false;
 	pvt->_debugsqlrresultsettranslation=false;
@@ -384,6 +394,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete pvt->_sqlrpr;
 	delete pvt->_sqlrp;
+	delete pvt->_sqlrd;
 	delete pvt->_sqlrt;
 	delete pvt->_sqlrf;
 	delete pvt->_sqlrrst;
@@ -562,8 +573,16 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 	initConnStats();
 
+	// get the query directives
+	pvt->_debugsqlrdirectives=pvt->_cfg->getDebugDirectives();
+	xmldomnode	*directives=pvt->_cfg->getDirectives();
+	if (!directives->isNullNode()) {
+		pvt->_sqlrd=new sqlrdirectives(this);
+		pvt->_sqlrd->load(directives);
+	}
+
 	// get the query translations
-	pvt->_debugsqlrtranslation=pvt->_cfg->getDebugTranslations();
+	pvt->_debugsqlrtranslations=pvt->_cfg->getDebugTranslations();
 	xmldomnode	*translations=pvt->_cfg->getTranslations();
 	if (!translations->isNullNode()) {
 		pvt->_sqlrp=newParser();
@@ -2775,11 +2794,32 @@ const char * const *sqlrservercontroller::dataTypeStrings() {
 	return datatypestring;
 }
 
+bool sqlrservercontroller::applyDirectives(sqlrservercursor *cursor) {
+
+	if (pvt->_debugsqlrdirectives) {
+		stdoutput.printf("========================================"
+				"========================================\n\n");
+		stdoutput.printf("applying directives...\n");
+	}
+
+	// apply translation rules
+	const char	*query=cursor->getQueryBuffer();
+	if (!pvt->_sqlrd->run(pvt->_conn,cursor,query)) {
+		if (pvt->_debugsqlrdirectives) {
+			stdoutput.printf("a directive failed\n");
+		}
+		// FIXME: raise directive failed event...
+		return false;
+	}
+
+	return true;
+}
+
 bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	const char	*query=cursor->getQueryBuffer();
 
-	if (pvt->_debugsqlrtranslation) {
+	if (pvt->_debugsqlrtranslations) {
 		stdoutput.printf("========================================"
 				"========================================\n\n");
 		stdoutput.printf("translating query...\n");
@@ -2794,7 +2834,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	translatedquery->clear();
 	if (!pvt->_sqlrt->run(pvt->_conn,cursor,
 				pvt->_sqlrp,query,translatedquery)) {
-		if (pvt->_debugsqlrtranslation) {
+		if (pvt->_debugsqlrtranslations) {
 			stdoutput.printf("translation failed, "
 						"using original:\n\"%s\"\n\n",
 						query);
@@ -2808,14 +2848,14 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 		cursor->setQueryTree(pvt->_sqlrp->detachTree());
 	}
 
-	if (pvt->_debugsqlrtranslation) {
+	if (pvt->_debugsqlrtranslations) {
 		stdoutput.printf("translated:\n\"%s\"\n\n",
 					translatedquery->getString());
 	}
 
 	// bail if the translated query is too large
 	if (translatedquery->getStringLength()>pvt->_maxquerysize) {
-		if (pvt->_debugsqlrtranslation) {
+		if (pvt->_debugsqlrtranslations) {
 			stdoutput.printf("translated query too large\n");
 		}
 		return false;
@@ -3537,12 +3577,13 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						const char *query,
 						uint32_t querylen) {
-	return prepareQuery(cursor,query,querylen,false,false);
+	return prepareQuery(cursor,query,querylen,false,false,false);
 }
 
 bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						const char *query,
 						uint32_t querylen,
+						bool enabledirectives,
 						bool enabletranslations,
 						bool enablefilters) {
 
@@ -3643,6 +3684,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 				SQLRQUERYSTATUS_FILTER_VIOLATION);
 			return false;
 		}
+	}
+
+	// apply directives
+	if (enabledirectives && pvt->_sqlrd) {
+		applyDirectives(cursor);
 	}
 
 	// translate query
@@ -3757,10 +3803,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor) {
-	return executeQuery(cursor,false,false,false);
+	return executeQuery(cursor,false,false,false,false);
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
+						bool enabledirectives,
 						bool enabletranslations,
 						bool enablefilters,
 						bool enabletriggers) {
@@ -3803,6 +3850,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 					SQLRQUERYSTATUS_FILTER_VIOLATION);
 				return false;
 			}
+		}
+
+		// apply directives
+		if (enabledirectives && pvt->_sqlrd) {
+			applyDirectives(cursor);
 		}
 
 		// translate query
@@ -3862,7 +3914,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		raiseDebugMessageEvent("faking binds...");
 
 		if (cursor->fakeInputBinds()) {
-			if (pvt->_debugsqlrtranslation) {
+			if (pvt->_debugsqlrtranslations) {
 				stdoutput.printf(
 				"after faking input binds:\n%s\n\n",
 				cursor->
@@ -4112,6 +4164,22 @@ void sqlrservercontroller::commitOrRollback(sqlrservercursor *cursor) {
 
 bool sqlrservercontroller::inTransaction() {
 	return pvt->_intransaction;
+}
+
+void sqlrservercontroller::setQueryTimeout(bool querytimeout) {
+	pvt->_querytimeout=querytimeout;
+}
+
+bool sqlrservercontroller::getQueryTimeout() {
+	return pvt->_querytimeout;
+}
+
+void sqlrservercontroller::setExecuteDirect(bool executedirect) {
+	pvt->_executedirect=executedirect;
+}
+
+bool sqlrservercontroller::getExecuteDirect() {
+	return pvt->_executedirect;
 }
 
 uint16_t sqlrservercontroller::getSendColumnInfo() {

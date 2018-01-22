@@ -59,16 +59,16 @@ Getting-started guides for various databases supported by SQL Relay.
 
 {{{#!td
  [http://software.firstworks.com/p/getting-started-with-oracle.html Oracle][[br]]
- [http://software.firstworks.com/p/getting.html SAP/Sybase][[br]]
+ [http://software.firstworks.com/p/getting-started-with-sapsybase.html SAP/Sybase][[br]]
  [http://software.firstworks.com/p/getting-started-with-ibm-db2.html IBM DB2][[br]]
  [http://software.firstworks.com/p/getting-started-with-mysql.html MySQL][[br]]
- [http://software.firstworks.com/p/blog-page_51.html PostgreSQL][[br]]
+ [http://software.firstworks.com/p/getting-started-with-postgresql.html PostgreSQL][[br]]
 }}}
 {{{#!td
  [http://software.firstworks.com/p/getting-started-with-firebird.html Firebird][[br]]
  [http://software.firstworks.com/p/getting-started-with-sqlite.html SQLite][[br]]
- [http://software.firstworks.com/p/blog-page_8.html MS Access (on non-MS platforms)][[br]]
- [http://software.firstworks.com/p/blog-page_65.html ODBC (non-MS platforms)][[br]]
+ [http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html MS Access (on non-MS platforms)][[br]]
+ [http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html ODBC (non-MS platforms)][[br]]
 }}}
 }}}
 

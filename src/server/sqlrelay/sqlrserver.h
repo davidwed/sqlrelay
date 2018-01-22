@@ -203,6 +203,12 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	getInitialAutoCommit();
 		bool	inTransaction();
 
+		// execution
+		void	setQueryTimeout(bool querytimeout);
+		bool	getQueryTimeout();
+		void	setExecuteDirect(bool executedirect);
+		bool	getExecuteDirect();
+
 		// errors
 		void		saveError();
 		void		saveErrorFromCursor(sqlrservercursor *cursor);
@@ -373,10 +379,12 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	prepareQuery(sqlrservercursor *cursor,
 						const char *query,
 						uint32_t length,
+						bool enabledirectives,
 						bool enabletranslations,
 						bool enablefilters);
 		bool	executeQuery(sqlrservercursor *cursor);
 		bool	executeQuery(sqlrservercursor *cursor,
+						bool enabledirectives,
 						bool enabletranslations,
 						bool enablefilters,
 						bool enabletriggers);
@@ -1135,6 +1143,13 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						bool **blob,
 						bool **null);
 
+		void	setQueryTimeout(bool querytimeout);
+		bool	getQueryTimeout();
+		void	setExecuteDirect(bool executedirect);
+		bool	getExecuteDirect();
+		void	setExecuteRpc(bool executerpc);
+		bool	getExecuteRpc();
+
 		sqlrserverconnection	*conn;
 
 	#include <sqlrelay/private/sqlrservercursor.h>
@@ -1563,6 +1578,36 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 		xmldomnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrparser.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrdirective {
+	public:
+		sqlrdirective(sqlrservercontroller *cont,
+					sqlrdirectives *sqlts,
+					xmldomnode *parameters);
+		virtual	~sqlrdirective();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					const char *query);
+	protected:
+		sqlrdirectives	*getDirectives();
+		xmldomnode	*getParameters();
+
+	#include <sqlrelay/private/sqlrdirective.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrdirectives {
+	public:
+		sqlrdirectives(sqlrservercontroller *cont);
+		~sqlrdirectives();
+
+		bool	load(xmldomnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					const char *query);
+
+	#include <sqlrelay/private/sqlrdirectives.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrtranslation {
