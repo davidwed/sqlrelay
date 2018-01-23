@@ -1902,9 +1902,6 @@ void odbccursor::deallocateResultSetBuffers() {
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
-	// parse query directives
-	//parseDirectives(query,length);
-
 	// initialize column count
 	initializeColCounts();
 
