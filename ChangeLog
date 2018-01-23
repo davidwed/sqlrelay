@@ -27,6 +27,7 @@
 		sqlrservercontroller and exposed it to modules
 	added docs for tls/ssl backend enc/auth
 	added directives framework
+	pushed connect timeout parameter up
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

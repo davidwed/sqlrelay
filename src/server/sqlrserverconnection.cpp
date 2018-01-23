@@ -127,10 +127,24 @@ void sqlrserverconnection::handleConnectString() {
 	}
 	cont->setMaxFieldLength(maxfieldlength);
 
+	// connect timeout
+	int64_t		connecttimeout=0;
+	const char	*cto=cont->getConnectStringValue("connecttimeout");
+	if (!cto) {
+		cto=cont->getConnectStringValue("timeout");
+	}
+	if (cto) {
+		connecttimeout=charstring::toInteger(cto);
+		if (connecttimeout<0) {
+			connecttimeout=0;
+		}
+	}
+	cont->setConnectTimeout(connecttimeout);
+
 	// query timeout
 	int64_t		querytimeout=0;
 	const char	*qto=cont->getConnectStringValue("querytimeout");
-	if (mfl) {
+	if (qto) {
 		querytimeout=charstring::toInteger(qto);
 		if (querytimeout<0) {
 			querytimeout=0;

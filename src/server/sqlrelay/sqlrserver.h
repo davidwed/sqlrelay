@@ -111,6 +111,12 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// connect string 
 		const char	*getConnectStringValue(const char *variable);
+		void		setConnectTimeout(uint64_t connecttimeout);
+		uint64_t	getConnectTimeout();
+		void		setQueryTimeout(uint64_t querytimeout);
+		uint64_t	getQueryTimeout();
+		void		setExecuteDirect(bool executedirect);
+		bool		getExecuteDirect();
 
 		// environment
 		const char	*getId();
@@ -202,12 +208,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	setInitialAutoCommit(bool iac);
 		bool	getInitialAutoCommit();
 		bool	inTransaction();
-
-		// execution
-		void	setQueryTimeout(bool querytimeout);
-		bool	getQueryTimeout();
-		void	setExecuteDirect(bool executedirect);
-		bool	getExecuteDirect();
 
 		// errors
 		void		saveError();
@@ -1143,12 +1143,12 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						bool **blob,
 						bool **null);
 
-		void	setQueryTimeout(bool querytimeout);
-		bool	getQueryTimeout();
-		void	setExecuteDirect(bool executedirect);
-		bool	getExecuteDirect();
-		void	setExecuteRpc(bool executerpc);
-		bool	getExecuteRpc();
+		void		setQueryTimeout(uint64_t querytimeout);
+		uint64_t	getQueryTimeout();
+		void		setExecuteDirect(bool executedirect);
+		bool		getExecuteDirect();
+		void		setExecuteRpc(bool executerpc);
+		bool		getExecuteRpc();
 
 		sqlrserverconnection	*conn;
 

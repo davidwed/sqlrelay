@@ -198,6 +198,7 @@ class sqlrservercontrollerprivate {
 	uint32_t	_maxcolumncount;
 	uint32_t	_maxfieldlength;
 
+	uint64_t	_connecttimeout;
 	uint64_t	_querytimeout;
 	bool		_executedirect;
 
@@ -297,6 +298,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_maxcolumncount=0;
 	pvt->_maxfieldlength=0;
 
+	pvt->_connecttimeout=0;
 	pvt->_querytimeout=0;
 	pvt->_executedirect=false;
 
@@ -4166,22 +4168,6 @@ bool sqlrservercontroller::inTransaction() {
 	return pvt->_intransaction;
 }
 
-void sqlrservercontroller::setQueryTimeout(bool querytimeout) {
-	pvt->_querytimeout=querytimeout;
-}
-
-bool sqlrservercontroller::getQueryTimeout() {
-	return pvt->_querytimeout;
-}
-
-void sqlrservercontroller::setExecuteDirect(bool executedirect) {
-	pvt->_executedirect=executedirect;
-}
-
-bool sqlrservercontroller::getExecuteDirect() {
-	return pvt->_executedirect;
-}
-
 uint16_t sqlrservercontroller::getSendColumnInfo() {
 	return pvt->_sendcolumninfo;
 }
@@ -6096,6 +6082,30 @@ const char *sqlrservercontroller::getUser() {
 
 const char *sqlrservercontroller::getPassword() {
 	return pvt->_password;
+}
+
+void sqlrservercontroller::setConnectTimeout(uint64_t connecttimeout) {
+	pvt->_connecttimeout=connecttimeout;
+}
+
+uint64_t sqlrservercontroller::getConnectTimeout() {
+	return pvt->_connecttimeout;
+}
+
+void sqlrservercontroller::setQueryTimeout(uint64_t querytimeout) {
+	pvt->_querytimeout=querytimeout;
+}
+
+uint64_t sqlrservercontroller::getQueryTimeout() {
+	return pvt->_querytimeout;
+}
+
+void sqlrservercontroller::setExecuteDirect(bool executedirect) {
+	pvt->_executedirect=executedirect;
+}
+
+bool sqlrservercontroller::getExecuteDirect() {
+	return pvt->_executedirect;
 }
 
 void sqlrservercontroller::setInterceptTransactionQueries(bool itxq) {

@@ -1182,11 +1182,11 @@ void sqlrservercursor::getFieldPointers(const char ***fieldnames,
 	*nulls=pvt->_nulls;
 }
 
-void sqlrservercursor::setQueryTimeout(bool querytimeout) {
+void sqlrservercursor::setQueryTimeout(uint64_t querytimeout) {
 	pvt->_querytimeout=querytimeout;
 }
 
-bool sqlrservercursor::getQueryTimeout() {
+uint64_t sqlrservercursor::getQueryTimeout() {
 	return pvt->_querytimeout;
 }
 

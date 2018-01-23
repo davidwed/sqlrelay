@@ -304,7 +304,6 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		const char	*db;
 		bool		trace;
 		const char	*tracefile;
-		uint64_t	timeout;
 		const char	*identity;
 		const char	*odbcversion;
 		bool		detachbeforelogin;
@@ -446,7 +445,6 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	db=NULL;
 	trace=false;
 	tracefile=NULL;
-	timeout=0;
 	identity=NULL;
 	odbcversion=NULL;
 	detachbeforelogin=false;
@@ -468,14 +466,6 @@ void odbcconnection::handleConnectString() {
 	trace=!charstring::compare(
 			cont->getConnectStringValue("trace"),"yes");
 	tracefile=cont->getConnectStringValue("tracefile");
-
-	const char	*to=cont->getConnectStringValue("timeout");
-	if (!charstring::length(to)) {
-		// for back-compatibility
-		timeout=5;
-	} else {
-		timeout=charstring::toInteger(to);
-	}
 
 	identity=cont->getConnectStringValue("identity");
 
@@ -572,11 +562,12 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set the connect timeout
-	if (timeout) {
+	uint64_t	connecttimeout=cont->getConnectTimeout();
+	if (connecttimeout) {
 		erg=SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,
-					(SQLPOINTER *)timeout,0);
+					(SQLPOINTER *)connecttimeout,0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			*error="Failed to set timeout";
+			*error="Failed to set connect timeout";
 			SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 			SQLFreeHandle(SQL_HANDLE_ENV,env);
 			return false;

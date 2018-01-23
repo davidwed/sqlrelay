@@ -1697,6 +1697,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 		debug=attr->getValue();
 		debugsql=charstring::contains(debug,"sql");
 		debugparser=charstring::contains(debug,"parser");
+		debugdirectives=charstring::contains(debug,"directives");
 		debugtranslations=charstring::contains(debug,"translations");
 		debugfilters=charstring::contains(debug,"filters");
 		debugtriggers=charstring::contains(debug,"triggers");

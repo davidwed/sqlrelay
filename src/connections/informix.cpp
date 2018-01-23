@@ -261,7 +261,6 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		const char	*servername;
 		const char	*db;
 		const char	*lang;
-		uint32_t	timeout;
 		stringbuffer	dsn;
 
 		stringbuffer	errormessage;
@@ -325,8 +324,6 @@ void informixconnection::handleConnectString() {
 	// get other parameters
 	lang=cont->getConnectStringValue("lang");
 
-	timeout=charstring::toInteger(cont->getConnectStringValue("timeout"));
-
 	// multi-row fetch doesn't work with clobs/blobs because you're already
 	// on a different row when SQLGetData is called to get the data for the
 	// clob/blob on the first row, so override it to 1
@@ -381,16 +378,17 @@ bool informixconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set the connect timeout
-	if (timeout) {
+	uint32_t	connecttimeout=cont->getConnectTimeout();
+	if (connecttimeout) {
 		erg=SQLSetConnectAttr(dbc,
 				#ifdef SQL_ATTR_LOGIN_TIMEOUT
 				SQL_ATTR_LOGIN_TIMEOUT,
 				#else
 				SQL_LOGIN_TIMEOUT,
 				#endif
-				(SQLPOINTER)timeout,0);
+				(SQLPOINTER)connecttimeout,0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			*error="Failed to set timeout";
+			*error="Failed to set connect timeout";
 			SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 			SQLFreeHandle(SQL_HANDLE_ENV,env);
 			return false;
