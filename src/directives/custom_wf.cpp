@@ -64,40 +64,15 @@ bool sqlrdirective_custom_wf::run(sqlrserverconnection *sqlrcon,
 	sqlrcur->setExecuteRpc(false);
 
 	// run through the query, processing directives
-	const char	*ptr=query;
-	const char	*start=ptr;
-	while (*ptr) {
-
-		// Skip comment marker and spaces after it.
-		// If the line didn't start with a comment,
-		// then we're done.
-		if (!charstring::compare(ptr,"--",2)) {
-			ptr+=2;
-			while (*ptr && *ptr==' ') {
-				ptr++;
-			}
-			start=ptr;
-		} else {
-			break;
-		}
-
-		// get the rest of the line and parse the directive
-		while (*ptr) {
-			if (*ptr=='\n' || !*ptr) {
-				parseDirective(sqlrcur,start,ptr-start);
-				if (!*ptr) {
-					break;
-				}
-				ptr++;
-				start=ptr;
-			} else {
-				ptr++;
-			}
-		}
+	const char	*line=query;
+	const char	*directivestart=NULL;
+	uint32_t	directivelength=0;
+	while (getDirective(line,&directivestart,&directivelength,&line)) {
+		parseDirective(sqlrcur,directivestart,directivelength);
 	}
 
 	// check for rpc markers (which might follow the comments)
-	if (query[0]==MARKER_ODBC_RPC) {
+	if (*line==MARKER_ODBC_RPC) {
 		if (debug) {
 			stdoutput.printf("%s...\n",MARKER_ODBC_RPC);
 		}

@@ -1593,6 +1593,10 @@ class SQLRSERVER_DLLSPEC sqlrdirective {
 	protected:
 		sqlrdirectives	*getDirectives();
 		xmldomnode	*getParameters();
+		bool		getDirective(const char *line,
+						const char **directivestart,
+						uint32_t *directivelength,
+						const char **newline);
 
 	#include <sqlrelay/private/sqlrdirective.h>
 };
