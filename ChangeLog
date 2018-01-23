@@ -26,7 +26,7 @@
 		allocate memory for bind variables into the
 		sqlrservercontroller and exposed it to modules
 	added docs for tls/ssl backend enc/auth
-	added directives framework
+	added directives framework and custom_wf directive
 	pushed connect timeout parameter up
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip

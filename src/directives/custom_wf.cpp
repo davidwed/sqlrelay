@@ -21,10 +21,10 @@ class SQLRSERVER_DLLSPEC sqlrdirective_custom_wf : public sqlrdirective {
 					uint32_t length);
 		void	crashmeTest(int32_t iargument);
 
-		bool	enabled;
-		bool	debug;
-
 		sqlrservercontroller	*cont;
+
+		bool	debug;
+		bool	enabled;
 };
 
 sqlrdirective_custom_wf::sqlrdirective_custom_wf(
@@ -34,12 +34,12 @@ sqlrdirective_custom_wf::sqlrdirective_custom_wf(
 				sqlrdirective(cont,sqlds,parameters) {
 	debugFunction();
 
+	this->cont=cont;
+
 	debug=cont->getConfig()->getDebugDirectives();
 
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
-
-	this->cont=cont;
 }
 
 #define KEYWORD_SQLEXECDIRECT "sqlexecdirect"
@@ -58,29 +58,51 @@ bool sqlrdirective_custom_wf::run(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
+	// reset directives
 	sqlrcur->setQueryTimeout(cont->getQueryTimeout());
 	sqlrcur->setExecuteDirect(cont->getExecuteDirect());
 	sqlrcur->setExecuteRpc(false);
 
+	// run through the query, processing directives
+	const char	*ptr=query;
+	const char	*start=ptr;
+	while (*ptr) {
+
+		// Skip comment marker and spaces after it.
+		// If the line didn't start with a comment,
+		// then we're done.
+		if (!charstring::compare(ptr,"--",2)) {
+			ptr+=2;
+			while (*ptr && *ptr==' ') {
+				ptr++;
+			}
+			start=ptr;
+		} else {
+			break;
+		}
+
+		// get the rest of the line and parse the directive
+		while (*ptr) {
+			if (*ptr=='\n' || !*ptr) {
+				parseDirective(sqlrcur,start,ptr-start);
+				if (!*ptr) {
+					break;
+				}
+				ptr++;
+				start=ptr;
+			} else {
+				ptr++;
+			}
+		}
+	}
+
+	// check for rpc markers (which might follow the comments)
 	if (query[0]==MARKER_ODBC_RPC) {
 		if (debug) {
 			stdoutput.printf("%s...\n",MARKER_ODBC_RPC);
 		}
 		sqlrcur->setExecuteDirect(true);
 		sqlrcur->setExecuteRpc(true);
-	}
-
-	const char	*linestart=query;
-	for (const char *ptr=query; *ptr; ptr++) {
-		if ((*ptr=='\n' || !*ptr) &&
-				(ptr-linestart)>2 &&
-				(linestart[0]=='-') &&
-				(linestart[1]=='-')) {
-			parseDirective(sqlrcur,
-					linestart+2,
-					ptr-linestart-2);
-			linestart=ptr+1;
-		}
 	}
 
 	return true;
@@ -92,15 +114,10 @@ void sqlrdirective_custom_wf::parseDirective(
 				uint32_t length) {
 	debugFunction();
 
-	uint32_t	cleanlength=length;
-	int32_t		argumentsize;
-	const char	*argument;
-	int32_t		iargument=0;
-
-	if (cleanlength && directivestart[cleanlength-1]=='\r') {
-		cleanlength--;
+	if (directivestart[length]=='\r') {
+		length--;
 	}
-	if (!cleanlength) {
+	if (!length) {
 		return;
 	}
 
@@ -108,7 +125,7 @@ void sqlrdirective_custom_wf::parseDirective(
 	// just very strict and simple formats for a code generator to emit.
 	if (!charstring::compare(directivestart,
 				KEYWORD_SQLEXECDIRECT,
-				cleanlength)) {
+				length)) {
 		if (debug) {
 			stdoutput.printf("%s...\n",KEYWORD_SQLEXECDIRECT);
 		}
@@ -118,7 +135,7 @@ void sqlrdirective_custom_wf::parseDirective(
 
 	if (!charstring::compare(directivestart,
 				KEYWORD_SQLPREPARE,
-				cleanlength)) {
+				length)) {
 		if (debug) {
 			stdoutput.printf("%s...\n",KEYWORD_SQLPREPARE);
 		}
@@ -127,7 +144,7 @@ void sqlrdirective_custom_wf::parseDirective(
 
 	if (!charstring::compare(directivestart,
 				KEYWORD_SQLRELAY_CRASH,
-				cleanlength)) {
+				length)) {
 		if (debug) {
 			stdoutput.printf("%s...\n",KEYWORD_SQLRELAY_CRASH);
 		}
@@ -135,12 +152,16 @@ void sqlrdirective_custom_wf::parseDirective(
 		return;
 	}
 
-	if ((cleanlength>charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)) &&
+	int32_t		argumentsize;
+	const char	*argument;
+	int32_t		iargument=0;
+
+	if ((length>charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)) &&
 		(!charstring::compare(directivestart,
 			KEYWORD_SQLRELAY_CRASH_ARG,
 			charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)))) {
 
-		argumentsize=cleanlength-
+		argumentsize=length-
 				charstring::length(KEYWORD_SQLRELAY_CRASH_ARG);
 		argument=&directivestart[
 				charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)];
@@ -153,12 +174,12 @@ void sqlrdirective_custom_wf::parseDirective(
 		return;
 	}
 
-	if ((cleanlength>charstring::length(KEYWORD_QUERYTIMEOUT)) &&
+	if ((length>charstring::length(KEYWORD_QUERYTIMEOUT)) &&
 		(!charstring::compare(directivestart,
 				KEYWORD_QUERYTIMEOUT,
 				charstring::length(KEYWORD_QUERYTIMEOUT)))) {
 
-		argumentsize=cleanlength-
+		argumentsize=length-
 				charstring::length(KEYWORD_QUERYTIMEOUT);
 		argument=&directivestart[
 				charstring::length(KEYWORD_QUERYTIMEOUT)];
