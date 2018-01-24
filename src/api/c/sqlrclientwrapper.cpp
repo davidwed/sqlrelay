@@ -52,6 +52,22 @@ void sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 	sqlrconref->setResponseTimeout(timeoutsec,timeoutusec);
 }
 
+
+void sqlrcon_getConnectTimeout(sqlrcon sqlrconref,
+			int32_t *timeoutsec, int32_t *timeoutusec) {
+	sqlrconref->getConnectTimeout(timeoutsec,timeoutusec);
+}
+
+void sqlrcon_getAuthenticationTimeout(sqlrcon sqlrconref,
+			int32_t *timeoutsec, int32_t *timeoutusec) {
+	sqlrconref->getAuthenticationTimeout(timeoutsec,timeoutusec);
+}
+
+void sqlrcon_getResponseTimeout(sqlrcon sqlrconref,
+			int32_t *timeoutsec, int32_t *timeoutusec) {
+	sqlrconref->getResponseTimeout(timeoutsec,timeoutusec);
+}
+
 void sqlrcon_enableKerberos(sqlrcon sqlrconref,
 					const char *service,
 					const char *mech,

@@ -63,6 +63,25 @@ void	sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 				int32_t timeoutsec, int32_t timeoutusec);
 
 
+/** @ingroup sqlrclientwrapper
+ *  Gets the server connect timeout in seconds and microseconds. */
+SQLRCLIENT_DLLSPEC
+void	sqlrcon_getConnectTimeout(sqlrcon sqlrconref,
+				int32_t *timeoutsec, int32_t *timeoutusec);
+
+/** @ingroup sqlrclientwrapper
+ *  Gets the authentication timeout in seconds and microseconds. */
+SQLRCLIENT_DLLSPEC
+void	sqlrcon_getAuthenticationTimeout(sqlrcon sqlrconref,
+				int32_t *timeoutsec, int32_t *timeoutusec);
+
+/** @ingroup sqlrclientwrapper
+ *  Gets the response timeout in seconds and microseconds. */
+SQLRCLIENT_DLLSPEC
+void	sqlrcon_getResponseTimeout(sqlrcon sqlrconref,
+				int32_t *timeoutsec, int32_t *timeoutusec);
+
+
 
 /** @ingroup sqlrclientwrapper
  *  Enables Kerberos authentication and encryption.

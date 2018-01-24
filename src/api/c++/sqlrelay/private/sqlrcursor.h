@@ -15,6 +15,7 @@
 		void	deleteSubstitutionVariables();
 		void	deleteInputBindVariables();
 		void	deleteOutputBindVariables();
+		void	deleteInputOutputBindVariables();
 		void	deleteVariables();
 
 		void	initQueryBuffer(uint32_t querylength);
@@ -27,6 +28,7 @@
 		void	validateBindsInternal();
 		void	sendInputBinds();
 		void	sendOutputBinds();
+		void	sendInputOutputBinds();
 		void	sendGetColumnInfo();
 		void	defineOutputBindGeneric(const char *variable,
 						sqlrclientbindvartype_t type,
@@ -85,6 +87,7 @@
 		bool	getSuspended();
 		bool	parseColumnInfo();
 		bool	parseOutputBinds();
+		bool	parseInputOutputBinds();
 		bool	parseResults();
 		void	setError(const char *err);
 		void	getErrorFromServer();
@@ -99,6 +102,7 @@
 		void	cacheNoError();
 		void	cacheColumnInfo();
 		void	cacheOutputBinds(uint32_t count);
+		void	cacheInputOutputBinds(uint32_t count);
 		void	cacheData();
 		void	finishCaching();
  
@@ -188,5 +192,21 @@
 		void		dontClearBindsDuringPrepare();
 		void		lazyFetch();
 		void		dontLazyFetch();
+		void		defineInputOutputBindString(
+						const char *variable,
+						const char *value,
+						uint32_t length);
+		void		defineInputOutputBindInteger(
+						const char *variable,
+						int64_t value);
+		void		defineInputOutputBindGeneric(
+						const char *variable,
+						sqlrclientbindvartype_t type,
+						const char *strvalue,
+						int64_t intvalue,
+						uint32_t valuesize);
+		const char	*getInputOutputBindString(const char *variable);
+		uint32_t	getInputOutputBindLength(const char *variable);
+		int64_t		getInputOutputBindInteger(const char *variable);
 
 	friend class sqlrconnection;

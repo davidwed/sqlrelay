@@ -218,6 +218,7 @@ class sqlrcursorprivate {
 		// bind variables
 		dynamicarray<sqlrclientbindvar>	*_inbindvars;
 		dynamicarray<sqlrclientbindvar>	*_outbindvars;
+		dynamicarray<sqlrclientbindvar>	*_inoutbindvars;
 		bool				_validatebinds;
 		bool				_dirtybinds;
 		bool				_clearbindsduringprepare;
@@ -414,6 +415,8 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 					OPTIMISTIC_BIND_COUNT,16);
 	pvt->_outbindvars=new dynamicarray<sqlrclientbindvar>(
 					OPTIMISTIC_BIND_COUNT,16);
+	pvt->_inoutbindvars=new dynamicarray<sqlrclientbindvar>(
+					OPTIMISTIC_BIND_COUNT,16);
 	pvt->_clearbindsduringprepare=true;
 	clearVariables();
 }
@@ -428,6 +431,7 @@ sqlrcursor::~sqlrcursor() {
 
 	// deallocate copied references
 	deleteVariables();
+	delete pvt->_inoutbindvars;
 	delete pvt->_outbindvars;
 	delete pvt->_inbindvars;
 	delete pvt->_subvars;
@@ -787,6 +791,18 @@ void sqlrcursor::cacheOutputBinds(uint32_t count) {
 							doubleval.scale);
 		}
 	}
+
+	// terminate the list of output binds
+	pvt->_cachedest->write((uint16_t)END_BIND_VARS);
+}
+
+void sqlrcursor::cacheInputOutputBinds(uint32_t count) {
+
+	if (pvt->_resumed || !pvt->_cachedest) {
+		return;
+	}
+
+	// FIXME: implement this
 
 	// terminate the list of output binds
 	pvt->_cachedest->write((uint16_t)END_BIND_VARS);
@@ -1332,6 +1348,7 @@ void sqlrcursor::deleteVariables() {
 	deleteSubstitutionVariables();
 	deleteInputBindVariables();
 	deleteOutputBindVariables();
+	deleteInputOutputBindVariables();
 }
 
 void sqlrcursor::deleteSubstitutionVariables() {
@@ -1398,6 +1415,29 @@ void sqlrcursor::deleteOutputBindVariables() {
 	}
 }
 
+void sqlrcursor::deleteInputOutputBindVariables() {
+
+	for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+		if (pvt->_copyrefs) {
+			delete[] (*pvt->_inoutbindvars)[i].variable;
+		}
+		if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_STRING) {
+			delete[] (*pvt->_inoutbindvars)[i].value.stringval;
+		}
+		if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_BLOB ||
+			(*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_CLOB) {
+			delete[] (*pvt->_inoutbindvars)[i].value.lobval;
+		}
+		if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_DATE) {
+			delete[] (*pvt->_inoutbindvars)[i].value.dateval.tz;
+		}
+	}
+}
+
 void sqlrcursor::substitution(const char *variable, const char *value) {
 	if (charstring::isNullOrEmpty(variable)) {
 		return;
@@ -1451,6 +1491,9 @@ void sqlrcursor::clearBinds() {
 
 	deleteOutputBindVariables();
 	pvt->_outbindvars->clear();
+
+	deleteInputOutputBindVariables();
+	pvt->_inoutbindvars->clear();
 }
 
 void sqlrcursor::inputBindBlob(const char *variable, const char *value,
@@ -1815,14 +1858,88 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 	bv->send=true;
 }
 
+void sqlrcursor::defineInputOutputBindString(const char *variable,
+							const char *value,
+							uint32_t length) {
+	defineInputOutputBindGeneric(variable,
+				SQLRCLIENTBINDVARTYPE_STRING,
+				value,0,length);
+}
+
+void sqlrcursor::defineInputOutputBindInteger(const char *variable,
+							int64_t value) {
+	defineInputOutputBindGeneric(variable,
+				SQLRCLIENTBINDVARTYPE_INTEGER,
+				NULL,value,sizeof(int64_t));
+}
+
+void sqlrcursor::defineInputOutputBindGeneric(const char *variable,
+						sqlrclientbindvartype_t type,
+						const char *strvalue,
+						int64_t intvalue,
+						uint32_t valuesize) {
+
+	if (charstring::isNullOrEmpty(variable)) {
+		return;
+	}
+
+	bool			preexisting=true;
+	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inoutbindvars);
+	if (!bv) {
+		bv=&(*pvt->_inoutbindvars)[pvt->_inoutbindvars->getLength()];
+		preexisting=false;
+		pvt->_dirtybinds=true;
+	}
+
+	// clean up old values and set new values
+	if (preexisting) {
+		if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
+			delete[] bv->value.stringval;
+		} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB ||
+				bv->type==SQLRCLIENTBINDVARTYPE_CLOB) {
+			delete[] bv->value.lobval;
+		}
+	}
+	if (pvt->_copyrefs) {
+		if (preexisting) {
+			delete[] bv->variable;
+		}
+		bv->variable=charstring::duplicate(variable);
+	} else {
+		bv->variable=(char *)variable;
+	}
+	bv->type=type;
+	if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
+		bv->value.stringval=new char[valuesize+1];
+		if (strvalue) {
+			charstring::copy(bv->value.stringval,
+						strvalue,valuesize);
+		} else {
+			bv->value.stringval[0]='\0';
+			bv->type=SQLRCLIENTBINDVARTYPE_NULL;
+		}
+	} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {
+		bv->value.integerval=intvalue;
+	} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB ||
+				bv->type==SQLRCLIENTBINDVARTYPE_CLOB) {
+		// FIXME: initialize....
+		bv->value.lobval=NULL;
+	}
+	bv->valuesize=valuesize;
+	bv->resultvaluesize=0;
+	bv->send=true;
+}
+
 const char *sqlrcursor::getOutputBindString(const char *variable) {
 
 	if (variable) {
 		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable) &&
+				((*pvt->_outbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_STRING ||
 				(*pvt->_outbindvars)[i].type==
-						SQLRCLIENTBINDVARTYPE_STRING) {
+						SQLRCLIENTBINDVARTYPE_NULL)) {
 				return (*pvt->_outbindvars)[i].value.stringval;
 			}
 		}
@@ -1957,6 +2074,54 @@ sqlrcursor *sqlrcursor::getOutputBindCursor(const char *variable,
 	return bindcursor;
 }
 
+const char *sqlrcursor::getInputOutputBindString(const char *variable) {
+
+	if (variable) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+			if (!charstring::compare(
+				(*pvt->_inoutbindvars)[i].variable,variable) &&
+				((*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_STRING ||
+				(*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_NULL)) {
+				return (*pvt->_inoutbindvars)[i].
+							value.stringval;
+			}
+		}
+	}
+	return NULL;
+}
+
+uint32_t sqlrcursor::getInputOutputBindLength(const char *variable) {
+
+	if (variable) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+			if (!charstring::compare(
+				(*pvt->_inoutbindvars)[i].variable,variable)) {
+				return (*pvt->_inoutbindvars)[i].
+							resultvaluesize;
+			}
+		}
+	}
+	return 0;
+}
+
+int64_t sqlrcursor::getInputOutputBindInteger(const char *variable) {
+
+	if (variable) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+			if (!charstring::compare(
+				(*pvt->_inoutbindvars)[i].variable,variable) &&
+				(*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_INTEGER) {
+				return (*pvt->_inoutbindvars)[i].
+							value.integerval;
+			}
+		}
+	}
+	return -1;
+}
+
 bool sqlrcursor::outputBindCursorIdIsValid(const char *variable) {
 	if (variable) {
 		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
@@ -1999,6 +2164,12 @@ bool sqlrcursor::validBind(const char *variable) {
 		if (!charstring::compare(
 			(*pvt->_outbindvars)[out].variable,variable)) {
 			return (*pvt->_outbindvars)[out].send;
+		}
+	}
+	for (uint64_t out=0; out<pvt->_inoutbindvars->getLength(); out++) {
+		if (!charstring::compare(
+			(*pvt->_inoutbindvars)[out].variable,variable)) {
+			return (*pvt->_inoutbindvars)[out].send;
 		}
 	}
 	return false;
@@ -2261,7 +2432,7 @@ void sqlrcursor::validateBindsInternal() {
 			// preceded by a colon and can't be followed by an
 			// alphabet character, number or underscore
 			after=ptr+len;
-			if (*(ptr-1)==':' && *after!='_' &&
+			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
 				!(*(after)>='a' && *(after)<='z') &&
 				!(*(after)>='A' && *(after)<='Z') &&
 				!(*(after)>='0' && *(after)<='9')) {
@@ -2275,6 +2446,48 @@ void sqlrcursor::validateBindsInternal() {
 		}
 
 		(*pvt->_outbindvars)[out].send=found;
+	}
+
+	// check each input/output bind
+	for (uint64_t inout=0;
+		inout<pvt->_inoutbindvars->getLength(); inout++) {
+
+		// don't check bind-by-position variables
+		len=charstring::length(
+				(*pvt->_inoutbindvars)[inout].variable);
+		if (charstring::isInteger(
+				(*pvt->_inoutbindvars)[inout].variable,len)) {
+			continue;
+		}
+
+		found=false;
+		start=pvt->_queryptr+1;
+
+		// there may be more than 1 match for the variable name as in
+		// "select * from table where table_name=:table_name", both
+		// table_name's would match, but only the second is a bind
+		// variable
+		while ((ptr=charstring::findFirst(start,
+				(*pvt->_inoutbindvars)[inout].variable))) {
+
+			// for a match to be a bind variable, it must be 
+			// preceded by a colon and can't be followed by an
+			// alphabet character, number or underscore
+			after=ptr+len;
+			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
+				!(*(after)>='a' && *(after)<='z') &&
+				!(*(after)>='A' && *(after)<='Z') &&
+				!(*(after)>='0' && *(after)<='9')) {
+				found=true;
+				break;
+			} else {
+				// jump past this instance to look for the
+				// next one
+				start=ptr+len;
+			}
+		}
+
+		(*pvt->_inoutbindvars)[inout].send=found;
 	}
 }
 
@@ -2302,6 +2515,7 @@ bool sqlrcursor::runQuery(const char *query) {
 
 		sendInputBinds();
 		sendOutputBinds();
+		sendInputOutputBinds();
 		sendGetColumnInfo();
 
 		pvt->_sqlrc->flushWriteBuffer();
@@ -2767,6 +2981,135 @@ void sqlrcursor::sendOutputBinds() {
 	}
 }
 
+void sqlrcursor::sendInputOutputBinds() {
+
+	// index
+	uint16_t	i=0;
+
+	// count number of vars to send
+	uint16_t	count=pvt->_inoutbindvars->getLength();
+	for (i=0; i<count; i++) {
+		if (!(*pvt->_inoutbindvars)[i].send) {
+			count--;
+		}
+	}
+
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("Sending ");
+		pvt->_sqlrc->debugPrint((int64_t)count);
+		pvt->_sqlrc->debugPrint(" Input/Output Bind Variables:\n");
+		pvt->_sqlrc->debugPreEnd();
+	}
+
+	// write the input/output bind variables to the server.
+	pvt->_cs->write(count);
+	uint16_t	size;
+	i=0;
+	while (i<count) {
+
+		// don't send anything if the send flag is turned off
+		if (!(*pvt->_inoutbindvars)[i].send) {
+			continue;
+		}
+
+		// send the variable, type, size that the buffer needs to be,
+		// and value
+		size=charstring::length((*pvt->_inoutbindvars)[i].variable);
+		pvt->_cs->write(size);
+		pvt->_cs->write((*pvt->_inoutbindvars)[i].variable,
+							(size_t)size);
+		pvt->_cs->write((uint16_t)(*pvt->_inoutbindvars)[i].type);
+		if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_NULL) {
+			pvt->_cs->write((*pvt->_inoutbindvars)[i].valuesize);
+		} else if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_STRING ||
+			(*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_BLOB ||
+			(*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_CLOB) {
+			pvt->_cs->write((*pvt->_inoutbindvars)[i].valuesize);
+			if ((*pvt->_inoutbindvars)[i].valuesize>0) {
+				pvt->_cs->write(
+					(*pvt->_inoutbindvars)[i].
+							value.stringval,
+					(size_t)(*pvt->_inoutbindvars)[i].
+								valuesize);
+			}
+		} else if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_INTEGER) {
+			pvt->_cs->write((uint64_t)(*pvt->_inoutbindvars)[i].
+							value.integerval);
+		}
+		// FIXME: long, double, date...
+
+		if (pvt->_sqlrc->debug()) {
+			pvt->_sqlrc->debugPreStart();
+			pvt->_sqlrc->debugPrint(
+				(*pvt->_inoutbindvars)[i].variable);
+			const char	*bindtype=NULL;
+			switch ((*pvt->_inoutbindvars)[i].type) {
+				case SQLRCLIENTBINDVARTYPE_NULL:
+					bindtype="(NULL)";
+					break;
+				case SQLRCLIENTBINDVARTYPE_STRING:
+					bindtype="(STRING)";
+					break;
+				case SQLRCLIENTBINDVARTYPE_INTEGER:
+					bindtype="(INTEGER)";
+					break;
+				case SQLRCLIENTBINDVARTYPE_DOUBLE:
+					bindtype="(DOUBLE)";
+					break;
+				case SQLRCLIENTBINDVARTYPE_DATE:
+					bindtype="(DATE)";
+					break;
+				case SQLRCLIENTBINDVARTYPE_BLOB:
+					bindtype="(BLOB)";
+					break;
+				case SQLRCLIENTBINDVARTYPE_CLOB:
+					bindtype="(CLOB)";
+					break;
+				case SQLRCLIENTBINDVARTYPE_CURSOR:
+					bindtype="(CURSOR)";
+					break;
+			}
+			pvt->_sqlrc->debugPrint(bindtype);
+			if ((*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_STRING ||
+				(*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_BLOB ||
+				(*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_CLOB ||
+				(*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_NULL) {
+				pvt->_sqlrc->debugPrint("=");
+				pvt->_sqlrc->debugPrint(
+					(*pvt->_inoutbindvars)[i].
+							value.stringval);
+				pvt->_sqlrc->debugPrint("(");
+				pvt->_sqlrc->debugPrint((int64_t)
+					(*pvt->_inoutbindvars)[i].valuesize);
+				pvt->_sqlrc->debugPrint(")");
+			} else if ((*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_INTEGER) {
+				pvt->_sqlrc->debugPrint("=");
+				pvt->_sqlrc->debugPrint(
+					(int64_t)(*pvt->_inoutbindvars)[i].
+							value.integerval);
+				pvt->_sqlrc->debugPrint("\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+			// FIXME: long, double, date...
+			pvt->_sqlrc->debugPrint("\n");
+			pvt->_sqlrc->debugPreEnd();
+		}
+
+		i++;
+	}
+}
+
 void sqlrcursor::sendGetColumnInfo() {
 
 	if (pvt->_sendcolumninfo==SEND_COLUMN_INFO) {
@@ -2844,7 +3187,8 @@ bool sqlrcursor::processInitialResultSet() {
 				(success=getCursorId()) && 
 				(success=getSuspended()))) &&
 			(success=parseColumnInfo()) && 
-			(success=parseOutputBinds())) {
+			(success=parseOutputBinds()) &&
+			(success=parseInputOutputBinds())) {
 
 		// skip and fetch here if we're reading from a cached result set
 		if (pvt->_cachesource) {
@@ -3970,6 +4314,540 @@ bool sqlrcursor::parseOutputBinds() {
 
 	// cache the output binds
 	cacheOutputBinds(count);
+
+	return true;
+}
+
+bool sqlrcursor::parseInputOutputBinds() {
+
+	if (pvt->_sqlrc->debug()) {
+		pvt->_sqlrc->debugPreStart();
+		pvt->_sqlrc->debugPrint("Receiving Input/Output "
+						"Bind Values: \n");
+		pvt->_sqlrc->debugPreEnd();
+	}
+
+	// useful variables
+	uint16_t	type;
+	uint32_t	length;
+	uint16_t	count=0;
+
+	// get the bind values
+	for (;;) {
+
+		if (pvt->_sqlrc->debug()) {
+			pvt->_sqlrc->debugPreStart();
+			pvt->_sqlrc->debugPrint("	getting type...\n");
+			pvt->_sqlrc->debugPreEnd();
+		}
+
+		// get the data type
+		if (getShort(&type)!=sizeof(uint16_t)) {
+			setError("Failed to get data type.\n "
+				"A network error may have occurred.");
+
+			return false;
+		}
+
+		if (pvt->_sqlrc->debug()) {
+			pvt->_sqlrc->debugPreStart();
+			pvt->_sqlrc->debugPrint("	done getting type: ");
+			pvt->_sqlrc->debugPrint((int64_t)type);
+			pvt->_sqlrc->debugPrint("\n");
+			pvt->_sqlrc->debugPreEnd();
+		}
+
+		// check for end of bind values
+		if (type==END_BIND_VARS) {
+
+			break;
+
+		} else if (type==NULL_DATA) {
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+						"	NULL output bind\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_NULL) {
+				(*pvt->_inoutbindvars)[count].type=
+						SQLRCLIENTBINDVARTYPE_STRING;
+			}
+
+			// handle a null value
+			(*pvt->_inoutbindvars)[count].resultvaluesize=0;
+			if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_STRING) {
+				if (pvt->_returnnulls) {
+					delete[] (*pvt->_inoutbindvars)[count].
+								value.stringval;
+					(*pvt->_inoutbindvars)[count].value.
+							stringval=NULL;
+				} else {
+					(*pvt->_inoutbindvars)[count].value.
+							stringval[0]='\0';
+				}
+			} else if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_INTEGER) {
+				(*pvt->_inoutbindvars)[count].value.
+							integerval=0;
+			} else if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_DOUBLE) {
+				(*pvt->_inoutbindvars)[count].
+						value.doubleval.value=0;
+				(*pvt->_inoutbindvars)[count].
+						value.doubleval.precision=0;
+				(*pvt->_inoutbindvars)[count].
+						value.doubleval.scale=0;
+			} else if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_DATE) {
+				(*pvt->_inoutbindvars)[count].
+						value.dateval.year=0;
+				(*pvt->_inoutbindvars)[count].
+						value.dateval.month=0;
+				(*pvt->_inoutbindvars)[count].
+						value.dateval.day=0;
+				(*pvt->_inoutbindvars)[count].
+						value.dateval.hour=0;
+				(*pvt->_inoutbindvars)[count].
+						value.dateval.minute=0;
+				(*pvt->_inoutbindvars)[count].
+						value.dateval.second=0;
+				(*pvt->_inoutbindvars)[count].
+						value.dateval.microsecond=0;
+				if (pvt->_returnnulls) {
+					(*pvt->_inoutbindvars)[count].
+						value.dateval.tz=NULL;
+				} else {
+					(*pvt->_inoutbindvars)[count].
+						value.dateval.tz=new char[1];
+					(*pvt->_inoutbindvars)[count].
+						value.dateval.tz[0]='\0';
+				}
+			} 
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPrint("		");
+				pvt->_sqlrc->debugPrint("done fetching.\n");
+			}
+
+		} else if (type==STRING_DATA) {
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+						"	STRING input/output "
+						"bind\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			// get the value length
+			if (getLong(&length)!=sizeof(uint32_t)) {
+				setError("Failed to get string value length.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].resultvaluesize=length;
+			// FIXME: verify that resultvaluesize <= size of buffer
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+						"		length=");
+				pvt->_sqlrc->debugPrint((int64_t)length);
+				pvt->_sqlrc->debugPrint("\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			// get the value
+			if ((uint32_t)getString(
+					(*pvt->_inoutbindvars)[count].value.
+						stringval,length)!=length) {
+				setError("Failed to get string value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.stringval[length]='\0';
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint("		");
+				pvt->_sqlrc->debugPrint("done fetching\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+		} else if (type==INTEGER_DATA) {
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+						"	INTEGER input/output "
+						"bind\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			// get the value
+			if (getLongLong((uint64_t *)
+					&(*pvt->_inoutbindvars)[count].value.
+						integerval)!=sizeof(uint64_t)) {
+				setError("Failed to get integer value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint("		");
+				pvt->_sqlrc->debugPrint("done fetching\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+		} else if (type==DOUBLE_DATA) {
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+					"	DOUBLE input/output bind\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			// get the value
+			if (getDouble(&(*pvt->_inoutbindvars)[count].value.
+						doubleval.value)!=
+						sizeof(double)) {
+				setError("Failed to get double value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			// get the precision
+			if (getLong(&(*pvt->_inoutbindvars)[count].value.
+						doubleval.precision)!=
+						sizeof(uint32_t)) {
+				setError("Failed to get precision.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			// get the scale
+			if (getLong(&(*pvt->_inoutbindvars)[count].value.
+						doubleval.scale)!=
+						sizeof(uint32_t)) {
+				setError("Failed to get scale.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint("		");
+				pvt->_sqlrc->debugPrint("done fetching\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+		} else if (type==DATE_DATA) {
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+					"	DATE input/output bind\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			uint16_t	temp;
+
+			// get the year
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.dateval.year=(int16_t)temp;
+
+			// get the month
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.dateval.month=(int16_t)temp;
+
+			// get the day
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.dateval.day=(int16_t)temp;
+
+			// get the hour
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.dateval.hour=(int16_t)temp;
+
+			// get the minute
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.dateval.minute=(int16_t)temp;
+
+			// get the second
+			if (getShort(&temp)!=sizeof(uint16_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.dateval.second=(int16_t)temp;
+
+			// get the microsecond
+			uint32_t	temp32;
+			if (getLong(&temp32)!=sizeof(uint32_t)) {
+				setError("Failed to get long value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].value.
+					dateval.microsecond=(int32_t)temp32;
+
+			// get the timezone length
+			uint16_t	length;
+			if (getShort(&length)!=sizeof(uint16_t)) {
+				setError("Failed to get timezone length.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.dateval.tz=new char[length+1];
+
+			// get the timezone
+			if ((uint16_t)getString(
+					(*pvt->_inoutbindvars)[count].value.
+						dateval.tz,length)!=length) {
+				setError("Failed to get timezone.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].
+					value.dateval.tz[length]='\0';
+
+			// get the isnegative flag
+			bool	tempbool;
+			if (getBool(&tempbool)!=sizeof(bool)) {
+				setError("Failed to get bool value.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			(*pvt->_inoutbindvars)[count].value.
+					dateval.isnegative=tempbool;
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint("		");
+				pvt->_sqlrc->debugPrint("done fetching\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+		} else {
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint("	LOB/CLOB ");
+				pvt->_sqlrc->debugPrint("input/output bind\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			// must be START_LONG_DATA...
+			// get the total length of the long data
+			uint64_t	totallength;
+			if (getLongLong(&totallength)!=sizeof(uint64_t)) {
+				setError("Failed to get total length.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+					"		length=");
+				pvt->_sqlrc->debugPrint((int64_t)totallength);
+				pvt->_sqlrc->debugPrint("\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			// create a buffer to hold the data
+			// FIXME: this should be pre-allocated or something...
+			char	*buffer=new char[totallength+1];
+
+			uint64_t	offset=0;
+			uint32_t	length;
+			for (;;) {
+
+				if (pvt->_sqlrc->debug()) {
+					pvt->_sqlrc->debugPreStart();
+					pvt->_sqlrc->debugPrint(
+							"		");
+					pvt->_sqlrc->debugPrint(
+							"fetching...\n");
+					pvt->_sqlrc->debugPreEnd();
+				}
+
+				// get the type of the chunk
+				if (getShort(&type)!=sizeof(uint16_t)) {
+					delete[] buffer;
+					setError("Failed to get chunk type.\n "
+						"A network error may have "
+						"occurred.");
+					return false;
+				}
+
+				// check to see if we're done
+				if (type==END_LONG_DATA) {
+					break;
+				}
+
+				// get the length of the chunk
+				if (getLong(&length)!=sizeof(uint32_t)) {
+					delete[] buffer;
+					setError("Failed to get chunk length.\n"
+						" A network error may have "
+						"occurred.");
+					return false;
+				}
+
+				// get the chunk of data
+				if ((uint32_t)getString(buffer+offset,
+							length)!=length) {
+					delete[] buffer;
+					setError("Failed to get chunk data.\n "
+						"A network error may have "
+						"occurred.");
+					return false;
+				}
+
+				offset=offset+length;
+			}
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint("		");
+				pvt->_sqlrc->debugPrint("done fetching.\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+
+			// NULL terminate the buffer.  This makes 
+			// certain operations safer and won't hurt
+			// since the actual length (which doesn't
+			// include the NULL) is available from
+			// getOutputBindLength.
+			buffer[totallength]='\0';
+			(*pvt->_inoutbindvars)[count].value.lobval=buffer;
+			(*pvt->_inoutbindvars)[count].resultvaluesize=
+								totallength;
+		}
+
+		if (pvt->_sqlrc->debug()) {
+			pvt->_sqlrc->debugPreStart();
+			pvt->_sqlrc->debugPrint(
+					(*pvt->_inoutbindvars)[count].variable);
+			pvt->_sqlrc->debugPrint("=");
+			if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_BLOB) {
+				pvt->_sqlrc->debugPrintBlob(
+					(*pvt->_inoutbindvars)[count].
+							value.lobval,
+					(*pvt->_inoutbindvars)[count].
+							resultvaluesize);
+			} else if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_CLOB) {
+				pvt->_sqlrc->debugPrintClob(
+					(*pvt->_inoutbindvars)[count].
+							value.lobval,
+					(*pvt->_inoutbindvars)[count].
+							resultvaluesize);
+			} else if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_CURSOR) {
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.cursorid);
+			} else if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_INTEGER) {
+				pvt->_sqlrc->debugPrint(
+						(*pvt->_inoutbindvars)[count].
+							value.integerval);
+			} else if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_DOUBLE) {
+				pvt->_sqlrc->debugPrint(
+						(*pvt->_inoutbindvars)[count].
+							value.doubleval.value);
+				pvt->_sqlrc->debugPrint("(");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.doubleval.
+							precision);
+				pvt->_sqlrc->debugPrint(",");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.doubleval.
+							scale);
+				pvt->_sqlrc->debugPrint(")");
+			} else if ((*pvt->_inoutbindvars)[count].type==
+						SQLRCLIENTBINDVARTYPE_DATE) {
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.dateval.year);
+				pvt->_sqlrc->debugPrint("-");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.dateval.month);
+				pvt->_sqlrc->debugPrint("-");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.dateval.day);
+				pvt->_sqlrc->debugPrint(" ");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.dateval.hour);
+				pvt->_sqlrc->debugPrint(":");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.dateval.minute);
+				pvt->_sqlrc->debugPrint(":");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+							value.dateval.second);
+				pvt->_sqlrc->debugPrint(" ");
+				pvt->_sqlrc->debugPrint(
+						(*pvt->_inoutbindvars)[count].
+							value.dateval.tz);
+			} else {
+				pvt->_sqlrc->debugPrint(
+						(*pvt->_inoutbindvars)[count].
+							value.stringval);
+			}
+			pvt->_sqlrc->debugPrint("\n");
+			pvt->_sqlrc->debugPreEnd();
+		}
+
+		count++;
+	}
+
+	// cache the input/output binds
+	cacheInputOutputBinds(count);
 
 	return true;
 }

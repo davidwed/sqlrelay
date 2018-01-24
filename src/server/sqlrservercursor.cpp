@@ -30,6 +30,8 @@ class sqlrservercursorprivate {
 		sqlrserverbindvar	*_inbindvars;
 		uint16_t		_outbindcount;
 		sqlrserverbindvar	*_outbindvars;
+		uint16_t		_inoutbindcount;
+		sqlrserverbindvar	*_inoutbindvars;
 
 		uint64_t	_totalrowsfetched;
 
@@ -88,6 +90,9 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 				conn->cont->getConfig()->getMaxBindCount()];
 	setOutputBindCount(0);
 	pvt->_outbindvars=new sqlrserverbindvar[
+				conn->cont->getConfig()->getMaxBindCount()];
+	setInputOutputBindCount(0);
+	pvt->_inoutbindvars=new sqlrserverbindvar[
 				conn->cont->getConfig()->getMaxBindCount()];
 
 	pvt->_totalrowsfetched=0;
@@ -151,6 +156,7 @@ sqlrservercursor::~sqlrservercursor() {
 	delete pvt->_querytree;
 	delete[] pvt->_inbindvars;
 	delete[] pvt->_outbindvars;
+	delete[] pvt->_inoutbindvars;
 	delete pvt->_customquerycursor;
 	delete[] pvt->_error;
 	deallocateFieldPointers();
@@ -401,6 +407,85 @@ bool sqlrservercursor::getLobOutputBindSegment(uint16_t index,
 }
 
 void sqlrservercursor::closeLobOutputBind(uint16_t index) {
+	// by default, do nothing
+}
+
+bool sqlrservercursor::inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						char *value, 
+						uint32_t valuesize, 
+						int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrservercursor::inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrservercursor::inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrservercursor::inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						int32_t *microsecond,
+						const char **tz,
+						bool *isnegative,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrservercursor::inputOutputBindBlob(const char *variable,
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrservercursor::inputOutputBindClob(const char *variable,
+						uint16_t variablesize,
+						uint16_t index,
+						int16_t *isnull) {
+	// by default, do nothing...
+	return true;
+}
+
+bool sqlrservercursor::getLobInputOutputBindLength(uint16_t index,
+							uint64_t *length) {
+	*length=0;
+	return true;
+}
+
+bool sqlrservercursor::getLobInputOutputBindSegment(uint16_t index,
+					char *buffer, uint64_t buffersize,
+					uint64_t offset, uint64_t charstoread,
+					uint64_t *charsread) {
+	*charsread=0;
+	return false;
+}
+
+void sqlrservercursor::closeLobInputOutputBind(uint16_t index) {
 	// by default, do nothing
 }
 
@@ -881,6 +966,18 @@ uint16_t sqlrservercursor::getOutputBindCount() {
 
 sqlrserverbindvar *sqlrservercursor::getOutputBinds() {
 	return pvt->_outbindvars;
+}
+
+void sqlrservercursor::setInputOutputBindCount(uint16_t inoutbindcount) {
+	pvt->_inoutbindcount=inoutbindcount;
+}
+
+uint16_t sqlrservercursor::getInputOutputBindCount() {
+	return pvt->_inoutbindcount;
+}
+
+sqlrserverbindvar *sqlrservercursor::getInputOutputBinds() {
+	return pvt->_inoutbindvars;
 }
 
 void sqlrservercursor::abort() {

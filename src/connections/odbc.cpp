@@ -12,9 +12,6 @@
 #include <sqlucode.h>
 #include <sqltypes.h>
 
-// for memchr
-#include <string.h>
-
 // note that sqlrserver.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
 #include <sqlrelay/sqlrserver.h>
@@ -138,6 +135,15 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
+		bool		inputOutputBind(const char *variable, 
+						uint16_t variablesize,
+						char *value, 
+						uint32_t valuesize,
+						int16_t *isnull);
+		bool		inputOutputBind(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
 		int16_t		nonNullBindValue();
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(uint16_t isnull);
@@ -201,11 +207,14 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
 		int16_t		**outisnullptr;
+		int16_t		**inoutisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
 		SQLLEN		*outisnull;
+		SQLLEN		*inoutisnull;
 		SQLLEN		sqlnulldata;
 		#else
 		SQLINTEGER	*outisnull;
+		SQLINTEGER	*inoutisnull;
 		SQLINTEGER	sqlnulldata;
 		#endif
 
@@ -1838,15 +1847,20 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	outdatebind=new datebind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
+	inoutisnullptr=new int16_t *[maxbindcount];
 	#ifdef SQLBINDPARAMETER_SQLLEN
 	outisnull=new SQLLEN[maxbindcount];
+	inoutisnull=new SQLLEN[maxbindcount];
 	#else
 	outisnull=new SQLINTEGER[maxbindcount];
+	inoutisnull=new SQLINTEGER[maxbindcount];
 	#endif
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
+		inoutisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
@@ -1857,7 +1871,9 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 odbccursor::~odbccursor() {
 	delete[] outdatebind;
 	delete[] outisnullptr;
+	delete[] inoutisnullptr;
 	delete[] outisnull;
+	delete[] inoutisnull;
 	deallocateResultSetBuffers();
 }
 
@@ -2174,8 +2190,8 @@ bool odbccursor::outputBind(const char *variable,
 				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
-				SQL_CHAR,
-				0,
+				SQL_VARCHAR,
+				valuesize,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
@@ -2288,6 +2304,65 @@ bool odbccursor::outputBind(const char *variable,
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
+bool odbccursor::inputOutputBind(const char *variable, 
+				uint16_t variablesize,
+				char *value, 
+				uint32_t valuesize, 
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	//inoutdatebind[pos-1]=NULL;
+	inoutisnullptr[pos-1]=isnull;
+
+	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
+				sqlnulldata:charstring::length(value);
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_CHAR,
+				SQL_VARCHAR,
+				valuesize,
+				0,
+				(SQLPOINTER)value,
+				valuesize,
+				&(inoutisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputOutputBind(const char *variable, 
+				uint16_t variablesize,
+				int64_t *value,
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	//inoutdatebind[pos-1]=NULL;
+	inoutisnullptr[pos-1]=isnull;
+
+	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
+				sqlnulldata:sizeof(int64_t);
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_SBIGINT,
+				SQL_BIGINT,
+				0,
+				0,
+				value,
+				sizeof(int64_t),
+				&(inoutisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
 int16_t odbccursor::nonNullBindValue() {
 	return 0;
 }
@@ -2365,7 +2440,9 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	// too soon.
 
 	// convert date output binds and copy out isnulls
-	for (uint16_t i=0; i<getOutputBindCount(); i++) {
+	//for (uint16_t i=0; i<getOutputBindCount(); i++) {
+	// FIXME: inefficient
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -2400,6 +2477,13 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 				// forcibly null-terminate the buffer
 				sb->value[outisnull[i]]=0;
 			}*/
+		}
+	}
+	//for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+	// FIXME: inefficient
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		if (inoutisnullptr[i]) {
+			*(inoutisnullptr[i])=inoutisnull[i];
 		}
 	}
 
@@ -2951,9 +3035,17 @@ void odbccursor::closeResultSet() {
 
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
+	}
+
+	// FIXME: inefficient, but there appears to be a case where
+	// closeResultSet isn't called, and stale ptrs get left lingering
+	// around...
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutisnullptr[i]=NULL;
+		inoutisnull[i]=0;
 	}
 
 	if (!conn->cont->getMaxColumnCount()) {
