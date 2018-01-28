@@ -893,9 +893,9 @@ endif
 
 
 APIALLSUBDIRS =
-APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-mysql clean-postgresql clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-tcl clean-erlang
+APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-mysql clean-postgresql clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-jdbc clean-tcl clean-erlang
 APIINSTALLSUBDIRS =
-APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-mysql uninstall-postgresql uninstall-odbc uninstall-java
+APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-mysql uninstall-postgresql uninstall-odbc uninstall-java uninstall-jdbc
 ifneq ($(ENABLE_CPP),)
 APIALLSUBDIRS += all-cpp all-c
 APIINSTALLSUBDIRS += install-cpp install-c
@@ -945,8 +945,8 @@ APIINSTALLSUBDIRS += install-phppdo
 APIUNINSTALLSUBDIRS += uninstall-phppdo
 endif
 ifneq ($(HAVE_JAVA),)
-APIALLSUBDIRS += all-java
-APIINSTALLSUBDIRS += install-java
+APIALLSUBDIRS += all-java all-jdbc
+APIINSTALLSUBDIRS += install-java install-jdbc
 endif
 ifneq ($(HAVE_TCL),)
 APIALLSUBDIRS += all-tcl

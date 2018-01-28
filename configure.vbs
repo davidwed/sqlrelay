@@ -793,10 +793,10 @@ if JAVAPREFIX="" then
 end if
 
 if disablejava=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" all-java"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-java"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-java"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-java"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-java all-jdbc"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-java clean-jdbc"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-java install-jdbc"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-java uninstall-jdbc"
 
 	WScript.Echo("Java prefix... " & JAVAPREFIX)
 else
