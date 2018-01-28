@@ -26,7 +26,7 @@ clean:
 	$(LTCLEAN) $(RM) *.class *.jar
 
 sqlrelayjdbc.jar: $(SRCS)
-	$(JAVAC) $(SRCS)
+	$(JAVAC) -cp ../java/sqlrelay.jar $(SRCS)
 	$(JAR) -cf $@ $(OBJS)
 
 install:
