@@ -2,183 +2,216 @@ package com.firstworks.sql;
 
 import java.sql.*;
 
-public class SQLRelayDriver implements java.sql.Driver {
+import java.util.Properties;
+import java.util.logging.Logger;
 
-    static {
-        try {
-            java.sql.DriverManager.registerDriver(new SQLRelayDriver());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
+public class SQLRelayDriver implements Driver {
 
-    public SQLRelayDriver() throws SQLException {
-    }
+	static {
+		try {
+			DriverManager.registerDriver(new SQLRelayDriver());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 
-    /**
-     *   Try to make a database connection to the given URL.
-     */
-    public Connection connect(String url, Properties info) throws SQLException {
+	public SQLRelayDriver() throws SQLException {
+	}
 
-        // all parameters could be passed in as properties
-        String  host=info.getProperty("host");
-        int     port=Integer.parseInt(info.getProperty("port"));
-        String  socket=info.getProperty("socket");
-        String  user=info.getProperty("user");
-        String  password=info.getProperty("password");
+	/**
+	 *   Try to make a database connection to the given URL.
+	 */
+	public Connection connect(String url,
+					Properties info)
+					throws SQLException {
 
-        // get retrytime with default of 0
-        int     retrytime=0;
-        String  retrytimestr=info.getProperty("retrytime");
-        if (retrytimestr!=null) {
-            retrytime=Integer.parseInt(retrytimesstr);
-        }
+		// all parameters could be passed in as properties
+		String	host=info.getProperty("host");
+		int	port=Integer.parseInt(info.getProperty("port"));
+		String	socket=info.getProperty("socket");
+		String	user=info.getProperty("user");
+		String	password=info.getProperty("password");
 
-        // get tries with default of 1
-        int     tries=1;
-        String  triesstring=info.getProperty("tries");
-        if (triesstr!=null) {
-            tries=Integer.parseInt(triesstr);
-        }
+		// get retrytime with default of 0
+		int	retrytime=0;
+		String	retrytimestr=info.getProperty("retrytime");
+		if (retrytimestr!=null) {
+			retrytime=Integer.parseInt(retrytimestr);
+		}
 
-        // override them if they were passed in in the url
-        // url format:  jdbc:sqlrelay:host:port/socket
-        // the port must be greater than 0 and the /socket segment is optional
+		// get tries with default of 1
+		int	tries=1;
+		String	triesstr=info.getProperty("tries");
+		if (triesstr!=null) {
+			tries=Integer.parseInt(triesstr);
+		}
 
-        // get the name
-        String name=substring(url,5,13);
-        if (!name.equals("sqlrelay:")) {
-            return null;
-        }
+		// override them if they were passed in in the url
+		// url format:
+		// jdbc:sqlrelay://[user:password@]host:[port][:socket]
 
-        // get host
-        int colon=url.getIndexOf(':',14);
-        if (colon>0) {
-            host=substring(url,14,colon);
-        }
+		// check for jdbc:sqlrelay://
+		if (url.substring(0,15).equals("jdbc:sqlrelay://")) {
 
-        // get port
-        int slash=url.getIndexOf('/',colon+1);
-        if (slash>colon+1) {
-            port=Integer.parseInt(substring(url,colon+1,slash));
-        } else {
-            port=Integer.parseInt(substring(url,colon+1));
-        }
+			// split the rest of the string on @ and get the parts
+			String[]	parts=url.substring(16).split("@");
+			String		cred=null;
+			String		conn=null;
+			if (parts.length==1) {
+				conn=parts[0];
+			} else if (parts.length>=2) {
+				cred=parts[0];
+				conn=parts[1];
+			}
 
-        // get socket
-        if (slash>colon+1) {
-            socket=substring(url,slash+1);
-        }
+			// split the cred on : and get the parts
+			if (cred!=null) {
+				parts=cred.split(":");
+				user=parts[0];
+				if (parts.length>=2) {
+					password=parts[1];
+				}
+			}
 
-        // if all the values are there, create the connection and return it
-        if (host!=null && port>0 && user!=null && password!=null) {
-            return new Connection(host,port,socket,
-                                    user,password,
-                                    retrytime,tries);
-        } else {
-            return null;
-        }
-    }
+			// split the conn on : and get the parts
+			if (conn!=null) {
+				parts=conn.split(":");
+				if (parts.length>=1) {
+					host=parts[0];
+				}
+				if (parts.length>=2) {
+					port=Integer.parseInt(parts[1]);
+				}
+				if (parts.length>=3) {
+					socket=parts[2];
+				}
+			}
+		}
 
-    /**
-     *  Returns true if the driver thinks that it can open a connection to the 
-     *  given URL.
-     */
-    public boolean acceptsURL(String url) throws SQLException {
+		// finagle the port
+		if (port==0) {
+			port=9000;
+		}
 
-        // url format:  jdbc:sqlrelay:host:port/socket
-        // the port must be greater than 0 and the /socket segment is optional
+		// if all the values are there then create
+		// the connection and return it
+		if (host!=null && port>0 && user!=null && password!=null) {
+			return new SQLRelayConnection(host,port,socket,
+							user,password,
+							retrytime,tries);
+		}
+		return null;
+	}
 
-        // check for jdbc:
-        if (!substring(url,0,4).equals("jdbc:")) {
-            return false;
-        }
-            
-        // check for sqlrelay:
-        if (!substring(url,5,13).equals("sqlrelay:")) {
-            return false;
-        }
+	/**
+	 *  Returns true if the driver thinks that it can open a connection to
+	 *  the given URL.
+	 */
+	public boolean acceptsURL(String url) throws SQLException {
 
-        // check for a host/port
-        int colon=url.getIndexOf(':',14);
-        if (colon<14) {
-            return false;
-        }
+		// url format:
+		// jdbc:sqlrelay://[user:password@]host:[port][:socket]
 
-        // check for a port
-        int slash=url.getIndexOf('/',colon+1);
-        if (slash>colon+1) {
-            port=Integer.parseInt(substring(url,colon+1,slash));
-        } else {
-            port=Integer.parseInt(substring(url,colon+1));
-        }
-        if (port<1) {
-            return false;
-        }
+		// check for jdbc:sqlrelay://
+		if (!url.substring(0,15).equals("jdbc:sqlrelay://")) {
+			return false;
+		}
 
-        return true;
-    }
+		// split the rest of the string on @ and get the parts
+		String[]	parts=url.substring(16).split("@");
+		String		cred=null;
+		String		conn=null;
+		if (parts.length==1) {
+			conn=parts[0];
+		} else if (parts.length==2) {
+			cred=parts[0];
+			conn=parts[1];
+		}
 
-    /**
-     *  The getPropertyInfo method is intended to allow a generic GUI tool to 
-     *  discover what properties it should prompt a human for in order to get 
-     *  enough information to connect to a database. 
-     */
-    public DriverPropertyInfo[] getPropertyInfo(String url, Properties info)
-                                                        throws SQLException {
+		// split the conn on : and get the parts
+		String	host=null;
+		int	port=0;
+		String	socket=null;
+		if (conn!=null) {
+			parts=conn.split(":");
+			host=(parts.length>=1)?parts[0]:null;
+			port=(parts.length>=2)?Integer.parseInt(parts[1]):9000;
+			socket=(parts.length>=3)?parts[2]:null;
+		}
 
-        DriverPropertyInfo[] dpi=new DriverPropertyInfo[7];
+		// host/port or socket must be valid
+		return ((host!=null && port>0) || socket!=null);
+	}
 
-        dpi[0]=new DriverPropertyInfo("host","");
-        dpi[0].description="Name of host running SQL Relay.";
-        dpi[0].required=true;
+	/**
+	 *  The getPropertyInfo method is intended to allow a generic GUI tool
+	 *  to discover what properties it should prompt a human for in order
+	 *  to get enough information to connect to a database. 
+	 */
+	public DriverPropertyInfo[] getPropertyInfo(String url,
+							Properties info)
+							throws SQLException {
 
-        dpi[1]=new DriverPropertyInfo("port","");
-        dpi[1].description="Port SQL Relay is listening on.";
-        dpi[1].required=true;
+		DriverPropertyInfo[] dpi=new DriverPropertyInfo[7];
 
-        dpi[2]=new DriverPropertyInfo("socket","");
-        dpi[2].description="Filename of unix socket SQL Relay is listening on.";
-        dpi[2].required=false;
+		dpi[0]=new DriverPropertyInfo("host","");
+		dpi[0].description="Name of host running SQL Relay.";
+		dpi[0].required=true;
 
-        dpi[3]=new DriverPropertyInfo("user","");
-        dpi[3].description="User name for authentication.";
-        dpi[3].required=true;
+		dpi[1]=new DriverPropertyInfo("port","");
+		dpi[1].description="Port SQL Relay is listening on.";
+		dpi[1].required=true;
 
-        dpi[4]=new DriverPropertyInfo("password","");
-        dpi[4].description="Password for authentication.";
-        dpi[4].required=true;
+		dpi[2]=new DriverPropertyInfo("socket","");
+		dpi[2].description="Filename of unix socket SQL Relay is "+
+					"listening on.";
+		dpi[2].required=false;
 
-        dpi[5]=new DriverPropertyInfo("retrytime","0");
-        dpi[5].description="If connection fails, wait this number of seconds before trying to connect again.";
-        dpi[5].required=true;
+		dpi[3]=new DriverPropertyInfo("user","");
+		dpi[3].description="User name for authentication.";
+		dpi[3].required=true;
 
-        dpi[6]=new DriverPropertyInfo("tries","1");
-        dpi[6].description="If connection fails, retry this number of times.";
-        dpi[6].required=true;
+		dpi[4]=new DriverPropertyInfo("password","");
+		dpi[4].description="Password for authentication.";
+		dpi[4].required=true;
 
-        return dpi;
-    }
+		dpi[5]=new DriverPropertyInfo("retrytime","0");
+		dpi[5].description="If connection fails, wait this number "+
+					"of seconds before trying to connect "+
+					"again.";
+		dpi[5].required=true;
 
-    /**
-     *   Get the driver's major version number.
-     */
-    public int getMajorVersion() {
-        return 0;
-    }
+		dpi[6]=new DriverPropertyInfo("tries","1");
+		dpi[6].description="If connection fails, retry this number "+
+					"of times.";
+		dpi[6].required=true;
 
-    /**
-     *   Get the driver's minor version number.
-     */
-    public int getMinorVersion() {
-        return 0;
-    }
+		return dpi;
+	}
 
-    /**
-     *  Report whether the Driver is a genuine JDBC COMPLIANT (tm) driver. 
-     */
-    public boolean jdbcCompliant() {
-        return false;
-    }
+	/**
+	 *   Get the driver's major version number.
+	 */
+	public int getMajorVersion() {
+		return 0;
+	}
+
+	/**
+	 *   Get the driver's minor version number.
+	 */
+	public int getMinorVersion() {
+		return 0;
+	}
+
+	public Logger getParentLogger() {
+		return null;
+	}
+
+	/**
+	 *  Report whether the Driver is a genuine JDBC COMPLIANT (tm) driver. 
+	 */
+	public boolean jdbcCompliant() {
+		return false;
+	}
 
 }
