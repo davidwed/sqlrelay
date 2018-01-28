@@ -64,7 +64,7 @@ sudo /sbin/ldconfig
 }}}
 
 
-== Build and Install SQL Relay on the Host ==
+== Build and Install SQL Relay Server Software ==
 
 Download current .tar.gz files of SQL Relay and Rudiments from the '''Source Distribution''' section of [http://sqlrelay.sourceforge.net/download.html the SQL Relay Downloads page] and scp/sftp them to the SQL Relay server.
 
@@ -261,6 +261,8 @@ hello world
 
 There shouldn't be any errors or warnings, but if there are, then some typical problems and solutions include:
 
+* "Couldn't connect to the listener." - the SQL Relay server probably isn't running
+ * Restart the SQL Relay server
 * "Authentication Error." - the user or password specified on the sqlrsh command line don't match the user or password in the user tag of the sqlrelay.conf file
  * Specify the correct user or password on the sqlrsh command line
  * Update the sqlrelay.conf file and restart SQL Relay

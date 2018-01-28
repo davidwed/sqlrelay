@@ -20,18 +20,18 @@ OBJS = SQLRelayConnection.class \
 	SQLRelayResultSet.class \
 	SQLRelayResultSetMetaData.class
 
-all: sqlr.jar
+all: sqlrelayjdbc.jar
 
 clean:
 	$(LTCLEAN) $(RM) *.class *.jar
 
-sqlr.jar: $(SRCS)
+sqlrelayjdbc.jar: $(SRCS)
 	$(JAVAC) $(SRCS)
 	$(JAR) -cf $@ $(OBJS)
 
 install:
-	$(CP) sqlr.jar $(javadir)
-	$(CHMOD) 644 $(javadir)/sqlr.jar
+	$(CP) sqlrelayjdbc.jar $(javadir)
+	$(CHMOD) 644 $(javadir)/sqlrelayjdbc.jar
 
 uninstall:
-	$(RM) $(javadir)/sqlr.jar
+	$(RM) $(javadir)/sqlrelayjdbc.jar
