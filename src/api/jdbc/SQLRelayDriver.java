@@ -22,28 +22,13 @@ public class SQLRelayDriver implements Driver {
 	public SQLRelayDriver() throws SQLException {
 	}
 
-	private class SQLRConnectInfo {
-
-		public String	host;
-		public String	portstr;
-		public String	socket;
-		public String	user;
-		public String	password;
-		public String	retrytimestr;
-		public String	triesstr;
-
-		public short	port;
-		public int	retrytime;
-		public int	tries;
-	}
-
 	/**
 	 *   Try to make a database connection to the given URL.
 	 */
 	public Connection connect(String url,
 					Properties info)
 					throws SQLException {
-		SQLRConnectInfo	ci=parseConnectInfo(url,info);
+		SQLRelayConnectInfo	ci=parseConnectInfo(url,info);
 		return (validConnectInfo(ci))?
 			new SQLRelayConnection(ci.host,ci.port,ci.socket,
 							ci.user,ci.password,
@@ -51,7 +36,7 @@ public class SQLRelayDriver implements Driver {
 			null;
 	}
 
-	public SQLRConnectInfo parseConnectInfo(String url,
+	public SQLRelayConnectInfo parseConnectInfo(String url,
 						Properties info) {
 
 		String	host=null;
@@ -148,8 +133,8 @@ public class SQLRelayDriver implements Driver {
 			tries=1;
 		}
 
-		// create, populate, return a SQLRConnectInfo
-		SQLRConnectInfo	ci=new SQLRConnectInfo();
+		// create, populate, return a SQLRelayConnectInfo
+		SQLRelayConnectInfo	ci=new SQLRelayConnectInfo();
 		ci.host = host;
 		ci.portstr = portstr;
 		ci.port = port;
@@ -163,7 +148,7 @@ public class SQLRelayDriver implements Driver {
 		return ci;
 	}
 
-	private boolean validConnectInfo(SQLRConnectInfo ci) {
+	private boolean validConnectInfo(SQLRelayConnectInfo ci) {
 		return ((ci.host!=null && ci.port>0) || ci.socket!=null);
 	}
 
@@ -184,7 +169,7 @@ public class SQLRelayDriver implements Driver {
 							Properties info)
 							throws SQLException {
 
-		SQLRConnectInfo	ci=parseConnectInfo(url,info);
+		SQLRelayConnectInfo	ci=parseConnectInfo(url,info);
 
 		List<DriverPropertyInfo>	dpilist=
 					new ArrayList<DriverPropertyInfo>();

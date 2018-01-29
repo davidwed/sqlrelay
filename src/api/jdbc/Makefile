@@ -9,7 +9,8 @@ SRCS = SQLRelayConnection.java \
 	SQLRelayPreparedStatement.java \
 	SQLRelayCallableStatement.java \
 	SQLRelayResultSet.java \
-	SQLRelayResultSetMetaData.java
+	SQLRelayResultSetMetaData.java \
+	SQLRelayConnectInfo.java
 
 OBJS = SQLRelayConnection.class \
 	SQLRelayDriver.class \
@@ -18,7 +19,8 @@ OBJS = SQLRelayConnection.class \
 	SQLRelayPreparedStatement.class \
 	SQLRelayCallableStatement.class \
 	SQLRelayResultSet.class \
-	SQLRelayResultSetMetaData.class
+	SQLRelayResultSetMetaData.class \
+	SQLRelayConnectInfo.class
 
 all: sqlrelayjdbc.jar
 
