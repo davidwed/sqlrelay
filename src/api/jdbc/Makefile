@@ -2,34 +2,24 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-SRCS = SQLRelayConnection.java \
-	SQLRelayDriver.java \
-	SQLRelayDatabaseMetaData.java \
-	SQLRelayStatement.java \
-	SQLRelayPreparedStatement.java \
-	SQLRelayCallableStatement.java \
-	SQLRelayResultSet.java \
-	SQLRelayResultSetMetaData.java \
-	SQLRelayConnectInfo.java
-
-OBJS = SQLRelayConnection.class \
-	SQLRelayDriver.class \
-	SQLRelayDatabaseMetaData.class \
-	SQLRelayStatement.class \
-	SQLRelayPreparedStatement.class \
-	SQLRelayCallableStatement.class \
-	SQLRelayResultSet.class \
-	SQLRelayResultSetMetaData.class \
-	SQLRelayConnectInfo.class
+SRCS = com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayConnection.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayDriver.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayDatabaseMetaData.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayStatement.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayPreparedStatement.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayCallableStatement.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayResultSet.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayResultSetMetaData.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayConnectInfo.java
 
 all: sqlrelayjdbc.jar
 
 clean:
-	$(LTCLEAN) $(RM) *.class *.jar
+	$(LTCLEAN) $(RM) com/firstworks/sql/*.class *.jar
 
 sqlrelayjdbc.jar: $(SRCS)
 	$(JAVAC) -cp ../java/sqlrelay.jar $(SRCS)
-	$(JAR) -cf $@ $(OBJS)
+	$(JAR) -cf $@ META-INF com
 
 install:
 	$(CP) sqlrelayjdbc.jar $(javadir)

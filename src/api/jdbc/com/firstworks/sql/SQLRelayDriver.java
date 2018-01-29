@@ -9,21 +9,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-public class Driver implements java.sql.Driver {
+public class SQLRelayDriver implements Driver {
 
-	public static String driverPrefix="jdbc:sqlrelay:";
 	private static final int MAJOR_VERSION=1;
 	private static final int MINOR_VERSION=2;
 
 	static {
 		try {
-			DriverManager.registerDriver(new Driver());
+			DriverManager.registerDriver(new SQLRelayDriver());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public Driver() throws SQLException {
+	public SQLRelayDriver() throws SQLException {
 	}
 
 	/**
@@ -67,7 +66,7 @@ public class Driver implements java.sql.Driver {
 		// jdbc:sqlrelay://[user:password@]host:[port][:socket]
 
 		// check for jdbc:sqlrelay://
-		if (url.substring(0,15).equals(driverPrefix+"//")) {
+		if (url.substring(0,15).equals("jdbc:sqlrelay://")) {
 
 			// split the rest of the string on @ and get the parts
 			String[]	parts=url.substring(16).split("@");
@@ -254,13 +253,5 @@ public class Driver implements java.sql.Driver {
 	 */
 	public boolean jdbcCompliant() {
 		return false;
-	}
-
-	public static final String getVersion() {
-		return MAJOR_VERSION+"."+MINOR_VERSION;
-	}
-
-	public String toString() {
-		return "SQL Relay "+getVersion();
 	}
 }
