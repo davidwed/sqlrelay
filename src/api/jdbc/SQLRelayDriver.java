@@ -11,6 +11,10 @@ import java.util.ArrayList;
 
 public class SQLRelayDriver implements Driver {
 
+	public static String driverPrefix="jdbc:sqlrelay:";
+	private static final int MAJOR_VERSION=1;
+	private static final int MINOR_VERSION=2;
+
 	static {
 		try {
 			DriverManager.registerDriver(new SQLRelayDriver());
@@ -63,7 +67,7 @@ public class SQLRelayDriver implements Driver {
 		// jdbc:sqlrelay://[user:password@]host:[port][:socket]
 
 		// check for jdbc:sqlrelay://
-		if (url.substring(0,15).equals("jdbc:sqlrelay://")) {
+		if (url.substring(0,15).equals(driverPrefix+"//")) {
 
 			// split the rest of the string on @ and get the parts
 			String[]	parts=url.substring(16).split("@");
@@ -231,14 +235,14 @@ public class SQLRelayDriver implements Driver {
 	 *   Get the driver's major version number.
 	 */
 	public int getMajorVersion() {
-		return 1;
+		return MAJOR_VERSION;
 	}
 
 	/**
 	 *   Get the driver's minor version number.
 	 */
 	public int getMinorVersion() {
-		return 2;
+		return MINOR_VERSION;
 	}
 
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
@@ -252,4 +256,11 @@ public class SQLRelayDriver implements Driver {
 		return false;
 	}
 
+	public static final String getVersion() {
+		return MAJOR_VERSION+"."+MINOR_VERSION;
+	}
+
+	public String toString() {
+		return "SQL Relay "+getVersion();
+	}
 }
