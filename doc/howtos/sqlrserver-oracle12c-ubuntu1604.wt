@@ -3,7 +3,7 @@ This how-to walks through:
 * Installing an SQL Relay server on an Ubuntu 16.04 system
 * Configuring a connection between the SQL Relay server and an Oracle database
 
-This how-to assumes that two systems have been set up and configured as follows:
+It assumes that two systems have been set up and configured as follows:
 
 '''SQL Relay server'''
 
