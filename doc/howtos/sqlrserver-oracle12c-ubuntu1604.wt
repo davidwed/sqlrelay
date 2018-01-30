@@ -1,4 +1,9 @@
-This HOWTO assumes that two systems have been set up and configured as follows:
+This how-to walks through:
+
+* Installing an SQL Relay server on an Ubuntu 16.04 system
+* Configuring a connection between the SQL Relay server and an Oracle database
+
+This how-to assumes that two systems have been set up and configured as follows:
 
 '''SQL Relay server'''
 
@@ -11,8 +16,8 @@ This HOWTO assumes that two systems have been set up and configured as follows:
 
 '''Oracle database server'''
 
-* Any operating system that supports Oracle 12c
-* Oracle 12c database is installed, accessible as:
+* Any operating system that supports Oracle 10g or higher
+* Oracle 10g or higher database is installed, accessible as:
  * Hostname: //oracle//
  * Port: 1521
  * SID/SERVICE_NAME: //ora1//
