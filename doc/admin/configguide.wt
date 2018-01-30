@@ -1310,7 +1310,8 @@ The following configuration enables TLS/SSL encryption for an instance of SQL re
 }}}
 
 * The '''tls''' parameter enables (or disables) TLS/SSL encryption.
-* The '''tlscert''' parameter specifies the TLS/SSL certificate chain to use. (See [tlscert.html The tlscert Parameter] for details)
+* The '''tlscert''' parameter specifies the TLS/SSL certificate chain to use.
+ * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlscert.html The tlscert Parameter] for details.)
 * User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
 
 To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert parameter.  If that criterium is met then the instance can be started using:
@@ -1402,7 +1403,8 @@ The following configuration enables these checks for an instance of SQL relay:
 }}}
 
 * The '''tlsvalidate''' parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.
-* The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.  (See [tlsca.html The tlsca Parameter] for details)
+* The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
+ * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlsca.html The tlsca Parameter] for details.)
 * User list auth is also used.
 
 Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authorized against the list of valid names.

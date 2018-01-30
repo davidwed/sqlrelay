@@ -1943,7 +1943,11 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <ul>
   <li>The <b>tls</b> parameter enables (or disables) TLS/SSL encryption.</li>
-  <li>The <b>tlscert</b> parameter specifies the TLS/SSL certificate chain to use. (See <a href="tlscert.html">The tlscert Parameter</a> for details)</li>
+  <li>The <b>tlscert</b> parameter specifies the TLS/SSL certificate chain to use.</li>
+  <ul>
+    <li>(a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See <a href="tlscert.html">The tlscert Parameter</a> for details.)</li>
+  </ul>
+
   <li>User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.</li>
 </ul>
 
@@ -2048,7 +2052,11 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <ul>
   <li>The <b>tlsvalidate</b> parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.</li>
-  <li>The <b>tlsca</b> parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.  (See <a href="tlsca.html">The tlsca Parameter</a> for details)</li>
+  <li>The <b>tlsca</b> parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.</li>
+  <ul>
+    <li>(a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See <a href="tlsca.html">The tlsca Parameter</a> for details.)</li>
+  </ul>
+
   <li>User list auth is also used.</li>
 </ul>
 
