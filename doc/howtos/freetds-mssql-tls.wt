@@ -1,0 +1,348 @@
+= TLS/SSL Encryption with MS SQL Server and !FreeTDS =
+
+=== Introduction ===
+
+This tutorial walks through enabling TLS/SSL encryption between a !FreeTDS application and an Microsoft SQL Server 2014 database, including basic encryption, certificate validation, and common name validation.
+
+Unfortunately MS SQL Server doesn't support mutual authentication via TLS/SSL; that is, the database cannot validate the application's certficate and common name. This is just as well though, as there is also no obvious way to configure !FreeTDS to use a private key and certificate on the client-side.
+
+=== Assumptions ===
+
+For the purposes of this tutorial, the following assumptions are made:
+
+* An MS SQL Server 2014 database is running on a Windows system named db.firstworks.com.
+* The database contains an instance named EXAMPLEDB which is accessible using exampleuser/examplepass credentials.
+* An application which accesses the database is installed on a linux server named app.firstworks.com and currently configured to access the database without encryption.
+* The application uses !FreeTDS to access the database.
+* A private key and certificate for the database don't currently exist, but will be created, and will be named db.key and db.crt.
+* A certificate chain for the certificate authority which will sign db.crt exists, named ca.pem.
+
+
+=== Basic Encryption ===
+
+First, we will configure basic TLS/SSL encryption of the communications between the database and application server.
+
+==== Database Server Configuration ====
+
+By default, MS SQL Server 2015 supports encryption, and enables it if the application so requests. We can configure the database to require encrypted connections, though, as follows.
+
+* Open the Start menu.
+* Select the Microsoft SQL Server 2014 program group.
+* Select the SQL Server Configuration Manager.
+* Expand SQL Server Network Configuration.
+* Right-Click Protocols for EXAMPLEDB and select Properties.
+* Select the Flags Tab.
+* Change Force Encryption to Yes.
+* Click OK.
+* Click OK.
+* Exit the SQL Server Configuration Manager.
+
+Restart the database server.
+
+* Press Windows-key-R.
+* Type "services.msc" and hit return.
+* Scroll down to SQL Server (EXAMPLEDB) and select it.
+* Click Restart the service.
+
+That's all on the database server.
+
+==== Application Server Configuration ====
+
+MS SQL Server speaks versions 7.0 - 7.4 of the TDS (Tabular Data Stream) protocol. Version 7.0 doesn't support encryption, but versions 7.1 and higher do.
+
+!FreeTDS requests encryption when it's configured to use TDS version 7.1 or higher. Just to be sure, though, we can also configure the connection to require encryption, rather than just request it.
+
+Edit the !FreeTDS configuration file (usually /etc/freetds.conf), find the server entry that you use to connect to the EXAMPLEDB, verify that the TDS version is set to 7.1 or higher, and add a line to require encryption, as follows:
+
+{{{
+[EXAMPLEDB]
+ host = db.firstworks.com
+ port = 1433
+ tds version = 7.3
+ encryption = require
+}}}
+
+Note that in this example, "tds version" is set to 7.3. I have had trouble with 7.4 resulting in "Unexpected EOF from the server" errors. Your mileage may vary.
+
+That's all on the application server.
+
+==== Testing With tsql ====
+
+Connect to the database from the application server using the !FreeTDS-supplied tsql program as follows:
+
+{{{
+tsql -S EXAMPLEDB -U exampleuser -P examplepass
+}}}
+
+Unfortunately there is no easy way to verify that the connection is encrypted. If you access the database as the "sa" user, then you can run:
+
+{{{
+1> select encrypt_option from sys.dm_exec_connections where session_id = @@SPID
+2> go
+encrypt_option
+TRUE
+(1 row affected)
+}}}
+
+But non-admin users don't typically have access to sys.dm_exec_connections.
+
+Another way to verify that the connection is encrypted is to run tsql with TDSDUMP enabled:
+
+{{{
+TDSDUMP=stdout tsql -S EXAMPLEDB -U exampleuser -P examplepass
+}}}
+
+If you see lines in the output like:
+
+{{{
+  REC[0x55a2216316b0]: Decrypted Packet[1] Application Data(23) with length: 421
+}}}
+
+then the connection is encrypted.
+
+If the connection fails, it will most likely fail with:
+
+* Error 20017 (severity 9): Unexpected EOF from the server
+ * The server didn't like something about the protocol and hung up.
+ * Verify that you are using tds version 7.1 - 7.3 in your freetds.conf server entry.
+
+
+==== Updating Your Application ====
+
+Your application shouldn't actually require any changes. As long as it is configured to use the EXAMPLEDB server entry, all communications between it and the database will be encrypted.
+
+=== Adding Database Certificate Validation ===
+
+So far, we have encrypted communications between the application and the database, but we can make the application more secure by installing a certificate on the database server, and configuring the application to validate the certificate.
+
+==== Database Server Configuration ====
+
+The database server must have has host name "db" and primary DNS suffix "firstworks.com". But, Windows servers are commonly configured without a primary DNS suffix.
+
+To set the primary DNS suffix:
+
+* Press Windows-key-R.
+* Type "control panel" and hit return.
+* Click System and Security.
+* Click System.
+* Under "Computer name, domain name, and workgroup settings", click Change settings.
+* Next to "To rename this computer or change its domain or workgroup, click Change", click Change.
+* Click More.
+* Under "Primary DNS suffix of this computer" enter "firstworks.com".
+* Click OK.
+* Click OK.
+* Click OK.
+* Reboot the database server.
+
+
+Generate the certificate for the database server.
+
+The certificate can be generated by a well-known certificate authority, generated by an in-house certificate authority, or can even be self-signed.
+
+In any case, MS SQL Server places some specific requirements on the certificate:
+
+* The common name MUST match the fully qualified domain name of the database server. In this case: db.firstworks.com.
+* The Enhanced Key Usage property MUST include Server Authentication.
+ * In openssl terms, the extendedKeyUsage extension must include serverAuth in the extfile used to generate the certificate signing request.
+
+
+Combine this certificate, its associated private key, and certificate for the certificate authority that signed it into a PKCS#12 certificate chain file named db.pfk.
+
+There are various ways to do this, but with openssl you can run:
+
+{{{
+PASSWORD="" openssl pkcs12 -export -passout env:PASSWORD -in db.crt -inkey db.key -certfile ca.crt -out db.pfx
+}}}
+
+When the pfk is created, it MUST be created with !KeySpec set to AT_KEYEXCHANGE. Or, in openssl terms, the -keyext option must be used when creating the pfk file. Actually though, -keyext is the default, so just DON'T create the pfk file using -keysig.
+
+The C:\ProgramData\Microsoft\Crypto\RSA\MachineKeys folder often has the wrong permissions. Verify that both Administrators and Everyone have Full Control. If they don't, then give them both Full Control. You may get an error when you do this, indicating that permissions couldn't be changed on an individual file, but this seems safe to ignore.
+
+Now that the prerequisites are taken care of...
+
+Copy db.pfk to the database server, and install it in the Windows certificate store:
+
+* Press Windows-key-R.
+* Type "mmc" and hit return.
+* Click File.
+* Click Add/Remove Snap-in.
+* From Available snap-ins, double-click Certificates.
+* Select Computer Account.
+* Click Next.
+* Select Local Computer.
+* Click Finish.
+* Click OK.
+* Expand Certificates (Local Computer).
+* Right-Click Personal.
+* Click All Tasks.
+* Click Import...
+* Click Next.
+* Click Browse.
+* Select All Files *.* from the file-types pulldown.
+* Select db.pfk
+* Click OK.
+* Enter a private key password, if your private key has one.
+* Click Next.
+* Click Next.
+* Click Finish.
+* Exit
+* Don't save settings.
+
+Configure MS SQL Server to use the certificate.
+
+* Open the Start menu.
+* Select the Microsoft SQL Server 2014 program group.
+* Select the SQL Server Configuration Manager.
+* Expand SQL Server Network Configuration.
+* Right-Click Protocols for EXAMPLEDB and select Properties.
+* Select the Certificates Tab.
+* Select db.firstworks.com from the pulldown list.
+ * If db.firstworks.com is missing from the list, then either:
+  * The common name in the certificate is something other than "db.firstworks.com".
+   * The best solution is to generate a new certificate.
+  * The database server's host name is something other than "db".
+   * See instructions above for setting the host name.
+  * The database server's primary DNS suffix is something other than "firstworks.com".
+   * See instructions above for setting the primary DNS suffix.
+* Click OK.
+* Click OK.
+* Exit the SQL Server Configuration Manager.
+
+Restart the database server.
+
+* Press Windows-key-R.
+* Type "services.msc" and hit return.
+* Scroll down to SQL Server (EXAMPLEDB) and select it.
+* Click Restart the service.
+ * If the service fails to start, then either:
+  * The Enhanced Key Usage property of the certificate is missing or doesn't include Server Authentication.
+   * Generate a new certificate with the parameter set correctly.
+   * Replace the bad certificate.
+   * Restart SQL Server (EXAMPLEDB)
+  * C:\ProgramData\Microsoft\Crypto\RSA\MachineKeys has the wrong permissions.
+   * See instructions above for setting the permissions.
+   * Restart SQL Server (EXAMPLEDB)
+* Exit the Services manager.
+
+That's all on the database server.
+
+==== Application Server Configuration ====
+
+Configuring the application server is much simpler.
+
+Copy ca.pem to the application server and install it in a convenient place, like /etc.
+
+!FreeTDS will validate the database's certificate if it is provided with a certificate chain to validate it against.
+
+On the application server, edit the !FreeTDS configuration file (usually /etc/freetds.conf), find the server entry that you use to connect to the EXAMPLEDB, and add a ca file line, as follows:
+
+{{{
+[EXAMPLEDB]
+ host = db.firstworks.com
+ port = 1433
+ tds version = 7.3
+ encryption = require
+ ca file = /etc/ca.pem
+ check certificate hostname = no
+}}}
+
+Note that "check certificate hostname" is set to no. At this point, we're just validating that the database server is a host that we trust. We're not worried about whether it's the exact host we intend to be talking to.
+
+That's all on the application server.
+
+==== Testing With tsql ====
+
+Connect to the database from the application server using the !FreeTDS-supplied tsql program as follows:
+
+{{{
+tsql -S EXAMPLEDB -U exampleuser -P examplepass
+}}}
+
+If the connection fails, it will most likely fail with:
+
+{{{
+Error 20002 (severity 9): Adaptive Server connection failed
+}}}
+
+Which isn't very helpful. Running tsql with TDSDUMP enabled...
+
+{{{
+TDSDUMP=stdout tsql -S EXAMPLEDB -U exampleuser -P examplepass
+}}}
+
+...may be slightly more revealing.
+
+It may say:
+
+{{{
+tls.c:484:handshake failed: Error in the certificate.
+}}}
+
+That usually means that the ca.pem's certificate authority didn't sign the database's certificate. Double-check it.
+
+If it also says something like this:
+
+{{{
+tls.c:368:Certificate hostname does not match
+}}}
+
+Then "check certificate hostname" is probably misspelled.
+
+Adding Database Certificate Common Name Validation
+
+So far, we are encrypting communications between the application and the database and validating the database server's certificate, but we can also make the application more secure by validating the common name in the database server's certificate.
+
+This is actually pretty simple. In fact we had to do additional work to disable it earlier.
+
+On the application server, modify /etc/freetds.conf and set "check certificate hostname" to yes.
+
+{{{
+[EXAMPLEDB]
+ host = db.firstworks.com
+ port = 1433
+ tds version = 7.3
+ encryption = require
+ ca file = /etc/ca.pem
+ check certificate hostname = yes
+}}}
+
+Or, optionally just remove the parameter altogether, as checking the certificate's common name is the default behavior.
+
+You can test the configuration using tsql:
+
+{{{
+tsql -S EXAMPLEDB -U exampleuser -P examplepass
+}}}
+
+Again, it may fail with the not-so-helpful:
+
+{{{
+Error 20002 (severity 9): Adaptive Server connection failed
+}}}
+
+Running tsql with TDSDUMP enabled...
+
+{{{
+TDSDUMP=stdout tsql -S EXAMPLEDB -U exampleuser -P examplepass
+}}}
+
+...might be more revealing.
+
+It may say:
+
+{{{
+...
+tls.c:368:Certificate hostname does not match
+...
+tls.c:484:handshake failed: Error in the certificate.
+...
+}}}
+
+This means that the common name in the database's certificate didn't match the host parameter in the freetds.conf file.
+
+* Verify the common name in the freetds.conf file and in the database's certificate.
+ * If the host name in the freetds.conf file is wrong then change it and try again.
+ * If the common name in the certificate is wrong, then:
+  * Ideally the certificate should be regenerated and re-deployed.
+  * If that's not an option, then you can add a DNS entry (or /etc/hosts entry) for the name that is in the certificate, and update the freetds.conf file with that name.
+

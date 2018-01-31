@@ -9,6 +9,7 @@ SRCS = \
 	oracle-tls-wallet-quirks.wt \
 	oracle-tls-selfsigned.wt \
 	oracle-tls-casigned.wt \
+	freetds-mssql-tls.wt \
 	sqlrserver-oracle12c-ubuntu1604.wt \
 	sqlrclient-ubuntu1604.wt \
 	sqlrserver-tls-pfx-sqlserver-windows.wt \
@@ -21,6 +22,7 @@ OBJS = \
 	oracle-tls-wallet-quirks.html \
 	oracle-tls-selfsigned.html \
 	oracle-tls-casigned.html \
+	freetds-mssql-tls.html \
 	sqlrserver-oracle12c-ubuntu1604.html \
 	sqlrclient-ubuntu1604.html \
 	sqlrserver-tls-pfx-sqlserver-windows.html \
