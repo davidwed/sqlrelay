@@ -22,7 +22,7 @@ It assumes that two systems have been set up and configured as follows:
  * Password: //sqlrpassword//
 
 
-== Install Prerequisite Software ==
+=== Install Prerequisite Software ===
 
 On the SQL Relay client system, run the following command to install the prerequisite software packages:
 
@@ -31,7 +31,7 @@ sudo apt install libedit-dev libssl-dev libkrb5-dev libpcre3-dev libcurl4-openss
 }}}
 
 
-== Build and Install SQL Relay Client Software ==
+=== Build and Install SQL Relay Client Software ===
 
 On the SQL Relay client system, download current .tar.gz files of SQL Relay and Rudiments from the '''Source Distribution''' section of [http://sqlrelay.sourceforge.net/download.html the SQL Relay Downloads page].
 
@@ -52,7 +52,7 @@ sudo make install
 }}}
 
 
-== Update the Environment ==
+=== Update the Environment ===
 
 Create /etc/profile.d/firstworks.sh with the following contents:
 
@@ -75,7 +75,7 @@ sudo /sbin/ldconfig
 Exit and log back in to apply the updates to the environment.
 
 
-== Verify Connectivity to the SQL Relay Server ==
+=== Verify Connectivity to the SQL Relay Server ===
 
 To verfiy DNS resolution of the SQL Relay server hostname, run:
 
@@ -155,7 +155,7 @@ There shouldn't be any errors or warnings, but if there are, then some typical p
 
 Congratulations!  If you made it to this point, the SQL Relay server is configured correctly.
 
-== Uninstallation ==
+=== Uninstallation ===
 
 If, for some reason, you need to completely uninstall SQL Relay, then run the following commands from the directory that the source trees were extracted to:
 

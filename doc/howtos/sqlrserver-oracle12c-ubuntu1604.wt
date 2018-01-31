@@ -27,7 +27,7 @@ It assumes that two systems have been set up and configured as follows:
  * Password: //oraclepassword//
 
 
-== Install Prerequisite Software ==
+=== Install Prerequisite Software ===
 
 ssh into the SQL Relay server and run the following command to install the prerequisite software packages:
 
@@ -36,7 +36,7 @@ sudo apt install unzip g++ make libedit-dev libssl-dev libkrb5-dev libpcre3-dev 
 }}}
 
 
-== Install Oracle Instant Client ==
+=== Install Oracle Instant Client ===
 
 Download Oracle Instant Client 12c as follows.
 
@@ -71,7 +71,7 @@ sudo /sbin/ldconfig
 }}}
 
 
-== Build and Install SQL Relay Server Software ==
+=== Build and Install SQL Relay Server Software ===
 
 Download current .tar.gz files of SQL Relay and Rudiments from the '''Source Distribution''' section of [http://sqlrelay.sourceforge.net/download.html the SQL Relay Downloads page] and scp/sftp them to the SQL Relay server.
 
@@ -92,7 +92,7 @@ sudo make install
 }}}
 
 
-== Update the Environment ==
+=== Update the Environment ===
 
 Create /etc/profile.d/firstworks.sh with the following contents:
 
@@ -129,7 +129,7 @@ sudo /sbin/ldconfig
 Exit and ssh back in to apply the updates to the environment.
 
 
-== Configure SQL Relay ==
+=== Configure SQL Relay ===
 
 Create /usr/local/firstworks/etc/sqlrelay.conf.d/oracle.conf with the following contents:
 
@@ -155,7 +155,7 @@ sudo chmod 640 /usr/local/firstworks/etc/sqlrelay.conf/oracle.conf
 }}}
 
 
-== Start SQL Relay ==
+=== Start SQL Relay ===
 
 Start SQL Relay by running:
 
@@ -208,7 +208,7 @@ sudo sqlr-stop
 sudo sqlr-start -id sample
 }}}
 
-== Verify SQL Relay ==
+=== Verify SQL Relay ===
 
 To verify that the SQL Relay processes are running, run:
 
@@ -285,7 +285,7 @@ SQL Relay should also be configured to restart on reboot.  To verify this:
 
 Congratulations!  If you made it to this point, the SQL Relay server is configured correctly.
 
-== Uninstallation ==
+=== Uninstallation ===
 
 If, for some reason, you need to completely uninstall SQL Relay, then run the following commands from the directory that the source trees were extracted to:
 

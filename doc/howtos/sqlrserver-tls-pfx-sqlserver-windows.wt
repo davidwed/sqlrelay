@@ -35,7 +35,7 @@ This how-to also assumes that a certificate has been created to secure the SQL R
  * The private key
  * The CA certificate
 
-== Install Rudiments and SQL Relay Packages ==
+=== Install Rudiments and SQL Relay Packages ===
 
 Download current .zip files of the '''SQL Relay Binary Distribution for Windows''' from the '''Binary Distributions''' section of the [http://sqlrelay.sourceforge.net/download.html the SQL Relay Downloads page] to the SQL Relay server Desktop.
 
@@ -66,7 +66,7 @@ Extract and install the software as follows:
 
 It's now safe to trash the sqlrelay-binary-distribution-1.2.0 folder and zip.
 
-== Configure an ODBC DSN ==
+=== Configure an ODBC DSN ===
 
 SQL Relay will use ODBC to connect to the database.
 
@@ -93,7 +93,7 @@ To configure a DSN for a TLS-encrypted ODBC connection to MS SQL Server:
   * Click OK
  * Click OK
 
-== Configure SQL Relay ==
+=== Configure SQL Relay ===
 
 To configure SQL Relay:
 
@@ -116,7 +116,7 @@ To configure SQL Relay:
 &lt;/instances&gt;
 }}}
 
-== Start SQL Relay ==
+=== Start SQL Relay ===
 
 Start SQL Relay by running:
 
@@ -147,7 +147,7 @@ sqlr-stop
 sqlr-start -id sample
 }}}
 
-== Verify SQL Relay ==
+=== Verify SQL Relay ===
 
 To verify that the SQL Relay processes are running:
 
@@ -198,7 +198,7 @@ There shouldn't be any errors or warnings.
 
 Congratulations!  If you made it to this point, the SQL Relay server is configured correctly.
 
-== Uninstallation ==
+=== Uninstallation ===
 
 If, for some reason, you need to completely uninstall SQL Relay then:
 
