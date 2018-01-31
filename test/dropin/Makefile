@@ -39,6 +39,9 @@ oracle.lo: oracle.cpp
 oracle.obj: oracle.cpp
 	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(ORACLENCLUDES) $(COMPILE) tds.cpp
 
+oracle.class: oracle.java
+	$(JAVAC) oracle.java
+
 mysql: mysql.cpp mysql.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
 
@@ -58,4 +61,4 @@ oracle: oracle.cpp oracle.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) oracle.$(OBJ) $(ORACLELIBS) $(DROPINTESTLIBS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE) tds$(EXE) oracle$(EXE)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE) tds$(EXE) oracle$(EXE)

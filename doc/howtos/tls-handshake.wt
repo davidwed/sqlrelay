@@ -1,0 +1,58 @@
+TLS Handshake - Mutual Authentication + DHE cipher...
+
+* -> '''ClientHello'''
+ * Client sends:
+  * highest protocol version
+  * supported cipher suites
+  * supported compression modes
+  * a random number
+
+* <- '''ServerHello'''
+ * Server sends:
+  * chosen protocol version
+  * chosen cipher suite
+  * chosen compression modes
+  * a random number
+* <- '''Certificate'''
+ * Server sends its certificate, which contains a public key
+ * Client validates the certificate
+* <- '''ServerKeyExchange'''
+ * Server sends client DH primes
+ * Client and server generate asymmetric keys from these primes
+ * Do these keys encrypt the rest of the handshake???
+* <- '''CertificateRequest'''
+ * Server requests client's certificate
+* <- '''ServerHelloDone'''
+
+* -> '''Certificate'''
+ * Client sends its certificate, which contains a public key
+ * Server validates the certificate
+* -> '''ClientKeyExchange'''
+ * //PreMasterSecret// is generated from:
+  * protocol version
+  * random data
+ * //PreMasterSecret// is encrypted using server's public key
+ * encrypted //PreMasterSecret// is sent to the server
+ 
+* -> '''CertificateVerify'''
+ * Client-private-key-encrypted signature (hash and MAC?) of the previous messages
+ * Server decrypts with client-public-key and verifies
+
+* Client and server generate the same //MasterSecret//
+ * Server uses its private key to decrypt the //PreMasterSecret//
+ * //MasterSecret// is generated from:
+  * Client random number
+  * Server random number
+  * //PreMasterSecret//
+
+* -> '''ChangeCipherSpec'''
+ * marker - everything from here on is encrypted using the MasterSecret
+* -> '''Finished'''
+ * //MasterSecret//-encrypted hash and MAC of previous messages
+ * if server can decrypt and verify then handshake is complete
+
+* <- '''ChangeCipherSpec'''
+ * marker - everything from here on is encrypted using the MasterSecret
+* <- '''Finished'''
+ * //MasterSecret//-encrypted hash and MAC of previous messages
+ * if client can decrypt and verify then handshake is complete

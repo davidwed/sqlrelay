@@ -1,0 +1,114 @@
+== Basic Encryption ==
+
+Any simple two-way cipher can be used to encrypt and decrypt messages.
+
+To encrypt a message, a simple cipher passes the message through some math, and the result is the encrypted message.
+
+For example, if the ROT-13 cipher is used to encrypt the (text) message:
+
+{{{
+hello
+}}}
+
+then the (text) result is:
+
+{{{
+uryyb
+}}}
+
+To decrypt the message, the cipher passes the encrypted message through some inverse math, and the result is the decrypted message.
+
+This isn't very secure though.  Anyone who knows (or guesses) the cipher that was used to encrypt the message can decrypt it.
+
+Secure ciphers use keys to encrypt and decrypt messages.  A key is a just a series of numbers, ideally a long and random series.
+
+To encrypt a message, a secure cipher passes the message AND key through some math, and the result is the encrypted message.
+
+For example, if the AES cipher is used to encrypt the (text) message:
+
+{{{
+hello
+}}}
+
+with the (base64) key:
+
+{{{
+MTIzNDU2Nzg5MAo=
+}}}
+
+then the (base64) result is:
+
+{{{
+zXG5hDlSo6vBJTRe9/lz6Q==
+}}}
+
+To decrypt the message, the cipher passes the encrypted message and key through some inverse math, and the result is the decrypted message.
+
+This is more secure because someone would have to know the alogorithm and the key to decrypt the message.  If the key is long and random, then it should take a prohibitively long time to guess.
+
+
+= Symmetric Cryptography =
+
+In symmetric cryptography, the same key is used to encrypt and decrypt messages.
+
+The examples above are examples of symmetric cryptography.
+
+Symmetric cryptography is secure as long as great care is taken in distributing the key.
+
+Anyone who intercepts the key can decrypt messages encrypted by it and encrypt new messages with it.  Thus, anyone who intercepts the key without being detected could eavesdrop on or impersonate a valid holder of the key.
+
+
+= Asymmetric Cryptography =
+
+In asymmetric cryptography, a pair of keys is required to encrypt and decrypt messages.  Each key can only decrypt messages encrypted by the other key.
+
+For example, if the RSA cipher is used to encrypt the (text) message:
+
+{{{
+hello
+}}}
+
+with the (base64) key:
+
+{{{
+MIICXQIBAAKBgQDDgN/T3nd4iFqPAbOgUmgqz9ucPx+r9yFhvB1/4o9uutWQJHa7
+MZ2Bd9sJ5DXZcCXnco4nkwfz+0e3cCP8xt6MsaK2OdyS2R3dF/PdDVFk790EIDqE
+WxjqFKCL+XZ+YGCEaL/C7UOVp5I7hGjtkS0lASip2rt55Mrhd0AEXs35PQIDAQAB
+AoGAC7YusmyDT68rbaG2dwY4w0fMaiHF7fFSCJ7STZTu7r02ifoFOtWQD+90KbWI
+HEyBmMneBjTipxUIiM6o+T2Ym043SN8N45ISS79L8uHDSHlPn1Bo+0/HpiNMi9gh
+ewOy7oztEgzp3CQQp82F6E17hiZqbJ1ChY48KPims6d9kykCQQDtPhILNN4ivIX4
+yqjDgsqpsIKsPzQacwGIMIlEMvAWKI3FSu/mRGVHZHWjXze9ueZkRDshYdpZBXa2
+WSu8/JavAkEA0vX7A9SG8K7ymaNjpZtVxMxZzjU8How484ygdpRWRBe8ORB5LI+/
+cXjE0vjl/O7E8Rn3BpxXYOJKOlZUQDBp0wJBALirZlQ+1OLpKMfeyLtXZfXsper6
+T85+0yR104O4utYkvyZiDJeLieKmukNvbO5MdKB71CNKDjLZY+zRQJCddZUCQQC5
+7vdYPt7YDznfU/Slp60GkR2t85mTSv9/GTjsin0l8s2AdhZ2whN3zXucfqcmMMP/
+xGTGvND+oTPPCvuiv4jlAkB4b3JG17/SykXyd/u8yahSuN5EhJ+6YY8aao+N/qHm
+PX85aep6O33Ufc9WjFL628El6BxLi68yYgvM73MfqXGE
+}}}
+
+then the (base64) result is:
+
+{{{
+u8iqyYRUEGmJd7n54A5cW8lWGFjj0Pd1+g5NVnrFU4tzxRAn+8bl1IvWAo4SCzbH
+C87C9IgD8mUxxYNOxzcEVsbRW2pCUREwnyX7wNlJg/6eBLGdc4NIQAt/dfccmilz
+WIx6BxhGSSxpsK9oP25OKouXdp8csOaV0vwvAabHblY=
+}}}
+
+However, it cannot be decrypted with the same key.  It can only be decrypted with the (base64) key:
+
+{{{
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDDgN/T3nd4iFqPAbOgUmgqz9uc
+Px+r9yFhvB1/4o9uutWQJHa7MZ2Bd9sJ5DXZcCXnco4nkwfz+0e3cCP8xt6MsaK2
+OdyS2R3dF/PdDVFk790EIDqEWxjqFKCL+XZ+YGCEaL/C7UOVp5I7hGjtkS0lASip
+2rt55Mrhd0AEXs35PQIDAQAB
+}}}
+
+Asymmetric cryptography is often called public-key/private-key encryption because the primary key (the private key) is kept secret and the corresponding key (the public key) is distributed freely.
+
+Since the public key is distributed, it is no more secure than a symmetric cryptographic key.  It could be intercepted, and anyone who intercepts it without being detected could eavesdrop on or impersonate a valid holder of the key.
+
+The private key is highly secure though.  Since it is never distributed, intercepting it without detection should be prohibitively difficult or expensive.  Thus, it should be very difficult for someone to eavesdrop on messages sent by a holder of the public key or impersonate the holder of the private key.
+
+This is especially useful in cases where only one side of the conversation is passing sensitive information to the other.  For example, when making purchases on the web, the purchaser sends sensitive credit card information to the store, but the information sent back to the purchaser isn't nearly as sensitive.
+
+Of course, if both parties exchange public keys and use them exclusively for encryption, then each party can trust that only the other will be able to decrypt their encrypted messages.

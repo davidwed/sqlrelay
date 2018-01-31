@@ -1,0 +1,17 @@
+= Oracle TLS/SSL Encryption Tutorials =
+
+So, you want to secure communications between your application and an Oracle database with TLS/SSL...
+
+[https://httpd.apache.org/docs/2.4/ssl/ssl_howto.html Most] [https://dev.mysql.com/doc/refman/5.7/en/using-secure-connections.html TLS/SSL-capable] [https://www.postgresql.org/docs/9.5/static/ssl-tcp.html servers] are secured by generating a private key, getting a certificate, and adding a few lines to a config file to tell the server the locations of the cert and key files. Of course, if you generate the certificate yourself, then you also have to tell the server about your fake certificate authority. But, for most apps, that's it. Three parameters in a file somewhere: cert, key, and ca.
+
+With Oracle, the idea is similar, but the details are very different.
+
+Rather than storing certificates and keys in files and providing the paths to them in a config file, you store them in an Oracle "wallet" and provide the path to the wallet.
+
+While Oracle wallets are more secure than flat files, the security features introduce [oracle-tls-wallet-quirks.html some interesting quirks] that are worth reviewing before attempting an implementation.
+
+When you're ready to take the plunge, tutorials follow:
+
+* [oracle-tls-selfsigned.html Oracle TLS/SSL Encryption With Self-Signed Certificates]
+* [oracle-tls-casigned.html Oracle TLS/SSL Encryption with CA-Signed Certificates]
+

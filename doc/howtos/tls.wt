@@ -1,0 +1,7 @@
+Transport Layer Security (TLS), formerly known as Secure Socket Layer (SSL) is a widely supported form of encryption and authentication.
+
+Under TLS, all communication is encrypted, and signed certificates can be used to authenticate the server - i.e. validate that the server is really the server that the client intends to be talking to, and not an imposter.
+
+In a less common, mutual-authentication scheme, the server can validate the client via a signed certificate as well.
+
+
