@@ -1125,12 +1125,23 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {
 				sqlrcur->defineInputOutputBindInteger(name,
 						bv->integerval);
-			}
-			/*else if (bv->type==SQLRCLIENTBINDVARTYPE_DOUBLE) {
-				sqlrcur->defineInputOutputBindDouble(name);
+			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DOUBLE) {
+				sqlrcur->defineInputOutputBindDouble(name,
+						bv->doubleval.value,
+						bv->doubleval.precision,
+						bv->doubleval.scale);
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
-				sqlrcur->defineInputOutputBindDate(name);
-			}*/
+				sqlrcur->defineInputOutputBindDate(name,
+						bv->dateval.year,
+						bv->dateval.month,
+						bv->dateval.day,
+						bv->dateval.hour,
+						bv->dateval.minute,
+						bv->dateval.second,
+						bv->dateval.microsecond,
+						bv->dateval.tz,
+						bv->dateval.isnegative);
+			}
 		}
 	}
 
@@ -1184,8 +1195,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {
 				bv->integerval=
 				sqlrcur->getInputOutputBindInteger(name);
-			}
-			/*else if (bv->type==SQLRCLIENTBINDVARTYPE_DOUBLE) {
+			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DOUBLE) {
 				bv->doubleval.value=
 				sqlrcur->getInputOutputBindDouble(name);
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
@@ -1199,7 +1209,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						&(bv->dateval.microsecond),
 						&(bv->dateval.tz),
 						&(bv->dateval.isnegative));
-			}*/
+			}
 		}
 	}
 }
@@ -1864,6 +1874,7 @@ bool sqlrsh::outputbind(sqlrcursor *sqlrcur,
 		delete[] parts[0];
 	} else {
 		stderror.printf("usage: outputbind "
+				// FIXME: not entirely accurate
 				"[variable] [type] [length] [scale]\n");
 		for (uint64_t i=0; i<partcount; i++) {
 			delete[] parts[i];
@@ -1913,7 +1924,8 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 
 		if (!charstring::compareIgnoringCase(
 						parts[2],"string") &&
-						partcount==6) {
+						partcount>=6) {
+			// inputoutputbind 1 string length = 'string'
 			bv->type=SQLRCLIENTBINDVARTYPE_STRING;
 			bv->outputstringbindlength=
 				charstring::toInteger(parts[3]);
@@ -1921,33 +1933,46 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"integer") &&
 						partcount==5) {
+			// inputoutputbind 1 integer = value
 			bv->type=SQLRCLIENTBINDVARTYPE_INTEGER;
 			bv->integerval=charstring::toInteger(value);
-		}
-		/*else if (!charstring::compareIgnoringCase(
+		} else if (!charstring::compareIgnoringCase(
 						parts[2],"double") &&
-						partcount==5) {
+						partcount==7) {
+			// inputoutputbind 1 double prec scale = value
 			bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-			bv->doubleval.value=0.0;
+			bv->doubleval.value=charstring::toFloat(value);
 			bv->doubleval.precision=
 				charstring::toInteger(parts[3]);
 			bv->doubleval.scale=
 				charstring::toInteger(parts[4]);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"date") &&
-						partcount==3) {
+						partcount>=5) {
+			// inputoutputbind 1 date = '...'
+			int16_t	year;
+			int16_t	month;
+			int16_t	day;
+			int16_t	hour;
+			int16_t	minute;
+			int16_t	second;
+			int32_t	microsecond;
+			bool	isnegative;
+			parseDateTime(value,false,false,"/",
+						&year,&month,&day,
+						&hour,&minute,&second,
+						&microsecond,&isnegative);
 			bv->type=SQLRCLIENTBINDVARTYPE_DATE;
-			bv->dateval.year=0;
-			bv->dateval.month=0;
-			bv->dateval.day=0;
-			bv->dateval.hour=0;
-			bv->dateval.minute=0;
-			bv->dateval.second=0;
-			bv->dateval.microsecond=0;
+			bv->dateval.year=year;
+			bv->dateval.month=month;
+			bv->dateval.day=day;
+			bv->dateval.hour=hour;
+			bv->dateval.minute=minute;
+			bv->dateval.second=second;
+			bv->dateval.microsecond=microsecond;
 			bv->dateval.tz="";
-			bv->dateval.isnegative=false;
-		}*/
-		else {
+			bv->dateval.isnegative=isnegative;
+		} else {
 			sane=false;
 		}
 
@@ -2002,7 +2027,7 @@ void sqlrsh::printbinds(const char *type,
 						bv->doubleval.value);
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
 			stdoutput.printf("(DATE) = %02d/%02d/%04d "
-						"%s%02d:%02d:%02d:%03d %s\n",
+						"%s%02d:%02d:%02d.%06d %s\n",
 						bv->dateval.month,
 						bv->dateval.day,
 						bv->dateval.year,

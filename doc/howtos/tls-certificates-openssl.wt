@@ -12,40 +12,8 @@ Under TLS:
 * Servers can also optionally authenticate clients via certificate, presented by the client
  * This is known as mutual-authentication and is less common
 
-To TLS-secure a host, the following are typically required:
-
-* a private key
-* a corresponding public key
-* a certificate
-
-The private key is kept secret.
-
-The certificate:
-
-* contains information identifying the host
-* contains the public key
-* was signed (encrypted) by the private key of a Certificte Authority (CA)
-* contains information identifying the CA that signed it
-
-Certificate Authorities are identified by CA certs.
-
-A CA cert:
-
-* contains information identifying the CA
-* contains the public key
-* was signed (encrypted) by the private key of a Certificte Authority (CA)
-* contains information identifying the CA that signed it
-
-CA certs for well-known CA's are typically included in operating system distributions.  Applications can typically be manually configured to recognize CA's not included with the operating system as well.
-
-Each cert or CA cert is signed by a parent CA.  
-
-!OpenSSL is arguably the most popular TLS implementation.  It is available for most modern platforms, and it provides all of the necessary utilities for generating certificates.
-
 Certificates used to secure web sites or other public servers should be issued by well known Certificate Authorities.  However, certificates used for development or used internally to an organization may be self-signed.
 
 === Generating Self-Signed Certificates ===
-
-Ordinarily a certificate is encrypted (signed) by the private key of a Certificate Authority.  The public key provided by that Certificate Authority's certificate can then be used to decryypt and read the certificate.
 
 A self-signed certificate is signed by its own private key.

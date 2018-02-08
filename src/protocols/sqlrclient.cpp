@@ -1781,6 +1781,7 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			bv->value.dateval.second=0;
 			bv->value.dateval.microsecond=0;
 			bv->value.dateval.tz=NULL;
+			bv->value.dateval.isnegative=false;
 			// allocate enough space to store the date/time string
 			// or whatever buffer a child might need to store a
 			// date 512 bytes ought to be enough
@@ -1904,24 +1905,180 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 			}
 			bv->isnull=cont->nonNullBindValue();
 			cont->raiseDebugMessageEvent("INTEGER");
-		} /*else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
-			cont->raiseDebugMessageEvent("DOUBLE");
-			// these don't typically get set, but they get used
-			// when building debug strings, so we need to
-			// initialize them
-			bv->value.doubleval.precision=0;
-			bv->value.doubleval.scale=0;
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
+
+			// get the bind value
+			ssize_t	result=clientsock->read(
+					&(bv->value.doubleval.value),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(double)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"value";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the precision
+			result=clientsock->read(
+					&(bv->value.doubleval.precision),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint32_t)) {
+				const char	*info="get binds failed: "
+							"failed to get "
+							"precision";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the scale
+			result=clientsock->read(
+					&(bv->value.doubleval.scale),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint32_t)) {
+				const char	*info="get binds failed: "
+							"failed to get "
+							"scale";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
 			bv->isnull=cont->nonNullBindValue();
+			cont->raiseDebugMessageEvent("DOUBLE");
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
-			cont->raiseDebugMessageEvent("DATE");
-			bv->value.dateval.year=0;
-			bv->value.dateval.month=0;
-			bv->value.dateval.day=0;
-			bv->value.dateval.hour=0;
-			bv->value.dateval.minute=0;
-			bv->value.dateval.second=0;
-			bv->value.dateval.microsecond=0;
-			bv->value.dateval.tz=NULL;
+
+			// get the year
+			ssize_t	result=clientsock->read(
+					&(bv->value.dateval.year),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"year";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the month
+			result=clientsock->read(
+					&(bv->value.dateval.month),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"month";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the day
+			result=clientsock->read(
+					&(bv->value.dateval.day),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"day";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the hour
+			result=clientsock->read(
+					&(bv->value.dateval.hour),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"hour";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the minute
+			result=clientsock->read(
+					&(bv->value.dateval.minute),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"minute";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the second
+			result=clientsock->read(
+					&(bv->value.dateval.second),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"second";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the microsecond
+			result=clientsock->read(
+					&(bv->value.dateval.microsecond),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint32_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"microsecond";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the tz length
+			uint16_t	tzlen=0;
+			result=clientsock->read(&tzlen,idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"tz length";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the tz
+			bv->value.dateval.tz=(char *)bindpool->allocate(tzlen);
+			result=clientsock->read(bv->value.dateval.tz,tzlen,
+						idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)tzlen) {
+				bv->value.dateval.tz[0]='\0';
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"tz";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the is-negative flag
+			result=clientsock->read(&bv->value.dateval.isnegative,
+							idleclienttimeout,0);
+			if (result!=sizeof(bool)) {
+				const char	*info="get binds failed: "
+							"failed to get "
+							"is-negative flag";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
 			// allocate enough space to store the date/time string
 			// or whatever buffer a child might need to store a
 			// date 512 bytes ought to be enough
@@ -1929,8 +2086,10 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 			bv->value.dateval.buffer=
 				(char *)bindpool->allocate(
 						bv->value.dateval.buffersize);
+
 			bv->isnull=cont->nonNullBindValue();
-		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB ||
+			cont->raiseDebugMessageEvent("DATE");
+		} /*else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB ||
 					bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
 				return false;
@@ -1942,7 +2101,6 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 			}
 			bv->isnull=cont->nonNullBindValue();
 		}*/
-		// FIXME: long, double, date, lob...
 	}
 
 	cont->raiseDebugMessageEvent("done getting input/output binds");
@@ -2330,14 +2488,6 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 	}
 	bv->value.dateval.tz[length]='\0';
 
-	// allocate enough space to store the date/time string
-	// 64 bytes ought to be enough
-	bv->value.dateval.buffersize=64;
-	bv->value.dateval.buffer=(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-
-	bv->isnull=cont->nonNullBindValue();
-
 	// get the is-negative flag
 	bool	tempbool;
 	result=clientsock->read(&tempbool,idleclienttimeout,0);
@@ -2348,6 +2498,14 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 		return false;
 	}
 	bv->value.dateval.isnegative=tempbool;
+
+	// allocate enough space to store the date/time string
+	// 64 bytes ought to be enough
+	bv->value.dateval.buffersize=64;
+	bv->value.dateval.buffer=(char *)bindpool->allocate(
+						bv->value.dateval.buffersize);
+
+	bv->isnull=cont->nonNullBindValue();
 
 	debugstr.clear();
 	debugstr.append(bv->value.dateval.year)->append('-');
@@ -2928,7 +3086,7 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 			clientsock->write((uint16_t)INTEGER_DATA);
 			clientsock->write((uint64_t)bv->value.integerval);
 
-		} /*else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
 
 			if (cont->logEnabled() ||
 				cont->notificationsEnabled()) {
@@ -2988,8 +3146,7 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 			clientsock->write(bv->value.dateval.tz,length);
 			clientsock->write((bool)bv->value.dateval.isnegative);
 
-		}*/
-		// FIXME: long, double, date, lob...
+		}
 
 		if (cont->logEnabled() || cont->notificationsEnabled()) {
 			cont->raiseDebugMessageEvent(debugstr.getString());

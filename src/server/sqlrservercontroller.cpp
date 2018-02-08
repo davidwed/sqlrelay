@@ -3598,8 +3598,8 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} /*else if (bind->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
-			if (!cursor->outputBind(
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
+			if (!cursor->inputOutputBind(
 					bind->variable,
 					bind->variablesize,
 					&bind->value.doubleval.value,
@@ -3609,7 +3609,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 				return false;
 			}
 		} else if (bind->type==SQLRSERVERBINDVARTYPE_DATE) {
-			if (!cursor->outputBind(
+			if (!cursor->inputOutputBind(
 					bind->variable,
 					bind->variablesize,
 					&bind->value.dateval.year,
@@ -3626,15 +3626,15 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 					&bind->isnull)) {
 				return false;
 			}
-		} else if (bind->type==SQLRSERVERBINDVARTYPE_BLOB) {
-			if (!cursor->outputBindBlob(
+		} /*else if (bind->type==SQLRSERVERBINDVARTYPE_BLOB) {
+			if (!cursor->inputOutputBindBlob(
 					bind->variable,
 					bind->variablesize,inout,
 					&bind->isnull)) {
 				return false;
 			}
 		} else if (bind->type==SQLRSERVERBINDVARTYPE_CLOB) {
-			if (!cursor->outputBindClob(
+			if (!cursor->inputOutputBindClob(
 					bind->variable,
 					bind->variablesize,inout,
 					&bind->isnull)) {

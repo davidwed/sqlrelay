@@ -42,6 +42,9 @@ oracle.obj: oracle.cpp
 oracle.class: oracle.java
 	$(JAVAC) oracle.java
 
+odbc.class: odbc.java
+	$(JAVAC) odbc.java
+
 mysql: mysql.cpp mysql.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
 

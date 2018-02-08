@@ -144,6 +144,26 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						uint16_t variablesize,
 						int64_t *value,
 						int16_t *isnull);
+		bool		inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
+		bool		inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						int32_t *microsecond,
+						const char **tz,
+						bool *isnegative,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		int16_t		nonNullBindValue();
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(uint16_t isnull);
@@ -207,6 +227,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
 		int16_t		**outisnullptr;
+		datebind	**inoutdatebind;
 		int16_t		**inoutisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
 		SQLLEN		*outisnull;
@@ -1846,6 +1867,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	stmt=NULL;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	outdatebind=new datebind *[maxbindcount];
+	inoutdatebind=new datebind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
 	inoutisnullptr=new int16_t *[maxbindcount];
 	#ifdef SQLBINDPARAMETER_SQLLEN
@@ -1857,6 +1879,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	#endif
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
+		inoutdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
 		inoutisnullptr[i]=NULL;
 		outisnull[i]=0;
@@ -1870,6 +1893,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 
 odbccursor::~odbccursor() {
 	delete[] outdatebind;
+	delete[] inoutdatebind;
 	delete[] outisnullptr;
 	delete[] inoutisnullptr;
 	delete[] outisnull;
@@ -2288,6 +2312,7 @@ bool odbccursor::outputBind(const char *variable,
 	db->tz=tz;
 	*isnegative=false;
 	db->buffer=buffer;
+
 	outdatebind[pos-1]=db;
 	outisnullptr[pos-1]=isnull;
 
@@ -2296,6 +2321,8 @@ bool odbccursor::outputBind(const char *variable,
 				SQL_PARAM_OUTPUT,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
+				// FIXME: shouldn't these be 29,9
+				// like an input/output bind?
 				0,
 				0,
 				buffer,
@@ -2315,7 +2342,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 		return false;
 	}
 
-	//inoutdatebind[pos-1]=NULL;
+	inoutdatebind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
@@ -2344,7 +2371,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 		return false;
 	}
 
-	//inoutdatebind[pos-1]=NULL;
+	inoutdatebind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
@@ -2360,6 +2387,91 @@ bool odbccursor::inputOutputBind(const char *variable,
 				value,
 				sizeof(int64_t),
 				&(inoutisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputOutputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t *precision,
+				uint32_t *scale,
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	inoutdatebind[pos-1]=NULL;
+	inoutisnullptr[pos-1]=isnull;
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_DOUBLE,
+				SQL_DOUBLE,
+				*precision,
+				*scale,
+				value,
+				sizeof(double),
+				&(outisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputOutputBind(const char *variable,
+				uint16_t variablesize,
+				int16_t *year,
+				int16_t *month,
+				int16_t *day,
+				int16_t *hour,
+				int16_t *minute,
+				int16_t *second,
+				int32_t *microsecond,
+				const char **tz,
+				bool *isnegative,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
+	ts->year=*year;
+	ts->month=*month;
+	ts->day=*day;
+	ts->hour=*hour;
+	ts->minute=*minute;
+	ts->second=*second;
+	ts->fraction=(*microsecond)*1000;
+
+	datebind	*db=new datebind;
+	db->year=year;
+	db->month=month;
+	db->day=day;
+	db->hour=hour;
+	db->minute=minute;
+	db->second=second;
+	db->microsecond=microsecond;
+	db->tz=tz;
+	*isnegative=false;
+	db->buffer=buffer;
+
+	inoutdatebind[pos-1]=db;
+	inoutisnullptr[pos-1]=isnull;
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_TIMESTAMP,
+				SQL_TIMESTAMP,
+				29,
+				9,
+				buffer,
+				0,
+				&(outisnull[pos-1]));
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2482,6 +2594,19 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	//for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
 	// FIXME: inefficient
 	for (uint16_t i=0; i<maxbindcount; i++) {
+		if (inoutdatebind[i]) {
+			datebind	*db=inoutdatebind[i];
+			SQL_TIMESTAMP_STRUCT	*ts=
+				(SQL_TIMESTAMP_STRUCT *)db->buffer;
+			*(db->year)=ts->year;
+			*(db->month)=ts->month;
+			*(db->day)=ts->day;
+			*(db->hour)=ts->hour;
+			*(db->minute)=ts->minute;
+			*(db->second)=ts->second;
+			*(db->microsecond)=ts->fraction/1000;
+			*(db->tz)=NULL;
+		}
 		if (inoutisnullptr[i]) {
 			*(inoutisnullptr[i])=inoutisnull[i];
 		}
@@ -3037,6 +3162,10 @@ void odbccursor::closeResultSet() {
 		delete outdatebind[i];
 	}
 
+	for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+		delete inoutdatebind[i];
+	}
+
 	// FIXME: inefficient, but there appears to be a case where
 	// closeResultSet isn't called, and stale ptrs get left lingering
 	// around...
@@ -3044,6 +3173,7 @@ void odbccursor::closeResultSet() {
 		outdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutdatebind[i]=NULL;
 		inoutisnullptr[i]=NULL;
 		inoutisnull[i]=0;
 	}

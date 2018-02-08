@@ -144,13 +144,13 @@ Solves - "I wrote my app using the native MySQL API but the company is migrating
 
 <p>There are some features that SQL Relay currently lacks that are either being worked on, or at least planned though.</p>
 
-<p>SQL Relay is not currently a transparent database gateway.  Ie. you can't currently just aim SQL Relay at MySQL and aim your app at SQL Relay.  SQL Relay has it's own client/server protocol and API.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you would need to update the connect string to use the SQL Relay driver.  You could also potentially use the <a href="dropin/mysql.html">drop-in replacement library for MySQL</a> or <a href="dropin/postgresql.html">drop-in replacement library for PostgreSQL</a>.  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for several native database protocols though.</p>
+<p>The MySQL Front-End Module makes SQL Relay a transparent database proxy for MySQL.  You can just aim SQL Relay at MySQL and aim your app at SQL Relay.  But, SQL Relay currently lacks Front-End Modules for other database protocols, so it can't be used as a transparent proxy for other databases.  SQL Relay has it's own client/server protocol and API though.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you can update the connect string to use the SQL Relay driver.  You could also potentially use the <a href="dropin/mysql.html">drop-in replacement library for MySQL</a> or <a href="dropin/postgresql.html">drop-in replacement library for PostgreSQL</a>.  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for various other native database protocols though.</p>
 
 <p>SQL Relay can provide a single-point of access for replicated databases but it does not provide replication.  It cannot keep multiple databases in sync.</p>
 
 <p>Similarly, though SQL Relay can provide a single-point of access for multiple databases, it does not currently provide a mechanism for joining tables across databases or sending the same query to multiple databases and merging the result sets.</p>
 
-<p>SQL Relay cannot currently translate queries from one syntax to another.  Though it can be used to aim an app originally written for MySQL at Oracle, for example, it cannot (yet) transparently convert queries in MySQL syntax to Oracle syntax.</p>
+<p>SQL Relay does provide a query translation framework and various query translation modules.  However SQL Relay cannot automatically translate queries from one syntax to another.  Though it can be used to aim an app originally written for MySQL at Oracle, for example, it cannot (yet) transparently convert queries in MySQL syntax to Oracle syntax.  If you want to use aim an app originally written for one database at another, you would have to modify the queries in the application, or write/configure custom query translation modules to translate specific queries from one form to another.</p>
 
 <br/><a name="connectionpooling"/><h3>What is "persistent database connection pooling"?</h3>
 

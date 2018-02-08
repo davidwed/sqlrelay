@@ -1795,7 +1795,7 @@ void sqlrcursor::defineOutputBindDouble(const char *variable) {
 
 void sqlrcursor::defineOutputBindDate(const char *variable) {
 	defineOutputBindGeneric(variable,
-				SQLRCLIENTBINDVARTYPE_DATE,sizeof(double));
+				SQLRCLIENTBINDVARTYPE_DATE,0);
 }
 
 void sqlrcursor::defineOutputBindBlob(const char *variable) {
@@ -1863,20 +1863,66 @@ void sqlrcursor::defineInputOutputBindString(const char *variable,
 							uint32_t length) {
 	defineInputOutputBindGeneric(variable,
 				SQLRCLIENTBINDVARTYPE_STRING,
-				value,0,length);
+				value,0,0.0,0,0,
+				0,0,0,0,0,0,0,NULL,false,
+				length);
 }
 
 void sqlrcursor::defineInputOutputBindInteger(const char *variable,
 							int64_t value) {
 	defineInputOutputBindGeneric(variable,
 				SQLRCLIENTBINDVARTYPE_INTEGER,
-				NULL,value,sizeof(int64_t));
+				NULL,value,0.0,0,0,
+				0,0,0,0,0,0,0,NULL,false,
+				sizeof(int64_t));
+}
+
+void sqlrcursor::defineInputOutputBindDouble(const char *variable,
+							double value,
+							uint32_t precision,
+							uint32_t scale) {
+	defineInputOutputBindGeneric(variable,
+				SQLRCLIENTBINDVARTYPE_DOUBLE,
+				NULL,0,value,precision,scale,
+				0,0,0,0,0,0,0,NULL,false,
+				sizeof(double));
+}
+
+void sqlrcursor::defineInputOutputBindDate(const char *variable,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						int32_t microsecond,
+						const char *tz,
+						bool isnegative) {
+	defineInputOutputBindGeneric(variable,
+				SQLRCLIENTBINDVARTYPE_DATE,
+				NULL,0,0.0,0,0,
+				year,month,day,minute,
+				hour,second,microsecond,
+				tz,isnegative,
+				0);
 }
 
 void sqlrcursor::defineInputOutputBindGeneric(const char *variable,
 						sqlrclientbindvartype_t type,
 						const char *strvalue,
 						int64_t intvalue,
+						double doublevalue,
+						uint32_t precision,
+						uint32_t scale,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						int32_t microsecond,
+						const char *tz,
+						bool isnegative,
 						uint32_t valuesize) {
 
 	if (charstring::isNullOrEmpty(variable)) {
@@ -1920,6 +1966,20 @@ void sqlrcursor::defineInputOutputBindGeneric(const char *variable,
 		}
 	} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {
 		bv->value.integerval=intvalue;
+	} else if (bv->type==SQLRCLIENTBINDVARTYPE_DOUBLE) {
+		bv->value.doubleval.value=doublevalue;
+		bv->value.doubleval.precision=precision;
+		bv->value.doubleval.scale=scale;
+	} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
+		bv->value.dateval.year=year;
+		bv->value.dateval.month=month;
+		bv->value.dateval.day=day;
+		bv->value.dateval.hour=hour;
+		bv->value.dateval.minute=minute;
+		bv->value.dateval.second=second;
+		bv->value.dateval.microsecond=microsecond;
+		bv->value.dateval.tz=(char *)tz;
+		bv->value.dateval.isnegative=isnegative;
 	} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB ||
 				bv->type==SQLRCLIENTBINDVARTYPE_CLOB) {
 		// FIXME: initialize....
@@ -2120,6 +2180,59 @@ int64_t sqlrcursor::getInputOutputBindInteger(const char *variable) {
 		}
 	}
 	return -1;
+}
+
+double sqlrcursor::getInputOutputBindDouble(const char *variable) {
+
+	if (variable) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+			if (!charstring::compare(
+				(*pvt->_inoutbindvars)[i].variable,variable) &&
+				(*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_DOUBLE) {
+				return (*pvt->_inoutbindvars)[i].
+							value.doubleval.value;
+			}
+		}
+	}
+	return -1.0;
+}
+
+bool sqlrcursor::getInputOutputBindDate(const char *variable,
+			int16_t *year, int16_t *month, int16_t *day,
+			int16_t *hour, int16_t *minute, int16_t *second,
+			int32_t *microsecond, const char **tz,
+			bool *isnegative) {
+
+	if (variable) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+			if (!charstring::compare(
+				(*pvt->_inoutbindvars)[i].variable,variable) &&
+				(*pvt->_inoutbindvars)[i].type==
+						SQLRCLIENTBINDVARTYPE_DATE) {
+				*year=(*pvt->_inoutbindvars)[i].
+						value.dateval.year;
+				*month=(*pvt->_inoutbindvars)[i].
+						value.dateval.month;
+				*day=(*pvt->_inoutbindvars)[i].
+						value.dateval.day;
+				*hour=(*pvt->_inoutbindvars)[i].
+						value.dateval.hour;
+				*minute=(*pvt->_inoutbindvars)[i].
+						value.dateval.minute;
+				*second=(*pvt->_inoutbindvars)[i].
+						value.dateval.second;
+				*microsecond=(*pvt->_inoutbindvars)[i].
+						value.dateval.microsecond;
+				*tz=(*pvt->_inoutbindvars)[i].
+						value.dateval.tz;
+				*isnegative=(*pvt->_inoutbindvars)[i].
+						value.dateval.isnegative;
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 bool sqlrcursor::outputBindCursorIdIsValid(const char *variable) {
@@ -2824,7 +2937,7 @@ void sqlrcursor::sendInputBinds() {
 				pvt->_sqlrc->debugPrint((int64_t)
 					(*pvt->_inbindvars)[i].
 						value.dateval.second);
-				pvt->_sqlrc->debugPrint(":");
+				pvt->_sqlrc->debugPrint(".");
 				pvt->_sqlrc->debugPrint((int64_t)
 					(*pvt->_inbindvars)[i].value.
 						dateval.microsecond);
@@ -3041,10 +3154,41 @@ void sqlrcursor::sendInputOutputBinds() {
 					SQLRCLIENTBINDVARTYPE_INTEGER) {
 			pvt->_cs->write((uint64_t)(*pvt->_inoutbindvars)[i].
 							value.integerval);
+		} else if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_DOUBLE) {
+			pvt->_cs->write((*pvt->_inoutbindvars)[i].
+						value.doubleval.value);
+			pvt->_cs->write((*pvt->_inoutbindvars)[i].
+						value.doubleval.precision);
+			pvt->_cs->write((*pvt->_inoutbindvars)[i].
+						value.doubleval.scale);
+		} else if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_DATE) {
+			pvt->_cs->write((uint16_t)(*pvt->_inoutbindvars)[i].
+							value.dateval.year);
+			pvt->_cs->write((uint16_t)(*pvt->_inoutbindvars)[i].
+							value.dateval.month);
+			pvt->_cs->write((uint16_t)(*pvt->_inoutbindvars)[i].
+							value.dateval.day);
+			pvt->_cs->write((uint16_t)(*pvt->_inoutbindvars)[i].
+							value.dateval.hour);
+			pvt->_cs->write((uint16_t)(*pvt->_inoutbindvars)[i].
+							value.dateval.minute);
+			pvt->_cs->write((uint16_t)(*pvt->_inoutbindvars)[i].
+							value.dateval.second);
+			pvt->_cs->write((uint32_t)(*pvt->_inoutbindvars)[i].
+						value.dateval.microsecond);
+			pvt->_cs->write((uint16_t)charstring::length(
+						(*pvt->_inoutbindvars)[i].
+						value.dateval.tz));
+			pvt->_cs->write((*pvt->_inoutbindvars)[i].
+						value.dateval.tz);
+			pvt->_cs->write((*pvt->_inoutbindvars)[i].
+						value.dateval.isnegative);
 		}
-		// FIXME: long, double, date...
 
 		if (pvt->_sqlrc->debug()) {
+
 			pvt->_sqlrc->debugPreStart();
 			pvt->_sqlrc->debugPrint(
 				(*pvt->_inoutbindvars)[i].variable);
@@ -3076,6 +3220,7 @@ void sqlrcursor::sendInputOutputBinds() {
 					break;
 			}
 			pvt->_sqlrc->debugPrint(bindtype);
+
 			if ((*pvt->_inoutbindvars)[i].type==
 						SQLRCLIENTBINDVARTYPE_STRING ||
 				(*pvt->_inoutbindvars)[i].type==
@@ -3084,6 +3229,7 @@ void sqlrcursor::sendInputOutputBinds() {
 						SQLRCLIENTBINDVARTYPE_CLOB ||
 				(*pvt->_inoutbindvars)[i].type==
 						SQLRCLIENTBINDVARTYPE_NULL) {
+
 				pvt->_sqlrc->debugPrint("=");
 				pvt->_sqlrc->debugPrint(
 					(*pvt->_inoutbindvars)[i].
@@ -3092,19 +3238,92 @@ void sqlrcursor::sendInputOutputBinds() {
 				pvt->_sqlrc->debugPrint((int64_t)
 					(*pvt->_inoutbindvars)[i].valuesize);
 				pvt->_sqlrc->debugPrint(")");
+
 			} else if ((*pvt->_inoutbindvars)[i].type==
 						SQLRCLIENTBINDVARTYPE_INTEGER) {
+
 				pvt->_sqlrc->debugPrint("=");
 				pvt->_sqlrc->debugPrint(
 					(int64_t)(*pvt->_inoutbindvars)[i].
 							value.integerval);
 				pvt->_sqlrc->debugPrint("\n");
 				pvt->_sqlrc->debugPreEnd();
+
+			} else if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_DOUBLE) {
+
+				if (pvt->_sqlrc->debug()) {
+					pvt->_sqlrc->debugPrint("=");
+					pvt->_sqlrc->debugPrint(
+						(*pvt->_inoutbindvars)[i].
+						value.doubleval.value);
+					pvt->_sqlrc->debugPrint(":");
+					pvt->_sqlrc->debugPrint(
+						(int64_t)
+						(*pvt->_inoutbindvars)[i].
+						value.doubleval.precision);
+					pvt->_sqlrc->debugPrint(",");
+					pvt->_sqlrc->debugPrint(
+						(int64_t)
+						(*pvt->_inoutbindvars)[i].
+						value.doubleval.scale);
+					pvt->_sqlrc->debugPrint("\n");
+					pvt->_sqlrc->debugPreEnd();
+				}
+
+			} else if ((*pvt->_inoutbindvars)[i].type==
+					SQLRCLIENTBINDVARTYPE_DATE) {
+
+				if (pvt->_sqlrc->debug()) {
+					pvt->_sqlrc->debugPrint("=");
+					pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[i].
+							value.dateval.year);
+					pvt->_sqlrc->debugPrint("-");
+					pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[i].
+							value.dateval.month);
+					pvt->_sqlrc->debugPrint("-");
+					pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[i].
+							value.dateval.day);
+					pvt->_sqlrc->debugPrint(" ");
+					if ((*pvt->_inoutbindvars)[i].
+						value.dateval.isnegative) {
+						pvt->_sqlrc->debugPrint("-");
+					}
+					pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[i].
+							value.dateval.hour);
+					pvt->_sqlrc->debugPrint(":");
+					pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[i].
+							value.dateval.minute);
+					pvt->_sqlrc->debugPrint(":");
+					pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[i].
+							value.dateval.second);
+					pvt->_sqlrc->debugPrint(".");
+					pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[i].value.
+							dateval.microsecond);
+					pvt->_sqlrc->debugPrint(" ");
+					pvt->_sqlrc->debugPrint(
+						(*pvt->_inoutbindvars)[i].
+							value.dateval.tz);
+					pvt->_sqlrc->debugPrint("\n");
+					pvt->_sqlrc->debugPreEnd();
+				}
 			}
-			// FIXME: long, double, date...
 			pvt->_sqlrc->debugPrint("\n");
 			pvt->_sqlrc->debugPreEnd();
 		}
+
+		// set this to NULL here because it will be deleted in
+		// deleteInputOutputVariables, and it needs to be NULL in case
+		// the query fails and parseInputOutputVariables (which
+		// allocates a buffer for it) is never called
+		(*pvt->_inoutbindvars)[i].value.dateval.tz=NULL;
 
 		i++;
 	}
@@ -4296,6 +4515,10 @@ bool sqlrcursor::parseOutputBinds() {
 				pvt->_sqlrc->debugPrint((int64_t)
 						(*pvt->_outbindvars)[count].
 							value.dateval.second);
+				pvt->_sqlrc->debugPrint(".");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+						value.dateval.microsecond);
 				pvt->_sqlrc->debugPrint(" ");
 				pvt->_sqlrc->debugPrint(
 						(*pvt->_outbindvars)[count].
@@ -4418,15 +4641,10 @@ bool sqlrcursor::parseInputOutputBinds() {
 						value.dateval.second=0;
 				(*pvt->_inoutbindvars)[count].
 						value.dateval.microsecond=0;
-				if (pvt->_returnnulls) {
-					(*pvt->_inoutbindvars)[count].
-						value.dateval.tz=NULL;
-				} else {
-					(*pvt->_inoutbindvars)[count].
+				(*pvt->_inoutbindvars)[count].
 						value.dateval.tz=new char[1];
-					(*pvt->_inoutbindvars)[count].
+				(*pvt->_inoutbindvars)[count].
 						value.dateval.tz[0]='\0';
-				}
 			} 
 
 			if (pvt->_sqlrc->debug()) {
@@ -4631,8 +4849,8 @@ bool sqlrcursor::parseInputOutputBinds() {
 					"A network error may have occurred.");
 				return false;
 			}
-			(*pvt->_inoutbindvars)[count].
-					value.dateval.tz=new char[length+1];
+			(*pvt->_inoutbindvars)[count].value.
+					dateval.tz=new char[length+1];
 
 			// get the timezone
 			if ((uint16_t)getString(
@@ -4830,6 +5048,10 @@ bool sqlrcursor::parseInputOutputBinds() {
 				pvt->_sqlrc->debugPrint((int64_t)
 						(*pvt->_inoutbindvars)[count].
 							value.dateval.second);
+				pvt->_sqlrc->debugPrint(".");
+				pvt->_sqlrc->debugPrint((int64_t)
+						(*pvt->_inoutbindvars)[count].
+						value.dateval.microsecond);
 				pvt->_sqlrc->debugPrint(" ");
 				pvt->_sqlrc->debugPrint(
 						(*pvt->_inoutbindvars)[count].

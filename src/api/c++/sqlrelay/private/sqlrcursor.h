@@ -199,14 +199,53 @@
 		void		defineInputOutputBindInteger(
 						const char *variable,
 						int64_t value);
+		void		defineInputOutputBindDouble(
+						const char *variable,
+						double value,
+						uint32_t precision,
+						uint32_t scale);
+		void		defineInputOutputBindDate(
+						const char *variable,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						int32_t microsecond,
+						const char *tz,
+						bool isnegative);
 		void		defineInputOutputBindGeneric(
 						const char *variable,
 						sqlrclientbindvartype_t type,
 						const char *strvalue,
 						int64_t intvalue,
+						double doublevalue,
+						uint32_t precision,
+						uint32_t scale,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						int32_t microsecond,
+						const char *tz,
+						bool isnegative,
 						uint32_t valuesize);
 		const char	*getInputOutputBindString(const char *variable);
 		uint32_t	getInputOutputBindLength(const char *variable);
 		int64_t		getInputOutputBindInteger(const char *variable);
+		double		getInputOutputBindDouble(const char *variable);
+		bool		getInputOutputBindDate(const char *variable,
+							int16_t *year,
+							int16_t *month,
+							int16_t *day,
+							int16_t *hour,
+							int16_t *minute,
+							int16_t *second,
+							int32_t *microsecond,
+							const char **tz,
+							bool *isnegative);
 
 	friend class sqlrconnection;

@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-/*#ifdef _WIN32
+//#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif*/
+//#endif*/
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -3754,7 +3754,11 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 						"SQL_ACCESS_MODE\n");
 			// FIXME: implement
 			break;
-		//case SQL_AUTOCOMMIT: (settable but not gettable)
+		case SQL_AUTOCOMMIT:
+			debugPrintf("  unsupported attribute: "
+						"SQL_AUTOCOMMIT\n");
+			// FIXME: implement
+			break;
 		case SQL_LOGIN_TIMEOUT:
 			debugPrintf("  unsupported attribute: "
 						"SQL_LOGIN_TIMEOUT\n");
