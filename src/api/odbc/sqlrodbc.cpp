@@ -3400,7 +3400,7 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 				debugPrintf("  value: %d\n",
 					*((int16_t *)ob->parametervalue));
 				break;
-			/*case SQL_C_FLOAT:
+			case SQL_C_FLOAT:
 				debugPrintf("  valuetype: SQL_C_FLOAT\n");
 				*((float *)ob->parametervalue)=
 					(float)stmt->cur->
@@ -3413,7 +3413,7 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 					(double)stmt->cur->
 						getInputOutputBindDouble(
 								parametername);
-				break;*/
+				break;
 			case SQL_C_NUMERIC:
 				debugPrintf("  valuetype: SQL_C_NUMERIC\n");
 				SQLR_ParseNumeric(
@@ -3424,7 +3424,7 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 					stmt->cur->getInputOutputBindLength(
 								parametername));
 				break;
-			/*case SQL_C_DATE:
+			case SQL_C_DATE:
 			case SQL_C_TYPE_DATE:
 				{
 				debugPrintf("  valuetype: "
@@ -3525,7 +3525,7 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 				debugPrintf("    second: %d\n",ts->second);
 				debugPrintf("    fraction: %d\n",ts->fraction);
 				}
-				break;*/
+				break;
 			case SQL_C_INTERVAL_YEAR:
 			case SQL_C_INTERVAL_MONTH:
 			case SQL_C_INTERVAL_DAY:
@@ -10375,17 +10375,9 @@ static SQLRETURN SQLR_InputOutputBindParameter(
 	debugFunction();
 
 	// FIXME:
-	// Currently, SQL Relay only supports string/integer input/output binds.
-	// Handle various other types as output binds for now.
+	// Currently, SQL Relay doesn't support lob input/output binds.
+	// Handle them as output binds for now.
 	switch (valuetype) {
-		case SQL_C_FLOAT:
-		case SQL_C_DOUBLE:
-		case SQL_C_DATE:
-		case SQL_C_TYPE_DATE:
-		case SQL_C_TIME:
-		case SQL_C_TYPE_TIME:
-		case SQL_C_TIMESTAMP:
-		case SQL_C_TYPE_TIMESTAMP:
 		//case SQL_C_VARBOOKMARK:
 		//	(dup of SQL_C_BINARY)
 		case SQL_C_BINARY:
@@ -10502,9 +10494,22 @@ static SQLRETURN SQLR_InputOutputBindParameter(
 				(int64_t)(*((unsigned char *)parametervalue)));
 			break;
 		case SQL_C_FLOAT:
+			debugPrintf("  valuetype: SQL_C_FLOAT\n");
+			debugPrintf("  value: \"%f\"\n",
+				(float)(*((double *)parametervalue)));
+			stmt->cur->defineInputOutputBindDouble(parametername,
+				(float)(*((double *)parametervalue)),
+				lengthprecision,
+				parameterscale);
+			break;
 		case SQL_C_DOUBLE:
-			debugPrintf("  valuetype: SQL_C_FLOAT/SQL_C_DOUBLE\n");
-			//stmt->cur->defineInputOutputBindDouble(parametername);
+			debugPrintf("  valuetype: SQL_C_DOUBLE\n");
+			debugPrintf("  value: \"%f\"\n",
+				*((double *)parametervalue));
+			stmt->cur->defineInputOutputBindDouble(parametername,
+				*((double *)parametervalue),
+				lengthprecision,
+				parameterscale);
 			break;
 		case SQL_C_NUMERIC:
 			debugPrintf("  valuetype: SQL_C_NUMERIC\n");
@@ -10515,19 +10520,46 @@ static SQLRETURN SQLR_InputOutputBindParameter(
 			break;
 		case SQL_C_DATE:
 		case SQL_C_TYPE_DATE:
+			{
 			debugPrintf("  valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
-			//stmt->cur->defineInputOutputBindDate(parametername);
+			DATE_STRUCT	*ds=(DATE_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d-%d-%d\"\n",
+						ds->year,ds->month,ds->day);
+			stmt->cur->defineInputOutputBindDate(parametername,
+						ds->year,ds->month,ds->day,
+						0,0,0,0,NULL,false);
+			}
 			break;
 		case SQL_C_TIME:
 		case SQL_C_TYPE_TIME:
+			{
 			debugPrintf("  valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
-			//stmt->cur->defineInputOutputBindDate(parametername);
+			TIME_STRUCT	*ts=(TIME_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d:%d:%d\"\n",
+						ts->hour,ts->minute,ts->second);
+			stmt->cur->defineInputOutputBindDate(parametername,
+						0,0,0,
+						ts->hour,ts->minute,ts->second,
+						0,NULL,false);
 			break;
+			}
 		case SQL_C_TIMESTAMP:
 		case SQL_C_TYPE_TIMESTAMP:
+			{
 			debugPrintf("  valuetype: "
 				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
-			//stmt->cur->defineInputOutputBindDate(parametername);
+			TIMESTAMP_STRUCT	*tss=
+					(TIMESTAMP_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d-%d-%d %d:%d:%d:%d\"\n",
+					tss->year,tss->month,tss->day,
+					tss->hour,tss->minute,tss->second,
+					tss->fraction/1000);
+			stmt->cur->defineInputOutputBindDate(parametername,
+					tss->year,tss->month,tss->day,
+					tss->hour,tss->minute,tss->second,
+					tss->fraction/1000,NULL,false);
+			break;
+			}
 			break;
 		case SQL_C_INTERVAL_YEAR:
 		case SQL_C_INTERVAL_MONTH:
