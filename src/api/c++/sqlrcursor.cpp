@@ -1907,6 +1907,18 @@ void sqlrcursor::defineInputOutputBindDate(const char *variable,
 				0);
 }
 
+void sqlrcursor::defineOutputBindBlob(const char *variable,
+						const char *value,
+						uint32_t size) {
+	// FIXME: implement this...
+}
+
+void sqlrcursor::defineOutputBindClob(const char *variable,
+						const char *value,
+						uint32_t size) {
+	// FIXME: implement this...
+}
+
 void sqlrcursor::defineInputOutputBindGeneric(const char *variable,
 						sqlrclientbindvartype_t type,
 						const char *strvalue,
@@ -2233,6 +2245,16 @@ bool sqlrcursor::getInputOutputBindDate(const char *variable,
 		}
 	}
 	return false;
+}
+
+const char *sqlrcursor::getInputOutputBindBlob(const char *variable) {
+	// FIXME: implement this
+	return NULL;
+}
+
+const char *sqlrcursor::getInputOutputBindClob(const char *variable) {
+	// FIXME: implement this
+	return NULL;
 }
 
 bool sqlrcursor::outputBindCursorIdIsValid(const char *variable) {

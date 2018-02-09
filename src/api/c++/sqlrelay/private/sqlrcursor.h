@@ -215,6 +215,12 @@
 						int32_t microsecond,
 						const char *tz,
 						bool isnegative);
+		void		defineOutputBindBlob(const char *variable,
+						const char *value,
+						uint32_t size);
+		void		defineOutputBindClob(const char *variable,
+						const char *value,
+						uint32_t size);
 		void		defineInputOutputBindGeneric(
 						const char *variable,
 						sqlrclientbindvartype_t type,
@@ -247,5 +253,7 @@
 							int32_t *microsecond,
 							const char **tz,
 							bool *isnegative);
+		const char	*getInputOutputBindBlob(const char *variable);
+		const char	*getInputOutputBindClob(const char *variable);
 
 	friend class sqlrconnection;
