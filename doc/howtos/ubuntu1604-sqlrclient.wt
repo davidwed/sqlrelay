@@ -21,13 +21,17 @@ It assumes that two systems have been set up and configured as follows:
  * Username: //sqlruser//
  * Password: //sqlrpassword//
 
+( See the how-to [ubuntu1604-sqlrserver-oracle12c.html Ubuntu 16.04 - SQL Relay Server + Oracle 12c] for information on configuring a system like this. )
 
+[[br]]
 === Install Prerequisite Software ===
 
 On the SQL Relay client system, run the following command to install the prerequisite software packages:
 
 {{{
-sudo apt install libedit-dev libssl-dev libkrb5-dev libpcre3-dev libcurl4-openssl-dev
+sudo apt install libedit-dev libssl-dev libkrb5-dev libpcre3-dev libcurl4-openssl-dev \
+perl php-dev python3-dev ruby-dev tcl-dev openjdk-8-jdk erlang-dev nodejs-dev node-gyp \
+mono-devel unixodbc-dev
 }}}
 
 

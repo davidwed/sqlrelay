@@ -10,10 +10,10 @@ SRCS = \
 	oracle-tls-selfsigned.wt \
 	oracle-tls-casigned.wt \
 	freetds-mssql-tls.wt \
-	sqlrserver-oracle12c-ubuntu1604.wt \
-	sqlrclient-ubuntu1604.wt \
+	ubuntu1604-sqlrserver-oracle12c.wt \
+	ubuntu1604-sqlrclient.wt \
+	ubuntu1604-datagrip.wt \
 	sqlrserver-tls-pfx-sqlserver-windows.wt \
-	tls.wt \
 	tls-encryption.wt \
 	tls-certificate.wt
 
@@ -23,10 +23,10 @@ OBJS = \
 	oracle-tls-selfsigned.html \
 	oracle-tls-casigned.html \
 	freetds-mssql-tls.html \
-	sqlrserver-oracle12c-ubuntu1604.html \
-	sqlrclient-ubuntu1604.html \
+	ubuntu1604-sqlrserver-oracle12c.html \
+	ubuntu1604-sqlrclient.html \
+	ubuntu1604-datagrip.html \
 	sqlrserver-tls-pfx-sqlserver-windows.html \
-	tls.html \
 	tls-encryption.html \
 	tls-certificate.html
 
