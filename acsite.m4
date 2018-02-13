@@ -2218,7 +2218,7 @@ AC_SUBST(ENABLE_SYBASE)
 
 AC_DEFUN([FW_CHECK_ODBC],
 [
-if ( test "$ENABLE_ODBC" = "yes" )
+if ( test "$ENABLE_ODBC" = "yes" -o "$ENABLE_ODBC_DRIVER" = "yes" )
 then
 
 	ODBCINCLUDES=""

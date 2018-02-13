@@ -764,10 +764,12 @@ ifneq ($(strip $(MYSQLLIBS)),)
 CONNECTIONSALLTARGETS += all-mysql
 CONNECTIONSINSTALLTARGETS += installsharedlib-mysql
 endif
+ifneq ($(strip $(ENABLE_ODBC)),)
 ifneq ($(strip $(ODBCLIBS)),)
 ifneq ($(strip $(ODBCUNICODE)),)
 CONNECTIONSALLTARGETS += all-odbc
 CONNECTIONSINSTALLTARGETS += installsharedlib-odbc
+endif
 endif
 endif
 ifeq ($(strip $(ENABLE_ORACLE)),yes)

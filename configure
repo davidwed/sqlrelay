@@ -26447,7 +26447,7 @@ echo "******************************"
 echo
 echo "***** ODBC *******************"
 
-if ( test "$ENABLE_ODBC" = "yes" )
+if ( test "$ENABLE_ODBC" = "yes" -o "$ENABLE_ODBC_DRIVER" = "yes" )
 then
 
 	ODBCINCLUDES=""
@@ -35609,7 +35609,7 @@ else
 		SYBASEBUILD="at-runtime"
 	fi
 fi
-if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
+if ( test -n "$ENABLE_ODBC" -a -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
 	ODBCBUILD="dynamic   "
 	if ( test -n "$ODBCSTATIC" ); then
 		ODBCBUILD="static    "
