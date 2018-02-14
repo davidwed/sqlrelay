@@ -52,12 +52,12 @@ edit the configuration file and make sure that the connectstring for the
 MySQL instance uses the socket parameter, as follows:</p>
 
 <blockquote>
-user=testuser;password=testpassword;db=testdb;socket=/var/lib/mysql/mysql.sock
+user=exampleuser;password=examplepassword;db=exampledb;socket=/var/lib/mysql/mysql.sock
 </blockquote>
 <p>as opposed to:</p>
 
 <blockquote>
-user=testuser;password=testpassword;db=testdb;host=localhost;port=5432
+user=exampleuser;password=examplepassword;db=exampledb;host=localhost;port=5432
 </blockquote>
 <h3>PostgreSQL</h3>
 
@@ -101,12 +101,12 @@ edit the configuration file and make sure that the connectstring for the
 PostgreSQL instance uses the host and port parameters as follows:</p>
 
 <blockquote>
-user=testuser;password=testpassword;host=/tmp;port=5432;
+user=exampleuser;password=examplepassword;host=/tmp;port=5432;
 </blockquote>
 <p>as opposed to:</p>
 
 <blockquote>
-user=testuser;password=testpassword;host=localhost;port=5432;
+user=exampleuser;password=examplepassword;host=localhost;port=5432;
 </blockquote>
 <p>Ordinarily, the host parameter tells SQL Relay what host to connect to, but
 if it starts with a / then it indicates what directory to look for the socket
@@ -191,7 +191,7 @@ IPC instead of an inet socket.  Just configure the connect string to use an SID
 that uses IPC to connect to the database.  For example:</p>
 
 <blockquote>
-user=testuser;password=testpassword;oracle_sid=ora1;
+user=exampleuser;password=examplepassword;oracle_sid=ora1;
 </blockquote>
 <h3>SQLite</h3>
 
@@ -213,7 +213,7 @@ which relays to the remote instance and connect to the local instance.</p>
 Just configure the connect string to use the local database.  For example:</p>
 
 <blockquote>
-db=testdb
+db=exampledb
 </blockquote>
 <h3>Informix</h3>
 
@@ -232,7 +232,7 @@ connection, use the onipcshm protocol.</p>
 For example:</p>
 
 <blockquote>
-db=testdb
+db=exampledb
 </blockquote>
 <h3>SAP/Sybase</h3>
 
@@ -257,16 +257,16 @@ socket.  In the configuration file, the instance that is talking to mysql
 should have a socket attribute:</p>
 
 <blockquote>
-&lt;instance id="mysqltest" port="8006" socket="/tmp/mysqltest.socket" ... &gt;
+&lt;instance id="mysqlexample" port="8006" socket="/tmp/mysqlexample.socket" ... &gt;
 </blockquote>
 <p>In the above example, the SQL Relay server will listen on inet port 8006 and
-unix socket /tmp/mysqltest.socket.</p>
+unix socket /tmp/mysqlexample.socket.</p>
 
 <p>Now make sure that your app is using that socket as well.  When you create
 a new sqlrconnection, make sure you tell it to use the unix socket:</p>
 
 <blockquote>
-sqlrconnection	*con=new sqlrconnection("localhost",8006,"/tmp/mysqltest.socket","user","password",0,1);
+sqlrconnection	*con=new sqlrconnection("localhost",8006,"/tmp/mysqlexample.socket","user","password",0,1);
 </blockquote>
 <p>as opposed to:</p>
 

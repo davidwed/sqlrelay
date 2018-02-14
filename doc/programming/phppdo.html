@@ -124,7 +124,7 @@ use.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
@@ -207,12 +207,12 @@ best used with DML or DDL queries.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">exec</font></b><font color="#990000">(</font><font color="#FF0000">"insert into testtable values (1,'hello')"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">exec</font></b><font color="#990000">(</font><font color="#FF0000">"insert into exampletable values (1,'hello')"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"exec failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 </tt></pre>
@@ -227,12 +227,12 @@ return result sets.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testtable"</font><font color="#990000">));</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">));</font>
 </tt></pre>
 
 </blockquote>
@@ -255,7 +255,7 @@ throws no error.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
@@ -347,12 +347,12 @@ objects.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">exec</font></b><font color="#990000">(</font><font color="#FF0000">"insert into testtable values (1,1.1,'hello')"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
+<b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">exec</font></b><font color="#990000">(</font><font color="#FF0000">"insert into exampletable values (1,1.1,'hello')"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">errorCode</font></b><font color="#990000">().</font><font color="#FF0000">":"</font><font color="#990000">.</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">errorInfo</font></b><font color="#990000">());</font>
 <font color="#FF0000">}</font>
 
@@ -381,12 +381,12 @@ the bindValue() method.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"insert into testtable values (:var1,:var2,:var3,:var4)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"insert into exampletable values (:var1,:var2,:var3,:var4)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
@@ -416,7 +416,7 @@ flag with the variable type.</dd>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
@@ -439,12 +439,12 @@ streams, so you have to use stream functions to access them.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select blob_col into :blobvar from testtable"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select blob_col into :blobvar from exampletable"</font><font color="#990000">);</font>
 $blobvar<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindParam</font></b><font color="#990000">(</font><font color="#FF0000">":blobvar"</font><font color="#990000">,</font>$blobvar<font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_LOB<font color="#990000">|</font>PDO<font color="#990000">::</font>PARAM_INPUT_OUTPUT<font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
@@ -471,7 +471,7 @@ binding by position, the first bind parameter is number 1, not 0.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font>var1<font color="#990000">,:</font>var2<font color="#990000">,:</font>var3<font color="#990000">,:</font>var4<font color="#990000">)</font></tt></pre>
+<pre><tt>insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font>var1<font color="#990000">,:</font>var2<font color="#990000">,:</font>var3<font color="#990000">,:</font>var4<font color="#990000">)</font></tt></pre>
 
 </blockquote>
 <p>or</p>
@@ -481,7 +481,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font><font color="#993399">1</font><font color="#990000">,:</font><font color="#993399">2</font><font color="#990000">,:</font><font color="#993399">3</font><font color="#990000">,:</font><font color="#993399">4</font><font color="#990000">)</font></tt></pre>
+<pre><tt>insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font><font color="#993399">1</font><font color="#990000">,:</font><font color="#993399">2</font><font color="#990000">,:</font><font color="#993399">3</font><font color="#990000">,:</font><font color="#993399">4</font><font color="#990000">)</font></tt></pre>
 
 </blockquote>
 <p>With Sybase and MS SQL Server:</p>
@@ -491,7 +491,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@var1<font color="#990000">,</font>@var2<font color="#990000">,</font>@var3<font color="#990000">,</font>@var4<font color="#990000">)</font></tt></pre>
+<pre><tt>insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@var1<font color="#990000">,</font>@var2<font color="#990000">,</font>@var3<font color="#990000">,</font>@var4<font color="#990000">)</font></tt></pre>
 
 </blockquote>
 <p>With DB2, <a href="MySQL">MySQL</a> and Firebird:</p>
@@ -501,7 +501,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(?,?,?,?)</font></tt></pre>
+<pre><tt>insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(?,?,?,?)</font></tt></pre>
 
 </blockquote>
 <p>With <a href="PostgreSQL">PostgreSQL</a>:</p>
@@ -511,7 +511,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>$<font color="#993399">1</font><font color="#990000">,</font>$<font color="#993399">2</font><font color="#990000">,</font>$<font color="#993399">3</font><font color="#990000">,</font>$<font color="#993399">4</font><font color="#990000">)</font></tt></pre>
+<pre><tt>insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>$<font color="#993399">1</font><font color="#990000">,</font>$<font color="#993399">2</font><font color="#990000">,</font>$<font color="#993399">3</font><font color="#990000">,</font>$<font color="#993399">4</font><font color="#990000">)</font></tt></pre>
 
 </blockquote>
 <p>With SQLite:</p>
@@ -521,7 +521,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font>var1<font color="#990000">,:</font>var2<font color="#990000">,:</font>var3<font color="#990000">,:</font>var4<font color="#990000">)</font></tt></pre>
+<pre><tt>insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(:</font>var1<font color="#990000">,:</font>var2<font color="#990000">,:</font>var3<font color="#990000">,:</font>var4<font color="#990000">)</font></tt></pre>
 
 </blockquote>
 <p>or</p>
@@ -531,7 +531,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(?,?,?,?)</font></tt></pre>
+<pre><tt>insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(?,?,?,?)</font></tt></pre>
 
 </blockquote>
 <br/><p>However...</p>
@@ -555,12 +555,12 @@ supports this paradigm, you can reap a substantial performance improvement.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"insert into testtable values (:var1,:var2,:var3)"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"insert into exampletable values (:var1,:var2,:var3)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_INT<font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":var"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">,</font>PDO<font color="#990000">::</font>PARAM_STR<font color="#990000">);</font>
@@ -596,12 +596,12 @@ arrays (the default).</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from testtable"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from exampletable"</font><font color="#990000">);</font>
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">fetch</font></b><font color="#990000">();</font>
 <b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">0</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">1</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#993399">2</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#993399">3</font><font color="#990000">]).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
 <b><font color="#000000">echo</font></b><font color="#990000">(</font>$result<font color="#990000">[</font><font color="#FF0000">"int_col"</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#FF0000">"float_col"</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font>$result<font color="#990000">[</font><font color="#FF0000">"string_col"</font><font color="#990000">].</font><font color="#FF0000">","</font><font color="#990000">.</font><b><font color="#000000">stream_get_contents</font></b><font color="#990000">(</font><font color="#FF0000">"blob_col"</font><font color="#990000">).</font><font color="#FF0000">"</font><font color="#CC33CC">\n</font><font color="#FF0000">"</font><font color="#990000">);</font>
@@ -619,12 +619,12 @@ values into preallocated variables.</dd>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from testtable"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from exampletable"</font><font color="#990000">);</font>
 
 $col1<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font>
 $col2<font color="#990000">=</font><font color="#FF0000">""</font><font color="#990000">;</font>
@@ -653,12 +653,12 @@ an entire result set in one step.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from testtable"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from exampletable"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">fetchAll</font></b><font color="#990000">();</font>
@@ -678,12 +678,12 @@ set too.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from testtable"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select int_col, float_col, string_col, blob_col from exampletable"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">fetchColumn</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">);</font>
@@ -751,7 +751,7 @@ iterate through its result set, inserting rows into another table, using only
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
@@ -783,12 +783,12 @@ type, length and various flags are available from getColumnMeta().</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>$dbh<font color="#990000">)</font> <font color="#FF0000">{</font>
 	<b><font color="#000000">die</font></b><font color="#990000">(</font><font color="#FF0000">"connection failed"</font><font color="#990000">);</font>
 <font color="#FF0000">}</font>
 
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testtable"</font><font color="#990000">));</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">));</font>
 
 <b><font color="#0000FF">for</font></b> <font color="#990000">(</font>$i<font color="#990000">=</font><font color="#993399">0</font><font color="#990000">;</font> $i<font color="#990000">&lt;</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">columnCount</font></b><font color="#990000">();</font> $i<font color="#990000">++)</font> <font color="#FF0000">{</font>
 
@@ -836,7 +836,7 @@ each database that SQL Relay supports.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> is
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> is
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
@@ -851,7 +851,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"begin testproc(:in1,:in2,:in3); end;"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"begin exampleproc(:in1,:in2,:in3); end;"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -866,7 +866,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -879,7 +879,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
+<pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font>
 </tt></pre>
 
@@ -892,7 +892,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -907,7 +907,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -920,7 +920,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
         suspend<font color="#990000">;</font>
@@ -936,7 +936,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure exampleproc ?, ?, ?"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -951,7 +951,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -964,7 +964,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
@@ -979,7 +979,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -994,7 +994,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1007,7 +1007,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">void</font> as <font color="#FF0000">'</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">void</font> as <font color="#FF0000">'</font>
 <font color="#FF0000">begin</font>
 <font color="#FF0000">        insert into mytable values ($1,$2,$3);</font>
 <font color="#FF0000">        return;</font>
@@ -1023,7 +1023,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testfunc($1,$2,$3)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call examplefunc($1,$2,$3)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1038,7 +1038,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 </tt></pre>
 
 </blockquote>
@@ -1051,7 +1051,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
@@ -1066,7 +1066,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1083,7 +1083,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1108,7 +1108,7 @@ Oracle calls these functions.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> returns number is
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> returns number is
 begin
         <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
 end<font color="#990000">;</font>
@@ -1123,7 +1123,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select testproc(:in1,:in2,:in3) from dual"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select exampleproc(:in1,:in2,:in3) from dual"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1138,7 +1138,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1152,7 +1152,7 @@ parameter.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">)</font> as
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">)</font> as
 begin
         out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
 end<font color="#990000">;</font>
@@ -1167,7 +1167,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select testproc(:in1,:in2,:in3,:out1) from dual"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select exampleproc(:in1,:in2,:in3,:out1) from dual"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1184,7 +1184,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1201,7 +1201,7 @@ itself.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
+<pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
         select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">)</font>
 </tt></pre>
 
@@ -1214,7 +1214,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1231,7 +1231,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1244,7 +1244,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1256,7 +1256,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampleproc(?,?,?)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1275,7 +1275,7 @@ variables.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure exampleproc ?, ?, ?"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1292,7 +1292,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1308,7 +1308,7 @@ than as return values of the procedure itself.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> language sql
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> language sql
 begin
         <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
 end
@@ -1323,7 +1323,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?,?)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1340,7 +1340,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1353,7 +1353,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">int</font> as <font color="#FF0000">'</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">int</font> as <font color="#FF0000">'</font>
 <font color="#FF0000">declare</font>
 <font color="#FF0000">        in1 int;</font>
 <font color="#FF0000">        in2 float;</font>
@@ -1374,7 +1374,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc($1,$2,$3)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from examplefunc($1,$2,$3)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1389,7 +1389,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 </tt></pre>
 
 </blockquote>
@@ -1404,7 +1404,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1416,7 +1416,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from examplefunc(?,?,?)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1433,7 +1433,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1446,7 +1446,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1458,7 +1458,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testproc()"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampleproc()"</font><font color="#990000">);</font>
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1470,7 +1470,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1484,7 +1484,7 @@ procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1498,7 +1498,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0"</font><font color="#990000">);</font>
 
-$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(@out1)"</font><font color="#990000">);</font>
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(@out1)"</font><font color="#990000">);</font>
 
 $stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select @out1"</font><font color="#990000">);</font>
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
@@ -1512,7 +1512,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1536,7 +1536,7 @@ itself, but the rest must be returned through output parameters.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">,</font> out2 <font color="#008080">out</font> number<font color="#990000">,</font> out3 <font color="#008080">out</font> varchar2<font color="#990000">)</font> is
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">,</font> out2 <font color="#008080">out</font> number<font color="#990000">,</font> out3 <font color="#008080">out</font> varchar2<font color="#990000">)</font> is
 begin
         out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
         out2<font color="#990000">:=</font>in2<font color="#990000">;</font>
@@ -1553,7 +1553,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select testproc(:in1,:in2,:in3,:out1,:out2,:out3) from dual"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select exampleproc(:in1,:in2,:in3,:out1,:out2,:out3) from dual"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">":in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1574,7 +1574,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1587,7 +1587,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#008080">int</font> output<font color="#990000">,</font> @out2 <font color="#008080">int</font> output<font color="#990000">,</font> @out3 <font color="#009900">int</font> output as
+<pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#008080">int</font> output<font color="#990000">,</font> @out2 <font color="#008080">int</font> output<font color="#990000">,</font> @out3 <font color="#009900">int</font> output as
         select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">),</font>
                 @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">),</font>
                 @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">)</font>
@@ -1602,7 +1602,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"@in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1623,7 +1623,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1636,7 +1636,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">,</font> <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">,</font> <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
 begin
         out1<font color="#990000">=</font>in1<font color="#990000">;</font>
         out2<font color="#990000">=</font>in2<font color="#990000">;</font>
@@ -1654,7 +1654,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampleproc(?,?,?)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1669,7 +1669,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1682,7 +1682,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">double</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">double</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
 begin
         <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
         <font color="#008080">set</font> out2 <font color="#990000">=</font> in2<font color="#990000">;</font>
@@ -1699,7 +1699,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?,?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?,?,?,?)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1720,7 +1720,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1733,7 +1733,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">record</font> as <font color="#FF0000">'</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">record</font> as <font color="#FF0000">'</font>
 <font color="#FF0000">declare</font>
 <font color="#FF0000">        output record;</font>
 <font color="#FF0000">begin</font>
@@ -1752,7 +1752,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from examplefunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"$3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1767,7 +1767,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 </tt></pre>
 
 </blockquote>
@@ -1783,7 +1783,7 @@ set of a MySQL procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1795,7 +1795,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?)"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#FF0000">"1.1"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">bindValue</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1812,7 +1812,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1826,7 +1826,7 @@ of a MySQL procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1840,7 +1840,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0, @out2=0.0, @out3=''"</font><font color="#990000">);</font>
 
-$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(@out1,@out2,@out3)"</font><font color="#990000">);</font>
+$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(@out1,@out2,@out3)"</font><font color="#990000">);</font>
 
 $stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select @out1,@out2,@out3"</font><font color="#990000">);</font>
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
@@ -1854,7 +1854,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1880,7 +1880,7 @@ each database that SQL Relay supports.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create procedure testproc <font color="#008080">as</font> select <font color="#990000">*</font> from testtable
+<pre><tt>create procedure exampleproc <font color="#008080">as</font> select <font color="#990000">*</font> from exampletable
 </tt></pre>
 
 </blockquote>
@@ -1892,7 +1892,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1904,7 +1904,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1930,7 +1930,7 @@ that return result sets.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">()</font> returns setof <font color="#008080">record</font> as <font color="#FF0000">'</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">()</font> returns setof <font color="#008080">record</font> as <font color="#FF0000">'</font>
 <font color="#FF0000">        declare output record;</font>
 <font color="#FF0000">begin</font>
 <font color="#FF0000">        for output in select * from mytable loop</font>
@@ -1950,7 +1950,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc() as (testint int, testfloat float, testchar char(40)"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"select * from examplefunc() as (exampleint int, examplefloat float, examplechar char(40)"</font><font color="#990000">);</font>
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1962,7 +1962,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function testfunc
+<pre><tt>drop function examplefunc
 </tt></pre>
 
 </blockquote>
@@ -1981,7 +1981,7 @@ the following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1993,7 +1993,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc()"</font><font color="#990000">);</font>
+<pre><tt>$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc()"</font><font color="#990000">);</font>
 $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -2005,7 +2005,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -2069,7 +2069,7 @@ possible.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 $stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
 
 <font color="#990000">...</font> <b><font color="#0000FF">do</font></b> some stuff that takes a <font color="#008080">short</font> time <font color="#990000">...</font>
@@ -2099,8 +2099,8 @@ is possible.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testtable"</font><font color="#990000">);</font>
+<pre><tt>$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">query</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampletable"</font><font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">suspendResultSet</font></b><font color="#990000">();</font>
 $dbh<font color="#990000">-&gt;</font><b><font color="#000000">suspendSession</font></b><font color="#990000">();</font>
 $rs<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><font color="#000000">getResultSetId</font></b><font color="#990000">();</font>
@@ -2119,7 +2119,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#990000">...</font> get <font color="#008080">the</font> rs<font color="#990000">,</font> port and socket from <font color="#008080">previous</font> page <font color="#990000">...</font>
 
-$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"testuser"</font><font color="#990000">,</font><font color="#FF0000">"testpassword"</font><font color="#990000">);</font>
+$dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
 $stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font>null<font color="#990000">);</font>
 $dbh<font color="#990000">-&gt;</font><b><font color="#000000">resumeSession</font></b><font color="#990000">(</font>$port<font color="#990000">,</font>$socket<font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">resumeResultSet</font></b><font color="#990000">(</font>$rs<font color="#990000">);</font>

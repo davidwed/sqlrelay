@@ -1,4 +1,4 @@
-sqlrcur_sendQuery($cur,"call testproc()");
+sqlrcur_sendQuery($cur,"call exampleproc()");
 var $field00=sqlrcur_getFieldByIndex($cur,0,0);
 var $field01=sqlrcur_getFieldByIndex($cur,0,1);
 var $field02=sqlrcur_getFieldByIndex($cur,0,2);

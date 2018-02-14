@@ -1,4 +1,4 @@
-my $sth=$dbh->prepareQuery("exec testproc");
+my $sth=$dbh->prepareQuery("exec exampleproc");
 $sth->execute();
 my $out1;
 my $out2;

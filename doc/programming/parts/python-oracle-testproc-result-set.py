@@ -1,4 +1,4 @@
-cur.prepareQuery("begin  :curs:=testproc; end;")
+cur.prepareQuery("begin  :curs:=exampleproc; end;")
 cur.defineOutputBindCursor("curs")
 cur.executeQuery()
 bindcur=cur.getOutputBindCursor("curs")

@@ -1,7 +1,7 @@
 use SQLRelay::Connection;
 use SQLRelay::Cursor;
 
-$con=SQLRelay::Connection->new("sqlrserver",9000,"/tmp/test.socket","user","password",0,1);
+$con=SQLRelay::Connection->new("sqlrserver",9000,"/tmp/example.socket","user","password",0,1);
 $cur=SQLRelay::Cursor->new($con);
 
 $cur->prepareQuery("begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;");

@@ -9,12 +9,12 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=user;Password=password;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			// Prepare the query...
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "insert into testtable values (:var1,:var2,:var3)";
+			sqlrcom.CommandText = "insert into exampletable values (:var1,:var2,:var3)";
 			sqlrcom.Prepare();
 
 

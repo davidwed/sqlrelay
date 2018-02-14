@@ -32,14 +32,14 @@ FileUsage<font color="#990000">=</font><font color="#993399">0</font></tt></pre>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>sqlrtest<font color="#990000">]</font>
+<pre><tt><font color="#990000">[</font>sqlrexample<font color="#990000">]</font>
 Description<font color="#990000">=</font>Connection to SQL Relay
 Driver<font color="#990000">=</font>SQLRelay
 Server<font color="#990000">=</font>sqlrserver
 Port<font color="#990000">=</font><font color="#993399">9000</font>
-Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>test<font color="#990000">.</font>socket
-User<font color="#990000">=</font>testuser
-Password<font color="#990000">=</font>testpass</tt></pre>
+Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>example<font color="#990000">.</font>socket
+User<font color="#990000">=</font>exampleuser
+Password<font color="#990000">=</font>examplepass</tt></pre>
 
 </blockquote>
 <p>Here the Driver attribute refers to the instance in odbcinst.ini.</p>
@@ -51,15 +51,15 @@ Password<font color="#990000">=</font>testpass</tt></pre>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>sqlrtest<font color="#990000">]</font>
+<pre><tt><font color="#990000">[</font>sqlrexample<font color="#990000">]</font>
 Description<font color="#990000">=</font>Connection to SQL Relay
 Driver<font color="#990000">=/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib<font color="#990000">/</font>libsqlrodbc<font color="#990000">.</font>so
 FileUsage<font color="#990000">=</font><font color="#993399">0</font>
 Server<font color="#990000">=</font>sqlrserver
 Port<font color="#990000">=</font><font color="#993399">9000</font>
-Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>test<font color="#990000">.</font>socket
-User<font color="#990000">=</font>testuser
-Password<font color="#990000">=</font>testpass</tt></pre>
+Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>example<font color="#990000">.</font>socket
+User<font color="#990000">=</font>exampleuser
+Password<font color="#990000">=</font>examplepass</tt></pre>
 
 </blockquote>
 <h2>Windows</h2>
@@ -133,7 +133,7 @@ Password<font color="#990000">=</font>testpass</tt></pre>
 or unixODBC to access the database through SQL Relay as follows:</p>
 
 <blockquote>
-<b>isql sqlrtest</b>
+<b>isql sqlrexample</b>
 </blockquote>
 <p>Here is a sample session:</p>
 
@@ -151,13 +151,13 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#990000">|</font> quit                                  <font color="#990000">|</font>
 <font color="#990000">|</font>                                       <font color="#990000">|</font>
 <font color="#990000">+---------------------------------------+</font>
-SQL<font color="#990000">&gt;</font> create <font color="#008080">table</font> <b><font color="#000000">test</font></b> <font color="#990000">(</font><font color="#008080">col1</font> <font color="#009900">int</font><font color="#990000">,</font> <font color="#008080">col2</font> <b><font color="#000000">varchar2</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+SQL<font color="#990000">&gt;</font> create <font color="#008080">table</font> <b><font color="#000000">exampletable</font></b> <font color="#990000">(</font><font color="#008080">col1</font> <font color="#009900">int</font><font color="#990000">,</font> <font color="#008080">col2</font> <b><font color="#000000">varchar2</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 SQLRowCount returns <font color="#993399">0</font>
-SQL<font color="#990000">&gt;</font> insert into <font color="#008080">test</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font><font color="#990000">)</font>
+SQL<font color="#990000">&gt;</font> insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font><font color="#990000">)</font>
 SQLRowCount returns <font color="#993399">1</font>
-SQL<font color="#990000">&gt;</font> insert into <font color="#008080">test</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#FF0000">'goodbye'</font><font color="#990000">)</font>
+SQL<font color="#990000">&gt;</font> insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#FF0000">'goodbye'</font><font color="#990000">)</font>
 SQLRowCount returns <font color="#993399">1</font>
-SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from test
+SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from exampletable
 <font color="#990000">+-----+--------+</font>
 <font color="#990000">|</font> COL1<font color="#990000">|</font> COL2   <font color="#990000">|</font>
 <font color="#990000">+-----+--------+</font>
@@ -166,9 +166,9 @@ SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from 
 <font color="#990000">+-----+--------+</font>
 SQLRowCount returns <font color="#993399">0</font>
 <font color="#993399">2</font> rows fetched
-SQL<font color="#990000">&gt;</font> update test <font color="#008080">set</font> col2<font color="#990000">=</font><font color="#FF0000">'bye'</font> <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#993399">2</font>
+SQL<font color="#990000">&gt;</font> update exampletable <font color="#008080">set</font> col2<font color="#990000">=</font><font color="#FF0000">'bye'</font> <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#993399">2</font>
 SQLRowCount returns <font color="#993399">1</font>
-SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from test
+SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from exampletable
 <font color="#990000">+-----+------+</font>
 <font color="#990000">|</font> COL1<font color="#990000">|</font> COL2 <font color="#990000">|</font>
 <font color="#990000">+-----+------+</font>
@@ -177,15 +177,15 @@ SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from 
 <font color="#990000">+-----+------+</font>
 SQLRowCount returns <font color="#993399">0</font>
 <font color="#993399">2</font> rows fetched
-SQL<font color="#990000">&gt;</font> <b><font color="#0000FF">delete</font></b> from test
+SQL<font color="#990000">&gt;</font> <b><font color="#0000FF">delete</font></b> from exampletable
 SQLRowCount returns <font color="#993399">2</font>
-SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from test
+SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from exampletable
 <font color="#990000">+-----+-----+</font>
 <font color="#990000">|</font> COL1<font color="#990000">|</font> COL2<font color="#990000">|</font>
 <font color="#990000">+-----+-----+</font>
 <font color="#990000">+-----+-----+</font>
 SQLRowCount returns <font color="#993399">0</font>
-SQL<font color="#990000">&gt;</font> drop table test
+SQL<font color="#990000">&gt;</font> drop table exampletable
 SQLRowCount returns <font color="#993399">0</font>
 SQL<font color="#990000">&gt;</font> quit
 <font color="#990000">[</font>dmuse@fedora <font color="#990000">~]</font>$ </tt></pre>

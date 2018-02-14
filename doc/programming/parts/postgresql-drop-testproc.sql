@@ -1,1 +1,1 @@
-drop function testfunc(int,float,varchar(20))
+drop function examplefunc(int,float,varchar(20))

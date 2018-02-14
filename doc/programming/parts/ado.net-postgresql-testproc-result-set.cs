@@ -1,4 +1,4 @@
-sqlrcom.CommandText = "select * from testfunc() as (testint int, testfloat float, testchar char(40))";
+sqlrcom.CommandText = "select * from examplefunc() as (exampleint int, examplefloat float, examplechar char(40))";
 System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
 datareader.Read();
 Int64 out1 = datareader.GetInt64(0);

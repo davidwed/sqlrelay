@@ -21,14 +21,14 @@ Once the instance is defined you can add a DSN for SQL Relay by adding an entry 
 
 {{{#!blockquote
 {{{#!code
-[sqlrtest]
+[sqlrexample]
 Description=Connection to SQL Relay
 Driver=SQLRelay
 Server=sqlrserver
 Port=9000
-Socket=/tmp/test.socket
-User=testuser
-Password=testpass
+Socket=/tmp/example.socket
+User=exampleuser
+Password=examplepass
 }}}
 }}}
 
@@ -38,15 +38,15 @@ Alternatively, you could create a combined instance/DSN by adding an entry like 
 
 {{{#!blockquote
 {{{#!code
-[sqlrtest]
+[sqlrexample]
 Description=Connection to SQL Relay
 Driver=/usr/local/firstworks/lib/libsqlrodbc.so
 FileUsage=0
 Server=sqlrserver
 Port=9000
-Socket=/tmp/test.socket
-User=testuser
-Password=testpass
+Socket=/tmp/example.socket
+User=exampleuser
+Password=examplepass
 }}}
 }}}
 
@@ -112,7 +112,7 @@ Now you can use the //isql// command line utility that comes with iODBC
 or unixODBC to access the database through SQL Relay as follows:
 
 {{{#!blockquote
-'''isql sqlrtest'''
+'''isql sqlrexample'''
 }}}
 
 Here is a sample session:
@@ -128,13 +128,13 @@ Here is a sample session:
 | quit                                  |
 |                                       |
 +---------------------------------------+
-SQL> create table test (col1 int, col2 varchar2(20))
+SQL> create table exampletable (col1 int, col2 varchar2(20))
 SQLRowCount returns 0
-SQL> insert into test values (1,'hello')
+SQL> insert into exampletable values (1,'hello')
 SQLRowCount returns 1
-SQL> insert into test values (2,'goodbye')
+SQL> insert into exampletable values (2,'goodbye')
 SQLRowCount returns 1
-SQL> select * from test
+SQL> select * from exampletable
 +-----+--------+
 | COL1| COL2   |
 +-----+--------+
@@ -143,9 +143,9 @@ SQL> select * from test
 +-----+--------+
 SQLRowCount returns 0
 2 rows fetched
-SQL> update test set col2='bye' where col1=2
+SQL> update exampletable set col2='bye' where col1=2
 SQLRowCount returns 1
-SQL> select * from test
+SQL> select * from exampletable
 +-----+------+
 | COL1| COL2 |
 +-----+------+
@@ -154,15 +154,15 @@ SQL> select * from test
 +-----+------+
 SQLRowCount returns 0
 2 rows fetched
-SQL> delete from test
+SQL> delete from exampletable
 SQLRowCount returns 2
-SQL> select * from test
+SQL> select * from exampletable
 +-----+-----+
 | COL1| COL2|
 +-----+-----+
 +-----+-----+
 SQLRowCount returns 0
-SQL> drop table test
+SQL> drop table exampletable
 SQLRowCount returns 0
 SQL> quit
 [dmuse@fedora ~]$ 

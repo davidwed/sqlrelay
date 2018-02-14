@@ -1,1 +1,1 @@
-create procedure testproc as select * from testtable
+create procedure exampleproc as select * from exampletable

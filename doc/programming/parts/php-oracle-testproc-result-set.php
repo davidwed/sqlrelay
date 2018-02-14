@@ -1,4 +1,4 @@
-sqlrcur_prepareQuery($cur,"begin  :curs:=testproc; end;");
+sqlrcur_prepareQuery($cur,"begin  :curs:=exampleproc; end;");
 sqlrcur_defineOutputBindCursor($cur,"curs");
 sqlrcur_executeQuery($cur);
 $bindcur=sqlrcur_getOutputBindCursor($cur,"curs");

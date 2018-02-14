@@ -1,1 +1,1 @@
-create procedure testproc() begin select 1; end;
+create procedure exampleproc() begin select 1; end;

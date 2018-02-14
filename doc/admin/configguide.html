@@ -252,7 +252,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>ORCL <font color="#990000">=</font>
   <font color="#990000">(</font>DESCRIPTION <font color="#990000">=</font>
-    <font color="#990000">(</font>ADDRESS <font color="#990000">=</font> <font color="#990000">(</font>PROTOCOL <font color="#990000">=</font> TCP<font color="#990000">)(</font>HOST <font color="#990000">=</font> testhost<font color="#990000">)(</font>PORT <font color="#990000">=</font> <font color="#993399">1521</font><font color="#990000">))</font>
+    <font color="#990000">(</font>ADDRESS <font color="#990000">=</font> <font color="#990000">(</font>PROTOCOL <font color="#990000">=</font> TCP<font color="#990000">)(</font>HOST <font color="#990000">=</font> examplehost<font color="#990000">)(</font>PORT <font color="#990000">=</font> <font color="#993399">1521</font><font color="#990000">))</font>
     <font color="#990000">(</font>CONNECT_DATA <font color="#990000">=</font>
       <font color="#990000">(</font>SERVER <font color="#990000">=</font> DEDICATED<font color="#990000">)</font>
       <font color="#990000">(</font>SERVICE_NAME <font color="#990000">=</font> orcl<font color="#990000">)</font>
@@ -277,7 +277,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = testhost)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)))"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = examplehost)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)))"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -308,7 +308,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=testdsn"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=exampledsn"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -327,14 +327,14 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>testdsn<font color="#990000">]</font>
+<pre><tt><font color="#990000">[</font>exampledsn<font color="#990000">]</font>
 Description<font color="#990000">=</font>SQL Server
 Driver<font color="#990000">=</font>ODBC Driver <font color="#993399">11</font> <b><font color="#0000FF">for</font></b> SQL Server
-Server<font color="#990000">=</font>testhost
+Server<font color="#990000">=</font>examplehost
 Port<font color="#990000">=</font><font color="#993399">1433</font>
 Database<font color="#990000">=</font>
-User<font color="#990000">=</font>testuser
-Password<font color="#990000">=</font>testpassword</tt></pre>
+User<font color="#990000">=</font>exampleuser
+Password<font color="#990000">=</font>examplepassword</tt></pre>
 
 </blockquote>
 <p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
@@ -376,7 +376,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -391,8 +391,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
-	host <font color="#990000">=</font> testhost
+<pre><tt><font color="#990000">[</font>EXAMPLEDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> examplehost
 	port <font color="#990000">=</font> <font color="#993399">1433</font>
 	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">7.0</font>
 	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font></tt></pre>
@@ -419,7 +419,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -446,9 +446,9 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>TESTDB
-	master tcp ether testhost <font color="#993399">5000</font>
-	query tcp ether testhost <font color="#993399">5000</font></tt></pre>
+<pre><tt>EXAMPLEDB
+	master tcp ether examplehost <font color="#993399">5000</font>
+	query tcp ether examplehost <font color="#993399">5000</font></tt></pre>
 
 </blockquote>
 <p>(Note that the interfaces file must be readable by the user that the instance of SQL Relay is run as.)</p>
@@ -480,7 +480,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -495,8 +495,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
-	host <font color="#990000">=</font> testhost
+<pre><tt><font color="#990000">[</font>EXAMPLEDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> examplehost
 	port <font color="#990000">=</font> <font color="#993399">5000</font>
 	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">5.0</font></tt></pre>
 
@@ -524,7 +524,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -557,7 +557,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"informixdir=/opt/informix;servername=ol_informix1210;db=testdb;user=testuser;password=testpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"informixdir=/opt/informix;servername=ol_informix1210;db=exampledb;user=exampleuser;password=examplepassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -620,7 +620,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -628,7 +628,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>The host and db options indicate that SQL Relay should connect to the database testdb on the host testhost.</p>
+<p>The host and db options indicate that SQL Relay should connect to the database exampledb on the host examplehost.</p>
 
 <p>See the <a href="configreference.html#mysql">SQL Relay Configuration Reference</a> for other valid MySQL connect string options.</p>
 
@@ -651,7 +651,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -659,7 +659,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>The host and db options indicate that SQL Relay should connect to the database testdb on the host testhost.</p>
+<p>The host and db options indicate that SQL Relay should connect to the database exampledb on the host examplehost.</p>
 
 <p>See the <a href="configreference.html#postgresql">SQL Relay Configuration Reference</a> for other valid PostgreSQL connect string options.</p>
 
@@ -682,7 +682,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;db=testhost:/opt/firebird/testdb.gdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;db=examplehost:/opt/firebird/exampledb.gdb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -690,7 +690,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>The db option indicates that SQL Relay should connect to the database located at /opt/firebird/testdb.gdb on the host testhost.</p>
+<p>The db option indicates that SQL Relay should connect to the database located at /opt/firebird/exampledb.gdb on the host examplehost.</p>
 
 <p>Note that if the database is located on a Windows host, then the path segment of the db option should be specified as a Windows-style path with doubled backslashes.  For example:
 <blockquote>
@@ -698,7 +698,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>testhost<font color="#990000">:</font>C<font color="#990000">:\\</font><font color="#008080">Program</font> Files<font color="#990000">\\</font>Firebird<font color="#990000">\\</font>Firebird_3_0<font color="#990000">\\</font>testdb<font color="#990000">.</font>gdb</tt></pre>
+<pre><tt>examplehost<font color="#990000">:</font>C<font color="#990000">:\\</font><font color="#008080">Program</font> Files<font color="#990000">\\</font>Firebird<font color="#990000">\\</font>Firebird_3_0<font color="#990000">\\</font>exampledb<font color="#990000">.</font>gdb</tt></pre>
 
 </blockquote>
 </p>
@@ -724,7 +724,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/sqlite/testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/sqlite/exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -732,9 +732,9 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>The db option indicates that SQL Relay should connect to the database /var/sqlite/testdb.</p>
+<p>The db option indicates that SQL Relay should connect to the database /var/sqlite/exampledb.</p>
 
-<p>Note that the database file (testdb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay is run as.</p>
+<p>Note that the database file (exampledb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay is run as.</p>
 
 <p>SQLite also supports a high-performance in-memory mode where tables are maintained in memory and nothing is written to permanent storage.  To use this mode with SQL Relay, set the db option to :memory:.</p>
 
@@ -788,7 +788,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=testdsn"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=exampledsn"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -807,14 +807,14 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>testdsn<font color="#990000">]</font>
+<pre><tt><font color="#990000">[</font>exampledsn<font color="#990000">]</font>
 Description<font color="#990000">=</font>SQL Server
 Driver<font color="#990000">=</font>ODBC Driver <font color="#993399">11</font> <b><font color="#0000FF">for</font></b> SQL Server
-Server<font color="#990000">=</font>testhost
+Server<font color="#990000">=</font>examplehost
 Port<font color="#990000">=</font><font color="#993399">1433</font>
 Database<font color="#990000">=</font>
-User<font color="#990000">=</font>testuser
-Password<font color="#990000">=</font>testpassword</tt></pre>
+User<font color="#990000">=</font>exampleuser
+Password<font color="#990000">=</font>examplepassword</tt></pre>
 
 </blockquote>
 <p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
@@ -856,7 +856,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/mdbtools/testdb.mdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/mdbtools/exampledb.mdb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -864,7 +864,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>The db option indicates that SQL Relay should connect to the database /var/mdbtools/testdb.mdb.</p>
+<p>The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.</p>
 
 <p>(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)</p>
 
@@ -1110,7 +1110,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -1119,7 +1119,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -1176,7 +1176,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -1185,7 +1185,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -1306,7 +1306,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -1329,7 +1329,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=testdb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2175,7 +2175,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCPS)(HOST = testhost)(PORT = 2484)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)))"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCPS)(HOST = examplehost)(PORT = 2484)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)))"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2200,7 +2200,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCPS)(HOST = testhost)(PORT = 2484)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)) (SECURITY = (SSL_SERVER_CERT_DN = "</font><font color="#009900">CN</font><font color="#990000">=</font><font color="#FF0000">testhost.yourdomain.com")))"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCPS)(HOST = examplehost)(PORT = 2484)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = orcl)) (SECURITY = (SSL_SERVER_CERT_DN = "</font><font color="#009900">CN</font><font color="#990000">=</font><font color="#FF0000">examplehost.yourdomain.com")))"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2208,7 +2208,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>In this case, the database server's certificate is expected to present the distinguished name: CN=testhost.yourdomain.com</p>
+<p>In this case, the database server's certificate is expected to present the distinguished name: CN=examplehost.yourdomain.com</p>
 
 <br/><a name="backendenc-mssql-freetds"/><h3>Microsoft SQL Server (using FreeTDS)</h3>
 
@@ -2256,8 +2256,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
-	host <font color="#990000">=</font> testhost
+<pre><tt><font color="#990000">[</font>EXAMPLEDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> examplehost
 	port <font color="#990000">=</font> <font color="#993399">1433</font>
 	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">7.1</font>
 	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font>
@@ -2273,8 +2273,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
-	host <font color="#990000">=</font> testhost
+<pre><tt><font color="#990000">[</font>EXAMPLEDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> examplehost
 	port <font color="#990000">=</font> <font color="#993399">1433</font>
 	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">7.1</font>
 	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font>
@@ -2290,8 +2290,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>TESTDB<font color="#990000">]</font>
-	host <font color="#990000">=</font> testhost<font color="#990000">.</font>yourdomain<font color="#990000">.</font>com
+<pre><tt><font color="#990000">[</font>EXAMPLEDB<font color="#990000">]</font>
+	host <font color="#990000">=</font> examplehost<font color="#990000">.</font>yourdomain<font color="#990000">.</font>com
 	port <font color="#990000">=</font> <font color="#993399">1433</font>
 	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">7.1</font>
 	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font>
@@ -2302,7 +2302,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.</p>
 
-<p>The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, TESTDB refers to the FreeTDS TESTDB entry configured above:</p>
+<p>The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, EXAMPLEDB refers to the FreeTDS EXAMPLEDB entry configured above:</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -2317,7 +2317,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=TESTDB;user=testuser;password=testpassword;db=testdb"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2364,7 +2364,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb;sslmode=require"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost;db=exampledb;sslmode=require"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2417,7 +2417,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb;sslmode=verify-ca;sslca=/etc/ca.pem"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost;db=exampledb;sslmode=verify-ca;sslca=/etc/ca.pem"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2440,7 +2440,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost.yourdomain.com;db=testdb;sslmode=verify-full;sslca=/etc/ca.pem"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost.yourdomain.com;db=exampledb;sslmode=verify-full;sslca=/etc/ca.pem"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2493,7 +2493,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb;sslmode=require"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost;db=exampledb;sslmode=require"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2550,7 +2550,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost;db=testdb;sslmode=verify-ca"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost;db=exampledb;sslmode=verify-ca"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2573,7 +2573,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=testpassword;host=testhost.yourdomain.com;db=testdb;sslmode=verify-full"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost.yourdomain.com;db=exampledb;sslmode=verify-full"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2661,10 +2661,10 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;passwordencryption</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"rot"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"13"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/passwordencryptions&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"test"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"grfg"</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"fdyecnffjbeq"</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=grfgcnffjbeq;..."</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=grfgcnffjbeq;..."</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2678,7 +2678,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>In this example, the <i>id</i> and <i>count</i> attributes are parameters for the <i>rot</i> module.  "13" tells the module to rotate by 13 characters.  The <i>id</i> attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The <i>id</i> attribute is mandatory.</p>
 
-<p>Note that the password in the user tag is encrypted (unencrypted, it would just be "test") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "testpassword").  A command line program (described later) is provided to encrypt passwords.</p>
+<p>Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "examplepassword").  A command line program (described later) is provided to encrypt passwords.</p>
 
 <p>Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the <i>id</i> parameter in the passwordencryption tag ( <i>rot13</i> ), not the module name ( <i>rot</i> ).</p>
 
@@ -2698,10 +2698,10 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;passwordencryption</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"rot"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"rot10"</font> <font color="#009900">count</font><font color="#990000">=</font><font color="#FF0000">"10"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/passwordencryptions&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"test"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"grfg"</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"fdyecnffjbeq"</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot13"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=testuser;password=docdzkccgybn;..."</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot10"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=ohkwzvozkccgybn;..."</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"rot10"</font> <font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2732,8 +2732,8 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example:</p>
 
 <blockquote>
-  <pre>$ sqlr-pwdenc -id example -pwdencid rot13 -password testpassword
-grfgcnffjbeq
+  <pre>$ sqlr-pwdenc -id example -pwdencid rot13 -password examplepassword
+rknzcyrcnffjbeq
 </pre>
 
 </blockquote>
@@ -2751,7 +2751,7 @@ grfgcnffjbeq
 <p>You should use:</p>
 
 <blockquote>
-  <pre>sqlrsh -id example -user test -password test
+  <pre>sqlrsh -id example -user sqlruser -password sqlrpassword
 </pre>
 
 </blockquote>
@@ -3479,12 +3479,12 @@ http://www.gnu.org/software/src-highlite -->
     <ul>
       <li>Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
-        <li>Eg. 'create table test (col1 int)' creates a table named <i>TEST</i> with a column named <i>COL1</i>.</li>
+        <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>EXAMPLETABLE</i> with a column named <i>COL1</i>.</li>
       </ul>
 
       <li>Some databases (eg. PostgreSQL, MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
-        <li>Eg. 'create table test (col1 int)' creates a table named <i>test</i> with a column named <i>col1</i>.</li>
+        <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>exampletable</i> with a column named <i>col1</i>.</li>
       </ul>
 
       <li>This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.</li>
@@ -3501,12 +3501,12 @@ http://www.gnu.org/software/src-highlite -->
     <ul>
       <li>Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
-        <li>Eg. 'create table test (col1 int)' creates a table named <i>TEST</i> with a column named <i>COL1</i>.</li>
+        <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>EXAMPLETABLE</i> with a column named <i>COL1</i>.</li>
       </ul>
 
       <li>Some databases (eg. PostgreSQL, MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
-        <li>Eg. 'create table test (col1 int)' creates a table named <i>test</i> with a column named <i>col1</i>.</li>
+        <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>exampletable</i> with a column named <i>col1</i>.</li>
       </ul>
 
       <li>This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.</li>
@@ -3922,7 +3922,7 @@ http://www.gnu.org/software/src-highlite -->
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
                 <b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb;"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/connections&gt;</font></b>
         <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -4013,7 +4013,7 @@ http://www.gnu.org/software/src-highlite -->
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
                 <b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb;"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/connections&gt;</font></b>
         <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -4096,7 +4096,7 @@ http://www.gnu.org/software/src-highlite -->
                         <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sapuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sappassword"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
                 <b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=TESTDB;user=testuser;password=testpassword;db=testdb;"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"sybase=/opt/sap;lang=en_US;server=EXAMPLEDB;user=exampleuser;password=examplepassword;db=exampledb;"</font><b><font color="#0000FF">/&gt;</font></b>
                 <b><font color="#0000FF">&lt;/connections&gt;</font></b>
         <b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -4258,7 +4258,7 @@ sqlrsh - Version 1.1.0
 0> use mydb1;
 0> currentdb;
 mydb1
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db mydb1
@@ -4270,7 +4270,7 @@ this table is in db mydb1
 0> use mydb2;
 0> currentdb;
 mydb2
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db mydb2
@@ -4282,7 +4282,7 @@ this table is in db mydb2
 0> use pgdb1;
 0> currentdb;
 pgdb1
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db pgdb1

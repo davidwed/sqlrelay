@@ -33,6 +33,12 @@
 
 ----
 
+==== Frequently Asked Questions ====
+
+ [faq.html FAQ]
+
+----
+
 [[br]]
 {{{#!td
 ==== Administering SQL Relay ====
@@ -142,9 +148,3 @@ Drop-In Replacement Libraries allow many native !MySQL or !PostgreSQL applicatio
 
  [dropin/mysql.html MySQL][[br]]
  [dropin/postgresql.html PostgreSQL][[br]]
-
-----
-
-==== Frequently Asked Questions ====
-
- [faq.html FAQ]

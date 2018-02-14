@@ -1,1 +1,1 @@
-drop function testfunc
+drop function examplefunc

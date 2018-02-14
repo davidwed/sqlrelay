@@ -1,6 +1,6 @@
 select
 	*
 from
-	testtable
+	exampletable
 where
 	stringcol>:stringvar

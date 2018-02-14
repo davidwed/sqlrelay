@@ -1,2 +1,2 @@
-drop function testproc
+drop function exampleproc
 drop package types

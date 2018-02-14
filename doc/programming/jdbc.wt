@@ -9,7 +9,7 @@ See [odbc.html Programming with SQL Relay using ODBC] for instructions detailing
 A good program to test this with is [http://henplus.sourceforge.net/ HenPlus], a JDBC command line client.  After downloading and installing !HenPlus, you can run it as follows:
 
 {{{#!blockquote
-'''henplus jdbc:odbc:sqlrtest'''
+'''henplus jdbc:odbc:sqlrexample'''
 }}}
 
 When you run it, you might get an error like:
@@ -30,7 +30,7 @@ Here is a sample henplus session:
 
 {{{#!blockquote
 {{{#!code
-[dmuse@fedora bin]$ ./henplus jdbc:odbc:sqlrtest
+[dmuse@fedora bin]$ ./henplus jdbc:odbc:sqlrexample
 no readline found (no JavaReadline in java.library.path). Using simple stdin.
 using GNU readline (Brian Fox, Chet Ramey), Java wrapper by Bernhard Bablok
 henplus config at /home/dmuse/.henplus
@@ -42,17 +42,17 @@ henplus config at /home/dmuse/.henplus
  conditions of the GNU Public License <http://www.gnu.org/licenses/gpl2.txt>
 ----------------------------------------------------------------------------
 HenPlus II connecting 
- url 'jdbc:odbc:sqlrtest'
+ url 'jdbc:odbc:sqlrexample'
  driver version 2.1
  oracle - Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - Production
 With the Partitioning, OLAP, Data Mining and Real Application Testing options
-@odbc> create table testtable (col1 int, col2 varchar2(20));
+@odbc> create table exampletable (col1 int, col2 varchar2(20));
 affected 0 rows (301 msec)
-@odbc> insert into testtable values (1,'hello');
+@odbc> insert into exampletable values (1,'hello');
 affected 1 rows (71 msec)
-@odbc> insert into testtable values (2,'goodbye');
+@odbc> insert into exampletable values (2,'goodbye');
 affected 1 rows (1 msec)
-@odbc> select * from testtable;
+@odbc> select * from exampletable;
 ------+---------+
  COL1 |  COL2   |
 ------+---------+
@@ -60,9 +60,9 @@ affected 1 rows (1 msec)
     2 | goodbye |
 ------+---------+
 2 rows in result (first row: 56 msec; total: 57 msec)
-@odbc> update testtable set col2='bye' where col1=2;
+@odbc> update exampletable set col2='bye' where col1=2;
 affected 1 rows (2 msec)
-@odbc> select * from testtable;
+@odbc> select * from exampletable;
 ------+-------+
  COL1 | COL2  |
 ------+-------+
@@ -70,16 +70,16 @@ affected 1 rows (2 msec)
     2 | bye   |
 ------+-------+
 2 rows in result (first row: 1 msec; total: 2 msec)
-@odbc> delete from testtable where col1=1;
+@odbc> delete from exampletable where col1=1;
 affected 1 rows (2 msec)
-@odbc> select * from testtable;
+@odbc> select * from exampletable;
 ------+------+
  COL1 | COL2 |
 ------+------+
     2 | bye  |
 ------+------+
 1 row in result (first row: 1 msec; total: 1 msec)
-@odbc> drop table testtable;
+@odbc> drop table exampletable;
 affected 0 rows (3.637 sec)
 @odbc> quit
 storing settings..

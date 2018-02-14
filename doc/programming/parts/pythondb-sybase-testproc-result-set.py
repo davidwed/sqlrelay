@@ -1,2 +1,2 @@
-cur.execute('call testproc')
+cur.execute('call exampleproc')
 result=cur.fetchall()

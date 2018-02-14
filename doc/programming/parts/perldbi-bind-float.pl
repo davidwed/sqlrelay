@@ -2,7 +2,7 @@
 
 use DBI;
 
-my $dbh=DBI->connect("DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/test.socket","testuser","testpassword");
+my $dbh=DBI->connect("DBI:SQLRelay:host=sqlrserver;port=9000;socket=/tmp/example.socket","exampleuser","examplepassword");
 
 my $sth=$dbh->prepare("insert into mytable values (:floatval)");
 

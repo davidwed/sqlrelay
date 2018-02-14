@@ -344,7 +344,7 @@ With Oracle:
 
 {{{#!blockquote
 {{{#!code
-insert into testtable values (:var1,:var2,:var3,:var4)
+insert into exampletable values (:var1,:var2,:var3,:var4)
 }}}
 }}}
 
@@ -352,7 +352,7 @@ or
 
 {{{#!blockquote
 {{{#!code
-insert into testtable values (:1,:2,:3,:4)
+insert into exampletable values (:1,:2,:3,:4)
 }}}
 }}}
 
@@ -360,7 +360,7 @@ With Sybase and MS SQL Server:
 
 {{{#!blockquote
 {{{#!code
-insert into testtable values (@var1,@var2,@var3,@var4)
+insert into exampletable values (@var1,@var2,@var3,@var4)
 }}}
 }}}
 
@@ -368,7 +368,7 @@ With DB2, MySQL and Firebird:
 
 {{{#!blockquote
 {{{#!code
-insert into testtable values (?,?,?,?)
+insert into exampletable values (?,?,?,?)
 }}}
 }}}
 
@@ -376,7 +376,7 @@ With PostgreSQL:
 
 {{{#!blockquote
 {{{#!code
-insert into testtable values ($1,$2,$3,$4)
+insert into exampletable values ($1,$2,$3,$4)
 }}}
 }}}
 
@@ -384,7 +384,7 @@ With SQLite:
 
 {{{#!blockquote
 {{{#!code
-insert into testtable values (:var1,:var2,:var3,:var4)
+insert into exampletable values (:var1,:var2,:var3,:var4)
 }}}
 }}}
 
@@ -392,7 +392,7 @@ or
 
 {{{#!blockquote
 {{{#!code
-insert into testtable values (?,?,?,?)
+insert into exampletable values (?,?,?,?)
 }}}
 }}}
 

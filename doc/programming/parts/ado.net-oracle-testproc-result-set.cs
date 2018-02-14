@@ -1,5 +1,5 @@
 SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "begin :curs=testproc; end;";
+sqlrcom.CommandText = "begin :curs=exampleproc; end;";
 
 SQLRelayParameter curs = new SQLRelayParameter();
 curs.ParameterName = "curs";

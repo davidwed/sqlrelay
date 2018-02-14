@@ -1,4 +1,4 @@
-cur.sendQuery("call testproc()");
+cur.sendQuery("call exampleproc()");
 String  field00=cur.getField(0,0);
 String  field01=cur.getField(0,1);
 String  field02=cur.getField(0,2);

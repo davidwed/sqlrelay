@@ -1,2 +1,2 @@
-$stmt=$dbh->prepare("select * from testfunc() as (testint int, testfloat float, testchar char(40)");
+$stmt=$dbh->prepare("select * from examplefunc() as (exampleint int, examplefloat float, examplechar char(40)");
 $result=$stmt->execute();

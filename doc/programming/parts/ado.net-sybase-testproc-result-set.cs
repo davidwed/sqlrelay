@@ -1,4 +1,4 @@
-sqlrcom.CommandText = "exec testproc";
+sqlrcom.CommandText = "exec exampleproc";
 System.Data.IDataReader datareader = sqlrcom.ExecuteReader();
 datareader.Read();
 Int64 out1 = datareader.GetInt64(0);

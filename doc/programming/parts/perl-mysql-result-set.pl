@@ -1,4 +1,4 @@
-$cur->sendQuery("call testproc()");
+$cur->sendQuery("call exampleproc()");
 my $field00=cur->getField(0,0);
 my $field01=cur->getField(0,1);
 my $field02=cur->getField(0,2);

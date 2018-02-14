@@ -182,7 +182,7 @@ The oracle_sid option refers to an entry in the tnsnames.ora file (usually $ORAC
 {{{#!code
 ORCL =
   (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = testhost)(PORT = 1521))
+    (ADDRESS = (PROTOCOL = TCP)(HOST = examplehost)(PORT = 1521))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
       (SERVICE_NAME = orcl)
@@ -226,14 +226,14 @@ On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /
 
 {{{#!blockquote
 {{{#!code
-[testdsn]
+[exampledsn]
 Description=SQL Server
 Driver=ODBC Driver 11 for SQL Server
-Server=testhost
+Server=examplehost
 Port=1433
 Database=
-User=testuser
-Password=testpassword
+User=exampleuser
+Password=examplepassword
 }}}
 }}}
 
@@ -272,8 +272,8 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 
 {{{#!blockquote
 {{{#!code
-[TESTDB]
-	host = testhost
+[EXAMPLEDB]
+	host = examplehost
 	port = 1433
 	tds version = 7.0
 	client charset = UTF-8
@@ -309,9 +309,9 @@ On Linux/Unix platforms, the server option refers to an entry in the interfaces 
 
 {{{#!blockquote
 {{{#!code
-TESTDB
-	master tcp ether testhost 5000
-	query tcp ether testhost 5000
+EXAMPLEDB
+	master tcp ether examplehost 5000
+	query tcp ether examplehost 5000
 }}}
 }}}
 
@@ -342,8 +342,8 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 
 {{{#!blockquote
 {{{#!code
-[TESTDB]
-	host = testhost
+[EXAMPLEDB]
+	host = examplehost
 	port = 5000
 	tds version = 5.0
 }}}
@@ -428,7 +428,7 @@ In this example, SQL Relay is configured to connect to a !MySQL database.
 }}}
 }}}
 
-The host and db options indicate that SQL Relay should connect to the database testdb on the host testhost.
+The host and db options indicate that SQL Relay should connect to the database exampledb on the host examplehost.
 
 See the [configreference.html#mysql SQL Relay Configuration Reference] for other valid !MySQL connect string options.
 
@@ -445,7 +445,7 @@ In this example, SQL Relay is configured to connect to a !PostgreSQL database.
 }}}
 }}}
 
-The host and db options indicate that SQL Relay should connect to the database testdb on the host testhost.
+The host and db options indicate that SQL Relay should connect to the database exampledb on the host examplehost.
 
 See the [configreference.html#postgresql SQL Relay Configuration Reference] for other valid !PostgreSQL connect string options.
 
@@ -462,12 +462,12 @@ In this example, SQL Relay is configured to connect to a Firebird database.
 }}}
 }}}
 
-The db option indicates that SQL Relay should connect to the database located at /opt/firebird/testdb.gdb on the host testhost.
+The db option indicates that SQL Relay should connect to the database located at /opt/firebird/exampledb.gdb on the host examplehost.
 
 Note that if the database is located on a Windows host, then the path segment of the db option should be specified as a Windows-style path with doubled backslashes.  For example:
 {{{#!blockquote
 {{{#!code
-testhost:C:\\Program Files\\Firebird\\Firebird_3_0\\testdb.gdb
+examplehost:C:\\Program Files\\Firebird\\Firebird_3_0\\exampledb.gdb
 }}}
 }}}
 
@@ -486,9 +486,9 @@ In this example, SQL Relay is configured to connect to a SQLite database.
 }}}
 }}}
 
-The db option indicates that SQL Relay should connect to the database /var/sqlite/testdb.
+The db option indicates that SQL Relay should connect to the database /var/sqlite/exampledb.
 
-Note that the database file (testdb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay is run as.
+Note that the database file (exampledb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay is run as.
 
 SQLite also supports a high-performance in-memory mode where tables are maintained in memory and nothing is written to permanent storage.  To use this mode with SQL Relay, set the db option to :memory:.
 
@@ -529,14 +529,14 @@ On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /
 
 {{{#!blockquote
 {{{#!code
-[testdsn]
+[exampledsn]
 Description=SQL Server
 Driver=ODBC Driver 11 for SQL Server
-Server=testhost
+Server=examplehost
 Port=1433
 Database=
-User=testuser
-Password=testpassword
+User=exampleuser
+Password=examplepassword
 }}}
 }}}
 
@@ -571,7 +571,7 @@ On Linux and Unix platforms, limited read-only access to Microsoft Access databa
 }}}
 }}}
 
-The db option indicates that SQL Relay should connect to the database /var/mdbtools/testdb.mdb.
+The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.
 
 (Note that the database file must be readable by the user that the instance of SQL Relay is run as.)
 
@@ -1511,7 +1511,7 @@ This example adds distinguished name validation:
 }}}
 }}}
 
-In this case, the database server's certificate is expected to present the distinguished name: CN=testhost.yourdomain.com
+In this case, the database server's certificate is expected to present the distinguished name: CN=examplehost.yourdomain.com
 
 [[br]][=#backendenc-mssql-freetds]
 === Microsoft SQL Server (using !FreeTDS) ===
@@ -1545,8 +1545,8 @@ In this example, !FreeTDS is configured to require an encrypted connection to th
 
 {{{#!blockquote
 {{{#!code
-[TESTDB]
-	host = testhost
+[EXAMPLEDB]
+	host = examplehost
 	port = 1433
 	tds version = 7.1
 	client charset = UTF-8
@@ -1560,8 +1560,8 @@ In this example, !FreeTDS is also configured to validate the database server's c
 
 {{{#!blockquote
 {{{#!code
-[TESTDB]
-	host = testhost
+[EXAMPLEDB]
+	host = examplehost
 	port = 1433
 	tds version = 7.1
 	client charset = UTF-8
@@ -1575,8 +1575,8 @@ In this example, !FreeTDS is also configured to validate that the common name in
 
 {{{#!blockquote
 {{{#!code
-[TESTDB]
-	host = testhost.yourdomain.com
+[EXAMPLEDB]
+	host = examplehost.yourdomain.com
 	port = 1433
 	tds version = 7.1
 	client charset = UTF-8
@@ -1588,7 +1588,7 @@ In this example, !FreeTDS is also configured to validate that the common name in
 
 Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
 
-The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, TESTDB refers to the !FreeTDS TESTDB entry configured above:
+The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, EXAMPLEDB refers to the !FreeTDS EXAMPLEDB entry configured above:
 
 {{{#!blockquote
 {{{#!code
@@ -1805,7 +1805,7 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 In this example, the //id// and //count// attributes are parameters for the //rot// module.  "13" tells the module to rotate by 13 characters.  The //id// attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The //id// attribute is mandatory.
 
-Note that the password in the user tag is encrypted (unencrypted, it would just be "test") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "testpassword").  A command line program (described later) is provided to encrypt passwords.
+Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "examplepassword").  A command line program (described later) is provided to encrypt passwords.
 
 Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// parameter in the passwordencryption tag ( //rot13// ), not the module name ( //rot// ).
 
@@ -1840,8 +1840,8 @@ For example:
 
 {{{#!blockquote
 {{{
-$ sqlr-pwdenc -id example -pwdencid rot13 -password testpassword
-grfgcnffjbeq
+$ sqlr-pwdenc -id example -pwdencid rot13 -password examplepassword
+rknzcyrcnffjbeq
 }}}
 }}}
 
@@ -1861,7 +1861,7 @@ You should use:
 
 {{{#!blockquote
 {{{
-sqlrsh -id example -user test -password test
+sqlrsh -id example -user sqlruser -password sqlrpassword
 }}}
 }}}
 
@@ -2292,9 +2292,9 @@ The following parameters are currently supported:
 * '''convertcasedoublequoted''' - "upper", "lower", "yes", or "no".  Defaults to "no".
  * If set to "upper" or "lower" then values enclosed in double-quotes are converted to the specified case.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
-   * Eg. 'create table test (col1 int)' creates a table named //TEST// with a column named //COL1//.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
   * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
-   * Eg. 'create table test (col1 int)' creates a table named //test// with a column named //col1//.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "yes" then values enclosed in double-quotes are converted to the case specified by the convertcase parameter.
  * If set to "no" then no case conversion is done.
@@ -2302,9 +2302,9 @@ The following parameters are currently supported:
 * '''removedoublequotes''' - "yes" or "no".  Defaults to "no".
  * If set to "yes" then double-quotes are removed, except for escaped double quotes.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
-   * Eg. 'create table test (col1 int)' creates a table named //TEST// with a column named //COL1//.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
   * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
-   * Eg. 'create table test (col1 int)' creates a table named //test// with a column named //col1//.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "no" then double-quotes are not removed.
  * If omitted then the value defaults to "no".
@@ -2641,7 +2641,7 @@ sqlrsh - Version 1.1.0
 0> use mydb1;
 0> currentdb;
 mydb1
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db mydb1
@@ -2653,7 +2653,7 @@ this table is in db mydb1
 0> use mydb2;
 0> currentdb;
 mydb2
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db mydb2
@@ -2665,7 +2665,7 @@ this table is in db mydb2
 0> use pgdb1;
 0> currentdb;
 pgdb1
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db pgdb1

@@ -1,2 +1,2 @@
-cur.execute('select testfunc()')
+cur.execute('select examplefunc()')
 result=cur.fetchone()[0]

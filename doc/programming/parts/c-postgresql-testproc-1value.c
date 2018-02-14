@@ -1,4 +1,4 @@
-sqlrcur_prepareQuery(cur,"select * from testfunc(1,2,3)");
+sqlrcur_prepareQuery(cur,"select * from examplefunc(1,2,3)");
 sqlrcur_inputBindLong(cur,"1",1);
 sqlrcur_inputBindDouble(cur,"2",1.1,4,2);
 sqlrcur_inputBindString(cur,"3","hello");

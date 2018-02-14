@@ -15,7 +15,7 @@
 <p>A good program to test this with is <a target="_blank" href="http://henplus.sourceforge.net/">HenPlus</a>, a JDBC command line client.  After downloading and installing HenPlus, you can run it as follows:</p>
 
 <blockquote>
-<b>henplus jdbc:odbc:sqlrtest</b>
+<b>henplus jdbc:odbc:sqlrexample</b>
 </blockquote>
 <p>When you run it, you might get an error like:</p>
 
@@ -36,7 +36,7 @@ export LD_PRELOAD=/usr/lib/libodbc.so
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>dmuse@<font color="#008080">fedora</font> bin<font color="#990000">]</font>$ <font color="#990000">./</font><font color="#008080">henplus</font> jdbc<font color="#990000">:</font>odbc<font color="#990000">:</font>sqlrtest
+<pre><tt><font color="#990000">[</font>dmuse@<font color="#008080">fedora</font> bin<font color="#990000">]</font>$ <font color="#990000">./</font><font color="#008080">henplus</font> jdbc<font color="#990000">:</font>odbc<font color="#990000">:</font>sqlrexample
 no <font color="#008080">readline</font> <b><font color="#000000">found</font></b> <font color="#990000">(</font>no JavaReadline <font color="#008080">in</font> java<font color="#990000">.</font>library<font color="#990000">.</font>path<font color="#990000">).</font> Using <font color="#008080">simple</font> stdin<font color="#990000">.</font>
 <b><font color="#0000FF">using</font></b> <font color="#008080">GNU</font> <b><font color="#000000">readline</font></b> <font color="#990000">(</font><font color="#008080">Brian</font> Fox<font color="#990000">,</font> <font color="#008080">Chet</font> Ramey<font color="#990000">),</font> Java wrapper by Bernhard Bablok
 henplus <font color="#008080">config</font> at <font color="#990000">/</font>home<font color="#990000">/</font>dmuse<font color="#990000">/.</font>henplus
@@ -48,17 +48,17 @@ henplus <font color="#008080">config</font> at <font color="#990000">/</font>hom
  conditions of the GNU <font color="#008080">Public</font> License <font color="#990000">&lt;</font>http<font color="#990000">:</font><i><font color="#9A1900">//www.gnu.org/licenses/gpl2.txt&gt;</font></i>
 <font color="#990000">----------------------------------------------------------------------------</font>
 HenPlus II connecting 
- url <font color="#FF0000">'jdbc:odbc:sqlrtest'</font>
+ url <font color="#FF0000">'jdbc:odbc:sqlrexample'</font>
  driver version <font color="#993399">2.1</font>
  oracle <font color="#990000">-</font> Oracle Database 11g Enterprise Edition Release <font color="#993399">11.2</font><font color="#990000">.</font><font color="#993399">0.1</font><font color="#990000">.</font><font color="#993399">0</font> <font color="#990000">-</font> Production
 With <font color="#008080">the</font> Partitioning<font color="#990000">,</font> OLAP<font color="#990000">,</font> Data Mining and Real Application Testing options
-@odbc<font color="#990000">&gt;</font> create <font color="#008080">table</font> <b><font color="#000000">testtable</font></b> <font color="#990000">(</font><font color="#008080">col1</font> <font color="#009900">int</font><font color="#990000">,</font> <font color="#008080">col2</font> <b><font color="#000000">varchar2</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">));</font>
+@odbc<font color="#990000">&gt;</font> create <font color="#008080">table</font> <b><font color="#000000">exampletable</font></b> <font color="#990000">(</font><font color="#008080">col1</font> <font color="#009900">int</font><font color="#990000">,</font> <font color="#008080">col2</font> <b><font color="#000000">varchar2</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">));</font>
 affected <font color="#993399">0</font> <b><font color="#000000">rows</font></b> <font color="#990000">(</font><font color="#993399">301</font> msec<font color="#990000">)</font>
-@odbc<font color="#990000">&gt;</font> insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font><font color="#990000">);</font>
+@odbc<font color="#990000">&gt;</font> insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font><font color="#990000">);</font>
 affected <font color="#993399">1</font> <b><font color="#000000">rows</font></b> <font color="#990000">(</font><font color="#993399">71</font> msec<font color="#990000">)</font>
-@odbc<font color="#990000">&gt;</font> insert into <font color="#008080">testtable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#FF0000">'goodbye'</font><font color="#990000">);</font>
+@odbc<font color="#990000">&gt;</font> insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#FF0000">'goodbye'</font><font color="#990000">);</font>
 affected <font color="#993399">1</font> <b><font color="#000000">rows</font></b> <font color="#990000">(</font><font color="#993399">1</font> msec<font color="#990000">)</font>
-@odbc<font color="#990000">&gt;</font> select <font color="#990000">*</font> <font color="#008080">from</font> testtable<font color="#990000">;</font>
+@odbc<font color="#990000">&gt;</font> select <font color="#990000">*</font> <font color="#008080">from</font> exampletable<font color="#990000">;</font>
 <font color="#990000">------+---------+</font>
  COL1 <font color="#990000">|</font>  COL2   <font color="#990000">|</font>
 <font color="#990000">------+---------+</font>
@@ -66,9 +66,9 @@ affected <font color="#993399">1</font> <b><font color="#000000">rows</font></b>
     <font color="#993399">2</font> <font color="#990000">|</font> goodbye <font color="#990000">|</font>
 <font color="#990000">------+---------+</font>
 <font color="#993399">2</font> rows <font color="#008080">in</font> <b><font color="#000000">result</font></b> <font color="#990000">(</font><font color="#008080">first</font> row<font color="#990000">:</font> <font color="#993399">56</font> msec<font color="#990000">;</font> total<font color="#990000">:</font> <font color="#993399">57</font> msec<font color="#990000">)</font>
-@odbc<font color="#990000">&gt;</font> update testtable <font color="#008080">set</font> col2<font color="#990000">=</font><font color="#FF0000">'bye'</font> <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#993399">2</font><font color="#990000">;</font>
+@odbc<font color="#990000">&gt;</font> update exampletable <font color="#008080">set</font> col2<font color="#990000">=</font><font color="#FF0000">'bye'</font> <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#993399">2</font><font color="#990000">;</font>
 affected <font color="#993399">1</font> <b><font color="#000000">rows</font></b> <font color="#990000">(</font><font color="#993399">2</font> msec<font color="#990000">)</font>
-@odbc<font color="#990000">&gt;</font> select <font color="#990000">*</font> <font color="#008080">from</font> testtable<font color="#990000">;</font>
+@odbc<font color="#990000">&gt;</font> select <font color="#990000">*</font> <font color="#008080">from</font> exampletable<font color="#990000">;</font>
 <font color="#990000">------+-------+</font>
  COL1 <font color="#990000">|</font> COL2  <font color="#990000">|</font>
 <font color="#990000">------+-------+</font>
@@ -76,16 +76,16 @@ affected <font color="#993399">1</font> <b><font color="#000000">rows</font></b>
     <font color="#993399">2</font> <font color="#990000">|</font> bye   <font color="#990000">|</font>
 <font color="#990000">------+-------+</font>
 <font color="#993399">2</font> rows <font color="#008080">in</font> <b><font color="#000000">result</font></b> <font color="#990000">(</font><font color="#008080">first</font> row<font color="#990000">:</font> <font color="#993399">1</font> msec<font color="#990000">;</font> total<font color="#990000">:</font> <font color="#993399">2</font> msec<font color="#990000">)</font>
-@odbc<font color="#990000">&gt;</font> <b><font color="#0000FF">delete</font></b> from testtable <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#993399">1</font><font color="#990000">;</font>
+@odbc<font color="#990000">&gt;</font> <b><font color="#0000FF">delete</font></b> from exampletable <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#993399">1</font><font color="#990000">;</font>
 affected <font color="#993399">1</font> <b><font color="#000000">rows</font></b> <font color="#990000">(</font><font color="#993399">2</font> msec<font color="#990000">)</font>
-@odbc<font color="#990000">&gt;</font> select <font color="#990000">*</font> <font color="#008080">from</font> testtable<font color="#990000">;</font>
+@odbc<font color="#990000">&gt;</font> select <font color="#990000">*</font> <font color="#008080">from</font> exampletable<font color="#990000">;</font>
 <font color="#990000">------+------+</font>
  COL1 <font color="#990000">|</font> COL2 <font color="#990000">|</font>
 <font color="#990000">------+------+</font>
     <font color="#993399">2</font> <font color="#990000">|</font> bye  <font color="#990000">|</font>
 <font color="#990000">------+------+</font>
 <font color="#993399">1</font> row <font color="#008080">in</font> <b><font color="#000000">result</font></b> <font color="#990000">(</font><font color="#008080">first</font> row<font color="#990000">:</font> <font color="#993399">1</font> msec<font color="#990000">;</font> total<font color="#990000">:</font> <font color="#993399">1</font> msec<font color="#990000">)</font>
-@odbc<font color="#990000">&gt;</font> drop <font color="#008080">table</font> testtable<font color="#990000">;</font>
+@odbc<font color="#990000">&gt;</font> drop <font color="#008080">table</font> exampletable<font color="#990000">;</font>
 affected <font color="#993399">0</font> <b><font color="#000000">rows</font></b> <font color="#990000">(</font><font color="#993399">3.637</font> sec<font color="#990000">)</font>
 @odbc<font color="#990000">&gt;</font> quit
 <font color="#008080">storing</font> settings<font color="#990000">..</font>

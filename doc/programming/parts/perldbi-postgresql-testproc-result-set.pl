@@ -1,4 +1,4 @@
-my $sth=$dbh->prepare("select * from testfunc() as (testint int, testfloat float, testchar char(40))");
+my $sth=$dbh->prepare("select * from examplefunc() as (exampleint int, examplefloat float, examplechar char(40))");
 $sth->execute();
 my $col1;
 my $col2;

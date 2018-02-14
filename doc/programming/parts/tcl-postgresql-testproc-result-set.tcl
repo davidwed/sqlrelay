@@ -1,4 +1,4 @@
-$cur sendQuery "select * from testfunc() as (testint int, testfloat float, testchar char(40))"
+$cur sendQuery "select * from examplefunc() as (exampleint int, examplefloat float, examplechar char(40))"
 set $field00 [$cur getField 0,0]
 set $field01 [$cur getField 0,1]
 set $field02 [$cur getField 0,2]

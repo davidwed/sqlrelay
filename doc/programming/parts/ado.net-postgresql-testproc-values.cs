@@ -1,5 +1,5 @@
 SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select * from testfunc(?,?,?) as (col1 int, col2 float, col3 char(20))";
+sqlrcom.CommandText = "select * from examplefunc(?,?,?) as (col1 int, col2 float, col3 char(20))";
 sqlrcom.Parameters.Add("in1",1);
 sqlrcom.Parameters.Add("in2",1.1);
 sqlrcom.Parameters.Add("in3","hello");

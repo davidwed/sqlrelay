@@ -1,6 +1,6 @@
 var	sqlrelay=require("sqlrelay");
 
-var	con=new sqlrelay.SQLRConnection("sqlrserver",9000,"/tmp/test.socket","user","password",0,1);
+var	con=new sqlrelay.SQLRConnection("sqlrserver",9000,"/tmp/example.socket","user","password",0,1);
 var	cur=new sqlrelay.SQLRCursor(con);
 
 cur.setResultSetBufferSize(5);

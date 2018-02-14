@@ -1,6 +1,6 @@
 load /usr/lib/sqlrelay/sqlrelay.so sqlrelay
 
-set con [sqlrcon -server "host" -port 9000 -socket "/tmp/test.socket" -user "user" -password "password" -retrytime 0 -tries 1]
+set con [sqlrcon -server "host" -port 9000 -socket "/tmp/example.socket" -user "user" -password "password" -retrytime 0 -tries 1]
 set cur [$con sqlrcur]
 
 $cur prepareQuery "begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;"

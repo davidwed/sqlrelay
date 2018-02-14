@@ -1,2 +1,2 @@
-$stmt=$dbh->prepare("call testproc()");
+$stmt=$dbh->prepare("call exampleproc()");
 $result=$stmt->execute();
