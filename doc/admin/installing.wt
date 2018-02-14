@@ -17,7 +17,7 @@
 [=#platforms]
 == Supported Platforms ==
 
-All SQL Relay components should build and run on relatively modern versions of Linux, Unix, or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, Minix, SCO OpenServer, SCO UnixWare, GNU Hurd, Haiku and Syllable.  Other Unix or Unix-like systems may also be supported.
+All SQL Relay components should build and run on relatively modern versions of Linux, Unix, or Unix-like systems including Solaris, FreeBSD, NetBSD, OpenBSD, Minix, SCO OpenServer, SCO !UnixWare, GNU Hurd, Haiku and Syllable.  Other Unix or Unix-like systems may also be supported.
 
 x86 and x86_64 platforms are supported, as are non-x86 architectures such as ARM, Sparc, Mips, PPC, and others.
 
@@ -32,7 +32,7 @@ Before you can compile SQL Relay, you must install some prerequisites.
 
 The first thing that you need is a compiler toolchain and make utility.
 
-GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native compiler toolchain for SCO UnixWare is also supported.  Native compiler toolchains for other Unix platforms may work as well.  GNU make is also required on Linux/Unix platforms.
+GNU and clang/LLVM toolchains are supported on Linux/Unix systems.   The native compiler toolchain for SCO !UnixWare is also supported.  Native compiler toolchains for other Unix platforms may work as well.  GNU make is also required on Linux/Unix platforms.
 
 Microsoft Visual Studio and Microsoft Visual Studio Express toolchains are supported on Windows.  Versions 2005 and greater should work.  The nmake utility is also required, but it's provided by Visual Studio.
 

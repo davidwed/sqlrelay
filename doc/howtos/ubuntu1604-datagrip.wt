@@ -133,7 +133,7 @@ datagrip.sh
 * On the !DataGrip License Activation dialog:
  * Click Evaluate for free
  * Click Evaluate
-* On the License Agreement for DataGrip... dialog:
+* On the License Agreement for !DataGrip... dialog:
  * Click Accept
 * On the Customize !DataGrip dialog:
  * Click Skip Remaining and Set Defaults
@@ -205,7 +205,7 @@ It should display results in a new window below, like the following:
 1  hello world
 }}}
 
-At this point, you should be able to run any query you like.
+At this point, you should be able to run any query you like, and generally use !DataGrip as you would with any other database.
 
 === Uninstallation ===
 
