@@ -593,14 +593,16 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 			// if we found a double-escaped quote like '' or ""...
 			if (doubleescape && (*ptr==quote && *(ptr+1)==quote)) {
 				// write the double-escaped quote
-				sb->write(*ptr)->write(*ptr);
+				sb->write(*ptr);
+				sb->write(*ptr);
 				ptr=ptr+2;
 			} else
 
 			// if we found a slash-escaped quote like \' or \"...
 			if (slashescape && (*ptr=='\\' && *(ptr+1)==quote)) {
 				// convert to a double-escaped quote
-				sb->write(*(ptr+1))->write(*(ptr+1));
+				sb->write(*(ptr+1));
+				sb->write(*(ptr+1));
 				ptr=ptr+2;
 			} else
 
@@ -651,14 +653,16 @@ bool sqlrtranslation_normalize::caseConvertQuotedStrings(
 			// if we found a double-escaped quote like "" or ``...
 			if (doubleescape && (*ptr==quote && *(ptr+1)==quote)) {
 				// write the double-escaped quote
-				sb->write(*ptr)->write(*ptr);
+				sb->write(*ptr);
+				sb->write(*ptr);
 				ptr=ptr+2;
 			} else
 
 			// if we found a slash-escaped quote like \" or \`...
 			if (slashescape && (*ptr=='\\' && *(ptr+1)==quote)) {
 				// convert to a double-escaped quote
-				sb->write(*(ptr+1))->write(*(ptr+1));
+				sb->write(*(ptr+1));
+				sb->write(*(ptr+1));
 				ptr=ptr+2;
 			} else
 
