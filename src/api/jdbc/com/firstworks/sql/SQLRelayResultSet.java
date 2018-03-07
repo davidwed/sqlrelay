@@ -4,6 +4,7 @@ import java.sql.*;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringBufferInputStream;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Map;
@@ -15,10 +16,18 @@ public class SQLRelayResultSet implements ResultSet {
 
 	private SQLRCursor	sqlrcur;
 	private long		currentrow;
+	private	boolean		beforefirst;
+	private	boolean		afterlast;
 
 	public SQLRelayResultSet() {
+		reset();
+	}
+
+	private void	reset() {
 		sqlrcur=null;
 		currentrow=-1;
+		beforefirst=true;
+		afterlast=false;
 	}
 
 	public void	setSQLRCursor(SQLRCursor sqlrcur) {
@@ -26,65 +35,136 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public boolean	absolute(int row) throws SQLException {
-		return false;
+		throwExceptionIfClosed();
+		if (row<currentrow) {
+			throw new SQLException(
+					"FIXME: ResultSet "+
+					"type is Forward-Only");
+		} else if (row==0) {
+			beforefirst=true;
+			currentrow=-1;
+			afterlast=false;
+		} else if (row>0) {
+			beforefirst=false;
+			currentrow=row-1;
+			// FIXME: set afterlast...
+		} else if (row<0) {
+			// FIXME: implement this...
+			return false;
+		}
+		return true;
 	}
 
 	public void	afterLast() throws SQLException {
+		throwExceptionIfClosed();
+		afterlast=true;
 	}
 
 	public void	beforeFirst() throws SQLException {
+		throwExceptionIfClosed();
+		beforefirst=true;
 	}
 
 	public void	cancelRowUpdates() throws SQLException {
+		throwExceptionIfClosed();
+		throwNotSupportedException();
 	}
 
 	public void	clearWarnings() throws SQLException {
+		throwExceptionIfClosed();
 	}
 
 	public void	close() throws SQLException {
+		reset();
 	}
 
 	public void	deleteRow() throws SQLException {
+		throwExceptionIfClosed();
+		throwNotSupportedException();
 	}
 
 	public int	findColumn(String columnlabel) throws SQLException {
-		return 0;
+		throwExceptionIfClosed();
+		for (int i=0; i<sqlrcur.colCount(); i++) {
+			if (sqlrcur.getColumnName(i).equals(columnlabel)) {
+				return i+1;
+			}
+		}
+		throw new SQLException("FIXME: Column not found");
 	}
 
 	public boolean	first() throws SQLException {
-		return false;
+		return absolute(1);
 	}
 
 	public Array	getArray(int columnindex) throws SQLException {
+		throwExceptionIfClosed();
+		throwNotSupportedException();
 		return null;
 	}
 
 	public Array	getArray(String columnlabel) throws SQLException {
+		throwExceptionIfClosed();
+		throwNotSupportedException();
 		return null;
 	}
 
-	public InputStream	getAsciiStream(int columnindex) throws SQLException {
-		return null;
+	public InputStream	getAsciiStream(int columnindex)
+							throws SQLException {
+		throwExceptionIfClosed();
+		// FIXME: not sure this is correct, how do we ensure it's ascii?
+		return new StringBufferInputStream(
+				sqlrcur.getField(currentrow,columnindex-1));
 	}
 
-	public InputStream	getAsciiStream(String columnlabel) throws SQLException {
-		return null;
+	public InputStream	getAsciiStream(String columnlabel)
+							throws SQLException {
+		throwExceptionIfClosed();
+		// FIXME: not sure this is correct, how do we ensure it's ascii?
+		return new StringBufferInputStream(
+				sqlrcur.getField(currentrow,columnlabel));
 	}
 
-	public BigDecimal	getBigDecimal(int columnindex) throws SQLException {
-		return null;
+	public BigDecimal	getBigDecimal(int columnindex)
+							throws SQLException {
+		throwExceptionIfClosed();
+		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		if (field==null) {
+			return null;
+		}
+		return new BigDecimal(field);
 	}
 
-	public BigDecimal	getBigDecimal(int columnindex, int scale) throws SQLException {
-		return null;
+	public BigDecimal	getBigDecimal(int columnindex, int scale)
+							throws SQLException {
+		throwExceptionIfClosed();
+		// FIXME: do something with scale...
+		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		if (field==null) {
+			return null;
+		}
+		return new BigDecimal(field);
 	}
 
-	public BigDecimal	getBigDecimal(String columnlabel) throws SQLException {
-		return null;
+	public BigDecimal	getBigDecimal(String columnlabel)
+							throws SQLException {
+		throwExceptionIfClosed();
+		String	field=sqlrcur.getField(currentrow,columnlabel);
+		if (field==null) {
+			return null;
+		}
+		return new BigDecimal(field);
 	}
 
-	public BigDecimal	getBigDecimal(String columnlabel, int scale) throws SQLException {
-		return null;
+	public BigDecimal	getBigDecimal(String columnlabel, int scale)
+							throws SQLException {
+		throwExceptionIfClosed();
+		// FIXME: do something with scale...
+		String	field=sqlrcur.getField(currentrow,columnlabel);
+		if (field==null) {
+			return null;
+		}
+		return new BigDecimal(field);
 	}
 
 	public InputStream	getBinaryStream(int columnindex) throws SQLException {
@@ -391,7 +471,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public boolean	last() throws SQLException {
-		return false;
+		return absolute(-1);
 	}
 
 	public void	moveToCurrentRow() throws SQLException {
@@ -693,5 +773,19 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public <T> T	unwrap(Class<T> iface) throws SQLException {
 		return null;
+	}
+
+	private void throwExceptionIfClosed() throws SQLException {
+		if (sqlrcur==null) {
+			throw new SQLException("FIXME: ResultSet is closed");
+		}
+	}
+
+	private void throwErrorMessageException() throws SQLException {
+		throw new SQLException(sqlrcur.errorMessage());
+	}
+
+	private void throwNotSupportedException() throws SQLException {
+		throw new SQLFeatureNotSupportedException();
 	}
 }

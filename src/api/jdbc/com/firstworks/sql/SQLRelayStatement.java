@@ -26,7 +26,7 @@ public class SQLRelayStatement implements Statement {
 		reset();
 	}
 
-	private void reset() {
+	private void	reset() {
 		connection=null;
 		sqlrcon=null;
 		sqlrcur=null;
@@ -344,7 +344,7 @@ public class SQLRelayStatement implements Statement {
 
 	private void throwExceptionIfClosed() throws SQLException {
 		if (sqlrcur==null) {
-			throw new SQLException("FIXME: Connection is closed");
+			throw new SQLException("FIXME: Statement is closed");
 		}
 	}
 
