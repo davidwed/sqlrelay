@@ -66,7 +66,7 @@ public class SQLRelayDriver implements Driver {
 		// jdbc:sqlrelay://[user:password@]host:[port][:socket]
 
 		// check for jdbc:sqlrelay://
-		if (url.substring(0,15).equals("jdbc:sqlrelay://")) {
+		if (url.substring(0,16).equals("jdbc:sqlrelay://")) {
 
 			// split the rest of the string on @ and get the parts
 			String[]	parts=url.substring(16).split("@");
@@ -148,6 +148,7 @@ public class SQLRelayDriver implements Driver {
 		ci.retrytime = retrytime;
 		ci.triesstr = triesstr;
 		ci.tries = tries;
+
 		return ci;
 	}
 

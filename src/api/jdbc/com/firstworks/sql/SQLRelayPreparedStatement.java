@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.util.Calendar;
 import java.net.URL;
 
+import com.firstworks.sqlrelay.*;
+
 public class SQLRelayPreparedStatement
 		extends SQLRelayStatement
 		implements PreparedStatement {
