@@ -15,7 +15,6 @@ public class SQLRelayStatement implements Statement {
 	private boolean			closeoncompletion;
 	private SQLRelayResultSet	resultset;
 	private int			fetchdirection;
-	private int			fetchsize;
 	private int			maxfieldsize;
 	private int			maxrows;
 	private boolean			poolable;
@@ -90,6 +89,7 @@ public class SQLRelayStatement implements Statement {
 		boolean	result=sqlrcur.sendQuery(sql);
 		if (result) {
 			resultset=new SQLRelayResultSet();
+			resultset.setStatement(this);
 			resultset.setSQLRCursor(sqlrcur);
 		} else {
 			throwErrorMessageException();
@@ -137,9 +137,10 @@ public class SQLRelayStatement implements Statement {
 		if (!sqlrcur.sendQuery(sql)) {
 			throw new SQLException(sqlrcur.errorMessage());
 		}
-		SQLRelayResultSet	rs=new SQLRelayResultSet();
-		rs.setSQLRCursor(sqlrcur);
-		return rs;
+		resultset=new SQLRelayResultSet();
+		resultset.setStatement(this);
+		resultset.setSQLRCursor(sqlrcur);
+		return resultset;
 	}
 
 	public int 	executeUpdate(String sql) throws SQLException {

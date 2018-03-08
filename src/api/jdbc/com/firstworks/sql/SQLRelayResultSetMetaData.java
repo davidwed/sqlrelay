@@ -2,7 +2,19 @@ package com.firstworks.sql;
 
 import java.sql.*;
 
+import com.firstworks.sqlrelay.*;
+
 public class SQLRelayResultSetMetaData implements ResultSetMetaData {
+
+	private	SQLRCursor	sqlrcur;
+
+	public SQLRelayResultSetMetaData() {
+		sqlrcur=null;
+	}
+
+	public void	setSQLRCursor(SQLRCursor sqlrcur) {
+		this.sqlrcur=sqlrcur;
+	}
 
 	public String 	getCatalogName(int column) {
 		return null;
