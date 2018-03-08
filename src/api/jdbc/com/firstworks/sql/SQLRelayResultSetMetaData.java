@@ -25,35 +25,36 @@ public class SQLRelayResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public int 	getColumnCount() {
-		return 0;
+		return sqlrcur.colCount();
 	}
 
 	public int 	getColumnDisplaySize(int column) {
-		return 0;
+		return sqlrcur.getLongest(column-1);
 	}
 
 	public String 	getColumnLabel(int column) {
-		return null;
+		return sqlrcur.getColumnName(column-1);
 	}
 
 	public String 	getColumnName(int column) {
-		return null;
+		return sqlrcur.getColumnName(column-1);
 	}
 
 	public int 	getColumnType(int column) {
+		// FIXME: map these...
 		return 0;
 	}
 
 	public String 	getColumnTypeName(int column) {
-		return null;
+		return sqlrcur.getColumnType(column-1);
 	}
 
 	public int 	getPrecision(int column) {
-		return 0;
+		return (int)sqlrcur.getColumnPrecision(column-1);
 	}
 
 	public int 	getScale(int column) {
-		return 0;
+		return (int)sqlrcur.getColumnScale(column-1);
 	}
 
 	public String 	getSchemaName(int column) {
@@ -65,14 +66,16 @@ public class SQLRelayResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public boolean 	isAutoIncrement(int column) {
-		return false;
+		return sqlrcur.getColumnIsAutoIncrement(column-1);
 	}
 
 	public boolean 	isCaseSensitive(int column) {
+		// FIXME: can db type tell us this?
 		return false;
 	}
 
 	public boolean 	isCurrency(int column) {
+		// FIXME: map this
 		return false;
 	}
 
@@ -81,7 +84,8 @@ public class SQLRelayResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public int 	isNullable(int column) {
-		return 0;
+		return (sqlrcur.getColumnIsNullable(column-1))?
+						columnNullable:columnNoNulls;
 	}
 
 	public boolean 	isReadOnly(int column) {
@@ -93,7 +97,7 @@ public class SQLRelayResultSetMetaData implements ResultSetMetaData {
 	}
 
 	public boolean 	isSigned(int column) {
-		return false;
+		return !sqlrcur.getColumnIsUnsigned(column-1);
 	}
 
 	public boolean 	isWritable(int column) {
