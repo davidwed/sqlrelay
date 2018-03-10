@@ -10,15 +10,15 @@ public class SQLRelayStatement implements Statement {
 
 	private Connection		connection;
 	private SQLRConnection		sqlrcon;
-	private SQLRCursor		sqlrcur;
+	protected SQLRCursor		sqlrcur;
 	private List<String>		batch;
 	private boolean			closeoncompletion;
-	private SQLRelayResultSet	resultset;
+	protected SQLRelayResultSet	resultset;
 	private int			fetchdirection;
 	private int			maxfieldsize;
 	private int			maxrows;
 	private boolean			poolable;
-	private int			updatecount;
+	protected int			updatecount;
 	private boolean			escapeprocessing;
 
 	public SQLRelayStatement() {
@@ -134,12 +134,13 @@ public class SQLRelayStatement implements Statement {
 		// FIXME: handle timeout
 		resultset=null;
 		updatecount=-1;
-		if (!sqlrcur.sendQuery(sql)) {
+		if (sqlrcur.sendQuery(sql)) {
+			resultset=new SQLRelayResultSet();
+			resultset.setStatement(this);
+			resultset.setSQLRCursor(sqlrcur);
+		} else {
 			throw new SQLException(sqlrcur.errorMessage());
 		}
-		resultset=new SQLRelayResultSet();
-		resultset.setStatement(this);
-		resultset.setSQLRCursor(sqlrcur);
 		return resultset;
 	}
 
@@ -148,11 +149,11 @@ public class SQLRelayStatement implements Statement {
 		// FIXME: handle timeout
 		resultset=null;
 		updatecount=-1;
-		boolean	result=sqlrcur.sendQuery(sql);
-		if (!result) {
+		if (sqlrcur.sendQuery(sql)) {
+			updatecount=(int)sqlrcur.affectedRows();
+		} else {
 			throwErrorMessageException();
 		}
-		updatecount=(int)sqlrcur.affectedRows();
 		return updatecount;
 	}
 
@@ -343,17 +344,17 @@ public class SQLRelayStatement implements Statement {
 		return null;
 	}
 
-	private void throwExceptionIfClosed() throws SQLException {
+	protected void throwExceptionIfClosed() throws SQLException {
 		if (sqlrcur==null) {
 			throw new SQLException("FIXME: Statement is closed");
 		}
 	}
 
-	private void throwErrorMessageException() throws SQLException {
+	protected void throwErrorMessageException() throws SQLException {
 		throw new SQLException(sqlrcur.errorMessage());
 	}
 
-	private void throwNotSupportedException() throws SQLException {
+	protected void throwNotSupportedException() throws SQLException {
 		throw new SQLFeatureNotSupportedException();
 	}
 };

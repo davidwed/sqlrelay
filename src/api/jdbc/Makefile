@@ -6,6 +6,8 @@ SRCS = com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayConnection.java \
 	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayDriver.java \
 	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayDatabaseMetaData.java \
 	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayStatement.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayParameter.java \
+	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayParameterMetaData.java \
 	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayPreparedStatement.java \
 	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayCallableStatement.java \
 	com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayResultSet.java \

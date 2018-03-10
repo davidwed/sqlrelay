@@ -10,6 +10,11 @@ import com.firstworks.sqlrelay.*;
 
 public class SQLRelayConnection implements Connection {
 
+	private String		host;
+	private short		port;
+	private String		socket;
+	private String		user;
+	private String		password;
 	private SQLRConnection	sqlrcon;
 	private	boolean		readonly;
 	private Properties	clientinfo;
@@ -23,11 +28,36 @@ public class SQLRelayConnection implements Connection {
 					String password,
 					int retrytime,
 					int tries) throws SQLException {
+		this.host=host;
+		this.port=port;
+		this.socket=socket;
+		this.user=user;
+		this.password=password;
 		sqlrcon=new SQLRConnection(host,port,socket,
 						user,password,retrytime,tries);
 		readonly=false;
 		clientinfo=new Properties();
 		typemap=null;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public short getPort() {
+		return port;
+	}
+
+	public String getSocket() {
+		return socket;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public String getPassword() {
+		return password;
 	}
 
 	public void	abort(Executor executor) throws SQLException {
@@ -149,7 +179,10 @@ public class SQLRelayConnection implements Connection {
 
 	public DatabaseMetaData	getMetaData() throws SQLException {
 		throwExceptionIfClosed();
-		return new SQLRelayDatabaseMetaData();
+		SQLRelayDatabaseMetaData	metadata=
+						new SQLRelayDatabaseMetaData();
+		metadata.setConnection(this);
+		return metadata;
 	}
 
 	public int	getNetworkTimeout() throws SQLException {
@@ -245,8 +278,8 @@ public class SQLRelayConnection implements Connection {
 		throwExceptionIfClosed();
 		SQLRCursor	sqlrcur=new SQLRCursor(sqlrcon);
 		sqlrcur.prepareQuery(sql);
-		SQLRelayCallableStatement	sqlrstmt=
-						new SQLRelayCallableStatement();
+		SQLRelayPreparedStatement	sqlrstmt=
+						new SQLRelayPreparedStatement();
 		sqlrstmt.setConnection(this);
 		sqlrstmt.setSQLRConnection(sqlrcon);
 		sqlrstmt.setSQLRCursor(sqlrcur);

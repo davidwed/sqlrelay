@@ -63,7 +63,7 @@ public class SQLRelayDriver implements Driver {
 
 		// override them if they were passed in in the url
 		// url format:
-		// jdbc:sqlrelay://[user:password@]host:[port][:socket]
+		// jdbc:sqlrelay://[user:password@]host[:port][:socket]
 
 		// check for jdbc:sqlrelay://
 		if (url.substring(0,16).equals("jdbc:sqlrelay://")) {
@@ -103,15 +103,15 @@ public class SQLRelayDriver implements Driver {
 			}
 		}
 
-		// convert port string to integer, default to 0
+		// convert port string to integer, default to 9000
 		short	port;
 		try {
 			port=Short.parseShort(portstr);
 		} catch (NumberFormatException ex) {
-			port=0;
+			port=9000;
 		}
 		if (port<0) {
-			port=0;
+			port=9000;
 		}
 
 		// convert retrytime string to integer, default to 0
