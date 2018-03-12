@@ -8,6 +8,57 @@ import com.firstworks.sqlrelay.*;
 
 public class SQLRelayParameter {
 
+	public enum BindType {
+		Array,
+		AsciiStream,
+		AsciiStreamWithIntLength,
+		AsciiStreamWithLongLength,
+		BigDecimal,
+		BinaryStream,
+		BinaryStreamWithIntLength,
+		BinaryStreamWithLongLength,
+		Blob,
+		BlobInputStream,
+		BlobInputStreamWithLongLength,
+		Boolean,
+		Byte,
+		Bytes,
+		CharacterStream,
+		CharacterStreamWithIntLength,
+		CharacterStreamWithLongLength,
+		Clob,
+		ClobReader,
+		ClobReaderWithLength,
+		Date,
+		DateWithCalendar,
+		Double,
+		Float,
+		Int,
+		Long,
+		NCharStream,
+		NCharStreamWithLength,
+		NClob,
+		NClobReader,
+		NClobReaderWithLength,
+		NString,
+		Null,
+		NullWithTypeName,
+		Object,
+		ObjectWithTargetType,
+		ObjectWithTargetTypeAndScaleOrLength,
+		Ref,
+		RowId,
+		Short,
+		String,
+		SQLXML,
+		Time,
+		TimeWithCalendar,
+		Timestamp,
+		TimestampWithCalendar,
+		UnicodeStream,
+		URL
+	};
+
 	private String	classname;
 	private int	mode;
 	private int	type;
@@ -23,6 +74,7 @@ public class SQLRelayParameter {
 	private boolean		lob;
 	private boolean		ascii;
 	private Calendar	cal;
+	private	BindType	bindtype;
 
 	public SQLRelayParameter() {
 		classname=null;
@@ -39,6 +91,7 @@ public class SQLRelayParameter {
 		lob=false;
 		ascii=false;
 		cal=null;
+		bindtype=BindType.Null;
 	}
 
 	public String 	getClassName() {
@@ -97,6 +150,10 @@ public class SQLRelayParameter {
 		return cal;
 	}
 
+	public BindType getBindType() {
+		return bindtype;
+	}
+
 	public void 	setClassName(String classname) {
 		this.classname=classname;
 	}
@@ -151,5 +208,9 @@ public class SQLRelayParameter {
 
 	public void	setCalendar(Calendar cal) {
 		this.cal=cal;
+	}
+
+	public void	setBindType(BindType bindtype) {
+		this.bindtype=bindtype;
 	}
 }
