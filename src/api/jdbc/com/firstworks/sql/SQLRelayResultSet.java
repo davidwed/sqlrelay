@@ -32,7 +32,7 @@ public class SQLRelayResultSet implements ResultSet {
 	private void	reset() {
 		statement=null;
 		sqlrcur=null;
-		currentrow=-1;
+		currentrow=0;
 		beforefirst=true;
 		afterlast=false;
 		fetchdirection=ResultSet.FETCH_FORWARD;
@@ -55,12 +55,20 @@ public class SQLRelayResultSet implements ResultSet {
 					"type is Forward-Only");
 		} else if (row==0) {
 			beforefirst=true;
-			currentrow=-1;
+			currentrow=0;
 			afterlast=false;
 		} else if (row>0) {
 			beforefirst=false;
-			currentrow=row-1;
-			// FIXME: set afterlast...
+			currentrow=row;
+			// FIXME: there are some games we can play to decide
+			// whether we need to do this getField()
+			sqlrcur.getField(currentrow-1,0);
+			long	firstrowindex=sqlrcur.firstRowIndex();
+			if (sqlrcur.endOfResultSet() &&
+				(currentrow-1)>=sqlrcur.rowCount()) {
+				afterlast=true;
+				return false;
+			}
 		} else if (row<0) {
 			// FIXME: implement this...
 			return false;
@@ -88,6 +96,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public void	close() throws SQLException {
+		sqlrcur.closeResultSet();
 		reset();
 	}
 
@@ -128,7 +137,7 @@ public class SQLRelayResultSet implements ResultSet {
 							throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		// FIXME: not sure this is correct, how do we ensure it's ascii?
 		return new StringBufferInputStream(field);
@@ -138,7 +147,7 @@ public class SQLRelayResultSet implements ResultSet {
 							throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		String	field=sqlrcur.getField(currentrow,columnlabel);
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		// FIXME: not sure this is correct, how do we ensure it's ascii?
 		return new StringBufferInputStream(field);
@@ -148,7 +157,7 @@ public class SQLRelayResultSet implements ResultSet {
 							throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		if (field==null) {
 			wasnull=true;
 			return null;
@@ -161,7 +170,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		// FIXME: do something with scale...
-		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		if (field==null) {
 			wasnull=true;
 			return null;
@@ -173,7 +182,7 @@ public class SQLRelayResultSet implements ResultSet {
 							throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		String	field=sqlrcur.getField(currentrow,columnlabel);
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		if (field==null) {
 			wasnull=true;
 			return null;
@@ -186,7 +195,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		// FIXME: do something with scale...
-		String	field=sqlrcur.getField(currentrow,columnlabel);
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		if (field==null) {
 			wasnull=true;
 			return null;
@@ -199,7 +208,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		byte[]	field=sqlrcur.getFieldAsByteArray(
-					currentrow,columnindex-1);
+					currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		return new ByteArrayInputStream(field);
 	}
@@ -209,7 +218,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		byte[]	field=sqlrcur.getFieldAsByteArray(
-					currentrow,columnlabel);
+					currentrow-1,columnlabel);
 		wasnull=(field==null);
 		return new ByteArrayInputStream(field);
 	}
@@ -233,7 +242,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public boolean	getBoolean(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		return field.equals("1");
 	}
@@ -241,7 +250,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public boolean	getBoolean(String columnlabel) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		String	field=sqlrcur.getField(currentrow,columnlabel);
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		return field.equals("1");
 	}
@@ -249,24 +258,24 @@ public class SQLRelayResultSet implements ResultSet {
 	public byte	getByte(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow,columnindex-1)==null);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
 		return (byte)sqlrcur.getFieldAsInteger(
-					currentrow,columnindex-1);
+					currentrow-1,columnindex-1);
 	}
 
 	public byte	getByte(String columnlabel) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		wasnull=(sqlrcur.getField(currentrow,columnlabel)==null);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
 		return (byte)sqlrcur.getFieldAsInteger(
-					currentrow,columnlabel);
+					currentrow-1,columnlabel);
 	}
 
 	public byte[]	getBytes(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		byte[]	field=sqlrcur.getFieldAsByteArray(
-					currentrow,columnindex-1);
+					currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		return field;
 	}
@@ -275,7 +284,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		byte[]	field=sqlrcur.getFieldAsByteArray(
-					currentrow,columnlabel);
+					currentrow-1,columnlabel);
 		wasnull=(field==null);
 		return field;
 	}
@@ -284,7 +293,7 @@ public class SQLRelayResultSet implements ResultSet {
 						throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		return (wasnull)?null:(new StringReader(field));
 	}
@@ -293,7 +302,7 @@ public class SQLRelayResultSet implements ResultSet {
 						throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		String	field=sqlrcur.getField(currentrow,columnlabel);
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		return (wasnull)?null:(new StringReader(field));
 	}
@@ -361,15 +370,15 @@ public class SQLRelayResultSet implements ResultSet {
 	public double	getDouble(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow,columnindex-1)==null);
-		return sqlrcur.getFieldAsDouble(currentrow,columnindex-1);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
+		return sqlrcur.getFieldAsDouble(currentrow-1,columnindex-1);
 	}
 
 	public double	getDouble(String columnlabel) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		wasnull=(sqlrcur.getField(currentrow,columnlabel)==null);
-		return sqlrcur.getFieldAsDouble(currentrow,columnlabel);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
+		return sqlrcur.getFieldAsDouble(currentrow-1,columnlabel);
 	}
 
 	public int	getFetchDirection() throws SQLException {
@@ -385,17 +394,17 @@ public class SQLRelayResultSet implements ResultSet {
 	public float	getFloat(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow,columnindex-1)==null);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
 		return (float)sqlrcur.getFieldAsDouble(
-					currentrow,columnindex-1);
+					currentrow-1,columnindex-1);
 	}
 
 	public float	getFloat(String columnlabel) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		wasnull=(sqlrcur.getField(currentrow,columnlabel)==null);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
 		return (float)sqlrcur.getFieldAsDouble(
-					currentrow,columnlabel);
+					currentrow-1,columnlabel);
 	}
 
 	public int	getHoldability() throws SQLException {
@@ -407,31 +416,32 @@ public class SQLRelayResultSet implements ResultSet {
 	public int	getInt(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow,columnindex-1)==null);
-		return (int)sqlrcur.getFieldAsInteger(currentrow,columnindex-1);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
+		return (int)sqlrcur.getFieldAsInteger(
+					currentrow-1,columnindex-1);
 	}
 
 	public int	getInt(String columnlabel) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		wasnull=(sqlrcur.getField(currentrow,columnlabel)==null);
-		return (int)sqlrcur.getFieldAsInteger(currentrow,columnlabel);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
+		return (int)sqlrcur.getFieldAsInteger(currentrow-1,columnlabel);
 	}
 
 	public long	getLong(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow,columnindex-1)==null);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
 		return (long)sqlrcur.getFieldAsInteger(
-					currentrow,columnindex-1);
+					currentrow-1,columnindex-1);
 	}
 
 	public long	getLong(String columnlabel) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		wasnull=(sqlrcur.getField(currentrow,columnlabel)==null);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
 		return (long)sqlrcur.getFieldAsInteger(
-					currentrow,columnlabel);
+					currentrow-1,columnlabel);
 	}
 
 	public ResultSetMetaData	getMetaData() throws SQLException {
@@ -447,7 +457,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		byte[]	bytes=sqlrcur.getFieldAsByteArray(
-						currentrow,columnindex-1);
+						currentrow-1,columnindex-1);
 		wasnull=(bytes==null);
 		return (wasnull)?null:
 				(new InputStreamReader(
@@ -459,7 +469,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		byte[]	bytes=sqlrcur.getFieldAsByteArray(
-						currentrow,columnlabel);
+						currentrow-1,columnlabel);
 		wasnull=(bytes==null);
 		return (wasnull)?null:
 				(new InputStreamReader(
@@ -486,7 +496,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		byte[]	bytes=sqlrcur.getFieldAsByteArray(
-						currentrow,columnindex-1);
+						currentrow-1,columnindex-1);
 		wasnull=(bytes==null);
 		try {
 			return (wasnull)?null:(new String(bytes,"UTF-8"));
@@ -499,7 +509,7 @@ public class SQLRelayResultSet implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		byte[]	bytes=sqlrcur.getFieldAsByteArray(
-						currentrow,columnlabel);
+						currentrow-1,columnlabel);
 		wasnull=(bytes==null);
 		try {
 			return (wasnull)?null:(new String(bytes,"UTF-8"));
@@ -599,16 +609,16 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public short	getShort(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
-		wasnull=(sqlrcur.getField(currentrow,columnindex-1)==null);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
 		return (short)sqlrcur.getFieldAsInteger(
-						currentrow,columnindex-1);
+						currentrow-1,columnindex-1);
 	}
 
 	public short	getShort(String columnlabel) throws SQLException {
 		throwExceptionIfClosed();
-		wasnull=(sqlrcur.getField(currentrow,columnlabel)==null);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
 		return (short)sqlrcur.getFieldAsInteger(
-						currentrow,columnlabel);
+						currentrow-1,columnlabel);
 	}
 
 	public SQLXML	getSQLXML(int columnindex) throws SQLException {
@@ -634,7 +644,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public String	getString(int columnindex) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		return field;
 	}
@@ -642,7 +652,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public String	getString(String columnlabel) throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		String	field=sqlrcur.getField(currentrow,columnlabel);
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		return field;
 	}
@@ -726,7 +736,7 @@ public class SQLRelayResultSet implements ResultSet {
 							throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		String	field=sqlrcur.getField(currentrow,columnindex-1);
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		return new StringBufferInputStream(field);
 	}
@@ -735,7 +745,7 @@ public class SQLRelayResultSet implements ResultSet {
 							throws SQLException {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		String	field=sqlrcur.getField(currentrow,columnlabel);
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		return new StringBufferInputStream(field);
 	}
@@ -821,9 +831,12 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public boolean	relative(int rows) throws SQLException {
 		throwExceptionIfClosed();
-		int	newrow=(int)(currentrow-rows);
-		if (newrow<0) {
-			newrow=0;
+		if (rows==0) {
+			return true;
+		}
+		int	newrow=(int)(currentrow+rows);
+		if (newrow<1) {
+			newrow=1;
 		}
 		return absolute(newrow);
 	}

@@ -16,7 +16,7 @@ public class SQLRelayConnection implements Connection {
 	private String		user;
 	private String		password;
 	private SQLRConnection	sqlrcon;
-	private	boolean		readonly;
+	private boolean		readonly;
 	private Properties	clientinfo;
 
 	private Map<String,Class<?>>	typemap;
@@ -38,6 +38,7 @@ public class SQLRelayConnection implements Connection {
 		readonly=false;
 		clientinfo=new Properties();
 		typemap=null;
+//sqlrcon.debugOn();
 	}
 
 	public String getHost() {

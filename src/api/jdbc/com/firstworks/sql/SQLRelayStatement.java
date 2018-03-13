@@ -73,6 +73,9 @@ public class SQLRelayStatement implements Statement {
 	}
 
 	public void 	close() throws SQLException {
+		if (resultset!=null) {
+			resultset.close();
+		}
 		reset();
 	}
 
@@ -82,15 +85,18 @@ public class SQLRelayStatement implements Statement {
 	}
 
 	public boolean 	execute(String sql) throws SQLException {
+System.out.println("Statement.execute(...)");
 		throwExceptionIfClosed();
 		// FIXME: handle timeout
 		resultset=null;
 		updatecount=-1;
 		boolean	result=sqlrcur.sendQuery(sql);
 		if (result) {
-			resultset=new SQLRelayResultSet();
-			resultset.setStatement(this);
-			resultset.setSQLRCursor(sqlrcur);
+			if (sqlrcur.affectedRows()==0) {
+				resultset=new SQLRelayResultSet();
+				resultset.setStatement(this);
+				resultset.setSQLRCursor(sqlrcur);
+			}
 		} else {
 			throwErrorMessageException();
 		}
@@ -130,14 +136,17 @@ public class SQLRelayStatement implements Statement {
 	}
 
 	public ResultSet 	executeQuery(String sql) throws SQLException {
+System.out.println("Statement.executeQuery(...)");
 		throwExceptionIfClosed();
 		// FIXME: handle timeout
 		resultset=null;
 		updatecount=-1;
 		if (sqlrcur.sendQuery(sql)) {
-			resultset=new SQLRelayResultSet();
-			resultset.setStatement(this);
-			resultset.setSQLRCursor(sqlrcur);
+			if (sqlrcur.affectedRows()==0) {
+				resultset=new SQLRelayResultSet();
+				resultset.setStatement(this);
+				resultset.setSQLRCursor(sqlrcur);
+			}
 		} else {
 			throw new SQLException(sqlrcur.errorMessage());
 		}
@@ -145,6 +154,7 @@ public class SQLRelayStatement implements Statement {
 	}
 
 	public int 	executeUpdate(String sql) throws SQLException {
+System.out.println("Statement.executeUpdate(...)");
 		throwExceptionIfClosed();
 		// FIXME: handle timeout
 		resultset=null;
