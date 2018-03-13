@@ -17,7 +17,7 @@ SRCS = com$(SLASH)firstworks$(SLASH)sql$(SLASH)SQLRelayConnection.java \
 all: sqlrelayjdbc.jar
 
 clean:
-	$(LTCLEAN) $(RM) com/firstworks/sql/*.class *.jar
+	$(RM) com/firstworks/sql/*.class *.jar
 
 sqlrelayjdbc.jar: $(SRCS)
 	$(JAVAC) -cp ../java/sqlrelay.jar $(SRCS)
