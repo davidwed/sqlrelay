@@ -20,11 +20,11 @@ def checkSuccess(value,success):
 
 def main():
 
-	cert="/usr/local/firstworks/etc/client.pem"
-	ca="/usr/local/firstworks/etc/client.pem"
+	cert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem"
+	ca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem"
 	if platform.system()=="Windows":
-		cert="C:\\Program Files\\Firstworks\\etc\\client.pfx"
-		ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx"
+		cert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx"
+		ca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx"
 
 	PySQLRClient.getNumericFieldsAsNumbers()
 

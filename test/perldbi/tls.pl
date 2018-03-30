@@ -59,11 +59,11 @@ sub checkSuccessString {
 	}
 }
 
-$tlscert="/usr/local/firstworks/etc/client.pem";
-$tlsca="/usr/local/firstworks/etc/ca.pem";
+$tlscert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem";
+$tlsca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem";
 if ($^O eq "MSWin32") {
-	$tlscert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
-	$tlsca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
+	$tlscert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx";
+	$tlsca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx";
 }
 
 
