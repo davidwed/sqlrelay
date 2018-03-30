@@ -64,4 +64,4 @@ oracle: oracle.cpp oracle.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) oracle.$(OBJ) $(ORACLELIBS) $(DROPINTESTLIBS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE) tds$(EXE) oracle$(EXE)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE) tds$(EXE) oracle$(EXE) bind$(EXE)

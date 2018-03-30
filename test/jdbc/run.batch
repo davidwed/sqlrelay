@@ -1,0 +1,1 @@
+"C:\Program Files\Java\jdk1.8.0_102\bin\java" -classpath .;"c:\\Program Files\\Firstworks\\java\\sqlrelay.jar";"c:\\Program Files\\Firstworks\\java\sqlrelayjdbc.jar" -Djava.library.path="c:\\Program Files\\Firstworks\\java\\com\\firstworks\\sqlrelay" %1
