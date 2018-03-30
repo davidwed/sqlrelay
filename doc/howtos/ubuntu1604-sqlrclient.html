@@ -1,0 +1,188 @@
+<h1>Ubuntu 16.04 - Basic SQL Relay Client</h1>
+
+<p>This how-to walks through:</p>
+
+<ul>
+  <li>Installing a basic SQL Relay client on an Ubuntu 16.04 system</li>
+  <li>Using it to access a database via an SQL Relay server, installed on another system</li>
+</ul>
+
+<p>It assumes that two systems have been set up and configured as follows:</p>
+
+<p><b>SQL Relay client</b></p>
+
+<ul>
+  <li>Ubuntu 16.04 Desktop operating system</li>
+  <li><i>apt upgrade</i> was run post-install</li>
+  <li>A user with sudo privileges has desktop access to the system</li>
+</ul>
+
+<p><b>SQL Relay server</b></p>
+
+<ul>
+  <li>Any operating system that supports SQL Relay server, accessible as:</li>
+  <ul>
+    <li>Hostname: <i>sqlrserver</i></li>
+    <li>Port: 9000</li>
+    <li>Username: <i>sqlruser</i></li>
+    <li>Password: <i>sqlrpassword</i></li>
+  </ul>
+
+</ul>
+
+<p>( See the how-to <a href="ubuntu1604-sqlrserver-oracle12c.html">Ubuntu 16.04 - SQL Relay Server + Oracle 12c</a> for information on configuring a system like this. )</p>
+
+<br/><h3>Install Prerequisite Software</h3>
+
+<p>On the SQL Relay client system, run the following command to install the prerequisite software packages:</p>
+
+<pre>sudo apt install libedit-dev libssl-dev libkrb5-dev libpcre3-dev libcurl4-openssl-dev \
+perl php-dev python3-dev ruby-dev tcl-dev openjdk-8-jdk erlang-dev nodejs-dev node-gyp \
+mono-devel unixodbc-dev
+</pre>
+
+<br/><h3>Build and Install SQL Relay Client Software</h3>
+
+<p>On the SQL Relay client system, download current .tar.gz files of SQL Relay and Rudiments from the <b>Source Distribution</b> section of <a target="_blank" href="http://sqlrelay.sourceforge.net/download.html">the SQL Relay Downloads page</a>.</p>
+
+<p>Extract, build, and install the software as follows:</p>
+
+<pre>tar xfz rudiments-*.tar.gz
+cd rudiments-*
+./configure
+make
+sudo make install
+cd ..
+tar xfz sqlrelay-*.tar.gz
+cd sqlrelay-*
+./configure --disable-server
+make
+sudo make install
+</pre>
+
+<br/><h3>Update the Environment</h3>
+
+<p>Create /etc/profile.d/firstworks.sh with the following contents:</p>
+
+<pre>export PATH=$PATH:/usr/local/firstworks/bin
+</pre>
+
+<p>Create /etc/ld.so.conf.d/firstworks.conf with the following contents:</p>
+
+<pre>/usr/local/firstworks/lib
+</pre>
+
+<p>Then run:</p>
+
+<pre>sudo /sbin/ldconfig
+</pre>
+
+<p>Exit and log back in to apply the updates to the environment.</p>
+
+<h3>Verify Connectivity to the SQL Relay Server</h3>
+
+<p>To verfiy DNS resolution of the SQL Relay server hostname, run:</p>
+
+<pre>ping -c1 sqlrserver
+</pre>
+
+<p>It should respond with output like the following:</p>
+
+<pre>PING sqlrserver.firstworks.com (192.168.123.6) 56(84) bytes of data.
+64 bytes from sqlrserver.firstworks.com (192.168.123.6): icmp_seq=1 ttl=64 time=0.259 ms
+
+--- sqlrserver.firstworks.com ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.259/0.259/0.259/0.000 ms
+</pre>
+
+<p>If not, then some typical problems and solutions include:</p>
+
+<ul>
+  <li>The hostname doesn't resolve to an IP address</li>
+  <ul>
+    <li>Add an entry in /etc/hosts with the hostname and IP address of the SQL Relay server</li>
+    <li>Update your local DNS configuration with the hostname and IP address of the SQL Relay server</li>
+  </ul>
+
+  <li>The SQL Relay server isn't running</li>
+  <ul>
+    <li>Verify that the SQL Relay server is running</li>
+  </ul>
+
+  <li>The SQL Relay server is blocked behind a firewall</li>
+  <ul>
+    <li>Open a hole in the firewall to the SQL Relay server</li>
+  </ul>
+
+</ul>
+
+<p>To verify that you can log into the SQL Relay server and run queries, run the <i>sqlrsh</i> client as follows:</p>
+
+<pre>sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
+</pre>
+
+<p>It should respond with the following output and prompt:</p>
+
+<pre>sqlrsh - Version 1.2.0
+        Connected to: sqlrserver:9000 as sqlruser
+
+        type help; for help.
+
+0>
+</pre>
+
+<p>Try a simple query, like:</p>
+
+<pre>select 'hello world' from dual;
+</pre>
+
+<p>( Note: this query is valid for an Oracle database, if the SQL Relay server is connected to a different database, then you may have to use a slightly different query )</p>
+
+<p>It should respond with output and a prompt similar to the following:</p>
+
+<pre>'HELLOWORLD'
+============
+hello world
+
+        Rows Returned   : 1
+        Fields Returned : 1
+        Elapsed Time    : 0.006065 sec
+
+0>
+</pre>
+
+<p>There shouldn't be any errors or warnings, but if there are, then some typical problems and solutions include:</p>
+
+<ul>
+  <li>"Couldn't connect to the listener." - the SQL Relay server probably isn't running</li>
+  <ul>
+    <li>Restart the SQL Relay server</li>
+  </ul>
+
+  <li>"Authentication Error." - the user or password specified on the sqlrsh command line don't match the user or password in the user tag of the sqlrelay.conf file</li>
+  <ul>
+    <li>Specify the correct user or password on the sqlrsh command line</li>
+    <li>Update the sqlrelay.conf file and restart SQL Relay</li>
+  </ul>
+
+  <li>A SQL error of some kind</li>
+  <ul>
+    <li>Try a different query</li>
+  </ul>
+
+</ul>
+
+<p>Congratulations!  If you made it to this point, the SQL Relay server is configured correctly.</p>
+
+<h3>Uninstallation</h3>
+
+<p>If, for some reason, you need to completely uninstall SQL Relay, then run the following commands from the directory that the source trees were extracted to:</p>
+
+<pre>cd sqlrelay-*
+sudo make uninstall
+cd ../rudiments-*
+sudo make uninstall
+sudo rm -rf /usr/local/firstworks
+</pre>
+
