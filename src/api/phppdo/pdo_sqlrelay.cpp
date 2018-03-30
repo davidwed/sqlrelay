@@ -672,13 +672,13 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 			#endif
 					==IS_RESOURCE) {
 				TSRMLS_FETCH();
-				php_stream_from_zval_no_verify(
-						strm,
-					#if PHP_MAJOR_VERSION >= 7
-						parameter);
-					#else
-						&param->parameter);
-					#endif
+				#if PHP_MAJOR_VERSION >= 7
+					php_stream_from_zval_no_verify(
+							strm,parameter);
+				#else
+					php_stream_from_zval_no_verify(
+							strm,&param->parameter);
+				#endif
 			}
 			if (!strm) {
 				return 0;
