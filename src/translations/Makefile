@@ -28,7 +28,7 @@ install: $(INSTALLLIB)
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)translation_normalize.$(LIBEXT) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)translation_patterns$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)translation_patterns.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
