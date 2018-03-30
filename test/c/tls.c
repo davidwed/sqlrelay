@@ -127,11 +127,11 @@ int	main(int argc, char **argv) {
 	char	query[4000+25];
 	const char	*clobbindvar;
 
-	const char	*cert="/usr/local/firstworks/etc/client.pem";
-	const char	*ca="/usr/local/firstworks/etc/ca.pem";
+	const char	*cert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem";
+	const char	*ca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem";
 	#ifdef _WIN32
-		cert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
-		ca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
+		cert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx";
+		ca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx";
 	#endif
 
 
