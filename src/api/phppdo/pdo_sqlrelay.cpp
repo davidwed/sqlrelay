@@ -622,18 +622,20 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 		case PDO_PARAM_INT:
 			#if PHP_MAJOR_VERSION >= 7
 				ZVAL_LONG(parameter,
+					sqlrcur->getOutputBindInteger(name));
 			#else
 				ZVAL_LONG(param->parameter,
-			#endif
 					sqlrcur->getOutputBindInteger(name));
+			#endif
 			return 1;
 		case PDO_PARAM_BOOL:
 			#if PHP_MAJOR_VERSION >= 7
 				ZVAL_BOOL(parameter,
+					sqlrcur->getOutputBindInteger(name));
 			#else
 				ZVAL_BOOL(param->parameter,
-			#endif
 					sqlrcur->getOutputBindInteger(name));
+			#endif
 			return 1;
 		case PDO_PARAM_STR:
 			strvalue=(char *)sqlrcur->getOutputBindString(name);
