@@ -101,7 +101,9 @@ distclean: clean
 		test/testall.sh \
 		test/testall.vbs \
 		test/test.sh \
-		test/test.bat
+		test/test.bat \
+		msvc/setupx64/setupx64.vdproj \
+		msvc/setupx86/setupx86.vdproj
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \
