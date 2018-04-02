@@ -591,9 +591,10 @@ endif
 
 
 # util
-STATICUTILPLUGINSRCS = sqlrconfigdeclarations.cpp \
-			sqlrconfigassignments.cpp
+STATICUTILPLUGINSRCS = 
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
+STATICUTILPLUGINSRCS += sqlrconfigdeclarations.cpp \
+			sqlrconfigassignments.cpp
 STATICUTILPLUGINLOBJS = $(shell ls ../configs/*.$(OBJ))
 endif
 UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
@@ -612,7 +613,9 @@ ENABLE_UTIL = @ENABLE_UTIL@
 
 # server
 ENABLE_SERVER = @ENABLE_SERVER@
-STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
+STATICPLUGINSRCS =
+ifeq ($(SQLRELAY_ENABLE_SHARED),no)
+STATICPLUGINSRCS += sqlrserverconnectiondeclarations.cpp \
 		sqlrserverconnectionassignments.cpp \
 		sqlrprotocoldeclarations.cpp \
 		sqlrprotocolassignments.cpp \
@@ -634,7 +637,6 @@ STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrfilterassignments.cpp \
 		sqlrquerydeclarations.cpp \
 		sqlrqueryassignments.cpp
-ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../protocols/*.$(OBJ)) \
 		$(shell ls ../parsers/*.$(OBJ)) \
