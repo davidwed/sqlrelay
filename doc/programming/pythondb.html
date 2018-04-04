@@ -642,7 +642,11 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">)</font> as
+begin
+        out1<font color="#990000">=</font>in1<font color="#990000">;</font>
+        suspend<font color="#990000">;</font>
+end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>

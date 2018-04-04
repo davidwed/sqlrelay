@@ -33,7 +33,7 @@ use the SQLRClient namespace.
 
 {{{#!blockquote
 {{{#!code
-using SQLRClient;
+@parts/cs-using.cs@
 }}}
 }}}
 
@@ -97,21 +97,7 @@ use.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-
-			... execute some queries ...
-		}
-	}
-}
+@parts/cs-session.cs@
 }}}
 }}}
 
@@ -134,36 +120,7 @@ query.  The same cursor may be used over and over.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.sendQuery("select * from my_table");
-
-			cur.sendQuery("select * from my_table");
-
-        		... do some stuff that takes a short time ...
-
-        		cur.sendFileQuery("/usr/local/myprogram/sql","myquery.sql");
-        		con.endSession();
-
-        		... do some stuff that takes a long time ...
-
-        		cur.sendQuery("select * from my_other_table");
-        		con.endSession();
-
-        		... process the result set ...
-		}
-	}
-}
+@parts/cs-execute.cs@
 }}}
 }}}
 
@@ -230,26 +187,7 @@ You can find out why by calling errorMessage().
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-
-        		if (cur.sendQuery("select * from my_nonexistant_table") != true)
-			{
-                		Console.WriteLine(cur.errorMessage());
-        		}
-		}
-	}
-}
+@parts/cs-errors.cs@
 }}}
 }}}
 
@@ -274,29 +212,7 @@ scale.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-        		cur.prepareQuery("select * from mytable $(whereclause)")
-        		cur.substitution("whereclause", "where stringcol=:stringval and integercol&gt;:integerval and floatcol&gt;floatval");
-        		cur.inputBind("stringval", "true");
-        		cur.inputBind("integerval", 10);
-        		cur.inputBind("floatval", 1.1, 2, 1);
-        		cur.executeQuery();
-
-        		... process the result set ...
-		}
-	}
-}
+@parts/cs-bind.cs@
 }}}
 }}}
 
@@ -309,37 +225,7 @@ provides methods for defining and retrieving output bind variables.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.prepareQuery("begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;");
-        		cur.inputBind("integer1", 10);
-        		cur.inputBind("integer2", 20);
-        		cur.inputBind("float1", 1.1, 2, 1);
-        		cur.inputBind("float2", 2.2, 2, 1);
-        		cur.inputBind("integer3", 30);
-        		cur.defineOutputBindInteger("result1");
-        		cur.defineOutputBindDouble("result2");
-        		cur.defineOutputBindString("result3", 100);
-        		cur.executeQuery();
-        		Int64 result1=cur.getOutputBindInteger("result1");
-        		Double result2=cur.getOutputBindDouble("result2");
-        		String result3=cur.getOutputBindString("result3");
-        		con.endSession();
-
-        		... do something with the result ...
-		}
-	}
-}
+@parts/cs-bind-out.cs@
 }}}
 }}}
 
@@ -353,37 +239,7 @@ inputBindClob() methods.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-        		cur.executeQuery("create table images (image blob, description clob)");
-
-        		Byte imagedata[40000];
-        		UInt64 imagelength;
-
-        		... read an image from a file into imagedata and the length of the file into imagelength ...
-
-        		String description;
-        		UInt64 desclength;
-
-        		... read a description from a file into description and the length of the file into desclength ...
-
-        		cur.prepareQuery("insert into images values (:image,:desc)");
-        		cur.inputBindBlob("image", imagedata, imagelength);
-        		cur.inputBindClob("desc", description, desclength);
-        		cur.executeQuery();
-		}
-	}
-}
+@parts/cs-bind-lob.cs@
 }}}
 }}}
 
@@ -393,35 +249,7 @@ defineOutputBindClob()/getOutputBindClob().
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.prepareQuery("begin  select image into :image from images;  select description into :desc from images;  end;");
-        		cur.defineOutputBindBlob("image");
-        		cur.defineOutputBindClob("desc");
-        		cur.executeQuery();
-
-        		String image = cur.getOutputBindBlob("image");
-        		UInt32 imagelength = cur.getOutputBindLength("image");
-
-        		String desc = cur.getOutputBindClob("desc");
-        		UInt32 desclength = cur.getOutputBindLength("desc");
-
-        		con.endSession();
-
-        		... do something with image and desc ...
-		}
-	}
-}
+@parts/cs-bind-lob-out.cs@
 }}}
 }}}
 
@@ -445,38 +273,7 @@ supports this paradigm, you can reap a substantial performance improvement.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.prepareQuery("select * from mytable where mycolumn&gt;:value");
-			cur.inputBind("value", 1);
-			cur.executeQuery();
-
-			... process the result set ...
-
-			cur.clearBinds();
-			cur.inputBind("value", 5);
-			cur.executeQuery();
-
-			... process the result set ...
-
-			cur.clearBinds();
-			cur.inputBind("value", 10);
-			cur.executeQuery();
-
-			... process the result set ...
-		}
-	}
-}
+@parts/cs-reexecute.cs@
 }}}
 }}}
 
@@ -488,33 +285,7 @@ result sets.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.sendQuery("select * from my_table");
-        		con.endSession();
-
-        		for (UInt64 row=0; row&lt;cur.rowCount(); row++)
-			{
-                		for (UInt32 col=0; col&lt;cur.colCount(); col++)
-				{
-                        		Console.Write(cur.getField(row, col));
-					Console.Write(",");
-                		}
-                		Console.Write("\n");
-        		}
-		}
-	}
-}
+@parts/cs-fields.cs@
 }}}
 }}}
 
@@ -526,34 +297,7 @@ fields in the row.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.sendQuery("select * from my_table");
-        		con.endSession();
-
-        		for (UInt64 row=0; row&lt;cur.rowCount(); row++)
-			{
-                		String[] rowarray=cur.getRow(row);
-                		for (UInt32 col=0; col&lt;cur.colCount(); col++)
-				{
-                        		Console.Write(rowarray[col]);
-					Console.Write(",");
-                		}
-				Console.Write("\n");
-        		}
-		}
-	}
-}
+@parts/cs-fields-row.cs@
 }}}
 }}}
 
@@ -599,58 +343,7 @@ index of the first row of the currently buffered chunk.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.setResultSetBufferSize(5);
-
-        		cur.sendQuery("select * from my_table");
-
-        		Boolean done = false;
-        		UInt64 row = 0;
-        		String field;
-        		while (!done)
-			{
-                		for (UInt32 col=0; col&lt;cur.colCount(); col++)
-				{
-                        		field = cur.getField(row, col);
-                        		if (field != null)
-					{
-						Console.Write(field);
-						Console.Write(",");
-                        		}
-					else
-					{
-                                		done = true;
-                        		}
-                		}
-                		Console.Write("\n");
-                		row++;
-        		}
-
-        		cur.sendQuery("select * from my_other_table");
-
-        		... process this query's result set in chunks also ...
-
-        		cur.setResultSetBufferSize(0);
-
-        		cur.sendQuery("select * from my_third_table");
-
-        		... process this query's result set all at once ...
-
-        		con.endSession();
-		}
-	}
-}
+@parts/cs-rsbuffersize.cs@
 }}}
 }}}
 
@@ -666,34 +359,7 @@ For example:
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cursor1 = new SQLRCursor(con);
-			SQLRCursor cursor2 = new SQLRCursor(con);
-
-        		cursor1.setResultSetBufferSize(10);
-        		cursor1.sendQuery("select * from my_huge_table");
-
-        		UInt64 index = 0;
-        		while (!cursor1.endOfResultSet())
-			{
-                		cursor2.prepareQuery("insert into my_other_table values (:1,:2,:3)");
-                		cursor2.inputBind("1", cursor1.getField(index, 1));
-                		cursor2.inputBind("2", cursor1.getField(index, 2));
-                		cursor2.inputBind("3", cursor1.getField(index, 3));
-                		cursor2.executeQuery();
-        		}
-		}
-	}
-}
+@parts/cs-cursors.cs@
 }}}
 }}}
 
@@ -706,12 +372,7 @@ getOutputBindCursor() and fetchFromOutputBindCursor().
 PL/SQL Procedure:
 {{{#!blockquote
 {{{#!code
-FUNCTION sp_mytable RETURN types.cursorType
-l_cursor types.cursorType;
-BEGIN
-        OPEN l_cursor FOR SELECT * FROM mytable;
-        RETURN l_cursor;
-END;
+@parts/oracle-create-spmytable.sql@
 }}}
 }}}
 
@@ -720,38 +381,7 @@ END;
 Program code:
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.prepareQuery("begin  :curs:=sp_mytable; end;");
-        		cur.defineOutputBindCursor("curs");
-        		cur.executeQuery();
-
-        		SQLRCursor bindcur = cur.getOutputBindCursor("curs");
-        		bindcur.fetchFromBindCursor();
-
-        		// print fields from table
-        		for (int i=0; i&lt;bindcur.rowCount(); i++)
-			{
-                		for (int j=0; j&lt;bindcur.colCount(); j++)
-				{
-                        		Console.Write(bindcur.getField(i, j));
-					Console.Write(", ");
-                		}
-                		Console.Write("\n");
-        		}
-		}
-	}
-}
+@parts/cs-bind-cursor.cs@
 }}}
 }}}
 
@@ -773,56 +403,7 @@ always returned as false.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-        		cur.sendQuery("select * from my_table");
-        		con.endSession();
-
-        		for (UInt32 i=0; i&lt;cur.colCount(); i++)
-			{
-                		Console.Write("Name:          ");
-				Console.WriteLine(cur.getColumnName(i));
-                		Console.Write("Type:          ");
-				Console.WriteLine(cur.getColumnType(i));
-                		Console.Write("Length:        ");
-				Console.WriteLine(cur.getColumnLength(i));
-                		Console.Write("Precision:     ");
-				Console.WriteLine(cur.getColumnPrecision(i));
-                		Console.Write("Scale:         ");
-				Console.WriteLine(cur.getColumnScale(i));
-                		Console.Write("Longest Field: ");
-				Console.WriteLine(cur.getLongest(i));
-                		Console.Write("Nullable:      ");
-				Console.WriteLine(cur.getColumnIsNullable(i));
-                		Console.Write("Primary Key:   ");
-				Console.WriteLine(cur.getColumnIsPrimaryKey(i));
-                		Console.Write("Unique:        ");
-				Console.WriteLine(cur.getColumnIsUnique(i));
-                		Console.Write("Part of Key:   ");
-				Console.WriteLine(cur.getColumnIsPartOfKey(i));
-                		Console.Write("Unsigned:      ");
-				Console.WriteLine(cur.getColumnIsUnsigned(i));
-                		Console.Write("Zero Filled:   ");
-				Console.WriteLine(cur.getColumnIsZeroFilled(i));
-                		Console.Write("Binary:        ");
-				Console.WriteLine(cur.getColumnIsBinary(i));
-                		Console.Write("Auto Increment:");
-				Console.WriteLine(cur.getColumnIsAutoIncrement(i));
-                		Console.Write("\n");
-        		}
-		}
-	}
-}
+@parts/cs-columninfo.cs@
 }}}
 }}}
 
@@ -836,56 +417,7 @@ database.
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			// column names will be forced to upper case
-        		cur.upperCaseColumnNames();
-        		cur.sendQuery("select * from my_table");
-        		con.endSession();
-
-        		for (UInt32 i=0; i&lt;cur.colCount(); i++)
-			{
-                		Console.Write("Name:          ");
-				Console.WriteLine(getColumnName(i));
-                		Console.Write("\n");
-        		}
-
-        		// column names will be forced to lower case
-        		cur.lowerCaseColumnNames();
-        		cur.sendQuery("select * from my_table");
-        		con.endSession();
-
-        		for (UInt32 i=0; i&lt;cur.colCount(); i++)
-			{
-                		Console.Write("Name:          ");
-				Console.WriteLine(cur.getColumnName(i));
-                		Console.Write("\n");
-        		}
-
-        		// column names will be the same as they are in the database
-        		cur.mixedCaseColumnNames();
-        		cur.sendQuery("select * from my_table");
-        		con.endSession();
-
-        		for (UInt32 i=0; i&lt;cur.colCount(); i++)
-			{
-                		Console.Write("Name:          ");
-				Console.WriteLine(cur.getColumnName(i));
-                		Console.Write("\n");
-        		}
-		}
-	}
-}
+@parts/cs-columncase.cs@
 }}}
 }}}
 
@@ -924,10 +456,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in1 in number, in2 in number, in3 in varchar2) is
-begin
-        insert into mytable values (in1,in2,in3);
-end;
+@parts/oracle-create-testproc.sql@
 }}}
 }}}
 
@@ -936,11 +465,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("begin exampleproc(:in1,:in2,:in3); end;");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
-cur.executeQuery();
+@parts/cs-oracle-testproc.cs@
 }}}
 }}}
 
@@ -948,7 +473,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/oracle-drop-testproc.sql@
 }}}
 }}}
 
@@ -959,8 +484,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc @in1 int, @in2 float, @in3 varchar(20) as
-        insert into mytable values (@in1,@in2,@in3)
+@parts/sybase-create-testproc.sql@
 }}}
 }}}
 
@@ -969,11 +493,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("exec exampleproc");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
-cur.executeQuery();
+@parts/cs-sybase-testproc.cs@
 }}}
 }}}
 
@@ -981,7 +501,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/sybase-drop-testproc.sql@
 }}}
 }}}
 
@@ -991,11 +511,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in1 integer, in2 float, in3 varchar(20)) as
-begin
-        insert into mytable values (in1,in2,in3);
-        suspend;
-end;
+@parts/firebird-create-testproc.sql@
 }}}
 }}}
 
@@ -1004,11 +520,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("execute procedure exampleproc ?, ?, ?");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.executeQuery();
+@parts/cs-firebird-testproc.cs@
 }}}
 }}}
 
@@ -1016,7 +528,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/firebird-drop-testproc.sql@
 }}}
 }}}
 
@@ -1026,10 +538,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in in1 int, in in2 double, in in3 varchar(20)) language sql
-begin
-        insert into mytable values (in1,in2,in3);
-end;
+@parts/db2-create-testproc.sql@
 }}}
 }}}
 
@@ -1038,11 +547,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("call exampleproc(?,?,?)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.executeQuery();
+@parts/cs-db2-testproc.cs@
 }}}
 }}}
 
@@ -1050,7 +555,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/db2-drop-testproc.sql@
 }}}
 }}}
 
@@ -1060,11 +565,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create function examplefunc(int,float,varchar(20)) returns void as '
-begin
-        insert into mytable values ($1,$2,$3);
-        return;
-end;' language plpgsql
+@parts/postgresql-create-testproc.sql@
 }}}
 }}}
 
@@ -1073,11 +574,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("select examplefunc($1,$2,$3)");
-cur.inputBind("$1", 1);
-cur.inputBind("$2", 1.1, 2, 1);
-cur.inputBind("$3", "hello");
-cur.executeQuery();
+@parts/cs-postgresql-testproc.cs@
 }}}
 }}}
 
@@ -1085,7 +582,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop function examplefunc(int,float,varchar(20))
+@parts/postgresql-drop-testproc.sql@
 }}}
 }}}
 
@@ -1095,10 +592,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in in1 int, in in2 float, in in3 varchar(20))
-begin
-        insert into mytable values (in1,in2,in3);
-end;
+@parts/mysql-create-testproc.sql@
 }}}
 }}}
 
@@ -1107,11 +601,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("call exampleproc(?,?,?)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.executeQuery();
+@parts/cs-mysql-testproc.cs@
 }}}
 }}}
 
@@ -1121,7 +611,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/mysql-drop-testproc.sql@
 }}}
 }}}
 
@@ -1145,10 +635,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create function exampleproc(in1 in number, in2 in number, in3 in varchar2) returns number is
-begin
-        return in1;
-end;
+@parts/oracle-create-testproc-1value.sql@
 }}}
 }}}
 
@@ -1157,12 +644,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("select exampleproc(:in1,:in2,:in3) from dual");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
-cur.executeQuery();
-String result=cur.getField(0, 0);
+@parts/cs-oracle-testproc-1value.cs@
 }}}
 }}}
 
@@ -1170,7 +652,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop function exampleproc
+@parts/oracle-drop-testproc.sql@
 }}}
 }}}
 
@@ -1181,10 +663,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in1 in number, in2 in number, in3 in varchar2, out1 out number) as
-begin
-        out1:=in1;
-end;
+@parts/oracle-create-testproc-1value-output-param.sql@
 }}}
 }}}
 
@@ -1193,13 +672,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("begin exampleproc(:in1,:in2,:in3,:out1); end;");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
-cur.defineOutputBindInteger("out1");
-cur.executeQuery();
-Int64 result=cur.getOutputBindInteger("out1");
+@parts/cs-oracle-testproc-1value-output-param.cs@
 }}}
 }}}
 
@@ -1207,7 +680,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/oracle-drop-testproc.sql@
 }}}
 }}}
 
@@ -1222,8 +695,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc @in1 int, @in2 float, @in3 varchar(20), @out1 int output as
-        select @out1=@in1
+@parts/sybase-create-testproc-1value.sql@
 }}}
 }}}
 
@@ -1232,13 +704,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("exec exampleproc");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
-cur.defineOutputBindInteger("out1");
-cur.executeQuery();
-Int64 result=cur.getOutputBindInteger("out1");
+@parts/cs-sybase-testproc-1value.cs@
 }}}
 }}}
 
@@ -1246,7 +712,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/sybase-drop-testproc.sql@
 }}}
 }}}
 
@@ -1257,11 +723,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in1 integer, in2 float, in3 varchar(20)) returns (out1 integer) as
-begin
-        out1=in1;
-        suspend;
-end;
+@parts/firebird-create-testproc-1value.sql@
 }}}
 }}}
 
@@ -1270,12 +732,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("select * from exampleproc(?,?,?)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.executeQuery();
-String result=cur.getField(0, 0);
+@parts/cs-firebird-testproc-1value.cs@
 }}}
 }}}
 
@@ -1287,13 +744,7 @@ variables.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("execute procedure exampleproc ?, ?, ?");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.defineOutputBindInteger("1");
-cur.executeQuery();
-Int64 result=cur.getOutputBindInteger("1");
+@parts/cs-firebird-testproc-1value-output-param.cs@
 }}}
 }}}
 
@@ -1301,7 +752,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/firebird-drop-testproc.sql@
 }}}
 }}}
 
@@ -1315,10 +766,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in in1 int, in in2 double, in in3 varchar(20), out out1 int) language sql
-begin
-        set out1 = in1;
-end
+@parts/db2-create-testproc-1value.sql@
 }}}
 }}}
 
@@ -1327,13 +775,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("call exampleproc(?,?,?,?)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.defineOutputBindInteger("4");
-cur.executeQuery();
-Int64 result=cur.getOutputBindInteger("4");
+@parts/cs-db2-testproc-1value.cs@
 }}}
 }}}
 
@@ -1341,7 +783,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/db2-drop-testproc.sql@
 }}}
 }}}
 
@@ -1352,16 +794,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create function examplefunc(int,float,char(20)) returns int as '
-declare
-        in1 int;
-        in2 float;
-        in3 char(20);
-begin
-        in1:=$1;
-        return;
-end;
-' language plpgsql
+@parts/postgresql-create-testproc-1value.sql@
 }}}
 }}}
 
@@ -1370,12 +803,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("select * from examplefunc($1,$2,$3)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 4, 2);
-cur.inputBind("3", "hello");
-cur.executeQuery();
-String result=cur.getField(0,0);
+@parts/cs-postgresql-testproc-1value.cs@
 }}}
 }}}
 
@@ -1383,7 +811,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop function examplefunc(int,float,char(20))
+@parts/postgresql-drop-testproc-1value.sql@
 }}}
 }}}
 
@@ -1395,7 +823,7 @@ To create the function, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create function examplefunc(in1 int, in2 float, in3 varchar(20)) returns int return in1;
+@parts/mysql-create-testproc-1value.sql@
 }}}
 }}}
 
@@ -1404,12 +832,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("select examplefunc(?,?,?)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 4, 2);
-cur.inputBind("3", "hello");
-cur.executeQuery();
-String result=cur.getField(0, 0);
+@parts/cs-mysql-testproc-1value.cs@
 }}}
 }}}
 
@@ -1419,7 +842,7 @@ To drop the function, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop function examplefunc
+@parts/mysql-drop-testproc.sql@
 }}}
 }}}
 
@@ -1429,7 +852,7 @@ To create the procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc() begin select 1; end;
+@parts/mysql-create-testproc-1value-result-set.sql@
 }}}
 }}}
 
@@ -1438,8 +861,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.sendQuery("select exampleproc()");
-String result=cur.getFieldByIndex(0, 0);
+@parts/cs-mysql-testproc-1value-result-set.cs@
 }}}
 }}}
 
@@ -1447,7 +869,7 @@ To drop the procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/mysql-drop-testproc.sql@
 }}}
 }}}
 
@@ -1458,7 +880,7 @@ To create the procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(out out1 int) begin select 1 into out1; end;
+@parts/mysql-create-testproc-1value-output-param.sql@
 }}}
 }}}
 
@@ -1467,10 +889,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.sendQuery("set @out1=0");
-cur.sendQuery("call exampleproc(@out1)");
-cur.sendQuery("select @out1");
-String result=cur.getFieldByIndex(0, 0);
+@parts/cs-mysql-testproc-1value-output-param.cs@
 }}}
 }}}
 
@@ -1478,7 +897,7 @@ To drop the procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/mysql-drop-testproc.sql@
 }}}
 }}}
 
@@ -1501,12 +920,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in1 in number, in2 in number, in3 in varchar2, out1 out number, out2 out number, out3 out varchar2) is
-begin
-        out1:=in1;
-        out2:=in2;
-        out3:=in3;
-end;
+@parts/oracle-create-testproc-values.sql@
 }}}
 }}}
 
@@ -1515,17 +929,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("begin exampleproc(:in1,:in2,:in3,:out1,:out2,:out3); end;");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
-cur.defineOutputBindInteger("out1");
-cur.defineOutputBindDouble("out2");
-cur.defineOutputBindString("out3", 20);
-cur.executeQuery();
-Int64 out1=cur.getOutputBindInteger("out1");
-Int64 out2=cur.getOutputBindDouble("out2");
-String out3=cur.getOutputBindString("out3");
+@parts/cs-oracle-testproc-values.cs@
 }}}
 }}}
 
@@ -1533,7 +937,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/oracle-drop-testproc.sql@
 }}}
 }}}
 
@@ -1544,10 +948,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc @in1 int, @in2 float, @in3 varchar(20), @out1 int output, @out2 int output, @out3 int output as
-        select @out1=@in1,
-                @out2=@in2,
-                @out3=@in3
+@parts/sybase-create-testproc-values.sql@
 }}}
 }}}
 
@@ -1556,17 +957,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("exec exampleproc");
-cur.inputBind("in1", 1);
-cur.inputBind("in2", 1.1, 2, 1);
-cur.inputBind("in3", "hello");
-cur.defineOutputBindInteger("out1");
-cur.defineOutputBindDouble("out2");
-cur.defineOutputBindString("out3", 20);
-cur.executeQuery();
-Int64 out1=cur.getOutputBindInteger("out1");
-Double out2=cur.getOutputBindDouble("out2");
-String out3=cur.getOutputBindString("out3");
+@parts/cs-sybase-testproc-values.cs@
 }}}
 }}}
 
@@ -1574,7 +965,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/sybase-drop-testproc.sql@
 }}}
 }}}
 
@@ -1585,13 +976,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in1 integer, in2 float, in3 varchar(20)) returns (out1 integer, out2 float, out3 varchar(20)) as
-begin
-        out1=in1;
-        out2=in2;
-        out3=in3;
-        suspend;
-end;
+@parts/firebird-create-testproc-values.sql@
 }}}
 }}}
 
@@ -1600,14 +985,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("select * from exampleproc(?,?,?)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.executeQuery();
-String out1=cur.getField(0, 0);
-String out2=cur.getField(0, 1);
-String out3=cur.getField(0, 2);
+@parts/cs-firebird-testproc-values.cs@
 }}}
 }}}
 
@@ -1619,17 +997,7 @@ bind variables.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("execute procedure exampleproc ?, ?, ?");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.defineOutputBindInteger("1");
-cur.defineOutputBindDouble("2");
-cur.defineOutputBindString("3", 20);
-cur.executeQuery();
-Int64 out1=cur.getOutputBindInteger("1");
-Double out2=cur.getOutputBindDouble("2");
-String out3=cur.getOutputBindString("3");
+@parts/cs-firebird-testproc-values-output-params.cs@
 }}}
 }}}
 
@@ -1637,7 +1005,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/firebird-drop-testproc.sql@
 }}}
 }}}
 
@@ -1648,12 +1016,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in in1 int, in in2 double, in in3 varchar(20), out out1 int, out out2 double, out out3 varchar(20)) language sql
-begin
-        set out1 = in1;
-        set out2 = in2;
-        set out3 = in3;
-end
+@parts/db2-create-testproc-values.sql@
 }}}
 }}}
 
@@ -1662,17 +1025,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("call exampleproc(?,?,?,?,?,?)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 2, 1);
-cur.inputBind("3", "hello");
-cur.defineOutputBindInteger("4");
-cur.defineOutputBindDouble("5");
-cur.defineOutputBindString("6", 25);
-cur.executeQuery();
-Int64 out1=cur.getOutputBindInteger("4");
-Double out2=cur.getOutputBindDouble("5");
-String out3=cur.getOutputBindString("6");
+@parts/cs-db2-testproc-values.cs@
 }}}
 }}}
 
@@ -1680,7 +1033,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/db2-drop-testproc.sql@
 }}}
 }}}
 
@@ -1691,14 +1044,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create function examplefunc(int,float,char(20)) returns record as '
-declare
-        output record;
-begin
-        select $1,$2,$3 into output;
-        return output;
-end;
-' language plpgsql
+@parts/postgresql-create-testproc-values.sql@
 }}}
 }}}
 
@@ -1707,14 +1053,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("select * from examplefunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 4, 2);
-cur.inputBind("3", "hello");
-cur.executeQuery();
-String out1=cur.getField(0, 0);
-String out2=cur.getField(0, 1);
-String out3=cur.getField(0, 2);
+@parts/cs-postgresql-create-testproc-values.cs@
 }}}
 }}}
 
@@ -1722,7 +1061,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop function examplefunc(int,float,char(20))
+@parts/postgresql-drop-testproc-values.sql@
 }}}
 }}}
 
@@ -1735,10 +1074,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(in in1 int, in in2 float, in in3 varchar(20))
-begin
-	select in1, in2, in3;
-end;
+@parts/mysql-create-testproc-values.sql@
 }}}
 }}}
 
@@ -1747,14 +1083,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("call exampleproc(?,?,?)");
-cur.inputBind("1", 1);
-cur.inputBind("2", 1.1, 4, 2);
-cur.inputBind("3", "hello");
-cur.executeQuery();
-String out1=cur.getField(0, 0);
-String out2=cur.getField(0, 1);
-String out3=cur.getField(0, 2);
+@parts/cs-mysql-testproc-values.cs@
 }}}
 }}}
 
@@ -1764,7 +1093,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/mysql-drop-testproc.sql@
 }}}
 }}}
 
@@ -1775,7 +1104,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc(out out1 int, out out2 float, out out3 varchar(20)) begin select 1,1.1,'hello' into out1, out2, out3; end;
+@parts/mysql-create-testproc-values-output-params.sql@
 }}}
 }}}
 
@@ -1784,6 +1113,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
+@parts/cs-mysql-testproc-values-output-params.cs@
 cur.sendQuery("set @out1=0, @out2=0.0, @out3=''");
 cur.sendQuery("call exampleproc(@out1,@out3,@out3)");
 cur.sendQuery("select @out1,@out2,@out3");
@@ -1797,7 +1127,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/mysql-drop-testproc.sql@
 }}}
 }}}
 
@@ -1815,16 +1145,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create or replace package types as
-        type cursorType is ref cursor;
-end;
-
-create function exampleproc return types.cursortype is
-        l_cursor    types.cursorType;
-begin
-        open l_cursor for select * from mytable;
-        return l_cursor;
-end;
+@parts/oracle-create-testproc-result-set.sql@
 }}}
 }}}
 
@@ -1833,18 +1154,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.prepareQuery("begin  :curs:=exampleproc; end;");
-cur.defineOutputBindCursor("curs");
-cur.executeQuery();
-SQLRCursor bindcur=cur.getOutputBindCursor("curs");
-bindcur.fetchFromBindCursor();
-String field00=bindcur.getField(0, 0);
-String field01=bindcur.getField(0, 1);
-String field02=bindcur.getField(0, 2);
-String field10=bindcur.getField(1, 0);
-String field11=bindcur.getField(1, 1);
-String field12=bindcur.getField(1, 2);
-...
+@parts/cs-oracle-testproc-result-set.cs@
 }}}
 }}}
 
@@ -1852,8 +1162,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop function exampleproc
-drop package types
+@parts/oracle-drop-testproc-result-set.sql@
 }}}
 }}}
 
@@ -1864,7 +1173,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc as select * from exampletable
+@parts/sybase-create-testproc-result-set.sql@
 }}}
 }}}
 
@@ -1873,14 +1182,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.sendQuery("exec exampleproc");
-String field00=cur.getFieldByIndex(0, 0);
-String field01=cur.getFieldByIndex(0, 1);
-String field02=cur.getFieldByIndex(0, 2);
-String field10=cur.getFieldByIndex(1, 0);
-String field11=cur.getFieldByIndex(1, 1);
-String field12=cur.getFieldByIndex(1, 2);
-...
+@parts/cs-sybase-testproc-result-set.cs@
 }}}
 }}}
 
@@ -1888,7 +1190,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/sybase-drop-testproc.sql@
 }}}
 }}}
 
@@ -1912,15 +1214,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-create function examplefunc() returns setof record as '
-        declare output record;
-begin
-        for output in select * from mytable loop
-                return next output;
-        end loop;
-        return;
-end;
-' language plpgsql
+@parts/postgresql-create-testproc-result-set.sql@
 }}}
 }}}
 
@@ -1929,14 +1223,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.sendQuery("select * from examplefunc() as (exampleint int, examplefloat float, examplechar char(40))");
-String field00=cur.getField(0, 0);
-String field01=cur.getField(0, 1);
-String field02=cur.getField(0, 2);
-String field10=cur.getField(1, 0);
-String field11=cur.getField(1, 1);
-String field12=cur.getField(1, 2);
-...
+@parts/cs-postgresql-testproc-result-set.cs@
 }}}
 }}}
 
@@ -1944,7 +1231,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop function examplefunc
+@parts/postgresql-drop-testproc.sql@
 }}}
 }}}
 
@@ -1960,7 +1247,7 @@ the following.
 
 {{{#!blockquote
 {{{#!code
-create procedure exampleproc() begin select * from mytable; end;
+@parts/mysql-create-testproc-result-set.sql@
 }}}
 }}}
 
@@ -1969,14 +1256,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-cur.sendQuery("call exampleproc()");
-String field00=cur.getField(0, 0);
-String field01=cur.getField(0, 1);
-String field02=cur.getField(0, 2);
-String field10=cur.getField(1, 0);
-String field11=cur.getField(1, 1);
-String field12=cur.getField(1, 2);
-...
+@parts/cs-mysql-testproc-result-set.cs@
 }}}
 }}}
 
@@ -1986,7 +1266,7 @@ To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-drop procedure exampleproc
+@parts/mysql-drop-testproc.sql@
 }}}
 }}}
 
@@ -2006,31 +1286,7 @@ First page:
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			... generate a unique filename ...
-
-        		cur.cacheToFile(filename);
-        		cur.setCacheTtl(600);
-        		cur.sendQuery("select * from my_table");
-        		con.endSession();
-        		cur.cacheOff();
-
-        		... pass the filename to the next page ...
-
-		}
-	}
-}
+@parts/cs-caching-firstpage.cs@
 }}}
 }}}
 
@@ -2038,40 +1294,83 @@ Second page:
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			... get the filename from the previous page ...
-
-        		... get the page to display from the previous page ...
-
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-        		cur.openCachedResultSet(filename);
-        		con.endSession();
-
-        		for (UInt64 row=pagetodisplay*20; row&lt;(pagetodisplay+1)*20; row++)
-			{
-                		for (UInt32 col=0; col&lt;cur.colCount(); col++)
-				{
-                        		Console.Write(cur.getField(row,col));
-					Console.Write(",");
-                		}
-				Console.Write("\n");
-        		}
-		}
-	}
-}
+@parts/cs-caching-secondpage.cs@
 }}}
 }}}
 
+For result-set caching to be effective, the sqlr-cachemanager process must be enabled and running on the client system.  The sqlr-cachemanager scans the cache periodically and deletes cached result sets whos ttl's have expired.  If it is not running, stale result sets persist beyond their intended ttl's.
+
+To enable the sqlr-cachemanager at boot on systemd platforms:
+
+{{{#!blockquote
+{{{#!code
+systemctl enable sqlrcachemanager.service
+}}}
+}}}
+
+To start the sqlr-cachemanager on systemd platforms:
+
+{{{#!blockquote
+{{{#!code
+systemctl start sqlrcachemanager.service
+}}}
+}}}
+
+To enable the sqlr-cachemanager at boot on most non-systemd platforms, you must create a symlink into the /etc/rc2.d or /etc/rc3.d directory.  Eg:
+
+{{{#!blockquote
+{{{#!code
+cd /etc/rc2.d
+ln -s ../init.d/sqlrcachemanager S15sqlrcachemanager
+}}}
+
+or
+
+{{{#!code
+cd /etc/rc3.d
+ln -s ../init.d/sqlrcachemanager S15sqlrcachemanager
+}}}
+}}}
+
+To start the sqlr-cachemanager on most non-systemd platforms:
+
+{{{#!blockquote
+{{{#!code
+/etc/init.d/sqlrcachemanager start
+}}}
+}}}
+
+To enable the sqlr-cachemanager at boot on !FreeBSD platforms, edit /etc/rc.conf and add a line like:
+
+{{{#!blockquote
+{{{#!code
+sqlrcachemanager_enable=YES
+}}}
+}}}
+
+To enable the sqlr-cachemanager at boot on !NetBSD platforms, edit /etc/rc.conf and add a line like:
+
+{{{#!blockquote
+{{{#!code
+sqlrcachemanager=YES
+}}}
+}}}
+
+To enable the sqlr-cachemanager at boot on !OpenBSD platforms, edit /etc/rc.conf and add a line like:
+
+{{{#!blockquote
+{{{#!code
+sqlrcachemanager_flags=YES
+}}}
+}}}
+
+To start the sqlr-cachemanager on BSD platforms:
+
+{{{#!blockquote
+{{{#!code
+/etc/init.d/sqlrcachemanager start
+}}}
+}}}
 
 [=#suspending]
 == Suspending and Resuming Sessions ==
@@ -2084,29 +1383,7 @@ First page:
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			cur.sendQuery("insert into my_table values (1,2,3)");
-        		cur.suspendResultSet();
-        		con.suspendSession();
-        		UInt16 rs = cur.getResultSetId();
-        		UInt16 port = cur.getConnectionPort();
-        		String socket = cur.getConnectionSocket();
-
-        		... pass the rs, port and socket to the next page ...
-		}
-	}
-}
+@parts/cs-suspend.cs@
 }}}
 }}}
 
@@ -2114,27 +1391,7 @@ Second page:
 
 {{{#!blockquote
 {{{#!code
-using System;
-using SQLRClient;
-
-namespace SQLRExamples
-{
-	class SQLRExample
-	{
-		public static void Main()
-		{
-			... get rs, port and socket from previous page ...
-
-			SQLRConnection con = new SQLRConnection("sqlrserver", 9000, "/tmp/example.socket", "user", "password", 0, 1);
-			SQLRCursor cur = new SQLRCursor(con);
-
-			con.resumeSession(port, socket);
-        		cur.resumeResultSet(rs);
-        		cur.sendQuery("commit");
-        		con.endSession();
-		}
-	}
-}
+@parts/cs-resume.cs@
 }}}
 }}}
 

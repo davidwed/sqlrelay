@@ -42,7 +42,8 @@ use the SQLRClient namespace.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font></tt></pre>
+<pre><tt><b><font color="#0000FF">using</font></b> SQLRClient<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>You'll also need to include the SQLRelay.dll assembly.  This is usually found in C:\Program Files\Firstworks\bin on Windows or /usr/local/firstworks/lib on Unix/Linux.</p>
@@ -116,7 +117,8 @@ http://www.gnu.org/software/src-highlite -->
 			<font color="#990000">...</font> execute <font color="#008080">some</font> queries <font color="#990000">...</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>After calling the constructor, a session is established when the first 
@@ -169,7 +171,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>Note the call to endSession() after the call to sendFileQuery().  Since the
@@ -253,7 +256,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#FF0000">}</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <a name="bindvars"/><h2>Substitution and Bind Variables</h2>
@@ -301,7 +305,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>If you are curious how many bind variables have been declared in a query,
@@ -346,7 +351,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something with <font color="#008080">the</font> result <font color="#990000">...</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>The getOutputBindString() method returns a NULL value as an empty string.  
@@ -392,7 +398,8 @@ http://www.gnu.org/software/src-highlite -->
         		cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>Likewise, you can retreive BLOB or CLOB data using
@@ -432,7 +439,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#990000">...</font> <b><font color="#0000FF">do</font></b> something with image <font color="#008080">and</font> desc <font color="#990000">...</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>Sometimes its convenient to bind a bunch of variables that may or may not 
@@ -488,7 +496,8 @@ http://www.gnu.org/software/src-highlite -->
 			<font color="#990000">...</font> process the <font color="#008080">result</font> set <font color="#990000">...</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <a name="fields"/><h2>Accessing Fields in the Result Set</h2>
@@ -527,7 +536,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#FF0000">}</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>The getField() method returns a string.  If you would like to get a field as
@@ -568,7 +578,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#FF0000">}</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>The getField() and getRow() methods return NULL fields as empty strings.
@@ -666,7 +677,8 @@ http://www.gnu.org/software/src-highlite -->
         		con<font color="#990000">.</font><b><font color="#000000">endSession</font></b><font color="#990000">();</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <a name="cursors"/><h2>Cursors</h2>
@@ -710,7 +722,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#FF0000">}</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>If you are using stored procedures with Oracle, a stored
@@ -730,7 +743,8 @@ http://www.gnu.org/software/src-highlite -->
 BEGIN
         <font color="#008080">OPEN</font> l_cursor <font color="#008080">FOR</font> SELECT <font color="#990000">*</font> <font color="#008080">FROM</font> mytable<font color="#990000">;</font>
         <font color="#008080">RETURN</font> l_cursor<font color="#990000">;</font>
-END<font color="#990000">;</font></tt></pre>
+END<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 </p>
@@ -772,7 +786,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#FF0000">}</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 </p>
@@ -846,7 +861,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#FF0000">}</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>Some databases force column names to upper case, others force column names
@@ -911,7 +927,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#FF0000">}</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <a name="storedprocedures"/><h2>Stored Procedures</h2>
@@ -954,7 +971,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> is
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -969,7 +987,8 @@ http://www.gnu.org/software/src-highlite -->
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
-cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font></tt></pre>
+cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -979,7 +998,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
@@ -992,7 +1012,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
-        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font></tt></pre>
+        insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1007,7 +1028,8 @@ http://www.gnu.org/software/src-highlite -->
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
-cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font></tt></pre>
+cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1017,7 +1039,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <h4>Firebird</h4>
@@ -1033,7 +1056,8 @@ http://www.gnu.org/software/src-highlite -->
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
         suspend<font color="#990000">;</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1048,7 +1072,8 @@ http://www.gnu.org/software/src-highlite -->
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
-cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font></tt></pre>
+cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1058,7 +1083,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <h4>DB2</h4>
@@ -1073,7 +1099,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1088,7 +1115,8 @@ http://www.gnu.org/software/src-highlite -->
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
-cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font></tt></pre>
+cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1098,7 +1126,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <h4>Postgresql</h4>
@@ -1114,7 +1143,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">begin</font>
 <font color="#FF0000">        insert into mytable values ($1,$2,$3);</font>
 <font color="#FF0000">        return;</font>
-<font color="#FF0000">end;'</font> language plpgsql</tt></pre>
+<font color="#FF0000">end;'</font> language plpgsql
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1129,7 +1159,8 @@ http://www.gnu.org/software/src-highlite -->
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"$1"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"$2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"$3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
-cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font></tt></pre>
+cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1139,7 +1170,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font></tt></pre>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+</tt></pre>
 
 </blockquote>
 <h4>MySQL</h4>
@@ -1154,7 +1186,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1169,7 +1202,8 @@ http://www.gnu.org/software/src-highlite -->
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
-cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font></tt></pre>
+cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
+</tt></pre>
 
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
@@ -1181,7 +1215,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h3>Single Values</h3>
@@ -1208,7 +1243,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">function</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> returns number is
 begin
         <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1224,7 +1260,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
-<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1234,7 +1271,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <p>Here is an example where the value is returned through an output
@@ -1250,7 +1288,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">)</font> as
 begin
         out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1267,7 +1306,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">Int64</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1277,7 +1317,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
@@ -1294,7 +1335,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
-        select @out1<font color="#990000">=</font>@in1</tt></pre>
+        select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">)</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1311,7 +1353,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">Int64</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1321,7 +1364,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>Firebird</h4>
@@ -1337,7 +1381,8 @@ http://www.gnu.org/software/src-highlite -->
 begin
         out1<font color="#990000">=</font>in1<font color="#990000">;</font>
         suspend<font color="#990000">;</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1353,7 +1398,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
-<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
@@ -1373,7 +1419,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">Int64</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1383,7 +1430,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>DB2</h4>
@@ -1401,7 +1449,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> language sql
 begin
         <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
-end</tt></pre>
+end
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1418,7 +1467,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
-<font color="#008080">Int64</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">Int64</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1428,7 +1478,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>Postgresql</h4>
@@ -1449,7 +1500,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">        in1:=$1;</font>
 <font color="#FF0000">        return;</font>
 <font color="#FF0000">end;</font>
-<font color="#FF0000">'</font> language plpgsql</tt></pre>
+<font color="#FF0000">'</font> language plpgsql
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1465,7 +1517,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">4</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
-<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1475,7 +1528,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font></tt></pre>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+</tt></pre>
 
 </blockquote>
 <h4>MySQL</h4>
@@ -1489,7 +1543,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font></tt></pre>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the function from an SQL Relay program, use code like the
@@ -1505,7 +1560,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font> <font color="#993399">1.1</font><font color="#990000">,</font> <font color="#993399">4</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font> <font color="#FF0000">"hello"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
-<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
@@ -1517,7 +1573,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function examplefunc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <p>A single value can be returned in the result set of a MySQL procedure.</p>
@@ -1529,7 +1586,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font></tt></pre>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execeute the procedure from an SQL Relay program, use code like the
@@ -1541,7 +1599,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select exampleproc()"</font><font color="#990000">);</font>
-<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
@@ -1551,7 +1610,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <p>A single value can be returned using the output variable of a MySQL
@@ -1564,7 +1624,8 @@ procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font></tt></pre>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execeute the procedure from an SQL Relay program, use code like the
@@ -1578,7 +1639,8 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(@out1)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select @out1"</font><font color="#990000">);</font>
-<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the procedure, run a query like the following.</p>
@@ -1588,7 +1650,8 @@ cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><f
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h3>Multiple Values</h3>
@@ -1616,7 +1679,8 @@ begin
         out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
         out2<font color="#990000">:=</font>in2<font color="#990000">;</font>
         out3<font color="#990000">:=</font>in3<font color="#990000">;</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1637,7 +1701,8 @@ cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindString
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 <font color="#008080">Int64</font> out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
 <font color="#008080">Int64</font> out2<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindDouble</font></b><font color="#990000">(</font><font color="#FF0000">"out2"</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindString</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindString</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1647,7 +1712,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
@@ -1660,9 +1726,10 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#008080">int</font> output<font color="#990000">,</font> @out2 <font color="#008080">int</font> output<font color="#990000">,</font> @out3 <font color="#009900">int</font> output as
-        select @out1<font color="#990000">=</font>@in1<font color="#990000">,</font>
-                @out2<font color="#990000">=</font>@in2<font color="#990000">,</font>
-                @out3<font color="#990000">=</font>@in3</tt></pre>
+        select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">),</font>
+                @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">),</font>
+                @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">)</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1683,7 +1750,8 @@ cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindString
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 <font color="#008080">Int64</font> out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">);</font>
 <font color="#008080">Double</font> out2<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindDouble</font></b><font color="#990000">(</font><font color="#FF0000">"out2"</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindString</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindString</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1693,7 +1761,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>Firebird</h4>
@@ -1711,7 +1780,8 @@ begin
         out2<font color="#990000">=</font>in2<font color="#990000">;</font>
         out3<font color="#990000">=</font>in3<font color="#990000">;</font>
         suspend<font color="#990000">;</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1729,7 +1799,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 <font color="#008080">String</font> out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">String</font> out2<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>Alternatively, you can run a query like the following and receive the result
@@ -1753,7 +1824,8 @@ cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindString
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 <font color="#008080">Int64</font> out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">);</font>
 <font color="#008080">Double</font> out2<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindDouble</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindString</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindString</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1763,7 +1835,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>DB2</h4>
@@ -1780,7 +1853,8 @@ begin
         <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
         <font color="#008080">set</font> out2 <font color="#990000">=</font> in2<font color="#990000">;</font>
         <font color="#008080">set</font> out3 <font color="#990000">=</font> in3<font color="#990000">;</font>
-end</tt></pre>
+end
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1801,7 +1875,8 @@ cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindString
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 <font color="#008080">Int64</font> out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindInteger</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">);</font>
 <font color="#008080">Double</font> out2<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindDouble</font></b><font color="#990000">(</font><font color="#FF0000">"5"</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindString</font></b><font color="#990000">(</font><font color="#FF0000">"6"</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindString</font></b><font color="#990000">(</font><font color="#FF0000">"6"</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1811,7 +1886,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>Postgresql</h4>
@@ -1830,7 +1906,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">        select $1,$2,$3 into output;</font>
 <font color="#FF0000">        return output;</font>
 <font color="#FF0000">end;</font>
-<font color="#FF0000">'</font> language plpgsql</tt></pre>
+<font color="#FF0000">'</font> language plpgsql
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1848,7 +1925,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 <font color="#008080">String</font> out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">String</font> out2<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1858,7 +1936,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font></tt></pre>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+</tt></pre>
 
 </blockquote>
 <h4>MySQL</h4>
@@ -1873,10 +1952,8 @@ set of a MySQL procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
-begin
-	<font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font>
-end<font color="#990000">;</font></tt></pre>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1894,7 +1971,8 @@ cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><f
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 <font color="#008080">String</font> out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">String</font> out2<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
-<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font></tt></pre>
+<font color="#008080">String</font> out3<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
@@ -1906,7 +1984,8 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <p>Here's how you can get multiple values from the output variables
@@ -1919,7 +1998,8 @@ of a MySQL procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font></tt></pre>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1930,7 +2010,8 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0, @out2=0.0, @out3=''"</font><font color="#990000">);</font>
+<pre><tt>@parts<font color="#990000">/</font>cs<font color="#990000">-</font>mysql<font color="#990000">-</font>testproc<font color="#990000">-</font>values<font color="#990000">-</font>output<font color="#990000">-</font>params<font color="#990000">.</font>cs@
+cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0, @out2=0.0, @out3=''"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(@out1,@out3,@out3)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select @out1,@out2,@out3"</font><font color="#990000">);</font>
 <font color="#008080">String</font> out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
@@ -1945,7 +2026,8 @@ cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><f
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h3>Result Sets</h3>
@@ -1972,7 +2054,8 @@ create function exampleproc <font color="#008080">return</font> types<font color
 begin
         <font color="#008080">open</font> l_cursor <font color="#008080">for</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font>
         <b><font color="#0000FF">return</font></b> l_cursor<font color="#990000">;</font>
-end<font color="#990000">;</font></tt></pre>
+end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -1994,7 +2077,8 @@ bindcur<font color="#990000">.</font><b><font color="#000000">fetchFromBindCurso
 <font color="#008080">String</font> field10<font color="#990000">=</font>bindcur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">String</font> field11<font color="#990000">=</font>bindcur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">String</font> field12<font color="#990000">=</font>bindcur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
-<font color="#990000">...</font></tt></pre>
+<font color="#990000">...</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -2005,7 +2089,8 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>drop function exampleproc
-drop package types</tt></pre>
+drop package types
+</tt></pre>
 
 </blockquote>
 <br/><h4>Sybase and Microsoft SQL Server</h4>
@@ -2017,7 +2102,8 @@ drop package types</tt></pre>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create procedure exampleproc <font color="#008080">as</font> select <font color="#990000">*</font> from exampletable</tt></pre>
+<pre><tt>create procedure exampleproc <font color="#008080">as</font> select <font color="#990000">*</font> from exampletable
+</tt></pre>
 
 </blockquote>
 <p>To exceute the stored procedure from an SQL Relay program, ue code like the
@@ -2035,7 +2121,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#008080">String</font> field10<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">String</font> field11<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">String</font> field12<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
-<font color="#990000">...</font></tt></pre>
+<font color="#990000">...</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -2045,7 +2132,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><h4>Firebird</h4>
@@ -2078,7 +2166,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#FF0000">        end loop;</font>
 <font color="#FF0000">        return;</font>
 <font color="#FF0000">end;</font>
-<font color="#FF0000">'</font> language plpgsql</tt></pre>
+<font color="#FF0000">'</font> language plpgsql
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -2096,7 +2185,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#008080">String</font> field10<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">String</font> field11<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">String</font> field12<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
-<font color="#990000">...</font></tt></pre>
+<font color="#990000">...</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -2106,7 +2196,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function examplefunc</tt></pre>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+</tt></pre>
 
 </blockquote>
 <h4>MySQL</h4>
@@ -2124,7 +2215,8 @@ the following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font></tt></pre>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
+</tt></pre>
 
 </blockquote>
 <p>To execute the stored procedure from an SQL Relay program, use code like the
@@ -2142,7 +2234,8 @@ http://www.gnu.org/software/src-highlite -->
 <font color="#008080">String</font> field10<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">String</font> field11<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">String</font> field12<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font> <font color="#993399">2</font><font color="#990000">);</font>
-<font color="#990000">...</font></tt></pre>
+<font color="#990000">...</font>
+</tt></pre>
 
 </blockquote>
 <p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
@@ -2154,7 +2247,8 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure exampleproc</tt></pre>
+<pre><tt>drop procedure exampleproc
+</tt></pre>
 
 </blockquote>
 <br/><a name="caching"/><h2>Caching The Result Set</h2>
@@ -2196,7 +2290,8 @@ http://www.gnu.org/software/src-highlite -->
 
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>Second page:</p>
@@ -2236,10 +2331,103 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#FF0000">}</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
-<br/><a name="suspending"/><h2>Suspending and Resuming Sessions</h2>
+<p>For result-set caching to be effective, the sqlr-cachemanager process must be enabled and running on the client system.  The sqlr-cachemanager scans the cache periodically and deletes cached result sets whos ttl's have expired.  If it is not running, stale result sets persist beyond their intended ttl's.</p>
+
+<p>To enable the sqlr-cachemanager at boot on systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>systemctl <font color="#008080">enable</font> sqlrcachemanager<font color="#990000">.</font>service</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>systemctl <font color="#008080">start</font> sqlrcachemanager<font color="#990000">.</font>service</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on most non-systemd platforms, you must create a symlink into the /etc/rc2.d or /etc/rc3.d directory.  Eg:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>cd <font color="#990000">/</font>etc<font color="#990000">/</font>rc2<font color="#990000">.</font>d
+ln <font color="#990000">-</font>s <font color="#990000">../</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager S15sqlrcachemanager</tt></pre>
+
+  <p>or</p>
+
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>cd <font color="#990000">/</font>etc<font color="#990000">/</font>rc3<font color="#990000">.</font>d
+ln <font color="#990000">-</font>s <font color="#990000">../</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager S15sqlrcachemanager</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on most non-systemd platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">/</font>etc<font color="#990000">/</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager start</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on FreeBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager_enable<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on NetBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To enable the sqlr-cachemanager at boot on OpenBSD platforms, edit /etc/rc.conf and add a line like:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrcachemanager_flags<font color="#990000">=</font>YES</tt></pre>
+
+</blockquote>
+<p>To start the sqlr-cachemanager on BSD platforms:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">/</font>etc<font color="#990000">/</font>init<font color="#990000">.</font>d<font color="#990000">/</font>sqlrcachemanager start</tt></pre>
+
+</blockquote>
+<a name="suspending"/><h2>Suspending and Resuming Sessions</h2>
 
 <p>Sometimes web-based applications need a single database transaction to span
 multiple pages.  Since SQL Relay sessions can be suspended and resumed, this
@@ -2274,7 +2462,8 @@ http://www.gnu.org/software/src-highlite -->
         		<font color="#990000">...</font> pass <font color="#008080">the</font> rs<font color="#990000">,</font> port and socket to the <font color="#008080">next</font> page <font color="#990000">...</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>Second page:</p>
@@ -2304,7 +2493,8 @@ http://www.gnu.org/software/src-highlite -->
         		con<font color="#990000">.</font><b><font color="#000000">endSession</font></b><font color="#990000">();</font>
 		<font color="#FF0000">}</font>
 	<font color="#FF0000">}</font>
-<font color="#FF0000">}</font></tt></pre>
+<font color="#FF0000">}</font>
+</tt></pre>
 
 </blockquote>
 <p>You can also distribute the processing of a result set across a series of

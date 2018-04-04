@@ -1,0 +1,11 @@
+cur.prepareQuery("call exampleproc(?,?,?,?,?,?)");
+cur.inputBind("1", 1);
+cur.inputBind("2", 1.1, 2, 1);
+cur.inputBind("3", "hello");
+cur.defineOutputBindInteger("4");
+cur.defineOutputBindDouble("5");
+cur.defineOutputBindString("6", 25);
+cur.executeQuery();
+Int64 out1=cur.getOutputBindInteger("4");
+Double out2=cur.getOutputBindDouble("5");
+String out3=cur.getOutputBindString("6");
