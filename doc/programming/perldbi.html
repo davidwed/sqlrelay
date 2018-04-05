@@ -1800,50 +1800,12 @@ each database that SQL Relay supports.</p>
 
 <h4>Oracle</h4>
 
-<p>To create the stored procedure, run a query like the following.</p>
+<p>Stored procedures in Oracle can return open cursors as return values or output
+parameters. A client-side cursor can be bound to this open cursor and rows can
+be fetched from it. However the SQL Relay driver for Perl DBI does not currently
+support output bind cursors.</p>
 
-<blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>create or replace package types as
-        type cursorType is <font color="#008080">ref</font> cursor<font color="#990000">;</font>
-end<font color="#990000">;</font>
-
-create function exampleproc <font color="#008080">return</font> types<font color="#990000">.</font>cursortype is
-        <font color="#008080">l_cursor</font>    types<font color="#990000">.</font>cursorType<font color="#990000">;</font>
-begin
-        <font color="#008080">open</font> l_cursor <font color="#008080">for</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font>
-        <b><font color="#0000FF">return</font></b> l_cursor<font color="#990000">;</font>
-end<font color="#990000">;</font>
-</tt></pre>
-
-</blockquote>
-<p>To execute the stored procedure from an SQL Relay program, use code like the
-following.</p>
-
-<blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>@parts<font color="#990000">/</font>perldbi<font color="#990000">-</font>oracle<font color="#990000">-</font>testproc<font color="#990000">-</font>result<font color="#990000">-</font>set<font color="#990000">.</font>pl@</tt></pre>
-
-</blockquote>
-<p>To drop the stored procedure, run a query like the following.</p>
-
-<blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function exampleproc
-drop package types
-</tt></pre>
-
-</blockquote>
-<br/><h4>Sybase and Microsoft SQL Server</h4>
+<h4>Sybase and Microsoft SQL Server</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 

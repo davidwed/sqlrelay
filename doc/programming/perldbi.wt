@@ -1109,31 +1109,10 @@ each database that SQL Relay supports.
 
 ==== Oracle ====
 
-To create the stored procedure, run a query like the following.
-
-{{{#!blockquote
-{{{#!code
-@parts/oracle-create-testproc-result-set.sql@
-}}}
-}}}
-
-To execute the stored procedure from an SQL Relay program, use code like the
-following.
-
-{{{#!blockquote
-{{{#!code
-@parts/perldbi-oracle-testproc-result-set.pl@
-}}}
-}}}
-
-To drop the stored procedure, run a query like the following.
-
-{{{#!blockquote
-{{{#!code
-@parts/oracle-drop-testproc-result-set.sql@
-}}}
-}}}
-
+Stored procedures in Oracle can return open cursors as return values or output
+parameters. A client-side cursor can be bound to this open cursor and rows can
+be fetched from it. However the SQL Relay driver for Perl DBI does not currently
+support output bind cursors.
 
 ==== Sybase and Microsoft SQL Server ====
 

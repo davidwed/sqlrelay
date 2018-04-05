@@ -32,6 +32,7 @@
 	made SQLGetConnectAttr(SQL_AUTOCOMMIT) not return an error
 	fixed configure bug causing --disable-server to disable the odbc api
 	configure.vbs sets versions in vdproj files now
+	fixed some missing code in the documentation
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields
