@@ -1,0 +1,11 @@
+$cur->prepareQuery("begin  :curs:=exampleproc; end;");
+$cur->defineOutputBindCursor("curs");
+$cur->executeQuery();
+my $bindcur=$cur->getOutputBindCursor("curs");
+$bindcur->fetchFromBindCursor();
+my $field00=$bindcur->getField(0,0);
+my $field01=$bindcur->getField(0,1);
+my $field02=$bindcur->getField(0,2);
+my $field10=$bindcur->getField(1,0);
+my $field11=$bindcur->getField(1,1);
+my $field12=$bindcur->getField(1,2);

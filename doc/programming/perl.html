@@ -1798,7 +1798,18 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>@parts<font color="#990000">/</font>perl<font color="#990000">-</font>oracle<font color="#990000">-</font>testproc<font color="#990000">-</font>result<font color="#990000">-</font>set<font color="#990000">.</font>pl@</tt></pre>
+<pre><tt>$cur<font color="#990000">-&gt;</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin  :curs:=exampleproc; end;"</font><font color="#990000">);</font>
+$cur<font color="#990000">-&gt;</font><b><font color="#000000">defineOutputBindCursor</font></b><font color="#990000">(</font><font color="#FF0000">"curs"</font><font color="#990000">);</font>
+$cur<font color="#990000">-&gt;</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
+my $bindcur<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getOutputBindCursor</font></b><font color="#990000">(</font><font color="#FF0000">"curs"</font><font color="#990000">);</font>
+$bindcur<font color="#990000">-&gt;</font><b><font color="#000000">fetchFromBindCursor</font></b><font color="#990000">();</font>
+my $field00<font color="#990000">=</font>$bindcur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+my $field01<font color="#990000">=</font>$bindcur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+my $field02<font color="#990000">=</font>$bindcur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+my $field10<font color="#990000">=</font>$bindcur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+my $field11<font color="#990000">=</font>$bindcur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+my $field12<font color="#990000">=</font>$bindcur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1834,7 +1845,15 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>@parts<font color="#990000">/</font>perl<font color="#990000">-</font>sybase<font color="#990000">-</font>testproc<font color="#990000">-</font>result<font color="#990000">-</font>set<font color="#990000">.</font>pl@</tt></pre>
+<pre><tt>$cur<font color="#990000">-&gt;</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
+my $field00<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+my $field01<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+my $field02<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+my $field10<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+my $field11<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+my $field12<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<font color="#990000">...</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1890,7 +1909,15 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>@parts<font color="#990000">/</font>perl<font color="#990000">-</font>postgresql<font color="#990000">-</font>testproc<font color="#990000">-</font>result<font color="#990000">-</font>set<font color="#990000">.</font>pl@</tt></pre>
+<pre><tt>$cur<font color="#990000">-&gt;</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from examplefunc() as (testint int, testfloat float, testchar char(40))"</font><font color="#990000">);</font>
+my $field00<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+my $field01<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+my $field02<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+my $field10<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+my $field11<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+my $field12<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<font color="#990000">...</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
@@ -1931,7 +1958,15 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>@parts<font color="#990000">/</font>perl<font color="#990000">-</font>mysql<font color="#990000">-</font>testproc<font color="#990000">-</font>result<font color="#990000">-</font>set<font color="#990000">.</font>pl@</tt></pre>
+<pre><tt>$cur<font color="#990000">-&gt;</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc()"</font><font color="#990000">);</font>
+my $field00<font color="#990000">=</font>cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+my $field01<font color="#990000">=</font>cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+my $field02<font color="#990000">=</font>cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+my $field10<font color="#990000">=</font>cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
+my $field11<font color="#990000">=</font>cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+my $field12<font color="#990000">=</font>cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+<font color="#990000">...</font>
+</tt></pre>
 
 </blockquote>
 <p>To drop the stored procedure, run a query like the following.</p>
