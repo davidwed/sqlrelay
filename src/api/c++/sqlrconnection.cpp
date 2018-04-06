@@ -481,7 +481,7 @@ void sqlrconnection::setTimeoutFromEnv(const char *var,
 	const char	*timeout=environment::getValue(var);
 	if (charstring::isNumber(timeout)) {
 		*timeoutsec=charstring::toInteger(timeout);
-		long double	dbl=charstring::toFloat(timeout);
+		long double	dbl=charstring::toFloatC(timeout);
 		dbl=dbl-(long double)(*timeoutsec);
 		*timeoutusec=(int32_t)(dbl*1000000.0);
 	} else {

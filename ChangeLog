@@ -33,6 +33,9 @@
 	fixed configure bug causing --disable-server to disable the odbc api
 	configure.vbs sets versions in vdproj files now
 	fixed some missing code in the documentation
+	replaced toFloat() calls with toFloatC()
+	mysql connection module handles /* ... */ comments correctly when
+		detecting which API (stmt vs. traditional) to use now
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

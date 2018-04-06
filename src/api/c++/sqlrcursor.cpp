@@ -6040,7 +6040,7 @@ int64_t sqlrcursor::getFieldAsInteger(uint64_t row, uint32_t col) {
 
 double sqlrcursor::getFieldAsDouble(uint64_t row, uint32_t col) {
 	const char	*field=getField(row,col);
-	return (field)?charstring::toFloat(field):0.0;
+	return (field)?charstring::toFloatC(field):0.0;
 }
 
 const char *sqlrcursor::getField(uint64_t row, const char *col) {
@@ -6073,7 +6073,7 @@ int64_t sqlrcursor::getFieldAsInteger(uint64_t row, const char *col) {
 
 double sqlrcursor::getFieldAsDouble(uint64_t row, const char *col) {
 	const char	*field=getField(row,col);
-	return (field)?charstring::toFloat(field):0.0;
+	return (field)?charstring::toFloatC(field):0.0;
 }
 
 uint32_t sqlrcursor::getFieldLength(uint64_t row, uint32_t col) {

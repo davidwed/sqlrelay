@@ -1707,7 +1707,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		delete[] value;
 	} else if (charstring::isNumber(value)) {
 		bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-		bv->doubleval.value=charstring::toFloat(value);
+		bv->doubleval.value=charstring::toFloatC(value);
 		bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
 		bv->doubleval.scale=
 			charstring::findFirst(value,'.')-value+
@@ -1941,7 +1941,7 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 						partcount==7) {
 			// inputoutputbind 1 double prec scale = value
 			bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-			bv->doubleval.value=charstring::toFloat(value);
+			bv->doubleval.value=charstring::toFloatC(value);
 			bv->doubleval.precision=
 				charstring::toInteger(parts[3]);
 			bv->doubleval.scale=

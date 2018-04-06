@@ -771,7 +771,9 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	stmtpreparefailed=false;
 	bindformaterror=false;
 	unsupportedbystmt.compile(
-			"^[ 	\r\n]*(("
+			"^[ 	\r\n]*"
+			"(/\\*.*\\*/[ 	\r\n]+)*"
+			"(("
 				"create|CREATE|"
 				"drop|DROP|"
 				"procedure|PROCEDURE|"

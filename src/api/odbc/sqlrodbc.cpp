@@ -4638,7 +4638,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_FLOAT\n");
 			if (targetvalue) {
 				*((SQLREAL *)targetvalue)=
-					(SQLREAL)charstring::toFloat(field);
+					(SQLREAL)charstring::toFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((SQLREAL *)targetvalue));
 			}
@@ -4647,7 +4647,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_DOUBLE\n");
 			if (targetvalue) {
 				*((SQLDOUBLE *)targetvalue)=
-					(SQLDOUBLE)charstring::toFloat(field);
+					(SQLDOUBLE)charstring::toFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((SQLDOUBLE *)targetvalue));
 			}

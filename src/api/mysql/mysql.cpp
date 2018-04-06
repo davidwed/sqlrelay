@@ -2106,7 +2106,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 						*((float *)stmt->
 							resultbinds[i].buffer)=
 							(float)charstring::
-								toFloat(row[i]);
+							toFloatC(row[i]);
 					}
 					break;
 				case MYSQL_TYPE_NEWDECIMAL:
@@ -2117,7 +2117,7 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 						*((double *)stmt->
 							resultbinds[i].buffer)=
 							(double)charstring::
-								toFloat(row[i]);
+							toFloatC(row[i]);
 					}
 					break;
 				case MYSQL_TYPE_ENUM:
