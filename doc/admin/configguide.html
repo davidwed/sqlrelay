@@ -86,6 +86,11 @@
   <li><a href="#translation">Translation</a></li>
   <ul>
     <li><a href="#querytranslation">Query Translation</a></li>
+    <ul>
+      <li><a href="#normalize">normalize</a></li>
+      <li><a href="#patterns">patterns</a></li>
+    </ul>
+
     <li><a href="#resultsettranslation">Result Set Translation</a></li>
   </ul>
 
@@ -3197,23 +3202,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
-<b><font color="#0000FF">&lt;instances&gt;</font></b>
-	...
-	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
-		...
-		<b><font color="#0000FF">&lt;filters&gt;</font></b>
-			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"patterns"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^(drop|create)"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"hugetable"</font> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"cistring"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"outsidequotes"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"badstring"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"insidequotes"</font> <font color="#009900">errornumbrer</font><font color="#990000">=</font><font color="#FF0000">"100"</font> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"pattern filter violation"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/filter&gt;</font></b>
-		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
-		...
-	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
-	...
-<b><font color="#0000FF">&lt;/instances&gt;</font></b>
-</tt></pre>
+<pre><tt>@parts<font color="#990000">/</font>sqlrelay<font color="#990000">-</font>filters<font color="#990000">-</font>patterns<font color="#990000">.</font>conf@</tt></pre>
 
 </blockquote>
 <p>These queries would be filtered out:</p>
@@ -3396,13 +3385,16 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>At startup, the SQL Relay server creates instances of the specified translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.</p>
 
-<p>Currently, the following translation module is available:</p>
+<p>Currently, the following translation modules are available:</p>
 
 <ul>
   <li><b>normalize</b></li>
+  <li><b>patterns</b></li>
 </ul>
 
 <p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<br/><a name="normalize"/><h4>normalize</h4>
 
 <p>The <b>normalize</b> module performs the following operations on a query:</p>
 
@@ -3576,7 +3568,184 @@ http://www.gnu.org/software/src-highlite -->
 
 </ul>
 
-<br/><a name="resultsettranslation"/><h3>Result Set Translation</h3>
+<br/><br/><a name="patterns"/><h4>patterns</h4>
+
+<p>The <b>patterns</b> module allows you to match the entire query, or parts of it, against a pattern, and then replace the matching part.</p>
+
+<p>The module is highly configurable, and capable of doing some fairly complex substitutions.  For example:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"patterns"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">"old_tablename"</font> <font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">"new_tablename"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"outsidequotes"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">"David"</font> <font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">"Dave"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"insidequotes"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"cistring"</font> <font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">"Johnathan"</font> <font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">"John"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"insidequotes"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">"(Dan|Danny)"</font> <font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">"Daniel"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"insidequotes"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">"(Rich|Richie)"</font> <font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">"Richard"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"insidequotes"</font> <font color="#009900">global</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">"^show tables$"</font> <font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">"select * from user_tables"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/translation&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example, several pattern-translations are defined, instructing the module to:</p>
+
+<ul>
+  <li>Convert <i>old_tablename</i> to <i>new_tablename</i>, but only outside of quoted strings.</li>
+  <li>Convert <i>David</i> to <i>Dave</i>, but only inside of quoted strings.</li>
+  <li>Convert <i>Johnathan</i> to <i>John</i>, but only inside of quoted strings, and using case-insensitive matching.</li>
+  <li>Convert <i>Dan</i> or <i>Danny</i> to <i>Daniel</i>, but only inside of quoted strings.</li>
+  <li>Convert only the first instance of <i>Rich</i> or <i>Richie</i> to <i>Richard</i>, and only inside of quoted strings.</li>
+  <li>Convert the entire query <i>show tables</i> to the entire query <i>select * from user_tables</i>.</li>
+</ul>
+
+<p>This example illustrates the use of several attributes of the pattern tag:</p>
+
+<ul>
+  <li><b>type</b> - The type of matching to do.  Options include:</li>
+  <ul>
+    <li><i>string</i> - basic string matching - the default</li>
+    <li><i>cistring</i> - case-insensitive string matching</li>
+    <li><i>regex</i> - regular-expression matching</li>
+  </ul>
+
+  <li><b>from</b> - The pattern to match.</li>
+  <li><b>to</b> - The string to convert matching parts of the query to.</li>
+  <li><b>scope</b> - Where to match and translate.  Options include:</li>
+  <ul>
+    <li><i>anywhere</i> - anywhere in the query - the default</li>
+    <li><i>outsidequotes</i> - only outside of quoted strings</li>
+    <li><i>insidequotes</i> - only inside of quoted strings</li>
+  </ul>
+
+  <li><b>global</b> - Only valid when type="regex".  Options include:</li>
+  <ul>
+    <li><i>yes</i> - find all matches - the default</li>
+    <li><i>no</i> - only find the first match</li>
+  </ul>
+
+</ul>
+
+<p>Note that in this example, the normalize translation is loaded prior to the patterns translation.  Pattern matching is substantially more reliable and efficient if the query has been normalized first.  See the <a href="#normalize">normalize</a> translation for more information.</p>
+
+<p>Another powerful feature of the patterns translation module is nested matching:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"patterns"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font>
+					<font color="#009900">match</font><font color="#990000">=</font><font color="#FF0000">"^create table .*"</font><b><font color="#0000FF">&gt;</font></b>
+					<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font>
+						<font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">" tinytext,"</font>
+						<font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">" varchar2(254),"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font>
+						<font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">" mediumtext,"</font>
+						<font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">" varchar2(1023),"</font><b><font color="#0000FF">/&gt;</font></b>
+					<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font>
+						<font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">" longtext,"</font>
+						<font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">" clob,"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/pattern&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font>
+					<font color="#009900">match</font><font color="#990000">=</font><font color="#FF0000">"^select .*,oldvalue,newvalue,.* from ticket_change .* union .*"</font><b><font color="#0000FF">&gt;</font></b>
+					<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font>
+						<font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">",oldvalue,newvalue,"</font>
+						<font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">",to_char(oldvalue),to_char(newvalue),"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;/pattern&gt;</font></b>
+			<b><font color="#0000FF">&lt;/translation&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example...</p>
+
+<p>The first pattern-translation replaces:</p>
+
+<ul>
+  <li>the tinytext column type with varchar2(254)</li>
+  <li>the mediumtext column type with varchar2(1023)</li>
+  <li>the longtext column type with clob</li>
+</ul>
+
+<p>But the replacements are only done in <i>create table</i> queries.</p>
+
+<p>It's unlikely that those patterns would show up in other queries, but not impossible.  Also, the translation is made more efficient by the initial match, as it will bail immediately if the query is something other than a create table, rather than having to scan the entire rest of the query.</p>
+
+<p>The second pattern-translation basically wraps oldvalue and newvalue with to_char(), but only in a very specific query.  This is a good example of how the patterns translation can help run an app written for one type of database against a different type of database.  One-off query translations are often necessary in these cases.</p>
+
+<p>Note that in these examples, the outer pattern tags have a match attribute rather than from/to attributes.  When doing nested matching, outer tags use the match attribute to grab pieces of the query, and pass them down to nested tags.</p>
+
+<p>The type, scope, and global attributes are valid for outer pattern tags, but the from and to attributes are ignored in any pattern tag with a match attribute.</p>
+
+<p>Note also that in these examples, the nested pattern tags use type="string", but type="regex" and type="cistring" are supported, as is the global attribute for type="regex".  However, the scope attribute is only valid at the top level and is ignored in nested pattern tags.</p>
+
+<p>Though more than 2 levels is rarely necessary, any level of nesting is supported:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"patterns"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font>
+					<font color="#009900">match</font><font color="#990000">=</font><font color="#FF0000">"...pattern to match in query..."</font><b><font color="#0000FF">&gt;</font></b>
+					<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font>
+						<font color="#009900">match</font><font color="#990000">=</font><font color="#FF0000">"...pattern to match in matching pieces of query..."</font><b><font color="#0000FF">&gt;</font></b>
+						<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font>
+							<font color="#009900">match</font><font color="#990000">=</font><font color="#FF0000">"...pattern to match in those pieces..."</font><b><font color="#0000FF">&gt;</font></b>
+							<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font>
+								<font color="#009900">match</font><font color="#990000">=</font><font color="#FF0000">"...and so on..."</font><b><font color="#0000FF">&gt;</font></b>
+								<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font>
+									<font color="#009900">from</font><font color="#990000">=</font><font color="#FF0000">"...from pattern..."</font>
+									<font color="#009900">to</font><font color="#990000">=</font><font color="#FF0000">"...to pattern..."</font><b><font color="#0000FF">/&gt;</font></b>
+							<b><font color="#0000FF">&lt;/pattern&gt;</font></b>
+						<b><font color="#0000FF">&lt;/pattern&gt;</font></b>
+					<b><font color="#0000FF">&lt;/pattern&gt;</font></b>
+				<b><font color="#0000FF">&lt;/pattern&gt;</font></b>
+			<b><font color="#0000FF">&lt;/translation&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<br/><br/><a name="resultsettranslation"/><h3>Result Set Translation</h3>
 
 <p>Result set translation allows the SQL Relay server to alter fields in the result set before returning the field to the client.</p>
 

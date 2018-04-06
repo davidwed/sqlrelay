@@ -54,6 +54,8 @@
  * [#filtering Query Filtering]
 * [#translation Translation]
  * [#querytranslation Query Translation]
+  * [#normalize normalize]
+  * [#patterns patterns]
  * [#resultsettranslation Result Set Translation]
 * [#queryrouting Query Routing]
  * [#regex regex]
@@ -2238,11 +2240,16 @@ All translation modules have an //enabled// parameter, allowing the module to be
 
 At startup, the SQL Relay server creates instances of the specified translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.
 
-Currently, the following translation module is available:
+Currently, the following translation modules are available:
 
 * '''normalize'''
+* '''patterns'''
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#normalize]
+==== normalize ====
 
 The '''normalize''' module performs the following operations on a query:
 
@@ -2336,6 +2343,84 @@ The following parameters are currently supported:
  * Most databases support //double-escaped// quotes.  For example, if a quoted string needs to contains a quote, then that would be expressed like: 'I said ''hello'' to her.'
  * By default, the normalize translation interprets double-escaped single, double, and back-quotes in this manner.
  * If doubleescape is set to "no" then all quotes, double-quotes, and back-quotes will be interpreted literally, potentially affecting case conversion and quote removal.
+
+
+[[br]][=#patterns]
+==== patterns ====
+
+The '''patterns''' module allows you to match the entire query, or parts of it, against a pattern, and then replace the matching part.
+
+The module is highly configurable, and capable of doing some fairly complex substitutions.  For example:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-translations-patterns.conf@
+}}}
+}}}
+
+In this example, several pattern-translations are defined, instructing the module to:
+
+* Convert //old_tablename// to //new_tablename//, but only outside of quoted strings.
+* Convert //David// to //Dave//, but only inside of quoted strings.
+* Convert //Johnathan// to //John//, but only inside of quoted strings, and using case-insensitive matching.
+* Convert //Dan// or //Danny// to //Daniel//, but only inside of quoted strings.
+* Convert only the first instance of //Rich// or //Richie// to //Richard//, and only inside of quoted strings.
+* Convert the entire query //show tables// to the entire query //select * from user_tables//.
+
+This example illustrates the use of several attributes of the pattern tag:
+
+* '''type''' - The type of matching to do.  Options include:
+ * //string// - basic string matching - the default
+ * //cistring// - case-insensitive string matching
+ * //regex// - regular-expression matching
+* '''from''' - The pattern to match.
+* '''to''' - The string to convert matching parts of the query to.
+* '''scope''' - Where to match and translate.  Options include:
+ * //anywhere// - anywhere in the query - the default
+ * //outsidequotes// - only outside of quoted strings
+ * //insidequotes// - only inside of quoted strings
+* '''global''' - Only valid when type="regex".  Options include:
+ * //yes// - find all matches - the default
+ * //no// - only find the first match
+
+Note that in this example, the normalize translation is loaded prior to the patterns translation.  Pattern matching is substantially more reliable and efficient if the query has been normalized first.  See the [#normalize normalize] translation for more information.
+
+Another powerful feature of the patterns translation module is nested matching:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-translations-patterns-nested.conf@
+}}}
+}}}
+
+In this example...
+
+The first pattern-translation replaces:
+
+* the tinytext column type with varchar2(254)
+* the mediumtext column type with varchar2(1023)
+* the longtext column type with clob
+
+But the replacements are only done in //create table// queries.
+
+It's unlikely that those patterns would show up in other queries, but not impossible.  Also, the translation is made more efficient by the initial match, as it will bail immediately if the query is something other than a create table, rather than having to scan the entire rest of the query.
+
+The second pattern-translation basically wraps oldvalue and newvalue with to_char(), but only in a very specific query.  This is a good example of how the patterns translation can help run an app written for one type of database against a different type of database.  One-off query translations are often necessary in these cases.
+
+Note that in these examples, the outer pattern tags have a match attribute rather than from/to attributes.  When doing nested matching, outer tags use the match attribute to grab pieces of the query, and pass them down to nested tags.
+
+The type, scope, and global attributes are valid for outer pattern tags, but the from and to attributes are ignored in any pattern tag with a match attribute.
+
+Note also that in these examples, the nested pattern tags use type="string", but type="regex" and type="cistring" are supported, as is the global attribute for type="regex".  However, the scope attribute is only valid at the top level and is ignored in nested pattern tags.
+
+Though more than 2 levels is rarely necessary, any level of nesting is supported:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-translations-patterns-nested-multi.conf@
+}}}
+}}}
+
 
 [[br]][=#resultsettranslation]
 === Result Set Translation ===
