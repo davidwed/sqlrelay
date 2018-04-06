@@ -2299,6 +2299,16 @@ The following parameters are currently supported:
  * If set to "yes" then values enclosed in double-quotes are converted to the case specified by the convertcase parameter.
  * If set to "no" then no case conversion is done.
  * If omitted then the value defaults to "no".
+* '''convertcasebackquoted''' - "upper", "lower", "yes", or "no".  Defaults to "no".
+ * If set to "upper" or "lower" then values enclosed in back-quotes are converted to the specified case.  In some database (MySQL and !MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.
+  * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
+  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
+  * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
+ * If set to "yes" then values enclosed in back-quotes are converted to the case specified by the convertcase parameter.
+ * If set to "no" then no case conversion is done.
+ * If omitted then the value defaults to "no".
 * '''removedoublequotes''' - "yes" or "no".  Defaults to "no".
  * If set to "yes" then double-quotes are removed, except for escaped double quotes.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
@@ -2308,6 +2318,24 @@ The following parameters are currently supported:
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "no" then double-quotes are not removed.
  * If omitted then the value defaults to "no".
+* '''removebackquotes''' - "yes" or "no".  Defaults to "no".
+ * If set to "yes" then back-quotes are removed, except for escaped back quotes.  In some database (MySQL and !MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
+  * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
+  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
+  * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
+ * If set to "no" then back-quotes are not removed.
+ * If omitted then the value defaults to "no".
+* '''slashescape''' - "yes" or "no".  Defaults to "yes".
+ * Most databases support //double-escaped// quotes.  For example, if a quoted string needs to contains a quote, then that would be expressed like: 'I said ''hello'' to her.'
+ * Some databases support //slash-escaped// quotes.  For example, if a quoted string needs to contains a quote, then that would be expressed like: 'I said \'hello\' to her.'
+ * By default, the normalize translation converts slash-escaped single, double, and back-quotes to double-escaped single, double, and back-quotes.
+ * If slashescape is set to "no" then the slash will be ignored as an escape character, and the quote (or double/back quote) and slash will be interpreted literally, potentially affecting case conversion and quote removal.
+* '''doubleescape''' - "yes" or "no".  Defaults to "yes".
+ * Most databases support //double-escaped// quotes.  For example, if a quoted string needs to contains a quote, then that would be expressed like: 'I said ''hello'' to her.'
+ * By default, the normalize translation interprets double-escaped single, double, and back-quotes in this manner.
+ * If doubleescape is set to "no" then all quotes, double-quotes, and back-quotes will be interpreted literally, potentially affecting case conversion and quote removal.
 
 [[br]][=#resultsettranslation]
 === Result Set Translation ===
