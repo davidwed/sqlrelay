@@ -20,7 +20,7 @@ clean:
 	$(RM) com/firstworks/sql/*.class *.jar
 
 sqlrelayjdbc.jar: $(SRCS)
-	$(JAVAC) -cp ../java/sqlrelay.jar $(SRCS)
+	$(JAVAC) -classpath ../java/sqlrelay.jar $(SRCS)
 	$(JAR) -cf $@ META-INF com
 
 install:

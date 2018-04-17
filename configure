@@ -34523,6 +34523,14 @@ $as_echo_n "checking for PHP config directory... " >&6; }
 			PHPCONFSTYLE="freebsd"
 		fi
 	fi
+	if ( test "$PHPCONFSTYLE" = "unknown" )
+	then
+		if ( test -d "/usr/pkg/etc/php.d" )
+		then
+			PHPCONFDIR="/usr/pkg/etc/php.d"
+			PHPCONFSTYLE="netbsd"
+		fi
+	fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFDIR - $PHPCONFSTYLE style" >&5
 $as_echo "$PHPCONFDIR - $PHPCONFSTYLE style" >&6; }
 

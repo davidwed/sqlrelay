@@ -275,6 +275,7 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		CS_CONNECTION	*dbconn;
 
 		const char	*sybase;
+		const char	*freetds;
 		const char	*lang;
 		const char	*server;
 		const char	*db;
@@ -329,6 +330,7 @@ void freetdsconnection::handleConnectString() {
 	sqlrserverconnection::handleConnectString();
 
 	sybase=cont->getConnectStringValue("sybase");
+	freetds=cont->getConnectStringValue("freetds");
 	lang=cont->getConnectStringValue("lang");
 	server=cont->getConnectStringValue("server");
 	db=cont->getConnectStringValue("db");
@@ -357,6 +359,22 @@ bool freetdsconnection::logIn(const char **error, const char **warning) {
 		*error=logInError(
 			"Failed to set SYBASE environment variable.",1);
 		return false;
+	}
+
+	// set freetds
+	if (!charstring::isNullOrEmpty(freetds)) {
+		if (!environment::setValue("FREETDS",freetds)) {
+			*error=logInError(
+				"Failed to set FREETDS "
+				"environment variable.",1);
+			return false;
+		}
+		if (!environment::setValue("FREETDSCONF",freetds)) {
+			*error=logInError(
+				"Failed to set FREETDSCONF "
+				"environment variable.",1);
+			return false;
+		}
 	}
 
 	// set lang
