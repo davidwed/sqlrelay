@@ -39,6 +39,7 @@
 	added php conf type for netbsd
 	added freetds parameter to freetds connection module that sets the
 		FREETDS/FREETDSCONF environment variables
+	fixed some subtle SQLGetData bugs in ODBC driver
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-//#ifdef _WIN32
+/*#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-//#endif*/
+#endif*/
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -4501,21 +4501,6 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					stmt->cur->colCount()+col]);
 	debugPrintf("  offset: %lld\n",*offset);
 
-	// FIXME: remove this, this wasn't the problem, and the problem is
-	// solved...
-	// ADO often passes in a targetvalue which overlaps the strlen_or_ind.
-	// (usually by 2 bytes, as if strlen_or_ind should only be 2 bytes long)
-	// Also, notably, in these cases, targetvalue isn't aligned to a
-	// 4-byte boundary.
-	// Not sure what to do, other than ignore one or the other.
-	/*if (targetvalue>=strlen_or_ind &&
-		targetvalue<(((unsigned char *)strlen_or_ind)+
-					sizeof(strlen_or_ind))) {
-		debugPrintf("  WARNING! targetvalue overlaps strlen_or_ind\n");
-		targetvalue=NULL;
-		//strlen_or_ind=NULL;
-	}*/
-
 	// handle NULL fields
 	if (!field) {
 		if (strlen_or_ind) {
@@ -4545,6 +4530,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 
 	// get the field data
 	bool	trunc=false;
+	bool	nodata=false;
 	switch (targettype) {
 		case SQL_C_CHAR:
 		#ifdef SQL_C_WCHAR
@@ -4553,22 +4539,29 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			{
 			debugPrintf("  targettype: SQL_C_(W)CHAR\n");
 
-			// reset field and fieldlength re. offset
-			field+=*offset;
-			fieldlength-=*offset;
+			uint32_t	bytestocopy;
+			if (*offset<fieldlength) {
 
-			// calculate size to copy
-			// make sure to include the null-terminator
-			uint32_t	bytestocopy=
-					((uint32_t)bufferlength<fieldlength+1)?
-						bufferlength:fieldlength+1;
+				// reset field and fieldlength re. offset
+				field+=*offset;
+				fieldlength-=*offset;
+
+				// calculate size to copy
+				// make sure to include the null-terminator
+				if ((uint32_t)bufferlength<fieldlength+1) {
+					bytestocopy=bufferlength;
+					*offset+=bytestocopy;
+					trunc=true;
+				} else {
+					bytestocopy=fieldlength+1;
+					*offset+=fieldlength;
+				}
+			} else {
+				fieldlength=0;
+				bytestocopy=0;
+				nodata=true;
+			}
 			debugPrintf("  bytestocopy: %ld\n",bytestocopy);
-
-			// update offset
-			*offset+=bytestocopy;
-
-			// decide if truncation occurred
-			trunc=(bytestocopy<fieldlength+1);
 
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
@@ -4706,21 +4699,28 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
 
-			// reset field and fieldlength re. offset
-			field+=*offset;
-			fieldlength-=*offset;
+			uint32_t	bytestocopy;
+			if (*offset<fieldlength) {
 
-			// calculate size to copy
-			uint32_t	bytestocopy=
-					((uint32_t)bufferlength<fieldlength)?
-						bufferlength:fieldlength;
+				// reset field and fieldlength re. offset
+				field+=*offset;
+				fieldlength-=*offset;
+
+				// calculate size to copy
+				if ((uint32_t)bufferlength<fieldlength) {
+					bytestocopy=bufferlength;
+					*offset+=bytestocopy;
+					trunc=true;
+				} else {
+					bytestocopy=fieldlength;
+					*offset+=fieldlength;
+				}
+			} else {
+				fieldlength=0;
+				bytestocopy=0;
+				nodata=true;
+			}
 			debugPrintf("  bytestocopy: %ld\n",bytestocopy);
-
-			// update offset
-			*offset+=bytestocopy;
-
-			// decide if truncation occurred
-			trunc=(bytestocopy<fieldlength);
 
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
@@ -4824,10 +4824,15 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	}
 
 	if (trunc) {
+		debugPrintf("  returning SQL_SUCCESS_WITH_INFO\n");
 		SQLR_STMTSetError(stmt,
 			"String data, right truncation",0,"01004");
 		return SQL_SUCCESS_WITH_INFO;
 	}
+	if (nodata) {
+		return SQL_NO_DATA;
+	}
+	debugPrintf("  returning SQL_SUCCESS\n");
 	return SQL_SUCCESS;
 }
 
@@ -4999,7 +5004,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 						"SQL_DIAG_SQLSTATE: %s\n",
 						stmt->sqlstate);
 					val.strval=stmt->sqlstate;
-					type=1;
+					type=0;
 					break;
 				case SQL_DIAG_CURSOR_ROW_COUNT:
 					val.lenval=

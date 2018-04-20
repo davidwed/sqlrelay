@@ -100,7 +100,7 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 	}
 
 	if (pvt->_debug) {
-		stdoutput.printf("loading result set translation: %s\n",module);
+		stdoutput.printf("loading result set row translation: %s\n",module);
 	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
@@ -113,7 +113,8 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
 		stdoutput.printf("failed to load "
-				"result set translation module: %s\n",module);
+				"result set row translation module: %s\n",
+				module);
 		char	*error=dl->getError();
 		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
@@ -135,7 +136,7 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
 		stdoutput.printf("failed to load "
-				"result set translation: %s\n",module);
+				"result set row translation: %s\n",module);
 		char	*error=dl->getError();
 		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
