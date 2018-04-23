@@ -579,6 +579,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							uint32_t col);
 		uint16_t	getColumnTableLength(sqlrservercursor *cursor,
 							uint32_t col);
+		void		getColumnNameList(sqlrservercursor *cursor,
+							stringbuffer *output);
+		void		translateResultSetHeader(
+						sqlrservercursor *cursor);
 
 		// result set navigation
 		bool		knowsRowCount(sqlrservercursor *cursor);
@@ -1107,7 +1111,6 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						uint64_t *charsread);
 		virtual void	closeLobField(uint32_t col);
 		virtual	void	closeResultSet();
-		virtual bool	getColumnNameList(stringbuffer *output);
 
 		virtual void	encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize);
@@ -1230,6 +1233,10 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		bool		getExecuteDirect();
 		void		setExecuteRpc(bool executerpc);
 		bool		getExecuteRpc();
+
+		void	setResultSetHeaderHasBeenTranslated(
+					bool resultsetheaderhasbeentranslated);
+		bool	getResultSetHeaderHasBeenTranslated();
 
 		sqlrserverconnection	*conn;
 

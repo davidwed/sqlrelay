@@ -75,6 +75,8 @@ class sqlrservercursorprivate {
 		uint64_t	_querytimeout;
 		bool		_executedirect;
 		bool		_executerpc;
+
+		bool		_resultsetheaderhasbeentranslated;
 };
 
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
@@ -149,6 +151,8 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_querytimeout=conn->cont->getQueryTimeout();
 	pvt->_executedirect=conn->cont->getExecuteDirect();
 	pvt->_executerpc=false;
+
+	pvt->_resultsetheaderhasbeentranslated=false;
 }
 
 sqlrservercursor::~sqlrservercursor() {
@@ -730,16 +734,6 @@ void sqlrservercursor::closeResultSet() {
 	return;
 }
 
-bool sqlrservercursor::getColumnNameList(stringbuffer *output) {
-	for (uint32_t i=0; i<colCount(); i++) {
-		if (i) {
-			output->append(',');
-		}
-		output->append(getColumnName(i),getColumnNameLength(i));
-	}
-	return true;
-}
-
 uint16_t sqlrservercursor::getId() {
 	return pvt->_id;
 }
@@ -1309,4 +1303,13 @@ void sqlrservercursor::setExecuteRpc(bool executerpc) {
 
 bool sqlrservercursor::getExecuteRpc() {
 	return pvt->_executerpc;
+}
+
+void sqlrservercursor::setResultSetHeaderHasBeenTranslated(
+				bool resultsetheaderhasbeentranslated) {
+	pvt->_resultsetheaderhasbeentranslated=resultsetheaderhasbeentranslated;
+}
+
+bool sqlrservercursor::getResultSetHeaderHasBeenTranslated() {
+	return pvt->_resultsetheaderhasbeentranslated;
 }

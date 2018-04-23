@@ -86,7 +86,8 @@ class sqlrservercontrollerprivate {
 	sqlrtranslations		*_sqlrt;
 	sqlrfilters			*_sqlrf;
 	sqlrresultsettranslations	*_sqlrrst;
-	sqlrresultsetrowtranslations	*_sqlrrrst;
+	sqlrresultsetrowtranslations	*_sqlrrsrt;
+	sqlrresultsetheadertranslations	*_sqlrrsht;
 	sqlrtriggers			*_sqlrtr;
 	sqlrloggers			*_sqlrlg;
 	sqlrnotifications		*_sqlrn;
@@ -154,6 +155,7 @@ class sqlrservercontrollerprivate {
 	bool		_debugbindtranslation;
 	bool		_debugsqlrresultsettranslation;
 	bool		_debugsqlrresultsetrowtranslation;
+	bool		_debugsqlrresultsetheadertranslation;
 
 	dynamiclib	_conndl;
 	dynamiclib	_sqlrpdl;
@@ -320,7 +322,8 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_sqlrt=NULL;
 	pvt->_sqlrf=NULL;
 	pvt->_sqlrrst=NULL;
-	pvt->_sqlrrrst=NULL;
+	pvt->_sqlrrsrt=NULL;
+	pvt->_sqlrrsht=NULL;
 	pvt->_sqlrtr=NULL;
 	pvt->_sqlrlg=NULL;
 	pvt->_sqlrn=NULL;
@@ -400,7 +403,8 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_sqlrt;
 	delete pvt->_sqlrf;
 	delete pvt->_sqlrrst;
-	delete pvt->_sqlrrrst;
+	delete pvt->_sqlrrsrt;
+	delete pvt->_sqlrrsht;
 	delete pvt->_sqlrtr;
 	delete pvt->_sqlrlg;
 	delete pvt->_sqlrn;
@@ -619,8 +623,18 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*resultsetrowtranslations=
 				pvt->_cfg->getResultSetRowTranslations();
 	if (!resultsetrowtranslations->isNullNode()) {
-		pvt->_sqlrrrst=new sqlrresultsetrowtranslations(this);
-		pvt->_sqlrrrst->load(resultsetrowtranslations);
+		pvt->_sqlrrsrt=new sqlrresultsetrowtranslations(this);
+		pvt->_sqlrrsrt->load(resultsetrowtranslations);
+	}
+
+	// get the result set header translations
+	pvt->_debugsqlrresultsetheadertranslation=
+			pvt->_cfg->getDebugResultSetHeaderTranslations();
+	xmldomnode	*resultsetheadertranslations=
+			pvt->_cfg->getResultSetHeaderTranslations();
+	if (!resultsetheadertranslations->isNullNode()) {
+		pvt->_sqlrrsht=new sqlrresultsetheadertranslations(this);
+		pvt->_sqlrrsht->load(resultsetheadertranslations);
 	}
 
 	// get the triggers
@@ -3884,6 +3898,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						bool enablefilters,
 						bool enabletriggers) {
 
+	// reset header translation flag
+	cursor->setResultSetHeaderHasBeenTranslated(false);
+
 	// set state
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
 
@@ -4750,8 +4767,8 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 	}
 
 	// run translations
-	if (pvt->_sqlrrrst) {
-		pvt->_sqlrrrst->run(pvt->_conn,cursor,colcount,
+	if (pvt->_sqlrrsrt) {
+		pvt->_sqlrrsrt->run(pvt->_conn,cursor,colcount,
 					names,fields,fieldlengths);
 	}
 
@@ -4947,8 +4964,8 @@ void sqlrservercontroller::endSession() {
 	}
 
 	// reset result set row translation modules
-	if (pvt->_sqlrrrst) {
-		pvt->_sqlrrrst->endSession();
+	if (pvt->_sqlrrsrt) {
+		pvt->_sqlrrsrt->endSession();
 	}
 
 	// reset trigger modules
@@ -6272,18 +6289,17 @@ bool sqlrservercontroller::getColumnNames(const char *query,
 
 	size_t		querylen=charstring::length(query);
 
-	bool	retval=false;
 	sqlrservercursor	*gcncur=newCursor();
 	if (open(gcncur) &&
 		prepareQuery(gcncur,query,querylen) && executeQuery(gcncur)) {
 
 		// build column list...
-		retval=gcncur->getColumnNameList(output);
+		getColumnNameList(gcncur,output);
 	}
 	closeResultSet(gcncur);
 	close(gcncur);
 	deleteCursor(gcncur);
-	return retval;
+	return true;
 }
 
 void sqlrservercontroller::addSessionTempTableForDrop(const char *table) {
@@ -6839,93 +6855,162 @@ uint16_t sqlrservercontroller::columnTypeFormat(sqlrservercursor *cursor) {
 
 const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnName(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnNameLength(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnType(mapColumn(col));
 }
 
 const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnTypeName(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnTypeNameLength(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnLength(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnPrecision(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnScale(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnIsNullable(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnIsPrimaryKey(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnIsUnique(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnIsPartOfKey(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnIsUnsigned(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnIsZeroFilled(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnIsBinary(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
 						sqlrservercursor *cursor,
 							uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnIsAutoIncrement(mapColumn(col));
 }
 
 const char *sqlrservercontroller::getColumnTable(sqlrservercursor *cursor,
 								uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnTable(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnTableLength(sqlrservercursor *cursor,
 								uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
 	return cursor->getColumnTableLength(mapColumn(col));
+}
+
+void sqlrservercontroller::getColumnNameList(sqlrservercursor *cursor,
+							stringbuffer *output) {
+	for (uint32_t i=0; i<colCount(cursor); i++) {
+		if (i) {
+			output->append(',');
+		}
+		output->append(getColumnName(cursor,i),
+				getColumnNameLength(cursor,i));
+	}
+}
+
+void sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
+	// FIXME: do something here...
 }
 
 bool sqlrservercontroller::noRowsToReturn(sqlrservercursor *cursor) {
