@@ -125,7 +125,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 						uint16_t unsignednumber,
 						uint16_t zerofill,
 						uint16_t binary,
-						uint16_t autoincrement);
+						uint16_t autoincrement,
+						const char *table,
+						uint16_t tablelength);
 		void	sendColumnDefinitionString(const char *name,
 						uint16_t namelen,
 						const char *type, 
@@ -140,7 +142,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 						uint16_t unsignednumber,
 						uint16_t zerofill,
 						uint16_t binary,
-						uint16_t autoincrement);
+						uint16_t autoincrement,
+						const char *table,
+						uint16_t tablelength);
 		bool	returnResultSetData(sqlrservercursor *cursor,
 						bool getskipandfetch,
 						bool overridelazyfetch);
@@ -2709,6 +2713,8 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 		uint16_t	binary=cont->getColumnIsBinary(cursor,i);
 		uint16_t	autoincrement=
 				cont->getColumnIsAutoIncrement(cursor,i);
+		const char	*table=cont->getColumnTable(cursor,i);
+		uint16_t	tablelen=cont->getColumnTableLength(cursor,i);
 
 		if (format==COLUMN_TYPE_IDS) {
 			sendColumnDefinition(name,namelen,
@@ -2716,7 +2722,7 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
 					unsignednumber,zerofill,binary,
-					autoincrement);
+					autoincrement,table,tablelen);
 		} else {
 			sendColumnDefinitionString(name,namelen,
 					cont->getColumnTypeName(cursor,i),
@@ -2724,7 +2730,7 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
 					unsignednumber,zerofill,binary,
-					autoincrement);
+					autoincrement,table,tablelen);
 		}
 	}
 }
@@ -3173,7 +3179,9 @@ void sqlrprotocol_sqlrclient::sendColumnDefinition(
 						uint16_t unsignednumber,
 						uint16_t zerofill,
 						uint16_t binary,
-						uint16_t autoincrement) {
+						uint16_t autoincrement,
+						const char *table,
+						uint16_t tablelen) {
 	debugFunction();
 
 	if (cont->logEnabled() || cont->notificationsEnabled()) {
@@ -3216,6 +3224,8 @@ void sqlrprotocol_sqlrclient::sendColumnDefinition(
 	clientsock->write(zerofill);
 	clientsock->write(binary);
 	clientsock->write(autoincrement);
+	clientsock->write(tablelen);
+	clientsock->write(table,tablelen);
 }
 
 void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
@@ -3233,7 +3243,9 @@ void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
 						uint16_t unsignednumber,
 						uint16_t zerofill,
 						uint16_t binary,
-						uint16_t autoincrement) {
+						uint16_t autoincrement,
+						const char *table,
+						uint16_t tablelen) {
 	debugFunction();
 
 	if (cont->logEnabled() || cont->notificationsEnabled()) {
@@ -3279,6 +3291,8 @@ void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
 	clientsock->write(zerofill);
 	clientsock->write(binary);
 	clientsock->write(autoincrement);
+	clientsock->write(tablelen);
+	clientsock->write(table,tablelen);
 }
 
 bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,

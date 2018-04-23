@@ -668,6 +668,14 @@ uint16_t sqlrservercursor::getColumnIsAutoIncrement(uint32_t col) {
 	return 0;
 }
 
+const char *sqlrservercursor::getColumnTable(uint32_t col) {
+	return NULL;
+}
+
+uint16_t sqlrservercursor::getColumnTableLength(uint32_t col) {
+	return charstring::length(getColumnTable(col));
+}
+
 bool sqlrservercursor::ignoreDateDdMmParameter(uint32_t col,
 					const char *data, uint32_t size) {
 	return false;

@@ -147,6 +147,7 @@ class sqlrclientcolumn {
 		uint16_t	zerofill;
 		uint16_t	binary;
 		uint16_t	autoincrement;
+		char		*table;
 };
 
 enum columncase {
@@ -706,6 +707,7 @@ void sqlrcursor::cacheColumnInfo() {
 
 		// write the columns themselves
 		uint16_t			namelen;
+		uint16_t			tablelen;
 		sqlrclientcolumn		*whichcolumn;
 		for (uint32_t i=0; i<pvt->_colcount; i++) {
 
@@ -742,6 +744,11 @@ void sqlrcursor::cacheColumnInfo() {
 			pvt->_cachedest->write(whichcolumn->zerofill);
 			pvt->_cachedest->write(whichcolumn->binary);
 			pvt->_cachedest->write(whichcolumn->autoincrement);
+
+			// write the table
+			tablelen=charstring::length(whichcolumn->table);
+			pvt->_cachedest->write(tablelen);
+			pvt->_cachedest->write(whichcolumn->table,tablelen);
 		}
 	}
 }
@@ -3913,6 +3920,24 @@ bool sqlrcursor::parseColumnInfo() {
 					"A network error may have occurred.");
 				return false;
 			}
+	
+			// get the table length
+			if (getShort(&length)!=sizeof(uint16_t)) {
+				setError("Failed to get the table length.\n"
+					"A network error may have occurred.");
+				return false;
+			}
+	
+			// get the table
+			currentcol->table=
+				(char *)pvt->_colstorage->allocate(length+1);
+			if (getString(currentcol->table,length)!=length) {
+				setError("Failed to get the table.\n "
+					"A network error may have occurred.");
+				return false;
+			}
+			currentcol->table[length]='\0';
+
 
 			// initialize the longest value
 			currentcol->longest=0;
@@ -3920,6 +3945,9 @@ bool sqlrcursor::parseColumnInfo() {
 			if (pvt->_sqlrc->debug()) {
 				pvt->_sqlrc->debugPreStart();
 				pvt->_sqlrc->debugPrint("	");
+				pvt->_sqlrc->debugPrint("\"");
+				pvt->_sqlrc->debugPrint(currentcol->table);
+				pvt->_sqlrc->debugPrint("\".");
 				pvt->_sqlrc->debugPrint("\"");
 				pvt->_sqlrc->debugPrint(currentcol->name);
 				pvt->_sqlrc->debugPrint("\",");
@@ -5871,6 +5899,11 @@ bool sqlrcursor::getColumnIsAutoIncrement(uint32_t col) {
 	return (whichcol)?(whichcol->autoincrement!=0):false;
 }
 
+const char *sqlrcursor::getColumnTable(uint32_t col) {
+	sqlrclientcolumn	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->table:NULL;
+}
+
 uint32_t sqlrcursor::getLongest(uint32_t col) {
 	sqlrclientcolumn	*whichcol=getColumn(col);
 	return (whichcol)?whichcol->longest:0;
@@ -5941,6 +5974,11 @@ bool sqlrcursor::getColumnIsBinary(const char *col) {
 bool sqlrcursor::getColumnIsAutoIncrement(const char *col) {
 	sqlrclientcolumn	*whichcol=getColumn(col);
 	return (whichcol)?(whichcol->autoincrement!=0):false;
+}
+
+const char *sqlrcursor::getColumnTable(const char *col) {
+	sqlrclientcolumn	*whichcol=getColumn(col);
+	return (whichcol)?whichcol->table:NULL;
 }
 
 

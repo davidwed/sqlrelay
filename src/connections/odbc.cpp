@@ -50,6 +50,8 @@ struct odbccolumn {
 	SQLINTEGER	unsignednumber;
 	SQLINTEGER	autoincrement;
 #endif
+	char		table[4096];
+	uint16_t	tablelength;
 };
 
 struct datebind {
@@ -187,6 +189,8 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		uint16_t	getColumnIsUnsigned(uint32_t i);
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
+		const char	*getColumnTable(uint32_t i);
+		uint16_t	getColumnTableLength(uint32_t i);
 		bool		noRowsToReturn();
 		bool		fetchRow();
 		void		getField(uint32_t col,
@@ -2721,6 +2725,17 @@ bool odbccursor::handleColumns() {
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+
+			// table name
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TABLE_NAME,
+					column[i].table,4096,
+					(SQLSMALLINT *)&(column[i].tablelength),
+					NULL);
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
+			column[i].tablelength=
+					charstring::length(column[i].table);
 #else
 			// column name
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LABEL,
@@ -2802,6 +2817,17 @@ bool odbccursor::handleColumns() {
 			#else
 			column[i].autoincrement=0;
 			#endif
+
+			// table name
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TABLE_NAME,
+					column[i].table,4096,
+					(SQLSMALLINT *)&(column[i].tablelength),
+					NULL);
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
+			column[i].tablelength=
+					charstring::length(column[i].table);
 #endif
 		}
 
@@ -3008,6 +3034,14 @@ uint16_t odbccursor::getColumnIsBinary(uint32_t i) {
 
 uint16_t odbccursor::getColumnIsAutoIncrement(uint32_t i) {
 	return column[i].autoincrement;
+}
+
+const char *odbccursor::getColumnTable(uint32_t i) {
+	return column[i].table;
+}
+
+uint16_t odbccursor::getColumnTableLength(uint32_t i) {
+	return column[i].tablelength;
 }
 
 bool odbccursor::noRowsToReturn() {

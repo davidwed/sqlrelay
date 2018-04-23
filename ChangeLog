@@ -40,6 +40,8 @@
 	added freetds parameter to freetds connection module that sets the
 		FREETDS/FREETDSCONF environment variables
 	fixed some subtle SQLGetData bugs in ODBC driver
+	updated sqlrserver API to support getting the table of a column
+	updated sqlrclient protocol to send/receive it
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

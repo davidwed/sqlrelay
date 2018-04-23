@@ -6918,6 +6918,16 @@ uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
 	return cursor->getColumnIsAutoIncrement(mapColumn(col));
 }
 
+const char *sqlrservercontroller::getColumnTable(sqlrservercursor *cursor,
+								uint32_t col) {
+	return cursor->getColumnTable(mapColumn(col));
+}
+
+uint16_t sqlrservercontroller::getColumnTableLength(sqlrservercursor *cursor,
+								uint32_t col) {
+	return cursor->getColumnTableLength(mapColumn(col));
+}
+
 bool sqlrservercontroller::noRowsToReturn(sqlrservercursor *cursor) {
 	return cursor->noRowsToReturn();
 }

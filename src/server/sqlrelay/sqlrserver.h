@@ -575,6 +575,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		uint16_t	getColumnIsAutoIncrement(
 						sqlrservercursor *cursor,
 							uint32_t col);
+		const char	*getColumnTable(sqlrservercursor *cursor,
+							uint32_t col);
+		uint16_t	getColumnTableLength(sqlrservercursor *cursor,
+							uint32_t col);
 
 		// result set navigation
 		bool		knowsRowCount(sqlrservercursor *cursor);
@@ -1079,6 +1083,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual uint16_t	getColumnIsZeroFilled(uint32_t col);
 		virtual uint16_t	getColumnIsBinary(uint32_t col);
 		virtual uint16_t	getColumnIsAutoIncrement(uint32_t col);
+		virtual const char	*getColumnTable(uint32_t col);
+		virtual uint16_t	getColumnTableLength(uint32_t col);
 		virtual bool		ignoreDateDdMmParameter(uint32_t col,
 							const char *data,
 							uint32_t size);

@@ -255,5 +255,7 @@
 							bool *isnegative);
 		const char	*getInputOutputBindBlob(const char *variable);
 		const char	*getInputOutputBindClob(const char *variable);
+		const char	*getColumnTable(const char *col);
+		const char	*getColumnTable(uint32_t col);
 
 	friend class sqlrconnection;
