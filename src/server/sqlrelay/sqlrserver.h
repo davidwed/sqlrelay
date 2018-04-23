@@ -1894,6 +1894,47 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 	#include <sqlrelay/private/sqlrresultsetrowtranslations.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation {
+	public:
+		sqlrresultsetheadertranslation(
+					sqlrservercontroller *cont,
+					sqlrresultsetheadertranslations *rs,
+					xmldomnode *parameters);
+		virtual	~sqlrresultsetheadertranslation();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames,
+					const char ***fields,
+					uint64_t **fieldlengths);
+
+	protected:
+		sqlrresultsetheadertranslations
+					*getResultSetHeaderTranslations();
+		xmldomnode		*getParameters();
+
+	#include <sqlrelay/private/sqlrresultsetheadertranslation.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslations {
+	public:
+		sqlrresultsetheadertranslations(sqlrservercontroller *cont);
+		~sqlrresultsetheadertranslations();
+
+		bool	load(xmldomnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						uint32_t colcount,
+						const char * const *fieldnames,
+						const char ***fields,
+						uint64_t **fieldlengths);
+
+		void	endSession();
+
+	#include <sqlrelay/private/sqlrresultsetheadertranslations.h>
+};
+
 class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
 		sqlrtrigger(sqlrservercontroller *cont,

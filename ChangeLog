@@ -42,6 +42,7 @@
 	fixed some subtle SQLGetData bugs in ODBC driver
 	updated sqlrserver API to support getting the table of a column
 	updated sqlrclient protocol to send/receive it
+	added result set header translation framework
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields
