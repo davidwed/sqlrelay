@@ -4746,7 +4746,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 	}
 
 	if (pvt->_debugsqlrresultsettranslation) {
-		stdoutput.printf("translated:\n%s\n\n",*field);
+		stdoutput.printf("translated:\n%.*s\n\n",*fieldlength,*field);
 	}
 }
 
@@ -4774,7 +4774,8 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 
 	if (pvt->_debugsqlrresultsetrowtranslation) {
 		for (uint32_t i=0; i<colcount; i++) {
-			stdoutput.printf("translated:\n%s\n\n",(*fields)[i]);
+			stdoutput.printf("translated:\n%.*s\n\n",
+					(*fieldlengths)[i],(*fields)[i]);
 		}
 	}
 }
