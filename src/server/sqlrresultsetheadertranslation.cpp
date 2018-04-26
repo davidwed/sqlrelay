@@ -26,9 +26,24 @@ sqlrresultsetheadertranslation::~sqlrresultsetheadertranslation() {
 bool sqlrresultsetheadertranslation::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
-					const char * const *fieldnames,
-					const char ***field,
-					uint64_t **fieldlength) {
+					const char ***columnnames,
+					uint16_t **columnnamelengths,
+					uint16_t **columntypes,
+					const char ***columntypenames,
+					uint16_t **columntypenamelengths,
+					uint32_t **columnlengths,
+					uint32_t **columnprecisions,
+					uint32_t **columnscales,
+					uint16_t **columnisnullables,
+					uint16_t **columnisprimarykeys,
+					uint16_t **columnisuniques,
+					uint16_t **columnispartofkeys,
+					uint16_t **columnisunsigneds,
+					uint16_t **columniszerofilleds,
+					uint16_t **columnisbinarys,
+					uint16_t **columnisautoincrements,
+					const char ***columntables,
+					uint16_t **columntablelengths) {
 	return true;
 }
 

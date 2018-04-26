@@ -176,11 +176,26 @@ void sqlrresultsetheadertranslations::loadResultSetHeaderTranslation(
 }
 
 bool sqlrresultsetheadertranslations::run(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
-						uint32_t colcount,
-						const char * const *fieldnames,
-						const char ***fields,
-						uint64_t **fieldlengths) {
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char ***columnnames,
+					uint16_t **columnnamelengths,
+					uint16_t **columntypes,
+					const char ***columntypenames,
+					uint16_t **columntypenamelengths,
+					uint32_t **columnlengths,
+					uint32_t **columnprecisions,
+					uint32_t **columnscales,
+					uint16_t **columnisnullables,
+					uint16_t **columnisprimarykeys,
+					uint16_t **columnisuniques,
+					uint16_t **columnispartofkeys,
+					uint16_t **columnisunsigneds,
+					uint16_t **columniszerofilleds,
+					uint16_t **columnisbinarys,
+					uint16_t **columnisautoincrements,
+					const char ***columntables,
+					uint16_t **columntablelengths) {
 	debugFunction();
 
 	for (singlylinkedlistnode
@@ -194,8 +209,25 @@ bool sqlrresultsetheadertranslations::run(sqlrserverconnection *sqlrcon,
 		}
 
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
-						colcount,fieldnames,
-						fields,fieldlengths)) {
+						colcount,
+						columnnames,
+						columnnamelengths,
+						columntypes,
+						columntypenames,
+						columntypenamelengths,
+						columnlengths,
+						columnprecisions,
+						columnscales,
+						columnisnullables,
+						columnisprimarykeys,
+						columnisuniques,
+						columnispartofkeys,
+						columnisunsigneds,
+						columniszerofilleds,
+						columnisbinarys,
+						columnisautoincrements,
+						columntables,
+						columntablelengths)) {
 			return false;
 		}
 	}

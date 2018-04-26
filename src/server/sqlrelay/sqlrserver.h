@@ -1219,13 +1219,34 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 
 		stringbuffer	*getQueryWithFakeInputBindsBuffer();
 
+		void	allocateColumnPointers(uint32_t colcount);
+		void	deallocateColumnPointers();
+		void	getColumnPointers(const char ***columnnames,
+					uint16_t **columnnamelengths,
+					uint16_t **columntypes,
+					const char ***columntypenames,
+					uint16_t **columntypenamelengths,
+					uint32_t **columnlengths,
+					uint32_t **columnprecisions,
+					uint32_t **columnscales,
+					uint16_t **columnisnullables,
+					uint16_t **columnisprimarykeys,
+					uint16_t **columnisuniques,
+					uint16_t **columnispartofkeys,
+					uint16_t **columnisunsigneds,
+					uint16_t **columniszerofilleds,
+					uint16_t **columnisbinarys,
+					uint16_t **columnisautoincrements,
+					const char ***columntables,
+					uint16_t **columntablelengths);
+
 		void	allocateFieldPointers(uint32_t colcount);
 		void	deallocateFieldPointers();
 		void	getFieldPointers(const char ***fieldnames,
-						const char ***fields,
-						uint64_t **fieldlengths,
-						bool **blob,
-						bool **null);
+					const char ***fields,
+					uint64_t **fieldlengths,
+					bool **blob,
+					bool **null);
 
 		void		setQueryTimeout(uint64_t querytimeout);
 		uint64_t	getQueryTimeout();
@@ -1912,9 +1933,24 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation {
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
-					const char * const *fieldnames,
-					const char ***fields,
-					uint64_t **fieldlengths);
+					const char ***columnnames,
+					uint16_t **columnnamelengths,
+					uint16_t **columntypes,
+					const char ***columntypenames,
+					uint16_t **columntypenamelengths,
+					uint32_t **columnlengths,
+					uint32_t **columnprecisions,
+					uint32_t **columnscales,
+					uint16_t **columnisnullables,
+					uint16_t **columnisprimarykeys,
+					uint16_t **columnisuniques,
+					uint16_t **columnispartofkeys,
+					uint16_t **columnisunsigneds,
+					uint16_t **columniszerofilleds,
+					uint16_t **columnisbinarys,
+					uint16_t **columnisautoincrements,
+					const char ***columntables,
+					uint16_t **columntablelengths);
 
 	protected:
 		sqlrresultsetheadertranslations
@@ -1931,12 +1967,26 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslations {
 
 		bool	load(xmldomnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
-						uint32_t colcount,
-						const char * const *fieldnames,
-						const char ***fields,
-						uint64_t **fieldlengths);
-
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char ***columnnames,
+					uint16_t **columnnamelengths,
+					uint16_t **columntypes,
+					const char ***columntypenames,
+					uint16_t **columntypenamelengths,
+					uint32_t **columnlengths,
+					uint32_t **columnprecisions,
+					uint32_t **columnscales,
+					uint16_t **columnisnullables,
+					uint16_t **columnisprimarykeys,
+					uint16_t **columnisuniques,
+					uint16_t **columnispartofkeys,
+					uint16_t **columnisunsigneds,
+					uint16_t **columniszerofilleds,
+					uint16_t **columnisbinarys,
+					uint16_t **columnisautoincrements,
+					const char ***columntables,
+					uint16_t **columntablelengths);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsetheadertranslations.h>
