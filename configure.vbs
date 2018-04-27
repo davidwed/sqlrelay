@@ -268,7 +268,7 @@ set WshShell=WScript.CreateObject("WScript.Shell")
 
 
 ' get top_builddir
-top_builddir=fso.GetAbsolutePathName(".")
+top_builddir=chr(34) & fso.GetAbsolutePathName(".") & chr(34)
 
 
 WScript.Echo("")
