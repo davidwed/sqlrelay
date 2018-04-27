@@ -343,6 +343,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		detachbeforelogin;
 		const char	*lastinsertidquery;
 		bool		mars;
+		bool		servercursor;
 
 		stringbuffer	errormessage;
 
@@ -484,6 +485,7 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	detachbeforelogin=false;
 	lastinsertidquery=NULL;
 	mars=false;
+	servercursor=false;
 }
 
 
@@ -511,6 +513,8 @@ void odbcconnection::handleConnectString() {
 	lastinsertidquery=cont->getConnectStringValue("lastinsertidquery");
 
 	mars=!charstring::compare(cont->getConnectStringValue("mars"),"yes");
+	servercursor=!charstring::compare(
+			cont->getConnectStringValue("servercursor"),"yes");
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
@@ -1998,6 +2002,21 @@ bool odbccursor::allocateStatementHandle() {
 	erg=SQLAllocStmt(odbcconn->dbc,&stmt);
 	#endif
 
+	// MS SQL Server only returns table names for columns when using a
+	// server cursor or when the query contains a FOR BROWSE clause.
+	//
+	// Some apps need the table name.
+	//
+	// Setting the cursor type to static appears to be the least invasive
+	// way of influencing the server to use a server cursor and thus return
+	// column names.  The cost is that we can't use FOR BROWSE clauses, but
+	// SQL Relay doesn't support updating result sets anyway, so that
+	// shouldn't be too much of a problem.
+	if (odbcconn->servercursor) {
+		SQLSetStmtAttr(stmt,SQL_ATTR_CURSOR_TYPE,
+			(SQLPOINTER)SQL_CURSOR_STATIC,SQL_IS_INTEGER);
+	}
+
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2727,7 +2746,7 @@ bool odbccursor::handleColumns() {
 			}
 
 			// table name
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TABLE_NAME,
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_BASE_TABLE_NAME,
 					column[i].table,4096,
 					(SQLSMALLINT *)&(column[i].tablelength),
 					NULL);

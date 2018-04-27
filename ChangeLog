@@ -43,6 +43,7 @@
 	updated sqlrserver API to support getting the table of a column
 	updated sqlrclient protocol to send/receive it
 	added result set header translation framework
+	added servercursor option to odbc connection module
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields
