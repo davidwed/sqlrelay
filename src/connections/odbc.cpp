@@ -344,6 +344,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		const char	*lastinsertidquery;
 		bool		mars;
 		bool		servercursor;
+		const char	*overrideschema;
 
 		stringbuffer	errormessage;
 
@@ -486,6 +487,7 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	lastinsertidquery=NULL;
 	mars=false;
 	servercursor=false;
+	overrideschema=NULL;
 }
 
 
@@ -515,6 +517,10 @@ void odbcconnection::handleConnectString() {
 	mars=!charstring::compare(cont->getConnectStringValue("mars"),"yes");
 	servercursor=!charstring::compare(
 			cont->getConnectStringValue("servercursor"),"yes");
+	const char	*os=cont->getConnectStringValue("overrideschema");
+	if (!charstring::isNullOrEmpty(os)) {
+		overrideschema=os;
+	}
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
@@ -990,14 +996,18 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// get the table name (or % for all tables)
@@ -1128,14 +1138,18 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// the table name might be in one
@@ -1229,14 +1243,18 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// the table name might be in one
@@ -1326,14 +1344,18 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// the table name might be in one
@@ -1694,14 +1716,18 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// get the procedure name (or % for all procedures)

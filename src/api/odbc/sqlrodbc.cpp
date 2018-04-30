@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-/*#ifdef _WIN32
+#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif*/
+#endif
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -4557,9 +4557,13 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					*offset+=fieldlength;
 				}
 			} else {
+				if (*offset>fieldlength) {
+					nodata=true;
+				} else {
+					(*offset)++;
+				}
 				fieldlength=0;
 				bytestocopy=0;
-				nodata=true;
 			}
 			debugPrintf("  bytestocopy: %ld\n",bytestocopy);
 
@@ -4716,9 +4720,13 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					*offset+=fieldlength;
 				}
 			} else {
+				if (*offset>fieldlength) {
+					nodata=true;
+				} else {
+					(*offset)++;
+				}
 				fieldlength=0;
 				bytestocopy=0;
-				nodata=true;
 			}
 			debugPrintf("  bytestocopy: %ld\n",bytestocopy);
 
@@ -4830,6 +4838,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		return SQL_SUCCESS_WITH_INFO;
 	}
 	if (nodata) {
+		debugPrintf("  returning SQL_NO_DATA\n");
 		return SQL_NO_DATA;
 	}
 	debugPrintf("  returning SQL_SUCCESS\n");
