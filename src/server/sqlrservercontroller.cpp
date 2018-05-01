@@ -2258,39 +2258,46 @@ bool sqlrservercontroller::getListsByApiCalls() {
 
 bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getDatabaseList(cursor,wild);
 }
 
 bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getSchemaList(cursor,wild);
 }
 
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getTableList(cursor,wild);
 }
 
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getTableTypeList(cursor,wild);
 }
 
 bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getColumnList(cursor,table,wild);
 }
 
 bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getPrimaryKeyList(cursor,table,wild);
 }
 
 bool sqlrservercontroller::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getKeyAndIndexList(cursor,table,wild);
 }
 
@@ -2298,17 +2305,20 @@ bool sqlrservercontroller::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *procedure,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getProcedureBindAndColumnList(cursor,procedure,wild);
 }
 
 bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getTypeInfoList(cursor,type,wild);
 }
 
 bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getProcedureList(cursor,wild);
 }
 
