@@ -1105,6 +1105,7 @@ bool odbcconnection::getTableTypeList(sqlrservercursor *cursor,
 bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 					const char *table,
 					const char *wild) {
+stdoutput.printf("here: %s\n",table);
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
@@ -1203,6 +1204,7 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	}
 	delete[] tableparts;
 
+stdoutput.printf("done\n");
 	// parse the column information
 	return (retval)?odbccur->handleColumns():false;
 }
