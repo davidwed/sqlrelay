@@ -7116,8 +7116,6 @@ void sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
 				&pvt->_columntablelengths);
 	}
 
-	// FIXME: do some translating here
-
 	cursor->setResultSetHeaderHasBeenTranslated(true);
 }
 
