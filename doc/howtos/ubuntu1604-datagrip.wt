@@ -1,0 +1,218 @@
+= Ubuntu 16.04 - !JetBrains !DataGrip + SQL Relay =
+
+This how-to walks through:
+
+* Installing !JetBrains !DataGrip on an Ubuntu 16.04 system
+* Using !DataGrip to access a database via an SQL Relay server, installed on another system
+
+!DataGrip can access any data source for which a JDBC driver exists.  SQL Relay doesn't provide a proper JDBC driver, but does provide an ODBC driver.  So, the JDBC-ODBC bridge provided by Java 1.7 can be used to access SQL Relay.
+
+The how-to assumes that two systems have been set up and configured as follows:
+
+'''!DataGrip/SQL Relay client'''
+
+* Ubuntu 16.04 Desktop operating system
+* //apt upgrade// was run post-install
+* A user with sudo privileges has desktop access to the system
+
+( See the how-to [ubuntu1604-sqlrclient.html Ubuntu 16.04 - Basic SQL Relay Client] for information on configuring a system like this. )
+
+'''SQL Relay server'''
+
+* Any operating system that supports SQL Relay server, accessible as:
+ * Hostname: '''sqlrserver'''
+ * Port: 9000
+ * Username: '''sqlruser'''
+ * Password: '''sqlrpassword'''
+
+( See the how-to [ubuntu1604-sqlrserver-oracle12c.html Ubuntu 16.04 - SQL Relay Server + Oracle 12c] for information on configuring a system like this. )
+
+
+=== Install Java SE 1.7 ===
+
+On the !DataGrip/SQL Relay client system, download Java JDK 1.7 as follows.
+
+* Navigate to [https://oracle.com the Oracle website].
+* Mouse-over the //Sign In// link at the top right of the page.
+* If you don't already have an account, click //Create an account// and follow the instructions.
+* If you have an account, click the //Sign In// box and enter your Username and Password.
+* Navigate to [http://www.oracle.com/technetwork/java/javase/downloads/java-archive-downloads-javase7-521261.html Java SE 7 Archive Downloads].
+* Click the radio box next to //Accept License Agreement//.
+* Scroll down to the section labelled //Java SE Development Kit 7u80// and download the following tar.gz file from beneath that section:
+ * jdk-7u80-linux-x64.tar.gz
+
+Install the contents of the tar.gz file as follows:
+
+{{{
+tar xfz jdk-7u80-linux-x64.tar.gz
+sudo mv jdk1.7.0_80 /opt
+}}}
+
+
+=== Install !DataGrip ===
+
+Download !DataGrip as follows:
+
+* Navigate to [https://www.jetbrains.com/datagrip/download/#section=linux Download DataGrip].
+* Click the Download button.
+* Wait a few seconds for the download to start.
+
+Install !DataGrip as follows:
+
+{{{
+tar xfz datagrip-*.tar.gz
+sudo mv DatGrip-* /opt
+}}}
+
+Create the script /usr/local/bin/datagrip.sh with the following contents:
+
+{{{
+#!/bin/sh
+
+export JAVA_HOME=/opt/jdk1.7.0_80
+export LD_LIBRARY_PATH=/opt/jdk1.7.0_80/jre/lib/amd64
+export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libodbc.so
+
+cd /opt/DataGrip-*/bin
+./datagrip.sh
+}}}
+
+The JAVA_HOME variable indicates which JVM to use.  In this case, we must use the Java 1.7 JVM that we installed earlier as opposed to any system JVM.
+
+The LD_LIBRARY_PATH variable includes the location of the libJdbcOdbc.so library (the native component of the JDBC-ODBC bridge) and various libraries that it depends on.
+
+The LD_PRELOAD variable makes sure that the ODBC library is loaded, as libJdbcOdbc.so requires it, but isn't actually linked against it, for some reason.
+
+Give the script execute permissions as follows.
+
+{{{
+sudo chmod 755 /usr/local/bin/datagrip.sh
+}}}
+
+=== Configure ODBC ===
+
+Append the following to /etc/odbcinst.ini
+
+{{{
+[SQLRelay]
+Description=ODBC for SQL Relay
+Setup=/usr/local/firstworks/lib/libsqlrodbc.so
+Driver=/usr/local/firstworks/lib/libsqlrodbc.so
+Setup64=/usr/local/firstworks/lib/libsqlrodbc.so
+Driver64=/usr/local/firstworks/lib/libsqlrodbc.so
+UsageCount=1
+}}}
+
+Append the following to /etc/odbc/ini
+
+{{{
+[sqlrserver]
+Driver=SQLRelay
+Server=sqlrserver
+Port=9000
+User=sqlruser
+Password=sqlrpassword
+}}}
+
+
+=== Run !DataGrip for the First Time ===
+
+The first time you run !DataGrip it prompts you for various initial configuration options.
+
+Run the datagrip.sh script you created earlier as follows.
+
+{{{
+datagrip.sh
+}}}
+
+* On the Complete Installation dialog:
+ * Leave Do not import settings selected
+ * Click Ok
+* On the !DataGrip Privacy Policy Agreement dialog:
+ * Click Accept
+* On the !DataGrip License Activation dialog:
+ * Click Evaluate for free
+ * Click Evaluate
+* On the License Agreement for !DataGrip... dialog:
+ * Click Accept
+* On the Customize !DataGrip dialog:
+ * Click Skip Remaining and Set Defaults
+
+!DataGrip should now be running and present you with its main page.
+
+
+=== Add an ODBC Driver Profile ===
+
+!DataGrip comes with JDBC driver profiles for Oracle, !MySQL, !PostgreSQL, and many other databases, but it doesn't come with an ODBC driver profile.
+
+To add an ODBC driver profile:
+
+* Click File -> Data Sources...
+
+This should pop up a Data Sources and Drivers dialog.
+
+* Click the + in the upper left hand corner and select Driver
+
+This should add a new entry to the Drivers list named Database Driver and display a panel with various Driver-related settings to the right of the list.
+
+* Replace the Name of Database Driver with ODBC.
+* Click the + to the right of the box under Additional files
+* In the Select Database Driver Files dialog:
+ * Navigate to /opt/jdk1.7.0_80/jre/lib
+ * Select rt.jar
+ * Click OK
+* Click the Class pulldown and select sun.jdbc.odbc.JdbcOdbcDriver
+* Click OK
+
+=== Add an ODBC Database Connection ===
+
+To configure an ODBC connection to SQL Relay:
+
+* Mouse-over the icon in the lower left corner of the !DataGrip window.
+* Select Database
+
+This should pop up a Database window.
+
+* Click the + in the upper right of this window
+* Select Data Source -> ODBC
+
+This should pop up the Data Sources and Drivers dialog.  There should be a Project Data Sources list at the top, with an entry named ODBC -.  There should be a with various Data Source-related settings to the right of the list.
+
+* Set User to sqlruser
+* Set Password to sqlrpassword
+* Set URL to jdbc:odbc:sqlrserver
+* Click OK
+
+This should close the Data Sources and Drivers dialog and bring up a console window labeled ODBC - jdbc:odbc:sqlrserver.
+
+* If you get a Choose password for new keyring dialog, just click Cancel.
+* If you get an error indicating that the SQL dialect isn't set, then it is safe to ignore.
+
+=== Verify Connectivity to the SQL Relay Server ===
+
+In the jdbc:odbc:sqlrserver console, enter a query like the following:
+
+{{{
+select 'hello world' from dual
+}}}
+
+And click the green arrow in the upper left hand corner of the console window.
+
+It should display results in a new window below, like the following:
+
+{{{
+   'HELLOWORLD'
+1  hello world
+}}}
+
+At this point, you should be able to run any query you like, and generally use !DataGrip as you would with any other database.
+
+=== Uninstallation ===
+
+If, for some reason, you need to completely uninstall !DataGrip and its dependencies, then run the following commands:
+
+{{{
+sudo rm -rf /opt/DataGrip-* /opt/jdk1.7.0_80 /usr/local/bin/datagrip.sh
+}}}
+
+Then run the uninstallation procedure for SQL Relay and Rudiments as described in [ubuntu1604-sqlrclient.html Ubuntu 16.04 - Basic SQL Relay Client].

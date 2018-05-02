@@ -1,4 +1,4 @@
-cur.sendQuery("exec testproc");
+cur.sendQuery("exec exampleproc");
 field00=cur.getFieldByIndex(0,0);
 field01=cur.getFieldByIndex(0,1);
 field02=cur.getFieldByIndex(0,2);

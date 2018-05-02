@@ -268,7 +268,7 @@ set WshShell=WScript.CreateObject("WScript.Shell")
 
 
 ' get top_builddir
-top_builddir=fso.GetAbsolutePathName(".")
+top_builddir=chr(34) & fso.GetAbsolutePathName(".") & chr(34)
 
 
 WScript.Echo("")
@@ -442,8 +442,8 @@ end if
 ALLSERVER=""
 INSTALLSERVER=""
 if disableserver=false then
-	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections"
-	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections"
+	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections"
+	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections"
 end if
 
 
@@ -793,10 +793,10 @@ if JAVAPREFIX="" then
 end if
 
 if disablejava=false then
-	APIALLSUBDIRS=APIALLSUBDIRS+" all-java"
-	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-java"
-	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-java"
-	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-java"
+	APIALLSUBDIRS=APIALLSUBDIRS+" all-java all-jdbc"
+	APICLEANSUBDIRS=APICLEANSUBDIRS+" clean-java clean-jdbc"
+	APIINSTALLSUBDIRS=APIINSTALLSUBDIRS+" install-java install-jdbc"
+	APIUNINSTALLSUBDIRS=APIUNINSTALLSUBDIRS+ " uninstall-java uninstall-jdbc"
 
 	WScript.Echo("Java prefix... " & JAVAPREFIX)
 else
@@ -995,7 +995,9 @@ infiles=Array(_
 	"bin\\sqlrserver-config.in",_
 	"test\\testall.vbs.in",_
 	"sqlrelay-c.pc.in",_
-	"sqlrelay-c++.pc.in"_
+	"sqlrelay-c++.pc.in",_
+	"msvc\\setupx64\\setupx64.vdproj.in",_
+	"msvc\\setupx86\\setupx86.vdproj.in"_
 	)
 outfiles=Array(_
 	"config.mk",_
@@ -1007,7 +1009,9 @@ outfiles=Array(_
 	"bin\\sqlrserver-config",_
 	"test\\testall.vbs",_
 	"sqlrelay-c.pc",_
-	"sqlrelay-c++.pc"_
+	"sqlrelay-c++.pc",_
+	"msvc\\setupx64\\setupx64.vdproj",_
+	"msvc\\setupx86\\setupx86.vdproj"_
 	)
 
 

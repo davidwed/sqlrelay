@@ -27,12 +27,12 @@ proc checkSuccess {value success} {
 	}
 }
 
-set cert "/usr/local/firstworks/etc/client.pem"
-set ca "/usr/local/firstworks/etc/ca.pem"
+set cert "/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem"
+set ca "/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem"
 set OS [lindex $tcl_platform(os) 0]
 if { $OS == "Windows" } {
-	set cert "C:\\Program Files\\Firstworks\\etc\\client.pfx"
-	set ca "C:\\Program Files\\Firstworks\\etc\\ca.pfx"
+	set cert "C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx"
+	set ca "C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx"
 }
 
 # instantiation

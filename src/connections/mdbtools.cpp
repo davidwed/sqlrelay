@@ -52,6 +52,7 @@ class SQLRSERVER_DLLSPEC mdbtoolsconnection : public sqlrserverconnection {
 						const char *table,
 						const char *wild);
 		bool	setIsolationLevel(const char *isolevel);
+		const char	*noopQuery();
 		bool	autoCommitOn();
 		bool	autoCommitOff();
 		bool	supportsAutoCommit();
@@ -72,7 +73,8 @@ enum cursortype_t {
 	QUERY_CURSORTYPE=0,
 	DB_LIST_CURSORTYPE,
 	TABLE_LIST_CURSORTYPE,
-	COLUMN_LIST_CURSORTYPE
+	COLUMN_LIST_CURSORTYPE,
+	NOOP_CURSORTYPE
 };
 
 class SQLRSERVER_DLLSPEC mdbtoolscursor : public sqlrservercursor {
@@ -253,6 +255,10 @@ bool mdbtoolsconnection::setIsolationLevel(const char *isolevel) {
 	return true;
 }
 
+const char *mdbtoolsconnection::noopQuery() {
+	return "noop";
+}
+
 bool mdbtoolsconnection::autoCommitOn() {
 	// do nothing
 	return true;
@@ -347,6 +353,11 @@ bool mdbtoolscursor::supportsNativeBinds(const char *query, uint32_t length) {
 }
 
 bool mdbtoolscursor::executeQuery(const char *query, uint32_t length) {
+
+	if (!charstring::compare(query,"noop")) {
+		cursortype=NOOP_CURSORTYPE;
+		return true;
+	}
 
 	cursortype=QUERY_CURSORTYPE;
 
@@ -497,7 +508,9 @@ bool mdbtoolscursor::knowsAffectedRows() {
 }
 
 uint32_t mdbtoolscursor::colCount() {
-	if (cursortype==QUERY_CURSORTYPE) {
+	if (cursortype==NOOP_CURSORTYPE) {
+		return 0;
+	} else if (cursortype==QUERY_CURSORTYPE) {
 		return ((MdbSQL *)mdbsql)->num_columns;
 	} else if (cursortype==COLUMN_LIST_CURSORTYPE) {
 		return 5;
@@ -537,8 +550,9 @@ const char *mdbtoolscursor::getColumnName(uint32_t col) {
 }
 
 bool mdbtoolscursor::noRowsToReturn() {
-
-	if (cursortype==QUERY_CURSORTYPE) {
+	if (cursortype==NOOP_CURSORTYPE) {
+		return true;
+	} else if (cursortype==QUERY_CURSORTYPE) {
 		// if there were no columns then there can be no rows
 		return (((MdbSQL *)mdbsql)->num_columns==0);
 	} else if (cursortype==DB_LIST_CURSORTYPE) {
@@ -552,6 +566,9 @@ bool mdbtoolscursor::noRowsToReturn() {
 }
 
 bool mdbtoolscursor::fetchRow() {
+	if (cursortype==NOOP_CURSORTYPE) {
+		return false;
+	}
 	if (cursortype==QUERY_CURSORTYPE) {
 		#ifdef HAVE_MDB_SQL_FETCH_ROW
 			return mdb_sql_fetch_row((MdbSQL *)mdbsql,

@@ -1,1 +1,1 @@
-create procedure testproc() begin select * from mytable; end;
+create procedure exampleproc() begin select * from mytable; end;

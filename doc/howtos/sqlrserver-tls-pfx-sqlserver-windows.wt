@@ -1,0 +1,219 @@
+=  Windows - SQL Relay Server + TLS + .pfx + MS SQL Server =
+
+This how-to walks through:
+
+* Installing an SQL Relay server on a Windows system
+* Configuring a TLS-secured connection between the SQL Relay server and an MS SQL Server database with a .pfx file
+* Configuring the SQL Relay server for TLS-secured communications with SQL Relay clients
+
+It assumes that two systems have been set up and configured as follows:
+
+'''SQL Relay server'''
+
+* 64-bit Windows 7 or higher operating system
+* A user with Administrator privileges has console or Remote Desktop access to the system
+* A browser is installed and configured to be able to access the web without significant restrictions
+* The host name of the server is set to //sqlrserver//
+* The fully qualified domain name of the server is //sqlrserver.firstworks.com//
+
+'''MS SQL Server database server'''
+
+* Any operating system that supports MS SQL Server 2012 or higher
+* MS SQL Server 2012 or higher, accessible as:
+ * Hostname: //mssql//
+ * Port: 1433
+ * SQL Server Authentication:
+  * Username: //mssqluser//
+  * Password: //mssqlpassword//
+
+This how-to also assumes that a certificate has been created to secure the SQL Relay server, which was signed by an Certificate Authority internal to the organization, rather than a well-known Certificate Authority, and:
+
+* The CA cert is available as ca.pfx
+* The SQL Relay server certificate was created with the Common Name or a Subject Alternative Name set to //sqlrserver.firstworks.com//
+* A certificate store file sqlrelay.pfx has been created containing:
+ * The SQL Relay server certificate
+ * The private key
+ * The CA certificate
+
+=== Install Rudiments and SQL Relay Packages ===
+
+Download current .zip files of the '''SQL Relay Binary Distribution for Windows''' from the '''Binary Distributions''' section of the [http://sqlrelay.sourceforge.net/download.html the SQL Relay Downloads page] to the SQL Relay server Desktop.
+
+Extract and install the software as follows:
+
+* Right-click on sqlrelay-binary-distribution-1.2.0.zip and select Extract All...
+* Click Extract
+* Wait for extraction to finish and to pop up a window containing the extracted files
+* Navigate to sqlrelay-binary-distribution-1.2.0\x64\rudiments
+* Double-click setup
+* If you get an Open File - Security Warning then click Run
+* In the setup wizard...
+ * On the '''Welcome to the Firstworks Rudiments (64-bit) Setup Wizard''' screen, click Next
+ * On the '''Select Installation Folder''' screen, click Next
+ * On the '''Confirm Installation''' screen, click Next
+ * The '''Installing Firstworks Rudiments (64-bit)''' screen will show installation progress
+ * On the '''Installation Complete''' screen, click Close
+* Navigate up and into sqlrelay-binary-distribution-1.2.0\x64\sqlrelay
+* Double-click setup
+* If you get an Open File - Security Warning then click Run
+* In the setup wizard...
+ * On the '''Welcome to the Firstworks SQL Relay (64-bit) Setup Wizard''' screen, click Next
+ * On the '''Select Installation Folder''' screen, click Next
+ * On the '''Confirm Installation''' screen, click Next
+ * The '''Installing Firstworks SQL Relay (64-bit)''' screen will show installation progress
+ * On the '''Installation Complete''' screen, click Close
+* Close the sqlrelay-binary-distribution-1.2.0 file manager window.
+
+It's now safe to trash the sqlrelay-binary-distribution-1.2.0 folder and zip.
+
+=== Configure an ODBC DSN ===
+
+SQL Relay will use ODBC to connect to the database.
+
+To configure a DSN for a TLS-encrypted ODBC connection to MS SQL Server:
+
+* Press Windows-key-R
+* Type //odbcad32// and hit return
+* In the '''ODBC Data Source Administrator'''
+ * Select the System DSN tab
+ * Click Add...
+ * Select SQL Server Native Client 11.0
+ * Click Finish
+ * In the '''Create a New Data Source to SQL Server''' dialog
+  * Enter //mssql// for Name
+  * Enter //mssql// for Server
+  * Click Next
+  * Click the radio button next to With SQL Server authentication...
+  * Enter //mssqluser// for Login ID
+  * Enter //mssqlpassword// for Password
+  * Click Next
+  * Click Next
+  * Check Use strong encryption for data
+  * Click Finish
+  * Click OK
+ * Click OK
+
+=== Configure SQL Relay ===
+
+To configure SQL Relay:
+
+* Install sqlrelay.pfx as C:\Program Files\Firstworks\etc\sqlrelay.pfx
+* Install ca.pfx as C:\Program Files\Firstworks\etc\ca.pfx
+* Create the file C:\Program Files\Firstworks\etc\sqlrelay.conf.d\mssql.conf with the following contents:
+
+{{{
+&lt;?xml version="1.0"?&gt;
+&lt;instances&gt;
+    &lt;instance id="sample" dbase="odbc"
+            tls="yes" tlscert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.pfx"&gt;
+        &lt;users&gt;
+            &lt;user user="sqlruser" password="sqlrpassword"/&gt;
+        &lt;/users&gt;
+        &lt;connections&gt;
+            &lt;connection string="dsn=mssql;user=mssqluser;password=mssqlpassword"/&gt;
+        &lt;/connections&gt;
+    &lt;/instance&gt;
+&lt;/instances&gt;
+}}}
+
+=== Start SQL Relay ===
+
+Start SQL Relay by running:
+
+{{{
+sqlr-start -id sample
+}}}
+
+It should open a new window with the following output:
+
+{{{
+Starting listener:
+  sqlr-listener -id sample -localstatedir C:\Program Files\Firstworks\var\
+
+Starting 5 connections to sample-0 :
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir C:\Program Files\Firstworks\var\
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir C:\Program Files\Firstworks\var\
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir C:\Program Files\Firstworks\var\
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir C:\Program Files\Firstworks\var\
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir C:\Program Files\Firstworks\var\
+}}}
+
+There shouldn't be any errors or warnings, but if there are, then there is probably a configuration problem of some kind.  Adjust mssql.conf or the ODBC DSN as appropriate.
+
+If you need to restart the SQL Relay server, run:
+
+{{{
+sqlr-stop
+sqlr-start -id sample
+}}}
+
+=== Verify SQL Relay ===
+
+To verify that the SQL Relay processes are running:
+
+* Press Windows-key-R
+* Type //taskmgr// and hit return
+* Select the Processes tab
+
+There should be 1 sqlr-listener process and 5 sqlr-connection processes.
+
+To verify that you can log into the SQL Relay server and run queries, run the //sqlrsh// client as follows:
+
+{{{
+sqlrsh -host localhost -user sqlruser -password sqlrpassword -tls -tlsverify ca+host -tlsca "C:\Program Files\Firstworks\etc\ca.pfx"
+}}}
+
+It should respond with the following output and prompt:
+
+{{{
+sqlrsh - Version 1.2.0
+        Connected to: localhost:9000 as sqlruser
+
+        type help; for help.
+
+0>
+}}}
+
+Try a simple query:
+
+{{{
+select 'hello world';
+}}}
+
+It should respond with the following output and prompt:
+
+{{{
+
+============
+hello world
+
+        Rows Returned   : 1
+        Fields Returned : 1
+        Elapsed Time    : 0.006065 sec
+
+0>
+}}}
+
+There shouldn't be any errors or warnings.
+
+Congratulations!  If you made it to this point, the SQL Relay server is configured correctly.
+
+=== Uninstallation ===
+
+If, for some reason, you need to completely uninstall SQL Relay then:
+
+* Press Windows-key-R
+* Enter //control panel// and hit return
+* Click Uninstall a program
+* Select Firstworks SQL Relay (64-bit) and click Uninstall
+* Click Yes
+* Wait for the Windows Installer dialog to finsh uninstalling the package
+* Select Firstworks Rudiments (64-bit) and click Uninstall
+* Click Yes
+* Wait for the Windows Installer dialog to finsh uninstalling the package
+* Close the Control Panel
+* Open a Windows Explorer window
+* Browse to C:\Program Files
+* Right-click Firstworks and select Delete
+* Click Yes
+* Empty the Recycle Bin

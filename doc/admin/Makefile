@@ -7,6 +7,7 @@ include ../../config.mk
 SRCS = configguide.wt \
 	configreference.wt \
 	installing.wt \
+	installingpkg.wt \
 	oraclentier.wt \
 	prerequisites.wt \
 	running.wt \
@@ -17,6 +18,7 @@ SRCS = configguide.wt \
 OBJS = configguide.html \
 	configreference.html \
 	installing.html \
+	installingpkg.html \
 	oraclentier.html \
 	prerequisites.html \
 	running.html \

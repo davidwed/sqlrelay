@@ -32,7 +32,7 @@ lib$(SQLR)util.$(LIBEXT): $(SRCS) $(LOBJS)
 
 sqlrconfigdeclarations.cpp: sqlrconfigdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../configs/*.$(OBJ)`; \
+	for file in `ls ../configs/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -40,7 +40,7 @@ sqlrconfigdeclarations.cpp: sqlrconfigdeclarations.cpp.in
 
 sqlrconfigassignments.cpp: sqlrconfigassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../configs/*.$(OBJ)`; \
+	for file in `ls ../configs/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \

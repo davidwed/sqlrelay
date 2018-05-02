@@ -1,0 +1,3 @@
+sqlrdirective	*new_sqlrdirective_@module@(sqlrservercontroller *cont,
+							sqlrdirectives *sqlts,
+							xmldomnode *parameters);

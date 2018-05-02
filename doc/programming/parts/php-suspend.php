@@ -1,5 +1,5 @@
 <?
-     $con=sqlrcon_alloc("sqlrserver",9000,"/tmp/test.socket","user","password",0,1);
+     $con=sqlrcon_alloc("sqlrserver",9000,"/tmp/example.socket","user","password",0,1);
      $cur=sqlrcur_alloc($con);
 
      sqlrcur_sendQuery($cur,"insert into my_table values (1,2,3)");

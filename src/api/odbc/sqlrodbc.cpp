@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-/*#ifdef _WIN32
+#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif*/
+#endif
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -180,6 +180,7 @@ struct STMT {
 	paramdesc				*impparamdesc;
 	dictionary<int32_t, char *>		inputbindstrings;
 	dictionary<int32_t,outputbind *>	outputbinds;
+	dictionary<int32_t,outputbind *>	inputoutputbinds;
 	SQLROWSETSIZE				*rowsfetchedptr;
 	SQLUSMALLINT				*rowstatusptr;
 	bool					executed;
@@ -736,6 +737,16 @@ static void SQLR_ResetParams(STMT *stmt) {
 		delete node->getValue();
 	}
 	oblist->clear();
+
+	// clear input/output bind list
+	linkedlist<dictionarynode<int32_t, outputbind * > *>
+				*ioblist=stmt->inputoutputbinds.getList();
+	for (linkedlistnode<dictionarynode<int32_t, outputbind * > *>
+					*node=ioblist->getFirst();
+					node; node=node->getNext()) {
+		delete node->getValue();
+	}
+	ioblist->clear();
 }
 
 static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
@@ -3265,6 +3276,354 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 	}
 }
 
+static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
+	debugFunction();
+
+	STMT	*stmt=(STMT *)statementhandle;
+
+	linkedlist<dictionarynode<int32_t, outputbind *> *>
+				*list=stmt->inputoutputbinds.getList();
+	for (linkedlistnode<dictionarynode<int32_t, outputbind *> *>
+					*node=list->getFirst();
+					node; node=node->getNext()) {
+
+		outputbind	*ob=node->getValue()->getValue();
+
+		// convert parameternumber to a string
+		char	*parametername=charstring::parseNumber(
+						ob->parameternumber);
+		debugPrintf("\n");
+		debugPrintf("  parametername: %s\n",parametername);
+		debugPrintf("  parameternumber: %d\n",ob->parameternumber);
+		debugPrintf("  valuetype: %d\n",ob->valuetype);
+		debugPrintf("  lengthprecision: %lld\n",
+					(uint64_t)ob->lengthprecision);
+		debugPrintf("  parameterscale: %ld\n",ob->parameterscale);
+		debugPrintf("  bufferlength: %lld\n",
+					(uint64_t)ob->bufferlength);
+		debugPrintf("  strlen_or_ind: %lld\n",
+					(uint64_t)ob->strlen_or_ind);
+
+		// FIXME: handle NULL values
+
+		if (!ob->parametervalue) {
+			debugPrintf("  parametervalue is NULL, "
+					"(not copying out any value)\n");
+			delete[] parametername;
+			continue;
+		}
+
+		switch (ob->valuetype) {
+			case SQL_C_CHAR:
+				{
+				debugPrintf("  valuetype: SQL_C_CHAR\n");
+				const char	*str=
+					stmt->cur->getInputOutputBindString(
+								parametername);
+				uint32_t	len=
+					stmt->cur->getInputOutputBindLength(
+								parametername);
+				if (!str) {
+					debugPrintf("  value is NULL\n");
+					if (ob->strlen_or_ind) {
+						*(ob->strlen_or_ind)=
+							SQL_NULL_DATA;
+					} else {
+						debugPrintf("  strlen_or_ind "
+								"is NULL\n");
+					}
+				} else {
+
+					// make sure to incldue the
+					// null-terminator
+					charstring::safeCopy(
+						(char *)ob->parametervalue,
+						ob->bufferlength,
+						str,len+1);
+
+					// make sure to null-terminate
+					// (even if data has to be truncated)
+					((char *)ob->parametervalue)[
+						ob->bufferlength-1]='\0';
+
+					if (ob->strlen_or_ind) {
+						*(ob->strlen_or_ind)=len;
+					} else {
+						debugPrintf("  strlen_or_ind "
+								"is NULL\n");
+					}
+					debugPrintf("  value: \"%.*s\" (%d)\n",
+								len,str,len);
+				}
+				}
+				break;
+			case SQL_C_SLONG:
+			case SQL_C_LONG:
+				debugPrintf("  valuetype: "
+					"SQL_C_SLONG/SQL_C_LONG\n");
+				*((int32_t *)ob->parametervalue)=
+					(int32_t)
+					stmt->cur->getInputOutputBindInteger(
+								parametername);
+				debugPrintf("  value: %d\n",
+					*((int32_t *)ob->parametervalue));
+				break;
+			//case SQL_C_BOOKMARK:
+			//	(dup of SQL_C_ULONG)
+			case SQL_C_ULONG:
+				debugPrintf("  valuetype: "
+					"SQL_C_ULONG/SQL_C_BOOKMARK\n");
+				*((uint32_t *)ob->parametervalue)=
+					(uint32_t)
+					stmt->cur->getInputOutputBindInteger(
+								parametername);
+				debugPrintf("  value: %d\n",
+					*((int32_t *)ob->parametervalue));
+				break;
+			case SQL_C_SSHORT:
+			case SQL_C_SHORT:
+				debugPrintf("  valuetype: "
+					"SQL_C_SSHORT/SQL_C_SHORT\n");
+				*((int16_t *)ob->parametervalue)=
+					(int16_t)
+					stmt->cur->getInputOutputBindInteger(
+								parametername);
+				debugPrintf("  value: %d\n",
+					*((int16_t *)ob->parametervalue));
+				break;
+			case SQL_C_USHORT:
+				debugPrintf("  valuetype: SQL_C_USHORT\n");
+				*((uint16_t *)ob->parametervalue)=
+					(uint16_t)
+					stmt->cur->getInputOutputBindInteger(
+								parametername);
+				debugPrintf("  value: %d\n",
+					*((int16_t *)ob->parametervalue));
+				break;
+			case SQL_C_FLOAT:
+				debugPrintf("  valuetype: SQL_C_FLOAT\n");
+				*((float *)ob->parametervalue)=
+					(float)stmt->cur->
+						getInputOutputBindDouble(
+								parametername);
+				break;
+			case SQL_C_DOUBLE:
+				debugPrintf("  valuetype: SQL_C_DOUBLE\n");
+				*((double *)ob->parametervalue)=
+					(double)stmt->cur->
+						getInputOutputBindDouble(
+								parametername);
+				break;
+			case SQL_C_NUMERIC:
+				debugPrintf("  valuetype: SQL_C_NUMERIC\n");
+				SQLR_ParseNumeric(
+					(SQL_NUMERIC_STRUCT *)
+							ob->parametervalue,
+					stmt->cur->getInputOutputBindString(
+								parametername),
+					stmt->cur->getInputOutputBindLength(
+								parametername));
+				break;
+			case SQL_C_DATE:
+			case SQL_C_TYPE_DATE:
+				{
+				debugPrintf("  valuetype: "
+					"SQL_C_DATE/SQL_C_TYPE_DATE\n");
+				int16_t	year;
+				int16_t	month;
+				int16_t	day;
+				int16_t	hour;
+				int16_t	minute;
+				int16_t	second;
+				int32_t	microsecond;
+				const char	*tz;
+				bool	isnegative;
+				stmt->cur->getInputOutputBindDate(
+							parametername,
+							&year,&month,&day,
+							&hour,&minute,&second,
+							&microsecond,&tz,
+							&isnegative);
+				DATE_STRUCT	*ds=
+					(DATE_STRUCT *)ob->parametervalue;
+				ds->year=year;
+				ds->month=month;
+				ds->day=day;
+
+				debugPrintf("    year: %d\n",ds->year);
+				debugPrintf("    month: %d\n",ds->month);
+				debugPrintf("    day: %d\n",ds->day);
+				}
+				break;
+			case SQL_C_TIME:
+			case SQL_C_TYPE_TIME:
+				{
+				debugPrintf("  valuetype: "
+					"SQL_C_TIME/SQL_C_TYPE_TIME\n");
+				int16_t	year;
+				int16_t	month;
+				int16_t	day;
+				int16_t	hour;
+				int16_t	minute;
+				int16_t	second;
+				int32_t	microsecond;
+				const char	*tz;
+				bool	isnegative;
+				stmt->cur->getInputOutputBindDate(
+							parametername,
+							&year,&month,&day,
+							&hour,&minute,&second,
+							&microsecond,&tz,
+							&isnegative);
+				TIME_STRUCT	*ts=
+					(TIME_STRUCT *)ob->parametervalue;
+				ts->hour=hour;
+				ts->minute=minute;
+				ts->second=second;
+
+				debugPrintf("    hour: %d\n",ts->hour);
+				debugPrintf("    minute: %d\n",ts->minute);
+				debugPrintf("    second: %d\n",ts->second);
+				}
+				break;
+			case SQL_C_TIMESTAMP:
+			case SQL_C_TYPE_TIMESTAMP:
+				{
+				debugPrintf("  valuetype: "
+					"SQL_C_TIMESTAMP/"
+					"SQL_C_TYPE_TIMESTAMP\n");
+				int16_t	year;
+				int16_t	month;
+				int16_t	day;
+				int16_t	hour;
+				int16_t	minute;
+				int16_t	second;
+				int32_t	microsecond;
+				const char	*tz;
+				bool	isnegative;
+				stmt->cur->getInputOutputBindDate(
+							parametername,
+							&year,&month,&day,
+							&hour,&minute,&second,
+							&microsecond,&tz,
+							&isnegative);
+				TIMESTAMP_STRUCT	*ts=
+					(TIMESTAMP_STRUCT *)ob->parametervalue;
+				ts->year=year;
+				ts->month=month;
+				ts->day=day;
+				ts->hour=hour;
+				ts->minute=minute;
+				ts->second=second;
+				ts->fraction=microsecond*1000;
+
+				debugPrintf("    year: %d\n",ts->year);
+				debugPrintf("    month: %d\n",ts->month);
+				debugPrintf("    day: %d\n",ts->day);
+				debugPrintf("    hour: %d\n",ts->hour);
+				debugPrintf("    minute: %d\n",ts->minute);
+				debugPrintf("    second: %d\n",ts->second);
+				debugPrintf("    fraction: %d\n",ts->fraction);
+				}
+				break;
+			case SQL_C_INTERVAL_YEAR:
+			case SQL_C_INTERVAL_MONTH:
+			case SQL_C_INTERVAL_DAY:
+			case SQL_C_INTERVAL_HOUR:
+			case SQL_C_INTERVAL_MINUTE:
+			case SQL_C_INTERVAL_SECOND:
+			case SQL_C_INTERVAL_YEAR_TO_MONTH:
+			case SQL_C_INTERVAL_DAY_TO_HOUR:
+			case SQL_C_INTERVAL_DAY_TO_MINUTE:
+			case SQL_C_INTERVAL_DAY_TO_SECOND:
+			case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+			case SQL_C_INTERVAL_HOUR_TO_SECOND:
+			case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+				debugPrintf("  valuetype: SQL_C_INTERVAL_XXX\n");
+				SQLR_ParseInterval(
+					(SQL_INTERVAL_STRUCT *)
+							ob->parametervalue,
+					stmt->cur->getInputOutputBindString(
+								parametername),
+					stmt->cur->getInputOutputBindLength(
+								parametername));
+				break;
+			//case SQL_C_VARBOOKMARK:
+			//	(dup of SQL_C_BINARY)
+			/*case SQL_C_BINARY:
+				{
+				debugPrintf("  valuetype: "
+					"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
+				charstring::safeCopy(
+					(char *)ob->parametervalue,
+					ob->bufferlength,
+					stmt->cur->getInputOutputBindBlob(
+								parametername),
+					stmt->cur->getInputOutputBindLength(
+								parametername));
+				break;
+				}*/
+			case SQL_C_BIT:
+				{
+				debugPrintf("  valuetype: SQL_C_BIT\n");
+				const char	*val=
+					stmt->cur->getInputOutputBindString(
+								parametername);
+				((unsigned char *)ob->parametervalue)[0]=
+					(charstring::contains("YyTt",val) ||
+					charstring::toInteger(val))?'1':'0';
+				}
+				break;
+			case SQL_C_SBIGINT:
+				debugPrintf("  valuetype: SQL_C_SBIGINT\n");
+				*((int64_t *)ob->parametervalue)=
+				(int64_t)stmt->cur->getInputOutputBindInteger(
+								parametername);
+				debugPrintf("  value: %lld\n",
+					*((int64_t *)ob->parametervalue));
+				break;
+			case SQL_C_UBIGINT:
+				debugPrintf("  valuetype: SQL_C_UBIGINT\n");
+				*((uint64_t *)ob->parametervalue)=
+				(uint64_t)stmt->cur->getInputOutputBindInteger(
+								parametername);
+				debugPrintf("  value: %lld\n",
+					*((int64_t *)ob->parametervalue));
+				break;
+			case SQL_C_TINYINT:
+			case SQL_C_STINYINT:
+				debugPrintf("  valuetype: "
+					"SQL_C_TINYINT/SQL_C_STINYINT\n");
+				*((char *)ob->parametervalue)=
+				(char)stmt->cur->getInputOutputBindInteger(
+								parametername);
+				break;
+			case SQL_C_UTINYINT:
+				debugPrintf("  valuetype: SQL_C_UTINYINT\n");
+				*((unsigned char *)ob->parametervalue)=
+				(unsigned char)stmt->cur->
+						getInputOutputBindInteger(
+								parametername);
+				break;
+			case SQL_C_GUID:
+				debugPrintf("  valuetype: SQL_C_GUID\n");
+				SQLR_ParseGuid(
+					(SQLGUID *)ob->parametervalue,
+					stmt->cur->getInputOutputBindString(
+								parametername),
+					stmt->cur->getInputOutputBindLength(
+								parametername));
+				break;
+			default:
+				debugPrintf("  invalue valuetype\n");
+				break;
+		}
+
+		// clean up
+		delete[] parametername;
+	}
+}
+
 static uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 
 	// find the length of the string
@@ -3343,6 +3702,7 @@ static SQLRETURN SQLR_SQLExecDirect(SQLHSTMT statementhandle,
 	if (result) {
 		debugPrintf("  success\n");
 		SQLR_FetchOutputBinds(stmt);
+		SQLR_FetchInputOutputBinds(stmt);
 		return SQL_SUCCESS;
 	}
 
@@ -3410,6 +3770,7 @@ static SQLRETURN SQLR_SQLExecute(SQLHSTMT statementhandle) {
 		}
 
 		SQLR_FetchOutputBinds(stmt);
+		SQLR_FetchInputOutputBinds(stmt);
 		return SQL_SUCCESS;
 	}
 
@@ -3754,7 +4115,11 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 						"SQL_ACCESS_MODE\n");
 			// FIXME: implement
 			break;
-		//case SQL_AUTOCOMMIT: (settable but not gettable)
+		case SQL_AUTOCOMMIT:
+			debugPrintf("  unsupported attribute: "
+						"SQL_AUTOCOMMIT\n");
+			// FIXME: implement
+			break;
 		case SQL_LOGIN_TIMEOUT:
 			debugPrintf("  unsupported attribute: "
 						"SQL_LOGIN_TIMEOUT\n");
@@ -4136,21 +4501,6 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 					stmt->cur->colCount()+col]);
 	debugPrintf("  offset: %lld\n",*offset);
 
-	// FIXME: remove this, this wasn't the problem, and the problem is
-	// solved...
-	// ADO often passes in a targetvalue which overlaps the strlen_or_ind.
-	// (usually by 2 bytes, as if strlen_or_ind should only be 2 bytes long)
-	// Also, notably, in these cases, targetvalue isn't aligned to a
-	// 4-byte boundary.
-	// Not sure what to do, other than ignore one or the other.
-	/*if (targetvalue>=strlen_or_ind &&
-		targetvalue<(((unsigned char *)strlen_or_ind)+
-					sizeof(strlen_or_ind))) {
-		debugPrintf("  WARNING! targetvalue overlaps strlen_or_ind\n");
-		targetvalue=NULL;
-		//strlen_or_ind=NULL;
-	}*/
-
 	// handle NULL fields
 	if (!field) {
 		if (strlen_or_ind) {
@@ -4180,6 +4530,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 
 	// get the field data
 	bool	trunc=false;
+	bool	nodata=false;
 	switch (targettype) {
 		case SQL_C_CHAR:
 		#ifdef SQL_C_WCHAR
@@ -4188,22 +4539,33 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			{
 			debugPrintf("  targettype: SQL_C_(W)CHAR\n");
 
-			// reset field and fieldlength re. offset
-			field+=*offset;
-			fieldlength-=*offset;
+			uint32_t	bytestocopy;
+			if (*offset<fieldlength) {
 
-			// calculate size to copy
-			// make sure to include the null-terminator
-			uint32_t	bytestocopy=
-					((uint32_t)bufferlength<fieldlength+1)?
-						bufferlength:fieldlength+1;
+				// reset field and fieldlength re. offset
+				field+=*offset;
+				fieldlength-=*offset;
+
+				// calculate size to copy
+				// make sure to include the null-terminator
+				if ((uint32_t)bufferlength<fieldlength+1) {
+					bytestocopy=bufferlength;
+					*offset+=bytestocopy;
+					trunc=true;
+				} else {
+					bytestocopy=fieldlength+1;
+					*offset+=fieldlength;
+				}
+			} else {
+				if (*offset>fieldlength) {
+					nodata=true;
+				} else {
+					(*offset)++;
+				}
+				fieldlength=0;
+				bytestocopy=0;
+			}
 			debugPrintf("  bytestocopy: %ld\n",bytestocopy);
-
-			// update offset
-			*offset+=bytestocopy;
-
-			// decide if truncation occurred
-			trunc=(bytestocopy<fieldlength+1);
 
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
@@ -4273,7 +4635,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_FLOAT\n");
 			if (targetvalue) {
 				*((SQLREAL *)targetvalue)=
-					(SQLREAL)charstring::toFloat(field);
+					(SQLREAL)charstring::toFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((SQLREAL *)targetvalue));
 			}
@@ -4282,7 +4644,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_DOUBLE\n");
 			if (targetvalue) {
 				*((SQLDOUBLE *)targetvalue)=
-					(SQLDOUBLE)charstring::toFloat(field);
+					(SQLDOUBLE)charstring::toFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((SQLDOUBLE *)targetvalue));
 			}
@@ -4341,21 +4703,32 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: "
 				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
 
-			// reset field and fieldlength re. offset
-			field+=*offset;
-			fieldlength-=*offset;
+			uint32_t	bytestocopy;
+			if (*offset<fieldlength) {
 
-			// calculate size to copy
-			uint32_t	bytestocopy=
-					((uint32_t)bufferlength<fieldlength)?
-						bufferlength:fieldlength;
+				// reset field and fieldlength re. offset
+				field+=*offset;
+				fieldlength-=*offset;
+
+				// calculate size to copy
+				if ((uint32_t)bufferlength<fieldlength) {
+					bytestocopy=bufferlength;
+					*offset+=bytestocopy;
+					trunc=true;
+				} else {
+					bytestocopy=fieldlength;
+					*offset+=fieldlength;
+				}
+			} else {
+				if (*offset>fieldlength) {
+					nodata=true;
+				} else {
+					(*offset)++;
+				}
+				fieldlength=0;
+				bytestocopy=0;
+			}
 			debugPrintf("  bytestocopy: %ld\n",bytestocopy);
-
-			// update offset
-			*offset+=bytestocopy;
-
-			// decide if truncation occurred
-			trunc=(bytestocopy<fieldlength);
 
 			if (strlen_or_ind) {
 				*strlen_or_ind=fieldlength;
@@ -4459,10 +4832,16 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 	}
 
 	if (trunc) {
+		debugPrintf("  returning SQL_SUCCESS_WITH_INFO\n");
 		SQLR_STMTSetError(stmt,
 			"String data, right truncation",0,"01004");
 		return SQL_SUCCESS_WITH_INFO;
 	}
+	if (nodata) {
+		debugPrintf("  returning SQL_NO_DATA\n");
+		return SQL_NO_DATA;
+	}
+	debugPrintf("  returning SQL_SUCCESS\n");
 	return SQL_SUCCESS;
 }
 
@@ -4634,7 +5013,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 						"SQL_DIAG_SQLSTATE: %s\n",
 						stmt->sqlstate);
 					val.strval=stmt->sqlstate;
-					type=1;
+					type=0;
 					break;
 				case SQL_DIAG_CURSOR_ROW_COUNT:
 					val.lenval=
@@ -9996,6 +10375,257 @@ static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
 					SQLSMALLINT parameterscale,
 					SQLPOINTER parametervalue,
 					SQLLEN bufferlength,
+					SQLLEN *strlen_or_ind);
+
+static SQLRETURN SQLR_InputOutputBindParameter(
+					SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT valuetype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN bufferlength,
+					SQLLEN *strlen_or_ind) {
+	debugFunction();
+
+	// FIXME:
+	// Currently, SQL Relay doesn't support lob input/output binds.
+	// Handle them as output binds for now.
+	switch (valuetype) {
+		//case SQL_C_VARBOOKMARK:
+		//	(dup of SQL_C_BINARY)
+		case SQL_C_BINARY:
+			return SQLR_OutputBindParameter(
+					statementhandle,
+					parameternumber,
+					valuetype,
+					lengthprecision,
+					parameterscale,
+					parametervalue,
+					bufferlength,
+					strlen_or_ind);
+	}
+
+	STMT	*stmt=(STMT *)statementhandle;
+	if (statementhandle==SQL_NULL_HSTMT || !stmt || !stmt->cur) {
+		debugPrintf("  NULL stmt handle\n");
+		return SQL_INVALID_HANDLE;
+	}
+
+	SQLRETURN	retval=SQL_SUCCESS;
+
+	// convert parameternumber to a string
+	char	*parametername=charstring::parseNumber(parameternumber);
+
+	debugPrintf("  parametername: %s\n",parametername);
+	debugPrintf("  parameternumber: %d\n",parameternumber);
+	debugPrintf("  valuetype: %d\n",valuetype);
+	debugPrintf("  lengthprecision: %lld\n",(uint64_t)lengthprecision);
+	debugPrintf("  parameterscale: %d\n",parameterscale);
+	debugPrintf("  bufferlength: %lld\n",(uint64_t)bufferlength);
+	debugPrintf("  strlen_or_ind: %lld\n",(uint64_t)strlen_or_ind);
+
+	// store the output bind for later
+	outputbind	*ob=new outputbind;
+	ob->parameternumber=parameternumber;
+	ob->valuetype=valuetype;
+	ob->lengthprecision=lengthprecision;
+	ob->parameterscale=parameterscale;
+	ob->parametervalue=parametervalue;
+	ob->bufferlength=bufferlength;
+	ob->strlen_or_ind=strlen_or_ind;
+	stmt->inputoutputbinds.setValue(parameternumber,ob);
+
+	switch (valuetype) {
+		case SQL_C_CHAR:
+		case SQL_C_BIT:
+			debugPrintf("  valuetype: SQL_C_CHAR/SQL_C_BIT\n");
+			debugPrintf("  value: \"%s\"\n",parametervalue);
+			stmt->cur->defineInputOutputBindString(parametername,
+						(const char *)parametervalue,
+								bufferlength);
+			break;
+		case SQL_C_LONG:
+		case SQL_C_SLONG:
+		//case SQL_C_BOOKMARK:
+		//	(dup of SQL_C_ULONG)
+			debugPrintf("  valuetype: SQL_C_(S)LONG\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int32_t *)parametervalue)));
+			stmt->cur->defineInputOutputBindInteger(parametername,
+				(int64_t)(*((int32_t *)parametervalue)));
+			break;
+		case SQL_C_ULONG:
+			debugPrintf("  valuetype: SQL_C_ULONG\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((uint32_t *)parametervalue)));
+			stmt->cur->defineInputOutputBindInteger(parametername,
+				(int64_t)(*((uint32_t *)parametervalue)));
+			break;
+		case SQL_C_SBIGINT:
+			debugPrintf("  valuetype: SQL_C_SBIGINT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int64_t *)parametervalue)));
+			stmt->cur->defineInputOutputBindInteger(parametername,
+				(int64_t)(*((int64_t *)parametervalue)));
+			break;
+			break;
+		case SQL_C_UBIGINT:
+			debugPrintf("  valuetype: SQL_C_USBIGINT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((uint64_t *)parametervalue)));
+			stmt->cur->defineInputOutputBindInteger(parametername,
+				(int64_t)(*((uint64_t *)parametervalue)));
+			break;
+		case SQL_C_SHORT:
+		case SQL_C_SSHORT:
+			debugPrintf("  valuetype: SQL_C_(S)SHORT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((int16_t *)parametervalue)));
+			stmt->cur->defineInputOutputBindInteger(parametername,
+				(int64_t)(*((int16_t *)parametervalue)));
+			break;
+		case SQL_C_USHORT:
+			debugPrintf("  valuetype: SQL_C_USHORT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((uint16_t *)parametervalue)));
+			stmt->cur->defineInputOutputBindInteger(parametername,
+				(int64_t)(*((uint16_t *)parametervalue)));
+			break;
+		case SQL_C_TINYINT:
+		case SQL_C_STINYINT:
+			debugPrintf("  valuetype: SQL_C_(S)TINYINT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((char *)parametervalue)));
+			stmt->cur->defineInputOutputBindInteger(parametername,
+				(int64_t)(*((char *)parametervalue)));
+			break;
+		case SQL_C_UTINYINT:
+			debugPrintf("  valuetype: SQL_C_UTINYINT\n");
+			debugPrintf("  value: \"%lld\"\n",
+				(int64_t)(*((unsigned char *)parametervalue)));
+			stmt->cur->defineInputOutputBindInteger(parametername,
+				(int64_t)(*((unsigned char *)parametervalue)));
+			break;
+		case SQL_C_FLOAT:
+			debugPrintf("  valuetype: SQL_C_FLOAT\n");
+			debugPrintf("  value: \"%f\"\n",
+				(float)(*((double *)parametervalue)));
+			stmt->cur->defineInputOutputBindDouble(parametername,
+				(float)(*((double *)parametervalue)),
+				lengthprecision,
+				parameterscale);
+			break;
+		case SQL_C_DOUBLE:
+			debugPrintf("  valuetype: SQL_C_DOUBLE\n");
+			debugPrintf("  value: \"%f\"\n",
+				*((double *)parametervalue));
+			stmt->cur->defineInputOutputBindDouble(parametername,
+				*((double *)parametervalue),
+				lengthprecision,
+				parameterscale);
+			break;
+		case SQL_C_NUMERIC:
+			debugPrintf("  valuetype: SQL_C_NUMERIC\n");
+			// bind as a string, the result will be parsed
+			stmt->cur->defineInputOutputBindString(parametername,
+						(const char *)parametervalue,
+								128);
+			break;
+		case SQL_C_DATE:
+		case SQL_C_TYPE_DATE:
+			{
+			debugPrintf("  valuetype: SQL_C_DATE/SQL_C_TYPE_DATE\n");
+			DATE_STRUCT	*ds=(DATE_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d-%d-%d\"\n",
+						ds->year,ds->month,ds->day);
+			stmt->cur->defineInputOutputBindDate(parametername,
+						ds->year,ds->month,ds->day,
+						0,0,0,0,NULL,false);
+			}
+			break;
+		case SQL_C_TIME:
+		case SQL_C_TYPE_TIME:
+			{
+			debugPrintf("  valuetype: SQL_C_TIME/SQL_C_TYPE_TIME\n");
+			TIME_STRUCT	*ts=(TIME_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d:%d:%d\"\n",
+						ts->hour,ts->minute,ts->second);
+			stmt->cur->defineInputOutputBindDate(parametername,
+						0,0,0,
+						ts->hour,ts->minute,ts->second,
+						0,NULL,false);
+			break;
+			}
+		case SQL_C_TIMESTAMP:
+		case SQL_C_TYPE_TIMESTAMP:
+			{
+			debugPrintf("  valuetype: "
+				"SQL_C_TIMESTAMP/SQL_C_TYPE_TIMESTAMP\n");
+			TIMESTAMP_STRUCT	*tss=
+					(TIMESTAMP_STRUCT *)parametervalue;
+			debugPrintf("  value: \"%d-%d-%d %d:%d:%d:%d\"\n",
+					tss->year,tss->month,tss->day,
+					tss->hour,tss->minute,tss->second,
+					tss->fraction/1000);
+			stmt->cur->defineInputOutputBindDate(parametername,
+					tss->year,tss->month,tss->day,
+					tss->hour,tss->minute,tss->second,
+					tss->fraction/1000,NULL,false);
+			break;
+			}
+			break;
+		case SQL_C_INTERVAL_YEAR:
+		case SQL_C_INTERVAL_MONTH:
+		case SQL_C_INTERVAL_DAY:
+		case SQL_C_INTERVAL_HOUR:
+		case SQL_C_INTERVAL_MINUTE:
+		case SQL_C_INTERVAL_SECOND:
+		case SQL_C_INTERVAL_YEAR_TO_MONTH:
+		case SQL_C_INTERVAL_DAY_TO_HOUR:
+		case SQL_C_INTERVAL_DAY_TO_MINUTE:
+		case SQL_C_INTERVAL_DAY_TO_SECOND:
+		case SQL_C_INTERVAL_HOUR_TO_MINUTE:
+		case SQL_C_INTERVAL_HOUR_TO_SECOND:
+		case SQL_C_INTERVAL_MINUTE_TO_SECOND:
+			debugPrintf("  valuetype: SQL_C_INTERVAL_XXX\n");
+			// bind as a string, the result will be parsed
+			stmt->cur->defineInputOutputBindString(parametername,
+						(const char *)parametervalue,
+								128);
+			break;
+		//case SQL_C_VARBOOKMARK:
+		//	(dup of SQL_C_BINARY)
+		case SQL_C_BINARY:
+			debugPrintf("  valuetype: "
+				"SQL_C_BINARY/SQL_C_VARBOOKMARK\n");
+			//stmt->cur->defineInputOutputBindBlob(parametername);
+			break;
+		case SQL_C_GUID:
+			debugPrintf("  valuetype: SQL_C_GUID\n");
+			// bind as a string, the result will be parsed
+			stmt->cur->defineInputOutputBindString(parametername,
+						(const char *)parametervalue,
+								128);
+			break;
+		default:
+			debugPrintf("  invalid valuetype\n");
+			retval=SQL_ERROR;
+			break;
+	}
+
+	delete[] parametername;
+
+	return retval;
+}
+
+static SQLRETURN SQLR_OutputBindParameter(SQLHSTMT statementhandle,
+					SQLUSMALLINT parameternumber,
+					SQLSMALLINT valuetype,
+					SQLULEN lengthprecision,
+					SQLSMALLINT parameterscale,
+					SQLPOINTER parametervalue,
+					SQLLEN bufferlength,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
 
@@ -10152,11 +10782,7 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 		case SQL_PARAM_INPUT_OUTPUT:
 			debugPrintf("  inputoutputtype: "
 						"SQL_PARAM_INPUT_OUTPUT\n");
-			// FIXME: SQL Relay doesn't currently support in/out
-			// params, and some apps pass output params as in/out.
-			// So, for now we'll just pass an in/out param as an
-			// out param.
-			return SQLR_OutputBindParameter(statementhandle,
+			return SQLR_InputOutputBindParameter(statementhandle,
 							parameternumber,
 							valuetype,
 							lengthprecision,

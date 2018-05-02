@@ -1,0 +1,24 @@
+= Oracle Wallet Quirks =
+
+Oracle wallets have some features that make them more secure than storing certs and keys in flat files, but these features can also make wallets difficult to work with, at least with the Oracle-provided tools.
+
+* Wallets can be locked to a host.
+ * If a host-locked wallet is moved to a different host, attempts to use it will fail.
+* Certificates are segregated into User Certificates and Trusted Certificates.
+ * User Certificates, along with their corresponding private keys, are used to encrypt data.
+ * Trusted Certificates are used to identify hosts or establish chains of trust.
+* Import of User Certificates into a wallet is highly restricted.
+ * A User Certificate cannot be imported unless certificates for its entire chain of trust have already been imported as Trusted Certificates.
+ * A User Certificate cannot be imported unless its private key and certificate request are already present in the wallet.
+  * Wallets can generate private keys, but private keys cannot be imported into a wallet.
+  * Wallets can generate certificate requests, but certificate requests cannot be imported into a wallet.
+
+Some notable consequences of these features are:
+
+* If the wallet was locked to a host when it was created, it won't function after a migration to a new host, or after recovery from backup to a new host.
+* You cannot import an existing cert/key pair, which wasn't created in association with a wallet, into a wallet. Thus, you cannot use an existing cert/key pair to secure database communications.
+
+Also, Oracle wallets are difficult to use with Oracle Instant Client. The sqlnet.ora file must be used to specify the location of the wallet. This presumes that you have an ORACLE_HOME, but hosts which use Instant Client don't typically have one. Also, Instant Client doesn't provide any tools for managing wallets.
+
+Of course, there are workarounds for all of these issues, but some of them are cumbersome, and almost certainly unsupported.
+

@@ -383,7 +383,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc.cpp@
+@parts/perl-oracle-testproc.pl@
 }}}
 }}}
 
@@ -411,7 +411,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-sybase-testproc.cpp@
+@parts/perl-sybase-testproc.pl@
 }}}
 }}}
 
@@ -438,7 +438,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc.cpp@
+@parts/perl-firebird-testproc.pl@
 }}}
 }}}
 
@@ -465,7 +465,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-db2-testproc.cpp@
+@parts/perl-db2-testproc.pl@
 }}}
 }}}
 
@@ -492,7 +492,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-postgresql-testproc.cpp@
+@parts/perl-postgresql-testproc.pl@
 }}}
 }}}
 
@@ -519,7 +519,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc.cpp@
+@parts/perl-mysql-testproc.pl@
 }}}
 }}}
 
@@ -562,7 +562,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc-1value.cpp@
+@parts/perl-oracle-testproc-1value.pl@
 }}}
 }}}
 
@@ -590,7 +590,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc-1value-output-param.cpp@
+@parts/perl-oracle-testproc-1value-output-param.pl@
 }}}
 }}}
 
@@ -622,7 +622,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-sybase-testproc-1value.cpp@
+@parts/perl-sybase-testproc-1value.pl@
 }}}
 }}}
 
@@ -641,7 +641,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-@parts/firebird-drop-testproc.sql@
+@parts/firebird-create-testproc-1value.sql@
 }}}
 }}}
 
@@ -650,7 +650,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc-1value.cpp@
+@parts/perl-firebird-testproc-1value.pl@
 }}}
 }}}
 
@@ -662,7 +662,7 @@ variables.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc-1value-output-param.cpp@
+@parts/perl-firebird-testproc-1value-output-param.pl@
 }}}
 }}}
 
@@ -693,7 +693,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-db2-testproc-1value.cpp@
+@parts/perl-db2-testproc-1value.pl@
 }}}
 }}}
 
@@ -721,7 +721,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-postgresql-testproc-1value.cpp@
+@parts/perl-postgresql-testproc-1value.pl@
 }}}
 }}}
 
@@ -750,7 +750,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-1value.cpp@
+@parts/perl-mysql-testproc-1value.pl@
 }}}
 }}}
 
@@ -779,7 +779,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-1value-result-set.cpp@
+@parts/perl-mysql-testproc-1value-result-set.pl@
 }}}
 }}}
 
@@ -807,7 +807,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-1value-output-param.cpp@
+@parts/perl-mysql-testproc-1value-output-param.pl@
 }}}
 }}}
 
@@ -847,7 +847,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc-values.cpp@
+@parts/perl-oracle-testproc-values.pl@
 }}}
 }}}
 
@@ -875,7 +875,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-sybase-testproc-values.cpp@
+@parts/perl-sybase-testproc-values.pl@
 }}}
 }}}
 
@@ -903,7 +903,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc-values.cpp@
+@parts/perl-firebird-testproc-values.pl@
 }}}
 }}}
 
@@ -915,7 +915,7 @@ bind variables.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-firebird-testproc-values-output-params.cpp@
+@parts/perl-firebird-testproc-values-output-params.pl@
 }}}
 }}}
 
@@ -943,7 +943,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-db2-testproc-values.cpp@
+@parts/perl-db2-testproc-values.pl@
 }}}
 }}}
 
@@ -971,7 +971,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-postgresql-testproc-values.cpp@
+@parts/perl-postgresql-testproc-values.pl@
 }}}
 }}}
 
@@ -1001,7 +1001,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-values.cpp@
+@parts/perl-mysql-testproc-values.pl@
 }}}
 }}}
 
@@ -1031,7 +1031,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-values-output-params.cpp@
+@parts/perl-mysql-testproc-values-output-params.pl@
 }}}
 }}}
 
@@ -1066,7 +1066,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-oracle-testproc-result-set.cpp@
+@parts/perl-oracle-testproc-result-set.pl@
 }}}
 }}}
 
@@ -1094,7 +1094,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-sybase-testproc-result-set.cpp@
+@parts/perl-sybase-testproc-result-set.pl@
 }}}
 }}}
 
@@ -1135,7 +1135,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-postgresql-testproc-result-set.cpp@
+@parts/perl-postgresql-testproc-result-set.pl@
 }}}
 }}}
 
@@ -1168,7 +1168,7 @@ following.
 
 {{{#!blockquote
 {{{#!code
-@parts/c++-mysql-testproc-result-set.cpp@
+@parts/perl-mysql-testproc-result-set.pl@
 }}}
 }}}
 

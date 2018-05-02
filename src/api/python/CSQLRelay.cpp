@@ -1232,7 +1232,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
       PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", rc, rl));
       return PyObject_CallObject(decimal, tuple);
     } else {
-      return Py_BuildValue("f",(double)charstring::toFloat(rc));
+      return Py_BuildValue("f",(double)charstring::toFloatC(rc));
     }
   } else if (usenumeric && isNumberTypeChar(type)) {
     return Py_BuildValue("L",charstring::toInteger(rc));
@@ -1355,7 +1355,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
         PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", row_data[counter], row_lengths[counter]));
         obj=PyObject_CallObject(decimal, tuple);
       } else {
-        obj=Py_BuildValue("f", (double)charstring::toFloat(row_data[counter]));
+        obj=Py_BuildValue("f", (double)charstring::toFloatC(row_data[counter]));
       }
       PyList_SetItem(my_list, counter, obj);
     } else if (usenumeric && isNumberTypeChar(type)) {
@@ -1426,7 +1426,7 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
           PyTuple_SetItem(tuple, 0, Py_BuildValue("s", field));
           PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), PyObject_CallObject(decimal, tuple));
         } else {
-          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",(double)charstring::toFloat(field)));
+          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",(double)charstring::toFloatC(field)));
         }
     } else if (usenumeric && isNumberTypeChar(type)) {
       PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::toInteger(field)));

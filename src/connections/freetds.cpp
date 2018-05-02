@@ -257,6 +257,7 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
+		const char	*getNoopQuery();
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
 		char	bindVariablePrefix();
@@ -274,6 +275,7 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		CS_CONNECTION	*dbconn;
 
 		const char	*sybase;
+		const char	*freetds;
 		const char	*lang;
 		const char	*server;
 		const char	*db;
@@ -328,6 +330,7 @@ void freetdsconnection::handleConnectString() {
 	sqlrserverconnection::handleConnectString();
 
 	sybase=cont->getConnectStringValue("sybase");
+	freetds=cont->getConnectStringValue("freetds");
 	lang=cont->getConnectStringValue("lang");
 	server=cont->getConnectStringValue("server");
 	db=cont->getConnectStringValue("db");
@@ -356,6 +359,22 @@ bool freetdsconnection::logIn(const char **error, const char **warning) {
 		*error=logInError(
 			"Failed to set SYBASE environment variable.",1);
 		return false;
+	}
+
+	// set freetds
+	if (!charstring::isNullOrEmpty(freetds)) {
+		if (!environment::setValue("FREETDS",freetds)) {
+			*error=logInError(
+				"Failed to set FREETDS "
+				"environment variable.",1);
+			return false;
+		}
+		if (!environment::setValue("FREETDSCONF",freetds)) {
+			*error=logInError(
+				"Failed to set FREETDSCONF "
+				"environment variable.",1);
+			return false;
+		}
 	}
 
 	// set lang
@@ -830,6 +849,10 @@ const char *freetdsconnection::getCurrentDatabaseQuery() {
 
 const char *freetdsconnection::getLastInsertIdQuery() {
 	return "select @@identity";
+}
+
+const char *freetdsconnection::getNoopQuery() {
+	return "waitfor delay '0:0'";
 }
 
 const char *freetdsconnection::bindFormat() {
@@ -1739,9 +1762,11 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 				bytestring::copy(outbindstrings[i],
 						data[i],length);
 			} else if (outbindtype[i]==CS_INT_TYPE) {
-				*outbindints[i]=charstring::toInteger(data[i]);
+				*outbindints[i]=
+					charstring::toInteger(data[i]);
 			} else if (outbindtype[i]==CS_FLOAT_TYPE) {
-				*outbinddoubles[i]=charstring::toFloat(data[i]);
+				*outbinddoubles[i]=
+					charstring::toFloatC(data[i]);
 			} else if (outbindtype[i]==CS_DATETIME_TYPE) {
 
 				// convert to a CS_DATEREC

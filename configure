@@ -26447,7 +26447,7 @@ echo "******************************"
 echo
 echo "***** ODBC *******************"
 
-if ( test "$ENABLE_ODBC" = "yes" )
+if ( test "$ENABLE_ODBC" = "yes" -o "$ENABLE_ODBC_DRIVER" = "yes" )
 then
 
 	ODBCINCLUDES=""
@@ -34523,6 +34523,14 @@ $as_echo_n "checking for PHP config directory... " >&6; }
 			PHPCONFSTYLE="freebsd"
 		fi
 	fi
+	if ( test "$PHPCONFSTYLE" = "unknown" )
+	then
+		if ( test -d "/usr/pkg/etc/php.d" )
+		then
+			PHPCONFDIR="/usr/pkg/etc/php.d"
+			PHPCONFSTYLE="netbsd"
+		fi
+	fi
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PHPCONFDIR - $PHPCONFSTYLE style" >&5
 $as_echo "$PHPCONFDIR - $PHPCONFSTYLE style" >&6; }
 
@@ -35609,7 +35617,7 @@ else
 		SYBASEBUILD="at-runtime"
 	fi
 fi
-if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
+if ( test -n "$ENABLE_ODBC" -a -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
 	ODBCBUILD="dynamic   "
 	if ( test -n "$ODBCSTATIC" ); then
 		ODBCBUILD="static    "

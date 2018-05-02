@@ -73,11 +73,11 @@ Type:  \copyright for distribution terms
        \g or terminate with semicolon to execute query
        \q to quit
 
-=> create table testtable (col1 varchar2(60), col2 number(5,2));
+=> create table exampletable (col1 varchar2(60), col2 number(5,2));
 
-=> insert into testtable values ('hello',123.45);
+=> insert into exampletable values ('hello',123.45);
 
-=> select * from testtable;
+=> select * from exampletable;
  COL1  |  COL2
 -------+--------
  hello | 123.45

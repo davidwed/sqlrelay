@@ -1,4 +1,4 @@
-my $sth=$dbh->prepareQuery("call testproc(?,?,?)");
+my $sth=$dbh->prepareQuery("call exampleproc(?,?,?)");
 $sth->bind_param("1",1);
 $sth->bind_param("2",1.1,4,2);
 $sth->bind_param("3","hello");

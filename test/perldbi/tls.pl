@@ -59,11 +59,11 @@ sub checkSuccessString {
 	}
 }
 
-$tlscert="/usr/local/firstworks/etc/client.pem";
-$tlsca="/usr/local/firstworks/etc/ca.pem";
+$tlscert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem";
+$tlsca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem";
 if ($^O eq "MSWin32") {
-	$tlscert="C:\\Program Files\\Firstworks\\etc\\client.pfx";
-	$tlsca="C:\\Program Files\\Firstworks\\etc\\ca.pfx";
+	$tlscert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx";
+	$tlsca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx";
 }
 
 
@@ -757,7 +757,7 @@ print("\n");
 print("GET INFO: \n");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}),"TESTUSER");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_NAME}),"oracle");
-checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_VER}),"Oracle Database 12c Enterprise Edition Release 12.1.0.1.0 - 64bit Production\nWith the Partitioning, OLAP, Advanced Analytics and Real Application Testing options");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_VER}),"Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_USER_NAME}),"");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_IDENTIFIER_QUOTE_CHAR}),"\"");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_CATALOG_NAME_SEPARATOR}),"@");

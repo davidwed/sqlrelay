@@ -9,21 +9,21 @@ namespace SQLRExamples
 	{
 		public static void Main()
 		{
-			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=test;Password=test;Retry Time=0;Tries=1;Debug=false");
+			SQLRelayConnection sqlrcon = new SQLRelayConnection("Data Source=sqlrserver:9000;User ID=user;Password=password;Retry Time=0;Tries=1;Debug=false");
 			sqlrcon.Open();
 
 			SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-			sqlrcom.CommandText = "insert into testtable values (:clobvar,:blobvar)";
+			sqlrcom.CommandText = "insert into exampletable values (:clobvar,:blobvar)";
 
 			SQLRelayParameter clobvar = new SQLRelayParameter();
 			clobvar.ParameterName = "clobvar";
-			clobvar.Value = "testclob";
+			clobvar.Value = "exampleclob";
 			clobvar.SQLRelayType = SQLRelayType.Clob;
 			sqlrcom.Parameters.Add(clobvar);
 
 			SQLRelayParameter blobvar = new SQLRelayParameter();
 			blobvar.ParameterName = "blobvar";
-			blobvar.Value = System.Text.Encoding.Default.GetBytes("testblob");
+			blobvar.Value = System.Text.Encoding.Default.GetBytes("exampleblob");
 			blobvar.SQLRelayType = SQLRelayType.Blob;
 			sqlrcom.Parameters.Add(blobvar);
 

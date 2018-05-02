@@ -36,7 +36,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>     sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>     con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>     con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 
 <font color="#990000">...</font> execute <font color="#008080">some</font> queries <font color="#990000">...</font>
 </tt></pre>
@@ -65,7 +65,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
@@ -148,7 +148,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 <b><font color="#0000FF">if</font></b> <font color="#990000">(!</font>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from my_nonexistant_table"</font><font color="#990000">))</font> <font color="#FF0000">{</font>
@@ -182,7 +182,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from mytable $(whereclause)"</font><font color="#990000">);</font>
@@ -210,7 +210,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;"</font><font color="#990000">);</font>
@@ -247,7 +247,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">(</font><font color="#FF0000">"create table images (image blob, description clob)"</font><font color="#990000">);</font>
@@ -282,7 +282,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">(</font><font color="#FF0000">"create table images (image blob, description clob)"</font><font color="#990000">);</font>
@@ -330,7 +330,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from mytable where mycolumn&amp;gt;:value"</font><font color="#990000">);</font>
@@ -365,7 +365,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
@@ -393,7 +393,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
@@ -455,7 +455,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">setResultSetBufferSize</font></b><font color="#990000">(</font><font color="#993399">5</font><font color="#990000">);</font>
@@ -507,7 +507,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cursor1<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 <font color="#008080">var</font>	cursor2<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
@@ -538,7 +538,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin  :curs:=sp_mytable; end;"</font><font color="#990000">);</font>
@@ -580,7 +580,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from my_table"</font><font color="#990000">);</font>
@@ -633,7 +633,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 <i><font color="#9A1900">// column names will be forced to upper case</font></i>
@@ -702,7 +702,7 @@ each database that SQL Relay supports.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> is
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> is
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
@@ -717,7 +717,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin testproc(:in1,:in2,:in3); end;"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin exampleproc(:in1,:in2,:in3); end;"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -732,7 +732,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -745,7 +745,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
+<pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">)</font> as
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>@in1<font color="#990000">,</font>@in2<font color="#990000">,</font>@in3<font color="#990000">)</font>
 </tt></pre>
 
@@ -758,7 +758,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -773,7 +773,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -786,7 +786,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
         suspend<font color="#990000">;</font>
@@ -802,7 +802,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure exampleproc ?, ?, ?"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -817,7 +817,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -830,7 +830,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
@@ -845,7 +845,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -860,7 +860,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -873,7 +873,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">void</font> as <font color="#FF0000">'</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">void</font> as <font color="#FF0000">'</font>
 <font color="#FF0000">begin</font>
 <font color="#FF0000">        insert into mytable values ($1,$2,$3);</font>
 <font color="#FF0000">        return;</font>
@@ -889,7 +889,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select testfunc($1,$2,$3)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select examplefunc($1,$2,$3)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -904,7 +904,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 </tt></pre>
 
 </blockquote>
@@ -917,7 +917,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 begin
         insert into <font color="#008080">mytable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font>in1<font color="#990000">,</font>in2<font color="#990000">,</font>in3<font color="#990000">);</font>
 end<font color="#990000">;</font>
@@ -932,7 +932,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -949,7 +949,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -974,7 +974,7 @@ Oracle calls these functions.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> returns number is
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">)</font> returns number is
 begin
         <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
 end<font color="#990000">;</font>
@@ -989,7 +989,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select testproc(?,?,?) from dual"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select exampleproc(?,?,?) from dual"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1005,7 +1005,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1019,7 +1019,7 @@ parameter.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">)</font> as
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">)</font> as
 begin
         out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
 end<font color="#990000">;</font>
@@ -1034,7 +1034,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin testproc(:in1,:in2,:in3,:out1); end;"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin exampleproc(:in1,:in2,:in3,:out1); end;"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1051,7 +1051,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1068,7 +1068,7 @@ itself.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
+<pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#009900">int</font> output as
         select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">)</font>
 </tt></pre>
 
@@ -1081,7 +1081,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1098,7 +1098,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1111,7 +1111,11 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">)</font> as
+begin
+        out1<font color="#990000">=</font>in1<font color="#990000">;</font>
+        suspend<font color="#990000">;</font>
+end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1123,7 +1127,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampleproc(?,?,?)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1143,7 +1147,7 @@ variables.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure exampleproc ?, ?, ?"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1160,7 +1164,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1176,7 +1180,7 @@ than as return values of the procedure itself.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> language sql
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> language sql
 begin
         <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
 end
@@ -1191,7 +1195,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?,?)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1208,7 +1212,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1221,7 +1225,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">int</font> as <font color="#FF0000">'</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">int</font> as <font color="#FF0000">'</font>
 <font color="#FF0000">declare</font>
 <font color="#FF0000">        in1 int;</font>
 <font color="#FF0000">        in2 float;</font>
@@ -1242,7 +1246,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc($1,$2,$3)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from examplefunc($1,$2,$3)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1258,7 +1262,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 </tt></pre>
 
 </blockquote>
@@ -1273,7 +1277,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#009900">int</font> <b><font color="#0000FF">return</font></b> in1<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1285,7 +1289,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select testfunc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select examplefunc(?,?,?)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1303,7 +1307,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1316,7 +1320,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">()</font> begin select <font color="#993399">1</font><font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1328,7 +1332,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select testproc()"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select exampleproc()"</font><font color="#990000">);</font>
 <font color="#008080">var</font>     result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
 </tt></pre>
 
@@ -1340,7 +1344,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1354,7 +1358,7 @@ procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">)</font> begin select <font color="#993399">1</font> <font color="#008080">into</font> out1<font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1367,7 +1371,7 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0"</font><font color="#990000">);</font>
-cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(@out1)"</font><font color="#990000">);</font>
+cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(@out1)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select @out1"</font><font color="#990000">);</font>
 <font color="#008080">var</font>     result<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
 </tt></pre>
@@ -1380,7 +1384,7 @@ cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><f
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1404,7 +1408,7 @@ itself, but the rest must be returned through output parameters.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">,</font> out2 <font color="#008080">out</font> number<font color="#990000">,</font> out3 <font color="#008080">out</font> varchar2<font color="#990000">)</font> is
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in1 <font color="#008080">in</font> number<font color="#990000">,</font> in2 <font color="#008080">in</font> number<font color="#990000">,</font> in3 <font color="#008080">in</font> varchar2<font color="#990000">,</font> out1 <font color="#008080">out</font> number<font color="#990000">,</font> out2 <font color="#008080">out</font> number<font color="#990000">,</font> out3 <font color="#008080">out</font> varchar2<font color="#990000">)</font> is
 begin
         out1<font color="#990000">:=</font>in1<font color="#990000">;</font>
         out2<font color="#990000">:=</font>in2<font color="#990000">;</font>
@@ -1421,7 +1425,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin testproc(:in1,:in2,:in3,:out1,:out2,:out3); end;"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin exampleproc(:in1,:in2,:in3,:out1,:out2,:out3); end;"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1442,7 +1446,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1455,7 +1459,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> testproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#008080">int</font> output<font color="#990000">,</font> @out2 <font color="#008080">int</font> output<font color="#990000">,</font> @out3 <font color="#009900">int</font> output as
+<pre><tt>create <font color="#008080">procedure</font> exampleproc @<font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> @<font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> @<font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> @out1 <font color="#008080">int</font> output<font color="#990000">,</font> @out2 <font color="#008080">int</font> output<font color="#990000">,</font> @out3 <font color="#009900">int</font> output as
         select @out1<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in1<font color="#990000">),</font>
                 @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">),</font>
                 @out2<font color="#990000">=</font><b><font color="#000000">convert</font></b><font color="#990000">(</font><b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font>@in2<font color="#990000">)</font>
@@ -1470,7 +1474,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1491,7 +1495,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1504,7 +1508,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">,</font> <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font><font color="#008080">in1</font> integer<font color="#990000">,</font> <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> <b><font color="#000000">returns</font></b> <font color="#990000">(</font><font color="#008080">out1</font> integer<font color="#990000">,</font> <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> as
 begin
         out1<font color="#990000">=</font>in1<font color="#990000">;</font>
         out2<font color="#990000">=</font>in2<font color="#990000">;</font>
@@ -1522,7 +1526,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from exampleproc(?,?,?)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1544,7 +1548,7 @@ bind variables.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure testproc ?, ?, ?"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"execute procedure exampleproc ?, ?, ?"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1565,7 +1569,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1578,7 +1582,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">double</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">double</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">),</font> out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">double</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> language sql
 begin
         <font color="#008080">set</font> out1 <font color="#990000">=</font> in1<font color="#990000">;</font>
         <font color="#008080">set</font> out2 <font color="#990000">=</font> in2<font color="#990000">;</font>
@@ -1595,7 +1599,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?,?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?,?,?,?)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1616,7 +1620,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1629,7 +1633,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">record</font> as <font color="#FF0000">'</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> returns <font color="#008080">record</font> as <font color="#FF0000">'</font>
 <font color="#FF0000">declare</font>
 <font color="#FF0000">        output record;</font>
 <font color="#FF0000">begin</font>
@@ -1648,7 +1652,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from examplefunc($1,$2,$3) as (col1 int, col2 float, col3 char(20))"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1666,7 +1670,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+<pre><tt>drop <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">(</font><font color="#009900">int</font><font color="#990000">,</font><font color="#009900">float</font><font color="#990000">,</font><font color="#009900">char</font><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
 </tt></pre>
 
 </blockquote>
@@ -1682,7 +1686,7 @@ set of a MySQL procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>in <font color="#008080">in1</font> <font color="#009900">int</font><font color="#990000">,</font> in <font color="#008080">in2</font> <font color="#009900">float</font><font color="#990000">,</font> in <font color="#008080">in3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin <font color="#008080">select</font> in1<font color="#990000">,</font> in2<font color="#990000">,</font> in3<font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1694,7 +1698,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(?,?,?)"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
@@ -1714,7 +1718,7 @@ cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1728,7 +1732,7 @@ of a MySQL procedure.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">(</font>out <font color="#008080">out1</font> <font color="#009900">int</font><font color="#990000">,</font> out <font color="#008080">out2</font> <font color="#009900">float</font><font color="#990000">,</font> out <font color="#008080">out3</font> <b><font color="#000000">varchar</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font> begin select <font color="#993399">1</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font> <font color="#008080">into</font> out1<font color="#990000">,</font> out2<font color="#990000">,</font> out3<font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1741,7 +1745,7 @@ by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"set @out1=0, @out2=0.0, @out3=''"</font><font color="#990000">);</font>
-cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc(@out1,@out3,@out3)"</font><font color="#990000">);</font>
+cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(@out1,@out3,@out3)"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select @out1,@out2,@out3"</font><font color="#990000">);</font>
 <font color="#008080">var</font>     out1<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">var</font>     out2<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
@@ -1756,7 +1760,7 @@ cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><f
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1779,7 +1783,7 @@ http://www.gnu.org/software/src-highlite -->
         type cursorType is <font color="#008080">ref</font> cursor<font color="#990000">;</font>
 end<font color="#990000">;</font>
 
-create function testproc <font color="#008080">return</font> types<font color="#990000">.</font>cursortype is
+create function exampleproc <font color="#008080">return</font> types<font color="#990000">.</font>cursortype is
         <font color="#008080">l_cursor</font>    types<font color="#990000">.</font>cursorType<font color="#990000">;</font>
 begin
         <font color="#008080">open</font> l_cursor <font color="#008080">for</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font>
@@ -1796,7 +1800,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin  :curs:=testproc; end;"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"begin  :curs:=exampleproc; end;"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">defineOutputBindCursor</font></b><font color="#990000">(</font><font color="#FF0000">"curs"</font><font color="#990000">);</font>
 cur<font color="#990000">.</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 <font color="#008080">var</font>     bindcur<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getOutputBindCursor</font></b><font color="#990000">(</font><font color="#FF0000">"curs"</font><font color="#990000">);</font>
@@ -1817,7 +1821,7 @@ bindcur<font color="#990000">.</font><b><font color="#000000">fetchFromBindCurso
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function testproc
+<pre><tt>drop function exampleproc
 drop package types
 </tt></pre>
 
@@ -1831,7 +1835,7 @@ drop package types
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create procedure testproc <font color="#008080">as</font> select <font color="#990000">*</font> from testtable
+<pre><tt>create procedure exampleproc <font color="#008080">as</font> select <font color="#990000">*</font> from exampletable
 </tt></pre>
 
 </blockquote>
@@ -1843,7 +1847,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec testproc"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"exec exampleproc"</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field00<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field01<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field02<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getFieldByIndex</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
@@ -1860,7 +1864,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1886,7 +1890,7 @@ that return result sets.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">testfunc</font></b><font color="#990000">()</font> returns setof <font color="#008080">record</font> as <font color="#FF0000">'</font>
+<pre><tt>create <font color="#008080">function</font> <b><font color="#000000">examplefunc</font></b><font color="#990000">()</font> returns setof <font color="#008080">record</font> as <font color="#FF0000">'</font>
 <font color="#FF0000">        declare output record;</font>
 <font color="#FF0000">begin</font>
 <font color="#FF0000">        for output in select * from mytable loop</font>
@@ -1906,7 +1910,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from testfunc() as (testint int, testfloat float, testchar char(40))"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"select * from examplefunc() as (exampleint int, examplefloat float, examplechar char(40))"</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field00<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field01<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field02<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
@@ -1923,7 +1927,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop function testfunc
+<pre><tt>drop function examplefunc
 </tt></pre>
 
 </blockquote>
@@ -1942,7 +1946,7 @@ the following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">testproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
+<pre><tt>create <font color="#008080">procedure</font> <b><font color="#000000">exampleproc</font></b><font color="#990000">()</font> <font color="#008080">begin</font> select <font color="#990000">*</font> <font color="#008080">from</font> mytable<font color="#990000">;</font> end<font color="#990000">;</font>
 </tt></pre>
 
 </blockquote>
@@ -1954,7 +1958,7 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call testproc()"</font><font color="#990000">);</font>
+<pre><tt>cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc()"</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field00<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field01<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>     field02<font color="#990000">=</font>cur<font color="#990000">.</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
@@ -1971,7 +1975,7 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>drop procedure testproc
+<pre><tt>drop procedure exampleproc
 </tt></pre>
 
 </blockquote>
@@ -1992,7 +1996,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 <font color="#990000">...</font> generate a <font color="#008080">unique</font> filename <font color="#990000">...</font>
@@ -2020,7 +2024,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <font color="#990000">...</font> get the page to display from the <font color="#008080">previous</font> page <font color="#990000">...</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">openCachedResultSet</font></b><font color="#990000">(</font>filename<font color="#990000">);</font>
@@ -2142,7 +2146,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 cur<font color="#990000">.</font><b><font color="#000000">sendQuery</font></b><font color="#990000">(</font><font color="#FF0000">"insert into my_table values (1,2,3)"</font><font color="#990000">);</font>
@@ -2165,7 +2169,7 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#008080">var</font>	sqlrelay<font color="#990000">=</font><b><font color="#000000">require</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay"</font><font color="#990000">);</font>
 
-<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/test.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+<font color="#008080">var</font>	con<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRConnection</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrserver"</font><font color="#990000">,</font><font color="#993399">9000</font><font color="#990000">,</font><font color="#FF0000">"/tmp/example.socket"</font><font color="#990000">,</font><font color="#FF0000">"user"</font><font color="#990000">,</font><font color="#FF0000">"password"</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 <font color="#008080">var</font>	cur<font color="#990000">=</font><b><font color="#0000FF">new</font></b> sqlrelay<font color="#990000">.</font><b><font color="#000000">SQLRCursor</font></b><font color="#990000">(</font>con<font color="#990000">);</font>
 
 con<font color="#990000">.</font><b><font color="#000000">resumeSession</font></b><font color="#990000">(</font>port<font color="#990000">,</font>socket<font color="#990000">);</font>

@@ -1,2 +1,2 @@
-$cur sendQuery "select testfunc()"
+$cur sendQuery "select examplefunc()"
 set $result [$cur getField 0 0]

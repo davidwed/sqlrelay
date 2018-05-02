@@ -13,18 +13,54 @@
 <p>On Unix or Linux platforms, using unixODBC or iODBC, you can create an instance for the SQL Relay driver by adding an entry like the following to your ODBC instances file (usually /etc/odbcinst.ini)</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>SQLRelay<font color="#990000">]</font>
+Description<font color="#990000">=</font>ODBC <b><font color="#0000FF">for</font></b> SQL Relay
+Driver<font color="#990000">=/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib<font color="#990000">/</font>libsqlrodbc<font color="#990000">.</font>so
+FileUsage<font color="#990000">=</font><font color="#993399">0</font></tt></pre>
+
 </blockquote>
 <p>Note that the Driver attribute must bet set to the full pathname of the libsqlrodbc.so driver.  Note also that on Mac OS X you'll need to replace the <b>.so</b> suffix with <b>.dylib</b></p>
 
 <p>Once the instance is defined you can add a DSN for SQL Relay by adding an entry like the following to your ODBC INI file (usually /etc/odbc.ini)</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>sqlrexample<font color="#990000">]</font>
+Description<font color="#990000">=</font>Connection to SQL Relay
+Driver<font color="#990000">=</font>SQLRelay
+Server<font color="#990000">=</font>sqlrserver
+Port<font color="#990000">=</font><font color="#993399">9000</font>
+Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>example<font color="#990000">.</font>socket
+User<font color="#990000">=</font>exampleuser
+Password<font color="#990000">=</font>examplepass</tt></pre>
+
 </blockquote>
 <p>Here the Driver attribute refers to the instance in odbcinst.ini.</p>
 
 <p>Alternatively, you could create a combined instance/DSN by adding an entry like the following to your ODBC INI file (usually /etc/odbc.ini)</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>sqlrexample<font color="#990000">]</font>
+Description<font color="#990000">=</font>Connection to SQL Relay
+Driver<font color="#990000">=/</font>usr<font color="#990000">/</font>local<font color="#990000">/</font>firstworks<font color="#990000">/</font>lib<font color="#990000">/</font>libsqlrodbc<font color="#990000">.</font>so
+FileUsage<font color="#990000">=</font><font color="#993399">0</font>
+Server<font color="#990000">=</font>sqlrserver
+Port<font color="#990000">=</font><font color="#993399">9000</font>
+Socket<font color="#990000">=/</font>tmp<font color="#990000">/</font>example<font color="#990000">.</font>socket
+User<font color="#990000">=</font>exampleuser
+Password<font color="#990000">=</font>examplepass</tt></pre>
+
 </blockquote>
 <h2>Windows</h2>
 
@@ -97,28 +133,91 @@
 or unixODBC to access the database through SQL Relay as follows:</p>
 
 <blockquote>
-<b>isql sqlrtest</b>
+<b>isql sqlrexample</b>
 </blockquote>
 <p>Here is a sample session:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>dmuse@fedora <font color="#990000">~]</font>$ isql sqlrodbc
+<font color="#990000">+---------------------------------------+</font>
+<font color="#990000">|</font> Connected<font color="#990000">!</font>                            <font color="#990000">|</font>
+<font color="#990000">|</font>                                       <font color="#990000">|</font>
+<font color="#990000">|</font> sql<font color="#990000">-</font>statement                         <font color="#990000">|</font>
+<font color="#990000">|</font> help <font color="#990000">[</font>tablename<font color="#990000">]</font>                      <font color="#990000">|</font>
+<font color="#990000">|</font> quit                                  <font color="#990000">|</font>
+<font color="#990000">|</font>                                       <font color="#990000">|</font>
+<font color="#990000">+---------------------------------------+</font>
+SQL<font color="#990000">&gt;</font> create <font color="#008080">table</font> <b><font color="#000000">exampletable</font></b> <font color="#990000">(</font><font color="#008080">col1</font> <font color="#009900">int</font><font color="#990000">,</font> <font color="#008080">col2</font> <b><font color="#000000">varchar2</font></b><font color="#990000">(</font><font color="#993399">20</font><font color="#990000">))</font>
+SQLRowCount returns <font color="#993399">0</font>
+SQL<font color="#990000">&gt;</font> insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,</font><font color="#FF0000">'hello'</font><font color="#990000">)</font>
+SQLRowCount returns <font color="#993399">1</font>
+SQL<font color="#990000">&gt;</font> insert into <font color="#008080">exampletable</font> <b><font color="#000000">values</font></b> <font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,</font><font color="#FF0000">'goodbye'</font><font color="#990000">)</font>
+SQLRowCount returns <font color="#993399">1</font>
+SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from exampletable
+<font color="#990000">+-----+--------+</font>
+<font color="#990000">|</font> COL1<font color="#990000">|</font> COL2   <font color="#990000">|</font>
+<font color="#990000">+-----+--------+</font>
+<font color="#990000">|</font> <font color="#993399">1</font>   <font color="#990000">|</font> hello  <font color="#990000">|</font>
+<font color="#990000">|</font> <font color="#993399">2</font>   <font color="#990000">|</font> goodbye<font color="#990000">|</font>
+<font color="#990000">+-----+--------+</font>
+SQLRowCount returns <font color="#993399">0</font>
+<font color="#993399">2</font> rows fetched
+SQL<font color="#990000">&gt;</font> update exampletable <font color="#008080">set</font> col2<font color="#990000">=</font><font color="#FF0000">'bye'</font> <font color="#008080">where</font> col1<font color="#990000">=</font><font color="#993399">2</font>
+SQLRowCount returns <font color="#993399">1</font>
+SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from exampletable
+<font color="#990000">+-----+------+</font>
+<font color="#990000">|</font> COL1<font color="#990000">|</font> COL2 <font color="#990000">|</font>
+<font color="#990000">+-----+------+</font>
+<font color="#990000">|</font> <font color="#993399">1</font>   <font color="#990000">|</font> hello<font color="#990000">|</font>
+<font color="#990000">|</font> <font color="#993399">2</font>   <font color="#990000">|</font> bye  <font color="#990000">|</font>
+<font color="#990000">+-----+------+</font>
+SQLRowCount returns <font color="#993399">0</font>
+<font color="#993399">2</font> rows fetched
+SQL<font color="#990000">&gt;</font> <b><font color="#0000FF">delete</font></b> from exampletable
+SQLRowCount returns <font color="#993399">2</font>
+SQL<font color="#990000">&gt;</font> select <font color="#990000">*</font> from exampletable
+<font color="#990000">+-----+-----+</font>
+<font color="#990000">|</font> COL1<font color="#990000">|</font> COL2<font color="#990000">|</font>
+<font color="#990000">+-----+-----+</font>
+<font color="#990000">+-----+-----+</font>
+SQLRowCount returns <font color="#993399">0</font>
+SQL<font color="#990000">&gt;</font> drop table exampletable
+SQLRowCount returns <font color="#993399">0</font>
+SQL<font color="#990000">&gt;</font> quit
+<font color="#990000">[</font>dmuse@fedora <font color="#990000">~]</font>$ </tt></pre>
+
 </blockquote>
 <p>If you get an error like <b>ISQL ERROR: Could not SQLConnect</b> when you run isql then it's possible that it can't find your ODBC INI file.  Some versions of unixODBC, when compiled and installed with non-standard prefixes, still look for odbc.ini in /etc rather than under their prefix.  For example, I discovered that on Mac OS X, unixODBC 2.2.12 installed under /sw should look for /sw/etc/odbc.ini but instead it looks for /etc/odbc.ini, even though <i>odbcinst -j</i> looks under /sw.</p>
 
 <p>You can work around this by setting environment variables to override whatever default search path unixODBC uses.  For example, to force it to look under /sw/etc, use:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#008080">export</font> ODBCINST<font color="#990000">=/</font>sw<font color="#990000">/</font>etc<font color="#990000">/</font>odbcinst<font color="#990000">.</font>ini
+<font color="#008080">export</font> ODBCINI<font color="#990000">=/</font>sw<font color="#990000">/</font>etc<font color="#990000">/</font>odbc<font color="#990000">.</font>ini</tt></pre>
+
 </blockquote>
 <p>Any program that uses ODBC can be configured to use SQL Relay via ODBC by setting its DSN to the SQL Relay DSN that you defined. </p>
 
 <p>You can also use SQL Relay with any language that supports ODBC directly or has a database abstraction layer that supports ODBC.  For example, lets say you have an existing PHP app that uses MDB2 to connect to Oracle and you want to use SQL Relay with it.  There is no PHP MDB2 driver for SQL Relay, but since MDB2 suppots ODBC, you could use:</p>
 
 <blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>PHP <font color="#990000">-&gt;</font> MDB2 <font color="#990000">-&gt;</font> ODBC <font color="#990000">-&gt;</font> <font color="#008080">SQL</font> Relay <font color="#990000">-&gt;</font> Oracle</tt></pre>
+
 </blockquote>
 <p>Similarly, you could use SQL Relay via ODBC with PHP/PDO, PHP/ADODB, Java/JDBC (<a href="jdbc.html">using the JDBC-ODBC bridge</a>), with the ODBC Adapter for Ruby on Rails, and so on.</p>
 
-<p>Developing applications which use ODBC is beyond the scope if this document but many examples and tutorials can be found on the web.
-</p>
-
+Developing applications which use ODBC is beyond the scope if this document but many examples and tutorials can be found on the web.
 </body>
 </html>

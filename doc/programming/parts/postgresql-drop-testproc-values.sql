@@ -1,1 +1,1 @@
-drop function testfunc(int,float,char(20))
+drop function examplefunc(int,float,char(20))

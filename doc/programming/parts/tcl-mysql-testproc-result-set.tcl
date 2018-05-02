@@ -1,4 +1,4 @@
-$cur sendQuery "call testproc()"
+$cur sendQuery "call exampleproc()"
 set $field00 [$cur getField 0 0]
 set $field01 [$cur getField 0 1]
 set $field02 [$cur getField 0 2]

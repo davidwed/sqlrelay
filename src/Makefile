@@ -41,6 +41,9 @@ all-pwdencs:
 all-auths:
 	cd auths $(AND) $(MAKE) all
 
+all-directives:
+	cd directives $(AND) $(MAKE) all
+
 all-translations:
 	cd translations $(AND) $(MAKE) all
 
@@ -72,6 +75,7 @@ clean:
 	cd protocols $(AND) $(MAKE) clean
 	cd pwdencs $(AND) $(MAKE) clean
 	cd auths $(AND) $(MAKE) clean
+	cd directives $(AND) $(MAKE) clean
 	cd translations $(AND) $(MAKE) clean
 	cd resultsettranslations $(AND) $(MAKE) clean
 	cd resultsetrowtranslations $(AND) $(MAKE) clean
@@ -121,6 +125,9 @@ install-pwdencs:
 install-auths:
 	cd auths $(AND) $(MAKE) install
 
+install-directives:
+	cd directives $(AND) $(MAKE) install
+
 install-translations:
 	cd translations $(AND) $(MAKE) install
 
@@ -152,6 +159,7 @@ uninstall:
 	cd protocols $(AND) $(MAKE) uninstall
 	cd pwdencs $(AND) $(MAKE) uninstall
 	cd auths $(AND) $(MAKE) uninstall
+	cd directives $(AND) $(MAKE) uninstall
 	cd translations $(AND) $(MAKE) uninstall
 	cd resultsettranslations $(AND) $(MAKE) uninstall
 	cd resultsetrowtranslations $(AND) $(MAKE) uninstall

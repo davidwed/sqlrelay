@@ -179,12 +179,14 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual const char	*getDebug()=0;
 		virtual bool		getDebugSql()=0;
 		virtual bool		getDebugParser()=0;
+		virtual bool		getDebugDirectives()=0;
 		virtual bool		getDebugTranslations()=0;
 		virtual bool		getDebugFilters()=0;
 		virtual bool		getDebugTriggers()=0;
 		virtual bool		getDebugBindTranslations()=0;
 		virtual bool		getDebugResultSetTranslations()=0;
 		virtual bool		getDebugResultSetRowTranslations()=0;
+		virtual bool		getDebugResultSetHeaderTranslations()=0;
 		virtual bool		getDebugProtocols()=0;
 		virtual bool		getDebugAuths()=0;
 		virtual bool		getDebugPasswordEncryptions()=0;
@@ -224,10 +226,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual xmldomnode	*getListeners()=0;
 		virtual xmldomnode	*getParser()=0;
+		virtual xmldomnode	*getDirectives()=0;
 		virtual xmldomnode	*getTranslations()=0;
 		virtual xmldomnode	*getFilters()=0;
 		virtual xmldomnode	*getResultSetTranslations()=0;
 		virtual xmldomnode	*getResultSetRowTranslations()=0;
+		virtual xmldomnode	*getResultSetHeaderTranslations()=0;
 		virtual xmldomnode	*getTriggers()=0;
 		virtual xmldomnode	*getLoggers()=0;
 		virtual xmldomnode	*getNotifications()=0;

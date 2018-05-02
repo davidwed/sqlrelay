@@ -1,0 +1,39 @@
+= TLS Certificate Chains =
+
+Under TLS, hosts authenticate each other via certificates.
+
+A host certificate contains:
+
+* information identifying the host
+* the public key of the host
+* the signature of a Certificte Authority (CA)
+* information identifying the signing CA
+
+Certificate Authorities are identified by CA certs.
+
+A CA cert contains:
+
+* information identifying the CA
+* the public key of the CA
+* the signature of another CA
+* information identifying the signing CA
+
+As the host cert was signed by a CA, and each CA cert was signed by another CA, they collectively form a Certificate Chain, which ultimately terminates at the certificate for a Root CA (Root cert).
+
+A Root cert contains:
+
+* information identifying the Root CA
+* the public key of the Root CA
+* the signature of the Root CA itself
+
+Root certs and well-known CA certs are typically included in operating system distributions.  Applications can usually be manually configured to recognize Root certs and CA certs that were not included with the operating system.
+
+To validate a host cert:
+* The cert is validated against the CA cert of its signing CA
+* That CA cert is validated against the CA cert of its signing CA
+* ...and so on until a CA cert was signed by a Root cert...
+* That CA cert is validated against the Root cert of its signing Root CA
+
+If this fails at any point, then the host cert is rejected.  Otherwise, the host cert is accepted.
+
+For an invalid host cert to be accepted, every CA or Root cert in the chain would have to have been replaced with a forged cert.  If this were to occur though, then other, valid host certs would be rejected, and the attack would be discovered.

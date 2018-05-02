@@ -54,20 +54,12 @@ extern "C" {
 	#define GET_PARAMETERS zend_parse_parameters
 	#define PARAMS(a) a,
 
-	#define PHP_STREAM_COPY_TO_MEM(a,b) php_stream_copy_to_mem(a,PHP_STREAM_COPY_ALL,0)
+	#define PHP_STREAM_COPY_TO_MEM(a,b) \
+		php_stream_copy_to_mem(a,PHP_STREAM_COPY_ALL,0)
 	#define PHP_STREAM_TO_ZVAL(a,b) php_stream_to_zval(a,&b)
 	#define PHP_STREAM_TO_ZVAL_P(a,b) php_stream_to_zval(a,b)
 
-	#define MY_ZVAL_NULL(a) ZVAL_NULL(&(a))
-	#define MY_ZVAL_NULL_P(a) ZVAL_NULL((a))
-	#define MY_ZVAL_LONG(a,b) ZVAL_LONG(&(a),b)
-	#define MY_ZVAL_LONG_P(a,b) ZVAL_LONG((a),b)
-	#define MY_ZVAL_DOUBLE(a,b) ZVAL_DOUBLE(&(a),b)
-	#define MY_ZVAL_DOUBLE_P(a,b) ZVAL_DOUBLE(a,b)
-	#define MY_ZVAL_BOOL(a,b) ZVAL_BOOL(&(a),b)
-	#define MY_ZVAL_BOOL_P(a,b) ZVAL_BOOL(a,b)
-	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(&(a),b)
-	#define MY_ZVAL_STRING_P(a,b,c) ZVAL_STRING(a,b)
+	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b)
 
 	#define RET_STRING(a,b) \
 		RETURN_STR(zend_string_init(a,charstring::length(a),0))
@@ -105,17 +97,11 @@ extern "C" {
 	#define GET_PARAMETERS zend_get_parameters_ex
 	#define PARAMS(a)
 
-	#define PHP_STREAM_COPY_TO_MEM(a,b) php_stream_copy_to_mem(a,b,PHP_STREAM_COPY_ALL,0)
+	#define PHP_STREAM_COPY_TO_MEM(a,b) \
+		php_stream_copy_to_mem(a,b,PHP_STREAM_COPY_ALL,0)
 	#define PHP_STREAM_TO_ZVAL(a,b) php_stream_to_zval(a,b)
 
-	#define MY_ZVAL_NULL(a) ZVAL_NULL(a)
-	#define MY_ZVAL_LONG(a,b) ZVAL_LONG(a,b)
-        #define MY_ZVAL_DOUBLE(a,b) ZVAL_DOUBLE(a,b)
-        #define MY_ZVAL_DOUBLE_P(a,b) ZVAL_DOUBLE(a,b)
-	#define MY_ZVAL_BOOL(a,b) ZVAL_BOOL(a,b)
-	#define MY_ZVAL_BOOL_P(a,b) ZVAL_BOOL(a,b)
 	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b,c)
-	#define MY_ZVAL_STRING_P(a,b,c) ZVAL_STRING(a,b,c)
 
 	#define RET_STRING RETURN_STRING
 
@@ -137,8 +123,10 @@ extern "C" {
 	#define ADD_NEXT_INDEX_STRING_P(a,b) add_next_index_string(a,b,1)
 	#define ADD_ASSOC_ZVAL(a,b,c) add_assoc_zval(a,b,c)
 
-	#define	getStmt()	(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC)
-	#define getDbh()	(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
+	#define	getStmt() \
+		(pdo_stmt_t *)zend_object_store_get_object(getThis() TSRMLS_CC)
+	#define getDbh() \
+		(pdo_dbh_t *)zend_object_store_get_object(getThis() TSRMLS_CC);
 #endif
 
 #define sqlrelayError(s) \
@@ -617,41 +605,80 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 	}
 
 	char	*strvalue;
+	#if PHP_MAJOR_VERSION >= 7
 	zval	*parameter=(Z_ISREF(param->parameter))?
 				Z_REFVAL(param->parameter):
 				&param->parameter;
+	#endif
 
 	switch (PDO_PARAM_TYPE(param->param_type)) {
 		case PDO_PARAM_NULL:
-			MY_ZVAL_NULL_P(parameter);
+			#if PHP_MAJOR_VERSION >= 7
+				ZVAL_NULL(parameter);
+			#else
+				ZVAL_NULL(param->parameter);
+			#endif
 			return 1;
 		case PDO_PARAM_INT:
-			MY_ZVAL_LONG_P(parameter,
+			#if PHP_MAJOR_VERSION >= 7
+				ZVAL_LONG(parameter,
 					sqlrcur->getOutputBindInteger(name));
+			#else
+				ZVAL_LONG(param->parameter,
+					sqlrcur->getOutputBindInteger(name));
+			#endif
 			return 1;
 		case PDO_PARAM_BOOL:
-			MY_ZVAL_BOOL_P(parameter,
+			#if PHP_MAJOR_VERSION >= 7
+				ZVAL_BOOL(parameter,
 					sqlrcur->getOutputBindInteger(name));
+			#else
+				ZVAL_BOOL(param->parameter,
+					sqlrcur->getOutputBindInteger(name));
+			#endif
 			return 1;
 		case PDO_PARAM_STR:
 			strvalue=(char *)sqlrcur->getOutputBindString(name);
 			if (!strvalue) {
-				MY_ZVAL_NULL_P(parameter);
+			#if PHP_MAJOR_VERSION >= 7
+				ZVAL_NULL(parameter);
 			} else {
-				MY_ZVAL_STRING_P(parameter,strvalue,1);
+				MY_ZVAL_STRING(parameter,strvalue,1);
+			#else
+				ZVAL_NULL(param->parameter);
+			} else {
+				MY_ZVAL_STRING(param->parameter,strvalue,1);
+			#endif
 			}
 			return 1;
 		case PDO_PARAM_LOB:
 			{
 			php_stream	*strm=NULL;
-			if (TYPE_P(parameter)==IS_STRING) {
+			if (
+			#if PHP_MAJOR_VERSION >= 7
+				TYPE_P(parameter)
+			#else
+				TYPE(param->parameter)
+			#endif
+					==IS_STRING) {
 				TSRMLS_FETCH();
 				strm=php_stream_memory_create(
 							TEMP_STREAM_DEFAULT);
-			} else if (TYPE_P(parameter)==IS_RESOURCE) {
+			} else if (
+			#if PHP_MAJOR_VERSION >= 7
+				TYPE_P(parameter)
+			#else
+				TYPE(param->parameter)
+			#endif
+					==IS_RESOURCE) {
 				TSRMLS_FETCH();
-				php_stream_from_zval_no_verify(
-						strm,parameter);
+				#if PHP_MAJOR_VERSION >= 7
+					php_stream_from_zval_no_verify(
+							strm,parameter);
+				#else
+					php_stream_from_zval_no_verify(
+							strm,&param->parameter);
+				#endif
 			}
 			if (!strm) {
 				return 0;
@@ -661,9 +688,16 @@ static int sqlrcursorBindPostExec(sqlrcursor *sqlrcur,
 				sqlrcur->getOutputBindBlob(name),
 				sqlrcur->getOutputBindLength(name));
 			php_stream_seek(strm,0,SEEK_SET);
-			if (TYPE_P(parameter)==IS_STRING) {
-				PHP_STREAM_TO_ZVAL_P(strm,parameter);
-			}
+			#if PHP_MAJOR_VERSION >= 7
+				if (TYPE_P(parameter)==IS_STRING) {
+					PHP_STREAM_TO_ZVAL_P(strm,parameter);
+				}
+			#else
+				if (TYPE(param->parameter)==IS_STRING) {
+					PHP_STREAM_TO_ZVAL(strm,
+							param->parameter);
+				}
+			#endif
 			}
 			return 1;
 		case PDO_PARAM_STMT:
@@ -1286,7 +1320,7 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 	switch (attr) {
 		case PDO_ATTR_AUTOCOMMIT:
 			// use to turn on or off auto-commit mode
-			MY_ZVAL_BOOL_P(retval,dbh->auto_commit);
+			ZVAL_BOOL(retval,dbh->auto_commit);
 			return 1;
 		case PDO_ATTR_PREFETCH:
 			// configure the prefetch size for drivers
@@ -1295,13 +1329,13 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 		case PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT:
 			sqlrcon->getConnectTimeout(&timeoutsec,&timeoutusec);
 			timeout=timeoutsec+timeoutusec*1.0E-6;
-			MY_ZVAL_DOUBLE_P(retval,timeout);
+			ZVAL_DOUBLE(retval,timeout);
 			return 1;
 		case PDO_SQLRELAY_ATTR_AUTHENTICATION_TIMEOUT:
 			sqlrcon->getAuthenticationTimeout(&timeoutsec,
 								&timeoutusec);
 			timeout=timeoutsec+timeoutusec*1.0E-6;
-			MY_ZVAL_DOUBLE_P(retval,timeout);
+			ZVAL_DOUBLE(retval,timeout);
 			return 1;
 		case PDO_ATTR_TIMEOUT:
 			// Generic timeout. The closest concept would be the
@@ -1309,39 +1343,39 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 		case PDO_SQLRELAY_ATTR_RESPONSE_TIMEOUT:
 			sqlrcon->getResponseTimeout(&timeoutsec,&timeoutusec);
 			timeout=timeoutsec+timeoutusec*1.0E-6;
-			MY_ZVAL_DOUBLE_P(retval,timeout);
+			ZVAL_DOUBLE(retval,timeout);
 			return 1;
 		case PDO_SQLRELAY_ATTR_SQLRELAY_VERSION:
 			temp=(char *)SQLR_VERSION;
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 	        case PDO_SQLRELAY_ATTR_RUDIMENTS_VERSION:
 			temp=(char *)sys::getRudimentsVersion();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 	        case PDO_SQLRELAY_ATTR_CLIENT_INFO:
 			temp=(char *)((sqlrcon!=NULL)?
 					sqlrcon->getClientInfo():NULL);
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_ATTR_SERVER_VERSION:
 			// database server version
 			temp=(char *)sqlrcon->serverVersion();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_ATTR_CLIENT_VERSION:
 			// client library version
 			temp=(char *)sqlrcon->clientVersion();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_ATTR_SERVER_INFO:
@@ -1368,43 +1402,43 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 		#ifdef HAVE_PHP_PDO_ATTR_EMULATE_PREPARES
 		case PDO_ATTR_EMULATE_PREPARES:
 			// use substititution variables rather than binds
-			MY_ZVAL_BOOL_P(retval,sqlrdbh->usesubvars);
+			ZVAL_BOOL(retval,sqlrdbh->usesubvars);
 			return 1;
 		#endif
 		case PDO_SQLRELAY_ATTR_DB_TYPE:
 			temp=(char *)sqlrcon->identify();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_VERSION:
 			temp=(char *)sqlrcon->dbVersion();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_HOST_NAME:
 			temp=(char *)sqlrcon->dbHostName();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_DB_IP_ADDRESS:
 			temp=(char *)sqlrcon->dbIpAddress();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_BIND_FORMAT:
 			temp=(char *)sqlrcon->bindFormat();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		case PDO_SQLRELAY_ATTR_CURRENT_DB:
 			temp=(char *)sqlrcon->getCurrentDatabase();
 			if (temp) {
-				MY_ZVAL_STRING_P(retval,temp,1);
+				MY_ZVAL_STRING(retval,temp,1);
 			}
 			return 1;
 		default:

@@ -1,3 +1,3 @@
-cur.prepareQuery("select testproc()")
+cur.prepareQuery("select exampleproc()")
 cur.executeQuery()
 result=cur.getField(0,0)

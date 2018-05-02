@@ -6,7 +6,7 @@ public class MyClass {
 
         	... get rs, port and socket from previous page ...
 
-        	SQLRConnection      con=new SQLRConnection("sqlrserver",(short)9000,"/tmp/test.socket","user","password",0,1);
+        	SQLRConnection      con=new SQLRConnection("sqlrserver",(short)9000,"/tmp/example.socket","user","password",0,1);
         	SQLRCursor          cur=new SQLRCursor(con);
 
         	con.resumeSession(port,socket);

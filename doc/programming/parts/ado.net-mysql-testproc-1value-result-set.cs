@@ -1,3 +1,3 @@
 SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
-sqlrcom.CommandText = "select testproc()";
+sqlrcom.CommandText = "select exampleproc()";
 Int64 result = sqlrcom.ExecuteScalar();

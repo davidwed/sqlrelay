@@ -1,0 +1,18 @@
+In a TLS connection, Certificates (certs) are used to identify hosts - i.e. servers and, less commonly, clients.
+
+They typically contain:
+
+* A host name or domain name
+* A public key
+
+Certificates are generated, signed, and issued by a Certificate Authority (CA).
+
+To generate a certificate, you must:
+* Generate a private key and a corresponding public key
+ * The private key should be kept secret
+* Submit a Certificate Signing Request to a CA containing:
+ * The host name or domain name
+ * The public key
+
+The CA must:
+* 

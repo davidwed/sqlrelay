@@ -1,4 +1,4 @@
-sqlrcur_prepareQuery($cur,"call testproc(?,?,?,?,?,?)");
+sqlrcur_prepareQuery($cur,"call exampleproc(?,?,?,?,?,?)");
 sqlrcur_inputBind($cur,"1",1);
 sqlrcur_inputBind($cur,"2",1.1,2,1);
 sqlrcur_inputBind($cur,"3","hello");

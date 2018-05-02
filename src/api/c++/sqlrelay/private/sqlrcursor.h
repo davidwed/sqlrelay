@@ -15,6 +15,7 @@
 		void	deleteSubstitutionVariables();
 		void	deleteInputBindVariables();
 		void	deleteOutputBindVariables();
+		void	deleteInputOutputBindVariables();
 		void	deleteVariables();
 
 		void	initQueryBuffer(uint32_t querylength);
@@ -27,6 +28,7 @@
 		void	validateBindsInternal();
 		void	sendInputBinds();
 		void	sendOutputBinds();
+		void	sendInputOutputBinds();
 		void	sendGetColumnInfo();
 		void	defineOutputBindGeneric(const char *variable,
 						sqlrclientbindvartype_t type,
@@ -85,6 +87,7 @@
 		bool	getSuspended();
 		bool	parseColumnInfo();
 		bool	parseOutputBinds();
+		bool	parseInputOutputBinds();
 		bool	parseResults();
 		void	setError(const char *err);
 		void	getErrorFromServer();
@@ -99,6 +102,7 @@
 		void	cacheNoError();
 		void	cacheColumnInfo();
 		void	cacheOutputBinds(uint32_t count);
+		void	cacheInputOutputBinds(uint32_t count);
 		void	cacheData();
 		void	finishCaching();
  
@@ -188,5 +192,70 @@
 		void		dontClearBindsDuringPrepare();
 		void		lazyFetch();
 		void		dontLazyFetch();
+		void		defineInputOutputBindString(
+						const char *variable,
+						const char *value,
+						uint32_t length);
+		void		defineInputOutputBindInteger(
+						const char *variable,
+						int64_t value);
+		void		defineInputOutputBindDouble(
+						const char *variable,
+						double value,
+						uint32_t precision,
+						uint32_t scale);
+		void		defineInputOutputBindDate(
+						const char *variable,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						int32_t microsecond,
+						const char *tz,
+						bool isnegative);
+		void		defineOutputBindBlob(const char *variable,
+						const char *value,
+						uint32_t size);
+		void		defineOutputBindClob(const char *variable,
+						const char *value,
+						uint32_t size);
+		void		defineInputOutputBindGeneric(
+						const char *variable,
+						sqlrclientbindvartype_t type,
+						const char *strvalue,
+						int64_t intvalue,
+						double doublevalue,
+						uint32_t precision,
+						uint32_t scale,
+						int16_t year,
+						int16_t month,
+						int16_t day,
+						int16_t hour,
+						int16_t minute,
+						int16_t second,
+						int32_t microsecond,
+						const char *tz,
+						bool isnegative,
+						uint32_t valuesize);
+		const char	*getInputOutputBindString(const char *variable);
+		uint32_t	getInputOutputBindLength(const char *variable);
+		int64_t		getInputOutputBindInteger(const char *variable);
+		double		getInputOutputBindDouble(const char *variable);
+		bool		getInputOutputBindDate(const char *variable,
+							int16_t *year,
+							int16_t *month,
+							int16_t *day,
+							int16_t *hour,
+							int16_t *minute,
+							int16_t *second,
+							int32_t *microsecond,
+							const char **tz,
+							bool *isnegative);
+		const char	*getInputOutputBindBlob(const char *variable);
+		const char	*getInputOutputBindClob(const char *variable);
+		const char	*getColumnTable(const char *col);
+		const char	*getColumnTable(uint32_t col);
 
 	friend class sqlrconnection;

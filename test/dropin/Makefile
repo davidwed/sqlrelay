@@ -9,6 +9,9 @@ all: $(DROPINTESTTARGETS)
 mysql.lo: mysql.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) $< $(OUT)$@
 
+bind.lo: bind.cpp
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) $< $(OUT)$@
+
 mysql.obj: mysql.cpp
 	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(MYSQLINCLUDES) $(COMPILE) mysql.cpp 
 
@@ -36,8 +39,17 @@ oracle.lo: oracle.cpp
 oracle.obj: oracle.cpp
 	$(CXX) $(CXXFLAGS) $(DROPINTESTCPPFLAGS) $(ORACLENCLUDES) $(COMPILE) tds.cpp
 
+oracle.class: oracle.java
+	$(JAVAC) oracle.java
+
+odbc.class: odbc.java
+	$(JAVAC) odbc.java
+
 mysql: mysql.cpp mysql.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
+
+bind: bind.cpp bind.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) bind.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
 
 mysqldatetodatetime: mysqldatetodatetime.cpp mysqldatetodatetime.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysqldatetodatetime.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
@@ -52,4 +64,4 @@ oracle: oracle.cpp oracle.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) oracle.$(OBJ) $(ORACLELIBS) $(DROPINTESTLIBS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE) tds$(EXE) oracle$(EXE)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class mysql$(EXE) postgresql$(EXE) mysqldatetodatetime$(EXE) tds$(EXE) oracle$(EXE) bind$(EXE)

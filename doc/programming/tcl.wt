@@ -636,7 +636,7 @@ To create the stored procedure, run a query like the following.
 
 {{{#!blockquote
 {{{#!code
-@parts/firebird-drop-testproc.sql@
+@parts/firebird-create-testproc-1value.sql@
 }}}
 }}}
 

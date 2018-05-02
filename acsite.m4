@@ -2218,7 +2218,7 @@ AC_SUBST(ENABLE_SYBASE)
 
 AC_DEFUN([FW_CHECK_ODBC],
 [
-if ( test "$ENABLE_ODBC" = "yes" )
+if ( test "$ENABLE_ODBC" = "yes" -o "$ENABLE_ODBC_DRIVER" = "yes" )
 then
 
 	ODBCINCLUDES=""
@@ -3626,6 +3626,14 @@ then
 		then
 			PHPCONFDIR="/usr/local/etc/php"
 			PHPCONFSTYLE="freebsd"
+		fi
+	fi
+	if ( test "$PHPCONFSTYLE" = "unknown" )
+	then
+		if ( test -d "/usr/pkg/etc/php.d" )
+		then
+			PHPCONFDIR="/usr/pkg/etc/php.d"
+			PHPCONFSTYLE="netbsd"
 		fi
 	fi
 	AC_MSG_RESULT($PHPCONFDIR - $PHPCONFSTYLE style)

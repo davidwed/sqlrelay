@@ -7,6 +7,7 @@ include ../../config.mk
 SRCS = ado.net.wt \
 	c.wt \
 	c++.wt \
+	cs.wt \
 	binds.wt \
 	erlang.wt \
 	java.wt \
@@ -26,6 +27,7 @@ SRCS = ado.net.wt \
 OBJS = ado.net.html \
 	c.html \
 	c++.html \
+	cs.html \
 	binds.html \
 	erlang.html \
 	java.html \

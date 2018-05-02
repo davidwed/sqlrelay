@@ -29,6 +29,7 @@ clean:
 	cd cs $(AND) $(MAKE) clean
 	cd dropin $(AND) $(MAKE) clean
 	cd java $(AND) $(MAKE) clean
+	cd jdbc $(AND) $(MAKE) clean
 	cd nodejs $(AND) $(MAKE) clean
 	cd odbc $(AND) $(MAKE) clean
 	cd perl $(AND) $(MAKE) clean

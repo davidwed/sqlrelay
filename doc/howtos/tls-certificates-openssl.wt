@@ -1,0 +1,19 @@
+= Generating TLS Certificates with OpenSSL =
+
+=== Introduction ===
+
+Transport Layer Security (TLS), formerly known as Secure Socket Layer (SSL) is a widely supported form of encryption and authentication.
+
+Under TLS:
+
+* All communications are encrypted
+* Clients can optionally authenticate servers via certificate, presented by the server
+ * I.e. a client can validate that the server is really the server that the client intends to be talking to, and not an imposter
+* Servers can also optionally authenticate clients via certificate, presented by the client
+ * This is known as mutual-authentication and is less common
+
+Certificates used to secure web sites or other public servers should be issued by well known Certificate Authorities.  However, certificates used for development or used internally to an organization may be self-signed.
+
+=== Generating Self-Signed Certificates ===
+
+A self-signed certificate is signed by its own private key.

@@ -514,7 +514,7 @@ void sqlrlistener::setHandoffMethod() {
         	// get the os and version
         	char    *os=sys::getOperatingSystemName();
         	char    *rel=sys::getOperatingSystemRelease();
-        	double  ver=charstring::toFloat(rel);
+        	double  ver=charstring::toFloatC(rel);
 	
         	// force proxy for Cygwin and Linux < 2.2
         	if (!charstring::compare(os,"CYGWIN",6) ||

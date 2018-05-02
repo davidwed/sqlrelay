@@ -12,9 +12,6 @@
 #include <sqlucode.h>
 #include <sqltypes.h>
 
-// for memchr
-#include <string.h>
-
 // note that sqlrserver.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
 #include <sqlrelay/sqlrserver.h>
@@ -53,6 +50,8 @@ struct odbccolumn {
 	SQLINTEGER	unsignednumber;
 	SQLINTEGER	autoincrement;
 #endif
+	char		table[4096];
+	uint16_t	tablelength;
 };
 
 struct datebind {
@@ -79,12 +78,6 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		void		deallocateResultSetBuffers();
 		bool		prepareQuery(const char *query,
 						uint32_t length);
-		void		initializeDirectives();
-		void		parseDirective(const char *directivestart,
-							uint32_t length);
-		void		parseDirectives(const char *query,
-							uint32_t length);
-		void		crashmeTest(int32_t iargument);
 		bool		allocateStatementHandle();
 		void		initializeColCounts();
 		void		initializeRowCounts();
@@ -144,6 +137,35 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
+		bool		inputOutputBind(const char *variable, 
+						uint16_t variablesize,
+						char *value, 
+						uint32_t valuesize,
+						int16_t *isnull);
+		bool		inputOutputBind(const char *variable, 
+						uint16_t variablesize,
+						int64_t *value,
+						int16_t *isnull);
+		bool		inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						double *value,
+						uint32_t *precision,
+						uint32_t *scale,
+						int16_t *isnull);
+		bool		inputOutputBind(const char *variable,
+						uint16_t variablesize,
+						int16_t *year,
+						int16_t *month,
+						int16_t *day,
+						int16_t *hour,
+						int16_t *minute,
+						int16_t *second,
+						int32_t *microsecond,
+						const char **tz,
+						bool *isnegative,
+						char *buffer,
+						uint16_t buffersize,
+						int16_t *isnull);
 		int16_t		nonNullBindValue();
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(uint16_t isnull);
@@ -167,6 +189,8 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		uint16_t	getColumnIsUnsigned(uint32_t i);
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
+		const char	*getColumnTable(uint32_t i);
+		uint16_t	getColumnTableLength(uint32_t i);
 		bool		noRowsToReturn();
 		bool		fetchRow();
 		void		getField(uint32_t col,
@@ -207,17 +231,17 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
 		int16_t		**outisnullptr;
+		datebind	**inoutdatebind;
+		int16_t		**inoutisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
 		SQLLEN		*outisnull;
+		SQLLEN		*inoutisnull;
 		SQLLEN		sqlnulldata;
 		#else
 		SQLINTEGER	*outisnull;
+		SQLINTEGER	*inoutisnull;
 		SQLINTEGER	sqlnulldata;
 		#endif
-
-		uint64_t	querytimeout;
-		bool		executedirect;
-		bool		executerpc;
 
 		uint32_t	row;
 		uint32_t	maxrow;
@@ -314,14 +338,13 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		const char	*db;
 		bool		trace;
 		const char	*tracefile;
-		uint64_t	timeout;
-		uint64_t	querytimeout;
 		const char	*identity;
 		const char	*odbcversion;
 		bool		detachbeforelogin;
 		const char	*lastinsertidquery;
-		bool		executedirect;
 		bool		mars;
+		bool		servercursor;
+		const char	*overrideschema;
 
 		stringbuffer	errormessage;
 
@@ -458,14 +481,13 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	db=NULL;
 	trace=false;
 	tracefile=NULL;
-	timeout=0;
-	querytimeout=0;
 	identity=NULL;
 	odbcversion=NULL;
 	detachbeforelogin=false;
 	lastinsertidquery=NULL;
-	executedirect=false;
 	mars=false;
+	servercursor=false;
+	overrideschema=NULL;
 }
 
 
@@ -483,19 +505,6 @@ void odbcconnection::handleConnectString() {
 			cont->getConnectStringValue("trace"),"yes");
 	tracefile=cont->getConnectStringValue("tracefile");
 
-	const char	*to=cont->getConnectStringValue("timeout");
-	if (!charstring::length(to)) {
-		// for back-compatibility
-		timeout=5;
-	} else {
-		timeout=charstring::toInteger(to);
-	}
-
-	const char	*qto=cont->getConnectStringValue("querytimeout");
-	if (charstring::length(qto)) {
-		querytimeout=charstring::toInteger(qto);
-	}
-
 	identity=cont->getConnectStringValue("identity");
 
 	odbcversion=cont->getConnectStringValue("odbcversion");
@@ -505,10 +514,13 @@ void odbcconnection::handleConnectString() {
 
 	lastinsertidquery=cont->getConnectStringValue("lastinsertidquery");
 
-	executedirect=!charstring::compare(
-			cont->getConnectStringValue("executedirect"),"yes");
-
 	mars=!charstring::compare(cont->getConnectStringValue("mars"),"yes");
+	servercursor=!charstring::compare(
+			cont->getConnectStringValue("servercursor"),"yes");
+	const char	*os=cont->getConnectStringValue("overrideschema");
+	if (!charstring::isNullOrEmpty(os)) {
+		overrideschema=os;
+	}
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
@@ -594,11 +606,12 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set the connect timeout
-	if (timeout) {
+	uint64_t	connecttimeout=cont->getConnectTimeout();
+	if (connecttimeout) {
 		erg=SQLSetConnectAttr(dbc,SQL_LOGIN_TIMEOUT,
-					(SQLPOINTER *)timeout,0);
+					(SQLPOINTER *)connecttimeout,0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			*error="Failed to set timeout";
+			*error="Failed to set connect timeout";
 			SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 			SQLFreeHandle(SQL_HANDLE_ENV,env);
 			return false;
@@ -797,8 +810,8 @@ char *odbcconnection::odbcDriverConnectionString(const char *userasc,
 	return buff;
 }
 
-void pushConnstrValue(char **pptr, size_t *pbuffavail,
-			const char *keyword, const char *value) {
+void odbcconnection::pushConnstrValue(char **pptr, size_t *pbuffavail,
+				const char *keyword, const char *value) {
 
 	const char	*openbracket="";
 	const char	*closebracket="";
@@ -983,14 +996,18 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// get the table name (or % for all tables)
@@ -1121,14 +1138,18 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// the table name might be in one
@@ -1222,14 +1243,18 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// the table name might be in one
@@ -1319,14 +1344,18 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// the table name might be in one
@@ -1687,14 +1716,18 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 	}
 
 	// get the current user (schema)
-	SQLSMALLINT	schemalen=0;
-	if (SQLGetInfo(dbc,
-			SQL_USER_NAME,
-			schemabuffer,
-			sizeof(schemabuffer),
-			&schemalen)==SQL_SUCCESS) {
-		schemabuffer[schemalen]='\0';
-		schema=schemabuffer;
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
 
 	// get the procedure name (or % for all procedures)
@@ -1841,7 +1874,7 @@ void odbcconnection::errorMessage(char *errorbuffer,
 #endif
 
 bool odbcconnection::isLiveConnection(SQLCHAR *state) {
-	// TODO: Gain access to the dbc, and if ODBC 3.5 see if
+	// TODO: Gain access to the dbc, and in ODBC 3.5 see if
 	// SQL_ATTR_CONNECTION_DEAD is SQL_CD_TRUE.
 	return bytestring::compare("08S01",state,5) &&
 		bytestring::compare("08003",state,5);
@@ -1868,28 +1901,37 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	stmt=NULL;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	outdatebind=new datebind *[maxbindcount];
+	inoutdatebind=new datebind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
+	inoutisnullptr=new int16_t *[maxbindcount];
 	#ifdef SQLBINDPARAMETER_SQLLEN
 	outisnull=new SQLLEN[maxbindcount];
+	inoutisnull=new SQLLEN[maxbindcount];
 	#else
 	outisnull=new SQLINTEGER[maxbindcount];
+	inoutisnull=new SQLINTEGER[maxbindcount];
 	#endif
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
+		inoutdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
+		inoutisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 	initializeColCounts();
 	initializeRowCounts();
-	initializeDirectives();
 }
 
 odbccursor::~odbccursor() {
 	delete[] outdatebind;
+	delete[] inoutdatebind;
 	delete[] outisnullptr;
+	delete[] inoutisnullptr;
 	delete[] outisnull;
+	delete[] inoutisnull;
 	deallocateResultSetBuffers();
 }
 
@@ -1937,10 +1979,6 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	// initialize column count
 	initializeColCounts();
 
-	// parse query directives
-	initializeDirectives();
-	parseDirectives(query,length);
-
 	// allocate the statement handle
 	if (!allocateStatementHandle()) {
 		return false;
@@ -1956,7 +1994,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			delete[] buffers[nextbuf];
 		}
 	}
-	if (executedirect) {
+	if (getExecuteDirect()) {
 		return true;
 	}
 	char *query_ucs=conv_to_ucs((char*)query);
@@ -1965,157 +2003,13 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		delete[] query_ucs;
 	}
 	#else
-	if (executedirect) {
+	if (getExecuteDirect()) {
 		return true;
 	}
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 	#endif
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
-
-void odbccursor::initializeDirectives() {
-	querytimeout=0;
-	executedirect=odbcconn->executedirect;
-	executerpc=false;
-}
-
-// FIXME: arguably this should all be pushed up to the controller
-
-#define KEYWORD_SQLEXECDIRECT "sqlexecdirect"
-#define KEYWORD_QUERYTIMEOUT "querytimeout:"
-#define KEYWORD_SQLPREPARE "sqlprepare"
-#define KEYWORD_SQLRELAY_CRASH "sqlrelay-crash"
-#define KEYWORD_SQLRELAY_CRASH_ARG "sqlrelay-crash:"
-#define MARKER_ODBC_RPC '{'
-
-void odbccursor::parseDirectives(const char *query, uint32_t length) {
-
-	const char	*linestart=NULL;
-	const char	*lineend=NULL;
-
-	if (query[0]==MARKER_ODBC_RPC) {
-		executedirect=true;
-		executerpc=true;
-	}
-	linestart=query;
-
-	for (uint32_t i=0; i < length; ++i) {
-		if ((query[i]=='\n') || !((i+1)<length)) {
-			if (query[i]=='\n') {
-				lineend=&query[i];
-			} else {
-				lineend=&query[i+1];
-			}
-			if (((lineend-linestart)>2) &&
-				(linestart[0]=='-') &&
-				(linestart[1]=='-')) {
-				parseDirective(&linestart[2],
-						lineend-linestart-2);
-			}
-			linestart=&query[i+1];
-		}
-	}
-}
-
-void odbccursor::parseDirective(const char *directivestart, uint32_t length) {
-
-	uint32_t	cleanlength=length;
-	int32_t		argumentsize;
-	const char	*argument;
-	int32_t		iargument=0;
-
-	if (cleanlength && directivestart[cleanlength-1]=='\r') {
-		cleanlength--;
-	}
-	if (!cleanlength) {
-		return;
-	}
-
-	// Note: These are not intended to be human friendly declarations,
-	// just very strict and simple formats for a code generator to emit.
-	if (!charstring::compare(directivestart,
-				KEYWORD_SQLEXECDIRECT,
-				cleanlength)) {
-		executedirect=true;
-		return;
-	}
-
-	if (!charstring::compare(directivestart,
-				KEYWORD_SQLPREPARE,
-				cleanlength)) {
-		executedirect=false;
-	}
-
-	if (!charstring::compare(directivestart,
-				KEYWORD_SQLRELAY_CRASH,
-				cleanlength)) {
-		crashmeTest(0);
-		return;
-	}
-
-	if ((cleanlength>charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)) &&
-		(!charstring::compare(directivestart,
-			KEYWORD_SQLRELAY_CRASH_ARG,
-			charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)))) {
-
-		argumentsize=cleanlength-
-				charstring::length(KEYWORD_SQLRELAY_CRASH_ARG);
-		argument=&directivestart[
-				charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)];
-
-		if (charstring::isInteger(argument,argumentsize)) {
-			iargument=charstring::toInteger(argument);
-		}
-
-		crashmeTest(iargument);
-		return;
-	}
-
-	if ((cleanlength>charstring::length(KEYWORD_QUERYTIMEOUT)) &&
-		(!charstring::compare(directivestart,
-				KEYWORD_QUERYTIMEOUT,
-				charstring::length(KEYWORD_QUERYTIMEOUT)))) {
-
-		argumentsize=cleanlength-
-				charstring::length(KEYWORD_QUERYTIMEOUT);
-		argument=&directivestart[
-				charstring::length(KEYWORD_QUERYTIMEOUT)];
-
-		if (charstring::isInteger(argument,argumentsize)) {
-			// well, I know that the directive is always zero
-			// terminated someplace, and I already know this it
-			// appears to be an integer, so let it rip even though
-			// we would like to use the argumentsize.
-			querytimeout=charstring::toInteger(argument);
-		}
-		return;
-	}
-}
-
-void odbccursor::crashmeTest(int32_t iargument) {
-
-	char	*some_ptr=(char *)NULL;
-
-	if (iargument==0) {
-		// assignment to NULL pointer
-		some_ptr[0]=1;
-	} else if (iargument==1) {
-		// delete NULL pointer
-		delete[] some_ptr;
-	} else if (iargument==2) {
-		// double free
-		some_ptr=new char[100];
-		delete[] some_ptr;
-		delete[] some_ptr;
-	} else if (iargument==3) {
-		// accessing NULL pointer
-		some_ptr[0]=(memchr(some_ptr,25,30))?1:2;
-	} else if (iargument==4) {
-		// accessing NULL pointer 
-		some_ptr[0]=some_ptr[10];
-	}
-}
-
 
 bool odbccursor::allocateStatementHandle() {
 
@@ -2133,6 +2027,21 @@ bool odbccursor::allocateStatementHandle() {
 	#else
 	erg=SQLAllocStmt(odbcconn->dbc,&stmt);
 	#endif
+
+	// MS SQL Server only returns table names for columns when using a
+	// server cursor or when the query contains a FOR BROWSE clause.
+	//
+	// Some apps need the table name.
+	//
+	// Setting the cursor type to static appears to be the least invasive
+	// way of influencing the server to use a server cursor and thus return
+	// column names.  The cost is that we can't use FOR BROWSE clauses, but
+	// SQL Relay doesn't support updating result sets anyway, so that
+	// shouldn't be too much of a problem.
+	if (odbcconn->servercursor) {
+		SQLSetStmtAttr(stmt,SQL_ATTR_CURSOR_TYPE,
+			(SQLPOINTER)SQL_CURSOR_STATIC,SQL_IS_INTEGER);
+	}
 
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
@@ -2354,8 +2263,8 @@ bool odbccursor::outputBind(const char *variable,
 				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
-				SQL_CHAR,
-				0,
+				SQL_VARCHAR,
+				valuesize,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
@@ -2452,6 +2361,7 @@ bool odbccursor::outputBind(const char *variable,
 	db->tz=tz;
 	*isnegative=false;
 	db->buffer=buffer;
+
 	outdatebind[pos-1]=db;
 	outisnullptr[pos-1]=isnull;
 
@@ -2460,8 +2370,154 @@ bool odbccursor::outputBind(const char *variable,
 				SQL_PARAM_OUTPUT,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
+				// FIXME: shouldn't these be 29,9
+				// like an input/output bind?
 				0,
 				0,
+				buffer,
+				0,
+				&(outisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputOutputBind(const char *variable, 
+				uint16_t variablesize,
+				char *value, 
+				uint32_t valuesize, 
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	inoutdatebind[pos-1]=NULL;
+	inoutisnullptr[pos-1]=isnull;
+
+	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
+				sqlnulldata:charstring::length(value);
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_CHAR,
+				SQL_VARCHAR,
+				valuesize,
+				0,
+				(SQLPOINTER)value,
+				valuesize,
+				&(inoutisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputOutputBind(const char *variable, 
+				uint16_t variablesize,
+				int64_t *value,
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	inoutdatebind[pos-1]=NULL;
+	inoutisnullptr[pos-1]=isnull;
+
+	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
+				sqlnulldata:sizeof(int64_t);
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_SBIGINT,
+				SQL_BIGINT,
+				0,
+				0,
+				value,
+				sizeof(int64_t),
+				&(inoutisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputOutputBind(const char *variable,
+				uint16_t variablesize,
+				double *value,
+				uint32_t *precision,
+				uint32_t *scale,
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	inoutdatebind[pos-1]=NULL;
+	inoutisnullptr[pos-1]=isnull;
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_DOUBLE,
+				SQL_DOUBLE,
+				*precision,
+				*scale,
+				value,
+				sizeof(double),
+				&(outisnull[pos-1]));
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputOutputBind(const char *variable,
+				uint16_t variablesize,
+				int16_t *year,
+				int16_t *month,
+				int16_t *day,
+				int16_t *hour,
+				int16_t *minute,
+				int16_t *second,
+				int32_t *microsecond,
+				const char **tz,
+				bool *isnegative,
+				char *buffer,
+				uint16_t buffersize,
+				int16_t *isnull) {
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
+	ts->year=*year;
+	ts->month=*month;
+	ts->day=*day;
+	ts->hour=*hour;
+	ts->minute=*minute;
+	ts->second=*second;
+	ts->fraction=(*microsecond)*1000;
+
+	datebind	*db=new datebind;
+	db->year=year;
+	db->month=month;
+	db->day=day;
+	db->hour=hour;
+	db->minute=minute;
+	db->second=second;
+	db->microsecond=microsecond;
+	db->tz=tz;
+	*isnegative=false;
+	db->buffer=buffer;
+
+	inoutdatebind[pos-1]=db;
+	inoutisnullptr[pos-1]=isnull;
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_TIMESTAMP,
+				SQL_TIMESTAMP,
+				29,
+				9,
 				buffer,
 				0,
 				&(outisnull[pos-1]));
@@ -2492,10 +2548,9 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	// * init from query timeout specified in the connect string
 	// * override with query timeout set via a directive
 	// * if it's still > 0 then actually set the timeout
-	// FIXME: doesn't initializeDirectives basically do this?
-	uint64_t	statementquerytimeout=odbcconn->querytimeout;
-	if (querytimeout>0) {
-		statementquerytimeout=querytimeout;
+	uint64_t	statementquerytimeout=conn->cont->getQueryTimeout();
+	if (getQueryTimeout()>0) {
+		statementquerytimeout=getQueryTimeout();
 	}
 	if (statementquerytimeout>0) {
 		erg=SQLSetStmtAttr(stmt,SQL_ATTR_QUERY_TIMEOUT,
@@ -2505,7 +2560,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	// execute the query
-	if (executedirect) {
+	if (getExecuteDirect()) {
 		#ifdef HAVE_SQLCONNECTW
 		char	*queryucs=conv_to_ucs((char*)query);
 		erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
@@ -2546,7 +2601,9 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	// too soon.
 
 	// convert date output binds and copy out isnulls
-	for (uint16_t i=0; i<getOutputBindCount(); i++) {
+	//for (uint16_t i=0; i<getOutputBindCount(); i++) {
+	// FIXME: inefficient
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
 			SQL_TIMESTAMP_STRUCT	*ts=
@@ -2581,6 +2638,26 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 				// forcibly null-terminate the buffer
 				sb->value[outisnull[i]]=0;
 			}*/
+		}
+	}
+	//for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+	// FIXME: inefficient
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		if (inoutdatebind[i]) {
+			datebind	*db=inoutdatebind[i];
+			SQL_TIMESTAMP_STRUCT	*ts=
+				(SQL_TIMESTAMP_STRUCT *)db->buffer;
+			*(db->year)=ts->year;
+			*(db->month)=ts->month;
+			*(db->day)=ts->day;
+			*(db->hour)=ts->hour;
+			*(db->minute)=ts->minute;
+			*(db->second)=ts->second;
+			*(db->microsecond)=ts->fraction/1000;
+			*(db->tz)=NULL;
+		}
+		if (inoutisnullptr[i]) {
+			*(inoutisnullptr[i])=inoutisnull[i];
 		}
 	}
 
@@ -2693,6 +2770,17 @@ bool odbccursor::handleColumns() {
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+
+			// table name
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_BASE_TABLE_NAME,
+					column[i].table,4096,
+					(SQLSMALLINT *)&(column[i].tablelength),
+					NULL);
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
+			column[i].tablelength=
+					charstring::length(column[i].table);
 #else
 			// column name
 			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LABEL,
@@ -2774,6 +2862,17 @@ bool odbccursor::handleColumns() {
 			#else
 			column[i].autoincrement=0;
 			#endif
+
+			// table name
+			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TABLE_NAME,
+					column[i].table,4096,
+					(SQLSMALLINT *)&(column[i].tablelength),
+					NULL);
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
+			column[i].tablelength=
+					charstring::length(column[i].table);
 #endif
 		}
 
@@ -2982,6 +3081,14 @@ uint16_t odbccursor::getColumnIsAutoIncrement(uint32_t i) {
 	return column[i].autoincrement;
 }
 
+const char *odbccursor::getColumnTable(uint32_t i) {
+	return column[i].table;
+}
+
+uint16_t odbccursor::getColumnTableLength(uint32_t i) {
+	return column[i].tablelength;
+}
+
 bool odbccursor::noRowsToReturn() {
 	// if there are no columns, then there can't be any rows either
 	return (!ncols);
@@ -3132,9 +3239,22 @@ void odbccursor::closeResultSet() {
 
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		delete outdatebind[i];
+	}
+
+	for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+		delete inoutdatebind[i];
+	}
+
+	// FIXME: inefficient, but there appears to be a case where
+	// closeResultSet isn't called, and stale ptrs get left lingering
+	// around...
+	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutdatebind[i]=NULL;
+		inoutisnullptr[i]=NULL;
+		inoutisnull[i]=0;
 	}
 
 	if (!conn->cont->getMaxColumnCount()) {

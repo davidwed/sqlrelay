@@ -82,10 +82,12 @@ class sqlrservercontrollerprivate {
 
 	sqlrprotocols			*_sqlrpr;
 	sqlrparser			*_sqlrp;
+	sqlrdirectives			*_sqlrd;
 	sqlrtranslations		*_sqlrt;
 	sqlrfilters			*_sqlrf;
 	sqlrresultsettranslations	*_sqlrrst;
-	sqlrresultsetrowtranslations	*_sqlrrrst;
+	sqlrresultsetrowtranslations	*_sqlrrsrt;
+	sqlrresultsetheadertranslations	*_sqlrrsht;
 	sqlrtriggers			*_sqlrtr;
 	sqlrloggers			*_sqlrlg;
 	sqlrnotifications		*_sqlrn;
@@ -140,17 +142,20 @@ class sqlrservercontrollerprivate {
 	uint64_t		_serversockincount;
 	unixsocketserver	*_serversockun;
 
+	memorypool	*_bindpool;
 	memorypool	*_bindmappingspool;
 	namevaluepairs	*_inbindmappings;
 	namevaluepairs	*_outbindmappings;
 
 	bool		_debugsql;
 	bool		_debugsqlrparser;
-	bool		_debugsqlrtranslation;
+	bool		_debugsqlrdirectives;
+	bool		_debugsqlrtranslations;
 	bool		_debugsqlrfilters;
 	bool		_debugbindtranslation;
 	bool		_debugsqlrresultsettranslation;
 	bool		_debugsqlrresultsetrowtranslation;
+	bool		_debugsqlrresultsetheadertranslation;
 
 	dynamiclib	_conndl;
 	dynamiclib	_sqlrpdl;
@@ -195,6 +200,10 @@ class sqlrservercontrollerprivate {
 	uint32_t	_maxcolumncount;
 	uint32_t	_maxfieldlength;
 
+	uint64_t	_connecttimeout;
+	uint64_t	_querytimeout;
+	bool		_executedirect;
+
 	int64_t		_loggedinsec;
 	int64_t		_loggedinusec;
 
@@ -218,6 +227,25 @@ class sqlrservercontrollerprivate {
 	dictionary< uint32_t, uint32_t >	_odbcdatabasescolumnmap;
 	dictionary< uint32_t, uint32_t >	_odbctablescolumnmap;
 	dictionary< uint32_t, uint32_t >	_odbccolumnscolumnmap;
+
+	const char	**_columnnames;
+	uint16_t	*_columnnamelengths;
+	uint16_t	*_columntypes;
+	const char	**_columntypenames;
+	uint16_t	*_columntypenamelengths;
+	uint32_t	*_columnlengths;
+	uint32_t	*_columnprecisions;
+	uint32_t	*_columnscales;
+	uint16_t	*_columnisnullables;
+	uint16_t	*_columnisprimarykeys;
+	uint16_t	*_columnisuniques;
+	uint16_t	*_columnispartofkeys;
+	uint16_t	*_columnisunsigneds;
+	uint16_t	*_columniszerofilleds;
+	uint16_t	*_columnisbinarys;
+	uint16_t	*_columnisautoincrements;
+	const char	**_columntables;
+	uint16_t	*_columntablelengths;
 
 	const char	**_fieldnames;
 	const char	**_fields;
@@ -291,6 +319,10 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_maxcolumncount=0;
 	pvt->_maxfieldlength=0;
 
+	pvt->_connecttimeout=0;
+	pvt->_querytimeout=0;
+	pvt->_executedirect=false;
+
 	pvt->_connected=false;
 	pvt->_inclientsession=false;
 	pvt->_loggedin=false;
@@ -298,16 +330,19 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_relogintime=0;
 
 	// maybe someday these parameters will be configurable
+	pvt->_bindpool=new memorypool(512,128,100);
 	pvt->_bindmappingspool=new memorypool(512,128,100);
 	pvt->_inbindmappings=new namevaluepairs;
 	pvt->_outbindmappings=new namevaluepairs;
 
 	pvt->_sqlrpr=NULL;
 	pvt->_sqlrp=NULL;
+	pvt->_sqlrd=NULL;
 	pvt->_sqlrt=NULL;
 	pvt->_sqlrf=NULL;
 	pvt->_sqlrrst=NULL;
-	pvt->_sqlrrrst=NULL;
+	pvt->_sqlrrsrt=NULL;
+	pvt->_sqlrrsht=NULL;
 	pvt->_sqlrtr=NULL;
 	pvt->_sqlrlg=NULL;
 	pvt->_sqlrn=NULL;
@@ -318,7 +353,8 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_decrypteddbpassword=NULL;
 
-	pvt->_debugsqlrtranslation=false;
+	pvt->_debugsqlrdirectives=false;
+	pvt->_debugsqlrtranslations=false;
 	pvt->_debugsqlrfilters=false;
 	pvt->_debugbindtranslation=false;
 	pvt->_debugsqlrresultsettranslation=false;
@@ -375,16 +411,19 @@ sqlrservercontroller::~sqlrservercontroller() {
 		file::remove(pvt->_unixsocket.getString());
 	}
 
+	delete pvt->_bindpool;
 	delete pvt->_bindmappingspool;
 	delete pvt->_inbindmappings;
 	delete pvt->_outbindmappings;
 
 	delete pvt->_sqlrpr;
 	delete pvt->_sqlrp;
+	delete pvt->_sqlrd;
 	delete pvt->_sqlrt;
 	delete pvt->_sqlrf;
 	delete pvt->_sqlrrst;
-	delete pvt->_sqlrrrst;
+	delete pvt->_sqlrrsrt;
+	delete pvt->_sqlrrsht;
 	delete pvt->_sqlrtr;
 	delete pvt->_sqlrlg;
 	delete pvt->_sqlrn;
@@ -559,8 +598,16 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 	initConnStats();
 
+	// get the query directives
+	pvt->_debugsqlrdirectives=pvt->_cfg->getDebugDirectives();
+	xmldomnode	*directives=pvt->_cfg->getDirectives();
+	if (!directives->isNullNode()) {
+		pvt->_sqlrd=new sqlrdirectives(this);
+		pvt->_sqlrd->load(directives);
+	}
+
 	// get the query translations
-	pvt->_debugsqlrtranslation=pvt->_cfg->getDebugTranslations();
+	pvt->_debugsqlrtranslations=pvt->_cfg->getDebugTranslations();
 	xmldomnode	*translations=pvt->_cfg->getTranslations();
 	if (!translations->isNullNode()) {
 		pvt->_sqlrp=newParser();
@@ -595,8 +642,18 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	xmldomnode	*resultsetrowtranslations=
 				pvt->_cfg->getResultSetRowTranslations();
 	if (!resultsetrowtranslations->isNullNode()) {
-		pvt->_sqlrrrst=new sqlrresultsetrowtranslations(this);
-		pvt->_sqlrrrst->load(resultsetrowtranslations);
+		pvt->_sqlrrsrt=new sqlrresultsetrowtranslations(this);
+		pvt->_sqlrrsrt->load(resultsetrowtranslations);
+	}
+
+	// get the result set header translations
+	pvt->_debugsqlrresultsetheadertranslation=
+			pvt->_cfg->getDebugResultSetHeaderTranslations();
+	xmldomnode	*resultsetheadertranslations=
+			pvt->_cfg->getResultSetHeaderTranslations();
+	if (!resultsetheadertranslations->isNullNode()) {
+		pvt->_sqlrrsht=new sqlrresultsetheadertranslations(this);
+		pvt->_sqlrrsht->load(resultsetheadertranslations);
 	}
 
 	// get the triggers
@@ -2039,7 +2096,8 @@ bool sqlrservercontroller::autoCommitOn() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("autocommit off\n\n");
+		stdoutput.printf("%d: autocommit off\n\n",
+					process::getProcessId());
 	}
 
 	pvt->_autocommitforthissession=true;
@@ -2057,7 +2115,8 @@ bool sqlrservercontroller::autoCommitOff() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("autocommit off\n\n");
+		stdoutput.printf("%d: autocommit off\n\n",
+					process::getProcessId());
 	}
 
 	pvt->_autocommitforthissession=false;
@@ -2078,7 +2137,8 @@ bool sqlrservercontroller::begin() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("begin\n\n");
+		stdoutput.printf("%d: begin\n\n",
+					process::getProcessId());
 	}
 
 	// if we're faking transaction blocks, do that,
@@ -2114,7 +2174,8 @@ bool sqlrservercontroller::commit() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("commit\n\n");
+		stdoutput.printf("%d: commit\n\n",
+					process::getProcessId());
 	}
 
 	if (pvt->_conn->commit()) {
@@ -2148,7 +2209,8 @@ bool sqlrservercontroller::rollback() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("rollback\n\n");
+		stdoutput.printf("%d: rollback\n\n",
+					process::getProcessId());
 	}
 
 	if (pvt->_conn->rollback()) {
@@ -2196,39 +2258,46 @@ bool sqlrservercontroller::getListsByApiCalls() {
 
 bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getDatabaseList(cursor,wild);
 }
 
 bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getSchemaList(cursor,wild);
 }
 
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getTableList(cursor,wild);
 }
 
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getTableTypeList(cursor,wild);
 }
 
 bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getColumnList(cursor,table,wild);
 }
 
 bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getPrimaryKeyList(cursor,table,wild);
 }
 
 bool sqlrservercontroller::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getKeyAndIndexList(cursor,table,wild);
 }
 
@@ -2236,17 +2305,20 @@ bool sqlrservercontroller::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *procedure,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getProcedureBindAndColumnList(cursor,procedure,wild);
 }
 
 bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getTypeInfoList(cursor,type,wild);
 }
 
 bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 	return pvt->_conn->getProcedureList(cursor,wild);
 }
 
@@ -2321,7 +2393,8 @@ void sqlrservercontroller::saveError() {
 	pvt->_conn->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("ERROR:\n%d: %.*s\n\n",
+		stdoutput.printf("%d: ERROR:\n%d: %.*s\n\n",
+					process::getProcessId(),
 					errorcode,errorlength,
 					pvt->_conn->getErrorBuffer());
 	}
@@ -2766,11 +2839,32 @@ const char * const *sqlrservercontroller::dataTypeStrings() {
 	return datatypestring;
 }
 
+bool sqlrservercontroller::applyDirectives(sqlrservercursor *cursor) {
+
+	if (pvt->_debugsqlrdirectives) {
+		stdoutput.printf("========================================"
+				"========================================\n\n");
+		stdoutput.printf("applying directives...\n");
+	}
+
+	// apply translation rules
+	const char	*query=cursor->getQueryBuffer();
+	if (!pvt->_sqlrd->run(pvt->_conn,cursor,query)) {
+		if (pvt->_debugsqlrdirectives) {
+			stdoutput.printf("a directive failed\n");
+		}
+		// FIXME: raise directive failed event...
+		return false;
+	}
+
+	return true;
+}
+
 bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	const char	*query=cursor->getQueryBuffer();
 
-	if (pvt->_debugsqlrtranslation) {
+	if (pvt->_debugsqlrtranslations) {
 		stdoutput.printf("========================================"
 				"========================================\n\n");
 		stdoutput.printf("translating query...\n");
@@ -2785,7 +2879,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	translatedquery->clear();
 	if (!pvt->_sqlrt->run(pvt->_conn,cursor,
 				pvt->_sqlrp,query,translatedquery)) {
-		if (pvt->_debugsqlrtranslation) {
+		if (pvt->_debugsqlrtranslations) {
 			stdoutput.printf("translation failed, "
 						"using original:\n\"%s\"\n\n",
 						query);
@@ -2799,14 +2893,14 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 		cursor->setQueryTree(pvt->_sqlrp->detachTree());
 	}
 
-	if (pvt->_debugsqlrtranslation) {
+	if (pvt->_debugsqlrtranslations) {
 		stdoutput.printf("translated:\n\"%s\"\n\n",
 					translatedquery->getString());
 	}
 
 	// bail if the translated query is too large
 	if (translatedquery->getStringLength()>pvt->_maxquerysize) {
-		if (pvt->_debugsqlrtranslation) {
+		if (pvt->_debugsqlrtranslations) {
 			stdoutput.printf("translated query too large\n");
 		}
 		return false;
@@ -3522,18 +3616,89 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 			}
 		}
 	}
+
+	for (int16_t inout=0;
+		inout<cursor->getInputOutputBindCount(); inout++) {
+
+		bind=&cursor->getInputOutputBinds()[inout];
+
+		// bind the value to the variable
+		if (bind->type==SQLRSERVERBINDVARTYPE_STRING ||
+				bind->type==SQLRSERVERBINDVARTYPE_NULL) {
+			if (!cursor->inputOutputBind(
+					bind->variable,
+					bind->variablesize,
+					bind->value.stringval,
+					bind->valuesize+1,
+					&bind->isnull)) {
+				return false;
+			}
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_INTEGER) {
+			if (!cursor->inputOutputBind(
+					bind->variable,
+					bind->variablesize,
+					&bind->value.integerval,
+					&bind->isnull)) {
+				return false;
+			}
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
+			if (!cursor->inputOutputBind(
+					bind->variable,
+					bind->variablesize,
+					&bind->value.doubleval.value,
+					&bind->value.doubleval.precision,
+					&bind->value.doubleval.scale,
+					&bind->isnull)) {
+				return false;
+			}
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_DATE) {
+			if (!cursor->inputOutputBind(
+					bind->variable,
+					bind->variablesize,
+					&bind->value.dateval.year,
+					&bind->value.dateval.month,
+					&bind->value.dateval.day,
+					&bind->value.dateval.hour,
+					&bind->value.dateval.minute,
+					&bind->value.dateval.second,
+					&bind->value.dateval.microsecond,
+					(const char **)&bind->value.dateval.tz,
+					&bind->value.dateval.isnegative,
+					bind->value.dateval.buffer,
+					bind->value.dateval.buffersize,
+					&bind->isnull)) {
+				return false;
+			}
+		} /*else if (bind->type==SQLRSERVERBINDVARTYPE_BLOB) {
+			if (!cursor->inputOutputBindBlob(
+					bind->variable,
+					bind->variablesize,inout,
+					&bind->isnull)) {
+				return false;
+			}
+		} else if (bind->type==SQLRSERVERBINDVARTYPE_CLOB) {
+			if (!cursor->inputOutputBindClob(
+					bind->variable,
+					bind->variablesize,inout,
+					&bind->isnull)) {
+				return false;
+			}
+		}*/
+	}
+
 	return true;
 }
 
 bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						const char *query,
 						uint32_t querylen) {
-	return prepareQuery(cursor,query,querylen,false,false);
+	return prepareQuery(cursor,query,querylen,false,false,false);
 }
 
 bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						const char *query,
 						uint32_t querylen,
+						bool enabledirectives,
 						bool enabletranslations,
 						bool enablefilters) {
 
@@ -3542,7 +3707,8 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("query:\n%.*s\n\n",querylen,query);
+		stdoutput.printf("%d: query:\n%.*s\n\n",
+				process::getProcessId(),querylen,query);
 	}
 
 	// The standard paradigm is:
@@ -3635,6 +3801,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 		}
 	}
 
+	// apply directives
+	if (enabledirectives && pvt->_sqlrd) {
+		applyDirectives(cursor);
+	}
+
 	// translate query
 	if (enabletranslations && pvt->_sqlrt) {
 		translateQuery(cursor);
@@ -3668,7 +3839,8 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	query=cursor->getQueryBuffer();
 	querylen=cursor->getQueryLength();
 	if (enabletranslations && pvt->_sqlrt && pvt->_debugsql) {
-		stdoutput.printf("translated:\n%.*s\n\n",querylen,query);
+		stdoutput.printf("%d: translated:\n%.*s\n\n",
+					process::getProcessId(),querylen,query);
 	}
 
 	// fake input binds if this specific query doesn't support them
@@ -3746,13 +3918,17 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor) {
-	return executeQuery(cursor,false,false,false);
+	return executeQuery(cursor,false,false,false,false);
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
+						bool enabledirectives,
 						bool enabletranslations,
 						bool enablefilters,
 						bool enabletriggers) {
+
+	// reset header translation flag
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 
 	// set state
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
@@ -3792,6 +3968,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 					SQLRQUERYSTATUS_FILTER_VIOLATION);
 				return false;
 			}
+		}
+
+		// apply directives
+		if (enabledirectives && pvt->_sqlrd) {
+			applyDirectives(cursor);
 		}
 
 		// translate query
@@ -3851,7 +4032,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		raiseDebugMessageEvent("faking binds...");
 
 		if (cursor->fakeInputBinds()) {
-			if (pvt->_debugsqlrtranslation) {
+			if (pvt->_debugsqlrtranslations) {
 				stdoutput.printf(
 				"after faking input binds:\n%s\n\n",
 				cursor->
@@ -4594,7 +4775,7 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 	}
 
 	if (pvt->_debugsqlrresultsettranslation) {
-		stdoutput.printf("translated:\n%s\n\n",*field);
+		stdoutput.printf("translated:\n%.*s\n\n",*fieldlength,*field);
 	}
 }
 
@@ -4615,14 +4796,15 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 	}
 
 	// run translations
-	if (pvt->_sqlrrrst) {
-		pvt->_sqlrrrst->run(pvt->_conn,cursor,colcount,
+	if (pvt->_sqlrrsrt) {
+		pvt->_sqlrrsrt->run(pvt->_conn,cursor,colcount,
 					names,fields,fieldlengths);
 	}
 
 	if (pvt->_debugsqlrresultsetrowtranslation) {
 		for (uint32_t i=0; i<colcount; i++) {
-			stdoutput.printf("translated:\n%s\n\n",(*fields)[i]);
+			stdoutput.printf("translated:\n%.*s\n\n",
+					(*fieldlengths)[i],(*fields)[i]);
 		}
 	}
 }
@@ -4812,8 +4994,8 @@ void sqlrservercontroller::endSession() {
 	}
 
 	// reset result set row translation modules
-	if (pvt->_sqlrrrst) {
-		pvt->_sqlrrrst->endSession();
+	if (pvt->_sqlrrsrt) {
+		pvt->_sqlrrsrt->endSession();
 	}
 
 	// reset trigger modules
@@ -6019,6 +6201,30 @@ const char *sqlrservercontroller::getPassword() {
 	return pvt->_password;
 }
 
+void sqlrservercontroller::setConnectTimeout(uint64_t connecttimeout) {
+	pvt->_connecttimeout=connecttimeout;
+}
+
+uint64_t sqlrservercontroller::getConnectTimeout() {
+	return pvt->_connecttimeout;
+}
+
+void sqlrservercontroller::setQueryTimeout(uint64_t querytimeout) {
+	pvt->_querytimeout=querytimeout;
+}
+
+uint64_t sqlrservercontroller::getQueryTimeout() {
+	return pvt->_querytimeout;
+}
+
+void sqlrservercontroller::setExecuteDirect(bool executedirect) {
+	pvt->_executedirect=executedirect;
+}
+
+bool sqlrservercontroller::getExecuteDirect() {
+	return pvt->_executedirect;
+}
+
 void sqlrservercontroller::setInterceptTransactionQueries(bool itxq) {
 	pvt->_intercepttxqueries=itxq;
 }
@@ -6113,18 +6319,17 @@ bool sqlrservercontroller::getColumnNames(const char *query,
 
 	size_t		querylen=charstring::length(query);
 
-	bool	retval=false;
 	sqlrservercursor	*gcncur=newCursor();
 	if (open(gcncur) &&
 		prepareQuery(gcncur,query,querylen) && executeQuery(gcncur)) {
 
 		// build column list...
-		retval=gcncur->getColumnNameList(output);
+		getColumnNameList(gcncur,output);
 	}
 	closeResultSet(gcncur);
 	close(gcncur);
 	deleteCursor(gcncur);
-	return retval;
+	return true;
 }
 
 void sqlrservercontroller::addSessionTempTableForDrop(const char *table) {
@@ -6485,6 +6690,10 @@ const char *sqlrservercontroller::dbVersion() {
 	return pvt->_conn->dbVersion();
 }
 
+memorypool *sqlrservercontroller::getBindPool() {
+	return pvt->_bindpool;
+}
+
 memorypool *sqlrservercontroller::getBindMappingsPool() {
 	return pvt->_bindmappingspool;
 }
@@ -6534,28 +6743,6 @@ const char *sqlrservercontroller::getDebugDir() {
 
 bool sqlrservercontroller::isCustomQuery(sqlrservercursor *cursor) {
 	return cursor->isCustomQuery();
-}
-
-bool sqlrservercontroller::getLobOutputBindLength(sqlrservercursor *cursor,
-							uint16_t index,
-							uint64_t *length) {
-	return cursor->getLobOutputBindLength(index,length);
-}
-
-bool sqlrservercontroller::getLobOutputBindSegment(sqlrservercursor *cursor,
-							uint16_t index,
-							char *buffer,
-							uint64_t buffersize,
-							uint64_t offset,
-							uint64_t charstoread,
-							uint64_t *charsread) {
-	return cursor->getLobOutputBindSegment(index,buffer,buffersize,
-						offset,charstoread,charsread);
-}
-
-void sqlrservercontroller::closeLobOutputBind(sqlrservercursor *cursor,
-							uint16_t index) {
-	cursor->closeLobOutputBind(index);
 }
 
 bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
@@ -6634,7 +6821,8 @@ void sqlrservercontroller::saveError(sqlrservercursor *cursor) {
 	cursor->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("ERROR:\n%d: %.*s\n\n",
+		stdoutput.printf("%d: ERROR:\n%d: %.*s\n\n",
+					process::getProcessId(),
 					errorcode,errorlength,
 					cursor->getErrorBuffer());
 	}
@@ -6697,83 +6885,248 @@ uint16_t sqlrservercontroller::columnTypeFormat(sqlrservercursor *cursor) {
 
 const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnName(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnnames[col];
 }
 
 uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnNameLength(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnnamelengths[col];
 }
 
 uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnType(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columntypes[col];
 }
 
 const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnTypeName(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columntypenames[col];
 }
 
 uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnTypeNameLength(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columntypenamelengths[col];
 }
 
 uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnLength(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnlengths[col];
 }
 
 uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnPrecision(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnprecisions[col];
 }
 
 uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnScale(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnscales[col];
 }
 
 uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsNullable(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnisnullables[col];
 }
 
 uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsPrimaryKey(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnisprimarykeys[col];
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsUnique(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnisuniques[col];
 }
 
 uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsPartOfKey(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnispartofkeys[col];
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsUnsigned(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnisunsigneds[col];
 }
 
 uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsZeroFilled(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columniszerofilleds[col];
 }
 
 uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsBinary(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnisbinarys[col];
 }
 
 uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
 						sqlrservercursor *cursor,
 							uint32_t col) {
-	return cursor->getColumnIsAutoIncrement(mapColumn(col));
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columnisautoincrements[col];
+}
+
+const char *sqlrservercontroller::getColumnTable(sqlrservercursor *cursor,
+								uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columntables[col];
+}
+
+uint16_t sqlrservercontroller::getColumnTableLength(sqlrservercursor *cursor,
+								uint32_t col) {
+	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
+		translateResultSetHeader(cursor);
+	}
+	return pvt->_columntablelengths[col];
+}
+
+void sqlrservercontroller::getColumnNameList(sqlrservercursor *cursor,
+							stringbuffer *output) {
+	for (uint32_t i=0; i<colCount(cursor); i++) {
+		if (i) {
+			output->append(',');
+		}
+		output->append(getColumnName(cursor,i),
+				getColumnNameLength(cursor,i));
+	}
+}
+
+void sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
+
+	// get arrays of field pointers,
+	// helpfully provided for us by the cursor
+	cursor->getColumnPointers(&(pvt->_columnnames),
+				&(pvt->_columnnamelengths),
+				&(pvt->_columntypes),
+				&(pvt->_columntypenames),
+				&(pvt->_columntypenamelengths),
+				&(pvt->_columnlengths),
+				&(pvt->_columnprecisions),
+				&(pvt->_columnscales),
+				&(pvt->_columnisnullables),
+				&(pvt->_columnisprimarykeys),
+				&(pvt->_columnisuniques),
+				&(pvt->_columnispartofkeys),
+				&(pvt->_columnisunsigneds),
+				&(pvt->_columniszerofilleds),
+				&(pvt->_columnisbinarys),
+				&(pvt->_columnisautoincrements),
+				&(pvt->_columntables),
+				&(pvt->_columntablelengths));
+
+	uint32_t	colcount=colCount(cursor);
+
+	for (uint32_t col=0; col<colcount; col++) {
+		pvt->_columnnames[col]=
+			cursor->getColumnName(mapColumn(col));
+		pvt->_columnnamelengths[col]=
+			cursor->getColumnNameLength(mapColumn(col));
+		pvt->_columntypes[col]=
+			cursor->getColumnType(mapColumn(col));
+		pvt->_columntypenames[col]=
+			cursor->getColumnTypeName(mapColumn(col));
+		pvt->_columntypenamelengths[col]=
+			cursor->getColumnTypeNameLength(mapColumn(col));
+		pvt->_columnlengths[col]=
+			cursor->getColumnLength(mapColumn(col));
+		pvt->_columnprecisions[col]=
+			cursor->getColumnPrecision(mapColumn(col));
+		pvt->_columnscales[col]=
+			cursor->getColumnScale(mapColumn(col));
+		pvt->_columnisnullables[col]=
+			cursor->getColumnIsNullable(mapColumn(col));
+		pvt->_columnisprimarykeys[col]=
+			cursor->getColumnIsPrimaryKey(mapColumn(col));
+		pvt->_columnisuniques[col]=
+			cursor->getColumnIsUnique(mapColumn(col));
+		pvt->_columnispartofkeys[col]=
+			cursor->getColumnIsPartOfKey(mapColumn(col));
+		pvt->_columnisunsigneds[col]=
+			cursor->getColumnIsUnsigned(mapColumn(col));
+		pvt->_columniszerofilleds[col]=
+			cursor->getColumnIsZeroFilled(mapColumn(col));
+		pvt->_columnisbinarys[col]=
+			cursor->getColumnIsBinary(mapColumn(col));
+		pvt->_columnisautoincrements[col]=
+			cursor->getColumnIsAutoIncrement(mapColumn(col));
+		pvt->_columntables[col]=
+			cursor->getColumnTable(mapColumn(col));
+		pvt->_columntablelengths[col]=
+			cursor->getColumnTableLength(mapColumn(col));
+	}
+
+	if (pvt->_sqlrrsht) {
+		pvt->_sqlrrsht->run(pvt->_conn,
+				cursor,colcount,
+				&pvt->_columnnames,
+				&pvt->_columnnamelengths,
+				&pvt->_columntypes,
+				&pvt->_columntypenames,
+				&pvt->_columntypenamelengths,
+				&pvt->_columnlengths,
+				&pvt->_columnprecisions,
+				&pvt->_columnscales,
+				&pvt->_columnisnullables,
+				&pvt->_columnisprimarykeys,
+				&pvt->_columnisuniques,
+				&pvt->_columnispartofkeys,
+				&pvt->_columnisunsigneds,
+				&pvt->_columniszerofilleds,
+				&pvt->_columnisbinarys,
+				&pvt->_columnisautoincrements,
+				&pvt->_columntables,
+				&pvt->_columntablelengths);
+	}
+
+	cursor->setResultSetHeaderHasBeenTranslated(true);
 }
 
 bool sqlrservercontroller::noRowsToReturn(sqlrservercursor *cursor) {
@@ -6807,7 +7160,6 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 	for (uint32_t i=0; i<colcount; i++) {
 
 		pvt->_fieldnames[i]=getColumnName(cursor,i);
-
 		pvt->_fields[i]=NULL;
 		pvt->_fieldlengths[i]=0;
 		pvt->_blobs[i]=false;
@@ -6908,7 +7260,8 @@ uint16_t sqlrservercontroller::getInputBindCount(sqlrservercursor *cursor) {
 	return cursor->getInputBindCount();
 }
 
-sqlrserverbindvar *sqlrservercontroller::getInputBinds(sqlrservercursor *cursor) {
+sqlrserverbindvar *sqlrservercontroller::getInputBinds(
+						sqlrservercursor *cursor) {
 	return cursor->getInputBinds();
 }
 
@@ -6921,8 +7274,70 @@ uint16_t sqlrservercontroller::getOutputBindCount(sqlrservercursor *cursor) {
 	return cursor->getOutputBindCount();
 }
 
-sqlrserverbindvar *sqlrservercontroller::getOutputBinds(sqlrservercursor *cursor) {
+sqlrserverbindvar *sqlrservercontroller::getOutputBinds(
+						sqlrservercursor *cursor) {
 	return cursor->getOutputBinds();
+}
+
+bool sqlrservercontroller::getLobOutputBindLength(sqlrservercursor *cursor,
+							uint16_t index,
+							uint64_t *length) {
+	return cursor->getLobOutputBindLength(index,length);
+}
+
+bool sqlrservercontroller::getLobOutputBindSegment(sqlrservercursor *cursor,
+							uint16_t index,
+							char *buffer,
+							uint64_t buffersize,
+							uint64_t offset,
+							uint64_t charstoread,
+							uint64_t *charsread) {
+	return cursor->getLobOutputBindSegment(index,buffer,buffersize,
+						offset,charstoread,charsread);
+}
+
+void sqlrservercontroller::closeLobOutputBind(sqlrservercursor *cursor,
+							uint16_t index) {
+	cursor->closeLobOutputBind(index);
+}
+
+void sqlrservercontroller::setInputOutputBindCount(sqlrservercursor *cursor,
+						uint16_t outbindcount) {
+	cursor->setInputOutputBindCount(outbindcount);
+}
+
+uint16_t sqlrservercontroller::getInputOutputBindCount(
+						sqlrservercursor *cursor) {
+	return cursor->getInputOutputBindCount();
+}
+
+sqlrserverbindvar *sqlrservercontroller::getInputOutputBinds(
+						sqlrservercursor *cursor) {
+	return cursor->getInputOutputBinds();
+}
+
+bool sqlrservercontroller::getLobInputOutputBindLength(
+						sqlrservercursor *cursor,
+						uint16_t index,
+						uint64_t *length) {
+	return cursor->getLobInputOutputBindLength(index,length);
+}
+
+bool sqlrservercontroller::getLobInputOutputBindSegment(
+						sqlrservercursor *cursor,
+						uint16_t index,
+						char *buffer,
+						uint64_t buffersize,
+						uint64_t offset,
+						uint64_t charstoread,
+						uint64_t *charsread) {
+	return cursor->getLobInputOutputBindSegment(index,buffer,buffersize,
+						offset,charstoread,charsread);
+}
+
+void sqlrservercontroller::closeLobInputOutputBind(sqlrservercursor *cursor,
+							uint16_t index) {
+	cursor->closeLobInputOutputBind(index);
 }
 
 bool sqlrservercontroller::open(sqlrservercursor *cursor) {

@@ -8,7 +8,7 @@ public class MyClass {
 
         	... get the page to display from the previous page ...
 
-        	SQLRConnection      con=new SQLRConnection("sqlrserver",(short)9000,"/tmp/test.socket","user","password",0,1);
+        	SQLRConnection      con=new SQLRConnection("sqlrserver",(short)9000,"/tmp/example.socket","user","password",0,1);
         	SQLRCursor          cur=new SQLRCursor(con);
 
         	cur.openCachedResultSet(filename);

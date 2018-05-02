@@ -1,1 +1,1 @@
-drop procedure testproc
+drop procedure exampleproc

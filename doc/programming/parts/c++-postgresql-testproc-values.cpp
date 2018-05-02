@@ -1,4 +1,4 @@
-cur->prepareQuery("select * from testfunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))");
+cur->prepareQuery("select * from examplefunc(:in1,:in2,:in3) as (col1 int, col2 float, col3 char(20))");
 cur->inputBind("in1",1);
 cur->inputBind("in2",1.1,4,2);
 cur->inputBind("in3","hello");

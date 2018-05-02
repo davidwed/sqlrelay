@@ -2,7 +2,7 @@
 
 main() {
 
-        sqlrcon      con=sqlrcon_alloc("sqlrserver",9000,"/tmp/test.socket","user","password",0,1);
+        sqlrcon      con=sqlrcon_alloc("sqlrserver",9000,"/tmp/example.socket","user","password",0,1);
         sqlrcur      cur=sqlrcur_alloc(con);
 
         sqlrcur_prepareQuery(cur,"begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;");

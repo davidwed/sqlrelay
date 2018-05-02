@@ -1,4 +1,4 @@
-sqlrcur_sendQuery($cur,"select * from testfunc() as (testint int, testfloat float, testchar char(40))");
+sqlrcur_sendQuery($cur,"select * from examplefunc() as (exampleint int, examplefloat float, examplechar char(40))");
 $field00=sqlrcur_getField($cur,0,0);
 $field01=sqlrcur_getField($cur,0,1);
 $field02=sqlrcur_getField($cur,0,2);

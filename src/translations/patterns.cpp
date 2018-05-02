@@ -24,6 +24,8 @@ struct pattern_t {
 	const char		*to;
 	bool			ignorecase;
 	scope_t			scope;
+	pattern_t 		*patterns;
+	uint32_t		patterncount;
 };
 
 class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
@@ -37,12 +39,24 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 					const char *query,
 					stringbuffer *translatedquery);
 	private:
+		void	buildPatternsTree(xmldomnode *root,
+						pattern_t **p,
+						uint32_t *pcount,
+						bool toplevel);
+		void	freePatternsTree(pattern_t *p, uint32_t pcount);
 
+		void	applyPatterns(const char *str,
+					pattern_t *p,
+					uint32_t pcount,
+					stringbuffer *outb);
 		void	applyPattern(const char *str,
-					pattern_t *pc,
-					stringbuffer *outbuffer);
+					pattern_t *p,
+					stringbuffer *outb);
+		void	matchAndReplace(const char *str,
+					pattern_t *p,
+					stringbuffer *outb);
 
-		pattern_t	*p;
+		pattern_t	*patterns;
 		uint32_t	patterncount;
 
 		bool	enabled;
@@ -58,7 +72,7 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 
 	debug=cont->getConfig()->getDebugTranslations();
 
-	p=NULL;
+	patterns=NULL;
 	patterncount=0;
 
 	enabled=charstring::compareIgnoringCase(
@@ -67,73 +81,98 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 		return;
 	}
 
+	buildPatternsTree(parameters,&patterns,&patterncount,true);
+}
+
+void sqlrtranslation_patterns::buildPatternsTree(xmldomnode *root,
+						pattern_t **p,
+						uint32_t *pcount,
+						bool toplevel) {
+
 	// count patterns
-	patterncount=0;
-	for (xmldomnode *c=parameters->getFirstTagChild("pattern");
+	(*pcount)=0;
+	for (xmldomnode *c=root->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
-		patterncount++;
+		(*pcount)++;
+	}
+	if (!(*pcount)) {
+		*p=NULL;
+		return;
 	}
 
 	// build pattern list
-	p=new pattern_t[patterncount];
+	*p=new pattern_t[*pcount];
 	uint32_t	i=0;
-	for (xmldomnode *c=parameters->getFirstTagChild("pattern");
+	for (xmldomnode *c=root->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
 
-		p[i].matchre=NULL;
-		p[i].matchglobal=true;
-		p[i].fromre=NULL;
-		p[i].replaceglobal=true;
-		p[i].ignorecase=false;
-
-		const char	*from=c->getAttributeValue("from");
-		p[i].from=from;
-
 		const char	*match=c->getAttributeValue("match");
-		p[i].match=match;
+		(*p)[i].match=match;
+		(*p)[i].matchre=NULL;
+		(*p)[i].matchglobal=true;
+		const char	*from=c->getAttributeValue("from");
+		(*p)[i].from=from;
+		(*p)[i].fromre=NULL;
+		(*p)[i].replaceglobal=true;
+		(*p)[i].to=c->getAttributeValue("to");
+		(*p)[i].ignorecase=false;
+		(*p)[i].scope=SCOPE_QUERY;
 
 		const char	*type=c->getAttributeValue("type");
 		if (!charstring::compareIgnoringCase(type,"regex")) {
 			if (!charstring::isNullOrEmpty(match)) {
-				p[i].matchre=new regularexpression();
-				p[i].matchre->compile(match);
-				p[i].matchre->study();
-				p[i].matchglobal=
+				(*p)[i].matchre=new regularexpression();
+				(*p)[i].matchre->compile(match);
+				(*p)[i].matchre->study();
+				(*p)[i].matchglobal=
 					!charstring::isNo(
-					c->getAttributeValue("matchglobal"));
+					c->getAttributeValue("global"));
+			} else if (!charstring::isNullOrEmpty(from)) {
+				(*p)[i].fromre=new regularexpression();
+				(*p)[i].fromre->compile(from);
+				(*p)[i].fromre->study();
+				(*p)[i].replaceglobal=
+					!charstring::isNo(
+					c->getAttributeValue("global"));
 			}
-			p[i].fromre=new regularexpression();
-			p[i].fromre->compile(from);
-			p[i].fromre->study();
-			p[i].replaceglobal=
-				!charstring::isNo(
-				c->getAttributeValue("replaceglobal"));
 		} else if (!charstring::compareIgnoringCase(type,"cistring")) {
-			p[i].ignorecase=true;
+			(*p)[i].ignorecase=true;
 		}
 
-		const char	*scope=c->getAttributeValue("scope");
-		if (!charstring::compareIgnoringCase(
+		if (toplevel) {
+			const char	*scope=c->getAttributeValue("scope");
+			if (!charstring::compareIgnoringCase(
 						scope,"outsidequotes")) {
-			p[i].scope=SCOPE_OUTSIDE_QUOTES;
-		} else if (!charstring::compareIgnoringCase(
+				(*p)[i].scope=SCOPE_OUTSIDE_QUOTES;
+			} else if (!charstring::compareIgnoringCase(
 						scope,"insidequotes")) {
-			p[i].scope=SCOPE_INSIDE_QUOTES;
-		} else {
-			p[i].scope=SCOPE_QUERY;
+				(*p)[i].scope=SCOPE_INSIDE_QUOTES;
+			}
 		}
 
-		p[i].to=c->getAttributeValue("to");
+		buildPatternsTree(c,
+			&((*p)[i].patterns),
+			&((*p)[i].patterncount),
+			false);
+
 		i++;
 	}
 }
 
-sqlrtranslation_patterns::~sqlrtranslation_patterns() {
-	for (uint32_t i=0; i<patterncount; i++) {
+void sqlrtranslation_patterns::freePatternsTree(pattern_t *p, uint32_t pcount) {
+	if (!p || !pcount) {
+		return;
+	}
+	freePatternsTree(p->patterns,p->patterncount);
+	for (uint32_t i=0; i<pcount; i++) {
 		delete p[i].matchre;
 		delete p[i].fromre;
 	}
 	delete[] p;
+}
+
+sqlrtranslation_patterns::~sqlrtranslation_patterns() {
+	freePatternsTree(patterns,patterncount);
 }
 
 bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
@@ -150,36 +189,48 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 		stdoutput.printf("original query:\n\"%s\"\n\n",query);
 	}
 
+	applyPatterns(query,patterns,patterncount,translatedquery);
+
+	return true;
+}
+
+void sqlrtranslation_patterns::applyPatterns(const char *str,
+						pattern_t *p,
+						uint32_t pcount,
+						stringbuffer *outb) {
+
 	// run through the patterns
 	stringbuffer	querybuffer1;
 	stringbuffer	querybuffer2;
-	for (uint32_t i=0; i<patterncount; i++) {
+	for (uint32_t i=0; i<pcount; i++) {
 
 		// choose which buffer to write to and clear it
 		stringbuffer	*outbuffer=&querybuffer1;
 		if (i%2) {
 			outbuffer=&querybuffer2;
 		}
-		if (i==patterncount-1) {
-			outbuffer=translatedquery;
+		if (i==pcount-1) {
+			outbuffer=outb;
+		} else {
+			outbuffer->clear();
 		}
-		outbuffer->clear();
 
 		// get the current pattern
 		pattern_t	*pc=&(p[i]);
 
-		// match against the entire query, if necessary...
 		if (pc->scope==SCOPE_QUERY) {
 
-			applyPattern(query,pc,outbuffer);
+			// match against the entire str
+			applyPattern(str,pc,outbuffer);
 
 		} else {
 
 			// split the string on single-quotes
-			// FIXME: what about backslash-escaped quotes
+			// (NOTE: this presumes that backslash-escaped quotes
+			// have been normalized by the normalize translation)
 			char		**parts=NULL;
 			uint64_t	partcount=0;
-			charstring::split(query,"'",false,&parts,&partcount);
+			charstring::split(str,"'",false,&parts,&partcount);
 
 			// If we're looking at the query outside of quoted
 			// strings, then that ought to be the even numbered
@@ -187,116 +238,174 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 			// However, if the query starts with a single-quote
 			// (which a valid query wouldn't, but who knows...)
 			// then flip the logic.
-			bool	mod=0;
-			if (pc->scope==SCOPE_INSIDE_QUOTES && query[0]!='\'') {
-				mod=1;
-			}
+			bool	mod=(str[0]!='\'');
 
 			// check every other part...
 			for (uint64_t j=0; j<partcount; j++) {
-				if (j%2==mod) {
-					applyPattern(parts[j],pc,outbuffer);
-				} else {
-					outbuffer->append('\'');
-					outbuffer->append(parts[j]);
+				bool	quoted=(j%2==mod);
+				if (quoted) {
 					outbuffer->append('\'');
 				}
+				if ((quoted &&
+					pc->scope==SCOPE_INSIDE_QUOTES) ||
+					pc->scope==SCOPE_OUTSIDE_QUOTES) {
+					applyPattern(parts[j],pc,outbuffer);
+				} else {
+					outbuffer->append(parts[j]);
+				}
+				if (quoted) {
+					outbuffer->append('\'');
+				}
+				delete[] parts[j];
+			}
+
+			if (debug) {
+				stdoutput.printf("translated to:\n\"%s\"\n\n",
+							outbuffer->getString());
 			}
 
 			// clean up
-			for (uint32_t k=0; k<partcount; k++) {
-				delete[] parts[k];
-			}
 			delete[] parts;
 		}
 
 		// reset input
-		query=outbuffer->getString();
+		str=outbuffer->getString();
 	}
-
-	return true;
 }
 
 void sqlrtranslation_patterns::applyPattern(const char *str,
-						pattern_t *pc,
-						stringbuffer *outbuffer) {
+						pattern_t *p,
+						stringbuffer *outb) {
 
-	ssize_t		pcfromlen=(debug)?charstring::length(pc->from):0;
+	ssize_t		pfromlen=(debug)?charstring::length(p->from):0;
 	const char	*fromellipses="";
-	if (pcfromlen>77) {
-		pcfromlen=74;
+	if (pfromlen>77) {
+		pfromlen=74;
 		fromellipses="...";
 	}
-	ssize_t		pctolen=(debug)?charstring::length(pc->to):0;
+	ssize_t		ptolen=(debug)?charstring::length(p->to):0;
 	const char	*toellipses="";
-	if (pctolen>77) {
-		pctolen=74;
+	if (ptolen>77) {
+		ptolen=74;
 		toellipses="...";
 	}
 
 	char	*convstr=NULL;
 
-	if (pc->matchre) {
+	if (p->matchre) {
 		if (debug) {
 			stdoutput.printf("applying "
-					"match:\n\"%s\"\n"
-					"from:\n\"%.*s%s\"\n"
-					"to:\n\"%.*s%s\"\n\n",
-					pc->match,
-					pcfromlen,pc->from,fromellipses,
-					pctolen,pc->to,toellipses);
+					"match:\n\"%s\"\n",
+					p->match);
 		}
-		convstr=charstring::replace(str,
-					pc->matchre,
-					pc->matchglobal,
-					pc->fromre,
-					pc->to,
-					pc->replaceglobal);
-	} else if (pc->fromre) {
+		matchAndReplace(str,p,outb);
+	} else if (p->fromre) {
 		if (debug) {
 			stdoutput.printf("applying regex "
 					"from:\n\"%.*s%s\"\n"
 					"to:\n\"%.*s%s\"\n\n",
-					pcfromlen,pc->from,fromellipses,
-					pctolen,pc->to,toellipses);
+					pfromlen,p->from,fromellipses,
+					ptolen,p->to,toellipses);
 		}
 		convstr=charstring::replace(str,
-					pc->fromre,
-					pc->to,
-					pc->replaceglobal);
-	} else if (!pc->ignorecase) {
+					p->fromre,
+					p->to,
+					p->replaceglobal);
+		outb->append(convstr);
+	} else if (!p->ignorecase) {
 		if (debug) {
 			stdoutput.printf("applying string "
 					"from:\n\"%.*s%s\"\n"
-					"to:\n\"%.*s%s\"\n\n",
-					pcfromlen,pc->from,fromellipses,
-					pctolen,pc->to,toellipses);
+					"to:\n\"%.*s%s\"\n",
+					pfromlen,p->from,fromellipses,
+					ptolen,p->to,toellipses);
+			if (p->scope==SCOPE_INSIDE_QUOTES) {
+				stdoutput.printf("inside quotes on chunk:\n"
+							"\"%s\"\n",str);
+			}
+			if (p->scope==SCOPE_OUTSIDE_QUOTES) {
+				stdoutput.printf("outside quotes on chunk:\n"
+							"\"%s\"\n",str);
+			}
+			stdoutput.write("\n");
 		}
-		convstr=charstring::replace(str,pc->from,pc->to);
+		convstr=charstring::replace(str,p->from,p->to);
+		outb->append(convstr);
 	} else {
 		if (debug) {
 			stdoutput.printf("applying case-insensitive string "
 					"from:\n\"%.*s%s\"\n"
 					"to:\n\"%.*s%s\"\n\n",
-					pcfromlen,pc->from,fromellipses,
-					pctolen,pc->to,toellipses);
+					pfromlen,p->from,fromellipses,
+					ptolen,p->to,toellipses);
 		}
 		char	*lowstr=charstring::duplicate(str);
 		charstring::lower(lowstr);
-		char	*lowfrom=charstring::duplicate(pc->from);
+		char	*lowfrom=charstring::duplicate(p->from);
 		charstring::lower(lowfrom);
-		convstr=charstring::replace(lowstr,lowfrom,pc->to);
+		convstr=charstring::replace(lowstr,lowfrom,p->to);
+		outb->append(convstr);
 		delete[] lowstr;
 		delete[] lowfrom;
 	}
 
-	outbuffer->append(convstr);
 	delete[] convstr;
 
-	if (debug) {
+	if (debug && p->scope!=SCOPE_INSIDE_QUOTES &&
+			p->scope!=SCOPE_OUTSIDE_QUOTES) {
 		stdoutput.printf("translated to:\n\"%s\"\n\n",
-						outbuffer->getString());
+						outb->getString());
 	}
+}
+
+void sqlrtranslation_patterns::matchAndReplace(const char *str,
+						pattern_t *p,
+						stringbuffer *outb) {
+
+	const char	*start=str;
+	for (;;) {
+
+		// look for a matching part
+		const char	*ptr=start;
+		if (!*ptr || !p->matchre->match(ptr) ||
+				!p->matchre->getSubstringCount()) {
+
+			// bail if no match is found
+			break;
+		}
+
+		// get the bounds of the matching chunk
+		int32_t		mi=p->matchre->getSubstringCount()-1;
+		const char	*matchstart=p->matchre->getSubstringStart(mi);
+		const char	*matchend=p->matchre->getSubstringEnd(mi);
+
+		// move on if they're the same
+		if (matchend==matchstart) {
+			ptr++;
+			continue;
+		}
+
+		// get a copy of the matching chunk
+		char	*matchchunk=charstring::duplicate(matchstart,
+							matchend-matchstart);
+
+		// append the previous, non-matching part of the main string
+		outb->append(start,matchstart-start);
+
+		// transform the chunk...
+		applyPatterns(matchchunk,p->patterns,p->patterncount,outb);
+
+		// move the start forward
+		start=matchend;
+
+		// bail if we're not matching globally
+		if (!p->matchglobal) {
+			break;
+		}
+	}
+
+	// append the rest of the main string
+	outb->append(start);
 }
 
 extern "C" {

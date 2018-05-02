@@ -1090,7 +1090,7 @@ else
 		SYBASEBUILD="at-runtime"
 	fi
 fi
-if ( test -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
+if ( test -n "$ENABLE_ODBC" -a -n "$ODBCLIBS" -a "$ODBCUNICODE" ); then
 	ODBCBUILD="dynamic   "
 	if ( test -n "$ODBCSTATIC" ); then
 		ODBCBUILD="static    "

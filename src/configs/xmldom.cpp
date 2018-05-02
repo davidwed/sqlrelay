@@ -77,12 +77,14 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugSql();
 		bool		getDebugErrors();
 		bool		getDebugParser();
+		bool		getDebugDirectives();
 		bool		getDebugTranslations();
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
 		bool		getDebugBindTranslations();
 		bool		getDebugResultSetTranslations();
 		bool		getDebugResultSetRowTranslations();
+		bool		getDebugResultSetHeaderTranslations();
 		bool		getDebugProtocols();
 		bool		getDebugAuths();
 		bool		getDebugPasswordEncryptions();
@@ -114,10 +116,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 
 		xmldomnode	*getListeners();
 		xmldomnode	*getParser();
+		xmldomnode	*getDirectives();
 		xmldomnode	*getTranslations();
 		xmldomnode	*getFilters();
 		xmldomnode	*getResultSetTranslations();
 		xmldomnode	*getResultSetRowTranslations();
+		xmldomnode	*getResultSetHeaderTranslations();
 		xmldomnode	*getTriggers();
 		xmldomnode	*getLoggers();
 		xmldomnode	*getNotifications();
@@ -197,12 +201,14 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*debug;
 		bool		debugsql;
 		bool		debugparser;
+		bool		debugdirectives;
 		bool		debugtranslations;
 		bool		debugfilters;
 		bool		debugtriggers;
 		bool		debugbindtranslations;
 		bool		debugresultsettranslations;
 		bool		debugresultsetrowtranslations;
+		bool		debugresultsetheadertranslations;
 		bool		debugprotocols;
 		bool		debugauths;
 		bool		debugpwdencs;
@@ -234,10 +240,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 
 		xmldomnode	*listenersxml;
 		xmldomnode	*parserxml;
+		xmldomnode	*directivesxml;
 		xmldomnode	*translationsxml;
 		xmldomnode	*filtersxml;
 		xmldomnode	*resultsettranslationsxml;
 		xmldomnode	*resultsetrowtranslationsxml;
+		xmldomnode	*resultsetheadertranslationsxml;
 		xmldomnode	*triggersxml;
 		xmldomnode	*loggersxml;
 		xmldomnode	*notificationsxml;
@@ -328,14 +336,17 @@ void sqlrconfig_xmldom::init() {
 	debug=DEFAULT_DEBUG;
 	debugsql=charstring::contains(debug,"sql");
 	debugparser=charstring::contains(debug,"parser");
+	debugdirectives=charstring::contains(debug,"directives");
 	debugtranslations=charstring::contains(debug,"translations");
 	debugfilters=charstring::contains(debug,"filters");
 	debugtriggers=charstring::contains(debug,"triggers");
 	debugbindtranslations=charstring::contains(debug,"bindtranslations");
 	debugresultsettranslations=
-			charstring::contains(debug,"resultsettranslations");
+		charstring::contains(debug,"resultsettranslations");
 	debugresultsetrowtranslations=
-			charstring::contains(debug,"resultsetrowtranslations");
+		charstring::contains(debug,"resultsetrowtranslations");
+	debugresultsetheadertranslations=
+		charstring::contains(debug,"resultsetheadertranslations");
 	debugprotocols=charstring::contains(debug,"protocols");
 	debugauths=charstring::contains(debug,"auths");
 	debugpwdencs=charstring::contains(debug,"passwordencrypytions");
@@ -574,6 +585,10 @@ bool sqlrconfig_xmldom::getDebugParser() {
 	return debugparser;
 }
 
+bool sqlrconfig_xmldom::getDebugDirectives() {
+	return debugdirectives;
+}
+
 bool sqlrconfig_xmldom::getDebugTranslations() {
 	return debugtranslations;
 }
@@ -596,6 +611,10 @@ bool sqlrconfig_xmldom::getDebugResultSetTranslations() {
 
 bool sqlrconfig_xmldom::getDebugResultSetRowTranslations() {
 	return debugresultsetrowtranslations;
+}
+
+bool sqlrconfig_xmldom::getDebugResultSetHeaderTranslations() {
+	return debugresultsetheadertranslations;
 }
 
 bool sqlrconfig_xmldom::getDebugProtocols() {
@@ -714,6 +733,10 @@ xmldomnode *sqlrconfig_xmldom::getParser() {
 	return parserxml;
 }
 
+xmldomnode *sqlrconfig_xmldom::getDirectives() {
+	return directivesxml;
+}
+
 xmldomnode *sqlrconfig_xmldom::getTranslations() {
 	return translationsxml;
 }
@@ -728,6 +751,10 @@ xmldomnode *sqlrconfig_xmldom::getResultSetTranslations() {
 
 xmldomnode *sqlrconfig_xmldom::getResultSetRowTranslations() {
 	return resultsetrowtranslationsxml;
+}
+
+xmldomnode *sqlrconfig_xmldom::getResultSetHeaderTranslations() {
+	return resultsetheadertranslationsxml;
 }
 
 xmldomnode *sqlrconfig_xmldom::getTriggers() {
@@ -1684,15 +1711,22 @@ void sqlrconfig_xmldom::getTreeValues() {
 		debug=attr->getValue();
 		debugsql=charstring::contains(debug,"sql");
 		debugparser=charstring::contains(debug,"parser");
+		debugdirectives=charstring::contains(debug,"directives");
 		debugtranslations=charstring::contains(debug,"translations");
 		debugfilters=charstring::contains(debug,"filters");
 		debugtriggers=charstring::contains(debug,"triggers");
 		debugbindtranslations=
-			charstring::contains(debug,"bindtranslations");
+			charstring::contains(debug,
+					"bindtranslations");
 		debugresultsettranslations=
-			charstring::contains(debug,"resultsettranslations");
+			charstring::contains(debug,
+					"resultsettranslations");
 		debugresultsetrowtranslations=
-			charstring::contains(debug,"resultsetrowtranslations");
+			charstring::contains(debug,
+					"resultsetrowtranslations");
+		debugresultsetheadertranslations=
+			charstring::contains(debug,
+					"resultsetheadertranslations");
 		debugprotocols=charstring::contains(debug,"protocols");
 		debugauths=charstring::contains(debug,"auths");
 		debugpwdencs=charstring::contains(debug,"passwordencryptions");
@@ -1778,12 +1812,15 @@ void sqlrconfig_xmldom::getTreeValues() {
 	// xmls...
 	listenersxml=instance->getFirstTagChild("listeners");
 	parserxml=instance->getFirstTagChild("parser");
+	directivesxml=instance->getFirstTagChild("directives");
 	translationsxml=instance->getFirstTagChild("translations");
 	filtersxml=instance->getFirstTagChild("filters");
 	resultsettranslationsxml=instance->getFirstTagChild(
 						"resultsettranslations");
 	resultsetrowtranslationsxml=instance->getFirstTagChild(
 						"resultsetrowtranslations");
+	resultsetheadertranslationsxml=instance->getFirstTagChild(
+						"resultsetheadertranslations");
 	triggersxml=instance->getFirstTagChild("triggers");
 	loggersxml=instance->getFirstTagChild("loggers");
 	notificationsxml=instance->getFirstTagChild("notifications");

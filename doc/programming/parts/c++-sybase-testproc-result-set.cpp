@@ -1,4 +1,4 @@
-cur->sendQuery("exec testproc");
+cur->sendQuery("exec exampleproc");
 char    *field00=cur->getFieldByIndex(0,0);
 char    *field01=cur->getFieldByIndex(0,1);
 char    *field02=cur->getFieldByIndex(0,2);

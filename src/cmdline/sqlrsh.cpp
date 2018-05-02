@@ -81,6 +81,7 @@ class sqlrshenv {
 		dictionary<char *, sqlrshbindvalue *>	inputbinds;
 		memorypool	*inbindpool;
 		dictionary<char *, sqlrshbindvalue *>	outputbinds;
+		dictionary<char *, sqlrshbindvalue *>	inputoutputbinds;
 		char		*cacheto;
 		sqlrshformat	format;
 		bool		getasnumber;
@@ -108,6 +109,7 @@ sqlrshenv::sqlrshenv() {
 sqlrshenv::~sqlrshenv() {
 	clearbinds(&inputbinds);
 	clearbinds(&outputbinds);
+	clearbinds(&inputoutputbinds);
 	delete inbindpool;
 	delete[] cacheto;
 }
@@ -219,6 +221,9 @@ class	sqlrsh {
 						sqlrshenv *env,
 						const char *command);
 		bool	outputbind(sqlrcursor *sqlrcur,
+						sqlrshenv *env,
+						const char *command);
+		bool	inputoutputbind(sqlrcursor *sqlrcur,
 						sqlrshenv *env,
 						const char *command);
 		void	printbinds(const char *type,
@@ -520,11 +525,16 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"inputbind ",10) ||
 		!charstring::compareIgnoringCase(ptr,"inputbindblob ",14) ||
 		!charstring::compareIgnoringCase(ptr,"outputbind ",11) ||
+		!charstring::compareIgnoringCase(ptr,"inputoutputbind ",16) ||
 		!charstring::compareIgnoringCase(ptr,"printinputbind",14) ||
 		!charstring::compareIgnoringCase(ptr,"printoutputbind",15) ||
+		!charstring::compareIgnoringCase(
+					ptr,"printinputoutputbind",20) ||
 		!charstring::compareIgnoringCase(ptr,"printbinds") ||
 		!charstring::compareIgnoringCase(ptr,"clearinputbind",14) ||
 		!charstring::compareIgnoringCase(ptr,"clearoutputbind",15) ||
+		!charstring::compareIgnoringCase(
+					ptr,"clearinputoutputbind",20) ||
 		!charstring::compareIgnoringCase(ptr,"clearbinds") ||
 		!charstring::compareIgnoringCase(ptr,"lastinsertid") ||
 		!charstring::compareIgnoringCase(ptr,"setclientinfo ",14) ||
@@ -658,10 +668,15 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return inputbindblob(sqlrcur,env,command);
 	} else if (!charstring::compareIgnoringCase(ptr,"outputbind ",11)) {	
 		return outputbind(sqlrcur,env,command);
+	} else if (!charstring::compareIgnoringCase(
+						ptr,"inputoutputbind ",16)) {	
+		return inputoutputbind(sqlrcur,env,command);
 	} else if (!charstring::compareIgnoringCase(ptr,"printbinds")) {	
 		printbinds("Input",&env->inputbinds);
 		stdoutput.printf("\n");
 		printbinds("Output",&env->outputbinds);
+		stdoutput.printf("\n");
+		printbinds("Input/Output",&env->inputoutputbinds);
 		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"clearinputbind",14)) {	
 		env->clearbinds(&env->inputbinds);
@@ -669,9 +684,14 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"clearoutputbind",15)) {
 		env->clearbinds(&env->outputbinds);
 		return true;
+	} else if (!charstring::compareIgnoringCase(ptr,
+						"clearinputoutputbind",20)) {
+		env->clearbinds(&env->inputoutputbinds);
+		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"clearbinds")) {	
 		env->clearbinds(&env->inputbinds);
 		env->clearbinds(&env->outputbinds);
+		env->clearbinds(&env->inputoutputbinds);
 		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"lastinsertid")) {	
 		if (!lastinsertid(sqlrcon,env)) {
@@ -1090,6 +1110,41 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
+	if (env->inputoutputbinds.getList()->getLength()) {
+
+		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+			*node=env->inputoutputbinds.getList()->getFirst();
+			node; node=node->getNext()) {
+
+			const char	*name=node->getValue()->getKey();
+			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
+				sqlrcur->defineInputOutputBindString(name,
+						bv->stringval,
+						bv->outputstringbindlength);
+			} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {
+				sqlrcur->defineInputOutputBindInteger(name,
+						bv->integerval);
+			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DOUBLE) {
+				sqlrcur->defineInputOutputBindDouble(name,
+						bv->doubleval.value,
+						bv->doubleval.precision,
+						bv->doubleval.scale);
+			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
+				sqlrcur->defineInputOutputBindDate(name,
+						bv->dateval.year,
+						bv->dateval.month,
+						bv->dateval.day,
+						bv->dateval.hour,
+						bv->dateval.minute,
+						bv->dateval.second,
+						bv->dateval.microsecond,
+						bv->dateval.tz,
+						bv->dateval.isnegative);
+			}
+		}
+	}
+
 	sqlrcur->executeQuery();
 
 	if (env->outputbinds.getList()->getLength()) {
@@ -1112,6 +1167,39 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 					sqlrcur->getOutputBindDouble(name);
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
 				sqlrcur->getOutputBindDate(name,
+						&(bv->dateval.year),
+						&(bv->dateval.month),
+						&(bv->dateval.day),
+						&(bv->dateval.hour),
+						&(bv->dateval.minute),
+						&(bv->dateval.second),
+						&(bv->dateval.microsecond),
+						&(bv->dateval.tz),
+						&(bv->dateval.isnegative));
+			}
+		}
+	}
+
+	if (env->inputoutputbinds.getList()->getLength()) {
+
+		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+			*node=env->inputoutputbinds.getList()->getFirst();
+			node; node=node->getNext()) {
+
+			const char	*name=node->getValue()->getKey();
+			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
+				delete[] bv->stringval;
+				bv->stringval=charstring::duplicate(
+				sqlrcur->getInputOutputBindString(name));
+			} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {
+				bv->integerval=
+				sqlrcur->getInputOutputBindInteger(name);
+			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DOUBLE) {
+				bv->doubleval.value=
+				sqlrcur->getInputOutputBindDouble(name);
+			} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
+				sqlrcur->getInputOutputBindDate(name,
 						&(bv->dateval.year),
 						&(bv->dateval.month),
 						&(bv->dateval.day),
@@ -1619,7 +1707,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		delete[] value;
 	} else if (charstring::isNumber(value)) {
 		bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-		bv->doubleval.value=charstring::toFloat(value);
+		bv->doubleval.value=charstring::toFloatC(value);
 		bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
 		bv->doubleval.scale=
 			charstring::findFirst(value,'.')-value+
@@ -1786,12 +1874,130 @@ bool sqlrsh::outputbind(sqlrcursor *sqlrcur,
 		delete[] parts[0];
 	} else {
 		stderror.printf("usage: outputbind "
+				// FIXME: not entirely accurate
 				"[variable] [type] [length] [scale]\n");
 		for (uint64_t i=0; i<partcount; i++) {
 			delete[] parts[i];
 		}
 	}
 	delete[] parts;
+
+	return sane;
+}
+
+bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
+				sqlrshenv *env, const char *command) {
+
+	// get the value
+	char		*value=NULL;
+	const char	*equals=charstring::findFirst(command,'=');
+	if (equals) {
+		value=charstring::duplicate(equals+1);
+		charstring::bothTrim(value);
+		charstring::bothTrim(value,'\'');
+	} else if (charstring::compare(
+			command+charstring::length(command)-8," is null")) {
+		// FIXME: usage...
+		return false;
+	}
+
+	// split the command on ' '
+	char		**parts;
+	uint64_t	partcount;
+	charstring::split(command," ",true,&parts,&partcount);
+
+	// sanity check...
+	bool	sane=true;
+	if (partcount>=5 && !charstring::compare(parts[0],"inputoutputbind")) {
+
+		// if the bind variable is already defined, clear it...
+		sqlrshbindvalue	*bv=NULL;
+		if (env->inputoutputbinds.getValue(parts[1],&bv)) {
+			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
+				delete[] bv->stringval;
+			}
+			delete bv;
+		}
+
+		// define the variable
+		bv=new sqlrshbindvalue;
+
+		if (!charstring::compareIgnoringCase(
+						parts[2],"string") &&
+						partcount>=6) {
+			// inputoutputbind 1 string length = 'string'
+			bv->type=SQLRCLIENTBINDVARTYPE_STRING;
+			bv->outputstringbindlength=
+				charstring::toInteger(parts[3]);
+			bv->stringval=charstring::unescape(value);
+		} else if (!charstring::compareIgnoringCase(
+						parts[2],"integer") &&
+						partcount==5) {
+			// inputoutputbind 1 integer = value
+			bv->type=SQLRCLIENTBINDVARTYPE_INTEGER;
+			bv->integerval=charstring::toInteger(value);
+		} else if (!charstring::compareIgnoringCase(
+						parts[2],"double") &&
+						partcount==7) {
+			// inputoutputbind 1 double prec scale = value
+			bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
+			bv->doubleval.value=charstring::toFloatC(value);
+			bv->doubleval.precision=
+				charstring::toInteger(parts[3]);
+			bv->doubleval.scale=
+				charstring::toInteger(parts[4]);
+		} else if (!charstring::compareIgnoringCase(
+						parts[2],"date") &&
+						partcount>=5) {
+			// inputoutputbind 1 date = '...'
+			int16_t	year;
+			int16_t	month;
+			int16_t	day;
+			int16_t	hour;
+			int16_t	minute;
+			int16_t	second;
+			int32_t	microsecond;
+			bool	isnegative;
+			parseDateTime(value,false,false,"/",
+						&year,&month,&day,
+						&hour,&minute,&second,
+						&microsecond,&isnegative);
+			bv->type=SQLRCLIENTBINDVARTYPE_DATE;
+			bv->dateval.year=year;
+			bv->dateval.month=month;
+			bv->dateval.day=day;
+			bv->dateval.hour=hour;
+			bv->dateval.minute=minute;
+			bv->dateval.second=second;
+			bv->dateval.microsecond=microsecond;
+			bv->dateval.tz="";
+			bv->dateval.isnegative=isnegative;
+		} else {
+			sane=false;
+		}
+
+		// put the bind variable in the list
+		if (sane) {
+			env->inputoutputbinds.setValue(parts[1],bv);
+		}
+
+	} else {
+		sane=false;
+	}
+
+	// clean up
+	if (sane) {
+		delete[] parts[0];
+	} else {
+		stderror.printf("usage: inputoutputbind "
+				// FIXME: not entirely accurate
+				"[variable] [type] [length] [scale]\n");
+		for (uint64_t i=0; i<partcount; i++) {
+			delete[] parts[i];
+		}
+	}
+	delete[] parts;
+	delete[] value;
 
 	return sane;
 }
@@ -1821,7 +2027,7 @@ void sqlrsh::printbinds(const char *type,
 						bv->doubleval.value);
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_DATE) {
 			stdoutput.printf("(DATE) = %02d/%02d/%04d "
-						"%s%02d:%02d:%02d:%03d %s\n",
+						"%s%02d:%02d:%02d.%06d %s\n",
 						bv->dateval.month,
 						bv->dateval.day,
 						bv->dateval.year,

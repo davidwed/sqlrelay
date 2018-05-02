@@ -1,4 +1,4 @@
-create function testfunc(int,float,char(20)) returns record as '
+create function examplefunc(int,float,char(20)) returns record as '
 declare
         output record;
 begin

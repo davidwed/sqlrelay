@@ -1,4 +1,4 @@
-create function testfunc(int,float,char(20)) returns int as '
+create function examplefunc(int,float,char(20)) returns int as '
 declare
         in1 int;
         in2 float;

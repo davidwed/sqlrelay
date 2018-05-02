@@ -125,13 +125,13 @@ It is a tool in a chain - another tier in a multi-tiered application - designed 
 
 There are some features that SQL Relay currently lacks that are either being worked on, or at least planned though.
 
-SQL Relay is not currently a transparent database gateway.  Ie. you can't currently just aim SQL Relay at !MySQL and aim your app at SQL Relay.  SQL Relay has it's own client/server protocol and API.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you would need to update the connect string to use the SQL Relay driver.  You could also potentially use the [dropin/mysql.html drop-in replacement library for MySQL] or [dropin/postgresql.html drop-in replacement library for PostgreSQL].  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for several native database protocols though.
+The !MySQL Front-End Module makes SQL Relay a transparent database proxy for !MySQL.  You can just aim SQL Relay at !MySQL and aim your app at SQL Relay.  But, SQL Relay currently lacks Front-End Modules for other database protocols, so it can't be used as a transparent proxy for other databases.  SQL Relay has it's own client/server protocol and API though.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you can update the connect string to use the SQL Relay driver.  You could also potentially use the [dropin/mysql.html drop-in replacement library for MySQL] or [dropin/postgresql.html drop-in replacement library for PostgreSQL].  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for various other native database protocols though.
 
 SQL Relay can provide a single-point of access for replicated databases but it does not provide replication.  It cannot keep multiple databases in sync.
 
 Similarly, though SQL Relay can provide a single-point of access for multiple databases, it does not currently provide a mechanism for joining tables across databases or sending the same query to multiple databases and merging the result sets.
 
-SQL Relay cannot currently translate queries from one syntax to another.  Though it can be used to aim an app originally written for !MySQL at Oracle, for example, it cannot (yet) transparently convert queries in !MySQL syntax to Oracle syntax.
+SQL Relay does provide a query translation framework and various query translation modules.  However SQL Relay cannot automatically translate queries from one syntax to another.  Though it can be used to aim an app originally written for !MySQL at Oracle, for example, it cannot (yet) transparently convert queries in !MySQL syntax to Oracle syntax.  If you want to use aim an app originally written for one database at another, you would have to modify the queries in the application, or write/configure custom query translation modules to translate specific queries from one form to another.
 
 
 [[br]][=#connectionpooling]
@@ -237,7 +237,7 @@ Let's say you're running PHP's againt a database like Oracle, MS SQL Server or D
 
 Let's say you're using Apache, mod_php and Oracle and you determine by doing all sorts of analysis that you need to keep 30 Apache processes running to provide adequate response.  Since most of your site isn't database-driven, on average, no more than 5 PHP's actually access the database simultaneously.  Currently, you're using persistent connections to defeat the time-cost of logging into Oracle, but you have to maintain 30 connections (1 per web server process) which takes up a lot of memory on both the web server and database server and you really only need 5 connections. By using SQL Relay you can reduce the number of Oracle connections to the 5 that you need, continue to run 30 Apache processes and reclaim the wasted memory on both machines.
 
-Many websites run applications written in a combination of languages, some of which have their own database pooling systems.  Perl modules, for example, can use Apache::DBI and PHP has a persistent database connection system, but a PHP cannot use an Apache::DBI connection and a Perl module cannot use a PHP persistent connection.  Thus in order to make sure that there are enough database connections for each platform, many more web-server processes have to be run, perhaps twice as many.  If the PHP's and Perl modules used SQL Relay instead, they could share databse connections and reduce the number of web-server processes and database connections.
+Many websites run applications written in a combination of languages, some of which have their own database pooling systems.  Perl modules, for example, can use Apache-DBI and PHP has a persistent database connection system, but a PHP cannot use an Apache-DBI connection and a Perl module cannot use a PHP persistent connection.  Thus in order to make sure that there are enough database connections for each platform, many more web-server processes have to be run, perhaps twice as many.  If the PHP's and Perl modules used SQL Relay instead, they could share databse connections and reduce the number of web-server processes and database connections.
 
 SQL Relay makes it easy to distribute load over replicated servers.  A common scaling solution when using !MySQL or !PostgreSQL in a read-only web environment is to run several web servers with a dedicated database server for each web server or group of web servers and update all the databases simultaneously at scheduled intervals.  This usually works pretty well, but sometimes database or web servers get runs of heavy load while others are idle.  In other cases, an uneven number of machines is required.  For example, your application may need 3 web servers but only 2 database servers or vice-versa and buying 3 of each would be wasteful.  Moreover, in most cases, the servers have to be equivalently powerful machines.  You can't usually just add another cheap machine that you have lying around into the pool.   SQL Relay can connect to multiple, replicated or clustered database servers, providing web-based applications access to whichever server isn't busy.  SQL Relay can also be configured to maintain more connections to more powerful machines and fewer connections to less powerful machines, enabling unevenly matched machines to be used in the same database pool.  Collectively, these features allow you to save money by using only the exact number of servers that you need and by enabling you to use spare hardware in your database pools.
 
@@ -322,14 +322,14 @@ Native database API libraries are often very large. The SQL Relay API's are ligh
 [[br]][=#dbiproxy]
 === How does SQL Relay compare to DBI::Proxy? ===
 
-The DBI::Proxy module is Perl-specific, or at least very challenging to use from other languages.  SQL Relay likely outperforms DBI::Proxy since DBI::Proxy is primarily targeted at providing access to databases from unsupported platforms, not at improving application performance, though I have never tested one against the other.  SQL Relay can provide access to databases from unsupported platforms as well, even platforms for which there is no unix support using the ODBC connection and an ODBC to ODBC bridge.
+The DBI-Proxy module is Perl-specific, or at least very challenging to use from other languages.  SQL Relay likely outperforms DBI-Proxy since DBI-Proxy is primarily targeted at providing access to databases from unsupported platforms, not at improving application performance, though I have never tested one against the other.  SQL Relay can provide access to databases from unsupported platforms as well, even platforms for which there is no unix support using the ODBC connection and an ODBC to ODBC bridge.
 
 [[br]][=#apachedbi]
 === How does SQL Relay compare to Apache::DBI or PHP's persistent database connections? ===
 
-SQL Relay is more lightweight and potentially faster than Apache::DBI and is competitive in speed with PHP's persistent connections.  SQL Relay can be used to provide a connection pool to multiple machines and has more backend features than Apache::DBI or PHP.  However, the DBI and PHP API's are generally considered to be simpler to implement.
+SQL Relay is more lightweight and potentially faster than Apache-DBI and is competitive in speed with PHP's persistent connections.  SQL Relay can be used to provide a connection pool to multiple machines and has more backend features than Apache-DBI or PHP.  However, the DBI and PHP API's are generally considered to be simpler to implement.
 
-When using Apache::DBI or PHP's persistent connections, a connection is opened to the database for every web server process.  Frequently, web sites need to run large numbers of processes to provide adequate response.  As the number of database connections grows, resources get strained and a lot of database connections go unused most of the time.
+When using Apache-DBI or PHP's persistent connections, a connection is opened to the database for every web server process.  Frequently, web sites need to run large numbers of processes to provide adequate response.  As the number of database connections grows, resources get strained and a lot of database connections go unused most of the time.
 
 If a website runs a mixture of Perl modules and PHP scripts, the issue can be doubled.
 
@@ -429,11 +429,11 @@ The native !PostgreSQL API returns data type ids (numbers), rather than data typ
 
 For example, the following connectstring will instruct SQL Relay to return type names instead of numbers:
 
- user=myuser;password=mypass;db=testdb;mangletypes=yes
+ user=exampleuser;password=examplepass;db=exampledb;mangletypes=yes
 
 The following connectstring will instruct SQL Relay to return type numbers:
 
- user=myuser;password=mypass;db=testdb;mangletypes=no
+ user=exampleuser;password=examplepass;db=exampledb;mangletypes=no
 
 Leaving the mangletypes parameter out altogether is the same as setting it to "no".
 
@@ -474,13 +474,13 @@ Now you can log in as '''dmuse''' and connect to the database using '''sqlplus /
 
 In the configuration file, set the runasuser attribute of the instance tag to the user that you want to connect as and leave out the user, password and oracle_sid parameters of the string attribute of the connection tag. 
 
-For example, here's a normal (non-OS-authentication) configuration which connects to the ora1 instance of oracle using testuser/testpassword:
+For example, here's a normal (non-OS-authentication) configuration which connects to the ora1 instance of oracle using exampleuser/examplepassword:
 
 {{{
         &lt;instance ... runasuser="oracle" ...&gt;
                 ...
                 &lt;connections&gt;
-                        &lt;connection ... string="user=testuser;password=testpassword;oracle_sid=ora1" .../&gt;
+                        &lt;connection ... string="user=exampleuser;password=examplepassword;oracle_sid=ora1" .../&gt;
                 &lt;/connections&gt;
         &lt;/instance&gt;
 }}}
@@ -510,7 +510,7 @@ How old is your !MySQL server?
 Ancient versions of !MySQL didn't support transactions at all.  Old versions did, but only if you explicitly created tables using a table type that supports transactions like InnoDB:
 
 {{{
-create table testtable (col1 int) type=innodb
+create table exampletable (col1 int) type=innodb
 }}}
 
 Modern versions create transaction-capable tables by default.
@@ -665,7 +665,7 @@ There is an exception to this is with Oracle.  Since Oracle exposes cursor varia
 You can use output bind variables to get data out of DML with RETURNING clauses if the values returned are scalar.  For example:
 
 {{{
-        insert into testtable values ("one",2) returning :first, :second
+        insert into exampletable values ("one",2) returning :first, :second
 }}}
 
 Vector values are not supported.

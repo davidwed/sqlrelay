@@ -261,6 +261,7 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
 		const char	*setIsolationLevelQuery();
+		const char	*noopQuery();
 		const char	*bindFormat();
 
 		SQLHENV		env;
@@ -270,7 +271,6 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		const char	*db2path;
 		const char	*server;
 		const char	*lang;
-		uint32_t	timeout;
 
 		stringbuffer	errormessage;
 
@@ -311,14 +311,6 @@ void db2connection::handleConnectString() {
 	identity=cont->getConnectStringValue("identity");
 
 	lang=cont->getConnectStringValue("lang");
-
-	const char	*to=cont->getConnectStringValue("timeout");
-	if (!charstring::length(to)) {
-		// for back-compatibility
-		timeout=5;
-	} else {
-		timeout=charstring::toInteger(to);
-	}
 
 	maxoutbindlobsize=charstring::toInteger(
 			cont->getConnectStringValue("maxoutbindlobsize"));
@@ -368,16 +360,17 @@ bool db2connection::logIn(const char **error, const char **warning) {
 	}
 
 	// set the connect timeout
-	if (timeout) {
+	uint32_t	connecttimeout=cont->getConnectTimeout();
+	if (connecttimeout) {
 		erg=SQLSetConnectAttr(dbc,
 				#ifdef SQL_ATTR_LOGIN_TIMEOUT
 				SQL_ATTR_LOGIN_TIMEOUT,
 				#else
 				SQL_LOGIN_TIMEOUT,
 				#endif
-				(SQLPOINTER)timeout,0);
+				(SQLPOINTER)connecttimeout,0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			*error="Failed to set timeout";
+			*error="Failed to set connect timeout";
 			SQLFreeHandle(SQL_HANDLE_DBC,dbc);
 			SQLFreeHandle(SQL_HANDLE_ENV,env);
 			return false;
@@ -722,6 +715,10 @@ const char *db2connection::getLastInsertIdQuery() {
 
 const char *db2connection::setIsolationLevelQuery() {
         return "set current isolation %s";
+}
+
+const char *db2connection::noopQuery() {
+	return "begin end;";
 }
 
 db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :

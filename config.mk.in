@@ -484,6 +484,7 @@ endif
 
 
 # odbc
+ENABLE_ODBC = @ENABLE_ODBC@
 ENABLE_ODBC_DRIVER = @ENABLE_ODBC_DRIVER@
 ODBCINCLUDES = @ODBCINCLUDES@
 ODBCLIBS = @ODBCLIBS@
@@ -590,9 +591,10 @@ endif
 
 
 # util
-STATICUTILPLUGINSRCS = sqlrconfigdeclarations.cpp \
-			sqlrconfigassignments.cpp
+STATICUTILPLUGINSRCS = 
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
+STATICUTILPLUGINSRCS += sqlrconfigdeclarations.cpp \
+			sqlrconfigassignments.cpp
 STATICUTILPLUGINLOBJS = $(shell ls ../configs/*.$(OBJ))
 endif
 UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
@@ -611,7 +613,9 @@ ENABLE_UTIL = @ENABLE_UTIL@
 
 # server
 ENABLE_SERVER = @ENABLE_SERVER@
-STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
+STATICPLUGINSRCS =
+ifeq ($(SQLRELAY_ENABLE_SHARED),no)
+STATICPLUGINSRCS += sqlrserverconnectiondeclarations.cpp \
 		sqlrserverconnectionassignments.cpp \
 		sqlrprotocoldeclarations.cpp \
 		sqlrprotocolassignments.cpp \
@@ -633,7 +637,6 @@ STATICPLUGINSRCS = sqlrserverconnectiondeclarations.cpp \
 		sqlrfilterassignments.cpp \
 		sqlrquerydeclarations.cpp \
 		sqlrqueryassignments.cpp
-ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../protocols/*.$(OBJ)) \
 		$(shell ls ../parsers/*.$(OBJ)) \
@@ -643,6 +646,7 @@ STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../routers/*.$(OBJ)) \
 		$(shell ls ../pwdencs/*.$(OBJ)) \
 		$(shell ls ../auths/*.$(OBJ)) \
+		$(shell ls ../directives/*.$(OBJ)) \
 		$(shell ls ../translations/*.$(OBJ)) \
 		$(shell ls ../resultsettranslations/*.$(OBJ)) \
 		$(shell ls ../resultsetrowtranslations/*.$(OBJ)) \
@@ -763,10 +767,12 @@ ifneq ($(strip $(MYSQLLIBS)),)
 CONNECTIONSALLTARGETS += all-mysql
 CONNECTIONSINSTALLTARGETS += installsharedlib-mysql
 endif
+ifneq ($(strip $(ENABLE_ODBC)),)
 ifneq ($(strip $(ODBCLIBS)),)
 ifneq ($(strip $(ODBCUNICODE)),)
 CONNECTIONSALLTARGETS += all-odbc
 CONNECTIONSINSTALLTARGETS += installsharedlib-odbc
+endif
 endif
 endif
 ifeq ($(strip $(ENABLE_ORACLE)),yes)
@@ -870,8 +876,8 @@ SRCALLSUBDIRS += all-util all-configs
 SRCINSTALLSUBDIRS += install-util install-configs
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections
-SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections
+SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections
+SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections
 endif
 else
 SRCALLSUBDIRS = all-api
@@ -881,8 +887,8 @@ SRCALLSUBDIRS += all-configs all-util
 SRCINSTALLSUBDIRS += install-configs install-util
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections all-server
-SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections install-server
+SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections all-server
+SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections install-server
 endif
 endif
 ifeq ($(ENABLE_CMDLINE),yes)
@@ -892,9 +898,9 @@ endif
 
 
 APIALLSUBDIRS =
-APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-mysql clean-postgresql clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-tcl clean-erlang
+APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-mysql clean-postgresql clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-jdbc clean-tcl clean-erlang
 APIINSTALLSUBDIRS =
-APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-mysql uninstall-postgresql uninstall-odbc uninstall-java
+APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-mysql uninstall-postgresql uninstall-odbc uninstall-java uninstall-jdbc
 ifneq ($(ENABLE_CPP),)
 APIALLSUBDIRS += all-cpp all-c
 APIINSTALLSUBDIRS += install-cpp install-c
@@ -944,8 +950,8 @@ APIINSTALLSUBDIRS += install-phppdo
 APIUNINSTALLSUBDIRS += uninstall-phppdo
 endif
 ifneq ($(HAVE_JAVA),)
-APIALLSUBDIRS += all-java
-APIINSTALLSUBDIRS += install-java
+APIALLSUBDIRS += all-java all-jdbc
+APIINSTALLSUBDIRS += install-java install-jdbc
 endif
 ifneq ($(HAVE_TCL),)
 APIALLSUBDIRS += all-tcl

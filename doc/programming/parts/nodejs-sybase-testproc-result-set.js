@@ -1,4 +1,4 @@
-cur.sendQuery("exec testproc");
+cur.sendQuery("exec exampleproc");
 var     field00=cur.getFieldByIndex(0,0);
 var     field01=cur.getFieldByIndex(0,1);
 var     field02=cur.getFieldByIndex(0,2);

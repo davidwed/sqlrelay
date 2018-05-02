@@ -7,7 +7,7 @@ main() {
         sqlrcur      cursor2;
         int          index;
 
-        con=new sqlrcon_alloc("sqlrserver",9000,"/tmp/test.socket","user","password",0,1);
+        con=new sqlrcon_alloc("sqlrserver",9000,"/tmp/example.socket","user","password",0,1);
         cursor1=new sqlrcur_alloc(con);
         cursor2=new sqlrcur_alloc(con);
 

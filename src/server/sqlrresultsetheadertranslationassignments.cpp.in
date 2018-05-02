@@ -1,0 +1,4 @@
+	if (!charstring::compare(module,"@module@")) {
+		rstr=new_sqlrresultsetheadertranslation_@module@(
+				pvt->_cont,this,resultsetheadertranslation);
+	} else

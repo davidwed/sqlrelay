@@ -38,6 +38,9 @@ all-phppdo:
 all-java:
 	cd java $(AND) $(MAKE) all
 
+all-jdbc:
+	cd jdbc $(AND) $(MAKE) all
+
 all-tcl:
 	cd tcl $(AND) $(MAKE) all
 
@@ -85,6 +88,9 @@ clean-phppdo:
 
 clean-java:
 	cd java $(AND) $(MAKE) clean
+
+clean-jdbc:
+	cd jdbc $(AND) $(MAKE) clean
 
 clean-tcl:
 	cd tcl $(AND) $(MAKE) clean
@@ -134,6 +140,9 @@ install-phppdo:
 install-java:
 	cd java $(AND) $(MAKE) install
 
+install-jdbc:
+	cd jdbc $(AND) $(MAKE) install
+
 install-tcl:
 	cd tcl $(AND) $(MAKE) install
 
@@ -181,6 +190,9 @@ uninstall-phppdo:
 
 uninstall-java:
 	cd java $(AND) $(MAKE) uninstall
+
+uninstall-jdbc:
+	cd jdbc $(AND) $(MAKE) uninstall
 
 uninstall-tcl:
 	cd tcl $(AND) $(MAKE) uninstall

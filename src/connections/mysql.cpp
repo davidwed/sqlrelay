@@ -198,6 +198,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*getCurrentDatabaseQuery();
 		const char	*setIsolationLevelQuery();
 		bool		getLastInsertId(uint64_t *id);
+		const char	*noopQuery();
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		supportsAutoCommit();
@@ -664,6 +665,10 @@ bool mysqlconnection::getLastInsertId(uint64_t *id) {
 	return true;
 }
 
+const char *mysqlconnection::noopQuery() {
+	return "begin; end;";
+}
+
 bool mysqlconnection::isTransactional() {
 	return true;
 }
@@ -766,7 +771,9 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	stmtpreparefailed=false;
 	bindformaterror=false;
 	unsupportedbystmt.compile(
-			"^[ 	\r\n]*(("
+			"^[ 	\r\n]*"
+			"(/\\*.*\\*/[ 	\r\n]+)*"
+			"(("
 				"create|CREATE|"
 				"drop|DROP|"
 				"procedure|PROCEDURE|"

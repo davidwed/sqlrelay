@@ -1,6 +1,6 @@
 my $sth=$dbh->prepare("set \@out1=0, \@out2=0.0, \@out3='')");
 $sth->execute();
-$sth=$dbh->prepare("call testproc(\@out1,\@out2,\@out3)");
+$sth=$dbh->prepare("call exampleproc(\@out1,\@out2,\@out3)");
 $sth->execute();
 $sth=$dbh->prepare("select \@out1,\@out2,\@out3");
 $sth->execute();

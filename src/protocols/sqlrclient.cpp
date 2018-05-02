@@ -80,6 +80,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getQuery(sqlrservercursor *cursor);
 		bool	getInputBinds(sqlrservercursor *cursor);
 		bool	getOutputBinds(sqlrservercursor *cursor);
+		bool	getInputOutputBinds(sqlrservercursor *cursor);
 		bool	getBindVarCount(sqlrservercursor *cursor,
 						uint16_t *count);
 		bool	getBindVarName(sqlrservercursor *cursor,
@@ -110,6 +111,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 							uint16_t index);
 		void	sendLobOutputBind(sqlrservercursor *cursor,
 							uint16_t index);
+		void	returnInputOutputBindValues(sqlrservercursor *cursor);
 		void	sendColumnDefinition(const char *name,
 						uint16_t namelen,
 						uint16_t type, 
@@ -123,7 +125,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 						uint16_t unsignednumber,
 						uint16_t zerofill,
 						uint16_t binary,
-						uint16_t autoincrement);
+						uint16_t autoincrement,
+						const char *table,
+						uint16_t tablelength);
 		void	sendColumnDefinitionString(const char *name,
 						uint16_t namelen,
 						const char *type, 
@@ -138,7 +142,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 						uint16_t unsignednumber,
 						uint16_t zerofill,
 						uint16_t binary,
-						uint16_t autoincrement);
+						uint16_t autoincrement,
+						const char *table,
+						uint16_t tablelength);
 		bool	returnResultSetData(sqlrservercursor *cursor,
 						bool getskipandfetch,
 						bool overridelazyfetch);
@@ -246,7 +252,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	maxstringbindvaluelength=
 			cont->getConfig()->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cont->getConfig()->getMaxLobBindValueLength();
-	bindpool=new memorypool(512,128,100);
+	bindpool=cont->getBindPool();
 	lazyfetch=false;
 	maxerrorlength=cont->getConfig()->getMaxErrorLength();
 	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
@@ -375,12 +381,11 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 
 sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
 	debugFunction();
-	delete bindpool;
 	delete[] clientinfo;
 }
 
 clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
-						filedescriptor *cs) {
+							filedescriptor *cs) {
 	debugFunction();
 
 	clientsock=cs;
@@ -1266,6 +1271,7 @@ bool sqlrprotocol_sqlrclient::newQueryCommand(sqlrservercursor *cursor) {
 	if (success) {
 		success=(getInputBinds(cursor) &&
 				getOutputBinds(cursor) &&
+				getInputOutputBinds(cursor) &&
 				getSendColumnInfo());
 	}
 
@@ -1302,6 +1308,7 @@ bool sqlrprotocol_sqlrclient::reExecuteQueryCommand(sqlrservercursor *cursor) {
 	// get binds and whether to get column info
 	if (getInputBinds(cursor) &&
 		getOutputBinds(cursor) &&
+		getInputOutputBinds(cursor) &&
 		getSendColumnInfo()) {
 		return processQueryOrBindCursor(cursor,
 				SQLRCLIENTQUERYTYPE_QUERY,
@@ -1400,13 +1407,13 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 		if (bindcursor) {
 			success=cont->fetchFromBindCursor(cursor);
 		} else if (reexecute) {
-			success=cont->executeQuery(cursor,true,true,true);
+			success=cont->executeQuery(cursor,true,true,true,true);
 		} else {
 			success=(cont->prepareQuery(cursor,
 					cont->getQueryBuffer(cursor),
 					cont->getQueryLength(cursor),
-					true,true) &&
-				cont->executeQuery(cursor,true,true,true));
+					true,true,true) &&
+				cont->executeQuery(cursor,true,true,true,true));
 		}
 
 		// get the skip and fetch parameters here so everything can be
@@ -1778,6 +1785,7 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			bv->value.dateval.second=0;
 			bv->value.dateval.microsecond=0;
 			bv->value.dateval.tz=NULL;
+			bv->value.dateval.isnegative=false;
 			// allocate enough space to store the date/time string
 			// or whatever buffer a child might need to store a
 			// date 512 bytes ought to be enough
@@ -1811,6 +1819,295 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 	}
 
 	cont->raiseDebugMessageEvent("done getting output binds");
+	return true;
+}
+
+bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
+	debugFunction();
+
+	cont->raiseDebugMessageEvent("getting input/output binds...");
+
+	// get the number of input/output bind variable/values
+	uint16_t	inoutbindcount=0;
+	if (!getBindVarCount(cursor,&inoutbindcount)) {
+		return false;
+	}
+	cont->setInputOutputBindCount(cursor,inoutbindcount);
+
+	// get the input/output bind buffers
+	sqlrserverbindvar	*inoutbinds=cont->getInputOutputBinds(cursor);
+
+	// fill the buffers
+	for (uint16_t i=0; i<inoutbindcount && i<maxbindcount; i++) {
+
+		sqlrserverbindvar	*bv=&(inoutbinds[i]);
+
+		// get the variable name and type
+		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
+			return false;
+		}
+
+		// get the size of the value
+		if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
+			bv->type=SQLRSERVERBINDVARTYPE_STRING;
+			bv->value.stringval=NULL;
+			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
+				return false;
+			}
+			// This must be a allocated and cleared because oracle
+			// gets angry if these aren't initialized to NULL's.
+			// It's possible that just the first character needs to
+			// be NULL, but for now I'm just going to go ahead and
+			// use allocateAndClear.
+			bv->value.stringval=
+				(char *)bindpool->allocateAndClear(
+							bv->valuesize+1);
+			bv->isnull=cont->nullBindValue();
+			cont->raiseDebugMessageEvent("NULL");
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
+			bv->value.stringval=NULL;
+			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
+				return false;
+			}
+			// This must be a allocated and cleared because oracle
+			// gets angry if these aren't initialized to NULL's.
+			// It's possible that just the first character needs to
+			// be NULL, but for now I'm just going to go ahead and
+			// use allocateAndClear.
+			bv->value.stringval=
+				(char *)bindpool->allocateAndClear(
+							bv->valuesize+1);
+
+			// get the bind value
+			ssize_t	result=clientsock->read(bv->value.stringval,
+							bv->valuesize,
+							idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)(bv->valuesize)) {
+				bv->value.stringval[0]='\0';
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"value";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+			bv->value.stringval[bv->valuesize]='\0';
+			bv->isnull=cont->nonNullBindValue();
+			cont->raiseDebugMessageEvent("STRING");
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
+
+			// get the bind value
+			ssize_t	result=clientsock->read(&(bv->value.integerval),
+							idleclienttimeout,0);
+			if (result!=sizeof(uint64_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"value";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+			bv->isnull=cont->nonNullBindValue();
+			cont->raiseDebugMessageEvent("INTEGER");
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
+
+			// get the bind value
+			ssize_t	result=clientsock->read(
+					&(bv->value.doubleval.value),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(double)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"value";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the precision
+			result=clientsock->read(
+					&(bv->value.doubleval.precision),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint32_t)) {
+				const char	*info="get binds failed: "
+							"failed to get "
+							"precision";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the scale
+			result=clientsock->read(
+					&(bv->value.doubleval.scale),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint32_t)) {
+				const char	*info="get binds failed: "
+							"failed to get "
+							"scale";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			bv->isnull=cont->nonNullBindValue();
+			cont->raiseDebugMessageEvent("DOUBLE");
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
+
+			// get the year
+			ssize_t	result=clientsock->read(
+					&(bv->value.dateval.year),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"year";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the month
+			result=clientsock->read(
+					&(bv->value.dateval.month),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"month";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the day
+			result=clientsock->read(
+					&(bv->value.dateval.day),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"day";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the hour
+			result=clientsock->read(
+					&(bv->value.dateval.hour),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"hour";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the minute
+			result=clientsock->read(
+					&(bv->value.dateval.minute),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"minute";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the second
+			result=clientsock->read(
+					&(bv->value.dateval.second),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"second";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the microsecond
+			result=clientsock->read(
+					&(bv->value.dateval.microsecond),
+					idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint32_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"microsecond";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the tz length
+			uint16_t	tzlen=0;
+			result=clientsock->read(&tzlen,idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)sizeof(uint16_t)) {
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"tz length";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the tz
+			bv->value.dateval.tz=(char *)bindpool->allocate(tzlen);
+			result=clientsock->read(bv->value.dateval.tz,tzlen,
+						idleclienttimeout,0);
+			if ((uint32_t)result!=(uint32_t)tzlen) {
+				bv->value.dateval.tz[0]='\0';
+				const char	*info="get binds failed: "
+							"failed to get bind "
+							"tz";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// get the is-negative flag
+			result=clientsock->read(&bv->value.dateval.isnegative,
+							idleclienttimeout,0);
+			if (result!=sizeof(bool)) {
+				const char	*info="get binds failed: "
+							"failed to get "
+							"is-negative flag";
+				cont->raiseClientProtocolErrorEvent(
+							cursor,info,result);
+				return false;
+			}
+
+			// allocate enough space to store the date/time string
+			// or whatever buffer a child might need to store a
+			// date 512 bytes ought to be enough
+			bv->value.dateval.buffersize=512;
+			bv->value.dateval.buffer=
+				(char *)bindpool->allocate(
+						bv->value.dateval.buffersize);
+
+			bv->isnull=cont->nonNullBindValue();
+			cont->raiseDebugMessageEvent("DATE");
+		} /*else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB ||
+					bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
+			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
+				return false;
+			}
+			if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
+				cont->raiseDebugMessageEvent("BLOB");
+			} else if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
+				cont->raiseDebugMessageEvent("CLOB");
+			}
+			bv->isnull=cont->nonNullBindValue();
+		}*/
+	}
+
+	cont->raiseDebugMessageEvent("done getting input/output binds");
 	return true;
 }
 
@@ -2195,14 +2492,6 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 	}
 	bv->value.dateval.tz[length]='\0';
 
-	// allocate enough space to store the date/time string
-	// 64 bytes ought to be enough
-	bv->value.dateval.buffersize=64;
-	bv->value.dateval.buffer=(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-
-	bv->isnull=cont->nonNullBindValue();
-
 	// get the is-negative flag
 	bool	tempbool;
 	result=clientsock->read(&tempbool,idleclienttimeout,0);
@@ -2213,6 +2502,14 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 		return false;
 	}
 	bv->value.dateval.isnegative=tempbool;
+
+	// allocate enough space to store the date/time string
+	// 64 bytes ought to be enough
+	bv->value.dateval.buffersize=64;
+	bv->value.dateval.buffer=(char *)bindpool->allocate(
+						bv->value.dateval.buffersize);
+
+	bv->isnull=cont->nonNullBindValue();
 
 	debugstr.clear();
 	debugstr.append(bv->value.dateval.year)->append('-');
@@ -2389,6 +2686,7 @@ void sqlrprotocol_sqlrclient::returnResultSetHeader(sqlrservercursor *cursor) {
 
 	// return the output bind vars
 	returnOutputBindValues(cursor);
+	returnInputOutputBindValues(cursor);
 
 	cont->raiseDebugMessageEvent("done returning result set header");
 }
@@ -2415,6 +2713,8 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 		uint16_t	binary=cont->getColumnIsBinary(cursor,i);
 		uint16_t	autoincrement=
 				cont->getColumnIsAutoIncrement(cursor,i);
+		const char	*table=cont->getColumnTable(cursor,i);
+		uint16_t	tablelen=cont->getColumnTableLength(cursor,i);
 
 		if (format==COLUMN_TYPE_IDS) {
 			sendColumnDefinition(name,namelen,
@@ -2422,7 +2722,7 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
 					unsignednumber,zerofill,binary,
-					autoincrement);
+					autoincrement,table,tablelen);
 		} else {
 			sendColumnDefinitionString(name,namelen,
 					cont->getColumnTypeName(cursor,i),
@@ -2430,7 +2730,7 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
 					unsignednumber,zerofill,binary,
-					autoincrement);
+					autoincrement,table,tablelen);
 		}
 	}
 }
@@ -2716,6 +3016,155 @@ void sqlrprotocol_sqlrclient::sendLobOutputBind(sqlrservercursor *cursor,
 	}
 }
 
+void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
+						sqlrservercursor *cursor) {
+	debugFunction();
+
+	if (cont->logEnabled() || cont->notificationsEnabled()) {
+		debugstr.clear();
+		debugstr.append("returning ");
+		debugstr.append(cont->getInputOutputBindCount(cursor));
+		debugstr.append(" input/output bind values: ");
+		cont->raiseDebugMessageEvent(debugstr.getString());
+	}
+
+	// run through the input/output bind values, sending them back
+	for (uint16_t i=0; i<cont->getInputOutputBindCount(cursor); i++) {
+
+		sqlrserverbindvar	*bv=
+				&(cont->getInputOutputBinds(cursor)[i]);
+
+		if (cont->logEnabled() || cont->notificationsEnabled()) {
+			debugstr.clear();
+			debugstr.append(i);
+			debugstr.append(":");
+		}
+
+		if (cont->bindValueIsNull(bv->isnull)) {
+
+			if (cont->logEnabled() ||
+				cont->notificationsEnabled()) {
+				debugstr.append("NULL");
+			}
+
+			clientsock->write((uint16_t)NULL_DATA);
+
+		} else /*if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
+
+			if (cont->logEnabled() ||
+				cont->notificationsEnabled()) {
+				debugstr.append("BLOB:");
+			}
+
+			returnInputOutputBindBlob(cursor,i);
+
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
+
+			if (cont->logEnabled() ||
+				cont->notificationsEnabled()) {
+				debugstr.append("CLOB:");
+			}
+
+			returnInputOutputBindClob(cursor,i);
+
+		} else*/ if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
+
+			if (cont->logEnabled() ||
+				cont->notificationsEnabled()) {
+				debugstr.append("STRING:");
+				debugstr.append(bv->value.stringval);
+			}
+
+			clientsock->write((uint16_t)STRING_DATA);
+			bv->valuesize=charstring::length(
+						(char *)bv->value.stringval);
+			clientsock->write(bv->valuesize);
+			clientsock->write(bv->value.stringval,bv->valuesize);
+
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
+
+			if (cont->logEnabled() ||
+				cont->notificationsEnabled()) {
+				debugstr.append("INTEGER:");
+				debugstr.append(bv->value.integerval);
+			}
+
+			clientsock->write((uint16_t)INTEGER_DATA);
+			clientsock->write((uint64_t)bv->value.integerval);
+
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
+
+			if (cont->logEnabled() ||
+				cont->notificationsEnabled()) {
+				debugstr.append("DOUBLE:");
+				debugstr.append(bv->value.doubleval.value);
+				debugstr.append("(");
+				debugstr.append(bv->value.doubleval.precision);
+				debugstr.append(",");
+				debugstr.append(bv->value.doubleval.scale);
+				debugstr.append(")");
+			}
+
+			clientsock->write((uint16_t)DOUBLE_DATA);
+			clientsock->write(bv->value.doubleval.value);
+			clientsock->write((uint32_t)bv->value.
+						doubleval.precision);
+			clientsock->write((uint32_t)bv->value.
+						doubleval.scale);
+
+		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
+
+			if (cont->logEnabled() ||
+				cont->notificationsEnabled()) {
+				debugstr.append("DATE:");
+				debugstr.append(bv->value.dateval.year);
+				debugstr.append("-");
+				debugstr.append(bv->value.dateval.month);
+				debugstr.append("-");
+				debugstr.append(bv->value.dateval.day);
+				debugstr.append(" ");
+				if (bv->value.dateval.isnegative) {
+					debugstr.append('-');
+				}
+				debugstr.append(bv->value.dateval.hour);
+				debugstr.append(":");
+				debugstr.append(bv->value.dateval.minute);
+				debugstr.append(":");
+				debugstr.append(bv->value.dateval.second);
+				debugstr.append(":");
+				debugstr.append(bv->value.dateval.microsecond);
+				debugstr.append(" ");
+				debugstr.append(bv->value.dateval.tz);
+			}
+
+			clientsock->write((uint16_t)DATE_DATA);
+			clientsock->write((uint16_t)bv->value.dateval.year);
+			clientsock->write((uint16_t)bv->value.dateval.month);
+			clientsock->write((uint16_t)bv->value.dateval.day);
+			clientsock->write((uint16_t)bv->value.dateval.hour);
+			clientsock->write((uint16_t)bv->value.dateval.minute);
+			clientsock->write((uint16_t)bv->value.dateval.second);
+			clientsock->write((uint32_t)bv->value.
+							dateval.microsecond);
+			uint16_t	length=charstring::length(
+							bv->value.dateval.tz);
+			clientsock->write(length);
+			clientsock->write(bv->value.dateval.tz,length);
+			clientsock->write((bool)bv->value.dateval.isnegative);
+
+		}
+
+		if (cont->logEnabled() || cont->notificationsEnabled()) {
+			cont->raiseDebugMessageEvent(debugstr.getString());
+		}
+	}
+
+	// terminate the bind vars
+	clientsock->write((uint16_t)END_BIND_VARS);
+
+	cont->raiseDebugMessageEvent("done returning input/output bind values");
+}
+
 void sqlrprotocol_sqlrclient::sendColumnDefinition(
 						const char *name,
 						uint16_t namelen,
@@ -2730,7 +3179,9 @@ void sqlrprotocol_sqlrclient::sendColumnDefinition(
 						uint16_t unsignednumber,
 						uint16_t zerofill,
 						uint16_t binary,
-						uint16_t autoincrement) {
+						uint16_t autoincrement,
+						const char *table,
+						uint16_t tablelen) {
 	debugFunction();
 
 	if (cont->logEnabled() || cont->notificationsEnabled()) {
@@ -2773,6 +3224,8 @@ void sqlrprotocol_sqlrclient::sendColumnDefinition(
 	clientsock->write(zerofill);
 	clientsock->write(binary);
 	clientsock->write(autoincrement);
+	clientsock->write(tablelen);
+	clientsock->write(table,tablelen);
 }
 
 void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
@@ -2790,7 +3243,9 @@ void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
 						uint16_t unsignednumber,
 						uint16_t zerofill,
 						uint16_t binary,
-						uint16_t autoincrement) {
+						uint16_t autoincrement,
+						const char *table,
+						uint16_t tablelen) {
 	debugFunction();
 
 	if (cont->logEnabled() || cont->notificationsEnabled()) {
@@ -2836,6 +3291,8 @@ void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
 	clientsock->write(zerofill);
 	clientsock->write(binary);
 	clientsock->write(autoincrement);
+	clientsock->write(tablelen);
+	clientsock->write(table,tablelen);
 }
 
 bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
@@ -3431,6 +3888,7 @@ bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 	// set the values that we won't get from the client
 	cont->setInputBindCount(cursor,0);
 	cont->setOutputBindCount(cursor,0);
+	cont->setInputOutputBindCount(cursor,0);
 	cont->setSendColumnInfo(SEND_COLUMN_INFO);
 
 	// get the list and return it

@@ -4,7 +4,7 @@ var	sqlrelay=require("sqlrelay");
 
 ... get the page to display from the previous page ...
 
-var	con=new sqlrelay.SQLRConnection("sqlrserver",9000,"/tmp/test.socket","user","password",0,1);
+var	con=new sqlrelay.SQLRConnection("sqlrserver",9000,"/tmp/example.socket","user","password",0,1);
 var	cur=new sqlrelay.SQLRCursor(con);
 
 cur.openCachedResultSet(filename);

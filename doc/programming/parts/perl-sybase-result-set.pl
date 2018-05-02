@@ -1,4 +1,4 @@
-$cur->sendQuery("exec testproc");
+$cur->sendQuery("exec exampleproc");
 my $field00=$cur->getFieldByIndex(0,0);
 my $field01=$cur->getFieldByIndex(0,1);
 my $field02=$cur->getFieldByIndex(0,2);

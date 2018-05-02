@@ -1,6 +1,6 @@
 var	sqlrelay=require("sqlrelay");
 
-var	con=new sqlrelay.SQLRConnection("sqlrserver",9000,"/tmp/test.socket","user","password",0,1);
+var	con=new sqlrelay.SQLRConnection("sqlrserver",9000,"/tmp/example.socket","user","password",0,1);
 var	cur=new sqlrelay.SQLRCursor(con);
 
 cur.prepareQuery("begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;");

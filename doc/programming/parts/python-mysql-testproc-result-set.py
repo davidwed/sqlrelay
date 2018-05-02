@@ -1,4 +1,4 @@
-cur.sendQuery("call testproc()")
+cur.sendQuery("call exampleproc()")
 field00=cur.getField(0,0)
 field01=cur.getField(0,1)
 field02=cur.getField(0,2)

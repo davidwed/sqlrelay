@@ -1,0 +1,4 @@
+sqlrresultsetheadertranslation	*new_sqlrresultsetheadertranslation_@module@(
+					sqlrservercontroller *cont,
+					sqlrresultsetheadertranslations *rs,
+					xmldomnode *parameters);

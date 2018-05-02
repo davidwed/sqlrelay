@@ -1,0 +1,298 @@
+= Ubuntu 16.05 - SQL Relay Server + Oracle 12c =
+
+This how-to walks through:
+
+* Installing an SQL Relay server on an Ubuntu 16.04 system
+* Configuring a connection between the SQL Relay server and an Oracle database
+
+It assumes that two systems have been set up and configured as follows:
+
+'''SQL Relay server'''
+
+* Ubuntu 16.04 Server operating system
+* At least the following package sets were selected during installation:
+ * standard system utilities
+ * !OpenSSH server
+* //apt upgrade// was run post-install
+* A user with sudo privileges has ssh and scp/sftp access to the system
+
+'''Oracle database server'''
+
+* Any operating system that supports Oracle 10g or higher
+* Oracle 10g or higher database is installed, accessible as:
+ * Hostname: //oracle//
+ * Port: 1521
+ * SID/SERVICE_NAME: //ora1//
+ * Username: //oracleuser//
+ * Password: //oraclepassword//
+
+
+=== Install Prerequisite Software ===
+
+ssh into the SQL Relay server and run the following command to install the prerequisite software packages:
+
+{{{
+sudo apt install unzip g++ make libedit-dev libssl-dev libkrb5-dev libpcre3-dev libcurl4-openssl-dev libaio1
+}}}
+
+
+=== Install Oracle Instant Client ===
+
+Download Oracle Instant Client 12c as follows.
+
+* Navigate to [https://oracle.com the Oracle website].
+* Mouse-over the //Sign In// link at the top right of the page.
+* If you don't already have an account, click //Create an account// and follow the instructions.
+* If you have an account, click the //Sign In// box and enter your Username and Password.
+* Navigate to [http://www.oracle.com/technetwork/topics/linuxx86-64soft-092277.html Instant Client Downloads for Linux x86-64].
+* Click the radio box next to //Accept License Agreement//.
+* Scroll down to the section labelled //Version 12.2.0.1.0// and download the following zip files from beneath that section:
+ * instantclient-basic-linux.x64-12.2.0.1.0.zip
+ * instantclient-sdk-linux.x64-12.2.0.1.0.zip
+
+scp/sftp the zip files to the SQL Relay server, ssh into the SQL Relay server, and install the the contents of the zip files as follows:
+
+{{{
+unzip instantclient-basic-linux.x64-12.2.0.1.0.zip
+unzip instantclient-sdk-linux.x64-12.2.0.1.0.zip
+sudo mv instantclient_12_2 /opt
+}}}
+
+Create the file /etc/ld.so.conf.d/oracle.conf with the following contents:
+
+{{{
+/opt/instantclient_12_2
+}}}
+
+Then run:
+
+{{{
+sudo /sbin/ldconfig
+}}}
+
+
+=== Build and Install SQL Relay Server Software ===
+
+Download current .tar.gz files of SQL Relay and Rudiments from the '''Source Distribution''' section of [http://sqlrelay.sourceforge.net/download.html the SQL Relay Downloads page] and scp/sftp them to the SQL Relay server.
+
+ssh into the SQL Relay server, and extract, build, and install the software as follows:
+
+{{{
+tar xfz rudiments-*.tar.gz
+cd rudiments-*
+./configure
+make
+sudo make install
+cd ..
+tar xfz sqlrelay-*.tar.gz
+cd sqlrelay-*
+./configure
+make
+sudo make install
+}}}
+
+
+=== Update the Environment ===
+
+Create /etc/profile.d/firstworks.sh with the following contents:
+
+{{{
+export PATH=$PATH:/usr/local/firstworks/bin
+}}}
+
+Update the sudo secure_path by running:
+
+{{{
+sudo visudo
+}}}
+
+...and editing the secure_path line to include /usr/local/firstworks/bin and read as follows:
+
+{{{
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin:/usr/local/firstworks/bin"
+}}}
+
+(hit ctrl-X, followed by Y to save)
+
+Create /etc/ld.so.conf.d/firstworks.conf with the following contents:
+
+{{{
+/usr/local/firstworks/lib
+}}}
+
+Then run:
+
+{{{
+sudo /sbin/ldconfig
+}}}
+
+Exit and ssh back in to apply the updates to the environment.
+
+
+=== Configure SQL Relay ===
+
+Create /usr/local/firstworks/etc/sqlrelay.conf.d/oracle.conf with the following contents:
+
+{{{
+&lt;?xml version="1.0"?&gt;
+&lt;instances&gt;
+    &lt;instance id="sample" enabled="yes"&gt;
+        &lt;users&gt;
+            &lt;user user="sqlruser" password="sqlrpassword"/&gt;
+        &lt;/users&gt;
+        &lt;connections&gt;
+            &lt;connection string="user=oracleuser;password=oraclepassword;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"/&gt;
+        &lt;/connections&gt;
+    &lt;/instance&gt;
+&lt;/instances&gt;
+}}}
+
+Configure more secure permissions on this file:
+
+{{{
+sudo chown nobody /usr/local/firstworks/etc/sqlrelay.conf/oracle.conf
+sudo chmod 640 /usr/local/firstworks/etc/sqlrelay.conf/oracle.conf
+}}}
+
+
+=== Start SQL Relay ===
+
+Start SQL Relay by running:
+
+{{{
+sudo sqlr-start -id sample
+}}}
+
+It should respond with the following output:
+
+{{{
+Starting listener:
+  sqlr-listener -id sample -localstatedir /usr/local/firstworks/var/
+
+Starting 5 connections to sample-0 :
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+  sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+}}}
+
+There shouldn't be any errors or warnings, but if there are, then some typical problems and solutions include:
+
+* Permissions errors
+ * Verify that the file oracle.conf is owned by //nobody:root// and has -rw-r----- permissions.
+ * Verify that you used sudo when running sqlr-start
+* A prerequisite package wasn't installed
+ * Rerun the apt command at the top of the tutorial
+* /etc/ld.so.conf.d/oracle.conf doesn't include the correct path
+ * Update it with the correct path and run: sudo /sbin/ldconfig
+* /etc/profile.d/firstworks.sh doesn't include the correct path
+ * Update it with the correct path and re-login
+* /etc/ld.so.conf.d/firstworks.conf doesn't include the correct path
+ * Update it with the correct path and run: sudo /sbin/ldconfig
+* secure_path in /etc/sudoers doesn't include the correct path
+ * Update it with the correct path using: sudo visudo
+* The SERVICE_NAME is incorrect in the connection string sqlrelay.conf
+ * Update sqlrelay.conf with a valid SERVICE_NAME
+* The user or password is incorrect in the connection string in sqlrelay.conf
+ * Update sqlrelay.conf with valid user or password
+* The database hostname doesn't resolve to an IP address
+ * Add an entry in /etc/hosts with the hostname and IP address of the database
+ * Update your local DNS configuration with the hostname and IP address of the database
+ * Replace the database hostname in the connection string in sqlrelay.conf with the IP address of the database
+
+If you need to restart the SQL Relay server, run:
+
+{{{
+sudo sqlr-stop
+sudo sqlr-start -id sample
+}}}
+
+=== Verify SQL Relay ===
+
+To verify that the SQL Relay processes are running, run:
+
+{{{
+ps -efa | grep sqlr- | grep -v grep
+}}}
+
+It should respond with output like the following:
+
+{{{
+nobody     1272      1  0 12:33 ?        00:00:00 sqlr-listener -id sample -localstatedir /usr/local/firstworks/var/
+nobody     1273      1  0 12:33 ?        00:00:00 sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+nobody     1274      1  0 12:33 ?        00:00:00 sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+nobody     1275      1  0 12:33 ?        00:00:00 sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+nobody     1276      1  0 12:33 ?        00:00:00 sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+nobody     1277      1  0 12:33 ?        00:00:00 sqlr-connection -id sample -connectionid sample-0 -localstatedir /usr/local/firstworks/var/
+}}}
+
+There should be 1 sqlr-listener process and 5 sqlr-connection processes, all running as the user //nobody//.
+
+To verify that you can log into the SQL Relay server and run queries, run the //sqlrsh// client as follows:
+
+{{{
+sqlrsh -host localhost -user sqlruser -password sqlrpassword
+}}}
+
+It should respond with the following output and prompt:
+
+{{{
+sqlrsh - Version 1.2.0
+        Connected to: localhost:9000 as sqlruser
+
+        type help; for help.
+
+0>
+}}}
+
+Try a simple query:
+
+{{{
+select 'hello world' from dual;
+}}}
+
+It should respond with the following output and prompt:
+
+{{{
+'HELLOWORLD'
+============
+hello world
+
+        Rows Returned   : 1
+        Fields Returned : 1
+        Elapsed Time    : 0.006065 sec
+
+0>
+}}}
+
+There shouldn't be any errors or warnings, but if there are, then some typical problems and solutions include:
+
+* "Couldn't connect to the listener." - the SQL Relay server probably isn't running
+ * Restart the SQL Relay server
+* "Authentication Error." - the user or password specified on the sqlrsh command line don't match the user or password in the user tag of the sqlrelay.conf file
+ * Specify the correct user or password on the sqlrsh command line
+ * Update the sqlrelay.conf file and restart SQL Relay
+* "ORA-00942: table or view does not exist" - the table name //dual// was mispelled, perhaps as //dua1// (with the number //1// instead of the letter //l//)
+ * Spell the table name //dual// with the letter //l//
+
+SQL Relay should also be configured to restart on reboot.  To verify this:
+
+* Reboot the server
+* Log into it when it has finished rebooting
+* Verify that the SQL Relay processes are running, as described above
+* Verify that you run queries with the //sqlrsh// client as described above
+
+Congratulations!  If you made it to this point, the SQL Relay server is configured correctly.
+
+=== Uninstallation ===
+
+If, for some reason, you need to completely uninstall SQL Relay, then run the following commands from the directory that the source trees were extracted to:
+
+{{{
+cd sqlrelay-*
+sudo make uninstall
+cd ../rudiments-*
+sudo make uninstall
+sudo rm -rf /usr/local/firstworks
+}}}

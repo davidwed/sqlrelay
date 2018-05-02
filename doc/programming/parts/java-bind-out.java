@@ -4,7 +4,7 @@ import SQLRCursor;
 public class myclass {
         public static main() {
 
-                SQLRConnection      con=new SQLRConnection("sqlrserver",(short)9000,"/tmp/test.socket","user","password",0,1);
+                SQLRConnection      con=new SQLRConnection("sqlrserver",(short)9000,"/tmp/example.socket","user","password",0,1);
                 SQLRCursor          cur=new SQLRCursor(con);
 
                 cur.prepareQuery("begin  :result1:=addTwoIntegers(:integer1,:integer2);  :result2=addTwoFloats(:float1,:float2);  :result3=convertToString(:integer3); end;");

@@ -1,4 +1,4 @@
-$cur prepareQuery "select * from testproc(?,?,?)"
+$cur prepareQuery "select * from exampleproc(?,?,?)"
 $cur inputBind "in1" 1
 $cur inputBind "in2" 1.1 4 2
 $cur inputBind "in3" "hello"

@@ -78,7 +78,7 @@ do
 		echo "pinging $DB..."
 		if ( test "$DB" = "tls" )
 		then
-			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert $PREFIX/etc/client.pem -tlsca $PREFIX/etc/ca.pem -tlsvalidate ca -command ping 2>&1`
+			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert $PREFIX/etc/sqlrelay.conf.d/client.pem -tlsca $PREFIX/etc/sqlrelay.conf.d/ca.pem -tlsvalidate ca -command ping 2>&1`
 		elif ( test "$DB" = "extensions" )
 		then
 			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping 2>&1`

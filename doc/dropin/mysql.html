@@ -112,15 +112,15 @@ Your MySQL connection id is 0 to server version: 3.23.58
 
 Type 'help;' or '\h' for help. Type '\c' to clear the buffer.
 
-mysql&gt; create table testtable (col1 varchar2(60), col2 number(5,2));
+mysql&gt; create table exampletable (col1 varchar2(60), col2 number(5,2));
 Empty set (0.21 sec)
 
 
-mysql&gt; insert into testtable values ('hello',123.45);
+mysql&gt; insert into exampletable values ('hello',123.45);
 Empty set (0.00 sec)
 
 
-mysql&gt; select * from testtable;
+mysql&gt; select * from exampletable;
 +-------+--------+
 | COL1  | COL2   |
 +-------+--------+
@@ -129,7 +129,7 @@ mysql&gt; select * from testtable;
 1 row in set (0.09 sec)
 
 
-mysql&gt; drop table testtable;
+mysql&gt; drop table exampletable;
 Empty set (0.21 sec)
 
 

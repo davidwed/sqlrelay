@@ -18,6 +18,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrresultsettranslation.cpp \
 	sqlrresultsetrowtranslations.cpp \
 	sqlrresultsetrowtranslation.cpp \
+	sqlrresultsetheadertranslations.cpp \
+	sqlrresultsetheadertranslation.cpp \
 	sqlrtriggers.cpp \
 	sqlrtrigger.cpp \
 	sqlrloggers.cpp \
@@ -35,6 +37,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrcredentials.cpp \
 	sqlrauths.cpp \
 	sqlrauth.cpp \
+	sqlrdirectives.cpp \
+	sqlrdirective.cpp \
 	$(STATICPLUGINSRCS)
 
 LIBSQLRSERVERLOBJS = \
@@ -53,6 +57,8 @@ LIBSQLRSERVERLOBJS = \
 	sqlrresultsettranslation.$(OBJ) \
 	sqlrresultsetrowtranslations.$(OBJ) \
 	sqlrresultsetrowtranslation.$(OBJ) \
+	sqlrresultsetheadertranslations.$(OBJ) \
+	sqlrresultsetheadertranslation.$(OBJ) \
 	sqlrtriggers.$(OBJ) \
 	sqlrtrigger.$(OBJ) \
 	sqlrloggers.$(OBJ) \
@@ -69,7 +75,9 @@ LIBSQLRSERVERLOBJS = \
 	sqlrpwdenc.$(OBJ) \
 	sqlrcredentials.$(OBJ) \
 	sqlrauths.$(OBJ) \
-	sqlrauth.$(OBJ)
+	sqlrauth.$(OBJ) \
+	sqlrdirectives.$(OBJ) \
+	sqlrdirective.$(OBJ)
 
 .SUFFIXES: .lo .cpp.in
 
@@ -123,7 +131,7 @@ $(SQLR)-status$(EXE): sqlr-status.cpp sqlr-status.$(OBJ)
 
 sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../connections/*.$(OBJ)`; \
+	for file in `ls ../connections/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -131,7 +139,7 @@ sqlrserverconnectiondeclarations.cpp: sqlrserverconnectiondeclarations.cpp.in
 
 sqlrserverconnectionassignments.cpp: sqlrserverconnectionassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../connections/*.$(OBJ)`; \
+	for file in `ls ../connections/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -139,7 +147,7 @@ sqlrserverconnectionassignments.cpp: sqlrserverconnectionassignments.cpp.in
 
 sqlrprotocoldeclarations.cpp: sqlrprotocoldeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../protocols/*.$(OBJ)`; \
+	for file in `ls ../protocols/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -147,7 +155,7 @@ sqlrprotocoldeclarations.cpp: sqlrprotocoldeclarations.cpp.in
 
 sqlrprotocolassignments.cpp: sqlrprotocolassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../protocols/*.$(OBJ)`; \
+	for file in `ls ../protocols/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -155,7 +163,7 @@ sqlrprotocolassignments.cpp: sqlrprotocolassignments.cpp.in
 
 sqlrparserdeclarations.cpp: sqlrparserdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../parsers/*.$(OBJ) | grep -v sqlre`; \
+	for file in `ls ../parsers/*.$(OBJ) 2> /dev/null | grep -v sqlre`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -163,7 +171,7 @@ sqlrparserdeclarations.cpp: sqlrparserdeclarations.cpp.in
 
 sqlrparserassignments.cpp: sqlrparserassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../parsers/*.$(OBJ) | grep -v sqlre`; \
+	for file in `ls ../parsers/*.$(OBJ) 2> /dev/null | grep -v sqlre`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -171,7 +179,7 @@ sqlrparserassignments.cpp: sqlrparserassignments.cpp.in
 
 sqlrloggerdeclarations.cpp: sqlrloggerdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../loggers/*.$(OBJ)`; \
+	for file in `ls ../loggers/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -179,7 +187,7 @@ sqlrloggerdeclarations.cpp: sqlrloggerdeclarations.cpp.in
 
 sqlrloggerassignments.cpp: sqlrloggerassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../loggers/*.$(OBJ)`; \
+	for file in `ls ../loggers/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -187,7 +195,7 @@ sqlrloggerassignments.cpp: sqlrloggerassignments.cpp.in
 
 sqlrnotificationdeclarations.cpp: sqlrnotificationdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../notifications/*.$(OBJ)`; \
+	for file in `ls ../notifications/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -195,7 +203,7 @@ sqlrnotificationdeclarations.cpp: sqlrnotificationdeclarations.cpp.in
 
 sqlrnotificationassignments.cpp: sqlrnotificationassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../notifications/*.$(OBJ)`; \
+	for file in `ls ../notifications/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -203,7 +211,7 @@ sqlrnotificationassignments.cpp: sqlrnotificationassignments.cpp.in
 
 sqlrscheduledeclarations.cpp: sqlrscheduledeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../schedules/*.$(OBJ)`; \
+	for file in `ls ../schedules/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -211,7 +219,7 @@ sqlrscheduledeclarations.cpp: sqlrscheduledeclarations.cpp.in
 
 sqlrscheduleassignments.cpp: sqlrscheduleassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../schedules/*.$(OBJ)`; \
+	for file in `ls ../schedules/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -219,7 +227,7 @@ sqlrscheduleassignments.cpp: sqlrscheduleassignments.cpp.in
 
 sqlrrouterdeclarations.cpp: sqlrrouterdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../routers/*.$(OBJ)`; \
+	for file in `ls ../routers/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -227,7 +235,7 @@ sqlrrouterdeclarations.cpp: sqlrrouterdeclarations.cpp.in
 
 sqlrrouterassignments.cpp: sqlrrouterassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../routers/*.$(OBJ)`; \
+	for file in `ls ../routers/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -235,7 +243,7 @@ sqlrrouterassignments.cpp: sqlrrouterassignments.cpp.in
 
 sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../pwdencs/*.$(OBJ)`; \
+	for file in `ls ../pwdencs/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -243,7 +251,7 @@ sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
 
 sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../pwdencs/*.$(OBJ)`; \
+	for file in `ls ../pwdencs/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -251,7 +259,7 @@ sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
 
 sqlrauthdeclarations.cpp: sqlrauthdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../auths/*.$(OBJ)`; \
+	for file in `ls ../auths/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -259,7 +267,23 @@ sqlrauthdeclarations.cpp: sqlrauthdeclarations.cpp.in
 
 sqlrauthassignments.cpp: sqlrauthassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../auths/*.$(OBJ)`; \
+	for file in `ls ../auths/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrdirectivedeclarations.cpp: sqlrdirectivedeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../directives/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrdirectiveassignments.cpp: sqlrdirectiveassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../directives/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -267,7 +291,7 @@ sqlrauthassignments.cpp: sqlrauthassignments.cpp.in
 
 sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../translations/*.$(OBJ)`; \
+	for file in `ls ../translations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -275,7 +299,7 @@ sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
 
 sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../translations/*.$(OBJ)`; \
+	for file in `ls ../translations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -283,7 +307,7 @@ sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
 
 sqlrresultsettranslationdeclarations.cpp: sqlrresultsettranslationdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../resultsettranslations/*.$(OBJ)`; \
+	for file in `ls ../resultsettranslations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -291,7 +315,7 @@ sqlrresultsettranslationdeclarations.cpp: sqlrresultsettranslationdeclarations.c
 
 sqlrresultsettranslationassignments.cpp: sqlrresultsettranslationassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../resultsettranslations/*.$(OBJ)`; \
+	for file in `ls ../resultsettranslations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -299,7 +323,7 @@ sqlrresultsettranslationassignments.cpp: sqlrresultsettranslationassignments.cpp
 
 sqlrresultsetrowtranslationdeclarations.cpp: sqlrresultsetrowtranslationdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../resultsetrowtranslations/*.$(OBJ)`; \
+	for file in `ls ../resultsetrowtranslations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -307,7 +331,23 @@ sqlrresultsetrowtranslationdeclarations.cpp: sqlrresultsetrowtranslationdeclarat
 
 sqlrresultsetrowtranslationassignments.cpp: sqlrresultsetrowtranslationassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../resultsetrowtranslations/*.$(OBJ)`; \
+	for file in `ls ../resultsetrowtranslations/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrresultsetheadertranslationdeclarations.cpp: sqlrresultsetheadertranslationdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../resultsetheadertranslations/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrresultsetheadertranslationassignments.cpp: sqlrresultsetheadertranslationassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../resultsetheadertranslations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -315,7 +355,7 @@ sqlrresultsetrowtranslationassignments.cpp: sqlrresultsetrowtranslationassignmen
 
 sqlrfilterdeclarations.cpp: sqlrfilterdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../filters/*.$(OBJ)`; \
+	for file in `ls ../filters/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -323,7 +363,7 @@ sqlrfilterdeclarations.cpp: sqlrfilterdeclarations.cpp.in
 
 sqlrfilterassignments.cpp: sqlrfilterassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../filters/*.$(OBJ)`; \
+	for file in `ls ../filters/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -331,7 +371,7 @@ sqlrfilterassignments.cpp: sqlrfilterassignments.cpp.in
 
 sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../queries/*.$(OBJ)`; \
+	for file in `ls ../queries/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -339,7 +379,7 @@ sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 
 sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../queries/*.$(OBJ)`; \
+	for file in `ls ../queries/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -379,6 +419,8 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrquery.h $(includedir)/sqlrelay/private/sqlrquery.h
 	$(CP) sqlrelay/private/sqlrresultsetrowtranslation.h $(includedir)/sqlrelay/private/sqlrresultsetrowtranslation.h
 	$(CP) sqlrelay/private/sqlrresultsetrowtranslations.h $(includedir)/sqlrelay/private/sqlrresultsetrowtranslations.h
+	$(CP) sqlrelay/private/sqlrresultsetheadertranslation.h $(includedir)/sqlrelay/private/sqlrresultsetheadertranslation.h
+	$(CP) sqlrelay/private/sqlrresultsetheadertranslations.h $(includedir)/sqlrelay/private/sqlrresultsetheadertranslations.h
 	$(CP) sqlrelay/private/sqlrresultsettranslation.h $(includedir)/sqlrelay/private/sqlrresultsettranslation.h
 	$(CP) sqlrelay/private/sqlrresultsettranslations.h $(includedir)/sqlrelay/private/sqlrresultsettranslations.h
 	$(CP) sqlrelay/private/sqlrrouter.h $(includedir)/sqlrelay/private/sqlrrouter.h
@@ -392,6 +434,8 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrserverincludes.h $(includedir)/sqlrelay/private/sqlrserverincludes.h
 	$(CP) sqlrelay/private/sqlrshm.h $(includedir)/sqlrelay/private/sqlrshm.h
 	$(CP) sqlrelay/private/sqlrtlscredentials.h $(includedir)/sqlrelay/private/sqlrtlscredentials.h
+	$(CP) sqlrelay/private/sqlrdirective.h $(includedir)/sqlrelay/private/sqlrdirective.h
+	$(CP) sqlrelay/private/sqlrdirectives.h $(includedir)/sqlrelay/private/sqlrdirectives.h
 	$(CP) sqlrelay/private/sqlrtranslation.h $(includedir)/sqlrelay/private/sqlrtranslation.h
 	$(CP) sqlrelay/private/sqlrtranslations.h $(includedir)/sqlrelay/private/sqlrtranslations.h
 	$(CP) sqlrelay/private/sqlrtrigger.h $(includedir)/sqlrelay/private/sqlrtrigger.h
@@ -416,6 +460,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrquery.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetrowtranslation.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetrowtranslations.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetheadertranslation.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetheadertranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsettranslation.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsettranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrouter.h
@@ -471,6 +517,8 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrqueries.h \
 		$(includedir)/sqlrelay/private/sqlrquerycursor.h \
 		$(includedir)/sqlrelay/private/sqlrquery.h \
+		$(includedir)/sqlrelay/private/sqlrresultsetheadertranslation.h \
+		$(includedir)/sqlrelay/private/sqlrresultsetheadertranslations.h \
 		$(includedir)/sqlrelay/private/sqlrresultsetrowtranslation.h \
 		$(includedir)/sqlrelay/private/sqlrresultsetrowtranslations.h \
 		$(includedir)/sqlrelay/private/sqlrresultsettranslation.h \

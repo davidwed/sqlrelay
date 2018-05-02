@@ -3,7 +3,7 @@ SQLRelayCommand sqlrcom = (SQLRelayComand)sqlrcon.CreateCommand();
 sqlrcom.CommandText = "set @out1=0, @out2=0.0, @out3=''";
 Int64 result = sqlrcom.ExecuteNonQuery();
 
-sqlrcom.CommandText = "call testproc(@out1,@out2,@out3)";
+sqlrcom.CommandText = "call exampleproc(@out1,@out2,@out3)";
 Int64 result = sqlrcom.ExecuteNonQuery();
 
 sqlrcom.CommandText = "select @out1,@out2,@out3";

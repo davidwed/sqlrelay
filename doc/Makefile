@@ -187,3 +187,4 @@ clean:
 	cd dropin $(AND) $(MAKE) clean
 	cd features $(AND) $(MAKE) clean
 	cd programming $(AND) $(MAKE) clean
+	cd howtos $(AND) $(MAKE) clean

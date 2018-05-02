@@ -1,4 +1,4 @@
-sqlrcur_sendQuery(cur,"exec testproc");
+sqlrcur_sendQuery(cur,"exec exampleproc");
 char    *field00=sqlrcur_getFieldByIndex(cur,0,0);
 char    *field01=sqlrcur_getFieldByIndex(cur,0,1);
 char    *field02=sqlrcur_getFieldByIndex(cur,0,2);

@@ -2,16 +2,12 @@
 
 * [#quick Quick Start]
 * [#basic Basic Configuration]
- * [#dbconnections Database Connections]
-  * [#dbconnections-performance For Performance]
-  * [#dbconnections-throttling Throttling]
- * [#dbcursors Database Cursors]
- * [#dynamicscaling Dynamic Scaling]
- * [#listener Listener Configuration]
  * [#database Database Configuration]
   * [#db-oracle Oracle]
-  * [#db-mssql Microsoft SQL Server (using FreeTDS)]
-  * [#db-sap SAP/Sybase]
+  * [#db-mssql-odbc Microsoft SQL Server (using ODBC)]
+  * [#db-mssql-freetds Microsoft SQL Server (using FreeTDS)]
+  * [#db-sap SAP/Sybase (using the native SAP/Sybase library)]
+  * [#db-sap-freetds SAP/Sybase (using the FreeTDS)]
   * [#db-db2 IBM DB2]
   * [#db-informix Informix]
   * [#db-mysql MySQL]
@@ -20,6 +16,12 @@
   * [#db-sqlite SQLite]
   * [#db-odbc ODBC]
   * [#db-msaccess Microsoft Access (using MDBTools)]
+ * [#dbconnections Database Connections]
+  * [#dbconnections-performance For Performance]
+  * [#dbconnections-throttling For Throttling]
+ * [#dbcursors Database Cursors]
+ * [#dynamicscaling Dynamic Scaling]
+ * [#listener Listener Configuration]
  * [#instances Multiple Instances]
  * [#autostart Starting Instances Automatically]
 * [#altconfigfile Alternate Configuration File Options]
@@ -31,7 +33,7 @@
  * [#cluster Load-Balancing and Fail-Over With Replicated Databases or Database Clusters]
  * [#rac Already-Load-Balanced Databases]
  * [#masterslave Master-Slave Query Routing]
- * [#frontend Front-End Load-Balancing and Fail-Over]
+ * [#frontendlb Front-End Load-Balancing and Fail-Over]
 * [#authoptions Authentication/Authorization Options]
  * [#userlistauth User List Auth]
  * [#dbauth Database Auth]
@@ -39,7 +41,12 @@
  * [#krb Kerberos and Active Directory Encryption and Authentication]
  * [#tls TLS/SSL Encryption and Authentication]
 * [#security Security Features]
- * [#krbtls Kerberos/Active Directory and TLS/SSL Encryption and Authentication]
+ * [#frontendencryption Front-End Encryption and Secure Authentication]
+ * [#backendencryption Back-End Encryption and Secure Authentication]
+  * [#backendenc-oracle Oracle]
+  * [#backendenc-mssql-freetds Microsoft SQL Server (using FreeTDS)]
+  * [#backendenc-mysql MySQL]
+  * [#backendenc-postgresql PostgreSQL]
  * [#runas Run-As User and Group]
  * [#deniedallowedips Denied/Allowed IP Addresses]
  * [#pwdenc Password Encryption]
@@ -47,6 +54,8 @@
  * [#filtering Query Filtering]
 * [#translation Translation]
  * [#querytranslation Query Translation]
+  * [#normalize normalize]
+  * [#patterns patterns]
  * [#resultsettranslation Result Set Translation]
 * [#queryrouting Query Routing]
  * [#regex regex]
@@ -140,7 +149,440 @@ sqlr-stop
 
 The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are you'll want to configure it further.
 
-[=#dbconnections]
+
+[[br]][=#database]
+=== Database Configuration ===
+
+By default, SQL Relay assumes that it's connecting to an Oracle database, but many other databases are supported.  The dbase attribute of the instance tag specifies the database type and the connect string options (options in the string attribute of the connection tag) specify the parameters used to connect to the database.  The connect string options are different for each database.
+
+Examples follow.
+
+[[br]][=#db-oracle]
+==== Oracle ====
+
+In this example, SQL Relay is configured to connect to an Oracle database.  The dbase parameter defaults to "oracle", so the dbase attribute may be omitted when connecting to an Oracle database.  It is just set here for illustrative purposes.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-oracle.conf@
+}}}
+}}}
+
+The oracle_home option refers to the base directory of an Oracle instance.  On Windows platforms, it should be specified as a Windows-style path with doubled backslashes.  For example:
+
+{{{#!blockquote
+{{{#!code
+C:\\Oracle\\ora12.1
+}}}
+}}}
+
+The oracle_home option is often unnecessary though, as the $ORACLE_HOME environment variable is usually set system-wide.
+
+The oracle_sid option refers to an entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora) similar to:
+
+{{{#!blockquote
+{{{#!code
+ORCL =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = examplehost)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = orcl)
+    )
+  )
+}}}
+}}}
+
+(Note that the tnsnames.ora file must be readable by the user that the instance of SQL Relay is run as.)
+
+If you are using Oracle Instant Client, then it's likely that you don't have an $ORACLE_HOME or a tnsnames.ora file.  In that case, the oracle_sid can be set directly to a tnsnames-style expression and the oracle_home option can be omitted.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-oracle-sid.conf@
+}}}
+}}}
+
+See the [configreference.html#oracle SQL Relay Configuration Reference] for other valid Oracle connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-oracle.html Getting Started With Oracle] for general assistance installing and configuring an Oracle database.
+
+[[br]][=#db-mssql-odbc]
+==== Microsoft SQL Server (using ODBC) ====
+
+On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] for some versions of Linux.
+
+In this example, SQL Relay is configured to connect to a Microsoft SQL Server database using ODBC.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-odbc.conf@
+}}}
+}}}
+
+The dsn option refers to an ODBC DSN (Data Source Name).
+
+On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
+
+On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).
+
+{{{#!blockquote
+{{{#!code
+[exampledsn]
+Description=SQL Server
+Driver=ODBC Driver 11 for SQL Server
+Server=examplehost
+Port=1433
+Database=
+User=exampleuser
+Password=examplepassword
+}}}
+}}}
+
+The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:
+
+{{{#!blockquote
+{{{#!code
+[ODBC Driver 11 for SQL Server] 
+Description=Microsoft ODBC Driver 11 for SQL Server
+Driver=/opt/microsoft/msodbcsql/lib64/libmsodbcsql-11.0.so.2270.0 
+Threading=1 
+UsageCount=1 
+}}}
+}}}
+
+(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html Getting Started With ODBC (on a non-MS platform)] for general assistance installing and configuring ODBC on a non-MS platform.
+
+[[br]][=#db-mssql-freetds]
+==== Microsoft SQL Server (using !FreeTDS) ====
+
+On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] for some versions of Linux.
+
+However, on Linux and Unix platforms, access to Microsoft SQL Server databases is also available using [http://www.freetds.org FreeTDS].
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mssql-freetds.conf@
+}}}
+}}}
+
+The server option refers to an entry in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf) which identifies the database server, similar to:
+
+{{{#!blockquote
+{{{#!code
+[EXAMPLEDB]
+	host = examplehost
+	port = 1433
+	tds version = 7.0
+	client charset = UTF-8
+}}}
+}}}
+
+(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#freetds SQL Relay Configuration Reference] for other valid !FreeTDS connect string options.
+
+[[br]][=#db-sap]
+==== SAP/Sybase (using the native SAP/Sybase library) ====
+
+In this example, SQL Relay is configured to connect to a SAP/Sybase database using the native SAP/Sybase library.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-sap.conf@
+}}}
+}}}
+
+The sybase option refers to the base directory of the SAP/Sybase software installation.  On Windows platforms, it should be specified as a Windows-style path with doubled backslashes.  For example:
+
+{{{#!blockquote
+{{{#!code
+C:\\SAP
+}}}
+}}}
+
+The sybase option is often unnecessary though, as the $SYBASE environment variable is usually set system-wide.
+
+On Linux/Unix platforms, the server option refers to an entry in the interfaces (usually $SYBASE/interfaces) file which identifies the database server, similar to:
+
+{{{#!blockquote
+{{{#!code
+EXAMPLEDB
+	master tcp ether examplehost 5000
+	query tcp ether examplehost 5000
+}}}
+}}}
+
+(Note that the interfaces file must be readable by the user that the instance of SQL Relay is run as.)
+
+On Windows platforms, the server option refers to a similar entry created in an opaque location with the Open Client Directory Services Editor (dsedit).
+
+The lang option sets the language to a value that is known to be supported by Sybase.  This may not be necessary on all platforms.  See [../faq.html#sqlserver the FAQ] for more info.
+
+See the [configreference.html#sap SQL Relay Configuration Reference] for other valid SAP/Sybase connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-sapsybase.html Getting Started With SAP/Sybase] for general assistance installing and configuring an SAP/Sybase database.
+
+[[br]][=#db-sap-freetds]
+==== SAP/Sybase (using !FreeTDS) ====
+
+The native SAP/Sybase library is available on Windows and on some Linux/Unix platforms.
+
+However, on Linux and Unix platforms, access to SAP/Sybase databases is also available using [http://www.freetds.org FreeTDS].
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-sap-freetds.conf@
+}}}
+}}}
+
+The server option refers to an entry in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf) which identifies the database server, similar to:
+
+{{{#!blockquote
+{{{#!code
+[EXAMPLEDB]
+	host = examplehost
+	port = 5000
+	tds version = 5.0
+}}}
+}}}
+
+(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#freetds SQL Relay Configuration Reference] for other valid !FreeTDS connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-sapsybase.html Getting Started With SAP/Sybase] for general assistance installing and configuring an SAP/Sybase database.
+
+[[br]][=#db-db2]
+==== IBM DB2 ====
+
+In this example, SQL Relay is configured to connect to an IBM DB2 database.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-db2.conf@
+}}}
+}}}
+
+The db option refers to an entry in the local DB2 instance's database catalog.  See [http://software.firstworks.com/p/getting-started-with-ibm-db2.html#accessingremote Getting Started With IBM DB2 - Accessing Remote Instances] for more information.
+
+The timeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.
+
+See the [configreference.html#db2 SQL Relay Configuration Reference] for other valid IBM DB2 connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started With IBM DB2] for general assistance installing and configuring an IBM DB2 database.
+
+[[br]][=#db-informix]
+==== Informix ====
+
+In this example, SQL Relay is configured to connect to an Informix database.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-informix.conf@
+}}}
+}}}
+
+The informixdir option refers to the base directory of the Informix software installation.  On Windows platforms, it should be specified as a Windows-style pathwith doubled backslashes.  For example:
+
+{{{#!blockquote
+{{{#!code
+C:\\Program Files\\IBM Informix Software Bundle
+}}}
+}}}
+
+The informixdir option is often unnecessary, as the $INFORMIXDIR environment variable is usually set system-wide.
+
+On Linux and Unix platforms, the servername option refers to an entry in the sqlhosts file (usually $INFORMIXDIR/etc/sqlhosts) which identifies the database server, similar to:
+
+{{{#!blockquote
+{{{#!code
+ol_informix1210 onsoctcp 192.168.123.59 ol_informix1210
+}}}
+}}}
+
+The second ol_informix1210 in the sqlhosts file refers to an entry in /etc/services which identifies the port that the server is listening on, similar to:
+
+{{{#!blockquote
+{{{#!code
+ol_informix1210 29756/tcp
+}}}
+}}}
+
+(Note that the sqlhosts and /etc/services files must be readable by the user that the instance of SQL Relay is run as.)
+
+On Windows platforms, the servername option refers to a similar entry created in an opaque location with the Setnet32 program.
+
+See the [configreference.html#informix SQL Relay Configuration Reference] for other valid Informix connect string options.
+
+[[br]][=#db-mysql]
+==== !MySQL ====
+
+In this example, SQL Relay is configured to connect to a !MySQL database.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysql.conf@
+}}}
+}}}
+
+The host and db options indicate that SQL Relay should connect to the database exampledb on the host examplehost.
+
+See the [configreference.html#mysql SQL Relay Configuration Reference] for other valid !MySQL connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-mysql.html Getting Started With MySQL] for general assistance installing and configuring a !MySQL database.
+
+[[br]][=#db-postgresql]
+==== !PostgreSQL ====
+
+In this example, SQL Relay is configured to connect to a !PostgreSQL database.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresql.conf@
+}}}
+}}}
+
+The host and db options indicate that SQL Relay should connect to the database exampledb on the host examplehost.
+
+See the [configreference.html#postgresql SQL Relay Configuration Reference] for other valid !PostgreSQL connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-postgresql.html Getting Started With PostgreSQL] for general assistance installing and configuring a !PostgreSQL database.
+
+[[br]][=#db-firebird]
+==== Firebird ====
+
+In this example, SQL Relay is configured to connect to a Firebird database.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-firebird.conf@
+}}}
+}}}
+
+The db option indicates that SQL Relay should connect to the database located at /opt/firebird/exampledb.gdb on the host examplehost.
+
+Note that if the database is located on a Windows host, then the path segment of the db option should be specified as a Windows-style path with doubled backslashes.  For example:
+{{{#!blockquote
+{{{#!code
+examplehost:C:\\Program Files\\Firebird\\Firebird_3_0\\exampledb.gdb
+}}}
+}}}
+
+See the [configreference.html#firebird SQL Relay Configuration Reference] for other valid Firebird connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-firebird.html Getting Started With Firebird] for general assistance installing and configuring a Firebird database.
+
+[[br]][=#db-sqlite]
+==== SQLite ====
+
+In this example, SQL Relay is configured to connect to a SQLite database.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-sqlite.conf@
+}}}
+}}}
+
+The db option indicates that SQL Relay should connect to the database /var/sqlite/exampledb.
+
+Note that the database file (exampledb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay is run as.
+
+SQLite also supports a high-performance in-memory mode where tables are maintained in memory and nothing is written to permanent storage.  To use this mode with SQL Relay, set the db option to :memory:.
+
+As each running instance of sqlr-connection will have its own separate in-memory database, you almost certainly want to limit the number of connections to 1.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-sqlite-memory.conf@
+}}}
+}}}
+
+Note that the entire in-memory database will be lost when SQL Relay is stopped.  There is no way to preserve it.  Such is the nature of pure in-memory databases.
+
+See the [configreference.html#sqlite SQL Relay Configuration Reference] for other valid SQLite connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-sqlite.html Getting Started With SQLite] for general assistance installing and configuring a SQLite database.
+
+[[br]][=#db-odbc]
+==== ODBC ====
+
+SQL Relay supports most popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.
+
+On Windows platforms, ODBC is commonly used to access Microsoft SQL Server and Microsoft Access databases.  On some Linux platforms, the [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] is also commonly used to access Microsoft SQL Server databases, as an alternative to [http://www.freetds.org FreeTDS].  Many other database vendors provide ODBC drivers for Windows and Linux platforms though.
+
+In this example, SQL Relay is configured to connect to an ODBC database.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-odbc.conf@
+}}}
+}}}
+
+The dsn option refers to an ODBC DSN (Data Source Name).
+
+On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
+
+On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini) which identifies the database server, similar to:
+
+{{{#!blockquote
+{{{#!code
+[exampledsn]
+Description=SQL Server
+Driver=ODBC Driver 11 for SQL Server
+Server=examplehost
+Port=1433
+Database=
+User=exampleuser
+Password=examplepassword
+}}}
+}}}
+
+The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:
+
+{{{#!blockquote
+{{{#!code
+[ODBC Driver 11 for SQL Server] 
+Description=Microsoft ODBC Driver 11 for SQL Server
+Driver=/opt/microsoft/msodbcsql/lib64/libmsodbcsql-11.0.so.2270.0 
+Threading=1 
+UsageCount=1 
+}}}
+}}}
+
+(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html Getting Started With ODBC (on a non-MS platform)] for general assistance installing and configuring ODBC on a non-MS platform.
+
+[[br]][=#db-msaccess]
+==== Microsoft Access (using MDBTools) ====
+
+On Windows platforms, ODBC can be used to access a Microsoft Access database.
+
+On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available using [http://mdbtools.sourceforge.net MDBTools].
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-msaccess.conf@
+}}}
+}}}
+
+The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.
+
+(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#mdbtools SQL Relay Configuration Reference] for other valid MDBTools connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html Getting Started With MS Access (on a non-MS platform)] for general assistance with MS Access databases on non-MS platforms.
+
+
+[[br]][=#dbconnections]
 === Database Connections ===
 
 By default, SQL Relay opens and maintains a pool of 5 [../features/connectionpooling.html persistent database connections], but the number of connections can be configured using the connections attribute.
@@ -167,14 +609,15 @@ The command above also returns the "shmmax requirement" for the configuration.  
 }}}
 
 [=#dbconnections-performance]
-=== For Performance ===
+==== For Performance ====
 
 In a performance-oriented configuration, a good rule of thumb is to open as many connections as you can.  That number is usually environment-specific, and dictated by database, system and network resources.
 
 [=#dbconnections-throttling]
-=== Throttling ===
+==== For Throttling ====
 
 If you intend to [../features/throttling.html throttle] database access to a particular application, then you may intentionally configure a small number of connections.
+
 
 [[br]][=#dbcursors]
 === Database Cursors ===
@@ -271,384 +714,6 @@ If the server has multiple network interfaces, SQL Relay can also be configured 
 When configured this way, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
 
 If the socket option is specified but port and addresses options are not, then SQL Relay will only listen on the socket.  If addresses/port and socket options are both specified then it listens on both.
-
-
-[[br]][=#database]
-=== Database Configuration ===
-
-By default, SQL Relay assumes that it's connecting to an Oracle database, but many other databases are supported.  The dbase attribute of the instance tag specifies the database type and the connect string options (options in the string attribute of the connection tag) specify the parameters used to connect to the database.  The connect string options are different for each database.
-
-Examples follow.
-
-[[br]][=#db-oracle]
-==== Oracle ====
-
-In this example, SQL Relay is configured to connect to an Oracle database.  The dbase parameter defaults to "oracle", so the dbase attribute may be omitted when connecting to an Oracle database.  It is just set here for illustrative purposes.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-oracle.conf@
-}}}
-}}}
-
-The oracle_home option refers to the base directory of an Oracle instance.  On Windows platforms, it should be specified as a Windows-style path with doubled backslashes.  For example:
-
-{{{#!blockquote
-{{{#!code
-C:\\Oracle\\ora12.1
-}}}
-}}}
-
-The oracle_home option is often unnecessary though, as the $ORACLE_HOME environment variable is usually set system-wide.
-
-The oracle_sid option refers to an entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora) similar to:
-
-{{{#!blockquote
-{{{#!code
-ORCL =
-  (DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST = testhost)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = orcl)
-    )
-  )
-}}}
-}}}
-
-(Note that the tnsnames.ora file must be readable by the user that the instance of SQL Relay is run as.)
-
-If you are using Oracle Instant Client, then it's likely that you don't have an $ORACLE_HOME or a tnsnames.ora file.  In that case, the oracle_sid can be set directly to a tnsnames-style expression and the oracle_home option can be omitted.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-oracle-sid.conf@
-}}}
-}}}
-
-See the [configreference.html#oracle SQL Relay Configuration Reference] for other valid Oracle connect string options.
-
-See [http://systems.firstworks.com/p/getting-started-with-oracle.html Getting Started With Oracle] for general assistance installing and configuring an Oracle database.
-
-[[br]][=#db-mssql-freetds]
-==== Microsoft SQL Server (using !FreeTDS) ====
-
-On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] for some versions of Linux.
-
-However, on Linux and Unix platforms, access to Microsoft SQL Server databases is also available using [http://www.freetds.org FreeTDS].
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-mssql-freetds.conf@
-}}}
-}}}
-
-The server option refers to an entry in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf) which identifies the database server, similar to:
-
-{{{#!blockquote
-{{{#!code
-[TESTDB]
-	host = testhost
-	port = 1433
-	tds version = 7.0
-	client charset = UTF-8
-}}}
-}}}
-
-(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay is run as.)
-
-See the [configreference.html#freetds SQL Relay Configuration Reference] for other valid !FreeTDS connect string options.
-
-[[br]][=#db-sap]
-==== SAP/Sybase (using the native SAP/Sybase library) ====
-
-In this example, SQL Relay is configured to connect to a SAP/Sybase database using the native SAP/Sybase library.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-sap.conf@
-}}}
-}}}
-
-The sybase option refers to the base directory of the SAP/Sybase software installation.  On Windows platforms, it should be specified as a Windows-style path with doubled backslashes.  For example:
-
-{{{#!blockquote
-{{{#!code
-C:\\SAP
-}}}
-}}}
-
-The sybase option is often unnecessary though, as the $SYBASE environment variable is usually set system-wide.
-
-On Linux/Unix platforms, the server option refers to an entry in the interfaces (usually $SYBASE/interfaces) file which identifies the database server, similar to:
-
-{{{#!blockquote
-{{{#!code
-TESTDB
-	master tcp ether testhost 5000
-	query tcp ether testhost 5000
-}}}
-}}}
-
-(Note that the interfaces file must be readable by the user that the instance of SQL Relay is run as.)
-
-On Windows platforms, the server option refers to a similar entry created in an opaque location with the Open Client Directory Services Editor (dsedit).
-
-The lang option sets the language to a value that is known to be supported by Sybase.  This may not be necessary on all platforms.  See [../faq.html#sqlserver the FAQ] for more info.
-
-See the [configreference.html#sap SQL Relay Configuration Reference] for other valid SAP/Sybase connect string options.
-
-See [http://systems.firstworks.com/p/getting.html Getting Started With SAP/Sybase] for general assistance installing and configuring an SAP/Sybase database.
-
-[[br]][=#db-sapfreetds]
-==== SAP/Sybase (using !FreeTDS) ====
-
-While the SAP/Sybase native library can be used to access a SAP/Sybase database on all platforms, on Linux and Unix platforms, access to SAP/Sybase databases is also available using [http://www.freetds.org FreeTDS].
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-sap-freetds.conf@
-}}}
-}}}
-
-The server option refers to an entry in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf) which identifies the database server, similar to:
-
-{{{#!blockquote
-{{{#!code
-[TESTDB]
-	host = testhost
-	port = 5000
-	tds version = 5.0
-}}}
-}}}
-
-(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay is run as.)
-
-See the [configreference.html#freetds SQL Relay Configuration Reference] for other valid !FreeTDS connect string options.
-
-See [http://systems.firstworks.com/p/getting.html Getting Started With SAP/Sybase] for general assistance installing and configuring an SAP/Sybase database.
-
-[[br]][=#db-db2]
-==== IBM DB2 ====
-
-In this example, SQL Relay is configured to connect to an IBM DB2 database.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-db2.conf@
-}}}
-}}}
-
-The db option refers to an entry in the local DB2 instance's database catalog.  See [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html#accessingremote Getting Started With IBM DB2 - Accessing Remote Instances] for more information.
-
-The timeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.
-
-See the [configreference.html#db2 SQL Relay Configuration Reference] for other valid IBM DB2 connect string options.
-
-See [http://systems.firstworks.com/p/getting-started-with-ibm-db2.html Getting Started With IBM DB2] for general assistance installing and configuring an IBM DB2 database.
-
-[[br]][=#db-informix]
-==== Informix ====
-
-In this example, SQL Relay is configured to connect to an Informix database.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-informix.conf@
-}}}
-}}}
-
-The informixdir option refers to the base directory of the Informix software installation.  On Windows platforms, it should be specified as a Windows-style pathwith doubled backslashes.  For example:
-
-{{{#!blockquote
-{{{#!code
-C:\\Program Files\\IBM Informix Software Bundle
-}}}
-}}}
-
-The informixdir option is often unnecessary, as the $INFORMIXDIR environment variable is usually set system-wide.
-
-On Linux and Unix platforms, the servername option refers to an entry in the sqlhosts file (usually $INFORMIXDIR/etc/sqlhosts) which identifies the database server, similar to:
-
-{{{#!blockquote
-{{{#!code
-ol_informix1210 onsoctcp 192.168.123.59 ol_informix1210
-}}}
-}}}
-
-The second ol_informix1210 in the sqlhosts file refers to an entry in /etc/services which identifies the port that the server is listening on, similar to:
-
-{{{#!blockquote
-{{{#!code
-ol_informix1210 29756/tcp
-}}}
-}}}
-
-(Note that the sqlhosts and /etc/services files must be readable by the user that the instance of SQL Relay is run as.)
-
-On Windows platforms, the servername option refers to a similar entry created in an opaque location with the Setnet32 program.
-
-See the [configreference.html#informix SQL Relay Configuration Reference] for other valid Informix connect string options.
-
-[[br]][=#db-mysql]
-==== !MySQL ====
-
-In this example, SQL Relay is configured to connect to a !MySQL database.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-mysql.conf@
-}}}
-}}}
-
-The host and db options indicate that SQL Relay should connect to the database testdb on the host testhost.
-
-See the [configreference.html#mysql SQL Relay Configuration Reference] for other valid !MySQL connect string options.
-
-See [http://systems.firstworks.com/p/getting-started-with-mysql.html Getting Started With MySQL] for general assistance installing and configuring a !MySQL database.
-
-[[br]][=#db-postgresql]
-==== !PostgreSQL ====
-
-In this example, SQL Relay is configured to connect to a !PostgreSQL database.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-postgresql.conf@
-}}}
-}}}
-
-The host and db options indicate that SQL Relay should connect to the database testdb on the host testhost.
-
-See the [configreference.html#postgresql SQL Relay Configuration Reference] for other valid !PostgreSQL connect string options.
-
-See [http://systems.firstworks.com/p/blog-page_51.html Getting Started With PostgreSQL] for general assistance installing and configuring a !PostgreSQL database.
-
-[[br]][=#db-firebird]
-==== Firebird ====
-
-In this example, SQL Relay is configured to connect to a Firebird database.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-firebird.conf@
-}}}
-}}}
-
-The db option indicates that SQL Relay should connect to the database located at /opt/firebird/testdb.gdb on the host testhost.
-
-Note that if the database is located on a Windows host, then the path segment of the db option should be specified as a Windows-style path with doubled backslashes.  For example:
-{{{#!blockquote
-{{{#!code
-testhost:C:\\Program Files\\Firebird\\Firebird_3_0\\testdb.gdb
-}}}
-}}}
-
-See the [configreference.html#firebird SQL Relay Configuration Reference] for other valid Firebird connect string options.
-
-See [http://systems.firstworks.com/p/getting-started-with-firebird.html Getting Started With Firebird] for general assistance installing and configuring a Firebird database.
-
-[[br]][=#db-sqlite]
-==== SQLite ====
-
-In this example, SQL Relay is configured to connect to a SQLite database.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-sqlite.conf@
-}}}
-}}}
-
-The db option indicates that SQL Relay should connect to the database /var/sqlite/testdb.
-
-Note that the database file (testdb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay is run as.
-
-SQLite also supports a high-performance in-memory mode where tables are maintained in memory and nothing is written to permanent storage.  To use this mode with SQL Relay, set the db option to :memory:.
-
-As each running instance of sqlr-connection will have its own separate in-memory database, you almost certainly want to limit the number of connections to 1.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-sqlite-memory.conf@
-}}}
-}}}
-
-Note that the entire in-memory database will be lost when SQL Relay is stopped.  There is no way to preserve it.  Such is the nature of pure in-memory databases.
-
-See the [configreference.html#sqlite SQL Relay Configuration Reference] for other valid SQLite connect string options.
-
-See [http://systems.firstworks.com/p/getting-started-with-sqlite.html Getting Started With SQLite] for general assistance installing and configuring a SQLite database.
-
-[[br]][=#db-odbc]
-==== ODBC ====
-
-ODBC can be used to access databases for which SQL Relay has no native support.  On Windows platforms, ODBC is commonly used to access Microsoft SQL Server and Microsoft Access databases.  On Linux platforms, the [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] is also commonly used to access Microsoft SQL Server databases, as an alternative to [http://www.freetds.org FreeTDS].
-
-In this example, SQL Relay is configured to connect to a ODBC database.
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-odbc.conf@
-}}}
-}}}
-
-The dsn option refers to an ODBC DSN (Data Source Name).
-
-On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini) which identifies the database server, similar to:
-
-{{{#!blockquote
-{{{#!code
-[testdsn]
-Description=SQL Server
-Driver=ODBC Driver 11 for SQL Server
-Server=testhost
-Port=1433
-Database=
-User=testuser
-Password=testpassword
-}}}
-}}}
-
-The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:
-
-{{{#!blockquote
-{{{#!code
-[ODBC Driver 11 for SQL Server] 
-Description=Microsoft ODBC Driver 11 for SQL Server
-Driver=/opt/microsoft/msodbcsql/lib64/libmsodbcsql-11.0.so.2270.0 
-Threading=1 
-UsageCount=1 
-}}}
-}}}
-
-(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)
-
-On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (odbcad32.exe).
-
-See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
-
-See [http://systems.firstworks.com/p/blog-page_65.html Getting Started With ODBC (on a non-MS platform)] for general assistance installing and configuring ODBC on a non-MS platform.
-
-[[br]][=#db-msaccess]
-==== Microsoft Access (using MDBTools) ====
-
-On Windows platforms, ODBC can be used to access a Microsoft Access database.
-
-On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available using [http://mdbtools.sourceforge.net MDBTools].
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-msaccess.conf@
-}}}
-}}}
-
-The db option indicates that SQL Relay should connect to the database /var/mdbtools/testdb.mdb.
-
-(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)
-
-See the [configreference.html#mdbtools SQL Relay Configuration Reference] for other valid MDBTools connect string options.
-
-See [http://systems.firstworks.com/p/blog-page_8.html Getting Started With MS Access (on a non-MS platform)] for general assistance with MS Access databases on non-MS platforms.
 
 
 [[br]][=#instances]
@@ -1056,7 +1121,7 @@ sqlrsh -host sqlrserver -user routeruser -password routerpassword
 }}}
 
 
-[[br]][=#frontend]
+[[br]][=#frontendlb]
 === Front-End Load-Balancing and Fail-Over ===
 
 If you are building out a high availability environment, or if your pool of application servers is just sufficiently large, you might want to set up a pool of SQL Relay servers between your application servers and the database.
@@ -1084,7 +1149,7 @@ Round-robin DNS is so-called because, traditionally, the order of the IP address
 
 There are several options for controlling which users are allowed to access an instance of SQL Relay.
 
-[=#userlistauth]
+[[br]][=#userlistauth]
 === User List Auth ===
 
 The standard authentication/authorization option is //user list// auth.
@@ -1102,7 +1167,7 @@ To enable user list auth, you must provide a list of valid user/password combina
 [[br]][=#dbauth]
 === Database Auth ===
 
-Another authentication/authorization option is //database// auth.
+Another popular authentication/authorization option is //database// auth.
 
 When database auth is used, a user is authenticated/authorized against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.
 
@@ -1144,7 +1209,7 @@ To enable proxied auth, omit the list of user/passwords and configure authtier="
 [[br]][=#krb]
 === Kerberos and Active Directory Encryption and Authentication ===
 
-SQL Relay supports Kerberos encryption and authentication.
+SQL Relay supports Kerberos encryption and authentication between the SQL Relay client and SQL Relay Server.
 
 When Kerberos encryption and authentication is used:
 
@@ -1226,7 +1291,7 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 [[br]][=#tls]
 === TLS/SSL Encryption and Authentication ===
 
-SQL Relay supports TLS/SSL encryption and authentication.
+SQL Relay supports TLS/SSL encryption and authentication between the SQL Relay client and SQL Relay Server.
 
 When TLS/SSL encryption and authentication is used:
 
@@ -1236,7 +1301,9 @@ When TLS/SSL encryption and authentication is used:
 When using TLS/SSL encryption and authentication, at minimum, a certificate must be supplied to the SQL Relay server.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.
 
 
-The following configuration enables TLS/SSL security for an instance of SQL relay:
+==== Encryption Only ====
+
+The following configuration enables TLS/SSL encryption for an instance of SQL relay:
 
 {{{#!blockquote
 {{{#!code
@@ -1245,7 +1312,8 @@ The following configuration enables TLS/SSL security for an instance of SQL rela
 }}}
 
 * The '''tls''' parameter enables (or disables) TLS/SSL encryption.
-* The '''tlscert''' parameter specifies the TLS/SSL certificate chain to use. (See [tlscert.html The tlscert Parameter] for details)
+* The '''tlscert''' parameter specifies the TLS/SSL certificate chain to use.
+ * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlscert.html The tlscert Parameter] for details.)
 * User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
 
 To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert parameter.  If that criterium is met then the instance can be started using:
@@ -1271,6 +1339,7 @@ sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate 
 This establishes a TLS/SSL-encrypted session but does not validate the server's certificate or identity.  The session will only continue if the server's certificate is is well-formed and hasn't expired, '''but the client is still vulnerable to various attacks'''.
 
 [[br]]
+==== Certificate Validation ====
 
 For a more secure session, the client may validate that the server's certificate was signed by a trusted certificate authority, known to the system, as follows:
 
@@ -1293,6 +1362,7 @@ sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate 
 This establishes a TLS/SSL-encrypted session with the server and validates the server's certificate, but does not validate the server's identity.  The session will only continue if the server's certificate is valid, '''but the client is still vulnerable to various attacks'''.
 
 [[br]]
+==== Host Name Validation ====
 
 For a more secure session, the client may validate that the host name provided by the server's certificate matches the host name that the client meant to connect to, as follows:
 
@@ -1307,8 +1377,9 @@ sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tl
 Note that the fully qualified host name was provided.  Note also the use of the ca+host value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the host name will also be validated.  If the certificate contains Subject Alternative Names, then the host name will be compared to each of them.  If no Subject Alternative Names are provided then the host name will be compared to the certificate's Common Name.  The session will only continue if the sever's certificate and identity are both valid.
 
 [[br]]
+==== Domain Name Validation ====
 
-Unless self-signed, certificates can be expensive, so certificates are often shared by multiple servers across a domain.  To manage environments like this, the host name validation can be relaxed as follows:
+Unless self-signed, certificates can be expensive, so certificates are often shared by multiple servers across a domain.  To manage environments like this, the host name validation can be relaxed as follows, to just domain name validation:
 
 {{{#!blockquote
 {{{
@@ -1321,6 +1392,7 @@ sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tl
 Note that the fully qualified host name was provided.  Note also the use of the ca+domain value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the domain name portion of the host name will also be validated.  If the certificate contains Subject Alternative Names, then the domain name portion of the host name will be compared to the domain name portion of each of them.  If no Subject Alternative Names are provided then the domain name portion of the host name will be compared to the domain name portion of the certificate's Common Name.  The session will only continue if the sever's certificate and domain identity are both valid.
 
 [[br]]
+==== Mutual Authentication ====
 
 For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.
 
@@ -1333,10 +1405,13 @@ The following configuration enables these checks for an instance of SQL relay:
 }}}
 
 * The '''tlsvalidate''' parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.
-* The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.  (See [tlsca.html The tlsca Parameter] for details)
-* User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
+* The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
+ * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlsca.html The tlsca Parameter] for details.)
+* User list auth is also used.
 
-Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name of no SAN's are present) are authorized against the list of valid names.
+Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authorized against the list of valid names.
+
+Note also that when '''tlsvalidate''' is set to "yes", database and proxied auth cannot currently be used.  This is because database and proxied auth both require a user name and password but the client certificate doesn't provide either.
 
 To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:
 
@@ -1362,6 +1437,9 @@ sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/s
 
 In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.
 
+[[br]]
+==== Performance Considerations ====
+
 While TLS/SSL authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:
 
 * When establishing the secure session, a significant amount of data must be sent back and forth between the client and server over multiple network round-trips.
@@ -1377,10 +1455,297 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 
 SQL Relay offers several features to enhance security.
 
-[[br]][=#krbtls]
-=== Kerberos/Active Directory and TLS/SSL Encryption and Authentication ===
+[[br]][=#frontendencryption]
+=== Front-End Encryption and Secure Authentication ===
 
-As mentioned in the [#authoptions Authentication/Authorization Options] section above, SQL Relay supports [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication].
+As mentioned in the [#authoptions Authentication/Authorization Options] section above, SQL Relay supports [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication] between the SQL Relay client and SQL Relay server.
+
+[[br]][=#backendencryption]
+=== Back-End Encryption and Secure Authentication ===
+
+SQL Relay also supports TLS/SSL Encryption and Authentication between the SQL Relay server and some databases.
+
+The configuration details differ between databases though.
+
+[[br]][=#backendenc-oracle]
+=== Oracle ===
+
+Modern Oracle databases support the following TLS/SSL features:
+
+* Encryption
+* Certificate Validation
+* Distinguished Name Validation
+* Mutual Authentication
+
+Configuring SQL Relay to use TLS/SSL encryption and authentication with an Oracle database involves:
+
+* Configuring SQL*Net on the database server to support secure connections
+* Configuring SQL*Net on the SQL Relay server to support secure connections
+* Telling SQL Relay to use an oracle_sid that refers to a secure connection
+
+Most of the configuration on the SQL Relay server is done outside of SQL Relay itself.
+
+Configuring SQL*Net involves setting up Oracle Wallets, which is a relatively complex process.  See [http://software.firstworks.com/p/oracle-tlsssl-encryption-tutorials.html Oracle TLS/SSL Encryption Tutorials] for more information.  Once that is done though, the SQL Relay configuration is relatively simple.
+
+In this example, orcltls refers to a TLS/SSL-secured entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora):
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-oracle-tls.conf@
+}}}
+}}}
+
+In this example, there is no tnsnames.ora file, so the oracle_sid is set directly to a tnsnames-style expression that describes a TLS/SSL-secured connection:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-oracle-sid-tls.conf@
+}}}
+}}}
+
+Note the TCPS protocol and port 2848.  Also note that the SERVICE_NAME is still set to orcl, rather than orcltls.
+
+This example adds distinguished name validation:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-oracle-sid-tls-dn.conf@
+}}}
+}}}
+
+In this case, the database server's certificate is expected to present the distinguished name: CN=examplehost.yourdomain.com
+
+[[br]][=#backendenc-mssql-freetds]
+=== Microsoft SQL Server (using !FreeTDS) ===
+
+Modern Microsoft SQL Server databases support the following TLS/SSL features:
+
+* Encryption
+* Certificate Validation
+* Common Name Validation
+
+Microsoft SQL Server does not support Mutual Authentication over TLS/SSL.
+
+Configuring SQL Relay to use TLS/SSL encryption and authentication with a Microsoft SQL Server database using !FreeTDS involves:
+
+* Installing a certificate and key on the database server
+* Configuring !FreeTDS on the SQL Relay server to support secure connections
+* Telling SQL Relay to use a !FreeTDS server entry that refers to a secure connection
+
+Modern Microsoft SQL Server databases support encryption by default, and enable it upon request.  However, a certificate must be installed on the database server to support authentication.  This process can be tricky because SQL Server places some specific requirements on the certificate:
+
+* The common name MUST match the fully qualified domain name of the database server (host name + primary DNS suffix).
+ * ...but Windows servers are commonly configured without a primary DNS suffix.
+* The Enhanced Key Usage property MUST include Server Authentication.
+ * Or, in openssl terms: the extendedKeyUsage extension must include serverAuth in the extfile used to generate the certificate signing request.
+
+See [http://software.firstworks.com/p/tlsssl-encryption-with-ms-sql-server.html  TLS/SSL Encryption with MS SQL Server and FreeTDS] for more information.
+
+Most of the configuration on the SQL Relay server is done outside of SQL Relay itself, in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf).
+
+In this example, !FreeTDS is configured to require an encrypted connection to the database:
+
+{{{#!blockquote
+{{{#!code
+[EXAMPLEDB]
+	host = examplehost
+	port = 1433
+	tds version = 7.1
+	client charset = UTF-8
+	encryption = require
+}}}
+}}}
+
+Note that the tds version is 7.1 or higher.  Version 7.0 doesn't support encryption.
+
+In this example, !FreeTDS is also configured to validate the database server's certificate against the CA cert /etc/ca.pem (but does not validate the common name):
+
+{{{#!blockquote
+{{{#!code
+[EXAMPLEDB]
+	host = examplehost
+	port = 1433
+	tds version = 7.1
+	client charset = UTF-8
+	encryption = require
+	ca file = /etc/ca.pem
+	check certificate hostname = no
+}}}
+}}}
+
+In this example, !FreeTDS is also configured to validate that the common name in the database server's certificate matches the database server's host name:
+
+{{{#!blockquote
+{{{#!code
+[EXAMPLEDB]
+	host = examplehost.yourdomain.com
+	port = 1433
+	tds version = 7.1
+	client charset = UTF-8
+	encryption = require
+	ca file = /etc/ca.pem
+	check certificate hostname = yes
+}}}
+}}}
+
+Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
+
+The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, EXAMPLEDB refers to the !FreeTDS EXAMPLEDB entry configured above:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mssql-freetds.conf@
+}}}
+}}}
+
+
+[[br]][=#backendenc-mysql]
+=== !MySQL ===
+
+Modern !MySQL databases support the following TLS/SSL features:
+
+* Encryption
+* Certificate Validation
+* Common Name Validation
+
+!MySQL does not support Mutual Authentication over TLS/SSL.
+
+Configuring SQL Relay to use TLS/SSL encryption and authentication with a !MySQL database involves:
+
+* Installing a certificate and key on the database server
+* Configuring the SQL Relay server to support encryption and/or authentication
+* Installing CA certs and revocation lists, as necessary, on the SQL Relay server
+
+!MySQL has supported TLS/SSL encryption and authentication since version 4.0, and encryption has been enabled by default since version 5.7.  Older versions require host configuration to enable encryption though, and a certificate must be installed on the database server to support authentication.  See [https://dev.mysql.com/doc/refman/5.7/en/encrypted-connections.html Using Encrypted Connections] for more information.
+
+On the SQL Relay server, most of the configuration is done in the SQL Relay configuration file, in the string attribute of the connection tag.
+
+The following example requires an encrypted connection:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysql-tls.conf@
+}}}
+}}}
+
+The following connection string options are supported:
+
+* '''sslmode''' - The ssl mode of the connection.
+ * disable - Don't use an encrypted connection.
+ * prefer - Use an encrypted connection if the database supports it.
+ * require - Require an encrypted connection.
+ * verify-ca - Require an encrypted connection and validate the server's certificate.
+ * verify-full - Require an encrypted connection, validate the server's certificate, and validate that the common name in the server's certificate matches the server's host name.
+* '''tlsversion''' - the TLS version to use
+ * TLSv1
+ * TLSv1.1
+ * TLSv1.2
+ * Any more recent version of TLS, as supported by and enabled in the underlying !MySQL client/server.
+ * If left blank or omitted, then the highest supported version is negotiated.
+* '''sslkey''' - The full path name of an ssl key file (eg. /etc/certs/key.pem).
+* '''sslcert''' - The full path name of an ssl certificate file (eg. /etc/certs/cert.pem).
+* '''sslcipher''' - A list of permissable ciphers to use for SSL encryption.  Only necessary if you want to restrict which cipers to use.
+* '''sslca''' - The full path name of an SSL CA certificate to add to the list of trusted CA certificates to validate the host's certificate against (eg. /etc/certs/ca.pem).
+* '''sslcapath''' - The full path name to a directory that contains a set of trusted SSL CA certificates to add to the list of trusted CA certificates to validate the host's certificate against (eg. /etc/certs/ca).
+* '''sslcrl''' - The full path name of an SSL certificate revocation list (eg. /etc/certs/crl.pem).
+* '''sslcrlpath''' - The full path name of a directory that contains a set of SSL certificate revocation lists (eg. /etc/certs/crl).
+
+The following example also validates the database server's certificate against the CA cert /etc/ca.pem (but does not validate the common name):
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysql-tls-verify-ca.conf@
+}}}
+}}}
+
+The following example also validates that the common name in the database server's certificate matches the database server's host name:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysql-tls-verify-full.conf@
+}}}
+}}}
+
+Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
+
+[[br]][=#backendenc-postgresql]
+=== !PostgreSQL ===
+
+Modern !PostgreSQL databases support the following TLS/SSL features:
+
+* Encryption
+* Certificate Validation
+* Common Name Validation
+* Mutual Authentication
+
+Configuring SQL Relay to use TLS/SSL encryption and authentication with a !PostgreSQL database involves:
+
+* Configuring the database server to support secure connections
+* Installing a certificate on the database server
+* Configuring the SQL Relay server to support secure connections
+* Installing a certificate on the SQL Relay server
+
+* Configuring the database server to support encryption and/or authentication
+* Installing certificate, key, CA certs, and revocation lists, as necessary, on the database server
+* Configuring the SQL Relay server to support encryption and/or authentication
+* Installing certificate, key, CA certs, and revocation lists, as necessary, on the SQL Relay server
+
+!PostgreSQL has supported TLS/SSL encryption and authentication since at least version 7.1.  Enabling encryption and/or authentication is straightforward.  See [https://www.postgresql.org/docs/9.6/static/ssl-tcp.html Secure TCP/IP Connections with SSL] for more information.
+
+On the SQL Relay server, most of the configuration is done by adding an '''sslmode''' parameter to the string attribute of the connection tag, in the SQL Relay configuration file.
+
+The following example requires an encrypted connection:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresql-tls.conf@
+}}}
+}}}
+
+The following '''sslmode''' options are supported:
+
+* disable - Don't use an encrypted connection.
+* allow - Allow an encrypted connection if the database supports it.
+* prefer - Use an encrypted connection if the database supports it.
+* require - Require an encrypted connection.
+* verify-ca - Require an encrypted connection and validate the server's certificate.
+* verify-full - Require an encrypted connection, validate the server's certificate, and validate that the common name in the server's certificate matches the server's host name.
+
+If '''sslmode''' is set to any value other than disable, then certificate and key files must be present as:
+
+* ~/.postgresql/postgresql.crt
+* ~/.postgresql/postgresql.key
+
+(where ~/ refers to the home directory of the user that sqlrelay is configured to run as)
+
+If '''sslmode''' is set to verify-ca or verify-full then a CA cert file must be present as:
+
+* ~/.postgresql/root.crt
+
+Optionally, a certificate revocation list may also be present as:
+
+* ~/.postgresql/root.crl
+
+See [http://www.postgresql.org/docs/devel/static/libpq-ssl.html#LIBPQ-SSL-FILE-USAGE SSL Client File Usage] for more information about file names and locations.
+
+The following example also validates the database server's certificate (but does not validate the common name):
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresql-tls-verify-ca.conf@
+}}}
+}}}
+
+The following example also validates that the common name in the database server's certificate matches the database server's host name:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresql-tls-verify-full.conf@
+}}}
+}}}
+
+Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
+
 
 [[br]][=#runas]
 === Run-As User and Group ===
@@ -1442,7 +1807,7 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 In this example, the //id// and //count// attributes are parameters for the //rot// module.  "13" tells the module to rotate by 13 characters.  The //id// attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The //id// attribute is mandatory.
 
-Note that the password in the user tag is encrypted (unencrypted, it would just be "test") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "testpassword").  A command line program (described later) is provided to encrypt passwords.
+Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "examplepassword").  A command line program (described later) is provided to encrypt passwords.
 
 Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// parameter in the passwordencryption tag ( //rot13// ), not the module name ( //rot// ).
 
@@ -1477,8 +1842,8 @@ For example:
 
 {{{#!blockquote
 {{{
-$ sqlr-pwdenc -id example -pwdencid rot13 -password testpassword
-grfgcnffjbeq
+$ sqlr-pwdenc -id example -pwdencid rot13 -password examplepassword
+rknzcyrcnffjbeq
 }}}
 }}}
 
@@ -1498,7 +1863,7 @@ You should use:
 
 {{{#!blockquote
 {{{
-sqlrsh -id example -user test -password test
+sqlrsh -id example -user sqlruser -password sqlrpassword
 }}}
 }}}
 
@@ -1875,11 +2240,16 @@ All translation modules have an //enabled// parameter, allowing the module to be
 
 At startup, the SQL Relay server creates instances of the specified translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.
 
-Currently, the following translation module is available:
+Currently, the following translation modules are available:
 
 * '''normalize'''
+* '''patterns'''
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#normalize]
+==== normalize ====
 
 The '''normalize''' module performs the following operations on a query:
 
@@ -1929,22 +2299,128 @@ The following parameters are currently supported:
 * '''convertcasedoublequoted''' - "upper", "lower", "yes", or "no".  Defaults to "no".
  * If set to "upper" or "lower" then values enclosed in double-quotes are converted to the specified case.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
-   * Eg. 'create table test (col1 int)' creates a table named //TEST// with a column named //COL1//.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
   * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
-   * Eg. 'create table test (col1 int)' creates a table named //test// with a column named //col1//.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "yes" then values enclosed in double-quotes are converted to the case specified by the convertcase parameter.
+ * If set to "no" then no case conversion is done.
+ * If omitted then the value defaults to "no".
+* '''convertcasebackquoted''' - "upper", "lower", "yes", or "no".  Defaults to "no".
+ * If set to "upper" or "lower" then values enclosed in back-quotes are converted to the specified case.  In some database (MySQL and !MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.
+  * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
+  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
+  * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
+ * If set to "yes" then values enclosed in back-quotes are converted to the case specified by the convertcase parameter.
  * If set to "no" then no case conversion is done.
  * If omitted then the value defaults to "no".
 * '''removedoublequotes''' - "yes" or "no".  Defaults to "no".
  * If set to "yes" then double-quotes are removed, except for escaped double quotes.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
-   * Eg. 'create table test (col1 int)' creates a table named //TEST// with a column named //COL1//.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
   * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
-   * Eg. 'create table test (col1 int)' creates a table named //test// with a column named //col1//.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "no" then double-quotes are not removed.
  * If omitted then the value defaults to "no".
+* '''removebackquotes''' - "yes" or "no".  Defaults to "no".
+ * If set to "yes" then back-quotes are removed, except for escaped back quotes.  In some database (MySQL and !MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
+  * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
+  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+   * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
+  * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
+ * If set to "no" then back-quotes are not removed.
+ * If omitted then the value defaults to "no".
+* '''slashescape''' - "yes" or "no".  Defaults to "yes".
+ * Most databases support //double-escaped// quotes.  For example, if a quoted string needs to contains a quote, then that would be expressed like: 'I said ''hello'' to her.'
+ * Some databases support //slash-escaped// quotes.  For example, if a quoted string needs to contains a quote, then that would be expressed like: 'I said \'hello\' to her.'
+ * By default, the normalize translation converts slash-escaped single, double, and back-quotes to double-escaped single, double, and back-quotes.
+ * If slashescape is set to "no" then the slash will be ignored as an escape character, and the quote (or double/back quote) and slash will be interpreted literally, potentially affecting case conversion and quote removal.
+* '''doubleescape''' - "yes" or "no".  Defaults to "yes".
+ * Most databases support //double-escaped// quotes.  For example, if a quoted string needs to contains a quote, then that would be expressed like: 'I said ''hello'' to her.'
+ * By default, the normalize translation interprets double-escaped single, double, and back-quotes in this manner.
+ * If doubleescape is set to "no" then all quotes, double-quotes, and back-quotes will be interpreted literally, potentially affecting case conversion and quote removal.
+
+
+[[br]][=#patterns]
+==== patterns ====
+
+The '''patterns''' module allows you to match the entire query, or parts of it, against a pattern, and then replace the matching part.
+
+The module is highly configurable, and capable of doing some fairly complex substitutions.  For example:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-translations-patterns.conf@
+}}}
+}}}
+
+In this example, several pattern-translations are defined, instructing the module to:
+
+* Convert //old_tablename// to //new_tablename//, but only outside of quoted strings.
+* Convert //David// to //Dave//, but only inside of quoted strings.
+* Convert //Johnathan// to //John//, but only inside of quoted strings, and using case-insensitive matching.
+* Convert //Dan// or //Danny// to //Daniel//, but only inside of quoted strings.
+* Convert only the first instance of //Rich// or //Richie// to //Richard//, and only inside of quoted strings.
+* Convert the entire query //show tables// to the entire query //select * from user_tables//.
+
+This example illustrates the use of several attributes of the pattern tag:
+
+* '''type''' - The type of matching to do.  Options include:
+ * //string// - basic string matching - the default
+ * //cistring// - case-insensitive string matching
+ * //regex// - regular-expression matching
+* '''from''' - The pattern to match.
+* '''to''' - The string to convert matching parts of the query to.
+* '''scope''' - Where to match and translate.  Options include:
+ * //anywhere// - anywhere in the query - the default
+ * //outsidequotes// - only outside of quoted strings
+ * //insidequotes// - only inside of quoted strings
+* '''global''' - Only valid when type="regex".  Options include:
+ * //yes// - find all matches - the default
+ * //no// - only find the first match
+
+Note that in this example, the normalize translation is loaded prior to the patterns translation.  Pattern matching is substantially more reliable and efficient if the query has been normalized first.  See the [#normalize normalize] translation for more information.
+
+Another powerful feature of the patterns translation module is nested matching:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-translations-patterns-nested.conf@
+}}}
+}}}
+
+In this example...
+
+The first pattern-translation replaces:
+
+* the tinytext column type with varchar2(254)
+* the mediumtext column type with varchar2(1023)
+* the longtext column type with clob
+
+But the replacements are only done in //create table// queries.
+
+It's unlikely that those patterns would show up in other queries, but not impossible.  Also, the translation is made more efficient by the initial match, as it will bail immediately if the query is something other than a create table, rather than having to scan the entire rest of the query.
+
+The second pattern-translation basically wraps oldvalue and newvalue with to_char(), but only in a very specific query.  This is a good example of how the patterns translation can help run an app written for one type of database against a different type of database.  One-off query translations are often necessary in these cases.
+
+Note that in these examples, the outer pattern tags have a match attribute rather than from/to attributes.  When doing nested matching, outer tags use the match attribute to grab pieces of the query, and pass them down to nested tags.
+
+The type, scope, and global attributes are valid for outer pattern tags, but the from and to attributes are ignored in any pattern tag with a match attribute.
+
+Note also that in these examples, the nested pattern tags use type="string", but type="regex" and type="cistring" are supported, as is the global attribute for type="regex".  However, the scope attribute is only valid at the top level and is ignored in nested pattern tags.
+
+Though more than 2 levels is rarely necessary, any level of nesting is supported:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-translations-patterns-nested-multi.conf@
+}}}
+}}}
+
 
 [[br]][=#resultsettranslation]
 === Result Set Translation ===
@@ -2278,7 +2754,7 @@ sqlrsh - Version 1.1.0
 0> use mydb1;
 0> currentdb;
 mydb1
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db mydb1
@@ -2290,7 +2766,7 @@ this table is in db mydb1
 0> use mydb2;
 0> currentdb;
 mydb2
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db mydb2
@@ -2302,7 +2778,7 @@ this table is in db mydb2
 0> use pgdb1;
 0> currentdb;
 pgdb1
-0> select * from testtable;
+0> select * from exampletable;
 col1
 ==========================
 this table is in db pgdb1
