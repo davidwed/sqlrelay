@@ -171,7 +171,8 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		bool		bindValueIsNull(uint16_t isnull);
 		bool		executeQuery(const char *query,
 						uint32_t length);
-		bool		handleColumns();
+		bool		handleColumns(bool getcolumninfo,
+						bool bindcolumns);
 		void		errorMessage(char *errorbuffer,
 						uint32_t errorbufferlength,
 						uint32_t *errorlength,
@@ -343,7 +344,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		detachbeforelogin;
 		const char	*lastinsertidquery;
 		bool		mars;
-		bool		servercursor;
+		bool		getcolumntables;
 		const char	*overrideschema;
 
 		stringbuffer	errormessage;
@@ -486,7 +487,7 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	detachbeforelogin=false;
 	lastinsertidquery=NULL;
 	mars=false;
-	servercursor=false;
+	getcolumntables=false;
 	overrideschema=NULL;
 }
 
@@ -515,8 +516,8 @@ void odbcconnection::handleConnectString() {
 	lastinsertidquery=cont->getConnectStringValue("lastinsertidquery");
 
 	mars=!charstring::compare(cont->getConnectStringValue("mars"),"yes");
-	servercursor=!charstring::compare(
-			cont->getConnectStringValue("servercursor"),"yes");
+	getcolumntables=!charstring::compare(
+			cont->getConnectStringValue("getcolumntables"),"yes");
 	const char	*os=cont->getConnectStringValue("overrideschema");
 	if (!charstring::isNullOrEmpty(os)) {
 		overrideschema=os;
@@ -931,7 +932,7 @@ bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
@@ -957,7 +958,7 @@ bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getTableList(sqlrservercursor *cursor,
@@ -1073,7 +1074,7 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	delete[] tableparts;
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getTableTypeList(sqlrservercursor *cursor,
@@ -1099,7 +1100,7 @@ bool odbcconnection::getTableTypeList(sqlrservercursor *cursor,
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getColumnList(sqlrservercursor *cursor,
@@ -1204,7 +1205,7 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	delete[] tableparts;
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
@@ -1305,7 +1306,7 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 	delete[] tableparts;
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
@@ -1420,7 +1421,7 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 	delete[] tableparts;
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getProcedureBindAndColumnList(
@@ -1527,7 +1528,7 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	delete[] procparts;
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
@@ -1678,7 +1679,7 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
@@ -1788,7 +1789,7 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 	delete[] procparts;
 
 	// parse the column information
-	return (retval)?odbccur->handleColumns():false;
+	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
 const char *odbcconnection::selectDatabaseQuery() {
@@ -1984,6 +1985,23 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
+	if (odbcconn->getcolumntables && !getExecuteDirect()) {
+
+		// MS SQL Server only returns column table names when using a
+		// server cursor or when the query contains a FOR BROWSE clause.
+		//
+		// Some apps need the table name.
+		//
+		// Setting the cursor type to static appears to be the least
+		// invasive way of influencing the server to use a server cursor
+		// and thus return column names.
+		//
+		// (see more below)
+		SQLSetStmtAttr(stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
+	}
+
 	// prepare the query...
 
 	#ifdef HAVE_SQLCONNECTW
@@ -1997,6 +2015,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	if (getExecuteDirect()) {
 		return true;
 	}
+
 	char *query_ucs=conv_to_ucs((char*)query);
 	erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
 	if (query_ucs) {
@@ -2008,6 +2027,65 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	}
 	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 	#endif
+
+	if (odbcconn->getcolumntables) {
+
+		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+			return false;
+		}
+
+		// (continued from above)
+		//
+		// If we want column table names then we had to do something
+		// like use a static cursor above.  However, if we actually
+		// execute with a static cursor, then performance is really
+		// bad if there are a decent number of rows.
+		//
+		// To work around, we'll grab the column info, close the
+		// cursor, reallocate the statment handle with a regular
+		// forward-only cursor, and re-prepare it.
+		//
+		// This is generally faster than fetching from a static cursor.
+		// It won't be for complex queries that return small result
+		// sets, but we'll hope that isn't the case.
+		//
+		// Arguably this should be controlled by a directive on a
+		// query-by-query basis like execute-direct is.
+
+		if (!handleColumns(true,false)) {
+			return false;
+		}
+
+		SQLCloseCursor(stmt);
+
+		// allocate the statement handle
+		if (!allocateStatementHandle()) {
+			return false;
+		}
+
+		SQLSetStmtAttr(stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_FORWARD_ONLY,
+				SQL_IS_INTEGER);
+
+		#ifdef HAVE_SQLCONNECTW
+		//free allocated buffers
+		while (nextbuf>0) {
+			nextbuf--;
+			if (buffers[nextbuf]) {
+				delete[] buffers[nextbuf];
+			}
+		}
+
+		char *query_ucs=conv_to_ucs((char*)query);
+		erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
+		if (query_ucs) {
+			delete[] query_ucs;
+		}
+		#else
+		erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
+		#endif
+	}
+
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2027,22 +2105,6 @@ bool odbccursor::allocateStatementHandle() {
 	#else
 	erg=SQLAllocStmt(odbcconn->dbc,&stmt);
 	#endif
-
-	// MS SQL Server only returns table names for columns when using a
-	// server cursor or when the query contains a FOR BROWSE clause.
-	//
-	// Some apps need the table name.
-	//
-	// Setting the cursor type to static appears to be the least invasive
-	// way of influencing the server to use a server cursor and thus return
-	// column names.  The cost is that we can't use FOR BROWSE clauses, but
-	// SQL Relay doesn't support updating result sets anyway, so that
-	// shouldn't be too much of a problem.
-	if (odbcconn->servercursor) {
-		SQLSetStmtAttr(stmt,SQL_ATTR_CURSOR_TYPE,
-			(SQLPOINTER)SQL_CURSOR_STATIC,SQL_IS_INTEGER);
-	}
-
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2541,7 +2603,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	// initialize counts
 	initializeRowCounts();
 
-
 	// query timeout is an odbc-driver level read timeout but with
 	// special cleanup handling in better drivers to tell the server
 	// to stop executing the query after the client read timeout...
@@ -2584,8 +2645,14 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 
 	checkForTempTable(query,length);
 
-	if (!handleColumns()) {
-		return false;
+	if (odbcconn->getcolumntables && !getExecuteDirect()) {
+		if (!handleColumns(false,true)) {
+			return false;
+		}
+	} else {
+		if (!handleColumns(true,true)) {
+			return false;
+		}
 	}
 
 	// get the row count
@@ -2675,242 +2742,293 @@ void odbccursor::initializeRowCounts() {
 	affectedrows=-1;
 }
 
-bool odbccursor::handleColumns() {
+bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 
-	// get the column count
+	// get the column count and max column count
 	erg=SQLNumResultCols(stmt,&ncols);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}
 
-	// allocate buffers and limit column count if necessary
-	if (!conn->cont->getMaxColumnCount()) {
-		allocateResultSetBuffers(ncols);
-	} else if ((uint32_t)ncols>conn->cont->getMaxColumnCount()) {
+	// limit column count if necessary
+	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
+	if (maxcolumncount && (uint32_t)ncols>maxcolumncount) {
 		ncols=conn->cont->getMaxColumnCount();
 	}
 
-	// run through the columns
-	for (SQLSMALLINT i=0; i<ncols; i++) {
+	if (getcolumninfo) {
 
-		if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
+		// run through the columns
+		for (SQLSMALLINT i=0; i<ncols; i++) {
+
+			if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
 #if (ODBCVER >= 0x0300)
-			// column name
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LABEL,
-					column[i].name,4096,
-					(SQLSMALLINT *)&(column[i].namelength),
-					NULL);
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
-			column[i].namelength=charstring::length(column[i].name);
+				// column name
+				erg=SQLColAttribute(stmt,i+1,SQL_DESC_LABEL,
+						column[i].name,4096,
+						(SQLSMALLINT *)
+						&(column[i].namelength),
+						NULL);
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
+				column[i].namelength=
+					charstring::length(column[i].name);
 
-			// column length
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
-					NULL,0,NULL,
-					&(column[i].length));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column length
+				erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
+						NULL,0,NULL,
+						&(column[i].length));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 	
-			// column type
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TYPE,
-					NULL,0,NULL,
-					&(column[i].type));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column type
+				erg=SQLColAttribute(stmt,i+1,SQL_DESC_TYPE,
+						NULL,0,NULL,
+						&(column[i].type));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// column precision
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_PRECISION,
-					NULL,0,NULL,
-					&(column[i].precision));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column precision
+				erg=SQLColAttribute(stmt,i+1,SQL_DESC_PRECISION,
+						NULL,0,NULL,
+						&(column[i].precision));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// column scale
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_SCALE,
-					NULL,0,NULL,
-					&(column[i].scale));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column scale
+				erg=SQLColAttribute(stmt,i+1,SQL_DESC_SCALE,
+						NULL,0,NULL,
+						&(column[i].scale));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// column nullable
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_NULLABLE,
-					NULL,0,NULL,
-					&(column[i].nullable));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column nullable
+				erg=SQLColAttribute(stmt,i+1,SQL_DESC_NULLABLE,
+						NULL,0,NULL,
+						&(column[i].nullable));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// primary key
+				// primary key
 
-			// unique
+				// unique
 
-			// part of key
+				// part of key
 
-			// unsigned number
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_UNSIGNED,
-					NULL,0,NULL,
-					&(column[i].unsignednumber));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// unsigned number
+				erg=SQLColAttribute(stmt,i+1,SQL_DESC_UNSIGNED,
+						NULL,0,NULL,
+						&(column[i].unsignednumber));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// zero fill
+				// zero fill
 
-			// binary
+				// binary
 
-			// autoincrement
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_AUTO_UNIQUE_VALUE,
-					NULL,0,NULL,
-					&(column[i].autoincrement));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// autoincrement
+				erg=SQLColAttribute(stmt,i+1,
+						SQL_DESC_AUTO_UNIQUE_VALUE,
+						NULL,0,NULL,
+						&(column[i].autoincrement));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// table name
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_BASE_TABLE_NAME,
-					column[i].table,4096,
-					(SQLSMALLINT *)&(column[i].tablelength),
-					NULL);
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
-			column[i].tablelength=
+				// table name
+				erg=SQLColAttribute(stmt,i+1,
+						SQL_DESC_BASE_TABLE_NAME,
+						column[i].table,4096,
+						(SQLSMALLINT *)
+						&(column[i].tablelength),
+						NULL);
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
+				column[i].tablelength=
 					charstring::length(column[i].table);
 #else
-			// column name
-			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LABEL,
-					column[i].name,4096,
-					(SQLSMALLINT *)&(column[i].namelength),
-					NULL);
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
-			// FIXME: above we reset namelength to length(name)...
+				// column name
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_LABEL,
+						column[i].name,4096,
+						(SQLSMALLINT *)
+						&(column[i].namelength),
+						NULL);
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
+				// FIXME: above we reset namelength
+				// to length(name)...
 
-			// column length
-			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_LENGTH,
-					NULL,0,NULL,
-					&(column[i].length));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column length
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_LENGTH,
+						NULL,0,NULL,
+						&(column[i].length));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// column type
-			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_TYPE,
-					NULL,0,NULL,
-					&(column[i].type));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column type
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_TYPE,
+						NULL,0,NULL,
+						&(column[i].type));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// column precision
-			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_PRECISION,
-					NULL,0,NULL,
-					&(column[i].precision));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column precision
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_PRECISION,
+						NULL,0,NULL,
+						&(column[i].precision));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// column scale
-			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_SCALE,
-					NULL,0,NULL,
-					&(column[i].scale));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column scale
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_SCALE,
+						NULL,0,NULL,
+						&(column[i].scale));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// column nullable
-			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_NULLABLE,
-					NULL,0,NULL,
-					&(column[i].nullable));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// column nullable
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_NULLABLE,
+						NULL,0,NULL,
+						&(column[i].nullable));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// primary key
+				// primary key
 
-			// unique
+				// unique
 
-			// part of key
+				// part of key
 
-			// unsigned number
-			erg=SQLColAttributes(stmt,i+1,SQL_COLUMN_UNSIGNED,
-					NULL,0,NULL,
-					&(column[i].unsignednumber));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
+				// unsigned number
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_UNSIGNED,
+						NULL,0,NULL,
+						&(column[i].unsignednumber));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
 
-			// zero fill
+				// zero fill
 
-			// binary
+				// binary
 
-			// autoincrement
-			#ifdef SQL_DESC_AUTO_UNIQUE_VALUE
-			erg=SQLColAttributes(stmt,i+1,
-					SQL_COLUMN_AUTO_UNIQUE_VALUE,
-					NULL,0,NULL,
-					&(column[i].autoincrement));
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
-			#else
-			column[i].autoincrement=0;
-			#endif
+				// autoincrement
+				#ifdef SQL_DESC_AUTO_UNIQUE_VALUE
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_AUTO_INCREMENT,
+						NULL,0,NULL,
+						&(column[i].autoincrement));
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
+				#else
+				column[i].autoincrement=0;
+				#endif
 
-			// table name
-			erg=SQLColAttribute(stmt,i+1,SQL_DESC_TABLE_NAME,
-					column[i].table,4096,
-					(SQLSMALLINT *)&(column[i].tablelength),
-					NULL);
-			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-				return false;
-			}
-			column[i].tablelength=
+				// table name
+				erg=SQLColAttributes(stmt,i+1,
+						SQL_COLUMN_TABLE_NAME,
+						column[i].table,4096,
+						(SQLSMALLINT *)
+						&(column[i].tablelength),
+						NULL);
+				if (erg!=SQL_SUCCESS &&
+					erg!=SQL_SUCCESS_WITH_INFO) {
+					return false;
+				}
+				column[i].tablelength=
 					charstring::length(column[i].table);
 #endif
+			}
+		}
+	}
+
+	if (bindcolumns) {
+
+		// allocate buffers if necessary
+		if (!maxcolumncount) {
+			allocateResultSetBuffers(ncols);
 		}
 
-		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		// run through the columns
+		for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		// bind the column to a buffer
-		#ifdef HAVE_SQLCONNECTW
-		if (column[i].type==SQL_WVARCHAR || column[i].type==SQL_WCHAR) {
-			// bind nvarchar and nchar fields as wchar
-			erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
-					field[i],maxfieldlength,
-					&indicator[i]);
+			uint32_t	maxfieldlength=
+					conn->cont->getMaxFieldLength();
 
-		} else {
 			// bind the column to a buffer
-			if (column[i].type==SQL_TYPE_TIMESTAMP ||
-					column[i].type==SQL_TYPE_DATE) {
-				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
+			#ifdef HAVE_SQLCONNECTW
+			if (column[i].type==SQL_WVARCHAR ||
+					column[i].type==SQL_WCHAR) {
+
+				// bind nvarchar and nchar fields as wchar
+				erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
 						field[i],maxfieldlength,
 						&indicator[i]);
+
 			} else {
+
+				// bind the column to a buffer
+				if (column[i].type==SQL_TYPE_TIMESTAMP ||
+						column[i].type==SQL_TYPE_DATE) {
+					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
+							field[i],maxfieldlength,
+							&indicator[i]);
+				} else {
+					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+							field[i],maxfieldlength,
+							&indicator[i]);
+				}
+			}
+			#else
+			if (column[i].type!=SQL_LONGVARCHAR &&
+				column[i].type!=SQL_LONGVARBINARY) {
 				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 						field[i],maxfieldlength,
 						&indicator[i]);
 			}
-
-		}
-		#else
-		if (column[i].type!=SQL_LONGVARCHAR &&
-			column[i].type!=SQL_LONGVARBINARY) {
-			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-					field[i],maxfieldlength,
-					&indicator[i]);
-		}
-		#endif
+			#endif
 		
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
 		}
 	}
 
