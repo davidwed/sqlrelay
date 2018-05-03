@@ -2041,8 +2041,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		// execute with a static cursor, then performance is really
 		// bad if there are a decent number of rows.
 		//
-		// To work around, we'll grab the column info, close the
-		// cursor, reallocate the statment handle with a regular
+		// To work around, we'll grab the column info, reallocate the
+		// statment handle, letting its cursor type default to a
 		// forward-only cursor, and re-prepare it.
 		//
 		// This is generally faster than fetching from a static cursor.
@@ -2055,17 +2055,9 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		if (!handleColumns(true,false)) {
 			return false;
 		}
-
-		SQLCloseCursor(stmt);
-
-		// allocate the statement handle
 		if (!allocateStatementHandle()) {
 			return false;
 		}
-
-		SQLSetStmtAttr(stmt,SQL_ATTR_CURSOR_TYPE,
-				(SQLPOINTER)SQL_CURSOR_FORWARD_ONLY,
-				SQL_IS_INTEGER);
 
 		#ifdef HAVE_SQLCONNECTW
 		//free allocated buffers
@@ -2646,6 +2638,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	checkForTempTable(query,length);
 
 	if (odbcconn->getcolumntables && !getExecuteDirect()) {
+		// if we're getting column tables then we already
+		// did the first half of this in prepareQuery()
 		if (!handleColumns(false,true)) {
 			return false;
 		}
@@ -2744,7 +2738,7 @@ void odbccursor::initializeRowCounts() {
 
 bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 
-	// get the column count and max column count
+	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
@@ -2753,7 +2747,7 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 	// limit column count if necessary
 	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
 	if (maxcolumncount && (uint32_t)ncols>maxcolumncount) {
-		ncols=conn->cont->getMaxColumnCount();
+		ncols=maxcolumncount;
 	}
 
 	if (getcolumninfo) {
@@ -2987,11 +2981,10 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 			allocateResultSetBuffers(ncols);
 		}
 
+		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+
 		// run through the columns
 		for (SQLSMALLINT i=0; i<ncols; i++) {
-
-			uint32_t	maxfieldlength=
-					conn->cont->getMaxFieldLength();
 
 			// bind the column to a buffer
 			#ifdef HAVE_SQLCONNECTW
@@ -3260,6 +3253,7 @@ void odbccursor::getField(uint32_t col,
 	// handle normal datatypes
 	*fld=field[col];
 	*fldlength=indicator[col];
+//stdoutput.printf("%s - %lld\n",*fld,*fldlength);
 }
 
 bool odbccursor::getLobFieldLength(uint32_t col, uint64_t *length) {
