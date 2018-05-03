@@ -3253,7 +3253,6 @@ void odbccursor::getField(uint32_t col,
 	// handle normal datatypes
 	*fld=field[col];
 	*fldlength=indicator[col];
-//stdoutput.printf("%s - %lld\n",*fld,*fldlength);
 }
 
 bool odbccursor::getLobFieldLength(uint32_t col, uint64_t *length) {
