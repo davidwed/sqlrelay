@@ -44,6 +44,8 @@
 	updated sqlrclient protocol to send/receive it
 	added result set header translation framework
 	added getcolumntables option to odbc connection module
+	ODBC SQLTables switches to the specified catalog before getting the
+		table list now (and switches back)
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

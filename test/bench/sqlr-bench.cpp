@@ -121,7 +121,7 @@ int main(int argc, const char **argv) {
 		stdoutput.printf(
 			"usage: sqlr-bench \\\n"
 			"	[-db db2|informix|firebird|freetds|mysql|"
-			"oracle|postgresql|sap|sqlite] \\\n"
+			"oracle|postgresql|sap|sqlite|odbc] \\\n"
 			"	[-dbconnectstring dbconnectstring] \\\n"
 			"	[-proxyconnectstring proxyconnectstring] \\\n"
 			"	[-sqlrconnectstring sqlrconnectstring] \\\n"
@@ -317,6 +317,13 @@ int main(int argc, const char **argv) {
 					"user=testuser;"
 					"password=testpassword;";
 			}
+		} else if (!charstring::compare(db,"odbc")) {
+			if (!dbconnectstring) {
+				dbconnectstring=
+					"db=testdsn;"
+					"user=testuser;"
+					"password=testpassword;";
+			}
 		}
 
 		// init bench
@@ -437,6 +444,8 @@ void graphStats(const char *graph, const char *db,
 	} else if (!charstring::compare(db,"sap") ||
 			!charstring::compare(db,"sybase")) {
 		db="SAP/Sybase";
+	} else if (!charstring::compare(db,"odbc")) {
+		db="ODBC";
 	}
 
 	// write out the stats to temp.csv

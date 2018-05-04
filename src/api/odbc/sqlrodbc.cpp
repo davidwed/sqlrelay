@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-#ifdef _WIN32
+/*#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif
+#endif*/
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -9303,12 +9303,27 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		debugPrintf("  getting table list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
 
-		// FIXME: this list should also be restricted to the
-		// specified catalog, schema, and table type
+		// switch to the specified catalog
+		// (unless we're currently in that catalog)
+		char	*cat=charstring::duplicate(
+					stmt->conn->con->getCurrentDatabase());
+		bool	sameascurrent=!charstring::compare(cat,catname);
+		if (!sameascurrent) {
+			stmt->conn->con->selectDatabase(catname);
+		}
 
+		// get the table list
+		// FIXME: this list should also be restricted to the
+		// specified schema, and table type
 		retval=
 		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
+
+		// switch back
+		if (!sameascurrent) {
+			stmt->conn->con->selectDatabase(cat);
+		}
+		delete[] cat;
 	}
 
 	delete[] catname;
