@@ -919,6 +919,12 @@ bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
 		return false;
 	}
 
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -945,6 +951,12 @@ bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
 		return false;
 	}
 
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -969,6 +981,12 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	// allocate the statement handle
 	if (!odbccur->allocateStatementHandle()) {
 		return false;
+	}
+
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
 	}
 
 	// initialize column and row counts
@@ -1087,6 +1105,12 @@ bool odbcconnection::getTableTypeList(sqlrservercursor *cursor,
 		return false;
 	}
 
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -1112,6 +1136,12 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	// allocate the statement handle
 	if (!odbccur->allocateStatementHandle()) {
 		return false;
+	}
+
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
 	}
 
 	// initialize column and row counts
@@ -1219,6 +1249,12 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 		return false;
 	}
 
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -1318,6 +1354,12 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 	// allocate the statement handle
 	if (!odbccur->allocateStatementHandle()) {
 		return false;
+	}
+
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
 	}
 
 	// initialize column and row counts
@@ -1436,6 +1478,12 @@ bool odbcconnection::getProcedureBindAndColumnList(
 		return false;
 	}
 
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
+	}
+
 	// initialize column and row counts
 	odbccur->initializeColCounts();
 	odbccur->initializeRowCounts();
@@ -1540,6 +1588,12 @@ bool odbcconnection::getTypeInfoList(sqlrservercursor *cursor,
 	// allocate the statement handle
 	if (!odbccur->allocateStatementHandle()) {
 		return false;
+	}
+
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
 	}
 
 	// initialize column and row counts
@@ -1690,6 +1744,12 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 	// allocate the statement handle
 	if (!odbccur->allocateStatementHandle()) {
 		return false;
+	}
+
+	if (getcolumntables) {
+		SQLSetStmtAttr(odbccur->stmt,SQL_ATTR_CURSOR_TYPE,
+				(SQLPOINTER)SQL_CURSOR_STATIC,
+				SQL_IS_INTEGER);
 	}
 
 	// initialize column and row counts
