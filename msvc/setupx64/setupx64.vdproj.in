@@ -291,6 +291,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_54775A08BCA6498DA0A3FC042595966A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_548D84B3F6E14C138AC5714166772891"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -304,6 +310,12 @@
         "Entry"
         {
         "MsmKey" = "8:_592947D271F6409A8001C0EBB9341950"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5A2F1923DFC64C1089911A198D306030"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -502,6 +514,12 @@
         "Entry"
         {
         "MsmKey" = "8:_88F9EB18A36646BF9A3F768C704F69DA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_896F089A51E2469998542099FF971E08"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -796,6 +814,12 @@
         "Entry"
         {
         "MsmKey" = "8:_F28667103B044F2AAA544D9D9F07FA82"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F33953BB33D9497E9FBE8B88B8FF4806"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -1873,6 +1897,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_54775A08BCA6498DA0A3FC042595966A"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrresultsetheadertranslations.h"
+            "TargetName" = "8:sqlrresultsetheadertranslations.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_548D84B3F6E14C138AC5714166772891"
             {
             "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrprotocol.h"
@@ -1917,6 +1961,26 @@
             {
             "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrtrigger.h"
             "TargetName" = "8:sqlrtrigger.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5A2F1923DFC64C1089911A198D306030"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrdirectives.h"
+            "TargetName" = "8:sqlrdirectives.h"
             "Tag" = "8:"
             "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
@@ -2579,6 +2643,26 @@
             "TargetName" = "8:sqlr-start.exe"
             "Tag" = "8:"
             "Folder" = "8:_0888B5E585AE438DA1FFC568FF54A5C7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_896F089A51E2469998542099FF971E08"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrresultsetheadertranslation.h"
+            "TargetName" = "8:sqlrresultsetheadertranslation.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -3553,6 +3637,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F33953BB33D9497E9FBE8B88B8FF4806"
+            {
+            "SourcePath" = "8:..\\..\\src\\server\\sqlrelay\\private\\sqlrdirective.h"
+            "TargetName" = "8:sqlrdirective.h"
+            "Tag" = "8:"
+            "Folder" = "8:_E9C0F623CBFA470A8EBB6D5F00BE80A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F5501075189F42F1A52481CD9134B3F8"
             {
             "SourcePath" = "8:..\\..\\src\\cmdline\\sqlrsh.exe"
@@ -4265,7 +4369,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Firstworks SQL Relay (64-bit)"
         "ProductCode" = "8:{C0EC8D59-D301-4F83-83D9-1CCD6E8001A5}"
-        "PackageCode" = "8:{00AA499A-3C85-45EB-911F-119DFE2DF91A}"
+        "PackageCode" = "8:{71BD4AE9-9AAE-4F6E-822C-DF881EEF1391}"
         "UpgradeCode" = "8:{97679A6A-B07C-4278-9494-57F8C96615C6}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
