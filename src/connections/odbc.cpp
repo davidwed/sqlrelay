@@ -3050,32 +3050,25 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 			#ifdef HAVE_SQLCONNECTW
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
-
-				// bind nvarchar and nchar fields as wchar
 				erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
 						field[i],maxfieldlength,
-						&indicator[i]);
-
-			} else {
-
-				// bind the column to a buffer
-				if (column[i].type==SQL_TYPE_TIMESTAMP ||
+						&(indicator[i]));
+			} else if (column[i].type==SQL_TYPE_TIMESTAMP ||
 						column[i].type==SQL_TYPE_DATE) {
-					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
-							field[i],maxfieldlength,
-							&indicator[i]);
-				} else {
-					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-							field[i],maxfieldlength,
-							&indicator[i]);
-				}
+				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
+						field[i],maxfieldlength,
+						&(indicator[i]));
+			} else {
+				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+						field[i],maxfieldlength,
+						&(indicator[i]));
 			}
 			#else
 			if (column[i].type!=SQL_LONGVARCHAR &&
 				column[i].type!=SQL_LONGVARBINARY) {
 				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 						field[i],maxfieldlength,
-						&indicator[i]);
+						&(indicator[i]));
 			}
 			#endif
 		
@@ -3274,13 +3267,14 @@ bool odbccursor::fetchRow() {
 	
 	#ifdef HAVE_SQLCONNECTW
 	//convert char and varchar data to user coding from ucs-2
+	uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 	for (int i=0; i<ncols; i++) {
 		if (column[i].type==SQL_WVARCHAR || column[i].type==SQL_WCHAR) {
 			if (indicator[i]!=-1 && field[i]) {
 				char	*u=conv_to_user_coding(field[i]);
 				size_t	len=charstring::length(u);
-				if (len>=sizeof(field[i])) {
-					len=sizeof(field[i])-1;
+				if (len>=maxfieldlength) {
+					len=maxfieldlength-1;
 				}
 				charstring::copy(field[i],u,len);
 				indicator[i]=len;

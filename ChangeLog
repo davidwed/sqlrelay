@@ -46,6 +46,7 @@
 	added getcolumntables option to odbc connection module
 	ODBC SQLTables switches to the specified catalog before getting the
 		table list now (and switches back)
+	fixed ODBC wchar truncation problem
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields
