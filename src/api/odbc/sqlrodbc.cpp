@@ -9304,9 +9304,31 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	} else {
 
-		const char	*wild=tblname;
-		if (!charstring::compare(wild,"%")) {
-			wild=NULL;
+		const char	*wild=NULL;
+
+		// If tblname was empty or %, then leave "wild" NULL.
+		// Otherwise concatenate catalog/schema's until it's in one
+		// of the following formats:
+		// * table
+		// * schema.table
+		// * catalog.schema.table
+		// If tblname already contains a . then just use it as-is.
+		if (!charstring::isNullOrEmpty(tblname) &&
+				charstring::compare(tblname,"%")) {
+
+			if (!charstring::contains(tblname,'.') &&
+				!charstring::isNullOrEmpty(schname)) {
+
+				stringbuffer	wildstr;
+				if (!charstring::isNullOrEmpty(catname)) {
+					wildstr.append(catname)->append('.');
+				}
+				wildstr.append(schname)->append('.');
+				wildstr.append(tblname);
+				delete[] tblname;
+				tblname=wildstr.detachString();
+			}
+			wild=tblname;
 		}
 
 		debugPrintf("  getting table list...\n");
@@ -9314,7 +9336,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 		// switch to the specified catalog
 		// (unless we're currently in that catalog)
-		char	*cat=charstring::duplicate(
+		/*char	*cat=charstring::duplicate(
 					stmt->conn->con->getCurrentDatabase());
 		if (charstring::compare(cat,catname)) {
 			charstring::copy(stmt->conn->switchdb,cat);
@@ -9322,11 +9344,11 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		} else {
 			stmt->conn->switchdb[0]='\0';
 		}
-		delete[] cat;
+		delete[] cat;*/
 
 		// get the table list
 		// FIXME: this list should also be restricted to the
-		// specified schema, and table type
+		// specified table type
 		retval=
 		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
