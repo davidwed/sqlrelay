@@ -4578,7 +4578,10 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 
 				// make sure to null-terminate
 				// (even if data has to be truncated)
-				((char *)targetvalue)[bufferlength-1]='\0';
+				if (trunc) {
+					((char *)targetvalue)
+						[bytestocopy-1]='\0';
+				}
 
 				debugPrintf("  value: %.*s%s",
 					(bytestocopy<=80)?bytestocopy:80,
@@ -9304,23 +9307,26 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		// * schema.table
 		// * catalog.schema.table
 		// If tblname already contains a . then just use it as-is.
-		if (!charstring::isNullOrEmpty(tblname) &&
-				charstring::compare(tblname,"%")) {
+		if (!charstring::contains(tblname,'.')) {
 
-			if (!charstring::contains(tblname,'.') &&
-				!charstring::isNullOrEmpty(schname)) {
-
-				stringbuffer	wildstr;
-				if (!charstring::isNullOrEmpty(catname)) {
-					wildstr.append(catname)->append('.');
-				}
-				wildstr.append(schname)->append('.');
-				wildstr.append(tblname);
-				delete[] tblname;
-				tblname=wildstr.detachString();
+			stringbuffer	wildstr;
+			if (!charstring::isNullOrEmpty(catname)) {
+				wildstr.append(catname)->append('.');
 			}
-			wild=tblname;
+			if (!charstring::isNullOrEmpty(schname)) {
+				wildstr.append(schname)->append('.');
+			} else if (wildstr.getStringLength()) {
+				wildstr.append("%.");
+			}
+			if (!charstring::isNullOrEmpty(schname)) {
+				wildstr.append(tblname);
+			} else {
+				wildstr.append('%');
+			}
+			delete[] tblname;
+			tblname=wildstr.detachString();
 		}
+		wild=tblname;
 
 		debugPrintf("  getting table list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
