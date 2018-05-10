@@ -131,7 +131,6 @@ struct CONN {
 	bool				nullsasnulls;
 	bool				lazyconnect;
 	bool				clearbindsduringprepare;
-	char				switchdb[1024];
 
 	bool				attrmetadataid;
 	SQLSMALLINT			sqlerrorindex;
@@ -331,7 +330,6 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				conn->error=NULL;
 				SQLR_CONNClearError(conn);
 				env->connlist.append(conn);
-				conn->switchdb[0]='\0';
 				conn->attrmetadataid=false;
 			}
 			return SQL_SUCCESS;
@@ -762,13 +760,6 @@ static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
 
 	SQLR_ResetParams(stmt);
 	stmt->cur->closeResultSet();
-
-	// SQLTables() might have set up a database to switch back to after
-	// getting the table list.  Switch back to it now, if necessary.
-	if (stmt->conn->switchdb[0]) {
-		stmt->conn->con->selectDatabase(stmt->conn->switchdb);
-		stmt->conn->switchdb[0]='\0';
-	}
 
 	return SQL_SUCCESS;
 }
@@ -9333,18 +9324,6 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 		debugPrintf("  getting table list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
-
-		// switch to the specified catalog
-		// (unless we're currently in that catalog)
-		/*char	*cat=charstring::duplicate(
-					stmt->conn->con->getCurrentDatabase());
-		if (charstring::compare(cat,catname)) {
-			charstring::copy(stmt->conn->switchdb,cat);
-			stmt->conn->con->selectDatabase(catname);
-		} else {
-			stmt->conn->switchdb[0]='\0';
-		}
-		delete[] cat;*/
 
 		// get the table list
 		// FIXME: this list should also be restricted to the
