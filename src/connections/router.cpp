@@ -243,6 +243,7 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 		uint16_t	getColumnIsZeroFilled(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
+		const char	*getColumnTable(uint32_t col);
 		bool		noRowsToReturn();
 		bool		fetchRow();
 		void		getField(uint32_t col,
@@ -1743,6 +1744,10 @@ uint16_t routercursor::getColumnIsBinary(uint32_t col) {
 
 uint16_t routercursor::getColumnIsAutoIncrement(uint32_t col) {
 	return (currentcur)?currentcur->getColumnIsAutoIncrement(col):0;
+}
+
+const char *routercursor::getColumnTable(uint32_t col) {
+	return (currentcur)?currentcur->getColumnTable(col):NULL;
 }
 
 bool routercursor::noRowsToReturn() {
