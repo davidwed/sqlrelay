@@ -34,6 +34,8 @@ struct db2column {
 	uint16_t	zerofill;
 	uint16_t	binary;
 	uint16_t	autoincrement;
+	char		table[4096];
+	uint16_t	tablelength;
 };
 
 struct datebind {
@@ -168,6 +170,8 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		uint16_t	getColumnIsUnsigned(uint32_t i);
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
+		const char	*getColumnTable(uint32_t i);
+		uint16_t	getColumnTableLength(uint32_t i);
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
@@ -1440,6 +1444,18 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+
+			// table name
+			erg=SQLColAttribute(stmt,i+1,
+				SQL_COLUMN_TABLE_NAME,
+				column[i].table,4096,
+				(SQLSMALLINT *)&(column[i].tablelength),
+				NULL);
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
+			column[i].tablelength=
+				charstring::length(column[i].table);
 		}
 
 		// bind the column to a lob locator or buffer
@@ -1626,6 +1642,14 @@ uint16_t db2cursor::getColumnIsBinary(uint32_t i) {
 
 uint16_t db2cursor::getColumnIsAutoIncrement(uint32_t i) {
 	return column[i].autoincrement;
+}
+
+const char *db2cursor::getColumnTable(uint32_t i) {
+	return column[i].table;
+}
+
+uint16_t db2cursor::getColumnTableLength(uint32_t i) {
+	return column[i].tablelength;
 }
 
 bool db2cursor::noRowsToReturn() {

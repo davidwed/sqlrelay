@@ -32,6 +32,8 @@ struct informixcolumn {
 	SQLLEN		zerofill;
 	SQLLEN		binary;
 	SQLLEN		autoincrement;
+	char		table[4096];
+	uint16_t	tablelength;
 };
 
 struct datebind {
@@ -161,6 +163,8 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		uint16_t	getColumnIsUnsigned(uint32_t i);
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
+		const char	*getColumnTable(uint32_t i);
+		uint16_t	getColumnTableLength(uint32_t i);
 		bool		noRowsToReturn();
 		bool		skipRow();
 		bool		fetchRow();
@@ -1428,6 +1432,18 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+
+			// table name
+			erg=SQLColAttribute(stmt,i+1,
+				SQL_COLUMN_TABLE_NAME,
+				column[i].table,4096,
+				(SQLSMALLINT *)&(column[i].tablelength),
+				NULL);
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
+			column[i].tablelength=
+				charstring::length(column[i].table);
 		}
 
 		if (column[i].type==SQL_LONGVARBINARY ||
@@ -1650,6 +1666,14 @@ uint16_t informixcursor::getColumnIsBinary(uint32_t i) {
 
 uint16_t informixcursor::getColumnIsAutoIncrement(uint32_t i) {
 	return column[i].autoincrement;
+}
+
+const char *informixcursor::getColumnTable(uint32_t i) {
+	return column[i].table;
+}
+
+uint16_t informixcursor::getColumnTableLength(uint32_t i) {
+	return column[i].tablelength;
 }
 
 bool informixcursor::noRowsToReturn() {

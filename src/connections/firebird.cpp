@@ -170,6 +170,8 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 		uint32_t	getColumnLength(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
+		const char	*getColumnTable(uint32_t col);
+		uint16_t	getColumnTableLength(uint32_t col);
 		bool		noRowsToReturn();
 		bool		fetchRow();
 		void		getField(uint32_t col,
@@ -1741,6 +1743,14 @@ uint32_t firebirdcursor::getColumnPrecision(uint32_t col) {
 
 uint32_t firebirdcursor::getColumnScale(uint32_t col) {
 	return -outsqlda->sqlvar[col].sqlscale;
+}
+
+const char *firebirdcursor::getColumnTable(uint32_t col) {
+	return outsqlda->sqlvar[col].relname;
+}
+
+uint16_t firebirdcursor::getColumnTableLength(uint32_t col) {
+	return outsqlda->sqlvar[col].relname_length;
 }
 
 bool firebirdcursor::noRowsToReturn() {
