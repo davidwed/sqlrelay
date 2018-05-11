@@ -40,7 +40,9 @@
 	added freetds parameter to freetds connection module that sets the
 		FREETDS/FREETDSCONF environment variables
 	fixed some subtle SQLGetData bugs in ODBC driver
-	updated sqlrserver API to support getting the table of a column
+	updated sqlrserver API to support getting the column tables
+	updated odbc, mysql, postgresql, and sqlite connection modules to
+		return column table names
 	updated sqlrclient protocol to send/receive it
 	added result set header translation framework
 	added getcolumntables option to odbc connection module
