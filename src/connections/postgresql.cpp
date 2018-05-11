@@ -53,6 +53,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*bindFormat();
 
 		dictionary< int32_t, char *>	datatypes;
+		dictionary< int32_t, char *>	tables;
 
 		PGconn	*pgconn;
 
@@ -62,6 +63,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*db;
 		const char	*sslmode;
 		uint16_t	typemangling;
+		uint16_t	tablemangling;
 		const char	*charset;
 		char		*dbversion;
 		char		*hostname;
@@ -153,6 +155,7 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		const char	*getColumnTypeName(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
+		const char	*getColumnTable(uint32_t col);
 		bool		noRowsToReturn();
 		bool		fetchRow();
 		void		getField(uint32_t col,
@@ -170,6 +173,7 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		int		currentrow;
 
 		char		typenamebuffer[6];
+		char		tablenamebuffer[6];
 
 		postgresqlconnection	*postgresqlconn;
 
@@ -201,6 +205,7 @@ postgresqlconnection::postgresqlconnection(sqlrservercontroller *cont) :
 						sqlrserverconnection(cont) {
 	dbversion=NULL;
 	datatypes.setTrackInsertionOrder(false);
+	tables.setTrackInsertionOrder(false);
 	pgconn=NULL;
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	currentoid=InvalidOid;
@@ -236,6 +241,12 @@ void postgresqlconnection::handleConnectString() {
 	} else {
 		typemangling=2;
 	}
+	const char	*tablemang=cont->getConnectStringValue("tablemangling");
+	if (!tablemang ||!charstring::compareIgnoringCase(tablemang,"no")) {
+		tablemangling=0;
+	} else {
+		tablemangling=2;
+	}
 	charset=cont->getConnectStringValue("charset");
 	const char	*lastinsertidfunc=
 			cont->getConnectStringValue("lastinsertidfunction");
@@ -268,6 +279,16 @@ bool postgresqlconnection::logIn(const char **error,
 			delete[] node->getValue()->getValue();
 		}
 		datatypes.clear();
+	}
+
+	// clear the table dictionary
+	if (tablemangling==2) {
+		for (avltreenode< dictionarynode<int32_t,char *> *>
+					*node=tables.getTree()->getFirst();
+					node; node=node->getNext()) {
+			delete[] node->getValue()->getValue();
+		}
+		tables.clear();
 	}
 
 	// log in
@@ -339,6 +360,22 @@ bool postgresqlconnection::logIn(const char **error,
 		PQclear(result);
 	}
 
+	// build the table dictionary
+	if (typemangling==2) {
+		PGresult	*result=PQexec(pgconn,
+					"select oid,relname from pg_class");
+		if (!result) {
+			*error=logInError("Get tables failed");
+			return false;
+		}
+		for (int i=0; i<PQntuples(result); i++) {
+			tables.setValue(
+				charstring::toInteger(PQgetvalue(result,i,0)),
+				charstring::duplicate(PQgetvalue(result,i,1)));
+		}
+		PQclear(result);
+	}
+
 #if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
@@ -391,6 +428,16 @@ void postgresqlconnection::logOut() {
 			delete[] node->getValue()->getValue();
 		}
 		datatypes.clear();
+	}
+
+	// clear the table dictionary
+	if (typemangling==2) {
+		for (avltreenode< dictionarynode<int32_t,char *> *>
+					*node=tables.getTree()->getFirst();
+					node; node=node->getNext()) {
+			delete[] node->getValue()->getValue();
+		}
+		tables.clear();
 	}
 }
 
@@ -1324,6 +1371,20 @@ uint16_t postgresqlcursor::getColumnIsBinary(uint32_t col) {
 	binary=PQbinaryTuples(pgresult);
 #endif
 	return binary;
+}
+
+const char *postgresqlcursor::getColumnTable(uint32_t col) {
+	// PQftable returns an oid rather than a table name, so we have to map
+	// it to a table name.
+	// tablemangling=0 means return the internal number as a string
+	// tablemangling=2 means return the name as a string
+	Oid	pgfieldtable=PQftable(pgresult,col);
+	if (!postgresqlconn->tablemangling) {
+		charstring::printf(tablenamebuffer,sizeof(tablenamebuffer),
+						"%d",(int32_t)pgfieldtable);
+		return tablenamebuffer;
+	}
+	return postgresqlconn->tables.getValue((int32_t)pgfieldtable);
 }
 
 bool postgresqlcursor::noRowsToReturn() {

@@ -135,6 +135,7 @@ class SQLRSERVER_DLLSPEC sqlitecursor : public sqlrservercursor {
 		const char	*getColumnName(uint32_t col);
 		#ifdef HAVE_SQLITE3_STMT
 		uint16_t	getColumnType(uint32_t col);
+		const char	*getColumnTable(uint32_t col);
 		#endif
 		bool		noRowsToReturn();
 		bool		skipRow();
@@ -152,6 +153,7 @@ class SQLRSERVER_DLLSPEC sqlitecursor : public sqlrservercursor {
 		bool		lastinsertrowid;
 
 		#ifdef HAVE_SQLITE3_STMT
+		char		**columntables;
 		int		*columntypes;
 		sqlite3_stmt	*stmt;
 		bool		justexecuted;
@@ -429,6 +431,7 @@ sqlitecursor::sqlitecursor(sqlrserverconnection *conn, uint16_t id) :
 	nrow=0;
 	lastinsertrowid=false;
 	#ifdef HAVE_SQLITE3_STMT
+	columntables=NULL;
 	columntypes=NULL;
 	stmt=NULL;
 	justexecuted=false;
@@ -457,6 +460,14 @@ sqlitecursor::~sqlitecursor() {
 	}
 
 	#ifdef HAVE_SQLITE3_STMT
+	// clean up old column tables
+	if (columntables) {
+		for (int i=0; i<ncolumn; i++) {
+			delete[] columntables[i];
+		}
+		delete[] columntables;
+	}
+
 	// clean up old column types
 	if (columntypes) {
 		delete[] columntypes;
@@ -648,15 +659,19 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 	// cache off the columns so they can be returned later if the result
 	// set is suspended/resumed
 	#ifdef HAVE_SQLITE3_STMT
+	columntables=new char *[ncolumn];
 	columnnames=new char *[ncolumn];
 	columntypes=new int[ncolumn];
 	if (lastinsertrowid) {
+		columntables[0]=charstring::duplicate("");
 		columnnames[0]=charstring::duplicate("LASTINSERTROWID");
 		columntypes[0]=INTEGER_DATATYPE;
 	} else {
 		for (int i=0; i<ncolumn; i++) {
+			columntables[i]=charstring::duplicate(
+					sqlite3_column_table_name(stmt,i));
 			columnnames[i]=charstring::duplicate(
-						sqlite3_column_name(stmt,i));
+					sqlite3_column_name(stmt,i));
 			columntypes[i]=sqlite3_column_type(stmt,i);
 		}
 	}
@@ -686,6 +701,15 @@ int sqlitecursor::runQuery(const char *query) {
 	}
 
 	#ifdef HAVE_SQLITE3_STMT
+	// clean up old column tables
+	if (columntables) {
+		for (int i=0; i<ncolumn; i++) {
+			delete[] columntables[i];
+		}
+		delete[] columntables;
+		columntables=NULL;
+	}
+
 	// clean up old column types
 	if (columntypes) {
 		delete[] columntypes;
@@ -805,6 +829,10 @@ const char *sqlitecursor::getColumnName(uint32_t col) {
 }
 
 #ifdef HAVE_SQLITE3_STMT
+const char *sqlitecursor::getColumnTable(uint32_t col) {
+	return columntables[col];
+}
+
 uint16_t sqlitecursor::getColumnType(uint32_t col) {
 	switch (columntypes[col]) {
 		case SQLITE_INTEGER:
