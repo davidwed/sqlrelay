@@ -1661,7 +1661,11 @@ void mysqlcursor::getField(uint32_t col,
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		if (!isnull[col]) {
-			uint16_t	coltype=getColumnType(col);
+			// use conn->cont->getColumnType() instead of
+			// this->getColumnType() in case a column has been
+			// remapped (eg. for getting odbc-format column lists)
+			uint16_t	coltype=
+					conn->cont->getColumnType(this,col);
 			if (coltype==TINY_BLOB_DATATYPE ||
 				coltype==BLOB_DATATYPE ||
 				coltype==MEDIUM_BLOB_DATATYPE ||
