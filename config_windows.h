@@ -163,6 +163,15 @@
 /* Oracle 8i or greater */
 #define HAVE_ORACLE_8i
 
+/* Some versions of PHP PDO have PDO::ATTR_EMULATE_PREPARES */
+#define HAVE_PHP_PDO_ATTR_EMULATE_PREPARES 1
+
+/* Some versions of PHP PDO don't support const zend_function_entry */
+#define HAVE_PHP_PDO_CONST_ZEND_FUNCTION_ENTRY 1
+
+/* Some versions of PHP PDO have PDO_PARAM_ZVAL */
+#define HAVE_PHP_PDO_PARAM_ZVAL 1
+
 /* Some versions of postgresql have PQbinaryTuples */
 #define HAVE_POSTGRESQL_PQBINARYTUPLES 1
 

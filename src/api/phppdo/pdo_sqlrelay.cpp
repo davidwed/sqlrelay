@@ -351,7 +351,11 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
 	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
 		if (isFloatTypeChar(type)) {
+			#ifdef HAVE_PHP_PDO_PARAM_ZVAL
 			stmt->columns[colno].param_type=PDO_PARAM_ZVAL;
+			#else
+			stmt->columns[colno].param_type=PDO_PARAM_STR;
+			#endif
 		} else {
 			stmt->columns[colno].param_type=PDO_PARAM_INT;
 		}
@@ -384,6 +388,7 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 	switch (stmt->columns[colno].param_type) {
 		// NOTE: Currently, we only use ZVAL's for doubles,
 		// but we could do an additional float check here.
+		#ifdef HAVE_PHP_PDO_PARAM_ZVAL
 		case PDO_PARAM_ZVAL:
 			// handle NULLs
 			if (!sqlrcur->getFieldLength(
@@ -398,6 +403,7 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 			*ptr=(char *)&sqlrstmt->zvalfield;
 			*len=sizeof(sqlrstmt->zvalfield);
 			return 1;
+		#endif
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
 			// handle NULLs/empty-strings
