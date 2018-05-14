@@ -3756,6 +3756,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	cursor->setFakeInputBindsForThisQuery(pvt->_fakeinputbinds);
 	cursor->setQueryStatus(SQLRQUERYSTATUS_ERROR);
 	cursor->setQueryType(SQLRQUERYTYPE_ETC);
+	cursor->setResultSetHeaderHasBeenTranslated(false);
 
 	// reset column mapping
 	pvt->_columnmap=NULL;
@@ -3926,9 +3927,6 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						bool enabletranslations,
 						bool enablefilters,
 						bool enabletriggers) {
-
-	// reset header translation flag
-	cursor->setResultSetHeaderHasBeenTranslated(false);
 
 	// set state
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
