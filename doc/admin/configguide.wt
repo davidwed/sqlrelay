@@ -2096,7 +2096,7 @@ When using query filters, it is helpful to use the //normalize// query translati
 }}}
 }}}
 
-See [#querytranslations Query Translations] below for more information.
+Pattern matching is substantially more reliable and efficient if the query has been normalized first.  See [#querytranslations Query Translations] and the [#normalize normalize] translation below for more information.
 
 Currently, the following filter modules are available:
 
@@ -2156,7 +2156,7 @@ For example, with the following configuration:
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-filters-regex.conf@
+@parts/sqlrelay-filters-regex-normalize.conf@
 }}}
 }}}
 
