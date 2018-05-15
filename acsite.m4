@@ -1623,6 +1623,10 @@ AC_DEFUN([FW_CHECK_MYSQL_FUNCTIONS],
 	FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[mysql_get_server_version(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_GET_SERVER_VERSION,1,MySQL supports MYSQL_GET_SERVER_VERSION)],[AC_MSG_RESULT(no)])
 
+	AC_MSG_CHECKING(for MYSQL_FIELD.name_length)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[MYSQL_FIELD f; unsigned int a=f.name_length;],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_FIELD_NAME_LENGTH,1,MySQL supports MYSQL_FIELD.name_length)],[AC_MSG_RESULT(no)])
+
 	AC_MSG_CHECKING(for MYSQL_FIELD.org_table_length)
 	FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[MYSQL_FIELD f; unsigned int a=f.org_table_length;],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH,1,MySQL supports MYSQL_FIELD.org_table_length)],[AC_MSG_RESULT(no)])

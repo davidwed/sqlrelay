@@ -76,6 +76,9 @@
 /* MySQL supports CR_SERVER_LOST */
 #define HAVE_MYSQL_CR_SERVER_LOST 1
 
+/* MySQL supports MYSQL_FIELD.name_length */
+#define HAVE_MYSQL_FIELD_NAME_LENGTH 1
+
 /* MySQL supports MYSQL_FIELD.org_table_length */
 #define HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH 1
 

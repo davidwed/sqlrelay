@@ -50,6 +50,7 @@
 		table list now (and switches back)
 	fixed ODBC wchar truncation problem
 	fixed "show columns odbc" bug in mysql connection module
+	mysql connection module uses MYSQL_FIELD.name_length if it can now
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

@@ -101,6 +101,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
+#ifdef HAVE_MYSQL_FIELD_NAME_LENGTH
+		uint16_t	getColumnNameLength(uint32_t col);
+#endif
 		uint16_t	getColumnType(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
@@ -114,7 +117,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		uint16_t	getColumnIsBinary(uint32_t col);
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
 		const char	*getColumnTable(uint32_t col);
+#ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
 		uint16_t	getColumnTableLength(uint32_t col);
+#endif
 		bool		noRowsToReturn();
 		bool		fetchRow();
 		void		getField(uint32_t col,
@@ -1415,6 +1420,12 @@ const char *mysqlcursor::getColumnName(uint32_t col) {
 	return mysqlfields[col]->name;
 }
 
+#ifdef HAVE_MYSQL_FIELD_NAME_LENGTH
+uint16_t mysqlcursor::getColumnNameLength(uint32_t col) {
+	return mysqlfields[col]->name_length;
+}
+#endif
+
 uint16_t mysqlcursor::getColumnType(uint32_t col) {
 	switch (mysqlfields[col]->type) {
 		case FIELD_TYPE_STRING:
@@ -1631,13 +1642,11 @@ const char *mysqlcursor::getColumnTable(uint32_t col) {
 	return mysqlfields[col]->org_table;
 }
 
+#ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
 uint16_t mysqlcursor::getColumnTableLength(uint32_t col) {
-	#ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
-		return mysqlfields[col]->org_table_length;
-	#else
-		return charstring::length(mysqlfields[col]->org_table);
-	#endif
+	return mysqlfields[col]->org_table_length;
 }
+#endif
 
 bool mysqlcursor::noRowsToReturn() {
 	// for DML or DDL queries, return no data
