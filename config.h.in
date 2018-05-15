@@ -75,6 +75,9 @@
 /* MySQL supports CR_SERVER_LOST */
 #undef HAVE_MYSQL_CR_SERVER_LOST
 
+/* MySQL supports MYSQL_FIELD.org_table_length */
+#undef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
+
 /* MySQL supports FIELD_TYPE_ENUM */
 #undef HAVE_MYSQL_FIELD_TYPE_ENUM
 

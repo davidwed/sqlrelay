@@ -1632,7 +1632,11 @@ const char *mysqlcursor::getColumnTable(uint32_t col) {
 }
 
 uint16_t mysqlcursor::getColumnTableLength(uint32_t col) {
-	return mysqlfields[col]->org_table_length;
+	#ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
+		return mysqlfields[col]->org_table_length;
+	#else
+		return charstring::length(mysqlfields[col]->org_table);
+	#endif
 }
 
 bool mysqlcursor::noRowsToReturn() {
