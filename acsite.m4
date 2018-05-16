@@ -1627,6 +1627,10 @@ AC_DEFUN([FW_CHECK_MYSQL_FUNCTIONS],
 	FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[MYSQL_FIELD f; unsigned int a=f.name_length;],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_FIELD_NAME_LENGTH,1,MySQL supports MYSQL_FIELD.name_length)],[AC_MSG_RESULT(no)])
 
+	AC_MSG_CHECKING(for MYSQL_FIELD.org_table)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[MYSQL_FIELD f; const char *a=f.org_table;],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_FIELD_ORG_TABLE,1,MySQL supports MYSQL_FIELD.org_table)],[AC_MSG_RESULT(no)])
+
 	AC_MSG_CHECKING(for MYSQL_FIELD.org_table_length)
 	FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[MYSQL_FIELD f; unsigned int a=f.org_table_length;],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH,1,MySQL supports MYSQL_FIELD.org_table_length)],[AC_MSG_RESULT(no)])
@@ -1765,6 +1769,9 @@ then
 		AC_MSG_CHECKING(if PostgreSQL has PQbinaryTuples)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQbinaryTuples(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQBINARYTUPLES,1,Some versions of postgresql have PQbinaryTuples)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQftable)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQftable(NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQFTABLE,1,Some versions of postgresql have PQftable)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])

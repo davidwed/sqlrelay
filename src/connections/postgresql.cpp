@@ -155,7 +155,9 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		const char	*getColumnTypeName(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
+#ifdef HAVE_POSTGRESQL_PQFTABLE
 		const char	*getColumnTable(uint32_t col);
+#endif
 		bool		noRowsToReturn();
 		bool		fetchRow();
 		void		getField(uint32_t col,
@@ -1373,6 +1375,7 @@ uint16_t postgresqlcursor::getColumnIsBinary(uint32_t col) {
 	return binary;
 }
 
+#ifdef HAVE_POSTGRESQL_PQFTABLE
 const char *postgresqlcursor::getColumnTable(uint32_t col) {
 	// PQftable returns an oid rather than a table name, so we have to map
 	// it to a table name.
@@ -1386,6 +1389,7 @@ const char *postgresqlcursor::getColumnTable(uint32_t col) {
 	}
 	return postgresqlconn->tables.getValue((int32_t)pgfieldtable);
 }
+#endif
 
 bool postgresqlcursor::noRowsToReturn() {
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \

@@ -939,12 +939,12 @@ void sqlrconnection::protocol() {
 
 	if (pvt->_debug) {
 		debugPreStart();
-		debugPrint("Protocol : sqlrclient version 1\n");
+		debugPrint("Protocol : sqlrclient version 2\n");
 		debugPreEnd();
 	}
 
 	pvt->_cs->write((uint16_t)PROTOCOLVERSION);
-	pvt->_cs->write((uint16_t)1);
+	pvt->_cs->write((uint16_t)2);
 }
 
 void sqlrconnection::auth() {

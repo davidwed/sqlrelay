@@ -116,7 +116,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		uint16_t	getColumnIsZeroFilled(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
+#ifdef HAVE_MYSQL_FIELD_ORG_TABLE
 		const char	*getColumnTable(uint32_t col);
+#endif
 #ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
 		uint16_t	getColumnTableLength(uint32_t col);
 #endif
@@ -1638,9 +1640,11 @@ uint16_t mysqlcursor::getColumnIsAutoIncrement(uint32_t col) {
 	#endif
 }
 
+#ifdef HAVE_MYSQL_FIELD_ORG_TABLE
 const char *mysqlcursor::getColumnTable(uint32_t col) {
 	return mysqlfields[col]->org_table;
 }
+#endif
 
 #ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
 uint16_t mysqlcursor::getColumnTableLength(uint32_t col) {

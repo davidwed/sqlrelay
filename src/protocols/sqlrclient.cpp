@@ -234,6 +234,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 
 		char		lobbuffer[32768];
 
+		uint16_t	protocolversion;
+
 		bool		debug;
 };
 
@@ -376,6 +378,8 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 		}
 	}
 
+	protocolversion=0;
+
 	debug=cont->getConfig()->getDebugProtocols();
 }
 
@@ -432,10 +436,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 
 		// handle client protocol version as a command, for now
 		if (command==PROTOCOLVERSION) {
-			// get the next 2 bytes, but don't
-			// do anything with them, for now
-			uint16_t	version;
-			if (clientsock->read(&version,
+			if (clientsock->read(&protocolversion,
 						idleclienttimeout,0)==
 						sizeof(uint16_t)) {
 				continue;
@@ -1307,9 +1308,9 @@ bool sqlrprotocol_sqlrclient::reExecuteQueryCommand(sqlrservercursor *cursor) {
 
 	// get binds and whether to get column info
 	if (getInputBinds(cursor) &&
-		getOutputBinds(cursor) &&
-		getInputOutputBinds(cursor) &&
-		getSendColumnInfo()) {
+			getOutputBinds(cursor) &&
+			getInputOutputBinds(cursor) &&
+			getSendColumnInfo()) {
 		return processQueryOrBindCursor(cursor,
 				SQLRCLIENTQUERYTYPE_QUERY,
 				SQLRSERVERLISTFORMAT_NULL,
@@ -1824,6 +1825,12 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 
 bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 	debugFunction();
+
+	if (protocolversion<2) {
+		cont->raiseDebugMessageEvent("not getting input/output binds "
+						"(client protocol too old)");
+		return true;
+	}
 
 	cont->raiseDebugMessageEvent("getting input/output binds...");
 
@@ -3020,6 +3027,12 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 						sqlrservercursor *cursor) {
 	debugFunction();
 
+	if (protocolversion<2) {
+		cont->raiseDebugMessageEvent("not returning input/output binds "
+						"(client protocol too old)");
+		return;
+	}
+
 	if (cont->logEnabled() || cont->notificationsEnabled()) {
 		debugstr.clear();
 		debugstr.append("returning ");
@@ -3224,6 +3237,11 @@ void sqlrprotocol_sqlrclient::sendColumnDefinition(
 	clientsock->write(zerofill);
 	clientsock->write(binary);
 	clientsock->write(autoincrement);
+
+	if (protocolversion<2) {
+		return;
+	}
+
 	clientsock->write(tablelen);
 	clientsock->write(table,tablelen);
 }
@@ -3291,6 +3309,11 @@ void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
 	clientsock->write(zerofill);
 	clientsock->write(binary);
 	clientsock->write(autoincrement);
+
+	if (protocolversion<2) {
+		return;
+	}
+
 	clientsock->write(tablelen);
 	clientsock->write(table,tablelen);
 }

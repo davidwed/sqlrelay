@@ -78,6 +78,9 @@
 /* MySQL supports MYSQL_FIELD.name_length */
 #undef HAVE_MYSQL_FIELD_NAME_LENGTH
 
+/* MySQL supports MYSQL_FIELD.org_table */
+#undef HAVE_MYSQL_FIELD_ORG_TABLE
+
 /* MySQL supports MYSQL_FIELD.org_table_length */
 #undef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
 
@@ -188,6 +191,9 @@
 
 /* Some versions of postgresql have PQfmod */
 #undef HAVE_POSTGRESQL_PQFMOD
+
+/* Some versions of postgresql have PQftable */
+#undef HAVE_POSTGRESQL_PQFTABLE
 
 /* Some versions of postgresql have PQoidValue */
 #undef HAVE_POSTGRESQL_PQOIDVALUE
