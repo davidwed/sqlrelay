@@ -14,7 +14,7 @@
 	added \r and ; as possible after-variable characters for fake-binds
 	added -short, -connection-detail, and -query options to sqlr-status
 	added initial support for queries that return multiple result sets
-	... various odbc connection module improvements ...
+	lots of various odbc connection module improvements
 	added parse failed event
 	updated normalize translation to remove spaces around :=
 	added noop query framework
