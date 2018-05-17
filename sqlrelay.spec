@@ -514,6 +514,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_libexecdir}/%{name}/sqlrresultsettranslation_*
 %{_libexecdir}/%{name}/sqlrschedule_*
 %{_libexecdir}/%{name}/sqlrtranslation_*
+%{_libexecdir}/%{name}/sqlrdirective_*
 %{_mandir}/*/sqlr-listener.*
 %{_mandir}/*/sqlr-connection.*
 %{_mandir}/*/sqlr-scaler.*
@@ -574,6 +575,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/private/sqlrtrigger.h
 %{_includedir}/%{name}/private/sqlrtriggers.h
 %{_includedir}/%{name}/private/sqlruserpasswordcredentials.h
+%{_includedir}/%{name}/private/sqlrdirective.h
+%{_includedir}/%{name}/private/sqlrdirectives.h
+%{_includedir}/%{name}/private/sqlrresultsetheadertranslation.h
+%{_includedir}/%{name}/private/sqlrresultsetheadertranslations.h
 %{_libdir}/libsqlrserver.so
 %exclude %{_libdir}/lib*.la
 
@@ -846,8 +851,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon May 14 2018 David Muse <david.muse@firstworks.com> - 1.3.0-1
+* Wed May 16 2018 David Muse <david.muse@firstworks.com> - 1.3.0-1
 - Updated to version 1.3.0.
+- Added directive module headers and shared objects.
+- Added resultsetheadertranslation headers.
 
 * Fri Sep 22 2017 David Muse <david.muse@firstworks.com> - 1.2.0-1
 - Updated required version of rudiments-devel to 1.0.5.
