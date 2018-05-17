@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: rudiments-devel >= 1.0.5, systemd
+BuildRequires: rudiments-devel >= 1.0.7, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -853,6 +853,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %changelog
 * Wed May 16 2018 David Muse <david.muse@firstworks.com> - 1.3.0-1
 - Updated to version 1.3.0.
+- Updated to require rudiments 1.0.7.
 - Added directive module headers and shared objects.
 - Added resultsetheadertranslation headers.
 
