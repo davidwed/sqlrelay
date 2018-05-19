@@ -754,7 +754,7 @@ static PyObject *substitutions(PyObject *self, PyObject *args) {
   PyObject *precisions;
   PyObject *scales;
   long sqlrcur;
-  char *variable;
+  const char *variable;
   uint16_t success;
   PyObject *value;
   if (!PyArg_ParseTuple(args, "lOOOO", &sqlrcur, &variables, &values, &precisions, &scales))
@@ -894,7 +894,7 @@ static PyObject *inputBinds(PyObject *self, PyObject *args) {
   PyObject *precisions;
   PyObject *scales;
   long sqlrcur;
-  char *variable;
+  const char *variable;
   uint16_t success;
   PyObject *value;
   if (!PyArg_ParseTuple(args, "lOOOO", &sqlrcur, &variables, &values, &precisions, &scales))

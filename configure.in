@@ -668,6 +668,13 @@ FW_CHECK_NEW_DTAGS
 
 FW_CHECK_F_NO_BUILTIN
 
+dnl if LDFLAGS contains -Wl,-z,relro the CPPFLAGS requires -fPIC
+dnl libtool adds it at compile time but we need it for configure tests too
+if ( test -n "`echo $LDFLAGS | grep '\-Wl,\-z,relro'`" )
+then
+	CPPFLAGS="-fPIC $CPPFLAGS"
+fi
+
 echo "******************************"
 
 

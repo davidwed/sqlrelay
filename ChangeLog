@@ -51,6 +51,10 @@
 	fixed ODBC wchar truncation problem
 	fixed "show columns odbc" bug in mysql connection module
 	mysql connection module uses MYSQL_FIELD.name_length if it can now
+	fixed char * -> const char * bug in python API
+	added support for openjdk-11 to configure script
+	removed some unnecessary parentheses in mysql drop-in library that
+		gcc 8.1.1 doesn't like
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

@@ -197,8 +197,8 @@ struct MYSQL_BIND {
   my_bool       binary_data;      /* data buffer is binary */
   my_bool       null_field;       /* NULL data cache flag */
   my_bool	internal_is_null; /* Used if is_null is 0 */
-  void (*store_param_func);/*(NET *net, struct MYSQL_BIND *param);*/
-  void (*fetch_result);/*(struct MYSQL_BIND *, unsigned char **row);*/
+  void *store_param_func;/*(NET *net, struct MYSQL_BIND *param);*/
+  void *fetch_result;/*(struct MYSQL_BIND *, unsigned char **row);*/
 };
 #endif
 
