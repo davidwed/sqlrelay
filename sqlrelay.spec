@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.3.0
+Version: 1.3.1
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -851,6 +851,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon May 21 2018 David Muse <david.muse@firstworks.com> - 1.3.1-1
+- Updated to version 1.3.1.
+
 * Wed May 16 2018 David Muse <david.muse@firstworks.com> - 1.3.0-1
 - Updated to version 1.3.0.
 - Updated to require rudiments 1.0.7.
