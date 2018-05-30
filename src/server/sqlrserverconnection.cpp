@@ -26,6 +26,8 @@ class sqlrserverconnectionprivate {
 		char		*_dbhostname;
 		char		*_dbipaddress;
 		uint32_t	_dbhostiploop;
+
+		bool		_detachbeforelogin;
 };
 
 sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
@@ -45,6 +47,8 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 	pvt->_dbhostname=NULL;
 	pvt->_dbipaddress=NULL;
 	pvt->_dbhostiploop=0;
+
+	pvt->_detachbeforelogin=false;
 }
 
 sqlrserverconnection::~sqlrserverconnection() {
@@ -55,7 +59,7 @@ sqlrserverconnection::~sqlrserverconnection() {
 }
 
 bool sqlrserverconnection::mustDetachBeforeLogIn() {
-	return false;
+	return pvt->_detachbeforelogin;
 }
 
 bool sqlrserverconnection::supportsAuthOnDatabase() {
@@ -157,6 +161,10 @@ void sqlrserverconnection::handleConnectString() {
 		!charstring::compare(
 			cont->getConnectStringValue("executedirect"),
 			"yes"));
+
+	// detach before login
+	pvt->_detachbeforelogin=!charstring::compare(
+			cont->getConnectStringValue("detachbeforelogin"),"yes");
 }
 
 bool sqlrserverconnection::changeUser(const char *newuser,

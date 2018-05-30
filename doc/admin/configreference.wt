@@ -300,7 +300,7 @@ For '''sqlite''' databases, the connect string syntax is "db=DB;identity=ID"
 
 
 [=#odbc]
-For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no"
+For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no;trace=yes/no/default;tracefile=TRACEFILE;detachbeforelogin=yes/no"
 
 * '''user''': The username SQL Relay should use to log into the database.  Required.
 * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
@@ -312,6 +312,9 @@ For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSW
 * '''maxitembuffersize''': The maximum size of a field.  Fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
 * '''mars''': Whether to enable MS SQL Server MARS (Multiple Active Result Sets).  Set to yes to enable MARS with MS SQL Server.  Omit or set to no to disable MARS.  Omit when using an ODBC driver for a database other than MS SQL Server.  Optional, defaults to no.
+* '''trace''': Whether or not to enable ODBC tracing.  Set to yes to enable tracing.  Set to no to disable tracing.  Set to default to accept whatever is configured in the DSN.  Defaults to default.
+* '''tracefile''': Allows you to override the default ODBC trace file name, or the trace file name specified in the DSN.  If omitted then the trace file name specified in the DSN will be used.  If that is omitted then the default trace file name will be used.
+* '''detachbeforelogin''': Whether or not to detach from the controlling terminal before login.  When set to yes, the process ID's in the ODBC trace file will match the process ID of the sqlr-connection process.  Otherwise they will not.  Defaults to no.
 
 
 [=#mdbtools]

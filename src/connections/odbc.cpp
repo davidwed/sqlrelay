@@ -260,7 +260,6 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 			odbcconnection(sqlrservercontroller *cont);
 	private:
 		void		handleConnectString();
-		bool		mustDetachBeforeLogIn();
 		bool		logIn(const char **error, const char **warning);
 		char		*odbcDriverConnectionString(
 						const char *userasc,
@@ -337,11 +336,10 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		const char	*dsn;
 		const char	*server;
 		const char	*db;
-		bool		trace;
+		const char	*trace;
 		const char	*tracefile;
 		const char	*identity;
 		const char	*odbcversion;
-		bool		detachbeforelogin;
 		const char	*lastinsertidquery;
 		bool		mars;
 		bool		getcolumntables;
@@ -480,11 +478,10 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	dsn=NULL;
 	server=NULL;
 	db=NULL;
-	trace=false;
+	trace=NULL;
 	tracefile=NULL;
 	identity=NULL;
 	odbcversion=NULL;
-	detachbeforelogin=false;
 	lastinsertidquery=NULL;
 	mars=false;
 	getcolumntables=false;
@@ -502,16 +499,12 @@ void odbcconnection::handleConnectString() {
 	server=cont->getConnectStringValue("server");
 	db=cont->getConnectStringValue("db");
 
-	trace=!charstring::compare(
-			cont->getConnectStringValue("trace"),"yes");
+	trace=cont->getConnectStringValue("trace");
 	tracefile=cont->getConnectStringValue("tracefile");
 
 	identity=cont->getConnectStringValue("identity");
 
 	odbcversion=cont->getConnectStringValue("odbcversion");
-
-	detachbeforelogin=!charstring::compare(
-			cont->getConnectStringValue("detachbeforelogin"),"yes");
 
 	lastinsertidquery=cont->getConnectStringValue("lastinsertidquery");
 
@@ -525,10 +518,6 @@ void odbcconnection::handleConnectString() {
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
-}
-
-bool odbcconnection::mustDetachBeforeLogIn() {
-	return detachbeforelogin;
 }
 
 bool odbcconnection::logIn(const char **error, const char **warning) {
@@ -579,19 +568,27 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	}
 
 #if (ODBCVER >= 0x0300)
-	// enable tracing, if configured to do so
-	if (trace && !charstring::isNullOrEmpty(tracefile)) {
+	// trace paramters may have been set in the DSN,
+	// but we can also override them here...
+	if (!charstring::isNullOrEmpty(tracefile)) {
 		// FIXME: does this need to persist?
 		char	*tracefilename=traceFileName(tracefile);
 		erg=SQLSetConnectAttr(dbc,
 				SQL_ATTR_TRACEFILE,
 				(SQLPOINTER *)tracefilename,
 				SQL_NTS);
+		delete[] tracefilename;
+	}
+	if (!charstring::compare(trace,"yes")) {
 		erg=SQLSetConnectAttr(dbc,
 				SQL_ATTR_TRACE,
 				(SQLPOINTER *)SQL_OPT_TRACE_ON,
 				0);
-		delete[] tracefilename;
+	} else if (!charstring::compare(trace,"no")) {
+		erg=SQLSetConnectAttr(dbc,
+				SQL_ATTR_TRACE,
+				(SQLPOINTER *)SQL_OPT_TRACE_OFF,
+				0);
 	}
 
 	// set the initial db
