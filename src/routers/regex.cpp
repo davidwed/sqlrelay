@@ -60,10 +60,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 }
 
 sqlrrouter_regex::~sqlrrouter_regex() {
-	for (linkedlistnode< regularexpression *> *rn=relist.getFirst();
-							rn; rn=rn->getNext()) {
-		delete rn->getValue();
-	}
+	relist.clearAndDelete();
 }
 
 const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,

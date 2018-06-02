@@ -396,10 +396,7 @@ int main(int argc, const char **argv) {
 	}
 
 	// clean up
-	for (linkedlistnode< float > *node=stats.getKeys()->getFirst();
-						node; node=node->getNext()) {
-		delete stats.getValue(node->getValue());
-	}
+	stats.clearAndDeleteValues();
 
 	// exit
 	process::exit(0);

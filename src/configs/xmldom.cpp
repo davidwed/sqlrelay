@@ -396,28 +396,10 @@ void sqlrconfig_xmldom::init() {
 void sqlrconfig_xmldom::clear() {
 	debugFunction();
 
-	for (connectstringnode *csn=connectstringlist.getFirst();
-						csn; csn=csn->getNext()) {
-		delete csn->getValue();
-	}
-	connectstringlist.clear();
-
-	for (routenode *rn=routelist.getFirst(); rn; rn=rn->getNext()) {
-		delete rn->getValue();
-	}
-	routelist.clear();
-
-	for (linkedlistnode< char * > *ssln=sessionstartqueries.getFirst();
-						ssln; ssln=ssln->getNext()) {
-		delete[] ssln->getValue();
-	}
-	sessionstartqueries.clear();
-
-	for (linkedlistnode< char * > *seln=sessionendqueries.getFirst();
-						seln; seln=seln->getNext()) {
-		delete[] seln->getValue();
-	}
-	sessionendqueries.clear();
+	connectstringlist.clearAndDelete();
+	routelist.clearAndDelete();
+	sessionstartqueries.clearAndArrayDelete();
+	sessionendqueries.clearAndArrayDelete();
 }
 
 const char *sqlrconfig_xmldom::getDefaultAddresses() {

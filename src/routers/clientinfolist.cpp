@@ -2,7 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#include <rudiments/linkedlist.h>
 #include <rudiments/regularexpression.h>
 
 class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {

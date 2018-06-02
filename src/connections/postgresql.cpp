@@ -275,22 +275,12 @@ bool postgresqlconnection::logIn(const char **error,
 
 	// clear the datatype dictionary
 	if (typemangling==2) {
-		for (avltreenode< dictionarynode<int32_t,char *> *>
-					*node=datatypes.getTree()->getFirst();
-					node; node=node->getNext()) {
-			delete[] node->getValue()->getValue();
-		}
-		datatypes.clear();
+		datatypes.clearAndArrayDeleteValues();
 	}
 
 	// clear the table dictionary
 	if (tablemangling==2) {
-		for (avltreenode< dictionarynode<int32_t,char *> *>
-					*node=tables.getTree()->getFirst();
-					node; node=node->getNext()) {
-			delete[] node->getValue()->getValue();
-		}
-		tables.clear();
+		tables.clearAndArrayDeleteValues();
 	}
 
 	// log in

@@ -715,38 +715,10 @@ SQLRETURN SQL_API SQLCancelHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 static void SQLR_ResetParams(STMT *stmt) {
 	debugFunction();
 
-	// clear bind variables
 	stmt->cur->clearBinds();
-
-	// clear input bind list
-	linkedlist<dictionarynode<int32_t, char * > *>
-				*ibslist=stmt->inputbindstrings.getList();
-	for (linkedlistnode<dictionarynode<int32_t, char * > *>
-					*node=ibslist->getFirst();
-					node; node=node->getNext()) {
-		delete[] node->getValue();
-	}
-	ibslist->clear();
-
-	// clear output bind list
-	linkedlist<dictionarynode<int32_t, outputbind * > *>
-				*oblist=stmt->outputbinds.getList();
-	for (linkedlistnode<dictionarynode<int32_t, outputbind * > *>
-					*node=oblist->getFirst();
-					node; node=node->getNext()) {
-		delete node->getValue();
-	}
-	oblist->clear();
-
-	// clear input/output bind list
-	linkedlist<dictionarynode<int32_t, outputbind * > *>
-				*ioblist=stmt->inputoutputbinds.getList();
-	for (linkedlistnode<dictionarynode<int32_t, outputbind * > *>
-					*node=ioblist->getFirst();
-					node; node=node->getNext()) {
-		delete node->getValue();
-	}
-	ioblist->clear();
+	stmt->inputbindstrings.clearAndArrayDeleteValues();
+	stmt->outputbinds.clearAndDeleteValues();
+	stmt->inputoutputbinds.clearAndDeleteValues();
 }
 
 static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {

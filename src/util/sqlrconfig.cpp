@@ -92,11 +92,7 @@ routecontainer::~routecontainer() {
 	delete[] socket;
 	delete[] user;
 	delete[] password;
-	for (linkedlistnode< regularexpression * > *re=
-					regexlist.getFirst();
-						re; re=re->getNext()) {
-		delete re->getValue();
-	}
+	regexlist.clearAndDelete();
 }
 
 void routecontainer::setIsFilter(bool isfilter) {

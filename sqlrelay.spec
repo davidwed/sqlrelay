@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: rudiments-devel >= 1.0.7, systemd
+BuildRequires: rudiments-devel >= 1.0.8, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -851,8 +851,9 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon May 21 2018 David Muse <david.muse@firstworks.com> - 1.3.1-1
+* Sat Jun 02 2018 David Muse <david.muse@firstworks.com> - 1.3.1-1
 - Updated to version 1.3.1.
+- Updated to require rudiments 1.0.8.
 
 * Wed May 16 2018 David Muse <david.muse@firstworks.com> - 1.3.0-1
 - Updated to version 1.3.0.
