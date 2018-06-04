@@ -3,7 +3,9 @@
 	updated to use rudiments container clearAndDelete...() methods
 	fixed nonsensical uint32_t majorversion>=0 comparison in freetds conn
 	fixed nonsensical uint16_t isnull==-1 comparison in odbc conn
-	fixed return NULL in mehtod that returns false in router conn
+	fixed return NULL in method that returns false in router conn
+	added manual removal of build directory in nodejs clean target
+	updated nodejs clean target with - in front of node-gyp clean
 
 1.3.0 - updated systemd init file to use SIGINT to kill sqlrelay
 	fixed several "ocurred" -> "occurred" typo's

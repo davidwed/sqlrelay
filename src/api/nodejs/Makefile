@@ -8,7 +8,8 @@ all: build/Release/sqlrelay.node
 
 clean:
 	$(RM) binding.gyp package.json
-	$(NODEGYP) clean
+	-$(NODEGYP) clean
+	$(RMTREE) build
 	$(RM) temp1.gyp temp2.gyp
 
 build/Release/sqlrelay.node: binding.gyp sqlrelay.cpp package.json
