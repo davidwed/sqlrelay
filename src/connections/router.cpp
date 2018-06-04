@@ -111,8 +111,6 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		int16_t		nullbindvalue;
 		int16_t		nonnullbindvalue;
 
-		const char	*error;
-
 		sqlrrouters	*sqlrr;
 
 		bool		routeentiresession;
@@ -943,7 +941,7 @@ bool routerconnection::ping() {
 		if (debug) {
 			stdoutput.printf("	routing error\n}\n");
 		}
-		return NULL;
+		return false;
 	}
 
 	// if routing entire sessions, then ping the appropriate connection

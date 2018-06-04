@@ -2644,7 +2644,7 @@ int16_t odbccursor::nullBindValue() {
 }
 
 bool odbccursor::bindValueIsNull(uint16_t isnull) {
-	return (isnull==SQL_NULL_DATA);
+	return ((int16_t)isnull==SQL_NULL_DATA);
 }
 
 bool odbccursor::executeQuery(const char *query, uint32_t length) {

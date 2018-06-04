@@ -914,7 +914,7 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 
 	// Affected row count is generally supported in versions >= 0.53 but
 	// appears to be broken in 0.61.
-	knowsaffectedrows=(majorversion>=0 ||
+	knowsaffectedrows=(majorversion>0 ||
 				(minorversion>=53 && minorversion!=61));
 
 	prepared=false;
