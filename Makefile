@@ -103,7 +103,8 @@ distclean: clean
 		test/test.sh \
 		test/test.bat \
 		msvc/setupx64/setupx64.vdproj \
-		msvc/setupx86/setupx86.vdproj
+		msvc/setupx86/setupx86.vdproj \
+		doc/admin/installingpkg.wt
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \

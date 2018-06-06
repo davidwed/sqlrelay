@@ -8,80 +8,103 @@
 
 <ul>
   <li><a href="#platforms">Supported Platforms</a></li>
-  <li><a href="#unixlinux">Installing SQL Relay from Packages on Linux and Unix</a></li>
-  <ul>
-    <li><a href="#linux">Linux</a></li>
-    <ul>
-      <li><a href="#downloading">Downloading SQL Relay Packages</a></li>
-      <li><a href="#installing">Installing SQL Relay Packages</a></li>
-    </ul>
-
-    <li><a href="#freebsd">FreeBSD</a></li>
-    <ul>
-      <li><a href="#pkg">Installing SQL Relay Using pkg</a></li>
-    </ul>
-
-    <li><a href="#netbsd">NetBSD</a></li>
-    <ul>
-      <li><a href="#pkg">Installing SQL Relay Using pkgin</a></li>
-    </ul>
-
-  </ul>
-
-  <li><a href="#windows">Installing SQL Relay from Packages on Windows</a></li>
-  <ul>
-    <li><a href="#downloadingwin">Downloading SQL Relay Packages</a></li>
-    <li><a href="#installingwin">Installing SQL Relay Packages</a></li>
-  </ul>
-
+  <li><a href="#linux">Linux</a></li>
+  <li><a href="#freebsd">FreeBSD</a></li>
+  <li><a href="#netbsd">NetBSD</a></li>
+  <li><a href="#windows">Windows</a></li>
 </ul>
 
 <a name="platforms"/><h2>Supported Platforms</h2>
 
-<p>...</p>
+<p>SQL Relay packages are currently available for:</p>
 
-<a name="unixlinux"/><h2>Installing SQL Relay from Packages on Linux and Unix</h2>
+<ul>
+  <li>RPM-based Linux (Fedora, CentOS/RHEL, and OpenSuSE)</li>
+  <li>FreeBSD</li>
+  <li>NetBSD</li>
+  <li>Windows</li>
+</ul>
 
-<p>...</p>
+<a name="linux"/><h2>Linux</h2>
 
-<a name="linux"/><h3>Linux</h3>
+<p>SQL Relay packages are currently available for RPM-based Linux distributions like Fedora, CentOS/RHEL, and OpenSuSE Linux, for the x86_64 architecture.</p>
 
-<p>...</p>
+<p>Packages are not currenly available for dpkg-based Linux like Ubunutu and Debian Linux or for non-x86_64 architectures.  On these platforms SQL Relay must be built from <a href="installing.html">source</a>.</p>
 
-<a name="downloading"/><h4>Downloading SQL Relay Packages</h4>
+<p>To download the Linux packages, download the <a target="_blank" href="http://sourceforge.net/projects/sqlrelay/files/sqlrelay/1.3.0/sqlrelay-binary-distribution-1.3.0.tar.gz/download">SQL Relay Binary Distribution for Linux</a>.  This file is a tar.gz containing RPMs for all supported Linux platforms.</p>
 
-<p>...</p>
+<p>To install packages, first extract the file:</p>
 
-<a name="installing"/><h4>Installing SQL Relay Packages</h4>
+<blockquote>
+  <pre>tar xfz sqlrelay-binary-distribution-1.3.0.tar.gz
+</pre>
 
-<p>...</p>
+</blockquote>
+<p>Then change directories into the directory that was created during the extraction:</p>
 
-<a name="freebsd"/><p> 
-=== FreeBSD ===</p>
+<blockquote>
+  <pre>cd sqlrelay-binary-distribution-1.3.0
+</pre>
 
-<p>...</p>
+</blockquote>
+<p>Then change directories into the directory for the appropriate distribution, for example:</p>
 
-<a name="pkg"/><h4>Installing SQL Relay Using pkg</h4>
+<blockquote>
+  <pre>cd centos7x64
+</pre>
 
-<p>...</p>
+</blockquote>
+<p>Then, install the RPMs.  Since different platforms use different packaging systems, installation instructions depend on the platform.</p>
 
-<a name="netbsd"/><h3>NetBSD</h3>
+<blockquote>
+  <p>On Fedora platforms, run (as root):</p>
 
-<p>...</p>
+  <blockquote>
+    <pre>dnf localinstall *
+</pre>
 
-<a name="pkg"/><h4>Installing SQL Relay Using pkgin</h4>
+  </blockquote>
+  <p>On CentOS platforms, run (as root):</p>
 
-<p>...</p>
+  <blockquote>
+    <pre>yum localinstall *
+</pre>
 
+  </blockquote>
+  <p>On OpenSuSE platforms, run (as root):</p>
+
+  <blockquote>
+    <pre>zypper install *
+</pre>
+
+  </blockquote>
+</blockquote>
+<p>In any case, the package packaging system should install the RPMs as well as any dependencies that they require.</p>
+
+<p>Client libraries for most of the databases supported by SQL Relay are available as RPMs and should be automatically installed by the packaging system.  However, packages for commercial databases are not available from any standard package repository and must be installed manually for SQL Relay to actually work with these databases.</p>
+
+<p>For SQL Relay to work with a commercial database, you must install and configure client libraries for one or more of <a target="_blank" href="http://www.oracle.com">Oracle</a>, <a target="_blank" href="http://scn.sap.com/community/developer-center/oltp-db">SAP/Sybase</a>, <a target="_blank" href="http://www.ibm.com/software/data/db2/">DB2</a>, or <a target="_blank" href="http://www.ibm.com/software/data/informix/">Informix</a>.</p>
+
+<a name="freebsd"/><h2>FreeBSD</h2>
+
+<p>SQL Relay is available as a <a target="_blank" href="http://www.freshports.org/databases/sqlrelay/">FreeBSD port</a>.  To install all packages related to SQL Relay, run (as root):</p>
+
+<blockquote>
+  <pre>pkg install sqlrelay py27-sqlrelay
+</pre>
+
+</blockquote>
+<a name="netbsd"/><h2>NetBSD</h2>
+
+<p>SQL Relay is available as a <a target="_blank" href="http://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/databases/sqlrelay/README.html">NetBSD</a> package. To install available all packages related to SQL Relay, run (as root):</p>
+
+<blockquote>
+  <pre>pkgin install sqlrelay sqlrelay-sqlite sqlrelay-pgsql sqlrelay-odbc sqlrelay-nodejs sqlrelay-mysql sqlrelay-freetds
+ruby22-sqlrelay ruby21-sqlrelay ruby200-sqlrelay py27-sqlrelay php56-sqlrelay php55-sqlrelay p5-sqlrelay
+</pre>
+
+</blockquote>
 <a name="windows"/><h2>Installing SQL Relay from Packages on Windows</h2>
-
-<p>...</p>
-
-<a name="downloadingwin"/><h3>Downloading SQL Relay Packages</h3>
-
-<p>...</p>
-
-<a name="installingwin"/><h3>Installing SQL Relay Packages</h3>
 
 ...
 </body>

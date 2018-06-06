@@ -35866,7 +35866,7 @@ fi
 
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh doc/admin/installingpkg.wt"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF
