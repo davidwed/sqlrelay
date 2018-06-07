@@ -283,7 +283,7 @@ or a tnsnames-style expression such as:
   <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 
-<br/><a name="db2"/><p>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</p>
+<br/><a name="db2"/><p>For <b>db2</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;connecttimeout=CONNECTTIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</p>
 
 <ul>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -292,7 +292,7 @@ or a tnsnames-style expression such as:
   <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
   <li><b>lang</b>: Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.</li>
   <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  DB2 is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
-  <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
+  <li><b>connecttimeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
   <li><b>fetchatonce</b>: The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
   <li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
   <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
@@ -301,7 +301,7 @@ or a tnsnames-style expression such as:
   <li><b>db2</b>: The base directory of the DB2 installation.  Only used if SQL Relay was built to load the DB2 client libraries at runtime.  Then the lib, lib32, and lib64 subdirectories of this directory will be searched, as appropriate, for the client libraries.</li>
 </ul>
 
-<br/><a name="informix"/><p>For <b>informix</b> databases, the connect string syntax is "user=USER;password=PASSWORD;informixdir=INFORMIXDIR;servername=SERVERNAME;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</p>
+<br/><a name="informix"/><p>For <b>informix</b> databases, the connect string syntax is "user=USER;password=PASSWORD;informixdir=INFORMIXDIR;servername=SERVERNAME;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;connecttimeout=CONNECTTIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"</p>
 
 <ul>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -313,7 +313,7 @@ or a tnsnames-style expression such as:
   <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
   <li><b>lang</b>: Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.</li>
   <li><b>faketransactionblocks</b>: Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Informix is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".</li>
-  <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
+  <li><b>connecttimeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
   <li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
   <li><b>maxitembuffersize</b>: The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
   <li><b>maxoutlobbindsize</b>: The maximum size of a lob output bind variable.  Defaults to 2 megabytes.  Has has no effect on lob columns.</li>
@@ -389,14 +389,14 @@ or a tnsnames-style expression such as:
   <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 
-<br/><a name="odbc"/><p>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no;trace=yes/no/default;tracefile=TRACEFILE;detachbeforelogin=yes/no"</p>
+<br/><a name="odbc"/><p>For <b>odbc</b> databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;connecttimeout=CONNECTTIMEOUT;odbcversion=ODBCVERSION;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no;trace=yes/no/default;tracefile=TRACEFILE;detachbeforelogin=yes/no"</p>
 
 <ul>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
   <li><b>password</b>: The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
   <li><b>dsn</b>: The entry in the the odbcinst.ini which specifies host, port and other database connection parameters.</li>
   <li><b>autocommit</b>: Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.</li>
-  <li><b>timeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
+  <li><b>connecttimeout</b>: Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.</li>
   <li><b>odbcversion</b>: Tells the driver to exhibit behavior from the specified version of ODBC.  Valid values include: 2, 3, and 3.8.  Defaults to 3.  It may be necessary to set this to 2 for some drivers that only support ODBC 2.</li>
   <li><b>maxselectlistsize</b>: The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>
   <li><b>maxitembuffersize</b>: The maximum size of a field.  Fields longer than this will be truncated.  Defaults to 32768. (see <a href="tuning.html#memoryusage">here</a> for more info on this parameter)</li>

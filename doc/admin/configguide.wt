@@ -370,7 +370,7 @@ In this example, SQL Relay is configured to connect to an IBM DB2 database.
 
 The db option refers to an entry in the local DB2 instance's database catalog.  See [http://software.firstworks.com/p/getting-started-with-ibm-db2.html#accessingremote Getting Started With IBM DB2 - Accessing Remote Instances] for more information.
 
-The timeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.
+The connecttimeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.
 
 See the [configreference.html#db2 SQL Relay Configuration Reference] for other valid IBM DB2 connect string options.
 

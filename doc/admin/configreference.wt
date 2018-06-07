@@ -194,7 +194,7 @@ For '''sap''' (or '''sybase''') databases, the connect string syntax is "sybase=
 
 
 [=#db2]
-For '''db2''' databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"
+For '''db2''' databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;connecttimeout=CONNECTTIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"
 
 * '''user''': The username SQL Relay should use to log into the database.  Required.
 * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
@@ -202,7 +202,7 @@ For '''db2''' databases, the connect string syntax is "user=USER;password=PASSWO
 * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
 * '''lang''': Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.
 * '''faketransactionblocks''': Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  DB2 is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".
-* '''timeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
+* '''connecttimeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
 * '''fetchatonce''': The number of rows that SQL Relay fetches from the database in each round trip.  Defaults to 10. (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
@@ -212,7 +212,7 @@ For '''db2''' databases, the connect string syntax is "user=USER;password=PASSWO
 
 
 [=#informix]
-For '''informix''' databases, the connect string syntax is "user=USER;password=PASSWORD;informixdir=INFORMIXDIR;servername=SERVERNAME;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;timeout=TIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"
+For '''informix''' databases, the connect string syntax is "user=USER;password=PASSWORD;informixdir=INFORMIXDIR;servername=SERVERNAME;db=DB;autocommit=yes/no;faketransactionblocks=yes/no;connecttimeout=CONNECTTIMEOUT;fetchatonce=FETCHATONCE;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID"
 
 * '''user''': The username SQL Relay should use to log into the database.  Required.
 * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
@@ -223,7 +223,7 @@ For '''informix''' databases, the connect string syntax is "user=USER;password=P
 * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
 * '''lang''': Sets/overrides the LANG environment variable and by extension, all locale-related variables.  Optional if the LANG environment variable is set.
 * '''faketransactionblocks''': Some databases are in autocommit mode until you explicitly start a transaction with a "start" or "begin" statement.  Informix is always in a transaction though, unless autocommit is turned on.  Setting this parameter to "yes" causes SQL Relay to put the database in autocommit mode until a "start" or "begin" statement is issued, and then put it back in autocommit mode when a commit or rollback is issued.  In effect, emulating the behavior of databases which require an explicit "start" or "begin".
-* '''timeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
+* '''connecttimeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
 * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''maxitembuffersize''': The maximum size of a non-lob field.  Non-lob fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''maxoutlobbindsize''': The maximum size of a lob output bind variable.  Defaults to 2 megabytes.  Has has no effect on lob columns.
@@ -300,13 +300,13 @@ For '''sqlite''' databases, the connect string syntax is "db=DB;identity=ID"
 
 
 [=#odbc]
-For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;timeout=TIMEOUT;odbcversion=ODBCVERSION;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no;trace=yes/no/default;tracefile=TRACEFILE;detachbeforelogin=yes/no"
+For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;connecttimeout=CONNECTTIMEOUT;odbcversion=ODBCVERSION;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no;trace=yes/no/default;tracefile=TRACEFILE;detachbeforelogin=yes/no"
 
 * '''user''': The username SQL Relay should use to log into the database.  Required.
 * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
 * '''dsn''': The entry in the the odbcinst.ini which specifies host, port and other database connection parameters.
 * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
-* '''timeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
+* '''connecttimeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
 * '''odbcversion''': Tells the driver to exhibit behavior from the specified version of ODBC.  Valid values include: 2, 3, and 3.8.  Defaults to 3.  It may be necessary to set this to 2 for some drivers that only support ODBC 2.
 * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''maxitembuffersize''': The maximum size of a field.  Fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
