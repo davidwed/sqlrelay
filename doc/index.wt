@@ -21,7 +21,7 @@
 
  [features/databases.html Database Support] - a wide variety of commercial and open-source databases are supported[[br]]
  [features/dbabstractionlayers.html Abstraction Layer Support] - drivers for most popular database abstraction layers are provided[[br]]
- [features/dropinreplacementlibs.html Drop-In Replacement Libraries] - allow many native !MySQL or !PostgreSQL applications to use SQL Relay without modification[[br]]
+ [features/dropinreplacementlibs.html Drop-In Replacement Libraries] - allow many native !MySQL/MariaDB or !PostgreSQL applications to use SQL Relay without modification[[br]]
  [features/languages.html Native API] - the powerful native SQL Relay client API supports a wide variety of programming languages[[br]]
 
  [features/substitutionandbindvars.html Substitution and Bind Variables] - make frequently run queries faster and more efficient[[br]]
@@ -144,7 +144,7 @@ The native SQL Relay client APIs provide advanced features like suspended sessio
 
 ==== Drop-In Replacement Libraries ====
 
-Drop-In Replacement Libraries allow many native !MySQL or !PostgreSQL applications to use SQL Relay without modification.
+Drop-In Replacement Libraries allow many native !MySQL/MariaDB or !PostgreSQL applications to use SQL Relay without modification.
 
- [dropin/mysql.html MySQL][[br]]
+ [dropin/mysql.html MySQL/MariaDB][[br]]
  [dropin/postgresql.html PostgreSQL][[br]]

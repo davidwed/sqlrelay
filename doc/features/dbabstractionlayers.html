@@ -8,13 +8,13 @@
 
 <p>Rather than using a native database API, most applications are written using a database abstraction layer that loads a database-specific driver at runtime.</p>
 
-<p>For example, a PHP app might be written to use PDO and be configured to load a MySQL driver at runtime to talk to a MySQL database.</p>
+<p>For example, a PHP app might be written to use PDO and be configured to load a MySQL/MariaDB driver at runtime to talk to a MySQL/MariaDB database.</p>
 
 <p><img src="../images/app-pdo-mysql.png"/></p>
 
 <p>SQL Relay currently provides drivers for ADO.NET, Perl DBI, Python DB-API, PHP PDO and ODBC.  JDBC is also supported via the JDBC-ODBC bridge.</p>
 
-<p>The same PHP app could be configured to load the SQL Relay driver to talk to MySQL via SQL Relay.</p>
+<p>The same PHP app could be configured to load the SQL Relay driver to talk to MySQL/MariaDB via SQL Relay.</p>
 
 <p><img src="../images/app-pdo-sqlr-mysql.png"/></p>
 
@@ -34,8 +34,6 @@
 <a href="../api/perl/SQLRelay.html">Perl DBI</a>,
 <a href="../api/python/PySQLRDB.py.html">Python DB-API</a>
 </blockquote>
-<p>The native SQL Relay client API is actually a database abstraction layer as well.  A program written using the native SQL Relay client API can talk to any database supported by SQL Relay.
-</p>
-
+The native SQL Relay client API is actually a database abstraction layer as well.  A program written using the native SQL Relay client API can talk to any database supported by SQL Relay.
 </body>
 </html>

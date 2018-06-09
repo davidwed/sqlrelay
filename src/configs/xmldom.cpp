@@ -1099,13 +1099,15 @@ void sqlrconfig_xmldom::normalizeTree() {
 		attr->setName("authtier");
 	}
 
-	// oracle8 -> oracle, sybase -> sap
+	// oracle8 -> oracle, sybase -> sap, mariadb -> mysql
 	attr=instance->getAttribute("dbase");
 	if (!attr->isNullNode()) {
 		if (!charstring::compare(attr->getValue(),"oracle8")) {
 			attr->setValue("oracle");
 		} else if (!charstring::compare(attr->getValue(),"sybase")) {
 			attr->setValue("sap");
+		} else if (!charstring::compare(attr->getValue(),"mariadb")) {
+			attr->setValue("mysql");
 		}
 	}
 

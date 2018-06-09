@@ -1,10 +1,10 @@
 <html>
 <head>
-	<title>Using the SQL Relay drop-in replacement library for MySQL</title>
+	<title>Using the SQL Relay drop-in replacement library for MySQL/MariaDB</title>
 	<link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-<h1>Using the SQL Relay drop-in replacement library for MySQL</h1>
+<h1>Using the SQL Relay drop-in replacement library for MySQL/MariaDB</h1>
 
 <ul>
   <li><a href="#whatis">What is a drop-in replacement library?</a></li>
@@ -20,14 +20,14 @@
 
 <a name="whatis"/><h2>What is a drop-in replacement library?</h2>
 
-<p>The SQL Relay Drop-In Replacement Library for MySQL is a shared-object library that can be LD_PRELOAD'ed to take the place of the native MySQL client library.</p>
+<p>The SQL Relay Drop-In Replacement Library for MySQL/MariaDB is a shared-object library that can be LD_PRELOAD'ed to take the place of the native MySQL/MariaDB client library.</p>
 
-<p>It allows many applications that are written to use MySQL directly to use SQL Relay without modification.  This allows an app to immediately take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling.  It can also be used to aim an app that was written to use MySQL at a different database.</p>
+<p>It allows many applications that are written to use MySQL/MariaDB directly to use SQL Relay without modification.  This allows an app to immediately take advantage of SQL Relay features such as connection pooling, load balancing, query routing and throttling.  It can also be used to aim an app that was written to use MySQL/MariaDB at a different database.</p>
 
 <a name="commandline"/><h2>Using the drop-in replacement library with command-line programs</h2>
 
-<p>To use the SQL Relay drop-in replacement library for MySQL clients, you first
-need to determine what version of MySQL your existing application was compiled
+<p>To use the SQL Relay drop-in replacement library for MySQL/MariaDB clients, you first
+need to determine what version of MySQL/MariaDB your existing application was compiled
 against.  There are 4 different drop-in replacement libraries.  One each for
 MySQL versions 3.xx, 4.0, 4.1, 5.0 and 5.1 or higher.  MySQL's native data
 structures changed a bit between the different versions.  If you use the wrong
@@ -57,13 +57,14 @@ library your program will most likely crash.</p>
   <li>4.1 - libmysql41sqlrelay.so</li>
   <li>5.0 - libmysql50sqlrelay.so</li>
   <li>5.1 or higher - libmysql51sqlrelay.so</li>
+  <li>any version of MariaDB - libmysql51sqlrelay.so</li>
 </ul>
 
-<p>Once you've figured out which version of MySQL is installed on your system,
+<p>Once you've figured out which version of MySQL/MariaDB is installed on your system,
 you can load the appropriate drop in library and run your program.</p>
 
 <p>The parameters that would ordinarily indicate which host, port, socket,
-username and password to use to connect to MySQL will be used as parameters to
+username and password to use to connect to MySQL/MariaDB will be used as parameters to
 connect to SQL Relay.  The parameter that would ordinarily indicate which
 database to connect to will be ignored.  Instances of SQL Relay are configured
 to connect to a single database, and that database will be used by the client
@@ -93,12 +94,12 @@ mysql -h localhost -P 9000 --user=oracleuser --password=oraclepass
 </blockquote>
 <p>The LD_PRELOAD environment variable instructs the dynamic loader to load
 libmysql51sqlrelay.so before loading any other libraries for any programs.
-The mysql client program will still load the native MySQL client library, but
+The mysql client program will still load the native MySQL/MariaDB client library, but
 since it loaded the SQL Relay drop-in replacement library first, function calls
-that would normally be fulfilled by the native MySQL client library are 
+that would normally be fulfilled by the native MySQL/MariaDB client library are 
 fulfilled by the SQL Relay drop-in replacement library instead.</p>
 
-<p>If your application was compiled against a different version of MySQL, you
+<p>If your application was compiled against a different version of MySQL/MariaDB, you
 will need to replace libmysql51sqlrelay.so with the appropriate library.</p>
 
 <p>Below is a sample session using the mysql command line client against an
@@ -140,7 +141,7 @@ mysql&gt; quit;
 </blockquote>
 <a name="daemons"/><h2>Using the drop-in replacement library with daemons</h2>
 
-<p>Using the SQL Relay drop-in replacement library for MySQL with daemons is
+<p>Using the SQL Relay drop-in replacement library for MySQL/MariaDB with daemons is
 simlar to using it on the command line.  You just need to add the LD_PRELOAD
 command to the startup script for the daemon before the command that starts the
 daemon itself.</p>
@@ -162,18 +163,18 @@ service requests on those ports.  The helper programs die off after the request
 is serviced.</p>
 
 <p>The easist way to get an inetd helper program to use the SQL Relay drop-in
-replacement library for MySQL is to add the LD_PRELOAD command to the startup
+replacement library for MySQL/MariaDB is to add the LD_PRELOAD command to the startup
 script for inetd/xinetd.  Any command that inetd/xinetd runs will also preload
 the library.</p>
 
-<p>However, if some of the helper programs need to actually run against MySQL
+<p>However, if some of the helper programs need to actually run against MySQL/MariaDB
 and not against SQL Relay, then you will have to do something different.  The
 easiest thing to do is create a script for each helper program that needs to 
 run against SQL Relay that runs the LD_PRELOAD command and then runs the actual
 helper program, passing it all the necessary command line arguments.</p>
 
-<p>For example, lets say you have a pop3 server called pop3d that uses MySQL
-for user identification and you wanted to use SQL Relay instead of MySQL.  The
+<p>For example, lets say you have a pop3 server called pop3d that uses MySQL/MariaDB
+for user identification and you wanted to use SQL Relay instead of MySQL/MariaDB.  The
 inetd.conf entry might look like this:</p>
 
 <blockquote>
@@ -227,14 +228,14 @@ export LD_PRELOAD
 </blockquote>
 <a name="php"/><h2>Using the drop-in replacement library with PHP</h2>
 
-<p>Ideally, if you wanted to use the drop-in replacement library for MySQL with
+<p>Ideally, if you wanted to use the drop-in replacement library for MySQL/MariaDB with
 PHP, you'd just add the LD_PRELOAD command to the startup script for the http
-daemon, but PHP is not typically linked against the MySQL client library,
-rather the PHP source code includes it's own MySQL client API which is compiled
+daemon, but PHP is not typically linked against the MySQL/MariaDB client library,
+rather the PHP source code includes it's own MySQL/MariaDB client API which is compiled
 directly into the PHP module itself.</p>
 
 <p>So, to use the drop-in replacement library with PHP, you must rebuild PHP
-and tell it to link against the MySQL client library.</p>
+and tell it to link against the MySQL/MariaDB client library.</p>
 
 <p>Follow the instructions at <a target="_blank" href="http://www.php.net/manual/en/install.php">PHP: Installation and Configuration</a> for downloading and extracting the
 PHP source code.  When running the <i>./configure,</i> script, in addition to
@@ -259,10 +260,10 @@ have to specify the libdir, with this option:</p>
 <p>Then continue to build and install PHP according to the instructions.</p>
 
 <p>Afterward, you should edit the <b>php.ini</b> file and configure it to load
-the <b>mysql.so</b> module automatically.  When MySQL was compiled into PHP, 
-the MySQL API calls could be made without loading the module, but now that it
+the <b>mysql.so</b> module automatically.  When MySQL/MariaDB was compiled into PHP, 
+the MySQL/MariaDB API calls could be made without loading the module, but now that it
 is not compiled into PHP, the module must be loaded manually.  To automatically
-load the MySQL module, add a line like the following to your <b>php.ini</b>.</p>
+load the MySQL/MariaDB module, add a line like the following to your <b>php.ini</b>.</p>
 
 <blockquote>
 <b>extension=mysql.so</b>
@@ -279,25 +280,25 @@ directory.  For example:</p>
 <blockquote>
 <b>extension_dir=/usr/local/lib/php/extensions/no-debug-non-zts-20060613</b>
 </blockquote>
-<p>After following these steps, your PHP apps which formerly used MySQL directly
+<p>After following these steps, your PHP apps which formerly used MySQL/MariaDB directly
 will now use SQL Relay.  You will need to change the connection parameters, to
 point to SQL Relay , but otherwise it should work.</p>
 
 <a name="modules"/><h2>Using the drop-in replacement library with modules</h2>
 
-<p>You may want to use the SQL Relay drop-in replacement library for MySQL
-clients with a program that isn't compiled against the native MySQL client
+<p>You may want to use the SQL Relay drop-in replacement library for MySQL/MariaDB
+clients with a program that isn't compiled against the native MySQL/MariaDB client
 library but rather loads it as a module such as a program that uses ODBC or
 Perl DBI, or an Apache/PHP application.</p>
 
 <p>Using the SQL Relay drop-in replacement library with programs that load
-the native MySQL client library as a module is simlar to using it on the
+the native MySQL/MariaDB client library as a module is simlar to using it on the
 command line.  You just need to make sure that the LD_PRELOAD command is run
 before the program starts.</p>
 
 <p>If the program is a command line program, then run the LD_PRELOAD command
 before running your program.  Even though the program ultimately loads the
-native MySQL client library, all of its functions will be overriden by the
+native MySQL/MariaDB client library, all of its functions will be overriden by the
 SQL Relay drop-in replacement library.</p>
 
 <p>If the program is a daemon then add the LD_PRELOAD command to the startup
@@ -307,9 +308,9 @@ script or systemd configuration for the daemon.</p>
 application running under Apache's mod_php, then add the LD_PRELOAD command to
 the startup script or systemd configuration for the daemon.  The caveat here is
 that all applications running in the address space of the daemon will use the
-drop-in replacement library instead of the native MySQL library.  It is not
+drop-in replacement library instead of the native MySQL/MariaDB library.  It is not
 possible, for example for a web server to run one PHP application directly
-against MySQL and another PHP application against SQL Relay using the drop-in
+against MySQL/MariaDB and another PHP application against SQL Relay using the drop-in
 replacement library; if the drop-in replacement library is loaded, both
 applications will end up using it.</p>
 
@@ -323,8 +324,8 @@ programs above)</a>).</p>
 
 <a name="work"/><h2>Function support</h2>
 
-<p>The SQL Relay drop-in replacement library for MySQL implements most of the
-native MySQL client library's functions, but there are a few functions that
+<p>The SQL Relay drop-in replacement library for MySQL/MariaDB implements most of the
+native MySQL/MariaDB client library's functions, but there are a few functions that
 aren't implemented because SQL Relay doesn't d way to support them.  These
 functions return safe values or a failure condition.</p>
 
@@ -332,13 +333,13 @@ functions return safe values or a failure condition.</p>
 
 <p>When fetching a date into a MYSQL_TIME struct, the drop-in library attempts to interpret whatever it got back from the database as a date.  It can parse the native formats of all the databases that SQL Relay currently supports, but it cannot tell by examination whether a date like 02-05-2011 is in MM-DD-YYYY format or DD-MM-YYYY format.  By default, it assumes MMDD, but if you want it to assume DDMM instead, set the environment variable SQLR_MYSQL_DATE_DDMM="yes".  Another environment variable allows you to specify different behaviors for dates that start with years, such as 2011-02-05.  If SQLR_MYSQL_DATE_YYYYDDMM="yes" then that date would be interpreted as being in the YYYY-DD-MM format.  If it is set to "no" then that date would be interpreted as being in the YYYY-MM-DD format.  If it is not set, then it defaults to whatever SQLR_MYSQL_DATE_DDMM is set to.  If neither are set then dates are universally interpreted to be in MM/DD format.  There are very specific cases where these two environment variables need to be set differently from one another.  You'll know if you need to.</p>
 
-<p>When using mysql_stmt_bind_result, it's possible to bind fewer buffers than there are columns in the result set.  For example you might run "select col1, col2, col3 from mytable" but only bind a single value, expecting col1 to be fetched and the others ignored.  The native MySQL library doesn't support this but some apps do it anyway and it's just fortune that they don't crash.  Some apps try a little harder and "NULL-terminate" the bind array with a zeroed-out bind buffer.  This doesn't appear to have any effect with the native MySQL library but with the drop-in replacement library if you set the environment variable SQLR_MYSQL_NULL_TERMINATED_RESULT_BINDS="yes" then mysql_stmt_fetch() and mysql_fetch() will stop populating bind buffers when they find one containing NULL's for the buffer, length and is_null pointers.</p>
+<p>When using mysql_stmt_bind_result, it's possible to bind fewer buffers than there are columns in the result set.  For example you might run "select col1, col2, col3 from mytable" but only bind a single value, expecting col1 to be fetched and the others ignored.  The native MySQL/MariaDB library doesn't support this but some apps do it anyway and it's just fortune that they don't crash.  Some apps try a little harder and "NULL-terminate" the bind array with a zeroed-out bind buffer.  This doesn't appear to have any effect with the native MySQL/MariaDB library but with the drop-in replacement library if you set the environment variable SQLR_MYSQL_NULL_TERMINATED_RESULT_BINDS="yes" then mysql_stmt_fetch() and mysql_fetch() will stop populating bind buffers when they find one containing NULL's for the buffer, length and is_null pointers.</p>
 
 <a name="mappingerrorcodes"/><h2>Mapping Error Codes</h2>
 
-<p>By default, mysql_stmt_errno and mysql_errno return the native error code from the database.  For example, if SQL Relay is pointed at Oracle and a query is missing a FROM clause, then the Oracle error code 923 will be returned - the error code corresponding to the Oracle error "FROM keyword not found where expected" rather than the MySQL error code 1064 corresponding to the MySQL error "ER_PARSE_ERROR".</p>
+<p>By default, mysql_stmt_errno and mysql_errno return the native error code from the database.  For example, if SQL Relay is pointed at Oracle and a query is missing a FROM clause, then the Oracle error code 923 will be returned - the error code corresponding to the Oracle error "FROM keyword not found where expected" rather than the MySQL/MariaDB error code 1064 corresponding to the MySQL/MariaDB error "ER_PARSE_ERROR".</p>
 
-<p>Since various databases have thousands of error codes, it's not feasible to map every one to the corresponding MySQL error code.  It is rare for an app to react to specific error codes, but if your app does, and requires specific MySQL error codes to be returned, then there it is possible to map native error codes to MySQL error codes.</p>
+<p>Since various databases have thousands of error codes, it's not feasible to map every one to the corresponding MySQL/MariaDB error code.  It is rare for an app to react to specific error codes, but if your app does, and requires specific MySQL/MariaDB error codes to be returned, then there it is possible to map native error codes to MySQL/MariaDB error codes.</p>
 
 <p>To do this, you must set the environment variable SQLR_MYSQL_ERROR_MAP to the location of an error map file.  For example:</p>
 

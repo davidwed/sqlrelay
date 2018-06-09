@@ -8,6 +8,8 @@
 	updated nodejs clean target with - in front of node-gyp clean
 	fleshed out the installing-sqlrelay-from-packages doc
 	connect string "timeout" -> "connecttimeout" in docs
+	dbase="mariadb" works now
+	docs have been updated to acknowledge mariadb
 
 1.3.0 - updated systemd init file to use SIGINT to kill sqlrelay
 	fixed several "ocurred" -> "occurred" typo's

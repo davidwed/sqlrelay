@@ -26,12 +26,12 @@ connect to the database using a remote connection.  However, if you're running
 SQL Relay on the same machine as the database, then you should configure it to
 connect to the database using a local connection if possible.
 
-=== !MySQL ===
+=== !MySQL/MariaDB ===
 
-!MySQL supports local connections over a unix socket.
+!MySQL/MariaDB supports local connections over a unix socket.
 
-By default, !MySQL is usually configured to accept local connections.  To make
-sure !MySQL is configuerd to accept local connections, edit the !MySQL
+By default, !MySQL/MariaDB is usually configured to accept local connections.  To make
+sure !MySQL/MariaDB is configuerd to accept local connections, edit the !MySQL/MariaDB
 configuration file (usually /etc/my.cnf) and add a line like the following to
 the `[mysqld]` section if it's not already there:
 
@@ -39,11 +39,11 @@ the `[mysqld]` section if it's not already there:
 socket=/var/lib/mysql/mysql.sock
 }}}
 
-Now restart !MySQL.
+Now restart !MySQL/MariaDB.
 
-To configure SQL Relay to connect to !MySQL using the local connection,
+To configure SQL Relay to connect to !MySQL/MariaDB using the local connection,
 edit the configuration file and make sure that the connectstring for the
-!MySQL instance uses the socket parameter, as follows:
+!MySQL/MariaDB instance uses the socket parameter, as follows:
 
 {{{#!blockquote
 user=exampleuser;password=examplepassword;db=exampledb;socket=/var/lib/mysql/mysql.sock
@@ -463,7 +463,7 @@ finding it may dramatically improve that query's performance.
 [=#memoryusage"]
 == Memory Usage ==
 
-Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Informix, SAP/Sybase, !FreeTDS, !MySQL, Firebird and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.
+Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Informix, SAP/Sybase, !FreeTDS, !MySQL/MariaDB, Firebird and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.
 
 The size of the result set buffer is determined by 3 parameters:
 
@@ -477,7 +477,7 @@ The size of the result set buffer is determined by 3 parameters:
 
 The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and SAP/Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.
 
-The default result set buffer size for Oracle, DB2, Informix, and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  Informix, !FreeTDS, !MySQL, Firebird, and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).
+The default result set buffer size for Oracle, DB2, Informix, and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  Informix, !FreeTDS, !MySQL/MariaDB, Firebird, and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).
 
 It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.
 
@@ -491,7 +491,7 @@ The "maximum size of an individual non-LOB field" parameter should be set to the
 
 There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.
 
-For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For Informix, !MySQL, Firebird, !FreeTDS, and ODBC, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  When routing queries or sessions, only the fetchatonce parameter is available.
+For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For Informix, !MySQL/MariaDB, Firebird, !FreeTDS, and ODBC, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  When routing queries or sessions, only the fetchatonce parameter is available.
 
 See the [configreference.html SQL Relay Configuration Reference] for details.
 
