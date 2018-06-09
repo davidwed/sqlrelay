@@ -10,6 +10,7 @@
 	connect string "timeout" -> "connecttimeout" in docs
 	dbase="mariadb" works now
 	docs have been updated to acknowledge mariadb
+	added configure test to disable ODBC on platforms without SQLULEN
 
 1.3.0 - updated systemd init file to use SIGINT to kill sqlrelay
 	fixed several "ocurred" -> "occurred" typo's

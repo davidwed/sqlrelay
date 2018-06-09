@@ -2351,6 +2351,14 @@ then
 #include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIB"])
 		fi
 	fi
+		
+	dnl disable odbc if it doesn't support SQLULEN
+	if ( test -n "$ODBCLIBS" )
+	then
+		AC_MSG_CHECKING(for SQLULEN)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>],[SQLULEN a;],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); ODBCLIBS=""])
+	fi
 
 	if ( test -n "$ODBCLIBS" )
 	then
