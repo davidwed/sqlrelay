@@ -1385,7 +1385,7 @@ then
 				else
 					MYSQLCONFIG="mysql_config"
 				fi
-				$MYSQLCONFIG --cflags 2> /dev/null
+				$MYSQLCONFIG --cflags > /dev/null 2> /dev/null
 				if ( test "$?" -ne "0" )
 				then
 					if ( test -n "$dir" )
@@ -1454,8 +1454,17 @@ then
 		if ( test -n "$MYSQLLIBS" )
 		then
 			AC_MSG_CHECKING(for valid mysql_config output)
+			MYSQLCONFIGSUCCESS="no"
 			FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); MYSQLCONFIGSUCCESS="yes"],[AC_MSG_RESULT(no)])
+
+			if ( test "$MYSQLCONFIGSUCCESS" = "no" )
+			then
+				AC_MSG_CHECKING(again with -L/usr/local/lib)
+				MYSQLLIBS="-L/usr/local/lib $MYSQLLIBS"
+				FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); MYSQLINCLUDES=""; MYSQLLIBS=""])
+			fi
 		fi
 
 		dnl do we need -lz?

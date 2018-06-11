@@ -19635,7 +19635,7 @@ then
 				else
 					MYSQLCONFIG="mysql_config"
 				fi
-				$MYSQLCONFIG --cflags 2> /dev/null
+				$MYSQLCONFIG --cflags > /dev/null 2> /dev/null
 				if ( test "$?" -ne "0" )
 				then
 					if ( test -n "$dir" )
@@ -20345,6 +20345,47 @@ fi
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for valid mysql_config output" >&5
 $as_echo_n "checking for valid mysql_config output... " >&6; }
+			MYSQLCONFIGSUCCESS="no"
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mysql.h>
+#include <stdlib.h>
+int
+main ()
+{
+mysql_close(NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; MYSQLCONFIGSUCCESS="yes"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+			if ( test "$MYSQLCONFIGSUCCESS" = "no" )
+			then
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking again with -L/usr/local/lib" >&5
+$as_echo_n "checking again with -L/usr/local/lib... " >&6; }
+				MYSQLLIBS="-L/usr/local/lib $MYSQLLIBS"
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
@@ -20379,6 +20420,7 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
+			fi
 		fi
 
 				if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
