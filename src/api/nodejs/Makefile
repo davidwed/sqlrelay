@@ -13,7 +13,7 @@ clean:
 	$(RM) temp1.gyp temp2.gyp
 
 build/Release/sqlrelay.node: binding.gyp sqlrelay.cpp package.json
-	$(NODEGYP) -v configure build
+	$(NODEGYP) $(NODEGYPPYTHON) -v configure build
 
 binding.gyp: binding_in.gyp
 	$(REPLACE) @NODEJSINCLUDEDIRS@ "$(NODEJSINCLUDEDIRS)" binding_in.gyp > temp1.gyp
