@@ -20381,7 +20381,7 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 
-			if ( test "$MYSQLCONFIGSUCCESS" = "no" )
+															if ( test "$MYSQLCONFIGSUCCESS" = "no" )
 			then
 				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking again with -L/usr/local/lib" >&5
 $as_echo_n "checking again with -L/usr/local/lib... " >&6; }

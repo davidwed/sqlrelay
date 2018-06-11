@@ -1458,6 +1458,10 @@ then
 			FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); MYSQLCONFIGSUCCESS="yes"],[AC_MSG_RESULT(no)])
 
+			dnl On freebsd 11.1, mysql_config doesn't include
+			dnl -L/usr/local/lib, but it should because libiconv
+			dnl is located there.  We'll try again, adding that,
+			dnl if mysql_config fails the first time.
 			if ( test "$MYSQLCONFIGSUCCESS" = "no" )
 			then
 				AC_MSG_CHECKING(again with -L/usr/local/lib)
