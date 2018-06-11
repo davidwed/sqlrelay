@@ -177,9 +177,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_num_fields(result),19);
 	stdoutput.printf("\n");
 
-	field=mysql_fetch_field_direct(result,0);
-
 	stdoutput.printf("tinyint\n");
+	field=mysql_fetch_field_direct(result,0);
 	checkSuccess(field->name,"testtinyint");
 	/*if (argc==2) {
 		checkSuccess(field->org_name,"testtinyint");
@@ -197,7 +196,8 @@ int	main(int argc, char **argv) {
 		checkSuccess(field->db_length,6);
 	}*/
 	checkSuccess(field->catalog_length,3);
-	checkSuccess(field->def_length,0);
+	// Some client API's don't set this if def is NULL
+	//checkSuccess(field->def_length,0);
 	checkSuccess(field->flags,NUM_FLAG);
 	checkSuccess(field->decimals,0);
 	/*if (argc==2) {

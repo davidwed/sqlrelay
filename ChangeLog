@@ -13,6 +13,7 @@
 	added configure test to disable ODBC on platforms without SQLULEN
 	updated mysql_config test to add -L/usr/local/lib if it fails, to deal
 		with libiconv, which is located there, on newer freebsd
+	updated mysql drop-in test not to test def_length if def is NULL
 
 1.3.0 - updated systemd init file to use SIGINT to kill sqlrelay
 	fixed several "ocurred" -> "occurred" typo's
