@@ -34221,6 +34221,22 @@ then
 	eval "JAVAC=\"$JAVAPATH/Commands/javac$EXE\""
 fi
 
+			if ( test "`basename $CXX`" = "g++3" )
+			then
+
+if ( test -r ""$JAVAPATH/bin/gcj3$EXE"" )
+then
+	eval "JAVAC=\"$JAVAPATH/bin/gcj3$EXE -C\""
+fi
+
+			else
+
+if ( test -r ""$JAVAPATH/bin/gcj$EXE"" )
+then
+	eval "JAVAC=\"$JAVAPATH/bin/gcj$EXE -C\""
+fi
+
+			fi
 
 if ( test -r ""$JAVAPATH/bin/jar$EXE"" )
 then
@@ -34264,6 +34280,20 @@ fi
 		then
 			HAVE_JAVA="yes"
 		fi
+	fi
+
+		if ( test -n "`grep kaffe $JAVAC | grep exec | grep Main`" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: javac appears to use kaffe" >&5
+$as_echo "$as_me: WARNING: javac appears to use kaffe" >&2;}
+		HAVE_JAVA=""
+	fi
+
+		if ( test "`basename $JAVAC`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: javac appears to be gcj 2.xx" >&5
+$as_echo "$as_me: WARNING: javac appears to be gcj 2.xx" >&2;}
+		HAVE_JAVA=""
 	fi
 
 	if ( test -n "$HAVE_JAVA" )

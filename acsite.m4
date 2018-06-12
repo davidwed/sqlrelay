@@ -3459,6 +3459,12 @@ then
 		then
 			FW_CHECK_FILE("$JAVAPATH/bin/javac$EXE",[JAVAC=\"$JAVAPATH/bin/javac$EXE\"])
 			FW_CHECK_FILE("$JAVAPATH/Commands/javac$EXE",[JAVAC=\"$JAVAPATH/Commands/javac$EXE\"])
+			if ( test "`basename $CXX`" = "g++3" )
+			then
+				FW_CHECK_FILE("$JAVAPATH/bin/gcj3$EXE",[JAVAC=\"$JAVAPATH/bin/gcj3$EXE -C\"])
+			else
+				FW_CHECK_FILE("$JAVAPATH/bin/gcj$EXE",[JAVAC=\"$JAVAPATH/bin/gcj$EXE -C\"])
+			fi
 			FW_CHECK_FILE("$JAVAPATH/bin/jar$EXE",[JAR=\"$JAVAPATH/bin/jar$EXE\"])
 			FW_CHECK_FILE("$JAVAPATH/Commands/jar$EXE",[JAR=\"$JAVAPATH/Commands/jar$EXE\"])
 			if ( test "$JAVAPATH" != "/usr" )
@@ -3482,6 +3488,20 @@ then
 		then
 			HAVE_JAVA="yes"
 		fi
+	fi
+
+	dnl if java is really kaffe then don't use it
+	if ( test -n "`grep kaffe $JAVAC | grep exec | grep Main`" )
+	then
+		AC_MSG_WARN(javac appears to use kaffe, which is not supported)
+		HAVE_JAVA=""
+	fi
+
+	dnl if java is really gcj 2.x then don't use it
+	if ( test "`basename $JAVAC`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
+	then
+		AC_MSG_WARN(javac appears to be gcj 2.xx, which is not supported)
+		HAVE_JAVA=""
 	fi
 
 	if ( test -n "$HAVE_JAVA" )
