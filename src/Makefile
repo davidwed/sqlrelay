@@ -53,6 +53,9 @@ all-resultsettranslations:
 all-resultsetrowtranslations:
 	cd resultsetrowtranslations $(AND) $(MAKE) all
 
+all-resultsetheadertranslations:
+	cd resultsetheadertranslations $(AND) $(MAKE) all
+
 all-filters:
 	cd filters $(AND) $(MAKE) all
 
@@ -79,6 +82,7 @@ clean:
 	cd translations $(AND) $(MAKE) clean
 	cd resultsettranslations $(AND) $(MAKE) clean
 	cd resultsetrowtranslations $(AND) $(MAKE) clean
+	cd resultsetheadertranslations $(AND) $(MAKE) clean
 	cd filters $(AND) $(MAKE) clean
 	cd connections $(AND) $(MAKE) clean
 	cd server $(AND) $(MAKE) clean
@@ -137,6 +141,9 @@ install-resultsettranslations:
 install-resultsetrowtranslations:
 	cd resultsetrowtranslations $(AND) $(MAKE) install
 
+install-resultsetheadertranslations:
+	cd resultsetheadertranslations $(AND) $(MAKE) install
+
 install-filters:
 	cd filters $(AND) $(MAKE) install
 
@@ -163,6 +170,7 @@ uninstall:
 	cd translations $(AND) $(MAKE) uninstall
 	cd resultsettranslations $(AND) $(MAKE) uninstall
 	cd resultsetrowtranslations $(AND) $(MAKE) uninstall
+	cd resultsetheadertranslations $(AND) $(MAKE) uninstall
 	cd filters $(AND) $(MAKE) uninstall
 	cd connections $(AND) $(MAKE) uninstall
 	cd server $(AND) $(MAKE) uninstall
