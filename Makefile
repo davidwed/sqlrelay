@@ -104,7 +104,8 @@ distclean: clean
 		test/test.bat \
 		msvc/setupx64/setupx64.vdproj \
 		msvc/setupx86/setupx86.vdproj \
-		doc/admin/installingpkg.wt
+		doc/admin/installingpkg.wt \
+		configure.lineno
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \
