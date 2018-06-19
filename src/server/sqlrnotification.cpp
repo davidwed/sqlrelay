@@ -7,11 +7,11 @@ class sqlrnotificationprivate {
 	friend class sqlrnotification;
 	private:
 		sqlrnotifications	*_ns;
-		xmldomnode		*_parameters;
+		domnode		*_parameters;
 };
 
 sqlrnotification::sqlrnotification(sqlrnotifications *ns,
-					xmldomnode *parameters) {
+					domnode *parameters) {
 	pvt=new sqlrnotificationprivate;
 	pvt->_ns=ns;
 	pvt->_parameters=parameters;
@@ -33,6 +33,6 @@ sqlrnotifications *sqlrnotification::getNotifications() {
 	return pvt->_ns;
 }
 
-xmldomnode *sqlrnotification::getParameters() {
+domnode *sqlrnotification::getParameters() {
 	return pvt->_parameters;
 }

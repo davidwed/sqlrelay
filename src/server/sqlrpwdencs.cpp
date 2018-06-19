@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
@@ -45,13 +45,13 @@ sqlrpwdencs::~sqlrpwdencs() {
 	delete pvt;
 }
 
-bool sqlrpwdencs::load(xmldomnode *parameters) {
+bool sqlrpwdencs::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the password encryption list
-	for (xmldomnode *pwdenc=parameters->getFirstTagChild();
+	for (domnode *pwdenc=parameters->getFirstTagChild();
 		!pwdenc->isNullNode(); pwdenc=pwdenc->getNextTagSibling()) {
 
 		debugPrintf("loading password encryption ...\n");
@@ -75,7 +75,7 @@ void sqlrpwdencs::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
+void sqlrpwdencs::loadPasswordEncryption(domnode *pwdenc) {
 	debugFunction();
 
 	// ignore non-pssword encryptions
@@ -121,8 +121,8 @@ void sqlrpwdencs::loadPasswordEncryption(xmldomnode *pwdenc) {
 	// load the password encryption itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrpwdenc_")->append(module);
-	sqlrpwdenc *(*newPasswordEncryption)(xmldomnode *, bool)=
-			(sqlrpwdenc *(*)(xmldomnode *, bool))
+	sqlrpwdenc *(*newPasswordEncryption)(domnode *, bool)=
+			(sqlrpwdenc *(*)(domnode *, bool))
 				dl->getSymbol(functionname.getString());
 	if (!newPasswordEncryption) {
 		stdoutput.printf("failed to load password "

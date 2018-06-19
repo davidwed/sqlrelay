@@ -3,7 +3,7 @@
 
 	private:
 		void		unload();
-		void		loadRouter(xmldomnode *route);
+		void		loadRouter(domnode *route);
 
 		friend class routerconnection;
 		friend class routercursor;

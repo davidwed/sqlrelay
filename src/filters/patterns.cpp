@@ -24,7 +24,7 @@ class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 	public:
 			sqlrfilter_patterns(sqlrservercontroller *cont,
 						sqlrfilters *fs,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrfilter_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -39,7 +39,7 @@ class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 
 sqlrfilter_patterns::sqlrfilter_patterns(sqlrservercontroller *cont,
 						sqlrfilters *fs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 						sqlrfilter(cont,fs,parameters) {
 	debugFunction();
 
@@ -55,7 +55,7 @@ sqlrfilter_patterns::sqlrfilter_patterns(sqlrservercontroller *cont,
 
 	// count patterns
 	patterncount=0;
-	for (xmldomnode *c=parameters->getFirstTagChild("pattern");
+	for (domnode *c=parameters->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
 		patterncount++;
 	}
@@ -63,7 +63,7 @@ sqlrfilter_patterns::sqlrfilter_patterns(sqlrservercontroller *cont,
 	// build pattern list
 	p=new pattern_t[patterncount];
 	uint32_t	i=0;
-	for (xmldomnode *c=parameters->getFirstTagChild("pattern");
+	for (domnode *c=parameters->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
 
 		const char	*pattern=c->getAttributeValue("pattern");
@@ -235,7 +235,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter
 			*new_sqlrfilter_patterns(sqlrservercontroller *cont,
 						sqlrfilters *fs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrfilter_patterns(cont,fs,parameters);
 	}
 }

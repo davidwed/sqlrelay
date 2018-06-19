@@ -9,7 +9,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 	public:
 			sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrrouter_regex();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -28,7 +28,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 
 sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 	debug=cont->getConfig()->getDebugRouters();
 	enabled=charstring::compareIgnoringCase(
@@ -40,7 +40,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 
 	connid=parameters->getAttributeValue("connectionid");
 
-	for (xmldomnode *pn=parameters->getFirstTagChild("pattern");
+	for (domnode *pn=parameters->getFirstTagChild("pattern");
 				!pn->isNullNode();
 				pn=pn->getNextTagSibling("pattern")) {
 
@@ -102,7 +102,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_regex(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrrouter_regex(cont,rs,parameters);
 	}
 }

@@ -3,10 +3,11 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
 #include <rudiments/sys.h>
+#include <rudiments/file.h>
 #include <rudiments/permissions.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
@@ -32,7 +33,7 @@ class sqlrnotificationsprivate {
 		const char	*_tmpdir;
 		char		*_tmpfilename;
 
-		xmldomnode	*_transports;
+		domnode	*_transports;
 
 		singlylinkedlist< sqlrnotificationplugin * >	_llist;
 };
@@ -53,7 +54,7 @@ sqlrnotifications::~sqlrnotifications() {
 	delete pvt;
 }
 
-bool sqlrnotifications::load(xmldomnode *parameters) {
+bool sqlrnotifications::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
@@ -61,7 +62,7 @@ bool sqlrnotifications::load(xmldomnode *parameters) {
 	pvt->_transports=parameters->getFirstTagChild("transports");
 
 	// run through the notification list
-	for (xmldomnode *notification=parameters->getFirstTagChild();
+	for (domnode *notification=parameters->getFirstTagChild();
 			!notification->isNullNode();
 			notification=notification->getNextTagSibling()) {
 
@@ -86,7 +87,7 @@ void sqlrnotifications::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrnotifications::loadNotification(xmldomnode *notification) {
+void sqlrnotifications::loadNotification(domnode *notification) {
 
 	debugFunction();
 
@@ -129,9 +130,9 @@ void sqlrnotifications::loadNotification(xmldomnode *notification) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrnotification_")->append(module);
 	sqlrnotification *(*newNotification)(sqlrnotifications *,
-							xmldomnode *)=
+							domnode *)=
 		(sqlrnotification *(*)(sqlrnotifications *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newNotification) {
 		stdoutput.printf("failed to load notification: %s\n",module);
@@ -193,7 +194,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 	const char	*eventstring=eventType(event);
 
 	// get the transport info, falling back to "mail"
-	xmldomnode	*transport=getTransport(transportid);
+	domnode	*transport=getTransport(transportid);
 	const char	*url=transport->getAttributeValue("url");
 	if (charstring::isNullOrEmpty(url)) {
 		url="mail";
@@ -325,8 +326,8 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 	return true;
 }
 
-xmldomnode *sqlrnotifications::getTransport(const char *transportid) {
-	for (xmldomnode *tnode=pvt->_transports->getFirstTagChild("transport");
+domnode *sqlrnotifications::getTransport(const char *transportid) {
+	for (domnode *tnode=pvt->_transports->getFirstTagChild("transport");
 				!tnode->isNullNode();
 				tnode=tnode->getNextTagSibling("transport")) {
 		if (!charstring::compare(transportid,

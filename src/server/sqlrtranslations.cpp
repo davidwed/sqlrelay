@@ -64,13 +64,13 @@ sqlrtranslations::~sqlrtranslations() {
 	delete pvt;
 }
 
-bool sqlrtranslations::load(xmldomnode *parameters) {
+bool sqlrtranslations::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the translation list
-	for (xmldomnode *translation=parameters->getFirstTagChild();
+	for (domnode *translation=parameters->getFirstTagChild();
 				!translation->isNullNode();
 				translation=translation->getNextTagSibling()) {
 
@@ -94,7 +94,7 @@ void sqlrtranslations::unload() {
 	pvt->_tlist.clear();
 }
 
-void sqlrtranslations::loadTranslation(xmldomnode *translation) {
+void sqlrtranslations::loadTranslation(domnode *translation) {
 	debugFunction();
 
 	// ignore non-translations
@@ -139,10 +139,10 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	functionname.append("new_sqlrtranslation_")->append(module);
 	sqlrtranslation *(*newTranslation)(sqlrservercontroller *,
 						sqlrtranslations *,
-						xmldomnode *)=
+						domnode *)=
 		(sqlrtranslation *(*)(sqlrservercontroller *,
 						sqlrtranslations *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
 		stdoutput.printf("failed to load translation: %s\n",module);

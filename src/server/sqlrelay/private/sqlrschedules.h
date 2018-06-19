@@ -3,6 +3,6 @@
 
 	private:
 		void		unload();
-		void		loadSchedule(xmldomnode *schedule);
+		void		loadSchedule(domnode *schedule);
 
 		sqlrschedulesprivate	*pvt;

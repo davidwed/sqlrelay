@@ -11,7 +11,7 @@
 #include <rudiments/singlylinkedlist.h>
 #include <rudiments/dictionary.h>
 #include <rudiments/xmldom.h>
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/gss.h>
 #include <rudiments/tls.h>
 

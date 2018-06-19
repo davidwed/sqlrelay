@@ -7,12 +7,12 @@ class sqlrtranslationprivate {
 	friend class sqlrtranslation;
 	private:
 		sqlrtranslations	*_sqlts;
-		xmldomnode		*_parameters;
+		domnode		*_parameters;
 };
 
 sqlrtranslation::sqlrtranslation(sqlrservercontroller *cont,
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) {
+					domnode *parameters) {
 	pvt=new sqlrtranslationprivate;
 	pvt->_sqlts=sqlts;
 	pvt->_parameters=parameters;
@@ -43,6 +43,6 @@ sqlrtranslations *sqlrtranslation::getTranslations() {
 	return pvt->_sqlts;
 }
 
-xmldomnode *sqlrtranslation::getParameters() {
+domnode *sqlrtranslation::getParameters() {
 	return pvt->_parameters;
 }

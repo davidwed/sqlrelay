@@ -3,7 +3,7 @@
 
 	private:
 		void		unload();
-		void		loadNotification(xmldomnode *notification);
+		void		loadNotification(domnode *notification);
 
 		char		*substitutions(sqlrlistener *sqlrl,
 						sqlrserverconnection *sqlrcon,

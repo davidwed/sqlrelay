@@ -47,13 +47,13 @@ sqlrfilters::~sqlrfilters() {
 	delete pvt;
 }
 
-bool sqlrfilters::load(xmldomnode *parameters) {
+bool sqlrfilters::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the filter list
-	for (xmldomnode *filter=parameters->getFirstTagChild();
+	for (domnode *filter=parameters->getFirstTagChild();
 				!filter->isNullNode();
 				filter=filter->getNextTagSibling()) {
 
@@ -101,7 +101,7 @@ void sqlrfilters::unload() {
 	pvt->_afterfilters.clear();
 }
 
-void sqlrfilters::loadFilter(xmldomnode *filter, 
+void sqlrfilters::loadFilter(domnode *filter, 
 				singlylinkedlist< sqlrfilterplugin * > *list) {
 	debugFunction();
 
@@ -147,10 +147,10 @@ void sqlrfilters::loadFilter(xmldomnode *filter,
 	functionname.append("new_sqlrfilter_")->append(module);
 	sqlrfilter *(*newFilter)(sqlrservercontroller *,
 					sqlrfilters *,
-					xmldomnode *)=
+					domnode *)=
 		(sqlrfilter *(*)(sqlrservercontroller *,
 					sqlrfilters *,
-					xmldomnode *))
+					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newFilter) {
 		stdoutput.printf("failed to load filter: %s\n",module);

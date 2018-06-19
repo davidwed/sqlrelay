@@ -224,22 +224,22 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual linkedlist< char *>	*getSessionStartQueries()=0;
 		virtual linkedlist< char *>	*getSessionEndQueries()=0;
 
-		virtual xmldomnode	*getListeners()=0;
-		virtual xmldomnode	*getParser()=0;
-		virtual xmldomnode	*getDirectives()=0;
-		virtual xmldomnode	*getTranslations()=0;
-		virtual xmldomnode	*getFilters()=0;
-		virtual xmldomnode	*getResultSetTranslations()=0;
-		virtual xmldomnode	*getResultSetRowTranslations()=0;
-		virtual xmldomnode	*getResultSetHeaderTranslations()=0;
-		virtual xmldomnode	*getTriggers()=0;
-		virtual xmldomnode	*getLoggers()=0;
-		virtual xmldomnode	*getNotifications()=0;
-		virtual xmldomnode	*getSchedules()=0;
-		virtual xmldomnode	*getRouters()=0;
-		virtual xmldomnode	*getQueries()=0;
-		virtual xmldomnode	*getPasswordEncryptions()=0;
-		virtual xmldomnode	*getAuths()=0;
+		virtual domnode	*getListeners()=0;
+		virtual domnode	*getParser()=0;
+		virtual domnode	*getDirectives()=0;
+		virtual domnode	*getTranslations()=0;
+		virtual domnode	*getFilters()=0;
+		virtual domnode	*getResultSetTranslations()=0;
+		virtual domnode	*getResultSetRowTranslations()=0;
+		virtual domnode	*getResultSetHeaderTranslations()=0;
+		virtual domnode	*getTriggers()=0;
+		virtual domnode	*getLoggers()=0;
+		virtual domnode	*getNotifications()=0;
+		virtual domnode	*getSchedules()=0;
+		virtual domnode	*getRouters()=0;
+		virtual domnode	*getQueries()=0;
+		virtual domnode	*getPasswordEncryptions()=0;
+		virtual domnode	*getAuths()=0;
 
 		virtual linkedlist< connectstringcontainer * >
 						*getConnectStringList()=0;

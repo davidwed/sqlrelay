@@ -2,18 +2,18 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 
 class sqlrqueryprivate {
 	friend class sqlrquery;
 	private:
 		sqlrqueries	*_qs;
-		xmldomnode	*_parameters;
+		domnode	*_parameters;
 };
 
 sqlrquery::sqlrquery(sqlrservercontroller *cont,
 				sqlrqueries *qs,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrqueryprivate;
 	pvt->_qs=qs;
 	pvt->_parameters=parameters;
@@ -35,7 +35,7 @@ sqlrqueries *sqlrquery::getQueries() {
 	return pvt->_qs;
 }
 
-xmldomnode *sqlrquery::getParameters() {
+domnode *sqlrquery::getParameters() {
 	return pvt->_parameters;
 }
 
@@ -43,12 +43,12 @@ class sqlrquerycursorprivate {
 	friend class sqlrquerycursor;
 	private:
 		sqlrquery	*_q;
-		xmldomnode	*_parameters;
+		domnode	*_parameters;
 };
 
 sqlrquerycursor::sqlrquerycursor(sqlrserverconnection *conn,
 					sqlrquery *q,
-					xmldomnode *parameters,
+					domnode *parameters,
 					uint16_t id) :
 						sqlrservercursor(conn,id) {
 	pvt=new sqlrquerycursorprivate;
@@ -76,6 +76,6 @@ sqlrqueries *sqlrquerycursor::getQueries() {
 	return pvt->_q->getQueries();
 }
 
-xmldomnode *sqlrquerycursor::getParameters() {
+domnode *sqlrquerycursor::getParameters() {
 	return pvt->_parameters;
 }

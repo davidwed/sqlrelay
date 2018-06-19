@@ -3,6 +3,6 @@
 
 	private:
 		void	unload();
-		void	loadDirective(xmldomnode *directive);
+		void	loadDirective(domnode *directive);
 
 		sqlrdirectivesprivate	*pvt;

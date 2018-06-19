@@ -11,7 +11,7 @@
 class SQLRSERVER_DLLSPEC sqlrlogger_debug : public sqlrlogger {
 	public:
 			sqlrlogger_debug(sqlrloggers *ls,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrlogger_debug();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
@@ -36,7 +36,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_debug : public sqlrlogger {
 };
 
 sqlrlogger_debug::sqlrlogger_debug(sqlrloggers *ls,
-					xmldomnode *parameters) :
+					domnode *parameters) :
 					sqlrlogger(ls,parameters) {
 	dbgfile=NULL;
 	debuglogger=NULL;
@@ -151,7 +151,7 @@ void sqlrlogger_debug::closeDebugFile() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_debug(
 						sqlrloggers *ls,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrlogger_debug(ls,parameters);
 	}
 }

@@ -7,13 +7,13 @@ class sqlrresultsetrowtranslationprivate {
 	friend class sqlrresultsetrowtranslation;
 	private:
 		sqlrresultsetrowtranslations	*_rs;
-		xmldomnode			*_parameters;
+		domnode			*_parameters;
 };
 
 sqlrresultsetrowtranslation::sqlrresultsetrowtranslation(
 				sqlrservercontroller *cont,
 				sqlrresultsetrowtranslations *rs,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrresultsetrowtranslationprivate;
 	pvt->_rs=rs;
 	pvt->_parameters=parameters;
@@ -37,6 +37,6 @@ sqlrresultsetrowtranslations *sqlrresultsetrowtranslation::
 	return pvt->_rs;
 }
 
-xmldomnode *sqlrresultsetrowtranslation::getParameters() {
+domnode *sqlrresultsetrowtranslation::getParameters() {
 	return pvt->_parameters;
 }

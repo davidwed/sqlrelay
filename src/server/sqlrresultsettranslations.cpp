@@ -48,13 +48,13 @@ sqlrresultsettranslations::~sqlrresultsettranslations() {
 	delete pvt;
 }
 
-bool sqlrresultsettranslations::load(xmldomnode *parameters) {
+bool sqlrresultsettranslations::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the result set translation list
-	for (xmldomnode *resultsettranslation=parameters->getFirstTagChild();
+	for (domnode *resultsettranslation=parameters->getFirstTagChild();
 			!resultsettranslation->isNullNode();
 			resultsettranslation=
 				resultsettranslation->getNextTagSibling()) {
@@ -80,7 +80,7 @@ void sqlrresultsettranslations::unload() {
 }
 
 void sqlrresultsettranslations::loadResultSetTranslation(
-				xmldomnode *resultsettranslation) {
+				domnode *resultsettranslation) {
 	debugFunction();
 
 	// ignore non-resultsettranslations
@@ -128,11 +128,11 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 	sqlrresultsettranslation *(*newResultSetTranslation)
 					(sqlrservercontroller *,
 					sqlrresultsettranslations *,
-					xmldomnode *)=
+					domnode *)=
 		(sqlrresultsettranslation *(*)
 					(sqlrservercontroller *,
 					sqlrresultsettranslations *,
-					xmldomnode *))
+					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
 		stdoutput.printf("failed to load "

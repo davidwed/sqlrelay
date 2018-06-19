@@ -3,7 +3,7 @@
 
 	private:
 		void	unload();
-		void	loadFilter(xmldomnode *filter,
+		void	loadFilter(domnode *filter,
 				singlylinkedlist< sqlrfilterplugin * > *list);
 		bool	run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,

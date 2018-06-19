@@ -7,12 +7,12 @@ class sqlrrouterprivate {
 	friend class sqlrrouter;
 	private:
 		sqlrrouters	*_rs;
-		xmldomnode	*_parameters;
+		domnode	*_parameters;
 };
 
 sqlrrouter::sqlrrouter(sqlrservercontroller *cont,
 				sqlrrouters *rs,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrrouterprivate;
 	pvt->_rs=rs;
 	pvt->_parameters=parameters;
@@ -37,6 +37,6 @@ sqlrrouters *sqlrrouter::getRouters() {
 	return pvt->_rs;
 }
 
-xmldomnode *sqlrrouter::getParameters() {
+domnode *sqlrrouter::getParameters() {
 	return pvt->_parameters;
 }

@@ -1,2 +1,2 @@
 sqlrnotification	*new_sqlrnotification_@module@(sqlrnotifications *ns,
-							xmldomnode *parameters);
+							domnode *parameters);

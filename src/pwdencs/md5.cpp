@@ -7,12 +7,12 @@
 
 class SQLRSERVER_DLLSPEC sqlrpwenc_md5 : public sqlrpwdenc {
 	public:
-			sqlrpwenc_md5(xmldomnode *parameters, bool debug);
+			sqlrpwenc_md5(domnode *parameters, bool debug);
 		bool	oneWay();
 		char	*encrypt(const char *value);
 };
 
-sqlrpwenc_md5::sqlrpwenc_md5(xmldomnode *parameters, bool debug) :
+sqlrpwenc_md5::sqlrpwenc_md5(domnode *parameters, bool debug) :
 						sqlrpwdenc(parameters,debug) {
 }
 
@@ -28,7 +28,7 @@ char *sqlrpwenc_md5::encrypt(const char *value) {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_md5(
-						xmldomnode *parameters,
+						domnode *parameters,
 						bool debug) {
 		return new sqlrpwenc_md5(parameters,debug);
 	}

@@ -3,7 +3,7 @@
 
 	private:
 		void	unload();
-		void	loadTranslation(xmldomnode *translation);
+		void	loadTranslation(domnode *translation);
 
 		sqlrdatabaseobject *createDatabaseObject(
 						memorypool *pool,

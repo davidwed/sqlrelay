@@ -32,14 +32,14 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 	public:
 			sqlrtranslation_patterns(sqlrservercontroller *cont,
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrtranslation_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
 					stringbuffer *translatedquery);
 	private:
-		void	buildPatternsTree(xmldomnode *root,
+		void	buildPatternsTree(domnode *root,
 						pattern_t **p,
 						uint32_t *pcount,
 						bool toplevel);
@@ -66,7 +66,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 
 sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrtranslation(cont,sqlts,parameters) {
 	debugFunction();
 
@@ -84,14 +84,14 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 	buildPatternsTree(parameters,&patterns,&patterncount,true);
 }
 
-void sqlrtranslation_patterns::buildPatternsTree(xmldomnode *root,
+void sqlrtranslation_patterns::buildPatternsTree(domnode *root,
 						pattern_t **p,
 						uint32_t *pcount,
 						bool toplevel) {
 
 	// count patterns
 	(*pcount)=0;
-	for (xmldomnode *c=root->getFirstTagChild("pattern");
+	for (domnode *c=root->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
 		(*pcount)++;
 	}
@@ -103,7 +103,7 @@ void sqlrtranslation_patterns::buildPatternsTree(xmldomnode *root,
 	// build pattern list
 	*p=new pattern_t[*pcount];
 	uint32_t	i=0;
-	for (xmldomnode *c=root->getFirstTagChild("pattern");
+	for (domnode *c=root->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
 
 		const char	*match=c->getAttributeValue("match");
@@ -413,7 +413,7 @@ extern "C" {
 			*new_sqlrtranslation_patterns(
 						sqlrservercontroller *cont,
 						sqlrtranslations *ts,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrtranslation_patterns(cont,ts,parameters);
 	}
 }

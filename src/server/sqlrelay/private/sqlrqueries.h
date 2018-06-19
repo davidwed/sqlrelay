@@ -3,6 +3,6 @@
 
 	private:
 		void	unload();
-		void	loadQuery(xmldomnode *logger);
+		void	loadQuery(domnode *logger);
 
 		sqlrqueriesprivate	*pvt;

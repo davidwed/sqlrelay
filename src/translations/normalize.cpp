@@ -11,7 +11,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 	public:
 			sqlrtranslation_normalize(sqlrservercontroller *cont,
 							sqlrtranslations *sqlts,
-							xmldomnode *parameters);
+							domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
@@ -60,7 +60,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 sqlrtranslation_normalize::sqlrtranslation_normalize(
 					sqlrservercontroller *cont,
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters) :
+					domnode *parameters) :
 				sqlrtranslation(cont,sqlts,parameters) {
 	debugFunction();
 
@@ -760,7 +760,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrtranslation *new_sqlrtranslation_normalize(
 						sqlrservercontroller *cont,
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrtranslation_normalize(cont,sqlts,parameters);
 	}
 }

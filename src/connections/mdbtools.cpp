@@ -4,6 +4,7 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/file.h>
 #include <rudiments/sys.h>
 
 #include <datatypes.h>

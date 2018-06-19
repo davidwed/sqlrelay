@@ -379,7 +379,7 @@ void routerconnection::handleConnectString() {
 
 	// load the router modules
 	// (this is just a convenient place to do it)
-	xmldomnode	*routers=cont->getConfig()->getRouters();
+	domnode	*routers=cont->getConfig()->getRouters();
 	if (!routers->isNullNode()) {
 		sqlrr=new sqlrrouters(cont,conids,cons,concount);
 		sqlrr->load(routers);

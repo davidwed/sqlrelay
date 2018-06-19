@@ -79,7 +79,7 @@ int main(int argc, const char **argv) {
 	}
 
 	// initialize the password encryption framework
-	xmldomnode	*pwdencs=cfg->getPasswordEncryptions();
+	domnode	*pwdencs=cfg->getPasswordEncryptions();
 	if (pwdencs->isNullNode()) {
 		stderror.printf("password encryption id %s not found\n",
 								pwdencid);

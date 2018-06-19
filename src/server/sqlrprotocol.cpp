@@ -7,12 +7,12 @@ class sqlrprotocolprivate {
 	friend class sqlrprotocol;
 	private:
 		sqlrprotocols		*_ps;
-		xmldomnode		*_parameters;
+		domnode		*_parameters;
 };
 
 sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 				sqlrprotocols *ps,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrprotocolprivate;
 	this->cont=cont;
 	pvt->_ps=ps;
@@ -35,6 +35,6 @@ sqlrprotocols *sqlrprotocol::getProtocols() {
 	return pvt->_ps;
 }
 
-xmldomnode *sqlrprotocol::getParameters() {
+domnode *sqlrprotocol::getParameters() {
 	return pvt->_parameters;
 }

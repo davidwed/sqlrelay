@@ -3,6 +3,6 @@
 
 	private:
 		void	unload();
-		void	loadProtocol(uint16_t index, xmldomnode *listener);
+		void	loadProtocol(uint16_t index, domnode *listener);
 
 		sqlrprotocolsprivate	*pvt;

@@ -7,12 +7,12 @@ class sqlrtriggerprivate {
 	friend class sqlrtrigger;
 	private:
 		sqlrtriggers	*_ts;
-		xmldomnode	*_parameters;
+		domnode	*_parameters;
 };
 
 sqlrtrigger::sqlrtrigger(sqlrservercontroller *cont,
 				sqlrtriggers *ts,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrtriggerprivate;
 	pvt->_ts=ts;
 	pvt->_parameters=parameters;
@@ -34,6 +34,6 @@ sqlrtriggers *sqlrtrigger::getTriggers() {
 	return pvt->_ts;
 }
 
-xmldomnode *sqlrtrigger::getParameters() {
+domnode *sqlrtrigger::getParameters() {
 	return pvt->_parameters;
 }

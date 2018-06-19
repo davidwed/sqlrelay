@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
@@ -42,13 +42,13 @@ sqlrloggers::~sqlrloggers() {
 	delete pvt;
 }
 
-bool sqlrloggers::load(xmldomnode *parameters) {
+bool sqlrloggers::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the logger list
-	for (xmldomnode *logger=parameters->getFirstTagChild();
+	for (domnode *logger=parameters->getFirstTagChild();
 		!logger->isNullNode(); logger=logger->getNextTagSibling()) {
 
 		debugPrintf("loading logger ...\n");
@@ -72,7 +72,7 @@ void sqlrloggers::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrloggers::loadLogger(xmldomnode *logger) {
+void sqlrloggers::loadLogger(domnode *logger) {
 
 	debugFunction();
 
@@ -114,9 +114,9 @@ void sqlrloggers::loadLogger(xmldomnode *logger) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrlogger_")->append(module);
 	sqlrlogger *(*newLogger)(sqlrloggers *,
-					xmldomnode *)=
+					domnode *)=
 			(sqlrlogger *(*)(sqlrloggers *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newLogger) {
 		stdoutput.printf("failed to load logger: %s\n",module);

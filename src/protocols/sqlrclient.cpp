@@ -10,6 +10,7 @@
 #include <rudiments/datetime.h>
 #include <rudiments/userentry.h>
 #include <rudiments/process.h>
+#include <rudiments/file.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
@@ -35,7 +36,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 	public:
 			sqlrprotocol_sqlrclient(sqlrservercontroller *cont,
 							sqlrprotocols *ps,
-							xmldomnode *parameters);
+							domnode *parameters);
 		virtual	~sqlrprotocol_sqlrclient();
 
 		clientsessionexitstatus_t	clientSession(
@@ -242,7 +243,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					sqlrservercontroller *cont,
 					sqlrprotocols *ps,
-					xmldomnode *parameters) :
+					domnode *parameters) :
 					sqlrprotocol(cont,ps,parameters) {
 	debugFunction();
 
@@ -4130,7 +4131,7 @@ bool sqlrprotocol_sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 
 	// get the tree as a string
 	xmldom		*tree=cont->getQueryTree(cursor);
-	xmldomnode	*root=(tree)?tree->getRootNode():NULL;
+	domnode	*root=(tree)?tree->getRootNode():NULL;
 	stringbuffer	*xml=(root)?root->xml():NULL;
 	const char	*xmlstring=(xml)?xml->getString():NULL;
 	uint64_t	xmlstringlen=(xml)?xml->getStringLength():0;
@@ -4178,7 +4179,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_sqlrclient(
 						sqlrservercontroller *cont,
 						sqlrprotocols *ps,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrprotocol_sqlrclient(cont,ps,parameters);
 	}
 }

@@ -6,7 +6,7 @@
 class SQLRSERVER_DLLSPEC sqlrnotification_events : public sqlrnotification {
 	public:
 			sqlrnotification_events(sqlrnotifications *ns,
-						xmldomnode *parameters);
+						domnode *parameters);
 
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
@@ -15,12 +15,12 @@ class SQLRSERVER_DLLSPEC sqlrnotification_events : public sqlrnotification {
 					const char *info);
 	private:
 		bool		enabled;
-		xmldomnode	*eventsnode;
-		xmldomnode	*recipientsnode;
+		domnode	*eventsnode;
+		domnode	*recipientsnode;
 };
 
 sqlrnotification_events::sqlrnotification_events(sqlrnotifications *ns,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrnotification(ns,parameters) {
 	enabled=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("enabled"),"no");
@@ -38,7 +38,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 	}
 
 	// for each event...
-	for (xmldomnode *enode=eventsnode->getFirstTagChild("event");
+	for (domnode *enode=eventsnode->getFirstTagChild("event");
 			!enode->isNullNode();
 			enode=enode->getNextTagSibling("event")) {
 
@@ -49,7 +49,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 		}
 
 		// for each recipient...
-		for (xmldomnode *rnode=recipientsnode->
+		for (domnode *rnode=recipientsnode->
 					getFirstTagChild("recipient");
 			!rnode->isNullNode();
 			rnode=rnode->getNextTagSibling("recipient")) {
@@ -72,7 +72,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrnotification *new_sqlrnotification_events(
 							sqlrnotifications *ns,
-							xmldomnode *parameters) {
+							domnode *parameters) {
 		return new sqlrnotification_events(ns,parameters);
 	}
 }

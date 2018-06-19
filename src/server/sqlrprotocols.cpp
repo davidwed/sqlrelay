@@ -41,14 +41,14 @@ sqlrprotocols::~sqlrprotocols() {
 	delete pvt;
 }
 
-bool sqlrprotocols::load(xmldomnode *parameters) {
+bool sqlrprotocols::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the listeners
 	uint16_t	i=0;
-	for (xmldomnode *listener=parameters->getFirstTagChild();
+	for (domnode *listener=parameters->getFirstTagChild();
 			!listener->isNullNode();
 			listener=listener->getNextTagSibling()) {
 
@@ -75,7 +75,7 @@ void sqlrprotocols::unload() {
 	pvt->_protos.clear();
 }
 
-void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
+void sqlrprotocols::loadProtocol(uint16_t index, domnode *listener) {
 	debugFunction();
 
 	// ignore any non-listener entries
@@ -110,10 +110,10 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 	functionname.append("new_sqlrprotocol_")->append(module);
 	sqlrprotocol *(*newProtocol)(sqlrservercontroller *,
 					sqlrprotocols *,
-					xmldomnode *)=
+					domnode *)=
 			(sqlrprotocol *(*)(sqlrservercontroller *,
 						sqlrprotocols *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
 		stdoutput.printf("failed to load protocol: %s\n",module);

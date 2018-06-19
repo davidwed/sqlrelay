@@ -6,7 +6,7 @@
 #include <rudiments/regularexpression.h>
 #include <rudiments/commandline.h>
 #include <rudiments/linkedlist.h>
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/dynamiclib.h>
 
 #ifndef SQLRUTIL_DLLSPEC

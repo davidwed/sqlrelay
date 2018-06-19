@@ -3,7 +3,7 @@
 
 	private:
 		void	unload();
-		void	loadTrigger(xmldomnode *trigger,
+		void	loadTrigger(domnode *trigger,
 					singlylinkedlist< sqlrtriggerplugin *>
 					*list);
 		void	run(sqlrserverconnection *sqlrcon,

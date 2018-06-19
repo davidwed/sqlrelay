@@ -45,13 +45,13 @@ sqlrdirectives::~sqlrdirectives() {
 	delete pvt;
 }
 
-bool sqlrdirectives::load(xmldomnode *parameters) {
+bool sqlrdirectives::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the directive list
-	for (xmldomnode *directive=parameters->getFirstTagChild();
+	for (domnode *directive=parameters->getFirstTagChild();
 				!directive->isNullNode();
 				directive=directive->getNextTagSibling()) {
 
@@ -75,7 +75,7 @@ void sqlrdirectives::unload() {
 	pvt->_dlist.clear();
 }
 
-void sqlrdirectives::loadDirective(xmldomnode *directive) {
+void sqlrdirectives::loadDirective(domnode *directive) {
 	debugFunction();
 
 	// ignore non-directives
@@ -120,10 +120,10 @@ void sqlrdirectives::loadDirective(xmldomnode *directive) {
 	functionname.append("new_sqlrdirective_")->append(module);
 	sqlrdirective *(*newDirective)(sqlrservercontroller *,
 						sqlrdirectives *,
-						xmldomnode *)=
+						domnode *)=
 		(sqlrdirective *(*)(sqlrservercontroller *,
 						sqlrdirectives *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newDirective) {
 		stdoutput.printf("failed to load directive: %s\n",module);

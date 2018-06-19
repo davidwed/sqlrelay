@@ -6,6 +6,7 @@
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
+#include <rudiments/file.h>
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 

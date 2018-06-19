@@ -14,7 +14,7 @@
 class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {
 	public:
 			sqlrlogger_custom_sc(sqlrloggers *ls,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrlogger_custom_sc();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
@@ -33,7 +33,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_custom_sc : public sqlrlogger {
 };
 
 sqlrlogger_custom_sc::sqlrlogger_custom_sc(sqlrloggers *ls,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
 	loglevel=SQLRLOGGER_LOGLEVEL_ERROR;
@@ -233,7 +233,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_custom_sc(
 						sqlrloggers *ls,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrlogger_custom_sc(ls,parameters);
 	}
 }

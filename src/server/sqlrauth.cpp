@@ -9,13 +9,13 @@ class sqlrauthprivate {
 	public:
 		sqlrauths	*_auths;
 		sqlrpwdencs	*_sqlrpe;
-		xmldomnode	*_parameters;
+		domnode	*_parameters;
 };
 
 sqlrauth::sqlrauth(sqlrservercontroller *cont,
 				sqlrauths *auths,
 				sqlrpwdencs *sqlrpe,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrauthprivate;
 	this->cont=cont;
 	pvt->_auths=auths;
@@ -39,6 +39,6 @@ sqlrpwdencs *sqlrauth::getPasswordEncryptions() {
 	return pvt->_sqlrpe;
 }
 
-xmldomnode *sqlrauth::getParameters() {
+domnode *sqlrauth::getParameters() {
 	return pvt->_parameters;
 }

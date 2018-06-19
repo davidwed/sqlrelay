@@ -3,6 +3,6 @@
 
 	private:
 		void	unload();
-		void	loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe);
+		void	loadAuth(domnode *auth, sqlrpwdencs *sqlrpe);
 
 		sqlrauthsprivate	*pvt;

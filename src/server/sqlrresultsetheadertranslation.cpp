@@ -7,13 +7,13 @@ class sqlrresultsetheadertranslationprivate {
 	friend class sqlrresultsetheadertranslation;
 	private:
 		sqlrresultsetheadertranslations	*_rs;
-		xmldomnode			*_parameters;
+		domnode			*_parameters;
 };
 
 sqlrresultsetheadertranslation::sqlrresultsetheadertranslation(
 				sqlrservercontroller *cont,
 				sqlrresultsetheadertranslations *rs,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrresultsetheadertranslationprivate;
 	pvt->_rs=rs;
 	pvt->_parameters=parameters;
@@ -52,6 +52,6 @@ sqlrresultsetheadertranslations *sqlrresultsetheadertranslation::
 	return pvt->_rs;
 }
 
-xmldomnode *sqlrresultsetheadertranslation::getParameters() {
+domnode *sqlrresultsetheadertranslation::getParameters() {
 	return pvt->_parameters;
 }

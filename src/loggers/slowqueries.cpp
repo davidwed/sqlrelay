@@ -12,7 +12,7 @@
 class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 	public:
 			sqlrlogger_slowqueries(sqlrloggers *ls,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrlogger_slowqueries();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
@@ -33,7 +33,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 };
 
 sqlrlogger_slowqueries::sqlrlogger_slowqueries(sqlrloggers *ls,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
 	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
@@ -173,7 +173,7 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_slowqueries(
 						sqlrloggers *ls,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrlogger_slowqueries(ls,parameters);
 	}
 }

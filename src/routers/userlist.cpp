@@ -8,7 +8,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 	public:
 			sqlrrouter_userlist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrrouter_userlist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -29,7 +29,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_userlist : public sqlrrouter {
 
 sqlrrouter_userlist::sqlrrouter_userlist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 	users=NULL;
 
@@ -46,7 +46,7 @@ sqlrrouter_userlist::sqlrrouter_userlist(sqlrservercontroller *cont,
 	// this is faster than running through the xml over and over
 	usercount=parameters->getChildCount();
 	users=new const char *[usercount];
-	xmldomnode *user=parameters->getFirstTagChild("user");
+	domnode *user=parameters->getFirstTagChild("user");
 	for (uint64_t i=0; i<usercount; i++) {
 		users[i]=user->getAttributeValue("user");
 		user=user->getNextTagSibling("user");
@@ -108,7 +108,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_userlist(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrrouter_userlist(cont,rs,parameters);
 	}
 }

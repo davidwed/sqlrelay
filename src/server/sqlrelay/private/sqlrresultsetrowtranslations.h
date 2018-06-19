@@ -4,6 +4,6 @@
 	private:
 		void	unload();
 		void	loadResultSetRowTranslation(
-					xmldomnode *resultsetrowtranslation);
+					domnode *resultsetrowtranslation);
 
 		sqlrresultsetrowtranslationsprivate	*pvt;

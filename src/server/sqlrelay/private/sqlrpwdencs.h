@@ -3,6 +3,6 @@
 
 	private:
 		void	unload();
-		void	loadPasswordEncryption(xmldomnode *pwdenc);
+		void	loadPasswordEncryption(domnode *pwdenc);
 
 		sqlrpwdencsprivate	*pvt;

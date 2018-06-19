@@ -160,7 +160,7 @@ class sqlrservercontrollerprivate {
 	dynamiclib	_conndl;
 	dynamiclib	_sqlrpdl;
 
-	xmldomnode	*_sqlrpnode;
+	domnode	*_sqlrpnode;
 
 	uint16_t	_cursorcount;
 	uint16_t	_mincursorcount;
@@ -501,7 +501,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_debugsql=pvt->_cfg->getDebugSql();
 
 	// get password encryptions
-	xmldomnode	*pwdencs=pvt->_cfg->getPasswordEncryptions();
+	domnode	*pwdencs=pvt->_cfg->getPasswordEncryptions();
 	if (!pwdencs->isNullNode()) {
 		pvt->_sqlrpe=new sqlrpwdencs(
 			pvt->_pth,pvt->_cfg->getDebugPasswordEncryptions());
@@ -509,7 +509,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}	
 
 	// initialize auth
-	xmldomnode	*auths=pvt->_cfg->getAuths();
+	domnode	*auths=pvt->_cfg->getAuths();
 	if (!auths->isNullNode()) {
 		pvt->_sqlra=new sqlrauths(this);
 		pvt->_sqlra->load(auths,pvt->_sqlrpe);
@@ -522,7 +522,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get loggers
-	xmldomnode	*loggers=pvt->_cfg->getLoggers();
+	domnode	*loggers=pvt->_cfg->getLoggers();
 	if (!loggers->isNullNode()) {
 		pvt->_sqlrlg=new sqlrloggers(pvt->_pth);
 		pvt->_sqlrlg->load(loggers);
@@ -530,14 +530,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get notifications
-	xmldomnode	*notifications=pvt->_cfg->getNotifications();
+	domnode	*notifications=pvt->_cfg->getNotifications();
 	if (!notifications->isNullNode()) {
 		pvt->_sqlrn=new sqlrnotifications(pvt->_pth);
 		pvt->_sqlrn->load(notifications);
 	}
 
 	// get schedules
-	xmldomnode	*schedules=pvt->_cfg->getSchedules();
+	domnode	*schedules=pvt->_cfg->getSchedules();
 	if (!schedules->isNullNode()) {
 		pvt->_sqlrs=new sqlrschedules(this);
 		pvt->_sqlrs->load(schedules);
@@ -600,7 +600,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the query directives
 	pvt->_debugsqlrdirectives=pvt->_cfg->getDebugDirectives();
-	xmldomnode	*directives=pvt->_cfg->getDirectives();
+	domnode	*directives=pvt->_cfg->getDirectives();
 	if (!directives->isNullNode()) {
 		pvt->_sqlrd=new sqlrdirectives(this);
 		pvt->_sqlrd->load(directives);
@@ -608,7 +608,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the query translations
 	pvt->_debugsqlrtranslations=pvt->_cfg->getDebugTranslations();
-	xmldomnode	*translations=pvt->_cfg->getTranslations();
+	domnode	*translations=pvt->_cfg->getTranslations();
 	if (!translations->isNullNode()) {
 		pvt->_sqlrp=newParser();
 		pvt->_sqlrt=new sqlrtranslations(this);
@@ -617,7 +617,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the query filters
 	pvt->_debugsqlrfilters=pvt->_cfg->getDebugFilters();
-	xmldomnode	*filters=pvt->_cfg->getFilters();
+	domnode	*filters=pvt->_cfg->getFilters();
 	if (!filters->isNullNode()) {
 		if (!pvt->_sqlrp) {
 			pvt->_sqlrp=newParser();
@@ -629,7 +629,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the result set translations
 	pvt->_debugsqlrresultsettranslation=
 				pvt->_cfg->getDebugResultSetTranslations();
-	xmldomnode	*resultsettranslations=
+	domnode	*resultsettranslations=
 				pvt->_cfg->getResultSetTranslations();
 	if (!resultsettranslations->isNullNode()) {
 		pvt->_sqlrrst=new sqlrresultsettranslations(this);
@@ -639,7 +639,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the result set row translations
 	pvt->_debugsqlrresultsetrowtranslation=
 				pvt->_cfg->getDebugResultSetRowTranslations();
-	xmldomnode	*resultsetrowtranslations=
+	domnode	*resultsetrowtranslations=
 				pvt->_cfg->getResultSetRowTranslations();
 	if (!resultsetrowtranslations->isNullNode()) {
 		pvt->_sqlrrsrt=new sqlrresultsetrowtranslations(this);
@@ -649,7 +649,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the result set header translations
 	pvt->_debugsqlrresultsetheadertranslation=
 			pvt->_cfg->getDebugResultSetHeaderTranslations();
-	xmldomnode	*resultsetheadertranslations=
+	domnode	*resultsetheadertranslations=
 			pvt->_cfg->getResultSetHeaderTranslations();
 	if (!resultsetheadertranslations->isNullNode()) {
 		pvt->_sqlrrsht=new sqlrresultsetheadertranslations(this);
@@ -657,7 +657,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get the triggers
-	xmldomnode	*triggers=pvt->_cfg->getTriggers();
+	domnode	*triggers=pvt->_cfg->getTriggers();
 	if (!triggers->isNullNode()) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!pvt->_sqlrp) {
@@ -713,7 +713,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	markDatabaseAvailable();
 
 	// get the custom query handlers
-	xmldomnode	*queries=pvt->_cfg->getQueries();
+	domnode	*queries=pvt->_cfg->getQueries();
 	if (!queries->isNullNode()) {
 		pvt->_sqlrq=new sqlrqueries(this);
 		pvt->_sqlrq->load(queries);
@@ -5628,8 +5628,8 @@ sqlrparser *sqlrservercontroller::newParser() {
 	// load the parser itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrparser_")->append(module);
-	sqlrparser	*(*newParser)(sqlrservercontroller *, xmldomnode *)=
-			(sqlrparser *(*)(sqlrservercontroller *, xmldomnode *))
+	sqlrparser	*(*newParser)(sqlrservercontroller *, domnode *)=
+			(sqlrparser *(*)(sqlrservercontroller *, domnode *))
 			pvt->_sqlrpdl.getSymbol(functionname.getString());
 	if (!newParser) {
 		char	*error=pvt->_sqlrpdl.getError();

@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
@@ -40,13 +40,13 @@ sqlrtriggers::~sqlrtriggers() {
 	delete pvt;
 }
 
-bool sqlrtriggers::load(xmldomnode *parameters) {
+bool sqlrtriggers::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the trigger list
-	for (xmldomnode *trigger=parameters->getFirstTagChild();
+	for (domnode *trigger=parameters->getFirstTagChild();
 		!trigger->isNullNode(); trigger=trigger->getNextTagSibling()) {
 
 		if (charstring::contains(
@@ -95,7 +95,7 @@ void sqlrtriggers::unload() {
 	pvt->_aftertriggers.clear();
 }
 
-void sqlrtriggers::loadTrigger(xmldomnode *trigger,
+void sqlrtriggers::loadTrigger(domnode *trigger,
 				singlylinkedlist< sqlrtriggerplugin * > *list) {
 
 	debugFunction();
@@ -141,10 +141,10 @@ void sqlrtriggers::loadTrigger(xmldomnode *trigger,
 	functionname.append("new_sqlrtrigger_")->append(module);
 	sqlrtrigger *(*newTrigger)(sqlrservercontroller *,
 						sqlrtriggers *,
-						xmldomnode *)=
+						domnode *)=
 			(sqlrtrigger *(*)(sqlrservercontroller *,
 						sqlrtriggers *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTrigger) {
 		stdoutput.printf("failed to load trigger: %s\n",module);

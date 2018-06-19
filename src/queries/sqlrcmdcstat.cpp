@@ -13,7 +13,7 @@ class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdcstat : public sqlrquery {
 	public:
 			sqlrquery_sqlrcmdcstat(sqlrservercontroller *cont,
 							sqlrqueries *qs,
-							xmldomnode *parameters);
+							domnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
 		sqlrquerycursor	*newCursor(sqlrserverconnection *conn,
 							uint16_t id);
@@ -24,7 +24,7 @@ class sqlrquery_sqlrcmdcstatcursor : public sqlrquerycursor {
 			sqlrquery_sqlrcmdcstatcursor(
 						sqlrserverconnection *sqlrcon,
 						sqlrquery *q,
-						xmldomnode *parameters,
+						domnode *parameters,
 						uint16_t id);
 			~sqlrquery_sqlrcmdcstatcursor();
 
@@ -53,7 +53,7 @@ class sqlrquery_sqlrcmdcstatcursor : public sqlrquerycursor {
 
 sqlrquery_sqlrcmdcstat::sqlrquery_sqlrcmdcstat(sqlrservercontroller *cont,
 						sqlrqueries *qs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 						sqlrquery(cont,qs,parameters) {
 	debugFunction();
 }
@@ -74,7 +74,7 @@ sqlrquerycursor *sqlrquery_sqlrcmdcstat::newCursor(
 sqlrquery_sqlrcmdcstatcursor::sqlrquery_sqlrcmdcstatcursor(
 					sqlrserverconnection *sqlrcon,
 					sqlrquery *q,
-					xmldomnode *parameters,
+					domnode *parameters,
 					uint16_t id) :
 				sqlrquerycursor(sqlrcon,q,parameters,id) {
 	currentrow=0;
@@ -269,7 +269,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrquery *new_sqlrquery_sqlrcmdcstat(
 						sqlrservercontroller *cont,
 						sqlrqueries *qs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrquery_sqlrcmdcstat(cont,qs,parameters);
 	}
 }

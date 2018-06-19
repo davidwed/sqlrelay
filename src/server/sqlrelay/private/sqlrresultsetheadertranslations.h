@@ -4,6 +4,6 @@
 	private:
 		void	unload();
 		void	loadResultSetHeaderTranslation(
-					xmldomnode *resultsetheadertranslation);
+					domnode *resultsetheadertranslation);
 
 		sqlrresultsetheadertranslationsprivate	*pvt;

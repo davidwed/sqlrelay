@@ -11,7 +11,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation_test :
 			sqlrresultsetheadertranslation_test(
 					sqlrservercontroller *cont,
 					sqlrresultsetheadertranslations *rs,
-					xmldomnode *parameters);
+					domnode *parameters);
 			~sqlrresultsetheadertranslation_test();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -25,7 +25,7 @@ sqlrresultsetheadertranslation_test::
 	sqlrresultsetheadertranslation_test(
 				sqlrservercontroller *cont,
 				sqlrresultsetheadertranslations *rs,
-				xmldomnode *parameters) :
+				domnode *parameters) :
 		sqlrresultsetheadertranslation(cont,rs,parameters) {
 }
 
@@ -47,7 +47,7 @@ extern "C" {
 			*new_sqlrresultsetheadertranslation_test(
 					sqlrservercontroller *cont,
 					sqlrresultsetheadertranslations *rs,
-					xmldomnode *parameters) {
+					domnode *parameters) {
 		return new sqlrresultsetheadertranslation_test(
 						cont,rs,parameters);
 	}

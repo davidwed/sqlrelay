@@ -165,7 +165,7 @@ sqlrlistener::~sqlrlistener() {
 
 	if (!pvt->_isforkedchild) {
 		if (pvt->_cfg && !pvt->_cfg->getListeners()->isNullNode()) {
-			for (xmldomnode *node=
+			for (domnode *node=
 				pvt->_cfg->getListeners()->
 					getFirstTagChild("listener");
 				!node->isNullNode();
@@ -295,14 +295,14 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	handleDynamicScaling();
 
-	xmldomnode	*loggers=pvt->_cfg->getLoggers();
+	domnode	*loggers=pvt->_cfg->getLoggers();
 	if (!loggers->isNullNode()) {
 		pvt->_sqlrlg=new sqlrloggers(pvt->_sqlrpth);
 		pvt->_sqlrlg->load(loggers);
 		pvt->_sqlrlg->init(this,NULL);
 	}
 
-	xmldomnode	*notifications=pvt->_cfg->getNotifications();
+	domnode	*notifications=pvt->_cfg->getNotifications();
 	if (!notifications->isNullNode()) {
 		pvt->_sqlrn=new sqlrnotifications(pvt->_sqlrpth);
 		pvt->_sqlrn->load(notifications);
@@ -773,12 +773,12 @@ void sqlrlistener::semError(const char *id, int semid) {
 
 bool sqlrlistener::listenOnClientSockets() {
 
-	xmldomnode	*listenerlist=pvt->_cfg->getListeners();
+	domnode	*listenerlist=pvt->_cfg->getListeners();
 
 	// count sockets and build socket arrays
 	pvt->_clientsockincount=0;
 	pvt->_clientsockuncount=0;
-	for (xmldomnode	*node=listenerlist->getFirstTagChild("listener");
+	for (domnode	*node=listenerlist->getFirstTagChild("listener");
 			!node->isNullNode();
 			node=node->getNextTagSibling("listener")) {
 		uint64_t	addrcount=0;
@@ -804,7 +804,7 @@ bool sqlrlistener::listenOnClientSockets() {
 	// listen on sockets
 	bool		listening=false;
 	uint16_t	protocolindex=0;
-	for (xmldomnode	*node=listenerlist->getFirstTagChild("listener");
+	for (domnode	*node=listenerlist->getFirstTagChild("listener");
 			!node->isNullNode();
 			node=node->getNextTagSibling("listener")) {
 		if (listenOnClientSocket(protocolindex,node)) {
@@ -816,7 +816,7 @@ bool sqlrlistener::listenOnClientSockets() {
 }
 
 bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
-						xmldomnode *ln) {
+						domnode *ln) {
 
 	// init return value
 	bool	listening=false;

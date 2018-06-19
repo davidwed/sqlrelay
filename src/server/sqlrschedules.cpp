@@ -3,7 +3,7 @@
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
@@ -42,13 +42,13 @@ sqlrschedules::~sqlrschedules() {
 	delete pvt;
 }
 
-bool sqlrschedules::load(xmldomnode *parameters) {
+bool sqlrschedules::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the schedule list
-	for (xmldomnode *schedule=parameters->getFirstTagChild();
+	for (domnode *schedule=parameters->getFirstTagChild();
 			!schedule->isNullNode();
 			schedule=schedule->getNextTagSibling()) {
 
@@ -73,7 +73,7 @@ void sqlrschedules::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrschedules::loadSchedule(xmldomnode *schedule) {
+void sqlrschedules::loadSchedule(domnode *schedule) {
 
 	debugFunction();
 
@@ -117,10 +117,10 @@ void sqlrschedules::loadSchedule(xmldomnode *schedule) {
 	functionname.append("new_sqlrschedule_")->append(module);
 	sqlrschedule *(*newSchedule)(sqlrservercontroller *,
 						sqlrschedules *,
-						xmldomnode *)=
+						domnode *)=
 			(sqlrschedule *(*)(sqlrservercontroller *,
 							sqlrschedules *,
-							xmldomnode *))
+							domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newSchedule) {
 		stdoutput.printf("failed to load schedule: %s\n",module);
