@@ -619,7 +619,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		// FIXME: can we move this inside of processQueryOrBindCursor?
 		// verify that log/notification modules activated by
 		// raise*Event calls don't still need the bind values
-		bindpool->deallocate();
+		bindpool->clear();
 
 	} while (loop);
 
@@ -1759,14 +1759,14 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a allocated and cleared because oracle
+			// This must be a allocated and zeroed because oracle
 			// gets angry if these aren't initialized to NULL's.
 			// It's possible that just the first character needs to
 			// be NULL, but for now I'm just going to go ahead and
-			// use allocateAndClear.
+			// allocate/zero.
 			bv->value.stringval=
-				(char *)bindpool->allocateAndClear(
-							bv->valuesize+1);
+				(char *)bindpool->allocate(bv->valuesize+1);
+			bytestring::zero(bv->value.stringval,bv->valuesize+1);
 			cont->raiseDebugMessageEvent("STRING");
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			cont->raiseDebugMessageEvent("INTEGER");
@@ -1862,14 +1862,14 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a allocated and cleared because oracle
+			// This must be a allocated and zeroed because oracle
 			// gets angry if these aren't initialized to NULL's.
 			// It's possible that just the first character needs to
 			// be NULL, but for now I'm just going to go ahead and
-			// use allocateAndClear.
+			// allocate/zero.
 			bv->value.stringval=
-				(char *)bindpool->allocateAndClear(
-							bv->valuesize+1);
+				(char *)bindpool->allocate(bv->valuesize+1);
+			bytestring::zero(bv->value.stringval,bv->valuesize+1);
 			bv->isnull=cont->nullBindValue();
 			cont->raiseDebugMessageEvent("NULL");
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
@@ -1877,14 +1877,14 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a allocated and cleared because oracle
+			// This must be a allocated and zeroed because oracle
 			// gets angry if these aren't initialized to NULL's.
 			// It's possible that just the first character needs to
 			// be NULL, but for now I'm just going to go ahead and
-			// use allocateAndClear.
+			// allocate/zero.
 			bv->value.stringval=
-				(char *)bindpool->allocateAndClear(
-							bv->valuesize+1);
+				(char *)bindpool->allocate(bv->valuesize+1);
+			bytestring::zero(bv->value.stringval,bv->valuesize+1);
 
 			// get the bind value
 			ssize_t	result=clientsock->read(bv->value.stringval,

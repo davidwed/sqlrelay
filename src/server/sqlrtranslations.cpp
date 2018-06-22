@@ -493,7 +493,7 @@ memorypool *sqlrtranslations::getMemoryPool() {
 }
 
 void sqlrtranslations::endSession() {
-	pvt->_memorypool->deallocate();
+	pvt->_memorypool->clear();
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
 }

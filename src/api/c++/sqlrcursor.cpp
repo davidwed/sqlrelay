@@ -6493,7 +6493,7 @@ void sqlrcursor::clearRows() {
 	}
 
 	// reset the row storage pool
-	pvt->_rowstorage->deallocate();
+	pvt->_rowstorage->clear();
 }
 
 void sqlrcursor::clearColumns() {
@@ -6507,7 +6507,7 @@ void sqlrcursor::clearColumns() {
 	}
 
 	// reset the column storage pool
-	pvt->_colstorage->deallocate();
+	pvt->_colstorage->clear();
 
 	// reset the column count
 	pvt->_previouscolcount=pvt->_colcount;

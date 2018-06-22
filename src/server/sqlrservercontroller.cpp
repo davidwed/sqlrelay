@@ -3787,7 +3787,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// do this here instead of inside translateBindVariables
 	// because translateQuery might use it
-	pvt->_bindmappingspool->deallocate();
+	pvt->_bindmappingspool->clear();
 
 	// before-filter query
 	if (enablefilters && pvt->_sqlrf) {
@@ -3953,7 +3953,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		// do this here instead of inside translateBindVariables
 		// because translateQuery might use it
-		pvt->_bindmappingspool->deallocate();
+		pvt->_bindmappingspool->clear();
 
 		// before-filter query
 		if (enablefilters && pvt->_sqlrf) {

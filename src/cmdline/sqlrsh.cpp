@@ -128,7 +128,7 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 		delete bv;
 	}
 	binds->clear();
-	inbindpool->deallocate();
+	inbindpool->clear();
 }
 
 enum querytype_t {
