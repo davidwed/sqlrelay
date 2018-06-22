@@ -74,7 +74,7 @@ sqlrfilter_patterns::sqlrfilter_patterns(sqlrservercontroller *cont,
 		const char	*type=c->getAttributeValue("type");
 		if (!charstring::compareIgnoringCase(type,"regex")) {
 			p[i].re=new regularexpression();
-			p[i].re->compile(pattern);
+			p[i].re->setPattern(pattern);
 			p[i].re->study();
 		} else if (!charstring::compareIgnoringCase(type,"cistring")) {
 			p[i].ignorecase=true;

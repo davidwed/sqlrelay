@@ -228,7 +228,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 						"current query tree:\n");
 					if (pvt->_tree) {
 						pvt->_tree->getRootNode()->
-							print(&stdoutput);
+							write(&stdoutput,true);
 					}
 					stdoutput.printf("\n");
 				}
@@ -271,7 +271,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 				stdoutput.printf("current query tree:\n");
 				if (pvt->_tree) {
 					pvt->_tree->getRootNode()->
-						print(&stdoutput);
+						write(&stdoutput,true);
 				}
 				stdoutput.printf("\n");
 				stdoutput.printf("\nfinal write failed\n\n");
@@ -292,7 +292,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 	if (pvt->_debug) {
 		stdoutput.printf("\nquery tree after translation:\n");
 		if (pvt->_tree) {
-			pvt->_tree->getRootNode()->print(&stdoutput);
+			pvt->_tree->getRootNode()->write(&stdoutput,true);
 		}
 		stdoutput.printf("\n");
 	}

@@ -38,7 +38,7 @@ sqlrfilter_regex::sqlrfilter_regex(sqlrservercontroller *cont,
 	}
 
 	pattern=parameters->getAttributeValue("pattern");
-	re.compile(pattern);
+	re.setPattern(pattern);
 	re.study();
 }
 

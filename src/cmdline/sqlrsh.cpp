@@ -725,7 +725,7 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"querytree")) {	
 		xmldom	xmld;
 		if (xmld.parseString(sqlrcur->getQueryTree())) {
-			xmld.getRootNode()->print(&stdoutput);
+			xmld.getRootNode()->write(&stdoutput,true);
 		}
 		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"translatedquery")) {	

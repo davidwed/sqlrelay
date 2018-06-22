@@ -50,7 +50,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 		}
 
 		regularexpression	*re=new regularexpression;
-		re->compile(pattern);
+		re->setPattern(pattern);
 		re->study();
 		relist.append(re);
 	}

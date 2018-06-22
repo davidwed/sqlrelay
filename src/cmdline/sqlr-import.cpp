@@ -467,10 +467,18 @@ void sqlrimportxml::massageField(stringbuffer *strb, const char *field) {
 	for (uint32_t index=0; field[index]; index++) {
 		if (field[index]=='&') {
 
-			// expand xml entities
+			// expand xml entities...
+
+			char	ch=(char)charstring::
+					toUnsignedInteger(field+index);
+
+			// double-up any single-quotes
+			if (ch=='\'') {
+				strb->append('\'');
+			}
+
 			index++;
-			strb->append((char)charstring::
-					toUnsignedInteger(field+index));
+			strb->append(ch);
 			while (field[index] && field[index]!=';') {
 				index++;
 			}
@@ -487,8 +495,15 @@ void sqlrimportxml::massageField(stringbuffer *strb, const char *field) {
 
 		} else {
 
-			// just append the character
-			strb->append(field[index]);
+			char	ch=field[index];
+
+			// double-up any single-quotes
+			if (ch=='\'') {
+				strb->append('\'');
+			}
+
+			// append the character
+			strb->append(ch);
 		}
 	}
 }
@@ -667,8 +682,15 @@ void sqlrimportcsv::massageField(stringbuffer *strb, const char *field) {
 
 		} else {
 
-			// just append the character
-			strb->append(field[index]);
+			char	ch=field[index];
+
+			// double-up any single-quotes
+			if (ch=='\'') {
+				strb->append('\'');
+			}
+
+			// append the character
+			strb->append(ch);
 		}
 	}
 }

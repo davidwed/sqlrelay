@@ -443,7 +443,7 @@ sqlitecursor::sqlitecursor(sqlrserverconnection *conn, uint16_t id) :
 
 	sqliteconn=(sqliteconnection *)conn;
 
-	selectlastinsertrowid.compile("^[ 	\r\n]*(select|SELECT)[ 	\r\n]+"
+	selectlastinsertrowid.setPattern("^[ 	\r\n]*(select|SELECT)[ 	\r\n]+"
 				"(last|LAST)[ 	\r\n]+(insert|INSERT)[ 	\r\n]+"
 				"(rowid|ROWID)");
 	selectlastinsertrowid.study();

@@ -770,9 +770,9 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	bindformaterror=false;
 
 	setCreateTempTablePattern("(create|CREATE)[ 	\n\r]+(global|GLOBAL)[ 	\n\r]+(temporary|TEMPORARY)[ 	\n\r]+(table|TABLE)[ 	\n\r]+");
-	preserverows.compile("(on|ON)[ 	\n\r]+(commit|COMMIT)[ 	\n\r]+(preserve|PRESERVE)[ 	\n\r]+(rows|ROWS)");
+	preserverows.setPattern("(on|ON)[ 	\n\r]+(commit|COMMIT)[ 	\n\r]+(preserve|PRESERVE)[ 	\n\r]+(rows|ROWS)");
 	preserverows.study();
-	executeprocedure.compile("(execute|EXECUTE)[ 	\n\r]+(procedure|PROCEDURE)");
+	executeprocedure.setPattern("(execute|EXECUTE)[ 	\n\r]+(procedure|PROCEDURE)");
 	executeprocedure.study();
 }
 

@@ -779,7 +779,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	usestmtprepare=true;
 	stmtpreparefailed=false;
 	bindformaterror=false;
-	unsupportedbystmt.compile(
+	unsupportedbystmt.setPattern(
 			"^[ 	\r\n]*"
 			"(/\\*.*\\*/[ 	\r\n]+)*"
 			"(("

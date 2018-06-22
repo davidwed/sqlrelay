@@ -1194,7 +1194,7 @@ void sqlrservercursor::setLiveConnection(bool liveconnection) {
 }
 
 void sqlrservercursor::setCreateTempTablePattern(const char *createtemp) {
-	pvt->_createtemp.compile(createtemp);
+	pvt->_createtemp.setPattern(createtemp);
 	pvt->_createtemp.study();
 }
 

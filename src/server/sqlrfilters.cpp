@@ -253,7 +253,8 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 				if (pvt->_debug) {
 					stdoutput.printf(
 						"query tree:\n");
-					tree->getRootNode()->print(&stdoutput);
+					tree->getRootNode()->
+						write(&stdoutput,true);
 					stdoutput.printf("\n");
 				}
 			}

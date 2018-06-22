@@ -4130,20 +4130,18 @@ bool sqlrprotocol_sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 	cont->raiseDebugMessageEvent("getting query tree");
 
 	// get the tree as a string
-	xmldom		*tree=cont->getQueryTree(cursor);
+	xmldom	*tree=cont->getQueryTree(cursor);
 	domnode	*root=(tree)?tree->getRootNode():NULL;
-	stringbuffer	*xml=(root)?root->xml():NULL;
-	const char	*xmlstring=(xml)?xml->getString():NULL;
-	uint64_t	xmlstringlen=(xml)?xml->getStringLength():0;
+	stringbuffer	xml;
+	if (root) {
+		root->write(&xml);
+	}
 
 	// send the tree
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	clientsock->write(xmlstringlen);
-	clientsock->write(xmlstring,xmlstringlen);
+	clientsock->write(xml.getStringLength());
+	clientsock->write(xml.getString(),xml.getStringLength());
 	clientsock->flushWriteBuffer(-1,-1);
-
-	// clean up
-	delete xml;
 
 	return true;
 }

@@ -122,14 +122,14 @@ void sqlrtranslation_patterns::buildPatternsTree(domnode *root,
 		if (!charstring::compareIgnoringCase(type,"regex")) {
 			if (!charstring::isNullOrEmpty(match)) {
 				(*p)[i].matchre=new regularexpression();
-				(*p)[i].matchre->compile(match);
+				(*p)[i].matchre->setPattern(match);
 				(*p)[i].matchre->study();
 				(*p)[i].matchglobal=
 					!charstring::isNo(
 					c->getAttributeValue("global"));
 			} else if (!charstring::isNullOrEmpty(from)) {
 				(*p)[i].fromre=new regularexpression();
-				(*p)[i].fromre->compile(from);
+				(*p)[i].fromre->setPattern(from);
 				(*p)[i].fromre->study();
 				(*p)[i].replaceglobal=
 					!charstring::isNo(
