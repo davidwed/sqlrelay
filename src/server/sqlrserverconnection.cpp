@@ -351,11 +351,12 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	sdquerylen=charstring::length(sdquery);
 
 	// run the query...
+	// (enable translations, triggers, etc. for this one)
 	bool	retval=false;
 	sqlrservercursor	*sdcur=cont->newCursor();
 	if (cont->open(sdcur) &&
-		cont->prepareQuery(sdcur,sdquery,sdquerylen) &&
-		cont->executeQuery(sdcur)) {
+		cont->prepareQuery(sdcur,sdquery,sdquerylen,true,true,true) &&
+		cont->executeQuery(sdcur,true,true,true,true)) {
 		cont->closeResultSet(sdcur);
 		retval=true;
 
