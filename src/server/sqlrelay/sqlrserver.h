@@ -1922,6 +1922,76 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 	#include <sqlrelay/private/sqlrresultsetrowtranslations.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation {
+	public:
+		sqlrresultsetrowblocktranslation(
+					sqlrservercontroller *cont,
+					sqlrresultsetrowblocktranslations *rs,
+					domnode *parameters);
+		virtual	~sqlrresultsetrowblocktranslation();
+
+		virtual bool	setRow(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames,
+					const char * const *fields,
+					uint64_t *fieldlengths,
+					bool *blobs,
+					bool *nulls);
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames);
+		virtual bool	getRow(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char ***fields,
+					uint64_t **fieldlengths,
+					bool **blobs,
+					bool **nulls);
+
+	protected:
+		sqlrresultsetrowblocktranslations
+					*getResultSetRowBlockTranslations();
+		domnode			*getParameters();
+
+	#include <sqlrelay/private/sqlrresultsetrowblocktranslation.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslations {
+	public:
+		sqlrresultsetrowblocktranslations(sqlrservercontroller *cont);
+		~sqlrresultsetrowblocktranslations();
+
+		bool	load(domnode *parameters);
+
+		uint64_t	getRowBlockSize();
+
+		bool	setRow(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames,
+					const char * const *fields,
+					uint64_t *fieldlengths,
+					bool *blobs,
+					bool *nulls);
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames);
+		bool	getRow(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char ***fields,
+					uint64_t **fieldlengths,
+					bool **blobs,
+					bool **nulls);
+
+		void	endSession();
+
+	#include <sqlrelay/private/sqlrresultsetrowblocktranslations.h>
+};
+
 class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation {
 	public:
 		sqlrresultsetheadertranslation(

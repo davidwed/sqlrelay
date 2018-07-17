@@ -641,6 +641,8 @@ STATICPLUGINSRCS += sqlrserverconnectiondeclarations.cpp \
 		sqlrresultsettranslationassignments.cpp \
 		sqlrresultsetrowtranslationdeclarations.cpp \
 		sqlrresultsetrowtranslationassignments.cpp \
+		sqlrresultsetrowblocktranslationdeclarations.cpp \
+		sqlrresultsetrowblocktranslationassignments.cpp \
 		sqlrresultsetheadertranslationdeclarations.cpp \
 		sqlrresultsetheadertranslationassignments.cpp \
 		sqlrfilterdeclarations.cpp \
@@ -660,6 +662,7 @@ STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../translations/*.$(OBJ)) \
 		$(shell ls ../resultsettranslations/*.$(OBJ)) \
 		$(shell ls ../resultsetrowtranslations/*.$(OBJ)) \
+		$(shell ls ../resultsetrowblocktranslations/*.$(OBJ)) \
 		$(shell ls ../resultsetheadertranslations/*.$(OBJ)) \
 		$(shell ls ../filters/*.$(OBJ)) \
 		$(shell ls ../queries/*.$(OBJ))
@@ -887,7 +890,7 @@ SRCALLSUBDIRS += all-util all-configs
 SRCINSTALLSUBDIRS += install-util install-configs
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-resultsetheadertranslations all-filters all-connections
+SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-connections
 SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-filters install-connections
 endif
 else
@@ -898,7 +901,7 @@ SRCALLSUBDIRS += all-configs all-util
 SRCINSTALLSUBDIRS += install-configs install-util
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-resultsetheadertranslations all-filters all-connections all-server
+SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-connections all-server
 SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-filters install-connections install-server
 endif
 endif

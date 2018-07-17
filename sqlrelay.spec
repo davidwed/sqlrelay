@@ -555,6 +555,8 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/private/sqlrqueries.h
 %{_includedir}/%{name}/private/sqlrquerycursor.h
 %{_includedir}/%{name}/private/sqlrquery.h
+%{_includedir}/%{name}/private/sqlrresultsetrowblocktranslation.h
+%{_includedir}/%{name}/private/sqlrresultsetrowblocktranslations.h
 %{_includedir}/%{name}/private/sqlrresultsetrowtranslation.h
 %{_includedir}/%{name}/private/sqlrresultsetrowtranslations.h
 %{_includedir}/%{name}/private/sqlrresultsettranslation.h
@@ -851,9 +853,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Sat Jun 02 2018 David Muse <david.muse@firstworks.com> - 1.3.1-1
+* Sat Jul 16 2018 David Muse <david.muse@firstworks.com> - 1.3.1-1
 - Updated to version 1.3.1.
 - Updated to require rudiments 1.0.8.
+- Added resultsetrowblocktranslations headers.
 
 * Wed May 16 2018 David Muse <david.muse@firstworks.com> - 1.3.0-1
 - Updated to version 1.3.0.

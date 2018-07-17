@@ -80,21 +80,22 @@ class sqlrservercontrollerprivate {
 	semaphoreset	*_semset;
 	sharedmemory	*_shmem;
 
-	sqlrprotocols			*_sqlrpr;
-	sqlrparser			*_sqlrp;
-	sqlrdirectives			*_sqlrd;
-	sqlrtranslations		*_sqlrt;
-	sqlrfilters			*_sqlrf;
-	sqlrresultsettranslations	*_sqlrrst;
-	sqlrresultsetrowtranslations	*_sqlrrsrt;
-	sqlrresultsetheadertranslations	*_sqlrrsht;
-	sqlrtriggers			*_sqlrtr;
-	sqlrloggers			*_sqlrlg;
-	sqlrnotifications		*_sqlrn;
-	sqlrschedules			*_sqlrs;
-	sqlrqueries			*_sqlrq;
-	sqlrpwdencs			*_sqlrpe;
-	sqlrauths			*_sqlra;
+	sqlrprotocols				*_sqlrpr;
+	sqlrparser				*_sqlrp;
+	sqlrdirectives				*_sqlrd;
+	sqlrtranslations			*_sqlrt;
+	sqlrfilters				*_sqlrf;
+	sqlrresultsettranslations		*_sqlrrst;
+	sqlrresultsetrowtranslations		*_sqlrrsrt;
+	sqlrresultsetrowblocktranslations	*_sqlrrsrbt;
+	sqlrresultsetheadertranslations		*_sqlrrsht;
+	sqlrtriggers				*_sqlrtr;
+	sqlrloggers				*_sqlrlg;
+	sqlrnotifications			*_sqlrn;
+	sqlrschedules				*_sqlrs;
+	sqlrqueries				*_sqlrq;
+	sqlrpwdencs				*_sqlrpe;
+	sqlrauths				*_sqlra;
 
 	filedescriptor	*_clientsock;
 
@@ -155,6 +156,7 @@ class sqlrservercontrollerprivate {
 	bool		_debugbindtranslation;
 	bool		_debugsqlrresultsettranslation;
 	bool		_debugsqlrresultsetrowtranslation;
+	bool		_debugsqlrresultsetrowblocktranslation;
 	bool		_debugsqlrresultsetheadertranslation;
 
 	dynamiclib	_conndl;
@@ -342,6 +344,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_sqlrf=NULL;
 	pvt->_sqlrrst=NULL;
 	pvt->_sqlrrsrt=NULL;
+	pvt->_sqlrrsrbt=NULL;
 	pvt->_sqlrrsht=NULL;
 	pvt->_sqlrtr=NULL;
 	pvt->_sqlrlg=NULL;
@@ -423,6 +426,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_sqlrf;
 	delete pvt->_sqlrrst;
 	delete pvt->_sqlrrsrt;
+	delete pvt->_sqlrrsrbt;
 	delete pvt->_sqlrrsht;
 	delete pvt->_sqlrtr;
 	delete pvt->_sqlrlg;
@@ -644,6 +648,16 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (!resultsetrowtranslations->isNullNode()) {
 		pvt->_sqlrrsrt=new sqlrresultsetrowtranslations(this);
 		pvt->_sqlrrsrt->load(resultsetrowtranslations);
+	}
+
+	// get the result set row block translations
+	pvt->_debugsqlrresultsetrowblocktranslation=
+			pvt->_cfg->getDebugResultSetRowBlockTranslations();
+	domnode	*resultsetrowblocktranslations=
+				pvt->_cfg->getResultSetRowBlockTranslations();
+	if (!resultsetrowblocktranslations->isNullNode()) {
+		pvt->_sqlrrsrbt=new sqlrresultsetrowblocktranslations(this);
+		pvt->_sqlrrsrbt->load(resultsetrowblocktranslations);
 	}
 
 	// get the result set header translations
@@ -4996,6 +5010,11 @@ void sqlrservercontroller::endSession() {
 		pvt->_sqlrrsrt->endSession();
 	}
 
+	// reset result set row blocktranslation modules
+	if (pvt->_sqlrrsrbt) {
+		pvt->_sqlrrsrbt->endSession();
+	}
+
 	// reset trigger modules
 	if (pvt->_sqlrtr) {
 		pvt->_sqlrtr->endSession();
@@ -7137,11 +7156,6 @@ bool sqlrservercontroller::skipRow(sqlrservercursor *cursor) {
 
 bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 
-	// fetch the row
-	if (!cursor->fetchRow()) {
-		return false;
-	}
-
 	// get arrays of field pointers,
 	// helpfully provided for us by the cursor
 	cursor->getFieldPointers(&(pvt->_fieldnames),
@@ -7153,27 +7167,113 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 	// get the column count
 	uint32_t	colcount=colCount(cursor);
 
-	// use the provided field pointer arrays to get the
-	// pointers to the column names and actual field data
-	for (uint32_t i=0; i<colcount; i++) {
+	if (pvt->_sqlrrsrbt) {
 
-		pvt->_fieldnames[i]=getColumnName(cursor,i);
-		pvt->_fields[i]=NULL;
-		pvt->_fieldlengths[i]=0;
-		pvt->_blobs[i]=false;
-		pvt->_nulls[i]=false;
-		cursor->getField(i,&(pvt->_fields[i]),
-					&(pvt->_fieldlengths[i]),
-					&(pvt->_blobs[i]),
-					&(pvt->_nulls[i]));
+		// if we have row block translations, then
+		// this is a little complex...
 
-		// A connection module might return the actual field length,
-		// even if its larger than the buffer that the data was
-		// copied into.  Override fieldlength, if necessary, just
-		// to be safe.
-		if (pvt->_maxfieldlength &&
-			pvt->_fieldlengths[i]>pvt->_maxfieldlength) {
-			pvt->_fieldlengths[i]=pvt->_maxfieldlength;
+		// if we're on the first row of a block...
+		if (!(cursor->getTotalRowsFetched()%
+				pvt->_sqlrrsrbt->getRowBlockSize())) {
+
+			// for each row in the block...
+			for (uint32_t j=0;
+				j<pvt->_sqlrrsrbt->getRowBlockSize(); j++) {
+
+				// fetch the row
+				if (!cursor->fetchRow()) {
+					break;
+				}
+
+				// use the provided field pointer arrays to get
+				// the pointers to the column names and actual
+				// field data
+				for (uint32_t i=0; i<colcount; i++) {
+
+					pvt->_fieldnames[i]=
+						getColumnName(cursor,i);
+					pvt->_fields[i]=NULL;
+					pvt->_fieldlengths[i]=0;
+					pvt->_blobs[i]=false;
+					pvt->_nulls[i]=false;
+					cursor->getField(i,
+						&(pvt->_fields[i]),
+						&(pvt->_fieldlengths[i]),
+						&(pvt->_blobs[i]),
+						&(pvt->_nulls[i]));
+
+					// A connection module might return the
+					// actual field length, even if its
+					// larger than the buffer that the data
+					// was copied into.  Override
+					// fieldlength, if necessary, just to
+					// be safe.
+					if (pvt->_maxfieldlength &&
+						pvt->_fieldlengths[i]>
+							pvt->_maxfieldlength) {
+						pvt->_fieldlengths[i]=
+							pvt->_maxfieldlength;
+					}
+				}
+
+				// send the row to the translators
+				pvt->_sqlrrsrbt->setRow(cursor->conn,
+							cursor,
+							colcount,
+							pvt->_fieldnames,
+							pvt->_fields,
+							pvt->_fieldlengths,
+							pvt->_blobs,
+							pvt->_nulls);
+			}
+
+			// run the translators
+			pvt->_sqlrrsrbt->run(cursor->conn,cursor,
+						colcount,pvt->_fieldnames);
+		}
+
+		// get the row from the translators
+		if (!pvt->_sqlrrsrbt->getRow(cursor->conn,cursor,
+						colcount,
+						&(pvt->_fields),
+						&(pvt->_fieldlengths),
+						&(pvt->_blobs),
+						&(pvt->_nulls))) {
+			return false;
+		}
+
+	} else {
+
+		// if we don't have any row block translations, then
+		// this is a little more straightforward...
+
+		// fetch the row
+		if (!cursor->fetchRow()) {
+			return false;
+		}
+
+		// use the provided field pointer arrays to get the
+		// pointers to the column names and actual field data
+		for (uint32_t i=0; i<colcount; i++) {
+
+			pvt->_fieldnames[i]=getColumnName(cursor,i);
+			pvt->_fields[i]=NULL;
+			pvt->_fieldlengths[i]=0;
+			pvt->_blobs[i]=false;
+			pvt->_nulls[i]=false;
+			cursor->getField(i,&(pvt->_fields[i]),
+						&(pvt->_fieldlengths[i]),
+						&(pvt->_blobs[i]),
+						&(pvt->_nulls[i]));
+
+			// A connection module might return the actual field
+			// length, even if its larger than the buffer that the
+			// data was copied into.  Override fieldlength, if
+			// necessary, just to be safe.
+			if (pvt->_maxfieldlength &&
+				pvt->_fieldlengths[i]>pvt->_maxfieldlength) {
+				pvt->_fieldlengths[i]=pvt->_maxfieldlength;
+			}
 		}
 	}
 
@@ -7183,6 +7283,7 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 
 	// bump total rows fetched
 	cursor->incrementTotalRowsFetched();
+
 	return true;
 }
 
