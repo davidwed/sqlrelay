@@ -231,7 +231,7 @@ bool sqlrresultsetrowblocktranslations::run(sqlrserverconnection *sqlrcon,
 	}
 	if (pvt->_debug) {
 		stdoutput.printf("\nrunning result set "
-				"row block translation run(0)...\n\n",
+				"row block translation run...\n\n",
 				pvt->_rowcount);
 	}
 	if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,colcount,fieldnames)) {
