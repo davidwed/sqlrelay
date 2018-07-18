@@ -1722,6 +1722,9 @@ void sqlrconfig_xmldom::getTreeValues() {
 		debugresultsetrowtranslations=
 			charstring::contains(debug,
 					"resultsetrowtranslations");
+		debugresultsetrowblocktranslations=
+			charstring::contains(debug,
+					"resultsetrowblocktranslations");
 		debugresultsetheadertranslations=
 			charstring::contains(debug,
 					"resultsetheadertranslations");

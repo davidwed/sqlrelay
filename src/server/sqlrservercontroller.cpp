@@ -7188,6 +7188,7 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 				// use the provided field pointer arrays to get
 				// the pointers to the column names and actual
 				// field data
+stdoutput.printf("fields:\n");
 				for (uint32_t i=0; i<colcount; i++) {
 
 					pvt->_fieldnames[i]=

@@ -41,7 +41,7 @@ sqlrresultsetrowblocktranslations::sqlrresultsetrowblocktranslations(
 	debugFunction();
 	pvt=new sqlrresultsetrowblocktranslationsprivate;
 	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugResultSetRowTranslations();
+	pvt->_debug=cont->getConfig()->getDebugResultSetRowBlockTranslations();
 	pvt->_rowcount=0;
 }
 
