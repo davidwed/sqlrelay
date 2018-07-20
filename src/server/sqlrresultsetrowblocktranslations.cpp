@@ -33,6 +33,7 @@ class sqlrresultsetrowblocktranslationsprivate {
 		singlylinkedlist< sqlrresultsetrowblocktranslationplugin * >
 									_tlist;
 
+		uint64_t		_rowblocksize;
 		uint64_t		_rowcount;
 };
 
@@ -42,6 +43,7 @@ sqlrresultsetrowblocktranslations::sqlrresultsetrowblocktranslations(
 	pvt=new sqlrresultsetrowblocktranslationsprivate;
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugResultSetRowBlockTranslations();
+	pvt->_rowblocksize=0;
 	pvt->_rowcount=0;
 }
 
@@ -55,6 +57,13 @@ bool sqlrresultsetrowblocktranslations::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
+
+	pvt->_rowblocksize=charstring::toInteger(
+				parameters->getAttributeValue("rowblocksize"));
+	if (!pvt->_rowblocksize) {
+		pvt->_rowblocksize=10;
+	}
+	
 
 	// run through the result set translation list
 	for (domnode *resultsetrowblocktranslation=
@@ -179,8 +188,7 @@ void sqlrresultsetrowblocktranslations::loadResultSetRowBlockTranslation(
 }
 
 uint64_t sqlrresultsetrowblocktranslations::getRowBlockSize() {
-	// FIXME: get from xml file
-	return 10;
+	return pvt->_rowblocksize;
 }
 
 bool sqlrresultsetrowblocktranslations::setRow(sqlrserverconnection *sqlrcon,
@@ -201,8 +209,7 @@ bool sqlrresultsetrowblocktranslations::setRow(sqlrserverconnection *sqlrcon,
 
 	if (pvt->_debug) {
 		stdoutput.printf("\nrunning result set "
-				"row block translation setRow(%d)...\n\n",
-				pvt->_rowcount);
+				"row block translation setRow()...\n\n");
 	}
 
 	pvt->_rowcount++;
@@ -231,8 +238,7 @@ bool sqlrresultsetrowblocktranslations::run(sqlrserverconnection *sqlrcon,
 	}
 	if (pvt->_debug) {
 		stdoutput.printf("\nrunning result set "
-				"row block translation run...\n\n",
-				pvt->_rowcount);
+				"row block translation run()...\n\n");
 	}
 	if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,colcount,fieldnames)) {
 		pvt->_rowcount=0;
@@ -253,7 +259,7 @@ bool sqlrresultsetrowblocktranslations::run(sqlrserverconnection *sqlrcon,
 				stdoutput.printf(
 					"\nrunning result set "
 					"row block translation "
-					"getRow(%d)...\n\n",i);
+					"getRow()...\n\n");
 			}
 
 			const char	**oldfields;
@@ -276,7 +282,7 @@ bool sqlrresultsetrowblocktranslations::run(sqlrserverconnection *sqlrcon,
 				stdoutput.printf(
 					"\nrunning result set "
 					"row block translation "
-					"setRow(%d)...\n\n",i);
+					"setRow()...\n\n");
 			}
 
 			if (!node->getNext()->getValue()->rstr->setRow(
@@ -328,8 +334,7 @@ bool sqlrresultsetrowblocktranslations::getRow(sqlrserverconnection *sqlrcon,
 	if (pvt->_debug) {
 		stdoutput.printf(
 			"\nrunning result set "
-			"row block translation getRow(%d)...\n\n",
-			pvt->_rowcount);
+			"row block translation getRow()...\n\n");
 	}
 
 	pvt->_rowcount--;
