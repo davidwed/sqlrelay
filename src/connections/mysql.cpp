@@ -257,6 +257,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		bool		ignorespace;
 
 		const char	*identity;
+		bool		usestmtapi;
 
 		char	*dbversion;
 		char	*dbhostname;
@@ -364,6 +365,9 @@ void mysqlconnection::handleConnectString() {
 	ignorespace=!charstring::compare(
 			cont->getConnectStringValue("ignorespace"),"yes");
 	identity=cont->getConnectStringValue("identity");
+
+	usestmtapi=charstring::compare(
+			cont->getConnectStringValue("api"),"classic");
 
 	// mysql doesn't support multi-row fetches
 	cont->setFetchAtOnce(1);
@@ -977,7 +981,8 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 bool mysqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	usestmtprepare=!unsupportedbystmt.match(query);
+	usestmtprepare=mysqlconn->usestmtapi &&
+			!unsupportedbystmt.match(query);
 	return usestmtprepare;
 #else
 	return false;

@@ -20,6 +20,7 @@
 	sqlr-import can import csv files now
 	sqlr-export correctly escapes double-quotes now
 	query translations apply to the select-database query now
+	added api=stmt/classic option to mysql connection module
 
 1.3.0 - updated systemd init file to use SIGINT to kill sqlrelay
 	fixed several "ocurred" -> "occurred" typo's
