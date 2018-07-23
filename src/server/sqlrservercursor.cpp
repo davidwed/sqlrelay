@@ -26,6 +26,8 @@ class sqlrservercursorprivate {
 		xmldom		*_querytree;
 		stringbuffer	_translatedquery;
 
+		memorypool	*_bindpool;
+
 		uint16_t		_inbindcount;
 		sqlrserverbindvar	*_inbindvars;
 		uint16_t		_outbindcount;
@@ -105,6 +107,8 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	this->conn=conn;
 
 	pvt->_maxerrorlength=conn->cont->getConfig()->getMaxErrorLength();
+
+	pvt->_bindpool=new memorypool(512,128,100);
 
 	setInputBindCount(0);
 	pvt->_inbindvars=new sqlrserverbindvar[
@@ -197,6 +201,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 sqlrservercursor::~sqlrservercursor() {
 	delete[] pvt->_querybuffer;
 	delete pvt->_querytree;
+	delete pvt->_bindpool;
 	delete[] pvt->_inbindvars;
 	delete[] pvt->_outbindvars;
 	delete[] pvt->_inoutbindvars;
@@ -984,6 +989,10 @@ void sqlrservercursor::encodeBlob(stringbuffer *buffer,
 		buffer->append(conn->cont->asciiToHex(data[i]));
 	}
 	buffer->append('\'');
+}
+
+memorypool *sqlrservercursor::getBindPool() {
+	return pvt->_bindpool;
 }
 
 void sqlrservercursor::setInputBindCount(uint16_t inbindcount) {

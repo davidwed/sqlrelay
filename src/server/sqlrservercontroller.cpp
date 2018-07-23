@@ -7340,6 +7340,10 @@ uint16_t sqlrservercontroller::getId(sqlrservercursor *cursor) {
 	return cursor->getId();
 }
 
+memorypool *sqlrservercontroller::getBindPool(sqlrservercursor *cursor) {
+	return cursor->getBindPool();
+}
+
 void sqlrservercontroller::setFakeInputBindsForThisQuery(
 					sqlrservercursor *cursor, bool fake) {
 	cursor->setFakeInputBindsForThisQuery(fake);
