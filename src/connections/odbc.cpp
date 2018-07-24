@@ -344,6 +344,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		mars;
 		bool		getcolumntables;
 		const char	*overrideschema;
+		bool		unicode;
 
 		stringbuffer	errormessage;
 
@@ -486,6 +487,7 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	mars=false;
 	getcolumntables=false;
 	overrideschema=NULL;
+	unicode=true;
 }
 
 
@@ -515,6 +517,10 @@ void odbcconnection::handleConnectString() {
 	if (!charstring::isNullOrEmpty(os)) {
 		overrideschema=os;
 	}
+
+	unicode=charstring::compare(
+			cont->getConnectStringValue("unicode"),"no");
+
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
@@ -653,19 +659,23 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		const char	*dsnasc=dsn;
 
 		#ifdef HAVE_SQLCONNECTW
-		char	*dsnucs=conv_to_ucs(dsnasc);
-		char	*userucs=conv_to_ucs(userasc);
-		char	*passworducs=conv_to_ucs(passwordasc);
-		erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
+		if (unicode) {
+			char	*dsnucs=conv_to_ucs(dsnasc);
+			char	*userucs=conv_to_ucs(userasc);
+			char	*passworducs=conv_to_ucs(passwordasc);
+			erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
 					(SQLWCHAR *)userucs,SQL_NTS,
 					(SQLWCHAR *)passworducs,SQL_NTS);
-		delete[] dsnucs;
-		delete[] userucs;
-		delete[] passworducs;
-		#else
-		erg=SQLConnect(dbc,(SQLCHAR *)dsnasc,SQL_NTS,
+			delete[] dsnucs;
+			delete[] userucs;
+			delete[] passworducs;
+		} else {
+		#endif
+			erg=SQLConnect(dbc,(SQLCHAR *)dsnasc,SQL_NTS,
 					(SQLCHAR *)userasc,SQL_NTS,
 					(SQLCHAR *)passwordasc,SQL_NTS);
+		#ifdef HAVE_SQLCONNECTW
+		}
 		#endif
 	}
 	
@@ -2062,27 +2072,31 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	// prepare the query...
 
 	#ifdef HAVE_SQLCONNECTW
-	//free allocated buffers
-	while (nextbuf>0) {
-		nextbuf--;
-		if (buffers[nextbuf]) {
-			delete[] buffers[nextbuf];
+	if (odbcconn->unicode) {
+		//free allocated buffers
+		while (nextbuf>0) {
+			nextbuf--;
+			if (buffers[nextbuf]) {
+				delete[] buffers[nextbuf];
+			}
 		}
-	}
-	if (getExecuteDirect()) {
-		return true;
-	}
+		if (getExecuteDirect()) {
+			return true;
+		}
 
-	char *query_ucs=conv_to_ucs((char*)query);
-	erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-	if (query_ucs) {
-		delete[] query_ucs;
+		char *query_ucs=conv_to_ucs((char*)query);
+		erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
+		if (query_ucs) {
+			delete[] query_ucs;
+		}
+	} else {
+	#endif
+		if (getExecuteDirect()) {
+			return true;
+		}
+		erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
+	#ifdef HAVE_SQLCONNECTW
 	}
-	#else
-	if (getExecuteDirect()) {
-		return true;
-	}
-	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 	#endif
 
 	if (odbcconn->getcolumntables) {
@@ -2117,21 +2131,25 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		}
 
 		#ifdef HAVE_SQLCONNECTW
-		//free allocated buffers
-		while (nextbuf>0) {
-			nextbuf--;
-			if (buffers[nextbuf]) {
-				delete[] buffers[nextbuf];
+		if (odbcconn->unicode) {
+			//free allocated buffers
+			while (nextbuf>0) {
+				nextbuf--;
+				if (buffers[nextbuf]) {
+					delete[] buffers[nextbuf];
+				}
 			}
-		}
 
-		char *query_ucs=conv_to_ucs((char*)query);
-		erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-		if (query_ucs) {
-			delete[] query_ucs;
+			char *query_ucs=conv_to_ucs((char*)query);
+			erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
+			if (query_ucs) {
+				delete[] query_ucs;
+			}
+		} else {
+		#endif
+			erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
+		#ifdef HAVE_SQLCONNECTW
 		}
-		#else
-		erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
 		#endif
 	}
 
@@ -2168,33 +2186,35 @@ bool odbccursor::inputBind(const char *variable,
 		return false;
 	}
 
+	SQLPOINTER	val=NULL;
+	SQLSMALLINT	valtype=SQL_C_CHAR;
 	#ifdef HAVE_SQLCONNECTW
-	char *value_ucs=conv_to_ucs((char*)value);
-	valuesize=ucslen(value_ucs)*2;
-	buffers[nextbuf]=value_ucs;
-	nextbuf++;
+	if (odbcconn->unicode) {
+		char *value_ucs=conv_to_ucs((char*)value);
+		valuesize=ucslen(value_ucs)*2;
+		buffers[nextbuf]=value_ucs;
+		nextbuf++;
+		val=(SQLPOINTER)value_ucs;
+		valtype=SQL_C_WCHAR;
+	} else {
+	#endif
+		val=(SQLPOINTER)value;
+	#ifdef HAVE_SQLCONNECTW
+	}
 	#endif
 
 	if (*isnull==SQL_NULL_DATA) {
 		// the 4th parameter (ValueType) must by
-		// SQL_C_BINARY for this to work with blobs
+		// SQL_C_BINARY (as opposed to SQL_C_WCHAR or SQL_C_CHAR)
+		// for this to work with blobs
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
-				/*#ifdef HAVE_SQLCONNECTW
-				SQL_C_WCHAR,
-				#else
-				SQL_C_CHAR,
-				#endif*/
 				SQL_C_BINARY,
 				SQL_CHAR,
 				1,
 				0,
-				#ifdef HAVE_SQLCONNECTW
-				(SQLPOINTER)value_ucs,
-				#else
-				(SQLPOINTER)value,
-				#endif
+				val,
 				valuesize,
 				&sqlnulldata);
 	} else {
@@ -2211,19 +2231,11 @@ bool odbccursor::inputBind(const char *variable,
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
-				#ifdef HAVE_SQLCONNECTW
-				SQL_C_WCHAR,
-				#else
-				SQL_C_CHAR,
-				#endif
+				valtype,
 				SQL_CHAR,
 				valuesize,
 				0,
-				#ifdef HAVE_SQLCONNECTW
-				(SQLPOINTER)value_ucs,
-				#else
-				(SQLPOINTER)value,
-				#endif
+				val,
 				valuesize,
 				NULL);
 	}
@@ -2672,11 +2684,15 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	// execute the query
 	if (getExecuteDirect()) {
 		#ifdef HAVE_SQLCONNECTW
-		char	*queryucs=conv_to_ucs((char*)query);
-		erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
-		delete[] queryucs;
-		#else
-		erg=SQLExecDirect(stmt,(SQLCHAR *)query,length);
+		if (odbcconn->unicode) {
+			char	*queryucs=conv_to_ucs((char*)query);
+			erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
+			delete[] queryucs;
+		} else {
+		#endif
+			erg=SQLExecDirect(stmt,(SQLCHAR *)query,length);
+		#ifdef HAVE_SQLCONNECTW
+		}
 		#endif
 	} else {
 		erg=SQLExecute(stmt);
@@ -3045,27 +3061,31 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 
 			// bind the column to a buffer
 			#ifdef HAVE_SQLCONNECTW
-			if (column[i].type==SQL_WVARCHAR ||
+			if (odbcconn->unicode) {
+				if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
-				erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
-						field[i],maxfieldlength,
-						&(indicator[i]));
-			} else if (column[i].type==SQL_TYPE_TIMESTAMP ||
+					erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
+							field[i],maxfieldlength,
+							&(indicator[i]));
+				} else if (column[i].type==SQL_TYPE_TIMESTAMP ||
 						column[i].type==SQL_TYPE_DATE) {
-				erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
-						field[i],maxfieldlength,
-						&(indicator[i]));
+					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
+							field[i],maxfieldlength,
+							&(indicator[i]));
+				} else {
+					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+							field[i],maxfieldlength,
+							&(indicator[i]));
+				}
 			} else {
-				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-						field[i],maxfieldlength,
-						&(indicator[i]));
-			}
-			#else
-			if (column[i].type!=SQL_LONGVARCHAR &&
-				column[i].type!=SQL_LONGVARBINARY) {
-				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-						field[i],maxfieldlength,
-						&(indicator[i]));
+			#endif
+				if (column[i].type!=SQL_LONGVARCHAR &&
+					column[i].type!=SQL_LONGVARBINARY) {
+					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
+							field[i],maxfieldlength,
+							&(indicator[i]));
+				}
+			#ifdef HAVE_SQLCONNECTW
 			}
 			#endif
 		
@@ -3263,19 +3283,23 @@ bool odbccursor::fetchRow() {
 	}
 	
 	#ifdef HAVE_SQLCONNECTW
-	//convert char and varchar data to user coding from ucs-2
-	uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
-	for (int i=0; i<ncols; i++) {
-		if (column[i].type==SQL_WVARCHAR || column[i].type==SQL_WCHAR) {
-			if (indicator[i]!=-1 && field[i]) {
-				char	*u=conv_to_user_coding(field[i]);
-				size_t	len=charstring::length(u);
-				if (len>=maxfieldlength) {
-					len=maxfieldlength-1;
+	if (odbcconn->unicode) {
+		//convert char and varchar data to user coding from ucs-2
+		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		for (int i=0; i<ncols; i++) {
+			if (column[i].type==SQL_WVARCHAR ||
+					column[i].type==SQL_WCHAR) {
+				if (indicator[i]!=-1 && field[i]) {
+					char	*u=conv_to_user_coding(
+								field[i]);
+					size_t	len=charstring::length(u);
+					if (len>=maxfieldlength) {
+						len=maxfieldlength-1;
+					}
+					charstring::copy(field[i],u,len);
+					indicator[i]=len;
+					delete[] u;
 				}
-				charstring::copy(field[i],u,len);
-				indicator[i]=len;
-				delete[] u;
 			}
 		}
 	}
