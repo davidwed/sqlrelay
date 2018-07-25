@@ -1085,6 +1085,7 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	}
 
 	// get the table list
+stdoutput.printf("SQLTables(%s,%s,%s)\n",catalog,schema,table);
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
@@ -1775,10 +1776,10 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
 	if (SQLGetConnectAttr(dbc,
-			SQL_CURRENT_QUALIFIER,
-			catalogbuffer,
-			sizeof(catalogbuffer),
-			&cataloglen)==SQL_SUCCESS) {
+				SQL_CURRENT_QUALIFIER,
+				catalogbuffer,
+				sizeof(catalogbuffer),
+				&cataloglen)==SQL_SUCCESS) {
 		catalogbuffer[cataloglen]='\0';
 		catalog=catalogbuffer;
 	}
