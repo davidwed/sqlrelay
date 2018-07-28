@@ -1198,6 +1198,9 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		const char	*skipCreateTempTableClause(
 						const char *query);
 
+		void	setColumnInfoIsValid(bool prepared);
+		bool	getColumnInfoIsValid();
+
 		void	setQueryHasBeenPreProcessed(bool preprocessed);
 		bool	getQueryHasBeenPreProcessed();
 

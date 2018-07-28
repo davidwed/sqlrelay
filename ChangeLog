@@ -23,6 +23,8 @@
 	added api=stmt/classic option to mysql connection module
 	added a per-cursor bindpool
 	added unicode=yes/no opiton to odbc connection module
+	fixed a bug that could cause stale column metadata to a protocol
+		module between prepare and execute when binds are being faked
 
 1.3.0 - updated systemd init file to use SIGINT to kill sqlrelay
 	fixed several "ocurred" -> "occurred" typo's

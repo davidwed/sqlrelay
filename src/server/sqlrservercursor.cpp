@@ -59,6 +59,8 @@ class sqlrservercursorprivate {
 
 		sqlrquerycursor		*_customquerycursor;
 
+		bool	_columninfoisvalid;
+
 		bool	_queryhasbeenpreprocessed;
 		bool	_queryhasbeenprepared;
 		bool	_queryhasbeenexecuted;
@@ -151,6 +153,8 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	clearTotalRowsFetched();
 
 	pvt->_id=id;
+
+	pvt->_columninfoisvalid=false;
 
 	pvt->_queryhasbeenpreprocessed=false;
 	pvt->_queryhasbeenprepared=false;
@@ -1213,6 +1217,14 @@ const char *sqlrservercursor::skipCreateTempTableClause(const char *query) {
 		return pvt->_createtemp.getSubstringEnd(0);
 	}
 	return NULL;
+}
+
+void sqlrservercursor::setColumnInfoIsValid(bool valid) {
+	pvt->_columninfoisvalid=valid;
+}
+
+bool sqlrservercursor::getColumnInfoIsValid() {
+	return pvt->_columninfoisvalid;
 }
 
 void sqlrservercursor::setQueryHasBeenPreProcessed(bool preprocessed) {

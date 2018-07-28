@@ -3721,8 +3721,10 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: query:\n%.*s\n\n",
-				process::getProcessId(),querylen,query);
+		stdoutput.printf("%d:%d:prepare:\n%.*s\n\n",
+					process::getProcessId(),
+					cursor->getId(),
+					querylen,query);
 	}
 
 	// The standard paradigm is:
@@ -3761,6 +3763,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	clearError(cursor);
 
 	// reset flags
+	cursor->setColumnInfoIsValid(false);
 	cursor->setQueryHasBeenPreProcessed(false);
 	cursor->setQueryHasBeenPrepared(false);
 	cursor->setQueryHasBeenExecuted(false);
@@ -3926,8 +3929,15 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 		return false;
 	}
 
-	// set flag indicating that the query has been prepared
+	// set flags indicating that the query has been prepared
 	cursor->setQueryHasBeenPrepared(true);
+
+	// set flag indicating that the column info is now valid
+	// FIXME: This isn't actually true for all backends, and probably
+	// shouldn't be set for backends where it's not true.  However,
+	// for now, we're just using so that bad column data isn't returned
+	// between now and execution, when we're faking binds.
+	cursor->setColumnInfoIsValid(true);
 
 	return true;
 }
@@ -3958,6 +3968,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// query must be re-prepared
 		if (cursor->getFakeInputBindsForThisQuery()) {
 			cursor->setQueryHasBeenPrepared(false);
+			cursor->setColumnInfoIsValid(false);
 		}
 	}
 
@@ -4145,6 +4156,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		// set flag indicating that the query has been prepared
 		cursor->setQueryHasBeenPrepared(true);
+
+		// set flag indicating that the column info is now valid
+		cursor->setColumnInfoIsValid(true);
 	}
 
 	raiseDebugMessageEvent("executing query...");
@@ -4197,6 +4211,17 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// (re)set the query start time
 	dt.getSystemDateAndTime();
 	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
+		stdoutput.printf("%d:%d:execute:\n%.*s\n\n",
+					process::getProcessId(),
+					cursor->getId(),
+					querylen,query);
+	}
 
 	// execute the query
 	success=cursor->executeQuery(query,querylen);
@@ -6769,6 +6794,9 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 
 	raiseDebugMessageEvent("fetching from bind cursor...");
 
+	// set flag indicating that the column info is valid
+	cursor->setColumnInfoIsValid(true);
+
 	// clear query buffer just so some future operation doesn't
 	// get confused into thinking this cursor actually ran one
 	cursor->getQueryBuffer()[0]='\0';
@@ -6838,8 +6866,9 @@ void sqlrservercontroller::saveError(sqlrservercursor *cursor) {
 	cursor->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("%d: ERROR:\n%d: %.*s\n\n",
+		stdoutput.printf("%d:%d:ERROR:\n%d: %.*s\n\n",
 					process::getProcessId(),
+					cursor->getId(),
 					errorcode,errorlength,
 					cursor->getErrorBuffer());
 	}
@@ -6893,15 +6922,71 @@ uint64_t sqlrservercontroller::affectedRows(sqlrservercursor *cursor) {
 }
 
 uint32_t sqlrservercontroller::colCount(sqlrservercursor *cursor) {
+
+	// "db"cursor::prepareQuery() resets the column count to 0 before
+	// preparing the query.  If the database knows the column count
+	// post-prepare, then "db"cursor::prepareQuery() also sets it
+	// immediately after preparing the query.
+	//
+	// But...
+	//
+	// If we're faking binds, then sqlrservercontroller::prepareQuery()
+	// doesn't actually call "db"cursor::prepareQuery().  Instead,
+	// sqlrservercontroller::executeQuery() calls it after faking the
+	// binds.
+	//
+	// The app won't know that though, and if we're using a front end
+	// (like the mysql fron end) which talks to the server after prepare,
+	// then the app might do something like:
+	//
+	// * mysql_stmt_prepare(...)
+	// * mysql_stmt_field_count(...)
+	// * mysql_stmt_execute(...);
+	//
+	// ...expecting mysql_stmt_field_count to return the valid column count.
+	//
+	// Since we're faking binds though, and "db"cursor::prepareQuery()
+	// hasn't actually been called by the time mysql_stmt_field_count is
+	// called, then the column count returned by "db"cursor::colCount()
+	// will still be the column count from the previous query.
+	//
+	// We can't just set it to 0 in closeResultSet because we want to be
+	// able to access the column metadata after calling that.
+	//
+	// So, we'll handle it here.
+	//
+	// When the client prepares the query,
+	// sqlrserverconnection::prepareQuery() will be called.  When it
+	// executes the query, sqlrserverconnection::executeQuery() will be
+	// called.  During that period, if bind-faking is enabled, then
+	// cursor->getQueryHasBeenPrepared() will return false.  In that case,
+	// return 0 for the column count.
+	//
+	// This results in the expected behavior when faking binds - the column
+	// metadata isn't available until after execute.
+	//
+	// Arguably, the various getColumn*() methods should return 0 or NULL
+	// as well at this time...
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	return mapColumnCount(cursor->colCount());
 }
 
 uint16_t sqlrservercontroller::columnTypeFormat(sqlrservercursor *cursor) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	return cursor->columnTypeFormat();
 }
 
 const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return NULL;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6910,6 +6995,10 @@ const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6918,6 +7007,10 @@ uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6926,6 +7019,10 @@ uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
 
 const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return NULL;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6934,6 +7031,10 @@ const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6942,6 +7043,10 @@ uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
 
 uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6950,6 +7055,10 @@ uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
 
 uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6958,6 +7067,10 @@ uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
 
 uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6966,6 +7079,10 @@ uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6974,6 +7091,10 @@ uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6982,6 +7103,10 @@ uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6990,6 +7115,10 @@ uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -6998,6 +7127,10 @@ uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -7006,6 +7139,10 @@ uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -7014,6 +7151,10 @@ uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -7023,6 +7164,10 @@ uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
 uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
 						sqlrservercursor *cursor,
 							uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -7031,6 +7176,10 @@ uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
 
 const char *sqlrservercontroller::getColumnTable(sqlrservercursor *cursor,
 								uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -7039,6 +7188,10 @@ const char *sqlrservercontroller::getColumnTable(sqlrservercursor *cursor,
 
 uint16_t sqlrservercontroller::getColumnTableLength(sqlrservercursor *cursor,
 								uint32_t col) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
 		translateResultSetHeader(cursor);
 	}
@@ -7047,6 +7200,10 @@ uint16_t sqlrservercontroller::getColumnTableLength(sqlrservercursor *cursor,
 
 void sqlrservercontroller::getColumnNameList(sqlrservercursor *cursor,
 							stringbuffer *output) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return;
+	}
 	for (uint32_t i=0; i<colCount(cursor); i++) {
 		if (i) {
 			output->append(',');
