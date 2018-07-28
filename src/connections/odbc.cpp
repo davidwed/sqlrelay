@@ -1085,7 +1085,6 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	}
 
 	// get the table list
-stdoutput.printf("SQLTables(%s,%s,%s)\n",catalog,schema,table);
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
