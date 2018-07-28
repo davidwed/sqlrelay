@@ -6794,8 +6794,8 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 
 	raiseDebugMessageEvent("fetching from bind cursor...");
 
-	// set flag indicating that the column info is valid
-	cursor->setColumnInfoIsValid(true);
+	// reset flags
+	cursor->setColumnInfoIsValid(false);
 
 	// clear query buffer just so some future operation doesn't
 	// get confused into thinking this cursor actually ran one
@@ -6807,8 +6807,11 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 	// reset total rows fetched
 	cursor->clearTotalRowsFetched();
 
-	// on failure save the error
-	if (!success) {
+	if (success) {
+		// set flag indicating that the column info is now valid
+		cursor->setColumnInfoIsValid(true);
+	} else {
+		// on failure save the error
 		saveError(cursor);
 	}
 
