@@ -175,6 +175,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool	text(const char *value);
 		bool	comment(const char *value);
 
+		bool	hasDebug(const char *value, const char *debug);
+
 		bool		listenoninet;
 		bool		listenonunix;
 		const char	*dbase;
@@ -338,29 +340,28 @@ void sqlrconfig_xmldom::init() {
 	allowedips=DEFAULT_DENIEDIPS;
 	deniedips=DEFAULT_DENIEDIPS;
 	debug=DEFAULT_DEBUG;
-	debugsql=charstring::contains(debug,"sql");
-	debugparser=charstring::contains(debug,"parser");
-	debugdirectives=charstring::contains(debug,"directives");
-	debugtranslations=charstring::contains(debug,"translations");
-	debugfilters=charstring::contains(debug,"filters");
-	debugtriggers=charstring::contains(debug,"triggers");
-	debugbindtranslations=charstring::contains(debug,"bindtranslations");
-	debugresultsettranslations=
-		charstring::contains(debug,"resultsettranslations");
+	debugsql=hasDebug(debug,"sql");
+	debugparser=hasDebug(debug,"parser");
+	debugdirectives=hasDebug(debug,"directives");
+	debugtranslations=hasDebug(debug,"translations");
+	debugfilters=hasDebug(debug,"filters");
+	debugtriggers=hasDebug(debug,"triggers");
+	debugbindtranslations=hasDebug(debug,"bindtranslations");
+	debugresultsettranslations=hasDebug(debug,"resultsettranslations");
 	debugresultsetrowtranslations=
-		charstring::contains(debug,"resultsetrowtranslations");
+		hasDebug(debug,"resultsetrowtranslations");
 	debugresultsetrowblocktranslations=
-		charstring::contains(debug,"resultsetrowblocktranslations");
+		hasDebug(debug,"resultsetrowblocktranslations");
 	debugresultsetheadertranslations=
-		charstring::contains(debug,"resultsetheadertranslations");
-	debugprotocols=charstring::contains(debug,"protocols");
-	debugauths=charstring::contains(debug,"auths");
-	debugpwdencs=charstring::contains(debug,"passwordencrypytions");
-	debugloggers=charstring::contains(debug,"loggers");
-	debugnotifications=charstring::contains(debug,"notifications");
-	debugschedules=charstring::contains(debug,"schedules");
-	debugrouters=charstring::contains(debug,"routers");
-	debugqueries=charstring::contains(debug,"queries");
+		hasDebug(debug,"resultsetheadertranslations");
+	debugprotocols=hasDebug(debug,"protocols");
+	debugauths=hasDebug(debug,"auths");
+	debugpwdencs=hasDebug(debug,"passwordencrypytions");
+	debugloggers=hasDebug(debug,"loggers");
+	debugnotifications=hasDebug(debug,"notifications");
+	debugschedules=hasDebug(debug,"schedules");
+	debugrouters=hasDebug(debug,"routers");
+	debugqueries=hasDebug(debug,"queries");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
@@ -1023,6 +1024,38 @@ bool sqlrconfig_xmldom::comment(const char *value) {
 	debugFunction();
 	debugPrintf("  comment: %s\n",value);
 	return true;
+}
+
+bool sqlrconfig_xmldom::hasDebug(const char *str, const char *debugstr) {
+
+	const char	*end=str+charstring::length(str);
+	size_t		debugstrlen=charstring::length(debugstr);
+
+	while(str<end) {
+
+		// see if the debug string is in the string at all
+		const char	*ptr=charstring::findFirst(str,debugstr);
+		if (!ptr) {
+			return false;
+		}
+
+		// if we found something, then verify that
+		// * it is at the beginning of the string
+		//   or
+		// * it is preceeded by a space
+		// and
+		// * it ends at the end of the string
+		//   or
+		// * it is followed by a space
+		if ((ptr==str || *(ptr-1)==' ') &&
+			(ptr+debugstrlen==end || *(ptr+debugstrlen)==' ')) {
+			return true;
+		}
+
+		// if not, move on and look for it again
+		str+=debugstrlen;
+	}
+	return false;
 }
 
 bool sqlrconfig_xmldom::load(const char *urlname, const char *id) {
@@ -1707,35 +1740,29 @@ void sqlrconfig_xmldom::getTreeValues() {
 	attr=instance->getAttribute("debug");
 	if (!attr->isNullNode()) {
 		debug=attr->getValue();
-		debugsql=charstring::contains(debug,"sql");
-		debugparser=charstring::contains(debug,"parser");
-		debugdirectives=charstring::contains(debug,"directives");
-		debugtranslations=charstring::contains(debug,"translations");
-		debugfilters=charstring::contains(debug,"filters");
-		debugtriggers=charstring::contains(debug,"triggers");
-		debugbindtranslations=
-			charstring::contains(debug,
-					"bindtranslations");
+		debugsql=hasDebug(debug,"sql");
+		debugparser=hasDebug(debug,"parser");
+		debugdirectives=hasDebug(debug,"directives");
+		debugtranslations=hasDebug(debug,"translations");
+		debugfilters=hasDebug(debug,"filters");
+		debugtriggers=hasDebug(debug,"triggers");
+		debugbindtranslations=hasDebug(debug,"bindtranslations");
 		debugresultsettranslations=
-			charstring::contains(debug,
-					"resultsettranslations");
+			hasDebug(debug,"resultsettranslations");
 		debugresultsetrowtranslations=
-			charstring::contains(debug,
-					"resultsetrowtranslations");
+			hasDebug(debug,"resultsetrowtranslations");
 		debugresultsetrowblocktranslations=
-			charstring::contains(debug,
-					"resultsetrowblocktranslations");
+			hasDebug(debug,"resultsetrowblocktranslations");
 		debugresultsetheadertranslations=
-			charstring::contains(debug,
-					"resultsetheadertranslations");
-		debugprotocols=charstring::contains(debug,"protocols");
-		debugauths=charstring::contains(debug,"auths");
-		debugpwdencs=charstring::contains(debug,"passwordencryptions");
-		debugloggers=charstring::contains(debug,"loggers");
-		debugnotifications=charstring::contains(debug,"notifications");
-		debugschedules=charstring::contains(debug,"schedules");
-		debugrouters=charstring::contains(debug,"routers");
-		debugqueries=charstring::contains(debug,"queries");
+			hasDebug(debug,"resultsetheadertranslations");
+		debugprotocols=hasDebug(debug,"protocols");
+		debugauths=hasDebug(debug,"auths");
+		debugpwdencs=hasDebug(debug,"passwordencryptions");
+		debugloggers=hasDebug(debug,"loggers");
+		debugnotifications=hasDebug(debug,"notifications");
+		debugschedules=hasDebug(debug,"schedules");
+		debugrouters=hasDebug(debug,"routers");
+		debugqueries=hasDebug(debug,"queries");
 	}
 	attr=instance->getAttribute("maxclientinfolength");
 	if (!attr->isNullNode()) {

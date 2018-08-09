@@ -7336,6 +7336,13 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 		if (!(cursor->getTotalRowsFetched()%
 				pvt->_sqlrrsrbt->getRowBlockSize())) {
 
+			if (pvt->_debugsqlrresultsetrowblocktranslation) {
+				stdoutput.printf("===================="
+						"===================="
+						"===================="
+						"====================\n");
+			}
+
 			// for each row in the block...
 			for (uint32_t j=0;
 				j<pvt->_sqlrrsrbt->getRowBlockSize(); j++) {
