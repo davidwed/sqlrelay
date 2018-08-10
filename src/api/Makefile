@@ -39,7 +39,6 @@ all-java:
 	cd java $(AND) $(MAKE) all
 
 all-jdbc:
-	# disabled for now
 	#cd jdbc $(AND) $(MAKE) all
 
 all-tcl:
@@ -142,7 +141,6 @@ install-java:
 	cd java $(AND) $(MAKE) install
 
 install-jdbc:
-	# disabled for now
 	#cd jdbc $(AND) $(MAKE) install
 
 install-tcl:
