@@ -72,7 +72,7 @@ do
 
 	# make sure that the instance is up
 	PING=""
-	for attempts in 1 2 3 4 5 6 7 8 9 10
+	for attempts in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 	do
 		echo
 		echo "pinging $DB..."
@@ -93,12 +93,7 @@ do
 
 		if ( test "$PING" = "0: Couldn't connect to the listener." )
 		then
-			if ( test "$DB" = "db2" )
-			then
-				sleep 5
-			else
-				sleep 2
-			fi
+			sleep 5
 		else
 			break
 		fi

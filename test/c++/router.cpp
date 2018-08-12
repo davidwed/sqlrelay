@@ -240,7 +240,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	checkSuccess(con->commit(),1);
-	snooze::microsnooze(0,200000);
+	snooze::microsnooze(0,500000);
 
 	stdoutput.printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
