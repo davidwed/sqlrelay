@@ -668,8 +668,14 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 		columntypes[0]=INTEGER_DATATYPE;
 	} else {
 		for (int i=0; i<ncolumn; i++) {
-			columntables[i]=charstring::duplicate(
-					sqlite3_column_table_name(stmt,i));
+			columntables[i]=
+				charstring::duplicate(
+					#ifdef HAVE_SQLITE3_COLUMN_TABLE_NAME
+					sqlite3_column_table_name(stmt,i)
+					#else
+					""
+					#endif
+					);
 			columnnames[i]=charstring::duplicate(
 					sqlite3_column_name(stmt,i));
 			columntypes[i]=sqlite3_column_type(stmt,i);

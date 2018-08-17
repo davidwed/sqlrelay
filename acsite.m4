@@ -1958,6 +1958,10 @@ then
 		FW_TRY_LINK([#include <sqlite3.h>
 #include <stdlib.h>],[char *a=0; sqlite3_free(a);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_FREE_WITH_CHAR,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
 
+		AC_MSG_CHECKING(for sqlite3_column_table_name)
+		FW_TRY_LINK([#include <sqlite3.h>
+#include <stdlib.h>],[sqlite3_column_table_name(0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_COLUMN_TABLE_NAME,1,SQLite supports sqlite3_column_table_name)],[AC_MSG_RESULT(no)])
+
 	fi
 
 	FW_INCLUDES(sqlite,[$SQLITEINCLUDES])
