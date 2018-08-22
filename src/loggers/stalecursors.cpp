@@ -84,7 +84,7 @@ bool sqlrlogger_stalecursors::init(sqlrlistener *sqlrl,
 
 	// create connection/cursors
 	sqlrclientcon=new sqlrconnection(host,port,socket,user,password,0,1);
-sqlrclientcon->debugOn();
+//sqlrclientcon->debugOn();
 	insertsqlrcur=new sqlrcursor(sqlrclientcon);
 	updatesqlrcur=new sqlrcursor(sqlrclientcon);
 	deletesqlrcur=new sqlrcursor(sqlrclientcon);

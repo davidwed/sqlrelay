@@ -144,6 +144,7 @@ class sqlrservercontrollerprivate {
 	unixsocketserver	*_serversockun;
 
 	memorypool	*_bindpool;
+	// FIXME: shouldn't these be per-cursor???
 	memorypool	*_bindmappingspool;
 	namevaluepairs	*_inbindmappings;
 	namevaluepairs	*_outbindmappings;
@@ -3286,11 +3287,13 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 		raiseDebugMessageEvent("remapping bind variables...");
 		raiseDebugMessageEvent("input binds:");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
-			raiseDebugMessageEvent(cursor->getInputBinds()[i].variable);
+			raiseDebugMessageEvent(
+					cursor->getInputBinds()[i].variable);
 		}
 		raiseDebugMessageEvent("output binds:");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
-			raiseDebugMessageEvent(cursor->getOutputBinds()[i].variable);
+			raiseDebugMessageEvent(
+					cursor->getOutputBinds()[i].variable);
 		}
 	}
 
@@ -3347,11 +3350,13 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 	if (logEnabled()) {
 		raiseDebugMessageEvent("remapped input binds:");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
-			raiseDebugMessageEvent(cursor->getInputBinds()[i].variable);
+			raiseDebugMessageEvent(
+					cursor->getInputBinds()[i].variable);
 		}
 		raiseDebugMessageEvent("remapped output binds:");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
-			raiseDebugMessageEvent(cursor->getOutputBinds()[i].variable);
+			raiseDebugMessageEvent(
+					cursor->getOutputBinds()[i].variable);
 		}
 	}
 }
