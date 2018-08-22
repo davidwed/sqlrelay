@@ -120,6 +120,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// environment
 		const char	*getId();
+		const char	*getConnectionId();
 		const char	*getLogDir();
 		const char	*getDebugDir();
 
@@ -323,6 +324,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							const char *info);
 		void	raiseParseFailureEvent(sqlrservercursor *cursor,
 							const char *info);
+		void	raiseCursorOpenEvent(sqlrservercursor *cursor);
+		void	raiseCursorCloseEvent(sqlrservercursor *cursor);
 
 
 		// cursor api...
@@ -1442,6 +1445,8 @@ enum sqlrevent_t {
 	SQLREVENT_INTEGRITY_VIOLATION,
 	SQLREVENT_TRANSLATION_FAILURE,
 	SQLREVENT_PARSE_FAILURE,
+	SQLREVENT_CURSOR_OPEN,
+	SQLREVENT_CURSOR_CLOSE,
 	SQLREVENT_INVALID_EVENT
 };
 

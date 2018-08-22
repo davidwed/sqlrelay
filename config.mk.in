@@ -699,6 +699,7 @@ CONFIGPLUGINLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(E
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++
 SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client
+SQLRLOGGER_STALECURSORSLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 INSTALLSHAREDLIB = installsharedlib

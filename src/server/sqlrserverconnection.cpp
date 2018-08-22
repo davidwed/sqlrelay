@@ -720,39 +720,53 @@ bool sqlrserverconnection::getListsByApiCalls() {
 
 bool sqlrserverconnection::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
@@ -760,17 +774,23 @@ bool sqlrserverconnection::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *procedure,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 

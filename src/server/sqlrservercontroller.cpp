@@ -1063,7 +1063,7 @@ bool sqlrservercontroller::initCursors(uint16_t count) {
 		if (!pvt->_cur[i]) {
 			pvt->_cur[i]=newCursor(i);
 		}
-		if (!pvt->_cur[i]->open()) {
+		if (!open(pvt->_cur[i])) {
 			pvt->_debugstr.clear();
 			pvt->_debugstr.append("cursor init failed: ");
 			pvt->_debugstr.append(i);
@@ -1959,7 +1959,7 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 		pvt->_cur[pvt->_cursorcount]=newCursor(pvt->_cursorcount);
 		pvt->_cur[pvt->_cursorcount]->
 				setState(SQLRCURSORSTATE_AVAILABLE);
-		if (!pvt->_cur[pvt->_cursorcount]->open()) {
+		if (!open(pvt->_cur[pvt->_cursorcount])) {
 			pvt->_debugstr.clear();
 			pvt->_debugstr.append("cursor init failure: ");
 			pvt->_debugstr.append(pvt->_cursorcount);
@@ -5075,7 +5075,7 @@ void sqlrservercontroller::endSession() {
 	// these down gradually rather than all at once
 	while (pvt->_cursorcount>pvt->_mincursorcount) {
 		pvt->_cursorcount--;
-		pvt->_cur[pvt->_cursorcount]->close();
+		close(pvt->_cur[pvt->_cursorcount]);
 		deleteCursor(pvt->_cur[pvt->_cursorcount]);
 		pvt->_cur[pvt->_cursorcount]=NULL;
 	}
@@ -5371,7 +5371,7 @@ void sqlrservercontroller::closeCursors(bool destroy) {
 
 			if (pvt->_cur[pvt->_cursorcount]) {
 				pvt->_cur[pvt->_cursorcount]->closeResultSet();
-				pvt->_cur[pvt->_cursorcount]->close();
+				close(pvt->_cur[pvt->_cursorcount]);
 				if (destroy) {
 					deleteCursor(
 						pvt->_cur[pvt->_cursorcount]);
@@ -6704,6 +6704,34 @@ void sqlrservercontroller::raiseParseFailureEvent(
 	}
 }
 
+void sqlrservercontroller::raiseCursorOpenEvent(sqlrservercursor *cursor) {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,cursor,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_CURSOR_OPEN,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,cursor,
+					SQLREVENT_CURSOR_OPEN,
+					NULL);
+	}
+}
+
+void sqlrservercontroller::raiseCursorCloseEvent(sqlrservercursor *cursor) {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,cursor,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_CURSOR_CLOSE,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,cursor,
+					SQLREVENT_CURSOR_CLOSE,
+					NULL);
+	}
+}
+
 void sqlrservercontroller::alarmHandler(int32_t signum) {
 	alarmrang=1;
 }
@@ -6773,6 +6801,10 @@ bool sqlrservercontroller::removeReplacementIndex(const char *database,
 
 const char *sqlrservercontroller::getId() {
 	return pvt->_cmdl->getId();
+}
+
+const char *sqlrservercontroller::getConnectionId() {
+	return pvt->_connectionid;
 }
 
 const char *sqlrservercontroller::getLogDir() {
@@ -7611,10 +7643,12 @@ void sqlrservercontroller::closeLobInputOutputBind(sqlrservercursor *cursor,
 }
 
 bool sqlrservercontroller::open(sqlrservercursor *cursor) {
+	raiseCursorOpenEvent(cursor);
 	return cursor->open();
 }
 
 bool sqlrservercontroller::close(sqlrservercursor *cursor) {
+	raiseCursorCloseEvent(cursor);
 	return cursor->close();
 }
 
