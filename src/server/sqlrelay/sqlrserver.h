@@ -124,6 +124,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getLogDir();
 		const char	*getDebugDir();
 
+		// passthrough
+		bool	send(unsigned char *data, size_t size);
+		bool	recv(unsigned char **data, size_t *size);
+
 		// re-login to the database
 		void	reLogIn();
 
@@ -752,6 +756,9 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 
 		virtual bool	supportsAuthOnDatabase();
 		virtual	void	handleConnectString();
+
+		virtual	bool	send(unsigned char *data, size_t size);
+		virtual	bool	recv(unsigned char **data, size_t *size);
 
 		virtual	bool	logIn(const char **error,
 					const char **warning)=0;

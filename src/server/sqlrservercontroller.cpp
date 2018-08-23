@@ -7840,3 +7840,11 @@ sqlrpaths *sqlrservercontroller::getPaths() {
 sqlrshm *sqlrservercontroller::getShm() {
 	return pvt->_shm;
 }
+
+bool sqlrservercontroller::send(unsigned char *data, size_t size) {
+	return pvt->_conn->send(data,size);
+}
+
+bool sqlrservercontroller::recv(unsigned char **data, size_t *size) {
+	return pvt->_conn->recv(data,size);
+}

@@ -935,3 +935,13 @@ bool sqlrserverconnection::getLiveConnection() {
 void sqlrserverconnection::setLiveConnection(bool liveconnection) {
 	pvt->_liveconnection=liveconnection;
 }
+
+bool sqlrserverconnection::send(unsigned char *data, size_t size) {
+	// by default, do nothing
+	return false;
+}
+
+bool sqlrserverconnection::recv(unsigned char **data, size_t *size) {
+	// by default, do nothing
+	return false;
+}
