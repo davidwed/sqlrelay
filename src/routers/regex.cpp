@@ -84,8 +84,10 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 				stdoutput.printf("			"
 							"routing query:\n"
 							"		"
-							"%s\n		"
-							"to: %s\n	}\n",
+							"	%s\n"
+							"		"
+							"	to: %s\n"
+							"		}\n",
 							query,connid);
 			}
 			return connid;
