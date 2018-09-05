@@ -172,8 +172,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		bindValueIsNull(int16_t isnull);
 		void		setFakeInputBinds(bool fake);
 		bool		getFakeInputBinds();
-		memorypool	*getBindPool();
-		memorypool	*getBindMappingsPool();
 
 		// fetch info
 		void		setFetchAtOnce(uint32_t fao);
@@ -401,6 +399,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// bind variables
 		memorypool	*getBindPool(sqlrservercursor *cursor);
+		memorypool	*getBindMappingsPool(sqlrservercursor *cursor);
+		namevaluepairs	*getInBindMappings(sqlrservercursor *cursor);
+		namevaluepairs	*getOutBindMappings(sqlrservercursor *cursor);
 
 		// input bind variables
 		void		setFakeInputBindsForThisQuery(
@@ -1134,6 +1135,9 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		bool		fakeInputBinds();
 
 		memorypool	*getBindPool();
+		memorypool	*getBindMappingsPool();
+		namevaluepairs	*getInBindMappings();
+		namevaluepairs	*getOutBindMappings();
 
 		void		setInputBindCount(uint16_t inbindcount);
 		uint16_t	getInputBindCount();

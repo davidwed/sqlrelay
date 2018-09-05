@@ -85,19 +85,24 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getBindVarCount(sqlrservercursor *cursor,
 						uint16_t *count);
 		bool	getBindVarName(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv);
+						sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getBindVarType(sqlrserverbindvar *bv);
 		bool	getBindSize(sqlrservercursor *cursor,
 						sqlrserverbindvar *bv,
 						uint32_t *maxsize);
-		void	getNullBind(sqlrserverbindvar *bv);
+		void	getNullBind(sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getStringBind(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv);
+						sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getIntegerBind(sqlrserverbindvar *bv);
 		bool	getDoubleBind(sqlrserverbindvar *bv);
-		bool	getDateBind(sqlrserverbindvar *bv);
+		bool	getDateBind(sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getLobBind(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv);
+						sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getSendColumnInfo();
 		bool	getSkipAndFetch(bool initial, sqlrservercursor *cursor);
 		void	returnResultSetHeader(sqlrservercursor *cursor);
@@ -227,8 +232,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		char		*clientinfo;
 		uint64_t	clientinfolen;
 
-		memorypool	*bindpool;
-
 		uint64_t	skip;
 		uint64_t	fetch;
 		bool		lazyfetch;
@@ -255,7 +258,6 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	maxstringbindvaluelength=
 			cont->getConfig()->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cont->getConfig()->getMaxLobBindValueLength();
-	bindpool=cont->getBindPool();
 	lazyfetch=false;
 	maxerrorlength=cont->getConfig()->getMaxErrorLength();
 	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
@@ -619,7 +621,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		// FIXME: can we move this inside of processQueryOrBindCursor?
 		// verify that log/notification modules activated by
 		// raise*Event calls don't still need the bind values
-		bindpool->clear();
+		cont->getBindPool(cursor)->clear();
 
 	} while (loop);
 
@@ -1682,6 +1684,7 @@ bool sqlrprotocol_sqlrclient::getInputBinds(sqlrservercursor *cursor) {
 	cont->setInputBindCount(cursor,inbindcount);
 
 	// get the input bind buffers
+	memorypool		*bindpool=cont->getBindPool(cursor);
 	sqlrserverbindvar	*inbinds=cont->getInputBinds(cursor);
 
 	// fill the buffers
@@ -1690,15 +1693,16 @@ bool sqlrprotocol_sqlrclient::getInputBinds(sqlrservercursor *cursor) {
 		sqlrserverbindvar	*bv=&(inbinds[i]);
 
 		// get the variable name and type
-		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
+		if (!(getBindVarName(cursor,bv,bindpool) &&
+					getBindVarType(bv))) {
 			return false;
 		}
 
 		// get the value
 		if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
-			getNullBind(bv);
+			getNullBind(bv,bindpool);
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
-			if (!getStringBind(cursor,bv)) {
+			if (!getStringBind(cursor,bv,bindpool)) {
 				return false;
 			}
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
@@ -1710,15 +1714,15 @@ bool sqlrprotocol_sqlrclient::getInputBinds(sqlrservercursor *cursor) {
 				return false;
 			}
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
-			if (!getDateBind(bv)) {
+			if (!getDateBind(bv,bindpool)) {
 				return false;
 			}
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
-			if (!getLobBind(cursor,bv)) {
+			if (!getLobBind(cursor,bv,bindpool)) {
 				return false;
 			}
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
-			if (!getLobBind(cursor,bv)) {
+			if (!getLobBind(cursor,bv,bindpool)) {
 				return false;
 			}
 		}		  
@@ -1741,6 +1745,7 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 	cont->setOutputBindCount(cursor,outbindcount);
 
 	// get the output bind buffers
+	memorypool		*bindpool=cont->getBindPool(cursor);
 	sqlrserverbindvar	*outbinds=cont->getOutputBinds(cursor);
 
 	// fill the buffers
@@ -1749,7 +1754,8 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 		sqlrserverbindvar	*bv=&(outbinds[i]);
 
 		// get the variable name and type
-		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
+		if (!(getBindVarName(cursor,bv,bindpool) &&
+					getBindVarType(bv))) {
 			return false;
 		}
 
@@ -1793,8 +1799,8 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			// date 512 bytes ought to be enough
 			bv->value.dateval.buffersize=512;
 			bv->value.dateval.buffer=
-				(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
+				(char *)bindpool->
+					allocate(bv->value.dateval.buffersize);
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB ||
 					bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
@@ -1843,6 +1849,7 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 	cont->setInputOutputBindCount(cursor,inoutbindcount);
 
 	// get the input/output bind buffers
+	memorypool		*bindpool=cont->getBindPool(cursor);
 	sqlrserverbindvar	*inoutbinds=cont->getInputOutputBinds(cursor);
 
 	// fill the buffers
@@ -1851,7 +1858,8 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 		sqlrserverbindvar	*bv=&(inoutbinds[i]);
 
 		// get the variable name and type
-		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
+		if (!(getBindVarName(cursor,bv,bindpool) &&
+					getBindVarType(bv))) {
 			return false;
 		}
 
@@ -2160,7 +2168,8 @@ bool sqlrprotocol_sqlrclient::getBindVarCount(sqlrservercursor *cursor,
 }
 
 bool sqlrprotocol_sqlrclient::getBindVarName(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv) {
+						sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	// init
@@ -2277,7 +2286,8 @@ bool sqlrprotocol_sqlrclient::getBindSize(sqlrservercursor *cursor,
 	return true;
 }
 
-void sqlrprotocol_sqlrclient::getNullBind(sqlrserverbindvar *bv) {
+void sqlrprotocol_sqlrclient::getNullBind(sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("NULL");
@@ -2289,7 +2299,8 @@ void sqlrprotocol_sqlrclient::getNullBind(sqlrserverbindvar *bv) {
 }
 
 bool sqlrprotocol_sqlrclient::getStringBind(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv) {
+						sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("STRING");
@@ -2392,7 +2403,8 @@ bool sqlrprotocol_sqlrclient::getDoubleBind(sqlrserverbindvar *bv) {
 	return true;
 }
 
-bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
+bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("DATE");
@@ -2514,8 +2526,8 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 	// allocate enough space to store the date/time string
 	// 64 bytes ought to be enough
 	bv->value.dateval.buffersize=64;
-	bv->value.dateval.buffer=(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
+	bv->value.dateval.buffer=(char *)bindpool->
+					allocate(bv->value.dateval.buffersize);
 
 	bv->isnull=cont->nonNullBindValue();
 
@@ -2537,7 +2549,8 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 }
 
 bool sqlrprotocol_sqlrclient::getLobBind(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv) {
+						sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	// init

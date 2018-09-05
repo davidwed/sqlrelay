@@ -48,6 +48,20 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 			continue;
 		}
 
+		// do we care about this query
+		if (event==SQLREVENT_QUERY) {
+			const char	*pattern=
+					enode->getAttributeValue("pattern");
+			if (!charstring::isNullOrEmpty(pattern)) {
+				if (!regularexpression::match(
+					sqlrcon->cont->getCurrentQuery(),
+					pattern)) {
+					continue;
+				}
+			}
+		}
+	
+
 		// for each recipient...
 		for (domnode *rnode=recipientsnode->
 					getFirstTagChild("recipient");

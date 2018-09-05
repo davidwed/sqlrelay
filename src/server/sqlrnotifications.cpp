@@ -316,6 +316,11 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 
 		// clean up
 		file::remove(pvt->_tmpfilename);
+
+	} else if (!charstring::compare(url,"debug")) {
+		stdoutput.printf("======================================="
+				"=======================================\n"
+				"%s\n",msg);
 	}
 	// FIXME: implement other transports
 

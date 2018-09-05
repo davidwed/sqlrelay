@@ -144,10 +144,6 @@ class sqlrservercontrollerprivate {
 	unixsocketserver	*_serversockun;
 
 	memorypool	*_bindpool;
-	// FIXME: shouldn't these be per-cursor???
-	memorypool	*_bindmappingspool;
-	namevaluepairs	*_inbindmappings;
-	namevaluepairs	*_outbindmappings;
 
 	bool		_debugsql;
 	bool		_debugsqlrparser;
@@ -332,12 +328,6 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_reloginseed=0;
 	pvt->_relogintime=0;
 
-	// maybe someday these parameters will be configurable
-	pvt->_bindpool=new memorypool(512,128,100);
-	pvt->_bindmappingspool=new memorypool(512,128,100);
-	pvt->_inbindmappings=new namevaluepairs;
-	pvt->_outbindmappings=new namevaluepairs;
-
 	pvt->_sqlrpr=NULL;
 	pvt->_sqlrp=NULL;
 	pvt->_sqlrd=NULL;
@@ -414,11 +404,6 @@ sqlrservercontroller::~sqlrservercontroller() {
 	if (pvt->_unixsocket.getStringLength()) {
 		file::remove(pvt->_unixsocket.getString());
 	}
-
-	delete pvt->_bindpool;
-	delete pvt->_bindmappingspool;
-	delete pvt->_inbindmappings;
-	delete pvt->_outbindmappings;
 
 	delete pvt->_sqlrpr;
 	delete pvt->_sqlrp;
@@ -2947,8 +2932,8 @@ enum queryparsestate_t {
 void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 	// clear bind mappings
-	pvt->_inbindmappings->clear();
-	pvt->_outbindmappings->clear();
+	cursor->getInBindMappings()->clear();
+	cursor->getOutBindMappings()->clear();
 
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
@@ -3213,8 +3198,8 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 						cursor->getOutputBindCount();
 		sqlrserverbindvar	*vars=(!i)?cursor->getInputBinds():
 						cursor->getOutputBinds();
-		namevaluepairs	*mappings=(!i)?pvt->_inbindmappings:
-						pvt->_outbindmappings;
+		namevaluepairs	*mappings=(!i)?cursor->getInBindMappings():
+						cursor->getOutBindMappings();
 
 		for (uint16_t j=0; j<count; j++) {
 
@@ -3242,7 +3227,7 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 
 				// allocate memory for the new name
 				char	*newvariable=
-					(char *)pvt->_bindmappingspool->
+					(char *)cursor->getBindMappingsPool()->
 						allocate(tempnumberlen+2);
 
 				// replace the existing bind var name and size
@@ -3306,8 +3291,8 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 						cursor->getOutputBindCount();
 		sqlrserverbindvar	*vars=(!i)?cursor->getInputBinds():
 						cursor->getOutputBinds();
-		namevaluepairs	*mappings=(!i)?pvt->_inbindmappings:
-						pvt->_outbindmappings;
+		namevaluepairs	*mappings=(!i)?cursor->getInBindMappings():
+						cursor->getOutBindMappings();
 
 		for (uint16_t j=0; j<count; j++) {
 
@@ -3809,7 +3794,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// do this here instead of inside translateBindVariables
 	// because translateQuery might use it
-	pvt->_bindmappingspool->clear();
+	cursor->getBindMappingsPool()->clear();
 
 	// before-filter query
 	if (enablefilters && pvt->_sqlrf) {
@@ -3983,7 +3968,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		// do this here instead of inside translateBindVariables
 		// because translateQuery might use it
-		pvt->_bindmappingspool->clear();
+		cursor->getBindMappingsPool()->clear();
 
 		// before-filter query
 		if (enablefilters && pvt->_sqlrf) {
@@ -6765,14 +6750,6 @@ const char *sqlrservercontroller::dbVersion() {
 	return pvt->_conn->dbVersion();
 }
 
-memorypool *sqlrservercontroller::getBindPool() {
-	return pvt->_bindpool;
-}
-
-memorypool *sqlrservercontroller::getBindMappingsPool() {
-	return pvt->_bindmappingspool;
-}
-
 const char *sqlrservercontroller::translateTableName(const char *table) {
 	if (pvt->_sqlrt) {
 		const char	*newname=NULL;
@@ -7546,6 +7523,21 @@ uint16_t sqlrservercontroller::getId(sqlrservercursor *cursor) {
 
 memorypool *sqlrservercontroller::getBindPool(sqlrservercursor *cursor) {
 	return cursor->getBindPool();
+}
+
+memorypool *sqlrservercontroller::getBindMappingsPool(
+						sqlrservercursor *cursor) {
+	return cursor->getBindMappingsPool();
+}
+
+namevaluepairs *sqlrservercontroller::getInBindMappings(
+						sqlrservercursor *cursor) {
+	return cursor->getInBindMappings();
+}
+
+namevaluepairs *sqlrservercontroller::getOutBindMappings(
+						sqlrservercursor *cursor) {
+	return cursor->getOutBindMappings();
 }
 
 void sqlrservercontroller::setFakeInputBindsForThisQuery(
