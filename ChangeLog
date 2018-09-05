@@ -1,4 +1,4 @@
-1.3.1 - odbc connection module - trace=yes/no/default now instead of just yes/no
+1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class
 	updated to use rudiments container clearAndDelete...() methods
 	fixed nonsensical uint32_t majorversion>=0 comparison in freetds conn
