@@ -986,9 +986,9 @@ then
 	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
 	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
 	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "1" -o "$V2" -lt "0" -o "$V3" -lt "8" )
+	if ( test "$V1" -lt "1" -o "$V2" -lt "1" -o "$V3" -lt "0" )
 	then
-		AC_MSG_ERROR([Rudiments version must be >= 1.0.8, found version $RUDIMENTSVERSION])
+		AC_MSG_ERROR([Rudiments version must be >= 1.1.0, found version $RUDIMENTSVERSION])
 		exit
 	fi
 fi
