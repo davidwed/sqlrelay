@@ -4939,6 +4939,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <ul>
   <li><b>event</b> - Required.  The event to listen for.</li>
+  <li><b>pattern</b> - Optional.  Only valid when event="query".  A regular expression limiting the set of queries that the notification will be sent for.  If set, then the notification will only be sent if the query matches the pattern.  If omitted, then the notification will be sent for all queries.</li>
 </ul>
 
 <p>Any number of recipients may also be specified.  Each recipient must be specified in its own <b>recipient</b> tag.  The recipient tag supports the following attributes:</p>

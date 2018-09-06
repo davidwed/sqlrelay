@@ -3065,6 +3065,7 @@ The '''events''' tag defines the set of events to listen for.  Valid events are:
 Any number of events may be specified.  Each event must be specified in its own '''event''' tag.  The event tag supports the following attributes:
 
 * '''event''' - Required.  The event to listen for.
+* '''pattern''' - Optional.  Only valid when event="query".  A regular expression limiting the set of queries that the notification will be sent for.  If set, then the notification will only be sent if the query matches the pattern.  If omitted, then the notification will be sent for all queries.
 
 Any number of recipients may also be specified.  Each recipient must be specified in its own '''recipient''' tag.  The recipient tag supports the following attributes:
 
