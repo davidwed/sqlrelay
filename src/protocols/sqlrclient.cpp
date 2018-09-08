@@ -4152,7 +4152,7 @@ bool sqlrprotocol_sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 
 	// send the tree
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	clientsock->write(xml.getStringLength());
+	clientsock->write((uint64_t)xml.getStringLength());
 	clientsock->write(xml.getString(),xml.getStringLength());
 	clientsock->flushWriteBuffer(-1,-1);
 
