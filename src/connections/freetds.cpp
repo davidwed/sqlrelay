@@ -1659,6 +1659,9 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 		// allocate buffers and limit column count if necessary
 		uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
 		if (!maxcolumncount) {
+			// see note in discardResults for
+			// why we're doing this here
+			deallocateResultSetBuffers();
 			allocateResultSetBuffers(ncols);
 		} else if ((uint32_t)ncols>maxcolumncount) {
 			ncols=maxcolumncount;
@@ -2089,9 +2092,17 @@ void freetdscursor::discardResults() {
 		}
 	}
 
-	if (!conn->cont->getMaxColumnCount()) {
+	// Deallocating the result set buffers here causes a problem, but only
+	// in the freetds connection.
+	// When using freetds, we have to call discardResults() when we hit
+	// the end of the result set (see note in fetchRow()) but if we
+	// deallocate the result set buffers at that point, then subsequent
+	// attempts to fetch column info, will result in a reference-after-free.
+	// So, unlike the in the sybase/sap connection code we defer the
+	// deallocate until right before the next allocate, in prepareQuery().
+	/*if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
-	}
+	}*/
 }
 
 
