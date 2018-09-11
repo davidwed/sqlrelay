@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <rudiments/dynamiclib.h>
+#include <rudiments/file.h>
 
 
 // types...
