@@ -1,3 +1,5 @@
+1.4.1 - spec file tweaks
+
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class
 	updated to use rudiments container clearAndDelete...() methods
