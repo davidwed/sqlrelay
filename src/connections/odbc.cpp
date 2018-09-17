@@ -277,6 +277,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		autoCommitOn();
 		bool		autoCommitOff();
 		bool		supportsAutoCommit();
+		const char	*beginTransactionQuery();
 		bool		commit();
 		bool		rollback();
 		void		errorMessage(char *errorbuffer,
@@ -349,6 +350,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		stringbuffer	errormessage;
 
 		char		dbversion[512];
+
+		const char	*begintxquery;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -692,6 +695,26 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		#endif
 		return false;
 	}
+
+	// get the type of database
+	char		dbmsnamebuffer[1024];
+	dbmsnamebuffer[0]='\0';
+	SQLSMALLINT	dbmsnamelen=0;
+	if (SQLGetInfo(dbc,
+			SQL_DBMS_NAME,
+			dbmsnamebuffer,
+			sizeof(dbmsnamebuffer),
+			&dbmsnamelen)==SQL_SUCCESS) {
+		dbmsnamebuffer[dbmsnamelen]='\0';
+	}
+
+	// set the begin query based on the db-type
+	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
+		begintxquery="BT";
+	} else {
+		begintxquery=sqlrserverconnection::beginTransactionQuery();
+	}
+	
 	return true;
 }
 
@@ -1905,6 +1928,10 @@ bool odbcconnection::autoCommitOff() {
 
 bool odbcconnection::supportsAutoCommit() {
 	return true;
+}
+
+const char *odbcconnection::beginTransactionQuery() {
+	return begintxquery;
 }
 
 bool odbcconnection::commit() {

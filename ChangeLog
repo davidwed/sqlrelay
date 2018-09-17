@@ -1,4 +1,5 @@
 1.4.1 - spec file tweaks
+	odbc uses different begin tx queries for different db's now
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class
