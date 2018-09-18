@@ -2634,7 +2634,8 @@ bool sqlrservercontroller::isRollbackQuery(sqlrservercursor *cursor) {
 			"rollback",8);
 }
 
-bool sqlrservercontroller::skipComment(const char **ptr, const char *endptr) {
+bool sqlrservercontroller::skipComment(const char **ptr,
+						const char *endptr) {
 	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
 		while (**ptr && **ptr!='\n') {
 			(*ptr)++;
@@ -2643,7 +2644,8 @@ bool sqlrservercontroller::skipComment(const char **ptr, const char *endptr) {
 	return *ptr!=endptr;
 }
 
-bool sqlrservercontroller::skipWhitespace(const char **ptr, const char *endptr) {
+bool sqlrservercontroller::skipWhitespace(const char **ptr,
+						const char *endptr) {
 	while (character::isWhitespace(**ptr) && *ptr<endptr) {
 		(*ptr)++;
 	}
@@ -2651,6 +2653,9 @@ bool sqlrservercontroller::skipWhitespace(const char **ptr, const char *endptr) 
 }
 
 const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
+	if (!query) {
+		return NULL;
+	}
 	const char	*ptr=query;
 	while (*ptr) {
 		if (character::isWhitespace(*ptr)) {

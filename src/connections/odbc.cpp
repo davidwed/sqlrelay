@@ -108,6 +108,11 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						char *buffer,
 						uint16_t buffersize,
 						int16_t *isnull);
+		bool		inputBindBlob(const char *variable,
+						uint16_t variablesize,
+						const char *value,
+						uint32_t valuesize,
+						int16_t *isnull);
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
 						char *value, 
@@ -352,6 +357,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		char		dbversion[512];
 
 		const char	*begintxquery;
+		bool		dontusecharforblob;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -711,8 +717,10 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	// set the begin query based on the db-type
 	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
 		begintxquery="BT";
+		dontusecharforblob=true;
 	} else {
 		begintxquery=sqlrserverconnection::beginTransactionQuery();
+		dontusecharforblob=false;
 	}
 	
 	return true;
@@ -2392,6 +2400,44 @@ bool odbccursor::inputBind(const char *variable,
 				0,
 				NULL);
 	}
+	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
+}
+
+bool odbccursor::inputBindBlob(const char *variable,
+						uint16_t variablesize,
+						const char *value,
+						uint32_t valuesize,
+						int16_t *isnull) {
+
+	// FIXME: This code is known to work with SQL Server...
+
+	if (!odbcconn->dontusecharforblob) {
+		return sqlrservercursor::inputBindBlob(
+						variable,
+						variablesize,
+						value,
+						valuesize,
+						isnull);
+	}
+
+	// FIXME: This code is known to work with Teradata...
+	// (Ideally we should getone body of code working for all dbs)
+
+	uint16_t	pos=charstring::toInteger(variable+1);
+	if (!pos || pos>maxbindcount) {
+		return false;
+	}
+
+	erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT,
+				SQL_C_BINARY,
+				SQL_BINARY,
+				valuesize,
+				0,
+				(SQLPOINTER)value,
+				0,
+				NULL);
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
