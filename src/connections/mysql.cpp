@@ -1778,7 +1778,13 @@ void mysqlcursor::closeResultSet() {
 	if (usestmtprepare) {
 		boundvariables=false;
 		bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
-		mysql_stmt_reset(stmt);
+		// FIXME: not calling mysql_stmt_reset() improves performance
+		// by a factor of two.  I'm not sure why I was calling it to
+		// begin with.  There's nothing in the function description that
+		// makes me think that I need to call it.  All tests appear to
+		// work without it.  Other apps don't call it.  For now we'll
+		// comment it out.
+		//mysql_stmt_reset(stmt);
 		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);
 			stmtfreeresult=false;
