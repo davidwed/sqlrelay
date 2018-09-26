@@ -146,6 +146,7 @@ class sqlrservercontrollerprivate {
 	memorypool	*_bindpool;
 
 	bool		_debugsql;
+	bool		_debugbulkload;
 	bool		_debugsqlrparser;
 	bool		_debugsqlrdirectives;
 	bool		_debugsqlrtranslations;
@@ -347,12 +348,17 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_decrypteddbpassword=NULL;
 
+	pvt->_debugsql=false;
+	pvt->_debugbulkload=true;
+	pvt->_debugsqlrparser=false;
 	pvt->_debugsqlrdirectives=false;
 	pvt->_debugsqlrtranslations=false;
 	pvt->_debugsqlrfilters=false;
 	pvt->_debugbindtranslation=false;
 	pvt->_debugsqlrresultsettranslation=false;
 	pvt->_debugsqlrresultsetrowtranslation=false;
+	pvt->_debugsqlrresultsetrowblocktranslation=false;
+	pvt->_debugsqlrresultsetheadertranslation=false;
 
 	pvt->_cur=NULL;
 
@@ -5695,6 +5701,105 @@ sqlrparser *sqlrservercontroller::newParser() {
 	}
 
 	return parser;
+}
+
+bool sqlrservercontroller::bulkLoadBegin(const char *id, uint64_t idlen) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load begin: \"%.*s\"\n",
+					process::getProcessId(),idlen,id);
+	}
+
+	// create shared memory
+
+	// FIXME: do something...
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadCheckpoint(const char *id, uint64_t idlen) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load checkpoint: \"%.*s\"\n",
+					process::getProcessId(),idlen,id);
+	}
+
+	// FIXME: not sure what to do here...
+	// maybe run a checkpoint query on each joined connection?
+
+	// FIXME: do something...
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadPrepare(const char *query,
+							uint64_t querylen) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load prepare:\n%.*s\n",
+					process::getProcessId(),querylen,query);
+	}
+
+	// put query in shared memory
+
+	// FIXME: do something...
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadJoin(const char *id, uint64_t idlen) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load join: \"%.*s\"\n",
+					process::getProcessId(),idlen,id);
+	}
+
+	// attach to shared memory
+	// get query from shared memory
+	// prepare query
+
+	// FIXME: do something...
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadBind(const unsigned char *data,
+							uint64_t datalen) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load bind:\n",
+					process::getProcessId());
+		stdoutput.safePrint(data,datalen);
+		stdoutput.write('\n');
+	}
+
+	// parse the data into an array of bindable pieces
+
+	// FIXME: do something...
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadExecute() {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load execute\n",
+					process::getProcessId());
+	}
+
+	// run through the bind array
+	// execute the query for each element
+
+	// FIXME: do something...
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadEnd() {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load end\n",
+					process::getProcessId());
+	}
+
+	// delete shared memory
+
+	// FIXME: do something...
+	return true;
 }
 
 void sqlrservercontroller::setState(enum sqlrconnectionstate_t state) {
