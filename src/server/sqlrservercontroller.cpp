@@ -25,6 +25,7 @@
 #include <rudiments/unixsocketclient.h>
 #include <rudiments/inetsocketserver.h>
 #include <rudiments/listener.h>
+#include <rudiments/md5.h>
 
 #include <defines.h>
 #include <defaults.h>
@@ -252,6 +253,20 @@ class sqlrservercontrollerprivate {
 	uint64_t	*_fieldlengths;
 	bool		*_blobs;
 	bool		*_nulls;
+
+	char			*_bulkserveridfilename;
+	sharedmemory		*_bulkservershmem;
+	unsigned char 		*_bulkservershm;
+	unsigned char 		*_bulkservershmquery;
+	sharedmemory		*_bulkclientshmem;
+	unsigned char		*_bulkclientshm;
+	sqlrservercursor	*_bulkcursor;
+	const char		*_bulkerrortable1;
+	const char		*_bulkerrortable2;
+	uint64_t		_bulkmaxerrorcount;
+	const char		*_bulkquery;
+	singlylinkedlist<const unsigned char *>	_bulkdata;
+	singlylinkedlist<uint64_t>		_bulkdatalen;
 };
 
 static signalhandler		alarmhandler;
@@ -383,6 +398,18 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_columnmap=NULL;
 
+	pvt->_bulkserveridfilename=NULL;
+	pvt->_bulkservershmem=NULL;
+	pvt->_bulkservershm=NULL;
+	pvt->_bulkservershmquery=NULL;
+	pvt->_bulkclientshmem=NULL;
+	pvt->_bulkclientshm=NULL;
+	pvt->_bulkcursor=NULL;
+	pvt->_bulkerrortable1=NULL;
+	pvt->_bulkerrortable2=NULL;
+	pvt->_bulkmaxerrorcount=0;
+	pvt->_bulkquery=NULL;
+
 	buildColumnMaps();
 }
 
@@ -444,6 +471,14 @@ sqlrservercontroller::~sqlrservercontroller() {
 	}
 
 	delete pvt->_conn;
+
+	if (pvt->_bulkserveridfilename) {
+		file::remove(pvt->_bulkserveridfilename);
+		delete[] pvt->_bulkserveridfilename;
+	}
+	delete pvt->_bulkservershmem;
+	delete pvt->_bulkclientshmem;
+	delete pvt->_bulkcursor;
 
 	delete pvt;
 }
@@ -2554,6 +2589,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (pvt->_faketransactionblocks &&
 				pvt->_infaketransactionblock) {
+			// FIXME: move to defines.h
 			setError(cursor,
 				"begin while in transaction block",
 							999999,true);
@@ -2570,6 +2606,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (pvt->_faketransactionblocks &&
 				!pvt->_infaketransactionblock) {
+			// FIXME: move to defines.h
 			setError(cursor,
 				"commit while not in transaction block",
 								999998,true);
@@ -2586,6 +2623,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (pvt->_faketransactionblocks &&
 				!pvt->_infaketransactionblock) {
+			// FIXME: move to defines.h
 			setError(cursor,
 				"rollback while not in transaction block",
 								999997,true);
@@ -5703,24 +5741,100 @@ sqlrparser *sqlrservercontroller::newParser() {
 	return parser;
 }
 
-bool sqlrservercontroller::bulkLoadBegin(const char *id, uint64_t idlen) {
+bool sqlrservercontroller::bulkLoadBegin(const char *id,
+						const char *errortable1,
+						const char *errortable2,
+						uint64_t maxerrorcount) {
 
 	if (pvt->_debugbulkload) {
-		stdoutput.printf("%d: bulk load begin: \"%.*s\"\n",
-					process::getProcessId(),idlen,id);
+		stdoutput.printf("%d: bulk load begin:\n"
+				"		id: \"%s\"\n",
+						process::getProcessId(),id);
+		stdoutput.printf("		error table 1: \"%s\"\n"
+				"		error table 2: \"%s\"\n"
+				"		max error count: %lld\n",
+						errortable1,
+						errortable2,
+						maxerrorcount);
 	}
 
-	// create shared memory
+	// get an md5 sum of the id
+	// use this rather than using the id directly because:
+	// * the id could be sensitive information
+	// * the id name might not conform to valid file naming conventions
+	md5	m;
+	m.append((const unsigned char *)id,charstring::length(id));
+	id=(const char *)m.getHash();
 
-	// FIXME: do something...
+	// create a key file and key
+	delete[] pvt->_bulkserveridfilename;
+	charstring::printf(&pvt->_bulkserveridfilename,"%sbulk-%s.ipc",
+						pvt->_pth->getIpcDir(),id);
+	if (!file::createFile(pvt->_bulkserveridfilename,
+				permissions::ownerReadWrite())) {
+		// FIXME: move to defines.h
+		setError("bulk load begin failed - "
+				"failed to create ipc file",999999,true);
+		bulkLoadEnd();
+		return false;
+	}
+	key_t	key=file::generateKey(pvt->_bulkserveridfilename,1);
+	if (key==-1) {
+		// FIXME: move to defines.h
+		setError("bulk load begin failed - "
+				"failed to generate ipc key",999999,true);
+		bulkLoadEnd();
+		return false;
+	}
+
+	// calculate shared memory segment size
+	uint64_t	shmsize=charstring::length(errortable1)+1+
+				charstring::length(errortable2)+1+
+				sizeof(uint64_t)+
+				pvt->_maxquerysize+1;
+
+	// create shared memory
+	pvt->_bulkservershmem=new sharedmemory;
+	if (!pvt->_bulkservershmem->create(key,shmsize,
+				permissions::evalPermString("rw-r-----"))) {
+		// FIXME: move to defines.h
+		setError("bulk load begin failed - "
+				"failed to create shm segment",999999,true);
+		bulkLoadEnd();
+		return false;
+	}
+	pvt->_bulkservershm=
+		(unsigned char *)pvt->_bulkservershmem->getPointer();
+	bytestring::zero(pvt->_bulkservershm,pvt->_maxquerysize+1);
+
+	// put error tables and maxerrorcount in shared memory
+	unsigned char	*ptr=pvt->_bulkservershm;
+
+	uint64_t	len=charstring::length(errortable1);
+	bytestring::copy(ptr,errortable1,len);
+	ptr+=len;
+	*ptr='\0';
+	ptr++;
+
+	len=charstring::length(errortable2);
+	bytestring::copy(ptr,errortable2,len);
+	ptr+=len;
+	*ptr='\0';
+	ptr++;
+
+	bytestring::copy(ptr,&maxerrorcount,sizeof(uint64_t));
+	ptr+=sizeof(uint64_t);
+
+	pvt->_bulkservershmquery=ptr;
+
 	return true;
 }
 
-bool sqlrservercontroller::bulkLoadCheckpoint(const char *id, uint64_t idlen) {
+bool sqlrservercontroller::bulkLoadCheckpoint(const char *id) {
 
 	if (pvt->_debugbulkload) {
-		stdoutput.printf("%d: bulk load checkpoint: \"%.*s\"\n",
-					process::getProcessId(),idlen,id);
+		stdoutput.printf("%d: bulk load checkpoint: \"%s\"\n",
+						process::getProcessId(),id);
 	}
 
 	// FIXME: not sure what to do here...
@@ -5730,63 +5844,353 @@ bool sqlrservercontroller::bulkLoadCheckpoint(const char *id, uint64_t idlen) {
 	return true;
 }
 
-bool sqlrservercontroller::bulkLoadPrepare(const char *query,
-							uint64_t querylen) {
+bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
+						uint64_t querylen,
+						uint16_t inbindcount,
+						sqlrserverbindvar *inbinds) {
 
 	if (pvt->_debugbulkload) {
-		stdoutput.printf("%d: bulk load prepare:\n%.*s\n",
+		stdoutput.printf("%d: bulk load prepare query:\n%.*s\n",
 					process::getProcessId(),querylen,query);
 	}
 
-	// put query in shared memory
+	// validate that the query is an insert
+	const char	*ptr=skipWhitespaceAndComments(query);
+	if (charstring::compareIgnoringCase(ptr,"insert",6) ||
+				!character::isWhitespace(*(ptr+6))) {
+		// FIXME: move to defines.h
+		setError("bulk load prepare query failed - "
+				"invalid query",999999,true);
+		return false;
+	}
 
-	// FIXME: do something...
+	// put the query in shared memory
+	bytestring::copy(pvt->_bulkservershmquery,query,querylen);
+	pvt->_bulkservershmquery[querylen]='\0';
+
+	// FIXME: put the bind var defintions in shared memory
+	/*for (uint16_t i=0; i<inbindcount; i++) {
+		sqlrserverbindvar	*inbind=&(inbinds[i]);
+	}*/
+
 	return true;
 }
 
-bool sqlrservercontroller::bulkLoadJoin(const char *id, uint64_t idlen) {
+bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 
 	if (pvt->_debugbulkload) {
-		stdoutput.printf("%d: bulk load join: \"%.*s\"\n",
-					process::getProcessId(),idlen,id);
+		stdoutput.printf("%d: bulk load join:\n"
+				"		id: \"%s\"\n",
+					process::getProcessId(),table);
+	}
+
+	// get an md5 sum of the table (see bulkLoadBegin for why)
+	md5	m;
+	m.append((const unsigned char *)table,charstring::length(table));
+	table=(const char *)m.getHash();
+
+	// create the key
+	char	*idfilename;
+	charstring::printf(&idfilename,"%sbulk-%s.ipc",
+				pvt->_pth->getIpcDir(),table);
+	key_t	key=file::generateKey(idfilename,1);
+	delete[] idfilename;
+	if (key==-1) {
+		// FIXME: move to defines.h
+		setError("bulk load join failed - "
+				"failed to generate ipc key",999999,true);
+		return false;
+	}
+
+	// (re)init shared memory
+	if (pvt->_bulkclientshmem) {
+		delete pvt->_bulkclientshmem;
 	}
 
 	// attach to shared memory
-	// get query from shared memory
-	// prepare query
+	pvt->_bulkclientshmem=new sharedmemory;
+	if (!pvt->_bulkclientshmem->attach(key,pvt->_maxquerysize+1)) {
+		// FIXME: move to defines.h
+		setError("bulk load join failed - "
+				"failed to attach to shm segment",999999,true);
+		return false;
+	}
+	pvt->_bulkclientshm=
+		(unsigned char *)pvt->_bulkclientshmem->getPointer();
 
-	// FIXME: do something...
+	// get error tables, maxerrorcount, and query from shared memory
+	const unsigned char	*ptr=pvt->_bulkclientshm;
+
+	pvt->_bulkerrortable1=(const char *)ptr;
+	ptr+=charstring::length(ptr);
+	ptr++;
+
+	pvt->_bulkerrortable2=(const char *)ptr;
+	ptr+=charstring::length(ptr);
+	ptr++;
+
+	pvt->_bulkmaxerrorcount=*((uint64_t *)ptr);
+	ptr+=sizeof(uint64_t);
+
+	pvt->_bulkquery=(const char *)ptr;
+
+	// clear bulk data lists
+	pvt->_bulkdata.clear();
+	pvt->_bulkdatalen.clear();
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("		error table 1: \"%s\"\n"
+				"		error table 2: \"%s\"\n"
+				"		max error count: %lld\n"
+				"		query:\n%s\n",
+						pvt->_bulkerrortable1,
+						pvt->_bulkerrortable2,
+						pvt->_bulkmaxerrorcount,
+						pvt->_bulkquery);
+	}
+
 	return true;
 }
 
-bool sqlrservercontroller::bulkLoadBind(const unsigned char *data,
+bool sqlrservercontroller::bulkLoadInputBind(const unsigned char *data,
 							uint64_t datalen) {
 
 	if (pvt->_debugbulkload) {
-		stdoutput.printf("%d: bulk load bind:\n",
+		stdoutput.printf("%d: bulk load input bind:\n",
 					process::getProcessId());
 		stdoutput.safePrint(data,datalen);
 		stdoutput.write('\n');
 	}
 
-	// parse the data into an array of bindable pieces
+	pvt->_bulkdata.append(data);
+	pvt->_bulkdatalen.append(datalen);
 
-	// FIXME: do something...
 	return true;
 }
 
-bool sqlrservercontroller::bulkLoadExecute() {
+bool sqlrservercontroller::bulkLoadExecuteQuery() {
 
 	if (pvt->_debugbulkload) {
-		stdoutput.printf("%d: bulk load execute\n",
-					process::getProcessId());
+		stdoutput.printf("%d: bulk load execute query - %d rows\n",
+						process::getProcessId(),
+						pvt->_bulkdata.getLength());
 	}
 
-	// run through the bind array
-	// execute the query for each element
+	// (re)init the bulk cursor
+	if (pvt->_bulkcursor) {
+		closeResultSet(pvt->_bulkcursor);
+		close(pvt->_bulkcursor);
+		deleteCursor(pvt->_bulkcursor);
+	}
+	pvt->_bulkcursor=newCursor();
 
-	// FIXME: do something...
+	// prepare the query
+	bool	success=true;
+	if (!open(pvt->_bulkcursor)) {
+		// FIXME: move to defines.h
+		setError("bulk load execute failed - "
+				"failed to open cursor",999999,true);
+		success=false;
+	}
+
+	// FIXME: it shouldn't be necessary to do this prior to prepare (#5257)
+	bulkLoadInitBinds();
+
+	if (!prepareQuery(pvt->_bulkcursor,
+				pvt->_bulkquery,
+				charstring::length(pvt->_bulkquery),
+				true,true,true)) {
+		// FIXME: move to defines.h
+		// FIXME: or should we get the exact error from the cursor?
+		setError("bulk load execute failed - "
+				"failed to prepare query",999999,true);
+		success=false;
+	}
+	if (!success) {
+		closeResultSet(pvt->_bulkcursor);
+		close(pvt->_bulkcursor);
+		deleteCursor(pvt->_bulkcursor);
+		pvt->_bulkcursor=NULL;
+		pvt->_bulkdata.clear();
+		pvt->_bulkdatalen.clear();
+		return false;
+	}
+
+	// FIXME: this should be done here (#5257)
+	//bulkLoadInitBinds();
+
+	// run through the bulk data, binding and executing
+	uint64_t		errorcount=0;
+	singlylinkedlistnode<const unsigned char *>	*datanode=
+						pvt->_bulkdata.getFirst();
+	singlylinkedlistnode<uint64_t>			*datalennode=
+						pvt->_bulkdatalen.getFirst();
+	while (datanode) {
+
+		bulkLoadBindRow(datanode->getValue(),datalennode->getValue());
+
+		if (!executeQuery(pvt->_bulkcursor)) {
+			bulkLoadError();
+			errorcount++;
+		}
+
+		datanode=datanode->getNext();
+		datalennode=datalennode->getNext();
+	}
+
+	// close the bulk cursor and clean up
+	closeResultSet(pvt->_bulkcursor);
+	close(pvt->_bulkcursor);
+	deleteCursor(pvt->_bulkcursor);
+	pvt->_bulkcursor=NULL;
+	pvt->_bulkdata.clear();
+	pvt->_bulkdatalen.clear();
+
+	if (errorcount>pvt->_bulkmaxerrorcount) {
+		// FIXME: move to defines.h
+		setError("bulk load execute query failed - "
+				"too many errors",999999,true);
+		return false;
+	}
 	return true;
+}
+
+void sqlrservercontroller::bulkLoadInitBinds() {
+
+	// FIXME: this expects a very specific format...
+
+	const unsigned char	*ptr=pvt->_bulkdata.getFirst()->getValue();
+
+	memorypool		*bindpool=getBindPool(pvt->_bulkcursor);
+
+	uint16_t		inbindcount=0;
+	sqlrserverbindvar	*inbinds=getInputBinds(pvt->_bulkcursor);
+
+	for (;;) {
+
+		// skip the delimiter
+		ptr++;
+
+		if (!*ptr || *ptr=='\n') {
+			break;
+		}
+
+		// create the variable name
+		// FIXME: this expects the variables to be named col1,col2,etc.
+		sqlrserverbindvar	*inbind=&(inbinds[inbindcount]);
+		inbind->variablesize=1+3+charstring::integerLength(
+							inbindcount+1);
+		inbind->variable=(char *)bindpool->allocate(
+						inbind->variablesize+1);
+		charstring::printf(inbind->variable,
+					inbind->variablesize+1,
+					":col%d",inbindcount+1);
+
+		// FIXME: we need to know the type...
+		if (!inbindcount) {
+			inbind->type=SQLRSERVERBINDVARTYPE_INTEGER;
+		} else {
+			inbind->type=SQLRSERVERBINDVARTYPE_STRING;
+		}
+
+		// bump the input bind count
+		inbindcount++;
+
+		// skip until next delimiter
+		while (*ptr && *ptr!='|') {
+			ptr++;
+		}
+	}
+
+	setInputBindCount(pvt->_bulkcursor,inbindcount);
+}
+
+void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
+							uint64_t datalen) {
+
+	// FIXME: this expects a very specific format...
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bind row {\n",process::getProcessId());
+	}
+
+	uint16_t		inbindcount=getInputBindCount(pvt->_bulkcursor);
+	sqlrserverbindvar	*inbinds=getInputBinds(pvt->_bulkcursor);
+
+	for (uint16_t i=0; i<inbindcount; i++) {
+		
+		// skip the delimiter
+		data++;
+
+		sqlrserverbindvar	*inbind=&(inbinds[i]);
+
+		// get the value
+		const unsigned char	*val=data;
+		inbind->valuesize=0;
+
+		// skip until next delimiter
+		while (*data!='|') {
+			inbind->valuesize++;
+			data++;
+		}
+
+		if (pvt->_debugbulkload) {
+			stdoutput.printf("	%.*s (%d): ",
+						inbind->variablesize,
+						inbind->variable,
+						inbind->type);
+		}
+
+		if (inbind->type==SQLRSERVERBINDVARTYPE_INTEGER) {
+
+			inbind->value.integerval=
+				charstring::toInteger((char *)val);
+			inbind->isnull=nonNullBindValue();
+
+			if (pvt->_debugbulkload) {
+				stdoutput.printf("%d\n",
+						inbind->value.integerval);
+			}
+
+		} else if (inbind->type==SQLRSERVERBINDVARTYPE_STRING) {
+
+			inbind->value.stringval=(char *)val;
+			inbind->isnull=nonNullBindValue();
+
+			if (pvt->_debugbulkload) {
+				stdoutput.printf("(%d) ",
+						inbind->valuesize);
+				stdoutput.printf("%.*s\n",
+						inbind->valuesize,
+						inbind->value.stringval);
+			}
+		}
+		// FIXME: other types...
+	}
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("}\n");
+	}
+}
+
+void sqlrservercontroller::bulkLoadError() {
+
+	// get the error
+	uint32_t	errorlength;
+	int64_t		errnum;
+	bool		liveconnection;
+	errorMessage(pvt->_bulkcursor,
+			pvt->_bulkcursor->getErrorBuffer(),
+			pvt->_maxerrorlength,
+			&errorlength,&errnum,&liveconnection);
+
+	// FIXME: store the error in pvt->_bulkerrortable1/pvt->bulkerrortable2
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load error\n%d\n%.*s\n",
+					process::getProcessId(),
+					errnum,errorlength,
+					pvt->_bulkcursor->getErrorBuffer());
+	}
 }
 
 bool sqlrservercontroller::bulkLoadEnd() {
@@ -5797,8 +6201,17 @@ bool sqlrservercontroller::bulkLoadEnd() {
 	}
 
 	// delete shared memory
+	delete pvt->_bulkservershmem;
+	pvt->_bulkservershmem=NULL;
+	pvt->_bulkservershm=NULL;
 
-	// FIXME: do something...
+	// remove the id file
+	if (pvt->_bulkserveridfilename) {
+		file::remove(pvt->_bulkserveridfilename);
+		delete[] pvt->_bulkserveridfilename;
+	}
+	pvt->_bulkserveridfilename=NULL;
+
 	return true;
 }
 

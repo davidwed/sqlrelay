@@ -256,6 +256,10 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 
 		stringbuffer	errormsg;
 
+		// FIXME: this is only used to store converted
+		// input bind strings and should be renamed
+		singlylinkedlist<char *>	buffers;
+
 		odbcconnection	*odbcconn;
 };
 
@@ -369,11 +373,6 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 #include <wchar.h>
 
 #define USER_CODING "UTF8"
-#define FIXED_BUFFER_COUNT 512
-
-// FIXME: this fixed size should be dynamic or at least checked.
-char *buffers[FIXED_BUFFER_COUNT];
-int nextbuf=0;
 
 void printerror(const char *error) {
 	char	*err=error::getErrorString();
@@ -439,9 +438,8 @@ char *conv_to_user_coding(const char *inbuf) {
 	return outbuf;
 }
 
-char *conv_to_ucs(const char *inbuf) {
+char *conv_to_ucs(const char *inbuf, size_t insize) {
 	
-	size_t	insize=charstring::length(inbuf);
 	size_t	avail=insize*2+4;
 	char	*outbuf=new char[avail];
 	char	*wrptr=outbuf;
@@ -478,6 +476,10 @@ char *conv_to_ucs(const char *inbuf) {
 		printerror("error in iconv_close");
 	}
 	return outbuf;
+}
+
+char *conv_to_ucs(const char *inbuf) {
+	return conv_to_ucs(inbuf,charstring::length(inbuf));
 }
 #endif
 
@@ -2035,6 +2037,7 @@ odbccursor::~odbccursor() {
 	delete[] inoutisnullptr;
 	delete[] outisnull;
 	delete[] inoutisnull;
+	buffers.clearAndArrayDelete();
 	deallocateResultSetBuffers();
 }
 
@@ -2108,13 +2111,9 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		//free allocated buffers
-		while (nextbuf>0) {
-			nextbuf--;
-			if (buffers[nextbuf]) {
-				delete[] buffers[nextbuf];
-			}
-		}
+		// free allocated buffers
+		// FIXME: really should do this before every execute too
+		buffers.clearAndArrayDelete();
 		if (getExecuteDirect()) {
 			return true;
 		}
@@ -2167,13 +2166,9 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
-			//free allocated buffers
-			while (nextbuf>0) {
-				nextbuf--;
-				if (buffers[nextbuf]) {
-					delete[] buffers[nextbuf];
-				}
-			}
+			// free allocated buffers
+			// FIXME: really should do this before every execute too
+			buffers.clearAndArrayDelete();
 
 			char *query_ucs=conv_to_ucs((char*)query);
 			erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
@@ -2225,10 +2220,9 @@ bool odbccursor::inputBind(const char *variable,
 	SQLSMALLINT	valtype=SQL_C_CHAR;
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		char *value_ucs=conv_to_ucs((char*)value);
+		char	*value_ucs=conv_to_ucs((char*)value,valuesize);
 		valuesize=ucslen(value_ucs)*2;
-		buffers[nextbuf]=value_ucs;
-		nextbuf++;
+		buffers.append(value_ucs);
 		val=(SQLPOINTER)value_ucs;
 		valtype=SQL_C_WCHAR;
 	} else {

@@ -682,17 +682,23 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							bool liveconnection);
 
 		// bulk load
-		bool	bulkLoadBegin(const char *id,
-						uint64_t idlen);
-		bool	bulkLoadCheckpoint(const char *id,
-						uint64_t idlen);
-		bool	bulkLoadPrepare(const char *query,
-						uint64_t querylen);
-		bool	bulkLoadJoin(const char *id,
-						uint64_t idlen);
-		bool	bulkLoadBind(const unsigned char *data,
+		bool	bulkLoadBegin(const char *table,
+					const char *errortable1,
+					const char *errortable2,
+					uint64_t maxerrorcount);
+		bool	bulkLoadCheckpoint(const char *id);
+		bool	bulkLoadPrepareQuery(const char *query,
+						uint64_t querylen,
+						uint16_t inbindcount,
+						sqlrserverbindvar *inbinds);
+		bool	bulkLoadJoin(const char *table);
+		bool	bulkLoadInputBind(const unsigned char *data,
 						uint64_t datalen);
-		bool	bulkLoadExecute();
+		bool	bulkLoadExecuteQuery();
+		void	bulkLoadInitBinds();
+		void	bulkLoadBindRow(const unsigned char *data,
+						uint64_t datalen);
+		void	bulkLoadError();
 		bool	bulkLoadEnd();
 
 		// cursor state
