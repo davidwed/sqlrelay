@@ -694,6 +694,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	bulkLoadJoin(const char *table);
 		bool	bulkLoadInputBind(const unsigned char *data,
 						uint64_t datalen);
+		void	bulkLoadParseInsert(const char *query,
+						char **table,
+                                                linkedlist<char *> *cols,
+                                                linkedlist<char *> *binds);
 		bool	bulkLoadExecuteQuery();
 		void	bulkLoadInitBinds();
 		void	bulkLoadBindRow(const unsigned char *data,

@@ -2589,10 +2589,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (pvt->_faketransactionblocks &&
 				pvt->_infaketransactionblock) {
-			// FIXME: move to defines.h
 			setError(cursor,
-				"begin while in transaction block",
-							999999,true);
+				SQLR_ERROR_BEGIN_IN_TX_BLOCK_STRING,
+				SQLR_ERROR_BEGIN_IN_TX_BLOCK,true);
 		} else {
 			retval=begin();
 		}
@@ -2606,10 +2605,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (pvt->_faketransactionblocks &&
 				!pvt->_infaketransactionblock) {
-			// FIXME: move to defines.h
 			setError(cursor,
-				"commit while not in transaction block",
-								999998,true);
+				SQLR_ERROR_COMMIT_NOT_IN_TX_BLOCK_STRING,
+				SQLR_ERROR_COMMIT_NOT_IN_TX_BLOCK,true);
 		} else {
 			retval=commit();
 		}
@@ -2623,10 +2621,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 		if (pvt->_faketransactionblocks &&
 				!pvt->_infaketransactionblock) {
-			// FIXME: move to defines.h
 			setError(cursor,
-				"rollback while not in transaction block",
-								999997,true);
+				SQLR_ERROR_ROLLBACK_NOT_IN_TX_BLOCK_STRING,
+				SQLR_ERROR_ROLLBACK_NOT_IN_TX_BLOCK,true);
 		} else {
 			retval=rollback();
 		}
@@ -4094,7 +4091,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		raiseDebugMessageEvent("faking binds...");
 
 		if (cursor->fakeInputBinds()) {
-			if (pvt->_debugsqlrtranslations) {
+			if (pvt->_debugbindtranslation) {
 				stdoutput.printf(
 				"after faking input binds:\n%s\n\n",
 				cursor->
@@ -5772,17 +5769,15 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 						pvt->_pth->getIpcDir(),id);
 	if (!file::createFile(pvt->_bulkserveridfilename,
 				permissions::ownerReadWrite())) {
-		// FIXME: move to defines.h
-		setError("bulk load begin failed - "
-				"failed to create ipc file",999999,true);
+		setError(SQLR_ERROR_BULKLOADBEGIN_IPC_FILE_STRING,
+				SQLR_ERROR_BULKLOADBEGIN_IPC_FILE,true);
 		bulkLoadEnd();
 		return false;
 	}
 	key_t	key=file::generateKey(pvt->_bulkserveridfilename,1);
 	if (key==-1) {
-		// FIXME: move to defines.h
-		setError("bulk load begin failed - "
-				"failed to generate ipc key",999999,true);
+		setError(SQLR_ERROR_BULKLOADBEGIN_IPC_KEY_STRING,
+				SQLR_ERROR_BULKLOADBEGIN_IPC_KEY,true);
 		bulkLoadEnd();
 		return false;
 	}
@@ -5797,9 +5792,8 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	pvt->_bulkservershmem=new sharedmemory;
 	if (!pvt->_bulkservershmem->create(key,shmsize,
 				permissions::evalPermString("rw-r-----"))) {
-		// FIXME: move to defines.h
-		setError("bulk load begin failed - "
-				"failed to create shm segment",999999,true);
+		setError(SQLR_ERROR_BULKLOADBEGIN_SHM_STRING,
+				SQLR_ERROR_BULKLOADBEGIN_SHM,true);
 		bulkLoadEnd();
 		return false;
 	}
@@ -5858,9 +5852,8 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 	const char	*ptr=skipWhitespaceAndComments(query);
 	if (charstring::compareIgnoringCase(ptr,"insert",6) ||
 				!character::isWhitespace(*(ptr+6))) {
-		// FIXME: move to defines.h
-		setError("bulk load prepare query failed - "
-				"invalid query",999999,true);
+		setError(SQLR_ERROR_BULKLOADPREPARE_INVALID_QUERY_STRING,
+				SQLR_ERROR_BULKLOADPREPARE_INVALID_QUERY,true);
 		return false;
 	}
 
@@ -5896,9 +5889,8 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 	key_t	key=file::generateKey(idfilename,1);
 	delete[] idfilename;
 	if (key==-1) {
-		// FIXME: move to defines.h
-		setError("bulk load join failed - "
-				"failed to generate ipc key",999999,true);
+		setError(SQLR_ERROR_BULKLOADJOIN_IPC_KEY_STRING,
+				SQLR_ERROR_BULKLOADJOIN_IPC_KEY,true);
 		return false;
 	}
 
@@ -5910,9 +5902,8 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 	// attach to shared memory
 	pvt->_bulkclientshmem=new sharedmemory;
 	if (!pvt->_bulkclientshmem->attach(key,pvt->_maxquerysize+1)) {
-		// FIXME: move to defines.h
-		setError("bulk load join failed - "
-				"failed to attach to shm segment",999999,true);
+		setError(SQLR_ERROR_BULKLOADJOIN_SHM_STRING,
+				SQLR_ERROR_BULKLOADJOIN_SHM,true);
 		return false;
 	}
 	pvt->_bulkclientshm=
@@ -5976,66 +5967,67 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 						pvt->_bulkdata.getLength());
 	}
 
-	// (re)init the bulk cursor
-	if (pvt->_bulkcursor) {
-		closeResultSet(pvt->_bulkcursor);
-		close(pvt->_bulkcursor);
-		deleteCursor(pvt->_bulkcursor);
-	}
+	// init the bulk cursor
 	pvt->_bulkcursor=newCursor();
 
-	// prepare the query
+	// open the cursor
 	bool	success=true;
 	if (!open(pvt->_bulkcursor)) {
-		// FIXME: move to defines.h
-		setError("bulk load execute failed - "
-				"failed to open cursor",999999,true);
+		setError(SQLR_ERROR_BULKLOADEXECUTE_OPEN_CURSOR_STRING,
+				SQLR_ERROR_BULKLOADEXECUTE_OPEN_CURSOR,true);
 		success=false;
 	}
 
-	// FIXME: it shouldn't be necessary to do this prior to prepare (#5257)
-	bulkLoadInitBinds();
+	if (success) {
+		// FIXME: it shouldn't be necessary to do this here (#5257)
+		bulkLoadInitBinds();
+	}
 
-	if (!prepareQuery(pvt->_bulkcursor,
+	// prepare the query
+	if (success && !prepareQuery(pvt->_bulkcursor,
 				pvt->_bulkquery,
 				charstring::length(pvt->_bulkquery),
 				true,true,true)) {
-		// FIXME: move to defines.h
 		// FIXME: or should we get the exact error from the cursor?
-		setError("bulk load execute failed - "
-				"failed to prepare query",999999,true);
+		setError(SQLR_ERROR_BULKLOADEXECUTE_PREPARE_QUERY_STRING,
+				SQLR_ERROR_BULKLOADEXECUTE_PREPARE_QUERY,true);
 		success=false;
 	}
-	if (!success) {
-		closeResultSet(pvt->_bulkcursor);
-		close(pvt->_bulkcursor);
-		deleteCursor(pvt->_bulkcursor);
-		pvt->_bulkcursor=NULL;
-		pvt->_bulkdata.clear();
-		pvt->_bulkdatalen.clear();
-		return false;
-	}
 
-	// FIXME: this should be done here (#5257)
-	//bulkLoadInitBinds();
+	if (success) {
 
-	// run through the bulk data, binding and executing
-	uint64_t		errorcount=0;
-	singlylinkedlistnode<const unsigned char *>	*datanode=
-						pvt->_bulkdata.getFirst();
-	singlylinkedlistnode<uint64_t>			*datalennode=
-						pvt->_bulkdatalen.getFirst();
-	while (datanode) {
+		// FIXME: it should be possible to do this here (#5257)
+		//bulkLoadInitBinds();
 
-		bulkLoadBindRow(datanode->getValue(),datalennode->getValue());
+		// run through the bulk data, binding and executing each row
+		uint64_t		errorcount=0;
+		singlylinkedlistnode<const unsigned char *>
+				*datanode=pvt->_bulkdata.getFirst();
+		singlylinkedlistnode<uint64_t>
+				*datalennode=pvt->_bulkdatalen.getFirst();
+		while (datanode) {
 
-		if (!executeQuery(pvt->_bulkcursor)) {
-			bulkLoadError();
-			errorcount++;
+			bulkLoadBindRow(datanode->getValue(),
+					datalennode->getValue());
+
+			if (!executeQuery(pvt->_bulkcursor)) {
+				bulkLoadError();
+				errorcount++;
+			}
+
+
+			// bail if too many errors occurred
+			if (errorcount>pvt->_bulkmaxerrorcount) {
+				setError(
+			SQLR_ERROR_BULKLOADEXECUTE_TOO_MANY_ERRORS_STRING,
+			SQLR_ERROR_BULKLOADEXECUTE_TOO_MANY_ERRORS,true);
+				success=false;
+				break;
+			}
+
+			datanode=datanode->getNext();
+			datalennode=datalennode->getNext();
 		}
-
-		datanode=datanode->getNext();
-		datalennode=datalennode->getNext();
 	}
 
 	// close the bulk cursor and clean up
@@ -6046,63 +6038,269 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 	pvt->_bulkdata.clear();
 	pvt->_bulkdatalen.clear();
 
-	if (errorcount>pvt->_bulkmaxerrorcount) {
-		// FIXME: move to defines.h
-		setError("bulk load execute query failed - "
-				"too many errors",999999,true);
-		return false;
-	}
-	return true;
+	return success;
 }
 
 void sqlrservercontroller::bulkLoadInitBinds() {
 
-	// FIXME: this expects a very specific format...
+	// get the table and column names from the query...
+	char			*table=NULL;
+	linkedlist<char *>	cols;
+	linkedlist<char *>	binds;
+	bulkLoadParseInsert(pvt->_bulkquery,&table,&cols,&binds);
 
-	const unsigned char	*ptr=pvt->_bulkdata.getFirst()->getValue();
-
-	memorypool		*bindpool=getBindPool(pvt->_bulkcursor);
-
-	uint16_t		inbindcount=0;
-	sqlrserverbindvar	*inbinds=getInputBinds(pvt->_bulkcursor);
-
-	for (;;) {
-
-		// skip the delimiter
-		ptr++;
-
-		if (!*ptr || *ptr=='\n') {
-			break;
-		}
-
-		// create the variable name
-		// FIXME: this expects the variables to be named col1,col2,etc.
-		sqlrserverbindvar	*inbind=&(inbinds[inbindcount]);
-		inbind->variablesize=1+3+charstring::integerLength(
-							inbindcount+1);
-		inbind->variable=(char *)bindpool->allocate(
-						inbind->variablesize+1);
-		charstring::printf(inbind->variable,
-					inbind->variablesize+1,
-					":col%d",inbindcount+1);
-
-		// FIXME: we need to know the type...
-		if (!inbindcount) {
-			inbind->type=SQLRSERVERBINDVARTYPE_INTEGER;
-		} else {
-			inbind->type=SQLRSERVERBINDVARTYPE_STRING;
-		}
-
-		// bump the input bind count
-		inbindcount++;
-
-		// skip until next delimiter
-		while (*ptr && *ptr!='|') {
-			ptr++;
+	// map columns to binds (if we actually have columns)
+	dictionary<char *, char *>	bindtocol;
+	bool				havecols=false;
+	if (cols.getLength()) {
+		havecols=true;
+		linkedlistnode<char *> *bind=binds.getFirst();
+		linkedlistnode<char *> *col=cols.getFirst();
+		while (bind && col) {
+			bindtocol.setValue(bind->getValue(),col->getValue());
+			bind=bind->getNext();
+			col=col->getNext();
 		}
 	}
 
-	setInputBindCount(pvt->_bulkcursor,inbindcount);
+	// get column info for the table and set bind type accordingly
+	sqlrservercursor	*cur=newCursor();
+	if (open(cur)) {
+
+		stringbuffer	query;
+		query.append("select * from ")->append(table);
+
+		if (prepareQuery(cur,query.getString(),
+					query.getStringLength()) &&
+					executeQuery(cur)) {
+
+			memorypool		*bindpool=
+						getBindPool(pvt->_bulkcursor);
+			sqlrserverbindvar	*inbinds=
+						getInputBinds(pvt->_bulkcursor);
+
+			// run through the binds...
+			uint16_t	inbindcount=0;
+			linkedlistnode<char *> *bind=binds.getFirst();
+			while (bind) {
+
+				// set up the input bind name
+				sqlrserverbindvar	*inbind=
+							&(inbinds[inbindcount]);
+				char		*var=bind->getValue();
+				uint16_t	varsize=charstring::length(var);
+				inbind->variable=
+					(char *)bindpool->allocate(varsize+1);
+				charstring::copy(inbind->variable,var);
+				inbind->variablesize=varsize;
+
+				// figure out which column the bind maps to
+				uint16_t	colindex=inbindcount;
+				if (havecols) {
+
+					const char	*col=
+						bindtocol.getValue(
+							bind->getValue());
+
+					for (uint16_t i=0;
+							i<colCount(cur);
+							i++) {
+
+						if (!charstring::compare(col,
+							getColumnName(cur,i))) {
+							colindex=i;
+						}
+					}
+
+					// FIXME: what if we don't find it?
+				}
+
+				// get the type of the column
+				uint16_t	type=getColumnType(
+								cur,colindex);
+
+				// set the bind type from the column type
+				if (isNumberTypeInt(type)) {
+					if (isFloatTypeInt(type)) {
+						inbind->type=
+						SQLRSERVERBINDVARTYPE_DOUBLE;
+					} else {
+						inbind->type=
+						SQLRSERVERBINDVARTYPE_INTEGER;
+					}
+				} else if (isBinaryTypeInt(type)) {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_BLOB;
+				} else if (isDateTimeTypeInt(type)) {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_DATE;
+				} else {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_STRING;
+				}
+
+				// bump to the next bind
+				bind=bind->getNext();
+				inbindcount++;
+			}
+
+			// set the input bind count
+			setInputBindCount(pvt->_bulkcursor,inbindcount);
+		}
+
+		closeResultSet(cur);
+	}
+	close(cur);
+	deleteCursor(cur);
+
+	// clean up
+	delete[] table;
+	cols.clearAndArrayDelete();
+	binds.clearAndArrayDelete();
+}
+
+void sqlrservercontroller::bulkLoadParseInsert(const char *query,
+						char **table,
+						linkedlist<char *> *cols,
+						linkedlist<char *> *binds) {
+
+	// get query end
+	const char	*queryend=query+charstring::length(query);
+
+	// skip whitespace and comments
+	const char	*ptr=skipWhitespaceAndComments(query);
+	if (!*ptr) {
+		return;
+	}
+
+	// skip "insert"
+	ptr+=6;
+	if (ptr>=queryend) {
+		return;
+	}
+
+	// skip whitespace
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// skip "into"
+	ptr+=4;
+	if (ptr>=queryend) {
+		return;
+	}
+
+	// skip whitespace
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// get table
+	const char	*start=ptr;
+	while (*ptr && !character::isWhitespace(*ptr)) {
+		ptr++;
+	}
+	if (!*ptr) {
+		return;
+	}
+
+	// return the table
+	*table=charstring::duplicate(start,ptr-start);
+
+	// FIXME: Some db's (teradata) don't require a values keyword.
+	// If it is missing then the parenthesized list following the
+	// table is the column values, rather than the list of columns.
+
+	// skip to column list
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// parse column list
+	if (*ptr=='(') {
+
+		// skip (
+		ptr++;
+		if (!*ptr) {
+			return;
+		}
+
+		// skip to )
+		start=ptr;
+		while (*ptr && *ptr!=')') {
+			ptr++;
+		}
+		if (!*ptr) {
+			return;
+		}
+
+		// parse out columns
+		char		**parts;
+		uint64_t	partcount;
+		charstring::split(start,ptr-start,
+					",",false,&parts,&partcount);
+		for (uint64_t i=0; i<partcount; i++) {
+			charstring::bothTrim(parts[i]);
+			cols->append(parts[i]);
+		}
+	}
+
+	// skip )
+	ptr++;
+	if (!*ptr) {
+		return;
+	}
+
+	// skip to "values"
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// skip "values"
+	ptr+=6;
+	if (ptr>=queryend) {
+		return;
+	}
+
+	// skip to actual values
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// parse values list
+	// FIXME: currently this assumes that all values are binds
+	if (*ptr=='(') {
+
+		// skip (
+		ptr++;
+		if (!*ptr) {
+			return;
+		}
+
+		// skip to )
+		start=ptr;
+		while (*ptr && *ptr!=')') {
+			ptr++;
+		}
+		if (!*ptr) {
+			return;
+		}
+
+		// parse out binds
+		char		**parts;
+		uint64_t	partcount;
+		charstring::split(start,ptr-start,
+					",",false,&parts,&partcount);
+		for (uint64_t i=0; i<partcount; i++) {
+			charstring::bothTrim(parts[i]);
+			binds->append(parts[i]);
+		}
+	}
 }
 
 void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
@@ -6140,31 +6338,42 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 						inbind->type);
 		}
 
-		if (inbind->type==SQLRSERVERBINDVARTYPE_INTEGER) {
+		switch (inbind->type) {
 
-			inbind->value.integerval=
-				charstring::toInteger((char *)val);
-			inbind->isnull=nonNullBindValue();
+			case SQLRSERVERBINDVARTYPE_NULL:
+				inbind->isnull=nullBindValue();
+				break;
 
-			if (pvt->_debugbulkload) {
-				stdoutput.printf("%d\n",
-						inbind->value.integerval);
-			}
-
-		} else if (inbind->type==SQLRSERVERBINDVARTYPE_STRING) {
-
-			inbind->value.stringval=(char *)val;
-			inbind->isnull=nonNullBindValue();
-
-			if (pvt->_debugbulkload) {
-				stdoutput.printf("(%d) ",
+			case SQLRSERVERBINDVARTYPE_STRING:
+				inbind->value.stringval=(char *)val;
+				inbind->isnull=nonNullBindValue();
+				if (pvt->_debugbulkload) {
+					stdoutput.printf("(%d) ",
 						inbind->valuesize);
-				stdoutput.printf("%.*s\n",
+					stdoutput.printf("%.*s\n",
 						inbind->valuesize,
 						inbind->value.stringval);
-			}
+				}
+				break;
+
+			case SQLRSERVERBINDVARTYPE_INTEGER:
+				inbind->value.integerval=
+					charstring::toInteger((char *)val);
+				inbind->isnull=nonNullBindValue();
+				if (pvt->_debugbulkload) {
+					stdoutput.printf("%d\n",
+						inbind->value.integerval);
+				}
+				break;
+
+			// FIXME: support other bind types...
+			case SQLRSERVERBINDVARTYPE_DOUBLE:
+			case SQLRSERVERBINDVARTYPE_DATE:
+			case SQLRSERVERBINDVARTYPE_BLOB:
+			case SQLRSERVERBINDVARTYPE_CLOB:
+			default:
+				break;
 		}
-		// FIXME: other types...
 	}
 
 	if (pvt->_debugbulkload) {
