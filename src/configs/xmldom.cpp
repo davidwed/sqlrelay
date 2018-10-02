@@ -82,6 +82,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
 		bool		getDebugBindTranslations();
+		bool		getDebugBindVariableTranslations();
 		bool		getDebugResultSetTranslations();
 		bool		getDebugResultSetRowTranslations();
 		bool		getDebugResultSetRowBlockTranslations();
@@ -120,6 +121,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		domnode	*getDirectives();
 		domnode	*getTranslations();
 		domnode	*getFilters();
+		domnode	*getBindVariableTranslations();
 		domnode	*getResultSetTranslations();
 		domnode	*getResultSetRowTranslations();
 		domnode	*getResultSetRowBlockTranslations();
@@ -210,6 +212,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugfilters;
 		bool		debugtriggers;
 		bool		debugbindtranslations;
+		bool		debugbindvariabletranslations;
 		bool		debugresultsettranslations;
 		bool		debugresultsetrowtranslations;
 		bool		debugresultsetrowblocktranslations;
@@ -248,6 +251,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		domnode	*directivesxml;
 		domnode	*translationsxml;
 		domnode	*filtersxml;
+		domnode	*bindvariabletranslationsxml;
 		domnode	*resultsettranslationsxml;
 		domnode	*resultsetrowtranslationsxml;
 		domnode	*resultsetrowblocktranslationsxml;
@@ -346,8 +350,12 @@ void sqlrconfig_xmldom::init() {
 	debugtranslations=hasDebug(debug,"translations");
 	debugfilters=hasDebug(debug,"filters");
 	debugtriggers=hasDebug(debug,"triggers");
-	debugbindtranslations=hasDebug(debug,"bindtranslations");
-	debugresultsettranslations=hasDebug(debug,"resultsettranslations");
+	debugbindtranslations=
+		hasDebug(debug,"bindtranslations");
+	debugbindvariabletranslations=
+		hasDebug(debug,"bindvariabletranslations");
+	debugresultsettranslations=
+		hasDebug(debug,"resultsettranslations");
 	debugresultsetrowtranslations=
 		hasDebug(debug,"resultsetrowtranslations");
 	debugresultsetrowblocktranslations=
@@ -594,6 +602,10 @@ bool sqlrconfig_xmldom::getDebugBindTranslations() {
 	return debugbindtranslations;
 }
 
+bool sqlrconfig_xmldom::getDebugBindVariableTranslations() {
+	return debugbindvariabletranslations;
+}
+
 bool sqlrconfig_xmldom::getDebugResultSetTranslations() {
 	return debugresultsettranslations;
 }
@@ -736,6 +748,10 @@ domnode *sqlrconfig_xmldom::getTranslations() {
 
 domnode *sqlrconfig_xmldom::getFilters() {
 	return filtersxml;
+}
+
+domnode *sqlrconfig_xmldom::getBindVariableTranslations() {
+	return bindvariabletranslationsxml;
 }
 
 domnode *sqlrconfig_xmldom::getResultSetTranslations() {
@@ -1747,6 +1763,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 		debugfilters=hasDebug(debug,"filters");
 		debugtriggers=hasDebug(debug,"triggers");
 		debugbindtranslations=hasDebug(debug,"bindtranslations");
+		debugbindvariabletranslations=
+			hasDebug(debug,"bindvariabletranslations");
 		debugresultsettranslations=
 			hasDebug(debug,"resultsettranslations");
 		debugresultsetrowtranslations=
@@ -1843,6 +1861,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 	directivesxml=instance->getFirstTagChild("directives");
 	translationsxml=instance->getFirstTagChild("translations");
 	filtersxml=instance->getFirstTagChild("filters");
+	bindvariabletranslationsxml=instance->getFirstTagChild(
+					"bindvariabletranslations");
 	resultsettranslationsxml=instance->getFirstTagChild(
 					"resultsettranslations");
 	resultsetrowtranslationsxml=instance->getFirstTagChild(

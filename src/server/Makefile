@@ -14,6 +14,7 @@ LIBSQLRSERVERSRCS = \
 	sqlrtranslation.cpp \
 	sqlrfilters.cpp \
 	sqlrfilter.cpp \
+	sqlrbindvariabletranslations.cpp \
 	sqlrresultsettranslations.cpp \
 	sqlrresultsettranslation.cpp \
 	sqlrresultsetrowtranslations.cpp \
@@ -55,6 +56,7 @@ LIBSQLRSERVERLOBJS = \
 	sqlrtranslation.$(OBJ) \
 	sqlrfilters.$(OBJ) \
 	sqlrfilter.$(OBJ) \
+	sqlrbindvariabletranslations.$(OBJ) \
 	sqlrresultsettranslations.$(OBJ) \
 	sqlrresultsettranslation.$(OBJ) \
 	sqlrresultsetrowtranslations.$(OBJ) \
@@ -309,6 +311,22 @@ sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
+sqlrbindvariabletranslationdeclarations.cpp: sqlrbindvariabletranslationdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../bindvariabletranslations/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrbindvariabletranslationassignments.cpp: sqlrbindvariabletranslationassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../bindvariabletranslations/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
 sqlrresultsettranslationdeclarations.cpp: sqlrresultsettranslationdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../resultsettranslations/*.$(OBJ) 2> /dev/null`; \
@@ -443,6 +461,8 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrresultsetrowblocktranslations.h $(includedir)/sqlrelay/private/sqlrresultsetrowblocktranslations.h
 	$(CP) sqlrelay/private/sqlrresultsetheadertranslation.h $(includedir)/sqlrelay/private/sqlrresultsetheadertranslation.h
 	$(CP) sqlrelay/private/sqlrresultsetheadertranslations.h $(includedir)/sqlrelay/private/sqlrresultsetheadertranslations.h
+	$(CP) sqlrelay/private/sqlrbindvariabletranslation.h $(includedir)/sqlrelay/private/sqlrbindvariabletranslation.h
+	$(CP) sqlrelay/private/sqlrbindvariabletranslations.h $(includedir)/sqlrelay/private/sqlrbindvariabletranslations.h
 	$(CP) sqlrelay/private/sqlrresultsettranslation.h $(includedir)/sqlrelay/private/sqlrresultsettranslation.h
 	$(CP) sqlrelay/private/sqlrresultsettranslations.h $(includedir)/sqlrelay/private/sqlrresultsettranslations.h
 	$(CP) sqlrelay/private/sqlrrouter.h $(includedir)/sqlrelay/private/sqlrrouter.h
@@ -486,6 +506,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetrowblocktranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetheadertranslation.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetheadertranslations.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrbindvariabletranslation.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrbindvariabletranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsettranslation.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsettranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrouter.h
@@ -547,6 +569,8 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrresultsetrowtranslations.h \
 		$(includedir)/sqlrelay/private/sqlrresultsetrowblocktranslation.h \
 		$(includedir)/sqlrelay/private/sqlrresultsetrowblocktranslations.h \
+		$(includedir)/sqlrelay/private/sqlrbindvariabletranslation.h \
+		$(includedir)/sqlrelay/private/sqlrbindvariabletranslations.h \
 		$(includedir)/sqlrelay/private/sqlrresultsettranslation.h \
 		$(includedir)/sqlrelay/private/sqlrresultsettranslations.h \
 		$(includedir)/sqlrelay/private/sqlrrouter.h \

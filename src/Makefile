@@ -47,6 +47,9 @@ all-directives:
 all-translations:
 	cd translations $(AND) $(MAKE) all
 
+all-bindvariabletranslations:
+	cd bindvariabletranslations $(AND) $(MAKE) all
+
 all-resultsettranslations:
 	cd resultsettranslations $(AND) $(MAKE) all
 
@@ -83,6 +86,7 @@ clean:
 	cd auths $(AND) $(MAKE) clean
 	cd directives $(AND) $(MAKE) clean
 	cd translations $(AND) $(MAKE) clean
+	cd bindvariabletranslations $(AND) $(MAKE) clean
 	cd resultsettranslations $(AND) $(MAKE) clean
 	cd resultsetrowtranslations $(AND) $(MAKE) clean
 	cd resultsetrowblocktranslations $(AND) $(MAKE) clean
@@ -139,6 +143,9 @@ install-directives:
 install-translations:
 	cd translations $(AND) $(MAKE) install
 
+install-bindvariabletranslations:
+	cd bindvariabletranslations $(AND) $(MAKE) install
+
 install-resultsettranslations:
 	cd resultsettranslations $(AND) $(MAKE) install
 
@@ -175,6 +182,7 @@ uninstall:
 	cd auths $(AND) $(MAKE) uninstall
 	cd directives $(AND) $(MAKE) uninstall
 	cd translations $(AND) $(MAKE) uninstall
+	cd bindvariabletranslations $(AND) $(MAKE) uninstall
 	cd resultsettranslations $(AND) $(MAKE) uninstall
 	cd resultsetrowtranslations $(AND) $(MAKE) uninstall
 	cd resultsetrowblocktranslations $(AND) $(MAKE) uninstall

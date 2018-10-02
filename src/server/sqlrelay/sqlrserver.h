@@ -56,7 +56,11 @@ enum sqlrserverbindvartype_t {
 	SQLRSERVERBINDVARTYPE_BLOB,
 	SQLRSERVERBINDVARTYPE_CLOB,
 	SQLRSERVERBINDVARTYPE_CURSOR,
-	SQLRSERVERBINDVARTYPE_DATE
+	SQLRSERVERBINDVARTYPE_DATE,
+
+	// special types for bulk load
+	SQLRSERVERBINDVARTYPE_DELIMITER,
+	SQLRSERVERBINDVARTYPE_NEWLINE
 };
 
 enum sqlrserverlistformat_t {
@@ -1889,6 +1893,36 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrfilters.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrbindvariabletranslation {
+	public:
+		sqlrbindvariabletranslation(sqlrservercontroller *cont,
+					sqlrbindvariabletranslations *bvts,
+					domnode *parameters);
+		virtual	~sqlrbindvariabletranslation();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur);
+
+	protected:
+		sqlrbindvariabletranslations	*getBindVariableTranslations();
+		domnode				*getParameters();
+
+	#include <sqlrelay/private/sqlrbindvariabletranslation.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrbindvariabletranslations {
+	public:
+		sqlrbindvariabletranslations(sqlrservercontroller *cont);
+		~sqlrbindvariabletranslations();
+
+		bool	load(domnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur);
+		void	endSession();
+
+	#include <sqlrelay/private/sqlrbindvariabletranslations.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {

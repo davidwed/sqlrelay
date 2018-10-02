@@ -86,6 +86,7 @@ class sqlrservercontrollerprivate {
 	sqlrdirectives				*_sqlrd;
 	sqlrtranslations			*_sqlrt;
 	sqlrfilters				*_sqlrf;
+	sqlrbindvariabletranslations		*_sqlrbvt;
 	sqlrresultsettranslations		*_sqlrrst;
 	sqlrresultsetrowtranslations		*_sqlrrsrt;
 	sqlrresultsetrowblocktranslations	*_sqlrrsrbt;
@@ -153,6 +154,7 @@ class sqlrservercontrollerprivate {
 	bool		_debugsqlrtranslations;
 	bool		_debugsqlrfilters;
 	bool		_debugbindtranslation;
+	bool		_debugsqlrbindvariabletranslation;
 	bool		_debugsqlrresultsettranslation;
 	bool		_debugsqlrresultsetrowtranslation;
 	bool		_debugsqlrresultsetrowblocktranslation;
@@ -370,6 +372,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_debugsqlrtranslations=false;
 	pvt->_debugsqlrfilters=false;
 	pvt->_debugbindtranslation=false;
+	pvt->_debugsqlrbindvariabletranslation=false;
 	pvt->_debugsqlrresultsettranslation=false;
 	pvt->_debugsqlrresultsetrowtranslation=false;
 	pvt->_debugsqlrresultsetrowblocktranslation=false;
@@ -655,6 +658,16 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		}
 		pvt->_sqlrf=new sqlrfilters(this);
 		pvt->_sqlrf->load(filters);
+	}
+
+	// get the bind variable translations
+	pvt->_debugsqlrbindvariabletranslation=
+				pvt->_cfg->getDebugBindVariableTranslations();
+	domnode	*bindvariabletranslations=
+				pvt->_cfg->getBindVariableTranslations();
+	if (!bindvariabletranslations->isNullNode()) {
+		pvt->_sqlrbvt=new sqlrbindvariabletranslations(this);
+		pvt->_sqlrbvt->load(bindvariabletranslations);
 	}
 
 	// get the result set translations
@@ -3501,6 +3514,16 @@ sqlrservercursor *sqlrservercontroller::useCustomQueryCursor(
 
 bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 
+	// translate binds
+	if (pvt->_debugsqlrbindvariabletranslation) {
+		stdoutput.printf("========================================"
+				"========================================\n\n");
+		stdoutput.printf("translating bind variables:\n");
+	}
+	if (pvt->_sqlrbvt) {
+		pvt->_sqlrbvt->run(pvt->_conn,cursor);
+	}
+
 	sqlrserverbindvar	*bind=NULL;
 	
 	// iterate through the arrays, binding values to variables
@@ -5862,9 +5885,16 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 	pvt->_bulkservershmquery[querylen]='\0';
 
 	// FIXME: put the bind var defintions in shared memory
-	/*for (uint16_t i=0; i<inbindcount; i++) {
+	for (uint16_t i=0; i<inbindcount; i++) {
 		sqlrserverbindvar	*inbind=&(inbinds[i]);
-	}*/
+		if (pvt->_debugbulkload) {
+			stdoutput.printf("	%.*s - %d(%d)\n",
+						inbind->variablesize,
+						inbind->variable,
+						inbind->type,
+						inbind->valuesize);
+		}
+	}
 
 	return true;
 }
@@ -6063,7 +6093,11 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 		}
 	}
 
-	// get column info for the table and set bind type accordingly
+	// Get column info for the table and set bind type accordingly...
+	// Ideally we'd call getColumnList() rather than running a "select *",
+	// but some ODBC drivers (eg. teradata) don't support SQLColumns(),
+	// so getColumnList() fails.  Everyone supports "select *", and as
+	// long as we don't fetch anything, it's fast enough.
 	sqlrservercursor	*cur=newCursor();
 	if (open(cur)) {
 
