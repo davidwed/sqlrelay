@@ -905,8 +905,8 @@ SRCALLSUBDIRS += all-configs all-util
 SRCINSTALLSUBDIRS += install-configs install-util
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariableetranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-connections all-server
-SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariableetranslations install-resultsettranslations install-filters install-connections install-server
+SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-connections all-server
+SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-filters install-connections install-server
 endif
 endif
 ifeq ($(ENABLE_CMDLINE),yes)
