@@ -2826,6 +2826,10 @@ const char *sqlrservercontroller::asciiToOctal(unsigned char ch) {
 	return asciitooctal[ch];
 }
 
+bool sqlrservercontroller::hasBindVariables(const char *query) {
+	return ::countBindVariables(query);
+}
+
 uint16_t sqlrservercontroller::countBindVariables(const char *query) {
 	return ::countBindVariables(query);
 }
