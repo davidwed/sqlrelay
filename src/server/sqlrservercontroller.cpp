@@ -6191,16 +6191,16 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 				// set the bind type from the column type
 				// (the order of these tests is import, eg.
 				// floats are numbers and dates are binary)
-				if (isFloatTypeInt(type)) {
+				if (isFloatType(type)) {
 					inbind->type=
 						SQLRSERVERBINDVARTYPE_DOUBLE;
-				} else if (isNumberTypeInt(type)) {
+				} else if (isNumberType(type)) {
 					inbind->type=
 						SQLRSERVERBINDVARTYPE_INTEGER;
-				} else if (isDateTimeTypeInt(type)) {
+				} else if (isDateTimeType(type)) {
 					inbind->type=
 						SQLRSERVERBINDVARTYPE_DATE;
-				} else if (isBinaryTypeInt(type)) {
+				} else if (isBinaryType(type)) {
 					inbind->type=
 						SQLRSERVERBINDVARTYPE_BLOB;
 				} else {
@@ -6276,6 +6276,7 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 	}
 
 	// return the table
+	// FIXME: make "table" safe to append to "select * from"
 	*table=charstring::duplicate(start,ptr-start);
 
 	// FIXME: Some db's (teradata) don't require a values keyword.

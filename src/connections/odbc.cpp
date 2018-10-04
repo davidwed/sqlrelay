@@ -364,6 +364,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		dontusecharforblob;
 		SQLSMALLINT	fractionscale;
 		bool		supportsfraction;
+		bool		timestampfortime;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -729,6 +730,9 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// fractional seconds results in "[Teradata][Support] (40520)
 		// Datetime field overflow resulting from invalid datetime."
 		supportsfraction=false;
+		// Teradata doesn't like it if you bind a SQL_TIMESTAMP_STRUCT
+		// to a TIME datatype.
+		timestampfortime=false;
 	} else {
 		begintxquery=sqlrserverconnection::beginTransactionQuery();
 		dontusecharforblob=false;
@@ -740,6 +744,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// full range.
 		fractionscale=9;
 		supportsfraction=true;
+		timestampfortime=true;
 	}
 	
 	return true;
@@ -2377,6 +2382,25 @@ bool odbccursor::inputBind(const char *variable,
 				buffer,
 				0,
 				NULL);
+
+	} else if (!validdate && validtime && !odbcconn->timestampfortime) {
+
+		SQL_TIME_STRUCT	*ts=(SQL_TIME_STRUCT *)buffer;
+		ts->hour=hour;
+		ts->minute=minute;
+		ts->second=second;
+
+		erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT,
+				SQL_C_TIME,
+				SQL_TIME,
+				0,
+				odbcconn->fractionscale,
+				buffer,
+				0,
+				NULL);
+
 	} else {
 
 		SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
