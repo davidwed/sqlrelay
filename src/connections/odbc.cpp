@@ -362,6 +362,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 
 		const char	*begintxquery;
 		bool		dontusecharforblob;
+		SQLSMALLINT	fractionscale;
+		bool		supportsfraction;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -720,9 +722,24 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
 		begintxquery="BT";
 		dontusecharforblob=true;
+		// See below...  Teradata only supports 6 digits though.
+		fractionscale=6;
+		// Well... Teradata theoretically supports 6 digits of
+		// fractional seconds, but any attempt to actually bind
+		// fractional seconds results in "[Teradata][Support] (40520)
+		// Datetime field overflow resulting from invalid datetime."
+		supportsfraction=false;
 	} else {
 		begintxquery=sqlrserverconnection::beginTransactionQuery();
 		dontusecharforblob=false;
+		// When binding dates using SQLBindParameter, the "decimal
+		// digits" parameter refers to the number of digits in the
+		// "fraction" part of the date.  Since that is in nanoseconds
+		// (billionths of a second (0-999999999)) in ODBC, the
+		// "decimal digits" parameter must be 9 to accomodate the
+		// full range.
+		fractionscale=9;
+		supportsfraction=true;
 	}
 	
 	return true;
@@ -2369,7 +2386,15 @@ bool odbccursor::inputBind(const char *variable,
 		ts->hour=hour;
 		ts->minute=minute;
 		ts->second=second;
-		ts->fraction=microsecond*1000;
+		if (odbcconn->supportsfraction) {
+			if (odbcconn->fractionscale==9) {
+				ts->fraction=microsecond*1000;
+			} else if (odbcconn->fractionscale==6) {
+				ts->fraction=microsecond;
+			}
+		} else {
+			ts->fraction=0;
+		}
 
 		// FIXME: this works with the SQL Server Native Client ODBC
 		// drivers, but not the old "standard" SQL Server driver
@@ -2384,12 +2409,7 @@ bool odbccursor::inputBind(const char *variable,
 				SQL_C_TIMESTAMP,
 				SQL_TIMESTAMP,
 				0,
-				// Here, decimal digits here refers to the max
-				// digits in ts->fraction.  Since ts->fraction
-				// represents billionths of a second
-				// (0-999999999) in ODBC, decimal digits must
-				// be 9 to accomodate the full range.
-				9,
+				odbcconn->fractionscale,
 				buffer,
 				0,
 				NULL);

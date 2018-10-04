@@ -260,6 +260,7 @@ class sqlrservercontrollerprivate {
 	sharedmemory		*_bulkservershmem;
 	unsigned char 		*_bulkservershm;
 	unsigned char 		*_bulkservershmquery;
+	unsigned char 		*_bulkservershmdataformat;
 	sharedmemory		*_bulkclientshmem;
 	unsigned char		*_bulkclientshm;
 	sqlrservercursor	*_bulkcursor;
@@ -267,6 +268,7 @@ class sqlrservercontrollerprivate {
 	const char		*_bulkerrortable2;
 	uint64_t		_bulkmaxerrorcount;
 	const char		*_bulkquery;
+	const unsigned char	*_bulkdataformat;
 	singlylinkedlist<const unsigned char *>	_bulkdata;
 	singlylinkedlist<uint64_t>		_bulkdatalen;
 };
@@ -405,6 +407,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_bulkservershmem=NULL;
 	pvt->_bulkservershm=NULL;
 	pvt->_bulkservershmquery=NULL;
+	pvt->_bulkservershmdataformat=NULL;
 	pvt->_bulkclientshmem=NULL;
 	pvt->_bulkclientshm=NULL;
 	pvt->_bulkcursor=NULL;
@@ -412,6 +415,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_bulkerrortable2=NULL;
 	pvt->_bulkmaxerrorcount=0;
 	pvt->_bulkquery=NULL;
+	pvt->_bulkdataformat=NULL;
 
 	buildColumnMaps();
 }
@@ -5813,7 +5817,11 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	uint64_t	shmsize=charstring::length(errortable1)+1+
 				charstring::length(errortable2)+1+
 				sizeof(uint64_t)+
-				pvt->_maxquerysize+1;
+				pvt->_maxquerysize+1+
+				sizeof(uint16_t)+
+				pvt->_maxbindcount*
+					(sizeof(sqlrserverbindvartype_t)+
+					sizeof(uint32_t));
 
 	// create shared memory
 	pvt->_bulkservershmem=new sharedmemory;
@@ -5847,6 +5855,8 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	ptr+=sizeof(uint64_t);
 
 	pvt->_bulkservershmquery=ptr;
+
+	pvt->_bulkservershmdataformat=ptr+pvt->_maxquerysize+1;
 
 	return true;
 }
@@ -5888,9 +5898,26 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 	bytestring::copy(pvt->_bulkservershmquery,query,querylen);
 	pvt->_bulkservershmquery[querylen]='\0';
 
-	// FIXME: put the bind var defintions in shared memory
+	// put the data format in shared memory...
+	ptr=(const char *)pvt->_bulkservershmdataformat;
+
+	// copy in the number of data format elements...
+	*((uint16_t *)ptr)=inbindcount;
+	ptr+=sizeof(uint16_t);
+
+	// for each data format element
 	for (uint16_t i=0; i<inbindcount; i++) {
+
 		sqlrserverbindvar	*inbind=&(inbinds[i]);
+
+		// copy in the data format element type
+		*((sqlrserverbindvartype_t *)ptr)=inbind->type;
+		ptr+=sizeof(sqlrserverbindvartype_t);
+
+		// copy in the data format element size
+		*((uint32_t *)ptr)=inbind->valuesize;
+		ptr+=sizeof(uint32_t);
+
 		if (pvt->_debugbulkload) {
 			stdoutput.printf("	%.*s - %d(%d)\n",
 						inbind->variablesize,
@@ -5943,7 +5970,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 	pvt->_bulkclientshm=
 		(unsigned char *)pvt->_bulkclientshmem->getPointer();
 
-	// get error tables, maxerrorcount, and query from shared memory
+	// get error tables
 	const unsigned char	*ptr=pvt->_bulkclientshm;
 
 	pvt->_bulkerrortable1=(const char *)ptr;
@@ -5954,10 +5981,16 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 	ptr+=charstring::length(ptr);
 	ptr++;
 
+	// get max error count
 	pvt->_bulkmaxerrorcount=*((uint64_t *)ptr);
 	ptr+=sizeof(uint64_t);
 
+	// get query
 	pvt->_bulkquery=(const char *)ptr;
+	ptr+=pvt->_maxquerysize+1;
+
+	// get data format definitions
+	pvt->_bulkdataformat=(const unsigned char *)ptr;
 
 	// clear bulk data lists
 	pvt->_bulkdata.clear();
@@ -6022,9 +6055,7 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 				pvt->_bulkquery,
 				charstring::length(pvt->_bulkquery),
 				true,true,true)) {
-		// FIXME: or should we get the exact error from the cursor?
-		setError(SQLR_ERROR_BULKLOADEXECUTE_PREPARE_QUERY_STRING,
-				SQLR_ERROR_BULKLOADEXECUTE_PREPARE_QUERY,true);
+		saveErrorFromCursor(pvt->_bulkcursor);
 		success=false;
 	}
 
@@ -6158,20 +6189,20 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 								cur,colindex);
 
 				// set the bind type from the column type
-				if (isNumberTypeInt(type)) {
-					if (isFloatTypeInt(type)) {
-						inbind->type=
-						SQLRSERVERBINDVARTYPE_DOUBLE;
-					} else {
-						inbind->type=
-						SQLRSERVERBINDVARTYPE_INTEGER;
-					}
-				} else if (isBinaryTypeInt(type)) {
+				// (the order of these tests is import, eg.
+				// floats are numbers and dates are binary)
+				if (isFloatTypeInt(type)) {
 					inbind->type=
-						SQLRSERVERBINDVARTYPE_BLOB;
+						SQLRSERVERBINDVARTYPE_DOUBLE;
+				} else if (isNumberTypeInt(type)) {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_INTEGER;
 				} else if (isDateTimeTypeInt(type)) {
 					inbind->type=
 						SQLRSERVERBINDVARTYPE_DATE;
+				} else if (isBinaryTypeInt(type)) {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_BLOB;
 				} else {
 					inbind->type=
 						SQLRSERVERBINDVARTYPE_STRING;
@@ -6344,30 +6375,61 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 							uint64_t datalen) {
 
-	// FIXME: this expects a very specific format...
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bind row {\n",process::getProcessId());
 	}
 
+	// get the number of data format elements...
+	const unsigned char	*ptr=pvt->_bulkdataformat;
+	uint16_t		formatcount=*((uint16_t *)ptr);
+	ptr+=sizeof(uint16_t);
+
+	// get the input bind count and input binds
 	uint16_t		inbindcount=getInputBindCount(pvt->_bulkcursor);
 	sqlrserverbindvar	*inbinds=getInputBinds(pvt->_bulkcursor);
+	memorypool		*bindpool=getBindPool(pvt->_bulkcursor);
 
-	for (uint16_t i=0; i<inbindcount; i++) {
+	uint16_t formatindex=0;
+	uint16_t inbindindex=0;
+	for (;;) {
+
+		// get the format element type
+		sqlrserverbindvartype_t	type=*((sqlrserverbindvartype_t *)ptr);
+		ptr+=sizeof(sqlrserverbindvartype_t);
+
+		// get the format element size
+		uint32_t	size=*((uint32_t *)ptr);
+		ptr+=sizeof(uint32_t);
 		
-		// skip the delimiter
-		data++;
-
-		sqlrserverbindvar	*inbind=&(inbinds[i]);
-
-		// get the value
-		const unsigned char	*val=data;
-		inbind->valuesize=0;
-
-		// skip until next delimiter
-		while (*data!='|') {
-			inbind->valuesize++;
-			data++;
+		// skip delimiters and newlines
+		if (type==SQLRSERVERBINDVARTYPE_DELIMITER ||
+				type==SQLRSERVERBINDVARTYPE_NEWLINE) {
+			if (pvt->_debugbulkload) {
+				if (type==SQLRSERVERBINDVARTYPE_DELIMITER) {
+					stdoutput.printf(
+						"	delimiter: %.*s\n",
+						size,data);
+				}
+				if (type==SQLRSERVERBINDVARTYPE_NEWLINE) {
+					stdoutput.printf("	newline\n");
+				}
+			}
+			formatindex++;
+			data+=size;
+			continue;
 		}
+
+		// for now we only support static-length strings
+		if (type!=SQLRSERVERBINDVARTYPE_STRING) {
+			// FIXME: set error...
+			break;
+		}
+
+		// get the bind value
+		sqlrserverbindvar	*inbind=&(inbinds[inbindindex]);
+		const unsigned char	*val=data;
+		inbind->valuesize=size;
+		data+=size;
 
 		if (pvt->_debugbulkload) {
 			stdoutput.printf("	%.*s (%d): ",
@@ -6376,15 +6438,13 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 						inbind->type);
 		}
 
+		char	*temp=NULL;
 		switch (inbind->type) {
 
-			case SQLRSERVERBINDVARTYPE_NULL:
-				inbind->isnull=nullBindValue();
-				break;
-
 			case SQLRSERVERBINDVARTYPE_STRING:
+			case SQLRSERVERBINDVARTYPE_BLOB:
+			case SQLRSERVERBINDVARTYPE_CLOB:
 				inbind->value.stringval=(char *)val;
-				inbind->isnull=nonNullBindValue();
 				if (pvt->_debugbulkload) {
 					stdoutput.printf("(%d) ",
 						inbind->valuesize);
@@ -6404,13 +6464,133 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 				}
 				break;
 
-			// FIXME: support other bind types...
 			case SQLRSERVERBINDVARTYPE_DOUBLE:
+				{
+				temp=charstring::duplicate(
+					(char *)val,inbind->valuesize);
+				inbind->value.doubleval.value=
+					charstring::toFloat(temp);
+				inbind->value.doubleval.precision=
+					inbind->valuesize-
+					((inbind->value.
+						doubleval.value<0)?1:0);
+				const char	*dot=
+					charstring::findFirst(temp,'.');
+				if (dot) {
+					inbind->value.doubleval.
+							precision--;
+					dot++;
+					inbind->value.doubleval.scale=
+						temp+inbind->valuesize-dot;
+				} else {
+					inbind->value.
+						doubleval.scale=0;
+				}
+				delete[] temp;
+				if (pvt->_debugbulkload) {
+					stdoutput.printf("%*.*f\n",
+						inbind->value.
+							doubleval.precision,
+						inbind->value.
+							doubleval.scale,
+						inbind->value.
+							doubleval.value);
+				}
+				}
+				break;
+
 			case SQLRSERVERBINDVARTYPE_DATE:
-			case SQLRSERVERBINDVARTYPE_BLOB:
-			case SQLRSERVERBINDVARTYPE_CLOB:
+				{
+				temp=charstring::duplicate(
+					(char *)val,inbind->valuesize);
+				charstring::bothTrim(temp);
+
+				// copy out the timezone
+				// (and null terminate the date before it)
+				char	*firstspace=
+					charstring::findFirst(temp," ");
+				char	*lastspace=
+					charstring::findLast(temp," ");
+				if (lastspace && lastspace!=firstspace) {
+					const char	*tz=lastspace+1;
+					inbind->value.dateval.tz=
+						(char *)bindpool->allocate(
+						temp+inbind->valuesize-tz+1);
+					charstring::copy(inbind->value.
+								dateval.tz,tz);
+					*lastspace='\0';
+				} else {
+					inbind->value.dateval.tz=NULL;
+				}
+
+				// FIXME: this assumes ISO-ish date/time format
+				// but who knows what we'll actually get, the
+				// ddmm, yyyyddmm, and delimiter parameters need
+				// to be configurable...
+				if (!parseDateTime(
+						temp,
+						false,
+						false,
+						"-",
+						&inbind->value.dateval.year,
+						&inbind->value.dateval.month,
+						&inbind->value.dateval.day,
+						&inbind->value.dateval.hour,
+						&inbind->value.dateval.minute,
+						&inbind->value.dateval.second,
+						&inbind->value.dateval.
+								microsecond,
+						&inbind->value.dateval.
+								isnegative)) {
+					// FIXME: what if this fails?
+				}
+				delete[] temp;
+
+				// allocate enough space to store the date/time
+				// string or whatever buffer a child might need
+				// to store a date 512 bytes ought to be enough
+				inbind->value.dateval.buffersize=512;
+				inbind->value.dateval.buffer=
+					(char *)bindpool->
+						allocate(inbind->value.dateval.
+								buffersize);
+
+				if (pvt->_debugbulkload) {
+					stdoutput.printf(
+						"%04hd-%02hd-%02hd "
+						"%02hd:%02hd:%02hd.%06d %s\n",
+						inbind->value.dateval.year,
+						inbind->value.dateval.month,
+						inbind->value.dateval.day,
+						inbind->value.dateval.hour,
+						inbind->value.dateval.minute,
+						inbind->value.dateval.second,
+						inbind->value.dateval.
+								microsecond,
+						((inbind->value.dateval.tz)?
+							inbind->value.
+								dateval.tz:""));
+				}
+				}
+
 			default:
 				break;
+		}
+
+		if (type==SQLRSERVERBINDVARTYPE_NULL) {
+			inbind->isnull=nullBindValue();
+		} else {
+			inbind->isnull=nonNullBindValue();
+		}
+
+		// move on
+		inbindindex++;
+		if (inbindindex==inbindcount) {
+			break;
+		}
+		formatindex++;
+		if (formatindex==formatcount) {
+			break;
 		}
 	}
 
