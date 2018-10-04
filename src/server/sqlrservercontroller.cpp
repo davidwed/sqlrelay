@@ -368,7 +368,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_decrypteddbpassword=NULL;
 
 	pvt->_debugsql=false;
-	pvt->_debugbulkload=true;
+	pvt->_debugbulkload=false;
 	pvt->_debugsqlrparser=false;
 	pvt->_debugsqlrdirectives=false;
 	pvt->_debugsqlrtranslations=false;
@@ -537,6 +537,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_maxerrorlength=pvt->_cfg->getMaxErrorLength();
 	pvt->_idleclienttimeout=pvt->_cfg->getIdleClientTimeout();
 	pvt->_debugsql=pvt->_cfg->getDebugSql();
+	pvt->_debugbulkload=pvt->_cfg->getDebugBulkLoad();
 
 	// get password encryptions
 	domnode	*pwdencs=pvt->_cfg->getPasswordEncryptions();

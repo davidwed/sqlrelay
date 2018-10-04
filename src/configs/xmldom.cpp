@@ -75,6 +75,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getDeniedIps();
 		const char	*getDebug();
 		bool		getDebugSql();
+		bool		getDebugBulkLoad();
 		bool		getDebugErrors();
 		bool		getDebugParser();
 		bool		getDebugDirectives();
@@ -206,6 +207,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*deniedips;
 		const char	*debug;
 		bool		debugsql;
+		bool		debugbulkload;
 		bool		debugparser;
 		bool		debugdirectives;
 		bool		debugtranslations;
@@ -345,6 +347,7 @@ void sqlrconfig_xmldom::init() {
 	deniedips=DEFAULT_DENIEDIPS;
 	debug=DEFAULT_DEBUG;
 	debugsql=hasDebug(debug,"sql");
+	debugbulkload=hasDebug(debug,"bulkload");
 	debugparser=hasDebug(debug,"parser");
 	debugdirectives=hasDebug(debug,"directives");
 	debugtranslations=hasDebug(debug,"translations");
@@ -576,6 +579,10 @@ const char *sqlrconfig_xmldom::getDebug() {
 
 bool sqlrconfig_xmldom::getDebugSql() {
 	return debugsql;
+}
+
+bool sqlrconfig_xmldom::getDebugBulkLoad() {
+	return debugbulkload;
 }
 
 bool sqlrconfig_xmldom::getDebugParser() {
@@ -1757,6 +1764,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	if (!attr->isNullNode()) {
 		debug=attr->getValue();
 		debugsql=hasDebug(debug,"sql");
+		debugbulkload=hasDebug(debug,"bulkload");
 		debugparser=hasDebug(debug,"parser");
 		debugdirectives=hasDebug(debug,"directives");
 		debugtranslations=hasDebug(debug,"translations");
