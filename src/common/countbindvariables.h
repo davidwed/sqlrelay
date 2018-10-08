@@ -33,13 +33,17 @@ static uint16_t countBindVariables(const char *query) {
 		// character was something that might come before a bind
 		// variable then we must have found a bind variable.
 		// count ?, :, @, $ separately
+		//
+		// NOTE that mysql allows @@'s in column names
+		// (eg. select @@version_comment limit 1) so if we find one of
+		// those, we must ignore it.
 		if (!inquotes &&
 			character::inSet(lastchar," \t\n\r=<>,(+-*/%|&!~^")) {
 			if (*ptr=='?') {
 				questionmarkcount++;
 			} else if (*ptr==':') {
 				coloncount++;
-			} else if (*ptr=='@') {
+			} else if (*ptr=='@' && *(ptr+1)!='@') {
 				atsigncount++;
 			} else if (*ptr=='$') {
 				dollarsigncount++;

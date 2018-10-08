@@ -1310,6 +1310,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 					bool resultsetheaderhasbeentranslated);
 		bool	getResultSetHeaderHasBeenTranslated();
 
+		unsigned char	*getModuleData();
+
 		sqlrserverconnection	*conn;
 
 	#include <sqlrelay/private/sqlrservercursor.h>

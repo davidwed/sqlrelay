@@ -15,6 +15,7 @@ LIBSQLRSERVERSRCS = \
 	sqlrfilters.cpp \
 	sqlrfilter.cpp \
 	sqlrbindvariabletranslations.cpp \
+	sqlrbindvariabletranslation.cpp \
 	sqlrresultsettranslations.cpp \
 	sqlrresultsettranslation.cpp \
 	sqlrresultsetrowtranslations.cpp \
@@ -57,6 +58,7 @@ LIBSQLRSERVERLOBJS = \
 	sqlrfilters.$(OBJ) \
 	sqlrfilter.$(OBJ) \
 	sqlrbindvariabletranslations.$(OBJ) \
+	sqlrbindvariabletranslation.$(OBJ) \
 	sqlrresultsettranslations.$(OBJ) \
 	sqlrresultsettranslation.$(OBJ) \
 	sqlrresultsetrowtranslations.$(OBJ) \

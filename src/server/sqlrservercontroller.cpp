@@ -3529,7 +3529,7 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 				"========================================\n\n");
 		stdoutput.printf("translating bind variables:\n");
 	}
-	if (pvt->_sqlrbvt) {
+	if (pvt->_sqlrbvt && cursor->getInputBindCount()) {
 		pvt->_sqlrbvt->run(pvt->_conn,cursor);
 	}
 

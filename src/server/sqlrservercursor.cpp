@@ -103,6 +103,9 @@ class sqlrservercursorprivate {
 		bool		_executerpc;
 
 		bool		_resultsetheaderhasbeentranslated;
+
+
+		unsigned char	_moduledata[1024];
 };
 
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
@@ -1493,4 +1496,8 @@ void sqlrservercursor::setResultSetHeaderHasBeenTranslated(
 
 bool sqlrservercursor::getResultSetHeaderHasBeenTranslated() {
 	return pvt->_resultsetheaderhasbeentranslated;
+}
+
+unsigned char *sqlrservercursor::getModuleData() {
+	return pvt->_moduledata;
 }

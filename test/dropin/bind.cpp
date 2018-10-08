@@ -69,11 +69,16 @@ int	main(int argc, char **argv) {
 		} else {
 			host="127.0.0.1";
 		}
-		db="testdb";
-		port="3306";
-		socket="/var/lib/mysql/mysql.sock";
-		user="testuser";
-		password="testpassword";
+		//db="testdb";
+		db="dbtest_enc";
+		//port="3306";
+		port="6033";
+		//socket="/var/lib/mysql/mysql.sock";
+		socket=NULL;
+		//user="testuser";
+		//password="testpassword";
+		user="secured";
+		password="pwd4secured";
 	}
 
 
@@ -108,7 +113,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("mysql_stmt_init:\n");
 	MYSQL_STMT	*stmt=mysql_stmt_init(&mysql);
 
-	stdoutput.printf("mysql_stmt_prepare/execute: select with binds\n");
+	stdoutput.printf("mysql_stmt_prepare\n");
 	const char	*query="select ?,?,?,?,?,?,?,?,?,?,?,?,?,?";
 	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
 	MYSQL_BIND	bind[14];
@@ -257,16 +262,23 @@ int	main(int argc, char **argv) {
 	bind[13].is_null=&bindisnull[13];
 
 	checkSuccess(mysql_stmt_bind_param(stmt,bind),0);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_execute\n");
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	/*checkSuccess(mysql_stmt_fetch(stmt),0);
+	#ifdef LIBMARIADB
+	checkSuccess(mysql_stmt_fetch(stmt),100);
+	#endif
+	stdoutput.printf("\n");
+	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
 	#ifdef LIBMARIADB
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
-	checkSuccess(mysql_stmt_execute(stmt),0);
-	checkSuccess(mysql_stmt_fetch(stmt),0);
-	#ifdef LIBMARIADB
-	checkSuccess(mysql_stmt_fetch(stmt),100);
-	#endif
+	stdoutput.printf("\n");
+	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
 	#ifdef LIBMARIADB
@@ -277,7 +289,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_close:\n");
 	checkSuccess(mysql_stmt_close(stmt),0);
-	stdoutput.printf("\n");
+	stdoutput.printf("\n");*/
 
 
 	mysql_close(&mysql);
