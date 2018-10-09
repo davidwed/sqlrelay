@@ -5,14 +5,14 @@
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
-class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation_test :
-					public sqlrresultsetrowtranslation {
+class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation_test :
+				public sqlrresultsetrowblocktranslation {
 	public:
-			sqlrresultsetrowtranslation_test(
+			sqlrresultsetrowblocktranslation_test(
 					sqlrservercontroller *cont,
-					sqlrresultsetrowtranslations *rs,
+					sqlrresultsetrowblocktranslations *rs,
 					domnode *parameters);
-			~sqlrresultsetrowtranslation_test();
+			~sqlrresultsetrowblocktranslation_test();
 		bool	setRow(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						uint32_t colcount,
@@ -34,52 +34,56 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation_test :
 						bool **nulls);
 };
 
-sqlrresultsetrowtranslation_test::
-	sqlrresultsetrowtranslation_test(
+sqlrresultsetrowblocktranslation_test::
+	sqlrresultsetrowblocktranslation_test(
 				sqlrservercontroller *cont,
-				sqlrresultsetrowtranslations *rs,
+				sqlrresultsetrowblocktranslations *rs,
 				domnode *parameters) :
-		sqlrresultsetrowtranslation(cont,rs,parameters) {
+		sqlrresultsetrowblocktranslation(cont,rs,parameters) {
 }
 
-sqlrresultsetrowtranslation_test::
-	~sqlrresultsetrowtranslation_test() {
+sqlrresultsetrowblocktranslation_test::
+	~sqlrresultsetrowblocktranslation_test() {
 }
 
-bool sqlrresultsetrowtranslation_test::setRow(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
-						uint32_t colcount,
-						const char * const *fieldnames,
-						const char **fields,
-						uint64_t *fieldlengths,
-						bool *blobs,
-						bool *nulls) {
+bool sqlrresultsetrowblocktranslation_test::setRow(
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames,
+					const char **fields,
+					uint64_t *fieldlengths,
+					bool *blobs,
+					bool *nulls) {
 	return true;
 }
 
-bool sqlrresultsetrowtranslation_test::run(sqlrserverconnection *sqlrcon,
+bool sqlrresultsetrowblocktranslation_test::run(
+					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
 					const char * const *fieldnames) {
 	return true;
 }
 
-bool sqlrresultsetrowtranslation_test::getRow(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
-						uint32_t colcount,
-						const char ***fields,
-						uint64_t **fieldlengths,
-						bool **blobs,
-						bool **nulls) {
+bool sqlrresultsetrowblocktranslation_test::getRow(
+					sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char ***fields,
+					uint64_t **fieldlengths,
+					bool **blobs,
+					bool **nulls) {
 	return true;
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation
-			*new_sqlrresultsetrowtranslation_test(
+	SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation
+			*new_sqlrresultsetrowblocktranslation_test(
 					sqlrservercontroller *cont,
-					sqlrresultsetrowtranslations *rs,
+					sqlrresultsetrowblocktranslations *rs,
 					domnode *parameters) {
-		return new sqlrresultsetrowtranslation_test(cont,rs,parameters);
+		return new sqlrresultsetrowblocktranslation_test(
+							cont,rs,parameters);
 	}
 }
