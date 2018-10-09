@@ -386,7 +386,7 @@ void printerror(const char *error) {
 int ucslen(const char *str) {
 	const char	*ptr=str;
 	int		res=0;
-	while (!(*ptr==0 && *(ptr+1)==0)) {
+	while (*ptr && *(ptr+1)) {
 		res++;
 		ptr+=2;
 	}
@@ -2140,11 +2140,9 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			return true;
 		}
 
-		char *query_ucs=conv_to_ucs((char*)query);
+		char *query_ucs=conv_to_ucs((char*)query,length);
 		erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-		if (query_ucs) {
-			delete[] query_ucs;
-		}
+		delete[] query_ucs;
 	} else {
 	#endif
 		if (getExecuteDirect()) {
@@ -2192,11 +2190,9 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			// FIXME: really should do this before every execute too
 			buffers.clearAndArrayDelete();
 
-			char *query_ucs=conv_to_ucs((char*)query);
+			char *query_ucs=conv_to_ucs((char*)query,length);
 			erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-			if (query_ucs) {
-				delete[] query_ucs;
-			}
+			delete[] query_ucs;
 		} else {
 		#endif
 			erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -2796,7 +2792,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	if (getExecuteDirect()) {
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
-			char	*queryucs=conv_to_ucs((char*)query);
+			char	*queryucs=conv_to_ucs((char*)query,length);
 			erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
 			delete[] queryucs;
 		} else {

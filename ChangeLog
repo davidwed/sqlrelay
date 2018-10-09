@@ -5,6 +5,7 @@
 	added bulk load framework
 	added bind variable translation framework
 	fixed countBindVariables to ignore @@'s
+	odbc passes length to unicode-conversion routine now, when it can
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class

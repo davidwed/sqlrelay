@@ -69,16 +69,11 @@ int	main(int argc, char **argv) {
 		} else {
 			host="127.0.0.1";
 		}
-		//db="testdb";
-		db="dbtest_enc";
-		//port="3306";
-		port="6033";
-		//socket="/var/lib/mysql/mysql.sock";
-		socket=NULL;
-		//user="testuser";
-		//password="testpassword";
-		user="secured";
-		password="pwd4secured";
+		db="testdb";
+		port="3306";
+		socket="/var/lib/mysql/mysql.sock";
+		user="testuser";
+		password="testpassword";
 	}
 
 
