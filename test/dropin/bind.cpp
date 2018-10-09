@@ -266,7 +266,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
-	/*checkSuccess(mysql_stmt_fetch(stmt),0);
+	checkSuccess(mysql_stmt_fetch(stmt),0);
 	#ifdef LIBMARIADB
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
@@ -289,7 +289,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_close:\n");
 	checkSuccess(mysql_stmt_close(stmt),0);
-	stdoutput.printf("\n");*/
+	stdoutput.printf("\n");
 
 
 	mysql_close(&mysql);
