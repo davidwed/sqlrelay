@@ -256,9 +256,9 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 
 		stringbuffer	errormsg;
 
-		// FIXME: this is only used to store converted
-		// input bind strings and should be renamed
-		singlylinkedlist<char *>	buffers;
+		#ifdef HAVE_SQLCONNECTW
+		singlylinkedlist<char *>	ucsinbindstrings;
+		#endif
 
 		odbcconnection	*odbcconn;
 };
@@ -2059,7 +2059,9 @@ odbccursor::~odbccursor() {
 	delete[] inoutisnullptr;
 	delete[] outisnull;
 	delete[] inoutisnull;
-	buffers.clearAndArrayDelete();
+	#ifdef HAVE_SQLCONNECTW
+	ucsinbindstrings.clearAndArrayDelete();
+	#endif
 	deallocateResultSetBuffers();
 }
 
@@ -2133,9 +2135,9 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		// free allocated buffers
-		// FIXME: really should do this before every execute too
-		buffers.clearAndArrayDelete();
+
+		ucsinbindstrings.clearAndArrayDelete();
+
 		if (getExecuteDirect()) {
 			return true;
 		}
@@ -2186,9 +2188,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
-			// free allocated buffers
-			// FIXME: really should do this before every execute too
-			buffers.clearAndArrayDelete();
+
+			ucsinbindstrings.clearAndArrayDelete();
 
 			char *query_ucs=conv_to_ucs((char*)query,length);
 			erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
@@ -2240,7 +2241,7 @@ bool odbccursor::inputBind(const char *variable,
 	if (odbcconn->unicode) {
 		char	*value_ucs=conv_to_ucs((char*)value,valuesize);
 		valuesize=ucslen(value_ucs)*2;
-		buffers.append(value_ucs);
+		ucsinbindstrings.append(value_ucs);
 		val=(SQLPOINTER)value_ucs;
 		valtype=SQL_C_WCHAR;
 	} else {
@@ -2804,6 +2805,12 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	} else {
 		erg=SQLExecute(stmt);
 	}
+
+	#ifdef HAVE_SQLCONNECTW
+		// free buffers used to convert string-binds to unicode
+		ucsinbindstrings.clearAndArrayDelete();
+	#endif
+
 	if (erg!=SQL_SUCCESS &&
 			erg!=SQL_SUCCESS_WITH_INFO
 			#if defined(SQL_NO_DATA)
