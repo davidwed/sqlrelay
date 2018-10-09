@@ -386,7 +386,7 @@ void printerror(const char *error) {
 int ucslen(const char *str) {
 	const char	*ptr=str;
 	int		res=0;
-	while (*ptr && *(ptr+1)) {
+	while (*ptr || *(ptr+1)) {
 		res++;
 		ptr+=2;
 	}
@@ -2155,11 +2155,15 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	}
 	#endif
 
-	if (odbcconn->getcolumntables) {
+	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
 
-		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-			return false;
-		}
+	if (!handleColumns(true,false)) {
+		return false;
+	}
+
+	if (odbcconn->getcolumntables) {
 
 		// (continued from above)
 		//
@@ -2178,10 +2182,6 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		//
 		// Arguably this should be controlled by a directive on a
 		// query-by-query basis like execute-direct is.
-
-		if (!handleColumns(true,false)) {
-			return false;
-		}
 		if (!allocateStatementHandle()) {
 			return false;
 		}
@@ -2286,9 +2286,6 @@ bool odbccursor::inputBind(const char *variable,
 				val,
 				valuesize,
 				NULL);
-	}
-	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
-		stdoutput.printf("bind failed\n");
 	}
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
@@ -2824,16 +2821,10 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 
 	checkForTempTable(query,length);
 
-	if (odbcconn->getcolumntables && !getExecuteDirect()) {
-		// if we're getting column tables then we already
-		// did the first half of this in prepareQuery()
-		if (!handleColumns(false,true)) {
-			return false;
-		}
-	} else {
-		if (!handleColumns(true,true)) {
-			return false;
-		}
+	// if we're not exec-direct'ing then we already
+	// did the first half of this in prepareQuery()
+	if (!handleColumns(getExecuteDirect(),true)) {
+		return false;
 	}
 
 	// get the row count
