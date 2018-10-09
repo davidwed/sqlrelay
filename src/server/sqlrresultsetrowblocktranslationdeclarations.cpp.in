@@ -1,0 +1,5 @@
+sqlrresultsetrowblocktranslation
+		*new_sqlrresultsetrowblocktranslation_@module@(
+					sqlrservercontroller *cont,
+					sqlrresultsetrowblocktranslations *rs,
+					domnode *parameters);
