@@ -353,6 +353,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_sqlrd=NULL;
 	pvt->_sqlrt=NULL;
 	pvt->_sqlrf=NULL;
+	pvt->_sqlrbvt=NULL;
 	pvt->_sqlrrst=NULL;
 	pvt->_sqlrrsrt=NULL;
 	pvt->_sqlrrsrbt=NULL;
@@ -450,6 +451,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_sqlrd;
 	delete pvt->_sqlrt;
 	delete pvt->_sqlrf;
+	delete pvt->_sqlrbvt;
 	delete pvt->_sqlrrst;
 	delete pvt->_sqlrrsrt;
 	delete pvt->_sqlrrsrbt;
