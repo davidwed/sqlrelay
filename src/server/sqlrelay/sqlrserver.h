@@ -689,16 +689,30 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	bulkLoadBegin(const char *table,
 					const char *errortable1,
 					const char *errortable2,
-					uint64_t maxerrorcount);
+					uint64_t maxerrorcount,
+					bool droperrortables);
 		bool	bulkLoadCheckpoint(const char *id);
 		bool	bulkLoadPrepareQuery(const char *query,
 						uint64_t querylen,
 						uint16_t inbindcount,
 						sqlrserverbindvar *inbinds);
+		bool	bulkLoadCreateErrorTables(const char *query,
+						uint64_t querylen,
+						const char *errortable1,
+						const char *errortable2);
+		bool	bulkLoadCreateErrorTable1(sqlrservercursor *cursor,
+						const char *query,
+						uint64_t querylen,
+						const char *errortable1);
+		bool	bulkLoadCreateErrorTable2(sqlrservercursor *cursor,
+						const char *query,
+						uint64_t querylen,
+						const char *errortable2);
 		bool	bulkLoadJoin(const char *table);
 		bool	bulkLoadInputBind(const unsigned char *data,
 						uint64_t datalen);
 		void	bulkLoadParseInsert(const char *query,
+						uint64_t querylen,
 						char **table,
                                                 linkedlist<char *> *cols,
                                                 linkedlist<char *> *binds);
@@ -707,7 +721,14 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	bulkLoadBindRow(const unsigned char *data,
 						uint64_t datalen);
 		void	bulkLoadError();
+		bool	bulkLoadStoreError(int64_t errorcode,
+						const char *error,
+						uint32_t errorlength,
+						const char *errortable1,
+						const char *errortable2);
 		bool	bulkLoadEnd();
+		bool	bulkLoadDropErrorTables(const char *errortable1,
+						const char *errortable2);
 
 		// cursor state
 		void			setState(sqlrservercursor *cursor,

@@ -267,6 +267,8 @@ class sqlrservercontrollerprivate {
 	const char		*_bulkerrortable1;
 	const char		*_bulkerrortable2;
 	uint64_t		_bulkmaxerrorcount;
+	uint64_t		_bulkdroperrortables;
+	uint64_t		_bulkquerylen;
 	const char		*_bulkquery;
 	const unsigned char	*_bulkdataformat;
 	singlylinkedlist<const unsigned char *>	_bulkdata;
@@ -415,6 +417,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_bulkerrortable1=NULL;
 	pvt->_bulkerrortable2=NULL;
 	pvt->_bulkmaxerrorcount=0;
+	pvt->_bulkquerylen=0;
 	pvt->_bulkquery=NULL;
 	pvt->_bulkdataformat=NULL;
 
@@ -5775,7 +5778,11 @@ sqlrparser *sqlrservercontroller::newParser() {
 bool sqlrservercontroller::bulkLoadBegin(const char *id,
 						const char *errortable1,
 						const char *errortable2,
-						uint64_t maxerrorcount) {
+						uint64_t maxerrorcount,
+						bool droperrortables) {
+
+	// FIXME: validate "errortable1" for safety
+	// FIXME: validate "errortable2" for safety
 
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load begin:\n"
@@ -5783,11 +5790,15 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 						process::getProcessId(),id);
 		stdoutput.printf("		error table 1: \"%s\"\n"
 				"		error table 2: \"%s\"\n"
-				"		max error count: %lld\n",
-						errortable1,
-						errortable2,
-						maxerrorcount);
+				"		max error count: %lld\n"
+				"		drop error tables: %s\n",
+				errortable1,
+				errortable2,
+				maxerrorcount,
+				(droperrortables)?"yes":"no");
 	}
+
+	// FIXME: bail if error tables already exist
 
 	// get an md5 sum of the id
 	// use this rather than using the id directly because:
@@ -5820,6 +5831,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	uint64_t	shmsize=charstring::length(errortable1)+1+
 				charstring::length(errortable2)+1+
 				sizeof(uint64_t)+
+				sizeof(bool)+
 				pvt->_maxquerysize+1+
 				sizeof(uint16_t)+
 				pvt->_maxbindcount*
@@ -5839,16 +5851,19 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 		(unsigned char *)pvt->_bulkservershmem->getPointer();
 	bytestring::zero(pvt->_bulkservershm,pvt->_maxquerysize+1);
 
-	// put error tables and maxerrorcount in shared memory
+	// put error tables, maxerrorcount,
+	// and drop error tables flag in shared memory
 	unsigned char	*ptr=pvt->_bulkservershm;
 
 	uint64_t	len=charstring::length(errortable1);
+	pvt->_bulkerrortable1=(const char *)ptr;
 	bytestring::copy(ptr,errortable1,len);
 	ptr+=len;
 	*ptr='\0';
 	ptr++;
 
 	len=charstring::length(errortable2);
+	pvt->_bulkerrortable2=(const char *)ptr;
 	bytestring::copy(ptr,errortable2,len);
 	ptr+=len;
 	*ptr='\0';
@@ -5857,9 +5872,12 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	bytestring::copy(ptr,&maxerrorcount,sizeof(uint64_t));
 	ptr+=sizeof(uint64_t);
 
-	pvt->_bulkservershmquery=ptr;
+	bytestring::copy(ptr,&droperrortables,sizeof(bool));
+	ptr+=sizeof(bool);
 
-	pvt->_bulkservershmdataformat=ptr+pvt->_maxquerysize+1;
+	// get positions for query and data format
+	pvt->_bulkservershmquery=ptr;
+	pvt->_bulkservershmdataformat=ptr+sizeof(uint64_t)+pvt->_maxquerysize+1;
 
 	return true;
 }
@@ -5897,9 +5915,19 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 		return false;
 	}
 
-	// put the query in shared memory
-	bytestring::copy(pvt->_bulkservershmquery,query,querylen);
-	pvt->_bulkservershmquery[querylen]='\0';
+	// create error tables
+	if (!bulkLoadCreateErrorTables(query,querylen,
+					pvt->_bulkerrortable1,
+					pvt->_bulkerrortable2)) {
+		return false;
+	}
+
+	// put the query length and query in shared memory
+	unsigned char	*qptr=pvt->_bulkservershmquery;
+	*((uint64_t *)qptr)=querylen;
+	qptr+=sizeof(uint64_t);
+	bytestring::copy(qptr,query,querylen);
+	qptr[querylen]='\0';
 
 	// put the data format in shared memory...
 	ptr=(const char *)pvt->_bulkservershmdataformat;
@@ -5931,6 +5959,153 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 	}
 
 	return true;
+}
+
+bool sqlrservercontroller::bulkLoadCreateErrorTables(
+					const char *query,
+					uint64_t querylen,
+					const char *errortable1,
+					const char *errortable2) {
+
+	bool	retval=false;
+	sqlrservercursor	*cursor=newCursor();
+	if (open(cursor)) {
+		retval=bulkLoadCreateErrorTable1(
+				cursor,query,querylen,errortable1) &&
+			bulkLoadCreateErrorTable2(
+				cursor,query,querylen,errortable2);
+	}
+	close(cursor);
+	deleteCursor(cursor);
+
+	return retval;
+}
+
+bool sqlrservercontroller::bulkLoadCreateErrorTable1(
+					sqlrservercursor *cursor,
+					const char *query,
+					uint64_t querylen,
+					const char *errortable1) {
+
+	// FIXME: this is right for teradata, but not right in general...
+	// teradata doesn't allow DDL inside of a
+	// tx unless it's the last thing in the tx
+	bool	wasintx=inTransaction();
+	if (wasintx) {
+		prepareQuery(cursor,"ET",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+
+		prepareQuery(cursor,"BT",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+	}
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load create error table: %s\n",
+					process::getProcessId(),errortable1);
+	}
+
+	// FIXME: this needs to be overridable per-connection
+
+	const char	*errortable1query=
+			"create table %s ("
+			"	ErrorCode integer,"
+			"	ErrorFieldName varchar(120),"
+			"	DataParcel varbyte(64000)"
+			")";
+
+	bool	retval=true;
+	stringbuffer	str;
+	str.writeFormatted(errortable1query,errortable1);
+	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
+							!executeQuery(cursor)) {
+		saveErrorFromCursor(cursor);
+		retval=false;
+	}
+	closeResultSet(cursor);
+
+	// FIXME: this is right for teradata, but not right in general...
+	// teradata doesn't allow DDL inside of a
+	// tx unless it's the last thing in the tx
+	if (wasintx) {
+		prepareQuery(cursor,"ET",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+
+		prepareQuery(cursor,"BT",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+		pvt->_intransaction=true;
+	}
+
+	return retval;
+}
+
+bool sqlrservercontroller::bulkLoadCreateErrorTable2(
+					sqlrservercursor *cursor,
+					const char *query,
+					uint64_t querylen,
+					const char *errortable2) {
+
+	// FIXME: this is right for teradata, but not right in general...
+	// teradata doesn't allow DDL inside of a
+	// tx unless it's the last thing in the tx
+	bool	wasintx=inTransaction();
+	if (wasintx) {
+		prepareQuery(cursor,"ET",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+
+		prepareQuery(cursor,"BT",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+	}
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load create error table: %s\n",
+					process::getProcessId(),errortable2);
+	}
+
+	// FIXME: this needs to be overridable per-connection
+	// and the default implementation needs to construct a create table
+	// from scratch, not relying on create table ... as select ... as this
+	// isn't supported by all db's
+
+
+	// get the table name from the query...
+	char	*table=NULL;
+	bulkLoadParseInsert(query,querylen,&table,NULL,NULL);
+
+	const char	*errortable2query=
+			"create table %s as (select * from %s) with no data";
+
+	bool	retval=true;
+	stringbuffer	str;
+	str.writeFormatted(errortable2query,errortable2,table);
+	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
+							!executeQuery(cursor)) {
+		saveErrorFromCursor(cursor);
+		retval=false;
+	}
+	closeResultSet(cursor);
+	delete[] table;
+
+	// FIXME: this is right for teradata, but not right in general...
+	// teradata doesn't allow DDL inside of a
+	// tx unless it's the last thing in the tx
+	if (wasintx) {
+		prepareQuery(cursor,"ET",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+
+		prepareQuery(cursor,"BT",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+		pvt->_intransaction=true;
+	}
+
+	return retval;
 }
 
 bool sqlrservercontroller::bulkLoadJoin(const char *table) {
@@ -5988,7 +6163,13 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 	pvt->_bulkmaxerrorcount=*((uint64_t *)ptr);
 	ptr+=sizeof(uint64_t);
 
-	// get query
+	// get drop error tables flag
+	pvt->_bulkdroperrortables=*((bool *)ptr);
+	ptr+=sizeof(bool);
+
+	// get query length and query
+	pvt->_bulkquerylen=*((uint64_t *)ptr);
+	ptr+=sizeof(uint64_t);
 	pvt->_bulkquery=(const char *)ptr;
 	ptr+=pvt->_maxquerysize+1;
 
@@ -6003,11 +6184,14 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 		stdoutput.printf("		error table 1: \"%s\"\n"
 				"		error table 2: \"%s\"\n"
 				"		max error count: %lld\n"
-				"		query:\n%s\n",
-						pvt->_bulkerrortable1,
-						pvt->_bulkerrortable2,
-						pvt->_bulkmaxerrorcount,
-						pvt->_bulkquery);
+				"		drop error tables : %s\n"
+				"		query:\n%.*s\n",
+				pvt->_bulkerrortable1,
+				pvt->_bulkerrortable2,
+				pvt->_bulkmaxerrorcount,
+				(pvt->_bulkdroperrortables)?"yes":"no",
+				pvt->_bulkquerylen,
+				pvt->_bulkquery);
 	}
 
 	return true;
@@ -6055,9 +6239,9 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 
 	// prepare the query
 	if (success && !prepareQuery(pvt->_bulkcursor,
-				pvt->_bulkquery,
-				charstring::length(pvt->_bulkquery),
-				true,true,true)) {
+					pvt->_bulkquery,
+					pvt->_bulkquerylen,
+					true,true,true)) {
 		saveErrorFromCursor(pvt->_bulkcursor);
 		success=false;
 	}
@@ -6111,11 +6295,13 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 
 void sqlrservercontroller::bulkLoadInitBinds() {
 
-	// get the table and column names from the query...
+	// get the table, column names, and binds from the query...
 	char			*table=NULL;
 	linkedlist<char *>	cols;
 	linkedlist<char *>	binds;
-	bulkLoadParseInsert(pvt->_bulkquery,&table,&cols,&binds);
+	bulkLoadParseInsert(pvt->_bulkquery,
+				pvt->_bulkquerylen,
+				&table,&cols,&binds);
 
 	// map columns to binds (if we actually have columns)
 	dictionary<char *, char *>	bindtocol;
@@ -6221,6 +6407,8 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 		}
 
 		closeResultSet(cur);
+	} else {
+		// FIXME: error...
 	}
 	close(cur);
 	deleteCursor(cur);
@@ -6232,12 +6420,13 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 }
 
 void sqlrservercontroller::bulkLoadParseInsert(const char *query,
+						uint64_t querylen,
 						char **table,
 						linkedlist<char *> *cols,
 						linkedlist<char *> *binds) {
 
 	// get query end
-	const char	*queryend=query+charstring::length(query);
+	const char	*queryend=query+querylen;
 
 	// skip whitespace and comments
 	const char	*ptr=skipWhitespaceAndComments(query);
@@ -6279,8 +6468,10 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 	}
 
 	// return the table
-	// FIXME: make "table" safe to append to "select * from"
-	*table=charstring::duplicate(start,ptr-start);
+	if (table) {
+		// FIXME: make "table" safe to substitute into a query
+		*table=charstring::duplicate(start,ptr-start);
+	}
 
 	// FIXME: Some db's (teradata) don't require a values keyword.
 	// If it is missing then the parenthesized list following the
@@ -6311,13 +6502,15 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 		}
 
 		// parse out columns
-		char		**parts;
-		uint64_t	partcount;
-		charstring::split(start,ptr-start,
-					",",false,&parts,&partcount);
-		for (uint64_t i=0; i<partcount; i++) {
-			charstring::bothTrim(parts[i]);
-			cols->append(parts[i]);
+		if (cols) {
+			char		**parts;
+			uint64_t	partcount;
+			charstring::split(start,ptr-start,
+						",",false,&parts,&partcount);
+			for (uint64_t i=0; i<partcount; i++) {
+				charstring::bothTrim(parts[i]);
+				cols->append(parts[i]);
+			}
 		}
 	}
 
@@ -6365,13 +6558,15 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 		}
 
 		// parse out binds
-		char		**parts;
-		uint64_t	partcount;
-		charstring::split(start,ptr-start,
-					",",false,&parts,&partcount);
-		for (uint64_t i=0; i<partcount; i++) {
-			charstring::bothTrim(parts[i]);
-			binds->append(parts[i]);
+		if (binds) {
+			char		**parts;
+			uint64_t	partcount;
+			charstring::split(start,ptr-start,
+						",",false,&parts,&partcount);
+			for (uint64_t i=0; i<partcount; i++) {
+				charstring::bothTrim(parts[i]);
+				binds->append(parts[i]);
+			}
 		}
 	}
 }
@@ -6614,14 +6809,63 @@ void sqlrservercontroller::bulkLoadError() {
 			pvt->_maxerrorlength,
 			&errorlength,&errnum,&liveconnection);
 
-	// FIXME: store the error in pvt->_bulkerrortable1/pvt->bulkerrortable2
-
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load error\n%d\n%.*s\n",
 					process::getProcessId(),
 					errnum,errorlength,
 					pvt->_bulkcursor->getErrorBuffer());
 	}
+
+	// store the error
+	if (!bulkLoadStoreError(errnum,
+				pvt->_bulkcursor->getErrorBuffer(),
+				errorlength,
+				pvt->_bulkerrortable1,
+				pvt->_bulkerrortable2)) {
+		// FIXME: error...
+	}
+}
+
+bool sqlrservercontroller::bulkLoadStoreError(int64_t errorcode,
+						const char *error,
+						uint32_t errorlength,
+						const char *bulkerrortable1,
+						const char *bulkerrortable2) {
+
+	// FIXME: this needs to be overridable per-connection
+
+	// FIXME: reuse a cursor...
+	sqlrservercursor	*cur=newCursor();
+	if (open(cur)) {
+
+		// insert into errortable1...
+
+		// FIXME: use binds...
+		const char	*errorquery=
+				"insert into %s values (%lld,'%s','%s')";
+		stringbuffer	query;
+		query.writeFormatted(errorquery,
+					bulkerrortable1,
+					errorcode,
+					// FIXME: get the column somehow
+					"bad_column",
+					// FIXME: get the data somehow
+					"bad_data");
+		// FIXME: get correct data somehow
+
+		if (!prepareQuery(cur,query.getString(),
+					query.getStringLength()) ||
+					!executeQuery(cur)) {
+			// FIXME: error...
+		}
+		closeResultSet(cur);
+
+		// FIXME: insert into errortable2...
+	}
+	close(cur);
+	deleteCursor(cur);
+
+	return true;
 }
 
 bool sqlrservercontroller::bulkLoadEnd() {
@@ -6629,6 +6873,13 @@ bool sqlrservercontroller::bulkLoadEnd() {
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load end\n",
 					process::getProcessId());
+	}
+
+	if (pvt->_bulkdroperrortables) {
+		if (!bulkLoadDropErrorTables(pvt->_bulkerrortable1,
+						pvt->_bulkerrortable2)) {
+			// FIXME: error...
+		}
 	}
 
 	// delete shared memory
@@ -6643,6 +6894,14 @@ bool sqlrservercontroller::bulkLoadEnd() {
 	}
 	pvt->_bulkserveridfilename=NULL;
 
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadDropErrorTables(
+					const char *errortable1,
+					const char *errortable2) {
+	// FIXME: implement this...
+	// this needs to be overridable per-connection
 	return true;
 }
 
