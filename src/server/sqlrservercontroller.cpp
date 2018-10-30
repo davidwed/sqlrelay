@@ -6851,7 +6851,6 @@ bool sqlrservercontroller::bulkLoadStoreError(int64_t errorcode,
 					"bad_column",
 					// FIXME: get the data somehow
 					"bad_data");
-		// FIXME: get correct data somehow
 
 		if (!prepareQuery(cur,query.getString(),
 					query.getStringLength()) ||
