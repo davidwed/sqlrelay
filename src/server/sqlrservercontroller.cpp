@@ -264,8 +264,8 @@ class sqlrservercontrollerprivate {
 	sharedmemory		*_bulkclientshmem;
 	unsigned char		*_bulkclientshm;
 	sqlrservercursor	*_bulkcursor;
-	const char		*_bulkerrortable1;
-	const char		*_bulkerrortable2;
+	const char		*_bulkerrorfieldtable;
+	const char		*_bulkerrorrowtable;
 	uint64_t		_bulkmaxerrorcount;
 	uint64_t		_bulkdroperrortables;
 	uint64_t		_bulkquerylen;
@@ -414,8 +414,8 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_bulkclientshmem=NULL;
 	pvt->_bulkclientshm=NULL;
 	pvt->_bulkcursor=NULL;
-	pvt->_bulkerrortable1=NULL;
-	pvt->_bulkerrortable2=NULL;
+	pvt->_bulkerrorfieldtable=NULL;
+	pvt->_bulkerrorrowtable=NULL;
 	pvt->_bulkmaxerrorcount=0;
 	pvt->_bulkquerylen=0;
 	pvt->_bulkquery=NULL;
@@ -4864,7 +4864,7 @@ uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
 			pvt->_columnmap->getList()->getLength():colcount;
 }
 
-void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
+bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 						const char *name,
 						uint32_t index,
 						const char **field,
@@ -4880,16 +4880,20 @@ void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 
 	// run translations
 	if (pvt->_sqlrrst) {
-		pvt->_sqlrrst->run(pvt->_conn,cursor,
-					name,index,field,fieldlength);
+		if (!pvt->_sqlrrst->run(pvt->_conn,cursor,
+					name,index,field,fieldlength)) {
+			// FIXME: return an error somehow
+			return false;
+		}
 	}
 
 	if (pvt->_debugsqlrresultsettranslation) {
 		stdoutput.printf("translated:\n%.*s\n\n",*fieldlength,*field);
 	}
+	return true;
 }
 
-void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
+bool sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 						uint32_t colcount,
 						const char * const *names,
 						const char ***fields,
@@ -4907,8 +4911,11 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 
 	// run translations
 	if (pvt->_sqlrrsrt) {
-		pvt->_sqlrrsrt->run(pvt->_conn,cursor,colcount,
-					names,fields,fieldlengths);
+		if (!pvt->_sqlrrsrt->run(pvt->_conn,cursor,colcount,
+						names,fields,fieldlengths)) {
+			// FIXME: return an error somehow
+			return false;
+		}
 	}
 
 	if (pvt->_debugsqlrresultsetrowtranslation) {
@@ -4917,9 +4924,10 @@ void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 					(*fieldlengths)[i],(*fields)[i]);
 		}
 	}
+	return true;
 }
 
-void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
+bool sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 						uint32_t index,
 						const char *field,
 						uint64_t fieldlength,
@@ -4935,7 +4943,7 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	// ignore non-date fields, if specified
 	if (ignorenondatetime &&
 		!isDateTimeTypeInt(getColumnType(cursor,index))) {
-		return;
+		return true;
 	}
 
 	// This weirdness is mainly to address a FreeTDS/MSSQL
@@ -4959,7 +4967,7 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 				&year,&month,&day,
 				&hour,&minute,&second,
 				&microsecond,&isnegative)) {
-		return;
+		return false;
 	}
 
 	// decide which format to use based on what parts
@@ -4988,6 +4996,8 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	// set return values
 	*newfield=pvt->_reformattedfield;
 	*newfieldlength=pvt->_reformattedfieldlength;
+
+	return true;
 }
 
 void sqlrservercontroller::closeAllResultSets() {
@@ -5776,13 +5786,13 @@ sqlrparser *sqlrservercontroller::newParser() {
 }
 
 bool sqlrservercontroller::bulkLoadBegin(const char *id,
-						const char *errortable1,
-						const char *errortable2,
+						const char *errorfieldtable,
+						const char *errorrowtable,
 						uint64_t maxerrorcount,
 						bool droperrortables) {
 
-	// FIXME: validate "errortable1" for safety
-	// FIXME: validate "errortable2" for safety
+	// FIXME: validate "errorfieldtable" for safety
+	// FIXME: validate "errorrowtable" for safety
 
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load begin:\n"
@@ -5792,8 +5802,8 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 				"		error table 2: \"%s\"\n"
 				"		max error count: %lld\n"
 				"		drop error tables: %s\n",
-				errortable1,
-				errortable2,
+				errorfieldtable,
+				errorrowtable,
 				maxerrorcount,
 				(droperrortables)?"yes":"no");
 	}
@@ -5828,8 +5838,8 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	}
 
 	// calculate shared memory segment size
-	uint64_t	shmsize=charstring::length(errortable1)+1+
-				charstring::length(errortable2)+1+
+	uint64_t	shmsize=charstring::length(errorfieldtable)+1+
+				charstring::length(errorrowtable)+1+
 				sizeof(uint64_t)+
 				sizeof(bool)+
 				pvt->_maxquerysize+1+
@@ -5855,16 +5865,16 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// and drop error tables flag in shared memory
 	unsigned char	*ptr=pvt->_bulkservershm;
 
-	uint64_t	len=charstring::length(errortable1);
-	pvt->_bulkerrortable1=(const char *)ptr;
-	bytestring::copy(ptr,errortable1,len);
+	uint64_t	len=charstring::length(errorfieldtable);
+	pvt->_bulkerrorfieldtable=(const char *)ptr;
+	bytestring::copy(ptr,errorfieldtable,len);
 	ptr+=len;
 	*ptr='\0';
 	ptr++;
 
-	len=charstring::length(errortable2);
-	pvt->_bulkerrortable2=(const char *)ptr;
-	bytestring::copy(ptr,errortable2,len);
+	len=charstring::length(errorrowtable);
+	pvt->_bulkerrorrowtable=(const char *)ptr;
+	bytestring::copy(ptr,errorrowtable,len);
 	ptr+=len;
 	*ptr='\0';
 	ptr++;
@@ -5917,8 +5927,8 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 
 	// create error tables
 	if (!bulkLoadCreateErrorTables(query,querylen,
-					pvt->_bulkerrortable1,
-					pvt->_bulkerrortable2)) {
+					pvt->_bulkerrorfieldtable,
+					pvt->_bulkerrorrowtable)) {
 		return false;
 	}
 
@@ -5964,16 +5974,16 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 bool sqlrservercontroller::bulkLoadCreateErrorTables(
 					const char *query,
 					uint64_t querylen,
-					const char *errortable1,
-					const char *errortable2) {
+					const char *errorfieldtable,
+					const char *errorrowtable) {
 
 	bool	retval=false;
 	sqlrservercursor	*cursor=newCursor();
 	if (open(cursor)) {
 		retval=bulkLoadCreateErrorTable1(
-				cursor,query,querylen,errortable1) &&
+				cursor,query,querylen,errorfieldtable) &&
 			bulkLoadCreateErrorTable2(
-				cursor,query,querylen,errortable2);
+				cursor,query,querylen,errorrowtable);
 	}
 	close(cursor);
 	deleteCursor(cursor);
@@ -5985,7 +5995,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable1(
 					sqlrservercursor *cursor,
 					const char *query,
 					uint64_t querylen,
-					const char *errortable1) {
+					const char *errorfieldtable) {
 
 	// FIXME: this is right for teradata, but not right in general...
 	// teradata doesn't allow DDL inside of a
@@ -6003,12 +6013,13 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable1(
 
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load create error table: %s\n",
-					process::getProcessId(),errortable1);
+							process::getProcessId(),
+							errorfieldtable);
 	}
 
 	// FIXME: this needs to be overridable per-connection
 
-	const char	*errortable1query=
+	const char	*errorfieldtablequery=
 			"create table %s ("
 			"	ErrorCode integer,"
 			"	ErrorFieldName varchar(120),"
@@ -6017,7 +6028,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable1(
 
 	bool	retval=true;
 	stringbuffer	str;
-	str.writeFormatted(errortable1query,errortable1);
+	str.writeFormatted(errorfieldtablequery,errorfieldtable);
 	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
 							!executeQuery(cursor)) {
 		saveErrorFromCursor(cursor);
@@ -6046,7 +6057,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable2(
 					sqlrservercursor *cursor,
 					const char *query,
 					uint64_t querylen,
-					const char *errortable2) {
+					const char *errorrowtable) {
 
 	// FIXME: this is right for teradata, but not right in general...
 	// teradata doesn't allow DDL inside of a
@@ -6064,7 +6075,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable2(
 
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load create error table: %s\n",
-					process::getProcessId(),errortable2);
+					process::getProcessId(),errorrowtable);
 	}
 
 	// FIXME: this needs to be overridable per-connection
@@ -6077,12 +6088,12 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable2(
 	char	*table=NULL;
 	bulkLoadParseInsert(query,querylen,&table,NULL,NULL);
 
-	const char	*errortable2query=
+	const char	*errorrowtablequery=
 			"create table %s as (select * from %s) with no data";
 
 	bool	retval=true;
 	stringbuffer	str;
-	str.writeFormatted(errortable2query,errortable2,table);
+	str.writeFormatted(errorrowtablequery,errorrowtable,table);
 	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
 							!executeQuery(cursor)) {
 		saveErrorFromCursor(cursor);
@@ -6151,11 +6162,11 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 	// get error tables
 	const unsigned char	*ptr=pvt->_bulkclientshm;
 
-	pvt->_bulkerrortable1=(const char *)ptr;
+	pvt->_bulkerrorfieldtable=(const char *)ptr;
 	ptr+=charstring::length(ptr);
 	ptr++;
 
-	pvt->_bulkerrortable2=(const char *)ptr;
+	pvt->_bulkerrorrowtable=(const char *)ptr;
 	ptr+=charstring::length(ptr);
 	ptr++;
 
@@ -6186,8 +6197,8 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 				"		max error count: %lld\n"
 				"		drop error tables : %s\n"
 				"		query:\n%.*s\n",
-				pvt->_bulkerrortable1,
-				pvt->_bulkerrortable2,
+				pvt->_bulkerrorfieldtable,
+				pvt->_bulkerrorrowtable,
 				pvt->_bulkmaxerrorcount,
 				(pvt->_bulkdroperrortables)?"yes":"no",
 				pvt->_bulkquerylen,
@@ -6820,8 +6831,8 @@ void sqlrservercontroller::bulkLoadError() {
 	if (!bulkLoadStoreError(errnum,
 				pvt->_bulkcursor->getErrorBuffer(),
 				errorlength,
-				pvt->_bulkerrortable1,
-				pvt->_bulkerrortable2)) {
+				pvt->_bulkerrorfieldtable,
+				pvt->_bulkerrorrowtable)) {
 		// FIXME: error...
 	}
 }
@@ -6829,8 +6840,8 @@ void sqlrservercontroller::bulkLoadError() {
 bool sqlrservercontroller::bulkLoadStoreError(int64_t errorcode,
 						const char *error,
 						uint32_t errorlength,
-						const char *bulkerrortable1,
-						const char *bulkerrortable2) {
+						const char *bulkerrorfieldtable,
+						const char *bulkerrorrowtable) {
 
 	// FIXME: this needs to be overridable per-connection
 
@@ -6838,14 +6849,14 @@ bool sqlrservercontroller::bulkLoadStoreError(int64_t errorcode,
 	sqlrservercursor	*cur=newCursor();
 	if (open(cur)) {
 
-		// insert into errortable1...
+		// insert into errorfieldtable...
 
 		// FIXME: use binds...
 		const char	*errorquery=
 				"insert into %s values (%lld,'%s','%s')";
 		stringbuffer	query;
 		query.writeFormatted(errorquery,
-					bulkerrortable1,
+					bulkerrorfieldtable,
 					errorcode,
 					// FIXME: get the column somehow
 					"bad_column",
@@ -6859,7 +6870,7 @@ bool sqlrservercontroller::bulkLoadStoreError(int64_t errorcode,
 		}
 		closeResultSet(cur);
 
-		// FIXME: insert into errortable2...
+		// FIXME: insert into errorrowtable...
 	}
 	close(cur);
 	deleteCursor(cur);
@@ -6875,8 +6886,8 @@ bool sqlrservercontroller::bulkLoadEnd() {
 	}
 
 	if (pvt->_bulkdroperrortables) {
-		if (!bulkLoadDropErrorTables(pvt->_bulkerrortable1,
-						pvt->_bulkerrortable2)) {
+		if (!bulkLoadDropErrorTables(pvt->_bulkerrorfieldtable,
+						pvt->_bulkerrorrowtable)) {
 			// FIXME: error...
 		}
 	}
@@ -6897,8 +6908,8 @@ bool sqlrservercontroller::bulkLoadEnd() {
 }
 
 bool sqlrservercontroller::bulkLoadDropErrorTables(
-					const char *errortable1,
-					const char *errortable2) {
+					const char *errorfieldtable,
+					const char *errorrowtable) {
 	// FIXME: implement this...
 	// this needs to be overridable per-connection
 	return true;
@@ -8621,8 +8632,11 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 			}
 
 			// run the translators
-			pvt->_sqlrrsrbt->run(cursor->conn,cursor,
-						colcount,pvt->_fieldnames);
+			if (!pvt->_sqlrrsrbt->run(cursor->conn,cursor,
+						colcount,pvt->_fieldnames)) {
+				// FIXME: return an error somehow
+				return false;
+			}
 		}
 
 		// get the row from the translators
@@ -8632,6 +8646,7 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 						&(pvt->_fieldlengths),
 						&(pvt->_blobs),
 						&(pvt->_nulls))) {
+			// FIXME: return an error somehow
 			return false;
 		}
 
@@ -8671,8 +8686,11 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 	}
 
 	// reformat the row
-	reformatRow(cursor,colcount,pvt->_fieldnames,
-				&(pvt->_fields),&(pvt->_fieldlengths));
+	if (!reformatRow(cursor,colcount,pvt->_fieldnames,
+				&(pvt->_fields),&(pvt->_fieldlengths))) {
+		// FIXME: return an error somehow
+		return false;
+	}
 
 	// bump total rows fetched
 	cursor->incrementTotalRowsFetched();
@@ -8700,7 +8718,10 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 	*null=pvt->_nulls[actualcol];
 
 	// reformat the field
-	reformatField(cursor,pvt->_fieldnames[col],col,field,fieldlength);
+	if (!reformatField(cursor,pvt->_fieldnames[col],
+					col,field,fieldlength)) {
+		// FIXME: return an error somehow
+	}
 }
 
 bool sqlrservercontroller::getLobFieldLength(sqlrservercursor *cursor,

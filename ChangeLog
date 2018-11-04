@@ -1,7 +1,7 @@
 1.4.1 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
 	made skipWhitespaceAndComments NULL-safe
-	disabled call to mysql_stmt_reset() to improve api=stmt performance
+	mysql_stmt_reset() called when needed now, improves api=stmt performance
 	added bulk load framework
 	added bind variable translation framework
 	fixed countBindVariables to ignore @@'s

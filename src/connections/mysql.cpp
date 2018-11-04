@@ -153,6 +153,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		MYSQL_STMT	*stmt;
+		bool		stmtreset;
 		bool		stmtfreeresult;
 		bool		stmtpreparefailed;
 
@@ -771,6 +772,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
+	stmtreset=false;
 	stmtfreeresult=false;
 
 	boundvariables=false;
@@ -1249,6 +1251,12 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		// get the affected row count
 		affectedrows=mysql_stmt_affected_rows(stmt);
 
+		// reinit stmt reset flag
+		// (if there aren't any cols, then there aren't any rows)
+		if (ncols) {
+			stmtreset=true;
+		}
+
 	} else {
 #endif
 
@@ -1665,7 +1673,11 @@ bool mysqlcursor::noRowsToReturn() {
 bool mysqlcursor::fetchRow() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		return !mysql_stmt_fetch(stmt);
+		int	result=mysql_stmt_fetch(stmt);
+		if (result==MYSQL_NO_DATA) {
+			stmtreset=false;
+		}
+		return !result;
 	} else {
 #endif
 		return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
@@ -1784,7 +1796,10 @@ void mysqlcursor::closeResultSet() {
 		// makes me think that I need to call it.  All tests appear to
 		// work without it.  Other apps don't call it.  For now we'll
 		// comment it out.
-		//mysql_stmt_reset(stmt);
+		if (stmtreset) {
+			mysql_stmt_reset(stmt);
+			stmtreset=false;
+		}
 		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);
 			stmtfreeresult=false;
