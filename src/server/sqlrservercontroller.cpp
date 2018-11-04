@@ -4418,7 +4418,7 @@ bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
 
 		if (!cursor->skipRow()) {
 			raiseDebugMessageEvent("skipping rows hit the "
-					"end of the result set");
+						"end of the result set");
 			return false;
 		}
 
@@ -5272,7 +5272,8 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 			prepareQuery(gttcur,query,charstring::length(query)) &&
 			executeQuery(gttcur)) {
 
-			while (fetchRow(gttcur)) {
+			bool	error;
+			while (fetchRow(gttcur,&error)) {
 				getField(gttcur,0,
 					&tablename,&fieldlength,&blob,&null);
 				truncateTempTable(cursor,tablename);
@@ -8551,7 +8552,10 @@ bool sqlrservercontroller::skipRow(sqlrservercursor *cursor) {
 	return cursor->skipRow();
 }
 
-bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
+bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
+
+	// initialize error
+	*error=false;
 
 	// get arrays of field pointers,
 	// helpfully provided for us by the cursor
@@ -8635,6 +8639,7 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 			if (!pvt->_sqlrrsrbt->run(cursor->conn,cursor,
 						colcount,pvt->_fieldnames)) {
 				// FIXME: return an error somehow
+				*error=true;
 				return false;
 			}
 		}
@@ -8647,6 +8652,7 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 						&(pvt->_blobs),
 						&(pvt->_nulls))) {
 			// FIXME: return an error somehow
+			*error=true;
 			return false;
 		}
 
@@ -8689,6 +8695,7 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 	if (!reformatRow(cursor,colcount,pvt->_fieldnames,
 				&(pvt->_fields),&(pvt->_fieldlengths))) {
 		// FIXME: return an error somehow
+		*error=true;
 		return false;
 	}
 

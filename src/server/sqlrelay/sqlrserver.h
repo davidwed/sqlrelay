@@ -608,7 +608,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		skipRow(sqlrservercursor *cursor);
 		bool		skipRows(sqlrservercursor *cursor,
 							uint64_t rows);
-		bool		fetchRow(sqlrservercursor *cursor);
+		bool		fetchRow(sqlrservercursor *cursor, bool *error);
 		void		nextRow(sqlrservercursor *cursor);
 		uint64_t	getTotalRowsFetched(sqlrservercursor *cursor);
 		void		closeResultSet(sqlrservercursor *cursor);

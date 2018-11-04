@@ -3391,11 +3391,15 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 		// send the specified number of rows back
 		for (uint64_t i=0; (!fetch || i<fetch); i++) {
-			if (cont->fetchRow(cursor)) {
+			bool	error=false;
+			if (cont->fetchRow(cursor,&error)) {
 				returnRow(cursor);
 				// FIXME: kludgy
 				cont->nextRow(cursor);
 			} else {
+				if (error) {
+					// FIXME: handle error
+				}
 				clientsock->write((uint16_t)END_RESULT_SET);
 				break;
 			}
