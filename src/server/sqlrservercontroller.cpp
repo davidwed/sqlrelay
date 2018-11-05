@@ -8670,11 +8670,13 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 						&(pvt->_fields),
 						&(pvt->_fieldlengths),
 						&(pvt->_blobs),
-						&(pvt->_nulls)) &&
-				pvt->_sqlrrsrbt->getError()) {
-			*error=true;
-			setError(cursor,pvt->_sqlrrsrbt->getError(),
-				SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION,true);
+						&(pvt->_nulls))) {
+			if (pvt->_sqlrrsrbt->getError()) {
+				*error=true;
+				setError(cursor,pvt->_sqlrrsrbt->getError(),
+					SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION,
+					true);
+			}
 			return false;
 		}
 
