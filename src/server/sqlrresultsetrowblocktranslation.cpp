@@ -51,6 +51,10 @@ bool sqlrresultsetrowblocktranslation::getRow(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
+const char *sqlrresultsetrowblocktranslation::getError() {
+	return NULL;
+}
+
 sqlrresultsetrowblocktranslations *sqlrresultsetrowblocktranslation::
 					getResultSetRowBlockTranslations() {
 	return pvt->_rs;

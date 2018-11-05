@@ -2927,6 +2927,7 @@ bool sqlrservercontroller::applyDirectives(sqlrservercursor *cursor) {
 			stdoutput.printf("a directive failed\n");
 		}
 		// FIXME: raise directive failed event...
+		// FIXME: return an error somehow
 		return false;
 	}
 
@@ -2958,6 +2959,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 						query);
 		}
 		raiseTranslationFailureEvent(cursor,query);
+		// FIXME: return an error somehow
 		return false;
 	}
 
@@ -3535,7 +3537,9 @@ bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 		stdoutput.printf("translating bind variables:\n");
 	}
 	if (pvt->_sqlrbvt && cursor->getInputBindCount()) {
-		pvt->_sqlrbvt->run(pvt->_conn,cursor);
+		if (!pvt->_sqlrbvt->run(pvt->_conn,cursor)) {
+			// FIXME: return an error somehow
+		}
 	}
 
 	sqlrserverbindvar	*bind=NULL;
@@ -4883,6 +4887,8 @@ bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 		if (!pvt->_sqlrrst->run(pvt->_conn,cursor,
 					name,index,field,fieldlength)) {
 			// FIXME: return an error somehow
+			//setError(cursor,pvt->_sqlrrst->getError(),
+				//SQLR_ERROR_RESULTSETTRANSLATION,true);
 			return false;
 		}
 	}
@@ -4914,6 +4920,8 @@ bool sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 		if (!pvt->_sqlrrsrt->run(pvt->_conn,cursor,colcount,
 						names,fields,fieldlengths)) {
 			// FIXME: return an error somehow
+			//setError(cursor,pvt->_sqlrrsrt->getError(),
+				//SQLR_ERROR_RESULTSETROWTRANSLATION,true);
 			return false;
 		}
 	}
@@ -8519,26 +8527,28 @@ void sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
 	}
 
 	if (pvt->_sqlrrsht) {
-		pvt->_sqlrrsht->run(pvt->_conn,
-				cursor,colcount,
-				&pvt->_columnnames,
-				&pvt->_columnnamelengths,
-				&pvt->_columntypes,
-				&pvt->_columntypenames,
-				&pvt->_columntypenamelengths,
-				&pvt->_columnlengths,
-				&pvt->_columnprecisions,
-				&pvt->_columnscales,
-				&pvt->_columnisnullables,
-				&pvt->_columnisprimarykeys,
-				&pvt->_columnisuniques,
-				&pvt->_columnispartofkeys,
-				&pvt->_columnisunsigneds,
-				&pvt->_columniszerofilleds,
-				&pvt->_columnisbinarys,
-				&pvt->_columnisautoincrements,
-				&pvt->_columntables,
-				&pvt->_columntablelengths);
+		if (!pvt->_sqlrrsht->run(pvt->_conn,
+					cursor,colcount,
+					&pvt->_columnnames,
+					&pvt->_columnnamelengths,
+					&pvt->_columntypes,
+					&pvt->_columntypenames,
+					&pvt->_columntypenamelengths,
+					&pvt->_columnlengths,
+					&pvt->_columnprecisions,
+					&pvt->_columnscales,
+					&pvt->_columnisnullables,
+					&pvt->_columnisprimarykeys,
+					&pvt->_columnisuniques,
+					&pvt->_columnispartofkeys,
+					&pvt->_columnisunsigneds,
+					&pvt->_columniszerofilleds,
+					&pvt->_columnisbinarys,
+					&pvt->_columnisautoincrements,
+					&pvt->_columntables,
+					&pvt->_columntablelengths)) {
+			// FIXME: return an error somehow
+		}
 	}
 
 	cursor->setResultSetHeaderHasBeenTranslated(true);
@@ -8625,21 +8635,31 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 				}
 
 				// send the row to the translators
-				pvt->_sqlrrsrbt->setRow(cursor->conn,
+				if (!pvt->_sqlrrsrbt->setRow(
+							cursor->conn,
 							cursor,
 							colcount,
 							pvt->_fieldnames,
 							pvt->_fields,
 							pvt->_fieldlengths,
 							pvt->_blobs,
-							pvt->_nulls);
+							pvt->_nulls)) {
+					*error=true;
+					setError(cursor,
+						pvt->_sqlrrsrbt->getError(),
+					SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION,
+						true);
+					return false;
+				}
 			}
 
 			// run the translators
 			if (!pvt->_sqlrrsrbt->run(cursor->conn,cursor,
 						colcount,pvt->_fieldnames)) {
-				// FIXME: return an error somehow
 				*error=true;
+				setError(cursor,pvt->_sqlrrsrbt->getError(),
+					SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION,
+					true);
 				return false;
 			}
 		}
@@ -8651,8 +8671,9 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 						&(pvt->_fieldlengths),
 						&(pvt->_blobs),
 						&(pvt->_nulls))) {
-			// FIXME: return an error somehow
 			*error=true;
+			setError(cursor,pvt->_sqlrrsrbt->getError(),
+				SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION,true);
 			return false;
 		}
 
@@ -8694,7 +8715,6 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 	// reformat the row
 	if (!reformatRow(cursor,colcount,pvt->_fieldnames,
 				&(pvt->_fields),&(pvt->_fieldlengths))) {
-		// FIXME: return an error somehow
 		*error=true;
 		return false;
 	}

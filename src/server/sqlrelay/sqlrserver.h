@@ -2056,6 +2056,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation {
 					bool **blobs,
 					bool **nulls);
 
+		virtual const char	*getError();
+
 	protected:
 		sqlrresultsetrowblocktranslations
 					*getResultSetRowBlockTranslations();
@@ -2092,6 +2094,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslations {
 					uint64_t **fieldlengths,
 					bool **blobs,
 					bool **nulls);
+
+		const char	*getError();
 
 		void	endSession();
 

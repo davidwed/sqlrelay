@@ -35,6 +35,8 @@ class sqlrresultsetrowblocktranslationsprivate {
 
 		uint64_t		_rowblocksize;
 		uint64_t		_rowcount;
+
+		const char		*_error;
 };
 
 sqlrresultsetrowblocktranslations::sqlrresultsetrowblocktranslations(
@@ -45,6 +47,7 @@ sqlrresultsetrowblocktranslations::sqlrresultsetrowblocktranslations(
 	pvt->_debug=cont->getConfig()->getDebugResultSetRowBlockTranslations();
 	pvt->_rowblocksize=0;
 	pvt->_rowcount=0;
+	pvt->_error=NULL;
 }
 
 sqlrresultsetrowblocktranslations::~sqlrresultsetrowblocktranslations() {
@@ -231,6 +234,8 @@ bool sqlrresultsetrowblocktranslations::run(sqlrserverconnection *sqlrcon,
 						
 	debugFunction();
 
+	pvt->_error=NULL;
+
 	singlylinkedlistnode< sqlrresultsetrowblocktranslationplugin * >
 						*node=pvt->_tlist.getFirst();
 	if (!node) {
@@ -242,6 +247,7 @@ bool sqlrresultsetrowblocktranslations::run(sqlrserverconnection *sqlrcon,
 	}
 	if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,colcount,fieldnames)) {
 		pvt->_rowcount=0;
+		pvt->_error=node->getValue()->rstr->getError();
 		return false;
 	}
 
@@ -311,6 +317,7 @@ bool sqlrresultsetrowblocktranslations::run(sqlrserverconnection *sqlrcon,
 								colcount,
 								fieldnames)) {
 			pvt->_rowcount=0;
+			pvt->_error=node->getValue()->rstr->getError();
 			return false;
 		}
 	}
@@ -347,6 +354,10 @@ bool sqlrresultsetrowblocktranslations::getRow(sqlrserverconnection *sqlrcon,
 		return false;
 	}
 	return true;
+}
+
+const char *sqlrresultsetrowblocktranslations::getError() {
+	return pvt->_error;
 }
 
 void sqlrresultsetrowblocktranslations::endSession() {
