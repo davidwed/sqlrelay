@@ -1790,12 +1790,12 @@ void mysqlcursor::closeResultSet() {
 	if (usestmtprepare) {
 		boundvariables=false;
 		bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
-		// FIXME: not calling mysql_stmt_reset() improves performance
-		// by a factor of two.  I'm not sure why I was calling it to
-		// begin with.  There's nothing in the function description that
-		// makes me think that I need to call it.  All tests appear to
-		// work without it.  Other apps don't call it.  For now we'll
-		// comment it out.
+
+		// Reset the statement if we didn't fetch all rows, otherwise
+		// subsequent attempts to prepare the same stmt again fail with:
+		// "Commands out of sync; you can't run this command now."
+		// Don't just generally do this though, as it reduces
+		// performance by a factor of two.
 		if (stmtreset) {
 			mysql_stmt_reset(stmt);
 			stmtreset=false;
@@ -1806,9 +1806,9 @@ void mysqlcursor::closeResultSet() {
 		}
 
 		// In mariadb-client-lgpl_2.x, if a mysql_stmt_prepare fails,
-		// then subsequent attempts to prepare the same stmt again with:
-		// "Unknown prepared statement handler (27) given to
-		// mysqld_stmt_reset" unless the statement is close and
+		// then subsequent attempts to prepare the same stmt again fail
+		// with: "Unknown prepared statement handler (27) given to
+		// mysqld_stmt_reset" unless the statement is closed and
 		// reopened.
 		if (stmtpreparefailed) {
 			mysql_stmt_close(stmt);
