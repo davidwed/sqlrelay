@@ -28,9 +28,11 @@ class sqlrbindvariabletranslationsprivate {
 	private:
 		sqlrservercontroller	*_cont;
 
-		bool	_debug;
+		bool		_debug;
 
 		singlylinkedlist< sqlrbindvariabletranslationplugin * >	_tlist;
+
+		const char	*_error;
 };
 
 sqlrbindvariabletranslations::sqlrbindvariabletranslations(
@@ -40,6 +42,7 @@ sqlrbindvariabletranslations::sqlrbindvariabletranslations(
 	pvt=new sqlrbindvariabletranslationsprivate;
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugBindVariableTranslations();
+	pvt->_error=NULL;
 }
 
 sqlrbindvariabletranslations::~sqlrbindvariabletranslations() {
@@ -174,6 +177,8 @@ bool sqlrbindvariabletranslations::run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur) {
 	debugFunction();
 
+	pvt->_error=NULL;
+
 	for (singlylinkedlistnode< sqlrbindvariabletranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
@@ -183,10 +188,15 @@ bool sqlrbindvariabletranslations::run(sqlrserverconnection *sqlrcon,
 		}
 
 		if (!node->getValue()->bvtr->run(sqlrcon,sqlrcur)) {
+			pvt->_error=node->getValue()->bvtr->getError();
 			return false;
 		}
 	}
 	return true;
+}
+
+const char *sqlrbindvariabletranslations::getError() {
+	return pvt->_error;
 }
 
 void sqlrbindvariabletranslations::endSession() {

@@ -32,6 +32,10 @@ bool sqlrresultsetrowtranslation::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
+const char *sqlrresultsetrowtranslation::getError() {
+	return NULL;
+}
+
 sqlrresultsetrowtranslations *sqlrresultsetrowtranslation::
 					getResultSetRowTranslations() {
 	return pvt->_rs;

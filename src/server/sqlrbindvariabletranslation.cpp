@@ -28,6 +28,10 @@ bool sqlrbindvariabletranslation::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
+const char *sqlrbindvariabletranslation::getError() {
+	return NULL;
+}
+
 sqlrbindvariabletranslations *sqlrbindvariabletranslation::
 					getBindVariableTranslations() {
 	return pvt->_bvts;

@@ -102,9 +102,6 @@ class sqlrservercursorprivate {
 		bool		_executedirect;
 		bool		_executerpc;
 
-		bool		_resultsetheaderhasbeentranslated;
-
-
 		unsigned char	_moduledata[1024];
 };
 
@@ -207,8 +204,6 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_querytimeout=conn->cont->getQueryTimeout();
 	pvt->_executedirect=conn->cont->getExecuteDirect();
 	pvt->_executerpc=false;
-
-	pvt->_resultsetheaderhasbeentranslated=false;
 }
 
 sqlrservercursor::~sqlrservercursor() {
@@ -1487,15 +1482,6 @@ void sqlrservercursor::setExecuteRpc(bool executerpc) {
 
 bool sqlrservercursor::getExecuteRpc() {
 	return pvt->_executerpc;
-}
-
-void sqlrservercursor::setResultSetHeaderHasBeenTranslated(
-				bool resultsetheaderhasbeentranslated) {
-	pvt->_resultsetheaderhasbeentranslated=resultsetheaderhasbeentranslated;
-}
-
-bool sqlrservercursor::getResultSetHeaderHasBeenTranslated() {
-	return pvt->_resultsetheaderhasbeentranslated;
 }
 
 unsigned char *sqlrservercursor::getModuleData() {

@@ -47,6 +47,10 @@ bool sqlrresultsetheadertranslation::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
+const char *sqlrresultsetheadertranslation::getError() {
+	return NULL;
+}
+
 sqlrresultsetheadertranslations *sqlrresultsetheadertranslation::
 					getResultSetHeaderTranslations() {
 	return pvt->_rs;

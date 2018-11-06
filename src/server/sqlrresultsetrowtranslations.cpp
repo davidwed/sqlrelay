@@ -31,6 +31,8 @@ class sqlrresultsetrowtranslationsprivate {
 		bool		_debug;
 
 		singlylinkedlist< sqlrresultsetrowtranslationplugin * >	_tlist;
+
+		const char	*_error;
 };
 
 sqlrresultsetrowtranslations::sqlrresultsetrowtranslations(
@@ -39,6 +41,7 @@ sqlrresultsetrowtranslations::sqlrresultsetrowtranslations(
 	pvt=new sqlrresultsetrowtranslationsprivate;
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugResultSetRowTranslations();
+	pvt->_error=NULL;
 }
 
 sqlrresultsetrowtranslations::~sqlrresultsetrowtranslations() {
@@ -177,6 +180,8 @@ bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
 						uint64_t **fieldlengths) {
 	debugFunction();
 
+	pvt->_error=NULL;
+
 	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
@@ -188,10 +193,15 @@ bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
 						colcount,fieldnames,
 						fields,fieldlengths)) {
+			pvt->_error=node->getValue()->rstr->getError();
 			return false;
 		}
 	}
 	return true;
+}
+
+const char *sqlrresultsetrowtranslations::getError() {
+	return pvt->_error;
 }
 
 void sqlrresultsetrowtranslations::endSession() {

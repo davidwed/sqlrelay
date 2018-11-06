@@ -32,6 +32,8 @@ class sqlrresultsetheadertranslationsprivate {
 
 		singlylinkedlist
 			< sqlrresultsetheadertranslationplugin * >	_tlist;
+
+		const char	*_error;
 };
 
 sqlrresultsetheadertranslations::sqlrresultsetheadertranslations(
@@ -40,6 +42,7 @@ sqlrresultsetheadertranslations::sqlrresultsetheadertranslations(
 	pvt=new sqlrresultsetheadertranslationsprivate;
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugResultSetHeaderTranslations();
+	pvt->_error=NULL;
 }
 
 sqlrresultsetheadertranslations::~sqlrresultsetheadertranslations() {
@@ -198,6 +201,8 @@ bool sqlrresultsetheadertranslations::run(sqlrserverconnection *sqlrcon,
 					uint16_t **columntablelengths) {
 	debugFunction();
 
+	pvt->_error=NULL;
+
 	for (singlylinkedlistnode
 		< sqlrresultsetheadertranslationplugin * > *node=
 						pvt->_tlist.getFirst();
@@ -228,10 +233,15 @@ bool sqlrresultsetheadertranslations::run(sqlrserverconnection *sqlrcon,
 						columnisautoincrements,
 						columntables,
 						columntablelengths)) {
+			pvt->_error=node->getValue()->rstr->getError();
 			return false;
 		}
 	}
 	return true;
+}
+
+const char *sqlrresultsetheadertranslations::getError() {
+	return pvt->_error;
 }
 
 void sqlrresultsetheadertranslations::endSession() {

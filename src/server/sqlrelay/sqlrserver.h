@@ -596,7 +596,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							uint32_t col);
 		void		getColumnNameList(sqlrservercursor *cursor,
 							stringbuffer *output);
-		void		translateResultSetHeader(
+		bool		translateResultSetHeader(
 						sqlrservercursor *cursor);
 
 		// result set navigation
@@ -1327,10 +1327,6 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		void		setExecuteRpc(bool executerpc);
 		bool		getExecuteRpc();
 
-		void	setResultSetHeaderHasBeenTranslated(
-					bool resultsetheaderhasbeentranslated);
-		bool	getResultSetHeaderHasBeenTranslated();
-
 		unsigned char	*getModuleData();
 
 		sqlrserverconnection	*conn;
@@ -1929,6 +1925,8 @@ class SQLRSERVER_DLLSPEC sqlrbindvariabletranslation {
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur);
 
+		virtual const char	*getError();
+
 	protected:
 		sqlrbindvariabletranslations	*getBindVariableTranslations();
 		domnode				*getParameters();
@@ -1944,6 +1942,9 @@ class SQLRSERVER_DLLSPEC sqlrbindvariabletranslations {
 		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur);
+
+		const char	*getError();
+
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrbindvariabletranslations.h>
@@ -2003,6 +2004,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					const char ***fields,
 					uint64_t **fieldlengths);
 
+		virtual const char	*getError();
+
 	protected:
 		sqlrresultsetrowtranslations	*getResultSetRowTranslations();
 		domnode			*getParameters();
@@ -2022,6 +2025,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 						const char * const *fieldnames,
 						const char ***fields,
 						uint64_t **fieldlengths);
+
+		const char	*getError();
 
 		void	endSession();
 
@@ -2132,6 +2137,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation {
 					const char ***columntables,
 					uint16_t **columntablelengths);
 
+		virtual const char	*getError();
+
 	protected:
 		sqlrresultsetheadertranslations
 					*getResultSetHeaderTranslations();
@@ -2167,6 +2174,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslations {
 					uint16_t **columnisautoincrements,
 					const char ***columntables,
 					uint16_t **columntablelengths);
+
+		const char	*getError();
+
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsetheadertranslations.h>

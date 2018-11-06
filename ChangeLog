@@ -8,6 +8,7 @@
 	odbc passes length to unicode-conversion routine now, when it can
 	improved conversion of string bind variables to unicode in odbc
 	odbc gets column info after prepare (before execute) in call cases now
+	added error handling to translation frameworks
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class
