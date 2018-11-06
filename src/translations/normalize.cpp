@@ -138,6 +138,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	debugFunction();
 
 	if (!enabled) {
+		translatedquery->append(query);
 		return true;
 	}
 

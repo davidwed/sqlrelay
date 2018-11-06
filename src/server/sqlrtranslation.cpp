@@ -6,6 +6,7 @@
 class sqlrtranslationprivate {
 	friend class sqlrtranslation;
 	private:
+
 		sqlrtranslations	*_sqlts;
 		domnode		*_parameters;
 };
@@ -37,6 +38,10 @@ bool sqlrtranslation::run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				xmldom *querytree) {
 	return true;
+}
+
+const char *sqlrtranslation::getError() {
+	return NULL;
 }
 
 sqlrtranslations *sqlrtranslation::getTranslations() {

@@ -40,9 +40,13 @@ class sqlrtranslationsprivate {
 		xmldom		*_tree;
 		bool		_debug;
 
+		const char	*_error;
+
 		singlylinkedlist< sqlrtranslationplugin * >	_tlist;
 
 		memorypool	*_memorypool;
+
+		bool		_useoriginalonerror;
 
 		dictionary< sqlrdatabaseobject *, char * >	_tablenamemap;
 		dictionary< sqlrdatabaseobject *, char * >	_indexnamemap;
@@ -53,8 +57,10 @@ sqlrtranslations::sqlrtranslations(sqlrservercontroller *cont) {
 	pvt=new sqlrtranslationsprivate;
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugTranslations();
+	pvt->_error=NULL;
 	pvt->_tree=NULL;
 	pvt->_memorypool=new memorypool(0,128,100);
+	pvt->_useoriginalonerror=true;
 }
 
 sqlrtranslations::~sqlrtranslations() {
@@ -68,6 +74,12 @@ bool sqlrtranslations::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
+
+	// default to useoriginal-on-error
+	pvt->_useoriginalonerror=charstring::compareIgnoringCase(
+					parameters->getAttributeValue(
+							"useoriginalonerror"),
+					"no");
 
 	// run through the translation list
 	for (domnode *translation=parameters->getFirstTagChild();
@@ -183,7 +195,21 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 					stringbuffer *translatedquery) {
 	debugFunction();
 
-	if (!query || !translatedquery) {
+	pvt->_error=NULL;
+
+	if (!query) {
+		pvt->_error="query was empty or null";
+		if (pvt->_debug) {
+			stdoutput.printf("\n%s\n\n",pvt->_error);
+		}
+		return false;
+	}
+
+	if (!translatedquery) {
+		pvt->_error="buffer for translated query was null";
+		if (pvt->_debug) {
+			stdoutput.printf("\n%s\n\n",pvt->_error);
+		}
 		return false;
 	}
 
@@ -206,17 +232,18 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 		if (tr->usesTree()) {
 
 			if (!sqlrp) {
+				pvt->_error="translation requires query "
+						"tree but no parser available";
 				if (pvt->_debug) {
-					stdoutput.printf("\ntranslation "
-							"requires query tree "
-							"but no parser "
-							"available...\n\n");
+					stdoutput.printf("\n%s\n\n",
+							pvt->_error);
 				}
 				return false;
 			}
 
 			if (!pvt->_tree) {
 				if (!sqlrp->parse(query)) {
+					pvt->_error="parse-query failed";
 					sqlrcon->cont->
 						raiseParseFailureEvent(
 								sqlrcur,query);
@@ -235,6 +262,11 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 			}
 
 			if (!tr->run(sqlrcon,sqlrcur,pvt->_tree)) {
+				pvt->_error=tr->getError();
+				if (pvt->_debug) {
+					stdoutput.printf("\n%s\n\n",
+							pvt->_error);
+				}
 				return false;
 			}
 
@@ -243,6 +275,11 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 			if (pvt->_tree) {
 				if (!sqlrp->write(tempquerystr)) {
+					pvt->_error="write-query failed";
+					if (pvt->_debug) {
+						stdoutput.printf("\n%s\n\n",
+								pvt->_error);
+					}
 					return false;
 				}
 				pvt->_tree=NULL;
@@ -252,9 +289,12 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 						&tempquerystr2:&tempquerystr1;
 			}
 
-			bool	success=tr->run(sqlrcon,sqlrcur,
-						query,tempquerystr);
-			if (!success) {
+			if (!tr->run(sqlrcon,sqlrcur,query,tempquerystr)) {
+				pvt->_error=tr->getError();
+				if (pvt->_debug) {
+					stdoutput.printf("\n%s\n\n",
+							pvt->_error);
+				}
 				return false;
 			}
 
@@ -267,6 +307,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 	if (pvt->_tree) {
 		if (!sqlrp->write(translatedquery)) {
+			pvt->_error="final write-query failed";
 			if (pvt->_debug) {
 				stdoutput.printf("current query tree:\n");
 				if (pvt->_tree) {
@@ -274,7 +315,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 						write(&stdoutput,true);
 				}
 				stdoutput.printf("\n");
-				stdoutput.printf("\nfinal write failed\n\n");
+				stdoutput.printf("\n%s\n\n",pvt->_error);
 			}
 			return false;
 		}
@@ -298,6 +339,10 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 	}
 
 	return true;
+}
+
+const char *sqlrtranslations::getError() {
+	return pvt->_error;
 }
 
 sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
@@ -490,6 +535,10 @@ bool sqlrtranslations::removeReplacement(
 
 memorypool *sqlrtranslations::getMemoryPool() {
 	return pvt->_memorypool;
+}
+
+bool sqlrtranslations::getUseOriginalOnError() {
+	return pvt->_useoriginalonerror;
 }
 
 void sqlrtranslations::endSession() {

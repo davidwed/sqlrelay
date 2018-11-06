@@ -2954,13 +2954,17 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	translatedquery->clear();
 	if (!pvt->_sqlrt->run(pvt->_conn,cursor,
 				pvt->_sqlrp,query,translatedquery)) {
-		if (pvt->_debugsqlrtranslations) {
-			stdoutput.printf("translation failed, "
+		raiseTranslationFailureEvent(cursor,query);
+		if (pvt->_sqlrt->getUseOriginalOnError()) {
+			if (pvt->_debugsqlrtranslations) {
+				stdoutput.printf("translation failed, "
 						"using original:\n\"%s\"\n\n",
 						query);
+			}
+			return true;
 		}
-		raiseTranslationFailureEvent(cursor,query);
-		// FIXME: return an error somehow
+		setError(cursor,pvt->_sqlrt->getError(),
+				SQLR_ERROR_QUERYTRANSLATION,true);
 		return false;
 	}
 
@@ -3904,8 +3908,12 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	}
 
 	// translate query
-	if (enabletranslations && pvt->_sqlrt) {
-		translateQuery(cursor);
+	if (enabletranslations && pvt->_sqlrt &&
+				!translateQuery(cursor)) {
+
+		// log the query
+		raiseQueryEvent(cursor);
+		return false;
 	}
 
 	// translate bind variables
@@ -4078,8 +4086,12 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		}
 
 		// translate query
-		if (enabletranslations && pvt->_sqlrt) {
-			translateQuery(cursor);
+		if (enabletranslations && pvt->_sqlrt &&
+					!translateQuery(cursor)) {
+
+			// log the query
+			raiseQueryEvent(cursor);
+			return false;
 		}
 
 		// translate bind variables

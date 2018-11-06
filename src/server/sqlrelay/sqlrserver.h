@@ -1813,6 +1813,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 
+		virtual const char	*getError();
+
 	protected:
 		sqlrtranslations	*getTranslations();
 		domnode		*getParameters();
@@ -1831,6 +1833,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						sqlrparser *sqlrp,
 						const char *query,
 						stringbuffer *translatedquery);
+
+		const char	*getError();
 
 		void	endSession();
 
@@ -1861,6 +1865,8 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						const char *index);
 
 		memorypool	*getMemoryPool();
+
+		bool	getUseOriginalOnError();
 
 	#include <sqlrelay/private/sqlrtranslations.h>
 };

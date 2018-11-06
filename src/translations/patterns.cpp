@@ -182,6 +182,7 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 	debugFunction();
 
 	if (!enabled) {
+		translatedquery->append(query);
 		return true;
 	}
 
