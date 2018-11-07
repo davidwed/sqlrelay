@@ -1238,6 +1238,10 @@ const char *sqlrservercursor::skipCreateTempTableClause(const char *query) {
 	return NULL;
 }
 
+bool sqlrservercursor::columnInfoIsValidAfterPrepare() {
+	return false;
+}
+
 void sqlrservercursor::setColumnInfoIsValid(bool valid) {
 	pvt->_columninfoisvalid=valid;
 }

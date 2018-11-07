@@ -1179,6 +1179,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual void	encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize);
 
+		virtual bool	columnInfoIsValidAfterPrepare();
+
 
 		uint16_t	getId();
 
@@ -1262,7 +1264,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		const char	*skipCreateTempTableClause(
 						const char *query);
 
-		void	setColumnInfoIsValid(bool prepared);
+		void	setColumnInfoIsValid(bool valid);
 		bool	getColumnInfoIsValid();
 
 		void	setQueryHasBeenPreProcessed(bool preprocessed);

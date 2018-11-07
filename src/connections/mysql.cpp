@@ -144,6 +144,8 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 
 		void		closeResultSet();
 
+		bool		columnInfoIsValidAfterPrepare();
+
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	**mysqlfields;
 		unsigned int	ncols;
@@ -1833,4 +1835,8 @@ void mysqlcursor::closeResultSet() {
 	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
+}
+
+bool mysqlcursor::columnInfoIsValidAfterPrepare() {
+	return true;
 }

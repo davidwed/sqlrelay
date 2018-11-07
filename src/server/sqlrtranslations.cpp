@@ -76,10 +76,10 @@ bool sqlrtranslations::load(domnode *parameters) {
 	unload();
 
 	// default to useoriginal-on-error
-	pvt->_useoriginalonerror=charstring::compareIgnoringCase(
-					parameters->getAttributeValue(
-							"useoriginalonerror"),
-					"no");
+	pvt->_useoriginalonerror=
+		!charstring::compareIgnoringCase(
+				parameters->getAttributeValue("onerror"),
+				"original");
 
 	// run through the translation list
 	for (domnode *translation=parameters->getFirstTagChild();

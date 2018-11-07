@@ -213,6 +213,8 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		bool		nextResultSet(bool *nextresultsetavailable);
 		void		closeResultSet();
 
+		bool		columnInfoIsValidAfterPrepare();
+
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
@@ -3551,6 +3553,10 @@ void odbccursor::closeResultSet() {
 	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
+}
+
+bool odbccursor::columnInfoIsValidAfterPrepare() {
+	return true;
 }
 
 extern "C" {

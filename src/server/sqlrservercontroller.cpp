@@ -4019,14 +4019,16 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// set flags indicating that the query has been prepared
 	cursor->setQueryHasBeenPrepared(true);
 
+	// bail now if column info isn't valid after prepare for this backend
+	if (!cursor->columnInfoIsValidAfterPrepare()) {
+		return true;
+	}
+
 	// set flag indicating that the column info is now valid
-	// FIXME: This isn't actually true for all backends, and probably
-	// shouldn't be set for backends where it's not true.  However,
-	// for now, we're just using so that bad column data isn't returned
-	// between now and execution, when we're faking binds.
 	cursor->setColumnInfoIsValid(true);
 
-	return true;
+	// translate result set headers
+	return translateResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor) {
@@ -4247,9 +4249,6 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		// set flag indicating that the query has been prepared
 		cursor->setQueryHasBeenPrepared(true);
-
-		// set flag indicating that the column info is now valid
-		cursor->setColumnInfoIsValid(true);
 	}
 
 	raiseDebugMessageEvent("executing query...");
@@ -4378,6 +4377,9 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// log the query
 	raiseQueryEvent(cursor);
+
+	// set flag indicating that the column info is now valid
+	cursor->setColumnInfoIsValid(true);
 
 	// translate result set headers
 	return (success)?translateResultSetHeader(cursor):false;
@@ -8070,6 +8072,9 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 	if (success) {
 		// set flag indicating that the column info is now valid
 		cursor->setColumnInfoIsValid(true);
+
+		// translate result set headers
+		success=translateResultSetHeader(cursor);
 	} else {
 		// on failure save the error
 		saveError(cursor);
