@@ -4903,9 +4903,8 @@ bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 	if (pvt->_sqlrrst) {
 		if (!pvt->_sqlrrst->run(pvt->_conn,cursor,
 					name,index,field,fieldlength)) {
-			// FIXME: return an error somehow
-			//setError(cursor,pvt->_sqlrrst->getError(),
-				//SQLR_ERROR_RESULTSETTRANSLATION,true);
+			setError(cursor,pvt->_sqlrrst->getError(),
+				SQLR_ERROR_RESULTSETTRANSLATION,true);
 			return false;
 		}
 	}
@@ -8700,7 +8699,7 @@ void sqlrservercontroller::nextRow(sqlrservercursor *cursor) {
 	cursor->nextRow();
 }
 
-void sqlrservercontroller::getField(sqlrservercursor *cursor,
+bool sqlrservercontroller::getField(sqlrservercursor *cursor,
 						uint32_t col,
 						const char **field,
 						uint64_t *fieldlength,
@@ -8716,10 +8715,8 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 	*null=pvt->_nulls[actualcol];
 
 	// reformat the field
-	if (!reformatField(cursor,pvt->_fieldnames[col],
-					col,field,fieldlength)) {
-		// FIXME: return an error somehow
-	}
+	return reformatField(cursor,pvt->_fieldnames[col],
+					col,field,fieldlength);
 }
 
 bool sqlrservercontroller::getLobFieldLength(sqlrservercursor *cursor,

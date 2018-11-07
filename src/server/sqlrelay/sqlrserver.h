@@ -615,7 +615,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		closeAllResultSets();
 
 		// fields
-		void	getField(sqlrservercursor *cursor,
+		bool	getField(sqlrservercursor *cursor,
 						uint32_t col,
 						const char **field,
 						uint64_t *fieldlength,
@@ -1972,6 +1972,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					const char **field,
 					uint64_t *fieldlength);
 
+		virtual const char	*getError();
+
 	protected:
 		sqlrresultsettranslations	*getResultSetTranslations();
 		domnode			*getParameters();
@@ -1991,6 +1993,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 						uint32_t fieldindex,
 						const char **field,
 						uint64_t *fieldlength);
+
+		const char	*getError();
 
 		void	endSession();
 

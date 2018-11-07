@@ -19,6 +19,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 					uint32_t fieldindex,
 					const char **field,
 					uint64_t *fieldlength);
+const char *getError();
 	private:
 		char		*reformattedfield;
 		uint64_t	reformattedfieldlength;
@@ -34,6 +35,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 		bool	enabled;
 
 		bool	debug;
+const char	*error;
 };
 
 sqlrresultsettranslation_reformatdatetime::
@@ -44,6 +46,7 @@ sqlrresultsettranslation_reformatdatetime::
 				sqlrresultsettranslation(cont,rs,parameters) {
 
 	debug=cont->getConfig()->getDebugResultSetTranslations();
+error=NULL;
 
 	reformattedfield=NULL;
 	reformattedfieldlength=0;
@@ -99,10 +102,6 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 		return true;
 	}
 
-	if (debug) {
-		stdoutput.printf("converted date \"%s\" ",*field);
-	}
-
 	// For now, call the sqlrservercontroller method.
 	// Eventually that code should be moved here.
 	sqlrcon->cont->reformatDateTimes(sqlrcur,fieldindex,
@@ -116,12 +115,14 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 					timeformat);
 
 	if (debug) {
-		stdoutput.printf("\"%s\"\nusing ddmm=%d and yyyyddmm=%d\n",
-						*field,ddmm,yyyyddmm);
+		stdoutput.printf("using ddmm=%d and yyyyddmm=%d\n",
+							ddmm,yyyyddmm);
 	}
 
 	return true;
 }
+
+const char *sqlrresultsettranslation_reformatdatetime::getError() { return error; }
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrresultsettranslation

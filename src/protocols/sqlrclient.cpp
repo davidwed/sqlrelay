@@ -3426,7 +3426,9 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 		uint64_t	fieldlength=0;
 		bool		blob=false;
 		bool		null=false;
-		cont->getField(cursor,i,&field,&fieldlength,&blob,&null);
+		if (!cont->getField(cursor,i,&field,&fieldlength,&blob,&null)) {
+			// FIXME: handle error
+		}
 
 		// send data to the client
 		if (null) {

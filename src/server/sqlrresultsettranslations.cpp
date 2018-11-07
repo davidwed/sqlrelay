@@ -28,9 +28,11 @@ class sqlrresultsettranslationsprivate {
 	private:
 		sqlrservercontroller	*_cont;
 
-		bool	_debug;
+		bool		_debug;
 
 		singlylinkedlist< sqlrresultsettranslationplugin * >	_tlist;
+
+		const char	*_error;
 };
 
 sqlrresultsettranslations::sqlrresultsettranslations(
@@ -40,6 +42,7 @@ sqlrresultsettranslations::sqlrresultsettranslations(
 	pvt=new sqlrresultsettranslationsprivate;
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugResultSetTranslations();
+	pvt->_error=NULL;
 }
 
 sqlrresultsettranslations::~sqlrresultsettranslations() {
@@ -177,6 +180,8 @@ bool sqlrresultsettranslations::run(sqlrserverconnection *sqlrcon,
 						uint64_t *fieldlength) {
 	debugFunction();
 
+	pvt->_error=NULL;
+
 	for (singlylinkedlistnode< sqlrresultsettranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
@@ -188,10 +193,15 @@ bool sqlrresultsettranslations::run(sqlrserverconnection *sqlrcon,
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
 						fieldname,fieldindex,
 						field,fieldlength)) {
+			pvt->_error=node->getValue()->rstr->getError();
 			return false;
 		}
 	}
 	return true;
+}
+
+const char *sqlrresultsettranslations::getError() {
+	return pvt->_error;
 }
 
 void sqlrresultsettranslations::endSession() {
