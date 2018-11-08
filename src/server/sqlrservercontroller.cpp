@@ -2156,11 +2156,11 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 bool sqlrservercontroller::autoCommitOn() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: autocommit off\n\n",
+		stdoutput.printf("%d: autocommit off\n",
 					process::getProcessId());
 	}
 
@@ -2175,11 +2175,11 @@ bool sqlrservercontroller::autoCommitOn() {
 bool sqlrservercontroller::autoCommitOff() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: autocommit off\n\n",
+		stdoutput.printf("%d: autocommit off\n",
 					process::getProcessId());
 	}
 
@@ -2197,11 +2197,11 @@ bool sqlrservercontroller::autoCommitOff() {
 bool sqlrservercontroller::begin() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: begin\n\n",
+		stdoutput.printf("%d: begin\n",
 					process::getProcessId());
 	}
 
@@ -2234,11 +2234,11 @@ bool sqlrservercontroller::beginFakeTransactionBlock() {
 bool sqlrservercontroller::commit() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: commit\n\n",
+		stdoutput.printf("%d: commit\n",
 					process::getProcessId());
 	}
 
@@ -2269,11 +2269,11 @@ bool sqlrservercontroller::endFakeTransactionBlock() {
 bool sqlrservercontroller::rollback() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: rollback\n\n",
+		stdoutput.printf("%d: rollback\n",
 					process::getProcessId());
 	}
 
@@ -2458,7 +2458,7 @@ void sqlrservercontroller::saveError() {
 	pvt->_conn->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("%d: ERROR:\n%d: %.*s\n\n",
+		stdoutput.printf("%d: ERROR:\n%d: %.*s\n",
 					process::getProcessId(),
 					errorcode,errorlength,
 					pvt->_conn->getErrorBuffer());
@@ -2916,8 +2916,10 @@ const char * const *sqlrservercontroller::dataTypeStrings() {
 bool sqlrservercontroller::applyDirectives(sqlrservercursor *cursor) {
 
 	if (pvt->_debugsqlrdirectives) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("applying directives...\n");
 	}
 
@@ -2940,9 +2942,11 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	const char	*query=cursor->getQueryBuffer();
 
 	if (pvt->_debugsqlrtranslations) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
-		stdoutput.printf("translating query...\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
+		stdoutput.printf("translating query...\n\n");
 		stdoutput.printf("original:\n\"%s\"\n",query);
 	}
 
@@ -2958,7 +2962,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 		if (pvt->_sqlrt->getUseOriginalOnError()) {
 			if (pvt->_debugsqlrtranslations) {
 				stdoutput.printf("translation failed, "
-						"using original:\n\"%s\"\n\n",
+						"using original:\n\"%s\"\n",
 						query);
 			}
 			return true;
@@ -2974,7 +2978,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	}
 
 	if (pvt->_debugsqlrtranslations) {
-		stdoutput.printf("translated:\n\"%s\"\n\n",
+		stdoutput.printf("translated:\n\"%s\"\n",
 					translatedquery->getString());
 	}
 
@@ -3020,8 +3024,10 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 	// debug
 	if (pvt->_debugbindtranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("translating bind variables...\n");
 		stdoutput.printf("original:\n%s\n",querybuffer);
 	}
@@ -3333,8 +3339,10 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 
 	// debug and logging
 	if (pvt->_debugbindtranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("remapping bind variables:\n");
 		stdoutput.printf("  input binds:\n");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
@@ -3453,8 +3461,10 @@ bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor, bool before) {
 	const char	*query=cursor->getQueryBuffer();
 
 	if (pvt->_debugsqlrfilters) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("filtering:\n\"%s\"\n\n",query);
 	}
 
@@ -3536,12 +3546,14 @@ sqlrservercursor *sqlrservercontroller::useCustomQueryCursor(
 bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
 
 	// translate binds
-	if (pvt->_debugsqlrbindvariabletranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
-		stdoutput.printf("translating bind variables:\n");
-	}
 	if (pvt->_sqlrbvt && cursor->getInputBindCount()) {
+		if (pvt->_debugsqlrbindvariabletranslation) {
+			stdoutput.printf("\n===================="
+				 	"===================="
+				 	"===================="
+				 	"===================\n\n");
+			stdoutput.printf("translating bind variables:\n");
+		}
 		if (!pvt->_sqlrbvt->run(pvt->_conn,cursor)) {
 			setError(cursor,pvt->_sqlrbvt->getError(),
 				SQLR_ERROR_BINDVARIABLETRANSLATION,true);
@@ -3801,11 +3813,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						bool enablefilters) {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d:%d:prepare:\n%.*s\n\n",
+		stdoutput.printf("%d:%d:prepare:\n%.*s\n",
 					process::getProcessId(),
 					cursor->getId(),
 					querylen,query);
@@ -3943,9 +3955,12 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// (re)get the query now that it's been translated
 	query=cursor->getQueryBuffer();
 	querylen=cursor->getQueryLength();
-	if (enabletranslations && pvt->_sqlrt && pvt->_debugsql) {
-		stdoutput.printf("%d: translated:\n%.*s\n\n",
-					process::getProcessId(),querylen,query);
+	if (enabletranslations && pvt->_sqlrt &&
+			pvt->_debugsql && !pvt->_debugsqlrtranslations) {
+		stdoutput.printf("\n%d:%d:translated:\n%.*s\n",
+					process::getProcessId(),
+					cursor->getId(),
+					querylen,query);
 	}
 
 	// fake input binds if this specific query doesn't support them
@@ -4303,11 +4318,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d:%d:execute:\n%.*s\n\n",
+		stdoutput.printf("%d:%d:execute:\n%.*s\n",
 					process::getProcessId(),
 					cursor->getId(),
 					querylen,query);
@@ -4380,6 +4395,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// set flag indicating that the column info is now valid
 	cursor->setColumnInfoIsValid(true);
+
+	// bail now if column info is valid after prepare for this backend
+	if (cursor->columnInfoIsValidAfterPrepare()) {
+		return success;
+	}
 
 	// translate result set headers
 	return (success)?translateResultSetHeader(cursor):false;
@@ -4890,27 +4910,30 @@ bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 						uint32_t index,
 						const char **field,
 						uint64_t *fieldlength) {
-
-	if (pvt->_debugsqlrresultsettranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
-		stdoutput.printf("translating result set "
-				"field %d (%s)...\n",index,name);
-		stdoutput.printf("original:\n%s\n",*field);
-	}
-
 	// run translations
 	if (pvt->_sqlrrst) {
+
+		if (pvt->_debugsqlrresultsettranslation) {
+			stdoutput.printf("\n===================="
+				 	"===================="
+				 	"===================="
+				 	"===================\n\n");
+			stdoutput.printf("translating result set "
+					"field %d (%s)...\n",index,name);
+			stdoutput.printf("original:\n%s\n",*field);
+		}
+
 		if (!pvt->_sqlrrst->run(pvt->_conn,cursor,
 					name,index,field,fieldlength)) {
 			setError(cursor,pvt->_sqlrrst->getError(),
 				SQLR_ERROR_RESULTSETTRANSLATION,true);
 			return false;
 		}
-	}
 
-	if (pvt->_debugsqlrresultsettranslation) {
-		stdoutput.printf("translated:\n%.*s\n\n",*fieldlength,*field);
+		if (pvt->_debugsqlrresultsettranslation) {
+			stdoutput.printf("translated:\n%.*s\n\n",
+						*fieldlength,*field);
+		}
 	}
 	return true;
 }
@@ -4921,30 +4944,34 @@ bool sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 						const char ***fields,
 						uint64_t **fieldlengths) {
 
-	if (pvt->_debugsqlrresultsetrowtranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
-		stdoutput.printf("translating result set row\n");
-		for (uint32_t i=0; i<colcount; i++) {
-			stdoutput.printf("field %d (%s)...\n",i,names[i]);
-			stdoutput.printf("original:\n%s\n",(*fields)[i]);
-		}
-	}
-
 	// run translations
 	if (pvt->_sqlrrsrt) {
+		if (pvt->_debugsqlrresultsetrowtranslation) {
+			stdoutput.printf("\n===================="
+				 	"===================="
+				 	"===================="
+				 	"===================\n\n");
+			stdoutput.printf("translating result set row\n");
+			for (uint32_t i=0; i<colcount; i++) {
+				stdoutput.printf("field %d (%s)...\n",
+								i,names[i]);
+				stdoutput.printf("original:\n%s\n",
+								(*fields)[i]);
+			}
+		}
+
 		if (!pvt->_sqlrrsrt->run(pvt->_conn,cursor,colcount,
 						names,fields,fieldlengths)) {
 			setError(cursor,pvt->_sqlrrsrt->getError(),
 				SQLR_ERROR_RESULTSETROWTRANSLATION,true);
 			return false;
 		}
-	}
 
-	if (pvt->_debugsqlrresultsetrowtranslation) {
-		for (uint32_t i=0; i<colcount; i++) {
-			stdoutput.printf("translated:\n%.*s\n\n",
+		if (pvt->_debugsqlrresultsetrowtranslation) {
+			for (uint32_t i=0; i<colcount; i++) {
+				stdoutput.printf("translated:\n%.*s\n\n",
 					(*fieldlengths)[i],(*fields)[i]);
+			}
 		}
 	}
 	return true;
@@ -8133,7 +8160,7 @@ void sqlrservercontroller::saveError(sqlrservercursor *cursor) {
 	cursor->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("%d:%d:ERROR:\n%d: %.*s\n\n",
+		stdoutput.printf("\n%d:%d:ERROR:\n%d: %.*s\n",
 					process::getProcessId(),
 					cursor->getId(),
 					errorcode,errorlength,
@@ -8493,8 +8520,17 @@ bool sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
 			cursor->getColumnTableLength(mapColumn(col));
 	}
 
-	if (colcount && pvt->_sqlrrsht &&
-		!pvt->_sqlrrsht->run(pvt->_conn,
+	if (pvt->_sqlrrsht && colcount) {
+
+		if (pvt->_debugsqlrresultsetheadertranslation) {
+			stdoutput.printf("\n===================="
+				 	"===================="
+				 	"===================="
+				 	"===================\n\n");
+			stdoutput.printf("translating result set header...\n");
+		}
+
+		if (!pvt->_sqlrrsht->run(pvt->_conn,
 					cursor,colcount,
 					&pvt->_columnnames,
 					&pvt->_columnnamelengths,
@@ -8514,9 +8550,10 @@ bool sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
 					&pvt->_columnisautoincrements,
 					&pvt->_columntables,
 					&pvt->_columntablelengths)) {
-		setError(cursor,pvt->_sqlrrsht->getError(),
+			setError(cursor,pvt->_sqlrrsht->getError(),
 				SQLR_ERROR_RESULTSETHEADERTRANSLATION,true);
-		return false;
+			return false;
+		}
 	}
 	return true;
 }
@@ -8555,10 +8592,12 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 				pvt->_sqlrrsrbt->getRowBlockSize())) {
 
 			if (pvt->_debugsqlrresultsetrowblocktranslation) {
-				stdoutput.printf("===================="
-						"===================="
-						"===================="
-						"====================\n");
+				stdoutput.printf("\n===================="
+				 		"===================="
+				 		"===================="
+				 		"===================\n\n");
+				stdoutput.printf("translating result "
+						"set row block...\n");
 			}
 
 			// for each row in the block...

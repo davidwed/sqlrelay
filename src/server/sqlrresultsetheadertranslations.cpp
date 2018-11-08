@@ -21,6 +21,7 @@ class sqlrresultsetheadertranslationplugin {
 	public:
 		sqlrresultsetheadertranslation	*rstr;
 		dynamiclib			*dl;
+		const char			*module;
 };
 
 class sqlrresultsetheadertranslationsprivate {
@@ -175,6 +176,7 @@ void sqlrresultsetheadertranslations::loadResultSetHeaderTranslation(
 				new sqlrresultsetheadertranslationplugin;
 	sqlrrstp->rstr=rstr;
 	sqlrrstp->dl=dl;
+	sqlrrstp->module=module;
 	pvt->_tlist.append(sqlrrstp);
 }
 
@@ -208,9 +210,8 @@ bool sqlrresultsetheadertranslations::run(sqlrserverconnection *sqlrcon,
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		if (pvt->_debug) {
-			stdoutput.printf(
-				"\nrunning result set "
-				"header translation...\n\n");
+			stdoutput.printf("\nrunning translation:  %s...\n\n",
+						node->getValue()->module);
 		}
 
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,

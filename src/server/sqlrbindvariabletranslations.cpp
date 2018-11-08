@@ -21,6 +21,7 @@ class sqlrbindvariabletranslationplugin {
 	public:
 		sqlrbindvariabletranslation	*bvtr;
 		dynamiclib			*dl;
+		const char			*module;
 };
 
 class sqlrbindvariabletranslationsprivate {
@@ -170,6 +171,7 @@ void sqlrbindvariabletranslations::loadBindVariableTranslation(
 				new sqlrbindvariabletranslationplugin;
 	sqlrrstp->bvtr=bvtr;
 	sqlrrstp->dl=dl;
+	sqlrrstp->module=module;
 	pvt->_tlist.append(sqlrrstp);
 }
 
@@ -183,8 +185,8 @@ bool sqlrbindvariabletranslations::run(sqlrserverconnection *sqlrcon,
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		if (pvt->_debug) {
-			stdoutput.printf(
-				"\nrunning bind variable translation...\n\n");
+			stdoutput.printf("\nrunning translation:  %s...\n\n",
+						node->getValue()->module);
 		}
 
 		if (!node->getValue()->bvtr->run(sqlrcon,sqlrcur)) {
