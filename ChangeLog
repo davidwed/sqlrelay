@@ -9,6 +9,7 @@
 	improved conversion of string bind variables to unicode in odbc
 	odbc gets column info after prepare (before execute) in call cases now
 	added error handling to translation frameworks
+	added mysql_stmt_store_result to prevent "Commands out of sync" errors
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class

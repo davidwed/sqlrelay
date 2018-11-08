@@ -155,7 +155,6 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		MYSQL_STMT	*stmt;
-		bool		stmtreset;
 		bool		stmtfreeresult;
 		bool		stmtpreparefailed;
 
@@ -774,7 +773,6 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
-	stmtreset=false;
 	stmtfreeresult=false;
 
 	boundvariables=false;
@@ -1250,14 +1248,13 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		checkForTempTable(query,length);
 
+		// store the result set
+		if (mysql_stmt_store_result(stmt)) {
+			return false;
+		}
+
 		// get the affected row count
 		affectedrows=mysql_stmt_affected_rows(stmt);
-
-		// reinit stmt reset flag
-		// (if there aren't any cols, then there aren't any rows)
-		if (ncols) {
-			stmtreset=true;
-		}
 
 	} else {
 #endif
@@ -1675,11 +1672,7 @@ bool mysqlcursor::noRowsToReturn() {
 bool mysqlcursor::fetchRow() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		int	result=mysql_stmt_fetch(stmt);
-		if (result==MYSQL_NO_DATA) {
-			stmtreset=false;
-		}
-		return !result;
+		return !mysql_stmt_fetch(stmt);
 	} else {
 #endif
 		return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
@@ -1793,15 +1786,6 @@ void mysqlcursor::closeResultSet() {
 		boundvariables=false;
 		bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
 
-		// Reset the statement if we didn't fetch all rows, otherwise
-		// subsequent attempts to prepare the same stmt again fail with:
-		// "Commands out of sync; you can't run this command now."
-		// Don't just generally do this though, as it reduces
-		// performance by a factor of two.
-		if (stmtreset) {
-			mysql_stmt_reset(stmt);
-			stmtreset=false;
-		}
 		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);
 			stmtfreeresult=false;
