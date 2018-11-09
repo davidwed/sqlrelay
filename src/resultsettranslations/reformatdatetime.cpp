@@ -35,7 +35,6 @@ const char *getError();
 		bool	enabled;
 
 		bool	debug;
-const char	*error;
 };
 
 sqlrresultsettranslation_reformatdatetime::
@@ -46,7 +45,6 @@ sqlrresultsettranslation_reformatdatetime::
 				sqlrresultsettranslation(cont,rs,parameters) {
 
 	debug=cont->getConfig()->getDebugResultSetTranslations();
-error=NULL;
 
 	reformattedfield=NULL;
 	reformattedfieldlength=0;
@@ -121,8 +119,6 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 
 	return true;
 }
-
-const char *sqlrresultsettranslation_reformatdatetime::getError() { return error; }
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrresultsettranslation
