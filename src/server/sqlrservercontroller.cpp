@@ -2322,69 +2322,78 @@ bool sqlrservercontroller::getListsByApiCalls() {
 
 bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getDatabaseList(cursor,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getSchemaList(cursor,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getTableList(cursor,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getTableTypeList(cursor,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getColumnList(cursor,table,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getPrimaryKeyList(cursor,table,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getKeyAndIndexList(cursor,table,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
-						const char *procedure,
+						const char *proc,
 						const char *wild) {
-	return pvt->_conn->getProcedureBindAndColumnList(
-						cursor,procedure,wild) &&
-					translateResultSetHeader(cursor);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getProcedureBindAndColumnList(cursor,proc,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getTypeInfoList(cursor,type,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
 	return pvt->_conn->getProcedureList(cursor,wild) &&
-					translateResultSetHeader(cursor);
+				handleResultSetHeader(cursor);
 }
 
 const char *sqlrservercontroller::getDatabaseListQuery(bool wild) {
@@ -2423,9 +2432,9 @@ const char *sqlrservercontroller::getKeyAndIndexListQuery(const char *table,
 }
 
 const char *sqlrservercontroller::getProcedureBindAndColumnListQuery(
-							const char *procedure,
+							const char *proc,
 							bool wild) {
-	return pvt->_conn->getProcedureBindAndColumnListQuery(procedure,wild);
+	return pvt->_conn->getProcedureBindAndColumnListQuery(proc,wild);
 }
 
 const char *sqlrservercontroller::getTypeInfoListQuery(const char *type,
@@ -3869,6 +3878,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	cursor->setFakeInputBindsForThisQuery(pvt->_fakeinputbinds);
 	cursor->setQueryStatus(SQLRQUERYSTATUS_ERROR);
 	cursor->setQueryType(SQLRQUERYTYPE_ETC);
+	cursor->setResultSetHeaderHasBeenHandled(false);
 
 	// reset column mapping
 	pvt->_columnmap=NULL;
@@ -4031,19 +4041,12 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 		return false;
 	}
 
-	// set flags indicating that the query has been prepared
+	// set flag indicating that the query has been prepared
 	cursor->setQueryHasBeenPrepared(true);
 
-	// bail now if column info isn't valid after prepare for this backend
-	if (!cursor->columnInfoIsValidAfterPrepare()) {
-		return true;
-	}
-
-	// set flag indicating that the column info is now valid
-	cursor->setColumnInfoIsValid(true);
-
-	// translate result set headers
-	return translateResultSetHeader(cursor);
+	// handle column info now if it's valid at this point
+	return (cursor->columnInfoIsValidAfterPrepare())?
+				handleResultSetHeader(cursor):true;
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor) {
@@ -4393,16 +4396,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// log the query
 	raiseQueryEvent(cursor);
 
-	// set flag indicating that the column info is now valid
-	cursor->setColumnInfoIsValid(true);
-
-	// bail now if column info is valid after prepare for this backend
-	if (cursor->columnInfoIsValidAfterPrepare()) {
-		return success;
-	}
-
-	// translate result set headers
-	return (success)?translateResultSetHeader(cursor):false;
+	return (success)?handleResultSetHeader(cursor):false;
 }
 
 void sqlrservercontroller::setNeedsCommitOrRollback(bool needed) {
@@ -8084,6 +8078,7 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 
 	// reset flags
 	cursor->setColumnInfoIsValid(false);
+	cursor->setResultSetHeaderHasBeenHandled(false);
 
 	// clear query buffer just so some future operation doesn't
 	// get confused into thinking this cursor actually ran one
@@ -8096,11 +8091,7 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 	cursor->clearTotalRowsFetched();
 
 	if (success) {
-		// set flag indicating that the column info is now valid
-		cursor->setColumnInfoIsValid(true);
-
-		// translate result set headers
-		success=translateResultSetHeader(cursor);
+		success=handleResultSetHeader(cursor);
 	} else {
 		// on failure save the error
 		saveError(cursor);
@@ -8453,11 +8444,20 @@ void sqlrservercontroller::getColumnNameList(sqlrservercursor *cursor,
 	}
 }
 
-bool sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
+bool sqlrservercontroller::handleResultSetHeader(sqlrservercursor *cursor) {
 
-	// FIXME: The below is apparently required even if translation doesn't
-	// occur and therefore should be moved out of this method.  Or, at
-	// least, this needs to be sorted out in some way.
+	// This could get called multiple times, depending on whether
+	// column info is valid post-prepare or post-execute.  It's easier
+	// to just call it and bail if its already been called, than to
+	// keep track of whether it needs to be called or not and not call
+	// it if it doesn't.
+	if (cursor->getResultSetHeaderHasBeenHandled()) {
+		return true;
+	}
+	cursor->setResultSetHeaderHasBeenHandled(true);
+
+	// set flag indicating that the column info is now valid
+	cursor->setColumnInfoIsValid(true);
 
 	// get arrays of field pointers,
 	// helpfully provided for us by the cursor
@@ -8480,6 +8480,7 @@ bool sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
 				&(pvt->_columntables),
 				&(pvt->_columntablelengths));
 
+	// remap columns
 	uint32_t	colcount=colCount(cursor);
 	for (uint32_t col=0; col<colcount; col++) {
 		pvt->_columnnames[col]=
@@ -8520,6 +8521,7 @@ bool sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
 			cursor->getColumnTableLength(mapColumn(col));
 	}
 
+	// translate columns
 	if (pvt->_sqlrrsht && colcount) {
 
 		if (pvt->_debugsqlrresultsetheadertranslation) {

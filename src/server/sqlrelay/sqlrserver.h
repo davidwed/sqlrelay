@@ -506,7 +506,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *wild);
 		bool		getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
-						const char *procedure,
+						const char *proc,
 						const char *wild);
 		bool		getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
@@ -525,7 +525,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getKeyAndIndexListQuery(const char *table,
 							bool wild);
 		const char	*getProcedureBindAndColumnListQuery(
-							const char *procedure,
+							const char *proc,
 							bool wild);
 		const char	*getTypeInfoListQuery(const char *type,
 							bool wild);
@@ -596,8 +596,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							uint32_t col);
 		void		getColumnNameList(sqlrservercursor *cursor,
 							stringbuffer *output);
-		bool		translateResultSetHeader(
-						sqlrservercursor *cursor);
+		bool		handleResultSetHeader(sqlrservercursor *cursor);
 
 		// result set navigation
 		bool		knowsRowCount(sqlrservercursor *cursor);
@@ -1328,6 +1327,10 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		bool		getExecuteDirect();
 		void		setExecuteRpc(bool executerpc);
 		bool		getExecuteRpc();
+
+		void		setResultSetHeaderHasBeenHandled(
+					bool resultsetheaderhasbeenhandled);
+		bool		getResultSetHeaderHasBeenHandled();
 
 		unsigned char	*getModuleData();
 
