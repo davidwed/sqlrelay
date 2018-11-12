@@ -8272,7 +8272,7 @@ const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return NULL;
 	}
-	return pvt->_columnnames[col];
+	return cursor->getColumnName(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
@@ -8281,7 +8281,7 @@ uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnnamelengths[col];
+	return cursor->getColumnNameLength(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
@@ -8290,7 +8290,7 @@ uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columntypes[col];
+	return cursor->getColumnType(mapColumn(col));
 }
 
 const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
@@ -8299,7 +8299,7 @@ const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return NULL;
 	}
-	return pvt->_columntypenames[col];
+	return cursor->getColumnTypeName(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
@@ -8308,7 +8308,7 @@ uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columntypenamelengths[col];
+	return cursor->getColumnTypeNameLength(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
@@ -8317,7 +8317,7 @@ uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnlengths[col];
+	return cursor->getColumnLength(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
@@ -8326,7 +8326,7 @@ uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnprecisions[col];
+	return cursor->getColumnPrecision(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
@@ -8335,7 +8335,7 @@ uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnscales[col];
+	return cursor->getColumnScale(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
@@ -8344,7 +8344,7 @@ uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnisnullables[col];
+	return cursor->getColumnIsNullable(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
@@ -8353,7 +8353,7 @@ uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnisprimarykeys[col];
+	return cursor->getColumnIsPrimaryKey(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
@@ -8362,7 +8362,7 @@ uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnisuniques[col];
+	return cursor->getColumnIsUnique(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
@@ -8371,7 +8371,7 @@ uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnispartofkeys[col];
+	return cursor->getColumnIsPartOfKey(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
@@ -8380,7 +8380,7 @@ uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnisunsigneds[col];
+	return cursor->getColumnIsUnsigned(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
@@ -8389,7 +8389,7 @@ uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columniszerofilleds[col];
+	return cursor->getColumnIsZeroFilled(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
@@ -8398,7 +8398,7 @@ uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnisbinarys[col];
+	return cursor->getColumnIsBinary(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
@@ -8408,7 +8408,7 @@ uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columnisautoincrements[col];
+	return cursor->getColumnIsAutoIncrement(mapColumn(col));
 }
 
 const char *sqlrservercontroller::getColumnTable(sqlrservercursor *cursor,
@@ -8417,7 +8417,7 @@ const char *sqlrservercontroller::getColumnTable(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columntables[col];
+	return cursor->getColumnTable(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnTableLength(sqlrservercursor *cursor,
@@ -8426,7 +8426,7 @@ uint16_t sqlrservercontroller::getColumnTableLength(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
 	}
-	return pvt->_columntablelengths[col];
+	return cursor->getColumnTableLength(mapColumn(col));
 }
 
 void sqlrservercontroller::getColumnNameList(sqlrservercursor *cursor,
@@ -8446,6 +8446,9 @@ void sqlrservercontroller::getColumnNameList(sqlrservercursor *cursor,
 
 bool sqlrservercontroller::handleResultSetHeader(sqlrservercursor *cursor) {
 
+	// set flag indicating that the column info is now valid
+	cursor->setColumnInfoIsValid(true);
+
 	// This could get called multiple times, depending on whether
 	// column info is valid post-prepare or post-execute.  It's easier
 	// to just call it and bail if its already been called, than to
@@ -8455,9 +8458,6 @@ bool sqlrservercontroller::handleResultSetHeader(sqlrservercursor *cursor) {
 		return true;
 	}
 	cursor->setResultSetHeaderHasBeenHandled(true);
-
-	// set flag indicating that the column info is now valid
-	cursor->setColumnInfoIsValid(true);
 
 	// get arrays of field pointers,
 	// helpfully provided for us by the cursor
