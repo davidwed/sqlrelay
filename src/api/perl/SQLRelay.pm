@@ -492,16 +492,20 @@ sub bind_param {
 		$length=length($val);
 	}
 
+	# remove any leading bind delimiters
+	my $p = $param;
+	$p=~s/^(:|@|\$)//;
+
 	# bind the parameter
 	my $cursor=$sth->FETCH('driver_cursor');
 	if ($type eq 'DBD::SQLRelay::SQL_CLOB') {
-		$cursor->inputBindClob($param,$val,$length);
+		$cursor->inputBindClob($p,$val,$length);
 	} elsif ($type eq 'DBD::SQLRelay::SQL_BLOB') {
-		$cursor->inputBindBlob($param,$val,$length);
+		$cursor->inputBindBlob($p,$val,$length);
 	} elsif (defined($precision) && defined($scale)) {
-		$cursor->inputBind($param,$val,$precision,$scale);
+		$cursor->inputBind($p,$val,$precision,$scale);
 	} else {
-		$cursor->inputBind($param,$val,$length);
+		$cursor->inputBind($p,$val,$length);
 	}
 
 	# update ParamValues, ParamTypes
@@ -534,14 +538,18 @@ sub bind_param_inout {
 		}
 	}
 
+	# remove any leading bind delimiters
+	my $p = $param;
+	$p=~s/^(:|@|\$)//;
+
 	# bind the parameter
 	my $cursor=$sth->FETCH('driver_cursor');
 	if ($type eq 'DBD::SQLRelay::SQL_CLOB') {
-		$cursor->defineOutputBindClob($param);
+		$cursor->defineOutputBindClob($p);
 	} elsif ($type eq 'DBD::SQLRelay::SQL_BLOB') {
-		$cursor->defineOutputBindBlob($param);
+		$cursor->defineOutputBindBlob($p);
 	} else {
-		$cursor->defineOutputBindString($param,$maxlen);
+		$cursor->defineOutputBindString($p,$maxlen);
 	}
 
 	# store the parameter name in the list of inout parameters
@@ -624,12 +632,16 @@ sub execute {
 	foreach $param(@param_inout_array) {
 		my $variable=$sth->FETCH('driver_param_inout_'.$param);
 		my $type=$sth->FETCH('driver_param_inout_type_'.$param);
+
+		# remove any leading bind delimiters
+		my $p = $param;
+		$p=~s/^(:|@|\$)//;
 		if ($type eq 'DBD::SQLRelay::SQL_CLOB') {
-			$$variable=$cursor->getOutputBindClob($param);
+			$$variable=$cursor->getOutputBindClob($p);
 		} elsif ($type eq 'DBD::SQLRelay::SQL_BLOB') {
-			$$variable=$cursor->getOutputBindBlob($param);
+			$$variable=$cursor->getOutputBindBlob($p);
 		} else {
-			$$variable=$cursor->getOutputBindString($param);
+			$$variable=$cursor->getOutputBindString($p);
 		}
 	}
 
