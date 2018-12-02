@@ -65,6 +65,9 @@ all-resultsetheadertranslations:
 all-filters:
 	cd filters $(AND) $(MAKE) all
 
+all-moduledatas:
+	cd moduledatas $(AND) $(MAKE) all
+
 all-connections:
 	cd connections $(AND) $(MAKE) all
 
@@ -92,6 +95,7 @@ clean:
 	cd resultsetrowblocktranslations $(AND) $(MAKE) clean
 	cd resultsetheadertranslations $(AND) $(MAKE) clean
 	cd filters $(AND) $(MAKE) clean
+	cd moduledatas $(AND) $(MAKE) clean
 	cd connections $(AND) $(MAKE) clean
 	cd server $(AND) $(MAKE) clean
 	cd cmdline $(AND) $(MAKE) clean
@@ -161,6 +165,9 @@ install-resultsetheadertranslations:
 install-filters:
 	cd filters $(AND) $(MAKE) install
 
+install-moduledatas:
+	cd moduledatas $(AND) $(MAKE) install
+
 install-connections:
 	cd connections $(AND) $(MAKE) install
 
@@ -188,6 +195,7 @@ uninstall:
 	cd resultsetrowblocktranslations $(AND) $(MAKE) uninstall
 	cd resultsetheadertranslations $(AND) $(MAKE) uninstall
 	cd filters $(AND) $(MAKE) uninstall
+	cd moduledatas $(AND) $(MAKE) uninstall
 	cd connections $(AND) $(MAKE) uninstall
 	cd server $(AND) $(MAKE) uninstall
 	cd cmdline $(AND) $(MAKE) uninstall
