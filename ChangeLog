@@ -12,6 +12,7 @@
 	readded conditional mysql_stmt_reset call to recover from
 		"Commands out of sync" errors
 	perl dbi driver allows leading delimiters in bind variable names now
+	fixed bind_inout_param -> bind_param_inout in perldbi docs
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class

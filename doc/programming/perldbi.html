@@ -338,9 +338,9 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>bind_param() is used for input binds.  bind_inout_param() is used for output
-binds.  Here is an example using the bind_inout_param() function to retrieve a
-value from a query.  The first parameter of a bind_inout_param() call is the
+<p>bind_param() is used for input binds.  bind_param_inout() is used for output
+binds.  Here is an example using the bind_param_inout() function to retrieve a
+value from a query.  The first parameter of a bind_param_inout() call is the
 name or position of the bind variable, the second parameter is the local
 variable to return the result in and the third variable is the size of the
 buffer to reserve for the value.</p>
@@ -361,9 +361,9 @@ http://www.gnu.org/software/src-highlite -->
 <b><font color="#0000FF">my</font></b> <font color="#009900">$hello</font><font color="#990000">;</font>
 <b><font color="#0000FF">my</font></b> <font color="#009900">$integer</font><font color="#990000">;</font>
 <b><font color="#0000FF">my</font></b> <font color="#009900">$float</font><font color="#990000">;</font>
-<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,\</font><font color="#009900">$hello</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
-<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,\</font><font color="#009900">$integer</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
-<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,\</font><font color="#009900">$float</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,\</font><font color="#009900">$hello</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,\</font><font color="#009900">$integer</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,\</font><font color="#009900">$float</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
 
 <font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
@@ -1045,7 +1045,7 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 my $result<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1092,7 +1092,7 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 my $result<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1160,7 +1160,7 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 my $result<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1208,7 +1208,7 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 my $result<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1498,9 +1498,9 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $out1<font color="#990000">;</font>
 my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1574,9 +1574,9 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $out1<font color="#990000">;</font>
 my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1625,9 +1625,9 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $out1<font color="#990000">;</font>
 my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"5"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"6"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"5"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"6"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 

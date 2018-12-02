@@ -218,9 +218,9 @@ hash containing type and length values.
 }}}
 }}}
 
-bind_param() is used for input binds.  bind_inout_param() is used for output
-binds.  Here is an example using the bind_inout_param() function to retrieve a
-value from a query.  The first parameter of a bind_inout_param() call is the
+bind_param() is used for input binds.  bind_param_inout() is used for output
+binds.  Here is an example using the bind_param_inout() function to retrieve a
+value from a query.  The first parameter of a bind_param_inout() call is the
 name or position of the bind variable, the second parameter is the local
 variable to return the result in and the third variable is the size of the
 buffer to reserve for the value.
