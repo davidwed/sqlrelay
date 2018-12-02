@@ -96,6 +96,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugSchedules();
 		bool		getDebugRouters();
 		bool		getDebugQueries();
+		bool		getDebugModuleDatas();
 		uint64_t	getMaxClientInfoLength();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
@@ -135,6 +136,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		domnode	*getQueries();
 		domnode	*getPasswordEncryptions();
 		domnode	*getAuths();
+		domnode	*getModuleDatas();
 
 		linkedlist< connectstringcontainer * >	*getConnectStringList();
 		connectstringcontainer	*getConnectString(
@@ -227,6 +229,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugschedules;
 		bool		debugrouters;
 		bool		debugqueries;
+		bool		debugmoduledatas;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -266,6 +269,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		domnode	*queriesxml;
 		domnode	*pwdencsxml;
 		domnode	*authsxml;
+		domnode	*moduledatasxml;
 
 		uint32_t	metrictotal;
 
@@ -373,6 +377,7 @@ void sqlrconfig_xmldom::init() {
 	debugschedules=hasDebug(debug,"schedules");
 	debugrouters=hasDebug(debug,"routers");
 	debugqueries=hasDebug(debug,"queries");
+	debugmoduledatas=hasDebug(debug,"moduledatas");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
@@ -661,6 +666,10 @@ bool sqlrconfig_xmldom::getDebugQueries() {
 	return debugqueries;
 }
 
+bool sqlrconfig_xmldom::getDebugModuleDatas() {
+	return debugmoduledatas;
+}
+
 uint64_t sqlrconfig_xmldom::getMaxClientInfoLength() {
 	return maxclientinfolength;
 }
@@ -807,6 +816,10 @@ domnode *sqlrconfig_xmldom::getPasswordEncryptions() {
 
 domnode *sqlrconfig_xmldom::getAuths() {
 	return authsxml;
+}
+
+domnode *sqlrconfig_xmldom::getModuleDatas() {
+	return moduledatasxml;
 }
 
 linkedlist< connectstringcontainer * > *sqlrconfig_xmldom::
@@ -1789,6 +1802,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 		debugschedules=hasDebug(debug,"schedules");
 		debugrouters=hasDebug(debug,"routers");
 		debugqueries=hasDebug(debug,"queries");
+		debugmoduledatas=hasDebug(debug,"moduledatas");
 	}
 	attr=instance->getAttribute("maxclientinfolength");
 	if (!attr->isNullNode()) {
@@ -1887,6 +1901,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	queriesxml=instance->getFirstTagChild("queries");
 	pwdencsxml=instance->getFirstTagChild("passwordencryptions");
 	authsxml=instance->getFirstTagChild("auths");
+	moduledatasxml=instance->getFirstTagChild("moduledatas");
 
 
 	// listeners tag...

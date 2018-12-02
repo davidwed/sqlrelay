@@ -198,6 +198,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getDebugSchedules()=0;
 		virtual bool		getDebugRouters()=0;
 		virtual bool		getDebugQueries()=0;
+		virtual bool		getDebugModuleDatas()=0;
 
 		virtual uint64_t	getMaxClientInfoLength()=0;
 		virtual uint32_t	getMaxQuerySize()=0;
@@ -245,6 +246,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual domnode	*getQueries()=0;
 		virtual domnode	*getPasswordEncryptions()=0;
 		virtual domnode	*getAuths()=0;
+		virtual domnode	*getModuleDatas()=0;
 
 		virtual linkedlist< connectstringcontainer * >
 						*getConnectStringList()=0;

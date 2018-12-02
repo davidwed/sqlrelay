@@ -43,6 +43,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrauth.cpp \
 	sqlrdirectives.cpp \
 	sqlrdirective.cpp \
+	sqlrmoduledatas.cpp \
+	sqlrmoduledata.cpp \
 	$(STATICPLUGINSRCS)
 
 LIBSQLRSERVERLOBJS = \
@@ -85,7 +87,9 @@ LIBSQLRSERVERLOBJS = \
 	sqlrauths.$(OBJ) \
 	sqlrauth.$(OBJ) \
 	sqlrdirectives.$(OBJ) \
-	sqlrdirective.$(OBJ)
+	sqlrdirective.$(OBJ) \
+	sqlrmoduledatas.$(OBJ) \
+	sqlrmoduledata.$(OBJ)
 
 .SUFFIXES: .lo .cpp.in
 
@@ -425,6 +429,22 @@ sqlrqueryassignments.cpp: sqlrqueryassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
+sqlrmoduledatadeclarations.cpp: sqlrmoduledatadeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../moduledatas/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrmoduledataassignments.cpp: sqlrmoduledataassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../moduledatas/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(bindir)
 	$(LTINSTALL) $(CP) $(SQLR)-start$(EXE) $(bindir)
@@ -485,6 +505,8 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrtrigger.h $(includedir)/sqlrelay/private/sqlrtrigger.h
 	$(CP) sqlrelay/private/sqlrtriggers.h $(includedir)/sqlrelay/private/sqlrtriggers.h
 	$(CP) sqlrelay/private/sqlruserpasswordcredentials.h $(includedir)/sqlrelay/private/sqlruserpasswordcredentials.h
+	$(CP) sqlrelay/private/sqlrmoduledata.h $(includedir)/sqlrelay/private/sqlrmoduledata.h
+	$(CP) sqlrelay/private/sqlrmoduledatas.h $(includedir)/sqlrelay/private/sqlrmoduledatas.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrauth.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrauths.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrfilter.h
@@ -528,6 +550,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrtrigger.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrtriggers.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlruserpasswordcredentials.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrmoduledata.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrmoduledatas.h
 	$(MKINSTALLDIRS) $(tmpdir)
 	$(CHMOD) 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(logdir)
@@ -591,6 +615,8 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrtrigger.h \
 		$(includedir)/sqlrelay/private/sqlrtriggers.h \
 		$(includedir)/sqlrelay/private/sqlruserpasswordcredentials.h \
+		$(includedir)/sqlrelay/private/sqlrmoduledata.h \
+		$(includedir)/sqlrelay/private/sqlrmoduledatas.h \
 		$(bindir)/$(SQLR)-start$(EXE) \
 		$(bindir)/$(SQLR)-stop$(EXE) \
 		$(bindir)/$(SQLR)-listener$(EXE) \

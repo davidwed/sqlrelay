@@ -98,6 +98,7 @@ class sqlrservercontrollerprivate {
 	sqlrqueries				*_sqlrq;
 	sqlrpwdencs				*_sqlrpe;
 	sqlrauths				*_sqlra;
+	sqlrmoduledatas				*_sqlrmd;
 
 	filedescriptor	*_clientsock;
 
@@ -159,6 +160,7 @@ class sqlrservercontrollerprivate {
 	bool		_debugsqlrresultsetrowtranslation;
 	bool		_debugsqlrresultsetrowblocktranslation;
 	bool		_debugsqlrresultsetheadertranslation;
+	bool		_debugsqlrmoduledata;
 
 	dynamiclib	_conndl;
 	dynamiclib	_sqlrpdl;
@@ -367,6 +369,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_sqlrq=NULL;
 	pvt->_sqlrpe=NULL;
 	pvt->_sqlra=NULL;
+	pvt->_sqlrmd=NULL;
 
 	pvt->_decrypteddbpassword=NULL;
 
@@ -382,6 +385,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_debugsqlrresultsetrowtranslation=false;
 	pvt->_debugsqlrresultsetrowblocktranslation=false;
 	pvt->_debugsqlrresultsetheadertranslation=false;
+	pvt->_debugsqlrmoduledata=false;
 
 	pvt->_cur=NULL;
 
@@ -466,6 +470,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_sqlrq;
 	delete pvt->_sqlrpe;
 	delete pvt->_sqlra;
+	delete pvt->_sqlrmd;
 
 	delete[] pvt->_decrypteddbpassword;
 
@@ -641,6 +646,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		}
 	}
 	initConnStats();
+
+	// get the module datas
+	pvt->_debugsqlrmoduledata=pvt->_cfg->getDebugModuleDatas();
+	domnode	*moduledatas=pvt->_cfg->getModuleDatas();
+	if (!moduledatas->isNullNode()) {
+		pvt->_sqlrmd=new sqlrmoduledatas(this);
+		pvt->_sqlrmd->load(moduledatas);
+	}
 
 	// get the query directives
 	pvt->_debugsqlrdirectives=pvt->_cfg->getDebugDirectives();
@@ -9100,6 +9113,10 @@ sqlrpaths *sqlrservercontroller::getPaths() {
 
 sqlrshm *sqlrservercontroller::getShm() {
 	return pvt->_shm;
+}
+
+sqlrmoduledata *sqlrservercontroller::getModuleData(const char *id) {
+	return pvt->_sqlrmd->getModuleData(id);
 }
 
 bool sqlrservercontroller::send(unsigned char *data, size_t size) {

@@ -118,3 +118,7 @@ class sqlrquerycursor;
 class sqlrquerycursorprivate;
 class sqlrqueries;
 class sqlrqueriesprivate;
+class sqlrmoduledata;
+class sqlrmoduledataprivate;
+class sqlrmoduledatas;
+class sqlrmoduledatasprivate;

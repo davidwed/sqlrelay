@@ -750,6 +750,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// shared memory
 		sqlrshm		*getShm();
 
+		// module data
+		sqlrmoduledata	*getModuleData(const char *id);
+
 		// utilities
 		bool		skipComment(const char **ptr,
 						const char *endptr);
@@ -2289,6 +2292,31 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrqueries.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrmoduledata {
+	public:
+		sqlrmoduledata(domnode *parameters);
+		virtual	~sqlrmoduledata();
+
+		const char	*getModuleType();
+		const char	*getId();
+
+		domnode		*getParameters();
+
+	#include <sqlrelay/private/sqlrmoduledata.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrmoduledatas {
+	public:
+		sqlrmoduledatas(sqlrservercontroller *cont);
+		~sqlrmoduledatas();
+
+		bool	load(domnode *parameters);
+
+		sqlrmoduledata	*getModuleData(const char *id);
+
+	#include <sqlrelay/private/sqlrmoduledatas.h>
 };
 
 #endif
