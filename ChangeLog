@@ -14,6 +14,7 @@
 	perl dbi driver allows leading delimiters in bind variable names now
 	fixed bind_inout_param -> bind_param_inout in perldbi docs
 	added moduledata framework
+	added sha1 and sha256 auth modules
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class
