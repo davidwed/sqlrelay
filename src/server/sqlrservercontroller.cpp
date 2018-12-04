@@ -5874,12 +5874,14 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// * the id name might not conform to valid file naming conventions
 	md5	m;
 	m.append((const unsigned char *)id,charstring::length(id));
-	id=(const char *)m.getHash();
+	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
+	id=md5str;
 
 	// create a key file and key
 	delete[] pvt->_bulkserveridfilename;
 	charstring::printf(&pvt->_bulkserveridfilename,"%sbulk-%s.ipc",
 						pvt->_pth->getIpcDir(),id);
+	delete[] md5str;
 	if (!file::createFile(pvt->_bulkserveridfilename,
 				permissions::ownerReadWrite())) {
 		setError(SQLR_ERROR_BULKLOADBEGIN_IPC_FILE_STRING,
