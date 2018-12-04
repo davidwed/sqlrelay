@@ -2,12 +2,17 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
+#include <rudiments/bytestring.h>
+#include <rudiments/filedescriptor.h>
+#include <rudiments/process.h>
 
 class sqlrprotocolprivate {
 	friend class sqlrprotocol;
 	private:
 		sqlrprotocols		*_ps;
-		domnode		*_parameters;
+		domnode			*_parameters;
+		bool			_bigendian;
+		bool			_debug;
 };
 
 sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
@@ -17,6 +22,8 @@ sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 	this->cont=cont;
 	pvt->_ps=ps;
 	pvt->_parameters=parameters;
+	pvt->_bigendian=false;
+	pvt->_debug=cont->getConfig()->getDebugProtocols();
 }
 
 sqlrprotocol::~sqlrprotocol() {
@@ -37,4 +44,348 @@ sqlrprotocols *sqlrprotocol::getProtocols() {
 
 domnode *sqlrprotocol::getParameters() {
 	return pvt->_parameters;
+}
+
+void sqlrprotocol::setProtocolIsBigEndian(bool bigendian) {
+	bigendian=pvt->_bigendian;
+}
+
+bool sqlrprotocol::getProtocolIsBigEndian() {
+	return pvt->_bigendian;
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					char *value,
+					const unsigned char **rpout) {
+	*value=(char)*rp;
+	*rpout=rp+sizeof(char);
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					unsigned char *value,
+					const unsigned char **rpout) {
+	*value=*rp;
+	*rpout=rp+sizeof(unsigned char);
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					char *value,
+					size_t length,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,length);
+	*rpout=rp+length;
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					unsigned char *value,
+					size_t length,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,length);
+	*rpout=rp+length;
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					char16_t *value,
+					size_t length,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,length*sizeof(char16_t));
+	*rpout=rp+length*sizeof(char16_t);
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					float *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(float));
+	*rpout=rp+sizeof(float);
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					double *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(double));
+	*rpout=rp+sizeof(double);
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint16_t));
+	*value=(pvt->_bigendian)?
+			filedescriptor::netToHost(*value):
+			filedescriptor::littleEndianToHost(*value);
+	*rpout=rp+sizeof(uint16_t);
+}
+
+
+void sqlrprotocol::copyOutLE(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint16_t));
+	*value=filedescriptor::littleEndianToHost(*value);
+	*rpout=rp+sizeof(uint16_t);
+}
+
+bool sqlrprotocol::copyOutLE(const unsigned char *rp,
+					uint16_t *value,
+					const char *name,
+					uint16_t expected,
+					const unsigned char **rpout) {
+	copyOutLE(rp,value,rpout);
+	if (*value!=expected) {
+		if (getDebug()) {
+			stdoutput.printf("bad %s 0x%04x, expected 0x%04x\n",
+							name,*value,expected);
+		}
+		*rpout=rp;
+		return false;
+	}
+	return true;
+}
+
+void sqlrprotocol::copyOutBE(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint16_t));
+	*value=filedescriptor::netToHost(*value);
+	*rpout=rp+sizeof(uint16_t);
+}
+
+bool sqlrprotocol::copyOutBE(const unsigned char *rp,
+					uint16_t *value,
+					const char *name,
+					uint16_t expected,
+					const unsigned char **rpout) {
+	copyOutBE(rp,value,rpout);
+	if (*value!=expected) {
+		if (pvt->_debug) {
+			stdoutput.printf("bad %s 0x%04x, expected 0x%04x\n",
+							name,*value,expected);
+		}
+		*rpout=rp;
+		return false;
+	}
+	return true;
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint32_t));
+	*value=(pvt->_bigendian)?
+			filedescriptor::netToHost(*value):
+			filedescriptor::littleEndianToHost(*value);
+	*rpout=rp+sizeof(uint32_t);
+}
+
+void sqlrprotocol::copyOutLE(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint32_t));
+	*value=filedescriptor::littleEndianToHost(*value);
+	*rpout=rp+sizeof(uint32_t);
+}
+
+bool sqlrprotocol::copyOutLE(const unsigned char *rp,
+					uint32_t *value,
+					const char *name,
+					uint32_t expected,
+					const unsigned char **rpout) {
+	copyOutLE(rp,value,rpout);
+	if (*value!=expected) {
+		if (getDebug()) {
+			stdoutput.printf("bad %s 0x%08x, expected 0x%08x\n",
+							name,*value,expected);
+		}
+		*rpout=rp;
+		return false;
+	}
+	return true;
+}
+
+void sqlrprotocol::copyOutBE(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint32_t));
+	*value=filedescriptor::netToHost(*value);
+	*rpout=rp+sizeof(uint32_t);
+}
+
+bool sqlrprotocol::copyOutBE(const unsigned char *rp,
+					uint32_t *value,
+					const char *name,
+					uint32_t expected,
+					const unsigned char **rpout) {
+	copyOutBE(rp,value,rpout);
+	if (*value!=expected) {
+		if (pvt->_debug) {
+			stdoutput.printf("bad %s 0x%08x, expected 0x%08x\n",
+							name,*value,expected);
+		}
+		*rpout=rp;
+		return false;
+	}
+	return true;
+}
+
+void sqlrprotocol::copyOut(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint64_t));
+	*value=(pvt->_bigendian)?
+			filedescriptor::netToHost(*value):
+			filedescriptor::littleEndianToHost(*value);
+	*rpout=rp+sizeof(uint64_t);
+}
+
+void sqlrprotocol::copyOutLE(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint64_t));
+	*value=filedescriptor::littleEndianToHost(*value);
+	*rpout=rp+sizeof(uint64_t);
+}
+
+bool sqlrprotocol::copyOutLE(const unsigned char *rp,
+					uint64_t *value,
+					const char *name,
+					uint64_t expected,
+					const unsigned char **rpout) {
+	copyOutLE(rp,value,rpout);
+	if (*value!=expected) {
+		if (getDebug()) {
+			stdoutput.printf("bad %s 0x%016x, expected 0x%016x\n",
+							name,*value,expected);
+		}
+		*rpout=rp;
+		return false;
+	}
+	return true;
+}
+
+void sqlrprotocol::copyOutBE(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout) {
+	bytestring::copy(value,rp,sizeof(uint64_t));
+	*value=filedescriptor::netToHost(*value);
+	*rpout=rp+sizeof(uint64_t);
+}
+
+bool sqlrprotocol::copyOutBE(const unsigned char *rp,
+					uint64_t *value,
+					const char *name,
+					uint64_t expected,
+					const unsigned char **rpout) {
+	copyOutBE(rp,value,rpout);
+	if (*value!=expected) {
+		if (pvt->_debug) {
+			stdoutput.printf("bad %s 0x%016x, expected 0x%016x\n",
+							name,*value,expected);
+		}
+		*rpout=rp;
+		return false;
+	}
+	return true;
+}
+
+uint16_t sqlrprotocol::hostTo(uint16_t value) {
+	return (getProtocolIsBigEndian())?
+			filedescriptor::hostToNet(value):
+			filedescriptor::hostToLittleEndian(value);
+}
+
+uint32_t sqlrprotocol::hostTo(uint32_t value) {
+	return (getProtocolIsBigEndian())?
+			filedescriptor::hostToNet(value):
+			filedescriptor::hostToLittleEndian(value);
+}
+
+uint64_t sqlrprotocol::hostTo(uint64_t value) {
+	return (getProtocolIsBigEndian())?
+			filedescriptor::hostToNet(value):
+			filedescriptor::hostToLittleEndian(value);
+}
+
+bool sqlrprotocol::getDebug() {
+	return pvt->_debug;
+}
+
+void sqlrprotocol::debugStart(const char *title) {
+	debugStart(title,0);
+}
+
+void sqlrprotocol::debugStart(const char *title, uint16_t indent) {
+	if (pvt->_debug) {
+		for (uint16_t i=0; i<indent; i++) {
+			stdoutput.write('	');
+		}
+		if (!indent) {
+			stdoutput.printf("%d: ",process::getProcessId());
+		}
+		stdoutput.write(title);
+		stdoutput.write(" {\n");
+	}
+}
+
+void sqlrprotocol::debugEnd() {
+	return debugEnd(0);
+}
+
+void sqlrprotocol::debugEnd(uint16_t indent) {
+	if (pvt->_debug) {
+		for (uint16_t i=0; i<indent; i++) {
+			stdoutput.write('	');
+		}
+		stdoutput.write("}\n");
+	}
+}
+
+void sqlrprotocol::debugHexDump(const unsigned char *data, uint64_t size) {
+	return debugHexDump(data,size,1);
+}
+
+void sqlrprotocol::debugHexDump(const unsigned char *data,
+						uint64_t size,
+						uint16_t indent) {
+	if (!pvt->_debug) {
+		return;
+	}
+	if (!size) {
+		return;
+	}
+	for (uint16_t j=0; j<indent; j++) {
+		stdoutput.write("	");
+	}
+	for (uint64_t i=0; i<size; i++) {
+		stdoutput.printf("%02x  ",data[i]);
+		if (!((i+1)%8)) {
+			stdoutput.write("   ");
+		}
+		if (!((i+1)%16)) {
+			stdoutput.write("\n");
+			for (uint16_t j=0; j<indent; j++) {
+				stdoutput.write("	");
+			}
+		}
+	}
+	stdoutput.write("\n");
+	for (uint16_t i=0; i<indent; i++) {
+		stdoutput.write("	");
+	}
+	for (uint64_t i=0; i<size; i++) {
+		if (data[i]>=' ' && data[i]<='~') {
+			stdoutput.printf("%c   ",data[i]);
+		} else {
+			stdoutput.write(".   ");
+		}
+		if (!((i+1)%8)) {
+			stdoutput.write("   ");
+		}
+		if (!((i+1)%16)) {
+			stdoutput.write("\n");
+			for (uint16_t j=0; j<indent; j++) {
+				stdoutput.write("	");
+			}
+		}
+	}
+	stdoutput.write('\n');
 }

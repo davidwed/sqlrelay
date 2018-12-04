@@ -1364,7 +1364,109 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 
 	protected:
 		sqlrprotocols		*getProtocols();
-		domnode		*getParameters();
+		domnode			*getParameters();
+
+		void	setProtocolIsBigEndian(bool bigendian);
+		bool	getProtocolIsBigEndian();
+
+		void	copyOut(const unsigned char *rp,
+					char *value,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					unsigned char *value,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					char *value,
+					size_t length,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					unsigned char *value,
+					size_t length,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					char16_t *value,
+					size_t length,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					float *value,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					double *value,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout);
+		void	copyOutLE(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout);
+		bool	copyOutLE(const unsigned char *rp,
+					uint16_t *value,
+					const char *name,
+					uint16_t expected,
+					const unsigned char **rpout);
+		void	copyOutBE(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout);
+		bool	copyOutBE(const unsigned char *rp,
+					uint16_t *value,
+					const char *name,
+					uint16_t expected,
+					const unsigned char **rpout);
+		void	copyOutLE(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout);
+		bool	copyOutLE(const unsigned char *rp,
+					uint32_t *value,
+					const char *name,
+					uint32_t expected,
+					const unsigned char **rpout);
+		void	copyOutBE(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout);
+		bool	copyOutBE(const unsigned char *rp,
+					uint32_t *value,
+					const char *name,
+					uint32_t expected,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout);
+		void	copyOutLE(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout);
+		bool	copyOutLE(const unsigned char *rp,
+					uint64_t *value,
+					const char *name,
+					uint64_t expected,
+					const unsigned char **rpout);
+		void	copyOutBE(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout);
+		bool	copyOutBE(const unsigned char *rp,
+					uint64_t *value,
+					const char *name,
+					uint64_t expected,
+					const unsigned char **rpout);
+
+		uint16_t	hostTo(uint16_t value);
+		uint32_t	hostTo(uint32_t value);
+		uint64_t	hostTo(uint64_t value);
+
+		bool	getDebug();
+
+		void	debugStart(const char *title);
+		void	debugStart(const char *title, uint16_t indent);
+		void	debugEnd();
+		void	debugEnd(uint16_t indent);
+
+		void	debugHexDump(const unsigned char *data,
+						uint64_t size);
+		void	debugHexDump(const unsigned char *data,
+						uint64_t size,
+						uint16_t indent);
 
 		sqlrservercontroller	*cont;
 

@@ -239,8 +239,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		char		lobbuffer[32768];
 
 		uint16_t	protocolversion;
-
-		bool		debug;
 };
 
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
@@ -382,8 +380,6 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	}
 
 	protocolversion=0;
-
-	debug=cont->getConfig()->getDebugProtocols();
 }
 
 sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
