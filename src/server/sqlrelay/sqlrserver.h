@@ -1460,6 +1460,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 					const char *name,
 					uint64_t expected,
 					const unsigned char **rpout);
+		uint64_t	copyOutLenEncInt(const unsigned char *in,
+						const unsigned char **out);
 
 		void	copyIn(bytebuffer *buffer, char value);
 		void	copyIn(bytebuffer *buffer, unsigned char value);
@@ -1479,6 +1481,14 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		void	copyIn(bytebuffer *buffer, uint64_t value);
 		void	copyInLE(bytebuffer *buffer, uint64_t value);
 		void	copyInBE(bytebuffer *buffer, uint64_t value);
+		void	copyInLenEncInt(bytebuffer *buffer,
+						uint64_t value);
+		void	copyInLenEncStr(bytebuffer *buffer,
+						const char *string);
+		void	copyInLenEncStr(bytebuffer *buffer,
+						const char *string,
+						uint64_t length);
+		void	copyInTriplet(bytebuffer *buffer, uint32_t value);
 
 		uint16_t	toHost(uint16_t value);
 		uint32_t	toHost(uint32_t value);

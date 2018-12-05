@@ -315,6 +315,48 @@ bool sqlrprotocol::copyOutBE(const unsigned char *rp,
 	return true;
 }
 
+uint64_t sqlrprotocol::copyOutLenEncInt(const unsigned char *rp,
+					const unsigned char **rpout) {
+	uint64_t	retval=0;
+	switch (*rp) {
+		case 0xfe:
+			{
+			uint64_t	val;
+			bytestring::copy(&val,rp+1,sizeof(uint64_t));
+			retval=val;
+			*rpout=rp+9;
+			}
+		case 0xfd:
+			{
+			uint32_t	val=0;
+			unsigned char	*valbytes=(unsigned char *)&val;
+			rp++;
+			valbytes[3]=*rp;
+			rp++;
+			valbytes[2]=*rp;
+			rp++;
+			valbytes[1]=*rp;
+			rp++;
+			valbytes[0]=0;
+			val=beToHost(val);
+			retval=(uint64_t)val;
+			*rpout=rp;
+			}
+		case 0xfc:
+			{
+			uint16_t	val;
+			bytestring::copy(&val,rp+1,sizeof(uint16_t));
+			retval=val;
+			*rpout=rp+3;
+			}
+		default:
+			// *rp should be <= 0xfb at this point
+			retval=*rp;
+			*rpout=rp+1;
+	}
+	return retval;
+}
+
 void sqlrprotocol::copyIn(bytebuffer *buffer, char value) {
 	buffer->append(value);
 }
@@ -379,6 +421,42 @@ void sqlrprotocol::copyInLE(bytebuffer *buffer, uint64_t value) {
 
 void sqlrprotocol::copyInBE(bytebuffer *buffer, uint64_t value) {
 	buffer->append(hostToBE(value));
+}
+
+void sqlrprotocol::copyInLenEncInt(bytebuffer *buffer, uint64_t value) {
+	if (value>=16777216) {
+		buffer->append((char)0xfe);
+		buffer->append((uint64_t)value);
+	} else if (value>=65536) {
+		buffer->append((char)0xfd);
+		copyInTriplet(buffer,(uint32_t)value);
+	} else if (value>=251) {
+		buffer->append((char)0xfc);
+		buffer->append((uint16_t)value);
+	} else {
+		buffer->append((char)value);
+	}
+}
+
+void sqlrprotocol::copyInTriplet(bytebuffer *buffer, uint32_t value) {
+	value=hostToBE(value);
+	unsigned char	*valuebytes=(unsigned char *)&value;
+	buffer->append(valuebytes[3]);
+	buffer->append(valuebytes[2]);
+	buffer->append(valuebytes[1]);
+}
+
+void sqlrprotocol::copyInLenEncStr(bytebuffer *buffer,
+						const char *string) {
+	copyInLenEncInt(buffer,charstring::length(string));
+	buffer->append(string);
+}
+
+void sqlrprotocol::copyInLenEncStr(bytebuffer *buffer,
+						const char *string,
+						uint64_t length) {
+	copyInLenEncInt(buffer,length);
+	buffer->append(string,length);
 }
 
 uint16_t sqlrprotocol::toHost(uint16_t value) {
