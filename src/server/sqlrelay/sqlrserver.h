@@ -1372,8 +1372,18 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		void	copyOut(const unsigned char *rp,
 					char *value,
 					const unsigned char **rpout);
+		bool	copyOut(const unsigned char *rp,
+					char *value,
+					const char *name,
+					char expected,
+					const unsigned char **rpout);
 		void	copyOut(const unsigned char *rp,
 					unsigned char *value,
+					const unsigned char **rpout);
+		bool	copyOut(const unsigned char *rp,
+					unsigned char *value,
+					const char *name,
+					unsigned char expected,
 					const unsigned char **rpout);
 		void	copyOut(const unsigned char *rp,
 					char *value,
@@ -1412,6 +1422,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 					const char *name,
 					uint16_t expected,
 					const unsigned char **rpout);
+		void	copyOut(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout);
 		void	copyOutLE(const unsigned char *rp,
 					uint32_t *value,
 					const unsigned char **rpout);
@@ -1427,9 +1440,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 					uint32_t *value,
 					const char *name,
 					uint32_t expected,
-					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
-					uint32_t *value,
 					const unsigned char **rpout);
 		void	copyOut(const unsigned char *rp,
 					uint64_t *value,
@@ -1451,9 +1461,44 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 					uint64_t expected,
 					const unsigned char **rpout);
 
+		void	copyIn(bytebuffer *buffer, char value);
+		void	copyIn(bytebuffer *buffer, unsigned char value);
+		void	copyIn(bytebuffer *buffer, const char *value);
+		void	copyIn(bytebuffer *buffer, const char *value,
+								size_t length);
+		void	copyIn(bytebuffer *buffer, const unsigned char *value,
+								size_t length);
+		void	copyIn(bytebuffer *buffer, float value);
+		void	copyIn(bytebuffer *buffer, double value);
+		void	copyIn(bytebuffer *buffer, uint16_t value);
+		void	copyInLE(bytebuffer *buffer, uint16_t value);
+		void	copyInBE(bytebuffer *buffer, uint16_t value);
+		void	copyIn(bytebuffer *buffer, uint32_t value);
+		void	copyInLE(bytebuffer *buffer, uint32_t value);
+		void	copyInBE(bytebuffer *buffer, uint32_t value);
+		void	copyIn(bytebuffer *buffer, uint64_t value);
+		void	copyInLE(bytebuffer *buffer, uint64_t value);
+		void	copyInBE(bytebuffer *buffer, uint64_t value);
+
+		uint16_t	toHost(uint16_t value);
+		uint32_t	toHost(uint32_t value);
+		uint64_t	toHost(uint64_t value);
+		uint16_t	leToHost(uint16_t value);
+		uint32_t	leToHost(uint32_t value);
+		uint64_t	leToHost(uint64_t value);
+		uint16_t	beToHost(uint16_t value);
+		uint32_t	beToHost(uint32_t value);
+		uint64_t	beToHost(uint64_t value);
+
 		uint16_t	hostTo(uint16_t value);
 		uint32_t	hostTo(uint32_t value);
 		uint64_t	hostTo(uint64_t value);
+		uint16_t	hostToLE(uint16_t value);
+		uint32_t	hostToLE(uint32_t value);
+		uint64_t	hostToLE(uint64_t value);
+		uint16_t	hostToBE(uint16_t value);
+		uint32_t	hostToBE(uint32_t value);
+		uint64_t	hostToBE(uint64_t value);
 
 		bool	getDebug();
 
