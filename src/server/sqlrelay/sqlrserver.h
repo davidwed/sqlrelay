@@ -1369,126 +1369,127 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		void	setProtocolIsBigEndian(bool bigendian);
 		bool	getProtocolIsBigEndian();
 
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					char *value,
 					const unsigned char **rpout);
-		bool	copyOut(const unsigned char *rp,
+		bool	read(const unsigned char *rp,
 					char *value,
 					const char *name,
 					char expected,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					unsigned char *value,
 					const unsigned char **rpout);
-		bool	copyOut(const unsigned char *rp,
+		bool	read(const unsigned char *rp,
 					unsigned char *value,
 					const char *name,
 					unsigned char expected,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					char *value,
 					size_t length,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					unsigned char *value,
 					size_t length,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					char16_t *value,
 					size_t length,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					float *value,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					double *value,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					uint16_t *value,
 					const unsigned char **rpout);
-		void	copyOutLE(const unsigned char *rp,
+		void	readLE(const unsigned char *rp,
 					uint16_t *value,
 					const unsigned char **rpout);
-		bool	copyOutLE(const unsigned char *rp,
-					uint16_t *value,
-					const char *name,
-					uint16_t expected,
-					const unsigned char **rpout);
-		void	copyOutBE(const unsigned char *rp,
-					uint16_t *value,
-					const unsigned char **rpout);
-		bool	copyOutBE(const unsigned char *rp,
+		bool	readLE(const unsigned char *rp,
 					uint16_t *value,
 					const char *name,
 					uint16_t expected,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	readBE(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout);
+		bool	readBE(const unsigned char *rp,
+					uint16_t *value,
+					const char *name,
+					uint16_t expected,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
 					uint32_t *value,
 					const unsigned char **rpout);
-		void	copyOutLE(const unsigned char *rp,
+		void	readLE(const unsigned char *rp,
 					uint32_t *value,
 					const unsigned char **rpout);
-		bool	copyOutLE(const unsigned char *rp,
+		bool	readLE(const unsigned char *rp,
 					uint32_t *value,
 					const char *name,
 					uint32_t expected,
 					const unsigned char **rpout);
-		void	copyOutBE(const unsigned char *rp,
+		void	readBE(const unsigned char *rp,
 					uint32_t *value,
 					const unsigned char **rpout);
-		bool	copyOutBE(const unsigned char *rp,
+		bool	readBE(const unsigned char *rp,
 					uint32_t *value,
 					const char *name,
 					uint32_t expected,
 					const unsigned char **rpout);
-		void	copyOut(const unsigned char *rp,
+		void	read(const unsigned char *rp,
 					uint64_t *value,
 					const unsigned char **rpout);
-		void	copyOutLE(const unsigned char *rp,
+		void	readLE(const unsigned char *rp,
 					uint64_t *value,
 					const unsigned char **rpout);
-		bool	copyOutLE(const unsigned char *rp,
-					uint64_t *value,
-					const char *name,
-					uint64_t expected,
-					const unsigned char **rpout);
-		void	copyOutBE(const unsigned char *rp,
-					uint64_t *value,
-					const unsigned char **rpout);
-		bool	copyOutBE(const unsigned char *rp,
+		bool	readLE(const unsigned char *rp,
 					uint64_t *value,
 					const char *name,
 					uint64_t expected,
 					const unsigned char **rpout);
-		uint64_t	copyOutLenEncInt(const unsigned char *in,
+		void	readBE(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout);
+		bool	readBE(const unsigned char *rp,
+					uint64_t *value,
+					const char *name,
+					uint64_t expected,
+					const unsigned char **rpout);
+		uint64_t	readLenEncInt(const unsigned char *in,
 						const unsigned char **out);
 
-		void	copyIn(bytebuffer *buffer, char value);
-		void	copyIn(bytebuffer *buffer, unsigned char value);
-		void	copyIn(bytebuffer *buffer, const char *value);
-		void	copyIn(bytebuffer *buffer, const char *value,
+		void	write(bytebuffer *buffer, char value);
+		void	write(bytebuffer *buffer, unsigned char value);
+		void	write(bytebuffer *buffer, const char *value);
+		void	write(bytebuffer *buffer, const char *value,
 								size_t length);
-		void	copyIn(bytebuffer *buffer, const unsigned char *value,
+		void	write(bytebuffer *buffer, const unsigned char *value,
 								size_t length);
-		void	copyIn(bytebuffer *buffer, float value);
-		void	copyIn(bytebuffer *buffer, double value);
-		void	copyIn(bytebuffer *buffer, uint16_t value);
-		void	copyInLE(bytebuffer *buffer, uint16_t value);
-		void	copyInBE(bytebuffer *buffer, uint16_t value);
-		void	copyIn(bytebuffer *buffer, uint32_t value);
-		void	copyInLE(bytebuffer *buffer, uint32_t value);
-		void	copyInBE(bytebuffer *buffer, uint32_t value);
-		void	copyIn(bytebuffer *buffer, uint64_t value);
-		void	copyInLE(bytebuffer *buffer, uint64_t value);
-		void	copyInBE(bytebuffer *buffer, uint64_t value);
-		void	copyInLenEncInt(bytebuffer *buffer,
+		void	write(bytebuffer *buffer, char16_t *str, size_t length);
+		void	write(bytebuffer *buffer, float value);
+		void	write(bytebuffer *buffer, double value);
+		void	write(bytebuffer *buffer, uint16_t value);
+		void	writeLE(bytebuffer *buffer, uint16_t value);
+		void	writeBE(bytebuffer *buffer, uint16_t value);
+		void	write(bytebuffer *buffer, uint32_t value);
+		void	writeLE(bytebuffer *buffer, uint32_t value);
+		void	writeBE(bytebuffer *buffer, uint32_t value);
+		void	write(bytebuffer *buffer, uint64_t value);
+		void	writeLE(bytebuffer *buffer, uint64_t value);
+		void	writeBE(bytebuffer *buffer, uint64_t value);
+		void	writeLenEncInt(bytebuffer *buffer,
 						uint64_t value);
-		void	copyInLenEncStr(bytebuffer *buffer,
+		void	writeLenEncStr(bytebuffer *buffer,
 						const char *string);
-		void	copyInLenEncStr(bytebuffer *buffer,
+		void	writeLenEncStr(bytebuffer *buffer,
 						const char *string,
 						uint64_t length);
-		void	copyInTriplet(bytebuffer *buffer, uint32_t value);
+		void	writeTriplet(bytebuffer *buffer, uint32_t value);
 
 		uint16_t	toHost(uint16_t value);
 		uint32_t	toHost(uint32_t value);
