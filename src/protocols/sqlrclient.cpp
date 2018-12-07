@@ -2275,7 +2275,8 @@ bool sqlrprotocol_sqlrclient::getBindSize(sqlrservercursor *cursor,
 		debugstr.clear();
 		debugstr.append("get binds failed: bad value length: ");
 		debugstr.append(bv->valuesize);
-		cont->raiseClientProtocolErrorEvent(cursor,debugstr.getString(),1);
+		cont->raiseClientProtocolErrorEvent(
+				cursor,debugstr.getString(),1);
 		return false;
 	}
 

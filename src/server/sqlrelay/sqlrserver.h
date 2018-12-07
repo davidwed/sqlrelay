@@ -99,6 +99,7 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 		uint32_t		valuesize;
 		uint32_t		resultvaluesize;
 		sqlrserverbindvartype_t	type;
+		unsigned char		nativetype;
 		int16_t			isnull;
 };
 
