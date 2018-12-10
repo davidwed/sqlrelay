@@ -857,7 +857,6 @@ bool sapcursor::close() {
 }
 
 bool sapcursor::prepareQuery(const char *query, uint32_t length) {
-stdoutput.printf("prepareQuery(%s)\n",query);
 
 	// initialize column count
 	ncols=0;
