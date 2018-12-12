@@ -260,7 +260,7 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		const char	*getNoopQuery();
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
-		char	bindVariablePrefix();
+		char		bindVariablePrefix();
 		const char	*tempTableDropPrefix();
 		bool		commit();
 		bool		rollback();

@@ -30,6 +30,7 @@ class sqlrservercursorprivate {
 		memorypool	*_bindmappingspool;
 		namevaluepairs	*_inbindmappings;
 		namevaluepairs	*_outbindmappings;
+		namevaluepairs	*_inoutbindmappings;
 
 		uint16_t		_inbindcount;
 		sqlrserverbindvar	*_inbindvars;
@@ -119,6 +120,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_bindmappingspool=new memorypool(512,128,100);
 	pvt->_inbindmappings=new namevaluepairs;
 	pvt->_outbindmappings=new namevaluepairs;
+	pvt->_inoutbindmappings=new namevaluepairs;
 
 	setInputBindCount(0);
 	pvt->_inbindvars=new sqlrserverbindvar[
@@ -217,6 +219,7 @@ sqlrservercursor::~sqlrservercursor() {
 	delete pvt->_bindmappingspool;
 	delete pvt->_inbindmappings;
 	delete pvt->_outbindmappings;
+	delete pvt->_inoutbindmappings;
 	delete[] pvt->_inbindvars;
 	delete[] pvt->_outbindvars;
 	delete[] pvt->_inoutbindvars;
@@ -809,7 +812,6 @@ bool sqlrservercursor::fakeInputBinds() {
 	pvt->_querywithfakeinputbinds.clear();
 
 	// loop through the query, performing substitutions
-	char	prefix=pvt->_inbindvars[0].variable[0];
 	char	*ptr=pvt->_querybuffer;
 	int	index=1;
 	bool	inquotes=false;
@@ -824,8 +826,11 @@ bool sqlrservercursor::fakeInputBinds() {
 			}
 		}
 
-		// look for the bind var prefix or ? if not inside of quotes
-		if (!inquotes && (*ptr==prefix || *ptr=='?')) {
+		// look for a bind var prefix or ? if not inside of quotes
+		if (!inquotes && (*ptr=='?' ||
+					(*ptr==':' && *(ptr+1)!='=') ||
+					(*ptr=='@' && *(ptr+1)!='@') ||
+					*ptr=='$')) {
 
 			// look through the list of vars
 			for (int16_t i=0; i<pvt->_inbindcount; i++) {
@@ -857,11 +862,11 @@ bool sqlrservercursor::fakeInputBinds() {
 
 					||
 
-					(!charstring::compare(ptr,
+					(!charstring::compare(ptr+1,
 						pvt->_inbindvars[i].
-							variable,
+							variable+1,
 						pvt->_inbindvars[i].
-							variablesize) 
+							variablesize-1) 
 					 		&&
 					(*(ptr+pvt->_inbindvars[i].
 						variablesize)==' ' ||
@@ -1016,6 +1021,10 @@ namevaluepairs *sqlrservercursor::getInBindMappings() {
 
 namevaluepairs *sqlrservercursor::getOutBindMappings() {
 	return pvt->_outbindmappings;
+}
+
+namevaluepairs *sqlrservercursor::getInOutBindMappings() {
+	return pvt->_inoutbindmappings;
 }
 
 memorypool *sqlrservercursor::getBindMappingsPool() {

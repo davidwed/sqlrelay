@@ -256,6 +256,7 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		const char	*setIsolationLevelQuery();
 		const char	*noopQuery();
 		const char	*bindFormat();
+		char		bindVariablePrefix();
 
 		SQLHENV		env;
 		SQLRETURN	erg;
@@ -745,6 +746,10 @@ const char *informixconnection::getColumnListQuery(
 
 const char *informixconnection::bindFormat() {
 	return "?";
+}
+
+char informixconnection::bindVariablePrefix() {
+	return '?';
 }
 
 const char *informixconnection::selectDatabaseQuery() {

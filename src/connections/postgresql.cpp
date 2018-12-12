@@ -51,6 +51,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getLastInsertIdQuery();
 		const char	*noopQuery();
 		const char	*bindFormat();
+		char		bindVariablePrefix();
 
 		dictionary< int32_t, char *>	datatypes;
 		dictionary< int32_t, char *>	tables;
@@ -677,6 +678,17 @@ const char *postgresqlconnection::bindFormat() {
 #endif
 }
 
+char postgresqlconnection::bindVariablePrefix() {
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+	return '$';
+#else
+	return sqlrserverconnection::bindFormat();
+#endif
+}
+
 postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 	postgresqlconn=(postgresqlconnection *)conn;
@@ -758,8 +770,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -786,8 +798,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -811,8 +823,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -836,8 +848,8 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -867,8 +879,8 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;

@@ -3040,6 +3040,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	// clear bind mappings
 	cursor->getInBindMappings()->clear();
 	cursor->getOutBindMappings()->clear();
+	cursor->getInOutBindMappings()->clear();
 
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
@@ -3232,11 +3233,19 @@ bool sqlrservercontroller::matchesNativeBindFormat(const char *bind) {
 		(bindformat[1]=='*' && character::isAlphanumeric(bind[1]))));
 }
 
+//#define OLDMAPPING 1
 void sqlrservercontroller::translateBindVariableInStringAndMap(
 						sqlrservercursor *cursor,
 						stringbuffer *currentbind,
 						uint16_t bindindex,
 						stringbuffer *newquery) {
+
+#ifndef OLDMAPPING
+	// replace the bind variable delimiter with whatever we would expect to
+	// find for this database
+	currentbind->setPosition(0);
+	currentbind->write(bindVariablePrefix());
+#endif
 
 	const char	*bindformat=pvt->_conn->bindFormat();
 	size_t		bindformatlen=charstring::length(bindformat);
@@ -3250,24 +3259,28 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 		// placeholder such as ?'s. (mysql, db2 and firebird format)
 
 		// replace bind variable itself with number
-		mapBindVariable(cursor,currentbind->getString(),bindindex);
+		mapBindVariable(cursor,currentbind->getString(),
+					currentbind->getStringLength(),
+					bindindex);
 
 	} else if (bindformat[1]=='1' &&
 			!charstring::isNumber(currentbind->getString()+1)) {
 
 		// This section handles 2-character placeholders where the
-		// second position is a 1, such as $1 (postgresql-format).
+		// second position is a number, such as $1 (postgresql-format).
 
 		// replace bind variable in string with number
 		newquery->append(bindindex);
 
 		// replace bind variable itself with number
-		mapBindVariable(cursor,currentbind->getString(),bindindex);
+		mapBindVariable(cursor,currentbind->getString(),
+					currentbind->getStringLength(),
+					bindindex);
 
 	} else {
 
 		// This section handles everything else, such as :*, @*.
-		// (oracle, sybase and ms sql server formats)
+		// (oracle, sybase, and ms sql server formats)
 
 		// If the current bind variable was a single character
 		// placeholder (such as a ?) then replace it with a delimited
@@ -3279,8 +3292,9 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 			newquery->append(bindindex);
 
 			// replace bind variable itself with number
-			mapBindVariable(cursor,
-					currentbind->getString(),bindindex);
+			mapBindVariable(cursor,currentbind->getString(),
+						currentbind->getStringLength(),
+						bindindex);
 		} else {
 			newquery->append(currentbind->getString()+1,
 					currentbind->getStringLength()-1);
@@ -3290,6 +3304,7 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 
 void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 						const char *bindvariable,
+						uint64_t bindvariablelen,
 						uint16_t bindindex) {
 
 	// if the current bind variable is a ? then just
@@ -3298,16 +3313,26 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 		bindvariable=NULL;
 	}
 
-	// run two passes, first for input binds, second for output binds
-	for (uint16_t i=0; i<2; i++) {
+#ifdef OLDMAPPING
+	// run three passes - input binds, output binds, input/output binds
+	for (uint16_t i=0; i<3; i++) {
 
-		// first pass for input binds, second pass for output binds
-		uint16_t	count=(!i)?cursor->getInputBindCount():
-						cursor->getOutputBindCount();
-		sqlrserverbindvar	*vars=(!i)?cursor->getInputBinds():
-						cursor->getOutputBinds();
-		namevaluepairs	*mappings=(!i)?cursor->getInBindMappings():
-						cursor->getOutBindMappings();
+		uint16_t		count;
+		sqlrserverbindvar	*vars;
+		namevaluepairs		*mappings;
+		if (i==0) {
+			count=cursor->getInputBindCount();
+			vars=cursor->getInputBinds();
+			mappings=cursor->getInBindMappings();
+		} else if (i==1) {
+			count=cursor->getOutputBindCount();
+			vars=cursor->getOutputBinds();
+			mappings=cursor->getOutBindMappings();
+		} else if (i==2) {
+			count=cursor->getInputOutputBindCount();
+			vars=cursor->getInputOutputBinds();
+			mappings=cursor->getInOutBindMappings();
+		}
 
 		for (uint16_t j=0; j<count; j++) {
 
@@ -3339,7 +3364,7 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 						allocate(tempnumberlen+2);
 
 				// replace the existing bind var name and size
-				newvariable[0]=pvt->_conn->bindVariablePrefix();
+				newvariable[0]=bindVariablePrefix();
 				charstring::copy(newvariable+1,tempnumber);
 				newvariable[tempnumberlen+1]='\0';
 
@@ -3351,6 +3376,30 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 			}
 		}
 	}
+#else
+
+	// create the new bind var name and get its length
+	char		*tempnumber=charstring::parseNumber(bindindex);
+	uint16_t	tempnumberlen=charstring::length(tempnumber);
+
+	char	*oldvariable=(char *)cursor->getBindMappingsPool()->
+						allocate(bindvariablelen+1);
+	char	*newvariable=(char *)cursor->getBindMappingsPool()->
+						allocate(tempnumberlen+2);
+
+	charstring::copy(oldvariable,bindvariable,bindvariablelen);
+	oldvariable[bindvariablelen]='\0';
+
+	newvariable[0]=bindVariablePrefix();
+	charstring::copy(newvariable+1,tempnumber);
+	newvariable[tempnumberlen+1]='\0';
+
+	// map existing name to new name
+	cursor->getInBindMappings()->setValue(oldvariable,newvariable);
+				
+	// clean up
+	delete[] tempnumber;
+#endif
 }
 
 void sqlrservercontroller::translateBindVariablesFromMappings(
@@ -3369,12 +3418,17 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 		stdoutput.printf("  input binds:\n");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
 			stdoutput.printf("    %s\n",
-					cursor->getInputBinds()[i].variable);
+				cursor->getInputBinds()[i].variable);
 		}
 		stdoutput.printf("  output binds:\n");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
 			stdoutput.printf("    %s\n",
-					cursor->getOutputBinds()[i].variable);
+				cursor->getOutputBinds()[i].variable);
+		}
+		stdoutput.printf("  input/output binds:\n");
+		for (i=0; i<cursor->getInputOutputBindCount(); i++) {
+			stdoutput.printf("    %s\n",
+				cursor->getInputOutputBinds()[i].variable);
 		}
 		stdoutput.printf("\n");
 	}
@@ -3383,26 +3437,48 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 		raiseDebugMessageEvent("input binds:");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
 			raiseDebugMessageEvent(
-					cursor->getInputBinds()[i].variable);
+				cursor->getInputBinds()[i].variable);
 		}
 		raiseDebugMessageEvent("output binds:");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
 			raiseDebugMessageEvent(
-					cursor->getOutputBinds()[i].variable);
+				cursor->getOutputBinds()[i].variable);
+		}
+		raiseDebugMessageEvent("input/output binds:");
+		for (i=0; i<cursor->getInputOutputBindCount(); i++) {
+			raiseDebugMessageEvent(
+				cursor->getInputOutputBinds()[i].variable);
 		}
 	}
 
-	// run two passes, first for input binds, second for output binds
+	// run three passes - input binds, output binds, input/output binds
 	bool	remapped=false;
-	for (i=0; i<2; i++) {
+	for (i=0; i<3; i++) {
 
-		// first pass for input binds, second pass for output binds
-		uint16_t	count=(!i)?cursor->getInputBindCount():
-						cursor->getOutputBindCount();
-		sqlrserverbindvar	*vars=(!i)?cursor->getInputBinds():
-						cursor->getOutputBinds();
-		namevaluepairs	*mappings=(!i)?cursor->getInBindMappings():
-						cursor->getOutBindMappings();
+		uint16_t		count;
+		sqlrserverbindvar	*vars;
+		namevaluepairs		*mappings;
+		if (i==0) {
+			count=cursor->getInputBindCount();
+			vars=cursor->getInputBinds();
+			mappings=cursor->getInBindMappings();
+		} else if (i==1) {
+			count=cursor->getOutputBindCount();
+			vars=cursor->getOutputBinds();
+#ifdef OLDMAPPING
+			mappings=cursor->getOutBindMappings();
+#else
+			mappings=cursor->getInBindMappings();
+#endif
+		} else if (i==2) {
+			count=cursor->getInputOutputBindCount();
+			vars=cursor->getInputOutputBinds();
+#ifdef OLDMAPPING
+			mappings=cursor->getInOutBindMappings();
+#else
+			mappings=cursor->getInBindMappings();
+#endif
+		}
 
 		for (uint16_t j=0; j<count; j++) {
 
@@ -3433,12 +3509,17 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 		stdoutput.printf("  remapped input binds:\n");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
 			stdoutput.printf("    %s\n",
-					cursor->getInputBinds()[i].variable);
+				cursor->getInputBinds()[i].variable);
 		}
 		stdoutput.printf("  remapped output binds:\n");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
 			stdoutput.printf("    %s\n",
-					cursor->getOutputBinds()[i].variable);
+				cursor->getOutputBinds()[i].variable);
+		}
+		stdoutput.printf("  remapped input/output binds:\n");
+		for (i=0; i<cursor->getOutputBindCount(); i++) {
+			stdoutput.printf("    %s\n",
+				cursor->getInputOutputBinds()[i].variable);
 		}
 		stdoutput.printf("\n");
 	}
@@ -3446,12 +3527,17 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 		raiseDebugMessageEvent("remapped input binds:");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
 			raiseDebugMessageEvent(
-					cursor->getInputBinds()[i].variable);
+				cursor->getInputBinds()[i].variable);
 		}
 		raiseDebugMessageEvent("remapped output binds:");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
 			raiseDebugMessageEvent(
-					cursor->getOutputBinds()[i].variable);
+				cursor->getOutputBinds()[i].variable);
+		}
+		raiseDebugMessageEvent("remapped input/output binds:");
+		for (i=0; i<cursor->getInputOutputBindCount(); i++) {
+			raiseDebugMessageEvent(
+				cursor->getInputOutputBinds()[i].variable);
 		}
 	}
 }
@@ -8822,6 +8908,11 @@ namevaluepairs *sqlrservercontroller::getInBindMappings(
 namevaluepairs *sqlrservercontroller::getOutBindMappings(
 						sqlrservercursor *cursor) {
 	return cursor->getOutBindMappings();
+}
+
+namevaluepairs *sqlrservercontroller::getInOutBindMappings(
+						sqlrservercursor *cursor) {
+	return cursor->getInOutBindMappings();
 }
 
 void sqlrservercontroller::setFakeInputBindsForThisQuery(

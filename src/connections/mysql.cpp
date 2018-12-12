@@ -201,7 +201,10 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*dbHostName();
+#ifdef HAVE_MYSQL_STMT_PREPARE
 		const char	*bindFormat();
+		char		bindVariablePrefix();
+#endif
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(
@@ -581,13 +584,15 @@ const char *mysqlconnection::dbHostName() {
 	return dbhostname;
 }
 
-const char *mysqlconnection::bindFormat() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
+const char *mysqlconnection::bindFormat() {
 	return "?";
-#else
-	return sqlrserverconnection::bindFormat();
-#endif
 }
+
+char mysqlconnection::bindVariablePrefix() {
+	return '?';
+}
+#endif
 
 const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 	return (wild)?"select "
@@ -1004,7 +1009,7 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
+	// "variable" should be something like ?1,:2,:3, etc.
 	// If it's something like :var1,:var2,:var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
@@ -1043,8 +1048,8 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -1077,8 +1082,8 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -1120,8 +1125,8 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -1190,8 +1195,8 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;

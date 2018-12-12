@@ -102,6 +102,7 @@ $cur->inputBind("12","testchar2");
 $cur->inputBind("13","testvarchar2");
 $cur->inputBind("14",1);
 checkSuccess($cur->executeQuery(),1);
+$con->debugOff();
 $cur->clearBinds();
 $cur->inputBind("1",3);
 $cur->inputBind("2",3);

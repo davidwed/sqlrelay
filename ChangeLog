@@ -17,6 +17,7 @@
 	added sha1 and sha256 auth modules
 	moved some common protocol module methods into sqlrprotocol
 	tweaked nodejs api to support node 11
+	refactored bind variable translation a bit
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class

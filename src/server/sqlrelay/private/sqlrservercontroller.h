@@ -67,6 +67,7 @@
 					stringbuffer *newquery);
 		void	mapBindVariable(sqlrservercursor *cursor,
 					const char *variablename,
+					uint64_t variablenamelen,
 					uint16_t bindindex);
 
 		void	translateBeginTransaction(sqlrservercursor *cursor);
