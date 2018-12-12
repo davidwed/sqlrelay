@@ -42,6 +42,11 @@ using namespace node;
 	#define newInt32(val) Int32::New(isolate,val)
 	#define newNumber(val) Number::New(isolate,val)
 	#define newArray(len) Array::New(isolate,len)
+	#if NODE_MAJOR_VERSION >= 10
+		#define newInstance(argc,argv) cons->NewInstance(isolate->GetCurrentContext(),argc,argv).ToLocalChecked()
+	#else
+		#define newInstance(argc,argv) cons->NewInstance(argc,argv)
+	#endif
 
 	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); return; }
 
@@ -74,6 +79,7 @@ using namespace node;
 	#define newInt32(val) Int32::New(val)
 	#define newNumber(val) Number::New(val)
 	#define newArray(len) Array::New(len)
+	#define newInstance(argc,argv) cons->NewInstance(argc,argv)
 
 	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); returnBoolean(false); }
 
@@ -335,7 +341,7 @@ RET SQLRConnection::New(const ARGS &args) {
 		const int	argc=1;
 		Local<Value>	argv[argc]={args[0]};
 		Local<Function>	cons=newLocalFunction(constructor);
-		returnObject(cons->NewInstance(argc,argv));
+		returnObject(newInstance(argc,argv));
 	}
 }
 
@@ -897,7 +903,7 @@ RET SQLRCursor::New(const ARGS &args) {
 		const int	argc=1;
 		Local<Value>	argv[argc]={args[0]};
 		Local<Function>	cons=newLocalFunction(constructor);
-		returnObject(cons->NewInstance(argc,argv));
+		returnObject(newInstance(argc,argv));
 	}
 }
 
