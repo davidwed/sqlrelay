@@ -51,7 +51,6 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getLastInsertIdQuery();
 		const char	*noopQuery();
 		const char	*bindFormat();
-		char		bindVariablePrefix();
 
 		dictionary< int32_t, char *>	datatypes;
 		dictionary< int32_t, char *>	tables;
@@ -673,17 +672,6 @@ const char *postgresqlconnection::bindFormat() {
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	return "$1";
-#else
-	return sqlrserverconnection::bindFormat();
-#endif
-}
-
-char postgresqlconnection::bindVariablePrefix() {
-#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
-		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
-	return '$';
 #else
 	return sqlrserverconnection::bindFormat();
 #endif

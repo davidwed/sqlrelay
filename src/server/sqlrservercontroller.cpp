@@ -3237,13 +3237,13 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 						uint16_t bindindex,
 						stringbuffer *newquery) {
 
+	const char	*bindformat=pvt->_conn->bindFormat();
+	size_t		bindformatlen=charstring::length(bindformat);
+
 	// replace the bind variable delimiter with whatever we would expect to
 	// find for this database
 	currentbind->setPosition(0);
-	currentbind->write(bindVariablePrefix());
-
-	const char	*bindformat=pvt->_conn->bindFormat();
-	size_t		bindformatlen=charstring::length(bindformat);
+	currentbind->write(bindformat[0]);
 
 	// append the first character of the bind format to the new query
 	newquery->append(bindformat[0]);
@@ -3320,7 +3320,7 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 	charstring::copy(oldvariable,bindvariable,bindvariablelen);
 	oldvariable[bindvariablelen]='\0';
 
-	newvariable[0]=bindVariablePrefix();
+	newvariable[0]=bindFormat()[0];
 	charstring::copy(newvariable+1,tempnumber);
 	newvariable[tempnumberlen+1]='\0';
 
@@ -6639,7 +6639,7 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 				// override whatever bind prefix was in the
 				// query with the correct one (in case a
 				// non-native bind format was used)
-				parts[i][0]=bindVariablePrefix();
+				parts[i][0]=bindFormat()[0];
 				binds->append(parts[i]);
 			}
 		}
@@ -7587,10 +7587,6 @@ int16_t sqlrservercontroller::nonNullBindValue() {
 
 int16_t sqlrservercontroller::nullBindValue() {
 	return pvt->_conn->nullBindValue();
-}
-
-char sqlrservercontroller::bindVariablePrefix() {
-	return pvt->_conn->bindVariablePrefix();
 }
 
 bool sqlrservercontroller::bindValueIsNull(int16_t isnull) {

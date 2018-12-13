@@ -302,7 +302,6 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*bindFormat();
-		char		bindVariablePrefix();
 		const char	*getLastInsertIdQuery();
 		bool		getListsByApiCalls();
 		bool		getDatabaseList(sqlrservercursor *cursor,
@@ -964,11 +963,6 @@ const char *odbcconnection::dbVersion() {
 const char *odbcconnection::bindFormat() {
 	// FIXME: not true for all db's
 	return "?";
-}
-
-char odbcconnection::bindVariablePrefix() {
-	// FIXME: not true for all db's
-	return '?';
 }
 
 const char *odbcconnection::getLastInsertIdQuery() {

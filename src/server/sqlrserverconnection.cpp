@@ -888,10 +888,6 @@ int16_t sqlrserverconnection::nullBindValue() {
 	return -1;
 }
 
-char sqlrserverconnection::bindVariablePrefix() {
-	return ':';
-}
-
 bool sqlrserverconnection::bindValueIsNull(int16_t isnull) {
 	return (isnull==nullBindValue());
 }

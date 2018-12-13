@@ -260,7 +260,6 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		const char	*getNoopQuery();
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
-		char		bindVariablePrefix();
 		const char	*tempTableDropPrefix();
 		bool		commit();
 		bool		rollback();
@@ -861,10 +860,6 @@ const char *freetdsconnection::bindFormat() {
 
 const char *freetdsconnection::beginTransactionQuery() {
 	return "BEGIN TRANSACTION";
-}
-
-char freetdsconnection::bindVariablePrefix() {
-	return '@';
 }
 
 freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :

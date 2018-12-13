@@ -249,7 +249,6 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*bindFormat();
-		char		bindVariablePrefix();
 		const char	*getLastInsertIdQuery();
 		const char	*noopQuery();
 
@@ -724,10 +723,6 @@ const char *firebirdconnection::getColumnListQuery(
 
 const char *firebirdconnection::bindFormat() {
 	return "?";
-}
-
-char firebirdconnection::bindVariablePrefix() {
-	return '?';
 }
 
 const char *firebirdconnection::getLastInsertIdQuery() {

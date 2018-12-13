@@ -171,7 +171,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// bind variables
 		const char	*bindFormat();
-		char		bindVariablePrefix();
 		int16_t		nonNullBindValue();
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(int16_t isnull);
@@ -938,7 +937,6 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual	const char	*bindFormat();
 		virtual	int16_t		nonNullBindValue();
 		virtual	int16_t		nullBindValue();
-		virtual char		bindVariablePrefix();
 		virtual bool		bindValueIsNull(int16_t isnull);
 
 		virtual const char	*tempTableDropPrefix();

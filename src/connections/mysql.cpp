@@ -203,7 +203,6 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*dbHostName();
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		const char	*bindFormat();
-		char		bindVariablePrefix();
 #endif
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
@@ -587,10 +586,6 @@ const char *mysqlconnection::dbHostName() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 const char *mysqlconnection::bindFormat() {
 	return "?";
-}
-
-char mysqlconnection::bindVariablePrefix() {
-	return '?';
 }
 #endif
 

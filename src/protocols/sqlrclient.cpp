@@ -2203,7 +2203,7 @@ bool sqlrprotocol_sqlrclient::getBindVarName(sqlrservercursor *cursor,
 	// get the variable name
 	bv->variablesize=bindnamesize+1;
 	bv->variable=(char *)bindpool->allocate(bindnamesize+2);
-	bv->variable[0]=cont->bindVariablePrefix();
+	bv->variable[0]=cont->bindFormat()[0];
 	result=clientsock->read(bv->variable+1,bindnamesize,
 					idleclienttimeout,0);
 	if (result!=bindnamesize) {

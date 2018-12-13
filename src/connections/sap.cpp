@@ -47,7 +47,6 @@ class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 		const char	*noopQuery();
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
-		char		bindVariablePrefix();
 		const char	*tempTableDropPrefix();
 		bool		commit();
 		bool		rollback();
@@ -670,10 +669,6 @@ const char *sapconnection::bindFormat() {
 
 const char *sapconnection::beginTransactionQuery() {
 	return "BEGIN TRANSACTION";
-}
-
-char sapconnection::bindVariablePrefix() {
-	return '@';
 }
 
 sapcursor::sapcursor(sqlrserverconnection *conn, uint16_t id) :
