@@ -5847,7 +5847,7 @@ sqlrparser *sqlrservercontroller::newParser() {
 	return parser;
 }
 
-bool sqlrservercontroller::bulkLoadBegin(const char *id,
+bool sqlrservercontroller::bulkLoadBegin(const char *table,
 						const char *errorfieldtable,
 						const char *errorrowtable,
 						uint64_t maxerrorcount,
@@ -5858,8 +5858,8 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load begin:\n"
-				"		id: \"%s\"\n",
-						process::getProcessId(),id);
+				"		table: \"%s\"\n",
+						process::getProcessId(),table);
 		stdoutput.printf("		error table 1: \"%s\"\n"
 				"		error table 2: \"%s\"\n"
 				"		max error count: %lld\n"
@@ -5872,19 +5872,19 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 
 	// FIXME: bail if error tables already exist
 
-	// get an md5 sum of the id
-	// use this rather than using the id directly because:
-	// * the id could be sensitive information
-	// * the id name might not conform to valid file naming conventions
+	// get an md5 sum of the table
+	// use this rather than using the table directly because:
+	// * the table name could be sensitive information
+	// * the table name might not conform to valid file naming conventions
 	md5	m;
-	m.append((const unsigned char *)id,charstring::length(id));
+	m.append((const unsigned char *)table,charstring::length(table));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
-	id=md5str;
+	table=md5str;
 
 	// create a key file and key
 	delete[] pvt->_bulkserveridfilename;
 	charstring::printf(&pvt->_bulkserveridfilename,"%sbulk-%s.ipc",
-						pvt->_pth->getIpcDir(),id);
+						pvt->_pth->getIpcDir(),table);
 	delete[] md5str;
 	if (!file::createFile(pvt->_bulkserveridfilename,
 				permissions::ownerReadWrite())) {
@@ -6187,19 +6187,21 @@ bool sqlrservercontroller::bulkLoadJoin(const char *table) {
 
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load join:\n"
-				"		id: \"%s\"\n",
+				"		table: \"%s\"\n",
 					process::getProcessId(),table);
 	}
 
 	// get an md5 sum of the table (see bulkLoadBegin for why)
 	md5	m;
 	m.append((const unsigned char *)table,charstring::length(table));
-	table=(const char *)m.getHash();
+	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
+	table=md5str;
 
 	// create the key
 	char	*idfilename;
 	charstring::printf(&idfilename,"%sbulk-%s.ipc",
 				pvt->_pth->getIpcDir(),table);
+	delete[] md5str;
 	key_t	key=file::generateKey(idfilename,1);
 	delete[] idfilename;
 	if (key==-1) {
@@ -6307,11 +6309,6 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 		success=false;
 	}
 
-	if (success) {
-		// FIXME: it shouldn't be necessary to do this here (#5257)
-		bulkLoadInitBinds();
-	}
-
 	// prepare the query
 	if (success && !prepareQuery(pvt->_bulkcursor,
 					pvt->_bulkquery,
@@ -6323,8 +6320,7 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 
 	if (success) {
 
-		// FIXME: it should be possible to do this here (#5257)
-		//bulkLoadInitBinds();
+		bulkLoadInitBinds();
 
 		// run through the bulk data, binding and executing each row
 		uint64_t		errorcount=0;
@@ -6640,6 +6636,10 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 						",",false,&parts,&partcount);
 			for (uint64_t i=0; i<partcount; i++) {
 				charstring::bothTrim(parts[i]);
+				// override whatever bind prefix was in the
+				// query with the correct one (in case a
+				// non-native bind format was used)
+				parts[i][0]=bindVariablePrefix();
 				binds->append(parts[i]);
 			}
 		}
@@ -6706,10 +6706,11 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 		data+=size;
 
 		if (pvt->_debugbulkload) {
-			stdoutput.printf("	%.*s (%d): ",
+			stdoutput.printf("	%.*s %d(%d): ",
 						inbind->variablesize,
 						inbind->variable,
-						inbind->type);
+						inbind->type,
+						size);
 		}
 
 		char	*temp=NULL;
