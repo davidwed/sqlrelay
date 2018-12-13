@@ -28,9 +28,7 @@ class sqlrservercursorprivate {
 
 		memorypool	*_bindpool;
 		memorypool	*_bindmappingspool;
-		namevaluepairs	*_inbindmappings;
-		namevaluepairs	*_outbindmappings;
-		namevaluepairs	*_inoutbindmappings;
+		namevaluepairs	*_bindmappings;
 
 		uint16_t		_inbindcount;
 		sqlrserverbindvar	*_inbindvars;
@@ -118,9 +116,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	pvt->_bindpool=new memorypool(512,128,100);
 	pvt->_bindmappingspool=new memorypool(512,128,100);
-	pvt->_inbindmappings=new namevaluepairs;
-	pvt->_outbindmappings=new namevaluepairs;
-	pvt->_inoutbindmappings=new namevaluepairs;
+	pvt->_bindmappings=new namevaluepairs;
 
 	setInputBindCount(0);
 	pvt->_inbindvars=new sqlrserverbindvar[
@@ -217,9 +213,7 @@ sqlrservercursor::~sqlrservercursor() {
 	delete pvt->_querytree;
 	delete pvt->_bindpool;
 	delete pvt->_bindmappingspool;
-	delete pvt->_inbindmappings;
-	delete pvt->_outbindmappings;
-	delete pvt->_inoutbindmappings;
+	delete pvt->_bindmappings;
 	delete[] pvt->_inbindvars;
 	delete[] pvt->_outbindvars;
 	delete[] pvt->_inoutbindvars;
@@ -1015,16 +1009,8 @@ memorypool *sqlrservercursor::getBindPool() {
 	return pvt->_bindpool;
 }
 
-namevaluepairs *sqlrservercursor::getInBindMappings() {
-	return pvt->_inbindmappings;
-}
-
-namevaluepairs *sqlrservercursor::getOutBindMappings() {
-	return pvt->_outbindmappings;
-}
-
-namevaluepairs *sqlrservercursor::getInOutBindMappings() {
-	return pvt->_inoutbindmappings;
+namevaluepairs *sqlrservercursor::getBindMappings() {
+	return pvt->_bindmappings;
 }
 
 memorypool *sqlrservercursor::getBindMappingsPool() {

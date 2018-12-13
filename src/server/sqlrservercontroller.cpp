@@ -3038,9 +3038,7 @@ enum queryparsestate_t {
 void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 	// clear bind mappings
-	cursor->getInBindMappings()->clear();
-	cursor->getOutBindMappings()->clear();
-	cursor->getInOutBindMappings()->clear();
+	cursor->getBindMappings()->clear();
 
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
@@ -3233,19 +3231,16 @@ bool sqlrservercontroller::matchesNativeBindFormat(const char *bind) {
 		(bindformat[1]=='*' && character::isAlphanumeric(bind[1]))));
 }
 
-//#define OLDMAPPING 1
 void sqlrservercontroller::translateBindVariableInStringAndMap(
 						sqlrservercursor *cursor,
 						stringbuffer *currentbind,
 						uint16_t bindindex,
 						stringbuffer *newquery) {
 
-#ifndef OLDMAPPING
 	// replace the bind variable delimiter with whatever we would expect to
 	// find for this database
 	currentbind->setPosition(0);
 	currentbind->write(bindVariablePrefix());
-#endif
 
 	const char	*bindformat=pvt->_conn->bindFormat();
 	size_t		bindformatlen=charstring::length(bindformat);
@@ -3313,71 +3308,6 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 		bindvariable=NULL;
 	}
 
-#ifdef OLDMAPPING
-	// run three passes - input binds, output binds, input/output binds
-	for (uint16_t i=0; i<3; i++) {
-
-		uint16_t		count;
-		sqlrserverbindvar	*vars;
-		namevaluepairs		*mappings;
-		if (i==0) {
-			count=cursor->getInputBindCount();
-			vars=cursor->getInputBinds();
-			mappings=cursor->getInBindMappings();
-		} else if (i==1) {
-			count=cursor->getOutputBindCount();
-			vars=cursor->getOutputBinds();
-			mappings=cursor->getOutBindMappings();
-		} else if (i==2) {
-			count=cursor->getInputOutputBindCount();
-			vars=cursor->getInputOutputBinds();
-			mappings=cursor->getInOutBindMappings();
-		}
-
-		for (uint16_t j=0; j<count; j++) {
-
-			// get the bind var
-			sqlrserverbindvar	*b=&(vars[j]);
-
-			// If a bind var name was passed in, look for a bind
-			// variable with a matching name.
-			// If no name was passed in then the bind vars are
-			// numeric; get the variable who's numeric name matches
-			// the index passed in.
-			if ((bindvariable &&
-				!charstring::compare(bindvariable,
-							b->variable)) ||
-				(!bindvariable &&
-				charstring::toInteger((b->variable)+1)==
-								bindindex)) {
-
-				// create the new bind var
-				// name and get its length
-				char		*tempnumber=charstring::
-							parseNumber(bindindex);
-				uint16_t	tempnumberlen=charstring::
-							length(tempnumber);
-
-				// allocate memory for the new name
-				char	*newvariable=
-					(char *)cursor->getBindMappingsPool()->
-						allocate(tempnumberlen+2);
-
-				// replace the existing bind var name and size
-				newvariable[0]=bindVariablePrefix();
-				charstring::copy(newvariable+1,tempnumber);
-				newvariable[tempnumberlen+1]='\0';
-
-				// map existing name to new name
-				mappings->setValue(b->variable,newvariable);
-				
-				// clean up
-				delete[] tempnumber;
-			}
-		}
-	}
-#else
-
 	// create the new bind var name and get its length
 	char		*tempnumber=charstring::parseNumber(bindindex);
 	uint16_t	tempnumberlen=charstring::length(tempnumber);
@@ -3395,11 +3325,10 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 	newvariable[tempnumberlen+1]='\0';
 
 	// map existing name to new name
-	cursor->getInBindMappings()->setValue(oldvariable,newvariable);
+	cursor->getBindMappings()->setValue(oldvariable,newvariable);
 				
 	// clean up
 	delete[] tempnumber;
-#endif
 }
 
 void sqlrservercontroller::translateBindVariablesFromMappings(
@@ -3455,29 +3384,18 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 	bool	remapped=false;
 	for (i=0; i<3; i++) {
 
+		namevaluepairs		*mappings=cursor->getBindMappings();
 		uint16_t		count;
 		sqlrserverbindvar	*vars;
-		namevaluepairs		*mappings;
 		if (i==0) {
 			count=cursor->getInputBindCount();
 			vars=cursor->getInputBinds();
-			mappings=cursor->getInBindMappings();
 		} else if (i==1) {
 			count=cursor->getOutputBindCount();
 			vars=cursor->getOutputBinds();
-#ifdef OLDMAPPING
-			mappings=cursor->getOutBindMappings();
-#else
-			mappings=cursor->getInBindMappings();
-#endif
 		} else if (i==2) {
 			count=cursor->getInputOutputBindCount();
 			vars=cursor->getInputOutputBinds();
-#ifdef OLDMAPPING
-			mappings=cursor->getInOutBindMappings();
-#else
-			mappings=cursor->getInBindMappings();
-#endif
 		}
 
 		for (uint16_t j=0; j<count; j++) {
@@ -8900,19 +8818,9 @@ memorypool *sqlrservercontroller::getBindMappingsPool(
 	return cursor->getBindMappingsPool();
 }
 
-namevaluepairs *sqlrservercontroller::getInBindMappings(
+namevaluepairs *sqlrservercontroller::getBindMappings(
 						sqlrservercursor *cursor) {
-	return cursor->getInBindMappings();
-}
-
-namevaluepairs *sqlrservercontroller::getOutBindMappings(
-						sqlrservercursor *cursor) {
-	return cursor->getOutBindMappings();
-}
-
-namevaluepairs *sqlrservercontroller::getInOutBindMappings(
-						sqlrservercursor *cursor) {
-	return cursor->getInOutBindMappings();
+	return cursor->getBindMappings();
 }
 
 void sqlrservercontroller::setFakeInputBindsForThisQuery(
