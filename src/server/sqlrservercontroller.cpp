@@ -3237,8 +3237,8 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 						uint16_t bindindex,
 						stringbuffer *newquery) {
 
+	// get the bind format
 	const char	*bindformat=pvt->_conn->bindFormat();
-	size_t		bindformatlen=charstring::length(bindformat);
 
 	// replace the bind variable delimiter with whatever we would expect to
 	// find for this database
@@ -3248,7 +3248,7 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 	// append the first character of the bind format to the new query
 	newquery->append(bindformat[0]);
 
-	if (bindformatlen==1) {
+	if (bindformat[1]=='\0') {
 
 		// This section handles single-character bind variable
 		// placeholder such as ?'s. (mysql, db2 and firebird format)
