@@ -19,6 +19,7 @@
 	tweaked nodejs api to support node 11
 	refactored bind variable translation a bit
 	consolidated bindVariablePrefix and bindFormat
+	fetching a row can return an error now
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class

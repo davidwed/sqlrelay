@@ -5174,6 +5174,38 @@ bool sqlrcursor::parseResults() {
 			return false;
 		}
 
+		// check for an error
+		if (type==FETCH_ERROR) {
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+						"Got fetch error.\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+			pvt->_endofresultset=true;
+
+			// if we were stepping through a cached result set
+			// then we need to close the file
+			clearCacheSource();
+
+			uint16_t err=getErrorStatus();
+			if (err==TIMEOUT_GETTING_ERROR_STATUS) {
+				// The pattern here is that we bail
+				// immediately.  Error status has
+				// already been set.
+				pvt->_sqlrc->endSession();
+				return false;
+			}
+			getErrorFromServer();
+			if (err==ERROR_OCCURRED_DISCONNECT) {
+				pvt->_sqlrc->endSession();
+stdoutput.printf("ending session!!!");
+				return false;
+			}
+			break;
+		}
+
 		// check for the end of the result set
 		if (type==END_RESULT_SET) {
 
@@ -6318,7 +6350,7 @@ bool sqlrcursor::nextResultSet() {
 	pvt->_sqlrc->flushWriteBuffer();
 
 	uint16_t err=getErrorStatus();
-	if (err != NO_ERROR_OCCURRED) {
+	if (err!=NO_ERROR_OCCURRED) {
 		if (err==TIMEOUT_GETTING_ERROR_STATUS) {
 			// the pattern here is that we bail immediately.
 			// error status has already been set.

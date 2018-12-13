@@ -3395,9 +3395,51 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 				cont->nextRow(cursor);
 			} else {
 				if (error) {
-					// FIXME: handle error
+					clientsock->write(
+						(uint16_t)FETCH_ERROR);
+
+					cont->raiseDebugMessageEvent(
+							"returning error...");
+
+					// FIXME: this is a little kludgy,
+					// ideally we'd just call returnError()
+					// but it has some side effects
+
+					// get the error
+					const char	*errorstring;
+					uint32_t	errorlength;
+					int64_t		errnum;
+					bool		liveconnection;
+					cont->errorMessage(cursor,
+							&errorstring,
+							&errorlength,
+							&errnum,
+							&liveconnection);
+
+					// send the error status
+					if (!liveconnection) {
+						clientsock->write((uint16_t)
+						ERROR_OCCURRED_DISCONNECT);
+					} else {
+						clientsock->write((uint16_t)
+						ERROR_OCCURRED);
+					}
+
+					// send the error code
+					clientsock->write((uint64_t)errnum);
+
+					// send the error string
+					clientsock->write(
+						(uint16_t)errorlength);
+					clientsock->write(
+						errorstring,errorlength);
+
+					cont->raiseDebugMessageEvent(
+							"done returning error");
+				} else {
+					clientsock->write(
+						(uint16_t)END_RESULT_SET);
 				}
-				clientsock->write((uint16_t)END_RESULT_SET);
 				break;
 			}
 		}
