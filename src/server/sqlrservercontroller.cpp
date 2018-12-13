@@ -5847,7 +5847,7 @@ sqlrparser *sqlrservercontroller::newParser() {
 	return parser;
 }
 
-bool sqlrservercontroller::bulkLoadBegin(const char *table,
+bool sqlrservercontroller::bulkLoadBegin(const char *id,
 						const char *errorfieldtable,
 						const char *errorrowtable,
 						uint64_t maxerrorcount,
@@ -5858,8 +5858,8 @@ bool sqlrservercontroller::bulkLoadBegin(const char *table,
 
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load begin:\n"
-				"		table: \"%s\"\n",
-						process::getProcessId(),table);
+				"		id: \"%s\"\n",
+						process::getProcessId(),id);
 		stdoutput.printf("		error table 1: \"%s\"\n"
 				"		error table 2: \"%s\"\n"
 				"		max error count: %lld\n"
@@ -5872,19 +5872,19 @@ bool sqlrservercontroller::bulkLoadBegin(const char *table,
 
 	// FIXME: bail if error tables already exist
 
-	// get an md5 sum of the table
+	// get an md5 sum of the id
 	// use this rather than using the table directly because:
-	// * the table name could be sensitive information
-	// * the table name might not conform to valid file naming conventions
+	// * the id could be sensitive information
+	// * the id might not conform to valid file naming conventions
 	md5	m;
-	m.append((const unsigned char *)table,charstring::length(table));
+	m.append((const unsigned char *)id,charstring::length(id));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
-	table=md5str;
+	id=md5str;
 
 	// create a key file and key
 	delete[] pvt->_bulkserveridfilename;
 	charstring::printf(&pvt->_bulkserveridfilename,"%sbulk-%s.ipc",
-						pvt->_pth->getIpcDir(),table);
+						pvt->_pth->getIpcDir(),id);
 	delete[] md5str;
 	if (!file::createFile(pvt->_bulkserveridfilename,
 				permissions::ownerReadWrite())) {
@@ -6183,24 +6183,24 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable2(
 	return retval;
 }
 
-bool sqlrservercontroller::bulkLoadJoin(const char *table) {
+bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load join:\n"
-				"		table: \"%s\"\n",
-					process::getProcessId(),table);
+				"		id: \"%s\"\n",
+					process::getProcessId(),id);
 	}
 
-	// get an md5 sum of the table (see bulkLoadBegin for why)
+	// get an md5 sum of the id (see bulkLoadBegin for why)
 	md5	m;
-	m.append((const unsigned char *)table,charstring::length(table));
+	m.append((const unsigned char *)id,charstring::length(id));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
-	table=md5str;
+	id=md5str;
 
 	// create the key
 	char	*idfilename;
 	charstring::printf(&idfilename,"%sbulk-%s.ipc",
-				pvt->_pth->getIpcDir(),table);
+				pvt->_pth->getIpcDir(),id);
 	delete[] md5str;
 	key_t	key=file::generateKey(idfilename,1);
 	delete[] idfilename;

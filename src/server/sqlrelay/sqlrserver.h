@@ -685,7 +685,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							bool liveconnection);
 
 		// bulk load
-		bool	bulkLoadBegin(const char *table,
+		bool	bulkLoadBegin(const char *id,
 					const char *errorfieldtable,
 					const char *errorrowtable,
 					uint64_t maxerrorcount,
@@ -707,7 +707,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *query,
 						uint64_t querylen,
 						const char *errorrowtable);
-		bool	bulkLoadJoin(const char *table);
+		bool	bulkLoadJoin(const char *id);
 		bool	bulkLoadInputBind(const unsigned char *data,
 						uint64_t datalen);
 		void	bulkLoadParseInsert(const char *query,
