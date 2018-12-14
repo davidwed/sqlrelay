@@ -603,9 +603,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		knowsAffectedRows(sqlrservercursor *cursor);
 		uint64_t	affectedRows(sqlrservercursor *cursor);
 		bool		noRowsToReturn(sqlrservercursor *cursor);
-		bool		skipRow(sqlrservercursor *cursor);
+		bool		skipRow(sqlrservercursor *cursor,
+							bool *error);
 		bool		skipRows(sqlrservercursor *cursor,
-							uint64_t rows);
+							uint64_t rows,
+							bool *error);
 		bool		fetchRow(sqlrservercursor *cursor, bool *error);
 		void		nextRow(sqlrservercursor *cursor);
 		uint64_t	getTotalRowsFetched(sqlrservercursor *cursor);
@@ -1157,8 +1159,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 							const char *data,
 							uint32_t size);
 		virtual	bool	noRowsToReturn();
-		virtual	bool	skipRow();
-		virtual	bool	fetchRow();
+		virtual	bool	skipRow(bool *error);
+		virtual	bool	fetchRow(bool *error);
 		virtual	void	nextRow();
 		virtual void	getField(uint32_t col,
 						const char **field,

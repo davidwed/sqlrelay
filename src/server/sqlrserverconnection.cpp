@@ -397,7 +397,8 @@ char *sqlrserverconnection::getCurrentDatabase() {
 		gcdcur->prepareQuery(gcdquery,gcdquerylen) &&
 		gcdcur->executeQuery(gcdquery,gcdquerylen)) {
 
-		if (!gcdcur->noRowsToReturn() && gcdcur->fetchRow()) {
+		bool	error=false;
+		if (!gcdcur->noRowsToReturn() && gcdcur->fetchRow(&error)) {
 
 			// get the first field of the row and return it
 			const char	*field=NULL;
@@ -437,7 +438,8 @@ char *sqlrserverconnection::getCurrentSchema() {
 		gcscur->prepareQuery(gcsquery,gcsquerylen) &&
 		gcscur->executeQuery(gcsquery,gcsquerylen)) {
 
-		if (!gcscur->noRowsToReturn() && gcscur->fetchRow()) {
+		bool	error=false;
+		if (!gcscur->noRowsToReturn() && gcscur->fetchRow(&error)) {
 
 			// get the first field of the row and return it
 			const char	*field=NULL;
@@ -484,7 +486,8 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 		liicur->prepareQuery(liiquery,liiquerylen) &&
 		liicur->executeQuery(liiquery,liiquerylen)) {
 
-		if (!liicur->noRowsToReturn() && liicur->fetchRow()) {
+		bool	error=false;
+		if (!liicur->noRowsToReturn() && liicur->fetchRow(&error)) {
 
 			// get the first field of the row and return it
 			const char	*field=NULL;
@@ -631,7 +634,9 @@ const char *sqlrserverconnection::dbHostName() {
 			dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
 			dbhncur->executeQuery(dbhnquery,dbhnquerylen)) {
 
-			if (!dbhncur->noRowsToReturn() && dbhncur->fetchRow()) {
+			bool	error=false;
+			if (!dbhncur->noRowsToReturn() &&
+					dbhncur->fetchRow(&error)) {
 				const char	*field=NULL;
 				uint64_t	fieldlength=0;
 				bool		blob=false;
@@ -688,7 +693,9 @@ const char *sqlrserverconnection::dbIpAddress() {
 			dbiacur->prepareQuery(dbiaquery,dbiaquerylen) &&
 			dbiacur->executeQuery(dbiaquery,dbiaquerylen)) {
 
-			if (!dbiacur->noRowsToReturn() && dbiacur->fetchRow()) {
+			bool	error=false;
+			if (!dbiacur->noRowsToReturn() &&
+					dbiacur->fetchRow(&error)) {
 				const char	*field=NULL;
 				uint64_t	fieldlength=0;
 				bool		blob=false;
@@ -860,11 +867,12 @@ bool sqlrserverconnection::isSynonym(const char *table) {
 	synquerylen=charstring::length(synquery);
 
 	sqlrservercursor	*syncur=cont->newCursor();
+	bool	error=false;
 	bool	result=(syncur->open() &&
 			syncur->prepareQuery(synquery,synquerylen) &&
 			syncur->executeQuery(synquery,synquerylen) &&
 			!syncur->noRowsToReturn() &&
-			syncur->fetchRow());
+			syncur->fetchRow(&error));
 	syncur->closeResultSet();
 	syncur->close();
 	cont->deleteCursor(syncur);

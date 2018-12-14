@@ -323,8 +323,8 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 		uint16_t	getColumnIsNullable(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
 		bool		noRowsToReturn();
-		bool		skipRow();
-		bool		fetchRow();
+		bool		skipRow(bool *error);
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -3941,15 +3941,18 @@ bool oraclecursor::noRowsToReturn() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
 
-bool oraclecursor::skipRow() {
-	if (fetchRow()) {
+bool oraclecursor::skipRow(bool *error) {
+	if (fetchRow(error)) {
 		row++;
 		return true;
 	}
 	return false;
 }
 
-bool oraclecursor::fetchRow() {
+bool oraclecursor::fetchRow(bool *error) {
+
+	*error=false;
+
 	if (row==conn->cont->getFetchAtOnce()) {
 		row=0;
 	}

@@ -48,7 +48,7 @@ class sqlrquery_sqlrcmdgstatcursor : public sqlrquerycursor {
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -279,7 +279,8 @@ bool sqlrquery_sqlrcmdgstatcursor::noRowsToReturn() {
 	return false;
 }
 
-bool sqlrquery_sqlrcmdgstatcursor::fetchRow() {
+bool sqlrquery_sqlrcmdgstatcursor::fetchRow(bool *error) {
+	*error=false;
 	if (currentrow<rowcount) {
 		currentrow++;
 		return true;

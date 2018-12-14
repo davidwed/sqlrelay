@@ -154,6 +154,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	returnResultSetData(sqlrservercursor *cursor,
 						bool getskipandfetch,
 						bool overridelazyfetch);
+		void	returnFetchError(sqlrservercursor *cursor);
 		void	returnRow(sqlrservercursor *cursor);
 		void	sendField(const char *data, uint32_t size);
 		void	sendNullField();
@@ -3360,6 +3361,8 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 	if (!lazyfetch || overridelazyfetch) {
 
+		bool	error=false;
+
 		// for some queries, there are no rows to return, 
 		if (cont->noRowsToReturn(cursor)) {
 			clientsock->write((uint16_t)END_RESULT_SET);
@@ -3370,11 +3373,15 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 		}
 
 		// skip the specified number of rows
-		if (!cont->skipRows(cursor,skip)) {
-			clientsock->write((uint16_t)END_RESULT_SET);
+		if (!cont->skipRows(cursor,skip,&error)) {
+			if (error) {
+				returnFetchError(cursor);
+			} else {
+				clientsock->write((uint16_t)END_RESULT_SET);
+				cont->raiseDebugMessageEvent(
+					"done returning result set data");
+			}
 			clientsock->flushWriteBuffer(-1,-1);
-			cont->raiseDebugMessageEvent(
-				"done returning result set data");
 			return true;
 		}
 
@@ -3388,54 +3395,13 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 		// send the specified number of rows back
 		for (uint64_t i=0; (!fetch || i<fetch); i++) {
-			bool	error=false;
 			if (cont->fetchRow(cursor,&error)) {
 				returnRow(cursor);
 				// FIXME: kludgy
 				cont->nextRow(cursor);
 			} else {
 				if (error) {
-					clientsock->write(
-						(uint16_t)FETCH_ERROR);
-
-					cont->raiseDebugMessageEvent(
-							"returning error...");
-
-					// FIXME: this is a little kludgy,
-					// ideally we'd just call returnError()
-					// but it has some side effects
-
-					// get the error
-					const char	*errorstring;
-					uint32_t	errorlength;
-					int64_t		errnum;
-					bool		liveconnection;
-					cont->errorMessage(cursor,
-							&errorstring,
-							&errorlength,
-							&errnum,
-							&liveconnection);
-
-					// send the error status
-					if (!liveconnection) {
-						clientsock->write((uint16_t)
-						ERROR_OCCURRED_DISCONNECT);
-					} else {
-						clientsock->write((uint16_t)
-						ERROR_OCCURRED);
-					}
-
-					// send the error code
-					clientsock->write((uint64_t)errnum);
-
-					// send the error string
-					clientsock->write(
-						(uint16_t)errorlength);
-					clientsock->write(
-						errorstring,errorlength);
-
-					cont->raiseDebugMessageEvent(
-							"done returning error");
+					returnFetchError(cursor);
 				} else {
 					clientsock->write(
 						(uint16_t)END_RESULT_SET);
@@ -3448,6 +3414,40 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 	cont->raiseDebugMessageEvent("done returning result set data");
 	return true;
+}
+
+void sqlrprotocol_sqlrclient::returnFetchError(sqlrservercursor *cursor) {
+
+	clientsock->write((uint16_t)FETCH_ERROR);
+
+	cont->raiseDebugMessageEvent("returning error...");
+
+	// FIXME: this is a little kludgy, ideally we'd just call returnError()
+	// but it has some side effects
+
+	// get the error
+	const char	*errorstring;
+	uint32_t	errorlength;
+	int64_t		errnum;
+	bool		liveconnection;
+	cont->errorMessage(cursor,&errorstring,&errorlength,
+					&errnum,&liveconnection);
+
+	// send the error status
+	if (!liveconnection) {
+		clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
+	} else {
+		clientsock->write((uint16_t)ERROR_OCCURRED);
+	}
+
+	// send the error code
+	clientsock->write((uint64_t)errnum);
+
+	// send the error string
+	clientsock->write((uint16_t)errorlength);
+	clientsock->write(errorstring,errorlength);
+
+	cont->raiseDebugMessageEvent("done returning error");
 }
 
 void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {

@@ -198,7 +198,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		const char	*getColumnTable(uint32_t i);
 		uint16_t	getColumnTableLength(uint32_t i);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -3382,9 +3382,14 @@ bool odbccursor::noRowsToReturn() {
 	return (!ncols);
 }
 
-bool odbccursor::fetchRow() {
+bool odbccursor::fetchRow(bool *error) {
 
+	*error=false;
 	erg=SQLFetch(stmt);
+	if (erg==SQL_ERROR) {
+		*error=true;
+		return false;
+	}
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		return false;
 	}

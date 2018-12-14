@@ -243,7 +243,7 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
 		const char	*getColumnTable(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -1752,13 +1752,19 @@ bool routercursor::noRowsToReturn() {
 	return (((currentcur)?currentcur->rowCount():0)==0);
 }
 
-bool routercursor::fetchRow() {
+bool routercursor::fetchRow(bool *error) {
+
+	*error=false;
+
 	if (!currentcur) {
 		return false;
 	}
 	if (currentcur->getField(nextrow,(uint32_t)0)) {
 		nextrow++;
 		return true;
+	}
+	if (currentcur->errorMessage()) {
+		*error=true;
 	}
 	return false;
 }

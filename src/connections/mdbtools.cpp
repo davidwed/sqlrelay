@@ -94,7 +94,7 @@ class SQLRSERVER_DLLSPEC mdbtoolscursor : public sqlrservercursor {
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 						const char **field,
 						uint64_t *fieldlength,
@@ -566,7 +566,10 @@ bool mdbtoolscursor::noRowsToReturn() {
 	return true;
 }
 
-bool mdbtoolscursor::fetchRow() {
+bool mdbtoolscursor::fetchRow(bool *error) {
+
+	*error=false;
+
 	if (cursortype==NOOP_CURSORTYPE) {
 		return false;
 	}

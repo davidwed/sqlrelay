@@ -173,7 +173,7 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 		const char	*getColumnTable(uint32_t col);
 		uint16_t	getColumnTableLength(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -1759,24 +1759,26 @@ bool firebirdcursor::noRowsToReturn() {
 	return (queryisexecsp)?true:!outsqlda->sqld;
 }
 
-bool firebirdcursor::fetchRow() {
+bool firebirdcursor::fetchRow(bool *error) {
+
+	*error=false;
 
 	ISC_STATUS	retcode=isc_dsql_fetch(firebirdconn->error,
 							&stmt,1,outsqlda);
+
+	// success
+	if (!retcode) {
+		return true;
+	}
+
+	// no more rows
 	if (retcode==100) {
-		// no more rows
-		return false;
-	} else if (retcode==335544364) {
-		// Request synchronization error.  This usually occurs because
-		// max-field-length was too small and a field was truncated.
-		// When it happens, the fetch fails, the cursor still points to
-		// the same row, and subsequent fetches will attempt to return
-		// the same row again.  There's no known way to recover and
-		// continue fetching rows, so we have to bail here.  Maybe a
-		// future version of firebird will have a fix for this.
 		return false;
 	}
-	return true;
+
+	// error
+	*error=true;
+	return false;
 }
 
 void firebirdcursor::getField(uint32_t col,

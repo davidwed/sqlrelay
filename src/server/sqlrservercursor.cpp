@@ -746,11 +746,12 @@ bool sqlrservercursor::noRowsToReturn() {
 	return true;
 }
 
-bool sqlrservercursor::skipRow() {
-	return fetchRow();
+bool sqlrservercursor::skipRow(bool *error) {
+	return fetchRow(error);
 }
 
-bool sqlrservercursor::fetchRow() {
+bool sqlrservercursor::fetchRow(bool *error) {
+	*error=false;
 	// by default, indicate that we are at the end of the result set
 	return false;
 }

@@ -174,8 +174,8 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 						const char *data,
 						uint32_t size);
 		bool		noRowsToReturn();
-		bool		skipRow();
-		bool		fetchRow();
+		bool		skipRow(bool *error);
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -1055,10 +1055,11 @@ bool freetdscursor::open() {
 
 			const char	*q=query[i];
 			int32_t		len=charstring::length(q);
+			bool		error=false;
 
 			if (prepareQuery(q,len) &&
 					executeQuery(q,len) &&
-					fetchRow()) {
+					fetchRow(&error)) {
 				freetdsconn->dbversion=
 					charstring::duplicate(data[index[i]]);
 			}
@@ -1975,15 +1976,19 @@ bool freetdscursor::noRowsToReturn() {
 			resultstype!=CS_COMPUTE_RESULT);
 }
 
-bool freetdscursor::skipRow() {
-	if (fetchRow()) {
+bool freetdscursor::skipRow(bool *error) {
+	if (fetchRow(error)) {
 		row++;
 		return true;
 	}
 	return false;
 }
 
-bool freetdscursor::fetchRow() {
+bool freetdscursor::fetchRow(bool *error) {
+
+	*error=false;
+	// FIXME: set error if an error occurs
+
 	if (row==(CS_INT)conn->cont->getFetchAtOnce()) {
 		row=0;
 	}
@@ -2019,6 +2024,9 @@ bool freetdscursor::fetchRow() {
 		}
 
 		if (fetchresult!=CS_SUCCEED || !rowsread) {
+			if (fetchresult==CS_FAIL || fetchresult==CS_ROW_FAIL) {
+				*error=true;
+			}
 			return false;
 		}
 		maxrow=rowsread;

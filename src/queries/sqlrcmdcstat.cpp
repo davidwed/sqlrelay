@@ -38,7 +38,7 @@ class sqlrquery_sqlrcmdcstatcursor : public sqlrquerycursor {
 		uint32_t	getColumnScale(uint32_t col);
 		uint16_t	getColumnIsNullable(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -148,7 +148,8 @@ bool sqlrquery_sqlrcmdcstatcursor::noRowsToReturn() {
 	return false;
 }
 
-bool sqlrquery_sqlrcmdcstatcursor::fetchRow() {
+bool sqlrquery_sqlrcmdcstatcursor::fetchRow(bool *error) {
+	*error=false;
 	while (currentrow<MAXCONNECTIONS) {
 		cs=&(conn->cont->getShm()->connstats[currentrow]);
 		currentrow++;

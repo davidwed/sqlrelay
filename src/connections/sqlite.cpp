@@ -138,8 +138,8 @@ class SQLRSERVER_DLLSPEC sqlitecursor : public sqlrservercursor {
 		const char	*getColumnTable(uint32_t col);
 		#endif
 		bool		noRowsToReturn();
-		bool		skipRow();
-		bool		fetchRow();
+		bool		skipRow(bool *error);
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -861,16 +861,19 @@ bool sqlitecursor::noRowsToReturn() {
 	return (!nrow);
 }
 
-bool sqlitecursor::skipRow() {
+bool sqlitecursor::skipRow(bool *error) {
 	#ifdef HAVE_SQLITE3_STMT
-	return fetchRow();
+	return fetchRow(error);
 	#else
 	rowindex=rowindex+ncolumn;
 	return true;
 	#endif
 }
 
-bool sqlitecursor::fetchRow() {
+bool sqlitecursor::fetchRow(bool *error) {
+
+	*error=false;
+
 	#ifdef HAVE_SQLITE3_STMT
 	if (justexecuted) {
 		justexecuted=false;
@@ -879,7 +882,11 @@ bool sqlitecursor::fetchRow() {
 	if (lastinsertrowid) {
 		return false;
 	}
-	return (sqlite3_step(stmt)==SQLITE_ROW);
+	int	result=sqlite3_step(stmt);
+	if (result==SQLITE_ERROR) {
+		*error=true;
+	}
+	return (result==SQLITE_ROW);
 	#else
 	// have to check for nrow+1 because the 
 	// first row is actually the column names

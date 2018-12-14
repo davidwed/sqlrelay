@@ -4454,7 +4454,8 @@ void sqlrservercontroller::setSendColumnInfo(uint16_t sendcolumninfo) {
 	pvt->_sendcolumninfo=sendcolumninfo;
 }
 
-bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
+bool sqlrservercontroller::skipRows(sqlrservercursor *cursor,
+						uint64_t rows, bool *error) {
 
 	if (pvt->_sqlrlg) {
 		pvt->_debugstr.clear();
@@ -4468,9 +4469,17 @@ bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
 
 		raiseDebugMessageEvent("skip...");
 
-		if (!cursor->skipRow()) {
-			raiseDebugMessageEvent("skipping rows hit the "
+		bool	error;
+		if (!skipRow(cursor,&error)) {
+			if (error) {
+				raiseDebugMessageEvent(
+						"skipping rows encountered "
+						"an error");
+			} else {
+				raiseDebugMessageEvent(
+						"skipping rows hit the "
 						"end of the result set");
+			}
 			return false;
 		}
 
@@ -8580,8 +8589,8 @@ bool sqlrservercontroller::noRowsToReturn(sqlrservercursor *cursor) {
 	return cursor->noRowsToReturn();
 }
 
-bool sqlrservercontroller::skipRow(sqlrservercursor *cursor) {
-	return cursor->skipRow();
+bool sqlrservercontroller::skipRow(sqlrservercursor *cursor, bool *error) {
+	return cursor->skipRow(error);
 }
 
 bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
@@ -8623,8 +8632,13 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 				j<pvt->_sqlrrsrbt->getRowBlockSize(); j++) {
 
 				// fetch the row
-				if (!cursor->fetchRow()) {
+				if (!cursor->fetchRow(error)) {
 					break;
+				}
+
+				// handle errors
+				if (*error) {
+					return false;
 				}
 
 				// use the provided field pointer arrays to get
@@ -8710,7 +8724,12 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 		// this is a little more straightforward...
 
 		// fetch the row
-		if (!cursor->fetchRow()) {
+		if (!cursor->fetchRow(error)) {
+			return false;
+		}
+
+		// handle errors
+		if (*error) {
 			return false;
 		}
 

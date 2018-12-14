@@ -123,7 +123,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		uint16_t	getColumnTableLength(uint32_t col);
 #endif
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -1683,20 +1683,38 @@ bool mysqlcursor::noRowsToReturn() {
 	return (!mysqlresult);
 }
 
-bool mysqlcursor::fetchRow() {
+bool mysqlcursor::fetchRow(bool *error) {
+
+	*error=false;
+
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		int	result=mysql_stmt_fetch(stmt);
-		if (result==MYSQL_NO_DATA) {
+		if (result==1) {
+			*error=true;
+			return false;
+		} else if (result==MYSQL_NO_DATA) {
 			stmtreset=false;
 			return false;
 		}
 		return !result;
 	} else {
 #endif
-		return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
-			(mysqlrowlengths=mysql_fetch_lengths(
-						mysqlresult))!=NULL);
+		mysqlrow=mysql_fetch_row(mysqlresult);
+		if (!mysqlrow) {
+			if (*mysql_error(mysqlconn->mysqlptr)) {
+				*error=true;
+			}
+			return false;
+		}
+		mysqlrowlengths=mysql_fetch_lengths(mysqlresult);
+		if (!mysqlrowlengths) {
+			if (*mysql_error(mysqlconn->mysqlptr)) {
+				*error=true;
+			}
+			return false;
+		}
+		return true;
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	}
 #endif

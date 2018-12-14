@@ -189,8 +189,8 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 		uint16_t	getColumnIsBinary(uint32_t col);
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
 		bool		noRowsToReturn();
-		bool		skipRow();
-		bool		fetchRow();
+		bool		skipRow(bool *error);
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -816,10 +816,11 @@ bool sapcursor::open() {
 
 			const char	*q=query[i];
 			int32_t		len=charstring::length(q);
+			bool		error=false;
 
 			if (prepareQuery(q,len) &&
 					executeQuery(q,len) &&
-					fetchRow()) {
+					fetchRow(&error)) {
 				sapconn->dbversion=
 					charstring::duplicate(data[index[i]]);
 			}
@@ -1591,15 +1592,19 @@ bool sapcursor::noRowsToReturn() {
 			resultstype!=CS_COMPUTE_RESULT);
 }
 
-bool sapcursor::skipRow() {
-	if (fetchRow()) {
+bool sapcursor::skipRow(bool *error) {
+	if (fetchRow(error)) {
 		row++;
 		return true;
 	}
 	return false;
 }
 
-bool sapcursor::fetchRow() {
+bool sapcursor::fetchRow(bool *error) {
+
+	*error=false;
+	// FIXME: set error if an error occurs
+
 	if (row==(CS_INT)conn->cont->getFetchAtOnce()) {
 		row=0;
 	}
@@ -1607,10 +1612,14 @@ bool sapcursor::fetchRow() {
 		return false;
 	}
 	if (!row) {
-		if (ct_fetch(cmd,CS_UNUSED,
-					CS_UNUSED,
-					CS_UNUSED,
-					&rowsread)!=CS_SUCCEED || !rowsread) {
+		CS_RETCODE	result=ct_fetch(cmd,CS_UNUSED,
+							CS_UNUSED,
+							CS_UNUSED,
+							&rowsread);
+		if (result!=CS_SUCCEED || !rowsread) {
+			if (result==CS_FAIL || result==CS_ROW_FAIL) {
+				*error=true;
+			}
 			return false;
 		}
 		maxrow=rowsread;

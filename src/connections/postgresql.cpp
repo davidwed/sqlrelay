@@ -159,7 +159,7 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		const char	*getColumnTable(uint32_t col);
 #endif
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -1391,7 +1391,11 @@ bool postgresqlcursor::noRowsToReturn() {
 #endif
 }
 
-bool postgresqlcursor::fetchRow() {
+bool postgresqlcursor::fetchRow(bool *error) {
+
+	*error=false;
+	// FIXME: set error if an error occurs
+
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	if (!justexecuted) {
