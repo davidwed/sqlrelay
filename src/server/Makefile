@@ -514,7 +514,7 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlruserpasswordcredentials.h $(includedir)/sqlrelay/private/sqlruserpasswordcredentials.h
 	$(CP) sqlrelay/private/sqlrmoduledata.h $(includedir)/sqlrelay/private/sqlrmoduledata.h
 	$(CP) sqlrelay/private/sqlrmoduledatas.h $(includedir)/sqlrelay/private/sqlrmoduledatas.h
-	$(CP) sqlrelay/private/sqlrmysqlcredentials.h $(includedir)/sqlrelay/private/sqlrtlscredentials.h
+	$(CP) sqlrelay/private/sqlrmysqlcredentials.h $(includedir)/sqlrelay/private/sqlrmysqlcredentials.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrauth.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrauths.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrfilter.h
