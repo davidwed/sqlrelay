@@ -1591,6 +1591,27 @@ class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 	#include <sqlrelay/private/sqlrtlscredentials.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlrmysqlcredentials : public sqlrcredentials {
+	public:
+			sqlrmysqlcredentials();
+		virtual	~sqlrmysqlcredentials();
+		const char	*getType();
+
+		void	setUser(const char *user);
+		void	setPassword(const char *password);
+		void	setPasswordLength(uint64_t passwordlength);
+		void	setMethod(const char *method);
+		void	setExtra(const char *extra);
+
+		const char	*getUser();
+		const char	*getPassword();
+		uint64_t	getPasswordLength();
+		const char	*getMethod();
+		const char	*getExtra();
+
+	#include <sqlrelay/private/sqlrmysqlcredentials.h>
+};
+
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 		sqlrauth(sqlrservercontroller *cont,

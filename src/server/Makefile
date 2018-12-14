@@ -91,6 +91,9 @@ LIBSQLRSERVERLOBJS = \
 	sqlrmoduledatas.$(OBJ) \
 	sqlrmoduledata.$(OBJ)
 
+MYSQLCREDSRCS = sqlrmysqlcredentials.cpp
+MYSQLCREDOBJS = sqlrmysqlcredentials.$(OBJ)
+
 .SUFFIXES: .lo .cpp.in
 
 .cpp.lo:
@@ -101,6 +104,7 @@ LIBSQLRSERVERLOBJS = \
 
 all: $(STATICPLUGINSRCS) \
 	lib$(SQLR)server.$(LIBEXT) \
+	lib$(SQLR)mysqlcredentials.$(LIBEXT) \
 	$(SQLR)-start$(EXE) \
 	$(SQLR)-stop$(EXE) \
 	$(SQLR)-listener$(EXE) \
@@ -116,6 +120,9 @@ clean:
 
 lib$(SQLR)server.$(LIBEXT): $(LIBSQLRSERVERSRCS) $(LIBSQLRSERVERLOBJS)
 	$(LTLINK) $(LINK) $(OUT)$@ $(LIBSQLRSERVERLOBJS) $(STATICPLUGINLOBJS) $(LDFLAGS) $(SRVLINKFLAGS) $(LIBSQLRSERVERLIBS) $(RUDIMENTSLIBS) $(STATICPLUGINLIBS) $(EXTRALIBS)
+
+lib$(SQLR)mysqlcredentials.$(LIBEXT): $(MYSQLCREDSRCS) $(MYSQLCREDOBJS)
+	$(LTLINK) $(LINK) $(OUT)$@ $(MYSQLCREDOBJS) $(LDFLAGS) $(SRVLINKFLAGS) $(LIBSQLRSERVERLIBS) $(RUDIMENTSLIBS) $(EXTRALIBS)
 
 $(SQLR)-start$(EXE): sqlr-start.cpp sqlr-start.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-start.$(OBJ) $(SERVERLIBS)
@@ -564,10 +571,12 @@ installdll:
 	$(LTINSTALL) $(CP) lib$(SQLR)server.$(LIBEXT) $(bindir)
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) $(CP) lib$(SQLR)server.lib $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)mysqlcredentials.lib $(libdir)
 
 installlib:
 	$(MKINSTALLDIRS) $(libdir)
 	$(LTINSTALL) $(CP) lib$(SQLR)server.$(LIBEXT) $(libdir)
+	$(LTINSTALL) $(CP) lib$(SQLR)mysqlcredentials.$(LIBEXT) $(libdir)
 	$(LTFINISH) $(libdir)
 
 uninstall: $(UNINSTALLLIB)
@@ -643,9 +652,12 @@ uninstall: $(UNINSTALLLIB)
 uninstalldll:
 	$(RM) $(bindir)/lib$(SQLR)server.$(LIBEXT) \
 		$(libdir)/lib$(SQLR)server.lib \
+		$(bindir)/lib$(SQLR)mysqlcredentials.$(LIBEXT) \
+		$(libdir)/lib$(SQLR)mysqlcredentials.lib \
 		$(bindir)/libsqlrserver.$(LIBEXT) \
 		$(libdir)/libsqlrserver.lib
 
 uninstalllib:
 	$(LTUNINSTALL) $(RM) $(libdir)/lib$(SQLR)server.$(LIBEXT) \
+				$(libdir)/lib$(SQLR)mysqlcredentials.$(LIBEXT) \
 				 $(libdir)/libsqlrserver.$(LIBEXT)

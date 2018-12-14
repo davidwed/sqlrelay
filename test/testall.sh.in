@@ -59,15 +59,15 @@ do
 	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
 	then
-		$PREFIX/bin/sqlr-start -id routermaster -backtrace `pwd`
+		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id routermaster -backtrace `pwd`
 		sleep 2
 
-		$PREFIX/bin/sqlr-start -id routerslave -backtrace `pwd`
+		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id routerslave -backtrace `pwd`
 		sleep 2
 	fi
 
 	# start the instance
-	$PREFIX/bin/sqlr-start -id ${DB}test -backtrace `pwd`
+	$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id ${DB}test -backtrace `pwd`
 	sleep 2
 
 	# make sure that the instance is up
