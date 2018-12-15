@@ -164,7 +164,7 @@ uninstall:
 	$(RMTREE) $(docdir)
 
 clean:
-	$(RM) $(OBJS) enterprise.wt enterpriseadmin.wt
+	$(RM) $(OBJS)
 	cd admin $(AND) $(MAKE) clean
 	cd dropin $(AND) $(MAKE) clean
 	cd features $(AND) $(MAKE) clean
