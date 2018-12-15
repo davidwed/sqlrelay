@@ -10,29 +10,11 @@ OBJS = index.html faq.html
 .wt.html:
 	wt -i $< -o $@ -xhtml xhtml.conf
 
-all: enterprise.wt enterpriseadmin.wt $(OBJS)
+all: $(OBJS)
 	cd admin $(AND) $(MAKE)
 	cd dropin $(AND) $(MAKE)
 	cd features $(AND) $(MAKE)
 	cd programming $(AND) $(MAKE)
-
-index.html: enterprise.wt
-
-enterprise.wt:
-	$(CP) empty.wt.in enterprise.wt
-
-enterpriseadmin.wt:
-	$(CP) empty.wt.in enterpriseadmin.wt
-
-enterprise:
-	$(RM) enterprise.wt enterpriseadmin.wt
-	$(CP) enterprise.wt.in enterprise.wt
-	$(CP) enterpriseadmin.wt.in enterpriseadmin.wt
-	$(MAKE) all
-
-nonenterprise:
-	$(RM) enterprise.wt enterpriseadmin.wt index.html
-	$(MAKE) enterprise.wt enterpriseadmin.wt index.html
 
 install:
 	$(MKINSTALLDIRS) $(docdir)

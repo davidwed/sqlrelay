@@ -32,7 +32,7 @@ In this configuration, SQL Relay becomes a transparent proxy.  !MySQL apps aimed
 [=#configuration]
 == Basic Configuration ==
 
-Before the SQL Relay Enterprise !MySQL Front-End Modules can be configured, they must first be [install_modules.html installed] and [license_mysql_frontend.html licensed].  Once they are, basic configuration consists of adding a set of tags that instruct SQL Relay to load the !MySQL protocol module and the appropriate !MySQL auth module to the SQL Relay configuration file (usually sqlrelay.conf).
+Basic configuration of the !MySQL Front-End Modules consists of adding a set of tags that instruct SQL Relay to load the !MySQL protocol module and the appropriate !MySQL auth module to the SQL Relay configuration file (usually sqlrelay.conf).
 
 {{{#!blockquote
 {{{#!code
@@ -179,9 +179,9 @@ And, another issue is that some !MySQL and !MariaDB distributions omit the neces
 [=#features]
 == Standard SQL Relay Features ==
 
-Once the app is talking to SQL Relay, most of SQL Relay's features become available to the app, including [../../sqlrelay/features/connectionpooling.html Connection Pooling], [../../sqlrelay/features/throttling.html Throttling], [../../sqlrelay/features/ha.html High Availability Features], [../../sqlrelay/features/queryrouting.html Query Routing], [../../sqlrelay/features/queryfiltering.html Query Filtering], and [../../sqlrelay/features/schedules.html Connection Schedules].
+Once the app is talking to SQL Relay, most of SQL Relay's features become available to the app, including [../features/connectionpooling.html Connection Pooling], [../features/throttling.html Throttling], [../features/ha.html High Availability Features], [../features/queryrouting.html Query Routing], [../features/queryfiltering.html Query Filtering], and [../features/schedules.html Connection Schedules].
 
-For the most part, these can be configured as defined in the [../../sqlrelay/admin/configguide.html SQL Relay Configuration Guide].
+For the most part, these can be configured as defined in the [configguide.html SQL Relay Configuration Guide].
 
 There are a few incompatible configurations though.
 
