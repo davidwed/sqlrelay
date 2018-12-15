@@ -30,8 +30,6 @@
  [features/resultsetcaching.html Client-Side Result Set Caching] - makes paging faster and easier[[br]]
  [features/suspendedtx.html Suspended Transactions] - allow a single transaction to span multiple web pages[[br]]
 
-@enterprise.wt@
-
 ----
 
 ==== Frequently Asked Questions ====
@@ -78,8 +76,6 @@ Getting-started guides for various databases supported by SQL Relay.
  [http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html ODBC (non-MS platforms)][[br]]
 }}}
 }}}
-
-@enterpriseadmin.wt@
 
 ----
 
