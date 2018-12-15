@@ -705,6 +705,7 @@ CONFIGPLUGINLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(E
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++
 SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client
+SQLRAUTH_MYSQLLIBS = -L$(top_builddir)/src/server -l$(SQLR)mysqlcredentials
 SQLRLOGGER_STALECURSORSLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
@@ -829,7 +830,7 @@ endif
 
 
 # tests
-TESTALLSUBDIRS = all-c all-cpp all-java all-stress all-tcl
+TESTALLSUBDIRS = all-dropin all-c all-cpp all-java all-stress all-tcl
 ifneq ($(HAVE_MONO),)
 	TESTALLSUBDIRS += all-cs
 endif

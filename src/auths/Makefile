@@ -37,10 +37,10 @@ $(SQLR)auth_sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(SQLRAUTH_SQLRELAYLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)auth_mysql_userlist.$(LIBEXT): mysql_userlist.cpp mysql_userlist.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ mysql_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql_userlist.$(OBJ) $(LDFLAGS) $(SQLRAUTH_MYSQLLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)auth_mysql_database.$(LIBEXT): mysql_database.cpp mysql_database.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ mysql_database.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ mysql_database.$(OBJ) $(LDFLAGS) $(SQLRAUTH_MYSQLLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

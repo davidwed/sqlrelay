@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.4.0
+Version: 1.5.0
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -502,6 +502,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver.so.*
+%{_libdir}/libsqlrmysqlcredentials.so.*
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrconfig_*
 %{_libexecdir}/%{name}/sqlrfilter_*
@@ -545,6 +546,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/private/sqlrlistener.h
 %{_includedir}/%{name}/private/sqlrlogger.h
 %{_includedir}/%{name}/private/sqlrloggers.h
+%{_includedir}/%{name}/private/sqlrmysqlcredentials.h
 %{_includedir}/%{name}/private/sqlrnotification.h
 %{_includedir}/%{name}/private/sqlrnotifications.h
 %{_includedir}/%{name}/private/sqlrparser.h
@@ -582,6 +584,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/private/sqlrresultsetheadertranslation.h
 %{_includedir}/%{name}/private/sqlrresultsetheadertranslations.h
 %{_libdir}/libsqlrserver.so
+%{_libdir}/libsqlrmysqlcredentials.so
 %exclude %{_libdir}/lib*.la
 
 %postun server-devel
@@ -853,6 +856,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Dec 14 2018 David Muse <david.muse@firstworks.com> - 1.5.0-1
+- Updated to version 1.5.0.
+- Added mysql-frontend components.
+
 * Wed Sep 05 2018 David Muse <david.muse@firstworks.com> - 1.4.0-1
 - Updated to version 1.4.0.
 - Updated to require rudiments 1.0.8.

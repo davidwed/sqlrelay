@@ -1,0 +1,29 @@
+<html>
+<head>
+	<title>MySQL Front-End Modules</title>
+	<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<h1>MySQL Front-End Modules</h1>
+
+<p>Solves - "I need a transparent, sever-only MySQL proxy with features like <a href="connectionpooling.html">Connection Pooling</a>, <a href="throttling.html">Throttling</a>, <a href="ha.html">High Availability</a>, <a href="queryrouting.html">Query Routing</a>, <a href="queryfiltering.html">Query Filtering</a>, and <a href="schedules.html">Connection Schedules</a>."</p>
+
+<p>Whether written using the native MySQL API, or a connector of some sort, MySQL apps communicate with the database using the MySQL client-server protocol.</p>
+
+<p><img src="../images/mysqlnativeprotocol.png"/></p>
+
+<p>Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using the SQL Relay client-server protocol.</p>
+
+<p><img src="../images/sqlrelaynativeprotocol.png"/></p>
+
+<p>However, the MySQL Front-End Modules enable SQL Relay to speak the MySQL client-server protocol.  This allows MySQL apps to communicate directly with SQL Relay, rather than to a MySQL database, without modification, and without using a drop-in replacement library.</p>
+
+<p><img src="../images/sqlrelaymysqlprotocol.png"/></p>
+
+<p>In this configuration, SQL Relay becomes a transparent proxy.  MySQL apps aimed at SQL Relay still think that they're talking to a MySQL database, but in fact, are talking to SQL Relay.  Once the app is talking to SQL Relay, most of SQL Relay's features become available to the app, including <a href="connectionpooling.html">Connection Pooling</a>, <a href="throttling.html">Throttling</a>, <a href="ha.html">High Availability</a>, <a href="queryrouting.html">Query Routing</a>, <a href="queryfiltering.html">Query Filtering</a>, and <a href="schedules.html">Connection Schedules</a>.  Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the MySQL database it was originally written to use.</p>
+
+<p><img src="../images/sqlrelaymysqlprotocolbackend.png"/></p>
+
+Some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+</body>
+</html>
