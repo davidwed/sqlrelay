@@ -82,7 +82,7 @@ SQLRelay consists of several components:
 --------------------------------------------------------------------------------
 
 The SQLRelay Server
-Copyright (c) 1999-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -142,7 +142,7 @@ it possible to release a modified version which carries forward this exception.
 --------------------------------------------------------------------------------
 
 The SQLRelay Command-Line Clients
-Copyright (c) 1999-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -163,7 +163,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay C/C++ API
-Copyright (c) 1999-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -185,7 +185,7 @@ Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay C# API
-Copyright (c) 2012-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -216,7 +216,7 @@ This work is licensed under the Creative Commons Attribution 3.0 United States L
 --------------------------------------------------------------------------------
 
 The SQLRelay Java API
-Copyright (c) 2001-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -238,7 +238,7 @@ Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay node.js API
-Copyright (c) 2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -259,7 +259,7 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 --------------------------------------------------------------------------------
 
 The SQLRelay ODBC API
-Copyright (c) 2007-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -281,7 +281,7 @@ Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay Perl API
-Copyright (c) 2000-2015  David Muse and Dmitry Ovsyanko
+Copyright (c) 1999-2018 David Muse and Dmitry Ovsyanko
 
 This work is covered by the Artistic License.
 
@@ -312,7 +312,7 @@ Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay PHP PDO API
-Copyright (c) 2014-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This source file is subject to version 3.01 of the PHP license,
 that is bundled with this package in the file COPYING, and is
@@ -336,7 +336,7 @@ This work is covered by the PointOne Public License.
 --------------------------------------------------------------------------------
 
 The SQLRelay Ruby API
-Copyright (c) 2001-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This library is free software; you can redistribute it and/or
 modify it under the terms of the GNU Library General Public
@@ -379,7 +379,7 @@ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 --------------------------------------------------------------------------------
 
 The SQLRelay MySQL Drop-In API
-Copyright (c) 2004-2015 David Muse
+Copyright (c) 1999-2018 David Muse
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -400,7 +400,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay PostgreSQL Drop-In API
-Copyright (c) 2003-2015 David Muse
+Copyright (c) 1999-2018 David Muse
 
 This work is covered by the BSD License for derivative works of PostgreSQL.
 
@@ -409,7 +409,7 @@ This work is covered by the BSD License for derivative works of PostgreSQL.
 --------------------------------------------------------------------------------
 
 The SQLRelay Tests
-Copyright (c) 1999-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -430,7 +430,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay Documentation
-Copyright (c) 1999-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License
@@ -451,7 +451,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 --------------------------------------------------------------------------------
 
 The SQLRelay Examples
-Copyright (c) 1999-2015  David Muse
+Copyright (c) 1999-2018 David Muse
 
 This work is covered by the FSF Unlimited License.
 

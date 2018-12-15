@@ -1,5 +1,5 @@
 <html><pre><?php
-# Copyright (c) 2013  David Muse
+# Copyright (c) 1999-2018 David Muse
 # See the file COPYING for more information.
 
 	function checkSuccess($value,$success) {

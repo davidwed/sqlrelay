@@ -1,4 +1,4 @@
-// Copyright (c) 2013 David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 // Some versions of PHP 7.0 need INT64_MIN/INT64_MAX to be defined but

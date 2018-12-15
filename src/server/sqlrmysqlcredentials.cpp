@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // All rights reserved
 
 #include <config.h>

@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-# Copyright (c) 2000-2001  David Muse
+# Copyright (c) 1999-2018 David Muse
 # See the file COPYING for more information.
 
 from SQLRelay import PySQLRDB

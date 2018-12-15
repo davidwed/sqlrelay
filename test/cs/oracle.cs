@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 
 using System;
@@ -840,15 +840,6 @@ namespace SQLRClientTest
             sqlrcom.Connection = sqlrcon;
             checkSuccess(ExecuteScalar(sqlrcom), 6);
             Console.WriteLine("\n");
-
-            // unicode
-            /*Console.WriteLine("UNICODE:");
-            sqlrcom.CommandText = "select unistr('abc\00e5\00f1\00f6') from dual";
-            datareader = ExecuteReader(sqlrcom);
-            checkSuccess(datareader != null, true);
-            checkSuccess(datareader.Read(), true);
-            checkSuccess(datareader.GetString(0), "abcåñö");
-            Console.WriteLine("\n");*/
 
             // closed datareader
             Console.WriteLine("CLOSED DATAREADER:");
