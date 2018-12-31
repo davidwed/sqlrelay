@@ -63,3 +63,9 @@ sqlrresultsetrowblocktranslations *sqlrresultsetrowblocktranslation::
 domnode *sqlrresultsetrowblocktranslation::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrresultsetrowblocktranslation::endTransaction(bool commit) {
+}
+
+void sqlrresultsetrowblocktranslation::endSession() {
+}

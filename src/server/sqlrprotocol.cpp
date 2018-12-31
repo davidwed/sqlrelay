@@ -38,6 +38,12 @@ tlscontext *sqlrprotocol::getTLSContext() {
 	return NULL;
 }
 
+void sqlrprotocol::endTransaction(bool commit) {
+}
+
+void sqlrprotocol::endSession() {
+}
+
 sqlrprotocols *sqlrprotocol::getProtocols() {
 	return pvt->_ps;
 }

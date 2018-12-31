@@ -43,6 +43,7 @@
 		void	clientSession();
 
 		bool	beginFakeTransactionBlock();
+		void	endTransaction(bool commit);
 		bool	endFakeTransactionBlock();
 		bool	checkInterceptQuery(sqlrservercursor *cursor);
 		bool	interceptQuery(sqlrservercursor *cursor);

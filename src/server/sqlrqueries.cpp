@@ -164,6 +164,18 @@ sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
 	return NULL;
 }
 
+void sqlrqueries::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->qr->endTransaction(commit);
+	}
+}
+
 void sqlrqueries::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->qr->endSession();
+	}
 }

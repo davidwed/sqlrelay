@@ -40,3 +40,9 @@ sqlrrouters *sqlrrouter::getRouters() {
 domnode *sqlrrouter::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrrouter::endTransaction(bool commit) {
+}
+
+void sqlrrouter::endSession() {
+}

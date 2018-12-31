@@ -175,8 +175,20 @@ void sqlrnotifications::run(sqlrlistener *sqlrl,
 	}
 }
 
+void sqlrnotifications::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->n->endTransaction(commit);
+	}
+}
+
 void sqlrnotifications::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->n->endSession();
+	}
 }
 
 bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,

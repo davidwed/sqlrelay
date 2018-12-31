@@ -201,6 +201,18 @@ const char *sqlrbindvariabletranslations::getError() {
 	return pvt->_error;
 }
 
+void sqlrbindvariabletranslations::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrbindvariabletranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->bvtr->endTransaction(commit);
+	}
+}
+
 void sqlrbindvariabletranslations::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrbindvariabletranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->bvtr->endSession();
+	}
 }

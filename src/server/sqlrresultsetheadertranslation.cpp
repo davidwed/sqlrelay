@@ -59,3 +59,9 @@ sqlrresultsetheadertranslations *sqlrresultsetheadertranslation::
 domnode *sqlrresultsetheadertranslation::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrresultsetheadertranslation::endTransaction(bool commit) {
+}
+
+void sqlrresultsetheadertranslation::endSession() {
+}

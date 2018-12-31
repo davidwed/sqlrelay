@@ -2263,11 +2263,7 @@ bool sqlrservercontroller::commit() {
 	}
 
 	if (pvt->_conn->commit()) {
-		endFakeTransactionBlock();
-		pvt->_txpool->clear();
-		if (!pvt->_autocommitforthissession) {
-			pvt->_intransaction=false;
-		}
+		endTransaction(true);
 		return true;
 	}
 	return false;
@@ -2287,6 +2283,81 @@ bool sqlrservercontroller::endFakeTransactionBlock() {
 	return true;
 }
 
+void sqlrservercontroller::endTransaction(bool commit) {
+
+	// end fake transaction blocks
+	// FIXME: this can fail
+	endFakeTransactionBlock();
+
+	// reset protocol modules
+	if (pvt->_sqlrpr) {
+		pvt->_sqlrpr->endTransaction(commit);
+	}
+
+	// reset translation modules
+	if (pvt->_sqlrt) {
+		pvt->_sqlrt->endTransaction(commit);
+	}
+
+	// reset filter modules
+	if (pvt->_sqlrf) {
+		pvt->_sqlrf->endTransaction(commit);
+	}
+
+	// reset bind variable translation modules
+	if (pvt->_sqlrbvt) {
+		pvt->_sqlrbvt->endTransaction(commit);
+	}
+
+	// reset result set header translation modules
+	if (pvt->_sqlrrsht) {
+		pvt->_sqlrrsht->endTransaction(commit);
+	}
+
+	// reset result set translation modules
+	if (pvt->_sqlrrst) {
+		pvt->_sqlrrst->endTransaction(commit);
+	}
+
+	// reset result set row translation modules
+	if (pvt->_sqlrrsrt) {
+		pvt->_sqlrrsrt->endTransaction(commit);
+	}
+
+	// reset result set row block translation modules
+	if (pvt->_sqlrrsrbt) {
+		pvt->_sqlrrsrbt->endTransaction(commit);
+	}
+
+	// reset trigger modules
+	if (pvt->_sqlrtr) {
+		pvt->_sqlrtr->endTransaction(commit);
+	}
+
+	// reset logger modules
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->endTransaction(commit);
+	}
+
+	// reset notification modules
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->endTransaction(commit);
+	}
+
+	// reset query modules
+	if (pvt->_sqlrq) {
+		pvt->_sqlrq->endTransaction(commit);
+	}
+
+	// clear per-session pool
+	pvt->_txpool->clear();
+
+	// set in-tx flag
+	if (!pvt->_autocommitforthissession) {
+		pvt->_intransaction=false;
+	}
+}
+
 bool sqlrservercontroller::rollback() {
 
 	if (pvt->_debugsql) {
@@ -2299,11 +2370,7 @@ bool sqlrservercontroller::rollback() {
 	}
 
 	if (pvt->_conn->rollback()) {
-		endFakeTransactionBlock();
-		pvt->_txpool->clear();
-		if (!pvt->_autocommitforthissession) {
-			pvt->_intransaction=false;
-		}
+		endTransaction(false);
 		return true;
 	}
 	return false;
@@ -5187,6 +5254,16 @@ void sqlrservercontroller::endSession() {
 		pvt->_sqlrf->endSession();
 	}
 
+	// reset bind variable translation modules
+	if (pvt->_sqlrbvt) {
+		pvt->_sqlrbvt->endSession();
+	}
+
+	// reset result set header translation modules
+	if (pvt->_sqlrrsht) {
+		pvt->_sqlrrsht->endSession();
+	}
+
 	// reset result set translation modules
 	if (pvt->_sqlrrst) {
 		pvt->_sqlrrst->endSession();
@@ -5197,7 +5274,7 @@ void sqlrservercontroller::endSession() {
 		pvt->_sqlrrsrt->endSession();
 	}
 
-	// reset result set row blocktranslation modules
+	// reset result set row block translation modules
 	if (pvt->_sqlrrsrbt) {
 		pvt->_sqlrrsrbt->endSession();
 	}

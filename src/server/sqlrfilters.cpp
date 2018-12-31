@@ -275,6 +275,28 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
+void sqlrfilters::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_beforefilters.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->f->endTransaction(commit);
+	}
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_afterfilters.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->f->endTransaction(commit);
+	}
+}
+
 void sqlrfilters::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_beforefilters.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->f->endSession();
+	}
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_afterfilters.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->f->endSession();
+	}
 }

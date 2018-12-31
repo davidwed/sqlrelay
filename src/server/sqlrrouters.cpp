@@ -190,8 +190,20 @@ bool sqlrrouters::routeEntireSession() {
 	return true;
 }
 
+void sqlrrouters::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->r->endTransaction(commit);
+	}
+}
+
 void sqlrrouters::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->r->endSession();
+	}
 }
 
 void sqlrrouters::setCurrentConnectionId(const char *connid) {

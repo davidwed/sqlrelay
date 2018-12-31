@@ -206,6 +206,18 @@ const char *sqlrresultsettranslations::getError() {
 	return pvt->_error;
 }
 
+void sqlrresultsettranslations::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrresultsettranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->rstr->endTransaction(commit);
+	}
+}
+
 void sqlrresultsettranslations::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrresultsettranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->rstr->endSession();
+	}
 }

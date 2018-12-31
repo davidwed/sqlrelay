@@ -51,3 +51,9 @@ sqlrtranslations *sqlrtranslation::getTranslations() {
 domnode *sqlrtranslation::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrtranslation::endTransaction(bool commit) {
+}
+
+void sqlrtranslation::endSession() {
+}

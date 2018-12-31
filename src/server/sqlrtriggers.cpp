@@ -210,6 +210,28 @@ void sqlrtriggers::run(sqlrserverconnection *sqlrcon,
 	}
 }
 
+void sqlrtriggers::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrtriggerplugin * >
+				*node=pvt->_beforetriggers.getFirst();
+				node; node=node->getNext()) {
+		node->getValue()->tr->endTransaction(commit);
+	}
+	for (singlylinkedlistnode< sqlrtriggerplugin * >
+				*node=pvt->_aftertriggers.getFirst();
+				node; node=node->getNext()) {
+		node->getValue()->tr->endTransaction(commit);
+	}
+}
+
 void sqlrtriggers::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrtriggerplugin * >
+				*node=pvt->_beforetriggers.getFirst();
+				node; node=node->getNext()) {
+		node->getValue()->tr->endSession();
+	}
+	for (singlylinkedlistnode< sqlrtriggerplugin * >
+				*node=pvt->_aftertriggers.getFirst();
+				node; node=node->getNext()) {
+		node->getValue()->tr->endSession();
+	}
 }

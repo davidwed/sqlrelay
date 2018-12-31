@@ -357,6 +357,18 @@ const char *sqlrresultsetrowblocktranslations::getError() {
 	return pvt->_error;
 }
 
+void sqlrresultsetrowblocktranslations::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrresultsetrowblocktranslationplugin * >
+					*node=pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->rstr->endTransaction(commit);
+	}
+}
+
 void sqlrresultsetrowblocktranslations::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrresultsetrowblocktranslationplugin * >
+					*node=pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->rstr->endSession();
+	}
 }

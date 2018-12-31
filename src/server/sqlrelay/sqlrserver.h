@@ -1365,6 +1365,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		virtual gsscontext	*getGSSContext();
 		virtual tlscontext	*getTLSContext();
 
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrprotocols		*getProtocols();
 		domnode			*getParameters();
@@ -1540,6 +1543,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 		bool		load(domnode *listeners);
 		sqlrprotocol	*getProtocol(uint16_t port);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrprotocols.h>
@@ -1719,6 +1723,9 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 					sqlrlogger_loglevel_t level,
 					sqlrevent_t event,
 					const char *info);
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrloggers	*getLoggers();
 		domnode	*getParameters();
@@ -1741,6 +1748,7 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 				sqlrevent_t event,
 				const char *info);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 		const char	*logLevel(sqlrlogger_loglevel_t level);
@@ -1763,6 +1771,8 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 					sqlrservercursor *sqlrcur,
 					sqlrevent_t event,
 					const char *info);
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrnotifications	*getNotifications();
@@ -1783,6 +1793,7 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 					sqlrevent_t event,
 					const char *info);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 		const char	*eventType(sqlrevent_t event);
@@ -1888,6 +1899,9 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 
 		virtual	bool	routeEntireSession();
 
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrrouters	*getRouters();
 		domnode	*getParameters();
@@ -1913,6 +1927,7 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 						int64_t *errn);
 		bool	routeEntireSession();
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 		const char	*getCurrentConnectionId();
@@ -2005,6 +2020,9 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 
 		virtual const char	*getError();
 
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrtranslations	*getTranslations();
 		domnode		*getParameters();
@@ -2026,6 +2044,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 
 		const char	*getError();
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 		void	setReplacementTableName(const char *database,
@@ -2078,6 +2097,9 @@ class SQLRSERVER_DLLSPEC sqlrfilter {
 
 		virtual void	getError(const char **err, int64_t *errn);
 
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrfilters	*getFilters();
 		domnode	*getParameters();
@@ -2104,6 +2126,7 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 						const char **err,
 						int64_t *errn);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrfilters.h>
@@ -2120,6 +2143,9 @@ class SQLRSERVER_DLLSPEC sqlrbindvariabletranslation {
 					sqlrservercursor *sqlrcur);
 
 		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrbindvariabletranslations	*getBindVariableTranslations();
@@ -2139,6 +2165,7 @@ class SQLRSERVER_DLLSPEC sqlrbindvariabletranslations {
 
 		const char	*getError();
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrbindvariabletranslations.h>
@@ -2159,6 +2186,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					uint64_t *fieldlength);
 
 		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrresultsettranslations	*getResultSetTranslations();
@@ -2182,6 +2212,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 
 		const char	*getError();
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsettranslations.h>
@@ -2203,6 +2234,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					uint64_t **fieldlengths);
 
 		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrresultsetrowtranslations	*getResultSetRowTranslations();
@@ -2226,6 +2260,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 
 		const char	*getError();
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsetrowtranslations.h>
@@ -2260,6 +2295,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation {
 					bool **nulls);
 
 		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrresultsetrowblocktranslations
@@ -2300,6 +2338,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslations {
 
 		const char	*getError();
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsetrowblocktranslations.h>
@@ -2336,6 +2375,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation {
 					uint16_t **columntablelengths);
 
 		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrresultsetheadertranslations
@@ -2375,6 +2417,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslations {
 
 		const char	*getError();
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsetheadertranslations.h>
@@ -2392,6 +2435,9 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 					xmldom *querytree,
 					bool before,
 					bool success);
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrtriggers	*getTriggers();
@@ -2414,6 +2460,7 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 						xmldom *querytree,
 						bool success);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrtriggers.h>
@@ -2431,6 +2478,9 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 		virtual sqlrquerycursor	*newCursor(	
 						sqlrserverconnection *sqlrcon,
 						uint16_t id);
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrqueries	*getQueries();
@@ -2469,6 +2519,7 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 						uint32_t querylength,
 						uint16_t id);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrqueries.h>

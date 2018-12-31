@@ -536,7 +536,20 @@ bool sqlrtranslations::getUseOriginalOnError() {
 	return pvt->_useoriginalonerror;
 }
 
+void sqlrtranslations::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->tr->endTransaction(commit);
+	}
+}
+
 void sqlrtranslations::endSession() {
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
+	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->tr->endSession();
+	}
 }

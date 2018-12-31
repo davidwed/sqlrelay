@@ -37,3 +37,9 @@ sqlrtriggers *sqlrtrigger::getTriggers() {
 domnode *sqlrtrigger::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrtrigger::endTransaction(bool commit) {
+}
+
+void sqlrtrigger::endSession() {
+}

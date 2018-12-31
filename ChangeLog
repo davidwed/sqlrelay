@@ -23,6 +23,8 @@
 	included mysql protocol module and auth modules
 	added per-tx/session memory pools, migrated sqlrtranslations memory
 		pool to per-session pool
+	added controller endTransaction() method
+	added endTransaction/endSession methods to all modules
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class

@@ -40,3 +40,9 @@ sqlrloggers *sqlrlogger::getLoggers() {
 domnode *sqlrlogger::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrlogger::endTransaction(bool commit) {
+}
+
+void sqlrlogger::endSession() {
+}

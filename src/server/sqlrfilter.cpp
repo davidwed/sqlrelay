@@ -66,3 +66,9 @@ sqlrfilters *sqlrfilter::getFilters() {
 domnode *sqlrfilter::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrfilter::endTransaction(bool commit) {
+}
+
+void sqlrfilter::endSession() {
+}

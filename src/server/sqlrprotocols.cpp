@@ -152,6 +152,18 @@ sqlrprotocol *sqlrprotocols::getProtocol(uint16_t index) {
 	return pp->pr;
 }
 
+void sqlrprotocols::endTransaction(bool commit) {
+	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
+			*node=pvt->_protos.getList()->getFirst();
+			node; node=node->getNext()) {
+		node->getValue()->getValue()->pr->endTransaction(commit);
+	}
+}
+
 void sqlrprotocols::endSession() {
-	// nothing for now, maybe in the future
+	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
+			*node=pvt->_protos.getList()->getFirst();
+			node; node=node->getNext()) {
+		node->getValue()->getValue()->pr->endSession();
+	}
 }

@@ -39,6 +39,12 @@ domnode *sqlrquery::getParameters() {
 	return pvt->_parameters;
 }
 
+void sqlrquery::endTransaction(bool commit) {
+}
+
+void sqlrquery::endSession() {
+}
+
 class sqlrquerycursorprivate {
 	friend class sqlrquerycursor;
 	private:

@@ -36,3 +36,9 @@ sqlrnotifications *sqlrnotification::getNotifications() {
 domnode *sqlrnotification::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrnotification::endTransaction(bool commit) {
+}
+
+void sqlrnotification::endSession() {
+}

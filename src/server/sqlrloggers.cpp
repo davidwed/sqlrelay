@@ -170,8 +170,20 @@ void sqlrloggers::run(sqlrlistener *sqlrl,
 	}
 }
 
+void sqlrloggers::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->lg->endTransaction(commit);
+	}
+}
+
 void sqlrloggers::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->lg->endSession();
+	}
 }
 
 static const char *loglevels[]={"DEBUG","INFO","WARNING","ERROR"};

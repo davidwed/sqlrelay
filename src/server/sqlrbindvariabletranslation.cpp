@@ -40,3 +40,9 @@ sqlrbindvariabletranslations *sqlrbindvariabletranslation::
 domnode *sqlrbindvariabletranslation::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrbindvariabletranslation::endTransaction(bool commit) {
+}
+
+void sqlrbindvariabletranslation::endSession() {
+}
