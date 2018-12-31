@@ -735,6 +735,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						sqlrcursorstate_t state);
 		sqlrcursorstate_t	getState(sqlrservercursor *cursor);
 
+		// memory pools
+		memorypool	*getPerTransactionMemoryPool();
+		memorypool	*getPerSessionMemoryPool();
+
 		// query parser
 		sqlrparser	*getParser();
 
@@ -2049,8 +2053,6 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 		bool	removeReplacementIndex(const char *database,
 						const char *schema,
 						const char *index);
-
-		memorypool	*getMemoryPool();
 
 		bool	getUseOriginalOnError();
 

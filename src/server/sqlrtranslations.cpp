@@ -44,8 +44,6 @@ class sqlrtranslationsprivate {
 
 		singlylinkedlist< sqlrtranslationplugin * >	_tlist;
 
-		memorypool	*_memorypool;
-
 		bool		_useoriginalonerror;
 
 		dictionary< sqlrdatabaseobject *, char * >	_tablenamemap;
@@ -59,14 +57,12 @@ sqlrtranslations::sqlrtranslations(sqlrservercontroller *cont) {
 	pvt->_debug=cont->getConfig()->getDebugTranslations();
 	pvt->_error=NULL;
 	pvt->_tree=NULL;
-	pvt->_memorypool=new memorypool(0,128,100);
 	pvt->_useoriginalonerror=true;
 }
 
 sqlrtranslations::~sqlrtranslations() {
 	debugFunction();
 	unload();
-	delete pvt->_memorypool;
 	delete pvt;
 }
 
@@ -345,7 +341,7 @@ const char *sqlrtranslations::getError() {
 	return pvt->_error;
 }
 
-sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
+sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(
 						const char *database,
 						const char *schema,
 						const char *object,
@@ -356,6 +352,9 @@ sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
 	char	*schemacopy=NULL;
 	char	*objectcopy=NULL;
 	char	*dependencycopy=NULL;
+
+	// get memory pool
+	memorypool	*pool=pvt->_cont->getPerSessionMemoryPool();
 
 	// create buffers and copy data into them
 	if (database) {
@@ -403,11 +402,11 @@ void sqlrtranslations::setReplacementTableName(
 					const char *oldtable,
 					const char *newtable) {
 	setReplacementName(&pvt->_tablenamemap,
-				createDatabaseObject(pvt->_memorypool,
-							database,
-							schema,
-							oldtable,
-							NULL),
+				createDatabaseObject(
+					database,
+					schema,
+					oldtable,
+					NULL),
 				newtable);
 }
 
@@ -418,11 +417,11 @@ void sqlrtranslations::setReplacementIndexName(
 					const char *newindex,
 					const char *table) {
 	setReplacementName(&pvt->_indexnamemap,
-				createDatabaseObject(pvt->_memorypool,
-							database,
-							schema,
-							oldindex,
-							table),
+				createDatabaseObject(
+					database,
+					schema,
+					oldindex,
+					table),
 				newindex);
 }
 
@@ -533,16 +532,11 @@ bool sqlrtranslations::removeReplacement(
 	return false;
 }
 
-memorypool *sqlrtranslations::getMemoryPool() {
-	return pvt->_memorypool;
-}
-
 bool sqlrtranslations::getUseOriginalOnError() {
 	return pvt->_useoriginalonerror;
 }
 
 void sqlrtranslations::endSession() {
-	pvt->_memorypool->clear();
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
 }

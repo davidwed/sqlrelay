@@ -146,7 +146,8 @@ class sqlrservercontrollerprivate {
 	uint64_t		_serversockincount;
 	unixsocketserver	*_serversockun;
 
-	memorypool	*_bindpool;
+	memorypool	*_txpool;
+	memorypool	*_sessionpool;
 
 	bool		_debugsql;
 	bool		_debugbulkload;
@@ -373,6 +374,9 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_decrypteddbpassword=NULL;
 
+	pvt->_txpool=new memorypool(0,128,100);
+	pvt->_sessionpool=new memorypool(0,128,100);
+
 	pvt->_debugsql=false;
 	pvt->_debugbulkload=false;
 	pvt->_debugsqlrparser=false;
@@ -496,6 +500,9 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_bulkservershmem;
 	delete pvt->_bulkclientshmem;
 	delete pvt->_bulkcursor;
+
+	delete pvt->_txpool;
+	delete pvt->_sessionpool;
 
 	delete pvt;
 }
@@ -2257,6 +2264,7 @@ bool sqlrservercontroller::commit() {
 
 	if (pvt->_conn->commit()) {
 		endFakeTransactionBlock();
+		pvt->_txpool->clear();
 		if (!pvt->_autocommitforthissession) {
 			pvt->_intransaction=false;
 		}
@@ -2292,6 +2300,7 @@ bool sqlrservercontroller::rollback() {
 
 	if (pvt->_conn->rollback()) {
 		endFakeTransactionBlock();
+		pvt->_txpool->clear();
 		if (!pvt->_autocommitforthissession) {
 			pvt->_intransaction=false;
 		}
@@ -3385,8 +3394,8 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 	for (i=0; i<3; i++) {
 
 		namevaluepairs		*mappings=cursor->getBindMappings();
-		uint16_t		count;
-		sqlrserverbindvar	*vars;
+		uint16_t		count=0;
+		sqlrserverbindvar	*vars=NULL;
 		if (i==0) {
 			count=cursor->getInputBindCount();
 			vars=cursor->getInputBinds();
@@ -5222,6 +5231,9 @@ void sqlrservercontroller::endSession() {
 	if (pvt->_sqlra) {
 		pvt->_sqlra->endSession();
 	}
+
+	// clear per-session pool
+	pvt->_sessionpool->clear();
 
 	// shrink the cursor array, if necessary
 	// FIXME: it would probably be more efficient to scale
@@ -9104,6 +9116,14 @@ bool sqlrservercontroller::getLiveConnection(sqlrservercursor *cursor) {
 void sqlrservercontroller::setLiveConnection(sqlrservercursor *cursor,
 						bool liveconnection) {
 	cursor->setLiveConnection(liveconnection);
+}
+
+memorypool *sqlrservercontroller::getPerTransactionMemoryPool() {
+	return pvt->_txpool;
+}
+
+memorypool *sqlrservercontroller::getPerSessionMemoryPool() {
+	return pvt->_sessionpool;
 }
 
 sqlrparser *sqlrservercontroller::getParser() {

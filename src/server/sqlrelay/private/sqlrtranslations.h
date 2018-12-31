@@ -6,7 +6,6 @@
 		void	loadTranslation(domnode *translation);
 
 		sqlrdatabaseobject *createDatabaseObject(
-						memorypool *pool,
 						const char *database,
 						const char *schema,
 						const char *object,
