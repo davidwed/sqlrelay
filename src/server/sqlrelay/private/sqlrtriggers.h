@@ -3,15 +3,11 @@
 
 	private:
 		void	unload();
-		void	loadTrigger(domnode *trigger,
-					singlylinkedlist< sqlrtriggerplugin *>
-					*list);
+		sqlrtriggerplugin	*loadTrigger(domnode *trigger);
 		void	run(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					xmldom *querytree,
-					singlylinkedlist< sqlrtriggerplugin * >
-					*list,
-					bool before,
-					bool success);
+				sqlrservercursor *sqlrcur,
+				singlylinkedlist< sqlrtriggerplugin * > *list,
+				bool before,
+				bool *success);
 
 		sqlrtriggersprivate	*pvt;

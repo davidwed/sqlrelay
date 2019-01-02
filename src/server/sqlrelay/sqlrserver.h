@@ -2432,9 +2432,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					xmldom *querytree,
 					bool before,
-					bool success);
+					bool *success);
 
 		virtual void	endTransaction(bool commit);
 		virtual void	endSession();
@@ -2453,12 +2452,10 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 
 		bool	load(domnode *parameters);
 		void	runBeforeTriggers(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
-						xmldom *querytree);
+						sqlrservercursor *sqlrcur);
 		void	runAfterTriggers(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
-						xmldom *querytree,
-						bool success);
+						bool *success);
 
 		void	endTransaction(bool commit);
 		void	endSession();

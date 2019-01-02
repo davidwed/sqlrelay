@@ -21,7 +21,7 @@ class sqlrtriggersprivate {
 	private:
 		sqlrservercontroller	*_cont;
 
-		bool		_debug;
+		bool	_debug;
 
 		singlylinkedlist< sqlrtriggerplugin * >	_beforetriggers;
 		singlylinkedlist< sqlrtriggerplugin * >	_aftertriggers;
@@ -49,25 +49,39 @@ bool sqlrtriggers::load(domnode *parameters) {
 	for (domnode *trigger=parameters->getFirstTagChild();
 		!trigger->isNullNode(); trigger=trigger->getNextTagSibling()) {
 
-		if (charstring::contains(
-				trigger->getAttributeValue("when"),
-				"before")) {
+		bool	before=(charstring::contains(
+					trigger->getAttributeValue("when"),
+					"before") ||
+				charstring::contains(
+					trigger->getAttributeValue("when"),
+					"both"));
+		bool	after=(charstring::contains(
+					trigger->getAttributeValue("when"),
+					"after") ||
+				charstring::contains(
+					trigger->getAttributeValue("when"),
+					"both"));
 
-			// add trigger to before list
+		// load the trigger
+		sqlrtriggerplugin	*p=loadTrigger(trigger);
+		if (!p) {
+			continue;
+		}
+
+		// add trigger to before list
+		if (before) {
 			if (pvt->_debug) {
-				stdoutput.printf("loading trigger "
-							"before ...\n");
+				stdoutput.printf("before trigger\n");
 			}
-			loadTrigger(trigger,&pvt->_beforetriggers);
+			pvt->_beforetriggers.append(p);
+		}
 
-		} else {
-
-			// add trigger to after list
+		// add trigger to after list
+		if (after) {
 			if (pvt->_debug) {
-				stdoutput.printf("loading trigger "
-							"after ...\n");
+				stdoutput.printf("after trigger\n");
 			}
-			loadTrigger(trigger,&pvt->_aftertriggers);
+			pvt->_aftertriggers.append(p);
 		}
 	}
 	return true;
@@ -79,9 +93,11 @@ void sqlrtriggers::unload() {
 				pvt->_beforetriggers.getFirst();
 					bnode; bnode=bnode->getNext()) {
 		sqlrtriggerplugin	*sqlt=bnode->getValue();
-		delete sqlt->tr;
-		delete sqlt->dl;
-		delete sqlt;
+		if (!pvt->_aftertriggers.find(sqlt)) {
+			delete sqlt->tr;
+			delete sqlt->dl;
+			delete sqlt;
+		}
 	}
 	pvt->_beforetriggers.clear();
 	for (singlylinkedlistnode< sqlrtriggerplugin * > *anode=
@@ -95,14 +111,13 @@ void sqlrtriggers::unload() {
 	pvt->_aftertriggers.clear();
 }
 
-void sqlrtriggers::loadTrigger(domnode *trigger,
-				singlylinkedlist< sqlrtriggerplugin * > *list) {
+sqlrtriggerplugin *sqlrtriggers::loadTrigger(domnode *trigger) {
 
 	debugFunction();
 
 	// ignore non-triggers
 	if (charstring::compare(trigger->getName(),"trigger")) {
-		return;
+		return NULL;
 	}
 
 	// get the trigger name
@@ -111,7 +126,7 @@ void sqlrtriggers::loadTrigger(domnode *trigger,
 		// try "file", that's what it used to be called
 		module=trigger->getAttributeValue("file");
 		if (!charstring::length(module)) {
-			return;
+			return NULL;
 		}
 	}
 
@@ -133,7 +148,7 @@ void sqlrtriggers::loadTrigger(domnode *trigger,
 		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
 		delete dl;
-		return;
+		return NULL;
 	}
 
 	// load the trigger itself
@@ -153,7 +168,7 @@ void sqlrtriggers::loadTrigger(domnode *trigger,
 		delete[] error;
 		dl->close();
 		delete dl;
-		return;
+		return NULL;
 	}
 	sqlrtrigger	*tr=(*newTrigger)(pvt->_cont,this,trigger);
 
@@ -167,46 +182,39 @@ void sqlrtriggers::loadTrigger(domnode *trigger,
 		stdoutput.printf("success\n");
 	}
 
-	// add the plugin to the list
+	// build and return the plugin
 	sqlrtriggerplugin	*sqltp=new sqlrtriggerplugin;
 	sqltp->tr=tr;
 	sqltp->dl=dl;
-	list->append(sqltp);
+	return sqltp;
 }
 
 void sqlrtriggers::runBeforeTriggers(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					xmldom *querytree) {
+					sqlrservercursor *sqlrcur) {
 	debugFunction();
-	run(sqlrcon,sqlrcur,querytree,&pvt->_beforetriggers,true,true);
+	run(sqlrcon,sqlrcur,&pvt->_beforetriggers,true,NULL);
 }
 
 void sqlrtriggers::runAfterTriggers(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
-						xmldom *querytree,
-						bool success) {
+						bool *success) {
 	debugFunction();
-	run(sqlrcon,sqlrcur,querytree,&pvt->_aftertriggers,false,success);
+	run(sqlrcon,sqlrcur,&pvt->_aftertriggers,false,success);
 }
 
 void sqlrtriggers::run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
-				xmldom *querytree,
 				singlylinkedlist< sqlrtriggerplugin * > *list,
 				bool before,
-				bool success) {
+				bool *success) {
 	debugFunction();
-	if (!querytree) {
-		return;
-	}
 	for (singlylinkedlistnode< sqlrtriggerplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
 		if (pvt->_debug) {
 			stdoutput.printf("\nrunning %s trigger...\n\n",
 						(before)?"before":"after");
 		}
-		node->getValue()->tr->run(sqlrcon,sqlrcur,
-						querytree,before,success);
+		node->getValue()->tr->run(sqlrcon,sqlrcur,before,success);
 	}
 }
 

@@ -4405,8 +4405,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// handle before-triggers
 	if (enabletriggers && pvt->_sqlrtr) {
-		pvt->_sqlrtr->runBeforeTriggers(pvt->_conn,cursor,
-						cursor->getQueryTree());
+		pvt->_sqlrtr->runBeforeTriggers(pvt->_conn,cursor);
 	}
 
 	// (re)set the query start time
@@ -4461,8 +4460,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// handle after-triggers
 	if (enabletriggers && pvt->_sqlrtr) {
-		pvt->_sqlrtr->runAfterTriggers(pvt->_conn,cursor,
-						cursor->getQueryTree(),success);
+		pvt->_sqlrtr->runAfterTriggers(pvt->_conn,cursor,&success);
 	}
 
 	// was the query a commit or rollback?
@@ -5363,23 +5361,12 @@ void sqlrservercontroller::dropTempTables(sqlrservercursor *cursor) {
 }
 
 void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
-					const char *tablename) {
+						const char *tablename) {
 
 	stringbuffer	dropquery;
 	dropquery.append("drop table ");
 	dropquery.append(pvt->_conn->tempTableDropPrefix());
 	dropquery.append(tablename);
-
-	// FIXME: I need to refactor all of this so that this just gets
-	// run as a matter of course instead of explicitly getting run here
-	// FIXME: freetds/sybase override this method but don't do this
-	if (pvt->_sqlrtr && pvt->_sqlrp) {
-		if (pvt->_sqlrp->parse(dropquery.getString())) {
-			pvt->_sqlrtr->runBeforeTriggers(
-						pvt->_conn,cursor,
-						pvt->_sqlrp->getTree());
-		}
-	}
 
 	// kind of a kluge...
 	// The cursor might already have a querytree associated with it and
@@ -5393,15 +5380,6 @@ void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 		executeQuery(cursor);
 	}
 	cursor->closeResultSet();
-
-	// FIXME: I need to refactor all of this so that this just gets
-	// run as a matter of course instead of explicitly getting run here
-	// FIXME: freetds/sybase override this method but don't do this
-	if (pvt->_sqlrtr && pvt->_sqlrp) {
-		pvt->_sqlrtr->runAfterTriggers(
-					pvt->_conn,cursor,
-					pvt->_sqlrp->getTree(),true);
-	}
 }
 
 void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {

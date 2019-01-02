@@ -24,9 +24,8 @@ sqlrtrigger::~sqlrtrigger() {
 
 bool sqlrtrigger::run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
-				xmldom *querytree,
 				bool before,
-				bool success) {
+				bool *success) {
 	return true;
 }
 
