@@ -420,6 +420,22 @@ sqlrfilterassignments.cpp: sqlrfilterassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
+sqlrtriggerdeclarations.cpp: sqlrtriggerdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../triggers/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrtriggerassignments.cpp: sqlrtriggerassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../triggers/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
 sqlrquerydeclarations.cpp: sqlrquerydeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../queries/*.$(OBJ) 2> /dev/null`; \

@@ -1,0 +1,3 @@
+sqlrtrigger	*new_sqlrtrigger_@module@(sqlrservercontroller *cont,
+						sqlrtriggers *fs,
+						domnode *parameters);

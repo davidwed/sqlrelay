@@ -1,0 +1,3 @@
+	if (!charstring::compare(module,"@module@")) {
+		tr=new_sqlrtrigger_@module@(pvt->_cont,this,trigger);
+	} else

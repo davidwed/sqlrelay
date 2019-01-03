@@ -10,6 +10,12 @@
 
 #include <config.h>
 
+#ifndef SQLRELAY_ENABLE_SHARED
+	extern "C" {
+		#include "sqlrfilterdeclarations.cpp"
+	}
+#endif
+
 class sqlrtriggerplugin {
 	public:
 		sqlrtrigger	*tr;
@@ -175,7 +181,11 @@ sqlrtriggerplugin *sqlrtriggers::loadTrigger(domnode *trigger) {
 #else
 
 	dynamiclib	*dl=NULL;
-	sqlrtrigger	*tr=NULL;
+	sqlrtrigger	*tr;
+	#include "sqlrtriggerassignments.cpp"
+	{
+		tr=NULL;
+	}
 #endif
 
 	if (pvt->_debug) {
