@@ -649,6 +649,8 @@ STATICPLUGINSRCS += sqlrserverconnectiondeclarations.cpp \
 		sqlrresultsetheadertranslationassignments.cpp \
 		sqlrfilterdeclarations.cpp \
 		sqlrfilterassignments.cpp \
+		sqlrtriggerdeclarations.cpp \
+		sqlrtriggerassignments.cpp \
 		sqlrquerydeclarations.cpp \
 		sqlrqueryassignments.cpp \
 		sqlrmoduledatadeclarations.cpp \
