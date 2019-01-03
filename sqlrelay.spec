@@ -506,6 +506,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrconfig_*
 %{_libexecdir}/%{name}/sqlrfilter_*
+%{_libexecdir}/%{name}/sqlrtrigger_*
 %{_libexecdir}/%{name}/sqlrnotification_*
 %{_libexecdir}/%{name}/sqlrparser_*
 %{_libexecdir}/%{name}/sqlrprotocol_*
@@ -856,9 +857,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Dec 14 2018 David Muse <david.muse@firstworks.com> - 1.5.0-1
+* Wed Jan 02 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
 - Updated to version 1.5.0.
 - Added mysql-frontend components.
+- Added triggers.
 
 * Wed Sep 05 2018 David Muse <david.muse@firstworks.com> - 1.4.0-1
 - Updated to version 1.4.0.
