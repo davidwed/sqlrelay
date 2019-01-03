@@ -504,6 +504,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_libdir}/libsqlrserver.so.*
 %{_libdir}/libsqlrmysqlcredentials.so.*
 %{_libexecdir}/%{name}/sqlrauth_*
+%{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
 %{_libexecdir}/%{name}/sqlrconfig_*
 %{_libexecdir}/%{name}/sqlrfilter_*
 %{_libexecdir}/%{name}/sqlrtrigger_*
@@ -512,6 +513,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_libexecdir}/%{name}/sqlrprotocol_*
 %{_libexecdir}/%{name}/sqlrpwdenc_*
 %{_libexecdir}/%{name}/sqlrlogger_*
+%{_libexecdir}/%{name}/sqlrmoduledata_*
 %{_libexecdir}/%{name}/sqlrquery_*
 %{_libexecdir}/%{name}/sqlrresultsettranslation_*
 %{_libexecdir}/%{name}/sqlrschedule_*
@@ -541,6 +543,8 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/sqlrserver.h
 %{_includedir}/%{name}/private/sqlrauth.h
 %{_includedir}/%{name}/private/sqlrauths.h
+%{_includedir}/%{name}/private/sqlrbindvariabletranslation.h
+%{_includedir}/%{name}/private/sqlrbindvariabletranslations.h
 %{_includedir}/%{name}/private/sqlrfilter.h
 %{_includedir}/%{name}/private/sqlrfilters.h
 %{_includedir}/%{name}/private/sqlrgsscredentials.h
@@ -548,6 +552,8 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/private/sqlrlogger.h
 %{_includedir}/%{name}/private/sqlrloggers.h
 %{_includedir}/%{name}/private/sqlrmysqlcredentials.h
+%{_includedir}/%{name}/private/sqlrmoduledata.h
+%{_includedir}/%{name}/private/sqlrmoduledatas.h
 %{_includedir}/%{name}/private/sqlrnotification.h
 %{_includedir}/%{name}/private/sqlrnotifications.h
 %{_includedir}/%{name}/private/sqlrparser.h
@@ -859,6 +865,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %changelog
 * Wed Jan 02 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
 - Updated to version 1.5.0.
+- Added bind variable translation and module data components.
 - Added mysql-frontend components.
 - Added triggers.
 

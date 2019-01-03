@@ -25,6 +25,8 @@ typedef	short		SQLRETURN;
 
 #define	BOOL	int
 
+#define SQL_ERROR	-1
+
 
 // structs...
 struct SQL_DATE_STRUCT {

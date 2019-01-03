@@ -9,6 +9,7 @@
 #undef DB2VERSION
 #define DB2VERSION	8
 
+#define SQL_ERROR	-1
 
 // types...
 typedef unsigned char	SQLCHAR;
