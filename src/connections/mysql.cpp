@@ -1459,7 +1459,8 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		case FIELD_TYPE_STRING:
 			return STRING_DATATYPE;
 		case FIELD_TYPE_VAR_STRING:
-			return CHAR_DATATYPE;
+			//return CHAR_DATATYPE;
+			return VARSTRING_DATATYPE;
 		case FIELD_TYPE_DECIMAL:
 			return DECIMAL_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL
@@ -1549,7 +1550,8 @@ uint32_t mysqlcursor::getColumnLength(uint32_t col) {
 	switch (getColumnType(col)) {
 		case STRING_DATATYPE:
 			return (uint32_t)mysqlfields[col]->length;
-		case CHAR_DATATYPE:
+		//case CHAR_DATATYPE:
+		case VARSTRING_DATATYPE:
 			return (uint32_t)mysqlfields[col]->length+1;
 		case DECIMAL_DATATYPE:
 			{
