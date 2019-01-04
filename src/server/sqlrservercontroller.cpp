@@ -2180,7 +2180,7 @@ bool sqlrservercontroller::autoCommitOn() {
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: autocommit off\n",
+		stdoutput.printf("%d: autocommit on\n",
 					process::getProcessId());
 	}
 
