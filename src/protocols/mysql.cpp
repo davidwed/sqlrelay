@@ -2906,7 +2906,13 @@ bool sqlrprotocol_mysql::comQuery(sqlrservercursor *cursor) {
 
 	// bounds checking
 	if (querylen>maxquerysize) {
-		return sendErrPacket(1105,"Unknown error","24000");
+		stringbuffer	err;
+		err.append("Query loo large (");
+		err.append(querylen);
+		err.append(">");
+		err.append(maxquerysize);
+		err.append(")");
+		return sendErrPacket(1105,err.getString(),"24000");
 	}
 
 	if (getDebug()) {
@@ -3971,7 +3977,13 @@ bool sqlrprotocol_mysql::buildListQuery(sqlrservercursor *cursor,
 					wildbuf.getStringLength()+
 					tablebuf.getStringLength());
 	if (cont->getQueryLength(cursor)>maxquerysize) {
-		return sendErrPacket(1105,"Unknown error","24000");
+		stringbuffer	err;
+		err.append("Query loo large (");
+		err.append(cont->getQueryLength(cursor));
+		err.append(">");
+		err.append(maxquerysize);
+		err.append(")");
+		return sendErrPacket(1105,err.getString(),"24000");
 	}
 
 	// fill the query buffer and update the length
@@ -4271,7 +4283,13 @@ bool sqlrprotocol_mysql::comStmtPrepare(sqlrservercursor *cursor) {
 
 	// bounds checking
 	if (querylen>maxquerysize) {
-		return sendErrPacket(1105,"Unknown error","24000");
+		stringbuffer	err;
+		err.append("Query loo large (");
+		err.append(querylen);
+		err.append(">");
+		err.append(maxquerysize);
+		err.append(")");
+		return sendErrPacket(1105,err.getString(),"24000");
 	}
 
 	// copy it into the cursor's query buffer
@@ -4309,7 +4327,13 @@ bool sqlrprotocol_mysql::sendStmtPrepareOk(sqlrservercursor *cursor) {
 
 	// bounds checking
 	if (pcount>maxbindcount) {
-		return sendErrPacket(1105,"Unknown error","24000");
+		stringbuffer	err;
+		err.append("Too mang binds (");
+		err.append(pcount);
+		err.append(">");
+		err.append(maxbindcount);
+		err.append(")");
+		return sendErrPacket(1105,err.getString(),"24000");
 	}
 
 	// store the number of params
