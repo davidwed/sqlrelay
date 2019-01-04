@@ -8,6 +8,7 @@
 * [#features Standard SQL Relay Features]
 * [#foreignbackend Targeting a Foreign Backend]
 * [#specialpurpose Special-Purpose Configuration Options]
+ * [#zeroscale Mapping zero-scale DECIMAL to BIGINT]
  * [#datetime Mapping DATE to DATETIME]
  * [#oldmariadbjdbc Supporting Older MariaDB JDBC Drivers]
 * [#limitations Limitations]
@@ -211,6 +212,23 @@ When targeting a foreign backend, some queries may have to be modified to use th
 == Special-Purpose Configuration Options ==
 
 The !MySQL Front-End Modules have several special-purpose configuration options.
+
+[=#zeroscale]
+=== Mapping zero-scale DECIMAL to BIGINT ===
+
+When targeting a foreign backend...
+
+Some backend databases, like Oracle, don't have integer types.  An integer type is really just a DECIMAL with a scale of 0.
+
+By default, the !MySQL Front-End Modules map zero-scale DECIMAL types to the !MySQL DECIMAL type.  Buy you might want to map them to the !MySQL BIGINT type instead.
+
+The //zeroscaledecimaltobigint// option instructs the module to do this mapping.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfezeroscaledecimal.conf@
+}}}
+}}}
 
 [=#datetime]
 === Mapping DATE to DATETIME ===

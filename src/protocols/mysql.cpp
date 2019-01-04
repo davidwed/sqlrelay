@@ -840,6 +840,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		uint64_t	handshake;
 		uint64_t	clientprotocol;
 		bool		datetodatetime;
+		bool		zeroscaledecimaltobigint;
 		bool		oldmariadbjdbcservercapabilitieshack;
 
 		bytebuffer	resppacket;
@@ -904,6 +905,10 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 	datetodatetime=!charstring::compareIgnoringCase(
 				parameters->getAttributeValue(
 						"datetodatetime"),"yes");
+	zeroscaledecimaltobigint=
+			!charstring::compareIgnoringCase(
+				parameters->getAttributeValue(
+					"zeroscaledecimaltobigint"),"yes");
 
 	oldmariadbjdbcservercapabilitieshack=
 		!charstring::compareIgnoringCase(
@@ -915,6 +920,8 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 		stdoutput.printf("	handshake: %d\n",handshake);
 		stdoutput.printf("	clientprotocol: %d\n",clientprotocol);
 		stdoutput.printf("	datetodatetime: %d\n",datetodatetime);
+		stdoutput.printf("	zeroscaledecimaltobigint"
+				": %d\n",zeroscaledecimaltobigint);
 		stdoutput.printf("	oldmariadbjdbcservercapabilitieshack"
 				": %d\n",oldmariadbjdbcservercapabilitieshack);
 		debugEnd();
@@ -3208,12 +3215,14 @@ unsigned char sqlrprotocol_mysql::getColumnType(const char *columntypestring,
 			// Some DB's, like oracle, don't distinguish between
 			// decimal and integer types, they just have a numeric
 			// field which may or may not have decimal points.
-			// Those fields types get translated to "decimal"
-			// but if there are 0 decimal points, then we need to
-			// translate them to an integer type here.
+			// By default, even if they have 0 decimal points,
+			// those fields types get translated to "decimal", but
+			// we also provide the option of mapping them to
+			// MYSQL_TYPE_LONGLONG (AKA BIGINT).
 			if ((retval==MYSQL_TYPE_DECIMAL ||
-				retval==MYSQL_TYPE_NEWDECIMAL) && !scale) {
-				retval=MYSQL_TYPE_LONG;
+				retval==MYSQL_TYPE_NEWDECIMAL) && !scale &&
+				zeroscaledecimaltobigint) {
+				retval=MYSQL_TYPE_LONGLONG;
 			}
 
 			// Some DB's, like oracle, don't have separate DATE
