@@ -283,8 +283,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testsmallint"),"SMALLINT");
 	checkSuccess(cur->getColumnType(4),"STRING");
 	checkSuccess(cur->getColumnType("testchar"),"STRING");
-	checkSuccess(cur->getColumnType(5),"CHAR");
-	checkSuccess(cur->getColumnType("testvarchar"),"CHAR");
+	checkSuccess(cur->getColumnType(5),"VARSTRING");
+	checkSuccess(cur->getColumnType("testvarchar"),"VARSTRING");
 	checkSuccess(cur->getColumnType(6),"DATE");
 	checkSuccess(cur->getColumnType("testdate"),"DATE");
 	checkSuccess(cur->getColumnType(7),"TIME");
@@ -501,8 +501,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testsmallint"),"SMALLINT");
 	checkSuccess(cur->getColumnType(4),"STRING");
 	checkSuccess(cur->getColumnType("testchar"),"STRING");
-	checkSuccess(cur->getColumnType(5),"CHAR");
-	checkSuccess(cur->getColumnType("testvarchar"),"CHAR");
+	checkSuccess(cur->getColumnType(5),"VARSTRING");
+	checkSuccess(cur->getColumnType("testvarchar"),"VARSTRING");
 	checkSuccess(cur->getColumnType(6),"DATE");
 	checkSuccess(cur->getColumnType("testdate"),"DATE");
 	checkSuccess(cur->getColumnType(7),"TIME");

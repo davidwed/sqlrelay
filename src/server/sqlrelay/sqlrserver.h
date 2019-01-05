@@ -206,8 +206,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	setNeedsCommitOrRollback(bool needed);
 		bool	getNeedsCommitOrRollback();
 		bool	setIsolationLevel(const char *isolevel);
-		void	setInterceptTransactionQueries(bool itxqb);
-		bool	getInterceptTransactionQueries();
 		void	setFakeTransactionBlocks(bool ftb);
 		bool	getFakeTransactionBlocks();
 		void	setFakeAutoCommit(bool fac);

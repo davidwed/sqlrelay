@@ -289,10 +289,6 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 	sqlrr=NULL;
 	routeentiresession=false;
 
-	// tell the controller to intercept begins, commits, and rollbacks sent
-	// as queries and call begin(), commit(), and rollback() methods instead
-	cont->setInterceptTransactionQueries(true);
-
 	debug=cont->getConfig()->getDebugRouters();
 }
 

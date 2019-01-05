@@ -120,7 +120,6 @@ class sqlrservercontrollerprivate {
 
 	bool		_autocommitforthissession;
 
-	bool		_intercepttxqueries;
 	bool		_faketransactionblocks;
 	bool		_faketransactionblocksautocommiton;
 	bool		_infaketransactionblock;
@@ -321,7 +320,6 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_autocommitforthissession=false;
 
-	pvt->_intercepttxqueries=false;
 	pvt->_faketransactionblocks=false;
 	pvt->_faketransactionblocksautocommiton=false;
 	pvt->_infaketransactionblock=false;
@@ -2666,12 +2664,6 @@ void sqlrservercontroller::setLiveConnection(bool liveconnection) {
 
 bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 
-	// we have to do this if we're faking transaction blocks,
-	// otherwise we'll only do it if it was manually enabled
-	if (!pvt->_faketransactionblocks && !pvt->_intercepttxqueries) {
-		return false;
-	}
-
 	// for now, we only intercept transaction queries
 	if (isBeginTransactionQuery(cursor)) {
 		cursor->setQueryType(SQLRQUERYTYPE_BEGIN);
@@ -2689,12 +2681,6 @@ bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 
 	cursor->setQueryWasIntercepted(false);
-
-	// we have to do this if we're faking transaction blocks,
-	// otherwise we'll only do it if it was manually enabled
-	if (!pvt->_faketransactionblocks && !pvt->_intercepttxqueries) {
-		return false;
-	}
 
 	// Get the query type.  It will have been set by checkInterceptQuery().
 	sqlrquerytype_t	querytype=cursor->getQueryType();
@@ -2781,14 +2767,22 @@ bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
 
 	} else if (!charstring::compareIgnoringCase(ptr,"start ",6)) {
 		return true;
+	} else if (!charstring::compareIgnoringCase(ptr,"bt",2) &&
+					cursor->getQueryLength()==2) {
+		return true;
 	}
 	return false;
 }
 
 bool sqlrservercontroller::isCommitQuery(sqlrservercursor *cursor) {
-	return !charstring::compareIgnoringCase(
-			skipWhitespaceAndComments(cursor->getQueryBuffer()),
-			"commit",6);
+
+	// find the start of the actual query
+	const char	*ptr=skipWhitespaceAndComments(
+					cursor->getQueryBuffer());
+
+	return (!charstring::compareIgnoringCase(ptr,"commit",6) ||
+		(!charstring::compareIgnoringCase(ptr,"et",2) &&
+					cursor->getQueryLength()==2));
 }
 
 bool sqlrservercontroller::isRollbackQuery(sqlrservercursor *cursor) {
@@ -7619,14 +7613,6 @@ void sqlrservercontroller::setExecuteDirect(bool executedirect) {
 
 bool sqlrservercontroller::getExecuteDirect() {
 	return pvt->_executedirect;
-}
-
-void sqlrservercontroller::setInterceptTransactionQueries(bool itxq) {
-	pvt->_intercepttxqueries=itxq;
-}
-
-bool sqlrservercontroller::getInterceptTransactionQueries() {
-	return pvt->_intercepttxqueries;
 }
 
 void sqlrservercontroller::setFakeTransactionBlocks(bool ftb) {

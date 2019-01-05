@@ -260,7 +260,7 @@ class mysql {
 		checkSuccess(cur.getColumnType(11),"YEAR");
 		checkSuccess(cur.getColumnType(12),"STRING");
 		checkSuccess(cur.getColumnType(13),"BLOB");
-		checkSuccess(cur.getColumnType(14),"CHAR");
+		checkSuccess(cur.getColumnType(14),"VARSTRING");
 		checkSuccess(cur.getColumnType(15),"TINYBLOB");
 		checkSuccess(cur.getColumnType(16),"MEDIUMBLOB");
 		checkSuccess(cur.getColumnType(17),"LONGBLOB");
@@ -279,7 +279,7 @@ class mysql {
 		checkSuccess(cur.getColumnType("testyear"),"YEAR");
 		checkSuccess(cur.getColumnType("testchar"),"STRING");
 		checkSuccess(cur.getColumnType("testtext"),"BLOB");
-		checkSuccess(cur.getColumnType("testvarchar"),"CHAR");
+		checkSuccess(cur.getColumnType("testvarchar"),"VARSTRING");
 		checkSuccess(cur.getColumnType("testtinytext"),"TINYBLOB");
 		checkSuccess(cur.getColumnType("testmediumtext"),"MEDIUMBLOB");
 		checkSuccess(cur.getColumnType("testlongtext"),"LONGBLOB");

@@ -296,7 +296,7 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getColumnType(10),"DATETIME");
 	checkSuccess(cur->getColumnType(11),"YEAR");
 	checkSuccess(cur->getColumnType(12),"STRING");
-	checkSuccess(cur->getColumnType(13),"CHAR");
+	checkSuccess(cur->getColumnType(13),"VARSTRING");
 	checkSuccess(cur->getColumnType(14),"BLOB");
 	checkSuccess(cur->getColumnType(15),"TINYBLOB");
 	checkSuccess(cur->getColumnType(16),"MEDIUMBLOB");
@@ -319,7 +319,7 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getColumnType("testdatetime"),"DATETIME");
 	checkSuccess(cur->getColumnType("testyear"),"YEAR");
 	checkSuccess(cur->getColumnType("testchar"),"STRING");
-	checkSuccess(cur->getColumnType("testvarchar"),"CHAR");
+	checkSuccess(cur->getColumnType("testvarchar"),"VARSTRING");
 	checkSuccess(cur->getColumnType("testtext"),"BLOB");
 	checkSuccess(cur->getColumnType("testtinytext"),"TINYBLOB");
 	checkSuccess(cur->getColumnType("testmediumtext"),"MEDIUMBLOB");

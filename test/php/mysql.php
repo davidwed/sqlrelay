@@ -198,7 +198,7 @@
 	checkSuccess(sqlrcur_getColumnType($cur,11),"YEAR");
 	checkSuccess(sqlrcur_getColumnType($cur,12),"STRING");
 	checkSuccess(sqlrcur_getColumnType($cur,13),"BLOB");
-	checkSuccess(sqlrcur_getColumnType($cur,14),"CHAR");
+	checkSuccess(sqlrcur_getColumnType($cur,14),"VARSTRING");
 	checkSuccess(sqlrcur_getColumnType($cur,15),"TINYBLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,16),"MEDIUMBLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,17),"LONGBLOB");
@@ -217,7 +217,7 @@
 	checkSuccess(sqlrcur_getColumnType($cur,"testyear"),"YEAR");
 	checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"STRING");
 	checkSuccess(sqlrcur_getColumnType($cur,"testtext"),"BLOB");
-	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"CHAR");
+	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"VARSTRING");
 	checkSuccess(sqlrcur_getColumnType($cur,"testtinytext"),"TINYBLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,"testmediumtext"),"MEDIUMBLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,"testlongtext"),"LONGBLOB");
