@@ -2206,7 +2206,13 @@ bool sqlrservercontroller::autoCommitOff() {
 		// if the db doesn't support transaction blocks (oracle,
 		// firebird, informix) then we are in a transaction here,
 		// otherwise we aren't
-		pvt->_intransaction=!pvt->_conn->supportsTransactionBlocks();
+		//pvt->_intransaction=!pvt->_conn->supportsTransactionBlocks();
+		// actually, it seems that in db's that support transaction
+		// blocks, setting autocommit off is about the same as running
+		// a begin/start-tx query, so we're in a transaction no matter
+		// what...
+		// FIXME: verify this though, with all db's
+		pvt->_intransaction=true;
 		return true;
 	}
 	return false;
@@ -2554,10 +2560,10 @@ void sqlrservercontroller::saveError() {
 	pvt->_conn->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("%d: ERROR:\n%d: %.*s\n",
-					process::getProcessId(),
-					errorcode,errorlength,
-					pvt->_conn->getErrorBuffer());
+		stdoutput.printf("%d:ERROR:\n%d:",
+				process::getProcessId(),errorcode);
+		stdoutput.write(pvt->_conn->getErrorBuffer(),errorlength);
+		stdoutput.write('\n');
 	}
 }
 
@@ -2674,6 +2680,12 @@ bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 	} else if (isRollbackQuery(cursor)) {
 		cursor->setQueryType(SQLRQUERYTYPE_ROLLBACK);
 		return true;
+	} else if (isAutoCommitOnQuery(cursor)) {
+		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_ON);
+		return true;
+	} else if (isAutoCommitOffQuery(cursor)) {
+		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_OFF);
+		return true;
 	}
 	return false;
 }
@@ -2738,8 +2750,81 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 		// FIXME: if the rollback fails and the db api doesn't support
 		// a rollback command then the connection-level error needs to
 		// be copied to the cursor so queryOrBindCursor can report it
+	} else if (querytype==SQLRQUERYTYPE_AUTOCOMMIT_ON) {
+		cursor->setQueryWasIntercepted(true);
+		cursor->setInputBindCount(0);
+		cursor->setOutputBindCount(0);
+		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+		// FIXME: fake tx block issues here???
+		retval=autoCommitOn();
+	} else if (querytype==SQLRQUERYTYPE_AUTOCOMMIT_OFF) {
+		cursor->setQueryWasIntercepted(true);
+		cursor->setInputBindCount(0);
+		cursor->setOutputBindCount(0);
+		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+		// FIXME: fake tx block issues here???
+		retval=autoCommitOff();
 	}
 	return retval;
+}
+
+bool sqlrservercontroller::isAutoCommitOnQuery(sqlrservercursor *cursor) {
+	return isAutoCommitQuery(cursor,true);
+}
+
+bool sqlrservercontroller::isAutoCommitOffQuery(sqlrservercursor *cursor) {
+	return isAutoCommitQuery(cursor,false);
+}
+
+bool sqlrservercontroller::isAutoCommitQuery(sqlrservercursor *cursor,
+								bool on) {
+
+	// find the start of the actual query
+	const char	*ptr=skipWhitespaceAndComments(
+					cursor->getQueryBuffer());
+
+	// look for "set"
+	if (charstring::compare(ptr,"set",3)) {
+		return false;
+	}
+	ptr+=3;
+
+	// skip whitespace
+	ptr=skipWhitespaceAndComments(ptr);
+
+	// look for "autocommit"
+	if (charstring::compare(ptr,"autocommit",10)) {
+		return false;
+	}
+	ptr+=10;
+
+	// skip whitespace
+	ptr=skipWhitespaceAndComments(ptr);
+
+	// look for "="
+	if (*ptr!='=') {
+		return false;
+	}
+	ptr++;
+
+	// skip whitespace
+	ptr=skipWhitespaceAndComments(ptr);
+
+	// look for 1/0
+	if (*ptr!=((on)?'1':'0')) {
+		return false;
+	}
+	ptr++;
+
+	// skip whitespace
+	ptr=skipWhitespaceAndComments(ptr);
+
+	// look for end of query
+	if (*ptr) {
+		return false;
+	}
+
+	return true;
 }
 
 bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
@@ -3089,7 +3174,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	// write the translated query to the cursor's query buffer
 	// so it'll be there if we decide to re-execute it later
-	charstring::copy(cursor->getQueryBuffer(),
+	bytestring::copy(cursor->getQueryBuffer(),
 			translatedquery->getString(),
 			translatedquery->getStringLength());
 	cursor->setQueryLength(
@@ -3262,7 +3347,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	if (newqlen>pvt->_maxquerysize) {
 		newqlen=pvt->_maxquerysize;
 	}
-	charstring::copy(querybuffer,newq,newqlen);
+	bytestring::copy(querybuffer,newq,newqlen);
 	querybuffer[newqlen]='\0';
 	cursor->setQueryLength(newqlen);
 
@@ -3624,9 +3709,11 @@ sqlrservercursor *sqlrservercontroller::useCustomQueryCursor(
 
 	// copy the query that we just got into
 	// the custom query cursor's buffers
-	charstring::copy(
+	bytestring::copy(
 		customcursor->getQueryBuffer(),
-		cursor->getQueryBuffer());
+		cursor->getQueryBuffer(),
+		cursor->getQueryLength());
+	customcursor->getQueryBuffer()[cursor->getQueryLength()]='\0';
 	customcursor->setQueryLength(cursor->getQueryLength());
 
 	// set the custom cursor' state
@@ -3913,10 +4000,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d:%d:prepare:\n%.*s\n",
+		stdoutput.printf("%d:%d:prepare:\n",
 					process::getProcessId(),
-					cursor->getId(),
-					querylen,query);
+					cursor->getId());
+		stdoutput.write(query,querylen);
+		stdoutput.write('\n');
 	}
 
 	// The standard paradigm is:
@@ -3982,12 +4070,10 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// copy query to cursor's query buffer if necessary
 	if (query!=cursor->getQueryBuffer()) {
-		charstring::copy(cursor->getQueryBuffer(),query,querylen);
+		bytestring::copy(cursor->getQueryBuffer(),query,querylen);
 		cursor->getQueryBuffer()[querylen]='\0';
 		cursor->setQueryLength(querylen);
 	}
-
-
 
 	// bail if we are just generally configured to fake input binds
 	if (cursor->getFakeInputBindsForThisQuery()) {
@@ -4411,10 +4497,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d:%d:execute:\n%.*s\n",
+		stdoutput.printf("%d:%d:execute:\n",
 					process::getProcessId(),
-					cursor->getId(),
-					querylen,query);
+					cursor->getId());
+		stdoutput.write(query,querylen);
+		stdoutput.write('\n');
 	}
 
 	// execute the query
@@ -8229,11 +8316,12 @@ void sqlrservercontroller::saveError(sqlrservercursor *cursor) {
 	cursor->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("\n%d:%d:ERROR:\n%d: %.*s\n",
+		stdoutput.printf("\n%d:%d:ERROR:\n%d:",
 					process::getProcessId(),
 					cursor->getId(),
-					errorcode,errorlength,
-					cursor->getErrorBuffer());
+					errorcode);
+		stdoutput.write(cursor->getErrorBuffer(),errorlength);
+		stdoutput.write('\n');
 	}
 }
 

@@ -50,6 +50,9 @@
 		bool	isBeginTransactionQuery(sqlrservercursor *cursor);
 		bool	isCommitQuery(sqlrservercursor *cursor);
 		bool	isRollbackQuery(sqlrservercursor *cursor);
+		bool	isAutoCommitOnQuery(sqlrservercursor *cursor);
+		bool	isAutoCommitOffQuery(sqlrservercursor *cursor);
+		bool	isAutoCommitQuery(sqlrservercursor *cursor, bool on);
 
 		void	translateBindVariablesFromMappings(
 						sqlrservercursor *cursor);

@@ -2072,6 +2072,13 @@ bool sqlrprotocol_mysql::sendOkPacket(bool noteof,
 					char sessionstatechangetype,
 					const char *sessionstatechangedata) {
 
+	// update statusflags
+	if (cont->inTransaction()) {
+		statusflags|=SERVER_STATUS_IN_TRANS;
+	} else {
+		statusflags|=SERVER_STATUS_AUTOCOMMIT;
+	}
+
 	char	header=(noteof)?0x00:0xFE;
 
 	if (getDebug()) {
@@ -2177,6 +2184,13 @@ bool sqlrprotocol_mysql::sendEofPacket(uint16_t warnings,
 
 	// the second is an "old school" eof packet...
 	resetSendPacketBuffer();
+
+	// update statusflags
+	if (cont->inTransaction()) {
+		statusflags|=SERVER_STATUS_IN_TRANS;
+	} else {
+		statusflags|=SERVER_STATUS_AUTOCOMMIT;
+	}
 
 	if (getDebug()) {
 		debugStart("eof");
