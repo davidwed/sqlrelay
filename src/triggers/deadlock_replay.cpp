@@ -107,7 +107,10 @@ bool sqlrtrigger_deadlock_replay::logQuery(sqlrserverconnection *sqlrcon,
 	// copy the query itself (make sure to null terminate)
 	qd->querylen=sqlrcur->getQueryLength();
 	qd->query=(char *)pool->allocate(qd->querylen+1);
-	charstring::copy(qd->query,sqlrcur->getQueryBuffer());
+	bytestring::copy(qd->query,
+			sqlrcur->getQueryBuffer(),
+			sqlrcur->getQueryLength());
+	qd->query[sqlrcur->getQueryLength()]='\0';
 
 	if (debug) {
 		stdoutput.printf("	query:\n%.*s\n",qd->querylen,qd->query);
