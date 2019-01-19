@@ -1218,7 +1218,7 @@ clientsessionexitstatus_t sqlrprotocol_mysql::clientSession(
 
 void sqlrprotocol_mysql::resetSendPacketBuffer() {
 	resppacket.clear();
-	writeBE(&resppacket,(uint32_t)0);
+	writeLE(&resppacket,(uint32_t)0);
 }
 
 bool sqlrprotocol_mysql::sendPacket() {
@@ -1539,8 +1539,8 @@ bool sqlrprotocol_mysql::recvHandshakeResponse() {
 	const unsigned char	*rp=reqpacket;
 
 	uint32_t	capabilityflags;
-	bytestring::copy(&capabilityflags,rp,sizeof(uint32_t));
-	capabilityflags=leToHost(capabilityflags);
+	readLE(rp,&capabilityflags,&rp);
+	rp-=sizeof(uint32_t);
 
 	if (capabilityflags&CLIENT_PROTOCOL_41) {
 		parseHandshakeResponse41(rp,reqpacketsize);
@@ -1559,18 +1559,14 @@ void sqlrprotocol_mysql::parseHandshakeResponse41(
 	debugStart("handshake response 41");
 
 	// capability flags
-	bytestring::copy(&clientcapabilityflags,rp,sizeof(uint32_t));
-	rp+=sizeof(uint32_t);
-	clientcapabilityflags=leToHost(clientcapabilityflags);
+	readLE(rp,&clientcapabilityflags,&rp);
 	if (getDebug()) {
 		debugCapabilityFlags(clientcapabilityflags);
 	}
 
 	// max-packet size
 	uint32_t	maxpacketsize;
-	bytestring::copy(&maxpacketsize,rp,sizeof(uint32_t));
-	rp+=sizeof(uint32_t);
-	maxpacketsize=leToHost(maxpacketsize);
+	readLE(rp,&maxpacketsize,&rp);
 	if (getDebug()) {
 		stdoutput.printf("	max-packet size: %d\n",maxpacketsize);
 	}
@@ -1722,9 +1718,7 @@ void sqlrprotocol_mysql::parseHandshakeResponse320(
 
 	// capability flags
 	uint16_t	shortcapabilityflags;
-	bytestring::copy(&shortcapabilityflags,rp,sizeof(uint16_t));
-	rp+=sizeof(uint16_t);
-	shortcapabilityflags=leToHost(shortcapabilityflags);
+	readLE(rp,&shortcapabilityflags,&rp);
 	if (getDebug()) {
 		debugCapabilityFlags(shortcapabilityflags);
 	}
@@ -1732,7 +1726,7 @@ void sqlrprotocol_mysql::parseHandshakeResponse320(
 
 	// max-packet size
 	uint32_t	maxpacketsize;
-	bytestring::copy(&maxpacketsize,rp,sizeof(uint32_t));
+	bytestring::copy(&maxpacketsize,&rp,sizeof(uint32_t));
 	rp+=3;
 	maxpacketsize=(maxpacketsize&0xFFFFFF00);
 	maxpacketsize=leToHost(maxpacketsize);
@@ -4270,8 +4264,10 @@ bool sqlrprotocol_mysql::comProcessKill(sqlrservercursor *cursor) {
 
 	// asks the server to kill the specified server thread
 
+	const unsigned char	*rp=reqpacket+1;
+
 	uint32_t	connid;
-	bytestring::copy(&connid,reqpacket+1,sizeof(uint32_t));
+	readLE(rp,&connid,&rp);
 
 	if (getDebug()) {
 		debugStart("com_process_kill");
@@ -4366,7 +4362,7 @@ bool sqlrprotocol_mysql::sendStmtPrepareOk(sqlrservercursor *cursor) {
 	resetSendPacketBuffer();
 
 	write(&resppacket,(char)0x00);
-	writeBE(&resppacket,(uint32_t)cont->getId(cursor));
+	writeLE(&resppacket,(uint32_t)cont->getId(cursor));
 	writeLE(&resppacket,ccount);
 	writeLE(&resppacket,pcount);
 	write(&resppacket,(char)0x00);
@@ -4453,8 +4449,7 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 
 	// get statement id
 	uint32_t	stmtid;
-	bytestring::copy(&stmtid,rp,sizeof(uint32_t));
-	rp+=sizeof(uint32_t);
+	readLE(rp,&stmtid,&rp);
 
 	// get the requested cursor
 	sqlrservercursor	*cursor=cont->getCursor(stmtid);
@@ -4468,8 +4463,7 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 
 	// get iteration count
 	uint32_t	iterationcount;
-	bytestring::copy(&iterationcount,rp,sizeof(uint32_t));
-	rp+=sizeof(uint32_t);
+	readLE(rp,&iterationcount,&rp);
 
 	if (getDebug()) {
 		debugStart("com_stmt_execute");
@@ -4515,9 +4509,7 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 
 			// get parameter types
 			for (uint16_t i=0; i<pcount; i++) {
-				bytestring::copy(&(pt[i]),rp,sizeof(uint16_t));
-				pt[i]=leToHost(pt[i]);
-				rp+=sizeof(uint16_t);
+				readLE(rp,&(pt[i]),&rp);
 			}
 
 			// bind the parameters
@@ -4598,55 +4590,46 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 				{
 				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
 				uint16_t	val;
-				bytestring::copy(&val,rp,sizeof(uint16_t));
-				val=leToHost((uint16_t)val);
+				readLE(rp,&val,&rp);
 				bv->value.integerval=(int16_t)val;
 				bv->isnull=cont->nonNullBindValue();
-				rp+=sizeof(int16_t);
 				}
 				break;
 			case MYSQL_TYPE_LONG:
 				{
 				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
 				uint32_t	val;
-				bytestring::copy(&val,rp,sizeof(uint32_t));
-				val=leToHost((uint32_t)val);
+				readLE(rp,&val,&rp);
 				bv->value.integerval=(int32_t)val;
 				bv->isnull=cont->nonNullBindValue();
-				rp+=sizeof(int32_t);
 				}
 				break;
 			case MYSQL_TYPE_LONGLONG:
 				{
 				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
 				uint64_t	val;
-				bytestring::copy(&val,rp,sizeof(uint64_t));
-				val=leToHost((uint64_t)val);
+				readLE(rp,&val,&rp);
 				bv->value.integerval=(int64_t)val;
 				bv->isnull=cont->nonNullBindValue();
-				rp+=sizeof(int64_t);
 				}
 				break;
 			case MYSQL_TYPE_FLOAT:
 				{
 				float	temp;
 				bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-				bytestring::copy(&temp,rp,sizeof(float));
+				read(rp,&temp,&rp);
 				bv->value.doubleval.value=temp;
 				bv->value.doubleval.precision=0;
 				bv->value.doubleval.scale=0;
 				bv->isnull=cont->nonNullBindValue();
-				rp+=sizeof(float);
 				}
 				break;
 			case MYSQL_TYPE_DOUBLE:
 				bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-				bytestring::copy(&bv->value.doubleval.value,
-							rp,sizeof(double));
+				read(rp,&bv->value.doubleval.value,&rp);
 				bv->value.doubleval.precision=0;
 				bv->value.doubleval.scale=0;
 				bv->isnull=cont->nonNullBindValue();
-				rp+=sizeof(double);
 				break;
 			case MYSQL_TYPE_TIME:
 				{
@@ -4731,6 +4714,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 					int16_t	year;
 					bytestring::copy(&year,
 							rp,sizeof(int16_t));
+					// FIXME: convert LE to host
 					bv->value.dateval.year=
 						filedescriptor::
 						littleEndianToHost(
@@ -4777,6 +4761,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 					int16_t	year;
 					bytestring::copy(&year,
 							rp,sizeof(int16_t));
+					// FIXME: convert LE to host
 					bv->value.dateval.year=
 						filedescriptor::
 						littleEndianToHost(
@@ -4800,6 +4785,8 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 							int32_t	ms;
 							bytestring::copy(&ms,
 							rp,sizeof(int32_t));
+							// FIXME: convert LE
+							// to host
 							bv->value.dateval.
 								microsecond=
 							filedescriptor::
@@ -4917,14 +4904,12 @@ bool sqlrprotocol_mysql::comStmtSendLongData() {
 
 	// get statement id
 	uint32_t	stmtid;
-	bytestring::copy(&stmtid,rp,sizeof(uint32_t));
-	rp+=sizeof(uint32_t);
+	readLE(rp,&stmtid,&rp);
 	rplen-=sizeof(uint32_t);
 
 	// get the parameter id
 	uint16_t	paramid;
-	bytestring::copy(&paramid,rp,sizeof(uint16_t));
-	rp+=sizeof(uint16_t);
+	readLE(rp,&paramid,&rp);
 	rplen-=sizeof(uint16_t);
 
 	// get the data
@@ -4969,7 +4954,7 @@ bool sqlrprotocol_mysql::comStmtClose() {
 
 	// get statement id
 	uint32_t	stmtid;
-	bytestring::copy(&stmtid,rp,sizeof(uint32_t));
+	readLE(rp,&stmtid,&rp);
 
 	if (getDebug()) {
 		debugStart("com_stmt_close");
@@ -5001,7 +4986,7 @@ bool sqlrprotocol_mysql::comStmtReset() {
 
 	// get statement id
 	uint32_t	stmtid;
-	bytestring::copy(&stmtid,rp,sizeof(uint32_t));
+	readLE(rp,&stmtid,&rp);
 
 	if (getDebug()) {
 		debugStart("com_stmt_reset");
@@ -5031,7 +5016,7 @@ bool sqlrprotocol_mysql::comSetOption(sqlrservercursor *cursor) {
 
 	// get multi-statement option
 	uint16_t	multistmtoption;
-	bytestring::copy(&multistmtoption,rp,sizeof(uint16_t));
+	readLE(rp,&multistmtoption,&rp);
 
 	if (getDebug()) {
 		debugStart("com_set_option");
@@ -5055,12 +5040,11 @@ bool sqlrprotocol_mysql::comStmtFetch() {
 
 	// get statement id
 	uint32_t	stmtid;
-	bytestring::copy(&stmtid,rp,sizeof(uint32_t));
-	rp+=sizeof(uint32_t);
+	readLE(rp,&stmtid,&rp);
 
 	// get num rows
 	uint32_t	numrows;
-	bytestring::copy(&numrows,rp,sizeof(uint32_t));
+	readLE(rp,&numrows,&rp);
 
 	if (getDebug()) {
 		debugStart("com_stmt_fetch");
