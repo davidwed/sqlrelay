@@ -4498,6 +4498,7 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 							newparamsbound);
 		}
 
+		uint16_t	*pt=ptypes[cont->getId(cursor)];
 		if (newparamsbound==1) {
 
 			// get new parameters...
@@ -4505,16 +4506,14 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 			// re-init type/value storage
 			clearParams(cursor);
 
-			uint16_t	*pt=ptypes[cont->getId(cursor)];
-
 			// get parameter types
 			for (uint16_t i=0; i<pcount; i++) {
 				readLE(rp,&(pt[i]),&rp);
 			}
-
-			// bind the parameters
-			bindParameters(cursor,pcount,pt,nullbitmap,rp,&rp);
 		}
+
+		// bind the parameters
+		bindParameters(cursor,pcount,pt,nullbitmap,rp,&rp);
 	} else {
 		clearParams(cursor);
 	}
@@ -4806,10 +4805,11 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 				bv->valuesize=readLenEncInt(rp,&rp);
 				bv->value.stringval=
 					(char *)bindpool->allocate(
-							bv->valuesize);
-				charstring::copy(bv->value.stringval,
+							bv->valuesize+1);
+				bytestring::copy(bv->value.stringval,
 							(const char *)rp,
 							bv->valuesize);
+				bv->value.stringval[bv->valuesize]='\0';
 				bv->isnull=cont->nonNullBindValue();
 				rp+=bv->valuesize;
 				break;
@@ -4821,10 +4821,11 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 				bv->valuesize=readLenEncInt(rp,&rp);
 				bv->value.stringval=
 					(char *)bindpool->allocate(
-							bv->valuesize);
+							bv->valuesize+1);
 				charstring::copy(bv->value.stringval,
 							(const char *)rp,
 							bv->valuesize);
+				bv->value.stringval[bv->valuesize]='\0';
 				bv->isnull=cont->nonNullBindValue();
 				rp+=bv->valuesize;
 				break;
