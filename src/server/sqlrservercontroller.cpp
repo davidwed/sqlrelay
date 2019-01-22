@@ -2783,47 +2783,89 @@ bool sqlrservercontroller::isAutoCommitQuery(sqlrservercursor *cursor,
 	const char	*ptr=skipWhitespaceAndComments(
 					cursor->getQueryBuffer());
 
-	// look for "set"
-	if (charstring::compare(ptr,"set",3)) {
-		return false;
-	}
-	ptr+=3;
-
-	// skip whitespace
-	ptr=skipWhitespaceAndComments(ptr);
-
 	// look for "autocommit"
-	if (charstring::compare(ptr,"autocommit",10)) {
-		return false;
+	if (!charstring::compare(ptr,"autocommit",10)) {
+
+		ptr+=10;
+
+	}  else {
+
+		// look for "set"
+		if (!charstring::compare(ptr,"set",3)) {
+			ptr+=3;
+		} else {
+stdoutput.printf("fail 1\n");
+			return false;
+		}
+
+		// skip whitespace
+		ptr=skipWhitespaceAndComments(ptr);
+
+		// look for "autocommit"/"auto"/"implicit_transactions"
+		if (!charstring::compare(ptr,"autocommit",10)) {
+			ptr+=10;
+		} else if (!charstring::compare(ptr,"auto",4)) {
+			ptr+=4;
+		} else if (!charstring::compare(
+					ptr,"implicit_transactions",21)) {
+			ptr+=21;
+		} else {
+stdoutput.printf("fail 2\n");
+			return false;
+		}
 	}
-	ptr+=10;
 
 	// skip whitespace
 	ptr=skipWhitespaceAndComments(ptr);
 
-	// look for "="
-	if (*ptr!='=') {
-		return false;
+	// look for "="/"to"
+	if (*ptr=='=') {
+		ptr++;
+	} else if (!charstring::compare(ptr,"to",2)) {
+		ptr+=2;
 	}
-	ptr++;
 
 	// skip whitespace
 	ptr=skipWhitespaceAndComments(ptr);
 
-	// look for 1/0
-	if (*ptr!=((on)?'1':'0')) {
-		return false;
+	if (on) {
+		// look for 1/on/yes/immediate
+		if (*ptr=='1') {
+			ptr++;
+		} else if (!charstring::compare(ptr,"on",2)) {
+			ptr+=2;
+		} else if (!charstring::compare(ptr,"yes",3)) {
+			ptr+=3;
+		} else if (!charstring::compare(ptr,"immediate",9)) {
+			ptr+=9;
+		} else {
+stdoutput.printf("fail 4\n");
+			return false;
+		}
+	} else {
+		// look for 0/off/no
+		if (*ptr=='0') {
+			ptr++;
+		} else if (!charstring::compare(ptr,"off",3)) {
+			ptr+=3;
+		} else if (!charstring::compare(ptr,"no",2)) {
+			ptr+=2;
+		} else {
+stdoutput.printf("fail 5\n");
+			return false;
+		}
 	}
-	ptr++;
 
 	// skip whitespace
 	ptr=skipWhitespaceAndComments(ptr);
 
 	// look for end of query
 	if (*ptr) {
+stdoutput.printf("fail 6\n");
 		return false;
 	}
 
+stdoutput.printf("%s - is autocommit %s\n",cursor->getQueryBuffer(),(on)?"on":"off");
 	return true;
 }
 

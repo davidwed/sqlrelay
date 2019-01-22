@@ -33,6 +33,7 @@
 	fixed mysql varchar type mapping (from char to varstring)
 	mysql front-end sets in-tx/autocommit status flags now
 	bytestring::copy() used now when copying queries between buffers
+	fixed some subtle bind-realated mysql protocol bugs
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class
