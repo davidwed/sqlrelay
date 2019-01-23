@@ -2861,7 +2861,6 @@ bool sqlrservercontroller::isAutoCommitQuery(sqlrservercursor *cursor,
 		return false;
 	}
 
-stdoutput.printf("is autocommit %s\n",(on)?"on":"off");
 	return true;
 }
 
