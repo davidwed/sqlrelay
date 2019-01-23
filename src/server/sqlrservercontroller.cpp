@@ -2784,17 +2784,16 @@ bool sqlrservercontroller::isAutoCommitQuery(sqlrservercursor *cursor,
 					cursor->getQueryBuffer());
 
 	// look for "autocommit"
-	if (!charstring::compare(ptr,"autocommit",10)) {
+	if (!charstring::compareIgnoringCase(ptr,"autocommit",10)) {
 
 		ptr+=10;
 
 	}  else {
 
 		// look for "set"
-		if (!charstring::compare(ptr,"set",3)) {
+		if (!charstring::compareIgnoringCase(ptr,"set",3)) {
 			ptr+=3;
 		} else {
-stdoutput.printf("fail 1\n");
 			return false;
 		}
 
@@ -2802,15 +2801,14 @@ stdoutput.printf("fail 1\n");
 		ptr=skipWhitespaceAndComments(ptr);
 
 		// look for "autocommit"/"auto"/"implicit_transactions"
-		if (!charstring::compare(ptr,"autocommit",10)) {
+		if (!charstring::compareIgnoringCase(ptr,"autocommit",10)) {
 			ptr+=10;
-		} else if (!charstring::compare(ptr,"auto",4)) {
+		} else if (!charstring::compareIgnoringCase(ptr,"auto",4)) {
 			ptr+=4;
-		} else if (!charstring::compare(
+		} else if (!charstring::compareIgnoringCase(
 					ptr,"implicit_transactions",21)) {
 			ptr+=21;
 		} else {
-stdoutput.printf("fail 2\n");
 			return false;
 		}
 	}
@@ -2821,7 +2819,7 @@ stdoutput.printf("fail 2\n");
 	// look for "="/"to"
 	if (*ptr=='=') {
 		ptr++;
-	} else if (!charstring::compare(ptr,"to",2)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"to",2)) {
 		ptr+=2;
 	}
 
@@ -2832,26 +2830,25 @@ stdoutput.printf("fail 2\n");
 		// look for 1/on/yes/immediate
 		if (*ptr=='1') {
 			ptr++;
-		} else if (!charstring::compare(ptr,"on",2)) {
+		} else if (!charstring::compareIgnoringCase(ptr,"on",2)) {
 			ptr+=2;
-		} else if (!charstring::compare(ptr,"yes",3)) {
+		} else if (!charstring::compareIgnoringCase(ptr,"yes",3)) {
 			ptr+=3;
-		} else if (!charstring::compare(ptr,"immediate",9)) {
+		} else if (!charstring::compareIgnoringCase(
+							ptr,"immediate",9)) {
 			ptr+=9;
 		} else {
-stdoutput.printf("fail 4\n");
 			return false;
 		}
 	} else {
 		// look for 0/off/no
 		if (*ptr=='0') {
 			ptr++;
-		} else if (!charstring::compare(ptr,"off",3)) {
+		} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
 			ptr+=3;
-		} else if (!charstring::compare(ptr,"no",2)) {
+		} else if (!charstring::compareIgnoringCase(ptr,"no",2)) {
 			ptr+=2;
 		} else {
-stdoutput.printf("fail 5\n");
 			return false;
 		}
 	}
@@ -2861,11 +2858,10 @@ stdoutput.printf("fail 5\n");
 
 	// look for end of query
 	if (*ptr) {
-stdoutput.printf("fail 6\n");
 		return false;
 	}
 
-stdoutput.printf("%s - is autocommit %s\n",cursor->getQueryBuffer(),(on)?"on":"off");
+stdoutput.printf("is autocommit %s\n",(on)?"on":"off");
 	return true;
 }
 
