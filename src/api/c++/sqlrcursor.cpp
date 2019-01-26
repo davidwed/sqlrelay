@@ -5200,7 +5200,6 @@ bool sqlrcursor::parseResults() {
 			getErrorFromServer();
 			if (err==ERROR_OCCURRED_DISCONNECT) {
 				pvt->_sqlrc->endSession();
-stdoutput.printf("ending session!!!");
 				return false;
 			}
 			break;
