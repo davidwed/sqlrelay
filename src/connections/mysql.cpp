@@ -665,7 +665,7 @@ const char *mysqlconnection::getColumnListQuery(
 }
 
 const char *mysqlconnection::selectDatabaseQuery() {
-	return "use %s";
+	return "use `%s`";
 }
 
 const char *mysqlconnection::getCurrentDatabaseQuery() {

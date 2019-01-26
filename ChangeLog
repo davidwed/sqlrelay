@@ -34,6 +34,7 @@
 	mysql front-end sets in-tx/autocommit status flags now
 	bytestring::copy() used now when copying queries between buffers
 	fixed some subtle bind-realated mysql protocol bugs
+	mysql connection quotes database name when selecting the db now
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class
