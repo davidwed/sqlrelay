@@ -2670,20 +2670,24 @@ void sqlrservercontroller::setLiveConnection(bool liveconnection) {
 
 bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 
+	// find the start of the actual query
+	const char	*ptr=skipWhitespaceAndComments(
+					cursor->getQueryBuffer());
+
 	// for now, we only intercept transaction queries
-	if (isBeginTransactionQuery(cursor)) {
+	if (isBeginTransactionQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_BEGIN);
 		return true;
-	} else if (isCommitQuery(cursor)) {
+	} else if (isCommitQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_COMMIT);
 		return true;
-	} else if (isRollbackQuery(cursor)) {
+	} else if (isRollbackQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_ROLLBACK);
 		return true;
-	} else if (isAutoCommitOnQuery(cursor)) {
+	} else if (isAutoCommitOnQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_ON);
 		return true;
-	} else if (isAutoCommitOffQuery(cursor)) {
+	} else if (isAutoCommitOffQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_OFF);
 		return true;
 	}
@@ -2702,162 +2706,168 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 	// the query will be sent directly to the db and endFakeBeginTransaction
 	// won't get called.
 	bool	retval=false;
-	if (querytype==SQLRQUERYTYPE_BEGIN) {
-		cursor->setQueryWasIntercepted(true);
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks &&
-				pvt->_infaketransactionblock) {
-			setError(cursor,
-				SQLR_ERROR_BEGIN_IN_TX_BLOCK_STRING,
-				SQLR_ERROR_BEGIN_IN_TX_BLOCK,true);
-		} else {
-			retval=begin();
-		}
-		// FIXME: if the begin fails and the db api doesn't support
-		// a begin command then the connection-level error needs to
-		// be copied to the cursor so queryOrBindCursor can report it
-	} else if (querytype==SQLRQUERYTYPE_COMMIT) {
-		cursor->setQueryWasIntercepted(true);
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks &&
-				!pvt->_infaketransactionblock) {
-			setError(cursor,
+	switch (querytype) {
+		case SQLRQUERYTYPE_BEGIN:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			if (pvt->_faketransactionblocks &&
+					pvt->_infaketransactionblock) {
+				setError(cursor,
+					SQLR_ERROR_BEGIN_IN_TX_BLOCK_STRING,
+					SQLR_ERROR_BEGIN_IN_TX_BLOCK,true);
+			} else {
+				retval=begin();
+			}
+			// FIXME: if the begin fails and the db api doesn't
+			// support a begin command then the connection-level
+			// error needs to be copied to the cursor so
+			// queryOrBindCursor can report it
+			break;
+		case SQLRQUERYTYPE_COMMIT:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			if (pvt->_faketransactionblocks &&
+					!pvt->_infaketransactionblock) {
+				setError(cursor,
 				SQLR_ERROR_COMMIT_NOT_IN_TX_BLOCK_STRING,
 				SQLR_ERROR_COMMIT_NOT_IN_TX_BLOCK,true);
-		} else {
-			retval=commit();
-		}
-		// FIXME: if the commit fails and the db api doesn't support
-		// a commit command then the connection-level error needs to
-		// be copied to the cursor so queryOrBindCursor can report it
-	} else if (querytype==SQLRQUERYTYPE_ROLLBACK) {
-		cursor->setQueryWasIntercepted(true);
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks &&
-				!pvt->_infaketransactionblock) {
-			setError(cursor,
+			} else {
+				retval=commit();
+			}
+			// FIXME: if the commit fails and the db api doesn't
+			// support a commit command then the connection-level
+			// error needs to be copied to the cursor so
+			// queryOrBindCursor can report it
+			break;
+		case SQLRQUERYTYPE_ROLLBACK:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			if (pvt->_faketransactionblocks &&
+					!pvt->_infaketransactionblock) {
+				setError(cursor,
 				SQLR_ERROR_ROLLBACK_NOT_IN_TX_BLOCK_STRING,
 				SQLR_ERROR_ROLLBACK_NOT_IN_TX_BLOCK,true);
-		} else {
-			retval=rollback();
-		}
-		// FIXME: if the rollback fails and the db api doesn't support
-		// a rollback command then the connection-level error needs to
-		// be copied to the cursor so queryOrBindCursor can report it
-	} else if (querytype==SQLRQUERYTYPE_AUTOCOMMIT_ON) {
-		cursor->setQueryWasIntercepted(true);
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		// FIXME: fake tx block issues here???
-		retval=autoCommitOn();
-	} else if (querytype==SQLRQUERYTYPE_AUTOCOMMIT_OFF) {
-		cursor->setQueryWasIntercepted(true);
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		// FIXME: fake tx block issues here???
-		retval=autoCommitOff();
+			} else {
+				retval=rollback();
+			}
+			// FIXME: if the rollback fails and the db api doesn't
+			// support a rollback command then the connection-level
+			// error needs to be copied to the cursor so
+			// queryOrBindCursor can report it
+			break;
+		case SQLRQUERYTYPE_AUTOCOMMIT_ON:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			// FIXME: fake tx block issues here???
+			retval=autoCommitOn();
+			break;
+		case SQLRQUERYTYPE_AUTOCOMMIT_OFF:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			// FIXME: fake tx block issues here???
+			retval=autoCommitOff();
+			break;
+		default:
+			break;
 	}
 	return retval;
 }
 
-bool sqlrservercontroller::isAutoCommitOnQuery(sqlrservercursor *cursor) {
-	return isAutoCommitQuery(cursor,true);
+bool sqlrservercontroller::isAutoCommitOnQuery(const char *query) {
+	return isAutoCommitQuery(query,true);
 }
 
-bool sqlrservercontroller::isAutoCommitOffQuery(sqlrservercursor *cursor) {
-	return isAutoCommitQuery(cursor,false);
+bool sqlrservercontroller::isAutoCommitOffQuery(const char *query) {
+	return isAutoCommitQuery(query,false);
 }
 
-bool sqlrservercontroller::isAutoCommitQuery(sqlrservercursor *cursor,
-								bool on) {
-
-	// find the start of the actual query
-	const char	*ptr=skipWhitespaceAndComments(
-					cursor->getQueryBuffer());
+bool sqlrservercontroller::isAutoCommitQuery(const char *query, bool on) {
 
 	// look for "autocommit"
-	if (!charstring::compareIgnoringCase(ptr,"autocommit",10)) {
+	if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
 
-		ptr+=10;
+		query+=10;
 
 	}  else {
 
 		// look for "set"
-		if (!charstring::compareIgnoringCase(ptr,"set",3)) {
-			ptr+=3;
+		if (!charstring::compareIgnoringCase(query,"set",3)) {
+			query+=3;
 		} else {
 			return false;
 		}
 
 		// skip whitespace
-		ptr=skipWhitespaceAndComments(ptr);
+		query=skipWhitespaceAndComments(query);
 
 		// look for "autocommit"/"auto"/"implicit_transactions"
-		if (!charstring::compareIgnoringCase(ptr,"autocommit",10)) {
-			ptr+=10;
-		} else if (!charstring::compareIgnoringCase(ptr,"auto",4)) {
-			ptr+=4;
+		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
+			query+=10;
+		} else if (!charstring::compareIgnoringCase(query,"auto",4)) {
+			query+=4;
 		} else if (!charstring::compareIgnoringCase(
-					ptr,"implicit_transactions",21)) {
-			ptr+=21;
+					query,"implicit_transactions",21)) {
+			query+=21;
 		} else {
 			return false;
 		}
 	}
 
 	// skip whitespace
-	ptr=skipWhitespaceAndComments(ptr);
+	query=skipWhitespaceAndComments(query);
 
 	// look for "="/"to"
-	if (*ptr=='=') {
-		ptr++;
-	} else if (!charstring::compareIgnoringCase(ptr,"to",2)) {
-		ptr+=2;
+	if (*query=='=') {
+		query++;
+	} else if (!charstring::compareIgnoringCase(query,"to",2)) {
+		query+=2;
 	}
 
 	// skip whitespace
-	ptr=skipWhitespaceAndComments(ptr);
+	query=skipWhitespaceAndComments(query);
 
 	if (on) {
 		// look for 1/on/yes/immediate
-		if (*ptr=='1') {
-			ptr++;
-		} else if (!charstring::compareIgnoringCase(ptr,"on",2)) {
-			ptr+=2;
-		} else if (!charstring::compareIgnoringCase(ptr,"yes",3)) {
-			ptr+=3;
+		if (*query=='1') {
+			query++;
+		} else if (!charstring::compareIgnoringCase(query,"on",2)) {
+			query+=2;
+		} else if (!charstring::compareIgnoringCase(query,"yes",3)) {
+			query+=3;
 		} else if (!charstring::compareIgnoringCase(
-							ptr,"immediate",9)) {
-			ptr+=9;
+							query,"immediate",9)) {
+			query+=9;
 		} else {
 			return false;
 		}
 	} else {
 		// look for 0/off/no
-		if (*ptr=='0') {
-			ptr++;
-		} else if (!charstring::compareIgnoringCase(ptr,"off",3)) {
-			ptr+=3;
-		} else if (!charstring::compareIgnoringCase(ptr,"no",2)) {
-			ptr+=2;
+		if (*query=='0') {
+			query++;
+		} else if (!charstring::compareIgnoringCase(query,"off",3)) {
+			query+=3;
+		} else if (!charstring::compareIgnoringCase(query,"no",2)) {
+			query+=2;
 		} else {
 			return false;
 		}
 	}
 
 	// skip whitespace
-	ptr=skipWhitespaceAndComments(ptr);
+	query=skipWhitespaceAndComments(query);
 
 	// look for end of query
-	if (*ptr) {
+	if (*query) {
 		return false;
 	}
 
@@ -2865,52 +2875,47 @@ bool sqlrservercontroller::isAutoCommitQuery(sqlrservercursor *cursor,
 }
 
 bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
+	return isBeginTransactionQuery(skipWhitespaceAndComments(
+						cursor->getQueryBuffer()));
+}
 
-	// find the start of the actual query
-	const char	*ptr=skipWhitespaceAndComments(
-					cursor->getQueryBuffer());
+bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 
 	// See if it was any of the different queries used to start a
 	// transaction.  IMPORTANT: don't just look for the first 5 characters
 	// to be "begin", make sure it's the entire query.  Many db's use
 	// "begin" to start a stored procedure block, but in those cases,
 	// something will follow it.
-	if (!charstring::compareIgnoringCase(ptr,"begin",5)) {
+	if (!charstring::compareIgnoringCase(query,"begin",5)) {
 
 		// make sure there are only spaces, comments or the word "work"
 		// after the begin
-		const char	*spaceptr=skipWhitespaceAndComments(ptr+5);
+		const char	*spaceptr=skipWhitespaceAndComments(query+5);
 		
-		if (!charstring::compareIgnoringCase(spaceptr,"work",4) ||
-			*spaceptr=='\0') {
+		if (*spaceptr=='\0' ||
+			!charstring::compareIgnoringCase(spaceptr,"work",4)) {
 			return true;
 		}
 		return false;
 
-	} else if (!charstring::compareIgnoringCase(ptr,"start ",6)) {
+	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
 		return true;
-	} else if (!charstring::compareIgnoringCase(ptr,"bt",2) &&
-					cursor->getQueryLength()==2) {
+	} else if (!charstring::compareIgnoringCase(query,"bt",2) &&
+							*(query+2)=='\0') {
 		return true;
 	}
 	return false;
 }
 
-bool sqlrservercontroller::isCommitQuery(sqlrservercursor *cursor) {
+bool sqlrservercontroller::isCommitQuery(const char *query) {
 
-	// find the start of the actual query
-	const char	*ptr=skipWhitespaceAndComments(
-					cursor->getQueryBuffer());
-
-	return (!charstring::compareIgnoringCase(ptr,"commit",6) ||
-		(!charstring::compareIgnoringCase(ptr,"et",2) &&
-					cursor->getQueryLength()==2));
+	return (!charstring::compareIgnoringCase(query,"commit",6) ||
+		(!charstring::compareIgnoringCase(query,"et",2) &&
+						*(query+2))=='\0');
 }
 
-bool sqlrservercontroller::isRollbackQuery(sqlrservercursor *cursor) {
-	return !charstring::compareIgnoringCase(
-			skipWhitespaceAndComments(cursor->getQueryBuffer()),
-			"rollback",8);
+bool sqlrservercontroller::isRollbackQuery(const char *query) {
+	return !charstring::compareIgnoringCase(query,"rollback",8);
 }
 
 bool sqlrservercontroller::skipComment(const char **ptr,
@@ -4154,6 +4159,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	}
 
 	// translate "begin" queries
+	// FIXME: can we just let interceptQuery below handle this?
 	if (pvt->_conn->supportsTransactionBlocks() &&
 			isBeginTransactionQuery(cursor)) {
 		translateBeginTransaction(cursor);
@@ -4330,6 +4336,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		}
 
 		// translate "begin" queries
+		// FIXME: can we just let interceptQuery below handle this?
 		if (pvt->_conn->supportsTransactionBlocks() &&
 				isBeginTransactionQuery(cursor)) {
 			translateBeginTransaction(cursor);
