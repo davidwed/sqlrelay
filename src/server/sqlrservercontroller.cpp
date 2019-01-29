@@ -2911,7 +2911,7 @@ bool sqlrservercontroller::isCommitQuery(const char *query) {
 
 	return (!charstring::compareIgnoringCase(query,"commit",6) ||
 		(!charstring::compareIgnoringCase(query,"et",2) &&
-						*(query+2))=='\0');
+						*(query+2)=='\0'));
 }
 
 bool sqlrservercontroller::isRollbackQuery(const char *query) {

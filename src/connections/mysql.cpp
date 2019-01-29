@@ -1271,9 +1271,6 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 #endif
 
 		// initialize result set
-if (mysqlresult) {
-	stdoutput.printf("%d:mysqlresult is not null\n",getId());
-}
 		mysqlresult=NULL;
 
 		// execute the query

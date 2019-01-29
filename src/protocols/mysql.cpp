@@ -1061,6 +1061,8 @@ clientsessionexitstatus_t sqlrprotocol_mysql::clientSession(
 				case COM_QUIT:
 					// just end the session and
 					// close the connection
+					debugStart("com_quit");
+					debugEnd();
 					loop=false;
 					endsession=true;
 					break;
