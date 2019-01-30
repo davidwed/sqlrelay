@@ -254,7 +254,7 @@ struct MYSQL_STMT {
 	MYSQL_RES	*result;
 	MYSQL_BIND	*resultbinds;
 	MYSQL		*mysql;
-	memorypool	*bindvarnames;
+	memorypool	bindvarnames;
 };
 
 struct MYSQL {
@@ -622,7 +622,6 @@ MYSQL_RES *mysql_list_processes(MYSQL *mysql) {
 	mysql_stmt_close(mysql->currentstmt);
 
 	mysql->currentstmt=new MYSQL_STMT;
-	mysql->currentstmt->bindvarnames=new memorypool(0,128,100);
 	mysql->currentstmt->result=new MYSQL_RES;
 	mysql->currentstmt->result->stmtbackptr=NULL;
 	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
@@ -829,7 +828,6 @@ MYSQL_RES *mysql_list_dbs(MYSQL *mysql, const char *wild) {
 	mysql_stmt_close(mysql->currentstmt);
 
 	mysql->currentstmt=new MYSQL_STMT;
-	mysql->currentstmt->bindvarnames=new memorypool(0,128,100);
 	mysql->currentstmt->result=new MYSQL_RES;
 	mysql->currentstmt->result->stmtbackptr=NULL;
 	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
@@ -852,7 +850,6 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 	mysql_stmt_close(mysql->currentstmt);
 
 	mysql->currentstmt=new MYSQL_STMT;
-	mysql->currentstmt->bindvarnames=new memorypool(0,128,100);
 	mysql->currentstmt->result=new MYSQL_RES;
 	mysql->currentstmt->result->stmtbackptr=NULL;
 	mysql->currentstmt->result->sqlrcur=new sqlrcursor(mysql->sqlrcon,true);
@@ -886,7 +883,6 @@ MYSQL_RES *mysql_list_fields(MYSQL *mysql,
 	mysql_stmt_close(mysql->currentstmt);
 
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
-	stmt->bindvarnames=new memorypool(0,128,100);
 	mysql->currentstmt=stmt;
 	stmt->result=new MYSQL_RES;
 	stmt->result->stmtbackptr=NULL;
@@ -2326,7 +2322,6 @@ my_bool mysql_send_long_data(MYSQL_STMT *stmt,
 MYSQL_STMT *mysql_stmt_init(MYSQL *mysql) {
 	debugFunction();
 	MYSQL_STMT	*stmt=new MYSQL_STMT;
-	stmt->bindvarnames=new memorypool(0,128,100);
 	stmt->mysql=mysql;
 	stmt->result=new MYSQL_RES;
 	stmt->result->stmtbackptr=stmt;
@@ -2403,7 +2398,6 @@ my_bool mysql_stmt_close(MYSQL_STMT *stmt) {
 	debugFunction();
 	if (stmt) {
 		mysql_free_result(stmt->result);
-		delete stmt->bindvarnames;
 		delete stmt;
 	}
 	return 0;
@@ -2487,7 +2481,7 @@ my_bool mysql_stmt_attr_get(MYSQL_STMT *stmt,
 my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 	debugFunction();
 
-	stmt->bindvarnames->clear();
+	stmt->bindvarnames.clear();
 
 	unsigned long	paramcount=mysql_param_count(stmt);
 	for (unsigned long i=0; i<paramcount; i++) {
@@ -2495,7 +2489,7 @@ my_bool mysql_stmt_bind_param(MYSQL_STMT *stmt, MYSQL_BIND *bind) {
 		// use 1-based index for variable names
 		size_t	buffersize=charstring::integerLength((uint32_t)i+1)+1;
 		char	*variable=
-			(char *)stmt->bindvarnames->allocate(buffersize);
+			(char *)stmt->bindvarnames.allocate(buffersize);
 		charstring::printf(variable,buffersize,"%ld",i+1);
 
 		// get the cursor

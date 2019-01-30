@@ -79,7 +79,7 @@ class sqlrshenv {
 		bool		lazyfetch;
 		char		delimiter;
 		dictionary<char *, sqlrshbindvalue *>	inputbinds;
-		memorypool	*inbindpool;
+		memorypool	inbindpool;
 		dictionary<char *, sqlrshbindvalue *>	outputbinds;
 		dictionary<char *, sqlrshbindvalue *>	inputoutputbinds;
 		char		*cacheto;
@@ -98,7 +98,6 @@ sqlrshenv::sqlrshenv() {
 	autocommit=false;
 	lazyfetch=false;
 	delimiter=';';
-	inbindpool=new memorypool(512,128,100);
 	cacheto=NULL;
 	format=SQLRSH_FORMAT_PLAIN;
 	getasnumber=false;
@@ -110,7 +109,6 @@ sqlrshenv::~sqlrshenv() {
 	clearbinds(&inputbinds);
 	clearbinds(&outputbinds);
 	clearbinds(&inputoutputbinds);
-	delete inbindpool;
 	delete[] cacheto;
 }
 
@@ -128,7 +126,7 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 		delete bv;
 	}
 	binds->clear();
-	inbindpool->clear();
+	inbindpool.clear();
 }
 
 enum querytype_t {

@@ -26,8 +26,8 @@ class sqlrservercursorprivate {
 		xmldom		*_querytree;
 		stringbuffer	_translatedquery;
 
-		memorypool	*_bindpool;
-		memorypool	*_bindmappingspool;
+		memorypool	_bindpool;
+		memorypool	_bindmappingspool;
 		namevaluepairs	*_bindmappings;
 
 		uint16_t		_inbindcount;
@@ -114,8 +114,6 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	pvt->_maxerrorlength=conn->cont->getConfig()->getMaxErrorLength();
 
-	pvt->_bindpool=new memorypool(0,128,100);
-	pvt->_bindmappingspool=new memorypool(0,128,100);
 	pvt->_bindmappings=new namevaluepairs;
 
 	setInputBindCount(0);
@@ -211,8 +209,6 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 sqlrservercursor::~sqlrservercursor() {
 	delete[] pvt->_querybuffer;
 	delete pvt->_querytree;
-	delete pvt->_bindpool;
-	delete pvt->_bindmappingspool;
 	delete pvt->_bindmappings;
 	delete[] pvt->_inbindvars;
 	delete[] pvt->_outbindvars;
@@ -1007,7 +1003,7 @@ void sqlrservercursor::encodeBlob(stringbuffer *buffer,
 }
 
 memorypool *sqlrservercursor::getBindPool() {
-	return pvt->_bindpool;
+	return &pvt->_bindpool;
 }
 
 namevaluepairs *sqlrservercursor::getBindMappings() {
@@ -1015,7 +1011,7 @@ namevaluepairs *sqlrservercursor::getBindMappings() {
 }
 
 memorypool *sqlrservercursor::getBindMappingsPool() {
-	return pvt->_bindmappingspool;
+	return &pvt->_bindmappingspool;
 }
 
 void sqlrservercursor::setInputBindCount(uint16_t inbindcount) {

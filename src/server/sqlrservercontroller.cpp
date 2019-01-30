@@ -145,8 +145,8 @@ class sqlrservercontrollerprivate {
 	uint64_t		_serversockincount;
 	unixsocketserver	*_serversockun;
 
-	memorypool	*_txpool;
-	memorypool	*_sessionpool;
+	memorypool	_txpool;
+	memorypool	_sessionpool;
 
 	bool		_debugsql;
 	bool		_debugbulkload;
@@ -372,9 +372,6 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_decrypteddbpassword=NULL;
 
-	pvt->_txpool=new memorypool(0,128,100);
-	pvt->_sessionpool=new memorypool(0,128,100);
-
 	pvt->_debugsql=false;
 	pvt->_debugbulkload=false;
 	pvt->_debugsqlrparser=false;
@@ -498,9 +495,6 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_bulkservershmem;
 	delete pvt->_bulkclientshmem;
 	delete pvt->_bulkcursor;
-
-	delete pvt->_txpool;
-	delete pvt->_sessionpool;
 
 	delete pvt;
 }
@@ -2354,7 +2348,7 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	}
 
 	// clear per-session pool
-	pvt->_txpool->clear();
+	pvt->_txpool.clear();
 
 	// set in-tx flag
 	if (!pvt->_autocommitforthissession) {
@@ -5433,7 +5427,7 @@ void sqlrservercontroller::endSession() {
 	}
 
 	// clear per-session pool
-	pvt->_sessionpool->clear();
+	pvt->_sessionpool.clear();
 
 	// shrink the cursor array, if necessary
 	// FIXME: it would probably be more efficient to scale
@@ -9292,11 +9286,11 @@ void sqlrservercontroller::setLiveConnection(sqlrservercursor *cursor,
 }
 
 memorypool *sqlrservercontroller::getPerTransactionMemoryPool() {
-	return pvt->_txpool;
+	return &pvt->_txpool;
 }
 
 memorypool *sqlrservercontroller::getPerSessionMemoryPool() {
-	return pvt->_sessionpool;
+	return &pvt->_sessionpool;
 }
 
 sqlrparser *sqlrservercontroller::getParser() {
