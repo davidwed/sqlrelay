@@ -4483,9 +4483,6 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 	const unsigned char	*nullbitmap=NULL;
 	unsigned char		newparamsbound=0;
 
-	// re-init parameters
-	clearParams(cursor);
-
 	if (pcount) {
 
 		// get null bitmap
@@ -4517,6 +4514,8 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 
 		// bind the parameters
 		bindParameters(cursor,pcount,pt,nullbitmap,rp,&rp);
+	} else {
+		clearParams(cursor);
 	}
 
 	debugEnd();
@@ -4547,9 +4546,11 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 		stdoutput.write("	bind {\n");
 	}
 
-	cont->setInputBindCount(cursor,pcount);
 	memorypool		*bindpool=cont->getBindPool(cursor);
 	sqlrserverbindvar	*inbinds=cont->getInputBinds(cursor);
+
+	cont->setInputBindCount(cursor,pcount);
+	bindpool->clear();
 
 	for (uint16_t i=0; i<pcount; i++) {
 
