@@ -871,6 +871,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		uint16_t	maxbindcount;
 
 		char		**bindvarnames;
+		int16_t		*bindvarnamesizes;
 
 		char		lobbuffer[32768];
 
@@ -936,8 +937,10 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 	maxbindcount=cont->getConfig()->getMaxBindCount();
 
 	bindvarnames=new char *[maxbindcount];
+	bindvarnamesizes=new int16_t[maxbindcount];
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		charstring::printf(&bindvarnames[i],"?%d",i+1);
+		bindvarnamesizes[i]=charstring::length(bindvarnames[i]);
 	}
 
 	pcounts=new uint16_t[maxcursorcount];
@@ -4480,6 +4483,9 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 	const unsigned char	*nullbitmap=NULL;
 	unsigned char		newparamsbound=0;
 
+	// re-init parameters
+	clearParams(cursor);
+
 	if (pcount) {
 
 		// get null bitmap
@@ -4502,12 +4508,6 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 
 		uint16_t	*pt=ptypes[cont->getId(cursor)];
 		if (newparamsbound==1) {
-
-			// get new parameters...
-
-			// re-init type/value storage
-			clearParams(cursor);
-
 			// get parameter types
 			for (uint16_t i=0; i<pcount; i++) {
 				readLE(rp,&(pt[i]),&rp);
@@ -4516,8 +4516,6 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 
 		// bind the parameters
 		bindParameters(cursor,pcount,pt,nullbitmap,rp,&rp);
-	} else {
-		clearParams(cursor);
 	}
 
 	debugEnd();
@@ -4558,7 +4556,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 
 		// the bind variable name should be something like ?1, ?2, etc.
 		bv->variable=bindvarnames[i];
-		bv->variablesize=charstring::length(bv->variable);
+		bv->variablesize=bindvarnamesizes[i];
 
 		// handle nulls
 		unsigned char	nullbitmapindex=nullbitmap[(i)/8];
@@ -4824,7 +4822,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 				bv->value.stringval=
 					(char *)bindpool->allocate(
 							bv->valuesize+1);
-				charstring::copy(bv->value.stringval,
+				bytestring::copy(bv->value.stringval,
 							(const char *)rp,
 							bv->valuesize);
 				bv->value.stringval[bv->valuesize]='\0';
@@ -4879,19 +4877,6 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 }
 
 void sqlrprotocol_mysql::clearParams(sqlrservercursor *cursor) {
-
-	/*uint16_t		pcount=cont->getInputBindCount(cursor);
-	sqlrserverbindvar	*inbinds=cont->getInputBinds(cursor);
-
-	for (uint16_t i=0; i<pcount; i++) {
-		sqlrserverbindvar	*bv=&(inbinds[i]);
-		if (bv->type==SQLRSERVERBINDVARTYPE_STRING ||
-			bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
-			delete[] bv->value.stringval;
-		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
-			delete[] bv->value.dateval.buffer;
-		}
-	}*/
 	cont->getBindPool(cursor)->clear();
 	cont->setInputBindCount(cursor,0);
 }
