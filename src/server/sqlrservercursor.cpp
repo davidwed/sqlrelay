@@ -114,8 +114,8 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	pvt->_maxerrorlength=conn->cont->getConfig()->getMaxErrorLength();
 
-	pvt->_bindpool=new memorypool(512,128,100);
-	pvt->_bindmappingspool=new memorypool(512,128,100);
+	pvt->_bindpool=new memorypool(0,128,100);
+	pvt->_bindmappingspool=new memorypool(0,128,100);
 	pvt->_bindmappings=new namevaluepairs;
 
 	setInputBindCount(0);
