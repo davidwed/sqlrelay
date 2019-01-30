@@ -846,7 +846,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		bytebuffer	resppacket;
 		unsigned char	seq;
 
-		memorypool	*reqpacketpool;
+		memorypool	reqpacketpool;
 		unsigned char	*reqpacket;
 		uint64_t	reqpacketsize;
 
@@ -930,8 +930,6 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 
 	r.setSeed(randomnumber::getSeed());
 
-	reqpacketpool=new memorypool(1024,1024,10240);
-
 	maxcursorcount=cont->getConfig()->getMaxCursors();
 	maxquerysize=cont->getConfig()->getMaxQuerySize();
 	maxbindcount=cont->getConfig()->getMaxBindCount();
@@ -983,8 +981,6 @@ sqlrprotocol_mysql::~sqlrprotocol_mysql() {
 	delete[] ptypes;
 	delete[] columntypes;
 	delete[] nullbitmap;
-
-	delete reqpacketpool;
 }
 
 void sqlrprotocol_mysql::init() {
@@ -1008,7 +1004,7 @@ void sqlrprotocol_mysql::free() {
 	delete[] challenge;
 	delete[] response;
 	delete[] database;
-	reqpacketpool->clear();
+	reqpacketpool.clear();
 }
 
 void sqlrprotocol_mysql::reInit() {
@@ -1319,8 +1315,8 @@ bool sqlrprotocol_mysql::recvPacket() {
 		return false;
 	}
 
-	reqpacketpool->clear();
-	reqpacket=reqpacketpool->allocate(reqpacketsize);
+	reqpacketpool.clear();
+	reqpacket=reqpacketpool.allocate(reqpacketsize);
 
 	// packet
 	if (clientsock->read(reqpacket,reqpacketsize)!=(ssize_t)reqpacketsize) {
