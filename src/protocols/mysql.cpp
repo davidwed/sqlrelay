@@ -4507,6 +4507,7 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 		}
 
 		uint16_t	*pt=ptypes[cont->getId(cursor)];
+
 		if (newparamsbound==1) {
 			// get parameter types
 			for (uint16_t i=0; i<pcount; i++) {
