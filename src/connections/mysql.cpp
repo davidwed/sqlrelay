@@ -1250,16 +1250,6 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		checkForTempTable(query,length);
 
-		// store the result set
-		// FIXME: no, don't, this is disastrous when there are like
-		// 5 million rows, but not doing it eventually results in
-		// Commands out of sync, and neither calling mysql_stmt_reset
-		// when all rows haven't been fetched, nor manually fetching
-		// them fixes it.
-		/*if (mysql_stmt_store_result(stmt)) {
-			return false;
-		}*/
-
 		// get the affected row count
 		affectedrows=mysql_stmt_affected_rows(stmt);
 
