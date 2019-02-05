@@ -1242,6 +1242,18 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		uint64_t	getQueryEndSec();
 		uint64_t	getQueryEndUSec();
 
+		void		setFetchStart(uint64_t sec, uint64_t usec);
+		uint64_t	getFetchStartSec();
+		uint64_t	getFetchStartUSec();
+
+		void		setFetchEnd(uint64_t sec, uint64_t usec);
+		uint64_t	getFetchEndSec();
+		uint64_t	getFetchEndUSec();
+
+		void		resetFetchTime();
+		void		tallyFetchTime();
+		uint64_t	getFetchUSec();
+
 		void			setState(sqlrcursorstate_t state);
 		sqlrcursorstate_t	getState();
 

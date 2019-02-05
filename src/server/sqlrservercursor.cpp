@@ -49,6 +49,11 @@ class sqlrservercursorprivate {
 		uint64_t	_querystartusec;
 		uint64_t	_queryendsec;
 		uint64_t	_queryendusec;
+		uint64_t	_fetchstartsec;
+		uint64_t	_fetchstartusec;
+		uint64_t	_fetchendsec;
+		uint64_t	_fetchendusec;
+		uint64_t	_fetchusec;
 
 		uint32_t	_maxerrorlength;
 
@@ -129,6 +134,20 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_totalrowsfetched=0;
 
 	pvt->_currentrowreformatted=false;
+
+	pvt->_commandstartsec=0;
+	pvt->_commandstartusec=0;
+	pvt->_commandendsec=0;
+	pvt->_commandendusec=0;
+	pvt->_querystartsec=0;
+	pvt->_querystartusec=0;
+	pvt->_queryendsec=0;
+	pvt->_queryendusec=0;
+	pvt->_fetchstartsec=0;
+	pvt->_fetchstartusec=0;
+	pvt->_fetchendsec=0;
+	pvt->_fetchendusec=0;
+	pvt->_fetchusec=0;
 	
 	setState(SQLRCURSORSTATE_AVAILABLE);
 
@@ -1150,6 +1169,46 @@ uint64_t sqlrservercursor::getQueryEndSec() {
 
 uint64_t sqlrservercursor::getQueryEndUSec() {
 	return pvt->_queryendusec;
+}
+
+void sqlrservercursor::setFetchStart(uint64_t sec, uint64_t usec) {
+	pvt->_fetchstartsec=sec;
+	pvt->_fetchstartusec=usec;
+}
+
+uint64_t sqlrservercursor::getFetchStartSec() {
+	return pvt->_fetchstartsec;
+}
+
+uint64_t sqlrservercursor::getFetchStartUSec() {
+	return pvt->_fetchstartusec;
+}
+
+
+void sqlrservercursor::setFetchEnd(uint64_t sec, uint64_t usec) {
+	pvt->_fetchendsec=sec;
+	pvt->_fetchendusec=usec;
+}
+
+uint64_t sqlrservercursor::getFetchEndSec() {
+	return pvt->_fetchendsec;
+}
+
+uint64_t sqlrservercursor::getFetchEndUSec() {
+	return pvt->_fetchendusec;
+}
+
+void sqlrservercursor::resetFetchTime() {
+	pvt->_fetchusec=0;
+}
+
+void sqlrservercursor::tallyFetchTime() {
+        pvt->_fetchusec+=((pvt->_fetchendsec-pvt->_fetchstartsec)*1000000)+
+					pvt->_fetchendusec-pvt->_fetchstartusec;
+}
+
+uint64_t sqlrservercursor::getFetchUSec() {
+	return pvt->_fetchusec;
 }
 
 void sqlrservercursor::setState(sqlrcursorstate_t state) {
