@@ -54,6 +54,8 @@
 		bool	isAutoCommitOnQuery(const char *query);
 		bool	isAutoCommitOffQuery(const char *query);
 		bool	isAutoCommitQuery(const char *query, bool on);
+		bool	isSetIncludingAutoCommitQuery(const char *query,
+								bool *on);
 
 		void	translateBindVariablesFromMappings(
 						sqlrservercursor *cursor);

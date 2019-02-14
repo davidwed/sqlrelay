@@ -2410,7 +2410,7 @@ bool sqlrservercontroller::getListsByApiCalls() {
 bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 	return pvt->_conn->getDatabaseList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2418,7 +2418,7 @@ bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 	return pvt->_conn->getSchemaList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2426,7 +2426,7 @@ bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 	return pvt->_conn->getTableList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2434,7 +2434,7 @@ bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 	return pvt->_conn->getTableTypeList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2443,7 +2443,7 @@ bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 	return pvt->_conn->getColumnList(cursor,table,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2452,7 +2452,7 @@ bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 	return pvt->_conn->getPrimaryKeyList(cursor,table,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2470,7 +2470,7 @@ bool sqlrservercontroller::getProcedureBindAndColumnList(
 						const char *proc,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 	return pvt->_conn->getProcedureBindAndColumnList(cursor,proc,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2486,7 +2486,7 @@ bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 	return pvt->_conn->getProcedureList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2692,6 +2692,17 @@ bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 	} else if (isAutoCommitOffQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_OFF);
 		return true;
+	} else {
+		bool	on=false;
+		if (isSetIncludingAutoCommitQuery(ptr,&on)) {
+			// For these, set the query type, but don't actually
+			// return true.  That way they won't actually be
+			// intercepted by interceptQuery().  Instead they'll be
+			// handled as special cases by executeQuery().
+			cursor->setQueryType((on)?
+				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON:
+				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF);
+		}
 	}
 	return false;
 }
@@ -2874,6 +2885,72 @@ bool sqlrservercontroller::isAutoCommitQuery(const char *query, bool on) {
 	}
 
 	return true;
+}
+
+bool sqlrservercontroller::isSetIncludingAutoCommitQuery(
+						const char *query, bool *on) {
+
+	*on=false;
+
+	// look for "set"
+	if (!charstring::compareIgnoringCase(query,"set",3)) {
+		query+=3;
+	} else {
+		return false;
+	}
+
+	for (;;) {
+
+		// skip whitespace
+		query=skipWhitespaceAndComments(query);
+
+		// look for "autocommit"
+		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
+			query+=10;
+			break;
+		}
+
+		// look for a comma or end of query
+		while (*query && *query!=',') {
+			query++;
+		}
+		if (!*query) {
+			return false;
+		}
+
+		// skip comma
+		query++;
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	// look for "="/"to"
+	if (*query=='=') {
+		query++;
+	} else {
+		return false;
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	// look for 1/0
+	if (*query=='1') {
+		*on=true;
+		query++;
+	} else if (*query=='0') {
+		*on=false;
+		query++;
+	} else {
+		return false;
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	// success if we hit a comma, or are at the end of the query
+	return (*query!=',' || *query);
 }
 
 bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
@@ -4281,7 +4358,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
 
 	// reset fetch timings
-	cursor->resetFetchTime();
+	//cursor->resetFetchTime();
 
 	// if we're re-executing
 	if (cursor->getQueryHasBeenExecuted()) {
@@ -4564,6 +4641,19 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// set the query end time
 	dt.getSystemDateAndTime();
 	cursor->setQueryEnd(dt.getSeconds(),dt.getMicroseconds());
+
+	// special case intercepts...
+	// rather than actually intercepting these, we
+	// allow the db to run them and set the flags here
+	if (cursor->getQueryType()==
+			SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON) {
+		pvt->_autocommitforthissession=true;
+		pvt->_intransaction=false;
+	} else if (cursor->getQueryType()==
+			SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF) {
+		pvt->_autocommitforthissession=false;
+		pvt->_intransaction=true;
+	}
 
 	// on failure, save the error
 	// get it here rather than below because with some db's
@@ -8825,18 +8915,18 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 				j<pvt->_sqlrrsrbt->getRowBlockSize(); j++) {
 
 				// set the fetch start time
-				dt.getSystemDateAndTime();
+				/*dt.getSystemDateAndTime();
 				cursor->setFetchStart(dt.getSeconds(),
-							dt.getMicroseconds());
+							dt.getMicroseconds());*/
 
 				// fetch the row
 				bool	success=cursor->fetchRow(error);
 
 				// set the fetch end time
-				dt.getSystemDateAndTime();
+				/*dt.getSystemDateAndTime();
 				cursor->setFetchEnd(dt.getSeconds(),
 							dt.getMicroseconds());
-				cursor->tallyFetchTime();
+				cursor->tallyFetchTime();*/
 
 				// bail if fetch failed
 				if (!success) {
@@ -8931,16 +9021,16 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 		// this is a little more straightforward...
 
 		// set the fetch start time
-		dt.getSystemDateAndTime();
-		cursor->setFetchStart(dt.getSeconds(),dt.getMicroseconds());
+		/*dt.getSystemDateAndTime();
+		cursor->setFetchStart(dt.getSeconds(),dt.getMicroseconds());*/
 
 		// fetch the row
 		bool	success=cursor->fetchRow(error);
 
 		// set the fetch end time
-		dt.getSystemDateAndTime();
+		/*dt.getSystemDateAndTime();
 		cursor->setFetchEnd(dt.getSeconds(),dt.getMicroseconds());
-		cursor->tallyFetchTime();
+		cursor->tallyFetchTime();*/
 
 		// bail if fetch failed
 		if (!success) {
