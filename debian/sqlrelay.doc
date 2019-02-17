@@ -1,0 +1,10 @@
+Document: sqlrelay
+Title: Debian SQL Relay Manual
+Author: David Muse <david.muse@firstworks.com>
+Abstract: This manual describes what SQL Relay is
+ and how it can be used.
+Section: unknown
+
+Format: HTML
+Index: /usr/share/doc/sqlrelay/index.html
+Files: /usr/share/doc/sqlrelay/*

@@ -1,0 +1,8 @@
+usr/bin/sqlrsh
+usr/bin/sqlr-export
+usr/bin/sqlr-import
+usr/bin/sqlr-status
+usr/share/man/man1/sqlrsh.1
+usr/share/man/man1/sqlr-export.1
+usr/share/man/man1/sqlr-import.1
+usr/share/man/man8/sqlr-status.8
