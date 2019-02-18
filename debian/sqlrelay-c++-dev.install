@@ -4,4 +4,4 @@ usr/include/sqlrelay/private/sqlrclientincludes.h
 usr/include/sqlrelay/private/sqlrconnection.h
 usr/include/sqlrelay/private/sqlrcursor.h
 usr/lib/*/libsqlrclient.so
-usr/lib/pkgconfig/sqlrelay-c++.pc
+usr/lib/*/pkgconfig/sqlrelay-c++.pc

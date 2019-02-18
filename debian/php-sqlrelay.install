@@ -1,0 +1,2 @@
+usr/lib/php/*/sql_relay.so
+etc/php/*/mods-available/sql_relay.ini

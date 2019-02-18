@@ -773,6 +773,7 @@ SOCKETLIBS
 PTHREADLIB
 PTHREADINCLUDES
 DISABLE_NEW_DTAGS
+WNOERRORDATETIME
 WNOUNKNOWNPRAGMAS
 WNOMISMATCHEDTAGS
 WNOOVERLOADEDVIRTUAL
@@ -17292,6 +17293,50 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 if ( test -n "$WNOUNKNOWNPRAGMAS" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-error=date-time" >&5
+$as_echo_n "checking for -Wno-error=date-time... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="-Wall -Werror -Wno-error=date-time"
+LIBS=""
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+int
+main ()
+{
+printf("%s %s\n",__DATE__,__TIME__);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  WNOERRORDATETIME="-Wno-error=date-time"
+else
+  WNOERRORDATETIME=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+if ( test -n "$WNOERRORDATETIME" )
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }

@@ -1,0 +1,3 @@
+usr/java/sqlrelay.jar
+usr/java/com/firstworks/sqlrelay/libSQLRConnection.so
+usr/java/com/firstworks/sqlrelay/libSQLRCursor.so

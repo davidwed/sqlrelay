@@ -586,6 +586,22 @@ fi
 AC_SUBST(WNOLONGDOUBLE)
 ])
 
+
+dnl checks to see if -Wno-error=date-time
+AC_DEFUN([FW_CHECK_WNOERRORDATETIME],
+[
+AC_MSG_CHECKING(for -Wno-error=date-time)
+FW_TRY_LINK([#include <stdio.h>],[printf("%s %s\n",__DATE__,__TIME__);],[-Wall -Werror -Wno-error=date-time],[],[],[WNOERRORDATETIME="-Wno-error=date-time"],[WNOERRORDATETIME=""])
+if ( test -n "$WNOERRORDATETIME" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(WNOERRORDATETIME)
+])
+
+
 dnl Checks for minix and adds some macros if it is
 AC_DEFUN([FW_CHECK_MINIX],
 [

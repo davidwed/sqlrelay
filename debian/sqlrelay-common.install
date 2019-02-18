@@ -1,1 +1,1 @@
-usr/lib/libsqlrutil.so.*
+usr/lib/*/libsqlrutil.so.*

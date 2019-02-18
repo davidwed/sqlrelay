@@ -274,10 +274,3 @@ Architecture: any
 Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
 Description: Documentation for SQL Relay
  Documentation for SQL Relay.
-
-Package: sqlrelay-javadoc
-Section: libdevel
-Architecture: any
-Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
-Description: API documentation for SQL Relay
- API documentation for SQL Relay.
