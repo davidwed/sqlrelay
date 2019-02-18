@@ -1,4 +1,5 @@
-usr/local/*/perl/*/SQLRelay
-usr/local/*/perl/*/auto/SQLRelay
+usr/local/lib/*/perl/*/SQLRelay/Connection.pm
+usr/local/lib/*/perl/*/SQLRelay/Cursor.pm
+usr/local/lib/*/perl/*/auto/SQLRelay
 usr/share/man/man3/SQLRelay::Connection.*
 usr/share/man/man3/SQLRelay::Cursor.*

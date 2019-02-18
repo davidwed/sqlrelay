@@ -2410,7 +2410,6 @@ bool sqlrservercontroller::getListsByApiCalls() {
 bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	//cursor->resetFetchTime();
 	return pvt->_conn->getDatabaseList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2418,7 +2417,6 @@ bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	//cursor->resetFetchTime();
 	return pvt->_conn->getSchemaList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2426,7 +2424,6 @@ bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	//cursor->resetFetchTime();
 	return pvt->_conn->getTableList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2434,7 +2431,6 @@ bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	//cursor->resetFetchTime();
 	return pvt->_conn->getTableTypeList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2443,7 +2439,6 @@ bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	//cursor->resetFetchTime();
 	return pvt->_conn->getColumnList(cursor,table,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2452,7 +2447,6 @@ bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	//cursor->resetFetchTime();
 	return pvt->_conn->getPrimaryKeyList(cursor,table,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2470,7 +2464,6 @@ bool sqlrservercontroller::getProcedureBindAndColumnList(
 						const char *proc,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	//cursor->resetFetchTime();
 	return pvt->_conn->getProcedureBindAndColumnList(cursor,proc,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -2486,7 +2479,6 @@ bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	//cursor->resetFetchTime();
 	return pvt->_conn->getProcedureList(cursor,wild) &&
 				handleResultSetHeader(cursor);
 }
@@ -4356,9 +4348,6 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// set state
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
-
-	// reset fetch timings
-	//cursor->resetFetchTime();
 
 	// if we're re-executing
 	if (cursor->getQueryHasBeenExecuted()) {
@@ -8914,22 +8903,8 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 			for (uint32_t j=0;
 				j<pvt->_sqlrrsrbt->getRowBlockSize(); j++) {
 
-				// set the fetch start time
-				/*dt.getSystemDateAndTime();
-				cursor->setFetchStart(dt.getSeconds(),
-							dt.getMicroseconds());*/
-
-				// fetch the row
-				bool	success=cursor->fetchRow(error);
-
-				// set the fetch end time
-				/*dt.getSystemDateAndTime();
-				cursor->setFetchEnd(dt.getSeconds(),
-							dt.getMicroseconds());
-				cursor->tallyFetchTime();*/
-
-				// bail if fetch failed
-				if (!success) {
+				// fetch the row, bail if fetch failed
+				if (!cursor->fetchRow(error)) {
 					break;
 				}
 
@@ -9020,20 +8995,8 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 		// if we don't have any row block translations, then
 		// this is a little more straightforward...
 
-		// set the fetch start time
-		/*dt.getSystemDateAndTime();
-		cursor->setFetchStart(dt.getSeconds(),dt.getMicroseconds());*/
-
-		// fetch the row
-		bool	success=cursor->fetchRow(error);
-
-		// set the fetch end time
-		/*dt.getSystemDateAndTime();
-		cursor->setFetchEnd(dt.getSeconds(),dt.getMicroseconds());
-		cursor->tallyFetchTime();*/
-
-		// bail if fetch failed
-		if (!success) {
+		// fetch the row, bail if fetch failed
+		if (!cursor->fetchRow(error)) {
 			return false;
 		}
 

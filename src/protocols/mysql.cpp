@@ -3354,6 +3354,7 @@ bool sqlrprotocol_mysql::sendResultSetRows(sqlrservercursor *cursor,
 		// fetch a row
 		bool	error;
 		if (!cont->fetchRow(cursor,&error)) {
+
 			if (error) {
 				retval=sendQueryError(cursor);
 			} else {

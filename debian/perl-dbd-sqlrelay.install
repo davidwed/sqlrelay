@@ -1,2 +1,3 @@
-usr/local/*/perl/*/DBD/SQLRelay
+usr/local/share/perl/*/DBD/SQLRelay.pm
+usr/local/lib/*/perl/*/auto/DBD
 usr/share/man/man3/DBD::SQLRelay.*
