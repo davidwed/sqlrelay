@@ -1332,6 +1332,25 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 					uint16_t **columnisautoincrements,
 					const char ***columntables,
 					uint16_t **columntablelengths);
+		const char	*getColumnNameFromBuffer(uint32_t col);
+		uint16_t	getColumnNameLengthFromBuffer(uint32_t col);
+		uint16_t	getColumnTypeFromBuffer(uint32_t col);
+		const char	*getColumnTypeNameFromBuffer(uint32_t col);
+		uint16_t	getColumnTypeNameLengthFromBuffer(uint32_t col);
+		uint32_t	getColumnLengthFromBuffer(uint32_t col);
+		uint32_t	getColumnPrecisionFromBuffer(uint32_t col);
+		uint32_t	getColumnScaleFromBuffer(uint32_t col);
+		uint16_t	getColumnIsNullableFromBuffer(uint32_t col);
+		uint16_t	getColumnIsPrimaryKeyFromBuffer(uint32_t col);
+		uint16_t	getColumnIsUniqueFromBuffer(uint32_t col);
+		uint16_t	getColumnIsPartOfKeyFromBuffer(uint32_t col);
+		uint16_t	getColumnIsUnsignedFromBuffer(uint32_t col);
+		uint16_t	getColumnIsZeroFilledFromBuffer(uint32_t col);
+		uint16_t	getColumnIsBinaryFromBuffer(uint32_t col);
+		uint16_t	getColumnIsAutoIncrementFromBuffer(
+							uint32_t col);
+		const char	*getColumnTableFromBuffer(uint32_t col);
+		uint16_t	getColumnTableLengthFromBuffer(uint32_t col);
 
 		void	allocateFieldPointers(uint32_t colcount);
 		void	deallocateFieldPointers();

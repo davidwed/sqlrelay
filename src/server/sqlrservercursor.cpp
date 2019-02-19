@@ -1472,6 +1472,78 @@ void sqlrservercursor::getColumnPointers(const char ***columnnames,
 	*columntablelengths=pvt->_columntablelengths;
 }
 
+const char *sqlrservercursor::getColumnNameFromBuffer(uint32_t col) {
+	return pvt->_columnnames[col];
+}
+
+uint16_t sqlrservercursor::getColumnNameLengthFromBuffer(uint32_t col) {
+	return pvt->_columnnamelengths[col];
+}
+
+uint16_t sqlrservercursor::getColumnTypeFromBuffer(uint32_t col) {
+	return pvt->_columntypes[col];
+}
+
+const char *sqlrservercursor::getColumnTypeNameFromBuffer(uint32_t col) {
+	return pvt->_columntypenames[col];
+}
+
+uint16_t sqlrservercursor::getColumnTypeNameLengthFromBuffer(uint32_t col) {
+	return pvt->_columntypenamelengths[col];
+}
+
+uint32_t sqlrservercursor::getColumnLengthFromBuffer(uint32_t col) {
+	return pvt->_columnlengths[col];
+}
+
+uint32_t sqlrservercursor::getColumnPrecisionFromBuffer(uint32_t col) {
+	return pvt->_columnprecisions[col];
+}
+
+uint32_t sqlrservercursor::getColumnScaleFromBuffer(uint32_t col) {
+	return pvt->_columnscales[col];
+}
+
+uint16_t sqlrservercursor::getColumnIsNullableFromBuffer(uint32_t col) {
+	return pvt->_columnisnullables[col];
+}
+
+uint16_t sqlrservercursor::getColumnIsPrimaryKeyFromBuffer(uint32_t col) {
+	return pvt->_columnisprimarykeys[col];
+}
+
+uint16_t sqlrservercursor::getColumnIsUniqueFromBuffer(uint32_t col) {
+	return pvt->_columnisuniques[col];
+}
+
+uint16_t sqlrservercursor::getColumnIsPartOfKeyFromBuffer(uint32_t col) {
+	return pvt->_columnispartofkeys[col];
+}
+
+uint16_t sqlrservercursor::getColumnIsUnsignedFromBuffer(uint32_t col) {
+	return pvt->_columnisunsigneds[col];
+}
+
+uint16_t sqlrservercursor::getColumnIsZeroFilledFromBuffer(uint32_t col) {
+	return pvt->_columniszerofilleds[col];
+}
+
+uint16_t sqlrservercursor::getColumnIsBinaryFromBuffer(uint32_t col) {
+	return pvt->_columnisbinarys[col];
+}
+
+uint16_t sqlrservercursor::getColumnIsAutoIncrementFromBuffer(uint32_t col) {
+	return pvt->_columnisautoincrements[col];
+}
+
+const char *sqlrservercursor::getColumnTableFromBuffer(uint32_t col) {
+	return pvt->_columntables[col];
+}
+
+uint16_t sqlrservercursor::getColumnTableLengthFromBuffer(uint32_t col) {
+	return pvt->_columntablelengths[col];
+}
+
 void sqlrservercursor::allocateFieldPointers(uint32_t colcount) {
 	pvt->_fieldnames=new const char *[colcount];
 	pvt->_fields=new const char *[colcount];
