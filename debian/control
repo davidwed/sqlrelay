@@ -3,12 +3,12 @@ Priority: optional
 Maintainer: David Muse <david.muse@firstworks.com>
 Homepage: http://sqlrelay.sourceforge.net
 Standards-Version: 3.9.6
-Build-Depends: debhelper (>=9),autotools-dev
+Build-Depends: debhelper (>=9),autotools-dev, rudiments-dev
 
 Package: sqlrelay
 Section: libs
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${shlibs:Depends}, ${misc:Depends}, rudiments
 Description: C++ class library for developing systems and applications
  SQL Relay is a persistent database connection pooling, proxying, throttling,
  load balancing and query routing/filtering system for Unix and Linux

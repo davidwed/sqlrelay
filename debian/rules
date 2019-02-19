@@ -3,7 +3,6 @@
 # output every command that modifies files on the build system.
 #export DH_VERBOSE = 1
 
-
 # see FEATURE AREAS in dpkg-buildflags(1)
 #export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
@@ -22,9 +21,14 @@ clean:
 %:
 	dh $@  --with autotools_dev
 
+override_dh_auto_configure:
+	dh_auto_configure -- --disable-static \
+				--enable-oracle-at-runtime \
+				--enable-sap-at-runtime \
+				--enable-db2-at-runtime \
+				--enable-informix-at-runtime \
+				--with-default-runasuser=sqlrelay \
+				--with-default-runasgroup=sqlrelay
 
-# dh_make generated override targets
-# This is example for Cmake (See https://bugs.debian.org/641051 )
-#override_dh_auto_configure:
-#	dh_auto_configure -- #	-DCMAKE_LIBRARY_PATH=$(DEB_HOST_MULTIARCH)
-
+# FIXME: temporary kludge
+override_dh_usrlocal:

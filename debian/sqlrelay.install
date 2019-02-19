@@ -30,3 +30,7 @@ usr/share/man/man8/sqlr-scaler.8
 usr/share/man/man8/sqlr-start.8
 usr/share/man/man8/sqlr-stop.8
 usr/share/man/man8/sqlr-pwdenc.8
+var/run/sqlrelay/
+var/cache/sqlrelay/
+var/log/sqlrelay/
+var/log/sqlrelay/debug/
