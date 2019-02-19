@@ -34,3 +34,4 @@ var/run/sqlrelay/
 var/cache/sqlrelay/
 var/log/sqlrelay/
 var/log/sqlrelay/debug/
+lib/systemd/system/sqlrelay.service
