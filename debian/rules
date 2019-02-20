@@ -12,8 +12,9 @@
 # package maintainers to append LDFLAGS
 #export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
-# FIXME: temporary kludge
+# FIXME: temporary kludges
 export PERL_VERSION = $(shell eval `perl -V:version`; echo $$version)
+export RUBY_VERSION = $(shell ruby -v | cut -d' ' -f2 | sed -e "s|p.*||")
 
 clean:
 	dh_testdir
@@ -33,8 +34,6 @@ override_dh_auto_configure:
 		--enable-informix-at-runtime \
 		--with-perl-site-lib=/usr/share/perl/$(PERL_VERSION) \
 		--with-perl-site-arch=/usr/lib/$(DEB_HOST_MULTIARCH)/perl/$(PERL_VERSION) \
+		--with-ruby-site-arch-dir=/usr/lib/$(DEB_HOST_MULTIARCH)/ruby/$(RUBY_VERSION) \
 		--with-default-runasuser=sqlrelay \
 		--with-default-runasgroup=sqlrelay
-
-# FIXME: temporary kludge
-override_dh_usrlocal:
