@@ -699,15 +699,15 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %else
 
 %files -n python-%{name}
-%dir %{python3_sitearch}/SQLRelay/__pycache__
-%dir %{python3_sitearch}/SQLRelay
+%dir %{python_sitearch}/SQLRelay/__pycache__
+%dir %{python_sitearch}/SQLRelay
 %{python_sitearch}/SQLRelay/CSQLRelay.so
 %{python_sitearch}/SQLRelay/PySQLRClient.py*
 %{python_sitearch}/SQLRelay/__init__.py*
 
 %files -n python-db-%{name}
-%dir %{python3_sitearch}/SQLRelay/__pycache__
-%dir %{python3_sitearch}/SQLRelay
+%dir %{python_sitearch}/SQLRelay/__pycache__
+%dir %{python_sitearch}/SQLRelay
 %{python_sitearch}/SQLRelay/PySQLRDB.py*
 
 %endif

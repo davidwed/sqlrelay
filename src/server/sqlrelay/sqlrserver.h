@@ -1634,8 +1634,8 @@ class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 
 class SQLRSERVER_DLLSPEC sqlrmysqlcredentials : public sqlrcredentials {
 	public:
-			sqlrmysqlcredentials();
-		virtual	~sqlrmysqlcredentials();
+		sqlrmysqlcredentials();
+		~sqlrmysqlcredentials();
 		const char	*getType();
 
 		void	setUser(const char *user);
