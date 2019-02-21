@@ -479,14 +479,12 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 
 
 %post
-/sbin/ldconfig
 %systemd_post %{name}.service
 
 %preun
 %systemd_preun %{name}.service
 
 %postun
-/sbin/ldconfig
 %systemd_postun_with_restart %{name}.service
 rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
@@ -631,16 +629,8 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %files c++
 %{_libdir}/libsqlrclient.so.*
 
-%post c++ -p /sbin/ldconfig
-
-%postun c++ -p /sbin/ldconfig
-
 %files c
 %{_libdir}/libsqlrclientwrapper.so.*
-
-%post c -p /sbin/ldconfig
-
-%postun c -p /sbin/ldconfig
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
@@ -758,16 +748,8 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 %files dropin-mysql
 %{_libdir}/libmysql*%{name}.so.*
 
-%post dropin-mysql -p /sbin/ldconfig
-
-%postun dropin-mysql -p /sbin/ldconfig
-
 %files dropin-postgresql
 %{_libdir}/libpq%{name}.so.*
-
-%post dropin-postgresql -p /sbin/ldconfig
-
-%postun dropin-postgresql -p /sbin/ldconfig
 
 %files oracle
 %{_libexecdir}/%{name}/sqlrconnection_oracle*
@@ -863,7 +845,8 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed Jan 02 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
+* Wed Feb 20 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
+- Removed calls to /sbin/ldconfig.
 - Updated to version 1.5.0.
 - Added bind variable translation and module data components.
 - Added mysql-frontend components.
