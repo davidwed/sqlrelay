@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: gcc-c++, rudiments-devel >= 1.0.8, systemd
+BuildRequires: gcc-c++, rudiments-devel >= 1.2.0, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -88,7 +88,7 @@ The SQL Relay C client library.
 %package c++-devel
 License: LGPLv2
 Summary: Development files for the SQL Relay C++ client library
-Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.0.5
+Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.2.0
 
 %description c++-devel
 Development files for the SQL Relay C++ client library.
@@ -852,6 +852,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %changelog
 * Wed Feb 20 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
+- Updated to require rudiments 1.2.0.
 - Removed globbing of library major versions.
 - Removed calls to /sbin/ldconfig.
 - Updated to version 1.5.0.
