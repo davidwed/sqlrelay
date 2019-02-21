@@ -486,7 +486,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 
 %postun
 %systemd_postun_with_restart %{name}.service
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %files
@@ -503,6 +502,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_libdir}/libsqlrserver.so.9.*
 %{_libdir}/libsqlrmysqlcredentials.so.9
 %{_libdir}/libsqlrmysqlcredentials.so.9.*
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
 %{_libexecdir}/%{name}/sqlrconfig_*
@@ -540,6 +540,8 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files server-devel
 %{_bindir}/sqlrserver-config
+%dir %{_includedir}/%{name}
+%dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrserver.h
 %{_includedir}/%{name}/private/sqlrauth.h
 %{_includedir}/%{name}/private/sqlrauths.h
@@ -594,10 +596,6 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_libdir}/libsqlrmysqlcredentials.so
 %exclude %{_libdir}/lib*.la
 
-%postun server-devel
-rmdir %{_includedir}/%{name} 2> /dev/null || :
-rmdir %{_includedir}/%{name}/private 2> /dev/null || :
-
 %files clients
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
@@ -625,6 +623,8 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %{_libdir}/libsqlrutil.so.9.*
 
 %files common-devel
+%dir %{_includedir}/%{name}
+%dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrutil.h
 %{_includedir}/%{name}/private/sqlrutilincludes.h
 %{_libdir}/libsqlrutil.so
@@ -639,6 +639,8 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
+%dir %{_includedir}/%{name}
+%dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrclient.h
 %{_includedir}/%{name}/private/sqlrclientincludes.h
 %{_includedir}/%{name}/private/sqlrconnection.h
@@ -647,22 +649,16 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %{_libdir}/pkgconfig/%{name}-c++.pc
 %exclude %{_libdir}/lib*.la
 
-%postun c++-devel
-rmdir %{_includedir}/%{name} 2> /dev/null || :
-rmdir %{_includedir}/%{name}/private 2> /dev/null || :
-
 %files c-devel
 %{_bindir}/sqlrclientwrapper-config
+%dir %{_includedir}/%{name}
+%dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrclientwrapper.h
 %{_includedir}/%{name}/private/sqlrclientwrapper.h
 %{_includedir}/%{name}/private/sqlrclientwrapperincludes.h
 %{_libdir}/libsqlrclientwrapper.so
 %{_libdir}/pkgconfig/%{name}-c.pc
 %exclude %{_libdir}/lib*.la
-
-%postun c-devel
-rmdir %{_includedir}/%{name} 2> /dev/null || :
-rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 
 %files -n odbc-%{name}
 %{_libdir}/libsqlrodbc.so.5
@@ -686,32 +682,32 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %if 0%{?fedora}
 
 %files -n python3-%{name}
+%dir %{python3_sitearch}/SQLRelay/__pycache__
+%dir %{python3_sitearch}/SQLRelay
 %{python3_sitearch}/SQLRelay/CSQLRelay.so
 %{python3_sitearch}/SQLRelay/PySQLRClient.py
 %{python3_sitearch}/SQLRelay/__init__.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRClient.*
 %{python3_sitearch}/SQLRelay/__pycache__/__init__.*
 
-%postun -n python3-%{name}
-rmdir %{python3_sitearch}/SQLRelay/__pycache__ 2> /dev/null || :
-rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
-
 %files -n python3-db-%{name}
+%dir %{python3_sitearch}/SQLRelay/__pycache__
+%dir %{python3_sitearch}/SQLRelay
 %{python3_sitearch}/SQLRelay/PySQLRDB.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRDB.*
 
 %else
 
 %files -n python-%{name}
+%dir %{python3_sitearch}/SQLRelay/__pycache__
+%dir %{python3_sitearch}/SQLRelay
 %{python_sitearch}/SQLRelay/CSQLRelay.so
 %{python_sitearch}/SQLRelay/PySQLRClient.py*
 %{python_sitearch}/SQLRelay/__init__.py*
 
-%postun -n python-%{name}
-rmdir %{python_sitearch}/SQLRelay/__pycache__ 2> /dev/null || :
-rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
-
 %files -n python-db-%{name}
+%dir %{python3_sitearch}/SQLRelay/__pycache__
+%dir %{python3_sitearch}/SQLRelay
 %{python_sitearch}/SQLRelay/PySQLRDB.py*
 
 %endif
@@ -730,6 +726,7 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 
 %files -n java-%{name}
 %{_javadir}/*.jar
+%dir %{_libdir}/%{name}
 %{_libdir}/%{name}/*.so
 
 %files -n tcl-%{name}
@@ -742,6 +739,7 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 %{_libdir}/erlang/lib/%{name}-%{version}
 
 %files -n mono-data-%{name}
+%dir %{_libdir}/%{name}
 %{_libdir}/%{name}/SQLRClient.dll
 %{_libdir}/%{name}/SQLRClient.dll.config
 
@@ -758,100 +756,77 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 %{_libdir}/libpq%{name}.so.*
 
 %files oracle
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_oracle*
 
-%postun oracle
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files mysql
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_mysql*
 
-%postun mysql
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files postgresql
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_postgresql*
 
-%postun postgresql
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files sqlite
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_sqlite*
-
-%postun sqlite
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %if 0%{?fedora}
 
 %files freetds
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_freetds*
-
-%postun freetds
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %endif
 
 
 %files sap
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_sap*
 
-%postun sap
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files odbc
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_odbc*
 
-%postun odbc
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files db2
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_db2*
-
-%postun db2
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %if 0%{?fedora}
 
 %files firebird
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_firebird*
 
-%postun firebird
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files mdbtools
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_mdbtools*
-
-%postun mdbtools
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %endif
 
 
 %files informix
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_informix*
 
-%postun informix
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files router
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_router*
 %{_libexecdir}/%{name}/sqlrrouter_*
-
-%postun router
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files doc
 %{_docdir}/%{name}
 %{_datadir}/licenses/%{name}
-%{_datadir}/%{name}/examples
+%{_datadir}/%{name}
 
 %files javadoc
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed Feb 20 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
+* Thu Feb 21 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
+- Replaced empty-directory-removing postun's with dir's.
 - Updated to require rudiments 1.2.0.
 - Removed globbing of library major versions.
 - Removed calls to /sbin/ldconfig.
