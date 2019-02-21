@@ -499,8 +499,10 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_bindir}/sqlr-start
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver.so.*
-%{_libdir}/libsqlrmysqlcredentials.so.*
+%{_libdir}/libsqlrserver.so.9
+%{_libdir}/libsqlrserver.so.9.*
+%{_libdir}/libsqlrmysqlcredentials.so.9
+%{_libdir}/libsqlrmysqlcredentials.so.9.*
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
 %{_libexecdir}/%{name}/sqlrconfig_*
@@ -619,7 +621,8 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %systemd_preun %{name}cachemanager.service
 
 %files common
-%{_libdir}/libsqlrutil.so.*
+%{_libdir}/libsqlrutil.so.9
+%{_libdir}/libsqlrutil.so.9.*
 
 %files common-devel
 %{_includedir}/%{name}/sqlrutil.h
@@ -627,10 +630,12 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %{_libdir}/libsqlrutil.so
 
 %files c++
-%{_libdir}/libsqlrclient.so.*
+%{_libdir}/libsqlrclient.so.5
+%{_libdir}/libsqlrclient.so.5.*
 
 %files c
-%{_libdir}/libsqlrclientwrapper.so.*
+%{_libdir}/libsqlrclientwrapper.so.5
+%{_libdir}/libsqlrclientwrapper.so.5.*
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
@@ -660,7 +665,8 @@ rmdir %{_includedir}/%{name} 2> /dev/null || :
 rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 
 %files -n odbc-%{name}
-%{_libdir}/libsqlrodbc.so.*
+%{_libdir}/libsqlrodbc.so.5
+%{_libdir}/libsqlrodbc.so.5.*
 %{_libdir}/libsqlrodbc.so
 
 %files -n perl-%{name}
@@ -846,6 +852,7 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %changelog
 * Wed Feb 20 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
+- Removed globbing of library major versions.
 - Removed calls to /sbin/ldconfig.
 - Updated to version 1.5.0.
 - Added bind variable translation and module data components.
