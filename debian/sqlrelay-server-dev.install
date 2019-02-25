@@ -50,4 +50,3 @@ usr/include/sqlrelay/private/sqlrdirectives.h
 usr/include/sqlrelay/private/sqlrresultsetheadertranslation.h
 usr/include/sqlrelay/private/sqlrresultsetheadertranslations.h
 usr/lib/*/libsqlrserver.so
-usr/lib/*/libsqlrmysqlcredentials.so

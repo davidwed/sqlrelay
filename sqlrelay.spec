@@ -500,8 +500,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver.so.9
 %{_libdir}/libsqlrserver.so.9.*
-%{_libdir}/libsqlrmysqlcredentials.so.9
-%{_libdir}/libsqlrmysqlcredentials.so.9.*
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
@@ -593,7 +591,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrresultsetheadertranslation.h
 %{_includedir}/%{name}/private/sqlrresultsetheadertranslations.h
 %{_libdir}/libsqlrserver.so
-%{_libdir}/libsqlrmysqlcredentials.so
 %exclude %{_libdir}/lib*.la
 
 %files clients

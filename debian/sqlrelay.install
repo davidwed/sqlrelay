@@ -7,7 +7,6 @@ usr/bin/sqlr-start
 usr/bin/sqlr-stop
 usr/bin/sqlr-pwdenc
 usr/lib/*/libsqlrserver.so.*
-usr/lib/*/libsqlrmysqlcredentials.so.*
 usr/lib/*/sqlrelay/sqlrauth_*
 usr/lib/*/sqlrelay/sqlrbindvariabletranslation_*
 usr/lib/*/sqlrelay/sqlrconfig_*
