@@ -19,7 +19,6 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 					uint32_t fieldindex,
 					const char **field,
 					uint64_t *fieldlength);
-const char *getError();
 	private:
 		char		*reformattedfield;
 		uint64_t	reformattedfieldlength;
