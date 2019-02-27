@@ -3889,8 +3889,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E6761151B15C4A36A9F229994ADCAAB1"
             {
-            "SourcePath" = "8:..\\..\\src\\triggers\\sqlrtrigger_deadlock_replay.dll"
-            "TargetName" = "8:sqlrtrigger_deadlock_replay.dll"
+            "SourcePath" = "8:..\\..\\src\\triggers\\sqlrtrigger_replay.dll"
+            "TargetName" = "8:sqlrtrigger_replay.dll"
             "Tag" = "8:"
             "Folder" = "8:_0CC0967169F54C2998A34CCA57F17B2E"
             "Condition" = "8:"
