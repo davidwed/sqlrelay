@@ -12,16 +12,15 @@ class querydetails {
 		linkedlist<sqlrserverbindvar *>	inoutbindvars;
 };
 
-class SQLRSERVER_DLLSPEC sqlrtrigger_deadlock_replay : public sqlrtrigger {
+class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 	public:
-			sqlrtrigger_deadlock_replay(
-					sqlrservercontroller *cont,
-					sqlrtriggers *ts,
-					domnode *parameters);
+			sqlrtrigger_replay(sqlrservercontroller *cont,
+						sqlrtriggers *ts,
+						domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
-					sqlrservercursor *sqlrcur,
-					bool before,
-					bool *success);
+						sqlrservercursor *sqlrcur,
+						bool before,
+						bool *success);
 
 		void	endTransaction(bool commit);
 
@@ -47,8 +46,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_deadlock_replay : public sqlrtrigger {
 		bool	inreplay;
 };
 
-sqlrtrigger_deadlock_replay::sqlrtrigger_deadlock_replay(
-					sqlrservercontroller *cont,
+sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 					sqlrtriggers *ts,
 					domnode *parameters) :
 					sqlrtrigger(cont,ts,parameters) {
@@ -67,7 +65,7 @@ sqlrtrigger_deadlock_replay::sqlrtrigger_deadlock_replay(
 	inreplay=false;
 }
 
-bool sqlrtrigger_deadlock_replay::run(sqlrserverconnection *sqlrcon,
+bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						bool before,
 						bool *success) {
@@ -79,7 +77,7 @@ bool sqlrtrigger_deadlock_replay::run(sqlrserverconnection *sqlrcon,
 	}
 }
 
-bool sqlrtrigger_deadlock_replay::logQuery(sqlrserverconnection *sqlrcon,
+bool sqlrtrigger_replay::logQuery(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur) {
 
 	// bail if we're currently replaying the log...
@@ -186,8 +184,7 @@ bool sqlrtrigger_deadlock_replay::logQuery(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-void sqlrtrigger_deadlock_replay::copyBind(
-					memorypool *pool,
+void sqlrtrigger_replay::copyBind(memorypool *pool,
 					sqlrserverbindvar *dest,
 					sqlrserverbindvar *source) {
 
@@ -220,17 +217,17 @@ void sqlrtrigger_deadlock_replay::copyBind(
 	}
 }
 
-bool sqlrtrigger_deadlock_replay::replayLog(sqlrserverconnection *sqlrcon,
+bool sqlrtrigger_replay::replayLog(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur) {
 
-	// bail if we didn't get a deadlock...
+	// bail if we didn't get a replay condition...
 	if (error) {
 		// FIXME: error buffer might not be terminated
 		if (!charstring::contains(sqlrcur->getErrorBuffer(),error)) {
 			return true;
 		}
 		if (debug) {
-			stdoutput.printf("deadlock detected {\n");
+			stdoutput.printf("replay condition detected {\n");
 			stdoutput.printf("	pattern: %s\n",error);
 			stdoutput.printf("	error string: %.*s\n",
 						sqlrcur->getErrorLength(),
@@ -242,7 +239,7 @@ bool sqlrtrigger_deadlock_replay::replayLog(sqlrserverconnection *sqlrcon,
 			return true;
 		}
 		if (debug) {
-			stdoutput.printf("deadlock detected {\n");
+			stdoutput.printf("replay condition detected {\n");
 			stdoutput.printf("	error code: %d\n",errorcode);
 			stdoutput.printf("}\n");
 		}
@@ -424,7 +421,7 @@ bool sqlrtrigger_deadlock_replay::replayLog(sqlrserverconnection *sqlrcon,
 	return retval;
 }
 
-void sqlrtrigger_deadlock_replay::endTransaction(bool commit) {
+void sqlrtrigger_replay::endTransaction(bool commit) {
 
 	// bail if we're currently replaying the log...
 	if (inreplay) {
@@ -442,11 +439,11 @@ void sqlrtrigger_deadlock_replay::endTransaction(bool commit) {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC
-	sqlrtrigger	*new_sqlrtrigger_deadlock_replay(
+	sqlrtrigger	*new_sqlrtrigger_replay(
 						sqlrservercontroller *cont,
 						sqlrtriggers *ts,
 						domnode *parameters) {
 
-		return new sqlrtrigger_deadlock_replay(cont,ts,parameters);
+		return new sqlrtrigger_replay(cont,ts,parameters);
 	}
 }

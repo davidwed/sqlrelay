@@ -10,29 +10,30 @@ include ../../config.mk
 .cpp.obj:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
-all: $(SQLR)trigger_deadlock_replay.$(LIBEXT)
+all: $(SQLR)trigger_replay.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
-$(SQLR)trigger_deadlock_replay.$(LIBEXT): deadlock_replay.cpp deadlock_replay.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ deadlock_replay.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+$(SQLR)trigger_replay.$(LIBEXT): replay.cpp replay.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ replay.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)trigger_deadlock_replay.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)trigger_replay.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)trigger_deadlock_replay.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/$(SQLR)trigger_deadlock_replay.a
-	$(RM) $(libexecdir)/$(SQLR)trigger_deadlock_replay.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/$(SQLR)trigger_deadlock_replay.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)trigger_replay.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)trigger_replay.a
+	$(RM) $(libexecdir)/$(SQLR)trigger_replay.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)trigger_replay.so so $(MODULESUFFIX)
 
 uninstall:
+	$(RM) $(libexecdir)/$(SQLR)trigger_replay.*
 	$(RM) $(libexecdir)/$(SQLR)trigger_deadlock_replay.*
