@@ -25,7 +25,7 @@
 		pool to per-session pool
 	added controller endTransaction() method
 	added endTransaction/endSession methods to all modules
-	added a deadlock_replay trigger
+	added a replay trigger
 	fixed systemctl enable bug
 	made mapping of 0-scale decimals to longlong's in mysql protocol
 		optional, and disabled by default
