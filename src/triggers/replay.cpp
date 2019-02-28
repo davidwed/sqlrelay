@@ -12,11 +12,24 @@ class querydetails {
 		linkedlist<sqlrserverbindvar *>	inoutbindvars;
 };
 
+enum condition_t {
+	CONDITION_ERROR=0,
+	CONDITION_ERRORCODE
+};
+
+class condition {
+	public:
+		condition_t	cond;
+		const char	*error;
+		uint32_t	errorcode;
+};
+
 class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 	public:
-			sqlrtrigger_replay(sqlrservercontroller *cont,
+		sqlrtrigger_replay(sqlrservercontroller *cont,
 						sqlrtriggers *ts,
 						domnode *parameters);
+		~sqlrtrigger_replay();
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						bool before,
@@ -38,10 +51,9 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		sqlrservercontroller	*cont;
 
 		bool		debug;
-		const char	*error;
-		uint32_t	errorcode;
 
 		linkedlist<querydetails *>	log;
+		linkedlist<condition *>		conditions;
 
 		bool	inreplay;
 };
@@ -54,15 +66,31 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 
 	debug=cont->getConfig()->getDebugTriggers();
 
-	const char	*err=parameters->getAttributeValue("error");
-	error=NULL;
-	if (charstring::isNumber(err)) {
-		errorcode=charstring::toInteger(err);
-	} else {
-		error=err;
+	// get the replay conditions...
+	for (domnode *cond=parameters->getFirstTagChild("condition");
+				!cond->isNullNode();
+				cond=cond->getNextTagSibling("condition")) {
+
+		condition	*c=new condition;
+
+		// for now we only support <condition error="..."/>
+		const char	*err=cond->getAttributeValue("error");
+		if (charstring::isNumber(err)) {
+			c->cond=CONDITION_ERRORCODE;
+			c->errorcode=charstring::toInteger(err);
+		} else {
+			c->cond=CONDITION_ERROR;
+			c->error=err;
+		}
+
+		conditions.append(c);
 	}
 
 	inreplay=false;
+}
+
+sqlrtrigger_replay::~sqlrtrigger_replay() {
+	conditions.clearAndDelete();
 }
 
 bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
@@ -220,29 +248,51 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 bool sqlrtrigger_replay::replayLog(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur) {
 
-	// bail if we didn't get a replay condition...
-	if (error) {
-		// FIXME: error buffer might not be terminated
-		if (!charstring::contains(sqlrcur->getErrorBuffer(),error)) {
-			return true;
-		}
-		if (debug) {
-			stdoutput.printf("replay condition detected {\n");
-			stdoutput.printf("	pattern: %s\n",error);
-			stdoutput.printf("	error string: %.*s\n",
+	// did we get a replay condition?
+	bool	found=false;
+	for (linkedlistnode<condition *> *node=conditions.getFirst();
+						node; node=node->getNext()) {
+
+		condition	*val=node->getValue();
+
+		if (val->cond==CONDITION_ERROR) {
+
+			// FIXME: error buffer might not be terminated
+			if (charstring::contains(
+				sqlrcur->getErrorBuffer(),val->error)) {
+				found=true;
+				if (debug) {
+					stdoutput.printf(
+						"replay condition "
+						"detected {\n");
+					stdoutput.printf("	"
+						"pattern: %s\n",val->error);
+					stdoutput.printf("	"
+						"error string: %.*s\n",
 						sqlrcur->getErrorLength(),
 						sqlrcur->getErrorBuffer());
-			stdoutput.printf("}\n");
+					stdoutput.printf("}\n");
+				}
+			}
+
+		} else if (val->cond==CONDITION_ERRORCODE) {
+
+			if (sqlrcur->getErrorNumber()==val->errorcode) {
+				found=true;
+				if (debug) {
+					stdoutput.printf(
+						"replay condition "
+						"detected {\n");
+					stdoutput.printf("	"
+						"error code: %d\n",
+						val->errorcode);
+					stdoutput.printf("}\n");
+				}
+			}
 		}
-	} else {
-		if (sqlrcur->getErrorNumber()!=errorcode) {
-			return true;
-		}
-		if (debug) {
-			stdoutput.printf("replay condition detected {\n");
-			stdoutput.printf("	error code: %d\n",errorcode);
-			stdoutput.printf("}\n");
-		}
+	}
+	if (!found) {
+		return true;
 	}
 
 	if (debug) {

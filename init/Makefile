@@ -91,37 +91,37 @@ ifeq ($(initroot),)
 	then \
 		if ( test -d "/lib/systemd/system" ); \
 		then \
-			/bin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service; \
+			/bin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service || /bin/systemctl enable sqlrelay.service; \
 		elif ( test -d "/usr/lib/systemd/system" ); \
 		then \
-			/bin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service; \
+			/bin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /bin/systemctl enable sqlrelay.service; \
 		fi; \
 	elif ( test -x "/usr/bin/systemctl" ); \
 	then \
 		if ( test -d "/lib/systemd/system" ); \
 		then \
-			/usr/bin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service; \
+			/usr/bin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service || /usr/bin/systemctl enable sqlrelay.service; \
 		elif ( test -d "/usr/lib/systemd/system" ); \
 		then \
-			/usr/bin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service; \
+			/usr/bin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/bin/systemctl enable sqlrelay.service; \
 		fi; \
 	elif ( test -x "/sbin/systemctl" ); \
 	then \
 		if ( test -d "/lib/systemd/system" ); \
 		then \
-			/sbin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service; \
+			/sbin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service || /sbin/systemctl enable sqlrelay.service; \
 		elif ( test -d "/usr/lib/systemd/system" ); \
 		then \
-			/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service; \
+			/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /sbin/systemctl enable sqlrelay.service; \
 		fi; \
 	elif ( test -x "/usr/sbin/systemctl" ); \
 	then \
 		if ( test -d "/lib/systemd/system" ); \
 		then \
-			/usr/sbin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service; \
+			/usr/sbin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service || /usr/sbin/systemctl enable sqlrelay.service; \
 		elif ( test -d "/usr/lib/systemd/system" ); \
 		then \
-			/usr/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service; \
+			/usr/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/sbin/systemctl enable sqlrelay.service; \
 		fi; \
 	elif ( test -x "/sbin/chkconfig" ); \
 	then \
