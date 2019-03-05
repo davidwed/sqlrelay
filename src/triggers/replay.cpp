@@ -38,10 +38,9 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		void	endTransaction(bool commit);
 
 	private:
-		bool	logQuery(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur);
-		bool	replayLog(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur);
+		bool	logQuery(sqlrservercursor *sqlrcur);
+		bool	replayLog(sqlrservercursor *sqlrcur);
+		bool	replayCondition(sqlrservercursor *sqlrcur);
 
 
 		void	copyBind(memorypool *pool,
@@ -54,6 +53,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 
 		linkedlist<querydetails *>	log;
 		linkedlist<condition *>		conditions;
+		memorypool			logpool;
 
 		bool	inreplay;
 };
@@ -98,15 +98,14 @@ bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
 						bool before,
 						bool *success) {
 	if (before) {
-		return logQuery(sqlrcon,sqlrcur);
+		return logQuery(sqlrcur);
 	} else {
-		*success=replayLog(sqlrcon,sqlrcur);
+		*success=replayLog(sqlrcur);
 		return *success;
 	}
 }
 
-bool sqlrtrigger_replay::logQuery(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur) {
+bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 	// bail if we're currently replaying the log...
 	if (inreplay) {
@@ -124,7 +123,6 @@ bool sqlrtrigger_replay::logQuery(sqlrserverconnection *sqlrcon,
 	// log the query...
 
 	querydetails	*qd=new querydetails;
-	memorypool	*pool=cont->getPerTransactionMemoryPool();
 
 	if (debug) {
 		stdoutput.printf("log {\n");
@@ -132,11 +130,9 @@ bool sqlrtrigger_replay::logQuery(sqlrserverconnection *sqlrcon,
 
 	// copy the query itself (make sure to null terminate)
 	qd->querylen=sqlrcur->getQueryLength();
-	qd->query=(char *)pool->allocate(qd->querylen+1);
-	bytestring::copy(qd->query,
-			sqlrcur->getQueryBuffer(),
-			sqlrcur->getQueryLength());
-	qd->query[sqlrcur->getQueryLength()]='\0';
+	qd->query=(char *)logpool.allocate(qd->querylen+1);
+	bytestring::copy(qd->query,sqlrcur->getQueryBuffer(),qd->querylen);
+	qd->query[qd->querylen]='\0';
 
 	if (debug) {
 		stdoutput.printf("	query:\n%.*s\n",qd->querylen,qd->query);
@@ -155,7 +151,7 @@ bool sqlrtrigger_replay::logQuery(sqlrserverconnection *sqlrcon,
 						invars[i].variable);
 		}
 		sqlrserverbindvar	*bv=new sqlrserverbindvar;
-		copyBind(pool,bv,&(invars[i]));
+		copyBind(&logpool,bv,&(invars[i]));
 		qd->inbindvars.append(bv);
 	}
 	if (debug && incount) {
@@ -175,7 +171,7 @@ bool sqlrtrigger_replay::logQuery(sqlrserverconnection *sqlrcon,
 						outvars[i].variable);
 		}
 		sqlrserverbindvar	*bv=new sqlrserverbindvar;
-		copyBind(pool,bv,&(outvars[i]));
+		copyBind(&logpool,bv,&(outvars[i]));
 		qd->outbindvars.append(bv);
 	}
 	if (debug && outcount) {
@@ -195,7 +191,7 @@ bool sqlrtrigger_replay::logQuery(sqlrserverconnection *sqlrcon,
 						inoutvars[i].variable);
 		}
 		sqlrserverbindvar	*bv=new sqlrserverbindvar;
-		copyBind(pool,bv,&(inoutvars[i]));
+		copyBind(&logpool,bv,&(inoutvars[i]));
 		qd->inoutbindvars.append(bv);
 	}
 	if (debug && inoutcount) {
@@ -245,8 +241,199 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 	}
 }
 
-bool sqlrtrigger_replay::replayLog(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur) {
+bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
+	bool	retval=true;
+
+	// we're replaying the log
+	inreplay=true;
+
+	while (replayCondition(sqlrcur)) {
+
+		if (debug) {
+			stdoutput.printf("replay log {\n");
+		}
+
+		// clear the error
+		cont->clearError();
+		cont->clearError(sqlrcur);
+
+		// roll back the current transaction
+		if (debug) {
+			stdoutput.printf("	rollback {\n");
+		}
+		if (!cont->rollback()) {
+			if (debug) {
+				stdoutput.printf("	error\n");
+				stdoutput.printf("}\n");
+			}
+			logpool.clear();
+			log.clearAndDelete();
+			return false;
+		}
+
+		// start a new transaction
+		if (debug) {
+			stdoutput.printf("	}\n");
+			stdoutput.printf("	begin {\n");
+		}
+		if (!cont->begin()) {
+			if (debug) {
+				stdoutput.printf("	error\n");
+				stdoutput.printf("}\n");
+			}
+			logpool.clear();
+			log.clearAndDelete();
+			return false;
+		}
+		if (debug) {
+			stdoutput.printf("	}\n");
+		}
+
+		// get the bind pool
+		memorypool	*pool=cont->getBindPool(sqlrcur);
+
+		// replay the log
+		retval=true;
+		for (linkedlistnode<querydetails *> *node=log.getFirst();
+						node; node=node->getNext()) {
+
+			// get the query details
+			querydetails	*qd=node->getValue();
+		
+			// prepare the query
+			if (debug) {
+				stdoutput.printf("	prepare query {\n");
+				stdoutput.printf("		query:\n%.*s\n",
+							qd->querylen,qd->query);
+			}
+			if (!cont->prepareQuery(sqlrcur,
+						qd->query,qd->querylen)) {
+				if (debug) {
+					stdoutput.printf("		"
+							"prepare error...\n");
+					stdoutput.printf("	}\n");
+				}
+				retval=false;
+				break;
+			}
+			if (debug) {
+				stdoutput.printf("	}\n");
+			}
+
+			// copy out input binds
+			uint16_t	incount=qd->inbindvars.getLength();
+			sqlrcur->setInputBindCount(incount);
+			sqlrserverbindvar	*invars=
+						sqlrcur->getInputBinds();
+			if (debug && incount) {
+				stdoutput.printf("	input binds {\n");
+			}
+			linkedlistnode<sqlrserverbindvar *>	*inbindnode=
+						qd->inbindvars.getFirst();
+			for (uint16_t i=0; i<incount; i++) {
+				sqlrserverbindvar	*bv=
+						inbindnode->getValue();
+				if (debug) {
+					stdoutput.printf("		%.*s\n",
+							bv->variablesize,
+							bv->variable);
+				}
+				copyBind(pool,&(invars[i]),bv);
+				inbindnode=inbindnode->getNext();
+			}
+			if (debug && incount) {
+				stdoutput.printf("	}\n");
+			}
+
+			// copy out output binds
+			uint16_t	outcount=qd->outbindvars.getLength();
+			sqlrcur->setInputBindCount(outcount);
+			sqlrserverbindvar	*outvars=
+						sqlrcur->getOutputBinds();
+			if (debug && outcount) {
+				stdoutput.printf("	output binds {\n");
+			}
+			linkedlistnode<sqlrserverbindvar *>	*outbindnode=
+						qd->outbindvars.getFirst();
+			for (uint16_t i=0; i<outcount; i++) {
+				sqlrserverbindvar	*bv=
+						outbindnode->getValue();
+				if (debug) {
+					stdoutput.printf("		%.*s\n",
+							bv->variablesize,
+							bv->variable);
+				}
+				copyBind(pool,&(outvars[i]),bv);
+				outbindnode=outbindnode->getNext();
+			}
+			if (debug && outcount) {
+				stdoutput.printf("	}\n");
+			}
+	
+			// copy out input-output binds
+			uint16_t		inoutcount=
+						qd->inoutbindvars.getLength();
+			sqlrcur->setInputBindCount(inoutcount);
+			sqlrserverbindvar	*inoutvars=
+						sqlrcur->getInputOutputBinds();
+			if (debug && inoutcount) {
+				stdoutput.printf("	"
+						"input-output binds {\n");
+			}
+			linkedlistnode<sqlrserverbindvar *>	*inoutbindnode=
+						qd->inoutbindvars.getFirst();
+			for (uint16_t i=0; i<inoutcount; i++) {
+				sqlrserverbindvar	*bv=
+						inoutbindnode->getValue();
+				if (debug) {
+					stdoutput.printf("		%.*s\n",
+							bv->variablesize,
+							bv->variable);
+				}
+				copyBind(pool,&(inoutvars[i]),bv);
+				inoutbindnode=inoutbindnode->getNext();
+			}
+			if (debug && inoutcount) {
+				stdoutput.printf("	}\n");
+			}
+
+			// execute the query
+			if (debug) {
+				stdoutput.printf("	execute query {\n");
+			}
+			if (!cont->executeQuery(sqlrcur)) {
+				if (debug) {
+					stdoutput.printf("		"
+							"execute error...\n");
+					stdoutput.printf("	}\n");
+				}
+				retval=false;
+				break;
+			}
+			if (debug) {
+				stdoutput.printf("	}\n");
+			}
+		}
+
+		if (debug) {
+			stdoutput.printf("}\n");
+		}
+	}
+
+	if (!retval) {
+		// clear the log and roll back on error
+		cont->rollback();
+		logpool.clear();
+		log.clearAndDelete();
+	}
+
+	// we're no longer replaying the log
+	inreplay=false;
+
+	return retval;
+}
+
+bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur) {
 
 	// did we get a replay condition?
 	bool	found=false;
@@ -291,184 +478,7 @@ bool sqlrtrigger_replay::replayLog(sqlrserverconnection *sqlrcon,
 			}
 		}
 	}
-	if (!found) {
-		return true;
-	}
-
-	if (debug) {
-		stdoutput.printf("replay log {\n");
-	}
-
-	// we're replaying the log
-	inreplay=true;
-
-	// clear the error
-	cont->clearError();
-	cont->clearError(sqlrcur);
-
-	// roll back the current transaction
-	if (debug) {
-		stdoutput.printf("	rollback {\n");
-	}
-	if (!cont->rollback()) {
-		if (debug) {
-			stdoutput.printf("	error\n");
-			stdoutput.printf("}\n");
-		}
-		log.clearAndDelete();
-		return false;
-	}
-
-	// start a new transaction
-	if (debug) {
-		stdoutput.printf("	}\n");
-		stdoutput.printf("	begin {\n");
-	}
-	if (!cont->begin()) {
-		if (debug) {
-			stdoutput.printf("	error\n");
-			stdoutput.printf("}\n");
-		}
-		log.clearAndDelete();
-		return false;
-	}
-	if (debug) {
-		stdoutput.printf("	}\n");
-	}
-
-	// get the bind pool
-	memorypool	*pool=cont->getBindPool(sqlrcur);
-
-	// replay the log
-	bool	retval=true;
-	for (linkedlistnode<querydetails *> *node=log.getFirst();
-						node; node=node->getNext()) {
-
-		// get the query details
-		querydetails	*qd=node->getValue();
-		
-		// prepare the query
-		if (debug) {
-			stdoutput.printf("	prepare query {\n");
-			stdoutput.printf("		query:\n%.*s\n",
-						qd->querylen,qd->query);
-		}
-		if (!cont->prepareQuery(sqlrcur,qd->query,qd->querylen)) {
-			if (debug) {
-				stdoutput.printf("		"
-						"prepare error...\n");
-				stdoutput.printf("	}\n");
-			}
-			retval=false;
-			break;
-		}
-		if (debug) {
-			stdoutput.printf("	}\n");
-		}
-
-		// copy out input binds
-		uint16_t		incount=qd->inbindvars.getLength();
-		sqlrcur->setInputBindCount(incount);
-		sqlrserverbindvar	*invars=sqlrcur->getInputBinds();
-		if (debug && incount) {
-			stdoutput.printf("	input binds {\n");
-		}
-		linkedlistnode<sqlrserverbindvar *>	*inbindnode=
-						qd->inbindvars.getFirst();
-		for (uint16_t i=0; i<incount; i++) {
-			sqlrserverbindvar	*bv=inbindnode->getValue();
-			if (debug) {
-				stdoutput.printf("		%.*s\n",
-							bv->variablesize,
-							bv->variable);
-			}
-			copyBind(pool,&(invars[i]),bv);
-			inbindnode=inbindnode->getNext();
-		}
-		if (debug && incount) {
-			stdoutput.printf("	}\n");
-		}
-
-		// copy out output binds
-		uint16_t		outcount=qd->outbindvars.getLength();
-		sqlrcur->setInputBindCount(outcount);
-		sqlrserverbindvar	*outvars=sqlrcur->getOutputBinds();
-		if (debug && outcount) {
-			stdoutput.printf("	output binds {\n");
-		}
-		linkedlistnode<sqlrserverbindvar *>	*outbindnode=
-						qd->outbindvars.getFirst();
-		for (uint16_t i=0; i<outcount; i++) {
-			sqlrserverbindvar	*bv=outbindnode->getValue();
-			if (debug) {
-				stdoutput.printf("		%.*s\n",
-							bv->variablesize,
-							bv->variable);
-			}
-			copyBind(pool,&(outvars[i]),bv);
-			outbindnode=outbindnode->getNext();
-		}
-		if (debug && outcount) {
-			stdoutput.printf("	}\n");
-		}
-
-		// copy out input-output binds
-		uint16_t		inoutcount=
-					qd->inoutbindvars.getLength();
-		sqlrcur->setInputBindCount(inoutcount);
-		sqlrserverbindvar	*inoutvars=
-					sqlrcur->getInputOutputBinds();
-		if (debug && inoutcount) {
-			stdoutput.printf("	input-output binds {\n");
-		}
-		linkedlistnode<sqlrserverbindvar *>	*inoutbindnode=
-						qd->inoutbindvars.getFirst();
-		for (uint16_t i=0; i<inoutcount; i++) {
-			sqlrserverbindvar	*bv=inoutbindnode->getValue();
-			if (debug) {
-				stdoutput.printf("		%.*s\n",
-							bv->variablesize,
-							bv->variable);
-			}
-			copyBind(pool,&(inoutvars[i]),bv);
-			inoutbindnode=inoutbindnode->getNext();
-		}
-		if (debug && inoutcount) {
-			stdoutput.printf("	}\n");
-		}
-
-		// execute the query
-		if (debug) {
-			stdoutput.printf("	execute query {\n");
-		}
-		if (!cont->executeQuery(sqlrcur)) {
-			if (debug) {
-				stdoutput.printf("		"
-						"execute error...\n");
-				stdoutput.printf("	}\n");
-			}
-			retval=false;
-			break;
-		}
-		if (debug) {
-			stdoutput.printf("	}\n");
-		}
-	}
-
-	if (!retval) {
-		// clear the log and roll back on error
-		cont->rollback();
-		log.clearAndDelete();
-	}
-
-	// we're no longer replaying the log
-	inreplay=false;
-
-	if (debug) {
-		stdoutput.printf("}\n");
-	}
-
-	return retval;
+	return found;
 }
 
 void sqlrtrigger_replay::endTransaction(bool commit) {
@@ -481,6 +491,7 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 	if (debug) {
 		stdoutput.printf("clear log {\n");
 	}
+	logpool.clear();
 	log.clearAndDelete();
 	if (debug) {
 		stdoutput.printf("}\n");
