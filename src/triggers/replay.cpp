@@ -242,6 +242,7 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 }
 
 bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
+
 	bool	retval=true;
 
 	// we're replaying the log
@@ -251,6 +252,12 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 
 		if (debug) {
 			stdoutput.printf("replay log {\n");
+		}
+
+		if (debug) {
+			stdoutput.printf("	triggering query:\n%.*s\n",
+						sqlrcur->getQueryLength(),
+						sqlrcur->getQueryBuffer());
 		}
 
 		// clear the error
@@ -309,8 +316,10 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 			if (!cont->prepareQuery(sqlrcur,
 						qd->query,qd->querylen)) {
 				if (debug) {
-					stdoutput.printf("		"
-							"prepare error...\n");
+					stdoutput.printf(
+						"		"
+						"prepare error: %d\n",
+						sqlrcur->getErrorNumber());
 					stdoutput.printf("	}\n");
 				}
 				retval=false;
@@ -403,8 +412,10 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 			}
 			if (!cont->executeQuery(sqlrcur)) {
 				if (debug) {
-					stdoutput.printf("		"
-							"execute error...\n");
+					stdoutput.printf(
+						"		"
+						"execute error: %d\n",
+						sqlrcur->getErrorNumber());
 					stdoutput.printf("	}\n");
 				}
 				retval=false;
