@@ -1884,31 +1884,22 @@ void firebirdcursor::getField(uint32_t col,
 		// int64's are weird.  To the left of the decimal
 		// point is the value/10^scale, to the right is
 		// value%10^scale
+		ISC_INT64	v=field[col].int64buffer;
 		if (outsqlda->sqlvar[col].sqlscale) {
-
-			stringbuffer	decimal;
-			decimal.append((int64_t)(field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)));
-		
-			// gotta get the right number
-			// of decimal places
-			for (int32_t i=decimal.getStringLength();
-				i<-outsqlda->sqlvar[col].sqlscale;
-				i++) {
-				decimal.append("0");
-			}
-
+			ISC_SHORT	scale=-outsqlda->sqlvar[col].sqlscale;
+			int		p=(int)pow(10.0,(double)scale);
 			*fldlength=charstring::printf(
 					field[col].textbuffer,
 					conn->cont->getMaxFieldLength(),
-					"%lld.%s",(int64_t)(field[col].int64buffer/(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)),decimal.getString());
-			*fld=field[col].textbuffer;
+					"%lld.%0*lld",
+					(int64_t)(v/p),scale,(int64_t)(v%p));
 		} else {
 			*fldlength=charstring::printf(
 					field[col].textbuffer,
 					conn->cont->getMaxFieldLength(),
-					"%lld",(int64_t)field[col].int64buffer);
-			*fld=field[col].textbuffer;
+					"%lld",(int64_t)v);
 		}
+		*fld=field[col].textbuffer;
 
 	} else if (outsqlda->sqlvar[col].sqltype==SQL_ARRAY ||
 		outsqlda->sqlvar[col].sqltype==SQL_ARRAY+1 ||

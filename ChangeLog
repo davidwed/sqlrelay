@@ -37,6 +37,7 @@
 	mysql connection quotes database name when selecting the db now
 	added fetch-timings
 	-Wno-error=date-time is used if supported
+	fixed firebird int64 datatype decimal problem
 
 1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
 	pushed detachbeforelogin parameter up to sqlrserverconnection class
