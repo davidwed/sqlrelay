@@ -12,7 +12,7 @@
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
-		#include "sqlrfilterdeclarations.cpp"
+		#include "sqlrtriggerdeclarations.cpp"
 	}
 #endif
 
