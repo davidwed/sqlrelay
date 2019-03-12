@@ -318,8 +318,9 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 				if (debug) {
 					stdoutput.printf(
 						"		"
-						"prepare error: %d\n",
-						sqlrcur->getErrorNumber());
+						"prepare error: %.*s\n",
+						sqlrcur->getErrorLength(),
+						sqlrcur->getErrorBuffer());
 					stdoutput.printf("	}\n");
 				}
 				retval=false;
@@ -414,8 +415,9 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 				if (debug) {
 					stdoutput.printf(
 						"		"
-						"execute error: %d\n",
-						sqlrcur->getErrorNumber());
+						"execute error: %.*s\n",
+						sqlrcur->getErrorLength(),
+						sqlrcur->getErrorBuffer());
 					stdoutput.printf("	}\n");
 				}
 				retval=false;
