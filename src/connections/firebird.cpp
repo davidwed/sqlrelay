@@ -1038,7 +1038,7 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 	}
 
 	// write the value to the blob, MAX_LOB_CHUNK_SIZE bytes at a time
-	uint16_t	bytesput=0;
+	uint32_t	bytesput=0;
 	while (bytesput<valuesize) {
 		uint16_t	bytestoput=0;
 		if (valuesize-bytesput<MAX_LOB_CHUNK_SIZE) {
