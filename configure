@@ -35796,7 +35796,7 @@ fi
 echo "******************************"
 
 
-SQLR_VERSION="1.5.0"
+SQLR_VERSION="1.6.0"
 
 
 cat >>confdefs.h <<_ACEOF
@@ -35805,7 +35805,7 @@ _ACEOF
 
 
 
-SRV_SONAME_VERSION_INFO="9:0:0"
+SRV_SONAME_VERSION_INFO="9:0:1"
 CLT_SONAME_VERSION_INFO="5:0:0"
 
 

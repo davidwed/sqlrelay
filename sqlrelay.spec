@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.5.0
+Version: 1.6.0
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -820,6 +820,9 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Apr 01 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
+- Updated to version 1.6.0.
+
 * Thu Feb 21 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
 - Replaced empty-directory-removing postun's with dir's.
 - Updated to require rudiments 1.2.0.

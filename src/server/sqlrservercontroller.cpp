@@ -2178,6 +2178,9 @@ bool sqlrservercontroller::autoCommitOn() {
 
 	pvt->_autocommitforthissession=true;
 	if (pvt->_conn->autoCommitOn()) {
+		if (pvt->_intransaction) {
+			raiseCommitEvent();
+		}
 		pvt->_intransaction=false;
 		return true;
 	}
@@ -2206,7 +2209,11 @@ bool sqlrservercontroller::autoCommitOff() {
 		// a begin/start-tx query, so we're in a transaction no matter
 		// what...
 		// FIXME: verify this though, with all db's
+		bool	wasintx=pvt->_intransaction;
 		pvt->_intransaction=true;
+		if (!wasintx) {
+			raiseBeginTransactionEvent();
+		}
 		return true;
 	}
 	return false;
@@ -2229,6 +2236,7 @@ bool sqlrservercontroller::begin() {
 			beginFakeTransactionBlock():
 			pvt->_conn->begin()) {
 		pvt->_intransaction=true;
+		raiseBeginTransactionEvent();
 		return true;
 	}
 	return false;
@@ -2286,6 +2294,13 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	// end fake transaction blocks
 	// FIXME: this can fail
 	endFakeTransactionBlock();
+
+	// raise events
+	if (commit) {
+		raiseCommitEvent();
+	} else {
+		raiseRollbackEvent();
+	}
 
 	// reset protocol modules
 	if (pvt->_sqlrpr) {
@@ -4637,11 +4652,18 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	if (cursor->getQueryType()==
 			SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON) {
 		pvt->_autocommitforthissession=true;
+		if (pvt->_intransaction) {
+			raiseCommitEvent();
+		}
 		pvt->_intransaction=false;
 	} else if (cursor->getQueryType()==
 			SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF) {
 		pvt->_autocommitforthissession=false;
+		bool	wasintx=pvt->_intransaction;
 		pvt->_intransaction=true;
+		if (wasintx) {
+			raiseBeginTransactionEvent();
+		}
 	}
 
 	// on failure, save the error
@@ -6397,6 +6419,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable1(
 		executeQuery(cursor);
 		closeResultSet(cursor);
 		pvt->_intransaction=true;
+		raiseBeginTransactionEvent();
 	}
 
 	return retval;
@@ -6463,6 +6486,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable2(
 		executeQuery(cursor);
 		closeResultSet(cursor);
 		pvt->_intransaction=true;
+		raiseBeginTransactionEvent();
 	}
 
 	return retval;
@@ -8279,6 +8303,48 @@ void sqlrservercontroller::raiseCursorCloseEvent(sqlrservercursor *cursor) {
 	if (pvt->_sqlrn) {
 		pvt->_sqlrn->run(NULL,pvt->_conn,cursor,
 					SQLREVENT_CURSOR_CLOSE,
+					NULL);
+	}
+}
+
+void sqlrservercontroller::raiseBeginTransactionEvent() {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,NULL,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_BEGIN_TRANSACTION,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,NULL,
+					SQLREVENT_BEGIN_TRANSACTION,
+					NULL);
+	}
+}
+
+void sqlrservercontroller::raiseCommitEvent() {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,NULL,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_COMMIT,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,NULL,
+					SQLREVENT_COMMIT,
+					NULL);
+	}
+}
+
+void sqlrservercontroller::raiseRollbackEvent() {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,NULL,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_ROLLBACK,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,NULL,
+					SQLREVENT_ROLLBACK,
 					NULL);
 	}
 }

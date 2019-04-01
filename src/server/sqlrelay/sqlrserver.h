@@ -334,6 +334,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							const char *info);
 		void	raiseCursorOpenEvent(sqlrservercursor *cursor);
 		void	raiseCursorCloseEvent(sqlrservercursor *cursor);
+		void	raiseBeginTransactionEvent();
+		void	raiseCommitEvent();
+		void	raiseRollbackEvent();
 
 
 		// cursor api...
@@ -1733,6 +1736,9 @@ enum sqlrevent_t {
 	SQLREVENT_PARSE_FAILURE,
 	SQLREVENT_CURSOR_OPEN,
 	SQLREVENT_CURSOR_CLOSE,
+	SQLREVENT_BEGIN_TRANSACTION,
+	SQLREVENT_COMMIT,
+	SQLREVENT_ROLLBACK,
 	SQLREVENT_INVALID_EVENT
 };
 
