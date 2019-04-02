@@ -137,7 +137,7 @@ Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 Perl DBI driver for SQL Relay.
 
 
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel} > 7
 
 %package -n python3-%{name}
 License: ZPL 1.0 or MIT
@@ -159,22 +159,22 @@ Python DB bindings for SQL Relay.
 
 %else
 
-%package -n python-%{name}
+%package -n python2-%{name}
 License: ZPL 1.0 or MIT
 Summary: Python bindings for the SQL Relay client API
 BuildRequires: python-devel
 
-%description -n python-%{name}
+%description -n python2-%{name}
 Python bindings for the SQL Relay client API.
 
 
-%package -n python-db-%{name}
+%package -n python2-db-%{name}
 License: ZPL 1.0 or MIT
 Summary: Python DB bindings for SQL Relay
 BuildRequires: python-devel
 Requires: python-%{name}%{?_isa} = %{version}-%{release}
 
-%description -n python-db-%{name}
+%description -n python2-db-%{name}
 Python DB bindings for SQL Relay.
 
 %endif
@@ -695,13 +695,13 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 
 %else
 
-%files -n python-%{name}
+%files -n python2-%{name}
 %dir %{python_sitearch}/SQLRelay
 %{python_sitearch}/SQLRelay/CSQLRelay.so
 %{python_sitearch}/SQLRelay/PySQLRClient.py*
 %{python_sitearch}/SQLRelay/__init__.py*
 
-%files -n python-db-%{name}
+%files -n python2-db-%{name}
 %dir %{python_sitearch}/SQLRelay
 %{python_sitearch}/SQLRelay/PySQLRDB.py*
 
@@ -820,8 +820,10 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon Apr 01 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
+* Tue Apr 02 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
 - Updated to version 1.6.0.
+- Replaced python-* names with python2-*.
+- Updated to build python 3 packages for rhel > 7.
 
 * Thu Feb 21 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
 - Replaced empty-directory-removing postun's with dir's.
