@@ -107,6 +107,10 @@ extern "C" {
 
 	#define HASH_INDEX_FIND(a,b,c) c=zend_hash_index_find(a,b)
 
+	#if PHP_MAJOR_VERSION > 7 || PHP_MINOR_VERSION > 2
+		#define ARRAY_INIT_CANT_FAIL 1
+	#endif
+
 #else
 
 	#define ZVAL zval**
@@ -2592,9 +2596,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 	if (!r) {
 		RETURN_FALSE;
 	}
+	#ifdef ARRAY_INIT_CANT_FAIL
+	array_init(return_value);
+	#else
 	if (array_init(return_value) == FAILURE) {
 		RETURN_FALSE;
 	}
+	#endif
 	for (i=0; i<cursor->colCount(); i++) {
 		if (!r[i]) {
 			// using add_next_index_unset because add_assoc_null
@@ -2648,9 +2656,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 	if (!r) {
 		RETURN_FALSE;
 	}
+	#ifdef ARRAY_INIT_CANT_FAIL
+	array_init(return_value);
+	#else
 	if (array_init(return_value) == FAILURE) {
 		RETURN_FALSE;
 	}
+	#endif
 	for (i=0; i<cursor->colCount(); i++) {
 		if (!r[i]) {
 			// using add_assoc_unset because add_assoc_null isn't
@@ -2694,9 +2706,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengths) {
 	if (!r) {
 		RETURN_FALSE;
 	}
+	#ifdef ARRAY_INIT_CANT_FAIL
+	array_init(return_value);
+	#else
 	if (array_init(return_value) == FAILURE) {
 		RETURN_FALSE;
 	}
+	#endif
 	for (i=0; i<cursor->colCount(); i++) {
 		add_next_index_long(return_value,r[i]);
 	}
@@ -2739,9 +2755,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowlengthsassoc) {
 	if (!r) {
 		RETURN_FALSE;
 	}
+	#ifdef ARRAY_INIT_CANT_FAIL
+	array_init(return_value);
+	#else
 	if (array_init(return_value) == FAILURE) {
 		RETURN_FALSE;
 	}
+	#endif
 	for (i=0; i<cursor->colCount(); i++) {
 		add_assoc_long(return_value,const_cast<char *>(rC[i]),r[i]);
 	}
@@ -2772,9 +2792,13 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getcolumnnames) {
 	if (!r) {
 		RETURN_FALSE;
 	}
+	#ifdef ARRAY_INIT_CANT_FAIL
+	array_init(return_value);
+	#else
 	if (array_init(return_value) == FAILURE) {
 		RETURN_FALSE;
 	}
+	#endif
 	for (i=0; i<cursor->colCount(); i++) {
 		ADD_NEXT_INDEX_STRING(return_value,const_cast<char *>(r[i]),1);
 	}
