@@ -2,6 +2,7 @@
 // All rights reserved
 
 #include <sqlrelay/sqlrserver.h>
+#include <rudiments/snooze.h>
 
 class querydetails {
 	public:
@@ -51,6 +52,10 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 
 		bool		debug;
 
+		bool		replaytx;
+
+		uint32_t	maxretries;
+
 		linkedlist<querydetails *>	log;
 		linkedlist<condition *>		conditions;
 		memorypool			logpool;
@@ -65,6 +70,15 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 	this->cont=cont;
 
 	debug=cont->getConfig()->getDebugTriggers();
+
+	// get the scope (query or tx)
+	replaytx=!charstring::compareIgnoringCase(
+				parameters->getAttributeValue("scope"),
+				"transaction");
+
+	// get the max retries
+	maxretries=charstring::toInteger(
+				parameters->getAttributeValue("maxretries"));
 
 	// get the replay conditions...
 	for (domnode *cond=parameters->getFirstTagChild("condition");
@@ -112,12 +126,21 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 		return true;
 	}
 
-	// bail if we're not in a transaction
-	if (!cont->inTransaction()) {
-		if (debug) {
-			stdoutput.printf("not in a trasaction\n");
+	if (replaytx) {
+
+		// bail if we're not in a transaction
+		if (!cont->inTransaction()) {
+			if (debug) {
+				stdoutput.printf("not in a trasaction\n");
+			}
+			return true;
 		}
-		return true;
+
+	} else {
+
+		// clear the log and logpool
+		logpool.clear();
+		log.clearAndDelete();
 	}
 
 	// log the query...
@@ -248,10 +271,40 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 	// we're replaying the log
 	inreplay=true;
 
+	uint32_t	sec=0;
+	uint32_t	usec=0;
+	uint32_t	retry=0;
 	while (replayCondition(sqlrcur)) {
 
+		// delay before trying again...
+		// delay a little longer before each retry, up to 10 seconds
+		if (retry==1) {
+			usec=10000;
+		} else {
+			if (sec) {
+				sec*=2;
+				if (sec>=10) {
+					sec=10;
+				}
+			} else {
+				usec*=2;
+				if (usec>=1000000) {
+					usec=0;
+					sec=1;
+				}
+			}
+		}
+		if (sec || usec) {
+			if (debug) {
+				stdoutput.printf("delay %d sec, %d usec...",
+								sec,usec);
+			}
+			snooze::microsnooze(sec,usec);
+		}
+
+
 		if (debug) {
-			stdoutput.printf("replay log {\n");
+			stdoutput.printf("replay {\n");
 		}
 
 		if (debug) {
@@ -264,36 +317,39 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 		cont->clearError();
 		cont->clearError(sqlrcur);
 
-		// roll back the current transaction
-		if (debug) {
-			stdoutput.printf("	rollback {\n");
-		}
-		if (!cont->rollback()) {
-			if (debug) {
-				stdoutput.printf("	error\n");
-				stdoutput.printf("}\n");
-			}
-			logpool.clear();
-			log.clearAndDelete();
-			return false;
-		}
+		if (replaytx) {
 
-		// start a new transaction
-		if (debug) {
-			stdoutput.printf("	}\n");
-			stdoutput.printf("	begin {\n");
-		}
-		if (!cont->begin()) {
+			// roll back the current transaction
 			if (debug) {
-				stdoutput.printf("	error\n");
-				stdoutput.printf("}\n");
+				stdoutput.printf("	rollback {\n");
 			}
-			logpool.clear();
-			log.clearAndDelete();
-			return false;
-		}
-		if (debug) {
-			stdoutput.printf("	}\n");
+			if (!cont->rollback()) {
+				if (debug) {
+					stdoutput.printf("	error\n");
+					stdoutput.printf("}\n");
+				}
+				logpool.clear();
+				log.clearAndDelete();
+				return false;
+			}
+
+			// start a new transaction
+			if (debug) {
+				stdoutput.printf("	}\n");
+				stdoutput.printf("	begin {\n");
+			}
+			if (!cont->begin()) {
+				if (debug) {
+					stdoutput.printf("	error\n");
+					stdoutput.printf("}\n");
+				}
+				logpool.clear();
+				log.clearAndDelete();
+				return false;
+			}
+			if (debug) {
+				stdoutput.printf("	}\n");
+			}
 		}
 
 		// get the bind pool
@@ -431,9 +487,17 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 		if (debug) {
 			stdoutput.printf("}\n");
 		}
+
+		// bump retry count
+		retry++;
+
+		// bail if we've tried too many times already
+		if (retry>maxretries) {
+			break;
+		}
 	}
 
-	if (!retval) {
+	if (replaytx && !retval) {
 		// clear the log and roll back on error
 		cont->rollback();
 		logpool.clear();
@@ -501,8 +565,13 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 		return;
 	}
 
+	// bail if we're not replaying transactions queries...
+	if (!replaytx) {
+		return;
+	}
+
 	if (debug) {
-		stdoutput.printf("clear log {\n");
+		stdoutput.printf("clear {\n");
 	}
 	logpool.clear();
 	log.clearAndDelete();
