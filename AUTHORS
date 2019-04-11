@@ -226,4 +226,7 @@ Samat Yusupov
 	PHP PDO dbh driver methods (0.58)
 
 George Carrette - gjc@alum.mit.edu
-	PHP PDO connect string patches (0.60)
+	Lots of patches (0.60 - 1.0.1)
+
+Joseph Caputo - Joseph.Caputo@broadridge.com
+	MySQL 8.0 compat patch
