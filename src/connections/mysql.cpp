@@ -15,7 +15,7 @@
 	#include <errmsg.h>
 #endif
 
-#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80001
+#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
 	typedef bool my_bool;
 #endif
 
