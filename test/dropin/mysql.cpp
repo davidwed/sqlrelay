@@ -6,6 +6,13 @@
 #include <rudiments/stdio.h>
 #include <config.h>
 
+// MySQL 8+ doesn't have my_bool, but MariaDB 10+ does
+#ifndef LIBMARIADB
+	#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
+		typedef bool my_bool;
+	#endif
+#endif
+
 MYSQL		mysql;
 MYSQL_RES	*result;
 MYSQL_FIELD	*field;
@@ -112,7 +119,13 @@ int	main(int argc, char **argv) {
 	#endif
 
 	stdoutput.printf("mysql_character_set_name:\n");
+	#if !defined(LIBMARIADB) && \
+		defined(MYSQL_VERSION_ID) && \
+		MYSQL_VERSION_ID>=80000
+	checkSuccess((char *)mysql_character_set_name(&mysql),"utf8mb4");
+	#else
 	checkSuccess((char *)mysql_character_set_name(&mysql),"latin1");
+	#endif
 	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_list_dbs\n");
@@ -790,11 +803,14 @@ int	main(int argc, char **argv) {
 
 	// FIXME: mysql_change_user
 
+	#if defined(LIBMARIADB) || \
+		(defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID<80000)
 	stdoutput.printf("mysql_shutdown\n");
 	// should fail for lack of permissions
 	// deprecated in real mysql, and always returns 1 on error
 	checkSuccess(mysql_shutdown(&mysql,SHUTDOWN_DEFAULT),1);
 	stdoutput.printf("\n");
+	#endif
 
 	stdoutput.printf("mysql_refresh\n");
 	// these should all fail for lack of permissions

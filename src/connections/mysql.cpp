@@ -15,8 +15,11 @@
 	#include <errmsg.h>
 #endif
 
-#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
-	typedef bool my_bool;
+// MySQL 8+ doesn't have my_bool, but MariaDB 10+ does
+#ifndef LIBMARIADB
+	#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
+		typedef bool my_bool;
+	#endif
 #endif
 
 #ifndef TRUE
