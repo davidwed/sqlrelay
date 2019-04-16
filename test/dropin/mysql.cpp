@@ -7,7 +7,7 @@
 #include <config.h>
 
 // MySQL 8+ doesn't have my_bool, but MariaDB 10+ does
-#ifndef LIBMARIADB
+#ifndef MARIADB_BASE_VERSION
 	#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
 		typedef bool my_bool;
 	#endif
@@ -119,7 +119,7 @@ int	main(int argc, char **argv) {
 	#endif
 
 	stdoutput.printf("mysql_character_set_name:\n");
-	#if !defined(LIBMARIADB) && \
+	#if !defined(MARIADB_BASE_VERSION) && \
 		defined(MYSQL_VERSION_ID) && \
 		MYSQL_VERSION_ID>=80000
 	checkSuccess((char *)mysql_character_set_name(&mysql),"utf8mb4");
@@ -766,7 +766,7 @@ int	main(int argc, char **argv) {
 
 	// some versions of mariadb crash when you call this
 	// (arguably, I should figure out which versions and look for that too)
-	#ifndef LIBMARIADB
+	#ifndef MARIADB_BASE_VERSION
 	stdoutput.printf("mysql_list_processes\n");
 	result=mysql_list_processes(&mysql);
 	checkSuccess(mysql_num_fields(result),9);
@@ -803,7 +803,7 @@ int	main(int argc, char **argv) {
 
 	// FIXME: mysql_change_user
 
-	#if defined(LIBMARIADB) || \
+	#if defined(MARIADB_BASE_VERSION) || \
 		(defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID<80000)
 	stdoutput.printf("mysql_shutdown\n");
 	// should fail for lack of permissions
@@ -1082,7 +1082,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldisnull[3],0);
 	checkSuccess(fieldisnull[4],1);
 	checkSuccess(fieldisnull[5],0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");	
@@ -1099,7 +1099,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldisnull[3],1);
 	checkSuccess(fieldisnull[4],0);
 	checkSuccess(fieldisnull[5],1);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
@@ -1272,7 +1272,7 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[11].buffer,"2001-01-02");
 	checkSuccess((const char *)fieldbind[12].buffer,"-36:10:11");
 	checkSuccess((const char *)fieldbind[13].buffer,"2001-01-02 12:10:11");
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
@@ -1325,7 +1325,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(bindisnull[1],1);
 	checkSuccess(bindisnull[2],0);
 	checkSuccess(bindisnull[3],1);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
@@ -1378,7 +1378,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldisnull[1],0);
 	checkSuccess(fieldisnull[2],1);
 	checkSuccess(fieldisnull[3],0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");

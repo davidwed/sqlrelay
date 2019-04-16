@@ -16,7 +16,7 @@
 #endif
 
 // MySQL 8+ doesn't have my_bool, but MariaDB 10+ does
-#ifndef LIBMARIADB
+#ifndef MARIADB_BASE_VERSION
 	#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
 		typedef bool my_bool;
 	#endif

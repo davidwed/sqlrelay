@@ -301,21 +301,21 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
 	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
 	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
