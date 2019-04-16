@@ -266,6 +266,7 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 
 bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 
+debug=true;
 	bool	retval=true;
 
 	// we're replaying the log
@@ -330,6 +331,7 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 				}
 				logpool.clear();
 				log.clearAndDelete();
+debug=false;
 				return false;
 			}
 
@@ -345,6 +347,7 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 				}
 				logpool.clear();
 				log.clearAndDelete();
+debug=false;
 				return false;
 			}
 			if (debug) {
@@ -492,7 +495,7 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 		retry++;
 
 		// bail if we've tried too many times already
-		if (retry>maxretries) {
+		if (maxretries && retry>maxretries) {
 			break;
 		}
 	}
@@ -507,6 +510,7 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 	// we're no longer replaying the log
 	inreplay=false;
 
+debug=false;
 	return retval;
 }
 
