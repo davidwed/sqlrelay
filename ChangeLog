@@ -1,6 +1,8 @@
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3
 	integrated my_bool fix for mysql 8.0.1+
+	mysql sslmode=require/prefer + bad sslca/sslcapath generates warning
+		rather than error now (like the mysql cli)
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

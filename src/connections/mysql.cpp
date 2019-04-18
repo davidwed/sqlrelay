@@ -248,6 +248,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*port;
 		const char	*socket;
 		const char	*charset;
+		const char	*sslmodestr;
 #ifdef HAVE_MYSQL_OPT_SSL_MODE
 		unsigned int	sslmode;
 #endif
@@ -325,7 +326,7 @@ void mysqlconnection::handleConnectString() {
 	port=cont->getConnectStringValue("port");
 	socket=cont->getConnectStringValue("socket");
 	charset=cont->getConnectStringValue("charset");
-	const char	*sslmodestr=cont->getConnectStringValue("sslmode");
+	sslmodestr=cont->getConnectStringValue("sslmode");
 #ifdef HAVE_MYSQL_OPT_SSL_MODE
 	if (charstring::isNullOrEmpty(sslmodestr) ||
 		!charstring::compare(sslmodestr,"disable")) {
@@ -415,70 +416,125 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 			(!charstring::isNullOrEmpty(socket))?socket:NULL;
 	unsigned long	clientflag=0;
 	#ifdef CLIENT_MULTI_STATEMENTS
-	clientflag|=CLIENT_MULTI_STATEMENTS;
+		clientflag|=CLIENT_MULTI_STATEMENTS;
 	#endif
 	#ifdef CLIENT_FOUND_ROWS
-	if (foundrows) {
-		clientflag|=CLIENT_FOUND_ROWS;
-	}
+		if (foundrows) {
+			clientflag|=CLIENT_FOUND_ROWS;
+		}
 	#endif
 	#ifdef CLIENT_IGNORE_SPACE
-	if (ignorespace) {
-		clientflag|=CLIENT_IGNORE_SPACE;
-	}
+		if (ignorespace) {
+			clientflag|=CLIENT_IGNORE_SPACE;
+		}
 	#endif
 	#if MYSQL_VERSION_ID>=32200
-	// initialize database connection structure
-	mysqlptr=mysql_init(NULL);
-	if (!mysqlptr) {
-		*error="mysql_init failed";
-		return false;
-	}
-	#ifdef HAVE_MYSQL_OPT_SSL_MODE
-	mysql_options(mysqlptr,MYSQL_OPT_SSL_MODE,&sslmode);
-	#else
-		#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
-		mysql_options(mysqlptr,MYSQL_OPT_SSL_ENFORCE,sslenforce);
+		// initialize database connection structure
+		mysqlptr=mysql_init(NULL);
+		if (!mysqlptr) {
+			*error="mysql_init failed";
+			return false;
+		}
+		#ifdef HAVE_MYSQL_OPT_SSL_MODE
+			mysql_options(mysqlptr,
+					MYSQL_OPT_SSL_MODE,
+					&sslmode);
+		#else
+			#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
+				mysql_options(mysqlptr,
+						MYSQL_OPT_SSL_ENFORCE,
+						sslenforce);
+			#endif
+			#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
+				mysql_options(mysqlptr,
+					MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
+					sslverifyservercert);
+			#endif
 		#endif
-		#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
-		mysql_options(mysqlptr,MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
-							sslverifyservercert);
+		#ifdef HAVE_MYSQL_OPT_TLS_VERSION
+			mysql_options(mysqlptr,
+					MYSQL_OPT_TLS_VERSION,
+					tlsversion);
 		#endif
-	#endif
-	#ifdef HAVE_MYSQL_OPT_TLS_VERSION
-	mysql_options(mysqlptr,MYSQL_OPT_TLS_VERSION,tlsversion);
-	#endif
-	#ifdef HAVE_MYSQL_SSL_SET
-	mysql_ssl_set(mysqlptr,sslkey,sslcert,sslca,sslcapath,sslcipher);
-	#endif
-	#ifdef HAVE_MYSQL_OPT_SSLCRL
-	mysql_options(mysqlptr,MYSQL_OPT_SSLCRL,sslcrl);
-	#endif
-	#ifdef HAVE_MYSQL_OPT_SSLCRLPATH
-	mysql_options(mysqlptr,MYSQL_OPT_SSLCRLPATH,sslcrlpath);
-	#endif
+		#ifdef HAVE_MYSQL_SSL_SET
+			mysql_ssl_set(mysqlptr,sslkey,sslcert,
+					sslca,sslcapath,sslcipher);
+		#endif
+		#ifdef HAVE_MYSQL_OPT_SSLCRL
+			mysql_options(mysqlptr,
+					MYSQL_OPT_SSLCRL,
+					sslcrl);
+		#endif
+		#ifdef HAVE_MYSQL_OPT_SSLCRLPATH
+			mysql_options(mysqlptr,
+					MYSQL_OPT_SSLCRLPATH,
+					sslcrlpath);
+		#endif
+	
+		bool	sslcafallback=false;
+		MYSQL	*result=mysql_real_connect(mysqlptr,
+							hostval,
+							user,
+							password,
+							dbval,
+							portval,
+							socketval,
+							clientflag);
+		#ifdef HAVE_MYSQL_SSL_SET
+			if (!result && mysql_errno(mysqlptr)==2026 &&
+				(!charstring::compare(sslmodestr,"require") ||
+				!charstring::compare(sslmodestr,"prefer")) &&
+				(!charstring::isNullOrEmpty(sslca) ||
+				!charstring::isNullOrEmpty(sslcapath))) {
 
-	if (!mysql_real_connect(mysqlptr,hostval,user,password,dbval,
-					portval,socketval,clientflag)) {
+				sslcafallback=true;
+				mysql_ssl_set(mysqlptr,sslkey,sslcert,
+							NULL,NULL,sslcipher);
+				result=mysql_real_connect(mysqlptr,
+								hostval,
+								user,
+								password,
+								dbval,
+								portval,
+								socketval,
+								clientflag);
+			}
+		#endif
+		if (!result) {
+			loginerror.clear();
+			loginerror.append("mysql_real_connect failed: ");
+			loginerror.append(mysql_error(mysqlptr));
+			*error=loginerror.getString();
+			logOut();
+			return false;
+		} else if (sslcafallback) {
+			*warning="WARNING: no verification of server "
+					"certificate will be done. "
+					"Use sslmode=verify-ca or "
+					"verify-identity.";
+		}
 	#else
-	mysqlptr=&mysql;
-	if (!mysql_real_connect(mysqlptr,hostval,user,password,
-					portval,socketval,clientflag)) {
+		mysqlptr=&mysql;
+		if (!mysql_real_connect(mysqlptr,hostval,user,password,
+						portval,socketval,clientflag)) {
+			loginerror.clear();
+			loginerror.append("mysql_real_connect failed: ");
+			loginerror.append(mysql_error(mysqlptr));
+			*error=loginerror.getString();
+			logOut();
+			return false;
+		}
 	#endif
-		loginerror.clear();
-		loginerror.append("mysql_real_connect failed: ");
-		loginerror.append(mysql_error(mysqlptr));
-		*error=loginerror.getString();
 #else
 	if (!mysql_connect(mysqlptr,hostval,user,password)) {
 		loginerror.clear();
 		loginerror.append("mysql_connect failed: ");
 		loginerror.append(mysql_error(mysqlptr));
 		*error=loginerror.getString();
-#endif
 		logOut();
 		return false;
 	}
+#endif
 
 #ifdef HAVE_MYSQL_OPT_RECONNECT
 	// Enable autoreconnect in the C api
