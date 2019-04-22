@@ -953,8 +953,11 @@ static void sqlrconnectionRewriteQuery(const char *query,
 				inbind=false;
 			}
 
-			// catch ?, :, $ and @ but not @@
-			if (character::inSet(*c,"?:$") ||
+			// catch ? and $
+			// also catch : but not :=
+			// also catch @ but not @@
+			if (character::inSet(*c,"?$") ||
+					(*c==':' && *(c+1)!='=') ||
 					(*c=='@' && *(c+1)!='@')) {
 				newquery->append("$(");
 				if (*c=='?') {

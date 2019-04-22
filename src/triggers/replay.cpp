@@ -130,9 +130,6 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 		// bail if we're not in a transaction
 		if (!cont->inTransaction()) {
-			if (debug) {
-				stdoutput.printf("not in a trasaction\n");
-			}
 			return true;
 		}
 
@@ -147,87 +144,42 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 	querydetails	*qd=new querydetails;
 
-	if (debug) {
-		stdoutput.printf("log {\n");
-	}
-
 	// copy the query itself (make sure to null terminate)
 	qd->querylen=sqlrcur->getQueryLength();
 	qd->query=(char *)logpool.allocate(qd->querylen+1);
 	bytestring::copy(qd->query,sqlrcur->getQueryBuffer(),qd->querylen);
 	qd->query[qd->querylen]='\0';
 
-	if (debug) {
-		stdoutput.printf("	query:\n%.*s\n",qd->querylen,qd->query);
-	}
-
 	// copy in input binds
 	uint16_t		incount=sqlrcur->getInputBindCount();
 	sqlrserverbindvar	*invars=sqlrcur->getInputBinds();
-	if (debug && incount) {
-		stdoutput.printf("	input binds {\n");
-	}
 	for (uint16_t i=0; i<incount; i++) {
-		if (debug) {
-			stdoutput.printf("		%.*s\n",
-						invars[i].variablesize,
-						invars[i].variable);
-		}
 		sqlrserverbindvar	*bv=new sqlrserverbindvar;
 		copyBind(&logpool,bv,&(invars[i]));
 		qd->inbindvars.append(bv);
-	}
-	if (debug && incount) {
-		stdoutput.printf("	}\n");
 	}
 	
 	// copy in output binds
 	uint16_t		outcount=sqlrcur->getOutputBindCount();
 	sqlrserverbindvar	*outvars=sqlrcur->getOutputBinds();
-	if (debug && outcount) {
-		stdoutput.printf("	output binds {\n");
-	}
 	for (uint16_t i=0; i<outcount; i++) {
-		if (debug) {
-			stdoutput.printf("		%.*s\n",
-						outvars[i].variablesize,
-						outvars[i].variable);
-		}
 		sqlrserverbindvar	*bv=new sqlrserverbindvar;
 		copyBind(&logpool,bv,&(outvars[i]));
 		qd->outbindvars.append(bv);
-	}
-	if (debug && outcount) {
-		stdoutput.printf("	}\n");
 	}
 
 	// copy in input-output binds
 	uint16_t		inoutcount=sqlrcur->getInputOutputBindCount();
 	sqlrserverbindvar	*inoutvars=sqlrcur->getInputOutputBinds();
-	if (debug && inoutcount) {
-		stdoutput.printf("	input-output binds {\n");
-	}
 	for (uint16_t i=0; i<inoutcount; i++) {
-		if (debug) {
-			stdoutput.printf("		%.*s\n",
-						inoutvars[i].variablesize,
-						inoutvars[i].variable);
-		}
 		sqlrserverbindvar	*bv=new sqlrserverbindvar;
 		copyBind(&logpool,bv,&(inoutvars[i]));
 		qd->inoutbindvars.append(bv);
-	}
-	if (debug && inoutcount) {
-		stdoutput.printf("	}\n");
 	}
 
 	// log copied query and binds
 	log.append(qd);
 
-	if (debug) {
-		stdoutput.printf("}\n");
-	}
-	
 	return true;
 }
 
@@ -266,7 +218,6 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 
 bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 
-debug=true;
 	bool	retval=true;
 
 	// we're replaying the log
@@ -331,7 +282,6 @@ debug=true;
 				}
 				logpool.clear();
 				log.clearAndDelete();
-debug=false;
 				return false;
 			}
 
@@ -347,7 +297,6 @@ debug=false;
 				}
 				logpool.clear();
 				log.clearAndDelete();
-debug=false;
 				return false;
 			}
 			if (debug) {
@@ -510,7 +459,6 @@ debug=false;
 	// we're no longer replaying the log
 	inreplay=false;
 
-debug=false;
 	return retval;
 }
 
@@ -574,14 +522,8 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 		return;
 	}
 
-	if (debug) {
-		stdoutput.printf("clear {\n");
-	}
 	logpool.clear();
 	log.clearAndDelete();
-	if (debug) {
-		stdoutput.printf("}\n");
-	}
 }
 
 extern "C" {

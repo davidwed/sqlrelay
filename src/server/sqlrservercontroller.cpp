@@ -3367,8 +3367,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 			// if we find whitespace or a couple of other things
 			// then the next thing could be a bind variable
-			if (character::isWhitespace(*c) ||
-					*c==',' || *c=='(' || *c=='=') {
+			if (character::inSet(*c," \t\n\r=<>,(+-*/%|&!~^")) {
 				parsestate=BEFORE_BIND;
 			}
 
