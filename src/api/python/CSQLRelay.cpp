@@ -25,11 +25,11 @@
 
 extern "C" {
 
-#define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_FLOAT_TYPE_CHAR
-#define NEED_IS_BIT_TYPE_CHAR
-#define NEED_BIT_STRING_TO_LONG
-#define NEED_IS_BOOL_TYPE_CHAR
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_FLOAT_TYPE_CHAR 1
+#define NEED_IS_BIT_TYPE_CHAR 1
+#define NEED_BIT_STRING_TO_LONG 1
+#define NEED_IS_BOOL_TYPE_CHAR 1
 #include <datatypes.h>
 
 bool usenumeric=false;

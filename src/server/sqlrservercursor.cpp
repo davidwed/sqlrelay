@@ -10,6 +10,8 @@
 #define NEED_DATATYPESTRING 1
 #include <datatypes.h>
 #include <defines.h>
+#define NEED_BEFORE_BIND_VARIABLE 1
+#include <bindvariables.h>
 
 class sqlrservercursorprivate {
 	 friend class sqlrservercursor;
@@ -822,22 +824,20 @@ bool sqlrservercursor::fakeInputBinds() {
 	pvt->_querywithfakeinputbinds.clear();
 
 	// loop through the query, performing substitutions
-	char	*ptr=pvt->_querybuffer;
-	int	index=1;
-	bool	inquotes=false;
+	char		*ptr=pvt->_querybuffer;
+	const char	*prevptr="\0";
+	int		index=1;
+	bool		inquotes=false;
 	while (*ptr) {
 
-		// are we inside of quotes ?
-		if (*ptr=='\'') {
-			if (inquotes) {
-				inquotes=false;
-			} else {
-				inquotes=true;
-			}
+		// are we inside of quotes?
+		if (*ptr=='\'' && (*prevptr!='\\' && *prevptr!='\'')) {
+			inquotes=!inquotes;
 		}
 
 		// look for a bind var prefix or ? if not inside of quotes
-		if (!inquotes && (*ptr=='?' ||
+		if (!inquotes && beforeBindVariable(prevptr) &&
+					(*ptr=='?' ||
 					(*ptr==':' && *(ptr+1)!='=') ||
 					(*ptr=='@' && *(ptr+1)!='@') ||
 					*ptr=='$')) {
@@ -915,6 +915,8 @@ bool sqlrservercursor::fakeInputBinds() {
 			pvt->_querywithfakeinputbinds.append(*ptr);
 			ptr++;
 		}
+
+		prevptr=ptr-1;
 	}
 	return true;
 }

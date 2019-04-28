@@ -9,7 +9,7 @@
 #include <rudiments/stdio.h>
 #include <config.h>
 #include <defaults.h>
-#define NEED_IS_NUMBER_TYPE_CHAR
+#define NEED_IS_NUMBER_TYPE_CHAR 1
 #include <datatypes.h>
 #include <version.h>
 

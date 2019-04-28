@@ -29,27 +29,30 @@
 
 #include <defines.h>
 #include <defaults.h>
-#define NEED_DATATYPESTRING
-#define NEED_IS_BIT_TYPE_CHAR
-#define NEED_IS_BIT_TYPE_INT
-#define NEED_IS_BOOL_TYPE_CHAR
-#define NEED_IS_BOOL_TYPE_INT
-#define NEED_IS_FLOAT_TYPE_CHAR
-#define NEED_IS_FLOAT_TYPE_INT
-#define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_NUMBER_TYPE_INT
-#define NEED_IS_BLOB_TYPE_CHAR
-#define NEED_IS_BLOB_TYPE_INT
-#define NEED_IS_UNSIGNED_TYPE_CHAR
-#define NEED_IS_UNSIGNED_TYPE_INT
-#define NEED_IS_BINARY_TYPE_CHAR
-#define NEED_IS_BINARY_TYPE_INT
-#define NEED_IS_DATETIME_TYPE_CHAR
-#define NEED_IS_DATETIME_TYPE_INT
+#define NEED_DATATYPESTRING 1
+#define NEED_IS_BIT_TYPE_CHAR 1
+#define NEED_IS_BIT_TYPE_INT 1
+#define NEED_IS_BOOL_TYPE_CHAR 1
+#define NEED_IS_BOOL_TYPE_INT 1
+#define NEED_IS_FLOAT_TYPE_CHAR 1
+#define NEED_IS_FLOAT_TYPE_INT 1
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_NUMBER_TYPE_INT 1
+#define NEED_IS_BLOB_TYPE_CHAR 1
+#define NEED_IS_BLOB_TYPE_INT 1
+#define NEED_IS_UNSIGNED_TYPE_CHAR 1
+#define NEED_IS_UNSIGNED_TYPE_INT 1
+#define NEED_IS_BINARY_TYPE_CHAR 1
+#define NEED_IS_BINARY_TYPE_INT 1
+#define NEED_IS_DATETIME_TYPE_CHAR 1
+#define NEED_IS_DATETIME_TYPE_INT 1
 #include <datatypes.h>
-#define NEED_CONVERT_DATE_TIME
+#define NEED_CONVERT_DATE_TIME 1
 #include <parsedatetime.h>
-#include <countbindvariables.h>
+#define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_AFTER_BIND_VARIABLE 1
+#define NEED_COUNT_BIND_VARIABLES 1
+#include <bindvariables.h>
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
@@ -3367,7 +3370,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 			// if we find whitespace or a couple of other things
 			// then the next thing could be a bind variable
-			if (character::inSet(*c," \t\n\r=<>,(+-*/%|&!~^")) {
+			if (beforeBindVariable(c)) {
 				parsestate=BEFORE_BIND;
 			}
 
@@ -3379,6 +3382,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 		// copy anything in quotes verbatim
 		if (parsestate==IN_QUOTES) {
+			// FIXME: handle escaped quotes
 			if (*c=='\'') {
 				parsestate=IN_QUERY;
 			}
@@ -3413,10 +3417,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			// If we find whitespace or a few other things
 			// then we're done with the bind variable.  Process it.
 			// Otherwise get the variable itself in another buffer.
-			bool	endofbind=(character::isWhitespace(*c) ||
-						*c==',' || *c==')' ||
-						*c==';' || *c=='=' ||
-						(*c==':' && *(c+1)=='='));
+			bool	endofbind=afterBindVariable(c);
 			if (endofbind || c==endptr) {
 
 				// special case if we hit the end of the string

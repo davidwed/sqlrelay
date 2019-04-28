@@ -2,15 +2,29 @@
 // See the file COPYING for more information
 #ifndef COUNT_BIND_VARIABLES_H
 #define COUNT_BIND_VARIABLES_H
+#include <rudiments/character.h>
 
+#ifdef NEED_BEFORE_BIND_VARIABLE
+static bool beforeBindVariable(const char *c) {
+	return character::inSet(*c," \t\n\r=<>,(+-*/%|&!~^");
+}
+#endif
+
+#ifdef NEED_AFTER_BIND_VARIABLE
+static bool afterBindVariable(const char *c) {
+	return (character::inSet(*c," \t\n\r,);=") || (*c==':' && *(c+1)=='='));
+}
+#endif
+
+#ifdef NEED_COUNT_BIND_VARIABLES
 static uint16_t countBindVariables(const char *query) {
 
 	if (!query) {
 		return 0;
 	}
 
-	char	lastchar='\0';
-	bool	inquotes=false;
+	const char	*prevptr="\0";
+	bool		inquotes=false;
 
 	uint16_t	questionmarkcount=0;
 	uint16_t	coloncount=0;
@@ -19,25 +33,22 @@ static uint16_t countBindVariables(const char *query) {
 
 	for (const char *ptr=query; *ptr; ptr++) {
 
-		if (*ptr=='\'' && lastchar!='\\') {
-			if (inquotes) {
-				inquotes=false;
-			} else {
-				inquotes=true;
-			}
+		// are we inside of quotes?
+		if (*ptr=='\'' && (*prevptr!='\\' && *prevptr!='\'')) {
+			inquotes=!inquotes;
 		}
 
-		// If we're not inside of a quoted string and we run into
-		// a ?, : (for oracle-style binds), @ (for sap/sybase-style
-		// binds) or $ (for postgresql-style binds) and the previous
+		// If we're not inside of a quoted string and the previous
 		// character was something that might come before a bind
-		// variable then we must have found a bind variable.
-		// count ?, :, @, $ separately
+		// variable and we run into a ?, : (for oracle-style binds),
+		// @ (for sap/sybase-style binds) or $ (for postgresql-style
+		// binds) then we must have found a bind variable.
+		//
+		// Count ?, :, @, $ separately.
 		//
 		// (make sure to catch :'s but not :='s)
 		// (make sure to catch @'s but not @@'s)
-		if (!inquotes &&
-			character::inSet(lastchar," \t\n\r=<>,(+-*/%|&!~^")) {
+		if (!inquotes && beforeBindVariable(prevptr)) {
 			if (*ptr=='?') {
 				questionmarkcount++;
 			} else if (*ptr==':' && *(ptr+1)!='=') {
@@ -49,7 +60,7 @@ static uint16_t countBindVariables(const char *query) {
 			}
 		}
 
-		lastchar=*ptr;
+		prevptr=ptr;
 	}
 
 	// if we got $'s or ?'s, ignore the :'s or @'s
@@ -67,5 +78,6 @@ static uint16_t countBindVariables(const char *query) {
 	}
 	return 0;
 }
+#endif
 
 #endif

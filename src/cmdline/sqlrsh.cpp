@@ -18,10 +18,10 @@
 #include <rudiments/prompt.h>
 #include <config.h>
 #include <defaults.h>
-#define NEED_IS_BIT_TYPE_CHAR
-#define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_FLOAT_TYPE_CHAR
-#define NEED_IS_NONSCALE_FLOAT_TYPE_CHAR
+#define NEED_IS_BIT_TYPE_CHAR 1
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_FLOAT_TYPE_CHAR 1
+#define NEED_IS_NONSCALE_FLOAT_TYPE_CHAR 1
 #include <datatypes.h>
 #include <defines.h>
 #include <parsedatetime.h>

@@ -10,13 +10,15 @@
 #endif
 
 #include <config.h>
-#define NEED_IS_BIT_TYPE_CHAR
-#define NEED_IS_BOOL_TYPE_CHAR
-#define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_FLOAT_TYPE_CHAR
-#define NEED_IS_BLOB_TYPE_CHAR
+#define NEED_IS_BIT_TYPE_CHAR 1
+#define NEED_IS_BOOL_TYPE_CHAR 1
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_FLOAT_TYPE_CHAR 1
+#define NEED_IS_BLOB_TYPE_CHAR 1
 #include <datatypes.h>
 #include <defines.h>
+#define NEED_AFTER_BIND_VARIABLE 1
+#include <bindvariables.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/singlylinkedlist.h>
@@ -935,30 +937,31 @@ static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
 static void sqlrconnectionRewriteQuery(const char *query,
 						uint32_t querylen,
 						stringbuffer *newquery) {
+	const char	*prevptr="\0";
 	bool		inquotes=false;
 	bool		inbind=false;
 	uint16_t	varcounter=0;
 
 	for (const char *c=query; *c; c++) {
 
-		if (*c=='\'') {
+		if (*c=='\'' && (*prevptr!='\\' && *prevptr!='\'')) {
 			inquotes=!inquotes;
 		}
 
 		if (!inquotes) {
 
-			if (inbind && (character::isWhitespace(*c) ||
-						character::inSet(*c,",);:="))) {
+			if (inbind && afterBindVariable(c)) {
 				newquery->append(')');
 				inbind=false;
 			}
 
-			// catch ? and $
-			// also catch : but not :=
-			// also catch @ but not @@
-			if (character::inSet(*c,"?$") ||
-					(*c==':' && *(c+1)!='=') ||
-					(*c=='@' && *(c+1)!='@')) {
+			// catch ?, :, @, and $
+			// (make sure to catch :'s but not :='s)
+			// (make sure to catch @'s but not @@'s)
+			if (*c=='?' ||
+				(*c==':' && *(c+1)!='=') ||
+				(*c=='@' && *(c+1)!='@') ||
+				*c=='$') {
 				newquery->append("$(");
 				if (*c=='?') {
 					newquery->append(varcounter);
@@ -966,11 +969,13 @@ static void sqlrconnectionRewriteQuery(const char *query,
 				} else {
 					inbind=true;
 				}
+				prevptr=c;
 				continue;
 			}
 		}
 
 		newquery->append(*c);
+		prevptr=c;
 	}
 }
 

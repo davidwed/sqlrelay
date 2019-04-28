@@ -13,9 +13,12 @@
 #include <rudiments/filesystem.h>
 #include <rudiments/error.h>
 #include <defines.h>
-#define NEED_DATATYPESTRING
+#define NEED_DATATYPESTRING 1
 #include <datatypes.h>
-#include <countbindvariables.h>
+#define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_AFTER_BIND_VARIABLE 1
+#define NEED_COUNT_BIND_VARIABLES 1
+#include <bindvariables.h>
 
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN 256
@@ -2362,11 +2365,7 @@ void sqlrcursor::performSubstitutions() {
 		// figure out whether we're inside a quoted 
 		// string or not
 		if (*ptr=='\'' && *(ptr-1)!='\\') {
-			if (inquotes) {
-				inquotes=false;
-			} else {
-				inquotes=true;
-			}
+			inquotes=!inquotes;
 		}
 	
 		// if we find an open-brace then start 
@@ -2531,13 +2530,12 @@ void sqlrcursor::validateBindsInternal() {
 					(*pvt->_inbindvars)[in].variable))) {
 
 			// for a match to be a bind variable, it must be 
-			// preceded by a colon or at-sign and can't be followed
-			// by an alphabet character, number or underscore
+			// preceded by a bind delimiter and followed by a
+			// valid character
 			after=ptr+len;
-			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
-				!(*(after)>='a' && *(after)<='z') &&
-				!(*(after)>='A' && *(after)<='Z') &&
-				!(*(after)>='0' && *(after)<='9')) {
+			if ((*(ptr-1)=='?' || *(ptr-1)==':' ||
+				*(ptr-1)=='@' || *(ptr-1)=='$') &&
+				afterBindVariable(after)) {
 				found=true;
 				break;
 			} else {
@@ -2574,10 +2572,9 @@ void sqlrcursor::validateBindsInternal() {
 			// preceded by a colon and can't be followed by an
 			// alphabet character, number or underscore
 			after=ptr+len;
-			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
-				!(*(after)>='a' && *(after)<='z') &&
-				!(*(after)>='A' && *(after)<='Z') &&
-				!(*(after)>='0' && *(after)<='9')) {
+			if ((*(ptr-1)=='?' || *(ptr-1)==':' ||
+				*(ptr-1)=='@' || *(ptr-1)=='$') &&
+				afterBindVariable(after)) {
 				found=true;
 				break;
 			} else {
@@ -2616,10 +2613,9 @@ void sqlrcursor::validateBindsInternal() {
 			// preceded by a colon and can't be followed by an
 			// alphabet character, number or underscore
 			after=ptr+len;
-			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
-				!(*(after)>='a' && *(after)<='z') &&
-				!(*(after)>='A' && *(after)<='Z') &&
-				!(*(after)>='0' && *(after)<='9')) {
+			if ((*(ptr-1)=='?' || *(ptr-1)==':' ||
+				*(ptr-1)=='@' || *(ptr-1)=='$') &&
+				afterBindVariable(after)) {
 				found=true;
 				break;
 			} else {
