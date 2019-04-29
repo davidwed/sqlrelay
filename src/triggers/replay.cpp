@@ -2,6 +2,7 @@
 // All rights reserved
 
 #include <sqlrelay/sqlrserver.h>
+#include <rudiments/character.h>
 #include <rudiments/snooze.h>
 
 class querydetails {
@@ -43,6 +44,34 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		bool	replayLog(sqlrservercursor *sqlrcur);
 		bool	replayCondition(sqlrservercursor *sqlrcur);
 
+
+		void	copyQuery(sqlrservercursor *sqlrcur,
+						querydetails *qd);
+		void	copyQuery(querydetails *qd,
+					const char *query,
+					uint32_t querylen);
+		void	getQueryType(const char *query,
+					uint32_t querylen,
+					bool *isinsert,
+					bool *isinsertselect,
+					bool *isselectinto,
+					bool *ismultiinsert);
+		void	getColumns(const char *query,
+					uint32_t querylen,
+					linkedlist<char *> *columns,
+					const char **autoinccolumn);
+		void	rewriteQuery(querydetails *qd,
+					const char *query,
+					uint32_t querylen,
+					uint64_t liid,
+					linkedlist<char *> *columns,
+					const char *autoinccolumn);
+		uint64_t	countValues(const char *values);
+		void		appendValues(stringbuffer *newquery,
+						const char *values,
+						char **cols,
+						uint64_t liid,
+						const char *autoinccolumn);
 
 		void	copyBind(memorypool *pool,
 					sqlrserverbindvar *dest,
@@ -112,11 +141,11 @@ bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
 						bool before,
 						bool *success) {
 	if (before) {
-		return logQuery(sqlrcur);
-	} else {
-		*success=replayLog(sqlrcur);
-		return *success;
+		return true;
 	}
+
+	*success=(logQuery(sqlrcur) && replayLog(sqlrcur));
+	return *success;
 }
 
 bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
@@ -144,11 +173,8 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 	querydetails	*qd=new querydetails;
 
-	// copy the query itself (make sure to null terminate)
-	qd->querylen=sqlrcur->getQueryLength();
-	qd->query=(char *)logpool.allocate(qd->querylen+1);
-	bytestring::copy(qd->query,sqlrcur->getQueryBuffer(),qd->querylen);
-	qd->query[qd->querylen]='\0';
+	// copy the query itself
+	copyQuery(sqlrcur,qd);
 
 	// copy in input binds
 	uint16_t		incount=sqlrcur->getInputBindCount();
@@ -180,7 +206,394 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	// log copied query and binds
 	log.append(qd);
 
+stdoutput.printf("-----------------------\n");
+for (linkedlistnode<querydetails *> *node=log.getFirst();
+				node; node=node->getNext()) {
+	stdoutput.printf("%s\n",node->getValue()->query);
+}
 	return true;
+}
+
+void sqlrtrigger_replay::copyQuery(sqlrservercursor *sqlrcur,
+						querydetails *qd) {
+
+	const char	*query=sqlrcur->getQueryBuffer();
+	uint32_t	querylen=sqlrcur->getQueryLength();
+
+	// get query type
+	bool	isinsert=false;
+	bool	isinsertselect=false;
+	bool	isselectinto=false;
+	bool	ismultiinsert=false;
+	getQueryType(query,querylen,
+			&isinsert,&isinsertselect,
+			&isselectinto,&ismultiinsert);
+
+	// FIXME: suppprt insert select, select into, and multi-insert
+	if (isinsert) {
+
+		// get last insert id
+		// (get it here because getColumns() below will reset it)
+		uint64_t	liid=0;
+		cont->getLastInsertId(&liid);
+
+		// get columns
+		linkedlist<char *>	columns;
+		const char 		*autoinccolumn=NULL;
+		getColumns(query,querylen,&columns,&autoinccolumn);
+
+		if (!liid || !autoinccolumn) {
+
+			// If there was no last-insert-id or auto-increment
+			// column then we don't actually have to rewrite
+			// anything.  Just do a normal copy.
+			copyQuery(qd,query,querylen);
+
+		} else {
+
+			rewriteQuery(qd,query,querylen,
+					liid,&columns,autoinccolumn);
+		}
+
+		// clean up
+		columns.clearAndDelete();
+
+	} else {
+		copyQuery(qd,query,querylen);
+	}
+}
+
+void sqlrtrigger_replay::copyQuery(querydetails *qd,
+					const char *query,
+					uint32_t querylen) {
+
+	// copy query verbatim
+	qd->querylen=querylen;
+	qd->query=(char *)logpool.allocate(querylen+1);
+	bytestring::copy(qd->query,query,querylen);
+	// (make sure to null terminate)
+	qd->query[querylen]='\0';
+}
+
+void sqlrtrigger_replay::getQueryType(const char *query,
+					uint32_t querylen,
+					bool *isinsert,
+					bool *isinsertselect,
+					bool *isselectinto,
+					bool *ismultiinsert) {
+	*isinsert=false;
+	*isinsertselect=false;
+	*isselectinto=false;
+	*ismultiinsert=false;
+
+	const char	*start=cont->skipWhitespaceAndComments(query);
+
+	// FIXME: assumes normalized query...
+
+	if (querylen>12 && !charstring::compare(start,"insert into ",12)) {
+
+		*isinsert=true;
+
+		// FIXME: detect "INSERT ... SELECT ..."
+
+		// FIXME: detect multi-insert
+
+	} else if (querylen>7 && !charstring::compare(start,"select ",7)) {
+
+		// FIXME: detect "SELECT ... INTO ..."
+	}
+}
+
+void sqlrtrigger_replay::getColumns(const char *query,
+					uint32_t querylen,
+					linkedlist<char *> *columns,
+					const char **autoinccolumn) {
+
+	*autoinccolumn=NULL;
+
+	// get table name...
+	const char	*start=cont->skipWhitespaceAndComments(query)+12;
+	const char	*end=charstring::findFirst(start,' ');
+	if (!end) {
+		return;
+	}
+	char	*table=charstring::duplicate(start,end-start);
+
+	// get columns
+	sqlrservercursor        *gclcur=cont->newCursor();
+	if (cont->open(gclcur)) {
+
+		bool	retval=false;
+		if (cont->getListsByApiCalls()) {
+			cont->setColumnListColumnMap(
+					SQLRSERVERLISTFORMAT_MYSQL);
+			retval=cont->getColumnList(gclcur,table,NULL);
+		} else {
+			const char	*q=
+				cont->getColumnListQuery(table,false);
+			// FIXME: clean up buffers to avoid SQL injection
+			// FIXME: bounds checking
+			char	*querybuffer=cont->getQueryBuffer(gclcur);
+			charstring::printf(querybuffer,
+					cont->getConfig()->getMaxQuerySize()+1,
+					q,table);
+			cont->setQueryLength(gclcur,
+					charstring::length(querybuffer));
+			retval=cont->prepareQuery(gclcur,
+					cont->getQueryBuffer(gclcur),
+					cont->getQueryLength(gclcur),
+					false,false,false) &&
+				cont->executeQuery(gclcur,
+					false,false,false,false);
+		}
+		if (retval) {
+
+			bool    error;
+			while (cont->fetchRow(gclcur,&error)) {
+
+				const char	*column;
+				const char	*extra;
+				uint64_t	fieldlength;
+				bool		blob;
+				bool		null;
+				cont->getField(gclcur,0,&column,
+						&fieldlength,&blob,&null);
+				cont->getField(gclcur,8,&extra,
+						&fieldlength,&blob,&null);
+
+				char	*dup=charstring::duplicate(column);
+				columns->append(dup);
+				if (charstring::contains(extra,
+							"auto_increment")) {
+					*autoinccolumn=dup;
+				}
+
+				// FIXME: kludgy
+				cont->nextRow(gclcur);
+			}
+		}
+	}
+	cont->closeResultSet(gclcur);
+	cont->close(gclcur);
+	cont->deleteCursor(gclcur);
+}
+
+void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
+						const char *query,
+						uint32_t querylen,
+						uint64_t liid,
+						linkedlist<char *> *columns,
+						const char *autoinccolumn) {
+	stringbuffer	newquery;
+
+	// did the query contain column names?
+
+	// skip to the start of the query
+	const char	*start=cont->skipWhitespaceAndComments(query);
+
+	// skip to table name
+	const char	*table=start+12;
+
+	// skip to either "(" before columns or "values"
+	const char	*colsstart=charstring::findFirst(table,' ')+1;
+
+	// skip to first value (after ") values (")
+	const char	*values=charstring::findFirst(colsstart,"values (")+8;
+
+	// append up to the columns
+	newquery.append(start,colsstart-start);
+
+	char		**cols=NULL;
+	uint64_t	colcount=0;
+
+	if (*colsstart!='(') {
+
+		// count values
+		colcount=countValues(values);
+
+		// create "cols" from "columns"
+		cols=new char *[colcount];
+		linkedlistnode<char *>	*node=columns->getFirst();
+		for (uint64_t i=0; i<colcount; i++) {
+			cols[i]=charstring::duplicate(node->getValue());
+			node=node->getNext();
+		}
+
+	} else {
+
+		// parse columns
+		const char	*colsend=charstring::findFirst(colsstart,')');
+		char		*colscopy=
+				charstring::duplicate(colsstart+1,
+							colsend-colsstart-1);
+		charstring::split(colscopy,",",true,&cols,&colcount);
+		delete[] colscopy;
+	}
+
+	// does the column list contain the autoincrement column?
+	bool	columnsincludeautoinccolumn=false;
+	for (uint64_t i=0; i<colcount; i++) {
+		if (!charstring::compare(cols[i],autoinccolumn)) {
+			columnsincludeautoinccolumn=true;
+		}
+	}
+
+	// append columns
+	newquery.append('(');
+	if (!columnsincludeautoinccolumn) {
+		newquery.append(autoinccolumn)->append(',');
+	}
+	for (uint64_t i=0; i<colcount; i++) {
+		if (i) {
+			newquery.append(',');
+		}
+		newquery.append(cols[i]);
+	}
+
+	// append values
+	newquery.append(") values (");
+	if (!columnsincludeautoinccolumn) {
+		newquery.append(liid)->append(',')->append(values);
+	} else {
+		appendValues(&newquery,values,cols,liid,autoinccolumn);
+	}
+
+	// clean up
+	for (uint64_t i=0; i<colcount; i++) {
+		delete[] cols[i];
+	}
+	delete[] cols;
+
+	// copy out the rewritten query
+	copyQuery(qd,newquery.getString(),newquery.getStringLength());
+}
+
+uint64_t sqlrtrigger_replay::countValues(const char *values) {
+
+	uint64_t	valuecount=0;
+	const char	*c=values;
+	char		prevc='\0';
+	bool		inquotes=false;
+	uint32_t	parens=0;
+	for (;;) {
+
+		// handle quotes...
+		if (*c=='\'' && prevc!='\\' && prevc!='\'') {
+			inquotes=!inquotes;
+		}
+
+		if (!inquotes) {
+
+			// handle parentheses...
+			if (*c=='(') {
+				parens++;
+			} else if (parens && *c==')') {
+				parens--;
+			} else {
+				// bump the value count if we found a comma
+				if (*c==',') {
+					valuecount++;
+				}
+			}
+		}
+
+		// keep going
+		prevc=*c;
+		c++;
+		if (!inquotes && !parens && *c==')') {
+			valuecount++;
+			break;
+		}
+	}
+
+	return valuecount;
+}
+
+void sqlrtrigger_replay::appendValues(stringbuffer *newquery,
+						const char *values,
+						char **cols,
+						uint64_t liid,
+						const char *autoinccolumn) {
+
+	stringbuffer	value;
+	uint64_t	valueindex=0;
+	const char	*c=values;
+	char		prevc='\0';
+	bool		inquotes=false;
+	uint32_t	parens=0;
+	for (;;) {
+
+		// handle quotes...
+		if (*c=='\'' && prevc!='\\' && prevc!='\'') {
+			inquotes=!inquotes;
+		}
+
+		if (!inquotes) {
+
+			// handle parentheses...
+			if (*c=='(') {
+				parens++;
+				value.append(*c);
+			} else if (parens && *c==')') {
+				parens--;
+				value.append(*c);
+			} else {
+				if (*c==',') {
+
+					// if the value was a null and this is
+					// the autoincrement column, then
+					// append the last-insert-id,
+					// otherwise just append the value
+					if (!charstring::compare(
+							cols[valueindex],
+							autoinccolumn) &&
+						!charstring::compare(
+							value.getString(),
+							"null")) {
+						newquery->append(liid);
+					} else {
+						newquery->append(
+							value.getString());
+					}
+
+					// append the comma
+					newquery->append(',');
+
+					valueindex++;
+					value.clear();
+				} else {
+					value.append(*c);
+				}
+			}
+		} else {
+			value.append(*c);
+		}
+
+		// keep going
+		prevc=*c;
+		c++;
+		if (!inquotes && !parens && *c==')') {
+
+			// if the value was a null and this is
+			// the autoincrement column, then
+			// append the last-insert-id,
+			// otherwise just append the value
+			if (!charstring::compare(cols[valueindex],
+							autoinccolumn) &&
+				!charstring::compare(value.getString(),
+								"null")) {
+				newquery->append(liid);
+			} else {
+				newquery->append(
+					value.getString());
+			}
+
+			// append the )
+			newquery->append(')');
+
+			return;
+		}
+	}
 }
 
 void sqlrtrigger_replay::copyBind(memorypool *pool,
