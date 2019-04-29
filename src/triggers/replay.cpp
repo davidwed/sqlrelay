@@ -206,11 +206,11 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	// log copied query and binds
 	log.append(qd);
 
-stdoutput.printf("-----------------------\n");
+/*stdoutput.printf("-----------------------\n");
 for (linkedlistnode<querydetails *> *node=log.getFirst();
 				node; node=node->getNext()) {
 	stdoutput.printf("%s\n",node->getValue()->query);
-}
+}*/
 	return true;
 }
 
@@ -682,7 +682,7 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 		cont->clearError();
 		cont->clearError(sqlrcur);
 
-		if (replaytx) {
+		/*if (replaytx) {
 
 			// roll back the current transaction
 			if (debug) {
@@ -715,7 +715,7 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 			if (debug) {
 				stdoutput.printf("	}\n");
 			}
-		}
+		}*/
 
 		// get the bind pool
 		memorypool	*pool=cont->getBindPool(sqlrcur);
