@@ -11,6 +11,7 @@
 #include <datatypes.h>
 #include <defines.h>
 #define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_IS_BIND_DELIMITER 1
 #include <bindvariables.h>
 
 class sqlrservercursorprivate {
@@ -835,12 +836,18 @@ bool sqlrservercursor::fakeInputBinds() {
 			inquotes=!inquotes;
 		}
 
-		// look for a bind var prefix or ? if not inside of quotes
-		if (!inquotes && beforeBindVariable(prevptr) &&
-					(*ptr=='?' ||
-					(*ptr==':' && *(ptr+1)!='=') ||
-					(*ptr=='@' && *(ptr+1)!='@') ||
-					*ptr=='$')) {
+		// look for a bind var prefix
+		if (!inquotes &&
+			beforeBindVariable(prevptr) &&
+			isBindDelimiter(ptr,
+			conn->cont->getConfig()->
+			getBindVariableDelimiterQuestionMarkSupported(),
+			conn->cont->getConfig()->
+			getBindVariableDelimiterColonSupported(),
+			conn->cont->getConfig()->
+			getBindVariableDelimiterAtSignSupported(),
+			conn->cont->getConfig()->
+			getBindVariableDelimiterDollarSignSupported())) {
 
 			// look through the list of vars
 			for (int16_t i=0; i<pvt->_inbindcount; i++) {
@@ -927,7 +934,12 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 	if (pvt->_inbindvars[index].type==SQLRSERVERBINDVARTYPE_STRING ||
 		pvt->_inbindvars[index].type==SQLRSERVERBINDVARTYPE_CLOB) {
 
-		buffer->append("'");
+		if (conn->cont->getConfig()->
+			getFakeInputBindVariablesUnicodeStrings()) {
+			buffer->append('N');
+		}
+
+		buffer->append('\'');
 
 		size_t	length=pvt->_inbindvars[index].valuesize;
 
@@ -947,7 +959,7 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 			buffer->append(ch);
 		}
 
-		buffer->append("'");
+		buffer->append('\'');
 
 	} else if (pvt->_inbindvars[index].type==
 				SQLRSERVERBINDVARTYPE_BLOB) {

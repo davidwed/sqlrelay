@@ -3,6 +3,10 @@
 	integrated my_bool fix for mysql 8.0.1+
 	mysql sslmode=require/prefer + bad sslca/sslcapath generates warning
 		rather than error now (like the mysql cli)
+	refactored various routines that parse bind variables out of queries
+	added bindvariabledelimiters config option to define supported bind
+		variable delimiters
+	added fakeinputbindvariablesunicodestrings config option
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

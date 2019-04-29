@@ -17,6 +17,7 @@
 #define NEED_IS_BLOB_TYPE_CHAR 1
 #include <datatypes.h>
 #include <defines.h>
+#define NEED_IS_BIND_DELIMITER 1
 #define NEED_AFTER_BIND_VARIABLE 1
 #include <bindvariables.h>
 #include <sqlrelay/sqlrclient.h>
@@ -955,13 +956,7 @@ static void sqlrconnectionRewriteQuery(const char *query,
 				inbind=false;
 			}
 
-			// catch ?, :, @, and $
-			// (make sure to catch :'s but not :='s)
-			// (make sure to catch @'s but not @@'s)
-			if (*c=='?' ||
-				(*c==':' && *(c+1)!='=') ||
-				(*c=='@' && *(c+1)!='@') ||
-				*c=='$') {
+			if (isBindDelimiter(c,true,true,true,true)) {
 				newquery->append("$(");
 				if (*c=='?') {
 					newquery->append(varcounter);

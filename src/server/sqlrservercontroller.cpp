@@ -50,6 +50,7 @@
 #define NEED_CONVERT_DATE_TIME 1
 #include <parsedatetime.h>
 #define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_IS_BIND_DELIMITER 1
 #define NEED_AFTER_BIND_VARIABLE 1
 #define NEED_COUNT_BIND_VARIABLES 1
 #include <bindvariables.h>
@@ -135,6 +136,10 @@ class sqlrservercontrollerprivate {
 
 	bool		_fakeinputbinds;
 	bool		_translatebinds;
+	bool		_questionmarksupported;
+	bool		_colonsupported;
+	bool		_atsignsupported;
+	bool		_dollarsignsupported;
 
 	const char	*_isolationlevel;
 
@@ -330,6 +335,10 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_fakeinputbinds=false;
 	pvt->_translatebinds=false;
+	pvt->_questionmarksupported=true;
+	pvt->_colonsupported=true;
+	pvt->_atsignsupported=true;
+	pvt->_dollarsignsupported=true;
 
 	pvt->_isolationlevel=NULL;
 
@@ -753,6 +762,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get translate bind variable behavior
 	pvt->_translatebinds=pvt->_cfg->getTranslateBindVariables();
+	pvt->_questionmarksupported=
+		pvt->_cfg->getBindVariableDelimiterQuestionMarkSupported();
+	pvt->_colonsupported=
+		pvt->_cfg->getBindVariableDelimiterColonSupported();
+	pvt->_atsignsupported=
+		pvt->_cfg->getBindVariableDelimiterAtSignSupported();
+	pvt->_dollarsignsupported=
+		pvt->_cfg->getBindVariableDelimiterDollarSignSupported();
 	pvt->_debugbindtranslation=pvt->_cfg->getDebugBindTranslations();
 
 	// initialize cursors
@@ -3146,11 +3163,19 @@ const char *sqlrservercontroller::asciiToOctal(unsigned char ch) {
 }
 
 bool sqlrservercontroller::hasBindVariables(const char *query) {
-	return ::countBindVariables(query);
+	return ::countBindVariables(query,
+				pvt->_questionmarksupported,
+				pvt->_colonsupported,
+				pvt->_atsignsupported,
+				pvt->_dollarsignsupported);
 }
 
 uint16_t sqlrservercontroller::countBindVariables(const char *query) {
-	return ::countBindVariables(query);
+	return ::countBindVariables(query,
+				pvt->_questionmarksupported,
+				pvt->_colonsupported,
+				pvt->_atsignsupported,
+				pvt->_dollarsignsupported);
 }
 
 bool sqlrservercontroller::isBitType(const char *type) {
@@ -3314,13 +3339,6 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	return true;
 }
 
-enum queryparsestate_t {
-	IN_QUERY=0,
-	IN_QUOTES,
-	BEFORE_BIND,
-	IN_BIND
-};
-
 void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 	// clear bind mappings
@@ -3394,12 +3412,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 		if (parsestate==BEFORE_BIND) {
 
 			// if we find a bind variable...
-			// (make sure to catch :'s but not :='s)
-			// (make sure to catch @'s but not @@'s)
-			if (*c=='?' ||
-				(*c==':' && *(c+1)!='=') ||
-				(*c=='@' && *(c+1)!='@') ||
-				*c=='$') {
+			if (isBindDelimiter(c,
+					pvt->_questionmarksupported,
+					pvt->_colonsupported,
+					pvt->_atsignsupported,
+					pvt->_dollarsignsupported)) {
 				parsestate=IN_BIND;
 				currentbind.clear();
 				continue;

@@ -141,8 +141,14 @@
 // default fake input bind variables attribute
 #define	DEFAULT_FAKEINPUTBINDVARIABLES "no"
 
+// default fake input bind variables unicode strings attribute
+#define	DEFAULT_FAKEINPUTBINDVARIABLESUNICODESTRINGS "no"
+
 // default translate bind variables attribute
 #define	DEFAULT_TRANSLATEBINDVARIABLES "no"
+
+// default bind variable delimiters
+#define	DEFAULT_BINDVARIABLEDELIMITERS "?:@$"
 
 // default interval that the cachemanager will scan on
 #define DEFAULT_INTERVAL 30

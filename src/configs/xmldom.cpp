@@ -109,6 +109,11 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getReLoginAtStart();
 		bool		getFakeInputBindVariables();
 		const char	*getFakeInputBindVariablesDateFormat();
+		bool		getFakeInputBindVariablesUnicodeStrings();
+		bool		getBindVariableDelimiterQuestionMarkSupported();
+		bool		getBindVariableDelimiterColonSupported();
+		bool		getBindVariableDelimiterAtSignSupported();
+		bool		getBindVariableDelimiterDollarSignSupported();
 		bool		getTranslateBindVariables();
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
@@ -242,6 +247,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		reloginatstart;
 		bool		fakeinputbindvariables;
 		const char	*fakeinputbindvariablesdateformat;
+		bool		fakeinputbindvariablesunicodestrings;
+		const char	*bindvariabledelimiters;
+		bool		questionmarksupported;
+		bool		colonsupported;
+		bool		atsignsupported;
+		bool		dollarsignsupported;
 		bool		translatebindvariables;
 		const char	*isolationlevel;
 		bool		ignoreselectdb;
@@ -394,6 +405,13 @@ void sqlrconfig_xmldom::init() {
 	fakeinputbindvariables=!charstring::compare(
 					DEFAULT_FAKEINPUTBINDVARIABLES,"yes");
 	fakeinputbindvariablesdateformat=NULL;
+	fakeinputbindvariablesunicodestrings=!charstring::compare(
+			DEFAULT_FAKEINPUTBINDVARIABLESUNICODESTRINGS,"yes");
+	bindvariabledelimiters=DEFAULT_BINDVARIABLEDELIMITERS;
+	questionmarksupported=charstring::contains(bindvariabledelimiters,'?');
+	colonsupported=charstring::contains(bindvariabledelimiters,':');
+	atsignsupported=charstring::contains(bindvariabledelimiters,'@');
+	dollarsignsupported=charstring::contains(bindvariabledelimiters,'$');
 	translatebindvariables=!charstring::compare(
 					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
 	isolationlevel=NULL;
@@ -719,6 +737,26 @@ bool sqlrconfig_xmldom::getFakeInputBindVariables() {
 
 const char *sqlrconfig_xmldom::getFakeInputBindVariablesDateFormat() {
 	return fakeinputbindvariablesdateformat;
+}
+
+bool sqlrconfig_xmldom::getFakeInputBindVariablesUnicodeStrings() {
+	return fakeinputbindvariablesunicodestrings;
+}
+
+bool sqlrconfig_xmldom::getBindVariableDelimiterQuestionMarkSupported() {
+	return questionmarksupported;
+}
+
+bool sqlrconfig_xmldom::getBindVariableDelimiterColonSupported() {
+	return colonsupported;
+}
+
+bool sqlrconfig_xmldom::getBindVariableDelimiterAtSignSupported() {
+	return atsignsupported;
+}
+
+bool sqlrconfig_xmldom::getBindVariableDelimiterDollarSignSupported() {
+	return dollarsignsupported;
 }
 
 bool sqlrconfig_xmldom::getTranslateBindVariables() {
@@ -1856,6 +1894,23 @@ void sqlrconfig_xmldom::getTreeValues() {
 	attr=instance->getAttribute("fakeinputbindvariablesdateformat");
 	if (!attr->isNullNode()) {
 		fakeinputbindvariablesdateformat=attr->getValue();
+	}
+	attr=instance->getAttribute("fakeinputbindvariablesunicodestrings");
+	if (!attr->isNullNode()) {
+		fakeinputbindvariablesunicodestrings=!charstring::compare(
+						attr->getValue(),"yes");
+	}
+	attr=instance->getAttribute("bindvariabledelimiters");
+	if (!attr->isNullNode()) {
+		bindvariabledelimiters=attr->getValue();
+		questionmarksupported=charstring::contains(
+						bindvariabledelimiters,'?');
+		colonsupported=charstring::contains(
+						bindvariabledelimiters,':');
+		atsignsupported=charstring::contains(
+						bindvariabledelimiters,'@');
+		dollarsignsupported=charstring::contains(
+						bindvariabledelimiters,'$');
 	}
 	attr=instance->getAttribute("translatebindvariables");
 	if (!attr->isNullNode()) {

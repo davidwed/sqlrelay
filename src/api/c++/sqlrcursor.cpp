@@ -16,6 +16,7 @@
 #define NEED_DATATYPESTRING 1
 #include <datatypes.h>
 #define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_IS_BIND_DELIMITER 1
 #define NEED_AFTER_BIND_VARIABLE 1
 #define NEED_COUNT_BIND_VARIABLES 1
 #include <bindvariables.h>
@@ -1337,7 +1338,7 @@ void sqlrcursor::attachToBindCursor(uint16_t bindcursorid) {
 }
 
 uint16_t sqlrcursor::countBindVariables() const {
-	return ::countBindVariables(pvt->_queryptr);
+	return ::countBindVariables(pvt->_queryptr,true,true,true,true);
 }
 
 void sqlrcursor::clearVariables() {

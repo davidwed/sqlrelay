@@ -217,6 +217,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual bool		getFakeInputBindVariables()=0;
 		virtual const char	*getFakeInputBindVariablesDateFormat()=0;
+		virtual bool		getFakeInputBindVariablesUnicodeStrings()=0;
+		virtual bool		getBindVariableDelimiterQuestionMarkSupported()=0;
+		virtual bool		getBindVariableDelimiterColonSupported()=0;
+		virtual bool		getBindVariableDelimiterAtSignSupported()=0;
+		virtual bool		getBindVariableDelimiterDollarSignSupported()=0;
+
 		virtual bool		getTranslateBindVariables()=0;
 
 		virtual const char	*getIsolationLevel()=0;

@@ -4,9 +4,29 @@
 #define COUNT_BIND_VARIABLES_H
 #include <rudiments/character.h>
 
+enum queryparsestate_t {
+	IN_QUERY=0,
+	IN_QUOTES,
+	BEFORE_BIND,
+	IN_BIND
+};
+
 #ifdef NEED_BEFORE_BIND_VARIABLE
 static bool beforeBindVariable(const char *c) {
 	return character::inSet(*c," \t\n\r=<>,(+-*/%|&!~^");
+}
+#endif
+
+#ifdef NEED_IS_BIND_DELIMITER
+static bool isBindDelimiter(const char *c,
+				bool questionmark,
+				bool colon,
+				bool atsign,
+				bool dollarsign) {
+	return (questionmark && *c=='?') ||
+		(colon && *c==':' && *(c+1)!='=') ||
+		(atsign && *c=='@' && *(c+1)!='@') ||
+		(dollarsign && *c=='$');
 }
 #endif
 
@@ -17,7 +37,11 @@ static bool afterBindVariable(const char *c) {
 #endif
 
 #ifdef NEED_COUNT_BIND_VARIABLES
-static uint16_t countBindVariables(const char *query) {
+static uint16_t countBindVariables(const char *query,
+					bool questionmark,
+					bool colon,
+					bool atsign,
+					bool dollarsign) {
 
 	if (!query) {
 		return 0;
@@ -38,24 +62,18 @@ static uint16_t countBindVariables(const char *query) {
 			inquotes=!inquotes;
 		}
 
-		// If we're not inside of a quoted string and the previous
-		// character was something that might come before a bind
-		// variable and we run into a ?, : (for oracle-style binds),
-		// @ (for sap/sybase-style binds) or $ (for postgresql-style
-		// binds) then we must have found a bind variable.
-		//
-		// Count ?, :, @, $ separately.
-		//
-		// (make sure to catch :'s but not :='s)
-		// (make sure to catch @'s but not @@'s)
 		if (!inquotes && beforeBindVariable(prevptr)) {
-			if (*ptr=='?') {
+			if (questionmark && isBindDelimiter(
+						ptr,true,false,false,false)) {
 				questionmarkcount++;
-			} else if (*ptr==':' && *(ptr+1)!='=') {
+			} else if (colon && isBindDelimiter(
+						ptr,false,true,false,false)) {
 				coloncount++;
-			} else if (*ptr=='@' && *(ptr+1)!='@') {
+			} else if (atsign && isBindDelimiter(
+						ptr,false,false,true,false)) {
 				atsigncount++;
-			} else if (*ptr=='$') {
+			} else if (dollarsign && isBindDelimiter(
+						ptr,false,false,false,true)) {
 				dollarsigncount++;
 			}
 		}
