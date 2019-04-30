@@ -73,6 +73,28 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 						int32_t *timeoutusec);
 
 
+		/** Sets which delimiters are used to identify bind variables
+		 *  in countBindVariables() and validateBinds().  Valid
+		 *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+		void	setBindVariableDelimiters(const char *delimiters);
+
+		/** Returns true if question marks (?) are considered to be
+		 *  valid bind variable delimiters. */
+		bool	getBindVariableDelimiterQuestionMarkSupported();
+
+		/** Returns true if colons (:) are considered to be
+		 *  valid bind variable delimiters. */
+		bool	getBindVariableDelimiterColonSupported();
+
+		/** Returns true if at-signs (@) are considered to be
+		 *  valid bind variable delimiters. */
+		bool	getBindVariableDelimiterAtSignSupported();
+
+		/** Returns true if dollar signs ($) are considered to be
+		 *  valid bind variable delimiters. */
+		bool	getBindVariableDelimiterDollarSignSupported();
+
+
 
 		/** Enables Kerberos authentication and encryption.
 		 *

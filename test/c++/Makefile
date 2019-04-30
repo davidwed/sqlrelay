@@ -87,3 +87,6 @@ krb: krb.cpp krb.$(OBJ)
 
 tls: tls.cpp tls.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tls.$(OBJ) $(CPPTESTLIBS)
+
+deadlockreplay: deadlockreplay.cpp deadlockreplay.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) deadlockreplay.$(OBJ) $(CPPTESTLIBS)

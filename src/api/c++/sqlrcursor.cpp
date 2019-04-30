@@ -1338,7 +1338,11 @@ void sqlrcursor::attachToBindCursor(uint16_t bindcursorid) {
 }
 
 uint16_t sqlrcursor::countBindVariables() const {
-	return ::countBindVariables(pvt->_queryptr,true,true,true,true);
+	return ::countBindVariables(pvt->_queryptr,
+		pvt->_sqlrc->getBindVariableDelimiterQuestionMarkSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterColonSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterAtSignSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterDollarSignSupported());
 }
 
 void sqlrcursor::clearVariables() {
@@ -2534,8 +2538,10 @@ void sqlrcursor::validateBindsInternal() {
 			// preceded by a bind delimiter and followed by a
 			// valid character
 			after=ptr+len;
-			if ((*(ptr-1)=='?' || *(ptr-1)==':' ||
-				*(ptr-1)=='@' || *(ptr-1)=='$') &&
+			if ((*(ptr-1)=='?' ||
+				*(ptr-1)==':' ||
+				*(ptr-1)=='@' ||
+				*(ptr-1)=='$') &&
 				afterBindVariable(after)) {
 				found=true;
 				break;
@@ -2573,8 +2579,10 @@ void sqlrcursor::validateBindsInternal() {
 			// preceded by a colon and can't be followed by an
 			// alphabet character, number or underscore
 			after=ptr+len;
-			if ((*(ptr-1)=='?' || *(ptr-1)==':' ||
-				*(ptr-1)=='@' || *(ptr-1)=='$') &&
+			if ((*(ptr-1)=='?' ||
+				*(ptr-1)==':' ||
+				*(ptr-1)=='@' ||
+				*(ptr-1)=='$') &&
 				afterBindVariable(after)) {
 				found=true;
 				break;
@@ -2614,8 +2622,10 @@ void sqlrcursor::validateBindsInternal() {
 			// preceded by a colon and can't be followed by an
 			// alphabet character, number or underscore
 			after=ptr+len;
-			if ((*(ptr-1)=='?' || *(ptr-1)==':' ||
-				*(ptr-1)=='@' || *(ptr-1)=='$') &&
+			if ((*(ptr-1)=='?' ||
+				*(ptr-1)==':' ||
+				*(ptr-1)=='@' ||
+				*(ptr-1)=='$') &&
 				afterBindVariable(after)) {
 				found=true;
 				break;

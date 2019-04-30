@@ -107,6 +107,12 @@ class sqlrconnectionprivate {
 		// bind format
 		char		*_bindformat;
 
+		// bind delimiters
+		bool		_questionmarksupported;
+		bool		_colonsupported;
+		bool		_atsignsupported;
+		bool		_dollarsignsupported;
+
 		// client info
 		char		*_clientinfo;
 		uint64_t	_clientinfolen;
@@ -225,6 +231,12 @@ void sqlrconnection::init(const char *server, uint16_t port,
 
 	// bind format
 	pvt->_bindformat=NULL;
+
+	// bind delimiters
+	pvt->_questionmarksupported=true;
+	pvt->_colonsupported=true;
+	pvt->_atsignsupported=true;
+	pvt->_dollarsignsupported=true;
 
 	// client info
 	pvt->_clientinfo=NULL;
@@ -2066,4 +2078,27 @@ bool sqlrconnection::isYes(const char *str) {
 
 bool sqlrconnection::isNo(const char *str) {
 	return charstring::isNo(str);
+}
+
+void sqlrconnection::setBindVariableDelimiters(const char *delimiters) {
+	pvt->_questionmarksupported=charstring::contains(delimiters,'?');
+	pvt->_colonsupported=charstring::contains(delimiters,':');
+	pvt->_atsignsupported=charstring::contains(delimiters,'@');
+	pvt->_dollarsignsupported=charstring::contains(delimiters,'$');
+}
+
+bool sqlrconnection::getBindVariableDelimiterQuestionMarkSupported() {
+	return pvt->_questionmarksupported;
+}
+
+bool sqlrconnection::getBindVariableDelimiterColonSupported() {
+	return pvt->_colonsupported;
+}
+
+bool sqlrconnection::getBindVariableDelimiterAtSignSupported() {
+	return pvt->_atsignsupported;
+}
+
+bool sqlrconnection::getBindVariableDelimiterDollarSignSupported() {
+	return pvt->_dollarsignsupported;
 }
