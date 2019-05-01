@@ -8,6 +8,7 @@
 		variable delimiters
 	added fakeinputbindvariablesunicodestrings config option
 	added bind variable delimiters config methods to c++ api
+	replay trigger updates
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
