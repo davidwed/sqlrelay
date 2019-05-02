@@ -9,7 +9,7 @@ Package: sqlrelay
 Section: libs
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, rudiments
-Description: C++ class library for developing systems and applications
+Description: Database proxy
  SQL Relay is a persistent database connection pooling, proxying, throttling,
  load balancing and query routing/filtering system for Unix and Linux
  supporting ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2,
