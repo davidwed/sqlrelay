@@ -2340,7 +2340,7 @@ bool sqlrcursor::executeQuery() {
 	}
 		
 	// run the query
-	bool	retval=runQuery(pvt->_queryptr);
+	bool	retval=runQuery();
 
 	// set up to re-execute the same query if executeQuery is called
 	// again before calling prepareQuery
@@ -2657,10 +2657,10 @@ void sqlrcursor::performSubstitution(stringbuffer *buffer, uint16_t which) {
 	(*pvt->_subvars)[which].substituted=true;
 }
 
-bool sqlrcursor::runQuery(const char *query) {
+bool sqlrcursor::runQuery() {
 
 	// send the query
-	if (sendQueryInternal(query)) {
+	if (sendQueryInternal()) {
 
 		sendInputBinds();
 		sendOutputBinds();
@@ -2676,11 +2676,11 @@ bool sqlrcursor::runQuery(const char *query) {
 	return false;
 }
 
-bool sqlrcursor::sendQueryInternal(const char *query) {
+bool sqlrcursor::sendQueryInternal() {
 
 	// if the first 8 characters of the query are "-- debug" followed
 	// by a return, then set debugging on
-	if (!charstring::compare(query,"-- debug\n",9)) {
+	if (!charstring::compare(pvt->_queryptr,"-- debug\n",9)) {
 		pvt->_sqlrc->debugOn();
 	}
 
@@ -2734,14 +2734,14 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 			pvt->_sqlrc->debugPrint("Length: ");
 			pvt->_sqlrc->debugPrint((int64_t)pvt->_querylen);
 			pvt->_sqlrc->debugPrint("\n");
-			pvt->_sqlrc->debugPrint(query);
+			pvt->_sqlrc->debugPrint(pvt->_queryptr);
 			pvt->_sqlrc->debugPrint("\n");
 			pvt->_sqlrc->debugPreEnd();
 		}
 
 		// send the query
 		pvt->_cs->write(pvt->_querylen);
-		pvt->_cs->write(query,pvt->_querylen);
+		pvt->_cs->write(pvt->_queryptr,pvt->_querylen);
 
 	} else {
 

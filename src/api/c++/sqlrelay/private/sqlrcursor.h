@@ -19,7 +19,7 @@
 		void	deleteVariables();
 
 		void	initQueryBuffer(uint32_t querylength);
-		bool	sendQueryInternal(const char *query);
+		bool	sendQueryInternal();
 		bool	getList(uint16_t command,
 				sqlrclientlistformat_t listformat,
 				const char *table, const char *wild);
@@ -69,7 +69,7 @@
 						bool preexisting);
 		void	performSubstitution(stringbuffer *buffer,
 							uint16_t which);
-		bool	runQuery(const char *query);
+		bool	runQuery();
 		bool	processInitialResultSet();
 
 		int32_t	getString(char *string, int32_t size);

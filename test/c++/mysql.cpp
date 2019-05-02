@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/process.h>
+#include <rudiments/bytestring.h>
 #include <rudiments/stdio.h>
 
 //#define PROFILING 1
@@ -1129,6 +1130,33 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getField(0,"testtext"),clobval);
 	checkSuccess(cur->getField(0,"testblob"),clobval);
 	cur->sendQuery("drop table testtable1");
+	stdoutput.printf("\n");
+
+	// binary data
+	stdoutput.printf("BINARY DATA: \n");
+	checkSuccess(cur->sendQuery("create table testtable (col1 longblob)"),true);
+	unsigned char	buffer[256];
+	for (uint16_t i=0; i<256; i++) {
+		buffer[i]=i;
+	}
+	stringbuffer	query;
+	query.append("insert into testtable values (_binary'");
+	for (uint64_t i=0; i<sizeof(buffer); i++) {
+		if (buffer[i]=='\'') {
+			query.append('\'');
+		}
+		if (buffer[i]=='\\') {
+			query.append('\\');
+		}
+		query.append(buffer[i]);
+	}
+	query.append("')");
+	checkSuccess(cur->sendQuery(query.getString(),query.getSize()),true);
+	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+	checkSuccess(cur->getFieldLength(0,(uint32_t)0),sizeof(buffer));
+	checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),
+						buffer,sizeof(buffer)),0);
+	cur->sendQuery("drop table testtable");
 	stdoutput.printf("\n");
 
 	// invalid queries...
