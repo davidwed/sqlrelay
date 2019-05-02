@@ -30,6 +30,7 @@ bool sqlrtranslation::usesTree() {
 bool sqlrtranslation::run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
 				const char *query,
+				uint32_t querylength,
 				stringbuffer *translatedquery) {
 	return true;
 }

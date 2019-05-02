@@ -37,6 +37,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery);
 	private:
 		void	buildPatternsTree(domnode *root,
@@ -178,6 +179,7 @@ sqlrtranslation_patterns::~sqlrtranslation_patterns() {
 bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery) {
 	debugFunction();
 

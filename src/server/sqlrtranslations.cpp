@@ -188,12 +188,13 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrparser *sqlrp,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery) {
 	debugFunction();
 
 	pvt->_error=NULL;
 
-	if (!query) {
+	if (!querylength || !query) {
 		pvt->_error="query was empty or null";
 		if (pvt->_debug) {
 			stdoutput.printf("\n%s\n\n",pvt->_error);
@@ -285,7 +286,8 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 						&tempquerystr2:&tempquerystr1;
 			}
 
-			if (!tr->run(sqlrcon,sqlrcur,query,tempquerystr)) {
+			if (!tr->run(sqlrcon,sqlrcur,
+					query,querylength,tempquerystr)) {
 				pvt->_error=tr->getError();
 				if (pvt->_debug) {
 					stdoutput.printf("\n%s\n\n",
@@ -295,6 +297,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 			}
 
 			query=tempquerystr->getString();
+			querylength=tempquerystr->getSize();
 
 			tempquerystr=(tempquerystr==&tempquerystr1)?
 						&tempquerystr2:&tempquerystr1;
@@ -316,7 +319,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 			return false;
 		}
 	} else {
-		translatedquery->append(query);
+		translatedquery->append(query,querylength);
 		if (sqlrp->parse(translatedquery->getString())) {
 			pvt->_tree=sqlrp->getTree();
 		} else {

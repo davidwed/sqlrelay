@@ -3273,6 +3273,7 @@ bool sqlrservercontroller::applyDirectives(sqlrservercursor *cursor) {
 bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	const char	*query=cursor->getQueryBuffer();
+	uint32_t	querylen=cursor->getQueryLength();
 
 	if (pvt->_debugsqlrtranslations) {
 		stdoutput.printf("\n===================="
@@ -3280,7 +3281,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 				 "===================="
 				 "===================\n\n");
 		stdoutput.printf("translating query...\n\n");
-		stdoutput.printf("original:\n\"%s\"\n",query);
+		stdoutput.printf("original:\n\"%.*s\"\n",querylen,query);
 	}
 
 	// clear the query tree
@@ -3289,14 +3290,14 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	// apply translation rules
 	stringbuffer	*translatedquery=cursor->getTranslatedQueryBuffer();
 	translatedquery->clear();
-	if (!pvt->_sqlrt->run(pvt->_conn,cursor,
-				pvt->_sqlrp,query,translatedquery)) {
+	if (!pvt->_sqlrt->run(pvt->_conn,cursor,pvt->_sqlrp,
+					query,querylen,translatedquery)) {
 		raiseTranslationFailureEvent(cursor,query);
 		if (pvt->_sqlrt->getUseOriginalOnError()) {
 			if (pvt->_debugsqlrtranslations) {
 				stdoutput.printf("translation failed, "
-						"using original:\n\"%s\"\n",
-						query);
+						"using original:\n\"%.*s\"\n",
+						querylen,query);
 			}
 			return true;
 		}
@@ -3311,12 +3312,13 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	}
 
 	if (pvt->_debugsqlrtranslations) {
-		stdoutput.printf("translated:\n\"%s\"\n",
+		stdoutput.printf("translated:\n\"%.*s\"\n",
+					translatedquery->getSize(),
 					translatedquery->getString());
 	}
 
 	// bail if the translated query is too large
-	if (translatedquery->getStringLength()>pvt->_maxquerysize) {
+	if (translatedquery->getSize()>pvt->_maxquerysize) {
 		if (pvt->_debugsqlrtranslations) {
 			stdoutput.printf("translated query too large\n");
 		}
@@ -3324,7 +3326,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	}
 
 	// replace with a noop if the query is empty
-	if (!translatedquery->getStringLength()) {
+	if (charstring::isNullOrEmpty(translatedquery->getString())) {
 		translatedquery->append(pvt->_conn->noopQuery());
 	}
 
@@ -3332,9 +3334,8 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	// so it'll be there if we decide to re-execute it later
 	bytestring::copy(cursor->getQueryBuffer(),
 			translatedquery->getString(),
-			translatedquery->getStringLength());
-	cursor->setQueryLength(
-			translatedquery->getStringLength());
+			translatedquery->getSize());
+	cursor->setQueryLength(translatedquery->getSize());
 	cursor->getQueryBuffer()[cursor->getQueryLength()]='\0';
 	return true;
 }

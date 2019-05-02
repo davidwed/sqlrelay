@@ -2051,6 +2051,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery);
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -2064,7 +2065,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 
 	protected:
 		sqlrtranslations	*getTranslations();
-		domnode		*getParameters();
+		domnode			*getParameters();
 
 	#include <sqlrelay/private/sqlrtranslation.h>
 };
@@ -2079,6 +2080,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						sqlrservercursor *sqlrcur,
 						sqlrparser *sqlrp,
 						const char *query,
+						uint32_t querylength,
 						stringbuffer *translatedquery);
 
 		const char	*getError();

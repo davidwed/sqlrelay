@@ -15,6 +15,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery);
 	private:
 		bool	skipQuotedStrings(const char *ptr,
@@ -134,16 +135,18 @@ static const char afterset[]=" +-/*=<>)";
 bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery) {
 	debugFunction();
 
 	if (!enabled) {
-		translatedquery->append(query);
+		translatedquery->append(query,querylength);
 		return true;
 	}
 
 	if (debug) {
-		stdoutput.printf("original query:\n\"%s\"\n\n",query);
+		stdoutput.printf("original query:\n\"%.*s\"\n\n",
+							querylength,query);
 	}
 
 	// clear the normalized query buffers
@@ -158,16 +161,17 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	// FIXME:
 	// * translate printable hex (or other) encoded values into characters
 	const char	*ptr=query;
+	const char	*end=query+querylength;
 	for (;;) {
 
 		// NOTE: it matters what order these are in...
 
 		// remove comments
 		if (!charstring::compare(ptr,"-- ",3)) {
-			while (*ptr && *ptr!='\n') {
+			while (ptr!=end && *ptr!='\n') {
 				ptr++;
 			}
-			if (*ptr) {
+			if (ptr!=end) {
 				ptr++;
 			}
 			continue;
@@ -178,7 +182,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			do {
 				ptr++;
 			} while (character::isWhitespace(*ptr));
-			if (*ptr && pass1.getStringLength()) {
+			if (ptr!=end && pass1.getStringLength()) {
 				pass1.append(' ');
 			}
 			continue;
@@ -230,7 +234,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// check for end of query
-		if (!*ptr) {
+		if (ptr==end) {
 			break;
 		}
 
@@ -248,111 +252,124 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 1):\n\"%s\"\n\n",
+		stdoutput.printf("normalized query (pass 1):\n\"%.*s\"\n\n",
+							pass1.getSize(),
 							pass1.getString());
 	}
 
 	// normalize the query, second pass...
 	// * convert any identifiable comma-separated
 	//   decimals to period-separated decimals
-	ptr=pass1.getString();
-	const char	*start=ptr;
+	const char	*start=NULL;
 	if (!foreigndecimals) {
-		pass2.append(ptr);
-		ptr="";
-	}
-	while (*ptr) {
 
-		// skip whitespace
-		if (character::isWhitespace(*ptr)) {
+		pass2.append(pass1.getString(),pass1.getSize());
+
+	} else {
+
+		ptr=pass1.getString();
+		end=ptr+pass1.getSize();
+		start=ptr;
+
+		while (ptr!=end) {
+
+			// skip whitespace
+			if (character::isWhitespace(*ptr)) {
+				pass2.append(*ptr);
+				ptr++;
+				continue;
+			}
+
+			// skip quoted strings
+			if (skipQuotedStrings(ptr,&pass2,&ptr,
+						true,true,true,false)) {
+				continue;
+			}
+
+			// look for a comma, followed by a digit
+			// (unless it's at the beginning of the query)
+			if (*ptr==',' &&
+				character::isDigit(*(ptr+1)) &&
+				ptr!=start) {
+
+				// skip backwards until we find a non-number
+				// (also skip a leading negative sign)
+				const char	*before=ptr-1;
+				while (character::isDigit(*before) &&
+							before!=start) {
+					before--;
+				}
+				if (*before=='-') {
+					before--;
+				}
+
+				// skip forwards until we find a non-number
+				const char	*after=ptr+1;
+				while (character::isDigit(*after) && *after) {
+					after++;
+				}
+
+				// if various conditions are true then
+				// switch the comma to a dot...
+				//
+				// This is tricky with decimals in parentheses.
+				// Eg. How should the following be interpreted?
+				//    (111,222,333,444)
+				// The logic below breaks on spaces.
+				// Eg:
+				//    (111,222, 333,444)
+				// Would be recognized as having 2 decimals:
+				//    111,222 and 333,444
+				// and
+				//    (111, 222, 333,444)
+				// Would be recognized as having 3 decimals:
+				//    111 and 222 and 333,444
+				//
+				// Another difficult case is something like:
+				//	f(111,222)
+				// Is that 1 or 2 parameters?
+				// For now, we're calling that 2 parameters.
+				if (
+					// it's not something like (111,222)
+					!(*before=='(' && *after==')') &&
+
+					// *before is one of a valid set of
+					// characters that can preceed a decimal
+					character::inSet(*before,beforeset) &&
+
+					// *after is one of a valid set of
+					// characters that can follow a decimal
+					(character::inSet(*after,afterset) ||
+
+					// *after is at the end of the query
+					!*after ||
+
+					// *after is a comma, followed by
+					// whitespace
+					(*after==',' &&
+					character::isWhitespace(*(after+1)))
+	
+					)) {
+
+					pass2.append('.');
+				} else {
+					pass2.append(',');
+				}
+
+				// move on...
+				ptr++;
+				continue;
+			}
+
+			// move on to the next character
 			pass2.append(*ptr);
 			ptr++;
-			continue;
 		}
-
-		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass2,&ptr,true,true,true,false)) {
-			continue;
-		}
-
-		// look for a comma, followed by a digit
-		// (unless it's at the beginning of the query)
-		if (*ptr==',' && character::isDigit(*(ptr+1)) && ptr!=start) {
-
-			// skip backwards until we find a non-number
-			// (also skip a leading negative sign)
-			const char	*before=ptr-1;
-			while (character::isDigit(*before) && before!=start) {
-				before--;
-			}
-			if (*before=='-') {
-				before--;
-			}
-
-			// skip forwards until we find a non-number
-			const char	*after=ptr+1;
-			while (character::isDigit(*after) && *after) {
-				after++;
-			}
-
-			// if various conditions are true then
-			// switch the comma to a dot...
-			//
-			// This is tricky with decimals in parentheses.
-			// Eg. How should the following be interpreted?
-			//    (111,222,333,444)
-			// The logic below breaks on spaces.
-			// Eg:
-			//    (111,222, 333,444)
-			// Would be recognized as having 2 decimals:
-			//    111,222 and 333,444
-			// and
-			//    (111, 222, 333,444)
-			// Would be recognized as having 3 decimals:
-			//    111 and 222 and 333,444
-			//
-			// Another difficult case is something like:
-			//	f(111,222)
-			// Is that 1 or 2 parameters?
-			// For now, we're calling that 2 parameters.
-			if (
-				// it's not something like (111,222)
-				!(*before=='(' && *after==')') &&
-
-				// *before is one of a valid set of characters
-				// that can preceed a decimal
-				character::inSet(*before,beforeset) &&
-
-				// *after is one of a valid set of characters
-				// that can follow a decimal
-				(character::inSet(*after,afterset) ||
-
-				// *after is at the end of the query
-				!*after ||
-
-				// *after is a comma, followed by whitespace
-				(*after==',' &&
-				character::isWhitespace(*(after+1)))
-
-				)) {
-
-				pass2.append('.');
-			} else {
-				pass2.append(',');
-			}
-
-			// move on...
-			ptr++;
-			continue;
-		}
-
-		// move on to the next character
-		pass2.append(*ptr);
-		ptr++;
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 2):\n\"%s\"\n\n",
+		stdoutput.printf("normalized query (pass 2):\n\"%.*s\"\n\n",
+							pass2.getSize(),
 							pass2.getString());
 	}
 
@@ -360,6 +377,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	// * remove spaces around symbols
 	ptr=pass2.getString();
 	start=ptr;
+	end=ptr+pass2.getSize();
 	for (;;) {
 
 		// skip quoted strings
@@ -479,7 +497,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// check for end of query
-		if (!*ptr) {
+		if (ptr==end) {
 			break;
 		}
 
@@ -491,7 +509,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 3):\n\"%s\"\n\n",
+		stdoutput.printf("normalized query (pass 3):\n\"%.*s\"\n\n",
+							pass3.getSize(),
 							pass3.getString());
 	}
 
@@ -502,6 +521,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	//   (if db supports static char() calls)
 	ptr=pass3.getString();
 	start=ptr;
+	end=ptr+pass3.getSize();
 	for (;;) {
 
 		// skip quoted strings
@@ -521,7 +541,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// check for end of query
-		if (!*ptr) {
+		if (ptr==end) {
 			break;
 		}
 
@@ -534,7 +554,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 4):\n\"%s\"\n\n",
+		stdoutput.printf("normalized query (pass 4):\n\"%.*s\"\n\n",
+						translatedquery->getSize(),
 						translatedquery->getString());
 	}
 

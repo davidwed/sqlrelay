@@ -144,7 +144,28 @@ bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
-	*success=(logQuery(sqlrcur) && replayLog(sqlrcur) && *success);
+	// bail if we couldn't log the query for some reason
+	if (!logQuery(sqlrcur)) {
+		*success=false;
+		return false;
+	}
+
+	// bail if the original query failed (*success==false)
+	// but we didn't encounter a replay condition
+	bool	replaycondition=false;
+	if (!(*success)) {
+		replaycondition=replayCondition(sqlrcur);
+		if (!replaycondition) {
+			*success=false;
+			return false;
+		}
+	}
+
+	// replay the log if the original query
+	// failed because of a replay condition
+	if (replaycondition) {
+		*success=replayLog(sqlrcur);
+	}
 	return *success;
 }
 
@@ -477,6 +498,12 @@ uint64_t sqlrtrigger_replay::countValues(const char *values) {
 	uint32_t	parens=0;
 	for (;;) {
 
+		// end-of-values condition
+		if (!inquotes && !parens && *c==')') {
+			valuecount++;
+			break;
+		}
+
 		// handle quotes...
 		if (*c=='\'' && prevc!='\\' && prevc!='\'') {
 			inquotes=!inquotes;
@@ -500,10 +527,6 @@ uint64_t sqlrtrigger_replay::countValues(const char *values) {
 		// keep going
 		prevc=*c;
 		c++;
-		if (!inquotes && !parens && *c==')') {
-			valuecount++;
-			break;
-		}
 	}
 
 	return valuecount;
@@ -522,6 +545,29 @@ void sqlrtrigger_replay::appendValues(stringbuffer *newquery,
 	bool		inquotes=false;
 	uint32_t	parens=0;
 	for (;;) {
+
+		// end-of-values condition
+		if (!inquotes && !parens && *c==')') {
+
+			// if the value was a null and this is
+			// the autoincrement column, then
+			// append the last-insert-id,
+			// otherwise just append the value
+			if (!charstring::compare(cols[valueindex],
+							autoinccolumn) &&
+				!charstring::compare(value.getString(),
+								"null")) {
+				newquery->append(liid);
+			} else {
+				newquery->append(
+					value.getString());
+			}
+
+			// append the )
+			newquery->append(')');
+
+			return;
+		}
 
 		// handle quotes...
 		if (*c=='\'' && prevc!='\\' && prevc!='\'') {
@@ -572,27 +618,6 @@ void sqlrtrigger_replay::appendValues(stringbuffer *newquery,
 		// keep going
 		prevc=*c;
 		c++;
-		if (!inquotes && !parens && *c==')') {
-
-			// if the value was a null and this is
-			// the autoincrement column, then
-			// append the last-insert-id,
-			// otherwise just append the value
-			if (!charstring::compare(cols[valueindex],
-							autoinccolumn) &&
-				!charstring::compare(value.getString(),
-								"null")) {
-				newquery->append(liid);
-			} else {
-				newquery->append(
-					value.getString());
-			}
-
-			// append the )
-			newquery->append(')');
-
-			return;
-		}
 	}
 }
 
@@ -640,7 +665,7 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 	uint32_t	sec=0;
 	uint32_t	usec=0;
 	uint32_t	retry=0;
-	while (replayCondition(sqlrcur)) {
+	do {
 
 		// delay before trying again...
 		// delay a little longer before each retry, up to 10 seconds
@@ -683,6 +708,8 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 		cont->clearError();
 		cont->clearError(sqlrcur);
 
+		// We may want to make it configurable whether to do this or
+		// not, but for now, don't.
 		/*if (replaytx) {
 
 			// roll back the current transaction
@@ -834,6 +861,9 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 				stdoutput.printf("	execute query {\n");
 			}
 			if (!cont->executeQuery(sqlrcur)) {
+				// if this fails, then it's actually ok, the
+				// query may have failed to execute in the
+				// original tx too...
 				if (debug) {
 					stdoutput.printf(
 						"		"
@@ -842,8 +872,6 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 						sqlrcur->getErrorBuffer());
 					stdoutput.printf("	}\n");
 				}
-				retval=false;
-				break;
 			}
 			if (debug) {
 				stdoutput.printf("	}\n");
@@ -861,7 +889,8 @@ bool sqlrtrigger_replay::replayLog(sqlrservercursor *sqlrcur) {
 		if (maxretries && retry>maxretries) {
 			break;
 		}
-	}
+
+	} while (replayCondition(sqlrcur));
 
 	if (replaytx && !retval) {
 		// clear the log and roll back on error
@@ -892,6 +921,7 @@ bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur) {
 			if (charstring::contains(
 				sqlrcur->getErrorBuffer(),val->error)) {
 				found=true;
+//debug=true;
 				if (debug) {
 					stdoutput.printf(
 						"replay condition "
@@ -904,12 +934,14 @@ bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur) {
 						sqlrcur->getErrorBuffer());
 					stdoutput.printf("}\n");
 				}
+//debug=false;
 			}
 
 		} else if (val->cond==CONDITION_ERRORCODE) {
 
 			if (sqlrcur->getErrorNumber()==val->errorcode) {
 				found=true;
+//debug=true;
 				if (debug) {
 					stdoutput.printf(
 						"replay condition "
@@ -919,6 +951,7 @@ bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur) {
 						val->errorcode);
 					stdoutput.printf("}\n");
 				}
+//debug=false;
 			}
 		}
 	}
