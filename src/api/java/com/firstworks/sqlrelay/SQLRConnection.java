@@ -57,6 +57,29 @@ public class SQLRConnection {
 
 
 
+	/** Sets which delimiters are used to identify bind variables
+	 *  in countBindVariables() and validateBinds().  Valid
+	 *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+	public native void	setBindVariableDelimiters(String delimiters);
+
+	/** Returns true if question marks (?) are considered to be
+	 *  valid bind variable delimiters. */
+	public native boolean	getBindVariableDelimiterQuestionMarkSupported();
+
+	/** Returns true if colons (:) are considered to be
+	 *  valid bind variable delimiters. */
+	public native boolean	getBindVariableDelimiterColonSupported();
+
+	/** Returns true if at-signs (@) are considered to be
+	 *  valid bind variable delimiters. */
+	public native boolean	getBindVariableDelimiterAtSignSupported();
+
+	/** Returns true if dollar signs ($) are considered to be
+	 *  valid bind variable delimiters. */
+	public native boolean	getBindVariableDelimiterDollarSignSupported();
+
+
+
 	/** Enables Kerberos authentication and encryption.
 	 *
 	 *  "service" indicates the Kerberos service name of the
