@@ -3,6 +3,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/environment.h>
+#include <rudiments/stringbuffer.h>
 #include <rudiments/stdio.h>
 #include <config.h>
 
@@ -1383,6 +1384,40 @@ int	main(int argc, char **argv) {
 	#endif
 	stdoutput.printf("\n");
 
+	stdoutput.printf("mysql_stmt_close:\n");
+	checkSuccess(mysql_stmt_close(stmt),0);
+	stdoutput.printf("\n");
+
+
+	stdoutput.printf("mysql_stmt_prepare/execute: binary data\n");
+	query="create table testdb.testtable (col1 longblob)";
+	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	const char	value[]={0,'"','"','\n'};
+	stringbuffer	q;
+	q.append("insert into testdb.testtable values (_binary'");
+	q.append(value,sizeof(value));
+	q.append("')");
+	checkSuccess(mysql_real_query(&mysql,q.getString(),q.getSize()),0);
+	stmt=mysql_stmt_init(&mysql);
+	query="select col1 from testdb.testtable";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
+	for (uint16_t i=0; i<19; i++) {
+		bytestring::zero(&fieldbind[i],sizeof(MYSQL_BIND));
+		fieldbind[i].buffer_type=MYSQL_TYPE_STRING;
+		fieldbind[i].buffer=&fieldbuffer[i*1024];
+		fieldbind[i].buffer_length=1024;
+		fieldbind[i].is_null=&fieldisnull[i];
+		fieldbind[i].length=&fieldlength[i];
+	}
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
+	checkSuccess(mysql_stmt_fetch(stmt),0);
+	stdoutput.printf("\n");
+	checkSuccess(fieldlength[0],sizeof(value));
+	checkSuccess(bytestring::compare(fieldbind[0].buffer,
+					value,sizeof(value)),0);
+	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_stmt_close:\n");
 	checkSuccess(mysql_stmt_close(stmt),0);

@@ -2926,8 +2926,9 @@ bool sqlrprotocol_mysql::comQuery(sqlrservercursor *cursor) {
 
 	if (getDebug()) {
 		debugStart("com_query");
-		stdoutput.printf("	query: \"%.*s\"\n",
-						(uint32_t)querylen,query);
+		stdoutput.printf("	query: \"");
+		stdoutput.safePrint(query,(uint32_t)querylen);
+		stdoutput.printf("\"\n");
 		stdoutput.printf("	query length: %d\n",querylen);
 		debugEnd();
 	}
@@ -4312,8 +4313,9 @@ bool sqlrprotocol_mysql::comStmtPrepare(sqlrservercursor *cursor) {
 
 	if (getDebug()) {
 		debugStart("com_stmt_prepare");
-		stdoutput.printf("	query: \"%.*s\"\n",
-						(uint32_t)querylen,query);
+		stdoutput.printf("	query: \"");
+		stdoutput.safePrint(query,(uint32_t)querylen);
+		stdoutput.printf("\"\n");
 		stdoutput.printf("	query length: %d\n",querylen);
 		debugEnd();
 	}
