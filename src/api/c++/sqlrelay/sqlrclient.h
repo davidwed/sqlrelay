@@ -73,6 +73,7 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 						int32_t *timeoutusec);
 
 
+
 		/** Sets which delimiters are used to identify bind variables
 		 *  in countBindVariables() and validateBinds().  Valid
 		 *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */

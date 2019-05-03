@@ -84,6 +84,39 @@ void	sqlrcon_getResponseTimeout(sqlrcon sqlrconref,
 
 
 /** @ingroup sqlrclientwrapper
+ *  Sets which delimiters are used to identify bind variables
+ *  in countBindVariables() and validateBinds().  Valid
+ *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+void	sqlrcon_setBindVariableDelimiters(sqlrcon sqlrconref,
+						const char *delimiters);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns true if question marks (?) are considered to be
+ *  valid bind variable delimiters. */
+int	sqlrcon_getBindVariableDelimiterQuestionMarkSupported(
+						sqlrcon sqlrconref);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns true if colons (:) are considered to be
+ *  valid bind variable delimiters. */
+int	sqlrcon_getBindVariableDelimiterColonSupported(
+						sqlrcon sqlrconref);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns true if at-signs (@) are considered to be
+ *  valid bind variable delimiters. */
+int	sqlrcon_getBindVariableDelimiterAtSignSupported(
+						sqlrcon sqlrconref);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns true if dollar signs ($) are considered to be
+ *  valid bind variable delimiters. */
+int	sqlrcon_getBindVariableDelimiterDollarSignSupported(
+						sqlrcon sqlrconref);
+
+
+
+/** @ingroup sqlrclientwrapper
  *  Enables Kerberos authentication and encryption.
  *
  *  "service" indicates the Kerberos service name of the

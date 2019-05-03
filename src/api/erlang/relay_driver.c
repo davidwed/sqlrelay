@@ -328,6 +328,65 @@ int main() {
 			ENCODE_VOID;   
 		}
 
+		if (strcmp("setBindVariableDelimiters", command) == TRUE) {
+			char delimiters[128];
+
+			// check number of arguments
+		    	if (arity != 1) return ERR_NUMBER_OF_ARGS;
+
+			// get input parameters
+			if (ei_decode_string(buf, &index, &delimiters[0])) { 
+				return ERR_DECODING_ARGS;
+			}
+
+			sqlrcon_setBindVariableDelimiters(con, delimiters);
+			ENCODE_VOID;
+		}
+
+		if (strcmp("getBindVariableDelimiterQuestionMarkSupported", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// call function and encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_long(&result, sqlrcon_getBindVariableDelimiterQuestionMarkSupported(con))) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
+
+		if (strcmp("getBindVariableDelimiterColonSupported", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// call function and encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_long(&result, sqlrcon_getBindVariableDelimiterColonSupported(con))) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
+
+		if (strcmp("getBindVariableDelimiterAtSignSupported", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// call function and encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_long(&result, sqlrcon_getBindVariableDelimiterAtSignSupported(con))) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
+
+		if (strcmp("getBindVariableDelimiterDollarSignSupported", command) == TRUE) {
+			// check number of arguments
+		    	if (arity != 0) return ERR_NUMBER_OF_ARGS;
+
+			// call function and encode result 
+			if (ei_x_encode_atom(&result, "ok") || 
+				ei_x_encode_long(&result, sqlrcon_getBindVariableDelimiterDollarSignSupported(con))) {
+				return ERR_ENCODING_ARGS;
+			}
+		}
+
 		if (strcmp("enableKerberos", command) == TRUE) {
                 	char service[128];
 			char mech[128];

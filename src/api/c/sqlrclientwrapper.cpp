@@ -68,6 +68,31 @@ void sqlrcon_getResponseTimeout(sqlrcon sqlrconref,
 	sqlrconref->getResponseTimeout(timeoutsec,timeoutusec);
 }
 
+void sqlrcon_setBindVariableDelimiters(sqlrcon sqlrconref,
+						const char *delimiters) {
+	sqlrconref->setBindVariableDelimiters(delimiters);
+}
+
+int sqlrcon_getBindVariableDelimiterQuestionMarkSupported(
+						sqlrcon sqlrconref) {
+	return sqlrconref->getBindVariableDelimiterQuestionMarkSupported();
+}
+
+int sqlrcon_getBindVariableDelimiterColonSupported(
+						sqlrcon sqlrconref) {
+	return sqlrconref->getBindVariableDelimiterColonSupported();
+}
+
+int sqlrcon_getBindVariableDelimiterAtSignSupported(
+						sqlrcon sqlrconref) {
+	return sqlrconref->getBindVariableDelimiterAtSignSupported();
+}
+
+int sqlrcon_getBindVariableDelimiterDollarSignSupported(
+						sqlrcon sqlrconref) {
+	return sqlrconref->getBindVariableDelimiterDollarSignSupported();
+}
+
 void sqlrcon_enableKerberos(sqlrcon sqlrconref,
 					const char *service,
 					const char *mech,
