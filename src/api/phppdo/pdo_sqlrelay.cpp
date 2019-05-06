@@ -1672,6 +1672,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		// other languages...
 		//{"autocommit",(char *)"1",0},
 		{"autocommit",(char *)"0",0},
+		{"bindvariabledelimiters",(char *)"?:@$",0}
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1699,6 +1700,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char	*db=options[22].optval;
 	const char      *connecttime=options[23].optval;
 	bool		autocommit=!charstring::isNo(options[24].optval);
+	const char	*bindvariabledelimiters=options[25].optval;
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1740,6 +1742,14 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 						timeoutsec,timeoutusec);
 		}
 	}
+
+	// set bind variable delimiters
+	sqlrdbh->sqlrcon->setBindVariableDelimiters(bindvariabledelimiters);
+stdoutput.printf("delimiters: %d,%d,%d,%d\n",
+	sqlrdbh->sqlrcon->getBindVariableDelimiterQuestionMarkSupported(),
+	sqlrdbh->sqlrcon->getBindVariableDelimiterColonSupported(),
+	sqlrdbh->sqlrcon->getBindVariableDelimiterAtSignSupported(),
+	sqlrdbh->sqlrcon->getBindVariableDelimiterDollarSignSupported());
 
 	// if we're not doing lazy connects, then do something lightweight
 	// that will verify whether SQL Relay is available or not
