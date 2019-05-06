@@ -108,6 +108,52 @@ static PyObject *setResponseTimeout(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", 0);
 }
 
+static PyObject *setBindVariableDelimiters(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  char *delimiters;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcon, &delimiters))
+    return NULL;
+  ((sqlrconnection *)sqlrcon)->setBindVariableDelimiters(delimiters);
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *getBindVariableDelimiterQuestionMarkSupported(
+					PyObject *self, PyObject *args) {
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  rc=((sqlrconnection *)sqlrcon)->getBindVariableDelimiterQuestionMarkSupported();
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *getBindVariableDelimiterColonSupported(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  rc=((sqlrconnection *)sqlrcon)->getBindVariableDelimiterColonSupported();
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *getBindVariableDelimiterAtSignSupported(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  rc=((sqlrconnection *)sqlrcon)->getBindVariableDelimiterAtSignSupported();
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *getBindVariableDelimiterDollarSignSupported(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  rc=((sqlrconnection *)sqlrcon)->getBindVariableDelimiterDollarSignSupported();
+  return Py_BuildValue("h", (short)rc);
+}
+
 static PyObject *enableKerberos(PyObject *self, PyObject *args) {
   long sqlrcon;
   char *service;
@@ -1911,6 +1957,11 @@ static PyMethodDef SQLRMethods[] = {
   {"setConnectTimeout", setConnectTimeout, METH_VARARGS},
   {"setAuthenticationTimeout", setAuthenticationTimeout, METH_VARARGS},
   {"setResponseTimeout", setResponseTimeout, METH_VARARGS},
+  {"setBindVariableDelimiters", setBindVariableDelimiters, METH_VARARGS},
+  {"getBindVariableDelimiterQuestionMarkSupported", getBindVariableDelimiterQuestionMarkSupported, METH_VARARGS},
+  {"getBindVariableDelimiterColonSupported", getBindVariableDelimiterColonSupported, METH_VARARGS},
+  {"getBindVariableDelimiterAtSignSupported", getBindVariableDelimiterAtSignSupported, METH_VARARGS},
+  {"getBindVariableDelimiterDollarSignSupported", getBindVariableDelimiterDollarSignSupported, METH_VARARGS},
   {"enableKerberos", enableKerberos, METH_VARARGS},
   {"enableTls", enableTls, METH_VARARGS},
   {"disableEncryption", disableEncryption, METH_VARARGS},

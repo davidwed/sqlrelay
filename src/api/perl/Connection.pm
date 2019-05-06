@@ -75,6 +75,27 @@ __END__
             # this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
             # environment variable.
 
+        setBindVariableDelimiters(delimiters);
+            # Sets which delimiters are used to identify bind variables
+            # in countBindVariables() and validateBinds().  Valid
+            # delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+
+        getBindVariableDelimiterQuestionMarkSupported();
+            # Returns true if question marks (?) are considered to be
+            # valid bind variable delimiters. */
+
+        getBindVariableDelimiterColonSupported();
+            # Returns true if colons (:) are considered to be
+            # valid bind variable delimiters. */
+
+        getBindVariableDelimiterAtSignSupported();
+            # Returns true if at-signs (@) are considered to be
+            # valid bind variable delimiters. */
+
+        getBindVariableDelimiterDollarSignSupported();
+            # Returns true if dollar signs ($) are considered to be
+            # valid bind variable delimiters. */
+
         enableKerberos(service, mech, flags);
             # Enables Kerberos authentication and encryption.
             #

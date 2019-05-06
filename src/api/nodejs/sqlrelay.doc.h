@@ -47,6 +47,29 @@ class SQLRConnection {
 
 
 
+		/** Sets which delimiters are used to identify bind variables
+		 *  in countBindVariables() and validateBinds().  Valid
+		 *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+		function setBindVariableDelimiters(var delimiters);
+
+		/** Returns true if question marks (?) are considered to be
+		 *  valid bind variable delimiters. */
+		function getBindVariableDelimiterQuestionMarkSupported();
+
+		/** Returns true if colons (:) are considered to be
+		 *  valid bind variable delimiters. */
+		function getBindVariableDelimiterColonSupported();
+
+		/** Returns true if at-signs (@) are considered to be
+		 *  valid bind variable delimiters. */
+		function getBindVariableDelimiterAtSignSupported();
+
+		/** Returns true if dollar signs ($) are considered to be
+		 *  valid bind variable delimiters. */
+		function getBindVariableDelimiterDollarSignSupported();
+
+
+
 		/** Enables Kerberos authentication and encryption.
 		 *
 		 *  "service" indicates the Kerberos service name of the
@@ -82,7 +105,7 @@ class SQLRConnection {
 		 *  For a full list of flags, consult the GSSAPI documentation,
 		 *  though note that only the flags listed above are supported
 		 *  on Windows. */
-		void	enableKerberos(var service, var mech, var flags);
+		function enableKerberos(var service, var mech, var flags);
 
 		/** Enables TLS/SSL encryption, and optionally authentication.
 		 *
@@ -153,23 +176,23 @@ class SQLRConnection {
 		 *  generally supported on Linux/Unix platfoms (.pem, .pfx,
 		 *  etc.) but only the .pfx format is currently supported on
 		 *  Windows. */
-		void	enableTls(var version,
+		function enableTls(var version,
 					var cert, var password, var ciphers,
 					var validate, var ca, var depth);
 
 		/** Disables encryption. */
-		void	disableEncryption();
+		function disableEncryption();
 
 
 
 		/** Ends the session. */
-		function	endSession();
+		function endSession();
 
 		/** Disconnects this connection from the current
 		 *  session but leaves the session open so 
 		 *  that another connection can connect to it 
 		 *  using resumeSession(). */
-		var	suspendSession();
+		function suspendSession();
 
 		/** Returns the inet port that the connection is 
 		 *  communicating over. This parameter may be 
@@ -177,7 +200,7 @@ class SQLRConnection {
 		 *  the resumeSession() method.
 		 *  Note: The value this method returns is only
 		 *  valid after a call to suspendSession(). */
-		var	getConnectionPort();
+		function getConnectionPort();
 
 		/** Returns the unix socket that the connection 
 		 *  is communicating over. This parameter may be 
@@ -185,65 +208,65 @@ class SQLRConnection {
 		 *  the resumeSession() method.
 		 *  Note: The value this method returns is only
 		 *  valid after a call to suspendSession(). */
-		var getConnectionSocket();
+		function getConnectionSocket();
 
 		/** Resumes a session previously left open 
 		 *  using suspendSession().
 		 *  Returns true on success and false on failure. */
-		var	resumeSession(var port, var socket);
+		function resumeSession(var port, var socket);
 
 
 
 		/** Returns true if the database is up and false
 		 *  if it's down. */
-		var		ping();
+		function ping();
 
 		/** Returns the type of database: 
 		 *  oracle, postgresql, mysql, etc. */
-		var identify();
+		function identify();
 
 		/** Returns the version of the database */
-		var dbVersion();
+		function dbVersion();
 
 		/** Returns the host name of the database */
-		var dbHostName();
+		function dbHostName();
 
 		/** Returns the ip address of the database */
-		var dbIpAddress();
+		function dbIpAddress();
 
 		/** Returns the version of the sqlrelay server software. */
-		var serverVersion();
+		function serverVersion();
 
 		/** Returns the version of the sqlrelay client software. */
-		var clientVersion();
+		function clientVersion();
 
 		/** Returns a string representing the format
 		 *  of the bind variables used in the db. */
-		var bindFormat();
+		function bindFormat();
 
 
 
 		/** Sets the current database/schema to "database" */
-		var	selectDatabase(var database);
+		function selectDatabase(var database);
 
 		/** Returns the database/schema that is currently in use. */
-		var getCurrentDatabase();
+		function getCurrentDatabase();
 
 
 
 		/** Returns the value of the autoincrement
 		 *  column for the last insert */
-		var	getLastInsertId();
+		function getLastInsertId();
 
 
 
 		/** Instructs the database to perform a commit
 		 *  after every successful query. */
-		var	autoCommitOn();
+		function autoCommitOn();
 
 		/** Instructs the database to wait for the 
 		 *  client to tell it when to commit. */
-		var	autoCommitOff();
+		function autoCommitOff();
 
 
 		/** Begins a transaction.  Returns true if the begin
@@ -252,15 +275,15 @@ class SQLRConnection {
 		 *  commit or rollback is issued then this doesn't
 		 *  do anything unless SQL Relay is faking transaction
 		 *  blocks. */
-		var	begin();
+		function begin();
 
 		/** Commits a transaction.  Returns true if the commit
 		 *  succeeded, false if it failed. */
-		var	commit();
+		function commit();
 
 		/** Rolls back a transaction.  Returns true if the rollback
 		 *  succeeded, false if it failed. */
-		var	rollback();
+		function rollback();
 
 
 
@@ -268,13 +291,13 @@ class SQLRConnection {
 		 *  error, the error message is available here.
 		 *  If there is no error then this method 
 		 *  returns NULL. */
-		var errorMessage();
+		function errorMessage();
 
 		/** If an operation failed and generated an
 		 *  error, the error number is available here.
 		 *  If there is no error then this method 
 		 *  returns 0. */
-		var		errorNumber();
+		function errorNumber();
 
 
 
@@ -283,31 +306,31 @@ class SQLRConnection {
 		 *  this is to start a query with "-- debug\n".
 		 *  Yet another way is to set the environment
 		 *  variable SQLR_CLIENT_DEBUG to "ON" */
-		function	debugOn();
+		function debugOn();
 
 		/** Turns debugging off. */
-		function	debugOff();
+		function debugOff();
 
 		/** Returns false if debugging is off and true
 		 *  if debugging is on. */
-		var	getDebug();
+		function getDebug();
 
 
 
 		/** Allows you to specify a file to write debug to.
 		 *  Setting "filename" to NULL or an empty string causes debug
 		 *  to be written to standard output (the default). */
-		function	setDebugFile(var filename);
+		function setDebugFile(var filename);
 
 
 		/** Allows you to set a string that will be passed to the
 		 *  server and ultimately included in server-side logging
 		 *  along with queries that were run by this instance of
 		 *  the client. */
-		function		setClientInfo(var clientinfo);
+		function setClientInfo(var clientinfo);
 
 		/** Returns the string that was set by setClientInfo(). */
-		var getClientInfo();
+		function getClientInfo();
 };
 
 
@@ -321,12 +344,12 @@ class SQLRCursor {
 		/** Sets the number of rows of the result set
 		 *  to buffer at a time.  0 (the default)
 		 *  means buffer the entire result set. */
-		function	setResultSetBufferSize(var rows);
+		function setResultSetBufferSize(var rows);
 
 		/** Returns the number of result set rows that 
 		 *  will be buffered at a time or 0 for the
 		 *  entire result set. */
-		var	getResultSetBufferSize();
+		function getResultSetBufferSize();
 
 
 
@@ -334,22 +357,22 @@ class SQLRCursor {
 		 *  info (names, types, sizes).  If you don't
 		 *  need that info, you should call this
 		 *  method to improve performance. */
-		function	dontGetColumnInfo();
+		function dontGetColumnInfo();
 
 		/** Tells the server to send column info. */
-		function	getColumnInfo();
+		function getColumnInfo();
 
 
 		/** Columns names are returned in the same
 		 *  case as they are defined in the database.
 		 *  This is the default. */
-		function	mixedCaseColumnNames();
+		function mixedCaseColumnNames();
 
 		/** Columns names are converted to upper case. */
-		function	upperCaseColumnNames();
+		function upperCaseColumnNames();
 
 		/** Columns names are converted to lower case. */
-		function	lowerCaseColumnNames();
+		function lowerCaseColumnNames();
 
 
 
@@ -365,21 +388,21 @@ class SQLRCursor {
 		 *  to cacheToFile() changes which file to
 		 *  cache to or a call to cacheOff() turns off
 		 *  caching. */
-		function	cacheToFile(var filename);
+		function cacheToFile(var filename);
 
 		/** Sets the time-to-live for cached result
 		 *  sets. The sqlr-cachemanger will remove each 
 		 *  cached result set "ttl" seconds after it's 
 		 *  created, provided it's scanning the directory
 		 *  containing the cache files. */
-		function	setCacheTtl(var ttl);
+		function setCacheTtl(var ttl);
 
 		/** Returns the name of the file containing the
 		 *  cached result set. */
-		var getCacheFileName();
+		function getCacheFileName();
 
 		/** Sets query caching off. */
-		function	cacheOff();
+		function cacheOff();
 
 
 
@@ -387,124 +410,123 @@ class SQLRCursor {
 		 *  databases/schemas matching "wild".  If wild is empty
 		 *  or NULL then a list of all databases/schemas will be
 		 *  returned. */
-		var	getDatabaseList(var wild);
+		function getDatabaseList(var wild);
 
 		/** Sends a query that returns a list of tables
 		 *  matching "wild".  If wild is empty or NULL then
 		 *  a list of all tables will be returned. */
-		var	getTableList(var wild);
+		function getTableList(var wild);
 
 		/** Sends a query that returns a list of columns
 		 *  in the table specified by the "table" parameter
 		 *  matching "wild".  If wild is empty or NULL then
 		 *  a list of all columns will be returned. */
-		var	getColumnList(var table, var wild);
+		function getColumnList(var table, var wild);
 
 
 
 		/** Sends "query" directly and gets a result set. */
-		var	sendQuery(var query);
+		function sendQuery(var query);
 
 		/** Sends "query" with length "length" directly
- 		 *  and gets a result set. This method must be used
- 		 *  if the query contains binary data. */
-		var	sendQuery(var query, var length);
+		 *  and gets a result set. This method must be used
+		 *  if the query contains binary data. */
+		function sendQuery(var query, var length);
 
 		/** Sends the query in file "path"/"filename" directly
 		 *  and gets a result set. */
-		var	sendFileQuery(var path, var filename); 
+		function sendFileQuery(var path, var filename); 
 
 
 
 		/** Prepare to execute "query". */
-		function	prepareQuery(var query);
+		function prepareQuery(var query);
 
 		/** Prepare to execute "query" with length 
 		 *  "length".  This method must be used if the
 		 *  query contains binary data. */
-		function	prepareQuery(var query, var length);
+		function prepareQuery(var query, var length);
 
 		/** Prepare to execute the contents 
 		 *  of "path"/"filename".  Returns false if the
 		 * // file couldn't be opened. */
-		var	prepareFileQuery(var path,
+		function prepareFileQuery(var path,
 						var filename);
 
 
 
 		/** Defines a string substitution variable. */
-		function	substitution(var variable, var value);
+		function substitution(var variable, var value);
 
 		/** Defines an integer substitution variable. */
-		function	substitution(var variable, var value);
+		function substitution(var variable, var value);
 
 		/** Defines a decimal substitution variable. */
-		function	substitution(var variable, var value, 
+		function substitution(var variable, var value, 
 							var precision, 
 							var scale);
 
 		/** Defines an array of string substitution variables. */
-		function	substitutions(var variables,
+		function substitutions(var variables,
 						var values);
 
 		/** Defines an array of integer substitution variables. */
-		function	substitutions(var variables,
+		function substitutions(var variables,
 						var values);
 
 		/** Defines an array of decimal substitution variables. */
-		function	substitutions(var variables,
-					var values,
-					var precisions, 
-					var scales);
+		function substitutions(var variables,
+						var values,
+						var precisions, 
+						var scales);
 
 
 
 		/** Defines a string input bind variable. */
-		function	inputBind(var variable, var value);
+		function inputBind(var variable, var value);
 
 		/** Defines a string input bind variable. */
-		function	inputBind(var variable, var value,
-							var valuelength);
+		function inputBind(var variable, var value, var valuelength);
 
 		/** Defines a integer input bind variable. */
-		function	inputBind(var variable, var value);
+		function inputBind(var variable, var value);
 
 		/** Defines a decimal input bind variable.
 		  * (If you don't have the precision and scale then set
 		  * them both 0.  However in that case you may get
 		  * unexpected rounding behavior if the server is faking
 		  * binds.) */
-		function	inputBind(var variable, var value, 
+		function inputBind(var variable, var value, 
 							var precision, 
 							var scale);
 
 		/** Defines a date input bind variable.  "day" should be
 		 *  1-31 and "month" should be 1-12.  "tz" may be left NULL.
 		 *  Most databases ignore "tz".  */
-		function	inputBind(var variable,
+		function inputBind(var variable,
 				var year, var month, var day,
 				var hour, var minute, var second,
 				var microsecond, var tz);
 
 		/** Defines a binary lob input bind variable. */
-		function	inputBindBlob(var variable,
+		function inputBindBlob(var variable,
 						var value,
 						var size);
 
 		/** Defines a character lob input bind variable. */
-		function	inputBindClob(var variable,
+		function inputBindClob(var variable,
 						var value,
 						var size);
 
 		/** Defines an array of string input bind variables. */
-		function	inputBinds(var variables, var values);
+		function inputBinds(var variables, var values);
 
 		/** Defines an array of integer input bind variables. */
-		function	inputBinds(var variables,
+		function inputBinds(var variables,
 					const var values);
 
 		/** Defines an array of decimal input bind variables. */
-		function	inputBinds(var variables,
+		function inputBinds(var variables,
 					const var values, 
 					const var precisions, 
 					const var scales);
@@ -514,36 +536,36 @@ class SQLRCursor {
 		/** Defines an output bind variable.
 		 *  "bufferlength" bytes will be reserved
 		 *  to store the value. */
-		function	defineOutputBindString(var variable,
+		function defineOutputBindString(var variable,
 						var bufferlength);
 
 		/** Defines an integer output bind variable. */
-		function	defineOutputBindInteger(var variable);
+		function defineOutputBindInteger(var variable);
 
 		/** Defines a decimal output bind variable. */
-		function	defineOutputBindDouble(var variable);
+		function defineOutputBindDouble(var variable);
 
 		/** Defines a date output bind variable. */
-		function	defineOutputBindDate(var variable);
+		function defineOutputBindDate(var variable);
 
 		/** Defines a binary lob output bind variable. */
-		function	defineOutputBindBlob(var variable);
+		function defineOutputBindBlob(var variable);
 
 		/** Defines a character lob output bind variable. */
-		function	defineOutputBindClob(var variable);
+		function defineOutputBindClob(var variable);
 
 		/** Defines a cursor output bind variable. */
-		function	defineOutputBindCursor(var variable);
+		function defineOutputBindCursor(var variable);
 
 
 
 		/** Clears all bind variables. */
-		function	clearBinds();
+		function clearBinds();
 
 		/** Parses the previously prepared query,
 		 *  counts the number of bind variables defined
 		 *  in it and returns that number. */
-		var	countBindVariables() const;
+		function countBindVariables() const;
 
 		/** If you are binding to any variables that 
 		 *  might not actually be in your query, call 
@@ -551,39 +573,39 @@ class SQLRCursor {
 		 *  to bind them unless they really are in the 
 		 *  query.  There is a performance penalty for
 		 *  calling this method. */
-		function	validateBinds();
+		function validateBinds();
 
 		/** Returns true if "variable" was a valid
 		 *  bind variable of the query. */
-		var	validBind(var variable);
+		function validBind(var variable);
 
 
 
 		/** Execute the query that was previously 
 		 *  prepared and bound. */
-		var	executeQuery();
+		function executeQuery();
 
 		/** Fetch from a cursor that was returned as
 		 *  an output bind variable. */
-		var	fetchFromBindCursor();
+		function fetchFromBindCursor();
 
 
 
 		/** Get the value stored in a previously
 		 *  defined string output bind variable. */
-		var getOutputBindString(var variable);
+		function getOutputBindString(var variable);
 
 		/** Get the value stored in a previously
 		 *  defined integer output bind variable. */
-		var		getOutputBindInteger(var variable);
+		function getOutputBindInteger(var variable);
 
 		/** Get the value stored in a previously
 		 *  defined decimal output bind variable. */
-		var		getOutputBindDouble(var variable);
+		function getOutputBindDouble(var variable);
 
 		/** Get the value stored in a previously
 		 *  defined date output bind variable. */
-		var		getOutputBindDate(var variable,
+		function getOutputBindDate(var variable,
 							var year,
 							var month,
 							var day,
@@ -595,37 +617,37 @@ class SQLRCursor {
 
 		/** Get the value stored in a previously
 		 *  defined binary lob output bind variable. */
-		var getOutputBindBlob(var variable);
+		function getOutputBindBlob(var variable);
 
 		/** Get the value stored in a previously
 		 *  defined character lob output bind variable. */
-		var getOutputBindClob(var variable);
+		function getOutputBindClob(var variable);
 
 		/** Get the length of the value stored in a
 		 *  previously defined output bind variable. */
-		var	getOutputBindLength(var variable);
+		function getOutputBindLength(var variable);
 
 		/** Get the cursor associated with a previously
 		 *  defined output bind variable. */
-		var	getOutputBindCursor(var variable);
+		function getOutputBindCursor(var variable);
 
 
 		
 		/** Opens a cached result set.
 		 *  Returns true on success and false on failure. */
-		var		openCachedResultSet(var filename);
+		function openCachedResultSet(var filename);
 
 
 
 		/** Returns the number of columns in the current
 		 *  result set. */
-		var	colCount();
+		function colCount();
 
 		/** Returns the number of rows in the current 
 		 *  result set (if the result set is being
 		 *  stepped through, this returns the number
 		 *  of rows processed so far). */
-		var	rowCount();
+		function rowCount();
 
 		/** Returns the total number of rows that will 
 		 *  be returned in the result set.  Not all 
@@ -633,7 +655,7 @@ class SQLRCursor {
 		 *  for applications which are designed to be 
 		 *  portable across databases.  0 is returned
 		 *  by databases which don't support this option. */
-		var	totalRows();
+		function totalRows();
 
 		/** Returns the number of rows that were 
 		 *  updated, inserted or deleted by the query.
@@ -642,19 +664,19 @@ class SQLRCursor {
 		 *  to be portable across databases.  0 is 
 		 *  returned by databases which don't support 
 		 *  this option. */
-		var	affectedRows();
+		function affectedRows();
 
 		/** Returns the index of the first buffered row.
 		 *  This is useful when buffering only part of
 		 *  the result set at a time. */
-		var	firstRowIndex();
+		function firstRowIndex();
 
 		/** Returns false if part of the result set is
 		 *  still pending on the server and true if not.
 		 *  This method can only return false if 
 		 *  setResultSetBufferSize() has been called
 		 *  with a parameter other than 0. */
-		var		endOfResultSet();
+		function endOfResultSet();
 		
 		
 
@@ -662,84 +684,84 @@ class SQLRCursor {
 		 *  the error message is available here.  If 
 		 *  the query succeeded then this method 
 		 *  returns NULL. */
-		var errorMessage();
+		function errorMessage();
 
 		/** If a query failed and generated an
 		 *  error, the error number is available here.
 		 *  If there is no error then this method 
 		 *  returns 0. */
-		var		errorNumber();
+		function errorNumber();
 
 
 
 		/** Tells the connection to return NULL fields
 		 *  and output bind variables as empty strings. 
 		 *  This is the default. */
-		function	getNullsAsEmptyStrings();
+		function getNullsAsEmptyStrings();
 
 		/** Tells the connection to return NULL fields
 		 *  and output bind variables as NULL's rather
 		 *  than as empty strings. */
-		function	getNullsAsNulls();
+		function getNullsAsNulls();
 
 
 
 		/** Returns the specified field as a string. */
-		var getField(var row, var col);
+		function getField(var row, var col);
 
 		/** Returns the specified field as a string */
-		var getField(var row, var col);
+		function getField(var row, var col);
 
 		/** Returns the specified field as an integer. */
-		var	getFieldAsInteger(var row, var col);
+		function getFieldAsInteger(var row, var col);
 
 		/** Returns the specified field as an integer. */
-		var	getFieldAsInteger(var row, var col);
+		function getFieldAsInteger(var row, var col);
 
 		/** Returns the specified field as a decimal. */
-		var	getFieldAsDouble(var row, var col);
+		function getFieldAsDouble(var row, var col);
 
 		/** Returns the specified field as a decimal. */
-		var	getFieldAsDouble(var row, var col);
+		function getFieldAsDouble(var row, var col);
 
 
 
 		/** Returns the length of the specified field. */
-		var	getFieldLength(var row, var col);
+		function getFieldLength(var row, var col);
 
 		/** Returns the length of the specified field. */
-		var	getFieldLength(var row, var col);
+		function getFieldLength(var row, var col);
 
 
 
 		/** Returns a null terminated array of the 
 		 *  values of the fields in the specified row. */
-		var  getRow(var row);
+		function  getRow(var row);
 
 		/** Returns a null terminated array of the 
 		 *  lengths of the fields in the specified row. */
-		var getRowLengths(var row);
+		function getRowLengths(var row);
 
 		/** Returns a null terminated array of the 
 		 *  column names of the current result set. */
-		var  getColumnNames();
+		function  getColumnNames();
 
 		/** Returns the name of the specified column. */
-		var getColumnName(var col);
+		function getColumnName(var col);
 
 		/** Returns the type of the specified column. */
-		var getColumnType(var col);
+		function getColumnType(var col);
 
 		/** Returns the type of the specified column. */
-		var getColumnType(var col);
+		function getColumnType(var col);
 
 		/** Returns the number of bytes required on
 		 *  the server to store the data for the specified column */
-		var	getColumnLength(var col);
+		function getColumnLength(var col);
 
 		/** Returns the number of bytes required on
 		 *  the server to store the data for the specified column */
-		var	getColumnLength(var col);
+		function getColumnLength(var col);
 
 		/** Returns the precision of the specified
 		 *  column.
@@ -747,7 +769,7 @@ class SQLRCursor {
 		 *  a number.  eg: 123.45 has a precision of 5.
 		 *  For non-numeric types, it's the number of
 		 *  characters in the string. */
-		var	getColumnPrecision(var col);
+		function getColumnPrecision(var col);
 
 		/** Returns the precision of the specified
 		 *  column.
@@ -755,95 +777,95 @@ class SQLRCursor {
 		 *  a number.  eg: 123.45 has a precision of 5.
 		 *  For non-numeric types, it's the number of
 		 *  characters in the string. */
-		var	getColumnPrecision(var col);
+		function getColumnPrecision(var col);
 
 		/** Returns the scale of the specified column.
 		 *  Scale is the total number of digits to the
 		 *  right of the decimal point in a number.
 		 *  eg: 123.45 has a scale of 2. */
-		var	getColumnScale(var col);
+		function getColumnScale(var col);
 
 		/** Returns the scale of the specified column.
 		 *  Scale is the total number of digits to the
 		 *  right of the decimal point in a number.
 		 *  eg: 123.45 has a scale of 2. */
-		var	getColumnScale(var col);
+		function getColumnScale(var col);
 
 		/** Returns true if the specified column can
 		 *  contain nulls and false otherwise. */
-		var		getColumnIsNullable(var col);
+		function getColumnIsNullable(var col);
 
 		/** Returns true if the specified column can
 		 *  contain nulls and false otherwise. */
-		var		getColumnIsNullable(var col);
+		function getColumnIsNullable(var col);
 
 		/** Returns true if the specified column is a
 		 *  primary key and false otherwise. */
-		var		getColumnIsPrimaryKey(var col);
+		function getColumnIsPrimaryKey(var col);
 
 		/** Returns true if the specified column is a
 		 *  primary key and false otherwise. */
-		var		getColumnIsPrimaryKey(var col);
+		function getColumnIsPrimaryKey(var col);
 
 		/** Returns true if the specified column is
- 		 *  unique and false otherwise. */
-		var		getColumnIsUnique(var col);
+		 *  unique and false otherwise. */
+		function getColumnIsUnique(var col);
 
 		/** Returns true if the specified column is
- 		 *  unique and false otherwise. */
-		var		getColumnIsUnique(var col);
-
-		/** Returns true if the specified column is
-		 *  part of a composite key and false otherwise. */
-		var		getColumnIsPartOfKey(var col);
+		 *  unique and false otherwise. */
+		function getColumnIsUnique(var col);
 
 		/** Returns true if the specified column is
 		 *  part of a composite key and false otherwise. */
-		var		getColumnIsPartOfKey(var col);
+		function getColumnIsPartOfKey(var col);
+
+		/** Returns true if the specified column is
+		 *  part of a composite key and false otherwise. */
+		function getColumnIsPartOfKey(var col);
 
 		/** Returns true if the specified column is
 		 *  an unsigned number and false otherwise. */
-		var		getColumnIsUnsigned(var col);
+		function getColumnIsUnsigned(var col);
 
 		/** Returns true if the specified column is
 		 *  an unsigned number and false otherwise. */
-		var		getColumnIsUnsigned(var col);
+		function getColumnIsUnsigned(var col);
 
 		/** Returns true if the specified column was
 		 *  created with the zero-fill flag and false
 		 *  otherwise. */
-		var		getColumnIsZeroFilled(var col);
+		function getColumnIsZeroFilled(var col);
 
 		/** Returns true if the specified column was
 		 *  created with the zero-fill flag and false
 		 *  otherwise. */
-		var		getColumnIsZeroFilled(var col);
+		function getColumnIsZeroFilled(var col);
 
 		/** Returns true if the specified column
 		 *  contains binary data and false
 		 *  otherwise. */
-		var		getColumnIsBinary(var col);
+		function getColumnIsBinary(var col);
 
 		/** Returns true if the specified column
 		 *  contains binary data and false
 		 *  otherwise. */
-		var		getColumnIsBinary(var col);
+		function getColumnIsBinary(var col);
 
 		/** Returns true if the specified column
 		 *  auto-increments and false otherwise. */
-		var		getColumnIsAutoIncrement(var col);
+		function getColumnIsAutoIncrement(var col);
 
 		/** Returns true if the specified column
 		 *  auto-increments and false otherwise. */
-		var		getColumnIsAutoIncrement(var col);
+		function getColumnIsAutoIncrement(var col);
 
 		/** Returns the length of the longest field
 		 *  in the specified column. */
-		var	getLongest(var col);
+		function getLongest(var col);
 
 		/** Returns the length of the longest field
 		 *  in the specified column. */
-		var	getLongest(var col);
+		function getLongest(var col);
 
 
 
@@ -852,7 +874,7 @@ class SQLRCursor {
 		 *  suspendSession() so that another connection 
 		 *  can connect to it using resumeResultSet() 
 		 *  after it calls resumeSession(). */
-		function	suspendResultSet();
+		function suspendResultSet();
 
 		/** Returns the internal ID of this result set.
 		 *  This parameter may be passed to another 
@@ -860,23 +882,23 @@ class SQLRCursor {
 		 *  method.
 		 *  Note: The value this method returns is only
 		 *  valid after a call to suspendResultSet(). */
-		var	getResultSetId();
+		function getResultSetId();
 
 		/** Resumes a result set previously left open 
 		 *  using suspendSession().
 		 *  Returns true on success and false on failure. */
-		var	resumeResultSet(var id);
+		function resumeResultSet(var id);
 
 		/** Resumes a result set previously left open
 		 *  using suspendSession() and continues caching
 		 *  the result set to "filename".
 		 *  Returns true on success and false on failure. */
-		var	resumeCachedResultSet(var id,
+		function resumeCachedResultSet(var id,
 						var filename);
 
 		/** Closes the current result set, if one is open.  Data
 		 *  that has been fetched already is still available but
 		 *  no more data may be fetched.  Server side resources
 		 *  for the result set are freed as well. */
-		function	closeResultSet();
+		function closeResultSet();
 };

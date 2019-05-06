@@ -120,6 +120,22 @@ sqlrconnection::setResponseTimeout(timeoutsec,timeoutusec)
 		int32_t		timeoutusec
 
 void
+sqlrconnection::setBindVariableDelimiters(delimiters)
+		const char	*delimiters
+
+bool
+sqlrconnection::getBindVariableDelimiterQuestionMarkSupported()
+
+bool
+sqlrconnection::getBindVariableDelimiterColonSupported()
+
+bool
+sqlrconnection::getBindVariableDelimiterAtSignSupported()
+
+bool
+sqlrconnection::getBindVariableDelimiterDollarSignSupported()
+
+void
 sqlrconnection::enableKerberos(service,mech,flags)
 		const char	*service
 		const char	*mech

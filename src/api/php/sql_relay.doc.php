@@ -40,6 +40,32 @@ function sqlrcon_setAuthenticationTimeout($sqlrconref, $timeoutsec, $timeoutusec
  *  environment variable. */
 function sqlrcon_setResponseTimeout($sqlrconref, $timeoutsec, $timeoutusec){}
 
+/**
+ *  Sets which delimiters are used to identify bind variables
+ *  in countBindVariables() and validateBinds().  Valid
+ *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+function setBindVariableDelimiters($delimiters){}
+
+/**
+ *  Returns true if question marks (?) are considered to be
+ *  valid bind variable delimiters. */
+function getBindVariableDelimiterQuestionMarkSupported(){}
+
+/**
+ *  Returns true if colons (:) are considered to be
+ *  valid bind variable delimiters. */
+function getBindVariableDelimiterColonSupported(){}
+
+/**
+ *  Returns true if at-signs (@) are considered to be
+ *  valid bind variable delimiters. */
+function getBindVariableDelimiterAtSignSupported(){}
+
+/**
+ *  Returns true if dollar signs ($) are considered to be
+ *  valid bind variable delimiters. */
+function getBindVariableDelimiterDollarSignSupported(){}
+
 /** Enables Kerberos authentication and encryption.
  *
  *  "service" indicates the Kerberos service name of the
