@@ -110,6 +110,60 @@ static VALUE sqlrcon_setResponseTimeout(VALUE self,
 	return Qnil;
 }
 
+/**
+ *  call-seq:
+ *  setBindVariablesDelimiters(delimiters)
+ *
+ *  Sets which delimiters are used to identify bind variables
+ *  in countBindVariables() and validateBinds().  Valid
+ *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+static VALUE setBindVariableDelimiters(VALUE self, VALUE delimiters) {
+	sqlrconnection	*sqlrcon;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	sqlrcon->setBindVariableDelimiters(STR2CSTR(delimiters));
+	return Qnil;
+}
+
+/** Returns true if question marks (?) are considered to be
+ *  valid bind variable delimiters. */
+static VALUE getBindVariableDelimiterQuestionMarkSupported(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	bool result;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	result=sqlrcon->getBindVariableDelimiterQuestionMarkSupported();
+	return INT2NUM(result);
+}
+
+/** Returns true if colons (:) are considered to be
+ *  valid bind variable delimiters. */
+static VALUE getBindVariableDelimiterColonSupported(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	bool result;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	result=sqlrcon->getBindVariableDelimiterColonSupported();
+	return INT2NUM(result);
+}
+
+/** Returns true if at-signs (@) are considered to be
+ *  valid bind variable delimiters. */
+static VALUE getBindVariableDelimiterAtSignSupported(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	bool result;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	result=sqlrcon->getBindVariableDelimiterAtSignSupported();
+	return INT2NUM(result);
+}
+
+/** Returns true if dollar signs ($) are considered to be
+ *  valid bind variable delimiters. */
+static VALUE getBindVariableDelimiterDollarSignSupported(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	bool result;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	result=sqlrcon->getBindVariableDelimiterDollarSignSupported();
+	return INT2NUM(result);
+}
+
 /** Enables Kerberos authentication and encryption.
  *
  *  "service" indicates the Kerberos service name of the
@@ -569,6 +623,20 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_setAuthenticationTimeout,2);
 	rb_define_method(csqlrconnection,"setResponseTimeout",
 				(CAST)sqlrcon_setResponseTimeout,2);
+	rb_define_method(csqlrconnection,"setBindVariableDelimiters",
+				(CAST)setBindVariableDelimiters,1);
+	rb_define_method(csqlrconnection,
+			"getBindVariableDelimiterQuestionMarkSupported",
+			(CAST)getBindVariableDelimiterQuestionMarkSupported,0);
+	rb_define_method(csqlrconnection,
+			"getBindVariableDelimiterColonSupported",
+			(CAST)getBindVariableDelimiterColonSupported,0);
+	rb_define_method(csqlrconnection,
+			"getBindVariableDelimiterAtSignSupported",
+			(CAST)getBindVariableDelimiterAtSignSupported,0);
+	rb_define_method(csqlrconnection,
+			"getBindVariableDelimiterDollarSignSupported",
+			(CAST)getBindVariableDelimiterDollarSignSupported,0);
 	rb_define_method(csqlrconnection,"enableKerberos",
 				(CAST)sqlrcon_enableKerberos,3);
 	rb_define_method(csqlrconnection,"enableTls",

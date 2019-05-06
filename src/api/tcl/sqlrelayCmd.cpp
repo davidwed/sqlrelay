@@ -1822,6 +1822,11 @@ void sqlrconDelete(ClientData data) {
  *  $con setConnectTimeout
  *  $con setAuthenticationTimeout
  *  $con setResponseTimeout
+ *  $con setBindVariableDelimiters
+ *  $con getBindVariableDelimiterQuestionMarkSupported
+ *  $con getBindVariableDelimiterColonSupported
+ *  $con getBindVariableDelimiterAtSignSupported
+ *  $con getBindVariableDelimiterDollarSignSupported
  *  $con enableKerberos
  *  $con enableTls
  *  $con disableEncryption
@@ -1862,6 +1867,11 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "setConnectTimeout",
     "setAuthenticationTimeout",
     "setResponseTimeout",
+    "setBindVariableDelimiters",
+    "getBindVariableDelimiterQuestionMarkSupported",
+    "getBindVariableDelimiterColonSupported",
+    "getBindVariableDelimiterAtSignSupported",
+    "getBindVariableDelimiterDollarSignSupported",
     "enableKerberos",
     "enableTls",
     "disableEncryption",
@@ -1898,6 +1908,11 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_SETCONNECTTIMEOUT,
     SQLR_SETAUTHENTICATIONTIMEOUT,
     SQLR_SETRESPONSETIMEOUT,
+    SQLR_SETBINDVARIABLEDELIMITERS,
+    SQLR_GETBINDVARIABLEDELIMITERQUESTIONMARKSUPPORTED,
+    SQLR_GETBINDVARIABLEDELIMITERCOLONSUPPORTED,
+    SQLR_GETBINDVARIABLEDELIMITERATSIGNSUPPORTED,
+    SQLR_GETBINDVARIABLEDELIMITERDOLLARSIGNSUPPORTED,
     SQLR_ENABLEKERBEROS,
     SQLR_ENABLETLS,
     SQLR_DISABLEENCRYPTION,
@@ -1996,6 +2011,51 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     }
     con->setResponseTimeout(timeoutsec,timeoutusec);
     break;
+  }
+  case SQLR_SETBINDVARIABLEDELIMITERS: {
+    const char *delimiter;
+
+    if (objc > 3) {
+      Tcl_WrongNumArgs(interp, 1, objv, "delimiter");
+      return TCL_ERROR;
+    }
+
+    delimiter = Tcl_GetString(objv[2]);
+
+    con->setBindVariableDelimiters(delimiter);
+    break;
+  }
+  case SQLR_GETBINDVARIABLEDELIMITERQUESTIONMARKSUPPORTED: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp, Tcl_NewIntObj(
+			con->getBindVariableDelimiterQuestionMarkSupported()));
+  }
+  case SQLR_GETBINDVARIABLEDELIMITERCOLONSUPPORTED: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp, Tcl_NewIntObj(
+			con->getBindVariableDelimiterColonSupported()));
+  }
+  case SQLR_GETBINDVARIABLEDELIMITERATSIGNSUPPORTED: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp, Tcl_NewIntObj(
+			con->getBindVariableDelimiterAtSignSupported()));
+  }
+  case SQLR_GETBINDVARIABLEDELIMITERDOLLARSIGNSUPPORTED: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp, Tcl_NewIntObj(
+			con->getBindVariableDelimiterDollarSignSupported()));
   }
   case SQLR_ENABLEKERBEROS: {
     const char *service;
