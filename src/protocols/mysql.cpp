@@ -2924,14 +2924,14 @@ bool sqlrprotocol_mysql::comQuery(sqlrservercursor *cursor) {
 		return sendErrPacket(1105,err.getString(),"24000");
 	}
 
-	//if (getDebug()) {
+	if (getDebug()) {
 		debugStart("com_query");
 		stdoutput.printf("	query: \"");
 		stdoutput.safePrint(query,(uint32_t)querylen);
 		stdoutput.printf("\"\n");
 		stdoutput.printf("	query length: %d\n",querylen);
 		debugEnd();
-	//}
+	}
 
 	return sendQuery(cursor,query,querylen);
 }
@@ -4311,14 +4311,14 @@ bool sqlrprotocol_mysql::comStmtPrepare(sqlrservercursor *cursor) {
 	querybuffer[querylen]='\0';
 	cont->setQueryLength(cursor,querylen);
 
-	//if (getDebug() || !charstring::compareIgnoringCase(query,"insert into efile ",19)) {
+	if (getDebug()) {
 		debugStart("com_stmt_prepare");
 		stdoutput.printf("	query: \"");
 		stdoutput.safePrint(query,(uint32_t)querylen);
 		stdoutput.printf("\"\n");
 		stdoutput.printf("	query length: %d\n",querylen);
 		debugEnd();
-	//}
+	}
 
 	// prepare the query
 	if (!cont->prepareQuery(cursor,cont->getQueryBuffer(cursor),

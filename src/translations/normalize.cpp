@@ -19,6 +19,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 					stringbuffer *translatedquery);
 	private:
 		bool	skipQuotedStrings(const char *ptr,
+						const char *end,
 						stringbuffer *sb,
 						const char **newptr,
 						bool sq,
@@ -27,11 +28,13 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 						bool alreadyinside);
 		bool	caseConvertQuotedStrings(
 						const char *ptr,
+						const char *end,
 						stringbuffer *sb,
 						const char **newptr,
 						bool upper,
 						char quote);
 		bool	removeQuotes(const char *ptr,
+						const char *end,
 						stringbuffer *sb,
 						const char **newptr,
 						bool upper,
@@ -145,8 +148,9 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("original query:\n\"%.*s\"\n\n",
-							querylength,query);
+		stdoutput.write("original query:\n\"");
+		stdoutput.safePrint(query,querylength);
+		stdoutput.write("\"\n\n");
 	}
 
 	// clear the normalized query buffers
@@ -189,7 +193,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass1,&ptr,
+		if (skipQuotedStrings(ptr,end,&pass1,&ptr,
 					true,
 					(!uppercasedq &&
 						!lowercasedq &&
@@ -203,7 +207,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 
 		// remove double quotes
 		if (removedq) {
-			if (removeQuotes(ptr,&pass1,&ptr,
+			if (removeQuotes(ptr,end,&pass1,&ptr,
 						uppercase,lowercase,'"')) {
 				continue;
 			}
@@ -212,14 +216,14 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		// case-convert double-quoted strings
 		else if (uppercasedq || lowercasedq) {
 			if (caseConvertQuotedStrings(
-					ptr,&pass1,&ptr,uppercasedq,'"')) {
+					ptr,end,&pass1,&ptr,uppercasedq,'"')) {
 				continue;
 			}
 		}
 
 		// remove back quotes
 		if (removebq) {
-			if (removeQuotes(ptr,&pass1,&ptr,
+			if (removeQuotes(ptr,end,&pass1,&ptr,
 						uppercase,lowercase,'`')) {
 				continue;
 			}
@@ -228,7 +232,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		// case-convert back-quoted strings
 		else if (uppercasebq || lowercasebq) {
 			if (caseConvertQuotedStrings(
-					ptr,&pass1,&ptr,uppercasebq,'`')) {
+					ptr,end,&pass1,&ptr,uppercasebq,'`')) {
 				continue;
 			}
 		}
@@ -252,9 +256,9 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 1):\n\"%.*s\"\n\n",
-							pass1.getSize(),
-							pass1.getString());
+		stdoutput.write("normalized query (pass 1):\n\"");
+		stdoutput.safePrint(pass1.getString(),pass1.getSize());
+		stdoutput.write("\"\n\n");
 	}
 
 	// normalize the query, second pass...
@@ -281,7 +285,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			}
 
 			// skip quoted strings
-			if (skipQuotedStrings(ptr,&pass2,&ptr,
+			if (skipQuotedStrings(ptr,end,&pass2,&ptr,
 						true,true,true,false)) {
 				continue;
 			}
@@ -368,9 +372,9 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 2):\n\"%.*s\"\n\n",
-							pass2.getSize(),
-							pass2.getString());
+		stdoutput.write("normalized query (pass 2):\n\"");
+		stdoutput.safePrint(pass2.getString(),pass2.getSize());
+		stdoutput.write("\"\n\n");
 	}
 
 	// normalize the query, third pass...
@@ -381,7 +385,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	for (;;) {
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,&pass3,&ptr,true,true,true,false)) {
+		if (skipQuotedStrings(ptr,end,&pass3,&ptr,
+					true,true,true,false)) {
 			continue;
 		}
 
@@ -509,9 +514,9 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 3):\n\"%.*s\"\n\n",
-							pass3.getSize(),
-							pass3.getString());
+		stdoutput.write("normalized query (pass 3):\n\"");
+		stdoutput.safePrint(pass3.getString(),pass3.getSize());
+		stdoutput.write("\"\n\n");
 	}
 
 	// normalize the query, fourth pass...
@@ -525,8 +530,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	for (;;) {
 
 		// skip quoted strings
-		if (skipQuotedStrings(ptr,translatedquery,&ptr,
-					true,true,true,false)) {
+		if (skipQuotedStrings(ptr,end,translatedquery,&ptr,
+						true,true,true,false)) {
 			continue;
 		}
 
@@ -535,8 +540,8 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			ptr=ptr+3;
 			translatedquery->setPosition(
 					translatedquery->getPosition()-1);
-			skipQuotedStrings(ptr,translatedquery,&ptr,
-						true,true,true,true);
+			skipQuotedStrings(ptr,end,translatedquery,&ptr,
+							true,true,true,true);
 			continue;
 		}
 
@@ -554,15 +559,17 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	}
 
 	if (debug) {
-		stdoutput.printf("normalized query (pass 4):\n\"%.*s\"\n\n",
-						translatedquery->getSize(),
-						translatedquery->getString());
+		stdoutput.write("normalized query (pass 4):\n\"");
+		stdoutput.safePrint(translatedquery->getString(),
+					translatedquery->getSize());
+		stdoutput.write("\"\n\n");
 	}
 
 	return true;
 }
 
 bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
+						const char *end,
 						stringbuffer *sb,
 						const char **newptr,
 						bool sq,
@@ -620,9 +627,13 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 				ptr=ptr+2;
 			} else
 
-			// if we found a slash-escaped quote like \' or \"...
-			if (slashescape && (*ptr=='\\' && *(ptr+1)==quote)) {
-				// convert to a double-escaped quote
+			// if we found a slash-escaped quote like \' or \",
+			// or if we found a slash-escaped slash like \\...
+			if (slashescape && (*ptr=='\\' &&
+						(*(ptr+1)==quote ||
+						*(ptr+1)=='\\'))) {
+				// insert the thing after the slash twice
+				// converts \" to "" and leaves \\ alone
 				sb->write(*(ptr+1));
 				sb->write(*(ptr+1));
 				ptr=ptr+2;
@@ -630,16 +641,15 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 
 			// if we didn't find escaped quotes,
 			// or if we found an empty string...
-			if (*ptr!=quote)
-			{
+			if (*ptr!=quote) {
 				sb->write(*ptr);
 				ptr++;
 			}
 
-		} while (*ptr && *ptr!=quote);
+		} while (ptr!=end && *ptr!=quote);
 
 		// write the end-quote
-		if (*ptr) {
+		if (ptr!=end) {
 			sb->write(*ptr);
 			ptr++;
 		}
@@ -653,6 +663,7 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 
 bool sqlrtranslation_normalize::caseConvertQuotedStrings(
 						const char *ptr,
+						const char *end,
 						stringbuffer *sb,
 						const char **newptr,
 						bool upper,
@@ -700,10 +711,10 @@ bool sqlrtranslation_normalize::caseConvertQuotedStrings(
 				ptr++;
 			}
 
-		} while (*ptr && *ptr!=quote);
+		} while (ptr!=end && *ptr!=quote);
 
 		// write the end-quote
-		if (*ptr) {
+		if (ptr!=end) {
 			sb->write(*ptr);
 			ptr++;
 		}
@@ -717,6 +728,7 @@ bool sqlrtranslation_normalize::caseConvertQuotedStrings(
 
 bool sqlrtranslation_normalize::removeQuotes(
 					const char *ptr,
+					const char *end,
 					stringbuffer *sb,
 					const char **newptr,
 					bool upper,
@@ -763,10 +775,10 @@ bool sqlrtranslation_normalize::removeQuotes(
 				ptr++;
 			}
 
-		} while (*ptr && *ptr!=quote);
+		} while (ptr!=end && *ptr!=quote);
 
 		// skip the end-quote
-		if (*ptr) {
+		if (ptr!=end) {
 			ptr++;
 		}
 	}

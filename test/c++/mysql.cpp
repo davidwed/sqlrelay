@@ -1175,6 +1175,18 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getFieldLength(0,(uint32_t)0),3);
 	checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\0\"\"",3),0);
 	checkSuccess(cur->sendQuery("delete from testtable"),true);
+	stdoutput.printf("\n");
+	checkSuccess(cur->sendQuery("insert into testtable values (_binary'\\\0\\\"\\\"')",46),true);
+	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+	checkSuccess(cur->getFieldLength(0,(uint32_t)0),3);
+	checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\0\"\"",3),0);
+	checkSuccess(cur->sendQuery("delete from testtable"),true);
+	stdoutput.printf("\n");
+	checkSuccess(cur->sendQuery("insert into testtable values (_binary'\\\\\\'')",44),true);
+	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+	checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
+	checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\\\'",2),0);
+	checkSuccess(cur->sendQuery("delete from testtable"),true);
 	cur->sendQuery("drop table testtable");
 	stdoutput.printf("\n");
 

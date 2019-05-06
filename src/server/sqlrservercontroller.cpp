@@ -2386,9 +2386,7 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	pvt->_txpool.clear();
 
 	// set in-tx flag
-	if (!pvt->_autocommitforthissession) {
-		pvt->_intransaction=false;
-	}
+	pvt->_intransaction=!pvt->_autocommitforthissession;
 }
 
 bool sqlrservercontroller::rollback() {
@@ -3276,12 +3274,14 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	uint32_t	querylen=cursor->getQueryLength();
 
 	if (pvt->_debugsqlrtranslations) {
-		stdoutput.printf("\n===================="
+		stdoutput.write("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("translating query...\n\n");
-		stdoutput.printf("original:\n\"%.*s\"\n",querylen,query);
+		stdoutput.write("translating query...\n\n");
+		stdoutput.write("original:\n\"");
+		stdoutput.safePrint(query,querylen);
+		stdoutput.write("\"\n");
 	}
 
 	// clear the query tree
@@ -3295,9 +3295,10 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 		raiseTranslationFailureEvent(cursor,query);
 		if (pvt->_sqlrt->getUseOriginalOnError()) {
 			if (pvt->_debugsqlrtranslations) {
-				stdoutput.printf("translation failed, "
-						"using original:\n\"%.*s\"\n",
-						querylen,query);
+				stdoutput.write("translation failed, "
+						"using original:\n\"");
+				stdoutput.safePrint(query,querylen);
+				stdoutput.write("\"\n");
 			}
 			return true;
 		}
@@ -3312,15 +3313,16 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	}
 
 	if (pvt->_debugsqlrtranslations) {
-		stdoutput.printf("translated:\n\"%.*s\"\n",
-					translatedquery->getSize(),
-					translatedquery->getString());
+		stdoutput.write("translated:\n\"");
+		stdoutput.safePrint(translatedquery->getString(),
+					translatedquery->getSize());
+		stdoutput.write("\"\n");
 	}
 
 	// bail if the translated query is too large
 	if (translatedquery->getSize()>pvt->_maxquerysize) {
 		if (pvt->_debugsqlrtranslations) {
-			stdoutput.printf("translated query too large\n");
+			stdoutput.write("translated query too large\n");
 		}
 		return false;
 	}
