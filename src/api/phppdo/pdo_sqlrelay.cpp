@@ -1745,11 +1745,6 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 
 	// set bind variable delimiters
 	sqlrdbh->sqlrcon->setBindVariableDelimiters(bindvariabledelimiters);
-stdoutput.printf("delimiters: %d,%d,%d,%d\n",
-	sqlrdbh->sqlrcon->getBindVariableDelimiterQuestionMarkSupported(),
-	sqlrdbh->sqlrcon->getBindVariableDelimiterColonSupported(),
-	sqlrdbh->sqlrcon->getBindVariableDelimiterAtSignSupported(),
-	sqlrdbh->sqlrcon->getBindVariableDelimiterDollarSignSupported());
 
 	// if we're not doing lazy connects, then do something lightweight
 	// that will verify whether SQL Relay is available or not

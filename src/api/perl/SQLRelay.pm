@@ -80,6 +80,7 @@ sub connect {
 	$dsn{'db'}='';
 	$dsn{'debug'}=0;
 	$dsn{'lazyconnect'}=1;
+	$dsn{'bindvariabledelimiters'}="?:@\$";
 
 	# split the dsn
 	my $var;
@@ -137,6 +138,9 @@ sub connect {
 	if (length($dsn{'db'})) {
 		$connection->selectDatabase($dsn{'db'});
 	}
+
+	# set bind variable delimiters
+	$connection->setBindVariableDelimiters($dsn{'bindvariabledelimiters'});
 
 	# store some references in the database handle
 	$dbh->STORE('driver_database_handle',$drh);
