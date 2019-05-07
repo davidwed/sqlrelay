@@ -132,6 +132,8 @@ struct CONN {
 	bool				lazyconnect;
 	bool				clearbindsduringprepare;
 
+	char				bindvariabledelimiters[5];
+
 	bool				attrmetadataid;
 	SQLSMALLINT			sqlerrorindex;
 };
@@ -2346,6 +2348,13 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	conn->clearbindsduringprepare=
 		!charstring::isNo(clearbindsduringpreparebuf);
 
+	// bind variable delimiters
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"BindVariableDelimiters","?:@$",
+					conn->bindvariabledelimiters,
+					sizeof(conn->bindvariabledelimiters),
+					ODBC_INI);
+
 	// override dsn values with values passed in via the connectstring
 	if (connparams!=NULL) {
 		const char	*connserver=connparams->getValue("Server");
@@ -2394,6 +2403,14 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 			conn->lazyconnect=!charstring::isNo(connlazyconnect);
 		}
 		// FIXME: other flags
+
+		const char	*conn_bindvariabledelimiters=
+				connparams->getValue("BindVariableDelimiters");
+		if (conn_bindvariabledelimiters!=NULL) {
+			charstring::safeCopy(conn->bindvariabledelimiters,
+					sizeof(conn->bindvariabledelimiters),
+					conn_bindvariabledelimiters);
+		}
 	}
 
 
@@ -2427,6 +2444,8 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  LazyConnect: %d\n",conn->lazyconnect);
 	debugPrintf("  ClearBindsDuringPrepare: %d\n",
 					conn->clearbindsduringprepare);
+	debugPrintf("  BindVariableDelimiters: %s\n",
+					conn->bindvariabledelimiters);
 
 	// create connection
 	conn->con=new sqlrconnection(conn->server,
@@ -2465,6 +2484,8 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	#ifdef DEBUG_MESSAGES
 	conn->con->debugOn();
 	#endif
+
+	conn->con->setBindVariableDelimiters(conn->bindvariabledelimiters);
 
 	// if we're not doing lazy connects, then do something lightweight
 	// that will verify whether SQL Relay is available or not
