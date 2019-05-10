@@ -145,12 +145,14 @@ struct sqlrstatement {
 	stringbuffer			subvarquery;
 	singlylinkedlist< char * >	subvarstrings;
 	bool				fwdonly;
+	bool				emulatepreparesunicodestrings;
 };
 
 struct sqlrdbhandle {
 	sqlrconnection	*sqlrcon;
 	bool		translatebindsonserver;
 	bool		usesubvars;
+	bool		emulatepreparesunicodestrings;
 	int64_t		resultsetbuffersize;
 	bool		dontgetcolumninfo;
 	bool		nullsasnulls;
@@ -478,7 +480,11 @@ static int sqlrcursorSubstitutionPreExec(sqlrstatement *sqlrstmt,
 		case PDO_PARAM_STR:
 			CONVERT_TO_STRING(param->parameter);
 			str=new char[SLEN(param->parameter)+3];
-			charstring::copy(str,"'");
+			if (sqlrstmt->emulatepreparesunicodestrings) {
+				charstring::copy(str,"N'");
+			} else {
+				charstring::copy(str,"'");
+			}
 			charstring::append(str,
 					SVAL(param->parameter),
 					SLEN(param->parameter));
@@ -491,7 +497,11 @@ static int sqlrcursorSubstitutionPreExec(sqlrstatement *sqlrstmt,
 			if (TYPE(param->parameter)==IS_STRING) {
 				CONVERT_TO_STRING(param->parameter);
 				str=new char[SLEN(param->parameter)+3];
-				charstring::copy(str,"'");
+				if (sqlrstmt->emulatepreparesunicodestrings) {
+					charstring::copy(str,"N'");
+				} else {
+					charstring::copy(str,"'");
+				}
 				charstring::append(str,
 						SVAL(param->parameter),
 						SLEN(param->parameter));
@@ -1009,6 +1019,9 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 
 	sqlrstmt->subvarquery.clear();
 	clearList(&sqlrstmt->subvarstrings);
+
+	sqlrstmt->emulatepreparesunicodestrings=
+		sqlrdbh->emulatepreparesunicodestrings;
 
 	// FIXME:
 	// To not have to set translatebindvariables on the server, we need to
@@ -1672,7 +1685,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		// other languages...
 		//{"autocommit",(char *)"1",0},
 		{"autocommit",(char *)"0",0},
-		{"bindvariabledelimiters",(char *)"?:@$",0}
+		{"bindvariabledelimiters",(char *)"?:@$",0},
+		{"emulatepreparesunicodestrings",(char *)"0",0}
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1701,6 +1715,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char      *connecttime=options[23].optval;
 	bool		autocommit=!charstring::isNo(options[24].optval);
 	const char	*bindvariabledelimiters=options[25].optval;
+	bool		emulatepreparesunicodestrings=
+					charstring::isYes(options[26].optval);
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1817,6 +1833,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 
 	sqlrdbh->translatebindsonserver=false;
 	sqlrdbh->usesubvars=false;
+	sqlrdbh->emulatepreparesunicodestrings=emulatepreparesunicodestrings;
 
 	dbh->driver_data=(void *)sqlrdbh;
 	dbh->methods=&sqlrconnectionMethods;
