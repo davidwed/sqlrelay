@@ -11113,6 +11113,9 @@ static void createControls(HWND hwnd) {
 	createLabel(box3,"Clear Binds During Prepare",
 			x,y+=(labelheight+labeloffset),
 			labelwidth,labelheight);
+	createLabel(box3,"Bind Variable Delimiters",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
 
 	debugPrintf("  edits...\n");
 
@@ -11236,7 +11239,7 @@ static void createControls(HWND hwnd) {
 	bindvariabledelimitersedit=createEdit(box3,
 			dsndict.getValue("BindVariableDelimiters"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
-			1,true,false);
+			4,false,false);
 
 	debugPrintf("  buttons...\n");
 
