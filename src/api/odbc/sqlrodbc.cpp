@@ -10889,6 +10889,7 @@ static HWND		dontgetcolumninfoedit;
 static HWND		nullsasnullsedit;
 static HWND		lazyconnectedit;
 static HWND		clearbindsduringprepareedit;
+static HWND		bindvariabledelimitersedit;
 
 static const char	sqlrwindowclass[]="SQLRWindowClass";
 static const int	labelwidth=135;
@@ -11232,6 +11233,10 @@ static void createControls(HWND hwnd) {
 			dsndict.getValue("ClearBindsDuringPrepare"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1,true,false);
+	bindvariabledelimitersedit=createEdit(box3,
+			dsndict.getValue("BindVariableDelimiters"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			1,true,false);
 
 	debugPrintf("  buttons...\n");
 
@@ -11479,6 +11484,14 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("ClearBindsDuringPrepare",
 					clearbindsduringprepare);
 	}
+	if (!dsndict.getValue("BindVariableDelimiters")) {
+		char	*bindvariabledelimiters=new char[2];
+		SQLGetPrivateProfileString(dsnval,"BindVariableDelimiters",
+					"?:@$",
+					bindvariabledelimiters,5,ODBC_INI);
+		dsndict.setValue("BindVariableDelimiters",
+					bindvariabledelimiters);
+	}
 
 	debugPrintf("  success...\n");
 }
@@ -11723,6 +11736,13 @@ static void getDsnFromUi() {
 	GetWindowText(clearbindsduringprepareedit,data,len+1);
 	delete[] dsndict.getValue("ClearBindsDuringPrepare");
 	dsndict.setValue("ClearBindsDuringPrepare",data);
+
+	// BindVariableDelimiters
+	len=GetWindowTextLength(bindvariabledelimitersedit);
+	data=new char[len+1];
+	GetWindowText(bindvariabledelimitersedit,data,len+1);
+	delete[] dsndict.getValue("BindVariableDelimiters");
+	dsndict.setValue("BindVariableDelimiters",data);
 }
 
 static bool writeDsn() {
