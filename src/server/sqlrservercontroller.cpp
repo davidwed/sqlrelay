@@ -3160,16 +3160,18 @@ const char *sqlrservercontroller::asciiToOctal(unsigned char ch) {
 	return asciitooctal[ch];
 }
 
-bool sqlrservercontroller::hasBindVariables(const char *query) {
-	return ::countBindVariables(query,
+bool sqlrservercontroller::hasBindVariables(const char *query,
+						uint32_t querylen) {
+	return ::countBindVariables(query,querylen,
 				pvt->_questionmarksupported,
 				pvt->_colonsupported,
 				pvt->_atsignsupported,
 				pvt->_dollarsignsupported);
 }
 
-uint16_t sqlrservercontroller::countBindVariables(const char *query) {
-	return ::countBindVariables(query,
+uint16_t sqlrservercontroller::countBindVariables(const char *query,
+							uint32_t querylen) {
+	return ::countBindVariables(query,querylen,
 				pvt->_questionmarksupported,
 				pvt->_colonsupported,
 				pvt->_atsignsupported,
@@ -3372,50 +3374,62 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	queryparsestate_t	parsestate=IN_QUERY;
 	stringbuffer		newquery;
 	stringbuffer		currentbind;
-	const char		*endptr=querybuffer+cursor->getQueryLength()-1;
 
 	// use 1-based index for bind variables
 	uint16_t	bindindex=1;
 	
 	// run through the querybuffer...
-	char *c=querybuffer;
+	const char	*ptr=querybuffer;
+	const char	*endptr=querybuffer+cursor->getQueryLength()-1;
+	const char	*prevptr="\0";
 	do {
 
 		// if we're in the query...
 		if (parsestate==IN_QUERY) {
 
 			// if we find a quote, we're in quotes
-			if (*c=='\'') {
+			if (*ptr=='\'') {
 				parsestate=IN_QUOTES;
 			}
 
 			// if we find whitespace or a couple of other things
 			// then the next thing could be a bind variable
-			if (beforeBindVariable(c)) {
+			if (beforeBindVariable(ptr)) {
 				parsestate=BEFORE_BIND;
 			}
 
 			// append the character
-			newquery.append(*c);
-			c++;
+			newquery.append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
 			continue;
 		}
 
 		// copy anything in quotes verbatim
 		if (parsestate==IN_QUOTES) {
-			// FIXME: handle escaped quotes
-			if (*c=='\'') {
+
+			// if we find a quote, but not an escaped quote,
+			// then we're back in the query
+			if (*ptr=='\'' && *(ptr+1)!='\'' &&
+					*prevptr!='\'' && *prevptr!='\\') {
 				parsestate=IN_QUERY;
 			}
-			newquery.append(*c);
-			c++;
+
+			// append the character
+			newquery.append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
 			continue;
 		}
 
 		if (parsestate==BEFORE_BIND) {
 
 			// if we find a bind variable...
-			if (isBindDelimiter(c,
+			if (isBindDelimiter(ptr,
 					pvt->_questionmarksupported,
 					pvt->_colonsupported,
 					pvt->_atsignsupported,
@@ -3437,14 +3451,19 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			// If we find whitespace or a few other things
 			// then we're done with the bind variable.  Process it.
 			// Otherwise get the variable itself in another buffer.
-			bool	endofbind=afterBindVariable(c);
-			if (endofbind || c==endptr) {
+			bool	endofbind=afterBindVariable(ptr);
+			if (endofbind || ptr==endptr) {
 
 				// special case if we hit the end of the string
-				// an it's not one of the special chars
-				if (c==endptr && !endofbind) {
-					currentbind.append(*c);
-					c++;
+				// and it's not one of the special chars
+				if (ptr==endptr && !endofbind) {
+
+					// append the character
+					currentbind.append(*ptr);
+
+					// move on
+					prevptr=ptr;
+					ptr++;
 				}
 
 				// if the current bind variable format doesn't
@@ -3468,13 +3487,16 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 				parsestate=IN_QUERY;
 
 			} else {
-				currentbind.append(*c);
-				c++;
+
+				// move on
+				currentbind.append(*ptr);
+				prevptr=ptr;
+				ptr++;
 			}
 			continue;
 		}
 
-	} while (c<=endptr);
+	} while (ptr<=endptr);
 
 
 	// if no translation was performed

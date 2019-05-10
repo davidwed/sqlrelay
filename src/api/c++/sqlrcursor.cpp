@@ -1338,7 +1338,7 @@ void sqlrcursor::attachToBindCursor(uint16_t bindcursorid) {
 }
 
 uint16_t sqlrcursor::countBindVariables() const {
-	return ::countBindVariables(pvt->_queryptr,
+	return ::countBindVariables(pvt->_queryptr,pvt->_querylen,
 		pvt->_sqlrc->getBindVariableDelimiterQuestionMarkSupported(),
 		pvt->_sqlrc->getBindVariableDelimiterColonSupported(),
 		pvt->_sqlrc->getBindVariableDelimiterAtSignSupported(),

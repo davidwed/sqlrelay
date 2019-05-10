@@ -4336,7 +4336,8 @@ bool sqlrprotocol_mysql::sendStmtPrepareOk(sqlrservercursor *cursor) {
 	// should use the db method to get this, or countBindVariables() if the
 	// db doesn't know, and the sqlrservercursor class should expose it.
 	uint16_t	pcount=cont->countBindVariables(
-					cont->getQueryBuffer(cursor));
+					cont->getQueryBuffer(cursor),
+					cont->getQueryLength(cursor));
 	uint16_t	warningcount=0;
 
 	// bounds checking

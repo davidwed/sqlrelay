@@ -785,8 +785,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*asciiToHex(unsigned char ch);
 		const char	*asciiToOctal(unsigned char ch);
 
-		bool		hasBindVariables(const char *query);
-		uint16_t	countBindVariables(const char *query);
+		bool		hasBindVariables(const char *query,
+							uint32_t querylen);
+		uint16_t	countBindVariables(const char *query,
+							uint32_t querylen);
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);

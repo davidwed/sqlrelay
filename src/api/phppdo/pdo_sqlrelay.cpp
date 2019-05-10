@@ -948,40 +948,52 @@ static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
 static void sqlrconnectionRewriteQuery(const char *query,
 						uint32_t querylen,
 						stringbuffer *newquery) {
-	const char	*prevptr="\0";
 	bool		inquotes=false;
 	bool		inbind=false;
 	uint16_t	varcounter=0;
 
-	for (const char *c=query; *c; c++) {
+	const char	*ptr=query;
+	const char	*prevptr="\0";
+	do {
 
-		if (*c=='\'' && (*prevptr!='\\' && *prevptr!='\'')) {
-			inquotes=!inquotes;
+		// are we inside of quotes?
+		if (!inquotes) {
+			if (*ptr=='\'') {
+				inquotes = true;
+			}
+		} else {
+			if (*ptr=='\'' && *(ptr+1)!='\'' &&
+				*prevptr!='\\' && *prevptr!='\'') {
+				inquotes=false;
+			}
 		}
 
 		if (!inquotes) {
 
-			if (inbind && afterBindVariable(c)) {
+			if (inbind && afterBindVariable(ptr)) {
 				newquery->append(')');
 				inbind=false;
 			}
 
-			if (isBindDelimiter(c,true,true,true,true)) {
+			if (isBindDelimiter(ptr,true,true,true,true)) {
 				newquery->append("$(");
-				if (*c=='?') {
+				if (*ptr=='?') {
 					newquery->append(varcounter);
 					varcounter++;
 				} else {
 					inbind=true;
 				}
-				prevptr=c;
+				prevptr=ptr;
 				continue;
 			}
 		}
 
-		newquery->append(*c);
-		prevptr=c;
-	}
+		newquery->append(*ptr);
+		prevptr=ptr;
+		ptr++;
+
+	// FIXME: not binary-safe
+	} while (*ptr);
 }
 
 static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,

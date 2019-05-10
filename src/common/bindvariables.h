@@ -38,6 +38,7 @@ static bool afterBindVariable(const char *c) {
 
 #ifdef NEED_COUNT_BIND_VARIABLES
 static uint16_t countBindVariables(const char *query,
+					uint32_t querylen,
 					bool questionmark,
 					bool colon,
 					bool atsign,
@@ -47,39 +48,114 @@ static uint16_t countBindVariables(const char *query,
 		return 0;
 	}
 
-	const char	*prevptr="\0";
-	bool		inquotes=false;
-
 	uint16_t	questionmarkcount=0;
 	uint16_t	coloncount=0;
 	uint16_t	atsigncount=0;
 	uint16_t	dollarsigncount=0;
 
-	for (const char *ptr=query; *ptr; ptr++) {
+	queryparsestate_t	parsestate=IN_QUERY;
 
-		// are we inside of quotes?
-		if (*ptr=='\'' && (*prevptr!='\\' && *prevptr!='\'')) {
-			inquotes=!inquotes;
+	const char	*ptr=query;
+	const char	*endptr=query+querylen-1;
+	const char	*prevptr="\0";
+	do {
+
+		// if we're in the query...
+		if (parsestate==IN_QUERY) {
+
+                        // if we find a quote, we're in quotes
+                        if (*ptr=='\'') {
+                                parsestate=IN_QUOTES;
+                        }
+
+                        // if we find whitespace or a couple of other things
+                        // then the next thing could be a bind variable
+                        if (beforeBindVariable(ptr)) {
+                                parsestate=BEFORE_BIND;
+                        }
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
 		}
 
-		if (!inquotes && beforeBindVariable(prevptr)) {
+                // ignore anything in quotes
+                if (parsestate==IN_QUOTES) {
+
+                        // if we find a quote, but not an escaped quote,
+                        // then we're back in the query
+                        if (*ptr=='\'' && *(ptr+1)!='\'' &&
+					*prevptr!='\'' && *prevptr!='\\') {
+				parsestate=IN_QUERY;
+			}
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
+		}
+
+                if (parsestate==BEFORE_BIND) {
+
+                        // if we find a bind variable...
 			if (questionmark && isBindDelimiter(
 						ptr,true,false,false,false)) {
 				questionmarkcount++;
+                                parsestate=IN_BIND;
+                                continue;
 			} else if (colon && isBindDelimiter(
 						ptr,false,true,false,false)) {
 				coloncount++;
+                                parsestate=IN_BIND;
+                                continue;
 			} else if (atsign && isBindDelimiter(
 						ptr,false,false,true,false)) {
 				atsigncount++;
+                                parsestate=IN_BIND;
+                                continue;
 			} else if (dollarsign && isBindDelimiter(
 						ptr,false,false,false,true)) {
 				dollarsigncount++;
+                                parsestate=IN_BIND;
+                                continue;
 			}
+
+                        // if we didn't find a bind variable then we're just
+                        // back in the query
+                        parsestate=IN_QUERY;
+                        continue;
+                }
+
+		// if we're in a bind variable...
+		if (parsestate==IN_BIND) {
+
+			// If we find whitespace or a few other things
+			// then we're done with the bind variable.
+			bool	endofbind=afterBindVariable(ptr);
+			if (endofbind || ptr==endptr) {
+
+				// special case if we hit the end of the string
+				// and it's not one of the special chars
+				if (ptr==endptr && !endofbind) {
+
+					// move on
+					prevptr=ptr;
+					ptr++;
+				}
+
+				parsestate=IN_QUERY;
+
+			} else {
+
+				// move on
+				prevptr=ptr;
+				ptr++;
+			}
+			continue;
 		}
 
-		prevptr=ptr;
-	}
+	} while (ptr<=endptr);
 
 	// if we got $'s or ?'s, ignore the :'s or @'s
 	if (dollarsigncount) {

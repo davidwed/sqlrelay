@@ -11,6 +11,7 @@
 #include <datatypes.h>
 #include <defines.h>
 #define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_AFTER_BIND_VARIABLE 1
 #define NEED_IS_BIND_DELIMITER 1
 #include <bindvariables.h>
 
@@ -825,29 +826,38 @@ bool sqlrservercursor::fakeInputBinds() {
 	pvt->_querywithfakeinputbinds.clear();
 
 	// loop through the query, performing substitutions
+	bool		inquotes=false;
+	int64_t		bindindex=1;
+
 	char		*ptr=pvt->_querybuffer;
 	const char	*prevptr="\0";
-	int		index=1;
-	bool		inquotes=false;
-	while (*ptr) {
+	do {
 
 		// are we inside of quotes?
-		if (*ptr=='\'' && (*prevptr!='\\' && *prevptr!='\'')) {
-			inquotes=!inquotes;
-		}
+                if (!inquotes) {
+                        if (*ptr=='\'') {
+                                inquotes = true;
+                        }
+                } else {
+                        if (*ptr=='\'' && *(ptr+1)!='\'' &&
+                                *prevptr!='\\' && *prevptr!='\'') {
+                                inquotes=false;
+                        }
+                }
 
 		// look for a bind var prefix
 		if (!inquotes &&
 			beforeBindVariable(prevptr) &&
 			isBindDelimiter(ptr,
-			conn->cont->getConfig()->
-			getBindVariableDelimiterQuestionMarkSupported(),
-			conn->cont->getConfig()->
-			getBindVariableDelimiterColonSupported(),
-			conn->cont->getConfig()->
-			getBindVariableDelimiterAtSignSupported(),
-			conn->cont->getConfig()->
-			getBindVariableDelimiterDollarSignSupported())) {
+				conn->cont->getConfig()->
+				getBindVariableDelimiterQuestionMarkSupported(),
+				conn->cont->getConfig()->
+				getBindVariableDelimiterColonSupported(),
+				conn->cont->getConfig()->
+				getBindVariableDelimiterAtSignSupported(),
+				conn->cont->getConfig()->
+				getBindVariableDelimiterDollarSignSupported())
+			) {
 
 			// look through the list of vars
 			for (int16_t i=0; i<pvt->_inbindcount; i++) {
@@ -875,7 +885,7 @@ bool sqlrservercursor::fakeInputBinds() {
 					(*ptr=='?' && 
 					charstring::toInteger(
 						pvt->_inbindvars[i].
-							variable+1)==index) 
+							variable+1)==bindindex) 
 
 					||
 
@@ -885,20 +895,10 @@ bool sqlrservercursor::fakeInputBinds() {
 						pvt->_inbindvars[i].
 							variablesize-1) 
 					 		&&
-					(*(ptr+pvt->_inbindvars[i].
-						variablesize)==' ' ||
-					*(ptr+pvt->_inbindvars[i].
-						variablesize)=='	' ||
-					*(ptr+pvt->_inbindvars[i].
-						variablesize)=='\n' ||
-					*(ptr+pvt->_inbindvars[i].
-						variablesize)=='\r' ||
-					*(ptr+pvt->_inbindvars[i].
-						variablesize)==')' ||
-					*(ptr+pvt->_inbindvars[i].
-						variablesize)==',' ||
-					*(ptr+pvt->_inbindvars[i].
-						variablesize)==';' ||
+					(afterBindVariable(
+						ptr+pvt->_inbindvars[i].
+							variablesize) ||
+					// FIXME: not binary-safe
 					*(ptr+pvt->_inbindvars[i].
 						variablesize)=='\0')
 					)) {
@@ -911,20 +911,24 @@ bool sqlrservercursor::fakeInputBinds() {
 						ptr=ptr+pvt->_inbindvars[i].
 								variablesize;
 					}
-					index++;
+					bindindex++;
 					break;
 				}
 			}
 		}
 
+		prevptr=ptr;
+
 		// write the input query to the output query
+		// FIXME: not binary-safe
 		if (*ptr) {
 			pvt->_querywithfakeinputbinds.append(*ptr);
 			ptr++;
 		}
 
-		prevptr=ptr-1;
-	}
+	// FIXME: not binary-safe
+	} while (*ptr);
+
 	return true;
 }
 
