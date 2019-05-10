@@ -11296,6 +11296,8 @@ static void parseDsn(const char *dsn) {
 					charstring::duplicate("1"));
 		dsndict.setValue("ClearBindsDuringPrepare",
 					charstring::duplicate("1"));
+		dsndict.setValue("BindVariableDelimiters",
+					charstring::duplicate("?:@$"));
 
 		debugPrintf("  success...\n");
 		return;
