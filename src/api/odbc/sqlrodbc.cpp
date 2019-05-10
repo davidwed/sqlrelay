@@ -11488,7 +11488,7 @@ static void parseDsn(const char *dsn) {
 					clearbindsduringprepare);
 	}
 	if (!dsndict.getValue("BindVariableDelimiters")) {
-		char	*bindvariabledelimiters=new char[2];
+		char	*bindvariabledelimiters=new char[5];
 		SQLGetPrivateProfileString(dsnval,"BindVariableDelimiters",
 					"?:@$",
 					bindvariabledelimiters,5,ODBC_INI);
