@@ -26,6 +26,7 @@
 		void	sendCursorStatus();
 		void	performSubstitutions();
 		void	validateBindsInternal();
+		bool	validateBind(const char *variable);
 		void	sendInputBinds();
 		void	sendOutputBinds();
 		void	sendInputOutputBinds();

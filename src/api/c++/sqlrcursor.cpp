@@ -2506,94 +2506,30 @@ void sqlrcursor::validateBindsInternal() {
 		return;
 	}
 
-	// some useful variables
-	const char	*ptr;
-	const char	*start;
-	const char	*after;
-	bool		found;
-	size_t		len;
-
 	// check each input bind
 	for (uint64_t in=0; in<pvt->_inbindvars->getLength(); in++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(
-				(*pvt->_inbindvars)[in].variable);
 		if (charstring::isInteger(
-				(*pvt->_inbindvars)[in].variable,len)) {
+				(*pvt->_inbindvars)[in].variable)) {
 			continue;
 		}
 
-		found=false;
-		start=pvt->_queryptr+1;
-
-		// there may be more than 1 match for the variable name as in
-		// "select * from table where table_name=:table_name", both
-		// table_name's would match, but only the second is a bind
-		// variable
-		while ((ptr=charstring::findFirst(start,
-					(*pvt->_inbindvars)[in].variable))) {
-
-			// for a match to be a bind variable, it must be 
-			// preceded by a bind delimiter and followed by a
-			// valid character
-			after=ptr+len;
-			if ((*(ptr-1)=='?' ||
-				*(ptr-1)==':' ||
-				*(ptr-1)=='@' ||
-				*(ptr-1)=='$') &&
-				afterBindVariable(after)) {
-				found=true;
-				break;
-			} else {
-				// jump past this instance to look for the
-				// next one
-				start=ptr+len;
-			}
-		}
-
-		(*pvt->_inbindvars)[in].send=found;
+		(*pvt->_inbindvars)[in].send=
+			validateBind((*pvt->_inbindvars)[in].variable);
 	}
 
 	// check each output bind
 	for (uint64_t out=0; out<pvt->_outbindvars->getLength(); out++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(
-				(*pvt->_outbindvars)[out].variable);
 		if (charstring::isInteger(
-				(*pvt->_outbindvars)[out].variable,len)) {
+				(*pvt->_outbindvars)[out].variable)) {
 			continue;
 		}
 
-		found=false;
-		start=pvt->_queryptr+1;
-
-		// there may be more than 1 match for the variable name as in
-		// "select * from table where table_name=:table_name", both
-		// table_name's would match, but only 1 is correct
-		while ((ptr=charstring::findFirst(start,
-					(*pvt->_outbindvars)[out].variable))) {
-
-			// for a match to be a bind variable, it must be 
-			// preceded by a colon and can't be followed by an
-			// alphabet character, number or underscore
-			after=ptr+len;
-			if ((*(ptr-1)=='?' ||
-				*(ptr-1)==':' ||
-				*(ptr-1)=='@' ||
-				*(ptr-1)=='$') &&
-				afterBindVariable(after)) {
-				found=true;
-				break;
-			} else {
-				// jump past this instance to look for the
-				// next one
-				start=ptr+len;
-			}
-		}
-
-		(*pvt->_outbindvars)[out].send=found;
+		(*pvt->_outbindvars)[out].send=
+			validateBind((*pvt->_outbindvars)[out].variable);
 	}
 
 	// check each input/output bind
@@ -2601,43 +2537,125 @@ void sqlrcursor::validateBindsInternal() {
 		inout<pvt->_inoutbindvars->getLength(); inout++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(
-				(*pvt->_inoutbindvars)[inout].variable);
 		if (charstring::isInteger(
-				(*pvt->_inoutbindvars)[inout].variable,len)) {
+				(*pvt->_inoutbindvars)[inout].variable)) {
 			continue;
 		}
 
-		found=false;
-		start=pvt->_queryptr+1;
+		(*pvt->_inoutbindvars)[inout].send=
+			validateBind((*pvt->_inoutbindvars)[inout].variable);
+	}
+}
 
-		// there may be more than 1 match for the variable name as in
-		// "select * from table where table_name=:table_name", both
-		// table_name's would match, but only the second is a bind
-		// variable
-		while ((ptr=charstring::findFirst(start,
-				(*pvt->_inoutbindvars)[inout].variable))) {
+bool sqlrcursor::validateBind(const char *variable) {
 
-			// for a match to be a bind variable, it must be 
-			// preceded by a colon and can't be followed by an
-			// alphabet character, number or underscore
-			after=ptr+len;
-			if ((*(ptr-1)=='?' ||
-				*(ptr-1)==':' ||
-				*(ptr-1)=='@' ||
-				*(ptr-1)=='$') &&
-				afterBindVariable(after)) {
-				found=true;
-				break;
-			} else {
-				// jump past this instance to look for the
-				// next one
-				start=ptr+len;
+	queryparsestate_t	parsestate=IN_QUERY;
+	stringbuffer		currentbind;
+
+	size_t	len=charstring::length(variable);
+
+	// run through the querybuffer...
+	const char	*ptr=pvt->_queryptr;
+	const char	*endptr=pvt->_queryptr+pvt->_querylen;
+	const char	*prevptr="\0";
+	do {
+
+		// if we're in the query...
+		if (parsestate==IN_QUERY) {
+
+			// if we find a quote, we're in quotes
+			if (*ptr=='\'') {
+				parsestate=IN_QUOTES;
 			}
+
+			// if we find whitespace or a couple of other things
+			// then the next thing could be a bind variable
+			if (beforeBindVariable(ptr)) {
+				parsestate=BEFORE_BIND;
+			}
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
 		}
 
-		(*pvt->_inoutbindvars)[inout].send=found;
-	}
+		// copy anything in quotes verbatim
+		if (parsestate==IN_QUOTES) {
+
+			// if we find a quote, but not an escaped quote,
+			// then we're back in the query
+			if (*ptr=='\'' && *(ptr+1)!='\'' &&
+					*prevptr!='\'' && *prevptr!='\\') {
+				parsestate=IN_QUERY;
+			}
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
+		}
+
+		if (parsestate==BEFORE_BIND) {
+
+			// if we find a bind variable...
+			if (isBindDelimiter(ptr,
+		pvt->_sqlrc->getBindVariableDelimiterQuestionMarkSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterColonSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterAtSignSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterDollarSignSupported())) {
+				parsestate=IN_BIND;
+				currentbind.clear();
+				continue;
+			}
+
+			// if we didn't find a bind variable then we're just
+			// back in the query
+			parsestate=IN_QUERY;
+			continue;
+		}
+
+		// if we're in a bind variable...
+		if (parsestate==IN_BIND) {
+
+			// If we find whitespace or a few other things
+			// then we're done with the bind variable.  Process it.
+			// Otherwise get the variable itself in another buffer.
+			bool	endofbind=afterBindVariable(ptr);
+			if (endofbind || ptr==endptr-1) {
+
+				// special case...
+				// last character in the query
+				if (!endofbind && ptr==endptr-1) {
+					currentbind.append(*ptr);
+					prevptr=ptr;
+					ptr++;
+				}
+
+				// check variable against currentbind
+				if (len==currentbind.getStringLength()-1 &&
+					!charstring::compare(
+						variable,
+						currentbind.getString()+1,
+						len)) {
+					return true;
+				}
+
+				parsestate=IN_QUERY;
+
+			} else {
+
+				// move on
+				currentbind.append(*ptr);
+				prevptr=ptr;
+				ptr++;
+			}
+			continue;
+		}
+
+	} while (ptr<endptr);
+
+	return false;
 }
 
 void sqlrcursor::performSubstitution(stringbuffer *buffer, uint16_t which) {

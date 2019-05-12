@@ -18,6 +18,7 @@
 #include <datatypes.h>
 #include <defines.h>
 #define NEED_IS_BIND_DELIMITER 1
+#define NEED_BEFORE_BIND_VARIABLE 1
 #define NEED_AFTER_BIND_VARIABLE 1
 #include <bindvariables.h>
 #include <sqlrelay/sqlrclient.h>
@@ -940,60 +941,118 @@ static struct pdo_stmt_methods sqlrcursorMethods={
 
 static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
-	delete (sqlrconnection *)sqlrdbh->sqlrcon;
+	delete sqlrdbh->sqlrcon;
 	dbh->is_closed=1;
 	return 0;
 }
 
-static void sqlrconnectionRewriteQuery(const char *query,
+static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
+						const char *query,
 						uint32_t querylen,
 						stringbuffer *newquery) {
-	bool		inquotes=false;
-	bool		inbind=false;
+
+	queryparsestate_t	parsestate=IN_QUERY;
+
 	uint16_t	varcounter=0;
 
+	// run through the querybuffer...
 	const char	*ptr=query;
+	const char	*endptr=ptr+querylen;
 	const char	*prevptr="\0";
 	do {
 
-		// are we inside of quotes?
-		if (!inquotes) {
+		// if we're in the query...
+		if (parsestate==IN_QUERY) {
+
+			// if we find a quote, we're in quotes
 			if (*ptr=='\'') {
-				inquotes = true;
+				parsestate=IN_QUOTES;
 			}
-		} else {
-			if (*ptr=='\'' && *(ptr+1)!='\'' &&
-				*prevptr!='\\' && *prevptr!='\'') {
-				inquotes=false;
+
+			// if we find whitespace or a couple of other things
+			// then the next thing could be a bind variable
+			if (beforeBindVariable(ptr)) {
+				parsestate=BEFORE_BIND;
 			}
+
+			// append the character
+			newquery->append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
 		}
 
-		if (!inquotes) {
+		// copy anything in quotes verbatim
+		if (parsestate==IN_QUOTES) {
 
-			if (inbind && afterBindVariable(ptr)) {
-				newquery->append(')');
-				inbind=false;
+			// if we find a quote, but not an escaped quote,
+			// then we're back in the query
+			if (*ptr=='\'' && *(ptr+1)!='\'' &&
+					*prevptr!='\'' && *prevptr!='\\') {
+				parsestate=IN_QUERY;
 			}
 
-			if (isBindDelimiter(ptr,true,true,true,true)) {
-				newquery->append("$(");
-				if (*ptr=='?') {
-					newquery->append(varcounter);
-					varcounter++;
-				} else {
-					inbind=true;
-				}
-				prevptr=ptr;
+			// append the character
+			newquery->append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
+		}
+
+		if (parsestate==BEFORE_BIND) {
+
+			// if we find a bind variable...
+			if (isBindDelimiter(ptr,
+				sqlrcon->
+				getBindVariableDelimiterQuestionMarkSupported(),
+				sqlrcon->
+				getBindVariableDelimiterColonSupported(),
+				sqlrcon->
+				getBindVariableDelimiterAtSignSupported(),
+				sqlrcon->
+				getBindVariableDelimiterDollarSignSupported())
+				) {
+				parsestate=IN_BIND;
 				continue;
 			}
+
+			// if we didn't find a bind variable then we're just
+			// back in the query
+			parsestate=IN_QUERY;
+			continue;
 		}
 
-		newquery->append(*ptr);
-		prevptr=ptr;
-		ptr++;
+		// if we're in a bind variable...
+		if (parsestate==IN_BIND) {
 
-	// FIXME: not binary-safe
-	} while (*ptr);
+			// If we find whitespace or a few other things
+			// then we're done with the bind variable.  Process it.
+			// Otherwise get the variable itself in another buffer.
+			bool	endofbind=afterBindVariable(ptr);
+			if (endofbind) {
+
+				newquery->append("$(");
+				newquery->append(varcounter);
+				newquery->append(')');
+
+				varcounter++;
+
+				parsestate=IN_QUERY;
+
+			} else {
+
+				// move on
+				prevptr=ptr;
+				ptr++;
+			}
+			continue;
+		}
+
+	} while (ptr<endptr);
 }
 
 static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
@@ -1007,8 +1066,7 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrstatement	*sqlrstmt=new sqlrstatement;
-	sqlrstmt->sqlrcur=new sqlrcursor(
-				(sqlrconnection *)sqlrdbh->sqlrcon,true);
+	sqlrstmt->sqlrcur=new sqlrcursor(sqlrdbh->sqlrcon,true);
 
 	if (sqlrdbh->resultsetbuffersize>0) {
 		sqlrstmt->sqlrcur->setResultSetBufferSize(
@@ -1052,7 +1110,8 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	stmt->supports_placeholders=PDO_PLACEHOLDER_POSITIONAL;
 
 	if (sqlrdbh->usesubvars) {
-		sqlrconnectionRewriteQuery(sql,sqllen,&sqlrstmt->subvarquery);
+		sqlrconnectionRewriteQuery(sqlrdbh->sqlrcon,sql,sqllen,
+							&sqlrstmt->subvarquery);
 		sql=sqlrstmt->subvarquery.getString();
 		sqllen=sqlrstmt->subvarquery.getStringLength();
 	}

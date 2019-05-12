@@ -826,29 +826,63 @@ bool sqlrservercursor::fakeInputBinds() {
 	pvt->_querywithfakeinputbinds.clear();
 
 	// loop through the query, performing substitutions
-	bool		inquotes=false;
+	queryparsestate_t	parsestate=IN_QUERY;
+
+	// use 1-based index for bind variables
 	int64_t		bindindex=1;
 
+	// run through the querybuffer...
 	char		*ptr=pvt->_querybuffer;
+	const char	*endptr=pvt->_querybuffer+pvt->_querylength;
 	const char	*prevptr="\0";
 	do {
 
-		// are we inside of quotes?
-                if (!inquotes) {
-                        if (*ptr=='\'') {
-                                inquotes = true;
-                        }
-                } else {
-                        if (*ptr=='\'' && *(ptr+1)!='\'' &&
-                                *prevptr!='\\' && *prevptr!='\'') {
-                                inquotes=false;
-                        }
-                }
+		// if we're in the query...
+		if (parsestate==IN_QUERY) {
 
-		// look for a bind var prefix
-		if (!inquotes &&
-			beforeBindVariable(prevptr) &&
-			isBindDelimiter(ptr,
+			// if we find a quote, we're in quotes
+			if (*ptr=='\'') {
+				parsestate=IN_QUOTES;
+			}
+
+			// if we find whitespace or a couple of other things
+			// then the next thing could be a bind variable
+			if (beforeBindVariable(ptr)) {
+				parsestate=BEFORE_BIND;
+			}
+
+			// append the character
+			pvt->_querywithfakeinputbinds.append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
+		}
+
+		// copy anything in quotes verbatim
+		if (parsestate==IN_QUOTES) {
+
+			// if we find a quote, but not an escaped quote,
+			// then we're back in the query
+			if (*ptr=='\'' && *(ptr+1)!='\'' &&
+					*prevptr!='\'' && *prevptr!='\\') {
+				parsestate=IN_QUERY;
+			}
+
+			// append the character
+			pvt->_querywithfakeinputbinds.append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
+		}
+
+		if (parsestate==BEFORE_BIND) {
+
+			// if we find a bind variable...
+			if (isBindDelimiter(ptr,
 				conn->cont->getConfig()->
 				getBindVariableDelimiterQuestionMarkSupported(),
 				conn->cont->getConfig()->
@@ -857,7 +891,19 @@ bool sqlrservercursor::fakeInputBinds() {
 				getBindVariableDelimiterAtSignSupported(),
 				conn->cont->getConfig()->
 				getBindVariableDelimiterDollarSignSupported())
-			) {
+				) {
+				parsestate=IN_BIND;
+				continue;
+			}
+
+			// if we didn't find a bind variable then we're just
+			// back in the query
+			parsestate=IN_QUERY;
+			continue;
+		}
+
+		// if we're in a bind variable...
+		if (parsestate==IN_BIND) {
 
 			// look through the list of vars
 			for (int16_t i=0; i<pvt->_inbindcount; i++) {
@@ -894,14 +940,12 @@ bool sqlrservercursor::fakeInputBinds() {
 							variable+1,
 						pvt->_inbindvars[i].
 							variablesize-1) 
-					 		&&
+					&&
 					(afterBindVariable(
 						ptr+pvt->_inbindvars[i].
 							variablesize) ||
-					// FIXME: not binary-safe
-					*(ptr+pvt->_inbindvars[i].
-						variablesize)=='\0')
-					)) {
+					ptr+1+pvt->_inbindvars[i].
+						variablesize-1==endptr))) {
 
 					performSubstitution(
 					&(pvt->_querywithfakeinputbinds),i);
@@ -915,19 +959,12 @@ bool sqlrservercursor::fakeInputBinds() {
 					break;
 				}
 			}
+
+			parsestate=IN_QUERY;
+			continue;
 		}
 
-		prevptr=ptr;
-
-		// write the input query to the output query
-		// FIXME: not binary-safe
-		if (*ptr) {
-			pvt->_querywithfakeinputbinds.append(*ptr);
-			ptr++;
-		}
-
-	// FIXME: not binary-safe
-	} while (*ptr);
+	} while (ptr<endptr);
 
 	return true;
 }

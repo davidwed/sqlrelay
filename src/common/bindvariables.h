@@ -56,7 +56,7 @@ static uint16_t countBindVariables(const char *query,
 	queryparsestate_t	parsestate=IN_QUERY;
 
 	const char	*ptr=query;
-	const char	*endptr=query+querylen-1;
+	const char	*endptr=query+querylen;
 	const char	*prevptr="\0";
 	do {
 
@@ -132,17 +132,7 @@ static uint16_t countBindVariables(const char *query,
 
 			// If we find whitespace or a few other things
 			// then we're done with the bind variable.
-			bool	endofbind=afterBindVariable(ptr);
-			if (endofbind || ptr==endptr) {
-
-				// special case if we hit the end of the string
-				// and it's not one of the special chars
-				if (ptr==endptr && !endofbind) {
-
-					// move on
-					prevptr=ptr;
-					ptr++;
-				}
+			if (afterBindVariable(ptr)) {
 
 				parsestate=IN_QUERY;
 
@@ -155,7 +145,7 @@ static uint16_t countBindVariables(const char *query,
 			continue;
 		}
 
-	} while (ptr<=endptr);
+	} while (ptr<endptr);
 
 	// if we got $'s or ?'s, ignore the :'s or @'s
 	if (dollarsigncount) {

@@ -3380,7 +3380,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	
 	// run through the querybuffer...
 	const char	*ptr=querybuffer;
-	const char	*endptr=querybuffer+cursor->getQueryLength()-1;
+	const char	*endptr=querybuffer+cursor->getQueryLength();
 	const char	*prevptr="\0";
 	do {
 
@@ -3452,16 +3452,12 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			// then we're done with the bind variable.  Process it.
 			// Otherwise get the variable itself in another buffer.
 			bool	endofbind=afterBindVariable(ptr);
-			if (endofbind || ptr==endptr) {
+			if (endofbind || ptr==endptr-1) {
 
-				// special case if we hit the end of the string
-				// and it's not one of the special chars
-				if (ptr==endptr && !endofbind) {
-
-					// append the character
+				// special case...
+				// last character in the query
+				if (!endofbind && ptr==endptr-1) {
 					currentbind.append(*ptr);
-
-					// move on
 					prevptr=ptr;
 					ptr++;
 				}
@@ -3496,7 +3492,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			continue;
 		}
 
-	} while (ptr<=endptr);
+	} while (ptr<endptr);
 
 
 	// if no translation was performed
