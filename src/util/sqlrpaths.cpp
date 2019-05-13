@@ -73,7 +73,16 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 		localstatedir=defaultlocalstatedir;
 	}
 
-	scratch.append(localstatedir)->append("run")->
+	// we need to make sure that there's a slash after
+	// localstatedir when building other paths off of it
+	const char	*lsdterm=
+#ifdef _WIN32
+	(*(localstatedir+charstring::length(localstatedir)-1)=='\\')?"":"\\";
+#else
+	(*(localstatedir+charstring::length(localstatedir)-1)=='/')?"":"/";
+#endif
+
+	scratch.append(localstatedir)->append(lsdterm)->append("run")->
 			append(slash)->append(SQLRELAY)->append(slash);
 	tmpdirlen=scratch.getStringLength();
 	tmpdir=scratch.detachString();
@@ -90,14 +99,14 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	scratch.append(tmpdir);
 	piddir=scratch.detachString();
 
-	scratch.append(localstatedir)->append("log")->
+	scratch.append(localstatedir)->append(lsdterm)->append("log")->
 			append(slash)->append(SQLRELAY)->append(slash);
 	logdir=scratch.detachString();
 
 	scratch.append(logdir)->append("debug")->append(slash);
 	debugdir=scratch.detachString();
 
-	scratch.append(localstatedir)->append("cache")->
+	scratch.append(localstatedir)->append(lsdterm)->append("cache")->
 			append(slash)->append(SQLRELAY)->append(slash);
 	cachedir=scratch.detachString();
 

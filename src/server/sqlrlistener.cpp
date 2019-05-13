@@ -12,6 +12,7 @@
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 #include <rudiments/file.h>
+#include <rudiments/directory.h>
 #include <rudiments/error.h>
 #include <rudiments/datetime.h>
 #include <rudiments/sys.h>
@@ -272,6 +273,32 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	pvt->_cmdl=new sqlrcmdline(argc,argv);
 	pvt->_sqlrpth=new sqlrpaths(pvt->_cmdl);
 	pvt->_sqlrcfgs=new sqlrconfigs(pvt->_sqlrpth);
+
+	// The tmpdir his is often in /run or /var/run, which is often a tmpfs,
+	// at least on Linux.  So, it's blown away with each reboot.  Re-create
+	// it if it doesn't exist.
+	const char	*tmpdir=pvt->_sqlrpth->getTmpDir();
+	if (!file::exists(tmpdir)) {
+		char		**parts=NULL;
+		uint64_t	partcount=0;
+		charstring::split(tmpdir,"/",true,&parts,&partcount);
+		stringbuffer	path;
+		for (uint64_t i=0; i<partcount; i++) {
+			path.append('/')->append(parts[i]);
+			if (!file::exists(path.getString())) {
+				mode_t	mode=(i==partcount-1)?
+					permissions::evalPermString(
+							"rwxrwxrwx"):
+					permissions::evalPermString(
+							"rwxr-xr-x");
+				directory::create(path.getString(),mode);
+			}
+		}
+		for (uint64_t i=0; i<partcount; i++) {
+			delete[] parts[i];
+		}
+		delete[] parts;
+	}
 
 	if (!charstring::compare(pvt->_cmdl->getId(),DEFAULT_ID)) {
 		stderror.printf("Warning: using default id.\n");

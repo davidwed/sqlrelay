@@ -13,6 +13,8 @@
 	fixed a backslash-escape bug in the normalize translation
 	refactored some sqlrclient api private methods
 	refactored various bind-manipulation/detection methods
+	sqlr-listener creates tmpdir now on start, if it doesn't exist
+		(because this is often in /run, which is often a tmpfs)
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
