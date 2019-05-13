@@ -277,14 +277,19 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	// The tmpdir his is often in /run or /var/run, which is often a tmpfs,
 	// at least on Linux.  So, it's blown away with each reboot.  Re-create
 	// it if it doesn't exist.
+#ifdef WIN32
+	const char	*slash="\\";
+#else
+	const char	*slash="/";
+#endif
 	const char	*tmpdir=pvt->_sqlrpth->getTmpDir();
 	if (!file::exists(tmpdir)) {
 		char		**parts=NULL;
 		uint64_t	partcount=0;
-		charstring::split(tmpdir,"/",true,&parts,&partcount);
+		charstring::split(tmpdir,slash,true,&parts,&partcount);
 		stringbuffer	path;
 		for (uint64_t i=0; i<partcount; i++) {
-			path.append('/')->append(parts[i]);
+			path.append(slash)->append(parts[i]);
 			if (!file::exists(path.getString())) {
 				mode_t	mode=(i==partcount-1)?
 					permissions::evalPermString(
