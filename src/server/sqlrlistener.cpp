@@ -291,7 +291,10 @@ bool sqlrlistener::init(int argc, const char **argv) {
 							"rwxrwxrwx"):
 					permissions::evalPermString(
 							"rwxr-xr-x");
+				mode_t	oldumask=
+					process::setFileCreationMask(0000);
 				directory::create(path.getString(),mode);
+				process::setFileCreationMask(oldumask);
 			}
 		}
 		for (uint64_t i=0; i<partcount; i++) {
