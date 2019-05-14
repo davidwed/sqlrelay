@@ -2358,6 +2358,7 @@ void sqlrcursor::performSubstitutions() {
 	// perform substitutions
 	stringbuffer	container;
 	const char	*ptr=pvt->_queryptr;
+	const char	*endptr=pvt->_queryptr+pvt->_querylen;
 	bool		found=false;
 	bool		inquotes=false;
 	bool		inbraces=false;
@@ -2365,7 +2366,7 @@ void sqlrcursor::performSubstitutions() {
 	stringbuffer	*braces=NULL;
 
 	// iterate through the string
-	while (*ptr) {
+	while (ptr<endptr) {
 	
 		// figure out whether we're inside a quoted 
 		// string or not
@@ -2493,7 +2494,7 @@ void sqlrcursor::performSubstitutions() {
 	}
 
 	delete[] pvt->_querybuffer;
-	pvt->_querylen=container.getStringLength();
+	pvt->_querylen=container.getSize();
 	pvt->_querybuffer=container.detachString();
 	pvt->_queryptr=pvt->_querybuffer;
 
