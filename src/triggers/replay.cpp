@@ -3,6 +3,9 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/character.h>
+#include <rudiments/file.h>
+#include <rudiments/permissions.h>
+#include <rudiments/error.h>
 #include <rudiments/snooze.h>
 
 class querydetails {
@@ -25,6 +28,10 @@ class condition {
 		const char	*error;
 		uint32_t	errorcode;
 		bool		replaytx;
+
+		// for now we only support logging the result of a query
+		const char	*query;
+		const char	*logfile;
 };
 
 class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
@@ -42,10 +49,12 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 
 	private:
 		bool	logQuery(sqlrservercursor *sqlrcur);
-		bool	replay(sqlrservercursor *sqlrcur, bool replaytx);
+		bool	replay(sqlrservercursor *sqlrcur,
+					bool replaytx);
 		bool	replayCondition(sqlrservercursor *sqlrcur,
-							bool *replaytx,
-							bool indent);
+					bool *replaytx,
+					bool indent);
+		void	logReplayCondition(condition *cond);
 
 
 		void	copyQuery(sqlrservercursor *sqlrcur,
@@ -129,6 +138,17 @@ debug=true;
 		c->replaytx=!charstring::compareIgnoringCase(
 					cond->getAttributeValue("scope"),
 					"transaction");
+
+		// In the future, we might allow multiple queries/commands to
+		// be run when this condition occurs, and log the output.  But
+		// for now we only support logging the result of a single query.
+		// Get the query and file to log to, if provided...
+		c->logfile=cond->getFirstTagChild("log")->
+					getFirstTagChild("query")->
+					getAttributeValue("file");
+		c->query=cond->getFirstTagChild("log")->
+					getFirstTagChild("query")->
+					getFirstChild("text")->getValue();
 
 		conditions.append(c);
 	}
@@ -661,7 +681,8 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 	}
 }
 
-bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
+bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
+					bool replaytx) {
 
 	// we're replaying
 	inreplay=true;
@@ -902,8 +923,8 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
 }
 
 bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur,
-							bool *replaytx,
-							bool indent) {
+						bool *replaytx,
+						bool indent) {
 
 	// did we get a replay condition?
 	for (linkedlistnode<condition *> *node=conditions.getFirst();
@@ -938,6 +959,7 @@ bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur,
 						(*replaytx)?"true":"false",
 						(indent)?"	":"");
 				}
+				logReplayCondition(val);
 				return true;
 			}
 
@@ -961,11 +983,140 @@ bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur,
 						(*replaytx)?"true":"false",
 						(indent)?"	":"");
 				}
+				logReplayCondition(val);
 				return true;
 			}
 		}
 	}
 	return false;
+}
+
+void sqlrtrigger_replay::logReplayCondition(condition *cond) {
+
+	// bail if we don't have a query to run or logfile to log to
+	if (!cond->query || !cond->logfile) {
+		return;
+	}
+
+	// delimiter and timestamp
+	datetime	dt;
+	dt.getSystemDateAndTime();
+	stringbuffer	str;
+	str.append("========================================"
+			"=======================================\n");
+	str.append(dt.getString())->append("\n\n");
+
+	// run query
+	sqlrservercursor        *logcur=cont->newCursor();
+	bool	success=cont->open(logcur);
+	if (!success && debug) {
+		stdoutput.printf("failed to open log cursor\n");
+	}
+	if (success) {
+		success=cont->prepareQuery(logcur,cond->query,
+					charstring::length(cond->query));
+		if (!success && debug) {
+        		const char      *errorstring;
+        		uint32_t        errorlength;
+        		int64_t         errnum;
+        		bool            liveconnection;
+        		cont->errorMessage(logcur,&errorstring,
+							&errorlength,
+                                        		&errnum,
+							&liveconnection);
+			stdoutput.printf("failed to prepare log query:\n"
+						"%s\n%.*s\n",cond->query,
+						errorlength,errorstring);
+		}
+	}
+	if (success) {
+		success=cont->executeQuery(logcur);
+		if (!success && debug) {
+        		const char      *errorstring;
+        		uint32_t        errorlength;
+        		int64_t         errnum;
+        		bool            liveconnection;
+        		cont->errorMessage(logcur,&errorstring,
+							&errorlength,
+                                        		&errnum,
+							&liveconnection);
+			stdoutput.printf("failed to execute log query:\n"
+						"%s\n%.*s\n",cond->query,
+						errorlength,errorstring);
+		}
+	}
+	if (success) {
+		success=cont->colCount(logcur);
+		if (!success && debug) {
+			stdoutput.printf("log query produced no columns\n");
+		}
+	}
+
+	if (success) {
+
+		bool	first=true;
+		bool    error;
+		while (cont->fetchRow(logcur,&error)) {
+
+			if (first) {
+				first=false;
+			} else {
+				str.append(
+				"----------------------------------------"
+				"---------------------------------------\n");
+			}
+
+			// get fields
+			for (uint32_t i=0; i<cont->colCount(logcur); i++) {
+
+				const char	*field;
+				uint64_t	fieldlength;
+				bool		blob;
+				bool		null;
+				cont->getField(logcur,i,&field,
+						&fieldlength,&blob,&null);
+
+				str.append(cont->getColumnName(logcur,i));
+				str.append(" : ");
+				if (fieldlength>
+					(uint64_t)(80-
+					cont->getColumnNameLength(logcur,i)-
+					4)) {
+					str.append('\n');
+				}
+				str.append(field,fieldlength);
+				str.append('\n');
+			}
+			str.append('\n');
+
+			// FIXME: kludgy
+			cont->nextRow(logcur);
+		}
+
+		if (first && debug) {
+			stdoutput.printf("log query produced no rows\n");
+		}
+	}
+	cont->closeResultSet(logcur);
+	cont->close(logcur);
+	cont->deleteCursor(logcur);
+
+	// open log file
+	file	logfile;
+	if (!logfile.open(cond->logfile,
+				O_WRONLY|O_APPEND|O_CREAT,
+				permissions::evalPermString("rw-r--r--"))) {
+		if (debug) {
+			char	*err=error::getErrorString();
+			stdoutput.printf("failed to open %s\n%s\n",
+							cond->logfile,err);
+			delete[] err;
+			return;
+		}
+	}
+
+	// write the log message all-at-once
+	logfile.write(str.getString(),str.getSize());
 }
 
 void sqlrtrigger_replay::endTransaction(bool commit) {
@@ -983,8 +1134,7 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC
-	sqlrtrigger	*new_sqlrtrigger_replay(
-						sqlrservercontroller *cont,
+	sqlrtrigger	*new_sqlrtrigger_replay(sqlrservercontroller *cont,
 						sqlrtriggers *ts,
 						domnode *parameters) {
 
