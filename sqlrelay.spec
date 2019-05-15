@@ -498,8 +498,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-start
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver.so.9
-%{_libdir}/libsqlrserver.so.9.*
+%{_libdir}/libsqlrserver.so.8
+%{_libdir}/libsqlrserver.so.8.*
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
