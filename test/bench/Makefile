@@ -19,6 +19,7 @@ all: sqlrbench_db2.$(LIBEXT) \
 	sqlrbench_postgresql.$(LIBEXT) \
 	sqlrbench_sap.$(LIBEXT) \
 	sqlrbench_sqlite.$(LIBEXT) \
+	sqlrbench_odbc.$(LIBEXT) \
 	sqlrbench_sqlrelay.$(LIBEXT) \
 	sqlr-bench
 
@@ -97,6 +98,15 @@ sqlitebench.obj: sqlitebench.cpp
 
 sqlrbench_sqlite.$(LIBEXT): sqlitebench.$(OBJ) sqlitebench.cpp
 	$(LTLINK) $(LINK) $(OUT)$@ sqlitebench.$(OBJ) $(LDFLAGS) $(SQLITELIBS) $(MODLINKFLAGS)
+
+odbcbench.lo: odbcbench.cpp
+	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(ODBCINCLUDES) $(COMPILE) $< $(OUT)$@
+
+odbcbench.obj: odbcbench.cpp
+	$(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(ODBCINCLUDES) $(COMPILE) odbcbench.cpp
+
+sqlrbench_odbc.$(LIBEXT): odbcbench.$(OBJ) odbcbench.cpp
+	$(LTLINK) $(LINK) $(OUT)$@ odbcbench.$(OBJ) $(LDFLAGS) $(ODBCLIBS) $(MODLINKFLAGS)
 
 sqlrelaybench.lo: sqlrelaybench.cpp
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(BENCHCPPFLAGS) $(COMPILE) $< $(OUT)$@

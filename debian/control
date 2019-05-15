@@ -1,0 +1,276 @@
+Source: sqlrelay
+Priority: optional
+Maintainer: David Muse <david.muse@firstworks.com>
+Homepage: http://sqlrelay.sourceforge.net
+Standards-Version: 3.9.6
+Build-Depends: debhelper (>=9),autotools-dev, rudiments-dev
+
+Package: sqlrelay
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, rudiments
+Description: Database proxy
+ SQL Relay is a persistent database connection pooling, proxying, throttling,
+ load balancing and query routing/filtering system for Unix and Linux
+ supporting ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2,
+ Informix, Firebird, SQLite and MS Access (minimally) with APIs for C, C++,
+ .NET, Perl, Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL,
+ Erlang, and node.js, ODBC and ADO.NET drivers, drop-in replacement libraries
+ for MySQL and PostgreSQL, command line clients and extensive documentation.
+ The APIs support advanced database operations such as bind variables,
+ multi-row fetches, client-side result set caching and suspended transactions.
+ It is ideal for speeding up database-driven web-based applications, accessing
+ databases from unsupported platforms, migrating between databases, distributing
+ access to replicated or clustered databases and throttling database access.
+
+Package: sqlrelay-server-dev
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Development files for SQL Relay server modules
+ Development files for SQL Relay server modules.
+
+Package: sqlrelay-clients
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Command line clients for accessing databases via SQL Relay
+ Command line clients for accessing databases via SQL Relay.
+
+Package: sqlrelay-cachemanager
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: SQL Relay client-side result-set cache manager
+ SQL Relay client-side result-set cache manager.
+
+Package: sqlrelay-common
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Components used by SQL Relay client-side and server-side programs
+ Components used by SQL Relay client-side and server-side programs.
+
+Package: sqlrelay-common-dev
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Development files for SQL Relay common components
+ Development files for SQL Relay common components.
+
+Package: sqlrelay-c++
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: The SQL Relay C++ client library
+ The SQL Relay C++ client library.
+
+Package: sqlrelay-c
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: The SQL Relay C client library
+ The SQL Relay C client library.
+
+Package: sqlrelay-c++-dev
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Development files for the SQL Relay C++ client library
+ Development files for the SQL Relay C++ client library.
+
+Package: sqlrelay-c-dev
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Development files for the SQL Relay C client library
+ Development files for the SQL Relay C client library.
+
+Package: odbc-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: ODBC driver for SQL Relay
+ ODBC driver for SQL Relay.
+
+Package: perl-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Perl bindings for the SQL Relay client API
+ Perl bindings for the SQL Relay client API.
+
+Package: perl-dbd-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Perl DBI driver for SQL Relay
+ Perl DBI driver for SQL Relay.
+
+Package: python3-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Python bindings for the SQL Relay client API
+ Python bindings for the SQL Relay client API.
+
+Package: python3-db-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Python DB bindings for SQL Relay
+ Python DB bindings for SQL Relay.
+
+Package: ruby-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Ruby bindings for the SQL Relay client API
+ Ruby bindings for the SQL Relay client API.
+
+Package: php-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: PHP bindings for the SQL Relay client API
+ PHP bindings for the SQL Relay client API.
+
+Package: php-pdo-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: PHP PDO driver for SQL Relay
+ PHP PDO driver for SQL Relay.
+
+Package: java-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Java bindings for the SQL Relay client API
+ Java bindings for the SQL Relay client API.
+
+Package: tcl-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: TCL bindings for the SQL Relay client API
+ TCL bindings for the SQL Relay client API.
+
+Package: erlang-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Erlang bindings for the SQL Relay client API
+ Erlang bindings for the SQL Relay client API.
+
+Package: libmono-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Mono bindings for the SQL Relay client API and ADO.NET driver
+ Mono bindings for the SQL Relay client API and ADO.NET driver.
+
+Package: node-sqlrelay
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Nodejs bindings for the SQL Relay client API
+ Nodejs bindings for the SQL Relay client API.
+
+Package: sqlrelay-dropin-mysql
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Drop in replacement library that redirects MySQL clients to SQL Relay
+ Drop in replacement library that redirects MySQL clients to SQL Relay.
+
+Package: sqlrelay-dropin-postgresql
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Drop in replacement library that redirects PostgreSQL clients to SQL Relay
+ Drop in replacement library that redirects PostgreSQL clients to SQL Relay.
+
+Package: sqlrelay-oracle
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Oracle back-end module for SQL Relay
+ Oracle back-end module for SQL Relay.
+
+Package: sqlrelay-mysql
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: MySQL back-end module for SQL Relay
+ MySQL back-end module for SQL Relay.
+
+Package: sqlrelay-postgresql
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: PostgreSQL back-end module for SQL Relay
+ PostgreSQL back-end module for SQL Relay.
+
+Package: sqlrelay-sqlite
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: SQLite back-end module for SQL Relay
+ SQLite back-end module for SQL Relay.
+
+Package: sqlrelay-freetds
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: FreeTDS back-end module for SQL Relay
+ FreeTDS back-end module for SQL Relay.
+
+Package: sqlrelay-odbc
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: ODBC back-end module for SQL Relay
+ ODBC back-end module for SQL Relay.
+
+Package: sqlrelay-db2
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: DB2 back-end module for SQL Relay
+ DB2 back-end module for SQL Relay.
+
+Package: sqlrelay-firebird
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Firebird back-end module for SQL Relay
+ Firebird back-end module for SQL Relay.
+
+Package: sqlrelay-mdbtools
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: MDB Tools back-end module for SQL Relay
+ MDB Tools back-end module for SQL Relay.
+
+Package: sqlrelay-informix
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Informix back-end module for SQL Relay
+ Informix back-end module for SQL Relay.
+
+Package: sqlrelay-router
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Router back-end module for SQL Relay
+ Router back-end module for SQL Relay.
+
+Package: sqlrelay-doc
+Section: libdevel
+Architecture: any
+Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
+Description: Documentation for SQL Relay
+ Documentation for SQL Relay.

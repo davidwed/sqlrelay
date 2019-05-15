@@ -1,8 +1,8 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 	private:
 		void		unload();
-		void		loadLogger(xmldomnode *logger);
+		void		loadLogger(domnode *logger);
 
 		sqlrloggersprivate	*pvt;

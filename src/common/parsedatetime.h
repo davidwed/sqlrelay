@@ -1,4 +1,4 @@
-// Copyright (c) 2000-2005  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 #ifndef PARSE_DATE_H
 #define PARSE_DATE_H

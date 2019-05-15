@@ -663,10 +663,18 @@ FW_CHECK_WALL
 FW_CHECK_WNOOVERLOADEDVIRTUAL
 FW_CHECK_WNOMISMATCHEDTAGS
 FW_CHECK_WNOUNKNOWNPRAGMAS
+FW_CHECK_WNOERRORDATETIME
 FW_CHECK_DEBUG
 FW_CHECK_NEW_DTAGS
 
 FW_CHECK_F_NO_BUILTIN
+
+dnl if LDFLAGS contains -Wl,-z,relro the CPPFLAGS requires -fPIC
+dnl libtool adds it at compile time but we need it for configure tests too
+if ( test -n "`echo $LDFLAGS | grep '\-Wl,\-z,relro'`" )
+then
+	CPPFLAGS="-fPIC $CPPFLAGS"
+fi
 
 echo "******************************"
 
@@ -872,7 +880,7 @@ dnl    (and set MINOR and PATCH to 0)
 dnl 2. MINOR when you make backwards-incompatible changes
 dnl    (and set PATCH to 0)
 dnl 3. PATCH when you make backwards-compatible changes
-SQLR_VERSION="1.2.1"
+SQLR_VERSION="1.6.0"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 
@@ -883,8 +891,8 @@ dnl if library source changed at all,         c:r:a -> c:r+1:a
 dnl if interfaces added, removed, or changed, c:r:a -> c+1:0:a
 dnl if interfaces added,                      c:r:a -> c:r:a+1
 dnl if interfaces removed,                    c:r:a -> c:r:0
-SRV_SONAME_VERSION_INFO="6:0:0"
-CLT_SONAME_VERSION_INFO="4:0:0"
+SRV_SONAME_VERSION_INFO="9:0:1"
+CLT_SONAME_VERSION_INFO="5:0:0"
 AC_SUBST(SRV_SONAME_VERSION_INFO)
 AC_SUBST(CLT_SONAME_VERSION_INFO)
 
@@ -1136,11 +1144,14 @@ if ( test -n "$ENABLE_ROUTER" ); then
 	ROUTERBUILD="yes"
 	TESTDBS="$TESTDBS router"
 fi
+if ( test -n "$MYSQLLIBS" ); then
+	TESTDBS="$TESTDBS mysqlprotocol"
+fi
 AC_SUBST(TESTDBS)
 AC_SUBST(TESTAPIS)
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh doc/admin/installingpkg.wt"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config

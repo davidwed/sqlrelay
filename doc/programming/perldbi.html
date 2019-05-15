@@ -338,9 +338,9 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>bind_param() is used for input binds.  bind_inout_param() is used for output
-binds.  Here is an example using the bind_inout_param() function to retrieve a
-value from a query.  The first parameter of a bind_inout_param() call is the
+<p>bind_param() is used for input binds.  bind_param_inout() is used for output
+binds.  Here is an example using the bind_param_inout() function to retrieve a
+value from a query.  The first parameter of a bind_param_inout() call is the
 name or position of the bind variable, the second parameter is the local
 variable to return the result in and the third variable is the size of the
 buffer to reserve for the value.</p>
@@ -361,9 +361,9 @@ http://www.gnu.org/software/src-highlite -->
 <b><font color="#0000FF">my</font></b> <font color="#009900">$hello</font><font color="#990000">;</font>
 <b><font color="#0000FF">my</font></b> <font color="#009900">$integer</font><font color="#990000">;</font>
 <b><font color="#0000FF">my</font></b> <font color="#009900">$float</font><font color="#990000">;</font>
-<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,\</font><font color="#009900">$hello</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
-<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,\</font><font color="#009900">$integer</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
-<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,\</font><font color="#009900">$float</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#993399">1</font><font color="#990000">,\</font><font color="#009900">$hello</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#993399">2</font><font color="#990000">,\</font><font color="#009900">$integer</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
+<font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#993399">3</font><font color="#990000">,\</font><font color="#009900">$float</font><font color="#990000">,</font><font color="#993399">10</font><font color="#990000">);</font>
 
 <font color="#009900">$sth</font><font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 
@@ -912,7 +912,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<h4>MySQL</h4>
+<h4>MySQL/MariaDB</h4>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
@@ -1045,7 +1045,7 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 my $result<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1092,7 +1092,7 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 my $result<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1160,7 +1160,7 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 my $result<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1208,7 +1208,7 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 my $result<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$result<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1276,9 +1276,9 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<h4>MySQL</h4>
+<h4>MySQL/MariaDB</h4>
 
-<p>A single value can be returned from a MySQL function.</p>
+<p>A single value can be returned from a MySQL/MariaDB function.</p>
 
 <p>To create the function, run a query like the following.</p>
 
@@ -1323,7 +1323,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>A single value can be returned in the result set of a MySQL procedure.</p>
+<p>A single value can be returned in the result set of a MySQL/MariaDB procedure.</p>
 
 <p>To create the procedure, run a query like the following.</p>
 
@@ -1362,7 +1362,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>A single value can be returned using the output variable of a MySQL
+<p>A single value can be returned using the output variable of a MySQL/MariaDB
 procedure.</p>
 
 <p>To create the procedure, run a query like the following.</p>
@@ -1498,9 +1498,9 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $out1<font color="#990000">;</font>
 my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"out3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1574,9 +1574,9 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $out1<font color="#990000">;</font>
 my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">20</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1625,9 +1625,9 @@ $sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param</font>
 my $out1<font color="#990000">;</font>
 my $out2<font color="#990000">;</font>
 my $out3<font color="#990000">;</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"5"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
-$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_inout_param</font></b><font color="#990000">(</font><font color="#FF0000">"6"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"4"</font><font color="#990000">,\</font>$out1<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"5"</font><font color="#990000">,\</font>$out2<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
+$sth<font color="#990000">-&gt;</font><b><font color="#000000">bind_param_inout</font></b><font color="#990000">(</font><font color="#FF0000">"6"</font><font color="#990000">,\</font>$out3<font color="#990000">,</font><font color="#993399">25</font><font color="#990000">);</font>
 $sth<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></b><font color="#990000">();</font>
 </tt></pre>
 
@@ -1695,10 +1695,10 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<h4>MySQL</h4>
+<h4>MySQL/MariaDB</h4>
 
 <p>Here's how you can get multiple values from the result
-set of a MySQL procedure.</p>
+set of a MySQL/MariaDB procedure.</p>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
@@ -1746,7 +1746,7 @@ http://www.gnu.org/software/src-highlite -->
 
 </blockquote>
 <p>Here's how you can get multiple values from the output variables
-of a MySQL procedure.</p>
+of a MySQL/MariaDB procedure.</p>
 
 <p>To create the stored procedure, run a query like the following.</p>
 
@@ -1914,11 +1914,11 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<h4>MySQL</h4>
+<h4>MySQL/MariaDB</h4>
 
-<p>The result sets of all select statements called within MySQL stored
+<p>The result sets of all select statements called within MySQL/MariaDB stored
 procedures (that aren't selected into variables) are returned from the procedure
-call.  Though MySQL stored procedures can return multiple result sets,
+call.  Though MySQL/MariaDB stored procedures can return multiple result sets,
 currently SQL Relay can only fetch the first result set.</p>
 
 <p>To create the stored procedure which returns a result set, run a query like

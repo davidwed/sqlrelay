@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 
-# Copyright (c) 2001  David Muse
+# Copyright (c) 1999-2018 David Muse
 # See the file COPYING for more information.
 
 
@@ -227,7 +227,7 @@ checkSuccessString($cur->getColumnType(10),"DATETIME");
 checkSuccessString($cur->getColumnType(11),"YEAR");
 checkSuccessString($cur->getColumnType(12),"STRING");
 checkSuccessString($cur->getColumnType(13),"BLOB");
-checkSuccessString($cur->getColumnType(14),"CHAR");
+checkSuccessString($cur->getColumnType(14),"VARSTRING");
 checkSuccessString($cur->getColumnType(15),"TINYBLOB");
 checkSuccessString($cur->getColumnType(16),"MEDIUMBLOB");
 checkSuccessString($cur->getColumnType(17),"LONGBLOB");
@@ -246,7 +246,7 @@ checkSuccessString($cur->getColumnType("testdatetime"),"DATETIME");
 checkSuccessString($cur->getColumnType("testyear"),"YEAR");
 checkSuccessString($cur->getColumnType("testchar"),"STRING");
 checkSuccessString($cur->getColumnType("testtext"),"BLOB");
-checkSuccessString($cur->getColumnType("testvarchar"),"CHAR");
+checkSuccessString($cur->getColumnType("testvarchar"),"VARSTRING");
 checkSuccessString($cur->getColumnType("testtinytext"),"TINYBLOB");
 checkSuccessString($cur->getColumnType("testmediumtext"),"MEDIUMBLOB");
 checkSuccessString($cur->getColumnType("testlongtext"),"LONGBLOB");

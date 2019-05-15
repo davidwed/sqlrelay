@@ -1,4 +1,4 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -9,7 +9,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 	public:
 			sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrrouter_regex();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -28,7 +28,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 
 sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 	debug=cont->getConfig()->getDebugRouters();
 	enabled=charstring::compareIgnoringCase(
@@ -40,7 +40,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 
 	connid=parameters->getAttributeValue("connectionid");
 
-	for (xmldomnode *pn=parameters->getFirstTagChild("pattern");
+	for (domnode *pn=parameters->getFirstTagChild("pattern");
 				!pn->isNullNode();
 				pn=pn->getNextTagSibling("pattern")) {
 
@@ -50,7 +50,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 		}
 
 		regularexpression	*re=new regularexpression;
-		re->compile(pattern);
+		re->setPattern(pattern);
 		re->study();
 		relist.append(re);
 	}
@@ -60,10 +60,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 }
 
 sqlrrouter_regex::~sqlrrouter_regex() {
-	for (linkedlistnode< regularexpression *> *rn=relist.getFirst();
-							rn; rn=rn->getNext()) {
-		delete rn->getValue();
-	}
+	relist.clearAndDelete();
 }
 
 const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
@@ -87,8 +84,10 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 				stdoutput.printf("			"
 							"routing query:\n"
 							"		"
-							"%s\n		"
-							"to: %s\n	}\n",
+							"	%s\n"
+							"		"
+							"	to: %s\n"
+							"		}\n",
 							query,connid);
 			}
 			return connid;
@@ -105,7 +104,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_regex(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrrouter_regex(cont,rs,parameters);
 	}
 }

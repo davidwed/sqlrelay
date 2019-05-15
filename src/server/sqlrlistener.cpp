@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -12,6 +12,7 @@
 #include <rudiments/groupentry.h>
 #include <rudiments/process.h>
 #include <rudiments/file.h>
+#include <rudiments/directory.h>
 #include <rudiments/error.h>
 #include <rudiments/datetime.h>
 #include <rudiments/sys.h>
@@ -165,7 +166,7 @@ sqlrlistener::~sqlrlistener() {
 
 	if (!pvt->_isforkedchild) {
 		if (pvt->_cfg && !pvt->_cfg->getListeners()->isNullNode()) {
-			for (xmldomnode *node=
+			for (domnode *node=
 				pvt->_cfg->getListeners()->
 					getFirstTagChild("listener");
 				!node->isNullNode();
@@ -273,6 +274,40 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	pvt->_sqlrpth=new sqlrpaths(pvt->_cmdl);
 	pvt->_sqlrcfgs=new sqlrconfigs(pvt->_sqlrpth);
 
+	// The tmpdir his is often in /run or /var/run, which is often a tmpfs,
+	// at least on Linux.  So, it's blown away with each reboot.  Re-create
+	// it if it doesn't exist.
+#ifdef WIN32
+	const char	*slash="\\";
+#else
+	const char	*slash="/";
+#endif
+	const char	*tmpdir=pvt->_sqlrpth->getTmpDir();
+	if (!file::exists(tmpdir)) {
+		char		**parts=NULL;
+		uint64_t	partcount=0;
+		charstring::split(tmpdir,slash,true,&parts,&partcount);
+		stringbuffer	path;
+		for (uint64_t i=0; i<partcount; i++) {
+			path.append(slash)->append(parts[i]);
+			if (!file::exists(path.getString())) {
+				mode_t	mode=(i==partcount-1)?
+					permissions::evalPermString(
+							"rwxrwxrwx"):
+					permissions::evalPermString(
+							"rwxr-xr-x");
+				mode_t	oldumask=
+					process::setFileCreationMask(0000);
+				directory::create(path.getString(),mode);
+				process::setFileCreationMask(oldumask);
+			}
+		}
+		for (uint64_t i=0; i<partcount; i++) {
+			delete[] parts[i];
+		}
+		delete[] parts;
+	}
+
 	if (!charstring::compare(pvt->_cmdl->getId(),DEFAULT_ID)) {
 		stderror.printf("Warning: using default id.\n");
 	}
@@ -295,14 +330,14 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	handleDynamicScaling();
 
-	xmldomnode	*loggers=pvt->_cfg->getLoggers();
+	domnode	*loggers=pvt->_cfg->getLoggers();
 	if (!loggers->isNullNode()) {
 		pvt->_sqlrlg=new sqlrloggers(pvt->_sqlrpth);
 		pvt->_sqlrlg->load(loggers);
 		pvt->_sqlrlg->init(this,NULL);
 	}
 
-	xmldomnode	*notifications=pvt->_cfg->getNotifications();
+	domnode	*notifications=pvt->_cfg->getNotifications();
 	if (!notifications->isNullNode()) {
 		pvt->_sqlrn=new sqlrnotifications(pvt->_sqlrpth);
 		pvt->_sqlrn->load(notifications);
@@ -773,12 +808,12 @@ void sqlrlistener::semError(const char *id, int semid) {
 
 bool sqlrlistener::listenOnClientSockets() {
 
-	xmldomnode	*listenerlist=pvt->_cfg->getListeners();
+	domnode	*listenerlist=pvt->_cfg->getListeners();
 
 	// count sockets and build socket arrays
 	pvt->_clientsockincount=0;
 	pvt->_clientsockuncount=0;
-	for (xmldomnode	*node=listenerlist->getFirstTagChild("listener");
+	for (domnode	*node=listenerlist->getFirstTagChild("listener");
 			!node->isNullNode();
 			node=node->getNextTagSibling("listener")) {
 		uint64_t	addrcount=0;
@@ -804,7 +839,7 @@ bool sqlrlistener::listenOnClientSockets() {
 	// listen on sockets
 	bool		listening=false;
 	uint16_t	protocolindex=0;
-	for (xmldomnode	*node=listenerlist->getFirstTagChild("listener");
+	for (domnode	*node=listenerlist->getFirstTagChild("listener");
 			!node->isNullNode();
 			node=node->getNextTagSibling("listener")) {
 		if (listenOnClientSocket(protocolindex,node)) {
@@ -816,7 +851,7 @@ bool sqlrlistener::listenOnClientSockets() {
 }
 
 bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
-						xmldomnode *ln) {
+						domnode *ln) {
 
 	// init return value
 	bool	listening=false;

@@ -1,4 +1,4 @@
-// Copyright (c) 2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -47,13 +47,13 @@ sqlrfilters::~sqlrfilters() {
 	delete pvt;
 }
 
-bool sqlrfilters::load(xmldomnode *parameters) {
+bool sqlrfilters::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the filter list
-	for (xmldomnode *filter=parameters->getFirstTagChild();
+	for (domnode *filter=parameters->getFirstTagChild();
 				!filter->isNullNode();
 				filter=filter->getNextTagSibling()) {
 
@@ -101,7 +101,7 @@ void sqlrfilters::unload() {
 	pvt->_afterfilters.clear();
 }
 
-void sqlrfilters::loadFilter(xmldomnode *filter, 
+void sqlrfilters::loadFilter(domnode *filter, 
 				singlylinkedlist< sqlrfilterplugin * > *list) {
 	debugFunction();
 
@@ -147,10 +147,10 @@ void sqlrfilters::loadFilter(xmldomnode *filter,
 	functionname.append("new_sqlrfilter_")->append(module);
 	sqlrfilter *(*newFilter)(sqlrservercontroller *,
 					sqlrfilters *,
-					xmldomnode *)=
+					domnode *)=
 		(sqlrfilter *(*)(sqlrservercontroller *,
 					sqlrfilters *,
-					xmldomnode *))
+					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newFilter) {
 		stdoutput.printf("failed to load filter: %s\n",module);
@@ -253,7 +253,8 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 				if (pvt->_debug) {
 					stdoutput.printf(
 						"query tree:\n");
-					tree->getRootNode()->print(&stdoutput);
+					tree->getRootNode()->
+						write(&stdoutput,true);
 					stdoutput.printf("\n");
 				}
 			}
@@ -274,6 +275,28 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
+void sqlrfilters::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_beforefilters.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->f->endTransaction(commit);
+	}
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_afterfilters.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->f->endTransaction(commit);
+	}
+}
+
 void sqlrfilters::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_beforefilters.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->f->endSession();
+	}
+	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+						pvt->_afterfilters.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->f->endSession();
+	}
 }

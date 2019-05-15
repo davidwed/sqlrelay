@@ -1,4 +1,4 @@
-// Copyright (c) 2000-2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrutil.h>
@@ -92,11 +92,7 @@ routecontainer::~routecontainer() {
 	delete[] socket;
 	delete[] user;
 	delete[] password;
-	for (linkedlistnode< regularexpression * > *re=
-					regexlist.getFirst();
-						re; re=re->getNext()) {
-		delete re->getValue();
-	}
+	regexlist.clearAndDelete();
 }
 
 void routecontainer::setIsFilter(bool isfilter) {

@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -26,6 +26,8 @@ class sqlrserverconnectionprivate {
 		char		*_dbhostname;
 		char		*_dbipaddress;
 		uint32_t	_dbhostiploop;
+
+		bool		_detachbeforelogin;
 };
 
 sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
@@ -45,6 +47,8 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 	pvt->_dbhostname=NULL;
 	pvt->_dbipaddress=NULL;
 	pvt->_dbhostiploop=0;
+
+	pvt->_detachbeforelogin=false;
 }
 
 sqlrserverconnection::~sqlrserverconnection() {
@@ -55,7 +59,7 @@ sqlrserverconnection::~sqlrserverconnection() {
 }
 
 bool sqlrserverconnection::mustDetachBeforeLogIn() {
-	return false;
+	return pvt->_detachbeforelogin;
 }
 
 bool sqlrserverconnection::supportsAuthOnDatabase() {
@@ -157,6 +161,10 @@ void sqlrserverconnection::handleConnectString() {
 		!charstring::compare(
 			cont->getConnectStringValue("executedirect"),
 			"yes"));
+
+	// detach before login
+	pvt->_detachbeforelogin=!charstring::compare(
+			cont->getConnectStringValue("detachbeforelogin"),"yes");
 }
 
 bool sqlrserverconnection::changeUser(const char *newuser,
@@ -343,11 +351,12 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	sdquerylen=charstring::length(sdquery);
 
 	// run the query...
+	// (enable translations, triggers, etc. for this one)
 	bool	retval=false;
 	sqlrservercursor	*sdcur=cont->newCursor();
 	if (cont->open(sdcur) &&
-		cont->prepareQuery(sdcur,sdquery,sdquerylen) &&
-		cont->executeQuery(sdcur)) {
+		cont->prepareQuery(sdcur,sdquery,sdquerylen,true,true,true) &&
+		cont->executeQuery(sdcur,true,true,true,true)) {
 		cont->closeResultSet(sdcur);
 		retval=true;
 
@@ -388,7 +397,8 @@ char *sqlrserverconnection::getCurrentDatabase() {
 		gcdcur->prepareQuery(gcdquery,gcdquerylen) &&
 		gcdcur->executeQuery(gcdquery,gcdquerylen)) {
 
-		if (!gcdcur->noRowsToReturn() && gcdcur->fetchRow()) {
+		bool	error=false;
+		if (!gcdcur->noRowsToReturn() && gcdcur->fetchRow(&error)) {
 
 			// get the first field of the row and return it
 			const char	*field=NULL;
@@ -428,7 +438,8 @@ char *sqlrserverconnection::getCurrentSchema() {
 		gcscur->prepareQuery(gcsquery,gcsquerylen) &&
 		gcscur->executeQuery(gcsquery,gcsquerylen)) {
 
-		if (!gcscur->noRowsToReturn() && gcscur->fetchRow()) {
+		bool	error=false;
+		if (!gcscur->noRowsToReturn() && gcscur->fetchRow(&error)) {
 
 			// get the first field of the row and return it
 			const char	*field=NULL;
@@ -475,7 +486,8 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 		liicur->prepareQuery(liiquery,liiquerylen) &&
 		liicur->executeQuery(liiquery,liiquerylen)) {
 
-		if (!liicur->noRowsToReturn() && liicur->fetchRow()) {
+		bool	error=false;
+		if (!liicur->noRowsToReturn() && liicur->fetchRow(&error)) {
 
 			// get the first field of the row and return it
 			const char	*field=NULL;
@@ -622,7 +634,9 @@ const char *sqlrserverconnection::dbHostName() {
 			dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
 			dbhncur->executeQuery(dbhnquery,dbhnquerylen)) {
 
-			if (!dbhncur->noRowsToReturn() && dbhncur->fetchRow()) {
+			bool	error=false;
+			if (!dbhncur->noRowsToReturn() &&
+					dbhncur->fetchRow(&error)) {
 				const char	*field=NULL;
 				uint64_t	fieldlength=0;
 				bool		blob=false;
@@ -679,7 +693,9 @@ const char *sqlrserverconnection::dbIpAddress() {
 			dbiacur->prepareQuery(dbiaquery,dbiaquerylen) &&
 			dbiacur->executeQuery(dbiaquery,dbiaquerylen)) {
 
-			if (!dbiacur->noRowsToReturn() && dbiacur->fetchRow()) {
+			bool	error=false;
+			if (!dbiacur->noRowsToReturn() &&
+					dbiacur->fetchRow(&error)) {
 				const char	*field=NULL;
 				uint64_t	fieldlength=0;
 				bool		blob=false;
@@ -711,39 +727,53 @@ bool sqlrserverconnection::getListsByApiCalls() {
 
 bool sqlrserverconnection::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
@@ -751,17 +781,23 @@ bool sqlrserverconnection::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *procedure,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
 bool sqlrserverconnection::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
+	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
+				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
 }
 
@@ -831,11 +867,12 @@ bool sqlrserverconnection::isSynonym(const char *table) {
 	synquerylen=charstring::length(synquery);
 
 	sqlrservercursor	*syncur=cont->newCursor();
+	bool	error=false;
 	bool	result=(syncur->open() &&
 			syncur->prepareQuery(synquery,synquerylen) &&
 			syncur->executeQuery(synquery,synquerylen) &&
 			!syncur->noRowsToReturn() &&
-			syncur->fetchRow());
+			syncur->fetchRow(&error));
 	syncur->closeResultSet();
 	syncur->close();
 	cont->deleteCursor(syncur);
@@ -857,10 +894,6 @@ int16_t sqlrserverconnection::nonNullBindValue() {
 
 int16_t sqlrserverconnection::nullBindValue() {
 	return -1;
-}
-
-char sqlrserverconnection::bindVariablePrefix() {
-	return ':';
 }
 
 bool sqlrserverconnection::bindValueIsNull(int16_t isnull) {
@@ -905,4 +938,14 @@ bool sqlrserverconnection::getLiveConnection() {
 
 void sqlrserverconnection::setLiveConnection(bool liveconnection) {
 	pvt->_liveconnection=liveconnection;
+}
+
+bool sqlrserverconnection::send(unsigned char *data, size_t size) {
+	// by default, do nothing
+	return false;
+}
+
+bool sqlrserverconnection::recv(unsigned char **data, size_t *size) {
+	// by default, do nothing
+	return false;
 }

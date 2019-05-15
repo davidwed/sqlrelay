@@ -1,0 +1,3 @@
+	if (!charstring::compare(module,"@module@")) {
+		md=new_sqlrmoduledata_@module@(moduledata);
+	} else

@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -34,6 +34,8 @@ struct db2column {
 	uint16_t	zerofill;
 	uint16_t	binary;
 	uint16_t	autoincrement;
+	char		table[4096];
+	uint16_t	tablelength;
 };
 
 struct datebind {
@@ -168,9 +170,11 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		uint16_t	getColumnIsUnsigned(uint32_t i);
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
+		const char	*getColumnTable(uint32_t i);
+		uint16_t	getColumnTableLength(uint32_t i);
 		bool		noRowsToReturn();
-		bool		skipRow();
-		bool		fetchRow();
+		bool		skipRow(bool *error);
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **fld,
 					uint64_t *fldlength,
@@ -1440,6 +1444,18 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
+
+			// table name
+			erg=SQLColAttribute(stmt,i+1,
+				SQL_COLUMN_TABLE_NAME,
+				column[i].table,4096,
+				(SQLSMALLINT *)&(column[i].tablelength),
+				NULL);
+			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+				return false;
+			}
+			column[i].tablelength=
+				charstring::length(column[i].table);
 		}
 
 		// bind the column to a lob locator or buffer
@@ -1628,20 +1644,30 @@ uint16_t db2cursor::getColumnIsAutoIncrement(uint32_t i) {
 	return column[i].autoincrement;
 }
 
+const char *db2cursor::getColumnTable(uint32_t i) {
+	return column[i].table;
+}
+
+uint16_t db2cursor::getColumnTableLength(uint32_t i) {
+	return column[i].tablelength;
+}
+
 bool db2cursor::noRowsToReturn() {
 	// if there are no columns, then there can't be any rows either
 	return (ncols)?false:true;
 }
 
-bool db2cursor::skipRow() {
-	if (fetchRow()) {
+bool db2cursor::skipRow(bool *error) {
+	if (fetchRow(error)) {
 		rowgroupindex++;
 		return true;
 	}
 	return false;
 }
 
-bool db2cursor::fetchRow() {
+bool db2cursor::fetchRow(bool *error) {
+
+	*error=false;
 
 	if (rowgroupindex==conn->cont->getFetchAtOnce()) {
 		rowgroupindex=0;
@@ -1656,6 +1682,10 @@ bool db2cursor::fetchRow() {
 		// rows, otherwise we're at the end of the result and there are
 		// no more rows to fetch.
 		SQLRETURN	result=SQLFetchScroll(stmt,SQL_FETCH_NEXT,0);
+		if (result==SQL_ERROR) {
+			*error=true;
+			return false;
+		}
 		if (result!=SQL_SUCCESS && result!=SQL_SUCCESS_WITH_INFO) {
 			// there are no more rows to be fetched
 			return false;

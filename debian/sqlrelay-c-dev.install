@@ -1,0 +1,6 @@
+usr/bin/sqlrclientwrapper-config
+usr/include/sqlrelay/sqlrclientwrapper.h
+usr/include/sqlrelay/private/sqlrclientwrapper.h
+usr/include/sqlrelay/private/sqlrclientwrapperincludes.h
+usr/lib/*/libsqlrclientwrapper.so
+usr/lib/*/pkgconfig/sqlrelay-c.pc

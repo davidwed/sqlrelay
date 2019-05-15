@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <config.h>
@@ -13,9 +13,13 @@
 #include <rudiments/filesystem.h>
 #include <rudiments/error.h>
 #include <defines.h>
-#define NEED_DATATYPESTRING
+#define NEED_DATATYPESTRING 1
 #include <datatypes.h>
-#include <countbindvariables.h>
+#define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_IS_BIND_DELIMITER 1
+#define NEED_AFTER_BIND_VARIABLE 1
+#define NEED_COUNT_BIND_VARIABLES 1
+#include <bindvariables.h>
 
 #ifndef MAXPATHLEN
 	#define MAXPATHLEN 256
@@ -1334,7 +1338,11 @@ void sqlrcursor::attachToBindCursor(uint16_t bindcursorid) {
 }
 
 uint16_t sqlrcursor::countBindVariables() const {
-	return ::countBindVariables(pvt->_queryptr);
+	return ::countBindVariables(pvt->_queryptr,pvt->_querylen,
+		pvt->_sqlrc->getBindVariableDelimiterQuestionMarkSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterColonSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterAtSignSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterDollarSignSupported());
 }
 
 void sqlrcursor::clearVariables() {
@@ -2332,7 +2340,7 @@ bool sqlrcursor::executeQuery() {
 	}
 		
 	// run the query
-	bool	retval=runQuery(pvt->_queryptr);
+	bool	retval=runQuery();
 
 	// set up to re-execute the same query if executeQuery is called
 	// again before calling prepareQuery
@@ -2350,6 +2358,7 @@ void sqlrcursor::performSubstitutions() {
 	// perform substitutions
 	stringbuffer	container;
 	const char	*ptr=pvt->_queryptr;
+	const char	*endptr=pvt->_queryptr+pvt->_querylen;
 	bool		found=false;
 	bool		inquotes=false;
 	bool		inbraces=false;
@@ -2357,16 +2366,12 @@ void sqlrcursor::performSubstitutions() {
 	stringbuffer	*braces=NULL;
 
 	// iterate through the string
-	while (*ptr) {
+	while (ptr<endptr) {
 	
 		// figure out whether we're inside a quoted 
 		// string or not
 		if (*ptr=='\'' && *(ptr-1)!='\\') {
-			if (inquotes) {
-				inquotes=false;
-			} else {
-				inquotes=true;
-			}
+			inquotes=!inquotes;
 		}
 	
 		// if we find an open-brace then start 
@@ -2489,7 +2494,7 @@ void sqlrcursor::performSubstitutions() {
 	}
 
 	delete[] pvt->_querybuffer;
-	pvt->_querylen=container.getStringLength();
+	pvt->_querylen=container.getSize();
 	pvt->_querybuffer=container.detachString();
 	pvt->_queryptr=pvt->_querybuffer;
 
@@ -2502,92 +2507,30 @@ void sqlrcursor::validateBindsInternal() {
 		return;
 	}
 
-	// some useful variables
-	const char	*ptr;
-	const char	*start;
-	const char	*after;
-	bool		found;
-	size_t		len;
-
 	// check each input bind
 	for (uint64_t in=0; in<pvt->_inbindvars->getLength(); in++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(
-				(*pvt->_inbindvars)[in].variable);
 		if (charstring::isInteger(
-				(*pvt->_inbindvars)[in].variable,len)) {
+				(*pvt->_inbindvars)[in].variable)) {
 			continue;
 		}
 
-		found=false;
-		start=pvt->_queryptr+1;
-
-		// there may be more than 1 match for the variable name as in
-		// "select * from table where table_name=:table_name", both
-		// table_name's would match, but only the second is a bind
-		// variable
-		while ((ptr=charstring::findFirst(start,
-					(*pvt->_inbindvars)[in].variable))) {
-
-			// for a match to be a bind variable, it must be 
-			// preceded by a colon or at-sign and can't be followed
-			// by an alphabet character, number or underscore
-			after=ptr+len;
-			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
-				!(*(after)>='a' && *(after)<='z') &&
-				!(*(after)>='A' && *(after)<='Z') &&
-				!(*(after)>='0' && *(after)<='9')) {
-				found=true;
-				break;
-			} else {
-				// jump past this instance to look for the
-				// next one
-				start=ptr+len;
-			}
-		}
-
-		(*pvt->_inbindvars)[in].send=found;
+		(*pvt->_inbindvars)[in].send=
+			validateBind((*pvt->_inbindvars)[in].variable);
 	}
 
 	// check each output bind
 	for (uint64_t out=0; out<pvt->_outbindvars->getLength(); out++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(
-				(*pvt->_outbindvars)[out].variable);
 		if (charstring::isInteger(
-				(*pvt->_outbindvars)[out].variable,len)) {
+				(*pvt->_outbindvars)[out].variable)) {
 			continue;
 		}
 
-		found=false;
-		start=pvt->_queryptr+1;
-
-		// there may be more than 1 match for the variable name as in
-		// "select * from table where table_name=:table_name", both
-		// table_name's would match, but only 1 is correct
-		while ((ptr=charstring::findFirst(start,
-					(*pvt->_outbindvars)[out].variable))) {
-
-			// for a match to be a bind variable, it must be 
-			// preceded by a colon and can't be followed by an
-			// alphabet character, number or underscore
-			after=ptr+len;
-			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
-				!(*(after)>='a' && *(after)<='z') &&
-				!(*(after)>='A' && *(after)<='Z') &&
-				!(*(after)>='0' && *(after)<='9')) {
-				found=true;
-				break;
-			} else {
-				// jump past this instance to look for the
-				// next one
-				start=ptr+len;
-			}
-		}
-
-		(*pvt->_outbindvars)[out].send=found;
+		(*pvt->_outbindvars)[out].send=
+			validateBind((*pvt->_outbindvars)[out].variable);
 	}
 
 	// check each input/output bind
@@ -2595,42 +2538,125 @@ void sqlrcursor::validateBindsInternal() {
 		inout<pvt->_inoutbindvars->getLength(); inout++) {
 
 		// don't check bind-by-position variables
-		len=charstring::length(
-				(*pvt->_inoutbindvars)[inout].variable);
 		if (charstring::isInteger(
-				(*pvt->_inoutbindvars)[inout].variable,len)) {
+				(*pvt->_inoutbindvars)[inout].variable)) {
 			continue;
 		}
 
-		found=false;
-		start=pvt->_queryptr+1;
+		(*pvt->_inoutbindvars)[inout].send=
+			validateBind((*pvt->_inoutbindvars)[inout].variable);
+	}
+}
 
-		// there may be more than 1 match for the variable name as in
-		// "select * from table where table_name=:table_name", both
-		// table_name's would match, but only the second is a bind
-		// variable
-		while ((ptr=charstring::findFirst(start,
-				(*pvt->_inoutbindvars)[inout].variable))) {
+bool sqlrcursor::validateBind(const char *variable) {
 
-			// for a match to be a bind variable, it must be 
-			// preceded by a colon and can't be followed by an
-			// alphabet character, number or underscore
-			after=ptr+len;
-			if ((*(ptr-1)==':' || *(ptr-1)=='@') && *after!='_' &&
-				!(*(after)>='a' && *(after)<='z') &&
-				!(*(after)>='A' && *(after)<='Z') &&
-				!(*(after)>='0' && *(after)<='9')) {
-				found=true;
-				break;
-			} else {
-				// jump past this instance to look for the
-				// next one
-				start=ptr+len;
+	queryparsestate_t	parsestate=IN_QUERY;
+	stringbuffer		currentbind;
+
+	size_t	len=charstring::length(variable);
+
+	// run through the querybuffer...
+	const char	*ptr=pvt->_queryptr;
+	const char	*endptr=pvt->_queryptr+pvt->_querylen;
+	const char	*prevptr="\0";
+	do {
+
+		// if we're in the query...
+		if (parsestate==IN_QUERY) {
+
+			// if we find a quote, we're in quotes
+			if (*ptr=='\'') {
+				parsestate=IN_QUOTES;
 			}
+
+			// if we find whitespace or a couple of other things
+			// then the next thing could be a bind variable
+			if (beforeBindVariable(ptr)) {
+				parsestate=BEFORE_BIND;
+			}
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
 		}
 
-		(*pvt->_inoutbindvars)[inout].send=found;
-	}
+		// copy anything in quotes verbatim
+		if (parsestate==IN_QUOTES) {
+
+			// if we find a quote, but not an escaped quote,
+			// then we're back in the query
+			if (*ptr=='\'' && *(ptr+1)!='\'' &&
+					*prevptr!='\'' && *prevptr!='\\') {
+				parsestate=IN_QUERY;
+			}
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
+		}
+
+		if (parsestate==BEFORE_BIND) {
+
+			// if we find a bind variable...
+			if (isBindDelimiter(ptr,
+		pvt->_sqlrc->getBindVariableDelimiterQuestionMarkSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterColonSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterAtSignSupported(),
+		pvt->_sqlrc->getBindVariableDelimiterDollarSignSupported())) {
+				parsestate=IN_BIND;
+				currentbind.clear();
+				continue;
+			}
+
+			// if we didn't find a bind variable then we're just
+			// back in the query
+			parsestate=IN_QUERY;
+			continue;
+		}
+
+		// if we're in a bind variable...
+		if (parsestate==IN_BIND) {
+
+			// If we find whitespace or a few other things
+			// then we're done with the bind variable.  Process it.
+			// Otherwise get the variable itself in another buffer.
+			bool	endofbind=afterBindVariable(ptr);
+			if (endofbind || ptr==endptr-1) {
+
+				// special case...
+				// last character in the query
+				if (!endofbind && ptr==endptr-1) {
+					currentbind.append(*ptr);
+					prevptr=ptr;
+					ptr++;
+				}
+
+				// check variable against currentbind
+				if (len==currentbind.getStringLength()-1 &&
+					!charstring::compare(
+						variable,
+						currentbind.getString()+1,
+						len)) {
+					return true;
+				}
+
+				parsestate=IN_QUERY;
+
+			} else {
+
+				// move on
+				currentbind.append(*ptr);
+				prevptr=ptr;
+				ptr++;
+			}
+			continue;
+		}
+
+	} while (ptr<endptr);
+
+	return false;
 }
 
 void sqlrcursor::performSubstitution(stringbuffer *buffer, uint16_t which) {
@@ -2650,10 +2676,10 @@ void sqlrcursor::performSubstitution(stringbuffer *buffer, uint16_t which) {
 	(*pvt->_subvars)[which].substituted=true;
 }
 
-bool sqlrcursor::runQuery(const char *query) {
+bool sqlrcursor::runQuery() {
 
 	// send the query
-	if (sendQueryInternal(query)) {
+	if (sendQueryInternal()) {
 
 		sendInputBinds();
 		sendOutputBinds();
@@ -2669,11 +2695,11 @@ bool sqlrcursor::runQuery(const char *query) {
 	return false;
 }
 
-bool sqlrcursor::sendQueryInternal(const char *query) {
+bool sqlrcursor::sendQueryInternal() {
 
 	// if the first 8 characters of the query are "-- debug" followed
 	// by a return, then set debugging on
-	if (!charstring::compare(query,"-- debug\n",9)) {
+	if (!charstring::compare(pvt->_queryptr,"-- debug\n",9)) {
 		pvt->_sqlrc->debugOn();
 	}
 
@@ -2727,14 +2753,14 @@ bool sqlrcursor::sendQueryInternal(const char *query) {
 			pvt->_sqlrc->debugPrint("Length: ");
 			pvt->_sqlrc->debugPrint((int64_t)pvt->_querylen);
 			pvt->_sqlrc->debugPrint("\n");
-			pvt->_sqlrc->debugPrint(query);
+			pvt->_sqlrc->debugPrint(pvt->_queryptr);
 			pvt->_sqlrc->debugPrint("\n");
 			pvt->_sqlrc->debugPreEnd();
 		}
 
 		// send the query
 		pvt->_cs->write(pvt->_querylen);
-		pvt->_cs->write(query,pvt->_querylen);
+		pvt->_cs->write(pvt->_queryptr,pvt->_querylen);
 
 	} else {
 
@@ -5174,6 +5200,37 @@ bool sqlrcursor::parseResults() {
 			return false;
 		}
 
+		// check for an error
+		if (type==FETCH_ERROR) {
+
+			if (pvt->_sqlrc->debug()) {
+				pvt->_sqlrc->debugPreStart();
+				pvt->_sqlrc->debugPrint(
+						"Got fetch error.\n");
+				pvt->_sqlrc->debugPreEnd();
+			}
+			pvt->_endofresultset=true;
+
+			// if we were stepping through a cached result set
+			// then we need to close the file
+			clearCacheSource();
+
+			uint16_t err=getErrorStatus();
+			if (err==TIMEOUT_GETTING_ERROR_STATUS) {
+				// The pattern here is that we bail
+				// immediately.  Error status has
+				// already been set.
+				pvt->_sqlrc->endSession();
+				return false;
+			}
+			getErrorFromServer();
+			if (err==ERROR_OCCURRED_DISCONNECT) {
+				pvt->_sqlrc->endSession();
+				return false;
+			}
+			break;
+		}
+
 		// check for the end of the result set
 		if (type==END_RESULT_SET) {
 
@@ -6318,7 +6375,7 @@ bool sqlrcursor::nextResultSet() {
 	pvt->_sqlrc->flushWriteBuffer();
 
 	uint16_t err=getErrorStatus();
-	if (err != NO_ERROR_OCCURRED) {
+	if (err!=NO_ERROR_OCCURRED) {
 		if (err==TIMEOUT_GETTING_ERROR_STATUS) {
 			// the pattern here is that we bail immediately.
 			// error status has already been set.
@@ -6493,7 +6550,7 @@ void sqlrcursor::clearRows() {
 	}
 
 	// reset the row storage pool
-	pvt->_rowstorage->deallocate();
+	pvt->_rowstorage->clear();
 }
 
 void sqlrcursor::clearColumns() {
@@ -6507,7 +6564,7 @@ void sqlrcursor::clearColumns() {
 	}
 
 	// reset the column storage pool
-	pvt->_colstorage->deallocate();
+	pvt->_colstorage->clear();
 
 	// reset the column count
 	pvt->_previouscolcount=pvt->_colcount;

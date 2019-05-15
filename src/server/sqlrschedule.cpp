@@ -1,4 +1,4 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -312,14 +312,14 @@ class sqlrscheduleprivate {
 	friend class sqlrschedule;
 	private:
 		sqlrschedules	*_ss;
-		xmldomnode	*_parameters;
+		domnode	*_parameters;
 
 		linkedlist< sqlrschedulerule * >	_rules;
 };
 
 sqlrschedule::sqlrschedule(sqlrservercontroller *cont,
 				sqlrschedules *ss,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrscheduleprivate;
 	pvt->_ss=ss;
 	pvt->_parameters=parameters;
@@ -361,6 +361,6 @@ sqlrschedules *sqlrschedule::getSchedules() {
 	return pvt->_ss;
 }
 
-xmldomnode *sqlrschedule::getParameters() {
+domnode *sqlrschedule::getParameters() {
 	return pvt->_parameters;
 }

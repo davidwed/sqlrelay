@@ -1,4 +1,4 @@
-// Copyright (c) 2001  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 package com.firstworks.sqlrelay;
 
@@ -54,6 +54,29 @@ public class SQLRConnection {
 	 *  environment variable. */
 	public native void	setResponseTimeout(int timeoutsec,
 							int timeoutusec);
+
+
+
+	/** Sets which delimiters are used to identify bind variables
+	 *  in countBindVariables() and validateBinds().  Valid
+	 *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+	public native void	setBindVariableDelimiters(String delimiters);
+
+	/** Returns true if question marks (?) are considered to be
+	 *  valid bind variable delimiters. */
+	public native boolean	getBindVariableDelimiterQuestionMarkSupported();
+
+	/** Returns true if colons (:) are considered to be
+	 *  valid bind variable delimiters. */
+	public native boolean	getBindVariableDelimiterColonSupported();
+
+	/** Returns true if at-signs (@) are considered to be
+	 *  valid bind variable delimiters. */
+	public native boolean	getBindVariableDelimiterAtSignSupported();
+
+	/** Returns true if dollar signs ($) are considered to be
+	 *  valid bind variable delimiters. */
+	public native boolean	getBindVariableDelimiterDollarSignSupported();
 
 
 

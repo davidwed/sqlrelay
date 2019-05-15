@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
@@ -18,10 +18,10 @@
 #include <rudiments/prompt.h>
 #include <config.h>
 #include <defaults.h>
-#define NEED_IS_BIT_TYPE_CHAR
-#define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_FLOAT_TYPE_CHAR
-#define NEED_IS_NONSCALE_FLOAT_TYPE_CHAR
+#define NEED_IS_BIT_TYPE_CHAR 1
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_FLOAT_TYPE_CHAR 1
+#define NEED_IS_NONSCALE_FLOAT_TYPE_CHAR 1
 #include <datatypes.h>
 #include <defines.h>
 #include <parsedatetime.h>
@@ -79,7 +79,7 @@ class sqlrshenv {
 		bool		lazyfetch;
 		char		delimiter;
 		dictionary<char *, sqlrshbindvalue *>	inputbinds;
-		memorypool	*inbindpool;
+		memorypool	inbindpool;
 		dictionary<char *, sqlrshbindvalue *>	outputbinds;
 		dictionary<char *, sqlrshbindvalue *>	inputoutputbinds;
 		char		*cacheto;
@@ -98,7 +98,6 @@ sqlrshenv::sqlrshenv() {
 	autocommit=false;
 	lazyfetch=false;
 	delimiter=';';
-	inbindpool=new memorypool(512,128,100);
 	cacheto=NULL;
 	format=SQLRSH_FORMAT_PLAIN;
 	getasnumber=false;
@@ -110,7 +109,6 @@ sqlrshenv::~sqlrshenv() {
 	clearbinds(&inputbinds);
 	clearbinds(&outputbinds);
 	clearbinds(&inputoutputbinds);
-	delete inbindpool;
 	delete[] cacheto;
 }
 
@@ -128,7 +126,7 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 		delete bv;
 	}
 	binds->clear();
-	inbindpool->deallocate();
+	inbindpool.clear();
 }
 
 enum querytype_t {
@@ -725,7 +723,7 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(ptr,"querytree")) {	
 		xmldom	xmld;
 		if (xmld.parseString(sqlrcur->getQueryTree())) {
-			xmld.getRootNode()->print(&stdoutput);
+			xmld.getRootNode()->write(&stdoutput,true);
 		}
 		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"translatedquery")) {	

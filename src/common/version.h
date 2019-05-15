@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <rudiments/charstring.h>
@@ -20,7 +20,7 @@ static void version(int argc, const char **argv) {
 	stdoutput.printf("Compiled: %s %s\n",__DATE__,__TIME__);
 #endif
 	stdoutput.write("\n"
-		"Copyright (C) 1999-2016 David Muse\n"
+		"Copyright (c) 1999-2018 David Muse\n"
 		"This is free software; see the source for copying "
 		"conditions.  There is NO\n"
 		"warranty; not even for MERCHANTABILITY or "

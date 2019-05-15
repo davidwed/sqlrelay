@@ -481,7 +481,7 @@ To drop the stored procedure, run a query like the following.
 }}}
 }}}
 
-==== !MySQL ====
+==== !MySQL/MariaDB ====
 
 To create the stored procedure, run a query like the following.
 
@@ -711,9 +711,9 @@ To drop the stored procedure, run a query like the following.
 }}}
 }}}
 
-==== !MySQL ====
+==== !MySQL/MariaDB ====
 
-A single value can be returned from a !MySQL function.
+A single value can be returned from a !MySQL/MariaDB function.
 
 To create the function, run a query like the following.
 
@@ -742,7 +742,7 @@ To drop the function, run a query like the following.
 }}}
 }}}
 
-A single value can be returned in the result set of a !MySQL procedure.
+A single value can be returned in the result set of a !MySQL/MariaDB procedure.
 
 To create the procedure, run a query like the following.
 
@@ -769,7 +769,7 @@ To drop the procedure, run a query like the following.
 }}}
 }}}
 
-A single value can be returned using the output variable of a !MySQL
+A single value can be returned using the output variable of a !MySQL/MariaDB
 procedure.
 
 To create the procedure, run a query like the following.
@@ -963,10 +963,10 @@ To drop the stored procedure, run a query like the following.
 }}}
 }}}
 
-==== !MySQL ====
+==== !MySQL/MariaDB ====
 
 Here's how you can get multiple values from the result
-set of a !MySQL procedure.
+set of a !MySQL/MariaDB procedure.
 
 To create the stored procedure, run a query like the following.
 
@@ -996,7 +996,7 @@ To drop the stored procedure, run a query like the following.
 }}}
 
 Here's how you can get multiple values from the output variables
-of a !MySQL procedure.
+of a !MySQL/MariaDB procedure.
 
 To create the stored procedure, run a query like the following.
 
@@ -1141,11 +1141,11 @@ To drop the stored procedure, run a query like the following.
 }}}
 }}}
 
-==== !MySQL ====
+==== !MySQL/MariaDB ====
 
-The result sets of all select statements called within !MySQL stored
+The result sets of all select statements called within !MySQL/MariaDB stored
 procedures (that aren't selected into variables) are returned from the procedure
-call.  Though !MySQL stored procedures can return multiple result sets,
+call.  Though !MySQL/MariaDB stored procedures can return multiple result sets,
 currently SQL Relay can only fetch the first result set.
 
 To create the stored procedure which returns a result set, run a query like

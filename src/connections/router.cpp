@@ -1,4 +1,4 @@
-// Copyright (c) 2006-2016 David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -110,8 +110,6 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 
 		int16_t		nullbindvalue;
 		int16_t		nonnullbindvalue;
-
-		const char	*error;
 
 		sqlrrouters	*sqlrr;
 
@@ -243,8 +241,9 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 		uint16_t	getColumnIsZeroFilled(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
+		const char	*getColumnTable(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -289,10 +288,6 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 
 	sqlrr=NULL;
 	routeentiresession=false;
-
-	// tell the controller to intercept begins, commits, and rollbacks sent
-	// as queries and call begin(), commit(), and rollback() methods instead
-	cont->setInterceptTransactionQueries(true);
 
 	debug=cont->getConfig()->getDebugRouters();
 }
@@ -380,7 +375,7 @@ void routerconnection::handleConnectString() {
 
 	// load the router modules
 	// (this is just a convenient place to do it)
-	xmldomnode	*routers=cont->getConfig()->getRouters();
+	domnode	*routers=cont->getConfig()->getRouters();
 	if (!routers->isNullNode()) {
 		sqlrr=new sqlrrouters(cont,conids,cons,concount);
 		sqlrr->load(routers);
@@ -942,7 +937,7 @@ bool routerconnection::ping() {
 		if (debug) {
 			stdoutput.printf("	routing error\n}\n");
 		}
-		return NULL;
+		return false;
 	}
 
 	// if routing entire sessions, then ping the appropriate connection
@@ -1745,17 +1740,27 @@ uint16_t routercursor::getColumnIsAutoIncrement(uint32_t col) {
 	return (currentcur)?currentcur->getColumnIsAutoIncrement(col):0;
 }
 
+const char *routercursor::getColumnTable(uint32_t col) {
+	return (currentcur)?currentcur->getColumnTable(col):NULL;
+}
+
 bool routercursor::noRowsToReturn() {
 	return (((currentcur)?currentcur->rowCount():0)==0);
 }
 
-bool routercursor::fetchRow() {
+bool routercursor::fetchRow(bool *error) {
+
+	*error=false;
+
 	if (!currentcur) {
 		return false;
 	}
 	if (currentcur->getField(nextrow,(uint32_t)0)) {
 		nextrow++;
 		return true;
+	}
+	if (currentcur->errorMessage()) {
+		*error=true;
 	}
 	return false;
 }

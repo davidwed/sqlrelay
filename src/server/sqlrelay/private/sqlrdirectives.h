@@ -1,8 +1,8 @@
-// Copyright (c) 2017  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 	private:
 		void	unload();
-		void	loadDirective(xmldomnode *directive);
+		void	loadDirective(domnode *directive);
 
 		sqlrdirectivesprivate	*pvt;

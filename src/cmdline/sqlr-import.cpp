@@ -1,25 +1,26 @@
-// Copyright (c) 2005  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
 #include <sqlrelay/sqlrutil.h>
 #include <rudiments/xmlsax.h>
+#include <rudiments/csvsax.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 #include <config.h>
 #include <defaults.h>
-#define NEED_IS_NUMBER_TYPE_CHAR
+#define NEED_IS_NUMBER_TYPE_CHAR 1
 #include <datatypes.h>
 #include <version.h>
 
-class sqlrimport : public xmlsax {
+class sqlrimportxml : public xmlsax {
 	public:
-			sqlrimport(sqlrconnection *sqlrcon,
+			sqlrimportxml(sqlrconnection *sqlrcon,
 					sqlrcursor *sqlrcur,
 					uint64_t commitcount,
 					bool verbose,
 					const char *dbtype);
-			~sqlrimport();
+			~sqlrimportxml();
 	private:
 		bool	tagStart(const char *ns, const char *name);
 		bool	attributeName(const char *name);
@@ -94,31 +95,31 @@ class sqlrimport : public xmlsax {
 		static const unsigned short	AUTOINCREMENTATTR;
 };
 
-const unsigned short sqlrimport::NULLTAG=0;
-const unsigned short sqlrimport::TABLETAG=1;
-const unsigned short sqlrimport::SEQUENCETAG=2;
-const unsigned short sqlrimport::COLUMNSTAG=3;
-const unsigned short sqlrimport::COLUMNTAG=4;
-const unsigned short sqlrimport::ROWSTAG=5;
-const unsigned short sqlrimport::ROWTAG=6;
-const unsigned short sqlrimport::FIELDTAG=7;
+const unsigned short sqlrimportxml::NULLTAG=0;
+const unsigned short sqlrimportxml::TABLETAG=1;
+const unsigned short sqlrimportxml::SEQUENCETAG=2;
+const unsigned short sqlrimportxml::COLUMNSTAG=3;
+const unsigned short sqlrimportxml::COLUMNTAG=4;
+const unsigned short sqlrimportxml::ROWSTAG=5;
+const unsigned short sqlrimportxml::ROWTAG=6;
+const unsigned short sqlrimportxml::FIELDTAG=7;
 
-const unsigned short sqlrimport::NULLATTR=0;
-const unsigned short sqlrimport::NAMEATTR=1;
-const unsigned short sqlrimport::TYPEATTR=3;
-const unsigned short sqlrimport::LENGTHATTR=4;
-const unsigned short sqlrimport::PRECISIONATTR=5;
-const unsigned short sqlrimport::SCALEATTR=6;
-const unsigned short sqlrimport::NULLABLEATTR=7;
-const unsigned short sqlrimport::PRIMARYKEYATTR=8;
-const unsigned short sqlrimport::UNIQUEATTR=9;
-const unsigned short sqlrimport::PARTOFKEYATTR=10;
-const unsigned short sqlrimport::UNSIGNEDATTR=11;
-const unsigned short sqlrimport::ZEROFILLEDATTR=12;
-const unsigned short sqlrimport::BINARYATTR=13;
-const unsigned short sqlrimport::AUTOINCREMENTATTR=14;
+const unsigned short sqlrimportxml::NULLATTR=0;
+const unsigned short sqlrimportxml::NAMEATTR=1;
+const unsigned short sqlrimportxml::TYPEATTR=3;
+const unsigned short sqlrimportxml::LENGTHATTR=4;
+const unsigned short sqlrimportxml::PRECISIONATTR=5;
+const unsigned short sqlrimportxml::SCALEATTR=6;
+const unsigned short sqlrimportxml::NULLABLEATTR=7;
+const unsigned short sqlrimportxml::PRIMARYKEYATTR=8;
+const unsigned short sqlrimportxml::UNIQUEATTR=9;
+const unsigned short sqlrimportxml::PARTOFKEYATTR=10;
+const unsigned short sqlrimportxml::UNSIGNEDATTR=11;
+const unsigned short sqlrimportxml::ZEROFILLEDATTR=12;
+const unsigned short sqlrimportxml::BINARYATTR=13;
+const unsigned short sqlrimportxml::AUTOINCREMENTATTR=14;
 
-sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
+sqlrimportxml::sqlrimportxml(sqlrconnection *sqlrcon,
 				sqlrcursor *sqlrcur,
 				uint64_t commitcount,
 				bool verbose,
@@ -146,7 +147,7 @@ sqlrimport::sqlrimport(sqlrconnection *sqlrcon,
 	this->dbtype=dbtype;
 }
 
-sqlrimport::~sqlrimport() {
+sqlrimportxml::~sqlrimportxml() {
 	delete[] currentattribute;
 	delete[] table;
 	delete[] sequence;
@@ -154,7 +155,7 @@ sqlrimport::~sqlrimport() {
 	delete[] numbercolumn;
 }
 
-bool sqlrimport::tagStart(const char *ns, const char *name) {
+bool sqlrimportxml::tagStart(const char *ns, const char *name) {
 	if (!charstring::compare(name,"table")) {
 		return tableTagStart();
 	} else if (!charstring::compare(name,"sequence")) {
@@ -173,13 +174,13 @@ bool sqlrimport::tagStart(const char *ns, const char *name) {
 	return true;
 }
 
-bool sqlrimport::attributeName(const char *name) {
+bool sqlrimportxml::attributeName(const char *name) {
 	delete[] currentattribute;
 	currentattribute=charstring::duplicate(name);
 	return true;
 }
 
-bool sqlrimport::attributeValue(const char *value) {
+bool sqlrimportxml::attributeValue(const char *value) {
 	switch (currenttag) {
 		case TABLETAG:
 			if (!charstring::compare(currentattribute,"name")) {
@@ -232,7 +233,7 @@ bool sqlrimport::attributeValue(const char *value) {
 	return true;
 }
 
-bool sqlrimport::tagEnd(const char *ns, const char *name) {
+bool sqlrimportxml::tagEnd(const char *ns, const char *name) {
 	if (!charstring::compare(name,"table")) {
 		return tableTagEnd();
 	} else if (!charstring::compare(name,"sequence")) {
@@ -251,34 +252,34 @@ bool sqlrimport::tagEnd(const char *ns, const char *name) {
 	return true;
 }
 
-bool sqlrimport::tableTagStart() {
+bool sqlrimportxml::tableTagStart() {
 	currenttag=TABLETAG;
 	rowcount=0;
 	committedcount=0;
 	return true;
 }
 
-bool sqlrimport::sequenceTagStart() {
+bool sqlrimportxml::sequenceTagStart() {
 	currenttag=SEQUENCETAG;
 	return true;
 }
 
-bool sqlrimport::columnsTagStart() {
+bool sqlrimportxml::columnsTagStart() {
 	currenttag=COLUMNSTAG;
 	return true;
 }
 
-bool sqlrimport::columnTagStart() {
+bool sqlrimportxml::columnTagStart() {
 	currenttag=COLUMNTAG;
 	return true;
 }
 
-bool sqlrimport::rowsTagStart() {
+bool sqlrimportxml::rowsTagStart() {
 	currenttag=ROWSTAG;
 	return true;
 }
 
-bool sqlrimport::rowTagStart() {
+bool sqlrimportxml::rowTagStart() {
 	query.clear();
 	query.append("insert into ")->append(table)->append(" (");
 	query.append(columns.getString())->append(") values (");
@@ -288,7 +289,7 @@ bool sqlrimport::rowTagStart() {
 	return true;
 }
 
-bool sqlrimport::fieldTagStart() {
+bool sqlrimportxml::fieldTagStart() {
 	currenttag=FIELDTAG;
 	infield=true;
 	foundfieldtext=false;
@@ -296,7 +297,7 @@ bool sqlrimport::fieldTagStart() {
 }
 
 
-bool sqlrimport::tableTagEnd() {
+bool sqlrimportxml::tableTagEnd() {
 	sqlrcon->commit();
 	if (verbose) {
 		stdoutput.printf("  committed %lld rows (to %s).\n\n",
@@ -305,7 +306,7 @@ bool sqlrimport::tableTagEnd() {
 	return true;
 }
 
-bool sqlrimport::sequenceTagEnd() {
+bool sqlrimportxml::sequenceTagEnd() {
 
 	query.clear();
 
@@ -383,23 +384,23 @@ bool sqlrimport::sequenceTagEnd() {
 	return true;
 }
 
-bool sqlrimport::columnsTagEnd() {
+bool sqlrimportxml::columnsTagEnd() {
 	if (verbose) {
 		stdoutput.printf("  %ld columns.\n",(unsigned long)currentcol);
 	}
 	return true;
 }
 
-bool sqlrimport::columnTagEnd() {
+bool sqlrimportxml::columnTagEnd() {
 	currentcol++;
 	return true;
 }
 
-bool sqlrimport::rowsTagEnd() {
+bool sqlrimportxml::rowsTagEnd() {
 	return true;
 }
 
-bool sqlrimport::rowTagEnd() {
+bool sqlrimportxml::rowTagEnd() {
 	query.append(')');
 	if (fieldcount) {
 		if (rowcount==0) {
@@ -427,7 +428,7 @@ bool sqlrimport::rowTagEnd() {
 	return true;
 }
 
-bool sqlrimport::fieldTagEnd() {
+bool sqlrimportxml::fieldTagEnd() {
 	if (!foundfieldtext) {
 		query.append("NULL");
 		if (currentcol<colcount-1) {
@@ -440,7 +441,7 @@ bool sqlrimport::fieldTagEnd() {
 	return true;
 }
 
-bool sqlrimport::text(const char *string) {
+bool sqlrimportxml::text(const char *string) {
 	if (infield) {
 		foundfieldtext=true;
 		if (!charstring::isNullOrEmpty(string)) {
@@ -461,15 +462,23 @@ bool sqlrimport::text(const char *string) {
 	return true;
 }
 
-void sqlrimport::massageField(stringbuffer *strb, const char *field) {
+void sqlrimportxml::massageField(stringbuffer *strb, const char *field) {
 
 	for (uint32_t index=0; field[index]; index++) {
 		if (field[index]=='&') {
 
-			// expand xml entities
+			// expand xml entities...
+
+			char	ch=(char)charstring::
+					toUnsignedInteger(field+index);
+
+			// double-up any single-quotes
+			if (ch=='\'') {
+				strb->append('\'');
+			}
+
 			index++;
-			strb->append((char)charstring::
-					toUnsignedInteger(field+index));
+			strb->append(ch);
 			while (field[index] && field[index]!=';') {
 				index++;
 			}
@@ -486,8 +495,202 @@ void sqlrimport::massageField(stringbuffer *strb, const char *field) {
 
 		} else {
 
-			// just append the character
-			strb->append(field[index]);
+			char	ch=field[index];
+
+			// double-up any single-quotes
+			if (ch=='\'') {
+				strb->append('\'');
+			}
+
+			// append the character
+			strb->append(ch);
+		}
+	}
+}
+
+class sqlrimportcsv : public csvsax {
+	public:
+			sqlrimportcsv(sqlrconnection *sqlrcon,
+					sqlrcursor *sqlrcur,
+					uint64_t commitcount,
+					bool verbose,
+					const char *dbtype);
+			~sqlrimportcsv();
+
+		bool	parseFile(const char *filename);
+	private:
+		bool	column(const char *name, bool quoted);
+		bool	headerEnd();
+		bool	bodyStart();
+		bool	rowStart();
+		bool	field(const char *value, bool quoted);
+		bool	rowEnd();
+		bool	bodyEnd();
+
+		void	massageField(stringbuffer *strb, const char *field);
+
+		sqlrconnection	*sqlrcon;
+		sqlrcursor	*sqlrcur;
+
+		stringbuffer	query;
+		char		*table;
+		uint32_t	colcount;
+		stringbuffer	columns;
+		bool		*numbercolumn;
+		uint32_t	currentcol;
+		bool		foundfieldtext;
+		uint32_t	fieldcount;
+		uint64_t	rowcount;
+		uint64_t	commitcount;
+		uint64_t	committedcount;
+		bool		verbose;
+		const char	*dbtype;
+};
+
+sqlrimportcsv::sqlrimportcsv(sqlrconnection *sqlrcon,
+				sqlrcursor *sqlrcur,
+				uint64_t commitcount,
+				bool verbose,
+				const char *dbtype) : csvsax() {
+	this->sqlrcon=sqlrcon;
+	this->sqlrcur=sqlrcur;
+	table=NULL;
+	colcount=0;
+	currentcol=0;
+	numbercolumn=NULL;
+	foundfieldtext=false;
+	fieldcount=0;
+	rowcount=0;
+	this->verbose=verbose;
+	this->commitcount=commitcount;
+	if (!this->commitcount) {
+		this->commitcount=100;
+	}
+	committedcount=0;
+	this->dbtype=dbtype;
+}
+
+sqlrimportcsv::~sqlrimportcsv() {
+	delete[] table;
+	delete[] numbercolumn;
+}
+
+bool sqlrimportcsv::parseFile(const char *filename) {
+	table=file::basename(filename,".csv");
+	return csvsax::parseFile(filename);
+}
+
+bool sqlrimportcsv::column(const char *name, bool quoted) {
+	if (colcount) {
+		columns.append(',');
+	}
+	columns.append(name);
+	colcount++;
+	return true;
+}
+
+bool sqlrimportcsv::headerEnd() {
+	numbercolumn=new bool[colcount];
+	if (verbose) {
+		stdoutput.printf("  %ld columns.\n",(unsigned long)colcount);
+	}
+	return true;
+}
+
+bool sqlrimportcsv::bodyStart() {
+	rowcount=0;
+	committedcount=0;
+	return true;
+}
+
+bool sqlrimportcsv::rowStart() {
+	query.clear();
+	query.append("insert into ")->append(table)->append(" (");
+	query.append(columns.getString())->append(") values (");
+	currentcol=0;
+	fieldcount=0;
+	return true;
+}
+
+bool sqlrimportcsv::field(const char *value, bool quoted) {
+	if (currentcol) {
+		query.append(",");
+	}
+	if (!charstring::isNullOrEmpty(value)) {
+		bool	numbercolumn=isNumberTypeChar(value);
+		if (!numbercolumn) {
+			query.append('\'');
+		}
+		massageField(&query,value);
+		if (!numbercolumn) {
+			query.append('\'');
+		}
+	} else {
+		query.append("NULL");
+	}
+	currentcol++;
+	fieldcount++;
+	return true;
+}
+
+bool sqlrimportcsv::rowEnd() {
+	query.append(')');
+	if (fieldcount) {
+		if (rowcount==0) {
+			sqlrcon->begin();
+		}
+		if (!sqlrcur->sendQuery(query.getString())) {
+			stdoutput.printf("%s\n",sqlrcur->errorMessage());
+		}
+		rowcount++;
+		if (commitcount && !(rowcount%commitcount)) {
+			sqlrcon->commit();
+			committedcount++;
+			if (verbose) {
+				stdoutput.printf("  committed %lld rows",
+						(unsigned long long)rowcount);
+				if (!(committedcount%10)) {
+					stdoutput.printf(" (to %s)...\n",table);
+				} else {
+					stdoutput.printf("\n");
+				}
+			}
+			sqlrcon->begin();
+		}
+	}
+	return true;
+}
+
+bool sqlrimportcsv::bodyEnd() {
+	sqlrcon->commit();
+	if (verbose) {
+		stdoutput.printf("  committed %lld rows (to %s).\n\n",
+					(unsigned long long)rowcount,table);
+	}
+	return true;
+}
+
+
+void sqlrimportcsv::massageField(stringbuffer *strb, const char *field) {
+	for (uint32_t index=0; field[index]; index++) {
+		if (field[index]=='\\' &&
+				(!charstring::compare(dbtype,"postgresql") ||
+				!charstring::compare(dbtype,"mysql"))) {
+
+			// for postgres and mysql, escape \'s
+			strb->append("\\\\");
+
+		} else {
+
+			char	ch=field[index];
+
+			// double-up any single-quotes
+			if (ch=='\'') {
+				strb->append('\'');
+			}
+
+			// append the character
+			strb->append(ch);
 		}
 	}
 }
@@ -684,7 +887,15 @@ int main(int argc, const char **argv) {
 		sqlrcon.debugOn();
 	}
 
-	sqlrimport	sqlri(&sqlrcon,&sqlrcur,commitcount,
-					verbose,sqlrcon.identify());
-	process::exit(!sqlri.parseFile(file));
+	// xml or csv
+	const char	*suffix=charstring::findLast(file,'.');
+	if (!charstring::compare(suffix,".csv")) {
+		sqlrimportcsv	sqlricsv(&sqlrcon,&sqlrcur,commitcount,
+						verbose,sqlrcon.identify());
+		process::exit(!sqlricsv.parseFile(file));
+	} else {
+		sqlrimportxml	sqlrixml(&sqlrcon,&sqlrcur,commitcount,
+						verbose,sqlrcon.identify());
+		process::exit(!sqlrixml.parseFile(file));
+	}
 }

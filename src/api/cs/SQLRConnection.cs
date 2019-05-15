@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 using System;
@@ -73,6 +73,44 @@ public class SQLRConnection : IDisposable
     public void setResponseTimeout(Int32 timeoutsec, Int32 timeoutusec)
     {
         sqlrcon_setResponseTimeout(sqlrconref, timeoutsec, timeoutusec);
+    }
+
+
+
+    /** Sets which delimiters are used to identify bind variables
+     *  in countBindVariables() and validateBinds().  Valid
+     *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+    public void setBindVariableDelimiters(String delimiters)
+    {
+        sqlrcon_setBindVariableDelimiters(sqlrconref, delimiters);
+    }
+
+    /** Returns true if question marks (?) are considered to be
+    *  valid bind variable delimiters. */
+    public Boolean getBindVariableDelimiterQuestionMarkSupported()
+    {
+        return sqlrcon_getBindVariableDelimiterQuestionMarkSupported(sqlrconref)!=0;
+    }
+
+    /** Returns true if colons (:) are considered to be
+     *  valid bind variable delimiters. */
+    public Boolean getBindVariableDelimiterColonSupported()
+    {
+        return sqlrcon_getBindVariableDelimiterColonSupported(sqlrconref)!=0;
+    }
+
+    /** Returns true if at-signs (@) are considered to be
+     *  valid bind variable delimiters. */
+    public Boolean getBindVariableDelimiterAtSignSupported()
+    {
+        return sqlrcon_getBindVariableDelimiterAtSignSupported(sqlrconref)!=0;
+    }
+
+    /** Returns true if dollar signs ($) are considered to be
+     *  valid bind variable delimiters. */
+    public Boolean getBindVariableDelimiterDollarSignSupported()
+    {
+        return sqlrcon_getBindVariableDelimiterDollarSignSupported(sqlrconref)!=0;
     }
 
 
@@ -443,6 +481,21 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_setResponseTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern void sqlrcon_setBindVariableDelimiters(IntPtr sqlrconref, String delimiters);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern Int32 sqlrcon_getBindVariableDelimiterQuestionMarkSupported(IntPtr sqlrconref);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern Int32 sqlrcon_getBindVariableDelimiterColonSupported(IntPtr sqlrconref);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern Int32 sqlrcon_getBindVariableDelimiterAtSignSupported(IntPtr sqlrconref);
+
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern Int32 sqlrcon_getBindVariableDelimiterDollarSignSupported(IntPtr sqlrconref);
 
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_enableKerberos(IntPtr sqlrconref, String service, String mech, String flags);

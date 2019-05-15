@@ -1,4 +1,4 @@
-// Copyright (c) 2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 
 #include <sqlrelay/sqlrclient.h>
@@ -42,6 +42,11 @@ using namespace node;
 	#define newInt32(val) Int32::New(isolate,val)
 	#define newNumber(val) Number::New(isolate,val)
 	#define newArray(len) Array::New(isolate,len)
+	#if NODE_MAJOR_VERSION >= 10
+		#define newInstance(argc,argv) cons->NewInstance(isolate->GetCurrentContext(),argc,argv).ToLocalChecked()
+	#else
+		#define newInstance(argc,argv) cons->NewInstance(argc,argv)
+	#endif
 
 	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); return; }
 
@@ -74,6 +79,7 @@ using namespace node;
 	#define newInt32(val) Int32::New(val)
 	#define newNumber(val) Number::New(val)
 	#define newArray(len) Array::New(len)
+	#define newInstance(argc,argv) cons->NewInstance(argc,argv)
 
 	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); returnBoolean(false); }
 
@@ -107,6 +113,15 @@ class SQLRConnection : public ObjectWrap {
 		static RET	setConnectTimeout(const ARGS &args);
 		static RET	setAuthenticationTimeout(const ARGS &args);
 		static RET	setResponseTimeout(const ARGS &args);
+		static RET	setBindVariableDelimiters(const ARGS &args);
+		static RET	getBindVariableDelimiterQuestionMarkSupported(
+							const ARGS &args);
+		static RET	getBindVariableDelimiterColonSupported(
+							const ARGS &args);
+		static RET	getBindVariableDelimiterAtSignSupported(
+							const ARGS &args);
+		static RET	getBindVariableDelimiterDollarSignSupported(
+							const ARGS &args);
 		static RET	enableKerberos(const ARGS &args);
 		static RET	enableTls(const ARGS &args);
 		static RET	disableEncryption(const ARGS &args);
@@ -264,6 +279,21 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setAuthenticationTimeout",
 						setAuthenticationTimeout);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setResponseTimeout",setResponseTimeout);
+	NODE_SET_PROTOTYPE_METHOD(tpl,
+			"setBindVariableDelimiters",
+			setBindVariableDelimiters);
+	NODE_SET_PROTOTYPE_METHOD(tpl,
+			"getBindVariableDelimiterQuestionMarkSupported",
+			getBindVariableDelimiterQuestionMarkSupported);
+	NODE_SET_PROTOTYPE_METHOD(tpl,
+			"getBindVariableDelimiterColonSupported",
+			getBindVariableDelimiterColonSupported);
+	NODE_SET_PROTOTYPE_METHOD(tpl,
+			"getBindVariableDelimiterAtSignSupported",
+			getBindVariableDelimiterAtSignSupported);
+	NODE_SET_PROTOTYPE_METHOD(tpl,
+			"getBindVariableDelimiterDollarSignSupported",
+			getBindVariableDelimiterDollarSignSupported);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"enableKerberos",enableKerberos);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"enableTls",enableTls);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"disableEncryption",disableEncryption);
@@ -335,7 +365,7 @@ RET SQLRConnection::New(const ARGS &args) {
 		const int	argc=1;
 		Local<Value>	argv[argc]={args[0]};
 		Local<Function>	cons=newLocalFunction(constructor);
-		returnObject(cons->NewInstance(argc,argv));
+		returnObject(newInstance(argc,argv));
 	}
 }
 
@@ -373,6 +403,69 @@ RET SQLRConnection::setResponseTimeout(const ARGS &args) {
 						args[1]->Int32Value());
 
 	returnVoid();
+}
+
+RET SQLRConnection::setBindVariableDelimiters(const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,1);
+
+	sqlrcon(args)->setBindVariableDelimiters(toString(args[0]));
+
+	returnVoid();
+}
+
+RET SQLRConnection::getBindVariableDelimiterQuestionMarkSupported(
+							const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,0);
+
+	bool	result=sqlrcon(args)->
+			getBindVariableDelimiterQuestionMarkSupported();
+
+	returnBoolean(result);
+}
+
+RET SQLRConnection::getBindVariableDelimiterColonSupported(
+							const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,0);
+
+	bool	result=sqlrcon(args)->
+			getBindVariableDelimiterColonSupported();
+
+	returnBoolean(result);
+}
+
+RET SQLRConnection::getBindVariableDelimiterAtSignSupported(
+							const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,0);
+
+	bool	result=sqlrcon(args)->
+			getBindVariableDelimiterAtSignSupported();
+
+	returnBoolean(result);
+}
+
+RET SQLRConnection::getBindVariableDelimiterDollarSignSupported(
+							const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,0);
+
+	bool	result=sqlrcon(args)->
+			getBindVariableDelimiterDollarSignSupported();
+
+	returnBoolean(result);
 }
 
 RET SQLRConnection::enableKerberos(const ARGS &args) {
@@ -897,7 +990,7 @@ RET SQLRCursor::New(const ARGS &args) {
 		const int	argc=1;
 		Local<Value>	argv[argc]={args[0]};
 		Local<Function>	cons=newLocalFunction(constructor);
-		returnObject(cons->NewInstance(argc,argv));
+		returnObject(newInstance(argc,argv));
 	}
 }
 

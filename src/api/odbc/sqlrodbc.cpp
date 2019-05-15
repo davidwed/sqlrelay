@@ -1,4 +1,4 @@
-// Copyright (c) 2007  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <config.h>
@@ -13,7 +13,7 @@
 #include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
-#ifdef _WIN32
+/*#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
 	#ifdef _WIN32
@@ -21,7 +21,7 @@
 	#else
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
-#endif
+#endif*/
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -131,6 +131,8 @@ struct CONN {
 	bool				nullsasnulls;
 	bool				lazyconnect;
 	bool				clearbindsduringprepare;
+
+	char				bindvariabledelimiters[5];
 
 	bool				attrmetadataid;
 	SQLSMALLINT			sqlerrorindex;
@@ -715,38 +717,10 @@ SQLRETURN SQL_API SQLCancelHandle(SQLSMALLINT handletype, SQLHANDLE handle) {
 static void SQLR_ResetParams(STMT *stmt) {
 	debugFunction();
 
-	// clear bind variables
 	stmt->cur->clearBinds();
-
-	// clear input bind list
-	linkedlist<dictionarynode<int32_t, char * > *>
-				*ibslist=stmt->inputbindstrings.getList();
-	for (linkedlistnode<dictionarynode<int32_t, char * > *>
-					*node=ibslist->getFirst();
-					node; node=node->getNext()) {
-		delete[] node->getValue();
-	}
-	ibslist->clear();
-
-	// clear output bind list
-	linkedlist<dictionarynode<int32_t, outputbind * > *>
-				*oblist=stmt->outputbinds.getList();
-	for (linkedlistnode<dictionarynode<int32_t, outputbind * > *>
-					*node=oblist->getFirst();
-					node; node=node->getNext()) {
-		delete node->getValue();
-	}
-	oblist->clear();
-
-	// clear input/output bind list
-	linkedlist<dictionarynode<int32_t, outputbind * > *>
-				*ioblist=stmt->inputoutputbinds.getList();
-	for (linkedlistnode<dictionarynode<int32_t, outputbind * > *>
-					*node=ioblist->getFirst();
-					node; node=node->getNext()) {
-		delete node->getValue();
-	}
-	ioblist->clear();
+	stmt->inputbindstrings.clearAndArrayDeleteValues();
+	stmt->outputbinds.clearAndDeleteValues();
+	stmt->inputoutputbinds.clearAndDeleteValues();
 }
 
 static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
@@ -2374,6 +2348,13 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	conn->clearbindsduringprepare=
 		!charstring::isNo(clearbindsduringpreparebuf);
 
+	// bind variable delimiters
+	SQLGetPrivateProfileString((const char *)conn->dsn,
+					"BindVariableDelimiters","?:@$",
+					conn->bindvariabledelimiters,
+					sizeof(conn->bindvariabledelimiters),
+					ODBC_INI);
+
 	// override dsn values with values passed in via the connectstring
 	if (connparams!=NULL) {
 		const char	*connserver=connparams->getValue("Server");
@@ -2422,6 +2403,14 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 			conn->lazyconnect=!charstring::isNo(connlazyconnect);
 		}
 		// FIXME: other flags
+
+		const char	*conn_bindvariabledelimiters=
+				connparams->getValue("BindVariableDelimiters");
+		if (conn_bindvariabledelimiters!=NULL) {
+			charstring::safeCopy(conn->bindvariabledelimiters,
+					sizeof(conn->bindvariabledelimiters),
+					conn_bindvariabledelimiters);
+		}
 	}
 
 
@@ -2455,6 +2444,8 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	debugPrintf("  LazyConnect: %d\n",conn->lazyconnect);
 	debugPrintf("  ClearBindsDuringPrepare: %d\n",
 					conn->clearbindsduringprepare);
+	debugPrintf("  BindVariableDelimiters: %s\n",
+					conn->bindvariabledelimiters);
 
 	// create connection
 	conn->con=new sqlrconnection(conn->server,
@@ -2493,6 +2484,8 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	#ifdef DEBUG_MESSAGES
 	conn->con->debugOn();
 	#endif
+
+	conn->con->setBindVariableDelimiters(conn->bindvariabledelimiters);
 
 	// if we're not doing lazy connects, then do something lightweight
 	// that will verify whether SQL Relay is available or not
@@ -4578,7 +4571,10 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 
 				// make sure to null-terminate
 				// (even if data has to be truncated)
-				((char *)targetvalue)[bufferlength-1]='\0';
+				if (trunc) {
+					((char *)targetvalue)
+						[bytestocopy-1]='\0';
+				}
 
 				debugPrintf("  value: %.*s%s",
 					(bytestocopy<=80)?bytestocopy:80,
@@ -9295,17 +9291,42 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	} else {
 
-		const char	*wild=tblname;
-		if (!charstring::compare(wild,"%")) {
-			wild=NULL;
+		const char	*wild=NULL;
+
+		// If tblname was empty or %, then leave "wild" NULL.
+		// Otherwise concatenate catalog/schema's until it's in one
+		// of the following formats:
+		// * table
+		// * schema.table
+		// * catalog.schema.table
+		// If tblname already contains a . then just use it as-is.
+		if (!charstring::contains(tblname,'.')) {
+
+			stringbuffer	wildstr;
+			if (!charstring::isNullOrEmpty(catname)) {
+				wildstr.append(catname)->append('.');
+			}
+			if (!charstring::isNullOrEmpty(schname)) {
+				wildstr.append(schname)->append('.');
+			} else if (wildstr.getStringLength()) {
+				wildstr.append("%.");
+			}
+			if (!charstring::isNullOrEmpty(schname)) {
+				wildstr.append(tblname);
+			} else {
+				wildstr.append('%');
+			}
+			delete[] tblname;
+			tblname=wildstr.detachString();
 		}
+		wild=tblname;
 
 		debugPrintf("  getting table list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
 
+		// get the table list
 		// FIXME: this list should also be restricted to the
-		// specified catalog, schema, and table type
-
+		// specified table type
 		retval=
 		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;
@@ -10868,6 +10889,7 @@ static HWND		dontgetcolumninfoedit;
 static HWND		nullsasnullsedit;
 static HWND		lazyconnectedit;
 static HWND		clearbindsduringprepareedit;
+static HWND		bindvariabledelimitersedit;
 
 static const char	sqlrwindowclass[]="SQLRWindowClass";
 static const int	labelwidth=135;
@@ -11091,6 +11113,9 @@ static void createControls(HWND hwnd) {
 	createLabel(box3,"Clear Binds During Prepare",
 			x,y+=(labelheight+labeloffset),
 			labelwidth,labelheight);
+	createLabel(box3,"Bind Variable Delimiters",
+			x,y+=(labelheight+labeloffset),
+			labelwidth,labelheight);
 
 	debugPrintf("  edits...\n");
 
@@ -11211,6 +11236,10 @@ static void createControls(HWND hwnd) {
 			dsndict.getValue("ClearBindsDuringPrepare"),
 			x,y+=(labelheight+labeloffset),editwidth,labelheight,
 			1,true,false);
+	bindvariabledelimitersedit=createEdit(box3,
+			dsndict.getValue("BindVariableDelimiters"),
+			x,y+=(labelheight+labeloffset),editwidth,labelheight,
+			4,false,false);
 
 	debugPrintf("  buttons...\n");
 
@@ -11267,6 +11296,8 @@ static void parseDsn(const char *dsn) {
 					charstring::duplicate("1"));
 		dsndict.setValue("ClearBindsDuringPrepare",
 					charstring::duplicate("1"));
+		dsndict.setValue("BindVariableDelimiters",
+					charstring::duplicate("?:@$"));
 
 		debugPrintf("  success...\n");
 		return;
@@ -11457,6 +11488,14 @@ static void parseDsn(const char *dsn) {
 					clearbindsduringprepare,2,ODBC_INI);
 		dsndict.setValue("ClearBindsDuringPrepare",
 					clearbindsduringprepare);
+	}
+	if (!dsndict.getValue("BindVariableDelimiters")) {
+		char	*bindvariabledelimiters=new char[5];
+		SQLGetPrivateProfileString(dsnval,"BindVariableDelimiters",
+					"?:@$",
+					bindvariabledelimiters,5,ODBC_INI);
+		dsndict.setValue("BindVariableDelimiters",
+					bindvariabledelimiters);
 	}
 
 	debugPrintf("  success...\n");
@@ -11702,6 +11741,13 @@ static void getDsnFromUi() {
 	GetWindowText(clearbindsduringprepareedit,data,len+1);
 	delete[] dsndict.getValue("ClearBindsDuringPrepare");
 	dsndict.setValue("ClearBindsDuringPrepare",data);
+
+	// BindVariableDelimiters
+	len=GetWindowTextLength(bindvariabledelimitersedit);
+	data=new char[len+1];
+	GetWindowText(bindvariabledelimitersedit,data,len+1);
+	delete[] dsndict.getValue("BindVariableDelimiters");
+	dsndict.setValue("BindVariableDelimiters",data);
 }
 
 static bool writeDsn() {

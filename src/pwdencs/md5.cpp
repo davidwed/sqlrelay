@@ -1,4 +1,4 @@
-// Code below Copyright (c) 2012-2016 David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -7,12 +7,12 @@
 
 class SQLRSERVER_DLLSPEC sqlrpwenc_md5 : public sqlrpwdenc {
 	public:
-			sqlrpwenc_md5(xmldomnode *parameters, bool debug);
+			sqlrpwenc_md5(domnode *parameters, bool debug);
 		bool	oneWay();
 		char	*encrypt(const char *value);
 };
 
-sqlrpwenc_md5::sqlrpwenc_md5(xmldomnode *parameters, bool debug) :
+sqlrpwenc_md5::sqlrpwenc_md5(domnode *parameters, bool debug) :
 						sqlrpwdenc(parameters,debug) {
 }
 
@@ -23,12 +23,12 @@ bool sqlrpwenc_md5::oneWay() {
 char *sqlrpwenc_md5::encrypt(const char *value) {
 	md5	m;
 	m.append((const unsigned char *)value,charstring::length(value));
-	return charstring::duplicate((const char *)m.getHash());
+	return charstring::hexEncode(m.getHash(),m.getHashLength());
 }
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_md5(
-						xmldomnode *parameters,
+						domnode *parameters,
 						bool debug) {
 		return new sqlrpwenc_md5(parameters,debug);
 	}

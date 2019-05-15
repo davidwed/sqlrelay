@@ -1,0 +1,3 @@
+usr/bin/sqlr-cachemanager
+usr/share/man/man8/sqlr-cachemanager.8
+lib/systemd/system/sqlrcachemanager.service

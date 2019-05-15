@@ -1,1 +1,1 @@
-sqlrpwdenc	*new_sqlrpwdenc_@module@(xmldomnode *parameters);
+sqlrpwdenc	*new_sqlrpwdenc_@module@(domnode *parameters, bool debug);

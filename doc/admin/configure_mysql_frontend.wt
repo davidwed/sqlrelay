@@ -1,0 +1,277 @@
+= Configuring the !MySQL Front-End Modules =
+
+* [#introduction Introduction]
+* [#basic Basic Configuration]
+* [#listener Listener Configuration]
+* [#userlistauth User-List Auth]
+* [#databaseauth Database Auth]
+* [#features Standard SQL Relay Features]
+* [#foreignbackend Targeting a Foreign Backend]
+* [#specialpurpose Special-Purpose Configuration Options]
+ * [#zeroscale Mapping zero-scale DECIMAL to BIGINT]
+ * [#datetime Mapping DATE to DATETIME]
+ * [#oldmariadbjdbc Supporting Older MariaDB JDBC Drivers]
+* [#limitations Limitations]
+
+[=#introduction]
+== Introduction ==
+
+Whether written using the native !MySQL API, or a connector of some sort, !MySQL apps comminucate with the database using the !MySQL client-server protocol.
+
+[[Image(../images/mysqlnativeprotocol.png,nolink)]]
+
+Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using the SQL Relay client-server protocol.
+
+[[Image(../images/sqlrelaynativeprotocol.png,nolink)]]
+
+However, the !MySQL Front-End Modules enable SQL Relay to speak the !MySQL client-server protocol and authorize/authenticate users in the manner that the !MySQL database does.  This allows !MySQL apps to communicate directly with SQL Relay, rather than to a !MySQL database, without modification, and without using a drop-in replacement library.
+
+[[Image(../images/sqlrelaymysqlprotocol.png,nolink)]]
+
+In this configuration, SQL Relay becomes a transparent proxy.  !MySQL apps aimed at SQL Relay still think that they're talking to a !MySQL database, but in fact, are talking to SQL Relay.
+
+[=#configuration]
+== Basic Configuration ==
+
+Basic configuration of the !MySQL Front-End Modules consists of adding a set of tags that instruct SQL Relay to load the !MySQL protocol module and the appropriate !MySQL auth module to the SQL Relay configuration file (usually sqlrelay.conf).
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfebasic.conf@
+}}}
+}}}
+
+In this configuration:
+
+* The connection tag instructs the instance to log in to the //mysqldb// database on host //mysqlhost// as user //mysqluser// with password //mysqlpassword//.
+* The listener tag instructs SQL Relay to load the //mysql// protocol module, and listen on port 3307.
+* The auth tag instructs SQL Relay to load the //mysql_userlist// auth module.
+* The user tag defines the user //sqlruser// with password //sqlrpassword//.
+
+The instance can be started using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-start -id example
+}}}
+}}}
+
+and accessed from the local machine using:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=localhost --port=3307 --user=sqlruser --password=sqlrpassword
+}}}
+}}}
+
+It can also be accessed from a remote machine by replacing localhost with the hostname of the local machine.
+
+It can be stopped using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-stop -id example
+}}}
+}}}
+
+This instance speaks the !MySQL client-server protocol, and uses the native !MySQL authorization/authentication procedure.  Any any client that wishes to use it must also speak the !MySQL client-server protocol and present credentials in the native !MySQL format.  Basically this means that most software written using the !MySQL native API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  It also means that SQL Relay's standard sqlrsh client program cannot access this instance.
+
+[=#listener]
+== Listener Configuration ==
+
+Note that in the example above, the instance is configured to listen on port 3307.  The !MySQL database typically listens on port 3306, so port 3307 was chosen to avoid collisions with the database itself.
+
+However, if SQL Relay is run on a different server than the database itself, then it too can be configured to run on port 3306.  This is desirable when using SQL Relay as a transparent proxy.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfedbport.conf@
+}}}
+}}}
+
+If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfeaddresses.conf@
+}}}
+}}}
+
+When configured this way, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+
+SQL Relay can also be configured to listen on a unix socket by adding a //socket// attribute to the listener tag.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfesocket.conf@
+}}}
+}}}
+
+(Note that the user that SQL Relay is run as must be able to read and write to the path of the socket.)
+
+[=#userlistauth]
+== User-List Auth ==
+
+In all examples above, the instance is configured to load the //mysql_userlist// auth module and defines a user //sqlruser// with password //sqlrpassword//.
+
+In this configuration, a client must user //sqlruser/sqlrpassword// to access the database via SQL Relay.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfeuserlistmultiple.conf@
+}}}
+}}}
+
+When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.
+
+[=#databaseauth]
+== Database Auth ==
+
+If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be prohibitively inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the //mysql_database// module can be used to auth users directly against the database.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfedatabase.conf@
+}}}
+}}}
+
+In this configuration, SQL Relay initially logs in to the database as //mysqluser/mysqlpassword// as specified in the connection tag.  But each time a client connects, SQL Relay logs out and attempts to log back in as the user specified by the client, unless the user/password are the same as the current user.
+
+For example, if a client initially connects using:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=localhost --port=3307 --user=mysqluser --password=mysqlpassword
+}}}
+}}}
+
+...then SQL Relay doesn't need to log out and log back in.
+
+But if the client then tries to connect using:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=localhost --port=3307 --user=anotheruser --password=anotherpassword
+}}}
+}}}
+
+..then SQL Relay does need to log out and log back in.
+
+A subsequent connection using //anotheruser/anotherpassword// won't require a re-login, but a subsequent connection using any other user/password will.
+
+Though this module is convenient, it has two disadvantages.
+
+First, logging in and out of the database over and over partially defeats SQL Relay's persistent connection pooling.
+
+Second, the mysql_database module requires that the !MySQL client send it an unencrypted password.
+
+This may or may not be a problem, depending on how secure communications on your network need to be.
+
+Also, it may require reconfiguration (or modification) of your app to use the mysql_clear_password auth plugin.  For example, to send an unencrypted password from the mysql command line client:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=localhost --port=3307 --user=anotheruser --password=anotherpassword --default-auth=mysql_clear_password
+}}}
+}}}
+
+And, another issue is that some !MySQL and !MariaDB distributions omit the necessary mysql_clear_password module.  For example, the distributions available in the default !CentOS 6 and 7 repositories omit the module.  On these platforms, an alternative distribution of !MySQL/MariaDB would have to be installed or built from source.
+
+[=#features]
+== Standard SQL Relay Features ==
+
+Once the app is talking to SQL Relay, most of SQL Relay's features become available to the app, including [../features/connectionpooling.html Connection Pooling], [../features/throttling.html Throttling], [../features/ha.html High Availability Features], [../features/queryrouting.html Query Routing], [../features/queryfiltering.html Query Filtering], and [../features/schedules.html Connection Schedules].
+
+For the most part, these can be configured as defined in the [configguide.html SQL Relay Configuration Guide].
+
+There are a few incompatible configurations though.
+
+* Since the listener tag is used to define which protocol module to load and which addresses, port, and socket to listen on, you should not configure any //addresses//, //port//, and //socket// attributes in the instance tag.
+* Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an //authtier// attribute in the instance tag.
+
+Otherwise, all other tags and attributes are compatbile.
+
+[=#foreignbackend]
+== Targeting a Foreign Backend ==
+
+Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the !MySQL database it was originally written to use.
+
+This is as simple as specifying a different database using the //dbase// parameter in the instance tag and specifying the appropriate database connection string in the //string// attribute of the connection tag.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfeoracle.conf@
+}}}
+}}}
+
+In this example, a !MySQL frontend provides !MySQL applications access to an Oracle backend database.
+
+When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+
+[=#specialpurpose]
+== Special-Purpose Configuration Options ==
+
+The !MySQL Front-End Modules have several special-purpose configuration options.
+
+[=#zeroscale]
+=== Mapping zero-scale DECIMAL to BIGINT ===
+
+When targeting a foreign backend...
+
+Some backend databases, like Oracle, don't have integer types.  An integer type is really just a DECIMAL with a scale of 0.
+
+By default, the !MySQL Front-End Modules map zero-scale DECIMAL types to the !MySQL DECIMAL type.  Buy you might want to map them to the !MySQL BIGINT type instead.
+
+The //zeroscaledecimaltobigint// option instructs the module to do this mapping.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfezeroscaledecimal.conf@
+}}}
+}}}
+
+[=#datetime]
+=== Mapping DATE to DATETIME ===
+
+When targeting a foreign backend...
+
+Some backend databases, like Oracle, don't have separate DATE and DATETIME types.  Instead, they just have a DATE type, which can store date and time parts, and which parts are returned depend on a parameter like NLS_DATE_FORMAT.
+
+By default, the !MySQL Front-End Modules map the DATE type to the !MySQL DATE type.  But, if you are using DATE type fields to store date/times and have the database configured to return date and time parts, then you might want the DATE type mapped to the !MySQL DATETIME type.
+
+The //datetodatetime// option instructs the module to do this mapping.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfedatetodatetime.conf@
+}}}
+}}}
+
+[=#oldmariadbjdbc]
+=== Supporting Older !MariaDB JDBC Drivers ===
+
+Older !MariaDB JDBC drivers had a bug related to fetching the server's capability flags, and would reliably throw a !NullPointerException when attempting to connecting.
+
+(I'm not sure exactly what versions this bug is present in.  It's present in version 1.4.6, but fixed by 2.1.1.)
+
+The //oldmariadbjdbcservercapabilitieshack// option instructs the module to return server capability flags that don't upset the old driver.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfeoldmariadbjdbc.conf@
+}}}
+}}}
+
+[=#limitations]
+== Limitations ==
+
+The implementation of the !MySQL protocol is likely sufficient for most applications, but it isn't 100% complete.  Some notable limitations follow:
+
+* SSL/TLS authentication and encryption are currently not supported.
+* Only LATIN1_SWEDISH_CI and UTF8_GENERAL_CI character sets are supported.
+* Only the mysql_native_password and mysql_clear_password auth methods are supported.  Notably, mysql_old_password and authentication_windows_client are not supported.
+* Multi-statement queries are not supported.
+* mysql_change_user() is not supported.
+* mysql_send_long_data() is not supported.
+* mysql_info() will always returns NULL when used with SQL Relay.
+* MYSQL_FIELD.org_name/org_name_length and MYSQL_FIELD.org_table/org_table_length are not supported.

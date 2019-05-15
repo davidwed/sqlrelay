@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -9,7 +9,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 			sqlrauth_userlist(sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrauth_userlist();
 
 		const char	*auth(sqlrcredentials *cred);
@@ -26,7 +26,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
-					xmldomnode *parameters) :
+					domnode *parameters) :
 					sqlrauth(cont,auths,sqlrpe,parameters) {
 
 	users=NULL;
@@ -44,7 +44,7 @@ sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
 	passwords=new const char *[usercount];
 	passwordencryptions=new const char *[usercount];
 
-	xmldomnode *user=parameters->getFirstTagChild("user");
+	domnode *user=parameters->getFirstTagChild("user");
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
@@ -198,7 +198,7 @@ extern "C" {
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrauth_userlist(cont,auths,sqlrpe,parameters);
 	}
 }

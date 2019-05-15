@@ -1,4 +1,4 @@
-// Copyright (c) 2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -7,12 +7,12 @@
 
 class SQLRSERVER_DLLSPEC sqlrpwdenc_crypt : public sqlrpwdenc {
 	public:
-			sqlrpwdenc_crypt(xmldomnode *parameters, bool debug);
+			sqlrpwdenc_crypt(domnode *parameters, bool debug);
 		bool	oneWay();
 		char	*encrypt(const char *value);
 };
 
-sqlrpwdenc_crypt::sqlrpwdenc_crypt(xmldomnode *parameters, bool debug) :
+sqlrpwdenc_crypt::sqlrpwdenc_crypt(domnode *parameters, bool debug) :
 						sqlrpwdenc(parameters,debug) {
 }
 
@@ -36,7 +36,7 @@ char *sqlrpwdenc_crypt::encrypt(const char *value) {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_crypt(
-						xmldomnode *parameters,
+						domnode *parameters,
 						bool debug) {
 		return new sqlrpwdenc_crypt(parameters,debug);
 	}

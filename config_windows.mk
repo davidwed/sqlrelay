@@ -364,6 +364,7 @@ CONFIGPLUGINLIBS = /LIBPATH:$(top_builddir)\src\util lib$(SQLR)util.lib $(RUDIME
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) /I$(top_builddir)\src\api\c++
 SQLRAUTH_SQLRELAYLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib
+SQLRLOGGER_STALECURSORSLIBS = /LIBPATH:$(top_builddir)\src\api\c++ lib$(SQLR)client.lib
 
 INSTALLSHAREDLIB =
 
@@ -409,7 +410,7 @@ CONNECTIONSINSTALLTARGETS = @INSTALLDB2@ @INSTALLFIREBIRD@ @INSTALLMYSQL@ @INSTA
 
 
 # tests
-TESTALLSUBDIRS = all-c all-cpp all-cs all-java all-stress all-tcl
+TESTALLSUBDIRS = all-dropin all-c all-cpp all-cs all-java all-stress all-tcl
 
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
 CPPTESTLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib $(RUDIMENTSLIBS)

@@ -1,6 +1,6 @@
 #! /usr/bin/env perl
 
-# Copyright (c) 2001  David Muse
+# Copyright (c) 1999-2018 David Muse
 # See the file COPYING for more information.
 
 use DBI;
@@ -221,16 +221,17 @@ if ($DBI::VERSION>=1.22) {
 print("BIND BY NAME: \n");
 $sth->bind_param("var1",9);
 $sth->bind_param("var2","testchar9");
-$sth->bind_param("var3","testvarchar9");
-$sth->bind_param("var4","01-JAN-2009");
+# should work if leading delimiters are included too
+$sth->bind_param(":var3","testvarchar9");
+$sth->bind_param(":var4","01-JAN-2009");
 checkSuccess($sth->{ParamValues}->{"var1"},9);
 checkSuccess($sth->{ParamValues}->{"var2"},"testchar9");
-checkSuccess($sth->{ParamValues}->{"var3"},"testvarchar9");
-checkSuccess($sth->{ParamValues}->{"var4"},"01-JAN-2009");
+checkSuccess($sth->{ParamValues}->{":var3"},"testvarchar9");
+checkSuccess($sth->{ParamValues}->{":var4"},"01-JAN-2009");
 checkSuccess($sth->{ParamTypes}->{"var1"},"SQL_VARCHAR");
 checkSuccess($sth->{ParamTypes}->{"var2"},"SQL_VARCHAR");
-checkSuccess($sth->{ParamTypes}->{"var3"},"SQL_VARCHAR");
-checkSuccess($sth->{ParamTypes}->{"var4"},"SQL_VARCHAR");
+checkSuccess($sth->{ParamTypes}->{":var3"},"SQL_VARCHAR");
+checkSuccess($sth->{ParamTypes}->{":var4"},"SQL_VARCHAR");
 checkSuccess($sth->execute(),1);
 print("\n");
 
@@ -238,7 +239,8 @@ print("OUTPUT BIND BY NAME: \n");
 $sth=$dbh->prepare("begin  :numvar:=1; :stringvar:='hello'; :floatvar:=2.5; end;");
 $sth->bind_param_inout("numvar",\$numvar,10);
 $sth->bind_param_inout("stringvar",\$stringvar,10);
-$sth->bind_param_inout("floatvar",\$floatvar,10);
+# should work if leading delimiters are included too
+$sth->bind_param_inout(":floatvar",\$floatvar,10);
 checkSuccess($sth->execute(),1);
 checkSuccessString($numvar,'1');
 checkSuccessString($stringvar,'hello');

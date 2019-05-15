@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrutil.h>
@@ -11,7 +11,7 @@
 #include <rudiments/singlylinkedlist.h>
 #include <rudiments/dictionary.h>
 #include <rudiments/xmldom.h>
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/gss.h>
 #include <rudiments/tls.h>
 
@@ -87,6 +87,10 @@ class sqlrfilterprivate;
 class sqlrfilterplugin;
 class sqlrfilters;
 class sqlrfiltersprivate;
+class sqlrbindvariabletranslation;
+class sqlrbindvariabletranslationprivate;
+class sqlrbindvariabletranslations;
+class sqlrbindvariabletranslationsprivate;
 class sqlrresultsettranslation;
 class sqlrresultsettranslationprivate;
 class sqlrresultsettranslations;
@@ -95,6 +99,10 @@ class sqlrresultsetrowtranslation;
 class sqlrresultsetrowtranslationprivate;
 class sqlrresultsetrowtranslations;
 class sqlrresultsetrowtranslationsprivate;
+class sqlrresultsetrowblocktranslation;
+class sqlrresultsetrowblocktranslationprivate;
+class sqlrresultsetrowblocktranslations;
+class sqlrresultsetrowblocktranslationsprivate;
 class sqlrresultsetheadertranslation;
 class sqlrresultsetheadertranslationprivate;
 class sqlrresultsetheadertranslations;
@@ -110,3 +118,7 @@ class sqlrquerycursor;
 class sqlrquerycursorprivate;
 class sqlrqueries;
 class sqlrqueriesprivate;
+class sqlrmoduledata;
+class sqlrmoduledataprivate;
+class sqlrmoduledatas;
+class sqlrmoduledatasprivate;

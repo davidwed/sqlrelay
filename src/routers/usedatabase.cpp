@@ -1,4 +1,4 @@
-// Copyright (c) 2017  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -36,7 +36,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_usedatabase : public sqlrrouter {
 	public:
 			sqlrrouter_usedatabase(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrrouter_usedatabase();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -58,7 +58,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_usedatabase : public sqlrrouter {
 
 sqlrrouter_usedatabase::sqlrrouter_usedatabase(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 
 	debug=cont->getConfig()->getDebugRouters();
@@ -199,7 +199,7 @@ const char *sqlrrouter_usedatabase::mapDbName(const char *sqlrconid,
 							const char *dbname) {
 
 	// run through the map...
-	for (xmldomnode *map=getParameters()->getFirstTagChild("map");
+	for (domnode *map=getParameters()->getFirstTagChild("map");
 					!map->isNullNode();
 					map=map->getNextTagSibling("map")) {
 
@@ -222,7 +222,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_usedatabase(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrrouter_usedatabase(cont,rs,parameters);
 	}
 }

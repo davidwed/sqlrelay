@@ -36,7 +36,7 @@
 
 </div>
 
-SQL Relay supports [http://oracle.com Oracle], [http://www.mysql.com MySQL], [http://postgresql.org PostgreSQL], [http://scn.sap.com/community/developer-center/oltp-db SAP/Sybase], [http://www-01.ibm.com/software/data/db2/ IBM DB2], [http://www-01.ibm.com/software/data/informix/ Informix], [http://www.firebirdsql.org Firebird] and [http://sqlite.org SQLite] databases directly, using the native client API's for those databases.
+SQL Relay supports [http://oracle.com Oracle], [http://www.mysql.com MySQL]/[http://mariadb.com MariaDB], [http://postgresql.org PostgreSQL], [http://scn.sap.com/community/developer-center/oltp-db SAP/Sybase], [http://www-01.ibm.com/software/data/db2/ IBM DB2], [http://www-01.ibm.com/software/data/informix/ Informix], [http://www.firebirdsql.org Firebird] and [http://sqlite.org SQLite] databases directly, using the native client API's for those databases.
 
 Support is provided for Microsoft SQL Server via the [http://www.freetds.org FreeTDS] API.  Reportedly, some versions of Microsoft SQL Server can also be accessed using some versions of the SAP/Sybase database API.  So, depending on what version of SAP/Sybase you build SQL Relay against, you might be able to access certain versions of SQL Server.  I have never tried this myself.  Your milage may vary.
 

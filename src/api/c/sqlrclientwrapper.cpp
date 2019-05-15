@@ -1,4 +1,4 @@
-/* Copyright (c) 2000-2001  David Muse
+/* Copyright (c) 1999-2018 David Muse
    See the file COPYING for more information */
 
 #include <sqlrelay/sqlrclient.h>
@@ -66,6 +66,31 @@ void sqlrcon_getAuthenticationTimeout(sqlrcon sqlrconref,
 void sqlrcon_getResponseTimeout(sqlrcon sqlrconref,
 			int32_t *timeoutsec, int32_t *timeoutusec) {
 	sqlrconref->getResponseTimeout(timeoutsec,timeoutusec);
+}
+
+void sqlrcon_setBindVariableDelimiters(sqlrcon sqlrconref,
+						const char *delimiters) {
+	sqlrconref->setBindVariableDelimiters(delimiters);
+}
+
+int sqlrcon_getBindVariableDelimiterQuestionMarkSupported(
+						sqlrcon sqlrconref) {
+	return sqlrconref->getBindVariableDelimiterQuestionMarkSupported();
+}
+
+int sqlrcon_getBindVariableDelimiterColonSupported(
+						sqlrcon sqlrconref) {
+	return sqlrconref->getBindVariableDelimiterColonSupported();
+}
+
+int sqlrcon_getBindVariableDelimiterAtSignSupported(
+						sqlrcon sqlrconref) {
+	return sqlrconref->getBindVariableDelimiterAtSignSupported();
+}
+
+int sqlrcon_getBindVariableDelimiterDollarSignSupported(
+						sqlrcon sqlrconref) {
+	return sqlrconref->getBindVariableDelimiterDollarSignSupported();
 }
 
 void sqlrcon_enableKerberos(sqlrcon sqlrconref,

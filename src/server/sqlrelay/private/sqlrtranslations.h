@@ -1,12 +1,11 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 	private:
 		void	unload();
-		void	loadTranslation(xmldomnode *translation);
+		void	loadTranslation(domnode *translation);
 
 		sqlrdatabaseobject *createDatabaseObject(
-						memorypool *pool,
 						const char *database,
 						const char *schema,
 						const char *object,

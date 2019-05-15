@@ -773,6 +773,7 @@ SOCKETLIBS
 PTHREADLIB
 PTHREADINCLUDES
 DISABLE_NEW_DTAGS
+WNOERRORDATETIME
 WNOUNKNOWNPRAGMAS
 WNOMISMATCHEDTAGS
 WNOOVERLOADEDVIRTUAL
@@ -17302,6 +17303,50 @@ fi
 
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-error=date-time" >&5
+$as_echo_n "checking for -Wno-error=date-time... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="-Wall -Werror -Wno-error=date-time"
+LIBS=""
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+int
+main ()
+{
+printf("%s %s\n",__DATE__,__TIME__);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  WNOERRORDATETIME="-Wno-error=date-time"
+else
+  WNOERRORDATETIME=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+if ( test -n "$WNOERRORDATETIME" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
 if ( test "$DEBUG" = "yes" )
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -g3" >&5
@@ -17453,6 +17498,11 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
 fi
 
+
+if ( test -n "`echo $LDFLAGS | grep '\-Wl,\-z,relro'`" )
+then
+	CPPFLAGS="-fPIC $CPPFLAGS"
+fi
 
 echo "******************************"
 
@@ -18704,9 +18754,9 @@ then
 	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
 	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
 	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "1" -o "$V2" -lt "0" -o "$V3" -lt "5" )
+	if ( test "$V1" -lt "1" -o "$V2" -lt "2" -o "$V3" -lt "0" )
 	then
-		as_fn_error $? "Rudiments version must be >= 1.0.5, found version $RUDIMENTSVERSION" "$LINENO" 5
+		as_fn_error $? "Rudiments version must be >= 1.1.0, found version $RUDIMENTSVERSION" "$LINENO" 5
 		exit
 	fi
 fi
@@ -19630,7 +19680,7 @@ then
 				else
 					MYSQLCONFIG="mysql_config"
 				fi
-				$MYSQLCONFIG --cflags 2> /dev/null
+				$MYSQLCONFIG --cflags > /dev/null 2> /dev/null
 				if ( test "$?" -ne "0" )
 				then
 					if ( test -n "$dir" )
@@ -20340,6 +20390,47 @@ fi
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for valid mysql_config output" >&5
 $as_echo_n "checking for valid mysql_config output... " >&6; }
+			MYSQLCONFIGSUCCESS="no"
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mysql.h>
+#include <stdlib.h>
+int
+main ()
+{
+mysql_close(NULL);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; MYSQLCONFIGSUCCESS="yes"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+															if ( test "$MYSQLCONFIGSUCCESS" = "no" )
+			then
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking again with -L/usr/local/lib" >&5
+$as_echo_n "checking again with -L/usr/local/lib... " >&6; }
+				MYSQLLIBS="-L/usr/local/lib $MYSQLLIBS"
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
@@ -20374,6 +20465,7 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
+			fi
 		fi
 
 				if ( test -n "$MYSQLLIBS" -a -z "$MICROSOFT" )
@@ -21714,6 +21806,123 @@ if ac_fn_cxx_try_link "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; };
 $as_echo "#define HAVE_MYSQL_GET_SERVER_VERSION 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MYSQL_FIELD.name_length" >&5
+$as_echo_n "checking for MYSQL_FIELD.name_length... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mysql.h>
+#include <stdlib.h>
+int
+main ()
+{
+MYSQL_FIELD f; unsigned int a=f.name_length;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_MYSQL_FIELD_NAME_LENGTH 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MYSQL_FIELD.org_table" >&5
+$as_echo_n "checking for MYSQL_FIELD.org_table... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mysql.h>
+#include <stdlib.h>
+int
+main ()
+{
+MYSQL_FIELD f; const char *a=f.org_table;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_MYSQL_FIELD_ORG_TABLE 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for MYSQL_FIELD.org_table_length" >&5
+$as_echo_n "checking for MYSQL_FIELD.org_table_length... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$MYSQLSTATIC $MYSQLINCLUDES"
+LIBS="$MYSQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <mysql.h>
+#include <stdlib.h>
+int
+main ()
+{
+MYSQL_FIELD f; unsigned int a=f.org_table_length;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH 1" >>confdefs.h
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
@@ -23734,6 +23943,44 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if PostgreSQL has PQftable" >&5
+$as_echo_n "checking if PostgreSQL has PQftable... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$POSTGRESQLINCLUDES"
+LIBS="$POSTGRESQLLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <libpq-fe.h>
+#include <stdlib.h>
+int
+main ()
+{
+PQftable(NULL,0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_POSTGRESQL_PQFTABLE 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 	fi
 
 
@@ -25026,6 +25273,45 @@ if ac_fn_cxx_try_link "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; };
 $as_echo "#define HAVE_SQLITE3_FREE_WITH_CHAR 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sqlite3_column_table_name" >&5
+$as_echo_n "checking for sqlite3_column_table_name... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$SQLITESTATIC $SQLITEINCLUDES"
+LIBS="$SQLITELIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sqlite3.h>
+#include <stdlib.h>
+int
+main ()
+{
+sqlite3_column_table_name(0,0);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_SQLITE3_COLUMN_TABLE_NAME 1" >>confdefs.h
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
@@ -28650,6 +28936,46 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 		fi
+	fi
+
+		if ( test -n "$ODBCLIBS" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for SQLULEN" >&5
+$as_echo_n "checking for SQLULEN... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="$ODBCSTATIC $ODBCINCLUDES"
+LIBS="$ODBCLIBS $SOCKETLIBS"
+LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$ODBCLIBSPATH"
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <sql.h>
+#include <sqlext.h>
+int
+main ()
+{
+SQLULEN a;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }; ODBCLIBS=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
 	fi
 
 	if ( test -n "$ODBCLIBS" )
@@ -33912,6 +34238,8 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.12* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.11* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.10* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.9* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.8* 2> /dev/null` \
@@ -33921,7 +34249,11 @@ then
 `ls -d /usr/lib64/jvm/jdk-8-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-9-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-10-* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/jdk-11-* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.12* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.11* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.10* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.9* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.8* 2> /dev/null` \
@@ -33931,6 +34263,8 @@ then
 `ls -d /usr/lib/jvm/jdk-8-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-9-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-10-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-11-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 /System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local
@@ -33971,6 +34305,22 @@ then
 	eval "JAVAC=\"$JAVAPATH/Commands/javac$EXE\""
 fi
 
+			if ( test "`basename $CXX`" = "g++3" )
+			then
+
+if ( test -r ""$JAVAPATH/bin/gcj3$EXE"" )
+then
+	eval "JAVAC=\"$JAVAPATH/bin/gcj3$EXE -C\""
+fi
+
+			else
+
+if ( test -r ""$JAVAPATH/bin/gcj$EXE"" )
+then
+	eval "JAVAC=\"$JAVAPATH/bin/gcj$EXE -C\""
+fi
+
+			fi
 
 if ( test -r ""$JAVAPATH/bin/jar$EXE"" )
 then
@@ -34014,6 +34364,20 @@ fi
 		then
 			HAVE_JAVA="yes"
 		fi
+	fi
+
+		if ( test -n "`grep kaffe $JAVAC | grep exec | grep Main`" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: javac appears to use kaffe" >&5
+$as_echo "$as_me: WARNING: javac appears to use kaffe" >&2;}
+		HAVE_JAVA=""
+	fi
+
+		if ( test "`basename $JAVAC`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: javac appears to be gcj 2.xx" >&5
+$as_echo "$as_me: WARNING: javac appears to be gcj 2.xx" >&2;}
+		HAVE_JAVA=""
 	fi
 
 	if ( test -n "$HAVE_JAVA" )
@@ -34639,6 +35003,37 @@ if ac_fn_cxx_try_compile "$LINENO"; then :
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; };
 $as_echo "#define HAVE_PHP_PDO_CONST_ZEND_FUNCTION_ENTRY 1" >>confdefs.h
+
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+
+
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PDO_PARAM_ZVAL" >&5
+$as_echo_n "checking for PDO_PARAM_ZVAL... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+CPPFLAGS="$PHPINCLUDES"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <php.h>
+#include <pdo/php_pdo.h>
+#include <pdo/php_pdo_driver.h>
+int
+main ()
+{
+pdo_param_type a=PDO_PARAM_ZVAL;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; };
+$as_echo "#define HAVE_PHP_PDO_PARAM_ZVAL 1" >>confdefs.h
 
 else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
@@ -35401,7 +35796,7 @@ fi
 echo "******************************"
 
 
-SQLR_VERSION="1.2.1"
+SQLR_VERSION="1.6.0"
 
 
 cat >>confdefs.h <<_ACEOF
@@ -35410,8 +35805,8 @@ _ACEOF
 
 
 
-SRV_SONAME_VERSION_INFO="6:0:0"
-CLT_SONAME_VERSION_INFO="4:0:0"
+SRV_SONAME_VERSION_INFO="9:0:1"
+CLT_SONAME_VERSION_INFO="5:0:0"
 
 
 
@@ -35663,11 +36058,14 @@ if ( test -n "$ENABLE_ROUTER" ); then
 	ROUTERBUILD="yes"
 	TESTDBS="$TESTDBS router"
 fi
+if ( test -n "$MYSQLLIBS" ); then
+	TESTDBS="$TESTDBS mysqlprotocol"
+fi
 
 
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh doc/admin/installingpkg.wt"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF

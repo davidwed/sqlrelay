@@ -1,4 +1,4 @@
-// Copyright (c) 2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -41,14 +41,14 @@ sqlrprotocols::~sqlrprotocols() {
 	delete pvt;
 }
 
-bool sqlrprotocols::load(xmldomnode *parameters) {
+bool sqlrprotocols::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the listeners
 	uint16_t	i=0;
-	for (xmldomnode *listener=parameters->getFirstTagChild();
+	for (domnode *listener=parameters->getFirstTagChild();
 			!listener->isNullNode();
 			listener=listener->getNextTagSibling()) {
 
@@ -75,7 +75,7 @@ void sqlrprotocols::unload() {
 	pvt->_protos.clear();
 }
 
-void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
+void sqlrprotocols::loadProtocol(uint16_t index, domnode *listener) {
 	debugFunction();
 
 	// ignore any non-listener entries
@@ -110,10 +110,10 @@ void sqlrprotocols::loadProtocol(uint16_t index, xmldomnode *listener) {
 	functionname.append("new_sqlrprotocol_")->append(module);
 	sqlrprotocol *(*newProtocol)(sqlrservercontroller *,
 					sqlrprotocols *,
-					xmldomnode *)=
+					domnode *)=
 			(sqlrprotocol *(*)(sqlrservercontroller *,
 						sqlrprotocols *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
 		stdoutput.printf("failed to load protocol: %s\n",module);
@@ -152,6 +152,18 @@ sqlrprotocol *sqlrprotocols::getProtocol(uint16_t index) {
 	return pp->pr;
 }
 
+void sqlrprotocols::endTransaction(bool commit) {
+	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
+			*node=pvt->_protos.getList()->getFirst();
+			node; node=node->getNext()) {
+		node->getValue()->getValue()->pr->endTransaction(commit);
+	}
+}
+
 void sqlrprotocols::endSession() {
-	// nothing for now, maybe in the future
+	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
+			*node=pvt->_protos.getList()->getFirst();
+			node; node=node->getNext()) {
+		node->getValue()->getValue()->pr->endSession();
+	}
 }

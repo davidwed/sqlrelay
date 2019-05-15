@@ -11,6 +11,7 @@ SRCS = connectionpooling.wt \
 	ha.wt \
 	languages.wt \
 	multirowfetches.wt \
+	nativeprotocol.wt \
 	proxying.wt \
 	queryfiltering.wt \
 	queryrouting.wt \
@@ -27,6 +28,7 @@ OBJS = connectionpooling.html \
 	ha.html \
 	languages.html \
 	multirowfetches.html \
+	nativeprotocol.html \
 	proxying.html \
 	queryfiltering.html \
 	queryrouting.html \

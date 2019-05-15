@@ -1,9 +1,9 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 	private:
 		void	unload();
-		void	loadFilter(xmldomnode *filter,
+		void	loadFilter(domnode *filter,
 				singlylinkedlist< sqlrfilterplugin * > *list);
 		bool	run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,

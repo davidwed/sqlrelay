@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -53,6 +53,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*bindFormat();
 
 		dictionary< int32_t, char *>	datatypes;
+		dictionary< int32_t, char *>	tables;
 
 		PGconn	*pgconn;
 
@@ -62,6 +63,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*db;
 		const char	*sslmode;
 		uint16_t	typemangling;
+		uint16_t	tablemangling;
 		const char	*charset;
 		char		*dbversion;
 		char		*hostname;
@@ -153,8 +155,11 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		const char	*getColumnTypeName(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
+#ifdef HAVE_POSTGRESQL_PQFTABLE
+		const char	*getColumnTable(uint32_t col);
+#endif
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -170,6 +175,7 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		int		currentrow;
 
 		char		typenamebuffer[6];
+		char		tablenamebuffer[6];
 
 		postgresqlconnection	*postgresqlconn;
 
@@ -201,6 +207,7 @@ postgresqlconnection::postgresqlconnection(sqlrservercontroller *cont) :
 						sqlrserverconnection(cont) {
 	dbversion=NULL;
 	datatypes.setTrackInsertionOrder(false);
+	tables.setTrackInsertionOrder(false);
 	pgconn=NULL;
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
 	currentoid=InvalidOid;
@@ -236,6 +243,12 @@ void postgresqlconnection::handleConnectString() {
 	} else {
 		typemangling=2;
 	}
+	const char	*tablemang=cont->getConnectStringValue("tablemangling");
+	if (!tablemang ||!charstring::compareIgnoringCase(tablemang,"no")) {
+		tablemangling=0;
+	} else {
+		tablemangling=2;
+	}
 	charset=cont->getConnectStringValue("charset");
 	const char	*lastinsertidfunc=
 			cont->getConnectStringValue("lastinsertidfunction");
@@ -262,12 +275,12 @@ bool postgresqlconnection::logIn(const char **error,
 
 	// clear the datatype dictionary
 	if (typemangling==2) {
-		for (avltreenode< dictionarynode<int32_t,char *> *>
-					*node=datatypes.getTree()->getFirst();
-					node; node=node->getNext()) {
-			delete[] node->getValue()->getValue();
-		}
-		datatypes.clear();
+		datatypes.clearAndArrayDeleteValues();
+	}
+
+	// clear the table dictionary
+	if (tablemangling==2) {
+		tables.clearAndArrayDeleteValues();
 	}
 
 	// log in
@@ -339,6 +352,22 @@ bool postgresqlconnection::logIn(const char **error,
 		PQclear(result);
 	}
 
+	// build the table dictionary
+	if (typemangling==2) {
+		PGresult	*result=PQexec(pgconn,
+					"select oid,relname from pg_class");
+		if (!result) {
+			*error=logInError("Get tables failed");
+			return false;
+		}
+		for (int i=0; i<PQntuples(result); i++) {
+			tables.setValue(
+				charstring::toInteger(PQgetvalue(result,i,0)),
+				charstring::duplicate(PQgetvalue(result,i,1)));
+		}
+		PQclear(result);
+	}
+
 #if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
@@ -391,6 +420,16 @@ void postgresqlconnection::logOut() {
 			delete[] node->getValue()->getValue();
 		}
 		datatypes.clear();
+	}
+
+	// clear the table dictionary
+	if (typemangling==2) {
+		for (avltreenode< dictionarynode<int32_t,char *> *>
+					*node=tables.getTree()->getFirst();
+					node; node=node->getNext()) {
+			delete[] node->getValue()->getValue();
+		}
+		tables.clear();
 	}
 }
 
@@ -719,8 +758,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -747,8 +786,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -772,8 +811,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -797,8 +836,8 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -828,8 +867,8 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -1326,6 +1365,22 @@ uint16_t postgresqlcursor::getColumnIsBinary(uint32_t col) {
 	return binary;
 }
 
+#ifdef HAVE_POSTGRESQL_PQFTABLE
+const char *postgresqlcursor::getColumnTable(uint32_t col) {
+	// PQftable returns an oid rather than a table name, so we have to map
+	// it to a table name.
+	// tablemangling=0 means return the internal number as a string
+	// tablemangling=2 means return the name as a string
+	Oid	pgfieldtable=PQftable(pgresult,col);
+	if (!postgresqlconn->tablemangling) {
+		charstring::printf(tablenamebuffer,sizeof(tablenamebuffer),
+						"%d",(int32_t)pgfieldtable);
+		return tablenamebuffer;
+	}
+	return postgresqlconn->tables.getValue((int32_t)pgfieldtable);
+}
+#endif
+
 bool postgresqlcursor::noRowsToReturn() {
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
@@ -1336,7 +1391,11 @@ bool postgresqlcursor::noRowsToReturn() {
 #endif
 }
 
-bool postgresqlcursor::fetchRow() {
+bool postgresqlcursor::fetchRow(bool *error) {
+
+	*error=false;
+	// FIXME: set error if an error occurs
+
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	if (!justexecuted) {

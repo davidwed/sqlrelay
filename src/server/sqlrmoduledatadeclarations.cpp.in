@@ -1,0 +1,1 @@
+sqlrmoduledata	*new_sqlrmoduledata_@module@(domnode *parameters);

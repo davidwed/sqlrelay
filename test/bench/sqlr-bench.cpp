@@ -1,4 +1,4 @@
-// Copyright (c) 2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 #include <rudiments/commandline.h>
 #include <rudiments/process.h>
@@ -121,7 +121,7 @@ int main(int argc, const char **argv) {
 		stdoutput.printf(
 			"usage: sqlr-bench \\\n"
 			"	[-db db2|informix|firebird|freetds|mysql|"
-			"oracle|postgresql|sap|sqlite] \\\n"
+			"oracle|postgresql|sap|sqlite|odbc] \\\n"
 			"	[-dbconnectstring dbconnectstring] \\\n"
 			"	[-proxyconnectstring proxyconnectstring] \\\n"
 			"	[-sqlrconnectstring sqlrconnectstring] \\\n"
@@ -317,6 +317,13 @@ int main(int argc, const char **argv) {
 					"user=testuser;"
 					"password=testpassword;";
 			}
+		} else if (!charstring::compare(db,"odbc")) {
+			if (!dbconnectstring) {
+				dbconnectstring=
+					"db=testdsn;"
+					"user=testuser;"
+					"password=testpassword;";
+			}
 		}
 
 		// init bench
@@ -389,10 +396,7 @@ int main(int argc, const char **argv) {
 	}
 
 	// clean up
-	for (linkedlistnode< float > *node=stats.getKeys()->getFirst();
-						node; node=node->getNext()) {
-		delete stats.getValue(node->getValue());
-	}
+	stats.clearAndDeleteValues();
 
 	// exit
 	process::exit(0);
@@ -437,6 +441,8 @@ void graphStats(const char *graph, const char *db,
 	} else if (!charstring::compare(db,"sap") ||
 			!charstring::compare(db,"sybase")) {
 		db="SAP/Sybase";
+	} else if (!charstring::compare(db,"odbc")) {
+		db="ODBC";
 	}
 
 	// write out the stats to temp.csv

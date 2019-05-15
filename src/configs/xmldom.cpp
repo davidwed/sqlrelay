@@ -1,4 +1,4 @@
-// Copyright (c) 2000-2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <config.h>
@@ -75,15 +75,17 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getDeniedIps();
 		const char	*getDebug();
 		bool		getDebugSql();
-		bool		getDebugErrors();
+		bool		getDebugBulkLoad();
 		bool		getDebugParser();
 		bool		getDebugDirectives();
 		bool		getDebugTranslations();
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
 		bool		getDebugBindTranslations();
+		bool		getDebugBindVariableTranslations();
 		bool		getDebugResultSetTranslations();
 		bool		getDebugResultSetRowTranslations();
+		bool		getDebugResultSetRowBlockTranslations();
 		bool		getDebugResultSetHeaderTranslations();
 		bool		getDebugProtocols();
 		bool		getDebugAuths();
@@ -93,6 +95,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugSchedules();
 		bool		getDebugRouters();
 		bool		getDebugQueries();
+		bool		getDebugModuleDatas();
 		uint64_t	getMaxClientInfoLength();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
@@ -106,6 +109,11 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getReLoginAtStart();
 		bool		getFakeInputBindVariables();
 		const char	*getFakeInputBindVariablesDateFormat();
+		bool		getFakeInputBindVariablesUnicodeStrings();
+		bool		getBindVariableDelimiterQuestionMarkSupported();
+		bool		getBindVariableDelimiterColonSupported();
+		bool		getBindVariableDelimiterAtSignSupported();
+		bool		getBindVariableDelimiterDollarSignSupported();
 		bool		getTranslateBindVariables();
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
@@ -114,22 +122,25 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
 
-		xmldomnode	*getListeners();
-		xmldomnode	*getParser();
-		xmldomnode	*getDirectives();
-		xmldomnode	*getTranslations();
-		xmldomnode	*getFilters();
-		xmldomnode	*getResultSetTranslations();
-		xmldomnode	*getResultSetRowTranslations();
-		xmldomnode	*getResultSetHeaderTranslations();
-		xmldomnode	*getTriggers();
-		xmldomnode	*getLoggers();
-		xmldomnode	*getNotifications();
-		xmldomnode	*getSchedules();
-		xmldomnode	*getRouters();
-		xmldomnode	*getQueries();
-		xmldomnode	*getPasswordEncryptions();
-		xmldomnode	*getAuths();
+		domnode	*getListeners();
+		domnode	*getParser();
+		domnode	*getDirectives();
+		domnode	*getTranslations();
+		domnode	*getFilters();
+		domnode	*getBindVariableTranslations();
+		domnode	*getResultSetTranslations();
+		domnode	*getResultSetRowTranslations();
+		domnode	*getResultSetRowBlockTranslations();
+		domnode	*getResultSetHeaderTranslations();
+		domnode	*getTriggers();
+		domnode	*getLoggers();
+		domnode	*getNotifications();
+		domnode	*getSchedules();
+		domnode	*getRouters();
+		domnode	*getQueries();
+		domnode	*getPasswordEncryptions();
+		domnode	*getAuths();
+		domnode	*getModuleDatas();
 
 		linkedlist< connectstringcontainer * >	*getConnectStringList();
 		connectstringcontainer	*getConnectString(
@@ -173,6 +184,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool	text(const char *value);
 		bool	comment(const char *value);
 
+		bool	hasDebug(const char *value, const char *debug);
+
 		bool		listenoninet;
 		bool		listenonunix;
 		const char	*dbase;
@@ -200,14 +213,17 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*deniedips;
 		const char	*debug;
 		bool		debugsql;
+		bool		debugbulkload;
 		bool		debugparser;
 		bool		debugdirectives;
 		bool		debugtranslations;
 		bool		debugfilters;
 		bool		debugtriggers;
 		bool		debugbindtranslations;
+		bool		debugbindvariabletranslations;
 		bool		debugresultsettranslations;
 		bool		debugresultsetrowtranslations;
+		bool		debugresultsetrowblocktranslations;
 		bool		debugresultsetheadertranslations;
 		bool		debugprotocols;
 		bool		debugauths;
@@ -217,6 +233,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugschedules;
 		bool		debugrouters;
 		bool		debugqueries;
+		bool		debugmoduledatas;
 		uint64_t	maxclientinfolength;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -230,6 +247,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		reloginatstart;
 		bool		fakeinputbindvariables;
 		const char	*fakeinputbindvariablesdateformat;
+		bool		fakeinputbindvariablesunicodestrings;
+		const char	*bindvariabledelimiters;
+		bool		questionmarksupported;
+		bool		colonsupported;
+		bool		atsignsupported;
+		bool		dollarsignsupported;
 		bool		translatebindvariables;
 		const char	*isolationlevel;
 		bool		ignoreselectdb;
@@ -238,29 +261,32 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		linkedlist< char *>	sessionstartqueries;
 		linkedlist< char *>	sessionendqueries;
 
-		xmldomnode	*listenersxml;
-		xmldomnode	*parserxml;
-		xmldomnode	*directivesxml;
-		xmldomnode	*translationsxml;
-		xmldomnode	*filtersxml;
-		xmldomnode	*resultsettranslationsxml;
-		xmldomnode	*resultsetrowtranslationsxml;
-		xmldomnode	*resultsetheadertranslationsxml;
-		xmldomnode	*triggersxml;
-		xmldomnode	*loggersxml;
-		xmldomnode	*notificationsxml;
-		xmldomnode	*schedulesxml;
-		xmldomnode	*routersxml;
-		xmldomnode	*queriesxml;
-		xmldomnode	*pwdencsxml;
-		xmldomnode	*authsxml;
+		domnode	*listenersxml;
+		domnode	*parserxml;
+		domnode	*directivesxml;
+		domnode	*translationsxml;
+		domnode	*filtersxml;
+		domnode	*bindvariabletranslationsxml;
+		domnode	*resultsettranslationsxml;
+		domnode	*resultsetrowtranslationsxml;
+		domnode	*resultsetrowblocktranslationsxml;
+		domnode	*resultsetheadertranslationsxml;
+		domnode	*triggersxml;
+		domnode	*loggersxml;
+		domnode	*notificationsxml;
+		domnode	*schedulesxml;
+		domnode	*routersxml;
+		domnode	*queriesxml;
+		domnode	*pwdencsxml;
+		domnode	*authsxml;
+		domnode	*moduledatasxml;
 
 		uint32_t	metrictotal;
 
 		linkedlist< routecontainer *>		routelist;
 		linkedlist< connectstringcontainer * >	connectstringlist;
 
-		xmldomnode	*defaultlistener;
+		domnode	*defaultlistener;
 		const char	*defaultaddresses;
 		uint16_t	defaultport;
 		const char	*defaultsocket;
@@ -334,27 +360,34 @@ void sqlrconfig_xmldom::init() {
 	allowedips=DEFAULT_DENIEDIPS;
 	deniedips=DEFAULT_DENIEDIPS;
 	debug=DEFAULT_DEBUG;
-	debugsql=charstring::contains(debug,"sql");
-	debugparser=charstring::contains(debug,"parser");
-	debugdirectives=charstring::contains(debug,"directives");
-	debugtranslations=charstring::contains(debug,"translations");
-	debugfilters=charstring::contains(debug,"filters");
-	debugtriggers=charstring::contains(debug,"triggers");
-	debugbindtranslations=charstring::contains(debug,"bindtranslations");
+	debugsql=hasDebug(debug,"sql");
+	debugbulkload=hasDebug(debug,"bulkload");
+	debugparser=hasDebug(debug,"parser");
+	debugdirectives=hasDebug(debug,"directives");
+	debugtranslations=hasDebug(debug,"translations");
+	debugfilters=hasDebug(debug,"filters");
+	debugtriggers=hasDebug(debug,"triggers");
+	debugbindtranslations=
+		hasDebug(debug,"bindtranslations");
+	debugbindvariabletranslations=
+		hasDebug(debug,"bindvariabletranslations");
 	debugresultsettranslations=
-		charstring::contains(debug,"resultsettranslations");
+		hasDebug(debug,"resultsettranslations");
 	debugresultsetrowtranslations=
-		charstring::contains(debug,"resultsetrowtranslations");
+		hasDebug(debug,"resultsetrowtranslations");
+	debugresultsetrowblocktranslations=
+		hasDebug(debug,"resultsetrowblocktranslations");
 	debugresultsetheadertranslations=
-		charstring::contains(debug,"resultsetheadertranslations");
-	debugprotocols=charstring::contains(debug,"protocols");
-	debugauths=charstring::contains(debug,"auths");
-	debugpwdencs=charstring::contains(debug,"passwordencrypytions");
-	debugloggers=charstring::contains(debug,"loggers");
-	debugnotifications=charstring::contains(debug,"notifications");
-	debugschedules=charstring::contains(debug,"schedules");
-	debugrouters=charstring::contains(debug,"routers");
-	debugqueries=charstring::contains(debug,"queries");
+		hasDebug(debug,"resultsetheadertranslations");
+	debugprotocols=hasDebug(debug,"protocols");
+	debugauths=hasDebug(debug,"auths");
+	debugpwdencs=hasDebug(debug,"passwordencrypytions");
+	debugloggers=hasDebug(debug,"loggers");
+	debugnotifications=hasDebug(debug,"notifications");
+	debugschedules=hasDebug(debug,"schedules");
+	debugrouters=hasDebug(debug,"routers");
+	debugqueries=hasDebug(debug,"queries");
+	debugmoduledatas=hasDebug(debug,"moduledatas");
 	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
 	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
@@ -372,6 +405,13 @@ void sqlrconfig_xmldom::init() {
 	fakeinputbindvariables=!charstring::compare(
 					DEFAULT_FAKEINPUTBINDVARIABLES,"yes");
 	fakeinputbindvariablesdateformat=NULL;
+	fakeinputbindvariablesunicodestrings=!charstring::compare(
+			DEFAULT_FAKEINPUTBINDVARIABLESUNICODESTRINGS,"yes");
+	bindvariabledelimiters=DEFAULT_BINDVARIABLEDELIMITERS;
+	questionmarksupported=charstring::contains(bindvariabledelimiters,'?');
+	colonsupported=charstring::contains(bindvariabledelimiters,':');
+	atsignsupported=charstring::contains(bindvariabledelimiters,'@');
+	dollarsignsupported=charstring::contains(bindvariabledelimiters,'$');
 	translatebindvariables=!charstring::compare(
 					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
 	isolationlevel=NULL;
@@ -396,28 +436,10 @@ void sqlrconfig_xmldom::init() {
 void sqlrconfig_xmldom::clear() {
 	debugFunction();
 
-	for (connectstringnode *csn=connectstringlist.getFirst();
-						csn; csn=csn->getNext()) {
-		delete csn->getValue();
-	}
-	connectstringlist.clear();
-
-	for (routenode *rn=routelist.getFirst(); rn; rn=rn->getNext()) {
-		delete rn->getValue();
-	}
-	routelist.clear();
-
-	for (linkedlistnode< char * > *ssln=sessionstartqueries.getFirst();
-						ssln; ssln=ssln->getNext()) {
-		delete[] ssln->getValue();
-	}
-	sessionstartqueries.clear();
-
-	for (linkedlistnode< char * > *seln=sessionendqueries.getFirst();
-						seln; seln=seln->getNext()) {
-		delete[] seln->getValue();
-	}
-	sessionendqueries.clear();
+	connectstringlist.clearAndDelete();
+	routelist.clearAndDelete();
+	sessionstartqueries.clearAndArrayDelete();
+	sessionendqueries.clearAndArrayDelete();
 }
 
 const char *sqlrconfig_xmldom::getDefaultAddresses() {
@@ -581,6 +603,10 @@ bool sqlrconfig_xmldom::getDebugSql() {
 	return debugsql;
 }
 
+bool sqlrconfig_xmldom::getDebugBulkLoad() {
+	return debugbulkload;
+}
+
 bool sqlrconfig_xmldom::getDebugParser() {
 	return debugparser;
 }
@@ -605,12 +631,20 @@ bool sqlrconfig_xmldom::getDebugBindTranslations() {
 	return debugbindtranslations;
 }
 
+bool sqlrconfig_xmldom::getDebugBindVariableTranslations() {
+	return debugbindvariabletranslations;
+}
+
 bool sqlrconfig_xmldom::getDebugResultSetTranslations() {
 	return debugresultsettranslations;
 }
 
 bool sqlrconfig_xmldom::getDebugResultSetRowTranslations() {
 	return debugresultsetrowtranslations;
+}
+
+bool sqlrconfig_xmldom::getDebugResultSetRowBlockTranslations() {
+	return debugresultsetrowblocktranslations;
 }
 
 bool sqlrconfig_xmldom::getDebugResultSetHeaderTranslations() {
@@ -647,6 +681,10 @@ bool sqlrconfig_xmldom::getDebugRouters() {
 
 bool sqlrconfig_xmldom::getDebugQueries() {
 	return debugqueries;
+}
+
+bool sqlrconfig_xmldom::getDebugModuleDatas() {
+	return debugmoduledatas;
 }
 
 uint64_t sqlrconfig_xmldom::getMaxClientInfoLength() {
@@ -701,6 +739,26 @@ const char *sqlrconfig_xmldom::getFakeInputBindVariablesDateFormat() {
 	return fakeinputbindvariablesdateformat;
 }
 
+bool sqlrconfig_xmldom::getFakeInputBindVariablesUnicodeStrings() {
+	return fakeinputbindvariablesunicodestrings;
+}
+
+bool sqlrconfig_xmldom::getBindVariableDelimiterQuestionMarkSupported() {
+	return questionmarksupported;
+}
+
+bool sqlrconfig_xmldom::getBindVariableDelimiterColonSupported() {
+	return colonsupported;
+}
+
+bool sqlrconfig_xmldom::getBindVariableDelimiterAtSignSupported() {
+	return atsignsupported;
+}
+
+bool sqlrconfig_xmldom::getBindVariableDelimiterDollarSignSupported() {
+	return dollarsignsupported;
+}
+
 bool sqlrconfig_xmldom::getTranslateBindVariables() {
 	return translatebindvariables;
 }
@@ -725,68 +783,80 @@ linkedlist< char * > *sqlrconfig_xmldom::getSessionEndQueries() {
 	return &sessionendqueries;
 }
 
-xmldomnode *sqlrconfig_xmldom::getListeners() {
+domnode *sqlrconfig_xmldom::getListeners() {
 	return listenersxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getParser() {
+domnode *sqlrconfig_xmldom::getParser() {
 	return parserxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getDirectives() {
+domnode *sqlrconfig_xmldom::getDirectives() {
 	return directivesxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getTranslations() {
+domnode *sqlrconfig_xmldom::getTranslations() {
 	return translationsxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getFilters() {
+domnode *sqlrconfig_xmldom::getFilters() {
 	return filtersxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getResultSetTranslations() {
+domnode *sqlrconfig_xmldom::getBindVariableTranslations() {
+	return bindvariabletranslationsxml;
+}
+
+domnode *sqlrconfig_xmldom::getResultSetTranslations() {
 	return resultsettranslationsxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getResultSetRowTranslations() {
+domnode *sqlrconfig_xmldom::getResultSetRowTranslations() {
 	return resultsetrowtranslationsxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getResultSetHeaderTranslations() {
+domnode *sqlrconfig_xmldom::getResultSetRowBlockTranslations() {
+	return resultsetrowblocktranslationsxml;
+}
+
+domnode *sqlrconfig_xmldom::getResultSetHeaderTranslations() {
 	return resultsetheadertranslationsxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getTriggers() {
+domnode *sqlrconfig_xmldom::getTriggers() {
 	return triggersxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getLoggers() {
+domnode *sqlrconfig_xmldom::getLoggers() {
 	return loggersxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getNotifications() {
+domnode *sqlrconfig_xmldom::getNotifications() {
 	return notificationsxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getSchedules() {
+domnode *sqlrconfig_xmldom::getSchedules() {
 	return schedulesxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getRouters() {
+domnode *sqlrconfig_xmldom::getRouters() {
 	return routersxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getQueries() {
+domnode *sqlrconfig_xmldom::getQueries() {
 	return queriesxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getPasswordEncryptions() {
+domnode *sqlrconfig_xmldom::getPasswordEncryptions() {
 	return pwdencsxml;
 }
 
-xmldomnode *sqlrconfig_xmldom::getAuths() {
+domnode *sqlrconfig_xmldom::getAuths() {
 	return authsxml;
+}
+
+domnode *sqlrconfig_xmldom::getModuleDatas() {
+	return moduledatasxml;
 }
 
 linkedlist< connectstringcontainer * > *sqlrconfig_xmldom::
@@ -1029,6 +1099,38 @@ bool sqlrconfig_xmldom::comment(const char *value) {
 	return true;
 }
 
+bool sqlrconfig_xmldom::hasDebug(const char *str, const char *debugstr) {
+
+	const char	*end=str+charstring::length(str);
+	size_t		debugstrlen=charstring::length(debugstr);
+
+	while(str<end) {
+
+		// see if the debug string is in the string at all
+		const char	*ptr=charstring::findFirst(str,debugstr);
+		if (!ptr) {
+			return false;
+		}
+
+		// if we found something, then verify that
+		// * it is at the beginning of the string
+		//   or
+		// * it is preceeded by a space
+		// and
+		// * it ends at the end of the string
+		//   or
+		// * it is followed by a space
+		if ((ptr==str || *(ptr-1)==' ') &&
+			(ptr+debugstrlen==end || *(ptr+debugstrlen)==' ')) {
+			return true;
+		}
+
+		// if not, move on and look for it again
+		str+=debugstrlen;
+	}
+	return false;
+}
+
 bool sqlrconfig_xmldom::load(const char *urlname, const char *id) {
 	debugFunction();
 
@@ -1085,9 +1187,9 @@ stdoutput.printf("\n");*/
 void sqlrconfig_xmldom::normalizeTree() {
 
 	// prune instances for non-specified id's
-	xmldomnode *instance=getRootNode()->getFirstTagChild("instance");
+	domnode *instance=getRootNode()->getFirstTagChild("instance");
 	while (!instance->isNullNode()) {
-		xmldomnode	*next=instance->getNextTagSibling("instance");
+		domnode	*next=instance->getNextTagSibling("instance");
 		if (charstring::compare(instance->getAttributeValue("id"),id)) {
 			instance->getParent()->deleteChild(instance);
 		}
@@ -1098,7 +1200,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	instance=getRootNode()->getFirstTagChild("instance");
 
 	// addresses="" -> addresses="0.0.0.0"
-	xmldomnode	*attr=instance->getAttribute("addresses");
+	domnode	*attr=instance->getAttribute("addresses");
 	if (!attr->isNullNode()) {
 		if (charstring::isNullOrEmpty(attr->getValue())) {
 			attr->setValue("0.0.0.0");
@@ -1117,40 +1219,42 @@ void sqlrconfig_xmldom::normalizeTree() {
 		attr->setName("authtier");
 	}
 
-	// oracle8 -> oracle, sybase -> sap
+	// oracle8 -> oracle, sybase -> sap, mariadb -> mysql
 	attr=instance->getAttribute("dbase");
 	if (!attr->isNullNode()) {
 		if (!charstring::compare(attr->getValue(),"oracle8")) {
 			attr->setValue("oracle");
 		} else if (!charstring::compare(attr->getValue(),"sybase")) {
 			attr->setValue("sap");
+		} else if (!charstring::compare(attr->getValue(),"mariadb")) {
+			attr->setValue("mysql");
 		}
 	}
 
 	// add missing listeners tag
-	xmldomnode	*listeners=instance->getFirstTagChild("listeners");
+	domnode	*listeners=instance->getFirstTagChild("listeners");
 	if (listeners->isNullNode()) {
 		listeners=instance->insertTag("listeners",0);
 	}
 
 	// addresses/port/socket/etc. in instance -> listener
-	xmldomnode	*addresses=instance->getAttribute("addresses");
-	xmldomnode	*port=instance->getAttribute("port");
-	xmldomnode	*socket=instance->getAttribute("socket");
-	xmldomnode	*krb=instance->getAttribute("krb");
-	xmldomnode	*krbservice=instance->getAttribute("krbservice");
-	xmldomnode	*krbkeytab=instance->getAttribute("krbkeytab");
-	xmldomnode	*krbmech=instance->getAttribute("krbmech");
-	xmldomnode	*krbflags=instance->getAttribute("krbflags");
-	xmldomnode	*tls=instance->getAttribute("tls");
-	xmldomnode	*tlsversion=instance->getAttribute("tlsversion");
-	xmldomnode	*tlscert=instance->getAttribute("tlscert");
-	xmldomnode	*tlskey=instance->getAttribute("tlskey");
-	xmldomnode	*tlspassword=instance->getAttribute("tlspassword");
-	xmldomnode	*tlsvalidate=instance->getAttribute("tlsvalidate");
-	xmldomnode	*tlsca=instance->getAttribute("tlsca");
-	xmldomnode	*tlsciphers=instance->getAttribute("tlsciphers");
-	xmldomnode	*tlsdepth=instance->getAttribute("tlsdepth");
+	domnode	*addresses=instance->getAttribute("addresses");
+	domnode	*port=instance->getAttribute("port");
+	domnode	*socket=instance->getAttribute("socket");
+	domnode	*krb=instance->getAttribute("krb");
+	domnode	*krbservice=instance->getAttribute("krbservice");
+	domnode	*krbkeytab=instance->getAttribute("krbkeytab");
+	domnode	*krbmech=instance->getAttribute("krbmech");
+	domnode	*krbflags=instance->getAttribute("krbflags");
+	domnode	*tls=instance->getAttribute("tls");
+	domnode	*tlsversion=instance->getAttribute("tlsversion");
+	domnode	*tlscert=instance->getAttribute("tlscert");
+	domnode	*tlskey=instance->getAttribute("tlskey");
+	domnode	*tlspassword=instance->getAttribute("tlspassword");
+	domnode	*tlsvalidate=instance->getAttribute("tlsvalidate");
+	domnode	*tlsca=instance->getAttribute("tlsca");
+	domnode	*tlsciphers=instance->getAttribute("tlsciphers");
+	domnode	*tlsdepth=instance->getAttribute("tlsdepth");
 	if (!addresses->isNullNode() ||
 			!port->isNullNode() ||
 			!socket->isNullNode() ||
@@ -1169,7 +1273,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!tlsciphers->isNullNode() ||
 			!tlsdepth->isNullNode()) {
 
-		xmldomnode	*listener=listeners->insertTag("listener",0);
+		domnode	*listener=listeners->insertTag("listener",0);
 		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
 
 		if (!addresses->isNullNode()) {
@@ -1261,12 +1365,12 @@ void sqlrconfig_xmldom::normalizeTree() {
 
 	// empty listeners tag
 	if (listeners->getFirstTagChild("listener")->isNullNode()) {
-		xmldomnode	*listener=listeners->appendTag("listener");
+		domnode	*listener=listeners->appendTag("listener");
 		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
 	}
 	
 	// normalize listeners
-	for (xmldomnode *listener=listeners->getFirstTagChild("listener");
+	for (domnode *listener=listeners->getFirstTagChild("listener");
 			!listener->isNullNode();
 			listener=listener->getNextTagSibling("listener")) {
 
@@ -1306,7 +1410,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 
 		// krb but no service -> default service
-		xmldomnode	*krbservice=
+		domnode	*krbservice=
 				instance->getAttribute("krbservice");
 		if (krbservice->isNullNode() &&
 			!charstring::compare(
@@ -1317,7 +1421,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// authentications -> auths
-	xmldomnode	*auths=instance->getFirstTagChild("authentications");
+	domnode	*auths=instance->getFirstTagChild("authentications");
 	if (!auths->isNullNode()) {
 		auths->setName("auths");
 	}
@@ -1329,7 +1433,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// authentication -> auth
-	for (xmldomnode *auth=auths->getFirstTagChild("authentication");
+	for (domnode *auth=auths->getFirstTagChild("authentication");
 			!auth->isNullNode();
 			auth=auth->getNextTagSibling("authentication")) {
 		auth->setName("auth");
@@ -1337,19 +1441,19 @@ void sqlrconfig_xmldom::normalizeTree() {
 
 	// users -> auth_userlist
 	bool		addeduserlist=false;
-	xmldomnode	*users=instance->getFirstTagChild("users");
+	domnode	*users=instance->getFirstTagChild("users");
 	if (!users->isNullNode()) {
 
-		xmldomnode	*auth=auths->insertTag("auth",0);
+		domnode	*auth=auths->insertTag("auth",0);
 		auth->setAttributeValue("module","userlist");
 
-		for (xmldomnode *user=users->getFirstTagChild("user");
+		for (domnode *user=users->getFirstTagChild("user");
 				!user->isNullNode();
 				user=user->getNextTagSibling("user")) {
 
-			xmldomnode	*authuser=auth->appendTag("user");
+			domnode	*authuser=auth->appendTag("user");
 
-			xmldomnode	*userattr=
+			domnode	*userattr=
 					user->getAttribute("user");
 			if (!userattr->isNullNode()) {
 				authuser->setAttributeValue(
@@ -1357,7 +1461,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 						userattr->getValue());
 			}
 
-			xmldomnode	*passwordattr=
+			domnode	*passwordattr=
 					user->getAttribute("password");
 			if (!passwordattr->isNullNode()) {
 				authuser->setAttributeValue(
@@ -1366,7 +1470,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 			}
 
 			// passwordencryption -> passwordencryptionid
-			xmldomnode	*pwdencidattr=
+			domnode	*pwdencidattr=
 					user->getAttribute(
 						"passwordencryptionid");
 			if (pwdencidattr->isNullNode()) {
@@ -1393,7 +1497,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 		if (!charstring::compare(attr->getValue(),"database") ||
 			!charstring::compare(attr->getValue(),"proxied")) {
 
-			xmldomnode	*auth=(addeduserlist)?
+			domnode	*auth=(addeduserlist)?
 					auths->insertTag("auth",1):
 					auths->insertTag("auth",0);
 
@@ -1404,7 +1508,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// krb_userlist/tls_userlist -> userlist
-	for (xmldomnode *auth=instance->getFirstTagChild("auths")->
+	for (domnode *auth=instance->getFirstTagChild("auths")->
 						getFirstTagChild("auth");
 				!auth->isNullNode();
 				auth=auth->getNextTagSibling("auth")) {
@@ -1420,8 +1524,8 @@ void sqlrconfig_xmldom::normalizeTree() {
 
 	// normalize connections
 	uint32_t	connectioncount=0;
-	xmldomnode	*conns=instance->getFirstTagChild("connections");
-	for (xmldomnode *conn=conns->getFirstTagChild("connection");
+	domnode	*conns=instance->getFirstTagChild("connections");
+	for (domnode *conn=conns->getFirstTagChild("connection");
 			!conn->isNullNode();
 			conn=conn->getNextTagSibling("connection")) {
 
@@ -1437,7 +1541,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 
 		// passwordencryption -> passwordencryptionid
-		xmldomnode	*pwdencattr=
+		domnode	*pwdencattr=
 				conn->getAttribute("passwordencryption");
 		if (!pwdencattr->isNullNode()) {
 			pwdencattr->setName("passwordencryptionid");
@@ -1445,12 +1549,12 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// datetimeformat -> resultsettranslation_reformatdatetime
-	xmldomnode	*dtformat=instance->getAttribute("datetimeformat");
-	xmldomnode	*dateformat=instance->getAttribute("dateformat");
-	xmldomnode	*timeformat=instance->getAttribute("timeformat");
-	xmldomnode	*dateddmm=instance->getAttribute("dateddmm");
-	xmldomnode	*dateyyyyddmm=instance->getAttribute("dateyyyyddmm");
-	xmldomnode	*datedelims=instance->getAttribute("datedelimiters");
+	domnode	*dtformat=instance->getAttribute("datetimeformat");
+	domnode	*dateformat=instance->getAttribute("dateformat");
+	domnode	*timeformat=instance->getAttribute("timeformat");
+	domnode	*dateddmm=instance->getAttribute("dateddmm");
+	domnode	*dateyyyyddmm=instance->getAttribute("dateyyyyddmm");
+	domnode	*datedelims=instance->getAttribute("datedelimiters");
 	if (!dtformat->isNullNode() ||
 		!dateformat->isNullNode() ||
 		!timeformat->isNullNode() ||
@@ -1459,14 +1563,14 @@ void sqlrconfig_xmldom::normalizeTree() {
 		!datedelims->isNullNode()) {
 
 		// get/add resultsettranslations tag
-		xmldomnode	*rstrans=
+		domnode	*rstrans=
 			instance->getFirstTagChild("resultsettranslations");
 		if (rstrans->isNullNode()) {
 			rstrans=instance->appendTag("resultsettranslations");
 		}
 
 		// add resultsettranslation tag
-		xmldomnode	*rst=
+		domnode	*rst=
 			rstrans->insertTag("resultsettranslation",0);
 		rst->setAttributeValue("module","reformatdatetime");
 
@@ -1503,17 +1607,17 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// old router format to new router format
-	xmldomnode	*router=instance->getFirstTagChild("router");
+	domnode	*router=instance->getFirstTagChild("router");
 	if (!router->isNullNode()) {
 
 		// add a routers node if none exists
-		xmldomnode	*rtrs=instance->getFirstTagChild("routers");
+		domnode	*rtrs=instance->getFirstTagChild("routers");
 		if (rtrs->isNullNode()) {
 			rtrs=instance->appendTag("routers");
 		}
 
 		// add a connections node if none exists
-		xmldomnode	*cons=instance->getFirstTagChild("connections");
+		domnode	*cons=instance->getFirstTagChild("connections");
 		if (cons->isNullNode()) {
 			cons=instance->appendTag("connections");
 		}
@@ -1522,7 +1626,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 		uint16_t	index=0;
 		stringbuffer	conid;
 		stringbuffer	str;
-		for (xmldomnode *route=router->getFirstTagChild("route");
+		for (domnode *route=router->getFirstTagChild("route");
 				!route->isNullNode();
 				route=route->getNextTagSibling("route")) {
 
@@ -1563,20 +1667,20 @@ void sqlrconfig_xmldom::normalizeTree() {
 			}
 
 			// add a connections.connection node
-			xmldomnode	*con=cons->appendTag("connection");
+			domnode	*con=cons->appendTag("connection");
 			con->setAttributeValue("connectionid",
 						conid.getString());
 			con->setAttributeValue("string",
 						str.getString());
 
 			// add a routers.router node
-			xmldomnode	*rtr=rtrs->appendTag("router");
+			domnode	*rtr=rtrs->appendTag("router");
 			rtr->setAttributeValue("module","regex");
 			rtr->setAttributeValue("connectionid",
 						conid.getString());
 
 			// for each query...
-			for (xmldomnode *query=route->getFirstTagChild("query");
+			for (domnode *query=route->getFirstTagChild("query");
 				!query->isNullNode();
 				query=query->getNextTagSibling("query")) {
 
@@ -1600,8 +1704,8 @@ void sqlrconfig_xmldom::normalizeTree() {
 void sqlrconfig_xmldom::getTreeValues() {
 
 	// instance tag...
-	xmldomnode	*instance=getRootNode()->getFirstTagChild("instance");
-	xmldomnode	*attr=instance->getAttribute("dbase");
+	domnode	*instance=getRootNode()->getFirstTagChild("instance");
+	domnode	*attr=instance->getAttribute("dbase");
 	if (!attr->isNullNode()) {
 		dbase=attr->getValue();
 	}
@@ -1709,32 +1813,33 @@ void sqlrconfig_xmldom::getTreeValues() {
 	attr=instance->getAttribute("debug");
 	if (!attr->isNullNode()) {
 		debug=attr->getValue();
-		debugsql=charstring::contains(debug,"sql");
-		debugparser=charstring::contains(debug,"parser");
-		debugdirectives=charstring::contains(debug,"directives");
-		debugtranslations=charstring::contains(debug,"translations");
-		debugfilters=charstring::contains(debug,"filters");
-		debugtriggers=charstring::contains(debug,"triggers");
-		debugbindtranslations=
-			charstring::contains(debug,
-					"bindtranslations");
+		debugsql=hasDebug(debug,"sql");
+		debugbulkload=hasDebug(debug,"bulkload");
+		debugparser=hasDebug(debug,"parser");
+		debugdirectives=hasDebug(debug,"directives");
+		debugtranslations=hasDebug(debug,"translations");
+		debugfilters=hasDebug(debug,"filters");
+		debugtriggers=hasDebug(debug,"triggers");
+		debugbindtranslations=hasDebug(debug,"bindtranslations");
+		debugbindvariabletranslations=
+			hasDebug(debug,"bindvariabletranslations");
 		debugresultsettranslations=
-			charstring::contains(debug,
-					"resultsettranslations");
+			hasDebug(debug,"resultsettranslations");
 		debugresultsetrowtranslations=
-			charstring::contains(debug,
-					"resultsetrowtranslations");
+			hasDebug(debug,"resultsetrowtranslations");
+		debugresultsetrowblocktranslations=
+			hasDebug(debug,"resultsetrowblocktranslations");
 		debugresultsetheadertranslations=
-			charstring::contains(debug,
-					"resultsetheadertranslations");
-		debugprotocols=charstring::contains(debug,"protocols");
-		debugauths=charstring::contains(debug,"auths");
-		debugpwdencs=charstring::contains(debug,"passwordencryptions");
-		debugloggers=charstring::contains(debug,"loggers");
-		debugnotifications=charstring::contains(debug,"notifications");
-		debugschedules=charstring::contains(debug,"schedules");
-		debugrouters=charstring::contains(debug,"routers");
-		debugqueries=charstring::contains(debug,"queries");
+			hasDebug(debug,"resultsetheadertranslations");
+		debugprotocols=hasDebug(debug,"protocols");
+		debugauths=hasDebug(debug,"auths");
+		debugpwdencs=hasDebug(debug,"passwordencryptions");
+		debugloggers=hasDebug(debug,"loggers");
+		debugnotifications=hasDebug(debug,"notifications");
+		debugschedules=hasDebug(debug,"schedules");
+		debugrouters=hasDebug(debug,"routers");
+		debugqueries=hasDebug(debug,"queries");
+		debugmoduledatas=hasDebug(debug,"moduledatas");
 	}
 	attr=instance->getAttribute("maxclientinfolength");
 	if (!attr->isNullNode()) {
@@ -1790,6 +1895,23 @@ void sqlrconfig_xmldom::getTreeValues() {
 	if (!attr->isNullNode()) {
 		fakeinputbindvariablesdateformat=attr->getValue();
 	}
+	attr=instance->getAttribute("fakeinputbindvariablesunicodestrings");
+	if (!attr->isNullNode()) {
+		fakeinputbindvariablesunicodestrings=!charstring::compare(
+						attr->getValue(),"yes");
+	}
+	attr=instance->getAttribute("bindvariabledelimiters");
+	if (!attr->isNullNode()) {
+		bindvariabledelimiters=attr->getValue();
+		questionmarksupported=charstring::contains(
+						bindvariabledelimiters,'?');
+		colonsupported=charstring::contains(
+						bindvariabledelimiters,':');
+		atsignsupported=charstring::contains(
+						bindvariabledelimiters,'@');
+		dollarsignsupported=charstring::contains(
+						bindvariabledelimiters,'$');
+	}
 	attr=instance->getAttribute("translatebindvariables");
 	if (!attr->isNullNode()) {
 		translatebindvariables=!charstring::compare(
@@ -1815,12 +1937,16 @@ void sqlrconfig_xmldom::getTreeValues() {
 	directivesxml=instance->getFirstTagChild("directives");
 	translationsxml=instance->getFirstTagChild("translations");
 	filtersxml=instance->getFirstTagChild("filters");
+	bindvariabletranslationsxml=instance->getFirstTagChild(
+					"bindvariabletranslations");
 	resultsettranslationsxml=instance->getFirstTagChild(
-						"resultsettranslations");
+					"resultsettranslations");
 	resultsetrowtranslationsxml=instance->getFirstTagChild(
-						"resultsetrowtranslations");
+					"resultsetrowtranslations");
+	resultsetrowblocktranslationsxml=instance->getFirstTagChild(
+					"resultsetrowblocktranslations");
 	resultsetheadertranslationsxml=instance->getFirstTagChild(
-						"resultsetheadertranslations");
+					"resultsetheadertranslations");
 	triggersxml=instance->getFirstTagChild("triggers");
 	loggersxml=instance->getFirstTagChild("loggers");
 	notificationsxml=instance->getFirstTagChild("notifications");
@@ -1829,11 +1955,12 @@ void sqlrconfig_xmldom::getTreeValues() {
 	queriesxml=instance->getFirstTagChild("queries");
 	pwdencsxml=instance->getFirstTagChild("passwordencryptions");
 	authsxml=instance->getFirstTagChild("auths");
+	moduledatasxml=instance->getFirstTagChild("moduledatas");
 
 
 	// listeners tag...
 	defaultlistener=NULL;
-	for (xmldomnode *node=listenersxml->getFirstTagChild("listener");
+	for (domnode *node=listenersxml->getFirstTagChild("listener");
 				!node->isNullNode();
 				node=node->getNextTagSibling("listener")) {
 
@@ -1877,16 +2004,16 @@ void sqlrconfig_xmldom::getTreeValues() {
 
 
 	// session queries
-	xmldomnode	*session=instance->getFirstTagChild("session");
-	xmldomnode	*start=session->getFirstTagChild("start");
-	for (xmldomnode *runquery=start->getFirstTagChild("runquery");
+	domnode	*session=instance->getFirstTagChild("session");
+	domnode	*start=session->getFirstTagChild("start");
+	for (domnode *runquery=start->getFirstTagChild("runquery");
 			!runquery->isNullNode();
 			runquery=runquery->getNextTagSibling("runquery")) {
 		sessionstartqueries.append(charstring::duplicate(
 				runquery->getFirstChild("text")->getValue()));
 	}
-	xmldomnode	*end=session->getFirstTagChild("end");
-	for (xmldomnode *runquery=end->getFirstTagChild("runquery");
+	domnode	*end=session->getFirstTagChild("end");
+	for (domnode *runquery=end->getFirstTagChild("runquery");
 			!runquery->isNullNode();
 			runquery=runquery->getNextTagSibling("runquery")) {
 		sessionendqueries.append(charstring::duplicate(
@@ -1895,7 +2022,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 
 
 	// connect string list
-	for (xmldomnode *connection=instance->
+	for (domnode *connection=instance->
 					getFirstTagChild("connections")->
 					getFirstTagChild("connection");
 			!connection->isNullNode();
@@ -1926,7 +2053,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 
 	// route list
 	uint32_t	routecount=0;
-	for (xmldomnode *route=instance->
+	for (domnode *route=instance->
 				getFirstTagChild("router")->
 				getFirstTagChild("route");
 			!route->isNullNode();
@@ -1942,7 +2069,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 		r->setUser(route->getAttributeValue("user"));
 		r->setPassword(route->getAttributeValue("password"));
 
-		for (xmldomnode *query=route->getFirstTagChild("query");
+		for (domnode *query=route->getFirstTagChild("query");
 				!query->isNullNode();
 				query=query->getNextTagSibling("query")) {
 			const char	*pattern=
@@ -1973,7 +2100,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 
 	// default user/password
-	xmldomnode	*defaultusertag=instance->getFirstTagChild("auths")->							getFirstTagChild(
+	domnode	*defaultusertag=instance->getFirstTagChild("auths")->							getFirstTagChild(
 						"auth","module","userlist")->
 						getFirstTagChild("user");
 	defaultuser=defaultusertag->getAttributeValue("user");

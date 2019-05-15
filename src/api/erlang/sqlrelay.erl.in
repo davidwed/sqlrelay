@@ -7,7 +7,7 @@
 % API
 -export([start/0, start/1, stop/0]).
 
--export([alloc/7, connectionFree/0, cursorFree/0, enableKerberos/3, enableTls/7, disableEncryption/0, endSession/0, suspendSession/0, resumeSession/2]).
+-export([alloc/7, connectionFree/0, cursorFree/0, setBindVariableDelimiters/1, getBindVariableDelimiterQuestionMarkSupported/0, getBindVariableDelimiterColonSupported/0, getBindVariableDelimiterAtSignSupported/0, getBindVariableDelimiterDollarSignSupported/0, enableKerberos/3, enableTls/7, disableEncryption/0, endSession/0, suspendSession/0, resumeSession/2]).
 -export([ping/0, identify/0, dbVersion/0, dbHostName/0, dbIpAddress/0, bindFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
 -export([selectDatabase/1, getCurrentDatabase/0]).
 -export([getConnectionPort/0, getConnectionSocket/0]).
@@ -102,6 +102,21 @@ connectionFree() -> erase("connection"), call_port({connectionFree}).
 
 %% @doc Destroys the cursor and cleans up all associated result set data.
 cursorFree() -> erase("cursor"), call_port({cursorFree}).
+
+%% @doc Sets which delimiters are used to identify bind variables in countBindVariables() and validateBinds().  Valid delimiters include ?,:,@, and $.  Defaults to "?:@$"
+setBindVariableDelimiters(Delimiters) -> call_port({setBindVariableDelimiters, Delimiters}).
+
+%% @doc Returns true if question marks (?) are considered to be valid bind variable delimiters.
+getBindVariableDelimiterQuestionMarkSupported() -> call_port({getBindVariableDelimiterQuestionMarkSupported}).
+
+%% @doc Returns true if colons (:) are considered to be valid bind variable delimiters.
+getBindVariableDelimiterColonSupported() -> call_port({getBindVariableDelimiterColonSupported}).
+
+%% @doc Returns true if at-signs (@) are considered to be valid bind variable delimiters.
+getBindVariableDelimiterAtSignSupported() -> call_port({getBindVariableDelimiterAtSignSupported}).
+
+%% @doc Returns true if dollar signs ($) are considered to be valid bind variable delimiters.
+getBindVariableDelimiterDollarSignSupported() -> call_port({getBindVariableDelimiterDollarSignSupported}).
 
 %% @doc <p>Enables Kerberos authentication and encryption.</p>  <p>"service" indicates the Kerberos service name of the SQL Relay server.  If left empty or NULL then the service name "sqlrelay" will be used. "sqlrelay" is the default service name of the SQL Relay server.  Note that on Windows platforms the service name must be fully qualified, including the host and realm name.  For example: "sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM".</p> <p>"mech" indicates the specific Kerberos mechanism to use. On Linux/Unix platforms, this should be a string representation of the mechnaism's OID, such as:</p> <p>{ 1 2 840 113554 1 2 2 }</p><p>On Windows platforms, this should be a string like:</p><p>Kerberos</p><p>If left empty or NULL then the default mechanism will be used.  Only set this if you know that you have a good reason to.</p> <p>"flags" indicates what Kerberos flags to use.  Multiple flags may be specified, separated by commas.  If left empty or NULL then a defalt set of flags will be used.  Only set this if you know that you have a good reason to.</p> <p>Valid flags include:</p> <ul><li>GSS_C_MUTUAL_FLAG</li><li>GSS_C_REPLAY_FLAG</li><li>GSS_C_SEQUENCE_FLAG</li><li>GSS_C_CONF_FLAG</li><li>GSS_C_INTEG_FLAG</li></ul> <p>For a full list of flags, consult the GSSAPI documentation, though note that only the flags listed above are supported on Windows.</p>
 enableKerberos(Service, Mech, Flags) -> call_port({enableKerberos, Service, Mech, Flags}).

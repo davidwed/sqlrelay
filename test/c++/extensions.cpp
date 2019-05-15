@@ -1,4 +1,4 @@
-// Copyright (c) 2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 
 #include <rudiments/charstring.h>
@@ -111,26 +111,61 @@ int	main(int argc, char **argv) {
 
 
 	printf("TRANSLATE BIND VARIABLES:\n");
-	cur->prepareQuery("select :1 from dual");
+	cur->prepareQuery("select :1 from dual where 'hel''lo'='hel''lo' and 1=:2 and 2=:3");
+	cur->validateBinds();
 	cur->inputBind("1","hello");
+	cur->inputBind("2",1);
+	cur->inputBind("3",2);
+	checkSuccess(cur->validBind("1"),true);
+	checkSuccess(cur->validBind("2"),true);
+	checkSuccess(cur->validBind("3"),true);
+	checkSuccess(cur->validBind("4"),false);
+	checkSuccess(cur->countBindVariables(),3);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
 	cur->clearBinds();
+	printf("\n");
 
-	cur->prepareQuery("select @1 from dual");
+	cur->prepareQuery("select @1 from dual where 'hel''lo'='hel''lo' and 1=@2 and 2=@3");
+	cur->validateBinds();
 	cur->inputBind("1","hello");
+	cur->inputBind("2",1);
+	cur->inputBind("3",2);
+	checkSuccess(cur->validBind("1"),true);
+	checkSuccess(cur->validBind("2"),true);
+	checkSuccess(cur->validBind("3"),true);
+	checkSuccess(cur->validBind("4"),false);
+	checkSuccess(cur->countBindVariables(),3);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
 	cur->clearBinds();
+	printf("\n");
 
-	cur->prepareQuery("select $1 from dual");
+	cur->prepareQuery("select $1 from dual where 'hel''lo'='hel''lo' and 1=$2 and 2=$3");
+	cur->validateBinds();
 	cur->inputBind("1","hello");
+	cur->inputBind("2",1);
+	cur->inputBind("3",2);
+	checkSuccess(cur->validBind("1"),true);
+	checkSuccess(cur->validBind("2"),true);
+	checkSuccess(cur->validBind("3"),true);
+	checkSuccess(cur->validBind("4"),false);
+	checkSuccess(cur->countBindVariables(),3);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
 	cur->clearBinds();
+	printf("\n");
 
-	cur->prepareQuery("select ? from dual");
+	cur->prepareQuery("select ? from dual where 'hel''lo'='hel''lo' and 1=? and 2=?");
+	cur->validateBinds();
 	cur->inputBind("1","hello");
+	cur->inputBind("2",1);
+	cur->inputBind("3",2);
+	checkSuccess(cur->validBind("1"),true);
+	checkSuccess(cur->validBind("2"),true);
+	checkSuccess(cur->validBind("3"),true);
+	checkSuccess(cur->validBind("4"),false);
+	checkSuccess(cur->countBindVariables(),3);
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
 	cur->clearBinds();

@@ -1,9 +1,9 @@
-// Copyright (c) 2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
@@ -43,13 +43,13 @@ sqlrauths::~sqlrauths() {
 	delete pvt;
 }
 
-bool sqlrauths::load(xmldomnode *parameters, sqlrpwdencs *sqlrpe) {
+bool sqlrauths::load(domnode *parameters, sqlrpwdencs *sqlrpe) {
 	debugFunction();
 
 	unload();
 
 	// run through each set of auths
-	for (xmldomnode *auth=parameters->getFirstTagChild("auth");
+	for (domnode *auth=parameters->getFirstTagChild("auth");
 			!auth->isNullNode();
 			auth=auth->getNextTagSibling("auth")) {
 
@@ -74,7 +74,7 @@ void sqlrauths::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
+void sqlrauths::loadAuth(domnode *auth, sqlrpwdencs *sqlrpe) {
 	debugFunction();
 
 	// get the auth name
@@ -113,11 +113,11 @@ void sqlrauths::loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe) {
 	sqlrauth *(*newAuth)(sqlrservercontroller *,
 					sqlrauths *,
 					sqlrpwdencs *,
-					xmldomnode *)=
+					domnode *)=
 			(sqlrauth *(*)(sqlrservercontroller *,
 					sqlrauths *,
 					sqlrpwdencs *,
-					xmldomnode *))
+					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newAuth) {
 		stdoutput.printf("failed to load auth: %s\n",module);

@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2016 David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the COPYING file for more information.
 
 #include <rudiments/stringbuffer.h>
@@ -6,7 +6,7 @@
 #include <rudiments/regularexpression.h>
 #include <rudiments/commandline.h>
 #include <rudiments/linkedlist.h>
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/dynamiclib.h>
 
 #ifndef SQLRUTIL_DLLSPEC

@@ -1,4 +1,4 @@
-// Copyright (c) 2001  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 
 #ifdef __CYGWIN__
@@ -79,7 +79,7 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_delete
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    setConnectTimeout
- * Signature: ()V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setConnectTimeout
   (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
@@ -90,7 +90,7 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setConnectTim
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    setAuthenticationTimeout
- * Signature: ()V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setAuthenticationTimeout
   (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
@@ -101,12 +101,72 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setAuthentica
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    setResponseTimeout
- * Signature: ()V
+ * Signature: (II)V
  */
 JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setResponseTimeout
   (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
 	getSqlrConnection(env,self)->
 		setResponseTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    setBindVariableDelimiters
+ * Signature: (Ljava/lang/String)V
+ */
+JNIEXPORT void setBindVariableDelimiters
+  (JNIEnv *env, jobject self, jstring delimiters) {
+
+	char	*delimitersstring=conGetStringUTFChars(env,delimiters,0);
+
+	getSqlrConnection(env,self)->
+		setBindVariableDelimiters(delimitersstring);
+
+	conReleaseStringUTFChars(env,delimiters,delimitersstring);
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getBindVariableDelimiterQuestionMarkSupported
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean getBindVariableDelimiterQuestionMarkSupported
+  (JNIEnv *env, jobject self) {
+	return (jboolean)getSqlrConnection(env,self)->
+			getBindVariableDelimiterQuestionMarkSupported();
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getBindVariableDelimiterColonSupported
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean getBindVariableDelimiterColonSupported
+  (JNIEnv *env, jobject self) {
+	return (jboolean)getSqlrConnection(env,self)->
+			getBindVariableDelimiterColonSupported();
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getBindVariableDelimiterAtSignSupported
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean getBindVariableDelimiterAtSignSupported
+  (JNIEnv *env, jobject self) {
+	return (jboolean)getSqlrConnection(env,self)->
+			getBindVariableDelimiterAtSignSupported();
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getBindVariableDelimiterDollarSignSupported
+ * Signature: ()Z
+ */
+JNIEXPORT jboolean getBindVariableDelimiterDollarSignSupported
+  (JNIEnv *env, jobject self) {
+	return (jboolean)getSqlrConnection(env,self)->
+			getBindVariableDelimiterDollarSignSupported();
 }
 
 /*

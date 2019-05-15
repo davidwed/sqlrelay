@@ -1,0 +1,2 @@
+usr/lib/php/*/pdo_sqlrelay.so
+etc/php/*/mods-available/pdo_sqlrelay.ini

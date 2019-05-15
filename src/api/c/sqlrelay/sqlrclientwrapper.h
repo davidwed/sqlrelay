@@ -1,4 +1,4 @@
-/* Copyright (c) 2000-2001  David Muse
+/* Copyright (c) 1999-2018 David Muse
  See the file COPYING for more information */
 
 #ifndef SQLRCLIENTWRAPPER_H
@@ -80,6 +80,39 @@ void	sqlrcon_getAuthenticationTimeout(sqlrcon sqlrconref,
 SQLRCLIENT_DLLSPEC
 void	sqlrcon_getResponseTimeout(sqlrcon sqlrconref,
 				int32_t *timeoutsec, int32_t *timeoutusec);
+
+
+
+/** @ingroup sqlrclientwrapper
+ *  Sets which delimiters are used to identify bind variables
+ *  in countBindVariables() and validateBinds().  Valid
+ *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
+void	sqlrcon_setBindVariableDelimiters(sqlrcon sqlrconref,
+						const char *delimiters);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns true if question marks (?) are considered to be
+ *  valid bind variable delimiters. */
+int	sqlrcon_getBindVariableDelimiterQuestionMarkSupported(
+						sqlrcon sqlrconref);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns true if colons (:) are considered to be
+ *  valid bind variable delimiters. */
+int	sqlrcon_getBindVariableDelimiterColonSupported(
+						sqlrcon sqlrconref);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns true if at-signs (@) are considered to be
+ *  valid bind variable delimiters. */
+int	sqlrcon_getBindVariableDelimiterAtSignSupported(
+						sqlrcon sqlrconref);
+
+/** @ingroup sqlrclientwrapper
+ *  Returns true if dollar signs ($) are considered to be
+ *  valid bind variable delimiters. */
+int	sqlrcon_getBindVariableDelimiterDollarSignSupported(
+						sqlrcon sqlrconref);
 
 
 

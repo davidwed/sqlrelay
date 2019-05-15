@@ -45,15 +45,15 @@ class NotSupportedError(DatabaseError):
     pass
 
 
-def connect(host, port, socket, user, password, retrytime=0, tries=1, krb='no', krbservice='', krbmech='', krbflags='', tls='no', tlsversion='', tlscert='', tlspassword='', tlsciphers='', tlsvalidate='', tlsca='', tlsdepth=0, db='', debug=0, columnnamecase='mixed', resultsetbuffersize=0, dontgetcolumninfo=0, nullsasnone=1, lazyconnect=1):
-    return SQLRConnection(host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth, db, debug, columnnamecase, resultsetbuffersize, dontgetcolumninfo, nullsasnone, lazyconnect)
+def connect(host, port, socket, user, password, retrytime=0, tries=1, krb='no', krbservice='', krbmech='', krbflags='', tls='no', tlsversion='', tlscert='', tlspassword='', tlsciphers='', tlsvalidate='', tlsca='', tlsdepth=0, db='', debug=0, columnnamecase='mixed', resultsetbuffersize=0, dontgetcolumninfo=0, nullsasnone=1, lazyconnect=1, bindvariabledelimiters="?:@$"):
+    return SQLRConnection(host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth, db, debug, columnnamecase, resultsetbuffersize, dontgetcolumninfo, nullsasnone, lazyconnect, bindvariabledelimiters)
 
 
 class SQLRConnection:
 
     connection=None
 
-    def __init__(self, host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth, db, debug, columnnamecase, resultsetbuffersize, dontgetcolumninfo, nullsasnone, lazyconnect):
+    def __init__(self, host, port, socket, user, password, retrytime, tries, krb, krbservice, krbmech, krbflags, tls, tlsversion, tlscert, tlspassword, tlsciphers, tlsvalidate, tlsca, tlsdepth, db, debug, columnnamecase, resultsetbuffersize, dontgetcolumninfo, nullsasnone, lazyconnect, bindvariabledelimiters):
 
         # create the connection
         self.connection=CSQLRelay.sqlrcon_alloc(host, port, socket, user, password, retrytime, tries)
@@ -80,6 +80,7 @@ class SQLRConnection:
         self.resultsetbuffersize=resultsetbuffersize
         self.dontgetcolumninfo=dontgetcolumninfo
         self.nullsasnone=nullsasnone
+        CSQLRelay.setBindVariableDelimiters(self.connection, bindvariabledelimiters)
 
         # if we're not doing lazy connects then do something
         # lightweight to connect to the server now

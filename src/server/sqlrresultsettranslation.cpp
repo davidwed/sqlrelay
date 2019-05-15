@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -7,13 +7,13 @@ class sqlrresultsettranslationprivate {
 	friend class sqlrresultsettranslation;
 	private:
 		sqlrresultsettranslations	*_rs;
-		xmldomnode			*_parameters;
+		domnode			*_parameters;
 };
 
 sqlrresultsettranslation::sqlrresultsettranslation(
 				sqlrservercontroller *cont,
 				sqlrresultsettranslations *rs,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrresultsettranslationprivate;
 	pvt->_rs=rs;
 	pvt->_parameters=parameters;
@@ -32,11 +32,21 @@ bool sqlrresultsettranslation::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
+const char *sqlrresultsettranslation::getError() {
+	return NULL;
+}
+
 sqlrresultsettranslations *sqlrresultsettranslation::
 					getResultSetTranslations() {
 	return pvt->_rs;
 }
 
-xmldomnode *sqlrresultsettranslation::getParameters() {
+domnode *sqlrresultsettranslation::getParameters() {
 	return pvt->_parameters;
+}
+
+void sqlrresultsettranslation::endTransaction(bool commit) {
+}
+
+void sqlrresultsettranslation::endSession() {
 }

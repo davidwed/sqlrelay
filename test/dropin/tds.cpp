@@ -5,6 +5,7 @@ extern "C" {
 #include <rudiments/charstring.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/environment.h>
+#include <rudiments/stringbuffer.h>
 #include <rudiments/stdio.h>
 #include <config.h>
 

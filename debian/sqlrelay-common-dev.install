@@ -1,0 +1,3 @@
+usr/include/sqlrelay/sqlrutil.h
+usr/include/sqlrelay/private/sqlrutilincludes.h
+usr/lib/*/libsqlrutil.so

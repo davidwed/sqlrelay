@@ -1,4 +1,96 @@
-1.2.1 - updated systemd init file to use SIGINT to kill sqlrelay
+1.6.0 - added begin, commit, rollback events
+	fixed array_init() calls for php-7.3
+	integrated my_bool fix for mysql 8.0.1+
+	mysql sslmode=require/prefer + bad sslca/sslcapath generates warning
+		rather than error now (like the mysql cli)
+	refactored various routines that parse bind variables out of queries
+	added bindvariabledelimiters config option to define supported bind
+		variable delimiters
+	added fakeinputbindvariablesunicodestrings config option
+	added bind variable delimiters config methods to c++ api
+	replay trigger updates
+	updated normalize translation to support queries containing binary data
+	fixed a backslash-escape bug in the normalize translation
+	refactored some sqlrclient api private methods
+	refactored various bind-manipulation/detection methods
+	sqlr-listener creates tmpdir now on start, if it doesn't exist
+		(because this is often in /run, which is often a tmpfs)
+
+1.5.0 - spec file tweaks
+	odbc uses different begin tx queries for different db's now
+	made skipWhitespaceAndComments NULL-safe
+	mysql_stmt_reset() called when needed now, improves api=stmt performance
+	added bulk load framework
+	added bind variable translation framework
+	fixed countBindVariables to ignore @@'s
+	odbc passes length to unicode-conversion routine now, when it can
+	improved conversion of string bind variables to unicode in odbc
+	odbc gets column info after prepare (before execute) in call cases now
+	added error handling to translation frameworks
+	readded conditional mysql_stmt_reset call to recover from
+		"Commands out of sync" errors
+	perl dbi driver allows leading delimiters in bind variable names now
+	fixed bind_inout_param -> bind_param_inout in perldbi docs
+	added moduledata framework
+	added sha1 and sha256 auth modules
+	moved some common protocol module methods into sqlrprotocol
+	tweaked nodejs api to support node 11
+	refactored bind variable translation a bit
+	consolidated bindVariablePrefix and bindFormat
+	fetching a row can return an error now
+	included mysql protocol module and auth modules
+	added per-tx/session memory pools, migrated sqlrtranslations memory
+		pool to per-session pool
+	added controller endTransaction() method
+	added endTransaction/endSession methods to all modules
+	added a replay trigger
+	fixed systemctl enable bug
+	made mapping of 0-scale decimals to longlong's in mysql protocol
+		optional, and disabled by default
+	all tx-queries are intercepted now (including autocommit on/off)
+	fixed mysql varchar type mapping (from char to varstring)
+	mysql front-end sets in-tx/autocommit status flags now
+	bytestring::copy() used now when copying queries between buffers
+	fixed some subtle bind-realated mysql protocol bugs
+	mysql connection quotes database name when selecting the db now
+	added fetch-timings
+	-Wno-error=date-time is used if supported
+	fixed firebird int64 datatype decimal problem
+	fixed firebird blob error
+
+1.4.0 - odbc connection module - trace=yes/no/default now instead of just yes/no
+	pushed detachbeforelogin parameter up to sqlrserverconnection class
+	updated to use rudiments container clearAndDelete...() methods
+	fixed nonsensical uint32_t majorversion>=0 comparison in freetds conn
+	fixed nonsensical uint16_t isnull==-1 comparison in odbc conn
+	fixed return NULL in method that returns false in router conn
+	added manual removal of build directory in nodejs clean target
+	updated nodejs clean target with - in front of node-gyp clean
+	fleshed out the installing-sqlrelay-from-packages doc
+	connect string "timeout" -> "connecttimeout" in docs
+	dbase="mariadb" works now
+	docs have been updated to acknowledge mariadb
+	added configure test to disable ODBC on platforms without SQLULEN
+	updated mysql_config test to add -L/usr/local/lib if it fails, to deal
+		with libiconv, which is located there, on newer freebsd
+	updated mysql drop-in test not to test def_length if def is NULL
+	added NODEGYPPYTHON flag that can be set manually on netbsd
+	fixed gcj/gcj3/kaffe detection on older systems
+	fixed some buggy static module declarations/assignments
+	sqlr-import can import csv files now
+	sqlr-export correctly escapes double-quotes now
+	query translations apply to the select-database query now
+	added api=stmt/classic option to mysql connection module
+	added a per-cursor bindpool
+	added unicode=yes/no opiton to odbc connection module
+	fixed a bug that could cause stale column metadata to a protocol
+		module between prepare and execute when binds are being faked
+	added stalecursors logger
+	added send()/recv() passthrough operations
+	made various bind-related buffers per-cursor
+	added pattern option to query notification event
+
+1.3.0 - updated systemd init file to use SIGINT to kill sqlrelay
 	fixed several "ocurred" -> "occurred" typo's
 	client debug hides password now
 	passing -disable-crash-handler to the scaler passes it to connections
@@ -14,7 +106,7 @@
 	added \r and ; as possible after-variable characters for fake-binds
 	added -short, -connection-detail, and -query options to sqlr-status
 	added initial support for queries that return multiple result sets
-	... various odbc connection module improvements ...
+	lots of various odbc connection module improvements
 	added parse failed event
 	updated normalize translation to remove spaces around :=
 	added noop query framework
@@ -40,10 +132,21 @@
 	added freetds parameter to freetds connection module that sets the
 		FREETDS/FREETDSCONF environment variables
 	fixed some subtle SQLGetData bugs in ODBC driver
-	updated sqlrserver API to support getting the table of a column
+	updated sqlrserver API to support getting the column tables
+	updated odbc, mysql, postgresql, and sqlite connection modules to
+		return column table names
 	updated sqlrclient protocol to send/receive it
 	added result set header translation framework
-	added servercursor option to odbc connection module
+	added getcolumntables option to odbc connection module
+	ODBC SQLTables switches to the specified catalog before getting the
+		table list now (and switches back)
+	fixed ODBC wchar truncation problem
+	fixed "show columns odbc" bug in mysql connection module
+	mysql connection module uses MYSQL_FIELD.name_length if it can now
+	fixed char * -> const char * bug in python API
+	added support for openjdk-11 to configure script
+	removed some unnecessary parentheses in mysql drop-in library that
+		gcc 8.1.1 doesn't like
 
 1.2.0 - fixed subtle error in sqlr-import that could cause it to skip
 		empty/NULL fields

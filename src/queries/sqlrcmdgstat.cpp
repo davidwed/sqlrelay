@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -16,7 +16,7 @@ class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdgstat : public sqlrquery {
 	public:
 			sqlrquery_sqlrcmdgstat(sqlrservercontroller *cont,
 							sqlrqueries *qs,
-							xmldomnode *parameters);
+							domnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
 		sqlrquerycursor	*newCursor(sqlrserverconnection *conn,
 							uint16_t id);
@@ -36,7 +36,7 @@ class sqlrquery_sqlrcmdgstatcursor : public sqlrquerycursor {
 			sqlrquery_sqlrcmdgstatcursor(
 						sqlrserverconnection *sqlrcon,
 						sqlrquery *q,
-						xmldomnode *parameters,
+						domnode *parameters,
 						uint16_t id);
 
 		bool		executeQuery(const char *query,
@@ -48,7 +48,7 @@ class sqlrquery_sqlrcmdgstatcursor : public sqlrquerycursor {
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -68,7 +68,7 @@ class sqlrquery_sqlrcmdgstatcursor : public sqlrquerycursor {
 
 sqlrquery_sqlrcmdgstat::sqlrquery_sqlrcmdgstat(sqlrservercontroller *cont,
 						sqlrqueries *qs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 						sqlrquery(cont,qs,parameters) {
 	debugFunction();
 }
@@ -89,7 +89,7 @@ sqlrquerycursor *sqlrquery_sqlrcmdgstat::newCursor(
 sqlrquery_sqlrcmdgstatcursor::sqlrquery_sqlrcmdgstatcursor(
 					sqlrserverconnection *sqlrcon,
 					sqlrquery *q,
-					xmldomnode *parameters,
+					domnode *parameters,
 					uint16_t id) :
 				sqlrquerycursor(sqlrcon,q,parameters,id) {
 	rowcount=0;
@@ -279,7 +279,8 @@ bool sqlrquery_sqlrcmdgstatcursor::noRowsToReturn() {
 	return false;
 }
 
-bool sqlrquery_sqlrcmdgstatcursor::fetchRow() {
+bool sqlrquery_sqlrcmdgstatcursor::fetchRow(bool *error) {
+	*error=false;
 	if (currentrow<rowcount) {
 		currentrow++;
 		return true;
@@ -315,7 +316,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrquery *new_sqlrquery_sqlrcmdgstat(
 						sqlrservercontroller *cont,
 						sqlrqueries *qs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrquery_sqlrcmdgstat(cont,qs,parameters);
 	}
 }

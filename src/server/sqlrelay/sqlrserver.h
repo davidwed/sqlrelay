@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #ifndef SQLRSERVER_H
@@ -39,7 +39,11 @@ enum sqlrquerytype_t {
 	SQLRQUERYTYPE_ETC,
 	SQLRQUERYTYPE_BEGIN,
 	SQLRQUERYTYPE_COMMIT,
-	SQLRQUERYTYPE_ROLLBACK
+	SQLRQUERYTYPE_ROLLBACK,
+	SQLRQUERYTYPE_AUTOCOMMIT_ON,
+	SQLRQUERYTYPE_AUTOCOMMIT_OFF,
+	SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON,
+	SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF
 };
 
 enum sqlrquerystatus_t {
@@ -56,7 +60,11 @@ enum sqlrserverbindvartype_t {
 	SQLRSERVERBINDVARTYPE_BLOB,
 	SQLRSERVERBINDVARTYPE_CLOB,
 	SQLRSERVERBINDVARTYPE_CURSOR,
-	SQLRSERVERBINDVARTYPE_DATE
+	SQLRSERVERBINDVARTYPE_DATE,
+
+	// special types for bulk load
+	SQLRSERVERBINDVARTYPE_DELIMITER,
+	SQLRSERVERBINDVARTYPE_NEWLINE
 };
 
 enum sqlrserverlistformat_t {
@@ -95,6 +103,7 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 		uint32_t		valuesize;
 		uint32_t		resultvaluesize;
 		sqlrserverbindvartype_t	type;
+		unsigned char		nativetype;
 		int16_t			isnull;
 };
 
@@ -120,8 +129,13 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// environment
 		const char	*getId();
+		const char	*getConnectionId();
 		const char	*getLogDir();
 		const char	*getDebugDir();
+
+		// passthrough
+		bool	send(unsigned char *data, size_t size);
+		bool	recv(unsigned char **data, size_t *size);
 
 		// re-login to the database
 		void	reLogIn();
@@ -161,14 +175,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// bind variables
 		const char	*bindFormat();
-		char		bindVariablePrefix();
 		int16_t		nonNullBindValue();
 		int16_t		nullBindValue();
 		bool		bindValueIsNull(int16_t isnull);
 		void		setFakeInputBinds(bool fake);
 		bool		getFakeInputBinds();
-		memorypool	*getBindPool();
-		memorypool	*getBindMappingsPool();
 
 		// fetch info
 		void		setFetchAtOnce(uint32_t fao);
@@ -199,8 +210,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void	setNeedsCommitOrRollback(bool needed);
 		bool	getNeedsCommitOrRollback();
 		bool	setIsolationLevel(const char *isolevel);
-		void	setInterceptTransactionQueries(bool itxqb);
-		bool	getInterceptTransactionQueries();
 		void	setFakeTransactionBlocks(bool ftb);
 		bool	getFakeTransactionBlocks();
 		void	setFakeAutoCommit(bool fac);
@@ -323,6 +332,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							const char *info);
 		void	raiseParseFailureEvent(sqlrservercursor *cursor,
 							const char *info);
+		void	raiseCursorOpenEvent(sqlrservercursor *cursor);
+		void	raiseCursorCloseEvent(sqlrservercursor *cursor);
+		void	raiseBeginTransactionEvent();
+		void	raiseCommitEvent();
+		void	raiseRollbackEvent();
 
 
 		// cursor api...
@@ -391,6 +405,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool	fetchFromBindCursor(sqlrservercursor *cursor);
 		bool	nextResultSet(sqlrservercursor *cursor,
 						bool *nextresultsetavailable);
+
+		// bind variables
+		memorypool	*getBindPool(sqlrservercursor *cursor);
+		memorypool	*getBindMappingsPool(sqlrservercursor *cursor);
+		namevaluepairs	*getBindMappings(sqlrservercursor *cursor);
 
 		// input bind variables
 		void		setFakeInputBindsForThisQuery(
@@ -491,7 +510,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *wild);
 		bool		getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
-						const char *procedure,
+						const char *proc,
 						const char *wild);
 		bool		getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
@@ -510,7 +529,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getKeyAndIndexListQuery(const char *table,
 							bool wild);
 		const char	*getProcedureBindAndColumnListQuery(
-							const char *procedure,
+							const char *proc,
 							bool wild);
 		const char	*getTypeInfoListQuery(const char *type,
 							bool wild);
@@ -581,8 +600,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							uint32_t col);
 		void		getColumnNameList(sqlrservercursor *cursor,
 							stringbuffer *output);
-		void		translateResultSetHeader(
-						sqlrservercursor *cursor);
+		bool		handleResultSetHeader(sqlrservercursor *cursor);
 
 		// result set navigation
 		bool		knowsRowCount(sqlrservercursor *cursor);
@@ -590,17 +608,19 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		knowsAffectedRows(sqlrservercursor *cursor);
 		uint64_t	affectedRows(sqlrservercursor *cursor);
 		bool		noRowsToReturn(sqlrservercursor *cursor);
-		bool		skipRow(sqlrservercursor *cursor);
+		bool		skipRow(sqlrservercursor *cursor,
+							bool *error);
 		bool		skipRows(sqlrservercursor *cursor,
-							uint64_t rows);
-		bool		fetchRow(sqlrservercursor *cursor);
+							uint64_t rows,
+							bool *error);
+		bool		fetchRow(sqlrservercursor *cursor, bool *error);
 		void		nextRow(sqlrservercursor *cursor);
 		uint64_t	getTotalRowsFetched(sqlrservercursor *cursor);
 		void		closeResultSet(sqlrservercursor *cursor);
 		void		closeAllResultSets();
 
 		// fields
-		void	getField(sqlrservercursor *cursor,
+		bool	getField(sqlrservercursor *cursor,
 						uint32_t col,
 						const char **field,
 						uint64_t *fieldlength,
@@ -618,17 +638,17 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						uint64_t *charsread);
 		void	closeLobField(sqlrservercursor *cursor,
 						uint32_t col);
-		void	reformatField(sqlrservercursor *cursor,
+		bool	reformatField(sqlrservercursor *cursor,
 						const char *name,
 						uint32_t index,
 						const char **field,
 						uint64_t *fieldlength);
-		void	reformatRow(sqlrservercursor *cursor,
+		bool	reformatRow(sqlrservercursor *cursor,
 						uint32_t colcount,
 						const char * const *names,
 						const char ***fields,
 						uint64_t **fieldlengths);
-		void	reformatDateTimes(sqlrservercursor *cursor,
+		bool	reformatDateTimes(sqlrservercursor *cursor,
 						uint32_t index,
 						const char *field,
 						uint64_t fieldlength,
@@ -670,10 +690,59 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setLiveConnection(sqlrservercursor *cursor,
 							bool liveconnection);
 
+		// bulk load
+		bool	bulkLoadBegin(const char *id,
+					const char *errorfieldtable,
+					const char *errorrowtable,
+					uint64_t maxerrorcount,
+					bool droperrortables);
+		bool	bulkLoadCheckpoint(const char *id);
+		bool	bulkLoadPrepareQuery(const char *query,
+						uint64_t querylen,
+						uint16_t inbindcount,
+						sqlrserverbindvar *inbinds);
+		bool	bulkLoadCreateErrorTables(const char *query,
+						uint64_t querylen,
+						const char *errorfieldtable,
+						const char *errorrowtable);
+		bool	bulkLoadCreateErrorTable1(sqlrservercursor *cursor,
+						const char *query,
+						uint64_t querylen,
+						const char *errorfieldtable);
+		bool	bulkLoadCreateErrorTable2(sqlrservercursor *cursor,
+						const char *query,
+						uint64_t querylen,
+						const char *errorrowtable);
+		bool	bulkLoadJoin(const char *id);
+		bool	bulkLoadInputBind(const unsigned char *data,
+						uint64_t datalen);
+		void	bulkLoadParseInsert(const char *query,
+						uint64_t querylen,
+						char **table,
+                                                linkedlist<char *> *cols,
+                                                linkedlist<char *> *binds);
+		bool	bulkLoadExecuteQuery();
+		void	bulkLoadInitBinds();
+		void	bulkLoadBindRow(const unsigned char *data,
+						uint64_t datalen);
+		void	bulkLoadError();
+		bool	bulkLoadStoreError(int64_t errorcode,
+						const char *error,
+						uint32_t errorlength,
+						const char *errorfieldtable,
+						const char *errorrowtable);
+		bool	bulkLoadEnd();
+		bool	bulkLoadDropErrorTables(const char *errorfieldtable,
+						const char *errorrowtable);
+
 		// cursor state
 		void			setState(sqlrservercursor *cursor,
 						sqlrcursorstate_t state);
 		sqlrcursorstate_t	getState(sqlrservercursor *cursor);
+
+		// memory pools
+		memorypool	*getPerTransactionMemoryPool();
+		memorypool	*getPerSessionMemoryPool();
 
 		// query parser
 		sqlrparser	*getParser();
@@ -690,6 +759,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// shared memory
 		sqlrshm		*getShm();
+
+		// module data
+		sqlrmoduledata	*getModuleData(const char *id);
 
 		// utilities
 		bool		skipComment(const char **ptr,
@@ -713,7 +785,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*asciiToHex(unsigned char ch);
 		const char	*asciiToOctal(unsigned char ch);
 
-		uint16_t	countBindVariables(const char *query);
+		bool		hasBindVariables(const char *query,
+							uint32_t querylen);
+		uint16_t	countBindVariables(const char *query,
+							uint32_t querylen);
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);
@@ -746,6 +821,9 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 
 		virtual bool	supportsAuthOnDatabase();
 		virtual	void	handleConnectString();
+
+		virtual	bool	send(unsigned char *data, size_t size);
+		virtual	bool	recv(unsigned char **data, size_t *size);
 
 		virtual	bool	logIn(const char **error,
 					const char **warning)=0;
@@ -872,7 +950,6 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual	const char	*bindFormat();
 		virtual	int16_t		nonNullBindValue();
 		virtual	int16_t		nullBindValue();
-		virtual char		bindVariablePrefix();
 		virtual bool		bindValueIsNull(int16_t isnull);
 
 		virtual const char	*tempTableDropPrefix();
@@ -1093,8 +1170,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 							const char *data,
 							uint32_t size);
 		virtual	bool	noRowsToReturn();
-		virtual	bool	skipRow();
-		virtual	bool	fetchRow();
+		virtual	bool	skipRow(bool *error);
+		virtual	bool	fetchRow(bool *error);
 		virtual	void	nextRow();
 		virtual void	getField(uint32_t col,
 						const char **field,
@@ -1115,10 +1192,16 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual void	encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize);
 
+		virtual bool	columnInfoIsValidAfterPrepare();
+
 
 		uint16_t	getId();
 
 		bool		fakeInputBinds();
+
+		memorypool	*getBindPool();
+		memorypool	*getBindMappingsPool();
+		namevaluepairs	*getBindMappings();
 
 		void		setInputBindCount(uint16_t inbindcount);
 		uint16_t	getInputBindCount();
@@ -1166,6 +1249,18 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		uint64_t	getQueryEndSec();
 		uint64_t	getQueryEndUSec();
 
+		void		setFetchStart(uint64_t sec, uint64_t usec);
+		uint64_t	getFetchStartSec();
+		uint64_t	getFetchStartUSec();
+
+		void		setFetchEnd(uint64_t sec, uint64_t usec);
+		uint64_t	getFetchEndSec();
+		uint64_t	getFetchEndUSec();
+
+		void		resetFetchTime();
+		void		tallyFetchTime();
+		uint64_t	getFetchUSec();
+
 		void			setState(sqlrcursorstate_t state);
 		sqlrcursorstate_t	getState();
 
@@ -1192,6 +1287,9 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 						const char *createtemp);
 		const char	*skipCreateTempTableClause(
 						const char *query);
+
+		void	setColumnInfoIsValid(bool valid);
+		bool	getColumnInfoIsValid();
 
 		void	setQueryHasBeenPreProcessed(bool preprocessed);
 		bool	getQueryHasBeenPreProcessed();
@@ -1239,6 +1337,25 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 					uint16_t **columnisautoincrements,
 					const char ***columntables,
 					uint16_t **columntablelengths);
+		const char	*getColumnNameFromBuffer(uint32_t col);
+		uint16_t	getColumnNameLengthFromBuffer(uint32_t col);
+		uint16_t	getColumnTypeFromBuffer(uint32_t col);
+		const char	*getColumnTypeNameFromBuffer(uint32_t col);
+		uint16_t	getColumnTypeNameLengthFromBuffer(uint32_t col);
+		uint32_t	getColumnLengthFromBuffer(uint32_t col);
+		uint32_t	getColumnPrecisionFromBuffer(uint32_t col);
+		uint32_t	getColumnScaleFromBuffer(uint32_t col);
+		uint16_t	getColumnIsNullableFromBuffer(uint32_t col);
+		uint16_t	getColumnIsPrimaryKeyFromBuffer(uint32_t col);
+		uint16_t	getColumnIsUniqueFromBuffer(uint32_t col);
+		uint16_t	getColumnIsPartOfKeyFromBuffer(uint32_t col);
+		uint16_t	getColumnIsUnsignedFromBuffer(uint32_t col);
+		uint16_t	getColumnIsZeroFilledFromBuffer(uint32_t col);
+		uint16_t	getColumnIsBinaryFromBuffer(uint32_t col);
+		uint16_t	getColumnIsAutoIncrementFromBuffer(
+							uint32_t col);
+		const char	*getColumnTableFromBuffer(uint32_t col);
+		uint16_t	getColumnTableLengthFromBuffer(uint32_t col);
 
 		void	allocateFieldPointers(uint32_t colcount);
 		void	deallocateFieldPointers();
@@ -1255,9 +1372,11 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		void		setExecuteRpc(bool executerpc);
 		bool		getExecuteRpc();
 
-		void	setResultSetHeaderHasBeenTranslated(
-					bool resultsetheaderhasbeentranslated);
-		bool	getResultSetHeaderHasBeenTranslated();
+		void		setResultSetHeaderHasBeenHandled(
+					bool resultsetheaderhasbeenhandled);
+		bool		getResultSetHeaderHasBeenHandled();
+
+		unsigned char	*getModuleData();
 
 		sqlrserverconnection	*conn;
 
@@ -1275,7 +1394,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 	public:
 		sqlrprotocol(sqlrservercontroller *cont,
 					sqlrprotocols *ps,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrprotocol();
 
 		virtual clientsessionexitstatus_t
@@ -1284,9 +1403,170 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		virtual gsscontext	*getGSSContext();
 		virtual tlscontext	*getTLSContext();
 
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrprotocols		*getProtocols();
-		xmldomnode		*getParameters();
+		domnode			*getParameters();
+
+		void	setProtocolIsBigEndian(bool bigendian);
+		bool	getProtocolIsBigEndian();
+
+		void	read(const unsigned char *rp,
+					char *value,
+					const unsigned char **rpout);
+		bool	read(const unsigned char *rp,
+					char *value,
+					const char *name,
+					char expected,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					unsigned char *value,
+					const unsigned char **rpout);
+		bool	read(const unsigned char *rp,
+					unsigned char *value,
+					const char *name,
+					unsigned char expected,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					char *value,
+					size_t length,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					unsigned char *value,
+					size_t length,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					char16_t *value,
+					size_t length,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					float *value,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					double *value,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout);
+		void	readLE(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout);
+		bool	readLE(const unsigned char *rp,
+					uint16_t *value,
+					const char *name,
+					uint16_t expected,
+					const unsigned char **rpout);
+		void	readBE(const unsigned char *rp,
+					uint16_t *value,
+					const unsigned char **rpout);
+		bool	readBE(const unsigned char *rp,
+					uint16_t *value,
+					const char *name,
+					uint16_t expected,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout);
+		void	readLE(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout);
+		bool	readLE(const unsigned char *rp,
+					uint32_t *value,
+					const char *name,
+					uint32_t expected,
+					const unsigned char **rpout);
+		void	readBE(const unsigned char *rp,
+					uint32_t *value,
+					const unsigned char **rpout);
+		bool	readBE(const unsigned char *rp,
+					uint32_t *value,
+					const char *name,
+					uint32_t expected,
+					const unsigned char **rpout);
+		void	read(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout);
+		void	readLE(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout);
+		bool	readLE(const unsigned char *rp,
+					uint64_t *value,
+					const char *name,
+					uint64_t expected,
+					const unsigned char **rpout);
+		void	readBE(const unsigned char *rp,
+					uint64_t *value,
+					const unsigned char **rpout);
+		bool	readBE(const unsigned char *rp,
+					uint64_t *value,
+					const char *name,
+					uint64_t expected,
+					const unsigned char **rpout);
+		uint64_t	readLenEncInt(const unsigned char *in,
+						const unsigned char **out);
+
+		void	write(bytebuffer *buffer, char value);
+		void	write(bytebuffer *buffer, unsigned char value);
+		void	write(bytebuffer *buffer, const char *value);
+		void	write(bytebuffer *buffer, const char *value,
+								size_t length);
+		void	write(bytebuffer *buffer, const unsigned char *value,
+								size_t length);
+		void	write(bytebuffer *buffer, char16_t *str, size_t length);
+		void	write(bytebuffer *buffer, float value);
+		void	write(bytebuffer *buffer, double value);
+		void	write(bytebuffer *buffer, uint16_t value);
+		void	writeLE(bytebuffer *buffer, uint16_t value);
+		void	writeBE(bytebuffer *buffer, uint16_t value);
+		void	write(bytebuffer *buffer, uint32_t value);
+		void	writeLE(bytebuffer *buffer, uint32_t value);
+		void	writeBE(bytebuffer *buffer, uint32_t value);
+		void	write(bytebuffer *buffer, uint64_t value);
+		void	writeLE(bytebuffer *buffer, uint64_t value);
+		void	writeBE(bytebuffer *buffer, uint64_t value);
+		void	writeLenEncInt(bytebuffer *buffer,
+						uint64_t value);
+		void	writeLenEncStr(bytebuffer *buffer,
+						const char *string);
+		void	writeLenEncStr(bytebuffer *buffer,
+						const char *string,
+						uint64_t length);
+		void	writeTriplet(bytebuffer *buffer, uint32_t value);
+
+		uint16_t	toHost(uint16_t value);
+		uint32_t	toHost(uint32_t value);
+		uint64_t	toHost(uint64_t value);
+		uint16_t	leToHost(uint16_t value);
+		uint32_t	leToHost(uint32_t value);
+		uint64_t	leToHost(uint64_t value);
+		uint16_t	beToHost(uint16_t value);
+		uint32_t	beToHost(uint32_t value);
+		uint64_t	beToHost(uint64_t value);
+
+		uint16_t	hostTo(uint16_t value);
+		uint32_t	hostTo(uint32_t value);
+		uint64_t	hostTo(uint64_t value);
+		uint16_t	hostToLE(uint16_t value);
+		uint32_t	hostToLE(uint32_t value);
+		uint64_t	hostToLE(uint64_t value);
+		uint16_t	hostToBE(uint16_t value);
+		uint32_t	hostToBE(uint32_t value);
+		uint64_t	hostToBE(uint64_t value);
+
+		bool	getDebug();
+
+		void	debugStart(const char *title);
+		void	debugStart(const char *title, uint16_t indent);
+		void	debugEnd();
+		void	debugEnd(uint16_t indent);
+
+		void	debugHexDump(const unsigned char *data,
+						uint64_t size);
+		void	debugHexDump(const unsigned char *data,
+						uint64_t size,
+						uint16_t indent);
 
 		sqlrservercontroller	*cont;
 
@@ -1298,9 +1578,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocols {
 		sqlrprotocols(sqlrservercontroller *cont);
 		~sqlrprotocols();
 
-		bool		load(xmldomnode *listeners);
+		bool		load(domnode *listeners);
 		sqlrprotocol	*getProtocol(uint16_t port);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrprotocols.h>
@@ -1356,19 +1637,40 @@ class SQLRSERVER_DLLSPEC sqlrtlscredentials : public sqlrcredentials {
 	#include <sqlrelay/private/sqlrtlscredentials.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlrmysqlcredentials : public sqlrcredentials {
+	public:
+		sqlrmysqlcredentials();
+		~sqlrmysqlcredentials();
+		const char	*getType();
+
+		void	setUser(const char *user);
+		void	setPassword(const char *password);
+		void	setPasswordLength(uint64_t passwordlength);
+		void	setMethod(const char *method);
+		void	setExtra(const char *extra);
+
+		const char	*getUser();
+		const char	*getPassword();
+		uint64_t	getPasswordLength();
+		const char	*getMethod();
+		const char	*getExtra();
+
+	#include <sqlrelay/private/sqlrmysqlcredentials.h>
+};
+
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 		sqlrauth(sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrauth();
 		virtual	const char	*auth(sqlrcredentials *cred);
 
 	protected:
 		sqlrauths	*getAuths();
 		sqlrpwdencs	*getPasswordEncryptions();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 
 		sqlrservercontroller	*cont;
 
@@ -1380,7 +1682,7 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		sqlrauths(sqlrservercontroller *cont);
 		~sqlrauths();
 
-		bool		load(xmldomnode *parameters,
+		bool		load(domnode *parameters,
 					sqlrpwdencs *sqlrpe);
 		const char	*auth(sqlrcredentials *cred);
 
@@ -1391,7 +1693,7 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 
 class SQLRSERVER_DLLSPEC sqlrpwdenc {
 	public:
-		sqlrpwdenc(xmldomnode *parameters, bool debug);
+		sqlrpwdenc(domnode *parameters, bool debug);
 		virtual	~sqlrpwdenc();
 		virtual const char	*getId();
 		virtual	bool	oneWay();
@@ -1399,7 +1701,7 @@ class SQLRSERVER_DLLSPEC sqlrpwdenc {
 		virtual	char	*decrypt(const char *value);
 
 	protected:
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 		bool		getDebug();
 
 	#include <sqlrelay/private/sqlrpwdenc.h>
@@ -1410,7 +1712,7 @@ class SQLRSERVER_DLLSPEC sqlrpwdencs {
 		sqlrpwdencs(sqlrpaths *sqlrpth, bool debug);
 		~sqlrpwdencs();
 
-		bool		load(xmldomnode *parameters);
+		bool		load(domnode *parameters);
 		sqlrpwdenc	*getPasswordEncryptionById(const char *id);
 
 	#include <sqlrelay/private/sqlrpwdencs.h>
@@ -1434,6 +1736,11 @@ enum sqlrevent_t {
 	SQLREVENT_INTEGRITY_VIOLATION,
 	SQLREVENT_TRANSLATION_FAILURE,
 	SQLREVENT_PARSE_FAILURE,
+	SQLREVENT_CURSOR_OPEN,
+	SQLREVENT_CURSOR_CLOSE,
+	SQLREVENT_BEGIN_TRANSACTION,
+	SQLREVENT_COMMIT,
+	SQLREVENT_ROLLBACK,
 	SQLREVENT_INVALID_EVENT
 };
 
@@ -1446,7 +1753,7 @@ enum sqlrlogger_loglevel_t {
 
 class SQLRSERVER_DLLSPEC sqlrlogger {
 	public:
-		sqlrlogger(sqlrloggers *ls, xmldomnode *parameters);
+		sqlrlogger(sqlrloggers *ls, domnode *parameters);
 		virtual	~sqlrlogger();
 
 		virtual bool	init(sqlrlistener *sqlrl,
@@ -1457,9 +1764,12 @@ class SQLRSERVER_DLLSPEC sqlrlogger {
 					sqlrlogger_loglevel_t level,
 					sqlrevent_t event,
 					const char *info);
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrloggers	*getLoggers();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrlogger.h>
 };
@@ -1469,7 +1779,7 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 		sqlrloggers(sqlrpaths *sqlrpth);
 		~sqlrloggers();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		void	init(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon);
 		void	run(sqlrlistener *sqlrl,
@@ -1479,6 +1789,7 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 				sqlrevent_t event,
 				const char *info);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 		const char	*logLevel(sqlrlogger_loglevel_t level);
@@ -1493,7 +1804,7 @@ class SQLRSERVER_DLLSPEC sqlrloggers {
 class SQLRSERVER_DLLSPEC sqlrnotification {
 	public:
 		sqlrnotification(sqlrnotifications *ns,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrnotification();
 
 		virtual bool	run(sqlrlistener *sqlrl,
@@ -1501,10 +1812,12 @@ class SQLRSERVER_DLLSPEC sqlrnotification {
 					sqlrservercursor *sqlrcur,
 					sqlrevent_t event,
 					const char *info);
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrnotifications	*getNotifications();
-		xmldomnode		*getParameters();
+		domnode		*getParameters();
 
 	#include <sqlrelay/private/sqlrnotification.h>
 };
@@ -1514,13 +1827,14 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 		sqlrnotifications(sqlrpaths *sqlrpth);
 		~sqlrnotifications();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		void	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrevent_t event,
 					const char *info);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 		const char	*eventType(sqlrevent_t event);
@@ -1536,7 +1850,7 @@ class SQLRSERVER_DLLSPEC sqlrnotifications {
 						sqlrevent_t event,
 						const char *info);
 
-		xmldomnode	*getTransport(const char *transportid);
+		domnode	*getTransport(const char *transportid);
 
 	#include <sqlrelay/private/sqlrnotifications.h>
 };
@@ -1575,7 +1889,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 	public:
 		sqlrschedule(sqlrservercontroller *cont,
 					sqlrschedules *ss,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrschedule();
 
 		virtual bool	allowed(sqlrserverconnection *sqlrcon,
@@ -1593,7 +1907,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule {
 
 	protected:
 		sqlrschedules	*getSchedules();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrschedule.h>
 };
@@ -1603,7 +1917,7 @@ class SQLRSERVER_DLLSPEC sqlrschedules {
 		sqlrschedules(sqlrservercontroller *cont);
 		~sqlrschedules();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		bool	allowed(sqlrserverconnection *sqlrcon,
 						const char *user);
 
@@ -1616,7 +1930,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 	public:
 		sqlrrouter(sqlrservercontroller *cont,
 				sqlrrouters *rs,
-				xmldomnode *parameters);
+				domnode *parameters);
 		virtual	~sqlrrouter();
 
 		virtual const char *route(sqlrserverconnection *sqlrcon,
@@ -1626,9 +1940,12 @@ class SQLRSERVER_DLLSPEC sqlrrouter {
 
 		virtual	bool	routeEntireSession();
 
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrrouters	*getRouters();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 		const char 	**getConnectionIds();
 		sqlrconnection 	**getConnections();
 		uint16_t	getConnectionCount();
@@ -1644,13 +1961,14 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 				uint16_t connectioncount);
 		~sqlrrouters();
 
-		bool		load(xmldomnode *parameters);
+		bool		load(domnode *parameters);
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						const char **err,
 						int64_t *errn);
 		bool	routeEntireSession();
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 		const char	*getCurrentConnectionId();
@@ -1664,7 +1982,7 @@ class SQLRSERVER_DLLSPEC sqlrrouters {
 class SQLRSERVER_DLLSPEC sqlrparser {
 	public:
 		sqlrparser(sqlrservercontroller *cont,
-				xmldomnode *parameters);
+				domnode *parameters);
 		virtual	~sqlrparser();
 
 		virtual	bool	parse(const char *query);
@@ -1673,18 +1991,18 @@ class SQLRSERVER_DLLSPEC sqlrparser {
 		virtual	xmldom	*detachTree();
 
 		virtual	bool	write(stringbuffer *output);
-		virtual	bool	write(xmldomnode *node,
+		virtual	bool	write(domnode *node,
 					stringbuffer *output,
 					bool omitsiblings);
-		virtual	bool	write(xmldomnode *node, 
+		virtual	bool	write(domnode *node, 
 					stringbuffer *output);
 
-		virtual void	getMetaData(xmldomnode *node);
+		virtual void	getMetaData(domnode *node);
 
 		virtual void	endSession();
 
 	protected:
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrparser.h>
 };
@@ -1693,7 +2011,7 @@ class SQLRSERVER_DLLSPEC sqlrdirective {
 	public:
 		sqlrdirective(sqlrservercontroller *cont,
 					sqlrdirectives *sqlts,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrdirective();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1701,7 +2019,7 @@ class SQLRSERVER_DLLSPEC sqlrdirective {
 					const char *query);
 	protected:
 		sqlrdirectives	*getDirectives();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 		bool		getDirective(const char *line,
 						const char **directivestart,
 						uint32_t *directivelength,
@@ -1715,7 +2033,7 @@ class SQLRSERVER_DLLSPEC sqlrdirectives {
 		sqlrdirectives(sqlrservercontroller *cont);
 		~sqlrdirectives();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query);
@@ -1727,7 +2045,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 	public:
 		sqlrtranslation(sqlrservercontroller *cont,
 					sqlrtranslations *sqlts,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrtranslation();
 
 		virtual bool	usesTree();
@@ -1735,15 +2053,21 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery);
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					xmldom *querytree);
 
+		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrtranslations	*getTranslations();
-		xmldomnode		*getParameters();
+		domnode			*getParameters();
 
 	#include <sqlrelay/private/sqlrtranslation.h>
 };
@@ -1753,13 +2077,17 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 		sqlrtranslations(sqlrservercontroller *cont);
 		~sqlrtranslations();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						sqlrparser *sqlrp,
 						const char *query,
+						uint32_t querylength,
 						stringbuffer *translatedquery);
 
+		const char	*getError();
+
+		void	endTransaction(bool commit);
 		void	endSession();
 
 		void	setReplacementTableName(const char *database,
@@ -1788,7 +2116,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 						const char *schema,
 						const char *index);
 
-		memorypool	*getMemoryPool();
+		bool	getUseOriginalOnError();
 
 	#include <sqlrelay/private/sqlrtranslations.h>
 };
@@ -1797,7 +2125,7 @@ class SQLRSERVER_DLLSPEC sqlrfilter {
 	public:
 		sqlrfilter(sqlrservercontroller *cont,
 					sqlrfilters *fs,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrfilter();
 
 		virtual bool	usesTree();
@@ -1812,9 +2140,12 @@ class SQLRSERVER_DLLSPEC sqlrfilter {
 
 		virtual void	getError(const char **err, int64_t *errn);
 
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrfilters	*getFilters();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrfilter.h>
 };
@@ -1824,7 +2155,7 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 		sqlrfilters(sqlrservercontroller *cont);
 		~sqlrfilters();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		bool	runBeforeFilters(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						sqlrparser *sqlrp,
@@ -1838,16 +2169,56 @@ class SQLRSERVER_DLLSPEC sqlrfilters {
 						const char **err,
 						int64_t *errn);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrfilters.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrbindvariabletranslation {
+	public:
+		sqlrbindvariabletranslation(sqlrservercontroller *cont,
+					sqlrbindvariabletranslations *bvts,
+					domnode *parameters);
+		virtual	~sqlrbindvariabletranslation();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur);
+
+		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
+	protected:
+		sqlrbindvariabletranslations	*getBindVariableTranslations();
+		domnode				*getParameters();
+
+	#include <sqlrelay/private/sqlrbindvariabletranslation.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrbindvariabletranslations {
+	public:
+		sqlrbindvariabletranslations(sqlrservercontroller *cont);
+		~sqlrbindvariabletranslations();
+
+		bool	load(domnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur);
+
+		const char	*getError();
+
+		void	endTransaction(bool commit);
+		void	endSession();
+
+	#include <sqlrelay/private/sqlrbindvariabletranslations.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 	public:
 		sqlrresultsettranslation(sqlrservercontroller *cont,
 						sqlrresultsettranslations *rs,
-						xmldomnode *parameters);
+						domnode *parameters);
 		virtual	~sqlrresultsettranslation();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1857,9 +2228,14 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation {
 					const char **field,
 					uint64_t *fieldlength);
 
+		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrresultsettranslations	*getResultSetTranslations();
-		xmldomnode			*getParameters();
+		domnode			*getParameters();
 
 	#include <sqlrelay/private/sqlrresultsettranslation.h>
 };
@@ -1869,7 +2245,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 		sqlrresultsettranslations(sqlrservercontroller *cont);
 		~sqlrresultsettranslations();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						const char *fieldname,
@@ -1877,6 +2253,9 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslations {
 						const char **field,
 						uint64_t *fieldlength);
 
+		const char	*getError();
+
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsettranslations.h>
@@ -1887,7 +2266,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 		sqlrresultsetrowtranslation(
 					sqlrservercontroller *cont,
 					sqlrresultsetrowtranslations *rs,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrresultsetrowtranslation();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1897,9 +2276,14 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslation {
 					const char ***fields,
 					uint64_t **fieldlengths);
 
+		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrresultsetrowtranslations	*getResultSetRowTranslations();
-		xmldomnode			*getParameters();
+		domnode			*getParameters();
 
 	#include <sqlrelay/private/sqlrresultsetrowtranslation.h>
 };
@@ -1909,7 +2293,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 		sqlrresultsetrowtranslations(sqlrservercontroller *cont);
 		~sqlrresultsetrowtranslations();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						uint32_t colcount,
@@ -1917,9 +2301,90 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowtranslations {
 						const char ***fields,
 						uint64_t **fieldlengths);
 
+		const char	*getError();
+
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsetrowtranslations.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation {
+	public:
+		sqlrresultsetrowblocktranslation(
+					sqlrservercontroller *cont,
+					sqlrresultsetrowblocktranslations *rs,
+					domnode *parameters);
+		virtual	~sqlrresultsetrowblocktranslation();
+
+		virtual bool	setRow(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames,
+					const char * const *fields,
+					uint64_t *fieldlengths,
+					bool *blobs,
+					bool *nulls);
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames);
+		virtual bool	getRow(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char ***fields,
+					uint64_t **fieldlengths,
+					bool **blobs,
+					bool **nulls);
+
+		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
+	protected:
+		sqlrresultsetrowblocktranslations
+					*getResultSetRowBlockTranslations();
+		domnode			*getParameters();
+
+	#include <sqlrelay/private/sqlrresultsetrowblocktranslation.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslations {
+	public:
+		sqlrresultsetrowblocktranslations(sqlrservercontroller *cont);
+		~sqlrresultsetrowblocktranslations();
+
+		bool	load(domnode *parameters);
+
+		uint64_t	getRowBlockSize();
+
+		bool	setRow(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames,
+					const char * const *fields,
+					uint64_t *fieldlengths,
+					bool *blobs,
+					bool *nulls);
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char * const *fieldnames);
+		bool	getRow(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					uint32_t colcount,
+					const char ***fields,
+					uint64_t **fieldlengths,
+					bool **blobs,
+					bool **nulls);
+
+		const char	*getError();
+
+		void	endTransaction(bool commit);
+		void	endSession();
+
+	#include <sqlrelay/private/sqlrresultsetrowblocktranslations.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation {
@@ -1927,7 +2392,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation {
 		sqlrresultsetheadertranslation(
 					sqlrservercontroller *cont,
 					sqlrresultsetheadertranslations *rs,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrresultsetheadertranslation();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
@@ -1952,10 +2417,15 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation {
 					const char ***columntables,
 					uint16_t **columntablelengths);
 
+		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrresultsetheadertranslations
 					*getResultSetHeaderTranslations();
-		xmldomnode		*getParameters();
+		domnode		*getParameters();
 
 	#include <sqlrelay/private/sqlrresultsetheadertranslation.h>
 };
@@ -1965,7 +2435,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslations {
 		sqlrresultsetheadertranslations(sqlrservercontroller *cont);
 		~sqlrresultsetheadertranslations();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
@@ -1987,6 +2457,10 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslations {
 					uint16_t **columnisautoincrements,
 					const char ***columntables,
 					uint16_t **columntablelengths);
+
+		const char	*getError();
+
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsetheadertranslations.h>
@@ -1996,18 +2470,20 @@ class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
 		sqlrtrigger(sqlrservercontroller *cont,
 					sqlrtriggers *ts,
-					xmldomnode *parameters);
+					domnode *parameters);
 		virtual	~sqlrtrigger();
 
 		virtual bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					xmldom *querytree,
 					bool before,
-					bool success);
+					bool *success);
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
 
 	protected:
 		sqlrtriggers	*getTriggers();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrtrigger.h>
 };
@@ -2017,15 +2493,14 @@ class SQLRSERVER_DLLSPEC sqlrtriggers {
 		sqlrtriggers(sqlrservercontroller *cont);
 		~sqlrtriggers();
 
-		bool	load(xmldomnode *parameters);
+		bool	load(domnode *parameters);
 		void	runBeforeTriggers(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
-						xmldom *querytree);
+						sqlrservercursor *sqlrcur);
 		void	runAfterTriggers(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
-						xmldom *querytree,
-						bool success);
+						bool *success);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrtriggers.h>
@@ -2035,7 +2510,7 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 	public:
 		sqlrquery(sqlrservercontroller *cont,
 				sqlrqueries *qs,
-				xmldomnode *parameters);
+				domnode *parameters);
 		virtual	~sqlrquery();
 
 		virtual bool	match(const char *querystring,
@@ -2044,9 +2519,12 @@ class SQLRSERVER_DLLSPEC sqlrquery {
 						sqlrserverconnection *sqlrcon,
 						uint16_t id);
 
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	protected:
 		sqlrqueries	*getQueries();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrquery.h>
 };
@@ -2055,7 +2533,7 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 	public:
 		sqlrquerycursor(sqlrserverconnection *conn,
 					sqlrquery *q,
-					xmldomnode *parameters,
+					domnode *parameters,
 					uint16_t id);
 		virtual	~sqlrquerycursor();
 		virtual sqlrquerytype_t	queryType(const char *query,
@@ -2065,7 +2543,7 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 	protected:
 		sqlrquery	*getQuery();
 		sqlrqueries	*getQueries();
-		xmldomnode	*getParameters();
+		domnode	*getParameters();
 
 	#include <sqlrelay/private/sqlrquerycursor.h>
 };
@@ -2075,15 +2553,41 @@ class SQLRSERVER_DLLSPEC sqlrqueries {
 		sqlrqueries(sqlrservercontroller *cont);
 		~sqlrqueries();
 
-		bool		load(xmldomnode *parameters);
+		bool		load(domnode *parameters);
 		sqlrquerycursor	*match(sqlrserverconnection *sqlrcon,
 						const char *querystring,
 						uint32_t querylength,
 						uint16_t id);
 
+		void	endTransaction(bool commit);
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrqueries.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrmoduledata {
+	public:
+		sqlrmoduledata(domnode *parameters);
+		virtual	~sqlrmoduledata();
+
+		const char	*getModuleType();
+		const char	*getId();
+
+		domnode		*getParameters();
+
+	#include <sqlrelay/private/sqlrmoduledata.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrmoduledatas {
+	public:
+		sqlrmoduledatas(sqlrservercontroller *cont);
+		~sqlrmoduledatas();
+
+		bool	load(domnode *parameters);
+
+		sqlrmoduledata	*getModuleData(const char *id);
+
+	#include <sqlrelay/private/sqlrmoduledatas.h>
 };
 
 #endif

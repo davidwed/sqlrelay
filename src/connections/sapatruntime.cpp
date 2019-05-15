@@ -1,7 +1,8 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <rudiments/dynamiclib.h>
+#include <rudiments/file.h>
 
 
 // types...
@@ -359,6 +360,7 @@ CS_RETCODE (*cs_dt_crack)(
 #define CS_READ_ONLY		(CS_INT)0x0002
 
 #define CS_EXTERNAL_ERR		(CS_RETCODE)(-200)
+#define CS_ROW_FAIL		(CS_RETCODE)(CS_EXTERNAL_ERR - 3)
 #define CS_END_RESULTS		(CS_RETCODE)(CS_EXTERNAL_ERR - 5)
 
 #define CS_FORCE_CLOSE		(CS_INT)301

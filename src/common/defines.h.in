@@ -1,4 +1,4 @@
-// Copyright (c) 2000-2001  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 
 #ifndef DEFINES_H
@@ -69,7 +69,6 @@
 #define DONT_NEED_NEW_CURSOR 1
 
 #define END_COLUMN_INFO 0
-#define END_RESULT_SET 3
 
 #define ACTUAL_ROWS 1
 #define NO_ACTUAL_ROWS 0
@@ -89,6 +88,8 @@
 #define INTEGER_DATA 5
 #define DOUBLE_DATA 6
 #define DATE_DATA 7
+#define END_RESULT_SET 8
+#define FETCH_ERROR 9
 
 #define END_BIND_VARS 8 
 
@@ -164,5 +165,46 @@
 #define SQLR_ERROR_NOTIMPLEMENTED 900019
 #define SQLR_ERROR_NOTIMPLEMENTED_STRING \
 	"Not implemented."
+#define SQLR_ERROR_BULKLOADBEGIN_IPC_FILE 900020
+#define SQLR_ERROR_BULKLOADBEGIN_IPC_FILE_STRING \
+	"Bulk load begin failed - failed to create ipc file."
+#define SQLR_ERROR_BULKLOADBEGIN_IPC_KEY 900021
+#define SQLR_ERROR_BULKLOADBEGIN_IPC_KEY_STRING \
+	"Bulk load begin failed - failed to generate ipc key."
+#define SQLR_ERROR_BULKLOADBEGIN_SHM 900022
+#define SQLR_ERROR_BULKLOADBEGIN_SHM_STRING \
+	"Bulk load begin failed - failed to create shm segment."
+#define SQLR_ERROR_BULKLOADPREPARE_INVALID_QUERY 900023
+#define SQLR_ERROR_BULKLOADPREPARE_INVALID_QUERY_STRING \
+	"Bulk load prepare failed - invalid query."
+#define SQLR_ERROR_BULKLOADJOIN_IPC_KEY 900023
+#define SQLR_ERROR_BULKLOADJOIN_IPC_KEY_STRING \
+	"Bulk load join failed - failed to generate ipc key."
+#define SQLR_ERROR_BULKLOADJOIN_SHM 900024
+#define SQLR_ERROR_BULKLOADJOIN_SHM_STRING \
+	"Bulk load join failed - failed to attach to shm segment."
+#define SQLR_ERROR_BULKLOADEXECUTE_OPEN_CURSOR 900025
+#define SQLR_ERROR_BULKLOADEXECUTE_OPEN_CURSOR_STRING \
+	"Bulk load execute failed - failed to open cursor."
+#define SQLR_ERROR_BULKLOADEXECUTE_TOO_MANY_ERRORS 900026
+#define SQLR_ERROR_BULKLOADEXECUTE_TOO_MANY_ERRORS_STRING \
+	"Bulk load execute failed - too many errors."
+#define SQLR_ERROR_QUERYTRANSLATION 900027
+#define SQLR_ERROR_BINDVARIABLETRANSLATION 900028
+#define SQLR_ERROR_RESULTSETHEADERTRANSLATION 900029
+#define SQLR_ERROR_RESULTSETTRANSLATION 900030
+#define SQLR_ERROR_RESULTSETROWTRANSLATION 900031
+#define SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION 900032
+
+
+#define SQLR_ERROR_ROLLBACK_NOT_IN_TX_BLOCK 999997
+#define SQLR_ERROR_ROLLBACK_NOT_IN_TX_BLOCK_STRING \
+	"rollback while not in transaction block"
+#define SQLR_ERROR_COMMIT_NOT_IN_TX_BLOCK 999998
+#define SQLR_ERROR_COMMIT_NOT_IN_TX_BLOCK_STRING \
+	"commit while not in transaction block"
+#define SQLR_ERROR_BEGIN_IN_TX_BLOCK 999999
+#define SQLR_ERROR_BEGIN_IN_TX_BLOCK_STRING \
+	"begin while in transaction block"
 
 #endif

@@ -1,0 +1,3 @@
+usr/share/perl/*/DBD/SQLRelay.pm
+usr/lib/*/perl/*/auto/DBD
+usr/share/man/man3/DBD::SQLRelay.*

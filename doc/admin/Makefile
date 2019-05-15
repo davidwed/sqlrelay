@@ -6,6 +6,7 @@ include ../../config.mk
 
 SRCS = configguide.wt \
 	configreference.wt \
+	configure_mysql_frontend.wt \
 	installing.wt \
 	installingpkg.wt \
 	oraclentier.wt \
@@ -17,6 +18,7 @@ SRCS = configguide.wt \
 
 OBJS = configguide.html \
 	configreference.html \
+	configure_mysql_frontend.html \
 	installing.html \
 	installingpkg.html \
 	oraclentier.html \

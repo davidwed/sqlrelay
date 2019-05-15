@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2011  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -21,6 +21,7 @@ class sqlrresultsetrowtranslationplugin {
 	public:
 		sqlrresultsetrowtranslation	*rstr;
 		dynamiclib			*dl;
+		const char			*module;
 };
 
 class sqlrresultsetrowtranslationsprivate {
@@ -31,6 +32,8 @@ class sqlrresultsetrowtranslationsprivate {
 		bool		_debug;
 
 		singlylinkedlist< sqlrresultsetrowtranslationplugin * >	_tlist;
+
+		const char	*_error;
 };
 
 sqlrresultsetrowtranslations::sqlrresultsetrowtranslations(
@@ -39,6 +42,7 @@ sqlrresultsetrowtranslations::sqlrresultsetrowtranslations(
 	pvt=new sqlrresultsetrowtranslationsprivate;
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugResultSetRowTranslations();
+	pvt->_error=NULL;
 }
 
 sqlrresultsetrowtranslations::~sqlrresultsetrowtranslations() {
@@ -47,13 +51,13 @@ sqlrresultsetrowtranslations::~sqlrresultsetrowtranslations() {
 	delete pvt;
 }
 
-bool sqlrresultsetrowtranslations::load(xmldomnode *parameters) {
+bool sqlrresultsetrowtranslations::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the result set translation list
-	for (xmldomnode *resultsetrowtranslation=parameters->getFirstTagChild();
+	for (domnode *resultsetrowtranslation=parameters->getFirstTagChild();
 			!resultsetrowtranslation->isNullNode();
 			resultsetrowtranslation=
 				resultsetrowtranslation->getNextTagSibling()) {
@@ -79,7 +83,7 @@ void sqlrresultsetrowtranslations::unload() {
 }
 
 void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
-				xmldomnode *resultsetrowtranslation) {
+				domnode *resultsetrowtranslation) {
 	debugFunction();
 
 	// ignore non-resultsetrowtranslations
@@ -128,11 +132,11 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 	sqlrresultsetrowtranslation *(*newResultSetTranslation)
 					(sqlrservercontroller *,
 					sqlrresultsetrowtranslations *,
-					xmldomnode *)=
+					domnode *)=
 		(sqlrresultsetrowtranslation *(*)
 					(sqlrservercontroller *,
 					sqlrresultsetrowtranslations *,
-					xmldomnode *))
+					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
 		stdoutput.printf("failed to load "
@@ -166,6 +170,7 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 				new sqlrresultsetrowtranslationplugin;
 	sqlrrstp->rstr=rstr;
 	sqlrrstp->dl=dl;
+	sqlrrstp->module=module;
 	pvt->_tlist.append(sqlrrstp);
 }
 
@@ -177,23 +182,42 @@ bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
 						uint64_t **fieldlengths) {
 	debugFunction();
 
+	pvt->_error=NULL;
+
 	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		if (pvt->_debug) {
-			stdoutput.printf(
-				"\nrunning result set row translation...\n\n");
+			stdoutput.printf("\nrunning translation:  %s...\n\n",
+						node->getValue()->module);
 		}
 
 		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
 						colcount,fieldnames,
 						fields,fieldlengths)) {
+			pvt->_error=node->getValue()->rstr->getError();
 			return false;
 		}
 	}
 	return true;
 }
 
+const char *sqlrresultsetrowtranslations::getError() {
+	return pvt->_error;
+}
+
+void sqlrresultsetrowtranslations::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->rstr->endTransaction(commit);
+	}
+}
+
 void sqlrresultsetrowtranslations::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->rstr->endSession();
+	}
 }

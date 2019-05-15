@@ -1,4 +1,4 @@
-// Copyright (c) 2017  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -32,14 +32,15 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 	public:
 			sqlrtranslation_patterns(sqlrservercontroller *cont,
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrtranslation_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery);
 	private:
-		void	buildPatternsTree(xmldomnode *root,
+		void	buildPatternsTree(domnode *root,
 						pattern_t **p,
 						uint32_t *pcount,
 						bool toplevel);
@@ -66,7 +67,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 
 sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 						sqlrtranslations *sqlts,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrtranslation(cont,sqlts,parameters) {
 	debugFunction();
 
@@ -84,14 +85,14 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 	buildPatternsTree(parameters,&patterns,&patterncount,true);
 }
 
-void sqlrtranslation_patterns::buildPatternsTree(xmldomnode *root,
+void sqlrtranslation_patterns::buildPatternsTree(domnode *root,
 						pattern_t **p,
 						uint32_t *pcount,
 						bool toplevel) {
 
 	// count patterns
 	(*pcount)=0;
-	for (xmldomnode *c=root->getFirstTagChild("pattern");
+	for (domnode *c=root->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
 		(*pcount)++;
 	}
@@ -103,7 +104,7 @@ void sqlrtranslation_patterns::buildPatternsTree(xmldomnode *root,
 	// build pattern list
 	*p=new pattern_t[*pcount];
 	uint32_t	i=0;
-	for (xmldomnode *c=root->getFirstTagChild("pattern");
+	for (domnode *c=root->getFirstTagChild("pattern");
 			!c->isNullNode(); c=c->getNextTagSibling("pattern")) {
 
 		const char	*match=c->getAttributeValue("match");
@@ -122,14 +123,14 @@ void sqlrtranslation_patterns::buildPatternsTree(xmldomnode *root,
 		if (!charstring::compareIgnoringCase(type,"regex")) {
 			if (!charstring::isNullOrEmpty(match)) {
 				(*p)[i].matchre=new regularexpression();
-				(*p)[i].matchre->compile(match);
+				(*p)[i].matchre->setPattern(match);
 				(*p)[i].matchre->study();
 				(*p)[i].matchglobal=
 					!charstring::isNo(
 					c->getAttributeValue("global"));
 			} else if (!charstring::isNullOrEmpty(from)) {
 				(*p)[i].fromre=new regularexpression();
-				(*p)[i].fromre->compile(from);
+				(*p)[i].fromre->setPattern(from);
 				(*p)[i].fromre->study();
 				(*p)[i].replaceglobal=
 					!charstring::isNo(
@@ -178,10 +179,12 @@ sqlrtranslation_patterns::~sqlrtranslation_patterns() {
 bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery) {
 	debugFunction();
 
 	if (!enabled) {
+		translatedquery->append(query);
 		return true;
 	}
 
@@ -413,7 +416,7 @@ extern "C" {
 			*new_sqlrtranslation_patterns(
 						sqlrservercontroller *cont,
 						sqlrtranslations *ts,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrtranslation_patterns(cont,ts,parameters);
 	}
 }

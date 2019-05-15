@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 	private:
@@ -18,7 +18,7 @@
 		void	setStartTime();
 		bool	listenOnClientSockets();
 		bool	listenOnClientSocket(uint16_t protocolindex,
-							xmldomnode *ln);
+							domnode *ln);
 		bool	listenOnHandoffSocket(const char *id);
 		bool	listenOnDeregistrationSocket(const char *id);
 		bool	listenOnFixupSocket(const char *id);

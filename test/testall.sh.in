@@ -28,6 +28,18 @@ do
 			continue
 		fi
 
+	# for the mysqlprotocol test, verify that we support the mysql
+	elif ( test "$DB" = "mysqlprotocol" )
+	then
+		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_mysql.so 2> /dev/null`" )
+		then
+			echo "skipping $DB..."
+			echo
+			echo "================================================================================"
+			echo
+			continue
+		fi
+
 	# for other tests, verify that we support the database
 	else
 		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_$DB.so 2> /dev/null`" )
@@ -59,20 +71,20 @@ do
 	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
 	then
-		$PREFIX/bin/sqlr-start -id routermaster -backtrace `pwd`
+		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id routermaster -backtrace `pwd`
 		sleep 2
 
-		$PREFIX/bin/sqlr-start -id routerslave -backtrace `pwd`
+		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id routerslave -backtrace `pwd`
 		sleep 2
 	fi
 
 	# start the instance
-	$PREFIX/bin/sqlr-start -id ${DB}test -backtrace `pwd`
+	$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id ${DB}test -backtrace `pwd`
 	sleep 2
 
 	# make sure that the instance is up
 	PING=""
-	for attempts in 1 2 3 4 5 6 7 8 9 10
+	for attempts in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 	do
 		echo
 		echo "pinging $DB..."
@@ -82,6 +94,13 @@ do
 		elif ( test "$DB" = "extensions" )
 		then
 			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping 2>&1`
+		elif ( test "$DB" = "mysqlprotocol" )
+		then
+			PING="0: Couldn't connect to the listener."
+			if ( test -n "`netstat -an 2> /dev/null | grep LISTEN | grep 3306`" )
+			then
+				PING="The database is up."
+			fi
 		else
 			PING=`$PREFIX/bin/sqlrsh -id ${DB}test -command ping 2>&1`
 		fi
@@ -93,12 +112,7 @@ do
 
 		if ( test "$PING" = "0: Couldn't connect to the listener." )
 		then
-			if ( test "$DB" = "db2" )
-			then
-				sleep 5
-			else
-				sleep 2
-			fi
+			sleep 5
 		else
 			break
 		fi
@@ -118,7 +132,13 @@ do
 		echo
 		echo "success..."
 		echo
-		./test.sh $DB
+
+		if ( test "$DB" = "mysqlprotocol" )
+		then
+			./dropin/mysql
+		else
+			./test.sh $DB
+		fi
 	else
 		echo
 		echo "failed to start ${DB}test"
@@ -141,12 +161,12 @@ do
 	if ( test "$DB" = "router" )
 	then
 		sleep 2
-		$PREFIX/bin/sqlr-stop -id routermaster
+		$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id routermaster
 		sleep 2
-		$PREFIX/bin/sqlr-stop -id routerslave
+		$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id routerslave
 	fi
 	sleep 2
-	$PREFIX/bin/sqlr-stop -id ${DB}test
+	$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id ${DB}test
 	sleep 2
 
 	echo

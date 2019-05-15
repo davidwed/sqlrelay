@@ -1,9 +1,9 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
@@ -53,13 +53,13 @@ sqlrrouters::~sqlrrouters() {
 	delete pvt;
 }
 
-bool sqlrrouters::load(xmldomnode *parameters) {
+bool sqlrrouters::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the router list
-	for (xmldomnode *router=parameters->getFirstTagChild();
+	for (domnode *router=parameters->getFirstTagChild();
 			!router->isNullNode();
 			router=router->getNextTagSibling()) {
 
@@ -82,7 +82,7 @@ void sqlrrouters::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrrouters::loadRouter(xmldomnode *router) {
+void sqlrrouters::loadRouter(domnode *router) {
 
 	debugFunction();
 
@@ -128,10 +128,10 @@ void sqlrrouters::loadRouter(xmldomnode *router) {
 	functionname.append("new_sqlrrouter_")->append(module);
 	sqlrrouter *(*newRouter)(sqlrservercontroller *,
 					sqlrrouters *,
-					xmldomnode *)=
+					domnode *)=
 			(sqlrrouter *(*)(sqlrservercontroller *,
 						sqlrrouters *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newRouter) {
 		stdoutput.printf("failed to load router: %s\n",module);
@@ -190,8 +190,20 @@ bool sqlrrouters::routeEntireSession() {
 	return true;
 }
 
+void sqlrrouters::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->r->endTransaction(commit);
+	}
+}
+
 void sqlrrouters::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->r->endSession();
+	}
 }
 
 void sqlrrouters::setCurrentConnectionId(const char *connid) {

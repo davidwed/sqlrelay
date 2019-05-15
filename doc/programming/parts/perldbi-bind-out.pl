@@ -9,9 +9,9 @@ my $sth=$dbh->prepare("begin; :1='hello'; :2=1; :3=5.5; end;");
 my $hello;
 my $integer;
 my $float;
-$sth->bind_inout_param(1,\$hello,10);
-$sth->bind_inout_param(2,\$integer,10);
-$sth->bind_inout_param(3,\$float,10);
+$sth->bind_param_inout(1,\$hello,10);
+$sth->bind_param_inout(2,\$integer,10);
+$sth->bind_param_inout(3,\$float,10);
 
 $sth->execute();
 

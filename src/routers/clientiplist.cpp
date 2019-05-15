@@ -1,14 +1,13 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#include <rudiments/linkedlist.h>
 
 class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 	public:
 			sqlrrouter_clientiplist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrrouter_clientiplist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -31,7 +30,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientiplist : public sqlrrouter {
 
 sqlrrouter_clientiplist::sqlrrouter_clientiplist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 	clientips=NULL;
 
@@ -48,7 +47,7 @@ sqlrrouter_clientiplist::sqlrrouter_clientiplist(sqlrservercontroller *cont,
 	// this is faster than running through the xml over and over
 	clientipcount=parameters->getChildCount();
 	clientips=new const char *[clientipcount];
-	xmldomnode *clientip=parameters->getFirstTagChild("client");
+	domnode *clientip=parameters->getFirstTagChild("client");
 	for (uint64_t i=0; i<clientipcount; i++) {
 		clientips[i]=clientip->getAttributeValue("ip");
 		clientip=clientip->getNextTagSibling("client");
@@ -216,7 +215,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_clientiplist(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrrouter_clientiplist(cont,rs,parameters);
 	}
 }

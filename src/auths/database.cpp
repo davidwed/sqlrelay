@@ -1,4 +1,4 @@
-// Copyright (c) 2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -10,7 +10,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 			sqlrauth_database(sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
-						xmldomnode *parameters);
+						domnode *parameters);
 		const char	*auth(sqlrcredentials *cred);
 	private:
 		bool		first;
@@ -21,7 +21,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 sqlrauth_database::sqlrauth_database(sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
-					xmldomnode *parameters) :
+					domnode *parameters) :
 					sqlrauth(cont,auths,sqlrpe,parameters) {
 	first=true;
 }
@@ -76,7 +76,7 @@ extern "C" {
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrauth_database(cont,auths,sqlrpe,parameters);
 	}
 }

@@ -47,14 +47,29 @@ all-directives:
 all-translations:
 	cd translations $(AND) $(MAKE) all
 
+all-bindvariabletranslations:
+	cd bindvariabletranslations $(AND) $(MAKE) all
+
 all-resultsettranslations:
 	cd resultsettranslations $(AND) $(MAKE) all
 
 all-resultsetrowtranslations:
 	cd resultsetrowtranslations $(AND) $(MAKE) all
 
+all-resultsetrowblocktranslations:
+	cd resultsetrowblocktranslations $(AND) $(MAKE) all
+
+all-resultsetheadertranslations:
+	cd resultsetheadertranslations $(AND) $(MAKE) all
+
 all-filters:
 	cd filters $(AND) $(MAKE) all
+
+all-triggers:
+	cd triggers $(AND) $(MAKE) all
+
+all-moduledatas:
+	cd moduledatas $(AND) $(MAKE) all
 
 all-connections:
 	cd connections $(AND) $(MAKE) all
@@ -77,9 +92,14 @@ clean:
 	cd auths $(AND) $(MAKE) clean
 	cd directives $(AND) $(MAKE) clean
 	cd translations $(AND) $(MAKE) clean
+	cd bindvariabletranslations $(AND) $(MAKE) clean
 	cd resultsettranslations $(AND) $(MAKE) clean
 	cd resultsetrowtranslations $(AND) $(MAKE) clean
+	cd resultsetrowblocktranslations $(AND) $(MAKE) clean
+	cd resultsetheadertranslations $(AND) $(MAKE) clean
 	cd filters $(AND) $(MAKE) clean
+	cd triggers $(AND) $(MAKE) clean
+	cd moduledatas $(AND) $(MAKE) clean
 	cd connections $(AND) $(MAKE) clean
 	cd server $(AND) $(MAKE) clean
 	cd cmdline $(AND) $(MAKE) clean
@@ -131,14 +151,29 @@ install-directives:
 install-translations:
 	cd translations $(AND) $(MAKE) install
 
+install-bindvariabletranslations:
+	cd bindvariabletranslations $(AND) $(MAKE) install
+
 install-resultsettranslations:
 	cd resultsettranslations $(AND) $(MAKE) install
 
 install-resultsetrowtranslations:
 	cd resultsetrowtranslations $(AND) $(MAKE) install
 
+install-resultsetrowblocktranslations:
+	cd resultsetrowblocktranslations $(AND) $(MAKE) install
+
+install-resultsetheadertranslations:
+	cd resultsetheadertranslations $(AND) $(MAKE) install
+
 install-filters:
 	cd filters $(AND) $(MAKE) install
+
+install-triggers:
+	cd triggers $(AND) $(MAKE) install
+
+install-moduledatas:
+	cd moduledatas $(AND) $(MAKE) install
 
 install-connections:
 	cd connections $(AND) $(MAKE) install
@@ -161,9 +196,14 @@ uninstall:
 	cd auths $(AND) $(MAKE) uninstall
 	cd directives $(AND) $(MAKE) uninstall
 	cd translations $(AND) $(MAKE) uninstall
+	cd bindvariabletranslations $(AND) $(MAKE) uninstall
 	cd resultsettranslations $(AND) $(MAKE) uninstall
 	cd resultsetrowtranslations $(AND) $(MAKE) uninstall
+	cd resultsetrowblocktranslations $(AND) $(MAKE) uninstall
+	cd resultsetheadertranslations $(AND) $(MAKE) uninstall
 	cd filters $(AND) $(MAKE) uninstall
+	cd triggers $(AND) $(MAKE) uninstall
+	cd moduledatas $(AND) $(MAKE) uninstall
 	cd connections $(AND) $(MAKE) uninstall
 	cd server $(AND) $(MAKE) uninstall
 	cd cmdline $(AND) $(MAKE) uninstall

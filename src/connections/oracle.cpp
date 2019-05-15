@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -6,6 +6,7 @@
 #include <rudiments/bytestring.h>
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
+#include <rudiments/file.h>
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
@@ -322,8 +323,8 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 		uint16_t	getColumnIsNullable(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
 		bool		noRowsToReturn();
-		bool		skipRow();
-		bool		fetchRow();
+		bool		skipRow(bool *error);
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -2446,7 +2447,7 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 
 	#ifdef HAVE_ORACLE_8i
 	setCreateTempTablePattern("(create|CREATE)[ 	\n\r]+(global|GLOBAL)[ 	\n\r]+(temporary|TEMPORARY)[ 	\n\r]+(table|TABLE)[ 	\n\r]+");
-	preserverows.compile("(on|ON)[ 	\n\r]+(commit|COMMIT)[ 	\n\r]+(preserve|PRESERVE)[ 	\n\r]+(rows|ROWS)");
+	preserverows.setPattern("(on|ON)[ 	\n\r]+(commit|COMMIT)[ 	\n\r]+(preserve|PRESERVE)[ 	\n\r]+(rows|ROWS)");
 	preserverows.study();
 	#endif
 }
@@ -3940,15 +3941,18 @@ bool oraclecursor::noRowsToReturn() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
 
-bool oraclecursor::skipRow() {
-	if (fetchRow()) {
+bool oraclecursor::skipRow(bool *error) {
+	if (fetchRow(error)) {
 		row++;
 		return true;
 	}
 	return false;
 }
 
-bool oraclecursor::fetchRow() {
+bool oraclecursor::fetchRow(bool *error) {
+
+	*error=false;
+
 	if (row==conn->cont->getFetchAtOnce()) {
 		row=0;
 	}

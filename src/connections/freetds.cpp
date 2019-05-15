@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -174,8 +174,8 @@ class SQLRSERVER_DLLSPEC freetdscursor : public sqlrservercursor {
 						const char *data,
 						uint32_t size);
 		bool		noRowsToReturn();
-		bool		skipRow();
-		bool		fetchRow();
+		bool		skipRow(bool *error);
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -260,7 +260,6 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		const char	*getNoopQuery();
 		const char	*bindFormat();
 		const char	*beginTransactionQuery();
-		char	bindVariablePrefix();
 		const char	*tempTableDropPrefix();
 		bool		commit();
 		bool		rollback();
@@ -863,10 +862,6 @@ const char *freetdsconnection::beginTransactionQuery() {
 	return "BEGIN TRANSACTION";
 }
 
-char freetdsconnection::bindVariablePrefix() {
-	return '@';
-}
-
 freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 						sqlrservercursor(conn,id) {
 
@@ -914,7 +909,7 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 
 	// Affected row count is generally supported in versions >= 0.53 but
 	// appears to be broken in 0.61.
-	knowsaffectedrows=(majorversion>=0 ||
+	knowsaffectedrows=(majorversion>0 ||
 				(minorversion>=53 && minorversion!=61));
 
 	prepared=false;
@@ -1060,10 +1055,11 @@ bool freetdscursor::open() {
 
 			const char	*q=query[i];
 			int32_t		len=charstring::length(q);
+			bool		error=false;
 
 			if (prepareQuery(q,len) &&
 					executeQuery(q,len) &&
-					fetchRow()) {
+					fetchRow(&error)) {
 				freetdsconn->dbversion=
 					charstring::duplicate(data[index[i]]);
 			}
@@ -1659,6 +1655,9 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 		// allocate buffers and limit column count if necessary
 		uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
 		if (!maxcolumncount) {
+			// see note in discardResults for
+			// why we're doing this here
+			deallocateResultSetBuffers();
 			allocateResultSetBuffers(ncols);
 		} else if ((uint32_t)ncols>maxcolumncount) {
 			ncols=maxcolumncount;
@@ -1977,15 +1976,19 @@ bool freetdscursor::noRowsToReturn() {
 			resultstype!=CS_COMPUTE_RESULT);
 }
 
-bool freetdscursor::skipRow() {
-	if (fetchRow()) {
+bool freetdscursor::skipRow(bool *error) {
+	if (fetchRow(error)) {
 		row++;
 		return true;
 	}
 	return false;
 }
 
-bool freetdscursor::fetchRow() {
+bool freetdscursor::fetchRow(bool *error) {
+
+	*error=false;
+	// FIXME: set error if an error occurs
+
 	if (row==(CS_INT)conn->cont->getFetchAtOnce()) {
 		row=0;
 	}
@@ -2021,6 +2024,9 @@ bool freetdscursor::fetchRow() {
 		}
 
 		if (fetchresult!=CS_SUCCEED || !rowsread) {
+			if (fetchresult==CS_FAIL || fetchresult==CS_ROW_FAIL) {
+				*error=true;
+			}
 			return false;
 		}
 		maxrow=rowsread;
@@ -2089,9 +2095,17 @@ void freetdscursor::discardResults() {
 		}
 	}
 
-	if (!conn->cont->getMaxColumnCount()) {
+	// Deallocating the result set buffers here causes a problem, but only
+	// in the freetds connection.
+	// When using freetds, we have to call discardResults() when we hit
+	// the end of the result set (see note in fetchRow()) but if we
+	// deallocate the result set buffers at that point, then subsequent
+	// attempts to fetch column info, will result in a reference-after-free.
+	// So, unlike the in the sybase/sap connection code we defer the
+	// deallocate until right before the next allocate, in prepareQuery().
+	/*if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
-	}
+	}*/
 }
 
 

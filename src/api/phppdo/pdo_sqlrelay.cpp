@@ -1,4 +1,4 @@
-// Copyright (c) 2013 David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 // Some versions of PHP 7.0 need INT64_MIN/INT64_MAX to be defined but
@@ -10,13 +10,17 @@
 #endif
 
 #include <config.h>
-#define NEED_IS_BIT_TYPE_CHAR
-#define NEED_IS_BOOL_TYPE_CHAR
-#define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_FLOAT_TYPE_CHAR
-#define NEED_IS_BLOB_TYPE_CHAR
+#define NEED_IS_BIT_TYPE_CHAR 1
+#define NEED_IS_BOOL_TYPE_CHAR 1
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_FLOAT_TYPE_CHAR 1
+#define NEED_IS_BLOB_TYPE_CHAR 1
 #include <datatypes.h>
 #include <defines.h>
+#define NEED_IS_BIND_DELIMITER 1
+#define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_AFTER_BIND_VARIABLE 1
+#include <bindvariables.h>
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/stringbuffer.h>
 #include <rudiments/singlylinkedlist.h>
@@ -142,12 +146,14 @@ struct sqlrstatement {
 	stringbuffer			subvarquery;
 	singlylinkedlist< char * >	subvarstrings;
 	bool				fwdonly;
+	bool				emulatepreparesunicodestrings;
 };
 
 struct sqlrdbhandle {
 	sqlrconnection	*sqlrcon;
 	bool		translatebindsonserver;
 	bool		usesubvars;
+	bool		emulatepreparesunicodestrings;
 	int64_t		resultsetbuffersize;
 	bool		dontgetcolumninfo;
 	bool		nullsasnulls;
@@ -351,7 +357,11 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
 	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
 		if (isFloatTypeChar(type)) {
+			#ifdef HAVE_PHP_PDO_PARAM_ZVAL
 			stmt->columns[colno].param_type=PDO_PARAM_ZVAL;
+			#else
+			stmt->columns[colno].param_type=PDO_PARAM_STR;
+			#endif
 		} else {
 			stmt->columns[colno].param_type=PDO_PARAM_INT;
 		}
@@ -384,6 +394,7 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 	switch (stmt->columns[colno].param_type) {
 		// NOTE: Currently, we only use ZVAL's for doubles,
 		// but we could do an additional float check here.
+		#ifdef HAVE_PHP_PDO_PARAM_ZVAL
 		case PDO_PARAM_ZVAL:
 			// handle NULLs
 			if (!sqlrcur->getFieldLength(
@@ -398,6 +409,7 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 			*ptr=(char *)&sqlrstmt->zvalfield;
 			*len=sizeof(sqlrstmt->zvalfield);
 			return 1;
+		#endif
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
 			// handle NULLs/empty-strings
@@ -469,7 +481,11 @@ static int sqlrcursorSubstitutionPreExec(sqlrstatement *sqlrstmt,
 		case PDO_PARAM_STR:
 			CONVERT_TO_STRING(param->parameter);
 			str=new char[SLEN(param->parameter)+3];
-			charstring::copy(str,"'");
+			if (sqlrstmt->emulatepreparesunicodestrings) {
+				charstring::copy(str,"N'");
+			} else {
+				charstring::copy(str,"'");
+			}
 			charstring::append(str,
 					SVAL(param->parameter),
 					SLEN(param->parameter));
@@ -482,7 +498,11 @@ static int sqlrcursorSubstitutionPreExec(sqlrstatement *sqlrstmt,
 			if (TYPE(param->parameter)==IS_STRING) {
 				CONVERT_TO_STRING(param->parameter);
 				str=new char[SLEN(param->parameter)+3];
-				charstring::copy(str,"'");
+				if (sqlrstmt->emulatepreparesunicodestrings) {
+					charstring::copy(str,"N'");
+				} else {
+					charstring::copy(str,"'");
+				}
 				charstring::append(str,
 						SVAL(param->parameter),
 						SLEN(param->parameter));
@@ -921,48 +941,118 @@ static struct pdo_stmt_methods sqlrcursorMethods={
 
 static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
-	delete (sqlrconnection *)sqlrdbh->sqlrcon;
+	delete sqlrdbh->sqlrcon;
 	dbh->is_closed=1;
 	return 0;
 }
 
-static void sqlrconnectionRewriteQuery(const char *query,
+static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
+						const char *query,
 						uint32_t querylen,
 						stringbuffer *newquery) {
-	bool		inquotes=false;
-	bool		inbind=false;
+
+	queryparsestate_t	parsestate=IN_QUERY;
+
 	uint16_t	varcounter=0;
 
-	for (const char *c=query; *c; c++) {
+	// run through the querybuffer...
+	const char	*ptr=query;
+	const char	*endptr=ptr+querylen;
+	const char	*prevptr="\0";
+	do {
 
-		if (*c=='\'') {
-			inquotes=!inquotes;
-		}
+		// if we're in the query...
+		if (parsestate==IN_QUERY) {
 
-		if (!inquotes) {
-
-			if (inbind && (character::isWhitespace(*c) ||
-						character::inSet(*c,",);:="))) {
-				newquery->append(')');
-				inbind=false;
+			// if we find a quote, we're in quotes
+			if (*ptr=='\'') {
+				parsestate=IN_QUOTES;
 			}
 
-			// catch ?, :, $ and @ but not @@
-			if (character::inSet(*c,"?:$") ||
-					(*c=='@' && *(c+1)!='@')) {
-				newquery->append("$(");
-				if (*c=='?') {
-					newquery->append(varcounter);
-					varcounter++;
-				} else {
-					inbind=true;
-				}
+			// if we find whitespace or a couple of other things
+			// then the next thing could be a bind variable
+			if (beforeBindVariable(ptr)) {
+				parsestate=BEFORE_BIND;
+			}
+
+			// append the character
+			newquery->append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
+		}
+
+		// copy anything in quotes verbatim
+		if (parsestate==IN_QUOTES) {
+
+			// if we find a quote, but not an escaped quote,
+			// then we're back in the query
+			if (*ptr=='\'' && *(ptr+1)!='\'' &&
+					*prevptr!='\'' && *prevptr!='\\') {
+				parsestate=IN_QUERY;
+			}
+
+			// append the character
+			newquery->append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
+			continue;
+		}
+
+		if (parsestate==BEFORE_BIND) {
+
+			// if we find a bind variable...
+			if (isBindDelimiter(ptr,
+				sqlrcon->
+				getBindVariableDelimiterQuestionMarkSupported(),
+				sqlrcon->
+				getBindVariableDelimiterColonSupported(),
+				sqlrcon->
+				getBindVariableDelimiterAtSignSupported(),
+				sqlrcon->
+				getBindVariableDelimiterDollarSignSupported())
+				) {
+				parsestate=IN_BIND;
 				continue;
 			}
+
+			// if we didn't find a bind variable then we're just
+			// back in the query
+			parsestate=IN_QUERY;
+			continue;
 		}
 
-		newquery->append(*c);
-	}
+		// if we're in a bind variable...
+		if (parsestate==IN_BIND) {
+
+			// If we find whitespace or a few other things
+			// then we're done with the bind variable.  Process it.
+			// Otherwise get the variable itself in another buffer.
+			bool	endofbind=afterBindVariable(ptr);
+			if (endofbind) {
+
+				newquery->append("$(");
+				newquery->append(varcounter);
+				newquery->append(')');
+
+				varcounter++;
+
+				parsestate=IN_QUERY;
+
+			} else {
+
+				// move on
+				prevptr=ptr;
+				ptr++;
+			}
+			continue;
+		}
+
+	} while (ptr<endptr);
 }
 
 static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
@@ -976,8 +1066,7 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrstatement	*sqlrstmt=new sqlrstatement;
-	sqlrstmt->sqlrcur=new sqlrcursor(
-				(sqlrconnection *)sqlrdbh->sqlrcon,true);
+	sqlrstmt->sqlrcur=new sqlrcursor(sqlrdbh->sqlrcon,true);
 
 	if (sqlrdbh->resultsetbuffersize>0) {
 		sqlrstmt->sqlrcur->setResultSetBufferSize(
@@ -1001,6 +1090,9 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	sqlrstmt->subvarquery.clear();
 	clearList(&sqlrstmt->subvarstrings);
 
+	sqlrstmt->emulatepreparesunicodestrings=
+		sqlrdbh->emulatepreparesunicodestrings;
+
 	// FIXME:
 	// To not have to set translatebindvariables on the server, we need to
 	// figure out what db relay is connected to, set supports_placeholders
@@ -1018,7 +1110,8 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	stmt->supports_placeholders=PDO_PLACEHOLDER_POSITIONAL;
 
 	if (sqlrdbh->usesubvars) {
-		sqlrconnectionRewriteQuery(sql,sqllen,&sqlrstmt->subvarquery);
+		sqlrconnectionRewriteQuery(sqlrdbh->sqlrcon,sql,sqllen,
+							&sqlrstmt->subvarquery);
 		sql=sqlrstmt->subvarquery.getString();
 		sqllen=sqlrstmt->subvarquery.getStringLength();
 	}
@@ -1663,6 +1756,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		// other languages...
 		//{"autocommit",(char *)"1",0},
 		{"autocommit",(char *)"0",0},
+		{"bindvariabledelimiters",(char *)"?:@$",0},
+		{"emulatepreparesunicodestrings",(char *)"0",0}
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1690,6 +1785,9 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char	*db=options[22].optval;
 	const char      *connecttime=options[23].optval;
 	bool		autocommit=!charstring::isNo(options[24].optval);
+	const char	*bindvariabledelimiters=options[25].optval;
+	bool		emulatepreparesunicodestrings=
+					charstring::isYes(options[26].optval);
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1731,6 +1829,9 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 						timeoutsec,timeoutusec);
 		}
 	}
+
+	// set bind variable delimiters
+	sqlrdbh->sqlrcon->setBindVariableDelimiters(bindvariabledelimiters);
 
 	// if we're not doing lazy connects, then do something lightweight
 	// that will verify whether SQL Relay is available or not
@@ -1803,6 +1904,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 
 	sqlrdbh->translatebindsonserver=false;
 	sqlrdbh->usesubvars=false;
+	sqlrdbh->emulatepreparesunicodestrings=emulatepreparesunicodestrings;
 
 	dbh->driver_data=(void *)sqlrdbh;
 	dbh->methods=&sqlrconnectionMethods;

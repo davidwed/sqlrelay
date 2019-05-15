@@ -76,6 +76,15 @@
 /* MySQL supports CR_SERVER_LOST */
 #define HAVE_MYSQL_CR_SERVER_LOST 1
 
+/* MySQL supports MYSQL_FIELD.name_length */
+#define HAVE_MYSQL_FIELD_NAME_LENGTH 1
+
+/* MySQL supports MYSQL_FIELD.org_table */
+#define HAVE_MYSQL_FIELD_ORG_TABLE 1
+
+/* MySQL supports MYSQL_FIELD.org_table_length */
+#define HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH 1
+
 /* MySQL supports FIELD_TYPE_ENUM */
 #define HAVE_MYSQL_FIELD_TYPE_ENUM 1
 
@@ -163,11 +172,23 @@
 /* Oracle 8i or greater */
 #define HAVE_ORACLE_8i
 
+/* Some versions of PHP PDO have PDO::ATTR_EMULATE_PREPARES */
+#define HAVE_PHP_PDO_ATTR_EMULATE_PREPARES 1
+
+/* Some versions of PHP PDO don't support const zend_function_entry */
+#define HAVE_PHP_PDO_CONST_ZEND_FUNCTION_ENTRY 1
+
+/* Some versions of PHP PDO have PDO_PARAM_ZVAL */
+#define HAVE_PHP_PDO_PARAM_ZVAL 1
+
 /* Some versions of postgresql have PQbinaryTuples */
 #define HAVE_POSTGRESQL_PQBINARYTUPLES 1
 
 /* Some versions of postgresql have PQexecPrepared */
 #define HAVE_POSTGRESQL_PQEXECPREPARED 1
+
+/* Some versions of postgresql have PQftable */
+#define HAVE_POSTGRESQL_PQFTABLE 1
 
 /* Some versions of postgresql have PQfmod */
 #define HAVE_POSTGRESQL_PQFMOD 1

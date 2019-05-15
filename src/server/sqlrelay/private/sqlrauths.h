@@ -1,8 +1,8 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 	private:
 		void	unload();
-		void	loadAuth(xmldomnode *auth, sqlrpwdencs *sqlrpe);
+		void	loadAuth(domnode *auth, sqlrpwdencs *sqlrpe);
 
 		sqlrauthsprivate	*pvt;

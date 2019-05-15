@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -7,12 +7,12 @@ class sqlrtriggerprivate {
 	friend class sqlrtrigger;
 	private:
 		sqlrtriggers	*_ts;
-		xmldomnode	*_parameters;
+		domnode	*_parameters;
 };
 
 sqlrtrigger::sqlrtrigger(sqlrservercontroller *cont,
 				sqlrtriggers *ts,
-				xmldomnode *parameters) {
+				domnode *parameters) {
 	pvt=new sqlrtriggerprivate;
 	pvt->_ts=ts;
 	pvt->_parameters=parameters;
@@ -24,9 +24,8 @@ sqlrtrigger::~sqlrtrigger() {
 
 bool sqlrtrigger::run(sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
-				xmldom *querytree,
 				bool before,
-				bool success) {
+				bool *success) {
 	return true;
 }
 
@@ -34,6 +33,12 @@ sqlrtriggers *sqlrtrigger::getTriggers() {
 	return pvt->_ts;
 }
 
-xmldomnode *sqlrtrigger::getParameters() {
+domnode *sqlrtrigger::getParameters() {
 	return pvt->_parameters;
+}
+
+void sqlrtrigger::endTransaction(bool commit) {
+}
+
+void sqlrtrigger::endSession() {
 }

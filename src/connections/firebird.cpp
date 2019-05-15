@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -170,8 +170,10 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 		uint32_t	getColumnLength(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
+		const char	*getColumnTable(uint32_t col);
+		uint16_t	getColumnTableLength(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -768,9 +770,9 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	bindformaterror=false;
 
 	setCreateTempTablePattern("(create|CREATE)[ 	\n\r]+(global|GLOBAL)[ 	\n\r]+(temporary|TEMPORARY)[ 	\n\r]+(table|TABLE)[ 	\n\r]+");
-	preserverows.compile("(on|ON)[ 	\n\r]+(commit|COMMIT)[ 	\n\r]+(preserve|PRESERVE)[ 	\n\r]+(rows|ROWS)");
+	preserverows.setPattern("(on|ON)[ 	\n\r]+(commit|COMMIT)[ 	\n\r]+(preserve|PRESERVE)[ 	\n\r]+(rows|ROWS)");
 	preserverows.study();
-	executeprocedure.compile("(execute|EXECUTE)[ 	\n\r]+(procedure|PROCEDURE)");
+	executeprocedure.setPattern("(execute|EXECUTE)[ 	\n\r]+(procedure|PROCEDURE)");
 	executeprocedure.study();
 }
 
@@ -1036,7 +1038,7 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 	}
 
 	// write the value to the blob, MAX_LOB_CHUNK_SIZE bytes at a time
-	uint16_t	bytesput=0;
+	uint32_t	bytesput=0;
 	while (bytesput<valuesize) {
 		uint16_t	bytestoput=0;
 		if (valuesize-bytesput<MAX_LOB_CHUNK_SIZE) {
@@ -1743,30 +1745,40 @@ uint32_t firebirdcursor::getColumnScale(uint32_t col) {
 	return -outsqlda->sqlvar[col].sqlscale;
 }
 
+const char *firebirdcursor::getColumnTable(uint32_t col) {
+	return outsqlda->sqlvar[col].relname;
+}
+
+uint16_t firebirdcursor::getColumnTableLength(uint32_t col) {
+	return outsqlda->sqlvar[col].relname_length;
+}
+
 bool firebirdcursor::noRowsToReturn() {
 	// for exec procedure queries, outsqlda contains output bind values
 	// rather than a result set and there is no result set
 	return (queryisexecsp)?true:!outsqlda->sqld;
 }
 
-bool firebirdcursor::fetchRow() {
+bool firebirdcursor::fetchRow(bool *error) {
+
+	*error=false;
 
 	ISC_STATUS	retcode=isc_dsql_fetch(firebirdconn->error,
 							&stmt,1,outsqlda);
+
+	// success
+	if (!retcode) {
+		return true;
+	}
+
+	// no more rows
 	if (retcode==100) {
-		// no more rows
-		return false;
-	} else if (retcode==335544364) {
-		// Request synchronization error.  This usually occurs because
-		// max-field-length was too small and a field was truncated.
-		// When it happens, the fetch fails, the cursor still points to
-		// the same row, and subsequent fetches will attempt to return
-		// the same row again.  There's no known way to recover and
-		// continue fetching rows, so we have to bail here.  Maybe a
-		// future version of firebird will have a fix for this.
 		return false;
 	}
-	return true;
+
+	// error
+	*error=true;
+	return false;
 }
 
 void firebirdcursor::getField(uint32_t col,
@@ -1872,31 +1884,22 @@ void firebirdcursor::getField(uint32_t col,
 		// int64's are weird.  To the left of the decimal
 		// point is the value/10^scale, to the right is
 		// value%10^scale
+		ISC_INT64	v=field[col].int64buffer;
 		if (outsqlda->sqlvar[col].sqlscale) {
-
-			stringbuffer	decimal;
-			decimal.append((int64_t)(field[col].int64buffer%(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)));
-		
-			// gotta get the right number
-			// of decimal places
-			for (int32_t i=decimal.getStringLength();
-				i<-outsqlda->sqlvar[col].sqlscale;
-				i++) {
-				decimal.append("0");
-			}
-
+			ISC_SHORT	scale=-outsqlda->sqlvar[col].sqlscale;
+			int		p=(int)pow(10.0,(double)scale);
 			*fldlength=charstring::printf(
 					field[col].textbuffer,
 					conn->cont->getMaxFieldLength(),
-					"%lld.%s",(int64_t)(field[col].int64buffer/(int)pow(10.0,(double)-outsqlda->sqlvar[col].sqlscale)),decimal.getString());
-			*fld=field[col].textbuffer;
+					"%lld.%0*lld",
+					(int64_t)(v/p),scale,(int64_t)(v%p));
 		} else {
 			*fldlength=charstring::printf(
 					field[col].textbuffer,
 					conn->cont->getMaxFieldLength(),
-					"%lld",(int64_t)field[col].int64buffer);
-			*fld=field[col].textbuffer;
+					"%lld",(int64_t)v);
 		}
+		*fld=field[col].textbuffer;
 
 	} else if (outsqlda->sqlvar[col].sqltype==SQL_ARRAY ||
 		outsqlda->sqlvar[col].sqltype==SQL_ARRAY+1 ||

@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.2.1
+Version: 1.6.0pre
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: rudiments-devel >= 1.0.5, systemd
+BuildRequires: gcc-c++, rudiments-devel >= 1.2.0, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -88,7 +88,7 @@ The SQL Relay C client library.
 %package c++-devel
 License: LGPLv2
 Summary: Development files for the SQL Relay C++ client library
-Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.0.5
+Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.2.0
 
 %description c++-devel
 Development files for the SQL Relay C++ client library.
@@ -137,7 +137,7 @@ Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 Perl DBI driver for SQL Relay.
 
 
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel} > 7
 
 %package -n python3-%{name}
 License: ZPL 1.0 or MIT
@@ -159,22 +159,22 @@ Python DB bindings for SQL Relay.
 
 %else
 
-%package -n python-%{name}
+%package -n python2-%{name}
 License: ZPL 1.0 or MIT
 Summary: Python bindings for the SQL Relay client API
 BuildRequires: python-devel
 
-%description -n python-%{name}
+%description -n python2-%{name}
 Python bindings for the SQL Relay client API.
 
 
-%package -n python-db-%{name}
+%package -n python2-db-%{name}
 License: ZPL 1.0 or MIT
 Summary: Python DB bindings for SQL Relay
 BuildRequires: python-devel
 Requires: python-%{name}%{?_isa} = %{version}-%{release}
 
-%description -n python-db-%{name}
+%description -n python2-db-%{name}
 Python DB bindings for SQL Relay.
 
 %endif
@@ -479,16 +479,13 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 
 
 %post
-/sbin/ldconfig
 %systemd_post %{name}.service
 
 %preun
 %systemd_preun %{name}.service
 
 %postun
-/sbin/ldconfig
 %systemd_postun_with_restart %{name}.service
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %files
@@ -501,19 +498,25 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_bindir}/sqlr-start
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver.so.*
+%{_libdir}/libsqlrserver.so.9
+%{_libdir}/libsqlrserver.so.9.*
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
+%{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
 %{_libexecdir}/%{name}/sqlrconfig_*
 %{_libexecdir}/%{name}/sqlrfilter_*
+%{_libexecdir}/%{name}/sqlrtrigger_*
 %{_libexecdir}/%{name}/sqlrnotification_*
 %{_libexecdir}/%{name}/sqlrparser_*
 %{_libexecdir}/%{name}/sqlrprotocol_*
 %{_libexecdir}/%{name}/sqlrpwdenc_*
 %{_libexecdir}/%{name}/sqlrlogger_*
+%{_libexecdir}/%{name}/sqlrmoduledata_*
 %{_libexecdir}/%{name}/sqlrquery_*
 %{_libexecdir}/%{name}/sqlrresultsettranslation_*
 %{_libexecdir}/%{name}/sqlrschedule_*
 %{_libexecdir}/%{name}/sqlrtranslation_*
+%{_libexecdir}/%{name}/sqlrdirective_*
 %{_mandir}/*/sqlr-listener.*
 %{_mandir}/*/sqlr-connection.*
 %{_mandir}/*/sqlr-scaler.*
@@ -535,15 +538,22 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files server-devel
 %{_bindir}/sqlrserver-config
+%dir %{_includedir}/%{name}
+%dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrserver.h
 %{_includedir}/%{name}/private/sqlrauth.h
 %{_includedir}/%{name}/private/sqlrauths.h
+%{_includedir}/%{name}/private/sqlrbindvariabletranslation.h
+%{_includedir}/%{name}/private/sqlrbindvariabletranslations.h
 %{_includedir}/%{name}/private/sqlrfilter.h
 %{_includedir}/%{name}/private/sqlrfilters.h
 %{_includedir}/%{name}/private/sqlrgsscredentials.h
 %{_includedir}/%{name}/private/sqlrlistener.h
 %{_includedir}/%{name}/private/sqlrlogger.h
 %{_includedir}/%{name}/private/sqlrloggers.h
+%{_includedir}/%{name}/private/sqlrmysqlcredentials.h
+%{_includedir}/%{name}/private/sqlrmoduledata.h
+%{_includedir}/%{name}/private/sqlrmoduledatas.h
 %{_includedir}/%{name}/private/sqlrnotification.h
 %{_includedir}/%{name}/private/sqlrnotifications.h
 %{_includedir}/%{name}/private/sqlrparser.h
@@ -554,6 +564,8 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/private/sqlrqueries.h
 %{_includedir}/%{name}/private/sqlrquerycursor.h
 %{_includedir}/%{name}/private/sqlrquery.h
+%{_includedir}/%{name}/private/sqlrresultsetrowblocktranslation.h
+%{_includedir}/%{name}/private/sqlrresultsetrowblocktranslations.h
 %{_includedir}/%{name}/private/sqlrresultsetrowtranslation.h
 %{_includedir}/%{name}/private/sqlrresultsetrowtranslations.h
 %{_includedir}/%{name}/private/sqlrresultsettranslation.h
@@ -574,12 +586,12 @@ rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 %{_includedir}/%{name}/private/sqlrtrigger.h
 %{_includedir}/%{name}/private/sqlrtriggers.h
 %{_includedir}/%{name}/private/sqlruserpasswordcredentials.h
+%{_includedir}/%{name}/private/sqlrdirective.h
+%{_includedir}/%{name}/private/sqlrdirectives.h
+%{_includedir}/%{name}/private/sqlrresultsetheadertranslation.h
+%{_includedir}/%{name}/private/sqlrresultsetheadertranslations.h
 %{_libdir}/libsqlrserver.so
 %exclude %{_libdir}/lib*.la
-
-%postun server-devel
-rmdir %{_includedir}/%{name} 2> /dev/null || :
-rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 
 %files clients
 %{_bindir}/sqlrsh
@@ -604,29 +616,28 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %systemd_preun %{name}cachemanager.service
 
 %files common
-%{_libdir}/libsqlrutil.so.*
+%{_libdir}/libsqlrutil.so.9
+%{_libdir}/libsqlrutil.so.9.*
 
 %files common-devel
+%dir %{_includedir}/%{name}
+%dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrutil.h
 %{_includedir}/%{name}/private/sqlrutilincludes.h
 %{_libdir}/libsqlrutil.so
 
 %files c++
-%{_libdir}/libsqlrclient.so.*
-
-%post c++ -p /sbin/ldconfig
-
-%postun c++ -p /sbin/ldconfig
+%{_libdir}/libsqlrclient.so.5
+%{_libdir}/libsqlrclient.so.5.*
 
 %files c
-%{_libdir}/libsqlrclientwrapper.so.*
-
-%post c -p /sbin/ldconfig
-
-%postun c -p /sbin/ldconfig
+%{_libdir}/libsqlrclientwrapper.so.5
+%{_libdir}/libsqlrclientwrapper.so.5.*
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
+%dir %{_includedir}/%{name}
+%dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrclient.h
 %{_includedir}/%{name}/private/sqlrclientincludes.h
 %{_includedir}/%{name}/private/sqlrconnection.h
@@ -635,12 +646,10 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %{_libdir}/pkgconfig/%{name}-c++.pc
 %exclude %{_libdir}/lib*.la
 
-%postun c++-devel
-rmdir %{_includedir}/%{name} 2> /dev/null || :
-rmdir %{_includedir}/%{name}/private 2> /dev/null || :
-
 %files c-devel
 %{_bindir}/sqlrclientwrapper-config
+%dir %{_includedir}/%{name}
+%dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrclientwrapper.h
 %{_includedir}/%{name}/private/sqlrclientwrapper.h
 %{_includedir}/%{name}/private/sqlrclientwrapperincludes.h
@@ -648,12 +657,9 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %{_libdir}/pkgconfig/%{name}-c.pc
 %exclude %{_libdir}/lib*.la
 
-%postun c-devel
-rmdir %{_includedir}/%{name} 2> /dev/null || :
-rmdir %{_includedir}/%{name}/private 2> /dev/null || :
-
 %files -n odbc-%{name}
-%{_libdir}/libsqlrodbc.so.*
+%{_libdir}/libsqlrodbc.so.5
+%{_libdir}/libsqlrodbc.so.5.*
 %{_libdir}/libsqlrodbc.so
 
 %files -n perl-%{name}
@@ -673,32 +679,30 @@ rmdir %{_includedir}/%{name}/private 2> /dev/null || :
 %if 0%{?fedora}
 
 %files -n python3-%{name}
+%dir %{python3_sitearch}/SQLRelay/__pycache__
+%dir %{python3_sitearch}/SQLRelay
 %{python3_sitearch}/SQLRelay/CSQLRelay.so
 %{python3_sitearch}/SQLRelay/PySQLRClient.py
 %{python3_sitearch}/SQLRelay/__init__.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRClient.*
 %{python3_sitearch}/SQLRelay/__pycache__/__init__.*
 
-%postun -n python3-%{name}
-rmdir %{python3_sitearch}/SQLRelay/__pycache__ 2> /dev/null || :
-rmdir %{python3_sitearch}/SQLRelay 2> /dev/null || :
-
 %files -n python3-db-%{name}
+%dir %{python3_sitearch}/SQLRelay/__pycache__
+%dir %{python3_sitearch}/SQLRelay
 %{python3_sitearch}/SQLRelay/PySQLRDB.py
 %{python3_sitearch}/SQLRelay/__pycache__/PySQLRDB.*
 
 %else
 
-%files -n python-%{name}
+%files -n python2-%{name}
+%dir %{python_sitearch}/SQLRelay
 %{python_sitearch}/SQLRelay/CSQLRelay.so
 %{python_sitearch}/SQLRelay/PySQLRClient.py*
 %{python_sitearch}/SQLRelay/__init__.py*
 
-%postun -n python-%{name}
-rmdir %{python_sitearch}/SQLRelay/__pycache__ 2> /dev/null || :
-rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
-
-%files -n python-db-%{name}
+%files -n python2-db-%{name}
+%dir %{python_sitearch}/SQLRelay
 %{python_sitearch}/SQLRelay/PySQLRDB.py*
 
 %endif
@@ -717,6 +721,7 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 
 %files -n java-%{name}
 %{_javadir}/*.jar
+%dir %{_libdir}/%{name}
 %{_libdir}/%{name}/*.so
 
 %files -n tcl-%{name}
@@ -729,6 +734,7 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 %{_libdir}/erlang/lib/%{name}-%{version}
 
 %files -n mono-data-%{name}
+%dir %{_libdir}/%{name}
 %{_libdir}/%{name}/SQLRClient.dll
 %{_libdir}/%{name}/SQLRClient.dll.config
 
@@ -741,113 +747,104 @@ rmdir %{python_sitearch}/SQLRelay 2> /dev/null || :
 %files dropin-mysql
 %{_libdir}/libmysql*%{name}.so.*
 
-%post dropin-mysql -p /sbin/ldconfig
-
-%postun dropin-mysql -p /sbin/ldconfig
-
 %files dropin-postgresql
 %{_libdir}/libpq%{name}.so.*
 
-%post dropin-postgresql -p /sbin/ldconfig
-
-%postun dropin-postgresql -p /sbin/ldconfig
-
 %files oracle
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_oracle*
 
-%postun oracle
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files mysql
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_mysql*
 
-%postun mysql
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files postgresql
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_postgresql*
 
-%postun postgresql
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files sqlite
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_sqlite*
-
-%postun sqlite
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %if 0%{?fedora}
 
 %files freetds
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_freetds*
-
-%postun freetds
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %endif
 
 
 %files sap
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_sap*
 
-%postun sap
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files odbc
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_odbc*
 
-%postun odbc
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files db2
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_db2*
-
-%postun db2
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 
 %if 0%{?fedora}
 
 %files firebird
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_firebird*
 
-%postun firebird
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files mdbtools
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_mdbtools*
-
-%postun mdbtools
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %endif
 
 
 %files informix
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_informix*
 
-%postun informix
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
-
 %files router
+%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_router*
 %{_libexecdir}/%{name}/sqlrrouter_*
-
-%postun router
-rmdir %{_libexecdir}/%{name} 2> /dev/null || :
 
 %files doc
 %{_docdir}/%{name}
 %{_datadir}/licenses/%{name}
-%{_datadir}/%{name}/examples
+%{_datadir}/%{name}
 
 %files javadoc
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed Nov 08 2017 David Muse <david.muse@firstworks.com> - 1.2.1-1
-- Updated to version 1.2.1.
+* Tue Apr 02 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
+- Updated to version 1.6.0.
+- Replaced python-* names with python2-*.
+- Updated to build python 3 packages for rhel > 7.
+
+* Thu Feb 21 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
+- Replaced empty-directory-removing postun's with dir's.
+- Updated to require rudiments 1.2.0.
+- Removed globbing of library major versions.
+- Removed calls to /sbin/ldconfig.
+- Updated to version 1.5.0.
+- Added bind variable translation and module data components.
+- Added mysql-frontend components.
+- Added triggers.
+
+* Wed Sep 05 2018 David Muse <david.muse@firstworks.com> - 1.4.0-1
+- Updated to version 1.4.0.
+- Updated to require rudiments 1.0.8.
+- Added resultsetrowblocktranslations headers.
+
+* Wed May 16 2018 David Muse <david.muse@firstworks.com> - 1.3.0-1
+- Updated to version 1.3.0.
+- Updated to require rudiments 1.0.7.
+- Added directive module headers and shared objects.
+- Added resultsetheadertranslation headers.
 
 * Fri Sep 22 2017 David Muse <david.muse@firstworks.com> - 1.2.0-1
 - Updated required version of rudiments-devel to 1.0.5.

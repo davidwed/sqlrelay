@@ -25,11 +25,11 @@
 
 extern "C" {
 
-#define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_FLOAT_TYPE_CHAR
-#define NEED_IS_BIT_TYPE_CHAR
-#define NEED_BIT_STRING_TO_LONG
-#define NEED_IS_BOOL_TYPE_CHAR
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_FLOAT_TYPE_CHAR 1
+#define NEED_IS_BIT_TYPE_CHAR 1
+#define NEED_BIT_STRING_TO_LONG 1
+#define NEED_IS_BOOL_TYPE_CHAR 1
 #include <datatypes.h>
 
 bool usenumeric=false;
@@ -106,6 +106,52 @@ static PyObject *setResponseTimeout(PyObject *self, PyObject *args) {
     return NULL;
   ((sqlrconnection *)sqlrcon)->setResponseTimeout(timeoutsec,timeoutusec);
   return Py_BuildValue("h", 0);
+}
+
+static PyObject *setBindVariableDelimiters(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  char *delimiters;
+  if (!PyArg_ParseTuple(args, "ls", &sqlrcon, &delimiters))
+    return NULL;
+  ((sqlrconnection *)sqlrcon)->setBindVariableDelimiters(delimiters);
+  return Py_BuildValue("h", 0);
+}
+
+static PyObject *getBindVariableDelimiterQuestionMarkSupported(
+					PyObject *self, PyObject *args) {
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  rc=((sqlrconnection *)sqlrcon)->getBindVariableDelimiterQuestionMarkSupported();
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *getBindVariableDelimiterColonSupported(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  rc=((sqlrconnection *)sqlrcon)->getBindVariableDelimiterColonSupported();
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *getBindVariableDelimiterAtSignSupported(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  rc=((sqlrconnection *)sqlrcon)->getBindVariableDelimiterAtSignSupported();
+  return Py_BuildValue("h", (short)rc);
+}
+
+static PyObject *getBindVariableDelimiterDollarSignSupported(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  bool rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  rc=((sqlrconnection *)sqlrcon)->getBindVariableDelimiterDollarSignSupported();
+  return Py_BuildValue("h", (short)rc);
 }
 
 static PyObject *enableKerberos(PyObject *self, PyObject *args) {
@@ -754,7 +800,7 @@ static PyObject *substitutions(PyObject *self, PyObject *args) {
   PyObject *precisions;
   PyObject *scales;
   long sqlrcur;
-  char *variable;
+  const char *variable;
   uint16_t success;
   PyObject *value;
   if (!PyArg_ParseTuple(args, "lOOOO", &sqlrcur, &variables, &values, &precisions, &scales))
@@ -894,7 +940,7 @@ static PyObject *inputBinds(PyObject *self, PyObject *args) {
   PyObject *precisions;
   PyObject *scales;
   long sqlrcur;
-  char *variable;
+  const char *variable;
   uint16_t success;
   PyObject *value;
   if (!PyArg_ParseTuple(args, "lOOOO", &sqlrcur, &variables, &values, &precisions, &scales))
@@ -1911,6 +1957,11 @@ static PyMethodDef SQLRMethods[] = {
   {"setConnectTimeout", setConnectTimeout, METH_VARARGS},
   {"setAuthenticationTimeout", setAuthenticationTimeout, METH_VARARGS},
   {"setResponseTimeout", setResponseTimeout, METH_VARARGS},
+  {"setBindVariableDelimiters", setBindVariableDelimiters, METH_VARARGS},
+  {"getBindVariableDelimiterQuestionMarkSupported", getBindVariableDelimiterQuestionMarkSupported, METH_VARARGS},
+  {"getBindVariableDelimiterColonSupported", getBindVariableDelimiterColonSupported, METH_VARARGS},
+  {"getBindVariableDelimiterAtSignSupported", getBindVariableDelimiterAtSignSupported, METH_VARARGS},
+  {"getBindVariableDelimiterDollarSignSupported", getBindVariableDelimiterDollarSignSupported, METH_VARARGS},
   {"enableKerberos", enableKerberos, METH_VARARGS},
   {"enableTls", enableTls, METH_VARARGS},
   {"disableEncryption", disableEncryption, METH_VARARGS},

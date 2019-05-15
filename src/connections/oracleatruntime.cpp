@@ -1,7 +1,8 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <rudiments/dynamiclib.h>
+#include <rudiments/file.h>
 
 
 // FIXME: for now, assume version 8i+

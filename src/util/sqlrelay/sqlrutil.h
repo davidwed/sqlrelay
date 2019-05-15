@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2014 David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #ifndef SQLRUTIL_H
@@ -178,14 +178,17 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual const char	*getDebug()=0;
 		virtual bool		getDebugSql()=0;
+		virtual bool		getDebugBulkLoad()=0;
 		virtual bool		getDebugParser()=0;
 		virtual bool		getDebugDirectives()=0;
 		virtual bool		getDebugTranslations()=0;
 		virtual bool		getDebugFilters()=0;
 		virtual bool		getDebugTriggers()=0;
 		virtual bool		getDebugBindTranslations()=0;
+		virtual bool		getDebugBindVariableTranslations()=0;
 		virtual bool		getDebugResultSetTranslations()=0;
 		virtual bool		getDebugResultSetRowTranslations()=0;
+		virtual bool		getDebugResultSetRowBlockTranslations()=0;
 		virtual bool		getDebugResultSetHeaderTranslations()=0;
 		virtual bool		getDebugProtocols()=0;
 		virtual bool		getDebugAuths()=0;
@@ -195,6 +198,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getDebugSchedules()=0;
 		virtual bool		getDebugRouters()=0;
 		virtual bool		getDebugQueries()=0;
+		virtual bool		getDebugModuleDatas()=0;
 
 		virtual uint64_t	getMaxClientInfoLength()=0;
 		virtual uint32_t	getMaxQuerySize()=0;
@@ -213,6 +217,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual bool		getFakeInputBindVariables()=0;
 		virtual const char	*getFakeInputBindVariablesDateFormat()=0;
+		virtual bool		getFakeInputBindVariablesUnicodeStrings()=0;
+		virtual bool		getBindVariableDelimiterQuestionMarkSupported()=0;
+		virtual bool		getBindVariableDelimiterColonSupported()=0;
+		virtual bool		getBindVariableDelimiterAtSignSupported()=0;
+		virtual bool		getBindVariableDelimiterDollarSignSupported()=0;
+
 		virtual bool		getTranslateBindVariables()=0;
 
 		virtual const char	*getIsolationLevel()=0;
@@ -224,22 +234,25 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual linkedlist< char *>	*getSessionStartQueries()=0;
 		virtual linkedlist< char *>	*getSessionEndQueries()=0;
 
-		virtual xmldomnode	*getListeners()=0;
-		virtual xmldomnode	*getParser()=0;
-		virtual xmldomnode	*getDirectives()=0;
-		virtual xmldomnode	*getTranslations()=0;
-		virtual xmldomnode	*getFilters()=0;
-		virtual xmldomnode	*getResultSetTranslations()=0;
-		virtual xmldomnode	*getResultSetRowTranslations()=0;
-		virtual xmldomnode	*getResultSetHeaderTranslations()=0;
-		virtual xmldomnode	*getTriggers()=0;
-		virtual xmldomnode	*getLoggers()=0;
-		virtual xmldomnode	*getNotifications()=0;
-		virtual xmldomnode	*getSchedules()=0;
-		virtual xmldomnode	*getRouters()=0;
-		virtual xmldomnode	*getQueries()=0;
-		virtual xmldomnode	*getPasswordEncryptions()=0;
-		virtual xmldomnode	*getAuths()=0;
+		virtual domnode	*getListeners()=0;
+		virtual domnode	*getParser()=0;
+		virtual domnode	*getDirectives()=0;
+		virtual domnode	*getTranslations()=0;
+		virtual domnode	*getFilters()=0;
+		virtual domnode	*getBindVariableTranslations()=0;
+		virtual domnode	*getResultSetTranslations()=0;
+		virtual domnode	*getResultSetRowTranslations()=0;
+		virtual domnode	*getResultSetRowBlockTranslations()=0;
+		virtual domnode	*getResultSetHeaderTranslations()=0;
+		virtual domnode	*getTriggers()=0;
+		virtual domnode	*getLoggers()=0;
+		virtual domnode	*getNotifications()=0;
+		virtual domnode	*getSchedules()=0;
+		virtual domnode	*getRouters()=0;
+		virtual domnode	*getQueries()=0;
+		virtual domnode	*getPasswordEncryptions()=0;
+		virtual domnode	*getAuths()=0;
+		virtual domnode	*getModuleDatas()=0;
 
 		virtual linkedlist< connectstringcontainer * >
 						*getConnectStringList()=0;

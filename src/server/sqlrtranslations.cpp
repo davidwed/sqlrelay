@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2011  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -40,9 +40,11 @@ class sqlrtranslationsprivate {
 		xmldom		*_tree;
 		bool		_debug;
 
+		const char	*_error;
+
 		singlylinkedlist< sqlrtranslationplugin * >	_tlist;
 
-		memorypool	*_memorypool;
+		bool		_useoriginalonerror;
 
 		dictionary< sqlrdatabaseobject *, char * >	_tablenamemap;
 		dictionary< sqlrdatabaseobject *, char * >	_indexnamemap;
@@ -53,24 +55,30 @@ sqlrtranslations::sqlrtranslations(sqlrservercontroller *cont) {
 	pvt=new sqlrtranslationsprivate;
 	pvt->_cont=cont;
 	pvt->_debug=cont->getConfig()->getDebugTranslations();
+	pvt->_error=NULL;
 	pvt->_tree=NULL;
-	pvt->_memorypool=new memorypool(0,128,100);
+	pvt->_useoriginalonerror=true;
 }
 
 sqlrtranslations::~sqlrtranslations() {
 	debugFunction();
 	unload();
-	delete pvt->_memorypool;
 	delete pvt;
 }
 
-bool sqlrtranslations::load(xmldomnode *parameters) {
+bool sqlrtranslations::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
+	// default to useoriginal-on-error
+	pvt->_useoriginalonerror=
+		!charstring::compareIgnoringCase(
+				parameters->getAttributeValue("onerror"),
+				"original");
+
 	// run through the translation list
-	for (xmldomnode *translation=parameters->getFirstTagChild();
+	for (domnode *translation=parameters->getFirstTagChild();
 				!translation->isNullNode();
 				translation=translation->getNextTagSibling()) {
 
@@ -94,7 +102,7 @@ void sqlrtranslations::unload() {
 	pvt->_tlist.clear();
 }
 
-void sqlrtranslations::loadTranslation(xmldomnode *translation) {
+void sqlrtranslations::loadTranslation(domnode *translation) {
 	debugFunction();
 
 	// ignore non-translations
@@ -139,10 +147,10 @@ void sqlrtranslations::loadTranslation(xmldomnode *translation) {
 	functionname.append("new_sqlrtranslation_")->append(module);
 	sqlrtranslation *(*newTranslation)(sqlrservercontroller *,
 						sqlrtranslations *,
-						xmldomnode *)=
+						domnode *)=
 		(sqlrtranslation *(*)(sqlrservercontroller *,
 						sqlrtranslations *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
 		stdoutput.printf("failed to load translation: %s\n",module);
@@ -180,10 +188,25 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrparser *sqlrp,
 					const char *query,
+					uint32_t querylength,
 					stringbuffer *translatedquery) {
 	debugFunction();
 
-	if (!query || !translatedquery) {
+	pvt->_error=NULL;
+
+	if (!querylength || !query) {
+		pvt->_error="query was empty or null";
+		if (pvt->_debug) {
+			stdoutput.printf("\n%s\n\n",pvt->_error);
+		}
+		return false;
+	}
+
+	if (!translatedquery) {
+		pvt->_error="buffer for translated query was null";
+		if (pvt->_debug) {
+			stdoutput.printf("\n%s\n\n",pvt->_error);
+		}
 		return false;
 	}
 
@@ -206,17 +229,18 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 		if (tr->usesTree()) {
 
 			if (!sqlrp) {
+				pvt->_error="translation requires query "
+						"tree but no parser available";
 				if (pvt->_debug) {
-					stdoutput.printf("\ntranslation "
-							"requires query tree "
-							"but no parser "
-							"available...\n\n");
+					stdoutput.printf("\n%s\n\n",
+							pvt->_error);
 				}
 				return false;
 			}
 
 			if (!pvt->_tree) {
 				if (!sqlrp->parse(query)) {
+					pvt->_error="parse-query failed";
 					sqlrcon->cont->
 						raiseParseFailureEvent(
 								sqlrcur,query);
@@ -228,13 +252,18 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 						"current query tree:\n");
 					if (pvt->_tree) {
 						pvt->_tree->getRootNode()->
-							print(&stdoutput);
+							write(&stdoutput,true);
 					}
 					stdoutput.printf("\n");
 				}
 			}
 
 			if (!tr->run(sqlrcon,sqlrcur,pvt->_tree)) {
+				pvt->_error=tr->getError();
+				if (pvt->_debug) {
+					stdoutput.printf("\n%s\n\n",
+							pvt->_error);
+				}
 				return false;
 			}
 
@@ -243,6 +272,11 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 			if (pvt->_tree) {
 				if (!sqlrp->write(tempquerystr)) {
+					pvt->_error="write-query failed";
+					if (pvt->_debug) {
+						stdoutput.printf("\n%s\n\n",
+								pvt->_error);
+					}
 					return false;
 				}
 				pvt->_tree=NULL;
@@ -252,13 +286,18 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 						&tempquerystr2:&tempquerystr1;
 			}
 
-			bool	success=tr->run(sqlrcon,sqlrcur,
-						query,tempquerystr);
-			if (!success) {
+			if (!tr->run(sqlrcon,sqlrcur,
+					query,querylength,tempquerystr)) {
+				pvt->_error=tr->getError();
+				if (pvt->_debug) {
+					stdoutput.printf("\n%s\n\n",
+							pvt->_error);
+				}
 				return false;
 			}
 
 			query=tempquerystr->getString();
+			querylength=tempquerystr->getSize();
 
 			tempquerystr=(tempquerystr==&tempquerystr1)?
 						&tempquerystr2:&tempquerystr1;
@@ -267,19 +306,20 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 	if (pvt->_tree) {
 		if (!sqlrp->write(translatedquery)) {
+			pvt->_error="final write-query failed";
 			if (pvt->_debug) {
 				stdoutput.printf("current query tree:\n");
 				if (pvt->_tree) {
 					pvt->_tree->getRootNode()->
-						print(&stdoutput);
+						write(&stdoutput,true);
 				}
 				stdoutput.printf("\n");
-				stdoutput.printf("\nfinal write failed\n\n");
+				stdoutput.printf("\n%s\n\n",pvt->_error);
 			}
 			return false;
 		}
 	} else {
-		translatedquery->append(query);
+		translatedquery->append(query,querylength);
 		if (sqlrp->parse(translatedquery->getString())) {
 			pvt->_tree=sqlrp->getTree();
 		} else {
@@ -292,7 +332,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 	if (pvt->_debug) {
 		stdoutput.printf("\nquery tree after translation:\n");
 		if (pvt->_tree) {
-			pvt->_tree->getRootNode()->print(&stdoutput);
+			pvt->_tree->getRootNode()->write(&stdoutput,true);
 		}
 		stdoutput.printf("\n");
 	}
@@ -300,7 +340,11 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
+const char *sqlrtranslations::getError() {
+	return pvt->_error;
+}
+
+sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(
 						const char *database,
 						const char *schema,
 						const char *object,
@@ -311,6 +355,9 @@ sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(memorypool *pool,
 	char	*schemacopy=NULL;
 	char	*objectcopy=NULL;
 	char	*dependencycopy=NULL;
+
+	// get memory pool
+	memorypool	*pool=pvt->_cont->getPerSessionMemoryPool();
 
 	// create buffers and copy data into them
 	if (database) {
@@ -358,11 +405,11 @@ void sqlrtranslations::setReplacementTableName(
 					const char *oldtable,
 					const char *newtable) {
 	setReplacementName(&pvt->_tablenamemap,
-				createDatabaseObject(pvt->_memorypool,
-							database,
-							schema,
-							oldtable,
-							NULL),
+				createDatabaseObject(
+					database,
+					schema,
+					oldtable,
+					NULL),
 				newtable);
 }
 
@@ -373,11 +420,11 @@ void sqlrtranslations::setReplacementIndexName(
 					const char *newindex,
 					const char *table) {
 	setReplacementName(&pvt->_indexnamemap,
-				createDatabaseObject(pvt->_memorypool,
-							database,
-							schema,
-							oldindex,
-							table),
+				createDatabaseObject(
+					database,
+					schema,
+					oldindex,
+					table),
 				newindex);
 }
 
@@ -488,12 +535,24 @@ bool sqlrtranslations::removeReplacement(
 	return false;
 }
 
-memorypool *sqlrtranslations::getMemoryPool() {
-	return pvt->_memorypool;
+bool sqlrtranslations::getUseOriginalOnError() {
+	return pvt->_useoriginalonerror;
+}
+
+void sqlrtranslations::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->tr->endTransaction(commit);
+	}
 }
 
 void sqlrtranslations::endSession() {
-	pvt->_memorypool->deallocate();
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
+	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
+						pvt->_tlist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->tr->endSession();
+	}
 }

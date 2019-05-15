@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2012-2015  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 using System;
@@ -39,6 +39,7 @@ namespace SQLRClient
         public Boolean _dontgetcolumninfo = false;
         public Boolean _nullsasnulls = false;
         private Boolean _lazyconnect = true;
+        private String _bindvariabledelimiters = "?:@$";
 
         #endregion
 
@@ -143,6 +144,7 @@ namespace SQLRClient
                 _dontgetcolumninfo = false;
                 _nullsasnulls = false;
                 _lazyconnect = true;
+        	_bindvariabledelimiters = "?:@$";
 
                 // parse the connection string
                 String[] parts = ConnectionString.Split(";".ToCharArray());
@@ -265,6 +267,10 @@ namespace SQLRClient
                     {
                         _lazyconnect = !SQLRConnection.isNo(subparts[1]);
                     }
+                    else if (subparts[0] == "BindVariableDelimiters")
+                    {
+                        _bindvariabledelimiters = subparts[1];
+                    }
                 }
             }
         }
@@ -365,6 +371,8 @@ namespace SQLRClient
             {
                 _sqlrcon.identify();
             }
+
+            _sqlrcon.setBindVariableDelimiters(_bindvariabledelimiters);
 
             ChangeDatabase(_db);
         }

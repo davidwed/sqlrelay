@@ -233,7 +233,7 @@ end if
 
 
 ' version
-SQLR_VERSION="1.2.1"
+SQLR_VERSION="1.6.0"
 
 ' paths
 pfix="C:\\Program Files\\Firstworks"
@@ -442,8 +442,8 @@ end if
 ALLSERVER=""
 INSTALLSERVER=""
 if disableserver=false then
-	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections"
-	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections"
+	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-filters all-triggers all-connections"
+	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-filters install-triggers install-connections"
 end if
 
 
@@ -978,6 +978,9 @@ end if
 if disablerouter=false then
 	ROUTERBUILD="yes    "
 	TESTDBS=TESTDBs&"""router"","
+end if
+if disablemysql=false then
+	TESTDBS=TESTDBs&"""mysqlprotocol"","
 end if
 
 ' truncate the trailing comma

@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -6,10 +6,10 @@
 class sqlrparserprivate {
 	friend class sqlrparser;
 	private:
-		xmldomnode		*_parameters;
+		domnode		*_parameters;
 };
 
-sqlrparser::sqlrparser(sqlrservercontroller *cont, xmldomnode *parameters) {
+sqlrparser::sqlrparser(sqlrservercontroller *cont, domnode *parameters) {
 	pvt=new sqlrparserprivate;
 	pvt->_parameters=parameters;
 }
@@ -37,21 +37,21 @@ bool sqlrparser::write(stringbuffer *output) {
 	return false;
 }
 
-bool sqlrparser::write(xmldomnode *node,
+bool sqlrparser::write(domnode *node,
 				stringbuffer *output,
 				bool omitsiblings) {
 	return false;
 }
 
-bool sqlrparser::write(xmldomnode *node, stringbuffer *output) {
+bool sqlrparser::write(domnode *node, stringbuffer *output) {
 	return false;
 }
 
-void sqlrparser::getMetaData(xmldomnode *node) {
+void sqlrparser::getMetaData(domnode *node) {
 	// by default, do nothing...
 }
 
-xmldomnode *sqlrparser::getParameters() {
+domnode *sqlrparser::getParameters() {
 	return pvt->_parameters;
 }
 

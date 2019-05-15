@@ -1,15 +1,14 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#include <rudiments/linkedlist.h>
 #include <rudiments/regularexpression.h>
 
 class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {
 	public:
 			sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters);
+						domnode *parameters);
 			~sqlrrouter_clientinfolist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
@@ -30,7 +29,7 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {
 
 sqlrrouter_clientinfolist::sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 	clientinfos=NULL;
 
@@ -47,7 +46,7 @@ sqlrrouter_clientinfolist::sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 	// this is faster than running through the xml over and over
 	clientinfocount=parameters->getChildCount();
 	clientinfos=new regularexpression *[clientinfocount];
-	xmldomnode *clientinfo=parameters->getFirstTagChild("clientinfo");
+	domnode *clientinfo=parameters->getFirstTagChild("clientinfo");
 	for (uint64_t i=0; i<clientinfocount; i++) {
 		clientinfos[i]=new regularexpression(
 				clientinfo->getAttributeValue("pattern"));
@@ -114,7 +113,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrrouter *new_sqlrrouter_clientinfolist(
 						sqlrservercontroller *cont,
 						sqlrrouters *rs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrrouter_clientinfolist(cont,rs,parameters);
 	}
 }

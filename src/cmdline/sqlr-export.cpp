@@ -1,4 +1,4 @@
-// Copyright (c) 2005  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrclient.h>
@@ -25,10 +25,9 @@ static void xmlEscapeField(const char *field, uint32_t length) {
 
 static void csvEscapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
-		// backslash-escape double quotes and ignore non-ascii
-		// characters
+		// escape double quotes and ignore non-ascii characters
 		if (field[index]=='"') {
-			stdoutput.printf("\\\"");
+			stdoutput.printf("\"\"");
 		} else if (field[index]>=' ' || field[index]<='~') {
 			stdoutput.printf("%c",field[index]);
 		}

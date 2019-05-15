@@ -1,4 +1,4 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -9,7 +9,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule_cron_userlist : public sqlrschedule {
 	public:
 			sqlrschedule_cron_userlist(sqlrservercontroller *cont,
 							sqlrschedules *ss,
-							xmldomnode *parameters);
+							domnode *parameters);
 
 		bool	allowed(sqlrserverconnection *sqlrcon,
 						const char *user);
@@ -21,7 +21,7 @@ class SQLRSERVER_DLLSPEC sqlrschedule_cron_userlist : public sqlrschedule {
 sqlrschedule_cron_userlist::sqlrschedule_cron_userlist(
 						sqlrservercontroller *cont,
 						sqlrschedules *ss,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 					sqlrschedule(cont,ss,parameters) {
 
 	enabled=charstring::compareIgnoringCase(
@@ -30,7 +30,7 @@ sqlrschedule_cron_userlist::sqlrschedule_cron_userlist(
 			parameters->getAttributeValue("default"),"deny");
 
 	// parse the rules
-	for (xmldomnode *r=parameters->
+	for (domnode *r=parameters->
 				getFirstTagChild("rules")->
 				getFirstTagChild();
 			!r->isNullNode();
@@ -58,7 +58,7 @@ bool sqlrschedule_cron_userlist::allowed(sqlrserverconnection *sqlrcon,
 	debugPrintf("user...\n");
 
 	bool	found=false;
-	for (xmldomnode *u=getParameters()->
+	for (domnode *u=getParameters()->
 				getFirstTagChild("users")->
 				getFirstTagChild("user");
 			!u->isNullNode();
@@ -93,7 +93,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrschedule *new_sqlrschedule_cron_userlist(
 						sqlrservercontroller *cont,
 						sqlrschedules *ss,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrschedule_cron_userlist(cont,ss,parameters);
 	}
 }

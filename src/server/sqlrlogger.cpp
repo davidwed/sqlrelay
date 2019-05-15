@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -7,10 +7,10 @@ class sqlrloggerprivate {
 	friend class sqlrlogger;
 	private:
 		sqlrloggers	*_ls;
-		xmldomnode	*_parameters;
+		domnode	*_parameters;
 };
 
-sqlrlogger::sqlrlogger(sqlrloggers *ls, xmldomnode *parameters) {
+sqlrlogger::sqlrlogger(sqlrloggers *ls, domnode *parameters) {
 	pvt=new sqlrloggerprivate;
 	pvt->_ls=ls;
 	pvt->_parameters=parameters;
@@ -37,6 +37,12 @@ sqlrloggers *sqlrlogger::getLoggers() {
 	return pvt->_ls;
 }
 
-xmldomnode *sqlrlogger::getParameters() {
+domnode *sqlrlogger::getParameters() {
 	return pvt->_parameters;
+}
+
+void sqlrlogger::endTransaction(bool commit) {
+}
+
+void sqlrlogger::endSession() {
 }

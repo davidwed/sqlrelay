@@ -22,6 +22,9 @@ all-stress:
 all-tcl:
 	cd tcl $(AND) $(MAKE) all
 
+all-dropin:
+	cd dropin $(AND) $(MAKE) all
+
 clean:
 	cd bench $(AND) $(MAKE) clean
 	cd c $(AND) $(MAKE) clean

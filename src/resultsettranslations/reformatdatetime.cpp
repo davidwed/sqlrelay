@@ -1,4 +1,4 @@
-// Copyright (c) 2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -11,7 +11,7 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 			sqlrresultsettranslation_reformatdatetime(
 					sqlrservercontroller *cont,
 					sqlrresultsettranslations *rs,
-					xmldomnode *parameters);
+					domnode *parameters);
 			~sqlrresultsettranslation_reformatdatetime();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -40,7 +40,7 @@ sqlrresultsettranslation_reformatdatetime::
 	sqlrresultsettranslation_reformatdatetime(
 				sqlrservercontroller *cont,
 				sqlrresultsettranslations *rs,
-				xmldomnode *parameters) :
+				domnode *parameters) :
 				sqlrresultsettranslation(cont,rs,parameters) {
 
 	debug=cont->getConfig()->getDebugResultSetTranslations();
@@ -99,10 +99,6 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 		return true;
 	}
 
-	if (debug) {
-		stdoutput.printf("converted date \"%s\" ",*field);
-	}
-
 	// For now, call the sqlrservercontroller method.
 	// Eventually that code should be moved here.
 	sqlrcon->cont->reformatDateTimes(sqlrcur,fieldindex,
@@ -116,8 +112,8 @@ bool sqlrresultsettranslation_reformatdatetime::run(
 					timeformat);
 
 	if (debug) {
-		stdoutput.printf("\"%s\"\nusing ddmm=%d and yyyyddmm=%d\n",
-						*field,ddmm,yyyyddmm);
+		stdoutput.printf("using ddmm=%d and yyyyddmm=%d\n",
+							ddmm,yyyyddmm);
 	}
 
 	return true;
@@ -128,7 +124,7 @@ extern "C" {
 			*new_sqlrresultsettranslation_reformatdatetime(
 					sqlrservercontroller *cont,
 					sqlrresultsettranslations *rs,
-					xmldomnode *parameters) {
+					domnode *parameters) {
 		return new sqlrresultsettranslation_reformatdatetime(
 							cont,rs,parameters);
 	}

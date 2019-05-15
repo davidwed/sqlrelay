@@ -10,7 +10,7 @@
   * [#db-sap-freetds SAP/Sybase (using the FreeTDS)]
   * [#db-db2 IBM DB2]
   * [#db-informix Informix]
-  * [#db-mysql MySQL]
+  * [#db-mysql MySQL/MariaDB]
   * [#db-postgresql PostgreSQL]
   * [#db-firebird Firebird]
   * [#db-sqlite SQLite]
@@ -45,7 +45,7 @@
  * [#backendencryption Back-End Encryption and Secure Authentication]
   * [#backendenc-oracle Oracle]
   * [#backendenc-mssql-freetds Microsoft SQL Server (using FreeTDS)]
-  * [#backendenc-mysql MySQL]
+  * [#backendenc-mysql MySQL/MariaDB]
   * [#backendenc-postgresql PostgreSQL]
  * [#runas Run-As User and Group]
  * [#deniedallowedips Denied/Allowed IP Addresses]
@@ -370,7 +370,7 @@ In this example, SQL Relay is configured to connect to an IBM DB2 database.
 
 The db option refers to an entry in the local DB2 instance's database catalog.  See [http://software.firstworks.com/p/getting-started-with-ibm-db2.html#accessingremote Getting Started With IBM DB2 - Accessing Remote Instances] for more information.
 
-The timeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.
+The connecttimeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.
 
 See the [configreference.html#db2 SQL Relay Configuration Reference] for other valid IBM DB2 connect string options.
 
@@ -420,9 +420,9 @@ On Windows platforms, the servername option refers to a similar entry created in
 See the [configreference.html#informix SQL Relay Configuration Reference] for other valid Informix connect string options.
 
 [[br]][=#db-mysql]
-==== !MySQL ====
+==== !MySQL/MariaDB ====
 
-In this example, SQL Relay is configured to connect to a !MySQL database.
+In this example, SQL Relay is configured to connect to a !MySQL/MariaDB database.
 
 {{{#!blockquote
 {{{#!code
@@ -432,9 +432,9 @@ In this example, SQL Relay is configured to connect to a !MySQL database.
 
 The host and db options indicate that SQL Relay should connect to the database exampledb on the host examplehost.
 
-See the [configreference.html#mysql SQL Relay Configuration Reference] for other valid !MySQL connect string options.
+See the [configreference.html#mysql SQL Relay Configuration Reference] for other valid !MySQL/MariaDB connect string options.
 
-See [http://software.firstworks.com/p/getting-started-with-mysql.html Getting Started With MySQL] for general assistance installing and configuring a !MySQL database.
+See [http://software.firstworks.com/p/getting-started-with-mysql.html Getting Started With MySQL] for general assistance installing and configuring a !MySQL/MariaDB database.
 
 [[br]][=#db-postgresql]
 ==== !PostgreSQL ====
@@ -1600,23 +1600,23 @@ The SQL Relay configuration is no different than the configuration for an insecu
 
 
 [[br]][=#backendenc-mysql]
-=== !MySQL ===
+=== !MySQL/MariaDB ===
 
-Modern !MySQL databases support the following TLS/SSL features:
+Modern !MySQL/MariaDB databases support the following TLS/SSL features:
 
 * Encryption
 * Certificate Validation
 * Common Name Validation
 
-!MySQL does not support Mutual Authentication over TLS/SSL.
+!MySQL/MariaDB does not support Mutual Authentication over TLS/SSL.
 
-Configuring SQL Relay to use TLS/SSL encryption and authentication with a !MySQL database involves:
+Configuring SQL Relay to use TLS/SSL encryption and authentication with a !MySQL/MariaDB database involves:
 
 * Installing a certificate and key on the database server
 * Configuring the SQL Relay server to support encryption and/or authentication
 * Installing CA certs and revocation lists, as necessary, on the SQL Relay server
 
-!MySQL has supported TLS/SSL encryption and authentication since version 4.0, and encryption has been enabled by default since version 5.7.  Older versions require host configuration to enable encryption though, and a certificate must be installed on the database server to support authentication.  See [https://dev.mysql.com/doc/refman/5.7/en/encrypted-connections.html Using Encrypted Connections] for more information.
+!MySQL/MariaDB has supported TLS/SSL encryption and authentication since version 4.0, and encryption has been enabled by default since version 5.7.  Older versions require host configuration to enable encryption though, and a certificate must be installed on the database server to support authentication.  See [https://dev.mysql.com/doc/refman/5.7/en/encrypted-connections.html Using Encrypted Connections] for more information.
 
 On the SQL Relay server, most of the configuration is done in the SQL Relay configuration file, in the string attribute of the connection tag.
 
@@ -1640,7 +1640,7 @@ The following connection string options are supported:
  * TLSv1
  * TLSv1.1
  * TLSv1.2
- * Any more recent version of TLS, as supported by and enabled in the underlying !MySQL client/server.
+ * Any more recent version of TLS, as supported by and enabled in the underlying !MySQL/MariaDB client/server.
  * If left blank or omitted, then the highest supported version is negotiated.
 * '''sslkey''' - The full path name of an ssl key file (eg. /etc/certs/key.pem).
 * '''sslcert''' - The full path name of an ssl certificate file (eg. /etc/certs/cert.pem).
@@ -1871,11 +1871,17 @@ Currently, the following password encryption modules are available in the standa
 
 * rot
 * md5
+* sha1
+* sha256
 * crypt
 
 The '''rot''' module is a two-way encryption module that performs a character rotation, similar to the popular [http://en.wikipedia.org/wiki/ROT13 ROT13] algorithm, though it can rotate by any amount specified in the //count// attribute, not just 13 and rotates digits as well as upper and lower-case characters.
 
 The '''md5''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/MD5 MD5] algorithm.
+
+The '''sha1''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/SHA-1 SHA-1] algorithm.
+
+The '''sha256''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/SHA-2 SHA-256] algorithm.
 
 The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
 
@@ -2096,7 +2102,7 @@ When using query filters, it is helpful to use the //normalize// query translati
 }}}
 }}}
 
-See [#querytranslations Query Translations] below for more information.
+Pattern matching is substantially more reliable and efficient if the query has been normalized first.  See [#querytranslations Query Translations] and the [#normalize normalize] translation below for more information.
 
 Currently, the following filter modules are available:
 
@@ -2156,7 +2162,7 @@ For example, with the following configuration:
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-filters-regex.conf@
+@parts/sqlrelay-filters-regex-normalize.conf@
 }}}
 }}}
 
@@ -2300,17 +2306,17 @@ The following parameters are currently supported:
  * If set to "upper" or "lower" then values enclosed in double-quotes are converted to the specified case.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
-  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+  * Some databases (eg. !PostgreSQL, !MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "yes" then values enclosed in double-quotes are converted to the case specified by the convertcase parameter.
  * If set to "no" then no case conversion is done.
  * If omitted then the value defaults to "no".
 * '''convertcasebackquoted''' - "upper", "lower", "yes", or "no".  Defaults to "no".
- * If set to "upper" or "lower" then values enclosed in back-quotes are converted to the specified case.  In some database (MySQL and !MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.
+ * If set to "upper" or "lower" then values enclosed in back-quotes are converted to the specified case.  In some database (MySQL/MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
-  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+  * Some databases (eg. !PostgreSQL, !MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "yes" then values enclosed in back-quotes are converted to the case specified by the convertcase parameter.
@@ -2320,16 +2326,16 @@ The following parameters are currently supported:
  * If set to "yes" then double-quotes are removed, except for escaped double quotes.  Double-quotes usually surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
-  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+  * Some databases (eg. !PostgreSQL, !MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "no" then double-quotes are not removed.
  * If omitted then the value defaults to "no".
 * '''removebackquotes''' - "yes" or "no".  Defaults to "no".
- * If set to "yes" then back-quotes are removed, except for escaped back quotes.  In some database (MySQL and !MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
+ * If set to "yes" then back-quotes are removed, except for escaped back quotes.  In some databases (MySQL/MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.
   * Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //EXAMPLETABLE// with a column named //COL1//.
-  * Some databases (eg. !PostgreSQL, !MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
+  * Some databases (eg. !PostgreSQL, !MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
  * If set to "no" then back-quotes are not removed.
@@ -2582,7 +2588,7 @@ Note the use of a notification module to notify //dba@firstworks.com// if an //i
 
 Master-slave routing isn't all that the '''regex''' module can do though.
 
-In the example below, we provide a single point of access to !MySQL and !PostgreSQL databases.
+In the example below, we provide a single point of access to !MySQL/MariaDB and !PostgreSQL databases.
 
 {{{#!blockquote
 {{{#!code
@@ -2699,7 +2705,7 @@ The '''usedatabase''' allows you to access databases across multiple database in
 
 For example, lets say you have two database instances:
 
-A !MySQL instance that hosts 3 databases:
+A !MySQL/MariaDB instance that hosts 3 databases:
 
 * mydb1
 * mydb2
@@ -2710,11 +2716,11 @@ A !MySQL instance that hosts 3 databases:
 * pg1
 * pg2
 
-If you configure an instance of SQL Relay to access the !MySQL instance, then a SQL Relay client can run queries like "use mydb1" or "use mydb2" to select the database.
+If you configure an instance of SQL Relay to access the !MySQL/MariaDB instance, then a SQL Relay client can run queries like "use mydb1" or "use mydb2" to select the database.
 
 Similarly, if you configure an instance of SQL Relay to access the !PostgreSQL instance, then a SQL Relay client can run queries like "use pbdb1" or "use pbdb2" to select the database.
 
-The '''usedatabase''' module allows a client connected to a single instance of SQL Relay to select the database across both instances.  For example, "use mydb1" would set the current database to the mydb1 database hosted by the !MySQL instance, and "use pgdb2" would set the current database to the pgdb2 database hosted by the !PostgreSQL instance.
+The '''usedatabase''' module allows a client connected to a single instance of SQL Relay to select the database across both instances.  For example, "use mydb1" would set the current database to the mydb1 database hosted by the !MySQL/MariaDB instance, and "use pgdb2" would set the current database to the pgdb2 database hosted by the !PostgreSQL instance.
 
 An example configuration follows.
 
@@ -2726,7 +2732,7 @@ An example configuration follows.
 
 In this example, 3 SQL Relay instances are defined:
 
-* one to maintain connections to an !MySQL instance
+* one to maintain connections to an !MySQL/MariaDB instance
 * one to maintain connections to a !PostgreSQL database
 * one to route queries to the other two instances
 
@@ -2791,9 +2797,9 @@ this table is in db pgdb1
 }}}
 }}}
 
-But...  What if two different instances host databases with the same name?  For example, what if your !MySQL instance hosts a database named db2, and your !PostgreSQL instance also hosts a database named db2?
+But...  What if two different instances host databases with the same name?  For example, what if your !MySQL/MariaDB instance hosts a database named db2, and your !PostgreSQL instance also hosts a database named db2?
 
-To resolve situations like this, the '''usedatabase''' module allows you to map a database to an alias.  In this example, the db2 database hosted by !MySQL is mapped to mydb2, and the db2 database hosted by !PostgreSQL is mapped to pgdb2.
+To resolve situations like this, the '''usedatabase''' module allows you to map a database to an alias.  In this example, the db2 database hosted by !MySQL/MariaDB is mapped to mydb2, and the db2 database hosted by !PostgreSQL is mapped to pgdb2.
 
 {{{#!blockquote
 {{{#!code
@@ -2801,7 +2807,7 @@ To resolve situations like this, the '''usedatabase''' module allows you to map 
 }}}
 }}}
 
-To access the db2 database hosted by !MySQL, the user would run:
+To access the db2 database hosted by !MySQL/MariaDB, the user would run:
 
 {{{#!blockquote
 {{{
@@ -3065,6 +3071,7 @@ The '''events''' tag defines the set of events to listen for.  Valid events are:
 Any number of events may be specified.  Each event must be specified in its own '''event''' tag.  The event tag supports the following attributes:
 
 * '''event''' - Required.  The event to listen for.
+* '''pattern''' - Optional.  Only valid when event="query".  A regular expression limiting the set of queries that the notification will be sent for.  If set, then the notification will only be sent if the query matches the pattern.  If omitted, then the notification will be sent for all queries.
 
 Any number of recipients may also be specified.  Each recipient must be specified in its own '''recipient''' tag.  The recipient tag supports the following attributes:
 

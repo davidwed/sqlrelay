@@ -63,8 +63,8 @@ COMPILE = -c
 OUT = -o 
 BASECPPFLAGS = @CPPFLAGS@
 EXTRACPPFLAGS =
-CXXFLAGS = @CXXFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@
-CFLAGS = @CFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@
+CXXFLAGS = @CXXFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@ @WNOERRORDATETIME@
+CFLAGS = @CFLAGS@ @WALL@ @PIPE@ @WNOLONGDOUBLE@ @WNOOVERLOADEDVIRTUAL@ @WNOERRORDATETIME@
 WERROR = @WERROR@
 WNOUNKNOWNPRAGMAS = @WNOUNKNOWNPRAGMAS@
 WNOMISMATCHEDTAGS = @WNOMISMATCHEDTAGS@
@@ -623,20 +623,38 @@ STATICPLUGINSRCS += sqlrserverconnectiondeclarations.cpp \
 		sqlrparserassignments.cpp \
 		sqlrloggerdeclarations.cpp \
 		sqlrloggerassignments.cpp \
+		sqlrnotificationdeclarations.cpp \
+		sqlrnotificationassignments.cpp \
+		sqlrscheduledeclarations.cpp \
+		sqlrscheduleassignments.cpp \
+		sqlrrouterdeclarations.cpp \
+		sqlrrouterassignments.cpp \
 		sqlrpwdencdeclarations.cpp \
 		sqlrpwdencassignments.cpp \
 		sqlrauthdeclarations.cpp \
 		sqlrauthassignments.cpp \
+		sqlrdirectivedeclarations.cpp \
+		sqlrdirectiveassignments.cpp \
 		sqlrtranslationdeclarations.cpp \
 		sqlrtranslationassignments.cpp \
+		sqlrbindvariabletranslationdeclarations.cpp \
+		sqlrbindvariabletranslationassignments.cpp \
 		sqlrresultsettranslationdeclarations.cpp \
 		sqlrresultsettranslationassignments.cpp \
 		sqlrresultsetrowtranslationdeclarations.cpp \
 		sqlrresultsetrowtranslationassignments.cpp \
+		sqlrresultsetrowblocktranslationdeclarations.cpp \
+		sqlrresultsetrowblocktranslationassignments.cpp \
+		sqlrresultsetheadertranslationdeclarations.cpp \
+		sqlrresultsetheadertranslationassignments.cpp \
 		sqlrfilterdeclarations.cpp \
 		sqlrfilterassignments.cpp \
+		sqlrtriggerdeclarations.cpp \
+		sqlrtriggerassignments.cpp \
 		sqlrquerydeclarations.cpp \
-		sqlrqueryassignments.cpp
+		sqlrqueryassignments.cpp \
+		sqlrmoduledatadeclarations.cpp \
+		sqlrmoduledataassignments.cpp
 STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../protocols/*.$(OBJ)) \
 		$(shell ls ../parsers/*.$(OBJ)) \
@@ -648,10 +666,15 @@ STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../auths/*.$(OBJ)) \
 		$(shell ls ../directives/*.$(OBJ)) \
 		$(shell ls ../translations/*.$(OBJ)) \
+		$(shell ls ../bindvariabletranslations/*.$(OBJ)) \
 		$(shell ls ../resultsettranslations/*.$(OBJ)) \
 		$(shell ls ../resultsetrowtranslations/*.$(OBJ)) \
+		$(shell ls ../resultsetrowblocktranslations/*.$(OBJ)) \
+		$(shell ls ../resultsetheadertranslations/*.$(OBJ)) \
 		$(shell ls ../filters/*.$(OBJ)) \
-		$(shell ls ../queries/*.$(OBJ))
+		$(shell ls ../triggers/*.$(OBJ)) \
+		$(shell ls ../queries/*.$(OBJ)) \
+		$(shell ls ../moduledatas/*.$(OBJ))
 STATICPLUGINLIBS =
 STATICPLUGINLIBS += $(DB2LIBS)
 STATICPLUGINLIBS += $(FIREBIRDLIBS)
@@ -685,6 +708,7 @@ CONFIGPLUGINLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(E
 
 AUTHCPPFLAGS = $(PLUGINCPPFLAGS) -I$(top_builddir)/src/api/c++
 SQLRAUTH_SQLRELAYLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client
+SQLRLOGGER_STALECURSORSLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 INSTALLSHAREDLIB = installsharedlib
@@ -808,7 +832,7 @@ endif
 
 
 # tests
-TESTALLSUBDIRS = all-c all-cpp all-java all-stress all-tcl
+TESTALLSUBDIRS = all-dropin all-c all-cpp all-java all-stress all-tcl
 ifneq ($(HAVE_MONO),)
 	TESTALLSUBDIRS += all-cs
 endif
@@ -876,8 +900,8 @@ SRCALLSUBDIRS += all-util all-configs
 SRCINSTALLSUBDIRS += install-util install-configs
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections
-SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections
+SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections
+SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-filters install-triggers install-moduledatas install-connections
 endif
 else
 SRCALLSUBDIRS = all-api
@@ -887,8 +911,8 @@ SRCALLSUBDIRS += all-configs all-util
 SRCINSTALLSUBDIRS += install-configs install-util
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-filters all-connections all-server
-SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-filters install-connections install-server
+SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections all-server
+SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-filters install-triggers install-moduledatas install-connections install-server
 endif
 endif
 ifeq ($(ENABLE_CMDLINE),yes)

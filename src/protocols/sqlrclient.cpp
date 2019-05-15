@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <config.h>
@@ -10,6 +10,7 @@
 #include <rudiments/datetime.h>
 #include <rudiments/userentry.h>
 #include <rudiments/process.h>
+#include <rudiments/file.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
@@ -35,7 +36,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 	public:
 			sqlrprotocol_sqlrclient(sqlrservercontroller *cont,
 							sqlrprotocols *ps,
-							xmldomnode *parameters);
+							domnode *parameters);
 		virtual	~sqlrprotocol_sqlrclient();
 
 		clientsessionexitstatus_t	clientSession(
@@ -84,19 +85,24 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getBindVarCount(sqlrservercursor *cursor,
 						uint16_t *count);
 		bool	getBindVarName(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv);
+						sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getBindVarType(sqlrserverbindvar *bv);
 		bool	getBindSize(sqlrservercursor *cursor,
 						sqlrserverbindvar *bv,
 						uint32_t *maxsize);
-		void	getNullBind(sqlrserverbindvar *bv);
+		void	getNullBind(sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getStringBind(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv);
+						sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getIntegerBind(sqlrserverbindvar *bv);
 		bool	getDoubleBind(sqlrserverbindvar *bv);
-		bool	getDateBind(sqlrserverbindvar *bv);
+		bool	getDateBind(sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getLobBind(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv);
+						sqlrserverbindvar *bv,
+						memorypool *bindpool);
 		bool	getSendColumnInfo();
 		bool	getSkipAndFetch(bool initial, sqlrservercursor *cursor);
 		void	returnResultSetHeader(sqlrservercursor *cursor);
@@ -148,6 +154,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	returnResultSetData(sqlrservercursor *cursor,
 						bool getskipandfetch,
 						bool overridelazyfetch);
+		void	returnFetchError(sqlrservercursor *cursor);
 		void	returnRow(sqlrservercursor *cursor);
 		void	sendField(const char *data, uint32_t size);
 		void	sendNullField();
@@ -226,21 +233,19 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		char		*clientinfo;
 		uint64_t	clientinfolen;
 
-		memorypool	*bindpool;
-
 		uint64_t	skip;
 		uint64_t	fetch;
 		bool		lazyfetch;
 
 		char		lobbuffer[32768];
 
-		bool		debug;
+		uint16_t	protocolversion;
 };
 
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 					sqlrservercontroller *cont,
 					sqlrprotocols *ps,
-					xmldomnode *parameters) :
+					domnode *parameters) :
 					sqlrprotocol(cont,ps,parameters) {
 	debugFunction();
 
@@ -252,7 +257,6 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	maxstringbindvaluelength=
 			cont->getConfig()->getMaxStringBindValueLength();
 	maxlobbindvaluelength=cont->getConfig()->getMaxLobBindValueLength();
-	bindpool=cont->getBindPool();
 	lazyfetch=false;
 	maxerrorlength=cont->getConfig()->getMaxErrorLength();
 	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
@@ -376,7 +380,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 		}
 	}
 
-	debug=cont->getConfig()->getDebugProtocols();
+	protocolversion=0;
 }
 
 sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
@@ -432,10 +436,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 
 		// handle client protocol version as a command, for now
 		if (command==PROTOCOLVERSION) {
-			// get the next 2 bytes, but don't
-			// do anything with them, for now
-			uint16_t	version;
-			if (clientsock->read(&version,
+			if (clientsock->read(&protocolversion,
 						idleclienttimeout,0)==
 						sizeof(uint16_t)) {
 				continue;
@@ -617,7 +618,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		// FIXME: can we move this inside of processQueryOrBindCursor?
 		// verify that log/notification modules activated by
 		// raise*Event calls don't still need the bind values
-		bindpool->deallocate();
+		cont->getBindPool(cursor)->clear();
 
 	} while (loop);
 
@@ -1307,9 +1308,9 @@ bool sqlrprotocol_sqlrclient::reExecuteQueryCommand(sqlrservercursor *cursor) {
 
 	// get binds and whether to get column info
 	if (getInputBinds(cursor) &&
-		getOutputBinds(cursor) &&
-		getInputOutputBinds(cursor) &&
-		getSendColumnInfo()) {
+			getOutputBinds(cursor) &&
+			getInputOutputBinds(cursor) &&
+			getSendColumnInfo()) {
 		return processQueryOrBindCursor(cursor,
 				SQLRCLIENTQUERYTYPE_QUERY,
 				SQLRSERVERLISTFORMAT_NULL,
@@ -1680,6 +1681,7 @@ bool sqlrprotocol_sqlrclient::getInputBinds(sqlrservercursor *cursor) {
 	cont->setInputBindCount(cursor,inbindcount);
 
 	// get the input bind buffers
+	memorypool		*bindpool=cont->getBindPool(cursor);
 	sqlrserverbindvar	*inbinds=cont->getInputBinds(cursor);
 
 	// fill the buffers
@@ -1688,15 +1690,16 @@ bool sqlrprotocol_sqlrclient::getInputBinds(sqlrservercursor *cursor) {
 		sqlrserverbindvar	*bv=&(inbinds[i]);
 
 		// get the variable name and type
-		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
+		if (!(getBindVarName(cursor,bv,bindpool) &&
+					getBindVarType(bv))) {
 			return false;
 		}
 
 		// get the value
 		if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
-			getNullBind(bv);
+			getNullBind(bv,bindpool);
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
-			if (!getStringBind(cursor,bv)) {
+			if (!getStringBind(cursor,bv,bindpool)) {
 				return false;
 			}
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
@@ -1708,15 +1711,15 @@ bool sqlrprotocol_sqlrclient::getInputBinds(sqlrservercursor *cursor) {
 				return false;
 			}
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
-			if (!getDateBind(bv)) {
+			if (!getDateBind(bv,bindpool)) {
 				return false;
 			}
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
-			if (!getLobBind(cursor,bv)) {
+			if (!getLobBind(cursor,bv,bindpool)) {
 				return false;
 			}
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
-			if (!getLobBind(cursor,bv)) {
+			if (!getLobBind(cursor,bv,bindpool)) {
 				return false;
 			}
 		}		  
@@ -1739,6 +1742,7 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 	cont->setOutputBindCount(cursor,outbindcount);
 
 	// get the output bind buffers
+	memorypool		*bindpool=cont->getBindPool(cursor);
 	sqlrserverbindvar	*outbinds=cont->getOutputBinds(cursor);
 
 	// fill the buffers
@@ -1747,7 +1751,8 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 		sqlrserverbindvar	*bv=&(outbinds[i]);
 
 		// get the variable name and type
-		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
+		if (!(getBindVarName(cursor,bv,bindpool) &&
+					getBindVarType(bv))) {
 			return false;
 		}
 
@@ -1757,14 +1762,14 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a allocated and cleared because oracle
+			// This must be a allocated and zeroed because oracle
 			// gets angry if these aren't initialized to NULL's.
 			// It's possible that just the first character needs to
 			// be NULL, but for now I'm just going to go ahead and
-			// use allocateAndClear.
+			// allocate/zero.
 			bv->value.stringval=
-				(char *)bindpool->allocateAndClear(
-							bv->valuesize+1);
+				(char *)bindpool->allocate(bv->valuesize+1);
+			bytestring::zero(bv->value.stringval,bv->valuesize+1);
 			cont->raiseDebugMessageEvent("STRING");
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
 			cont->raiseDebugMessageEvent("INTEGER");
@@ -1791,8 +1796,8 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 			// date 512 bytes ought to be enough
 			bv->value.dateval.buffersize=512;
 			bv->value.dateval.buffer=
-				(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
+				(char *)bindpool->
+					allocate(bv->value.dateval.buffersize);
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB ||
 					bv->type==SQLRSERVERBINDVARTYPE_CLOB) {
 			if (!getBindSize(cursor,bv,&maxlobbindvaluelength)) {
@@ -1825,6 +1830,12 @@ bool sqlrprotocol_sqlrclient::getOutputBinds(sqlrservercursor *cursor) {
 bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 	debugFunction();
 
+	if (protocolversion<2) {
+		cont->raiseDebugMessageEvent("not getting input/output binds "
+						"(client protocol too old)");
+		return true;
+	}
+
 	cont->raiseDebugMessageEvent("getting input/output binds...");
 
 	// get the number of input/output bind variable/values
@@ -1835,6 +1846,7 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 	cont->setInputOutputBindCount(cursor,inoutbindcount);
 
 	// get the input/output bind buffers
+	memorypool		*bindpool=cont->getBindPool(cursor);
 	sqlrserverbindvar	*inoutbinds=cont->getInputOutputBinds(cursor);
 
 	// fill the buffers
@@ -1843,7 +1855,8 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 		sqlrserverbindvar	*bv=&(inoutbinds[i]);
 
 		// get the variable name and type
-		if (!(getBindVarName(cursor,bv) && getBindVarType(bv))) {
+		if (!(getBindVarName(cursor,bv,bindpool) &&
+					getBindVarType(bv))) {
 			return false;
 		}
 
@@ -1854,14 +1867,14 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a allocated and cleared because oracle
+			// This must be a allocated and zeroed because oracle
 			// gets angry if these aren't initialized to NULL's.
 			// It's possible that just the first character needs to
 			// be NULL, but for now I'm just going to go ahead and
-			// use allocateAndClear.
+			// allocate/zero.
 			bv->value.stringval=
-				(char *)bindpool->allocateAndClear(
-							bv->valuesize+1);
+				(char *)bindpool->allocate(bv->valuesize+1);
+			bytestring::zero(bv->value.stringval,bv->valuesize+1);
 			bv->isnull=cont->nullBindValue();
 			cont->raiseDebugMessageEvent("NULL");
 		} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
@@ -1869,14 +1882,14 @@ bool sqlrprotocol_sqlrclient::getInputOutputBinds(sqlrservercursor *cursor) {
 			if (!getBindSize(cursor,bv,&maxstringbindvaluelength)) {
 				return false;
 			}
-			// This must be a allocated and cleared because oracle
+			// This must be a allocated and zeroed because oracle
 			// gets angry if these aren't initialized to NULL's.
 			// It's possible that just the first character needs to
 			// be NULL, but for now I'm just going to go ahead and
-			// use allocateAndClear.
+			// allocate/zero.
 			bv->value.stringval=
-				(char *)bindpool->allocateAndClear(
-							bv->valuesize+1);
+				(char *)bindpool->allocate(bv->valuesize+1);
+			bytestring::zero(bv->value.stringval,bv->valuesize+1);
 
 			// get the bind value
 			ssize_t	result=clientsock->read(bv->value.stringval,
@@ -2152,7 +2165,8 @@ bool sqlrprotocol_sqlrclient::getBindVarCount(sqlrservercursor *cursor,
 }
 
 bool sqlrprotocol_sqlrclient::getBindVarName(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv) {
+						sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	// init
@@ -2190,7 +2204,7 @@ bool sqlrprotocol_sqlrclient::getBindVarName(sqlrservercursor *cursor,
 	// get the variable name
 	bv->variablesize=bindnamesize+1;
 	bv->variable=(char *)bindpool->allocate(bindnamesize+2);
-	bv->variable[0]=cont->bindVariablePrefix();
+	bv->variable[0]=cont->bindFormat()[0];
 	result=clientsock->read(bv->variable+1,bindnamesize,
 					idleclienttimeout,0);
 	if (result!=bindnamesize) {
@@ -2262,14 +2276,16 @@ bool sqlrprotocol_sqlrclient::getBindSize(sqlrservercursor *cursor,
 		debugstr.clear();
 		debugstr.append("get binds failed: bad value length: ");
 		debugstr.append(bv->valuesize);
-		cont->raiseClientProtocolErrorEvent(cursor,debugstr.getString(),1);
+		cont->raiseClientProtocolErrorEvent(
+				cursor,debugstr.getString(),1);
 		return false;
 	}
 
 	return true;
 }
 
-void sqlrprotocol_sqlrclient::getNullBind(sqlrserverbindvar *bv) {
+void sqlrprotocol_sqlrclient::getNullBind(sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("NULL");
@@ -2281,7 +2297,8 @@ void sqlrprotocol_sqlrclient::getNullBind(sqlrserverbindvar *bv) {
 }
 
 bool sqlrprotocol_sqlrclient::getStringBind(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv) {
+						sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("STRING");
@@ -2384,7 +2401,8 @@ bool sqlrprotocol_sqlrclient::getDoubleBind(sqlrserverbindvar *bv) {
 	return true;
 }
 
-bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
+bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	cont->raiseDebugMessageEvent("DATE");
@@ -2506,8 +2524,8 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 	// allocate enough space to store the date/time string
 	// 64 bytes ought to be enough
 	bv->value.dateval.buffersize=64;
-	bv->value.dateval.buffer=(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
+	bv->value.dateval.buffer=(char *)bindpool->
+					allocate(bv->value.dateval.buffersize);
 
 	bv->isnull=cont->nonNullBindValue();
 
@@ -2529,7 +2547,8 @@ bool sqlrprotocol_sqlrclient::getDateBind(sqlrserverbindvar *bv) {
 }
 
 bool sqlrprotocol_sqlrclient::getLobBind(sqlrservercursor *cursor,
-						sqlrserverbindvar *bv) {
+						sqlrserverbindvar *bv,
+						memorypool *bindpool) {
 	debugFunction();
 
 	// init
@@ -3020,6 +3039,12 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 						sqlrservercursor *cursor) {
 	debugFunction();
 
+	if (protocolversion<2) {
+		cont->raiseDebugMessageEvent("not returning input/output binds "
+						"(client protocol too old)");
+		return;
+	}
+
 	if (cont->logEnabled() || cont->notificationsEnabled()) {
 		debugstr.clear();
 		debugstr.append("returning ");
@@ -3224,6 +3249,11 @@ void sqlrprotocol_sqlrclient::sendColumnDefinition(
 	clientsock->write(zerofill);
 	clientsock->write(binary);
 	clientsock->write(autoincrement);
+
+	if (protocolversion<2) {
+		return;
+	}
+
 	clientsock->write(tablelen);
 	clientsock->write(table,tablelen);
 }
@@ -3291,6 +3321,11 @@ void sqlrprotocol_sqlrclient::sendColumnDefinitionString(
 	clientsock->write(zerofill);
 	clientsock->write(binary);
 	clientsock->write(autoincrement);
+
+	if (protocolversion<2) {
+		return;
+	}
+
 	clientsock->write(tablelen);
 	clientsock->write(table,tablelen);
 }
@@ -3326,6 +3361,8 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 	if (!lazyfetch || overridelazyfetch) {
 
+		bool	error=false;
+
 		// for some queries, there are no rows to return, 
 		if (cont->noRowsToReturn(cursor)) {
 			clientsock->write((uint16_t)END_RESULT_SET);
@@ -3336,11 +3373,15 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 		}
 
 		// skip the specified number of rows
-		if (!cont->skipRows(cursor,skip)) {
-			clientsock->write((uint16_t)END_RESULT_SET);
+		if (!cont->skipRows(cursor,skip,&error)) {
+			if (error) {
+				returnFetchError(cursor);
+			} else {
+				clientsock->write((uint16_t)END_RESULT_SET);
+				cont->raiseDebugMessageEvent(
+					"done returning result set data");
+			}
 			clientsock->flushWriteBuffer(-1,-1);
-			cont->raiseDebugMessageEvent(
-				"done returning result set data");
 			return true;
 		}
 
@@ -3354,12 +3395,17 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 		// send the specified number of rows back
 		for (uint64_t i=0; (!fetch || i<fetch); i++) {
-			if (cont->fetchRow(cursor)) {
+			if (cont->fetchRow(cursor,&error)) {
 				returnRow(cursor);
 				// FIXME: kludgy
 				cont->nextRow(cursor);
 			} else {
-				clientsock->write((uint16_t)END_RESULT_SET);
+				if (error) {
+					returnFetchError(cursor);
+				} else {
+					clientsock->write(
+						(uint16_t)END_RESULT_SET);
+				}
 				break;
 			}
 		}
@@ -3368,6 +3414,40 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 	cont->raiseDebugMessageEvent("done returning result set data");
 	return true;
+}
+
+void sqlrprotocol_sqlrclient::returnFetchError(sqlrservercursor *cursor) {
+
+	clientsock->write((uint16_t)FETCH_ERROR);
+
+	cont->raiseDebugMessageEvent("returning error...");
+
+	// FIXME: this is a little kludgy, ideally we'd just call returnError()
+	// but it has some side effects
+
+	// get the error
+	const char	*errorstring;
+	uint32_t	errorlength;
+	int64_t		errnum;
+	bool		liveconnection;
+	cont->errorMessage(cursor,&errorstring,&errorlength,
+					&errnum,&liveconnection);
+
+	// send the error status
+	if (!liveconnection) {
+		clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
+	} else {
+		clientsock->write((uint16_t)ERROR_OCCURRED);
+	}
+
+	// send the error code
+	clientsock->write((uint64_t)errnum);
+
+	// send the error string
+	clientsock->write((uint16_t)errorlength);
+	clientsock->write(errorstring,errorlength);
+
+	cont->raiseDebugMessageEvent("done returning error");
 }
 
 void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
@@ -3385,7 +3465,9 @@ void sqlrprotocol_sqlrclient::returnRow(sqlrservercursor *cursor) {
 		uint64_t	fieldlength=0;
 		bool		blob=false;
 		bool		null=false;
-		cont->getField(cursor,i,&field,&fieldlength,&blob,&null);
+		if (!cont->getField(cursor,i,&field,&fieldlength,&blob,&null)) {
+			// FIXME: handle error
+		}
 
 		// send data to the client
 		if (null) {
@@ -4106,20 +4188,18 @@ bool sqlrprotocol_sqlrclient::getQueryTreeCommand(sqlrservercursor *cursor) {
 	cont->raiseDebugMessageEvent("getting query tree");
 
 	// get the tree as a string
-	xmldom		*tree=cont->getQueryTree(cursor);
-	xmldomnode	*root=(tree)?tree->getRootNode():NULL;
-	stringbuffer	*xml=(root)?root->xml():NULL;
-	const char	*xmlstring=(xml)?xml->getString():NULL;
-	uint64_t	xmlstringlen=(xml)?xml->getStringLength():0;
+	xmldom	*tree=cont->getQueryTree(cursor);
+	domnode	*root=(tree)?tree->getRootNode():NULL;
+	stringbuffer	xml;
+	if (root) {
+		root->write(&xml);
+	}
 
 	// send the tree
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	clientsock->write(xmlstringlen);
-	clientsock->write(xmlstring,xmlstringlen);
+	clientsock->write((uint64_t)xml.getStringLength());
+	clientsock->write(xml.getString(),xml.getStringLength());
 	clientsock->flushWriteBuffer(-1,-1);
-
-	// clean up
-	delete xml;
 
 	return true;
 }
@@ -4155,7 +4235,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_sqlrclient(
 						sqlrservercontroller *cont,
 						sqlrprotocols *ps,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrprotocol_sqlrclient(cont,ps,parameters);
 	}
 }

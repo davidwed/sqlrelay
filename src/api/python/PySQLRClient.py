@@ -68,6 +68,42 @@ class sqlrconnection:
         """
         return CSQLRelay.setResponseTimeout(self.connection, timeoutsec, timeoutusec)
 
+    def setBindVariableDelimiters(self, delimiters):
+        """
+        Sets which delimiters are used to identify bind variables
+        in countBindVariables() and validateBinds().  Valid
+        delimiters include ?,:,@, and $.  Defaults to "?:@$"
+        """
+        return CSQLRelay.setBindVariableDelimiters(self.connection, delimiters)
+
+    def getBindVariableDelimiterQuestionMarkSupported(self):
+        """
+        Returns true if question marks (?) are considered to be
+        valid bind variable delimiters.
+        """
+        return CSQLRelay.getBindVariableDelimiterQuestionMarkSupported(self.connection)
+
+    def getBindVariableDelimiterColonSupported(self):
+        """
+        Returns true if colons (:) are considered to be
+        valid bind variable delimiters.
+        """
+        return CSQLRelay.getBindVariableDelimiterColonSupported(self.connection)
+
+    def getBindVariableDelimiterAtSignSupported(self):
+        """
+        Returns true if at-signs (@) are considered to be
+        valid bind variable delimiters.
+        """
+        return CSQLRelay.getBindVariableDelimiterAtSignSupported(self.connection)
+
+    def getBindVariableDelimiterDollarSignSupported(self):
+        """
+        Returns true if dollar signs ($) are considered to be
+        valid bind variable delimiters.
+        """
+        return CSQLRelay.getBindVariableDelimiterDollarSignSupported(self.connection)
+
     def enableKerberos(self, service, mech, flags):
         """
         Enables Kerberos authentication and encryption.

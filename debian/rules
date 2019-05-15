@@ -1,0 +1,39 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+# FIXME: temporary kludges
+export PERL_VERSION = $(shell eval `perl -V:version`; echo $$version)
+export RUBY_VERSION = $(shell ruby -v | cut -d' ' -f2 | sed -e "s|p.*||")
+
+clean:
+	dh_testdir
+	dh_auto_configure
+	dh_auto_clean
+	dh_clean
+
+%:
+	dh $@  --with autotools_dev
+
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		--disable-static \
+		--enable-oracle-at-runtime \
+		--enable-sap-at-runtime \
+		--enable-db2-at-runtime \
+		--enable-informix-at-runtime \
+		--with-perl-site-lib=/usr/share/perl/$(PERL_VERSION) \
+		--with-perl-site-arch=/usr/lib/$(DEB_HOST_MULTIARCH)/perl/$(PERL_VERSION) \
+		--with-ruby-site-arch-dir=/usr/lib/$(DEB_HOST_MULTIARCH)/ruby/$(RUBY_VERSION) \
+		--with-default-runasuser=sqlrelay \
+		--with-default-runasgroup=sqlrelay

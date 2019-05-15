@@ -19,7 +19,7 @@
       <li><a href="#db-sap-freetds">SAP/Sybase (using the FreeTDS)</a></li>
       <li><a href="#db-db2">IBM DB2</a></li>
       <li><a href="#db-informix">Informix</a></li>
-      <li><a href="#db-mysql">MySQL</a></li>
+      <li><a href="#db-mysql">MySQL/MariaDB</a></li>
       <li><a href="#db-postgresql">PostgreSQL</a></li>
       <li><a href="#db-firebird">Firebird</a></li>
       <li><a href="#db-sqlite">SQLite</a></li>
@@ -72,7 +72,7 @@
     <ul>
       <li><a href="#backendenc-oracle">Oracle</a></li>
       <li><a href="#backendenc-mssql-freetds">Microsoft SQL Server (using FreeTDS)</a></li>
-      <li><a href="#backendenc-mysql">MySQL</a></li>
+      <li><a href="#backendenc-mysql">MySQL/MariaDB</a></li>
       <li><a href="#backendenc-postgresql">PostgreSQL</a></li>
     </ul>
 
@@ -529,7 +529,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;connecttimeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -539,7 +539,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>The db option refers to an entry in the local DB2 instance's database catalog.  See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-ibm-db2.html#accessingremote">Getting Started With IBM DB2 - Accessing Remote Instances</a> for more information.</p>
 
-<p>The timeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.</p>
+<p>The connecttimeout=0 option tells SQL Relay not to time out when connecting to the database.  DB2 instances can take a long time to log in to sometimes.  The default timeout is often too short.</p>
 
 <p>See the <a href="configreference.html#db2">SQL Relay Configuration Reference</a> for other valid IBM DB2 connect string options.</p>
 
@@ -608,9 +608,9 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See the <a href="configreference.html#informix">SQL Relay Configuration Reference</a> for other valid Informix connect string options.</p>
 
-<br/><a name="db-mysql"/><h4>MySQL</h4>
+<br/><a name="db-mysql"/><h4>MySQL/MariaDB</h4>
 
-<p>In this example, SQL Relay is configured to connect to a MySQL database.</p>
+<p>In this example, SQL Relay is configured to connect to a MySQL/MariaDB database.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -625,7 +625,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=examplepassword;host=examplehost;db=exampledb"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -635,9 +635,9 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>The host and db options indicate that SQL Relay should connect to the database exampledb on the host examplehost.</p>
 
-<p>See the <a href="configreference.html#mysql">SQL Relay Configuration Reference</a> for other valid MySQL connect string options.</p>
+<p>See the <a href="configreference.html#mysql">SQL Relay Configuration Reference</a> for other valid MySQL/MariaDB connect string options.</p>
 
-<p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-mysql.html">Getting Started With MySQL</a> for general assistance installing and configuring a MySQL database.</p>
+<p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-mysql.html">Getting Started With MySQL</a> for general assistance installing and configuring a MySQL/MariaDB database.</p>
 
 <br/><a name="db-postgresql"/><h4>PostgreSQL</h4>
 
@@ -1124,7 +1124,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;connecttimeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -1190,7 +1190,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;connecttimeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -1334,7 +1334,7 @@ http://www.gnu.org/software/src-highlite -->
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;timeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=exampledb;user=db2inst1;password=db2inst1pass;lang=C;connecttimeout=0"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 
@@ -2330,9 +2330,9 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<br/><br/><a name="backendenc-mysql"/><h3>MySQL</h3>
+<br/><br/><a name="backendenc-mysql"/><h3>MySQL/MariaDB</h3>
 
-<p>Modern MySQL databases support the following TLS/SSL features:</p>
+<p>Modern MySQL/MariaDB databases support the following TLS/SSL features:</p>
 
 <ul>
   <li>Encryption</li>
@@ -2340,9 +2340,9 @@ http://www.gnu.org/software/src-highlite -->
   <li>Common Name Validation</li>
 </ul>
 
-<p>MySQL does not support Mutual Authentication over TLS/SSL.</p>
+<p>MySQL/MariaDB does not support Mutual Authentication over TLS/SSL.</p>
 
-<p>Configuring SQL Relay to use TLS/SSL encryption and authentication with a MySQL database involves:</p>
+<p>Configuring SQL Relay to use TLS/SSL encryption and authentication with a MySQL/MariaDB database involves:</p>
 
 <ul>
   <li>Installing a certificate and key on the database server</li>
@@ -2350,7 +2350,7 @@ http://www.gnu.org/software/src-highlite -->
   <li>Installing CA certs and revocation lists, as necessary, on the SQL Relay server</li>
 </ul>
 
-<p>MySQL has supported TLS/SSL encryption and authentication since version 4.0, and encryption has been enabled by default since version 5.7.  Older versions require host configuration to enable encryption though, and a certificate must be installed on the database server to support authentication.  See <a target="_blank" href="https://dev.mysql.com/doc/refman/5.7/en/encrypted-connections.html">Using Encrypted Connections</a> for more information.</p>
+<p>MySQL/MariaDB has supported TLS/SSL encryption and authentication since version 4.0, and encryption has been enabled by default since version 5.7.  Older versions require host configuration to enable encryption though, and a certificate must be installed on the database server to support authentication.  See <a target="_blank" href="https://dev.mysql.com/doc/refman/5.7/en/encrypted-connections.html">Using Encrypted Connections</a> for more information.</p>
 
 <p>On the SQL Relay server, most of the configuration is done in the SQL Relay configuration file, in the string attribute of the connection tag.</p>
 
@@ -2394,7 +2394,7 @@ http://www.gnu.org/software/src-highlite -->
     <li>TLSv1</li>
     <li>TLSv1.1</li>
     <li>TLSv1.2</li>
-    <li>Any more recent version of TLS, as supported by and enabled in the underlying MySQL client/server.</li>
+    <li>Any more recent version of TLS, as supported by and enabled in the underlying MySQL/MariaDB client/server.</li>
     <li>If left blank or omitted, then the highest supported version is negotiated.</li>
   </ul>
 
@@ -2765,12 +2765,18 @@ rknzcyrcnffjbeq
 <ul>
   <li>rot</li>
   <li>md5</li>
+  <li>sha1</li>
+  <li>sha256</li>
   <li>crypt</li>
 </ul>
 
 <p>The <b>rot</b> module is a two-way encryption module that performs a character rotation, similar to the popular <a target="_blank" href="http://en.wikipedia.org/wiki/ROT13">ROT13</a> algorithm, though it can rotate by any amount specified in the <i>count</i> attribute, not just 13 and rotates digits as well as upper and lower-case characters.</p>
 
 <p>The <b>md5</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/MD5">MD5</a> algorithm.</p>
+
+<p>The <b>sha1</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/SHA-1">SHA-1</a> algorithm.</p>
+
+<p>The <b>sha256</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/SHA-2">SHA-256</a> algorithm.</p>
 
 <p>The <b>crypt</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">DES</a> algorithm using a salt specified in the <i>salt</i> attribute.  The salt is required and must be a 2 digit alphanumeric code.</p>
 
@@ -3169,7 +3175,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>See <a href="#querytranslations">Query Translations</a> below for more information.</p>
+<p>Pattern matching is substantially more reliable and efficient if the query has been normalized first.  See <a href="#querytranslations">Query Translations</a> and the <a href="#normalize">normalize</a> translation below for more information.</p>
 
 <p>Currently, the following filter modules are available:</p>
 
@@ -3202,7 +3208,28 @@ http://www.gnu.org/software/src-highlite -->
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>@parts<font color="#990000">/</font>sqlrelay<font color="#990000">-</font>filters<font color="#990000">-</font>patterns<font color="#990000">.</font>conf@</tt></pre>
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;filters&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"patterns"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^(create)"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^(drop)"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"cistring"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"hugetable"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"badstring"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"insidequotes"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/filter&gt;</font></b>
+		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
 
 </blockquote>
 <p>These queries would be filtered out:</p>
@@ -3256,8 +3283,12 @@ http://www.gnu.org/software/src-highlite -->
 	...
 	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
 		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		...
 		<b><font color="#0000FF">&lt;filters&gt;</font></b>
-			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">" [0-9]*=[0-9]*"</font> <font color="#009900">errornumbrer</font><font color="#990000">=</font><font color="#FF0000">"100"</font> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"regex filter violation"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">" [0-9]*=[0-9]*"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
 		...
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
@@ -3312,6 +3343,10 @@ http://www.gnu.org/software/src-highlite -->
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 	...
 	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
 		...
 		<b><font color="#0000FF">&lt;filters&gt;</font></b>
 			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"hugetable"</font> <font color="#009900">ignorecase</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">errornumbrer</font><font color="#990000">=</font><font color="#FF0000">"100"</font> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"string filter violation"</font><b><font color="#0000FF">/&gt;</font></b>
@@ -3474,7 +3509,7 @@ http://www.gnu.org/software/src-highlite -->
         <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>EXAMPLETABLE</i> with a column named <i>COL1</i>.</li>
       </ul>
 
-      <li>Some databases (eg. PostgreSQL, MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
+      <li>Some databases (eg. PostgreSQL, MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
         <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>exampletable</i> with a column named <i>col1</i>.</li>
       </ul>
@@ -3489,14 +3524,14 @@ http://www.gnu.org/software/src-highlite -->
 
   <li><b>convertcasebackquoted</b> - "upper", "lower", "yes", or "no".  Defaults to "no".</li>
   <ul>
-    <li>If set to "upper" or "lower" then values enclosed in back-quotes are converted to the specified case.  In some database (MySQL and MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.</li>
+    <li>If set to "upper" or "lower" then values enclosed in back-quotes are converted to the specified case.  In some database (MySQL/MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" forces the case of the quoted object names in the query.</li>
     <ul>
       <li>Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
         <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>EXAMPLETABLE</i> with a column named <i>COL1</i>.</li>
       </ul>
 
-      <li>Some databases (eg. PostgreSQL, MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
+      <li>Some databases (eg. PostgreSQL, MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
         <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>exampletable</i> with a column named <i>col1</i>.</li>
       </ul>
@@ -3518,7 +3553,7 @@ http://www.gnu.org/software/src-highlite -->
         <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>EXAMPLETABLE</i> with a column named <i>COL1</i>.</li>
       </ul>
 
-      <li>Some databases (eg. PostgreSQL, MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
+      <li>Some databases (eg. PostgreSQL, MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
         <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>exampletable</i> with a column named <i>col1</i>.</li>
       </ul>
@@ -3532,14 +3567,14 @@ http://www.gnu.org/software/src-highlite -->
 
   <li><b>removebackquotes</b> - "yes" or "no".  Defaults to "no".</li>
   <ul>
-    <li>If set to "yes" then back-quotes are removed, except for escaped back quotes.  In some database (MySQL and MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.</li>
+    <li>If set to "yes" then back-quotes are removed, except for escaped back quotes.  In some databases (MySQL/MariaDB) back-quotes can be used to surround the names of database objects such as table, index, or column names to indicate that they should be interpreted in a case-sensitive manner.  So, effectively, setting this to "yes" causes the database to interpret the object names case-insensitively.</li>
     <ul>
       <li>Some databases (eg. Oracle) default object names to upper case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
         <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>EXAMPLETABLE</i> with a column named <i>COL1</i>.</li>
       </ul>
 
-      <li>Some databases (eg. PostgreSQL, MySQL, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
+      <li>Some databases (eg. PostgreSQL, MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.</li>
       <ul>
         <li>Eg. 'create table exampletable (col1 int)' creates a table named <i>exampletable</i> with a column named <i>col1</i>.</li>
       </ul>
@@ -4044,7 +4079,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><p>Master-slave routing isn't all that the <b>regex</b> module can do though.</p>
 
-<p>In the example below, we provide a single point of access to MySQL and PostgreSQL databases.</p>
+<p>In the example below, we provide a single point of access to MySQL/MariaDB and PostgreSQL databases.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -4380,7 +4415,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>For example, lets say you have two database instances:</p>
 
-<p>A MySQL instance that hosts 3 databases:</p>
+<p>A MySQL/MariaDB instance that hosts 3 databases:</p>
 
 <ul>
   <li>mydb1</li>
@@ -4395,11 +4430,11 @@ http://www.gnu.org/software/src-highlite -->
   <li>pg2</li>
 </ul>
 
-<p>If you configure an instance of SQL Relay to access the MySQL instance, then a SQL Relay client can run queries like "use mydb1" or "use mydb2" to select the database.</p>
+<p>If you configure an instance of SQL Relay to access the MySQL/MariaDB instance, then a SQL Relay client can run queries like "use mydb1" or "use mydb2" to select the database.</p>
 
 <p>Similarly, if you configure an instance of SQL Relay to access the PostgreSQL instance, then a SQL Relay client can run queries like "use pbdb1" or "use pbdb2" to select the database.</p>
 
-<p>The <b>usedatabase</b> module allows a client connected to a single instance of SQL Relay to select the database across both instances.  For example, "use mydb1" would set the current database to the mydb1 database hosted by the MySQL instance, and "use pgdb2" would set the current database to the pgdb2 database hosted by the PostgreSQL instance.</p>
+<p>The <b>usedatabase</b> module allows a client connected to a single instance of SQL Relay to select the database across both instances.  For example, "use mydb1" would set the current database to the mydb1 database hosted by the MySQL/MariaDB instance, and "use pgdb2" would set the current database to the pgdb2 database hosted by the PostgreSQL instance.</p>
 
 <p>An example configuration follows.</p>
 
@@ -4455,7 +4490,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, 3 SQL Relay instances are defined:</p>
 
 <ul>
-  <li>one to maintain connections to an MySQL instance</li>
+  <li>one to maintain connections to an MySQL/MariaDB instance</li>
   <li>one to maintain connections to a PostgreSQL database</li>
   <li>one to route queries to the other two instances</li>
 </ul>
@@ -4522,9 +4557,9 @@ this table is in db pgdb1
 </pre>
 
 </blockquote>
-<p>But...  What if two different instances host databases with the same name?  For example, what if your MySQL instance hosts a database named db2, and your PostgreSQL instance also hosts a database named db2?</p>
+<p>But...  What if two different instances host databases with the same name?  For example, what if your MySQL/MariaDB instance hosts a database named db2, and your PostgreSQL instance also hosts a database named db2?</p>
 
-<p>To resolve situations like this, the <b>usedatabase</b> module allows you to map a database to an alias.  In this example, the db2 database hosted by MySQL is mapped to mydb2, and the db2 database hosted by PostgreSQL is mapped to pgdb2.</p>
+<p>To resolve situations like this, the <b>usedatabase</b> module allows you to map a database to an alias.  In this example, the db2 database hosted by MySQL/MariaDB is mapped to mydb2, and the db2 database hosted by PostgreSQL is mapped to pgdb2.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -4556,7 +4591,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>To access the db2 database hosted by MySQL, the user would run:</p>
+<p>To access the db2 database hosted by MySQL/MariaDB, the user would run:</p>
 
 <blockquote>
   <pre>use mydb2
@@ -4910,6 +4945,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <ul>
   <li><b>event</b> - Required.  The event to listen for.</li>
+  <li><b>pattern</b> - Optional.  Only valid when event="query".  A regular expression limiting the set of queries that the notification will be sent for.  If set, then the notification will only be sent if the query matches the pattern.  If omitted, then the notification will be sent for all queries.</li>
 </ul>
 
 <p>Any number of recipients may also be specified.  Each recipient must be specified in its own <b>recipient</b> tag.  The recipient tag supports the following attributes:</p>

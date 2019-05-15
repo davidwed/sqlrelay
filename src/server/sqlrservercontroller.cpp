@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2014  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <config.h>
@@ -25,30 +25,35 @@
 #include <rudiments/unixsocketclient.h>
 #include <rudiments/inetsocketserver.h>
 #include <rudiments/listener.h>
+#include <rudiments/md5.h>
 
 #include <defines.h>
 #include <defaults.h>
-#define NEED_DATATYPESTRING
-#define NEED_IS_BIT_TYPE_CHAR
-#define NEED_IS_BIT_TYPE_INT
-#define NEED_IS_BOOL_TYPE_CHAR
-#define NEED_IS_BOOL_TYPE_INT
-#define NEED_IS_FLOAT_TYPE_CHAR
-#define NEED_IS_FLOAT_TYPE_INT
-#define NEED_IS_NUMBER_TYPE_CHAR
-#define NEED_IS_NUMBER_TYPE_INT
-#define NEED_IS_BLOB_TYPE_CHAR
-#define NEED_IS_BLOB_TYPE_INT
-#define NEED_IS_UNSIGNED_TYPE_CHAR
-#define NEED_IS_UNSIGNED_TYPE_INT
-#define NEED_IS_BINARY_TYPE_CHAR
-#define NEED_IS_BINARY_TYPE_INT
-#define NEED_IS_DATETIME_TYPE_CHAR
-#define NEED_IS_DATETIME_TYPE_INT
+#define NEED_DATATYPESTRING 1
+#define NEED_IS_BIT_TYPE_CHAR 1
+#define NEED_IS_BIT_TYPE_INT 1
+#define NEED_IS_BOOL_TYPE_CHAR 1
+#define NEED_IS_BOOL_TYPE_INT 1
+#define NEED_IS_FLOAT_TYPE_CHAR 1
+#define NEED_IS_FLOAT_TYPE_INT 1
+#define NEED_IS_NUMBER_TYPE_CHAR 1
+#define NEED_IS_NUMBER_TYPE_INT 1
+#define NEED_IS_BLOB_TYPE_CHAR 1
+#define NEED_IS_BLOB_TYPE_INT 1
+#define NEED_IS_UNSIGNED_TYPE_CHAR 1
+#define NEED_IS_UNSIGNED_TYPE_INT 1
+#define NEED_IS_BINARY_TYPE_CHAR 1
+#define NEED_IS_BINARY_TYPE_INT 1
+#define NEED_IS_DATETIME_TYPE_CHAR 1
+#define NEED_IS_DATETIME_TYPE_INT 1
 #include <datatypes.h>
-#define NEED_CONVERT_DATE_TIME
+#define NEED_CONVERT_DATE_TIME 1
 #include <parsedatetime.h>
-#include <countbindvariables.h>
+#define NEED_BEFORE_BIND_VARIABLE 1
+#define NEED_IS_BIND_DELIMITER 1
+#define NEED_AFTER_BIND_VARIABLE 1
+#define NEED_COUNT_BIND_VARIABLES 1
+#include <bindvariables.h>
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
@@ -80,21 +85,24 @@ class sqlrservercontrollerprivate {
 	semaphoreset	*_semset;
 	sharedmemory	*_shmem;
 
-	sqlrprotocols			*_sqlrpr;
-	sqlrparser			*_sqlrp;
-	sqlrdirectives			*_sqlrd;
-	sqlrtranslations		*_sqlrt;
-	sqlrfilters			*_sqlrf;
-	sqlrresultsettranslations	*_sqlrrst;
-	sqlrresultsetrowtranslations	*_sqlrrsrt;
-	sqlrresultsetheadertranslations	*_sqlrrsht;
-	sqlrtriggers			*_sqlrtr;
-	sqlrloggers			*_sqlrlg;
-	sqlrnotifications		*_sqlrn;
-	sqlrschedules			*_sqlrs;
-	sqlrqueries			*_sqlrq;
-	sqlrpwdencs			*_sqlrpe;
-	sqlrauths			*_sqlra;
+	sqlrprotocols				*_sqlrpr;
+	sqlrparser				*_sqlrp;
+	sqlrdirectives				*_sqlrd;
+	sqlrtranslations			*_sqlrt;
+	sqlrfilters				*_sqlrf;
+	sqlrbindvariabletranslations		*_sqlrbvt;
+	sqlrresultsettranslations		*_sqlrrst;
+	sqlrresultsetrowtranslations		*_sqlrrsrt;
+	sqlrresultsetrowblocktranslations	*_sqlrrsrbt;
+	sqlrresultsetheadertranslations		*_sqlrrsht;
+	sqlrtriggers				*_sqlrtr;
+	sqlrloggers				*_sqlrlg;
+	sqlrnotifications			*_sqlrn;
+	sqlrschedules				*_sqlrs;
+	sqlrqueries				*_sqlrq;
+	sqlrpwdencs				*_sqlrpe;
+	sqlrauths				*_sqlra;
+	sqlrmoduledatas				*_sqlrmd;
 
 	filedescriptor	*_clientsock;
 
@@ -116,7 +124,6 @@ class sqlrservercontrollerprivate {
 
 	bool		_autocommitforthissession;
 
-	bool		_intercepttxqueries;
 	bool		_faketransactionblocks;
 	bool		_faketransactionblocksautocommiton;
 	bool		_infaketransactionblock;
@@ -129,6 +136,10 @@ class sqlrservercontrollerprivate {
 
 	bool		_fakeinputbinds;
 	bool		_translatebinds;
+	bool		_questionmarksupported;
+	bool		_colonsupported;
+	bool		_atsignsupported;
+	bool		_dollarsignsupported;
 
 	const char	*_isolationlevel;
 
@@ -142,25 +153,27 @@ class sqlrservercontrollerprivate {
 	uint64_t		_serversockincount;
 	unixsocketserver	*_serversockun;
 
-	memorypool	*_bindpool;
-	memorypool	*_bindmappingspool;
-	namevaluepairs	*_inbindmappings;
-	namevaluepairs	*_outbindmappings;
+	memorypool	_txpool;
+	memorypool	_sessionpool;
 
 	bool		_debugsql;
+	bool		_debugbulkload;
 	bool		_debugsqlrparser;
 	bool		_debugsqlrdirectives;
 	bool		_debugsqlrtranslations;
 	bool		_debugsqlrfilters;
 	bool		_debugbindtranslation;
+	bool		_debugsqlrbindvariabletranslation;
 	bool		_debugsqlrresultsettranslation;
 	bool		_debugsqlrresultsetrowtranslation;
+	bool		_debugsqlrresultsetrowblocktranslation;
 	bool		_debugsqlrresultsetheadertranslation;
+	bool		_debugsqlrmoduledata;
 
 	dynamiclib	_conndl;
 	dynamiclib	_sqlrpdl;
 
-	xmldomnode	*_sqlrpnode;
+	domnode	*_sqlrpnode;
 
 	uint16_t	_cursorcount;
 	uint16_t	_mincursorcount;
@@ -252,6 +265,24 @@ class sqlrservercontrollerprivate {
 	uint64_t	*_fieldlengths;
 	bool		*_blobs;
 	bool		*_nulls;
+
+	char			*_bulkserveridfilename;
+	sharedmemory		*_bulkservershmem;
+	unsigned char 		*_bulkservershm;
+	unsigned char 		*_bulkservershmquery;
+	unsigned char 		*_bulkservershmdataformat;
+	sharedmemory		*_bulkclientshmem;
+	unsigned char		*_bulkclientshm;
+	sqlrservercursor	*_bulkcursor;
+	const char		*_bulkerrorfieldtable;
+	const char		*_bulkerrorrowtable;
+	uint64_t		_bulkmaxerrorcount;
+	uint64_t		_bulkdroperrortables;
+	uint64_t		_bulkquerylen;
+	const char		*_bulkquery;
+	const unsigned char	*_bulkdataformat;
+	singlylinkedlist<const unsigned char *>	_bulkdata;
+	singlylinkedlist<uint64_t>		_bulkdatalen;
 };
 
 static signalhandler		alarmhandler;
@@ -297,7 +328,6 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_autocommitforthissession=false;
 
-	pvt->_intercepttxqueries=false;
 	pvt->_faketransactionblocks=false;
 	pvt->_faketransactionblocksautocommiton=false;
 	pvt->_infaketransactionblock=false;
@@ -305,6 +335,10 @@ sqlrservercontroller::sqlrservercontroller() {
 
 	pvt->_fakeinputbinds=false;
 	pvt->_translatebinds=false;
+	pvt->_questionmarksupported=true;
+	pvt->_colonsupported=true;
+	pvt->_atsignsupported=true;
+	pvt->_dollarsignsupported=true;
 
 	pvt->_isolationlevel=NULL;
 
@@ -329,19 +363,15 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_reloginseed=0;
 	pvt->_relogintime=0;
 
-	// maybe someday these parameters will be configurable
-	pvt->_bindpool=new memorypool(512,128,100);
-	pvt->_bindmappingspool=new memorypool(512,128,100);
-	pvt->_inbindmappings=new namevaluepairs;
-	pvt->_outbindmappings=new namevaluepairs;
-
 	pvt->_sqlrpr=NULL;
 	pvt->_sqlrp=NULL;
 	pvt->_sqlrd=NULL;
 	pvt->_sqlrt=NULL;
 	pvt->_sqlrf=NULL;
+	pvt->_sqlrbvt=NULL;
 	pvt->_sqlrrst=NULL;
 	pvt->_sqlrrsrt=NULL;
+	pvt->_sqlrrsrbt=NULL;
 	pvt->_sqlrrsht=NULL;
 	pvt->_sqlrtr=NULL;
 	pvt->_sqlrlg=NULL;
@@ -350,15 +380,23 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_sqlrq=NULL;
 	pvt->_sqlrpe=NULL;
 	pvt->_sqlra=NULL;
+	pvt->_sqlrmd=NULL;
 
 	pvt->_decrypteddbpassword=NULL;
 
+	pvt->_debugsql=false;
+	pvt->_debugbulkload=false;
+	pvt->_debugsqlrparser=false;
 	pvt->_debugsqlrdirectives=false;
 	pvt->_debugsqlrtranslations=false;
 	pvt->_debugsqlrfilters=false;
 	pvt->_debugbindtranslation=false;
+	pvt->_debugsqlrbindvariabletranslation=false;
 	pvt->_debugsqlrresultsettranslation=false;
 	pvt->_debugsqlrresultsetrowtranslation=false;
+	pvt->_debugsqlrresultsetrowblocktranslation=false;
+	pvt->_debugsqlrresultsetheadertranslation=false;
+	pvt->_debugsqlrmoduledata=false;
 
 	pvt->_cur=NULL;
 
@@ -382,6 +420,21 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_proxypid=0;
 
 	pvt->_columnmap=NULL;
+
+	pvt->_bulkserveridfilename=NULL;
+	pvt->_bulkservershmem=NULL;
+	pvt->_bulkservershm=NULL;
+	pvt->_bulkservershmquery=NULL;
+	pvt->_bulkservershmdataformat=NULL;
+	pvt->_bulkclientshmem=NULL;
+	pvt->_bulkclientshm=NULL;
+	pvt->_bulkcursor=NULL;
+	pvt->_bulkerrorfieldtable=NULL;
+	pvt->_bulkerrorrowtable=NULL;
+	pvt->_bulkmaxerrorcount=0;
+	pvt->_bulkquerylen=0;
+	pvt->_bulkquery=NULL;
+	pvt->_bulkdataformat=NULL;
 
 	buildColumnMaps();
 }
@@ -411,18 +464,15 @@ sqlrservercontroller::~sqlrservercontroller() {
 		file::remove(pvt->_unixsocket.getString());
 	}
 
-	delete pvt->_bindpool;
-	delete pvt->_bindmappingspool;
-	delete pvt->_inbindmappings;
-	delete pvt->_outbindmappings;
-
 	delete pvt->_sqlrpr;
 	delete pvt->_sqlrp;
 	delete pvt->_sqlrd;
 	delete pvt->_sqlrt;
 	delete pvt->_sqlrf;
+	delete pvt->_sqlrbvt;
 	delete pvt->_sqlrrst;
 	delete pvt->_sqlrrsrt;
+	delete pvt->_sqlrrsrbt;
 	delete pvt->_sqlrrsht;
 	delete pvt->_sqlrtr;
 	delete pvt->_sqlrlg;
@@ -431,6 +481,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_sqlrq;
 	delete pvt->_sqlrpe;
 	delete pvt->_sqlra;
+	delete pvt->_sqlrmd;
 
 	delete[] pvt->_decrypteddbpassword;
 
@@ -448,6 +499,14 @@ sqlrservercontroller::~sqlrservercontroller() {
 	}
 
 	delete pvt->_conn;
+
+	if (pvt->_bulkserveridfilename) {
+		file::remove(pvt->_bulkserveridfilename);
+		delete[] pvt->_bulkserveridfilename;
+	}
+	delete pvt->_bulkservershmem;
+	delete pvt->_bulkclientshmem;
+	delete pvt->_bulkcursor;
 
 	delete pvt;
 }
@@ -499,9 +558,10 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	pvt->_maxerrorlength=pvt->_cfg->getMaxErrorLength();
 	pvt->_idleclienttimeout=pvt->_cfg->getIdleClientTimeout();
 	pvt->_debugsql=pvt->_cfg->getDebugSql();
+	pvt->_debugbulkload=pvt->_cfg->getDebugBulkLoad();
 
 	// get password encryptions
-	xmldomnode	*pwdencs=pvt->_cfg->getPasswordEncryptions();
+	domnode	*pwdencs=pvt->_cfg->getPasswordEncryptions();
 	if (!pwdencs->isNullNode()) {
 		pvt->_sqlrpe=new sqlrpwdencs(
 			pvt->_pth,pvt->_cfg->getDebugPasswordEncryptions());
@@ -509,7 +569,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}	
 
 	// initialize auth
-	xmldomnode	*auths=pvt->_cfg->getAuths();
+	domnode	*auths=pvt->_cfg->getAuths();
 	if (!auths->isNullNode()) {
 		pvt->_sqlra=new sqlrauths(this);
 		pvt->_sqlra->load(auths,pvt->_sqlrpe);
@@ -522,7 +582,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get loggers
-	xmldomnode	*loggers=pvt->_cfg->getLoggers();
+	domnode	*loggers=pvt->_cfg->getLoggers();
 	if (!loggers->isNullNode()) {
 		pvt->_sqlrlg=new sqlrloggers(pvt->_pth);
 		pvt->_sqlrlg->load(loggers);
@@ -530,14 +590,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get notifications
-	xmldomnode	*notifications=pvt->_cfg->getNotifications();
+	domnode	*notifications=pvt->_cfg->getNotifications();
 	if (!notifications->isNullNode()) {
 		pvt->_sqlrn=new sqlrnotifications(pvt->_pth);
 		pvt->_sqlrn->load(notifications);
 	}
 
 	// get schedules
-	xmldomnode	*schedules=pvt->_cfg->getSchedules();
+	domnode	*schedules=pvt->_cfg->getSchedules();
 	if (!schedules->isNullNode()) {
 		pvt->_sqlrs=new sqlrschedules(this);
 		pvt->_sqlrs->load(schedules);
@@ -598,9 +658,17 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 	initConnStats();
 
+	// get the module datas
+	pvt->_debugsqlrmoduledata=pvt->_cfg->getDebugModuleDatas();
+	domnode	*moduledatas=pvt->_cfg->getModuleDatas();
+	if (!moduledatas->isNullNode()) {
+		pvt->_sqlrmd=new sqlrmoduledatas(this);
+		pvt->_sqlrmd->load(moduledatas);
+	}
+
 	// get the query directives
 	pvt->_debugsqlrdirectives=pvt->_cfg->getDebugDirectives();
-	xmldomnode	*directives=pvt->_cfg->getDirectives();
+	domnode	*directives=pvt->_cfg->getDirectives();
 	if (!directives->isNullNode()) {
 		pvt->_sqlrd=new sqlrdirectives(this);
 		pvt->_sqlrd->load(directives);
@@ -608,7 +676,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the query translations
 	pvt->_debugsqlrtranslations=pvt->_cfg->getDebugTranslations();
-	xmldomnode	*translations=pvt->_cfg->getTranslations();
+	domnode	*translations=pvt->_cfg->getTranslations();
 	if (!translations->isNullNode()) {
 		pvt->_sqlrp=newParser();
 		pvt->_sqlrt=new sqlrtranslations(this);
@@ -617,7 +685,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get the query filters
 	pvt->_debugsqlrfilters=pvt->_cfg->getDebugFilters();
-	xmldomnode	*filters=pvt->_cfg->getFilters();
+	domnode	*filters=pvt->_cfg->getFilters();
 	if (!filters->isNullNode()) {
 		if (!pvt->_sqlrp) {
 			pvt->_sqlrp=newParser();
@@ -626,10 +694,20 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		pvt->_sqlrf->load(filters);
 	}
 
+	// get the bind variable translations
+	pvt->_debugsqlrbindvariabletranslation=
+				pvt->_cfg->getDebugBindVariableTranslations();
+	domnode	*bindvariabletranslations=
+				pvt->_cfg->getBindVariableTranslations();
+	if (!bindvariabletranslations->isNullNode()) {
+		pvt->_sqlrbvt=new sqlrbindvariabletranslations(this);
+		pvt->_sqlrbvt->load(bindvariabletranslations);
+	}
+
 	// get the result set translations
 	pvt->_debugsqlrresultsettranslation=
 				pvt->_cfg->getDebugResultSetTranslations();
-	xmldomnode	*resultsettranslations=
+	domnode	*resultsettranslations=
 				pvt->_cfg->getResultSetTranslations();
 	if (!resultsettranslations->isNullNode()) {
 		pvt->_sqlrrst=new sqlrresultsettranslations(this);
@@ -639,17 +717,27 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the result set row translations
 	pvt->_debugsqlrresultsetrowtranslation=
 				pvt->_cfg->getDebugResultSetRowTranslations();
-	xmldomnode	*resultsetrowtranslations=
+	domnode	*resultsetrowtranslations=
 				pvt->_cfg->getResultSetRowTranslations();
 	if (!resultsetrowtranslations->isNullNode()) {
 		pvt->_sqlrrsrt=new sqlrresultsetrowtranslations(this);
 		pvt->_sqlrrsrt->load(resultsetrowtranslations);
 	}
 
+	// get the result set row block translations
+	pvt->_debugsqlrresultsetrowblocktranslation=
+			pvt->_cfg->getDebugResultSetRowBlockTranslations();
+	domnode	*resultsetrowblocktranslations=
+				pvt->_cfg->getResultSetRowBlockTranslations();
+	if (!resultsetrowblocktranslations->isNullNode()) {
+		pvt->_sqlrrsrbt=new sqlrresultsetrowblocktranslations(this);
+		pvt->_sqlrrsrbt->load(resultsetrowblocktranslations);
+	}
+
 	// get the result set header translations
 	pvt->_debugsqlrresultsetheadertranslation=
 			pvt->_cfg->getDebugResultSetHeaderTranslations();
-	xmldomnode	*resultsetheadertranslations=
+	domnode	*resultsetheadertranslations=
 			pvt->_cfg->getResultSetHeaderTranslations();
 	if (!resultsetheadertranslations->isNullNode()) {
 		pvt->_sqlrrsht=new sqlrresultsetheadertranslations(this);
@@ -657,7 +745,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get the triggers
-	xmldomnode	*triggers=pvt->_cfg->getTriggers();
+	domnode	*triggers=pvt->_cfg->getTriggers();
 	if (!triggers->isNullNode()) {
 		// for triggers, we'll need an sqlrparser as well
 		if (!pvt->_sqlrp) {
@@ -674,6 +762,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// get translate bind variable behavior
 	pvt->_translatebinds=pvt->_cfg->getTranslateBindVariables();
+	pvt->_questionmarksupported=
+		pvt->_cfg->getBindVariableDelimiterQuestionMarkSupported();
+	pvt->_colonsupported=
+		pvt->_cfg->getBindVariableDelimiterColonSupported();
+	pvt->_atsignsupported=
+		pvt->_cfg->getBindVariableDelimiterAtSignSupported();
+	pvt->_dollarsignsupported=
+		pvt->_cfg->getBindVariableDelimiterDollarSignSupported();
 	pvt->_debugbindtranslation=pvt->_cfg->getDebugBindTranslations();
 
 	// initialize cursors
@@ -713,7 +809,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	markDatabaseAvailable();
 
 	// get the custom query handlers
-	xmldomnode	*queries=pvt->_cfg->getQueries();
+	domnode	*queries=pvt->_cfg->getQueries();
 	if (!queries->isNullNode()) {
 		pvt->_sqlrq=new sqlrqueries(this);
 		pvt->_sqlrq->load(queries);
@@ -1049,7 +1145,7 @@ bool sqlrservercontroller::initCursors(uint16_t count) {
 		if (!pvt->_cur[i]) {
 			pvt->_cur[i]=newCursor(i);
 		}
-		if (!pvt->_cur[i]->open()) {
+		if (!open(pvt->_cur[i])) {
 			pvt->_debugstr.clear();
 			pvt->_debugstr.append("cursor init failed: ");
 			pvt->_debugstr.append(i);
@@ -1945,7 +2041,7 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 		pvt->_cur[pvt->_cursorcount]=newCursor(pvt->_cursorcount);
 		pvt->_cur[pvt->_cursorcount]->
 				setState(SQLRCURSORSTATE_AVAILABLE);
-		if (!pvt->_cur[pvt->_cursorcount]->open()) {
+		if (!open(pvt->_cur[pvt->_cursorcount])) {
 			pvt->_debugstr.clear();
 			pvt->_debugstr.append("cursor init failure: ");
 			pvt->_debugstr.append(pvt->_cursorcount);
@@ -2092,16 +2188,19 @@ void sqlrservercontroller::suspendSession(const char **unixsocket,
 bool sqlrservercontroller::autoCommitOn() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: autocommit off\n\n",
+		stdoutput.printf("%d: autocommit on\n",
 					process::getProcessId());
 	}
 
 	pvt->_autocommitforthissession=true;
 	if (pvt->_conn->autoCommitOn()) {
+		if (pvt->_intransaction) {
+			raiseCommitEvent();
+		}
 		pvt->_intransaction=false;
 		return true;
 	}
@@ -2111,11 +2210,11 @@ bool sqlrservercontroller::autoCommitOn() {
 bool sqlrservercontroller::autoCommitOff() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: autocommit off\n\n",
+		stdoutput.printf("%d: autocommit off\n",
 					process::getProcessId());
 	}
 
@@ -2124,7 +2223,17 @@ bool sqlrservercontroller::autoCommitOff() {
 		// if the db doesn't support transaction blocks (oracle,
 		// firebird, informix) then we are in a transaction here,
 		// otherwise we aren't
-		pvt->_intransaction=!pvt->_conn->supportsTransactionBlocks();
+		//pvt->_intransaction=!pvt->_conn->supportsTransactionBlocks();
+		// actually, it seems that in db's that support transaction
+		// blocks, setting autocommit off is about the same as running
+		// a begin/start-tx query, so we're in a transaction no matter
+		// what...
+		// FIXME: verify this though, with all db's
+		bool	wasintx=pvt->_intransaction;
+		pvt->_intransaction=true;
+		if (!wasintx) {
+			raiseBeginTransactionEvent();
+		}
 		return true;
 	}
 	return false;
@@ -2133,11 +2242,11 @@ bool sqlrservercontroller::autoCommitOff() {
 bool sqlrservercontroller::begin() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: begin\n\n",
+		stdoutput.printf("%d: begin\n",
 					process::getProcessId());
 	}
 
@@ -2147,6 +2256,7 @@ bool sqlrservercontroller::begin() {
 			beginFakeTransactionBlock():
 			pvt->_conn->begin()) {
 		pvt->_intransaction=true;
+		raiseBeginTransactionEvent();
 		return true;
 	}
 	return false;
@@ -2170,19 +2280,16 @@ bool sqlrservercontroller::beginFakeTransactionBlock() {
 bool sqlrservercontroller::commit() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: commit\n\n",
+		stdoutput.printf("%d: commit\n",
 					process::getProcessId());
 	}
 
 	if (pvt->_conn->commit()) {
-		endFakeTransactionBlock();
-		if (!pvt->_autocommitforthissession) {
-			pvt->_intransaction=false;
-		}
+		endTransaction(true);
 		return true;
 	}
 	return false;
@@ -2202,22 +2309,99 @@ bool sqlrservercontroller::endFakeTransactionBlock() {
 	return true;
 }
 
+void sqlrservercontroller::endTransaction(bool commit) {
+
+	// end fake transaction blocks
+	// FIXME: this can fail
+	endFakeTransactionBlock();
+
+	// raise events
+	if (commit) {
+		raiseCommitEvent();
+	} else {
+		raiseRollbackEvent();
+	}
+
+	// reset protocol modules
+	if (pvt->_sqlrpr) {
+		pvt->_sqlrpr->endTransaction(commit);
+	}
+
+	// reset translation modules
+	if (pvt->_sqlrt) {
+		pvt->_sqlrt->endTransaction(commit);
+	}
+
+	// reset filter modules
+	if (pvt->_sqlrf) {
+		pvt->_sqlrf->endTransaction(commit);
+	}
+
+	// reset bind variable translation modules
+	if (pvt->_sqlrbvt) {
+		pvt->_sqlrbvt->endTransaction(commit);
+	}
+
+	// reset result set header translation modules
+	if (pvt->_sqlrrsht) {
+		pvt->_sqlrrsht->endTransaction(commit);
+	}
+
+	// reset result set translation modules
+	if (pvt->_sqlrrst) {
+		pvt->_sqlrrst->endTransaction(commit);
+	}
+
+	// reset result set row translation modules
+	if (pvt->_sqlrrsrt) {
+		pvt->_sqlrrsrt->endTransaction(commit);
+	}
+
+	// reset result set row block translation modules
+	if (pvt->_sqlrrsrbt) {
+		pvt->_sqlrrsrbt->endTransaction(commit);
+	}
+
+	// reset trigger modules
+	if (pvt->_sqlrtr) {
+		pvt->_sqlrtr->endTransaction(commit);
+	}
+
+	// reset logger modules
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->endTransaction(commit);
+	}
+
+	// reset notification modules
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->endTransaction(commit);
+	}
+
+	// reset query modules
+	if (pvt->_sqlrq) {
+		pvt->_sqlrq->endTransaction(commit);
+	}
+
+	// clear per-session pool
+	pvt->_txpool.clear();
+
+	// set in-tx flag
+	pvt->_intransaction=!pvt->_autocommitforthissession;
+}
+
 bool sqlrservercontroller::rollback() {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: rollback\n\n",
+		stdoutput.printf("%d: rollback\n",
 					process::getProcessId());
 	}
 
 	if (pvt->_conn->rollback()) {
-		endFakeTransactionBlock();
-		if (!pvt->_autocommitforthissession) {
-			pvt->_intransaction=false;
-		}
+		endTransaction(false);
 		return true;
 	}
 	return false;
@@ -2258,68 +2442,78 @@ bool sqlrservercontroller::getListsByApiCalls() {
 
 bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getDatabaseList(cursor,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getDatabaseList(cursor,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getSchemaList(cursor,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getSchemaList(cursor,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getTableList(cursor,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getTableList(cursor,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getTableTypeList(cursor,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getTableTypeList(cursor,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getColumnList(cursor,table,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getColumnList(cursor,table,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getPrimaryKeyList(cursor,table,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getPrimaryKeyList(cursor,table,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getKeyAndIndexList(cursor,table,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getKeyAndIndexList(cursor,table,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
-						const char *procedure,
+						const char *proc,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getProcedureBindAndColumnList(cursor,procedure,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getProcedureBindAndColumnList(cursor,proc,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getTypeInfoList(cursor,type,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getTypeInfoList(cursor,type,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenTranslated(false);
-	return pvt->_conn->getProcedureList(cursor,wild);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	return pvt->_conn->getProcedureList(cursor,wild) &&
+				handleResultSetHeader(cursor);
 }
 
 const char *sqlrservercontroller::getDatabaseListQuery(bool wild) {
@@ -2358,9 +2552,9 @@ const char *sqlrservercontroller::getKeyAndIndexListQuery(const char *table,
 }
 
 const char *sqlrservercontroller::getProcedureBindAndColumnListQuery(
-							const char *procedure,
+							const char *proc,
 							bool wild) {
-	return pvt->_conn->getProcedureBindAndColumnListQuery(procedure,wild);
+	return pvt->_conn->getProcedureBindAndColumnListQuery(proc,wild);
 }
 
 const char *sqlrservercontroller::getTypeInfoListQuery(const char *type,
@@ -2393,10 +2587,10 @@ void sqlrservercontroller::saveError() {
 	pvt->_conn->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("%d: ERROR:\n%d: %.*s\n\n",
-					process::getProcessId(),
-					errorcode,errorlength,
-					pvt->_conn->getErrorBuffer());
+		stdoutput.printf("%d:ERROR:\n%d:",
+				process::getProcessId(),errorcode);
+		stdoutput.write(pvt->_conn->getErrorBuffer(),errorlength);
+		stdoutput.write('\n');
 	}
 }
 
@@ -2503,22 +2697,37 @@ void sqlrservercontroller::setLiveConnection(bool liveconnection) {
 
 bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 
-	// we have to do this if we're faking transaction blocks,
-	// otherwise we'll only do it if it was manually enabled
-	if (!pvt->_faketransactionblocks && !pvt->_intercepttxqueries) {
-		return false;
-	}
+	// find the start of the actual query
+	const char	*ptr=skipWhitespaceAndComments(
+					cursor->getQueryBuffer());
 
 	// for now, we only intercept transaction queries
-	if (isBeginTransactionQuery(cursor)) {
+	if (isBeginTransactionQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_BEGIN);
 		return true;
-	} else if (isCommitQuery(cursor)) {
+	} else if (isCommitQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_COMMIT);
 		return true;
-	} else if (isRollbackQuery(cursor)) {
+	} else if (isRollbackQuery(ptr)) {
 		cursor->setQueryType(SQLRQUERYTYPE_ROLLBACK);
 		return true;
+	} else if (isAutoCommitOnQuery(ptr)) {
+		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_ON);
+		return true;
+	} else if (isAutoCommitOffQuery(ptr)) {
+		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_OFF);
+		return true;
+	} else {
+		bool	on=false;
+		if (isSetIncludingAutoCommitQuery(ptr,&on)) {
+			// For these, set the query type, but don't actually
+			// return true.  That way they won't actually be
+			// intercepted by interceptQuery().  Instead they'll be
+			// handled as special cases by executeQuery().
+			cursor->setQueryType((on)?
+				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON:
+				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF);
+		}
 	}
 	return false;
 }
@@ -2526,12 +2735,6 @@ bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 
 	cursor->setQueryWasIntercepted(false);
-
-	// we have to do this if we're faking transaction blocks,
-	// otherwise we'll only do it if it was manually enabled
-	if (!pvt->_faketransactionblocks && !pvt->_intercepttxqueries) {
-		return false;
-	}
 
 	// Get the query type.  It will have been set by checkInterceptQuery().
 	sqlrquerytype_t	querytype=cursor->getQueryType();
@@ -2541,100 +2744,286 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 	// the query will be sent directly to the db and endFakeBeginTransaction
 	// won't get called.
 	bool	retval=false;
-	if (querytype==SQLRQUERYTYPE_BEGIN) {
-		cursor->setQueryWasIntercepted(true);
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks &&
-				pvt->_infaketransactionblock) {
-			setError(cursor,
-				"begin while in transaction block",
-							999999,true);
-		} else {
-			retval=begin();
-		}
-		// FIXME: if the begin fails and the db api doesn't support
-		// a begin command then the connection-level error needs to
-		// be copied to the cursor so queryOrBindCursor can report it
-	} else if (querytype==SQLRQUERYTYPE_COMMIT) {
-		cursor->setQueryWasIntercepted(true);
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks &&
-				!pvt->_infaketransactionblock) {
-			setError(cursor,
-				"commit while not in transaction block",
-								999998,true);
-		} else {
-			retval=commit();
-		}
-		// FIXME: if the commit fails and the db api doesn't support
-		// a commit command then the connection-level error needs to
-		// be copied to the cursor so queryOrBindCursor can report it
-	} else if (querytype==SQLRQUERYTYPE_ROLLBACK) {
-		cursor->setQueryWasIntercepted(true);
-		cursor->setInputBindCount(0);
-		cursor->setOutputBindCount(0);
-		pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
-		if (pvt->_faketransactionblocks &&
-				!pvt->_infaketransactionblock) {
-			setError(cursor,
-				"rollback while not in transaction block",
-								999997,true);
-		} else {
-			retval=rollback();
-		}
-		// FIXME: if the rollback fails and the db api doesn't support
-		// a rollback command then the connection-level error needs to
-		// be copied to the cursor so queryOrBindCursor can report it
+	switch (querytype) {
+		case SQLRQUERYTYPE_BEGIN:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			if (pvt->_faketransactionblocks &&
+					pvt->_infaketransactionblock) {
+				setError(cursor,
+					SQLR_ERROR_BEGIN_IN_TX_BLOCK_STRING,
+					SQLR_ERROR_BEGIN_IN_TX_BLOCK,true);
+			} else {
+				retval=begin();
+			}
+			// FIXME: if the begin fails and the db api doesn't
+			// support a begin command then the connection-level
+			// error needs to be copied to the cursor so
+			// queryOrBindCursor can report it
+			break;
+		case SQLRQUERYTYPE_COMMIT:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			if (pvt->_faketransactionblocks &&
+					!pvt->_infaketransactionblock) {
+				setError(cursor,
+				SQLR_ERROR_COMMIT_NOT_IN_TX_BLOCK_STRING,
+				SQLR_ERROR_COMMIT_NOT_IN_TX_BLOCK,true);
+			} else {
+				retval=commit();
+			}
+			// FIXME: if the commit fails and the db api doesn't
+			// support a commit command then the connection-level
+			// error needs to be copied to the cursor so
+			// queryOrBindCursor can report it
+			break;
+		case SQLRQUERYTYPE_ROLLBACK:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			if (pvt->_faketransactionblocks &&
+					!pvt->_infaketransactionblock) {
+				setError(cursor,
+				SQLR_ERROR_ROLLBACK_NOT_IN_TX_BLOCK_STRING,
+				SQLR_ERROR_ROLLBACK_NOT_IN_TX_BLOCK,true);
+			} else {
+				retval=rollback();
+			}
+			// FIXME: if the rollback fails and the db api doesn't
+			// support a rollback command then the connection-level
+			// error needs to be copied to the cursor so
+			// queryOrBindCursor can report it
+			break;
+		case SQLRQUERYTYPE_AUTOCOMMIT_ON:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			// FIXME: fake tx block issues here???
+			retval=autoCommitOn();
+			break;
+		case SQLRQUERYTYPE_AUTOCOMMIT_OFF:
+			cursor->setQueryWasIntercepted(true);
+			cursor->setInputBindCount(0);
+			cursor->setOutputBindCount(0);
+			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
+			// FIXME: fake tx block issues here???
+			retval=autoCommitOff();
+			break;
+		default:
+			break;
 	}
 	return retval;
 }
 
-bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
+bool sqlrservercontroller::isAutoCommitOnQuery(const char *query) {
+	return isAutoCommitQuery(query,true);
+}
 
-	// find the start of the actual query
-	const char	*ptr=skipWhitespaceAndComments(
-					cursor->getQueryBuffer());
+bool sqlrservercontroller::isAutoCommitOffQuery(const char *query) {
+	return isAutoCommitQuery(query,false);
+}
+
+bool sqlrservercontroller::isAutoCommitQuery(const char *query, bool on) {
+
+	// look for "autocommit"
+	if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
+
+		query+=10;
+
+	}  else {
+
+		// look for "set"
+		if (!charstring::compareIgnoringCase(query,"set",3)) {
+			query+=3;
+		} else {
+			return false;
+		}
+
+		// skip whitespace
+		query=skipWhitespaceAndComments(query);
+
+		// look for "autocommit"/"auto"/"implicit_transactions"
+		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
+			query+=10;
+		} else if (!charstring::compareIgnoringCase(query,"auto",4)) {
+			query+=4;
+		} else if (!charstring::compareIgnoringCase(
+					query,"implicit_transactions",21)) {
+			query+=21;
+		} else {
+			return false;
+		}
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	// look for "="/"to"
+	if (*query=='=') {
+		query++;
+	} else if (!charstring::compareIgnoringCase(query,"to",2)) {
+		query+=2;
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	if (on) {
+		// look for 1/on/yes/immediate
+		if (*query=='1') {
+			query++;
+		} else if (!charstring::compareIgnoringCase(query,"on",2)) {
+			query+=2;
+		} else if (!charstring::compareIgnoringCase(query,"yes",3)) {
+			query+=3;
+		} else if (!charstring::compareIgnoringCase(
+							query,"immediate",9)) {
+			query+=9;
+		} else {
+			return false;
+		}
+	} else {
+		// look for 0/off/no
+		if (*query=='0') {
+			query++;
+		} else if (!charstring::compareIgnoringCase(query,"off",3)) {
+			query+=3;
+		} else if (!charstring::compareIgnoringCase(query,"no",2)) {
+			query+=2;
+		} else {
+			return false;
+		}
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	// look for end of query
+	if (*query) {
+		return false;
+	}
+
+	return true;
+}
+
+bool sqlrservercontroller::isSetIncludingAutoCommitQuery(
+						const char *query, bool *on) {
+
+	*on=false;
+
+	// look for "set"
+	if (!charstring::compareIgnoringCase(query,"set",3)) {
+		query+=3;
+	} else {
+		return false;
+	}
+
+	for (;;) {
+
+		// skip whitespace
+		query=skipWhitespaceAndComments(query);
+
+		// look for "autocommit"
+		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
+			query+=10;
+			break;
+		}
+
+		// look for a comma or end of query
+		while (*query && *query!=',') {
+			query++;
+		}
+		if (!*query) {
+			return false;
+		}
+
+		// skip comma
+		query++;
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	// look for "="/"to"
+	if (*query=='=') {
+		query++;
+	} else {
+		return false;
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	// look for 1/0
+	if (*query=='1') {
+		*on=true;
+		query++;
+	} else if (*query=='0') {
+		*on=false;
+		query++;
+	} else {
+		return false;
+	}
+
+	// skip whitespace
+	query=skipWhitespaceAndComments(query);
+
+	// success if we hit a comma, or are at the end of the query
+	return (*query!=',' || *query);
+}
+
+bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
+	return isBeginTransactionQuery(skipWhitespaceAndComments(
+						cursor->getQueryBuffer()));
+}
+
+bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 
 	// See if it was any of the different queries used to start a
 	// transaction.  IMPORTANT: don't just look for the first 5 characters
 	// to be "begin", make sure it's the entire query.  Many db's use
 	// "begin" to start a stored procedure block, but in those cases,
 	// something will follow it.
-	if (!charstring::compareIgnoringCase(ptr,"begin",5)) {
+	if (!charstring::compareIgnoringCase(query,"begin",5)) {
 
 		// make sure there are only spaces, comments or the word "work"
 		// after the begin
-		const char	*spaceptr=skipWhitespaceAndComments(ptr+5);
+		const char	*spaceptr=skipWhitespaceAndComments(query+5);
 		
-		if (!charstring::compareIgnoringCase(spaceptr,"work",4) ||
-			*spaceptr=='\0') {
+		if (*spaceptr=='\0' ||
+			!charstring::compareIgnoringCase(spaceptr,"work",4)) {
 			return true;
 		}
 		return false;
 
-	} else if (!charstring::compareIgnoringCase(ptr,"start ",6)) {
+	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
+		return true;
+	} else if (!charstring::compareIgnoringCase(query,"bt",2) &&
+							*(query+2)=='\0') {
 		return true;
 	}
 	return false;
 }
 
-bool sqlrservercontroller::isCommitQuery(sqlrservercursor *cursor) {
-	return !charstring::compareIgnoringCase(
-			skipWhitespaceAndComments(cursor->getQueryBuffer()),
-			"commit",6);
+bool sqlrservercontroller::isCommitQuery(const char *query) {
+
+	return (!charstring::compareIgnoringCase(query,"commit",6) ||
+		(!charstring::compareIgnoringCase(query,"et",2) &&
+						*(query+2)=='\0'));
 }
 
-bool sqlrservercontroller::isRollbackQuery(sqlrservercursor *cursor) {
-	return !charstring::compareIgnoringCase(
-			skipWhitespaceAndComments(cursor->getQueryBuffer()),
-			"rollback",8);
+bool sqlrservercontroller::isRollbackQuery(const char *query) {
+	return !charstring::compareIgnoringCase(query,"rollback",8);
 }
 
-bool sqlrservercontroller::skipComment(const char **ptr, const char *endptr) {
+bool sqlrservercontroller::skipComment(const char **ptr,
+						const char *endptr) {
 	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
 		while (**ptr && **ptr!='\n') {
 			(*ptr)++;
@@ -2643,7 +3032,8 @@ bool sqlrservercontroller::skipComment(const char **ptr, const char *endptr) {
 	return *ptr!=endptr;
 }
 
-bool sqlrservercontroller::skipWhitespace(const char **ptr, const char *endptr) {
+bool sqlrservercontroller::skipWhitespace(const char **ptr,
+						const char *endptr) {
 	while (character::isWhitespace(**ptr) && *ptr<endptr) {
 		(*ptr)++;
 	}
@@ -2651,6 +3041,9 @@ bool sqlrservercontroller::skipWhitespace(const char **ptr, const char *endptr) 
 }
 
 const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
+	if (!query) {
+		return NULL;
+	}
 	const char	*ptr=query;
 	while (*ptr) {
 		if (character::isWhitespace(*ptr)) {
@@ -2767,8 +3160,22 @@ const char *sqlrservercontroller::asciiToOctal(unsigned char ch) {
 	return asciitooctal[ch];
 }
 
-uint16_t sqlrservercontroller::countBindVariables(const char *query) {
-	return ::countBindVariables(query);
+bool sqlrservercontroller::hasBindVariables(const char *query,
+						uint32_t querylen) {
+	return ::countBindVariables(query,querylen,
+				pvt->_questionmarksupported,
+				pvt->_colonsupported,
+				pvt->_atsignsupported,
+				pvt->_dollarsignsupported);
+}
+
+uint16_t sqlrservercontroller::countBindVariables(const char *query,
+							uint32_t querylen) {
+	return ::countBindVariables(query,querylen,
+				pvt->_questionmarksupported,
+				pvt->_colonsupported,
+				pvt->_atsignsupported,
+				pvt->_dollarsignsupported);
 }
 
 bool sqlrservercontroller::isBitType(const char *type) {
@@ -2842,8 +3249,10 @@ const char * const *sqlrservercontroller::dataTypeStrings() {
 bool sqlrservercontroller::applyDirectives(sqlrservercursor *cursor) {
 
 	if (pvt->_debugsqlrdirectives) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("applying directives...\n");
 	}
 
@@ -2854,6 +3263,7 @@ bool sqlrservercontroller::applyDirectives(sqlrservercursor *cursor) {
 			stdoutput.printf("a directive failed\n");
 		}
 		// FIXME: raise directive failed event...
+		// FIXME: return an error somehow
 		return false;
 	}
 
@@ -2863,12 +3273,17 @@ bool sqlrservercontroller::applyDirectives(sqlrservercursor *cursor) {
 bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	const char	*query=cursor->getQueryBuffer();
+	uint32_t	querylen=cursor->getQueryLength();
 
 	if (pvt->_debugsqlrtranslations) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
-		stdoutput.printf("translating query...\n");
-		stdoutput.printf("original:\n\"%s\"\n",query);
+		stdoutput.write("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
+		stdoutput.write("translating query...\n\n");
+		stdoutput.write("original:\n\"");
+		stdoutput.safePrint(query,querylen);
+		stdoutput.write("\"\n");
 	}
 
 	// clear the query tree
@@ -2877,14 +3292,20 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	// apply translation rules
 	stringbuffer	*translatedquery=cursor->getTranslatedQueryBuffer();
 	translatedquery->clear();
-	if (!pvt->_sqlrt->run(pvt->_conn,cursor,
-				pvt->_sqlrp,query,translatedquery)) {
-		if (pvt->_debugsqlrtranslations) {
-			stdoutput.printf("translation failed, "
-						"using original:\n\"%s\"\n\n",
-						query);
-		}
+	if (!pvt->_sqlrt->run(pvt->_conn,cursor,pvt->_sqlrp,
+					query,querylen,translatedquery)) {
 		raiseTranslationFailureEvent(cursor,query);
+		if (pvt->_sqlrt->getUseOriginalOnError()) {
+			if (pvt->_debugsqlrtranslations) {
+				stdoutput.write("translation failed, "
+						"using original:\n\"");
+				stdoutput.safePrint(query,querylen);
+				stdoutput.write("\"\n");
+			}
+			return true;
+		}
+		setError(cursor,pvt->_sqlrt->getError(),
+				SQLR_ERROR_QUERYTRANSLATION,true);
 		return false;
 	}
 
@@ -2894,54 +3315,49 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	}
 
 	if (pvt->_debugsqlrtranslations) {
-		stdoutput.printf("translated:\n\"%s\"\n\n",
-					translatedquery->getString());
+		stdoutput.write("translated:\n\"");
+		stdoutput.safePrint(translatedquery->getString(),
+					translatedquery->getSize());
+		stdoutput.write("\"\n");
 	}
 
 	// bail if the translated query is too large
-	if (translatedquery->getStringLength()>pvt->_maxquerysize) {
+	if (translatedquery->getSize()>pvt->_maxquerysize) {
 		if (pvt->_debugsqlrtranslations) {
-			stdoutput.printf("translated query too large\n");
+			stdoutput.write("translated query too large\n");
 		}
 		return false;
 	}
 
 	// replace with a noop if the query is empty
-	if (!translatedquery->getStringLength()) {
+	if (charstring::isNullOrEmpty(translatedquery->getString())) {
 		translatedquery->append(pvt->_conn->noopQuery());
 	}
 
 	// write the translated query to the cursor's query buffer
 	// so it'll be there if we decide to re-execute it later
-	charstring::copy(cursor->getQueryBuffer(),
+	bytestring::copy(cursor->getQueryBuffer(),
 			translatedquery->getString(),
-			translatedquery->getStringLength());
-	cursor->setQueryLength(
-			translatedquery->getStringLength());
+			translatedquery->getSize());
+	cursor->setQueryLength(translatedquery->getSize());
 	cursor->getQueryBuffer()[cursor->getQueryLength()]='\0';
 	return true;
 }
 
-enum queryparsestate_t {
-	IN_QUERY=0,
-	IN_QUOTES,
-	BEFORE_BIND,
-	IN_BIND
-};
-
 void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 	// clear bind mappings
-	pvt->_inbindmappings->clear();
-	pvt->_outbindmappings->clear();
+	cursor->getBindMappings()->clear();
 
 	// get query buffer
 	char	*querybuffer=cursor->getQueryBuffer();
 
 	// debug
 	if (pvt->_debugbindtranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("translating bind variables...\n");
 		stdoutput.printf("original:\n%s\n",querybuffer);
 	}
@@ -2958,55 +3374,66 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	queryparsestate_t	parsestate=IN_QUERY;
 	stringbuffer		newquery;
 	stringbuffer		currentbind;
-	const char		*endptr=querybuffer+cursor->getQueryLength()-1;
 
 	// use 1-based index for bind variables
 	uint16_t	bindindex=1;
 	
 	// run through the querybuffer...
-	char *c=querybuffer;
+	const char	*ptr=querybuffer;
+	const char	*endptr=querybuffer+cursor->getQueryLength();
+	const char	*prevptr="\0";
 	do {
 
 		// if we're in the query...
 		if (parsestate==IN_QUERY) {
 
 			// if we find a quote, we're in quotes
-			if (*c=='\'') {
+			if (*ptr=='\'') {
 				parsestate=IN_QUOTES;
 			}
 
 			// if we find whitespace or a couple of other things
 			// then the next thing could be a bind variable
-			if (character::isWhitespace(*c) ||
-					*c==',' || *c=='(' || *c=='=') {
+			if (beforeBindVariable(ptr)) {
 				parsestate=BEFORE_BIND;
 			}
 
 			// append the character
-			newquery.append(*c);
-			c++;
+			newquery.append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
 			continue;
 		}
 
 		// copy anything in quotes verbatim
 		if (parsestate==IN_QUOTES) {
-			if (*c=='\'') {
+
+			// if we find a quote, but not an escaped quote,
+			// then we're back in the query
+			if (*ptr=='\'' && *(ptr+1)!='\'' &&
+					*prevptr!='\'' && *prevptr!='\\') {
 				parsestate=IN_QUERY;
 			}
-			newquery.append(*c);
-			c++;
+
+			// append the character
+			newquery.append(*ptr);
+
+			// move on
+			prevptr=ptr;
+			ptr++;
 			continue;
 		}
 
 		if (parsestate==BEFORE_BIND) {
 
 			// if we find a bind variable...
-			// (make sure to catch :'s but not :='s)
-			// (make sure to catch @'s but not @@'s)
-			if (*c=='?' ||
-				(*c==':' && *(c+1)!='=') ||
-				(*c=='@' && *(c+1)!='@') ||
-				*c=='$') {
+			if (isBindDelimiter(ptr,
+					pvt->_questionmarksupported,
+					pvt->_colonsupported,
+					pvt->_atsignsupported,
+					pvt->_dollarsignsupported)) {
 				parsestate=IN_BIND;
 				currentbind.clear();
 				continue;
@@ -3024,17 +3451,15 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			// If we find whitespace or a few other things
 			// then we're done with the bind variable.  Process it.
 			// Otherwise get the variable itself in another buffer.
-			bool	endofbind=(character::isWhitespace(*c) ||
-						*c==',' || *c==')' ||
-						*c==';' || *c=='=' ||
-						(*c==':' && *(c+1)=='='));
-			if (endofbind || c==endptr) {
+			bool	endofbind=afterBindVariable(ptr);
+			if (endofbind || ptr==endptr-1) {
 
-				// special case if we hit the end of the string
-				// an it's not one of the special chars
-				if (c==endptr && !endofbind) {
-					currentbind.append(*c);
-					c++;
+				// special case...
+				// last character in the query
+				if (!endofbind && ptr==endptr-1) {
+					currentbind.append(*ptr);
+					prevptr=ptr;
+					ptr++;
 				}
 
 				// if the current bind variable format doesn't
@@ -3058,13 +3483,16 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 				parsestate=IN_QUERY;
 
 			} else {
-				currentbind.append(*c);
-				c++;
+
+				// move on
+				currentbind.append(*ptr);
+				prevptr=ptr;
+				ptr++;
 			}
 			continue;
 		}
 
-	} while (c<=endptr);
+	} while (ptr<endptr);
 
 
 	// if no translation was performed
@@ -3085,7 +3513,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	if (newqlen>pvt->_maxquerysize) {
 		newqlen=pvt->_maxquerysize;
 	}
-	charstring::copy(querybuffer,newq,newqlen);
+	bytestring::copy(querybuffer,newq,newqlen);
 	querybuffer[newqlen]='\0';
 	cursor->setQueryLength(newqlen);
 
@@ -3130,36 +3558,45 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 						uint16_t bindindex,
 						stringbuffer *newquery) {
 
+	// get the bind format
 	const char	*bindformat=pvt->_conn->bindFormat();
-	size_t		bindformatlen=charstring::length(bindformat);
+
+	// replace the bind variable delimiter with whatever we would expect to
+	// find for this database
+	currentbind->setPosition(0);
+	currentbind->write(bindformat[0]);
 
 	// append the first character of the bind format to the new query
 	newquery->append(bindformat[0]);
 
-	if (bindformatlen==1) {
+	if (bindformat[1]=='\0') {
 
 		// This section handles single-character bind variable
 		// placeholder such as ?'s. (mysql, db2 and firebird format)
 
 		// replace bind variable itself with number
-		mapBindVariable(cursor,currentbind->getString(),bindindex);
+		mapBindVariable(cursor,currentbind->getString(),
+					currentbind->getStringLength(),
+					bindindex);
 
 	} else if (bindformat[1]=='1' &&
 			!charstring::isNumber(currentbind->getString()+1)) {
 
 		// This section handles 2-character placeholders where the
-		// second position is a 1, such as $1 (postgresql-format).
+		// second position is a number, such as $1 (postgresql-format).
 
 		// replace bind variable in string with number
 		newquery->append(bindindex);
 
 		// replace bind variable itself with number
-		mapBindVariable(cursor,currentbind->getString(),bindindex);
+		mapBindVariable(cursor,currentbind->getString(),
+					currentbind->getStringLength(),
+					bindindex);
 
 	} else {
 
 		// This section handles everything else, such as :*, @*.
-		// (oracle, sybase and ms sql server formats)
+		// (oracle, sybase, and ms sql server formats)
 
 		// If the current bind variable was a single character
 		// placeholder (such as a ?) then replace it with a delimited
@@ -3171,8 +3608,9 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 			newquery->append(bindindex);
 
 			// replace bind variable itself with number
-			mapBindVariable(cursor,
-					currentbind->getString(),bindindex);
+			mapBindVariable(cursor,currentbind->getString(),
+						currentbind->getStringLength(),
+						bindindex);
 		} else {
 			newquery->append(currentbind->getString()+1,
 					currentbind->getStringLength()-1);
@@ -3182,6 +3620,7 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 
 void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 						const char *bindvariable,
+						uint64_t bindvariablelen,
 						uint16_t bindindex) {
 
 	// if the current bind variable is a ? then just
@@ -3190,59 +3629,27 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 		bindvariable=NULL;
 	}
 
-	// run two passes, first for input binds, second for output binds
-	for (uint16_t i=0; i<2; i++) {
+	// create the new bind var name and get its length
+	char		*tempnumber=charstring::parseNumber(bindindex);
+	uint16_t	tempnumberlen=charstring::length(tempnumber);
 
-		// first pass for input binds, second pass for output binds
-		uint16_t	count=(!i)?cursor->getInputBindCount():
-						cursor->getOutputBindCount();
-		sqlrserverbindvar	*vars=(!i)?cursor->getInputBinds():
-						cursor->getOutputBinds();
-		namevaluepairs	*mappings=(!i)?pvt->_inbindmappings:
-						pvt->_outbindmappings;
-
-		for (uint16_t j=0; j<count; j++) {
-
-			// get the bind var
-			sqlrserverbindvar	*b=&(vars[j]);
-
-			// If a bind var name was passed in, look for a bind
-			// variable with a matching name.
-			// If no name was passed in then the bind vars are
-			// numeric; get the variable who's numeric name matches
-			// the index passed in.
-			if ((bindvariable &&
-				!charstring::compare(bindvariable,
-							b->variable)) ||
-				(!bindvariable &&
-				charstring::toInteger((b->variable)+1)==
-								bindindex)) {
-
-				// create the new bind var
-				// name and get its length
-				char		*tempnumber=charstring::
-							parseNumber(bindindex);
-				uint16_t	tempnumberlen=charstring::
-							length(tempnumber);
-
-				// allocate memory for the new name
-				char	*newvariable=
-					(char *)pvt->_bindmappingspool->
+	char	*oldvariable=(char *)cursor->getBindMappingsPool()->
+						allocate(bindvariablelen+1);
+	char	*newvariable=(char *)cursor->getBindMappingsPool()->
 						allocate(tempnumberlen+2);
 
-				// replace the existing bind var name and size
-				newvariable[0]=pvt->_conn->bindVariablePrefix();
-				charstring::copy(newvariable+1,tempnumber);
-				newvariable[tempnumberlen+1]='\0';
+	charstring::copy(oldvariable,bindvariable,bindvariablelen);
+	oldvariable[bindvariablelen]='\0';
 
-				// map existing name to new name
-				mappings->setValue(b->variable,newvariable);
+	newvariable[0]=bindFormat()[0];
+	charstring::copy(newvariable+1,tempnumber);
+	newvariable[tempnumberlen+1]='\0';
+
+	// map existing name to new name
+	cursor->getBindMappings()->setValue(oldvariable,newvariable);
 				
-				// clean up
-				delete[] tempnumber;
-			}
-		}
-	}
+	// clean up
+	delete[] tempnumber;
 }
 
 void sqlrservercontroller::translateBindVariablesFromMappings(
@@ -3253,18 +3660,25 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 
 	// debug and logging
 	if (pvt->_debugbindtranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("remapping bind variables:\n");
 		stdoutput.printf("  input binds:\n");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
 			stdoutput.printf("    %s\n",
-					cursor->getInputBinds()[i].variable);
+				cursor->getInputBinds()[i].variable);
 		}
 		stdoutput.printf("  output binds:\n");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
 			stdoutput.printf("    %s\n",
-					cursor->getOutputBinds()[i].variable);
+				cursor->getOutputBinds()[i].variable);
+		}
+		stdoutput.printf("  input/output binds:\n");
+		for (i=0; i<cursor->getInputOutputBindCount(); i++) {
+			stdoutput.printf("    %s\n",
+				cursor->getInputOutputBinds()[i].variable);
 		}
 		stdoutput.printf("\n");
 	}
@@ -3272,25 +3686,38 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 		raiseDebugMessageEvent("remapping bind variables...");
 		raiseDebugMessageEvent("input binds:");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
-			raiseDebugMessageEvent(cursor->getInputBinds()[i].variable);
+			raiseDebugMessageEvent(
+				cursor->getInputBinds()[i].variable);
 		}
 		raiseDebugMessageEvent("output binds:");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
-			raiseDebugMessageEvent(cursor->getOutputBinds()[i].variable);
+			raiseDebugMessageEvent(
+				cursor->getOutputBinds()[i].variable);
+		}
+		raiseDebugMessageEvent("input/output binds:");
+		for (i=0; i<cursor->getInputOutputBindCount(); i++) {
+			raiseDebugMessageEvent(
+				cursor->getInputOutputBinds()[i].variable);
 		}
 	}
 
-	// run two passes, first for input binds, second for output binds
+	// run three passes - input binds, output binds, input/output binds
 	bool	remapped=false;
-	for (i=0; i<2; i++) {
+	for (i=0; i<3; i++) {
 
-		// first pass for input binds, second pass for output binds
-		uint16_t	count=(!i)?cursor->getInputBindCount():
-						cursor->getOutputBindCount();
-		sqlrserverbindvar	*vars=(!i)?cursor->getInputBinds():
-						cursor->getOutputBinds();
-		namevaluepairs	*mappings=(!i)?pvt->_inbindmappings:
-						pvt->_outbindmappings;
+		namevaluepairs		*mappings=cursor->getBindMappings();
+		uint16_t		count=0;
+		sqlrserverbindvar	*vars=NULL;
+		if (i==0) {
+			count=cursor->getInputBindCount();
+			vars=cursor->getInputBinds();
+		} else if (i==1) {
+			count=cursor->getOutputBindCount();
+			vars=cursor->getOutputBinds();
+		} else if (i==2) {
+			count=cursor->getInputOutputBindCount();
+			vars=cursor->getInputOutputBinds();
+		}
 
 		for (uint16_t j=0; j<count; j++) {
 
@@ -3321,23 +3748,35 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 		stdoutput.printf("  remapped input binds:\n");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
 			stdoutput.printf("    %s\n",
-					cursor->getInputBinds()[i].variable);
+				cursor->getInputBinds()[i].variable);
 		}
 		stdoutput.printf("  remapped output binds:\n");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
 			stdoutput.printf("    %s\n",
-					cursor->getOutputBinds()[i].variable);
+				cursor->getOutputBinds()[i].variable);
+		}
+		stdoutput.printf("  remapped input/output binds:\n");
+		for (i=0; i<cursor->getOutputBindCount(); i++) {
+			stdoutput.printf("    %s\n",
+				cursor->getInputOutputBinds()[i].variable);
 		}
 		stdoutput.printf("\n");
 	}
 	if (logEnabled()) {
 		raiseDebugMessageEvent("remapped input binds:");
 		for (i=0; i<cursor->getInputBindCount(); i++) {
-			raiseDebugMessageEvent(cursor->getInputBinds()[i].variable);
+			raiseDebugMessageEvent(
+				cursor->getInputBinds()[i].variable);
 		}
 		raiseDebugMessageEvent("remapped output binds:");
 		for (i=0; i<cursor->getOutputBindCount(); i++) {
-			raiseDebugMessageEvent(cursor->getOutputBinds()[i].variable);
+			raiseDebugMessageEvent(
+				cursor->getOutputBinds()[i].variable);
+		}
+		raiseDebugMessageEvent("remapped input/output binds:");
+		for (i=0; i<cursor->getInputOutputBindCount(); i++) {
+			raiseDebugMessageEvent(
+				cursor->getInputOutputBinds()[i].variable);
 		}
 	}
 }
@@ -3369,8 +3808,10 @@ bool sqlrservercontroller::filterQuery(sqlrservercursor *cursor, bool before) {
 	const char	*query=cursor->getQueryBuffer();
 
 	if (pvt->_debugsqlrfilters) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
 		stdoutput.printf("filtering:\n\"%s\"\n\n",query);
 	}
 
@@ -3434,9 +3875,11 @@ sqlrservercursor *sqlrservercontroller::useCustomQueryCursor(
 
 	// copy the query that we just got into
 	// the custom query cursor's buffers
-	charstring::copy(
+	bytestring::copy(
 		customcursor->getQueryBuffer(),
-		cursor->getQueryBuffer());
+		cursor->getQueryBuffer(),
+		cursor->getQueryLength());
+	customcursor->getQueryBuffer()[cursor->getQueryLength()]='\0';
 	customcursor->setQueryLength(cursor->getQueryLength());
 
 	// set the custom cursor' state
@@ -3450,6 +3893,22 @@ sqlrservercursor *sqlrservercontroller::useCustomQueryCursor(
 }
 
 bool sqlrservercontroller::handleBinds(sqlrservercursor *cursor) {
+
+	// translate binds
+	if (pvt->_sqlrbvt && cursor->getInputBindCount()) {
+		if (pvt->_debugsqlrbindvariabletranslation) {
+			stdoutput.printf("\n===================="
+				 	"===================="
+				 	"===================="
+				 	"===================\n\n");
+			stdoutput.printf("translating bind variables:\n");
+		}
+		if (!pvt->_sqlrbvt->run(pvt->_conn,cursor)) {
+			setError(cursor,pvt->_sqlrbvt->getError(),
+				SQLR_ERROR_BINDVARIABLETRANSLATION,true);
+			return false;
+		}
+	}
 
 	sqlrserverbindvar	*bind=NULL;
 	
@@ -3703,12 +4162,15 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 						bool enablefilters) {
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("===================="
+		stdoutput.printf("\n===================="
 				 "===================="
 				 "===================="
 				 "===================\n\n");
-		stdoutput.printf("%d: query:\n%.*s\n\n",
-				process::getProcessId(),querylen,query);
+		stdoutput.printf("%d:%d:prepare:\n",
+					process::getProcessId(),
+					cursor->getId());
+		stdoutput.write(query,querylen);
+		stdoutput.write('\n');
 	}
 
 	// The standard paradigm is:
@@ -3747,6 +4209,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	clearError(cursor);
 
 	// reset flags
+	cursor->setColumnInfoIsValid(false);
 	cursor->setQueryHasBeenPreProcessed(false);
 	cursor->setQueryHasBeenPrepared(false);
 	cursor->setQueryHasBeenExecuted(false);
@@ -3756,6 +4219,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	cursor->setFakeInputBindsForThisQuery(pvt->_fakeinputbinds);
 	cursor->setQueryStatus(SQLRQUERYSTATUS_ERROR);
 	cursor->setQueryType(SQLRQUERYTYPE_ETC);
+	cursor->setResultSetHeaderHasBeenHandled(false);
 
 	// reset column mapping
 	pvt->_columnmap=NULL;
@@ -3772,12 +4236,10 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// copy query to cursor's query buffer if necessary
 	if (query!=cursor->getQueryBuffer()) {
-		charstring::copy(cursor->getQueryBuffer(),query,querylen);
+		bytestring::copy(cursor->getQueryBuffer(),query,querylen);
 		cursor->getQueryBuffer()[querylen]='\0';
 		cursor->setQueryLength(querylen);
 	}
-
-
 
 	// bail if we are just generally configured to fake input binds
 	if (cursor->getFakeInputBindsForThisQuery()) {
@@ -3786,7 +4248,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// do this here instead of inside translateBindVariables
 	// because translateQuery might use it
-	pvt->_bindmappingspool->deallocate();
+	cursor->getBindMappingsPool()->clear();
 
 	// before-filter query
 	if (enablefilters && pvt->_sqlrf) {
@@ -3807,8 +4269,12 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	}
 
 	// translate query
-	if (enabletranslations && pvt->_sqlrt) {
-		translateQuery(cursor);
+	if (enabletranslations && pvt->_sqlrt &&
+				!translateQuery(cursor)) {
+
+		// log the query
+		raiseQueryEvent(cursor);
+		return false;
 	}
 
 	// translate bind variables
@@ -3817,6 +4283,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	}
 
 	// translate "begin" queries
+	// FIXME: can we just let interceptQuery below handle this?
 	if (pvt->_conn->supportsTransactionBlocks() &&
 			isBeginTransactionQuery(cursor)) {
 		translateBeginTransaction(cursor);
@@ -3838,9 +4305,12 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// (re)get the query now that it's been translated
 	query=cursor->getQueryBuffer();
 	querylen=cursor->getQueryLength();
-	if (enabletranslations && pvt->_sqlrt && pvt->_debugsql) {
-		stdoutput.printf("%d: translated:\n%.*s\n\n",
-					process::getProcessId(),querylen,query);
+	if (enabletranslations && pvt->_sqlrt &&
+			pvt->_debugsql && !pvt->_debugsqlrtranslations) {
+		stdoutput.printf("\n%d:%d:translated:\n%.*s\n",
+					process::getProcessId(),
+					cursor->getId(),
+					querylen,query);
 	}
 
 	// fake input binds if this specific query doesn't support them
@@ -3914,7 +4384,9 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// set flag indicating that the query has been prepared
 	cursor->setQueryHasBeenPrepared(true);
 
-	return true;
+	// handle column info now if it's valid at this point
+	return (cursor->columnInfoIsValidAfterPrepare())?
+				handleResultSetHeader(cursor):true;
 }
 
 bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor) {
@@ -3926,9 +4398,6 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 						bool enabletranslations,
 						bool enablefilters,
 						bool enabletriggers) {
-
-	// reset header translation flag
-	cursor->setResultSetHeaderHasBeenTranslated(false);
 
 	// set state
 	setState((isCustomQuery(cursor))?PROCESS_CUSTOM:PROCESS_SQL);
@@ -3946,6 +4415,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// query must be re-prepared
 		if (cursor->getFakeInputBindsForThisQuery()) {
 			cursor->setQueryHasBeenPrepared(false);
+			cursor->setColumnInfoIsValid(false);
 		}
 	}
 
@@ -3955,7 +4425,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		// do this here instead of inside translateBindVariables
 		// because translateQuery might use it
-		pvt->_bindmappingspool->deallocate();
+		cursor->getBindMappingsPool()->clear();
 
 		// before-filter query
 		if (enablefilters && pvt->_sqlrf) {
@@ -3976,8 +4446,12 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		}
 
 		// translate query
-		if (enabletranslations && pvt->_sqlrt) {
-			translateQuery(cursor);
+		if (enabletranslations && pvt->_sqlrt &&
+					!translateQuery(cursor)) {
+
+			// log the query
+			raiseQueryEvent(cursor);
+			return false;
 		}
 
 		// translate bind variables
@@ -3986,6 +4460,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		}
 
 		// translate "begin" queries
+		// FIXME: can we just let interceptQuery below handle this?
 		if (pvt->_conn->supportsTransactionBlocks() &&
 				isBeginTransactionQuery(cursor)) {
 			translateBeginTransaction(cursor);
@@ -4032,7 +4507,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		raiseDebugMessageEvent("faking binds...");
 
 		if (cursor->fakeInputBinds()) {
-			if (pvt->_debugsqlrtranslations) {
+			if (pvt->_debugbindtranslation) {
 				stdoutput.printf(
 				"after faking input binds:\n%s\n\n",
 				cursor->
@@ -4178,13 +4653,24 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// handle before-triggers
 	if (enabletriggers && pvt->_sqlrtr) {
-		pvt->_sqlrtr->runBeforeTriggers(pvt->_conn,cursor,
-						cursor->getQueryTree());
+		pvt->_sqlrtr->runBeforeTriggers(pvt->_conn,cursor);
 	}
 
 	// (re)set the query start time
 	dt.getSystemDateAndTime();
 	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+
+	if (pvt->_debugsql) {
+		stdoutput.printf("\n===================="
+				 "===================="
+				 "===================="
+				 "===================\n\n");
+		stdoutput.printf("%d:%d:execute:\n",
+					process::getProcessId(),
+					cursor->getId());
+		stdoutput.write(query,querylen);
+		stdoutput.write('\n');
+	}
 
 	// execute the query
 	success=cursor->executeQuery(query,querylen);
@@ -4197,6 +4683,26 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// set the query end time
 	dt.getSystemDateAndTime();
 	cursor->setQueryEnd(dt.getSeconds(),dt.getMicroseconds());
+
+	// special case intercepts...
+	// rather than actually intercepting these, we
+	// allow the db to run them and set the flags here
+	if (cursor->getQueryType()==
+			SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON) {
+		pvt->_autocommitforthissession=true;
+		if (pvt->_intransaction) {
+			raiseCommitEvent();
+		}
+		pvt->_intransaction=false;
+	} else if (cursor->getQueryType()==
+			SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF) {
+		pvt->_autocommitforthissession=false;
+		bool	wasintx=pvt->_intransaction;
+		pvt->_intransaction=true;
+		if (wasintx) {
+			raiseBeginTransactionEvent();
+		}
+	}
 
 	// on failure, save the error
 	// get it here rather than below because with some db's
@@ -4223,8 +4729,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// handle after-triggers
 	if (enabletriggers && pvt->_sqlrtr) {
-		pvt->_sqlrtr->runAfterTriggers(pvt->_conn,cursor,
-						cursor->getQueryTree(),success);
+		pvt->_sqlrtr->runAfterTriggers(pvt->_conn,cursor,&success);
 	}
 
 	// was the query a commit or rollback?
@@ -4251,7 +4756,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// log the query
 	raiseQueryEvent(cursor);
 
-	return success;
+	return (success)?handleResultSetHeader(cursor):false;
 }
 
 void sqlrservercontroller::setNeedsCommitOrRollback(bool needed) {
@@ -4292,7 +4797,8 @@ void sqlrservercontroller::setSendColumnInfo(uint16_t sendcolumninfo) {
 	pvt->_sendcolumninfo=sendcolumninfo;
 }
 
-bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
+bool sqlrservercontroller::skipRows(sqlrservercursor *cursor,
+						uint64_t rows, bool *error) {
 
 	if (pvt->_sqlrlg) {
 		pvt->_debugstr.clear();
@@ -4306,9 +4812,17 @@ bool sqlrservercontroller::skipRows(sqlrservercursor *cursor, uint64_t rows) {
 
 		raiseDebugMessageEvent("skip...");
 
-		if (!cursor->skipRow()) {
-			raiseDebugMessageEvent("skipping rows hit the "
-					"end of the result set");
+		bool	error;
+		if (!skipRow(cursor,&error)) {
+			if (error) {
+				raiseDebugMessageEvent(
+						"skipping rows encountered "
+						"an error");
+			} else {
+				raiseDebugMessageEvent(
+						"skipping rows hit the "
+						"end of the result set");
+			}
 			return false;
 		}
 
@@ -4754,62 +5268,79 @@ uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
 			pvt->_columnmap->getList()->getLength():colcount;
 }
 
-void sqlrservercontroller::reformatField(sqlrservercursor *cursor,
+bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,
 						const char *name,
 						uint32_t index,
 						const char **field,
 						uint64_t *fieldlength) {
-
-	if (pvt->_debugsqlrresultsettranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
-		stdoutput.printf("translating result set "
-				"field %d (%s)...\n",index,name);
-		stdoutput.printf("original:\n%s\n",*field);
-	}
-
 	// run translations
 	if (pvt->_sqlrrst) {
-		pvt->_sqlrrst->run(pvt->_conn,cursor,
-					name,index,field,fieldlength);
-	}
 
-	if (pvt->_debugsqlrresultsettranslation) {
-		stdoutput.printf("translated:\n%.*s\n\n",*fieldlength,*field);
+		if (pvt->_debugsqlrresultsettranslation) {
+			stdoutput.printf("\n===================="
+				 	"===================="
+				 	"===================="
+				 	"===================\n\n");
+			stdoutput.printf("translating result set "
+					"field %d (%s)...\n",index,name);
+			stdoutput.printf("original:\n%s\n",*field);
+		}
+
+		if (!pvt->_sqlrrst->run(pvt->_conn,cursor,
+					name,index,field,fieldlength)) {
+			setError(cursor,pvt->_sqlrrst->getError(),
+				SQLR_ERROR_RESULTSETTRANSLATION,true);
+			return false;
+		}
+
+		if (pvt->_debugsqlrresultsettranslation) {
+			stdoutput.printf("translated:\n%.*s\n\n",
+						*fieldlength,*field);
+		}
 	}
+	return true;
 }
 
-void sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
+bool sqlrservercontroller::reformatRow(sqlrservercursor *cursor,
 						uint32_t colcount,
 						const char * const *names,
 						const char ***fields,
 						uint64_t **fieldlengths) {
 
-	if (pvt->_debugsqlrresultsetrowtranslation) {
-		stdoutput.printf("========================================"
-				"========================================\n\n");
-		stdoutput.printf("translating result set row\n");
-		for (uint32_t i=0; i<colcount; i++) {
-			stdoutput.printf("field %d (%s)...\n",i,names[i]);
-			stdoutput.printf("original:\n%s\n",(*fields)[i]);
-		}
-	}
-
 	// run translations
 	if (pvt->_sqlrrsrt) {
-		pvt->_sqlrrsrt->run(pvt->_conn,cursor,colcount,
-					names,fields,fieldlengths);
-	}
+		if (pvt->_debugsqlrresultsetrowtranslation) {
+			stdoutput.printf("\n===================="
+				 	"===================="
+				 	"===================="
+				 	"===================\n\n");
+			stdoutput.printf("translating result set row\n");
+			for (uint32_t i=0; i<colcount; i++) {
+				stdoutput.printf("field %d (%s)...\n",
+								i,names[i]);
+				stdoutput.printf("original:\n%s\n",
+								(*fields)[i]);
+			}
+		}
 
-	if (pvt->_debugsqlrresultsetrowtranslation) {
-		for (uint32_t i=0; i<colcount; i++) {
-			stdoutput.printf("translated:\n%.*s\n\n",
+		if (!pvt->_sqlrrsrt->run(pvt->_conn,cursor,colcount,
+						names,fields,fieldlengths)) {
+			setError(cursor,pvt->_sqlrrsrt->getError(),
+				SQLR_ERROR_RESULTSETROWTRANSLATION,true);
+			return false;
+		}
+
+		if (pvt->_debugsqlrresultsetrowtranslation) {
+			for (uint32_t i=0; i<colcount; i++) {
+				stdoutput.printf("translated:\n%.*s\n\n",
 					(*fieldlengths)[i],(*fields)[i]);
+			}
 		}
 	}
+	return true;
 }
 
-void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
+bool sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 						uint32_t index,
 						const char *field,
 						uint64_t fieldlength,
@@ -4825,7 +5356,7 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	// ignore non-date fields, if specified
 	if (ignorenondatetime &&
 		!isDateTimeTypeInt(getColumnType(cursor,index))) {
-		return;
+		return true;
 	}
 
 	// This weirdness is mainly to address a FreeTDS/MSSQL
@@ -4849,7 +5380,7 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 				&year,&month,&day,
 				&hour,&minute,&second,
 				&microsecond,&isnegative)) {
-		return;
+		return false;
 	}
 
 	// decide which format to use based on what parts
@@ -4878,6 +5409,8 @@ void sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	// set return values
 	*newfield=pvt->_reformattedfield;
 	*newfieldlength=pvt->_reformattedfieldlength;
+
+	return true;
 }
 
 void sqlrservercontroller::closeAllResultSets() {
@@ -4988,6 +5521,16 @@ void sqlrservercontroller::endSession() {
 		pvt->_sqlrf->endSession();
 	}
 
+	// reset bind variable translation modules
+	if (pvt->_sqlrbvt) {
+		pvt->_sqlrbvt->endSession();
+	}
+
+	// reset result set header translation modules
+	if (pvt->_sqlrrsht) {
+		pvt->_sqlrrsht->endSession();
+	}
+
 	// reset result set translation modules
 	if (pvt->_sqlrrst) {
 		pvt->_sqlrrst->endSession();
@@ -4996,6 +5539,11 @@ void sqlrservercontroller::endSession() {
 	// reset result set row translation modules
 	if (pvt->_sqlrrsrt) {
 		pvt->_sqlrrsrt->endSession();
+	}
+
+	// reset result set row block translation modules
+	if (pvt->_sqlrrsrbt) {
+		pvt->_sqlrrsrbt->endSession();
 	}
 
 	// reset trigger modules
@@ -5028,12 +5576,15 @@ void sqlrservercontroller::endSession() {
 		pvt->_sqlra->endSession();
 	}
 
+	// clear per-session pool
+	pvt->_sessionpool.clear();
+
 	// shrink the cursor array, if necessary
 	// FIXME: it would probably be more efficient to scale
 	// these down gradually rather than all at once
 	while (pvt->_cursorcount>pvt->_mincursorcount) {
 		pvt->_cursorcount--;
-		pvt->_cur[pvt->_cursorcount]->close();
+		close(pvt->_cur[pvt->_cursorcount]);
 		deleteCursor(pvt->_cur[pvt->_cursorcount]);
 		pvt->_cur[pvt->_cursorcount]=NULL;
 	}
@@ -5079,23 +5630,12 @@ void sqlrservercontroller::dropTempTables(sqlrservercursor *cursor) {
 }
 
 void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
-					const char *tablename) {
+						const char *tablename) {
 
 	stringbuffer	dropquery;
 	dropquery.append("drop table ");
 	dropquery.append(pvt->_conn->tempTableDropPrefix());
 	dropquery.append(tablename);
-
-	// FIXME: I need to refactor all of this so that this just gets
-	// run as a matter of course instead of explicitly getting run here
-	// FIXME: freetds/sybase override this method but don't do this
-	if (pvt->_sqlrtr && pvt->_sqlrp) {
-		if (pvt->_sqlrp->parse(dropquery.getString())) {
-			pvt->_sqlrtr->runBeforeTriggers(
-						pvt->_conn,cursor,
-						pvt->_sqlrp->getTree());
-		}
-	}
 
 	// kind of a kluge...
 	// The cursor might already have a querytree associated with it and
@@ -5109,15 +5649,6 @@ void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 		executeQuery(cursor);
 	}
 	cursor->closeResultSet();
-
-	// FIXME: I need to refactor all of this so that this just gets
-	// run as a matter of course instead of explicitly getting run here
-	// FIXME: freetds/sybase override this method but don't do this
-	if (pvt->_sqlrtr && pvt->_sqlrp) {
-		pvt->_sqlrtr->runAfterTriggers(
-					pvt->_conn,cursor,
-					pvt->_sqlrp->getTree(),true);
-	}
 }
 
 void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
@@ -5147,7 +5678,8 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 			prepareQuery(gttcur,query,charstring::length(query)) &&
 			executeQuery(gttcur)) {
 
-			while (fetchRow(gttcur)) {
+			bool	error;
+			while (fetchRow(gttcur,&error)) {
 				getField(gttcur,0,
 					&tablename,&fieldlength,&blob,&null);
 				truncateTempTable(cursor,tablename);
@@ -5329,7 +5861,7 @@ void sqlrservercontroller::closeCursors(bool destroy) {
 
 			if (pvt->_cur[pvt->_cursorcount]) {
 				pvt->_cur[pvt->_cursorcount]->closeResultSet();
-				pvt->_cur[pvt->_cursorcount]->close();
+				close(pvt->_cur[pvt->_cursorcount]);
 				if (destroy) {
 					deleteCursor(
 						pvt->_cur[pvt->_cursorcount]);
@@ -5630,8 +6162,8 @@ sqlrparser *sqlrservercontroller::newParser() {
 	// load the parser itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrparser_")->append(module);
-	sqlrparser	*(*newParser)(sqlrservercontroller *, xmldomnode *)=
-			(sqlrparser *(*)(sqlrservercontroller *, xmldomnode *))
+	sqlrparser	*(*newParser)(sqlrservercontroller *, domnode *)=
+			(sqlrparser *(*)(sqlrservercontroller *, domnode *))
 			pvt->_sqlrpdl.getSymbol(functionname.getString());
 	if (!newParser) {
 		char	*error=pvt->_sqlrpdl.getError();
@@ -5658,6 +6190,1141 @@ sqlrparser *sqlrservercontroller::newParser() {
 	}
 
 	return parser;
+}
+
+bool sqlrservercontroller::bulkLoadBegin(const char *id,
+						const char *errorfieldtable,
+						const char *errorrowtable,
+						uint64_t maxerrorcount,
+						bool droperrortables) {
+
+	// FIXME: validate "errorfieldtable" for safety
+	// FIXME: validate "errorrowtable" for safety
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load begin:\n"
+				"		id: \"%s\"\n",
+						process::getProcessId(),id);
+		stdoutput.printf("		error table 1: \"%s\"\n"
+				"		error table 2: \"%s\"\n"
+				"		max error count: %lld\n"
+				"		drop error tables: %s\n",
+				errorfieldtable,
+				errorrowtable,
+				maxerrorcount,
+				(droperrortables)?"yes":"no");
+	}
+
+	// FIXME: bail if error tables already exist
+
+	// get an md5 sum of the id
+	// use this rather than using the table directly because:
+	// * the id could be sensitive information
+	// * the id might not conform to valid file naming conventions
+	md5	m;
+	m.append((const unsigned char *)id,charstring::length(id));
+	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
+	id=md5str;
+
+	// create a key file and key
+	delete[] pvt->_bulkserveridfilename;
+	charstring::printf(&pvt->_bulkserveridfilename,"%sbulk-%s.ipc",
+						pvt->_pth->getIpcDir(),id);
+	delete[] md5str;
+	if (!file::createFile(pvt->_bulkserveridfilename,
+				permissions::ownerReadWrite())) {
+		setError(SQLR_ERROR_BULKLOADBEGIN_IPC_FILE_STRING,
+				SQLR_ERROR_BULKLOADBEGIN_IPC_FILE,true);
+		bulkLoadEnd();
+		return false;
+	}
+	key_t	key=file::generateKey(pvt->_bulkserveridfilename,1);
+	if (key==-1) {
+		setError(SQLR_ERROR_BULKLOADBEGIN_IPC_KEY_STRING,
+				SQLR_ERROR_BULKLOADBEGIN_IPC_KEY,true);
+		bulkLoadEnd();
+		return false;
+	}
+
+	// calculate shared memory segment size
+	uint64_t	shmsize=charstring::length(errorfieldtable)+1+
+				charstring::length(errorrowtable)+1+
+				sizeof(uint64_t)+
+				sizeof(bool)+
+				pvt->_maxquerysize+1+
+				sizeof(uint16_t)+
+				pvt->_maxbindcount*
+					(sizeof(sqlrserverbindvartype_t)+
+					sizeof(uint32_t));
+
+	// create shared memory
+	pvt->_bulkservershmem=new sharedmemory;
+	if (!pvt->_bulkservershmem->create(key,shmsize,
+				permissions::evalPermString("rw-r-----"))) {
+		setError(SQLR_ERROR_BULKLOADBEGIN_SHM_STRING,
+				SQLR_ERROR_BULKLOADBEGIN_SHM,true);
+		bulkLoadEnd();
+		return false;
+	}
+	pvt->_bulkservershm=
+		(unsigned char *)pvt->_bulkservershmem->getPointer();
+	bytestring::zero(pvt->_bulkservershm,pvt->_maxquerysize+1);
+
+	// put error tables, maxerrorcount,
+	// and drop error tables flag in shared memory
+	unsigned char	*ptr=pvt->_bulkservershm;
+
+	uint64_t	len=charstring::length(errorfieldtable);
+	pvt->_bulkerrorfieldtable=(const char *)ptr;
+	bytestring::copy(ptr,errorfieldtable,len);
+	ptr+=len;
+	*ptr='\0';
+	ptr++;
+
+	len=charstring::length(errorrowtable);
+	pvt->_bulkerrorrowtable=(const char *)ptr;
+	bytestring::copy(ptr,errorrowtable,len);
+	ptr+=len;
+	*ptr='\0';
+	ptr++;
+
+	bytestring::copy(ptr,&maxerrorcount,sizeof(uint64_t));
+	ptr+=sizeof(uint64_t);
+
+	bytestring::copy(ptr,&droperrortables,sizeof(bool));
+	ptr+=sizeof(bool);
+
+	// get positions for query and data format
+	pvt->_bulkservershmquery=ptr;
+	pvt->_bulkservershmdataformat=ptr+sizeof(uint64_t)+pvt->_maxquerysize+1;
+
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadCheckpoint(const char *id) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load checkpoint: \"%s\"\n",
+						process::getProcessId(),id);
+	}
+
+	// FIXME: not sure what to do here...
+	// maybe run a checkpoint query on each joined connection?
+
+	// FIXME: do something...
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
+						uint64_t querylen,
+						uint16_t inbindcount,
+						sqlrserverbindvar *inbinds) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load prepare query:\n%.*s\n",
+					process::getProcessId(),querylen,query);
+	}
+
+	// validate that the query is an insert
+	const char	*ptr=skipWhitespaceAndComments(query);
+	if (charstring::compareIgnoringCase(ptr,"insert",6) ||
+				!character::isWhitespace(*(ptr+6))) {
+		setError(SQLR_ERROR_BULKLOADPREPARE_INVALID_QUERY_STRING,
+				SQLR_ERROR_BULKLOADPREPARE_INVALID_QUERY,true);
+		return false;
+	}
+
+	// create error tables
+	if (!bulkLoadCreateErrorTables(query,querylen,
+					pvt->_bulkerrorfieldtable,
+					pvt->_bulkerrorrowtable)) {
+		return false;
+	}
+
+	// put the query length and query in shared memory
+	unsigned char	*qptr=pvt->_bulkservershmquery;
+	*((uint64_t *)qptr)=querylen;
+	qptr+=sizeof(uint64_t);
+	bytestring::copy(qptr,query,querylen);
+	qptr[querylen]='\0';
+
+	// put the data format in shared memory...
+	ptr=(const char *)pvt->_bulkservershmdataformat;
+
+	// copy in the number of data format elements...
+	*((uint16_t *)ptr)=inbindcount;
+	ptr+=sizeof(uint16_t);
+
+	// for each data format element
+	for (uint16_t i=0; i<inbindcount; i++) {
+
+		sqlrserverbindvar	*inbind=&(inbinds[i]);
+
+		// copy in the data format element type
+		*((sqlrserverbindvartype_t *)ptr)=inbind->type;
+		ptr+=sizeof(sqlrserverbindvartype_t);
+
+		// copy in the data format element size
+		*((uint32_t *)ptr)=inbind->valuesize;
+		ptr+=sizeof(uint32_t);
+
+		if (pvt->_debugbulkload) {
+			stdoutput.printf("	%.*s - %d(%d)\n",
+						inbind->variablesize,
+						inbind->variable,
+						inbind->type,
+						inbind->valuesize);
+		}
+	}
+
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadCreateErrorTables(
+					const char *query,
+					uint64_t querylen,
+					const char *errorfieldtable,
+					const char *errorrowtable) {
+
+	bool	retval=false;
+	sqlrservercursor	*cursor=newCursor();
+	if (open(cursor)) {
+		retval=bulkLoadCreateErrorTable1(
+				cursor,query,querylen,errorfieldtable) &&
+			bulkLoadCreateErrorTable2(
+				cursor,query,querylen,errorrowtable);
+	}
+	close(cursor);
+	deleteCursor(cursor);
+
+	return retval;
+}
+
+bool sqlrservercontroller::bulkLoadCreateErrorTable1(
+					sqlrservercursor *cursor,
+					const char *query,
+					uint64_t querylen,
+					const char *errorfieldtable) {
+
+	// FIXME: this is right for teradata, but not right in general...
+	// teradata doesn't allow DDL inside of a
+	// tx unless it's the last thing in the tx
+	bool	wasintx=inTransaction();
+	if (wasintx) {
+		prepareQuery(cursor,"ET",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+
+		prepareQuery(cursor,"BT",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+	}
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load create error table: %s\n",
+							process::getProcessId(),
+							errorfieldtable);
+	}
+
+	// FIXME: this needs to be overridable per-connection
+
+	const char	*errorfieldtablequery=
+			"create table %s ("
+			"	ErrorCode integer,"
+			"	ErrorFieldName varchar(120),"
+			"	DataParcel varbyte(64000)"
+			")";
+
+	bool	retval=true;
+	stringbuffer	str;
+	str.writeFormatted(errorfieldtablequery,errorfieldtable);
+	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
+							!executeQuery(cursor)) {
+		saveErrorFromCursor(cursor);
+		retval=false;
+	}
+	closeResultSet(cursor);
+
+	// FIXME: this is right for teradata, but not right in general...
+	// teradata doesn't allow DDL inside of a
+	// tx unless it's the last thing in the tx
+	if (wasintx) {
+		prepareQuery(cursor,"ET",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+
+		prepareQuery(cursor,"BT",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+		pvt->_intransaction=true;
+		raiseBeginTransactionEvent();
+	}
+
+	return retval;
+}
+
+bool sqlrservercontroller::bulkLoadCreateErrorTable2(
+					sqlrservercursor *cursor,
+					const char *query,
+					uint64_t querylen,
+					const char *errorrowtable) {
+
+	// FIXME: this is right for teradata, but not right in general...
+	// teradata doesn't allow DDL inside of a
+	// tx unless it's the last thing in the tx
+	bool	wasintx=inTransaction();
+	if (wasintx) {
+		prepareQuery(cursor,"ET",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+
+		prepareQuery(cursor,"BT",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+	}
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load create error table: %s\n",
+					process::getProcessId(),errorrowtable);
+	}
+
+	// FIXME: this needs to be overridable per-connection
+	// and the default implementation needs to construct a create table
+	// from scratch, not relying on create table ... as select ... as this
+	// isn't supported by all db's
+
+
+	// get the table name from the query...
+	char	*table=NULL;
+	bulkLoadParseInsert(query,querylen,&table,NULL,NULL);
+
+	const char	*errorrowtablequery=
+			"create table %s as (select * from %s) with no data";
+
+	bool	retval=true;
+	stringbuffer	str;
+	str.writeFormatted(errorrowtablequery,errorrowtable,table);
+	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
+							!executeQuery(cursor)) {
+		saveErrorFromCursor(cursor);
+		retval=false;
+	}
+	closeResultSet(cursor);
+	delete[] table;
+
+	// FIXME: this is right for teradata, but not right in general...
+	// teradata doesn't allow DDL inside of a
+	// tx unless it's the last thing in the tx
+	if (wasintx) {
+		prepareQuery(cursor,"ET",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+
+		prepareQuery(cursor,"BT",2);
+		executeQuery(cursor);
+		closeResultSet(cursor);
+		pvt->_intransaction=true;
+		raiseBeginTransactionEvent();
+	}
+
+	return retval;
+}
+
+bool sqlrservercontroller::bulkLoadJoin(const char *id) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load join:\n"
+				"		id: \"%s\"\n",
+					process::getProcessId(),id);
+	}
+
+	// get an md5 sum of the id (see bulkLoadBegin for why)
+	md5	m;
+	m.append((const unsigned char *)id,charstring::length(id));
+	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
+	id=md5str;
+
+	// create the key
+	char	*idfilename;
+	charstring::printf(&idfilename,"%sbulk-%s.ipc",
+				pvt->_pth->getIpcDir(),id);
+	delete[] md5str;
+	key_t	key=file::generateKey(idfilename,1);
+	delete[] idfilename;
+	if (key==-1) {
+		setError(SQLR_ERROR_BULKLOADJOIN_IPC_KEY_STRING,
+				SQLR_ERROR_BULKLOADJOIN_IPC_KEY,true);
+		return false;
+	}
+
+	// (re)init shared memory
+	if (pvt->_bulkclientshmem) {
+		delete pvt->_bulkclientshmem;
+	}
+
+	// attach to shared memory
+	pvt->_bulkclientshmem=new sharedmemory;
+	if (!pvt->_bulkclientshmem->attach(key,pvt->_maxquerysize+1)) {
+		setError(SQLR_ERROR_BULKLOADJOIN_SHM_STRING,
+				SQLR_ERROR_BULKLOADJOIN_SHM,true);
+		return false;
+	}
+	pvt->_bulkclientshm=
+		(unsigned char *)pvt->_bulkclientshmem->getPointer();
+
+	// get error tables
+	const unsigned char	*ptr=pvt->_bulkclientshm;
+
+	pvt->_bulkerrorfieldtable=(const char *)ptr;
+	ptr+=charstring::length(ptr);
+	ptr++;
+
+	pvt->_bulkerrorrowtable=(const char *)ptr;
+	ptr+=charstring::length(ptr);
+	ptr++;
+
+	// get max error count
+	pvt->_bulkmaxerrorcount=*((uint64_t *)ptr);
+	ptr+=sizeof(uint64_t);
+
+	// get drop error tables flag
+	pvt->_bulkdroperrortables=*((bool *)ptr);
+	ptr+=sizeof(bool);
+
+	// get query length and query
+	pvt->_bulkquerylen=*((uint64_t *)ptr);
+	ptr+=sizeof(uint64_t);
+	pvt->_bulkquery=(const char *)ptr;
+	ptr+=pvt->_maxquerysize+1;
+
+	// get data format definitions
+	pvt->_bulkdataformat=(const unsigned char *)ptr;
+
+	// clear bulk data lists
+	pvt->_bulkdata.clear();
+	pvt->_bulkdatalen.clear();
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("		error table 1: \"%s\"\n"
+				"		error table 2: \"%s\"\n"
+				"		max error count: %lld\n"
+				"		drop error tables : %s\n"
+				"		query:\n%.*s\n",
+				pvt->_bulkerrorfieldtable,
+				pvt->_bulkerrorrowtable,
+				pvt->_bulkmaxerrorcount,
+				(pvt->_bulkdroperrortables)?"yes":"no",
+				pvt->_bulkquerylen,
+				pvt->_bulkquery);
+	}
+
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadInputBind(const unsigned char *data,
+							uint64_t datalen) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load input bind:\n",
+					process::getProcessId());
+		stdoutput.safePrint(data,datalen);
+		stdoutput.write('\n');
+	}
+
+	pvt->_bulkdata.append(data);
+	pvt->_bulkdatalen.append(datalen);
+
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadExecuteQuery() {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load execute query - %d rows\n",
+						process::getProcessId(),
+						pvt->_bulkdata.getLength());
+	}
+
+	// init the bulk cursor
+	pvt->_bulkcursor=newCursor();
+
+	// open the cursor
+	bool	success=true;
+	if (!open(pvt->_bulkcursor)) {
+		setError(SQLR_ERROR_BULKLOADEXECUTE_OPEN_CURSOR_STRING,
+				SQLR_ERROR_BULKLOADEXECUTE_OPEN_CURSOR,true);
+		success=false;
+	}
+
+	// prepare the query
+	if (success && !prepareQuery(pvt->_bulkcursor,
+					pvt->_bulkquery,
+					pvt->_bulkquerylen,
+					true,true,true)) {
+		saveErrorFromCursor(pvt->_bulkcursor);
+		success=false;
+	}
+
+	if (success) {
+
+		bulkLoadInitBinds();
+
+		// run through the bulk data, binding and executing each row
+		uint64_t		errorcount=0;
+		singlylinkedlistnode<const unsigned char *>
+				*datanode=pvt->_bulkdata.getFirst();
+		singlylinkedlistnode<uint64_t>
+				*datalennode=pvt->_bulkdatalen.getFirst();
+		while (datanode) {
+
+			bulkLoadBindRow(datanode->getValue(),
+					datalennode->getValue());
+
+			if (!executeQuery(pvt->_bulkcursor)) {
+				bulkLoadError();
+				errorcount++;
+			}
+
+
+			// bail if too many errors occurred
+			if (errorcount>pvt->_bulkmaxerrorcount) {
+				setError(
+			SQLR_ERROR_BULKLOADEXECUTE_TOO_MANY_ERRORS_STRING,
+			SQLR_ERROR_BULKLOADEXECUTE_TOO_MANY_ERRORS,true);
+				success=false;
+				break;
+			}
+
+			datanode=datanode->getNext();
+			datalennode=datalennode->getNext();
+		}
+	}
+
+	// close the bulk cursor and clean up
+	closeResultSet(pvt->_bulkcursor);
+	close(pvt->_bulkcursor);
+	deleteCursor(pvt->_bulkcursor);
+	pvt->_bulkcursor=NULL;
+	pvt->_bulkdata.clear();
+	pvt->_bulkdatalen.clear();
+
+	return success;
+}
+
+void sqlrservercontroller::bulkLoadInitBinds() {
+
+	// get the table, column names, and binds from the query...
+	char			*table=NULL;
+	linkedlist<char *>	cols;
+	linkedlist<char *>	binds;
+	bulkLoadParseInsert(pvt->_bulkquery,
+				pvt->_bulkquerylen,
+				&table,&cols,&binds);
+
+	// map columns to binds (if we actually have columns)
+	dictionary<char *, char *>	bindtocol;
+	bool				havecols=false;
+	if (cols.getLength()) {
+		havecols=true;
+		linkedlistnode<char *> *bind=binds.getFirst();
+		linkedlistnode<char *> *col=cols.getFirst();
+		while (bind && col) {
+			bindtocol.setValue(bind->getValue(),col->getValue());
+			bind=bind->getNext();
+			col=col->getNext();
+		}
+	}
+
+	// Get column info for the table and set bind type accordingly...
+	// Ideally we'd call getColumnList() rather than running a "select *",
+	// but some ODBC drivers (eg. teradata) don't support SQLColumns(),
+	// so getColumnList() fails.  Everyone supports "select *", and as
+	// long as we don't fetch anything, it's fast enough.
+	sqlrservercursor	*cur=newCursor();
+	if (open(cur)) {
+
+		stringbuffer	query;
+		query.append("select * from ")->append(table);
+
+		if (prepareQuery(cur,query.getString(),
+					query.getStringLength()) &&
+					executeQuery(cur)) {
+
+			memorypool		*bindpool=
+						getBindPool(pvt->_bulkcursor);
+			sqlrserverbindvar	*inbinds=
+						getInputBinds(pvt->_bulkcursor);
+
+			// run through the binds...
+			uint16_t	inbindcount=0;
+			linkedlistnode<char *> *bind=binds.getFirst();
+			while (bind) {
+
+				// set up the input bind name
+				sqlrserverbindvar	*inbind=
+							&(inbinds[inbindcount]);
+				char		*var=bind->getValue();
+				uint16_t	varsize=charstring::length(var);
+				inbind->variable=
+					(char *)bindpool->allocate(varsize+1);
+				charstring::copy(inbind->variable,var);
+				inbind->variablesize=varsize;
+
+				// figure out which column the bind maps to
+				uint16_t	colindex=inbindcount;
+				if (havecols) {
+
+					const char	*col=
+						bindtocol.getValue(
+							bind->getValue());
+
+					for (uint16_t i=0;
+							i<colCount(cur);
+							i++) {
+
+						if (!charstring::compare(col,
+							getColumnName(cur,i))) {
+							colindex=i;
+						}
+					}
+
+					// FIXME: what if we don't find it?
+				}
+
+				// get the type of the column
+				uint16_t	type=getColumnType(
+								cur,colindex);
+
+				// set the bind type from the column type
+				// (the order of these tests is import, eg.
+				// floats are numbers and dates are binary)
+				if (isFloatType(type)) {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_DOUBLE;
+				} else if (isNumberType(type)) {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_INTEGER;
+				} else if (isDateTimeType(type)) {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_DATE;
+				} else if (isBinaryType(type)) {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_BLOB;
+				} else {
+					inbind->type=
+						SQLRSERVERBINDVARTYPE_STRING;
+				}
+
+				// bump to the next bind
+				bind=bind->getNext();
+				inbindcount++;
+			}
+
+			// set the input bind count
+			setInputBindCount(pvt->_bulkcursor,inbindcount);
+		}
+
+		closeResultSet(cur);
+	} else {
+		// FIXME: error...
+	}
+	close(cur);
+	deleteCursor(cur);
+
+	// clean up
+	delete[] table;
+	cols.clearAndArrayDelete();
+	binds.clearAndArrayDelete();
+}
+
+void sqlrservercontroller::bulkLoadParseInsert(const char *query,
+						uint64_t querylen,
+						char **table,
+						linkedlist<char *> *cols,
+						linkedlist<char *> *binds) {
+
+	// get query end
+	const char	*queryend=query+querylen;
+
+	// skip whitespace and comments
+	const char	*ptr=skipWhitespaceAndComments(query);
+	if (!*ptr) {
+		return;
+	}
+
+	// skip "insert"
+	ptr+=6;
+	if (ptr>=queryend) {
+		return;
+	}
+
+	// skip whitespace
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// skip "into"
+	ptr+=4;
+	if (ptr>=queryend) {
+		return;
+	}
+
+	// skip whitespace
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// get table
+	const char	*start=ptr;
+	while (*ptr && !character::isWhitespace(*ptr)) {
+		ptr++;
+	}
+	if (!*ptr) {
+		return;
+	}
+
+	// return the table
+	if (table) {
+		// FIXME: make "table" safe to substitute into a query
+		*table=charstring::duplicate(start,ptr-start);
+	}
+
+	// FIXME: Some db's (teradata) don't require a values keyword.
+	// If it is missing then the parenthesized list following the
+	// table is the column values, rather than the list of columns.
+
+	// skip to column list
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// parse column list
+	if (*ptr=='(') {
+
+		// skip (
+		ptr++;
+		if (!*ptr) {
+			return;
+		}
+
+		// skip to )
+		start=ptr;
+		while (*ptr && *ptr!=')') {
+			ptr++;
+		}
+		if (!*ptr) {
+			return;
+		}
+
+		// parse out columns
+		if (cols) {
+			char		**parts;
+			uint64_t	partcount;
+			charstring::split(start,ptr-start,
+						",",false,&parts,&partcount);
+			for (uint64_t i=0; i<partcount; i++) {
+				charstring::bothTrim(parts[i]);
+				cols->append(parts[i]);
+			}
+		}
+	}
+
+	// skip )
+	ptr++;
+	if (!*ptr) {
+		return;
+	}
+
+	// skip to "values"
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// skip "values"
+	ptr+=6;
+	if (ptr>=queryend) {
+		return;
+	}
+
+	// skip to actual values
+	ptr=skipWhitespaceAndComments(ptr);
+	if (!*ptr) {
+		return;
+	}
+
+	// parse values list
+	// FIXME: currently this assumes that all values are binds
+	if (*ptr=='(') {
+
+		// skip (
+		ptr++;
+		if (!*ptr) {
+			return;
+		}
+
+		// skip to )
+		start=ptr;
+		while (*ptr && *ptr!=')') {
+			ptr++;
+		}
+		if (!*ptr) {
+			return;
+		}
+
+		// parse out binds
+		if (binds) {
+			char		**parts;
+			uint64_t	partcount;
+			charstring::split(start,ptr-start,
+						",",false,&parts,&partcount);
+			for (uint64_t i=0; i<partcount; i++) {
+				charstring::bothTrim(parts[i]);
+				// override whatever bind prefix was in the
+				// query with the correct one (in case a
+				// non-native bind format was used)
+				parts[i][0]=bindFormat()[0];
+				binds->append(parts[i]);
+			}
+		}
+	}
+}
+
+void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
+							uint64_t datalen) {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bind row {\n",process::getProcessId());
+	}
+
+	// get the number of data format elements...
+	const unsigned char	*ptr=pvt->_bulkdataformat;
+	uint16_t		formatcount=*((uint16_t *)ptr);
+	ptr+=sizeof(uint16_t);
+
+	// get the input bind count and input binds
+	uint16_t		inbindcount=getInputBindCount(pvt->_bulkcursor);
+	sqlrserverbindvar	*inbinds=getInputBinds(pvt->_bulkcursor);
+	memorypool		*bindpool=getBindPool(pvt->_bulkcursor);
+
+	uint16_t formatindex=0;
+	uint16_t inbindindex=0;
+	for (;;) {
+
+		// get the format element type
+		sqlrserverbindvartype_t	type=*((sqlrserverbindvartype_t *)ptr);
+		ptr+=sizeof(sqlrserverbindvartype_t);
+
+		// get the format element size
+		uint32_t	size=*((uint32_t *)ptr);
+		ptr+=sizeof(uint32_t);
+		
+		// skip delimiters and newlines
+		if (type==SQLRSERVERBINDVARTYPE_DELIMITER ||
+				type==SQLRSERVERBINDVARTYPE_NEWLINE) {
+			if (pvt->_debugbulkload) {
+				if (type==SQLRSERVERBINDVARTYPE_DELIMITER) {
+					stdoutput.printf(
+						"	delimiter: %.*s\n",
+						size,data);
+				}
+				if (type==SQLRSERVERBINDVARTYPE_NEWLINE) {
+					stdoutput.printf("	newline\n");
+				}
+			}
+			formatindex++;
+			data+=size;
+			continue;
+		}
+
+		// for now we only support static-length strings
+		if (type!=SQLRSERVERBINDVARTYPE_STRING) {
+			// FIXME: set error...
+			break;
+		}
+
+		// get the bind value
+		sqlrserverbindvar	*inbind=&(inbinds[inbindindex]);
+		const unsigned char	*val=data;
+		inbind->valuesize=size;
+		data+=size;
+
+		if (pvt->_debugbulkload) {
+			stdoutput.printf("	%.*s %d(%d): ",
+						inbind->variablesize,
+						inbind->variable,
+						inbind->type,
+						size);
+		}
+
+		char	*temp=NULL;
+		switch (inbind->type) {
+
+			case SQLRSERVERBINDVARTYPE_STRING:
+			case SQLRSERVERBINDVARTYPE_BLOB:
+			case SQLRSERVERBINDVARTYPE_CLOB:
+				inbind->value.stringval=(char *)val;
+				if (pvt->_debugbulkload) {
+					stdoutput.printf("(%d) ",
+						inbind->valuesize);
+					stdoutput.printf("%.*s\n",
+						inbind->valuesize,
+						inbind->value.stringval);
+				}
+				break;
+
+			case SQLRSERVERBINDVARTYPE_INTEGER:
+				inbind->value.integerval=
+					charstring::toInteger((char *)val);
+				inbind->isnull=nonNullBindValue();
+				if (pvt->_debugbulkload) {
+					stdoutput.printf("%d\n",
+						inbind->value.integerval);
+				}
+				break;
+
+			case SQLRSERVERBINDVARTYPE_DOUBLE:
+				{
+				temp=charstring::duplicate(
+					(char *)val,inbind->valuesize);
+				inbind->value.doubleval.value=
+					charstring::toFloat(temp);
+				inbind->value.doubleval.precision=
+					inbind->valuesize-
+					((inbind->value.
+						doubleval.value<0)?1:0);
+				const char	*dot=
+					charstring::findFirst(temp,'.');
+				if (dot) {
+					inbind->value.doubleval.
+							precision--;
+					dot++;
+					inbind->value.doubleval.scale=
+						temp+inbind->valuesize-dot;
+				} else {
+					inbind->value.
+						doubleval.scale=0;
+				}
+				delete[] temp;
+				if (pvt->_debugbulkload) {
+					stdoutput.printf("%*.*f\n",
+						inbind->value.
+							doubleval.precision,
+						inbind->value.
+							doubleval.scale,
+						inbind->value.
+							doubleval.value);
+				}
+				}
+				break;
+
+			case SQLRSERVERBINDVARTYPE_DATE:
+				{
+				temp=charstring::duplicate(
+					(char *)val,inbind->valuesize);
+				charstring::bothTrim(temp);
+
+				// copy out the timezone
+				// (and null terminate the date before it)
+				char	*firstspace=
+					charstring::findFirst(temp," ");
+				char	*lastspace=
+					charstring::findLast(temp," ");
+				if (lastspace && lastspace!=firstspace) {
+					const char	*tz=lastspace+1;
+					inbind->value.dateval.tz=
+						(char *)bindpool->allocate(
+						temp+inbind->valuesize-tz+1);
+					charstring::copy(inbind->value.
+								dateval.tz,tz);
+					*lastspace='\0';
+				} else {
+					inbind->value.dateval.tz=NULL;
+				}
+
+				// FIXME: this assumes ISO-ish date/time format
+				// but who knows what we'll actually get, the
+				// ddmm, yyyyddmm, and delimiter parameters need
+				// to be configurable...
+				if (!parseDateTime(
+						temp,
+						false,
+						false,
+						"-",
+						&inbind->value.dateval.year,
+						&inbind->value.dateval.month,
+						&inbind->value.dateval.day,
+						&inbind->value.dateval.hour,
+						&inbind->value.dateval.minute,
+						&inbind->value.dateval.second,
+						&inbind->value.dateval.
+								microsecond,
+						&inbind->value.dateval.
+								isnegative)) {
+					// FIXME: what if this fails?
+				}
+				delete[] temp;
+
+				// allocate enough space to store the date/time
+				// string or whatever buffer a child might need
+				// to store a date 512 bytes ought to be enough
+				inbind->value.dateval.buffersize=512;
+				inbind->value.dateval.buffer=
+					(char *)bindpool->
+						allocate(inbind->value.dateval.
+								buffersize);
+
+				if (pvt->_debugbulkload) {
+					stdoutput.printf(
+						"%04hd-%02hd-%02hd "
+						"%02hd:%02hd:%02hd.%06d %s\n",
+						inbind->value.dateval.year,
+						inbind->value.dateval.month,
+						inbind->value.dateval.day,
+						inbind->value.dateval.hour,
+						inbind->value.dateval.minute,
+						inbind->value.dateval.second,
+						inbind->value.dateval.
+								microsecond,
+						((inbind->value.dateval.tz)?
+							inbind->value.
+								dateval.tz:""));
+				}
+				}
+
+			default:
+				break;
+		}
+
+		if (type==SQLRSERVERBINDVARTYPE_NULL) {
+			inbind->isnull=nullBindValue();
+		} else {
+			inbind->isnull=nonNullBindValue();
+		}
+
+		// move on
+		inbindindex++;
+		if (inbindindex==inbindcount) {
+			break;
+		}
+		formatindex++;
+		if (formatindex==formatcount) {
+			break;
+		}
+	}
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("}\n");
+	}
+}
+
+void sqlrservercontroller::bulkLoadError() {
+
+	// get the error
+	uint32_t	errorlength;
+	int64_t		errnum;
+	bool		liveconnection;
+	errorMessage(pvt->_bulkcursor,
+			pvt->_bulkcursor->getErrorBuffer(),
+			pvt->_maxerrorlength,
+			&errorlength,&errnum,&liveconnection);
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load error\n%d\n%.*s\n",
+					process::getProcessId(),
+					errnum,errorlength,
+					pvt->_bulkcursor->getErrorBuffer());
+	}
+
+	// store the error
+	if (!bulkLoadStoreError(errnum,
+				pvt->_bulkcursor->getErrorBuffer(),
+				errorlength,
+				pvt->_bulkerrorfieldtable,
+				pvt->_bulkerrorrowtable)) {
+		// FIXME: error...
+	}
+}
+
+bool sqlrservercontroller::bulkLoadStoreError(int64_t errorcode,
+						const char *error,
+						uint32_t errorlength,
+						const char *bulkerrorfieldtable,
+						const char *bulkerrorrowtable) {
+
+	// FIXME: this needs to be overridable per-connection
+
+	// FIXME: reuse a cursor...
+	sqlrservercursor	*cur=newCursor();
+	if (open(cur)) {
+
+		// insert into errorfieldtable...
+
+		// FIXME: use binds...
+		const char	*errorquery=
+				"insert into %s values (%lld,'%s','%s')";
+		stringbuffer	query;
+		query.writeFormatted(errorquery,
+					bulkerrorfieldtable,
+					errorcode,
+					// FIXME: get the column somehow
+					"bad_column",
+					// FIXME: get the data somehow
+					"bad_data");
+
+		if (!prepareQuery(cur,query.getString(),
+					query.getStringLength()) ||
+					!executeQuery(cur)) {
+			// FIXME: error...
+		}
+		closeResultSet(cur);
+
+		// FIXME: insert into errorrowtable...
+	}
+	close(cur);
+	deleteCursor(cur);
+
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadEnd() {
+
+	if (pvt->_debugbulkload) {
+		stdoutput.printf("%d: bulk load end\n",
+					process::getProcessId());
+	}
+
+	if (pvt->_bulkdroperrortables) {
+		if (!bulkLoadDropErrorTables(pvt->_bulkerrorfieldtable,
+						pvt->_bulkerrorrowtable)) {
+			// FIXME: error...
+		}
+	}
+
+	// delete shared memory
+	delete pvt->_bulkservershmem;
+	pvt->_bulkservershmem=NULL;
+	pvt->_bulkservershm=NULL;
+
+	// remove the id file
+	if (pvt->_bulkserveridfilename) {
+		file::remove(pvt->_bulkserveridfilename);
+		delete[] pvt->_bulkserveridfilename;
+	}
+	pvt->_bulkserveridfilename=NULL;
+
+	return true;
+}
+
+bool sqlrservercontroller::bulkLoadDropErrorTables(
+					const char *errorfieldtable,
+					const char *errorrowtable) {
+	// FIXME: implement this...
+	// this needs to be overridable per-connection
+	return true;
 }
 
 void sqlrservercontroller::setState(enum sqlrconnectionstate_t state) {
@@ -6225,14 +7892,6 @@ bool sqlrservercontroller::getExecuteDirect() {
 	return pvt->_executedirect;
 }
 
-void sqlrservercontroller::setInterceptTransactionQueries(bool itxq) {
-	pvt->_intercepttxqueries=itxq;
-}
-
-bool sqlrservercontroller::getInterceptTransactionQueries() {
-	return pvt->_intercepttxqueries;
-}
-
 void sqlrservercontroller::setFakeTransactionBlocks(bool ftb) {
 	pvt->_faketransactionblocks=ftb;
 }
@@ -6267,10 +7926,6 @@ int16_t sqlrservercontroller::nonNullBindValue() {
 
 int16_t sqlrservercontroller::nullBindValue() {
 	return pvt->_conn->nullBindValue();
-}
-
-char sqlrservercontroller::bindVariablePrefix() {
-	return pvt->_conn->bindVariablePrefix();
 }
 
 bool sqlrservercontroller::bindValueIsNull(int16_t isnull) {
@@ -6662,6 +8317,76 @@ void sqlrservercontroller::raiseParseFailureEvent(
 	}
 }
 
+void sqlrservercontroller::raiseCursorOpenEvent(sqlrservercursor *cursor) {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,cursor,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_CURSOR_OPEN,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,cursor,
+					SQLREVENT_CURSOR_OPEN,
+					NULL);
+	}
+}
+
+void sqlrservercontroller::raiseCursorCloseEvent(sqlrservercursor *cursor) {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,cursor,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_CURSOR_CLOSE,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,cursor,
+					SQLREVENT_CURSOR_CLOSE,
+					NULL);
+	}
+}
+
+void sqlrservercontroller::raiseBeginTransactionEvent() {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,NULL,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_BEGIN_TRANSACTION,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,NULL,
+					SQLREVENT_BEGIN_TRANSACTION,
+					NULL);
+	}
+}
+
+void sqlrservercontroller::raiseCommitEvent() {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,NULL,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_COMMIT,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,NULL,
+					SQLREVENT_COMMIT,
+					NULL);
+	}
+}
+
+void sqlrservercontroller::raiseRollbackEvent() {
+	if (pvt->_sqlrlg) {
+		pvt->_sqlrlg->run(NULL,pvt->_conn,NULL,
+					SQLRLOGGER_LOGLEVEL_INFO,
+					SQLREVENT_ROLLBACK,
+					NULL);
+	}
+	if (pvt->_sqlrn) {
+		pvt->_sqlrn->run(NULL,pvt->_conn,NULL,
+					SQLREVENT_ROLLBACK,
+					NULL);
+	}
+}
+
 void sqlrservercontroller::alarmHandler(int32_t signum) {
 	alarmrang=1;
 }
@@ -6688,14 +8413,6 @@ const char *sqlrservercontroller::identify() {
 
 const char *sqlrservercontroller::dbVersion() {
 	return pvt->_conn->dbVersion();
-}
-
-memorypool *sqlrservercontroller::getBindPool() {
-	return pvt->_bindpool;
-}
-
-memorypool *sqlrservercontroller::getBindMappingsPool() {
-	return pvt->_bindmappingspool;
 }
 
 const char *sqlrservercontroller::translateTableName(const char *table) {
@@ -6733,6 +8450,10 @@ const char *sqlrservercontroller::getId() {
 	return pvt->_cmdl->getId();
 }
 
+const char *sqlrservercontroller::getConnectionId() {
+	return pvt->_connectionid;
+}
+
 const char *sqlrservercontroller::getLogDir() {
 	return pvt->_pth->getLogDir();
 }
@@ -6752,6 +8473,10 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 
 	raiseDebugMessageEvent("fetching from bind cursor...");
 
+	// reset flags
+	cursor->setColumnInfoIsValid(false);
+	cursor->setResultSetHeaderHasBeenHandled(false);
+
 	// clear query buffer just so some future operation doesn't
 	// get confused into thinking this cursor actually ran one
 	cursor->getQueryBuffer()[0]='\0';
@@ -6762,8 +8487,10 @@ bool sqlrservercontroller::fetchFromBindCursor(sqlrservercursor *cursor) {
 	// reset total rows fetched
 	cursor->clearTotalRowsFetched();
 
-	// on failure save the error
-	if (!success) {
+	if (success) {
+		success=handleResultSetHeader(cursor);
+	} else {
+		// on failure save the error
 		saveError(cursor);
 	}
 
@@ -6821,10 +8548,12 @@ void sqlrservercontroller::saveError(sqlrservercursor *cursor) {
 	cursor->setLiveConnection(liveconnection);
 
 	if (pvt->_debugsql) {
-		stdoutput.printf("%d: ERROR:\n%d: %.*s\n\n",
+		stdoutput.printf("\n%d:%d:ERROR:\n%d:",
 					process::getProcessId(),
-					errorcode,errorlength,
-					cursor->getErrorBuffer());
+					cursor->getId(),
+					errorcode);
+		stdoutput.write(cursor->getErrorBuffer(),errorlength);
+		stdoutput.write('\n');
 	}
 }
 
@@ -6876,160 +8605,234 @@ uint64_t sqlrservercontroller::affectedRows(sqlrservercursor *cursor) {
 }
 
 uint32_t sqlrservercontroller::colCount(sqlrservercursor *cursor) {
+
+	// "db"cursor::prepareQuery() resets the column count to 0 before
+	// preparing the query.  If the database knows the column count
+	// post-prepare, then "db"cursor::prepareQuery() also sets it
+	// immediately after preparing the query.
+	//
+	// But...
+	//
+	// If we're faking binds, then sqlrservercontroller::prepareQuery()
+	// doesn't actually call "db"cursor::prepareQuery().  Instead,
+	// sqlrservercontroller::executeQuery() calls it after faking the
+	// binds.
+	//
+	// The app won't know that though, and if we're using a front end
+	// (like the mysql fron end) which talks to the server after prepare,
+	// then the app might do something like:
+	//
+	// * mysql_stmt_prepare(...)
+	// * mysql_stmt_field_count(...)
+	// * mysql_stmt_execute(...);
+	//
+	// ...expecting mysql_stmt_field_count to return the valid column count.
+	//
+	// Since we're faking binds though, and "db"cursor::prepareQuery()
+	// hasn't actually been called by the time mysql_stmt_field_count is
+	// called, then the column count returned by "db"cursor::colCount()
+	// will still be the column count from the previous query.
+	//
+	// We can't just set it to 0 in closeResultSet because we want to be
+	// able to access the column metadata after calling that.
+	//
+	// So, we'll handle it here.
+	//
+	// When the client prepares the query,
+	// sqlrserverconnection::prepareQuery() will be called.  When it
+	// executes the query, sqlrserverconnection::executeQuery() will be
+	// called.  During that period, if bind-faking is enabled, then
+	// cursor->getQueryHasBeenPrepared() will return false.  In that case,
+	// return 0 for the column count.
+	//
+	// This results in the expected behavior when faking binds - the column
+	// metadata isn't available until after execute.
+	//
+	// Arguably, the various getColumn*() methods should return 0 or NULL
+	// as well at this time...
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	return mapColumnCount(cursor->colCount());
 }
 
 uint16_t sqlrservercontroller::columnTypeFormat(sqlrservercursor *cursor) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
+	}
 	return cursor->columnTypeFormat();
 }
 
 const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return NULL;
 	}
-	return pvt->_columnnames[col];
+	return cursor->getColumnNameFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnnamelengths[col];
+	return cursor->getColumnNameLengthFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnType(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columntypes[col];
+	return cursor->getColumnTypeFromBuffer(mapColumn(col));
 }
 
 const char *sqlrservercontroller::getColumnTypeName(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return NULL;
 	}
-	return pvt->_columntypenames[col];
+	return cursor->getColumnTypeNameFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnTypeNameLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columntypenamelengths[col];
+	return cursor->getColumnTypeNameLengthFromBuffer(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnLength(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnlengths[col];
+	return cursor->getColumnLengthFromBuffer(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnPrecision(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnprecisions[col];
+	return cursor->getColumnPrecisionFromBuffer(mapColumn(col));
 }
 
 uint32_t sqlrservercontroller::getColumnScale(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnscales[col];
+	return cursor->getColumnScaleFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsNullable(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnisnullables[col];
+	return cursor->getColumnIsNullableFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsPrimaryKey(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnisprimarykeys[col];
+	return cursor->getColumnIsPrimaryKeyFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnique(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnisuniques[col];
+	return cursor->getColumnIsUniqueFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsPartOfKey(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnispartofkeys[col];
+	return cursor->getColumnIsPartOfKeyFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsUnsigned(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnisunsigneds[col];
+	return cursor->getColumnIsUnsignedFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsZeroFilled(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columniszerofilleds[col];
+	return cursor->getColumnIsZeroFilledFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsBinary(sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnisbinarys[col];
+	return cursor->getColumnIsBinaryFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnIsAutoIncrement(
 						sqlrservercursor *cursor,
 							uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columnisautoincrements[col];
+	return cursor->getColumnIsAutoIncrementFromBuffer(mapColumn(col));
 }
 
 const char *sqlrservercontroller::getColumnTable(sqlrservercursor *cursor,
 								uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columntables[col];
+	return cursor->getColumnTableFromBuffer(mapColumn(col));
 }
 
 uint16_t sqlrservercontroller::getColumnTableLength(sqlrservercursor *cursor,
 								uint32_t col) {
-	if (!cursor->getResultSetHeaderHasBeenTranslated()) {
-		translateResultSetHeader(cursor);
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return 0;
 	}
-	return pvt->_columntablelengths[col];
+	return cursor->getColumnTableLengthFromBuffer(mapColumn(col));
 }
 
 void sqlrservercontroller::getColumnNameList(sqlrservercursor *cursor,
 							stringbuffer *output) {
+	// see comment in colCount()
+	if (!cursor->getColumnInfoIsValid()) {
+		return;
+	}
 	for (uint32_t i=0; i<colCount(cursor); i++) {
 		if (i) {
 			output->append(',');
@@ -7039,7 +8842,20 @@ void sqlrservercontroller::getColumnNameList(sqlrservercursor *cursor,
 	}
 }
 
-void sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
+bool sqlrservercontroller::handleResultSetHeader(sqlrservercursor *cursor) {
+
+	// set flag indicating that the column info is now valid
+	cursor->setColumnInfoIsValid(true);
+
+	// This could get called multiple times, depending on whether
+	// column info is valid post-prepare or post-execute.  It's easier
+	// to just call it and bail if its already been called, than to
+	// keep track of whether it needs to be called or not and not call
+	// it if it doesn't.
+	if (cursor->getResultSetHeaderHasBeenHandled()) {
+		return true;
+	}
+	cursor->setResultSetHeaderHasBeenHandled(true);
 
 	// get arrays of field pointers,
 	// helpfully provided for us by the cursor
@@ -7062,8 +8878,8 @@ void sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
 				&(pvt->_columntables),
 				&(pvt->_columntablelengths));
 
+	// remap columns
 	uint32_t	colcount=colCount(cursor);
-
 	for (uint32_t col=0; col<colcount; col++) {
 		pvt->_columnnames[col]=
 			cursor->getColumnName(mapColumn(col));
@@ -7103,46 +8919,57 @@ void sqlrservercontroller::translateResultSetHeader(sqlrservercursor *cursor) {
 			cursor->getColumnTableLength(mapColumn(col));
 	}
 
-	if (pvt->_sqlrrsht) {
-		pvt->_sqlrrsht->run(pvt->_conn,
-				cursor,colcount,
-				&pvt->_columnnames,
-				&pvt->_columnnamelengths,
-				&pvt->_columntypes,
-				&pvt->_columntypenames,
-				&pvt->_columntypenamelengths,
-				&pvt->_columnlengths,
-				&pvt->_columnprecisions,
-				&pvt->_columnscales,
-				&pvt->_columnisnullables,
-				&pvt->_columnisprimarykeys,
-				&pvt->_columnisuniques,
-				&pvt->_columnispartofkeys,
-				&pvt->_columnisunsigneds,
-				&pvt->_columniszerofilleds,
-				&pvt->_columnisbinarys,
-				&pvt->_columnisautoincrements,
-				&pvt->_columntables,
-				&pvt->_columntablelengths);
-	}
+	// translate columns
+	if (pvt->_sqlrrsht && colcount) {
 
-	cursor->setResultSetHeaderHasBeenTranslated(true);
+		if (pvt->_debugsqlrresultsetheadertranslation) {
+			stdoutput.printf("\n===================="
+				 	"===================="
+				 	"===================="
+				 	"===================\n\n");
+			stdoutput.printf("translating result set header...\n");
+		}
+
+		if (!pvt->_sqlrrsht->run(pvt->_conn,
+					cursor,colcount,
+					&pvt->_columnnames,
+					&pvt->_columnnamelengths,
+					&pvt->_columntypes,
+					&pvt->_columntypenames,
+					&pvt->_columntypenamelengths,
+					&pvt->_columnlengths,
+					&pvt->_columnprecisions,
+					&pvt->_columnscales,
+					&pvt->_columnisnullables,
+					&pvt->_columnisprimarykeys,
+					&pvt->_columnisuniques,
+					&pvt->_columnispartofkeys,
+					&pvt->_columnisunsigneds,
+					&pvt->_columniszerofilleds,
+					&pvt->_columnisbinarys,
+					&pvt->_columnisautoincrements,
+					&pvt->_columntables,
+					&pvt->_columntablelengths)) {
+			setError(cursor,pvt->_sqlrrsht->getError(),
+				SQLR_ERROR_RESULTSETHEADERTRANSLATION,true);
+			return false;
+		}
+	}
+	return true;
 }
 
 bool sqlrservercontroller::noRowsToReturn(sqlrservercursor *cursor) {
 	return cursor->noRowsToReturn();
 }
 
-bool sqlrservercontroller::skipRow(sqlrservercursor *cursor) {
-	return cursor->skipRow();
+bool sqlrservercontroller::skipRow(sqlrservercursor *cursor, bool *error) {
+	return cursor->skipRow(error);
 }
 
-bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
+bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 
-	// fetch the row
-	if (!cursor->fetchRow()) {
-		return false;
-	}
+	// initialize error
+	*error=false;
 
 	// get arrays of field pointers,
 	// helpfully provided for us by the cursor
@@ -7155,36 +8982,168 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor) {
 	// get the column count
 	uint32_t	colcount=colCount(cursor);
 
-	// use the provided field pointer arrays to get the
-	// pointers to the column names and actual field data
-	for (uint32_t i=0; i<colcount; i++) {
+	// for timings...
+	datetime	dt;
 
-		pvt->_fieldnames[i]=getColumnName(cursor,i);
-		pvt->_fields[i]=NULL;
-		pvt->_fieldlengths[i]=0;
-		pvt->_blobs[i]=false;
-		pvt->_nulls[i]=false;
-		cursor->getField(i,&(pvt->_fields[i]),
-					&(pvt->_fieldlengths[i]),
-					&(pvt->_blobs[i]),
-					&(pvt->_nulls[i]));
+	if (pvt->_sqlrrsrbt) {
 
-		// A connection module might return the actual field length,
-		// even if its larger than the buffer that the data was
-		// copied into.  Override fieldlength, if necessary, just
-		// to be safe.
-		if (pvt->_maxfieldlength &&
-			pvt->_fieldlengths[i]>pvt->_maxfieldlength) {
-			pvt->_fieldlengths[i]=pvt->_maxfieldlength;
+		// if we have row block translations, then
+		// this is a little complex...
+
+		// if we're on the first row of a block...
+		if (!(cursor->getTotalRowsFetched()%
+				pvt->_sqlrrsrbt->getRowBlockSize())) {
+
+			if (pvt->_debugsqlrresultsetrowblocktranslation) {
+				stdoutput.printf("\n===================="
+				 		"===================="
+				 		"===================="
+				 		"===================\n\n");
+				stdoutput.printf("translating result "
+						"set row block...\n");
+			}
+
+			// for each row in the block...
+			for (uint32_t j=0;
+				j<pvt->_sqlrrsrbt->getRowBlockSize(); j++) {
+
+				// fetch the row, bail if fetch failed
+				if (!cursor->fetchRow(error)) {
+					break;
+				}
+
+				// handle errors
+				if (*error) {
+					return false;
+				}
+
+				// use the provided field pointer arrays to get
+				// the pointers to the column names and actual
+				// field data
+				for (uint32_t i=0; i<colcount; i++) {
+
+					pvt->_fieldnames[i]=
+						getColumnName(cursor,i);
+					pvt->_fields[i]=NULL;
+					pvt->_fieldlengths[i]=0;
+					pvt->_blobs[i]=false;
+					pvt->_nulls[i]=false;
+					cursor->getField(i,
+						&(pvt->_fields[i]),
+						&(pvt->_fieldlengths[i]),
+						&(pvt->_blobs[i]),
+						&(pvt->_nulls[i]));
+
+					// A connection module might return the
+					// actual field length, even if its
+					// larger than the buffer that the data
+					// was copied into.  Override
+					// fieldlength, if necessary, just to
+					// be safe.
+					if (pvt->_maxfieldlength &&
+						pvt->_fieldlengths[i]>
+							pvt->_maxfieldlength) {
+						pvt->_fieldlengths[i]=
+							pvt->_maxfieldlength;
+					}
+				}
+
+				// send the row to the translators
+				if (!pvt->_sqlrrsrbt->setRow(
+							cursor->conn,
+							cursor,
+							colcount,
+							pvt->_fieldnames,
+							pvt->_fields,
+							pvt->_fieldlengths,
+							pvt->_blobs,
+							pvt->_nulls)) {
+					*error=true;
+					setError(cursor,
+						pvt->_sqlrrsrbt->getError(),
+					SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION,
+						true);
+					return false;
+				}
+			}
+
+			// run the translators
+			if (!pvt->_sqlrrsrbt->run(cursor->conn,cursor,
+						colcount,pvt->_fieldnames)) {
+				*error=true;
+				setError(cursor,pvt->_sqlrrsrbt->getError(),
+					SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION,
+					true);
+				return false;
+			}
+		}
+
+		// get the row from the translators
+		if (!pvt->_sqlrrsrbt->getRow(cursor->conn,cursor,
+						colcount,
+						&(pvt->_fields),
+						&(pvt->_fieldlengths),
+						&(pvt->_blobs),
+						&(pvt->_nulls))) {
+			if (pvt->_sqlrrsrbt->getError()) {
+				*error=true;
+				setError(cursor,pvt->_sqlrrsrbt->getError(),
+					SQLR_ERROR_RESULTSETROWBLOCKTRANSLATION,
+					true);
+			}
+			return false;
+		}
+
+	} else {
+
+		// if we don't have any row block translations, then
+		// this is a little more straightforward...
+
+		// fetch the row, bail if fetch failed
+		if (!cursor->fetchRow(error)) {
+			return false;
+		}
+
+		// handle errors
+		if (*error) {
+			return false;
+		}
+
+		// use the provided field pointer arrays to get the
+		// pointers to the column names and actual field data
+		for (uint32_t i=0; i<colcount; i++) {
+
+			pvt->_fieldnames[i]=getColumnName(cursor,i);
+			pvt->_fields[i]=NULL;
+			pvt->_fieldlengths[i]=0;
+			pvt->_blobs[i]=false;
+			pvt->_nulls[i]=false;
+			cursor->getField(i,&(pvt->_fields[i]),
+						&(pvt->_fieldlengths[i]),
+						&(pvt->_blobs[i]),
+						&(pvt->_nulls[i]));
+
+			// A connection module might return the actual field
+			// length, even if its larger than the buffer that the
+			// data was copied into.  Override fieldlength, if
+			// necessary, just to be safe.
+			if (pvt->_maxfieldlength &&
+				pvt->_fieldlengths[i]>pvt->_maxfieldlength) {
+				pvt->_fieldlengths[i]=pvt->_maxfieldlength;
+			}
 		}
 	}
 
 	// reformat the row
-	reformatRow(cursor,colcount,pvt->_fieldnames,
-				&(pvt->_fields),&(pvt->_fieldlengths));
+	if (!reformatRow(cursor,colcount,pvt->_fieldnames,
+				&(pvt->_fields),&(pvt->_fieldlengths))) {
+		*error=true;
+		return false;
+	}
 
 	// bump total rows fetched
 	cursor->incrementTotalRowsFetched();
+
 	return true;
 }
 
@@ -7192,7 +9151,7 @@ void sqlrservercontroller::nextRow(sqlrservercursor *cursor) {
 	cursor->nextRow();
 }
 
-void sqlrservercontroller::getField(sqlrservercursor *cursor,
+bool sqlrservercontroller::getField(sqlrservercursor *cursor,
 						uint32_t col,
 						const char **field,
 						uint64_t *fieldlength,
@@ -7208,7 +9167,8 @@ void sqlrservercontroller::getField(sqlrservercursor *cursor,
 	*null=pvt->_nulls[actualcol];
 
 	// reformat the field
-	reformatField(cursor,pvt->_fieldnames[col],col,field,fieldlength);
+	return reformatField(cursor,pvt->_fieldnames[col],
+					col,field,fieldlength);
 }
 
 bool sqlrservercontroller::getLobFieldLength(sqlrservercursor *cursor,
@@ -7239,6 +9199,20 @@ void sqlrservercontroller::closeResultSet(sqlrservercursor *cursor) {
 
 uint16_t sqlrservercontroller::getId(sqlrservercursor *cursor) {
 	return cursor->getId();
+}
+
+memorypool *sqlrservercontroller::getBindPool(sqlrservercursor *cursor) {
+	return cursor->getBindPool();
+}
+
+memorypool *sqlrservercontroller::getBindMappingsPool(
+						sqlrservercursor *cursor) {
+	return cursor->getBindMappingsPool();
+}
+
+namevaluepairs *sqlrservercontroller::getBindMappings(
+						sqlrservercursor *cursor) {
+	return cursor->getBindMappings();
 }
 
 void sqlrservercontroller::setFakeInputBindsForThisQuery(
@@ -7341,10 +9315,12 @@ void sqlrservercontroller::closeLobInputOutputBind(sqlrservercursor *cursor,
 }
 
 bool sqlrservercontroller::open(sqlrservercursor *cursor) {
+	raiseCursorOpenEvent(cursor);
 	return cursor->open();
 }
 
 bool sqlrservercontroller::close(sqlrservercursor *cursor) {
+	raiseCursorCloseEvent(cursor);
 	return cursor->close();
 }
 
@@ -7506,6 +9482,14 @@ void sqlrservercontroller::setLiveConnection(sqlrservercursor *cursor,
 	cursor->setLiveConnection(liveconnection);
 }
 
+memorypool *sqlrservercontroller::getPerTransactionMemoryPool() {
+	return &pvt->_txpool;
+}
+
+memorypool *sqlrservercontroller::getPerSessionMemoryPool() {
+	return &pvt->_sessionpool;
+}
+
 sqlrparser *sqlrservercontroller::getParser() {
 	return pvt->_sqlrp;
 }
@@ -7530,4 +9514,16 @@ sqlrpaths *sqlrservercontroller::getPaths() {
 
 sqlrshm *sqlrservercontroller::getShm() {
 	return pvt->_shm;
+}
+
+sqlrmoduledata *sqlrservercontroller::getModuleData(const char *id) {
+	return pvt->_sqlrmd->getModuleData(id);
+}
+
+bool sqlrservercontroller::send(unsigned char *data, size_t size) {
+	return pvt->_conn->send(data,size);
+}
+
+bool sqlrservercontroller::recv(unsigned char **data, size_t *size) {
+	return pvt->_conn->recv(data,size);
 }

@@ -6,6 +6,8 @@
 #include <rudiments/stdio.h>
 #include <config.h>
 
+//#define FULL 1
+
 MYSQL		mysql;
 MYSQL_RES	*result;
 MYSQL_FIELD	*field;
@@ -69,11 +71,19 @@ int	main(int argc, char **argv) {
 		} else {
 			host="127.0.0.1";
 		}
+#ifdef FULL
 		db="testdb";
 		port="3306";
 		socket="/var/lib/mysql/mysql.sock";
 		user="testuser";
 		password="testpassword";
+#else
+		db="dbtest_enc";
+		port="6033";
+		socket="/var/lib/mysql/mysql.sock";
+		user="secured";
+		password="pwd4secured";
+#endif
 	}
 
 
@@ -108,16 +118,27 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("mysql_stmt_init:\n");
 	MYSQL_STMT	*stmt=mysql_stmt_init(&mysql);
 
-	stdoutput.printf("mysql_stmt_prepare/execute: select with binds\n");
+	stdoutput.printf("mysql_stmt_prepare\n");
+#ifdef FULL
 	const char	*query="select ?,?,?,?,?,?,?,?,?,?,?,?,?,?";
+#else
+	const char	*query="select ?,?";
+#endif
 	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+#ifdef FULL
 	MYSQL_BIND	bind[14];
 	unsigned long	bindlength[14];
 	my_bool		bindisnull[14];
+#else
+	MYSQL_BIND	bind[2];
+	unsigned long	bindlength[2];
+	my_bool		bindisnull[2];
+#endif
 	bytestring::zero(&bind,sizeof(bind));
 	bytestring::zero(&bindlength,sizeof(bindlength));
 	bytestring::zero(&bindisnull,sizeof(bindisnull));
 
+#ifdef FULL
 	char	tinyval=1;
 	bind[0].buffer_type=MYSQL_TYPE_TINY;
 	bind[0].buffer=&tinyval;
@@ -188,44 +209,20 @@ int	main(int argc, char **argv) {
 	bindisnull[7]=0;
 	bind[7].is_null=&bindisnull[7];
 
-	bind[8].buffer_type=MYSQL_TYPE_TINY_BLOB;
-	bind[8].buffer=(void *)"tinyblob1";
-	bind[8].buffer_length=9;
-	bindlength[8]=9;
-	bind[8].length=&bindlength[8];
-	bindisnull[8]=0;
-	bind[8].is_null=&bindisnull[8];
-
-	bind[9].buffer_type=MYSQL_TYPE_MEDIUM_BLOB;
-	bind[9].buffer=(void *)"mediumblob1";
-	bind[9].buffer_length=11;
-	bindlength[9]=11;
-	bind[9].length=&bindlength[9];
-	bindisnull[9]=0;
-	bind[9].is_null=&bindisnull[9];
-
-	bind[10].buffer_type=MYSQL_TYPE_LONG_BLOB;
-	bind[10].buffer=(void *)"longblob1";
-	bind[10].buffer_length=9;
-	bindlength[10]=9;
-	bind[10].length=&bindlength[10];
-	bindisnull[10]=0;
-	bind[10].is_null=&bindisnull[10];
-
-	bind[11].buffer_type=MYSQL_TYPE_DATE;
+	bind[8].buffer_type=MYSQL_TYPE_DATE;
 	MYSQL_TIME	datetm;
 	bytestring::zero(&datetm,sizeof(datetm));
 	datetm.year=2001;
 	datetm.month=1;
 	datetm.day=2;
-	bind[11].buffer=(void *)&datetm;
-	bind[11].buffer_length=sizeof(datetm);
-	bindlength[11]=sizeof(datetm);
-	bind[11].length=&bindlength[11];
-	bindisnull[11]=0;
-	bind[11].is_null=&bindisnull[11];
+	bind[8].buffer=(void *)&datetm;
+	bind[8].buffer_length=sizeof(datetm);
+	bindlength[8]=sizeof(datetm);
+	bind[8].length=&bindlength[8];
+	bindisnull[8]=0;
+	bind[8].is_null=&bindisnull[8];
 
-	bind[12].buffer_type=MYSQL_TYPE_TIME;
+	bind[9].buffer_type=MYSQL_TYPE_TIME;
 	MYSQL_TIME	timetm;
 	bytestring::zero(&timetm,sizeof(timetm));
 	timetm.neg=1;
@@ -233,14 +230,14 @@ int	main(int argc, char **argv) {
 	timetm.hour=12;
 	timetm.minute=10;
 	timetm.second=11;
-	bind[12].buffer=(void *)&timetm;
-	bind[12].buffer_length=sizeof(timetm);
-	bindlength[12]=sizeof(timetm);
-	bind[12].length=&bindlength[12];
-	bindisnull[12]=0;
-	bind[12].is_null=&bindisnull[12];
+	bind[9].buffer=(void *)&timetm;
+	bind[9].buffer_length=sizeof(timetm);
+	bindlength[9]=sizeof(timetm);
+	bind[9].length=&bindlength[9];
+	bindisnull[9]=0;
+	bind[9].is_null=&bindisnull[9];
 
-	bind[13].buffer_type=MYSQL_TYPE_DATETIME;
+	bind[10].buffer_type=MYSQL_TYPE_DATETIME;
 	MYSQL_TIME	datetimetm;
 	bytestring::zero(&datetimetm,sizeof(datetimetm));
 	datetimetm.year=2001;
@@ -249,27 +246,76 @@ int	main(int argc, char **argv) {
 	datetimetm.hour=12;
 	datetimetm.minute=10;
 	datetimetm.second=11;
-	bind[13].buffer=(void *)&datetimetm;
-	bind[13].buffer_length=sizeof(datetimetm);
-	bindlength[13]=sizeof(datetimetm);
+	bind[10].buffer=(void *)&datetimetm;
+	bind[10].buffer_length=sizeof(datetimetm);
+	bindlength[10]=sizeof(datetimetm);
+	bind[10].length=&bindlength[10];
+	bindisnull[10]=0;
+	bind[10].is_null=&bindisnull[10];
+
+	bind[11].buffer_type=MYSQL_TYPE_TINY_BLOB;
+	bind[11].buffer=(void *)"tinyblob1";
+	bind[11].buffer_length=9;
+	bindlength[11]=9;
+	bind[11].length=&bindlength[11];
+	bindisnull[11]=0;
+	bind[11].is_null=&bindisnull[11];
+
+	bind[12].buffer_type=MYSQL_TYPE_MEDIUM_BLOB;
+	bind[12].buffer=(void *)"mediumblob1";
+	bind[12].buffer_length=11;
+	bindlength[12]=11;
+	bind[12].length=&bindlength[12];
+	bindisnull[12]=0;
+	bind[12].is_null=&bindisnull[12];
+
+	bind[13].buffer_type=MYSQL_TYPE_LONG_BLOB;
+	bind[13].buffer=(void *)"longblob1";
+	bind[13].buffer_length=9;
+	bindlength[13]=9;
 	bind[13].length=&bindlength[13];
 	bindisnull[13]=0;
 	bind[13].is_null=&bindisnull[13];
+#else
+	char	tinyval=1;
+	bind[0].buffer_type=MYSQL_TYPE_TINY;
+	bind[0].buffer=&tinyval;
+	bind[0].buffer_length=sizeof(tinyval);
+	bindlength[0]=sizeof(tinyval);
+	bind[0].length=&bindlength[0];
+	bindisnull[0]=0;
+	bind[0].is_null=&bindisnull[0];
+
+	bind[1].buffer_type=MYSQL_TYPE_STRING;
+	bind[1].buffer=(void *)"string1";
+	bind[1].buffer_length=7;
+	bindlength[1]=7;
+	bind[1].length=&bindlength[1];
+	bindisnull[1]=0;
+	bind[1].is_null=&bindisnull[1];
+#endif
 
 	checkSuccess(mysql_stmt_bind_param(stmt,bind),0);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
+	stdoutput.printf("\n");
+	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
+	stdoutput.printf("\n");
+	stdoutput.printf("mysql_stmt_execute\n");
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");

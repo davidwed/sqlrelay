@@ -1,9 +1,9 @@
-// Copyright (c) 2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
 
-#include <rudiments/xmldomnode.h>
+#include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
@@ -42,13 +42,13 @@ sqlrqueries::~sqlrqueries() {
 	delete pvt;
 }
 
-bool sqlrqueries::load(xmldomnode *parameters) {
+bool sqlrqueries::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
 
 	// run through the query list
-	for (xmldomnode *query=parameters->getFirstTagChild();
+	for (domnode *query=parameters->getFirstTagChild();
 		!query->isNullNode(); query=query->getNextTagSibling()) {
 
 		debugPrintf("loading query ...\n");
@@ -72,7 +72,7 @@ void sqlrqueries::unload() {
 	pvt->_llist.clear();
 }
 
-void sqlrqueries::loadQuery(xmldomnode *query) {
+void sqlrqueries::loadQuery(domnode *query) {
 
 	debugFunction();
 
@@ -115,10 +115,10 @@ void sqlrqueries::loadQuery(xmldomnode *query) {
 	functionname.append("new_sqlrquery_")->append(module);
 	sqlrquery *(*newQuery)(sqlrservercontroller *,
 					sqlrqueries *,
-					xmldomnode *)=
+					domnode *)=
 			(sqlrquery *(*)(sqlrservercontroller *,
 						sqlrqueries *,
-						xmldomnode *))
+						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newQuery) {
 		stdoutput.printf("failed to load query: %s\n",module);
@@ -164,6 +164,18 @@ sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
 	return NULL;
 }
 
+void sqlrqueries::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->qr->endTransaction(commit);
+	}
+}
+
 void sqlrqueries::endSession() {
-	// nothing for now, maybe in the future
+	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+						pvt->_llist.getFirst();
+						node; node=node->getNext()) {
+		node->getValue()->qr->endSession();
+	}
 }

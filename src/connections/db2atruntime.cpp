@@ -1,13 +1,15 @@
-// Copyright (c) 2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <rudiments/dynamiclib.h>
+#include <rudiments/file.h>
 
 
 // FIXME: for now, assume version 8+
 #undef DB2VERSION
 #define DB2VERSION	8
 
+#define SQL_ERROR	-1
 
 // types...
 typedef unsigned char	SQLCHAR;
@@ -220,6 +222,7 @@ SQLRETURN (*SQLCloseCursor)(SQLHSTMT hStmt);
 #define	SQL_COLUMN_NULLABLE		7
 #define	SQL_COLUMN_UNSIGNED		8
 #define	SQL_COLUMN_AUTO_INCREMENT	11
+#define	SQL_COLUMN_TABLE_NAME		15
 #define	SQL_COLUMN_LABEL		18
 
 #define	SQL_CHAR		1

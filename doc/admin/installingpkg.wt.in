@@ -1,0 +1,140 @@
+= Installing SQL Relay From Packages =
+
+* [#platforms Supported Platforms]
+* [#linux Linux]
+* [#freebsd FreeBSD]
+* [#netbsd NetBSD]
+* [#windows Windows]
+
+[=#platforms]
+== Supported Platforms ==
+
+SQL Relay packages are currently available for:
+
+* RPM-based Linux (Fedora, !CentOS/RHEL, and !OpenSuSE)
+* !FreeBSD
+* !NetBSD
+* Windows
+
+Packages are not currently available for other platforms, but on other platforms, SQL Relay can be built from [installing.html source].
+
+[=#linux]
+== Linux ==
+
+SQL Relay packages are currently available for RPM-based Linux distributions like Fedora, !CentOS/RHEL, and !OpenSuSE Linux, for the x86_64 architecture.
+
+Packages are not currenly available for dpkg-based Linux like Ubunutu and Debian Linux, or for non-x86_64 architectures.  On these platforms SQL Relay must be built from [installing.html source].
+
+To download the Linux packages, download the [http://sourceforge.net/projects/sqlrelay/files/sqlrelay/@SQLR_VERSION@/sqlrelay-binary-distribution-@SQLR_VERSION@.tar.gz/download SQL Relay Binary Distribution for Linux].  This file is a tar.gz containing RPMs for all supported Linux platforms.
+
+To install the packages, first extract the file:
+
+{{{#!blockquote
+{{{
+tar xfz sqlrelay-binary-distribution-@SQLR_VERSION@.tar.gz
+}}}
+}}}
+
+Then, change directories into the directory that was created during the extraction:
+
+{{{#!blockquote
+{{{
+cd sqlrelay-binary-distribution-@SQLR_VERSION@
+}}}
+}}}
+
+Then, change directories into the directory for the appropriate distribution.  For example:
+
+{{{#!blockquote
+{{{
+cd centos7x64
+}}}
+}}}
+
+Then, install the RPMs.  Since different platforms use different packaging systems, installation instructions depend on the platform.
+
+{{{#!blockquote
+
+On Fedora platforms, run (as root):
+
+{{{#!blockquote
+{{{
+dnf localinstall *
+}}}
+}}}
+
+On !CentOS platforms, run (as root):
+
+{{{#!blockquote
+{{{
+yum localinstall *
+}}}
+}}}
+
+On !OpenSuSE platforms, run (as root):
+
+{{{#!blockquote
+{{{
+zypper install *
+}}}
+}}}
+
+}}}
+
+In any case, the package packaging system should install the RPMs as well as any dependencies that they require.
+
+Client libraries for most of the databases supported by SQL Relay are available as RPMs and should be automatically installed by the packaging system.  However, packages for commercial databases are not available from any standard package repository and must be installed manually for SQL Relay to actually work with these databases.
+
+For SQL Relay to work with a commercial database, you must install and configure client libraries for one or more of [http://www.oracle.com Oracle], [http://scn.sap.com/community/developer-center/oltp-db SAP/Sybase], [http://www.ibm.com/software/data/db2/ DB2], or [http://www.ibm.com/software/data/informix/ Informix].
+
+SQL Relay should now be installed.  At this point, it's safe to delete the sqlrelay-binary-distribution-@SQLR_VERSION@ directory and sqlrelay-binary-distribution-@SQLR_VERSION@.tar.gz file.
+
+[=#freebsd]
+== !FreeBSD ==
+
+SQL Relay is available as a [http://www.freshports.org/databases/sqlrelay/ FreeBSD port].  To install all packages related to SQL Relay, run (as root):
+
+{{{#!blockquote
+{{{
+pkg install sqlrelay py27-sqlrelay
+}}}
+}}}
+
+[=#netbsd]
+== !NetBSD ==
+
+SQL Relay is available as a [http://ftp.netbsd.org/pub/pkgsrc/current/pkgsrc/databases/sqlrelay/README.html NetBSD] package. To install all available packages related to SQL Relay, run (as root):
+
+{{{#!blockquote
+{{{
+pkgin install sqlrelay sqlrelay-sqlite sqlrelay-pgsql sqlrelay-odbc sqlrelay-nodejs sqlrelay-mysql sqlrelay-freetds
+ruby22-sqlrelay ruby21-sqlrelay ruby200-sqlrelay py27-sqlrelay php56-sqlrelay php55-sqlrelay p5-sqlrelay
+}}}
+}}}
+
+[=#windows]
+== Installing SQL Relay from Packages on Windows ==
+
+SQL Relay packages are currently available for Windows, for the x86 and x86_64 architectures.
+
+To download the Windows packages, download the [http://sourceforge.net/projects/sqlrelay/files/sqlrelay/@SQLR_VERSION@/sqlrelay-binary-distribution-@SQLR_VERSION@.zip/download SQL Relay Binary Distribution for Windows].  This file is a zip containing Windows packages for supported platforms.
+
+To install the packages:
+
+* Open the folder that the zip was downloaded into.
+* Right click the zip file and select Extract All...
+* Open the folder that was created by the extraction (if it didn't open automatically).
+* Open the folder that is appropriate for your architecture (x86 or x64).
+* Install Rudiments...
+ * Open the rudiments folder.
+ * Double-click "setup".
+ * Follow the instructions in the installer.  Accept all defaults.
+ * In Windows Explorer, click the back arrow to return to the parent folder.
+* Install SQL Relay...
+ * Open the sqlrelay folder.
+ * Double-click "setup".
+ * Follow the instructions in the installer.  Accept all defaults.
+
+SQL Relay should now be installed.  At this point, it's safe to delete the sqlrelay-binary-distribution-@SQLR_VERSION@ folder and sqlrelay-binary-distribution-@SQLR_VERSION@.zip file.
+
+NOTE: Rudiments and SQL Relay are currently built using Visual Studio 2013, and require the [https://www.microsoft.com/en-us/download/details.aspx?id=40784 Visual C++ Redistributable Packages for Visual Studio 2013].  Try installing this package manually if you encounter problems when trying to run SQL Relay.

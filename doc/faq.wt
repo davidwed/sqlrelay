@@ -27,7 +27,7 @@
 * [#replicated How can SQL Relay be used with replicated or clustered databases?]
 * [#databaseusers Can SQL Relay proxy multiple database users instead of using the same user for every session?]
 * [#routing Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?]
-* [#mysqlrouting Can I use SQL Relay to make my existing MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?]
+* [#mysqlrouting Can I use SQL Relay to make my existing MySQL/MariaDB app send all insert/update/delete's to a master database and distribute select's over a set of slaves?]
 * [#filtering Can SQL Relay be configured to filter out certain queries?]
 
 == Build Questions ==
@@ -48,7 +48,7 @@
 * [#postgresql How do I get data type names instead of numbers when using PostgreSQL?]
 * [#nlslang I'm using a non-ascii character set in my Oracle database, why am I get get garbage back when I do a select?]
 * [#oracleosauth How do I use Oracle's OS-Authentication (users identified externally)?]
-* [#mysqltrans Why aren't commit's working in MySQL?]
+* [#mysqltrans Why aren't commit's working in MySQL/MariaDB?]
 * [#mssqldates What's the deal with date columns in MS SQL Server?]
 
 == Programming Questions ==
@@ -110,8 +110,8 @@ Solves - "I wish there was a cheap and easy way to automatically distribute traf
 '''Query Routing''' - conditionally sends queries to one database or another[[br]]
 Solves - "My database is getting slammed.  I could replicate it but then I'd have to rewrite my app to send DML to the master and somehow distribute selects over the slaves."
 
-'''Drop-In Replacement Libraries''' - aims an existing !MySQL or !PostgreSQL app at SQL Relay without modification[[br]]
-Solves - "I wrote my app using the native !MySQL API but the company is migrating to Oracle.  I can tweak the queries to work with Oracle but I really don't want to have to modify the app to use OCI."
+'''Drop-In Replacement Libraries''' - aims an existing !MySQL/MariaDB or !PostgreSQL app at SQL Relay without modification[[br]]
+Solves - "I wrote my app using the native !MySQL/MariaDB API but the company is migrating to Oracle.  I can tweak the queries to work with Oracle but I really don't want to have to modify the app to use OCI."
 
 SQL Relay has client API's for most modern programming languages and drivers for many popular database abstraction API's.
 
@@ -125,13 +125,13 @@ It is a tool in a chain - another tier in a multi-tiered application - designed 
 
 There are some features that SQL Relay currently lacks that are either being worked on, or at least planned though.
 
-The !MySQL Front-End Module makes SQL Relay a transparent database proxy for !MySQL.  You can just aim SQL Relay at !MySQL and aim your app at SQL Relay.  But, SQL Relay currently lacks Front-End Modules for other database protocols, so it can't be used as a transparent proxy for other databases.  SQL Relay has it's own client/server protocol and API though.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you can update the connect string to use the SQL Relay driver.  You could also potentially use the [dropin/mysql.html drop-in replacement library for MySQL] or [dropin/postgresql.html drop-in replacement library for PostgreSQL].  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for various other native database protocols though.
+The !MySQL/MariaDB Front-End Module makes SQL Relay a transparent database proxy for !MySQL/MariaDB.  You can just aim SQL Relay at !MySQL/MariaDB and aim your app at SQL Relay.  But, SQL Relay currently lacks Front-End Modules for other database protocols, so it can't be used as a transparent proxy for other databases.  SQL Relay has it's own client/server protocol and API though.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you can update the connect string to use the SQL Relay driver.  You could also potentially use the [dropin/mysql.html drop-in replacement library for MySQL/MariaDB] or [dropin/postgresql.html drop-in replacement library for PostgreSQL].  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for various other native database protocols though.
 
 SQL Relay can provide a single-point of access for replicated databases but it does not provide replication.  It cannot keep multiple databases in sync.
 
 Similarly, though SQL Relay can provide a single-point of access for multiple databases, it does not currently provide a mechanism for joining tables across databases or sending the same query to multiple databases and merging the result sets.
 
-SQL Relay does provide a query translation framework and various query translation modules.  However SQL Relay cannot automatically translate queries from one syntax to another.  Though it can be used to aim an app originally written for !MySQL at Oracle, for example, it cannot (yet) transparently convert queries in !MySQL syntax to Oracle syntax.  If you want to use aim an app originally written for one database at another, you would have to modify the queries in the application, or write/configure custom query translation modules to translate specific queries from one form to another.
+SQL Relay does provide a query translation framework and various query translation modules.  However SQL Relay cannot automatically translate queries from one syntax to another.  Though it can be used to aim an app originally written for !MySQL/MariaDB at Oracle, for example, it cannot (yet) transparently convert queries in !MySQL/MariaDB syntax to Oracle syntax.  If you want to use aim an app originally written for one database at another, you would have to modify the queries in the application, or write/configure custom query translation modules to translate specific queries from one form to another.
 
 
 [[br]][=#connectionpooling]
@@ -172,7 +172,7 @@ See [features/queryrouting.html Query Routing].
 [[br]][=#dropinlibs]
 === What are "drop-in replacement libraries"? ===
 
-See [dropin/mysql.html Using the SQL Relay drop-in replacement library for MySQL] and [dropin/postgresql.html Using the SQL Relay drop-in replacement library for PostgreSQL].
+See [dropin/mysql.html Using the SQL Relay drop-in replacement library for MySQL/MariaDB] and [dropin/postgresql.html Using the SQL Relay drop-in replacement library for PostgreSQL].
 
 [[br]][=#databases]
 === What databases does SQL Relay support? ===
@@ -239,7 +239,7 @@ Let's say you're using Apache, mod_php and Oracle and you determine by doing all
 
 Many websites run applications written in a combination of languages, some of which have their own database pooling systems.  Perl modules, for example, can use Apache-DBI and PHP has a persistent database connection system, but a PHP cannot use an Apache-DBI connection and a Perl module cannot use a PHP persistent connection.  Thus in order to make sure that there are enough database connections for each platform, many more web-server processes have to be run, perhaps twice as many.  If the PHP's and Perl modules used SQL Relay instead, they could share databse connections and reduce the number of web-server processes and database connections.
 
-SQL Relay makes it easy to distribute load over replicated servers.  A common scaling solution when using !MySQL or !PostgreSQL in a read-only web environment is to run several web servers with a dedicated database server for each web server or group of web servers and update all the databases simultaneously at scheduled intervals.  This usually works pretty well, but sometimes database or web servers get runs of heavy load while others are idle.  In other cases, an uneven number of machines is required.  For example, your application may need 3 web servers but only 2 database servers or vice-versa and buying 3 of each would be wasteful.  Moreover, in most cases, the servers have to be equivalently powerful machines.  You can't usually just add another cheap machine that you have lying around into the pool.   SQL Relay can connect to multiple, replicated or clustered database servers, providing web-based applications access to whichever server isn't busy.  SQL Relay can also be configured to maintain more connections to more powerful machines and fewer connections to less powerful machines, enabling unevenly matched machines to be used in the same database pool.  Collectively, these features allow you to save money by using only the exact number of servers that you need and by enabling you to use spare hardware in your database pools.
+SQL Relay makes it easy to distribute load over replicated servers.  A common scaling solution when using !MySQL/MariaDB or !PostgreSQL in a read-only web environment is to run several web servers with a dedicated database server for each web server or group of web servers and update all the databases simultaneously at scheduled intervals.  This usually works pretty well, but sometimes database or web servers get runs of heavy load while others are idle.  In other cases, an uneven number of machines is required.  For example, your application may need 3 web servers but only 2 database servers or vice-versa and buying 3 of each would be wasteful.  Moreover, in most cases, the servers have to be equivalently powerful machines.  You can't usually just add another cheap machine that you have lying around into the pool.   SQL Relay can connect to multiple, replicated or clustered database servers, providing web-based applications access to whichever server isn't busy.  SQL Relay can also be configured to maintain more connections to more powerful machines and fewer connections to less powerful machines, enabling unevenly matched machines to be used in the same database pool.  Collectively, these features allow you to save money by using only the exact number of servers that you need and by enabling you to use spare hardware in your database pools.
 
 [[br]][=#unsupported]
 === How does SQL Relay allow me to access a database from a platform not supported by the database vendor? ===
@@ -255,7 +255,7 @@ If your app was written using a database abstraction API supported by SQL Relay 
 
 If your app was written using a database specific API then you might have to port your app to use the SQL Relay API, or a supported DB abstraction layer first.
 
-If your app was written using a !MySQL or !PostgreSQL API then you might be able to use the [dropin/mysql.html SQL Relay Drop-In Replacement Library for MySQL] or the [dropin/postgresql.html SQL Relay Drop-In Replacement Library for PostgreSQL] without modifying your app at all.
+If your app was written using a !MySQL/MariaDB or !PostgreSQL API then you might be able to use the [dropin/mysql.html SQL Relay Drop-In Replacement Library for MySQL/MariaDB] or the [dropin/postgresql.html SQL Relay Drop-In Replacement Library for PostgreSQL] without modifying your app at all.
 
 SQL Relay doesn't currently do query translation though.  There might be queries in your app that are written using database-specific syntax that would need to be modified to use the new database.
 
@@ -269,9 +269,9 @@ See [features/ha.html High Availability].
 
 Yes.  In the instance tag in the configuration file, set authtier="database".  See the [admin/configreference.html SQL Relay Configuration Reference] for more information.
 
-SQL Relay does this very efficiently when used with Oracle and !MySQL.  For Oracle, the database must be configured properly.  See [admin/oraclentier.html this document] for step-by-step instructions.
+SQL Relay does this very efficiently when used with Oracle.  The database must be configured properly though.  See [admin/oraclentier.html this document] for step-by-step instructions.
 
-Oracle and !MySQL allow a process that is connected to the database to switch users without disconnecting from the database.  When used with other databases, SQL Relay logs out and logs back in to the database whenever it needs to switch users.
+Oracle allows a process that is connected to the database to switch users without disconnecting from the database.  When used with other databases, SQL Relay logs out and logs back in to the database whenever it needs to switch users.
 
 [[br]][=#routing]
 === Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves? ===
@@ -279,13 +279,13 @@ Oracle and !MySQL allow a process that is connected to the database to switch us
 Yes, see [admin/router.html Query Routing].
 
 [[br]][=#mysqlrouting]
-=== Can I use SQL Relay to make my existing !MySQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves? ===
+=== Can I use SQL Relay to make my existing !MySQL/MariaDB app send all insert/update/delete's to a master database and distribute select's over a set of slaves? ===
 
-Probably.  You'll need to set up SQL Relay to route queries and use the Drop-in Replacement Library for !MySQL to redirect your app to use SQL Relay.
+Probably.  You'll need to set up SQL Relay to route queries and use the Drop-in Replacement Library for !MySQL/MariaDB to redirect your app to use SQL Relay.
 
 See [admin/router.html Query Routing] for details on how to set up SQL Relay as a query router.
 
-See [dropin/mysql.html Using the SQL Relay drop-in replacement library for MySQL] for details about how to use the drop-in replacement library.
+See [dropin/mysql.html Using the SQL Relay drop-in replacement library for MySQL/MariaDB] for details about how to use the drop-in replacement library.
 
 [[br]][=#filtering]
 === Can SQL Relay be configured to filter out certain queries? ===
@@ -448,7 +448,7 @@ If the character set used by the SQL Relay server process is missing characters 
 
 Configuring the character set used by the SQL Relay process is different for each database.
 
-When using !MySQL, !PostgreSQL, !FreeTDS, SAP/Sybase and Firebird databases, the character set can be set by setting the '''charset''' variable in the connect string of the configuration file.
+When using !MySQL/MariaDB, !PostgreSQL, !FreeTDS, SAP/Sybase and Firebird databases, the character set can be set by setting the '''charset''' variable in the connect string of the configuration file.
 
 When using Oracle, the character set can be set by setting the '''nls_lang''' variable in the connect string.
 
@@ -503,11 +503,11 @@ It's possible to set up an externally authenticated user to have access to other
 }}}
 
 [[br]][=#mysqltrans]
-=== Why aren't commit's working in !MySQL? ===
+=== Why aren't commit's working in !MySQL/MariaDB? ===
 
 How old is your !MySQL server?
 
-Ancient versions of !MySQL didn't support transactions at all.  Old versions did, but only if you explicitly created tables using a table type that supports transactions like InnoDB:
+Ancient versions of !MySQL didn't support transactions at all.  Old versions did, but only if you explicitly created tables using a table type that supports transactions like !InnoDB:
 
 {{{
 create table exampletable (col1 int) type=innodb
@@ -515,15 +515,15 @@ create table exampletable (col1 int) type=innodb
 
 Modern versions create transaction-capable tables by default.
 
-However, if you're accustomed to other databases, you may still be surprised at modern !MySQL's transaction behavior.  !MySQL supports several //isolation levels// and the default level is different from other database.  See the official !MySQL documentation for more information on this, but a summary follows.
+However, if you're accustomed to other databases, you may still be surprised at modern !MySQL/MariaDB's transaction behavior.  !MySQL/MariaDB supports several //isolation levels// and the default level is different from other database.  See the official !MySQL/MariaDB documentation for more information on this, but a summary follows.
 
 With most databases, if a client has a connection open and commits a set of inserts, updates or deletes, then those changes are immediately visible to other clients using separate connections.
 
-With !MySQL, after beginning a transaction, the database will appear to be unaffected by queries run in other transactions until the transaction you are running is committed.  So, if another client commits a set of inserts, you won't see them until you commit your transaction.
+With !MySQL/MariaDB, after beginning a transaction, the database will appear to be unaffected by queries run in other transactions until the transaction you are running is committed.  So, if another client commits a set of inserts, you won't see them until you commit your transaction.
 
 If you're in autocommit mode though and haven't begun a transaction, then you will immediately see all changes committed by other clients.  But as soon as you begin a transaction, you will no longer see changes to the database until you commit your transaction.
 
-As of SQL Relay 0.39, when using !MySQL, whenever a client connects to the server, the !MySQL connection daemon executes a commit before running the first query to sync things up.  This emulates the behavior that a client would expect if it was making a new connection directly to the database.
+As of SQL Relay 0.39, when using !MySQL/MariaDB, whenever a client connects to the server, the !MySQL/MariaDB connection daemon executes a commit before running the first query to sync things up.  This emulates the behavior that a client would expect if it was making a new connection directly to the database.
 
 [[br]][=#mssqldates]
 === What's the deal with date columns in MS SQL Server? ===
@@ -651,7 +651,7 @@ The syntax for creating and executing a stored procedure is different for each d
 
 This depends entirely on the database you're using.
 
-For Firebird you just run a query like '''select * from myprocedure'''.  For DB2, Informix and !MySQL you just run a query like '''call myprocedure'''.  For SAP/Sybase/FreeTDS you just run a query like '''exec myprocedure'''.  For !PostgreSQL you call '''select * from myprocedure() ...''' where ... is replaced with a description of the columns that the procedure returns.  In all of these cases, the result set is available as if you were selecting from a table.
+For Firebird you just run a query like '''select * from myprocedure'''.  For DB2, Informix and !MySQL/MariaDB you just run a query like '''call myprocedure'''.  For SAP/Sybase/FreeTDS you just run a query like '''exec myprocedure'''.  For !PostgreSQL you call '''select * from myprocedure() ...''' where ... is replaced with a description of the columns that the procedure returns.  In all of these cases, the result set is available as if you were selecting from a table.
 
 Oracle is a bit different.  A stored procedure may declare a cursor variable, assign the results of a query to it and return it either as a return value or as an output bind variable.  You have to use defineOutputBindCursor(), getOutputBindCursor() and fetchFromBindCursor().  The use of these are documented in the various language guides for SQL Relay such as [programming/c++.html the C++ guide].  After calling fetchFromBindCursor(), the result set is available as if you were selecting from a table.
 

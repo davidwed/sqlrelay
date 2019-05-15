@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2012  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -13,7 +13,7 @@ class SQLRSERVER_DLLSPEC sqlrquery_sqlrcmdcstat : public sqlrquery {
 	public:
 			sqlrquery_sqlrcmdcstat(sqlrservercontroller *cont,
 							sqlrqueries *qs,
-							xmldomnode *parameters);
+							domnode *parameters);
 		bool	match(const char *querystring, uint32_t querylength);
 		sqlrquerycursor	*newCursor(sqlrserverconnection *conn,
 							uint16_t id);
@@ -24,7 +24,7 @@ class sqlrquery_sqlrcmdcstatcursor : public sqlrquerycursor {
 			sqlrquery_sqlrcmdcstatcursor(
 						sqlrserverconnection *sqlrcon,
 						sqlrquery *q,
-						xmldomnode *parameters,
+						domnode *parameters,
 						uint16_t id);
 			~sqlrquery_sqlrcmdcstatcursor();
 
@@ -38,7 +38,7 @@ class sqlrquery_sqlrcmdcstatcursor : public sqlrquerycursor {
 		uint32_t	getColumnScale(uint32_t col);
 		uint16_t	getColumnIsNullable(uint32_t col);
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -53,7 +53,7 @@ class sqlrquery_sqlrcmdcstatcursor : public sqlrquerycursor {
 
 sqlrquery_sqlrcmdcstat::sqlrquery_sqlrcmdcstat(sqlrservercontroller *cont,
 						sqlrqueries *qs,
-						xmldomnode *parameters) :
+						domnode *parameters) :
 						sqlrquery(cont,qs,parameters) {
 	debugFunction();
 }
@@ -74,7 +74,7 @@ sqlrquerycursor *sqlrquery_sqlrcmdcstat::newCursor(
 sqlrquery_sqlrcmdcstatcursor::sqlrquery_sqlrcmdcstatcursor(
 					sqlrserverconnection *sqlrcon,
 					sqlrquery *q,
-					xmldomnode *parameters,
+					domnode *parameters,
 					uint16_t id) :
 				sqlrquerycursor(sqlrcon,q,parameters,id) {
 	currentrow=0;
@@ -148,7 +148,8 @@ bool sqlrquery_sqlrcmdcstatcursor::noRowsToReturn() {
 	return false;
 }
 
-bool sqlrquery_sqlrcmdcstatcursor::fetchRow() {
+bool sqlrquery_sqlrcmdcstatcursor::fetchRow(bool *error) {
+	*error=false;
 	while (currentrow<MAXCONNECTIONS) {
 		cs=&(conn->cont->getShm()->connstats[currentrow]);
 		currentrow++;
@@ -269,7 +270,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrquery *new_sqlrquery_sqlrcmdcstat(
 						sqlrservercontroller *cont,
 						sqlrqueries *qs,
-						xmldomnode *parameters) {
+						domnode *parameters) {
 		return new sqlrquery_sqlrcmdcstat(cont,qs,parameters);
 	}
 }

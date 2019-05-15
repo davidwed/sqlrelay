@@ -3,8 +3,16 @@
 #include <rudiments/charstring.h>
 #include <rudiments/bytestring.h>
 #include <rudiments/environment.h>
+#include <rudiments/stringbuffer.h>
 #include <rudiments/stdio.h>
 #include <config.h>
+
+// MySQL 8+ doesn't have my_bool, but MariaDB 10+ does
+#ifndef MARIADB_BASE_VERSION
+	#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
+		typedef bool my_bool;
+	#endif
+#endif
 
 MYSQL		mysql;
 MYSQL_RES	*result;
@@ -112,7 +120,13 @@ int	main(int argc, char **argv) {
 	#endif
 
 	stdoutput.printf("mysql_character_set_name:\n");
+	#if !defined(MARIADB_BASE_VERSION) && \
+		defined(MYSQL_VERSION_ID) && \
+		MYSQL_VERSION_ID>=80000
+	checkSuccess((char *)mysql_character_set_name(&mysql),"utf8mb4");
+	#else
 	checkSuccess((char *)mysql_character_set_name(&mysql),"latin1");
+	#endif
 	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_list_dbs\n");
@@ -177,9 +191,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_num_fields(result),19);
 	stdoutput.printf("\n");
 
-	field=mysql_fetch_field_direct(result,0);
-
 	stdoutput.printf("tinyint\n");
+	field=mysql_fetch_field_direct(result,0);
 	checkSuccess(field->name,"testtinyint");
 	/*if (argc==2) {
 		checkSuccess(field->org_name,"testtinyint");
@@ -197,7 +210,8 @@ int	main(int argc, char **argv) {
 		checkSuccess(field->db_length,6);
 	}*/
 	checkSuccess(field->catalog_length,3);
-	checkSuccess(field->def_length,0);
+	// Some client API's don't set this if def is NULL
+	//checkSuccess(field->def_length,0);
 	checkSuccess(field->flags,NUM_FLAG);
 	checkSuccess(field->decimals,0);
 	/*if (argc==2) {
@@ -753,7 +767,7 @@ int	main(int argc, char **argv) {
 
 	// some versions of mariadb crash when you call this
 	// (arguably, I should figure out which versions and look for that too)
-	#ifndef LIBMARIADB
+	#ifndef MARIADB_BASE_VERSION
 	stdoutput.printf("mysql_list_processes\n");
 	result=mysql_list_processes(&mysql);
 	checkSuccess(mysql_num_fields(result),9);
@@ -790,11 +804,14 @@ int	main(int argc, char **argv) {
 
 	// FIXME: mysql_change_user
 
+	#if defined(MARIADB_BASE_VERSION) || \
+		(defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID<80000)
 	stdoutput.printf("mysql_shutdown\n");
 	// should fail for lack of permissions
 	// deprecated in real mysql, and always returns 1 on error
 	checkSuccess(mysql_shutdown(&mysql,SHUTDOWN_DEFAULT),1);
 	stdoutput.printf("\n");
+	#endif
 
 	stdoutput.printf("mysql_refresh\n");
 	// these should all fail for lack of permissions
@@ -1066,7 +1083,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldisnull[3],0);
 	checkSuccess(fieldisnull[4],1);
 	checkSuccess(fieldisnull[5],0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");	
@@ -1083,7 +1100,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldisnull[3],1);
 	checkSuccess(fieldisnull[4],0);
 	checkSuccess(fieldisnull[5],1);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
@@ -1256,7 +1273,7 @@ int	main(int argc, char **argv) {
 	checkSuccess((const char *)fieldbind[11].buffer,"2001-01-02");
 	checkSuccess((const char *)fieldbind[12].buffer,"-36:10:11");
 	checkSuccess((const char *)fieldbind[13].buffer,"2001-01-02 12:10:11");
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
@@ -1309,7 +1326,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(bindisnull[1],1);
 	checkSuccess(bindisnull[2],0);
 	checkSuccess(bindisnull[3],1);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
@@ -1362,11 +1379,45 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldisnull[1],0);
 	checkSuccess(fieldisnull[2],1);
 	checkSuccess(fieldisnull[3],0);
-	#ifdef LIBMARIADB
+	#ifdef MARIADB_BASE_VERSION
 	checkSuccess(mysql_stmt_fetch(stmt),100);
 	#endif
 	stdoutput.printf("\n");
 
+	stdoutput.printf("mysql_stmt_close:\n");
+	checkSuccess(mysql_stmt_close(stmt),0);
+	stdoutput.printf("\n");
+
+
+	stdoutput.printf("mysql_stmt_prepare/execute: binary data\n");
+	query="create table testdb.testtable (col1 longblob)";
+	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	const char	value[]={0,'"','"','\n'};
+	stringbuffer	q;
+	q.append("insert into testdb.testtable values (_binary'");
+	q.append(value,sizeof(value));
+	q.append("')");
+	checkSuccess(mysql_real_query(&mysql,q.getString(),q.getSize()),0);
+	stmt=mysql_stmt_init(&mysql);
+	query="select col1 from testdb.testtable";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
+	for (uint16_t i=0; i<19; i++) {
+		bytestring::zero(&fieldbind[i],sizeof(MYSQL_BIND));
+		fieldbind[i].buffer_type=MYSQL_TYPE_STRING;
+		fieldbind[i].buffer=&fieldbuffer[i*1024];
+		fieldbind[i].buffer_length=1024;
+		fieldbind[i].is_null=&fieldisnull[i];
+		fieldbind[i].length=&fieldlength[i];
+	}
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
+	checkSuccess(mysql_stmt_fetch(stmt),0);
+	stdoutput.printf("\n");
+	checkSuccess(fieldlength[0],sizeof(value));
+	checkSuccess(bytestring::compare(fieldbind[0].buffer,
+					value,sizeof(value)),0);
+	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_stmt_close:\n");
 	checkSuccess(mysql_stmt_close(stmt),0);

@@ -314,10 +314,11 @@ try
 	$sql = <<<SQL
 SELECT *
   FROM testtable
- WHERE uid = 1;
+ WHERE uid = :uid;
 SQL;
 	
 	$stmt = $db->query($sql);
+	$stmt->bindValue(':uid', 1, PDO::PARAM_INT);
 	$rowcnt = $stmt->rowCount();
 	
 	tcCheck('selectRowCount', $rowcnt, 1);

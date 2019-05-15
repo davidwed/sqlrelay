@@ -1,4 +1,4 @@
-// Copyright (c) 2001  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 
 #include <sqlrelay/sqlrclientwrapper.h>
@@ -253,7 +253,7 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,11),"YEAR");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,12),"STRING");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,13),"BLOB");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,14),"CHAR");
+	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,14),"VARSTRING");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,15),"TINYBLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,16),"MEDIUMBLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,17),"LONGBLOB");
@@ -272,7 +272,7 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testyear"),"YEAR");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"STRING");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtext"),"BLOB");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"CHAR");
+	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"VARSTRING");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtinytext"),"TINYBLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testmediumtext"),"MEDIUMBLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testlongtext"),"LONGBLOB");

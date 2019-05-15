@@ -586,6 +586,22 @@ fi
 AC_SUBST(WNOLONGDOUBLE)
 ])
 
+
+dnl checks to see if -Wno-error=date-time
+AC_DEFUN([FW_CHECK_WNOERRORDATETIME],
+[
+AC_MSG_CHECKING(for -Wno-error=date-time)
+FW_TRY_LINK([#include <stdio.h>],[printf("%s %s\n",__DATE__,__TIME__);],[-Wall -Werror -Wno-error=date-time],[],[],[WNOERRORDATETIME="-Wno-error=date-time"],[WNOERRORDATETIME=""])
+if ( test -n "$WNOERRORDATETIME" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(WNOERRORDATETIME)
+])
+
+
 dnl Checks for minix and adds some macros if it is
 AC_DEFUN([FW_CHECK_MINIX],
 [
@@ -986,9 +1002,9 @@ then
 	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
 	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
 	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "1" -o "$V2" -lt "0" -o "$V3" -lt "5" )
+	if ( test "$V1" -lt "1" -o "$V2" -lt "2" -o "$V3" -lt "0" )
 	then
-		AC_MSG_ERROR([Rudiments version must be >= 1.0.5, found version $RUDIMENTSVERSION])
+		AC_MSG_ERROR([Rudiments version must be >= 1.1.0, found version $RUDIMENTSVERSION])
 		exit
 	fi
 fi
@@ -1385,7 +1401,7 @@ then
 				else
 					MYSQLCONFIG="mysql_config"
 				fi
-				$MYSQLCONFIG --cflags 2> /dev/null
+				$MYSQLCONFIG --cflags > /dev/null 2> /dev/null
 				if ( test "$?" -ne "0" )
 				then
 					if ( test -n "$dir" )
@@ -1454,8 +1470,21 @@ then
 		if ( test -n "$MYSQLLIBS" )
 		then
 			AC_MSG_CHECKING(for valid mysql_config output)
+			MYSQLCONFIGSUCCESS="no"
 			FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); MYSQLCONFIGSUCCESS="yes"],[AC_MSG_RESULT(no)])
+
+			dnl On freebsd 11.1, mysql_config doesn't include
+			dnl -L/usr/local/lib, but it should because libiconv
+			dnl is located there.  We'll try again, adding that,
+			dnl if mysql_config fails the first time.
+			if ( test "$MYSQLCONFIGSUCCESS" = "no" )
+			then
+				AC_MSG_CHECKING(again with -L/usr/local/lib)
+				MYSQLLIBS="-L/usr/local/lib $MYSQLLIBS"
+				FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[mysql_close(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); MYSQLINCLUDES=""; MYSQLLIBS=""])
+			fi
 		fi
 
 		dnl do we need -lz?
@@ -1622,6 +1651,18 @@ AC_DEFUN([FW_CHECK_MYSQL_FUNCTIONS],
 	AC_MSG_CHECKING(for MYSQL_GET_SERVER_VERSION)
 	FW_TRY_LINK([#include <mysql.h>
 #include <stdlib.h>],[mysql_get_server_version(NULL);],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_GET_SERVER_VERSION,1,MySQL supports MYSQL_GET_SERVER_VERSION)],[AC_MSG_RESULT(no)])
+
+	AC_MSG_CHECKING(for MYSQL_FIELD.name_length)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[MYSQL_FIELD f; unsigned int a=f.name_length;],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_FIELD_NAME_LENGTH,1,MySQL supports MYSQL_FIELD.name_length)],[AC_MSG_RESULT(no)])
+
+	AC_MSG_CHECKING(for MYSQL_FIELD.org_table)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[MYSQL_FIELD f; const char *a=f.org_table;],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_FIELD_ORG_TABLE,1,MySQL supports MYSQL_FIELD.org_table)],[AC_MSG_RESULT(no)])
+
+	AC_MSG_CHECKING(for MYSQL_FIELD.org_table_length)
+	FW_TRY_LINK([#include <mysql.h>
+#include <stdlib.h>],[MYSQL_FIELD f; unsigned int a=f.org_table_length;],[$MYSQLSTATIC $MYSQLINCLUDES],[$MYSQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH,1,MySQL supports MYSQL_FIELD.org_table_length)],[AC_MSG_RESULT(no)])
 ])
 
 
@@ -1757,6 +1798,9 @@ then
 		AC_MSG_CHECKING(if PostgreSQL has PQbinaryTuples)
 		FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQbinaryTuples(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQBINARYTUPLES,1,Some versions of postgresql have PQbinaryTuples)],[AC_MSG_RESULT(no)])
+		AC_MSG_CHECKING(if PostgreSQL has PQftable)
+		FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQftable(NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQFTABLE,1,Some versions of postgresql have PQftable)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])
@@ -1929,6 +1973,10 @@ then
 		AC_MSG_CHECKING(for sqlite3_free with char * argument)
 		FW_TRY_LINK([#include <sqlite3.h>
 #include <stdlib.h>],[char *a=0; sqlite3_free(a);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_FREE_WITH_CHAR,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
+
+		AC_MSG_CHECKING(for sqlite3_column_table_name)
+		FW_TRY_LINK([#include <sqlite3.h>
+#include <stdlib.h>],[sqlite3_column_table_name(0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_COLUMN_TABLE_NAME,1,SQLite supports sqlite3_column_table_name)],[AC_MSG_RESULT(no)])
 
 	fi
 
@@ -2335,6 +2383,14 @@ then
 #include <sqltypes.h>
 #include <stdlib.h>],[SQLHENV env; SQLHDBC dbc; SQLAllocEnv(&env); SQLAllocConnect(env,&dbc); SQLFreeConnect(&dbc); SQLFreeEnv(&env);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); ODBCINCLUDES="$ODBCINCLUDES $PTHREADINCLUDES"; ODBCLIBS="$ODBCLIBS $PTHREADLIB"])
 		fi
+	fi
+		
+	dnl disable odbc if it doesn't support SQLULEN
+	if ( test -n "$ODBCLIBS" )
+	then
+		AC_MSG_CHECKING(for SQLULEN)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>],[SQLULEN a;],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no); ODBCLIBS=""])
 	fi
 
 	if ( test -n "$ODBCLIBS" )
@@ -3376,6 +3432,8 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.12* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.11* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.10* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.9* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.8* 2> /dev/null` \
@@ -3385,7 +3443,11 @@ then
 `ls -d /usr/lib64/jvm/jdk-8-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-9-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-10-* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/jdk-11-* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.12* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.11* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.10* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.9* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.8* 2> /dev/null` \
@@ -3395,6 +3457,8 @@ then
 `ls -d /usr/lib/jvm/jdk-8-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-9-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-10-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-11-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 /System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local
@@ -3415,6 +3479,12 @@ then
 		then
 			FW_CHECK_FILE("$JAVAPATH/bin/javac$EXE",[JAVAC=\"$JAVAPATH/bin/javac$EXE\"])
 			FW_CHECK_FILE("$JAVAPATH/Commands/javac$EXE",[JAVAC=\"$JAVAPATH/Commands/javac$EXE\"])
+			if ( test "`basename $CXX`" = "g++3" )
+			then
+				FW_CHECK_FILE("$JAVAPATH/bin/gcj3$EXE",[JAVAC=\"$JAVAPATH/bin/gcj3$EXE -C\"])
+			else
+				FW_CHECK_FILE("$JAVAPATH/bin/gcj$EXE",[JAVAC=\"$JAVAPATH/bin/gcj$EXE -C\"])
+			fi
 			FW_CHECK_FILE("$JAVAPATH/bin/jar$EXE",[JAR=\"$JAVAPATH/bin/jar$EXE\"])
 			FW_CHECK_FILE("$JAVAPATH/Commands/jar$EXE",[JAR=\"$JAVAPATH/Commands/jar$EXE\"])
 			if ( test "$JAVAPATH" != "/usr" )
@@ -3438,6 +3508,20 @@ then
 		then
 			HAVE_JAVA="yes"
 		fi
+	fi
+
+	dnl if java is really kaffe then don't use it
+	if ( test -n "`grep kaffe $JAVAC | grep exec | grep Main`" )
+	then
+		AC_MSG_WARN(javac appears to use kaffe, which is not supported)
+		HAVE_JAVA=""
+	fi
+
+	dnl if java is really gcj 2.x then don't use it
+	if ( test "`basename $JAVAC`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
+	then
+		AC_MSG_WARN(javac appears to be gcj 2.xx, which is not supported)
+		HAVE_JAVA=""
 	fi
 
 	if ( test -n "$HAVE_JAVA" )
@@ -3679,6 +3763,11 @@ then
 static const zend_function_entry *test(pdo_dbh_t *dbh, int kind TSRMLS_DC) { return 0; }
 static struct pdo_dbh_methods methods={ 0,0,0,0,0,0,0,0,0,0,0,0,test };
 ],[],[$PHPINCLUDES],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_PHP_PDO_CONST_ZEND_FUNCTION_ENTRY,1,Some versions of PHP PDO don't support const zend_function_entry)],[AC_MSG_RESULT(no)])
+
+		AC_MSG_CHECKING(for PDO_PARAM_ZVAL)
+		FW_TRY_COMPILE([#include <php.h>
+#include <pdo/php_pdo.h>
+#include <pdo/php_pdo_driver.h>],[pdo_param_type a=PDO_PARAM_ZVAL;],[$PHPINCLUDES],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_PHP_PDO_PARAM_ZVAL,1,Some versions of PHP PDO have PDO_PARAM_ZVAL)],[AC_MSG_RESULT(no)])
 	fi
 fi
 ])

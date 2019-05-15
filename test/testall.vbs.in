@@ -44,7 +44,7 @@ for each db in testdbs
 
 	' make sure that the instance is up
 	PING=""
-	for i=1 to 10
+	for i=1 to 15
 
 		WScript.Echo("")
 		WScript.Echo("pinging " & db & "...")
@@ -73,7 +73,7 @@ for each db in testdbs
 		Wscript.Echo(pingerr)
 
 		if pingerr="0:Couldn't connect to the listener." then
-			WScript.Sleep(2000)
+			WScript.Sleep(5000)
 		else
 			exit for
 		end if

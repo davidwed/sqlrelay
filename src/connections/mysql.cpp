@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2016  David Muse
+// Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
@@ -13,6 +13,13 @@
 #include <mysql.h>
 #if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=32200
 	#include <errmsg.h>
+#endif
+
+// MySQL 8+ doesn't have my_bool, but MariaDB 10+ does
+#ifndef MARIADB_BASE_VERSION
+	#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
+		typedef bool my_bool;
+	#endif
 #endif
 
 #ifndef TRUE
@@ -101,6 +108,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		uint64_t	affectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
+#ifdef HAVE_MYSQL_FIELD_NAME_LENGTH
+		uint16_t	getColumnNameLength(uint32_t col);
+#endif
 		uint16_t	getColumnType(uint32_t col);
 		uint32_t	getColumnLength(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
@@ -113,8 +123,14 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		uint16_t	getColumnIsZeroFilled(uint32_t col);
 		uint16_t	getColumnIsBinary(uint32_t col);
 		uint16_t	getColumnIsAutoIncrement(uint32_t col);
+#ifdef HAVE_MYSQL_FIELD_ORG_TABLE
+		const char	*getColumnTable(uint32_t col);
+#endif
+#ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
+		uint16_t	getColumnTableLength(uint32_t col);
+#endif
 		bool		noRowsToReturn();
-		bool		fetchRow();
+		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
 					uint64_t *fieldlength,
@@ -135,6 +151,8 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 
 		void		closeResultSet();
 
+		bool		columnInfoIsValidAfterPrepare();
+
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	**mysqlfields;
 		unsigned int	ncols;
@@ -144,6 +162,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		MYSQL_STMT	*stmt;
+		bool		stmtreset;
 		bool		stmtfreeresult;
 		bool		stmtpreparefailed;
 
@@ -189,7 +208,9 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*identify();
 		const char	*dbVersion();
 		const char	*dbHostName();
+#ifdef HAVE_MYSQL_STMT_PREPARE
 		const char	*bindFormat();
+#endif
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(
@@ -227,6 +248,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*port;
 		const char	*socket;
 		const char	*charset;
+		const char	*sslmodestr;
 #ifdef HAVE_MYSQL_OPT_SSL_MODE
 		unsigned int	sslmode;
 #endif
@@ -248,6 +270,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		bool		ignorespace;
 
 		const char	*identity;
+		bool		usestmtapi;
 
 		char	*dbversion;
 		char	*dbhostname;
@@ -303,7 +326,7 @@ void mysqlconnection::handleConnectString() {
 	port=cont->getConnectStringValue("port");
 	socket=cont->getConnectStringValue("socket");
 	charset=cont->getConnectStringValue("charset");
-	const char	*sslmodestr=cont->getConnectStringValue("sslmode");
+	sslmodestr=cont->getConnectStringValue("sslmode");
 #ifdef HAVE_MYSQL_OPT_SSL_MODE
 	if (charstring::isNullOrEmpty(sslmodestr) ||
 		!charstring::compare(sslmodestr,"disable")) {
@@ -356,6 +379,9 @@ void mysqlconnection::handleConnectString() {
 			cont->getConnectStringValue("ignorespace"),"yes");
 	identity=cont->getConnectStringValue("identity");
 
+	usestmtapi=charstring::compare(
+			cont->getConnectStringValue("api"),"classic");
+
 	// mysql doesn't support multi-row fetches
 	cont->setFetchAtOnce(1);
 }
@@ -390,70 +416,125 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 			(!charstring::isNullOrEmpty(socket))?socket:NULL;
 	unsigned long	clientflag=0;
 	#ifdef CLIENT_MULTI_STATEMENTS
-	clientflag|=CLIENT_MULTI_STATEMENTS;
+		clientflag|=CLIENT_MULTI_STATEMENTS;
 	#endif
 	#ifdef CLIENT_FOUND_ROWS
-	if (foundrows) {
-		clientflag|=CLIENT_FOUND_ROWS;
-	}
+		if (foundrows) {
+			clientflag|=CLIENT_FOUND_ROWS;
+		}
 	#endif
 	#ifdef CLIENT_IGNORE_SPACE
-	if (ignorespace) {
-		clientflag|=CLIENT_IGNORE_SPACE;
-	}
+		if (ignorespace) {
+			clientflag|=CLIENT_IGNORE_SPACE;
+		}
 	#endif
 	#if MYSQL_VERSION_ID>=32200
-	// initialize database connection structure
-	mysqlptr=mysql_init(NULL);
-	if (!mysqlptr) {
-		*error="mysql_init failed";
-		return false;
-	}
-	#ifdef HAVE_MYSQL_OPT_SSL_MODE
-	mysql_options(mysqlptr,MYSQL_OPT_SSL_MODE,&sslmode);
-	#else
-		#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
-		mysql_options(mysqlptr,MYSQL_OPT_SSL_ENFORCE,sslenforce);
+		// initialize database connection structure
+		mysqlptr=mysql_init(NULL);
+		if (!mysqlptr) {
+			*error="mysql_init failed";
+			return false;
+		}
+		#ifdef HAVE_MYSQL_OPT_SSL_MODE
+			mysql_options(mysqlptr,
+					MYSQL_OPT_SSL_MODE,
+					&sslmode);
+		#else
+			#ifdef HAVE_MYSQL_OPT_SSL_ENFORCE
+				mysql_options(mysqlptr,
+						MYSQL_OPT_SSL_ENFORCE,
+						sslenforce);
+			#endif
+			#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
+				mysql_options(mysqlptr,
+					MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
+					sslverifyservercert);
+			#endif
 		#endif
-		#ifdef HAVE_MYSQL_OPT_SSL_VERIFY_SERVER_CERT
-		mysql_options(mysqlptr,MYSQL_OPT_SSL_VERIFY_SERVER_CERT,
-							sslverifyservercert);
+		#ifdef HAVE_MYSQL_OPT_TLS_VERSION
+			mysql_options(mysqlptr,
+					MYSQL_OPT_TLS_VERSION,
+					tlsversion);
 		#endif
-	#endif
-	#ifdef HAVE_MYSQL_OPT_TLS_VERSION
-	mysql_options(mysqlptr,MYSQL_OPT_TLS_VERSION,tlsversion);
-	#endif
-	#ifdef HAVE_MYSQL_SSL_SET
-	mysql_ssl_set(mysqlptr,sslkey,sslcert,sslca,sslcapath,sslcipher);
-	#endif
-	#ifdef HAVE_MYSQL_OPT_SSLCRL
-	mysql_options(mysqlptr,MYSQL_OPT_SSLCRL,sslcrl);
-	#endif
-	#ifdef HAVE_MYSQL_OPT_SSLCRLPATH
-	mysql_options(mysqlptr,MYSQL_OPT_SSLCRLPATH,sslcrlpath);
-	#endif
+		#ifdef HAVE_MYSQL_SSL_SET
+			mysql_ssl_set(mysqlptr,sslkey,sslcert,
+					sslca,sslcapath,sslcipher);
+		#endif
+		#ifdef HAVE_MYSQL_OPT_SSLCRL
+			mysql_options(mysqlptr,
+					MYSQL_OPT_SSLCRL,
+					sslcrl);
+		#endif
+		#ifdef HAVE_MYSQL_OPT_SSLCRLPATH
+			mysql_options(mysqlptr,
+					MYSQL_OPT_SSLCRLPATH,
+					sslcrlpath);
+		#endif
+	
+		bool	sslcafallback=false;
+		MYSQL	*result=mysql_real_connect(mysqlptr,
+							hostval,
+							user,
+							password,
+							dbval,
+							portval,
+							socketval,
+							clientflag);
+		#ifdef HAVE_MYSQL_SSL_SET
+			if (!result && mysql_errno(mysqlptr)==2026 &&
+				(!charstring::compare(sslmodestr,"require") ||
+				!charstring::compare(sslmodestr,"prefer")) &&
+				(!charstring::isNullOrEmpty(sslca) ||
+				!charstring::isNullOrEmpty(sslcapath))) {
 
-	if (!mysql_real_connect(mysqlptr,hostval,user,password,dbval,
-					portval,socketval,clientflag)) {
+				sslcafallback=true;
+				mysql_ssl_set(mysqlptr,sslkey,sslcert,
+							NULL,NULL,sslcipher);
+				result=mysql_real_connect(mysqlptr,
+								hostval,
+								user,
+								password,
+								dbval,
+								portval,
+								socketval,
+								clientflag);
+			}
+		#endif
+		if (!result) {
+			loginerror.clear();
+			loginerror.append("mysql_real_connect failed: ");
+			loginerror.append(mysql_error(mysqlptr));
+			*error=loginerror.getString();
+			logOut();
+			return false;
+		} else if (sslcafallback) {
+			*warning="WARNING: no verification of server "
+					"certificate will be done. "
+					"Use sslmode=verify-ca or "
+					"verify-identity.";
+		}
 	#else
-	mysqlptr=&mysql;
-	if (!mysql_real_connect(mysqlptr,hostval,user,password,
-					portval,socketval,clientflag)) {
+		mysqlptr=&mysql;
+		if (!mysql_real_connect(mysqlptr,hostval,user,password,
+						portval,socketval,clientflag)) {
+			loginerror.clear();
+			loginerror.append("mysql_real_connect failed: ");
+			loginerror.append(mysql_error(mysqlptr));
+			*error=loginerror.getString();
+			logOut();
+			return false;
+		}
 	#endif
-		loginerror.clear();
-		loginerror.append("mysql_real_connect failed: ");
-		loginerror.append(mysql_error(mysqlptr));
-		*error=loginerror.getString();
 #else
 	if (!mysql_connect(mysqlptr,hostval,user,password)) {
 		loginerror.clear();
 		loginerror.append("mysql_connect failed: ");
 		loginerror.append(mysql_error(mysqlptr));
 		*error=loginerror.getString();
-#endif
 		logOut();
 		return false;
 	}
+#endif
 
 #ifdef HAVE_MYSQL_OPT_RECONNECT
 	// Enable autoreconnect in the C api
@@ -565,13 +646,11 @@ const char *mysqlconnection::dbHostName() {
 	return dbhostname;
 }
 
-const char *mysqlconnection::bindFormat() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
+const char *mysqlconnection::bindFormat() {
 	return "?";
-#else
-	return sqlrserverconnection::bindFormat();
-#endif
 }
+#endif
 
 const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 	return (wild)?"select "
@@ -649,7 +728,7 @@ const char *mysqlconnection::getColumnListQuery(
 }
 
 const char *mysqlconnection::selectDatabaseQuery() {
-	return "use %s";
+	return "use `%s`";
 }
 
 const char *mysqlconnection::getCurrentDatabaseQuery() {
@@ -758,6 +837,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	stmt=NULL;
+	stmtreset=false;
 	stmtfreeresult=false;
 
 	boundvariables=false;
@@ -770,7 +850,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	usestmtprepare=true;
 	stmtpreparefailed=false;
 	bindformaterror=false;
-	unsupportedbystmt.compile(
+	unsupportedbystmt.setPattern(
 			"^[ 	\r\n]*"
 			"(/\\*.*\\*/[ 	\r\n]+)*"
 			"(("
@@ -968,7 +1048,8 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 bool mysqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	usestmtprepare=!unsupportedbystmt.match(query);
+	usestmtprepare=mysqlconn->usestmtapi &&
+			!unsupportedbystmt.match(query);
 	return usestmtprepare;
 #else
 	return false;
@@ -986,7 +1067,7 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
+	// "variable" should be something like ?1,:2,:3, etc.
 	// If it's something like :var1,:var2,:var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
@@ -1025,8 +1106,8 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -1059,8 +1140,8 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -1102,8 +1183,8 @@ bool mysqlcursor::inputBind(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -1172,8 +1253,8 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 		return true;
 	}
 
-	// "variable" should be something like :1,:2,:3, etc.
-	// If it's something like :var1,:var2,:var3, etc. then it'll be
+	// "variable" should be something like ?1,?2,?3, etc.
+	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
 	uint16_t	pos=charstring::toInteger(variable+1)-1;
@@ -1234,6 +1315,10 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 		// get the affected row count
 		affectedrows=mysql_stmt_affected_rows(stmt);
+
+		if (ncols) {
+			stmtreset=true;
+		}
 
 	} else {
 #endif
@@ -1413,12 +1498,19 @@ const char *mysqlcursor::getColumnName(uint32_t col) {
 	return mysqlfields[col]->name;
 }
 
+#ifdef HAVE_MYSQL_FIELD_NAME_LENGTH
+uint16_t mysqlcursor::getColumnNameLength(uint32_t col) {
+	return mysqlfields[col]->name_length;
+}
+#endif
+
 uint16_t mysqlcursor::getColumnType(uint32_t col) {
 	switch (mysqlfields[col]->type) {
 		case FIELD_TYPE_STRING:
 			return STRING_DATATYPE;
 		case FIELD_TYPE_VAR_STRING:
-			return CHAR_DATATYPE;
+			//return CHAR_DATATYPE;
+			return VARSTRING_DATATYPE;
 		case FIELD_TYPE_DECIMAL:
 			return DECIMAL_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL
@@ -1508,7 +1600,8 @@ uint32_t mysqlcursor::getColumnLength(uint32_t col) {
 	switch (getColumnType(col)) {
 		case STRING_DATATYPE:
 			return (uint32_t)mysqlfields[col]->length;
-		case CHAR_DATATYPE:
+		//case CHAR_DATATYPE:
+		case VARSTRING_DATATYPE:
 			return (uint32_t)mysqlfields[col]->length+1;
 		case DECIMAL_DATATYPE:
 			{
@@ -1625,20 +1718,55 @@ uint16_t mysqlcursor::getColumnIsAutoIncrement(uint32_t col) {
 	#endif
 }
 
+#ifdef HAVE_MYSQL_FIELD_ORG_TABLE
+const char *mysqlcursor::getColumnTable(uint32_t col) {
+	return mysqlfields[col]->org_table;
+}
+#endif
+
+#ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
+uint16_t mysqlcursor::getColumnTableLength(uint32_t col) {
+	return mysqlfields[col]->org_table_length;
+}
+#endif
+
 bool mysqlcursor::noRowsToReturn() {
 	// for DML or DDL queries, return no data
 	return (!mysqlresult);
 }
 
-bool mysqlcursor::fetchRow() {
+bool mysqlcursor::fetchRow(bool *error) {
+
+	*error=false;
+
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		return !mysql_stmt_fetch(stmt);
+		int	result=mysql_stmt_fetch(stmt);
+		if (result==1) {
+			*error=true;
+			return false;
+		} else if (result==MYSQL_NO_DATA) {
+			stmtreset=false;
+			return false;
+		}
+		return !result;
 	} else {
 #endif
-		return ((mysqlrow=mysql_fetch_row(mysqlresult))!=NULL &&
-			(mysqlrowlengths=mysql_fetch_lengths(
-						mysqlresult))!=NULL);
+		mysqlrow=mysql_fetch_row(mysqlresult);
+		if (!mysqlrow) {
+			if (*mysql_error(mysqlconn->mysqlptr)) {
+				*error=true;
+			}
+			return false;
+		}
+		mysqlrowlengths=mysql_fetch_lengths(mysqlresult);
+		if (!mysqlrowlengths) {
+			if (*mysql_error(mysqlconn->mysqlptr)) {
+				*error=true;
+			}
+			return false;
+		}
+		return true;
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	}
 #endif
@@ -1651,7 +1779,11 @@ void mysqlcursor::getField(uint32_t col,
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
 		if (!isnull[col]) {
-			uint16_t	coltype=getColumnType(col);
+			// use conn->cont->getColumnType() instead of
+			// this->getColumnType() in case a column has been
+			// remapped (eg. for getting odbc-format column lists)
+			uint16_t	coltype=
+					conn->cont->getColumnType(this,col);
 			if (coltype==TINY_BLOB_DATATYPE ||
 				coltype==BLOB_DATATYPE ||
 				coltype==MEDIUM_BLOB_DATATYPE ||
@@ -1740,18 +1872,25 @@ void mysqlcursor::closeLobField(uint32_t col) {
 void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		boundvariables=false;
-		bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
-		mysql_stmt_reset(stmt);
+		if (boundvariables) {
+			bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
+			boundvariables=false;
+		}
+
+		if (stmtreset) {
+			mysql_stmt_reset(stmt);
+			stmtreset=false;
+		}
+
 		if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);
 			stmtfreeresult=false;
 		}
 
 		// In mariadb-client-lgpl_2.x, if a mysql_stmt_prepare fails,
-		// then subsequent attempts to prepare the same stmt again with:
-		// "Unknown prepared statement handler (27) given to
-		// mysqld_stmt_reset" unless the statement is close and
+		// then subsequent attempts to prepare the same stmt again fail
+		// with: "Unknown prepared statement handler (27) given to
+		// mysqld_stmt_reset" unless the statement is closed and
 		// reopened.
 		if (stmtpreparefailed) {
 			mysql_stmt_close(stmt);
@@ -1776,4 +1915,8 @@ void mysqlcursor::closeResultSet() {
 	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
+}
+
+bool mysqlcursor::columnInfoIsValidAfterPrepare() {
+	return true;
 }
