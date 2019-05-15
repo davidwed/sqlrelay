@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.6.0pre
+Version: 1.6.0
 Release: 1%{?dist}
 Summary: Database proxy
 
