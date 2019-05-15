@@ -99,7 +99,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		linkedlist<condition *>		conditions;
 		memorypool			logpool;
 
-		bool	inreplay;
+		bool	logqueries;
 
 		bool	wasintx;
 };
@@ -153,7 +153,7 @@ debug=true;
 		conditions.append(c);
 	}
 
-	inreplay=false;
+	logqueries=true;
 
 	wasintx=false;
 }
@@ -197,8 +197,8 @@ bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
 
 bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
-	// bail if we're currently replaying the log...
-	if (inreplay) {
+	// bail if we're not supposed to be logging
+	if (!logqueries) {
 		return true;
 	}
 
@@ -684,8 +684,8 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 					bool replaytx) {
 
-	// we're replaying
-	inreplay=true;
+	// don't log any queries that we run during the replay
+	logqueries=false;
 
 	// get the bind pool
 	memorypool	*pool=cont->getBindPool(sqlrcur);
@@ -916,8 +916,8 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 		log.clearAndDelete();
 	}
 
-	// we're no longer replaying the log
-	inreplay=false;
+	// start logging queries again
+	logqueries=true;
 
 	return retval;
 }
@@ -1005,6 +1005,9 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 	str.append("========================================"
 			"=======================================\n");
 	str.append(dt.getString())->append("\n\n");
+
+	// don't log this query
+	logqueries=false;
 
 	// run query
 	sqlrservercursor        *logcur=cont->newCursor();
@@ -1101,6 +1104,9 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 	cont->close(logcur);
 	cont->deleteCursor(logcur);
 
+	// start logging queries again
+	logqueries=true;
+
 	// open log file
 	file	logfile;
 	if (!logfile.open(cond->logfile,
@@ -1122,7 +1128,7 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 void sqlrtrigger_replay::endTransaction(bool commit) {
 
 	// bail if we're currently replaying the log...
-	if (inreplay) {
+	if (!logqueries) {
 		return;
 	}
 
