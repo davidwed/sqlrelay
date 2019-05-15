@@ -616,8 +616,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %systemd_preun %{name}cachemanager.service
 
 %files common
-%{_libdir}/libsqlrutil.so.9
-%{_libdir}/libsqlrutil.so.9.*
+%{_libdir}/libsqlrutil.so.8
+%{_libdir}/libsqlrutil.so.8.*
 
 %files common-devel
 %dir %{_includedir}/%{name}
