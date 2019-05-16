@@ -1022,6 +1022,9 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	}
 #endif
 
+	// force re-fetch of column info
+	setResultSetHeaderHasBeenHandled(false);
+
 	return true;
 }
 
