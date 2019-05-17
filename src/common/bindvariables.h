@@ -63,16 +63,16 @@ static uint16_t countBindVariables(const char *query,
 		// if we're in the query...
 		if (parsestate==IN_QUERY) {
 
-                        // if we find a quote, we're in quotes
-                        if (*ptr=='\'') {
-                                parsestate=IN_QUOTES;
-                        }
+			// if we find a quote, we're in quotes
+			if (*ptr=='\'') {
+				parsestate=IN_QUOTES;
+			}
 
-                        // if we find whitespace or a couple of other things
-                        // then the next thing could be a bind variable
-                        if (beforeBindVariable(ptr)) {
-                                parsestate=BEFORE_BIND;
-                        }
+			// if we find whitespace or a couple of other things
+			// then the next thing could be a bind variable
+			if (beforeBindVariable(ptr)) {
+				parsestate=BEFORE_BIND;
+			}
 
 			// move on
 			prevptr=ptr;
@@ -80,13 +80,14 @@ static uint16_t countBindVariables(const char *query,
 			continue;
 		}
 
-                // ignore anything in quotes
-                if (parsestate==IN_QUOTES) {
+		// ignore anything in quotes
+		if (parsestate==IN_QUOTES) {
 
-                        // if we find a quote, but not an escaped quote,
-                        // then we're back in the query
-                        if (*ptr=='\'' && *(ptr+1)!='\'' &&
-					*prevptr!='\'' && *prevptr!='\\') {
+			// if we find a quote, but not an escaped quote,
+			// then we're back in the query
+			// (or we're in between one of these: '...''...'
+			// which is functionally the same)
+			if (*ptr=='\'' && *prevptr!='\\') {
 				parsestate=IN_QUERY;
 			}
 
@@ -96,36 +97,36 @@ static uint16_t countBindVariables(const char *query,
 			continue;
 		}
 
-                if (parsestate==BEFORE_BIND) {
+		if (parsestate==BEFORE_BIND) {
 
-                        // if we find a bind variable...
+			// if we find a bind variable...
 			if (questionmark && isBindDelimiter(
 						ptr,true,false,false,false)) {
 				questionmarkcount++;
-                                parsestate=IN_BIND;
-                                continue;
+				parsestate=IN_BIND;
+				continue;
 			} else if (colon && isBindDelimiter(
 						ptr,false,true,false,false)) {
 				coloncount++;
-                                parsestate=IN_BIND;
-                                continue;
+				parsestate=IN_BIND;
+				continue;
 			} else if (atsign && isBindDelimiter(
 						ptr,false,false,true,false)) {
 				atsigncount++;
-                                parsestate=IN_BIND;
-                                continue;
+				parsestate=IN_BIND;
+				continue;
 			} else if (dollarsign && isBindDelimiter(
 						ptr,false,false,false,true)) {
 				dollarsigncount++;
-                                parsestate=IN_BIND;
-                                continue;
+				parsestate=IN_BIND;
+				continue;
 			}
 
-                        // if we didn't find a bind variable then we're just
-                        // back in the query
-                        parsestate=IN_QUERY;
-                        continue;
-                }
+			// if we didn't find a bind variable then we're just
+			// back in the query
+			parsestate=IN_QUERY;
+			continue;
+		}
 
 		// if we're in a bind variable...
 		if (parsestate==IN_BIND) {

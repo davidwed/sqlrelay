@@ -3412,8 +3412,9 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 			// if we find a quote, but not an escaped quote,
 			// then we're back in the query
-			if (*ptr=='\'' && *(ptr+1)!='\'' &&
-					*prevptr!='\'' && *prevptr!='\\') {
+			// (or we're in between one of these: '...''...'
+			// which is functionally the same)
+			if (*ptr=='\'' && *prevptr!='\\') {
 				parsestate=IN_QUERY;
 			}
 
