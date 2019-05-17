@@ -57,6 +57,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		void	logReplayCondition(condition *cond);
 
 
+		bool	queryIsSelect(sqlrservercursor *sqlrcur);
 		void	copyQuery(sqlrservercursor *sqlrcur,
 						querydetails *qd);
 		void	copyQuery(querydetails *qd,
@@ -92,7 +93,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		sqlrservercontroller	*cont;
 
 		bool		debug;
-
+		bool		includeselects;
 		uint32_t	maxretries;
 
 		linkedlist<querydetails *>	log;
@@ -112,6 +113,11 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 
 	debug=cont->getConfig()->getDebugTriggers();
 debug=true;
+
+	// get whether to include selects
+	includeselects=charstring::isYes(
+			parameters->getAttributeValue("includeselects"));
+stdoutput.printf("includeselects = %d\n",includeselects);
 
 	// get the max retries
 	maxretries=charstring::toInteger(
@@ -218,6 +224,14 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	}
 
 	// log the query...
+	if (!includeselects && queryIsSelect(sqlrcur)) {
+		if (debug) {
+			stdoutput.printf("ignoring query:\n%.*s\n}\n",
+						sqlrcur->getQueryLength(),
+						sqlrcur->getQueryBuffer());
+		}
+		return true;
+	}
 
 	querydetails	*qd=new querydetails;
 
@@ -260,6 +274,14 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 		stdoutput.printf("%s\n",node->getValue()->query);
 	}*/
 	return true;
+}
+
+bool sqlrtrigger_replay::queryIsSelect(sqlrservercursor *sqlrcur) {
+
+	const char	*query=sqlrcur->getQueryBuffer();
+	uint32_t	querylen=sqlrcur->getQueryLength();
+
+	return (querylen>=7 && !charstring::compare(query,"select ",7));
 }
 
 void sqlrtrigger_replay::copyQuery(sqlrservercursor *sqlrcur,
