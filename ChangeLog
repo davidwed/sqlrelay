@@ -8,7 +8,10 @@
 		variable delimiters
 	added fakeinputbindvariablesunicodestrings config option
 	added bind variable delimiters config methods to c++ api
-	replay trigger updates
+	replay trigger can now run a query (eg. "show engine innodb status")
+		and log the results to a file when a replay condition occurs
+	replay trigger doesn't log/replay selects by default now (but this is
+		configurable)
 	updated normalize translation to support queries containing binary data
 	fixed a backslash-escape bug in the normalize translation
 	refactored some sqlrclient api private methods
