@@ -117,7 +117,6 @@ debug=true;
 	// get whether to include selects
 	includeselects=charstring::isYes(
 			parameters->getAttributeValue("includeselects"));
-stdoutput.printf("includeselects = %d\n",includeselects);
 
 	// get the max retries
 	maxretries=charstring::toInteger(
