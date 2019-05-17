@@ -225,11 +225,13 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 	// log the query...
 	if (!includeselects && queryIsSelect(sqlrcur)) {
+debug=false;
 		if (debug) {
 			stdoutput.printf("ignoring query:\n%.*s\n}\n",
 						sqlrcur->getQueryLength(),
 						sqlrcur->getQueryBuffer());
 		}
+debug=true;
 		return true;
 	}
 
