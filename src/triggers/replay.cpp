@@ -57,18 +57,17 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		void	logReplayCondition(condition *cond);
 
 
-		bool	queryIsSelect(sqlrservercursor *sqlrcur);
-		void	copyQuery(sqlrservercursor *sqlrcur,
-						querydetails *qd);
-		void	copyQuery(querydetails *qd,
-					const char *query,
-					uint32_t querylen);
 		void	getQueryType(const char *query,
 					uint32_t querylen,
+					bool *isselect,
 					bool *isinsert,
 					bool *isinsertselect,
 					bool *isselectinto,
 					bool *ismultiinsert);
+		bool	isMultiInsert(const char *ptr, const char *end);
+		void	copyQuery(querydetails *qd,
+					const char *query,
+					uint32_t querylen);
 		void	getColumns(const char *query,
 					uint32_t querylen,
 					linkedlist<char *> *columns,
@@ -103,6 +102,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		bool	logqueries;
 
 		bool	wasintx;
+
+		bool	disabled;
 };
 
 sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
@@ -161,6 +162,8 @@ debug=true;
 	logqueries=true;
 
 	wasintx=false;
+
+	disabled=false;
 }
 
 sqlrtrigger_replay::~sqlrtrigger_replay() {
@@ -171,8 +174,15 @@ bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						bool before,
 						bool *success) {
+
+	// only run this trigger after running a query
 	if (before) {
-		return true;
+		return *success;
+	}
+
+	// bail if logging/replay was disabled due to a query we can't handle
+	if (disabled) {
+		return *success;
 	}
 
 	// bail if we couldn't log the query for some reason
@@ -222,8 +232,45 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 		wasintx=true;
 	}
 
+	// get query type
+	const char	*query=sqlrcur->getQueryBuffer();
+	uint32_t	querylen=sqlrcur->getQueryLength();
+	bool		isselect=false;
+	bool		isinsert=false;
+	bool		isinsertselect=false;
+	bool		isselectinto=false;
+	bool		ismultiinsert=false;
+	getQueryType(query,querylen,
+			&isselect,&isinsert,&isinsertselect,
+			&isselectinto,&ismultiinsert);
+
+	// We can't (currently) handle insert-select, select-into,
+	// or multi-insert during replay.
+	if (isinsertselect || isselectinto || ismultiinsert) {
+
+		// If we weren't in a transaction, then just don't log the
+		// query.  If we weren't in a transaction, then clear the log
+		// and disable replay altogether until end-of-transaction.
+		if (cont->inTransaction()) {
+			logpool.clear();
+			log.clearAndDelete();
+			disabled=true;
+			if (debug) {
+				stdoutput.printf("%s query encountered, "
+					"disabling replay until "
+					"end-of-transaction:\n%.*s\n}\n",
+					((isinsertselect)?"insert-select":
+					((isselectinto)?"select-into":
+					"multi-insert")),
+					sqlrcur->getQueryLength(),
+					sqlrcur->getQueryBuffer());
+			}
+		}
+		return true;
+	}
+
 	// log the query...
-	if (!includeselects && queryIsSelect(sqlrcur)) {
+	if (!includeselects && isselect) {
 debug=false;
 		if (debug) {
 			stdoutput.printf("ignoring query:\n%.*s\n}\n",
@@ -236,8 +283,37 @@ debug=true;
 
 	querydetails	*qd=new querydetails;
 
-	// copy the query itself
-	copyQuery(sqlrcur,qd);
+	if (isinsert) {
+
+		// get last insert id
+		// (get it here because getColumns() below will reset it)
+		uint64_t	liid=0;
+		cont->getLastInsertId(&liid);
+
+		// get columns
+		linkedlist<char *>	columns;
+		const char 		*autoinccolumn=NULL;
+		getColumns(query,querylen,&columns,&autoinccolumn);
+
+		if (!liid || !autoinccolumn) {
+
+			// If there was no last-insert-id or auto-increment
+			// column then we don't actually have to rewrite
+			// anything.  Just do a normal copy.
+			copyQuery(qd,query,querylen);
+
+		} else {
+
+			rewriteQuery(qd,query,querylen,
+					liid,&columns,autoinccolumn);
+		}
+
+		// clean up
+		columns.clearAndDelete();
+
+	} else {
+		copyQuery(qd,query,querylen);
+	}
 
 	// copy in input binds
 	uint16_t		incount=sqlrcur->getInputBindCount();
@@ -277,63 +353,6 @@ debug=true;
 	return true;
 }
 
-bool sqlrtrigger_replay::queryIsSelect(sqlrservercursor *sqlrcur) {
-
-	const char	*query=sqlrcur->getQueryBuffer();
-	uint32_t	querylen=sqlrcur->getQueryLength();
-
-	return (querylen>=7 && !charstring::compare(query,"select ",7));
-}
-
-void sqlrtrigger_replay::copyQuery(sqlrservercursor *sqlrcur,
-						querydetails *qd) {
-
-	const char	*query=sqlrcur->getQueryBuffer();
-	uint32_t	querylen=sqlrcur->getQueryLength();
-
-	// get query type
-	bool	isinsert=false;
-	bool	isinsertselect=false;
-	bool	isselectinto=false;
-	bool	ismultiinsert=false;
-	getQueryType(query,querylen,
-			&isinsert,&isinsertselect,
-			&isselectinto,&ismultiinsert);
-
-	// FIXME: suppprt insert select, select into, and multi-insert
-	if (isinsert) {
-
-		// get last insert id
-		// (get it here because getColumns() below will reset it)
-		uint64_t	liid=0;
-		cont->getLastInsertId(&liid);
-
-		// get columns
-		linkedlist<char *>	columns;
-		const char 		*autoinccolumn=NULL;
-		getColumns(query,querylen,&columns,&autoinccolumn);
-
-		if (!liid || !autoinccolumn) {
-
-			// If there was no last-insert-id or auto-increment
-			// column then we don't actually have to rewrite
-			// anything.  Just do a normal copy.
-			copyQuery(qd,query,querylen);
-
-		} else {
-
-			rewriteQuery(qd,query,querylen,
-					liid,&columns,autoinccolumn);
-		}
-
-		// clean up
-		columns.clearAndDelete();
-
-	} else {
-		copyQuery(qd,query,querylen);
-	}
-}
-
 void sqlrtrigger_replay::copyQuery(querydetails *qd,
 					const char *query,
 					uint32_t querylen) {
@@ -348,16 +367,19 @@ void sqlrtrigger_replay::copyQuery(querydetails *qd,
 
 void sqlrtrigger_replay::getQueryType(const char *query,
 					uint32_t querylen,
+					bool *isselect,
 					bool *isinsert,
 					bool *isinsertselect,
 					bool *isselectinto,
 					bool *ismultiinsert) {
+	*isselect=false;
 	*isinsert=false;
 	*isinsertselect=false;
 	*isselectinto=false;
 	*ismultiinsert=false;
 
 	const char	*start=cont->skipWhitespaceAndComments(query);
+	const char	*end=query+querylen;
 
 	// FIXME: assumes normalized query...
 
@@ -365,14 +387,85 @@ void sqlrtrigger_replay::getQueryType(const char *query,
 
 		*isinsert=true;
 
-		// FIXME: detect "INSERT ... SELECT ..."
+		// detect insert-select...
 
-		// FIXME: detect multi-insert
+		// skip to either "(" before columns, "values", or "select"
+		// FIXME: the table name could be quoted and contain a space
+		const char	*ptr=charstring::findFirst(start+12,' ')+1;
+		if (ptr>=end) {
+			return;
+		}
+
+		// if we found columns, then skip to "values" or "select"
+		if (*ptr=='(') {
+			ptr=charstring::findFirst(ptr,')')+2;
+		}
+		if (ptr>=end) {
+			return;
+		}
+		
+		// if we find "values " then it's a plain insert
+		if (end>ptr+7 && !charstring::compare(ptr,"values ",7)) {
+			if (isMultiInsert(ptr+7,end)) {
+				*isinsert=false;
+				*ismultiinsert=true;
+			}
+			return;
+		}
+
+		// otherwise it's some kind of insert ... select
+		*isinsert=false;
+		*isinsertselect=true;
 
 	} else if (querylen>7 && !charstring::compare(start,"select ",7)) {
 
-		// FIXME: detect "SELECT ... INTO ..."
+		*isselect=true;
+
+		// FIXME: detect select-into
 	}
+}
+
+bool sqlrtrigger_replay::isMultiInsert(const char *ptr, const char *end) {
+
+	// ptr should be sitting on the opening paren...
+
+	// skip to right after the closing paren...
+	const char	*c=ptr+1;
+	char		prevc='\0';
+	bool		inquotes=false;
+	uint32_t	parens=0;
+	for (;;) {
+
+		// closing paren condition
+		if (!inquotes && !parens && *c==')') {
+			c++;
+			break;
+		}
+
+		// handle quotes...
+		if (!inquotes && *c=='\'') {
+			inquotes=true;
+		} else if (inquotes && *c=='\'' && prevc!='\\') {
+			inquotes=false;
+		}
+
+		if (!inquotes) {
+
+			// handle parentheses...
+			if (*c=='(') {
+				parens++;
+			} else if (parens && *c==')') {
+				parens--;
+			}
+		}
+
+		// keep going
+		prevc=*c;
+		c++;
+	}
+	
+	// if there's a comma after the closing paren, then it's a multi-insert
+	return (c!=end && *c==',');
 }
 
 void sqlrtrigger_replay::getColumns(const char *query,
@@ -466,6 +559,7 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 	const char	*table=start+12;
 
 	// skip to either "(" before columns or "values"
+	// FIXME: the table name could be quoted and contain a space
 	const char	*colsstart=charstring::findFirst(table,' ')+1;
 
 	// skip to first value (after ") values (")
@@ -555,8 +649,10 @@ uint64_t sqlrtrigger_replay::countValues(const char *values) {
 		}
 
 		// handle quotes...
-		if (*c=='\'' && prevc!='\\' && prevc!='\'') {
-			inquotes=!inquotes;
+		if (!inquotes && *c=='\'') {
+			inquotes=true;
+		} else if (inquotes && *c=='\'' && prevc!='\\') {
+			inquotes=false;
 		}
 
 		if (!inquotes) {
@@ -620,8 +716,10 @@ void sqlrtrigger_replay::appendValues(stringbuffer *newquery,
 		}
 
 		// handle quotes...
-		if (*c=='\'' && prevc!='\\' && prevc!='\'') {
-			inquotes=!inquotes;
+		if (!inquotes && *c=='\'') {
+			inquotes=true;
+		} else if (inquotes && *c=='\'' && prevc!='\\') {
+			inquotes=false;
 		}
 
 		if (!inquotes) {
@@ -1159,6 +1257,8 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 	log.clearAndDelete();
 
 	wasintx=false;
+
+	disabled=false;
 }
 
 extern "C" {
