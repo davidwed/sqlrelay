@@ -47,12 +47,11 @@ sqlrlogger_debug::sqlrlogger_debug(sqlrloggers *ls,
 	}
 	dbgfileperms=permissions::evalPermString(permstring);
 	name=NULL;
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
-	loglistener=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("listener"),"no");
-	logconnection=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("connection"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
+	loglistener=!charstring::isNo(
+			parameters->getAttributeValue("listener"));
+	logconnection=!charstring::isNo(
+			parameters->getAttributeValue("connection"));
 }
 
 sqlrlogger_debug::~sqlrlogger_debug() {

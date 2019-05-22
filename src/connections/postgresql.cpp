@@ -236,15 +236,15 @@ void postgresqlconnection::handleConnectString() {
 	db=cont->getConnectStringValue("db");
 	sslmode=cont->getConnectStringValue("sslmode");
 	const char	*typemang=cont->getConnectStringValue("typemangling");
-	if (!typemang ||!charstring::compareIgnoringCase(typemang,"no")) {
+	if (!typemang || charstring::isNo(typemang)) {
 		typemangling=0;
-	} else if (!charstring::compareIgnoringCase(typemang,"yes")) {
+	} else if (charstring::isYes(typemang)) {
 		typemangling=1;
 	} else {
 		typemangling=2;
 	}
 	const char	*tablemang=cont->getConnectStringValue("tablemangling");
-	if (!tablemang ||!charstring::compareIgnoringCase(tablemang,"no")) {
+	if (!tablemang || charstring::isNo(tablemang)) {
 		tablemangling=0;
 	} else {
 		tablemangling=2;

@@ -497,20 +497,18 @@ void oracleconnection::handleConnectString() {
 	#endif
 
 	#ifdef HAVE_ORACLE_8i
-	droptemptables=!charstring::compare(
-			cont->getConnectStringValue("droptemptables"),"yes");
+	droptemptables=charstring::isYes(
+			cont->getConnectStringValue("droptemptables"));
 
 	cont->addGlobalTempTables(
 			cont->getConnectStringValue("globaltemptables"));
 	#endif
 
-	rejectduplicatebinds=!charstring::compare(
-			cont->getConnectStringValue("rejectduplicatebinds"),
-			"yes");
+	rejectduplicatebinds=charstring::isYes(
+			cont->getConnectStringValue("rejectduplicatebinds"));
 
-	disablekeylookup=!charstring::compareIgnoringCase(
-			cont->getConnectStringValue("disablekeylookup"),
-			"yes");
+	disablekeylookup=charstring::isYes(
+			cont->getConnectStringValue("disablekeylookup"));
 
 	const char	*lastinsertidfunc=
 			cont->getConnectStringValue("lastinsertidfunction");

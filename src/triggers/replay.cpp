@@ -65,6 +65,10 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 					bool *isselectinto,
 					bool *ismultiinsert);
 		bool	isMultiInsert(const char *ptr, const char *end);
+		void	disableUntilEndOfTx(const char *query, 
+						int32_t querylen,
+						bool isinsertselect,
+						bool isselectinto);
 		void	copyQuery(querydetails *qd,
 					const char *query,
 					uint32_t querylen);
@@ -244,32 +248,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 			&isselect,&isinsert,&isinsertselect,
 			&isselectinto,&ismultiinsert);
 
-	// We can't (currently) handle insert-select, select-into,
-	// or multi-insert during replay.
-	if (isinsertselect || isselectinto || ismultiinsert) {
-
-		// If we weren't in a transaction, then just don't log the
-		// query.  If we weren't in a transaction, then clear the log
-		// and disable replay altogether until end-of-transaction.
-		if (cont->inTransaction()) {
-			logpool.clear();
-			log.clearAndDelete();
-			disabled=true;
-			if (debug) {
-				stdoutput.printf("%s query encountered, "
-					"disabling replay until "
-					"end-of-transaction:\n%.*s\n}\n",
-					((isinsertselect)?"insert-select":
-					((isselectinto)?"select-into":
-					"multi-insert")),
-					sqlrcur->getQueryLength(),
-					sqlrcur->getQueryBuffer());
-			}
-		}
-		return true;
-	}
-
-	// log the query...
+	// bail if the query was a select, and we're ignoring selects
 	if (!includeselects && isselect) {
 debug=false;
 		if (debug) {
@@ -281,9 +260,15 @@ debug=true;
 		return true;
 	}
 
-	querydetails	*qd=new querydetails;
+	// We can't select-into during replay.
+	if (isselectinto) {
+		disableUntilEndOfTx(query,querylen,false,isselectinto);
+		return true;
+	}
 
-	if (isinsert) {
+	// log the query...
+	querydetails	*qd=new querydetails;
+	if (isinsert || isinsertselect || ismultiinsert) {
 
 		// get last insert id
 		// (get it here because getColumns() below will reset it)
@@ -294,6 +279,7 @@ debug=true;
 		linkedlist<char *>	columns;
 		const char 		*autoinccolumn=NULL;
 		getColumns(query,querylen,&columns,&autoinccolumn);
+stdoutput.printf("%d,%d - %s = %lld\n",isinsertselect,ismultiinsert,autoinccolumn,liid);
 
 		if (!liid || !autoinccolumn) {
 
@@ -302,10 +288,22 @@ debug=true;
 			// anything.  Just do a normal copy.
 			copyQuery(qd,query,querylen);
 
-		} else {
+		} else if (!isinsertselect && !ismultiinsert) {
 
 			rewriteQuery(qd,query,querylen,
 					liid,&columns,autoinccolumn);
+
+		} else {
+// FIXME: Dangit, liid is set, even if we specify a value for the auto_increment column, so we can't just tell whether we specified it by checking liid.  We actually have to examine which columns were specified in the query...
+
+			// Apparently the query was either an insert-select or
+			// multi-insert, and had an autoincrement column, which
+			// generated an id.  There's no way to handle either
+			// of those.
+			disableUntilEndOfTx(query,querylen,
+						isinsertselect,false);
+			columns.clearAndDelete();
+			return true;
 		}
 
 		// clean up
@@ -351,6 +349,30 @@ debug=true;
 		stdoutput.printf("%s\n",node->getValue()->query);
 	}*/
 	return true;
+}
+
+void sqlrtrigger_replay::disableUntilEndOfTx(const char *query, 
+						int32_t querylen,
+						bool isinsertselect,
+						bool isselectinto) {
+
+	// If we weren't in a transaction, then just don't log the
+	// query.  If we weren't in a transaction, then clear the log
+	// and disable replay altogether until end-of-transaction.
+	if (cont->inTransaction()) {
+		logpool.clear();
+		log.clearAndDelete();
+		disabled=true;
+		if (debug) {
+			stdoutput.printf("%s query encountered, "
+				"disabling replay until "
+				"end-of-transaction:\n%.*s\n}\n",
+				((isinsertselect)?"insert-select":
+				((isselectinto)?"select-into":
+				"multi-insert")),
+				querylen,query);
+		}
+	}
 }
 
 void sqlrtrigger_replay::copyQuery(querydetails *qd,

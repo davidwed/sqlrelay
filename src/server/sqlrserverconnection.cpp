@@ -75,20 +75,15 @@ void sqlrserverconnection::handleConnectString() {
 	cont->setPassword(cont->getConnectStringValue("password"));
 
 	// autocommit
-	cont->setInitialAutoCommit(
-		!charstring::compare(
-			cont->getConnectStringValue("autocommit"),
-			"yes"));
+	cont->setInitialAutoCommit(charstring::isYes(
+			cont->getConnectStringValue("autocommit")));
 
 	// fake transaction blocks
-	cont->setFakeTransactionBlocks(
-		!charstring::compare(
-			cont->getConnectStringValue("faketransactionblocks"),
-			"yes"));
+	cont->setFakeTransactionBlocks(charstring::isYes(
+			cont->getConnectStringValue("faketransactionblocks")));
 
 	// fake binds
-	if (!charstring::compare(
-			cont->getConnectStringValue("fakebinds"),"yes")) {
+	if (charstring::isYes(cont->getConnectStringValue("fakebinds"))) {
 		cont->setFakeInputBinds(true);
 	}
 
@@ -157,14 +152,12 @@ void sqlrserverconnection::handleConnectString() {
 	cont->setQueryTimeout(querytimeout);
 
 	// execute-direct
-	cont->setExecuteDirect(
-		!charstring::compare(
-			cont->getConnectStringValue("executedirect"),
-			"yes"));
+	cont->setExecuteDirect(charstring::isYes(
+			cont->getConnectStringValue("executedirect")));
 
 	// detach before login
-	pvt->_detachbeforelogin=!charstring::compare(
-			cont->getConnectStringValue("detachbeforelogin"),"yes");
+	pvt->_detachbeforelogin=charstring::isYes(
+			cont->getConnectStringValue("detachbeforelogin"));
 }
 
 bool sqlrserverconnection::changeUser(const char *newuser,

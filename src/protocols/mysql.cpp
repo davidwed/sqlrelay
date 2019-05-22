@@ -903,18 +903,17 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 		clientprotocol=41;
 	}
 
-	datetodatetime=!charstring::compareIgnoringCase(
-				parameters->getAttributeValue(
-						"datetodatetime"),"yes");
+	datetodatetime=charstring::isYes(
+			parameters->getAttributeValue("datetodatetime"));
 	zeroscaledecimaltobigint=
-			!charstring::compareIgnoringCase(
+			charstring::isYes(
 				parameters->getAttributeValue(
-					"zeroscaledecimaltobigint"),"yes");
+					"zeroscaledecimaltobigint"));
 
 	oldmariadbjdbcservercapabilitieshack=
-		!charstring::compareIgnoringCase(
+		charstring::isYes(
 			parameters->getAttributeValue(
-				"oldmariadbjdbcservercapabilitieshack"),"yes");
+				"oldmariadbjdbcservercapabilitieshack"));
 
 	if (getDebug()) {
 		debugStart("parameters");

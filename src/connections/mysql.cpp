@@ -373,10 +373,9 @@ void mysqlconnection::handleConnectString() {
 	sslcapath=cont->getConnectStringValue("sslcapath");
 	sslcrl=cont->getConnectStringValue("sslcrl");
 	sslcrlpath=cont->getConnectStringValue("sslcrlpath");
-	foundrows=!charstring::compare(
-			cont->getConnectStringValue("foundrows"),"yes");
-	ignorespace=!charstring::compare(
-			cont->getConnectStringValue("ignorespace"),"yes");
+	foundrows=charstring::isYes(cont->getConnectStringValue("foundrows"));
+	ignorespace=charstring::isYes(
+			cont->getConnectStringValue("ignorespace"));
 	identity=cont->getConnectStringValue("identity");
 
 	usestmtapi=charstring::compare(

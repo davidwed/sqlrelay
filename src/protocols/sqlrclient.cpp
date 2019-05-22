@@ -263,8 +263,8 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	clientinfo=new char[maxclientinfolength+1];
 	clientsock=NULL;
 	ctx=NULL;
-	usekrb=!charstring::compare(parameters->getAttributeValue("krb"),"yes");
-	usetls=!charstring::compare(parameters->getAttributeValue("tls"),"yes");
+	usekrb=charstring::isYes(parameters->getAttributeValue("krb"));
+	usetls=charstring::isYes(parameters->getAttributeValue("tls"));
 
 	if (usekrb) {
 		if (gss::supported()) {
@@ -352,9 +352,8 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 
 			// get whether to validate
 			tctx.setValidatePeer(
-				!charstring::compare(
-				parameters->getAttributeValue("tlsvalidate"),
-				"yes"));
+				charstring::isYes(
+				parameters->getAttributeValue("tlsvalidate")));
 
 			// get the certificate authority file to use
 			// FIXME: not-found warning

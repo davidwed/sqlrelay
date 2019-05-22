@@ -37,8 +37,7 @@ sqlrlogger_custom_sc::sqlrlogger_custom_sc(sqlrloggers *ls,
 						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
 	loglevel=SQLRLOGGER_LOGLEVEL_ERROR;
-	enabled=charstring::compareIgnoringCase(
-			getParameters()->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 }
 
 sqlrlogger_custom_sc::~sqlrlogger_custom_sc() {

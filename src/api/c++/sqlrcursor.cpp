@@ -3882,6 +3882,11 @@ bool sqlrcursor::parseColumnInfo() {
 					return false;
 				}
 
+				// sanity check
+				if (currentcol->type>=END_DATATYPE) {
+					currentcol->type=UNKNOWN_DATATYPE;
+				}
+
 			} else {
 
 				// get the column type length

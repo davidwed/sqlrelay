@@ -4386,7 +4386,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	cursor->setQueryHasBeenPrepared(true);
 
 	// handle column info now if it's valid at this point
-	return (cursor->columnInfoIsValidAfterPrepare())?
+	return (columnInfoIsValidAfterPrepare(cursor))?
 				handleResultSetHeader(cursor):true;
 }
 
@@ -4788,6 +4788,12 @@ void sqlrservercontroller::commitOrRollback(sqlrservercursor *cursor) {
 
 bool sqlrservercontroller::inTransaction() {
 	return pvt->_intransaction;
+}
+
+bool sqlrservercontroller::columnInfoIsValidAfterPrepare(
+					sqlrservercursor *cursor) {
+	return !cursor->getExecuteDirect() &&
+		cursor->columnInfoIsValidAfterPrepare();
 }
 
 uint16_t sqlrservercontroller::getSendColumnInfo() {

@@ -4320,15 +4320,13 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	bool	isnegative=false;
 
 	// get day/month format
-	bool	ddmm=!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_ODBC_DATE_DDMM"),
-					"yes");
+	bool	ddmm=charstring::isYes(environment::getValue(
+					"SQLR_ODBC_DATE_DDMM"));
 	bool		yyyyddmm=ddmm;
 	const char	*yyyyddmmstr=environment::getValue(
 					"SQLR_ODBC_DATE_YYYYDDMM");
 	if (yyyyddmmstr) {
-		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+		yyyyddmm=charstring::isYes(yyyyddmmstr);
 	}
 
 	// parse
@@ -4359,15 +4357,13 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	bool	isnegative=false;
 
 	// get day/month format
-	bool	ddmm=!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_ODBC_DATE_DDMM"),
-					"yes");
+	bool	ddmm=charstring::isYes(environment::getValue(
+					"SQLR_ODBC_DATE_DDMM"));
 	bool		yyyyddmm=ddmm;
 	const char	*yyyyddmmstr=environment::getValue(
 					"SQLR_ODBC_DATE_YYYYDDMM");
 	if (yyyyddmmstr) {
-		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+		yyyyddmm=charstring::isYes(yyyyddmmstr);
 	}
 
 	// parse
@@ -4398,15 +4394,13 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	bool	isnegative=false;
 
 	// get day/month format
-	bool	ddmm=!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_ODBC_DATE_DDMM"),
-					"yes");
+	bool	ddmm=charstring::isYes(environment::getValue(
+					"SQLR_ODBC_DATE_DDMM"));
 	bool		yyyyddmm=ddmm;
 	const char	*yyyyddmmstr=environment::getValue(
 					"SQLR_ODBC_DATE_YYYYDDMM");
 	if (yyyyddmmstr) {
-		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+		yyyyddmm=charstring::isYes(yyyyddmmstr);
 	}
 
 	// parse

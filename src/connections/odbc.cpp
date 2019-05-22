@@ -526,16 +526,15 @@ void odbcconnection::handleConnectString() {
 
 	lastinsertidquery=cont->getConnectStringValue("lastinsertidquery");
 
-	mars=!charstring::compare(cont->getConnectStringValue("mars"),"yes");
-	getcolumntables=!charstring::compare(
-			cont->getConnectStringValue("getcolumntables"),"yes");
+	mars=charstring::isYes(cont->getConnectStringValue("mars"));
+	getcolumntables=charstring::isYes(
+			cont->getConnectStringValue("getcolumntables"));
 	const char	*os=cont->getConnectStringValue("overrideschema");
 	if (!charstring::isNullOrEmpty(os)) {
 		overrideschema=os;
 	}
 
-	unicode=charstring::compare(
-			cont->getConnectStringValue("unicode"),"no");
+	unicode=!charstring::isNo(cont->getConnectStringValue("unicode"));
 
 
 	// unixodbc doesn't support array fetches
@@ -601,12 +600,12 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 				SQL_NTS);
 		delete[] tracefilename;
 	}
-	if (!charstring::compare(trace,"yes")) {
+	if (charstring::isYes(trace)) {
 		erg=SQLSetConnectAttr(dbc,
 				SQL_ATTR_TRACE,
 				(SQLPOINTER *)SQL_OPT_TRACE_ON,
 				0);
-	} else if (!charstring::compare(trace,"no")) {
+	} else if (charstring::isNo(trace)) {
 		erg=SQLSetConnectAttr(dbc,
 				SQL_ATTR_TRACE,
 				(SQLPOINTER *)SQL_OPT_TRACE_OFF,

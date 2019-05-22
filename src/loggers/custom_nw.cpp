@@ -39,8 +39,7 @@ sqlrlogger_custom_nw::sqlrlogger_custom_nw(sqlrloggers *ls,
 						domnode *parameters) :
 						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 }
 
 sqlrlogger_custom_nw::~sqlrlogger_custom_nw() {

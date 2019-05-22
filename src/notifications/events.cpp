@@ -22,8 +22,7 @@ class SQLRSERVER_DLLSPEC sqlrnotification_events : public sqlrnotification {
 sqlrnotification_events::sqlrnotification_events(sqlrnotifications *ns,
 						domnode *parameters) :
 					sqlrnotification(ns,parameters) {
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	eventsnode=parameters->getFirstTagChild("events");
 	recipientsnode=parameters->getFirstTagChild("recipients");
 }

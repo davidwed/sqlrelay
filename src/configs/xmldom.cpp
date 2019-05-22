@@ -401,19 +401,19 @@ void sqlrconfig_xmldom::init() {
 	metrictotal=0;
 	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
 	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
-	reloginatstart=!charstring::compare(DEFAULT_RELOGINATSTART,"yes");
-	fakeinputbindvariables=!charstring::compare(
-					DEFAULT_FAKEINPUTBINDVARIABLES,"yes");
+	reloginatstart=charstring::isYes(DEFAULT_RELOGINATSTART);
+	fakeinputbindvariables=charstring::isYes(
+					DEFAULT_FAKEINPUTBINDVARIABLES);
 	fakeinputbindvariablesdateformat=NULL;
-	fakeinputbindvariablesunicodestrings=!charstring::compare(
-			DEFAULT_FAKEINPUTBINDVARIABLESUNICODESTRINGS,"yes");
+	fakeinputbindvariablesunicodestrings=charstring::isYes(
+				DEFAULT_FAKEINPUTBINDVARIABLESUNICODESTRINGS);
 	bindvariabledelimiters=DEFAULT_BINDVARIABLEDELIMITERS;
 	questionmarksupported=charstring::contains(bindvariabledelimiters,'?');
 	colonsupported=charstring::contains(bindvariabledelimiters,':');
 	atsignsupported=charstring::contains(bindvariabledelimiters,'@');
 	dollarsignsupported=charstring::contains(bindvariabledelimiters,'$');
-	translatebindvariables=!charstring::compare(
-					DEFAULT_TRANSLATEBINDVARIABLES,"yes");
+	translatebindvariables=charstring::isYes(
+					DEFAULT_TRANSLATEBINDVARIABLES);
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
@@ -1036,7 +1036,7 @@ bool sqlrconfig_xmldom::attributeValue(const char *value) {
 		}
 
 		// if this instance is enabled, then add its id to the id list
-		if (inenabledattribute && !charstring::compare(value,"yes")) {
+		if (inenabledattribute && charstring::isYes(value)) {
 			idlist->append(charstring::duplicate(currentid));
 		}
 
@@ -1413,8 +1413,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 		domnode	*krbservice=
 				instance->getAttribute("krbservice");
 		if (krbservice->isNullNode() &&
-			!charstring::compare(
-				listener->getAttributeValue("krb"),"yes") ) {
+			charstring::isYes(listener->getAttributeValue("krb"))) {
 			listener->setAttributeValue("krbservice",
 						DEFAULT_KRBSERVICE);
 		}
@@ -1884,12 +1883,11 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 	attr=instance->getAttribute("reloginatstart");
 	if (!attr->isNullNode()) {
-		reloginatstart=!charstring::compare(attr->getValue(),"yes");
+		reloginatstart=charstring::isYes(attr->getValue());
 	}
 	attr=instance->getAttribute("fakeinputbindvariables");
 	if (!attr->isNullNode()) {
-		fakeinputbindvariables=!charstring::compare(
-						attr->getValue(),"yes");
+		fakeinputbindvariables=charstring::isYes(attr->getValue());
 	}
 	attr=instance->getAttribute("fakeinputbindvariablesdateformat");
 	if (!attr->isNullNode()) {
@@ -1897,8 +1895,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 	attr=instance->getAttribute("fakeinputbindvariablesunicodestrings");
 	if (!attr->isNullNode()) {
-		fakeinputbindvariablesunicodestrings=!charstring::compare(
-						attr->getValue(),"yes");
+		fakeinputbindvariablesunicodestrings=
+					charstring::isYes(attr->getValue());
 	}
 	attr=instance->getAttribute("bindvariabledelimiters");
 	if (!attr->isNullNode()) {
@@ -1914,8 +1912,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 	attr=instance->getAttribute("translatebindvariables");
 	if (!attr->isNullNode()) {
-		translatebindvariables=!charstring::compare(
-						attr->getValue(),"yes");
+		translatebindvariables=charstring::isYes(attr->getValue());
 	}
 	attr=instance->getAttribute("isolationlevel");
 	if (!attr->isNullNode()) {
@@ -1923,11 +1920,11 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 	attr=instance->getAttribute("ignoreselectdatabase");
 	if (!attr->isNullNode()) {
-		ignoreselectdb=!charstring::compare(attr->getValue(),"yes");
+		ignoreselectdb=charstring::isYes(attr->getValue());
 	}
 	attr=instance->getAttribute("waitfordowndatabase");
 	if (!attr->isNullNode()) {
-		waitfordowndb=!charstring::compare(attr->getValue(),"yes");
+		waitfordowndb=charstring::isYes(attr->getValue());
 	}
 
 
@@ -1992,14 +1989,12 @@ void sqlrconfig_xmldom::getTreeValues() {
 	defaultport=charstring::toUnsignedInteger(
 			defaultlistener->getAttributeValue("port"));
 	defaultsocket=defaultlistener->getAttributeValue("socket");
-	defaultkrb=!charstring::compare(
-			defaultlistener->getAttributeValue("krb"),"yes");
+	defaultkrb=charstring::isYes(defaultlistener->getAttributeValue("krb"));
 	defaultkrbkeytab=defaultlistener->getAttributeValue("krbkeytab");
 	defaultkrbservice=defaultlistener->getAttributeValue("krbservice");
 	defaultkrbmech=defaultlistener->getAttributeValue("krbmech");
 	defaultkrbflags=defaultlistener->getAttributeValue("krbflags");
-	defaulttls=!charstring::compare(
-			defaultlistener->getAttributeValue("tls"),"yes");
+	defaulttls=charstring::isYes(defaultlistener->getAttributeValue("tls"));
 	defaulttlsciphers=defaultlistener->getAttributeValue("tlsciphers");
 
 
@@ -2045,7 +2040,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 		c->setString((str)?str:DEFAULT_CONNECTSTRING);
 		c->parseConnectString();
 		c->setMetric(atouint32_t(metric,DEFAULT_METRIC,1));
-		c->setBehindLoadBalancer(!charstring::compare(blb,"yes"));
+		c->setBehindLoadBalancer(charstring::isYes(blb));
 		c->setPasswordEncryption(pwdencid);
 		connectstringlist.append(c);
 	}

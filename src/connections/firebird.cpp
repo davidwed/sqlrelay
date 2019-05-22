@@ -327,8 +327,8 @@ void firebirdconnection::handleConnectString() {
 
 	charset=cont->getConnectStringValue("charset");
 
-	droptemptables=!charstring::compare(
-			cont->getConnectStringValue("droptemptables"),"yes");
+	droptemptables=charstring::isYes(
+			cont->getConnectStringValue("droptemptables"));
 
 	cont->addGlobalTempTables(
 			cont->getConnectStringValue("globaltemptables"));

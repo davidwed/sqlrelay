@@ -536,6 +536,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getProcedureListQuery(bool wild);
 
 		// column info
+		bool		columnInfoIsValidAfterPrepare(
+						sqlrservercursor *cursor);
 		uint16_t	getSendColumnInfo();
 		void		setSendColumnInfo(uint16_t sendcolumninfo);
 		uint32_t	colCount(sqlrservercursor *cursor);
