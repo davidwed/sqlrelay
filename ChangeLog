@@ -20,6 +20,9 @@
 		(because this is often in /run, which is often a tmpfs)
 	postgresql connection module forces re-fetch of column data after
 		execute now
+	everything uses charstring::isYes/isNo now, instead of direct
+		comparisons against "yes" or "no"
+	fixed subtle sqlexecdirect bug
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
