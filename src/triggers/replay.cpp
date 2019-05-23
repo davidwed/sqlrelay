@@ -458,9 +458,26 @@ void sqlrtrigger_replay::parseQuery(const char *query,
 		
 		// if we find "values " then it's an insert,
 		// or possibly a multi-insert
-		if (end>ptr+7 && !charstring::compare(ptr,"values ",7)) {
+		// FIXME: kind-of a kludge...
+		// sometimes queries are written:
+		//	insert into blah values(...);
+		// with no space after "values", and the normalize translation
+		// doesn't fix this (though it ought to)
+		const char	*values=NULL;
+		if (end>ptr+7) {
+			values=charstring::findFirst(ptr,"values(");
+		}
+		if (values) {
+			values+=7;
+		} else if (end>ptr+8) {
+			values=charstring::findFirst(ptr,"values (");
+			if (values) {
+				values+=8;
+			}
+		}
+		if (values) {
 
-			if (isMultiInsert(ptr+7,end)) {
+			if (isMultiInsert(values,end)) {
 				*querytype=QUERYTYPE_MULTIINSERT;
 			}
 
@@ -585,8 +602,22 @@ void sqlrtrigger_replay::getColumns(const char *query,
 	} else {
 
 		// count values
-		*colcount=countValues(charstring::findFirst(
-						colsstart,"values (")+8);
+		// FIXME: kind-of a kludge...
+		// sometimes queries are written:
+		//	insert into blah values(...);
+		// with no space after "values", and the normalize translation
+		// doesn't fix this (though it ought to)
+		const char	*values=charstring::findFirst(
+						colsstart,"values(");
+		if (values) {
+			values+=7;
+		} else {
+			values=charstring::findFirst(colsstart,"values (");
+			if (values) {
+				values+=8;
+			}
+		}
+		*colcount=countValues(values);
 
 		// create array of columns from allcolumns
 		// that match the number of values
@@ -609,10 +640,10 @@ void sqlrtrigger_replay::getColumns(const char *query,
 
 bool sqlrtrigger_replay::isMultiInsert(const char *ptr, const char *end) {
 
-	// ptr should be sitting on the opening paren...
+	// ptr should be sitting right after the opening paren...
 
 	// skip to right after the closing paren...
-	const char	*c=ptr+1;
+	const char	*c=ptr;
 	char		prevc='\0';
 	bool		inquotes=false;
 	uint32_t	parens=0;
@@ -673,7 +704,20 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 	const char	*colsstart=charstring::findFirst(table,' ')+1;
 
 	// skip to first value (after ") values (")
-	const char	*values=charstring::findFirst(colsstart,"values (")+8;
+	// FIXME: kind-of a kludge...
+	// sometimes queries are written:
+	//	insert into blah values(...);
+	// with no space after "values", and the normalize translation
+	// doesn't fix this (though it ought to)
+	const char	*values=charstring::findFirst(colsstart,"values(");
+	if (values) {
+		values+=7;
+	} else {
+		values=charstring::findFirst(colsstart,"values (");
+		if (values) {
+			values+=8;
+		}
+	}
 
 	// append up to the columns
 	newquery.append(start,colsstart-start);
