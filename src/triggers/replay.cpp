@@ -369,13 +369,13 @@ debug=true;
 	// log copied query and binds
 	log.append(qd);
 
-	if (debug) {
+	/*if (debug) {
 		stdoutput.printf("-----------------------\n");
 		for (linkedlistnode<querydetails *> *node=log.getFirst();
 						node; node=node->getNext()) {
 			stdoutput.printf("%s\n",node->getValue()->query);
 		}
-	}
+	}*/
 	deleteCols(cols,colcount);
 	return true;
 }
