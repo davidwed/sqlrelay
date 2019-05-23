@@ -299,7 +299,6 @@ debug=true;
 // last-insert-id
 
 		if (!liid || !autoinccolumn || columnsincludeautoinccolumn) {
-stdoutput.printf("copyQuery...\n");
 
 			// If there was no last-insert-id or auto-increment
 			// column, or if there was an auto-increment column,
@@ -309,14 +308,12 @@ stdoutput.printf("copyQuery...\n");
 			copyQuery(qd,query,querylen);
 
 		} else if (querytype==QUERYTYPE_INSERT) {
-stdoutput.printf("rewriteQuery...\n");
 
 			rewriteQuery(qd,query,querylen,
 					cols,colcount,autoinccolumn,liid,
 					columnsincludeautoinccolumn);
 
 		} else {
-stdoutput.printf("disable...\n");
 
 			// The query was apparently a multi-insert, with
 			// an autoincrement column, which generated an id.
@@ -331,7 +328,6 @@ stdoutput.printf("disable...\n");
 		allcolumns.clearAndDelete();
 
 	} else if (querytype==QUERYTYPE_INSERTSELECT) {
-stdoutput.printf("disable...\n");
 
 		// There's no way (currently) to handle these.
 		disableUntilEndOfTx(query,querylen,querytype);
@@ -340,7 +336,6 @@ stdoutput.printf("disable...\n");
 		return true;
 
 	} else {
-stdoutput.printf("copyQuery...\n");
 		copyQuery(qd,query,querylen);
 	}
 
