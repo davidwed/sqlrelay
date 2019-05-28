@@ -367,6 +367,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		SQLSMALLINT	fractionscale;
 		bool		supportsfraction;
 		bool		timestampfortime;
+		uint32_t	maxallowedvarcharbindlength;
+		uint32_t	maxvarcharbindlength;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -720,7 +722,22 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		dbmsnamebuffer[dbmsnamelen]='\0';
 	}
 
-	// set the begin query based on the db-type
+	// set some default params
+	begintxquery=sqlrserverconnection::beginTransactionQuery();
+	dontusecharforblob=false;
+	// When binding dates using SQLBindParameter, the "decimal
+	// digits" parameter refers to the number of digits in the
+	// "fraction" part of the date.  Since that is in nanoseconds
+	// (billionths of a second (0-999999999)) in ODBC, the
+	// "decimal digits" parameter must be 9 to accomodate the
+	// full range.
+	fractionscale=9;
+	supportsfraction=true;
+	timestampfortime=true;
+	maxallowedvarcharbindlength=0;
+	maxvarcharbindlength=0;
+
+	// override some default params based on the db-type
 	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
 		begintxquery="BT";
 		dontusecharforblob=true;
@@ -734,18 +751,15 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// Teradata doesn't like it if you bind a SQL_TIMESTAMP_STRUCT
 		// to a TIME datatype.
 		timestampfortime=false;
-	} else {
-		begintxquery=sqlrserverconnection::beginTransactionQuery();
-		dontusecharforblob=false;
-		// When binding dates using SQLBindParameter, the "decimal
-		// digits" parameter refers to the number of digits in the
-		// "fraction" part of the date.  Since that is in nanoseconds
-		// (billionths of a second (0-999999999)) in ODBC, the
-		// "decimal digits" parameter must be 9 to accomodate the
-		// full range.
-		fractionscale=9;
-		supportsfraction=true;
-		timestampfortime=true;
+	} else if (!charstring::compare(dbmsnamebuffer,
+						"Microsoft SQL Server",20)) {
+		// SQL Server defines a varchar/nvarchar as 4000 characters
+		// long, but you can actually store up to 2Gb in them.
+		// However, if you send a valuesize > 4000 characters during
+		// a bind, then something in the chain doesn't like it.  To
+		// work around this, you have to send 0.  Go figure...
+		maxallowedvarcharbindlength=4000;
+		maxvarcharbindlength=0;
 	}
 	
 	return true;
@@ -2238,13 +2252,17 @@ bool odbccursor::inputBind(const char *variable,
 
 	SQLPOINTER	val=NULL;
 	SQLSMALLINT	valtype=SQL_C_CHAR;
+	SQLSMALLINT	paramtype=SQL_CHAR;
+	SQLLEN		bufferlength=valuesize;
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
 		char	*value_ucs=conv_to_ucs((char*)value,valuesize);
-		valuesize=ucslen(value_ucs)*2;
+		valuesize=ucslen(value_ucs);
+		bufferlength=valuesize*2;
 		ucsinbindstrings.append(value_ucs);
 		val=(SQLPOINTER)value_ucs;
 		valtype=SQL_C_WCHAR;
+		paramtype=SQL_WVARCHAR;
 	} else {
 	#endif
 		val=(SQLPOINTER)value;
@@ -2264,28 +2282,32 @@ bool odbccursor::inputBind(const char *variable,
 				1,
 				0,
 				val,
-				valuesize,
+				bufferlength,
 				&sqlnulldata);
 	} else {
 
-		// In ODBC-2 mode, SQL Server Native Client 11.0 (at least)
-		// allows a valuesize of 0, when the value is "".
-		// In non-ODBC-2 mode, it throws: "Invalid precision value"
-		// Using a valuesize of 1 works with all ODBC-modes.
-		// Hopefully it works with all drivers.
 		if (!valuesize) {
+			// In ODBC-2 mode, SQL Server Native Client 11.0
+			// (at least) allows a valuesize of 0, when the value
+			// is "".  In non-ODBC-2 mode, it throws:
+			// "Invalid precision value" Using a valuesize of 1
+			// works with all ODBC-modes.  Hopefully it works with
+			// all drivers.
 			valuesize=1;
+		} else if (odbcconn->maxallowedvarcharbindlength &&
+			valuesize>odbcconn->maxallowedvarcharbindlength) {
+			valuesize=odbcconn->maxvarcharbindlength;
 		}
 
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
 				valtype,
-				SQL_CHAR,
-				valuesize,
+				paramtype,
+				valuesize,	// in characters
 				0,
 				val,
-				valuesize,
+				bufferlength,	// in bytes
 				NULL);
 	}
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);

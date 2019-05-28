@@ -23,6 +23,7 @@
 	everything uses charstring::isYes/isNo now, instead of direct
 		comparisons against "yes" or "no"
 	fixed subtle sqlexecdirect bug
+	fixed subtle sqlserver max-varchar bind length bug
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
