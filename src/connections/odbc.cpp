@@ -254,13 +254,14 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		uint32_t	row;
 		uint32_t	maxrow;
 		uint32_t	totalrows;
-		uint32_t	rownumber;
 
 		stringbuffer	errormsg;
 
 		#ifdef HAVE_SQLCONNECTW
 		singlylinkedlist<char *>	ucsinbindstrings;
 		#endif
+
+		bool		columninfoisvalidafterprepare;
 
 		odbcconnection	*odbcconn;
 };
@@ -369,6 +370,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		timestampfortime;
 		uint32_t	maxallowedvarcharbindlength;
 		uint32_t	maxvarcharbindlength;
+		SQLINTEGER	columninfonotvalidyeterror;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -736,6 +738,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	timestampfortime=true;
 	maxallowedvarcharbindlength=0;
 	maxvarcharbindlength=0;
+	columninfonotvalidyeterror=0;
 
 	// override some default params based on the db-type
 	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
@@ -760,6 +763,19 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// work around this, you have to send 0.  Go figure...
 		maxallowedvarcharbindlength=4000;
 		maxvarcharbindlength=0;
+
+		// With MS SQL Server, sqlrsh commands like:
+		//	inputbind 1 = 'hello';
+		//	select ?;
+		// fail here with:
+		//	11521:
+		//	[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]
+		//	The metadata could not be determined because statement
+		//	'select @P1' uses an undeclared parameter in a context
+		//	that affects its metadata.
+		// So, in cases like this we can catch the error and defer
+		// getting/sending column info until later.
+		columninfonotvalidyeterror=11521;
 	}
 	
 	return true;
@@ -2844,9 +2860,11 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 
 	checkForTempTable(query,length);
 
-	// if we're not exec-direct'ing then we already
-	// did the first half of this in prepareQuery()
-	if (!handleColumns(getExecuteDirect(),true)) {
+	// if we're not exec-direct'ing, and if column info is valid after
+	// prepare, then we must have already done the first half of this in
+	// prepareQuery()
+	if (!handleColumns(getExecuteDirect() ||
+			!columninfoisvalidafterprepare,true)) {
 		return false;
 	}
 
@@ -2928,6 +2946,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 
 void odbccursor::initializeColCounts() {
 	ncols=0;
+	columninfoisvalidafterprepare=true;
 }
 
 void odbccursor::initializeRowCounts() {
@@ -2942,6 +2961,25 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+
+		// column info may not be valid until post-execute for
+		// particular queries
+		// (eg. "select ?" with a bind value in MS SQL Server)
+		if (odbcconn->columninfonotvalidyeterror) {
+			SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
+			SQLINTEGER	nativeerrnum=0;
+			SQLSMALLINT	errlength=0;
+			bytestring::zero(state,sizeof(state));
+			SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,
+							state,&nativeerrnum,
+							NULL,0,&errlength);
+			if (nativeerrnum==
+				odbcconn->columninfonotvalidyeterror) {
+				columninfoisvalidafterprepare=false;
+				erg=SQL_SUCCESS;
+				return true;
+			}
+		}
 		return false;
 	}
 
@@ -3582,7 +3620,7 @@ void odbccursor::closeResultSet() {
 }
 
 bool odbccursor::columnInfoIsValidAfterPrepare() {
-	return true;
+	return columninfoisvalidafterprepare;
 }
 
 extern "C" {

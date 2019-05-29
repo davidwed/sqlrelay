@@ -24,6 +24,8 @@
 		comparisons against "yes" or "no"
 	fixed subtle sqlexecdirect bug
 	fixed subtle sqlserver max-varchar bind length bug
+	fixed subtle sqlserver column-info-valid-after-prepare bug for queries
+		like "select ?" with a bind variable
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
