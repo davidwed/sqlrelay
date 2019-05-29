@@ -769,18 +769,20 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		maxallowedvarcharbindlength=4000;
 		maxvarcharbindlength=0;
 
-		// With MS SQL Server, sqlrsh commands like:
+		// With MS SQL Server, there are various cases where column
+		// metadata can't be fetched until post-execute.  For example:
+		//
+		// sqlrsh commands like:
 		//	inputbind 1 = 'hello';
 		//	select ?;
-		// fail here with:
+		// fail with:
 		//	11521:
 		//	[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]
 		//	The metadata could not be determined because statement
 		//	'select @P1' uses an undeclared parameter in a context
 		//	that affects its metadata.
-		// Also, with MS SQL Server, stored procedures that optionally
-		// execute selects which return different numbers of columns
-		// fail with:
+		// Sored procedures that optionally execute selects which
+		// return different numbers of columns fail with:
 		// 	11512:
 		// 	[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]
 		// 	The metadata could not be determined because the
@@ -789,10 +791,32 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// 	procedure '...some procedure...'.
 		// So, in cases like this we can catch the error and defer
 		// getting/sending column info until later.
-		columninfonotvalidyeterror=new SQLINTEGER[3];
-		columninfonotvalidyeterror[0]=11521;
-		columninfonotvalidyeterror[1]=11512;
-		columninfonotvalidyeterror[2]=0;
+		// Basically, it's error codes 11509-11530 but there could be
+		// others too...
+		columninfonotvalidyeterror=new SQLINTEGER[23];
+		columninfonotvalidyeterror[0]=11509;
+		columninfonotvalidyeterror[1]=11510;
+		columninfonotvalidyeterror[2]=11511;
+		columninfonotvalidyeterror[3]=11512;
+		columninfonotvalidyeterror[4]=11513;
+		columninfonotvalidyeterror[5]=11514;
+		columninfonotvalidyeterror[6]=11515;
+		columninfonotvalidyeterror[7]=11516;
+		columninfonotvalidyeterror[8]=11517;
+		columninfonotvalidyeterror[9]=11518;
+		columninfonotvalidyeterror[10]=11519;
+		columninfonotvalidyeterror[11]=11520;
+		columninfonotvalidyeterror[12]=11521;
+		columninfonotvalidyeterror[13]=11522;
+		columninfonotvalidyeterror[14]=11523;
+		columninfonotvalidyeterror[15]=11524;
+		columninfonotvalidyeterror[16]=11525;
+		columninfonotvalidyeterror[17]=11526;
+		columninfonotvalidyeterror[18]=11527;
+		columninfonotvalidyeterror[19]=11528;
+		columninfonotvalidyeterror[20]=11529;
+		columninfonotvalidyeterror[21]=11530;
+		columninfonotvalidyeterror[22]=0;
 	}
 	
 	return true;
