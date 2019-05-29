@@ -26,6 +26,9 @@
 	fixed subtle sqlserver max-varchar bind length bug
 	fixed subtle sqlserver column-info-valid-after-prepare bug for queries
 		like "select ?" with a bind variable
+	fixed subtle sqlserver column-info-valid-after-prepare bug for stored
+		procedures which optionally run selects returning different
+		numbers of columns
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

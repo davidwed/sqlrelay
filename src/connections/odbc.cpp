@@ -270,6 +270,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 	friend class odbccursor;
 	public:
 			odbcconnection(sqlrservercontroller *cont);
+			~odbcconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
@@ -370,7 +371,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		timestampfortime;
 		uint32_t	maxallowedvarcharbindlength;
 		uint32_t	maxvarcharbindlength;
-		SQLINTEGER	columninfonotvalidyeterror;
+		SQLINTEGER	*columninfonotvalidyeterror;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -508,8 +509,12 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	getcolumntables=false;
 	overrideschema=NULL;
 	unicode=true;
+	columninfonotvalidyeterror=NULL;
 }
 
+odbcconnection::~odbcconnection() {
+	delete[] columninfonotvalidyeterror;
+}
 
 void odbcconnection::handleConnectString() {
 
@@ -738,7 +743,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	timestampfortime=true;
 	maxallowedvarcharbindlength=0;
 	maxvarcharbindlength=0;
-	columninfonotvalidyeterror=0;
+	columninfonotvalidyeterror=NULL;
 
 	// override some default params based on the db-type
 	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
@@ -773,9 +778,21 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		//	The metadata could not be determined because statement
 		//	'select @P1' uses an undeclared parameter in a context
 		//	that affects its metadata.
+		// Also, with MS SQL Server, stored procedures that optionally
+		// execute selects which return different numbers of columns
+		// fail with:
+		// 	11512:
+		// 	[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]
+		// 	The metadata could not be determined because the
+		// 	statement '...some select query...' is not compatible
+		// 	with the statement '...some other select query...' in
+		// 	procedure '...some procedure...'.
 		// So, in cases like this we can catch the error and defer
 		// getting/sending column info until later.
-		columninfonotvalidyeterror=11521;
+		columninfonotvalidyeterror=new SQLINTEGER[3];
+		columninfonotvalidyeterror[0]=11521;
+		columninfonotvalidyeterror[1]=11512;
+		columninfonotvalidyeterror[2]=0;
 	}
 	
 	return true;
@@ -2964,7 +2981,9 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 
 		// column info may not be valid until post-execute for
 		// particular queries
-		// (eg. "select ?" with a bind value in MS SQL Server)
+		// (eg. "select ?" with a bind value in MS SQL Server, or a
+		// stored procedure that optionally executes selects with
+		// different numbers of columns)
 		if (odbcconn->columninfonotvalidyeterror) {
 			SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 			SQLINTEGER	nativeerrnum=0;
@@ -2973,11 +2992,14 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 			SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,
 							state,&nativeerrnum,
 							NULL,0,&errlength);
-			if (nativeerrnum==
-				odbcconn->columninfonotvalidyeterror) {
-				columninfoisvalidafterprepare=false;
-				erg=SQL_SUCCESS;
-				return true;
+			for (SQLINTEGER *ptr=
+					odbcconn->columninfonotvalidyeterror;
+					*ptr; ptr++) {
+				if (nativeerrnum==*ptr) {
+					columninfoisvalidafterprepare=false;
+					erg=SQL_SUCCESS;
+					return true;
+				}
 			}
 		}
 		return false;
