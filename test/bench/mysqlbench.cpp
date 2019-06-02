@@ -232,7 +232,8 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (charstring::compare(query,"create",6) && 
 		charstring::compare(query,"drop",4) && 
-		charstring::compare(query,"insert",6)) {
+		charstring::compare(query,"insert",6) &&
+		charstring::compare(query,"delete",6)) {
 
 		// prepare the query
 		if (mysql_stmt_prepare(stmt,query,charstring::length(query))) {

@@ -3077,6 +3077,14 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 				erg=SQLColAttribute(stmt,i+1,SQL_DESC_PRECISION,
 						NULL,0,NULL,
 						&(column[i].precision));
+				// Some drivers (Redshift) like to return -1
+				// for the precision of some (TEXT/NTEXT)
+				// columns.  This wreaks havoc on the client
+				// side, as the value is interpreted as 2^32-1.
+				// Override the -1 with the length.
+				if (column[i].precision==-1) {
+					column[i].precision=column[i].length;
+				}
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;

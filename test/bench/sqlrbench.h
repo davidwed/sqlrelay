@@ -25,7 +25,9 @@ class sqlrbench {
 						bool debug);
 		virtual	~sqlrbench();
 		void	shutDown();
-		bool	run(dictionary< float, linkedlist< float > *> *stats);
+		bool	run(
+			dictionary< float, linkedlist< float > *> *selectstats,
+			dictionary< float, linkedlist< float > *> *dmlstats);
 
 	protected:
 		sqlrbenchconnection	*con;
@@ -38,6 +40,11 @@ class sqlrbench {
 		void	appendRandomString(stringbuffer *str, uint32_t colsize);
 		void	benchSelect(const char *selectquery,
 					uint64_t queries,
+					uint64_t rows, uint32_t cols,
+					uint32_t colsize, uint16_t samples,
+					dictionary< float,
+						linkedlist< float > *> *stats);
+		void	benchDML(uint64_t queries,
 					uint64_t rows, uint32_t cols,
 					uint32_t colsize, uint16_t samples,
 					dictionary< float,
