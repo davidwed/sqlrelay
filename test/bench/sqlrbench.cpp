@@ -120,16 +120,13 @@ bool sqlrbench::run(dictionary< float, linkedlist< float > *> *selectstats,
 	}
 
 	// select
-	if (debug) {
-		stdoutput.printf("%s\n",selectquery);
-	}
-	if (!shutdown) {
+	if (!shutdown && selectstats) {
 		benchSelect(selectquery,queries,rows,cols,
 					colsize,samples,selectstats);
 	}
 
 	// DML
-	if (!shutdown) {
+	if (!shutdown && dmlstats) {
 		benchDML(queries,rows,cols,colsize,samples,dmlstats);
 	}
 
@@ -225,6 +222,10 @@ void sqlrbench::benchSelect(
 	// handle shutdown
 	if (shutdown) {
 		return;
+	}
+
+	if (debug) {
+		stdoutput.printf("%s\n",selectquery);
 	}
 
 	// display stats
@@ -383,6 +384,36 @@ void sqlrbench::benchDML(
 	stdoutput.printf("\n");
 	stdoutput.printf("queries-per-cx  queries-per-second      Mbps\n");
 
+	// delete any existing rows
+	if (debug) {
+		stdoutput.printf("connecting\n");
+	}
+	if (!con->connect()) {
+		stdoutput.printf("error connecting\n");
+	}
+	if (debug) {
+		stdoutput.printf("opening\n");
+	}
+	if (!cur->open()) {
+		stdoutput.printf("error opening\n");
+	}
+	if (!cur->query("delete from testtable",false)) {
+		stdoutput.printf("error deleting rows\n");
+		shutdown=true;
+	}
+	if (debug) {
+		stdoutput.printf("closing\n");
+	}
+	if (!cur->close()) {
+		stdoutput.printf("error closing\n");
+	}
+	if (debug) {
+		stdoutput.printf("disconnecting\n");
+	}
+	if (!con->disconnect()) {
+		stdoutput.printf("error disconnecting\n");
+	}
+
 	// run inserts
 	for (uint64_t qcount=1; qcount<=queries && !shutdown; qcount++) {
 
@@ -429,6 +460,8 @@ void sqlrbench::benchDML(
 					}
 					delete[] insertquery;
 				}
+
+				// delete the rows we just inserted
 				if (!cur->query("delete from testtable",
 								false)) {
 					stdoutput.printf(

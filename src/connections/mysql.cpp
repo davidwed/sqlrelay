@@ -1026,19 +1026,19 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	mysqlresult=NULL;
 	if (ncols) {
 		mysqlresult=mysql_stmt_result_metadata(stmt);
-	}
 
-	// grab the field info
-	if (mysqlresult) {
-		mysql_field_seek(mysqlresult,0);
-		for (unsigned int i=0; i<ncols; i++) {
-			mysqlfields[i]=mysql_fetch_field(mysqlresult);
+		// grab the field info
+		if (mysqlresult) {
+			mysql_field_seek(mysqlresult,0);
+			for (unsigned int i=0; i<ncols; i++) {
+				mysqlfields[i]=mysql_fetch_field(mysqlresult);
+			}
 		}
-	}
 
-	// bind the fields
-	if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
-		return false;
+		// bind the fields
+		if (mysql_stmt_bind_result(stmt,fieldbind)) {
+			return false;
+		}
 	}
 #endif
 

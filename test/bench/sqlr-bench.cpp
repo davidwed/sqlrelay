@@ -45,6 +45,8 @@ int main(int argc, const char **argv) {
 	bool		benchdb=true;
 	bool		benchproxy=false;
 	bool		benchsqlrelay=true;
+	bool		selectqueries=true;
+	bool		dmlqueries=true;
 	bool		debug=false;
 	const char	*graph=NULL;
 	bool		nosettle=false;
@@ -93,6 +95,11 @@ int main(int argc, const char **argv) {
 		benchsqlrelay=charstring::contains(bench,"sqlrelay");
 		benchproxy=charstring::contains(bench,"proxy");
 		benchdb=charstring::contains(bench,"db");
+	}
+	if (cmdl.found("querytypes")) {
+		const char	*queries=cmdl.getValue("querytypes");
+		selectqueries=charstring::contains(queries,"selects");
+		dmlqueries=charstring::contains(queries,"dml");
 	}
 	if (cmdl.found("debug")) {
 		debug=true;
@@ -385,7 +392,8 @@ int main(int argc, const char **argv) {
 		}
 
 		// run the benchmarks
-		stop=!bm->run(&selectstats,&dmlstats);
+		stop=!bm->run((selectqueries)?&selectstats:NULL,
+				(dmlqueries)?&dmlstats:NULL);
 
 		delete bm;
 		bm=NULL;
