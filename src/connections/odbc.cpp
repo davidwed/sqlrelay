@@ -311,7 +311,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getSchemaList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getTableList(sqlrservercursor *cursor,
-						const char *wild);
+						const char *wild,
+						uint16_t objecttypes);
 		bool		getTableTypeList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		isCurrentCatalog(const char *name);
@@ -1108,7 +1109,8 @@ bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
 }
 
 bool odbcconnection::getTableList(sqlrservercursor *cursor,
-					const char *wild) {
+					const char *wild,
+					uint16_t objecttypes) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 

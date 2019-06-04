@@ -41,6 +41,7 @@
 #include <odbcinst.h>
 
 #include <parsedatetime.h>
+#include <defines.h>
 
 #ifndef SQL_NULL_DESC
 	#define SQL_NULL_DESC 0
@@ -9318,11 +9319,26 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		debugPrintf("  getting table list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
 
+		uint16_t	objecttypes=0;
+		if (charstring::contains(tbltype,"TABLE")) {
+			objecttypes|=DB_OBJECT_TABLE;
+		}
+		if (charstring::contains(tbltype,"VIEW")) {
+			objecttypes|=DB_OBJECT_VIEW;
+		}
+		if (charstring::contains(tbltype,"ALIAS")) {
+			objecttypes|=DB_OBJECT_ALIAS;
+		}
+		if (charstring::contains(tbltype,"SYNONYM")) {
+			objecttypes|=DB_OBJECT_SYNONYM;
+		}
+
 		// get the table list
 		// FIXME: this list should also be restricted to the
 		// specified table type
 		retval=
-		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
+		(stmt->cur->getTableList(
+				wild,SQLRCLIENTLISTFORMAT_ODBC,objecttypes))?
 							SQL_SUCCESS:SQL_ERROR;
 	}
 

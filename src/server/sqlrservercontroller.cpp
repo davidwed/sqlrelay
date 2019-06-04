@@ -2455,10 +2455,11 @@ bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 }
 
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
-						const char *wild) {
+						const char *wild,
+						uint16_t objecttypes) {
 	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getTableList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return pvt->_conn->getTableList(cursor,wild,objecttypes) &&
+					handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
@@ -2524,8 +2525,9 @@ const char *sqlrservercontroller::getSchemaListQuery(bool wild) {
 	return pvt->_conn->getSchemaListQuery(wild);
 }
 
-const char *sqlrservercontroller::getTableListQuery(bool wild) {
-	return pvt->_conn->getTableListQuery(wild);
+const char *sqlrservercontroller::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
+	return pvt->_conn->getTableListQuery(wild,objecttypes);
 }
 
 const char *sqlrservercontroller::getTableTypeListQuery(bool wild) {

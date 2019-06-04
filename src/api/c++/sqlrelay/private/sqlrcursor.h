@@ -22,7 +22,8 @@
 		bool	sendQueryInternal();
 		bool	getList(uint16_t command,
 				sqlrclientlistformat_t listformat,
-				const char *table, const char *wild);
+				const char *table, const char *wild,
+				uint16_t objecttypes);
 		void	sendCursorStatus();
 		void	performSubstitutions();
 		void	validateBindsInternal();
@@ -153,7 +154,8 @@
 		bool		getSchemaList(const char *wild,
 					sqlrclientlistformat_t listformat);
 		bool		getTableList(const char *wild,
-					sqlrclientlistformat_t listformat);
+					sqlrclientlistformat_t listformat,
+					uint16_t objecttypes);
 		bool		getTableTypeList(const char *wild);
 		bool		getTableTypeList(const char *wild,
 					sqlrclientlistformat_t listformat);

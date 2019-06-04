@@ -733,7 +733,8 @@ bool sqlrserverconnection::getSchemaList(sqlrservercursor *cursor,
 }
 
 bool sqlrserverconnection::getTableList(sqlrservercursor *cursor,
-						const char *wild) {
+						const char *wild,
+						uint16_t objecttypes) {
 	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
 				SQLR_ERROR_NOTIMPLEMENTED,true);
 	return false;
@@ -802,7 +803,8 @@ const char *sqlrserverconnection::getSchemaListQuery(bool wild) {
 	return "select 1";
 }
 
-const char *sqlrserverconnection::getTableListQuery(bool wild) {
+const char *sqlrserverconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return "select 1";
 }
 

@@ -496,7 +496,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		getSchemaList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getTableList(sqlrservercursor *cursor,
-						const char *wild);
+						const char *wild,
+						uint16_t objecttypes);
 		bool		getTableTypeList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getColumnList(sqlrservercursor *cursor,
@@ -519,7 +520,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *wild);
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getSchemaListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getTableTypeListQuery(bool wild);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(const char *table,
@@ -893,7 +895,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 						const char *wild);
 		virtual bool		getTableList(
 						sqlrservercursor *cursor,
-						const char *wild);
+						const char *wild,
+						uint16_t objecttypes);
 		virtual bool		getTableTypeList(
 						sqlrservercursor *cursor,
 						const char *wild);
@@ -922,7 +925,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 						const char *wild);
 		virtual const char	*getDatabaseListQuery(bool wild);
 		virtual const char	*getSchemaListQuery(bool wild);
-		virtual const char	*getTableListQuery(bool wild);
+		virtual const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		virtual const char	*getTableTypeListQuery(bool wild);
 		virtual const char	*getGlobalTempTableListQuery();
 		virtual const char	*getColumnListQuery(

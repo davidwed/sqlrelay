@@ -123,7 +123,8 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getSchemaListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(
 						const char *table,
@@ -1188,7 +1189,8 @@ const char *oracleconnection::getSchemaListQuery(bool wild) {
 	return "select test from dual";
 }
 
-const char *oracleconnection::getTableListQuery(bool wild) {
+const char *oracleconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	if (supportssyscontext) {
 		return (wild)?
 			"select "

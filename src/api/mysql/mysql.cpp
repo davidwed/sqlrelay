@@ -20,6 +20,7 @@
 #define NEED_IS_UNSIGNED_TYPE_CHAR 1
 #define NEED_IS_BINARY_TYPE_CHAR 1
 #include <datatypes.h>
+#include <defines.h>
 
 extern "C" {
 
@@ -857,7 +858,9 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
 	mysql->currentstmt->result->sqlrcur->getTableList(wild,
-						SQLRCLIENTLISTFORMAT_MYSQL);
+					SQLRCLIENTLISTFORMAT_MYSQL,
+					DB_OBJECT_TABLE|DB_OBJECT_VIEW|
+					DB_OBJECT_ALIAS|DB_OBJECT_SYNONYM);
 	processFields(mysql->currentstmt);
 	mysql->currentstmt->result->currentfield=0;
 

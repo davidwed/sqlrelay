@@ -42,7 +42,8 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*dbIpAddressQuery();
 		const char	*dbIpAddress();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		bool		selectDatabase(const char *database);
@@ -545,7 +546,8 @@ const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
 		"	datname";
 }
 
-const char *postgresqlconnection::getTableListQuery(bool wild) {
+const char *postgresqlconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?
 		"select "
 		"	table_name, "

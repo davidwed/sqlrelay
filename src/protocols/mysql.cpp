@@ -8,6 +8,8 @@
 #include <rudiments/process.h>
 #include <rudiments/error.h>
 
+#include <defines.h>
+
 // capability flags
 #define CLIENT_LONG_PASSWORD				0x00000001
 #define CLIENT_FOUND_ROWS				0x00000002
@@ -3929,7 +3931,11 @@ bool sqlrprotocol_mysql::getListByApiCall(sqlrservercursor *cursor,
 		case MYSQLLISTTYPE_TABLE_LIST:
 			cont->setTableListColumnMap(
 					SQLRSERVERLISTFORMAT_MYSQL);
-			return cont->getTableList(cursor,wild);
+			return cont->getTableList(cursor,wild,
+							DB_OBJECT_TABLE|
+							DB_OBJECT_VIEW|
+							DB_OBJECT_ALIAS|
+							DB_OBJECT_SYNONYM);
 		case MYSQLLISTTYPE_COLUMN_LIST:
 			cont->setColumnListColumnMap(
 					SQLRSERVERLISTFORMAT_MYSQL);
@@ -3952,7 +3958,11 @@ bool sqlrprotocol_mysql::getListByQuery(sqlrservercursor *cursor,
 			query=cont->getDatabaseListQuery(havewild);
 			break;
 		case MYSQLLISTTYPE_TABLE_LIST:
-			query=cont->getTableListQuery(havewild);
+			query=cont->getTableListQuery(havewild,
+							DB_OBJECT_TABLE|
+							DB_OBJECT_VIEW|
+							DB_OBJECT_ALIAS|
+							DB_OBJECT_SYNONYM);
 			break;
 		case MYSQLLISTTYPE_COLUMN_LIST:
 			query=cont->getColumnListQuery(table,havewild);

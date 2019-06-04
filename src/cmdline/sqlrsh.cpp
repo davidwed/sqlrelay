@@ -924,7 +924,11 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 						"show tables odbc",16)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild,
-					SQLRCLIENTLISTFORMAT_ODBC);
+					SQLRCLIENTLISTFORMAT_ODBC,
+					DB_OBJECT_TABLE|
+					DB_OBJECT_VIEW|
+					DB_OBJECT_ALIAS|
+					DB_OBJECT_SYNONYM);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 							"show tables",11)) {

@@ -212,7 +212,8 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*bindFormat();
 #endif
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
@@ -667,7 +668,8 @@ const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 			"	information_schema.schemata";
 }
 
-const char *mysqlconnection::getTableListQuery(bool wild) {
+const char *mysqlconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?"select "
 			"	table_name, "
 			"	'TABLE', "

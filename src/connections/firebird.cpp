@@ -244,7 +244,8 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
@@ -601,7 +602,8 @@ const char *firebirdconnection::getDatabaseListQuery(bool wild) {
 	return "select '',NULL from rdb$database";
 }
 
-const char *firebirdconnection::getTableListQuery(bool wild) {
+const char *firebirdconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?
 		"select "
 		"	rdb$relation_name, "

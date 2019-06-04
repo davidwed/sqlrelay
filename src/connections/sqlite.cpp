@@ -48,7 +48,8 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		#ifdef SQLITE_TRANSACTIONAL
@@ -261,7 +262,8 @@ const char *sqliteconnection::getDatabaseListQuery(bool wild) {
 	return "select '',NULL";
 }
 
-const char *sqliteconnection::getTableListQuery(bool wild) {
+const char *sqliteconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?
 		"select "
 		"	tbl_name, "

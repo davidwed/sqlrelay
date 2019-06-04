@@ -247,7 +247,8 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		const char	*selectDatabaseQuery();
@@ -560,7 +561,8 @@ const char *informixconnection::getDatabaseListQuery(bool wild) {
 		"	sysmaster:sysdatabases ";
 }
 
-const char *informixconnection::getTableListQuery(bool wild) {
+const char *informixconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?
 		"select distinct "
 		"	tabname, "

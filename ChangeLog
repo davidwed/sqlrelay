@@ -28,6 +28,8 @@
 		after execute
 	odbc connection module sets column precision = column length if
 		column precision = -1
+	when using odbc on front and back end, the object type works in
+		SQLTables now
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
