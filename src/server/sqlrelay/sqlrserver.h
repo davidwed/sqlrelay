@@ -491,6 +491,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// db, table, column, procedure bind/column lists
 		bool		getListsByApiCalls();
+		bool		fakePrepareAndExecuteForApiCall(
+						sqlrservercursor *cursor);
 		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getSchemaList(sqlrservercursor *cursor,

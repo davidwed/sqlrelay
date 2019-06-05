@@ -754,6 +754,7 @@ sqlrservercursor *sqlrprotocol_sqlrclient::getCursor(uint16_t command) {
 		command==GETDBLIST ||
 		command==GETSCHEMALIST ||
 		command==GETTABLELIST ||
+		command==GETTABLELIST2 ||
 		command==GETTABLETYPELIST ||
 		command==GETCOLUMNLIST ||
 		command==GETPRIMARYKEYLIST ||
@@ -1458,6 +1459,7 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 								listformat);
 					break;
 				case SQLRCLIENTQUERYTYPE_TABLE_LIST:
+				case SQLRCLIENTQUERYTYPE_TABLE_LIST_2:
 					cont->setTableListColumnMap(
 								listformat);
 					break;
@@ -4044,6 +4046,7 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 			success=cont->getSchemaList(cursor,wild);
 			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_LIST:
+		case SQLRCLIENTQUERYTYPE_TABLE_LIST_2:
 			cont->setTableListColumnMap(listformat);
 			success=cont->getTableList(cursor,wild,objecttypes);
 			break;
@@ -4130,6 +4133,7 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 			query=cont->getSchemaListQuery(havewild);
 			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_LIST:
+		case SQLRCLIENTQUERYTYPE_TABLE_LIST_2:
 			query=cont->getTableListQuery(havewild,objecttypes);
 			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_TYPE_LIST:

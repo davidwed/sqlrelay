@@ -1135,7 +1135,6 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*table="";
-	const char	*tabletype="TABLE,VIEW,SYNONYM,ALIAS";
 	char		**tableparts=NULL;
 	uint64_t	tablepartcount=0;
 
@@ -1213,12 +1212,36 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 		}
 	}
 
+	stringbuffer	tabletype;
+	if (objecttypes&DB_OBJECT_TABLE) {
+		tabletype.append("TABLE");
+	}
+	if (objecttypes&DB_OBJECT_VIEW) {
+		if (tabletype.getSize()) {
+			tabletype.append(',');
+		}
+		tabletype.append("VIEW");
+	}
+	if (objecttypes&DB_OBJECT_ALIAS) {
+		if (tabletype.getSize()) {
+			tabletype.append(',');
+		}
+		tabletype.append("ALIAS");
+	}
+	if (objecttypes&DB_OBJECT_SYNONYM) {
+		if (tabletype.getSize()) {
+			tabletype.append(',');
+		}
+		tabletype.append("SYNONYM");
+	}
+stdoutput.printf("%s\n",tabletype.getString());
+
 	// get the table list
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)table,SQL_NTS,
-			(SQLCHAR *)tabletype,SQL_NTS);
+			(SQLCHAR *)tabletype.getString(),SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// clean up

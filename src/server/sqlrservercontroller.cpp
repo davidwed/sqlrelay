@@ -2440,81 +2440,94 @@ bool sqlrservercontroller::getListsByApiCalls() {
 	return pvt->_conn->getListsByApiCalls();
 }
 
+bool sqlrservercontroller::fakePrepareAndExecuteForApiCall(
+					sqlrservercursor *cursor) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	cursor->getBindMappingsPool()->clear();
+	cursor->setQueryLength(0);
+	cursor->getQueryBuffer()[0]='\0';
+	if (pvt->_sqlrt && !translateQuery(cursor)) {
+		return false;
+	}
+	cursor->clearTotalRowsFetched();
+	return true;
+}
+
 bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getDatabaseList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getDatabaseList(cursor,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getSchemaList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getSchemaList(cursor,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
 						const char *wild,
 						uint16_t objecttypes) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getTableList(cursor,wild,objecttypes) &&
-					handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getTableList(cursor,wild,objecttypes) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getTableTypeList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getTableTypeList(cursor,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getColumnList(cursor,table,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getColumnList(cursor,table,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getPrimaryKeyList(cursor,table,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getPrimaryKeyList(cursor,table,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getKeyAndIndexList(cursor,table,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getKeyAndIndexList(cursor,table,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *proc,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getProcedureBindAndColumnList(cursor,proc,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getProcedureBindAndColumnList(cursor,proc,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getTypeInfoList(cursor,type,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getTypeInfoList(cursor,type,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getProcedureList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getProcedureList(cursor,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 const char *sqlrservercontroller::getDatabaseListQuery(bool wild) {

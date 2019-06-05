@@ -931,6 +931,34 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 					DB_OBJECT_SYNONYM);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show only tables odbc",21)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_ODBC,
+					DB_OBJECT_TABLE);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show only views odbc",20)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_ODBC,
+					DB_OBJECT_VIEW);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show only aliases odbc",22)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_ODBC,
+					DB_OBJECT_ALIAS);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show only synonyms odbc",23)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_ODBC,
+					DB_OBJECT_SYNONYM);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 							"show tables",11)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild);

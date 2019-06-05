@@ -194,13 +194,13 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 	pvt->_error=NULL;
 
-	if (!querylength || !query) {
+	/*if (!querylength || !query) {
 		pvt->_error="query was empty or null";
 		if (pvt->_debug) {
 			stdoutput.printf("\n%s\n\n",pvt->_error);
 		}
 		return false;
-	}
+	}*/
 
 	if (!translatedquery) {
 		pvt->_error="buffer for translated query was null";
