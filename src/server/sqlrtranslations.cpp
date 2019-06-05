@@ -194,6 +194,9 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 
 	pvt->_error=NULL;
 
+	// FIXME: I commented this out to allow empty queries to be sent
+	// before getXXXList() calls.  Hopefully it doesn't break something
+	// else...
 	/*if (!querylength || !query) {
 		pvt->_error="query was empty or null";
 		if (pvt->_debug) {
