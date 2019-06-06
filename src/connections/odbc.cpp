@@ -1234,7 +1234,6 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 		}
 		tabletype.append("SYNONYM");
 	}
-stdoutput.printf("%s\n",tabletype.getString());
 
 	// get the table list
 	erg=SQLTables(odbccur->stmt,
