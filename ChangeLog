@@ -32,6 +32,9 @@
 		SQLTables now
 	result set translations work with "show databases/tables/etc." queries
 		with an ODBC backend now
+	increased oid buffer sizes in postgresql connection
+	fixed typemangling->tablemangling typo in postgresql connection -
+		tablemangling should work without typemangling now
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

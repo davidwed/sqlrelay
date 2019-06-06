@@ -175,8 +175,8 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		uint64_t	affectedrows;
 		int		currentrow;
 
-		char		typenamebuffer[6];
-		char		tablenamebuffer[6];
+		char		typenamebuffer[32];
+		char		tablenamebuffer[32];
 
 		postgresqlconnection	*postgresqlconn;
 
@@ -354,7 +354,7 @@ bool postgresqlconnection::logIn(const char **error,
 	}
 
 	// build the table dictionary
-	if (typemangling==2) {
+	if (tablemangling==2) {
 		PGresult	*result=PQexec(pgconn,
 					"select oid,relname from pg_class");
 		if (!result) {
