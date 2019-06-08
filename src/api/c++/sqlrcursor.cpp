@@ -2567,7 +2567,7 @@ bool sqlrcursor::validateBind(const char *variable) {
 	// run through the querybuffer...
 	const char	*ptr=pvt->_queryptr;
 	const char	*endptr=pvt->_queryptr+pvt->_querylen;
-	const char	*prevptr="\0";
+	char		prev='\0';
 	do {
 
 		// if we're in the query...
@@ -2585,7 +2585,11 @@ bool sqlrcursor::validateBind(const char *variable) {
 			}
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -2597,12 +2601,16 @@ bool sqlrcursor::validateBind(const char *variable) {
 			// then we're back in the query
 			// (or we're in between one of these: '...''...'
 			// which is functionally the same)
-			if (*ptr=='\'' && *prevptr!='\\') {
+			if (*ptr=='\'' && prev!='\\') {
 				parsestate=IN_QUERY;
 			}
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -2639,7 +2647,11 @@ bool sqlrcursor::validateBind(const char *variable) {
 				// last character in the query
 				if (!endofbind && ptr==endptr-1) {
 					currentbind.append(*ptr);
-					prevptr=ptr;
+					if (*ptr=='\\' && prev=='\\') {
+						prev='\0';
+					} else {
+						prev=*ptr;
+					}
 					ptr++;
 				}
 
@@ -2658,7 +2670,11 @@ bool sqlrcursor::validateBind(const char *variable) {
 
 				// move on
 				currentbind.append(*ptr);
-				prevptr=ptr;
+				if (*ptr=='\\' && prev=='\\') {
+					prev='\0';
+				} else {
+					prev=*ptr;
+				}
 				ptr++;
 			}
 			continue;

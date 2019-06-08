@@ -57,7 +57,7 @@ static uint16_t countBindVariables(const char *query,
 
 	const char	*ptr=query;
 	const char	*endptr=query+querylen;
-	const char	*prevptr="\0";
+	char		prev='\0';
 	do {
 
 		// if we're in the query...
@@ -75,7 +75,11 @@ static uint16_t countBindVariables(const char *query,
 			}
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -87,12 +91,16 @@ static uint16_t countBindVariables(const char *query,
 			// then we're back in the query
 			// (or we're in between one of these: '...''...'
 			// which is functionally the same)
-			if (*ptr=='\'' && *prevptr!='\\') {
+			if (*ptr=='\'' && prev!='\\') {
 				parsestate=IN_QUERY;
 			}
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -140,7 +148,11 @@ static uint16_t countBindVariables(const char *query,
 			} else {
 
 				// move on
-				prevptr=ptr;
+				if (*ptr=='\\' && prev=='\\') {
+					prev='\0';
+				} else {
+					prev=*ptr;
+				}
 				ptr++;
 			}
 			continue;

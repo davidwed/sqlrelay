@@ -35,6 +35,7 @@
 	increased oid buffer sizes in postgresql connection
 	fixed typemangling->tablemangling typo in postgresql connection -
 		tablemangling should work without typemangling now
+	fixed a '...\\''...' parsing bug
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

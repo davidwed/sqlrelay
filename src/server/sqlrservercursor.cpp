@@ -834,7 +834,7 @@ bool sqlrservercursor::fakeInputBinds() {
 	// run through the querybuffer...
 	char		*ptr=pvt->_querybuffer;
 	const char	*endptr=pvt->_querybuffer+pvt->_querylength;
-	const char	*prevptr="\0";
+	char		prev='\0';
 	do {
 
 		// if we're in the query...
@@ -855,7 +855,11 @@ bool sqlrservercursor::fakeInputBinds() {
 			pvt->_querywithfakeinputbinds.append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -867,7 +871,7 @@ bool sqlrservercursor::fakeInputBinds() {
 			// then we're back in the query
 			// (or we're in between one of these: '...''...'
 			// which is functionally the same)
-			if (*ptr=='\'' && *prevptr!='\\') {
+			if (*ptr=='\'' && prev!='\\') {
 				parsestate=IN_QUERY;
 			}
 
@@ -875,7 +879,11 @@ bool sqlrservercursor::fakeInputBinds() {
 			pvt->_querywithfakeinputbinds.append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}

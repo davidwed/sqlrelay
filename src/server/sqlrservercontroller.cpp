@@ -3396,7 +3396,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	// run through the querybuffer...
 	const char	*ptr=querybuffer;
 	const char	*endptr=querybuffer+cursor->getQueryLength();
-	const char	*prevptr="\0";
+	char		prev='\0';
 	do {
 
 		// if we're in the query...
@@ -3417,7 +3417,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			newquery.append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -3429,7 +3433,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			// then we're back in the query
 			// (or we're in between one of these: '...''...'
 			// which is functionally the same)
-			if (*ptr=='\'' && *prevptr!='\\') {
+			if (*ptr=='\'' && prev!='\\') {
 				parsestate=IN_QUERY;
 			}
 
@@ -3437,7 +3441,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			newquery.append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -3474,7 +3482,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 				// last character in the query
 				if (!endofbind && ptr==endptr-1) {
 					currentbind.append(*ptr);
-					prevptr=ptr;
+					if (*ptr=='\\' && prev=='\\') {
+						prev='\0';
+					} else {
+						prev=*ptr;
+					}
 					ptr++;
 				}
 
@@ -3502,7 +3514,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 				// move on
 				currentbind.append(*ptr);
-				prevptr=ptr;
+				if (*ptr=='\\' && prev=='\\') {
+					prev='\0';
+				} else {
+					prev=*ptr;
+				}
 				ptr++;
 			}
 			continue;

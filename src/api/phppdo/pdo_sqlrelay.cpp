@@ -958,7 +958,7 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 	// run through the querybuffer...
 	const char	*ptr=query;
 	const char	*endptr=ptr+querylen;
-	const char	prev='\0';
+	char		prev='\0';
 	do {
 
 		// if we're in the query...
@@ -979,7 +979,11 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			newquery->append(*ptr);
 
 			// move on
-			prev=*ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -999,7 +1003,11 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			newquery->append(*ptr);
 
 			// move on
-			prev=*ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -1047,7 +1055,11 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			} else {
 
 				// move on
-				prev=*ptr;
+				if (*ptr=='\\' && prev=='\\') {
+					prev='\0';
+				} else {
+					prev=*ptr;
+				}
 				ptr++;
 			}
 			continue;
