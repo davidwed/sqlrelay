@@ -550,6 +550,8 @@ const char *postgresqlconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
 	return (wild)?
 		"select "
+		"	table_catalog, "
+		"	table_schema, "
 		"	table_name, "
 		"	'TABLE', "
 		"	NULL "
@@ -560,9 +562,13 @@ const char *postgresqlconnection::getTableListQuery(bool wild,
 		"	and "
 		"	table_name like '%s' "
 		"order by "
+		"	table_catalog, "
+		"	table_schema, "
 		"	table_name":
 
 		"select "
+		"	table_catalog, "
+		"	table_schema, "
 		"	table_name, "
 		"	'TABLE', "
 		"	NULL "
@@ -571,6 +577,8 @@ const char *postgresqlconnection::getTableListQuery(bool wild,
 		"where "
 		"	table_schema = 'public' "
 		"order by "
+		"	table_catalog, "
+		"	table_schema, "
 		"	table_name";
 }
 

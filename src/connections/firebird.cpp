@@ -606,6 +606,8 @@ const char *firebirdconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
 	return (wild)?
 		"select "
+		"	NULL, "
+		"	rdb$owner_name, "
 		"	rdb$relation_name, "
 		"	'TABLE', "
 		"	NULL "
@@ -616,9 +618,12 @@ const char *firebirdconnection::getTableListQuery(bool wild,
 		"	and "
 		"	rdb$relation_name like '%s' "
 		"order by "
+		"	rdb$owner_name, "
 		"	rdb$relation_name":
 
 		"select "
+		"	NULL, "
+		"	rdb$owner_name, "
 		"	rdb$relation_name, "
 		"	'TABLE', "
 		"	NULL "
@@ -627,6 +632,7 @@ const char *firebirdconnection::getTableListQuery(bool wild,
 		"where "
 		"	rdb$system_flag=0 "
 		"order by "
+		"	rdb$owner_name, "
 		"	rdb$relation_name";
 }
 

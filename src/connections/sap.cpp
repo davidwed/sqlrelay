@@ -563,6 +563,8 @@ const char *sapconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
 	return (wild)?
 		"select "
+		"	NULL, "
+		"	NULL, "
 		"	name, "
 		"	'TABLE', "
 		"	NULL "
@@ -578,6 +580,8 @@ const char *sapconnection::getTableListQuery(bool wild,
 		"	name":
 
 		"select "
+		"	NULL, "
+		"	NULL, "
 		"	name, "
 		"	'TABLE', "
 		"	NULL "

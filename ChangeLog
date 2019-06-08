@@ -36,6 +36,7 @@
 	fixed typemangling->tablemangling typo in postgresql connection -
 		tablemangling should work without typemangling now
 	fixed a '...\\''...' parsing bug
+	non-odbc connection modules now return odbc-compatible(ish) table lists
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

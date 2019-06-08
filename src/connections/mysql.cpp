@@ -671,6 +671,8 @@ const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 const char *mysqlconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
 	return (wild)?"select "
+			"	table_catalog, "
+			"	table_schema, "
 			"	table_name, "
 			"	'TABLE', "
 			"	NULL "
@@ -679,16 +681,26 @@ const char *mysqlconnection::getTableListQuery(bool wild,
 			"where "
 			"	table_type='BASE TABLE' "
 			"	and "
-			"	table_name like '%s'"
+			"	table_name like '%s' "
+			"order by "
+			"	table_catalog, "
+			"	table_schema, "
+			"	table_name"
 			:
 			"select "
+			"	table_catalog, "
+			"	table_schema, "
 			"	table_name, "
 			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	information_schema.tables "
 			"where "
-			"	table_type='BASE TABLE'";
+			"	table_type='BASE TABLE'"
+			"order by "
+			"	table_catalog, "
+			"	table_schema, "
+			"	table_name";
 }
 
 const char *mysqlconnection::getColumnListQuery(

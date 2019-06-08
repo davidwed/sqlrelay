@@ -565,6 +565,8 @@ const char *informixconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
 	return (wild)?
 		"select distinct "
+		"	dbname, "
+		"	owner, "
 		"	tabname, "
 		"	'TABLE', "
 		"	'' as extra "
@@ -577,9 +579,13 @@ const char *informixconnection::getTableListQuery(bool wild,
 		"	and "
 		"	tabtype in ('T','S','P','V') "
 		"order by "
+		"	dbname, "
+		"	owner, "
 		"	tabname":
 
 		"select distinct "
+		"	dbname, "
+		"	owner, "
 		"	tabname, "
 		"	'TABLE', "
 		"	'' as extra "
@@ -590,6 +596,8 @@ const char *informixconnection::getTableListQuery(bool wild,
 		"	and "
 		"	tabtype in ('T','S','P','V') "
 		"order by "
+		"	dbname, "
+		"	owner, "
 		"	tabname";
 }
 

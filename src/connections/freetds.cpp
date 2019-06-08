@@ -644,6 +644,8 @@ const char *freetdsconnection::getTableListQuery(bool wild,
 	if (sybasedb) {
 		return (wild)?
 			"select "
+			"	NULL, "
+			"	NULL, "
 			"	name, "
 			"	'TABLE', "
 			"	NULL "
@@ -659,6 +661,8 @@ const char *freetdsconnection::getTableListQuery(bool wild,
 			"	name":
 	
 			"select "
+			"	NULL, "
+			"	NULL, "
 			"	name, "
 			"	'TABLE', "
 			"	NULL "
@@ -673,6 +677,8 @@ const char *freetdsconnection::getTableListQuery(bool wild,
 	} else {
 		return (wild)?
 			"select "
+			"	table_catalog, "
+			"	table_schema, "
 			"	table_name, "
 			"	'TABLE', "
 			"	NULL "
@@ -681,15 +687,21 @@ const char *freetdsconnection::getTableListQuery(bool wild,
 			"where "
 			"	table_name like '%s' "
 			"order by "
+			"	table_catalog, "
+			"	table_schema, "
 			"	table_name":
 	
 			"select "
+			"	table_catalog, "
+			"	table_schema, "
 			"	table_name, "
 			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	information_schema.tables "
 			"order by "
+			"	table_catalog, "
+			"	table_schema, "
 			"	table_name";
 	}
 }

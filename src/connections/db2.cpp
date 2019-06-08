@@ -434,6 +434,8 @@ void db2connection::dbVersionSpecificTasks() {
 
 		gettablelistquery=
 			"select distinct "
+			"	NULL, "
+			"	tabschema, "
 			"	tabname, "
 			"	'TABLE', "
 			"	NULL "
@@ -448,10 +450,13 @@ void db2connection::dbVersionSpecificTasks() {
 			"	and "
 			"	tabname like '%s' "
 			"order by "
+			"	tabschema, "
 			"	tabname";
 
 		gettablelistquerywild=
 			"select distinct "
+			"	NULL, "
+			"	tabschema, "
 			"	tabname, "
 			"	'TABLE', "
 			"	NULL "
@@ -464,6 +469,7 @@ void db2connection::dbVersionSpecificTasks() {
 			"	and "
 			"	type in ('T','U','V','W') "
 			"order by "
+			"	tabschema, "
 			"	tabname";
 
 		dbhostnamequery=
@@ -475,6 +481,8 @@ void db2connection::dbVersionSpecificTasks() {
 
 		gettablelistquery=
 			"select distinct "
+			"	NULL, "
+			"	tabschema, "
 			"	tabname, "
 			"	'TABLE', "
 			"	NULL "
@@ -489,10 +497,13 @@ void db2connection::dbVersionSpecificTasks() {
 			"	and "
 			"	tabname like '%s' "
 			"order by "
+			"	tabschema, "
 			"	tabname";
 
 		gettablelistquerywild=
 			"select distinct "
+			"	NULL, "
+			"	tabschema, "
 			"	tabname, "
 			"	'TABLE', "
 			"	NULL "
@@ -505,6 +516,7 @@ void db2connection::dbVersionSpecificTasks() {
 			"	and "
 			"	type in ('T','U','V','W') "
 			"order by "
+			"	tabschema, "
 			"	tabname";
 
 		// there is no obvious way to get this prior to 8.0

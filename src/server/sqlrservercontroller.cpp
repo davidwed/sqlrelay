@@ -5206,7 +5206,11 @@ void sqlrservercontroller::buildColumnMaps() {
 	// Native/MySQL getTableList:
 	//
 	// Tables_in_xxx
+#if 0
 	pvt->_mysqltablescolumnmap.setValue(0,0);
+#else
+pvt->_mysqltablescolumnmap.setValue(0,2);
+#endif
 
 	// Native/MySQL getColumnList:
 	//
@@ -5245,6 +5249,7 @@ void sqlrservercontroller::buildColumnMaps() {
 
 	// ODBC getTableList:
 	//
+#if 0
 	// TABLE_CAT -> NULL
 	pvt->_odbctablescolumnmap.setValue(0,2);
 	// TABLE_SCHEM -> NULL
@@ -5255,6 +5260,13 @@ void sqlrservercontroller::buildColumnMaps() {
 	pvt->_odbctablescolumnmap.setValue(3,1);
 	// REMARKS -> NULL
 	pvt->_odbctablescolumnmap.setValue(4,2);
+#else
+pvt->_odbctablescolumnmap.setValue(0,0);
+pvt->_odbctablescolumnmap.setValue(1,1);
+pvt->_odbctablescolumnmap.setValue(2,2);
+pvt->_odbctablescolumnmap.setValue(3,3);
+pvt->_odbctablescolumnmap.setValue(4,4);
+#endif
 
 	// ODBC getColumnList:
 	//
@@ -9018,7 +9030,12 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 					&(pvt->_nulls));
 
 	// get the column count
-	uint32_t	colcount=colCount(cursor);
+	// NOTE: Don't just set colcount=colCount(cursor) here.  If a column
+	// map is being used, then it returns the column count of the map, which
+	// could be smaller than the actual column count.  We need to be sure we
+	// fetch all columns, so we need to use the raw column count here.
+	uint32_t	colcount=(cursor->getColumnInfoIsValid())?
+						cursor->colCount():0;
 
 	// for timings...
 	datetime	dt;

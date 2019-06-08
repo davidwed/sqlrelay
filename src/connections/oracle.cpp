@@ -1194,6 +1194,8 @@ const char *oracleconnection::getTableListQuery(bool wild,
 	if (supportssyscontext) {
 		return (wild)?
 			"select "
+			"	NULL, "
+			"	owner, "
 			"	table_name, "
 			"	'TABLE', "
 			"	NULL "
@@ -1204,9 +1206,12 @@ const char *oracleconnection::getTableListQuery(bool wild,
 			"	and "
 			"	owner=sys_context('userenv','current_schema') "
 			"order by "
+			"	owner, "
 			"	table_name":
 
 			"select "
+			"	NULL, "
+			"	owner, "
 			"	table_name, "
 			"	'TABLE', "
 			"	NULL "
@@ -1215,10 +1220,13 @@ const char *oracleconnection::getTableListQuery(bool wild,
 			"where "
 			"	owner=sys_context('userenv','current_schema') "
 			"order by "
+			"	owner, "
 			"	table_name";
 	} else {
 		return (wild)?
 			"select "
+			"	NULL, "
+			"	owner, "
 			"	table_name, "
 			"	'TABLE', "
 			"	NULL "
@@ -1227,15 +1235,19 @@ const char *oracleconnection::getTableListQuery(bool wild,
 			"where "
 			"	table_name like upper('%s') "
 			"order by "
+			"	owner, "
 			"	table_name":
 
 			"select "
+			"	NULL, "
+			"	owner, "
 			"	table_name, "
 			"	'TABLE', "
 			"	NULL "
 			"from "
 			"	user_tables "
 			"order by "
+			"	owner, "
 			"	table_name";
 	}
 }
