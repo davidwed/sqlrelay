@@ -958,7 +958,7 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 	// run through the querybuffer...
 	const char	*ptr=query;
 	const char	*endptr=ptr+querylen;
-	const char	*prevptr="\0";
+	const char	prev='\0';
 	do {
 
 		// if we're in the query...
@@ -979,7 +979,7 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			newquery->append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			prev=*ptr;
 			ptr++;
 			continue;
 		}
@@ -991,7 +991,7 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			// then we're back in the query
 			// (or we're in between one of these: '...''...'
 			// which is functionally the same)
-			if (*ptr=='\'' && *prevptr!='\\') {
+			if (*ptr=='\'' && prev!='\\') {
 				parsestate=IN_QUERY;
 			}
 
@@ -999,7 +999,7 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			newquery->append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			prev=*ptr;
 			ptr++;
 			continue;
 		}
@@ -1047,7 +1047,7 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			} else {
 
 				// move on
-				prevptr=ptr;
+				prev=*ptr;
 				ptr++;
 			}
 			continue;

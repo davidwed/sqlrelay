@@ -694,7 +694,11 @@ bool sqlrtrigger_replay::isMultiInsert(const char *ptr, const char *end) {
 		}
 
 		// keep going
-		prevc=*c;
+		if (prevc=='\\' && *c=='\\') {
+			prevc='\0';
+		} else {
+			prevc=*c;
+		}
 		c++;
 	}
 	
