@@ -548,38 +548,8 @@ const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
 
 const char *postgresqlconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
-	return (wild)?
-		"select "
-		"	table_catalog, "
-		"	table_schema, "
-		"	table_name, "
-		"	'TABLE', "
-		"	NULL "
-		"from "
-		"	information_schema.tables "
-		"where "
-		"	table_schema = 'public' "
-		"	and "
-		"	table_name like '%s' "
-		"order by "
-		"	table_catalog, "
-		"	table_schema, "
-		"	table_name":
-
-		"select "
-		"	table_catalog, "
-		"	table_schema, "
-		"	table_name, "
-		"	'TABLE', "
-		"	NULL "
-		"from "
-		"	information_schema.tables "
-		"where "
-		"	table_schema = 'public' "
-		"order by "
-		"	table_catalog, "
-		"	table_schema, "
-		"	table_name";
+	return sqlrserverconnection::getTableListQuery(wild,objecttypes,
+					" and table_schema = 'public' ");
 }
 
 const char *postgresqlconnection::getColumnListQuery(

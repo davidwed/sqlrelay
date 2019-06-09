@@ -212,8 +212,6 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*bindFormat();
 #endif
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild,
-						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
@@ -666,41 +664,6 @@ const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 			"	NULL "
 			"from "
 			"	information_schema.schemata";
-}
-
-const char *mysqlconnection::getTableListQuery(bool wild,
-						uint16_t objecttypes) {
-	return (wild)?"select "
-			"	table_catalog, "
-			"	table_schema, "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
-			"from "
-			"	information_schema.tables "
-			"where "
-			"	table_type='BASE TABLE' "
-			"	and "
-			"	table_name like '%s' "
-			"order by "
-			"	table_catalog, "
-			"	table_schema, "
-			"	table_name"
-			:
-			"select "
-			"	table_catalog, "
-			"	table_schema, "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
-			"from "
-			"	information_schema.tables "
-			"where "
-			"	table_type='BASE TABLE'"
-			"order by "
-			"	table_catalog, "
-			"	table_schema, "
-			"	table_name";
 }
 
 const char *mysqlconnection::getColumnListQuery(

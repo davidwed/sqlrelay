@@ -675,34 +675,8 @@ const char *freetdsconnection::getTableListQuery(bool wild,
 			"order by "
 			"	name";
 	} else {
-		return (wild)?
-			"select "
-			"	table_catalog, "
-			"	table_schema, "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
-			"from "
-			"	information_schema.tables "
-			"where "
-			"	table_name like '%s' "
-			"order by "
-			"	table_catalog, "
-			"	table_schema, "
-			"	table_name":
-	
-			"select "
-			"	table_catalog, "
-			"	table_schema, "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
-			"from "
-			"	information_schema.tables "
-			"order by "
-			"	table_catalog, "
-			"	table_schema, "
-			"	table_name";
+		return sqlrserverconnection::getTableListQuery(
+						wild,objecttypes);
 	}
 }
 

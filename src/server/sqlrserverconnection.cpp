@@ -28,6 +28,8 @@ class sqlrserverconnectionprivate {
 		uint32_t	_dbhostiploop;
 
 		bool		_detachbeforelogin;
+
+		stringbuffer	_tablelistquery;
 };
 
 sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
@@ -805,7 +807,65 @@ const char *sqlrserverconnection::getSchemaListQuery(bool wild) {
 
 const char *sqlrserverconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
-	return "select 1";
+	return getTableListQuery(wild,objecttypes,NULL);
+
+}
+
+const char *sqlrserverconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes,
+						const char *extrawhere) {
+
+	stringbuffer	otypes;
+	otypes.append("	(");
+	if (objecttypes&DB_OBJECT_TABLE) {
+		otypes.append("	table_type = 'BASE TABLE' ");
+	}
+	if (objecttypes&DB_OBJECT_VIEW) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	table_type = 'VIEW' ");
+	}
+	if (objecttypes&DB_OBJECT_ALIAS) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	table_type = 'ALIAS' ");
+	}
+	if (objecttypes&DB_OBJECT_SYNONYM) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	table_type = 'SYNONYM' ");
+	}
+	otypes.append(") ");
+
+	pvt->_tablelistquery.clear();
+	pvt->_tablelistquery.append("select ");
+	pvt->_tablelistquery.append("	table_catalog as table_cat, ");
+	pvt->_tablelistquery.append("	table_schema as table_schem, ");
+	pvt->_tablelistquery.append("	table_name, ");
+	pvt->_tablelistquery.append("	case ");
+	pvt->_tablelistquery.append("		when table_type = ");
+	pvt->_tablelistquery.append("'BASE TABLE' then 'TABLE' ");
+	pvt->_tablelistquery.append("		else table_type ");
+	pvt->_tablelistquery.append("	end as table_type, ");
+	pvt->_tablelistquery.append("	NULL as remarks ");
+	pvt->_tablelistquery.append("from ");
+	pvt->_tablelistquery.append("	information_schema.tables ");
+	pvt->_tablelistquery.append("where ");
+	if (wild) {
+		pvt->_tablelistquery.append("	table_name like '%s' ");
+		pvt->_tablelistquery.append("	and ");
+	}
+	pvt->_tablelistquery.append(otypes.getString());
+	pvt->_tablelistquery.append(extrawhere);
+	pvt->_tablelistquery.append("order by ");
+	pvt->_tablelistquery.append("	table_cat, ");
+	pvt->_tablelistquery.append("	table_schem, ");
+	pvt->_tablelistquery.append("	table_name");
+
+	return pvt->_tablelistquery.getString();
 }
 
 const char *sqlrserverconnection::getTableTypeListQuery(bool wild) {

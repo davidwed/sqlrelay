@@ -929,6 +929,9 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual const char	*getSchemaListQuery(bool wild);
 		virtual const char	*getTableListQuery(bool wild,
 						uint16_t objecttypes);
+		virtual const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes,
+						const char *extrawhere);
 		virtual const char	*getTableTypeListQuery(bool wild);
 		virtual const char	*getGlobalTempTableListQuery();
 		virtual const char	*getColumnListQuery(
