@@ -37,6 +37,7 @@
 		tablemangling should work without typemangling now
 	fixed a '...\\''...' parsing bug
 	non-odbc connection modules now return odbc-compatible(ish) table lists
+	client info is no longer reset during endSession
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

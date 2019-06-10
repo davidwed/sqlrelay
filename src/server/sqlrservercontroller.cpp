@@ -5543,8 +5543,11 @@ void sqlrservercontroller::endSession() {
 	// set isolation level
 	pvt->_conn->setIsolationLevel(pvt->_isolationlevel);
 
+	// NOTE: For debugging, it's nice to know what the most recent
+	// clientinfo was, so lets not reset this.  Hopefully not resetting it
+	// doesn't break something.
 	// reset the client info
-	setClientInfo("",0);
+	//setClientInfo("",0);
 
 	// reset protocol modules
 	if (pvt->_sqlrpr) {
