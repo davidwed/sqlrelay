@@ -644,11 +644,12 @@ const char *freetdsconnection::getTableListQuery(bool wild,
 	if (sybasedb) {
 		return (wild)?
 			"select "
-			"	NULL, "
-			"	NULL, "
-			"	name, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	NULL as table_schem, "
+			"	name as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	sysobjects "
 			"where "

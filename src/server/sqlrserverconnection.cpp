@@ -850,7 +850,8 @@ const char *sqlrserverconnection::getTableListQuery(bool wild,
 	pvt->_tablelistquery.append("'BASE TABLE' then 'TABLE' ");
 	pvt->_tablelistquery.append("		else table_type ");
 	pvt->_tablelistquery.append("	end as table_type, ");
-	pvt->_tablelistquery.append("	NULL as remarks ");
+	pvt->_tablelistquery.append("	NULL as remarks, ");
+	pvt->_tablelistquery.append("	NULL as extra ");
 	pvt->_tablelistquery.append("from ");
 	pvt->_tablelistquery.append("	information_schema.tables ");
 	pvt->_tablelistquery.append("where ");

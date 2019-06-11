@@ -565,10 +565,11 @@ const char *informixconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
 	return (wild)?
 		"select distinct "
-		"	dbname, "
-		"	owner, "
-		"	tabname, "
-		"	'TABLE', "
+		"	dbname as table_cat, "
+		"	owner as table_schem, "
+		"	tabname as table_name, "
+		"	'TABLE' as table_type, "
+		"	'' as remarks, "
 		"	'' as extra "
 		"from "
 		"	systables "
@@ -584,10 +585,11 @@ const char *informixconnection::getTableListQuery(bool wild,
 		"	tabname":
 
 		"select distinct "
-		"	dbname, "
-		"	owner, "
-		"	tabname, "
-		"	'TABLE', "
+		"	dbname as table_cat, "
+		"	owner as table_schem, "
+		"	tabname as table_name, "
+		"	'TABLE' as table_type, "
+		"	'' as remarks, "
 		"	'' as extra "
 		"from "
 		"	systables "
