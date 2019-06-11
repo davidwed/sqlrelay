@@ -554,18 +554,60 @@ const char *postgresqlconnection::getTableListQuery(bool wild,
 
 const char *postgresqlconnection::getColumnListQuery(
 					const char *table, bool wild) {
+
+// table_cat
+// table_schem
+// table_name
+// column_name
+// data_type - driver-specific type (int)
+// type_name
+// column_size - char/binary: number of characters
+// 		datetime/interval: chars required to display the string
+// 		numeric: total digits or bits depending on num_prec_radix
+// buffer_length - length in bytes of data transferred during fetch
+// decimal_digits - scale
+// num_prec_radix - precision radix - 10 (decimal) or 2 (binary) for numeric
+// 			types, otherwise NULL
+// nullable - int (sql_no_nulls, sql_nullable, sql_nullable_unkown)
+// remarks - null
+// column_def - default value
+// sql_data_type - type (int)
+// sql_datetime_sub - subtype (int) for datetime/interval, otherwise null
+// char_octet_length - max len in bytes for char/binary, otherwise null
+// ordinal_position - 1-based
+// is_nullable - YES/NO
+
 	return (wild)?
 		"select "
+		"	table_catalog as table_cat, "
+		"	table_schema as table_schem, "
+		"	table_name as table_name, "
 		"	column_name, "
-		"	data_type, "
-		"	character_maximum_length, "
-		"	numeric_precision, "
-		"	numeric_scale, "
-		"	is_nullable, "
-		"	'' as key, "
+		"	null as data_type, " // case this...
+		"	data_type as type_name, "
+		"	case "
+		"		when numeric_scale is null "
+		"			then character_maximum_length "
+		"		else numeric_precision "
+		"	end as column_size, "
+		"	null as buffer_length, "
+		"	numeric_scale as decimal_digits, "
+		"	numeric_precision_radix as num_prec_radix, "
+		"	case "
+		"		when is_nullable = 'NO' "
+		"			then 0 "
+		"		when is_nullable = 'YES' "
+		"			then 1 "
+		"		else 2 "
+		"	end as nullable, "
+		"	null as remarks, "
 		"	column_default, "
-		"	'' as extra, "
-		"	NULL "
+		"	null as sql_data_type, "
+		"	null as sql_datetime_sub, "
+		"	character_octet_length as char_octet_length, "
+		"	ordinal_position, "
+		"	is_nullable, "
+		"	null as extra "
 		"from "
 		"	information_schema.columns "
 		"where "
@@ -576,16 +618,35 @@ const char *postgresqlconnection::getColumnListQuery(
 		"	ordinal_position":
 
 		"select "
+		"	table_catalog as table_cat, "
+		"	table_schema as table_schem, "
+		"	table_name as table_name, "
 		"	column_name, "
-		"	data_type, "
-		"	character_maximum_length, "
-		"	numeric_precision, "
-		"	numeric_scale, "
-		"	is_nullable, "
-		"	'' as key, "
+		"	null as data_type, " // case this...
+		"	data_type as type_name, "
+		"	case "
+		"		when numeric_scale is null "
+		"			then character_maximum_length "
+		"		else numeric_precision "
+		"	end as column_size, "
+		"	null as buffer_length, "
+		"	numeric_scale as decimal_digits, "
+		"	numeric_precision_radix as num_prec_radix, "
+		"	case "
+		"		when is_nullable = 'NO' "
+		"			then 0 "
+		"		when is_nullable = 'YES' "
+		"			then 1 "
+		"		else 2 "
+		"	end as nullable, "
+		"	null as remarks, "
 		"	column_default, "
-		"	'' as extra, "
-		"	NULL "
+		"	null as sql_data_type, "
+		"	null as sql_datetime_sub, "
+		"	character_octet_length as char_octet_length, "
+		"	ordinal_position, "
+		"	is_nullable, "
+		"	null as extra "
 		"from "
 		"	information_schema.columns "
 		"where "

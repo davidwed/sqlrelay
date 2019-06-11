@@ -435,8 +435,6 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_bulkquerylen=0;
 	pvt->_bulkquery=NULL;
 	pvt->_bulkdataformat=NULL;
-
-	buildColumnMaps();
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -550,6 +548,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		return false;
 	}
 
+	buildColumnMaps();
 	setUserAndGroup();
 
 	// update various configurable parameters
@@ -5203,16 +5202,33 @@ void sqlrservercontroller::buildColumnMaps() {
 	// Database
 	pvt->_mysqldatabasescolumnmap.setValue(0,0);
 
-	// Native/MySQL getTableList:
+	// MySQL getTableList:
 	//
-	// Tables_in_xxx
-#if 0
-	pvt->_mysqltablescolumnmap.setValue(0,0);
-#else
-pvt->_mysqltablescolumnmap.setValue(0,2);
-#endif
+	// Tables_in_xxx -> TABLE_NAME
+	pvt->_mysqltablescolumnmap.setValue(0,2);
 
 	// Native/MySQL getColumnList:
+if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
+	//
+	// column_name
+	pvt->_mysqlcolumnscolumnmap.setValue(0,3);
+	// data_type
+	pvt->_mysqlcolumnscolumnmap.setValue(1,5);
+	// character_maximum_length
+	pvt->_mysqlcolumnscolumnmap.setValue(2,6);
+	// numeric_precision
+	pvt->_mysqlcolumnscolumnmap.setValue(3,6);
+	// numeric_scale
+	pvt->_mysqlcolumnscolumnmap.setValue(4,8);
+	// is_nullable
+	pvt->_mysqlcolumnscolumnmap.setValue(5,10);
+	// column_key
+	pvt->_mysqlcolumnscolumnmap.setValue(6,18);
+	// column_default
+	pvt->_mysqlcolumnscolumnmap.setValue(7,12);
+	// extra
+	pvt->_mysqlcolumnscolumnmap.setValue(8,18);
+} else {
 	//
 	// column_name
 	pvt->_mysqlcolumnscolumnmap.setValue(0,0);
@@ -5232,9 +5248,10 @@ pvt->_mysqltablescolumnmap.setValue(0,2);
 	pvt->_mysqlcolumnscolumnmap.setValue(7,7);
 	// extra
 	pvt->_mysqlcolumnscolumnmap.setValue(8,8);
+}
 
 
-	// ODBC getDatabaseList:
+	// Native/ODBC getDatabaseList:
 	//
 	// TABLE_CAT -> Database
 	pvt->_odbcdatabasescolumnmap.setValue(0,0);
@@ -5248,28 +5265,57 @@ pvt->_mysqltablescolumnmap.setValue(0,2);
 	pvt->_odbcdatabasescolumnmap.setValue(4,1);
 
 	// ODBC getTableList:
-	//
-#if 0
-	// TABLE_CAT -> NULL
-	pvt->_odbctablescolumnmap.setValue(0,2);
-	// TABLE_SCHEM -> NULL
-	pvt->_odbctablescolumnmap.setValue(1,2);
-	// TABLE_NAME -> Tables_in_xxx
-	pvt->_odbctablescolumnmap.setValue(2,0);
-	// TABLE_TYPE -> 'TABLE'
-	pvt->_odbctablescolumnmap.setValue(3,1);
-	// REMARKS -> NULL
-	pvt->_odbctablescolumnmap.setValue(4,2);
-#else
-pvt->_odbctablescolumnmap.setValue(0,0);
-pvt->_odbctablescolumnmap.setValue(1,1);
-pvt->_odbctablescolumnmap.setValue(2,2);
-pvt->_odbctablescolumnmap.setValue(3,3);
-pvt->_odbctablescolumnmap.setValue(4,4);
-#endif
+	// TABLE_CAT
+	pvt->_odbctablescolumnmap.setValue(0,0);
+	// TABLE_SCHEM
+	pvt->_odbctablescolumnmap.setValue(1,1);
+	// TABLE_NAME
+	pvt->_odbctablescolumnmap.setValue(2,2);
+	// TABLE_TYPE
+	pvt->_odbctablescolumnmap.setValue(3,3);
+	// REMARKS
+	pvt->_odbctablescolumnmap.setValue(4,4);
 
 	// ODBC getColumnList:
 	//
+if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
+	// TABLE_CAT
+	pvt->_odbccolumnscolumnmap.setValue(0,0);
+	// TABLE_SCHEM
+	pvt->_odbccolumnscolumnmap.setValue(1,1);
+	// TABLE_NAME
+	pvt->_odbccolumnscolumnmap.setValue(2,2);
+	// COLUMN_NAME
+	pvt->_odbccolumnscolumnmap.setValue(3,3);
+	// DATA_TYPE (numeric)
+	pvt->_odbccolumnscolumnmap.setValue(4,4);
+	// TYPE_NAME
+	pvt->_odbccolumnscolumnmap.setValue(5,5);
+	// COLUMN_SIZE
+	pvt->_odbccolumnscolumnmap.setValue(6,6);
+	// BUFFER_LEGTH
+	pvt->_odbccolumnscolumnmap.setValue(7,7);
+	// DECIMAL_DIGITS - smallint - scale
+	pvt->_odbccolumnscolumnmap.setValue(8,8);
+	// NUM_PREC_RADIX - smallint - precision
+	pvt->_odbccolumnscolumnmap.setValue(9,9);
+	// NULLABLE
+	pvt->_odbccolumnscolumnmap.setValue(10,10);
+	// REMARKS
+	pvt->_odbccolumnscolumnmap.setValue(11,11);
+	// COLUMN_DEF
+	pvt->_odbccolumnscolumnmap.setValue(12,12);
+	// SQL_DATA_TYPE
+	pvt->_odbccolumnscolumnmap.setValue(13,13);
+	// SQL_DATETIME_SUB
+	pvt->_odbccolumnscolumnmap.setValue(14,14);
+	// CHAR_OCTET_LENGTH
+	pvt->_odbccolumnscolumnmap.setValue(15,15);
+	// ORDINAL_POSITION
+	pvt->_odbccolumnscolumnmap.setValue(16,16);
+	// IS_NULLABLE
+	pvt->_odbccolumnscolumnmap.setValue(17,17);
+} else {
 	// TABLE_CAT -> NULL
 	pvt->_odbccolumnscolumnmap.setValue(0,9);
 	// TABLE_SCHEM -> NULL
@@ -5306,6 +5352,7 @@ pvt->_odbctablescolumnmap.setValue(4,4);
 	pvt->_odbccolumnscolumnmap.setValue(16,9);
 	// IS_NULLABLE -> NULL
 	pvt->_odbccolumnscolumnmap.setValue(17,5);
+}
 }
 
 uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
