@@ -3986,6 +3986,15 @@ bool sqlrprotocol_mysql::buildListQuery(sqlrservercursor *cursor,
 						const char *wild,
 						const char *table) {
 
+	// If the table was given like catalog.schema.table, then just
+	// get the table.
+	const char	*realtable=charstring::findLast(table,".");
+	if (realtable) {
+		realtable++;
+	} else {
+		realtable=table;
+	}
+
 	// clean up buffers to avoid SQL injection
 	stringbuffer	wildbuf;
 	escapeParameter(&wildbuf,wild);

@@ -4175,11 +4175,20 @@ bool sqlrprotocol_sqlrclient::buildListQuery(sqlrservercursor *cursor,
 						const char *object) {
 	debugFunction();
 
+	// If the object was given like catalog.schema.object, then just
+	// get the object.
+	const char	*realobject=charstring::findLast(object,".");
+	if (realobject) {
+		realobject++;
+	} else {
+		realobject=object;
+	}
+
 	// clean up buffers to avoid SQL injection
 	stringbuffer	wildbuf;
 	escapeParameter(&wildbuf,wild);
 	stringbuffer	objectbuf;
-	escapeParameter(&objectbuf,object);
+	escapeParameter(&objectbuf,realobject);
 
 	// bounds checking
 	cont->setQueryLength(cursor,charstring::length(query)+
