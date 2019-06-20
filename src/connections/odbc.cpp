@@ -686,8 +686,10 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		#ifdef HAVE_SQLCONNECTW
 		if (unicode) {
 			char	*dsnucs=conv_to_ucs(dsnasc);
-			char	*userucs=conv_to_ucs(userasc);
-			char	*passworducs=conv_to_ucs(passwordasc);
+			char	*userucs=
+				(userasc)?conv_to_ucs(userasc):NULL;
+			char	*passworducs=
+				(passwordasc)?conv_to_ucs(passwordasc):NULL;
 			erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
 					(SQLWCHAR *)userucs,SQL_NTS,
 					(SQLWCHAR *)passworducs,SQL_NTS);

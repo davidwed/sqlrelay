@@ -39,6 +39,7 @@
 	non-odbc connection modules now return odbc-compatible(ish) table lists
 	client info is no longer reset during endSession
 	fixed a bug that could cause sqlite "show tables like '...'" to crash
+	fixed odbc unicode null user/password bug
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
