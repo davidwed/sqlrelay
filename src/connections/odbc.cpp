@@ -264,6 +264,8 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		bool		columninfoisvalidafterprepare;
 
 		odbcconnection	*odbcconn;
+
+		char	columnnamescratch[4096];
 };
 
 class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
@@ -3174,8 +3176,27 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
 				}
+				// Some databases (Hive) like to return
+				// columns as table.column.
+				// If the column name was table.column then
+				// split it and override the table name.
+				char	*dot=charstring::findFirst(
+							column[i].name,'.');
+				if (dot) {
+					char	*col=dot+1;
+					*dot='\0';
+					charstring::copy(column[i].table,
+								column[i].name);
+					charstring::copy(columnnamescratch,col);
+					charstring::copy(column[i].name,
+							columnnamescratch);
+					column[i].namelength=
+						charstring::length(
+							column[i].name);
+				}
 				column[i].tablelength=
 					charstring::length(column[i].table);
+
 #else
 				// column name
 				erg=SQLColAttributes(stmt,i+1,
@@ -3285,6 +3306,24 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
+				}
+				// Some databases (Hive) like to return
+				// columns as table.column.
+				// If the column name was table.column then
+				// split it and override the table name.
+				char	*dot=charstring::findFirst(
+							column[i].name,'.');
+				if (dot) {
+					char	*col=dot+1;
+					*dot='\0';
+					charstring::copy(column[i].table,
+								column[i].name);
+					charstring::copy(columnnamescratch,col);
+					charstring::copy(column[i].name,
+							columnnamescratch);
+					column[i].namelength=
+						charstring::length(
+							column[i].name);
 				}
 				column[i].tablelength=
 					charstring::length(column[i].table);
