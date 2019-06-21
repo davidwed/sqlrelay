@@ -4371,11 +4371,11 @@ http://www.gnu.org/software/src-highlite -->
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;routers&gt;</font></b>
 			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"clientinfolist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">".*oracle.*"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">".*orcl.*"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;clientinfo</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">".*oracle.*"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;clientinfo</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">".*orcl.*"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;/router&gt;</font></b>
 			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"clientinfolist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">"*"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;clientinfo</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"*"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;/router&gt;</font></b>
 		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
