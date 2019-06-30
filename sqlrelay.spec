@@ -234,7 +234,7 @@ Requires: tcl(abi) = 8.5
 TCL bindings for the SQL Relay client API.
 
 
-%if 0%{?fedora}
+#%if 0%{?fedora}
 
 %package -n erlang-%{name}
 License: CC-BY
@@ -266,7 +266,7 @@ BuildRequires: nodejs-packaging, node-gyp, nodejs-devel
 %description -n nodejs-%{name}
 Nodejs bindings for the SQL Relay client API.
 
-%endif
+#%endif
 
 
 %package dropin-mysql
@@ -320,7 +320,7 @@ BuildRequires: sqlite-devel
 SQLite back-end module for SQL Relay.
 
 
-%if 0%{?fedora}
+#%if 0%{?fedora}
 
 %package freetds
 License: GPLv2 with exceptions
@@ -330,7 +330,7 @@ BuildRequires: freetds-devel
 %description freetds
 FreeTDS back-end module for SQL Relay.
 
-%endif
+#%endif
 
 
 %package sap
@@ -358,7 +358,7 @@ Summary: IBM DB2 back-end module for SQL Relay
 IBM DB2 back-end module for SQL Relay.
 
 
-%if 0%{?fedora}
+#%if 0%{?fedora}
 
 %package firebird
 License: GPLv2 with exceptions
@@ -376,7 +376,7 @@ BuildRequires: mdbtools-devel
 %description mdbtools
 MDB Tools back-end module for SQL Relay.
 
-%endif
+#%endif
 
 
 %package informix
@@ -449,14 +449,14 @@ mkdir -p %{buildroot}%{tcl_sitearch}
 mv %{buildroot}%{_libdir}/%{name} %{buildroot}%{tcl_sitearch}/%{name}
 
 
-%if 0%{?fedora}
+#%if 0%{?fedora}
 
 # move mono assembly to (libdir)/(name)
 mkdir -p %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_libdir}/SQLRClient.dll %{buildroot}%{_libdir}/%{name}
 mv %{buildroot}%{_libdir}/SQLRClient.dll.config %{buildroot}%{_libdir}/%{name}
 
-%endif
+#%endif
 
 
 # .move jar files to (_javadir)
@@ -728,7 +728,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{tcl_sitearch}/%{name}
 
 
-%if 0%{?fedora}
+#%if 0%{?fedora}
 
 %files -n erlang-%{name}
 %{_libdir}/erlang/lib/%{name}-%{version}
@@ -741,7 +741,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %files -n nodejs-%{name}
 %{nodejs_sitearch}/%{name}
 
-%endif
+#%endif
 
 
 %files dropin-mysql
@@ -767,13 +767,13 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_sqlite*
 
 
-%if 0%{?fedora}
+#%if 0%{?fedora}
 
 %files freetds
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_freetds*
 
-%endif
+#%endif
 
 
 %files sap
@@ -789,7 +789,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_db2*
 
 
-%if 0%{?fedora}
+#%if 0%{?fedora}
 
 %files firebird
 %dir %{_libexecdir}/%{name}
@@ -799,7 +799,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_mdbtools*
 
-%endif
+#%endif
 
 
 %files informix
@@ -820,10 +820,12 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Tue Apr 02 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
+* Fri Jun 28 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
 - Updated to version 1.6.0.
 - Replaced python-* names with python2-*.
 - Updated to build python 3 packages for rhel > 7.
+- Updated to build Nodejs and Erlang packages on RHEL.
+- Updated to build Firebird, FreeTDS, and MDB Tools modules on RHEL.
 
 * Thu Feb 21 2019 David Muse <david.muse@firstworks.com> - 1.5.0-1
 - Replaced empty-directory-removing postun's with dir's.
