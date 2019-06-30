@@ -40,6 +40,7 @@
 	client info is no longer reset during endSession
 	fixed a bug that could cause sqlite "show tables like '...'" to crash
 	fixed odbc unicode null user/password bug
+	fixed PyString_AsString for python 3.<3
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now
