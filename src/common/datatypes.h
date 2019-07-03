@@ -644,10 +644,7 @@ static bool isBlobTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"GEOMETRY") ||
 		!charstring::compareIgnoringCase(type,"SDO_GEOMETRY") ||
 		!charstring::compareIgnoringCase(type,"NTEXT") ||
-		// FIXME: XML types are kind-of also LOBs, but we can't
-		// (currently) handle them as such.  See comments in the odbc
-		// connection module.
-		//!charstring::compareIgnoringCase(type,"XML") ||
+		!charstring::compareIgnoringCase(type,"XML") ||
 		!charstring::compareIgnoringCase(type,"GRAPHIC") ||
 		!charstring::compareIgnoringCase(type,"VARGRAPHIC") ||
 		!charstring::compareIgnoringCase(type,"LONGVARGRAPHIC") ||

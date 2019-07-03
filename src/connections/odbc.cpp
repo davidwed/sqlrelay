@@ -381,6 +381,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		uint32_t	maxallowedvarcharbindlength;
 		uint32_t	maxvarcharbindlength;
 		SQLINTEGER	*columninfonotvalidyeterror;
+		bool		convertdatetobinary;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -755,6 +756,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	maxallowedvarcharbindlength=0;
 	maxvarcharbindlength=0;
 	columninfonotvalidyeterror=NULL;
+	convertdatetobinary=true;
 
 	// override some default params based on the db-type
 	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
@@ -828,6 +830,10 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		columninfonotvalidyeterror[20]=11529;
 		columninfonotvalidyeterror[21]=11530;
 		columninfonotvalidyeterror[22]=0;
+
+		// SQL Server doesn't like for you to convert SQL_TYPE_DATE
+		// to SQL_C_BINARY
+		convertdatetobinary=false;
 	}
 	
 	return true;
@@ -3359,7 +3365,8 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 							field[i],maxfieldlength,
 							&(indicator[i]));
 				} else if (column[i].type==SQL_TYPE_TIMESTAMP ||
-						column[i].type==SQL_TYPE_DATE) {
+					(odbcconn->convertdatetobinary &&
+					column[i].type==SQL_TYPE_DATE)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 							field[i],maxfieldlength,
 							&(indicator[i]));
