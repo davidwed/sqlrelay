@@ -8,6 +8,7 @@
 	$user="test";
 	$password="test";
 	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=1";
+	#$dsn = "odbc:dsn=mssqlodbc;uid=testuser;pwd=testpassword";
 
 	$dbh=new PDO($dsn,$user,$password);
 	$stmt=$dbh->query("select ".
@@ -20,9 +21,13 @@
 	$result=$stmt->fetch(PDO::FETCH_NUM);
 	echo("$result[0]\n");
 	echo("$result[1]\n");
-	echo(stream_get_contents($result[2])."\n");
-	echo(stream_get_contents($result[3])."\n");
-	echo(stream_get_contents($result[4])."\n");
-	echo(stream_get_contents($result[5])."\n");
+	echo("$result[2]\n");
+	echo("$result[3]\n");
+	echo("$result[4]\n");
+	echo("$result[5]\n");
+	#echo(stream_get_contents($result[2])."\n");
+	#echo(stream_get_contents($result[3])."\n");
+	#echo(stream_get_contents($result[4])."\n");
+	#echo(stream_get_contents($result[5])."\n");
 	echo("\n");		
 ?>
