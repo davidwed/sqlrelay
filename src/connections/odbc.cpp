@@ -215,6 +215,12 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 
 		bool		columnInfoIsValidAfterPrepare();
 
+#if (ODBCVER >= 0x0300) && defined(SQLCOLATTRIBUTE_SQLLEN)
+		bool		isLob(SQLLEN type);
+#else
+		bool		isLob(SQLINTEGER type);
+#endif
+
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
@@ -3357,15 +3363,14 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 							field[i],maxfieldlength,
 							&(indicator[i]));
-				} else {
+				} else if (!isLob(column[i].type)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 							field[i],maxfieldlength,
 							&(indicator[i]));
 				}
 			} else {
 			#endif
-				if (column[i].type!=SQL_LONGVARCHAR &&
-					column[i].type!=SQL_LONGVARBINARY) {
+				if (!isLob(column[i].type)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 							field[i],maxfieldlength,
 							&(indicator[i]));
@@ -3609,8 +3614,7 @@ void odbccursor::getField(uint32_t col,
 	}
 
 	// handle lobs
-	if (column[col].type==SQL_LONGVARCHAR ||
-		column[col].type==SQL_LONGVARBINARY) {
+	if (isLob(column[col].type)) {
 		*blob=true;
 		return;
 	}
@@ -3628,6 +3632,13 @@ bool odbccursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 	SQLCHAR	buffer[1];
 	erg=SQLGetData(stmt,col+1,SQL_C_BINARY,buffer,0,&(loblength[col]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+
+	// FIXME: SQL Server XML types reliably return SQL_NO_TOTAL, so for now
+	// we aren't handling them as LOBs.  Is there some other way we can
+	// determine the length?
+	if (loblength[col]==SQL_NO_TOTAL) {
 		return false;
 	}
 
@@ -3740,6 +3751,20 @@ void odbccursor::closeResultSet() {
 
 bool odbccursor::columnInfoIsValidAfterPrepare() {
 	return columninfoisvalidafterprepare;
+}
+
+#if (ODBCVER >= 0x0300) && defined(SQLCOLATTRIBUTE_SQLLEN)
+bool odbccursor::isLob(SQLLEN type) {
+#else
+bool odbccursor::isLob(SQLINTEGER type) {
+#endif
+	// FIXME: -152 (SQL Server XML) types are kind-of also LOBs, but
+	// attempts to get their lengths reliably result in SQL_NO_TOTAL.
+	// We don't (currently) have a way of determining their lengths,
+	// so, for now, we'll handle them as non-LOBs.
+	return (type==SQL_LONGVARCHAR ||
+		type==SQL_LONGVARBINARY ||
+		type==SQL_WLONGVARCHAR);
 }
 
 extern "C" {

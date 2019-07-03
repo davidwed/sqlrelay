@@ -630,6 +630,8 @@ static bool isBlobTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"MEDIUMBLOB") ||
 		!charstring::compareIgnoringCase(type,"LONGBLOB") ||
 		!charstring::compareIgnoringCase(type,"BLOB") ||
+		!charstring::compareIgnoringCase(type,"LONGVARBINARY") ||
+		!charstring::compareIgnoringCase(type,"LONGVARCHAR") ||
 		!charstring::compareIgnoringCase(type,"RAW") ||
 		!charstring::compareIgnoringCase(type,"LONG_RAW") ||
 		!charstring::compareIgnoringCase(type,"CLOB") ||
@@ -642,7 +644,11 @@ static bool isBlobTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"GEOMETRY") ||
 		!charstring::compareIgnoringCase(type,"SDO_GEOMETRY") ||
 		!charstring::compareIgnoringCase(type,"NTEXT") ||
-		!charstring::compareIgnoringCase(type,"XML"));
+		!charstring::compareIgnoringCase(type,"XML") ||
+		!charstring::compareIgnoringCase(type,"GRAPHIC") ||
+		!charstring::compareIgnoringCase(type,"VARGRAPHIC") ||
+		!charstring::compareIgnoringCase(type,"LONGVARGRAPHIC") ||
+		!charstring::compareIgnoringCase(type,"DBCLOB"));
 }
 #endif
 
