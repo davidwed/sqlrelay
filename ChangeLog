@@ -44,6 +44,7 @@
 	fixed bug that caused some MSSQL lobs to sometimes be returned as
 		nulls when using ODBC on the backend
 	fixed bug that caused some MSSQL date fields to get returned as garbage
+	fixed older sqlrclient compatibility bug
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

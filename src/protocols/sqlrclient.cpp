@@ -244,6 +244,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		char		lobbuffer[32768];
 
 		uint16_t	protocolversion;
+		uint16_t	endresultset;
 };
 
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
@@ -384,6 +385,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	}
 
 	protocolversion=0;
+	endresultset=END_RESULT_SET;
 }
 
 sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
@@ -442,6 +444,10 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 			if (clientsock->read(&protocolversion,
 						idleclienttimeout,0)==
 						sizeof(uint16_t)) {
+				// END_RESULT_SET was 3 in protocol version 1,
+				// but changed in version 2
+				endresultset=(protocolversion==1)?
+							3:END_RESULT_SET;
 				continue;
 			}
 			endsession=false;
@@ -3373,7 +3379,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 		// for some queries, there are no rows to return, 
 		if (cont->noRowsToReturn(cursor)) {
-			clientsock->write((uint16_t)END_RESULT_SET);
+			clientsock->write(endresultset);
 			clientsock->flushWriteBuffer(-1,-1);
 			cont->raiseDebugMessageEvent(
 				"done returning result set data");
@@ -3385,7 +3391,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 			if (error) {
 				returnFetchError(cursor);
 			} else {
-				clientsock->write((uint16_t)END_RESULT_SET);
+				clientsock->write(endresultset);
 				cont->raiseDebugMessageEvent(
 					"done returning result set data");
 			}
@@ -3411,8 +3417,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 				if (error) {
 					returnFetchError(cursor);
 				} else {
-					clientsock->write(
-						(uint16_t)END_RESULT_SET);
+					clientsock->write(endresultset);
 				}
 				break;
 			}
