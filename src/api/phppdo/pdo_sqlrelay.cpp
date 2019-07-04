@@ -395,13 +395,11 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 
 	*caller_frees=0;
 
-stdoutput.printf("%d is ",colno);
 	switch (stmt->columns[colno].param_type) {
 		// NOTE: Currently, we only use ZVAL's for doubles,
 		// but we could do an additional float check here.
 		#ifdef HAVE_PHP_PDO_PARAM_ZVAL
 		case PDO_PARAM_ZVAL:
-stdoutput.printf("zval\n");
 			// handle NULLs
 			if (!sqlrcur->getFieldLength(
                                         sqlrstmt->currentrow,colno)) {
@@ -418,7 +416,6 @@ stdoutput.printf("zval\n");
 		#endif
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
-stdoutput.printf("int/bool\n");
 			// handle NULLs/empty-strings
 			if (!sqlrcur->getFieldLength(
 					sqlrstmt->currentrow,colno)) {
@@ -433,14 +430,12 @@ stdoutput.printf("int/bool\n");
 			*len=sizeof(long);
 			return 1;
 		case PDO_PARAM_STR:
-stdoutput.printf("str\n");
 			*ptr=(char *)sqlrcur->
 				getField(sqlrstmt->currentrow,colno);
 			*len=sqlrcur->
 				getFieldLength(sqlrstmt->currentrow,colno);
 			return 1;
 		case PDO_PARAM_LOB:
-stdoutput.printf("lob\n");
 			// lobs can be usually be returned as strings...
 			*ptr=(char *)sqlrcur->
 				getField(sqlrstmt->currentrow,colno);
