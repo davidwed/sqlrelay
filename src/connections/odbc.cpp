@@ -374,14 +374,15 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		char		dbversion[512];
 
 		const char	*begintxquery;
-		bool		dontusecharforblob;
+		bool		usecharforlobbind;
 		SQLSMALLINT	fractionscale;
 		bool		supportsfraction;
 		bool		timestampfortime;
 		uint32_t	maxallowedvarcharbindlength;
 		uint32_t	maxvarcharbindlength;
 		SQLINTEGER	*columninfonotvalidyeterror;
-		bool		convertdatetobinary;
+		bool		sqltypedatetosqlcbinary;
+		bool		fetchlobsasstrings;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -743,7 +744,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 
 	// set some default params
 	begintxquery=sqlrserverconnection::beginTransactionQuery();
-	dontusecharforblob=false;
+	usecharforlobbind=true;
 	// When binding dates using SQLBindParameter, the "decimal
 	// digits" parameter refers to the number of digits in the
 	// "fraction" part of the date.  Since that is in nanoseconds
@@ -756,12 +757,13 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	maxallowedvarcharbindlength=0;
 	maxvarcharbindlength=0;
 	columninfonotvalidyeterror=NULL;
-	convertdatetobinary=true;
+	sqltypedatetosqlcbinary=true;
+	fetchlobsasstrings=false;
 
 	// override some default params based on the db-type
 	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
 		begintxquery="BT";
-		dontusecharforblob=true;
+		usecharforlobbind=false;
 		// See below...  Teradata only supports 6 digits though.
 		fractionscale=6;
 		// Well... Teradata theoretically supports 6 digits of
@@ -833,9 +835,16 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 
 		// SQL Server doesn't like for you to convert SQL_TYPE_DATE
 		// to SQL_C_BINARY
-		convertdatetobinary=false;
+		sqltypedatetosqlcbinary=false;
+
+		// SQL Server has trouble mixing SQLBindCol and SQLGetData.
+		// If you SQLBindCol a column (eg. column 4) then you can't use
+		// SQLGetData to fetch an earlier column (eg. column 3).
+		// A workaround is to use SQLBindCol in all cases and fetch
+		// LOBs as strings.
+		fetchlobsasstrings=true;
 	}
-	
+
 	return true;
 }
 
@@ -2562,8 +2571,7 @@ bool odbccursor::inputBindBlob(const char *variable,
 						int16_t *isnull) {
 
 	// FIXME: This code is known to work with SQL Server...
-
-	if (!odbcconn->dontusecharforblob) {
+	if (odbcconn->usecharforlobbind) {
 		return sqlrservercursor::inputBindBlob(
 						variable,
 						variablesize,
@@ -2573,8 +2581,7 @@ bool odbccursor::inputBindBlob(const char *variable,
 	}
 
 	// FIXME: This code is known to work with Teradata...
-	// (Ideally we should getone body of code working for all dbs)
-
+	// (Ideally we should get one body of code working for all dbs)
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		return false;
@@ -3365,7 +3372,7 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 							field[i],maxfieldlength,
 							&(indicator[i]));
 				} else if (column[i].type==SQL_TYPE_TIMESTAMP ||
-					(odbcconn->convertdatetobinary &&
+					(odbcconn->sqltypedatetosqlcbinary &&
 					column[i].type==SQL_TYPE_DATE)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 							field[i],maxfieldlength,
@@ -3765,6 +3772,11 @@ bool odbccursor::isLob(SQLLEN type) {
 #else
 bool odbccursor::isLob(SQLINTEGER type) {
 #endif
+
+	if (odbcconn->fetchlobsasstrings) {
+		return false;
+	}
+
 	// FIXME: -152 (SQL Server XML) types are kind-of also LOBs, but
 	// attempts to get their lengths reliably result in SQL_NO_TOTAL.
 	// We don't (currently) have a way of determining their lengths,

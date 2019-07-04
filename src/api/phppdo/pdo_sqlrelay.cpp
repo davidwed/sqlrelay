@@ -147,6 +147,7 @@ struct sqlrstatement {
 	singlylinkedlist< char * >	subvarstrings;
 	bool				fwdonly;
 	bool				emulatepreparesunicodestrings;
+	bool				fetchlobsasstrings;
 };
 
 struct sqlrdbhandle {
@@ -157,6 +158,7 @@ struct sqlrdbhandle {
 	int64_t		resultsetbuffersize;
 	bool		dontgetcolumninfo;
 	bool		nullsasnulls;
+	bool		fetchlobsasstrings;
 };
 
 enum {
@@ -366,7 +368,9 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 			stmt->columns[colno].param_type=PDO_PARAM_INT;
 		}
 	} else if (isBlobTypeChar(type)) {
-		stmt->columns[colno].param_type=PDO_PARAM_LOB;
+		stmt->columns[colno].param_type=
+			(sqlrstmt->fetchlobsasstrings)?
+				PDO_PARAM_STR:PDO_PARAM_LOB;
 	} else if (isBoolTypeChar(type)) {
 		stmt->columns[colno].param_type=PDO_PARAM_BOOL;
 	} else {
@@ -391,11 +395,13 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 
 	*caller_frees=0;
 
+stdoutput.printf("%d is ",colno);
 	switch (stmt->columns[colno].param_type) {
 		// NOTE: Currently, we only use ZVAL's for doubles,
 		// but we could do an additional float check here.
 		#ifdef HAVE_PHP_PDO_PARAM_ZVAL
 		case PDO_PARAM_ZVAL:
+stdoutput.printf("zval\n");
 			// handle NULLs
 			if (!sqlrcur->getFieldLength(
                                         sqlrstmt->currentrow,colno)) {
@@ -412,6 +418,7 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 		#endif
 		case PDO_PARAM_INT:
 		case PDO_PARAM_BOOL:
+stdoutput.printf("int/bool\n");
 			// handle NULLs/empty-strings
 			if (!sqlrcur->getFieldLength(
 					sqlrstmt->currentrow,colno)) {
@@ -426,12 +433,14 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 			*len=sizeof(long);
 			return 1;
 		case PDO_PARAM_STR:
+stdoutput.printf("str\n");
 			*ptr=(char *)sqlrcur->
 				getField(sqlrstmt->currentrow,colno);
 			*len=sqlrcur->
 				getFieldLength(sqlrstmt->currentrow,colno);
 			return 1;
 		case PDO_PARAM_LOB:
+stdoutput.printf("lob\n");
 			// lobs can be usually be returned as strings...
 			*ptr=(char *)sqlrcur->
 				getField(sqlrstmt->currentrow,colno);
@@ -1106,6 +1115,9 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	sqlrstmt->emulatepreparesunicodestrings=
 		sqlrdbh->emulatepreparesunicodestrings;
 
+	sqlrstmt->fetchlobsasstrings=
+		sqlrdbh->fetchlobsasstrings;
+
 	// FIXME:
 	// To not have to set translatebindvariables on the server, we need to
 	// figure out what db relay is connected to, set supports_placeholders
@@ -1770,7 +1782,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		//{"autocommit",(char *)"1",0},
 		{"autocommit",(char *)"0",0},
 		{"bindvariabledelimiters",(char *)"?:@$",0},
-		{"emulatepreparesunicodestrings",(char *)"0",0}
+		{"emulatepreparesunicodestrings",(char *)"0",0},
+		{"fetchlobsasstrings",(char *)"0",0}
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1800,7 +1813,9 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	bool		autocommit=!charstring::isNo(options[24].optval);
 	const char	*bindvariabledelimiters=options[25].optval;
 	bool		emulatepreparesunicodestrings=
-					charstring::isYes(options[26].optval);
+				charstring::isYes(options[26].optval);
+	bool		fetchlobsasstrings=
+				charstring::isYes(options[27].optval);
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1918,6 +1933,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	sqlrdbh->translatebindsonserver=false;
 	sqlrdbh->usesubvars=false;
 	sqlrdbh->emulatepreparesunicodestrings=emulatepreparesunicodestrings;
+	sqlrdbh->fetchlobsasstrings=fetchlobsasstrings;
 
 	dbh->driver_data=(void *)sqlrdbh;
 	dbh->methods=&sqlrconnectionMethods;
