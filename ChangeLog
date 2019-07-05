@@ -45,6 +45,7 @@
 		nulls when using ODBC on the backend
 	fixed bug that caused some MSSQL date fields to get returned as garbage
 	fixed older sqlrclient compatibility bug
+	fixed SQLFetch parameter type mismatch in ODBC api
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

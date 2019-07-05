@@ -3947,10 +3947,15 @@ SQLRETURN SQL_API SQLFetch(SQLHSTMT statementhandle) {
 		return SQL_INVALID_HANDLE;
 	}
 
-	return SQLR_Fetch(statementhandle,
-				stmt->rowsfetchedptr,
-				stmt->rowstatusptr,
-				stmt->rowarraysize);
+	SQLULEN	localrowsfetched;
+	SQLRETURN	retval=SQLR_Fetch(statementhandle,
+						&localrowsfetched,
+						stmt->rowstatusptr,
+						stmt->rowarraysize);
+	if (stmt->rowsfetchedptr) {
+		*stmt->rowsfetchedptr=localrowsfetched;
+	}
+	return retval;
 }
 
 SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
@@ -3971,10 +3976,15 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 		return SQL_ERROR;
 	}
 
-	return SQLR_Fetch(statementhandle,
-				stmt->rowsfetchedptr,
-				stmt->rowstatusptr,
-				stmt->rowarraysize);
+	SQLULEN	localrowsfetched=0;
+	SQLRETURN	retval=SQLR_Fetch(statementhandle,
+						&localrowsfetched,
+						stmt->rowstatusptr,
+						stmt->rowarraysize);
+	if (stmt->rowsfetchedptr) {
+		*stmt->rowsfetchedptr=localrowsfetched;
+	}
+	return retval;
 }
 
 static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle);
