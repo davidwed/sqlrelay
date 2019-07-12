@@ -22,7 +22,6 @@
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
 #endif*/
-#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
