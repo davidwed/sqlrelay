@@ -17,7 +17,7 @@
 
 #include <stdio.h>
 
-#define USEDSN 1
+//#define USEDSN 1
 
 SQLRETURN	erg;
 SQLHENV		env;

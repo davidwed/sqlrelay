@@ -22,6 +22,7 @@
 		static const char debugfile[]="/tmp/sqlrodbcdebug.txt";
 	#endif
 #endif*/
+#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
 // windows needs this (don't include for __CYGWIN__ though)
@@ -9437,7 +9438,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	if (charstring::isNullOrEmpty(pwd)) {
 		pwd=pstr.getValue("pwd");
 	}
-	if (charstring::isNullOrEmpty(uid)) {
+	if (charstring::isNullOrEmpty(pwd)) {
 		pwd=pstr.getValue("Password");
 	}
 
