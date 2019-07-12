@@ -2216,23 +2216,24 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						sizeof(conn->user),
 						ODBC_INI);
 	}
+	parameterstring	pstr;
 	if (!charstring::isNullOrEmpty(password)) {
 		if (passwordlength==SQL_NTS) {
 			passwordlength=charstring::length(password);
 		}
-		if ((size_t)passwordlength>=sizeof(conn->password)) {
-			passwordlength=sizeof(conn->password)-1;
-		}
-		charstring::safeCopy(conn->password,sizeof(conn->password),
-					(const char *)password,passwordlength);
-		conn->password[passwordlength]='\0';
 	} else {
-		SQLGetPrivateProfileString((const char *)conn->dsn,
-						"Password","",
-						conn->password,
-						sizeof(conn->password),
-						ODBC_INI);
+		// SQLGetPrivateProfileString doesn't appear to be able to
+		// extract Passwords on all platforms.
+		pstr.parse(conn->dsn);
+		password=(SQLCHAR *)pstr.getValue("Password");
+		passwordlength=charstring::length(password);
 	}
+	if ((size_t)passwordlength>=sizeof(conn->password)) {
+		passwordlength=sizeof(conn->password)-1;
+	}
+	charstring::safeCopy(conn->password,sizeof(conn->password),
+				(const char *)password,passwordlength);
+	conn->password[passwordlength]='\0';
 	char	retrytimebuf[11];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"RetryTime","0",
 					retrytimebuf,sizeof(retrytimebuf),
@@ -9418,7 +9419,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					cbconnstrin);
 	debugPrintf("  connectstring: %s\n",nulltermconnstr);
 
-	// parse out DSN, UID and PWD from the connect string
+	// parse out DSN, UID/User and PWD/Password from the connect string
 	parameterstring	pstr;
 	pstr.parse(nulltermconnstr);
 	const char	*dsn=pstr.getValue("DSN");
@@ -9429,9 +9430,15 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	if (charstring::isNullOrEmpty(uid)) {
 		uid=pstr.getValue("uid");
 	}
+	if (charstring::isNullOrEmpty(uid)) {
+		uid=pstr.getValue("User");
+	}
 	const char	*pwd=pstr.getValue("PWD");
 	if (charstring::isNullOrEmpty(pwd)) {
 		pwd=pstr.getValue("pwd");
+	}
+	if (charstring::isNullOrEmpty(uid)) {
+		pwd=pstr.getValue("Password");
 	}
 
 	debugPrintf("  dsn: %s\n",dsn);
@@ -9474,6 +9481,53 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 
 	// clean up
 	delete[] nulltermconnstr;
+
+	// build the DSN if it wasn't explicitly provided
+	stringbuffer	dsnstr;
+	if (charstring::isNullOrEmpty(dsn)) {
+		
+		// exclude User/Password, we ought to have gotten them earlier
+		const char	*names[]={
+			"Server",
+			"Port",
+			"Socket",
+			"Retry Time",
+			"Tries",
+			"Enable Kerberos",
+			"Kerberos Service",
+			"Kerberos Mech",
+			"Kerberos Flags",
+			"Enable TLS",
+			"TLS Version",
+			"TLS Certificate",
+			"TLS Certificate Password",
+			"TLS Ciphers",
+			"TLS Validation",
+			"TLS Certificate Authority",
+			"TLS Depth",
+			"Database",
+			"Debug",
+			"Column Name Case",
+			"Result Set Buffer Size",
+			"Don't Get Column Info",
+			"Nulls As Nulls",
+			"Lazy Connect",
+			"Clear Binds During Prepare",
+			"Bind Variable Delimiters",
+			NULL
+		};
+
+		for (const char **name=names; *name; name++) {
+			const char	*val=pstr.getValue(*name);
+			if (!charstring::isNullOrEmpty(val)) {
+				dsnstr.append(*name);
+				dsnstr.append('=');
+				dsnstr.append(val);
+				dsnstr.append(';');
+			}
+		}
+		dsn=dsnstr.getString();
+	}
 
 	// the connect string must include a valid dsn or server parameter
 	if (charstring::isNullOrEmpty(dsn)) {
@@ -11371,10 +11425,17 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("User",user);
 	}
 	if (!dsndict.getValue("Password")) {
-		char	*password=new char[1024];
-		SQLGetPrivateProfileString(dsnval,"Password","",
-						password,1024,ODBC_INI);
-		dsndict.setValue("Password",password);
+		// SQLGetPrivateProfileString doesn't appear to be able to
+		// extract Passwords on all platforms.
+		parameterstring	pstr;
+		pstr.parse(dsnval);
+		const char	*pwd=pstr.getValue("Password");
+		size_t		pwdlen=charstring::length(password);
+		if (pwdlen>=1024) {
+			pwdlen=1024-1;
+		}
+		charstring::safeCopy(password,1024,(const char *)pwd,pwdlen);
+		password[pwdlen]='\0';
 	}
 	if (!dsndict.getValue("RetryTime")) {
 		char	*retrytime=new char[11];

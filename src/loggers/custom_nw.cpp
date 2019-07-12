@@ -162,9 +162,9 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 
 int sqlrlogger_custom_nw::strescape(const char *str, char *buf, int limit) {
 	// from oracpool my_strescape()
-	register char	*q=buf;
+	char		*q=buf;
 	const char	*strend=str+charstring::length(str);
-	for (register const char *p=str; p<strend; p++) {
+	for (const char *p=str; p<strend; p++) {
 		if (q-buf>=limit-1) {
 			break;
 		} else if (*p=='\n') { 

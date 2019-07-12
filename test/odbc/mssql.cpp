@@ -17,6 +17,8 @@
 
 #include <stdio.h>
 
+#define USEDSN 1
+
 SQLRETURN	erg;
 SQLHENV		env;
 SQLHDBC		dbc;
@@ -63,10 +65,6 @@ void checkSuccessInt(int value, int success) {
 
 int	main(int argc, char **argv) {
 
-	SQLCHAR		*dsn;
-	SQLCHAR		*user;
-	SQLCHAR		*password;
-
 	// allocate environemnt handle
 	printf("ENV HANDLE: \n");
 #if (ODBCVER >= 0x3000)
@@ -106,10 +104,20 @@ int	main(int argc, char **argv) {
 
 	// connect
 	printf("CONNECT: \n");
-	dsn=(SQLCHAR *)"sqlrodbc";
-	user=(SQLCHAR *)"test";
-	password=(SQLCHAR *)"test";
+#ifdef USEDSN
+	SQLCHAR	*dsn=(SQLCHAR *)"sqlrodbc";
+	SQLCHAR	*user=(SQLCHAR *)"test";
+	SQLCHAR	*password=(SQLCHAR *)"test";
 	erg=SQLConnect(dbc,dsn,SQL_NTS,user,SQL_NTS,password,SQL_NTS);
+#else
+	SQLCHAR		*incstring=(SQLCHAR *)"Driver={SQL Relay};Server=localhost;Port=8000;User=test;Password=test;LazyConnect=0;Debug=1;";
+	SQLCHAR		outcstring[1024];
+	SQLSMALLINT	outcstringlen;
+	erg=SQLDriverConnect(dbc,NULL,
+				incstring,SQL_NTS,
+				outcstring,sizeof(outcstring),&outcstringlen,
+				SQL_DRIVER_NOPROMPT);
+#endif
 	checkSuccessInt((erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO)?1:0,1);
 	printf("\n");
 
@@ -132,12 +140,14 @@ int	main(int argc, char **argv) {
 			&vallen);
 	checkSuccessInt(usmallintval,0);
 	checkSuccessInt((erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO)?1:0,1);
+#ifdef USEDSN
 	erg=SQLGetInfo(dbc,SQL_DATA_SOURCE_NAME,
 			(SQLPOINTER)strval,
 			(SQLSMALLINT)sizeof(strval),
 			&vallen);
 	checkSuccessString((const char *)strval,"sqlrodbc");
 	checkSuccessInt((erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO)?1:0,1);
+#endif
 	erg=SQLGetInfo(dbc,SQL_FETCH_DIRECTION,
 			(SQLPOINTER)&uintval,
 			(SQLSMALLINT)sizeof(uintval),
