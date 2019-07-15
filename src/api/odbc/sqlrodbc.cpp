@@ -11429,7 +11429,8 @@ static void parseDsn(const char *dsn) {
 		// extract Passwords on all platforms.
 		parameterstring	pstr;
 		pstr.parse(dsnval);
-		dsndict.setValue("Password",pstr.getValue("Password"));
+		dsndict.setValue("Password",
+			charstring::duplicate(pstr.getValue("Password")));
 	}
 	if (!dsndict.getValue("RetryTime")) {
 		char	*retrytime=new char[11];
