@@ -109,6 +109,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		void	returnResultSetHeader(sqlrservercursor *cursor);
 		void	returnColumnInfo(sqlrservercursor *cursor,
 							uint16_t format);
+		uint16_t	finagleColumnType(uint16_t coltype);
 		void	sendRowCounts(bool knowsactual, uint64_t actual,
 					bool knowsaffected, uint64_t affected);
 		void	returnOutputBindValues(sqlrservercursor *cursor);
@@ -2751,7 +2752,8 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 
 		if (format==COLUMN_TYPE_IDS) {
 			sendColumnDefinition(name,namelen,
-					cont->getColumnType(cursor,i),
+					finagleColumnType(
+						cont->getColumnType(cursor,i)),
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
 					unsignednumber,zerofill,binary,
@@ -2765,6 +2767,44 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 					unsignednumber,zerofill,binary,
 					autoincrement,table,tablelen);
 		}
+	}
+}
+
+uint16_t sqlrprotocol_sqlrclient::finagleColumnType(uint16_t coltype) {
+
+	if (protocolversion>=2) {
+		return coltype;
+	}
+
+	// these types didn't exist in earlier protocol verions
+	switch (coltype) {
+		// also added by mysql
+		case TINYTEXT_DATATYPE:
+			return TINY_BLOB_DATATYPE;
+		case MEDIUMTEXT_DATATYPE:
+			return MEDIUM_BLOB_DATATYPE;
+		case LONGTEXT_DATATYPE:
+			return LONG_BLOB_DATATYPE;
+		case JSON_DATATYPE:
+			return UNKNOWN_DATATYPE;
+		case GEOMETRY_DATATYPE:
+			return UNKNOWN_DATATYPE;
+		// also added by oracle
+		case SDO_GEOMETRY_DATATYPE:
+			return BLOB_DATATYPE;
+		// added by mssql
+		case NCHAR_DATATYPE:
+			return CHAR_DATATYPE;
+		case NVARCHAR_DATATYPE:
+			return VARCHAR_DATATYPE;
+		case NTEXT_DATATYPE:
+			return TEXT_DATATYPE;
+		case XML_DATATYPE:
+			return VARCHAR_DATATYPE;
+		case DATETIMEOFFSET_DATATYPE:
+			return DATETIME_DATATYPE;
+		default:
+			return UNKNOWN_DATATYPE;
 	}
 }
 

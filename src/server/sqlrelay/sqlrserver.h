@@ -140,11 +140,13 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// re-login to the database
 		void	reLogIn();
 
-		// client auth
+		// backend auth
 		void		setUser(const char *user);
 		void		setPassword(const char *password);
 		const char	*getUser();
 		const char	*getPassword();
+
+		// client auth
 		sqlrcredentials	*getCredentials(const char *user,
 						const char *password,
 						bool usegss,
