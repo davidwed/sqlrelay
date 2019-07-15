@@ -11429,13 +11429,7 @@ static void parseDsn(const char *dsn) {
 		// extract Passwords on all platforms.
 		parameterstring	pstr;
 		pstr.parse(dsnval);
-		const char	*pwd=pstr.getValue("Password");
-		size_t		pwdlen=charstring::length(password);
-		if (pwdlen>=1024) {
-			pwdlen=1024-1;
-		}
-		charstring::safeCopy(password,1024,(const char *)pwd,pwdlen);
-		password[pwdlen]='\0';
+		dsndict.setValue("Password",pstr.getValue("Password"));
 	}
 	if (!dsndict.getValue("RetryTime")) {
 		char	*retrytime=new char[11];
