@@ -109,7 +109,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		void	returnResultSetHeader(sqlrservercursor *cursor);
 		void	returnColumnInfo(sqlrservercursor *cursor,
 							uint16_t format);
-		uint16_t	finagleColumnType(uint16_t coltype);
+		uint16_t	protocolAppropriateColumnType(uint16_t coltype);
 		void	sendRowCounts(bool knowsactual, uint64_t actual,
 					bool knowsaffected, uint64_t affected);
 		void	returnOutputBindValues(sqlrservercursor *cursor);
@@ -2752,7 +2752,7 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 
 		if (format==COLUMN_TYPE_IDS) {
 			sendColumnDefinition(name,namelen,
-					finagleColumnType(
+					protocolAppropriateColumnType(
 						cont->getColumnType(cursor,i)),
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
@@ -2770,7 +2770,8 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 	}
 }
 
-uint16_t sqlrprotocol_sqlrclient::finagleColumnType(uint16_t coltype) {
+uint16_t sqlrprotocol_sqlrclient::protocolAppropriateColumnType(
+							uint16_t coltype) {
 
 	if (protocolversion>=2) {
 		return coltype;
@@ -2804,7 +2805,7 @@ uint16_t sqlrprotocol_sqlrclient::finagleColumnType(uint16_t coltype) {
 		case DATETIMEOFFSET_DATATYPE:
 			return DATETIME_DATATYPE;
 		default:
-			return UNKNOWN_DATATYPE;
+			return coltype;
 	}
 }
 
