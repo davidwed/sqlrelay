@@ -3084,6 +3084,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 
 	if (getcolumninfo) {
 
+		// allocate buffers if necessary
+		if (!maxcolumncount) {
+			allocateResultSetBuffers(ncols);
+		}
+
 		// run through the columns
 		for (SQLSMALLINT i=0; i<ncols; i++) {
 
@@ -3354,9 +3359,9 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 	if (bindcolumns) {
 
 		// allocate buffers if necessary
-		if (!maxcolumncount) {
+		/*if (!maxcolumncount) {
 			allocateResultSetBuffers(ncols);
-		}
+		}*/
 
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 
