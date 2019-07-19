@@ -257,6 +257,8 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		SQLINTEGER	sqlnulldata;
 		#endif
 
+		bool		bindformaterror;
+
 		uint32_t	row;
 		uint32_t	maxrow;
 		uint32_t	totalrows;
@@ -2168,6 +2170,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 		inoutisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
+	bindformaterror=false;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 	initializeColCounts();
 	initializeRowCounts();
@@ -2226,6 +2229,8 @@ void odbccursor::deallocateResultSetBuffers() {
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
+
+	bindformaterror=false;
 
 	// initialize column count
 	initializeColCounts();
@@ -2353,6 +2358,7 @@ bool odbccursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2425,6 +2431,7 @@ bool odbccursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2449,6 +2456,7 @@ bool odbccursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2482,6 +2490,7 @@ bool odbccursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2584,6 +2593,7 @@ bool odbccursor::inputBindBlob(const char *variable,
 	// (Ideally we should get one body of code working for all dbs)
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2608,6 +2618,7 @@ bool odbccursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2634,6 +2645,7 @@ bool odbccursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2664,6 +2676,7 @@ bool odbccursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2702,6 +2715,7 @@ bool odbccursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2743,6 +2757,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2772,6 +2787,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2803,6 +2819,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2839,6 +2856,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -3412,6 +3430,19 @@ void odbccursor::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
+	if (bindformaterror) {
+		// handle bind format errors
+		*errorlength=charstring::length(
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
+		charstring::safeCopy(errorbuffer,
+				errorbufferlength,
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
+				*errorlength);
+		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+		*liveconnection=true;
+		return;
+	}
+
 	SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 	SQLINTEGER	nativeerrnum;
 	SQLSMALLINT	errlength;

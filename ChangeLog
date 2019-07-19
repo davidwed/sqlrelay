@@ -50,6 +50,7 @@
 	added support for nodejs 12
 	SQLDriverConnect can take an inline DSN now
 	fixed odbc maxcolumncount=-1 crash
+	odbc, db2, and informix set bind format error now
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

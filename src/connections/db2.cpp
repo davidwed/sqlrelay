@@ -219,6 +219,8 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		uint64_t	totalrows;
 		uint64_t	rownumber;
 
+		bool		bindformaterror;
+
 		stringbuffer	errormsg;
 
 		db2connection	*db2conn;
@@ -762,6 +764,7 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 		outisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
+	bindformaterror=false;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 }
 
@@ -893,6 +896,8 @@ bool db2cursor::close() {
 
 bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 
+	bindformaterror=false;
+
 	// initialize column count
 	ncols=0;
 
@@ -925,6 +930,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -962,6 +968,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -986,6 +993,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1019,6 +1027,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1076,6 +1085,7 @@ bool db2cursor::inputBindBlob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1106,6 +1116,7 @@ bool db2cursor::inputBindClob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1131,6 +1142,7 @@ bool db2cursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1158,6 +1170,7 @@ bool db2cursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1189,6 +1202,7 @@ bool db2cursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1228,6 +1242,7 @@ bool db2cursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1266,6 +1281,7 @@ bool db2cursor::outputBindBlob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1293,6 +1309,7 @@ bool db2cursor::outputBindClob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1533,6 +1550,19 @@ void db2cursor::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
+	if (bindformaterror) {
+		// handle bind format errors
+		*errorlength=charstring::length(
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
+		charstring::safeCopy(errorbuffer,
+				errorbufferlength,
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
+				*errorlength);
+		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+		*liveconnection=true;
+		return;
+	}
+
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
 	SQLSMALLINT	errlength;
