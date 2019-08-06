@@ -601,6 +601,7 @@ RET SQLRConnection::identify(const ARGS &args) {
 	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->identify();
+stdoutput.printf("result=%s\n",result);
 
 	returnString(result);
 }

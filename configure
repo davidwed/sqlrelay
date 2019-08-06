@@ -35160,6 +35160,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PHPINCLUDES"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#define __STDC_LIMIT_MACROS 1
 #include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
@@ -35192,6 +35194,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PHPINCLUDES"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#define __STDC_LIMIT_MACROS 1
 #include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
@@ -35223,6 +35227,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PHPINCLUDES"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#define __STDC_LIMIT_MACROS 1
 #include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
@@ -35257,6 +35263,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PHPINCLUDES"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#define __STDC_LIMIT_MACROS 1
 #include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
@@ -38712,6 +38720,15 @@ sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstwor
 mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
 sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelay.service
 sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
+
+
+if ( test -r "libtool" )
+then
+	sed -e "s|-lgcc_s -lgcc|-lgcc_s|g" \
+		-e "s|-lgcc_s_pic|-lgcc_s|g" \
+		libtool > libtool.new
+	mv libtool.new libtool
+fi
 
 
 echo

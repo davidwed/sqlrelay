@@ -1162,7 +1162,7 @@ bool sqlrconfig_xmldom::load(const char *urlname, const char *id) {
 
 	#ifdef DEBUG_MESSAGES
 		debugPrintf("\noriginal tree:\n");
-		getRootNode()->print(&stdoutput);
+		getRootNode()->write(&stdoutput);
 		debugPrintf("\n");
 	#endif
 
@@ -1171,11 +1171,11 @@ bool sqlrconfig_xmldom::load(const char *urlname, const char *id) {
 
 	#ifdef DEBUG_MESSAGES
 		debugPrintf("normalized tree:\n");
-		getRootNode()->print(&stdoutput);
+		getRootNode()->write(&stdoutput);
 		debugPrintf("\n");
 	#endif
 /*stdoutput.printf("normalized tree:\n");
-getRootNode()->print(&stdoutput);
+getRootNode()->write(&stdoutput);
 stdoutput.printf("\n");*/
 
 	// get values from the tree

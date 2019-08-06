@@ -21,7 +21,7 @@ include ../../../config.mk
 					echo "second try errors : "; cat errors2; echo; \
 				fi; \
 				if ( test -s errors3 ); then \
-					echo "second try errors : "; cat errors3; echo; \
+					echo "third try errors : "; cat errors3; echo; \
 				fi; \
 				exit 1; \
 			else \
