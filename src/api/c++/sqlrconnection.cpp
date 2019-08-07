@@ -867,6 +867,7 @@ bool sqlrconnection::reConfigureSockets() {
 			if (pvt->_tlsversion) {
 				debugPrint(pvt->_tlsversion);
 			}
+			debugPrint("\n");
 			debugPrint("  cert: ");
 			if (pvt->_tlscert) {
 				debugPrint(pvt->_tlscert);
