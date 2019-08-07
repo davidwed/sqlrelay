@@ -125,7 +125,9 @@ int	main(int argc, char **argv) {
 		MYSQL_VERSION_ID>=80000
 	checkSuccess((char *)mysql_character_set_name(&mysql),"utf8mb4");
 	#else
-	checkSuccess((char *)mysql_character_set_name(&mysql),"latin1");
+	const char	*charset=mysql_character_set_name(&mysql);
+	checkSuccess(!charstring::compare(charset,"latin1") ||
+				!charstring::compare(charset,"utf8"),true);
 	#endif
 	stdoutput.printf("\n");
 
