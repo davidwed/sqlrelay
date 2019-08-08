@@ -817,7 +817,6 @@ static PyObject *substitutions(PyObject *self, PyObject *args) {
       if (value==Py_None) {
         ((sqlrcursor *)sqlrcur)->substitution(variable, (char *)NULL);
       } else if (PyString_Check(value)) {
-stdoutput.printf("string!!! - %s\n",PyString_AsString(value));
         ((sqlrcursor *)sqlrcur)->substitution(variable, PyString_AsString(value));
       } else if (PyInt_Check(value)) {
         ((sqlrcursor *)sqlrcur)->substitution(variable, (int64_t)PyInt_AsLong(value));
