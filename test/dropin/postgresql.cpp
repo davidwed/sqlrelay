@@ -206,7 +206,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQfname(pgresult,8),"testtimestamp");
 	stdoutput.printf("\n");
 	
-#if 0
 	stdoutput.printf("PQftype:\n");
 	checkSuccess(PQftype(pgresult,0),23);
 	checkSuccess(PQftype(pgresult,1),701);
@@ -242,7 +241,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQfmod(pgresult,7),-1);
 	checkSuccess(PQfmod(pgresult,8),-1);
 	stdoutput.printf("\n");
-#endif
 	
 	stdoutput.printf("PQbinaryTuples:\n");
 	checkSuccess(PQbinaryTuples(pgresult),0);

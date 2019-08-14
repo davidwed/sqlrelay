@@ -8,6 +8,8 @@
 #include <rudiments/randomnumber.h>
 #include <rudiments/error.h>
 
+#include <datatypes.h>
+
 // request/response packet types
 #define MESSAGE_NULL			0x00
 #define MESSAGE_AUTHENTICATION		'R'
@@ -513,6 +515,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 							uint16_t colcount);
 		bool	sendRowDescription(sqlrservercursor *cursor,
 							uint16_t colcount);
+		uint32_t	getColumnTypeOid(uint16_t coltype);
 		bool	sendDataRow(sqlrservercursor *cursor,
 							uint16_t colcount);
 		bool	sendCommandComplete(sqlrservercursor *cursor);
@@ -880,6 +883,8 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 		// if the client requested SSL, then deny it
 		if (protocolversion==80877103) {
 
+			// FIXME: support SSL
+
 			// close the connection if this is the second time
 			// we've gotten an ssl request in the same session
 			if (!first) {
@@ -909,8 +914,7 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 
 		} else if (protocolversion!=196608) {
 
-			// FIXME: return error of some kind...
-			// FIXME: support various protocols
+			sendErrorResponse("FATAL","88P01","Invalid protocol");
 			return false;
 
 		} else {
@@ -1010,7 +1014,7 @@ bool sqlrprotocol_postgresql::sendStartupMessageResponse() {
 
 	// fail if the user wasn't sent (it's required)
 	if (!user) {
-		// FIXME: return error of some kind...
+		sendErrorResponse("FATAL","88P01","user required");
 		return false;
 	}
 
@@ -1394,7 +1398,8 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 	for (uint16_t i=0; i<colcount; i++) {
 
 		// field name
-		write(&resppacket,cont->getColumnName(cursor,i));
+		const char	*columnname=cont->getColumnName(cursor,i);
+		write(&resppacket,columnname);
 		write(&resppacket,'\0');
 
 		// table oid (or 0 if not known)
@@ -1410,7 +1415,11 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 		writeBE(&resppacket,tableoid);
 
 		// column "attribute number" (or 0 if not known)
-		// FIXME: no idea what this even is
+		// I think this is attnum in the pg_attribute table for the
+		// row that corresponds to this column.  I think that
+		// corresponds to the 1-based index of the column in its table,
+		// except for system columns, which have (arbitrary) negative
+		// numbers.
 		writeBE(&resppacket,(uint16_t)0);
 
 		// data type oid (or 0 if not known)
@@ -1423,17 +1432,22 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 			// returning oid's.
 			coltypeoid=charstring::toInteger(coltypename);
 		} else {
-			// FIXME: map column types to oid's
+			coltypeoid=getColumnTypeOid(
+					cont->getColumnType(cursor,i));
 		}
 		writeBE(&resppacket,coltypeoid);
 
-		// data type size
-		// FIXME: should be negative for variable-width types
-		writeBE(&resppacket,(uint16_t)cont->getColumnLength(cursor,i));
-
-		// type modifier
-		// FIXME: no idea what this even is
-		writeBE(&resppacket,(uint32_t)0);
+		// data type size and modifier
+		uint16_t	datatypesize=cont->getColumnLength(cursor,i);
+		uint32_t	datatypemodifier=(uint32_t)-1;
+		// For various types (I'm sure I'll discover others later),
+		// return -1 for the size and return the size in the modifier
+		if (coltypeoid==1042 || coltypeoid==1043) {
+			datatypemodifier=datatypesize;
+			datatypesize=(uint16_t)-1;
+		}
+		writeBE(&resppacket,datatypesize);
+		writeBE(&resppacket,datatypemodifier);
 
 		// format code text=0, binary=1
 		// for now, we always return text, even if binary was requested
@@ -1443,19 +1457,20 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 		if (getDebug()) {
 			stdoutput.printf("	column %d {\n",i);
 			stdoutput.printf("		name: %s\n",
-						cont->getColumnName(cursor,i));
+							columnname);
 			stdoutput.printf("		table name: %s\n",
-								tablename);
+							tablename);
 			stdoutput.printf("		table oid: %d\n",
-								tableoid);
+							tableoid);
 			stdoutput.printf("		attribute number: 0\n");
 			stdoutput.printf("		column type name: %s\n",
-								coltypename);
+							coltypename);
 			stdoutput.printf("		data type oid: %d\n",
-								coltypeoid);
+							coltypeoid);
 			stdoutput.printf("		data type size: %d\n",
-					cont->getColumnLength(cursor,i));
-			stdoutput.printf("		type modifier: 0\n");
+							datatypesize);
+			stdoutput.printf("		type modifier: %d\n",
+							datatypemodifier);
 			stdoutput.printf("		format code: 0\n");
 			debugEnd(1);
 		}
@@ -1465,6 +1480,241 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 
 	// send response packet
 	return sendPacket(MESSAGE_ROWDESCRIPTION);
+}
+
+uint32_t sqlrprotocol_postgresql::getColumnTypeOid(uint16_t coltype) {
+
+	switch (coltype) {
+		case BOOL_DATATYPE:
+			return 16; //bool
+		case BYTEA_DATATYPE:
+			return 17; //bytea
+		case CHAR_DATATYPE:
+			return 18; //char
+		case NAME_DATATYPE:
+			return 19; //name
+		case INT8_DATATYPE:
+			return 20; //int8
+		case INT2_DATATYPE:
+			return 21; //int2
+		case INT2VECTOR_DATATYPE:
+			return 22; //int2vector
+		case INT4_DATATYPE:
+			return 23; //int4
+		case REGPROC_DATATYPE:
+			return 24; //regproc
+		case TEXT_DATATYPE:
+			return 25; //text
+		case OID_DATATYPE:
+			return 26; //oid
+		case TID_DATATYPE:
+			return 27; //tid
+		case XID_DATATYPE:
+			return 28; //xid
+		case CID_DATATYPE:
+			return 29; //cid
+		case OIDVECTOR_DATATYPE:
+			return 30; //oidvector
+		case PG_TYPE_DATATYPE:
+			return 71; //pg_type
+		case PG_ATTRIBUTE_DATATYPE:
+			return 75; //pg_attribute
+		case PG_PROC_DATATYPE:
+			return 81; //pg_proc
+		case PG_CLASS_DATATYPE:
+			return 83; //pg_class
+		case SMGR_DATATYPE:
+			return 210; //smgr
+		case POINT_DATATYPE:
+			return 600; //point
+		case LSEG_DATATYPE:
+			return 601; //lseg
+		case PATH_DATATYPE:
+			return 602; //path
+		case BOX_DATATYPE:
+			return 603; //box
+		case POLYGON_DATATYPE:
+			return 604; //polygon
+		case LINE_DATATYPE:
+			return 628; //line
+		case _LINE_DATATYPE:
+			return 629; //_line
+		case _CIDR_DATATYPE:
+			return 651; //_cidr
+		case FLOAT4_DATATYPE:
+			return 700; //float4
+		case FLOAT8_DATATYPE:
+			return 701; //float8
+		case ABSTIME_DATATYPE:
+			return 702; //abstime
+		case RELTIME_DATATYPE:
+			return 703; //reltime
+		case TINTERVAL_DATATYPE:
+			return 704; //tinterval
+		case CIRCLE_DATATYPE:
+			return 718; //circle
+		case _CIRCLE_DATATYPE:
+			return 719; //_circle
+		case MONEY_DATATYPE:
+			return 790; //money
+		case _MONEY_DATATYPE:
+			return 791; //_money
+		case MACADDR_DATATYPE:
+			return 829; //macaddr
+		case INET_DATATYPE:
+			return 869; //inet
+		case CIDR_DATATYPE:
+			return 650; //cidr
+		case _BOOL_DATATYPE:
+			return 1000; //_bool
+		case _BYTEA_DATATYPE:
+			return 1001; //_bytea
+		case _CHAR_DATATYPE:
+			return 1002; //_char
+		case _NAME_DATATYPE:
+			return 1003; //_name
+		case _INT2_DATATYPE:
+			return 1005; //_int2
+		case _INT2VECTOR_DATATYPE:
+			return 1006; //_int2vector
+		case _INT4_DATATYPE:
+			return 1007; //_int4
+		case _REGPROC_DATATYPE:
+			return 1008; //_regproc
+		case _TEXT_DATATYPE:
+			return 1009; //_text
+		case _TID_DATATYPE:
+			return 1010; //_tid
+		case _XID_DATATYPE:
+			return 1011; //_xid
+		case _CID_DATATYPE:
+			return 1012; //_cid
+		case _OIDVECTOR_DATATYPE:
+			return 1013; //_oidvector
+		case _BPCHAR_DATATYPE:
+			return 1014; //_bpchar
+		case _VARCHAR_DATATYPE:
+			return 1015; //_varchar
+		case _INT8_DATATYPE:
+			return 1016; //_int8
+		case _POINT_DATATYPE:
+			return 1017; //_point
+		case _LSEG_DATATYPE:
+			return 1018; //_lseg
+		case _PATH_DATATYPE:
+			return 1019; //_path
+		case _BOX_DATATYPE:
+			return 1020; //_box
+		case _FLOAT4_DATATYPE:
+			return 1021; //_float4
+		case _FLOAT8_DATATYPE:
+			return 1022; //_float8
+		case _ABSTIME_DATATYPE:
+			return 1023; //_abstime
+		case _RELTIME_DATATYPE:
+			return 1024; //_reltime
+		case _TINTERVAL_DATATYPE:
+			return 1025; //_tinterval
+		case _POLYGON_DATATYPE:
+			return 1027; //_polygon
+		case _OID_DATATYPE:
+			return 1028; //_oid
+		case ACLITEM_DATATYPE:
+			return 1033; //aclitem
+		case _ACLITEM_DATATYPE:
+			return 1034; //_aclitem
+		case _MACADDR_DATATYPE:
+			return 1040; //_macaddr
+		case _INET_DATATYPE:
+			return 1041; //_inet
+		case BPCHAR_DATATYPE:
+			return 1042; //bpchar
+		case VARCHAR_DATATYPE:
+			return 1043; //varchar
+		case DATE_DATATYPE:
+			return 1082; //date
+		case TIME_DATATYPE:
+			return 1083; //time
+		case TIMESTAMP_DATATYPE:
+			return 1114; //timestamp
+		case _TIMESTAMP_DATATYPE:
+			return 1115; //_timestamp
+		case _DATE_DATATYPE:
+			return 1182; //_date
+		case _TIME_DATATYPE:
+			return 1183; //_time
+		case TIMESTAMPTZ_DATATYPE:
+			return 1184; //timestamptz
+		case _TIMESTAMPTZ_DATATYPE:
+			return 1185; //_timestamptz
+		case INTERVAL_DATATYPE:
+			return 1186; //interval
+		case _INTERVAL_DATATYPE:
+			return 1187; //_interval
+		case _NUMERIC_DATATYPE:
+			return 1231; //_numeric
+		case TIMETZ_DATATYPE:
+			return 1266; //timetz
+		case _TIMETZ_DATATYPE:
+			return 1270; //_timetz
+		case BIT_DATATYPE:
+			return 1560; //bit
+		case _BIT_DATATYPE:
+			return 1561; //_bit
+		case VARBIT_DATATYPE:
+			return 1562; //varbit
+		case _VARBIT_DATATYPE:
+			return 1563; //_varbit
+		case NUMERIC_DATATYPE:
+			return 1700; //numeric
+		case REFCURSOR_DATATYPE:
+			return 1790; //refcursor
+		case _REFCURSOR_DATATYPE:
+			return 2201; //_refcursor
+		case REGPROCEDURE_DATATYPE:
+			return 2202; //regprocedure
+		case REGOPER_DATATYPE:
+			return 2203; //regoper
+		case REGOPERATOR_DATATYPE:
+			return 2204; //regoperator
+		case REGCLASS_DATATYPE:
+			return 2205; //regclass
+		case REGTYPE_DATATYPE:
+			return 2206; //regtype
+		case _REGPROCEDURE_DATATYPE:
+			return 2207; //_regprocedure
+		case _REGOPER_DATATYPE:
+			return 2208; //_regoper
+		case _REGOPERATOR_DATATYPE:
+			return 2209; //_regoperator
+		case _REGCLASS_DATATYPE:
+			return 2210; //_regclass
+		case _REGTYPE_DATATYPE:
+			return 2211; //_regtype
+		case RECORD_DATATYPE:
+			return 2249; //record
+		case CSTRING_DATATYPE:
+			return 2275; //cstring
+		case ANY_DATATYPE:
+			return 2276; //any
+		case ANYARRAY_DATATYPE:
+			return 2277; //anyarray
+		case VOID_DATATYPE:
+			return 2278; //void
+		case TRIGGER_DATATYPE:
+			return 2279; //trigger
+		case LANGUAGE_HANDLER_DATATYPE:
+			return 2280; //language_handler
+		case INTERNAL_DATATYPE:
+			return 2281; //internal
+		case OPAQUE_DATATYPE:
+			return 2282; //opaque
+		case ANYELEMENT_DATATYPE:
+			return 2283; //anyelement
+		case UNKNOWN_DATATYPE:
+		default:
+			return 705; //unknown
+	}
 }
 
 bool sqlrprotocol_postgresql::sendDataRow(sqlrservercursor *cursor,
