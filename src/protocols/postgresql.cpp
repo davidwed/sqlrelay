@@ -8,7 +8,7 @@
 #include <rudiments/randomnumber.h>
 #include <rudiments/error.h>
 
-// Define request/response packet types
+// request/response packet types
 #define MESSAGE_NULL			0x00
 #define MESSAGE_AUTHENTICATION		'R'
 #define MESSAGE_PASSWORD		'p'
@@ -22,21 +22,17 @@
 #define MESSAGE_PARSE			'P'
 #define MESSAGE_PARSECOMPLETE		'1'
 #define MESSAGE_BIND			'B'
+#define MESSAGE_BINDCOMPLETE		'2'
 #define MESSAGE_EXECUTE			'E'
 #define MESSAGE_SYNC			'S'
 #define MESSAGE_DESCRIBE		'D'
+#define MESSAGE_NODATA			'n'
 #define MESSAGE_CLOSE			'C'
+#define MESSAGE_CLOSECOMPLETE		'3'
 #define MESSAGE_TERMINATE		'X'
 
 
-#define RESPONSE_SUCCESS		0x00
-#define REQUEST_CURSOR_EXECUTE		0x0C
-#define RESPONSE_CURSOR_EXECUTE		0x0D
-#define REQUEST_CURSOR_FETCH		0x0E
-#define RESPONSE_CURSOR_FETCH		0x0F
-#define RESPONSE_END_OF_RESULT_SET	0x10
-
-// Define auth types
+// auth types
 #define AUTH_NONE		0
 #define AUTH_KRB5		2
 #define AUTH_CLEARTEXT		3
@@ -49,7 +45,7 @@
 #define AUTH_SASL_CONT		11
 #define AUTH_SASL_FINAL		12
 
-// Define (error) field types
+// (error) field types
 #define FIELD_TYPE_SEVERITY		'S'
 #define FIELD_TYPE_SEVERITYV		'V'
 #define FIELD_TYPE_CODE			'C'
@@ -68,41 +64,8 @@
 #define FIELD_TYPE_LINE			'L'
 #define FIELD_TYPE_ROUTINE		'R'
 
-// Define column/bind types
-#define SAMPLEDB_TYPE_NULL		0x01
-#define SAMPLEDB_TYPE_CHAR		0x02
-#define SAMPLEDB_TYPE_VARCHAR		0x03
-#define SAMPLEDB_TYPE_INT8		0x04
-#define SAMPLEDB_TYPE_INT16		0x05
-#define SAMPLEDB_TYPE_INT32		0x06
-#define SAMPLEDB_TYPE_INT64		0x07
-#define SAMPLEDB_TYPE_FLOAT		0x08
-#define SAMPLEDB_TYPE_DOUBLE		0x09
-#define SAMPLEDB_TYPE_DECIMAL		0x0A
-#define SAMPLEDB_TYPE_DATE		0x0B
-#define SAMPLEDB_TYPE_TIME		0x0C
-#define SAMPLEDB_TYPE_DATETIME		0x0D
-#define SAMPLEDB_TYPE_BLOB		0x0F
-#define SAMPLEDB_TYPE_END		0xFF
-
-// Define a sqlrelay-column-type to postgresql-column-type map.
-// 
-// In sqlrelay/src/common/datatypes.h SQL Relay defines a datatype enum, with
-// members for the datatypes supported by all of the databases that SQL Relay
-// supports.
-//
-// Element 0 is "UNKNOWN", element 1 is "CHAR", 2 is "INT", 3 is "SMALLINT",
-// etc.
-//
-// This array maps those elements to the datatypes we just defined above.
-// Eg.
-// * If SQL Relay sends back a datatype of 0 (UNKNOWN) then we'll map that to
-// our SAMPLEDB_TYPE_NULL type.
-// * If SQL Relay sends back a datatype of 1 (CHAR) then we'll map that to
-// our SAMPLEDB_TYPE_CHAR type.
-// * If SQL Relay sends back a datatype of 2 (INT) then we'll map that to
-// our SAMPLEDB_TYPE_INT32 type.
-// * etc.
+// sqlrelay-column-type to postgresql-column-type map.
+#if 0
 static unsigned char	postgresqltypemap[]={
 	// "UNKNOWN"
 	(unsigned char)SAMPLEDB_TYPE_NULL,
@@ -499,29 +462,9 @@ static unsigned char	postgresqltypemap[]={
 	// "DATETIMEOFFSET"
 	(unsigned char)SAMPLEDB_TYPE_DATETIME
 };
+#endif
 
 
-// Define the main protocol module class.
-//
-// The SQL Relay server architecture is as follows...
-//
-// Running sqlr-start runs 3 daemons:
-// * sqlr-listener
-// * sqlr-connection
-// * sqlr-scaler
-//
-// There is only 1 sqlr-listener and 1 sqlr-scaler, but there are multiple
-// sqlr-connection daemons.  Each of these opens and maintains a connection
-// to the database.
-//
-// Clients connect to the sqlr-listener, where they are queued until a
-// sqlr-connection is available.  When one is available, the client is handed
-// off to the sqlr-connection and talks to it, exclusively, for the duration of
-// the client session.  A sqlr-connection never talks to more than 1 client at
-// a time.
-//
-// Each sqlr-connection creates an instance of the protocol module class and
-// uses it to talk to the client.
 class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 	public:
 			sqlrprotocol_postgresql(sqlrservercontroller *cont,
@@ -561,12 +504,11 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 						const char *sqlstate,
 						const char *errorstring,
 						uint16_t errorstringlength);
-		bool	sendSuccessResponse();
 
 		bool	query();
-		bool	parse();
 		bool	emptyQuery(const char *query);
-		bool	sendQueryResult(sqlrservercursor *cursor);
+		bool	sendQueryResult(sqlrservercursor *cursor,
+						bool sendrowdescription);
 		bool	sendResultSet(sqlrservercursor *cursor,
 							uint16_t colcount);
 		bool	sendRowDescription(sqlrservercursor *cursor,
@@ -576,31 +518,13 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		bool	sendCommandComplete(sqlrservercursor *cursor);
 		bool	sendEmptyQueryResponse();
 
-		bool	cursorPrepare();
-		bool	cursorExecute();
-		bool	readInputBinds(sqlrservercursor *cursor,
-					const unsigned char *rp,
-					const unsigned char **rpout);
-		bool	readOutputBinds(sqlrservercursor *cursor,
-					const unsigned char *rp,
-					const unsigned char **rpout);
-		bool	readInputOutputBinds(sqlrservercursor *cursor,
-					const unsigned char *rp,
-					const unsigned char **rpout);
-		void	writeOutputBinds(sqlrservercursor *cursor);
-		void	writeInputOutputBinds(sqlrservercursor *cursor);
-		bool	cursorFetch();
-		bool	sendEndOfResultSetResponse();
-		void	writeField(sqlrservercursor *cursor,
-					uint16_t column,
-					const char *field,
-					uint64_t fieldlength,
-					unsigned char columntype,
-					bool blob,
-					bool null);
-		void	writeBlobField(sqlrservercursor *cursor,
-						uint16_t column);
-		bool	cursorClose();
+		bool	parse();
+		bool	bind();
+		bool	describe();
+		bool	sendNoData();
+		bool	execute();
+		bool	sync();
+		bool	close();
 
 		bool	sendCursorError(sqlrservercursor *cursor);
 		bool	sendNotImplementedError();
@@ -609,7 +533,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		bool	sendTooManyBindsError();
 
 		void	debugRecvTypeError();
-		void	debugColumnType(unsigned char columntype);
 		void	debugSystemError();
 
 		void	readString(const unsigned char *rp,
@@ -638,9 +561,13 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
 
+		char		**bindvarnames;
+		int16_t		*bindvarnamesizes;
+
 		char		lobbuffer[32768];
 
-		dictionary<char *, uint16_t>	cursormap;
+		dictionary<char *, sqlrservercursor *>	stmtcursormap;
+		dictionary<char *, sqlrservercursor *>	portalcursormap;
 };
 
 
@@ -649,120 +576,39 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 					domnode *parameters) :
 					sqlrprotocol(cont,ps,parameters) {
 
-	// Constructor!
-
-	// The parameters are as follows:
-	//
-	// "cont" - The SQL Relay server "controller".  This is the main
-	// 		SQL Relay server class.  Each sqlr-connection daemon
-	// 		creates one instance of these.  In turn, it creates a
-	// 		database connection, multiple database cursors,
-	// 		various pluggable modules, etc. and coordinates
-	// 		communication between them.  You'll call
-	// 		cont->something() to do pretty much everything.
-	//
-	// "ps" - Not super important, don't worry about what it is or what it
-	// 		does.
-	//
-	// "parameters" - Configurable parameters...
-	//
-	// This particular protocol module doesn't have any configurable
-	// parameters, but it's not unusual for a protocol module to have them.
-	//
-	// The <listener> tag in the sqlrelay.conf file defines which protocol
-	// module to load, and which port/socket for it to listen on.
-	//
-	// Eg.
-	// <instance ...>
-	// 	<listeners>
-	// 		<listener protocol="postgresql"
-	// 				port="2222"
-	// 				socket="/tmp/postgresql.socket" .../>
-	// 	</listeners>
-	// </instance>
-	//
-	// In this case, the instance listens on inet port 2222 and unix socket
-	// /tmp/postgresql.socket and talks to clients using the "postgresql" protocol
-	// (this protocol).
-	//
-	// The "parameters" domnode defined above points to the <listener> tag.
-	// The protocol, port, and socket attributes can be accessed by calling:
-	//
-	// const char	*protocol=parameters->getAttributeValue("protocol");
-	// const char	*port=parameters->getAttributeValue("port");
-	// const char	*socket=parameters->getAttributeValue("socket");
-	//
-	// If you want, you can define additional attributes, and access them
-	// as well by calling:
-	//
-	// const char	*myparam1=parameters->getAttributeValue("myparam1");
-	// const char	*myparam2=parameters->getAttributeValue("myparam2");
-	// const char	*myparam3=parameters->getAttributeValue("myparam3");
-	// etc.
-	//
-	// Arguably, you could even define and access nested XML tags and
-	// attributes.
-	//
-	// Eg.
-	// <instance ...>
-	// 	<listeners>
-	// 		<listener protocol="postgresql"
-	// 				port="2222"
-	// 				socket="/tmp/postgresql.socket" ...>
-	// 			<mytag1 myattr1="..." .../>
-	// 			<mytag2 myattr2="..." .../>
-	// 		</listener>
-	// 	</listeners>
-	// </instance>
-	//
-	// Any they could be accessed like:
-	//
-	// domnode	*mytag1=parameters->getFirstTagChild("mytag1")
-	// const char	*myattr1=mytag1->getAttributeValue("myattr1");
-	//
-	// domnode	*mytag2=parameters->getFirstTagChild("mytag2")
-	// const char	*myattr2=mytag2->getAttributeValue("myattr2");
-	//
-	// And so on...
-
-
-	// initialize everything...
-
-	// The clientsock is the inet port or unix socket that the client is
-	// talking to the server on.
 	clientsock=NULL;
 
-	// Request packet...
 	reqpacketsize=0;
 	reqpacket=NULL;
-	reqtype=0;
+	reqtype=MESSAGE_NULL;
 
 	rand.setSeed(randomnumber::getSeed());
 
-	// Get the max query size and max bind count from the controller.
 	maxquerysize=cont->getConfig()->getMaxQuerySize();
 	maxbindcount=cont->getConfig()->getMaxBindCount();
+
+	bindvarnames=new char *[maxbindcount];
+	bindvarnamesizes=new int16_t[maxbindcount];
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		charstring::printf(&bindvarnames[i],"$%d",i+1);
+		bindvarnamesizes[i]=charstring::length(bindvarnames[i]);
+	}
 
 	init();
 }
 
 sqlrprotocol_postgresql::~sqlrprotocol_postgresql() {
 
-	// Destructor!
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		delete[] bindvarnames[i];
+	}
+	delete[] bindvarnames;
 
 	free();
 	delete[] reqpacket;
 }
 
 void sqlrprotocol_postgresql::init() {
-
-	// This will be called at startup, and at the beginning of each
-	// client session.  Anything that should be re-initialized before
-	// each client session should be initialized here.
-	//
-	// Anything that should ONLY be initialized at server startup should go
-	// in the constructor instead of here.
-
 	user=NULL;
 	password=NULL;
 	database=NULL;
@@ -770,14 +616,6 @@ void sqlrprotocol_postgresql::init() {
 }
 
 void sqlrprotocol_postgresql::free() {
-
-	// This will be called at shutdown, and at the beginning of each
-	// client session, before init().  Anything that should be
-	// re-initialized before each client session should be freed here.
-	//
-	// Anything that should ONLY be freed at server shutdown should go in
-	// the destructor, not here.
-
 	delete[] user;
 	delete[] password;
 	delete[] database;
@@ -789,18 +627,6 @@ void sqlrprotocol_postgresql::free() {
 clientsessionexitstatus_t sqlrprotocol_postgresql::clientSession(
 						filedescriptor *cs) {
 
-	// This method gets called when a client is handed off to the
-	// sqlr-connection and should not exit until the client's session
-	// is over.
-	//
-	// It basically:
-	// * initializes the connection
-	// * handles client requests
-	// * cleans up for client-disconnect
-
-
-	// Get the file descriptor (inet/unix socket) that the client is
-	// communicating over.
 	clientsock=cs;
 
 	// Set up the socket...
@@ -827,7 +653,7 @@ clientsessionexitstatus_t sqlrprotocol_postgresql::clientSession(
 		do {
 
 			// get the request...
-			if (!sendReadyForQuery() || !recvPacket()) {
+			if (!recvPacket()) {
 				status=
 				CLIENTSESSIONEXITSTATUS_CLOSED_CONNECTION;
 				break;
@@ -849,14 +675,20 @@ clientsessionexitstatus_t sqlrprotocol_postgresql::clientSession(
 				case MESSAGE_PARSE:
 					loop=parse();
 					break;
-				case REQUEST_CURSOR_EXECUTE:
-					loop=cursorExecute();
+				case MESSAGE_BIND:
+					loop=bind();
 					break;
-				case REQUEST_CURSOR_FETCH:
-					loop=cursorFetch();
+				case MESSAGE_DESCRIBE:
+					loop=describe();
+					break;
+				case MESSAGE_EXECUTE:
+					loop=execute();
+					break;
+				case MESSAGE_SYNC:
+					loop=sync();
 					break;
 				case MESSAGE_CLOSE:
-					loop=cursorClose();
+					loop=close();
 					break;
 				default:
 					loop=sendNotImplementedError();
@@ -1005,8 +837,9 @@ bool sqlrprotocol_postgresql::initialHandshake() {
 	return recvStartupMessage() &&
 		sendStartupMessageResponse() &&
 		recvPasswordMessage() &&
-		authenticate();
+		authenticate() &&
 		// FIXME: send BackendKeyData and ParameterStatus here...
+		sendReadyForQuery();
 }
 
 bool sqlrprotocol_postgresql::recvStartupMessage() {
@@ -1175,8 +1008,7 @@ void sqlrprotocol_postgresql::parseOptions(const char *opts) {
 
 bool sqlrprotocol_postgresql::sendStartupMessageResponse() {
 
-	// The user is required to have been sent in the StartupMessage.
-	// Fail if it wasn't.
+	// fail if the user wasn't sent (it's required)
 	if (!user) {
 		// FIXME: return error of some kind...
 		return false;
@@ -1396,8 +1228,7 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 						const char *errorstring,
 						uint16_t errorstringlength) {
 
-	// Respond to the client that an error occurred, with an error code
-	// and error string.
+	// respond with the error
 
 	// response packet data structure:
 	//
@@ -1456,27 +1287,6 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 	return sendPacket(MESSAGE_ERRORRESPONSE);
 }
 
-bool sqlrprotocol_postgresql::sendSuccessResponse() {
-
-	// Respond to the client that the request succeeded.
-
-	// response packet data structure:
-	//
-	// data {
-	// 	(nothing)
-	// }
-
-	// debug
-	debugStart("success");
-	debugEnd();
-
-	// build response packet
-	resppacket.clear();
-
-	// send response packet
-	return sendPacket(RESPONSE_SUCCESS);
-}
-
 bool sqlrprotocol_postgresql::query() {
 
 	// get an available cursor
@@ -1506,6 +1316,10 @@ bool sqlrprotocol_postgresql::query() {
 	}
 	debugEnd();
 
+	// clear binds
+	cont->getBindPool(cursor)->clear();
+	cont->setInputBindCount(cursor,0);
+
 	// FIXME: There could be multiple queries.  If so, and if not in a
 	// transaction, then we need to start one and commit/rollback it later.
 	bool	result=false;
@@ -1515,7 +1329,7 @@ bool sqlrprotocol_postgresql::query() {
 		if (cont->prepareQuery(cursor,query,querylength,
 						true,true,true) &&
 			cont->executeQuery(cursor,true,true,true,true)) {
-			result=sendQueryResult(cursor);
+			result=sendQueryResult(cursor,true);
 		} else {
 			result=sendCursorError(cursor);
 		}
@@ -1524,25 +1338,28 @@ bool sqlrprotocol_postgresql::query() {
 	// release the cursor
 	cont->setState(cursor,SQLRCURSORSTATE_AVAILABLE);
 
-	return result;
+	return (result)?sendReadyForQuery():false;
 }
 
 bool sqlrprotocol_postgresql::emptyQuery(const char *query) {
 	return !(cont->skipWhitespaceAndComments(query)[0]);
 }
 
-bool sqlrprotocol_postgresql::sendQueryResult(sqlrservercursor *cursor) {
+bool sqlrprotocol_postgresql::sendQueryResult(sqlrservercursor *cursor,
+						bool sendrowdescription) {
 	uint16_t	colcount=cont->colCount(cursor);
-	return (colcount)?sendResultSet(cursor,colcount):
-				sendCommandComplete(cursor);
+	if (colcount) {
+		if (sendrowdescription &&
+			!sendRowDescription(cursor,colcount)) {
+			return false;
+		}
+		return sendResultSet(cursor,colcount);
+	}
+	return sendCommandComplete(cursor);
 }
 
 bool sqlrprotocol_postgresql::sendResultSet(sqlrservercursor *cursor,
 							uint16_t colcount) {
-
-	if (!sendRowDescription(cursor,colcount)) {
-		return false;
-	}
 
 	for (;;) {
 
@@ -1577,36 +1394,67 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 	for (uint16_t i=0; i<colcount; i++) {
 
 		// field name
-		resppacket.append(cont->getColumnName(cursor,i));
-		resppacket.append('\0');
+		write(&resppacket,cont->getColumnName(cursor,i));
+		write(&resppacket,'\0');
 
-		// FIXME: table oid (or 0 if not known)
-		resppacket.append((int32_t)0);
+		// table oid (or 0 if not known)
+		const char	*tablename=cont->getColumnTable(cursor,i);
+		uint32_t	tableoid=0;
+		if (charstring::isNumber(tablename)) {
+			// The postgresql backend returns oid's unless
+			// tablemangling=lookup is set.  If we get a number
+			// for the table name, then assume the backend is
+			// returning oid's.
+			tableoid=charstring::toInteger(tablename);
+		}
+		writeBE(&resppacket,tableoid);
 
-		// FIXME: column "attribute number" (index?) (or 0 if not known)
-		resppacket.append((int16_t)0);
+		// column "attribute number" (or 0 if not known)
+		// FIXME: no idea what this even is
+		writeBE(&resppacket,(uint16_t)0);
 
-		// FIXME: data type oid
-		resppacket.append((int32_t)0);
+		// data type oid (or 0 if not known)
+		const char	*coltypename=cont->getColumnTypeName(cursor,i);
+		uint32_t	coltypeoid=0;
+		if (charstring::isNumber(coltypename)) {
+			// The postgresql backend returns oid's unless
+			// typemangling=yes/lookup is set.  If we get a number
+			// for the type name, then assume the backend is
+			// returning oid's.
+			coltypeoid=charstring::toInteger(coltypename);
+		} else {
+			// FIXME: map column types to oid's
+		}
+		writeBE(&resppacket,coltypeoid);
 
-		// FIXME: data type size
-		resppacket.append((int16_t)0);
+		// data type size
+		// FIXME: should be negative for variable-width types
+		writeBE(&resppacket,(uint16_t)cont->getColumnLength(cursor,i));
 
-		// FIXME: type modifier
-		resppacket.append((int32_t)0);
+		// type modifier
+		// FIXME: no idea what this even is
+		writeBE(&resppacket,(uint32_t)0);
 
-		// FIXME: format code text=0, binary=1
-		resppacket.append((int16_t)0);
+		// format code text=0, binary=1
+		// for now, we always return text, even if binary was requested
+		writeBE(&resppacket,(uint16_t)0);
 
 		
 		if (getDebug()) {
 			stdoutput.printf("	column %d {\n",i);
 			stdoutput.printf("		name: %s\n",
 						cont->getColumnName(cursor,i));
-			stdoutput.printf("		table oid: 0\n");
+			stdoutput.printf("		table name: %s\n",
+								tablename);
+			stdoutput.printf("		table oid: %d\n",
+								tableoid);
 			stdoutput.printf("		attribute number: 0\n");
-			stdoutput.printf("		data type oid: 0\n");
-			stdoutput.printf("		data type size: 0\n");
+			stdoutput.printf("		column type name: %s\n",
+								coltypename);
+			stdoutput.printf("		data type oid: %d\n",
+								coltypeoid);
+			stdoutput.printf("		data type size: %d\n",
+					cont->getColumnLength(cursor,i));
 			stdoutput.printf("		type modifier: 0\n");
 			stdoutput.printf("		format code: 0\n");
 			debugEnd(1);
@@ -1766,7 +1614,7 @@ bool sqlrprotocol_postgresql::parse() {
 	// request packet data structure:
 	//
 	// data {
-	// 	char[]		cursor name
+	// 	char[]		stmt name
 	// 	char[]		query
 	// 	uint16_t	param count
 	// 	
@@ -1780,8 +1628,8 @@ bool sqlrprotocol_postgresql::parse() {
 	const unsigned char	*rp=reqpacket;
 	const unsigned char	*rpend=rp+reqpacketsize;
 
-	// get cursor name
-	const char	*cursorname=(const char *)rp;
+	// get stmt name
+	const char	*stmtname=(const char *)rp;
 	while (*rp && rp!=rpend) {
 		rp++;
 	}
@@ -1804,18 +1652,21 @@ bool sqlrprotocol_postgresql::parse() {
 	// get param types
 	uint16_t	paramcount;
 	readBE(rp,&paramcount,&rp);
+	if (paramcount>maxbindcount) {
+		return sendTooManyBindsError();
+	}
 	uint32_t	*paramtypes=new uint32_t[paramcount];
 	for (uint16_t i=0; i<paramcount; i++) {
 		readBE(rp,&(paramtypes[i]),&rp);
 	}
 
-	// map cursor id to name
-	cursormap.setValue(charstring::duplicate(cursorname),cursor->getId());
+	// map stmt -> cursor
+	stmtcursormap.setValue(charstring::duplicate(stmtname),cursor);
 
 	// debug
 	debugStart("Parse");
 	if (getDebug()) {
-		stdoutput.printf("	cursor name: %d\n",cursorname);
+		stdoutput.printf("	stmt name: %s\n",stmtname);
 		stdoutput.printf("	cursor id: %d\n",cursor->getId());
 		stdoutput.printf("	query length: %d\n",querylength);
 		stdoutput.printf("	query: %.*s\n",querylength,query);
@@ -1826,6 +1677,9 @@ bool sqlrprotocol_postgresql::parse() {
 		}
 	}
 	debugEnd();
+
+	// FIXME: do something with param types?
+	delete[] paramtypes;
 
 	// bounds checking
 	if (querylength>maxquerysize) {
@@ -1838,7 +1692,9 @@ bool sqlrprotocol_postgresql::parse() {
 	querybuffer[querylength]='\0';
 	cont->setQueryLength(cursor,querylength);
 
-	// FIXME: do something with param types?
+	// clear binds
+	cont->getBindPool(cursor)->clear();
+	cont->setInputBindCount(cursor,0);
 
 	// prepare the query
 	if (!cont->prepareQuery(cursor,cont->getQueryBuffer(cursor),
@@ -1851,25 +1707,6 @@ bool sqlrprotocol_postgresql::parse() {
 	// response packet data structure
 	//
 	// data {
-	// 	uint16_t	column count
-	//  	column[] {
-	//  		uint16_t	table name length
-	//  		char[]		table name
-	//  		uint16_t	column name length
-	//  		char[]		column name
-	//  		uint16_t	type
-	//  		uint32_t	length
-	//  		uint32_t	precision
-	//  		uint32_t	scale
-	//  		unsigned char	is nullable
-	//  		unsigned char	is primary key
-	//  		unsigned char	is unique
-	//  		unsigned char	is part of key
-	//  		unsigned char	is unsigned
-	//  		unsigned char	is zero filled
-	//  		unsigned char	is binary
-	//  		unsigned char	is auto increment
-	// 	}
 	// }
 
 	debugStart("ParseComplete");
@@ -1882,65 +1719,309 @@ bool sqlrprotocol_postgresql::parse() {
 	return sendPacket(MESSAGE_PARSECOMPLETE);
 }
 
-bool sqlrprotocol_postgresql::cursorExecute() {
-
-	// The client would like to execute the previously prepared query.
-	//
-	// Since this protocol supports bind variables, we must also collect:
-	// * input bind values
-	// * ouput bind definitions
-	// * input/output bind definitions and values
+bool sqlrprotocol_postgresql::bind() {
 
 	// request packet data structure:
 	//
 	// data {
-	// 	unsigned char	request type
-	// 	uint16_t	cursor id
-	// 	uint16_t	input bind count
-	// 	input bind[] {
-	// 		...
-	// 	}
-	// 	uint16_t	output bind count
-	// 	output bind[] {
-	// 		...
-	// 	}
-	// 	uint16_t	input/output bind count
-	// 	input/output bind[] {
-	// 		...
-	// 	}
+	// 	char[]		portal name
+	//	char[]		stmt name
+	//	uint16_t	param format code count
+	//	uint16_t[]	param formats (0=text, 1=binary)
+	//	uint16_t	param value count
+	//
+	//	// param values...
+	//	int32_t		value length (-1 = null)
+	//	byte[]		parameter value
+	//
+	//	uint16_t	result format code count
+	//	uint16_t[]	result formats (0=text, 1=binary)
+	// }
+
+	debugStart("Bind");
+
+	// parse request packet
+	const unsigned char	*rp=reqpacket;
+	const unsigned char	*rpend=rp+reqpacketsize;
+
+	stringbuffer	portal;
+	stringbuffer	stmtname;
+	readString(rp,rpend,&portal,&rp);
+	readString(rp,rpend,&stmtname,&rp);
+	
+	// get the requested cursor
+	sqlrservercursor	*cursor=NULL;
+	if (!stmtcursormap.getValue((char *)stmtname.getString(),&cursor)) {
+		// FIXME: invalid cursor error...
+	}
+
+	// map portal -> cursor
+	portalcursormap.setValue(
+		charstring::duplicate(portal.getString()),cursor);
+
+	// get and clear the bind pool
+	memorypool		*bindpool=cont->getBindPool(cursor);
+	bindpool->clear();
+
+	// get the input binds
+	sqlrserverbindvar	*inbinds=cont->getInputBinds(cursor);
+
+	// debug
+	if (getDebug()) {
+		stdoutput.printf("	portal name: %s\n",portal.getString());
+		stdoutput.printf("	stmt name: %s\n",stmtname.getString());
+		stdoutput.printf("	cursor id: %d\n",cursor->getId());
+	}
+
+	// param format codes...
+	uint16_t	paramformatcodecount;
+	readBE(rp,&paramformatcodecount,&rp);
+	if (paramformatcodecount>maxbindcount) {
+		return sendTooManyBindsError();
+	}
+	uint16_t	*paramformatcodes=NULL;
+	if (paramformatcodecount) {
+		// FIXME: use the bind pool
+		paramformatcodes=new uint16_t[paramformatcodecount];
+		for (uint16_t i=0; i<paramformatcodecount; i++) {
+			readBE(rp,&(paramformatcodes[i]),&rp);
+		}
+	}
+
+	// debug
+	if (getDebug()) {
+		stdoutput.printf("	param format codes: (%d) ",
+							paramformatcodecount);
+		for (uint16_t i=0; i<paramformatcodecount; i++) {
+			stdoutput.printf("%d",paramformatcodes[i]);
+		}
+		stdoutput.write('\n');
+	}
+
+	// param values...
+	uint16_t	paramvaluecount;
+	readBE(rp,&paramvaluecount,&rp);
+	if (paramvaluecount>maxbindcount) {
+		return sendTooManyBindsError();
+	}
+	// debug
+	if (getDebug()) {
+		stdoutput.printf("	param value count: %d\n",
+							paramvaluecount);
+	}
+	for (uint16_t i=0; i<paramvaluecount; i++) {
+
+		sqlrserverbindvar	*bv=&(inbinds[i]);
+
+		if (getDebug()) {
+			stdoutput.printf("	param %d {\n",i);
+		}
+
+		// get the variable name
+		bv->variable=bindvarnames[i];
+		bv->variablesize=bindvarnamesizes[i];
+
+		if (getDebug()) {
+			stdoutput.printf("		name: %s\n",
+							bv->variable);
+		}
+
+		if (!paramformatcodecount || !paramformatcodes[i]) {
+
+			// text parameter...
+
+			// get length/null-indicator
+			uint32_t	paramlength;
+			readBE(rp,&paramlength,&rp);
+
+			if (getDebug()) {
+				stdoutput.printf("		"
+						"format: text\n");
+				stdoutput.printf("		"
+						"length: %d\n",paramlength);
+			}
+
+			if (paramlength==(uint32_t)-1) {
+
+				// bind null
+				bv->type=SQLRSERVERBINDVARTYPE_NULL;
+				bv->isnull=cont->nullBindValue();
+
+				if (getDebug()) {
+					stdoutput.printf("		"
+							"value: (null)\n");
+				}
+
+			} else {
+
+				// bind string
+				bv->type=SQLRSERVERBINDVARTYPE_STRING;
+				bv->valuesize=paramlength;
+				bv->value.stringval=
+					(char *)bindpool->allocate(
+							bv->valuesize+1);
+				read(rp,bv->value.stringval,bv->valuesize,&rp);
+				bv->value.stringval[bv->valuesize]='\0';
+				bv->isnull=cont->nonNullBindValue();
+
+				if (getDebug()) {
+					stdoutput.printf("		"
+							"value: %s\n",
+							bv->value.stringval);
+				}
+			}
+
+		} else {
+
+			if (getDebug()) {
+				stdoutput.printf("		"
+						"format: binary\n");
+			}
+
+			// FIXME: binary parameter...
+		}
+
+		debugEnd(1);
+	}
+
+	// set the bind count
+	cont->setInputBindCount(cursor,paramvaluecount);
+
+	// result format codes...
+	// FIXME: what do we do with these?
+	uint16_t	resultformatcodecount;
+	readBE(rp,&resultformatcodecount,&rp);
+	uint16_t	*resultformatcodes=NULL;
+	if (resultformatcodecount) {
+		// FIXME: use the bind pool
+		resultformatcodes=new uint16_t[resultformatcodecount];
+		for (uint16_t i=0; i<resultformatcodecount; i++) {
+			readBE(rp,&(resultformatcodes[i]),&rp);
+		}
+	}
+
+	// debug
+	if (getDebug()) {
+		stdoutput.printf("	result format codes: (%d) ",
+							resultformatcodecount);
+		for (uint16_t i=0; i<resultformatcodecount; i++) {
+			stdoutput.printf("%d",resultformatcodes[i]);
+		}
+		stdoutput.write('\n');
+	}
+	debugEnd();
+
+	delete[] paramformatcodes;
+	delete[] resultformatcodes;
+
+	// response packet data structure
+	//
+	// data {
+	// }
+
+	debugStart("BindComplete");
+	debugEnd();
+
+	// build response packet
+	resppacket.clear();
+
+	// send response packet
+	return sendPacket(MESSAGE_BINDCOMPLETE);
+}
+
+bool sqlrprotocol_postgresql::describe() {
+
+	// request packet data structure:
+	//
+	// data {
+	//	char		S (stmt) or P (portal)
+	//	char[]		stmt/portal name
 	// }
 
 	// parse request packet
 	const unsigned char	*rp=reqpacket;
+	const unsigned char	*rpend=rp+reqpacketsize;
 
-	uint16_t	cursorid;
+	char	sorp;
+	read(rp,&sorp,&rp);
 
-	rp++;
-	readBE(rp,&cursorid,&rp);
-
-	debugStart("cursor execute request");
-	if (getDebug()) {
-		stdoutput.printf("	cursor id: %d\n",cursorid);
-	}
+	stringbuffer	name;
+	readString(rp,rpend,&name,&rp);
+	
+	// decide whether to use stmt/portal -> cursor map
+	dictionary<char *, sqlrservercursor *>	*dict=
+			(sorp=='S')?&stmtcursormap:&portalcursormap;
 
 	// get the requested cursor
-	sqlrservercursor	*cursor=cont->getCursor(cursorid);
-	if (!cursor) {
-		return sendCursorNotOpenError();
+	sqlrservercursor	*cursor=NULL;
+	if (!dict->getValue((char *)name.getString(),&cursor)) {
+		// FIXME: invalid cursor error...
 	}
 
-	// The "controller" provides a "memorypool" to store bind values.
-	// It's basically a specialized heap that can be deleted all-at-once.
-	// Clear that here.
-	cont->getBindPool(cursor)->clear();
+	// debug
+	debugStart("Describe");
+	if (getDebug()) {
+		stdoutput.printf("	S or P: %c\n",sorp);
+		stdoutput.printf("	name: %s\n",name.getString());
+		stdoutput.printf("	cursor id: %d\n",cursor->getId());
+	}
+	debugEnd();
 
-	// process binds
-	if (!readInputBinds(cursor,rp,&rp) ||
-		!readOutputBinds(cursor,rp,&rp) ||
-		!readInputOutputBinds(cursor,rp,&rp)) {
-		return sendTooManyBindsError();
+	// return RowDescription or NoData if the statement will not return rows
+	// (If there are no columns, then there can't be any rows)
+	uint16_t	colcount=cont->colCount(cursor);
+	return (colcount)?sendRowDescription(cursor,colcount):sendNoData();
+}
+
+bool sqlrprotocol_postgresql::sendNoData() {
+	
+	// response packet data structure:
+	//
+	// data {
+	// }
+
+	// debug
+	debugStart("NoData");
+	debugEnd();
+
+	// build response packet
+	resppacket.clear();
+
+	// send response packet
+	return sendPacket(MESSAGE_NODATA);
+}
+
+bool sqlrprotocol_postgresql::execute() {
+
+	// request packet data structure:
+	//
+	// data {
+	//	char[]		portal name
+	//	uint32_t	max number of rows to return
+	// }
+
+	// parse request packet
+	const unsigned char	*rp=reqpacket;
+	const unsigned char	*rpend=rp+reqpacketsize;
+
+	stringbuffer	portal;
+	readString(rp,rpend,&portal,&rp);
+	
+	uint32_t	maxrows;
+	readBE(rp,&maxrows,&rp);
+
+	// get the requested cursor
+	sqlrservercursor	*cursor=NULL;
+	if (!portalcursormap.getValue((char *)portal.getString(),&cursor)) {
+		// FIXME: invalid cursor error...
 	}
 
+	debugStart("Execute");
+	if (getDebug()) {
+		stdoutput.printf("	portal name: %s\n",portal.getString());
+		stdoutput.printf("	cursor id: %d\n",cursor->getId());
+		stdoutput.printf("	max rows: %d\n",maxrows);
+	}
 	debugEnd();
 
 	// execute the query
@@ -1948,1572 +2029,94 @@ bool sqlrprotocol_postgresql::cursorExecute() {
 		return sendCursorError(cursor);
 	}
 
-
-	// response packet data structure
-	//
-	// data {
-	// 	uint64_t	affected rows
-	// 	uint64_t	last insert id
-	// 	output bind[] {
-	// 		...
-	// 	}
-	// 	input/output bind[] {
-	// 		...
-	// 	}
-	// }
-
-	// set values to send
-	uint64_t	affectedrows=0;
-	uint64_t	lastinsertid=0;
-
-	if (cont->knowsAffectedRows(cursor)) {
-		affectedrows=cont->affectedRows(cursor);
+	if (emptyQuery(cont->getQueryBuffer(cursor))) {
+		return sendEmptyQueryResponse();
 	}
-	cont->getLastInsertId(&lastinsertid);
-	// NOTE; getLastInsertId can fail, but that usually just means that the
-	// db doesn't support it.  So, rather than return an error, we'll just
-	// leave id=0.
 
-	// debug
-	debugStart("cursor execute response");
-	if (getDebug()) {
-		stdoutput.printf("	affected rows: %lld\n",affectedrows);
-		stdoutput.printf("	last insert id: %lld\n",lastinsertid);
-	}
-	debugEnd();
-
-	// build response packet...
-	resppacket.clear();
-	writeBE(&resppacket,affectedrows);
-	writeBE(&resppacket,lastinsertid);
-	writeOutputBinds(cursor);
-	writeInputOutputBinds(cursor);
-
-	// send response packet
-	return sendPacket(RESPONSE_CURSOR_EXECUTE);
+	return sendQueryResult(cursor,false);
 }
 
-bool sqlrprotocol_postgresql::readInputBinds(sqlrservercursor *cursor,
-						const unsigned char *rp,
-						const unsigned char **rpout) {
-
-	// input bind structure
-	//
-	// input bind {
-	// 	unsigned char	bind type
-	// 	uint16_t	variable name size
-	// 	char[]		variable name
-	// 	if (type == null) {
-	// 		(nothing)
-	// 	}
-	// 	if (type == int8) {
-	// 		int8_t	value
-	// 	}
-	// 	if (type == int16) {
-	// 		int16_t	value
-	// 	}
-	// 	if (type == int32) {
-	// 		int32_t	value
-	// 	}
-	// 	if (type == int64) {
-	// 		int64_t	value
-	// 	}
-	// 	if (type == float) {
-	// 		float	value
-	// 	}
-	// 	if (type == double) {
-	// 		double	value
-	// 	}
-	// 	if (type == time) {
-	// 		char[]	fixed-length string representing time
-	// 	}
-	// 	if (type == date) {
-	// 		char[]	fixed-length string representing date
-	// 	}
-	// 	if (type == datetime) {
-	// 		char[]	fixed-length string representing date/time
-	// 	}
-	// 	if (type == blob/char/varchar/decimal) {
-	// 		int32_t	value length
-	// 		char[]	value
-	// 	}
-	// }
-
-	// get the bind array...
-	//
-	// The controller provides an array of sqlrserverbindvar structures.
-	//
-	// All we have to do is run through the bind variables passed to us
-	// and assign various bits of info to members of each struct in the
-	// array. The controller will do whatever else is necessary to bind
-	// them to the query prior to execution.
-	sqlrserverbindvar	*inbinds=cont->getInputBinds(cursor);
-
-	// get the bind pool
-	memorypool		*bindpool=cont->getBindPool(cursor);
-
-	// keep track of how many binds we find
-	uint16_t	bindcount=0;
-	for (;;) {
-
-		// get the bind variable type
-		unsigned char	nativebindtype;
-		read(rp,&nativebindtype,&rp);
-
-		// bail if we got the end-marker
-		if (nativebindtype==SAMPLEDB_TYPE_END) {
-			break;
-		}
-
-		debugStart("input bind",1);
-
-		sqlrserverbindvar	*bv=&(inbinds[bindcount]);
-
-		// get the bind variable name (and null terminate it)
-		readBE(rp,(uint16_t *)(&bv->variablesize),&rp);
-		bv->variable=(char *)bindpool->allocate(bv->variablesize+1);
-		read(rp,bv->variable,bv->variablesize,&rp);
-		bv->variable[bv->variablesize]='\0';
-
-		// get the bind variable data
-		switch (nativebindtype) {
-			case SAMPLEDB_TYPE_NULL:
-				bv->type=SQLRSERVERBINDVARTYPE_NULL;
-				bv->isnull=cont->nullBindValue();
-				break;
-			case SAMPLEDB_TYPE_INT8:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				unsigned char	val;
-				read(rp,&val,&rp);
-				bv->value.integerval=(int8_t)val;
-				bv->isnull=cont->nonNullBindValue();
-				break;
-				}
-			case SAMPLEDB_TYPE_INT16:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				uint16_t	val;
-				readBE(rp,&val,&rp);
-				bv->value.integerval=(int16_t)val;
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_INT32:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				uint32_t	val;
-				readBE(rp,&val,&rp);
-				bv->value.integerval=(int32_t)val;
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_INT64:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				uint64_t	val;
-				readBE(rp,&val,&rp);
-				bv->value.integerval=(int64_t)val;
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_FLOAT:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-				float	val;
-				read(rp,&val,&rp);
-				bv->value.doubleval.value=val;
-				bv->value.doubleval.precision=0;
-				bv->value.doubleval.scale=0;
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_DOUBLE:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-				double	val;
-				read(rp,&val,&rp);
-				bv->value.doubleval.value=val;
-				bv->value.doubleval.precision=0;
-				bv->value.doubleval.scale=0;
-				bv->isnull=cont->nonNullBindValue();
-				break;
-				}
-			case SAMPLEDB_TYPE_TIME:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DATE;
-
-				// eg: "00:00:00.000000"
-				char	val[16];
-				read(rp,val,15,&rp);
-				val[15]='\0';
-
-				cont->parseDateTime(val,
-						false,false,"/-.:",
-						&bv->value.dateval.year,
-						&bv->value.dateval.month,
-						&bv->value.dateval.day,
-						&bv->value.dateval.hour,
-						&bv->value.dateval.minute,
-						&bv->value.dateval.second,
-						&bv->value.dateval.microsecond,
-						&bv->value.dateval.isnegative);
-
-				// invalidate non-time parts
-				bv->value.dateval.year=-1;
-				bv->value.dateval.month=-1;
-				bv->value.dateval.day=-1;
-
-				// invalidate unsupported parts
-				bv->value.dateval.isnegative=false;
-				bv->value.dateval.tz=NULL;
-
-				// allocate scratch space
-				bv->value.dateval.buffersize=64;
-				bv->value.dateval.buffer=
-					(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_DATE:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DATE;
-
-				// eg. "2001-01-01"
-				char	val[11];
-				read(rp,val,10,&rp);
-				val[10]='\0';
-
-				cont->parseDateTime(val,
-						false,false,"/-.:",
-						&bv->value.dateval.year,
-						&bv->value.dateval.month,
-						&bv->value.dateval.day,
-						&bv->value.dateval.hour,
-						&bv->value.dateval.minute,
-						&bv->value.dateval.second,
-						&bv->value.dateval.microsecond,
-						&bv->value.dateval.isnegative);
-
-				// invalidate non-date parts
-				bv->value.dateval.hour=-1;
-				bv->value.dateval.minute=-1;
-				bv->value.dateval.second=-1;
-				bv->value.dateval.microsecond=-1;
-
-				// invalidate unsupported parts
-				bv->value.dateval.isnegative=false;
-				bv->value.dateval.tz=NULL;
-
-				// allocate scratch space
-				bv->value.dateval.buffersize=64;
-				bv->value.dateval.buffer=
-					(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_DATETIME:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DATE;
-
-				// eg. "2001-01-01 01:01:01.000000"
-				char	val[27];
-				read(rp,val,26,&rp);
-				val[26]='\0';
-
-				cont->parseDateTime(val,
-						false,false,"/-.:",
-						&bv->value.dateval.year,
-						&bv->value.dateval.month,
-						&bv->value.dateval.day,
-						&bv->value.dateval.hour,
-						&bv->value.dateval.minute,
-						&bv->value.dateval.second,
-						&bv->value.dateval.microsecond,
-						&bv->value.dateval.isnegative);
-
-				// invalidate unsupported parts
-				bv->value.dateval.isnegative=false;
-				bv->value.dateval.tz=NULL;
-
-				// allocated scratch space
-				bv->value.dateval.buffersize=64;
-				bv->value.dateval.buffer=
-					(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_BLOB:
-				// (null-terminate in case it's really a clob)
-				bv->type=SQLRSERVERBINDVARTYPE_BLOB;
-				readBE(rp,&bv->valuesize,&rp);
-				bv->value.stringval=
-					(char *)bindpool->allocate(
-							bv->valuesize+1);
-				read(rp,bv->value.stringval,bv->valuesize,&rp);
-				bv->value.stringval[bv->valuesize]='\0';
-				bv->isnull=cont->nonNullBindValue();
-				break;
-			default:
-				// handle all other types as
-				// strings of some kind...
-				// (be sure to null-terminate)
-				bv->type=SQLRSERVERBINDVARTYPE_STRING;
-				readBE(rp,&bv->valuesize,&rp);
-				bv->value.stringval=
-					(char *)bindpool->allocate(
-							bv->valuesize+1);
-				read(rp,bv->value.stringval,bv->valuesize,&rp);
-				bv->value.stringval[bv->valuesize]='\0';
-				bv->isnull=cont->nonNullBindValue();
-				break;
-		}
-
-		if (getDebug()) {
-			stdoutput.printf("		"
-						"variable: %s\n",bv->variable);
-			if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
-				stdoutput.write("		"
-						"type: NULL\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
-				stdoutput.write("		"
-						"type: STRING\n");
-				stdoutput.printf("		"
-						"value: %s\n",
-						bv->value.stringval);
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
-				stdoutput.write("		"
-						"type: INTEGER\n");
-				stdoutput.printf("		"
-						"value: %lld\n",
-						bv->value.integerval);
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
-				stdoutput.write("		"
-						"type: DOUBLE\n");
-				stdoutput.printf("		"
-						"value: %f (%d,%d)\n",
-						bv->value.doubleval.value,
-						bv->value.doubleval.precision,
-						bv->value.doubleval.scale);
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
-				stdoutput.write("		"
-						"type: DATE\n");
-				stdoutput.printf("		"
-						"value: ...\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
-				stdoutput.write("		"
-						"type: BLOB\n");
-				stdoutput.printf("		"
-						"value: ...\n");
-			}
-		}
-
-		debugEnd(1);
-
-		// increment bind count
-		bindcount++;
-
-		// bail if there were too many binds
-		if (bindcount==maxbindcount) {
-			return false;
-		}
-	}
-
-	// set the bind count
-	cont->setInputBindCount(cursor,bindcount);
-
-	// pass position back out
-	*rpout=rp;
-
-	return true;
-}
-
-bool sqlrprotocol_postgresql::readOutputBinds(sqlrservercursor *cursor,
-						const unsigned char *rp,
-						const unsigned char **rpout) {
-
-	// output bind structure
-	//
-	// output bind {
-	// 	unsigned char	bind type
-	// 	uint16_t	variable name size
-	// 	char[]		variable name
-	// 	if (type == blob/char/varchar/decimal) {
-	// 		int32_t	value length
-	// 	}
-	// }
-
-	// get the bind array
-	//
-	// The controller provides an array of sqlrserverbindvar structures.
-	//
-	// All we have to do is run through the bind variables passed to us
-	// and assign various bits of info to members of each struct in the
-	// array. The controller will do whatever else is necessary to bind
-	// them to the query prior to execution.
-	//
-	// Since these are output binds, all we really have to do is set the
-	// type and maybe initialize some things.
-	sqlrserverbindvar	*outbinds=cont->getOutputBinds(cursor);
-
-	// get the bind pool
-	memorypool		*bindpool=cont->getBindPool(cursor);
-
-	// keep track of how many binds we find
-	uint16_t	bindcount=0;
-	for (;;) {
-
-		// get the bind variable type
-		unsigned char	nativebindtype;
-		read(rp,&nativebindtype,&rp);
-
-		// bail if we got the end-marker
-		if (nativebindtype==SAMPLEDB_TYPE_END) {
-			break;
-		}
-
-		debugStart("output bind",1);
-
-		sqlrserverbindvar	*bv=&(outbinds[bindcount]);
-
-		// get the bind variable name (and null terminate it)
-		readBE(rp,(uint16_t *)(&bv->variablesize),&rp);
-		bv->variable=(char *)bindpool->allocate(bv->variablesize+1);
-		read(rp,bv->variable,bv->variablesize,&rp);
-		bv->variable[bv->variablesize]='\0';
-
-		// keep track of the native bind type
-		bv->nativetype=nativebindtype;
-
-		// get the bind variable data
-		switch (nativebindtype) {
-			case SAMPLEDB_TYPE_NULL:
-				bv->type=SQLRSERVERBINDVARTYPE_NULL;
-				break;
-			case SAMPLEDB_TYPE_INT8:
-			case SAMPLEDB_TYPE_INT16:
-			case SAMPLEDB_TYPE_INT32:
-			case SAMPLEDB_TYPE_INT64:
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				break;
-			case SAMPLEDB_TYPE_FLOAT:
-			case SAMPLEDB_TYPE_DOUBLE:
-				bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-				bv->value.doubleval.precision=0;
-				bv->value.doubleval.scale=0;
-				break;
-			case SAMPLEDB_TYPE_TIME:
-			case SAMPLEDB_TYPE_DATE:
-			case SAMPLEDB_TYPE_DATETIME:
-				bv->type=SQLRSERVERBINDVARTYPE_DATE;
-				bv->value.dateval.year=0;
-				bv->value.dateval.month=0;
-				bv->value.dateval.day=0;
-				bv->value.dateval.hour=0;
-				bv->value.dateval.minute=0;
-				bv->value.dateval.second=0;
-				bv->value.dateval.microsecond=0;
-				bv->value.dateval.tz=NULL;
-				bv->value.dateval.isnegative=false;
-
-				// allocate scratch space
-				bv->value.dateval.buffersize=64;
-				bv->value.dateval.buffer=
-					(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-				break;
-			case SAMPLEDB_TYPE_BLOB:
-				bv->type=SQLRSERVERBINDVARTYPE_BLOB;
-				readBE(rp,&bv->valuesize,&rp);
-				bv->value.stringval=
-					(char *)bindpool->allocate(
-							bv->valuesize+1);
-				bytestring::zero(bv->value.stringval,
-							bv->valuesize+1);
-				break;
-			default:
-				// handle all other types as
-				// strings of some kind...
-				bv->type=SQLRSERVERBINDVARTYPE_STRING;
-				readBE(rp,&bv->valuesize,&rp);
-				bv->value.stringval=
-					(char *)bindpool->allocate(
-							bv->valuesize+1);
-				bytestring::zero(bv->value.stringval,
-							bv->valuesize+1);
-				break;
-		}
-
-		if (getDebug()) {
-			stdoutput.printf("		"
-						"variable: %s\n",bv->variable);
-			if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
-				stdoutput.write("		"
-						"type: NULL\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
-				stdoutput.write("		"
-						"type: STRING\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
-				stdoutput.write("		"
-						"type: INTEGER\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
-				stdoutput.write("		"
-						"type: DOUBLE\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
-				stdoutput.write("		"
-						"type: DATE\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
-				stdoutput.write("		"
-						"type: BLOB\n");
-			}
-		}
-
-		debugEnd(1);
-
-		// increment bind count
-		bindcount++;
-
-		// bail if there were too many binds
-		if (bindcount==maxbindcount) {
-			return false;
-		}
-	}
-
-	// set the bind count
-	cont->setOutputBindCount(cursor,bindcount);
-
-	// pass position back out
-	*rpout=rp;
-
-	return true;
-}
-
-bool sqlrprotocol_postgresql::readInputOutputBinds(sqlrservercursor *cursor,
-						const unsigned char *rp,
-						const unsigned char **rpout) {
-
-	// input/output bind structure
-	//
-	// input/output bind {
-	// 	unsigned char	bind type
-	// 	uint16_t	variable name size
-	// 	char[]		variable name
-	// 	if (type == null) {
-	// 		(nothing)
-	// 	}
-	// 	if (type == int8) {
-	// 		int8_t	value
-	// 	}
-	// 	if (type == int16) {
-	// 		int16_t	value
-	// 	}
-	// 	if (type == int32) {
-	// 		int32_t	value
-	// 	}
-	// 	if (type == int64) {
-	// 		int64_t	value
-	// 	}
-	// 	if (type == float) {
-	// 		float	value
-	// 	}
-	// 	if (type == double) {
-	// 		double	value
-	// 	}
-	// 	if (type == time) {
-	// 		char[]	fixed-length string representing time
-	// 	}
-	// 	if (type == date) {
-	// 		char[]	fixed-length string representing date
-	// 	}
-	// 	if (type == datetime) {
-	// 		char[]	fixed-length string representing date/time
-	// 	}
-	// 	if (type == blob/char/varchar/decimal) {
-	// 		int32_t	value length
-	// 		char[]	value
-	// 	}
-	// }
-
-	// get the bind array
-	//
-	// The controller provides an array of sqlrserverbindvar structures.
-	//
-	// All we have to do is run through the bind variables passed to us
-	// and assign various bits of info to members of each struct in the
-	// array. The controller will do whatever else is necessary to bind
-	// them to the query prior to execution.
-	sqlrserverbindvar	*inoutbinds=cont->getInputOutputBinds(cursor);
-
-	// get the bind pool
-	memorypool		*bindpool=cont->getBindPool(cursor);
-
-	// keep track of how many binds we find
-	uint16_t	bindcount=0;
-	for (;;) {
-
-		// get the bind variable type
-		unsigned char	nativebindtype;
-		read(rp,&nativebindtype,&rp);
-
-		// bail if we got the end-marker
-		if (nativebindtype==SAMPLEDB_TYPE_END) {
-			break;
-		}
-
-		debugStart("input/output bind",1);
-
-		sqlrserverbindvar	*bv=&(inoutbinds[bindcount]);
-
-		// get the bind variable name (and null terminate it)
-		readBE(rp,(uint16_t *)(&bv->variablesize),&rp);
-		bv->variable=(char *)bindpool->allocate(bv->variablesize+1);
-		read(rp,bv->variable,bv->variablesize,&rp);
-		bv->variable[bv->variablesize]='\0';
-
-		// keep track of the native bind type
-		bv->nativetype=nativebindtype;
-
-		// get the bind variable data
-		switch (nativebindtype) {
-			case SAMPLEDB_TYPE_NULL:
-				bv->type=SQLRSERVERBINDVARTYPE_NULL;
-				bv->isnull=cont->nullBindValue();
-				break;
-			case SAMPLEDB_TYPE_INT8:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				unsigned char	val;
-				read(rp,&val,&rp);
-				bv->value.integerval=(int8_t)val;
-				bv->isnull=cont->nonNullBindValue();
-				break;
-				}
-			case SAMPLEDB_TYPE_INT16:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				uint16_t	val;
-				readBE(rp,&val,&rp);
-				bv->value.integerval=(int16_t)val;
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_INT32:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				uint32_t	val;
-				readBE(rp,&val,&rp);
-				bv->value.integerval=(int32_t)val;
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_INT64:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
-				uint64_t	val;
-				readBE(rp,&val,&rp);
-				bv->value.integerval=(int64_t)val;
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_FLOAT:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-				float	val;
-				read(rp,&val,&rp);
-				bv->value.doubleval.value=val;
-				bv->value.doubleval.precision=0;
-				bv->value.doubleval.scale=0;
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_DOUBLE:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-				double	val;
-				read(rp,&val,&rp);
-				bv->value.doubleval.value=val;
-				bv->value.doubleval.precision=0;
-				bv->value.doubleval.scale=0;
-				bv->isnull=cont->nonNullBindValue();
-				break;
-				}
-			case SAMPLEDB_TYPE_TIME:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DATE;
-
-				// eg: "00:00:00.000000"
-				char	val[16];
-				read(rp,val,15,&rp);
-				val[15]='\0';
-
-				cont->parseDateTime(val,
-						false,false,"/-.:",
-						&bv->value.dateval.year,
-						&bv->value.dateval.month,
-						&bv->value.dateval.day,
-						&bv->value.dateval.hour,
-						&bv->value.dateval.minute,
-						&bv->value.dateval.second,
-						&bv->value.dateval.microsecond,
-						&bv->value.dateval.isnegative);
-
-				// invalidate non-time parts
-				bv->value.dateval.year=-1;
-				bv->value.dateval.month=-1;
-				bv->value.dateval.day=-1;
-
-				// invalidate unsupported parts
-				bv->value.dateval.isnegative=false;
-				bv->value.dateval.tz=NULL;
-
-				// allocate scratch space
-				bv->value.dateval.buffersize=64;
-				bv->value.dateval.buffer=
-					(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_DATE:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DATE;
-
-				// eg. "2001-01-01"
-				char	val[11];
-				read(rp,val,10,&rp);
-				val[10]='\0';
-
-				cont->parseDateTime(val,
-						false,false,"/-.:",
-						&bv->value.dateval.year,
-						&bv->value.dateval.month,
-						&bv->value.dateval.day,
-						&bv->value.dateval.hour,
-						&bv->value.dateval.minute,
-						&bv->value.dateval.second,
-						&bv->value.dateval.microsecond,
-						&bv->value.dateval.isnegative);
-
-				// invalidate non-date parts
-				bv->value.dateval.hour=-1;
-				bv->value.dateval.minute=-1;
-				bv->value.dateval.second=-1;
-				bv->value.dateval.microsecond=-1;
-
-				// invalidate unsupported parts
-				bv->value.dateval.isnegative=false;
-				bv->value.dateval.tz=NULL;
-
-				// allocate scratch space
-				bv->value.dateval.buffersize=64;
-				bv->value.dateval.buffer=
-					(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_DATETIME:
-				{
-				bv->type=SQLRSERVERBINDVARTYPE_DATE;
-
-				// eg. "2001-01-01 01:01:01.000000"
-				char	val[27];
-				read(rp,val,26,&rp);
-				val[26]='\0';
-
-				cont->parseDateTime(val,
-						false,false,"/-.:",
-						&bv->value.dateval.year,
-						&bv->value.dateval.month,
-						&bv->value.dateval.day,
-						&bv->value.dateval.hour,
-						&bv->value.dateval.minute,
-						&bv->value.dateval.second,
-						&bv->value.dateval.microsecond,
-						&bv->value.dateval.isnegative);
-
-				// invalidate unsupported parts
-				bv->value.dateval.isnegative=false;
-				bv->value.dateval.tz=NULL;
-
-				// allocated scratch space
-				bv->value.dateval.buffersize=64;
-				bv->value.dateval.buffer=
-					(char *)bindpool->allocate(
-						bv->value.dateval.buffersize);
-
-				bv->isnull=cont->nonNullBindValue();
-				}
-				break;
-			case SAMPLEDB_TYPE_BLOB:
-				bv->type=SQLRSERVERBINDVARTYPE_BLOB;
-				readBE(rp,&bv->valuesize,&rp);
-				bv->value.stringval=
-					(char *)bindpool->allocate(
-							bv->valuesize);
-				read(rp,bv->value.stringval,bv->valuesize,&rp);
-				bv->isnull=cont->nonNullBindValue();
-				break;
-			default:
-				// handle all other types as
-				// strings of some kind...
-				bv->type=SQLRSERVERBINDVARTYPE_STRING;
-				readBE(rp,&bv->valuesize,&rp);
-				bv->value.stringval=
-					(char *)bindpool->allocate(
-							bv->valuesize);
-				read(rp,bv->value.stringval,bv->valuesize,&rp);
-				bv->isnull=cont->nonNullBindValue();
-				break;
-		}
-
-		if (getDebug()) {
-			stdoutput.printf("		"
-						"variable: %s\n",bv->variable);
-			if (bv->type==SQLRSERVERBINDVARTYPE_NULL) {
-				stdoutput.write("		"
-						"type: NULL\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
-				stdoutput.write("		"
-						"type: STRING\n");
-				stdoutput.printf("		"
-						"value: %s\n",
-						bv->value.stringval);
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
-				stdoutput.write("		"
-						"type: INTEGER\n");
-				stdoutput.printf("		"
-						"value: %lld\n",
-						bv->value.integerval);
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
-				stdoutput.write("		"
-						"type: DOUBLE\n");
-				stdoutput.printf("		"
-						"value: %f (%d,%d)\n",
-						bv->value.doubleval.value,
-						bv->value.doubleval.precision,
-						bv->value.doubleval.scale);
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
-				stdoutput.write("		"
-						"type: DATE\n");
-				stdoutput.printf("		"
-						"value: ...\n");
-			} else if (bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
-				stdoutput.write("		"
-						"type: BLOB\n");
-				stdoutput.printf("		"
-						"value: ...\n");
-			}
-		}
-
-		debugEnd(1);
-
-		// increment bind count
-		bindcount++;
-
-		// bail if there were too many binds
-		if (bindcount==maxbindcount) {
-			return false;
-		}
-	}
-
-	// set the bind count
-	cont->setInputOutputBindCount(cursor,bindcount);
-
-	// pass position back out
-	*rpout=rp;
-
-	return true;
-}
-
-void sqlrprotocol_postgresql::writeOutputBinds(sqlrservercursor *cursor) {
-
-	// output bind structure {
-	// 	unsigned char	bind type
-	// 	uint16_t	variable name size
-	// 	char[]		variable name
-	// 	unsigned char	isnull;
-	// 	if (type == null || isnull == true) {
-	// 		(nothing)
-	// 	}
-	// 	if (type == int8) {
-	// 		int8_t	value
-	// 	}
-	// 	if (type == int16) {
-	// 		int16_t	value
-	// 	}
-	// 	if (type == int32) {
-	// 		int32_t	value
-	// 	}
-	// 	if (type == int64) {
-	// 		int64_t	value
-	// 	}
-	// 	if (type == float) {
-	// 		float	value
-	// 	}
-	// 	if (type == double) {
-	// 		double	value
-	// 	}
-	// 	if (type == time) {
-	// 		char[]	fixed-length string representing time
-	// 	}
-	// 	if (type == date) {
-	// 		char[]	fixed-length string representing date
-	// 	}
-	// 	if (type == datetime) {
-	// 		char[]	fixed-length string representing date/time
-	// 	}
-	// 	if (type == blob/char/varchar/decimal) {
-	// 		int32_t	value length
-	// 		char[]	value
-	// 	}
-	// }
-
-	// By now, the controller will have populated the members of the 
-	// output and inputoutput binds arrays with whatever values we need
-	// to send back to the client.
-	//
-	// Send them back...
-
-	sqlrserverbindvar	*outbinds=cont->getOutputBinds(cursor);
-	uint16_t		bindcount=cont->getOutputBindCount(cursor);
-
-	for (uint16_t i=0; i<bindcount; i++) {
-
-		sqlrserverbindvar	*bv=&(outbinds[i]);
-
-		// get the native bind type
-		unsigned char	nativebindtype=bv->nativetype;
-
-		// send type and name
-		write(&resppacket,nativebindtype);
-		writeBE(&resppacket,*((uint16_t *)&bv->variablesize));
-		write(&resppacket,bv->variable,bv->variablesize);
-
-		// handle nulls
-		if (bv->isnull==cont->nullBindValue()) {
-			write(&resppacket,(unsigned char)1);
-			nativebindtype=SAMPLEDB_TYPE_NULL;
-		} else {
-			write(&resppacket,(unsigned char)0);
-		}
-
-		switch (nativebindtype) {
-			case SAMPLEDB_TYPE_NULL:
-				break;
-			case SAMPLEDB_TYPE_INT8:
-				{
-				int8_t	val=bv->value.integerval;
-				write(&resppacket,*((unsigned char *)&val));
-				break;
-				}
-			case SAMPLEDB_TYPE_INT16:
-				{
-				int16_t	val=bv->value.integerval;
-				writeBE(&resppacket,*((uint16_t *)&val));
-				}
-				break;
-			case SAMPLEDB_TYPE_INT32:
-				{
-				int32_t	val=bv->value.integerval;
-				writeBE(&resppacket,*((uint32_t *)&val));
-				}
-				break;
-			case SAMPLEDB_TYPE_INT64:
-				{
-				int64_t	val=bv->value.integerval;
-				writeBE(&resppacket,*((uint64_t *)&val));
-				}
-				break;
-			case SAMPLEDB_TYPE_FLOAT:
-				{
-				float	val=bv->value.doubleval.value;
-				write(&resppacket,val);
-				}
-				break;
-			case SAMPLEDB_TYPE_DOUBLE:
-				{
-				double	val=bv->value.doubleval.value;
-				write(&resppacket,val);
-				break;
-				}
-			case SAMPLEDB_TYPE_TIME:
-				{
-				char	val[16];
-				charstring::printf(val,sizeof(val),
-						"%02d:%02d:%02d.%06d",
-						bv->value.dateval.hour,
-						bv->value.dateval.minute,
-						bv->value.dateval.second,
-						bv->value.dateval.microsecond);
-				write(&resppacket,val);
-				}
-				break;
-			case SAMPLEDB_TYPE_DATE:
-				{
-				char	val[11];
-				charstring::printf(val,sizeof(val),
-						"%04d-%02d-%02d",
-						bv->value.dateval.year,
-						bv->value.dateval.month,
-						bv->value.dateval.day);
-				write(&resppacket,val);
-				}
-				break;
-			case SAMPLEDB_TYPE_DATETIME:
-				{
-				char	val[27];
-				charstring::printf(val,sizeof(val),
-						"%04d-%02d-%02d "
-						"%02d:%02d:%02d.%06d",
-						bv->value.dateval.year,
-						bv->value.dateval.month,
-						bv->value.dateval.day,
-						bv->value.dateval.hour,
-						bv->value.dateval.minute,
-						bv->value.dateval.second,
-						bv->value.dateval.microsecond);
-				write(&resppacket,val);
-				}
-				break;
-			case SAMPLEDB_TYPE_BLOB:
-				write(&resppacket,bv->valuesize);
-				write(&resppacket,bv->value.stringval);
-				break;
-			default:
-				// handle all other types as
-				// strings of some kind...
-				write(&resppacket,bv->valuesize);
-				write(&resppacket,bv->value.stringval);
-				break;
-		}
-	}
-}
-
-void sqlrprotocol_postgresql::writeInputOutputBinds(sqlrservercursor *cursor) {
-
-	// input/output bind structure {
-	// 	unsigned char	bind type
-	// 	uint16_t	variable name size
-	// 	char[]		variable name
-	// 	unsigned char	isnull;
-	// 	if (type == null || isnull == true) {
-	// 		(nothing)
-	// 	}
-	// 	if (type == int8) {
-	// 		int8_t	value
-	// 	}
-	// 	if (type == int16) {
-	// 		int16_t	value
-	// 	}
-	// 	if (type == int32) {
-	// 		int32_t	value
-	// 	}
-	// 	if (type == int64) {
-	// 		int64_t	value
-	// 	}
-	// 	if (type == float) {
-	// 		float	value
-	// 	}
-	// 	if (type == double) {
-	// 		double	value
-	// 	}
-	// 	if (type == time) {
-	// 		char[]	fixed-length string representing time
-	// 	}
-	// 	if (type == date) {
-	// 		char[]	fixed-length string representing date
-	// 	}
-	// 	if (type == datetime) {
-	// 		char[]	fixed-length string representing date/time
-	// 	}
-	// 	if (type == blob/char/varchar/decimal) {
-	// 		int32_t	value length
-	// 		char[]	value
-	// 	}
-	// }
-
-	// By now, the controller will have populated the members of the 
-	// output and inputoutput binds arrays with whatever values we need
-	// to send back to the client.
-	//
-	// Send them back...
-
-	sqlrserverbindvar	*inoutbinds=cont->getInputOutputBinds(cursor);
-	uint16_t		bindcount=cont->getInputOutputBindCount(cursor);
-
-	for (uint16_t i=0; i<bindcount; i++) {
-
-		sqlrserverbindvar	*bv=&(inoutbinds[i]);
-
-		// get the native bind type
-		unsigned char	nativebindtype=bv->nativetype;
-
-		// send type and name
-		write(&resppacket,nativebindtype);
-		writeBE(&resppacket,*((uint16_t *)&bv->variablesize));
-		write(&resppacket,bv->variable,bv->variablesize);
-
-		// handle nulls
-		if (bv->isnull==cont->nullBindValue()) {
-			write(&resppacket,(unsigned char)1);
-			nativebindtype=SAMPLEDB_TYPE_NULL;
-		} else {
-			write(&resppacket,(unsigned char)0);
-		}
-
-		switch (nativebindtype) {
-			case SAMPLEDB_TYPE_NULL:
-				break;
-			case SAMPLEDB_TYPE_INT8:
-				{
-				int8_t	val=bv->value.integerval;
-				write(&resppacket,*((unsigned char *)&val));
-				break;
-				}
-			case SAMPLEDB_TYPE_INT16:
-				{
-				int16_t	val=bv->value.integerval;
-				writeBE(&resppacket,*((uint16_t *)&val));
-				}
-				break;
-			case SAMPLEDB_TYPE_INT32:
-				{
-				int32_t	val=bv->value.integerval;
-				writeBE(&resppacket,*((uint32_t *)&val));
-				}
-				break;
-			case SAMPLEDB_TYPE_INT64:
-				{
-				int64_t	val=bv->value.integerval;
-				writeBE(&resppacket,*((uint64_t *)&val));
-				}
-				break;
-			case SAMPLEDB_TYPE_FLOAT:
-				{
-				float	val=bv->value.doubleval.value;
-				write(&resppacket,val);
-				}
-				break;
-			case SAMPLEDB_TYPE_DOUBLE:
-				{
-				double	val=bv->value.doubleval.value;
-				write(&resppacket,val);
-				break;
-				}
-			case SAMPLEDB_TYPE_TIME:
-				{
-				char	val[16];
-				charstring::printf(val,sizeof(val),
-						"%02d:%02d:%02d.%06d",
-						bv->value.dateval.hour,
-						bv->value.dateval.minute,
-						bv->value.dateval.second,
-						bv->value.dateval.microsecond);
-				write(&resppacket,val);
-				}
-				break;
-			case SAMPLEDB_TYPE_DATE:
-				{
-				char	val[11];
-				charstring::printf(val,sizeof(val),
-						"%04d-%02d-%02d",
-						bv->value.dateval.year,
-						bv->value.dateval.month,
-						bv->value.dateval.day);
-				write(&resppacket,val);
-				}
-				break;
-			case SAMPLEDB_TYPE_DATETIME:
-				{
-				char	val[27];
-				charstring::printf(val,sizeof(val),
-						"%04d-%02d-%02d "
-						"%02d:%02d:%02d.%06d",
-						bv->value.dateval.year,
-						bv->value.dateval.month,
-						bv->value.dateval.day,
-						bv->value.dateval.hour,
-						bv->value.dateval.minute,
-						bv->value.dateval.second,
-						bv->value.dateval.microsecond);
-				write(&resppacket,val);
-				}
-				break;
-			case SAMPLEDB_TYPE_BLOB:
-				write(&resppacket,bv->valuesize);
-				write(&resppacket,bv->value.stringval);
-				break;
-			default:
-				// handle all other types as
-				// strings of some kind...
-				write(&resppacket,bv->valuesize);
-				write(&resppacket,bv->value.stringval);
-				break;
-		}
-	}
-}
-
-bool sqlrprotocol_postgresql::cursorFetch() {
-
-	// The client would like to fetch a row from the result set of the
-	// previously executed query.
+bool sqlrprotocol_postgresql::sync() {
 
 	// request packet data structure:
 	//
 	// data {
-	// 	unsigned char	request type
-	// 	uint16_t	cursor id
 	// }
 
-	// parse request packet
-	const unsigned char	*rp=reqpacket;
-
-	uint16_t	cursorid;
-
-	rp++;
-	readBE(rp,&cursorid,&rp);
+	// parse request packet (nothing to do)
 
 	// debug
-	debugStart("cursor fetch request");
-	if (getDebug()) {
-		stdoutput.printf("	cursor id: %d\n",cursorid);
-	}
+	debugStart("Sync");
 	debugEnd();
 
-	// get the requested cursor
-	sqlrservercursor	*cursor=cont->getCursor(cursorid);
-	if (!cursor) {
-		return sendCursorNotOpenError();
-	}
-
-	// fetch the row
-	bool	error;
-	if (!cont->fetchRow(cursor,&error)) {
-		return (error)?sendCursorError(cursor):
-				sendEndOfResultSetResponse();
-	}
-
-
-	// response packet data structure
+	// The docs say:
 	//
-	// data {
-	// 	field [] {
-	// 		type
-	// 		data (format depends on type)
-	// 	}
-	// }
-
-	debugStart("row response");
-
-	// build response packet
-	resppacket.clear();
-
-	uint16_t	colcount=cont->colCount(cursor);
-	for (uint16_t i=0; i<colcount; i++) {
-
-		debugStart("field",1);
-
-		// get the field
-		const char	*field=NULL;
-		uint64_t	fieldlength=0;
-		bool		blob=0;
-		bool		null=0;
-		if (!cont->getField(cursor,i,&field,&fieldlength,&blob,&null)) {
-			debugEnd(1);
-			return false;
-		}
-
-		// send the field
-		writeField(cursor,i,field,fieldlength,
-			postgresqltypemap[cont->getColumnType(cursor,i)],
-			blob,null);
-
-		debugEnd(1);
-	}
-
-	debugEnd();
-
-	// FIXME: kludgy
-	cont->nextRow(cursor);
+	// This parameterless message causes the backend to close the current
+	// transaction if it's not inside a BEGIN/COMMIT transaction block
+	// ("close" meaning to commit if no error, or roll back if error).
+	//
+	// However, we'll be in an autocommit state if we're not inside of a
+	// transaction block.  So, we don't need to commit/rollback, the
+	// backend will automatically do that for us.
 
 	// send response packet
-	return sendPacket(RESPONSE_CURSOR_FETCH);
+	return sendReadyForQuery();
 }
 
-bool sqlrprotocol_postgresql::sendEndOfResultSetResponse() {
-
-	// response packet data structure
-	// 	(nothing)
-	// }
-
-	debugStart("end of result set response");
-	debugEnd();
-
-	// build response packet
-	resppacket.clear();
-
-	// send response packet
-	return sendPacket(RESPONSE_END_OF_RESULT_SET);
-}
-
-void sqlrprotocol_postgresql::writeField(sqlrservercursor *cursor,
-					uint16_t column,
-					const char *field,
-					uint64_t fieldlength,
-					unsigned char columntype,
-					bool blob,
-					bool null) {
-
-	// debug
-	if (getDebug()) {
-		if (blob) {
-			stdoutput.write("		LOB\n");
-		} else {
-			stdoutput.printf("		\"%s\" (%d)\n",
-							field,fieldlength);
-		}
-	}
-
-	// handle nulls
-	if (null) {
-		write(&resppacket,(unsigned char)SAMPLEDB_TYPE_NULL);
-		return;
-	}
-
-	// handle blobs
-	if (blob) {
-		writeBlobField(cursor,column);
-		return;
-	}
-
-	// handle regular fields
-	write(&resppacket,columntype);
-	switch (columntype) {
-		case SAMPLEDB_TYPE_INT8:
-			write(&resppacket,
-				(char)charstring::toInteger(field));
-			break;
-		case SAMPLEDB_TYPE_INT16:
-			writeBE(&resppacket,
-				(uint16_t)charstring::toInteger(field));
-			break;
-		case SAMPLEDB_TYPE_INT32:
-			writeBE(&resppacket,
-				(uint32_t)charstring::toInteger(field));
-			break;
-		case SAMPLEDB_TYPE_INT64:
-			writeBE(&resppacket,
-				(uint64_t)charstring::toInteger(field));
-			break;
-		case SAMPLEDB_TYPE_DOUBLE:
-			{
-			double		fval=charstring::toFloat(field);
-			uint64_t	ival;
-			bytestring::copy(&ival,&fval,sizeof(double));
-			writeBE(&resppacket,ival);
-			}
-			break;
-		case SAMPLEDB_TYPE_FLOAT:
-			{
-			float		fval=charstring::toFloat(field);
-			uint32_t	ival;
-			bytestring::copy(&ival,&fval,sizeof(float));
-			writeBE(&resppacket,ival);
-			}
-			break;
-		case SAMPLEDB_TYPE_TIME:
-			{
-			int16_t	year;
-			int16_t	month;
-			int16_t	day;
-			int16_t	hour;
-			int16_t	minute;
-			int16_t	second;
-			int32_t	usec;
-			bool	isnegative;
-			cont->parseDateTime(field,false,false,"/-.:",
-					&year,&month,&day,
-					&hour,&minute,&second,
-					&usec,&isnegative);
-			char	val[16];
-			charstring::printf(val,sizeof(val),
-						"%02d:%02d:%02d.%06d",
-						hour,minute,second,usec);
-			write(&resppacket,val);
-			}
-			break;
-		case SAMPLEDB_TYPE_DATE:
-			{
-			int16_t	year;
-			int16_t	month;
-			int16_t	day;
-			int16_t	hour;
-			int16_t	minute;
-			int16_t	second;
-			int32_t	usec;
-			bool	isnegative;
-			cont->parseDateTime(field,false,false,"/-.:",
-					&year,&month,&day,
-					&hour,&minute,&second,
-					&usec,&isnegative);
-			char	val[11];
-			charstring::printf(val,sizeof(val),
-						"%04d-%02d-%02d",
-						year,month,day);
-			write(&resppacket,val);
-			}
-			break;
-		case SAMPLEDB_TYPE_DATETIME:
-			{
-			int16_t	year;
-			int16_t	month;
-			int16_t	day;
-			int16_t	hour;
-			int16_t	minute;
-			int16_t	second;
-			int32_t	usec;
-			bool	isnegative;
-			cont->parseDateTime(field,false,false,"/-.:",
-					&year,&month,&day,
-					&hour,&minute,&second,
-					&usec,&isnegative);
-			char	val[27];
-			charstring::printf(val,sizeof(val),
-					"%04d-%02d-%02d %02d:%02d:%02d.%06d",
-					year,month,day,hour,minute,second,usec);
-			write(&resppacket,val);
-			}
-			break;
-		case SAMPLEDB_TYPE_CHAR:
-		case SAMPLEDB_TYPE_VARCHAR:
-		case SAMPLEDB_TYPE_DECIMAL:
-		case SAMPLEDB_TYPE_BLOB:
-			// Why handle LOBs here?  The database connection module
-			// might not correctly identify a LOB field as a LOB.
-			// This happens with the mysql connection module when
-			// it's using the traditional mysql API, which doesn't
-			// handle LOBs differently from other data.  In cases
-			// like that, the blob flag passed to getField() will be
-			// false and this method will be called instead of
-			// sendLobField().  So, this method has to handle LOBs
-			// too.
-			writeBE(&resppacket,fieldlength);
-			write(&resppacket,field,fieldlength);
-			break;
-		default:
-			break;
-	}
-}
-
-#define MAX_BYTES_PER_CHAR	4
-
-void sqlrprotocol_postgresql::writeBlobField(sqlrservercursor *cursor,
-							uint16_t column) {
-
-	// get blob length (send a null field if it fails)
-	uint64_t	loblength;
-	if (!cont->getLobFieldLength(cursor,column,&loblength)) {
-		write(&resppacket,(unsigned char)SAMPLEDB_TYPE_NULL);
-		cont->closeLobField(cursor,column);
-		return;
-	}
-
-	// initialize sizes and status
-	uint64_t	charstoread=sizeof(lobbuffer)/MAX_BYTES_PER_CHAR;
-	uint64_t	charsread=0;
-	uint64_t	offset=0;
-
-	// send blob data...
-	for (;;) {
-
-		// read a segment from the lob
-		if (cont->getLobFieldSegment(cursor,column,
-					lobbuffer,sizeof(lobbuffer),
-					offset,charstoread,&charsread) &&
-					charsread) {
-
-			// send type/length if we haven't already
-			if (!offset) {
-				write(&resppacket,
-					(unsigned char)SAMPLEDB_TYPE_BLOB);
-				write(&resppacket,loblength);
-			}
-
-			// send the segment we just got
-			write(&resppacket,lobbuffer,charsread);
-
-			// bump offset
-			offset=offset+charstoread;
-
-		} else {
-
-			// if we failed to read a segment or read
-			// an empty segment then we're done...
-
-			// if we haven't sent anything yet,
-			// then send a NULL field
-			if (!offset) {
-				write(&resppacket,
-					(unsigned char)SAMPLEDB_TYPE_NULL);
-			}
-
-			cont->closeLobField(cursor,column);
-			return;
-		}
-	}
-}
-
-bool sqlrprotocol_postgresql::cursorClose() {
+bool sqlrprotocol_postgresql::close() {
 
 	// The client would like to close the specified cursor.
 
 	// request packet data structure:
 	//
 	// data {
-	// 	unsigned char	request type
-	// 	uint16_t	cursor id
+	//	char		S (stmt) or P (portal)
+	//	char[]		stmt/portal name
 	// }
 
 	// parse request packet
 	const unsigned char	*rp=reqpacket;
+	const unsigned char	*rpend=rp+reqpacketsize;
 
-	uint16_t	cursorid;
+	char	sorp;
+	read(rp,&sorp,&rp);
 
-	rp++;
-	readBE(rp,&cursorid,&rp);
+	stringbuffer	name;
+	readString(rp,rpend,&name,&rp);
+
+	// decide whether to use stmt/portal -> cursor map
+	dictionary<char *, sqlrservercursor *>	*dict=
+			(sorp=='S')?&stmtcursormap:&portalcursormap;
+	
+	// get the requested cursor
+	sqlrservercursor	*cursor=NULL;
+	if (!dict->getValue((char *)name.getString(),&cursor)) {
+		// FIXME: invalid cursor error...
+	}
 
 	// debug
-	debugStart("cursor close request");
+	debugStart("Close");
 	if (getDebug()) {
-		stdoutput.printf("	cursor id: %d\n",cursorid);
+		stdoutput.printf("	S or P: %c\n",sorp);
+		stdoutput.printf("	name: %s\n",name.getString());
+		stdoutput.printf("	cursor id: %d\n",cursor->getId());
 	}
 	debugEnd();
 
-	// get the requested cursor
-	sqlrservercursor	*cursor=cont->getCursor(cursorid);
-	if (!cursor) {
-		return sendCursorNotOpenError();
-	}
-
-	// close the cursor
-	if (!cont->close(cursor)) {
-		return sendErrorResponse("Failed to close cursor");
-	}
+	// remove stmt/portal -> cursor mapping
+	dict->removeAndArrayDeleteKey((char *)name.getString());
 
 	// mark the cursor available
 	cont->setState(cursor,SQLRCURSORSTATE_AVAILABLE);
 
-	// success
-	return sendSuccessResponse();
+	debugStart("CloseComplete");
+	debugEnd();
+
+	// build response packet
+	resppacket.clear();
+
+	// send response packet
+	return sendPacket(MESSAGE_CLOSECOMPLETE);
 }
 
 bool sqlrprotocol_postgresql::sendCursorError(sqlrservercursor *cursor) {
@@ -3551,58 +2154,7 @@ bool sqlrprotocol_postgresql::sendTooManyBindsError() {
 
 void sqlrprotocol_postgresql::debugRecvTypeError() {
 	if (getDebug()) {
-		stdoutput.printf("invalid packet type: 0x%02x\n",reqtype);
-	}
-}
-
-void sqlrprotocol_postgresql::debugColumnType(unsigned char columntype) {
-	stdoutput.write("		type: ");
-	switch (columntype) {
-		case SAMPLEDB_TYPE_NULL:
-			stdoutput.write("SAMPLEDB_TYPE_NULL\n");
-			break;
-		case SAMPLEDB_TYPE_CHAR:
-			stdoutput.write("SAMPLEDB_TYPE_CHAR\n");
-			break;
-		case SAMPLEDB_TYPE_VARCHAR:
-			stdoutput.write("SAMPLEDB_TYPE_VARCHAR\n");
-			break;
-		case SAMPLEDB_TYPE_INT8:
-			stdoutput.write("SAMPLEDB_TYPE_INT8\n");
-			break;
-		case SAMPLEDB_TYPE_INT16:
-			stdoutput.write("SAMPLEDB_TYPE_INT16\n");
-			break;
-		case SAMPLEDB_TYPE_INT32:
-			stdoutput.write("SAMPLEDB_TYPE_INT32\n");
-			break;
-		case SAMPLEDB_TYPE_INT64:
-			stdoutput.write("SAMPLEDB_TYPE_INT64\n");
-			break;
-		case SAMPLEDB_TYPE_FLOAT:
-			stdoutput.write("SAMPLEDB_TYPE_FLOAT\n");
-			break;
-		case SAMPLEDB_TYPE_DOUBLE:
-			stdoutput.write("SAMPLEDB_TYPE_DOUBLE\n");
-			break;
-		case SAMPLEDB_TYPE_DECIMAL:
-			stdoutput.write("SAMPLEDB_TYPE_DECIMAL\n");
-			break;
-		case SAMPLEDB_TYPE_DATE:
-			stdoutput.write("SAMPLEDB_TYPE_DATE\n");
-			break;
-		case SAMPLEDB_TYPE_TIME:
-			stdoutput.write("SAMPLEDB_TYPE_TIME\n");
-			break;
-		case SAMPLEDB_TYPE_DATETIME:
-			stdoutput.write("SAMPLEDB_TYPE_DATETIME\n");
-			break;
-		case SAMPLEDB_TYPE_BLOB:
-			stdoutput.write("SAMPLEDB_TYPE_BLOB\n");
-			break;
-		default:
-			stdoutput.write("unknown SAMPLEDB_TYPE\n");
-			break;
+		stdoutput.printf("invalid packet type: %c\n",reqtype);
 	}
 }
 
@@ -3616,6 +2168,7 @@ void sqlrprotocol_postgresql::readString(const unsigned char *rp,
 					const unsigned char *rpend,
 					stringbuffer *strb,
 					const unsigned char **rpout) {
+
 	// read until we hit a null or the end of the request
 	while (*rp && rp!=rpend) {
 		strb->append(*rp);

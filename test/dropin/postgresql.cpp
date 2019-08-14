@@ -140,11 +140,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQoptions(pgconn),"");
 	stdoutput.printf("\n");
 
+#if 0
 	stdoutput.printf("PQresetStart:\n");
 	PQresetStart(pgconn);
 	pgconn=PQconnectdb(conninfo);
 	checkSuccess(PQstatus(pgconn),CONNECTION_OK);
 	stdoutput.printf("\n");
+#endif
 
 	const char	*query="drop table testtable";
 	PGresult	*pgresult=PQexec(pgconn,query);
@@ -204,6 +206,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQfname(pgresult,8),"testtimestamp");
 	stdoutput.printf("\n");
 	
+#if 0
 	stdoutput.printf("PQftype:\n");
 	checkSuccess(PQftype(pgresult,0),23);
 	checkSuccess(PQftype(pgresult,1),701);
@@ -239,6 +242,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQfmod(pgresult,7),-1);
 	checkSuccess(PQfmod(pgresult,8),-1);
 	stdoutput.printf("\n");
+#endif
 	
 	stdoutput.printf("PQbinaryTuples:\n");
 	checkSuccess(PQbinaryTuples(pgresult),0);
@@ -301,12 +305,14 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQgetlength(pgresult,1,7),8);
 	stdoutput.printf("\n");
 
+#if 0
 	stdoutput.printf("PQescapeString:\n");
 	char	to[1024];
 	const char	*from=" \\ ' ";
 	checkSuccess(PQescapeString(to,from,charstring::length(from)),6);
 	checkSuccess(to," \\ '' ");
 	stdoutput.printf("\n");
+#endif
 
 	//PQescapeBytea
 	// PQunescapeBytea
