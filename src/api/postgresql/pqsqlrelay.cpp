@@ -1406,12 +1406,14 @@ size_t PQescapeString(char *to, const char *from, size_t length) {
 
 	while (remaining>0) {
 		switch (*source) {
-			case '\\':
+			// did this change at some point?
+			// this used to be correct
+			/*case '\\':
 				*target='\\';
 				target++;
 				*target='\\';
 				// target and remaining are updated below.
-				break;
+				break;*/
 
 			case '\'':
 				*target='\'';

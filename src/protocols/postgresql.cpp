@@ -20,6 +20,7 @@
 #define MESSAGE_ROWDESCRIPTION		'T'
 #define MESSAGE_DATAROW			'D'
 #define MESSAGE_PARSE			'P'
+#define MESSAGE_PARSECOMPLETE		'1'
 #define MESSAGE_BIND			'B'
 #define MESSAGE_EXECUTE			'E'
 #define MESSAGE_SYNC			'S'
@@ -29,8 +30,6 @@
 
 
 #define RESPONSE_SUCCESS		0x00
-#define REQUEST_CURSOR_PREPARE		0x0A
-#define RESPONSE_CURSOR_PREPARE		0x0B
 #define REQUEST_CURSOR_EXECUTE		0x0C
 #define RESPONSE_CURSOR_EXECUTE		0x0D
 #define REQUEST_CURSOR_FETCH		0x0E
@@ -565,6 +564,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		bool	sendSuccessResponse();
 
 		bool	query();
+		bool	parse();
 		bool	emptyQuery(const char *query);
 		bool	sendQueryResult(sqlrservercursor *cursor);
 		bool	sendResultSet(sqlrservercursor *cursor,
@@ -639,6 +639,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		uint16_t	maxbindcount;
 
 		char		lobbuffer[32768];
+
+		dictionary<char *, uint16_t>	cursormap;
 };
 
 
@@ -844,8 +846,8 @@ clientsessionexitstatus_t sqlrprotocol_postgresql::clientSession(
 				case MESSAGE_QUERY:
 					loop=query();
 					break;
-				case REQUEST_CURSOR_PREPARE:
-					loop=cursorPrepare();
+				case MESSAGE_PARSE:
+					loop=parse();
 					break;
 				case REQUEST_CURSOR_EXECUTE:
 					loop=cursorExecute();
@@ -1520,10 +1522,6 @@ bool sqlrprotocol_postgresql::query() {
 	}
 
 	// release the cursor
-	if (!cont->close(cursor)) {
-		// FIXME: I'm not sure I can send an error here...
-		return sendErrorResponse("Failed to close cursor");
-	}
 	cont->setState(cursor,SQLRCURSORSTATE_AVAILABLE);
 
 	return result;
@@ -1757,7 +1755,7 @@ bool sqlrprotocol_postgresql::sendEmptyQueryResponse() {
 	return sendPacket(MESSAGE_EMPTYQUERYRESPONSE);
 }
 
-bool sqlrprotocol_postgresql::cursorPrepare() {
+bool sqlrprotocol_postgresql::parse() {
 
 	// get an available cursor
 	sqlrservercursor	*cursor=cont->getCursor();
@@ -1765,35 +1763,67 @@ bool sqlrprotocol_postgresql::cursorPrepare() {
 		return sendErrorResponse("Out of cursors");
 	}
 
-	// The client would like to prepare a query.
-
 	// request packet data structure:
 	//
 	// data {
-	// 	unsigned char	request type
-	// 	uint16_t	cursor id
-	// 	uint16_t	query length
+	// 	char[]		cursor name
 	// 	char[]		query
+	// 	uint16_t	param count
+	// 	
+	// 	// param types...
+	// 	uint32_t	type
+	// 	uint32_t	type
+	// 	...
 	// }
 
 	// parse request packet
 	const unsigned char	*rp=reqpacket;
+	const unsigned char	*rpend=rp+reqpacketsize;
 
-	uint16_t	cursorid;
-	uint16_t	querylength;
-	const char	*query;
-
+	// get cursor name
+	const char	*cursorname=(const char *)rp;
+	while (*rp && rp!=rpend) {
+		rp++;
+	}
+	if (rp==rpend) {
+		return sendErrorResponse("Invalid request");
+	}
 	rp++;
-	readBE(rp,&cursorid,&rp);
-	readBE(rp,&querylength,&rp);
-	query=(const char *)rp;
+
+	// get query
+	const char	*query=(const char *)rp;
+	while (*rp && rp!=rpend) {
+		rp++;
+	}
+	if (rp==rpend) {
+		return sendErrorResponse("Invalid request");
+	}
+	uint32_t	querylength=((const char *)rp)-query;
+	rp++;
+	
+	// get param types
+	uint16_t	paramcount;
+	readBE(rp,&paramcount,&rp);
+	uint32_t	*paramtypes=new uint32_t[paramcount];
+	for (uint16_t i=0; i<paramcount; i++) {
+		readBE(rp,&(paramtypes[i]),&rp);
+	}
+
+	// map cursor id to name
+	cursormap.setValue(charstring::duplicate(cursorname),cursor->getId());
 
 	// debug
-	debugStart("cursor prepare request");
+	debugStart("Parse");
 	if (getDebug()) {
-		stdoutput.printf("	cursor id: %d\n",cursorid);
+		stdoutput.printf("	cursor name: %d\n",cursorname);
+		stdoutput.printf("	cursor id: %d\n",cursor->getId());
 		stdoutput.printf("	query length: %d\n",querylength);
 		stdoutput.printf("	query: %.*s\n",querylength,query);
+		stdoutput.printf("	param count: %d\n",paramcount);
+		for (uint16_t i=0; i<paramcount; i++) {
+			stdoutput.printf("		param %d type: %d\n",
+							i,paramtypes[i]);
+		}
 	}
 	debugEnd();
 
@@ -1807,6 +1837,8 @@ bool sqlrprotocol_postgresql::cursorPrepare() {
 	bytestring::copy(querybuffer,query,querylength);
 	querybuffer[querylength]='\0';
 	cont->setQueryLength(cursor,querylength);
+
+	// FIXME: do something with param types?
 
 	// prepare the query
 	if (!cont->prepareQuery(cursor,cont->getQueryBuffer(cursor),
@@ -1840,108 +1872,14 @@ bool sqlrprotocol_postgresql::cursorPrepare() {
 	// 	}
 	// }
 
-	debugStart("cursor prepare response");
-
-	// set values to send
-	uint16_t	colcount=cont->colCount(cursor);
+	debugStart("ParseComplete");
+	debugEnd();
 
 	// build response packet
 	resppacket.clear();
-	writeBE(&resppacket,colcount);
-	
-	// debug
-	if (getDebug()) {
-		stdoutput.printf("	column count: %d\n",colcount);
-	}
-
-	for (uint16_t i=0; i<colcount; i++) {
-		
-		debugStart("column",1);
-
-		// set values to send
-		uint16_t	tablenamelength=
-				cont->getColumnTableLength(cursor,i);
-		const char	*tablename=
-				cont->getColumnTable(cursor,i);
-		uint16_t	columnnamelength=
-				cont->getColumnNameLength(cursor,i);
-		const char	*columnname=
-				cont->getColumnName(cursor,i);
-		unsigned char	columntype=postgresqltypemap[
-						cont->getColumnType(cursor,i)];
-		uint32_t	length=
-				cont->getColumnLength(cursor,i);
-		uint32_t	precision=
-				cont->getColumnPrecision(cursor,i);
-		uint32_t	scale=
-				cont->getColumnScale(cursor,i);
-		unsigned char	isnullable=
-				cont->getColumnIsNullable(cursor,i);
-		unsigned char	isprimarykey=
-				cont->getColumnIsPrimaryKey(cursor,i);
-		unsigned char	isunique=
-				cont->getColumnIsUnique(cursor,i);
-		unsigned char	ispartofkey=
-				cont->getColumnIsPartOfKey(cursor,i);
-		unsigned char	isunsigned=
-				cont->getColumnIsUnsigned(cursor,i);
-		unsigned char	iszerofilled=
-				cont->getColumnIsZeroFilled(cursor,i);
-		unsigned char	isbinary=
-				cont->getColumnIsBinary(cursor,i);
-		unsigned char	isautoincrement=
-				cont->getColumnIsAutoIncrement(cursor,i);
-
-		// debug
-		if (getDebug()) {
-			stdoutput.printf("		table name: %.*s\n",
-							tablenamelength,
-							tablename);
-			stdoutput.printf("		column name: %.*s\n",
-							columnnamelength,
-							columnname);
-			debugColumnType(columntype);
-			stdoutput.printf("		length: %d\n",length);
-			stdoutput.printf("		precision: %d\n",
-								precision);
-			stdoutput.printf("		scale: %d\n",scale);
-			stdoutput.printf("		is nullable: %d\n",
-								isnullable);
-			stdoutput.printf("		is unique: %d\n",
-								isunique);
-			stdoutput.printf("		is zero filled: %d\n",
-								iszerofilled);
-			stdoutput.printf("		is binary: %d\n",
-								isbinary);
-			stdoutput.printf("		is auto increment: "
-							"%d\n",isautoincrement);
-		}
-
-		// build response packet
-		writeBE(&resppacket,tablenamelength);
-		write(&resppacket,tablename,tablenamelength);
-		writeBE(&resppacket,columnnamelength);
-		write(&resppacket,columnname,columnnamelength);
-		write(&resppacket,columntype);
-		writeBE(&resppacket,length);
-		writeBE(&resppacket,precision);
-		writeBE(&resppacket,scale);
-		write(&resppacket,isnullable);
-		write(&resppacket,isprimarykey);
-		write(&resppacket,isunique);
-		write(&resppacket,ispartofkey);
-		write(&resppacket,isunsigned);
-		write(&resppacket,iszerofilled);
-		write(&resppacket,isbinary);
-		write(&resppacket,isautoincrement);
-
-		debugEnd(1);
-	}
-
-	debugEnd();
 
 	// send response packet
-	return sendPacket(RESPONSE_CURSOR_PREPARE);
+	return sendPacket(MESSAGE_PARSECOMPLETE);
 }
 
 bool sqlrprotocol_postgresql::cursorExecute() {

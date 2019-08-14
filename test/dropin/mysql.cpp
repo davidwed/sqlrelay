@@ -56,14 +56,13 @@ stdoutput.printf("\n%s\n",mysql_error(&mysql));
 
 int	main(int argc, char **argv) {
 
-	const char	*host;
+	const char	*host="127.0.0.1";
 	const char	*port;
 	const char	*socket;
 	const char	*user;
 	const char	*password;
 	const char	*db;
 	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		host="127.0.0.1";
 		port="9000";
 		socket="/tmp/test.socket";
 		user="test";
@@ -74,14 +73,12 @@ int	main(int argc, char **argv) {
 		// eg: ./mysql db64
 		if (argc==2) {
 			host=argv[1];
-		} else {
-			host="127.0.0.1";
 		}
-		db="testdb";
 		port="3306";
 		socket="/var/lib/mysql/mysql.sock";
 		user="testuser";
 		password="testpassword";
+		db="testdb";
 	}
 
 
