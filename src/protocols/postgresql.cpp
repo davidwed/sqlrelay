@@ -1742,6 +1742,11 @@ bool sqlrprotocol_postgresql::sendDataRow(sqlrservercursor *cursor,
 			bytestring::copy(&unegone,&negone,sizeof(int32_t));
 			writeBE(&resppacket,unegone);
 		} else {
+
+			// FIXME: currently, we only support text format, but
+			// we should send binary if the client requested it in
+			// the resultformatcodes
+
 			writeBE(&resppacket,(uint32_t)fieldlength);
 			write(&resppacket,field,fieldlength);
 		}
@@ -1928,7 +1933,7 @@ bool sqlrprotocol_postgresql::parse() {
 	}
 	debugEnd();
 
-	// FIXME: do something with param types?
+	// FIXME: do something with param types
 	delete[] paramtypes;
 
 	// bounds checking
@@ -2002,7 +2007,8 @@ bool sqlrprotocol_postgresql::bind() {
 	// get the requested cursor
 	sqlrservercursor	*cursor=NULL;
 	if (!stmtcursormap.getValue((char *)stmtname.getString(),&cursor)) {
-		// FIXME: invalid cursor error...
+		return sendErrorResponse("ERROR","26000",
+					"Invalid statement name");
 	}
 
 	// map portal -> cursor
@@ -2128,7 +2134,7 @@ bool sqlrprotocol_postgresql::bind() {
 						"format: binary\n");
 			}
 
-			// FIXME: binary parameter...
+			// FIXME: support binary parameters...
 		}
 
 		debugEnd(1);
@@ -2138,7 +2144,6 @@ bool sqlrprotocol_postgresql::bind() {
 	cont->setInputBindCount(cursor,paramvaluecount);
 
 	// result format codes...
-	// FIXME: what do we do with these?
 	uint16_t	resultformatcodecount;
 	readBE(rp,&resultformatcodecount,&rp);
 	uint16_t	*resultformatcodes=NULL;
@@ -2205,7 +2210,8 @@ bool sqlrprotocol_postgresql::describe() {
 	// get the requested cursor
 	sqlrservercursor	*cursor=NULL;
 	if (!dict->getValue((char *)name.getString(),&cursor)) {
-		// FIXME: invalid cursor error...
+		return sendErrorResponse("ERROR","26000",
+					"Invalid statement/portal name");
 	}
 
 	// debug
@@ -2263,7 +2269,7 @@ bool sqlrprotocol_postgresql::execute() {
 	// get the requested cursor
 	sqlrservercursor	*cursor=NULL;
 	if (!portalcursormap.getValue((char *)portal.getString(),&cursor)) {
-		// FIXME: invalid cursor error...
+		return sendErrorResponse("ERROR","26000","Invalid portal name");
 	}
 
 	debugStart("Execute");
@@ -2341,7 +2347,8 @@ bool sqlrprotocol_postgresql::close() {
 	// get the requested cursor
 	sqlrservercursor	*cursor=NULL;
 	if (!dict->getValue((char *)name.getString(),&cursor)) {
-		// FIXME: invalid cursor error...
+		return sendErrorResponse("ERROR","26000",
+					"Invalid statement/portal name");
 	}
 
 	// debug
