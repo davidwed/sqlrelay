@@ -1,3 +1,5 @@
+1.6.1 - added postgresql protocol module
+
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3
 	integrated my_bool fix for mysql 8.0.1+
