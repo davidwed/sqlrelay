@@ -524,6 +524,7 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrmoduledata.h $(includedir)/sqlrelay/private/sqlrmoduledata.h
 	$(CP) sqlrelay/private/sqlrmoduledatas.h $(includedir)/sqlrelay/private/sqlrmoduledatas.h
 	$(CP) sqlrelay/private/sqlrmysqlcredentials.h $(includedir)/sqlrelay/private/sqlrmysqlcredentials.h
+	$(CP) sqlrelay/private/sqlrpostgresqlcredentials.h $(includedir)/sqlrelay/private/sqlrpostgresqlcredentials.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrauth.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrauths.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrfilter.h
@@ -570,6 +571,7 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrmoduledata.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrmoduledatas.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrmysqlcredentials.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrpostgresqlcredentials.h
 	$(MKINSTALLDIRS) $(tmpdir)
 	$(CHMOD) 777 $(tmpdir)
 	$(MKINSTALLDIRS) $(logdir)
@@ -636,6 +638,7 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrmoduledata.h \
 		$(includedir)/sqlrelay/private/sqlrmoduledatas.h \
 		$(includedir)/sqlrelay/private/sqlrmysqlcredentials.h \
+		$(includedir)/sqlrelay/private/sqlrpostgresqlcredentials.h \
 		$(bindir)/$(SQLR)-start$(EXE) \
 		$(bindir)/$(SQLR)-stop$(EXE) \
 		$(bindir)/$(SQLR)-listener$(EXE) \
