@@ -15,6 +15,8 @@
 #define MESSAGE_AUTHENTICATION		'R'
 #define MESSAGE_PASSWORD		'p'
 #define MESSAGE_ERRORRESPONSE		'E'
+#define MESSAGE_BACKENDKEYDATA		'K'
+#define MESSAGE_PARAMETERSTATUS		'S'
 #define MESSAGE_READYFORQUERY		'Z'
 #define MESSAGE_COMMANDCOMPLETE		'C'
 #define MESSAGE_QUERY			'Q'
@@ -66,407 +68,6 @@
 #define FIELD_TYPE_LINE			'L'
 #define FIELD_TYPE_ROUTINE		'R'
 
-// sqlrelay-column-type to postgresql-column-type map.
-#if 0
-static unsigned char	postgresqltypemap[]={
-	// "UNKNOWN"
-	(unsigned char)SAMPLEDB_TYPE_NULL,
-	// addded by freetds
-	// "CHAR"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "INT"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "SMALLINT"
-	(unsigned char)SAMPLEDB_TYPE_INT16,
-	// "TINYINT"
-	(unsigned char)SAMPLEDB_TYPE_INT8,
-	// "MONEY"
-	(unsigned char)SAMPLEDB_TYPE_DECIMAL,
-	// "DATETIME"
-	(unsigned char)SAMPLEDB_TYPE_DATETIME,
-	// "NUMERIC"
-	(unsigned char)SAMPLEDB_TYPE_DECIMAL,
-	// "DECIMAL"
-	(unsigned char)SAMPLEDB_TYPE_DECIMAL,
-	// "SMALLDATETIME"
-	(unsigned char)SAMPLEDB_TYPE_DATETIME,
-	// "SMALLMONEY"
-	(unsigned char)SAMPLEDB_TYPE_DECIMAL,
-	// "IMAGE"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BINARY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BIT"
-	(unsigned char)SAMPLEDB_TYPE_INT8,
-	// "REAL"
-	(unsigned char)SAMPLEDB_TYPE_DECIMAL,
-	// "FLOAT"
-	(unsigned char)SAMPLEDB_TYPE_FLOAT,
-	// "TEXT"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "VARCHAR"
-	(unsigned char)SAMPLEDB_TYPE_VARCHAR,
-	// "VARBINARY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LONGCHAR"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LONGBINARY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LONG"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "ILLEGAL"
-	(unsigned char)SAMPLEDB_TYPE_NULL,
-	// "SENSITIVITY"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "BOUNDARY"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "VOID"
-	(unsigned char)SAMPLEDB_TYPE_NULL,
-	// "USHORT"
-	(unsigned char)SAMPLEDB_TYPE_INT16,
-	// added by lago
-	// "UNDEFINED"
-	(unsigned char)SAMPLEDB_TYPE_NULL,
-	// "DOUBLE"
-	(unsigned char)SAMPLEDB_TYPE_DOUBLE,
-	// "DATE"
-	(unsigned char)SAMPLEDB_TYPE_DATE,
-	// "TIME"
-	(unsigned char)SAMPLEDB_TYPE_TIME,
-	// "TIMESTAMP"
-	(unsigned char)SAMPLEDB_TYPE_DATETIME,
-	// added by msql
-	// "UINT"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "LASTREAL"
-	(unsigned char)SAMPLEDB_TYPE_DECIMAL,
-	// added by mysql
-	// "STRING"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "VARSTRING"
-	(unsigned char)SAMPLEDB_TYPE_VARCHAR,
-	// "LONGLONG"
-	(unsigned char)SAMPLEDB_TYPE_INT64,
-	// "MEDIUMINT"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "YEAR"
-	(unsigned char)SAMPLEDB_TYPE_INT16,
-	// "NEWDATE"
-	(unsigned char)SAMPLEDB_TYPE_DATETIME,
-	// "NULL"
-	(unsigned char)SAMPLEDB_TYPE_NULL,
-	// "ENUM"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "SET"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "TINYBLOB"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "MEDIUMBLOB"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LONGBLOB"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BLOB"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// added by oracle
-	// "VARCHAR2"
-	(unsigned char)SAMPLEDB_TYPE_VARCHAR,
-	// "NUMBER"
-	(unsigned char)SAMPLEDB_TYPE_DECIMAL,
-	// "ROWID"
-	(unsigned char)SAMPLEDB_TYPE_INT64,
-	// "RAW"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LONG_RAW"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "MLSLABEL"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "CLOB"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BFILE"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// added by odbc
-	// "BIGINT"
-	(unsigned char)SAMPLEDB_TYPE_INT64,
-	// "INTEGER"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "LONGVARBINARY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LONGVARCHAR"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// added by db2
-	// "GRAPHIC"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "VARGRAPHIC"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LONGVARGRAPHIC"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "DBCLOB"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "DATALINK"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "USER_DEFINED_TYPE"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "SHORT_DATATYPE"
-	(unsigned char)SAMPLEDB_TYPE_INT16,
-	// "TINY_DATATYPE"
-	(unsigned char)SAMPLEDB_TYPE_INT8,
-	// added by firebird
-	// "D_FLOAT"
-	(unsigned char)SAMPLEDB_TYPE_DOUBLE,
-	// "ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "QUAD"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "INT64"
-	(unsigned char)SAMPLEDB_TYPE_INT64,
-	// "DOUBLE PRECISION"
-	(unsigned char)SAMPLEDB_TYPE_DOUBLE,
-	// added by postgresql
-	// "BOOL"
-	(unsigned char)SAMPLEDB_TYPE_INT8,
-	// "BYTEA"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "NAME"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "INT8"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "INT2"
-	(unsigned char)SAMPLEDB_TYPE_INT16,
-	// "INT2VECTOR"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "INT4"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "REGPROC"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "OID"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "TID"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "XID"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "CID"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "OIDVECTOR"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "SMGR"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "POINT"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "LSEG"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "PATH"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "BOX"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "POLYGON"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "LINE"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "LINE_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "FLOAT4"
-	(unsigned char)SAMPLEDB_TYPE_FLOAT,
-	// "FLOAT8"
-	(unsigned char)SAMPLEDB_TYPE_DOUBLE,
-	// "ABSTIME"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "RELTIME"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "TINTERVAL"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "CIRCLE"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "CIRCLE_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "MONEY_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "MACADDR"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "INET"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "CIDR"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "BOOL_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BYTEA_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "CHAR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "NAME_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "INT2_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "INT2VECTOR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "INT4_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "REGPROC_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "TEXT_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "OID_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "TID_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "XID_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "CID_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "OIDVECTOR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BPCHAR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "VARCHAR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "INT8_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "POINT_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LSEG_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "PATH_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BOX_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "FLOAT4_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "FLOAT8_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "ABSTIME_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "RELTIME_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "TINTERVAL_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "POLYGON_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "ACLITEM"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "ACLITEM_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "MACADDR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "INET_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "CIDR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BPCHAR"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "TIMESTAMP_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "DATE_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "TIME_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "TIMESTAMPTZ"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "TIMESTAMPTZ_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "INTERVAL"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "INTERVAL_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "NUMERIC_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "TIMETZ"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "TIMETZ_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BIT_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "VARBIT"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "VARBIT_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "REFCURSOR"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "REFCURSOR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "REGPROCEDURE"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "REGOPER"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "REGOPERATOR"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "REGCLASS"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "REGTYPE"
-	(unsigned char)SAMPLEDB_TYPE_INT32,
-	// "REGPROCEDURE_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "REGOPER_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "REGOPERATOR_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "REGCLASS_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "REGTYPE_ARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "RECORD"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "CSTRING"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "ANY"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "ANYARRAY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "TRIGGER"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "LANGUAGE_HANDLER"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "INTERNAL"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "OPAQUE"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "ANYELEMENT"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "PG_TYPE"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "PG_ATTRIBUTE"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "PG_PROC"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "PG_CLASS"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// none added by sqlite
-	// added by sqlserver
-	// "UBIGINT"
-	(unsigned char)SAMPLEDB_TYPE_INT64,
-	// "UNIQUEIDENTIFIER"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// added by informix
-	// "SMALLFLOAT"
-	(unsigned char)SAMPLEDB_TYPE_FLOAT,
-	// "BYTE"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "BOOLEAN"
-	(unsigned char)SAMPLEDB_TYPE_INT8,
-	// "TINYTEXT"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "MEDIUMTEXT"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "LONGTEXT"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "JSON"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "GEOMETRY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "SDO_GEOMETRY"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "NCHAR"
-	(unsigned char)SAMPLEDB_TYPE_CHAR,
-	// "NVARCHAR"
-	(unsigned char)SAMPLEDB_TYPE_VARCHAR,
-	// "NTEXT"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "XML"
-	(unsigned char)SAMPLEDB_TYPE_BLOB,
-	// "DATETIMEOFFSET"
-	(unsigned char)SAMPLEDB_TYPE_DATETIME
-};
-#endif
-
-
 class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 	public:
 			sqlrprotocol_postgresql(sqlrservercontroller *cont,
@@ -494,6 +95,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		bool	recvPasswordMessage();
 		bool	authenticate();
 		bool	sendAuthenticationOk();
+		bool	sendBackendKeyData();
+		bool	sendStartupParameterStatuses();
+		bool	sendParameterStatus(const char *name,
+						const char *value);
 		bool	sendReadyForQuery();
 
 		bool	sendErrorResponse(const char *errorstring);
@@ -510,9 +115,11 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		bool	query();
 		bool	emptyQuery(const char *query);
 		bool	sendQueryResult(sqlrservercursor *cursor,
-						bool sendrowdescription);
+						bool sendrowdescription,
+						uint32_t maxrows);
 		bool	sendResultSet(sqlrservercursor *cursor,
-							uint16_t colcount);
+							uint16_t colcount,
+							uint32_t maxrows);
 		bool	sendRowDescription(sqlrservercursor *cursor,
 							uint16_t colcount);
 		uint32_t	getColumnTypeOid(uint16_t coltype);
@@ -562,6 +169,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		const char	*authmethod;
 		randomnumber	rand;
 		uint32_t	salt;
+		uint32_t	secretkey;
 
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -631,6 +239,7 @@ void sqlrprotocol_postgresql::init() {
 	database=NULL;
 	replication=NULL;
 	salt=0;
+	secretkey=0;
 }
 
 void sqlrprotocol_postgresql::free() {
@@ -856,7 +465,8 @@ bool sqlrprotocol_postgresql::initialHandshake() {
 		sendStartupMessageResponse() &&
 		recvPasswordMessage() &&
 		authenticate() &&
-		// FIXME: send BackendKeyData and ParameterStatus here...
+		sendBackendKeyData() &&
+		sendStartupParameterStatuses() &&
 		sendReadyForQuery();
 }
 
@@ -929,6 +539,7 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 
 		} else if (protocolversion!=196608) {
 
+			// FIXME: NegotiateProtocolVersion
 			sendErrorResponse("FATAL","88P01","Invalid protocol");
 			return false;
 
@@ -1195,6 +806,112 @@ bool sqlrprotocol_postgresql::sendAuthenticationOk() {
 	return sendPacket(MESSAGE_AUTHENTICATION);
 }
 
+bool sqlrprotocol_postgresql::sendBackendKeyData() {
+
+	// response packet data structure:
+	//
+	// data {
+	//	uint32_t	process id
+	//	uint32_t	secret key
+	// }
+
+	// set values to send
+	uint32_t	pid=process::getProcessId();
+	rand.generateNumber(&secretkey);
+
+	// debug
+	debugStart("BackendKeyData");
+	if (getDebug()) {
+		stdoutput.printf("	process id: %d\n",pid);
+		stdoutput.printf("	secret key: %d\n",secretkey);
+	}
+	debugEnd();
+
+	// build response packet
+	resppacket.clear();
+	writeBE(&resppacket,pid);
+	writeBE(&resppacket,secretkey);
+
+	// send response packet
+	return sendPacket(MESSAGE_BACKENDKEYDATA);
+}
+
+bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
+
+	// get (and massage the dbversion);
+	const char	*dbtype=cont->identify();
+	const char	*dbversion=cont->dbVersion();
+	stringbuffer	sv;
+	if (!charstring::compare(dbtype,"postgresql")) {
+		const char	*ptr=dbversion;
+		char		*major=NULL;
+		char		*minor=NULL;
+		char		*patch=NULL;
+		if (charstring::length(dbversion)==5) {
+			major=charstring::duplicate(ptr,1);
+			ptr++;
+		} else {
+			major=charstring::duplicate(ptr,2);
+			ptr+=2;
+		}
+		minor=charstring::duplicate(ptr,2);
+		ptr+=2;
+		patch=charstring::duplicate(ptr,2);
+		sv.append(major)->append('.');
+		sv.append(charstring::toInteger(minor))->append('.');
+		sv.append(charstring::toInteger(patch));
+	} else {
+		// FIXME: handle other db's too
+		sv.append(dbversion);
+	}
+
+	// see https://www.postgresql.org/docs/current/sql-show.html
+	// for info on each parameter
+
+	// FIXME: handle the rest of the parameters
+	return sendParameterStatus("server_version",sv.getString())
+		//&& sendParameterStatus("server_encoding","")
+		//&& sendParameterStatus("client_encoding","")
+		//&& sendParameterStatus("application_name","")
+		//&& sendParameterStatus("is_superuser","")
+		//&& sendParameterStatus("session_authorization","")
+		//&& sendParameterStatus("DateStyle","")
+		//&& sendParameterStatus("IntervalStyle","")
+		//&& sendParameterStatus("TimeZone","")
+		//&& sendParameterStatus("integer_datetimes","")
+		//&& sendParameterStatus("standard_conforming_strings","")
+		;
+}
+
+bool sqlrprotocol_postgresql::sendParameterStatus(const char *name,
+							const char *value) {
+
+	// response packet data structure:
+	//
+	// data {
+	//	char[]	name
+	//	char[]	value
+	// }
+
+	// debug
+	debugStart("ParameterStatus");
+	if (getDebug()) {
+		stdoutput.printf("	name: %s\n",name);
+		stdoutput.printf("	value: %s\n",value);
+	}
+	debugEnd();
+
+	// build response packet
+	resppacket.clear();
+	write(&resppacket,name);
+	write(&resppacket,'\0');
+	write(&resppacket,value);
+	write(&resppacket,'\0');
+
+	// send response packet
+	return sendPacket(MESSAGE_PARAMETERSTATUS);
+}
+
 bool sqlrprotocol_postgresql::sendReadyForQuery() {
 	
 	// respond, indicating that we're ready for a query
@@ -1348,7 +1065,7 @@ bool sqlrprotocol_postgresql::query() {
 		if (cont->prepareQuery(cursor,query,querylength,
 						true,true,true) &&
 			cont->executeQuery(cursor,true,true,true,true)) {
-			result=sendQueryResult(cursor,true);
+			result=sendQueryResult(cursor,true,0);
 		} else {
 			result=sendCursorError(cursor);
 		}
@@ -1365,20 +1082,24 @@ bool sqlrprotocol_postgresql::emptyQuery(const char *query) {
 }
 
 bool sqlrprotocol_postgresql::sendQueryResult(sqlrservercursor *cursor,
-						bool sendrowdescription) {
+						bool sendrowdescription,
+						uint32_t maxrows) {
 	uint16_t	colcount=cont->colCount(cursor);
 	if (colcount) {
 		if (sendrowdescription &&
 			!sendRowDescription(cursor,colcount)) {
 			return false;
 		}
-		return sendResultSet(cursor,colcount);
+		return sendResultSet(cursor,colcount,maxrows);
 	}
 	return sendCommandComplete(cursor);
 }
 
 bool sqlrprotocol_postgresql::sendResultSet(sqlrservercursor *cursor,
-							uint16_t colcount) {
+							uint16_t colcount,
+							uint32_t maxrows) {
+
+	// FIXME: pay attention to maxrows
 
 	for (;;) {
 
@@ -1499,6 +1220,7 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 
 uint32_t sqlrprotocol_postgresql::getColumnTypeOid(uint16_t coltype) {
 
+	// FIXME: use a type map
 	switch (coltype) {
 		case BOOL_DATATYPE:
 			return 16; //bool
@@ -2264,6 +1986,9 @@ bool sqlrprotocol_postgresql::sendNoData() {
 
 bool sqlrprotocol_postgresql::execute() {
 
+	// FIXME: if maxrows != 0 and there were rows left to fetch, then
+	// execute will be called again to fetch more of the result set
+
 	// request packet data structure:
 	//
 	// data {
@@ -2304,7 +2029,7 @@ bool sqlrprotocol_postgresql::execute() {
 		return sendEmptyQueryResponse();
 	}
 
-	return sendQueryResult(cursor,false);
+	return sendQueryResult(cursor,false,maxrows);
 }
 
 bool sqlrprotocol_postgresql::sync() {
