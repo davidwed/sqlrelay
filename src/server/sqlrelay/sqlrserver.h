@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2018 David Muse
+// Copyright (c) 1999-2019 David Muse
 // See the file COPYING for more information
 
 #ifndef SQLRSERVER_H
@@ -1669,6 +1669,27 @@ class SQLRSERVER_DLLSPEC sqlrmysqlcredentials : public sqlrcredentials {
 		const char	*getExtra();
 
 	#include <sqlrelay/private/sqlrmysqlcredentials.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrpostgresqlcredentials : public sqlrcredentials {
+	public:
+		sqlrpostgresqlcredentials();
+		~sqlrpostgresqlcredentials();
+		const char	*getType();
+
+		void	setUser(const char *user);
+		void	setPassword(const char *password);
+		void	setPasswordLength(uint64_t passwordlength);
+		void	setMethod(const char *method);
+		void	setSalt(uint32_t salt);
+
+		const char	*getUser();
+		const char	*getPassword();
+		uint64_t	getPasswordLength();
+		const char	*getMethod();
+		uint32_t	getSalt();
+
+	#include <sqlrelay/private/sqlrpostgresqlcredentials.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrauth {

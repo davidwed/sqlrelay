@@ -559,7 +559,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		char		*replication;
 		dictionary<char *, char *>	options;
 
+		const char	*authmethod;
 		randomnumber	rand;
+		uint32_t	salt;
 
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -580,6 +582,18 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 					sqlrprotocol(cont,ps,parameters) {
 
 	clientsock=NULL;
+
+	authmethod="postgresql_md5";
+	const char	*pwds=parameters->getAttributeValue("passwords");
+	if (!charstring::compareIgnoringCase(pwds,"cleartext")) {
+		authmethod="postgresql_cleartext";
+	}
+
+	if (getDebug()) {
+		debugStart("parameters");
+		stdoutput.printf("	authmethod: %s\n",authmethod);
+		debugEnd();
+	}
 
 	reqpacketsize=0;
 	reqpacket=NULL;
@@ -616,6 +630,7 @@ void sqlrprotocol_postgresql::init() {
 	password=NULL;
 	database=NULL;
 	replication=NULL;
+	salt=0;
 }
 
 void sqlrprotocol_postgresql::free() {
@@ -1018,9 +1033,9 @@ bool sqlrprotocol_postgresql::sendStartupMessageResponse() {
 		return false;
 	}
 
-	// FIXME: support either of these...
-	//return sendAuthenticationMD5Password();
-	return sendAuthenticationCleartextPassword();
+	return (!charstring::compare(authmethod,"postgresql_md5"))?
+				sendAuthenticationMD5Password():
+				sendAuthenticationCleartextPassword();
 }
 
 bool sqlrprotocol_postgresql::sendAuthenticationCleartextPassword() {
@@ -1059,15 +1074,12 @@ bool sqlrprotocol_postgresql::sendAuthenticationMD5Password() {
 	//
 	// data {
 	//	uint32_t	passwordtype
-	//	int32_t		salt
+	//	byte[4]		salt
 	// }
 
 	// set values to send
 	uint32_t	authtype=AUTH_MD5;
-	uint32_t	salt;
 	rand.generateNumber(&salt);
-	int32_t		signedsalt;
-	bytestring::copy(&signedsalt,&salt,sizeof(int32_t));
 
 	// debug
 	debugStart("AuthenticationMD5Password");
@@ -1080,7 +1092,7 @@ bool sqlrprotocol_postgresql::sendAuthenticationMD5Password() {
 	// build response packet
 	resppacket.clear();
 	writeBE(&resppacket,authtype);
-	writeBE(&resppacket,salt);
+	write(&resppacket,(unsigned char *)&salt,sizeof(salt));
 
 	// send response packet
 	return sendPacket(MESSAGE_AUTHENTICATION);
@@ -1123,9 +1135,12 @@ bool sqlrprotocol_postgresql::recvPasswordMessage() {
 bool sqlrprotocol_postgresql::authenticate() {
 
 	// build auth credentials
-	sqlruserpasswordcredentials	cred;
+	sqlrpostgresqlcredentials	cred;
 	cred.setUser(user);
 	cred.setPassword(password);
+	cred.setPasswordLength(charstring::length(password));
+	cred.setMethod(authmethod);
+	cred.setSalt(salt);
 
 	// authenticate
 	bool	retval=cont->auth(&cred);

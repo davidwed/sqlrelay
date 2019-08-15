@@ -171,3 +171,58 @@ const char *sqlrmysqlcredentials::getMethod() {
 const char *sqlrmysqlcredentials::getExtra() {
 	return extra;
 }
+
+sqlrpostgresqlcredentials::sqlrpostgresqlcredentials() : sqlrcredentials() {
+	user=NULL;
+	password=NULL;
+	passwordlength=0;
+	method=NULL;
+	salt=0;
+}
+
+sqlrpostgresqlcredentials::~sqlrpostgresqlcredentials() {
+}
+
+const char *sqlrpostgresqlcredentials::getType() {
+	return "postgresql";
+}
+
+void sqlrpostgresqlcredentials::setUser(const char *user) {
+	this->user=user;
+}
+
+void sqlrpostgresqlcredentials::setPassword(const char *password) {
+	this->password=password;
+}
+
+void sqlrpostgresqlcredentials::setPasswordLength(uint64_t passwordlength) {
+	this->passwordlength=passwordlength;
+}
+
+void sqlrpostgresqlcredentials::setMethod(const char *method) {
+	this->method=method;
+}
+
+void sqlrpostgresqlcredentials::setSalt(uint32_t salt) {
+	this->salt=salt;
+}
+
+const char *sqlrpostgresqlcredentials::getUser() {
+	return user;
+}
+
+const char *sqlrpostgresqlcredentials::getPassword() {
+	return password;
+}
+
+uint64_t sqlrpostgresqlcredentials::getPasswordLength() {
+	return passwordlength;
+}
+
+const char *sqlrpostgresqlcredentials::getMethod() {
+	return method;
+}
+
+uint32_t sqlrpostgresqlcredentials::getSalt() {
+	return salt;
+}
