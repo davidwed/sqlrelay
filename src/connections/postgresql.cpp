@@ -168,6 +168,13 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 					bool *null);
 		void		closeResultSet();
 
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+		bool		columnInfoIsValidAfterPrepare();
+#endif
+
 		PGresult	*pgresult;
 		ExecStatusType	pgstatus;
 		int		ncols;
@@ -774,6 +781,31 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	PQclear(pgresult);
 	pgresult=NULL;
 
+	// bail, if necessary
+	if (!result) {
+		return false;
+	}
+	
+	// describe the query (get column info)
+	pgresult=PQdescribePrepared(postgresqlconn->pgconn,"");
+
+	// handle some kind of outright failure
+	if (!pgresult) {
+		return false;
+	}
+
+	// handle errors
+	result=true;
+	pgstatus=PQresultStatus(pgresult);
+	if (pgstatus==PGRES_BAD_RESPONSE ||
+		pgstatus==PGRES_NONFATAL_ERROR ||
+		pgstatus==PGRES_FATAL_ERROR) {
+		result=false;
+	}
+
+	// get the col count
+	ncols=PQnfields(pgresult);
+
 	return result;
 }
 
@@ -954,6 +986,12 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	nrows=0;
 	currentrow=-1;
 
+	// clean up any result that might be lying around (eg. from a prepare)
+	if (pgresult) {
+		PQclear(pgresult);
+		pgresult=NULL;
+	}
+
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	int	result=1;
@@ -1008,8 +1046,13 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
+#if !((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)))
 	// get the col count
 	ncols=PQnfields(pgresult);
+#endif
 
 	// validate column count
 	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
@@ -1494,6 +1537,15 @@ void postgresqlcursor::closeResultSet() {
 	}
 #endif
 }
+
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+bool postgresqlcursor::columnInfoIsValidAfterPrepare() {
+	return true;
+}
+#endif
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_postgresqlconnection(
