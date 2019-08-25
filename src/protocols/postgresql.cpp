@@ -1597,12 +1597,6 @@ bool sqlrprotocol_postgresql::sendEmptyQueryResponse() {
 
 bool sqlrprotocol_postgresql::parse() {
 
-	// get an available cursor
-	sqlrservercursor	*cursor=cont->getCursor();
-	if (!cursor) {
-		return sendErrorResponse("Out of cursors");
-	}
-
 	// request packet data structure:
 	//
 	// data {
@@ -1651,9 +1645,20 @@ bool sqlrprotocol_postgresql::parse() {
 	for (uint16_t i=0; i<paramcount; i++) {
 		readBE(rp,&(paramtypes[i]),&rp);
 	}
+	
+	// get the requested cursor (or an available one)
+	sqlrservercursor	*cursor=NULL;
+	if (!stmtcursormap.getValue((char *)stmtname,&cursor)) {
 
-	// map stmt -> cursor
-	stmtcursormap.setValue(charstring::duplicate(stmtname),cursor);
+		// get an available cursor
+		cursor=cont->getCursor();
+		if (!cursor) {
+			return sendErrorResponse("Out of cursors");
+		}
+
+		// map stmt -> cursor
+		stmtcursormap.setValue(charstring::duplicate(stmtname),cursor);
+	} 
 
 	// debug
 	debugStart("Parse");
