@@ -33,16 +33,15 @@ sqlrfilter_string::sqlrfilter_string(sqlrservercontroller *cont,
 
 	debug=cont->getConfig()->getDebugFilters();
 
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled) {
 		return;
 	}
 
 	pattern=parameters->getAttributeValue("pattern");
 
-	ignorecase=!charstring::compareIgnoringCase(
-			parameters->getAttributeValue("ignorecase"),"yes");
+	ignorecase=charstring::isYes(
+			parameters->getAttributeValue("ignorecase"));
 
 	lowerpattern=NULL;
 	if (ignorecase) {

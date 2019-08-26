@@ -231,8 +231,7 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (charstring::compare(query,"create",6) && 
-		charstring::compare(query,"drop",4) && 
-		charstring::compare(query,"insert",6)) {
+		charstring::compare(query,"drop",4)) {
 
 		// prepare the query
 		if (mysql_stmt_prepare(stmt,query,charstring::length(query))) {
@@ -248,24 +247,26 @@ stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
 		}
 #endif
 
-		// get the column count
-		uint32_t	ncols=mysql_stmt_field_count(stmt);
-
-		// get statement metadata
-		MYSQL_RES	*mysqlresult=mysql_stmt_result_metadata(stmt);
-
-		// run through the columns
 		if (getcolumns) {
+
+			// get the column count
+			uint32_t	ncols=mysql_stmt_field_count(stmt);
+
+			// get statement metadata
+			MYSQL_RES	*mysqlresult=
+					mysql_stmt_result_metadata(stmt);
+
+			// run through the columns
 			mysql_field_seek(mysqlresult,0);
 			for (uint32_t i=0; i<ncols; i++) {
 				mysql_fetch_field(mysqlresult);
 			}
-		}
 
-		// bind result set buffers
-		if (mysql_stmt_bind_result(stmt,fieldbind)) {
+			// bind result set buffers
+			if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
 stdoutput.printf("bind: %s\n",mysql_stmt_error(stmt));
-			return false;
+				return false;
+			}
 		}
 
 #ifndef EXEC_BEFORE_METADATA
@@ -280,7 +281,9 @@ stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
 		mysql_stmt_affected_rows(stmt);
 
 		// run through the rows
-		while (!mysql_stmt_fetch(stmt)) {
+		if (getcolumns) {
+			while (!mysql_stmt_fetch(stmt)) {
+			}
 		}
 
 		// free the result set

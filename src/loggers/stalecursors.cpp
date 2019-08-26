@@ -51,8 +51,7 @@ sqlrlogger_stalecursors::sqlrlogger_stalecursors(sqlrloggers *ls,
 	user=parameters->getAttributeValue("user");
 	password=parameters->getAttributeValue("password");
 
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 
 	sqlrclientcon=NULL;
 	insertsqlrcur=NULL;

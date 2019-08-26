@@ -24,8 +24,7 @@ sqlrschedule_cron_userlist::sqlrschedule_cron_userlist(
 						domnode *parameters) :
 					sqlrschedule(cont,ss,parameters) {
 
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	defaultallow=charstring::compareIgnoringCase(
 			parameters->getAttributeValue("default"),"deny");
 

@@ -254,16 +254,9 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	if (!sqlrdebug || !*sqlrdebug) {
 		sqlrdebug=environment::getValue("SQLR_CLIENT_DEBUG");
 	}
-	const char	*yesset[]={"YES","ON","TRUE","Y","T","1",
-					"yes","on","true","y","t",
-					"Yes","On","True",NULL};
-	const char	*noset[]={"NO","OFF","FALSE","N","F","0",
-					"no","off","false","n","f",
-					"No","Off","False",NULL};
-	pvt->_debug=(sqlrdebug && *sqlrdebug &&
-				!charstring::inSet(sqlrdebug,noset));
-	if (pvt->_debug && !charstring::inSet(sqlrdebug,yesset) &&
-				!charstring::inSet(sqlrdebug,noset)) {
+	pvt->_debug=(sqlrdebug && *sqlrdebug && !charstring::isNo(sqlrdebug));
+	if (pvt->_debug && !charstring::isYes(sqlrdebug) &&
+				!charstring::isNo(sqlrdebug)) {
 		setDebugFile(sqlrdebug);
 	}
 	pvt->_webdebug=-1;
@@ -698,7 +691,7 @@ bool sqlrconnection::validateCertificate() {
 	// If we're not doing any validation then just return true. If we're
 	// just doing ca validation then the connect would have failed if the
 	// certificate was invalid, so we can just return true for that too.
-	if (!charstring::compareIgnoringCase(pvt->_tlsvalidate,"no") ||
+	if (charstring::isNo(pvt->_tlsvalidate) ||
 		!charstring::compareIgnoringCase(pvt->_tlsvalidate,"ca")) {
 		return true;
 	}
@@ -874,6 +867,7 @@ bool sqlrconnection::reConfigureSockets() {
 			if (pvt->_tlsversion) {
 				debugPrint(pvt->_tlsversion);
 			}
+			debugPrint("\n");
 			debugPrint("  cert: ");
 			if (pvt->_tlscert) {
 				debugPrint(pvt->_tlscert);

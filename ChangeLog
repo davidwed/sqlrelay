@@ -1,3 +1,6 @@
+1.6.1 - added postgresql protocol module
+	updated postgresql connection module to get column info pre-execute
+
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3
 	integrated my_bool fix for mysql 8.0.1+
@@ -8,13 +11,49 @@
 		variable delimiters
 	added fakeinputbindvariablesunicodestrings config option
 	added bind variable delimiters config methods to c++ api
-	replay trigger updates
+	replay trigger can now run a query (eg. "show engine innodb status")
+		and log the results to a file when a replay condition occurs
+	replay trigger doesn't log/replay selects by default now (but this is
+		configurable)
 	updated normalize translation to support queries containing binary data
 	fixed a backslash-escape bug in the normalize translation
 	refactored some sqlrclient api private methods
 	refactored various bind-manipulation/detection methods
 	sqlr-listener creates tmpdir now on start, if it doesn't exist
 		(because this is often in /run, which is often a tmpfs)
+	postgresql connection module forces re-fetch of column data after
+		execute now
+	everything uses charstring::isYes/isNo now, instead of direct
+		comparisons against "yes" or "no"
+	fixed subtle sqlexecdirect bug
+	fixed subtle sqlserver max-varchar bind length bug
+	fixed various subtle sqlserver bugs where column-info isn't valid until
+		after execute
+	odbc connection module sets column precision = column length if
+		column precision = -1
+	when using odbc on front and back end, the object type works in
+		SQLTables now
+	result set translations work with "show databases/tables/etc." queries
+		with an ODBC backend now
+	increased oid buffer sizes in postgresql connection
+	fixed typemangling->tablemangling typo in postgresql connection -
+		tablemangling should work without typemangling now
+	fixed a '...\\''...' parsing bug
+	non-odbc connection modules now return odbc-compatible(ish) table lists
+	client info is no longer reset during endSession
+	fixed a bug that could cause sqlite "show tables like '...'" to crash
+	fixed odbc unicode null user/password bug
+	fixed PyString_AsString for python 3.<3
+	fixed bug that caused some MSSQL lobs to sometimes be returned as
+		nulls when using ODBC on the backend
+	fixed bug that caused some MSSQL date fields to get returned as garbage
+	fixed a few older sqlrclient compatibility bugs
+	fixed SQLFetch parameter type mismatch in ODBC api
+	removed a non-c++17-compliant "register" from custom_nw logger
+	added support for nodejs 12
+	SQLDriverConnect can take an inline DSN now
+	fixed odbc maxcolumncount=-1 crash
+	odbc, db2, and informix set bind format error now
 
 1.5.0 - spec file tweaks
 	odbc uses different begin tx queries for different db's now

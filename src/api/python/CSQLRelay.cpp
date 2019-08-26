@@ -17,7 +17,11 @@
 
 #if PY_MAJOR_VERSION >= 3
 	#define PyString_Check PyUnicode_Check
+#if PY_MINOR_VERSION >= 3
 	#define PyString_AsString(a) PyUnicode_AsUTF8AndSize(a,NULL)
+#else
+	#define PyString_AsString(a) PyBytes_AS_STRING(PyUnicode_AsEncodedString(a,"utf-8","strict"))
+#endif
 	#define PyInt_Check PyLong_Check
 	#define PyInt_AsLong PyLong_AsLong
 #endif

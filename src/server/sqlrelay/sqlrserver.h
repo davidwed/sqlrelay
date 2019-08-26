@@ -1,4 +1,4 @@
-// Copyright (c) 1999-2018 David Muse
+// Copyright (c) 1999-2019 David Muse
 // See the file COPYING for more information
 
 #ifndef SQLRSERVER_H
@@ -140,11 +140,13 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// re-login to the database
 		void	reLogIn();
 
-		// client auth
+		// backend auth
 		void		setUser(const char *user);
 		void		setPassword(const char *password);
 		const char	*getUser();
 		const char	*getPassword();
+
+		// client auth
 		sqlrcredentials	*getCredentials(const char *user,
 						const char *password,
 						bool usegss,
@@ -491,12 +493,15 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 
 		// db, table, column, procedure bind/column lists
 		bool		getListsByApiCalls();
+		bool		fakePrepareAndExecuteForApiCall(
+						sqlrservercursor *cursor);
 		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getSchemaList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getTableList(sqlrservercursor *cursor,
-						const char *wild);
+						const char *wild,
+						uint16_t objecttypes);
 		bool		getTableTypeList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getColumnList(sqlrservercursor *cursor,
@@ -519,7 +524,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *wild);
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getSchemaListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getTableTypeListQuery(bool wild);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(const char *table,
@@ -536,6 +542,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getProcedureListQuery(bool wild);
 
 		// column info
+		bool		columnInfoIsValidAfterPrepare(
+						sqlrservercursor *cursor);
 		uint16_t	getSendColumnInfo();
 		void		setSendColumnInfo(uint16_t sendcolumninfo);
 		uint32_t	colCount(sqlrservercursor *cursor);
@@ -891,7 +899,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 						const char *wild);
 		virtual bool		getTableList(
 						sqlrservercursor *cursor,
-						const char *wild);
+						const char *wild,
+						uint16_t objecttypes);
 		virtual bool		getTableTypeList(
 						sqlrservercursor *cursor,
 						const char *wild);
@@ -920,7 +929,11 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 						const char *wild);
 		virtual const char	*getDatabaseListQuery(bool wild);
 		virtual const char	*getSchemaListQuery(bool wild);
-		virtual const char	*getTableListQuery(bool wild);
+		virtual const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
+		virtual const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes,
+						const char *extrawhere);
 		virtual const char	*getTableTypeListQuery(bool wild);
 		virtual const char	*getGlobalTempTableListQuery();
 		virtual const char	*getColumnListQuery(
@@ -1656,6 +1669,27 @@ class SQLRSERVER_DLLSPEC sqlrmysqlcredentials : public sqlrcredentials {
 		const char	*getExtra();
 
 	#include <sqlrelay/private/sqlrmysqlcredentials.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrpostgresqlcredentials : public sqlrcredentials {
+	public:
+		sqlrpostgresqlcredentials();
+		~sqlrpostgresqlcredentials();
+		const char	*getType();
+
+		void	setUser(const char *user);
+		void	setPassword(const char *password);
+		void	setPasswordLength(uint64_t passwordlength);
+		void	setMethod(const char *method);
+		void	setSalt(uint32_t salt);
+
+		const char	*getUser();
+		const char	*getPassword();
+		uint64_t	getPasswordLength();
+		const char	*getMethod();
+		uint32_t	getSalt();
+
+	#include <sqlrelay/private/sqlrpostgresqlcredentials.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrauth {

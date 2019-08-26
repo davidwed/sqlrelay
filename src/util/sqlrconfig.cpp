@@ -17,8 +17,7 @@ connectstringcontainer::connectstringcontainer() {
 	connectionid=NULL;
 	string=NULL;
 	metric=charstring::toInteger(DEFAULT_METRIC);
-	behindloadbalancer=!charstring::compareIgnoringCase(
-					DEFAULT_BEHINDLOADBALANCER,"yes");
+	behindloadbalancer=charstring::isYes(DEFAULT_BEHINDLOADBALANCER);
 	pwdenc=NULL;
 }
 

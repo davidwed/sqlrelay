@@ -215,6 +215,12 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 
 		bool		columnInfoIsValidAfterPrepare();
 
+#if (ODBCVER >= 0x0300) && defined(SQLCOLATTRIBUTE_SQLLEN)
+		bool		isLob(SQLLEN type);
+#else
+		bool		isLob(SQLINTEGER type);
+#endif
+
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
@@ -251,10 +257,11 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		SQLINTEGER	sqlnulldata;
 		#endif
 
+		bool		bindformaterror;
+
 		uint32_t	row;
 		uint32_t	maxrow;
 		uint32_t	totalrows;
-		uint32_t	rownumber;
 
 		stringbuffer	errormsg;
 
@@ -262,13 +269,18 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		singlylinkedlist<char *>	ucsinbindstrings;
 		#endif
 
+		bool		columninfoisvalidafterprepare;
+
 		odbcconnection	*odbcconn;
+
+		char	columnnamescratch[4096];
 };
 
 class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 	friend class odbccursor;
 	public:
 			odbcconnection(sqlrservercontroller *cont);
+			~odbcconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
@@ -309,7 +321,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getSchemaList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getTableList(sqlrservercursor *cursor,
-						const char *wild);
+						const char *wild,
+						uint16_t objecttypes);
 		bool		getTableTypeList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		isCurrentCatalog(const char *name);
@@ -363,10 +376,15 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		char		dbversion[512];
 
 		const char	*begintxquery;
-		bool		dontusecharforblob;
+		bool		usecharforlobbind;
 		SQLSMALLINT	fractionscale;
 		bool		supportsfraction;
 		bool		timestampfortime;
+		uint32_t	maxallowedvarcharbindlength;
+		uint32_t	maxvarcharbindlength;
+		SQLINTEGER	*columninfonotvalidyeterror;
+		bool		sqltypedatetosqlcbinary;
+		bool		fetchlobsasstrings;
 
 		#if (ODBCVER>=0x0300)
 		stringbuffer	errormsg;
@@ -504,8 +522,12 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	getcolumntables=false;
 	overrideschema=NULL;
 	unicode=true;
+	columninfonotvalidyeterror=NULL;
 }
 
+odbcconnection::~odbcconnection() {
+	delete[] columninfonotvalidyeterror;
+}
 
 void odbcconnection::handleConnectString() {
 
@@ -526,16 +548,15 @@ void odbcconnection::handleConnectString() {
 
 	lastinsertidquery=cont->getConnectStringValue("lastinsertidquery");
 
-	mars=!charstring::compare(cont->getConnectStringValue("mars"),"yes");
-	getcolumntables=!charstring::compare(
-			cont->getConnectStringValue("getcolumntables"),"yes");
+	mars=charstring::isYes(cont->getConnectStringValue("mars"));
+	getcolumntables=charstring::isYes(
+			cont->getConnectStringValue("getcolumntables"));
 	const char	*os=cont->getConnectStringValue("overrideschema");
 	if (!charstring::isNullOrEmpty(os)) {
 		overrideschema=os;
 	}
 
-	unicode=charstring::compare(
-			cont->getConnectStringValue("unicode"),"no");
+	unicode=!charstring::isNo(cont->getConnectStringValue("unicode"));
 
 
 	// unixodbc doesn't support array fetches
@@ -601,12 +622,12 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 				SQL_NTS);
 		delete[] tracefilename;
 	}
-	if (!charstring::compare(trace,"yes")) {
+	if (charstring::isYes(trace)) {
 		erg=SQLSetConnectAttr(dbc,
 				SQL_ATTR_TRACE,
 				(SQLPOINTER *)SQL_OPT_TRACE_ON,
 				0);
-	} else if (!charstring::compare(trace,"no")) {
+	} else if (charstring::isNo(trace)) {
 		erg=SQLSetConnectAttr(dbc,
 				SQL_ATTR_TRACE,
 				(SQLPOINTER *)SQL_OPT_TRACE_OFF,
@@ -677,8 +698,10 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		#ifdef HAVE_SQLCONNECTW
 		if (unicode) {
 			char	*dsnucs=conv_to_ucs(dsnasc);
-			char	*userucs=conv_to_ucs(userasc);
-			char	*passworducs=conv_to_ucs(passwordasc);
+			char	*userucs=
+				(userasc)?conv_to_ucs(userasc):NULL;
+			char	*passworducs=
+				(passwordasc)?conv_to_ucs(passwordasc):NULL;
 			erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
 					(SQLWCHAR *)userucs,SQL_NTS,
 					(SQLWCHAR *)passworducs,SQL_NTS);
@@ -721,10 +744,28 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		dbmsnamebuffer[dbmsnamelen]='\0';
 	}
 
-	// set the begin query based on the db-type
+	// set some default params
+	begintxquery=sqlrserverconnection::beginTransactionQuery();
+	usecharforlobbind=true;
+	// When binding dates using SQLBindParameter, the "decimal
+	// digits" parameter refers to the number of digits in the
+	// "fraction" part of the date.  Since that is in nanoseconds
+	// (billionths of a second (0-999999999)) in ODBC, the
+	// "decimal digits" parameter must be 9 to accomodate the
+	// full range.
+	fractionscale=9;
+	supportsfraction=true;
+	timestampfortime=true;
+	maxallowedvarcharbindlength=0;
+	maxvarcharbindlength=0;
+	columninfonotvalidyeterror=NULL;
+	sqltypedatetosqlcbinary=true;
+	fetchlobsasstrings=false;
+
+	// override some default params based on the db-type
 	if (!charstring::compare(dbmsnamebuffer,"Teradata")) {
 		begintxquery="BT";
-		dontusecharforblob=true;
+		usecharforlobbind=false;
 		// See below...  Teradata only supports 6 digits though.
 		fractionscale=6;
 		// Well... Teradata theoretically supports 6 digits of
@@ -735,20 +776,77 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// Teradata doesn't like it if you bind a SQL_TIMESTAMP_STRUCT
 		// to a TIME datatype.
 		timestampfortime=false;
-	} else {
-		begintxquery=sqlrserverconnection::beginTransactionQuery();
-		dontusecharforblob=false;
-		// When binding dates using SQLBindParameter, the "decimal
-		// digits" parameter refers to the number of digits in the
-		// "fraction" part of the date.  Since that is in nanoseconds
-		// (billionths of a second (0-999999999)) in ODBC, the
-		// "decimal digits" parameter must be 9 to accomodate the
-		// full range.
-		fractionscale=9;
-		supportsfraction=true;
-		timestampfortime=true;
+	} else if (!charstring::compare(dbmsnamebuffer,
+						"Microsoft SQL Server",20)) {
+		// SQL Server defines a varchar/nvarchar as 4000 characters
+		// long, but you can actually store up to 2Gb in them.
+		// However, if you send a valuesize > 4000 characters during
+		// a bind, then something in the chain doesn't like it.  To
+		// work around this, you have to send 0.  Go figure...
+		maxallowedvarcharbindlength=4000;
+		maxvarcharbindlength=0;
+
+		// With MS SQL Server, there are various cases where column
+		// metadata can't be fetched until post-execute.  For example:
+		//
+		// sqlrsh commands like:
+		//	inputbind 1 = 'hello';
+		//	select ?;
+		// fail with:
+		//	11521:
+		//	[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]
+		//	The metadata could not be determined because statement
+		//	'select @P1' uses an undeclared parameter in a context
+		//	that affects its metadata.
+		// Sored procedures that optionally execute selects which
+		// return different numbers of columns fail with:
+		// 	11512:
+		// 	[Microsoft][ODBC Driver 17 for SQL Server][SQL Server]
+		// 	The metadata could not be determined because the
+		// 	statement '...some select query...' is not compatible
+		// 	with the statement '...some other select query...' in
+		// 	procedure '...some procedure...'.
+		// So, in cases like this we can catch the error and defer
+		// getting/sending column info until later.
+		// Basically, it's error codes 11509-11530 but there could be
+		// others too...
+		columninfonotvalidyeterror=new SQLINTEGER[23];
+		columninfonotvalidyeterror[0]=11509;
+		columninfonotvalidyeterror[1]=11510;
+		columninfonotvalidyeterror[2]=11511;
+		columninfonotvalidyeterror[3]=11512;
+		columninfonotvalidyeterror[4]=11513;
+		columninfonotvalidyeterror[5]=11514;
+		columninfonotvalidyeterror[6]=11515;
+		columninfonotvalidyeterror[7]=11516;
+		columninfonotvalidyeterror[8]=11517;
+		columninfonotvalidyeterror[9]=11518;
+		columninfonotvalidyeterror[10]=11519;
+		columninfonotvalidyeterror[11]=11520;
+		columninfonotvalidyeterror[12]=11521;
+		columninfonotvalidyeterror[13]=11522;
+		columninfonotvalidyeterror[14]=11523;
+		columninfonotvalidyeterror[15]=11524;
+		columninfonotvalidyeterror[16]=11525;
+		columninfonotvalidyeterror[17]=11526;
+		columninfonotvalidyeterror[18]=11527;
+		columninfonotvalidyeterror[19]=11528;
+		columninfonotvalidyeterror[20]=11529;
+		columninfonotvalidyeterror[21]=11530;
+		columninfonotvalidyeterror[22]=0;
+
+		// SQL Server doesn't like for you to convert SQL_TYPE_DATE
+		// to SQL_C_BINARY
+		sqltypedatetosqlcbinary=false;
+
+		// SQL Server has trouble mixing SQLBindCol and SQLGetData.
+		// If you SQLBindCol a column (eg. column 4) then you can't use
+		// SQLGetData to fetch an earlier column (eg. column 3).
+		// A workaround is to use SQLBindCol in all cases and fetch
+		// LOBs as strings.
+		fetchlobsasstrings=true;
 	}
-	
+
 	return true;
 }
 
@@ -1038,7 +1136,8 @@ bool odbcconnection::getSchemaList(sqlrservercursor *cursor,
 }
 
 bool odbcconnection::getTableList(sqlrservercursor *cursor,
-					const char *wild) {
+					const char *wild,
+					uint16_t objecttypes) {
 
 	odbccursor	*odbccur=(odbccursor *)cursor;
 
@@ -1063,7 +1162,6 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*table="";
-	const char	*tabletype="TABLE,VIEW,SYNONYM,ALIAS";
 	char		**tableparts=NULL;
 	uint64_t	tablepartcount=0;
 
@@ -1141,12 +1239,35 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 		}
 	}
 
+	stringbuffer	tabletype;
+	if (objecttypes&DB_OBJECT_TABLE) {
+		tabletype.append("TABLE");
+	}
+	if (objecttypes&DB_OBJECT_VIEW) {
+		if (tabletype.getSize()) {
+			tabletype.append(',');
+		}
+		tabletype.append("VIEW");
+	}
+	if (objecttypes&DB_OBJECT_ALIAS) {
+		if (tabletype.getSize()) {
+			tabletype.append(',');
+		}
+		tabletype.append("ALIAS");
+	}
+	if (objecttypes&DB_OBJECT_SYNONYM) {
+		if (tabletype.getSize()) {
+			tabletype.append(',');
+		}
+		tabletype.append("SYNONYM");
+	}
+
 	// get the table list
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)table,SQL_NTS,
-			(SQLCHAR *)tabletype,SQL_NTS);
+			(SQLCHAR *)tabletype.getString(),SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
 	// clean up
@@ -2049,6 +2170,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 		inoutisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
+	bindformaterror=false;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 	initializeColCounts();
 	initializeRowCounts();
@@ -2107,6 +2229,8 @@ void odbccursor::deallocateResultSetBuffers() {
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
+
+	bindformaterror=false;
 
 	// initialize column count
 	initializeColCounts();
@@ -2234,18 +2358,23 @@ bool odbccursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
 	SQLPOINTER	val=NULL;
 	SQLSMALLINT	valtype=SQL_C_CHAR;
+	SQLSMALLINT	paramtype=SQL_CHAR;
+	SQLLEN		bufferlength=valuesize;
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
 		char	*value_ucs=conv_to_ucs((char*)value,valuesize);
-		valuesize=ucslen(value_ucs)*2;
+		valuesize=ucslen(value_ucs);
+		bufferlength=valuesize*2;
 		ucsinbindstrings.append(value_ucs);
 		val=(SQLPOINTER)value_ucs;
 		valtype=SQL_C_WCHAR;
+		paramtype=SQL_WVARCHAR;
 	} else {
 	#endif
 		val=(SQLPOINTER)value;
@@ -2265,28 +2394,32 @@ bool odbccursor::inputBind(const char *variable,
 				1,
 				0,
 				val,
-				valuesize,
+				bufferlength,
 				&sqlnulldata);
 	} else {
 
-		// In ODBC-2 mode, SQL Server Native Client 11.0 (at least)
-		// allows a valuesize of 0, when the value is "".
-		// In non-ODBC-2 mode, it throws: "Invalid precision value"
-		// Using a valuesize of 1 works with all ODBC-modes.
-		// Hopefully it works with all drivers.
 		if (!valuesize) {
+			// In ODBC-2 mode, SQL Server Native Client 11.0
+			// (at least) allows a valuesize of 0, when the value
+			// is "".  In non-ODBC-2 mode, it throws:
+			// "Invalid precision value" Using a valuesize of 1
+			// works with all ODBC-modes.  Hopefully it works with
+			// all drivers.
 			valuesize=1;
+		} else if (odbcconn->maxallowedvarcharbindlength &&
+			valuesize>odbcconn->maxallowedvarcharbindlength) {
+			valuesize=odbcconn->maxvarcharbindlength;
 		}
 
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
 				valtype,
-				SQL_CHAR,
-				valuesize,
+				paramtype,
+				valuesize,	// in characters
 				0,
 				val,
-				valuesize,
+				bufferlength,	// in bytes
 				NULL);
 	}
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
@@ -2298,6 +2431,7 @@ bool odbccursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2322,6 +2456,7 @@ bool odbccursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2355,6 +2490,7 @@ bool odbccursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2444,8 +2580,7 @@ bool odbccursor::inputBindBlob(const char *variable,
 						int16_t *isnull) {
 
 	// FIXME: This code is known to work with SQL Server...
-
-	if (!odbcconn->dontusecharforblob) {
+	if (odbcconn->usecharforlobbind) {
 		return sqlrservercursor::inputBindBlob(
 						variable,
 						variablesize,
@@ -2455,10 +2590,10 @@ bool odbccursor::inputBindBlob(const char *variable,
 	}
 
 	// FIXME: This code is known to work with Teradata...
-	// (Ideally we should getone body of code working for all dbs)
-
+	// (Ideally we should get one body of code working for all dbs)
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2483,6 +2618,7 @@ bool odbccursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2509,6 +2645,7 @@ bool odbccursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2539,6 +2676,7 @@ bool odbccursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2577,6 +2715,7 @@ bool odbccursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2618,6 +2757,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2647,6 +2787,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2678,6 +2819,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2714,6 +2856,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -2823,9 +2966,11 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 
 	checkForTempTable(query,length);
 
-	// if we're not exec-direct'ing then we already
-	// did the first half of this in prepareQuery()
-	if (!handleColumns(getExecuteDirect(),true)) {
+	// if we're not exec-direct'ing, and if column info is valid after
+	// prepare, then we must have already done the first half of this in
+	// prepareQuery()
+	if (!handleColumns(getExecuteDirect() ||
+			!columninfoisvalidafterprepare,true)) {
 		return false;
 	}
 
@@ -2907,6 +3052,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 
 void odbccursor::initializeColCounts() {
 	ncols=0;
+	columninfoisvalidafterprepare=true;
 }
 
 void odbccursor::initializeRowCounts() {
@@ -2921,6 +3067,30 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+
+		// column info may not be valid until post-execute for
+		// particular queries
+		// (eg. "select ?" with a bind value in MS SQL Server, or a
+		// stored procedure that optionally executes selects with
+		// different numbers of columns)
+		if (odbcconn->columninfonotvalidyeterror) {
+			SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
+			SQLINTEGER	nativeerrnum=0;
+			SQLSMALLINT	errlength=0;
+			bytestring::zero(state,sizeof(state));
+			SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,
+							state,&nativeerrnum,
+							NULL,0,&errlength);
+			for (SQLINTEGER *ptr=
+					odbcconn->columninfonotvalidyeterror;
+					*ptr; ptr++) {
+				if (nativeerrnum==*ptr) {
+					columninfoisvalidafterprepare=false;
+					erg=SQL_SUCCESS;
+					return true;
+				}
+			}
+		}
 		return false;
 	}
 
@@ -2931,6 +3101,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 	}
 
 	if (getcolumninfo) {
+
+		// allocate buffers if necessary
+		if (!maxcolumncount) {
+			allocateResultSetBuffers(ncols);
+		}
 
 		// run through the columns
 		for (SQLSMALLINT i=0; i<ncols; i++) {
@@ -2972,6 +3147,14 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 				erg=SQLColAttribute(stmt,i+1,SQL_DESC_PRECISION,
 						NULL,0,NULL,
 						&(column[i].precision));
+				// Some drivers (Redshift) like to return -1
+				// for the precision of some (TEXT/NTEXT)
+				// columns.  This wreaks havoc on the client
+				// side, as the value is interpreted as 2^32-1.
+				// Override the -1 with the length.
+				if (column[i].precision==-1) {
+					column[i].precision=column[i].length;
+				}
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
@@ -3035,8 +3218,27 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
 				}
+				// Some databases (Hive) like to return
+				// columns as table.column.
+				// If the column name was table.column then
+				// split it and override the table name.
+				char	*dot=charstring::findFirst(
+							column[i].name,'.');
+				if (dot) {
+					char	*col=dot+1;
+					*dot='\0';
+					charstring::copy(column[i].table,
+								column[i].name);
+					charstring::copy(columnnamescratch,col);
+					charstring::copy(column[i].name,
+							columnnamescratch);
+					column[i].namelength=
+						charstring::length(
+							column[i].name);
+				}
 				column[i].tablelength=
 					charstring::length(column[i].table);
+
 #else
 				// column name
 				erg=SQLColAttributes(stmt,i+1,
@@ -3147,6 +3349,24 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
 				}
+				// Some databases (Hive) like to return
+				// columns as table.column.
+				// If the column name was table.column then
+				// split it and override the table name.
+				char	*dot=charstring::findFirst(
+							column[i].name,'.');
+				if (dot) {
+					char	*col=dot+1;
+					*dot='\0';
+					charstring::copy(column[i].table,
+								column[i].name);
+					charstring::copy(columnnamescratch,col);
+					charstring::copy(column[i].name,
+							columnnamescratch);
+					column[i].namelength=
+						charstring::length(
+							column[i].name);
+				}
 				column[i].tablelength=
 					charstring::length(column[i].table);
 #endif
@@ -3157,9 +3377,9 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 	if (bindcolumns) {
 
 		// allocate buffers if necessary
-		if (!maxcolumncount) {
+		/*if (!maxcolumncount) {
 			allocateResultSetBuffers(ncols);
-		}
+		}*/
 
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 
@@ -3175,19 +3395,19 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 							field[i],maxfieldlength,
 							&(indicator[i]));
 				} else if (column[i].type==SQL_TYPE_TIMESTAMP ||
-						column[i].type==SQL_TYPE_DATE) {
+					(odbcconn->sqltypedatetosqlcbinary &&
+					column[i].type==SQL_TYPE_DATE)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 							field[i],maxfieldlength,
 							&(indicator[i]));
-				} else {
+				} else if (!isLob(column[i].type)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 							field[i],maxfieldlength,
 							&(indicator[i]));
 				}
 			} else {
 			#endif
-				if (column[i].type!=SQL_LONGVARCHAR &&
-					column[i].type!=SQL_LONGVARBINARY) {
+				if (!isLob(column[i].type)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 							field[i],maxfieldlength,
 							&(indicator[i]));
@@ -3210,6 +3430,19 @@ void odbccursor::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
+	if (bindformaterror) {
+		// handle bind format errors
+		*errorlength=charstring::length(
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
+		charstring::safeCopy(errorbuffer,
+				errorbufferlength,
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
+				*errorlength);
+		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+		*liveconnection=true;
+		return;
+	}
+
 	SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 	SQLINTEGER	nativeerrnum;
 	SQLSMALLINT	errlength;
@@ -3431,8 +3664,7 @@ void odbccursor::getField(uint32_t col,
 	}
 
 	// handle lobs
-	if (column[col].type==SQL_LONGVARCHAR ||
-		column[col].type==SQL_LONGVARBINARY) {
+	if (isLob(column[col].type)) {
 		*blob=true;
 		return;
 	}
@@ -3450,6 +3682,13 @@ bool odbccursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 	SQLCHAR	buffer[1];
 	erg=SQLGetData(stmt,col+1,SQL_C_BINARY,buffer,0,&(loblength[col]));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
+		return false;
+	}
+
+	// FIXME: SQL Server XML types reliably return SQL_NO_TOTAL, so for now
+	// we aren't handling them as LOBs.  Is there some other way we can
+	// determine the length?
+	if (loblength[col]==SQL_NO_TOTAL) {
 		return false;
 	}
 
@@ -3561,7 +3800,26 @@ void odbccursor::closeResultSet() {
 }
 
 bool odbccursor::columnInfoIsValidAfterPrepare() {
-	return true;
+	return columninfoisvalidafterprepare;
+}
+
+#if (ODBCVER >= 0x0300) && defined(SQLCOLATTRIBUTE_SQLLEN)
+bool odbccursor::isLob(SQLLEN type) {
+#else
+bool odbccursor::isLob(SQLINTEGER type) {
+#endif
+
+	if (odbcconn->fetchlobsasstrings) {
+		return false;
+	}
+
+	// FIXME: -152 (SQL Server XML) types are kind-of also LOBs, but
+	// attempts to get their lengths reliably result in SQL_NO_TOTAL.
+	// We don't (currently) have a way of determining their lengths,
+	// so, for now, we'll handle them as non-LOBs.
+	return (type==SQL_LONGVARCHAR ||
+		type==SQL_LONGVARBINARY ||
+		type==SQL_WLONGVARCHAR);
 }
 
 extern "C" {

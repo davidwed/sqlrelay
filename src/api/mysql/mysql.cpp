@@ -20,6 +20,7 @@
 #define NEED_IS_UNSIGNED_TYPE_CHAR 1
 #define NEED_IS_BINARY_TYPE_CHAR 1
 #include <datatypes.h>
+#include <defines.h>
 
 extern "C" {
 
@@ -857,7 +858,9 @@ MYSQL_RES *mysql_list_tables(MYSQL *mysql, const char *wild) {
 	mysql->currentstmt->result->fields=NULL;
 	mysql->currentstmt->result->lengths=NULL;
 	mysql->currentstmt->result->sqlrcur->getTableList(wild,
-						SQLRCLIENTLISTFORMAT_MYSQL);
+					SQLRCLIENTLISTFORMAT_MYSQL,
+					DB_OBJECT_TABLE|DB_OBJECT_VIEW|
+					DB_OBJECT_ALIAS|DB_OBJECT_SYNONYM);
 	processFields(mysql->currentstmt);
 	mysql->currentstmt->result->currentfield=0;
 
@@ -1876,10 +1879,9 @@ enum enum_field_types map_col_type(const char *columntype, int64_t scale) {
 			// provide the option of mapping it to
 			// MYSQL_TYPE_DATETIME.
 			if (retval==MYSQL_TYPE_DATE &&
-				!charstring::compare(
+				charstring::isYes(
 					environment::getValue(
-					"SQLR_MYSQL_MAP_DATE_TO_DATETIME"),
-					"yes")) {
+					"SQLR_MYSQL_MAP_DATE_TO_DATETIME"))) {
 				retval=MYSQL_TYPE_DATETIME;
 			}
 			return retval;
@@ -1913,15 +1915,13 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	buffer[length]='\0';
 
 	// parse
-	bool	ddmm=!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_MYSQL_DATE_DDMM"),
-					"yes");
+	bool	ddmm=charstring::isYes(environment::getValue(
+					"SQLR_MYSQL_DATE_DDMM"));
 	bool		yyyyddmm=ddmm;
 	const char	*yyyyddmmstr=environment::getValue(
 					"SQLR_MYSQL_DATE_YYYYDDMM");
 	if (yyyyddmmstr) {
-		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+		yyyyddmm=charstring::isYes(yyyyddmmstr);
 	}
 	parseDateTime(buffer,ddmm,yyyyddmm,
 				"/-:",&year,&month,&day,
@@ -1976,8 +1976,8 @@ int mysql_stmt_fetch(MYSQL_STMT *stmt) {
 		// is_null components are all settable.  If we find bind
 		// buffer with those values NULL then assume we've hit the
 		// NULL terminator.
-		if (!charstring::compareIgnoringCase(environment::getValue(
-			"SQLR_MYSQL_NULL_TERMINATED_RESULT_BINDS"),"yes") &&
+		if (charstring::isYes(environment::getValue(
+				"SQLR_MYSQL_NULL_TERMINATED_RESULT_BINDS")) &&
 			!stmt->resultbinds[i].buffer &&
 			!stmt->resultbinds[i].length &&
 			!stmt->resultbinds[i].is_null) {

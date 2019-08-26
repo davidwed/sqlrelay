@@ -48,8 +48,7 @@ sqlrresultsettranslation_reformatdatetime::
 	reformattedfield=NULL;
 	reformattedfieldlength=0;
 
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled) {
 		return;
 	}
@@ -63,12 +62,12 @@ sqlrresultsettranslation_reformatdatetime::
 		!charstring::length(dateyyyyddmm)) {
 		dateyyyyddmm=dateddmm;
 	}
-	ddmm=!charstring::compareIgnoringCase(dateddmm,"yes");
-	yyyyddmm=!charstring::compareIgnoringCase(dateyyyyddmm,"yes");
+	ddmm=charstring::isYes(dateddmm);
+	yyyyddmm=charstring::isYes(dateyyyyddmm);
 
-	ignorenondatetime=!charstring::compareIgnoringCase(
+	ignorenondatetime=charstring::isYes(
 				parameters->getAttributeValue(
-						"ignorenondatetime"),"yes");
+						"ignorenondatetime"));
 
 	datedelimiters=parameters->getAttributeValue("datedelimiters");
 	if (!datedelimiters) {

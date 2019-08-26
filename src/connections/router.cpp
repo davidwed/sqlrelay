@@ -75,7 +75,8 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getTableList(sqlrservercursor *cursor,
-						const char *wild);
+						const char *wild,
+						uint16_t objecttypes);
 		bool		getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
@@ -907,7 +908,8 @@ bool routerconnection::getDatabaseList(sqlrservercursor *cursor,
 }
 
 bool routerconnection::getTableList(sqlrservercursor *cursor,
-						const char *wild) {
+						const char *wild,
+						uint16_t objecttypes) {
 	// FIXME: implement this
 	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,
 				SQLR_ERROR_NOTIMPLEMENTED,true);

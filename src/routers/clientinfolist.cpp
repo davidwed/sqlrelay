@@ -34,8 +34,7 @@ sqlrrouter_clientinfolist::sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 	clientinfos=NULL;
 
 	debug=cont->getConfig()->getDebugRouters();
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled && debug) {
 		stdoutput.printf("	disabled\n");
 		return;

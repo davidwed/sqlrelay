@@ -212,7 +212,6 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		const char	*bindFormat();
 #endif
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
@@ -373,10 +372,9 @@ void mysqlconnection::handleConnectString() {
 	sslcapath=cont->getConnectStringValue("sslcapath");
 	sslcrl=cont->getConnectStringValue("sslcrl");
 	sslcrlpath=cont->getConnectStringValue("sslcrlpath");
-	foundrows=!charstring::compare(
-			cont->getConnectStringValue("foundrows"),"yes");
-	ignorespace=!charstring::compare(
-			cont->getConnectStringValue("ignorespace"),"yes");
+	foundrows=charstring::isYes(cont->getConnectStringValue("foundrows"));
+	ignorespace=charstring::isYes(
+			cont->getConnectStringValue("ignorespace"));
 	identity=cont->getConnectStringValue("identity");
 
 	usestmtapi=charstring::compare(
@@ -666,28 +664,6 @@ const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 			"	NULL "
 			"from "
 			"	information_schema.schemata";
-}
-
-const char *mysqlconnection::getTableListQuery(bool wild) {
-	return (wild)?"select "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
-			"from "
-			"	information_schema.tables "
-			"where "
-			"	table_type='BASE TABLE' "
-			"	and "
-			"	table_name like '%s'"
-			:
-			"select "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
-			"from "
-			"	information_schema.tables "
-			"where "
-			"	table_type='BASE TABLE'";
 }
 
 const char *mysqlconnection::getColumnListQuery(
@@ -1027,19 +1003,19 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	mysqlresult=NULL;
 	if (ncols) {
 		mysqlresult=mysql_stmt_result_metadata(stmt);
-	}
 
-	// grab the field info
-	if (mysqlresult) {
-		mysql_field_seek(mysqlresult,0);
-		for (unsigned int i=0; i<ncols; i++) {
-			mysqlfields[i]=mysql_fetch_field(mysqlresult);
+		// grab the field info
+		if (mysqlresult) {
+			mysql_field_seek(mysqlresult,0);
+			for (unsigned int i=0; i<ncols; i++) {
+				mysqlfields[i]=mysql_fetch_field(mysqlresult);
+			}
 		}
-	}
 
-	// bind the fields
-	if (ncols && mysql_stmt_bind_result(stmt,fieldbind)) {
-		return false;
+		// bind the fields
+		if (mysql_stmt_bind_result(stmt,fieldbind)) {
+			return false;
+		}
 	}
 #endif
 

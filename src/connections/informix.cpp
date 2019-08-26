@@ -210,6 +210,8 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 
 		bool		noop;
 
+		bool		bindformaterror;
+
 		stringbuffer	errormsg;
 
 		informixconnection	*informixconn;
@@ -247,7 +249,8 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		const char	*selectDatabaseQuery();
@@ -560,11 +563,15 @@ const char *informixconnection::getDatabaseListQuery(bool wild) {
 		"	sysmaster:sysdatabases ";
 }
 
-const char *informixconnection::getTableListQuery(bool wild) {
+const char *informixconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?
 		"select distinct "
-		"	tabname, "
-		"	'TABLE', "
+		"	dbname as table_cat, "
+		"	owner as table_schem, "
+		"	tabname as table_name, "
+		"	'TABLE' as table_type, "
+		"	'' as remarks, "
 		"	'' as extra "
 		"from "
 		"	systables "
@@ -575,11 +582,16 @@ const char *informixconnection::getTableListQuery(bool wild) {
 		"	and "
 		"	tabtype in ('T','S','P','V') "
 		"order by "
+		"	dbname, "
+		"	owner, "
 		"	tabname":
 
 		"select distinct "
-		"	tabname, "
-		"	'TABLE', "
+		"	dbname as table_cat, "
+		"	owner as table_schem, "
+		"	tabname as table_name, "
+		"	'TABLE' as table_type, "
+		"	'' as remarks, "
 		"	'' as extra "
 		"from "
 		"	systables "
@@ -588,6 +600,8 @@ const char *informixconnection::getTableListQuery(bool wild) {
 		"	and "
 		"	tabtype in ('T','S','P','V') "
 		"order by "
+		"	dbname, "
+		"	owner, "
 		"	tabname";
 }
 
@@ -788,6 +802,7 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 		outisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
+	bindformaterror=false;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 	truevalue=SQL_TRUE;
 }
@@ -881,6 +896,8 @@ bool informixcursor::close() {
 
 bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 
+	bindformaterror=false;
+
 	// FIXME: we shouldn't have to do this, but the tests crash in
 	// multiple locations if we don't...
 	if (!close() || !open()) {
@@ -909,6 +926,7 @@ bool informixcursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -948,6 +966,7 @@ bool informixcursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -972,6 +991,7 @@ bool informixcursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1005,6 +1025,7 @@ bool informixcursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1062,6 +1083,7 @@ bool informixcursor::inputBindBlob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1087,6 +1109,7 @@ bool informixcursor::inputBindClob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1116,6 +1139,7 @@ bool informixcursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1143,6 +1167,7 @@ bool informixcursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1174,6 +1199,7 @@ bool informixcursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1213,6 +1239,7 @@ bool informixcursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1251,6 +1278,7 @@ bool informixcursor::outputBindBlob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1277,6 +1305,7 @@ bool informixcursor::outputBindClob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1500,6 +1529,19 @@ void informixcursor::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
+	if (bindformaterror) {
+		// handle bind format errors
+		*errorlength=charstring::length(
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
+		charstring::safeCopy(errorbuffer,
+				errorbufferlength,
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
+				*errorlength);
+		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+		*liveconnection=true;
+		return;
+	}
+
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
 	SQLSMALLINT	errlength;

@@ -48,7 +48,8 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		#ifdef SQLITE_TRANSACTIONAL
@@ -261,12 +262,16 @@ const char *sqliteconnection::getDatabaseListQuery(bool wild) {
 	return "select '',NULL";
 }
 
-const char *sqliteconnection::getTableListQuery(bool wild) {
+const char *sqliteconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?
 		"select "
-		"	tbl_name, "
-		"	'TABLE', "
-		"	NULL "
+		"	NULL as table_cat, "
+		"	NULL as table_schem, "
+		"	tbl_name as table_name, "
+		"	'TABLE' as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
 		"from "
 		"(select "
 		"	tbl_name "
@@ -274,24 +279,25 @@ const char *sqliteconnection::getTableListQuery(bool wild) {
 		"	sqlite_master "
 		"where "
 		"	type in ('table','view') "
-		"	and "
-		"	tbl_name like '%s' "
 		"union all "
 		"select "
 		"	tbl_name "
 		"from "
 		"	sqlite_temp_master "
 		"where "
-		"	type in ('table','view') "
-		"	and "
-		"	tbl_name like '%s') "
+		"	type in ('table','view')) "
+		"where "
+		"	tbl_name like '%s' "
 		"order by "
 		"	tbl_name":
 
 		"select "
-		"	tbl_name, "
-		"	'TABLE', "
-		"	NULL "
+		"	NULL as table_cat, "
+		"	NULL as table_schem, "
+		"	tbl_name as table_name, "
+		"	'TABLE' as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
 		"from "
 		"(select "
 		"	tbl_name "

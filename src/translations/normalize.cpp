@@ -70,19 +70,16 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 
 	debug=cont->getConfig()->getDebugTranslations();
 
-	enabled=charstring::compareIgnoringCase(
-		parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 
-	foreigndecimals=!charstring::compareIgnoringCase(
-		parameters->getAttributeValue("foreigndecimals"),"yes");
+	foreigndecimals=charstring::isYes(
+			parameters->getAttributeValue("foreigndecimals"));
 
 	uppercase=!charstring::compareIgnoringCase(
-		parameters->getAttributeValue(
-				"convertcase"),"upper");
+		parameters->getAttributeValue("convertcase"),"upper");
 	lowercase=(!uppercase &&
-			charstring::compareIgnoringCase(
-				parameters->getAttributeValue(
-					"convertcase"),"no"));
+			!charstring::isNo(parameters->getAttributeValue(
+							"convertcase")));
 
 	uppercasedq=false;
 	lowercasedq=false;
@@ -93,7 +90,7 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 		uppercasedq=true;
 	} else if (!charstring::compareIgnoringCase(convertcasedq,"lower")) {
 		lowercasedq=true;
-	} else if (!charstring::compareIgnoringCase(convertcasedq,"yes")) {
+	} else if (charstring::isYes(convertcasedq)) {
 		if (lowercase) {
 			lowercasedq=true;
 		} else if (uppercase) {
@@ -101,9 +98,8 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 		}
 	}
 
-	removedq=!charstring::compareIgnoringCase(
-			parameters->getAttributeValue("removedoublequotes"),
-			"yes");
+	removedq=charstring::isYes(
+			parameters->getAttributeValue("removedoublequotes"));
 
 	uppercasebq=false;
 	lowercasebq=false;
@@ -114,7 +110,7 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 		uppercasebq=true;
 	} else if (!charstring::compareIgnoringCase(convertcasebq,"lower")) {
 		lowercasebq=true;
-	} else if (!charstring::compareIgnoringCase(convertcasebq,"yes")) {
+	} else if (charstring::isYes(convertcasebq)) {
 		if (lowercase) {
 			lowercasebq=true;
 		} else if (uppercase) {
@@ -122,9 +118,8 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 		}
 	}
 
-	removebq=!charstring::compareIgnoringCase(
-			parameters->getAttributeValue("removebackquotes"),
-			"yes");
+	removebq=charstring::isYes(
+			parameters->getAttributeValue("removebackquotes"));
 
 	doubleescape=!charstring::isNo(
 			parameters->getAttributeValue("doubleescape"));

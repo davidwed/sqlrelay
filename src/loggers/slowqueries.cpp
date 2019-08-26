@@ -41,8 +41,7 @@ sqlrlogger_slowqueries::sqlrlogger_slowqueries(sqlrloggers *ls,
 	totalusec=sec*1000000+usec;
 	usecommand=!charstring::compareIgnoringCase(
 			parameters->getAttributeValue("timer"),"command");
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 }
 
 sqlrlogger_slowqueries::~sqlrlogger_slowqueries() {

@@ -8,6 +8,8 @@
 #include <rudiments/process.h>
 #include <rudiments/error.h>
 
+#include <defines.h>
+
 // capability flags
 #define CLIENT_LONG_PASSWORD				0x00000001
 #define CLIENT_FOUND_ROWS				0x00000002
@@ -903,18 +905,17 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 		clientprotocol=41;
 	}
 
-	datetodatetime=!charstring::compareIgnoringCase(
-				parameters->getAttributeValue(
-						"datetodatetime"),"yes");
+	datetodatetime=charstring::isYes(
+			parameters->getAttributeValue("datetodatetime"));
 	zeroscaledecimaltobigint=
-			!charstring::compareIgnoringCase(
+			charstring::isYes(
 				parameters->getAttributeValue(
-					"zeroscaledecimaltobigint"),"yes");
+					"zeroscaledecimaltobigint"));
 
 	oldmariadbjdbcservercapabilitieshack=
-		!charstring::compareIgnoringCase(
+		charstring::isYes(
 			parameters->getAttributeValue(
-				"oldmariadbjdbcservercapabilitieshack"),"yes");
+				"oldmariadbjdbcservercapabilitieshack"));
 
 	if (getDebug()) {
 		debugStart("parameters");
@@ -3930,7 +3931,11 @@ bool sqlrprotocol_mysql::getListByApiCall(sqlrservercursor *cursor,
 		case MYSQLLISTTYPE_TABLE_LIST:
 			cont->setTableListColumnMap(
 					SQLRSERVERLISTFORMAT_MYSQL);
-			return cont->getTableList(cursor,wild);
+			return cont->getTableList(cursor,wild,
+							DB_OBJECT_TABLE|
+							DB_OBJECT_VIEW|
+							DB_OBJECT_ALIAS|
+							DB_OBJECT_SYNONYM);
 		case MYSQLLISTTYPE_COLUMN_LIST:
 			cont->setColumnListColumnMap(
 					SQLRSERVERLISTFORMAT_MYSQL);
@@ -3953,7 +3958,11 @@ bool sqlrprotocol_mysql::getListByQuery(sqlrservercursor *cursor,
 			query=cont->getDatabaseListQuery(havewild);
 			break;
 		case MYSQLLISTTYPE_TABLE_LIST:
-			query=cont->getTableListQuery(havewild);
+			query=cont->getTableListQuery(havewild,
+							DB_OBJECT_TABLE|
+							DB_OBJECT_VIEW|
+							DB_OBJECT_ALIAS|
+							DB_OBJECT_SYNONYM);
 			break;
 		case MYSQLLISTTYPE_COLUMN_LIST:
 			query=cont->getColumnListQuery(table,havewild);
@@ -3976,6 +3985,15 @@ bool sqlrprotocol_mysql::buildListQuery(sqlrservercursor *cursor,
 						const char *query,
 						const char *wild,
 						const char *table) {
+
+	// If the table was given like catalog.schema.table, then just
+	// get the table.
+	const char	*realtable=charstring::findLast(table,".");
+	if (realtable) {
+		realtable++;
+	} else {
+		realtable=table;
+	}
 
 	// clean up buffers to avoid SQL injection
 	stringbuffer	wildbuf;

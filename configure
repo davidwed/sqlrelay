@@ -30642,6 +30642,244 @@ fi
 fi
 
 			fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V11.1/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V11.1/lib/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V11.1/include\"; DB2VERSION=\"11\""
+		eval "DB2LIBSPATH=\"/opt/ibm/db2/V11.1/lib\"; DB2LIBS=\"-L/opt/ibm/db2/V11.1/lib -ldb2\"; DB2VERSION=\"11\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V11.1/lib/libdb2.a" -a -n "DB2LIBS=\"-L/opt/ibm/db2/V11.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V11.1/lib/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V11.1/include\"; DB2VERSION=\"11\""
+			eval "DB2LIBS=\"-L/opt/ibm/db2/V11.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/IBM/db2/V11.1/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/IBM/db2/V11.1/lib/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\""
+		eval "DB2LIBSPATH=\"/opt/IBM/db2/V11.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V11.1/lib -ldb2\"; DB2VERSION=\"11\""
+	fi
+else
+	if ( test -n "/opt/IBM/db2/V11.1/lib/libdb2.a" -a -n "DB2LIBS=\"-L/opt/IBM/db2/V11.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"" )
+	then
+
+if ( test -r "/opt/IBM/db2/V11.1/lib/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\""
+			eval "DB2LIBS=\"-L/opt/IBM/db2/V11.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V11.1/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V11.1/lib32/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V11.1/include\"; DB2VERSION=\"11\""
+		eval "DB2LIBSPATH32=\"/opt/ibm/db2/V11.1/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V11.1/lib32 -ldb2\"; DB2VERSION=\"11\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V11.1/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/ibm/db2/V11.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V11.1/lib32/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V11.1/include\"; DB2VERSION=\"11\""
+			eval "DB2LIBS32=\"-L/opt/ibm/db2/V11.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/IBM/db2/V11.1/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/IBM/db2/V11.1/lib32/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\""
+		eval "DB2LIBSPATH32=\"/opt/IBM/db2/V11.1/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V11.1/lib32 -ldb2\"; DB2VERSION=\"11\""
+	fi
+else
+	if ( test -n "/opt/IBM/db2/V11.1/lib32/libdb2.a" -a -n "DB2LIBS32=\"-L/opt/IBM/db2/V11.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"" )
+	then
+
+if ( test -r "/opt/IBM/db2/V11.1/lib32/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\""
+			eval "DB2LIBS32=\"-L/opt/IBM/db2/V11.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\""
+		fi
+	fi
+fi
+
+			if ( test "$ARCH" = "x64" )
+			then
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/ibm/db2/V11.1/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/ibm/db2/V11.1/lib64/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/ibm/db2/V11.1/include\"; DB2VERSION=\"11\""
+		eval "DB2LIBSPATH64=\"/opt/ibm/db2/V11.1/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V11.1/lib64 -ldb2\"; DB2VERSION=\"11\""
+	fi
+else
+	if ( test -n "/opt/ibm/db2/V11.1/lib64/libdb2.a" -a -n "DB2LIBS64=\"-L/opt/ibm/db2/V11.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"" )
+	then
+
+if ( test -r "/opt/ibm/db2/V11.1/lib64/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/ibm/db2/V11.1/include\"; DB2VERSION=\"11\""
+			eval "DB2LIBS64=\"-L/opt/ibm/db2/V11.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\""
+		fi
+	fi
+fi
+
+
+FOUNDHEADER=""
+FOUNDLIB=""
+
+if ( test -r "/opt/IBM/db2/V11.1/include/sql.h" )
+then
+	eval "FOUNDHEADER=\"yes\""
+fi
+
+
+if ( test -r "/opt/IBM/db2/V11.1/lib64/libdb2.$SOSUFFIX" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+	then
+		eval "DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\""
+		eval "DB2LIBSPATH64=\"/opt/IBM/db2/V11.1/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V11.1/lib64 -ldb2\"; DB2VERSION=\"11\""
+	fi
+else
+	if ( test -n "/opt/IBM/db2/V11.1/lib64/libdb2.a" -a -n "DB2LIBS64=\"-L/opt/IBM/db2/V11.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"" )
+	then
+
+if ( test -r "/opt/IBM/db2/V11.1/lib64/libdb2.a" )
+then
+	eval "FOUNDLIB=\"yes\""
+fi
+
+		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
+		then
+			eval "DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\""
+			eval "DB2LIBS64=\"-L/opt/IBM/db2/V11.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\""
+		fi
+	fi
+fi
+
+			fi
 		fi
 
 				if ( test -n "$DB2LIBS64" )
@@ -34922,6 +35160,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PHPINCLUDES"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#define __STDC_LIMIT_MACROS 1
 #include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
@@ -34954,6 +35194,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PHPINCLUDES"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#define __STDC_LIMIT_MACROS 1
 #include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
@@ -34985,6 +35227,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PHPINCLUDES"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#define __STDC_LIMIT_MACROS 1
 #include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
@@ -35019,6 +35263,8 @@ SAVECPPFLAGS="$CPPFLAGS"
 CPPFLAGS="$PHPINCLUDES"
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
+
+#define __STDC_LIMIT_MACROS 1
 #include <php.h>
 #include <pdo/php_pdo.h>
 #include <pdo/php_pdo_driver.h>
@@ -35738,6 +35984,8 @@ $as_echo_n "checking for node major version... " >&6; }
 		then
 			NODEJSCXXFLAGS="-std=c++11"
 		fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODEMAJORVERSION" >&5
+$as_echo "$NODEMAJORVERSION" >&6; }
 
 
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node module directory" >&5
@@ -35757,7 +36005,7 @@ $as_echo "$NODEMODULEDIR" >&6; }
 $as_echo_n "checking for node-gyp... " >&6; }
 		if ( test -r "$NODEMODULEDIR" )
 		then
-			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm6/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm6/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm7/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm7/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm8/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm8/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm9/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm9/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/../../share/node-gyp/bin/node-gyp.js"
+			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm6/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm6/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm7/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm7/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm8/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm8/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm9/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm9/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm10/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm10/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/../../share/node-gyp/bin/node-gyp.js"
 			do
 				if ( test -r "$file" )
 				then
@@ -35796,7 +36044,7 @@ fi
 echo "******************************"
 
 
-SQLR_VERSION="1.6.0"
+SQLR_VERSION="1.6.1"
 
 
 cat >>confdefs.h <<_ACEOF
@@ -38472,6 +38720,15 @@ sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstwor
 mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
 sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelay.service
 sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
+
+
+if ( test -r "libtool" )
+then
+	sed -e "s|-lgcc_s -lgcc|-lgcc_s|g" \
+		-e "s|-lgcc_s_pic|-lgcc_s|g" \
+		libtool > libtool.new
+	mv libtool.new libtool
+fi
 
 
 echo

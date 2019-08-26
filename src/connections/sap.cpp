@@ -38,7 +38,8 @@ class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
@@ -558,12 +559,16 @@ const char *sapconnection::getDatabaseListQuery(bool wild) {
 	return "select '',NULL as db";
 }
 
-const char *sapconnection::getTableListQuery(bool wild) {
+const char *sapconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?
 		"select "
-		"	name, "
-		"	'TABLE', "
-		"	NULL "
+		"	NULL as table_cat, "
+		"	NULL as table_schem, "
+		"	name as table_name, "
+		"	'TABLE' as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
 		"from "
 		"	sysobjects "
 		"where "
@@ -576,9 +581,12 @@ const char *sapconnection::getTableListQuery(bool wild) {
 		"	name":
 
 		"select "
-		"	name, "
-		"	'TABLE', "
-		"	NULL "
+		"	NULL as table_cat, "
+		"	NULL as table_schem, "
+		"	name as table_name, "
+		"	'TABLE' as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
 		"from "
 		"	sysobjects "
 		"where "

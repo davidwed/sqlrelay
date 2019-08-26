@@ -23,6 +23,7 @@ enum sqlrclientquerytype_t {
 	SQLRCLIENTQUERYTYPE_DATABASE_LIST,
 	SQLRCLIENTQUERYTYPE_SCHEMA_LIST,
 	SQLRCLIENTQUERYTYPE_TABLE_LIST,
+	SQLRCLIENTQUERYTYPE_TABLE_LIST_2,
 	SQLRCLIENTQUERYTYPE_TABLE_TYPE_LIST,
 	SQLRCLIENTQUERYTYPE_COLUMN_LIST,
 	SQLRCLIENTQUERYTYPE_PRIMARY_KEY_LIST,
@@ -108,6 +109,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		void	returnResultSetHeader(sqlrservercursor *cursor);
 		void	returnColumnInfo(sqlrservercursor *cursor,
 							uint16_t format);
+		uint16_t	protocolAppropriateColumnType(uint16_t coltype);
 		void	sendRowCounts(bool knowsactual, uint64_t actual,
 					bool knowsaffected, uint64_t affected);
 		void	returnOutputBindValues(sqlrservercursor *cursor);
@@ -172,6 +174,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		bool	getDatabaseListCommand(sqlrservercursor *cursor);
 		bool	getSchemaListCommand(sqlrservercursor *cursor);
 		bool	getTableListCommand(sqlrservercursor *cursor);
+		bool	getTableList2Command(sqlrservercursor *cursor);
 		bool	getTableTypeListCommand(sqlrservercursor *cursor);
 		bool	getColumnListCommand(sqlrservercursor *cursor);
 		bool	getPrimaryKeyListCommand(sqlrservercursor *cursor);
@@ -187,12 +190,14 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 					sqlrclientquerytype_t querytype,
 					const char *object,
 					const char *wild,
-					sqlrserverlistformat_t listformat);
+					sqlrserverlistformat_t listformat,
+					uint16_t objecttypes);
 		bool	getListByQuery(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
 					const char *object,
 					const char *wild,
-					sqlrserverlistformat_t listformat);
+					sqlrserverlistformat_t listformat,
+					uint16_t objecttypes);
 		bool	buildListQuery(sqlrservercursor *cursor,
 						const char *query,
 						const char *wild,
@@ -240,6 +245,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		char		lobbuffer[32768];
 
 		uint16_t	protocolversion;
+		uint16_t	endresultset;
 };
 
 sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
@@ -263,8 +269,8 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	clientinfo=new char[maxclientinfolength+1];
 	clientsock=NULL;
 	ctx=NULL;
-	usekrb=!charstring::compare(parameters->getAttributeValue("krb"),"yes");
-	usetls=!charstring::compare(parameters->getAttributeValue("tls"),"yes");
+	usekrb=charstring::isYes(parameters->getAttributeValue("krb"));
+	usetls=charstring::isYes(parameters->getAttributeValue("tls"));
 
 	if (usekrb) {
 		if (gss::supported()) {
@@ -352,9 +358,8 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 
 			// get whether to validate
 			tctx.setValidatePeer(
-				!charstring::compare(
-				parameters->getAttributeValue("tlsvalidate"),
-				"yes"));
+				charstring::isYes(
+				parameters->getAttributeValue("tlsvalidate")));
 
 			// get the certificate authority file to use
 			// FIXME: not-found warning
@@ -381,6 +386,7 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	}
 
 	protocolversion=0;
+	endresultset=END_RESULT_SET;
 }
 
 sqlrprotocol_sqlrclient::~sqlrprotocol_sqlrclient() {
@@ -439,6 +445,10 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 			if (clientsock->read(&protocolversion,
 						idleclienttimeout,0)==
 						sizeof(uint16_t)) {
+				// END_RESULT_SET was 3 in protocol version 1,
+				// but changed in version 2
+				endresultset=(protocolversion==1)?
+							3:END_RESULT_SET;
 				continue;
 			}
 			endsession=false;
@@ -576,6 +586,9 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		} else if (command==GETTABLELIST) {
 			cont->incrementGetTableListCount();
 			loop=getTableListCommand(cursor);
+		} else if (command==GETTABLELIST2) {
+			cont->incrementGetTableListCount();
+			loop=getTableList2Command(cursor);
 		} else if (command==GETTABLETYPELIST) {
 			//cont->incrementGetTableTypeListCount();
 			loop=getTableTypeListCommand(cursor);
@@ -748,6 +761,7 @@ sqlrservercursor *sqlrprotocol_sqlrclient::getCursor(uint16_t command) {
 		command==GETDBLIST ||
 		command==GETSCHEMALIST ||
 		command==GETTABLELIST ||
+		command==GETTABLELIST2 ||
 		command==GETTABLETYPELIST ||
 		command==GETCOLUMNLIST ||
 		command==GETPRIMARYKEYLIST ||
@@ -1452,6 +1466,7 @@ bool sqlrprotocol_sqlrclient::processQueryOrBindCursor(
 								listformat);
 					break;
 				case SQLRCLIENTQUERYTYPE_TABLE_LIST:
+				case SQLRCLIENTQUERYTYPE_TABLE_LIST_2:
 					cont->setTableListColumnMap(
 								listformat);
 					break;
@@ -2737,7 +2752,8 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 
 		if (format==COLUMN_TYPE_IDS) {
 			sendColumnDefinition(name,namelen,
-					cont->getColumnType(cursor,i),
+					protocolAppropriateColumnType(
+						cont->getColumnType(cursor,i)),
 					length,precision,scale,
 					nullable,primarykey,unique,partofkey,
 					unsignednumber,zerofill,binary,
@@ -2751,6 +2767,45 @@ void sqlrprotocol_sqlrclient::returnColumnInfo(sqlrservercursor *cursor,
 					unsignednumber,zerofill,binary,
 					autoincrement,table,tablelen);
 		}
+	}
+}
+
+uint16_t sqlrprotocol_sqlrclient::protocolAppropriateColumnType(
+							uint16_t coltype) {
+
+	if (protocolversion>=2) {
+		return coltype;
+	}
+
+	// these types didn't exist in earlier protocol verions
+	switch (coltype) {
+		// also added by mysql
+		case TINYTEXT_DATATYPE:
+			return TINY_BLOB_DATATYPE;
+		case MEDIUMTEXT_DATATYPE:
+			return MEDIUM_BLOB_DATATYPE;
+		case LONGTEXT_DATATYPE:
+			return LONG_BLOB_DATATYPE;
+		case JSON_DATATYPE:
+			return UNKNOWN_DATATYPE;
+		case GEOMETRY_DATATYPE:
+			return UNKNOWN_DATATYPE;
+		// also added by oracle
+		case SDO_GEOMETRY_DATATYPE:
+			return BLOB_DATATYPE;
+		// added by mssql
+		case NCHAR_DATATYPE:
+			return CHAR_DATATYPE;
+		case NVARCHAR_DATATYPE:
+			return VARCHAR_DATATYPE;
+		case NTEXT_DATATYPE:
+			return TEXT_DATATYPE;
+		case XML_DATATYPE:
+			return VARCHAR_DATATYPE;
+		case DATETIMEOFFSET_DATATYPE:
+			return DATETIME_DATATYPE;
+		default:
+			return coltype;
 	}
 }
 
@@ -3365,7 +3420,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 
 		// for some queries, there are no rows to return, 
 		if (cont->noRowsToReturn(cursor)) {
-			clientsock->write((uint16_t)END_RESULT_SET);
+			clientsock->write(endresultset);
 			clientsock->flushWriteBuffer(-1,-1);
 			cont->raiseDebugMessageEvent(
 				"done returning result set data");
@@ -3377,7 +3432,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 			if (error) {
 				returnFetchError(cursor);
 			} else {
-				clientsock->write((uint16_t)END_RESULT_SET);
+				clientsock->write(endresultset);
 				cont->raiseDebugMessageEvent(
 					"done returning result set data");
 			}
@@ -3403,8 +3458,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 				if (error) {
 					returnFetchError(cursor);
 				} else {
-					clientsock->write(
-						(uint16_t)END_RESULT_SET);
+					clientsock->write(endresultset);
 				}
 				break;
 			}
@@ -3787,6 +3841,16 @@ bool sqlrprotocol_sqlrclient::getTableListCommand(
 	return retval;
 }
 
+bool sqlrprotocol_sqlrclient::getTableList2Command(
+					sqlrservercursor *cursor) {
+	debugFunction();
+	cont->raiseDebugMessageEvent("get table list...");
+	bool	retval=getListCommand(cursor,
+				SQLRCLIENTQUERYTYPE_TABLE_LIST_2,false);
+	cont->raiseDebugMessageEvent("done getting table list");
+	return retval;
+}
+
 bool sqlrprotocol_sqlrclient::getTableTypeListCommand(
 					sqlrservercursor *cursor) {
 	debugFunction();
@@ -3967,6 +4031,20 @@ bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 		}
 	}
 
+	// read the object types
+	uint16_t	objecttypes=0;
+	if (querytype==SQLRCLIENTQUERYTYPE_TABLE_LIST_2) {
+
+		result=clientsock->read(&objecttypes,idleclienttimeout,0);
+		if (result!=sizeof(uint16_t)) {
+			cont->raiseClientProtocolErrorEvent(cursor,
+					"get list failed: "
+					"failed to get object types",
+					result);
+			return false;
+		}
+	}
+
 	// set the values that we won't get from the client
 	cont->setInputBindCount(cursor,0);
 	cont->setOutputBindCount(cursor,0);
@@ -3977,10 +4055,12 @@ bool sqlrprotocol_sqlrclient::getListCommand(sqlrservercursor *cursor,
 	bool	retval=true;
 	if (cont->getListsByApiCalls()) {
 		retval=getListByApiCall(cursor,querytype,object,wild,
-					(sqlrserverlistformat_t)listformat);
+					(sqlrserverlistformat_t)listformat,
+					objecttypes);
 	} else {
 		retval=getListByQuery(cursor,querytype,object,wild,
-					(sqlrserverlistformat_t)listformat);
+					(sqlrserverlistformat_t)listformat,
+					objecttypes);
 	}
 
 	// clean up
@@ -3994,7 +4074,8 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
 					const char *object,
 					const char *wild,
-					sqlrserverlistformat_t listformat) {
+					sqlrserverlistformat_t listformat,
+					uint16_t objecttypes) {
 	debugFunction();
 
 	// initialize flags andbuffers
@@ -4011,8 +4092,9 @@ bool sqlrprotocol_sqlrclient::getListByApiCall(sqlrservercursor *cursor,
 			success=cont->getSchemaList(cursor,wild);
 			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_LIST:
+		case SQLRCLIENTQUERYTYPE_TABLE_LIST_2:
 			cont->setTableListColumnMap(listformat);
-			success=cont->getTableList(cursor,wild);
+			success=cont->getTableList(cursor,wild,objecttypes);
 			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_TYPE_LIST:
 			cont->setTableTypeListColumnMap(listformat);
@@ -4082,7 +4164,8 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 					sqlrclientquerytype_t querytype,
 					const char *object,
 					const char *wild,
-					sqlrserverlistformat_t listformat) {
+					sqlrserverlistformat_t listformat,
+					uint16_t objecttypes) {
 	debugFunction();
 
 	// build the appropriate query
@@ -4096,7 +4179,8 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 			query=cont->getSchemaListQuery(havewild);
 			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_LIST:
-			query=cont->getTableListQuery(havewild);
+		case SQLRCLIENTQUERYTYPE_TABLE_LIST_2:
+			query=cont->getTableListQuery(havewild,objecttypes);
 			break;
 		case SQLRCLIENTQUERYTYPE_TABLE_TYPE_LIST:
 			query=cont->getTableTypeListQuery(havewild);
@@ -4137,11 +4221,20 @@ bool sqlrprotocol_sqlrclient::buildListQuery(sqlrservercursor *cursor,
 						const char *object) {
 	debugFunction();
 
+	// If the object was given like catalog.schema.object, then just
+	// get the object.
+	const char	*realobject=charstring::findLast(object,".");
+	if (realobject) {
+		realobject++;
+	} else {
+		realobject=object;
+	}
+
 	// clean up buffers to avoid SQL injection
 	stringbuffer	wildbuf;
 	escapeParameter(&wildbuf,wild);
 	stringbuffer	objectbuf;
-	escapeParameter(&objectbuf,object);
+	escapeParameter(&objectbuf,realobject);
 
 	// bounds checking
 	cont->setQueryLength(cursor,charstring::length(query)+

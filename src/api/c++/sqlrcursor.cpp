@@ -917,7 +917,7 @@ bool sqlrcursor::getDatabaseList(const char *wild,
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	return getList(GETDBLIST,listformat,NULL,wild);
+	return getList(GETDBLIST,listformat,NULL,wild,0);
 }
 
 bool sqlrcursor::getSchemaList(const char *wild) {
@@ -937,15 +937,18 @@ bool sqlrcursor::getSchemaList(const char *wild,
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	return getList(GETSCHEMALIST,listformat,NULL,wild);
+	return getList(GETSCHEMALIST,listformat,NULL,wild,0);
 }
 
 bool sqlrcursor::getTableList(const char *wild) {
-	return getTableList(wild,SQLRCLIENTLISTFORMAT_MYSQL);
+	return getTableList(wild,SQLRCLIENTLISTFORMAT_MYSQL,
+				DB_OBJECT_TABLE|DB_OBJECT_VIEW|
+				DB_OBJECT_ALIAS|DB_OBJECT_SYNONYM);
 }
 
 bool sqlrcursor::getTableList(const char *wild,
-					sqlrclientlistformat_t listformat) {
+					sqlrclientlistformat_t listformat,
+					uint16_t objecttypes) {
 	if (pvt->_sqlrc->debug()) {
 		pvt->_sqlrc->debugPreStart();
 		pvt->_sqlrc->debugPrint("getting table list ");
@@ -957,7 +960,7 @@ bool sqlrcursor::getTableList(const char *wild,
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	return getList(GETTABLELIST,listformat,NULL,wild);
+	return getList(GETTABLELIST2,listformat,NULL,wild,objecttypes);
 }
 
 bool sqlrcursor::getTableTypeList(const char *wild) {
@@ -977,7 +980,7 @@ bool sqlrcursor::getTableTypeList(const char *wild,
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	return getList(GETTABLETYPELIST,listformat,NULL,wild);
+	return getList(GETTABLETYPELIST,listformat,NULL,wild,0);
 }
 
 bool sqlrcursor::getColumnList(const char *table, const char *wild) {
@@ -1000,7 +1003,7 @@ bool sqlrcursor::getColumnList(const char *table,
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	return getList(GETCOLUMNLIST,listformat,(table)?table:"",wild);
+	return getList(GETCOLUMNLIST,listformat,(table)?table:"",wild,0);
 }
 
 bool sqlrcursor::getPrimaryKeysList(const char *table, const char *wild) {
@@ -1023,7 +1026,7 @@ bool sqlrcursor::getPrimaryKeysList(const char *table,
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	return getList(GETPRIMARYKEYLIST,listformat,(table)?table:"",wild);
+	return getList(GETPRIMARYKEYLIST,listformat,(table)?table:"",wild,0);
 }
 
 bool sqlrcursor::getKeyAndIndexList(const char *table, const char *qualifier) {
@@ -1047,7 +1050,7 @@ bool sqlrcursor::getKeyAndIndexList(const char *table,
 		pvt->_sqlrc->debugPreEnd();
 	}
 	return getList(GETKEYANDINDEXLIST,listformat,
-					(table)?table:"",qualifier);
+					(table)?table:"",qualifier,0);
 }
 
 bool sqlrcursor::getProcedureBindAndColumnList(
@@ -1076,7 +1079,7 @@ bool sqlrcursor::getProcedureBindAndColumnList(
 		pvt->_sqlrc->debugPreEnd();
 	}
 	return getList(GETPROCEDUREBINDANDCOLUMNLIST,
-				listformat,(procedure)?procedure:"",wild);
+				listformat,(procedure)?procedure:"",wild,0);
 }
 
 bool sqlrcursor::getTypeInfoList(const char *type, const char *wild) {
@@ -1099,7 +1102,7 @@ bool sqlrcursor::getTypeInfoList(const char *type,
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	return getList(GETTYPEINFOLIST,listformat,(type)?type:"",wild);
+	return getList(GETTYPEINFOLIST,listformat,(type)?type:"",wild,0);
 }
 
 bool sqlrcursor::getProcedureList(const char *wild) {
@@ -1119,11 +1122,12 @@ bool sqlrcursor::getProcedureList(const char *wild,
 		pvt->_sqlrc->debugPrint("\n");
 		pvt->_sqlrc->debugPreEnd();
 	}
-	return getList(GETPROCEDURELIST,listformat,NULL,wild);
+	return getList(GETPROCEDURELIST,listformat,NULL,wild,0);
 }
 
 bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
-					const char *table, const char *wild) {
+					const char *table, const char *wild,
+					uint16_t objecttypes) {
 
 	pvt->_reexecute=false;
 	pvt->_validatebinds=false;
@@ -1168,6 +1172,11 @@ bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
 		if (len) {
 			pvt->_cs->write(table,len);
 		}
+	}
+
+	// send the objecttypes parameter
+	if (command==GETTABLELIST2) {
+		pvt->_cs->write(objecttypes);
 	}
 
 	pvt->_sqlrc->flushWriteBuffer();
@@ -2558,7 +2567,7 @@ bool sqlrcursor::validateBind(const char *variable) {
 	// run through the querybuffer...
 	const char	*ptr=pvt->_queryptr;
 	const char	*endptr=pvt->_queryptr+pvt->_querylen;
-	const char	*prevptr="\0";
+	char		prev='\0';
 	do {
 
 		// if we're in the query...
@@ -2576,7 +2585,11 @@ bool sqlrcursor::validateBind(const char *variable) {
 			}
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -2586,13 +2599,18 @@ bool sqlrcursor::validateBind(const char *variable) {
 
 			// if we find a quote, but not an escaped quote,
 			// then we're back in the query
-			if (*ptr=='\'' && *(ptr+1)!='\'' &&
-					*prevptr!='\'' && *prevptr!='\\') {
+			// (or we're in between one of these: '...''...'
+			// which is functionally the same)
+			if (*ptr=='\'' && prev!='\\') {
 				parsestate=IN_QUERY;
 			}
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -2629,7 +2647,11 @@ bool sqlrcursor::validateBind(const char *variable) {
 				// last character in the query
 				if (!endofbind && ptr==endptr-1) {
 					currentbind.append(*ptr);
-					prevptr=ptr;
+					if (*ptr=='\\' && prev=='\\') {
+						prev='\0';
+					} else {
+						prev=*ptr;
+					}
 					ptr++;
 				}
 
@@ -2648,7 +2670,11 @@ bool sqlrcursor::validateBind(const char *variable) {
 
 				// move on
 				currentbind.append(*ptr);
-				prevptr=ptr;
+				if (*ptr=='\\' && prev=='\\') {
+					prev='\0';
+				} else {
+					prev=*ptr;
+				}
 				ptr++;
 			}
 			continue;
@@ -3879,6 +3905,11 @@ bool sqlrcursor::parseColumnInfo() {
 						"A network error may have "
 						"occurred.");
 					return false;
+				}
+
+				// sanity check
+				if (currentcol->type>=END_DATATYPE) {
+					currentcol->type=UNKNOWN_DATATYPE;
 				}
 
 			} else {

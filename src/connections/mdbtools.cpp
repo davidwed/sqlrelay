@@ -48,7 +48,8 @@ class SQLRSERVER_DLLSPEC mdbtoolsconnection : public sqlrserverconnection {
 		bool	getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
 		bool	getTableList(sqlrservercursor *cursor,
-						const char *wild);
+						const char *wild,
+						uint16_t objecttypes);
 		bool	getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
@@ -102,7 +103,8 @@ class SQLRSERVER_DLLSPEC mdbtoolscursor : public sqlrservercursor {
 						bool *null);
 		void		closeResultSet();
 		bool		getDatabaseList(const char *wild);
-		bool		getTableList(const char *wild);
+		bool		getTableList(const char *wild,
+						uint16_t objecttypes);
 		bool		getColumnList(const char *table,
 						const char *wild);
 		void		resetListValues(const char *wild);
@@ -237,8 +239,9 @@ bool mdbtoolsconnection::getDatabaseList(sqlrservercursor *cursor,
 }
 
 bool mdbtoolsconnection::getTableList(sqlrservercursor *cursor,
-						const char *wild) {
-	return ((mdbtoolscursor *)cursor)->getTableList(wild);
+						const char *wild,
+						uint16_t objecttypes) {
+	return ((mdbtoolscursor *)cursor)->getTableList(wild,objecttypes);
 }
 
 bool mdbtoolsconnection::getColumnList(sqlrservercursor *cursor,
@@ -389,7 +392,7 @@ bool mdbtoolscursor::getDatabaseList(const char *wild) {
 	return true;
 }
 
-bool mdbtoolscursor::getTableList(const char *wild) {
+bool mdbtoolscursor::getTableList(const char *wild, uint16_t objecttypes) {
 
 	cursortype=TABLE_LIST_CURSORTYPE;
 

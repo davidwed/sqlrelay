@@ -123,7 +123,8 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getSchemaListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(
 						const char *table,
@@ -497,20 +498,18 @@ void oracleconnection::handleConnectString() {
 	#endif
 
 	#ifdef HAVE_ORACLE_8i
-	droptemptables=!charstring::compare(
-			cont->getConnectStringValue("droptemptables"),"yes");
+	droptemptables=charstring::isYes(
+			cont->getConnectStringValue("droptemptables"));
 
 	cont->addGlobalTempTables(
 			cont->getConnectStringValue("globaltemptables"));
 	#endif
 
-	rejectduplicatebinds=!charstring::compare(
-			cont->getConnectStringValue("rejectduplicatebinds"),
-			"yes");
+	rejectduplicatebinds=charstring::isYes(
+			cont->getConnectStringValue("rejectduplicatebinds"));
 
-	disablekeylookup=!charstring::compareIgnoringCase(
-			cont->getConnectStringValue("disablekeylookup"),
-			"yes");
+	disablekeylookup=charstring::isYes(
+			cont->getConnectStringValue("disablekeylookup"));
 
 	const char	*lastinsertidfunc=
 			cont->getConnectStringValue("lastinsertidfunction");
@@ -1190,13 +1189,17 @@ const char *oracleconnection::getSchemaListQuery(bool wild) {
 	return "select test from dual";
 }
 
-const char *oracleconnection::getTableListQuery(bool wild) {
+const char *oracleconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	if (supportssyscontext) {
 		return (wild)?
 			"select "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	owner as table_schem, "
+			"	table_name as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	all_tables "
 			"where "
@@ -1204,38 +1207,51 @@ const char *oracleconnection::getTableListQuery(bool wild) {
 			"	and "
 			"	owner=sys_context('userenv','current_schema') "
 			"order by "
+			"	owner, "
 			"	table_name":
 
 			"select "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	owner as table_schem, "
+			"	table_name as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	all_tables "
 			"where "
 			"	owner=sys_context('userenv','current_schema') "
 			"order by "
+			"	owner, "
 			"	table_name";
 	} else {
 		return (wild)?
 			"select "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	owner as table_schem, "
+			"	table_name as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	user_tables "
 			"where "
 			"	table_name like upper('%s') "
 			"order by "
+			"	owner, "
 			"	table_name":
 
 			"select "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	owner as table_schem, "
+			"	table_name as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	user_tables "
 			"order by "
+			"	owner, "
 			"	table_name";
 	}
 }

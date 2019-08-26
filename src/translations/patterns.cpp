@@ -76,8 +76,7 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 	patterns=NULL;
 	patterncount=0;
 
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled) {
 		return;
 	}

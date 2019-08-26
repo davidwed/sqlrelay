@@ -16,7 +16,8 @@ all-base: $(SQLR)auth_userlist.$(LIBEXT) \
 		$(SQLR)auth_database.$(LIBEXT) \
 		$(SQLR)auth_proxied.$(LIBEXT) \
 		$(SQLR)auth_mysql_userlist.$(LIBEXT) \
-		$(SQLR)auth_mysql_database.$(LIBEXT)
+		$(SQLR)auth_mysql_database.$(LIBEXT) \
+		$(SQLR)auth_postgresql_userlist.$(LIBEXT) \
 
 all-sqlrelay: $(SQLR)auth_sqlrelay.$(LIBEXT)
 
@@ -42,6 +43,9 @@ $(SQLR)auth_mysql_userlist.$(LIBEXT): mysql_userlist.cpp mysql_userlist.$(OBJ)
 $(SQLR)auth_mysql_database.$(LIBEXT): mysql_database.cpp mysql_database.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ mysql_database.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
+$(SQLR)auth_postgresql_userlist.$(LIBEXT): postgresql_userlist.cpp postgresql_userlist.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ postgresql_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
 install: $(INSTALLLIB)
 
 installdll:
@@ -52,6 +56,7 @@ installdll:
 	$(LTINSTALL) $(CP) $(SQLR)auth_sqlrelay.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_mysql_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_mysql_database.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_postgresql_userlist.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB) $(AUTHINSTALLSHAREDLIBOPTIONALTARGETS)
 
@@ -77,6 +82,10 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)auth_mysql_database.a
 	$(RM) $(libexecdir)/$(SQLR)auth_mysql_database.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_mysql_database.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)auth_postgresql_userlist.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)auth_postgresql_userlist.a
+	$(RM) $(libexecdir)/$(SQLR)auth_postgresql_userlist.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_postgresql_userlist.so so $(MODULESUFFIX)
 
 installsharedlib-sqlrelay:
 	$(MKINSTALLDIRS) $(libexecdir)
@@ -96,6 +105,7 @@ uninstall:
 		$(libexecdir)/$(SQLR)auth_sqlrelay.* \
 		$(libexecdir)/$(SQLR)auth_mysql_userlist.* \
 		$(libexecdir)/$(SQLR)auth_mysql_database.* \
+		$(libexecdir)/$(SQLR)auth_postgresql_userlist.* \
 		$(libexecdir)/sqlrauth_default.* \
 		$(libexecdir)/sqlrauth_userlist.* \
 		$(libexecdir)/sqlrauth_database.* \

@@ -47,8 +47,7 @@ sqlrfilter_patterns::sqlrfilter_patterns(sqlrservercontroller *cont,
 	patterncount=0;
 	hasscope=false;
 
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled) {
 		return;
 	}

@@ -31,8 +31,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 	debug=cont->getConfig()->getDebugRouters();
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled && debug) {
 		stdoutput.printf("	disabled\n");
 		return;

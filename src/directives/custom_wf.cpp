@@ -38,8 +38,7 @@ sqlrdirective_custom_wf::sqlrdirective_custom_wf(
 
 	debug=cont->getConfig()->getDebugDirectives();
 
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 }
 
 #define KEYWORD_SQLEXECDIRECT "sqlexecdirect"

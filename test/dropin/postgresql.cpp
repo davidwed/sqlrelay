@@ -1,10 +1,10 @@
 #include <libpq-fe.h>
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
+#include <rudiments/environment.h>
 #include <rudiments/stdio.h>
 
 void checkSuccess(const char *value, const char *success) {
-	//printf("\"%s\"=\"%s\"\n",value,success);
 
 	if (!success) {
 		if (!value) {
@@ -12,6 +12,7 @@ void checkSuccess(const char *value, const char *success) {
 			return;
 		} else {
 			stdoutput.printf("failure ");
+			stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
 			process::exit(0);
 		}
 	}
@@ -20,28 +21,42 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("failure ");
+		stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
 		process::exit(0);
 	}
 }
 
 void checkSuccess(int value, int success) {
-	//printf("\"%d\"=\"%d\"\n",value,success);
-
 	if (value==success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("failure ");
+		stdoutput.printf("\"%d\"!=\"%d\"\n",value,success);
 		process::exit(0);
 	}
 }
 
 int	main(int argc, char **argv) {
 
-	const char	*host="localhost";
-	const char	*port="9000";
-	const char	*user="test";
-	const char	*password="test";
+	const char	*host="127.0.0.1";
+	const char	*port;
+	const char	*user;
+	const char	*password;
 	const char	*db="testdb";
+	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
+		port="9000";
+		user="test";
+		password="test";
+	} else {
+		// to run against a real postgresql instance, provide a host
+		// name eg: ./postgresql db64
+		if (argc==2) {
+			host=argv[1];
+		}
+		port="5432";
+		user="testuser";
+		password="testpassword";
+	}
 
 	stdoutput.printf("PQresStatus:\n");
 	checkSuccess(PQresStatus(PGRES_EMPTY_QUERY),"PGRES_EMPTY_QUERY");
@@ -125,11 +140,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQoptions(pgconn),"");
 	stdoutput.printf("\n");
 
+#if 0
 	stdoutput.printf("PQresetStart:\n");
 	PQresetStart(pgconn);
 	pgconn=PQconnectdb(conninfo);
 	checkSuccess(PQstatus(pgconn),CONNECTION_OK);
 	stdoutput.printf("\n");
+#endif
 
 	const char	*query="drop table testtable";
 	PGresult	*pgresult=PQexec(pgconn,query);
@@ -153,11 +170,11 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("PQprepare/PQexecPrepared: insert\n");
 	//query="insert into testtable values (2,2.2,2.2,2,'testchar2','testvarchar2','01/01/2002','02:00:00',NULL)";
 	query="insert into testtable values ($1,$2,$3,$4,$5,$6,$7,$8,$9)";
-	pgresult=PQprepare(pgconn,NULL,query,9,NULL);
+	pgresult=PQprepare(pgconn,"",query,9,NULL);
 	checkSuccess(PQresultStatus(pgresult),PGRES_COMMAND_OK);
 	PQclear(pgresult);
 	const char * const paramvalues[]={"2","2.2","2.2","2","testchar2","testvarchar2","01/01/2002","02:00:00",NULL};
-	pgresult=PQexecPrepared(pgconn,NULL,9,paramvalues,NULL,NULL,0);
+	pgresult=PQexecPrepared(pgconn,"",9,paramvalues,NULL,NULL,0);
 	checkSuccess(PQresultStatus(pgresult),PGRES_COMMAND_OK);
 	checkSuccess(PQcmdTuples(pgresult),"1");
 	PQclear(pgresult);
@@ -286,12 +303,14 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQgetlength(pgresult,1,7),8);
 	stdoutput.printf("\n");
 
+#if 0
 	stdoutput.printf("PQescapeString:\n");
 	char	to[1024];
 	const char	*from=" \\ ' ";
-	checkSuccess(PQescapeString(to,from,charstring::length(from)),7);
-	checkSuccess(to," \\\\ '' ");
+	checkSuccess(PQescapeString(to,from,charstring::length(from)),6);
+	checkSuccess(to," \\ '' ");
 	stdoutput.printf("\n");
+#endif
 
 	//PQescapeBytea
 	// PQunescapeBytea

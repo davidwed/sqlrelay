@@ -219,6 +219,8 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		uint64_t	totalrows;
 		uint64_t	rownumber;
 
+		bool		bindformaterror;
+
 		stringbuffer	errormsg;
 
 		db2connection	*db2conn;
@@ -258,7 +260,8 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		const char	*selectDatabaseQuery();
@@ -433,9 +436,12 @@ void db2connection::dbVersionSpecificTasks() {
 
 		gettablelistquery=
 			"select distinct "
-			"	tabname, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	tabschema as table_schem, "
+			"	tabname as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	syscat.tables "
 			"where "
@@ -447,13 +453,17 @@ void db2connection::dbVersionSpecificTasks() {
 			"	and "
 			"	tabname like '%s' "
 			"order by "
+			"	tabschema, "
 			"	tabname";
 
 		gettablelistquerywild=
 			"select distinct "
-			"	tabname, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	tabschema as table_schem, "
+			"	tabname as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	syscat.tables "
 			"where "
@@ -463,6 +473,7 @@ void db2connection::dbVersionSpecificTasks() {
 			"	and "
 			"	type in ('T','U','V','W') "
 			"order by "
+			"	tabschema, "
 			"	tabname";
 
 		dbhostnamequery=
@@ -474,9 +485,12 @@ void db2connection::dbVersionSpecificTasks() {
 
 		gettablelistquery=
 			"select distinct "
-			"	tabname, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	tabschema as table_schem, "
+			"	tabname as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	syscat.tables "
 			"where "
@@ -488,13 +502,17 @@ void db2connection::dbVersionSpecificTasks() {
 			"	and "
 			"	tabname like '%s' "
 			"order by "
+			"	tabschema, "
 			"	tabname";
 
 		gettablelistquerywild=
 			"select distinct "
-			"	tabname, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	tabschema as table_schem, "
+			"	tabname as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	syscat.tables "
 			"where "
@@ -504,6 +522,7 @@ void db2connection::dbVersionSpecificTasks() {
 			"	and "
 			"	type in ('T','U','V','W') "
 			"order by "
+			"	tabschema, "
 			"	tabname";
 
 		// there is no obvious way to get this prior to 8.0
@@ -656,7 +675,7 @@ const char *db2connection::getDatabaseListQuery(bool wild) {
 		"	syscat.schemata ";
 }
 
-const char *db2connection::getTableListQuery(bool wild) {
+const char *db2connection::getTableListQuery(bool wild, uint16_t objecttypes) {
 	return (wild)?gettablelistquery:gettablelistquerywild;
 }
 
@@ -745,6 +764,7 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 		outisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
+	bindformaterror=false;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 }
 
@@ -876,6 +896,8 @@ bool db2cursor::close() {
 
 bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 
+	bindformaterror=false;
+
 	// initialize column count
 	ncols=0;
 
@@ -908,6 +930,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -945,6 +968,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -969,6 +993,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1002,6 +1027,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1059,6 +1085,7 @@ bool db2cursor::inputBindBlob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1089,6 +1116,7 @@ bool db2cursor::inputBindClob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1114,6 +1142,7 @@ bool db2cursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1141,6 +1170,7 @@ bool db2cursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1172,6 +1202,7 @@ bool db2cursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1211,6 +1242,7 @@ bool db2cursor::outputBind(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1249,6 +1281,7 @@ bool db2cursor::outputBindBlob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1276,6 +1309,7 @@ bool db2cursor::outputBindClob(const char *variable,
 
 	uint16_t	pos=charstring::toInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
+		bindformaterror=true;
 		return false;
 	}
 
@@ -1516,6 +1550,19 @@ void db2cursor::errorMessage(char *errorbuffer,
 					uint32_t *errorlength,
 					int64_t *errorcode,
 					bool *liveconnection) {
+	if (bindformaterror) {
+		// handle bind format errors
+		*errorlength=charstring::length(
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
+		charstring::safeCopy(errorbuffer,
+				errorbufferlength,
+				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
+				*errorlength);
+		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
+		*liveconnection=true;
+		return;
+	}
+
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
 	SQLSMALLINT	errlength;

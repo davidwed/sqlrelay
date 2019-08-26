@@ -41,6 +41,7 @@
 #include <odbcinst.h>
 
 #include <parsedatetime.h>
+#include <defines.h>
 
 #ifndef SQL_NULL_DESC
 	#define SQL_NULL_DESC 0
@@ -2215,23 +2216,24 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						sizeof(conn->user),
 						ODBC_INI);
 	}
+	parameterstring	pstr;
 	if (!charstring::isNullOrEmpty(password)) {
 		if (passwordlength==SQL_NTS) {
 			passwordlength=charstring::length(password);
 		}
-		if ((size_t)passwordlength>=sizeof(conn->password)) {
-			passwordlength=sizeof(conn->password)-1;
-		}
-		charstring::safeCopy(conn->password,sizeof(conn->password),
-					(const char *)password,passwordlength);
-		conn->password[passwordlength]='\0';
 	} else {
-		SQLGetPrivateProfileString((const char *)conn->dsn,
-						"Password","",
-						conn->password,
-						sizeof(conn->password),
-						ODBC_INI);
+		// SQLGetPrivateProfileString doesn't appear to be able to
+		// extract Passwords on all platforms.
+		pstr.parse(conn->dsn);
+		password=(SQLCHAR *)pstr.getValue("Password");
+		passwordlength=charstring::length(password);
 	}
+	if ((size_t)passwordlength>=sizeof(conn->password)) {
+		passwordlength=sizeof(conn->password)-1;
+	}
+	charstring::safeCopy(conn->password,sizeof(conn->password),
+				(const char *)password,passwordlength);
+	conn->password[passwordlength]='\0';
 	char	retrytimebuf[11];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"RetryTime","0",
 					retrytimebuf,sizeof(retrytimebuf),
@@ -3946,10 +3948,15 @@ SQLRETURN SQL_API SQLFetch(SQLHSTMT statementhandle) {
 		return SQL_INVALID_HANDLE;
 	}
 
-	return SQLR_Fetch(statementhandle,
-				stmt->rowsfetchedptr,
-				stmt->rowstatusptr,
-				stmt->rowarraysize);
+	SQLULEN	localrowsfetched;
+	SQLRETURN	retval=SQLR_Fetch(statementhandle,
+						&localrowsfetched,
+						stmt->rowstatusptr,
+						stmt->rowarraysize);
+	if (stmt->rowsfetchedptr) {
+		*stmt->rowsfetchedptr=localrowsfetched;
+	}
+	return retval;
 }
 
 SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
@@ -3970,10 +3977,15 @@ SQLRETURN SQL_API SQLFetchScroll(SQLHSTMT statementhandle,
 		return SQL_ERROR;
 	}
 
-	return SQLR_Fetch(statementhandle,
-				stmt->rowsfetchedptr,
-				stmt->rowstatusptr,
-				stmt->rowarraysize);
+	SQLULEN	localrowsfetched=0;
+	SQLRETURN	retval=SQLR_Fetch(statementhandle,
+						&localrowsfetched,
+						stmt->rowstatusptr,
+						stmt->rowarraysize);
+	if (stmt->rowsfetchedptr) {
+		*stmt->rowsfetchedptr=localrowsfetched;
+	}
+	return retval;
 }
 
 static SQLRETURN SQLR_SQLFreeHandle(SQLSMALLINT handletype, SQLHANDLE handle);
@@ -4320,15 +4332,13 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	bool	isnegative=false;
 
 	// get day/month format
-	bool	ddmm=!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_ODBC_DATE_DDMM"),
-					"yes");
+	bool	ddmm=charstring::isYes(environment::getValue(
+					"SQLR_ODBC_DATE_DDMM"));
 	bool		yyyyddmm=ddmm;
 	const char	*yyyyddmmstr=environment::getValue(
 					"SQLR_ODBC_DATE_YYYYDDMM");
 	if (yyyyddmmstr) {
-		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+		yyyyddmm=charstring::isYes(yyyyddmmstr);
 	}
 
 	// parse
@@ -4359,15 +4369,13 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	bool	isnegative=false;
 
 	// get day/month format
-	bool	ddmm=!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_ODBC_DATE_DDMM"),
-					"yes");
+	bool	ddmm=charstring::isYes(environment::getValue(
+					"SQLR_ODBC_DATE_DDMM"));
 	bool		yyyyddmm=ddmm;
 	const char	*yyyyddmmstr=environment::getValue(
 					"SQLR_ODBC_DATE_YYYYDDMM");
 	if (yyyyddmmstr) {
-		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+		yyyyddmm=charstring::isYes(yyyyddmmstr);
 	}
 
 	// parse
@@ -4398,15 +4406,13 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	bool	isnegative=false;
 
 	// get day/month format
-	bool	ddmm=!charstring::compareIgnoringCase(
-					environment::getValue(
-					"SQLR_ODBC_DATE_DDMM"),
-					"yes");
+	bool	ddmm=charstring::isYes(environment::getValue(
+					"SQLR_ODBC_DATE_DDMM"));
 	bool		yyyyddmm=ddmm;
 	const char	*yyyyddmmstr=environment::getValue(
 					"SQLR_ODBC_DATE_YYYYDDMM");
 	if (yyyyddmmstr) {
-		yyyyddmm=!charstring::compare(yyyyddmmstr,"yes");
+		yyyyddmm=charstring::isYes(yyyyddmmstr);
 	}
 
 	// parse
@@ -9324,11 +9330,26 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 		debugPrintf("  getting table list...\n");
 		debugPrintf("  wild: %s\n",(wild)?wild:"");
 
+		uint16_t	objecttypes=0;
+		if (charstring::contains(tbltype,"TABLE")) {
+			objecttypes|=DB_OBJECT_TABLE;
+		}
+		if (charstring::contains(tbltype,"VIEW")) {
+			objecttypes|=DB_OBJECT_VIEW;
+		}
+		if (charstring::contains(tbltype,"ALIAS")) {
+			objecttypes|=DB_OBJECT_ALIAS;
+		}
+		if (charstring::contains(tbltype,"SYNONYM")) {
+			objecttypes|=DB_OBJECT_SYNONYM;
+		}
+
 		// get the table list
 		// FIXME: this list should also be restricted to the
 		// specified table type
 		retval=
-		(stmt->cur->getTableList(wild,SQLRCLIENTLISTFORMAT_ODBC))?
+		(stmt->cur->getTableList(
+				wild,SQLRCLIENTLISTFORMAT_ODBC,objecttypes))?
 							SQL_SUCCESS:SQL_ERROR;
 	}
 
@@ -9398,7 +9419,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 					cbconnstrin);
 	debugPrintf("  connectstring: %s\n",nulltermconnstr);
 
-	// parse out DSN, UID and PWD from the connect string
+	// parse out DSN, UID/User and PWD/Password from the connect string
 	parameterstring	pstr;
 	pstr.parse(nulltermconnstr);
 	const char	*dsn=pstr.getValue("DSN");
@@ -9409,9 +9430,15 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	if (charstring::isNullOrEmpty(uid)) {
 		uid=pstr.getValue("uid");
 	}
+	if (charstring::isNullOrEmpty(uid)) {
+		uid=pstr.getValue("User");
+	}
 	const char	*pwd=pstr.getValue("PWD");
 	if (charstring::isNullOrEmpty(pwd)) {
 		pwd=pstr.getValue("pwd");
+	}
+	if (charstring::isNullOrEmpty(pwd)) {
+		pwd=pstr.getValue("Password");
 	}
 
 	debugPrintf("  dsn: %s\n",dsn);
@@ -9454,6 +9481,53 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 
 	// clean up
 	delete[] nulltermconnstr;
+
+	// build the DSN if it wasn't explicitly provided
+	stringbuffer	dsnstr;
+	if (charstring::isNullOrEmpty(dsn)) {
+		
+		// exclude User/Password, we ought to have gotten them earlier
+		const char	*names[]={
+			"Server",
+			"Port",
+			"Socket",
+			"Retry Time",
+			"Tries",
+			"Enable Kerberos",
+			"Kerberos Service",
+			"Kerberos Mech",
+			"Kerberos Flags",
+			"Enable TLS",
+			"TLS Version",
+			"TLS Certificate",
+			"TLS Certificate Password",
+			"TLS Ciphers",
+			"TLS Validation",
+			"TLS Certificate Authority",
+			"TLS Depth",
+			"Database",
+			"Debug",
+			"Column Name Case",
+			"Result Set Buffer Size",
+			"Don't Get Column Info",
+			"Nulls As Nulls",
+			"Lazy Connect",
+			"Clear Binds During Prepare",
+			"Bind Variable Delimiters",
+			NULL
+		};
+
+		for (const char **name=names; *name; name++) {
+			const char	*val=pstr.getValue(*name);
+			if (!charstring::isNullOrEmpty(val)) {
+				dsnstr.append(*name);
+				dsnstr.append('=');
+				dsnstr.append(val);
+				dsnstr.append(';');
+			}
+		}
+		dsn=dsnstr.getString();
+	}
 
 	// the connect string must include a valid dsn or server parameter
 	if (charstring::isNullOrEmpty(dsn)) {
@@ -11351,10 +11425,12 @@ static void parseDsn(const char *dsn) {
 		dsndict.setValue("User",user);
 	}
 	if (!dsndict.getValue("Password")) {
-		char	*password=new char[1024];
-		SQLGetPrivateProfileString(dsnval,"Password","",
-						password,1024,ODBC_INI);
-		dsndict.setValue("Password",password);
+		// SQLGetPrivateProfileString doesn't appear to be able to
+		// extract Passwords on all platforms.
+		parameterstring	pstr;
+		pstr.parse(dsnval);
+		dsndict.setValue("Password",
+			charstring::duplicate(pstr.getValue("Password")));
 	}
 	if (!dsndict.getValue("RetryTime")) {
 		char	*retrytime=new char[11];

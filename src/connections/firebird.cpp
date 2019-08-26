@@ -244,7 +244,8 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostName();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getGlobalTempTableListQuery();
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
@@ -327,8 +328,8 @@ void firebirdconnection::handleConnectString() {
 
 	charset=cont->getConnectStringValue("charset");
 
-	droptemptables=!charstring::compare(
-			cont->getConnectStringValue("droptemptables"),"yes");
+	droptemptables=charstring::isYes(
+			cont->getConnectStringValue("droptemptables"));
 
 	cont->addGlobalTempTables(
 			cont->getConnectStringValue("globaltemptables"));
@@ -601,12 +602,16 @@ const char *firebirdconnection::getDatabaseListQuery(bool wild) {
 	return "select '',NULL from rdb$database";
 }
 
-const char *firebirdconnection::getTableListQuery(bool wild) {
+const char *firebirdconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	return (wild)?
 		"select "
-		"	rdb$relation_name, "
-		"	'TABLE', "
-		"	NULL "
+		"	NULL as table_cat, "
+		"	rdb$owner_name as table_schem, "
+		"	rdb$relation_name as table_name, "
+		"	'TABLE' as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
 		"from "
 		"	rdb$relations "
 		"where "
@@ -614,17 +619,22 @@ const char *firebirdconnection::getTableListQuery(bool wild) {
 		"	and "
 		"	rdb$relation_name like '%s' "
 		"order by "
+		"	rdb$owner_name, "
 		"	rdb$relation_name":
 
 		"select "
-		"	rdb$relation_name, "
-		"	'TABLE', "
-		"	NULL "
+		"	NULL as table_cat, "
+		"	rdb$owner_name as table_schem, "
+		"	rdb$relation_name as table_name, "
+		"	'TABLE' as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
 		"from "
 		"	rdb$relations "
 		"where "
 		"	rdb$system_flag=0 "
 		"order by "
+		"	rdb$owner_name, "
 		"	rdb$relation_name";
 }
 

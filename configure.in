@@ -880,7 +880,7 @@ dnl    (and set MINOR and PATCH to 0)
 dnl 2. MINOR when you make backwards-incompatible changes
 dnl    (and set PATCH to 0)
 dnl 3. PATCH when you make backwards-compatible changes
-SQLR_VERSION="1.6.0"
+SQLR_VERSION="1.6.1"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 
@@ -1166,6 +1166,20 @@ sed -e "s|\${DESTDIR}||g" init/com.firstworks.sqlrelay.plist > init/com.firstwor
 mv init/com.firstworks.sqlrelay.plist.new init/com.firstworks.sqlrelay.plist
 sed -e "s|@bindir@|$bindir|g" init/sqlrelay.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrelay.service
 sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libdir@|$libdir|g" | sed -e "s|\${exec_prefix}|$exec_prefix|g" | sed -e "s|\${prefix}|$prefix|g" | sed -e "s|\${DESTDIR}||g" > init/sqlrcachemanager.service
+
+
+dnl Some versions of NetBSD create a libtool with -lgcc_s -lgcc in it, but don't
+dnl provide a shared libgcc.
+dnl Also, some versions of NetBSD create a libtool with -lgcc_s_pic in it, but
+dnl don't provide a shraed libgcc_s_pic.
+dnl These cause all kinds of link failures.  Fix them
+if ( test -r "libtool" )
+then
+	sed -e "s|-lgcc_s -lgcc|-lgcc_s|g" \
+		-e "s|-lgcc_s_pic|-lgcc_s|g" \
+		libtool > libtool.new
+	mv libtool.new libtool
+fi
 
 
 dnl Summary.

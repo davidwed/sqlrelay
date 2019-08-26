@@ -173,9 +173,17 @@ int	main(int argc, char **argv) {
 
 
 	printf("FAKE INPUT BIND VARIABLES:\n");
-	cur->prepareQuery("select 1 from dual");
+	cur->prepareQuery("select '',1,'',:hello,'''','\\'' from dual where 1=:one");
+	cur->inputBind("hello","hello");
+	cur->inputBind("one","1");
 	cur->inputBind("nonexistentvar","nonexistentval");
 	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"");
+	checkSuccess(cur->getField(0,(uint32_t)1),"1");
+	checkSuccess(cur->getField(0,(uint32_t)2),"");
+	checkSuccess(cur->getField(0,(uint32_t)3),"hello");
+	checkSuccess(cur->getField(0,(uint32_t)4),"'");
+	checkSuccess(cur->getField(0,(uint32_t)5),"'");
 	printf("\n\n");
 
 

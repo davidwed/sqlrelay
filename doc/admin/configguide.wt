@@ -2670,7 +2670,7 @@ The '''string''' parameter in each connection tag provides the parameters necess
 [[br]][=#clientinfolist]
 ==== clientinfolist ====
 
-The '''clientinfolist''' module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  The client info cannot currently be set when using a connector for a database abstraction later such as PHP PDO or ODBC.
+The '''clientinfolist''' module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  When using PHP PDO, it can be set using the PDO_SQLRELAY_ATTR_CLIENT_INFO attribute.  The client info cannot currently be set when using the ODBC, Perl DBI, PythonDB, or ADO.NET drivers.
 
 An example configuration follows.
 

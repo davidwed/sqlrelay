@@ -46,6 +46,13 @@ if (/^win/.test(process.platform)) {
 	ca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx";
 }
 
+// with node10+ we need to use tls1.1 to avoid no-ciphers error on some
+// platforms (eg. opensuse 42.3)
+var	tlsversion=null;
+if (parseInt(process.version.substring(1,3))>=10) {
+	tlsversion="TLS1.1";
+}
+
 	
 // instantiation
 var con=new sqlrelay.SQLRConnection("sqlrelay",
@@ -53,7 +60,7 @@ var con=new sqlrelay.SQLRConnection("sqlrelay",
 				"/tmp/test.socket",
 				null,null,0,1);
 var cur=new sqlrelay.SQLRCursor(con);
-con.enableTls(null,cert,null,null,"ca",ca,0);
+con.enableTls(tlsversion,cert,null,null,"ca",ca,0);
 	
 // get database type
 console.log("IDENTIFY: ");
@@ -714,7 +721,7 @@ var secondcon=new sqlrelay.SQLRConnection("sqlrelay",
 				"/tmp/test.socket",
 				null,null,0,1);
 var secondcur=new sqlrelay.SQLRCursor(secondcon);
-secondcon.enableTls(null,cert,null,null,"ca",ca,0);
+secondcon.enableTls(tlsversion,cert,null,null,"ca",ca,0);
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 checkSuccess(secondcur.getField(0,0),"0");
 checkSuccess(con.commit(),1);

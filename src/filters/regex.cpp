@@ -31,8 +31,7 @@ sqlrfilter_regex::sqlrfilter_regex(sqlrservercontroller *cont,
 
 	debug=cont->getConfig()->getDebugFilters();
 
-	enabled=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("enabled"),"no");
+	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled) {
 		return;
 	}

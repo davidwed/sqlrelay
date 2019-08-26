@@ -4329,7 +4329,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><br/><a name="clientinfolist"/><h4>clientinfolist</h4>
 
-<p>The <b>clientinfolist</b> module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  The client info cannot currently be set when using a connector for a database abstraction later such as PHP PDO or ODBC.</p>
+<p>The <b>clientinfolist</b> module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  When using PHP PDO, it can be set using the PDO_SQLRELAY_ATTR_CLIENT_INFO attribute.  The client info cannot currently be set when using the ODBC, Perl DBI, <a href="PythonDB">PythonDB</a>, or ADO.NET drivers.</p>
 
 <p>An example configuration follows.</p>
 
@@ -4371,11 +4371,11 @@ http://www.gnu.org/software/src-highlite -->
                 <b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;routers&gt;</font></b>
 			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"clientinfolist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"master"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">".*oracle.*"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">".*orcl.*"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;clientinfo</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">".*oracle.*"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;clientinfo</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">".*orcl.*"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;/router&gt;</font></b>
 			<b><font color="#0000FF">&lt;router</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"clientinfolist"</font> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"slave"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;client</font></b> <font color="#009900">ip</font><font color="#990000">=</font><font color="#FF0000">"*"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;clientinfo</font></b> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"*"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;/router&gt;</font></b>
 		<b><font color="#0000FF">&lt;/routers&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>

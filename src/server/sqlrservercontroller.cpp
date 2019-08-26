@@ -435,8 +435,6 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_bulkquerylen=0;
 	pvt->_bulkquery=NULL;
 	pvt->_bulkdataformat=NULL;
-
-	buildColumnMaps();
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -550,6 +548,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		return false;
 	}
 
+	buildColumnMaps();
 	setUserAndGroup();
 
 	// update various configurable parameters
@@ -2440,80 +2439,94 @@ bool sqlrservercontroller::getListsByApiCalls() {
 	return pvt->_conn->getListsByApiCalls();
 }
 
+bool sqlrservercontroller::fakePrepareAndExecuteForApiCall(
+					sqlrservercursor *cursor) {
+	cursor->setResultSetHeaderHasBeenHandled(false);
+	cursor->getBindMappingsPool()->clear();
+	cursor->setQueryLength(0);
+	cursor->getQueryBuffer()[0]='\0';
+	if (pvt->_sqlrt && !translateQuery(cursor)) {
+		return false;
+	}
+	cursor->clearTotalRowsFetched();
+	return true;
+}
+
 bool sqlrservercontroller::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getDatabaseList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getDatabaseList(cursor,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getSchemaList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getSchemaList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getSchemaList(cursor,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableList(sqlrservercursor *cursor,
-						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getTableList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+						const char *wild,
+						uint16_t objecttypes) {
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getTableList(cursor,wild,objecttypes) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTableTypeList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getTableTypeList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getTableTypeList(cursor,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getColumnList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getColumnList(cursor,table,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getColumnList(cursor,table,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getPrimaryKeyList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getPrimaryKeyList(cursor,table,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getPrimaryKeyList(cursor,table,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getKeyAndIndexList(cursor,table,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getKeyAndIndexList(cursor,table,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getProcedureBindAndColumnList(
 						sqlrservercursor *cursor,
 						const char *proc,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getProcedureBindAndColumnList(cursor,proc,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getProcedureBindAndColumnList(cursor,proc,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getTypeInfoList(sqlrservercursor *cursor,
 						const char *type,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getTypeInfoList(cursor,type,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getTypeInfoList(cursor,type,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 bool sqlrservercontroller::getProcedureList(sqlrservercursor *cursor,
 						const char *wild) {
-	cursor->setResultSetHeaderHasBeenHandled(false);
-	return pvt->_conn->getProcedureList(cursor,wild) &&
-				handleResultSetHeader(cursor);
+	return fakePrepareAndExecuteForApiCall(cursor) &&
+		pvt->_conn->getProcedureList(cursor,wild) &&
+		handleResultSetHeader(cursor);
 }
 
 const char *sqlrservercontroller::getDatabaseListQuery(bool wild) {
@@ -2524,8 +2537,9 @@ const char *sqlrservercontroller::getSchemaListQuery(bool wild) {
 	return pvt->_conn->getSchemaListQuery(wild);
 }
 
-const char *sqlrservercontroller::getTableListQuery(bool wild) {
-	return pvt->_conn->getTableListQuery(wild);
+const char *sqlrservercontroller::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
+	return pvt->_conn->getTableListQuery(wild,objecttypes);
 }
 
 const char *sqlrservercontroller::getTableTypeListQuery(bool wild) {
@@ -3381,7 +3395,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 	// run through the querybuffer...
 	const char	*ptr=querybuffer;
 	const char	*endptr=querybuffer+cursor->getQueryLength();
-	const char	*prevptr="\0";
+	char		prev='\0';
 	do {
 
 		// if we're in the query...
@@ -3402,7 +3416,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			newquery.append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -3412,8 +3430,9 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 			// if we find a quote, but not an escaped quote,
 			// then we're back in the query
-			if (*ptr=='\'' && *(ptr+1)!='\'' &&
-					*prevptr!='\'' && *prevptr!='\\') {
+			// (or we're in between one of these: '...''...'
+			// which is functionally the same)
+			if (*ptr=='\'' && prev!='\\') {
 				parsestate=IN_QUERY;
 			}
 
@@ -3421,7 +3440,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 			newquery.append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -3458,7 +3481,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 				// last character in the query
 				if (!endofbind && ptr==endptr-1) {
 					currentbind.append(*ptr);
-					prevptr=ptr;
+					if (*ptr=='\\' && prev=='\\') {
+						prev='\0';
+					} else {
+						prev=*ptr;
+					}
 					ptr++;
 				}
 
@@ -3486,7 +3513,11 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 
 				// move on
 				currentbind.append(*ptr);
-				prevptr=ptr;
+				if (*ptr=='\\' && prev=='\\') {
+					prev='\0';
+				} else {
+					prev=*ptr;
+				}
 				ptr++;
 			}
 			continue;
@@ -4385,7 +4416,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	cursor->setQueryHasBeenPrepared(true);
 
 	// handle column info now if it's valid at this point
-	return (cursor->columnInfoIsValidAfterPrepare())?
+	return (columnInfoIsValidAfterPrepare(cursor))?
 				handleResultSetHeader(cursor):true;
 }
 
@@ -4789,6 +4820,12 @@ bool sqlrservercontroller::inTransaction() {
 	return pvt->_intransaction;
 }
 
+bool sqlrservercontroller::columnInfoIsValidAfterPrepare(
+					sqlrservercursor *cursor) {
+	return !cursor->getExecuteDirect() &&
+		cursor->columnInfoIsValidAfterPrepare();
+}
+
 uint16_t sqlrservercontroller::getSendColumnInfo() {
 	return pvt->_sendcolumninfo;
 }
@@ -5165,12 +5202,33 @@ void sqlrservercontroller::buildColumnMaps() {
 	// Database
 	pvt->_mysqldatabasescolumnmap.setValue(0,0);
 
-	// Native/MySQL getTableList:
+	// MySQL getTableList:
 	//
-	// Tables_in_xxx
-	pvt->_mysqltablescolumnmap.setValue(0,0);
+	// Tables_in_xxx -> TABLE_NAME
+	pvt->_mysqltablescolumnmap.setValue(0,2);
 
 	// Native/MySQL getColumnList:
+if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
+	//
+	// column_name
+	pvt->_mysqlcolumnscolumnmap.setValue(0,3);
+	// data_type
+	pvt->_mysqlcolumnscolumnmap.setValue(1,5);
+	// character_maximum_length
+	pvt->_mysqlcolumnscolumnmap.setValue(2,6);
+	// numeric_precision
+	pvt->_mysqlcolumnscolumnmap.setValue(3,6);
+	// numeric_scale
+	pvt->_mysqlcolumnscolumnmap.setValue(4,8);
+	// is_nullable
+	pvt->_mysqlcolumnscolumnmap.setValue(5,10);
+	// column_key
+	pvt->_mysqlcolumnscolumnmap.setValue(6,18);
+	// column_default
+	pvt->_mysqlcolumnscolumnmap.setValue(7,12);
+	// extra
+	pvt->_mysqlcolumnscolumnmap.setValue(8,18);
+} else {
 	//
 	// column_name
 	pvt->_mysqlcolumnscolumnmap.setValue(0,0);
@@ -5190,9 +5248,10 @@ void sqlrservercontroller::buildColumnMaps() {
 	pvt->_mysqlcolumnscolumnmap.setValue(7,7);
 	// extra
 	pvt->_mysqlcolumnscolumnmap.setValue(8,8);
+}
 
 
-	// ODBC getDatabaseList:
+	// Native/ODBC getDatabaseList:
 	//
 	// TABLE_CAT -> Database
 	pvt->_odbcdatabasescolumnmap.setValue(0,0);
@@ -5206,20 +5265,57 @@ void sqlrservercontroller::buildColumnMaps() {
 	pvt->_odbcdatabasescolumnmap.setValue(4,1);
 
 	// ODBC getTableList:
-	//
-	// TABLE_CAT -> NULL
-	pvt->_odbctablescolumnmap.setValue(0,2);
-	// TABLE_SCHEM -> NULL
-	pvt->_odbctablescolumnmap.setValue(1,2);
-	// TABLE_NAME -> Tables_in_xxx
-	pvt->_odbctablescolumnmap.setValue(2,0);
-	// TABLE_TYPE -> 'TABLE'
-	pvt->_odbctablescolumnmap.setValue(3,1);
-	// REMARKS -> NULL
-	pvt->_odbctablescolumnmap.setValue(4,2);
+	// TABLE_CAT
+	pvt->_odbctablescolumnmap.setValue(0,0);
+	// TABLE_SCHEM
+	pvt->_odbctablescolumnmap.setValue(1,1);
+	// TABLE_NAME
+	pvt->_odbctablescolumnmap.setValue(2,2);
+	// TABLE_TYPE
+	pvt->_odbctablescolumnmap.setValue(3,3);
+	// REMARKS
+	pvt->_odbctablescolumnmap.setValue(4,4);
 
 	// ODBC getColumnList:
 	//
+if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
+	// TABLE_CAT
+	pvt->_odbccolumnscolumnmap.setValue(0,0);
+	// TABLE_SCHEM
+	pvt->_odbccolumnscolumnmap.setValue(1,1);
+	// TABLE_NAME
+	pvt->_odbccolumnscolumnmap.setValue(2,2);
+	// COLUMN_NAME
+	pvt->_odbccolumnscolumnmap.setValue(3,3);
+	// DATA_TYPE (numeric)
+	pvt->_odbccolumnscolumnmap.setValue(4,4);
+	// TYPE_NAME
+	pvt->_odbccolumnscolumnmap.setValue(5,5);
+	// COLUMN_SIZE
+	pvt->_odbccolumnscolumnmap.setValue(6,6);
+	// BUFFER_LEGTH
+	pvt->_odbccolumnscolumnmap.setValue(7,7);
+	// DECIMAL_DIGITS - smallint - scale
+	pvt->_odbccolumnscolumnmap.setValue(8,8);
+	// NUM_PREC_RADIX - smallint - precision
+	pvt->_odbccolumnscolumnmap.setValue(9,9);
+	// NULLABLE
+	pvt->_odbccolumnscolumnmap.setValue(10,10);
+	// REMARKS
+	pvt->_odbccolumnscolumnmap.setValue(11,11);
+	// COLUMN_DEF
+	pvt->_odbccolumnscolumnmap.setValue(12,12);
+	// SQL_DATA_TYPE
+	pvt->_odbccolumnscolumnmap.setValue(13,13);
+	// SQL_DATETIME_SUB
+	pvt->_odbccolumnscolumnmap.setValue(14,14);
+	// CHAR_OCTET_LENGTH
+	pvt->_odbccolumnscolumnmap.setValue(15,15);
+	// ORDINAL_POSITION
+	pvt->_odbccolumnscolumnmap.setValue(16,16);
+	// IS_NULLABLE
+	pvt->_odbccolumnscolumnmap.setValue(17,17);
+} else {
 	// TABLE_CAT -> NULL
 	pvt->_odbccolumnscolumnmap.setValue(0,9);
 	// TABLE_SCHEM -> NULL
@@ -5256,6 +5352,7 @@ void sqlrservercontroller::buildColumnMaps() {
 	pvt->_odbccolumnscolumnmap.setValue(16,9);
 	// IS_NULLABLE -> NULL
 	pvt->_odbccolumnscolumnmap.setValue(17,5);
+}
 }
 
 uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
@@ -5493,8 +5590,11 @@ void sqlrservercontroller::endSession() {
 	// set isolation level
 	pvt->_conn->setIsolationLevel(pvt->_isolationlevel);
 
+	// NOTE: For debugging, it's nice to know what the most recent
+	// clientinfo was, so lets not reset this.  Hopefully not resetting it
+	// doesn't break something.
 	// reset the client info
-	setClientInfo("",0);
+	//setClientInfo("",0);
 
 	// reset protocol modules
 	if (pvt->_sqlrpr) {
@@ -8980,7 +9080,12 @@ bool sqlrservercontroller::fetchRow(sqlrservercursor *cursor, bool *error) {
 					&(pvt->_nulls));
 
 	// get the column count
-	uint32_t	colcount=colCount(cursor);
+	// NOTE: Don't just set colcount=colCount(cursor) here.  If a column
+	// map is being used, then it returns the column count of the map, which
+	// could be smaller than the actual column count.  We need to be sure we
+	// fetch all columns, so we need to use the raw column count here.
+	uint32_t	colcount=(cursor->getColumnInfoIsValid())?
+						cursor->colCount():0;
 
 	// for timings...
 	datetime	dt;

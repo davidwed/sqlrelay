@@ -251,7 +251,8 @@ class SQLRSERVER_DLLSPEC freetdsconnection : public sqlrserverconnection {
 		const char	*dbVersion();
 		const char	*dbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
@@ -638,13 +639,17 @@ const char *freetdsconnection::getDatabaseListQuery(bool wild) {
 	}
 }
 
-const char *freetdsconnection::getTableListQuery(bool wild) {
+const char *freetdsconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
 	if (sybasedb) {
 		return (wild)?
 			"select "
-			"	name, "
-			"	'TABLE', "
-			"	NULL "
+			"	NULL as table_cat, "
+			"	NULL as table_schem, "
+			"	name as table_name, "
+			"	'TABLE' as table_type, "
+			"	NULL as remarks, "
+			"	NULL as extra "
 			"from "
 			"	sysobjects "
 			"where "
@@ -657,6 +662,8 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 			"	name":
 	
 			"select "
+			"	NULL, "
+			"	NULL, "
 			"	name, "
 			"	'TABLE', "
 			"	NULL "
@@ -669,26 +676,8 @@ const char *freetdsconnection::getTableListQuery(bool wild) {
 			"order by "
 			"	name";
 	} else {
-		return (wild)?
-			"select "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
-			"from "
-			"	information_schema.tables "
-			"where "
-			"	table_name like '%s' "
-			"order by "
-			"	table_name":
-	
-			"select "
-			"	table_name, "
-			"	'TABLE', "
-			"	NULL "
-			"from "
-			"	information_schema.tables "
-			"order by "
-			"	table_name";
+		return sqlrserverconnection::getTableListQuery(
+						wild,objecttypes);
 	}
 }
 

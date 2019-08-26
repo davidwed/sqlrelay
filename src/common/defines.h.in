@@ -50,6 +50,7 @@
 #define GETKEYANDINDEXLIST 36
 #define GET_CURRENT_SCHEMA 37
 #define NEXT_RESULT_SET 38
+#define GETTABLELIST2 39
 
 #define SUSPENDED_RESULT_SET 1
 #define NO_SUSPENDED_RESULT_SET 0
@@ -95,6 +96,11 @@
 
 #define DONT_RE_EXECUTE 0
 #define RE_EXECUTE 1
+
+#define DB_OBJECT_TABLE		1
+#define DB_OBJECT_VIEW		2
+#define DB_OBJECT_ALIAS		4
+#define DB_OBJECT_SYNONYM	8
 
 // sizes...
 // FIXME: these are duplicated here and in sqlrshmdata.h

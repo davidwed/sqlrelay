@@ -42,7 +42,8 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*dbIpAddressQuery();
 		const char	*dbIpAddress();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getTableListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		bool		selectDatabase(const char *database);
@@ -167,6 +168,13 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 					bool *null);
 		void		closeResultSet();
 
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+		bool		columnInfoIsValidAfterPrepare();
+#endif
+
 		PGresult	*pgresult;
 		ExecStatusType	pgstatus;
 		int		ncols;
@@ -174,8 +182,8 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		uint64_t	affectedrows;
 		int		currentrow;
 
-		char		typenamebuffer[6];
-		char		tablenamebuffer[6];
+		char		typenamebuffer[32];
+		char		tablenamebuffer[32];
 
 		postgresqlconnection	*postgresqlconn;
 
@@ -236,15 +244,15 @@ void postgresqlconnection::handleConnectString() {
 	db=cont->getConnectStringValue("db");
 	sslmode=cont->getConnectStringValue("sslmode");
 	const char	*typemang=cont->getConnectStringValue("typemangling");
-	if (!typemang ||!charstring::compareIgnoringCase(typemang,"no")) {
+	if (!typemang || charstring::isNo(typemang)) {
 		typemangling=0;
-	} else if (!charstring::compareIgnoringCase(typemang,"yes")) {
+	} else if (charstring::isYes(typemang)) {
 		typemangling=1;
 	} else {
 		typemangling=2;
 	}
 	const char	*tablemang=cont->getConnectStringValue("tablemangling");
-	if (!tablemang ||!charstring::compareIgnoringCase(tablemang,"no")) {
+	if (!tablemang || charstring::isNo(tablemang)) {
 		tablemangling=0;
 	} else {
 		tablemangling=2;
@@ -353,7 +361,7 @@ bool postgresqlconnection::logIn(const char **error,
 	}
 
 	// build the table dictionary
-	if (typemangling==2) {
+	if (tablemangling==2) {
 		PGresult	*result=PQexec(pgconn,
 					"select oid,relname from pg_class");
 		if (!result) {
@@ -545,50 +553,53 @@ const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
 		"	datname";
 }
 
-const char *postgresqlconnection::getTableListQuery(bool wild) {
-	return (wild)?
-		"select "
-		"	table_name, "
-		"	'TABLE', "
-		"	NULL "
-		"from "
-		"	information_schema.tables "
-		"where "
-		"	table_schema = 'public' "
-		"	and "
-		"	table_name like '%s' "
-		"order by "
-		"	table_name":
-
-		"select "
-		"	table_name, "
-		"	'TABLE', "
-		"	NULL "
-		"from "
-		"	information_schema.tables "
-		"where "
-		"	table_schema = 'public' "
-		"order by "
-		"	table_name";
+const char *postgresqlconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes) {
+	return sqlrserverconnection::getTableListQuery(wild,objecttypes,
+					" and table_schema = 'public' ");
 }
 
 const char *postgresqlconnection::getColumnListQuery(
 					const char *table, bool wild) {
 	return (wild)?
 		"select "
+		"	table_catalog as table_cat, "
+		"	table_schema as table_schem, "
+		"	table_name as table_name, "
 		"	column_name, "
-		"	data_type, "
-		"	character_maximum_length, "
-		"	numeric_precision, "
-		"	numeric_scale, "
-		"	is_nullable, "
-		"	'' as key, "
+		"	null as data_type, " // case this...
+		"	data_type as type_name, "
+		"	case "
+		"		when numeric_scale is null "
+		"			then character_maximum_length "
+		"		else numeric_precision "
+		"	end as column_size, "
+		"	null as buffer_length, "
+			// length in bytes of data transferred during fetch
+		"	numeric_scale as decimal_digits, "
+		"	numeric_precision_radix as num_prec_radix, "
+		"	case "
+		"		when is_nullable = 'NO' "
+		"			then 0 "
+		"		when is_nullable = 'YES' "
+		"			then 1 "
+		"		else 2 "
+		"	end as nullable, "
+		"	null as remarks, "
 		"	column_default, "
-		"	'' as extra, "
-		"	NULL "
+		"	null as sql_data_type, "
+			// type (int)
+		"	null as sql_datetime_sub, "
+			// subtype (int) for datetime/interval, otherwise null
+		"	character_octet_length as char_octet_length, "
+		"	ordinal_position, "
+		"	is_nullable, "
+		"	null as extra "
 		"from "
 		"	information_schema.columns "
 		"where "
+		"	table_schema='public' "
+		"	and "
 		"	table_name='%s' "
 		"	and "
 		"	column_name like '%s' "
@@ -596,19 +607,40 @@ const char *postgresqlconnection::getColumnListQuery(
 		"	ordinal_position":
 
 		"select "
+		"	table_catalog as table_cat, "
+		"	table_schema as table_schem, "
+		"	table_name as table_name, "
 		"	column_name, "
-		"	data_type, "
-		"	character_maximum_length, "
-		"	numeric_precision, "
-		"	numeric_scale, "
-		"	is_nullable, "
-		"	'' as key, "
+		"	null as data_type, " // case this...
+		"	data_type as type_name, "
+		"	case "
+		"		when numeric_scale is null "
+		"			then character_maximum_length "
+		"		else numeric_precision "
+		"	end as column_size, "
+		"	null as buffer_length, "
+		"	numeric_scale as decimal_digits, "
+		"	numeric_precision_radix as num_prec_radix, "
+		"	case "
+		"		when is_nullable = 'NO' "
+		"			then 0 "
+		"		when is_nullable = 'YES' "
+		"			then 1 "
+		"		else 2 "
+		"	end as nullable, "
+		"	null as remarks, "
 		"	column_default, "
-		"	'' as extra, "
-		"	NULL "
+		"	null as sql_data_type, "
+		"	null as sql_datetime_sub, "
+		"	character_octet_length as char_octet_length, "
+		"	ordinal_position, "
+		"	is_nullable, "
+		"	null as extra "
 		"from "
 		"	information_schema.columns "
 		"where "
+		"	table_schema='public' "
+		"	and "
 		"	table_name='%s' "
 		"order by "
 		"	ordinal_position";
@@ -748,6 +780,31 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// clean up
 	PQclear(pgresult);
 	pgresult=NULL;
+
+	// bail, if necessary
+	if (!result) {
+		return false;
+	}
+	
+	// describe the query (get column info)
+	pgresult=PQdescribePrepared(postgresqlconn->pgconn,"");
+
+	// handle some kind of outright failure
+	if (!pgresult) {
+		return false;
+	}
+
+	// handle errors
+	result=true;
+	pgstatus=PQresultStatus(pgresult);
+	if (pgstatus==PGRES_BAD_RESPONSE ||
+		pgstatus==PGRES_NONFATAL_ERROR ||
+		pgstatus==PGRES_FATAL_ERROR) {
+		result=false;
+	}
+
+	// get the col count
+	ncols=PQnfields(pgresult);
 
 	return result;
 }
@@ -929,6 +986,12 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	nrows=0;
 	currentrow=-1;
 
+	// clean up any result that might be lying around (eg. from a prepare)
+	if (pgresult) {
+		PQclear(pgresult);
+		pgresult=NULL;
+	}
+
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	int	result=1;
@@ -983,8 +1046,13 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
+#if !((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)))
 	// get the col count
 	ncols=PQnfields(pgresult);
+#endif
 
 	// validate column count
 	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
@@ -1021,6 +1089,9 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		postgresqlconn->currentoid=coid;
 	}
 #endif
+
+	// force re-fetch of column info
+	setResultSetHeaderHasBeenHandled(false);
 
 	return true;
 }
@@ -1466,6 +1537,15 @@ void postgresqlcursor::closeResultSet() {
 	}
 #endif
 }
+
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+bool postgresqlcursor::columnInfoIsValidAfterPrepare() {
+	return true;
+}
+#endif
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrserverconnection *new_postgresqlconnection(

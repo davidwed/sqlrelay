@@ -147,6 +147,7 @@ struct sqlrstatement {
 	singlylinkedlist< char * >	subvarstrings;
 	bool				fwdonly;
 	bool				emulatepreparesunicodestrings;
+	bool				fetchlobsasstrings;
 };
 
 struct sqlrdbhandle {
@@ -157,6 +158,7 @@ struct sqlrdbhandle {
 	int64_t		resultsetbuffersize;
 	bool		dontgetcolumninfo;
 	bool		nullsasnulls;
+	bool		fetchlobsasstrings;
 };
 
 enum {
@@ -366,7 +368,9 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 			stmt->columns[colno].param_type=PDO_PARAM_INT;
 		}
 	} else if (isBlobTypeChar(type)) {
-		stmt->columns[colno].param_type=PDO_PARAM_LOB;
+		stmt->columns[colno].param_type=
+			(sqlrstmt->fetchlobsasstrings)?
+				PDO_PARAM_STR:PDO_PARAM_LOB;
 	} else if (isBoolTypeChar(type)) {
 		stmt->columns[colno].param_type=PDO_PARAM_BOOL;
 	} else {
@@ -958,7 +962,7 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 	// run through the querybuffer...
 	const char	*ptr=query;
 	const char	*endptr=ptr+querylen;
-	const char	*prevptr="\0";
+	char		prev='\0';
 	do {
 
 		// if we're in the query...
@@ -979,7 +983,11 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			newquery->append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -989,8 +997,9 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 
 			// if we find a quote, but not an escaped quote,
 			// then we're back in the query
-			if (*ptr=='\'' && *(ptr+1)!='\'' &&
-					*prevptr!='\'' && *prevptr!='\\') {
+			// (or we're in between one of these: '...''...'
+			// which is functionally the same)
+			if (*ptr=='\'' && prev!='\\') {
 				parsestate=IN_QUERY;
 			}
 
@@ -998,7 +1007,11 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			newquery->append(*ptr);
 
 			// move on
-			prevptr=ptr;
+			if (*ptr=='\\' && prev=='\\') {
+				prev='\0';
+			} else {
+				prev=*ptr;
+			}
 			ptr++;
 			continue;
 		}
@@ -1046,7 +1059,11 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 			} else {
 
 				// move on
-				prevptr=ptr;
+				if (*ptr=='\\' && prev=='\\') {
+					prev='\0';
+				} else {
+					prev=*ptr;
+				}
 				ptr++;
 			}
 			continue;
@@ -1092,6 +1109,9 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 
 	sqlrstmt->emulatepreparesunicodestrings=
 		sqlrdbh->emulatepreparesunicodestrings;
+
+	sqlrstmt->fetchlobsasstrings=
+		sqlrdbh->fetchlobsasstrings;
 
 	// FIXME:
 	// To not have to set translatebindvariables on the server, we need to
@@ -1757,7 +1777,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		//{"autocommit",(char *)"1",0},
 		{"autocommit",(char *)"0",0},
 		{"bindvariabledelimiters",(char *)"?:@$",0},
-		{"emulatepreparesunicodestrings",(char *)"0",0}
+		{"emulatepreparesunicodestrings",(char *)"0",0},
+		{"fetchlobsasstrings",(char *)"0",0}
 	};
 	php_pdo_parse_data_source(dbh->data_source,
 					dbh->data_source_len,
@@ -1787,7 +1808,9 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	bool		autocommit=!charstring::isNo(options[24].optval);
 	const char	*bindvariabledelimiters=options[25].optval;
 	bool		emulatepreparesunicodestrings=
-					charstring::isYes(options[26].optval);
+				charstring::isYes(options[26].optval);
+	bool		fetchlobsasstrings=
+				charstring::isYes(options[27].optval);
 
 	// create a sqlrconnection and attach it to the dbh
 	sqlrdbhandle	*sqlrdbh=new sqlrdbhandle;
@@ -1905,6 +1928,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	sqlrdbh->translatebindsonserver=false;
 	sqlrdbh->usesubvars=false;
 	sqlrdbh->emulatepreparesunicodestrings=emulatepreparesunicodestrings;
+	sqlrdbh->fetchlobsasstrings=fetchlobsasstrings;
 
 	dbh->driver_data=(void *)sqlrdbh;
 	dbh->methods=&sqlrconnectionMethods;
