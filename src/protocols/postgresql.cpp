@@ -113,7 +113,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 						uint16_t errorstringlength);
 
 		bool	query();
-		bool	emptyQuery(const char *query);
+		void	getQuery(const char *query,
+						const char **start,
+						const char **end);
+		const char	*skipWhitespace(const char *str);
 		bool	sendQueryResult(sqlrservercursor *cursor,
 						bool sendrowdescription,
 						uint32_t maxrows);
@@ -144,6 +147,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		bool	describe();
 		bool	sendNoData();
 		bool	execute();
+		bool	emptyQuery(const char *query);
 		bool	sync();
 		bool	close();
 
@@ -402,13 +406,13 @@ bool sqlrprotocol_postgresql::recvPacket(bool gettype) {
 	}
 
 	// debug
-	debugStart("recv");
 	if (getDebug()) {
+		debugStart("recv");
 		stdoutput.printf("	type: %c\n",reqtype);
 		stdoutput.printf("	size: %d\n",reqpacketsize);
 		debugHexDump(reqpacket,reqpacketsize);
+		debugEnd();
 	}
-	debugEnd();
 
 	return true;
 }
@@ -426,8 +430,8 @@ bool sqlrprotocol_postgresql::sendPacket(unsigned char type) {
 	// }
 
 	// debug
-	debugStart("send");
 	if (getDebug()) {
+		debugStart("send");
 		if (type!=MESSAGE_NULL) {
 			stdoutput.printf("	type: %c\n",type);
 		} else {
@@ -435,8 +439,8 @@ bool sqlrprotocol_postgresql::sendPacket(unsigned char type) {
 		}
 		stdoutput.printf("	size: %d\n",resppacket.getSize());
 		debugHexDump(resppacket.getBuffer(),resppacket.getSize());
+		debugEnd();
 	}
-	debugEnd();
 
 	// packet header
 	if (clientsock->write(type)!=sizeof(unsigned char)) {
@@ -592,8 +596,8 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 	// NOTE: only user is required, others may be left null
 	
 	// debug
-	debugStart("StartupMessage");
 	if (getDebug()) {
+		debugStart("StartupMessage");
 		stdoutput.printf("	protocol version: %d\n",
 							protocolversion);
 		stdoutput.printf("	user: %s\n",user);
@@ -606,8 +610,8 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 					key->getValue(),
 					options.getValue(key->getValue()));
 		}
+		debugEnd();
 	}
-	debugEnd();
 
 	return true;
 }
@@ -677,11 +681,11 @@ bool sqlrprotocol_postgresql::sendAuthenticationCleartextPassword() {
 	uint32_t	authtype=AUTH_CLEARTEXT;
 
 	// debug
-	debugStart("AuthenticationCleartextPassword");
 	if (getDebug()) {
+		debugStart("AuthenticationCleartextPassword");
 		stdoutput.printf("	auth type: %d\n",authtype);
+		debugEnd();
 	}
-	debugEnd();
 
 	// build response packet
 	resppacket.clear();
@@ -707,12 +711,12 @@ bool sqlrprotocol_postgresql::sendAuthenticationMD5Password() {
 	rand.generateNumber(&salt);
 
 	// debug
-	debugStart("AuthenticationMD5Password");
 	if (getDebug()) {
+		debugStart("AuthenticationMD5Password");
 		stdoutput.printf("	auth type: %d\n",authtype);
 		stdoutput.printf("	salt: %d\n",salt);
+		debugEnd();
 	}
-	debugEnd();
 
 	// build response packet
 	resppacket.clear();
@@ -748,11 +752,11 @@ bool sqlrprotocol_postgresql::recvPasswordMessage() {
 	password[reqpacketsize]='\0';
 
 	// debug
-	debugStart("PasswordMessage");
 	if (getDebug()) {
+		debugStart("PasswordMessage");
 		stdoutput.printf("	password: %s\n",password);
+		debugEnd();
 	}
-	debugEnd();
 
 	return true;
 }
@@ -771,11 +775,11 @@ bool sqlrprotocol_postgresql::authenticate() {
 	bool	retval=cont->auth(&cred);
 
 	// debug
-	debugStart("authenticate");
 	if (getDebug()) {
+		debugStart("authenticate");
 		stdoutput.printf("	auth %s\n",(retval)?"success":"failed");
+		debugEnd();
 	}
-	debugEnd();
 
 	// error
 	if (!retval) {
@@ -806,11 +810,11 @@ bool sqlrprotocol_postgresql::sendAuthenticationOk() {
 	uint32_t	success=0;
 
 	// debug
-	debugStart("AuthenticationOk");
 	if (getDebug()) {
+		debugStart("AuthenticationOk");
 		stdoutput.printf("	success: %d\n",success);
+		debugEnd();
 	}
-	debugEnd();
 
 	// build response packet
 	resppacket.clear();
@@ -834,12 +838,12 @@ bool sqlrprotocol_postgresql::sendBackendKeyData() {
 	rand.generateNumber(&secretkey);
 
 	// debug
-	debugStart("BackendKeyData");
 	if (getDebug()) {
+		debugStart("BackendKeyData");
 		stdoutput.printf("	process id: %d\n",pid);
 		stdoutput.printf("	secret key: %d\n",secretkey);
+		debugEnd();
 	}
-	debugEnd();
 
 	// build response packet
 	resppacket.clear();
@@ -908,12 +912,12 @@ bool sqlrprotocol_postgresql::sendParameterStatus(const char *name,
 	// }
 
 	// debug
-	debugStart("ParameterStatus");
 	if (getDebug()) {
+		debugStart("ParameterStatus");
 		stdoutput.printf("	name: %s\n",name);
 		stdoutput.printf("	value: %s\n",value);
+		debugEnd();
 	}
-	debugEnd();
 
 	// build response packet
 	resppacket.clear();
@@ -940,11 +944,11 @@ bool sqlrprotocol_postgresql::sendReadyForQuery() {
 	char	txblockstatus=(cont->inTransaction())?'T':'I';
 
 	// debug
-	debugStart("ReadyForQuery");
 	if (getDebug()) {
+		debugStart("ReadyForQuery");
 		stdoutput.printf("	tx block status: %c\n",txblockstatus);
+		debugEnd();
 	}
-	debugEnd();
 
 	// build response packet
 	resppacket.clear();
@@ -999,8 +1003,8 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 	}
 
 	// debug
-	debugStart("error");
 	if (getDebug()) {
+		debugStart("error");
 		stdoutput.printf("	field type: S\n");
 		stdoutput.printf("	string: %s\n",severity);
 		stdoutput.printf("	field type: C\n");
@@ -1009,15 +1013,15 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 		stdoutput.printf("	string: %.*s\n",errorstringlength,
 							errorstring);
 		stdoutput.printf("	field type: (null)\n");
+		debugEnd();
 	}
-	debugEnd();
 
 	// build response packet
 	resppacket.clear();
 
-// FIXME: somehow the real server sends:
-// psql: FATAL:  password authentication failed for user "testuser"
-// when a login fails.  It's not clear what field the "psql" is sent in.
+	// FIXME: somehow the real server sends:
+	// psql: FATAL:  password authentication failed for user "testuser"
+	// when a login fails.  It's not clear what field the "psql" is sent in.
 
 	write(&resppacket,(unsigned char)FIELD_TYPE_SEVERITY);
 	write(&resppacket,severity);
@@ -1058,30 +1062,96 @@ bool sqlrprotocol_postgresql::query() {
 	uint32_t	querylength=reqpacketsize;
 
 	// debug
-	debugStart("query");
 	if (getDebug()) {
+		debugStart("query");
 		stdoutput.printf("	cursor id: %d\n",cursor->getId());
 		stdoutput.printf("	query length: %d\n",querylength);
-		stdoutput.printf("	query: %.*s\n",querylength,query);
+		stdoutput.printf("	queries: %.*s\n",querylength,query);
+		debugEnd();
 	}
-	debugEnd();
 
 	// clear binds
 	cont->getBindPool(cursor)->clear();
 	cont->setInputBindCount(cursor,0);
 
-	// FIXME: There could be multiple queries.  If so, and if not in a
-	// transaction, then we need to start one and commit/rollback it later.
+	// there could be multiple queries, process them individually...
 	bool	result=false;
-	if (emptyQuery(query)) {
-		result=sendEmptyQueryResponse();
-	} else {
-		if (cont->prepareQuery(cursor,query,querylength,
-						true,true,true) &&
-			cont->executeQuery(cursor,true,true,true,true)) {
-			result=sendQueryResult(cursor,true,0);
+	bool	newtx=false;
+	bool	first=true;
+	bool	error=false;
+	for (;;) {
+
+		// get the query
+		const char	*start=NULL;
+		const char	*end=NULL;
+		getQuery(query,&start,&end);
+		query=start;
+		querylength=end-start;
+
+		// if there's more than 1 query, then
+		// we may need to begin a transaction
+		if (first) {
+			newtx=(*end &&
+				cont->skipWhitespaceAndComments(end+1)[0] &&
+				!cont->inTransaction());
+			if (newtx) {
+				debugStart("begin");
+				debugEnd();
+				cont->begin();
+			}
+			first=false;
+		}
+
+		if (getDebug()) {
+			debugStart("individual query");
+			stdoutput.printf("	query: %.*s\n",
+							querylength,query);
+			debugEnd();
+		}
+
+		// prepare/execute the query...
+		if (!querylength) {
+			result=sendEmptyQueryResponse();
 		} else {
-			result=sendCursorError(cursor);
+			if (cont->prepareQuery(cursor,query,querylength,
+							true,true,true) &&
+				cont->executeQuery(cursor,
+							true,true,true,true)) {
+				result=sendQueryResult(cursor,true,0);
+			} else {
+				result=sendCursorError(cursor);
+				error=true;
+				break;
+			}
+		}
+
+		// stop executing queries if:
+		// * a network error occurred
+		// * a sql error occurred
+		// * if we just executed the final query
+		if (!result || error || !*end) {
+			break;
+		}
+
+		// next...
+		query=skipWhitespace(end+1);
+
+		// catch if *end was a ; followed by a NULL or whitespace
+		if (!*query) {
+			break;
+		}
+	}
+
+	// if we had to start a new transaction, then complete it here
+	if (newtx) {
+		if (error) {
+			debugStart("rollback");
+			debugEnd();
+			cont->rollback();
+		} else {
+			debugStart("commit");
+			debugEnd();
+			cont->commit();
 		}
 	}
 
@@ -1091,8 +1161,39 @@ bool sqlrprotocol_postgresql::query() {
 	return (result)?sendReadyForQuery():false;
 }
 
-bool sqlrprotocol_postgresql::emptyQuery(const char *query) {
-	return !(cont->skipWhitespaceAndComments(query)[0]);
+void sqlrprotocol_postgresql::getQuery(const char *query,
+					const char **start,
+					const char **end) {
+
+	*start=cont->skipWhitespaceAndComments(query);
+
+	bool	inquotes=false;
+	char	quote='\0';
+	const char *ch=*start;
+	while (*ch) {
+		if (!inquotes) {
+			if (*ch=='\'' || *ch=='"' || *ch=='`') {
+				inquotes=true;
+				quote=*ch;
+			} else if (*ch==';') {
+				break;
+			}
+		} else {
+			if (*ch==quote) {
+				inquotes=false;
+			}
+		}
+		ch++;
+	}
+	*end=ch;
+}
+
+const char *sqlrprotocol_postgresql::skipWhitespace(const char *str) {
+	// FIXME: push this up to sqlrservercontroller
+	while (*str && character::isWhitespace(*str)) {
+		str++;
+	}
+	return str;
 }
 
 bool sqlrprotocol_postgresql::sendQueryResult(sqlrservercursor *cursor,
@@ -1575,12 +1676,12 @@ bool sqlrprotocol_postgresql::sendCommandComplete(sqlrservercursor *cursor) {
 	delete[] newq;
 
 	// debug
-	debugStart("CommandComplete");
 	if (getDebug()) {
+		debugStart("CommandComplete");
 		stdoutput.printf("	commandtag: %s\n",
 					commandtag.getString());
+		debugEnd();
 	}
-	debugEnd();
 
 	// build response packet
 	resppacket.clear();
@@ -1677,8 +1778,8 @@ bool sqlrprotocol_postgresql::parse() {
 	paramoids.setValue(cursor,paramtypes);
 
 	// debug
-	debugStart("Parse");
 	if (getDebug()) {
+		debugStart("Parse");
 		stdoutput.printf("	stmt name: %s\n",stmtname);
 		stdoutput.printf("	cursor id: %d\n",cursor->getId());
 		stdoutput.printf("	query length: %d\n",querylength);
@@ -1688,8 +1789,8 @@ bool sqlrprotocol_postgresql::parse() {
 			stdoutput.printf("	param %d type: %d\n",
 							i,paramtypes[i]);
 		}
+		debugEnd();
 	}
-	debugEnd();
 
 	// bounds checking
 	if (querylength>maxquerysize) {
@@ -2193,13 +2294,13 @@ bool sqlrprotocol_postgresql::describe() {
 	}
 
 	// debug
-	debugStart("Describe");
 	if (getDebug()) {
+		debugStart("Describe");
 		stdoutput.printf("	S or P: %c\n",sorp);
 		stdoutput.printf("	name: %s\n",name.getString());
 		stdoutput.printf("	cursor id: %d\n",cursor->getId());
+		debugEnd();
 	}
-	debugEnd();
 
 	// return RowDescription or NoData if the statement will not return rows
 	// (If there are no columns, then there can't be any rows)
@@ -2253,13 +2354,13 @@ bool sqlrprotocol_postgresql::execute() {
 		return sendErrorResponse("ERROR","26000","Invalid portal name");
 	}
 
-	debugStart("Execute");
 	if (getDebug()) {
+		debugStart("Execute");
 		stdoutput.printf("	portal name: %s\n",portal.getString());
 		stdoutput.printf("	cursor id: %d\n",cursor->getId());
 		stdoutput.printf("	max rows: %d\n",maxrows);
+		debugEnd();
 	}
-	debugEnd();
 
 	// execute the query
 	if (!cont->executeQuery(cursor,true,true,true,true)) {
@@ -2271,6 +2372,10 @@ bool sqlrprotocol_postgresql::execute() {
 	}
 
 	return sendQueryResult(cursor,false,maxrows);
+}
+
+bool sqlrprotocol_postgresql::emptyQuery(const char *query) {
+	return !(cont->skipWhitespaceAndComments(query)[0]);
 }
 
 bool sqlrprotocol_postgresql::sync() {
@@ -2333,13 +2438,13 @@ bool sqlrprotocol_postgresql::close() {
 	}
 
 	// debug
-	debugStart("Close");
 	if (getDebug()) {
+		debugStart("Close");
 		stdoutput.printf("	S or P: %c\n",sorp);
 		stdoutput.printf("	name: %s\n",name.getString());
 		stdoutput.printf("	cursor id: %d\n",cursor->getId());
+		debugEnd();
 	}
-	debugEnd();
 
 	// remove stmt/portal -> cursor mapping
 	dict->removeAndArrayDeleteKey((char *)name.getString());
