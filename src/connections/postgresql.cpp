@@ -182,7 +182,7 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		uint64_t	affectedrows;
 		int		currentrow;
 
-		char		typenamebuffer[32];
+		char		**typenamebuffer;
 		char		tablenamebuffer[32];
 
 		postgresqlconnection	*postgresqlconn;
@@ -729,6 +729,10 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	justexecuted=false;
 #endif
+	typenamebuffer=new char *[conn->cont->getMaxColumnCount()];
+	for (uint32_t i=0; i<conn->cont->getMaxColumnCount(); i++) {
+		typenamebuffer[i]=new char[32];
+	}
 }
 
 postgresqlcursor::~postgresqlcursor() {
@@ -743,6 +747,10 @@ postgresqlcursor::~postgresqlcursor() {
 	delete[] bindlengths;
 	delete[] bindformats;
 #endif
+	for (uint32_t i=0; i<conn->cont->getMaxColumnCount(); i++) {
+		delete[] typenamebuffer[i];
+	}
+	delete[] typenamebuffer;
 }
 
 #if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
@@ -1407,9 +1415,10 @@ const char *postgresqlcursor::getColumnTypeName(uint32_t col) {
 	// typemangling=2 means return the name as a string
 	Oid	pgfieldtype=PQftype(pgresult,col);
 	if (!postgresqlconn->typemangling) {
-		charstring::printf(typenamebuffer,sizeof(typenamebuffer),
+		charstring::printf(typenamebuffer[col],
+						sizeof(typenamebuffer[col]),
 						"%d",(int32_t)pgfieldtype);
-		return typenamebuffer;
+		return typenamebuffer[col];
 	}
 	return postgresqlconn->datatypes.getValue((int32_t)pgfieldtype);
 }
