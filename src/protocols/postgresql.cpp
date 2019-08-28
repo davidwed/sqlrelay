@@ -1214,8 +1214,7 @@ bool sqlrprotocol_postgresql::sendResultSet(sqlrservercursor *cursor,
 							uint16_t colcount,
 							uint32_t maxrows) {
 
-	// FIXME: pay attention to maxrows
-
+	uint32_t	fetched=0;
 	for (;;) {
 
 		bool	error;
@@ -1233,6 +1232,11 @@ bool sqlrprotocol_postgresql::sendResultSet(sqlrservercursor *cursor,
 
 		// FIXME: kludgy
 		cont->nextRow(cursor);
+
+		fetched++;
+		if (maxrows && fetched==maxrows) {
+			break;
+		}
 	}
 
 	return sendCommandComplete(cursor);
@@ -1596,8 +1600,8 @@ bool sqlrprotocol_postgresql::sendDataRow(sqlrservercursor *cursor,
 		} else {
 
 			// FIXME: currently, we only support text format, but
-			// we should send binary if the client requested it in
-			// the resultformatcodes
+			// we should send binary if the client requested it
+			// (in the resultformatcodes???)
 
 			writeBE(&resppacket,(uint32_t)fieldlength);
 			write(&resppacket,field,fieldlength);
@@ -1894,7 +1898,6 @@ bool sqlrprotocol_postgresql::bind() {
 	uint16_t	*paramformatcodes=NULL;
 	uint32_t	*oids=NULL;
 	if (paramformatcodecount) {
-		// FIXME: use the bind pool
 		paramformatcodes=new uint16_t[paramformatcodecount];
 		for (uint16_t i=0; i<paramformatcodecount; i++) {
 			readBE(rp,&(paramformatcodes[i]),&rp);
@@ -1980,15 +1983,17 @@ bool sqlrprotocol_postgresql::bind() {
 		debugEnd(1);
 	}
 
+	delete[] paramformatcodes;
+
 	// set the bind count
 	cont->setInputBindCount(cursor,paramvaluecount);
 
 	// result format codes...
+	// FIXME: do something with these...
 	uint16_t	resultformatcodecount;
 	readBE(rp,&resultformatcodecount,&rp);
 	uint16_t	*resultformatcodes=NULL;
 	if (resultformatcodecount) {
-		// FIXME: use the bind pool
 		resultformatcodes=new uint16_t[resultformatcodecount];
 		for (uint16_t i=0; i<resultformatcodecount; i++) {
 			readBE(rp,&(resultformatcodes[i]),&rp);
@@ -2006,7 +2011,6 @@ bool sqlrprotocol_postgresql::bind() {
 	}
 	debugEnd();
 
-	delete[] paramformatcodes;
 	delete[] resultformatcodes;
 
 	// response packet data structure
@@ -2328,8 +2332,11 @@ bool sqlrprotocol_postgresql::sendNoData() {
 
 bool sqlrprotocol_postgresql::execute() {
 
-	// FIXME: if maxrows != 0 and there were rows left to fetch, then
-	// execute will be called again to fetch more of the result set
+	// FIXME: if maxrows != 0 in a previous execute() and there were rows
+	// left to fetch, then execute will be called again to fetch more of
+	// the result set
+	//
+	// how to test this???
 
 	// request packet data structure:
 	//
