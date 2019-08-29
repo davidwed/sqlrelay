@@ -1020,10 +1020,6 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 	// build response packet
 	resppacket.clear();
 
-	// FIXME: somehow the real server sends:
-	// psql: FATAL:  password authentication failed for user "testuser"
-	// when a login fails.  It's not clear what field the "psql" is sent in.
-
 	write(&resppacket,(unsigned char)FIELD_TYPE_SEVERITY);
 	write(&resppacket,severity);
 	write(&resppacket,(unsigned char)'\0');
@@ -2072,6 +2068,20 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 	bv->isnull=cont->nonNullBindValue();
 
 	switch (oid) {
+		case 16: //bool
+		case 1000: //_bool
+			{
+			unsigned char	value=0;
+			bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
+			read(rp,&value,rpout);
+			bv->value.integerval=value;
+			if (getDebug()) {
+				stdoutput.printf("		"
+						"value: %lld\n",
+						bv->value.integerval);
+			}
+			}
+			break;
 		case 21: //int2
 		case 1005: //_int2
 			{
@@ -2154,33 +2164,63 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 		case 1043: //varchar
 			bindTextParameter(rp,paramlength,bindpool,bv,rpout);
 			break;
-		case 16: //bool
-		case 1000: //_bool
-			// FIXME: support this
-		case 1700: //numeric
-		case 1231: //_numeric
-			// FIXME: support this (decimal with precision/scale)
+		case 25: //text
+		case 1009: //_text
+			{
+			bv->type=SQLRSERVERBINDVARTYPE_CLOB;
+			bv->valuesize=paramlength;
+			bv->value.stringval=
+				(char *)bindpool->allocate(bv->valuesize+1);
+			read(rp,bv->value.stringval,bv->valuesize,rpout);
+			bv->value.stringval[bv->valuesize]='\0';
+			bv->isnull=cont->nonNullBindValue();
+			if (getDebug()) {
+				stdoutput.printf("		"
+						"value: %s\n",
+						bv->value.stringval);
+			}
+			}
+			break;
+		case 17: //bytea
+		case 1001: //_bytea
+			{
+			bv->type=SQLRSERVERBINDVARTYPE_BLOB;
+			bv->valuesize=paramlength;
+			bv->value.stringval=
+				(char *)bindpool->allocate(bv->valuesize);
+			read(rp,bv->value.stringval,bv->valuesize,rpout);
+			bv->isnull=cont->nonNullBindValue();
+			if (getDebug()) {
+				stdoutput.printf("		value: ");
+				stdoutput.safePrint(bv->value.stringval,
+							bv->valuesize);
+				stdoutput.printf("\n");
+			}
+			}
+			break;
 		case 1082: //date
 		case 1182: //_date
 			// FIXME: support this
+			// 4 bytes, number of days since 4713BC
 		case 1083: //time
 		case 1183: //_time
 			// FIXME: support this
-		case 1114: //timestamp
-		case 1115: //_timestamp
-			// FIXME: support this
+			// 8 bytes, microseconds since midnight
 		case 1266: //timetz
 		case 1270: //_timetz
 			// FIXME: support this
+			// 8 bytes, microseconds since midnight (+tz?)
+		case 1114: //timestamp
+		case 1115: //_timestamp
+			// FIXME: support this
+			// 8 bytes, microseconds since 4713BC
 		case 1184: //timestamptz
 		case 1185: //_timestamptz
 			// FIXME: support this
-		case 25: //text
-		case 1009: //_text
-			// FIXME: support this (clob)
-		case 17: //bytea
-		case 1001: //_bytea
-			// FIXME: support this (blob)
+			// 8 bytes, microseconds since 4713BC (+tz?)
+		case 1700: //numeric
+		case 1231: //_numeric
+			// FIXME: support this (decimal with precision/scale)
 
 
 		// the rest of these are probably rare...
