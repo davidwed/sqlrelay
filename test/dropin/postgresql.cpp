@@ -2,6 +2,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
 #include <rudiments/environment.h>
+#include <rudiments/stringbuffer.h>
 #include <rudiments/stdio.h>
 
 void checkSuccess(const char *value, const char *success) {
@@ -317,9 +318,16 @@ int	main(int argc, char **argv) {
 
 	PQclear(pgresult);
 
-	query="drop table testtable";
+	for (uint32_t i=0; i<10000; i++) {
+		stringbuffer	str;
+		str.append("insert into testtable values (")->append(i)->append(",1.1,1.1,1,'testchar1','testvarchar1','01/01/2001','01:00:00',NULL)");
+		pgresult=PQexec(pgconn,str.getString());
+		PQclear(pgresult);
+	}
+
+	/*query="drop table testtable";
 	pgresult=PQexec(pgconn,query);
-	PQclear(pgresult);
+	PQclear(pgresult);*/
 
 	PQfinish(pgconn);
 }

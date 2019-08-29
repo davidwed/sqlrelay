@@ -197,6 +197,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		dictionary<char *, sqlrservercursor *>	stmtcursormap;
 		dictionary<char *, sqlrservercursor *>	portalcursormap;
 		dictionary<sqlrservercursor *, uint32_t *>	paramoids;
+		dictionary<sqlrservercursor *, bool>		executeflag;
 };
 
 
@@ -1757,6 +1758,10 @@ bool sqlrprotocol_postgresql::parse() {
 		stmtcursormap.setValue(charstring::duplicate(stmtname),cursor);
 	} 
 
+	// set the execute flag true
+	// (see execute() method for more info on this)
+	executeflag.setValue(cursor,true);
+
 	// get query
 	const char	*query=(const char *)rp;
 	while (*rp && rp!=rpend) {
@@ -1878,6 +1883,10 @@ bool sqlrprotocol_postgresql::bind() {
 	// get and clear the bind pool
 	memorypool		*bindpool=cont->getBindPool(cursor);
 	bindpool->clear();
+
+	// (re)set the execute flag
+	// (see execute() method for more info on this)
+	executeflag.setValue(cursor,true);
 
 	// get the input binds
 	sqlrserverbindvar	*inbinds=cont->getInputBinds(cursor);
@@ -2332,12 +2341,6 @@ bool sqlrprotocol_postgresql::sendNoData() {
 
 bool sqlrprotocol_postgresql::execute() {
 
-	// FIXME: if maxrows != 0 in a previous execute() and there were rows
-	// left to fetch, then execute will be called again to fetch more of
-	// the result set
-	//
-	// how to test this???
-
 	// request packet data structure:
 	//
 	// data {
@@ -2361,23 +2364,46 @@ bool sqlrprotocol_postgresql::execute() {
 		return sendErrorResponse("ERROR","26000","Invalid portal name");
 	}
 
+	// get the execute flag...
+	// If the client passes a non-zero maxrows, and fetches all of them,
+	// then it will re-issue an execute command to fetch more rows.  In
+	// that case, we don't want to actually re-execute the query, just
+	// send more rows.  So, to handle this, we set the execute flag to
+	// true during prepare/bind phases, and false below.  If we get
+	// multiple execute commands without prepare/bind in between, then
+	// the flag will remain false, and we'll know to just fetch and return
+	// rows, rather than actually re-execute the query.
+	bool	exec=executeflag.getValue(cursor);
+
 	if (getDebug()) {
 		debugStart("Execute");
 		stdoutput.printf("	portal name: %s\n",portal.getString());
 		stdoutput.printf("	cursor id: %d\n",cursor->getId());
 		stdoutput.printf("	max rows: %d\n",maxrows);
+		if (!exec) {
+			stdoutput.printf("	(actually executing)\n");
+		} else {
+			stdoutput.printf("	(just fetching more rows)\n");
+		}
 		debugEnd();
 	}
 
-	// execute the query
-	if (!cont->executeQuery(cursor,true,true,true,true)) {
-		return sendCursorError(cursor);
-	}
+	// only execute the query if the flag is set
+	if (exec) {
 
-	if (emptyQuery(cont->getQueryBuffer(cursor))) {
-		return sendEmptyQueryResponse();
-	}
+		// set the execute flag false
+		executeflag.setValue(cursor,false);
 
+		// handle an empty query
+		if (emptyQuery(cont->getQueryBuffer(cursor))) {
+			return sendEmptyQueryResponse();
+		}
+
+		// execute the query
+		if (!cont->executeQuery(cursor,true,true,true,true)) {
+			return sendCursorError(cursor);
+		}
+	}
 	return sendQueryResult(cursor,false,maxrows);
 }
 
