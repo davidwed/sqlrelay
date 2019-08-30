@@ -1638,8 +1638,8 @@ bool sqlrprotocol_postgresql::sendCommandComplete(sqlrservercursor *cursor) {
 	stringbuffer	commandtag;
 	const char	*query=cont->getQueryBuffer(cursor);
 	const char	*q=cont->skipWhitespaceAndComments(query);
-	const char	*end=charstring::findFirst(q,' ');
-	if (!charstring::compareIgnoringCase(end+1,"table",5)) {
+	const char	*end=charstring::findFirstOrEnd(q,' ');
+	if (*end && !charstring::compareIgnoringCase(end+1,"table",5)) {
 		end=end+6;
 	}
 	char	*newq=charstring::duplicate(q,end-q);
