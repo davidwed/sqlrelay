@@ -2420,7 +2420,7 @@ bool sqlrprotocol_postgresql::execute() {
 		stdoutput.printf("	portal name: %s\n",portal.getString());
 		stdoutput.printf("	cursor id: %d\n",cursor->getId());
 		stdoutput.printf("	max rows: %d\n",maxrows);
-		if (!exec) {
+		if (exec) {
 			stdoutput.printf("	(actually executing)\n");
 		} else {
 			stdoutput.printf("	(just fetching more rows)\n");
