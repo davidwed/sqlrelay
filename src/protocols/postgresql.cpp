@@ -2127,9 +2127,11 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 		case 700: //float4
 		case 1021: //_float4
 			{
-			float	value=0;
 			bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-			read(rp,&value,rpout);
+			uint32_t	val;
+			readBE(rp,&val,rpout);
+			float		value;
+			bytestring::copy(&value,&val,sizeof(val));
 			bv->value.doubleval.value=value;
 			bv->value.doubleval.precision=0;
 			bv->value.doubleval.scale=0;
@@ -2143,10 +2145,11 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 		case 701: //float8
 		case 1022: //_float8
 			{
-			double	value=0;
 			bv->type=SQLRSERVERBINDVARTYPE_DOUBLE;
-			read(rp,&value,rpout);
-			bv->value.doubleval.value=value;
+			uint64_t	val;
+			readBE(rp,&val,rpout);
+			bytestring::copy(&bv->value.doubleval.value,
+							&val,sizeof(val));
 			bv->value.doubleval.precision=0;
 			bv->value.doubleval.scale=0;
 			if (getDebug()) {
