@@ -2198,6 +2198,57 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 			}
 			}
 			break;
+		case 1700: //numeric
+		case 1231: //_numeric
+			{
+			uint16_t	ndigits;
+			uint16_t	weight;
+			uint16_t	sign;
+			uint16_t	dscale;
+			readBE(rp,&ndigits,&rp);
+			readBE(rp,&weight,&rp);
+			readBE(rp,&sign,&rp);
+			readBE(rp,&dscale,&rp);
+			stringbuffer	str;
+			if (sign) {
+				str.append('-');
+			}
+			for (uint16_t i=0; i<ndigits; i++) {
+				uint16_t	digit;
+				readBE(rp,&digit,&rp);
+				if (!i) {
+					str.append(digit);
+				} else {
+					str.writeFormatted("%04d",digit);
+				}
+			}
+			
+			bv->type=SQLRSERVERBINDVARTYPE_STRING;
+			bv->valuesize=str.getSize();
+			bv->value.stringval=(char *)bindpool->
+						allocate(str.getSize()+1);
+			charstring::copy(bv->value.stringval,
+						str.getString(),
+						str.getSize());
+			bv->value.stringval[str.getSize()]='\0';
+			bv->isnull=cont->nonNullBindValue();
+
+			if (getDebug()) {
+				stdoutput.printf("		"
+						"ndigits: %hd\n",ndigits);
+				stdoutput.printf("		"
+						"weight: %hd\n",weight);
+				stdoutput.printf("		"
+						"sign: %hd\n",sign);
+				stdoutput.printf("		"
+						"dscale: %hd\n",dscale);
+				stdoutput.printf("		"
+						"value: %.*s\n",
+						bv->valuesize,
+						bv->value.stringval);
+			}
+			}
+			break;
 		case 1082: //date
 		case 1182: //_date
 			// FIXME: support this
@@ -2218,9 +2269,6 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 		case 1185: //_timestamptz
 			// FIXME: support this
 			// 8 bytes, microseconds since 4713BC (+tz?)
-		case 1700: //numeric
-		case 1231: //_numeric
-			// FIXME: support this (decimal with precision/scale)
 
 
 		// the rest of these are probably rare...
