@@ -1,6 +1,8 @@
 1.6.1 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute
 	fixed postgresql connection module type oid bug
+	added tag filter/moduledata
+	added moduledata(s)::closeResultSet()/endTransaction()/endSession()
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3
