@@ -9,21 +9,47 @@ sqlrmd_tag::sqlrmd_tag(domnode *parameters) : sqlrmoduledata(parameters) {
 }
 
 sqlrmd_tag::~sqlrmd_tag() {
-	tagmap.clearAndArrayDeleteValues();
+	avltree<dictionarynode<uint16_t, avltree<char *> *> *>
+						*tree=tags.getTree();
+	for (avltreenode<dictionarynode<uint16_t, avltree<char *> *> *>
+						*node=tree->getFirst();
+					node; node=tree->getNext(node)) {
+		delete[] node->getValue()->getValue();
+	}
+	tags.clearAndArrayDeleteValues();
 }
 
-void sqlrmd_tag::setTag(uint16_t cursorid, const char *tag) {
-	tagmap.removeAndArrayDeleteValue(cursorid);
-	tagmap.setValue(cursorid,charstring::duplicate(tag));
+void sqlrmd_tag::addTag(uint16_t cursorid, const char *tag) {
+	avltree<char *>	*tree=tags.getValue(cursorid);
+	if (tree && tree->find((char *)tag)) {
+		return;
+	}
+	if (!tree) {
+		avltree<char *>	*tree=new avltree<char *>();
+		tags.setValue(cursorid,tree);
+	}
+	tree->insert(charstring::duplicate(tag));
 }
 
-void sqlrmd_tag::setTag(uint16_t cursorid, const char *tag, size_t size) {
-	tagmap.removeAndArrayDeleteValue(cursorid);
-	tagmap.setValue(cursorid,charstring::duplicate(tag,size));
+void sqlrmd_tag::addTag(uint16_t cursorid, const char *tag, size_t size) {
+	avltree<char *>	*tree=tags.getValue(cursorid);
+	if (tree && tree->find((char *)tag)) {
+		return;
+	}
+	if (!tree) {
+		avltree<char *>	*tree=new avltree<char *>();
+		tags.setValue(cursorid,tree);
+	}
+	tree->insert(charstring::duplicate(tag,size));
 }
 
-const char *sqlrmd_tag::getTag(uint16_t cursorid) {
-	return tagmap.getValue(cursorid);;
+avltree<char *> *sqlrmd_tag::getTags(uint16_t cursorid) {
+	return tags.getValue(cursorid);
+}
+
+bool sqlrmd_tag::tagExists(uint16_t cursorid, const char *tag) {
+	avltree<char *>	*tree=tags.getValue(cursorid);
+	return (tree && tree->find((char *)tag));
 }
 
 extern "C" {

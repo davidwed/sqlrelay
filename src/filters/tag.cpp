@@ -7,6 +7,8 @@
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
+#include "../moduledatas/sqlrmoduledata_tag.h"
+
 enum scope_t {
 	SCOPE_QUERY=0,
 	SCOPE_OUTSIDE_QUOTES,
@@ -36,6 +38,8 @@ class SQLRSERVER_DLLSPEC sqlrfilter_tag : public sqlrfilter {
 		bool		hasscope;
 
 		bool	enabled;
+
+		sqlrmd_tag	*md;
 };
 
 sqlrfilter_tag::sqlrfilter_tag(sqlrservercontroller *cont,
@@ -95,6 +99,14 @@ sqlrfilter_tag::sqlrfilter_tag(sqlrservercontroller *cont,
 		}
 		i++;
 	}
+
+	// get the moduledata
+	const char	*moduledataid=
+			parameters->getAttributeValue("moduledataid");
+	if (!charstring::isNullOrEmpty(moduledataid)) {
+		moduledataid="tags";
+	}
+	md=(sqlrmd_tag *)cont->getModuleData(moduledataid);
 }
 
 sqlrfilter_tag::~sqlrfilter_tag() {
@@ -233,8 +245,12 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 	}
 	delete[] parts;
 
-	// FIXME: create tag in module data
+	// create tag in module data
+	if (md) {
+		md->addTag(sqlrcur->getId(),tag);
+	}
 
+	// always return true, we're not actually filtering out queries
 	return true;
 }
 

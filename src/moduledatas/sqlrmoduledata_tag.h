@@ -5,19 +5,21 @@
 #define SQLRMODULEDATA_TAG_H
 
 #include <sqlrelay/sqlrserver.h>
+#include <rudiments/dictionary.h>
+#include <rudiments/avltree.h>
 
 class SQLRSERVER_DLLSPEC sqlrmd_tag : public sqlrmoduledata {
 	public:
 		sqlrmd_tag(domnode *parameters);
 		~sqlrmd_tag();
 		
-		void		setTag(uint16_t cursorid, const char *tag);
-		void		setTag(uint16_t cursorid,
-					const char *tag, size_t size);
-		const char	*getTag(uint16_t cursorid);
+		void	addTag(uint16_t cursorid, const char *tag);
+		void	addTag(uint16_t cursorid, const char *tag, size_t size);
+		avltree<char *>	*getTags(uint16_t cursorid);
+		bool	tagExists(uint16_t cursorid, const char *tag);
 
 	private:
-		dictionary<uint16_t, char *>	tagmap;
+		dictionary<uint16_t, avltree<char *> *>	tags;
 };
 
 #endif
