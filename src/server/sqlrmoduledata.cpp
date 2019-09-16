@@ -36,3 +36,12 @@ const char *sqlrmoduledata::getId() {
 domnode *sqlrmoduledata::getParameters() {
 	return pvt->_parameters;
 }
+
+void sqlrmoduledata::closeResultSet(sqlrservercursor *sqlrcur) {
+}
+
+void sqlrmoduledata::endTransaction(bool commit) {
+}
+
+void sqlrmoduledata::endSession() {
+}

@@ -2609,6 +2609,10 @@ class SQLRSERVER_DLLSPEC sqlrmoduledata {
 
 		domnode		*getParameters();
 
+		virtual void	closeResultSet(sqlrservercursor *sqlrcur);
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	#include <sqlrelay/private/sqlrmoduledata.h>
 };
 
@@ -2620,6 +2624,10 @@ class SQLRSERVER_DLLSPEC sqlrmoduledatas {
 		bool	load(domnode *parameters);
 
 		sqlrmoduledata	*getModuleData(const char *id);
+
+		void	closeResultSet(sqlrservercursor *sqlrcur);
+		void	endTransaction(bool commit);
+		void	endSession();
 
 	#include <sqlrelay/private/sqlrmoduledatas.h>
 };
@@ -2633,6 +2641,8 @@ class SQLRSERVER_DLLSPEC sqlrmoduledata_tag : public sqlrmoduledata {
 		void	addTag(uint16_t cursorid, const char *tag, size_t size);
 		avltree<char *>	*getTags(uint16_t cursorid);
 		bool	tagExists(uint16_t cursorid, const char *tag);
+
+		void	closeResultSet(sqlrservercursor *sqlrcur);
 
 	#include <sqlrelay/private/sqlrmoduledata_tag.h>
 };

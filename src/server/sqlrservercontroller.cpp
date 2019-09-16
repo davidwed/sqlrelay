@@ -2381,6 +2381,11 @@ void sqlrservercontroller::endTransaction(bool commit) {
 		pvt->_sqlrq->endTransaction(commit);
 	}
 
+	// reset module datas
+	if (pvt->_sqlrmd) {
+		pvt->_sqlrmd->endTransaction(commit);
+	}
+
 	// clear per-session pool
 	pvt->_txpool.clear();
 
@@ -5674,6 +5679,11 @@ void sqlrservercontroller::endSession() {
 	// reset auth modules
 	if (pvt->_sqlra) {
 		pvt->_sqlra->endSession();
+	}
+
+	// reset module datas
+	if (pvt->_sqlrmd) {
+		pvt->_sqlrmd->endSession();
 	}
 
 	// clear per-session pool
@@ -9300,6 +9310,9 @@ void sqlrservercontroller::closeLobField(sqlrservercursor *cursor,
 
 void sqlrservercontroller::closeResultSet(sqlrservercursor *cursor) {
 	cursor->closeResultSet();
+	if (pvt->_sqlrmd) {
+		pvt->_sqlrmd->closeResultSet(cursor);
+	}
 }
 
 uint16_t sqlrservercontroller::getId(sqlrservercursor *cursor) {

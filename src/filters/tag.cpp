@@ -101,7 +101,7 @@ sqlrfilter_tag::sqlrfilter_tag(sqlrservercontroller *cont,
 	// get the moduledata
 	const char	*moduledataid=
 			parameters->getAttributeValue("moduledataid");
-	if (!charstring::isNullOrEmpty(moduledataid)) {
+	if (charstring::isNullOrEmpty(moduledataid)) {
 		moduledataid="tags";
 	}
 	md=(sqlrmoduledata_tag *)cont->getModuleData(moduledataid);
@@ -123,6 +123,10 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 		return true;
 	}
 
+	if (!md) {
+		return true;
+	}
+
 	// split the string on single-quotes if necessary
 	// (NOTE: this presumes that backslash-escaped quotes
 	// have been normalized by the normalize translation)
@@ -133,8 +137,7 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 	}
 
 	// run through the patterns until one of them fails...
-	const char	*tag=NULL;
-	for (uint32_t i=0; i<patterncount && !tag; i++) {
+	for (uint32_t i=0; i<patterncount; i++) {
 
 		pattern_t	*pc=&(p[i]);
 
@@ -144,7 +147,8 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 			// handle regex patterns
 			if (pc->re && pc->re->match(query)) {
 
-				tag=pc->tag;
+				// create tag in module data
+				md->addTag(sqlrcur->getId(),pc->tag);
 
 			// handle string patterns
 			} else {
@@ -171,8 +175,10 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 				}
 
 				// compare
-				if (!charstring::contains(qry,ptrn)) {
-					tag=pc->tag;
+				if (charstring::contains(qry,ptrn)) {
+
+					// create tag in module data
+					md->addTag(sqlrcur->getId(),pc->tag);
 				}
 
 				// clean up
@@ -193,12 +199,13 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 		}
 
 		// check every other part...
-		for (uint64_t j=start; j<partcount && !tag; j=j+2) {
+		for (uint64_t j=start; j<partcount; j=j+2) {
 
 			// handle regex patterns
 			if (pc->re && pc->re->match(parts[j])) {
 
-				tag=pc->tag;
+				// create tag in module data
+				md->addTag(sqlrcur->getId(),pc->tag);
 
 			// handle string patterns
 			} else {
@@ -226,8 +233,10 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 				}
 
 				// compare
-				if (!charstring::contains(prt,ptrn)) {
-					tag=pc->tag;
+				if (charstring::contains(prt,ptrn)) {
+
+					// create tag in module data
+					md->addTag(sqlrcur->getId(),pc->tag);
 				}
 
 				// clean up
@@ -242,11 +251,6 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 		delete[] parts[k];
 	}
 	delete[] parts;
-
-	// create tag in module data
-	if (md) {
-		md->addTag(sqlrcur->getId(),tag);
-	}
 
 	// always return true, we're not actually filtering out queries
 	return true;

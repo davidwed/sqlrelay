@@ -21,6 +21,7 @@ class sqlrfilterplugin {
 	public:
 		sqlrfilter	*f;
 		dynamiclib	*dl;
+		const char	*module;
 };
 
 class sqlrfiltersprivate {
@@ -60,19 +61,8 @@ bool sqlrfilters::load(domnode *parameters) {
 		if (charstring::contains(
 				filter->getAttributeValue("when"),
 				"before")) {
-
-			// add filter to before list
-			if (pvt->_debug) {
-				stdoutput.printf("loading filter before ...\n");
-			}
 			loadFilter(filter,&pvt->_beforefilters);
-
 		} else {
-
-			// add filter to after list
-			if (pvt->_debug) {
-				stdoutput.printf("loading filter after ...\n");
-			}
 			loadFilter(filter,&pvt->_afterfilters);
 		}
 	}
@@ -121,7 +111,9 @@ void sqlrfilters::loadFilter(domnode *filter,
 	}
 
 	if (pvt->_debug) {
-		stdoutput.printf("loading filter: %s\n",module);
+		stdoutput.printf("loading %s-filter module: %s\n",
+				(list==&pvt->_beforefilters)?"before":"after",
+				module);
 	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
@@ -180,6 +172,7 @@ void sqlrfilters::loadFilter(domnode *filter,
 	sqlrfilterplugin	*sqlrfp=new sqlrfilterplugin;
 	sqlrfp->f=f;
 	sqlrfp->dl=dl;
+	sqlrfp->module=module;
 	list->append(sqlrfp);
 }
 
@@ -222,7 +215,9 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 						node; node=node->getNext()) {
 
 		if (pvt->_debug) {
-			stdoutput.printf("\nrunning filter...\n\n");
+			stdoutput.printf("\nrunning %s-filter: %s...\n\n",
+				(list==&pvt->_beforefilters)?"before":"after",
+				node->getValue()->module);
 		}
 
 		sqlrfilter	*f=node->getValue()->f;
