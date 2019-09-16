@@ -2624,4 +2624,17 @@ class SQLRSERVER_DLLSPEC sqlrmoduledatas {
 	#include <sqlrelay/private/sqlrmoduledatas.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlrmoduledata_tag : public sqlrmoduledata {
+	public:
+		sqlrmoduledata_tag(domnode *parameters);
+		~sqlrmoduledata_tag();
+		
+		void	addTag(uint16_t cursorid, const char *tag);
+		void	addTag(uint16_t cursorid, const char *tag, size_t size);
+		avltree<char *>	*getTags(uint16_t cursorid);
+		bool	tagExists(uint16_t cursorid, const char *tag);
+
+	#include <sqlrelay/private/sqlrmoduledata_tag.h>
+};
+
 #endif

@@ -7,8 +7,6 @@
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
-#include "../moduledatas/sqlrmoduledata_tag.h"
-
 enum scope_t {
 	SCOPE_QUERY=0,
 	SCOPE_OUTSIDE_QUOTES,
@@ -39,7 +37,7 @@ class SQLRSERVER_DLLSPEC sqlrfilter_tag : public sqlrfilter {
 
 		bool	enabled;
 
-		sqlrmd_tag	*md;
+		sqlrmoduledata_tag	*md;
 };
 
 sqlrfilter_tag::sqlrfilter_tag(sqlrservercontroller *cont,
@@ -106,7 +104,7 @@ sqlrfilter_tag::sqlrfilter_tag(sqlrservercontroller *cont,
 	if (!charstring::isNullOrEmpty(moduledataid)) {
 		moduledataid="tags";
 	}
-	md=(sqlrmd_tag *)cont->getModuleData(moduledataid);
+	md=(sqlrmoduledata_tag *)cont->getModuleData(moduledataid);
 }
 
 sqlrfilter_tag::~sqlrfilter_tag() {
