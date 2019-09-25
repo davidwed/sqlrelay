@@ -3812,7 +3812,6 @@ void sqlrprotocol_mysql::buildLobField(sqlrservercursor *cursor,
 	uint64_t	charstoread=sizeof(lobbuffer)/MAX_BYTES_PER_CHAR;
 	uint64_t	charsread=0;
 	uint64_t	offset=0;
-	bool		start=true;
 
 	// FIXME: kludgy
 	// this is necessary to open the lob, at least with mysql
@@ -3827,28 +3826,13 @@ void sqlrprotocol_mysql::buildLobField(sqlrservercursor *cursor,
 					offset,charstoread,&charsread) ||
 					!charsread) {
 
-			cont->closeLobField(cursor,col);
-
 			// if we fail to get a segment or got nothing...
-			if (start) {
-				// if we haven't started sending yet,
-				// then send a NULL as 0xfb
-				write(&resppacket,(char)0xfb);
-				return;
-			} else {
-				// otherwise just end normally
-				writeLenEncInt(&resppacket,
-							temp.getSize());
-				write(&resppacket,temp.getBuffer(),
-							temp.getSize());
-				return;
-			}
+			cont->closeLobField(cursor,col);
+			writeLenEncInt(&resppacket,temp.getSize());
+			write(&resppacket,temp.getBuffer(),temp.getSize());
+			return;
 
 		} else {
-
-			if (start) {
-				start=false;
-			}
 
 			// append the segment we just got
 			temp.append(lobbuffer,charsread);
