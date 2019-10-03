@@ -776,6 +776,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *endptr);
 		bool		skipWhitespace(const char **ptr,
 						const char *endptr);
+		bool		skipWhitespaceAndComments(
+						const char **ptr,
+						const char *endptr);
 		const char	*skipWhitespaceAndComments(const char *query);
 
 		bool	parseDateTime(const char *datetime,

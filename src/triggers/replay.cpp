@@ -141,7 +141,6 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 	this->cont=cont;
 
 	debug=cont->getConfig()->getDebugTriggers();
-debug=true;
 
 	// get whether to include selects
 	includeselects=charstring::isYes(
@@ -280,13 +279,11 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 	// bail if the query was a select, and we're ignoring selects
 	if (!includeselects && querytype==QUERYTYPE_SELECT) {
-debug=false;
 		if (debug) {
 			stdoutput.printf("ignoring query:\n%.*s\n}\n",
 						sqlrcur->getQueryLength(),
 						sqlrcur->getQueryBuffer());
 		}
-debug=true;
 		deleteCols(cols,colcount);
 		return true;
 	}
