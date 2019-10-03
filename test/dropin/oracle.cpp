@@ -243,4 +243,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(currentrow,1);
 	checkSuccess((const char *)field,"hello");
 	stdoutput.printf("\n\n");
+
+	return 0;
 }

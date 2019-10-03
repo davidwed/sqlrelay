@@ -142,4 +142,6 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	mysql_close(&mysql);
+
+	return 0;
 }

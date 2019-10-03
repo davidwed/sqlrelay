@@ -330,4 +330,6 @@ int	main(int argc, char **argv) {
 	PQclear(pgresult);*/
 
 	PQfinish(pgconn);
+
+	return 0;
 }

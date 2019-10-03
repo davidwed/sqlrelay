@@ -987,5 +987,7 @@ class tls {
 		checkSuccess(cur.sendQuery("create table testtable"),0);
 		checkSuccess(cur.sendQuery("create table testtable"),0);
 		System.out.println();
+
+		System.exit(0);
 	}
 }

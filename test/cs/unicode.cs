@@ -150,6 +150,8 @@ namespace SQLRClientTest
             checkSuccess(datareader.GetString(0), "abcåñö");
             Console.WriteLine("\n");
             sqlrcon.Close();
+
+            Environment.Exit(0);
         }
     }
 }

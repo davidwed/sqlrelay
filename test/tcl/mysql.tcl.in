@@ -861,5 +861,4 @@ catch {checkSuccess [$cur sendQuery "create table testtable"] 0}
 catch {checkSuccess [$cur sendQuery "create table testtable"] 0}
 puts ""
 
-
-
+exit 0

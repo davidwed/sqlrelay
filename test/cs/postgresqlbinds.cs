@@ -35,6 +35,8 @@ namespace NpgsqlClientTest
 				}
 			}
 		}
+
+            Environment.Exit(0);
         }
     }
 }

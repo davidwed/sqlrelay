@@ -192,8 +192,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		char		**bindvarnames;
 		int16_t		*bindvarnamesizes;
 
-		char		lobbuffer[32768];
-
 		dictionary<char *, sqlrservercursor *>	stmtcursormap;
 		dictionary<char *, sqlrservercursor *>	portalcursormap;
 		dictionary<sqlrservercursor *, uint32_t *>	paramoids;

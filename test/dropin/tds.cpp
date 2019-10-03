@@ -987,4 +987,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(results,CS_END_RESULTS);
 	checkSuccess(ct_cancel(NULL,cmd,CS_CANCEL_ALL),CS_SUCCEED);
 	stdoutput.printf("\n");
+
+	return 0;
 }

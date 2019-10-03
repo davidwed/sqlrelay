@@ -896,6 +896,8 @@ namespace SQLRClientTest
             // invalid queries
 
             sqlrcon.Close();
+
+            Environment.Exit(0);
         }
     }
 }

@@ -870,3 +870,5 @@ checkSuccess(cur.sendQuery("create table testtable"),0);
 checkSuccess(cur.sendQuery("create table testtable"),0);
 checkSuccess(cur.sendQuery("create table testtable"),0);
 console.log();
+
+process.exit(0);

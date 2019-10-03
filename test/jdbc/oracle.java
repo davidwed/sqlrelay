@@ -23,5 +23,7 @@ class oracle {
 		stmt.close();
 
 		con.close();
+
+		System.exit(0);
 	}
 }

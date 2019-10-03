@@ -800,3 +800,5 @@ print("\n");
 
 
 $dbh->disconnect();
+
+exit(0);
