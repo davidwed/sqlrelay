@@ -3059,25 +3059,6 @@ bool sqlrservercontroller::skipWhitespace(const char **ptr,
 	return *ptr!=endptr;
 }
 
-bool sqlrservercontroller::skipWhitespaceAndComments(const char **ptr,
-							const char *endptr) {
-	while (*ptr<endptr) {
-		if (character::isWhitespace(**ptr)) {
-			(*ptr)++;
-		} else if (!charstring::compare(*ptr,"--",2)) {
-			while (**ptr && **ptr!='\n') {
-				(*ptr)++;
-			}
-			if (*ptr<endptr) {
-				(*ptr)++;
-			}
-		} else {
-			break;
-		}
-	}
-	return *ptr!=endptr;
-}
-
 const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
 	if (!query) {
 		return NULL;
