@@ -4,6 +4,7 @@
 	added tag filter/moduledata
 	added moduledata(s)::closeResultSet()/endTransaction()/endSession()
 	mysql protocol returns empty lobs correctly now (not as nulls)
+	configure replaces -lfbclient with -lgds on freebsd/firebird-2.0.3
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3

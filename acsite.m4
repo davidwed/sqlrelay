@@ -2815,6 +2815,14 @@ then
 		fi
 	fi
 
+	dnl freebsd + firebird 2.0.3 segfaults on isc_attach_database,
+	dnl when linked with -lfbclient, but works with -lgds
+	if ( test -n "$FIREBIRDLIBS" -a -n "`uname -a | grep FreeBSD`" -a -n "`pkg_info | grep firebird-client | grep 2\.0\.3`" )
+	then
+		FIREBIRDLIBS=`echo "$FIREBIRDLIBS" | sed -e "s|fbclient|gds|g"`
+		AC_MSG_WARN(replacng -lfbclient with -lgds on FreeBSD/Firebird-2.0.3)
+	fi
+
 	FW_INCLUDES(firebird,[$FIREBIRDINCLUDES])
 	FW_LIBS(firebird,[$FIREBIRDLIBS])
 

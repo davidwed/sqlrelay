@@ -29291,7 +29291,6 @@ $as_echo "$as_me: WARNING: ODBC connection support will not be built." >&2;}
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unicode support missing... ODBC connection support will not be built." >&5
 $as_echo "$as_me: WARNING: unicode support missing... ODBC connection support will not be built." >&2;}
-		ODBCLIBS=""
 	fi
 
 	if ( test -n "$ODBCLIBS" -a -n "$OBCUNICODE" -a -z "$HAVE_ICONV" )
@@ -32410,6 +32409,13 @@ $as_echo "$as_me: WARNING: No Firebird link configuration could be found." >&2;}
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Firebird support will not be built." >&5
 $as_echo "$as_me: WARNING: Firebird support will not be built." >&2;}
 		fi
+	fi
+
+			if ( test -n "$FIREBIRDLIBS" -a -n "`uname -a | grep FreeBSD`" -a -n "`pkg_info | grep firebird-client | grep 2\.0\.3`" )
+	then
+		FIREBIRDLIBS=`echo "$FIREBIRDLIBS" | sed -e "s|fbclient|gds|g"`
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: replacng -lfbclient with -lgds on FreeBSD/Firebird-2.0.3" >&5
+$as_echo "$as_me: WARNING: replacng -lfbclient with -lgds on FreeBSD/Firebird-2.0.3" >&2;}
 	fi
 
 
