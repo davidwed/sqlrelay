@@ -1928,7 +1928,7 @@ then
 			then
 				AC_MSG_CHECKING(if SQLite needs gdbm)
 				SQLITENEEDGDBM=""
-				FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$SQLITELIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
+				FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $SOCKETLIBS $PTHREADLIB],[$LD_LIBRARY_PATH:$SQLITELIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
 			
 				if ( test -n "$SQLITENEEDGDBM" )
 				then
@@ -1960,23 +1960,23 @@ then
 
 		AC_MSG_CHECKING(for sqlite3_stmt)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_stmt *a=0;],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_STMT,1,SQLite supports sqlite3_stmt)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[sqlite3_stmt *a=0;],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_STMT,1,SQLite supports sqlite3_stmt)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(for sqlite3_prepare_v2)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_prepare_v2(0,0,0,0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_PREPARE_V2,1,SQLite supports sqlite3_prepare_v2)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[sqlite3_prepare_v2(0,0,0,0,0);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_PREPARE_V2,1,SQLite supports sqlite3_prepare_v2)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(for sqlite3_malloc)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_malloc(0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_MALLOC,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[sqlite3_malloc(0);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_MALLOC,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(for sqlite3_free with char * argument)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[char *a=0; sqlite3_free(a);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_FREE_WITH_CHAR,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[char *a=0; sqlite3_free(a);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_FREE_WITH_CHAR,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(for sqlite3_column_table_name)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_column_table_name(0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_COLUMN_TABLE_NAME,1,SQLite supports sqlite3_column_table_name)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[sqlite3_column_table_name(0,0);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_COLUMN_TABLE_NAME,1,SQLite supports sqlite3_column_table_name)],[AC_MSG_RESULT(no)])
 
 	fi
 
@@ -2046,7 +2046,7 @@ then
 			dnl some versions of freetds need libiconv, see if
 			dnl a simple test will link
 			LINKFAILED=""
-			FW_TRY_LINK([],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[],[LINKFAILED="yes"])
+			FW_TRY_LINK([],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[],[LINKFAILED="yes"])
 
 			dnl if not, search for iconv
 			if ( test -n "$LINKFAILED" )
@@ -2060,7 +2060,7 @@ then
 				then
 					AC_MSG_CHECKING(whether freetds requires libiconv)
 
-					FW_TRY_LINK([],[],[$FREETDSINCLUDES $ICONVINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $ICONVLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[FREETDSINCLUDES="$FREETDSINCLUDES $ICONVINCLUDES"; FREETDSLIBS="$FREETDSLIBS $ICONVLIBS"; AC_MSG_RESULT(yes)],[FREETDSLIBS=""; FREETDSINCLUDES=""; AC_MSG_RESULT(no)])
+					FW_TRY_LINK([],[],[$FREETDSINCLUDES $ICONVINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $ICONVLIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[FREETDSINCLUDES="$FREETDSINCLUDES $ICONVINCLUDES"; FREETDSLIBS="$FREETDSLIBS $ICONVLIBS"; AC_MSG_RESULT(yes)],[FREETDSLIBS=""; FREETDSINCLUDES=""; AC_MSG_RESULT(no)])
 				else
 					FREETDSLIBS=""
 					FREETDSINCLUDES=""
@@ -2074,7 +2074,7 @@ then
 			then
 				AC_MSG_CHECKING(whether ctpublic.h contains function definitions)
 				FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
 			fi
 		fi
 
@@ -2082,7 +2082,7 @@ then
 		if ( test -n "$FREETDSLIBS" )
 		then
 			AC_MSG_CHECKING(whether tdsver.h exists)
-			FW_TRY_LINK([#include <tdsver.h>],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_H,1,Some versions of FreeTDS have tdsver.h)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tdsver.h>],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_H,1,Some versions of FreeTDS have tdsver.h)],[AC_MSG_RESULT(no)])
 		fi
 
 		dnl if FREETDSLIBS isn't defined at this point, then freetds
