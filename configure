@@ -27435,6 +27435,8 @@ fi
 			HAVE_UNIXODBC="yes"
 		fi
 
+		if ( test -z "$UNIXODBCLIBS" )
+		then
 
 
 SEARCHPATH=$ODBCPATH
@@ -27760,8 +27762,8 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-		if ( test -n "$UNIXODBCLIBS" )
-		then
+			if ( test -n "$UNIXODBCLIBS" )
+			then
 
 
 SEARCHPATH=$ODBCPATH
@@ -28087,7 +28089,8 @@ then
 	eval "=\"$HEADERSANDLIBSPATH\""
 fi
 
-			HAVE_UNIXODBC="yes"
+				HAVE_UNIXODBC="yes"
+			fi
 		fi
 
 
@@ -32411,7 +32414,7 @@ $as_echo "$as_me: WARNING: Firebird support will not be built." >&2;}
 		fi
 	fi
 
-			if ( test -n "$FIREBIRDLIBS" -a -n "`uname -a | grep FreeBSD`" -a -n "`pkg_info | grep firebird-client | grep 2\.0\.3`" )
+			if ( test -n "$FIREBIRDLIBS" -a -n "`uname -a 2> /dev/null | grep FreeBSD`" -a -n "`pkg_info 2> /dev/null | grep firebird-client | grep 2\.0\.3`" )
 	then
 		FIREBIRDLIBS=`echo "$FIREBIRDLIBS" | sed -e "s|fbclient|gds|g"`
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: replacng -lfbclient with -lgds on FreeBSD/Firebird-2.0.3" >&5

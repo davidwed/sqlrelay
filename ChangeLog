@@ -6,6 +6,7 @@
 	mysql protocol returns empty lobs correctly now (not as nulls)
 	configure replaces -lfbclient with -lgds on freebsd/firebird-2.0.3
 	fixed a bug that could cause sqlr-stop to try to kill pid 0
+	fixed unixodbc detection on solaris 11.4
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3

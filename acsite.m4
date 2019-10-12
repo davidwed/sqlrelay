@@ -2322,12 +2322,15 @@ then
 			HAVE_UNIXODBC="yes"
 		fi
 
-		dnl unixodbc (again, in a more common place)...
-		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINCLUDES],[UNIXODBCLIBS],[UNIXODBCLIBSPATH],[UNIXODBCSTATIC])
-		if ( test -n "$UNIXODBCLIBS" )
+		if ( test -z "$UNIXODBCLIBS" )
 		then
-			FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[odbcinst],[sql.h],[odbcinst],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINSTINCLUDES],[UNIXODBCINSTLIBS],[UNIXODBCINSTLIBSPATH],[UNIXODBCINSTSTATIC])
-			HAVE_UNIXODBC="yes"
+			dnl unixodbc (again, in a more common place)...
+			FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINCLUDES],[UNIXODBCLIBS],[UNIXODBCLIBSPATH],[UNIXODBCSTATIC])
+			if ( test -n "$UNIXODBCLIBS" )
+			then
+				FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[odbcinst],[sql.h],[odbcinst],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINSTINCLUDES],[UNIXODBCINSTLIBS],[UNIXODBCINSTLIBSPATH],[UNIXODBCINSTSTATIC])
+				HAVE_UNIXODBC="yes"
+			fi
 		fi
 
 		dnl iodbc...
@@ -2817,7 +2820,7 @@ then
 
 	dnl freebsd + firebird 2.0.3 segfaults on isc_attach_database,
 	dnl when linked with -lfbclient, but works with -lgds
-	if ( test -n "$FIREBIRDLIBS" -a -n "`uname -a | grep FreeBSD`" -a -n "`pkg_info | grep firebird-client | grep 2\.0\.3`" )
+	if ( test -n "$FIREBIRDLIBS" -a -n "`uname -a 2> /dev/null | grep FreeBSD`" -a -n "`pkg_info 2> /dev/null | grep firebird-client | grep 2\.0\.3`" )
 	then
 		FIREBIRDLIBS=`echo "$FIREBIRDLIBS" | sed -e "s|fbclient|gds|g"`
 		AC_MSG_WARN(replacng -lfbclient with -lgds on FreeBSD/Firebird-2.0.3)
