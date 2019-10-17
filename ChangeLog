@@ -1,4 +1,4 @@
-1.6.1 - added postgresql protocol module
+1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute
 	fixed postgresql connection module type oid bug
 	added tag filter/moduledata
