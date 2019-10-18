@@ -1770,6 +1770,7 @@ void mysqlcursor::getField(uint32_t col,
 				*fld=&field[col*
 					conn->cont->getMaxFieldLength()];
 				*fldlength=fieldlength[col];
+stdoutput.printf("%d: fieldlength=%d\n",col,fieldlength[col]);
 			}
 		} else {
 			*null=true;

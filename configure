@@ -38740,7 +38740,8 @@ sed -e "s|@bindir@|$bindir|g" init/sqlrcachemanager.service.in | sed -e "s|@libd
 
 if ( test -r "libtool" )
 then
-	sed -e "s|-lgcc_s -lgcc|-lgcc_s|g" \
+	sed -e "s|-lgcc_s -lgcc |-lgcc_s |g" \
+		-e "s|-lgcc_s -lgcc\"|-lgcc_s\"|g" \
 		-e "s|-lgcc_s_pic|-lgcc_s|g" \
 		libtool > libtool.new
 	mv libtool.new libtool

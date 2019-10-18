@@ -1175,7 +1175,8 @@ dnl don't provide a shraed libgcc_s_pic.
 dnl These cause all kinds of link failures.  Fix them
 if ( test -r "libtool" )
 then
-	sed -e "s|-lgcc_s -lgcc|-lgcc_s|g" \
+	sed -e "s|-lgcc_s -lgcc |-lgcc_s |g" \
+		-e "s|-lgcc_s -lgcc\"|-lgcc_s\"|g" \
 		-e "s|-lgcc_s_pic|-lgcc_s|g" \
 		libtool > libtool.new
 	mv libtool.new libtool
