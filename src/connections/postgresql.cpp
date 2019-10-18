@@ -168,10 +168,11 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 					bool *null);
 		void		closeResultSet();
 
-#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+#if ((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
+		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
 		bool		columnInfoIsValidAfterPrepare();
 #endif
 
@@ -785,6 +786,8 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 		result=false;
 	}
 
+#if defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
+
 	// clean up
 	PQclear(pgresult);
 	pgresult=NULL;
@@ -813,6 +816,7 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// get the col count
 	ncols=PQnfields(pgresult);
+#endif
 
 	return result;
 }
@@ -1057,7 +1061,8 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 #if !((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)))
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) || \
+		!(defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED))
 	// get the col count
 	ncols=PQnfields(pgresult);
 #endif
@@ -1547,10 +1552,11 @@ void postgresqlcursor::closeResultSet() {
 #endif
 }
 
-#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+#if ((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
+		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
 bool postgresqlcursor::columnInfoIsValidAfterPrepare() {
 	return true;
 }

@@ -1782,6 +1782,9 @@ then
 			AC_MSG_CHECKING(if PostgreSQL has PQsetSingleRowMode)
 			FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQsetSingleRowMode(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETSINGLEROWMODE,1,Some versions of postgresql have PQsetSingleRowMode)],[AC_MSG_RESULT(no)])
+			AC_MSG_CHECKING(if PostgreSQL has PQdescribePrepared)
+			FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQdescribePrepared(NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQDESCRIBEPREPARED,1,Some versions of postgresql have PQdescribePrepared)],[AC_MSG_RESULT(no)])
 		fi
 		AC_MSG_CHECKING(if PostgreSQL has PQserverVersion)
 		FW_TRY_LINK([#include <libpq-fe.h>
