@@ -8,6 +8,8 @@
 	fixed a bug that could cause sqlr-stop to try to kill pid 0
 	fixed unixodbc detection on solaris 11.4
 	added configure test for PQdescribePrepared
+	test improvements
+	documentation improvements
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3
