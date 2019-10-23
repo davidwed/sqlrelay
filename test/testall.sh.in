@@ -7,9 +7,17 @@ $PREFIX/bin/sqlr-stop
 sleep 2
 
 # really kill them
-kill `ps aux | grep sqlr-connection | grep -v grep | cut -c10-15` 2> /dev/null
-kill `ps aux | grep sqlr-scaler | grep -v grep | cut -c10-15` 2> /dev/null
-kill `ps aux | grep sqlr-listener | grep -v grep | cut -c10-15` 2> /dev/null
+ps aux > /dev/null 2> /dev/null
+if ( test "$?" = "0" )
+then
+	kill `ps aux | grep sqlr-connection | grep -v grep | cut -c10-15` 2> /dev/null
+	kill `ps aux | grep sqlr-scaler | grep -v grep | cut -c10-15` 2> /dev/null
+	kill `ps aux | grep sqlr-listener | grep -v grep | cut -c10-15` 2> /dev/null
+else
+	kill `ps -efa | grep sqlr-connection | grep -v grep | cut -c10-15` 2> /dev/null
+	kill `ps -efa | grep sqlr-scaler | grep -v grep | cut -c10-15` 2> /dev/null
+	kill `ps -efa | grep sqlr-listener | grep -v grep | cut -c10-15` 2> /dev/null
+fi
 sleep 2
 
 # for each database/configuration...

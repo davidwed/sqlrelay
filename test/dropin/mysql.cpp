@@ -56,6 +56,8 @@ stdoutput.printf("\n%s\n",mysql_error(&mysql));
 
 int	main(int argc, char **argv) {
 
+	#ifdef HAVE_MYSQL_STMT_PREPARE
+
 	const char	*host="127.0.0.1";
 	const char	*port;
 	const char	*socket;
@@ -1437,6 +1439,12 @@ int	main(int argc, char **argv) {
 
 
 	mysql_close(&mysql);
+
+	#else
+
+	stdoutput.printf("\n====== MySQL Client Too Old to Test ======\n\n");
+
+	#endif
 
 	return 0;
 }
