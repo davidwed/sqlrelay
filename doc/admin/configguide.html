@@ -24,7 +24,7 @@
       <li><a href="#db-firebird">Firebird</a></li>
       <li><a href="#db-sqlite">SQLite</a></li>
       <li><a href="#db-odbc-hive">Apache Hive (via ODBC)</a></li>
-      <li><a href="#db-odbc-impala">Impala (via ODBC)</a></li>
+      <li><a href="#db-odbc-impala">Apache Impala (via ODBC)</a></li>
       <li><a href="#db-odbc-redshift">Redshift (via ODBC)</a></li>
       <li><a href="#db-odbc-athena">Athena (via ODBC)</a></li>
       <li><a href="#db-odbc-elastisearch">Elastisearch (via ODBC)</a></li>
@@ -805,9 +805,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><a name="db-odbc-hive"/><h4>Apache Hive (via ODBC)</h4>
 
-<p>Apache Hive is a data warehouse built on top of Apache Hadoop.  An ODBC driver is available for Windows and Linux platforms which implements a SQL interface to Hive.</p>
-
-<p>Cloudera provides Hive ODBC drivers for Windows and Linux.  Both are rather quirky.</p>
+<p>Apache Hive is a data warehouse built on top of Apache Hadoop.  Cloudera provides a Hive ODBC driver for Windows and Linux platforms which implements a SQL interface to Hive.  This driver has some quirks.</p>
 
 <p>The most significant quirk is that version 2.6.4.1004 (and probably other versions) for Linux ship with their own copy of libssl/libcrypto, version 1.1.  These tend to conflict with the versions of libssl/libcrypto that SQL Relay itself is linked against, causing the driver to malfunction.  The only known solution is to build a copy of Rudiments and SQL Relay from source, configuring rudiments with the --disable-ssl --disable-gss --disable-libcurl options, and use this copy to access Hive.  Unfortunately, this has a side effect of disabling all SSL/TLS and Kerberos support in SQL Relay, as well as disabling the ability to load config files over https and ssh.  Perhaps a future version of the Cloudera Hive ODBC driver for Linux will link against the system versions of libssl/libcrypto and eliminate this quirk.</p>
 
@@ -842,9 +840,9 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>The contents of the session tag work around another Hive quirk.  "hivedb" is specified in the db option of the string attribute of the connection tag, but this doesn't appear to be adequate to actually put you in that schema.  Running the "use hivedb" query at the beginning of the session helps.  But, it appears that the schema isn't actually selected until the first query is run.  So, the "select 1" query immediately following the use query solves this.</p>
+<p>The contents of the session tag work around another quirk.  "hivedb" is specified in the db option of the string attribute of the connection tag, but this doesn't appear to be adequate to actually put you in that schema.  Running the "use hivedb" query at the beginning of the session helps.  But, it appears that the schema isn't actually selected until the first query is run.  So, the "select 1" query immediately following the use query solves this.</p>
 
-<p>The overrideschema option in the string attribute of the connection tag works around yet another Hive quirk.  Hive tends to report the current schema as something other than "hivedb", but when running "show tables" or "describe" queries, the database wants "hivedb" to be passed in as the schema for the table names.</p>
+<p>The overrideschema option in the string attribute of the connection tag works around yet another quirk.  The database tends to report the current schema as something other than "hivedb", but when running "show tables" or "describe" queries, the database wants "hivedb" to be passed in as the schema for the table names.</p>
 
 <p>The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).</p>
 
@@ -860,7 +858,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#990000">[</font>hive<font color="#990000">]</font>
 Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>cloudera<font color="#990000">/</font>hiveodbc<font color="#990000">/</font>lib<font color="#990000">/</font><font color="#993399">64</font><font color="#990000">/</font>libclouderahiveodbc64<font color="#990000">.</font>so
 HiveServerType<font color="#990000">=</font><font color="#993399">2</font>
-Host<font color="#990000">=</font>ec2<font color="#990000">-</font><font color="#993399">1</font><font color="#990000">-</font><font color="#993399">2</font><font color="#990000">-</font><font color="#993399">3</font><font color="#990000">-</font><font color="#993399">4</font><font color="#990000">.</font>compute<font color="#990000">-</font><font color="#993399">1</font><font color="#990000">.</font>amazonaws<font color="#990000">.</font>com
+Host<font color="#990000">=</font>hiveserver
 Port<font color="#990000">=</font><font color="#993399">10000</font></tt></pre>
 
 </blockquote>
@@ -868,9 +866,93 @@ Port<font color="#990000">=</font><font color="#993399">10000</font></tt></pre>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
-<br/><a name="db-odbc-impala"/><h4>Impala (via ODBC)</h4>
+<br/><a name="db-odbc-impala"/><h4>Apache Impala (via ODBC)</h4>
 
-<p>...</p>
+<p>Apache Impala is a query engine for Apache Hadoop.  Cloudera provides an Impala ODBC driver for Windows and Linux platforms.  This driver has some quirks.</p>
+
+<p>The most significant quirk is that version 2.5.20 (and probably other versions) for Linux ship linked against libsasl2.so.2.  This library can be found on RedHat Enterprise 6 (or CentOS 6) but modern Linux systems have moved on to newer versions.  To use the driver, it is necessary to get a copy of libsasl2.so.2.0.23 (or a similar version) from an old enough system, install it in an appropriate lib directory, and create libsasl2.so.2 as a symlink to it in that same directory.</p>
+
+<p>In this example, SQL Relay is configured to connect to a Impala database via ODBC.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"odbc"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;session&gt;</font></b>
+			<b><font color="#0000FF">&lt;start&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>
+				use default
+				<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>
+				select 1
+				<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+			<b><font color="#0000FF">&lt;/start&gt;</font></b>
+		<b><font color="#0000FF">&lt;/session&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=impala;overrideschema=%;unicode=no"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The contents of the session tag work around a quirk.  Normally the schema would be selected by setting the db option of the string attribute of the connection tag, but this doesn't work at all.  Running the "use default" query at the beginning of the session helps.  But, it appears that the schema isn't actually selected until the first query is run.  So, the "select 1" query immediately following the use query solves this.</p>
+
+<p>The overrideschema option in the string attribute of the connection tag works around yet another quirk.  When running "show tables" or "describe" queries, the database needs "%" (the SQL wildcard) to be passed in as the schema for the table names.</p>
+
+<p>The driver also doesn't support unicode, so the unicode=no option in the string attribute of the connection tag tells SQL Relay not to try.</p>
+
+<p>Note that there are no user/password options in the string attribute of the connection tag.  Impala supports several different authentication mechanisms, but by default, it allows unauthenticated access to the database (AuthMech=0).  This can be configured in the DSN though, and if a user/password authentication mechansim is selected, then the standard user/password options can be included.</p>
+
+<p>The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).</p>
+
+<p>On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).</p>
+
+<p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>impala<font color="#990000">]</font>
+Description<font color="#990000">=</font>Cloudera ODBC Driver <font color="#008080">for</font> <b><font color="#000000">Impala</font></b> <font color="#990000">(</font><font color="#993399">64</font><font color="#990000">-</font>bit<font color="#990000">)</font> DSN
+Driver<font color="#990000">=</font>Cloudera ODBC Driver <b><font color="#0000FF">for</font></b> Impala <font color="#993399">64</font><font color="#990000">-</font>bit
+HOST<font color="#990000">=</font>impalaserver
+PORT<font color="#990000">=</font><font color="#993399">21050</font>
+Database<font color="#990000">=</font>impaladb
+AuthMech<font color="#990000">=</font><font color="#993399">0</font>
+UID<font color="#990000">=</font><b><font color="#0000FF">default</font></b>
+PWD<font color="#990000">=</font>
+TSaslTransportBufSize<font color="#990000">=</font><font color="#993399">1000</font>
+RowsFetchedPerBlock<font color="#990000">=</font><font color="#993399">10000</font>
+SocketTimeout<font color="#990000">=</font><font color="#993399">0</font>
+StringColumnLength<font color="#990000">=</font><font color="#993399">32767</font>
+UseNativeQuery<font color="#990000">=</font><font color="#993399">0</font></tt></pre>
+
+</blockquote>
+<p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>Cloudera ODBC Driver <b><font color="#0000FF">for</font></b> Impala <font color="#993399">64</font><font color="#990000">-</font>bit<font color="#990000">]</font>
+Description<font color="#990000">=</font>Cloudera ODBC Driver <font color="#008080">for</font> <b><font color="#000000">Impala</font></b> <font color="#990000">(</font><font color="#993399">64</font><font color="#990000">-</font>bit<font color="#990000">)</font>
+Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>cloudera<font color="#990000">/</font>impalaodbc<font color="#990000">/</font>lib<font color="#990000">/</font><font color="#993399">64</font><font color="#990000">/</font>libclouderaimpalaodbc64<font color="#990000">.</font>so</tt></pre>
+
+</blockquote>
+<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
 <br/><a name="db-odbc-redshift"/><h4>Redshift (via ODBC)</h4>
 
