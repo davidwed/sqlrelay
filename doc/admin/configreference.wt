@@ -3,6 +3,7 @@
 * [#example Example]
 * [#tags Tags]
 * [#attributes Attributes]
+* [#advanced Advanced Configuration]
 
 [=#example]
 == Example ==
@@ -323,3 +324,8 @@ For '''mdbtools''' databases, the connect string syntax is "db=DATABASE;identity
 
 * '''db''': The filename of the database open.  Required.
 * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
+
+[=#advanced]
+== Advanced Configuration ==
+
+SQL Relay is highly modular, and there are additional tags and attributes that direct SQL Relay to load various filtering, translation, query routing, logging, notification, and other modules.  These are described in detail in the [configguide.html SQL Relay Configuration Guide].

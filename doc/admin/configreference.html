@@ -10,6 +10,7 @@
   <li><a href="#example">Example</a></li>
   <li><a href="#tags">Tags</a></li>
   <li><a href="#attributes">Attributes</a></li>
+  <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
 <a name="example"/><h2>Example</h2>
@@ -412,9 +413,11 @@ or a tnsnames-style expression such as:
 
 <ul>
   <li><b>db</b>: The filename of the database open.  Required.</li>
-  <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
-</li>
+  <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 
+<a name="advanced"/><h2>Advanced Configuration</h2>
+
+SQL Relay is highly modular, and there are additional tags and attributes that direct SQL Relay to load various filtering, translation, query routing, logging, notification, and other modules.  These are described in detail in the <a href="configguide.html">SQL Relay Configuration Guide</a>.
 </body>
 </html>
