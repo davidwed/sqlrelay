@@ -14,16 +14,15 @@
   * [#db-postgresql PostgreSQL]
   * [#db-firebird Firebird]
   * [#db-sqlite SQLite]
+  * [#db-msaccess Microsoft Access (via MDBTools)]
+  * [#db-odbc-teradata Teradata (via ODBC)]
+  * [#db-odbc-exasol Exasol (via ODBC)]
   * [#db-odbc-hive Apache Hive (via ODBC)]
   * [#db-odbc-impala Apache Impala (via ODBC)]
   * [#db-odbc-redshift Amazon Redshift (via ODBC)]
   * [#db-postgresql-redshift Amazon Redshift (via PostgreSQL)]
-  * [#db-odbc-athena Athena (via ODBC)]
-  * [#db-odbc-elastisearch Elastisearch (via ODBC)]
-  * [#db-odbc-teradata Teradata (via ODBC)]
-  * [#db-odbc-exasol Exasol (via ODBC)]
+  * [#db-odbc-athena Amazon Athena (via ODBC)]
   * [#db-odbc ODBC]
-  * [#db-msaccess Microsoft Access (via MDBTools)]
  * [#dbconnections Database Connections]
   * [#dbconnections-performance For Performance]
   * [#dbconnections-throttling For Throttling]
@@ -531,6 +530,127 @@ See the [configreference.html#sqlite SQL Relay Configuration Reference] for othe
 
 See [http://software.firstworks.com/p/getting-started-with-sqlite.html Getting Started With SQLite] for general assistance installing and configuring a SQLite database.
 
+
+[[br]][=#db-msaccess]
+==== Microsoft Access (via MDBTools) ====
+
+On Windows platforms, ODBC can be used to access a Microsoft Access database.
+
+On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via [http://mdbtools.sourceforge.net MDBTools].
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-msaccess.conf@
+}}}
+}}}
+
+The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.
+
+(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#mdbtools SQL Relay Configuration Reference] for other valid MDBTools connect string options.
+
+See [http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html Getting Started With MS Access (on a non-MS platform)] for general assistance with MS Access databases on non-MS platforms.
+
+
+[[br]][=#db-odbc-teradata]
+==== Teradata (via ODBC) ====
+
+Teradata ODBC drivers are available for many platforms, including Windows and Linux.
+
+In this example, SQL Relay is configured to connect to a Teradata database via ODBC.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-teradata.conf@
+}}}
+}}}
+
+The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).
+
+On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
+
+On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).
+
+{{{#!blockquote
+{{{#!code
+[teradata]
+Description=Teradata Database ODBC Driver 16.20
+Driver=/opt/teradata/client/16.20/lib64/tdataodbc_sb64.so
+DBCName=teradatahost
+UID=testuser
+PWD=testpassword
+AccountString=
+CharacterSet=ASCII
+DatasourceDNSEntries=
+DateTimeFormat=IAA
+DefaultDatabase=
+DontUseHelpDatabase=0
+DontUseTitles=1
+EnableExtendedStmtInfo=1
+EnableReadAhead=1
+IgnoreODBCSearchPattern=0
+LogErrorEvents=0
+LoginTimeout=20
+MaxRespSize=65536
+MaxSingleLOBBytes=0
+MaxTotalLOBBytesPerRow=0
+MechanismName=
+NoScan=0
+PrintOption=N
+retryOnEINTR=1
+ReturnGeneratedKeys=N
+SessionMode=System Default
+SplOption=Y
+TABLEQUALIFIER=0
+TCPNoDelay=1
+TdmstPortNumber=1025
+UPTMode=Not set
+USE2XAPPCUSTOMCATALOGMODE=0
+UseDataEncryption=0
+UseDateDataForTimeStampParams=0
+}}}
+}}}
+
+(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
+
+
+[[br]][=#db-odbc-exasol]
+==== Exasol (via ODBC) ====
+
+Exasol ODBC drivers are available for Windows and Linux.
+
+In this example, SQL Relay is configured to connect to an Exasol database via ODBC.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-exasol.conf@
+}}}
+}}}
+
+The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).
+
+On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
+
+On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).
+
+{{{#!blockquote
+{{{#!code
+[exasolution-uo2214lv2_64]
+DRIVER=/home/dmuse/software/EXASOL_ODBC-6.0.11/lib/linux/x86_64/libexaodbc-uo2214lv2.so
+EXAHOST=192.168.123.12:8563
+EXAUID=sys
+EXAPWD=exasol
+}}}
+}}}
+
+(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
+
+
 [[br]][=#db-odbc-hive]
 ==== Apache Hive (via ODBC) ====
 
@@ -704,56 +824,40 @@ See the [configreference.html#odbc SQL Relay Configuration Reference] for other 
 
 
 [[br]][=#db-odbc-athena]
-==== Athena (via ODBC) ====
+==== Amazon Athena (via ODBC) ====
 
-...
+Amazon Athena is an SQL interface to data stored in Amazon S3.  Simba provides an Athena ODBC driver for Windows and Linux platforms.  This driver (or perhaps Athena itself) has some quirks.
 
-[[br]][=#db-odbc-elastisearch]
-==== Elastisearch (via ODBC) ====
-
-...
-
-[[br]][=#db-odbc-teradata]
-==== Teradata (via ODBC) ====
-
-...
-
-[[br]][=#db-odbc-exasol]
-==== Exasol (via ODBC) ====
-
-...
-
-[[br]][=#db-odbc]
-==== ODBC ====
-
-SQL Relay supports most popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.
-
-On Windows platforms, ODBC is commonly used to access Microsoft SQL Server and Microsoft Access databases.  On some Linux platforms, the [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] is also commonly used to access Microsoft SQL Server databases, as an alternative to [http://www.freetds.org FreeTDS].  Many other database vendors provide ODBC drivers for Windows and Linux platforms though.
-
-In this example, SQL Relay is configured to connect to an ODBC database.
+In this example, SQL Relay is configured to connect to a Athena database via ODBC.
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-odbc.conf@
+@parts/sqlrelay-athena.conf@
 }}}
 }}}
+
+Note the odd user and password options in the string attribute of the connection tag.
+
+Note also that the db option is missing from the string attribute of the connection tag.  The schema must be set in the DSN, and setting it in the connection string doesn't override the one set in the DSN.
+
+The overrideschema option in the string attribute of the connection tag works around a quirk.  The database tends to report the current schema as something other than "athenadb", but when running "show tables" or "describe" queries, the database wants "athenadb" to be passed in as the schema for the table names.
 
 The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).
 
 On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
 
-On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini) which identifies the database server, similar to:
+On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).
 
 {{{#!blockquote
 {{{#!code
-[exampledsn]
-Description=SQL Server
-Driver=ODBC Driver 11 for SQL Server
-Server=examplehost
-Port=1433
-Database=
-User=exampleuser
-Password=examplepassword
+[athena]
+Description=Simba Athena ODBC Driver (64-bit) DSN
+Driver=/opt/simba/athenaodbc/lib/64/libathenaodbc_sb64.so
+AwsRegion=us-east-1
+Schema=athenadb
+S3OutputLocation=s3://athenadata/
+UID=RDXDE23X56D9822FFGE3
+PWD=uEEmF+RDexoXpqTD5MiP3421emYP2M+4Rqo6GHio
 }}}
 }}}
 
@@ -761,11 +865,9 @@ The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/o
 
 {{{#!blockquote
 {{{#!code
-[ODBC Driver 11 for SQL Server] 
-Description=Microsoft ODBC Driver 11 for SQL Server
-Driver=/opt/microsoft/msodbcsql/lib64/libmsodbcsql-11.0.so.2270.0 
-Threading=1 
-UsageCount=1 
+[Simba Athena ODBC Driver 64-bit]
+Description=Simba Athena ODBC Driver (64-bit)
+Driver=/opt/simba/athenaodbc/lib/64/libathenaodbc_sb64.so
 }}}
 }}}
 
@@ -773,28 +875,23 @@ UsageCount=1
 
 See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
 
-See [http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html Getting Started With ODBC (on a non-MS platform)] for general assistance installing and configuring ODBC on a non-MS platform.
 
-[[br]][=#db-msaccess]
-==== Microsoft Access (via MDBTools) ====
+[[br]][=#db-odbc]
+==== ODBC ====
 
-On Windows platforms, ODBC can be used to access a Microsoft Access database.
+SQL Relay supports many popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.
 
-On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via [http://mdbtools.sourceforge.net MDBTools].
+Accessing a database via an ODBC driver usually involves:
 
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-msaccess.conf@
-}}}
-}}}
+* Installing the driver
+* Creating a DSN
+ * On Windows this is done via a control panel
+ * On Linux/Unix it is done by adding entries to the odbc.ini and sometimes odbcinst.ini files
+* Creating an instance of SQL Relay with dbase="odbc" which refers to the DSN, optionally specifying the user and password
 
-The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.
+See the examples above for more details.  It should be possible to adapt one of them to the ODBC driver that you would like to use.
 
-(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)
-
-See the [configreference.html#mdbtools SQL Relay Configuration Reference] for other valid MDBTools connect string options.
-
-See [http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html Getting Started With MS Access (on a non-MS platform)] for general assistance with MS Access databases on non-MS platforms.
+Note that many ODBC drivers have quirks.  Many of the examples above demonstrate ways of working around some of these quirks.
 
 
 [[br]][=#dbconnections]

@@ -23,16 +23,15 @@
       <li><a href="#db-postgresql">PostgreSQL</a></li>
       <li><a href="#db-firebird">Firebird</a></li>
       <li><a href="#db-sqlite">SQLite</a></li>
+      <li><a href="#db-msaccess">Microsoft Access (via MDBTools)</a></li>
+      <li><a href="#db-odbc-teradata">Teradata (via ODBC)</a></li>
+      <li><a href="#db-odbc-exasol">Exasol (via ODBC)</a></li>
       <li><a href="#db-odbc-hive">Apache Hive (via ODBC)</a></li>
       <li><a href="#db-odbc-impala">Apache Impala (via ODBC)</a></li>
       <li><a href="#db-odbc-redshift">Amazon Redshift (via ODBC)</a></li>
       <li><a href="#db-postgresql-redshift">Amazon Redshift (via PostgreSQL)</a></li>
-      <li><a href="#db-odbc-athena">Athena (via ODBC)</a></li>
-      <li><a href="#db-odbc-elastisearch">Elastisearch (via ODBC)</a></li>
-      <li><a href="#db-odbc-teradata">Teradata (via ODBC)</a></li>
-      <li><a href="#db-odbc-exasol">Exasol (via ODBC)</a></li>
+      <li><a href="#db-odbc-athena">Amazon Athena (via ODBC)</a></li>
       <li><a href="#db-odbc">ODBC</a></li>
-      <li><a href="#db-msaccess">Microsoft Access (via MDBTools)</a></li>
     </ul>
 
     <li><a href="#dbconnections">Database Connections</a></li>
@@ -804,6 +803,165 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-sqlite.html">Getting Started With SQLite</a> for general assistance installing and configuring a SQLite database.</p>
 
+<br/><a name="db-msaccess"/><h4>Microsoft Access (via MDBTools)</h4>
+
+<p>On Windows platforms, ODBC can be used to access a Microsoft Access database.</p>
+
+<p>On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via <a target="_blank" href="http://mdbtools.sourceforge.net">MDBTools</a>.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mdbtools"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/mdbtools/exampledb.mdb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.</p>
+
+<p>(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>See the <a href="configreference.html#mdbtools">SQL Relay Configuration Reference</a> for other valid MDBTools connect string options.</p>
+
+<p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html">Getting Started With MS Access (on a non-MS platform)</a> for general assistance with MS Access databases on non-MS platforms.</p>
+
+<br/><a name="db-odbc-teradata"/><h4>Teradata (via ODBC)</h4>
+
+<p>Teradata ODBC drivers are available for many platforms, including Windows and Linux.</p>
+
+<p>In this example, SQL Relay is configured to connect to a Teradata database via ODBC.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"odbc"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=teradata;user=testuser;password=testpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).</p>
+
+<p>On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).</p>
+
+<p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>teradata<font color="#990000">]</font>
+Description<font color="#990000">=</font>Teradata Database ODBC Driver <font color="#993399">16.20</font>
+Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>teradata<font color="#990000">/</font>client<font color="#990000">/</font><font color="#993399">16.20</font><font color="#990000">/</font>lib64<font color="#990000">/</font>tdataodbc_sb64<font color="#990000">.</font>so
+DBCName<font color="#990000">=</font>teradatahost
+UID<font color="#990000">=</font>testuser
+PWD<font color="#990000">=</font>testpassword
+AccountString<font color="#990000">=</font>
+CharacterSet<font color="#990000">=</font>ASCII
+DatasourceDNSEntries<font color="#990000">=</font>
+DateTimeFormat<font color="#990000">=</font>IAA
+DefaultDatabase<font color="#990000">=</font>
+DontUseHelpDatabase<font color="#990000">=</font><font color="#993399">0</font>
+DontUseTitles<font color="#990000">=</font><font color="#993399">1</font>
+EnableExtendedStmtInfo<font color="#990000">=</font><font color="#993399">1</font>
+EnableReadAhead<font color="#990000">=</font><font color="#993399">1</font>
+IgnoreODBCSearchPattern<font color="#990000">=</font><font color="#993399">0</font>
+LogErrorEvents<font color="#990000">=</font><font color="#993399">0</font>
+LoginTimeout<font color="#990000">=</font><font color="#993399">20</font>
+MaxRespSize<font color="#990000">=</font><font color="#993399">65536</font>
+MaxSingleLOBBytes<font color="#990000">=</font><font color="#993399">0</font>
+MaxTotalLOBBytesPerRow<font color="#990000">=</font><font color="#993399">0</font>
+MechanismName<font color="#990000">=</font>
+NoScan<font color="#990000">=</font><font color="#993399">0</font>
+PrintOption<font color="#990000">=</font>N
+retryOnEINTR<font color="#990000">=</font><font color="#993399">1</font>
+ReturnGeneratedKeys<font color="#990000">=</font>N
+SessionMode<font color="#990000">=</font>System Default
+SplOption<font color="#990000">=</font>Y
+TABLEQUALIFIER<font color="#990000">=</font><font color="#993399">0</font>
+TCPNoDelay<font color="#990000">=</font><font color="#993399">1</font>
+TdmstPortNumber<font color="#990000">=</font><font color="#993399">1025</font>
+UPTMode<font color="#990000">=</font>Not set
+USE2XAPPCUSTOMCATALOGMODE<font color="#990000">=</font><font color="#993399">0</font>
+UseDataEncryption<font color="#990000">=</font><font color="#993399">0</font>
+UseDateDataForTimeStampParams<font color="#990000">=</font><font color="#993399">0</font></tt></pre>
+
+</blockquote>
+<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
+
+<br/><a name="db-odbc-exasol"/><h4>Exasol (via ODBC)</h4>
+
+<p>Exasol ODBC drivers are available for Windows and Linux.</p>
+
+<p>In this example, SQL Relay is configured to connect to an Exasol database via ODBC.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"odbc"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=exasolution-uo2214lv2_64;user=sys;password=exasol"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).</p>
+
+<p>On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).</p>
+
+<p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>exasolution<font color="#990000">-</font>uo2214lv2_64<font color="#990000">]</font>
+DRIVER<font color="#990000">=/</font>home<font color="#990000">/</font>dmuse<font color="#990000">/</font>software<font color="#990000">/</font>EXASOL_ODBC<font color="#990000">-</font><font color="#993399">6.0</font><font color="#990000">.</font><font color="#993399">11</font><font color="#990000">/</font>lib<font color="#990000">/</font>linux<font color="#990000">/</font>x86_64<font color="#990000">/</font>libexaodbc<font color="#990000">-</font>uo2214lv2<font color="#990000">.</font>so
+EXAHOST<font color="#990000">=</font><font color="#993399">192.168</font><font color="#990000">.</font><font color="#993399">123.12</font><font color="#990000">:</font><font color="#993399">8563</font>
+EXAUID<font color="#990000">=</font>sys
+EXAPWD<font color="#990000">=</font>exasol</tt></pre>
+
+</blockquote>
+<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
+
 <br/><a name="db-odbc-hive"/><h4>Apache Hive (via ODBC)</h4>
 
 <p>Apache Hive is a data warehouse built on top of Apache Hadoop.  Cloudera provides a Hive ODBC driver for Windows and Linux platforms which implements a SQL interface to Hive.  This driver has some quirks.</p>
@@ -1050,29 +1208,11 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid PostgreSQL connect string options.</p>
 
-<br/><a name="db-odbc-athena"/><h4>Athena (via ODBC)</h4>
+<br/><a name="db-odbc-athena"/><h4>Amazon Athena (via ODBC)</h4>
 
-<p>...</p>
+<p>Amazon Athena is an SQL interface to data stored in Amazon S3.  Simba provides an Athena ODBC driver for Windows and Linux platforms.  This driver (or perhaps Athena itself) has some quirks.</p>
 
-<br/><a name="db-odbc-elastisearch"/><h4>Elastisearch (via ODBC)</h4>
-
-<p>...</p>
-
-<br/><a name="db-odbc-teradata"/><h4>Teradata (via ODBC)</h4>
-
-<p>...</p>
-
-<br/><a name="db-odbc-exasol"/><h4>Exasol (via ODBC)</h4>
-
-<p>...</p>
-
-<br/><a name="db-odbc"/><h4>ODBC</h4>
-
-<p>SQL Relay supports most popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.</p>
-
-<p>On Windows platforms, ODBC is commonly used to access Microsoft SQL Server and Microsoft Access databases.  On some Linux platforms, the <a target="_blank" href="https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx">Microsoft-provided ODBC driver</a> is also commonly used to access Microsoft SQL Server databases, as an alternative to <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.  Many other database vendors provide ODBC drivers for Windows and Linux platforms though.</p>
-
-<p>In this example, SQL Relay is configured to connect to an ODBC database.</p>
+<p>In this example, SQL Relay is configured to connect to a Athena database via ODBC.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -1081,39 +1221,43 @@ http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
-
 	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"odbc"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=exampledsn"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=athena;user=RDXDE23X56D9822FFGE3;password=uEEmF+RDexoXpqTD5MiP3421emYP2M+4Rqo6GHio;overrideschema=athenadb"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
-
-<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
 </tt></pre>
 
 </blockquote>
+<p>Note the odd user and password options in the string attribute of the connection tag.</p>
+
+<p>Note also that the db option is missing from the string attribute of the connection tag.  The schema must be set in the DSN, and setting it in the connection string doesn't override the one set in the DSN.</p>
+
+<p>The overrideschema option in the string attribute of the connection tag works around a quirk.  The database tends to report the current schema as something other than "athenadb", but when running "show tables" or "describe" queries, the database wants "athenadb" to be passed in as the schema for the table names.</p>
+
 <p>The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).</p>
 
 <p>On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).</p>
 
-<p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini) which identifies the database server, similar to:</p>
+<p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>exampledsn<font color="#990000">]</font>
-Description<font color="#990000">=</font>SQL Server
-Driver<font color="#990000">=</font>ODBC Driver <font color="#993399">11</font> <b><font color="#0000FF">for</font></b> SQL Server
-Server<font color="#990000">=</font>examplehost
-Port<font color="#990000">=</font><font color="#993399">1433</font>
-Database<font color="#990000">=</font>
-User<font color="#990000">=</font>exampleuser
-Password<font color="#990000">=</font>examplepassword</tt></pre>
+<pre><tt><font color="#990000">[</font>athena<font color="#990000">]</font>
+Description<font color="#990000">=</font>Simba Athena <font color="#008080">ODBC</font> <b><font color="#000000">Driver</font></b> <font color="#990000">(</font><font color="#993399">64</font><font color="#990000">-</font>bit<font color="#990000">)</font> DSN
+Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>simba<font color="#990000">/</font>athenaodbc<font color="#990000">/</font>lib<font color="#990000">/</font><font color="#993399">64</font><font color="#990000">/</font>libathenaodbc_sb64<font color="#990000">.</font>so
+AwsRegion<font color="#990000">=</font>us<font color="#990000">-</font>east<font color="#990000">-</font><font color="#993399">1</font>
+Schema<font color="#990000">=</font>athenadb
+S3OutputLocation<font color="#990000">=</font>s3<font color="#990000">:</font><i><font color="#9A1900">//athenadata/</font></i>
+UID<font color="#990000">=</font>RDXDE23X56D9822FFGE3
+PWD<font color="#990000">=</font>uEEmF<font color="#990000">+</font>RDexoXpqTD5MiP3421emYP2M<font color="#990000">+</font>4Rqo6GHio</tt></pre>
 
 </blockquote>
 <p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
@@ -1123,53 +1267,35 @@ Password<font color="#990000">=</font>examplepassword</tt></pre>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt><font color="#990000">[</font>ODBC Driver <font color="#993399">11</font> <b><font color="#0000FF">for</font></b> <font color="#008080">SQL</font> Server<font color="#990000">]</font> 
-Description<font color="#990000">=</font>Microsoft ODBC Driver <font color="#993399">11</font> <b><font color="#0000FF">for</font></b> SQL Server
-Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>microsoft<font color="#990000">/</font>msodbcsql<font color="#990000">/</font>lib64<font color="#990000">/</font>libmsodbcsql<font color="#990000">-</font><font color="#993399">11.0</font><font color="#990000">.</font>so<font color="#990000">.</font><font color="#993399">2270.0</font> 
-Threading<font color="#990000">=</font><font color="#993399">1</font> 
-UsageCount<font color="#990000">=</font><font color="#993399">1</font> </tt></pre>
+<pre><tt><font color="#990000">[</font>Simba Athena ODBC Driver <font color="#993399">64</font><font color="#990000">-</font>bit<font color="#990000">]</font>
+Description<font color="#990000">=</font>Simba Athena <font color="#008080">ODBC</font> <b><font color="#000000">Driver</font></b> <font color="#990000">(</font><font color="#993399">64</font><font color="#990000">-</font>bit<font color="#990000">)</font>
+Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>simba<font color="#990000">/</font>athenaodbc<font color="#990000">/</font>lib<font color="#990000">/</font><font color="#993399">64</font><font color="#990000">/</font>libathenaodbc_sb64<font color="#990000">.</font>so</tt></pre>
 
 </blockquote>
 <p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)</p>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
-<p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html">Getting Started With ODBC (on a non-MS platform)</a> for general assistance installing and configuring ODBC on a non-MS platform.</p>
+<br/><a name="db-odbc"/><h4>ODBC</h4>
 
-<br/><a name="db-msaccess"/><h4>Microsoft Access (via MDBTools)</h4>
+<p>SQL Relay supports many popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.</p>
 
-<p>On Windows platforms, ODBC can be used to access a Microsoft Access database.</p>
+<p>Accessing a database via an ODBC driver usually involves:</p>
 
-<p>On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via <a target="_blank" href="http://mdbtools.sourceforge.net">MDBTools</a>.</p>
+<ul>
+  <li>Installing the driver</li>
+  <li>Creating a DSN</li>
+  <ul>
+    <li>On Windows this is done via a control panel</li>
+    <li>On Linux/Unix it is done by adding entries to the odbc.ini and sometimes odbcinst.ini files</li>
+  </ul>
 
-<blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
-<b><font color="#0000FF">&lt;instances&gt;</font></b>
+  <li>Creating an instance of SQL Relay with dbase="odbc" which refers to the DSN, optionally specifying the user and password</li>
+</ul>
 
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mdbtools"</font><b><font color="#0000FF">&gt;</font></b>
-		<b><font color="#0000FF">&lt;users&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/users&gt;</font></b>
-		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/mdbtools/exampledb.mdb"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<p>See the examples above for more details.  It should be possible to adapt one of them to the ODBC driver that you would like to use.</p>
 
-<b><font color="#0000FF">&lt;/instances&gt;</font></b>
-</tt></pre>
-
-</blockquote>
-<p>The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.</p>
-
-<p>(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)</p>
-
-<p>See the <a href="configreference.html#mdbtools">SQL Relay Configuration Reference</a> for other valid MDBTools connect string options.</p>
-
-<p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html">Getting Started With MS Access (on a non-MS platform)</a> for general assistance with MS Access databases on non-MS platforms.</p>
+<p>Note that many ODBC drivers have quirks.  Many of the examples above demonstrate ways of working around some of these quirks.</p>
 
 <br/><a name="dbconnections"/><h3>Database Connections</h3>
 
