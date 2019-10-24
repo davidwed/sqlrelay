@@ -16,7 +16,8 @@
   * [#db-sqlite SQLite]
   * [#db-odbc-hive Apache Hive (via ODBC)]
   * [#db-odbc-impala Apache Impala (via ODBC)]
-  * [#db-odbc-redshift Redshift (via ODBC)]
+  * [#db-odbc-redshift Amazon Redshift (via ODBC)]
+  * [#db-postgresql-redshift Amazon Redshift (via PostgreSQL)]
   * [#db-odbc-athena Athena (via ODBC)]
   * [#db-odbc-elastisearch Elastisearch (via ODBC)]
   * [#db-odbc-teradata Teradata (via ODBC)]
@@ -634,9 +635,73 @@ See the [configreference.html#odbc SQL Relay Configuration Reference] for other 
 
 
 [[br]][=#db-odbc-redshift]
-==== Redshift (via ODBC) ====
+==== Amazon Redshift (via ODBC) ====
 
-...
+Amazon Redshift is a cloud-hosted data warehouse service.  Amazon provides a Redshift ODBC driver for Windows and Linux platforms.  This driver (or perhaps Redshift itself) has some quirks.
+
+In this example, SQL Relay is configured to connect to a Redshift database via ODBC.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-redshift.conf@
+}}}
+}}}
+
+The ignoreselectdatabase="yes" attribute of the instance tag works around a quirk.  It instructs SQL Relay to ignore "use database" queries, or other attempts to select the current database/schema.  These options tend to put the connection outside of any database/schema, and unable to return to the desired database/schema.
+
+The overrideschema option in the string attribute of the connection tag works around another quirk.  When running "show tables" or "describe" queries, the database needs "public" to be passed in as the schema for the table names.
+
+The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).
+
+On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
+
+On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).
+
+{{{#!blockquote
+{{{#!code
+[redshift]
+Driver=Amazon Redshift (x64)
+Host=redshifthost
+Database=redshiftdb
+Username=redshiftuser
+Password=redshiftpassword
+}}}
+}}}
+
+The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:
+
+{{{#!blockquote
+{{{#!code
+[Amazon Redshift (x64)]
+Description=Amazon Redshift ODBC Driver (64-bit)
+Driver=/opt/amazon/redshiftodbc/lib/64/libamazonredshiftodbc64.so
+}}}
+}}}
+
+(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
+
+
+[[br]][=#db-postgresql-redshift]
+==== Amazon Redshift (via !PostgreSQL) ====
+
+Amazon Redshift is a cloud-hosted data warehouse service.  Since it is based on !PostgreSQL 8, it is possible to connect to a Redshift instance using the !PostgreSQL client library.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-redshift-postgresql.conf@
+}}}
+}}}
+
+The ignoreselectdatabase="yes" attribute of the instance tag works around a quirk.  It instructs SQL Relay to ignore "use database" queries, or other attempts to select the current database/schema.  These options tend to put the connection outside of any database/schema, and unable to return to the desired database/schema.
+
+The port option in the string attribute of the connection tag instructs SQL Relay to connect to the Redshift default port of 5439 rather than the !PostgreSQL default port of 5432.
+
+The typemangling and tablemangling options in the string attribute of the connection tag instruct SQL Relay to return data type and table names rather than data type and table object ID's (the default for !PostgreSQL)
+
+See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid !PostgreSQL connect string options.
+
 
 [[br]][=#db-odbc-athena]
 ==== Athena (via ODBC) ====
