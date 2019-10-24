@@ -40,6 +40,11 @@
   * [#mysqlspecialpurpose Special-Purpose Options]
   * [#mysqllimitations Limitations]
  * [#postgresqlprotocol PostgreSQL Protocol]
+  * [#postgresqlconfiguration Basic Configuration]
+  * [#postgresqllistener Listener Options]
+  * [#postgresqlauth Authentication/Authorization Options]
+  * [#postgresqlforeignbackend Foreign Backend]
+  * [#postgresqllimitations Limitations]
 * [#ha High Availability]
  * [#cluster Load-Balancing and Fail-Over With Replicated Databases or Database Clusters]
  * [#rac Already-Load-Balanced Databases]
@@ -1137,7 +1142,7 @@ Any kind of full SQL Relay session encryption should be used with caution in per
 [[br]][=#protocoloptions]
 == Client Protocol Options ==
 
-Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using the SQL Relay client-server protocol.
+Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using //SQLRClient//, the native SQL Relay client-server protocol.
 
 [[Image(../images/sqlrelaynativeprotocol.png,nolink)]]
 
@@ -1152,7 +1157,9 @@ In these configurations, SQL Relay becomes a transparent proxy.  !MySQL or !Post
 [[br]][=#sqlrclientprotocol]
 === SQLRClient Protocol ===
 
-...
+SQLRClient is the native SQL Relay protocol, enabled by default.  The example configurations above and throughout most of the rest of the guide configure SQL Relay to speak this protocol.
+
+If an instance speaks the SQLRClient client-server protocol, and supports the native SQL Relay authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQL Relay format.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [[br]][=#mysqlprotocol]
 === !MySQL Protocol ===
@@ -1257,7 +1264,7 @@ When using SQL Relay as a transparent proxy, it is desirable to define the same 
 
 ==== Database Auth ====
 
-If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be prohibitively inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the //mysql_database// module can be used to auth users directly against the database.
+If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the //mysql_database// module can be used to auth users directly against the database.
 
 {{{#!blockquote
 {{{#!code
@@ -1392,11 +1399,141 @@ Most of SQL Relay's core features are available when it is configured to speak t
 
 Otherwise, all other tags and attributes are compatbile.
 
-
 [[br]][=#postgresqlprotocol]
 === !PostgreSQL Protocol ===
 
-...
+[=#postgresqlconfiguration]
+==== Basic Configuration ====
+
+To enable SQL Relay to speak the !PostgreSQL protocol, add the appropriate listener and auth tags:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqlfebasic.conf@
+}}}
+}}}
+
+In this configuration:
+
+* The connection tag instructs the instance to log in to the //postgresqldb// database on host //postgresqlhost// as user //postgresqluser// with password //postgresqlpassword//.
+* The listener tag instructs SQL Relay to load the //postgresql// protocol module, and listen on port 5433.
+* The auth tag instructs SQL Relay to load the //postgresql_userlist// auth module.
+* The user tag defines the user //sqlruser// with password //sqlrpassword//.
+
+The instance can be started using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-start -id example
+}}}
+}}}
+
+and accessed from the local machine using:
+
+{{{#!blockquote
+{{{#!code
+psql -h localhost -p 5433 -u sqlruser
+}}}
+}}}
+
+It can also be accessed from a psql client program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.
+
+The instance can be stopped using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-stop -id example
+}}}
+}}}
+
+Since this instance speaks the !PostgreSQL client-server protocol, and supports the native !PostgreSQL authorization/authentication procedure, any client that wishes to use it must also speak the !PostgreSQL client-server protocol and present credentials in the native !PostgreSQL format.  This means that most software written using the !PostgreSQL native API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.
+
+[=#postgresqllistener]
+==== Listener Options ====
+
+In the example above, the instance is configured to listen on port 5433.  The !MySQL database typically listens on port 5432, so port 5433 was chosen to avoid collisions with the database itself.
+
+However, if SQL Relay is run on a different server than the database, then it can be configured to run on port 5432.  This is desirable when using SQL Relay as a transparent proxy.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqlfedbport.conf@
+}}}
+}}}
+
+If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqlfeaddresses.conf@
+}}}
+}}}
+
+In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+
+It can also be configured to listen on a unix socket by adding a //socket// attribute to the listener tag.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqlfesocket.conf@
+}}}
+}}}
+
+(Note that the user that SQL Relay is run as must be able to read and write to the path of the socket.)
+
+[=#postgresqlauth]
+==== Authentication/Authorization Options ====
+
+==== User List Auth ====
+
+In the examples above, the instance is configured to load the //postgresql_userlist// auth module and defines a user //sqlruser// with password //sqlrpassword//.
+
+In this configuration, a client must present //sqlruser/sqlrpassword// credentials.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqlfeuserlistmultiple.conf@
+}}}
+}}}
+
+When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.
+
+If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  Unfortunately there isn't currently a //postgresql_database// auth module that can be used to auth users directly against the database, so for now this is the only option.
+
+[=#postgresqlforeignbackend]
+==== Foreign Backend ====
+
+Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the !PostgreSQL database it was originally written to use.
+
+This is as simple as specifying a different database using the //dbase// parameter in the instance tag and specifying the appropriate database connection string in the //string// attribute of the connection tag.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqlfeoracle.conf@
+}}}
+}}}
+
+In this example, a !PostgreSQL frontend provides !PostgreSQL applications access to an Oracle backend database.
+
+When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+
+[=#postgresqllimitations]
+==== Limitations ====
+
+The implementation of the !PostgreSQL protocol is likely sufficient for most applications, but it isn't 100% complete.  Some notable limitations follow:
+
+* SSL/TLS authentication and encryption are currently not supported.
+* Kerberos authentication and encryption are currently not supported.
+* Multi-statement queries are not supported.
+
+Most of SQL Relay's core features are available when it is configured to speak the !PostgreSQL protocol, but there are a few incompatible configurations:
+
+* Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any //addresses//, //port//, and //socket// attributes in the instance tag.
+* Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an //authtier// attribute in the instance tag.
+* Database-auth (authenticating/authorizing users directly against the database) is not currently supported.
+* As SSL/TLS and Kerberos authentication and encryption are currently not supported, you should not configure any attributes related to SSL/TLS or Kerberos in the instance tag.
+
+Otherwise, all other tags and attributes are compatbile.
 
 ----
 

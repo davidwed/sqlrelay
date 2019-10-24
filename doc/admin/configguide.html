@@ -63,6 +63,14 @@
     </ul>
 
     <li><a href="#postgresqlprotocol">PostgreSQL Protocol</a></li>
+    <ul>
+      <li><a href="#postgresqlconfiguration">Basic Configuration</a></li>
+      <li><a href="#postgresqllistener">Listener Options</a></li>
+      <li><a href="#postgresqlauth">Authentication/Authorization Options</a></li>
+      <li><a href="#postgresqlforeignbackend">Foreign Backend</a></li>
+      <li><a href="#postgresqllimitations">Limitations</a></li>
+    </ul>
+
   </ul>
 
   <li><a href="#ha">High Availability</a></li>
@@ -1656,7 +1664,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><a name="protocoloptions"/><h2>Client Protocol Options</h2>
 
-<p>Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using the SQL Relay client-server protocol.</p>
+<p>Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using <i>SQLRClient</i>, the native SQL Relay client-server protocol.</p>
 
 <p><img src="../images/sqlrelaynativeprotocol.png"/></p>
 
@@ -1670,7 +1678,9 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><a name="sqlrclientprotocol"/><h3>SQLRClient Protocol</h3>
 
-<p>...</p>
+<p>SQLRClient is the native SQL Relay protocol, enabled by default.  The example configurations above and throughout most of the rest of the guide configure SQL Relay to speak this protocol.</p>
+
+<p>If an instance speaks the SQLRClient client-server protocol, and supports the native SQL Relay authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQL Relay format.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <br/><a name="mysqlprotocol"/><h3>MySQL Protocol</h3>
 
@@ -1881,7 +1891,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <h4>Database Auth</h4>
 
-<p>If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be prohibitively inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the <i>mysql_database</i> module can be used to auth users directly against the database.</p>
+<p>If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the <i>mysql_database</i> module can be used to auth users directly against the database.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -2125,7 +2135,267 @@ http://www.gnu.org/software/src-highlite -->
 
 <br/><a name="postgresqlprotocol"/><h3>PostgreSQL Protocol</h3>
 
-<p>...</p>
+<a name="postgresqlconfiguration"/><h4>Basic Configuration</h4>
+
+<p>To enable SQL Relay to speak the PostgreSQL protocol, add the appropriate listener and auth tags:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5433"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this configuration:</p>
+
+<ul>
+  <li>The connection tag instructs the instance to log in to the <i>postgresqldb</i> database on host <i>postgresqlhost</i> as user <i>postgresqluser</i> with password <i>postgresqlpassword</i>.</li>
+  <li>The listener tag instructs SQL Relay to load the <i>postgresql</i> protocol module, and listen on port 5433.</li>
+  <li>The auth tag instructs SQL Relay to load the <i>postgresql_userlist</i> auth module.</li>
+  <li>The user tag defines the user <i>sqlruser</i> with password <i>sqlrpassword</i>.</li>
+</ul>
+
+<p>The instance can be started using:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlr<font color="#990000">-</font>start <font color="#990000">-</font>id example</tt></pre>
+
+</blockquote>
+<p>and accessed from the local machine using:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>psql <font color="#990000">-</font><font color="#008080">h</font> localhost <font color="#990000">-</font>p <font color="#993399">5433</font> <font color="#990000">-</font>u sqlruser</tt></pre>
+
+</blockquote>
+<p>It can also be accessed from a psql client program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.</p>
+
+<p>The instance can be stopped using:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlr<font color="#990000">-</font>stop <font color="#990000">-</font>id example</tt></pre>
+
+</blockquote>
+<p>Since this instance speaks the PostgreSQL client-server protocol, and supports the native PostgreSQL authorization/authentication procedure, any client that wishes to use it must also speak the PostgreSQL client-server protocol and present credentials in the native PostgreSQL format.  This means that most software written using the PostgreSQL native API, or written using a database abstraction layer which loads a driver for PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.</p>
+
+<a name="postgresqllistener"/><h4>Listener Options</h4>
+
+<p>In the example above, the instance is configured to listen on port 5433.  The MySQL database typically listens on port 5432, so port 5433 was chosen to avoid collisions with the database itself.</p>
+
+<p>However, if SQL Relay is run on a different server than the database, then it can be configured to run on port 5432.  This is desirable when using SQL Relay as a transparent proxy.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">addresses</font><font color="#990000">=</font><font color="#FF0000">"192.168.1.50,192.168.1.51"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
+
+<p>It can also be configured to listen on a unix socket by adding a <i>socket</i> attribute to the listener tag.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/.s.PGSQL.5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>(Note that the user that SQL Relay is run as must be able to read and write to the path of the socket.)</p>
+
+<a name="postgresqlauth"/><h4>Authentication/Authorization Options</h4>
+
+<h4>User List Auth</h4>
+
+<p>In the examples above, the instance is configured to load the <i>postgresql_userlist</i> auth module and defines a user <i>sqlruser</i> with password <i>sqlrpassword</i>.</p>
+
+<p>In this configuration, a client must present <i>sqlruser/sqlrpassword</i> credentials.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oneuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"onepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"anotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"anotherpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"yetanotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"yetanotherpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.</p>
+
+<p>If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  Unfortunately there isn't currently a <i>postgresql_database</i> auth module that can be used to auth users directly against the database, so for now this is the only option.</p>
+
+<a name="postgresqlforeignbackend"/><h4>Foreign Backend</h4>
+
+<p>Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the PostgreSQL database it was originally written to use.</p>
+
+<p>This is as simple as specifying a different database using the <i>dbase</i> parameter in the instance tag and specifying the appropriate database connection string in the <i>string</i> attribute of the connection tag.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example, a PostgreSQL frontend provides PostgreSQL applications access to an Oracle backend database.</p>
+
+<p>When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.</p>
+
+<a name="postgresqllimitations"/><h4>Limitations</h4>
+
+<p>The implementation of the PostgreSQL protocol is likely sufficient for most applications, but it isn't 100% complete.  Some notable limitations follow:</p>
+
+<ul>
+  <li>SSL/TLS authentication and encryption are currently not supported.</li>
+  <li>Kerberos authentication and encryption are currently not supported.</li>
+  <li>Multi-statement queries are not supported.</li>
+</ul>
+
+<p>Most of SQL Relay's core features are available when it is configured to speak the PostgreSQL protocol, but there are a few incompatible configurations:</p>
+
+<ul>
+  <li>Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any <i>addresses</i>, <i>port</i>, and <i>socket</i> attributes in the instance tag.</li>
+  <li>Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an <i>authtier</i> attribute in the instance tag.</li>
+  <li>Database-auth (authenticating/authorizing users directly against the database) is not currently supported.</li>
+  <li>As SSL/TLS and Kerberos authentication and encryption are currently not supported, you should not configure any attributes related to SSL/TLS or Kerberos in the instance tag.</li>
+</ul>
+
+<p>Otherwise, all other tags and attributes are compatbile.</p>
 
 <hr/>
 
