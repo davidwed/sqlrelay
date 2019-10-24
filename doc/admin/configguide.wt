@@ -22,7 +22,7 @@
   * [#db-odbc-redshift Amazon Redshift (via ODBC)]
   * [#db-postgresql-redshift Amazon Redshift (via PostgreSQL)]
   * [#db-odbc-athena Amazon Athena (via ODBC)]
-  * [#db-odbc ODBC]
+  * [#db-odbc Generic ODBC]
  * [#dbconnections Database Connections]
   * [#dbconnections-performance For Performance]
   * [#dbconnections-throttling For Throttling]
@@ -877,7 +877,7 @@ See the [configreference.html#odbc SQL Relay Configuration Reference] for other 
 
 
 [[br]][=#db-odbc]
-==== ODBC ====
+==== Generic ODBC ====
 
 SQL Relay supports many popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.
 
