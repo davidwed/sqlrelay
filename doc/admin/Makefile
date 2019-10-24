@@ -13,7 +13,8 @@ SRCS = configguide.wt \
 	running.wt \
 	tuning.wt \
 	tlscert.wt \
-	tlsca.wt
+	tlsca.wt \
+	createtlscert.wt
 
 OBJS = configguide.html \
 	configreference.html \
@@ -24,7 +25,8 @@ OBJS = configguide.html \
 	running.html \
 	tuning.html \
 	tlscert.html \
-	tlsca.html
+	tlsca.html \
+	createtlscert.html
 
 .wt.html:
 	wt -i $< -o $@ -xhtml xhtml.conf

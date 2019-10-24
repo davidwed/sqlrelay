@@ -33,6 +33,7 @@ Or, it may specify a Windows Certificate Store.  For example:
 {{{#!blockquote
 {{{
 CURRENT_USER:MY
+ or
 MY
 }}}
 }}}
