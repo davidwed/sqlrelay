@@ -4,18 +4,25 @@
 * [#basic Basic Configuration]
  * [#database Database Configuration]
   * [#db-oracle Oracle]
-  * [#db-mssql-odbc Microsoft SQL Server (using ODBC)]
-  * [#db-mssql-freetds Microsoft SQL Server (using FreeTDS)]
-  * [#db-sap SAP/Sybase (using the native SAP/Sybase library)]
-  * [#db-sap-freetds SAP/Sybase (using the FreeTDS)]
+  * [#db-mssql-odbc Microsoft SQL Server (via ODBC)]
+  * [#db-mssql-freetds Microsoft SQL Server (via FreeTDS)]
+  * [#db-sap SAP/Sybase (via the native SAP/Sybase library)]
+  * [#db-sap-freetds SAP/Sybase (via FreeTDS)]
   * [#db-db2 IBM DB2]
   * [#db-informix Informix]
   * [#db-mysql MySQL/MariaDB]
   * [#db-postgresql PostgreSQL]
   * [#db-firebird Firebird]
   * [#db-sqlite SQLite]
+  * [#db-odbc-hive Apache Hive (via ODBC)]
+  * [#db-odbc-impala Impala (via ODBC)]
+  * [#db-odbc-redshift Redshift (via ODBC)]
+  * [#db-odbc-athena Athena (via ODBC)]
+  * [#db-odbc-elastisearch Elastisearch (via ODBC)]
+  * [#db-odbc-teradata Teradata (via ODBC)]
+  * [#db-odbc-exasol Exasol (via ODBC)]
   * [#db-odbc ODBC]
-  * [#db-msaccess Microsoft Access (using MDBTools)]
+  * [#db-msaccess Microsoft Access (via MDBTools)]
  * [#dbconnections Database Connections]
   * [#dbconnections-performance For Performance]
   * [#dbconnections-throttling For Throttling]
@@ -54,7 +61,7 @@
  * [#frontendencryption Front-End Encryption and Secure Authentication]
  * [#backendencryption Back-End Encryption and Secure Authentication]
   * [#backendenc-oracle Oracle]
-  * [#backendenc-mssql-freetds Microsoft SQL Server (using FreeTDS)]
+  * [#backendenc-mssql-freetds Microsoft SQL Server (via FreeTDS)]
   * [#backendenc-mysql MySQL/MariaDB]
   * [#backendenc-postgresql PostgreSQL]
  * [#runas Run-As User and Group]
@@ -223,11 +230,11 @@ See the [configreference.html#oracle SQL Relay Configuration Reference] for othe
 See [http://software.firstworks.com/p/getting-started-with-oracle.html Getting Started With Oracle] for general assistance installing and configuring an Oracle database.
 
 [[br]][=#db-mssql-odbc]
-==== Microsoft SQL Server (using ODBC) ====
+==== Microsoft SQL Server (via ODBC) ====
 
 On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] for some versions of Linux.
 
-In this example, SQL Relay is configured to connect to a Microsoft SQL Server database using ODBC.
+In this example, SQL Relay is configured to connect to a Microsoft SQL Server database via ODBC.
 
 {{{#!blockquote
 {{{#!code
@@ -235,7 +242,7 @@ In this example, SQL Relay is configured to connect to a Microsoft SQL Server da
 }}}
 }}}
 
-The dsn option refers to an ODBC DSN (Data Source Name).
+The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).
 
 On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
 
@@ -273,11 +280,11 @@ See the [configreference.html#odbc SQL Relay Configuration Reference] for other 
 See [http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html Getting Started With ODBC (on a non-MS platform)] for general assistance installing and configuring ODBC on a non-MS platform.
 
 [[br]][=#db-mssql-freetds]
-==== Microsoft SQL Server (using !FreeTDS) ====
+==== Microsoft SQL Server (via !FreeTDS) ====
 
 On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a [https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx Microsoft-provided ODBC driver] for some versions of Linux.
 
-However, on Linux and Unix platforms, access to Microsoft SQL Server databases is also available using [http://www.freetds.org FreeTDS].
+However, on Linux and Unix platforms, access to Microsoft SQL Server databases is also available via [http://www.freetds.org FreeTDS].
 
 {{{#!blockquote
 {{{#!code
@@ -302,9 +309,9 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 See the [configreference.html#freetds SQL Relay Configuration Reference] for other valid !FreeTDS connect string options.
 
 [[br]][=#db-sap]
-==== SAP/Sybase (using the native SAP/Sybase library) ====
+==== SAP/Sybase (via the native SAP/Sybase library) ====
 
-In this example, SQL Relay is configured to connect to a SAP/Sybase database using the native SAP/Sybase library.
+In this example, SQL Relay is configured to connect to a SAP/Sybase database via the native SAP/Sybase library.
 
 {{{#!blockquote
 {{{#!code
@@ -343,11 +350,11 @@ See the [configreference.html#sap SQL Relay Configuration Reference] for other v
 See [http://software.firstworks.com/p/getting-started-with-sapsybase.html Getting Started With SAP/Sybase] for general assistance installing and configuring an SAP/Sybase database.
 
 [[br]][=#db-sap-freetds]
-==== SAP/Sybase (using !FreeTDS) ====
+==== SAP/Sybase (via !FreeTDS) ====
 
 The native SAP/Sybase library is available on Windows and on some Linux/Unix platforms.
 
-However, on Linux and Unix platforms, access to SAP/Sybase databases is also available using [http://www.freetds.org FreeTDS].
+However, on Linux and Unix platforms, access to SAP/Sybase databases is also available via [http://www.freetds.org FreeTDS].
 
 {{{#!blockquote
 {{{#!code
@@ -523,6 +530,78 @@ See the [configreference.html#sqlite SQL Relay Configuration Reference] for othe
 
 See [http://software.firstworks.com/p/getting-started-with-sqlite.html Getting Started With SQLite] for general assistance installing and configuring a SQLite database.
 
+[[br]][=#db-odbc-hive]
+==== Apache Hive (via ODBC) ====
+
+Apache Hive is a data warehouse built on top of Apache Hadoop.  An ODBC driver is available for Windows and Linux platforms which implements a SQL interface to Hive.
+
+Cloudera provides Hive ODBC drivers for Windows and Linux.  Both are rather quirky.
+
+The most significant quirk is that version 2.6.4.1004 (and probably other versions) for Linux ship with their own copy of libssl/libcrypto, version 1.1.  These tend to conflict with the versions of libssl/libcrypto that SQL Relay itself is linked against, causing the driver to malfunction.  The only known solution is to build a copy of Rudiments and SQL Relay from source, configuring rudiments with the --disable-ssl --disable-gss --disable-libcurl options, and use this copy to access Hive.  Unfortunately, this has a side effect of disabling all SSL/TLS and Kerberos support in SQL Relay, as well as disabling the ability to load config files over https and ssh.  Perhaps a future version of the Cloudera Hive ODBC driver for Linux will link against the system versions of libssl/libcrypto and eliminate this quirk.
+
+In this example, SQL Relay is configured to connect to a Apache Hive data warehouse via ODBC.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-hive.conf@
+}}}
+}}}
+
+The contents of the session tag work around another Hive quirk.  "hivedb" is specified in the db option of the string attribute of the connection tag, but this doesn't appear to be adequate to actually put you in that schema.  Running the "use hivedb" query at the beginning of the session helps.  But, it appears that the schema isn't actually selected until the first query is run.  So, the "select 1" query immediately following the use query solves this.
+
+The overrideschema option in the string attribute of the connection tag works around yet another Hive quirk.  Hive tends to report the current schema as something other than "hivedb", but when running "show tables" or "describe" queries, the database wants "hivedb" to be passed in as the schema for the table names.
+
+The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).
+
+On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
+
+On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).
+
+{{{#!blockquote
+{{{#!code
+[hive]
+Driver=/opt/cloudera/hiveodbc/lib/64/libclouderahiveodbc64.so
+HiveServerType=2
+Host=ec2-1-2-3-4.compute-1.amazonaws.com
+Port=10000
+}}}
+}}}
+
+(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)
+
+See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
+
+
+[[br]][=#db-odbc-impala]
+==== Impala (via ODBC) ====
+
+...
+
+[[br]][=#db-odbc-redshift]
+==== Redshift (via ODBC) ====
+
+...
+
+[[br]][=#db-odbc-athena]
+==== Athena (via ODBC) ====
+
+...
+
+[[br]][=#db-odbc-elastisearch]
+==== Elastisearch (via ODBC) ====
+
+...
+
+[[br]][=#db-odbc-teradata]
+==== Teradata (via ODBC) ====
+
+...
+
+[[br]][=#db-odbc-exasol]
+==== Exasol (via ODBC) ====
+
+...
+
 [[br]][=#db-odbc]
 ==== ODBC ====
 
@@ -538,7 +617,7 @@ In this example, SQL Relay is configured to connect to an ODBC database.
 }}}
 }}}
 
-The dsn option refers to an ODBC DSN (Data Source Name).
+The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).
 
 On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).
 
@@ -576,11 +655,11 @@ See the [configreference.html#odbc SQL Relay Configuration Reference] for other 
 See [http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html Getting Started With ODBC (on a non-MS platform)] for general assistance installing and configuring ODBC on a non-MS platform.
 
 [[br]][=#db-msaccess]
-==== Microsoft Access (using MDBTools) ====
+==== Microsoft Access (via MDBTools) ====
 
 On Windows platforms, ODBC can be used to access a Microsoft Access database.
 
-On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available using [http://mdbtools.sourceforge.net MDBTools].
+On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via [http://mdbtools.sourceforge.net MDBTools].
 
 {{{#!blockquote
 {{{#!code
@@ -1737,7 +1816,7 @@ This example adds distinguished name validation:
 In this case, the database server's certificate is expected to present the distinguished name: CN=examplehost.yourdomain.com
 
 [[br]][=#backendenc-mssql-freetds]
-=== Microsoft SQL Server (using !FreeTDS) ===
+=== Microsoft SQL Server (via !FreeTDS) ===
 
 Modern Microsoft SQL Server databases support the following TLS/SSL features:
 
@@ -1747,7 +1826,7 @@ Modern Microsoft SQL Server databases support the following TLS/SSL features:
 
 Microsoft SQL Server does not support Mutual Authentication over TLS/SSL.
 
-Configuring SQL Relay to use TLS/SSL encryption and authentication with a Microsoft SQL Server database using !FreeTDS involves:
+Configuring SQL Relay to use TLS/SSL encryption and authentication with a Microsoft SQL Server database via !FreeTDS involves:
 
 * Installing a certificate and key on the database server
 * Configuring !FreeTDS on the SQL Relay server to support secure connections

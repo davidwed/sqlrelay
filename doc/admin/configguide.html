@@ -13,18 +13,25 @@
     <li><a href="#database">Database Configuration</a></li>
     <ul>
       <li><a href="#db-oracle">Oracle</a></li>
-      <li><a href="#db-mssql-odbc">Microsoft SQL Server (using ODBC)</a></li>
-      <li><a href="#db-mssql-freetds">Microsoft SQL Server (using FreeTDS)</a></li>
-      <li><a href="#db-sap">SAP/Sybase (using the native SAP/Sybase library)</a></li>
-      <li><a href="#db-sap-freetds">SAP/Sybase (using the FreeTDS)</a></li>
+      <li><a href="#db-mssql-odbc">Microsoft SQL Server (via ODBC)</a></li>
+      <li><a href="#db-mssql-freetds">Microsoft SQL Server (via FreeTDS)</a></li>
+      <li><a href="#db-sap">SAP/Sybase (via the native SAP/Sybase library)</a></li>
+      <li><a href="#db-sap-freetds">SAP/Sybase (via FreeTDS)</a></li>
       <li><a href="#db-db2">IBM DB2</a></li>
       <li><a href="#db-informix">Informix</a></li>
       <li><a href="#db-mysql">MySQL/MariaDB</a></li>
       <li><a href="#db-postgresql">PostgreSQL</a></li>
       <li><a href="#db-firebird">Firebird</a></li>
       <li><a href="#db-sqlite">SQLite</a></li>
+      <li><a href="#db-odbc-hive">Apache Hive (via ODBC)</a></li>
+      <li><a href="#db-odbc-impala">Impala (via ODBC)</a></li>
+      <li><a href="#db-odbc-redshift">Redshift (via ODBC)</a></li>
+      <li><a href="#db-odbc-athena">Athena (via ODBC)</a></li>
+      <li><a href="#db-odbc-elastisearch">Elastisearch (via ODBC)</a></li>
+      <li><a href="#db-odbc-teradata">Teradata (via ODBC)</a></li>
+      <li><a href="#db-odbc-exasol">Exasol (via ODBC)</a></li>
       <li><a href="#db-odbc">ODBC</a></li>
-      <li><a href="#db-msaccess">Microsoft Access (using MDBTools)</a></li>
+      <li><a href="#db-msaccess">Microsoft Access (via MDBTools)</a></li>
     </ul>
 
     <li><a href="#dbconnections">Database Connections</a></li>
@@ -87,7 +94,7 @@
     <li><a href="#backendencryption">Back-End Encryption and Secure Authentication</a></li>
     <ul>
       <li><a href="#backendenc-oracle">Oracle</a></li>
-      <li><a href="#backendenc-mssql-freetds">Microsoft SQL Server (using FreeTDS)</a></li>
+      <li><a href="#backendenc-mssql-freetds">Microsoft SQL Server (via FreeTDS)</a></li>
       <li><a href="#backendenc-mysql">MySQL/MariaDB</a></li>
       <li><a href="#backendenc-postgresql">PostgreSQL</a></li>
     </ul>
@@ -318,11 +325,11 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-oracle.html">Getting Started With Oracle</a> for general assistance installing and configuring an Oracle database.</p>
 
-<br/><a name="db-mssql-odbc"/><h4>Microsoft SQL Server (using ODBC)</h4>
+<br/><a name="db-mssql-odbc"/><h4>Microsoft SQL Server (via ODBC)</h4>
 
 <p>On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a <a target="_blank" href="https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx">Microsoft-provided ODBC driver</a> for some versions of Linux.</p>
 
-<p>In this example, SQL Relay is configured to connect to a Microsoft SQL Server database using ODBC.</p>
+<p>In this example, SQL Relay is configured to connect to a Microsoft SQL Server database via ODBC.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -345,7 +352,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>The dsn option refers to an ODBC DSN (Data Source Name).</p>
+<p>The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).</p>
 
 <p>On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).</p>
 
@@ -386,11 +393,11 @@ UsageCount<font color="#990000">=</font><font color="#993399">1</font> </tt></pr
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html">Getting Started With ODBC (on a non-MS platform)</a> for general assistance installing and configuring ODBC on a non-MS platform.</p>
 
-<br/><a name="db-mssql-freetds"/><h4>Microsoft SQL Server (using FreeTDS)</h4>
+<br/><a name="db-mssql-freetds"/><h4>Microsoft SQL Server (via FreeTDS)</h4>
 
 <p>On Windows platforms, ODBC can be used to access a Microsoft SQL Server database.  There is also a <a target="_blank" href="https://msdn.microsoft.com/en-us/library/hh568451(v=sql.110).aspx">Microsoft-provided ODBC driver</a> for some versions of Linux.</p>
 
-<p>However, on Linux and Unix platforms, access to Microsoft SQL Server databases is also available using <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
+<p>However, on Linux and Unix platforms, access to Microsoft SQL Server databases is also available via <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -431,9 +438,9 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See the <a href="configreference.html#freetds">SQL Relay Configuration Reference</a> for other valid FreeTDS connect string options.</p>
 
-<br/><a name="db-sap"/><h4>SAP/Sybase (using the native SAP/Sybase library)</h4>
+<br/><a name="db-sap"/><h4>SAP/Sybase (via the native SAP/Sybase library)</h4>
 
-<p>In this example, SQL Relay is configured to connect to a SAP/Sybase database using the native SAP/Sybase library.</p>
+<p>In this example, SQL Relay is configured to connect to a SAP/Sybase database via the native SAP/Sybase library.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -490,11 +497,11 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-sapsybase.html">Getting Started With SAP/Sybase</a> for general assistance installing and configuring an SAP/Sybase database.</p>
 
-<br/><a name="db-sap-freetds"/><h4>SAP/Sybase (using FreeTDS)</h4>
+<br/><a name="db-sap-freetds"/><h4>SAP/Sybase (via FreeTDS)</h4>
 
 <p>The native SAP/Sybase library is available on Windows and on some Linux/Unix platforms.</p>
 
-<p>However, on Linux and Unix platforms, access to SAP/Sybase databases is also available using <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
+<p>However, on Linux and Unix platforms, access to SAP/Sybase databases is also available via <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -796,6 +803,95 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-sqlite.html">Getting Started With SQLite</a> for general assistance installing and configuring a SQLite database.</p>
 
+<br/><a name="db-odbc-hive"/><h4>Apache Hive (via ODBC)</h4>
+
+<p>Apache Hive is a data warehouse built on top of Apache Hadoop.  An ODBC driver is available for Windows and Linux platforms which implements a SQL interface to Hive.</p>
+
+<p>Cloudera provides Hive ODBC drivers for Windows and Linux.  Both are rather quirky.</p>
+
+<p>The most significant quirk is that version 2.6.4.1004 (and probably other versions) for Linux ship with their own copy of libssl/libcrypto, version 1.1.  These tend to conflict with the versions of libssl/libcrypto that SQL Relay itself is linked against, causing the driver to malfunction.  The only known solution is to build a copy of Rudiments and SQL Relay from source, configuring rudiments with the --disable-ssl --disable-gss --disable-libcurl options, and use this copy to access Hive.  Unfortunately, this has a side effect of disabling all SSL/TLS and Kerberos support in SQL Relay, as well as disabling the ability to load config files over https and ssh.  Perhaps a future version of the Cloudera Hive ODBC driver for Linux will link against the system versions of libssl/libcrypto and eliminate this quirk.</p>
+
+<p>In this example, SQL Relay is configured to connect to a Apache Hive data warehouse via ODBC.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"odbc"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;session&gt;</font></b>
+			<b><font color="#0000FF">&lt;start&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>
+				use hivedb
+				<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>
+				select 1
+				<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+			<b><font color="#0000FF">&lt;/start&gt;</font></b>
+		<b><font color="#0000FF">&lt;/session&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"dsn=hive;user=hiveuser;password=hivepassword;db=hivedb;overrideschema=hivedb"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The contents of the session tag work around another Hive quirk.  "hivedb" is specified in the db option of the string attribute of the connection tag, but this doesn't appear to be adequate to actually put you in that schema.  Running the "use hivedb" query at the beginning of the session helps.  But, it appears that the schema isn't actually selected until the first query is run.  So, the "select 1" query immediately following the use query solves this.</p>
+
+<p>The overrideschema option in the string attribute of the connection tag works around yet another Hive quirk.  Hive tends to report the current schema as something other than "hivedb", but when running "show tables" or "describe" queries, the database wants "hivedb" to be passed in as the schema for the table names.</p>
+
+<p>The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).</p>
+
+<p>On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).</p>
+
+<p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">[</font>hive<font color="#990000">]</font>
+Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>cloudera<font color="#990000">/</font>hiveodbc<font color="#990000">/</font>lib<font color="#990000">/</font><font color="#993399">64</font><font color="#990000">/</font>libclouderahiveodbc64<font color="#990000">.</font>so
+HiveServerType<font color="#990000">=</font><font color="#993399">2</font>
+Host<font color="#990000">=</font>ec2<font color="#990000">-</font><font color="#993399">1</font><font color="#990000">-</font><font color="#993399">2</font><font color="#990000">-</font><font color="#993399">3</font><font color="#990000">-</font><font color="#993399">4</font><font color="#990000">.</font>compute<font color="#990000">-</font><font color="#993399">1</font><font color="#990000">.</font>amazonaws<font color="#990000">.</font>com
+Port<font color="#990000">=</font><font color="#993399">10000</font></tt></pre>
+
+</blockquote>
+<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)</p>
+
+<p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
+
+<br/><a name="db-odbc-impala"/><h4>Impala (via ODBC)</h4>
+
+<p>...</p>
+
+<br/><a name="db-odbc-redshift"/><h4>Redshift (via ODBC)</h4>
+
+<p>...</p>
+
+<br/><a name="db-odbc-athena"/><h4>Athena (via ODBC)</h4>
+
+<p>...</p>
+
+<br/><a name="db-odbc-elastisearch"/><h4>Elastisearch (via ODBC)</h4>
+
+<p>...</p>
+
+<br/><a name="db-odbc-teradata"/><h4>Teradata (via ODBC)</h4>
+
+<p>...</p>
+
+<br/><a name="db-odbc-exasol"/><h4>Exasol (via ODBC)</h4>
+
+<p>...</p>
+
 <br/><a name="db-odbc"/><h4>ODBC</h4>
 
 <p>SQL Relay supports most popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.</p>
@@ -825,7 +921,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>The dsn option refers to an ODBC DSN (Data Source Name).</p>
+<p>The dsn option in the string attribute of the connection tag refers to an ODBC DSN (Data Source Name).</p>
 
 <p>On Windows platforms, the DSN is an entry in the Windows Registry, created by the ODBC Data Source Administrator (look for "Set up ODBC data sources" in the Control Panel or just run odbcad32.exe).</p>
 
@@ -866,11 +962,11 @@ UsageCount<font color="#990000">=</font><font color="#993399">1</font> </tt></pr
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-odbc-on-non-ms.html">Getting Started With ODBC (on a non-MS platform)</a> for general assistance installing and configuring ODBC on a non-MS platform.</p>
 
-<br/><a name="db-msaccess"/><h4>Microsoft Access (using MDBTools)</h4>
+<br/><a name="db-msaccess"/><h4>Microsoft Access (via MDBTools)</h4>
 
 <p>On Windows platforms, ODBC can be used to access a Microsoft Access database.</p>
 
-<p>On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available using <a target="_blank" href="http://mdbtools.sourceforge.net">MDBTools</a>.</p>
+<p>On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via <a target="_blank" href="http://mdbtools.sourceforge.net">MDBTools</a>.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.8
@@ -2749,7 +2845,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>In this case, the database server's certificate is expected to present the distinguished name: CN=examplehost.yourdomain.com</p>
 
-<br/><a name="backendenc-mssql-freetds"/><h3>Microsoft SQL Server (using FreeTDS)</h3>
+<br/><a name="backendenc-mssql-freetds"/><h3>Microsoft SQL Server (via FreeTDS)</h3>
 
 <p>Modern Microsoft SQL Server databases support the following TLS/SSL features:</p>
 
@@ -2761,7 +2857,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Microsoft SQL Server does not support Mutual Authentication over TLS/SSL.</p>
 
-<p>Configuring SQL Relay to use TLS/SSL encryption and authentication with a Microsoft SQL Server database using FreeTDS involves:</p>
+<p>Configuring SQL Relay to use TLS/SSL encryption and authentication with a Microsoft SQL Server database via FreeTDS involves:</p>
 
 <ul>
   <li>Installing a certificate and key on the database server</li>
