@@ -102,8 +102,26 @@
     <li><a href="#runas">Run-As User and Group</a></li>
     <li><a href="#deniedallowedips">Denied/Allowed IP Addresses</a></li>
     <li><a href="#pwdenc">Password Encryption</a></li>
+    <ul>
+      <li><a href="#rot">rot</a></li>
+      <li><a href="#md5">md5</a></li>
+      <li><a href="#sha1">sha1</a></li>
+      <li><a href="#sha256">sha256</a></li>
+      <li><a href="#crypt">crypt</a></li>
+    </ul>
+
     <li><a href="#schedules">Connection Schedules</a></li>
+    <ul>
+      <li><a href="#cron_userlist">cron_userlist</a></li>
+    </ul>
+
     <li><a href="#filtering">Query Filtering</a></li>
+    <ul>
+      <li><a href="#filter-patterns">patterns</a></li>
+      <li><a href="#filter-regex">regex</a></li>
+      <li><a href="#filter-string">string</a></li>
+    </ul>
+
   </ul>
 
   <li><a href="#translation">Translation</a></li>
@@ -139,6 +157,10 @@
   </ul>
 
   <li><a href="#notifications">Notifications</a></li>
+  <ul>
+    <li><a href="#events">events</a></li>
+  </ul>
+
   <li><a href="#sessionqueries">Session-Queries</a></li>
   <li><a href="#altconfigfile">Alternative Configuration File Options</a></li>
   <ul>
@@ -3710,17 +3732,29 @@ rknzcyrcnffjbeq
   <li>crypt</li>
 </ul>
 
+<p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<br/><a name="rot"/><h4>rot</h4>
+
 <p>The <b>rot</b> module is a two-way encryption module that performs a character rotation, similar to the popular <a target="_blank" href="http://en.wikipedia.org/wiki/ROT13">ROT13</a> algorithm, though it can rotate by any amount specified in the <i>count</i> attribute, not just 13 and rotates digits as well as upper and lower-case characters.</p>
 
-<p>The <b>md5</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/MD5">MD5</a> algorithm.</p>
+<p>See examples above.</p>
 
-<p>The <b>sha1</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/SHA-1">SHA-1</a> algorithm.</p>
+<br/><a name="md5"/><h4>md5</h4>
 
-<p>The <b>sha256</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/SHA-2">SHA-256</a> algorithm.</p>
+<p>The <b>md5</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/MD5">MD5</a> algorithm.  This module has no parameters.</p>
 
-<p>The <b>crypt</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">DES</a> algorithm using a salt specified in the <i>salt</i> attribute.  The salt is required and must be a 2 digit alphanumeric code.</p>
+<br/><a name="sha1"/><h4>sha1</h4>
 
-<p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+<p>The <b>sha1</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/SHA-1">SHA-1</a> algorithm.  This module has no parameters.</p>
+
+<br/><a name="sha256"/><h4>sha256</h4>
+
+<p>The <b>sha256</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/SHA-2">SHA-256</a> algorithm.  This module has no parameters.</p>
+
+<br/><a name="crypt"/><h4>crypt</h4>
+
+<p>The <b>crypt</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">DES</a> algorithm using a salt specified in the <i>salt</i> parameter.  The salt is required and must be a 2 digit alphanumeric code.</p>
 
 <br/><a name="schedules"/><h3>Connection Schedules</h3>
 
@@ -3810,6 +3844,8 @@ http://www.gnu.org/software/src-highlite -->
 <p>At startup, the SQL Relay server creates instances of the specified schedule modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  Each module applies its rules to the specified user.  If a module denies access to a user then the remaining modules are ignored.  If the user makes it through all modules without being denies access, then the user is allowed access.</p>
 
 <p>Currently, only the ''cron_userlist'' connection schedule module is available in the standard SQL Relay distribution.  Custom modules may be developed though.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<br/><a name="cron_userlist"/><h4>cron_userlist</h4>
 
 <p>The <b>cron_userlist</b> module allows you to define a connection schedule for a list of users, using a cron-like syntax.</p>
 
@@ -4127,7 +4163,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
 
-<h4>patterns</h4>
+<br/><a name="filter-patterns"/><h4>patterns</h4>
 
 <p>The <b>patterns</b> module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.</p>
 
@@ -4199,7 +4235,7 @@ select <font color="#990000">*</font> from badstringtable <font color="#008080">
 </tt></pre>
 
 </blockquote>
-<h4>regex</h4>
+<br/><br/><a name="filter-regex"/><h4>regex</h4>
 
 <p>The <b>regex</b> module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.</p>
 
@@ -4259,7 +4295,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<h4>string</h4>
+<br/><br/><a name="filter-string"/><h4>string</h4>
 
 <p>The <b>string</b> module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.</p>
 
@@ -5961,6 +5997,8 @@ http://www.gnu.org/software/src-highlite -->
 </ul>
 
 <p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<br/><a name="events"/><h4>events</h4>
 
 <p>The <b>events</b> module listens for a specified set of events and notifies recipients when a one occurs.</p>
 

@@ -67,8 +67,17 @@
  * [#runas Run-As User and Group]
  * [#deniedallowedips Denied/Allowed IP Addresses]
  * [#pwdenc Password Encryption]
+  * [#rot rot]
+  * [#md5 md5]
+  * [#sha1 sha1]
+  * [#sha256 sha256]
+  * [#crypt crypt]
  * [#schedules Connection Schedules]
+  * [#cron_userlist cron_userlist]
  * [#filtering Query Filtering]
+  * [#filter-patterns patterns]
+  * [#filter-regex regex]
+  * [#filter-string string]
 * [#translation Translation]
  * [#querytranslation Query Translation]
   * [#normalize normalize]
@@ -87,6 +96,7 @@
  * [#slowqueries slowqueries]
  * [#stalecursors stalecursors]
 * [#notifications Notifications]
+ * [#events events]
 * [#sessionqueries Session-Queries]
 * [#altconfigfile Alternative Configuration File Options]
  * [#directory Configuration Directory]
@@ -2397,17 +2407,39 @@ Currently, the following password encryption modules are available in the standa
 * sha256
 * crypt
 
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#rot]
+==== rot ====
+
 The '''rot''' module is a two-way encryption module that performs a character rotation, similar to the popular [http://en.wikipedia.org/wiki/ROT13 ROT13] algorithm, though it can rotate by any amount specified in the //count// attribute, not just 13 and rotates digits as well as upper and lower-case characters.
 
-The '''md5''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/MD5 MD5] algorithm.
+See examples above.
 
-The '''sha1''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/SHA-1 SHA-1] algorithm.
 
-The '''sha256''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/SHA-2 SHA-256] algorithm.
+[[br]][=#md5]
+==== md5 ====
 
-The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
+The '''md5''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/MD5 MD5] algorithm.  This module has no parameters.
 
-Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+[[br]][=#sha1]
+==== sha1 ====
+
+The '''sha1''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/SHA-1 SHA-1] algorithm.  This module has no parameters.
+
+
+[[br]][=#sha256]
+==== sha256 ====
+
+The '''sha256''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/SHA-2 SHA-256] algorithm.  This module has no parameters.
+
+
+[[br]][=#crypt]
+==== crypt ====
+
+The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// parameter.  The salt is required and must be a 2 digit alphanumeric code.
 
 
 [[br]][=#schedules]
@@ -2440,6 +2472,10 @@ Connection schedule modules can be "stacked".  Multiple different modules may be
 At startup, the SQL Relay server creates instances of the specified schedule modules and initializes them.  When a client connects, the server passes the supplied credentials to each module, in the order that they were specified in the config file.  Each module applies its rules to the specified user.  If a module denies access to a user then the remaining modules are ignored.  If the user makes it through all modules without being denies access, then the user is allowed access.
 
 Currently, only the ''cron_userlist'' connection schedule module is available in the standard SQL Relay distribution.  Custom modules may be developed though.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#cron_userlist]
+==== cron_userlist ====
 
 The '''cron_userlist''' module allows you to define a connection schedule for a list of users, using a cron-like syntax.
 
@@ -2634,6 +2670,8 @@ Currently, the following filter modules are available:
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
+
+[[br]][=#filter-patterns]
 ==== patterns ====
 
 The '''patterns''' module matches the query against a specified set of patterns.  Each pattern may be a string, case-insensitive string, or regular expression.  Each pattern may also be matched against the entire query, only the parts of the query that are outside of quotes, or only the parts of the query that are contained within quotes.  If the query matches, then it is filtered out.
@@ -2670,6 +2708,8 @@ But these queries would not be:
 }}}
 }}}
 
+
+[[br]][=#filter-regex]
 ==== regex ====
 
 The '''regex''' module matches the query against a specified regular expression pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match, without the complexity of the patterns module.
@@ -2704,6 +2744,8 @@ But this query would not be:
 }}}
 }}}
 
+
+[[br]][=#filter-string]
 ==== string ====
 
 The '''string''' module matches the query against a specified string pattern.  If the query matches, then it is filtered out.  This module is useful if you need to do a quick match without the complexity of regular expressions or of the patterns module.
@@ -3650,6 +3692,10 @@ Currently, the following standard notification module is available:
 * '''events'''
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#events]
+==== events ====
 
 The '''events''' module listens for a specified set of events and notifies recipients when a one occurs.
 
