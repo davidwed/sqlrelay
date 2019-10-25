@@ -23,7 +23,7 @@
       <li><a href="#db-postgresql">PostgreSQL</a></li>
       <li><a href="#db-firebird">Firebird</a></li>
       <li><a href="#db-sqlite">SQLite</a></li>
-      <li><a href="#db-msaccess">Microsoft Access (via MDBTools)</a></li>
+      <li><a href="#db-msaccess">Microsoft Access</a></li>
       <li><a href="#db-odbc-teradata">Teradata (via ODBC)</a></li>
       <li><a href="#db-odbc-exasol">Exasol (via ODBC)</a></li>
       <li><a href="#db-odbc-hive">Apache Hive (via ODBC)</a></li>
@@ -337,7 +337,7 @@ http://www.gnu.org/software/src-highlite -->
   <font color="#990000">)</font></tt></pre>
 
 </blockquote>
-<p>(Note that the tnsnames.ora file must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the tnsnames.ora file must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>If you are using Oracle Instant Client, then it's likely that you don't have an $ORACLE_HOME or a tnsnames.ora file.  In that case, the oracle_sid can be set directly to a tnsnames-style expression and the oracle_home option can be omitted.</p>
 
@@ -428,7 +428,7 @@ Threading<font color="#990000">=</font><font color="#993399">1</font>
 UsageCount<font color="#990000">=</font><font color="#993399">1</font> </tt></pre>
 
 </blockquote>
-<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
@@ -475,7 +475,7 @@ http://www.gnu.org/software/src-highlite -->
 	<font color="#008080">client</font> charset <font color="#990000">=</font> UTF<font color="#990000">-</font><font color="#993399">8</font></tt></pre>
 
 </blockquote>
-<p>(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#freetds">SQL Relay Configuration Reference</a> for other valid FreeTDS connect string options.</p>
 
@@ -528,7 +528,7 @@ http://www.gnu.org/software/src-highlite -->
 	query tcp ether examplehost <font color="#993399">5000</font></tt></pre>
 
 </blockquote>
-<p>(Note that the interfaces file must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the interfaces file must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>On Windows platforms, the server option refers to a similar entry created in an opaque location with the Open Client Directory Services Editor (dsedit).</p>
 
@@ -578,7 +578,7 @@ http://www.gnu.org/software/src-highlite -->
 	<font color="#008080">tds</font> version <font color="#990000">=</font> <font color="#993399">5.0</font></tt></pre>
 
 </blockquote>
-<p>(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#freetds">SQL Relay Configuration Reference</a> for other valid FreeTDS connect string options.</p>
 
@@ -674,7 +674,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>ol_informix1210 <font color="#993399">29756</font><font color="#990000">/</font>tcp</tt></pre>
 
 </blockquote>
-<p>(Note that the sqlhosts and /etc/services files must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the sqlhosts and /etc/services files must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>On Windows platforms, the servername option refers to a similar entry created in an opaque location with the Setnet32 program.</p>
 
@@ -811,7 +811,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>The db option indicates that SQL Relay should connect to the database /var/sqlite/exampledb.</p>
 
-<p>Note that the database file (exampledb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay is run as.</p>
+<p>Note that the database file (exampledb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay runs as.</p>
 
 <p>SQLite also supports a high-performance in-memory mode where tables are maintained in memory and nothing is written to permanent storage.  To use this mode with SQL Relay, set the db option to :memory:.</p>
 
@@ -844,7 +844,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-sqlite.html">Getting Started With SQLite</a> for general assistance installing and configuring a SQLite database.</p>
 
-<br/><a name="db-msaccess"/><h3>Microsoft Access (via MDBTools)</h3>
+<br/><a name="db-msaccess"/><h3>Microsoft Access</h3>
 
 <p>On Windows platforms, ODBC can be used to access a Microsoft Access database.</p>
 
@@ -873,7 +873,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.</p>
 
-<p>(Note that the database file must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the database file must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#mdbtools">SQL Relay Configuration Reference</a> for other valid MDBTools connect string options.</p>
 
@@ -952,7 +952,7 @@ UseDataEncryption<font color="#990000">=</font><font color="#993399">0</font>
 UseDateDataForTimeStampParams<font color="#990000">=</font><font color="#993399">0</font></tt></pre>
 
 </blockquote>
-<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
@@ -999,7 +999,7 @@ EXAUID<font color="#990000">=</font>sys
 EXAPWD<font color="#990000">=</font>exasol</tt></pre>
 
 </blockquote>
-<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
@@ -1062,7 +1062,7 @@ Host<font color="#990000">=</font>hiveserver
 Port<font color="#990000">=</font><font color="#993399">10000</font></tt></pre>
 
 </blockquote>
-<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
@@ -1150,7 +1150,7 @@ Description<font color="#990000">=</font>Cloudera ODBC Driver <font color="#0080
 Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>cloudera<font color="#990000">/</font>impalaodbc<font color="#990000">/</font>lib<font color="#990000">/</font><font color="#993399">64</font><font color="#990000">/</font>libclouderaimpalaodbc64<font color="#990000">.</font>so</tt></pre>
 
 </blockquote>
-<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
@@ -1214,7 +1214,7 @@ Description<font color="#990000">=</font>Amazon Redshift <font color="#008080">O
 Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>amazon<font color="#990000">/</font>redshiftodbc<font color="#990000">/</font>lib<font color="#990000">/</font><font color="#993399">64</font><font color="#990000">/</font>libamazonredshiftodbc64<font color="#990000">.</font>so</tt></pre>
 
 </blockquote>
-<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
@@ -1313,7 +1313,7 @@ Description<font color="#990000">=</font>Simba Athena <font color="#008080">ODBC
 Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>simba<font color="#990000">/</font>athenaodbc<font color="#990000">/</font>lib<font color="#990000">/</font><font color="#993399">64</font><font color="#990000">/</font>libathenaodbc_sb64<font color="#990000">.</font>so</tt></pre>
 
 </blockquote>
-<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay is run as.)</p>
+<p>(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)</p>
 
 <p>See the <a href="configreference.html#odbc">SQL Relay Configuration Reference</a> for other valid ODBC connect string options.</p>
 
@@ -2286,7 +2286,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>(Note that the user that SQL Relay is run as must be able to read and write to the path of the socket.)</p>
+<p>(Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)</p>
 
 <a name="mysqlauth"/><h3>Authentication/Authorization Options</h3>
 
@@ -2735,7 +2735,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>(Note that the user that SQL Relay is run as must be able to read and write to the path of the socket.)</p>
+<p>(Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)</p>
 
 <a name="postgresqlauth"/><h3>Authentication/Authorization Options</h3>
 
@@ -3586,8 +3586,8 @@ http://www.gnu.org/software/src-highlite -->
 <p>There are several important considerations when setting runasuser/runasgroup:</p>
 
 <ul>
-  <li>runasuser is only effective if sqlr-start is run as root.</li>
-  <li>runasgroup only effective if sqlr-start is run by a member of the group, or by root.</li>
+  <li>runasuser is only effective if sqlr-start runs as root.</li>
+  <li>runasgroup only effective if sqlr-start runs as a member of the group, or by root.</li>
   <li>All SQL Relay configuration files, and any appropriate database configuration files (such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file) must be readable by the runasuser/runasgroup.  Otherwise various things will fail, most notably, dynamic scaling.</li>
   <li>SQL Relay must be able to write to "run" and "log" directories.  However, when installed from RPM packages, the /var/run/sqlrelay and /var/log/sqlrelay directories are owned by sqlrelay/sqlrelay and have fairly restrictive 755 permissions.  Thus, the permissions on these directories must be manually changed if runasuser or runasgroup are set to any value other than "sqlrelay".  This is not an issue if SQL Relay is built from source, and is not an issue on Windows.</li>
 </ul>
