@@ -74,6 +74,7 @@
   * [#normalize normalize]
   * [#patterns patterns]
  * [#resultsettranslation Result Set Translation]
+  * [#reformatdatetime reformatdatetime]
 * [#queryrouting Query Routing]
  * [#regex regex]
  * [#userlist userlist]
@@ -2976,6 +2977,9 @@ Currently, the following result set translation module is available:
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
+[[br]][=#reformatdatetime]
+==== reformatdatetime ====
+
 The '''reformatdatetime''' module examines the field, decides if it's a date/time field, and if so, reformats it based on the given parameters.
 
 The following parameters are currently supported:
@@ -3488,8 +3492,7 @@ Currently, the following standard logger modules are available:
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 
-[[br]]
-[=#debug]
+[[br]][=#debug]
 ==== debug ====
 
 The '''debug''' module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/log/sqlrelay/debug or /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.
@@ -3515,8 +3518,7 @@ Sample log for child listener process: [sqlr-listener.1886.html sqlr-listener.18
 Sample log for connecton process: [sqlr-connection.1871.html sqlr-connection.1871][[br]]
 
 
-[[br]]
-[=#slowqueries]
+[[br]][=#slowqueries]
 ==== slowqueries ====
 
 The '''slowqueries''' module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/log/sqlrelay or /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.
@@ -3542,8 +3544,7 @@ time: 0.000001
 Sample log: [sqlr-connection-oracletest-querylog.2899.html sqlr-connection-oracletest-querylog.2899]
 
 
-[[br]]
-[=#stalecursors]
+[[br]][=#stalecursors]
 ==== stalecursors ====
 
 It is not uncommon for a long-running application to open a cursor, and then never close it again.  So-called "cursor leaks" eventually lead to //No server-side cursors were available to process the query// (or similar) errors, and the root cause can be difficult to track down, especially if a lower-level database abstraction layer does the opening and closing of the cursors.
