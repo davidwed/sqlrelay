@@ -90,6 +90,7 @@
  * [#resultsetrowtranslation Result Set Row Block Translation]
 * [#directives Query Directives]
  * [#custom_wf custom_wf]
+ * [#crash crash]
 * [#queryrouting Query Routing]
  * [#regex regex]
  * [#userlist userlist]
@@ -3186,7 +3187,7 @@ All directive modules have an //enabled// parameter, allowing the module to be t
 
 At startup, the SQL Relay server creates instances of the specified directive modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file. 
 
-Currently, the following directive module is available:
+Currently, the following directive modules are available:
 
 * '''custom_wf'''
 
