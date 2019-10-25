@@ -10,6 +10,7 @@
 	added configure test for PQdescribePrepared
 	test improvements
 	documentation improvements
+	split sqlrelay-crash directive into its own module
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3
