@@ -79,6 +79,7 @@
   * [#filter-regex regex]
   * [#filter-string string]
 * [#translation Data Translation]
+ * [#queryparsing Query Parsing]
  * [#querytranslation Query Translation]
   * [#normalize normalize]
   * [#patterns patterns]
@@ -2327,9 +2328,9 @@ For example, to deny all clients except clients connecting from the 192.168.2.0 
 [[br]][=#pwdenc]
 == Password Encryption ==
 
-Password encryption enables you to store passwords in the configuration file in a manner that makes them not directly readable.  Passwords for SQL Relay users and database passwords may both be encrypted.
+Password encryption enables you to store passwords in the configuration file in a manner that makes them not directly readable.  Passwords for both SQL Relay users and database users may be encrypted.
 
-Encryption and decryption are achieved via loadable modules.  The //passwordencryptions// section of the configuration file indicates which modules to load, and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.
+Encryption and decryption are implemented by loadable modules.  The //passwordencryptions// section of the configuration file indicates which modules to load, and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.
 
 For example, to use the //rot// module, which encrypts by performing a simple character rotation:
 
@@ -2345,9 +2346,9 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 In this example, the //id// and //count// attributes are parameters for the //rot// module.  "13" tells the module to rotate by 13 characters.  The //id// attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The //id// attribute is mandatory.
 
-Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "examplepassword").  A command line program (described later) is provided to encrypt passwords.
+Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "examplepassword").  A command line program (described below) is provided to encrypt passwords.
 
-Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// parameter in the passwordencryption tag ( //rot13// ), not the module name ( //rot// ).
+Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// parameter in the passwordencryption tag ( //rot13enc// ), not the module name ( //rot// ).
 
 Password encryption modules may be "stacked".  It is possible to load multiple modules and use each one with a different password.  For example, you might want to use the //rot// module with a count of 13 for the SQL Relay password and a count of 10 for the database password.
 
@@ -2357,11 +2358,9 @@ Password encryption modules may be "stacked".  It is possible to load multiple m
 }}}
 }}}
 
-Encryption modules may be either two-way or one-way.  Two-way encryption modules can both encrypt and decrypt a password.  One-way encryption modules can only encrypt a password.
+Encryption modules may be either two-way or one-way.  Two-way encryption modules can both encrypt and decrypt a password.  One-way encryption modules can only encrypt a password, not decrypt it.
 
-Symmetric and asymmetric key encryption techniques are two-way.  The rot encryption is an example of symmetric key encryption.  Asymmetric key encryptions generally use a public/private key pair, where the publicly available key is be used to encrypt the data but a privately held key is required to decrypt it.  SQL Relay can use two-way encryption modules with passwords for SQL Relay users and database passwords.
-
-One-way encryption techniques include DES, MD5 and SHA1 hashes.  When using those techniques, the password can be encrypted but cannot effectively be decrypted.  SQL Relay can use one-way encryption moudles with passwords for SQL Relay users but can not use one-way encryption modules to encrypt database passwords.
+As such, SQL Relay can use either one-way or two-way encryption to encrypt passwords for SQL Relay users.  However, only two-way encryption can only be used to encrypt passwords for database users.
 
 The command line tool '''sqlr-pwdenc''' is provided to help encrypt passwords for inclusion in the configuration file.  Given an encryption module and password, it will print out the encrypted password.
 
@@ -2380,12 +2379,12 @@ For example:
 
 {{{#!blockquote
 {{{
-$ sqlr-pwdenc -id example -pwdencid rot13 -password examplepassword
+$ sqlr-pwdenc -id example -pwdencid rot13enc -password examplepassword
 rknzcyrcnffjbeq
 }}}
 }}}
 
-The resulting string "grfgcnffjbeq" can now be put in the configuration file as the password.
+The resulting string "rknzcyrcnffjbeq" can now be put in the configuration file as the password.
 
 There is one final thing to note.  Command line client programs like sqlrsh and sqlr-import take a -id option.  The -id option causes the program to open the configuration file and extract the host, port, socket, user and password from the specified instance.  If the password is encrypted, then the encrypted password will be extracted and passed to the server.  This will fail.  So, when using the -id option with an encrypted password, you must also use the -user and -password option, to override the user/password that are extracted from the configuration file.
 
@@ -2421,7 +2420,13 @@ Custom modules may also be developed.  For more information, please contact [mai
 
 The '''rot''' module is a two-way encryption module that performs a character rotation, similar to the popular [http://en.wikipedia.org/wiki/ROT13 ROT13] algorithm, though it can rotate by any amount specified in the //count// attribute, not just 13 and rotates digits as well as upper and lower-case characters.
 
-See examples above.
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-pwdencs-rot13.conf@
+}}}
+}}}
+
+Since the ROT algorithm is two-way, it can be used to encrypt passwords for both SQL Relay users and database users.
 
 
 [[br]][=#md5]
@@ -2429,11 +2434,27 @@ See examples above.
 
 The '''md5''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/MD5 MD5] algorithm.  This module has no parameters.
 
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-pwdencs-md5.conf@
+}}}
+}}}
+
+Since the MD5 algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.
+
 
 [[br]][=#sha1]
 === sha1 ===
 
 The '''sha1''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/SHA-1 SHA-1] algorithm.  This module has no parameters.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-pwdencs-sha1.conf@
+}}}
+}}}
+
+Since the SHA-1 algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.
 
 
 [[br]][=#sha256]
@@ -2441,11 +2462,27 @@ The '''sha1''' module is a one-way encryption module that encrypts the password 
 
 The '''sha256''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/SHA-2 SHA-256] algorithm.  This module has no parameters.
 
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-pwdencs-sha256.conf@
+}}}
+}}}
+
+Since the SHA-256 algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.
+
 
 [[br]][=#crypt]
 === crypt ===
 
 The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// parameter.  The salt is required and must be a 2 digit alphanumeric code.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-pwdencs-crypt.conf@
+}}}
+}}}
+
+Since the DES algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.
 
 
 [[br]][=#schedules]
@@ -2792,13 +2829,35 @@ But this query would not be:
 [[br]][=#translation]
 = Data Translation =
 
-SQL Relay offers features for translating queries and result sets.
+SQL Relay offers features for parsing and translating queries, and translating result sets.
+
+
+[[br]][=#queryparsing]
+== Query Parsing ==
+
+Query parsing enables the SQL Relay server to create a DOM tree representing the query, which can be more easily processed than plain text by other modules.
+
+Parsers are implemented as loadable modules.  The //parser// section of the configuration file indicates which parser module to load and what parameters to configure it with.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-parser.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+At startup, the SQL Relay server creates an instance of the specified parser modules and initializes it.  When a query is run, the server passes the query to the parser, which parses it and makes the DOM tree representing the query available to other modules.
+
+Currently, no open source parser modules are available, however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 
 [[br]][=#querytranslation]
 == Query Translation ==
 
-Query translation enables the SQL Relay server to alter queries before passing them to the database.
+Query translation enables the SQL Relay server to modify queries before passing them to the database.
 
 Query translation is implemented by loadable modules.  The //translations// section of the configuration file indicates which translation modules to load and what parameters to use when executing them.
 
@@ -3001,7 +3060,7 @@ Though more than 2 levels is rarely necessary, any level of nesting is supported
 [[br]][=#bindvariabletranslation]
 == Bind Variable Translation ==
 
-Bind variable translation enables the SQL Relay server to alter bind variables before passing them to the database.  Bind variable names or values may be modified.  Variables may also be added or deleted.  Bind variable translation is most often used in conjunction with query translation.
+Bind variable translation enables the SQL Relay server to modify bind variables before passing them to the database.  Bind variable names or values may be modified.  Variables may also be added or deleted.  Bind variable translation is most often used in conjunction with query translation.
 
 Bind variable translation is implemented by loadable modules.  The //bindvariabletranslations// section of the configuration file indicates which translation modules to load and what parameters to use when executing them.
 
@@ -3025,7 +3084,7 @@ Currently, no open source bind variable translation modules are available, howev
 [[br]][=#resultsetheaderranslation]
 == Result Set Header Translation ==
 
-Result set header translation enables the SQL Relay server to alter column information in the result set before returning it to the client.  Result set header translation is most often used in conjunction with result set translation.
+Result set header translation enables the SQL Relay server to modify column information in the result set before returning it to the client.  Result set header translation is most often used in conjunction with result set translation.
 
 Result set header translation is implemented by loadable modules.  The //resultsetheadertranslations// section of the configuration file indicates which translation modules to load and what parameters to use when executing them.
 
@@ -3049,7 +3108,7 @@ Currently, no open source result set header translation modules are available, h
 [[br]][=#resultsettranslation]
 == Result Set Translation ==
 
-Result set translation enables the SQL Relay server to alter fields in the result set before returning the field to the client.
+Result set translation enables the SQL Relay server to modify fields in the result set before returning the field to the client.
 
 Result set translation is implemented by loadable modules.  The //resultsettranslations// section of the configuration file indicates which result set translation modules to load and what parameters to use when executing them.
 
