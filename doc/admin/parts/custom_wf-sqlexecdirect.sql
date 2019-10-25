@@ -1,0 +1,2 @@
+-- sqlexecdirect
+select * from exampletable
