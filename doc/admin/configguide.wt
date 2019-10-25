@@ -82,6 +82,9 @@
  * [#usedatabase usedatabase]
  * [#routingquirks Quirks and Limitations]
 * [#logging Logging]
+ * [#debug debug]
+ * [#slowqueries slowqueries]
+ * [#stalecursors stalecursors]
 * [#notifications Notifications]
 * [#sessionqueries Session-Queries]
 * [#altconfigfile Alternative Configuration File Options]
@@ -3188,7 +3191,7 @@ The '''string''' parameter in each connection tag provides the parameters necess
 [[br]][=#clientinfolist]
 ==== clientinfolist ====
 
-The '''clientinfolist''' module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  When using PHP PDO, it can be set using the PDO_SQLRELAY_ATTR_CLIENT_INFO attribute.  The client info cannot currently be set when using the ODBC, Perl DBI, PythonDB, or ADO.NET drivers.
+The '''clientinfolist''' module routes queries by matching the "client info" sent by the client against a list of regular expressions.  The client info can be set using the setClientInfo() method/function provided by the native SQL Relay client API.  When using PHP PDO, it can be set using the PDO_SQLRELAY_ATTR_CLIENT_INFO attribute.  The client info cannot currently be set when using the ODBC, Perl DBI, !PythonDB, or ADO.NET drivers.
 
 An example configuration follows.
 
@@ -3480,12 +3483,22 @@ Currently, the following standard logger modules are available:
 
 * '''debug'''
 * '''slowqueries'''
+* '''stalecursors'''
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
+
+[[br]]
+[=#debug]
 ==== debug ====
 
 The '''debug''' module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/log/sqlrelay/debug or /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-debug.conf@
+}}}
+}}}
 
 This module takes three parameters: '''listener''', '''connection''' and '''perms'''.  The '''listener''' parameter may be set to "no" to disable logging of the sqlr-listener processes.  The '''connection''' parameter may be set to "no" to disable logging of the sqlr-connection processes.  Logging is enabled if either parameter is omitted or set to any other value.  The '''perms''' parameter may be set to any ls -l style permissions string.  The default is "rw-------" which translates to read/write for owner only.
 
@@ -3501,9 +3514,18 @@ Sample log for main listener process: [sqlr-listener.1869.html sqlr-listener.186
 Sample log for child listener process: [sqlr-listener.1886.html sqlr-listener.1886][[br]]
 Sample log for connecton process: [sqlr-connection.1871.html sqlr-connection.1871][[br]]
 
+
+[[br]]
+[=#slowqueries]
 ==== slowqueries ====
 
 The '''slowqueries''' module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/log/sqlrelay or /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-slowqueries.conf@
+}}}
+}}}
 
 This module takes two parameters: '''sec''' and '''usec'''.  Queries that take longer than '''sec''' seconds and '''usec''' microseconds will be logged.  Both parameters default to 0 and omitting them causes all queries to be logged.
 
@@ -3518,6 +3540,78 @@ time: 0.000001
 }}}
 
 Sample log: [sqlr-connection-oracletest-querylog.2899.html sqlr-connection-oracletest-querylog.2899]
+
+
+[[br]]
+[=#stalecursors]
+==== stalecursors ====
+
+It is not uncommon for a long-running application to open a cursor, and then never close it again.  So-called "cursor leaks" eventually lead to //No server-side cursors were available to process the query// (or similar) errors, and the root cause can be difficult to track down, especially if a lower-level database abstraction layer does the opening and closing of the cursors.
+
+The '''stalecursors''' module logs active cursors, enabling an administrator to see if any cursors have been open for a long time, and if so, what the last query the cursor ran was.
+
+The module works by opening a connection to another instance of SQL Relay (the "log instance"), where it creates a table named "stalecursors" and logs to that table.
+
+In the following example, the "stalecursors" instance (the log instance) provides access to a database where the stale cursors can be logged, and the "example" instance (the app instance) logs cursor activity there.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-stalecursors.conf@
+}}}
+}}}
+
+In the log instance, note the following:
+
+* It is configured to listen on a unix socket, but not configured to listen on a port.  This is because the app instance is running on the same machine.  This is not a requirement though.  The log instance could be configured to listen on a port as well, and serve app instances running on other machines.
+* translatebindvariable="yes" is set.  The queries that the module generates to insert, update, and delete from the stalecursors table use oracle-style (colon-delimited) bind variables.  If the log database is something other than oracle, then the log instance must translate the bind variables.
+* connections="5" and maxconnections="10" are set.  By default, SQL Relay opens 5 connections to the database.  The app instance uses this default configuration.  If the log instance also only opens 5 connections, then all 5 will be consumed by the app instance, and it won't be possible to access and examine the log from a client program.  So, we'll allow the log instance to scale up accordingly.
+
+
+The module takes 5 parameters: '''host''', '''port''', '''socket''', '''user''', and '''password'''.  These parameters are used to access the other instance of SQL Relay that will be used for logging.
+
+When a cursor is opened, the module adds a new row to the log.  Each time a query is executed, the row is updated.  When the cursor is closed, the module removes the row.
+
+If the cursor is never closed, then the row is never removed, even if the application exits.  The row will also persist across sqlr-starts and sqlr-stops of the app instance and log instances.  As such, it will eventually be necessary to manually clear to the table, or at least manually delete rows from it, analogous to deleting log files.
+
+To view currently active (and possibly stale) cursors, you would access the log instance like:
+
+{{{#!blockquote
+{{{
+sqlrsh -socket /tmp/stalecursors.socket -user stalecursorsuser -password stalecursorspassword
+}}}
+}}}
+
+And then view the log like:
+
+{{{#!blockquote
+{{{
+select * from stalecursors
+}}}
+}}}
+
+A typical result set would be something like:
+
+{{{#!blockquote
+{{{
+instance connection_id connection_pid cursor_id most_recent_query       most_recent_query_timestamp
+===================================================================================================
+example  example-0     27155          0         select * from bigtable  2019-10-24 20:34:06        
+example  example-0     27158          0         select * from mytable   2019-10-24 20:34:26        
+example  example-0     27162          0         select * from yourtable 2019-10-24 20:34:41        
+example  example-0     27166          0         select * from thistable 2019-10-24 20:34:53        
+example  example-0     27168          0         select * from thattable 2019-10-24 20:35:03        
+}}}
+}}}
+
+Multiple app instances may log to the same log instance.  To view cursor activity for a particular instance, just filter on the "instance" column.
+
+{{{#!blockquote
+{{{
+select * from stalecursors where instance='example'
+}}}
+}}}
+
+Note that each connection of an app instance will consume 1 connection of the log instance, so be sure to configure the log instance to start enough connections to the database.  Eg. if you have 2 app instances, each configured with connections="5", then the log instance should be configured with connections="10" and maxconnections set to something larger than 10 to allow for clients to connect and examine the logs.
 
 ----
 
