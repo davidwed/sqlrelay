@@ -82,8 +82,12 @@
  * [#querytranslation Query Translation]
   * [#normalize normalize]
   * [#patterns patterns]
+ * [#bindvariabletranslation Bind Variable Translation]
+ * [#resultsetheaderranslation Result Set Header Translation]
  * [#resultsettranslation Result Set Translation]
   * [#reformatdatetime reformatdatetime]
+ * [#resultsetrowtranslation Result Set Row Translation]
+ * [#resultsetrowtranslation Result Set Row Block Translation]
 * [#queryrouting Query Routing]
  * [#regex regex]
  * [#userlist userlist]
@@ -2992,6 +2996,54 @@ Though more than 2 levels is rarely necessary, any level of nesting is supported
 }}}
 
 
+[[br]][=#bindvariabletranslation]
+=== Bind Variable Translation ===
+
+Bind variable translation allows the SQL Relay server to alter bind variables before passing them to the database.  Bind variable names or values may be modified.  Variables may also be added or deleted.  Bind variable translation is most often used in conjunction with query translation.
+
+Bind variable translation is implemented by loadable modules.  The //bindvariabletranslations// section of the configuration file indicates which translation modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-bindvariabletranslations.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+All bind variable translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+At startup, the SQL Relay server creates instances of the specified bind variable translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.
+
+Currently, no open source bind variable translation modules are available, however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#resultsetheaderranslation]
+=== Result Set Header Translation ===
+
+Result set header translation allows the SQL Relay server to alter column information in the result set before returning it to the client.  Result set header translation is most often used in conjunction with result set translation.
+
+Result set header translation is implemented by loadable modules.  The //resultsetheadertranslations// section of the configuration file indicates which translation modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-resultsetheadertranslations.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+All result set header translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+At startup, the SQL Relay server creates instances of the specified result set header translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.
+
+Currently, no open source result set header translation modules are available, however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
 [[br]][=#resultsettranslation]
 === Result Set Translation ===
 
@@ -3069,6 +3121,38 @@ Into:
 Note that '''dateddmm''' and '''dateyyddmm''' should usually be set to the same thing.  There are very specific cases where these two parameters need to be set differently from one another.  You'll know if you need to.
 
 Note also that date/time translation in general is especially problematic with MS SQL Server.  See [../faq/#mssqldates the FAQ] for more info.
+
+
+[[br]][=#resultsetrowtranslation]
+=== Result Set Row Translation ===
+
+Result set row translation is similar to result set translation, except that an entire row is buffered and sent to the translation module, instead of fields being sent to the module one-at-a-time.
+
+This is useful if the value of one field needs to change based on the value of another field.  It also tends to perform better than translating one field at a time.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-resultsetrowtranslations.conf@
+}}}
+}}}
+
+Currently, no open source result set row translation modules are available, however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#resultsetrowblocktranslation]
+=== Result Set Row Block Translation ===
+
+Result set row block translation is similar to result set translation, except that blocks of rows are buffered and sent to the translation module, instead of individual rows or fields being sent to the module one-at-a-time.
+
+This is useful for the same reasons as result set row translation, and tends to be the highest performing option for translating result sets, but the modules tend to be complex.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-resultsetrowblocktranslations.conf@
+}}}
+}}}
+
+Currently, no open source result set row block translation modules are available, however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 ----
 
