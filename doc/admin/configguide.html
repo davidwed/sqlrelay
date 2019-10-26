@@ -159,6 +159,11 @@
     <li><a href="#routingquirks">Quirks and Limitations</a></li>
   </ul>
 
+  <li><a href="#triggers">Triggers</a></li>
+  <ul>
+    <li><a href="#replay">replay</a></li>
+  </ul>
+
   <li><a href="#logging">Logging</a></li>
   <ul>
     <li><a href="#debug">debug</a></li>
@@ -6091,7 +6096,301 @@ PostgreSQL requires "begin" queries, you must use a "begin" query to start a
 transaction, even if your app only intends to send queries which would be run
 against Oracle.  Conversely, if your client application is using a router which
 only routes queries over a set of Oracle databases, then you do not have to use
-"begin" queries.</p>
+"begin" queries.
+----</p>
+
+<br/><a name="triggers"/><h1>Triggers</h1>
+
+<p>Triggers enable SQL Relay to execute arbitrary code either before, or after a query is run.  They are similar to a database trigger, but they run inside of SQL Relay, rather than inside of the database.   As such, they are not limited to databaes operations.  They can run queries, make library or system calls, run shell commands, and anything else that an os-level application can do.</p>
+
+<p>Triggers are implemented by loadable modules.  The <i>triggers</i> section of the configuration file indicates which modules to load and what parameters to use when executing them.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		<b><font color="#0000FF">&lt;triggers&gt;</font></b>
+			<b><font color="#0000FF">&lt;trigger</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"replay"</font> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"after"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;condition</font></b> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"1213"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"transaction"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;condition</font></b> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"1205"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"query"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/trigger&gt;</font></b>
+		<b><font color="#0000FF">&lt;/triggers&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
+
+<p>All trigger modules have an <i>enabled</i> parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.</p>
+
+<p>All trigger modules also have a <i>when</i> parameter which can be set to "before", "after", or "both", indicating whether to run the trigger before the query is executed, after the query has been executed, or both.</p>
+
+<p>At startup, the SQL Relay server creates instances of the specified trigger modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  Each module may evaluate the query and decide whether to run something or not.</p>
+
+<p>Currently, the following standard trigger modules are available:</p>
+
+<ul>
+  <li><b>replay</b></li>
+</ul>
+
+<p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<br/><a name="replay"/><h2>replay</h2>
+
+<p>The replay module enables replay of the previous query, or of the entire transaction, when given conditions occur.</p>
+
+<p>This enables automatic recovery in the event of a deadlock and/or lock wait timeout.  It's possible that the module could be used for other purposes, but it's targeted for this use.</p>
+
+<p>An example configuration:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		<b><font color="#0000FF">&lt;triggers&gt;</font></b>
+			<b><font color="#0000FF">&lt;trigger</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"replay"</font> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"after"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;condition</font></b> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"1213"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"transaction"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;condition</font></b> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"1205"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"query"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/trigger&gt;</font></b>
+		<b><font color="#0000FF">&lt;/triggers&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example...</p>
+
+<p>The trigger is configured to run after the query has been executed.  This is the only valid configuration for the replay trigger.  If when="before" or when="both" is set then the trigger will be ignored.</p>
+
+<p>If an error code 1213 occurs (a MySQL deadlock), then the entire transaction is replayed.  If an error code 1205 occurs (a MySQL lock wait timeout), then the previous query is replayed.</p>
+
+<p>Note that the normalize translation is also configured.  This helps the trigger parse and rewrite queries more accurately.  See the section on Auto-Increment Columns below for details.</p>
+
+<p>Deadlocks aren't completely preventable, but if you know which queries caused the deadlock, then you can usually modify them (or the app) to mitigate the problem.  The replay module allows you to specify a query to run and a location to log the output of the query to, for each condition.  For example:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;translations&gt;</font></b>
+			<b><font color="#0000FF">&lt;translation</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"normalize"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/translations&gt;</font></b>
+		<b><font color="#0000FF">&lt;triggers&gt;</font></b>
+			<b><font color="#0000FF">&lt;trigger</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"replay"</font> <font color="#009900">when</font><font color="#990000">=</font><font color="#FF0000">"after"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;condition</font></b> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"1213"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"transaction"</font><b><font color="#0000FF">&gt;</font></b>
+					<b><font color="#0000FF">&lt;log&gt;</font></b>
+						<b><font color="#0000FF">&lt;query</font></b> <font color="#009900">file</font><font color="#990000">=</font><font color="#FF0000">"/tmp/example-deadlocks.log"</font><b><font color="#0000FF">&gt;</font></b>
+						show engine innodb status
+						<b><font color="#0000FF">&lt;/query&gt;</font></b>
+					<b><font color="#0000FF">&lt;/log&gt;</font></b>
+				<b><font color="#0000FF">&lt;/condition&gt;</font></b>
+				<b><font color="#0000FF">&lt;condition</font></b> <font color="#009900">error</font><font color="#990000">=</font><font color="#FF0000">"1205"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"query"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/trigger&gt;</font></b>
+		<b><font color="#0000FF">&lt;/triggers&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example...</p>
+
+<p>If an error code 1213 occurs (a MySQL deadlock), then the query "show engine innodb status" is executed, and the results logged to /tmp/example-deadlocks.log  Then, the entire transaction is replayed.</p>
+
+<p>If an error code 1205 occurs (a MySQL lock wait timeout), then the previous query is replayed, but no logging occurs.</p>
+
+<p>In this configuration, the module enables automatic recovery from deadlocks and lock wait timeouts, and the log allows a developer to go back later, examine the queries that caused the deadlocks, and modify them (or the app) to mitigate the problem.</p>
+
+<p>In addition to the <b>module</b> and <b>when</b> parameters, the <b>trigger</b> tag also supports the following parameters:</p>
+
+<ul>
+  <li><b>includeselects</b></li>
+  <ul>
+    <li>If set to "no" (the default) - select queries are not logged or replayed</li>
+    <li>If set to "yes" - select queries are logged and replayed</li>
+    <li>Use care when disabling this, as the query log will be larger and replay operations can take much longer.</li>
+  </ul>
+
+  <li><b>maxretries</b></li>
+  <ul>
+    <li>It's possible to encounter another replay condition while replaying a query or transaction.  If this happens, the module retries.  This parameter limits the total number of retries.  If it is exceeded, then whatever error occurred on the last retry is returned to the application.</li>
+  </ul>
+
+</ul>
+
+<p>The <b>condition</b> tag supports the following parameters:</p>
+
+<ul>
+  <li><b>error</b></li>
+  <ul>
+    <li>if numeric: the condition is true if the error code matches</li>
+    <li>if string: the condition is true if the error string contains the string</li>
+  </ul>
+
+  <li><b>scope</b></li>
+  <ul>
+    <li>transaction - replay the entire transaction if this condition occurs</li>
+    <li>transaction - replay the previous query if this condition occurs</li>
+  </ul>
+
+</ul>
+
+<p>The <b>log</b> tag doesn't support any parameters.</p>
+
+<p>The <b>query</b> tag contains the query to be run, and supports the following parameters:</p>
+
+<ul>
+  <li><b>log</b></li>
+  <ul>
+    <li>the name of the file to log the output of the query to</li>
+    <li>each log entry consists of a divider, timestamp, and result set</li>
+  </ul>
+
+</ul>
+
+<p>Sample (partial) log entries follow:</p>
+
+<blockquote>
+  <pre>===============================================================================
+05/15/2019 15:59:40 EDT
+
+Type : InnoDB
+Name : 
+Status : 
+
+=====================================
+2019-05-15 15:59:40 7f2dcb118b00 INNODB MONITOR OUTPUT
+=====================================
+Per second averages calculated from the last 9 seconds
+-----------------
+BACKGROUND THREAD
+-----------------
+srv_master_thread loops: 2625 srv_active, 0 srv_shutdown, 100871 srv_idle
+srv_master_thread log flush and writes: 103455
+... more lines ...
+Spin rounds per wait: 1.97 mutex, 5.00 RW-shared, 3.26 RW-excl
+------------------------
+LATEST DETECTED DEADLOCK
+------------------------
+2019-05-15 15:59:40 7f2dcce8bb00
+*** (1) TRANSACTION:
+TRANSACTION 1449294, ACTIVE 8 sec inserting
+mysql tables in use 1, locked 1
+LOCK WAIT 38 lock struct(s), heap size 6544, 34 row lock(s), undo log entries 22 MySQL thread id 2400, OS thread handle 0x7f2dcb118b00, query id 339194 localhost testuser update
+------------------------
+LATEST DETECTED DEADLOCK
+------------------------
+2019-05-15 15:59:40 7f2dcce8bb00
+*** (1) TRANSACTION:
+TRANSACTION 1449294, ACTIVE 8 sec inserting
+mysql tables in use 1, locked 1
+LOCK WAIT 38 lock struct(s), heap size 6544, 34 row lock(s), undo log entries 22 MySQL thread id 2400, OS thread handle 0x7f2dcb118b00, query id 339194 localhost testuser update
+insert into testtable (col1,col2,col3) values (null,0,2013183)
+*** (1) WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 9786 page no 6352 n bits 696 index `col1` of table `testdb`.`testtable` trx table locks 13 total table locks 6 trx id 1449294 lock_mode X locks gap before rec insert intention waiting lock hold time 1 wait time before grant 0 
+*** (2) TRANSACTION:
+TRANSACTION 1449304, ACTIVE 7 sec fetching rows
+mysql tables in use 25, locked 25
+18296 lock struct(s), heap size 2143784, 1437389 row lock(s)
+MySQL thread id 2361, OS thread handle 0x7f2dcce8bb00, query id 334173 localhost testuser Copying to tmp table on disk
+update testtable1,testtable2,testtable3 ... some long where clause ... some long set clause ...
+*** (2) HOLDS THE LOCK(S):
+RECORD LOCKS space id 9786 page no 6352 n bits 592 index `col1` of table `testdb`.`testtable` trx table locks 4 total table locks 6 trx id 1449304 lock mode S lock hold time 7 wait time before grant 0 
+*** (2) WAITING FOR THIS LOCK TO BE GRANTED:
+RECORD LOCKS space id 9786 page no 6327 n bits 368 index `GEN_CLUST_INDEX` of table `testdb`.`testtable` trx table locks 4 total table locks 6 trx id 1449304 lock mode S waiting lock hold time 0 wait time before grant 0 
+*** WE ROLL BACK TRANSACTION (1)
+------------
+TRANSACTIONS
+------------
+... more lines ...
+
+
+===============================================================================
+05/15/2019 17:21:33 EDT
+
+Type : InnoDB
+Name : 
+Status : 
+... more lines ...
+</pre>
+
+</blockquote>
+<p>From this log entry, we can see that insert and update queries encountered a gap-locking deadlock.</p>
+
+<p>Currently, each condition tag may contain only one log tag, and each log tag may contain only one query tag.  This restriction may be relaxed in a future release.</p>
+
+<p>If the log file doesn't already exist, the it is created with rw-r--r-- permissions, and will be owned by the user/group that SQL Relay is running as.  There aren't, currently, parameters to control permissions or ownership.</p>
+
+<h3>Considerations</h3>
+
+<p>There are some considerations that are important to take into account when using the replay module.</p>
+
+<h4>Deadlock Response</h4>
+
+<p>MySQL/MariaDB respond to a deadlock at the transaction level.  When a deadlock occurs, they roll back all of the queries in the current transaction, and all of these queries must be reexecuted in order to recover.  So, when using the replay module with MySQL/MariaDB and databases which respond similarly, use scope="transaction" in your conditions.</p>
+
+<p>Oracle responds to a deadlock at the query level.  When a deadlock occurs, it rolls back the query that deadlocked, and only that query must be reexecuted in order to recover.  So, when using the replay module with Oracle and databases which respond similarly, use scope="query" in your conditions.</p>
+
+<p>The replay module has been used extensively with MySQL/MariaDB, but not with other databases.  It should work, but there might be unforseen issues.  For example, the scope="transaction" behavior is modeled after the specific way that MySQL/MariaDB respond to a deadlock.  When a deadlock occurs, they roll back all of the queries in the current transaction.  However, you are still in the same transaction, it's just as if none of the queries had been run.  As such, when replaying a transaction, the module just re-executes the queries that it logged - it doesn't execute a rollback, or begin a new transaction first.  This may not be correct for all databases which handle deadlocks at the transaction level.</p>
+
+<h4>Memory Usage</h4>
+
+<p>Queries are, currently, just logged to memory.  If your application runs large queries, and/or has long running transactions, then excess memory consumption could become an issue.  The default behavior of not logging or replaying select queries helps, so use caution when disabling that option.</p>
+
+<h4>Retries</h4>
+
+<p>If, while replaying a query, or transaction, another replay condition is encountered, then the module will retry until the replay succeeds, or until maxretries is reached.</p>
+
+<p>To avoid hammering the system, the module delays between retries.  The delay is initially 10 milliseconds.  This doubles with each retry until the delay reaches 1 second.  Then that doubles until it reaches 10 seconds.  From then on, the delay between retries is 10 seconds.  This algorithm isn't currently configurable.  It also isn't backed by any particular science.  It just seems to work reasonably well.</p>
+
+<h4>Auto-Increment Columns</h4>
+
+<p>Auto-increment column values survive rollbacks.  If an insert into a table with an auto-increment column generates the value 300, and that query is rolled back then the row will be removed.  But, if the insert is run again, then it will generate the value 301 instead of 300.</p>
+
+<p>To handle this, the replay module parses and rewrites insert queries to contain the last-insert-id's that they generated and logs the rewritten query instead of the original.  Thus, when replayed, the query won't generate a value, but rather will re-use the value that it generated the first time.</p>
+
+<p>There are some limitations to this.</p>
+
+<ul>
+  <li>Multi-row inserts are supported unless they generate auto-increment column values.  These are impossible to support, as post-insert, the last-insert-id only returns the very last value that was generated.  It's not possible to collect the others.</li>
+  <li>Insert-Select queries (eg. insert into onetable select from anothertable) and Select-Into queries (eg. select * from onetable into anothertable) are similarly not supported.</li>
+</ul>
+
+<p>If any of those are detected, then the query log is cleared and the module is disabled until the beginning of the next transaction.  If a replay condition occurs, then the error is just returned as it would have been if the module were not in use.</p>
+
+<p>The module also has to do a bit of work to determine whether the insert contains an auto-increment column, including query the database for the last-insert-id, and potentially column info.  Column info is cached, but the cache isn't shared across sqlr-connection processes, and is (currently) cleared at the end of each transaction.  So, the module should be used with caution in performance-sensitive applications.</p>
 
 <hr/>
 
