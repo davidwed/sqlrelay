@@ -100,6 +100,9 @@
  * [#clientinfolist clientinfolist]
  * [#usedatabase usedatabase]
  * [#routingquirks Quirks and Limitations]
+* [#queries Custom Queries]
+ * [#sqlrcmdcstat sqlrcmdcstat]
+ * [#sqlrcmdgstat sqlrcmdgstat]
 * [#triggers Triggers]
  * [#replay replay]
 * [#logging Logging]
@@ -207,7 +210,7 @@ Examples follow.
 [[br]][=#db-oracle]
 === Oracle ===
 
-In this example, SQL Relay is configured to connect to an Oracle database.  The dbase parameter defaults to "oracle", so the dbase attribute may be omitted when connecting to an Oracle database.  It is just set here for illustrative purposes.
+In this example, SQL Relay is configured to connect to an Oracle database.  The dbase attribute defaults to "oracle", so the dbase attribute may be omitted when connecting to an Oracle database.  It is just set here for illustrative purposes.
 
 {{{#!blockquote
 {{{#!code
@@ -1237,16 +1240,16 @@ The following configuration configures an instance of SQL Relay to use Kerberos 
 }}}
 }}}
 
-* The '''krb''' parameter enables (or disables) Kerberos authentication and encryption.
-* The '''krbservice''' parameter specifies which Kerberos service to use.  This parameter is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.
-* The '''krbkeytab''' parameter specifies the location of the keytab file containing the key for the specified Kerberos service.  This parameter is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab
+* The '''krb''' attribute enables (or disables) Kerberos authentication and encryption.
+* The '''krbservice''' attribute specifies which Kerberos service to use.  This attribute is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.
+* The '''krbkeytab''' attribute specifies the location of the keytab file containing the key for the specified Kerberos service.  This attribute is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab
 * User list auth is also used.  Database and proxied auth are not currently supported with Kerberos.
 
 Note that no passwords are required in the user list.  Note also that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.
 
-To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the krbkeytab parameter.
+To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the krbkeytab attribute.
 
-To start the instance on a Windows system, you must be logged in as a user that can proxy the service specified by the krbservice parameter (or it's default value of "sqlrelay" if omitted).
+To start the instance on a Windows system, you must be logged in as a user that can proxy the service specified by the krbservice attribute (or it's default value of "sqlrelay" if omitted).
 
 If those criteria are met, starting the Kerberized instance of SQL Relay is the same as starting any other instance:
 
@@ -1322,12 +1325,12 @@ The following configuration enables TLS/SSL encryption for an instance of SQL re
 }}}
 }}}
 
-* The '''tls''' parameter enables (or disables) TLS/SSL encryption.
-* The '''tlscert''' parameter specifies the TLS/SSL certificate chain to use.
+* The '''tls''' attribute enables (or disables) TLS/SSL encryption.
+* The '''tlscert''' attribute specifies the TLS/SSL certificate chain to use.
  * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlscert.html The tlscert Parameter] for details.)
 * User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
 
-To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert parameter.  If that criterium is met then the instance can be started using:
+To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:
 
 {{{#!blockquote
 {{{
@@ -1415,8 +1418,8 @@ The following configuration enables these checks for an instance of SQL relay:
 }}}
 }}}
 
-* The '''tlsvalidate''' parameter enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca parameter.
-* The '''tlsca''' parameter specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
+* The '''tlsvalidate''' attribute enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca attribute.
+* The '''tlsca''' attribute specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
  * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlsca.html The tlsca Parameter] for details.)
 * User list auth is also used.
 
@@ -1638,7 +1641,7 @@ Another issue is that some !MySQL and !MariaDB distributions omit the necessary 
 
 Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the !MySQL database it was originally written to use.
 
-This is as simple as specifying a different database using the //dbase// parameter in the instance tag and specifying the appropriate database connection string in the //string// attribute of the connection tag.
+This is as simple as specifying a different database using the //dbase// attribute in the instance tag and specifying the appropriate database connection string in the //string// attribute of the connection tag.
 
 {{{#!blockquote
 {{{#!code
@@ -1827,7 +1830,7 @@ If the database has a lot of users, or users are added, deleted, or updated regu
 
 Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the !PostgreSQL database it was originally written to use.
 
-This is as simple as specifying a different database using the //dbase// parameter in the instance tag and specifying the appropriate database connection string in the //string// attribute of the connection tag.
+This is as simple as specifying a different database using the //dbase// attribute in the instance tag and specifying the appropriate database connection string in the //string// attribute of the connection tag.
 
 {{{#!blockquote
 {{{#!code
@@ -2334,7 +2337,7 @@ For example, to deny all clients except clients connecting from the 192.168.2.0 
 
 Password encryption enables you to store passwords in the configuration file in a manner that makes them not directly readable.  Passwords for both SQL Relay users and database users may be encrypted.
 
-Encryption and decryption are implemented by loadable modules.  The //passwordencryptions// section of the configuration file indicates which modules to load, and parameters in the user and connection tags indicate which module to use with the password defined in that same tag.
+Encryption and decryption are implemented by loadable modules.  The //passwordencryptions// section of the configuration file indicates which modules to load, and attributes in the user and connection tags indicate which module to use with the password defined in that same tag.
 
 For example, to use the //rot// module, which encrypts by performing a simple character rotation:
 
@@ -2348,11 +2351,11 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-In this example, the //id// and //count// attributes are parameters for the //rot// module.  "13" tells the module to rotate by 13 characters.  The //id// attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The //id// attribute is mandatory.
+In this example, the //id// and //count// attributes configure the //rot// module.  "13" tells the module to rotate by 13 characters.  The //id// attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The //id// attribute is mandatory.
 
 Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "examplepassword").  A command line program (described below) is provided to encrypt passwords.
 
-Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// parameter in the passwordencryption tag ( //rot13enc// ), not the module name ( //rot// ).
+Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// attribute in the passwordencryption tag ( //rot13enc// ), not the module name ( //rot// ).
 
 Password encryption modules may be "stacked".  It is possible to load multiple modules and use each one with a different password.  For example, you might want to use the //rot// module with a count of 13 for the SQL Relay password and a count of 10 for the database password.
 
@@ -2478,7 +2481,7 @@ Since the SHA-256 algorithm is one-way, it can be used to encrypt passwords for 
 [[br]][=#crypt]
 === crypt ===
 
-The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// parameter.  The salt is required and must be a 2 digit alphanumeric code.
+The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
 
 {{{#!blockquote
 {{{#!code
@@ -2506,7 +2509,7 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All schedule modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All schedule modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 Connection schedule modules can be "stacked".  Multiple different modules may be loaded, and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -2685,9 +2688,9 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All filter modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All filter modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
-All filter modules have an //when// parameter as well, which determines when the filter is applied.  If set to "before" then the module is executed before any query translations are executed.  If set to "after", or omitted, then the module is executed  after all query translations have been executed.  See [#querytranslations Query Translations] below for more information.
+All filter modules have an //when// attribute as well, which determines when the filter is applied.  If set to "before" then the module is executed before any query translations are executed.  If set to "after", or omitted, then the module is executed  after all query translations have been executed.  See [#querytranslations Query Translations] below for more information.
 
 Filter modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -2709,7 +2712,7 @@ When using query filters, it is helpful to use the //normalize// query translati
 
 Pattern matching is substantially more reliable and efficient if the query has been normalized first.  See [#querytranslations Query Translations] and the [#normalize normalize] translation below for more information.
 
-Currently, the following filter modules are available:
+Currently, the following filter modules are available in the standard SQL Relay distribution:
 
 * '''patterns'''
 * '''regex'''
@@ -2842,7 +2845,7 @@ The '''tag''' module matches queries in the same manner as the [#filter-patterns
 
 Note the moduledata tag defined prior to the filters tag.  Moduledata modules basically allow one module to pass data to another.  See [#moduledata Module Data] below for more details.  The tag filter module interoperates with the tag moduledata module and requires an instance of it to work.
 
-In the tag module, if the query matches the pattern, then instead of filtering it out so that it isn't executed, the query is "tagged" with the value specified in the '''tag''' parameter in the instance of moduledata specified by the '''moduledataid''' parameter.  Other modules (translation modules, for example) could then query the specified moduledata for the presence or absence of this value, and act accordingly.
+In the tag module, if the query matches the pattern, then instead of filtering it out so that it isn't executed, the query is "tagged" with the value specified in the '''tag''' attribute in the instance of moduledata specified by the '''moduledataid''' attribute.  Other modules (translation modules, for example) could then query the specified moduledata for the presence or absence of this value, and act accordingly.
 
 Currently, no open source modules make use of the tag filter/moduledata module,  however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
@@ -2893,11 +2896,11 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 At startup, the SQL Relay server creates instances of the specified translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.
 
-Currently, the following translation modules are available:
+Currently, the following translation modules are available in the standard SQL Relay distribution:
 
 * '''normalize'''
 * '''patterns'''
@@ -2937,10 +2940,10 @@ Would be translated to:
 
 Normalizing a query is useful when also using [#filtering query filtering] as it simplifies the patterns that have to be searched for.
 
-The following parameters are currently supported:
+The following attributes are currently supported:
 
 * '''foreigndecimals''' - "yes" or "no".  Defaults to "no".
- * SQL requires dots for decimal separators.  However, some internationalized apps are not well behaved and build queries with decimals that use commas for decimal separators.  This parameter instructs the module to try to identify comma-separated decimals and replace the commas with dots.
+ * SQL requires dots for decimal separators.  However, some internationalized apps are not well behaved and build queries with decimals that use commas for decimal separators.  This attribute instructs the module to try to identify comma-separated decimals and replace the commas with dots.
  * This can be tricky, especially with decimals in parentheses, which can be misinterpreted as parameters.  To help manage this, a space before a set of comma-separated numbers is interpreted as a delimiter, and no number may have more than 1 decimal separator.
  * For example:
   * (111,222, 333,444) is interpreted as having 2 decimals: 111.222 and 333.444
@@ -2960,7 +2963,7 @@ The following parameters are currently supported:
   * Some databases (eg. !PostgreSQL, !MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
- * If set to "yes" then values enclosed in double-quotes are converted to the case specified by the convertcase parameter.
+ * If set to "yes" then values enclosed in double-quotes are converted to the case specified by the convertcase attribute.
  * If set to "no" then no case conversion is done.
  * If omitted then the value defaults to "no".
 * '''convertcasebackquoted''' - "upper", "lower", "yes", or "no".  Defaults to "no".
@@ -2970,7 +2973,7 @@ The following parameters are currently supported:
   * Some databases (eg. !PostgreSQL, !MySQL/MariaDB, others) default object names to the specified case when creating the object, if the object names are unquoted in the create statement.
    * Eg. 'create table exampletable (col1 int)' creates a table named //exampletable// with a column named //col1//.
   * This can be useful when converting an app from one type of database to the other if the app's queries contain quoted object names.
- * If set to "yes" then values enclosed in back-quotes are converted to the case specified by the convertcase parameter.
+ * If set to "yes" then values enclosed in back-quotes are converted to the case specified by the convertcase attribute.
  * If set to "no" then no case conversion is done.
  * If omitted then the value defaults to "no".
 * '''removedoublequotes''' - "yes" or "no".  Defaults to "no".
@@ -3096,7 +3099,7 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All bind variable translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All bind variable translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 At startup, the SQL Relay server creates instances of the specified bind variable translations modules and initializes them.  When a query is run, the server passes the bind variables to each module, in the order that they were specified in the config file.  If a module modifies a bind variable, then that modified variable is passed on to the next module.
 
@@ -3120,7 +3123,7 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All result set header translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All result set header translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 At startup, the SQL Relay server creates instances of the specified result set header translations modules and initializes them.  When a query is run, the server passes the result set header to each module, in the order that they were specified in the config file.  If a module modifies the result set header, then that modified header is passed on to the next module.
 
@@ -3144,11 +3147,11 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All result set translation modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All result set translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 At startup, the SQL Relay server creates instances of the specified result set translation modules and initializes them.  As each field of the result set is returned, the server passes the field to each module, in the order that they were specified in the config file.  If a module modifies a field, then that modified field is passed on to the next module.
 
-Currently, the following result set translation module is available:
+Currently, the following result set translation module is available in the standard SQL Relay distribution:
 
 * '''reformatdatetime'''
 
@@ -3157,9 +3160,9 @@ Custom modules may also be developed.  For more information, please contact [mai
 [[br]][=#reformatdatetime]
 === reformatdatetime ===
 
-The '''reformatdatetime''' module examines the field, decides if it's a date/time field, and if so, reformats it based on the given parameters.
+The '''reformatdatetime''' module examines the field, decides if it's a date/time field, and if so, reformats it based on the given attributes.
 
-The following parameters are currently supported:
+The following attributes are currently supported:
 
 * '''datetimeformat''' - Specifies the format to convert date/time fields to.  May be any combination of the following format characters.  Non-format characters will be inserted as-is.
  * '''DD''' - day of the month
@@ -3174,12 +3177,12 @@ The following parameters are currently supported:
  * '''SS''' - second
  * '''FFF''' - fraction of a second
  * '''AM''' - AM or PM
-* '''dateformat''' - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.
-* '''timeformat''' - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat parameter.  Defaults to whatever value was supplied in the datetimeformat parameter.
-* '''dateddmm''' - If set to "yes" then dates are assumed to be in the DD-MM-YYYY format (with days leading), as opposed to MM-DD-YYYY format (with months leading).  This is important for interpreting dates like 03-04-2000.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.
-* '''dateyyddmm''' - If set to "yes" then dates are assumed to be in the YYYY-DD-MM format (with days leading), as opposed to YYYY-MM-DD-YYYY (with months leading).  This is important for interpreting dates like 2000-03-04.  If this parameter is set to "yes" then it would be interprted as March 4th rather than April 3rd.
-* '''datedelimiters''' - Determining whether the field is a date/time or not can be tricky.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This parameter enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.
-* '''ignorenondatetime''' - If this parameter is set to "yes" then only fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.  By default, all fields are examined and heuristics are used to determine whether the field contains a date/time.
+* '''dateformat''' - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat attribute.  Defaults to whatever value was supplied in the datetimeformat attribute.
+* '''timeformat''' - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat attribute.  Defaults to whatever value was supplied in the datetimeformat attribute.
+* '''dateddmm''' - If set to "yes" then dates are assumed to be in the DD-MM-YYYY format (with days leading), as opposed to MM-DD-YYYY format (with months leading).  This is important for interpreting dates like 03-04-2000.  If this attribute is set to "yes" then it would be interprted as March 4th rather than April 3rd.
+* '''dateyyddmm''' - If set to "yes" then dates are assumed to be in the YYYY-DD-MM format (with days leading), as opposed to YYYY-MM-DD-YYYY (with months leading).  This is important for interpreting dates like 2000-03-04.  If this attribute is set to "yes" then it would be interprted as March 4th rather than April 3rd.
+* '''datedelimiters''' - Determining whether the field is a date/time or not can be tricky.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This attribute enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.
+* '''ignorenondatetime''' - If this attribute is set to "yes" then only fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.  By default, all fields are examined and heuristics are used to determine whether the field contains a date/time.
 
 For example, the following configuration:
 
@@ -3201,7 +3204,7 @@ Into:
 07/10/2015 17:18:55
 }}}
 
-Note that '''dateddmm''' and '''dateyyddmm''' should usually be set to the same thing.  There are very specific cases where these two parameters need to be set differently from one another.  You'll know if you need to.
+Note that '''dateddmm''' and '''dateyyddmm''' should usually be set to the same thing.  There are very specific cases where these two attributes need to be set differently from one another.  You'll know if you need to.
 
 Note also that date/time translation in general is especially problematic with MS SQL Server.  See [../faq/#mssqldates the FAQ] for more info.
 
@@ -3253,7 +3256,7 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-At startup, the SQL Relay server creates one instance of the moduledata specified in each moduledata tag.  Each of these tags must specify an //id// parameter.  This id can be used by other modules to access this instance of moduledata.  If more than one instance of the same kind of moduledata is required, then multiple moduledata tags may be specified with the same //module// parameter and different //id// parameters.
+At startup, the SQL Relay server creates one instance of the moduledata specified in each moduledata tag.  Each of these tags must specify an //id// attribute.  This id can be used by other modules to access this instance of moduledata.  If more than one instance of the same kind of moduledata is required, then multiple moduledata tags may be specified with the same //module// attribute and different //id// attributes.
 
 Currently, the only open source moduledata module available is:
 
@@ -3290,11 +3293,11 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All directive modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All directive modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 At startup, the SQL Relay server creates instances of the specified directive modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file. 
 
-Currently, the following directive modules are available:
+Currently, the following directive modules are available in the standard SQL Relay distribution:
 
 * '''custom_wf'''
 
@@ -3385,7 +3388,7 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.
 
-All router modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All router modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 Router modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -3393,7 +3396,7 @@ In fact, the example above shows a stacked configuration.  The first instance of
 
 At startup, the SQL Relay server creates instances of the specified router modules and initializes them.  When the client sends a query to the SQL Relay server, the server consults each router module, in the order that they were specified in the config file.  Each module applies its routing rules to determine which connection to run the query on.  If a module returns a connection then the remaining modules are ignored.  If the query makes it through all modules without being routed to a particular connection, then the query is ignored.
 
-Currently, the following router modules are available:
+Currently, the following router modules are available in the standard SQL Relay distribution:
 
 * [#regex regex]
 * [#userlist userlist]
@@ -3424,7 +3427,7 @@ In this example, 3 SQL Relay instances are defined:
 
 In this configuration, DDL/DML queries are routed to the connectionid "master", and all other queries are routed to the connectionid "slave".
 
-The '''string''' parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
+The '''string''' attribute in each connection tag provides the parameters necessary to connect to the other instances.  Valid attributes include:
 
 * '''host''' - the host name or IP address of the SQL Relay instance
 * '''port''' - the port of the SQL Relay instance
@@ -3449,7 +3452,7 @@ In the example below, we provide a single point of access to !MySQL/MariaDB and 
 
 In this configuration, all queries containing "mysqldb." are sent to the connectionid "mysqldb" and all queries containing "postgresqldb." are sent to the connectionid "postgresqldb".
 
-As above, the '''string''' parameter in each connection tag provides the parameters necessary to connect to the other instances.
+As above, the '''string''' attribute in each connection tag provides the parameters necessary to connect to the other instances.
 
 Note the use of a notification module, as above.
 
@@ -3475,7 +3478,7 @@ In this example, 3 SQL Relay instances are defined:
 
 In this configuration, queries made by "oracle users" are routed to the connectionid "oracle", and all other queries are routed to the connectionid "sap".
 
-The '''string''' parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
+The '''string''' attribute in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
 
 * '''host''' - the host name or IP address of the SQL Relay instance
 * '''port''' - the port of the SQL Relay instance
@@ -3506,9 +3509,9 @@ In this example, 3 SQL Relay instances are defined:
 
 In this configuration, queries made by users originating at IP addresses 192.168.*.0-50 are routed to the connectionid "oracle", and queries made by users originating at all other IP addresses are routed to the connectionid "sap".
 
-Each octet of the '''ip''' parameter may be specfied as a number, a dash-separated range of numbers, or a * meaning "all possible values".
+Each octet of the '''ip''' attribute may be specfied as a number, a dash-separated range of numbers, or a * meaning "all possible values".
 
-The '''string''' parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
+The '''string''' attribute in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
 
 * '''host''' - the host name or IP address of the SQL Relay instance
 * '''port''' - the port of the SQL Relay instance
@@ -3539,7 +3542,7 @@ In this example, 3 SQL Relay instances are defined:
 
 In this configuration, queries made by users who send client info which contains the string "oracle" or "orcl" to the connectionid "oracle", and queries made by users sending any other client info the connectionid "sap".
 
-The '''string''' parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
+The '''string''' attribute in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
 
 * '''host''' - the host name or IP address of the SQL Relay instance
 * '''port''' - the port of the SQL Relay instance
@@ -3587,7 +3590,7 @@ In this example, 3 SQL Relay instances are defined:
 * one to maintain connections to a !PostgreSQL database
 * one to route queries to the other two instances
 
-The '''string''' parameter in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
+The '''string''' attribute in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
 
 * '''host''' - the host name or IP address of the SQL Relay instance
 * '''port''' - the port of the SQL Relay instance
@@ -3781,6 +3784,214 @@ transaction, even if your app only intends to send queries which would be run
 against Oracle.  Conversely, if your client application is using a router which
 only routes queries over a set of Oracle databases, then you do not have to use
 "begin" queries.
+
+----
+
+
+[[br]][=#queries]
+= Custom Queries =
+
+Custom queries enable SQL Relay to return result sets for non-SQL queries.
+
+Custom queries are implemented by loadable modules.  The //queries// section of the configuration file indicates which modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-queries.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+All query modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+At startup, the SQL Relay server creates instances of the specified query modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  Each module may evaluate the query and decide whether to respond or not.  If none of the query modules respond, then the query is passed along to the database.
+
+Currently, the following query modules are available in the standard SQL Relay distribution:
+
+* '''sqlrcmdcstat'''
+* '''sqlrcmdgstat'''
+
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#sqlrcmdcstat]
+== sqlrcmdcstat ==
+
+The sqlrcmdcstat module returns statistics about the sqlr-connection processes currently running for this instance of SQL Relay when the query "sqlrcmd cstat" is run.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-queries-sqlrcmdcstat.conf@
+}}}
+}}}
+
+An example session follows:
+
+{{{#!blockquote
+{{{
+sqlrsh - Version 1.7.0
+	Connected to: localhost:9000 as test
+
+	type help; for help.
+
+0> sqlrcmd cstat;
+INDEX MINE PROCESSID CONNECT STATE                 STATE_TIME   CLIENT_ADDR CLIENT_INFO SQL_TEXT     
+=====================================================================================================
+0     *    24464     1       RETURN_RESULT_SET             0.00 UNIX                    sqlrcmd cstat
+1          24465     0       ANNOUNCE_AVAILABILITY         0.01                                      
+2          24466     0       WAIT_SEMAPHORE                4.42                                      
+3          24467     0       WAIT_SEMAPHORE                4.35                                      
+4          24468     0       WAIT_SEMAPHORE                4.34 
+}}}
+}}}
+
+In this example:
+
+* the query "sqlrcmd cstat" has been run
+* five sqlr-connection processes are running for this SQL Relay instance
+* one sqlr-connection process is busy returning the result set of that command
+* another sqlr-connection process is announcing that it is available to accept a client connection
+* three other sqlr-connection processes are idle and waiting
+
+The columns of the result set are as follows:
+
+* INDEX - just a row index
+* MINE - contains a * if this sqlr-connection is running the "sqlrcmd cstat" command and null otherwise
+* PROCESSID - the OS process id of the sqlr-connection process
+* CONNECT - the total number of times a client has connected to this process since it was last started
+* STATE - one of the following...
+ * NOT_AVAILABLE - the current state is not available
+ * INIT - the process is initializing
+ * WAIT_FOR_AVAIL_DB - the process is waiting for the backend database to become available
+ * WAIT_CLIENT - the process is waiting for a client to connect
+ * SESSION_START - the client session is in the process of starting
+ * GET_COMMAND - the process is waiting for the client to send it a command
+ * PROCESS_SQL - a query has been run and the process is waiting for the result set
+ * PROCESS_SQLCMD - a sqlcmd has been run and the process is building the result set
+ * RETURN_RESULT_SET - a query or sqlcmd has been run and the process is returning the result set
+ * END_SESSION - the client session is in the process of ending
+ * ANNOUNCE_AVAILABILITY - the process is announcing that it is ready to accept a client
+ * WAIT_SEMAPHORE - the process is idle and waiting for the opportunity to announce that it is ready
+* STATE_TIME - the number of seconds that the process has been in the current state
+* CLIENT_ADDR - the IP address of the client, or "UNIX" if the client is connecte via a unix socket
+* CLIENT_INFO - an identifying "client info" string that some SQL Relay API's allow the client to set
+* SQL_TEXT - the query or command that is currently running
+
+
+[[br]][=#sqlrcmdgstat]
+== sqlrcmdgstat ==
+
+The sqlrcmdgstat module returns global statistics about this instance of SQL Relay when the query "sqlrcmd gstat" is run.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-queries-sqlrcmdgstat.conf@
+}}}
+}}}
+
+An example session follows:
+
+{{{#!blockquote
+{{{
+sqlrsh - Version 1.7.0
+	Connected to: localhost:9000 as test
+
+	type help; for help.
+
+0> sqlrcmd gstat;
+KEY                    VALUE               
+===========================================
+start                  2019/10/27 23:06:16 
+uptime                 930                 
+now                    2019/10/27 23:21:46 
+access_count           8                   
+query_total            43                  
+qpm                    2                   
+qpm_1                  4                   
+qpm_5                  1                   
+qpm_15                 2                   
+select_1               0                   
+select_5               0                   
+select_15              0                   
+insert_1               0                   
+insert_5               0                   
+insert_15              0                   
+update_1               0                   
+update_5               0                   
+update_15              0                   
+delete_1               0                   
+delete_5               0                   
+delete_15              0                   
+etc_1                  4                   
+etc_5                  1                   
+etc_15                 2                   
+sqlrcmd_1              0                   
+sqlrcmd_5              0                   
+sqlrcmd_15             0                   
+max_listener           1000                
+max_listener_error     0                   
+busy_listener          1                   
+peak_listener          1                   
+connection             5                   
+session                1                   
+peak_session           1                   
+peak_session_1min      1                   
+peak_session_1min_time 2019/10/27 23:21:46 
+sqlr_version           1.7.0               
+rudiments_version      1.2.1               
+module_compiled        Oct 24 2019 22:20:05
+
+	Rows Returned   : 39
+	Fields Returned : 78
+	Elapsed Time    : 0.018508 sec
+}}}
+}}}
+
+The result set is a set of key-value pairs, as follows:
+
+* start - the date/time that the instance was started
+* uptime - the number of seconds that the instance has been running
+* now - the current date/time
+* access_count - the number of times a client has connected to the instance
+* query_total - the total number of queries that have been run, intance-wide
+* qpm - queries-per-minute, averaged over total instance uptime
+* qpm_1 - queries-per-minute, for the previous minute
+* qpm_5 - queries-per-minute, averaged over the previous 5 minutes
+* qpm_15 - queries-per-minute, averaged over the previous 15 minutes
+* select_1 - selects-per-minute, averaged over total instance uptime
+* select_5 - selects-per-minute, averaged over the previous 5 minutes
+* seelct_15 - selects-per-minute, averaged over the previous 15 minutes
+* insert_1 - inserts-per-minute, averaged over the total instance uptime
+* insert_5 - inserts-per-minute, averaged over the previous 5 minutes
+* insert_15 - inserts-per-minute, averaged over the previous 15 minutes
+* update_1 - updates-per-minute, averaged over the total instance uptime
+* update_5 - updates-per-minute, averaged over the previous 5 minutes
+* update_15 - updates-per-minute, averaged over the previous 15 minutes
+* delete_1 - deletes-per-minute, averaged over the total instance uptime
+* delete_5 - deletes-per-minute, averaged over the previous 5 minutes
+* delete_15 - deletes-per-minute, averaged over the previous 15 minutes
+* etc_1 - other queries-per-minute, averaged over the total instance uptime
+* etc_5 - other queries-per-minute, averaged over the previous 5 minutes
+* etc_15 - other queries-per-minute, averaged over the previous 15 minutes
+* sqlrcmd_1 - sqlrcmds-per-minute, averaged over the total instance uptime
+* sqlrcmd_5 - sqlrcmds-per-minute, averaged over the previous 5 minutes
+* sqlrcmd_15 - sqlrcmds-per-minute, averaged over the previous 15 minutes
+* max_listener - value of the maxlisteners attribute of the instance tag for this instance (configured or default)
+* max_listener_error - the number of times that the maximum number of sqlr-listener threads were running and another client attempted to connect since the instance was started
+* busy_listener - the current number of sqlr-listener threads that are busy waiting for an available sqlr-connection to hand off a client to since the instance was started
+* peak_listener - the peak number of sqlr-listener threads that were running at the same time since the instance was started
+* connection - number of sqlr-connection processes currently running
+* session - number of currently active client sessions
+* peak_session - peak number of client sessions since the instance was started
+* peak_session_1min - peak number of client sessions in the previous minute
+* peak_session_1min_time - the time that the peak_session_1min value was calculated
+* sqlr_version - the version number of the SQL Relay server
+* rudiments_version - the version number of the Rudiments library that the SQL Relay server is using
+* module_compiled - the date/time that the SQL Relay server was compiled
+
 ----
 
 
@@ -3801,13 +4012,13 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All trigger modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All trigger modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
-All trigger modules also have a //when// parameter which can be set to "before", "after", or "both", indicating whether to run the trigger before the query is executed, after the query has been executed, or both.
+All trigger modules also have a //when// attribute which can be set to "before", "after", or "both", indicating whether to run the trigger before the query is executed, after the query has been executed, or both.
 
 At startup, the SQL Relay server creates instances of the specified trigger modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  Each module may evaluate the query and decide whether to run something or not.
 
-Currently, the following standard trigger modules are available:
+Currently, the following trigger modules are available in the standard SQL Relay distribution:
 
 * '''replay'''
 
@@ -3853,16 +4064,16 @@ If an error code 1205 occurs (a !MySQL lock wait timeout), then the previous que
 
 In this configuration, the module enables automatic recovery from deadlocks and lock wait timeouts, and the log allows a developer to go back later, examine the queries that caused the deadlocks, and modify them (or the app) to mitigate the problem.
 
-In addition to the '''module''' and '''when''' parameters, the '''trigger''' tag also supports the following parameters:
+In addition to the '''module''' and '''when''' attributes, the '''trigger''' tag also supports the following attributes:
 
 * '''includeselects'''
  * If set to "no" (the default) - select queries are not logged or replayed
  * If set to "yes" - select queries are logged and replayed
  * Use care when disabling this, as the query log will be larger and replay operations can take much longer.
 * '''maxretries'''
- * It's possible to encounter another replay condition while replaying a query or transaction.  If this happens, the module retries.  This parameter limits the total number of retries.  If it is exceeded, then whatever error occurred on the last retry is returned to the application.
+ * It's possible to encounter another replay condition while replaying a query or transaction.  If this happens, the module retries.  This attribute limits the total number of retries.  If it is exceeded, then whatever error occurred on the last retry is returned to the application.
 
-The '''condition''' tag supports the following parameters:
+The '''condition''' tag supports the following attributes:
 
 * '''error'''
  * if numeric: the condition is true if the error code matches
@@ -3871,9 +4082,9 @@ The '''condition''' tag supports the following parameters:
  * transaction - replay the entire transaction if this condition occurs
  * transaction - replay the previous query if this condition occurs
 
-The '''log''' tag doesn't support any parameters.
+The '''log''' tag doesn't support any attributes.
 
-The '''query''' tag contains the query to be run, and supports the following parameters:
+The '''query''' tag contains the query to be run, and supports the following attributes:
 
 * '''log'''
  * the name of the file to log the output of the query to
@@ -3951,7 +4162,7 @@ From this log entry, we can see that insert and update queries encountered a gap
 
 Currently, each condition tag may contain only one log tag, and each log tag may contain only one query tag.  This restriction may be relaxed in a future release.
 
-If the log file doesn't already exist, the it is created with rw-r--r-- permissions, and will be owned by the user/group that SQL Relay is running as.  There aren't, currently, parameters to control permissions or ownership.
+If the log file doesn't already exist, the it is created with rw-r--r-- permissions, and will be owned by the user/group that SQL Relay is running as.  There aren't, currently, attributes to control permissions or ownership.
 
 === Considerations ===
 
@@ -4016,13 +4227,13 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 Different modules may have different parameters.  In this example, listener="yes" tells the module to log debug info for the sqlr-listener processes and connection="yes" tells the module to log debug info for the sqlr-connection processes.
 
-All logger modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All logger modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 Logger modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 At startup, the SQL Relay server processes create instances of the specified logger modules and initialize them.  As events occur, the server passes the event, log level, and optionally, a string of information about the event to each module, in the order that they were specified in the config file.  If a module is listening for that event, at that log level, then it logs information about the event to a log file.
 
-Currently, the following standard logger modules are available:
+Currently, the following logger modules are available in the standard SQL Relay distribution:
 
 * '''debug'''
 * '''slowqueries'''
@@ -4042,7 +4253,7 @@ The '''debug''' module logs a great deal of information to about the internal op
 }}}
 }}}
 
-This module takes three parameters: '''listener''', '''connection''' and '''perms'''.  The '''listener''' parameter may be set to "no" to disable logging of the sqlr-listener processes.  The '''connection''' parameter may be set to "no" to disable logging of the sqlr-connection processes.  Logging is enabled if either parameter is omitted or set to any other value.  The '''perms''' parameter may be set to any ls -l style permissions string.  The default is "rw-------" which translates to read/write for owner only.
+This module takes three attributes: '''listener''', '''connection''' and '''perms'''.  The '''listener''' attribute may be set to "no" to disable logging of the sqlr-listener processes.  The '''connection''' attribute may be set to "no" to disable logging of the sqlr-connection processes.  Logging is enabled if either attribute is omitted or set to any other value.  The '''perms''' attribute may be set to any ls -l style permissions string.  The default is "rw-------" which translates to read/write for owner only.
 
 The general log format is:
 
@@ -4068,7 +4279,7 @@ The '''slowqueries''' module logs queries that take longer to run than a specifi
 }}}
 }}}
 
-This module takes two parameters: '''sec''' and '''usec'''.  Queries that take longer than '''sec''' seconds and '''usec''' microseconds will be logged.  Both parameters default to 0 and omitting them causes all queries to be logged.
+This module takes two attributes: '''sec''' and '''usec'''.  Queries that take longer than '''sec''' seconds and '''usec''' microseconds will be logged.  Both attributes default to 0 and omitting them causes all queries to be logged.
 
 The general format is:
 
@@ -4107,7 +4318,7 @@ In the log instance, note the following:
 * connections="5" and maxconnections="10" are set.  By default, SQL Relay opens 5 connections to the database.  The app instance uses this default configuration.  If the log instance also only opens 5 connections, then all 5 will be consumed by the app instance, and it won't be possible to access and examine the log from a client program.  So, we'll allow the log instance to scale up accordingly.
 
 
-The module takes 5 parameters: '''host''', '''port''', '''socket''', '''user''', and '''password'''.  These parameters are used to access the other instance of SQL Relay that will be used for logging.
+The module takes 5 attributes: '''host''', '''port''', '''socket''', '''user''', and '''password'''.  These attributes are used to access the other instance of SQL Relay that will be used for logging.
 
 When a cursor is opened, the module adds a new row to the log.  Each time a query is executed, the row is updated.  When the cursor is closed, the module removes the row.
 
@@ -4172,7 +4383,7 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All notification modules have an //enabled// parameter, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All notification modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
 Notification modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -4184,7 +4395,7 @@ Notification modules can be "stacked".  Multiple different modules may be loaded
 
 At startup, the SQL Relay server processes create instances of the specified notification modules and initializes them.  As events occur, the server passes the event and, optionally, a string of information about the event to each module, in the order that they were specified in the config file.  If a module is listening for that event, then it sends a notification to the specified recpients.
 
-Currently, the following standard notification module is available:
+Currently, the following notification module is available in the standard SQL Relay distribution:
 
 * '''events'''
 
