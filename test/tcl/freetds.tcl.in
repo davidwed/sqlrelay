@@ -288,10 +288,10 @@ checkSuccess [$cur getLongestByIndex 5] 3
 checkSuccess [$cur getLongestByName "testdecimal"] 3
 checkSuccess [$cur getLongestByIndex 6] 3
 checkSuccess [$cur getLongestByName "testnumeric"] 3
-checkSuccess [$cur getLongestByIndex 7] 4
-checkSuccess [$cur getLongestByName "testmoney"] 4
-checkSuccess [$cur getLongestByIndex 8] 4
-checkSuccess [$cur getLongestByName "testsmallmoney"] 4
+#checkSuccess [$cur getLongestByIndex 7] 4
+#checkSuccess [$cur getLongestByName "testmoney"] 4
+#checkSuccess [$cur getLongestByIndex 8] 4
+#checkSuccess [$cur getLongestByName "testsmallmoney"] 4
 #checkSuccess [$cur getLongestByIndex 9] 26
 #checkSuccess [$cur getLongestByName "testdatetime"] 26
 #checkSuccess [$cur getLongestByIndex 10] 26
@@ -328,8 +328,8 @@ checkSuccess [$cur getFieldByIndex 0 2] "1"
 #checkSuccess [$cur getFieldByIndex 0 4] "1.1"
 checkSuccess [$cur getFieldByIndex 0 5] "1.1"
 checkSuccess [$cur getFieldByIndex 0 6] "1.1"
-checkSuccess [$cur getFieldByIndex 0 7] "1.00"
-checkSuccess [$cur getFieldByIndex 0 8] "1.00"
+#checkSuccess [$cur getFieldByIndex 0 7] "1.00"
+#checkSuccess [$cur getFieldByIndex 0 8] "1.00"
 #checkSuccess [$cur getFieldByIndex 0 9] "Jan  1 2001 01:00:00:000AM"
 #checkSuccess [$cur getFieldByIndex 0 10] "Jan  1 2001 01:00:00:000AM"
 checkSuccess [$cur getFieldByIndex 0 11] "testchar1                               "
@@ -343,8 +343,8 @@ checkSuccess [$cur getFieldByIndex 7 2] "8"
 #checkSuccess [$cur getFieldByIndex 7 4] "8.8"
 #checkSuccess [$cur getFieldByIndex 7 5] "8.8"
 #checkSuccess [$cur getFieldByIndex 7 6] "8.8"
-checkSuccess [$cur getFieldByIndex 7 7] "8.00"
-checkSuccess [$cur getFieldByIndex 7 8] "8.00"
+#checkSuccess [$cur getFieldByIndex 7 7] "8.00"
+#checkSuccess [$cur getFieldByIndex 7 8] "8.00"
 #checkSuccess [$cur getFieldByIndex 7 9] "Jan  1 2008 08:00:00:000AM"
 #checkSuccess [$cur getFieldByIndex 7 10] "Jan  1 2008 08:00:00:000AM"
 checkSuccess [$cur getFieldByIndex 7 11] "testchar8                               "
@@ -360,8 +360,8 @@ checkSuccess [$cur getFieldLengthByIndex 0 2] 1
 #checkSuccess [$cur getFieldLengthByIndex 0 4] 3
 checkSuccess [$cur getFieldLengthByIndex 0 5] 3
 checkSuccess [$cur getFieldLengthByIndex 0 6] 3
-checkSuccess [$cur getFieldLengthByIndex 0 7] 4
-checkSuccess [$cur getFieldLengthByIndex 0 8] 4
+#checkSuccess [$cur getFieldLengthByIndex 0 7] 4
+#checkSuccess [$cur getFieldLengthByIndex 0 8] 4
 #checkSuccess [$cur getFieldLengthByIndex 0 9] 26
 #checkSuccess [$cur getFieldLengthByIndex 0 10] 26
 checkSuccess [$cur getFieldLengthByIndex 0 11] 40
@@ -375,8 +375,8 @@ checkSuccess [$cur getFieldLengthByIndex 7 2] 1
 #checkSuccess [$cur getFieldLengthByIndex 7 4] 17
 checkSuccess [$cur getFieldLengthByIndex 7 5] 3
 checkSuccess [$cur getFieldLengthByIndex 7 6] 3
-checkSuccess [$cur getFieldLengthByIndex 7 7] 4
-checkSuccess [$cur getFieldLengthByIndex 7 8] 4
+#checkSuccess [$cur getFieldLengthByIndex 7 7] 4
+#checkSuccess [$cur getFieldLengthByIndex 7 8] 4
 #checkSuccess [$cur getFieldLengthByIndex 7 9] 26
 #checkSuccess [$cur getFieldLengthByIndex 7 10] 26
 checkSuccess [$cur getFieldLengthByIndex 7 11] 40
@@ -392,8 +392,8 @@ checkSuccess [$cur getFieldByName 0 "testtinyint"] "1"
 #checkSuccess [$cur getFieldByName 0 "testfloat"] "1.1"
 checkSuccess [$cur getFieldByName 0 "testdecimal"] "1.1"
 checkSuccess [$cur getFieldByName 0 "testnumeric"] "1.1"
-checkSuccess [$cur getFieldByName 0 "testmoney"] "1.00"
-checkSuccess [$cur getFieldByName 0 "testsmallmoney"] "1.00"
+#checkSuccess [$cur getFieldByName 0 "testmoney"] "1.00"
+#checkSuccess [$cur getFieldByName 0 "testsmallmoney"] "1.00"
 #checkSuccess [$cur getFieldByName 0 "testdatetime"] "Jan  1 2001 01:00:00:000AM"
 #checkSuccess [$cur getFieldByName 0 "testsmalldatetime"] "Jan  1 2001 01:00:00:000AM"
 checkSuccess [$cur getFieldByName 0 "testchar"] "testchar1                               "
@@ -407,8 +407,8 @@ checkSuccess [$cur getFieldByName 7 "testtinyint"] "8"
 #checkSuccess [$cur getFieldByName 7 "testfloat"] "8.8"
 #checkSuccess [$cur getFieldByName 7 "testdecimal"] "8.8"
 #checkSuccess [$cur getFieldByName 7 "testnumeric"] "8.8"
-checkSuccess [$cur getFieldByName 7 "testmoney"] "8.00"
-checkSuccess [$cur getFieldByName 7 "testsmallmoney"] "8.00"
+#checkSuccess [$cur getFieldByName 7 "testmoney"] "8.00"
+#checkSuccess [$cur getFieldByName 7 "testsmallmoney"] "8.00"
 #checkSuccess [$cur getFieldByName 7 "testdatetime"] "Jan  1 2008 08:00:00:000AM"
 #checkSuccess [$cur getFieldByName 7 "testsmalldatetime"] "Jan  1 2008 08:00:00:000AM"
 checkSuccess [$cur getFieldByName 7 "testchar"] "testchar8                               "
@@ -424,8 +424,8 @@ checkSuccess [$cur getFieldLengthByName 0 "testtinyint"] 1
 #checkSuccess [$cur getFieldLengthByName 0 "testfloat"] 3
 checkSuccess [$cur getFieldLengthByName 0 "testdecimal"] 3
 checkSuccess [$cur getFieldLengthByName 0 "testnumeric"] 3
-checkSuccess [$cur getFieldLengthByName 0 "testmoney"] 4
-checkSuccess [$cur getFieldLengthByName 0 "testsmallmoney"] 4
+#checkSuccess [$cur getFieldLengthByName 0 "testmoney"] 4
+#checkSuccess [$cur getFieldLengthByName 0 "testsmallmoney"] 4
 #checkSuccess [$cur getFieldLengthByName 0 "testdatetime"] 26
 #checkSuccess [$cur getFieldLengthByName 0 "testsmalldatetime"] 26
 checkSuccess [$cur getFieldLengthByName 0 "testchar"] 40
@@ -439,8 +439,8 @@ checkSuccess [$cur getFieldLengthByName 7 "testtinyint"] 1
 #checkSuccess [$cur getFieldLengthByName 7 "testfloat"] 17
 checkSuccess [$cur getFieldLengthByName 7 "testdecimal"] 3
 checkSuccess [$cur getFieldLengthByName 7 "testnumeric"] 3
-checkSuccess [$cur getFieldLengthByName 7 "testmoney"] 4
-checkSuccess [$cur getFieldLengthByName 7 "testsmallmoney"] 4
+#checkSuccess [$cur getFieldLengthByName 7 "testmoney"] 4
+#checkSuccess [$cur getFieldLengthByName 7 "testsmallmoney"] 4
 #checkSuccess [$cur getFieldLengthByName 7 "testdatetime"] 26
 #checkSuccess [$cur getFieldLengthByName 7 "testsmalldatetime"] 26
 checkSuccess [$cur getFieldLengthByName 7 "testchar"] 40
@@ -457,8 +457,8 @@ checkSuccess [lindex $fields 2] 1
 #checkSuccess [lindex $fields 4] 1.1
 checkSuccess [lindex $fields 5] 1.1
 checkSuccess [lindex $fields 6] 1.1
-checkSuccess [lindex $fields 7] 1.0
-checkSuccess [lindex $fields 8] 1.0
+#checkSuccess [lindex $fields 7] 1.0
+#checkSuccess [lindex $fields 8] 1.0
 #checkSuccess [lindex $fields 9] "Jan  1 2001 01:00:00:000AM"
 #checkSuccess [lindex $fields 10] "Jan  1 2001 01:00:00:000AM"
 checkSuccess [lindex $fields 11] "testchar1                               "
@@ -475,8 +475,8 @@ checkSuccess [lindex $fieldlens 2] 1
 #checkSuccess [lindex $fieldlens 4] 3
 checkSuccess [lindex $fieldlens 5] 3
 checkSuccess [lindex $fieldlens 6] 3
-checkSuccess [lindex $fieldlens 7] 4
-checkSuccess [lindex $fieldlens 8] 4
+#checkSuccess [lindex $fieldlens 7] 4
+#checkSuccess [lindex $fieldlens 8] 4
 #checkSuccess [lindex $fieldlens 9] 26
 #checkSuccess [lindex $fieldlens 10] 26
 checkSuccess [lindex $fieldlens 11] 40
