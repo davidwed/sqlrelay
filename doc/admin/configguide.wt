@@ -78,6 +78,7 @@
   * [#filter-patterns patterns]
   * [#filter-regex regex]
   * [#filter-string string]
+  * [#filter-tag tag]
 * [#translation Data Translation]
  * [#queryparsing Query Parsing]
  * [#querytranslation Query Translation]
@@ -89,6 +90,7 @@
   * [#reformatdatetime reformatdatetime]
  * [#resultsetrowtranslation Result Set Row Translation]
  * [#resultsetrowtranslation Result Set Row Block Translation]
+ * [#moduledata Module Data]
 * [#directives Query Directives]
  * [#custom_wf custom_wf]
 * [#queryrouting Query Routing]
@@ -2826,6 +2828,24 @@ But this query would not be:
 }}}
 }}}
 
+
+[[br]][=#filter-tag]
+=== tag ===
+
+The '''tag''' module matches queries in the same manner as the [#filter-patterns patterns] module described above, and is configured similarly:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-tag.conf@
+}}}
+}}}
+
+Note the moduledata tag defined prior to the filters tag.  Moduledata modules basically allow one module to pass data to another.  See [#moduledata Module Data] below for more details.  The tag filter module interoperates with the tag moduledata module and requires an instance of it to work.
+
+In the tag module, if the query matches the pattern, then instead of filtering it out so that it isn't executed, the query is "tagged" with the value specified in the '''tag''' parameter in the instance of moduledata specified by the '''moduledataid''' parameter.  Other modules (translation modules, for example) could then query the specified moduledata for the presence or absence of this value, and act accordingly.
+
+Currently, no open source modules make use of the tag filter/moduledata module,  however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
 ----
 
 [[br]][=#translation]
@@ -3216,6 +3236,33 @@ This is useful for the same reasons as result set row translation, and tends to 
 }}}
 
 Currently, no open source result set row block translation modules are available, however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#moduledata]
+== Module Data ==
+
+Moduledata modules allow a developer to pass data between modules.  For example, a query translation module could set a value that a result set translation module could later read.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-moduledata.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+At startup, the SQL Relay server creates one instance of the moduledata specified in each moduledata tag.  Each of these tags must specify an //id// parameter.  This id can be used by other modules to access this instance of moduledata.  If more than one instance of the same kind of moduledata is required, then multiple moduledata tags may be specified with the same //module// parameter and different //id// parameters.
+
+Currently, the only open source moduledata module available is:
+
+* '''tag'''
+
+The tag module works as specified above in the documentation for the [#filter-tag tag] filter.
+
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
 
 ----
 

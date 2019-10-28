@@ -120,6 +120,7 @@
       <li><a href="#filter-patterns">patterns</a></li>
       <li><a href="#filter-regex">regex</a></li>
       <li><a href="#filter-string">string</a></li>
+      <li><a href="#filter-tag">tag</a></li>
     </ul>
 
   </ul>
@@ -142,6 +143,7 @@
 
     <li><a href="#resultsetrowtranslation">Result Set Row Translation</a></li>
     <li><a href="#resultsetrowtranslation">Result Set Row Block Translation</a></li>
+    <li><a href="#moduledata">Module Data</a></li>
   </ul>
 
   <li><a href="#directives">Query Directives</a></li>
@@ -4489,6 +4491,45 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
+<br/><br/><a name="filter-tag"/><h3>tag</h3>
+
+<p>The <b>tag</b> module matches queries in the same manner as the <a href="#filter-patterns">patterns</a> module described above, and is configured similarly:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;moduledatas&gt;</font></b>
+			<b><font color="#0000FF">&lt;moduledata</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"tag"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"tags"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/moduledatas&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;filters&gt;</font></b>
+			<b><font color="#0000FF">&lt;filter</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"tag"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^(create)"</font> <font color="#009900">tag</font><font color="#990000">=</font><font color="#FF0000">"create or drop query"</font> <font color="#009900">moduledataid</font><font color="#990000">=</font><font color="#FF0000">"tags"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"regex"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"^(drop)"</font> <font color="#009900">tag</font><font color="#990000">=</font><font color="#FF0000">"create or drop query"</font> <font color="#009900">moduledataid</font><font color="#990000">=</font><font color="#FF0000">"tags"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"cistring"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"hugetable"</font> <font color="#009900">tag</font><font color="#990000">=</font><font color="#FF0000">"hugetable query"</font> <font color="#009900">moduledataid</font><font color="#990000">=</font><font color="#FF0000">"tags"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;pattern</font></b> <font color="#009900">type</font><font color="#990000">=</font><font color="#FF0000">"string"</font> <font color="#009900">pattern</font><font color="#990000">=</font><font color="#FF0000">"badstring"</font> <font color="#009900">scope</font><font color="#990000">=</font><font color="#FF0000">"insidequotes"</font> <font color="#009900">tag</font><font color="#990000">=</font><font color="#FF0000">"contains badstring"</font> <font color="#009900">moduledataid</font><font color="#990000">=</font><font color="#FF0000">"tags"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/filter&gt;</font></b>
+		<b><font color="#0000FF">&lt;/filters&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>Note the moduledata tag defined prior to the filters tag.  Moduledata modules basically allow one module to pass data to another.  See <a href="#moduledata">Module Data</a> below for more details.  The tag filter module interoperates with the tag moduledata module and requires an instance of it to work.</p>
+
+<p>In the tag module, if the query matches the pattern, then instead of filtering it out so that it isn't executed, the query is "tagged" with the value specified in the <b>tag</b> parameter in the instance of moduledata specified by the <b>moduledataid</b> parameter.  Other modules (translation modules, for example) could then query the specified moduledata for the presence or absence of this value, and act accordingly.</p>
+
+<p>Currently, no open source modules make use of the tag filter/moduledata module,  however custom modules may be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
 <hr/>
 
 <br/><a name="translation"/><h1>Data Translation</h1>
@@ -5169,6 +5210,34 @@ http://www.gnu.org/software/src-highlite -->
 
 </blockquote>
 <p>Currently, no open source result set row block translation modules are available, however custom modules may be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
+
+<br/><a name="moduledata"/><h2>Module Data</h2>
+
+<p>Moduledata modules allow a developer to pass data between modules.  For example, a query translation module could set a value that a result set translation module could later read.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.8
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>@parts<font color="#990000">/</font>sqlrelay<font color="#990000">-</font>moduledata<font color="#990000">.</font>conf@</tt></pre>
+
+</blockquote>
+<p>The <i>module</i> attribute specifies which module to load.</p>
+
+<p>Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.</p>
+
+<p>At startup, the SQL Relay server creates one instance of the moduledata specified in each moduledata tag.  Each of these tags must specify an <i>id</i> parameter.  This id can be used by other modules to access this instance of moduledata.  If more than one instance of the same kind of moduledata is required, then multiple moduledata tags may be specified with the same <i>module</i> parameter and different <i>id</i> parameters.</p>
+
+<p>Currently, the only open source moduledata module available is:</p>
+
+<ul>
+  <li><b>tag</b></li>
+</ul>
+
+<p>The tag module works as specified above in the documentation for the <a href="#filter-tag">tag</a> filter.</p>
+
+<p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
 
 <hr/>
 
