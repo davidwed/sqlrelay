@@ -1,6 +1,6 @@
 = Native Database Protocol Support =
 
-Solves - "I need a transparent, sever-only !MySQL/MariaDB or !PostgreSQL proxy with features like [connectionpooling.html Connection Pooling], [throttling.html Throttling], [ha.html High Availability], [queryrouting.html Query Routing], [queryfiltering.html Query Filtering], and [schedules.html Connection Schedules]."
+Solves - "I need a transparent, sever-only !MySQL/MariaDB or !PostgreSQL proxy with features like [connectionpooling.html Connection Pooling], [throttling.html Throttling], [ha.html High Availability], [queryrouting.html Query Routing], [queryfiltering.html Query Filtering], and [schedules.html Connection Schedules]" and "I wrote my app using the native !MySQL/MariaDB/PostgreSQL API but the company is migrating to Oracle. I can tweak the queries to work with Oracle but I really don't want to have to modify the app to use OCI."
 
 Native database apps communicate with the database using native database client-server protocols.
 
@@ -16,7 +16,7 @@ Whether written using the native SQL Relay API or a connector of some sort, SQL 
 
 [[Image(../images/sqlrelaynativeprotocol.png,nolink)]]
 
-However, SQL Relay also supports the !MySQL/MariaDB and !PostgreSQL client-server protocols.  This allows apps written for those databases to communicate with SQL Relay, rather than directly with the native database, without modification, and without using a drop-in replacement library.
+However, SQL Relay also supports the !MySQL/MariaDB and !PostgreSQL client-server protocols.  This allows apps written for those databases to communicate with SQL Relay, rather than directly with the native database, without modification.
 
 [[Image(../images/sqlrelaymysqlprotocol.png,nolink)]]
 [[br]]

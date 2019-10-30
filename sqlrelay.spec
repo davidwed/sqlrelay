@@ -19,8 +19,8 @@ load balancing and query routing/filtering system for Unix and Linux supporting
 ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2, Informix, 
 Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, 
 Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js,
-ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and
-PostgreSQL, command line clients and extensive documentation.  The APIs support
+ODBC and ADO.NET drivers, native support for MySQL and PostgreSQL client
+protocols, command line clients and extensive documentation.  The APIs support
 advanced database operations such as bind variables, multi-row fetches,
 client-side result set caching and suspended transactions.  It is ideal for
 speeding up database-driven web-based applications, accessing databases from
@@ -263,23 +263,6 @@ BuildRequires: nodejs-packaging, node-gyp, nodejs-devel
 
 %description -n nodejs-%{name}
 Nodejs bindings for the SQL Relay client API.
-
-
-%package dropin-mysql
-License: GPLv2
-Summary: Drop in replacement library that redirects MySQL clients to SQL Relay
-
-%description dropin-mysql
-Drop in replacement library that redirects MySQL clients to SQL Relay.
-
-
-%package dropin-postgresql
-License: PostgreSQL
-Summary: Drop in replacement library that redirects PostgreSQL clients to SQL Relay
-BuildRequires: postgresql-devel
-
-%description dropin-postgresql
-Drop in replacement library that redirects PostgreSQL clients to SQL Relay.
 
 
 %package oracle
@@ -723,13 +706,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %files -n nodejs-%{name}
 %{nodejs_sitearch}/%{name}
 
-
-%files dropin-mysql
-%{_libdir}/libmysql*%{name}.so.*
-
-%files dropin-postgresql
-%{_libdir}/libpq%{name}.so.*
-
 %files oracle
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_oracle*
@@ -792,8 +768,9 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Thu Oct 17 2019 David Muse <david.muse@firstworks.com> - 1.7.0-1
+* Wed Oct 30 2019 David Muse <david.muse@firstworks.com> - 1.7.0-1
 - Updated to version 1.7.0.
+- Removed drop-in replacement library packages.
 
 * Fri Jun 28 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
 - Updated to version 1.6.0.

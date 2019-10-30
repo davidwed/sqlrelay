@@ -1720,8 +1720,8 @@ Optional Features:
   --disable-mono                Don't build Mono/C# api
   --disable-nodejs              Don't build node.js api
   --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library
-  --disable-mysql-drop-in       Don't build mysql drop-in-replacement library
-  --disable-postgresql-drop-in  Don't build postgresql drop-in-replacement library
+  --enable-mysql-drop-in        Build deprecated mysql drop-in-replacement library
+  --enable-postgresql-drop-in   Build deprecated postgresql drop-in-replacement library
   --enable-psql-rpath           Use -rpath when linking the postgresql drop-in replacement library against the SQL Relay client library
   --enable-dmalloc              Use the dmalloc library
   --enable-efence               Use the efence library
@@ -3373,16 +3373,16 @@ fi
 
 # Check whether --enable-mysql-drop-in was given.
 if test "${enable_mysql_drop_in+set}" = set; then :
-  enableval=$enable_mysql_drop_in; ENABLE_MYSQL_DROP_IN=""
+  enableval=$enable_mysql_drop_in; ENABLE_MYSQL_DROP_IN="yes"
 else
-  ENABLE_MYSQL_DROP_IN="yes"
+  ENABLE_MYSQL_DROP_IN=""
 fi
 
 # Check whether --enable-postgresql-drop-in was given.
 if test "${enable_postgresql_drop_in+set}" = set; then :
-  enableval=$enable_postgresql_drop_in; ENABLE_POSTGRESQL_DROP_IN=""
+  enableval=$enable_postgresql_drop_in; ENABLE_POSTGRESQL_DROP_IN="yes"
 else
-  ENABLE_POSTGRESQL_DROP_IN="yes"
+  ENABLE_POSTGRESQL_DROP_IN=""
 fi
 
 # Check whether --enable-psql-rpath was given.

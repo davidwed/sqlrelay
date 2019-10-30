@@ -1471,7 +1471,7 @@ Whether written using the native SQL Relay API, or a connector of some sort, SQL
 
 [[Image(../images/sqlrelaynativeprotocol.png,nolink)]]
 
-However, SQL Relay also supports the !MySQL and !PostgreSQL client-server protocols.  When SQL Relay is configured to use one of these, it allows !MySQL and !PostgreSQL apps to communicate directly with SQL Relay without modification, without having to install or use a SQL Relay driver on the client, and without having to install or use a drop-in replacement library on the client.
+However, SQL Relay also supports the !MySQL and !PostgreSQL client-server protocols.  When SQL Relay is configured to use one of these, it allows !MySQL and !PostgreSQL apps to communicate directly with SQL Relay without modification, without having to install any software on the client.
 
 [[Image(../images/sqlrelaymysqlprotocol.png,nolink)]]
 

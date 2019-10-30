@@ -21,9 +21,8 @@
  [features/schedules.html Connection Schedules] - constrain database access to specified times[[br]]
 
  [features/databases.html Database Support] - a wide variety of commercial and open-source databases are supported[[br]]
+ [features/nativeprotocol.html Native Database Protocol Support] - allow !MySQL/MariaDB and !PostgreSQL applications to use SQL Relay without modification[[br]]
  [features/dbabstractionlayers.html Abstraction Layer Support] - drivers for most popular database abstraction layers are provided[[br]]
- [features/dropinreplacementlibs.html Drop-In Replacement Libraries] - allow many native !MySQL/MariaDB and !PostgreSQL applications to use SQL Relay without modification[[br]]
- [features/nativeprotocol.html Native Database Protocol Support] - allow !MySQL/MariaDB and !PostgreSQL applications to use SQL Relay without modification and without a drop-in replacement library[[br]]
  [features/languages.html Native API] - the powerful native SQL Relay client API supports a wide variety of programming languages[[br]]
 
  [features/substitutionandbindvars.html Substitution and Bind Variables] - make frequently run queries faster and more efficient[[br]]
@@ -139,10 +138,3 @@ The native SQL Relay client APIs provide advanced features like suspended sessio
  [api/nodejs/html/annotated.html node.js][[br]]
 }}}
 }}}
-
-==== Drop-In Replacement Libraries ====
-
-Drop-In Replacement Libraries allow many native !MySQL/MariaDB or !PostgreSQL applications to use SQL Relay without modification.
-
- [dropin/mysql.html MySQL/MariaDB][[br]]
- [dropin/postgresql.html PostgreSQL][[br]]

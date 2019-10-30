@@ -365,13 +365,13 @@ AC_ARG_ENABLE(c-rpath,
 	CUSERPATH="yes",
 	CUSERPATH="")
 AC_ARG_ENABLE(mysql-drop-in,
-	[  --disable-mysql-drop-in       Don't build mysql drop-in-replacement library],
-	ENABLE_MYSQL_DROP_IN="",
-	ENABLE_MYSQL_DROP_IN="yes")
+	[  --enable-mysql-drop-in        Build deprecated mysql drop-in-replacement library],
+	ENABLE_MYSQL_DROP_IN="yes",
+	ENABLE_MYSQL_DROP_IN="")
 AC_ARG_ENABLE(postgresql-drop-in,
-	[  --disable-postgresql-drop-in  Don't build postgresql drop-in-replacement library],
-	ENABLE_POSTGRESQL_DROP_IN="",
-	ENABLE_POSTGRESQL_DROP_IN="yes")
+	[  --enable-postgresql-drop-in   Build deprecated postgresql drop-in-replacement library],
+	ENABLE_POSTGRESQL_DROP_IN="yes",
+	ENABLE_POSTGRESQL_DROP_IN="")
 AC_ARG_ENABLE(psql-rpath,
 	[  --enable-psql-rpath           Use -rpath when linking the postgresql drop-in replacement library against the SQL Relay client library],
 	PSQLUSERPATH="yes",
