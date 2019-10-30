@@ -1200,9 +1200,6 @@ echo "                PHP PDO     $PHPPDOBUILD           ODBC       $ODBCDRIVERB
 echo "                TCL         $TCLBUILD           Erlang     $ERLANGBUILD"
 echo "                Mono        $MONOBUILD           node.js    $NODEJSBUILD"
 echo
-echo " Drop-In Replacement Libraries:"
-echo "                MySQL       $MYSQLDIBUILD        PostgreSQL $POSTGRESQLDIBUILD"
-echo
 echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
 echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"

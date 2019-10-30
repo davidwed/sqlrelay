@@ -289,6 +289,13 @@ See [admin/router.html Query Routing] for details on how to set up SQL Relay as 
 
 See [admin/protocoloptions.html Client Protocol Options] in the configuration guide for details about how to configure SQL Relay to speak the !MySQL/MariaDB and !PostgreSQL protocols.
 
+[[br]][=#dropin]
+=== What happened to the drop-in replacement libraries for !MySQL/MariaDB and !PostgreSQL? ===
+
+As of version 1.6.0, the SQL Relay server supports the !MySQL/MariaDB client-server protocol, and as of version 1.7.0 supports the !PostgreSQL client-server protocol.  All features of the drop-in replacement libraries are covered, support for the protocols is a server-only solution.  See [admin/protocoloptions.html Client Protocol Options] in the configuration guide for details about how to configure SQL Relay to speak the !MySQL/MariaDB and !PostgreSQL protocols.
+
+The drop-in replacement modules can still be manually enabled in the configure script when building SQL Relay from source.
+
 [[br]][=#filtering]
 === Can SQL Relay be configured to filter out certain queries? ===
 

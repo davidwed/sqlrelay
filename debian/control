@@ -177,20 +177,6 @@ Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
 Description: Nodejs bindings for the SQL Relay client API
  Nodejs bindings for the SQL Relay client API.
 
-Package: sqlrelay-dropin-mysql
-Section: libdevel
-Architecture: any
-Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
-Description: Drop in replacement library that redirects MySQL clients to SQL Relay
- Drop in replacement library that redirects MySQL clients to SQL Relay.
-
-Package: sqlrelay-dropin-postgresql
-Section: libdevel
-Architecture: any
-Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
-Description: Drop in replacement library that redirects PostgreSQL clients to SQL Relay
- Drop in replacement library that redirects PostgreSQL clients to SQL Relay.
-
 Package: sqlrelay-oracle
 Section: libdevel
 Architecture: any
