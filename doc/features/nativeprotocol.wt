@@ -1,21 +1,28 @@
-= !MySQL Front-End Modules =
+= Native Database Protocol Support =
 
-Solves - "I need a transparent, sever-only !MySQL proxy with features like [connectionpooling.html Connection Pooling], [throttling.html Throttling], [ha.html High Availability], [queryrouting.html Query Routing], [queryfiltering.html Query Filtering], and [schedules.html Connection Schedules]."
+Solves - "I need a transparent, sever-only !MySQL/MariaDB or !PostgreSQL proxy with features like [connectionpooling.html Connection Pooling], [throttling.html Throttling], [ha.html High Availability], [queryrouting.html Query Routing], [queryfiltering.html Query Filtering], and [schedules.html Connection Schedules]."
 
-Whether written using the native !MySQL API, or a connector of some sort, !MySQL apps communicate with the database using the !MySQL client-server protocol.
+Native database apps communicate with the database using native database client-server protocols.
+
+For example, !MySQL/MariaDB apps communicate with the database using the !MySQL/MariaDB client-server protocol:
 
 [[Image(../images/mysqlnativeprotocol.png,nolink)]]
 
-Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using the SQL Relay client-server protocol.
+...and !PostgreSQL apps communicate with the database using the !PostgreSQL client-server protocol:
+
+[[Image(../images/postgresqlnativeprotocol.png,nolink)]]
+
+Whether written using the native SQL Relay API or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using the SQL Relay client-server protocol:
 
 [[Image(../images/sqlrelaynativeprotocol.png,nolink)]]
 
-However, the !MySQL Front-End Modules enable SQL Relay to speak the !MySQL client-server protocol.  This allows !MySQL apps to communicate directly with SQL Relay, rather than to a !MySQL database, without modification, and without using a drop-in replacement library.
+However, SQL Relay also supports the !MySQL/MariaDB and !PostgreSQL client-server protocols.  This allows apps written for those databases to communicate with SQL Relay, rather than directly with the native database, without modification, and without using a drop-in replacement library.
 
 [[Image(../images/sqlrelaymysqlprotocol.png,nolink)]]
+[[br]]
+[[br]]
+[[Image(../images/sqlrelaypostgresqlprotocol.png,nolink)]]
 
-In this configuration, SQL Relay becomes a transparent proxy.  !MySQL apps aimed at SQL Relay still think that they're talking to a !MySQL database, but in fact, are talking to SQL Relay.  Once the app is talking to SQL Relay, most of SQL Relay's features become available to the app, including [connectionpooling.html Connection Pooling], [throttling.html Throttling], [ha.html High Availability], [queryrouting.html Query Routing], [queryfiltering.html Query Filtering], and [schedules.html Connection Schedules].  Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the !MySQL database it was originally written to use.
-
-[[Image(../images/sqlrelaymysqlprotocolbackend.png,nolink)]]
+In this configuration, SQL Relay becomes a transparent proxy.  Native apps aimed at SQL Relay still think that they're talking to the database, but in fact, are talking to SQL Relay.  Once the app is talking to SQL Relay, most of SQL Relay's features become available to the app, including [connectionpooling.html Connection Pooling], [throttling.html Throttling], [ha.html High Availability], [queryrouting.html Query Routing], [queryfiltering.html Query Filtering], and [schedules.html Connection Schedules].  Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the database it was originally written to use.
 
 Some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
