@@ -11,7 +11,11 @@
 * [#loadbalancing What is "load-balancing"?]
 * [#failover What is "fail-over"?]
 * [#queryrouting What is "query routing"?]
+* [#queryfiltering What is "query filtering"?]
+* [#querytranslation What is "query translation"?]
+* [#connectionschedules What are "connection schedules"?]
 * [#databases What databases does SQL Relay support?]
+* [#nativeprotocol What database client-server protocols does SQL Relay support?]
 * [#platforms What platforms does SQL Relay run on?]
 * [#languages What languages does SQL Relay support?]
 * [#dbabstraction What database abstraction layers does SQL Relay support?]
@@ -176,10 +180,30 @@ See [features/ha.html High Availability].
 
 See [features/queryrouting.html Query Routing].
 
+[[br]][=#queryfiltering]
+=== What is "query filtering"? ===
+
+See [features/queryfiltering.html Query Filtering].
+
+[[br]][=#querytranslation]
+=== What is "query translation"? ===
+
+See [features/querytranslation.html Query Translation].
+
+[[br]][=#connectionschedules]
+=== What are "connection schedules"? ===
+
+See [features/schedules.html Connection Schedules].
+
 [[br]][=#databases]
 === What databases does SQL Relay support? ===
 
 See [features/databases.html Supported Databases].
+
+[[br]][=#nativeprotocol]
+=== What database client-server protocols does SQL Relay support? ===
+
+See [features/nativeprotocol.html Native Database Protocol Support].
 
 [[br]][=#platforms]
 === What platforms does SQL Relay run on? ===
