@@ -17,6 +17,7 @@
  [features/ha.html High Availability] - provides load balancing and failover with replicated or clustered databases[[br]]
  [features/queryrouting.html Query Routing] - conditionally sends queries to one database or another[[br]]
  [features/queryfiltering.html Query Filtering] - prevents queries that match certain patterns from being run at all[[br]]
+ [features/querytranslation.html Query Translation] - modifies queries before passing them to the database[[br]]
  [features/schedules.html Connection Schedules] - constrain database access to specified times[[br]]
 
  [features/databases.html Database Support] - a wide variety of commercial and open-source databases are supported[[br]]

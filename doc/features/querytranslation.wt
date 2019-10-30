@@ -1,0 +1,50 @@
+= Query Translation =
+
+Query translation enables the SQL Relay server to modify queries before passing them to the database.  This is useful for things like:
+
+Normalizing queries for more effective query filtering:
+
+{{{#!blockquote
+From:
+
+{{{#!blockquote
+{{{#!code
+@../admin/parts/normalize-before.sql@
+}}}
+}}}
+
+To:
+
+{{{#!blockquote
+{{{#!code
+@../admin/parts/normalize-after.sql@
+}}}
+}}}
+
+}}}
+
+
+Migrating an application to use a different database backend without modifying the application itself:
+
+{{{#!blockquote
+From:
+
+{{{#!blockquote
+{{{#!code
+create table mysqltable (col1 tinytext, col2 mediumtext)
+}}}
+}}}
+
+To:
+
+{{{#!blockquote
+{{{#!code
+create table oracletable (col1 varchar2(254), col2 varchar2(1023))
+}}}
+}}}
+
+}}}
+
+[[br]]
+
+A complete descripton of query translation with example configuration files is given [../admin/configguide.html#querytranslation here].
