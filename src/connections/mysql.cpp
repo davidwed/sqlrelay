@@ -731,6 +731,35 @@ bool mysqlconnection::isTransactional() {
 bool mysqlconnection::autoCommitOn() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
 	return !mysql_autocommit(mysqlptr,true);
+#elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
+
+	// re-init error data
+	cont->clearError();
+
+	// init some variables
+	const char	*query="set autocommit=1";
+	int		querylen=16;
+	bool		retval=false;
+
+	// run the query...
+	sqlrservercursor	*cur=cont->newCursor();
+	if (cur->open() &&
+		cur->prepareQuery(query,querylen)) {
+		retval=cur->executeQuery(query,querylen);
+	}
+
+	// If there was an error, copy it out.  We'll be destroying the
+	// cursor in a moment and the error will be lost otherwise.
+	if (!retval) {
+		cont->saveErrorFromCursor(cur);
+	}
+
+	// clean up
+	cur->closeResultSet();
+	cur->close();
+	cont->deleteCursor(cur);
+
+	return retval;
 #else
 	// do nothing
 	return true;
@@ -740,6 +769,35 @@ bool mysqlconnection::autoCommitOn() {
 bool mysqlconnection::autoCommitOff() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
 	return !mysql_autocommit(mysqlptr,false);
+#elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
+
+	// re-init error data
+	cont->clearError();
+
+	// init some variables
+	const char	*query="set autocommit=0";
+	int		querylen=16;
+	bool		retval=false;
+
+	// run the query...
+	sqlrservercursor	*cur=cont->newCursor();
+	if (cur->open() &&
+		cur->prepareQuery(query,querylen)) {
+		retval=cur->executeQuery(query,querylen);
+	}
+
+	// If there was an error, copy it out.  We'll be destroying the
+	// cursor in a moment and the error will be lost otherwise.
+	if (!retval) {
+		cont->saveErrorFromCursor(cur);
+	}
+
+	// clean up
+	cur->closeResultSet();
+	cur->close();
+	cont->deleteCursor(cur);
+
+	return retval;
 #else
 	// do nothing
 	return true;
