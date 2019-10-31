@@ -1494,11 +1494,14 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 			return VARSTRING_DATATYPE;
 		case FIELD_TYPE_DECIMAL:
 			return DECIMAL_DATATYPE;
-		case 246:
-			// decimal is 246 on MySQL 4.x
-			return DECIMAL_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL
 		case FIELD_TYPE_NEWDECIMAL:
+			return DECIMAL_DATATYPE;
+#else
+		case 246:
+			// the FIELD_TYPE_NEWDECIMAL enum isn't defined on
+			// MySQL 4.x but the number 246 (the value of that
+			// enum) is used
 			return DECIMAL_DATATYPE;
 #endif
 		case FIELD_TYPE_TINY:
