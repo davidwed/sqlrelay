@@ -298,11 +298,17 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getColumnType(11),"YEAR");
 	checkSuccess(cur->getColumnType(12),"STRING");
 	checkSuccess(cur->getColumnType(13),"VARSTRING");
+stdoutput.printf("\n14: BLOB\n");
 	checkSuccess(cur->getColumnType(14),"BLOB");
+stdoutput.printf("\n15: TINYBLOB\n");
 	checkSuccess(cur->getColumnType(15),"TINYBLOB");
+stdoutput.printf("\n16: MEDIUMBLOB\n");
 	checkSuccess(cur->getColumnType(16),"MEDIUMBLOB");
+stdoutput.printf("\n17: LONGBLOB\n");
 	checkSuccess(cur->getColumnType(17),"LONGBLOB");
+stdoutput.printf("\n18: BLOB\n");
 	checkSuccess(cur->getColumnType(18),"BLOB");
+stdoutput.printf("...:\n");
 	checkSuccess(cur->getColumnType(19),"TINYBLOB");
 	checkSuccess(cur->getColumnType(20),"MEDIUMBLOB");
 	checkSuccess(cur->getColumnType(21),"LONGBLOB");
@@ -437,7 +443,8 @@ for (uint16_t a=0; a<50; a++) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("TOTAL ROWS: \n");
-	checkSuccess(cur->totalRows(),0);
+	// older versions of mysql know this
+	//checkSuccess(cur->totalRows(),0);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("FIRST ROW INDEX: \n");

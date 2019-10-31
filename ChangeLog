@@ -12,6 +12,7 @@
 	documentation improvements
 	split sqlrelay-crash directive into its own module
 	deprecated drop-in replacement libraries in favor of protocol support
+	fixed various mysql 4.x bugs
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3

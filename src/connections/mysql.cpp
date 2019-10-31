@@ -753,6 +753,9 @@ bool mysqlconnection::supportsAutoCommit() {
 bool mysqlconnection::commit() {
 #ifdef HAVE_MYSQL_COMMIT
 	return !mysql_commit(mysqlptr);
+#elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
+	// 4.x supports transactions but doesn't have a mysql_commit function
+	return sqlrserverconnection::commit();
 #else
 	// do nothing
 	return true;
@@ -762,6 +765,9 @@ bool mysqlconnection::commit() {
 bool mysqlconnection::rollback() {
 #ifdef HAVE_MYSQL_ROLLBACK
 	return !mysql_rollback(mysqlptr);
+#elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
+	// 4.x supports transactions but doesn't have a mysql_rollback function
+	return sqlrserverconnection::rollback();
 #else
 	// do nothing
 	return true;
@@ -1485,9 +1491,11 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		case FIELD_TYPE_STRING:
 			return STRING_DATATYPE;
 		case FIELD_TYPE_VAR_STRING:
-			//return CHAR_DATATYPE;
 			return VARSTRING_DATATYPE;
 		case FIELD_TYPE_DECIMAL:
+			return DECIMAL_DATATYPE;
+		case 246:
+			// decimal is 246 on MySQL 4.x
 			return DECIMAL_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL
 		case FIELD_TYPE_NEWDECIMAL:
@@ -1540,25 +1548,27 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		case FIELD_TYPE_TINY_BLOB:
 			return TINY_BLOB_DATATYPE;
 		case FIELD_TYPE_BLOB:
-			// I originally thought that these were the
-			// lengths...
-			/*if (mysqlfields[col]->length<256) {
-				return TINY_BLOB_DATATYPE;
-			} else if (mysqlfields[col]->length<65536) {
-				return BLOB_DATATYPE;
-			} else if (mysqlfields[col]->length<16777216) {
-				return MEDIUM_BLOB_DATATYPE;
-			} else {
-				return LONG_BLOB_DATATYPE;
-			}*/
-			// But it appears that some platforms have larger
-			// lengths.  These appear to work most reliably...
+			#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=50000
 			if (mysqlfields[col]->length<766) {
 				return TINY_BLOB_DATATYPE;
 			} else if (mysqlfields[col]->length<196606) {
 				return BLOB_DATATYPE;
 			} else if (mysqlfields[col]->length<50441646) {
 				return MEDIUM_BLOB_DATATYPE;
+			#else
+			// MySQL 4 and lower uses these lengths for tiny and
+			// blob datatypes.  Medium and long both have the same
+			// length but are distinguishable by their max_lengths
+			// of 11 and 9 respectively.  No idea what the 11 and 9
+			// actually mean.
+			if (mysqlfields[col]->length<256) {
+				return TINY_BLOB_DATATYPE;
+			} else if (mysqlfields[col]->length<65536) {
+				return BLOB_DATATYPE;
+			} else if (mysqlfields[col]->length<16777216 &&
+					mysqlfields[col]->max_length==11) {
+				return MEDIUM_BLOB_DATATYPE;
+			#endif
 			} else {
 				return LONG_BLOB_DATATYPE;
 			}
@@ -1576,7 +1586,6 @@ uint32_t mysqlcursor::getColumnLength(uint32_t col) {
 	switch (getColumnType(col)) {
 		case STRING_DATATYPE:
 			return (uint32_t)mysqlfields[col]->length;
-		//case CHAR_DATATYPE:
 		case VARSTRING_DATATYPE:
 			return (uint32_t)mysqlfields[col]->length+1;
 		case DECIMAL_DATATYPE:
