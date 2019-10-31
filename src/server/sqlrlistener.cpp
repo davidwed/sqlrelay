@@ -1087,7 +1087,7 @@ void sqlrlistener::listen() {
 		return;
 	}
 
-	for(;;) {
+	for (;;) {
 		error::clearError();
 		if (!handleTraffic(waitForTraffic()) &&
 			error::getErrorNumber()==EMFILE) {
