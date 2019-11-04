@@ -739,14 +739,12 @@ bool mysqlconnection::autoCommitOn() {
 	// init some variables
 	const char	*query="set autocommit=1";
 	int		querylen=16;
-	bool		retval=false;
 
 	// run the query...
 	sqlrservercursor	*cur=cont->newCursor();
-	if (cur->open() &&
-		cur->prepareQuery(query,querylen)) {
-		retval=cur->executeQuery(query,querylen);
-	}
+	bool	retval=(cur->open() &&
+			cur->prepareQuery(query,querylen) &&
+			cur->executeQuery(query,querylen));
 
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
@@ -777,14 +775,12 @@ bool mysqlconnection::autoCommitOff() {
 	// init some variables
 	const char	*query="set autocommit=0";
 	int		querylen=16;
-	bool		retval=false;
 
 	// run the query...
 	sqlrservercursor	*cur=cont->newCursor();
-	if (cur->open() &&
-		cur->prepareQuery(query,querylen)) {
-		retval=cur->executeQuery(query,querylen);
-	}
+	bool	retval=(cur->open() &&
+			cur->prepareQuery(query,querylen) &&
+			cur->executeQuery(query,querylen));
 
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
@@ -1007,8 +1003,11 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// connected directly to mysql
 	// FIXME: is this necessary since queryIsNotSelect() returns true?
 	if (mysqlconn->firstquery) {
-		mysqlconn->commit();
+		// NOTE: Set firstquery to false before calling commit().  So
+		// that it won't loop up if commit() needs to run a COMMIT
+		// query (which will require calling prepareQuery()).
 		mysqlconn->firstquery=false;
+		mysqlconn->commit();
 	}
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
