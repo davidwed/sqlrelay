@@ -1954,9 +1954,32 @@ bool sqlrlistener::findMatchingSocket(uint32_t connectionpid,
 	// connection over the handoff socket associated with that node.
 	for (uint32_t i=0; i<pvt->_maxconnections; i++) {
 		if (pvt->_handoffsocklist[i].pid==connectionpid) {
+
+			filedescriptor	*sock=pvt->_handoffsocklist[i].sock;
+			if (!sock) {
+				// Occasionally, sock will be NULL.  It's not
+				// clear how this happens, but it does.
+				//
+				// If it does, then invalidate the entry in the
+				// handoffsocklist and bail.  The connection
+				// will go on and wait for the client to be
+				// handed off to it (which will never happen)
+				// and another connection will eventually be
+				// available to service this client.
+				// The original connection will be stuck
+				// waiting for a client forever, but without
+				// a valid socket to hand the client off
+				// through, it was functionally in that state
+				// already.
+				//
+				// Long term - figure out why sock is ever NULL.
+				pvt->_handoffsocklist[i].pid=0;
+				pvt->_handoffsocklist[i].sock=NULL;
+				return false;
+			}
+
 			connectionsock->setFileDescriptor(
-						pvt->_handoffsocklist[i].
-						sock->getFileDescriptor());
+					sock->getFileDescriptor());
 			return true;
 		}
 	}

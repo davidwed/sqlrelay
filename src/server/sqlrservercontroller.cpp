@@ -1375,7 +1375,7 @@ bool sqlrservercontroller::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
-		if (!announceAvailability(NULL,0,pvt->_connectionid)) {
+		if (!announceAvailability(pvt->_connectionid)) {
 			return true;
 		}
 
@@ -1564,12 +1564,7 @@ void sqlrservercontroller::initSession() {
 	raiseDebugMessageEvent("done initializing session...");
 }
 
-bool sqlrservercontroller::announceAvailability(const char *unixsocket,
-						unsigned short inetport,
-						const char *connectionid) {
-
-	// FIXME: unixsocket and inetport are unused and
-	// should be removed in the next minor release
+bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 
 	raiseDebugMessageEvent("announcing availability...");
 
@@ -6170,7 +6165,7 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	// Reset this semaphore to 0.  It can get left incremented if another
 	// sqlr-connection is killed between calls to signalListenerToRead()
 	// and this method.  It's ok to reset it here becuase no one except
-	// uthis process has access to this semaphore at this time because of
+	// this process has access to this semaphore at this time because of
 	// the lock on the announce mutex (semaphore 0).
 	pvt->_semset->setValue(3,0);
 
