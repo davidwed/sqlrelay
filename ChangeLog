@@ -14,6 +14,8 @@
 	deprecated drop-in replacement libraries in favor of protocol support
 	fixed various mysql 4.x bugs
 	added NULL handoff socket workaround
+	sqlr-status creates statistics on heap now instead of stack, to work
+		on platforms with a small default ulimit stack
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3
