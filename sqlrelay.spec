@@ -519,6 +519,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrlogger.h
 %{_includedir}/%{name}/private/sqlrloggers.h
 %{_includedir}/%{name}/private/sqlrmysqlcredentials.h
+%{_includedir}/%{name}/private/sqlrpostgresqlcredentials.h
 %{_includedir}/%{name}/private/sqlrmoduledata.h
 %{_includedir}/%{name}/private/sqlrmoduledatas.h
 %{_includedir}/%{name}/private/sqlrnotification.h
@@ -557,6 +558,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrdirectives.h
 %{_includedir}/%{name}/private/sqlrresultsetheadertranslation.h
 %{_includedir}/%{name}/private/sqlrresultsetheadertranslations.h
+%{_includedir}/%{name}/private/sqlrmoduledata*.h
 %{_libdir}/libsqlrserver.so
 %exclude %{_libdir}/lib*.la
 
@@ -772,6 +774,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 - Updated to version 1.7.0.
 - Removed drop-in replacement library packages.
 - Updated library versions.
+- Added some new header files.
 
 * Fri Jun 28 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
 - Updated to version 1.6.0.
