@@ -129,6 +129,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// read the commandline
 	cmdl=new sqlrcmdline(argc,argv);
 
+	// handle kill and crash signals
 	process::handleShutDown(shutDown);
 	disablecrashhandler=cmdl->found("-disable-crash-handler");
 	if (!disablecrashhandler) {

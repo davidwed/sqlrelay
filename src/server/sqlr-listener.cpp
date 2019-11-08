@@ -11,9 +11,9 @@
 #include <config.h>
 #include <version.h>
 
-sqlrlistener	*lsnr;
-bool		shutdownalready=false;
-const char	*backtrace=NULL;
+sqlrlistener		*lsnr;
+volatile sig_atomic_t	shutdowninprogress=0;
+const char		*backtrace=NULL;
 
 static void shutDown(int32_t signum) {
 
@@ -28,14 +28,14 @@ static void shutDown(int32_t signum) {
 	// * ...
 	// So, we'll catch shutdown loops and exit cleanly.  I'm not sure
 	// what else can be done.
-	if (shutdownalready) {
-		stderror.printf("%s-listener: (pid=%d) "
+	if (shutdowninprogress) {
+		/*stderror.printf("%s-listener: (pid=%d) "
 				"Shutdown loop detected, exiting.\n",
-				SQLR,(uint32_t)process::getProcessId());
+				SQLR,(uint32_t)process::getProcessId());*/
 		process::exit(0);
 	}
 
-	shutdownalready=true;
+	shutdowninprogress=1;
 
 	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGINT) {
 		stringbuffer	filename;

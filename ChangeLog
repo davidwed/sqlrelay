@@ -16,6 +16,7 @@
 	added NULL handoff socket workaround
 	sqlr-status creates statistics on heap now instead of stack, to work
 		on platforms with a small default ulimit stack
+	improved shutdown/crash handlers for sqlr-listener/connection
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3

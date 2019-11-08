@@ -16,19 +16,23 @@
 sqlrservercontroller	*cont=NULL;
 volatile sig_atomic_t	shutdowninprogress=0;
 signalhandler		shutdownhandler;
-bool			shutdownalready=false;
 const char		*backtrace=NULL;
 
 static void shutDown(int32_t signum) {
 
-	if (shutdownalready) {
-		stderror.printf("%s-connection (pid=%d) "
+	// Since this handler is established for more than one kind of signal,
+	// it might get invoked recursively by delivery of multiple signals.
+	// It might also get called if a signal is received during the final
+	// exit after lots of stuff has been freed.  So, keep track of whether
+	// the shutdown is in progress or not, and bail if we get called when
+	// it is.
+	if (shutdowninprogress) {
+		/*stderror.printf("%s-connection (pid=%d) "
 				"Shutdown loop detected, exiting.\n",
-				SQLR,(uint32_t)process::getProcessId());
+				SQLR,(uint32_t)process::getProcessId());*/
 		process::exit(0);
 	}
-
-	shutdownalready=true;
+	shutdowninprogress=1;
 
 	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGINT) {
 		stringbuffer    filename;
@@ -49,14 +53,6 @@ static void shutDown(int32_t signum) {
 		delete cont;
 		process::exit(0);
 	}
-
-	// Since this handler is established for more than one kind of signal,
-	// it might still get invoked recursively by delivery of some other kind
-	// of signal.  Use a static variable to keep track of that.
-	if (shutdowninprogress) {
-		return;
-	}
-	shutdowninprogress=1;
 
 	int	exitcode=1;
 	switch (signum) {
