@@ -465,8 +465,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-start
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver.so.8
-%{_libdir}/libsqlrserver.so.8.*
+%{_libdir}/libsqlrserver.so.10
+%{_libdir}/libsqlrserver.so.10.*
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
@@ -583,8 +583,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %systemd_preun %{name}cachemanager.service
 
 %files common
-%{_libdir}/libsqlrutil.so.8
-%{_libdir}/libsqlrutil.so.8.*
+%{_libdir}/libsqlrutil.so.10
+%{_libdir}/libsqlrutil.so.10.*
 
 %files common-devel
 %dir %{_includedir}/%{name}
@@ -768,9 +768,10 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed Oct 30 2019 David Muse <david.muse@firstworks.com> - 1.7.0-1
+* Fri Nov  8 2019 David Muse <david.muse@firstworks.com> - 1.7.0-1
 - Updated to version 1.7.0.
 - Removed drop-in replacement library packages.
+- Updated library versions.
 
 * Fri Jun 28 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
 - Updated to version 1.6.0.
