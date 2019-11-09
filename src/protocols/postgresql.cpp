@@ -942,7 +942,6 @@ bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
 				&stdconfstr,
 				NULL
 			};
-
 			uint16_t	i=0;
 			stringbuffer	q;
 			const char	*field;
@@ -953,7 +952,8 @@ bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
 			sqlrservercursor	*cursor=cont->getCursor();
 			for (const char **var=vars; *var; var++) {
 				q.append("show ")->append(*var);
-				if (!cont->prepareQuery(cursor,
+				if (!cursor ||
+					!cont->prepareQuery(cursor,
 							q.getString(),
 							q.getStringLength()) ||
 					!cont->executeQuery(cursor) ||
@@ -971,7 +971,10 @@ bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
 				i++;
 				q.clear();
 			}
-			cont->setState(cursor,SQLRCURSORSTATE_AVAILABLE);
+			if (cursor) {
+				cont->setState(cursor,
+						SQLRCURSORSTATE_AVAILABLE);
+			}
 
 		} else {
 			// FIXME: handle other db's too
