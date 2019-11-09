@@ -464,6 +464,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-scaler
 %{_bindir}/sqlr-start
 %{_bindir}/sqlr-stop
+%{_bindir}/sqlr-status
 %{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver.so.10
 %{_libdir}/libsqlrserver.so.10.*
@@ -489,6 +490,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/sqlr-scaler.*
 %{_mandir}/*/sqlr-start.*
 %{_mandir}/*/sqlr-stop.*
+%{_mandir}/*/sqlr-status.*
 %{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
@@ -566,11 +568,9 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import
-%{_bindir}/sqlr-status
 %{_mandir}/*/sqlrsh.*
 %{_mandir}/*/sqlr-export.*
 %{_mandir}/*/sqlr-import.*
-%{_mandir}/*/sqlr-status.*
 
 %files cachemanager
 %{_unitdir}/sqlrcachemanager.service
@@ -775,6 +775,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 - Removed drop-in replacement library packages.
 - Updated library versions.
 - Added some new header files.
+- Moved sqlr-status from sqlrelay-clients package to sqlrelay package.
 
 * Fri Jun 28 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
 - Updated to version 1.6.0.
