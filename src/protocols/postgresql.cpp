@@ -175,6 +175,18 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 
 		uint32_t	protocolversion;
 
+		stringbuffer	sv;
+		char		*serverencoding;
+		char		*clientencoding;
+		char		*applicationname;
+		char		*issuperuser;
+		char		*sessionauth;
+		char		*datestyle;
+		char		*intervalstyle;
+		char		*timezone;
+		char		*integerdatetimes;
+		char		*stdconfstr;
+
 		char		*user;
 		char		*password;
 		char		*database;
@@ -205,6 +217,17 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 					sqlrprotocol(cont,ps,parameters) {
 
 	clientsock=NULL;
+
+	serverencoding=NULL;
+	clientencoding=NULL;
+	applicationname=NULL;
+	issuperuser=NULL;
+	sessionauth=NULL;
+	datestyle=NULL;
+	intervalstyle=NULL;
+	timezone=NULL;
+	integerdatetimes=NULL;
+	stdconfstr=NULL;
 
 	authmethod="postgresql_md5";
 	const char	*pwds=parameters->getAttributeValue("passwords");
@@ -248,6 +271,17 @@ sqlrprotocol_postgresql::~sqlrprotocol_postgresql() {
 
 	free();
 	delete[] reqpacket;
+
+	delete[] serverencoding;
+	delete[] clientencoding;
+	delete[] applicationname;
+	delete[] issuperuser;
+	delete[] sessionauth;
+	delete[] datestyle;
+	delete[] intervalstyle;
+	delete[] timezone;
+	delete[] integerdatetimes;
+	delete[] stdconfstr;
 }
 
 void sqlrprotocol_postgresql::init() {
@@ -855,49 +889,119 @@ bool sqlrprotocol_postgresql::sendBackendKeyData() {
 
 bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
 
-	// get (and massage the dbversion);
-	const char	*dbtype=cont->identify();
-	const char	*dbversion=cont->dbVersion();
-	stringbuffer	sv;
-	if (!charstring::compare(dbtype,"postgresql")) {
-		const char	*ptr=dbversion;
-		char		*major=NULL;
-		char		*minor=NULL;
-		char		*patch=NULL;
-		if (charstring::length(dbversion)==5) {
-			major=charstring::duplicate(ptr,1);
-			ptr++;
-		} else {
-			major=charstring::duplicate(ptr,2);
+	if (!sv.getSize()) {
+
+		// get the dbversion
+		const char	*dbtype=cont->identify();
+		const char	*dbversion=cont->dbVersion();
+		if (!charstring::compare(dbtype,"postgresql")) {
+
+			// massage the dbversion
+			const char	*ptr=dbversion;
+			char		*major=NULL;
+			char		*minor=NULL;
+			char		*patch=NULL;
+			if (charstring::length(dbversion)==5) {
+				major=charstring::duplicate(ptr,1);
+				ptr++;
+			} else {
+				major=charstring::duplicate(ptr,2);
+				ptr+=2;
+			}
+			minor=charstring::duplicate(ptr,2);
 			ptr+=2;
+			patch=charstring::duplicate(ptr,2);
+			sv.append(major)->append('.');
+			sv.append(charstring::toInteger(minor))->append('.');
+			sv.append(charstring::toInteger(patch));
+
+			// get other variables
+			const char	*vars[]={
+				"server_encoding",
+				"client_encoding",
+				"application_name",
+				"is_superuser",
+				"session_authorization",
+				"DateStyle",
+				"IntervalStyle",
+				"TimeZone",
+				"integer_datetimes",
+				"standard_conforming_strings",
+				NULL
+			};
+			char	**vals[]={
+				&serverencoding,
+				&clientencoding,
+				&applicationname,
+				&issuperuser,
+				&sessionauth,
+				&datestyle,
+				&intervalstyle,
+				&timezone,
+				&integerdatetimes,
+				&stdconfstr,
+				NULL
+			};
+
+			uint16_t	i=0;
+			stringbuffer	q;
+			const char	*field;
+			uint64_t	fieldlength;
+			bool		blob;
+			bool		null;
+			bool		error;
+			sqlrservercursor	*cursor=cont->getCursor();
+			for (const char **var=vars; *var; var++) {
+				q.append("show ")->append(*var);
+				if (!cont->prepareQuery(cursor,
+							q.getString(),
+							q.getStringLength()) ||
+					!cont->executeQuery(cursor) ||
+					!cont->fetchRow(cursor,&error) ||
+					!cont->getField(cursor,0,
+							&field,
+							&fieldlength,
+							&blob,
+							&null)) {
+					field="";
+					fieldlength=0;
+				}
+				*vals[i]=charstring::duplicate(field,
+								fieldlength);
+				i++;
+				q.clear();
+			}
+			cont->setState(cursor,SQLRCURSORSTATE_AVAILABLE);
+
+		} else {
+			// FIXME: handle other db's too
+			sv.append(dbversion);
+
+			// FIXME: get these from the database (somehow)... 
+			serverencoding=charstring::duplicate("UTF8");
+			clientencoding=charstring::duplicate("UTF8");
+			applicationname=charstring::duplicate("");
+			issuperuser=charstring::duplicate("off");
+			sessionauth=charstring::duplicate("");
+			datestyle=charstring::duplicate("ISO, MDY");
+			intervalstyle=charstring::duplicate("postgres");
+			timezone=charstring::duplicate("US/Eastern");
+			integerdatetimes=charstring::duplicate("on");
+			stdconfstr=charstring::duplicate("on");
 		}
-		minor=charstring::duplicate(ptr,2);
-		ptr+=2;
-		patch=charstring::duplicate(ptr,2);
-		sv.append(major)->append('.');
-		sv.append(charstring::toInteger(minor))->append('.');
-		sv.append(charstring::toInteger(patch));
-	} else {
-		// FIXME: handle other db's too
-		sv.append(dbversion);
 	}
 
-	// see https://www.postgresql.org/docs/current/sql-show.html
-	// for info on each parameter
-
-	// FIXME: handle the rest of the parameters
-	return sendParameterStatus("server_version",sv.getString())
-		//&& sendParameterStatus("server_encoding","")
-		//&& sendParameterStatus("client_encoding","")
-		//&& sendParameterStatus("application_name","")
-		//&& sendParameterStatus("is_superuser","")
-		//&& sendParameterStatus("session_authorization","")
-		//&& sendParameterStatus("DateStyle","")
-		//&& sendParameterStatus("IntervalStyle","")
-		//&& sendParameterStatus("TimeZone","")
-		//&& sendParameterStatus("integer_datetimes","")
-		//&& sendParameterStatus("standard_conforming_strings","")
-		;
+	return sendParameterStatus("server_version",sv.getString()) &&
+		sendParameterStatus("server_encoding",serverencoding) &&
+		sendParameterStatus("client_encoding",clientencoding) &&
+		sendParameterStatus("application_name",applicationname) &&
+		sendParameterStatus("is_superuser",issuperuser) &&
+		sendParameterStatus("session_authorization",sessionauth) &&
+		sendParameterStatus("DateStyle",datestyle) &&
+		sendParameterStatus("IntervalStyle",intervalstyle) &&
+		sendParameterStatus("TimeZone",timezone) &&
+		sendParameterStatus("integer_datetimes",integerdatetimes) &&
+		sendParameterStatus("standard_conforming_strings",stdconfstr);
 }
 
 bool sqlrprotocol_postgresql::sendParameterStatus(const char *name,
