@@ -126,7 +126,6 @@ int	main(int argc, char **argv) {
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							NULL,NULL,0,1);
-con->debugOn();
 	cur=new sqlrcursor(con);
 	con->enableTls(NULL,cert,NULL,NULL,"ca",ca,0);
 
