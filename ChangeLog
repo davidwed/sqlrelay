@@ -15,11 +15,11 @@
 	fixed various mysql 4.x bugs
 	sqlr-status creates statistics on heap now instead of stack, to work
 		on platforms with a small default ulimit stack
-	fixed hang when more-than-one address was specified in the
-		instance:addresses attribute
 
 1.6.1 - added NULL handoff socket workaround
 	improved shutdown/crash handlers for sqlr-listener/connection
+	fixed hang when more-than-one address was specified in the
+		instance:addresses attribute
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3
