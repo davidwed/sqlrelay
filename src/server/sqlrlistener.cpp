@@ -875,7 +875,7 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 	// attempt to listen on the inet ports (on each specified address)
 	if (port && addrcount) {
 
-		for ( index=0; index<addrcount; index++) {
+		for (index=0; index<addrcount; index++) {
 
 			uint64_t	ind=pvt->_clientsockinindex+index;
 			pvt->_clientsockin[ind]=new inetsocketserver();
@@ -907,9 +907,9 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 				delete pvt->_clientsockin[ind];
 				pvt->_clientsockin[ind]=NULL;
 			}
-
-			pvt->_clientsockinindex++;
 		}
+
+		pvt->_clientsockinindex++;
 	}
 
 	// attempt to listen on the unix socket
