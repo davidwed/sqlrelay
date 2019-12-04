@@ -111,6 +111,14 @@ extern "C" {
 		#define ARRAY_INIT_CANT_FAIL 1
 	#endif
 
+	#if PHP_MAJOR_VERSION > 7 || PHP_MINOR_VERSION < 4
+		#define ADD_ASSOC_NULL(a,b) add_assoc_unset(a,b)
+		#define	ADD_NEXT_INDEX_NULL(a) add_next_index_unset(a)
+	#else
+		#define ADD_ASSOC_NULL(a,b) add_assoc_null(a,b)
+		#define	ADD_NEXT_INDEX_NULL(a) add_next_index_null(a)
+	#endif
+
 #else
 
 	#define ZVAL zval**
@@ -131,8 +139,10 @@ extern "C" {
 	#define RET_STRINGL RETURN_STRINGL
 
 	#define ADD_ASSOC_STRINGL(a,b,c,d,e) add_assoc_stringl(a,b,c,d,e)
+	#define ADD_ASSOC_NULL(a,b) add_assoc_unset(a,b)
 	#define ADD_NEXT_INDEX_STRING(a,b,c) add_next_index_string(a,b,c)
 	#define ADD_NEXT_INDEX_STRINGL(a,b,c,d) add_next_index_stringl(a,b,c,d)
+	#define	ADD_NEXT_INDEX_NULL(a) add_next_index_unset(a)
 
 	#define HASH_INDEX_FIND(a,b,c) zend_hash_index_find(a,b,(void **)&c)
 #endif
@@ -2725,9 +2735,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrow) {
 	#endif
 	for (i=0; i<cursor->colCount(); i++) {
 		if (!r[i]) {
-			// using add_next_index_unset because add_assoc_null
-			// isn't defined in older php
-			add_next_index_unset(return_value);
+			ADD_NEXT_INDEX_NULL(return_value);
 		} else {
 			ADD_NEXT_INDEX_STRINGL(return_value,
 						const_cast<char *>(r[i]),
@@ -2785,9 +2793,7 @@ DLEXPORT ZEND_FUNCTION(sqlrcur_getrowassoc) {
 	#endif
 	for (i=0; i<cursor->colCount(); i++) {
 		if (!r[i]) {
-			// using add_assoc_unset because add_assoc_null isn't
-			// defined in older php
-			add_assoc_unset(return_value,const_cast<char *>(rC[i]));
+			ADD_ASSOC_NULL(return_value,const_cast<char *>(rC[i]));
 		} else {
 			ADD_ASSOC_STRINGL(return_value,
 					const_cast<char *>(rC[i]),

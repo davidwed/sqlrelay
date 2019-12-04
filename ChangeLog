@@ -15,6 +15,7 @@
 	fixed various mysql 4.x bugs
 	sqlr-status creates statistics on heap now instead of stack, to work
 		on platforms with a small default ulimit stack
+	*_null used instead of *_unset on PHP 7.4
 
 1.6.1 - added NULL handoff socket workaround
 	improved shutdown/crash handlers for sqlr-listener/connection
