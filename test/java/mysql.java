@@ -373,7 +373,8 @@ class mysql {
 		System.out.println();
 	
 		System.out.println("TOTAL ROWS: ");
-		checkSuccess(cur.totalRows(),0);
+		// older versions of mysql know this
+		//checkSuccess(cur.totalRows(),0);
 		System.out.println();
 	
 		System.out.println("FIRST ROW INDEX: ");

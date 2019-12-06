@@ -311,7 +311,8 @@ checkSuccess [$cur rowCount] 8
 puts ""
 
 puts "TOTAL ROWS: "
-checkSuccess [$cur totalRows] 0
+# older versions of mysql know this
+#checkSuccess [$cur totalRows] 0
 puts ""
 
 puts "FIRST ROW INDEX: "

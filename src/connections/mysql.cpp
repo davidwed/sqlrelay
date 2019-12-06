@@ -414,8 +414,9 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 			(!charstring::isNullOrEmpty(socket))?socket:NULL;
 	unsigned long	clientflag=0;
 	#ifdef CLIENT_MULTI_STATEMENTS
-		clientflag|=CLIENT_MULTI_STATEMENTS;
+		//clientflag|=CLIENT_MULTI_STATEMENTS;
 	#endif
+clientflag|=(1UL << 17);
 	#ifdef CLIENT_FOUND_ROWS
 		if (foundrows) {
 			clientflag|=CLIENT_FOUND_ROWS;

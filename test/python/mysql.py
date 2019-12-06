@@ -313,7 +313,8 @@ def main():
 	print()
 
 	print("TOTAL ROWS: ")
-	checkSuccess(cur.totalRows(),0)
+	# older versions of mysql know this
+	#checkSuccess(cur.totalRows(),0)
 	print()
 
 	print("FIRST ROW INDEX: ")

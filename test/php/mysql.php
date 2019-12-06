@@ -311,7 +311,8 @@
 	echo("\n");
 
 	echo("TOTAL ROWS: \n");
-	checkSuccess(sqlrcur_totalRows($cur),0);
+	// older versions of mysql know this
+	//checkSuccess(sqlrcur_totalRows($cur),0);
 	echo("\n");
 
 	echo("FIRST ROW INDEX: \n");
