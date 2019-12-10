@@ -328,8 +328,8 @@ checkSuccess(cur.rowCount(),8);
 console.log("\n");
 
 console.log("TOTAL ROWS: ");
-# older versions of mysql know this
-#checkSuccess(cur.totalRows(),0);
+// older versions of mysql know this
+//checkSuccess(cur.totalRows(),0);
 console.log("\n");
 
 console.log("FIRST ROW INDEX: ");
