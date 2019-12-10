@@ -41,8 +41,8 @@ def main():
 
 	try:
 		cur.execute("drop table temptable")
-	except (PySQLRDB.DatabaseError) as e:
-		print(e)
+	except (PySQLRDB.DatabaseError):
+		print("drop table failed")
 
 	cur.execute("create table temptable (col1 number, col2 char(10), col3 number(2,1))")
 	cur.execute("select * from temptable")
@@ -97,8 +97,8 @@ def main():
 	# make sure we don't get a segfault
 	try :
 		cur.execute("select 1 from dual");
-	except (UnboundLocalError) as e:
-		print(e)
+	except (UnboundLocalError):
+		print("no segfault")
 
 if __name__ == '__main__':
 	main()
