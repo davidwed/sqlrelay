@@ -366,8 +366,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(field->name,"testtimestamp");
 	checkSuccess(field->length,19);
 	checkSuccess(field->flags,
-			TIMESTAMP_FLAG|ON_UPDATE_NOW_FLAG|
-			BINARY_FLAG|UNSIGNED_FLAG|NOT_NULL_FLAG);
+			TIMESTAMP_FLAG|
+			#ifdef ON_UPDATE_NOW_FLAG
+			ON_UPDATE_NOW_FLAG|
+			#endif
+			BINARY_FLAG|
+			UNSIGNED_FLAG|
+			NOT_NULL_FLAG);
 	checkSuccess(field->type,MYSQL_TYPE_TIMESTAMP);
 	mysql_free_result(result);
 	stdoutput.printf("\n");
