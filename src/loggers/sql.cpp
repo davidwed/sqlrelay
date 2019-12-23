@@ -9,11 +9,10 @@
 #include <rudiments/filesystem.h>
 #include <rudiments/stringbuffer.h>
 
-class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
+class SQLRSERVER_DLLSPEC sqlrlogger_sql : public sqlrlogger {
 	public:
-			sqlrlogger_slowqueries(sqlrloggers *ls,
-						domnode *parameters);
-			~sqlrlogger_slowqueries();
+			sqlrlogger_sql(sqlrloggers *ls, domnode *parameters);
+			~sqlrlogger_sql();
 
 		bool	init(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon);
@@ -29,28 +28,21 @@ class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 		uint64_t	sec;
 		uint64_t	usec;
 		uint64_t	totalusec;
-		bool		usecommand;
 		bool		enabled;
 };
 
-sqlrlogger_slowqueries::sqlrlogger_slowqueries(sqlrloggers *ls,
-						domnode *parameters) :
+sqlrlogger_sql::sqlrlogger_sql(sqlrloggers *ls, domnode *parameters) :
 						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
-	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
-	usec=charstring::toInteger(parameters->getAttributeValue("usec"));
-	totalusec=sec*1000000+usec;
-	usecommand=!charstring::compareIgnoringCase(
-			parameters->getAttributeValue("timer"),"command");
 	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 }
 
-sqlrlogger_slowqueries::~sqlrlogger_slowqueries() {
+sqlrlogger_sql::~sqlrlogger_sql() {
 	querylog.flushWriteBuffer(-1,-1);
 	delete[] querylogname;
 }
 
-bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
+bool sqlrlogger_sql::init(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon) {
 
 	if (!enabled) {
@@ -88,9 +80,7 @@ bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
 	return true;
 }
 
-static const char *days[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
-
-bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
+bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrlogger_loglevel_t level,
@@ -124,56 +114,28 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 		}
 	}
 
-	// calculate times
-	uint64_t	startsec=(usecommand)?sqlrcur->getCommandStartSec():
-						sqlrcur->getQueryStartSec();
-	uint64_t	startusec=(usecommand)?sqlrcur->getCommandStartUSec():
-						sqlrcur->getQueryStartUSec();
-	uint64_t	endsec=(usecommand)?sqlrcur->getCommandEndSec():
-						sqlrcur->getQueryEndSec();
-	uint64_t	endusec=(usecommand)?sqlrcur->getCommandEndUSec():
-						sqlrcur->getQueryEndUSec();
-
-	uint64_t	queryusec=((endsec-startsec)*1000000)+
-							endusec-startusec;
-	double		querysec=((double)queryusec)/1000000.0;
-
-	// log times
-	if (queryusec>=totalusec) {
-
-		datetime	dt;
-		dt.getSystemDateAndTime();
-		char	datebuffer[26];
-		charstring::printf(datebuffer,sizeof(datebuffer),
-					"%s %d %s % 2d  %02d:%02d:%02d",
-					days[dt.getDayOfWeek()-1],
-					dt.getYear(),
-					dt.getMonthAbbreviation(),
-					dt.getDayOfMonth(),
-					dt.getHour(),
-					dt.getMinutes(),
-					dt.getSeconds());
-		
-		stringbuffer	logentry;
-		logentry.append(datebuffer)->append(" :\n");
-		logentry.append(sqlrcur->getQueryBuffer());
+	// log query (and error, if there was one)
+	stringbuffer	logentry;
+	logentry.append(sqlrcur->getQueryBuffer());
+	logentry.append(";\n");
+	if (!charstring::isNullOrEmpty(sqlrcur->getErrorBuffer())) {
+		logentry.append("-- ERROR: ");
+		logentry.append(sqlrcur->getErrorBuffer());
 		logentry.append("\n");
-		logentry.append("execution time: ")->append(querysec,6);
-		logentry.append("\n");
-		if ((size_t)querylog.write(logentry.getString(),
-					logentry.getStringLength())!=
-						logentry.getStringLength()) {
-			return false;
-		}
-		//querylog.flushWriteBuffer(-1,-1);
 	}
+	if ((size_t)querylog.write(logentry.getString(),
+				logentry.getStringLength())!=
+					logentry.getStringLength()) {
+		return false;
+	}
+	//querylog.flushWriteBuffer(-1,-1);
 	return true;
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_slowqueries(
+	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_sql(
 						sqlrloggers *ls,
 						domnode *parameters) {
-		return new sqlrlogger_slowqueries(ls,parameters);
+		return new sqlrlogger_sql(ls,parameters);
 	}
 }

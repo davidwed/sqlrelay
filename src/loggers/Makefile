@@ -13,6 +13,7 @@ include ../../config.mk
 all: $(SQLR)logger_debug.$(LIBEXT) \
 	$(SQLR)logger_slowqueries.$(LIBEXT) \
 	$(SQLR)logger_stalecursors.$(LIBEXT) \
+	$(SQLR)logger_sql.$(LIBEXT) \
 	$(SQLR)logger_custom_nw.$(LIBEXT) \
 	$(SQLR)logger_custom_sc.$(LIBEXT)
 
@@ -29,6 +30,9 @@ $(SQLR)logger_slowqueries.$(LIBEXT): slowqueries.cpp slowqueries.$(OBJ)
 $(SQLR)logger_stalecursors.$(LIBEXT): stalecursors.cpp stalecursors.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ stalecursors.$(OBJ) $(LDFLAGS) $(SQLRLOGGER_STALECURSORSLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
+$(SQLR)logger_sql.$(LIBEXT): sql.cpp sql.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ sql.$(OBJ) $(LDFLAGS) $(SQLRLOGGER_STALECURSORSLIBS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
 $(SQLR)logger_custom_nw.$(LIBEXT): custom_nw.cpp custom_nw.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ custom_nw.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
@@ -42,6 +46,7 @@ installdll:
 	$(LTINSTALL) $(CP) $(SQLR)logger_debug.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)logger_slowqueries.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)logger_stalecursors.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)logger_sql.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)logger_custom_nw.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)logger_custom_sc.$(LIBEXT) $(libexecdir)
 
@@ -61,6 +66,10 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)logger_stalecursors.a
 	$(RM) $(libexecdir)/$(SQLR)logger_stalecursors.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)logger_stalecursors.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)logger_sql.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)logger_sql.a
+	$(RM) $(libexecdir)/$(SQLR)logger_sql.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)logger_sql.so so $(MODULESUFFIX)
 	$(LTINSTALL) $(CP) $(SQLR)logger_custom_nw.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/$(SQLR)logger_custom_nw.a
 	$(RM) $(libexecdir)/$(SQLR)logger_custom_nw.$(LIBEXT)
@@ -76,8 +85,10 @@ uninstall:
 		$(libexecdir)/$(SQLR)logger_debug.* \
 		$(libexecdir)/$(SQLR)logger_slowqueries.* \
 		$(libexecdir)/$(SQLR)logger_stalecursors.* \
+		$(libexecdir)/$(SQLR)logger_sql.* \
 		$(libexecdir)/sqlrlogger_custom_nw.* \
 		$(libexecdir)/sqlrlogger_custom_sc.* \
 		$(libexecdir)/sqlrlogger_debug.* \
 		$(libexecdir)/sqlrlogger_slowqueries.* \
-		$(libexecdir)/sqlrlogger_stalecursors.*
+		$(libexecdir)/sqlrlogger_stalecursors.* \
+		$(libexecdir)/sqlrlogger_sql.*
