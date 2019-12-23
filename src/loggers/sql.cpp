@@ -125,7 +125,7 @@ bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 	}
 	if ((size_t)querylog.write(logentry.getString(),
 				logentry.getStringLength())!=
-					logentry.getStringLength()) {
+				logentry.getStringLength()) {
 		return false;
 	}
 	//querylog.flushWriteBuffer(-1,-1);
