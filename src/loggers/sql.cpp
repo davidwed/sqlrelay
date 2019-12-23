@@ -96,8 +96,12 @@ bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 		return true;
 	}
 
-	// don't do anything unless we got INFO/QUERY
-	if (level!=SQLRLOGGER_LOGLEVEL_INFO || event!=SQLREVENT_QUERY) {
+	// don't do anything unless we got INFO/QUERY/TX
+	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
+		(event!=SQLREVENT_QUERY &&
+		event!=SQLREVENT_BEGIN_TRANSACTION &&
+		event!=SQLREVENT_ROLLBACK &&
+		event!=SQLREVENT_COMMIT)) {
 		return true;
 	}
 
@@ -116,12 +120,29 @@ bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 
 	// log query (and error, if there was one)
 	stringbuffer	logentry;
-	logentry.append(sqlrcur->getQueryBuffer());
-	logentry.append(";\n");
-	if (!charstring::isNullOrEmpty(sqlrcur->getErrorBuffer())) {
-		logentry.append("-- ERROR: ");
-		logentry.append(sqlrcur->getErrorBuffer());
-		logentry.append("\n");
+	if (event==SQLREVENT_QUERY) {
+		logentry.append(sqlrcon->cont->getQueryBuffer(sqlrcur));
+		logentry.append(";\n");
+		if (!charstring::isNullOrEmpty(
+				sqlrcon->cont->getErrorBuffer(sqlrcur))) {
+			logentry.append("-- ERROR: ");
+			logentry.append(sqlrcon->cont->getErrorBuffer(sqlrcur));
+			logentry.append("\n");
+		}
+	} else {
+		if (event==SQLREVENT_BEGIN_TRANSACTION) {
+			logentry.append("begin;\n");
+		} else if (event==SQLREVENT_ROLLBACK) {
+			logentry.append("rollback;\n");
+		} else if (event==SQLREVENT_COMMIT) {
+			logentry.append("commit;\n");
+		}
+		if (!charstring::isNullOrEmpty(
+				sqlrcon->cont->getErrorBuffer())) {
+			logentry.append("-- ERROR: ");
+			logentry.append(sqlrcon->cont->getErrorBuffer());
+			logentry.append("\n");
+		}
 	}
 	if ((size_t)querylog.write(logentry.getString(),
 				logentry.getStringLength())!=
