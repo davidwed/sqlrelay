@@ -153,6 +153,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 
 		bool		columnInfoIsValidAfterPrepare();
 
+		void		encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize);
+
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	**mysqlfields;
 		unsigned int	ncols;
@@ -280,6 +283,8 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		bool		firstquery;
 
 		stringbuffer	loginerror;
+
+		bool		escapeblobs;
 };
 
 extern "C" {
@@ -414,9 +419,9 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 			(!charstring::isNullOrEmpty(socket))?socket:NULL;
 	unsigned long	clientflag=0;
 	#ifdef CLIENT_MULTI_STATEMENTS
-		//clientflag|=CLIENT_MULTI_STATEMENTS;
+		clientflag|=CLIENT_MULTI_STATEMENTS;
 	#endif
-clientflag|=(1UL << 17);
+//clientflag|=(1UL << 17);
 	#ifdef CLIENT_FOUND_ROWS
 		if (foundrows) {
 			clientflag|=CLIENT_FOUND_ROWS;
@@ -564,11 +569,14 @@ clientflag|=(1UL << 17);
 #endif
 	connected=true;
 
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	// fake binds when connected to older servers
+	// get server version to decide whether to fake binds and how to
+	// escape blobs
+	escapeblobs=false;
 #ifdef HAVE_MYSQL_GET_SERVER_VERSION
-	if (mysql_get_server_version(mysqlptr)<40102) {
+	unsigned long	serverversion=mysql_get_server_version(mysqlptr);
+	if (serverversion<40102) {
 		cont->setFakeInputBinds(true);
+		escapeblobs=true;
 	}
 #else
 	char		**list;
@@ -583,7 +591,9 @@ clientflag|=(1UL << 17);
 		if (major>4 || (major==4 && minor>1) ||
 				(major==4 && minor==1 && patch>=2)) {
 			cont->setFakeInputBinds(true);
-		} 
+		}  else {
+			escapeblobs=true;
+		}
 		for (uint64_t index=0; index<listlen; index++) {
 			delete[] list[index];
 		}
@@ -599,8 +609,6 @@ clientflag|=(1UL << 17);
 	} else {
 		dbhostname=charstring::duplicate(hostinfo);
 	}
-
-#endif
 
 #ifdef HAVE_MYSQL_SET_CHARACTER_SET
 	// set the character set
@@ -1965,4 +1973,45 @@ void mysqlcursor::closeResultSet() {
 
 bool mysqlcursor::columnInfoIsValidAfterPrepare() {
 	return true;
+}
+
+void mysqlcursor::encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize) {
+	if (!mysqlconn->escapeblobs) {
+		return sqlrservercursor::encodeBlob(buffer,data,datasize);
+	}
+	buffer->append('\'');
+	for (uint32_t i=0; i<datasize; i++) {
+		switch (data[i]) {
+			case '\'':
+				buffer->append('\\');
+				buffer->append('\'');
+				break;
+			case '"':
+				buffer->append('\\');
+				buffer->append('"');
+				break;
+			case '\n':
+				buffer->append('\\');
+				buffer->append('n');
+				break;
+			case '\r':
+				buffer->append('\\');
+				buffer->append('r');
+				break;
+			case '\\':
+				buffer->append('\\');
+				buffer->append('\\');
+				break;
+			case 26:
+				buffer->append('\\');
+				buffer->append('Z');
+				break;
+			default:
+				// FIXME: what about binary data?
+				buffer->append(data[i]);
+				break;
+		}
+	}
+	buffer->append('\'');
 }

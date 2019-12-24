@@ -1094,49 +1094,52 @@ for (uint16_t a=0; a<50; a++) {
 	cur->sendQuery("drop table temptable\n");
 	stdoutput.printf("\n");
 
-	// stored functions
-	stdoutput.printf("FUNCTIONS: \n");
-	cur->sendQuery("drop function if exists testfunc");
-	checkSuccess(cur->sendQuery("create function testfunc(in1 int, in2 int) returns int return in1+in2;"),1);
-	cur->prepareQuery("select testfunc(?,?)");
-	cur->inputBind("1",10);
-	cur->inputBind("2",20);
-	checkSuccess(cur->executeQuery(),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"30");
-	cur->sendQuery("drop function if exists testfunc");
-	stdoutput.printf("\n");
+	if (majorversion>3) {
 
-	// stored procedures
-	stdoutput.printf("STORED PROCEDURES: \n");
-	// return no values
-	cur->sendQuery("drop procedure if exists testproc");
-	checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 float, in in3 char(20)) begin select in1, in2, in3; end;"),1);
-	cur->prepareQuery("call testproc(:in1,:in2,:in3)");
-	cur->inputBind("in1",1);
-	cur->inputBind("in2",1.1,4,2);
-	cur->inputBind("in3","hello");
-	bool	result=cur->executeQuery();
-	if (result || !charstring::contains(cur->errorMessage(),
-			"can't return a result set in the given context")) {
-		checkSuccess(result,1);
-		checkSuccess(cur->getField(0,(uint32_t)0),"1");
-		checkSuccess(cur->getField(0,(uint32_t)1),"1.1");
-		checkSuccess(cur->getField(0,(uint32_t)2),"hello");
+		// stored functions
+		stdoutput.printf("FUNCTIONS: \n");
+		cur->sendQuery("drop function if exists testfunc");
+		checkSuccess(cur->sendQuery("create function testfunc(in1 int, in2 int) returns int return in1+in2;"),1);
+		cur->prepareQuery("select testfunc(?,?)");
+		cur->inputBind("1",10);
+		cur->inputBind("2",20);
+		checkSuccess(cur->executeQuery(),1);
+		checkSuccess(cur->getField(0,(uint32_t)0),"30");
+		cur->sendQuery("drop function if exists testfunc");
+		stdoutput.printf("\n");
+
+		// stored procedures
+		stdoutput.printf("STORED PROCEDURES: \n");
+		// return no values
+		cur->sendQuery("drop procedure if exists testproc");
+		checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 float, in in3 char(20)) begin select in1, in2, in3; end;"),1);
+		cur->prepareQuery("call testproc(:in1,:in2,:in3)");
+		cur->inputBind("in1",1);
+		cur->inputBind("in2",1.1,4,2);
+		cur->inputBind("in3","hello");
+		bool	result=cur->executeQuery();
+		if (result || !charstring::contains(cur->errorMessage(),
+				"can't return a result set in the given context")) {
+			checkSuccess(result,1);
+			checkSuccess(cur->getField(0,(uint32_t)0),"1");
+			checkSuccess(cur->getField(0,(uint32_t)1),"1.1");
+			checkSuccess(cur->getField(0,(uint32_t)2),"hello");
+			cur->sendQuery("drop procedure testproc");
+			stdoutput.printf("\n");
+			// return values
+			checkSuccess(cur->sendQuery("create procedure testproc(out out1 int, out out2 float, out out3 char(20)) begin select 1, 1.1, 'hello' into out1, out2, out3; end;"),1);
+			checkSuccess(cur->sendQuery("set @out1=0, @out2=0.0, @out3=''"),1);
+			checkSuccess(cur->sendQuery("call testproc(@out1,@out2,@out3)"),1);
+			checkSuccess(cur->sendQuery("select @out1, @out2, @out3"),1);
+			checkSuccess(cur->getField(0,(uint32_t)0),"1");
+			checkSuccess(cur->getFieldAsDouble(0,(uint32_t)1),1.1);
+			checkSuccess(cur->getField(0,(uint32_t)2),"hello");
+		} else {
+			stdoutput.printf("bypassed");
+		}
 		cur->sendQuery("drop procedure testproc");
 		stdoutput.printf("\n");
-		// return values
-		checkSuccess(cur->sendQuery("create procedure testproc(out out1 int, out out2 float, out out3 char(20)) begin select 1, 1.1, 'hello' into out1, out2, out3; end;"),1);
-		checkSuccess(cur->sendQuery("set @out1=0, @out2=0.0, @out3=''"),1);
-		checkSuccess(cur->sendQuery("call testproc(@out1,@out2,@out3)"),1);
-		checkSuccess(cur->sendQuery("select @out1, @out2, @out3"),1);
-		checkSuccess(cur->getField(0,(uint32_t)0),"1");
-		checkSuccess(cur->getFieldAsDouble(0,(uint32_t)1),1.1);
-		checkSuccess(cur->getField(0,(uint32_t)2),"hello");
-	} else {
-		stdoutput.printf("bypassed");
 	}
-	cur->sendQuery("drop procedure testproc");
-	stdoutput.printf("\n");
 
 	// drop existing table
 	cur->sendQuery("drop table testtable");
@@ -1164,62 +1167,64 @@ for (uint16_t a=0; a<50; a++) {
 	stdoutput.printf("\n");
 
 	// binary data
-	stdoutput.printf("BINARY DATA: \n");
-	checkSuccess(cur->sendQuery("create table testtable (col1 longblob)"),true);
-	unsigned char	buffer[256];
-	for (uint16_t i=0; i<256; i++) {
-		buffer[i]=i;
-	}
-	stringbuffer	query;
-	query.append("insert into testtable values (_binary'");
-	for (uint64_t i=0; i<sizeof(buffer); i++) {
-		if (buffer[i]=='\'') {
-			query.append('\'');
+	if (majorversion>3) {
+		stdoutput.printf("BINARY DATA: \n");
+		checkSuccess(cur->sendQuery("create table testtable (col1 longblob)"),true);
+		unsigned char	buffer[256];
+		for (uint16_t i=0; i<256; i++) {
+			buffer[i]=i;
 		}
-		if (buffer[i]=='\\') {
-			query.append('\\');
+		stringbuffer	query;
+		query.append("insert into testtable values (_binary'");
+		for (uint64_t i=0; i<sizeof(buffer); i++) {
+			if (buffer[i]=='\'') {
+				query.append('\'');
+			}
+			if (buffer[i]=='\\') {
+				query.append('\\');
+			}
+			query.append(buffer[i]);
 		}
-		query.append(buffer[i]);
+		query.append("')");
+		checkSuccess(cur->sendQuery(query.getString(),query.getSize()),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),sizeof(buffer));
+		checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),
+							buffer,sizeof(buffer)),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		stdoutput.printf("\n");
+		checkSuccess(cur->sendQuery("insert into testtable values (_binary'''''')"),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
+		checkSuccess(charstring::compare(cur->getField(0,(uint32_t)0),"''"),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		stdoutput.printf("\n");
+		checkSuccess(cur->sendQuery("insert into testtable values (_binary'\"\"')"),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
+		checkSuccess(charstring::compare(cur->getField(0,(uint32_t)0),"\"\""),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		stdoutput.printf("\n");
+		checkSuccess(cur->sendQuery("insert into testtable values (_binary'\0\"\"')",43),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),3);
+		checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\0\"\"",3),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		stdoutput.printf("\n");
+		checkSuccess(cur->sendQuery("insert into testtable values (_binary'\\\0\\\"\\\"')",46),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),3);
+		checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\0\"\"",3),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		stdoutput.printf("\n");
+		checkSuccess(cur->sendQuery("insert into testtable values (_binary'\\\\\\'')",44),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
+		checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\\\'",2),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		cur->sendQuery("drop table testtable");
+		stdoutput.printf("\n");
 	}
-	query.append("')");
-	checkSuccess(cur->sendQuery(query.getString(),query.getSize()),true);
-	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
-	checkSuccess(cur->getFieldLength(0,(uint32_t)0),sizeof(buffer));
-	checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),
-						buffer,sizeof(buffer)),0);
-	checkSuccess(cur->sendQuery("delete from testtable"),true);
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("insert into testtable values (_binary'''''')"),true);
-	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
-	checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
-	checkSuccess(charstring::compare(cur->getField(0,(uint32_t)0),"''"),0);
-	checkSuccess(cur->sendQuery("delete from testtable"),true);
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("insert into testtable values (_binary'\"\"')"),true);
-	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
-	checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
-	checkSuccess(charstring::compare(cur->getField(0,(uint32_t)0),"\"\""),0);
-	checkSuccess(cur->sendQuery("delete from testtable"),true);
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("insert into testtable values (_binary'\0\"\"')",43),true);
-	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
-	checkSuccess(cur->getFieldLength(0,(uint32_t)0),3);
-	checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\0\"\"",3),0);
-	checkSuccess(cur->sendQuery("delete from testtable"),true);
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("insert into testtable values (_binary'\\\0\\\"\\\"')",46),true);
-	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
-	checkSuccess(cur->getFieldLength(0,(uint32_t)0),3);
-	checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\0\"\"",3),0);
-	checkSuccess(cur->sendQuery("delete from testtable"),true);
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("insert into testtable values (_binary'\\\\\\'')",44),true);
-	checkSuccess(cur->sendQuery("select col1 from testtable"),true);
-	checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
-	checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\\\'",2),0);
-	checkSuccess(cur->sendQuery("delete from testtable"),true);
-	cur->sendQuery("drop table testtable");
-	stdoutput.printf("\n");
 
 	// invalid queries...
 	stdoutput.printf("INVALID QUERIES: \n");

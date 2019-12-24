@@ -931,9 +931,9 @@
 	$secondcur=sqlrcur_alloc($secondcon);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	if ($majorversion>3) {
-		checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
-	} else {
 		checkSuccess(sqlrcur_getField($secondcur,0,0),"0");
+	} else {
+		checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
 	}
 	checkSuccess(sqlrcon_commit($con),1);
 	checkSuccess(sqlrcon_commit($secondcon),1);
