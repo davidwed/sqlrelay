@@ -76,6 +76,10 @@ int	main(int argc, char **argv) {
 	printf("IDENTIFY: \n");
 	checkSuccessString(sqlrcon_identify(con),"mysql");
 
+	// get the db version
+	const char	*dbversion=sqlrcon_dbVersion(con);
+	uint32_t	majorversion=dbversion[0]-'0';
+
 	// ping
 	printf("PING: \n");
 	checkSuccessInt(sqlrcon_ping(con),1);
@@ -251,7 +255,13 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,9),"TIME");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,10),"DATETIME");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,11),"YEAR");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,12),"STRING");
+	if (majorversion==3) {
+		checkSuccessString(
+			sqlrcur_getColumnTypeByIndex(cur,12),"VARSTRING");
+	} else {
+		checkSuccessString(
+			sqlrcur_getColumnTypeByIndex(cur,12),"STRING");
+	}
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,13),"BLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,14),"VARSTRING");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,15),"TINYBLOB");
@@ -270,7 +280,13 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtime"),"TIME");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testdatetime"),"DATETIME");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testyear"),"YEAR");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"STRING");
+	if (majorversion==3) {
+		checkSuccessString(
+		sqlrcur_getColumnTypeByName(cur,"testchar"),"VARSTRING");
+	} else {
+		checkSuccessString(
+		sqlrcur_getColumnTypeByName(cur,"testchar"),"STRING");
+	}
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtext"),"BLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"VARSTRING");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtinytext"),"TINYBLOB");
@@ -339,7 +355,11 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,15),9);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,16),11);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,17),9);
-	checkSuccessInt(sqlrcur_getLongestByIndex(cur,18),19);
+	if (majorversion==3) {
+		checkSuccessInt(sqlrcur_getLongestByIndex(cur,18),14);
+	} else {
+		checkSuccessInt(sqlrcur_getLongestByIndex(cur,18),19);
+	}
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtinyint"),1);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testsmallint"),1);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testmediumint"),1);
@@ -358,7 +378,13 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtinytext"),9);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testmediumtext"),11);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testlongtext"),9);
-	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtimestamp"),19);
+	if (majorversion==3) {
+		checkSuccessInt(
+			sqlrcur_getLongestByName(cur,"testtimestamp"),14);
+	} else {
+		checkSuccessInt(
+			sqlrcur_getLongestByName(cur,"testtimestamp"),19);
+	}
 	printf("\n");
 
 	printf("ROW COUNT: \n");
@@ -905,7 +931,11 @@ int	main(int argc, char **argv) {
 				"/tmp/test.socket","test","test",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
-	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");
+	if (majorversion>3) {
+		checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");
+	} else {
+		checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");
+	}
 	checkSuccessInt(sqlrcon_commit(con),1);
 	checkSuccessInt(sqlrcon_commit(secondcon),1);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);

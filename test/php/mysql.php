@@ -32,6 +32,10 @@
 	checkSuccess(sqlrcon_identify($con),"mysql");
 	echo("\n");
 
+	# get the db version
+	$dbversion=sqlrcon_dbVersion($con);
+	$majorversion=intval(substr($dbversion,0,1));
+
 	# ping
 	echo("PING: \n");
 	checkSuccess(sqlrcon_ping($con),1);
@@ -196,7 +200,11 @@
 	checkSuccess(sqlrcur_getColumnType($cur,9),"TIME");
 	checkSuccess(sqlrcur_getColumnType($cur,10),"DATETIME");
 	checkSuccess(sqlrcur_getColumnType($cur,11),"YEAR");
-	checkSuccess(sqlrcur_getColumnType($cur,12),"STRING");
+	if ($majorversion==3) {
+		checkSuccess(sqlrcur_getColumnType($cur,12),"VARSTRING");
+	} else {
+		checkSuccess(sqlrcur_getColumnType($cur,12),"STRING");
+	}
 	checkSuccess(sqlrcur_getColumnType($cur,13),"BLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,14),"VARSTRING");
 	checkSuccess(sqlrcur_getColumnType($cur,15),"TINYBLOB");
@@ -215,7 +223,11 @@
 	checkSuccess(sqlrcur_getColumnType($cur,"testtime"),"TIME");
 	checkSuccess(sqlrcur_getColumnType($cur,"testdatetime"),"DATETIME");
 	checkSuccess(sqlrcur_getColumnType($cur,"testyear"),"YEAR");
-	checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"STRING");
+	if ($majorversion==3) {
+		checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"VARSTRING");
+	} else {
+		checkSuccess(sqlrcur_getColumnType($cur,"testchar"),"STRING");
+	}
 	checkSuccess(sqlrcur_getColumnType($cur,"testtext"),"BLOB");
 	checkSuccess(sqlrcur_getColumnType($cur,"testvarchar"),"VARSTRING");
 	checkSuccess(sqlrcur_getColumnType($cur,"testtinytext"),"TINYBLOB");
@@ -284,7 +296,11 @@
 	checkSuccess(sqlrcur_getLongest($cur,15),9);
 	checkSuccess(sqlrcur_getLongest($cur,16),11);
 	checkSuccess(sqlrcur_getLongest($cur,17),9);
-	checkSuccess(sqlrcur_getLongest($cur,18),19);
+	if ($majorversion==3) {
+		checkSuccess(sqlrcur_getLongest($cur,18),14);
+	} else {
+		checkSuccess(sqlrcur_getLongest($cur,18),19);
+	}
 	checkSuccess(sqlrcur_getLongest($cur,"testtinyint"),1);
 	checkSuccess(sqlrcur_getLongest($cur,"testsmallint"),1);
 	checkSuccess(sqlrcur_getLongest($cur,"testmediumint"),1);
@@ -303,7 +319,11 @@
 	checkSuccess(sqlrcur_getLongest($cur,"testtinytext"),9);
 	checkSuccess(sqlrcur_getLongest($cur,"testmediumtext"),11);
 	checkSuccess(sqlrcur_getLongest($cur,"testlongtext"),9);
-	checkSuccess(sqlrcur_getLongest($cur,"testtimestamp"),19);
+	if ($majorversion==3) {
+		checkSuccess(sqlrcur_getLongest($cur,"testtimestamp"),14);
+	} else {
+		checkSuccess(sqlrcur_getLongest($cur,"testtimestamp"),19);
+	}
 	echo("\n");
 
 	echo("ROW COUNT: \n");
@@ -910,7 +930,11 @@
 					$socket,$user,$password,0,1);
 	$secondcur=sqlrcur_alloc($secondcon);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
-	checkSuccess(sqlrcur_getField($secondcur,0,0),"0");
+	if ($majorversion>3) {
+		checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
+	} else {
+		checkSuccess(sqlrcur_getField($secondcur,0,0),"0");
+	}
 	checkSuccess(sqlrcon_commit($con),1);
 	checkSuccess(sqlrcon_commit($secondcon),1);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);

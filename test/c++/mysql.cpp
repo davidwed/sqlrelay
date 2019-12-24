@@ -97,6 +97,10 @@ for (uint16_t a=0; a<50; a++) {
 	stdoutput.printf("IDENTIFY: \n");
 	checkSuccess(con->identify(),"mysql");
 
+        // get the db version
+        const char      *dbversion=con->dbVersion();
+        uint32_t        majorversion=dbversion[0]-'0';
+
 	// ping
 	stdoutput.printf("PING: \n");
 	checkSuccess(con->ping(),1);
@@ -296,7 +300,11 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getColumnType(9),"TIME");
 	checkSuccess(cur->getColumnType(10),"DATETIME");
 	checkSuccess(cur->getColumnType(11),"YEAR");
-	checkSuccess(cur->getColumnType(12),"STRING");
+	if (majorversion==3) {
+		checkSuccess(cur->getColumnType(12),"VARSTRING");
+	} else {
+		checkSuccess(cur->getColumnType(12),"STRING");
+	}
 	checkSuccess(cur->getColumnType(13),"VARSTRING");
 	checkSuccess(cur->getColumnType(14),"BLOB");
 	checkSuccess(cur->getColumnType(15),"TINYBLOB");
@@ -319,7 +327,11 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getColumnType("testtime"),"TIME");
 	checkSuccess(cur->getColumnType("testdatetime"),"DATETIME");
 	checkSuccess(cur->getColumnType("testyear"),"YEAR");
-	checkSuccess(cur->getColumnType("testchar"),"STRING");
+	if (majorversion==3) {
+		checkSuccess(cur->getColumnType("testchar"),"VARSTRING");
+	} else {
+		checkSuccess(cur->getColumnType("testchar"),"STRING");
+	}
 	checkSuccess(cur->getColumnType("testvarchar"),"VARSTRING");
 	checkSuccess(cur->getColumnType("testtext"),"BLOB");
 	checkSuccess(cur->getColumnType("testtinytext"),"TINYBLOB");
@@ -406,7 +418,11 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getLongest(19),9);
 	checkSuccess(cur->getLongest(20),11);
 	checkSuccess(cur->getLongest(21),9);
-	checkSuccess(cur->getLongest(22),19);
+	if (majorversion==3) {
+		checkSuccess(cur->getLongest(22),14);
+	} else {
+		checkSuccess(cur->getLongest(22),19);
+	}
 	checkSuccess(cur->getLongest("testtinyint"),1);
 	checkSuccess(cur->getLongest("testsmallint"),1);
 	checkSuccess(cur->getLongest("testmediumint"),1);
@@ -429,7 +445,11 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(cur->getLongest("testtinyblob"),9);
 	checkSuccess(cur->getLongest("testmediumblob"),11);
 	checkSuccess(cur->getLongest("testlongblob"),9);
-	checkSuccess(cur->getLongest("testtimestamp"),19);
+	if (majorversion==3) {
+		checkSuccess(cur->getLongest("testtimestamp"),14);
+	} else {
+		checkSuccess(cur->getLongest("testtimestamp"),19);
+	}
 	stdoutput.printf("\n");
 
 	stdoutput.printf("ROW COUNT: \n");
@@ -1024,7 +1044,11 @@ for (uint16_t a=0; a<50; a++) {
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
-	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
+	if (majorversion>3) {
+		checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
+	} else {
+		checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
+	}
 	checkSuccess(con->commit(),1);
 	checkSuccess(secondcon->commit(),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);

@@ -35,6 +35,10 @@ set cur [$con sqlrcur]
 puts "IDENTIFY: "
 checkSuccess [$con identify] "mysql"
 
+# get the db version
+set dbversion [$con dbVersion]
+set majorversion [string index $dbversion 0]
+
 # ping
 puts "PING: "
 checkSuccess [$con ping] 1
@@ -196,7 +200,11 @@ checkSuccess [$cur getColumnTypeByIndex 8] "DATE"
 checkSuccess [$cur getColumnTypeByIndex 9] "TIME"
 checkSuccess [$cur getColumnTypeByIndex 10] "DATETIME"
 checkSuccess [$cur getColumnTypeByIndex 11] "YEAR"
-checkSuccess [$cur getColumnTypeByIndex 12] "STRING"
+if {$majorversion == 3} {
+	checkSuccess [$cur getColumnTypeByIndex 12] "VARSTRING"
+} else {
+	checkSuccess [$cur getColumnTypeByIndex 12] "STRING"
+}
 checkSuccess [$cur getColumnTypeByIndex 13] "BLOB"
 checkSuccess [$cur getColumnTypeByIndex 14] "VARSTRING"
 checkSuccess [$cur getColumnTypeByIndex 15] "TINYBLOB"
@@ -215,7 +223,11 @@ checkSuccess [$cur getColumnTypeByName "testdate"] "DATE"
 checkSuccess [$cur getColumnTypeByName "testtime"] "TIME"
 checkSuccess [$cur getColumnTypeByName "testdatetime"] "DATETIME"
 checkSuccess [$cur getColumnTypeByName "testyear"] "YEAR"
-checkSuccess [$cur getColumnTypeByName "testchar"] "STRING"
+if {$majorversion == 3} {
+	checkSuccess [$cur getColumnTypeByName "testchar"] "VARSTRING"
+} else {
+	checkSuccess [$cur getColumnTypeByName "testchar"] "STRING"
+}
 checkSuccess [$cur getColumnTypeByName "testtext"] "BLOB"
 checkSuccess [$cur getColumnTypeByName "testvarchar"] "VARSTRING"
 checkSuccess [$cur getColumnTypeByName "testtinytext"] "TINYBLOB"
@@ -284,7 +296,11 @@ checkSuccess [$cur getLongestByIndex 14] 8
 checkSuccess [$cur getLongestByIndex 15] 9
 checkSuccess [$cur getLongestByIndex 16] 11
 checkSuccess [$cur getLongestByIndex 17] 9
-checkSuccess [$cur getLongestByIndex 18] 19
+if {$majorversion == 3} {
+	checkSuccess [$cur getLongestByIndex 18] 14
+} else {
+	checkSuccess [$cur getLongestByIndex 18] 19
+}
 checkSuccess [$cur getLongestByName "testtinyint"] 1
 checkSuccess [$cur getLongestByName "testsmallint"] 1
 checkSuccess [$cur getLongestByName "testmediumint"] 1
@@ -303,7 +319,11 @@ checkSuccess [$cur getLongestByName "testvarchar"] 8
 checkSuccess [$cur getLongestByName "testtinytext"] 9
 checkSuccess [$cur getLongestByName "testmediumtext"] 11
 checkSuccess [$cur getLongestByName "testlongtext"] 9
-checkSuccess [$cur getLongestByName "testtimestamp"] 19
+if {$majorversion == 3} {
+	checkSuccess [$cur getLongestByName "testtimestamp"] 14
+} else {
+	checkSuccess [$cur getLongestByName "testtimestamp"] 19
+}
 puts ""
 
 puts "ROW COUNT: "
@@ -808,7 +828,11 @@ puts "COMMIT AND ROLLBACK: "
 set secondcon [sqlrcon -server "sqlrelay" -port 9000 -socket "/tmp/test.socket" -user "test" -password "test" -retrytime 0 -tries 1]
 set secondcur [$secondcon sqlrcur]
 checkSuccess [$secondcur sendQuery "select count(*) from testtable"] 1
-checkSuccess [$secondcur getFieldByIndex 0 0] "0"
+if {$majorversion > 3} {
+	checkSuccess [$secondcur getFieldByIndex 0 0] "0"
+} else {
+	checkSuccess [$secondcur getFieldByIndex 0 0] "8"
+}
 checkSuccess [$con commit] 1
 checkSuccess [$secondcon commit] 1
 checkSuccess [$secondcur sendQuery "select count(*) from testtable"] 1

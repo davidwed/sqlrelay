@@ -38,6 +38,10 @@ console.log("IDENTIFY: ");
 checkSuccess(con.identify(),"mysql");
 console.log("\n");
 
+// get the db version
+var	dbversion=con.dbVersion();
+var	majorversion=parseInt(dbversion.substring(0,1));
+
 // ping
 console.log("PING: ");
 checkSuccess(con.ping(),1);
@@ -213,7 +217,11 @@ checkSuccess(cur.getColumnType(8),"DATE");
 checkSuccess(cur.getColumnType(9),"TIME");
 checkSuccess(cur.getColumnType(10),"DATETIME");
 checkSuccess(cur.getColumnType(11),"YEAR");
-checkSuccess(cur.getColumnType(12),"STRING");
+if (majorversion==3) {
+	checkSuccess(cur.getColumnType(12),"VARSTRING");
+} else {
+	checkSuccess(cur.getColumnType(12),"STRING");
+}
 checkSuccess(cur.getColumnType(13),"BLOB");
 checkSuccess(cur.getColumnType(14),"VARSTRING");
 checkSuccess(cur.getColumnType(15),"TINYBLOB");
@@ -232,7 +240,11 @@ checkSuccess(cur.getColumnType("testdate"),"DATE");
 checkSuccess(cur.getColumnType("testtime"),"TIME");
 checkSuccess(cur.getColumnType("testdatetime"),"DATETIME");
 checkSuccess(cur.getColumnType("testyear"),"YEAR");
-checkSuccess(cur.getColumnType("testchar"),"STRING");
+if (majorversion==3) {
+	checkSuccess(cur.getColumnType("testchar"),"VARSTRING");
+} else {
+	checkSuccess(cur.getColumnType("testchar"),"STRING");
+}
 checkSuccess(cur.getColumnType("testtext"),"BLOB");
 checkSuccess(cur.getColumnType("testvarchar"),"VARSTRING");
 checkSuccess(cur.getColumnType("testtinytext"),"TINYBLOB");
@@ -301,7 +313,11 @@ checkSuccess(cur.getLongest(14),8);
 checkSuccess(cur.getLongest(15),9);
 checkSuccess(cur.getLongest(16),11);
 checkSuccess(cur.getLongest(17),9);
-checkSuccess(cur.getLongest(18),19);
+if (majorversion==3) {
+	checkSuccess(cur.getLongest(18),14);
+} else {
+	checkSuccess(cur.getLongest(18),19);
+}
 checkSuccess(cur.getLongest("testtinyint"),1);
 checkSuccess(cur.getLongest("testsmallint"),1);
 checkSuccess(cur.getLongest("testmediumint"),1);
@@ -320,7 +336,11 @@ checkSuccess(cur.getLongest("testvarchar"),8);
 checkSuccess(cur.getLongest("testtinytext"),9);
 checkSuccess(cur.getLongest("testmediumtext"),11);
 checkSuccess(cur.getLongest("testlongtext"),9);
-checkSuccess(cur.getLongest("testtimestamp"),19);
+if (majorversion==3) {
+	checkSuccess(cur.getLongest("testtimestamp"),14);
+} else {
+	checkSuccess(cur.getLongest("testtimestamp"),19);
+}
 console.log("\n");
 
 console.log("ROW COUNT: ");
@@ -863,7 +883,11 @@ console.log("COMMIT AND ROLLBACK: ");
 var	secondcon=new sqlrelay.SQLRConnection("sqlrelay",9000,"/tmp/test.socket","test","test",0,1);
 var	 secondcur=new sqlrelay.SQLRCursor(secondcon);
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
-checkSuccess(secondcur.getField(0,0),"0");
+if (majorversion>3) {
+	checkSuccess(secondcur.getField(0,0),"0");
+} else {
+	checkSuccess(secondcur.getField(0,0),"8");
+}
 checkSuccess(con.commit(),1);
 checkSuccess(secondcon.commit(),1);
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);

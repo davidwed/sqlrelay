@@ -57,6 +57,10 @@ $cur=SQLRelay::Cursor->new($con);
 print("IDENTIFY: \n");
 checkSuccessString($con->identify(),"mysql");
 
+# get the db version
+$dbversion=$con->dbVersion();
+$majorversion=int(substr($dbversion,0,1));
+
 # ping
 print("PING: \n");
 checkSuccess($con->ping(),1);
@@ -225,7 +229,11 @@ checkSuccessString($cur->getColumnType(8),"DATE");
 checkSuccessString($cur->getColumnType(9),"TIME");
 checkSuccessString($cur->getColumnType(10),"DATETIME");
 checkSuccessString($cur->getColumnType(11),"YEAR");
-checkSuccessString($cur->getColumnType(12),"STRING");
+if ($majorversion==3) {
+	checkSuccessString($cur->getColumnType(12),"VARSTRING");
+} else {
+	checkSuccessString($cur->getColumnType(12),"STRING");
+}
 checkSuccessString($cur->getColumnType(13),"BLOB");
 checkSuccessString($cur->getColumnType(14),"VARSTRING");
 checkSuccessString($cur->getColumnType(15),"TINYBLOB");
@@ -244,7 +252,11 @@ checkSuccessString($cur->getColumnType("testdate"),"DATE");
 checkSuccessString($cur->getColumnType("testtime"),"TIME");
 checkSuccessString($cur->getColumnType("testdatetime"),"DATETIME");
 checkSuccessString($cur->getColumnType("testyear"),"YEAR");
-checkSuccessString($cur->getColumnType("testchar"),"STRING");
+if ($majorversion==3) {
+	checkSuccessString($cur->getColumnType("testchar"),"VARSTRING");
+} else {
+	checkSuccessString($cur->getColumnType("testchar"),"STRING");
+}
 checkSuccessString($cur->getColumnType("testtext"),"BLOB");
 checkSuccessString($cur->getColumnType("testvarchar"),"VARSTRING");
 checkSuccessString($cur->getColumnType("testtinytext"),"TINYBLOB");
@@ -313,7 +325,11 @@ checkSuccess($cur->getLongest(14),8);
 checkSuccess($cur->getLongest(15),9);
 checkSuccess($cur->getLongest(16),11);
 checkSuccess($cur->getLongest(17),9);
-checkSuccess($cur->getLongest(18),19);
+if ($majorversion==3) {
+	checkSuccess($cur->getLongest(18),14);
+} else {
+	checkSuccess($cur->getLongest(18),19);
+}
 checkSuccess($cur->getLongest("testtinyint"),1);
 checkSuccess($cur->getLongest("testsmallint"),1);
 checkSuccess($cur->getLongest("testmediumint"),1);
@@ -332,7 +348,11 @@ checkSuccess($cur->getLongest("testvarchar"),8);
 checkSuccess($cur->getLongest("testtinytext"),9);
 checkSuccess($cur->getLongest("testmediumtext"),11);
 checkSuccess($cur->getLongest("testlongtext"),9);
-checkSuccess($cur->getLongest("testtimestamp"),19);
+if ($majorversion==3) {
+	checkSuccess($cur->getLongest("testtimestamp"),14);
+} else {
+	checkSuccess($cur->getLongest("testtimestamp"),19);
+}
 print("\n");
 
 print("ROW COUNT: \n");
@@ -940,7 +960,11 @@ $secondcon=SQLRelay::Connection->new("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
 $secondcur=SQLRelay::Cursor->new($secondcon);
 checkSuccess($secondcur->sendQuery("select count(*) from testtable"),1);
-checkSuccessString($secondcur->getField(0,0),"0");
+if ($majorversion>3) {
+	checkSuccessString($secondcur->getField(0,0),"0");
+} else {
+	checkSuccessString($secondcur->getField(0,0),"8");
+}
 checkSuccess($con->commit(),1);
 checkSuccess($secondcon->commit(),1);
 checkSuccess($secondcur->sendQuery("select count(*) from testtable"),1);

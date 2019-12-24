@@ -82,6 +82,10 @@ class mysql {
 		// get database type
 		System.out.println("IDENTIFY: ");
 		checkSuccess(con.identify(),"mysql");
+
+		// get the db version
+		String	dbversion=con.dbVersion();
+		int	majorversion=dbversion.charAt(0)-'0';
 	
 		// ping
 		System.out.println("PING: ");
@@ -258,7 +262,11 @@ class mysql {
 		checkSuccess(cur.getColumnType(9),"TIME");
 		checkSuccess(cur.getColumnType(10),"DATETIME");
 		checkSuccess(cur.getColumnType(11),"YEAR");
-		checkSuccess(cur.getColumnType(12),"STRING");
+		if (majorversion==3) {
+			checkSuccess(cur.getColumnType(12),"VARSTRING");
+		} else {
+			checkSuccess(cur.getColumnType(12),"STRING");
+		}
 		checkSuccess(cur.getColumnType(13),"BLOB");
 		checkSuccess(cur.getColumnType(14),"VARSTRING");
 		checkSuccess(cur.getColumnType(15),"TINYBLOB");
@@ -277,7 +285,11 @@ class mysql {
 		checkSuccess(cur.getColumnType("testtime"),"TIME");
 		checkSuccess(cur.getColumnType("testdatetime"),"DATETIME");
 		checkSuccess(cur.getColumnType("testyear"),"YEAR");
-		checkSuccess(cur.getColumnType("testchar"),"STRING");
+		if (majorversion==3) {
+			checkSuccess(cur.getColumnType("testchar"),"VARSTRING");
+		} else {
+			checkSuccess(cur.getColumnType("testchar"),"STRING");
+		}
 		checkSuccess(cur.getColumnType("testtext"),"BLOB");
 		checkSuccess(cur.getColumnType("testvarchar"),"VARSTRING");
 		checkSuccess(cur.getColumnType("testtinytext"),"TINYBLOB");
@@ -346,7 +358,11 @@ class mysql {
 		checkSuccess(cur.getLongest(15),9);
 		checkSuccess(cur.getLongest(16),11);
 		checkSuccess(cur.getLongest(17),9);
-		checkSuccess(cur.getLongest(18),19);
+		if (majorversion==3) {
+			checkSuccess(cur.getLongest(18),14);
+		} else {
+			checkSuccess(cur.getLongest(18),19);
+		}
 		checkSuccess(cur.getLongest("testtinyint"),1);
 		checkSuccess(cur.getLongest("testsmallint"),1);
 		checkSuccess(cur.getLongest("testmediumint"),1);
@@ -365,7 +381,11 @@ class mysql {
 		checkSuccess(cur.getLongest("testtinytext"),9);
 		checkSuccess(cur.getLongest("testmediumtext"),11);
 		checkSuccess(cur.getLongest("testlongtext"),9);
-		checkSuccess(cur.getLongest("testtimestamp"),19);
+		if (majorversion==3) {
+			checkSuccess(cur.getLongest("testtimestamp"),14);
+		} else {
+			checkSuccess(cur.getLongest("testtimestamp"),19);
+		}
 		System.out.println();
 	
 		System.out.println("ROW COUNT: ");
@@ -911,7 +931,11 @@ class mysql {
 						"test","test",0,1);
 		SQLRCursor secondcur=new SQLRCursor(secondcon);
 		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
-		checkSuccess(secondcur.getField(0,0),"0");
+		if (majorversion>3) {
+			checkSuccess(secondcur.getField(0,0),"0");
+		} else {
+			checkSuccess(secondcur.getField(0,0),"8");
+		}
 		checkSuccess(con.commit(),1);
 		checkSuccess(secondcon.commit(),1);
 		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
