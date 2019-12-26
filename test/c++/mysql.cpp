@@ -1117,26 +1117,20 @@ for (uint16_t a=0; a<50; a++) {
 		cur->inputBind("in1",1);
 		cur->inputBind("in2",1.1,4,2);
 		cur->inputBind("in3","hello");
-		bool	result=cur->executeQuery();
-		if (result || !charstring::contains(cur->errorMessage(),
-				"can't return a result set in the given context")) {
-			checkSuccess(result,1);
-			checkSuccess(cur->getField(0,(uint32_t)0),"1");
-			checkSuccess(cur->getField(0,(uint32_t)1),"1.1");
-			checkSuccess(cur->getField(0,(uint32_t)2),"hello");
-			cur->sendQuery("drop procedure testproc");
-			stdoutput.printf("\n");
-			// return values
-			checkSuccess(cur->sendQuery("create procedure testproc(out out1 int, out out2 float, out out3 char(20)) begin select 1, 1.1, 'hello' into out1, out2, out3; end;"),1);
-			checkSuccess(cur->sendQuery("set @out1=0, @out2=0.0, @out3=''"),1);
-			checkSuccess(cur->sendQuery("call testproc(@out1,@out2,@out3)"),1);
-			checkSuccess(cur->sendQuery("select @out1, @out2, @out3"),1);
-			checkSuccess(cur->getField(0,(uint32_t)0),"1");
-			checkSuccess(cur->getFieldAsDouble(0,(uint32_t)1),1.1);
-			checkSuccess(cur->getField(0,(uint32_t)2),"hello");
-		} else {
-			stdoutput.printf("bypassed");
-		}
+		checkSuccess(cur->executeQuery(),1);
+		checkSuccess(cur->getField(0,(uint32_t)0),"1");
+		checkSuccess(cur->getField(0,(uint32_t)1),"1.1");
+		checkSuccess(cur->getField(0,(uint32_t)2),"hello");
+		cur->sendQuery("drop procedure testproc");
+		stdoutput.printf("\n");
+		// return values
+		checkSuccess(cur->sendQuery("create procedure testproc(out out1 int, out out2 float, out out3 char(20)) begin select 1, 1.1, 'hello' into out1, out2, out3; end;"),1);
+		checkSuccess(cur->sendQuery("set @out1=0, @out2=0.0, @out3=''"),1);
+		checkSuccess(cur->sendQuery("call testproc(@out1,@out2,@out3)"),1);
+		checkSuccess(cur->sendQuery("select @out1, @out2, @out3"),1);
+		checkSuccess(cur->getField(0,(uint32_t)0),"1");
+		checkSuccess(cur->getFieldAsDouble(0,(uint32_t)1),1.1);
+		checkSuccess(cur->getField(0,(uint32_t)2),"hello");
 		cur->sendQuery("drop procedure testproc");
 		stdoutput.printf("\n");
 	}
