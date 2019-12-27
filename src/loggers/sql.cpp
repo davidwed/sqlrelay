@@ -29,6 +29,7 @@ class SQLRSERVER_DLLSPEC sqlrlogger_sql : public sqlrlogger {
 		uint64_t	usec;
 		uint64_t	totalusec;
 		bool		enabled;
+		pid_t		pid;
 };
 
 sqlrlogger_sql::sqlrlogger_sql(sqlrloggers *ls, domnode *parameters) :
@@ -55,7 +56,7 @@ bool sqlrlogger_sql::init(sqlrlistener *sqlrl,
 	}
 
 	// get the pid
-	pid_t	pid=process::getProcessId();
+	pid=process::getProcessId();
 
 	// build up the query log name
 	delete[] querylogname;
@@ -118,8 +119,17 @@ bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 		}
 	}
 
-	// log query (and error, if there was one)
 	stringbuffer	logentry;
+
+	// log pid changes
+	if (process::getProcessId()!=pid) {
+		pid=process::getProcessId();
+		logentry.append("-- pid changed to ");
+		logentry.append(pid);
+		logentry.append('\n');
+	}
+
+	// log query (and error, if there was one)
 	if (event==SQLREVENT_QUERY) {
 		logentry.append(sqlrcon->cont->getQueryBuffer(sqlrcur));
 		logentry.append(";\n");
