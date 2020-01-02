@@ -125,7 +125,7 @@ bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 	if (process::getProcessId()!=pid) {
 		pid=process::getProcessId();
 		logentry.append("-- pid changed to ");
-		logentry.append(pid);
+		logentry.append((uint64_t)pid);
 		logentry.append('\n');
 	}
 
