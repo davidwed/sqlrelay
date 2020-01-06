@@ -2,6 +2,7 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
+#include <rudiments/charstring.h>
 
 class sqlrmoduledataprivate {
 	friend class sqlrmoduledata;
@@ -44,4 +45,61 @@ void sqlrmoduledata::endTransaction(bool commit) {
 }
 
 void sqlrmoduledata::endSession() {
+}
+
+sqlrmoduledata_tag::sqlrmoduledata_tag(domnode *parameters) :
+					sqlrmoduledata(parameters) {
+}
+
+sqlrmoduledata_tag::~sqlrmoduledata_tag() {
+	avltree<dictionarynode<uint16_t, avltree<char *> *> *>
+						*tree=tags.getTree();
+	for (avltreenode<dictionarynode<uint16_t, avltree<char *> *> *>
+						*node=tree->getFirst();
+					node; node=tree->getNext(node)) {
+		node->getValue()->getValue()->clearAndArrayDelete();
+	}
+	tags.clearAndDeleteValues();
+}
+
+void sqlrmoduledata_tag::addTag(uint16_t cursorid, const char *tag) {
+	avltree<char *>	*tree=tags.getValue(cursorid);
+	if (tree && tree->find((char *)tag)) {
+		return;
+	}
+	if (!tree) {
+		tree=new avltree<char *>();
+		tags.setValue(cursorid,tree);
+	}
+	tree->insert(charstring::duplicate(tag));
+}
+
+void sqlrmoduledata_tag::addTag(uint16_t cursorid,
+				const char *tag, size_t size) {
+	avltree<char *>	*tree=tags.getValue(cursorid);
+	if (tree && tree->find((char *)tag)) {
+		return;
+	}
+	if (!tree) {
+		tree=new avltree<char *>();
+		tags.setValue(cursorid,tree);
+	}
+	tree->insert(charstring::duplicate(tag,size));
+}
+
+avltree<char *> *sqlrmoduledata_tag::getTags(uint16_t cursorid) {
+	return tags.getValue(cursorid);
+}
+
+bool sqlrmoduledata_tag::tagExists(uint16_t cursorid, const char *tag) {
+	avltree<char *>	*tree=tags.getValue(cursorid);
+	return (tree && tree->find((char *)tag));
+}
+
+void sqlrmoduledata_tag::closeResultSet(sqlrservercursor *sqlrcur) {
+	avltree<char *>	*tree=tags.getValue(sqlrcur->getId());
+	if (tree) {
+		tree->clearAndArrayDelete();
+		tags.removeAndDeleteValue(sqlrcur->getId());
+	}
 }
