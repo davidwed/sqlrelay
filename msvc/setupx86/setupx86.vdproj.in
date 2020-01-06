@@ -3957,8 +3957,8 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D8D208CAE58E4CD1AAADFDDF3A1CAA88"
             {
-            "SourcePath" = "8:..\\..\\src\\auths\\sqlrauth_mysql_userlist.dll"
-            "TargetName" = "8:sqlrauth_mysql_userlist.dll"
+            "SourcePath" = "8:..\\..\\src\\auths\\sqlrauth_mysql_database.dll"
+            "TargetName" = "8:sqlrauth_mysql_database.dll"
             "Tag" = "8:"
             "Folder" = "8:_0CC0967169F54C2998A34CCA57F17B2E"
             "Condition" = "8:"
