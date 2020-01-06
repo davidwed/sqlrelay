@@ -442,8 +442,8 @@ end if
 ALLSERVER=""
 INSTALLSERVER=""
 if disableserver=false then
-	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-filters all-triggers all-connections"
-	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-filters install-triggers install-connections"
+	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections"
+	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-filters install-triggers install-moduledatas install-connections"
 end if
 
 
