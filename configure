@@ -632,6 +632,7 @@ ac_includes_default="\
 ac_default_prefix=/usr/local/firstworks
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+SHORTHOSTNAME
 HOSTNAME
 TESTAPIS
 TESTDBS
@@ -36369,6 +36370,28 @@ fi
 
 
 HOSTNAME=`hostname | cut -d'.' -f1`
+SHORTHOSTNAME=`echo $HOSTNAME | \
+sed -e "s|^centos|co|" \
+-e "s|^debian|db|" \
+-e "s|^fedora|fc|" \
+-e "s|^freebsd|fb|" \
+-e "s|^haiku|hk|" \
+-e "s|^openbsd|ob|" \
+-e "s|^netbsd|bb|" \
+-e "s|^opensuse|os|" \
+-e "s|^solaris|sl|" \
+-e "s|^syllable|sb|" \
+-e "s|^ubuntu|u|" \
+-e "s|^win|w|" \
+-e "s|alpha$|a|" \
+-e "s|mipsel$|m32|" \
+-e "s|mips64el$|m64|" \
+-e "s|hppa$|hp|" \
+-e "s|i386$|x86|" \
+-e "s|sparc$|s32|" \
+-e "s|sparc64$|s64|" \
+`
+
 
 
 
