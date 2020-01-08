@@ -632,6 +632,7 @@ ac_includes_default="\
 ac_default_prefix=/usr/local/firstworks
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+HOSTNAME
 TESTAPIS
 TESTDBS
 abs_builddir
@@ -36367,7 +36368,11 @@ fi
 
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh doc/admin/installingpkg.wt"
+HOSTNAME=`hostname | cut -d'.' -f1`
+
+
+
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf doc/admin/installingpkg.wt"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF

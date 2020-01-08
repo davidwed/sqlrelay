@@ -1151,7 +1151,11 @@ AC_SUBST(TESTDBS)
 AC_SUBST(TESTAPIS)
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh doc/admin/installingpkg.wt"
+HOSTNAME=`hostname | cut -d'.' -f1`
+AC_SUBST(HOSTNAME)
+
+
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf doc/admin/installingpkg.wt"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config

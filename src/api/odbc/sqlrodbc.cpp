@@ -8885,7 +8885,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 					"SQL_ATTR_ROW_BIND_TYPE/"
 					"SQL_BIND_TYPE: "
 					"%lld\n",(uint64_t)value);
-			stmt->rowbindtype=(SQLULEN)value;
+			stmt->rowbindtype=(SQLULEN)(uint64_t)value;
 			return SQL_SUCCESS;
 		//case SQL_ATTR_CONCURRENCY:
 		//case SQL_ATTR_CURSOR_TYPE:
@@ -8912,7 +8912,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			return SQL_SUCCESS;
 		case SQL_ROWSET_SIZE:
 			{
-			SQLULEN	val=(SQLULEN)value;
+			SQLULEN	val=(SQLULEN)(uint64_t)value;
 			debugPrintf("  attribute: SQL_ROWSET_SIZE: "
 						"%lld\n",(uint64_t)val);
 			// don't allow this to be set to "fetch all rows"
@@ -8933,7 +8933,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 		//case SQL_ATTR_RETRIEVE_DATA:
 		case SQL_RETRIEVE_DATA:
 			{
-			SQLULEN	val=(SQLULEN)value;
+			SQLULEN	val=(SQLULEN)(uint64_t)value;
 			debugPrintf("  attribute: "
 					"SQL_ATTR_RETRIEVE_DATA/"
 					"SQL_RETRIEVE_DATA: %lld\n",
@@ -8988,7 +8988,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			}
 		case SQL_ATTR_PARAM_BIND_TYPE:
 			{
-			SQLULEN	val=(SQLULEN)value;
+			SQLULEN	val=(SQLULEN)(uint64_t)value;
 			debugPrintf("  attribute: SQL_ATTR_PARAM_BIND_TYPE: "
 							"%lld\n",(uint64_t)val);
 			if (val==SQL_PARAM_BIND_BY_COLUMN) {
@@ -9019,7 +9019,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			}
 		case SQL_ATTR_PARAMSET_SIZE:
 			{
-			SQLULEN	val=(SQLULEN)value;
+			SQLULEN	val=(SQLULEN)(uint64_t)value;
 			debugPrintf("  attribute: SQL_ATTR_PARAMSET_SIZE: "
 					"%lld\n",(uint64_t)val);
 			if (val!=1) {
@@ -9050,7 +9050,7 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 			return SQL_SUCCESS;
 		case SQL_ATTR_ROW_ARRAY_SIZE:
 			{
-			SQLULEN val=(SQLULEN)value;
+			SQLULEN val=(SQLULEN)(uint64_t)value;
 			debugPrintf("  attribute: SQL_ATTR_ROW_ARRAY_SIZE: "
 						"%lld\n",(uint64_t)val);
 			// don't allow this to be set to "fetch all rows"
