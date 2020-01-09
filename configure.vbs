@@ -1002,7 +1002,7 @@ infiles=Array(_
 	"sqlrelay-c.pc.in",_
 	"sqlrelay-c++.pc.in",_
 	"msvc\\setupx64\\setupx64.vdproj.in",_
-	"msvc\\setupx86\\setupx86.vdproj.in"_
+	"msvc\\setupx86\\setupx86.vdproj.in",_
 	"test\\sqlrelay.conf.in"_
 	)
 outfiles=Array(_
@@ -1017,7 +1017,7 @@ outfiles=Array(_
 	"sqlrelay-c.pc",_
 	"sqlrelay-c++.pc",_
 	"msvc\\setupx64\\setupx64.vdproj",_
-	"msvc\\setupx86\\setupx86.vdproj"_
+	"msvc\\setupx86\\setupx86.vdproj",_
 	"test\\sqlrelay.conf"_
 	)
 
