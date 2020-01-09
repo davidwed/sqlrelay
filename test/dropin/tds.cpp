@@ -128,12 +128,13 @@ int	main(int argc, char **argv) {
 		// eg: ./tds mssql
 		if (argc==2) {
 			server=argv[1];
+			db="testdb";
 		} else {
 			server="localhost";
+			db="";
 		}
 		user="testuser";
 		password="testpassword";
-		db="testdb";
 	}
 
 

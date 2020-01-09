@@ -66,10 +66,11 @@ int	main(int argc, char **argv) {
 		// eg: ./mysql db64
 		if (argc==2) {
 			host=argv[1];
+			db="testdb";
 		} else {
 			host="127.0.0.1";
+			db="";
 		}
-		db="testdb";
 		port="3306";
 		socket="/var/lib/mysql/mysql.sock";
 		user="testuser";

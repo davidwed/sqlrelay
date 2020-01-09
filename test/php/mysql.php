@@ -46,14 +46,14 @@
 
 	# create a new table
 	echo("CREATE TEMPTABLE: \n");
-	checkSuccess(sqlrcur_sendQuery($cur,"create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"create table testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1);
 	echo("\n");
 
 	echo("INSERT: \n");
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)"),1);
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testdb.testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)"),1);
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testdb.testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','text3','varchar3','tinytext3','mediumtext3','longtext3',NULL)"),1);
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testdb.testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','text4','varchar4','tinytext4','mediumtext4','longtext4',NULL)"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','text3','varchar3','tinytext3','mediumtext3','longtext3',NULL)"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','text4','varchar4','tinytext4','mediumtext4','longtext4',NULL)"),1);
 	echo("\n");
 
 	echo("AFFECTED ROWS: \n");
@@ -61,7 +61,7 @@
 	echo("\n");
 
 	echo("BIND BY POSITION: \n");
-	sqlrcur_prepareQuery($cur,"insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)");
+	sqlrcur_prepareQuery($cur,"insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)");
 	checkSuccess(sqlrcur_countBindVariables($cur),18);
 	sqlrcur_inputBind($cur,"1",5);
 	sqlrcur_inputBind($cur,"2",5);
@@ -940,7 +940,7 @@
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	checkSuccess(sqlrcur_getField($secondcur,0,0),"8");
 	checkSuccess(sqlrcon_autoCommitOn($con),1);
-	checkSuccess(sqlrcur_sendQuery($cur,"insert into testdb.testtable values (10,10,10,10,10,10.1,10.1,1.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','text10','varchar10','tinytext10','mediumtext10','longtext10',NULL)"),1);
+	checkSuccess(sqlrcur_sendQuery($cur,"insert into testtable values (10,10,10,10,10,10.1,10.1,1.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','text10','varchar10','tinytext10','mediumtext10','longtext10',NULL)"),1);
 	checkSuccess(sqlrcon_commit($secondcon),1);
 	checkSuccess(sqlrcur_sendQuery($secondcur,"select count(*) from testtable"),1);
 	checkSuccess(sqlrcur_getField($secondcur,0,0),"9");

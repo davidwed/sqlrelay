@@ -96,6 +96,7 @@ for (uint16_t a=0; a<50; a++) {
 	// get database type
 	stdoutput.printf("IDENTIFY: \n");
 	checkSuccess(con->identify(),"mysql");
+	stdoutput.printf("\n");
 
         // get the db version
         const char      *dbversion=con->dbVersion();
@@ -111,14 +112,14 @@ for (uint16_t a=0; a<50; a++) {
 
 	// create a new table
 	stdoutput.printf("CREATE TEMPTABLE: \n");
-	checkSuccess(cur->sendQuery("create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testvarchar varchar(40), testtext text, testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testblob blob, testtinyblob tinyblob, testmediumblob mediumblob, testlongblob longblob, testtimestamp timestamp)"),1);
+	checkSuccess(cur->sendQuery("create table testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testvarchar varchar(40), testtext text, testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testblob blob, testtinyblob tinyblob, testmediumblob mediumblob, testlongblob longblob, testtimestamp timestamp)"),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("INSERT: \n");
-	checkSuccess(cur->sendQuery("insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','varchar1','text1','tinytext1','mediumtext1','longtext1','blob1','tinyblob1','mediumblob1','longblob1',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testdb.testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','varchar2','text2','tinytext2','mediumtext2','longtext2','blob2','tinyblob2','mediumblob2','longblob2',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testdb.testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','varchar3','text3','tinytext3','mediumtext3','longtext3','blob3','tinyblob3','mediumblob3','longblob3',NULL)"),1);
-	checkSuccess(cur->sendQuery("insert into testdb.testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','varchar4','text4','tinytext4','mediumtext4','longtext4','blob4','tinyblob4','mediumblob4','longblob4',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','varchar1','text1','tinytext1','mediumtext1','longtext1','blob1','tinyblob1','mediumblob1','longblob1',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','varchar2','text2','tinytext2','mediumtext2','longtext2','blob2','tinyblob2','mediumblob2','longblob2',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','varchar3','text3','tinytext3','mediumtext3','longtext3','blob3','tinyblob3','mediumblob3','longblob3',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','varchar4','text4','tinytext4','mediumtext4','longtext4','blob4','tinyblob4','mediumblob4','longblob4',NULL)"),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("AFFECTED ROWS: \n");
@@ -126,7 +127,7 @@ for (uint16_t a=0; a<50; a++) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("BIND BY POSITION: \n");
-	cur->prepareQuery("insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)");
+	cur->prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)");
 	checkSuccess(cur->countBindVariables(),22);
 	cur->inputBind("1",5);
 	cur->inputBind("2",5);
@@ -1054,7 +1055,7 @@ for (uint16_t a=0; a<50; a++) {
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
 	checkSuccess(con->autoCommitOn(),1);
-	checkSuccess(cur->sendQuery("insert into testdb.testtable values (10,10,10,10,10,10.1,10.1,1.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','varchar10','text10','tinytext10','mediumtext10','longtext10','blob10','tinyblob10','mediumblob10','longblob10',NULL)"),1);
+	checkSuccess(cur->sendQuery("insert into testtable values (10,10,10,10,10,10.1,10.1,1.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','varchar10','text10','tinytext10','mediumtext10','longtext10','blob10','tinyblob10','mediumblob10','longblob10',NULL)"),1);
 	checkSuccess(secondcon->commit(),1);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");

@@ -43,7 +43,7 @@ int	main(int argc, char **argv) {
 	const char	*port;
 	const char	*user;
 	const char	*password;
-	const char	*db="testdb";
+	const char	*db;
 	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
 		port="9000";
 		user="test";
@@ -53,6 +53,9 @@ int	main(int argc, char **argv) {
 		// name eg: ./postgresql db64
 		if (argc==2) {
 			host=argv[1];
+			db="testdb";
+		} else {
+			db="";
 		}
 		port="5432";
 		user="testuser";
