@@ -871,6 +871,8 @@ end if
 TESTDBS=""
 TESTAPIS=""
 
+HOSTNAME=WScript.CreateObject("WScript.Network").ComputerName
+
 CMDLINEBUILD="no "
 CPPBUILD="no "
 PERLBUILD="no "
@@ -1001,6 +1003,7 @@ infiles=Array(_
 	"sqlrelay-c++.pc.in",_
 	"msvc\\setupx64\\setupx64.vdproj.in",_
 	"msvc\\setupx86\\setupx86.vdproj.in"_
+	"test\\sqlrelay.conf.in"_
 	)
 outfiles=Array(_
 	"config.mk",_
@@ -1015,6 +1018,7 @@ outfiles=Array(_
 	"sqlrelay-c++.pc",_
 	"msvc\\setupx64\\setupx64.vdproj",_
 	"msvc\\setupx86\\setupx86.vdproj"_
+	"test\\sqlrelay.conf"_
 	)
 
 
@@ -1179,6 +1183,9 @@ for i=lbound(infiles) to ubound(infiles)
 	' tests
 	content=replace(content,"@TESTDBS@",TESTDBS,1,-1,0)
 	content=replace(content,"@TESTAPIS@",TESTAPIS,1,-1,0)
+
+	' hostname
+	content=replace(content,"@HOSTNAME@",HOSTNAME,1,-1,0)
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)
