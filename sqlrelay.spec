@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.7.0
+Version: 1.7.1
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -770,6 +770,9 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Thu Jan 09 2020 David Muse <david.muse@firstworks.com> - 1.7.1-1
+- Updated to version 1.7.1.
+
 * Fri Nov  8 2019 David Muse <david.muse@firstworks.com> - 1.7.0-1
 - Updated to version 1.7.0.
 - Removed drop-in replacement library packages.
