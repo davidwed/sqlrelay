@@ -871,7 +871,7 @@ end if
 TESTDBS=""
 TESTAPIS=""
 
-HOSTNAME=WScript.CreateObject("WScript.Network").ComputerName
+HOSTNAME=LCase(WScript.CreateObject("WScript.Network").ComputerName)
 
 CMDLINEBUILD="no "
 CPPBUILD="no "
