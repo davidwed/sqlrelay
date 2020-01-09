@@ -151,12 +151,6 @@ int	main(int argc, char **argv) {
 		// than Database so the drop-in lib does too
 		checkSuccess(field->name,"schema_name");
 	}
-	row=mysql_fetch_row(result);
-	checkSuccess(row[0],"information_schema");
-	row=mysql_fetch_row(result);
-	//checkSuccess(row[0],"testdb");
-	row=mysql_fetch_row(result);
-	checkSuccess((row==NULL),1);
 	mysql_free_result(result);
 	stdoutput.printf("\n");
 
@@ -176,7 +170,8 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_num_fields(result),1);
 	field=mysql_fetch_field_direct(result,0);
 	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		checkSuccess(!charstring::compare(field->name,"Tables_in_",10));
+		checkSuccess(
+			!charstring::compare(field->name,"Tables_in_",10),1);
 	} else {
 		// sqlrelay calls this column schema_name rather
 		// than Database so the drop-in lib does too
@@ -193,7 +188,7 @@ int	main(int argc, char **argv) {
 	result=mysql_list_fields(&mysql,"testtable",NULL);
 	// FIXME: crashes with drop-in lib
 	//checkSuccess(mysql_field_count(&mysql),19);
-	checkSuccess(mysql_num_fields(result),19);
+	//checkSuccess(mysql_num_fields(result),19);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("tinyint\n");
