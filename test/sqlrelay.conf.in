@@ -69,7 +69,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="user=testuser;password=testpassword;db=firebird:/opt/firebird/@HOSTNAME@.gdb;dialect=3"/>
+			<connection string="user=testuser;password=testpassword;db=firebird:/u02/@HOSTNAME@.gdb;dialect=3"/>
 		</connections>
 	</instance>
 
