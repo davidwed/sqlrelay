@@ -96,7 +96,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=dbmaster;user=testuser;password=testpassword;db=@HOSTNAME@"/>
+			<connection string="host=mysqlmaster;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
@@ -105,7 +105,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=dbslave;user=testuser;password=testpassword;db=@HOSTNAME@"/>
+			<connection string="host=mysqlslave;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
