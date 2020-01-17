@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "SQL Relay test results:" > testresults.log
+echo >> testresults.log
+
 PREFIX=@prefix@
 
 # stop any existing instances
@@ -75,6 +78,7 @@ do
 
 	# testing...
 	echo "testing $DB (from `hostname`)..."
+	echo "$DB..." >> testresults.log
 
 	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
@@ -157,6 +161,12 @@ do
 			if ( test "$DB" = "mysqlprotocol" )
 			then
 				./dropin/mysql
+				if ( test "$?" = "0" )
+				then
+					printf "    % 8s: success\n" "dropin" >> testresults.log
+				else
+					printf "    % 8s: failed\n" "dropin" >> testresults.log
+				fi
 			else
 				./test.sh $DB
 			fi
@@ -164,18 +174,7 @@ do
 			echo
 			echo "failed to start ${DB}test"
 			echo
-			echo "hit enter to continue or ctrl-c to stop..."
-			if ( test "$DB" = "krb" )
-			then
-				read -t 20 PROMPT 2> /dev/null
-				# (ubuntu's dash doesn't support read -t)
-				if ( test "$?" != "0" )
-				then
-					sleep 20
-				fi
-			else
-				read PROMPT
-			fi
+			echo "    db failed" >> testresults.log
 		fi
 	fi
 
@@ -195,3 +194,5 @@ do
 	echo "================================================================================"
 	echo
 done
+
+cat testresults.log
