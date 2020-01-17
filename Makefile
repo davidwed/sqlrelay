@@ -106,7 +106,8 @@ distclean: clean
 		msvc/setupx64/setupx64.vdproj \
 		msvc/setupx86/setupx86.vdproj \
 		doc/admin/installingpkg.wt \
-		configure.lineno
+		configure.lineno \
+		test/testresults.log
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \
