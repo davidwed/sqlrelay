@@ -611,6 +611,9 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrclientincludes.h
 %{_includedir}/%{name}/private/sqlrconnection.h
 %{_includedir}/%{name}/private/sqlrcursor.h
+%{_includedir}/%{name}/sqlrresultsetdomnode.h
+%{_includedir}/%{name}/private/sqlrresultsetdomnode.h
+%{_includedir}/%{name}/private/sqlrresultsetdomnodeincludes.h
 %{_libdir}/libsqlrclient.so
 %{_libdir}/pkgconfig/%{name}-c++.pc
 %exclude %{_libdir}/lib*.la
@@ -772,6 +775,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %changelog
 * Thu Jan 09 2020 David Muse <david.muse@firstworks.com> - 1.7.1-1
 - Updated to version 1.7.1.
+- Added sqlrresultsetdomnode to C++ API.
 
 * Fri Nov  8 2019 David Muse <david.muse@firstworks.com> - 1.7.0-1
 - Updated to version 1.7.0.

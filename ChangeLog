@@ -1,4 +1,5 @@
 1.7.1 - unattended tests
+	added sqlrresultsetdomnode class to c++ client API
 
 1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute

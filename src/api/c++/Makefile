@@ -2,8 +2,8 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-SRCS = sqlrconnection.cpp sqlrcursor.cpp
-LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ)
+SRCS = sqlrconnection.cpp sqlrcursor.cpp sqlrresultsetdomnode.cpp
+LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ) sqlrresultsetdomnode.$(OBJ)
 
 .SUFFIXES: .lo
 
@@ -29,12 +29,18 @@ install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(CP) sqlrelay/sqlrclient.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclient.h
+	$(CP) sqlrelay/sqlrresultsetdomnode.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrresultsetdomnode.h
 	$(CP) sqlrelay/private/sqlrclientincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrclientincludes.h
 	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
 	$(CP) sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcursor.h
+	$(CP) sqlrelay/private/sqlrresultsetdomnodeincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnodeincludes.h
+	$(CP) sqlrelay/private/sqlrresultsetdomnode.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnode.h
 
 installdll::
 	$(MKINSTALLDIRS) $(bindir)
