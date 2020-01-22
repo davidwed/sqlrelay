@@ -1599,7 +1599,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 			instance->deleteAttribute(dateyyyyddmm);
 		}
 		if (!datedelims->isNullNode()) {
-			rst->setAttributeValue("datedelims",
+			rst->setAttributeValue("datedelimiters",
 						datedelims->getValue());
 			instance->deleteAttribute(datedelims);
 		}
