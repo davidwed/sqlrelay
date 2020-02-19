@@ -9738,9 +9738,16 @@ static SQLRETURN SQLR_SQLSetStmtAttr(SQLHSTMT statementhandle,
 					SQLPOINTER value,
 					SQLINTEGER stringlength);
 
+
+#ifdef HAVE_SQLPARAMOPTIONS_ULEN
 SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle,
 					SQLULEN crow,
 					SQLULEN *pirow) {
+#else
+SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle,
+					SQLUINTEGER crow,
+					SQLUINTEGER *pirow) {
+#endif
 	debugFunction();
 	return (SQLR_SQLSetStmtAttr(statementhandle,
 				SQL_ATTR_PARAMSET_SIZE,

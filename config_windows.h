@@ -370,6 +370,9 @@
 /* SQLite supports sqlite3_stmt */
 #define HAVE_SQLITE3_STMT 1
 
+/* Some systems have SQLULEN parameters for SQLParamOptions */
+#define HAVE_SQLPARAMOPTIONS_ULEN 1
+
 /* Some systems have SQLROWSETSIZE */
 #define HAVE_SQLROWSETSIZE 1
 

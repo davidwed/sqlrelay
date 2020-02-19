@@ -1,6 +1,7 @@
 1.7.1 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
 	fixed datedelimiters parameter
+	added support for SQLParamOptions with SQLUINTEGER arguments
 
 1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute

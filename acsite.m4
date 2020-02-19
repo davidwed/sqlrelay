@@ -2455,6 +2455,11 @@ extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 extern "C" SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle, SQLUSMALLINT fetchorientation, SQLLEN fetchoffset, SQLULEN *pcrow, SQLUSMALLINT *rgfrowstatus) { return 0; }],[],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(SQLLEN/SQLULEN); AC_DEFINE(HAVE_SQLEXTENDEDFETCH_LEN,1,Some systems have SQLLEN/SQLULEN parameters for SQLExtendedFetch)],[AC_MSG_RESULT(SQLROWOFFSET/SQLROWSETSIZE)])
+		
+		AC_MSG_CHECKING(parameters for SQLParamOptions)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+extern "C" SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle, SQLULEN crow, SQLULEN *pirow) { return 0; }],[],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(SQLULEN); AC_DEFINE(HAVE_SQLPARAMOPTIONS_ULEN,1,Some systems have SQLULEN parameters for SQLParamOptions)],[AC_MSG_RESULT(SQLUINTEGER)])
 	fi
 
 	if ( test -z "$ODBCLIBS" )
