@@ -191,7 +191,6 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		unsigned long	*mysqlrowlengths;
 
 		mysqlconnection	*mysqlconn;
-my_ulonglong	rowcount;
 };
 
 class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
@@ -879,7 +878,6 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	mysqlresult=NULL;
 	ncols=0;
 	nrows=0;
-rowcount=0;
 	affectedrows=0;
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -1347,7 +1345,6 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 
 	// initialize row count
 	nrows=0;
-rowcount=0;
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
@@ -1800,14 +1797,12 @@ bool mysqlcursor::fetchRow(bool *error) {
 	if (usestmtprepare) {
 		int	result=mysql_stmt_fetch(stmt);
 		if (result==1) {
-stdoutput.printf("mysql_stmt_fetch=1 - rowcount=%lld error=%s\n",(uint64_t)rowcount,mysql_stmt_error(stmt));
 			*error=true;
 			return false;
 		} else if (result==MYSQL_NO_DATA) {
 			stmtreset=false;
 			return false;
 		}
-rowcount++;
 		return !result;
 	} else {
 #endif
