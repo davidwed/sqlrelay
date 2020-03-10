@@ -9630,7 +9630,7 @@ sqlrshm *sqlrservercontroller::getShm() {
 }
 
 sqlrmoduledata *sqlrservercontroller::getModuleData(const char *id) {
-	return pvt->_sqlrmd->getModuleData(id);
+	return (pvt->_sqlrmd)?pvt->_sqlrmd->getModuleData(id):NULL;
 }
 
 bool sqlrservercontroller::send(unsigned char *data, size_t size) {

@@ -517,6 +517,8 @@ class sqlrimportcsv : public csvsax {
 					const char *dbtype);
 			~sqlrimportcsv();
 
+		void	setTable(const char *table);
+		void	setIgnoreColumns(bool ignorecolumns);
 		bool	parseFile(const char *filename);
 	private:
 		bool	column(const char *name, bool quoted);
@@ -533,7 +535,8 @@ class sqlrimportcsv : public csvsax {
 		sqlrcursor	*sqlrcur;
 
 		stringbuffer	query;
-		char		*table;
+		const char	*table;
+		bool		ignorecolumns;
 		uint32_t	colcount;
 		stringbuffer	columns;
 		bool		*numbercolumn;
@@ -555,6 +558,7 @@ sqlrimportcsv::sqlrimportcsv(sqlrconnection *sqlrcon,
 	this->sqlrcon=sqlrcon;
 	this->sqlrcur=sqlrcur;
 	table=NULL;
+	ignorecolumns=false;
 	colcount=0;
 	currentcol=0;
 	numbercolumn=NULL;
@@ -575,17 +579,29 @@ sqlrimportcsv::~sqlrimportcsv() {
 	delete[] numbercolumn;
 }
 
+void sqlrimportcsv::setTable(const char *table) {
+	this->table=table;
+}
+
+void sqlrimportcsv::setIgnoreColumns(bool ignorecolumns) {
+	this->ignorecolumns=ignorecolumns;
+}
+
 bool sqlrimportcsv::parseFile(const char *filename) {
-	table=file::basename(filename,".csv");
+	if (!table) {
+		table=file::basename(filename,".csv");
+	}
 	return csvsax::parseFile(filename);
 }
 
 bool sqlrimportcsv::column(const char *name, bool quoted) {
-	if (colcount) {
-		columns.append(',');
+	if (!ignorecolumns) {
+		if (colcount) {
+			columns.append(',');
+		}
+		columns.append(name);
+		colcount++;
 	}
-	columns.append(name);
-	colcount++;
 	return true;
 }
 
@@ -605,8 +621,11 @@ bool sqlrimportcsv::bodyStart() {
 
 bool sqlrimportcsv::rowStart() {
 	query.clear();
-	query.append("insert into ")->append(table)->append(" (");
-	query.append(columns.getString())->append(") values (");
+	query.append("insert into ")->append(table);
+	if (colcount) {
+		query.append(" (")->append(columns.getString())->append(")");
+	}
+	query.append(" values (");
 	currentcol=0;
 	fieldcount=0;
 	return true;
@@ -640,7 +659,12 @@ bool sqlrimportcsv::rowEnd() {
 			sqlrcon->begin();
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			stdoutput.printf("%s\n",sqlrcur->errorMessage());
+			if (verbose) {
+				stdoutput.printf("%s\n",
+					sqlrcur->errorMessage());
+			}
+			sqlrcon->commit();
+			sqlrcon->begin();
 		}
 		rowcount++;
 		if (commitcount && !(rowcount%commitcount)) {
@@ -802,6 +826,8 @@ int main(int argc, const char **argv) {
 		debugfile=cmdline.getValue("debug");
 	}
 	bool		verbose=cmdline.found("verbose");
+	const char	*table=cmdline.getValue("table");
+	bool 		ignorecolumns=cmdline.found("ignorecolumns");
 
 	// at least id, host or socket, and file are required
 	if ((charstring::isNullOrEmpty(id) &&
@@ -892,6 +918,10 @@ int main(int argc, const char **argv) {
 	if (!charstring::compare(suffix,".csv")) {
 		sqlrimportcsv	sqlricsv(&sqlrcon,&sqlrcur,commitcount,
 						verbose,sqlrcon.identify());
+		if (!charstring::isNullOrEmpty(table)) {
+			sqlricsv.setTable(table);
+		}
+		sqlricsv.setIgnoreColumns(ignorecolumns);
 		process::exit(!sqlricsv.parseFile(file));
 	} else {
 		sqlrimportxml	sqlrixml(&sqlrcon,&sqlrcur,commitcount,
