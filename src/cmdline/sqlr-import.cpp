@@ -915,7 +915,7 @@ int main(int argc, const char **argv) {
 
 	// xml or csv
 	const char	*suffix=charstring::findLast(file,'.');
-	if (!charstring::compare(suffix,".csv")) {
+	if (!charstring::compareIgnoringCase(suffix,".csv")) {
 		sqlrimportcsv	sqlricsv(&sqlrcon,&sqlrcur,commitcount,
 						verbose,sqlrcon.identify());
 		if (!charstring::isNullOrEmpty(table)) {
