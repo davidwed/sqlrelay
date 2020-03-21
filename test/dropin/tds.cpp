@@ -477,6 +477,7 @@ int	main(int argc, char **argv) {
 	}
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[0].name);
 	checkSuccess(column[0].name,"testtinyint");
 	checkSuccess(column[0].datatype,CS_TINYINT_TYPE);
 	checkSuccess(column[0].format,CS_FMT_NULLTERM);
@@ -489,6 +490,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[0].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[1].name);
 	checkSuccess(column[1].name,"testbit");
 	checkSuccess(column[1].datatype,CS_BIT_TYPE);
 	checkSuccess(column[1].format,CS_FMT_NULLTERM);
@@ -501,6 +503,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[1].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[2].name);
 	checkSuccess(column[2].name,"testsmallint");
 	checkSuccess(column[2].datatype,CS_SMALLINT_TYPE);
 	checkSuccess(column[2].format,CS_FMT_NULLTERM);
@@ -513,6 +516,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[2].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[3].name);
 	checkSuccess(column[3].name,"testint");
 	checkSuccess(column[3].datatype,CS_INT_TYPE);
 	checkSuccess(column[3].format,CS_FMT_NULLTERM);
@@ -525,6 +529,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[3].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[4].name);
 	checkSuccess(column[4].name,"testsmalldatetime");
 	checkSuccess(column[4].datatype,CS_DATETIME4_TYPE);
 	checkSuccess(column[4].format,CS_FMT_NULLTERM);
@@ -537,6 +542,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[4].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[5].name);
 	checkSuccess(column[5].name,"testreal");
 	checkSuccess(column[5].datatype,CS_REAL_TYPE);
 	checkSuccess(column[5].format,CS_FMT_NULLTERM);
@@ -549,6 +555,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[5].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[6].name);
 	checkSuccess(column[6].name,"testmoney");
 	checkSuccess(column[6].datatype,CS_MONEY_TYPE);
 	checkSuccess(column[6].format,CS_FMT_NULLTERM);
@@ -561,6 +568,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[6].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[7].name);
 	checkSuccess(column[7].name,"testdatetime");
 	checkSuccess(column[7].datatype,CS_DATETIME_TYPE);
 	checkSuccess(column[7].format,CS_FMT_NULLTERM);
@@ -573,6 +581,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[7].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[8].name);
 	checkSuccess(column[8].name,"testfloat");
 	checkSuccess(column[8].datatype,CS_FLOAT_TYPE);
 	checkSuccess(column[8].format,CS_FMT_NULLTERM);
@@ -585,6 +594,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[8].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[9].name);
 	checkSuccess(column[9].name,"testsmallmoney");
 	checkSuccess(column[9].datatype,CS_MONEY4_TYPE);
 	checkSuccess(column[9].format,CS_FMT_NULLTERM);
@@ -597,6 +607,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[9].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[10].name);
 	checkSuccess(column[10].name,"testbigint");
 	checkSuccess(column[10].datatype,CS_BIGINT_TYPE);
 	checkSuccess(column[10].format,CS_FMT_NULLTERM);
@@ -609,6 +620,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[10].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[11].name);
 	checkSuccess(column[11].name,"testguid");
 	checkSuccess(column[11].datatype,CS_UNIQUE_TYPE);
 	checkSuccess(column[11].format,CS_FMT_NULLTERM);
@@ -621,6 +633,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[11].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[12].name);
 	checkSuccess(column[12].name,"testdecimal");
 	checkSuccess(column[12].datatype,CS_DECIMAL_TYPE);
 	checkSuccess(column[12].format,CS_FMT_NULLTERM);
@@ -633,6 +646,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[12].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[13].name);
 	checkSuccess(column[13].name,"testnumeric");
 	checkSuccess(column[13].datatype,CS_NUMERIC_TYPE);
 	checkSuccess(column[13].format,CS_FMT_NULLTERM);
@@ -645,9 +659,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[13].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[14].name);
 	checkSuccess(column[14].name,"testdate");
-	//checkSuccess(column[14].datatype,CS_DATE_TYPE);
-	checkSuccess(column[14].datatype,CS_CHAR_TYPE);		// #4652
+	checkSuccess(column[14].datatype,CS_DATE_TYPE);
 	checkSuccess(column[14].format,CS_FMT_NULLTERM);
 	// FIXME: 64 direct, 16 via relay
 	//checkSuccess(column[14].maxlength,64);
@@ -659,9 +673,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[14].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[15].name);
 	checkSuccess(column[15].name,"testtime");
-	//checkSuccess(column[15].datatype,CS_TIME_TYPE);
-	checkSuccess(column[15].datatype,CS_CHAR_TYPE);		// #4652
+	checkSuccess(column[15].datatype,CS_BIGTIME_TYPE);
 	checkSuccess(column[15].format,CS_FMT_NULLTERM);
 	// FIXME: 16/7/7 direct, 64/0/0 via relay
 	//checkSuccess(column[15].maxlength,16);
@@ -673,9 +687,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[15].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[16].name);
 	checkSuccess(column[16].name,"testdatetime2");
-	//checkSuccess(column[16].datatype,CS_DATETIME_TYPE);
-	checkSuccess(column[16].datatype,CS_CHAR_TYPE);		// #4652
+	checkSuccess(column[16].datatype,CS_BIGDATETIME_TYPE);
 	checkSuccess(column[16].format,CS_FMT_NULLTERM);
 	// FIXME: 16/7/7 direct, 64/0/0 via relay
 	//checkSuccess(column[16].maxlength,16);
@@ -687,9 +701,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[16].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[17].name);
 	checkSuccess(column[17].name,"testdatetimeoffset");
-	//checkSuccess(column[17].datatype,CS_DATETIMEOFFSET_TYPE);
-	checkSuccess(column[17].datatype,CS_CHAR_TYPE);		// #4652
+	checkSuccess(column[17].datatype,CS_BIGDATETIME_TYPE);
 	checkSuccess(column[17].format,CS_FMT_NULLTERM);
 	// FIXME: 16/7/7 direct, 64/0/0 via relay
 	//checkSuccess(column[17].maxlength,16);
@@ -701,6 +715,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[17].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[18].name);
 	checkSuccess(column[18].name,"testchar");
 	checkSuccess(column[18].datatype,CS_CHAR_TYPE);
 	checkSuccess(column[18].format,CS_FMT_NULLTERM);
@@ -714,6 +729,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[18].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[19].name);
 	checkSuccess(column[19].name,"testvarchar");
 	//checkSuccess(column[19].datatype,CS_VARCHAR_TYPE);
 	checkSuccess(column[19].datatype,CS_CHAR_TYPE);		// #4652
@@ -728,6 +744,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[19].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[20].name);
 	checkSuccess(column[20].name,"testbinary");
 	checkSuccess(column[20].datatype,CS_BINARY_TYPE);
 	checkSuccess(column[20].format,CS_FMT_NULLTERM);
@@ -740,6 +757,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[20].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[21].name);
 	checkSuccess(column[21].name,"testvarbinary");
 	//checkSuccess(column[21].datatype,CS_VARBINARY_TYPE);
 	checkSuccess(column[21].datatype,CS_BINARY_TYPE);	// #4781
@@ -753,6 +771,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[21].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[22].name);
 	checkSuccess(column[22].name,"testnvarchar");
 	//checkSuccess(column[22].datatype,CS_NVARCHAR_TYPE);
 	checkSuccess(column[22].datatype,CS_CHAR_TYPE);		// #4652
@@ -767,6 +786,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[22].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[23].name);
 	checkSuccess(column[23].name,"testnchar");
 	//checkSuccess(column[23].datatype,CS_NCHAR_TYPE);
 	checkSuccess(column[23].datatype,CS_CHAR_TYPE);		// #4652
@@ -781,9 +801,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[23].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[24].name);
 	checkSuccess(column[24].name,"testxml");
 	//checkSuccess(column[24].datatype,CS_XML_TYPE);
-	checkSuccess(column[24].datatype,CS_CHAR_TYPE);		// #4652
+	checkSuccess(column[24].datatype,CS_LONGCHAR_TYPE);
 	checkSuccess(column[24].format,CS_FMT_NULLTERM);
 	// maxlength limited by maxfieldlength via relay, but not directly
 	//checkSuccess(column[24].maxlength,131068);
@@ -795,6 +816,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[24].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[25].name);
 	checkSuccess(column[25].name,"testtext");
 	checkSuccess(column[25].datatype,CS_TEXT_TYPE);
 	checkSuccess(column[25].format,CS_FMT_NULLTERM);
@@ -808,6 +830,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[25].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[26].name);
 	checkSuccess(column[26].name,"testimage");
 	checkSuccess(column[26].datatype,CS_IMAGE_TYPE);
 	checkSuccess(column[26].format,CS_FMT_NULLTERM);
@@ -821,6 +844,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(column[26].usertype,CS_CHAR_TYPE);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("%s\n",column[27].name);
 	checkSuccess(column[27].name,"testntext");
 	checkSuccess(column[27].datatype,CS_TEXT_TYPE);
 	checkSuccess(column[27].format,CS_FMT_NULLTERM);
@@ -862,8 +886,8 @@ int	main(int argc, char **argv) {
 	// reals aren't converted to strings reliably enough to compare
 	//checkSuccess(data[5],"1.23");
 	checkSuccess(*(nullindicator[5]),0);
-	checkSuccess(data[6],"1.23");
-	checkSuccess(*(datalength[6]),5);
+	// moneys aren't converted to strings reliably enough to compare
+	//checkSuccess(data[6],"1.23");
 	checkSuccess(*(nullindicator[6]),0);
 	checkSuccess(data[7],"Jan  1 2001 01:01:01:000PM");
 	checkSuccess(*(datalength[7]),27);
@@ -871,8 +895,8 @@ int	main(int argc, char **argv) {
 	// floats aren't converted to strings reliably enough to compare
 	//checkSuccess(data[8],"1.23");
 	checkSuccess(*(nullindicator[8]),0);
-	checkSuccess(data[9],"1.23");
-	checkSuccess(*(datalength[9]),5);
+	// smallmoneys aren't converted to strings reliably enough to compare
+	//checkSuccess(data[9],"1.23");
 	checkSuccess(*(nullindicator[9]),0);
 	checkSuccess(data[10],"1");
 	checkSuccess(*(datalength[10]),2);
@@ -937,10 +961,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(data[3],"2");
 	checkSuccess(data[4],"Feb  2 2002 02:02:00:000PM");
 	//checkSuccess(data[5],"2.34");
-	checkSuccess(data[6],"2.34");
+	//checkSuccess(data[6],"2.34");
 	checkSuccess(data[7],"Feb  2 2002 02:02:02:000PM");
 	//checkSuccess(data[8],"2.34");
-	checkSuccess(data[9],"2.34");
+	//checkSuccess(data[9],"2.34");
 	checkSuccess(data[10],"2");
 	checkSuccess(data[11],"01020304-0102-0304-0102-030401020304");
 	checkSuccess(data[12],"2.34");
