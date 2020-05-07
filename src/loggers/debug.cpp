@@ -106,7 +106,7 @@ bool sqlrlogger_debug::run(sqlrlistener *sqlrl,
 		return false;
 	}
 	char	*header=debuglogger->logHeader(name);
-	debuglogger->write(header,0,info);
+	debuglogger->write(0,header,0,info);
 	delete[] header;
 	return true;
 }
