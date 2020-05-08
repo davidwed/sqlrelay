@@ -636,7 +636,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		query.append(",");
 	}
 	if (!charstring::isNullOrEmpty(value)) {
-		bool	numbercolumn=isNumberTypeChar(value);
+		bool	numbercolumn=charstring::isNumber(value);
 		if (!numbercolumn) {
 			query.append('\'');
 		}
