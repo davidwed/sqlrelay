@@ -140,9 +140,6 @@ sqlrimportxml::sqlrimportxml(sqlrconnection *sqlrcon,
 	rowcount=0;
 	this->verbose=verbose;
 	this->commitcount=commitcount;
-	if (!this->commitcount) {
-		this->commitcount=100;
-	}
 	committedcount=0;
 	this->dbtype=dbtype;
 }
@@ -410,6 +407,10 @@ bool sqlrimportxml::rowTagEnd() {
 			stdoutput.printf("%s\n",sqlrcur->errorMessage());
 		}
 		rowcount++;
+		if (verbose && !(rowcount%100)) {
+			stdoutput.printf("  imported %lld rows",
+					(unsigned long long)rowcount);
+		}
 		if (commitcount && !(rowcount%commitcount)) {
 			sqlrcon->commit();
 			committedcount++;
@@ -567,9 +568,6 @@ sqlrimportcsv::sqlrimportcsv(sqlrconnection *sqlrcon,
 	rowcount=0;
 	this->verbose=verbose;
 	this->commitcount=commitcount;
-	if (!this->commitcount) {
-		this->commitcount=100;
-	}
 	committedcount=0;
 	this->dbtype=dbtype;
 }
@@ -671,6 +669,10 @@ bool sqlrimportcsv::rowEnd() {
 			sqlrcon->begin();
 		}
 		rowcount++;
+		if (verbose && !(rowcount%100)) {
+			stdoutput.printf("  imported %lld rows",
+					(unsigned long long)rowcount);
+		}
 		if (commitcount && !(rowcount%commitcount)) {
 			sqlrcon->commit();
 			committedcount++;
@@ -822,8 +824,7 @@ int main(int argc, const char **argv) {
 	uint16_t	tlsdepth=charstring::toUnsignedInteger(
 					cmdline.getValue("tlsdepth"));
 	const char	*file=cmdline.getValue("file");
-	uint64_t	commitcount=charstring::toInteger(
-					cmdline.getValue("commitcount"));
+	const char	*commitcountstr=cmdline.getValue("commitcount");
 	bool		debug=cmdline.found("debug");
 	const char	*debugfile=NULL;
 	if (debug) {
@@ -916,6 +917,12 @@ int main(int argc, const char **argv) {
 		}
 		sqlrcon.debugOn();
 	}
+
+	// set commitcount
+	// (if not specified at all, default to 100)
+	uint64_t	commitcount=
+			(charstring::isNullOrEmpty(commitcountstr))?
+				100:charstring::toInteger(commitcountstr);
 
 	// xml or csv
 	const char	*suffix=charstring::findLast(file,'.');

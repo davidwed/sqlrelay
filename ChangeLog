@@ -5,6 +5,7 @@
 	sqlr-import detects uppercase .CSV suffix now
 	fixed a csv number-detection but in sqlr-import
 	fixed a delete[] of a const in sqlr-import
+	it's possible to specify a commitcount of 0 with sqlr-import now
 
 1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute
