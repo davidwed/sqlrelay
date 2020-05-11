@@ -535,7 +535,7 @@ class sqlrimportcsv : public csvsax {
 		sqlrcursor	*sqlrcur;
 
 		stringbuffer	query;
-		const char	*table;
+		char		*table;
 		bool		ignorecolumns;
 		uint32_t	colcount;
 		stringbuffer	columns;
@@ -580,7 +580,8 @@ sqlrimportcsv::~sqlrimportcsv() {
 }
 
 void sqlrimportcsv::setTable(const char *table) {
-	this->table=table;
+	delete[] this->table;
+	this->table=charstring::duplicate(table);
 }
 
 void sqlrimportcsv::setIgnoreColumns(bool ignorecolumns) {
@@ -606,6 +607,8 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 }
 
 bool sqlrimportcsv::headerEnd() {
+	// FIXME: set this and use it rather than
+	// calling isNumber in field() below
 	numbercolumn=new bool[colcount];
 	if (verbose) {
 		stdoutput.printf("  %ld columns.\n",(unsigned long)colcount);
@@ -636,12 +639,13 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		query.append(",");
 	}
 	if (!charstring::isNullOrEmpty(value)) {
-		bool	numbercolumn=charstring::isNumber(value);
-		if (!numbercolumn) {
+		// FIXME: get column type and use that intead of isNumber
+		bool	isnumber=charstring::isNumber(value);
+		if (!isnumber) {
 			query.append('\'');
 		}
 		massageField(&query,value);
-		if (!numbercolumn) {
+		if (!isnumber) {
 			query.append('\'');
 		}
 	} else {
