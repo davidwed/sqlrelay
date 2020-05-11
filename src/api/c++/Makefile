@@ -2,8 +2,16 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-SRCS = sqlrconnection.cpp sqlrcursor.cpp sqlrresultsetdomnode.cpp
-LOBJS = sqlrconnection.$(OBJ) sqlrcursor.$(OBJ) sqlrresultsetdomnode.$(OBJ)
+SRCS = sqlrconnection.cpp \
+	sqlrcursor.cpp \
+	sqlrresultsetdomnode.cpp \
+	sqlrimportxml.cpp \
+	sqlrimportcsv.cpp
+LOBJS = sqlrconnection.$(OBJ) \
+	sqlrcursor.$(OBJ) \
+	sqlrresultsetdomnode.$(OBJ) \
+	sqlrimportxml.$(OBJ) \
+	sqlrimportcsv.$(OBJ)
 
 .SUFFIXES: .lo
 
@@ -31,6 +39,10 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclient.h
 	$(CP) sqlrelay/sqlrresultsetdomnode.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrresultsetdomnode.h
+	$(CP) sqlrelay/sqlrimportxml.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimportxml.h
+	$(CP) sqlrelay/sqlrimportcsv.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimportcsv.h
 	$(CP) sqlrelay/private/sqlrclientincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrclientincludes.h
 	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
@@ -41,6 +53,14 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnodeincludes.h
 	$(CP) sqlrelay/private/sqlrresultsetdomnode.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnode.h
+	$(CP) sqlrelay/private/sqlrimportxmlincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportxmlincludes.h
+	$(CP) sqlrelay/private/sqlrimportxml.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportxml.h
+	$(CP) sqlrelay/private/sqlrimportcsvincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportcsvincludes.h
+	$(CP) sqlrelay/private/sqlrimportcsv.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportcsv.h
 
 installdll::
 	$(MKINSTALLDIRS) $(bindir)
@@ -57,19 +77,6 @@ uninstall: $(UNINSTALLLIB)
 	$(RMTREE) $(cachedir) \
 		$(localstatedir)/$(SQLRELAY)/cache \
 		$(localstatedir)/sqlrelay/cache
-	$(RM) $(includedir)/sqlrclient.h \
-		$(includedir)/private/sqlrclientincludes.h \
-		$(includedir)/private/sqlrconnection.h \
-		$(includedir)/private/sqlrcursor.h \
-		$(includedir)/private/bindvar.h \
-		$(includedir)/private/column.h \
-		$(includedir)/private/field.h \
-		$(includedir)/private/row.h \
-		$(includedir)/private/listformat.h \
-		$(includedir)/private/sqlrdefines.h \
-		$(includedir)/private/sqlrincludes.h \
-		$(includedir)/private/sqlrclientdll.h \
-		$(includedir)/private/dll.h
 	$(RMTREE) $(includedir)/sqlrelay
 
 uninstalldll:
