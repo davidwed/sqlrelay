@@ -196,10 +196,14 @@ bool sqlrimportxml::fieldTagStart() {
 
 
 bool sqlrimportxml::tableTagEnd() {
-	sqlrcon->commit();
-	lg->write(coarseloglevel,NULL,logindent,
-				"committed %lld rows (to %s)",
-				(unsigned long long)rowcount,table);
+	if (commitcount) {
+		sqlrcon->commit();
+		if (lg) {
+			lg->write(coarseloglevel,NULL,logindent,
+					"committed %lld rows (to %s)",
+					(unsigned long long)rowcount,table);
+		}
+	}
 	return true;
 }
 
@@ -215,8 +219,10 @@ bool sqlrimportxml::sequenceTagEnd() {
 		query.append("set generator ")->append(sequence);
 		query.append(" to ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			lg->write(coarseloglevel,NULL,logindent,
-					"%s",sqlrcur->errorMessage());
+			if (lg) {
+				lg->write(coarseloglevel,NULL,logindent,
+						"%s",sqlrcur->errorMessage());
+			}
 		}
 		return true;
 	} else if (charstring::contains(dbtype,"oracle")) {
@@ -228,15 +234,19 @@ bool sqlrimportxml::sequenceTagEnd() {
 		query.append(uppersequence)->append("'");
 		delete[] uppersequence;
 		if (!sqlrcur2.sendQuery(query.getString())) {
-			lg->write(coarseloglevel,NULL,logindent,
-					"%s",sqlrcur->errorMessage());
+			if (lg) {
+				lg->write(coarseloglevel,NULL,logindent,
+						"%s",sqlrcur->errorMessage());
+			}
 			return true;
 		}
 		query.clear();
 		query.append("drop sequence ")->append(sequence);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			lg->write(coarseloglevel,NULL,logindent,
-					"%s",sqlrcur->errorMessage());
+			if (lg) {
+				lg->write(coarseloglevel,NULL,logindent,
+						"%s",sqlrcur->errorMessage());
+			}
 			return true;
 		}
 		query.clear();
@@ -266,8 +276,10 @@ bool sqlrimportxml::sequenceTagEnd() {
 			query.append(sqlrcur2.getField(0,"CACHE_SIZE"));
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			lg->write(coarseloglevel,NULL,logindent,
-					"%s",sqlrcur->errorMessage());
+			if (lg) {
+				lg->write(coarseloglevel,NULL,logindent,
+						"%s",sqlrcur->errorMessage());
+			}
 		}
 		return true;
 	} else if (charstring::contains(dbtype,"postgresql") ||
@@ -276,20 +288,26 @@ bool sqlrimportxml::sequenceTagEnd() {
 		query.append("alter sequence ")->append(sequence);
 		query.append(" restart with ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			lg->write(coarseloglevel,NULL,logindent,
-					"%s",sqlrcur->errorMessage());
+			if (lg) {
+				lg->write(coarseloglevel,NULL,logindent,
+						"%s",sqlrcur->errorMessage());
+			}
 		}
 		return true;
 	}
 
-	lg->write(coarseloglevel,NULL,logindent,
+	if (lg) {
+		lg->write(coarseloglevel,NULL,logindent,
 				"%s doesn't support sequences",dbtype);
+	}
 	return true;
 }
 
 bool sqlrimportxml::columnsTagEnd() {
-	lg->write(coarseloglevel,NULL,logindent,
-			"%ld columns",(unsigned long)currentcol);
+	if (lg) {
+		lg->write(coarseloglevel,NULL,logindent,
+				"%ld columns",(unsigned long)currentcol);
+	}
 	return true;
 }
 
@@ -305,15 +323,17 @@ bool sqlrimportxml::rowsTagEnd() {
 bool sqlrimportxml::rowTagEnd() {
 	query.append(')');
 	if (fieldcount) {
-		if (rowcount==0) {
+		if (commitcount && !rowcount) {
 			sqlrcon->begin();
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			lg->write(coarseloglevel,NULL,logindent,
-					"%s",sqlrcur->errorMessage());
+			if (lg) {
+				lg->write(coarseloglevel,NULL,logindent,
+						"%s",sqlrcur->errorMessage());
+			}
 		}
 		rowcount++;
-		if (!(rowcount%100)) {
+		if (lg && !(rowcount%100)) {
 			lg->write(fineloglevel,NULL,logindent,
 					"imported %lld rows",
 					(unsigned long long)rowcount);
@@ -321,15 +341,17 @@ bool sqlrimportxml::rowTagEnd() {
 		if (commitcount && !(rowcount%commitcount)) {
 			sqlrcon->commit();
 			committedcount++;
-			if (!(committedcount%10)) {
-				lg->write(fineloglevel,NULL,logindent,
+			if (lg) {
+				if (!(committedcount%10)) {
+					lg->write(fineloglevel,NULL,logindent,
 						"committed %lld rows "
 						"(to %s)...",
 						(unsigned long long)rowcount);
-			} else {
-				lg->write(fineloglevel,NULL,logindent,
+				} else {
+					lg->write(fineloglevel,NULL,logindent,
 						"committed %lld rows",
 						(unsigned long long)rowcount);
+				}
 			}
 			sqlrcon->begin();
 		}

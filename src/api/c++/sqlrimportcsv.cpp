@@ -41,8 +41,10 @@ bool sqlrimportcsv::headerEnd() {
 	// FIXME: describe the table, set this and use it rather than
 	// calling isNumber in field() below
 	numbercolumn=new bool[colcount];
-	lg->write(coarseloglevel,NULL,logindent,
-			"%ld columns",(unsigned long)colcount);
+	if (lg) {
+		lg->write(coarseloglevel,NULL,logindent,
+				"%ld columns",(unsigned long)colcount);
+	}
 	return true;
 }
 
@@ -89,17 +91,19 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 bool sqlrimportcsv::rowEnd() {
 	query.append(')');
 	if (fieldcount) {
-		if (rowcount==0) {
+		if (commitcount && !rowcount) {
 			sqlrcon->begin();
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			lg->write(coarseloglevel,NULL,logindent,
-					"%s",sqlrcur->errorMessage());
+			if (lg) {
+				lg->write(coarseloglevel,NULL,logindent,
+						"%s",sqlrcur->errorMessage());
+			}
 			sqlrcon->commit();
 			sqlrcon->begin();
 		}
 		rowcount++;
-		if (!(rowcount%100)) {
+		if (lg && !(rowcount%100)) {
 			lg->write(fineloglevel,NULL,logindent,
 					"imported %lld rows",
 					(unsigned long long)rowcount);
@@ -107,16 +111,18 @@ bool sqlrimportcsv::rowEnd() {
 		if (commitcount && !(rowcount%commitcount)) {
 			sqlrcon->commit();
 			committedcount++;
-			if (!(committedcount%10)) {
-				lg->write(coarseloglevel,NULL,logindent,
+			if (lg) {
+				if (!(committedcount%10)) {
+					lg->write(coarseloglevel,NULL,logindent,
 						"committed %lld rows "
 						"(to %s)...",
 						(unsigned long long)rowcount,
 						table);
-			} else {
-				lg->write(fineloglevel,NULL,logindent,
+				} else {
+					lg->write(fineloglevel,NULL,logindent,
 						"committed %lld rows",
 						(unsigned long long)rowcount);
+				}
 			}
 			sqlrcon->begin();
 		}
@@ -126,9 +132,11 @@ bool sqlrimportcsv::rowEnd() {
 
 bool sqlrimportcsv::bodyEnd() {
 	sqlrcon->commit();
-	lg->write(coarseloglevel,NULL,logindent,
+	if (lg) {
+		lg->write(coarseloglevel,NULL,logindent,
 				"  committed %lld rows (to %s)",
 				(unsigned long long)rowcount,table);
+	}
 	return true;
 }
 

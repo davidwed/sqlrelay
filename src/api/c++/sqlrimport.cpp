@@ -16,6 +16,7 @@ sqlrimport::sqlrimport() {
 	coarseloglevel=0;
 	fineloglevel=0;
 	logindent=0;
+	shutdownflag=NULL;
 }
 
 sqlrimport::~sqlrimport() {
@@ -63,4 +64,8 @@ void sqlrimport::setFineLogLevel(uint8_t fineloglevel) {
 
 void sqlrimport::setLogIndent(uint32_t indent) {
 	this->logindent=logindent;
+}
+
+void sqlrimport::setShutdownFlag(bool *shutdownflag) {
+	this->shutdownflag=shutdownflag;
 }

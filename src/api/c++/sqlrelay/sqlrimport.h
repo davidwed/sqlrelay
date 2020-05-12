@@ -24,6 +24,8 @@ class sqlrimport {
 		void	setFineLogLevel(uint8_t fineloglevel);
 		void	setLogIndent(uint32_t indent);
 
+		void	setShutdownFlag(bool *shuttingdown);
+
 		virtual	bool	parseFile(const char *filename)=0;
 
 	#include <sqlrelay/private/sqlrimport.h>
