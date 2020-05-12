@@ -30,13 +30,7 @@ const unsigned short sqlrimportxml::ZEROFILLEDATTR=12;
 const unsigned short sqlrimportxml::BINARYATTR=13;
 const unsigned short sqlrimportxml::AUTOINCREMENTATTR=14;
 
-sqlrimportxml::sqlrimportxml(sqlrconnection *sqlrcon,
-				sqlrcursor *sqlrcur,
-				uint64_t commitcount,
-				bool verbose,
-				const char *dbtype) : xmlsax() {
-	this->sqlrcon=sqlrcon;
-	this->sqlrcur=sqlrcur;
+sqlrimportxml::sqlrimportxml() : sqlrimport(), xmlsax() {
 	currenttag=NULLTAG;
 	currentattribute=NULL;
 	table=NULL;
@@ -49,18 +43,18 @@ sqlrimportxml::sqlrimportxml(sqlrconnection *sqlrcon,
 	foundfieldtext=false;
 	fieldcount=0;
 	rowcount=0;
-	this->verbose=verbose;
-	this->commitcount=commitcount;
 	committedcount=0;
-	this->dbtype=dbtype;
 }
 
 sqlrimportxml::~sqlrimportxml() {
 	delete[] currentattribute;
-	delete[] table;
 	delete[] sequence;
 	delete[] sequencevalue;
 	delete[] numbercolumn;
+}
+
+bool sqlrimportxml::parseFile(const char *filename) {
+	return xmlsax::parseFile(filename);
 }
 
 bool sqlrimportxml::tagStart(const char *ns, const char *name) {
@@ -94,10 +88,6 @@ bool sqlrimportxml::attributeValue(const char *value) {
 			if (!charstring::compare(currentattribute,"name")) {
 				delete[] table;
 				table=charstring::duplicate(value);
-				if (verbose) {
-					stdoutput.printf(
-						"inserting into %s...\n",table);
-				}
 			}
 			break;
 		case SEQUENCETAG:
@@ -207,10 +197,9 @@ bool sqlrimportxml::fieldTagStart() {
 
 bool sqlrimportxml::tableTagEnd() {
 	sqlrcon->commit();
-	if (verbose) {
-		stdoutput.printf("  committed %lld rows (to %s).\n\n",
-					(unsigned long long)rowcount,table);
-	}
+	lg->write(coarseloglevel,NULL,logindent,
+				"committed %lld rows (to %s)",
+				(unsigned long long)rowcount,table);
 	return true;
 }
 
@@ -226,7 +215,8 @@ bool sqlrimportxml::sequenceTagEnd() {
 		query.append("set generator ")->append(sequence);
 		query.append(" to ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			stdoutput.printf("%s\n",sqlrcur->errorMessage());
+			lg->write(coarseloglevel,NULL,logindent,
+					"%s",sqlrcur->errorMessage());
 		}
 		return true;
 	} else if (charstring::contains(dbtype,"oracle")) {
@@ -238,13 +228,15 @@ bool sqlrimportxml::sequenceTagEnd() {
 		query.append(uppersequence)->append("'");
 		delete[] uppersequence;
 		if (!sqlrcur2.sendQuery(query.getString())) {
-			stdoutput.printf("%s\n",sqlrcur->errorMessage());
+			lg->write(coarseloglevel,NULL,logindent,
+					"%s",sqlrcur->errorMessage());
 			return true;
 		}
 		query.clear();
 		query.append("drop sequence ")->append(sequence);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			stdoutput.printf("%s\n",sqlrcur->errorMessage());
+			lg->write(coarseloglevel,NULL,logindent,
+					"%s",sqlrcur->errorMessage());
 			return true;
 		}
 		query.clear();
@@ -274,7 +266,8 @@ bool sqlrimportxml::sequenceTagEnd() {
 			query.append(sqlrcur2.getField(0,"CACHE_SIZE"));
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			stdoutput.printf("%s\n",sqlrcur->errorMessage());
+			lg->write(coarseloglevel,NULL,logindent,
+					"%s",sqlrcur->errorMessage());
 		}
 		return true;
 	} else if (charstring::contains(dbtype,"postgresql") ||
@@ -283,19 +276,20 @@ bool sqlrimportxml::sequenceTagEnd() {
 		query.append("alter sequence ")->append(sequence);
 		query.append(" restart with ")->append(sequencevalue);
 		if (!sqlrcur->sendQuery(query.getString())) {
-			stdoutput.printf("%s\n",sqlrcur->errorMessage());
+			lg->write(coarseloglevel,NULL,logindent,
+					"%s",sqlrcur->errorMessage());
 		}
 		return true;
 	}
 
-	stdoutput.printf("%s doesn't support sequences.\n",dbtype);
+	lg->write(coarseloglevel,NULL,logindent,
+				"%s doesn't support sequences",dbtype);
 	return true;
 }
 
 bool sqlrimportxml::columnsTagEnd() {
-	if (verbose) {
-		stdoutput.printf("  %ld columns.\n",(unsigned long)currentcol);
-	}
+	lg->write(coarseloglevel,NULL,logindent,
+			"%ld columns",(unsigned long)currentcol);
 	return true;
 }
 
@@ -315,24 +309,27 @@ bool sqlrimportxml::rowTagEnd() {
 			sqlrcon->begin();
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			stdoutput.printf("%s\n",sqlrcur->errorMessage());
+			lg->write(coarseloglevel,NULL,logindent,
+					"%s",sqlrcur->errorMessage());
 		}
 		rowcount++;
-		if (verbose && !(rowcount%100)) {
-			stdoutput.printf("  imported %lld rows",
+		if (!(rowcount%100)) {
+			lg->write(fineloglevel,NULL,logindent,
+					"imported %lld rows",
 					(unsigned long long)rowcount);
 		}
 		if (commitcount && !(rowcount%commitcount)) {
 			sqlrcon->commit();
 			committedcount++;
-			if (verbose) {
-				stdoutput.printf("  committed %lld rows",
+			if (!(committedcount%10)) {
+				lg->write(fineloglevel,NULL,logindent,
+						"committed %lld rows "
+						"(to %s)...",
 						(unsigned long long)rowcount);
-				if (!(committedcount%10)) {
-					stdoutput.printf(" (to %s)...\n",table);
-				} else {
-					stdoutput.printf("\n");
-				}
+			} else {
+				lg->write(fineloglevel,NULL,logindent,
+						"committed %lld rows",
+						(unsigned long long)rowcount);
 			}
 			sqlrcon->begin();
 		}

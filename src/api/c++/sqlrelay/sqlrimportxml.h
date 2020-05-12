@@ -6,14 +6,12 @@
 
 #include <sqlrelay/private/sqlrimportxmlincludes.h>
 
-class sqlrimportxml : public xmlsax {
+class sqlrimportxml : public sqlrimport, public xmlsax {
 	public:
-			sqlrimportxml(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur,
-					uint64_t commitcount,
-					bool verbose,
-					const char *dbtype);
+			sqlrimportxml();
 			~sqlrimportxml();
+
+		bool	parseFile(const char *filename);
 
 	#include <sqlrelay/private/sqlrimportxml.h>
 };

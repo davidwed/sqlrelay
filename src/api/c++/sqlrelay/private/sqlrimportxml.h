@@ -27,9 +27,6 @@
 
 		void	massageField(stringbuffer *strb, const char *field);
 
-		sqlrconnection	*sqlrcon;
-		sqlrcursor	*sqlrcur;
-
 		unsigned short	currenttag;
 		char		*currentattribute;
 
@@ -45,10 +42,7 @@
 		bool		foundfieldtext;
 		uint32_t	fieldcount;
 		uint64_t	rowcount;
-		uint64_t	commitcount;
 		uint64_t	committedcount;
-		bool		verbose;
-		const char	*dbtype;
 
 		static const unsigned short	NULLTAG;
 		static const unsigned short	TABLETAG;

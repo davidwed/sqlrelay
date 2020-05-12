@@ -6,17 +6,11 @@
 
 #include <sqlrelay/private/sqlrimportcsvincludes.h>
 
-class sqlrimportcsv : public csvsax {
+class sqlrimportcsv : public sqlrimport, public csvsax {
 	public:
-			sqlrimportcsv(sqlrconnection *sqlrcon,
-					sqlrcursor *sqlrcur,
-					uint64_t commitcount,
-					bool verbose,
-					const char *dbtype);
+			sqlrimportcsv();
 			~sqlrimportcsv();
 
-		void	setTable(const char *table);
-		void	setIgnoreColumns(bool ignorecolumns);
 		bool	parseFile(const char *filename);
 
 	#include <sqlrelay/private/sqlrimportcsv.h>

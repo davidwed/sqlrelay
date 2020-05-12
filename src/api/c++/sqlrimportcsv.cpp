@@ -5,39 +5,18 @@
 
 #include <rudiments/file.h>
 
-sqlrimportcsv::sqlrimportcsv(sqlrconnection *sqlrcon,
-				sqlrcursor *sqlrcur,
-				uint64_t commitcount,
-				bool verbose,
-				const char *dbtype) : csvsax() {
-	this->sqlrcon=sqlrcon;
-	this->sqlrcur=sqlrcur;
-	table=NULL;
-	ignorecolumns=false;
+sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 	colcount=0;
 	currentcol=0;
 	numbercolumn=NULL;
 	foundfieldtext=false;
 	fieldcount=0;
 	rowcount=0;
-	this->verbose=verbose;
-	this->commitcount=commitcount;
 	committedcount=0;
-	this->dbtype=dbtype;
 }
 
 sqlrimportcsv::~sqlrimportcsv() {
-	delete[] table;
 	delete[] numbercolumn;
-}
-
-void sqlrimportcsv::setTable(const char *table) {
-	delete[] this->table;
-	this->table=charstring::duplicate(table);
-}
-
-void sqlrimportcsv::setIgnoreColumns(bool ignorecolumns) {
-	this->ignorecolumns=ignorecolumns;
 }
 
 bool sqlrimportcsv::parseFile(const char *filename) {
@@ -59,12 +38,11 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 }
 
 bool sqlrimportcsv::headerEnd() {
-	// FIXME: set this and use it rather than
+	// FIXME: describe the table, set this and use it rather than
 	// calling isNumber in field() below
 	numbercolumn=new bool[colcount];
-	if (verbose) {
-		stdoutput.printf("  %ld columns.\n",(unsigned long)colcount);
-	}
+	lg->write(coarseloglevel,NULL,logindent,
+			"%ld columns",(unsigned long)colcount);
 	return true;
 }
 
@@ -115,29 +93,30 @@ bool sqlrimportcsv::rowEnd() {
 			sqlrcon->begin();
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			if (verbose) {
-				stdoutput.printf("%s\n",
-					sqlrcur->errorMessage());
-			}
+			lg->write(coarseloglevel,NULL,logindent,
+					"%s",sqlrcur->errorMessage());
 			sqlrcon->commit();
 			sqlrcon->begin();
 		}
 		rowcount++;
-		if (verbose && !(rowcount%100)) {
-			stdoutput.printf("  imported %lld rows",
+		if (!(rowcount%100)) {
+			lg->write(fineloglevel,NULL,logindent,
+					"imported %lld rows",
 					(unsigned long long)rowcount);
 		}
 		if (commitcount && !(rowcount%commitcount)) {
 			sqlrcon->commit();
 			committedcount++;
-			if (verbose) {
-				stdoutput.printf("  committed %lld rows",
+			if (!(committedcount%10)) {
+				lg->write(coarseloglevel,NULL,logindent,
+						"committed %lld rows "
+						"(to %s)...",
+						(unsigned long long)rowcount,
+						table);
+			} else {
+				lg->write(fineloglevel,NULL,logindent,
+						"committed %lld rows",
 						(unsigned long long)rowcount);
-				if (!(committedcount%10)) {
-					stdoutput.printf(" (to %s)...\n",table);
-				} else {
-					stdoutput.printf("\n");
-				}
 			}
 			sqlrcon->begin();
 		}
@@ -147,10 +126,9 @@ bool sqlrimportcsv::rowEnd() {
 
 bool sqlrimportcsv::bodyEnd() {
 	sqlrcon->commit();
-	if (verbose) {
-		stdoutput.printf("  committed %lld rows (to %s).\n\n",
-					(unsigned long long)rowcount,table);
-	}
+	lg->write(coarseloglevel,NULL,logindent,
+				"  committed %lld rows (to %s)",
+				(unsigned long long)rowcount,table);
 	return true;
 }
 

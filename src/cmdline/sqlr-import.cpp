@@ -210,19 +210,34 @@ int main(int argc, const char **argv) {
 			(charstring::isNullOrEmpty(commitcountstr))?
 				100:charstring::toInteger(commitcountstr);
 
+	// set up logging
+	logger	lg;
+	stdoutdestination	std;
+	lg.addLogDestination(&std);
+
 	// xml or csv
-	const char	*suffix=charstring::findLast(file,'.');
-	if (!charstring::compareIgnoringCase(suffix,".csv")) {
-		sqlrimportcsv	sqlricsv(&sqlrcon,&sqlrcur,commitcount,
-						verbose,sqlrcon.identify());
-		if (!charstring::isNullOrEmpty(table)) {
-			sqlricsv.setTable(table);
-		}
-		sqlricsv.setIgnoreColumns(ignorecolumns);
-		process::exit(!sqlricsv.parseFile(file));
+	sqlrimport	*sqlri;
+	if (!charstring::compareIgnoringCase(
+			charstring::findLast(file,'.'),".csv")) {
+		sqlri=new sqlrimportcsv();
 	} else {
-		sqlrimportxml	sqlrixml(&sqlrcon,&sqlrcur,commitcount,
-						verbose,sqlrcon.identify());
-		process::exit(!sqlrixml.parseFile(file));
+		sqlri=new sqlrimportxml();
 	}
+	sqlri->setSqlrConnection(&sqlrcon);
+	sqlri->setSqlrCursor(&sqlrcur);
+	sqlri->setDbType(sqlrcon.identify());
+	if (!charstring::isNullOrEmpty(table)) {
+		sqlri->setTable(table);
+	}
+	sqlri->setIgnoreColumns(ignorecolumns);
+	sqlri->setCommitCount(commitcount);
+	if (verbose) {
+		sqlri->setLogger(&lg);
+		sqlri->setCoarseLogLevel(1);
+		sqlri->setFineLogLevel(1);
+		sqlri->setLogIndent(1);
+	}
+	bool	success=sqlri->parseFile(file);
+	delete sqlri;
+	process::exit(!success);
 }

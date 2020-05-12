@@ -5,11 +5,13 @@ include ../../../config.mk
 SRCS = sqlrconnection.cpp \
 	sqlrcursor.cpp \
 	sqlrresultsetdomnode.cpp \
+	sqlrimport.cpp \
 	sqlrimportxml.cpp \
 	sqlrimportcsv.cpp
 LOBJS = sqlrconnection.$(OBJ) \
 	sqlrcursor.$(OBJ) \
 	sqlrresultsetdomnode.$(OBJ) \
+	sqlrimport.$(OBJ) \
 	sqlrimportxml.$(OBJ) \
 	sqlrimportcsv.$(OBJ)
 
