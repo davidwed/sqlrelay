@@ -33,7 +33,7 @@ void sqlrimport::setSqlrCursor(sqlrcursor *sqlrcur) {
 }
 
 void sqlrimport::setDbType(const char *dbtype) {
-	delete[] dbtype;
+	delete[] this->dbtype;
 	this->dbtype=charstring::duplicate(dbtype);
 }
 
