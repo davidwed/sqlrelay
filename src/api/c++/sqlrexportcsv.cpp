@@ -19,21 +19,23 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 
 	// print header
 	uint32_t	cols=sqlrcur->colCount();
-	for (uint32_t j=0; j<cols; j++) {
-		if (j) {
-			fd->printf(",");
+	if (!ignorecolumns) {
+		for (uint32_t j=0; j<cols; j++) {
+			if (j) {
+				fd->printf(",");
+			}
+			const char	*name=sqlrcur->getColumnName(j);
+			bool		isnumber=charstring::isNumber(name);
+			if (!isnumber) {
+				fd->write('"');
+			}
+			escapeField(fd,name,charstring::length(name));
+			if (!isnumber) {
+				fd->write('"');
+			}
 		}
-		const char	*name=sqlrcur->getColumnName(j);
-		bool		isnumber=charstring::isNumber(name);
-		if (!isnumber) {
-			fd->write('"');
-		}
-		escapeField(fd,name,charstring::length(name));
-		if (!isnumber) {
-			fd->write('"');
-		}
+		fd->printf("\n");
 	}
-	fd->printf("\n");
 
 	// print rows
 	uint64_t	row=0;

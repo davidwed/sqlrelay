@@ -27,12 +27,15 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 
 	// print columns
 	uint32_t	cols=sqlrcur->colCount();
-	fd->printf("<columns count=\"%d\">\n",cols);
-	for (uint32_t j=0; j<cols; j++) {
-		fd->printf("	<column name=\"%s\" type=\"%s\"/>\n",
-			sqlrcur->getColumnName(j),sqlrcur->getColumnType(j));
+	if (!ignorecolumns) {
+		fd->printf("<columns count=\"%d\">\n",cols);
+		for (uint32_t j=0; j<cols; j++) {
+			fd->printf("	<column name=\"%s\" type=\"%s\"/>\n",
+						sqlrcur->getColumnName(j),
+						sqlrcur->getColumnType(j));
+		}
+		fd->printf("</columns>\n");
 	}
-	fd->printf("</columns>\n");
 
 	// print rows
 	fd->printf("<rows>\n");
