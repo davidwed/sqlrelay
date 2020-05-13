@@ -11,10 +11,8 @@ class sqlrexport {
 			sqlrexport();
 		virtual	~sqlrexport();
 
-		void	setSqlrConnection(sqlrconnection *sqlrcon);
 		void	setSqlrCursor(sqlrcursor *sqlrcur);
 
-		void	setDbType(const char *dbtype);
 		void	setIgnoreColumns(bool ignorecolumns);
 
 		void	setLogger(logger *lg);

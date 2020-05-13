@@ -10,7 +10,7 @@
 		bool	rowEnd();
 		bool	bodyEnd();
 
-		void	massageField(stringbuffer *strb, const char *field);
+		void	escapeField(stringbuffer *strb, const char *field);
 
 		stringbuffer	query;
 		stringbuffer	columns;

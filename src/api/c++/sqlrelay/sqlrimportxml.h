@@ -11,7 +11,7 @@ class sqlrimportxml : public sqlrimport, public xmlsax {
 			sqlrimportxml();
 			~sqlrimportxml();
 
-		bool	importFile(const char *filename);
+		bool	importFromFile(const char *filename);
 
 	#include <sqlrelay/private/sqlrimportxml.h>
 };

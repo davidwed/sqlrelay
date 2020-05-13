@@ -11,59 +11,63 @@ sqlrexportxml::~sqlrexportxml() {
 
 bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 
-	// FIXME: create/open file
-	// FIXME: write to file rather than stdoutput
+	// output to stdoutput or create/open file
+	filedescriptor	*fd=&stdoutput;
+	if (!charstring::isNullOrEmpty(filename)) {
+		// FIXME: create/open file
+	}
 
 	// print header
-	stdoutput.printf("<?xml version=\"1.0\"?>\n");
+	fd->printf("<?xml version=\"1.0\"?>\n");
 
 	// print table name
 	if (!charstring::isNullOrEmpty(table)) {
-		stdoutput.printf("<table name=\"%s\">\n",table);
+		fd->printf("<table name=\"%s\">\n",table);
 	}
 
 	// print columns
 	uint32_t	cols=sqlrcur->colCount();
-	stdoutput.printf("<columns count=\"%d\">\n",cols);
+	fd->printf("<columns count=\"%d\">\n",cols);
 	for (uint32_t j=0; j<cols; j++) {
-		stdoutput.printf("	<column name=\"%s\" type=\"%s\"/>\n",
+		fd->printf("	<column name=\"%s\" type=\"%s\"/>\n",
 			sqlrcur->getColumnName(j),sqlrcur->getColumnType(j));
 	}
-	stdoutput.printf("</columns>\n");
+	fd->printf("</columns>\n");
 
 	// print rows
-	stdoutput.printf("<rows>\n");
+	fd->printf("<rows>\n");
 	uint64_t	row=0;
 	do {
-		stdoutput.printf("	<row>\n");
+		fd->printf("	<row>\n");
 		for (uint32_t col=0; col<cols; col++) {
 			const char	*field=sqlrcur->getField(row,col);
 			if (!field) {
 				break;
 			}
-			stdoutput.printf("	<field>");
-			xmlEscapeField(field,sqlrcur->getFieldLength(row,col));
-			stdoutput.printf("</field>\n");
+			fd->printf("	<field>");
+			escapeField(fd,field,sqlrcur->getFieldLength(row,col));
+			fd->printf("</field>\n");
 		}
-		stdoutput.printf("	</row>\n");
+		fd->printf("	</row>\n");
 		row++;
 	} while (!sqlrcur->endOfResultSet() || row<sqlrcur->rowCount());
-	stdoutput.printf("</rows>\n");
-	stdoutput.printf("</table>\n");
+	fd->printf("</rows>\n");
+	fd->printf("</table>\n");
 
 	return true;
 }
 
-void sqlrexportxml::xmlEscapeField(const char *field, uint32_t length) {
+void sqlrexportxml::escapeField(filedescriptor *fd,
+					const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		if (field[index]=='"') {
-			stdoutput.write("\"\"");
+			fd->write("\"\"");
 		} else if (field[index]<' ' || field[index]>'~' ||
 				field[index]=='&' || field[index]=='<' ||
 				field[index]=='>') {
-			stdoutput.printf("&%d;",(uint8_t)field[index]);
+			fd->printf("&%d;",(uint8_t)field[index]);
 		} else {
-			stdoutput.printf("%c",field[index]);
+			fd->write(field[index]);
 		}
 	}
 }

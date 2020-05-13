@@ -237,7 +237,7 @@ int main(int argc, const char **argv) {
 		sqlri->setFineLogLevel(1);
 		sqlri->setLogIndent(1);
 	}
-	bool	success=sqlri->parseFile(file);
+	bool	success=sqlri->importFromFile(file);
 	delete sqlri;
 	process::exit(!success);
 }

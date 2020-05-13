@@ -19,7 +19,7 @@ sqlrimportcsv::~sqlrimportcsv() {
 	delete[] numbercolumn;
 }
 
-bool sqlrimportcsv::importFile(const char *filename) {
+bool sqlrimportcsv::importFromFile(const char *filename) {
 	if (!table) {
 		table=file::basename(filename,".csv");
 	}
@@ -76,7 +76,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		if (!isnumber) {
 			query.append('\'');
 		}
-		massageField(&query,value);
+		escapeField(&query,value);
 		if (!isnumber) {
 			query.append('\'');
 		}
@@ -141,7 +141,7 @@ bool sqlrimportcsv::bodyEnd() {
 }
 
 
-void sqlrimportcsv::massageField(stringbuffer *strb, const char *field) {
+void sqlrimportcsv::escapeField(stringbuffer *strb, const char *field) {
 	for (uint32_t index=0; field[index]; index++) {
 		if (field[index]=='\\' &&
 				(!charstring::compare(dbtype,"postgresql") ||

@@ -11,26 +11,29 @@ sqlrexportcsv::~sqlrexportcsv() {
 
 bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 
-	// FIXME: create/open file
-	// FIXME: write to file rather than stdoutput
+	// output to stdoutput or create/open file
+	filedescriptor	*fd=&stdoutput;
+	if (!charstring::isNullOrEmpty(filename)) {
+		// FIXME: create/open file
+	}
 
 	// print header
 	uint32_t	cols=sqlrcur->colCount();
 	for (uint32_t j=0; j<cols; j++) {
 		if (j) {
-			stdoutput.printf(",");
+			fd->printf(",");
 		}
 		const char	*name=sqlrcur->getColumnName(j);
 		bool		isnumber=charstring::isNumber(name);
 		if (!isnumber) {
-			stdoutput.write('\'');
+			fd->write('"');
 		}
-		csvEscapeField(name,charstring::length(name));
+		escapeField(fd,name,charstring::length(name));
 		if (!isnumber) {
-			stdoutput.write('\'');
+			fd->write('"');
 		}
 	}
-	stdoutput.printf("\n");
+	fd->printf("\n");
 
 	// print rows
 	uint64_t	row=0;
@@ -41,18 +44,18 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 				break;
 			}
 			if (col) {
-				stdoutput.write(',');
+				fd->write(',');
 			}
 			bool	isnumber=charstring::isNumber(field);
 			if (!isnumber) {
-				stdoutput.write('\'');
+				fd->write('"');
 			}
-			csvEscapeField(field,sqlrcur->getFieldLength(row,col));
+			escapeField(fd,field,sqlrcur->getFieldLength(row,col));
 			if (!isnumber) {
-				stdoutput.write('\'');
+				fd->write('"');
 			}
 		}
-		stdoutput.write('\n');
+		fd->write('\n');
 		row++;
 		if (sqlrcur->endOfResultSet() && row>=sqlrcur->rowCount()) {
 			break;
@@ -62,16 +65,18 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	return true;
 }
 
-void sqlrexportcsv::csvEscapeField(const char *field, uint32_t length) {
+void sqlrexportcsv::escapeField(filedescriptor *fd,
+					const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		if (field[index]=='"') {
-			stdoutput.write("\"\"");
+			fd->write("\"\"");
 		} else if (field[index]<' ' || field[index]>'~' ||
 				field[index]=='&' || field[index]=='<' ||
 				field[index]=='>') {
-			stdoutput.printf("&%d;",(uint8_t)field[index]);
+			// FIXME: how should these be escaped in a CSV?
+			fd->printf("&%d;",(uint8_t)field[index]);
 		} else {
-			stdoutput.printf("%c",field[index]);
+			fd->write(field[index]);
 		}
 	}
 }

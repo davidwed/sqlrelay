@@ -26,7 +26,7 @@ class sqlrimport {
 
 		void	setShutdownFlag(bool *shuttingdown);
 
-		virtual	bool	parseFile(const char *filename)=0;
+		virtual	bool	importFromFile(const char *filename)=0;
 
 	#include <sqlrelay/private/sqlrimport.h>
 };

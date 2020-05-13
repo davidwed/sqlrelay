@@ -6,9 +6,7 @@
 #include <rudiments/file.h>
 
 sqlrexport::sqlrexport() {
-	sqlrcon=NULL;
 	sqlrcur=NULL;
-	dbtype=NULL;
 	ignorecolumns=false;
 	lg=NULL;
 	coarseloglevel=0;
@@ -21,17 +19,8 @@ sqlrexport::~sqlrexport() {
 	delete[] dbtype;
 }
 
-void sqlrexport::setSqlrConnection(sqlrconnection *sqlrcon) {
-	this->sqlrcon=sqlrcon;
-}
-
 void sqlrexport::setSqlrCursor(sqlrcursor *sqlrcur) {
 	this->sqlrcur=sqlrcur;
-}
-
-void sqlrexport::setDbType(const char *dbtype) {
-	delete[] this->dbtype;
-	this->dbtype=charstring::duplicate(dbtype);
 }
 
 void sqlrexport::setIgnoreColumns(bool ignorecolumns) {

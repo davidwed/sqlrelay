@@ -2,4 +2,5 @@
 // See the file COPYING for more information
 
 	private:
-		void	xmlEscapeField(const char *field, uint32_t length);
+		void	escapeField(filedescriptor *fd,
+					const char *field, uint32_t length);
