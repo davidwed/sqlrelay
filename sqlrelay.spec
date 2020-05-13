@@ -614,6 +614,24 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/sqlrresultsetdomnode.h
 %{_includedir}/%{name}/private/sqlrresultsetdomnode.h
 %{_includedir}/%{name}/private/sqlrresultsetdomnodeincludes.h
+%{_includedir}/%{name}/sqlrimport.h
+%{_includedir}/%{name}/sqlrimportcsv.h
+%{_includedir}/%{name}/sqlrimportxml.h
+%{_includedir}/%{name}/private/sqlrimport.h
+%{_includedir}/%{name}/private/sqlrimportincludes.h
+%{_includedir}/%{name}/private/sqlrimportcsv.h
+%{_includedir}/%{name}/private/sqlrimportcsvincludes.h
+%{_includedir}/%{name}/private/sqlrimportxml.h
+%{_includedir}/%{name}/private/sqlrimportxmlincludes.h
+%{_includedir}/%{name}/sqlrexport.h
+%{_includedir}/%{name}/sqlrexportcsv.h
+%{_includedir}/%{name}/sqlrexportxml.h
+%{_includedir}/%{name}/private/sqlrexport.h
+%{_includedir}/%{name}/private/sqlrexportincludes.h
+%{_includedir}/%{name}/private/sqlrexportcsv.h
+%{_includedir}/%{name}/private/sqlrexportcsvincludes.h
+%{_includedir}/%{name}/private/sqlrexportxml.h
+%{_includedir}/%{name}/private/sqlrexportxmlincludes.h
 %{_libdir}/libsqlrclient.so
 %{_libdir}/pkgconfig/%{name}-c++.pc
 %exclude %{_libdir}/lib*.la
@@ -773,9 +791,10 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Thu Jan 09 2020 David Muse <david.muse@firstworks.com> - 1.7.1-1
+* Wed May 13 2020 David Muse <david.muse@firstworks.com> - 1.7.1-1
 - Updated to version 1.7.1.
 - Added sqlrresultsetdomnode to C++ API.
+- Added sqlrimport/export to C++ API.
 
 * Fri Nov  8 2019 David Muse <david.muse@firstworks.com> - 1.7.0-1
 - Updated to version 1.7.0.
