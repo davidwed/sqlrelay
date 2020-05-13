@@ -19,7 +19,7 @@ sqlrimportcsv::~sqlrimportcsv() {
 	delete[] numbercolumn;
 }
 
-bool sqlrimportcsv::parseFile(const char *filename) {
+bool sqlrimportcsv::importFile(const char *filename) {
 	if (!table) {
 		table=file::basename(filename,".csv");
 	}

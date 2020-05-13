@@ -53,7 +53,7 @@ sqlrimportxml::~sqlrimportxml() {
 	delete[] numbercolumn;
 }
 
-bool sqlrimportxml::parseFile(const char *filename) {
+bool sqlrimportxml::importFile(const char *filename) {
 	return xmlsax::parseFile(filename);
 }
 

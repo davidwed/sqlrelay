@@ -11,7 +11,7 @@ class sqlrimportcsv : public sqlrimport, public csvsax {
 			sqlrimportcsv();
 			~sqlrimportcsv();
 
-		bool	parseFile(const char *filename);
+		bool	importFile(const char *filename);
 
 	#include <sqlrelay/private/sqlrimportcsv.h>
 };
