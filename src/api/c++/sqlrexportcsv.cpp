@@ -9,13 +9,9 @@ sqlrexportcsv::sqlrexportcsv() {
 sqlrexportcsv::~sqlrexportcsv() {
 }
 
-bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
-
-	// output to stdoutput or create/open file
-	filedescriptor	*fd=&stdoutput;
-	if (!charstring::isNullOrEmpty(filename)) {
-		// FIXME: create/open file
-	}
+bool sqlrexportcsv::exportToFileDescriptor(filedescriptor *fd,
+						const char *filename,
+						const char *table) {
 
 	// print header
 	uint32_t	cols=sqlrcur->colCount();

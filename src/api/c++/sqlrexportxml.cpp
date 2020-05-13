@@ -9,13 +9,9 @@ sqlrexportxml::sqlrexportxml() {
 sqlrexportxml::~sqlrexportxml() {
 }
 
-bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
-
-	// output to stdoutput or create/open file
-	filedescriptor	*fd=&stdoutput;
-	if (!charstring::isNullOrEmpty(filename)) {
-		// FIXME: create/open file
-	}
+bool sqlrexportxml::exportToFileDescriptor(filedescriptor *fd,
+						const char *filename,
+						const char *table) {
 
 	// print header
 	fd->printf("<?xml version=\"1.0\"?>\n");

@@ -30,7 +30,7 @@ static bool exportTable(sqlrcursor *sqlrcur,
 		sqlre=new sqlrexportxml();
 	}
 	sqlre->setSqlrCursor(sqlrcur);
-	bool	success=sqlre->exportToFile(NULL,table);
+	bool	success=sqlre->exportToFileDescriptor(&stdoutput,NULL,table);
 	delete sqlre;
 	return success;
 }
