@@ -11,8 +11,8 @@
 
 static void xmlEscapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
-		if (field[index]=='\'') {
-			stdoutput.printf("''");
+		if (field[index]=='"') {
+			stdoutput.write("\"\"");
 		} else if (field[index]<' ' || field[index]>'~' ||
 				field[index]=='&' || field[index]=='<' ||
 				field[index]=='>') {
@@ -26,8 +26,8 @@ static void xmlEscapeField(const char *field, uint32_t length) {
 static void csvEscapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		// escape double quotes and ignore non-ascii characters
-		if (field[index]=='"') {
-			stdoutput.printf("\"\"");
+		if (field[index]=='\'') {
+			stdoutput.write("''");
 		} else if (field[index]>=' ' || field[index]<='~') {
 			stdoutput.printf("%c",field[index]);
 		}
@@ -80,7 +80,15 @@ static void exportTableCsv(sqlrcursor *sqlrcur) {
 		if (j) {
 			stdoutput.printf(",");
 		}
-		stdoutput.printf("%s",sqlrcur->getColumnName(j));
+		const char	*name=sqlrcur->getColumnName(j);
+		bool		isnumber=charstring::isNumber(name);
+		if (!isnumber) {
+			stdoutput.write('\'');
+		}
+		csvEscapeField(name,charstring::length(name));
+		if (!isnumber) {
+			stdoutput.write('\'');
+		}
 	}
 	stdoutput.printf("\n");
 
@@ -93,13 +101,18 @@ static void exportTableCsv(sqlrcursor *sqlrcur) {
 				break;
 			}
 			if (col) {
-				stdoutput.printf(",");
+				stdoutput.write(',');
 			}
-			stdoutput.printf("\"");
+			bool	isnumber=charstring::isNumber(field);
+			if (!isnumber) {
+				stdoutput.write('\'');
+			}
 			csvEscapeField(field,sqlrcur->getFieldLength(row,col));
-			stdoutput.printf("\"");
+			if (!isnumber) {
+				stdoutput.write('\'');
+			}
 		}
-		stdoutput.printf("\n");
+		stdoutput.write('\n');
 		row++;
 		if (sqlrcur->endOfResultSet() && row>=sqlrcur->rowCount()) {
 			break;
