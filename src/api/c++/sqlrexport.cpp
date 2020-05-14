@@ -3,9 +3,6 @@
 
 #include <sqlrelay/sqlrexport.h>
 
-#include <rudiments/file.h>
-#include <rudiments/permissions.h>
-
 sqlrexport::sqlrexport() {
 	sqlrcur=NULL;
 	ignorecolumns=false;
@@ -17,7 +14,6 @@ sqlrexport::sqlrexport() {
 }
 
 sqlrexport::~sqlrexport() {
-	delete[] dbtype;
 }
 
 void sqlrexport::setSqlrCursor(sqlrcursor *sqlrcur) {
@@ -46,25 +42,4 @@ void sqlrexport::setLogIndent(uint32_t indent) {
 
 void sqlrexport::setShutdownFlag(bool *shutdownflag) {
 	this->shutdownflag=shutdownflag;
-}
-
-bool sqlrexport::exportToFile(const char *filename) {
-	return exportToFile(filename,NULL);
-}
-
-bool sqlrexport::exportToFile(const char *filename, const char *table) {
-
-	// output to stdoutput or create/open file
-	filedescriptor	*fd=&stdoutput;
-	file		f;
-	if (!charstring::isNullOrEmpty(filename)) {
-		if (!f.create(filename,
-				permissions::evalPermString("rw-r--r--"))) {
-			// FIXME: report error
-			return false;
-		}
-		fd=&f;
-	}
-
-	return exportToFileDescriptor(fd,filename,table);
 }

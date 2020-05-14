@@ -2,6 +2,9 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrexportcsv.h>
+#include <rudiments/filedescriptor.h>
+#include <rudiments/file.h>
+#include <rudiments/permissions.h>
 
 sqlrexportcsv::sqlrexportcsv() {
 }
@@ -9,9 +12,19 @@ sqlrexportcsv::sqlrexportcsv() {
 sqlrexportcsv::~sqlrexportcsv() {
 }
 
-bool sqlrexportcsv::exportToFileDescriptor(filedescriptor *fd,
-						const char *filename,
-						const char *table) {
+bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
+
+	// output to stdoutput or create/open file
+	filedescriptor	*fd=&stdoutput;
+	file		f;
+	if (!charstring::isNullOrEmpty(filename)) {
+		if (!f.create(filename,
+				permissions::evalPermString("rw-r--r--"))) {
+			// FIXME: report error
+			return false;
+		}
+		fd=&f;
+	}
 
 	// print header
 	uint32_t	cols=sqlrcur->colCount();

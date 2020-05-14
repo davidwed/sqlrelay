@@ -11,6 +11,8 @@ class sqlrexportcsv : public sqlrexport {
 			sqlrexportcsv();
 			~sqlrexportcsv();
 
+		bool	exportToFile(const char *filename, const char *table);
+
 	#include <sqlrelay/private/sqlrexportcsv.h>
 };
 

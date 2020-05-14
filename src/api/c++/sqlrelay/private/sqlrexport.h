@@ -4,7 +4,6 @@
 	protected:
 		sqlrconnection	*sqlrcon;
 		sqlrcursor	*sqlrcur;
-		char		*dbtype;
 		bool		ignorecolumns;
 		logger		*lg;
 		uint8_t		coarseloglevel;

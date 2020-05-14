@@ -22,12 +22,7 @@ class sqlrexport {
 
 		void	setShutdownFlag(bool *shuttingdown);
 
-		bool	exportToFile(const char *filename);
-		bool	exportToFile(const char *filename, const char *table);
-
-		virtual	bool	exportToFileDescriptor(
-						filedescriptor *fd,
-						const char *filename,
+		virtual	bool	exportToFile(const char *filename,
 						const char *table)=0;
 
 	#include <sqlrelay/private/sqlrexport.h>

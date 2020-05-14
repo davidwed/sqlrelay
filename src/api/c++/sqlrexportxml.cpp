@@ -2,6 +2,9 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrexportxml.h>
+#include <rudiments/filedescriptor.h>
+#include <rudiments/file.h>
+#include <rudiments/permissions.h>
 
 sqlrexportxml::sqlrexportxml() {
 }
@@ -9,9 +12,19 @@ sqlrexportxml::sqlrexportxml() {
 sqlrexportxml::~sqlrexportxml() {
 }
 
-bool sqlrexportxml::exportToFileDescriptor(filedescriptor *fd,
-						const char *filename,
-						const char *table) {
+bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
+
+	// output to stdoutput or create/open file
+	filedescriptor	*fd=&stdoutput;
+	file		f;
+	if (!charstring::isNullOrEmpty(filename)) {
+		if (!f.create(filename,
+				permissions::evalPermString("rw-r--r--"))) {
+			// FIXME: report error
+			return false;
+		}
+		fd=&f;
+	}
 
 	// print header
 	fd->printf("<?xml version=\"1.0\"?>\n");
