@@ -11,6 +11,7 @@ class sqlrexport {
 			sqlrexport();
 		virtual	~sqlrexport();
 
+		void	setSqlrConnection(sqlrconnection *sqlrconnection);
 		void	setSqlrCursor(sqlrcursor *sqlrcur);
 
 		void	setIgnoreColumns(bool ignorecolumns);
@@ -24,6 +25,13 @@ class sqlrexport {
 
 		virtual	bool	exportToFile(const char *filename,
 						const char *table)=0;
+
+		virtual	bool	rowsStart();
+		virtual	bool	rowStart();
+		virtual	bool	colStart();
+		virtual	bool	colEnd();
+		virtual	bool	rowEnd();
+		virtual	bool	rowsEnd();
 
 	#include <sqlrelay/private/sqlrexport.h>
 };

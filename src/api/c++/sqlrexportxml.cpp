@@ -14,6 +14,12 @@ sqlrexportxml::~sqlrexportxml() {
 
 bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 
+	// reset flags
+	exportrow=true;
+	currentrow=0;
+	currentcol=0;
+	currentfield=NULL;
+
 	// output to stdoutput or create/open file
 	filedescriptor	*fd=&stdoutput;
 	file		f;
@@ -46,40 +52,81 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 		fd->printf("</columns>\n");
 	}
 
-	// print rows
+	// call the pre-rows event
+	if (!rowsStart()) {
+		return false;
+	}
+
+	// export rows
 	fd->printf("<rows>\n");
-	uint64_t	row=0;
 	do {
-		fd->printf("	<row>\n");
-		for (uint32_t col=0; col<cols; col++) {
-			const char	*field=sqlrcur->getField(row,col);
-			if (!field) {
-				break;
-			}
-			fd->printf("	<field>");
-			escapeField(fd,field,sqlrcur->getFieldLength(row,col));
-			fd->printf("</field>\n");
+
+		// reset export-row flag
+		exportrow=true;
+
+		// call the pre-row event
+		if (!rowStart()) {
+			return false;
 		}
-		fd->printf("	</row>\n");
-		row++;
-	} while (!sqlrcur->endOfResultSet() || row<sqlrcur->rowCount());
+
+		// if rowStart() didn't disable export of this row...
+		if (exportrow) {
+			fd->printf("	<row>\n");
+			for (currentcol=0; currentcol<cols; currentcol++) {
+
+				// get the field
+				currentfield=sqlrcur->getField(
+						currentrow,currentcol);
+				if (!currentfield) {
+					break;
+				}
+
+				// call the pre-column event
+				if (!colStart()) {
+					return false;
+				}
+
+				// export the field
+				fd->printf("	<field>");
+				escapeField(fd,currentfield);
+				fd->printf("</field>\n");
+
+				// call the post-column event
+				if (!colEnd()) {
+					return false;
+				}
+			}
+			fd->printf("	</row>\n");
+		}
+
+		// call the post-row event
+		if (!rowEnd()) {
+			return false;
+		}
+
+		currentrow++;
+
+	} while (!sqlrcur->endOfResultSet() || currentrow<sqlrcur->rowCount());
+
 	fd->printf("</rows>\n");
 	fd->printf("</table>\n");
+
+	// call the post-rows event
+	if (!rowsEnd()) {
+		return false;
+	}
 
 	return true;
 }
 
-void sqlrexportxml::escapeField(filedescriptor *fd,
-					const char *field, uint32_t length) {
-	for (uint32_t index=0; index<length; index++) {
-		if (field[index]=='"') {
+void sqlrexportxml::escapeField(filedescriptor *fd, const char *field) {
+	for (const char *f=field; *f; f++) {
+		if (*f=='"') {
 			fd->write("\"\"");
-		} else if (field[index]<' ' || field[index]>'~' ||
-				field[index]=='&' || field[index]=='<' ||
-				field[index]=='>') {
-			fd->printf("&%d;",(uint8_t)field[index]);
+		} else if (*f<' ' || *f>'~' || *f=='&' || *f=='<' || *f=='>') {
+			fd->printf("&%d;",(uint8_t)*f);
 		} else {
-			fd->write(field[index]);
+			fd->write(*f);
 		}
 	}
 }

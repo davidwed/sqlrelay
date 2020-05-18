@@ -14,6 +14,12 @@ sqlrexportcsv::~sqlrexportcsv() {
 
 bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 
+	// reset flags
+	exportrow=true;
+	currentrow=0;
+	currentcol=0;
+	currentfield=NULL;
+
 	// output to stdoutput or create/open file
 	filedescriptor	*fd=&stdoutput;
 	file		f;
@@ -26,7 +32,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 		fd=&f;
 	}
 
-	// print header
+	// export header
 	uint32_t	cols=sqlrcur->colCount();
 	if (!ignorecolumns) {
 		for (uint32_t j=0; j<cols; j++) {
@@ -38,7 +44,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 			if (!isnumber) {
 				fd->write('"');
 			}
-			escapeField(fd,name,charstring::length(name));
+			escapeField(fd,name);
 			if (!isnumber) {
 				fd->write('"');
 			}
@@ -46,48 +52,85 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 		fd->printf("\n");
 	}
 
-	// print rows
-	uint64_t	row=0;
-	for (;;) {
-		for (uint32_t col=0; col<cols; col++) {
-			const char	*field=sqlrcur->getField(row,col);
-			if (!field) {
-				break;
-			}
-			if (col) {
-				fd->write(',');
-			}
-			bool	isnumber=charstring::isNumber(field);
-			if (!isnumber) {
-				fd->write('"');
-			}
-			escapeField(fd,field,sqlrcur->getFieldLength(row,col));
-			if (!isnumber) {
-				fd->write('"');
-			}
+	// call the pre-rows event
+	if (!rowsStart()) {
+		return false;
+	}
+
+	// export rows...
+	do {
+
+		// reset export-row flag
+		exportrow=true;
+
+		// call the pre-row event
+		if (!rowStart()) {
+			return false;
 		}
-		fd->write('\n');
-		row++;
-		if (sqlrcur->endOfResultSet() && row>=sqlrcur->rowCount()) {
-			break;
+
+		// if rowStart() didn't disable export of this row...
+		if (exportrow) {
+			for (currentcol=0; currentcol<cols; currentcol++) {
+
+				// get the field
+				currentfield=sqlrcur->getField(
+							currentrow,currentcol);
+				if (!currentfield) {
+					break;
+				}
+
+				// prepend a comma if necessary
+				if (currentcol) {
+					fd->write(',');
+				}
+
+				// call the pre-column event
+				if (!colStart()) {
+					return false;
+				}
+
+				// export the field
+				bool	isnumber=
+					charstring::isNumber(currentfield);
+				if (!isnumber) {
+					fd->write('"');
+				}
+				escapeField(fd,currentfield);
+				if (!isnumber) {
+					fd->write('"');
+				}
+
+				// call the post-column event
+				if (!colEnd()) {
+					return false;
+				}
+			}
+			fd->write('\n');
 		}
+
+		// call the post-row event
+		if (!rowEnd()) {
+			return false;
+		}
+
+		currentrow++;
+
+	} while  (!sqlrcur->endOfResultSet() || currentrow<sqlrcur->rowCount());
+
+	// call the post-rows event
+	if (!rowsEnd()) {
+		return false;
 	}
 
 	return true;
 }
 
-void sqlrexportcsv::escapeField(filedescriptor *fd,
-					const char *field, uint32_t length) {
-	for (uint32_t index=0; index<length; index++) {
-		if (field[index]=='"') {
+void sqlrexportcsv::escapeField(filedescriptor *fd, const char *field) {
+	for (const char *f=field; *f; f++) {
+		if (*f=='"') {
 			fd->write("\"\"");
-		} else if (field[index]<' ' || field[index]>'~' ||
-				field[index]=='&' || field[index]=='<' ||
-				field[index]=='>') {
-			// FIXME: how should these be escaped in a CSV?
-			fd->printf("&%d;",(uint8_t)field[index]);
 		} else {
-			fd->write(field[index]);
+			fd->write(*f);
 		}
 	}
 }

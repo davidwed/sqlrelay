@@ -24,7 +24,6 @@
 #define NEED_IS_NONSCALE_FLOAT_TYPE_CHAR 1
 #include <datatypes.h>
 #include <defines.h>
-#include <parsedatetime.h>
 #include <version.h>
 // FIXME: use rudiments locale class instead
 #include <locale.h>
@@ -1747,7 +1746,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		int16_t	second;
 		int32_t	microsecond;
 		bool	isnegative;
-		parseDateTime(value,false,false,"/",
+		datetime::parse(value,false,false,"/",
 					&year,&month,&day,
 					&hour,&minute,&second,
 					&microsecond,&isnegative);
@@ -2019,7 +2018,7 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 			int16_t	second;
 			int32_t	microsecond;
 			bool	isnegative;
-			parseDateTime(value,false,false,"/",
+			datetime::parse(value,false,false,"/",
 						&year,&month,&day,
 						&hour,&minute,&second,
 						&microsecond,&isnegative);

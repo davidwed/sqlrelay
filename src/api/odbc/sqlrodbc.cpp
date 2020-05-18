@@ -11,6 +11,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/character.h>
 #include <rudiments/environment.h>
+#include <rudiments/datetime.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
 /*#ifdef _WIN32
@@ -40,7 +41,6 @@
 #include <sqlext.h>
 #include <odbcinst.h>
 
-#include <parsedatetime.h>
 #include <defines.h>
 
 #ifndef SQL_NULL_DESC
@@ -4342,7 +4342,7 @@ static void SQLR_ParseDate(DATE_STRUCT *ds, const char *value) {
 	}
 
 	// parse
-	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
+	datetime::parse(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
 				&hour,&minute,&second,&usec,&isnegative);
 
 	// copy data out
@@ -4379,7 +4379,7 @@ static void SQLR_ParseTime(TIME_STRUCT *ts, const char *value) {
 	}
 
 	// parse
-	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
+	datetime::parse(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
 				&hour,&minute,&second,&usec,&isnegative);
 
 	// copy data out
@@ -4416,7 +4416,7 @@ static void SQLR_ParseTimeStamp(TIMESTAMP_STRUCT *tss, const char *value) {
 	}
 
 	// parse
-	parseDateTime(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
+	datetime::parse(value,ddmm,yyyyddmm,"/-:",&year,&month,&day,
 				&hour,&minute,&second,&usec,&isnegative);
 
 	// copy data out

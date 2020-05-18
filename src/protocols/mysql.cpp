@@ -6,6 +6,7 @@
 #include <rudiments/character.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/process.h>
+#include <rudiments/datetime.h>
 #include <rudiments/error.h>
 
 #include <defines.h>
@@ -3582,7 +3583,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 			int32_t	usec;
 			bool	isnegative;
 			// FIXME: set ddmm and yyyyddmm somehow
-			cont->parseDateTime(field,false,false,"/-.:",
+			datetime::parse(field,false,false,"/-.:",
 					&year,&month,&day,
 					&hour,&minute,&second,
 					&usec,&isnegative);
@@ -3638,7 +3639,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 			int16_t	second;
 			int32_t	usec;
 			bool	isnegative;
-			cont->parseDateTime(field,false,false,"/-.:",
+			datetime::parse(field,false,false,"/-.:",
 					&year,&month,&day,
 					&hour,&minute,&second,
 					&usec,&isnegative);

@@ -47,8 +47,6 @@
 #define NEED_IS_DATETIME_TYPE_CHAR 1
 #define NEED_IS_DATETIME_TYPE_INT 1
 #include <datatypes.h>
-#define NEED_CONVERT_DATE_TIME 1
-#include <parsedatetime.h>
 #define NEED_BEFORE_BIND_VARIABLE 1
 #define NEED_IS_BIND_DELIMITER 1
 #define NEED_AFTER_BIND_VARIABLE 1
@@ -3076,26 +3074,6 @@ const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
 	return ptr;
 }
 
-bool sqlrservercontroller::parseDateTime(
-				const char *datetime, bool ddmm, bool yyyyddmm,
-				const char *datedelimiters,
-				int16_t *year, int16_t *month, int16_t *day,
-				int16_t *hour, int16_t *minute, int16_t *second,
-				int32_t *microsecond, bool *isnegative) {
-	return ::parseDateTime(datetime,ddmm,yyyyddmm,datedelimiters,
-				year,month,day,hour,minute,second,microsecond,
-				isnegative);
-}
-
-char *sqlrservercontroller::convertDateTime(const char *format,
-				int16_t year, int16_t month, int16_t day,
-				int16_t hour, int16_t minute, int16_t second,
-				int32_t microsecond, bool isnegative) {
-	return ::convertDateTime(format,year,month,day,
-				hour,minute,second,microsecond,
-				isnegative);
-}
-
 static const char *asciitohex[]={
 	"00","01","02","03","04","05","06","07",
 	"08","09","0A","0B","0C","0D","0E","0F",
@@ -5472,7 +5450,7 @@ bool sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	int16_t	second=-1;
 	int32_t	microsecond=-1;
 	bool	isnegative=false;
-	if (!parseDateTime(field,ddmm,yyyyddmm,
+	if (!datetime::parse(field,ddmm,yyyyddmm,
 				datedelimiters,
 				&year,&month,&day,
 				&hour,&minute,&second,
@@ -5491,10 +5469,10 @@ bool sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 
 	// convert to the specified format
 	delete[] pvt->_reformattedfield;
-	pvt->_reformattedfield=convertDateTime(format,
-					year,month,day,
-					hour,minute,second,
-					microsecond,isnegative);
+	pvt->_reformattedfield=datetime::formatAs(format,
+						year,month,day,
+						hour,minute,second,
+						microsecond,isnegative);
 	pvt->_reformattedfieldlength=charstring::length(pvt->_reformattedfield);
 
 	if (pvt->_debugsqlrresultsettranslation) {
@@ -7254,7 +7232,7 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 				// but who knows what we'll actually get, the
 				// ddmm, yyyyddmm, and delimiter parameters need
 				// to be configurable...
-				if (!parseDateTime(
+				if (!datetime::parse(
 						temp,
 						false,
 						false,

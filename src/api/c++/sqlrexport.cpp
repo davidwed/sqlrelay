@@ -4,8 +4,13 @@
 #include <sqlrelay/sqlrexport.h>
 
 sqlrexport::sqlrexport() {
+	sqlrcon=NULL;
 	sqlrcur=NULL;
 	ignorecolumns=false;
+	exportrow=true;
+	currentrow=0;
+	currentcol=0;
+	currentfield=NULL;
 	lg=NULL;
 	coarseloglevel=0;
 	fineloglevel=0;
@@ -14,6 +19,10 @@ sqlrexport::sqlrexport() {
 }
 
 sqlrexport::~sqlrexport() {
+}
+
+void sqlrexport::setSqlrConnection(sqlrconnection *sqlrcon) {
+	this->sqlrcon=sqlrcon;
 }
 
 void sqlrexport::setSqlrCursor(sqlrcursor *sqlrcur) {
@@ -42,4 +51,34 @@ void sqlrexport::setLogIndent(uint32_t indent) {
 
 void sqlrexport::setShutdownFlag(bool *shutdownflag) {
 	this->shutdownflag=shutdownflag;
+}
+
+bool sqlrexport::rowsStart() {
+	// by default, just return success
+	return true;
+}
+
+bool sqlrexport::rowStart() {
+	// by default, just return success
+	return true;
+}
+
+bool sqlrexport::colStart() {
+	// by default, just return success
+	return true;
+}
+
+bool sqlrexport::colEnd() {
+	// by default, just return success
+	return true;
+}
+
+bool sqlrexport::rowEnd() {
+	// by default, just return success
+	return true;
+}
+
+bool sqlrexport::rowsEnd() {
+	// by default, just return success
+	return true;
 }
