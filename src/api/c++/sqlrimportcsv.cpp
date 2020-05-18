@@ -4,11 +4,17 @@
 #include <sqlrelay/sqlrimportcsv.h>
 
 #include <rudiments/file.h>
+#include <rudiments/datetime.h>
+
+#define NEED_IS_NUMBER_TYPE_CHAR
+#define NEED_IS_DATETIME_TYPE_CHAR
+#include <datatypes.h>
 
 sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 	colcount=0;
 	currentcol=0;
 	numbercolumn=NULL;
+	datecolumn=NULL;
 	foundfieldtext=false;
 	fieldcount=0;
 	rowcount=0;
@@ -17,6 +23,7 @@ sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 
 sqlrimportcsv::~sqlrimportcsv() {
 	delete[] numbercolumn;
+	delete[] datecolumn;
 }
 
 bool sqlrimportcsv::importFromFile(const char *filename) {
@@ -28,19 +35,37 @@ bool sqlrimportcsv::importFromFile(const char *filename) {
 
 bool sqlrimportcsv::column(const char *name, bool quoted) {
 	if (!ignorecolumns) {
-		if (colcount) {
+		if (currentcol) {
 			columns.append(',');
 		}
 		columns.append(name);
-		colcount++;
+		currentcol++;
 	}
 	return true;
 }
 
 bool sqlrimportcsv::headerEnd() {
-	// FIXME: describe the table, set this and use it rather than
-	// calling isNumber in field() below
+
+	// get column info
+	query.clear();
+	query.append("select ");
+	if (ignorecolumns) {
+		query.append('*');
+	} else {
+		query.append(columns.getString());
+	}
+	query.append(" from ")->append(table);
+	sqlrcur->setResultSetBufferSize(1);
+	if (!sqlrcur->sendQuery(query.getString())) {
+		return false;
+	}
+	colcount=sqlrcur->colCount();
 	numbercolumn=new bool[colcount];
+	datecolumn=new bool[colcount];
+	for (uint32_t i=0; i<colcount; i++) {
+		numbercolumn[i]=isNumberTypeChar(sqlrcur->getColumnType(i));
+		datecolumn[i]=isDateTimeTypeChar(sqlrcur->getColumnType(i));
+	}
 	if (lg) {
 		lg->write(coarseloglevel,NULL,logindent,
 				"%ld columns",(unsigned long)colcount);
@@ -57,7 +82,7 @@ bool sqlrimportcsv::bodyStart() {
 bool sqlrimportcsv::rowStart() {
 	query.clear();
 	query.append("insert into ")->append(table);
-	if (colcount) {
+	if (!ignorecolumns) {
 		query.append(" (")->append(columns.getString())->append(")");
 	}
 	query.append(" values (");
@@ -71,13 +96,37 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		query.append(",");
 	}
 	if (!charstring::isNullOrEmpty(value)) {
-		// FIXME: get column type and use that intead of isNumber
-		bool	isnumber=charstring::isNumber(value);
-		if (!isnumber) {
+		bool	isnumber=numbercolumn[currentcol];
+		bool	isdate=datecolumn[currentcol];
+		if (!isnumber || isdate) {
 			query.append('\'');
 		}
-		escapeField(&query,value);
-		if (!isnumber) {
+		if (isdate) {
+			int16_t year;
+			int16_t month;
+			int16_t day;
+			int16_t hour;
+			int16_t minute;
+			int16_t second;
+			int32_t microsecond;
+			bool isnegative;
+			// FIXME: pass in ddmm, yyyyddmm, datedelimiters
+			datetime::parse(value,false,false,"-/",
+					&year,&month,&day,
+					&hour,&minute,&second,&microsecond,
+					&isnegative);
+			// FIXME: what about microseconds and negatives?
+			char	*dt=datetime::formatAs(
+						"YYYY-MM-DD HH24:MI:SS",
+						year,month,day,
+						hour,minute,second,
+						microsecond,isnegative);
+			query.append(dt);
+			delete[] dt;
+		} else {
+			escapeField(&query,value);
+		}
+		if (!isnumber || isdate) {
 			query.append('\'');
 		}
 	} else {
@@ -134,7 +183,7 @@ bool sqlrimportcsv::bodyEnd() {
 	sqlrcon->commit();
 	if (lg) {
 		lg->write(coarseloglevel,NULL,logindent,
-				"  committed %lld rows (to %s)",
+				"committed %lld rows (to %s)",
 				(unsigned long long)rowcount,table);
 	}
 	return true;

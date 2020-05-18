@@ -17,6 +17,7 @@
 		uint32_t	colcount;
 		uint32_t	currentcol;
 		bool		*numbercolumn;
+		bool		*datecolumn;
 		bool		foundfieldtext;
 		uint32_t	fieldcount;
 		uint64_t	rowcount;
