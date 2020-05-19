@@ -22,7 +22,7 @@ class sqlrimport {
 		void	setLogger(logger *lg);
 		void	setCoarseLogLevel(uint8_t coarseloglevel);
 		void	setFineLogLevel(uint8_t fineloglevel);
-		void	setLogIndent(uint32_t indent);
+		void	setLogIndent(uint32_t logindent);
 
 		void	setShutdownFlag(bool *shuttingdown);
 

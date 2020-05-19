@@ -62,7 +62,7 @@ void sqlrimport::setFineLogLevel(uint8_t fineloglevel) {
 	this->fineloglevel=fineloglevel;
 }
 
-void sqlrimport::setLogIndent(uint32_t indent) {
+void sqlrimport::setLogIndent(uint32_t logindent) {
 	this->logindent=logindent;
 }
 
