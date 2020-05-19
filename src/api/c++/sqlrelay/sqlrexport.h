@@ -16,6 +16,8 @@ class sqlrexport {
 
 		void	setIgnoreColumns(bool ignorecolumns);
 
+		void	setFieldsToIgnore(const char * const *fieldstoignore);
+
 		void	setLogger(logger *lg);
 		void	setCoarseLogLevel(uint8_t coarseloglevel);
 		void	setFineLogLevel(uint8_t fineloglevel);

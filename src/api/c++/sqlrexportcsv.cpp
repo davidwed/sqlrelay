@@ -35,11 +35,17 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	// export header
 	uint32_t	cols=sqlrcur->colCount();
 	if (!ignorecolumns) {
+		bool	first=true;
 		for (uint32_t j=0; j<cols; j++) {
-			if (j) {
+			const char	*name=sqlrcur->getColumnName(j);
+			if (charstring::inSet(name,fieldstoignore)) {
+				continue;
+			}
+			if (first) {
+				first=false;
+			} else {
 				fd->printf(",");
 			}
-			const char	*name=sqlrcur->getColumnName(j);
 			bool		isnumber=charstring::isNumber(name);
 			if (!isnumber) {
 				fd->write('"');
@@ -70,7 +76,18 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 
 		// if rowStart() didn't disable export of this row...
 		if (exportrow) {
+			bool	first=true;
 			for (currentcol=0; currentcol<cols; currentcol++) {
+
+				// ignore particular fields
+				if (fieldstoignore) {
+					if (charstring::inSet(
+						sqlrcur->getColumnName(
+								currentcol),
+						fieldstoignore)) {
+						continue;
+					}
+				}
 
 				// get the field
 				currentfield=sqlrcur->getField(
@@ -80,7 +97,9 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 				}
 
 				// prepend a comma if necessary
-				if (currentcol) {
+				if (first) {
+					first=false;
+				} else {
 					fd->write(',');
 				}
 

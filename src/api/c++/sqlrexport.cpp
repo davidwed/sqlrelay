@@ -7,6 +7,7 @@ sqlrexport::sqlrexport() {
 	sqlrcon=NULL;
 	sqlrcur=NULL;
 	ignorecolumns=false;
+	fieldstoignore=NULL;
 	exportrow=true;
 	currentrow=0;
 	currentcol=0;
@@ -31,6 +32,10 @@ void sqlrexport::setSqlrCursor(sqlrcursor *sqlrcur) {
 
 void sqlrexport::setIgnoreColumns(bool ignorecolumns) {
 	this->ignorecolumns=ignorecolumns;
+}
+
+void sqlrexport::setFieldsToIgnore(const char * const *fieldstoignore) {
+	this->fieldstoignore=fieldstoignore;
 }
 
 void sqlrexport::setLogger(logger *lg) {
