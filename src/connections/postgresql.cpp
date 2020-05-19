@@ -14,7 +14,8 @@
 
 #include <libpq-fe.h>
 
-//#undef HAVE_POSTGRESQL_PQSENDQUERYPREPARED
+// FIXME: I get weird bind issues (sometimes) when I use this...
+#undef HAVE_POSTGRESQL_PQSENDQUERYPREPARED
 
 class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 	friend class postgresqlcursor;
