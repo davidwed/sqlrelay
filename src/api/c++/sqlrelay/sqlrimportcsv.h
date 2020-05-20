@@ -11,8 +11,8 @@ class sqlrimportcsv : public sqlrimport, public csvsax {
 			sqlrimportcsv();
 			~sqlrimportcsv();
 
-		void	setPrimaryKeyPosition(uint32_t primarykeyposition);
 		void	setPrimaryKeyName(const char *primarykeyname);
+		void	setPrimaryKeyPosition(uint32_t primarykeyposition);
 		void	setPrimaryKeySequence(const char *primarykeysequence);
 
 		bool	importFromFile(const char *filename);

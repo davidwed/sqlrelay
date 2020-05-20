@@ -11,8 +11,8 @@
 #include <datatypes.h>
 
 sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
-	primarykeyposition=0;
 	primarykeyname=NULL;
+	primarykeyposition=0;
 	primarykeysequence=NULL;
 	colcount=0;
 	currentcol=0;
@@ -31,13 +31,13 @@ sqlrimportcsv::~sqlrimportcsv() {
 	delete[] datecolumn;
 }
 
-void sqlrimportcsv::setPrimaryKeyPosition(uint32_t primarykeyposition) {
-	this->primarykeyposition=primarykeyposition;
-}
-
 void sqlrimportcsv::setPrimaryKeyName(const char *primarykeyname) {
 	delete[] this->primarykeyname;
 	this->primarykeyname=charstring::duplicate(primarykeyname);
+}
+
+void sqlrimportcsv::setPrimaryKeyPosition(uint32_t primarykeyposition) {
+	this->primarykeyposition=primarykeyposition;
 }
 
 void sqlrimportcsv::setPrimaryKeySequence(const char *primarykeysequence) {
@@ -84,9 +84,15 @@ bool sqlrimportcsv::headerEnd() {
 	colcount=sqlrcur->colCount();
 	numbercolumn=new bool[colcount];
 	datecolumn=new bool[colcount];
-	for (uint32_t i=0; i<colcount; i++) {
-		numbercolumn[i]=isNumberTypeChar(sqlrcur->getColumnType(i));
-		datecolumn[i]=isDateTimeTypeChar(sqlrcur->getColumnType(i));
+	for (uint32_t i=0, j=0; i<colcount; i++) {
+		// if this is the primary key column then skip it
+		// (and don't increment j)
+		if (ignorecolumns && primarykeyname && i==primarykeyposition) {
+			continue;
+		}
+		numbercolumn[j]=isNumberTypeChar(sqlrcur->getColumnType(i));
+		datecolumn[j]=isDateTimeTypeChar(sqlrcur->getColumnType(i));
+		j++;
 	}
 	if (lg) {
 		lg->write(coarseloglevel,NULL,logindent,
