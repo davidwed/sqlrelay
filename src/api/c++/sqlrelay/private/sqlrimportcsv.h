@@ -12,6 +12,10 @@
 
 		void	escapeField(stringbuffer *strb, const char *field);
 
+		uint32_t	primarykeyposition;
+		char		*primarykeyname;
+		char		*primarykeysequence;
+
 		stringbuffer	query;
 		stringbuffer	columns;
 		uint32_t	colcount;

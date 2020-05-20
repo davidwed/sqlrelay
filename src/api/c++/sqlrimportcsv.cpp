@@ -11,6 +11,9 @@
 #include <datatypes.h>
 
 sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
+	primarykeyposition=0;
+	primarykeyname=NULL;
+	primarykeysequence=NULL;
 	colcount=0;
 	currentcol=0;
 	numbercolumn=NULL;
@@ -22,8 +25,24 @@ sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 }
 
 sqlrimportcsv::~sqlrimportcsv() {
+	delete[] primarykeyname;
+	delete[] primarykeysequence;
 	delete[] numbercolumn;
 	delete[] datecolumn;
+}
+
+void sqlrimportcsv::setPrimaryKeyPosition(uint32_t primarykeyposition) {
+	this->primarykeyposition=primarykeyposition;
+}
+
+void sqlrimportcsv::setPrimaryKeyName(const char *primarykeyname) {
+	delete[] this->primarykeyname;
+	this->primarykeyname=charstring::duplicate(primarykeyname);
+}
+
+void sqlrimportcsv::setPrimaryKeySequence(const char *primarykeysequence) {
+	delete[] this->primarykeysequence;
+	this->primarykeysequence=charstring::duplicate(primarykeysequence);
 }
 
 bool sqlrimportcsv::importFromFile(const char *filename) {
@@ -37,6 +56,9 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 	if (!ignorecolumns) {
 		if (currentcol) {
 			columns.append(',');
+		}
+		if (primarykeyname && currentcol==primarykeyposition) {
+			columns.append(primarykeyname)->append(',');
 		}
 		columns.append(name);
 		currentcol++;
@@ -94,6 +116,15 @@ bool sqlrimportcsv::rowStart() {
 bool sqlrimportcsv::field(const char *value, bool quoted) {
 	if (currentcol) {
 		query.append(",");
+	}
+	if (primarykeyname && currentcol==primarykeyposition) {
+		if (primarykeysequence) {
+			query.append("nextval('");
+			query.append(primarykeyname);
+			query.append("'),");
+		} else {
+			query.append("null,");
+		}
 	}
 	if (!charstring::isNullOrEmpty(value)) {
 		bool	isnumber=numbercolumn[currentcol];
