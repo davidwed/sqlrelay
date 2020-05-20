@@ -126,7 +126,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 	if (primarykeyname && currentcol==primarykeyposition) {
 		if (primarykeysequence) {
 			query.append("nextval('");
-			query.append(primarykeyname);
+			query.append(primarykeysequence);
 			query.append("'),");
 		} else {
 			query.append("null,");
