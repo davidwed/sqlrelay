@@ -6,6 +6,9 @@
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 
+#define NEED_IS_NUMBER_TYPE_CHAR
+#include <datatypes.h>
+
 sqlrexportcsv::sqlrexportcsv() {
 }
 
@@ -34,19 +37,22 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 
 	// export header
 	uint32_t	cols=sqlrcur->colCount();
-	if (!ignorecolumns) {
-		bool	first=true;
-		for (uint32_t j=0; j<cols; j++) {
-			const char	*name=sqlrcur->getColumnName(j);
-			if (charstring::inSet(name,fieldstoignore)) {
-				continue;
-			}
+	delete[] numbercolumns;
+	numbercolumns=new bool[cols];
+	bool	first=true;
+	for (uint32_t j=0; j<cols; j++) {
+		numbercolumns[j]=isNumberTypeChar(sqlrcur->getColumnType(j));
+		const char	*name=sqlrcur->getColumnName(j);
+		if (charstring::inSet(name,fieldstoignore)) {
+			continue;
+		}
+		if (!ignorecolumns) {
 			if (first) {
 				first=false;
 			} else {
 				fd->printf(",");
 			}
-			bool		isnumber=charstring::isNumber(name);
+			bool	isnumber=charstring::isNumber(name);
 			if (!isnumber) {
 				fd->write('"');
 			}
@@ -55,6 +61,8 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 				fd->write('"');
 			}
 		}
+	}
+	if (!ignorecolumns) {
 		fd->printf("\n");
 	}
 
@@ -109,8 +117,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 				}
 
 				// export the field
-				bool	isnumber=
-					charstring::isNumber(currentfield);
+				bool	isnumber=numbercolumns[currentcol];
 				if (!isnumber) {
 					fd->write('"');
 				}

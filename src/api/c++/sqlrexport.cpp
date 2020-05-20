@@ -17,9 +17,11 @@ sqlrexport::sqlrexport() {
 	fineloglevel=0;
 	logindent=0;
 	shutdownflag=NULL;
+	numbercolumns=NULL;
 }
 
 sqlrexport::~sqlrexport() {
+	delete[] numbercolumns;
 }
 
 void sqlrexport::setSqlrConnection(sqlrconnection *sqlrcon) {

@@ -6,6 +6,9 @@
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 
+#define NEED_IS_NUMBER_TYPE_CHAR
+#include <datatypes.h>
+
 sqlrexportxml::sqlrexportxml() {
 }
 
@@ -32,25 +35,30 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 		fd=&f;
 	}
 
-	// print header
+	// export header
 	fd->printf("<?xml version=\"1.0\"?>\n");
 
-	// print table name
+	// export table name
 	if (!charstring::isNullOrEmpty(table)) {
 		fd->printf("<table name=\"%s\">\n",table);
 	}
 
-	// print columns
+	// export columns
 	uint32_t	cols=sqlrcur->colCount();
-	if (!ignorecolumns) {
-		for (uint32_t j=0; j<cols; j++) {
-			if (charstring::inSet(sqlrcur->getColumnName(j),
-							fieldstoignore)) {
-				cols--;
-			}
+	delete[] numbercolumns;
+	numbercolumns=new bool[cols];
+	for (uint32_t j=0; j<cols; j++) {
+		numbercolumns[j]=isNumberTypeChar(sqlrcur->getColumnType(j));
+		if (charstring::inSet(sqlrcur->getColumnName(j),
+						fieldstoignore)) {
+			cols--;
 		}
+	}
+	if (!ignorecolumns) {
 		fd->printf("<columns count=\"%d\">\n",cols);
-		cols=sqlrcur->colCount();
+	}
+	cols=sqlrcur->colCount();
+	if (!ignorecolumns) {
 		for (uint32_t j=0; j<cols; j++) {
 			const char	*name=sqlrcur->getColumnName(j);
 			if (charstring::inSet(name,fieldstoignore)) {
