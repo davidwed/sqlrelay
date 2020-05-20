@@ -14,8 +14,7 @@
 
 #include <libpq-fe.h>
 
-// FIXME: I get weird bind issues (sometimes) when I use this...
-#undef HAVE_POSTGRESQL_PQSENDQUERYPREPARED
+//#undef HAVE_POSTGRESQL_PQSENDQUERYPREPARED
 
 class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 	friend class postgresqlcursor;
@@ -174,6 +173,7 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
 		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
+		void		deallocateNamedStatement();
 		bool		columnInfoIsValidAfterPrepare();
 #endif
 
@@ -193,6 +193,9 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+		char		*cursorid;
+		stringbuffer	deallocatecursorid;
+		bool		allocated;
 		uint16_t	maxbindcount;
 		char		**bindvalues;
 		int		*bindlengths;
@@ -719,6 +722,15 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+	if (id) {
+		charstring::printf(&cursorid,"%s-%d",
+					conn->cont->getConnectionId(),id);
+		charstring::replace(cursorid,'-','_');
+	} else {
+		cursorid=charstring::duplicate("");
+	}
+	deallocatecursorid.append("deallocate ")->append(cursorid);
+	allocated=false;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	bindvalues=new char *[maxbindcount];
 	bytestring::zero(bindvalues,maxbindcount*sizeof(char *));
@@ -748,6 +760,8 @@ postgresqlcursor::~postgresqlcursor() {
 	delete[] bindvalues;
 	delete[] bindlengths;
 	delete[] bindformats;
+	deallocateNamedStatement();
+	delete[] cursorid;
 #endif
 	for (uint32_t i=0; i<conn->cont->getMaxColumnCount(); i++) {
 		delete[] typenamebuffer[i];
@@ -770,8 +784,12 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// reset the bind format error flag
 	bindformaterror=false;
 
+	// deallocate named statement
+	deallocateNamedStatement();
+
 	// prepare the query
-	pgresult=PQprepare(postgresqlconn->pgconn,"",query,0,NULL);
+	pgresult=PQprepare(postgresqlconn->pgconn,cursorid,query,0,NULL);
+	allocated=true;
 
 	// handle some kind of outright failure
 	if (!pgresult) {
@@ -799,7 +817,7 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	}
 	
 	// describe the query (get column info)
-	pgresult=PQdescribePrepared(postgresqlconn->pgconn,"");
+	pgresult=PQdescribePrepared(postgresqlconn->pgconn,cursorid);
 
 	// handle some kind of outright failure
 	if (!pgresult) {
@@ -1009,7 +1027,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	int	result=1;
 	if (bindcounter) {
-		result=PQsendQueryPrepared(postgresqlconn->pgconn,"",
+		result=PQsendQueryPrepared(postgresqlconn->pgconn,cursorid,
 						bindcounter,bindvalues,
 						bindlengths,bindformats,0);
 		bindcounter=0;
@@ -1035,7 +1053,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 #elif defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	if (bindcounter) {
-		pgresult=PQexecPrepared(postgresqlconn->pgconn,"",
+		pgresult=PQexecPrepared(postgresqlconn->pgconn,cursorid,
 					bindcounter,bindvalues,
 					bindlengths,bindformats,0);
 		bindcounter=0;
@@ -1558,6 +1576,18 @@ void postgresqlcursor::closeResultSet() {
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
 		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
+void postgresqlcursor::deallocateNamedStatement() {
+	if (allocated) {
+		if (cursorid[0]) {
+			pgresult=PQexec(postgresqlconn->pgconn,
+					deallocatecursorid.getString());
+			PQclear(pgresult);
+			pgresult=NULL;
+		}
+		allocated=false;
+	}
+}
+
 bool postgresqlcursor::columnInfoIsValidAfterPrepare() {
 	return true;
 }

@@ -11,6 +11,7 @@
 	csv import/export is consistent now
 	added some event methods to sqlrexport
 	migrated parsedatetime functions to rudiments datetime class
+	different postgresql cursors use different stmtNames now
 
 1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute
