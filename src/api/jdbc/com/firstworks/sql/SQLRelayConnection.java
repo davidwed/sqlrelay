@@ -117,20 +117,17 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public Statement	createStatement() throws SQLException {
-		throwExceptionIfClosed();
-		SQLRelayStatement	sqlrstmt=new SQLRelayStatement();
-		sqlrstmt.setConnection(this);
-		sqlrstmt.setSQLRConnection(sqlrcon);
-		sqlrstmt.setSQLRCursor(new SQLRCursor(sqlrcon));
-		return sqlrstmt;
+		return createStatement(ResultSet.TYPE_FORWARD_ONLY,
+					ResultSet.CONCUR_READ_ONLY,
+					ResultSet.CLOSE_CURSORS_AT_COMMIT);
 	}
 
 	public Statement	createStatement(int resultSetType,
 						int resultSetConcurrency)
 						throws SQLException {
-		throwExceptionIfClosed();
-		throwNotSupportedException();
-		return null;
+		return createStatement(resultSetType,
+					resultSetConcurrency,
+					ResultSet.CLOSE_CURSORS_AT_COMMIT);
 	}
 
 	public Statement	createStatement(int resultSetType,
@@ -138,8 +135,38 @@ public class SQLRelayConnection implements Connection {
 						int resultSetHoldability)
 						throws SQLException {
 		throwExceptionIfClosed();
-		throwNotSupportedException();
-		return null;
+
+		// unsupported options
+		if (resultSetType==
+				ResultSet.TYPE_SCROLL_SENSITIVE ||
+			resultSetConcurrency==
+				ResultSet.CONCUR_UPDATABLE ||
+			resultSetHoldability==
+				ResultSet.HOLD_CURSORS_OVER_COMMIT ||
+			throwNotSupportedException();
+		}
+
+		// create a cursor
+		SQLRCursor	sqlrcur=new SQLRCursor(sqlrcon);
+
+		// set result set buffer size as appropriate
+		switch (resultSetType) {
+			case ResultSet.TYPE_FORWARD_ONLY:
+				// FIXME: this can probably be set
+				// to something bigger than 1
+				sqlrcur.setResultSetBufferSize(1);
+				break;
+			case ResultSet.TYPE_SCROLL_INSENSITIVE:
+				sqlrcur.setResultSetBufferSize(0);
+				break;
+		}
+
+		// create a statement, attach the cursor to the statement
+		SQLRelayStatement	sqlrstmt=new SQLRelayStatement();
+		sqlrstmt.setConnection(this);
+		sqlrstmt.setSQLRConnection(sqlrcon);
+		sqlrstmt.setSQLRCursor(sqlrcur);
+		return sqlrstmt;
 	}
 
 	public Struct	createStruct(String typeName,
