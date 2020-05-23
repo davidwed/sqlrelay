@@ -96,7 +96,9 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public void	close() throws SQLException {
-		sqlrcur.closeResultSet();
+		if (sqlrcur!=null) {
+			sqlrcur.closeResultSet();
+		}
 		reset();
 	}
 
@@ -797,7 +799,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public boolean	isLast() throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: implememt this for real
+		// FIXME: implement this for real
 		return false;
 	}
 
