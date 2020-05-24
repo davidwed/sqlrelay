@@ -1455,13 +1455,12 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public boolean	isWrapperFor(Class<?> iface) throws SQLException {
-		// FIXME: implement this for SQLRCursor
-		return false;
+		return (iface==SQLRCursor.class);
 	}
 
+	@SuppressWarnings({"unchecked"})
 	public <T> T	unwrap(Class<T> iface) throws SQLException {
-		// FIXME: implement this for SQLRCursor
-		return null;
+		return (T)((iface==SQLRCursor.class)?sqlrcur:null);
 	}
 
 	private void throwExceptionIfClosed() throws SQLException {

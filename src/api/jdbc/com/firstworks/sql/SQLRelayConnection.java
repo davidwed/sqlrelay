@@ -18,6 +18,7 @@ public class SQLRelayConnection implements Connection {
 	private SQLRConnection	sqlrcon;
 	private boolean		readonly;
 	private Properties	clientinfo;
+	private	int		txisolevel;
 
 	private Map<String,Class<?>>	typemap;
 
@@ -35,6 +36,8 @@ public class SQLRelayConnection implements Connection {
 		this.password=password;
 		sqlrcon=new SQLRConnection(host,port,socket,
 						user,password,retrytime,tries);
+		// FIXME: defaults to repeatable read on mysql5+
+		txisolevel=Connection.TRANSACTION_READ_COMMITTED;
 		readonly=false;
 		clientinfo=new Properties();
 		typemap=null;
@@ -119,7 +122,7 @@ public class SQLRelayConnection implements Connection {
 	public Statement	createStatement() throws SQLException {
 		return createStatement(ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY,
-					ResultSet.CLOSE_CURSORS_AT_COMMIT);
+					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 	}
 
 	public Statement	createStatement(int resultSetType,
@@ -127,7 +130,7 @@ public class SQLRelayConnection implements Connection {
 						throws SQLException {
 		return createStatement(resultSetType,
 					resultSetConcurrency,
-					ResultSet.CLOSE_CURSORS_AT_COMMIT);
+					ResultSet.HOLD_CURSORS_OVER_COMMIT);
 	}
 
 	public Statement	createStatement(int resultSetType,
@@ -142,7 +145,7 @@ public class SQLRelayConnection implements Connection {
 			resultSetConcurrency==
 				ResultSet.CONCUR_UPDATABLE ||
 			resultSetHoldability==
-				ResultSet.HOLD_CURSORS_OVER_COMMIT ||
+				ResultSet.CLOSE_CURSORS_AT_COMMIT) {
 			throwNotSupportedException();
 		}
 
@@ -179,7 +182,8 @@ public class SQLRelayConnection implements Connection {
 
 	public boolean	getAutoCommit() throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: implement this for real...
+		// FIXME: sqlrclient api doesn't support this
+		// but JDBC doesn't allow SQLFeatureNotSupportedException
 		return false;
 	}
 
@@ -201,8 +205,7 @@ public class SQLRelayConnection implements Connection {
 
 	public int	getHoldability() throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: is this correct?
-		return ResultSet.CLOSE_CURSORS_AT_COMMIT;
+		return ResultSet.HOLD_CURSORS_OVER_COMMIT;
 	}
 
 	public DatabaseMetaData	getMetaData() throws SQLException {
@@ -223,18 +226,12 @@ public class SQLRelayConnection implements Connection {
 
 	public String	getSchema() throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: not supposed to throw not-supported
-		throwNotSupportedException();
-		// FIXME: this can be supported...
-		//return sqlrcon.getCurrentSchema();
-		return null;
+		return sqlrcon.getCurrentSchema();
 	}
 
 	public int	getTransactionIsolation() throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: not supposed to throw not-supported
-		throwNotSupportedException();
-		return 0;
+		return txisolevel;
 	}
 
 	public Map<String,Class<?>>	getTypeMap() throws SQLException {
@@ -257,15 +254,11 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public boolean	isValid(int timeout) throws SQLException {
-		if (timeout<0) {
-			throw new SQLException("FIXME: timeout < 0");
-		}
-		return isClosed();
+		return !isClosed();
 	}
 
 	public String	nativeSQL(String sql) throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: implement this for real...
 		return sql;
 	}
 
@@ -424,7 +417,9 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public void	setHoldability(int holdability) throws SQLException {
-		throwNotSupportedException();
+		if (holdability!=ResultSet.HOLD_CURSORS_OVER_COMMIT) {
+			throwNotSupportedException();
+		}
 	}
 
 	public void	setNetworkTimeout(Executor executor,
@@ -443,6 +438,7 @@ public class SQLRelayConnection implements Connection {
 
 	public void	setReadOnly(boolean readonly) throws SQLException {
 		throwExceptionIfClosed();
+		// FIXME: do something with this
 		this.readonly=readonly;
 	}
 
@@ -460,30 +456,45 @@ public class SQLRelayConnection implements Connection {
 
 	public void	setSchema(String schema) throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: not supposed to throw not-supported
-		throwNotSupportedException();
+		// FIXME: implement this somehow
 	}
 
 	public void	setTransactionIsolation(int level) throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: not supposed to throw not-supported
-		throwNotSupportedException();
+		switch (level) {
+			case Connection.TRANSACTION_READ_UNCOMMITTED:
+				// FIXME: implement this somehow
+				break;
+			case Connection.TRANSACTION_READ_COMMITTED:
+				// FIXME: implement this somehow
+				break;
+			case Connection.TRANSACTION_REPEATABLE_READ:
+				// FIXME: implement this somehow
+				break;
+			case Connection.TRANSACTION_SERIALIZABLE:
+				// FIXME: implement this somehow
+				break;
+			default:
+				throwException("Invalid transaction " +
+						"isolation level " + level);
+		}
+		txisolevel=level;
 	}
 
 	public void	setTypeMap(Map<String,Class<?>> map)
 						throws SQLException {
 		throwExceptionIfClosed();
+		// FIXME: do something with this
 		typemap=map;
 	}
 
 	public boolean	isWrapperFor(Class<?> iface) throws SQLException {
-		// FIXME: implement this for SQLRConnection
-		return false;
+		return (iface==SQLRConnection.class);
 	}
 
+	@SuppressWarnings({"unchecked"})
 	public <T> T	unwrap(Class<T> iface) throws SQLException {
-		// FIXME: implement this for SQLRConnection
-		return null;
+		return (T)((iface==SQLRConnection.class)?sqlrcon:null);
 	}
 
 	private void throwExceptionIfClosed() throws SQLException {
@@ -498,5 +509,9 @@ public class SQLRelayConnection implements Connection {
 
 	private void throwNotSupportedException() throws SQLException {
 		throw new SQLFeatureNotSupportedException();
+	}
+
+	private void throwException(String reason) throws SQLException {
+		throw new SQLException(reason);
 	}
 }

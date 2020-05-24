@@ -343,13 +343,13 @@ public class SQLRelayStatement implements Statement {
 	}
 
 	public boolean	isWrapperFor(Class<?> iface) throws SQLException {
-		// FIXME: implement this for SQLRCursor and SQLRConnection
-		return false;
+		return (iface==SQLRCursor.class);
+
 	}
 
+	@SuppressWarnings({"unchecked"})
 	public <T> T	unwrap(Class<T> iface) throws SQLException {
-		// FIXME: implement this for SQLRCursor and SQLRConnection
-		return null;
+		return (T)((iface==SQLRCursor.class)?sqlrcur:null);
 	}
 
 	protected void throwExceptionIfClosed() throws SQLException {

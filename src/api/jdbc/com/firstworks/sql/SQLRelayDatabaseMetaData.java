@@ -1007,12 +1007,10 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 	}
 
 	public boolean	isWrapperFor(Class<?> iface) throws SQLException {
-		// FIXME: implement this for SQLRCursor
 		return false;
 	}
 
 	public <T> T	unwrap(Class<T> iface) throws SQLException {
-		// FIXME: implement this for SQLRCursor
 		return null;
 	}
 };
