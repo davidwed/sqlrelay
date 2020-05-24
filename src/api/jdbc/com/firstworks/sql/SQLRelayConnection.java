@@ -18,7 +18,9 @@ public class SQLRelayConnection implements Connection {
 	private SQLRConnection	sqlrcon;
 	private boolean		readonly;
 	private Properties	clientinfo;
-	private	int		txisolevel;
+	private int		txisolevel;
+	private boolean		autocommit;
+	private int		networktimeout;
 
 	private Map<String,Class<?>>	typemap;
 
@@ -36,10 +38,16 @@ public class SQLRelayConnection implements Connection {
 		this.password=password;
 		sqlrcon=new SQLRConnection(host,port,socket,
 						user,password,retrytime,tries);
-		// FIXME: defaults to repeatable read on mysql5+
-		txisolevel=Connection.TRANSACTION_READ_COMMITTED;
 		readonly=false;
 		clientinfo=new Properties();
+		// FIXME: defaults to repeatable read on mysql5+
+		txisolevel=Connection.TRANSACTION_READ_COMMITTED;
+		// FIXME: might not be false, need to get this from server
+		autocommit=false;
+		// FIXME: the timeout can also be set using an environment
+		// variable, so we should get this from the underlying api
+		// instead of tracking it here
+		networktimeout=0;
 		typemap=null;
 //sqlrcon.debugOn();
 	}
@@ -95,21 +103,21 @@ public class SQLRelayConnection implements Connection {
 	public Blob	createBlob() throws SQLException {
 		throwExceptionIfClosed();
 		throwNotSupportedException();
-		// FIXME: we should support this...
+		// FIXME: we might be able to support this...
 		return null;
 	}
 
 	public Clob	createClob() throws SQLException {
 		throwExceptionIfClosed();
 		throwNotSupportedException();
-		// FIXME: we should support this...
+		// FIXME: we might be able to support this...
 		return null;
 	}
 
 	public NClob	createNClob() throws SQLException {
 		throwExceptionIfClosed();
 		throwNotSupportedException();
-		// FIXME: we should support this...
+		// FIXME: we might be able to support this...
 		return null;
 	}
 
@@ -182,9 +190,7 @@ public class SQLRelayConnection implements Connection {
 
 	public boolean	getAutoCommit() throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: sqlrclient api doesn't support this
-		// but JDBC doesn't allow SQLFeatureNotSupportedException
-		return false;
+		return autocommit;
 	}
 
 	public String	getCatalog() throws SQLException {
@@ -218,10 +224,10 @@ public class SQLRelayConnection implements Connection {
 
 	public int	getNetworkTimeout() throws SQLException {
 		throwExceptionIfClosed();
-		throwNotSupportedException();
-		// FIXME: this can be supported...
-		//return sqlrcon.getConnectTimeout();
-		return 0;
+		// FIXME: the timeout can also be set using an environment
+		// variable, so we should get this from the underlying api
+		// instead of tracking it here
+		return networktimeout;
 	}
 
 	public String	getSchema() throws SQLException {
@@ -241,6 +247,7 @@ public class SQLRelayConnection implements Connection {
 
 	public SQLWarning	getWarnings() throws SQLException {
 		throwExceptionIfClosed();
+		// sqlrelay doesn't support anything like this
 		return null;
 	}
 
@@ -254,7 +261,14 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public boolean	isValid(int timeout) throws SQLException {
-		return !isClosed();
+		if (isClosed()) {
+			return false;
+		}
+		// FIXME: need to get the current response timeout pre-ping
+		// and reset it post-ping, but the java api doesn't currently
+		// have getResponseTimeout methods
+		sqlrcon.setResponseTimeout(timeout,0);
+		return sqlrcon.ping();
 	}
 
 	public String	nativeSQL(String sql) throws SQLException {
@@ -374,6 +388,7 @@ public class SQLRelayConnection implements Connection {
 					sqlrcon.autoCommitOff())) {
 			throwErrorMessageException();
 		}
+		this.autocommit=autocommit;
 	}
 
 	public void	setCatalog(String catalog) throws SQLException {
@@ -426,19 +441,26 @@ public class SQLRelayConnection implements Connection {
 						int milliseconds)
 						throws SQLException {
 		throwExceptionIfClosed();
-		if (executor == null) {
-			throw new SQLException("FIXME: executor is null");
-		}
+		// we can ignore executor because we have an internal
+		// timeout implementation
 		if (milliseconds<0) {
-			throw new SQLException("FIXME: timeout < 0");
+			throwException("timeout < 0");
 		}
-		sqlrcon.setConnectTimeout(milliseconds/1000,
+		if (milliseconds==0) {
+			sqlrcon.setConnectTimeout(-1,-1);
+		} else {
+			sqlrcon.setConnectTimeout(milliseconds/1000,
 				((milliseconds-(milliseconds/1000))*1000));
+		}
+		// FIXME: the timeout can also be set using an environment
+		// variable, so we should get this from the underlying api
+		// instead of tracking it here
+		networktimeout=milliseconds;
 	}
 
 	public void	setReadOnly(boolean readonly) throws SQLException {
 		throwExceptionIfClosed();
-		// FIXME: do something with this
+		// FIXME: implement this somehow
 		this.readonly=readonly;
 	}
 
@@ -499,12 +521,12 @@ public class SQLRelayConnection implements Connection {
 
 	private void throwExceptionIfClosed() throws SQLException {
 		if (sqlrcon==null) {
-			throw new SQLException("FIXME: Connection is closed");
+			throwException("Connection is closed");
 		}
 	}
 
 	private void throwErrorMessageException() throws SQLException {
-		throw new SQLException(sqlrcon.errorMessage());
+		throwException(sqlrcon.errorMessage());
 	}
 
 	private void throwNotSupportedException() throws SQLException {

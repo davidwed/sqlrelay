@@ -121,14 +121,33 @@ class oracle {
 		String	socket=null;
 		String	user="test";
 		String	password="test";
+		String	url="jdbc:sqlrelay://"+
+				user+":"+password+"@"+host+":"+port;
 
 		// Connection
 		System.out.println("CONNECTION...");
 		Class.forName("com.firstworks.sql.SQLRelayDriver");
 		Connection	con=DriverManager.getConnection(
-				"jdbc:sqlrelay://"+user+":"+password+"@"+
-				host+":"+port,
-				"test","test");
+							url,"test","test");
+
+		// close, isClosed, isValid
+		System.out.println("CONNECTION - close");
+		checkSuccess(con.isClosed(),0);
+		checkSuccess(con.isValid(0),1);
+		con.close();
+		checkSuccess(con.isClosed(),1);
+		checkSuccess(con.isValid(0),0);
+		con=DriverManager.getConnection(url,"test","test");
+		System.out.println();
+
+		// setNetworkTimeout, getNetworkTimeout
+		con.setNetworkTimeout(null,1);
+		checkSuccess(con.getNetworkTimeout(),1);
+		con.setNetworkTimeout(null,2);
+		checkSuccess(con.getNetworkTimeout(),2);
+		con.setNetworkTimeout(null,0);
+		checkSuccess(con.getNetworkTimeout(),0);
+		System.out.println();
 
 		// SQLRelayConnection
 		System.out.println("CONNECTION - SQLRelayConnection");
@@ -148,13 +167,13 @@ class oracle {
 
 		// setCatalog, getCatalog
 		System.out.println("CONNECTION - catalog");
-		// FIXME: should be ora1
+		con.setCatalog("TESTUSER");
 		checkSuccess(con.getCatalog(),"TESTUSER");
 		System.out.println();
 
 		// setSchema, getSchema
 		System.out.println("CONNECTION - schema");
-		// FIXME: should be TESTUSER
+		con.setSchema("");
 		checkSuccess(con.getSchema(),"");
 		System.out.println();
 
@@ -178,8 +197,20 @@ class oracle {
 		System.out.println();
 
 		// setReadOnly, isReadOnly
+		System.out.println("CONNECTION - readonly");
+		con.setReadOnly(true);
+		checkSuccess(con.isReadOnly(),1);
+		con.setReadOnly(false);
+		checkSuccess(!con.isReadOnly(),1);
+		System.out.println();
 
 		// setAutoCommit, getAutoCommit
+		System.out.println("CONNECTION - autocommit");
+		con.setAutoCommit(true);
+		checkSuccess(con.getAutoCommit(),1);
+		con.setAutoCommit(false);
+		checkSuccess(!con.getAutoCommit(),1);
+		System.out.println();
 
 		// setHoldability, getHoldability
 		System.out.println("CONNECTION - holdability");
@@ -220,11 +251,13 @@ class oracle {
 		}
 		System.out.println();
 
-		// setNetworkTimeout, getNetworkTimeout
-
 		// setTypeMap, getTypeMap
 
 		// getWarnings, clearWarnings
+		System.out.println("CONNECTION - warnings");
+		checkSuccess(con.getWarnings()==null,1);
+		con.clearWarnings();
+		System.out.println();
 
 		// getMetaData
 
@@ -243,8 +276,6 @@ class oracle {
 
 		// commit
 		// rollback...
-
-		// close, isClosed, isValid
 
 		// createStatement
 		System.out.println("CONNECTION - create statement");
@@ -293,6 +324,7 @@ class oracle {
 		System.out.println();
 
 		// prepareCall...
+
 		// prepareStatement...
 		System.out.println("\n");
 
