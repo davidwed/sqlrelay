@@ -14,14 +14,24 @@ class sqlrexport {
 		void	setSqlrConnection(sqlrconnection *sqlrconnection);
 		void	setSqlrCursor(sqlrcursor *sqlrcur);
 
+		sqlrconnection	*getSqlrConnection();
+		sqlrcursor	*getSqlrCursor();
+
 		void	setIgnoreColumns(bool ignorecolumns);
+		bool	getIgnoreColumns();
 
 		void	setFieldsToIgnore(const char * const *fieldstoignore);
+		const char * const *getFieldsToIgnore();
 
 		void	setLogger(logger *lg);
 		void	setCoarseLogLevel(uint8_t coarseloglevel);
 		void	setFineLogLevel(uint8_t fineloglevel);
 		void	setLogIndent(uint32_t logindent);
+
+		logger		*getLogger();
+		uint8_t		getCoarseLogLevel();
+		uint8_t		getFineLogLevel();
+		uint32_t	getLogIndent();
 
 		void	setShutdownFlag(bool *shuttingdown);
 
@@ -34,6 +44,23 @@ class sqlrexport {
 		virtual	bool	colEnd();
 		virtual	bool	rowEnd();
 		virtual	bool	rowsEnd();
+
+	protected:
+		void	setExportRow(bool exportrow);
+		bool	getExportRow();
+
+		void		setCurrentRow(uint64_t currentrow);
+		uint64_t	getCurrentRow();
+
+		void		setCurrentColumn(uint32_t currentcol);
+		uint32_t	getCurrentColumn();
+
+		void		setCurrentField(const char *currentfield);
+		const char	*getCurrentField();
+
+		void	setNumberColumn(uint64_t index, bool value);
+		bool	getNumberColumn(uint64_t index);
+		void	clearNumberColumns();
 
 	#include <sqlrelay/private/sqlrexport.h>
 };

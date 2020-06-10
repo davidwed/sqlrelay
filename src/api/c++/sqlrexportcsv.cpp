@@ -18,10 +18,10 @@ sqlrexportcsv::~sqlrexportcsv() {
 bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 
 	// reset flags
-	exportrow=true;
-	currentrow=0;
-	currentcol=0;
-	currentfield=NULL;
+	setExportRow(true);
+	setCurrentRow(0);
+	setCurrentColumn(0);
+	setCurrentField(NULL);
 
 	// output to stdoutput or create/open file
 	filedescriptor	*fd=&stdoutput;
@@ -35,18 +35,20 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 		fd=&f;
 	}
 
+	sqlrcursor	*sqlrcur=getSqlrCursor();
+	const char * const *fieldstoignore=getFieldsToIgnore();
+
 	// export header
 	uint32_t	cols=sqlrcur->colCount();
-	delete[] numbercolumns;
-	numbercolumns=new bool[cols];
+	clearNumberColumns();
 	bool	first=true;
 	for (uint32_t j=0; j<cols; j++) {
-		numbercolumns[j]=isNumberTypeChar(sqlrcur->getColumnType(j));
+		setNumberColumn(j,isNumberTypeChar(sqlrcur->getColumnType(j)));
 		const char	*name=sqlrcur->getColumnName(j);
 		if (charstring::inSet(name,fieldstoignore)) {
 			continue;
 		}
-		if (!ignorecolumns) {
+		if (!getIgnoreColumns()) {
 			if (first) {
 				first=false;
 			} else {
@@ -62,7 +64,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 			}
 		}
 	}
-	if (!ignorecolumns) {
+	if (!getIgnoreColumns()) {
 		fd->printf("\n");
 	}
 
@@ -75,7 +77,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	do {
 
 		// reset export-row flag
-		exportrow=true;
+		setExportRow(true);
 
 		// call the pre-row event
 		if (!rowStart()) {
@@ -83,24 +85,27 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 		}
 
 		// if rowStart() didn't disable export of this row...
-		if (exportrow) {
+		if (getExportRow()) {
 			bool	first=true;
-			for (currentcol=0; currentcol<cols; currentcol++) {
+			for (setCurrentColumn(0);
+				getCurrentColumn()<cols;
+				setCurrentColumn(getCurrentColumn()+1)) {
 
 				// ignore particular fields
 				if (fieldstoignore) {
 					if (charstring::inSet(
 						sqlrcur->getColumnName(
-								currentcol),
+							getCurrentColumn()),
 						fieldstoignore)) {
 						continue;
 					}
 				}
 
 				// get the field
-				currentfield=sqlrcur->getField(
-							currentrow,currentcol);
-				if (!currentfield) {
+				setCurrentField(sqlrcur->getField(
+							getCurrentRow(),
+							getCurrentColumn()));
+				if (!getCurrentField()) {
 					break;
 				}
 
@@ -117,11 +122,12 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 				}
 
 				// export the field
-				bool	isnumber=numbercolumns[currentcol];
+				bool	isnumber=
+					getNumberColumn(getCurrentColumn());
 				if (!isnumber) {
 					fd->write('"');
 				}
-				escapeField(fd,currentfield);
+				escapeField(fd,getCurrentField());
 				if (!isnumber) {
 					fd->write('"');
 				}
@@ -139,9 +145,10 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 			return false;
 		}
 
-		currentrow++;
+		setCurrentRow(getCurrentRow()+1);
 
-	} while  (!sqlrcur->endOfResultSet() || currentrow<sqlrcur->rowCount());
+	} while  (!sqlrcur->endOfResultSet() ||
+			getCurrentRow()<sqlrcur->rowCount());
 
 	// call the post-rows event
 	if (!rowsEnd()) {

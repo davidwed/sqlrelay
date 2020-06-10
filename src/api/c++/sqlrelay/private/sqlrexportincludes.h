@@ -3,3 +3,4 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/logger.h>
+#include <rudiments/dynamicarray.h>

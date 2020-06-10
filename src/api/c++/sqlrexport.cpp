@@ -17,11 +17,9 @@ sqlrexport::sqlrexport() {
 	fineloglevel=0;
 	logindent=0;
 	shutdownflag=NULL;
-	numbercolumns=NULL;
 }
 
 sqlrexport::~sqlrexport() {
-	delete[] numbercolumns;
 }
 
 void sqlrexport::setSqlrConnection(sqlrconnection *sqlrcon) {
@@ -32,12 +30,28 @@ void sqlrexport::setSqlrCursor(sqlrcursor *sqlrcur) {
 	this->sqlrcur=sqlrcur;
 }
 
+sqlrconnection *sqlrexport::getSqlrConnection() {
+	return sqlrcon;
+}
+
+sqlrcursor *sqlrexport::getSqlrCursor() {
+	return sqlrcur;
+}
+
 void sqlrexport::setIgnoreColumns(bool ignorecolumns) {
 	this->ignorecolumns=ignorecolumns;
 }
 
+bool sqlrexport::getIgnoreColumns() {
+	return ignorecolumns;
+}
+
 void sqlrexport::setFieldsToIgnore(const char * const *fieldstoignore) {
 	this->fieldstoignore=fieldstoignore;
+}
+
+const char * const *sqlrexport::getFieldsToIgnore() {
+	return fieldstoignore;
 }
 
 void sqlrexport::setLogger(logger *lg) {
@@ -54,6 +68,22 @@ void sqlrexport::setFineLogLevel(uint8_t fineloglevel) {
 
 void sqlrexport::setLogIndent(uint32_t logindent) {
 	this->logindent=logindent;
+}
+
+logger *sqlrexport::getLogger() {
+	return lg;
+}
+
+uint8_t sqlrexport::getCoarseLogLevel() {
+	return coarseloglevel;
+}
+
+uint8_t sqlrexport::getFineLogLevel() {
+	return fineloglevel;
+}
+
+uint32_t sqlrexport::getLogIndent() {
+	return logindent;
 }
 
 void sqlrexport::setShutdownFlag(bool *shutdownflag) {
@@ -88,4 +118,48 @@ bool sqlrexport::rowEnd() {
 bool sqlrexport::rowsEnd() {
 	// by default, just return success
 	return true;
+}
+
+void sqlrexport::setExportRow(bool exportrow) {
+	this->exportrow=exportrow;
+}
+
+bool sqlrexport::getExportRow() {
+	return exportrow;
+}
+
+void sqlrexport::setCurrentRow(uint64_t currentrow) {
+	this->currentrow=currentrow;
+}
+
+uint64_t sqlrexport::getCurrentRow() {
+	return currentrow;
+}
+
+void sqlrexport::setCurrentColumn(uint32_t currentcol) {
+	this->currentcol=currentcol;
+}
+
+uint32_t sqlrexport::getCurrentColumn() {
+	return currentcol;
+}
+
+void sqlrexport::setCurrentField(const char *currentfield) {
+	this->currentfield=currentfield;
+}
+
+const char *sqlrexport::getCurrentField() {
+	return currentfield;
+}
+
+void sqlrexport::setNumberColumn(uint64_t index, bool value) {
+	numbercolumns[index]=value;
+}
+
+bool sqlrexport::getNumberColumn(uint64_t index) {
+	return numbercolumns[index];
+}
+
+void sqlrexport::clearNumberColumns() {
+	numbercolumns.clear();
 }

@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
-	protected:
+	private:
 		sqlrconnection		*sqlrcon;
 		sqlrcursor		*sqlrcur;
 		bool			ignorecolumns;
@@ -15,4 +15,4 @@
 		uint8_t			fineloglevel;
 		uint32_t		logindent;
 		bool			shutdownflag;
-		bool			*numbercolumns;
+		dynamicarray<bool>	numbercolumns;
