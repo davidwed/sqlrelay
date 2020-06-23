@@ -13,6 +13,7 @@
 	migrated parsedatetime functions to rudiments datetime class
 	different postgresql cursors use different stmtNames now
 	sqlrimportcsv can create a primary key that's not in the CSV now
+	sqlrexportcsv quotes 12+ digit numbers now
 
 1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute
