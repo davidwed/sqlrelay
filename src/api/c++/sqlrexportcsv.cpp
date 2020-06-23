@@ -121,14 +121,22 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 					return false;
 				}
 
+				// we need to quote the field if it's not a
+				// number, or if it is a number, but has more
+				// than 12 digits.  Excel (and presumably other
+				// spreadsheet apps) likes to convert 12+
+				// digit numbers to scientific notation.
+				bool	quote=
+					(!getNumberColumn(getCurrentColumn()) ||
+					charstring::length(
+						getCurrentField())>=12);
+
 				// export the field
-				bool	isnumber=
-					getNumberColumn(getCurrentColumn());
-				if (!isnumber) {
+				if (quote) {
 					fd->write('"');
 				}
 				escapeField(fd,getCurrentField());
-				if (!isnumber) {
+				if (quote) {
 					fd->write('"');
 				}
 
