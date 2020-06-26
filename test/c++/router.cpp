@@ -118,8 +118,8 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	// drop existing table
-	cur->sendQuery("drop table testtable1");
-	cur->sendQuery("drop table testtable2");
+	cur->sendQuery("drop table if exists testtable1");
+	cur->sendQuery("drop table if exists testtable2");
 
 	stdoutput.printf("CREATE TESTTABLES: \n");
 	checkSuccess(cur->sendQuery("create table testtable1 (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
