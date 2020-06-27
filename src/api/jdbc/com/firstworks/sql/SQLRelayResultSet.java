@@ -15,7 +15,7 @@ import java.net.URL;
 
 import com.firstworks.sqlrelay.*;
 
-public class SQLRelayResultSet implements ResultSet {
+public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 
 	private Statement	statement;
 	private SQLRCursor	sqlrcur;
@@ -26,10 +26,12 @@ public class SQLRelayResultSet implements ResultSet {
 	private boolean		wasnull;
 
 	public SQLRelayResultSet() {
+		debugFunction();
 		reset();
 	}
 
 	private void	reset() {
+		debugFunction();
 		statement=null;
 		sqlrcur=null;
 		currentrow=0;
@@ -40,14 +42,17 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public void	setStatement(Statement statement) {
+		debugFunction();
 		this.statement=statement;
 	}
 
 	public void	setSQLRCursor(SQLRCursor sqlrcur) {
+		debugFunction();
 		this.sqlrcur=sqlrcur;
 	}
 
 	public boolean	absolute(int row) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		if (row<currentrow) {
 			throw new SQLException(
@@ -77,25 +82,30 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public void	afterLast() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		afterlast=true;
 	}
 
 	public void	beforeFirst() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		beforefirst=true;
 	}
 
 	public void	cancelRowUpdates() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	clearWarnings() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 	}
 
 	public void	close() throws SQLException {
+		debugFunction();
 		if (sqlrcur!=null) {
 			sqlrcur.closeResultSet();
 		}
@@ -103,11 +113,13 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public void	deleteRow() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public int	findColumn(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		for (int i=0; i<sqlrcur.colCount(); i++) {
 			if (sqlrcur.getColumnName(i).equals(columnlabel)) {
@@ -118,10 +130,12 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public boolean	first() throws SQLException {
+		debugFunction();
 		return absolute(1);
 	}
 
 	public Array	getArray(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -129,6 +143,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Array	getArray(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -137,6 +152,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public InputStream	getAsciiStream(int columnindex)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
@@ -147,6 +163,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public InputStream	getAsciiStream(String columnlabel)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
@@ -157,6 +174,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public BigDecimal	getBigDecimal(int columnindex)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
@@ -169,6 +187,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public BigDecimal	getBigDecimal(int columnindex, int scale)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		// FIXME: do something with scale...
@@ -182,6 +201,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public BigDecimal	getBigDecimal(String columnlabel)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
@@ -194,6 +214,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public BigDecimal	getBigDecimal(String columnlabel, int scale)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		// FIXME: do something with scale...
@@ -207,6 +228,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public InputStream	getBinaryStream(int columnindex)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		byte[]	field=sqlrcur.getFieldAsByteArray(
@@ -217,6 +239,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public InputStream	getBinaryStream(String columnlabel)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		byte[]	field=sqlrcur.getFieldAsByteArray(
@@ -226,6 +249,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Blob	getBlob(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -234,6 +258,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Blob	getBlob(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -242,6 +267,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public boolean	getBoolean(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
@@ -250,6 +276,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public boolean	getBoolean(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
@@ -258,6 +285,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public byte	getByte(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
@@ -266,6 +294,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public byte	getByte(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
@@ -274,6 +303,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public byte[]	getBytes(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		byte[]	field=sqlrcur.getFieldAsByteArray(
@@ -283,6 +313,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public byte[]	getBytes(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		byte[]	field=sqlrcur.getFieldAsByteArray(
@@ -293,6 +324,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Reader	getCharacterStream(int columnindex)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
@@ -302,6 +334,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Reader	getCharacterStream(String columnlabel)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
@@ -310,6 +343,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Clob	getClob(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -318,6 +352,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Clob	getClob(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -326,16 +361,19 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public int	getConcurrency() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return ResultSet.CONCUR_READ_ONLY;
 	}
 
 	public String	getCursorName() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return null;
 	}
 
 	public Date	getDate(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -345,6 +383,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Date	getDate(int columnindex, Calendar cal)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -353,6 +392,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Date	getDate(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -362,6 +402,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Date	getDate(String columnlabel, Calendar cal)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -370,6 +411,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public double	getDouble(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
@@ -377,6 +419,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public double	getDouble(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
@@ -384,16 +427,19 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public int	getFetchDirection() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return (int)sqlrcur.getResultSetBufferSize();
 	}
 
 	public int	getFetchSize() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return (int)sqlrcur.getResultSetBufferSize();
 	}
 
 	public float	getFloat(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
@@ -402,6 +448,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public float	getFloat(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
@@ -410,12 +457,14 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public int	getHoldability() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: is this correct?
 		return ResultSet.CLOSE_CURSORS_AT_COMMIT;
 	}
 
 	public int	getInt(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
@@ -424,6 +473,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public int	getInt(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
@@ -431,6 +481,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public long	getLong(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
@@ -439,6 +490,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public long	getLong(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
@@ -447,6 +499,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public ResultSetMetaData	getMetaData() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayResultSetMetaData	metadata=
 						new SQLRelayResultSetMetaData();
@@ -456,6 +509,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Reader	getNCharacterStream(int columnindex)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		byte[]	bytes=sqlrcur.getFieldAsByteArray(
@@ -468,6 +522,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Reader	getNCharacterStream(String columnlabel)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		byte[]	bytes=sqlrcur.getFieldAsByteArray(
@@ -479,6 +534,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public NClob	getNClob(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -487,6 +543,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public NClob	getNClob(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -495,6 +552,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public String	getNString(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		byte[]	bytes=sqlrcur.getFieldAsByteArray(
@@ -508,6 +566,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public String	getNString(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		byte[]	bytes=sqlrcur.getFieldAsByteArray(
@@ -521,6 +580,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Object	getObject(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -530,6 +590,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public <T> T	getObject(int columnindex, Class<T> type)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -539,6 +600,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Object	getObject(int columnindex, Map<String,Class<?>> map)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -547,6 +609,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Object	getObject(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -556,6 +619,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public <T> T	getObject(String columnlabel, Class<T> type)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -565,6 +629,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Object	getObject(String columnlabel, Map<String,Class<?>> map)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -573,6 +638,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Ref	getRef(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -581,6 +647,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Ref	getRef(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -589,11 +656,13 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public int	getRow() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return (int)currentrow;
 	}
 
 	public RowId	getRowId(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -602,6 +671,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public RowId	getRowId(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -610,6 +680,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public short	getShort(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
 		return (short)sqlrcur.getFieldAsInteger(
@@ -617,6 +688,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public short	getShort(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
 		return (short)sqlrcur.getFieldAsInteger(
@@ -624,6 +696,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public SQLXML	getSQLXML(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -632,6 +705,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public SQLXML	getSQLXML(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -640,10 +714,12 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Statement	getStatement() throws SQLException {
+		debugFunction();
 		return statement;
 	}
 
 	public String	getString(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
@@ -652,6 +728,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public String	getString(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
@@ -660,6 +737,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Time	getTime(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -669,6 +747,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Time	getTime(int columnindex, Calendar cal)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -677,6 +756,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public Time	getTime(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -686,6 +766,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Time	getTime(String columnlabel, Calendar cal)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -695,6 +776,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Timestamp	getTimestamp(int columnindex)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -704,6 +786,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Timestamp	getTimestamp(int columnindex, Calendar cal)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -713,6 +796,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Timestamp	getTimestamp(String columnlabel)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -722,6 +806,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public Timestamp	getTimestamp(String columnlabel, Calendar cal)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -730,12 +815,14 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public int	getType() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return ResultSet.TYPE_FORWARD_ONLY;
 	}
 
 	public InputStream	getUnicodeStream(int columnindex)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
@@ -745,6 +832,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	public InputStream	getUnicodeStream(String columnlabel)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
@@ -753,6 +841,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public URL	getURL(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
@@ -761,6 +850,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public URL	getURL(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
@@ -769,69 +859,83 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public SQLWarning	getWarnings() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return null;
 	}
 
 	public void	insertRow() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public boolean	isAfterLast() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return afterlast;
 	}
 
 	public boolean	isBeforeFirst() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return beforefirst;
 	}
 
 	public boolean	isClosed() throws SQLException {
+		debugFunction();
 		return sqlrcur==null;
 	}
 
 	public boolean	isFirst() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return currentrow==0;
 	}
 
 	public boolean	isLast() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: implement this for real
 		return false;
 	}
 
 	public boolean	last() throws SQLException {
+		debugFunction();
 		return absolute(-1);
 	}
 
 	public void	moveToCurrentRow() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// since we don't support updating result sets, then we can't
 		// be on the insert row, and we're always on the current row
 	}
 
 	public void	moveToInsertRow() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public boolean	next() throws SQLException {
+		debugFunction();
 		return relative(1);
 	}
 
 	public boolean	previous() throws SQLException {
+		debugFunction();
 		return relative(-1);
 	}
 
 	public void	refreshRow() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public boolean	relative(int rows) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		if (rows==0) {
 			return true;
@@ -844,41 +948,48 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	public boolean	rowDeleted() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return false;
 	}
 
 	public boolean	rowInserted() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return false;
 	}
 
 	public boolean	rowUpdated() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return false;
 	}
 
 	public void	setFetchDirection(int direction) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		fetchdirection=direction;
 	}
 
 	public void	setFetchSize(int rows) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		sqlrcur.setResultSetBufferSize(rows);
 	}
 
 	public void	updateArray(int columnindex, Array x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateArray(String columnlabel, Array x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -886,6 +997,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateAsciiStream(int columnindex,
 						InputStream x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -894,6 +1006,7 @@ public class SQLRelayResultSet implements ResultSet {
 						InputStream x,
 						int length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -902,6 +1015,7 @@ public class SQLRelayResultSet implements ResultSet {
 						InputStream x,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -909,6 +1023,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateAsciiStream(String columnlabel,
 						InputStream x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -917,6 +1032,7 @@ public class SQLRelayResultSet implements ResultSet {
 						InputStream x,
 						int length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -925,6 +1041,7 @@ public class SQLRelayResultSet implements ResultSet {
 						InputStream x,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -932,6 +1049,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBigDecimal(int columnindex,
 						BigDecimal x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -939,6 +1057,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBigDecimal(String columnlabel,
 						BigDecimal x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -946,6 +1065,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBinaryStream(int columnindex,
 						InputStream x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -954,6 +1074,7 @@ public class SQLRelayResultSet implements ResultSet {
 						InputStream x,
 						int length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -962,6 +1083,7 @@ public class SQLRelayResultSet implements ResultSet {
 						InputStream x,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -969,6 +1091,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBinaryStream(String columnlabel,
 						InputStream x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -977,6 +1100,7 @@ public class SQLRelayResultSet implements ResultSet {
 						InputStream x,
 						int length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -985,12 +1109,14 @@ public class SQLRelayResultSet implements ResultSet {
 						InputStream x,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateBlob(int columnindex, Blob x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -998,6 +1124,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBlob(int columnindex,
 					InputStream inputStream)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1006,6 +1133,7 @@ public class SQLRelayResultSet implements ResultSet {
 					InputStream inputStream,
 					long length)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1013,6 +1141,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBlob(String columnlabel,
 					Blob x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1020,6 +1149,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBlob(String columnlabel,
 					InputStream inputStream)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1028,6 +1158,7 @@ public class SQLRelayResultSet implements ResultSet {
 					InputStream inputStream,
 					long length)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1035,6 +1166,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBoolean(int columnindex,
 						boolean x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1042,6 +1174,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBoolean(String columnlabel,
 						boolean x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1049,6 +1182,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateByte(int columnindex,
 						byte x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1056,6 +1190,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateByte(String columnlabel,
 						byte x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1063,6 +1198,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBytes(int columnindex,
 						byte[] x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1070,6 +1206,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateBytes(String columnlabel,
 						byte[] x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1077,6 +1214,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateCharacterStream(int columnindex,
 						Reader x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1085,6 +1223,7 @@ public class SQLRelayResultSet implements ResultSet {
 							Reader x,
 							int length)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1093,6 +1232,7 @@ public class SQLRelayResultSet implements ResultSet {
 							Reader x,
 							long length)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1100,6 +1240,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateCharacterStream(String columnlabel,
 							Reader reader)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1108,6 +1249,7 @@ public class SQLRelayResultSet implements ResultSet {
 							Reader reader,
 							int length)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1116,6 +1258,7 @@ public class SQLRelayResultSet implements ResultSet {
 							Reader reader,
 							long length)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1123,6 +1266,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateClob(int columnindex,
 					Clob x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1130,6 +1274,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateClob(int columnindex,
 					Reader reader)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1138,6 +1283,7 @@ public class SQLRelayResultSet implements ResultSet {
 					Reader reader,
 					long length)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1145,6 +1291,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateClob(String columnlabel,
 						Clob x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1152,6 +1299,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateClob(String columnlabel,
 						Reader reader)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1160,66 +1308,77 @@ public class SQLRelayResultSet implements ResultSet {
 						Reader reader,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateDate(int columnindex, Date x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateDate(String columnlabel, Date x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateDouble(int columnindex, double x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateDouble(String columnlabel, double x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateFloat(int columnindex, float x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateFloat(String columnlabel, float x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateInt(int columnindex, int x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateInt(String columnlabel, int x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateLong(int columnindex, long x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateLong(String columnlabel, long x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1227,6 +1386,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateNCharacterStream(int columnindex,
 							Reader x)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1235,6 +1395,7 @@ public class SQLRelayResultSet implements ResultSet {
 							Reader x,
 							long length)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1242,6 +1403,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateNCharacterStream(String columnlabel,
 							Reader reader)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1250,6 +1412,7 @@ public class SQLRelayResultSet implements ResultSet {
 							Reader reader,
 							long length)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1257,6 +1420,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateNClob(int columnindex,
 						NClob nClob)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1264,6 +1428,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateNClob(int columnindex,
 						Reader reader)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1272,6 +1437,7 @@ public class SQLRelayResultSet implements ResultSet {
 						Reader reader,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1279,6 +1445,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateNClob(String columnlabel,
 						NClob nClob)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1286,6 +1453,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateNClob(String columnlabel,
 						Reader reader)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1294,6 +1462,7 @@ public class SQLRelayResultSet implements ResultSet {
 						Reader reader,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1301,6 +1470,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateNString(int columnindex,
 						String nString)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1308,16 +1478,19 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateNString(String columnlabel,
 						String nString)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateNull(int columnindex) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateNull(String columnlabel) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1325,6 +1498,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateObject(int columnindex,
 						Object x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1333,6 +1507,7 @@ public class SQLRelayResultSet implements ResultSet {
 						Object x,
 						int scaleOrLength)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1340,6 +1515,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateObject(String columnlabel,
 						Object x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1348,47 +1524,55 @@ public class SQLRelayResultSet implements ResultSet {
 						Object x,
 						int scaleOrLength)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateRef(int columnindex, Ref x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateRef(String columnlabel, Ref x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateRow() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateRowId(int columnindex, RowId x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateRowId(String columnlabel, RowId x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateShort(int columnindex, short x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	updateShort(String columnlabel, short x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1396,6 +1580,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateSQLXML(int columnindex,
 						SQLXML xmlObject)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1403,6 +1588,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateSQLXML(String columnlabel,
 						SQLXML xmlObject)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1410,6 +1596,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateString(int columnindex,
 						String x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1417,6 +1604,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateString(String columnlabel,
 						String x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1424,6 +1612,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateTime(int columnindex,
 						Time x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1431,6 +1620,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateTime(String columnlabel,
 						Time x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1438,6 +1628,7 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateTimestamp(int columnindex,
 						Timestamp x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1445,21 +1636,25 @@ public class SQLRelayResultSet implements ResultSet {
 	public void	updateTimestamp(String columnlabel,
 						Timestamp x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public boolean	wasNull() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return wasnull;
 	}
 
 	public boolean	isWrapperFor(Class<?> iface) throws SQLException {
+		debugFunction();
 		return (iface==SQLRCursor.class);
 	}
 
 	@SuppressWarnings({"unchecked"})
 	public <T> T	unwrap(Class<T> iface) throws SQLException {
+		debugFunction();
 		return (T)((iface==SQLRCursor.class)?sqlrcur:null);
 	}
 
@@ -1470,6 +1665,7 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	private void throwInvalidColumn(int columnindex) throws SQLException {
+		debugFunction();
 		if (columnindex<1 || columnindex>sqlrcur.colCount()) {
 			throw new SQLException("FIXME: invalid columnindex");
 		}
@@ -1477,6 +1673,7 @@ public class SQLRelayResultSet implements ResultSet {
 
 	private void throwInvalidColumn(String columnlabel)
 						throws SQLException {
+		debugFunction();
 		String[] cols=sqlrcur.getColumnNames();
 		for (int i=0; i<cols.length; i++) {
 			if (cols[i].equals(columnlabel)) {
@@ -1487,10 +1684,12 @@ public class SQLRelayResultSet implements ResultSet {
 	}
 
 	private void throwErrorMessageException() throws SQLException {
+		debugFunction();
 		throw new SQLException(sqlrcur.errorMessage());
 	}
 
 	private void throwNotSupportedException() throws SQLException {
+		debugFunction();
 		throw new SQLFeatureNotSupportedException();
 	}
 }

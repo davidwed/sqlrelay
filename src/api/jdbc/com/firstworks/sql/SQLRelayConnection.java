@@ -8,7 +8,7 @@ import java.util.concurrent.Executor;
 
 import com.firstworks.sqlrelay.*;
 
-public class SQLRelayConnection implements Connection {
+public class SQLRelayConnection extends SQLRelayDebug implements Connection {
 
 	private String		host;
 	private short		port;
@@ -31,6 +31,8 @@ public class SQLRelayConnection implements Connection {
 					String password,
 					int retrytime,
 					int tries) throws SQLException {
+		debugFunction();
+
 		this.host=host;
 		this.port=port;
 		this.socket=socket;
@@ -49,43 +51,55 @@ public class SQLRelayConnection implements Connection {
 		// instead of tracking it here
 		networktimeout=0;
 		typemap=null;
-//sqlrcon.debugOn();
+
+		if (debug) {
+			sqlrcon.debugOn();
+		}
 	}
 
 	public String getHost() {
+		debugFunction();
 		return host;
 	}
 
 	public short getPort() {
+		debugFunction();
 		return port;
 	}
 
 	public String getSocket() {
+		debugFunction();
 		return socket;
 	}
 
 	public String getUser() {
+		debugFunction();
 		return user;
 	}
 
 	public String getPassword() {
+		debugFunction();
 		return password;
 	}
 
 	public void	abort(Executor executor) throws SQLException {
+		debugFunction();
 		close();
 	}
 
 	public void	clearWarnings() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 	}
 
 	public void	close() throws SQLException {
+		debugFunction();
 		sqlrcon.endSession();
 		sqlrcon=null;
 	}
 
 	public void	commit() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		if (!sqlrcon.commit()) {
 			throwErrorMessageException();
@@ -95,12 +109,14 @@ public class SQLRelayConnection implements Connection {
 	public Array	createArrayOf(String typeName,
 					Object[] elements)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
 	}
 
 	public Blob	createBlob() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: we might be able to support this...
@@ -108,6 +124,7 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public Clob	createClob() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: we might be able to support this...
@@ -115,6 +132,7 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public NClob	createNClob() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: we might be able to support this...
@@ -122,12 +140,14 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public SQLXML	createSQLXML() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
 	}
 
 	public Statement	createStatement() throws SQLException {
+		debugFunction();
 		return createStatement(ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY,
 					ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -136,6 +156,7 @@ public class SQLRelayConnection implements Connection {
 	public Statement	createStatement(int resultSetType,
 						int resultSetConcurrency)
 						throws SQLException {
+		debugFunction();
 		return createStatement(resultSetType,
 					resultSetConcurrency,
 					ResultSet.HOLD_CURSORS_OVER_COMMIT);
@@ -145,6 +166,7 @@ public class SQLRelayConnection implements Connection {
 						int resultSetConcurrency,
 						int resultSetHoldability)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 
 		// unsupported options
@@ -183,38 +205,45 @@ public class SQLRelayConnection implements Connection {
 	public Struct	createStruct(String typeName,
 						Object[] attributes)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
 	}
 
 	public boolean	getAutoCommit() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return autocommit;
 	}
 
 	public String	getCatalog() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return sqlrcon.getCurrentDatabase();
 	}
 
 	public Properties	getClientInfo() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return clientinfo;
 	}
 
 	public String	getClientInfo(String name) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		Properties	prop=getClientInfo();
 		return prop.getProperty(name);
 	}
 
 	public int	getHoldability() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return ResultSet.HOLD_CURSORS_OVER_COMMIT;
 	}
 
 	public DatabaseMetaData	getMetaData() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayDatabaseMetaData	metadata=
 						new SQLRelayDatabaseMetaData();
@@ -223,6 +252,7 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public int	getNetworkTimeout() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: the timeout can also be set using an environment
 		// variable, so we should get this from the underlying api
@@ -231,36 +261,43 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public String	getSchema() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return sqlrcon.getCurrentSchema();
 	}
 
 	public int	getTransactionIsolation() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return txisolevel;
 	}
 
 	public Map<String,Class<?>>	getTypeMap() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return typemap;
 	}
 
 	public SQLWarning	getWarnings() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// sqlrelay doesn't support anything like this
 		return null;
 	}
 
 	public boolean	isClosed() throws SQLException {
+		debugFunction();
 		return sqlrcon==null;
 	}
 
 	public boolean	isReadOnly() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return readonly;
 	}
 
 	public boolean	isValid(int timeout) throws SQLException {
+		debugFunction();
 		if (isClosed()) {
 			return false;
 		}
@@ -272,12 +309,14 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public String	nativeSQL(String sql) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return sql;
 	}
 
 	public CallableStatement	prepareCall(String sql)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRCursor	sqlrcur=new SQLRCursor(sqlrcon);
 		sqlrcur.prepareQuery(sql);
@@ -293,6 +332,7 @@ public class SQLRelayConnection implements Connection {
 						int resultSetType,
 						int resultSetConcurrency)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
@@ -303,6 +343,7 @@ public class SQLRelayConnection implements Connection {
 						int resultSetConcurrency,
 						int resultSetHoldability)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
@@ -310,6 +351,7 @@ public class SQLRelayConnection implements Connection {
 
 	public PreparedStatement	prepareStatement(String sql)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRCursor	sqlrcur=new SQLRCursor(sqlrcon);
 		sqlrcur.prepareQuery(sql);
@@ -324,6 +366,7 @@ public class SQLRelayConnection implements Connection {
 	public PreparedStatement	prepareStatement(String sql,
 						int autoGeneratedKeys)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
@@ -332,6 +375,7 @@ public class SQLRelayConnection implements Connection {
 	public PreparedStatement	prepareStatement(String sql,
 						int[] columnIndexes)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
@@ -341,6 +385,7 @@ public class SQLRelayConnection implements Connection {
 						int resultSetType,
 						int resultSetConcurrency)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
@@ -351,6 +396,7 @@ public class SQLRelayConnection implements Connection {
 						int resultSetConcurrency,
 						int resultSetHoldability)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
@@ -359,6 +405,7 @@ public class SQLRelayConnection implements Connection {
 	public PreparedStatement	prepareStatement(String sql,
 						String[] columnNames)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
@@ -366,11 +413,13 @@ public class SQLRelayConnection implements Connection {
 
 	public void	releaseSavepoint(Savepoint savepoint)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	rollback() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		if (!sqlrcon.rollback()) {
 			throwErrorMessageException();
@@ -378,11 +427,13 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public void	rollback(Savepoint savepoint) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void	setAutoCommit(boolean autocommit) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		if (!((autocommit)?sqlrcon.autoCommitOn():
 					sqlrcon.autoCommitOff())) {
@@ -392,6 +443,7 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public void	setCatalog(String catalog) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		if (!sqlrcon.selectDatabase(catalog)) {
 			throwErrorMessageException();
@@ -400,6 +452,7 @@ public class SQLRelayConnection implements Connection {
 
 	public void	setClientInfo(Properties properties)
 						throws SQLClientInfoException {
+		debugFunction();
 		if (sqlrcon==null) {
 			throw new SQLClientInfoException();
 		}
@@ -410,6 +463,7 @@ public class SQLRelayConnection implements Connection {
 
 	public void	setClientInfo(String name, String value)
 						throws SQLClientInfoException {
+		debugFunction();
 		if (sqlrcon==null) {
 			throw new SQLClientInfoException();
 		}
@@ -418,6 +472,7 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	private void	setClientInfo() {
+		debugFunction();
 		String	info=new String();
 		boolean	first=true;
 		for (String name: clientinfo.stringPropertyNames()) {
@@ -432,6 +487,7 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public void	setHoldability(int holdability) throws SQLException {
+		debugFunction();
 		if (holdability!=ResultSet.HOLD_CURSORS_OVER_COMMIT) {
 			throwNotSupportedException();
 		}
@@ -440,6 +496,7 @@ public class SQLRelayConnection implements Connection {
 	public void	setNetworkTimeout(Executor executor,
 						int milliseconds)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// we can ignore executor because we have an internal
 		// timeout implementation
@@ -459,29 +516,34 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	public void	setReadOnly(boolean readonly) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: implement this somehow
 		this.readonly=readonly;
 	}
 
 	public Savepoint	setSavepoint() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
 	}
 
 	public Savepoint	setSavepoint(String name) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		return null;
 	}
 
 	public void	setSchema(String schema) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: implement this somehow
 	}
 
 	public void	setTransactionIsolation(int level) throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		switch (level) {
 			case Connection.TRANSACTION_READ_UNCOMMITTED:
@@ -505,17 +567,20 @@ public class SQLRelayConnection implements Connection {
 
 	public void	setTypeMap(Map<String,Class<?>> map)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: do something with this
 		typemap=map;
 	}
 
 	public boolean	isWrapperFor(Class<?> iface) throws SQLException {
+		debugFunction();
 		return (iface==SQLRConnection.class);
 	}
 
 	@SuppressWarnings({"unchecked"})
 	public <T> T	unwrap(Class<T> iface) throws SQLException {
+		debugFunction();
 		return (T)((iface==SQLRConnection.class)?sqlrcon:null);
 	}
 
@@ -526,14 +591,21 @@ public class SQLRelayConnection implements Connection {
 	}
 
 	private void throwErrorMessageException() throws SQLException {
+		debugFunction();
 		throwException(sqlrcon.errorMessage());
 	}
 
 	private void throwNotSupportedException() throws SQLException {
+		debugFunction();
 		throw new SQLFeatureNotSupportedException();
 	}
 
 	private void throwException(String reason) throws SQLException {
+		debugFunction();
 		throw new SQLException(reason);
+	}
+
+	public SQLRConnection getSqlrCon() {
+		return sqlrcon;
 	}
 }

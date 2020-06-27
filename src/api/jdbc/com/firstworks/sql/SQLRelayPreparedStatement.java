@@ -25,17 +25,20 @@ public class SQLRelayPreparedStatement
 
 	SQLRelayPreparedStatement() {
 		super();
+		debugFunction();
 		batch=new ArrayList<HashMap<Integer,SQLRelayParameter>>();
 		parameters=new HashMap<Integer,SQLRelayParameter>();
 	}
 
 	public void 	addBatch() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		batch.add(parameters);
 		parameters=new HashMap<Integer,SQLRelayParameter>();
 	}
 
 	public void 	clearParameters() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		sqlrcur.clearBinds();
 		batch.clear();
@@ -43,6 +46,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public boolean 	execute() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: handle timeout
 		resultset=null;
@@ -65,6 +69,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public int[] 	executeBatch() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: handle timeout
 		int[]	results=new int[batch.size()];
@@ -78,6 +83,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public ResultSet 	executeQuery() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: handle timeout
 		resultset=null;
@@ -99,6 +105,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public int 	executeUpdate() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: handle timeout
 		resultset=null;
@@ -119,6 +126,7 @@ public class SQLRelayPreparedStatement
 
 	private void	bind(HashMap<Integer,SQLRelayParameter> params)
 							throws SQLException {
+		debugFunction();
 
 		if (params==null) {
 			return;
@@ -434,12 +442,14 @@ public class SQLRelayPreparedStatement
 	}
 
 	public ResultSetMetaData 	getMetaData() throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		return (resultset!=null)?resultset.getMetaData():null;
 	}
 
 	public ParameterMetaData 	getParameterMetaData()
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameterMetaData	pmd=
 					new SQLRelayParameterMetaData();
@@ -453,12 +463,14 @@ public class SQLRelayPreparedStatement
 
 	public void 	setArray(int parameterIndex, Array x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void 	setAsciiStream(int parameterIndex, InputStream x)
 							throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -482,6 +494,7 @@ public class SQLRelayPreparedStatement
 						InputStream x,
 						int length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -506,6 +519,7 @@ public class SQLRelayPreparedStatement
 						InputStream x,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -529,6 +543,7 @@ public class SQLRelayPreparedStatement
 	public void 	setBigDecimal(int parameterIndex,
 						BigDecimal x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -552,6 +567,7 @@ public class SQLRelayPreparedStatement
 	public void 	setBinaryStream(int parameterIndex,
 						InputStream x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -576,6 +592,7 @@ public class SQLRelayPreparedStatement
 						InputStream x,
 						int length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -600,6 +617,7 @@ public class SQLRelayPreparedStatement
 						InputStream x,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -622,6 +640,7 @@ public class SQLRelayPreparedStatement
 
 	public void 	setBlob(int parameterIndex, Blob x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -645,6 +664,7 @@ public class SQLRelayPreparedStatement
 	public void 	setBlob(int parameterIndex,
 					InputStream inputStream)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -669,6 +689,7 @@ public class SQLRelayPreparedStatement
 					InputStream inputStream,
 					long length)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -693,6 +714,7 @@ public class SQLRelayPreparedStatement
 	public void 	setBoolean(int parameterIndex,
 					boolean x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -716,6 +738,7 @@ public class SQLRelayPreparedStatement
 	public void 	setByte(int parameterIndex,
 					byte x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -739,6 +762,7 @@ public class SQLRelayPreparedStatement
 	public void 	setBytes(int parameterIndex,
 					byte[] x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		Byte[]	bytes=new Byte[x.length];
 		for (int i=0; i<x.length; i++) {
@@ -766,6 +790,7 @@ public class SQLRelayPreparedStatement
 	public void 	setCharacterStream(int parameterIndex,
 					Reader reader)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -790,6 +815,7 @@ public class SQLRelayPreparedStatement
 						Reader reader,
 						int length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -815,6 +841,7 @@ public class SQLRelayPreparedStatement
 						Reader reader,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -839,6 +866,7 @@ public class SQLRelayPreparedStatement
 	public void 	setClob(int parameterIndex,
 					Clob x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -862,6 +890,7 @@ public class SQLRelayPreparedStatement
 	public void 	setClob(int parameterIndex,
 					Reader reader)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -886,6 +915,7 @@ public class SQLRelayPreparedStatement
 					Reader reader,
 					long length)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -909,6 +939,7 @@ public class SQLRelayPreparedStatement
 	public void 	setDate(int parameterIndex,
 					Date x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: support this...
@@ -935,6 +966,7 @@ public class SQLRelayPreparedStatement
 					Date x,
 					Calendar cal)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: support this...
@@ -960,6 +992,7 @@ public class SQLRelayPreparedStatement
 	public void 	setDouble(int parameterIndex,
 					double x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -983,6 +1016,7 @@ public class SQLRelayPreparedStatement
 	public void 	setFloat(int parameterIndex,
 					float x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1006,6 +1040,7 @@ public class SQLRelayPreparedStatement
 	public void 	setInt(int parameterIndex,
 					int x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1029,6 +1064,7 @@ public class SQLRelayPreparedStatement
 	public void 	setLong(int parameterIndex,
 					long x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1052,6 +1088,7 @@ public class SQLRelayPreparedStatement
 	public void 	setNCharacterStream(int parameterIndex,
 						Reader value)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1076,6 +1113,7 @@ public class SQLRelayPreparedStatement
 						Reader value,
 						long length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1099,6 +1137,7 @@ public class SQLRelayPreparedStatement
 	public void 	setNClob(int parameterIndex,
 					NClob value)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1122,6 +1161,7 @@ public class SQLRelayPreparedStatement
 	public void 	setNClob(int parameterIndex,
 					Reader reader)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1146,6 +1186,7 @@ public class SQLRelayPreparedStatement
 					Reader reader,
 					long length)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1169,6 +1210,7 @@ public class SQLRelayPreparedStatement
 	public void 	setNString(int parameterIndex,
 					String value)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1192,6 +1234,7 @@ public class SQLRelayPreparedStatement
 	public void 	setNull(int parameterIndex,
 					int sqlType)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1216,6 +1259,7 @@ public class SQLRelayPreparedStatement
 					int sqlType,
 					String typeName)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1239,6 +1283,7 @@ public class SQLRelayPreparedStatement
 	public void 	setObject(int parameterIndex,
 					Object x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1247,6 +1292,7 @@ public class SQLRelayPreparedStatement
 					Object x,
 					int targetSqlType)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
@@ -1256,24 +1302,28 @@ public class SQLRelayPreparedStatement
 					int targetSqlType,
 					int scaleOrLength)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void 	setRef(int parameterIndex, Ref x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void 	setRowId(int parameterIndex, RowId x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void 	setShort(int parameterIndex, short x)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1296,6 +1346,7 @@ public class SQLRelayPreparedStatement
 
 	public void 	setString(int parameterIndex, String x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1319,12 +1370,14 @@ public class SQLRelayPreparedStatement
 	public void 	setSQLXML(int parameterIndex,
 					SQLXML xmlObject)
 					throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public void 	setTime(int parameterIndex, Time x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: support this...
@@ -1351,6 +1404,7 @@ public class SQLRelayPreparedStatement
 						Time x,
 						Calendar cal)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: support this...
@@ -1376,6 +1430,7 @@ public class SQLRelayPreparedStatement
 	public void 	setTimestamp(int parameterIndex,
 						Timestamp x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: support this...
@@ -1402,6 +1457,7 @@ public class SQLRelayPreparedStatement
 						Timestamp x,
 						Calendar cal)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 		// FIXME: support this...
@@ -1428,6 +1484,7 @@ public class SQLRelayPreparedStatement
 						InputStream x,
 						int length)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		SQLRelayParameter	param=new SQLRelayParameter();
 		param.setClassName("FIXME");
@@ -1450,23 +1507,28 @@ public class SQLRelayPreparedStatement
 
 	public void 	setURL(int parameterIndex, URL x)
 						throws SQLException {
+		debugFunction();
 		throwExceptionIfClosed();
 		throwNotSupportedException();
 	}
 
 	public String	asciiStreamToString(InputStream stream) {
+		debugFunction();
 		return streamToString(stream,"US-ASCII");
 	}
 
 	public String	asciiStreamToString(InputStream stream, long length) {
+		debugFunction();
 		return streamToString(stream,length,"US-ASCII");
 	}
 
 	public String	unicodeStreamToString(InputStream stream, long length) {
+		debugFunction();
 		return streamToString(stream,length,"UTF-8");
 	}
 
 	public String	streamToString(InputStream stream, String encoding) {
+		debugFunction();
 		try {
 			return readerToString(new BufferedReader(
 						new InputStreamReader(
@@ -1479,6 +1541,7 @@ public class SQLRelayPreparedStatement
 	public String	streamToString(InputStream stream,
 						long length,
 						String encoding) {
+		debugFunction();
 		try {
 			return readerToString(new BufferedReader(
 						new InputStreamReader(
@@ -1490,6 +1553,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public String	readerToString(Reader reader) {
+		debugFunction();
 		try {
 			StringBuilder	stringbuilder=new StringBuilder();
 			int	c=0;
@@ -1503,6 +1567,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public String	readerToString(Reader reader, long length) {
+		debugFunction();
 		try {
 			StringBuilder	stringbuilder=new StringBuilder();
 			int	c=0;
@@ -1516,6 +1581,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public String	clobToString(Clob clob) {
+		debugFunction();
 		try {
 			return asciiStreamToString(clob.getAsciiStream());
 		} catch (Exception ex) {
@@ -1524,6 +1590,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public String	nClobToUnicodeString(NClob clob) {
+		debugFunction();
 		try {
 			return readerToString(clob.getCharacterStream());
 		} catch (Exception ex) {
@@ -1532,6 +1599,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public byte[]	binaryStreamToBytes(InputStream stream) {
+		debugFunction();
 		try {
 			ByteArrayOutputStream	output=
 						new ByteArrayOutputStream();
@@ -1549,6 +1617,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public byte[]	binaryStreamToBytes(InputStream stream, long length) {
+		debugFunction();
 		try {
 			ByteArrayOutputStream	output=
 						new ByteArrayOutputStream();
@@ -1569,6 +1638,7 @@ public class SQLRelayPreparedStatement
 	}
 
 	public byte[]	blobToBytes(Blob blob) {
+		debugFunction();
 		try {
 			return binaryStreamToBytes(blob.getBinaryStream());
 		} catch (Exception ex) {
