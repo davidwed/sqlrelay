@@ -21,16 +21,14 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 		debugFunction();
 		// Retrieves whether the current user can call all the
 		// procedures returned by the method getProcedures.
-		// FIXME: this is almost certainly not correct.
-		return true;
+		return false;
 	}
 
 	public boolean 	allTablesAreSelectable() throws SQLException {
 		debugFunction();
 		// Retrieves whether the current user can use all the tables
 		// returned by the method getTables in a SELECT statement.
-		// FIXME: this is almost certainly not correct.
-		return true;
+		return false;
 	}
 
 	public boolean 	autoCommitFailureClosesAllResultSets()
@@ -225,7 +223,7 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 	public String 	getExtraNameCharacters() throws SQLException {
 		debugFunction();
 		// FIXME: db-specific
-		return null;
+		return "#@";
 	}
 
 	public ResultSet 	getFunctionColumns(
@@ -252,9 +250,8 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 	public String 	getIdentifierQuoteString() throws SQLException {
 		debugFunction();
 		// FIXME: db-specific
-		// * mysql uses back-tick
 		// * sqlserver uses braces
-		return "\"";
+		return (getDatabaseProductName().equals("mysql"))?"`":"\"";
 	}
 
 	public ResultSet 	getImportedKeys(String catalog,

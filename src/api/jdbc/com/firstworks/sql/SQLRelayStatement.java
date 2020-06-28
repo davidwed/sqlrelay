@@ -103,13 +103,11 @@ public class SQLRelayStatement extends SQLRelayDebug implements Statement {
 		updatecount=-1;
 		boolean	result=sqlrcur.sendQuery(sql);
 		if (result) {
-			if (sqlrcur.affectedRows()==0 && sqlrcur.colCount()>0) {
+			updatecount=(int)sqlrcur.affectedRows();
+			if (sqlrcur.colCount()>0) {
 				resultset=new SQLRelayResultSet();
 				resultset.setStatement(this);
 				resultset.setSQLRCursor(sqlrcur);
-			} else {
-				sqlrcur.closeResultSet();
-				result=false;
 			}
 		} else {
 			throwErrorMessageException();
