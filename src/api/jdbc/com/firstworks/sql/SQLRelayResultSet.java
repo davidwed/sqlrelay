@@ -9,9 +9,11 @@ import java.io.StringBufferInputStream;
 import java.io.StringReader;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Calendar;
 import java.util.Map;
 import java.net.URL;
+import java.net.MalformedURLException;
 
 import com.firstworks.sqlrelay.*;
 
@@ -21,6 +23,7 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	private SQLRCursor	sqlrcur;
 	private long		currentrow;
 	private	boolean		beforefirst;
+	private	boolean		islast;
 	private	boolean		afterlast;
 	private	int		fetchdirection;
 	private boolean		wasnull;
@@ -36,6 +39,7 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		sqlrcur=null;
 		currentrow=0;
 		beforefirst=true;
+		islast=false;
 		afterlast=false;
 		fetchdirection=ResultSet.FETCH_FORWARD;
 		wasnull=false;
@@ -63,24 +67,32 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		} else if (row==0) {
 			beforefirst=true;
 			currentrow=0;
+			islast=false;
 			afterlast=false;
 		} else if (row>0) {
 			beforefirst=false;
 			currentrow=row;
-			// FIXME: there are some games we can play to decide
-			// whether we need to do this getField()
+			// FIXME: we can evaulate the result set buffer size
+			// to decide whether or not we need to call getField()
 			sqlrcur.getField(currentrow-1,0);
-			long	firstrowindex=sqlrcur.firstRowIndex();
-			if (sqlrcur.endOfResultSet() &&
-				(currentrow-1)>=sqlrcur.rowCount()) {
-				afterlast=true;
-				debugPrintln("  after last");
-				return false;
+			long	rowcount=sqlrcur.rowCount();
+			if (sqlrcur.endOfResultSet()) {
+				if (currentrow-1==rowcount-1) {
+					islast=true;
+					afterlast=false;
+				} else if (currentrow-1>=rowcount) {
+					islast=false;
+					afterlast=true;
+					debugPrintln("  after last");
+					return false;
+				}
 			}
 		} else if (row<0) {
-			debugPrintln("  before first");
 			// FIXME: implement this...
-			return false;
+			// position relative to end of result set
+			String	ex="FIXME: negative row not supported";
+			debugPrintln("  exception: "+ex);
+			throw new SQLException(ex);
 		}
 		debugPrintln("  success");
 		return true;
@@ -204,7 +216,6 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		// FIXME: do something with scale...
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		debugPrintln("  field: "+field);
@@ -212,7 +223,9 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		if (wasnull) {
 			return null;
 		}
-		return new BigDecimal(field);
+		return new BigDecimal(
+				new BigInteger(field.replace("\\.","")),
+				scale);
 	}
 
 	public BigDecimal	getBigDecimal(String columnlabel)
@@ -235,7 +248,6 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		// FIXME: do something with scale...
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		debugPrintln("  field: "+field);
@@ -243,7 +255,9 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		if (wasnull) {
 			return null;
 		}
-		return new BigDecimal(field);
+		return new BigDecimal(
+				new BigInteger(field.replace("\\.","")),
+				scale);
 	}
 
 	public InputStream	getBinaryStream(int columnindex)
@@ -281,7 +295,9 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
-		// FIXME: we can support this...
+		// FIXME: we could theoretically support this, but currently
+		// SQLRelayResultSetMetaData.getColumnType/getColumnClassName
+		// don't return any lob types, so it's not currently necessary
 		return null;
 	}
 
@@ -290,7 +306,9 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
-		// FIXME: we can support this...
+		// FIXME: we could theoretically support this, but currently
+		// SQLRelayResultSetMetaData.getColumnType/getColumnClassName
+		// don't return any lob types, so it's not currently necessary
 		return null;
 	}
 
@@ -397,7 +415,9 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
-		// FIXME: we can support this...
+		// FIXME: we could theoretically support this, but currently
+		// SQLRelayResultSetMetaData.getColumnType/getColumnClassName
+		// don't return any lob types, so it's not currently necessary
 		return null;
 	}
 
@@ -406,7 +426,9 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
-		// FIXME: we can support this...
+		// FIXME: we could theoretically support this, but currently
+		// SQLRelayResultSetMetaData.getColumnType/getColumnClassName
+		// don't return any lob types, so it's not currently necessary
 		return null;
 	}
 
@@ -442,7 +464,7 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugPrintln("  field: "+field);
 		debugPrintln("  wasnull: "+wasnull);
 		// FIXME: use cal
-		// FIXME: not guaranteed to be in iso format
+		// FIXME: field isn't guaranteed to be in iso format
 		return (wasnull)?null:Date.valueOf(field);
 	}
 
@@ -462,7 +484,7 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugPrintln("  field: "+field);
 		debugPrintln("  wasnull: "+wasnull);
 		// FIXME: use cal
-		// FIXME: not guaranteed to be in iso format
+		// FIXME: field isn't guaranteed to be in iso format
 		return (wasnull)?null:Date.valueOf(field);
 	}
 
@@ -635,7 +657,9 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
-		// FIXME: we can support this...
+		// FIXME: we could theoretically support this, but currently
+		// SQLRelayResultSetMetaData.getColumnType/getColumnClassName
+		// don't return any lob types, so it's not currently necessary
 		return null;
 	}
 
@@ -644,7 +668,9 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
-		// FIXME: we can support this...
+		// FIXME: we could theoretically support this, but currently
+		// SQLRelayResultSetMetaData.getColumnType/getColumnClassName
+		// don't return any lob types, so it's not currently necessary
 		return null;
 	}
 
@@ -971,8 +997,18 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		throwNotSupportedException();
-		// FIXME: we might be able to support this somehow...
-		return null;
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		if (wasnull) {
+			return null;
+		}
+		try {
+			return new URL(field);
+		} catch (MalformedURLException ex) {
+			return null;
+		}
 	}
 
 	public URL	getURL(String columnlabel) throws SQLException {
@@ -980,8 +1016,18 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		throwNotSupportedException();
-		// FIXME: we might be able to support this somehow...
-		return null;
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		if (wasnull) {
+			return null;
+		}
+		try {
+			return new URL(field);
+		} catch (MalformedURLException ex) {
+			return null;
+		}
 	}
 
 	public SQLWarning	getWarnings() throws SQLException {
@@ -1028,8 +1074,6 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	public boolean	isLast() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		// FIXME: implement this for real
-		boolean	islast=false;
 		debugPrintln("  is last: "+islast);
 		return islast;
 	}
@@ -1804,22 +1848,26 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	}
 
 	private void throwInvalidColumn(int columnindex) throws SQLException {
-		debugFunction();
 		if (columnindex<1 || columnindex>sqlrcur.colCount()) {
-			throw new SQLException("FIXME: invalid columnindex");
+			debugFunction();
+			String	ex="FIXME: invalid column index";
+			debugPrintln("  exception: "+ex);
+			throw new SQLException(ex);
 		}
 	}
 
 	private void throwInvalidColumn(String columnlabel)
 						throws SQLException {
-		debugFunction();
 		String[] cols=sqlrcur.getColumnNames();
 		for (int i=0; i<cols.length; i++) {
 			if (cols[i].equals(columnlabel)) {
 				return;
 			}
 		}
-		throw new SQLException("FIXME: invalid columnindex");
+		debugFunction();
+		String	ex="FIXME: invalid column label";
+		debugPrintln("  exception: "+ex);
+		throw new SQLException(ex);
 	}
 
 	private void throwErrorMessageException() throws SQLException {
