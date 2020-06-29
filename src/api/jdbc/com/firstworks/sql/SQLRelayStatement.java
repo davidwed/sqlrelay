@@ -97,13 +97,25 @@ public class SQLRelayStatement extends SQLRelayDebug implements Statement {
 
 	public boolean 	execute(String sql) throws SQLException {
 		debugFunction();
+		debugPrintln("  sql: "+sql);
+
 		throwExceptionIfClosed();
+
 		// FIXME: handle timeout
 		resultset=null;
 		updatecount=-1;
+
 		boolean	result=sqlrcur.sendQuery(sql);
+
+		debugPrintln("  result: "+result);
+
 		if (result) {
+
 			updatecount=(int)sqlrcur.affectedRows();
+
+			debugPrintln("  updatecount: "+updatecount);
+			debugPrintln("  colcount: "+sqlrcur.colCount());
+
 			if (sqlrcur.colCount()>0) {
 				resultset=new SQLRelayResultSet();
 				resultset.setStatement(this);

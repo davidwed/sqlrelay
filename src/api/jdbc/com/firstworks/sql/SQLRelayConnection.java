@@ -53,7 +53,7 @@ public class SQLRelayConnection extends SQLRelayDebug implements Connection {
 		typemap=null;
 
 		if (debug) {
-			sqlrcon.debugOn();
+			//sqlrcon.debugOn();
 		}
 	}
 

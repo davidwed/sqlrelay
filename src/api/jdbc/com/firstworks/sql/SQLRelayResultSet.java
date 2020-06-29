@@ -54,10 +54,12 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	public boolean	absolute(int row) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
+		debugPrintln("  row: "+row);
 		if (row<currentrow) {
-			throw new SQLException(
-					"FIXME: ResultSet "+
-					"type is Forward-Only");
+			String	ex="FIXME: ResultSet "+
+					"type is Forward-Only";
+			debugPrintln("  exception: "+ex);
+			throw new SQLException(ex);
 		} else if (row==0) {
 			beforefirst=true;
 			currentrow=0;
@@ -72,12 +74,15 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 			if (sqlrcur.endOfResultSet() &&
 				(currentrow-1)>=sqlrcur.rowCount()) {
 				afterlast=true;
+				debugPrintln("  after last");
 				return false;
 			}
 		} else if (row<0) {
+			debugPrintln("  before first");
 			// FIXME: implement this...
 			return false;
 		}
+		debugPrintln("  success");
 		return true;
 	}
 
@@ -123,10 +128,13 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		for (int i=0; i<sqlrcur.colCount(); i++) {
 			if (sqlrcur.getColumnName(i).equals(columnlabel)) {
+				debugPrintln("  column: "+(i+1));
 				return i+1;
 			}
 		}
-		throw new SQLException("FIXME: Column not found");
+		String	ex=("Column not found");
+		debugPrintln("  "+ex);
+		throw new SQLException(ex);
 	}
 
 	public boolean	first() throws SQLException {
@@ -157,6 +165,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
 		// FIXME: not sure this is correct, how do we ensure it's ascii?
 		return new StringBufferInputStream(field);
 	}
@@ -168,6 +178,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
 		// FIXME: not sure this is correct, how do we ensure it's ascii?
 		return new StringBufferInputStream(field);
 	}
@@ -178,8 +190,10 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
-		if (field==null) {
-			wasnull=true;
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		if (wasnull) {
 			return null;
 		}
 		return new BigDecimal(field);
@@ -192,8 +206,10 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnindex);
 		// FIXME: do something with scale...
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
-		if (field==null) {
-			wasnull=true;
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		if (wasnull) {
 			return null;
 		}
 		return new BigDecimal(field);
@@ -205,8 +221,10 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
-		if (field==null) {
-			wasnull=true;
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		if (wasnull) {
 			return null;
 		}
 		return new BigDecimal(field);
@@ -219,8 +237,10 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnlabel);
 		// FIXME: do something with scale...
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
-		if (field==null) {
-			wasnull=true;
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		if (wasnull) {
 			return null;
 		}
 		return new BigDecimal(field);
@@ -234,6 +254,10 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		byte[]	field=sqlrcur.getFieldAsByteArray(
 					currentrow-1,columnindex-1);
 		wasnull=(field==null);
+		debugPrint("  field: ");
+		debugPrint(field);
+		debugPrint("\n");
+		debugPrintln("  was null: "+wasnull);
 		return new ByteArrayInputStream(field);
 	}
 
@@ -245,6 +269,10 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		byte[]	field=sqlrcur.getFieldAsByteArray(
 					currentrow-1,columnlabel);
 		wasnull=(field==null);
+		debugPrint("  field: ");
+		debugPrint(field);
+		debugPrint("\n");
+		debugPrintln("  was null: "+wasnull);
 		return new ByteArrayInputStream(field);
 	}
 
@@ -272,6 +300,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
 		return field.equals("1");
 	}
 
@@ -281,6 +311,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
 		return field.equals("1");
 	}
 
@@ -288,18 +320,24 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
-		return (byte)sqlrcur.getFieldAsInteger(
+		long	field=sqlrcur.getFieldAsInteger(
 					currentrow-1,columnindex-1);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return (byte)field;
 	}
 
 	public byte	getByte(String columnlabel) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
-		return (byte)sqlrcur.getFieldAsInteger(
+		long	field=sqlrcur.getFieldAsInteger(
 					currentrow-1,columnlabel);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return (byte)field;
 	}
 
 	public byte[]	getBytes(int columnindex) throws SQLException {
@@ -309,6 +347,10 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		byte[]	field=sqlrcur.getFieldAsByteArray(
 					currentrow-1,columnindex-1);
 		wasnull=(field==null);
+		debugPrint("  field: ");
+		debugPrint(field);
+		debugPrint("\n");
+		debugPrintln("  was null: "+wasnull);
 		return field;
 	}
 
@@ -319,6 +361,10 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		byte[]	field=sqlrcur.getFieldAsByteArray(
 					currentrow-1,columnlabel);
 		wasnull=(field==null);
+		debugPrint("  field: ");
+		debugPrint(field);
+		debugPrint("\n");
+		debugPrintln("  was null: "+wasnull);
 		return field;
 	}
 
@@ -329,6 +375,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
 		return (wasnull)?null:(new StringReader(field));
 	}
 
@@ -339,6 +387,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
 		return (wasnull)?null:(new StringReader(field));
 	}
 
@@ -363,22 +413,23 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	public int	getConcurrency() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		return ResultSet.CONCUR_READ_ONLY;
+		int	concurrency=ResultSet.CONCUR_READ_ONLY;
+		debugPrintln("  concurrency: "+concurrency);
+		return concurrency;
 	}
 
 	public String	getCursorName() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		return null;
+		String	cursorname=null;
+		debugPrintln("  cursor name: "+cursorname);
+		return cursorname;
 	}
 
 	public Date	getDate(int columnindex) throws SQLException {
 		debugFunction();
-		throwExceptionIfClosed();
-		throwInvalidColumn(columnindex);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: pass in some default calendar
+		return getDate(columnindex,null);
 	}
 
 	public Date	getDate(int columnindex, Calendar cal)
@@ -386,18 +437,18 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: use cal
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		return (wasnull)?null:Date.valueOf(field);
 	}
 
 	public Date	getDate(String columnlabel) throws SQLException {
 		debugFunction();
-		throwExceptionIfClosed();
-		throwInvalidColumn(columnlabel);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: pass in some default calendar
+		return getDate(columnlabel,null);
 	}
 
 	public Date	getDate(String columnlabel, Calendar cal)
@@ -405,97 +456,133 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: use cal
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		return (wasnull)?null:Date.valueOf(field);
 	}
 
 	public double	getDouble(int columnindex) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
+		double	field=sqlrcur.getFieldAsDouble(
+					currentrow-1,columnindex-1);
 		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
-		return sqlrcur.getFieldAsDouble(currentrow-1,columnindex-1);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return field;
 	}
 
 	public double	getDouble(String columnlabel) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
+		double	field=sqlrcur.getFieldAsDouble(
+					currentrow-1,columnlabel);
 		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
-		return sqlrcur.getFieldAsDouble(currentrow-1,columnlabel);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return field;
 	}
 
 	public int	getFetchDirection() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		return (int)sqlrcur.getResultSetBufferSize();
+		int	direction=ResultSet.FETCH_FORWARD;
+		debugPrintln("  direction: "+direction);
+		return direction;
 	}
 
 	public int	getFetchSize() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		return (int)sqlrcur.getResultSetBufferSize();
+		int	size=(int)sqlrcur.getResultSetBufferSize();
+		debugPrintln("  size: "+size);
+		return size;
 	}
 
 	public float	getFloat(int columnindex) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
-		return (float)sqlrcur.getFieldAsDouble(
+		float	field=(float)sqlrcur.getFieldAsDouble(
 					currentrow-1,columnindex-1);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return field;
 	}
 
 	public float	getFloat(String columnlabel) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
-		return (float)sqlrcur.getFieldAsDouble(
+		float	field=(float)sqlrcur.getFieldAsDouble(
 					currentrow-1,columnlabel);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return field;
 	}
 
 	public int	getHoldability() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: is this correct?
-		return ResultSet.CLOSE_CURSORS_AT_COMMIT;
+		int	holdability=ResultSet.CLOSE_CURSORS_AT_COMMIT;
+		debugPrintln("  holdability: "+holdability);
+		return holdability;
 	}
 
 	public int	getInt(int columnindex) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
-		return (int)sqlrcur.getFieldAsInteger(
+		int	field=(int)sqlrcur.getFieldAsInteger(
 					currentrow-1,columnindex-1);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return field;
 	}
 
 	public int	getInt(String columnlabel) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
+		int	field=(int)sqlrcur.getFieldAsInteger(
+					currentrow-1,columnlabel);
 		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
-		return (int)sqlrcur.getFieldAsInteger(currentrow-1,columnlabel);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return field;
 	}
 
 	public long	getLong(int columnindex) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
-		return (long)sqlrcur.getFieldAsInteger(
+		long	field=(long)sqlrcur.getFieldAsInteger(
 					currentrow-1,columnindex-1);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return field;
 	}
 
 	public long	getLong(String columnlabel) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
-		return (long)sqlrcur.getFieldAsInteger(
+		long	field=(long)sqlrcur.getFieldAsInteger(
 					currentrow-1,columnlabel);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  was null: "+wasnull);
+		return field;
 	}
 
 	public ResultSetMetaData	getMetaData() throws SQLException {
@@ -512,12 +599,16 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		byte[]	bytes=sqlrcur.getFieldAsByteArray(
+		byte[]	field=sqlrcur.getFieldAsByteArray(
 						currentrow-1,columnindex-1);
-		wasnull=(bytes==null);
+		wasnull=(field==null);
+		debugPrint("  field: ");
+		debugPrint(field);
+		debugPrint("\n");
+		debugPrintln("  was null: "+wasnull);
 		return (wasnull)?null:
 				(new InputStreamReader(
-					new ByteArrayInputStream(bytes)));
+					new ByteArrayInputStream(field)));
 	}
 
 	public Reader	getNCharacterStream(String columnlabel)
@@ -525,12 +616,16 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		byte[]	bytes=sqlrcur.getFieldAsByteArray(
+		byte[]	field=sqlrcur.getFieldAsByteArray(
 						currentrow-1,columnlabel);
-		wasnull=(bytes==null);
+		wasnull=(field==null);
+		debugPrint("  field: ");
+		debugPrint(field);
+		debugPrint("\n");
+		debugPrintln("  was null: "+wasnull);
 		return (wasnull)?null:
 				(new InputStreamReader(
-					new ByteArrayInputStream(bytes)));
+					new ByteArrayInputStream(field)));
 	}
 
 	public NClob	getNClob(int columnindex) throws SQLException {
@@ -555,11 +650,15 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		byte[]	bytes=sqlrcur.getFieldAsByteArray(
+		byte[]	field=sqlrcur.getFieldAsByteArray(
 						currentrow-1,columnindex-1);
-		wasnull=(bytes==null);
+		wasnull=(field==null);
+		debugPrint("  field: ");
+		debugPrint(field);
+		debugPrint("\n");
+		debugPrintln("  was null: "+wasnull);
 		try {
-			return (wasnull)?null:(new String(bytes,"UTF-8"));
+			return (wasnull)?null:(new String(field,"UTF-8"));
 		} catch (Exception ex) {
 			throw new SQLException(ex.getMessage());
 		}
@@ -569,11 +668,15 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		byte[]	bytes=sqlrcur.getFieldAsByteArray(
+		byte[]	field=sqlrcur.getFieldAsByteArray(
 						currentrow-1,columnlabel);
-		wasnull=(bytes==null);
+		wasnull=(field==null);
+		debugPrint("  field: ");
+		debugPrint(field);
+		debugPrint("\n");
+		debugPrintln("  was null: "+wasnull);
 		try {
-			return (wasnull)?null:(new String(bytes,"UTF-8"));
+			return (wasnull)?null:(new String(field,"UTF-8"));
 		} catch (Exception ex) {
 			throw new SQLException(ex.getMessage());
 		}
@@ -658,6 +761,7 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	public int	getRow() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
+		debugPrintln("  current row: "+currentrow);
 		return (int)currentrow;
 	}
 
@@ -682,17 +786,23 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	public short	getShort(int columnindex) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
-		return (short)sqlrcur.getFieldAsInteger(
+		short	field=(short)sqlrcur.getFieldAsInteger(
 						currentrow-1,columnindex-1);
+		wasnull=(sqlrcur.getField(currentrow-1,columnindex-1)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		return field;
 	}
 
 	public short	getShort(String columnlabel) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
-		return (short)sqlrcur.getFieldAsInteger(
+		short	field=(short)sqlrcur.getFieldAsInteger(
 						currentrow-1,columnlabel);
+		wasnull=(sqlrcur.getField(currentrow-1,columnlabel)==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		return field;
 	}
 
 	public SQLXML	getSQLXML(int columnindex) throws SQLException {
@@ -724,6 +834,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
 		return field;
 	}
 
@@ -733,16 +845,15 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
 		return field;
 	}
 
 	public Time	getTime(int columnindex) throws SQLException {
 		debugFunction();
-		throwExceptionIfClosed();
-		throwInvalidColumn(columnindex);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: pass in some default calendar
+		return getTime(columnindex,null);
 	}
 
 	public Time	getTime(int columnindex, Calendar cal)
@@ -750,18 +861,18 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: use cal
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		return (wasnull)?null:Time.valueOf(field);
 	}
 
 	public Time	getTime(String columnlabel) throws SQLException {
 		debugFunction();
-		throwExceptionIfClosed();
-		throwInvalidColumn(columnlabel);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: pass in some default calendar
+		return getTime(columnlabel,null);
 	}
 
 	public Time	getTime(String columnlabel, Calendar cal)
@@ -769,19 +880,19 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: use cal
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		return (wasnull)?null:Time.valueOf(field);
 	}
 
 	public Timestamp	getTimestamp(int columnindex)
 						throws SQLException {
 		debugFunction();
-		throwExceptionIfClosed();
-		throwInvalidColumn(columnindex);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: pass in some default calendar
+		return getTimestamp(columnindex,null);
 	}
 
 	public Timestamp	getTimestamp(int columnindex, Calendar cal)
@@ -789,19 +900,19 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: use cal
+		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		return (wasnull)?null:Timestamp.valueOf(field);
 	}
 
 	public Timestamp	getTimestamp(String columnlabel)
 							throws SQLException {
 		debugFunction();
-		throwExceptionIfClosed();
-		throwInvalidColumn(columnlabel);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: pass in some default calendar
+		return getTimestamp(columnlabel,null);
 	}
 
 	public Timestamp	getTimestamp(String columnlabel, Calendar cal)
@@ -809,15 +920,20 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		throwNotSupportedException();
-		// FIXME: we could support this if getFieldAsDate were exposed
-		return null;
+		// FIXME: use cal
+		String	field=sqlrcur.getField(currentrow-1,columnlabel);
+		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
+		return (wasnull)?null:Timestamp.valueOf(field);
 	}
 
 	public int	getType() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		return ResultSet.TYPE_FORWARD_ONLY;
+		int	type=ResultSet.TYPE_FORWARD_ONLY;
+		debugPrintln("  type: "+type);
+		return type;
 	}
 
 	public InputStream	getUnicodeStream(int columnindex)
@@ -827,6 +943,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnindex);
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
 		return new StringBufferInputStream(field);
 	}
 
@@ -837,6 +955,8 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		throwInvalidColumn(columnlabel);
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
+		debugPrintln("  field: "+field);
+		debugPrintln("  wasnull: "+wasnull);
 		return new StringBufferInputStream(field);
 	}
 
@@ -873,31 +993,39 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	public boolean	isAfterLast() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
+		debugPrintln("  after last: "+afterlast);
 		return afterlast;
 	}
 
 	public boolean	isBeforeFirst() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
+		debugPrintln("  before first: "+beforefirst);
 		return beforefirst;
 	}
 
 	public boolean	isClosed() throws SQLException {
 		debugFunction();
-		return sqlrcur==null;
+		boolean	isclosed=(sqlrcur==null);
+		debugPrintln("  is closed: "+isclosed);
+		return isclosed;
 	}
 
 	public boolean	isFirst() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
-		return currentrow==0;
+		boolean	isfirst=(currentrow==0);
+		debugPrintln("  is first: "+isfirst);
+		return isfirst;
 	}
 
 	public boolean	isLast() throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
 		// FIXME: implement this for real
-		return false;
+		boolean	islast=false;
+		debugPrintln("  is last: "+islast);
+		return islast;
 	}
 
 	public boolean	last() throws SQLException {
@@ -937,13 +1065,16 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	public boolean	relative(int rows) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
+		debugPrintln("  rows: "+rows);
 		if (rows==0) {
 			return true;
 		}
 		int	newrow=(int)(currentrow+rows);
+		debugPrintln("  newrow (before): "+newrow);
 		if (newrow<1) {
 			newrow=1;
 		}
+		debugPrintln("  newrow (after): "+newrow);
 		return absolute(newrow);
 	}
 
@@ -971,12 +1102,14 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 	public void	setFetchDirection(int direction) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
+		debugPrintln("  direction: "+direction);
 		fetchdirection=direction;
 	}
 
 	public void	setFetchSize(int rows) throws SQLException {
 		debugFunction();
 		throwExceptionIfClosed();
+		debugPrintln("  fetch size: "+rows);
 		sqlrcur.setResultSetBufferSize(rows);
 	}
 
