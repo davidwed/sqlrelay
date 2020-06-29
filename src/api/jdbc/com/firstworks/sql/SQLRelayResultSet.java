@@ -437,11 +437,12 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		// FIXME: use cal
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		debugPrintln("  field: "+field);
 		debugPrintln("  wasnull: "+wasnull);
+		// FIXME: use cal
+		// FIXME: not guaranteed to be in iso format
 		return (wasnull)?null:Date.valueOf(field);
 	}
 
@@ -456,11 +457,12 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		// FIXME: use cal
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		debugPrintln("  field: "+field);
 		debugPrintln("  wasnull: "+wasnull);
+		// FIXME: use cal
+		// FIXME: not guaranteed to be in iso format
 		return (wasnull)?null:Date.valueOf(field);
 	}
 
@@ -861,11 +863,12 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		// FIXME: use cal
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		debugPrintln("  field: "+field);
 		debugPrintln("  wasnull: "+wasnull);
+		// FIXME: use cal
+		// FIXME: not guaranteed to be in iso format
 		return (wasnull)?null:Time.valueOf(field);
 	}
 
@@ -880,11 +883,12 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		// FIXME: use cal
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		debugPrintln("  field: "+field);
 		debugPrintln("  wasnull: "+wasnull);
+		// FIXME: use cal
+		// FIXME: not guaranteed to be in iso format
 		return (wasnull)?null:Time.valueOf(field);
 	}
 
@@ -900,11 +904,12 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnindex);
-		// FIXME: use cal
 		String	field=sqlrcur.getField(currentrow-1,columnindex-1);
 		wasnull=(field==null);
 		debugPrintln("  field: "+field);
 		debugPrintln("  wasnull: "+wasnull);
+		// FIXME: use cal
+		// FIXME: not guaranteed to be in iso format
 		return (wasnull)?null:Timestamp.valueOf(field);
 	}
 
@@ -920,11 +925,12 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugFunction();
 		throwExceptionIfClosed();
 		throwInvalidColumn(columnlabel);
-		// FIXME: use cal
 		String	field=sqlrcur.getField(currentrow-1,columnlabel);
 		wasnull=(field==null);
 		debugPrintln("  field: "+field);
 		debugPrintln("  wasnull: "+wasnull);
+		// FIXME: use cal
+		// FIXME: not guaranteed to be in iso format
 		return (wasnull)?null:Timestamp.valueOf(field);
 	}
 
