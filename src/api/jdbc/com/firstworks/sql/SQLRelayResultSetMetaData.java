@@ -30,7 +30,7 @@ public class SQLRelayResultSetMetaData extends SQLRelayDebug implements ResultSe
 		debugFunction();
 		debugPrintln("  column: "+column);
 		String	retval=null;
-		String	ctype=sqlrcur.getColumnType(column-1);
+		String	ctype=sqlrcur.getColumnType(column-1).toUpperCase();
 		debugPrintln("  ctype: "+ctype);
 		if (ctype.equals("UNKNOWN")) {
 			retval=null;
@@ -672,7 +672,7 @@ public class SQLRelayResultSetMetaData extends SQLRelayDebug implements ResultSe
 		debugFunction();
 		debugPrintln("  column: "+column);
 		int	retval=0;
-		String	ctype=sqlrcur.getColumnType(column-1);
+		String	ctype=sqlrcur.getColumnType(column-1).toUpperCase();
 		debugPrintln("  ctype: "+ctype);
 		if (ctype.equals("UNKNOWN")) {
 			retval=Types.OTHER;
@@ -1340,7 +1340,7 @@ public class SQLRelayResultSetMetaData extends SQLRelayDebug implements ResultSe
 
 	public boolean 	isCurrency(int column) {
 		debugFunction();
-		String	ctype=sqlrcur.getColumnType(column-1);
+		String	ctype=sqlrcur.getColumnType(column-1).toUpperCase();
 		boolean	iscurrency=ctype.equals("MONEY") ||
 					ctype.equals("SMALLMONEY") ||
 					ctype.equals("MONEY_ARRAY");

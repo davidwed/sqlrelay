@@ -181,6 +181,7 @@ public class SQLRelayConnection extends SQLRelayDebug implements Connection {
 
 		// create a cursor
 		SQLRCursor	sqlrcur=new SQLRCursor(sqlrcon);
+		sqlrcur.getNullsAsNulls();
 
 		// set result set buffer size as appropriate
 		switch (resultSetType) {
@@ -319,6 +320,7 @@ public class SQLRelayConnection extends SQLRelayDebug implements Connection {
 		debugFunction();
 		throwExceptionIfClosed();
 		SQLRCursor	sqlrcur=new SQLRCursor(sqlrcon);
+		sqlrcur.getNullsAsNulls();
 		sqlrcur.prepareQuery(sql);
 		SQLRelayCallableStatement	sqlrstmt=
 						new SQLRelayCallableStatement();
@@ -354,6 +356,7 @@ public class SQLRelayConnection extends SQLRelayDebug implements Connection {
 		debugFunction();
 		throwExceptionIfClosed();
 		SQLRCursor	sqlrcur=new SQLRCursor(sqlrcon);
+		sqlrcur.getNullsAsNulls();
 		sqlrcur.prepareQuery(sql);
 		SQLRelayPreparedStatement	sqlrstmt=
 						new SQLRelayPreparedStatement();

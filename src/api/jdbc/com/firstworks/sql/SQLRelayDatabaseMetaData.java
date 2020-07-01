@@ -21,14 +21,18 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 		debugFunction();
 		// Retrieves whether the current user can call all the
 		// procedures returned by the method getProcedures.
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	allTablesAreSelectable() throws SQLException {
 		debugFunction();
 		// Retrieves whether the current user can use all the tables
 		// returned by the method getTables in a SELECT statement.
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	autoCommitFailureClosesAllResultSets()
@@ -38,37 +42,49 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 		// inidcates that all open ResultSets are closed, even ones
 		// that are holdable.
 		// FIXME: no idea if this is true or not
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	dataDefinitionCausesTransactionCommit()
 							throws SQLException {
 		debugFunction();
 		// FIXME: db-specific
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	dataDefinitionIgnoredInTransactions()
 							throws SQLException {
 		debugFunction();
 		// FIXME: db-specific
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	deletesAreDetected(int type) throws SQLException {
 		debugFunction();
 		// SQL Relay doesn't currenlty support ResultSet.RowDelete
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	doesMaxRowSizeIncludeBlobs() throws SQLException {
 		debugFunction();
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	generatedKeyAlwaysReturned() throws SQLException {
 		debugFunction();
-		return true;
+		boolean	result=true;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public ResultSet 	getAttributes(String catalog,
@@ -101,13 +117,17 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 	public String 	getCatalogSeparator() throws SQLException {
 		debugFunction();
 		// FIXME: oracle uses @
-		return ".";
+		String	separator=".";
+		debugPrintln("  separator: "+separator);
+		return separator;
 	}
 
 	public String 	getCatalogTerm() throws SQLException {
 		debugFunction();
 		// FIXME: I think SQL Server uses catalog, maybe sybase
-		return "database";
+		String	term="database";
+		debugPrintln("  term: "+term);
+		return term;
 	}
 
 	public ResultSet 	getClientInfoProperties() throws SQLException {
@@ -157,55 +177,73 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 	public int 	getDatabaseMajorVersion() throws SQLException {
 		debugFunction();
 		// FIXME: SQL Relay or db?
-		return 0;
+		int	majorversion=0;
+		debugPrintln("  major version: "+majorversion);
+		return majorversion;
 	}
 
 	public int 	getDatabaseMinorVersion() throws SQLException {
 		debugFunction();
 		// FIXME: SQL Relay or db?
-		return 0;
+		int	minorversion=0;
+		debugPrintln("  minor version: "+minorversion);
+		return minorversion;
 	}
 
 	public String 	getDatabaseProductName() throws SQLException {
 		debugFunction();
 		// FIXME: cache this...
-		return connection.getSqlrCon().identify();
+		String	id=connection.getSqlrCon().identify();
+		debugPrintln("  id: "+id);
+		return id;
 	}
 
 	public String 	getDatabaseProductVersion() throws SQLException {
 		debugFunction();
 		// FIXME: cache this...
-		return connection.getSqlrCon().dbVersion();
+		String	productversion=connection.getSqlrCon().dbVersion();
+		debugPrintln("  product version: "+productversion);
+		return productversion;
 	}
 
 	public int 	getDefaultTransactionIsolation() throws SQLException {
 		debugFunction();
-		return (getDatabaseProductName().equals("mysql"))?
-				Connection.TRANSACTION_REPEATABLE_READ:
-				Connection.TRANSACTION_READ_COMMITTED;
+		int	isolation=(getDatabaseProductName().equals("mysql"))?
+					Connection.TRANSACTION_REPEATABLE_READ:
+					Connection.TRANSACTION_READ_COMMITTED;
+		debugPrintln("  isolation: "+isolation);
+		return isolation;
 	}
 
 	public int 	getDriverMajorVersion() {
 		debugFunction();
 		// FIXME: make this come from sqlrclient
-		return 1;
+		int	majorversion=1;
+		debugPrintln("  major version: "+majorversion);
+		return majorversion;
 	}
 
 	public int 	getDriverMinorVersion() {
 		debugFunction();
 		// FIXME: make this come from sqlrclient
-		return 2;
+		int	minorversion=2;
+		debugPrintln("  minor version: "+minorversion);
+		return minorversion;
 	}
 
 	public String 	getDriverName() throws SQLException {
 		debugFunction();
-		return "sqlrelay";
+		String	drivername="sqlrelay";
+		debugPrintln("  driver name: "+drivername);
+		return drivername;
 	}
 
 	public String 	getDriverVersion() throws SQLException {
 		debugFunction();
 		// FIXME: make this come from sqlrclient
-		return "1.2.0";
+		String	driverversion="1.2.0";
+		debugPrintln("  driver version: "+driverversion);
+		return driverversion;
 	}
 
 	public ResultSet 	getExportedKeys(String catalog,
@@ -223,7 +261,9 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 	public String 	getExtraNameCharacters() throws SQLException {
 		debugFunction();
 		// FIXME: db-specific
-		return "#@";
+		String	extranamechars="#@";
+		debugPrintln("  extra name characters: "+extranamechars);
+		return extranamechars;
 	}
 
 	public ResultSet 	getFunctionColumns(

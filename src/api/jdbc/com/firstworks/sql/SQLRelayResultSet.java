@@ -936,6 +936,7 @@ public class SQLRelayResultSet extends SQLRelayDebug implements ResultSet {
 		debugPrintln("  wasnull: "+wasnull);
 		// FIXME: use cal
 		// FIXME: not guaranteed to be in iso format
+		// FIXME: postgresql ends with timezone offset (eg. -04)
 		return (wasnull)?null:Timestamp.valueOf(field);
 	}
 
