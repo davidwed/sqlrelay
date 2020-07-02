@@ -427,4 +427,8 @@ public class SQLRelayStatement extends SQLRelayDebug implements Statement {
 		debugFunction();
 		throw new SQLFeatureNotSupportedException();
 	}
+
+	public SQLRCursor getSQLRCursor() {
+		return sqlrcur;
+	}
 };

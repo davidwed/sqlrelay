@@ -608,7 +608,7 @@ public class SQLRelayConnection extends SQLRelayDebug implements Connection {
 		throw new SQLException(reason);
 	}
 
-	public SQLRConnection getSqlrCon() {
+	public SQLRConnection getSQLRConnection() {
 		return sqlrcon;
 	}
 }
