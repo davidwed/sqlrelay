@@ -38,10 +38,14 @@ class sqlrexport {
 		virtual	bool	exportToFile(const char *filename,
 						const char *table)=0;
 
+		virtual	bool	headerStart();
+		virtual	bool	columnStart();
+		virtual	bool	columnEnd();
+		virtual	bool	headerEnd();
 		virtual	bool	rowsStart();
 		virtual	bool	rowStart();
-		virtual	bool	colStart();
-		virtual	bool	colEnd();
+		virtual	bool	fieldStart();
+		virtual	bool	fieldEnd();
 		virtual	bool	rowEnd();
 		virtual	bool	rowsEnd();
 
@@ -61,6 +65,9 @@ class sqlrexport {
 		void	setNumberColumn(uint64_t index, bool value);
 		bool	getNumberColumn(uint64_t index);
 		void	clearNumberColumns();
+
+		void		setFileDescriptor(filedescriptor *fd);
+		filedescriptor	*getFileDescriptor();
 
 	#include <sqlrelay/private/sqlrexport.h>
 };

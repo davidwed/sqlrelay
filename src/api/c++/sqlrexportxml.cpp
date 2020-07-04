@@ -24,16 +24,17 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 	setCurrentField(NULL);
 
 	// output to stdoutput or create/open file
-	filedescriptor	*fd=&stdoutput;
-	file		f;
+	setFileDescriptor(&stdoutput);
+	file	f;
 	if (!charstring::isNullOrEmpty(filename)) {
 		if (!f.create(filename,
 				permissions::evalPermString("rw-r--r--"))) {
 			// FIXME: report error
 			return false;
 		}
-		fd=&f;
+		setFileDescriptor(&f);
 	}
+	filedescriptor	*fd=getFileDescriptor();
 
 	// export header
 	fd->printf("<?xml version=\"1.0\"?>\n");
@@ -114,8 +115,8 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 					break;
 				}
 
-				// call the pre-column event
-				if (!colStart()) {
+				// call the pre-field event
+				if (!fieldStart()) {
 					return false;
 				}
 
@@ -124,8 +125,8 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 				escapeField(fd,getCurrentField());
 				fd->printf("</field>\n");
 
-				// call the post-column event
-				if (!colEnd()) {
+				// call the post-field event
+				if (!fieldEnd()) {
 					return false;
 				}
 			}

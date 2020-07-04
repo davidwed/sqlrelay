@@ -8,6 +8,7 @@ sqlrexport::sqlrexport() {
 	sqlrcur=NULL;
 	ignorecolumns=false;
 	fieldstoignore=NULL;
+	fd=NULL;
 	exportrow=true;
 	currentrow=0;
 	currentcol=0;
@@ -90,6 +91,26 @@ void sqlrexport::setShutdownFlag(bool *shutdownflag) {
 	this->shutdownflag=shutdownflag;
 }
 
+bool sqlrexport::headerStart() {
+	// by default, just return success
+	return true;
+}
+
+bool sqlrexport::columnStart() {
+	// by default, just return success
+	return true;
+}
+
+bool sqlrexport::columnEnd() {
+	// by default, just return success
+	return true;
+}
+
+bool sqlrexport::headerEnd() {
+	// by default, just return success
+	return true;
+}
+
 bool sqlrexport::rowsStart() {
 	// by default, just return success
 	return true;
@@ -100,12 +121,12 @@ bool sqlrexport::rowStart() {
 	return true;
 }
 
-bool sqlrexport::colStart() {
+bool sqlrexport::fieldStart() {
 	// by default, just return success
 	return true;
 }
 
-bool sqlrexport::colEnd() {
+bool sqlrexport::fieldEnd() {
 	// by default, just return success
 	return true;
 }
@@ -162,4 +183,12 @@ bool sqlrexport::getNumberColumn(uint64_t index) {
 
 void sqlrexport::clearNumberColumns() {
 	numbercolumns.clear();
+}
+
+void sqlrexport::setFileDescriptor(filedescriptor *fd) {
+	this->fd=fd;
+}
+
+filedescriptor *sqlrexport::getFileDescriptor() {
+	return fd;
 }

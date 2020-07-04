@@ -6,6 +6,7 @@
 		sqlrcursor		*sqlrcur;
 		bool			ignorecolumns;
 		const char * const	*fieldstoignore;
+		filedescriptor		*fd;
 		bool			exportrow;
 		uint64_t		currentrow;
 		uint32_t		currentcol;

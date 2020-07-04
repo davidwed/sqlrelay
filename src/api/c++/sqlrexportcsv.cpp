@@ -24,15 +24,21 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	setCurrentField(NULL);
 
 	// output to stdoutput or create/open file
-	filedescriptor	*fd=&stdoutput;
-	file		f;
+	setFileDescriptor(&stdoutput);
+	file	f;
 	if (!charstring::isNullOrEmpty(filename)) {
 		if (!f.create(filename,
 				permissions::evalPermString("rw-r--r--"))) {
 			// FIXME: report error
 			return false;
 		}
-		fd=&f;
+		setFileDescriptor(&f);
+	}
+	filedescriptor	*fd=getFileDescriptor();
+
+	// call the pre-header event
+	if (!headerStart()) {
+		return false;
 	}
 
 	sqlrcursor	*sqlrcur=getSqlrCursor();
@@ -42,28 +48,54 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	uint32_t	cols=sqlrcur->colCount();
 	clearNumberColumns();
 	bool	first=true;
-	for (uint32_t j=0; j<cols; j++) {
-		setNumberColumn(j,isNumberTypeChar(sqlrcur->getColumnType(j)));
-		const char	*name=sqlrcur->getColumnName(j);
-		if (charstring::inSet(name,fieldstoignore)) {
+	for (setCurrentColumn(0);
+		getCurrentColumn()<cols;
+		setCurrentColumn(getCurrentColumn()+1)) {
+
+		setNumberColumn(getCurrentColumn(),
+			isNumberTypeChar(sqlrcur->getColumnType(
+						getCurrentColumn())));
+
+		setCurrentField(sqlrcur->getColumnName(getCurrentColumn()));
+		if (charstring::inSet(getCurrentField(),fieldstoignore)) {
 			continue;
 		}
+
 		if (!getIgnoreColumns()) {
+
 			if (first) {
 				first=false;
 			} else {
 				fd->printf(",");
 			}
-			bool	isnumber=charstring::isNumber(name);
+
+			// call the pre-column event
+			if (!columnStart()) {
+				return false;
+			}
+
+			bool	isnumber=
+				charstring::isNumber(getCurrentField());
 			if (!isnumber) {
 				fd->write('"');
 			}
-			escapeField(fd,name);
+			escapeField(fd,getCurrentField());
 			if (!isnumber) {
 				fd->write('"');
+			}
+
+			// call the post-column event
+			if (!columnEnd()) {
+				return false;
 			}
 		}
 	}
+
+	// call the post-header event
+	if (!headerEnd()) {
+		return false;
+	}
+
 	if (!getIgnoreColumns()) {
 		fd->printf("\n");
 	}
@@ -79,13 +111,14 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 		// reset export-row flag
 		setExportRow(true);
 
-		// call the pre-row event
-		if (!rowStart()) {
-			return false;
-		}
-
 		// if rowStart() didn't disable export of this row...
 		if (getExportRow()) {
+
+			// call the pre-row event
+			if (!rowStart()) {
+				return false;
+			}
+
 			bool	first=true;
 			for (setCurrentColumn(0);
 				getCurrentColumn()<cols;
@@ -116,8 +149,8 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 					fd->write(',');
 				}
 
-				// call the pre-column event
-				if (!colStart()) {
+				// call the pre-field event
+				if (!fieldStart()) {
 					return false;
 				}
 
@@ -140,17 +173,18 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 					fd->write('"');
 				}
 
-				// call the post-column event
-				if (!colEnd()) {
+				// call the post-field event
+				if (!fieldEnd()) {
 					return false;
 				}
 			}
-			fd->write('\n');
-		}
 
-		// call the post-row event
-		if (!rowEnd()) {
-			return false;
+			// call the post-row event
+			if (!rowEnd()) {
+				return false;
+			}
+
+			fd->write('\n');
 		}
 
 		setCurrentRow(getCurrentRow()+1);
