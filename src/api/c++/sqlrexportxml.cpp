@@ -130,12 +130,18 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 					return false;
 				}
 			}
-			fd->printf("	</row>\n");
 		}
 
 		// call the post-row event
+		// (we call this before closing the row in case an overridden
+		// rowEnd() wants to add more fields or something)
 		if (!rowEnd()) {
 			return false;
+		}
+
+		// if rowStart() didn't disable export of this row...
+		if (getExportRow()) {
+			fd->printf("	</row>\n");
 		}
 
 		setCurrentRow(getCurrentRow()+1);

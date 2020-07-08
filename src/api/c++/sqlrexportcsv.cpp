@@ -92,6 +92,8 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	}
 
 	// call the post-header event
+	// (we call this before closing the header in case an overridden
+	// headerEnd() wants to add more columns or something)
 	if (!headerEnd()) {
 		return false;
 	}
@@ -111,13 +113,13 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 		// reset export-row flag
 		setExportRow(true);
 
+		// call the pre-row event
+		if (!rowStart()) {
+			return false;
+		}
+
 		// if rowStart() didn't disable export of this row...
 		if (getExportRow()) {
-
-			// call the pre-row event
-			if (!rowStart()) {
-				return false;
-			}
 
 			bool	first=true;
 			for (setCurrentColumn(0);
@@ -178,12 +180,17 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 					return false;
 				}
 			}
+		}
 
-			// call the post-row event
-			if (!rowEnd()) {
-				return false;
-			}
+		// call the post-row event
+		// (we call this before closing the row in case an overridden
+		// rowEnd() wants to add more fields or something)
+		if (!rowEnd()) {
+			return false;
+		}
 
+		// if rowStart() didn't disable export of this row...
+		if (getExportRow()) {
 			fd->write('\n');
 		}
 
