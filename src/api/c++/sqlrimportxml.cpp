@@ -327,7 +327,7 @@ bool sqlrimportxml::rowTagEnd() {
 			sqlrcon->begin();
 		}
 		if (!sqlrcur->sendQuery(query.getString())) {
-			if (lg) {
+			if (lg && logerrors) {
 				lg->write(coarseloglevel,NULL,logindent,
 						"%s",sqlrcur->errorMessage());
 			}

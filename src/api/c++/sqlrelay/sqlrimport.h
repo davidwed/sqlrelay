@@ -26,6 +26,8 @@ class sqlrimport {
 
 		void	setShutdownFlag(bool *shuttingdown);
 
+		void	setLogErrors(bool logerrors);
+
 		virtual	bool	importFromFile(const char *filename)=0;
 
 	#include <sqlrelay/private/sqlrimport.h>
