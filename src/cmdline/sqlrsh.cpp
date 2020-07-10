@@ -1374,13 +1374,19 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		if (env->format==SQLRSH_FORMAT_PLAIN) {
 			stdoutput.write(name);
 		} else {
-			bool	isnumber=charstring::isNumber(name);
-			if (!isnumber) {
-				stdoutput.write('\'');
+			// we need to quote the field if it's not a
+			// number, or if it is a number, but has more
+			// than 12 digits.  Excel (and presumably other
+			// spreadsheet apps) likes to convert 12+
+			// digit numbers to scientific notation.
+			bool	quote=(!charstring::isNumber(name) ||
+					charstring::length(name)>=12);
+			if (quote) {
+				stdoutput.write('"');
 			}
 			csvEscapeField(name,namelen);
-			if (!isnumber) {
-				stdoutput.write('\'');
+			if (quote) {
+				stdoutput.write('"');
 			}
 		}
 
@@ -1414,9 +1420,9 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 void sqlrsh::csvEscapeField(const char *field, uint32_t length) {
 	for (uint32_t index=0; index<length; index++) {
 		// escape double quotes and ignore non-ascii characters
-		if (field[index]=='\'') {
-			stdoutput.write("\'\'");
-		} else if (field[index]>=' ' || field[index]<='~') {
+		if (field[index]=='"') {
+			stdoutput.write("\"\"");
+		} else if (field[index]>=' ' && field[index]<='~') {
 			stdoutput.printf("%c",field[index]);
 		}
 	}
@@ -1512,13 +1518,19 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			if (env->format==SQLRSH_FORMAT_PLAIN) {
 				stdoutput.write(field);
 			} else {
-				bool	isnumber=charstring::isNumber(field);
-				if (!isnumber) {
-					stdoutput.write('\'');
+				// we need to quote the field if it's not a
+				// number, or if it is a number, but has more
+				// than 12 digits.  Excel (and presumably other
+				// spreadsheet apps) likes to convert 12+
+				// digit numbers to scientific notation.
+				bool	quote=(!charstring::isNumber(field) ||
+						charstring::length(field)>=12);
+				if (quote) {
+					stdoutput.write('"');
 				}
 				csvEscapeField(field,fieldlength);
-				if (!isnumber) {
-					stdoutput.write('\'');
+				if (quote) {
+					stdoutput.write('"');
 				}
 			}
 
@@ -2272,8 +2284,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("	stats on|off		- ");
 	stdoutput.printf("toggles statistics after result set\n");
 	stdoutput.printf("	format plain|csv	- ");
-	stdoutput.printf("sets output format to plain, csv, or "
-						"csv with headers\n");
+	stdoutput.printf("sets output format to plain or csv\n");
 	stdoutput.printf("	debug on|off		- ");
 	stdoutput.printf("toggles debug messages\n");
 	stdoutput.printf("	nullsasnulls on|off	- ");

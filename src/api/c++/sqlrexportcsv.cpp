@@ -209,9 +209,10 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 
 void sqlrexportcsv::escapeField(filedescriptor *fd, const char *field) {
 	for (const char *f=field; *f; f++) {
+		// escape double quotes and ignore non-ascii characters
 		if (*f=='"') {
 			fd->write("\"\"");
-		} else {
+		} else if (*f>=' ' && *f<='~') {
 			fd->write(*f);
 		}
 	}
