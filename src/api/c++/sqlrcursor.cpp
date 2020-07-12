@@ -2849,7 +2849,8 @@ void sqlrcursor::sendInputBinds() {
 
 	// count number of vars to send
 	uint16_t	count=pvt->_inbindvars->getLength();
-	for (i=0; i<count; i++) {
+	uint16_t	total=count;
+	for (i=0; i<total; i++) {
 		if (!(*pvt->_inbindvars)[i].send) {
 			count--;
 		}
@@ -2867,10 +2868,11 @@ void sqlrcursor::sendInputBinds() {
 	pvt->_cs->write(count);
 	uint16_t	size;
 	i=0;
-	while (i<count) {
+	while (i<total) {
 
 		// don't send anything if the send flag is turned off
 		if (!(*pvt->_inbindvars)[i].send) {
+			i++;
 			continue;
 		}
 
@@ -3037,7 +3039,8 @@ void sqlrcursor::sendInputBinds() {
 
 			pvt->_cs->write((*pvt->_inbindvars)[i].valuesize);
 			if ((*pvt->_inbindvars)[i].valuesize>0) {
-				pvt->_cs->write((*pvt->_inbindvars)[i].value.lobval,
+				pvt->_cs->write(
+					(*pvt->_inbindvars)[i].value.lobval,
 						(size_t)(*pvt->_inbindvars)[i].
 								valuesize);
 			}
@@ -3081,7 +3084,8 @@ void sqlrcursor::sendOutputBinds() {
 
 	// count number of vars to send
 	uint16_t	count=pvt->_outbindvars->getLength();
-	for (i=0; i<count; i++) {
+	uint16_t	total=count;
+	for (i=0; i<total; i++) {
 		if (!(*pvt->_outbindvars)[i].send) {
 			count--;
 		}
@@ -3099,10 +3103,11 @@ void sqlrcursor::sendOutputBinds() {
 	pvt->_cs->write(count);
 	uint16_t	size;
 	i=0;
-	while (i<count) {
+	while (i<total) {
 
 		// don't send anything if the send flag is turned off
 		if (!(*pvt->_outbindvars)[i].send) {
+			i++;
 			continue;
 		}
 
@@ -3182,7 +3187,8 @@ void sqlrcursor::sendInputOutputBinds() {
 
 	// count number of vars to send
 	uint16_t	count=pvt->_inoutbindvars->getLength();
-	for (i=0; i<count; i++) {
+	uint16_t	total=count;
+	for (i=0; i<total; i++) {
 		if (!(*pvt->_inoutbindvars)[i].send) {
 			count--;
 		}
@@ -3200,10 +3206,11 @@ void sqlrcursor::sendInputOutputBinds() {
 	pvt->_cs->write(count);
 	uint16_t	size;
 	i=0;
-	while (i<count) {
+	while (i<total) {
 
 		// don't send anything if the send flag is turned off
 		if (!(*pvt->_inoutbindvars)[i].send) {
+			i++;
 			continue;
 		}
 
