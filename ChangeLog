@@ -16,6 +16,7 @@
 	sqlrexportcsv quotes 12+ digit numbers now
 	fixed subtle, count-related issues when validating bind variables on
 		the client side, that could cause a hang
+	added an aes128 pwdenc module
 
 1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute

@@ -14,7 +14,8 @@ all: $(SQLR)pwdenc_rot.$(LIBEXT) \
 	$(SQLR)pwdenc_md5.$(LIBEXT) \
 	$(SQLR)pwdenc_sha1.$(LIBEXT) \
 	$(SQLR)pwdenc_sha256.$(LIBEXT) \
-	$(SQLR)pwdenc_crypt.$(LIBEXT)
+	$(SQLR)pwdenc_crypt.$(LIBEXT) \
+	$(SQLR)pwdenc_aes128.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
@@ -35,6 +36,9 @@ $(SQLR)pwdenc_sha256.$(LIBEXT): sha256.cpp sha256.$(OBJ)
 $(SQLR)pwdenc_crypt.$(LIBEXT): crypt.cpp crypt.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ crypt.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
+$(SQLR)pwdenc_aes128.$(LIBEXT): aes128.cpp aes128.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ aes128.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
 install: $(INSTALLLIB)
 
 installdll:
@@ -44,6 +48,7 @@ installdll:
 	$(LTINSTALL) $(CP) $(SQLR)pwdenc_sha1.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)pwdenc_sha256.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)pwdenc_crypt.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)pwdenc_aes128.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
@@ -69,11 +74,16 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)pwdenc_crypt.a
 	$(RM) $(libexecdir)/$(SQLR)pwdenc_crypt.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)pwdenc_crypt.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)pwdenc_aes128.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_aes128.a
+	$(RM) $(libexecdir)/$(SQLR)pwdenc_aes128.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)pwdenc_aes128.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/$(SQLR)pwdenc_rot.* \
 		$(libexecdir)/$(SQLR)pwdenc_md5.* \
 		$(libexecdir)/$(SQLR)pwdenc_crypt.* \
+		$(libexecdir)/$(SQLR)pwdenc_aes128.* \
 		$(libexecdir)/sqlrpwdenc_rot.* \
 		$(libexecdir)/sqlrpwdenc_md5.* \
 		$(libexecdir)/sqlrpwdenc_sha1.* \
