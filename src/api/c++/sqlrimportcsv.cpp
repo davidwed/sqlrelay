@@ -152,6 +152,18 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 					&year,&month,&day,
 					&hour,&minute,&second,&microsecond,
 					&isnegative);
+			if (hour==-1) {
+				hour=0;
+			}
+			if (minute==-1) {
+				minute=0;
+			}
+			if (second==-1) {
+				second=0;
+			}
+			if (microsecond==-1) {
+				microsecond=0;
+			}
 			// FIXME: what about microseconds and negatives?
 			char	*dt=datetime::formatAs(
 						"YYYY-MM-DD HH24:MI:SS",
