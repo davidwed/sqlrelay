@@ -17,7 +17,7 @@ sqlrexport::sqlrexport() {
 	coarseloglevel=0;
 	fineloglevel=0;
 	logindent=0;
-	shutdownflag=NULL;
+	shutdownflag=false;
 }
 
 sqlrexport::~sqlrexport() {
