@@ -16,7 +16,7 @@ sqlrimport::sqlrimport() {
 	coarseloglevel=0;
 	fineloglevel=0;
 	logindent=0;
-	shutdownflag=NULL;
+	shutdownflag=false;
 	logerrors=true;
 }
 
