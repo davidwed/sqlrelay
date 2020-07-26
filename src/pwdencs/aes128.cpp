@@ -16,10 +16,12 @@ class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 					const char *path,
 					const char *ext,
 					unsigned char **out,
-					uint64_t *outlen);
+					uint64_t *outlen,
+					bool hexdecode);
 		bool	getFile(const char *filename,
 					unsigned char **out,
-					uint64_t *outlen);
+					uint64_t *outlen,
+					bool hexdecode);
 
 		const char	*debug;
 
@@ -71,35 +73,36 @@ char *sqlrpwenc_aes128::decrypt(const char *value) {
 char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 
 	converted.clear();
+	aes.clear();
 
 	// get the key, either directly or from a file
 	unsigned char	*key;
 	uint64_t	keylen;
 	getValue(getParameters()->getAttributeValue("key"),
-				keypath,keyext,&key,&keylen);
+				keypath,keyext,&key,&keylen,true);
 	if (keylen<aes.getKeySize()) {
 		delete[] key;
 		return NULL;
 	}
+	aes.setKey(key,aes.getKeySize());
 
 	// get the credentials, either directly or from a file
 	unsigned char	*cred;
 	uint64_t	credlen;
-	getValue(value,credpath,credext,&cred,&credlen);
-	if (credlen<aes.getIvSize()) {
-		delete[] key;
-		delete[] cred;
-		return NULL;
-	}
-
-	// set the key, iv (first 16 bytes of the credentials)
-	// and data (remaining bytes of the credentials)
-	aes.clear();
-	aes.setKey(key,aes.getKeySize());
+	getValue(value,credpath,credext,&cred,&credlen,dec);
 	if (dec) {
+		if (credlen<aes.getIvSize()) {
+			delete[] key;
+			delete[] cred;
+			return NULL;
+		}
+
+		// set the iv (first 16 bytes of the credentials)
+		// and data (remaining bytes of the credentials)
 		aes.setIv(cred,aes.getIvSize());
 		aes.append(cred+aes.getIvSize(),credlen-aes.getIvSize());
 	} else {
+		// set a random iv and set the data
 		aes.setRandomIv();
 		aes.append(cred,credlen);
 	}
@@ -108,21 +111,25 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	delete[] cred;
 
 	if (dec) {
-		converted.append(aes.getDecryptedData(),aes.getDataLength());
+		converted.append(aes.getDecryptedData(),
+					aes.getDecryptedDataLength());
+		converted.append('\0');
+		return (char *)converted.detachBuffer();
 	} else {
 		converted.append(aes.getIv(),aes.getIvSize());
-		converted.append(aes.getEncryptedData(),aes.getDataLength());
+		converted.append(aes.getEncryptedData(),
+					aes.getEncryptedDataLength());
+		return charstring::hexEncode(converted.getBuffer(),
+						converted.getSize());
 	}
-
-	return charstring::hexEncode(converted.getBuffer(),converted.getSize());
 }
 
 void sqlrpwenc_aes128::getValue(const char *in,
 					const char *path,
 					const char *ext,
 					unsigned char **out,
-					uint64_t *outlen) {
-
+					uint64_t *outlen,
+					bool hexdecode) {
 	*out=NULL;
 	*outlen=0;
 
@@ -136,13 +143,13 @@ void sqlrpwenc_aes128::getValue(const char *in,
 		fn.append(in+1,inlen-2);
 
 		// try the filename as-is
-		if (getFile(fn.getString(),out,outlen)) {
+		if (getFile(fn.getString(),out,outlen,hexdecode)) {
 			return;
 		}
 
 		// try appending an extension
 		fn.append(ext);
-		if (getFile(fn.getString(),out,outlen)) {
+		if (getFile(fn.getString(),out,outlen,hexdecode)) {
 			return;
 		}
 
@@ -150,27 +157,40 @@ void sqlrpwenc_aes128::getValue(const char *in,
 		fn.clear();
 		fn.append(path);
 		fn.append(in+1,inlen-2);
-		if (getFile(fn.getString(),out,outlen)) {
+		if (getFile(fn.getString(),out,outlen,hexdecode)) {
 			return;
 		}
 
 		// try appending a path again
 		fn.append(path);
-		if (getFile(fn.getString(),out,outlen)) {
+		if (getFile(fn.getString(),out,outlen,hexdecode)) {
 			return;
 		}
 	}
 
 	// just return the in verbatim
-	charstring::hexDecode(in,inlen,out,outlen);
+	if (hexdecode) {
+		charstring::hexDecode(in,inlen,out,outlen);
+	} else {
+		*outlen=inlen;
+		*out=(unsigned char *)charstring::duplicate(in,inlen);
+	}
 }
 
 bool sqlrpwenc_aes128::getFile(const char *filename,
 					unsigned char **out,
-					uint64_t *outlen) {
+					uint64_t *outlen,
+					bool hexdecode) {
 	file	f;
 	if (f.open(filename,O_RDONLY)) {
-		charstring::hexDecode(f.getContents(),f.getSize(),out,outlen);
+		if (hexdecode) {
+			charstring::hexDecode(f.getContents(),
+							f.getSize(),
+							out,outlen);
+		} else {
+			*outlen=f.getSize();
+			*out=(unsigned char *)f.getContents();
+		}
 		return true;
 	}
 	return false;
