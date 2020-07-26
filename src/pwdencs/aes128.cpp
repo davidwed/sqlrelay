@@ -4,6 +4,7 @@
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/aes128.h>
 #include <rudiments/file.h>
+#include <rudiments/sys.h>
 
 class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 	public:
@@ -44,7 +45,7 @@ sqlrpwenc_aes128::sqlrpwenc_aes128(domnode *parameters, bool debug) :
 	// get optional keypath/keyext
 	keypath=parameters->getAttributeValue("keypath");
 	if (charstring::isNullOrEmpty(keypath)) {
-		keypath="/usr/local/firstworks/etc/priv/dek";
+		keypath=SYSCONFDIR;
 	}
 	keyext=parameters->getAttributeValue("keyext");
 	if (charstring::isNullOrEmpty(keyext)) {
@@ -54,7 +55,7 @@ sqlrpwenc_aes128::sqlrpwenc_aes128(domnode *parameters, bool debug) :
 	// get optional credpath/credext
 	credpath=parameters->getAttributeValue("credpath");
 	if (charstring::isNullOrEmpty(credpath)) {
-		credpath="/usr/local/firstworks/etc/priv/credentials";
+		credpath=SYSCONFDIR;
 	}
 	credext=parameters->getAttributeValue("credext");
 	if (charstring::isNullOrEmpty(credext)) {
@@ -155,14 +156,14 @@ void sqlrpwenc_aes128::getValue(const char *in,
 
 		// try prepending a path
 		fn.clear();
-		fn.append(path);
+		fn.append(path)->append(sys::getDirectorySeparator());
 		fn.append(in+1,inlen-2);
 		if (getFile(fn.getString(),out,outlen,hexdecode)) {
 			return;
 		}
 
-		// try appending a path again
-		fn.append(path);
+		// try appending an extension again
+		fn.append(ext);
 		if (getFile(fn.getString(),out,outlen,hexdecode)) {
 			return;
 		}

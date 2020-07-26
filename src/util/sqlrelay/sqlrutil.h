@@ -35,6 +35,7 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 		const char	*getDefaultConfigUrl();
 		const char	*getConfigUrl();
 		const char	*getLibExecDir();
+		const char	*getSysConfDir();
 	protected:
 		char		*bindir;
 		char		*localstatedir;
@@ -52,6 +53,7 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 		char		*defaultconfigurl;
 		const char	*configurl;
 		char		*libexecdir;
+		char		*sysconfdir;
 };
 
 class SQLRUTIL_DLLSPEC connectstringcontainer {

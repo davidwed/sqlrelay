@@ -18,7 +18,6 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	stringbuffer	scratch;
 
 	char	*defaultlocalstatedir;
-	char	*sysconfdir;
 
 #ifdef _WIN32
 
@@ -127,8 +126,6 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	} else {
 		configurl=defaultconfigurl;
 	}
-
-	delete[] sysconfdir;
 }
 
 sqlrpaths::~sqlrpaths() {
@@ -145,6 +142,7 @@ sqlrpaths::~sqlrpaths() {
 	delete[] defaultconfigfile;
 	delete[] defaultconfigdir;
 	delete[] libexecdir;
+	delete[] sysconfdir;
 }
 
 const char *sqlrpaths::getBinDir() {
@@ -205,4 +203,8 @@ const char *sqlrpaths::getConfigUrl() {
 
 const char *sqlrpaths::getLibExecDir() {
 	return libexecdir;
+}
+
+const char *sqlrpaths::getSysConfDir() {
+	return sysconfdir;
 }
