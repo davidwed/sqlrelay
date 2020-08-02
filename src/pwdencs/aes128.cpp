@@ -102,11 +102,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 		aes.append(cred+aes.getIvSize(),credlen-aes.getIvSize());
 	} else {
 		// set a random iv and set the data
-		//aes.setRandomIv();
-const unsigned char iv[]={
-	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
-};
-aes.setIv(iv,16);
+		aes.setRandomIv();
 		aes.append(cred,credlen);
 	}
 
