@@ -109,15 +109,29 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	delete[] key;
 	delete[] cred;
 
+	// Below, if the encrypted/decrypted data was NULL then an
+	// encryption/decryption error occurred.  We should also return NULL to
+	// indicate than an error occurred, rather than returning an empty
+	// string.  In the case of decryption, returning an empty string would
+	// allow an empty password to succeed!
 	if (dec) {
+		const unsigned char	*data=aes.getDecryptedData();
+		if (!data) {
+			return NULL;
+		}
 		converted.append(aes.getDecryptedData(),
 					aes.getDecryptedDataLength());
 		converted.append('\0');
 		return (char *)converted.detachBuffer();
 	} else {
+		// if the encrypted data was NULL (an error occurred),
+		// then also return NULL, indicating than an error occurred
+		const unsigned char	*data=aes.getEncryptedData();
+		if (!data) {
+			return NULL;
+		}
 		converted.append(aes.getIv(),aes.getIvSize());
-		converted.append(aes.getEncryptedData(),
-					aes.getEncryptedDataLength());
+		converted.append(data,aes.getEncryptedDataLength());
 		return charstring::hexEncode(converted.getBuffer(),
 						converted.getSize());
 	}
