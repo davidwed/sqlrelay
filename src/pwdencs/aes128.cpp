@@ -14,11 +14,12 @@ class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 	private:
 		char	*convert(const char *value, bool dec);
 		void	getValue(const char *in,
+					bool inishex,
 					const char *path,
-					const char *ext,
+					const char *binext,
+					const char *hexext,
 					unsigned char **out,
-					uint64_t *outlen,
-					bool hexdecode);
+					uint64_t *outlen);
 		bool	getFile(const char *filename,
 					unsigned char **out,
 					uint64_t *outlen,
@@ -27,10 +28,9 @@ class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 		const char	*debug;
 
 		const char	*keypath;
-		const char	*keyext;
-
 		const char	*credpath;
-		const char	*credext;
+		const char	*binext;
+		const char	*hexext;
 
 		bytebuffer	converted;
 
@@ -42,24 +42,22 @@ sqlrpwenc_aes128::sqlrpwenc_aes128(domnode *parameters, bool debug) :
 
 	debug=parameters->getAttributeValue("debug");
 
-	// get optional keypath/keyext
+	// get optional paths and extensions
 	keypath=parameters->getAttributeValue("keypath");
 	if (charstring::isNullOrEmpty(keypath)) {
 		keypath=SYSCONFDIR;
 	}
-	keyext=parameters->getAttributeValue("keyext");
-	if (charstring::isNullOrEmpty(keyext)) {
-		keyext=".aes128";
-	}
-
-	// get optional credpath/credext
 	credpath=parameters->getAttributeValue("credpath");
 	if (charstring::isNullOrEmpty(credpath)) {
 		credpath=SYSCONFDIR;
 	}
-	credext=parameters->getAttributeValue("credext");
-	if (charstring::isNullOrEmpty(credext)) {
-		credext=".aes128";
+	binext=parameters->getAttributeValue("ext");
+	if (charstring::isNullOrEmpty(binext)) {
+		binext=".aes128";
+	}
+	hexext=parameters->getAttributeValue("hexext");
+	if (charstring::isNullOrEmpty(hexext)) {
+		hexext=".aes128hex";
 	}
 }
 
@@ -79,8 +77,8 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	// get the key, either directly or from a file
 	unsigned char	*key;
 	uint64_t	keylen;
-	getValue(getParameters()->getAttributeValue("key"),
-				keypath,keyext,&key,&keylen,true);
+	getValue(getParameters()->getAttributeValue("key"),true,
+				keypath,binext,hexext,&key,&keylen);
 	if (keylen<aes.getKeySize()) {
 		delete[] key;
 		return NULL;
@@ -90,7 +88,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	// get the credentials, either directly or from a file
 	unsigned char	*cred;
 	uint64_t	credlen;
-	getValue(value,credpath,credext,&cred,&credlen,dec);
+	getValue(value,dec,credpath,binext,hexext,&cred,&credlen);
 	if (dec) {
 		if (credlen<aes.getIvSize()) {
 			delete[] key;
@@ -104,7 +102,11 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 		aes.append(cred+aes.getIvSize(),credlen-aes.getIvSize());
 	} else {
 		// set a random iv and set the data
-		aes.setRandomIv();
+		//aes.setRandomIv();
+const unsigned char iv[]={
+	0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+};
+aes.setIv(iv,16);
 		aes.append(cred,credlen);
 	}
 
@@ -126,11 +128,12 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 }
 
 void sqlrpwenc_aes128::getValue(const char *in,
+					bool inishex,
 					const char *path,
-					const char *ext,
+					const char *binext,
+					const char *hexext,
 					unsigned char **out,
-					uint64_t *outlen,
-					bool hexdecode) {
+					uint64_t *outlen) {
 	*out=NULL;
 	*outlen=0;
 
@@ -141,16 +144,12 @@ void sqlrpwenc_aes128::getValue(const char *in,
 	if (in[0]=='[' && in[inlen-1]==']') {
 
 		stringbuffer	fn;
-		fn.append(in+1,inlen-2);
 
 		// try the filename as-is
-		if (getFile(fn.getString(),out,outlen,hexdecode)) {
-			return;
-		}
-
-		// try appending an extension
-		fn.append(ext);
-		if (getFile(fn.getString(),out,outlen,hexdecode)) {
+		fn.clear();
+		fn.append(in+1,inlen-2);
+		if (getFile(fn.getString(),out,outlen,
+				!charstring::endsWith(fn.getString(),hexext))) {
 			return;
 		}
 
@@ -158,23 +157,52 @@ void sqlrpwenc_aes128::getValue(const char *in,
 		fn.clear();
 		fn.append(path)->append(sys::getDirectorySeparator());
 		fn.append(in+1,inlen-2);
-		if (getFile(fn.getString(),out,outlen,hexdecode)) {
+		if (getFile(fn.getString(),out,outlen,
+				!charstring::endsWith(fn.getString(),hexext))) {
 			return;
 		}
 
-		// try appending an extension again
-		fn.append(ext);
-		if (getFile(fn.getString(),out,outlen,hexdecode)) {
+		// try appending the binary extension
+		fn.clear();
+		fn.append(in+1,inlen-2);
+		fn.append(binext);
+		if (getFile(fn.getString(),out,outlen,false)) {
+			return;
+		}
+
+		// try path + binary extension
+		fn.clear();
+		fn.append(path)->append(sys::getDirectorySeparator());
+		fn.append(in+1,inlen-2);
+		fn.append(binext);
+		if (getFile(fn.getString(),out,outlen,false)) {
+			return;
+		}
+
+		// try appending the hex extension
+		fn.clear();
+		fn.append(in+1,inlen-2);
+		fn.append(hexext);
+		if (getFile(fn.getString(),out,outlen,true)) {
+			return;
+		}
+
+		// try path + hex extension
+		fn.clear();
+		fn.append(path)->append(sys::getDirectorySeparator());
+		fn.append(in+1,inlen-2);
+		fn.append(hexext);
+		if (getFile(fn.getString(),out,outlen,true)) {
 			return;
 		}
 	}
 
 	// just return the in verbatim
-	if (hexdecode) {
+	if (inishex) {
 		charstring::hexDecode(in,inlen,out,outlen);
 	} else {
-		*outlen=inlen;
 		*out=(unsigned char *)charstring::duplicate(in,inlen);
+		*outlen=inlen;
 	}
 }
 
