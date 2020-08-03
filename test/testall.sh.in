@@ -174,7 +174,7 @@ do
 			echo
 			echo "failed to start ${DB}test"
 			echo
-			echo "    db failed" >> testresults.log
+			echo "    connect: failed" >> testresults.log
 		fi
 	fi
 
