@@ -1,7 +1,7 @@
 #!/bin/sh
 
-echo "SQL Relay test results:"
-echo
+echo "SQL Relay test results:" > testresults.log
+echo >> testresults.log
 
 PREFIX=@prefix@
 
@@ -78,7 +78,7 @@ do
 
 	# testing...
 	echo "testing $DB (from `hostname`)..."
-	echo "$DB..."
+	echo "$DB..." >> testresults.log
 
 	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
@@ -163,9 +163,9 @@ do
 				./dropin/mysql
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "dropin"
+					printf "    % 8s: success\n" "dropin" >> testresults.log
 				else
-					printf "    % 8s: failed\n" "dropin"
+					printf "    % 8s: failed\n" "dropin" >> testresults.log
 				fi
 			else
 				./test.sh $DB
@@ -174,7 +174,7 @@ do
 			echo
 			echo "failed to start ${DB}test"
 			echo
-			echo "     connect: failed"
+			echo "     connect: failed" >> testresults.log
 		fi
 	fi
 
@@ -194,3 +194,5 @@ do
 	echo "================================================================================"
 	echo
 done
+
+cat testresults.log
