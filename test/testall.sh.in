@@ -174,11 +174,7 @@ do
 			echo
 			echo "failed to start ${DB}test"
 			echo
-<<<<<<< HEAD
 			echo "     connect: failed"
-=======
-			echo "    connect: failed" >> testresults.log
->>>>>>> parent of a8d7b2c6... updates
 		fi
 	fi
 
