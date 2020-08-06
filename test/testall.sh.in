@@ -196,3 +196,5 @@ do
 done
 
 cat testresults.log
+
+exit 0

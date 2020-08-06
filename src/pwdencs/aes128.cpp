@@ -14,7 +14,8 @@ class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 	private:
 		char	*convert(const char *value, bool dec);
 		void	getValue(const char *in,
-					bool inishex,
+					bool verbatimishex,
+					bool fileishex,
 					const char *path,
 					const char *binext,
 					const char *hexext,
@@ -28,9 +29,14 @@ class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 		const char	*debug;
 
 		const char	*keypath;
+		bool		keybin;
+		const char	*keybinext;
+		const char	*keyhexext;
+
 		const char	*credpath;
-		const char	*binext;
-		const char	*hexext;
+		bool		credbin;
+		const char	*credbinext;
+		const char	*credhexext;
 
 		bytebuffer	converted;
 
@@ -42,23 +48,21 @@ sqlrpwenc_aes128::sqlrpwenc_aes128(domnode *parameters, bool debug) :
 
 	debug=parameters->getAttributeValue("debug");
 
-	// get optional paths and extensions
+	// get optional flags, paths, and extensions
 	keypath=parameters->getAttributeValue("keypath");
 	if (charstring::isNullOrEmpty(keypath)) {
 		keypath=SYSCONFDIR;
 	}
+	keybin=charstring::isYes(parameters->getAttributeValue("keybin"));
+	keybinext=parameters->getAttributeValue("keybinext");
+	keyhexext=parameters->getAttributeValue("keyhexext");
 	credpath=parameters->getAttributeValue("credpath");
 	if (charstring::isNullOrEmpty(credpath)) {
 		credpath=SYSCONFDIR;
 	}
-	binext=parameters->getAttributeValue("ext");
-	if (charstring::isNullOrEmpty(binext)) {
-		binext=".aes128";
-	}
-	hexext=parameters->getAttributeValue("hexext");
-	if (charstring::isNullOrEmpty(hexext)) {
-		hexext=".aes128hex";
-	}
+	credbin=charstring::isYes(parameters->getAttributeValue("credbin"));
+	credbinext=parameters->getAttributeValue("credbinext");
+	credhexext=parameters->getAttributeValue("credhexext");
 }
 
 char *sqlrpwenc_aes128::encrypt(const char *value) {
@@ -77,8 +81,8 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	// get the key, either directly or from a file
 	unsigned char	*key;
 	uint64_t	keylen;
-	getValue(getParameters()->getAttributeValue("key"),true,
-				keypath,binext,hexext,&key,&keylen);
+	getValue(getParameters()->getAttributeValue("key"),true,!keybin,
+				keypath,keybinext,keyhexext,&key,&keylen);
 	if (keylen<aes.getKeySize()) {
 		delete[] key;
 		return NULL;
@@ -88,7 +92,8 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	// get the credentials, either directly or from a file
 	unsigned char	*cred;
 	uint64_t	credlen;
-	getValue(value,dec,credpath,binext,hexext,&cred,&credlen);
+	getValue(value,dec,!credbin,
+			credpath,credbinext,credhexext,&cred,&credlen);
 	if (dec) {
 		if (credlen<aes.getIvSize()) {
 			delete[] key;
@@ -138,12 +143,14 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 }
 
 void sqlrpwenc_aes128::getValue(const char *in,
-					bool inishex,
+					bool verbatimishex,
+					bool fileishex,
 					const char *path,
 					const char *binext,
 					const char *hexext,
 					unsigned char **out,
 					uint64_t *outlen) {
+stdoutput.printf("getValue(%s)...\n",in);
 	*out=NULL;
 	*outlen=0;
 
@@ -156,59 +163,84 @@ void sqlrpwenc_aes128::getValue(const char *in,
 		stringbuffer	fn;
 
 		// try the filename as-is
+		// (if the filename doesn't end in the hexext,
+		// then assume it's binary)
 		fn.clear();
 		fn.append(in+1,inlen-2);
-		if (getFile(fn.getString(),out,outlen,
-				!charstring::endsWith(fn.getString(),hexext))) {
+stdoutput.printf("%s\n",fn.getString());
+		if (getFile(fn.getString(),out,outlen,fileishex)) {
+stdoutput.printf("found file\n");
 			return;
 		}
 
 		// try prepending a path
+		// (if the filename doesn't end in the hexext,
+		// then assume it's binary)
 		fn.clear();
 		fn.append(path)->append(sys::getDirectorySeparator());
 		fn.append(in+1,inlen-2);
-		if (getFile(fn.getString(),out,outlen,
-				!charstring::endsWith(fn.getString(),hexext))) {
+stdoutput.printf("%s\n",fn.getString());
+		if (getFile(fn.getString(),out,outlen,fileishex)) {
+stdoutput.printf("found path + file\n");
 			return;
 		}
 
-		// try appending the binary extension
-		fn.clear();
-		fn.append(in+1,inlen-2);
-		fn.append(binext);
-		if (getFile(fn.getString(),out,outlen,false)) {
-			return;
+		if (!charstring::isNullOrEmpty(binext)) {
+
+			// try appending the binary extension
+			fn.clear();
+			fn.append(in+1,inlen-2);
+			fn.append('.');
+			fn.append(binext);
+stdoutput.printf("%s\n",fn.getString());
+			if (getFile(fn.getString(),out,outlen,false)) {
+stdoutput.printf("found bin ext\n");
+				return;
+			}
+
+			// try path + binary extension
+			fn.clear();
+			fn.append(path)->append(sys::getDirectorySeparator());
+			fn.append(in+1,inlen-2);
+			fn.append('.');
+			fn.append(binext);
+stdoutput.printf("%s\n",fn.getString());
+			if (getFile(fn.getString(),out,outlen,false)) {
+stdoutput.printf("found path + bin ext\n");
+				return;
+			}
 		}
 
-		// try path + binary extension
-		fn.clear();
-		fn.append(path)->append(sys::getDirectorySeparator());
-		fn.append(in+1,inlen-2);
-		fn.append(binext);
-		if (getFile(fn.getString(),out,outlen,false)) {
-			return;
-		}
+		if (!charstring::isNullOrEmpty(hexext)) {
 
-		// try appending the hex extension
-		fn.clear();
-		fn.append(in+1,inlen-2);
-		fn.append(hexext);
-		if (getFile(fn.getString(),out,outlen,true)) {
-			return;
-		}
+			// try appending the hex extension
+			fn.clear();
+			fn.append(in+1,inlen-2);
+			fn.append('.');
+			fn.append(hexext);
+stdoutput.printf("%s\n",fn.getString());
+			if (getFile(fn.getString(),out,outlen,true)) {
+stdoutput.printf("found hex ext\n");
+				return;
+			}
 
-		// try path + hex extension
-		fn.clear();
-		fn.append(path)->append(sys::getDirectorySeparator());
-		fn.append(in+1,inlen-2);
-		fn.append(hexext);
-		if (getFile(fn.getString(),out,outlen,true)) {
-			return;
+			// try path + hex extension
+			fn.clear();
+			fn.append(path)->append(sys::getDirectorySeparator());
+			fn.append(in+1,inlen-2);
+			fn.append('.');
+			fn.append(hexext);
+stdoutput.printf("%s\n",fn.getString());
+			if (getFile(fn.getString(),out,outlen,true)) {
+stdoutput.printf("found path + hex ext\n");
+				return;
+			}
 		}
 	}
 
+stdoutput.printf("verbatim\n");
 	// just return the in verbatim
-	if (inishex) {
+	if (verbatimishex) {
 		charstring::hexDecode(in,inlen,out,outlen);
 	} else {
 		*out=(unsigned char *)charstring::duplicate(in,inlen);
