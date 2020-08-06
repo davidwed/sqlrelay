@@ -150,7 +150,6 @@ void sqlrpwenc_aes128::getValue(const char *in,
 					const char *hexext,
 					unsigned char **out,
 					uint64_t *outlen) {
-stdoutput.printf("getValue(%s)...\n",in);
 	*out=NULL;
 	*outlen=0;
 
@@ -163,25 +162,17 @@ stdoutput.printf("getValue(%s)...\n",in);
 		stringbuffer	fn;
 
 		// try the filename as-is
-		// (if the filename doesn't end in the hexext,
-		// then assume it's binary)
 		fn.clear();
 		fn.append(in+1,inlen-2);
-stdoutput.printf("%s\n",fn.getString());
 		if (getFile(fn.getString(),out,outlen,fileishex)) {
-stdoutput.printf("found file\n");
 			return;
 		}
 
 		// try prepending a path
-		// (if the filename doesn't end in the hexext,
-		// then assume it's binary)
 		fn.clear();
 		fn.append(path)->append(sys::getDirectorySeparator());
 		fn.append(in+1,inlen-2);
-stdoutput.printf("%s\n",fn.getString());
 		if (getFile(fn.getString(),out,outlen,fileishex)) {
-stdoutput.printf("found path + file\n");
 			return;
 		}
 
@@ -192,9 +183,7 @@ stdoutput.printf("found path + file\n");
 			fn.append(in+1,inlen-2);
 			fn.append('.');
 			fn.append(binext);
-stdoutput.printf("%s\n",fn.getString());
 			if (getFile(fn.getString(),out,outlen,false)) {
-stdoutput.printf("found bin ext\n");
 				return;
 			}
 
@@ -204,9 +193,7 @@ stdoutput.printf("found bin ext\n");
 			fn.append(in+1,inlen-2);
 			fn.append('.');
 			fn.append(binext);
-stdoutput.printf("%s\n",fn.getString());
 			if (getFile(fn.getString(),out,outlen,false)) {
-stdoutput.printf("found path + bin ext\n");
 				return;
 			}
 		}
@@ -218,9 +205,7 @@ stdoutput.printf("found path + bin ext\n");
 			fn.append(in+1,inlen-2);
 			fn.append('.');
 			fn.append(hexext);
-stdoutput.printf("%s\n",fn.getString());
 			if (getFile(fn.getString(),out,outlen,true)) {
-stdoutput.printf("found hex ext\n");
 				return;
 			}
 
@@ -230,15 +215,12 @@ stdoutput.printf("found hex ext\n");
 			fn.append(in+1,inlen-2);
 			fn.append('.');
 			fn.append(hexext);
-stdoutput.printf("%s\n",fn.getString());
 			if (getFile(fn.getString(),out,outlen,true)) {
-stdoutput.printf("found path + hex ext\n");
 				return;
 			}
 		}
 	}
 
-stdoutput.printf("verbatim\n");
 	// just return the in verbatim
 	if (verbatimishex) {
 		charstring::hexDecode(in,inlen,out,outlen);
