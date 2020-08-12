@@ -18,6 +18,8 @@
 		the client side, that could cause a hang
 	added an aes128 pwdenc module
 	applied a patch to fix a crash in the debug logger (missing "%s")
+	added a tweak to getsitearchdir.rb to fix incorrect lib/lib64 reporting
+		on some centos x64 systems
 
 1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute
