@@ -363,6 +363,8 @@ int	main(int argc, char **argv) {
 	field=mysql_fetch_field_direct(result,18);
 	checkSuccess(field->name,"testtimestamp");
 	checkSuccess(field->length,19);
+#if 0
+	// not reliable on all platforms
 	checkSuccess(field->flags,
 			TIMESTAMP_FLAG|
 			#ifdef ON_UPDATE_NOW_FLAG
@@ -371,6 +373,15 @@ int	main(int argc, char **argv) {
 			BINARY_FLAG|
 			UNSIGNED_FLAG|
 			NOT_NULL_FLAG);
+#else
+	checkSuccess(field->flags&TIMESTAMP_FLAG,TIMESTAMP_FLAG);
+	#ifdef ON_UPDATE_NOW_FLAG
+	checkSuccess(field->flags&ON_UPDATE_NOW_FLAG,ON_UPDATE_NOW_FLAG);
+	#endif
+	checkSuccess(field->flags&BINARY_FLAG,BINARY_FLAG);
+	checkSuccess(field->flags&UNSIGNED_FLAG,UNSIGNED_FLAG);
+	checkSuccess(field->flags&NOT_NULL_FLAG,NOT_NULL_FLAG);
+#endif
 	checkSuccess(field->type,MYSQL_TYPE_TIMESTAMP);
 	mysql_free_result(result);
 	stdoutput.printf("\n");
@@ -774,7 +785,8 @@ int	main(int argc, char **argv) {
 	#ifndef MARIADB_BASE_VERSION
 	stdoutput.printf("mysql_list_processes\n");
 	result=mysql_list_processes(&mysql);
-	checkSuccess(mysql_num_fields(result),9);
+	uint16_t	numfields=mysql_num_fields(result);
+	checkSuccess((numfields==8 || numfields==9),1);
 	field=mysql_fetch_field_direct(result,0);
 	checkSuccess(field->name,"Id");
 	field=mysql_fetch_field_direct(result,1);
@@ -791,8 +803,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(field->name,"State");
 	field=mysql_fetch_field_direct(result,7);
 	checkSuccess(field->name,"Info");
-	field=mysql_fetch_field_direct(result,8);
-	checkSuccess(field->name,"Progress");
+	if (numfields==9) {
+		field=mysql_fetch_field_direct(result,8);
+		checkSuccess(field->name,"Progress");
+	}
 	row=mysql_fetch_row(result);
 	stdoutput.printf("\n");
 	mysql_free_result(result);
