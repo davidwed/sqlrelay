@@ -168,12 +168,17 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 					bool *null);
 		void		closeResultSet();
 
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+		void		deallocateNamedStatement();
+#endif
 #if ((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
 		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
-		void		deallocateNamedStatement();
 		bool		columnInfoIsValidAfterPrepare();
 #endif
 
@@ -1571,11 +1576,10 @@ void postgresqlcursor::closeResultSet() {
 #endif
 }
 
-#if ((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+#if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
-		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 void postgresqlcursor::deallocateNamedStatement() {
 	if (allocated) {
 		if (cursorid[0]) {
@@ -1587,7 +1591,13 @@ void postgresqlcursor::deallocateNamedStatement() {
 		allocated=false;
 	}
 }
+#endif
 
+#if ((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
+		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
 bool postgresqlcursor::columnInfoIsValidAfterPrepare() {
 	return true;
 }
