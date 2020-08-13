@@ -188,7 +188,7 @@ int	main(int argc, char **argv) {
 	result=mysql_list_fields(&mysql,"testtable",NULL);
 	// FIXME: crashes with drop-in lib
 	//checkSuccess(mysql_field_count(&mysql),19);
-	//checkSuccess(mysql_num_fields(result),19);
+	checkSuccess(mysql_num_fields(result),19);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("tinyint\n");
