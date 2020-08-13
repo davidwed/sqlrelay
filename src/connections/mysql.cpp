@@ -277,6 +277,8 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		char	*dbversion;
 		char	*dbhostname;
 
+		stringbuffer	columnlistquery;
+
 		static const my_bool	mytrue;
 		static const my_bool	myfalse;
 
@@ -677,24 +679,19 @@ const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 
 const char *mysqlconnection::getColumnListQuery(
 					const char *table, bool wild) {
-	return (wild)?"select "
-			"	column_name, "
-			"	data_type, "
-			"	character_maximum_length, "
-			"	numeric_precision, "
-			"	numeric_scale, "
-			"	is_nullable, "
-			"	column_key, "
-			"	column_default, "
-			"	extra, "
-			"	NULL "
-			"from "
-			"	information_schema.columns "
-			"where "
-			"	table_name='%s' "
-			"	and "
-			"	column_name like '%s'"
-			:
+
+	// split the table name into db/schema/table parts
+	const char	*currentdb="def";
+	char	*currentschema=getCurrentDatabase();
+	char	*dbname=NULL;
+	char	*schemaname=NULL;
+	char	*tablename=NULL;
+	cont->splitObjectName(currentdb,currentschema,table,
+				&dbname,&schemaname,&tablename);
+
+	// FIXME: use db/schema/tablename here
+	columnlistquery.clear();
+	columnlistquery.append(
 			"select "
 			"	column_name, "
 			"	data_type, "
@@ -709,7 +706,30 @@ const char *mysqlconnection::getColumnListQuery(
 			"from "
 			"	information_schema.columns "
 			"where "
-			"	table_name='%s' ";
+			"	table_catalog='");
+	columnlistquery.append(dbname);
+	columnlistquery.append(
+			"' "
+			"	and "
+			"	table_schema='");
+	columnlistquery.append(schemaname);
+	columnlistquery.append(
+			"' "
+			"	and "
+			"	table_name='%s' ");
+	if (wild) {
+		columnlistquery.append(
+			"	and "
+			"	column_name like '%s'");
+	}
+
+	// clean up
+	delete[] currentschema;
+	delete[] dbname;
+	delete[] schemaname;
+	delete[] tablename;
+
+	return columnlistquery.getString();
 }
 
 const char *mysqlconnection::selectDatabaseQuery() {

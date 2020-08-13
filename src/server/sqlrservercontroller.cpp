@@ -3170,6 +3170,64 @@ uint16_t sqlrservercontroller::countBindVariables(const char *query,
 				pvt->_dollarsignsupported);
 }
 
+void sqlrservercontroller::splitObjectName(const char *currentdb,
+						const char *currentschema,
+						const char *combinedobject,
+						char **db,
+						char **schema,
+						char **object) {
+
+	// init return values
+	*db=NULL;
+	*schema=NULL;
+	*object=NULL;
+
+	// split the combined object
+	char		**parts=NULL;
+	uint64_t	partcount=0;
+	charstring::split(combinedobject,".",true,&parts,&partcount);
+
+	// the combined object might be in one of the following formats:
+	// * object
+	// * schema.object
+	// * db.schema.object
+	switch (partcount) {
+		case 3:
+			*db=parts[0];
+			*schema=parts[1];
+			*object=parts[2];
+			break;
+		case 2:
+			// If there are 2 parts the it could mean:
+			// * db(.defaultschama).object
+			//   or
+			// * (currentdb.)schema.object...
+			// If the first part is not the same as the current
+			// db, then we'll guess (currentdb.)schema.object,
+			// but we don't really know for sure. The app may
+			// really mean to target another db.
+			if (!charstring::compare(parts[0],currentdb)) {
+				*db=parts[0];
+				*schema=charstring::duplicate(currentschema);
+			} else {
+				*db=charstring::duplicate(currentdb);
+				*schema=parts[0];
+			}
+			*object=parts[1];
+			break;
+		case 1:
+			*db=charstring::duplicate(currentdb);
+			*schema=charstring::duplicate(currentschema);
+			*object=parts[0];
+			break;
+	}
+
+	// clean up (we don't need to delete each individual part because
+	// they've all been passed out and will be cleaned up by the calling
+	// method)
+	delete[] parts;
+}
+
 bool sqlrservercontroller::isBitType(const char *type) {
 	return ::isBitTypeChar(type);
 }

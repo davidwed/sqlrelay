@@ -785,6 +785,12 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							uint32_t querylen);
 		uint16_t	countBindVariables(const char *query,
 							uint32_t querylen);
+		void		splitObjectName(const char *currentdb,
+						const char *currentschema,
+						const char *combinedobject,
+						char **db,
+						char **schema,
+						char **object);
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);
