@@ -3467,6 +3467,8 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.14* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.12* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.11* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.10* 2> /dev/null` \
@@ -3480,7 +3482,11 @@ then
 `ls -d /usr/lib64/jvm/jdk-10-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-11-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-12-* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/jdk-13-* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/jdk-14-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.14* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.12* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.11* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.10* 2> /dev/null` \
@@ -3494,6 +3500,8 @@ then
 `ls -d /usr/lib/jvm/jdk-10-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-11-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
 /System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local
