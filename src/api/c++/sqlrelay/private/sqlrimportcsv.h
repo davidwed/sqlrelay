@@ -2,10 +2,13 @@
 // See the file COPYING for more information
 
 	private:
+		void	appendField(stringbuffer *query,
+					const char *value,
+					uint32_t currentcol);
 		void	escapeField(stringbuffer *strb, const char *field);
 
-		uint32_t	primarykeyposition;
-		char		*primarykeyname;
+		char		*primarykeycolumnname;
+		uint32_t	primarykeycolumnindex;
 		char		*primarykeysequence;
 
 		bool		ignorecolumnswithemptynames;
@@ -25,3 +28,6 @@
 
 		linkedlist<uint32_t>		columnswithemptynames;
 		linkedlistnode<uint32_t>	*columnswithemptynamesnode;
+
+		dictionary<uint32_t, char *>	staticvaluecolumnnames;
+		dictionary<uint32_t, char *>	staticvaluecolumnvalues;

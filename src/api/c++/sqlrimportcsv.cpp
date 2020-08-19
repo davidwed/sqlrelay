@@ -11,8 +11,8 @@
 #include <datatypes.h>
 
 sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
-	primarykeyname=NULL;
-	primarykeyposition=0;
+	primarykeycolumnname=NULL;
+	primarykeycolumnindex=0;
 	primarykeysequence=NULL;
 	ignorecolumnswithemptynames=false;
 	ignoreemptyrows=false;
@@ -29,24 +29,33 @@ sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 }
 
 sqlrimportcsv::~sqlrimportcsv() {
-	delete[] primarykeyname;
+	delete[] primarykeycolumnname;
 	delete[] primarykeysequence;
 	delete[] numbercolumn;
 	delete[] datecolumn;
+	staticvaluecolumnnames.clearAndArrayDeleteValues();
+	staticvaluecolumnvalues.clearAndArrayDeleteValues();
 }
 
-void sqlrimportcsv::setPrimaryKeyName(const char *primarykeyname) {
-	delete[] this->primarykeyname;
-	this->primarykeyname=charstring::duplicate(primarykeyname);
-}
-
-void sqlrimportcsv::setPrimaryKeyPosition(uint32_t primarykeyposition) {
-	this->primarykeyposition=primarykeyposition;
-}
-
-void sqlrimportcsv::setPrimaryKeySequence(const char *primarykeysequence) {
+void sqlrimportcsv::insertPrimaryKey(const char *primarykeycolumnname,
+					uint32_t primarykeycolumnindex,
+					const char *primarykeysequence) {
+	delete[] this->primarykeycolumnname;
+	this->primarykeycolumnname=charstring::duplicate(primarykeycolumnname);
+	this->primarykeycolumnindex=primarykeycolumnindex;
 	delete[] this->primarykeysequence;
 	this->primarykeysequence=charstring::duplicate(primarykeysequence);
+}
+
+void sqlrimportcsv::insertStaticValue(const char *columnname,
+					uint32_t columnindex,
+					const char *value) {
+	staticvaluecolumnnames.removeAndArrayDeleteValue(columnindex);
+	staticvaluecolumnvalues.removeAndArrayDeleteValue(columnindex);
+	staticvaluecolumnnames.setValue(
+			columnindex,charstring::duplicate(columnname));
+	staticvaluecolumnvalues.setValue(
+			columnindex,charstring::duplicate(value));
 }
 
 void sqlrimportcsv::setIgnoreColumnsWithEmptyNames(
@@ -77,9 +86,9 @@ bool sqlrimportcsv::importFromFile(const char *filename) {
 bool sqlrimportcsv::column(const char *name, bool quoted) {
 
 	// if this column is the primary key...
-	if (primarykeyname && currentcol==primarykeyposition) {
+	if (primarykeycolumnname && currentcol==primarykeycolumnindex) {
 
-		// and we're building a list of column names
+		// and we're building a list of column names...
 		if (!ignorecolumns) {
 
 			if (needcomma) {
@@ -87,11 +96,40 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 			}
 
 			// append the primary key name
-			columns.append(primarykeyname);
+			columns.append(primarykeycolumnname);
 
 			needcomma=true;
 		}
 		currentcol++;
+	}
+
+	// if there are any static columns...
+	if (staticvaluecolumnnames.getTree()->getLength()) {
+
+		// loop, handling them
+		for (;;) {
+
+			// get the static column name for this position
+			const char	*colname=
+				staticvaluecolumnnames.getValue(currentcol);
+			if (!colname) {
+				break;
+			}
+
+			// if we're building a list of column names...
+			if (!ignorecolumns) {
+
+				if (needcomma) {
+					columns.append(',');
+				}
+
+				// append the column name
+				columns.append(colname);
+
+				needcomma=true;
+			}
+			currentcol++;
+		}
 	}
 
 	// by default, we want to include this column in the list of column
@@ -174,7 +212,9 @@ bool sqlrimportcsv::headerEnd() {
 	datecolumn=new bool[colcount];
 	for (uint32_t i=0, j=0; i<colcount;) {
 
-		if (!ignorecolumns && primarykeyname && i==primarykeyposition) {
+		if (!ignorecolumns &&
+			primarykeycolumnname &&
+			i==primarykeycolumnindex) {
 
 			// If we're not ignoring columns, and this is the
 			// primary key column, then it won't be in the set of
@@ -232,7 +272,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 
 	// if we're manually adding the primary key, and this is the primary
 	// key position, then add it
-	if (primarykeyname && currentcol==primarykeyposition) {
+	if (primarykeycolumnname && currentcol==primarykeycolumnindex) {
 		if (needcomma) {
 			query.append(",");
 		}
@@ -246,6 +286,36 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		needcomma=true;
 		currentcol++;
 		fieldcount++;
+	}
+
+	// if there are any static columns...
+	if (staticvaluecolumnnames.getTree()->getLength()) {
+
+		// loop, handling them
+		for (;;) {
+
+			// get the static column name for this position
+			const char	*colname=
+				staticvaluecolumnnames.getValue(currentcol);
+			if (!colname) {
+				break;
+			}
+
+			// get the static column value for this position
+			const char	*colvalue=
+				staticvaluecolumnvalues.getValue(currentcol);
+
+			if (needcomma) {
+				query.append(',');
+			}
+
+			// append the field to the query
+			appendField(&query,colvalue,currentcol);
+
+			needcomma=true;
+			currentcol++;
+			fieldcount++;
+		}
 	}
 
 	// should we include this field, or ignore it
@@ -266,57 +336,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		}
 
 		// append the field to the query
-		if (!charstring::isNullOrEmpty(value)) {
-			bool	isnumber=
-				(numbercolumn)?numbercolumn[currentcol]:false;
-			bool	isdate=
-				(datecolumn)?datecolumn[currentcol]:false;
-			if (!isnumber || isdate) {
-				query.append('\'');
-			}
-			if (isdate) {
-				int16_t year;
-				int16_t month;
-				int16_t day;
-				int16_t hour;
-				int16_t minute;
-				int16_t second;
-				int32_t microsecond;
-				bool isnegative;
-				// FIXME: pass in ddmm, yyyyddmm, datedelimiters
-				datetime::parse(value,false,false,"-/",
-						&year,&month,&day,
-						&hour,&minute,&second,
-						&microsecond,&isnegative);
-				if (hour==-1) {
-					hour=0;
-				}
-				if (minute==-1) {
-					minute=0;
-				}
-				if (second==-1) {
-					second=0;
-				}
-				if (microsecond==-1) {
-					microsecond=0;
-				}
-				// FIXME: what about microseconds and negatives?
-				char	*dt=datetime::formatAs(
-							"YYYY-MM-DD HH24:MI:SS",
-							year,month,day,
-							hour,minute,second,
-							microsecond,isnegative);
-				query.append(dt);
-				delete[] dt;
-			} else {
-				escapeField(&query,value);
-			}
-			if (!isnumber || isdate) {
-				query.append('\'');
-			}
-		} else {
-			query.append("NULL");
-		}
+		appendField(&query,value,currentcol);
 
 		needcomma=true;
 
@@ -325,6 +345,62 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		fieldcount++;
 	}
 	return true;
+}
+
+void sqlrimportcsv::appendField(stringbuffer *query,
+					const char *value,
+					uint32_t currentcol) {
+
+	if (!charstring::isNullOrEmpty(value)) {
+
+		bool	isnumber=(numbercolumn)?numbercolumn[currentcol]:false;
+		bool	isdate=(datecolumn)?datecolumn[currentcol]:false;
+		if (!isnumber || isdate) {
+			query->append('\'');
+		}
+		if (isdate) {
+			int16_t year;
+			int16_t month;
+			int16_t day;
+			int16_t hour;
+			int16_t minute;
+			int16_t second;
+			int32_t microsecond;
+			bool isnegative;
+			// FIXME: pass in ddmm, yyyyddmm, datedelimiters
+			datetime::parse(value,false,false,"-/",
+					&year,&month,&day,
+					&hour,&minute,&second,
+					&microsecond,&isnegative);
+			if (hour==-1) {
+				hour=0;
+			}
+			if (minute==-1) {
+				minute=0;
+			}
+			if (second==-1) {
+				second=0;
+			}
+			if (microsecond==-1) {
+				microsecond=0;
+			}
+			// FIXME: what about microseconds and negatives?
+			char	*dt=datetime::formatAs(
+						"YYYY-MM-DD HH24:MI:SS",
+						year,month,day,
+						hour,minute,second,
+						microsecond,isnegative);
+			query->append(dt);
+			delete[] dt;
+		} else {
+			escapeField(query,value);
+		}
+		if (!isnumber || isdate) {
+			query->append('\'');
+		}
+	} else {
+		query->append("NULL");
+	}
 }
 
 bool sqlrimportcsv::rowEnd() {

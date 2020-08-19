@@ -11,11 +11,15 @@ class sqlrimportcsv : public sqlrimport, public csvsax {
 			sqlrimportcsv();
 			~sqlrimportcsv();
 
-		void	setPrimaryKeyName(const char *primarykeyname);
-		void	setPrimaryKeyPosition(uint32_t primarykeyposition);
-		void	setPrimaryKeySequence(const char *primarykeysequence);
+		void	insertPrimaryKey(const char *primarykeycolumnname,
+						uint32_t primarykeycolumnindex,
+						const char *primarykeysequence);
+		void	insertStaticValue(const char *columnname,
+						uint32_t columnindex,
+						const char *value);
 
-		void	setIgnoreColumnsWithEmptyNames(bool ignorecolumnswithemptynames);
+		void	setIgnoreColumnsWithEmptyNames(
+					bool ignorecolumnswithemptynames);
 		void	setIgnoreEmptyRows(bool ignoreemptyrows);
 
 		bool	importFromFile(const char *filename);
