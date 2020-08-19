@@ -49,6 +49,8 @@ class sqlrexport {
 		virtual	bool	rowEnd();
 		virtual	bool	rowsEnd();
 
+		virtual uint64_t	getExportedRowCount();
+
 	protected:
 		void	setExportRow(bool exportrow);
 		bool	getExportRow();

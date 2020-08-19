@@ -18,6 +18,7 @@ sqlrexport::sqlrexport() {
 	fineloglevel=0;
 	logindent=0;
 	shutdownflag=false;
+	exportedrowcount=0;
 }
 
 sqlrexport::~sqlrexport() {
@@ -112,7 +113,7 @@ bool sqlrexport::headerEnd() {
 }
 
 bool sqlrexport::rowsStart() {
-	// by default, just return success
+	exportedrowcount=0;
 	return true;
 }
 
@@ -132,13 +133,19 @@ bool sqlrexport::fieldEnd() {
 }
 
 bool sqlrexport::rowEnd() {
-	// by default, just return success
+	if (exportrow) {
+		exportedrowcount++;
+	}
 	return true;
 }
 
 bool sqlrexport::rowsEnd() {
 	// by default, just return success
 	return true;
+}
+
+uint64_t sqlrexport::getExportedRowCount() {
+	return exportedrowcount;
 }
 
 void sqlrexport::setExportRow(bool exportrow) {

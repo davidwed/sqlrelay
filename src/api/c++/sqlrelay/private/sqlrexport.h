@@ -17,3 +17,4 @@
 		uint32_t		logindent;
 		bool			shutdownflag;
 		dynamicarray<bool>	numbercolumns;
+		uint64_t		exportedrowcount;
