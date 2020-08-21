@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrresultsetdomnodeincludes.h>
 
-class sqlrresultsetdomnode : public cursordomnode {
+class SQLRCLIENT_DLLSPEC sqlrresultsetdomnode : public cursordomnode {
 	public:
 		sqlrresultsetdomnode(dom *dom,
 					domnode *nullnode,

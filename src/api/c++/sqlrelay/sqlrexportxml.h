@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrexportxmlincludes.h>
 
-class sqlrexportxml : public sqlrexport {
+class SQLRCLIENT_DLLSPEC sqlrexportxml : public sqlrexport {
 	public:
 			sqlrexportxml();
 			~sqlrexportxml();
