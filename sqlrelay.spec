@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.7.1
+Version: 1.8.1
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: gcc-c++, rudiments-devel >= 1.2.0, systemd
+BuildRequires: gcc-c++, rudiments-devel >= 1.3.0, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -466,8 +466,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-status
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver.so.10
-%{_libdir}/libsqlrserver.so.10.*
+%{_libdir}/libsqlrserver.so.11
+%{_libdir}/libsqlrserver.so.11.*
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
@@ -585,8 +585,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %systemd_preun %{name}cachemanager.service
 
 %files common
-%{_libdir}/libsqlrutil.so.10
-%{_libdir}/libsqlrutil.so.10.*
+%{_libdir}/libsqlrutil.so.11
+%{_libdir}/libsqlrutil.so.11.*
 
 %files common-devel
 %dir %{_includedir}/%{name}
@@ -596,12 +596,12 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_libdir}/libsqlrutil.so
 
 %files c++
-%{_libdir}/libsqlrclient.so.5
-%{_libdir}/libsqlrclient.so.5.*
+%{_libdir}/libsqlrclient.so.6
+%{_libdir}/libsqlrclient.so.6.*
 
 %files c
-%{_libdir}/libsqlrclientwrapper.so.5
-%{_libdir}/libsqlrclientwrapper.so.5.*
+%{_libdir}/libsqlrclientwrapper.so.6
+%{_libdir}/libsqlrclientwrapper.so.6.*
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
@@ -648,8 +648,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %exclude %{_libdir}/lib*.la
 
 %files -n odbc-%{name}
-%{_libdir}/libsqlrodbc.so.5
-%{_libdir}/libsqlrodbc.so.5.*
+%{_libdir}/libsqlrodbc.so.6
+%{_libdir}/libsqlrodbc.so.6.*
 %{_libdir}/libsqlrodbc.so
 
 %files -n perl-%{name}
@@ -791,8 +791,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed May 13 2020 David Muse <david.muse@firstworks.com> - 1.7.1-1
-- Updated to version 1.7.1.
+* Wed May 13 2020 David Muse <david.muse@firstworks.com> - 1.8.0-1
+- Updated to version 1.8.0.
 - Added sqlrresultsetdomnode to C++ API.
 - Added sqlrimport/export to C++ API.
 
