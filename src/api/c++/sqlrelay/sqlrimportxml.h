@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrimportxmlincludes.h>
 
-class sqlrimportxml : public sqlrimport, public xmlsax {
+class SQLRCLIENT_DLLSPEC sqlrimportxml : public sqlrimport, public xmlsax {
 	public:
 			sqlrimportxml();
 			~sqlrimportxml();

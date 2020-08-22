@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrimportincludes.h>
 
-class sqlrimport {
+class SQLRCLIENT_DLLSPEC sqlrimport {
 	public:
 			sqlrimport();
 		virtual	~sqlrimport();

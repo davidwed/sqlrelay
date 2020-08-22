@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrimportcsvincludes.h>
 
-class sqlrimportcsv : public sqlrimport, public csvsax {
+class SQLRCLIENT_DLLSPEC sqlrimportcsv : public sqlrimport, public csvsax {
 	public:
 			sqlrimportcsv();
 			~sqlrimportcsv();

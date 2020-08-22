@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrexportcsvincludes.h>
 
-class sqlrexportcsv : public sqlrexport {
+class SQLRCLIENT_DLLSPEC sqlrexportcsv : public sqlrexport {
 	public:
 			sqlrexportcsv();
 			~sqlrexportcsv();

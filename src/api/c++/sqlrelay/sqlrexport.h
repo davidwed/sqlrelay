@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrexportincludes.h>
 
-class sqlrexport {
+class SQLRCLIENT_DLLSPEC sqlrexport {
 	public:
 			sqlrexport();
 		virtual	~sqlrexport();
