@@ -259,7 +259,7 @@ Mono bindings for the SQL Relay client API and ADO.NET driver.
 License: LGPLv2
 Summary: Nodejs bindings for the SQL Relay client API
 ExclusiveArch: %{nodejs_arches}
-BuildRequires: nodejs-packaging, node-gyp, nodejs-devel
+BuildRequires: nodejs-packaging, nodejs-devel
 
 %description -n nodejs-%{name}
 Nodejs bindings for the SQL Relay client API.
@@ -341,6 +341,8 @@ BuildRequires: firebird-devel
 %description firebird
 Firebird back-end module for SQL Relay.
 
+
+%if 0%{?fedora} || 0%{?rhel} < 8
 %package mdbtools
 License: GPLv2 with exceptions
 Summary: MDB Tools back-end module for SQL Relay
@@ -348,6 +350,7 @@ BuildRequires: mdbtools-devel
 
 %description mdbtools
 MDB Tools back-end module for SQL Relay.
+%endif
 
 
 %package informix
@@ -666,7 +669,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/DBD::SQLRelay.*
 
 
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel} > 7
 
 %files -n python3-%{name}
 %dir %{python3_sitearch}/SQLRelay/__pycache__
@@ -768,10 +771,11 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_firebird*
 
+%if 0%{?fedora} || 0%{?rhel} < 8
 %files mdbtools
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_mdbtools*
-
+%endif
 
 %files informix
 %dir %{_libexecdir}/%{name}
@@ -791,7 +795,10 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Wed May 13 2020 David Muse <david.muse@firstworks.com> - 1.8.0-1
+* Mon Aug 24 2020 David Muse <david.muse@firstworks.com> - 1.8.0-1
+- Updated to not require node-gyp.
+- Updated to not build mdbtools packages on rhel 8.
+- Fixed bug that prevented python 3 packages from being build on rhel 8.
 - Updated to version 1.8.0.
 - Added sqlrresultsetdomnode to C++ API.
 - Added sqlrimport/export to C++ API.
