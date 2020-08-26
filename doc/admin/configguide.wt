@@ -72,6 +72,7 @@
   * [#sha1 sha1]
   * [#sha256 sha256]
   * [#crypt crypt]
+  * [#aes128 aes128]
  * [#schedules Connection Schedules]
   * [#cron_userlist cron_userlist]
  * [#filtering Query Filtering]
@@ -2490,6 +2491,24 @@ The '''crypt''' module is a one-way encryption module that encrypts the password
 }}}
 
 Since the DES algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.
+
+
+[[br]][=#aes128]
+=== aes128 ===
+
+The '''aes128''' module is a two-way encryption module that performs AES128 (CBC) encryption/decryption.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-pwdencs-aes128.conf@
+}}}
+}}}
+
+Since the aes128 algorithm is two-way, it can be used to encrypt passwords for both SQL Relay users and database users.
+
+The key attribute of the passwordencryption element contains a hexidecimal representation of the 128 bit (16 byte) key.  The password attribute of the user element, and password parameter of the string attribute of the connection element contain hexidecimal representations of the encrypted passwords.
+
+Note that multiple runs of sqlr-pwdenc with the same key and password will generate different results each time.  This is the correct behavior.  The first 128 bits (16 bytes) of the encrypted password are the "initialization vector" - a randomly generated string used in conjunction with the key to encrypt/decrypt the password.  This vector is generated each time sqlr-pwdenc is run.  Successive runs of sqlr-pwdenc generate different initialization vectors, and thus different encrypted passwords.
 
 
 [[br]][=#schedules]

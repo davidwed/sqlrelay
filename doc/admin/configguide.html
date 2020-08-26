@@ -108,6 +108,7 @@
       <li><a href="#sha1">sha1</a></li>
       <li><a href="#sha256">sha256</a></li>
       <li><a href="#crypt">crypt</a></li>
+      <li><a href="#aes128">aes128</a></li>
     </ul>
 
     <li><a href="#schedules">Connection Schedules</a></li>
@@ -223,7 +224,7 @@
 <p>The most minimal sqlrelay.conf would be something like:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -302,7 +303,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to an Oracle database.  The dbase attribute defaults to "oracle", so the dbase attribute may be omitted when connecting to an Oracle database.  It is just set here for illustrative purposes.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -325,7 +326,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The oracle_home option refers to the base directory of an Oracle instance.  On Windows platforms, it should be specified as a Windows-style path with doubled backslashes.  For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -337,7 +338,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The oracle_sid option refers to an entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora) similar to:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -356,7 +357,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>If you are using Oracle Instant Client, then it's likely that you don't have an $ORACLE_HOME or a tnsnames.ora file.  In that case, the oracle_sid can be set directly to a tnsnames-style expression and the oracle_home option can be omitted.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -387,7 +388,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to a Microsoft SQL Server database via ODBC.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -414,7 +415,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -431,7 +432,7 @@ Password<font color="#990000">=</font>examplepassword</tt></pre>
 <p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -455,7 +456,7 @@ UsageCount<font color="#990000">=</font><font color="#993399">1</font> </tt></pr
 <p>However, on Linux and Unix platforms, access to Microsoft SQL Server databases is also available via <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -478,7 +479,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The server option refers to an entry in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf) which identifies the database server, similar to:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -498,7 +499,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to a SAP/Sybase database via the native SAP/Sybase library.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -521,7 +522,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The sybase option refers to the base directory of the SAP/Sybase software installation.  On Windows platforms, it should be specified as a Windows-style path with doubled backslashes.  For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -533,7 +534,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux/Unix platforms, the server option refers to an entry in the interfaces (usually $SYBASE/interfaces) file which identifies the database server, similar to:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -559,7 +560,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>However, on Linux and Unix platforms, access to SAP/Sybase databases is also available via <a target="_blank" href="http://www.freetds.org">FreeTDS</a>.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -582,7 +583,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The server option refers to an entry in the freetds.conf file (usually /etc/freetds.conf or /usr/local/etc/freetds.conf) which identifies the database server, similar to:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -603,7 +604,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to an IBM DB2 database.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -636,7 +637,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to an Informix database.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -659,7 +660,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The informixdir option refers to the base directory of the Informix software installation.  On Windows platforms, it should be specified as a Windows-style pathwith doubled backslashes.  For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -671,7 +672,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, the servername option refers to an entry in the sqlhosts file (usually $INFORMIXDIR/etc/sqlhosts) which identifies the database server, similar to:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -681,7 +682,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The second ol_informix1210 in the sqlhosts file refers to an entry in /etc/services which identifies the port that the server is listening on, similar to:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -699,7 +700,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to a MySQL/MariaDB database.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -730,7 +731,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to a PostgreSQL database.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -761,7 +762,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to a Firebird database.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -785,7 +786,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Note that if the database is located on a Windows host, then the path segment of the db option should be specified as a Windows-style path with doubled backslashes.  For example:
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -803,7 +804,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to a SQLite database.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -832,7 +833,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>As each running instance of sqlr-connection will have its own separate in-memory database, you almost certainly want to limit the number of connections to 1.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -865,7 +866,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via <a target="_blank" href="http://mdbtools.sourceforge.net">MDBTools</a>.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -900,7 +901,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to a Teradata database via ODBC.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -925,7 +926,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -977,7 +978,7 @@ UseDateDataForTimeStampParams<font color="#990000">=</font><font color="#993399"
 <p>In this example, SQL Relay is configured to connect to an Exasol database via ODBC.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1002,7 +1003,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1026,7 +1027,7 @@ EXAPWD<font color="#990000">=</font>exasol</tt></pre>
 <p>In this example, SQL Relay is configured to connect to a Apache Hive data warehouse via ODBC.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1065,7 +1066,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1089,7 +1090,7 @@ Port<font color="#990000">=</font><font color="#993399">10000</font></tt></pre>
 <p>In this example, SQL Relay is configured to connect to a Impala database via ODBC.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1132,7 +1133,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1155,7 +1156,7 @@ UseNativeQuery<font color="#990000">=</font><font color="#993399">0</font></tt><
 <p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1175,7 +1176,7 @@ Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>cloudera<f
 <p>In this example, SQL Relay is configured to connect to a Redshift database via ODBC.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1204,7 +1205,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1219,7 +1220,7 @@ Password<font color="#990000">=</font>redshiftpassword</tt></pre>
 <p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1237,7 +1238,7 @@ Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>amazon<fon
 <p>Amazon Redshift is a cloud-hosted data warehouse service.  Since it is based on PostgreSQL 8, it is possible to connect to a Redshift instance using the PostgreSQL client library.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1270,7 +1271,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, SQL Relay is configured to connect to a Athena database via ODBC.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1301,7 +1302,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>On Linux and Unix platforms, the DSN is an entry in the odbc.ini file (usually /etc/odbc.ini).</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1318,7 +1319,7 @@ PWD<font color="#990000">=</font>uEEmF<font color="#990000">+</font>RDexoXpqTD5M
 <p>The Driver parameter refers to an entry in the odbcinst.ini file (usually /etc/odbcinst.ini) which identifies driver files:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1357,7 +1358,7 @@ Driver<font color="#990000">=/</font>opt<font color="#990000">/</font>simba<font
 <p>By default, SQL Relay opens and maintains a pool of 5 <a href="../features/connectionpooling.html">persistent database connections</a>, but the number of connections can be configured using the connections attribute.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1404,7 +1405,7 @@ The command above also returns the "shmmax requirement" for the configuration.  
 <p>SQL Relay maintains persistent cursors as well as connections.  By default, each connection opens one cursor, but the number of cursors opened by each connection can be configured using the cursors attribute.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1436,7 +1437,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The maxconnections and maxcursors attribute define the upper bounds.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1478,7 +1479,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>It can be configured to listen on a different port though...</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1508,7 +1509,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>It can also be configured to listen on a unix socket...</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1538,7 +1539,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1569,7 +1570,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In following example, instances that connect to Oracle, SAP/Sybase and DB2 are defined in the same file.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1635,7 +1636,7 @@ sqlrsh -host sqlrserver -port 9002
 <p>For example, if the following instances are defined...</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1731,7 +1732,7 @@ sqlrelay_flags=""
 <p>To enable user list auth, you must provide a list of valid user/password combinations, as follows:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1761,7 +1762,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To enable database auth, omit the list of user/passwords and configure authtier="database" as follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1792,7 +1793,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To enable proxied auth, omit the list of user/passwords and configure authtier="proxied" as follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1826,7 +1827,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following configuration configures an instance of SQL Relay to use Kerberos authentication and encryption:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1934,7 +1935,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following configuration enables TLS/SSL encryption for an instance of SQL relay:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2036,7 +2037,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following configuration enables these checks for an instance of SQL relay:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2140,7 +2141,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To enable SQL Relay to speak the MySQL protocol, add the appropriate listener and auth tags:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2177,7 +2178,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The instance can be started using:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2187,7 +2188,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>and accessed from the local machine using:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2201,7 +2202,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The instance can be stopped using:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2217,7 +2218,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>However, if SQL Relay is run on a different server than the database, then it can be configured to run on port 3306.  This is desirable when using SQL Relay as a transparent proxy.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2245,7 +2246,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2275,7 +2276,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>It can also be configured to listen on a unix socket by adding a <i>socket</i> attribute to the listener tag.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2311,7 +2312,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this configuration, a client must present <i>sqlruser/sqlrpassword</i> credentials.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2345,7 +2346,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the <i>mysql_database</i> module can be used to auth users directly against the database.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2373,7 +2374,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example, if a client initially connects using:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2385,7 +2386,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>But if the client then tries to connect using:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2406,7 +2407,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The second disadvantage may or may not be a problem, depending on how secure communications on your network need to be.  However, it may require reconfiguration (or modification) of your app to use the mysql_clear_password auth plugin.  For example, to send an unencrypted password from the mysql command line client:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2422,7 +2423,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>This is as simple as specifying a different database using the <i>dbase</i> attribute in the instance tag and specifying the appropriate database connection string in the <i>string</i> attribute of the connection tag.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2464,7 +2465,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <i>zeroscaledecimaltobigint</i> option instructs the module to do this mapping.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2500,7 +2501,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <i>datetodatetime</i> option instructs the module to do this mapping.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2534,7 +2535,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <i>oldmariadbjdbcservercapabilitieshack</i> option instructs the module to return server capability flags that don't upset the old driver.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2591,7 +2592,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To enable SQL Relay to speak the PostgreSQL protocol, add the appropriate listener and auth tags:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2628,7 +2629,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The instance can be started using:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2638,7 +2639,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>and accessed from the local machine using:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2650,7 +2651,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The instance can be stopped using:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2666,7 +2667,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>However, if SQL Relay is run on a different server than the database, then it can be configured to run on port 5432.  This is desirable when using SQL Relay as a transparent proxy.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2694,7 +2695,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2724,7 +2725,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>It can also be configured to listen on a unix socket by adding a <i>socket</i> attribute to the listener tag.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2760,7 +2761,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this configuration, a client must present <i>sqlruser/sqlrpassword</i> credentials.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2798,7 +2799,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>This is as simple as specifying a different database using the <i>dbase</i> attribute in the instance tag and specifying the appropriate database connection string in the <i>string</i> attribute of the connection tag.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2870,7 +2871,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In the configuration file, each connection tag defines a node to maintain connections to.  In the following example, SQL Relay is configured to distribute over three Oracle nodes - orcl1, orcl2, and orcl3</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2901,7 +2902,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>SQL Relay uses the connection tag's metric attribute to decide how many connections to open to each node.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2938,7 +2939,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To indicate to SQL Relay that the nodes are already-load-balanced, and need to be "shuffled" periodically, only one connection tag should be used, with the behindloadbalancer attribute set to "yes".</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2969,7 +2970,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>This actually requires 3 instances of SQL Relay.  One to connect to the master, one to connect to the slaves, and a third to route queries to the first two.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3130,7 +3131,7 @@ sqlr-start -id router
 <p>In this example, orcltls refers to a TLS/SSL-secured entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora):</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3153,7 +3154,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, there is no tnsnames.ora file, so the oracle_sid is set directly to a tnsnames-style expression that describes a TLS/SSL-secured connection:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3178,7 +3179,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>This example adds distinguished name validation:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3242,7 +3243,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, FreeTDS is configured to require an encrypted connection to the database:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3259,7 +3260,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, FreeTDS is also configured to validate the database server's certificate against the CA cert /etc/ca.pem (but does not validate the common name):</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3276,7 +3277,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In this example, FreeTDS is also configured to validate that the common name in the database server's certificate matches the database server's host name:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3295,7 +3296,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, EXAMPLEDB refers to the FreeTDS EXAMPLEDB entry configured above:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3342,7 +3343,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following example requires an encrypted connection:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3395,7 +3396,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following example also validates the database server's certificate against the CA cert /etc/ca.pem (but does not validate the common name):</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3418,7 +3419,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following example also validates that the common name in the database server's certificate matches the database server's host name:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3471,7 +3472,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following example requires an encrypted connection:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3528,7 +3529,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following example also validates the database server's certificate (but does not validate the common name):</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3551,7 +3552,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following example also validates that the common name in the database server's certificate matches the database server's host name:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3582,7 +3583,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>However, the runasuser and runasgroup attributes can be used to control what user and group the SQL Relay server runs as.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3615,7 +3616,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example, to deny all clients except clients connecting from the 192.168.2.0 and 64.45.22.0 networks:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3639,7 +3640,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example, to use the <i>rot</i> module, which encrypts by performing a simple character rotation:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3675,7 +3676,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Password encryption modules may be "stacked".  It is possible to load multiple modules and use each one with a different password.  For example, you might want to use the <i>rot</i> module with a count of 13 for the SQL Relay password and a count of 10 for the database password.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3760,7 +3761,7 @@ rknzcyrcnffjbeq
 <p>The <b>rot</b> module is a two-way encryption module that performs a character rotation, similar to the popular <a target="_blank" href="http://en.wikipedia.org/wiki/ROT13">ROT13</a> algorithm, though it can rotate by any amount specified in the <i>count</i> attribute, not just 13 and rotates digits as well as upper and lower-case characters.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3790,7 +3791,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <b>md5</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/MD5">MD5</a> algorithm.  This module has no parameters.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3818,7 +3819,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <b>sha1</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/SHA-1">SHA-1</a> algorithm.  This module has no parameters.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3846,7 +3847,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <b>sha256</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/SHA-2">SHA-256</a> algorithm.  This module has no parameters.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3874,7 +3875,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <b>crypt</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">DES</a> algorithm using a salt specified in the <i>salt</i> attribute.  The salt is required and must be a 2 digit alphanumeric code.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3897,6 +3898,40 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>Since the DES algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.</p>
 
+<br/><a name="aes128"/><h3>aes128</h3>
+
+<p>The <b>aes128</b> module is a two-way encryption module that performs AES128 (CBC) encryption/decryption.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;passwordencryptions&gt;</font></b>
+			<b><font color="#0000FF">&lt;passwordencryption</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"aes128"</font> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"aes128enc"</font> <font color="#009900">key</font><font color="#990000">=</font><font color="#FF0000">"000102030405060708090a0b0c0d0e0f"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/passwordencryptions&gt;</font></b>
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"1f7be0255e24783696a1783114e28667320ecef9537b5da48c19dbfa793fbcaf"</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"aes128enc"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db"</font> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser;password=724b747f3f0aa16a90469e31777b96354ed967d38b1be3f0dc1b0d799830d228;..."</font> <font color="#009900">passwordencryptionid</font><font color="#990000">=</font><font color="#FF0000">"aes128enc"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>Since the aes128 algorithm is two-way, it can be used to encrypt passwords for both SQL Relay users and database users.</p>
+
+<p>The key attribute of the passwordencryption element contains a hexidecimal representation of the 128 bit (16 byte) key.  The password attribute of the user element, and password parameter of the string attribute of the connection element contain hexidecimal representations of the encrypted passwords.</p>
+
+<p>Note that multiple runs of sqlr-pwdenc with the same key and password will generate different results each time.  This is the correct behavior.  The first 128 bits (16 bytes) of the encrypted password are the "initialization vector" - a randomly generated string used in conjunction with the key to encrypt/decrypt the password.  This vector is generated each time sqlr-pwdenc is run.  Successive runs of sqlr-pwdenc generate different initialization vectors, and thus different encrypted passwords.</p>
+
 <br/><a name="schedules"/><h2>Connection Schedules</h2>
 
 <p>Connection schedules enable the SQL Relay server to control when users are allowed to access the database.</p>
@@ -3904,7 +3939,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Connection schedules are implemented by loadable modules.  The <i>schedules</i> section of the configuration file indicates which modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3943,7 +3978,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Connection schedule modules can be "stacked".  Multiple different modules may be loaded, and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -3995,7 +4030,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>An example configuration follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4038,7 +4073,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Another example configuration follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4211,7 +4246,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Query filters are implemented by loadable modules.  The <i>filters</i> section of the configuration file indicates which filter modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4241,7 +4276,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Filter modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4269,7 +4304,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>When using query filters, it is helpful to use the <i>normalize</i> query translation too:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4321,7 +4356,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example, with the following configuration...</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4352,7 +4387,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>These queries would be filtered out:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4366,7 +4401,7 @@ select <font color="#990000">*</font> from badstringtable <font color="#008080">
 <p>But these queries would not be:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4391,7 +4426,7 @@ select <font color="#990000">*</font> from badstringtable <font color="#008080">
 <p>For example, with the following configuration:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4417,7 +4452,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>This query would be filtered out:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4428,7 +4463,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>But this query would not be:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4452,7 +4487,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example, with the following configuration:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4478,7 +4513,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>This query would be filtered out:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4489,7 +4524,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>But this query would not be:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4502,7 +4537,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <b>tag</b> module matches queries in the same manner as the <a href="#filter-patterns">patterns</a> module described above, and is configured similarly:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4549,7 +4584,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Parsers are implemented as loadable modules.  The <i>parser</i> section of the configuration file indicates which parser module to load and what parameters to configure it with.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4581,7 +4616,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Query translation is implemented by loadable modules.  The <i>translations</i> section of the configuration file indicates which translation modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4637,7 +4672,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example, the following query:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4654,7 +4689,7 @@ where
 <p>Would be translated to:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4800,7 +4835,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The module is highly configurable, and capable of doing some fairly complex substitutions.  For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4870,7 +4905,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Another powerful feature of the patterns translation module is nested matching:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4934,7 +4969,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Though more than 2 levels is rarely necessary, any level of nesting is supported:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -4977,7 +5012,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Bind variable translation is implemented by loadable modules.  The <i>bindvariabletranslations</i> section of the configuration file indicates which translation modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5015,7 +5050,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Result set header translation is implemented by loadable modules.  The <i>resultsetheadertranslations</i> section of the configuration file indicates which translation modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5053,7 +5088,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Result set translation is implemented by loadable modules.  The <i>resultsettranslations</i> section of the configuration file indicates which result set translation modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5130,7 +5165,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>For example, the following configuration:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5176,7 +5211,7 @@ Jul 10 2015 05:17:55:717PM
 <p>This is useful if the value of one field needs to change based on the value of another field.  It also tends to perform better than translating one field at a time.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5204,7 +5239,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>This is useful for the same reasons as result set row translation, and tends to be the highest performing option for translating result sets, but the modules tend to be complex.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5230,7 +5265,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Moduledata modules allow a developer to pass data between modules.  For example, a query translation module could set a value that a result set translation module could later read.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5262,7 +5297,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Query directives enable an app to give the SQL Relay server special per-query instructions in the comments preceeding the query.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5276,7 +5311,7 @@ select <font color="#990000">*</font> from exampletable
 <p>Query directives are implemented by loadable modules.  The <i>directives</i> section of the configuration file indicates which directive modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5328,7 +5363,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The sqlexecdirect directive tells SQL Relay to execute the query in a single step, rather than using the standard prepare/execute process.  This is useful for overriding the executedirect=no connection string option (the default) on a case-by-case basis.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5344,7 +5379,7 @@ select <font color="#990000">*</font> from exampletable
 <p>The sqlprepare directive tells SQL Relay to prepare/execute the query in a two-step step process, rather than executing the query in a single step.  This is useful for overriding the executedirect=yes connection string option on a case-by-case basis.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5360,7 +5395,7 @@ select <font color="#990000">*</font> from exampletable
 <p>The querytimeout directive sets a timeout (in seconds) for the query.  The following example sets a 60 second timeout.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5393,7 +5428,7 @@ select <font color="#990000">*</font> from exampletable
 <p>The actual query routing itself is implemented by loadable modules.  The <i>routers</i> section of the configuration file indicates which router modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5456,7 +5491,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>A classic <a href="#masterslave">Master-Slave Query Routing</a> configuration follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5556,7 +5591,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>In the example below, we provide a single point of access to MySQL/MariaDB and PostgreSQL databases.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5634,7 +5669,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>An example configuration follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5725,7 +5760,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>An example configuration follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5808,7 +5843,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>An example configuration follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -5913,7 +5948,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>An example configuration follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6036,7 +6071,7 @@ this table is in db pgdb1
 <p>To resolve situations like this, the <b>usedatabase</b> module enables you to map a database to an alias.  In this example, the db2 database hosted by MySQL/MariaDB is mapped to mydb2, and the db2 database hosted by PostgreSQL is mapped to pgdb2.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6194,7 +6229,7 @@ only routes queries over a set of Oracle databases, then you do not have to use
 <p>Custom queries are implemented by loadable modules.  The <i>queries</i> section of the configuration file indicates which modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6238,7 +6273,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The sqlrcmdcstat module returns statistics about the sqlr-connection processes currently running for this instance of SQL Relay when the query "sqlrcmd cstat" is run.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6320,7 +6355,7 @@ INDEX MINE PROCESSID CONNECT STATE                 STATE_TIME   CLIENT_ADDR CLIE
 <p>The sqlrcmdgstat module returns global statistics about this instance of SQL Relay when the query "sqlrcmd gstat" is run.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6449,7 +6484,7 @@ module_compiled        Oct 24 2019 22:20:05
 <p>Triggers are implemented by loadable modules.  The <i>triggers</i> section of the configuration file indicates which modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6503,7 +6538,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>An example configuration:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6539,7 +6574,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Deadlocks aren't completely preventable, but if you know which queries caused the deadlock, then you can usually modify them (or the app) to mitigate the problem.  The replay module allows you to specify a query to run and a location to log the output of the query to, for each condition.  For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6746,7 +6781,7 @@ Status :
 <p>Logging is implemented by loadable modules.  The <i>loggers</i> section of the configuration file indicates which modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6792,7 +6827,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The <b>debug</b> module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/log/sqlrelay/debug or /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6829,7 +6864,7 @@ Sample log for connecton process: <a href="sqlr-connection.1871.html">sqlr-conne
 <p>The <b>slowqueries</b> module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/log/sqlrelay or /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6872,7 +6907,7 @@ time: 0.000001
 <p>In the following example, the "stalecursors" instance (the log instance) provides access to a database where the stale cursors can be logged, and the "example" instance (the app instance) logs cursor activity there.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -6963,7 +6998,7 @@ example  example-0     27168          0         select * from thattable 2019-10-
 <p>Notifications are implemented by loadable modules.  The <i>notifications</i> section of the configuration file indicates which notification modules to load and what parameters to use when executing them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -7000,7 +7035,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Notification modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -7053,7 +7088,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>An example configuration follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -7192,7 +7227,7 @@ blat <i>message</i> -to <i>address</i> -subject <i>subject</i> -q
 <p>In the following example, the date format is set to MM/DD/YYYY at the beginning of the session and then reset back to DD-MON-YYYY at the end.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -7257,7 +7292,7 @@ http://www.gnu.org/software/src-highlite -->
 <p><b>sqlrelay.conf.d/oracle.conf</b></p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -7280,7 +7315,7 @@ http://www.gnu.org/software/src-highlite -->
 <p><b>sqlrelay.conf.d/sap.conf</b></p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -7303,7 +7338,7 @@ http://www.gnu.org/software/src-highlite -->
 <p><b>sqlrelay.conf.d/db2.conf</b></p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
