@@ -15,7 +15,8 @@ class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 						domnode *parameters);
 			~sqlrlogger_slowqueries();
 
-		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
+		bool	init(sqlrlistener *sqlrl,
+					sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,

@@ -208,8 +208,9 @@ int _sqlrelayError(pdo_dbh_t *dbh,
 		TSRMLS_FETCH();
 		zend_throw_exception_ex(php_pdo_get_exception(),
 					errornumber TSRMLS_CC,
-					"SQLSTATE[%s] [%d] %s",
-					*pdoerr,errornumber,errormessage);
+					"SQLSTATE[%s] [%lld] %s",
+					*pdoerr,(long long)errornumber,
+					errormessage);
 	}
 	return errornumber;
 }
@@ -222,8 +223,8 @@ void _bindFormatError() {
 			SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING;
 	zend_throw_exception_ex(php_pdo_get_exception(),
 					errornumber TSRMLS_CC,
-					"SQLSTATE[HY000] [%d] %s",
-					errornumber,errormessage);
+					"SQLSTATE[HY000] [%lld] %s",
+					(long long)errornumber,errormessage);
 }
 
 static void clearList(singlylinkedlist< char * > *list) {

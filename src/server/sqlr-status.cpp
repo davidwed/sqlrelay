@@ -182,7 +182,10 @@ int main(int argc, const char **argv) {
 
 	// take a snapshot of the stats
 	semset.waitWithUndo(9);
-	sqlrshm		statistics=*shm;
+	// create this on the heap, rather than stack because it can be pretty
+	// big and easily exceed the default stack ulimit on some platforms
+	sqlrshm		*statistics=new sqlrshm;
+	*statistics=*shm;
 	semset.signalWithUndo(9);
 	#define SEM_COUNT	13
 	int32_t	sem[SEM_COUNT];
@@ -204,17 +207,18 @@ int main(int argc, const char **argv) {
 				"cursor_reused=%d "
 				"total_queries=%d "
 				"total_errors=%d\n",
-				!statistics.disabled,
-				statistics.open_db_connections,
-				statistics.opened_db_connections,
-				statistics.open_db_cursors,
-				statistics.opened_db_cursors,
-				statistics.open_cli_connections,
-				statistics.opened_cli_connections,
-				statistics.times_new_cursor_used,
-				statistics.times_cursor_reused,
-				statistics.total_queries,
-				statistics.total_errors);
+				!statistics->disabled,
+				statistics->open_db_connections,
+				statistics->opened_db_connections,
+				statistics->open_db_cursors,
+				statistics->opened_db_cursors,
+				statistics->open_cli_connections,
+				statistics->opened_cli_connections,
+				statistics->times_new_cursor_used,
+				statistics->times_cursor_reused,
+				statistics->total_queries,
+				statistics->total_errors);
+		delete statistics;
 		process::exit(0);
 	}
 
@@ -243,20 +247,20 @@ int main(int argc, const char **argv) {
 		"  Connections:                  %d\n"
 		"  Connected Clients:            %d\n"
 		"\n",
-		(statistics.disabled)?"Disabled":"Enabled",
-		statistics.open_db_connections, 
-		statistics.opened_db_connections,
-		statistics.open_db_cursors,
-		statistics.opened_db_cursors,
-		statistics.open_cli_connections, 
-		statistics.opened_cli_connections,
-		statistics.times_new_cursor_used,
-		statistics.times_cursor_reused,
-		statistics.total_queries,
-		statistics.total_errors,
-		statistics.forked_listeners,
-		statistics.totalconnections,
-		statistics.connectedclients
+		(statistics->disabled)?"Disabled":"Enabled",
+		statistics->open_db_connections, 
+		statistics->opened_db_connections,
+		statistics->open_db_cursors,
+		statistics->opened_db_cursors,
+		statistics->open_cli_connections, 
+		statistics->opened_cli_connections,
+		statistics->times_new_cursor_used,
+		statistics->times_cursor_reused,
+		statistics->total_queries,
+		statistics->total_errors,
+		statistics->forked_listeners,
+		statistics->totalconnections,
+		statistics->connectedclients
 		);
 
 	stdoutput.printf("Mutexes:\n");
@@ -304,12 +308,12 @@ int main(int argc, const char **argv) {
 		);
 
 	if (connoutput) {
-		long conndim=sizeof(statistics.connstats)/
+		long conndim=sizeof(statistics->connstats)/
 				sizeof(struct sqlrconnstatistics);
-		sqlrconnstatistics *conn=&statistics.connstats[0];
+		sqlrconnstatistics *conn=&statistics->connstats[0];
 		stdoutput.printf("\n");
 		stdoutput.printf("Info for max=%ld connections id=%s\n\n",
-					conndim,&statistics.connectionid[0]);
+					conndim,&statistics->connectionid[0]);
 		for(long j=0; j<conndim; j++) {
 			if (conn[j].state!=NOT_AVAILABLE) {
 				// print out multiple lines, a cross between
@@ -412,5 +416,6 @@ int main(int argc, const char **argv) {
 		}
 	}
 
+	delete statistics;
 	process::exit(0);
 }

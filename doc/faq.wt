@@ -11,8 +11,11 @@
 * [#loadbalancing What is "load-balancing"?]
 * [#failover What is "fail-over"?]
 * [#queryrouting What is "query routing"?]
-* [#dropinlibs What are "drop-in replacement libraries"?]
+* [#queryfiltering What is "query filtering"?]
+* [#querytranslation What is "query translation"?]
+* [#connectionschedules What are "connection schedules"?]
 * [#databases What databases does SQL Relay support?]
+* [#nativeprotocol What database client-server protocols does SQL Relay support?]
 * [#platforms What platforms does SQL Relay run on?]
 * [#languages What languages does SQL Relay support?]
 * [#dbabstraction What database abstraction layers does SQL Relay support?]
@@ -27,7 +30,7 @@
 * [#replicated How can SQL Relay be used with replicated or clustered databases?]
 * [#databaseusers Can SQL Relay proxy multiple database users instead of using the same user for every session?]
 * [#routing Can I use SQL Relay to send all insert/update/delete's to a master database and distribute select's over a set of slaves?]
-* [#mysqlrouting Can I use SQL Relay to make my existing MySQL/MariaDB app send all insert/update/delete's to a master database and distribute select's over a set of slaves?]
+* [#mysqlrouting Can I use SQL Relay to make my existing MySQL/MariaDB or PostgreSQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves?]
 * [#filtering Can SQL Relay be configured to filter out certain queries?]
 
 == Build Questions ==
@@ -110,8 +113,14 @@ Solves - "I wish there was a cheap and easy way to automatically distribute traf
 '''Query Routing''' - conditionally sends queries to one database or another[[br]]
 Solves - "My database is getting slammed.  I could replicate it but then I'd have to rewrite my app to send DML to the master and somehow distribute selects over the slaves."
 
-'''Drop-In Replacement Libraries''' - aims an existing !MySQL/MariaDB or !PostgreSQL app at SQL Relay without modification[[br]]
-Solves - "I wrote my app using the native !MySQL/MariaDB API but the company is migrating to Oracle.  I can tweak the queries to work with Oracle but I really don't want to have to modify the app to use OCI."
+'''Query Filtering''' - prevents queries that match certain patterns from being run at all[[br]]
+Solves - "My users keep running this one query that brings the database to it's knees."
+
+'''Query Translation''' - modifies queries before passing them to the database[[br]]
+Solves - "I need to migrate my app to a different database, but I can't afford to find and edit hundreds of queries in the code."
+
+'''Connection Schedules''' - constrain database access to specified times
+Solves - "I need to keep users out during maintenance windows."
 
 SQL Relay has client API's for most modern programming languages and drivers for many popular database abstraction API's.
 
@@ -125,7 +134,9 @@ It is a tool in a chain - another tier in a multi-tiered application - designed 
 
 There are some features that SQL Relay currently lacks that are either being worked on, or at least planned though.
 
-The !MySQL/MariaDB Front-End Module makes SQL Relay a transparent database proxy for !MySQL/MariaDB.  You can just aim SQL Relay at !MySQL/MariaDB and aim your app at SQL Relay.  But, SQL Relay currently lacks Front-End Modules for other database protocols, so it can't be used as a transparent proxy for other databases.  SQL Relay has it's own client/server protocol and API though.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you can update the connect string to use the SQL Relay driver.  You could also potentially use the [dropin/mysql.html drop-in replacement library for MySQL/MariaDB] or [dropin/postgresql.html drop-in replacement library for PostgreSQL].  Otherwise you'd need to modify your app to use the SQL Relay API.  Efforts are underway to add support for various other native database protocols though.
+!MySQL/MariaDB and !PostgreSQL protocol support makes SQL Relay a transparent database proxy for !MySQL/MariaDB and !PostgreSQL.  You can just aim SQL Relay at the database and aim your app at SQL Relay.  SQL Relay currently lacks support for other database protocols, so it can't be used as a transparent proxy for other databases, though efforts are underway to add support for various other native database protocols.
+
+SQL Relay has it's own client/server protocol and API.  If your app uses a database abstraction API like PHP PDO, Perl DBI or ODBC, you can update the connect string to use the SQL Relay driver.  Otherwise you'd need to modify your app to use the SQL Relay API.
 
 SQL Relay can provide a single-point of access for replicated databases but it does not provide replication.  It cannot keep multiple databases in sync.
 
@@ -169,15 +180,30 @@ See [features/ha.html High Availability].
 
 See [features/queryrouting.html Query Routing].
 
-[[br]][=#dropinlibs]
-=== What are "drop-in replacement libraries"? ===
+[[br]][=#queryfiltering]
+=== What is "query filtering"? ===
 
-See [dropin/mysql.html Using the SQL Relay drop-in replacement library for MySQL/MariaDB] and [dropin/postgresql.html Using the SQL Relay drop-in replacement library for PostgreSQL].
+See [features/queryfiltering.html Query Filtering].
+
+[[br]][=#querytranslation]
+=== What is "query translation"? ===
+
+See [features/querytranslation.html Query Translation].
+
+[[br]][=#connectionschedules]
+=== What are "connection schedules"? ===
+
+See [features/schedules.html Connection Schedules].
 
 [[br]][=#databases]
 === What databases does SQL Relay support? ===
 
 See [features/databases.html Supported Databases].
+
+[[br]][=#nativeprotocol]
+=== What database client-server protocols does SQL Relay support? ===
+
+See [features/nativeprotocol.html Native Database Protocol Support].
 
 [[br]][=#platforms]
 === What platforms does SQL Relay run on? ===
@@ -251,13 +277,13 @@ See [features/proxying.html Proxying].
 
 SQL Relay is both a connection pool and database abstraction layer.  Lets say that your app currently connects directly to a database which has an insignificant connection delay but you want to migrate it to a database that has features that you want, but also has a significant connection delay.  If you first set up instances of SQL Relay to talk to both databases, and then put SQL Relay between your app and the database, you can switch between the databases by changing the connection parameters in your app to point to different instances of SQL Relay, as you would with any other database abstraction layer.  However, since SQL Relay is also a connection pool, you don't incur the connection delay associated with the new database.
 
-If your app was written using a database abstraction API supported by SQL Relay such as ODBC, ADO.NET, Perl DBI, etc. then this is straightforward.  You can just change the connect string to point to the appropriate instance of SQL Relay.
+!MySQL/MariaDB and !PostgreSQL protocol support makes SQL Relay a transparent database proxy for !MySQL/MariaDB and !PostgreSQL.  You can just aim SQL Relay at the database and aim your app at SQL Relay.
+
+If your app was written using a database abstraction API supported by SQL Relay such as ODBC, ADO.NET, Perl DBI, etc. then you can install the SQL Relay driver on the client machine and then just change the connect string to point to the appropriate instance of SQL Relay.
 
 If your app was written using a database specific API then you might have to port your app to use the SQL Relay API, or a supported DB abstraction layer first.
 
-If your app was written using a !MySQL/MariaDB or !PostgreSQL API then you might be able to use the [dropin/mysql.html SQL Relay Drop-In Replacement Library for MySQL/MariaDB] or the [dropin/postgresql.html SQL Relay Drop-In Replacement Library for PostgreSQL] without modifying your app at all.
-
-SQL Relay doesn't currently do query translation though.  There might be queries in your app that are written using database-specific syntax that would need to be modified to use the new database.
+SQL Relay can also be configured to perform query translation - to modify queries that were written using database-specific syntax on the fly.
 
 [[br]][=#replicated]
 === How can SQL Relay be used with replicated or clustered databases? ===
@@ -279,13 +305,20 @@ Oracle allows a process that is connected to the database to switch users withou
 Yes, see [admin/router.html Query Routing].
 
 [[br]][=#mysqlrouting]
-=== Can I use SQL Relay to make my existing !MySQL/MariaDB app send all insert/update/delete's to a master database and distribute select's over a set of slaves? ===
+=== Can I use SQL Relay to make my existing !MySQL/MariaDB or !PostgreSQL app send all insert/update/delete's to a master database and distribute select's over a set of slaves? ===
 
-Probably.  You'll need to set up SQL Relay to route queries and use the Drop-in Replacement Library for !MySQL/MariaDB to redirect your app to use SQL Relay.
+Probably.  You'll need to set up SQL Relay to route queries, configure it to speak either the !MySQL/MariaDB or !PostgreSQL client-server protocol to redirect your app to use SQL Relay.
 
 See [admin/router.html Query Routing] for details on how to set up SQL Relay as a query router.
 
-See [dropin/mysql.html Using the SQL Relay drop-in replacement library for MySQL/MariaDB] for details about how to use the drop-in replacement library.
+See [admin/protocoloptions.html Client Protocol Options] in the configuration guide for details about how to configure SQL Relay to speak the !MySQL/MariaDB and !PostgreSQL protocols.
+
+[[br]][=#dropin]
+=== What happened to the drop-in replacement libraries for !MySQL/MariaDB and !PostgreSQL? ===
+
+As of version 1.6.0, the SQL Relay server supports the !MySQL/MariaDB client-server protocol, and as of version 1.7.0 supports the !PostgreSQL client-server protocol.  All features of the drop-in replacement libraries are covered, support for the protocols is a server-only solution.  See [admin/protocoloptions.html Client Protocol Options] in the configuration guide for details about how to configure SQL Relay to speak the !MySQL/MariaDB and !PostgreSQL protocols.
+
+The drop-in replacement modules can still be manually enabled in the configure script when building SQL Relay from source.
 
 [[br]][=#filtering]
 === Can SQL Relay be configured to filter out certain queries? ===

@@ -25,13 +25,13 @@ With SQL Relay, you can speed up and enhance the scalability of database-driven 
 <a href="features/ha.html">High Availability</a> - provides load balancing and failover with replicated or clustered databases<br/>
 <a href="features/queryrouting.html">Query Routing</a> - conditionally sends queries to one database or another<br/>
 <a href="features/queryfiltering.html">Query Filtering</a> - prevents queries that match certain patterns from being run at all<br/>
+<a href="features/querytranslation.html">Query Translation</a> - modifies queries before passing them to the database<br/>
 <a href="features/schedules.html">Connection Schedules</a> - constrain database access to specified times<br/>
 </blockquote>
 <blockquote>
 <a href="features/databases.html">Database Support</a> - a wide variety of commercial and open-source databases are supported<br/>
+<a href="features/nativeprotocol.html">Native Database Protocol Support</a> - allow MySQL/MariaDB and PostgreSQL applications to use SQL Relay without modification<br/>
 <a href="features/dbabstractionlayers.html">Abstraction Layer Support</a> - drivers for most popular database abstraction layers are provided<br/>
-<a href="features/dropinreplacementlibs.html">Drop-In Replacement Libraries</a> - allow many native MySQL/MariaDB or PostgreSQL applications to use SQL Relay without modification<br/>
-<a href="features/nativeprotocol.html">MySQL Front-End Modules</a> - allow MySQL/MariaDB applications to use SQL Relay without modification and without a drop-in replacement library<br/>
 <a href="features/languages.html">Native API</a> - the powerful native SQL Relay client API supports a wide variety of programming languages<br/>
 </blockquote>
 <blockquote>
@@ -61,7 +61,6 @@ With SQL Relay, you can speed up and enhance the scalability of database-driven 
 <a href="admin/installing.html">Building and Installing SQL Relay From Source</a><br/>
 <a href="admin/installingpkg.html">Installing SQL Relay From Packages</a><br/>
 <a href="admin/configguide.html">SQL Relay Configuration Guide</a><br/>
-<a href="admin/configure_mysql_frontend.html">Configuring the MySQL Front-End Modules</a><br/>
 <a href="admin/configreference.html">SQL Relay Configuration Reference</a><br/>
 <a href="admin/running.html">SQL Relay Command Line Programs</a><br/>
 <a href="admin/tuning.html">Tuning SQL Relay</a><br/>
@@ -178,13 +177,5 @@ With SQL Relay, you can speed up and enhance the scalability of database-driven 
   </tr>
 </table>
 
-<h4>Drop-In Replacement Libraries</h4>
-
-<p>Drop-In Replacement Libraries allow many native MySQL/MariaDB or PostgreSQL applications to use SQL Relay without modification.</p>
-
-<blockquote>
-<a href="dropin/mysql.html">MySQL/MariaDB</a><br/>
-<a href="dropin/postgresql.html">PostgreSQL</a><br/>
-</blockquote>
 </body>
 </html>

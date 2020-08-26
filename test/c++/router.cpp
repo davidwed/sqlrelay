@@ -95,9 +95,14 @@ int	main(int argc, char **argv) {
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
 
+	// get database type
 	stdoutput.printf("IDENTIFY: \n");
 	checkSuccess(con->identify(),"router");
 	stdoutput.printf("\n");
+
+	// get the db version
+	const char	*dbversion=con->dbVersion();
+	uint32_t	majorversion=dbversion[0]-'0';
 
 	// ping
 	stdoutput.printf("PING: \n");
@@ -113,8 +118,8 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	// drop existing table
-	cur->sendQuery("drop table testtable1");
-	cur->sendQuery("drop table testtable2");
+	cur->sendQuery("drop table if exists testtable1");
+	cur->sendQuery("drop table if exists testtable2");
 
 	stdoutput.printf("CREATE TESTTABLES: \n");
 	checkSuccess(cur->sendQuery("create table testtable1 (testint int, testfloat float, testreal real, testsmallint smallint, testchar char(40), testvarchar varchar(40), testdate date, testtime time, testtimestamp timestamp)"),1);
@@ -281,8 +286,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testreal"),"REAL");
 	checkSuccess(cur->getColumnType(3),"SMALLINT");
 	checkSuccess(cur->getColumnType("testsmallint"),"SMALLINT");
-	checkSuccess(cur->getColumnType(4),"STRING");
-	checkSuccess(cur->getColumnType("testchar"),"STRING");
+	if (majorversion==3) {
+		checkSuccess(cur->getColumnType(4),"VARSTRING");
+		checkSuccess(cur->getColumnType("testchar"),"VARSTRING");
+	} else {
+		checkSuccess(cur->getColumnType(4),"STRING");
+		checkSuccess(cur->getColumnType("testchar"),"STRING");
+	}
 	checkSuccess(cur->getColumnType(5),"VARSTRING");
 	checkSuccess(cur->getColumnType("testvarchar"),"VARSTRING");
 	checkSuccess(cur->getColumnType(6),"DATE");
@@ -499,8 +509,13 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType("testreal"),"REAL");
 	checkSuccess(cur->getColumnType(3),"SMALLINT");
 	checkSuccess(cur->getColumnType("testsmallint"),"SMALLINT");
-	checkSuccess(cur->getColumnType(4),"STRING");
-	checkSuccess(cur->getColumnType("testchar"),"STRING");
+	if (majorversion==3) {
+		checkSuccess(cur->getColumnType(4),"VARSTRING");
+		checkSuccess(cur->getColumnType("testchar"),"VARSTRING");
+	} else {
+		checkSuccess(cur->getColumnType(4),"STRING");
+		checkSuccess(cur->getColumnType("testchar"),"STRING");
+	}
 	checkSuccess(cur->getColumnType(5),"VARSTRING");
 	checkSuccess(cur->getColumnType("testvarchar"),"VARSTRING");
 	checkSuccess(cur->getColumnType(6),"DATE");

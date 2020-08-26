@@ -168,3 +168,27 @@ void sqlrmoduledatas::loadModuleData(domnode *moduledata) {
 sqlrmoduledata *sqlrmoduledatas::getModuleData(const char *id) {
 	return pvt->_mdict.getValue(id);
 }
+
+void sqlrmoduledatas::closeResultSet(sqlrservercursor *sqlrcur) {
+	for (singlylinkedlistnode< sqlrmoduledataplugin * >
+				*node=pvt->_mlist.getFirst();
+				node; node=node->getNext()) {
+		node->getValue()->md->closeResultSet(sqlrcur);
+	}
+}
+
+void sqlrmoduledatas::endTransaction(bool commit) {
+	for (singlylinkedlistnode< sqlrmoduledataplugin * >
+				*node=pvt->_mlist.getFirst();
+				node; node=node->getNext()) {
+		node->getValue()->md->endTransaction(commit);
+	}
+}
+
+void sqlrmoduledatas::endSession() {
+	for (singlylinkedlistnode< sqlrmoduledataplugin * >
+				*node=pvt->_mlist.getFirst();
+				node; node=node->getNext()) {
+		node->getValue()->md->endSession();
+	}
+}

@@ -1,5 +1,8 @@
 #!/bin/sh
 
+echo "SQL Relay test results:" > testresults.log
+echo >> testresults.log
+
 PREFIX=@prefix@
 
 # stop any existing instances
@@ -7,9 +10,17 @@ $PREFIX/bin/sqlr-stop
 sleep 2
 
 # really kill them
-kill `ps aux | grep sqlr-connection | grep -v grep | cut -c10-15` 2> /dev/null
-kill `ps aux | grep sqlr-scaler | grep -v grep | cut -c10-15` 2> /dev/null
-kill `ps aux | grep sqlr-listener | grep -v grep | cut -c10-15` 2> /dev/null
+ps aux > /dev/null 2> /dev/null
+if ( test "$?" = "0" )
+then
+	kill `ps aux | grep sqlr-connection | grep -v grep | cut -c10-15` 2> /dev/null
+	kill `ps aux | grep sqlr-scaler | grep -v grep | cut -c10-15` 2> /dev/null
+	kill `ps aux | grep sqlr-listener | grep -v grep | cut -c10-15` 2> /dev/null
+else
+	kill `ps -efa | grep sqlr-connection | grep -v grep | cut -c10-15` 2> /dev/null
+	kill `ps -efa | grep sqlr-scaler | grep -v grep | cut -c10-15` 2> /dev/null
+	kill `ps -efa | grep sqlr-listener | grep -v grep | cut -c10-15` 2> /dev/null
+fi
 sleep 2
 
 # for each database/configuration...
@@ -67,6 +78,7 @@ do
 
 	# testing...
 	echo "testing $DB (from `hostname`)..."
+	echo "$DB..." >> testresults.log
 
 	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
@@ -84,6 +96,7 @@ do
 
 	# make sure that the instance is up
 	PING=""
+	BYPASS="no"
 	for attempts in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
 	do
 		echo
@@ -114,46 +127,54 @@ do
 		then
 			sleep 5
 		else
+
+			# If ssl is sufficiently old then the ssl test will
+			# fail like this.  Just bypass the test in that case.
+			SSLPROBLEM=`echo "$PING" | grep "unknown message digest algorithm"`
+			if ( test -n "$SSLPROBLEM" )
+			then
+				BYPASS="yes"
+			fi
 			break
 		fi
 	done
 
-	# run the tests
-	if ( test "$PING" = "The database is up." )
+	# bypass the test if necessary
+	if ( test "$BYPASS" = "no" )
 	then
 
-		# kinit for krb tests
-		if ( test "$DB" = "krb" )
+		# run the tests
+		if ( test "$PING" = "The database is up." )
 		then
-			kdestroy
-			kinit
-		fi
 
-		echo
-		echo "success..."
-		echo
-
-		if ( test "$DB" = "mysqlprotocol" )
-		then
-			./dropin/mysql
-		else
-			./test.sh $DB
-		fi
-	else
-		echo
-		echo "failed to start ${DB}test"
-		echo
-		echo "hit enter to continue or ctrl-c to stop..."
-		if ( test "$DB" = "krb" )
-		then
-			read -t 20 PROMPT 2> /dev/null
-			# (ubuntu's dash doesn't support read -t)
-			if ( test "$?" != "0" )
+			# kinit for krb tests
+			if ( test "$DB" = "krb" )
 			then
-				sleep 20
+				kdestroy
+				kinit
+			fi
+
+			echo
+			echo "success..."
+			echo
+
+			if ( test "$DB" = "mysqlprotocol" )
+			then
+				./dropin/mysql
+				if ( test "$?" = "0" )
+				then
+					printf "    % 8s: success\n" "dropin" >> testresults.log
+				else
+					printf "    % 8s: failed\n" "dropin" >> testresults.log
+				fi
+			else
+				./test.sh $DB
 			fi
 		else
-			read PROMPT
+			echo
+			echo "failed to start ${DB}test"
+			echo
+			echo "     connect: failed" >> testresults.log
 		fi
 	fi
 
@@ -173,3 +194,7 @@ do
 	echo "================================================================================"
 	echo
 done
+
+cat testresults.log
+
+exit 0

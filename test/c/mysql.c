@@ -75,6 +75,11 @@ int	main(int argc, char **argv) {
 	// get database type
 	printf("IDENTIFY: \n");
 	checkSuccessString(sqlrcon_identify(con),"mysql");
+	printf("\n");
+
+	// get the db version
+	const char	*dbversion=sqlrcon_dbVersion(con);
+	uint32_t	majorversion=dbversion[0]-'0';
 
 	// ping
 	printf("PING: \n");
@@ -86,14 +91,14 @@ int	main(int argc, char **argv) {
 
 	// create a new table
 	printf("CREATE TEMPTABLE: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"create table testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1);
 	printf("\n");
 
 	printf("INSERT: \n");
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)"),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testdb.testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)"),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testdb.testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','text3','varchar3','tinytext3','mediumtext3','longtext3',NULL)"),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testdb.testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','text4','varchar4','tinytext4','mediumtext4','longtext4',NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','text3','varchar3','tinytext3','mediumtext3','longtext3',NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','text4','varchar4','tinytext4','mediumtext4','longtext4',NULL)"),1);
 	printf("\n");
 
 	printf("AFFECTED ROWS: \n");
@@ -101,7 +106,7 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("BIND BY POSITION: \n");
-	sqlrcur_prepareQuery(cur,"insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)");
+	sqlrcur_prepareQuery(cur,"insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)");
 	checkSuccessInt(sqlrcur_countBindVariables(cur),18);
 	sqlrcur_inputBindLong(cur,"1",5);
 	sqlrcur_inputBindLong(cur,"2",5);
@@ -251,7 +256,13 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,9),"TIME");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,10),"DATETIME");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,11),"YEAR");
-	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,12),"STRING");
+	if (majorversion==3) {
+		checkSuccessString(
+			sqlrcur_getColumnTypeByIndex(cur,12),"VARSTRING");
+	} else {
+		checkSuccessString(
+			sqlrcur_getColumnTypeByIndex(cur,12),"STRING");
+	}
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,13),"BLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,14),"VARSTRING");
 	checkSuccessString(sqlrcur_getColumnTypeByIndex(cur,15),"TINYBLOB");
@@ -270,7 +281,13 @@ int	main(int argc, char **argv) {
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtime"),"TIME");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testdatetime"),"DATETIME");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testyear"),"YEAR");
-	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testchar"),"STRING");
+	if (majorversion==3) {
+		checkSuccessString(
+		sqlrcur_getColumnTypeByName(cur,"testchar"),"VARSTRING");
+	} else {
+		checkSuccessString(
+		sqlrcur_getColumnTypeByName(cur,"testchar"),"STRING");
+	}
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtext"),"BLOB");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testvarchar"),"VARSTRING");
 	checkSuccessString(sqlrcur_getColumnTypeByName(cur,"testtinytext"),"TINYBLOB");
@@ -339,7 +356,11 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,15),9);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,16),11);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,17),9);
-	checkSuccessInt(sqlrcur_getLongestByIndex(cur,18),19);
+	if (majorversion==3) {
+		checkSuccessInt(sqlrcur_getLongestByIndex(cur,18),14);
+	} else {
+		checkSuccessInt(sqlrcur_getLongestByIndex(cur,18),19);
+	}
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtinyint"),1);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testsmallint"),1);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testmediumint"),1);
@@ -358,7 +379,13 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtinytext"),9);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testmediumtext"),11);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testlongtext"),9);
-	checkSuccessInt(sqlrcur_getLongestByName(cur,"testtimestamp"),19);
+	if (majorversion==3) {
+		checkSuccessInt(
+			sqlrcur_getLongestByName(cur,"testtimestamp"),14);
+	} else {
+		checkSuccessInt(
+			sqlrcur_getLongestByName(cur,"testtimestamp"),19);
+	}
 	printf("\n");
 
 	printf("ROW COUNT: \n");
@@ -366,7 +393,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	printf("TOTAL ROWS: \n");
-	checkSuccessInt(sqlrcur_totalRows(cur),0);
+	// older versions of mysql know this
+	//checkSuccessInt(sqlrcur_totalRows(cur),0);
 	printf("\n");
 
 	printf("FIRST ROW INDEX: \n");
@@ -904,13 +932,17 @@ int	main(int argc, char **argv) {
 				"/tmp/test.socket","test","test",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
-	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");
+	if (majorversion>3) {
+		checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");
+	} else {
+		checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");
+	}
 	checkSuccessInt(sqlrcon_commit(con),1);
 	checkSuccessInt(sqlrcon_commit(secondcon),1);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"8");
 	checkSuccessInt(sqlrcon_autoCommitOn(con),1);
-	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testdb.testtable values (10,10,10,10,10,10.1,10.1,10.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','text10','varchar10','tinytext10','mediumtext10','longtext10',NULL)"),1);
+	checkSuccessInt(sqlrcur_sendQuery(cur,"insert into testtable values (10,10,10,10,10,10.1,10.1,1.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','text10','varchar10','tinytext10','mediumtext10','longtext10',NULL)"),1);
 	checkSuccessInt(sqlrcon_commit(secondcon),1);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"9");

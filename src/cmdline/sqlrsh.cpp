@@ -24,7 +24,6 @@
 #define NEED_IS_NONSCALE_FLOAT_TYPE_CHAR 1
 #include <datatypes.h>
 #include <defines.h>
-#include <parsedatetime.h>
 #include <version.h>
 // FIXME: use rudiments locale class instead
 #include <locale.h>
@@ -192,6 +191,7 @@ class	sqlrsh {
 					int64_t errornumber);
 		void	displayHeader(sqlrcursor *sqlrcur,
 						sqlrshenv *env);
+		void	csvEscapeField(const char *field, uint32_t length);
 		void	displayResultSet(sqlrcursor *sqlrcur,
 						sqlrshenv *env);
 		void	displayStats(sqlrcursor *sqlrcur,
@@ -1340,7 +1340,7 @@ void sqlrsh::displayError(sqlrshenv *env,
 
 void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
-	if (!env->headers) {
+	if (!env->headers && env->format!=SQLRSH_FORMAT_CSV) {
 		return;
 	}
 
@@ -1360,24 +1360,35 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 		// put a comma or extra space between field names
 		if (ci) {
-			if (env->format==SQLRSH_FORMAT_CSV) {
-				stdoutput.write(',');
-			} else {
+			if (env->format==SQLRSH_FORMAT_PLAIN) {
 				stdoutput.write(' ');
+			} else {
+				stdoutput.write(',');
 			}
 			charcount=charcount+1;
 		}
 
 		// write the column name
-		if (env->format==SQLRSH_FORMAT_CSV) {
-			stdoutput.write('\"');
-		}
 		name=sqlrcur->getColumnName(ci);
-		stdoutput.write(name);
-		if (env->format==SQLRSH_FORMAT_CSV) {
-			stdoutput.write('\"');
-		}
 		namelen=charstring::length(name);
+		if (env->format==SQLRSH_FORMAT_PLAIN) {
+			stdoutput.write(name);
+		} else {
+			// we need to quote the field if it's not a
+			// number, or if it is a number, but has more
+			// than 12 digits.  Excel (and presumably other
+			// spreadsheet apps) likes to convert 12+
+			// digit numbers to scientific notation.
+			bool	quote=(!charstring::isNumber(name) ||
+					charstring::length(name)>=12);
+			if (quote) {
+				stdoutput.write('"');
+			}
+			csvEscapeField(name,namelen);
+			if (quote) {
+				stdoutput.write('"');
+			}
+		}
 
 		// space-pad after the name, if necessary
 		if (env->format==SQLRSH_FORMAT_PLAIN) {
@@ -1398,11 +1409,22 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	stdoutput.printf("\n");
 
 	// display divider
-	if (env->divider) {
+	if (env->divider && env->headers) {
 		for (uint32_t i=0; i<charcount; i++) {
 			stdoutput.printf("=");
 		}
 		stdoutput.printf("\n");
+	}
+}
+
+void sqlrsh::csvEscapeField(const char *field, uint32_t length) {
+	for (uint32_t index=0; index<length; index++) {
+		// escape double quotes and ignore non-ascii characters
+		if (field[index]=='"') {
+			stdoutput.write("\"\"");
+		} else if (field[index]>=' ' && field[index]<='~') {
+			stdoutput.printf("%c",field[index]);
+		}
 	}
 }
 
@@ -1423,14 +1445,18 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	bool		done=false;
 	for (uint64_t row=0; !done; row++) {
 
+		if (row) {
+			stdoutput.write('\n');
+		}
+
 		for (uint32_t col=0; col<colcount; col++) {
 
 			// put a comma or extra space between fields
 			if (col) {
-				if (env->format==SQLRSH_FORMAT_CSV) {
-					stdoutput.write(',');
-				} else {
+				if (env->format==SQLRSH_FORMAT_PLAIN) {
 					stdoutput.write(' ');
+				} else {
+					stdoutput.write(',');
 				}
 			}
 
@@ -1479,17 +1505,33 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 			// handle nulls
 			if (!field) {
-				field="NULL";
-				fieldlength=4;
+				if (env->format==SQLRSH_FORMAT_PLAIN) {
+					field="NULL";
+					fieldlength=4;
+				} else {
+					field="";
+					fieldlength=0;
+				}
 			}
 
 			// write the field
-			if (env->format==SQLRSH_FORMAT_CSV) {
-				stdoutput.write('\"');
-			}
-			stdoutput.write(field);
-			if (env->format==SQLRSH_FORMAT_CSV) {
-				stdoutput.write('\"');
+			if (env->format==SQLRSH_FORMAT_PLAIN) {
+				stdoutput.write(field);
+			} else {
+				// we need to quote the field if it's not a
+				// number, or if it is a number, but has more
+				// than 12 digits.  Excel (and presumably other
+				// spreadsheet apps) likes to convert 12+
+				// digit numbers to scientific notation.
+				bool	quote=(!charstring::isNumber(field) ||
+						charstring::length(field)>=12);
+				if (quote) {
+					stdoutput.write('"');
+				}
+				csvEscapeField(field,fieldlength);
+				if (quote) {
+					stdoutput.write('"');
+				}
 			}
 
 			// space-pad after the field, if necessary
@@ -1507,7 +1549,6 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 				}
 			}
 		}
-		stdoutput.write('\n');
 	}
 }
 
@@ -1527,6 +1568,7 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	double		time=((double)(endusec-startusec))/1000000;
 
 	// display stats
+	stdoutput.write('\n');
 	stdoutput.printf("	Rows Returned   : ");
 	stdoutput.printf("%lld\n",(long long)sqlrcur->rowCount());
 	stdoutput.printf("	Fields Returned : ");
@@ -1716,7 +1758,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		int16_t	second;
 		int32_t	microsecond;
 		bool	isnegative;
-		parseDateTime(value,false,false,"/",
+		datetime::parse(value,false,false,"/",
 					&year,&month,&day,
 					&hour,&minute,&second,
 					&microsecond,&isnegative);
@@ -1988,7 +2030,7 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 			int16_t	second;
 			int32_t	microsecond;
 			bool	isnegative;
-			parseDateTime(value,false,false,"/",
+			datetime::parse(value,false,false,"/",
 						&year,&month,&day,
 						&hour,&minute,&second,
 						&microsecond,&isnegative);
@@ -2428,15 +2470,23 @@ bool sqlrsh::execute(int argc, const char **argv) {
 			"        [-tlsciphers cipherlist]\n"
 			"        [-tlsvalidate (no|ca|ca+domain|ca+host)] "
 			"[-tlsca ca] [-tlsdepth depth]\n"
-			"        [-script script | -command command] [-quiet] "
-			"[-format (plain|csv)] [-locale (env|name)] "
-			"[-getasnumber] [-noelapsed] [-nextresultset]\n"
+			"        [-script script | -command command]\n"
+			"        [-quiet]\n"
+			"        [-format (plain|csv)]\n"
+			"        [-locale (env|name)]\n"
+			"        [-getasnumber]\n"
+			"        [-noelapsed]\n"
+			"        [-nextresultset]\n"
 			"        [-resultsetbuffersize rows]\n"
 			"  or\n"
 			" %ssh [-config config] -id id\n"
-			"        [-script script | -command command] [-quiet] "
-			"[-format (plain|csv)] [-locale (env|name)] "
-			"[-getasnumber] [-noelapsed] [-nextresultset]\n"
+			"        [-script script | -command command]\n"
+			"        [-quiet]\n"
+			"        [-format (plain|csv)]\n"
+			"        [-locale (env|name)]\n"
+			"        [-getasnumber]\n"
+			"        [-noelapsed]\n"
+			"        [-nextresultset]\n"
 			"        [-resultsetbuffersize rows]\n",
 			SQLR,SQLR);
 		process::exit(1);

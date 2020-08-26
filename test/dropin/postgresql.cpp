@@ -2,6 +2,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
 #include <rudiments/environment.h>
+#include <rudiments/stringbuffer.h>
 #include <rudiments/stdio.h>
 
 void checkSuccess(const char *value, const char *success) {
@@ -42,7 +43,7 @@ int	main(int argc, char **argv) {
 	const char	*port;
 	const char	*user;
 	const char	*password;
-	const char	*db="testdb";
+	const char	*db;
 	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
 		port="9000";
 		user="test";
@@ -52,6 +53,9 @@ int	main(int argc, char **argv) {
 		// name eg: ./postgresql db64
 		if (argc==2) {
 			host=argv[1];
+			db="testdb";
+		} else {
+			db="";
 		}
 		port="5432";
 		user="testuser";
@@ -317,9 +321,18 @@ int	main(int argc, char **argv) {
 
 	PQclear(pgresult);
 
-	query="drop table testtable";
+	for (uint32_t i=0; i<10000; i++) {
+		stringbuffer	str;
+		str.append("insert into testtable values (")->append(i)->append(",1.1,1.1,1,'testchar1','testvarchar1','01/01/2001','01:00:00',NULL)");
+		pgresult=PQexec(pgconn,str.getString());
+		PQclear(pgresult);
+	}
+
+	/*query="drop table testtable";
 	pgresult=PQexec(pgconn,query);
-	PQclear(pgresult);
+	PQclear(pgresult);*/
 
 	PQfinish(pgconn);
+
+	return 0;
 }

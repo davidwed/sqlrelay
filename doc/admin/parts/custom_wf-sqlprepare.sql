@@ -1,0 +1,2 @@
+-- sqlprepare
+select * from exampletable

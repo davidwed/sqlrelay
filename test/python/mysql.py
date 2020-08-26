@@ -30,6 +30,11 @@ def main():
 	# get database type
 	print("IDENTIFY: ")
 	checkSuccess(con.identify(),"mysql")
+	print()
+
+	# get the db version
+	dbversion=con.dbVersion()
+	majorversion=int(dbversion[0:1])
 
 	# ping
 	print("PING: ")
@@ -41,14 +46,14 @@ def main():
 
 	# create a new table
 	print("CREATE TEMPTABLE: ")
-	checkSuccess(cur.sendQuery("create table testdb.testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1)
+	checkSuccess(cur.sendQuery("create table testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1)
 	print()
 
 	print("INSERT: ")
-	checkSuccess(cur.sendQuery("insert into testdb.testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)"),1)
-	checkSuccess(cur.sendQuery("insert into testdb.testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)"),1)
-	checkSuccess(cur.sendQuery("insert into testdb.testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','text3','varchar3','tinytext3','mediumtext3','longtext3',NULL)"),1)
-	checkSuccess(cur.sendQuery("insert into testdb.testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','text4','varchar4','tinytext4','mediumtext4','longtext4',NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (3,3,3,3,3,3.1,3.1,3.1,'2003-01-01','03:00:00','2003-01-01 03:00:00','2003','char3','text3','varchar3','tinytext3','mediumtext3','longtext3',NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (4,4,4,4,4,4.1,4.1,4.1,'2004-01-01','04:00:00','2004-01-01 04:00:00','2004','char4','text4','varchar4','tinytext4','mediumtext4','longtext4',NULL)"),1)
 	print()
 
 	print("AFFECTED ROWS: ")
@@ -56,7 +61,7 @@ def main():
 	print()
 
 	print("BIND BY POSITION: ")
-	cur.prepareQuery("insert into testdb.testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)")
+	cur.prepareQuery("insert into testtable values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NULL)")
 	checkSuccess(cur.countBindVariables(),18)
 	cur.inputBind("1",5)
 	cur.inputBind("2",5)
@@ -198,7 +203,10 @@ def main():
 	checkSuccess(cur.getColumnType(9),"TIME")
 	checkSuccess(cur.getColumnType(10),"DATETIME")
 	checkSuccess(cur.getColumnType(11),"YEAR")
-	checkSuccess(cur.getColumnType(12),"STRING")
+	if majorversion==3:
+		checkSuccess(cur.getColumnType(12),"VARSTRING")
+	else:
+		checkSuccess(cur.getColumnType(12),"STRING")
 	checkSuccess(cur.getColumnType(13),"BLOB")
 	checkSuccess(cur.getColumnType(14),"VARSTRING")
 	checkSuccess(cur.getColumnType(15),"TINYBLOB")
@@ -217,7 +225,10 @@ def main():
 	checkSuccess(cur.getColumnType("testtime"),"TIME")
 	checkSuccess(cur.getColumnType("testdatetime"),"DATETIME")
 	checkSuccess(cur.getColumnType("testyear"),"YEAR")
-	checkSuccess(cur.getColumnType("testchar"),"STRING")
+	if majorversion==3:
+		checkSuccess(cur.getColumnType("testchar"),"VARSTRING")
+	else:
+		checkSuccess(cur.getColumnType("testchar"),"STRING")
 	checkSuccess(cur.getColumnType("testtext"),"BLOB")
 	checkSuccess(cur.getColumnType("testvarchar"),"VARSTRING")
 	checkSuccess(cur.getColumnType("testtinytext"),"TINYBLOB")
@@ -286,7 +297,10 @@ def main():
 	checkSuccess(cur.getLongest(15),9)
 	checkSuccess(cur.getLongest(16),11)
 	checkSuccess(cur.getLongest(17),9)
-	checkSuccess(cur.getLongest(18),19)
+	if majorversion==3:
+		checkSuccess(cur.getLongest(18),14)
+	else:
+		checkSuccess(cur.getLongest(18),19)
 	checkSuccess(cur.getLongest("testtinyint"),1)
 	checkSuccess(cur.getLongest("testsmallint"),1)
 	checkSuccess(cur.getLongest("testmediumint"),1)
@@ -305,7 +319,10 @@ def main():
 	checkSuccess(cur.getLongest("testtinytext"),9)
 	checkSuccess(cur.getLongest("testmediumtext"),11)
 	checkSuccess(cur.getLongest("testlongtext"),9)
-	checkSuccess(cur.getLongest("testtimestamp"),19)
+	if majorversion==3:
+		checkSuccess(cur.getLongest("testtimestamp"),14)
+	else:
+		checkSuccess(cur.getLongest("testtimestamp"),19)
 	print()
 
 	print("ROW COUNT: ")
@@ -313,7 +330,8 @@ def main():
 	print()
 
 	print("TOTAL ROWS: ")
-	checkSuccess(cur.totalRows(),0)
+	# older versions of mysql know this
+	#checkSuccess(cur.totalRows(),0)
 	print()
 
 	print("FIRST ROW INDEX: ")
@@ -910,13 +928,16 @@ def main():
 						"test","test")
 	secondcur=PySQLRClient.sqlrcursor(secondcon)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
-	checkSuccess(secondcur.getField(0,0),0)
+	if majorversion>3:
+		checkSuccess(secondcur.getField(0,0),0)
+	else:
+		checkSuccess(secondcur.getField(0,0),8)
 	checkSuccess(con.commit(),1)
 	checkSuccess(secondcon.commit(),1)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),8)
 	checkSuccess(con.autoCommitOn(),1)
-	checkSuccess(cur.sendQuery("insert into testdb.testtable values (10,10,10,10,10,10.1,10.1,10.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','text10','varchar10','tinytext10','mediumtext10','longtext10',NULL)"),1)
+	checkSuccess(cur.sendQuery("insert into testtable values (10,10,10,10,10,10.1,10.1,1.1,'2010-01-01','10:00:00','2010-01-01 10:00:00','2010','char10','text10','varchar10','tinytext10','mediumtext10','longtext10',NULL)"),1)
 	checkSuccess(secondcon.commit(),1)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),9)
@@ -1085,3 +1106,4 @@ def main():
 
 if __name__ == "__main__":
 	main()
+	sys.exit(0)

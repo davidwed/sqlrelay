@@ -186,6 +186,9 @@
 /* Some versions of postgresql have PQconnectdb */
 #undef HAVE_POSTGRESQL_PQCONNECTDB
 
+/* Some versions of postgresql have PQdescribePrepared */
+#undef HAVE_POSTGRESQL_PQDESCRIBEPREPARED
+
 /* Some versions of postgresql have PQexecPrepared */
 #undef HAVE_POSTGRESQL_PQEXECPREPARED
 
@@ -239,6 +242,9 @@
 
 /* SQLite supports sqlite3_stmt */
 #undef HAVE_SQLITE3_STMT
+
+/* Some systems have SQLULEN parameters for SQLParamOptions */
+#undef HAVE_SQLPARAMOPTIONS_ULEN
 
 /* Some systems have SQLROWSETSIZE */
 #undef HAVE_SQLROWSETSIZE

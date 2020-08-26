@@ -10,8 +10,6 @@
 #include <rudiments/sys.h>
 #include <rudiments/stdio.h>
 
-#include <parsedatetime.h>
-
 #include <datatypes.h>
 #include <defines.h>
 #include <config.h>
@@ -2733,6 +2731,22 @@ void oraclecursor::checkRePrepare() {
 	}
 }
 
+static const char *shortmonths[]={
+	"JAN",
+	"FEB",
+	"MAR",
+	"APR",
+	"MAY",
+	"JUN",
+	"JUL",
+	"AUG",
+	"SEP",
+	"OCT",
+	"NOV",
+	"DEC",
+	NULL
+};
+
 void oraclecursor::dateToString(char *buffer, uint16_t buffersize,
 				int16_t year, int16_t month, int16_t day,
 				int16_t hour, int16_t minute, int16_t second,
@@ -2743,8 +2757,8 @@ void oraclecursor::dateToString(char *buffer, uint16_t buffersize,
 		conn->cont->getConfig()->getFakeInputBindVariablesDateFormat();
 	if (!charstring::isNullOrEmpty(format)) {
 		// FIXME: it'd be nice if we could pass buffer/buffersize
-		// into convertDateTime
-		char	*newdate=conn->cont->convertDateTime(format,
+		// into this
+		char	*newdate=datetime::formatAs(format,
 							year,month,day,
 							hour,minute,second,
 							microsecond,

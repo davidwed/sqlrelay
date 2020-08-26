@@ -606,3 +606,5 @@ checkSuccess($cur->sendQuery("create table testtable"),0);
 checkSuccess($cur->sendQuery("create table testtable"),0);
 checkSuccess($cur->sendQuery("create table testtable"),0);
 print("\n");
+
+exit(0);

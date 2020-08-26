@@ -56,6 +56,7 @@ int main(int argc, const char **argv) {
 	const char	*id=cmdline.getValue("-id");
 	const char	*pwdencid=cmdline.getValue("-pwdencid");
 	const char	*password=cmdline.getValue("-password");
+	bool		binary=cmdline.found("-binary");
 
 	// sanity check and usage message
 	if (charstring::isNullOrEmpty(id) ||
@@ -66,7 +67,7 @@ int main(int argc, const char **argv) {
 			" %s-pwdenc [-config config] "
 			"-id instance\n"
 			"             -pwdencid passwordencryptionid "
-			"-password password\n",SQLR);
+			"-password password -binary\n",SQLR);
 		process::exit(1);
 	}
 
@@ -96,7 +97,16 @@ int main(int argc, const char **argv) {
 
 	// encrypt the password and print the result
 	char	*encryptedpassword=sqlrp->encrypt(password);
-	stdoutput.printf("%s\n",encryptedpassword);
+	if (binary) {
+		unsigned char	*bin;
+		uint64_t	binlen;
+		charstring::hexDecode(encryptedpassword,
+					charstring::length(encryptedpassword),
+					&bin,&binlen);
+		stdoutput.write(bin,binlen);
+	} else {
+		stdoutput.printf("%s\n",encryptedpassword);
+	}
 	delete[] encryptedpassword;
 	process::exit(0);
 }

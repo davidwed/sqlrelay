@@ -10,6 +10,7 @@
 #include <rudiments/dictionary.h>
 #include <rudiments/file.h>
 #include <rudiments/memorypool.h>
+#include <rudiments/datetime.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES
 #include <rudiments/debugprint.h>
@@ -1895,7 +1896,6 @@ int mysql_execute(MYSQL_STMT *stmt) {
 	return mysql_stmt_execute(stmt);
 }
 
-#include <parsedatetime.h>
 static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 
 	// result variables
@@ -1923,7 +1923,7 @@ static void getDate(const char *field, uint32_t length, MYSQL_BIND *bind) {
 	if (yyyyddmmstr) {
 		yyyyddmm=charstring::isYes(yyyyddmmstr);
 	}
-	parseDateTime(buffer,ddmm,yyyyddmm,
+	datetime::parse(buffer,ddmm,yyyyddmm,
 				"/-:",&year,&month,&day,
 				&hour,&minute,&second,
 				&usec,&isnegative);

@@ -22,3 +22,6 @@ tls: tls.cs
 
 unicode: unicode.cs
 	$(CSC) $(CSCFLAGS) /out:unicode.exe unicode.cs /reference:SQLRClient.dll
+
+postgresqlbinds: postgresqlbinds.cs
+	$(CSC) $(CSCFLAGS) /out:postgresqlbinds.exe postgresqlbinds.cs /reference:Npgsql.dll

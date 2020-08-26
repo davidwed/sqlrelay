@@ -1,0 +1,123 @@
+= Creating a TLS Certificate Chain File =
+
+When obtaining a certificate from a Certificate Authority (or generating one yourself) it is common to receive 3 different files, rather than a single certificate chain file.
+
+These files are:
+
+* a host certificate (eg. host.crt)
+* a private key (eg. private.key)
+* a CA certificate (eg. ca.crt)
+
+The host certificate should look something like:
+
+{{{#!blockquote
+{{{
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 2 (0x2)
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: O=Rudiments, OU=Rudiments Certificate Authority Department/emailAddress=root@ca.localdomain, L=Atlanta, ST=Georgia, C=US, CN=ca.localdomain
+        Validity
+            Not Before: Oct 24 18:05:28 2019 GMT
+            Not After : Oct 21 18:05:28 2029 GMT
+        Subject: C=US, ST=Georgia, O=Rudiments, OU=Rudiments Server Department, CN=server.localdomain
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:c4:cc:7f:6c:66:18:3b:c9:34:63:b0:c6:84:a3:
+                    ... more lines like the above ...
+                    22:97
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication, TLS Web Client Authentication
+            X509v3 Subject Alternative Name: 
+                DNS:server.localdomain, DNS:localdomain
+    Signature Algorithm: sha256WithRSAEncryption
+         4a:f8:9a:dc:b8:6d:e2:e1:3f:16:aa:34:40:c2:b5:d3:f3:42:
+         ... more lines like the above ...
+         8a:d8:63:7d
+-----BEGIN CERTIFICATE-----
+MIID9jCCAt6gAwIBAgIBAjANBgkqhkiG9w0BAQsFADCBtzESMBAGA1UECgwJUnVk
+... more lines like the above ...
+JZSQVbu3ithjfQ==
+-----END CERTIFICATE-----
+}}}
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' The host certificate is sometimes (confusingly) referred to as the "public key".  It does contain the public key, but if it is in .crt format, and looks like the example above, then it is an actual certificate, not just a public key. )
+}}}
+
+The private key should look something like:
+
+{{{#!blockquote
+{{{
+-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAxMx/bGYYO8k0Y7DGhKOmVR3AQp+eY6v/oTKvDsz0/K6WjMhG
+... more lines like the above ...
+YvRVfwPbCOPASOak7yRLD7x5NlumNXw125CxNKVhGv0yTZdiHIsg
+-----END RSA PRIVATE KEY-----
+}}}
+}}}
+
+The CA certificate should look something like:
+
+{{{#!blockquote
+{{{
+-----BEGIN CERTIFICATE-----
+MIIFKzCCBBOgAwIBAgIUNvMPkbrtdYYf3bmAefh4R8sMQRkwDQYJKoZIhvcNAQEL
+... more lines like the above ...
+aiAQAbYuL0pyyu8h8Qk3RPmdl25sHFotdAyy9Ub/fQ==
+-----END CERTIFICATE-----
+}}}
+}}}
+
+To create a certificate chain file in .pem format (for Unix/Linux), all you have to do is concatenate them together.  On Unix/Linux this can be done as follows:
+
+{{{#!blockquote
+{{{
+cat host.crt private.key ca.crt > host.pem
+}}}
+}}}
+
+The resulting host.pem file can be used directly by SQL Relay's tlscert option on Unix/Linux.
+
+To create a certificate chain file in .pfx format (for Windows), you have to use the following openssl command:
+
+{{{#!blockquote
+{{{
+openssl pkcs12 -export -in host.crt -inkey private.key -certfile ca.crt -out host.pfx
+}}}
+}}}
+
+{{{#!blockquote
+(give it an empty password)
+}}}
+
+The resulting host.pfx file can be used directly by SQL Relay's tlscert option on Windows.
+
+
+== Troubleshooting ==
+
+=== I have a host certificate, private key, and CA certificate, but they don't look anything like those the examples above.  What do I do? ===
+
+They are probably just in different formats.  You'll have to figure out what format they are in and convert them.  The file name extension usually indicates the format, but not always.  Eg. a .key extension is common to use for a bunch of different formats.
+
+The openssl command can convert between a variety of formats, but you'll have to do some research to figure out what you have and what the command is to convert it.
+
+[[br]]
+=== I only have a public and private key.  What now? ===
+
+You'll have to either:
+
+* get a Certificate Authority to generate a certificate for you
+* set up your own internal Certificate Authority and generate a certificate for yourself
+* create a self-signed certificate
+
+[[br]]
+=== How do I convert a .pem file to a .pfx? === 
+
+You have to use an editor to extract the different parts into 3 separate files (host.crt, private.key, and ca.crt) and then run the command above to create the .pfx file from these parts.

@@ -47,8 +47,6 @@
 #define NEED_IS_DATETIME_TYPE_CHAR 1
 #define NEED_IS_DATETIME_TYPE_INT 1
 #include <datatypes.h>
-#define NEED_CONVERT_DATE_TIME 1
-#include <parsedatetime.h>
 #define NEED_BEFORE_BIND_VARIABLE 1
 #define NEED_IS_BIND_DELIMITER 1
 #define NEED_AFTER_BIND_VARIABLE 1
@@ -1375,7 +1373,7 @@ bool sqlrservercontroller::listen() {
 
 		waitForAvailableDatabase();
 		initSession();
-		if (!announceAvailability(NULL,0,pvt->_connectionid)) {
+		if (!announceAvailability(pvt->_connectionid)) {
 			return true;
 		}
 
@@ -1564,12 +1562,7 @@ void sqlrservercontroller::initSession() {
 	raiseDebugMessageEvent("done initializing session...");
 }
 
-bool sqlrservercontroller::announceAvailability(const char *unixsocket,
-						unsigned short inetport,
-						const char *connectionid) {
-
-	// FIXME: unixsocket and inetport are unused and
-	// should be removed in the next minor release
+bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 
 	raiseDebugMessageEvent("announcing availability...");
 
@@ -2381,6 +2374,11 @@ void sqlrservercontroller::endTransaction(bool commit) {
 		pvt->_sqlrq->endTransaction(commit);
 	}
 
+	// reset module datas
+	if (pvt->_sqlrmd) {
+		pvt->_sqlrmd->endTransaction(commit);
+	}
+
 	// clear per-session pool
 	pvt->_txpool.clear();
 
@@ -3076,26 +3074,6 @@ const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
 	return ptr;
 }
 
-bool sqlrservercontroller::parseDateTime(
-				const char *datetime, bool ddmm, bool yyyyddmm,
-				const char *datedelimiters,
-				int16_t *year, int16_t *month, int16_t *day,
-				int16_t *hour, int16_t *minute, int16_t *second,
-				int32_t *microsecond, bool *isnegative) {
-	return ::parseDateTime(datetime,ddmm,yyyyddmm,datedelimiters,
-				year,month,day,hour,minute,second,microsecond,
-				isnegative);
-}
-
-char *sqlrservercontroller::convertDateTime(const char *format,
-				int16_t year, int16_t month, int16_t day,
-				int16_t hour, int16_t minute, int16_t second,
-				int32_t microsecond, bool isnegative) {
-	return ::convertDateTime(format,year,month,day,
-				hour,minute,second,microsecond,
-				isnegative);
-}
-
 static const char *asciitohex[]={
 	"00","01","02","03","04","05","06","07",
 	"08","09","0A","0B","0C","0D","0E","0F",
@@ -3190,6 +3168,64 @@ uint16_t sqlrservercontroller::countBindVariables(const char *query,
 				pvt->_colonsupported,
 				pvt->_atsignsupported,
 				pvt->_dollarsignsupported);
+}
+
+void sqlrservercontroller::splitObjectName(const char *currentdb,
+						const char *currentschema,
+						const char *combinedobject,
+						char **db,
+						char **schema,
+						char **object) {
+
+	// init return values
+	*db=NULL;
+	*schema=NULL;
+	*object=NULL;
+
+	// split the combined object
+	char		**parts=NULL;
+	uint64_t	partcount=0;
+	charstring::split(combinedobject,".",true,&parts,&partcount);
+
+	// the combined object might be in one of the following formats:
+	// * object
+	// * schema.object
+	// * db.schema.object
+	switch (partcount) {
+		case 3:
+			*db=parts[0];
+			*schema=parts[1];
+			*object=parts[2];
+			break;
+		case 2:
+			// If there are 2 parts the it could mean:
+			// * db(.defaultschama).object
+			//   or
+			// * (currentdb.)schema.object...
+			// If the first part is not the same as the current
+			// db, then we'll guess (currentdb.)schema.object,
+			// but we don't really know for sure. The app may
+			// really mean to target another db.
+			if (!charstring::compare(parts[0],currentdb)) {
+				*db=parts[0];
+				*schema=charstring::duplicate(currentschema);
+			} else {
+				*db=charstring::duplicate(currentdb);
+				*schema=parts[0];
+			}
+			*object=parts[1];
+			break;
+		case 1:
+			*db=charstring::duplicate(currentdb);
+			*schema=charstring::duplicate(currentschema);
+			*object=parts[0];
+			break;
+	}
+
+	// clean up (we don't need to delete each individual part because
+	// they've all been passed out and will be cleaned up by the calling
+	// method)
+	delete[] parts;
 }
 
 bool sqlrservercontroller::isBitType(const char *type) {
@@ -5472,7 +5508,7 @@ bool sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 	int16_t	second=-1;
 	int32_t	microsecond=-1;
 	bool	isnegative=false;
-	if (!parseDateTime(field,ddmm,yyyyddmm,
+	if (!datetime::parse(field,ddmm,yyyyddmm,
 				datedelimiters,
 				&year,&month,&day,
 				&hour,&minute,&second,
@@ -5491,10 +5527,10 @@ bool sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 
 	// convert to the specified format
 	delete[] pvt->_reformattedfield;
-	pvt->_reformattedfield=convertDateTime(format,
-					year,month,day,
-					hour,minute,second,
-					microsecond,isnegative);
+	pvt->_reformattedfield=datetime::formatAs(format,
+						year,month,day,
+						hour,minute,second,
+						microsecond,isnegative);
 	pvt->_reformattedfieldlength=charstring::length(pvt->_reformattedfield);
 
 	if (pvt->_debugsqlrresultsettranslation) {
@@ -5674,6 +5710,11 @@ void sqlrservercontroller::endSession() {
 	// reset auth modules
 	if (pvt->_sqlra) {
 		pvt->_sqlra->endSession();
+	}
+
+	// reset module datas
+	if (pvt->_sqlrmd) {
+		pvt->_sqlrmd->endSession();
 	}
 
 	// clear per-session pool
@@ -6160,7 +6201,7 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	// Reset this semaphore to 0.  It can get left incremented if another
 	// sqlr-connection is killed between calls to signalListenerToRead()
 	// and this method.  It's ok to reset it here becuase no one except
-	// uthis process has access to this semaphore at this time because of
+	// this process has access to this semaphore at this time because of
 	// the lock on the announce mutex (semaphore 0).
 	pvt->_semset->setValue(3,0);
 
@@ -7249,7 +7290,7 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 				// but who knows what we'll actually get, the
 				// ddmm, yyyyddmm, and delimiter parameters need
 				// to be configurable...
-				if (!parseDateTime(
+				if (!datetime::parse(
 						temp,
 						false,
 						false,
@@ -9300,6 +9341,9 @@ void sqlrservercontroller::closeLobField(sqlrservercursor *cursor,
 
 void sqlrservercontroller::closeResultSet(sqlrservercursor *cursor) {
 	cursor->closeResultSet();
+	if (pvt->_sqlrmd) {
+		pvt->_sqlrmd->closeResultSet(cursor);
+	}
 }
 
 uint16_t sqlrservercontroller::getId(sqlrservercursor *cursor) {
@@ -9622,7 +9666,7 @@ sqlrshm *sqlrservercontroller::getShm() {
 }
 
 sqlrmoduledata *sqlrservercontroller::getModuleData(const char *id) {
-	return pvt->_sqlrmd->getModuleData(id);
+	return (pvt->_sqlrmd)?pvt->_sqlrmd->getModuleData(id):NULL;
 }
 
 bool sqlrservercontroller::send(unsigned char *data, size_t size) {

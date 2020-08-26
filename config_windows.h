@@ -184,14 +184,20 @@
 /* Some versions of postgresql have PQbinaryTuples */
 #define HAVE_POSTGRESQL_PQBINARYTUPLES 1
 
+/* Some versions of postgresql have PQconnectdb */
+#define HAVE_POSTGRESQL_PQCONNECTDB 1
+
+/* Some versions of postgresql have PQdescribePrepared */
+#define HAVE_POSTGRESQL_PQDESCRIBEPREPARED 1
+
 /* Some versions of postgresql have PQexecPrepared */
 #define HAVE_POSTGRESQL_PQEXECPREPARED 1
 
-/* Some versions of postgresql have PQftable */
-#define HAVE_POSTGRESQL_PQFTABLE 1
-
 /* Some versions of postgresql have PQfmod */
 #define HAVE_POSTGRESQL_PQFMOD 1
+
+/* Some versions of postgresql have PQftable */
+#define HAVE_POSTGRESQL_PQFTABLE 1
 
 /* Some versions of postgresql have PQoidValue */
 #define HAVE_POSTGRESQL_PQOIDVALUE 1
@@ -363,6 +369,9 @@
 
 /* SQLite supports sqlite3_stmt */
 #define HAVE_SQLITE3_STMT 1
+
+/* Some systems have SQLULEN parameters for SQLParamOptions */
+#define HAVE_SQLPARAMOPTIONS_ULEN 1
 
 /* Some systems have SQLROWSETSIZE */
 #define HAVE_SQLROWSETSIZE 1

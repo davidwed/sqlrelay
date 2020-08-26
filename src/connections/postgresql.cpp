@@ -172,6 +172,13 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+		void		deallocateNamedStatement();
+#endif
+#if ((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
+		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
 		bool		columnInfoIsValidAfterPrepare();
 #endif
 
@@ -182,7 +189,7 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		uint64_t	affectedrows;
 		int		currentrow;
 
-		char		typenamebuffer[32];
+		char		**typenamebuffer;
 		char		tablenamebuffer[32];
 
 		postgresqlconnection	*postgresqlconn;
@@ -191,6 +198,9 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+		char		*cursorid;
+		stringbuffer	deallocatecursorid;
+		bool		allocated;
 		uint16_t	maxbindcount;
 		char		**bindvalues;
 		int		*bindlengths;
@@ -717,6 +727,15 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+	if (id) {
+		charstring::printf(&cursorid,"%s-%d",
+					conn->cont->getConnectionId(),id);
+		charstring::replace(cursorid,'-','_');
+	} else {
+		cursorid=charstring::duplicate("");
+	}
+	deallocatecursorid.append("deallocate ")->append(cursorid);
+	allocated=false;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	bindvalues=new char *[maxbindcount];
 	bytestring::zero(bindvalues,maxbindcount*sizeof(char *));
@@ -729,6 +748,10 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	justexecuted=false;
 #endif
+	typenamebuffer=new char *[conn->cont->getMaxColumnCount()];
+	for (uint32_t i=0; i<conn->cont->getMaxColumnCount(); i++) {
+		typenamebuffer[i]=new char[32];
+	}
 }
 
 postgresqlcursor::~postgresqlcursor() {
@@ -742,7 +765,13 @@ postgresqlcursor::~postgresqlcursor() {
 	delete[] bindvalues;
 	delete[] bindlengths;
 	delete[] bindformats;
+	deallocateNamedStatement();
+	delete[] cursorid;
 #endif
+	for (uint32_t i=0; i<conn->cont->getMaxColumnCount(); i++) {
+		delete[] typenamebuffer[i];
+	}
+	delete[] typenamebuffer;
 }
 
 #if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
@@ -760,8 +789,12 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// reset the bind format error flag
 	bindformaterror=false;
 
+	// deallocate named statement
+	deallocateNamedStatement();
+
 	// prepare the query
-	pgresult=PQprepare(postgresqlconn->pgconn,"",query,0,NULL);
+	pgresult=PQprepare(postgresqlconn->pgconn,cursorid,query,0,NULL);
+	allocated=true;
 
 	// handle some kind of outright failure
 	if (!pgresult) {
@@ -777,6 +810,8 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 		result=false;
 	}
 
+#if defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
+
 	// clean up
 	PQclear(pgresult);
 	pgresult=NULL;
@@ -787,7 +822,7 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	}
 	
 	// describe the query (get column info)
-	pgresult=PQdescribePrepared(postgresqlconn->pgconn,"");
+	pgresult=PQdescribePrepared(postgresqlconn->pgconn,cursorid);
 
 	// handle some kind of outright failure
 	if (!pgresult) {
@@ -805,6 +840,7 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 	// get the col count
 	ncols=PQnfields(pgresult);
+#endif
 
 	return result;
 }
@@ -996,7 +1032,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	int	result=1;
 	if (bindcounter) {
-		result=PQsendQueryPrepared(postgresqlconn->pgconn,"",
+		result=PQsendQueryPrepared(postgresqlconn->pgconn,cursorid,
 						bindcounter,bindvalues,
 						bindlengths,bindformats,0);
 		bindcounter=0;
@@ -1022,7 +1058,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 #elif defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)
 	if (bindcounter) {
-		pgresult=PQexecPrepared(postgresqlconn->pgconn,"",
+		pgresult=PQexecPrepared(postgresqlconn->pgconn,cursorid,
 					bindcounter,bindvalues,
 					bindlengths,bindformats,0);
 		bindcounter=0;
@@ -1049,7 +1085,8 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 #if !((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)))
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) || \
+		!(defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED))
 	// get the col count
 	ncols=PQnfields(pgresult);
 #endif
@@ -1407,9 +1444,10 @@ const char *postgresqlcursor::getColumnTypeName(uint32_t col) {
 	// typemangling=2 means return the name as a string
 	Oid	pgfieldtype=PQftype(pgresult,col);
 	if (!postgresqlconn->typemangling) {
-		charstring::printf(typenamebuffer,sizeof(typenamebuffer),
+		charstring::printf(typenamebuffer[col],
+						sizeof(typenamebuffer[col]),
 						"%d",(int32_t)pgfieldtype);
-		return typenamebuffer;
+		return typenamebuffer[col];
 	}
 	return postgresqlconn->datatypes.getValue((int32_t)pgfieldtype);
 }
@@ -1542,6 +1580,24 @@ void postgresqlcursor::closeResultSet() {
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
+void postgresqlcursor::deallocateNamedStatement() {
+	if (allocated) {
+		if (cursorid[0]) {
+			pgresult=PQexec(postgresqlconn->pgconn,
+					deallocatecursorid.getString());
+			PQclear(pgresult);
+			pgresult=NULL;
+		}
+		allocated=false;
+	}
+}
+#endif
+
+#if ((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
+		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
+		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) && \
+		defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED)
 bool postgresqlcursor::columnInfoIsValidAfterPrepare() {
 	return true;
 }

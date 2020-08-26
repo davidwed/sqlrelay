@@ -14,6 +14,7 @@ SRCS = connectionpooling.wt \
 	nativeprotocol.wt \
 	proxying.wt \
 	queryfiltering.wt \
+	querytranslation.wt \
 	queryrouting.wt \
 	resultsetcaching.wt \
 	schedules.wt \
@@ -31,6 +32,7 @@ OBJS = connectionpooling.html \
 	nativeprotocol.html \
 	proxying.html \
 	queryfiltering.html \
+	querytranslation.html \
 	queryrouting.html \
 	resultsetcaching.html \
 	schedules.html \

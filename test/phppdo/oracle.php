@@ -514,9 +514,13 @@
 	echo("COMMIT AND ROLLBACK: \n");
 	$dbh->exec("drop table testtable1");
 	checkSuccess($dbh->exec("create table testtable1 (testnumber number)"),0);
-	checkSuccess($dbh->inTransaction(),0);
+	if (method_exists($dbh,"inTransaction")) {
+		checkSuccess($dbh->inTransaction(),0);
+	}
 	$dbh->beginTransaction();
-	checkSuccess($dbh->inTransaction(),1);
+	if (method_exists($dbh,"inTransaction")) {
+		checkSuccess($dbh->inTransaction(),1);
+	}
 	checkSuccess($dbh->exec("insert into testtable1 values (1)"),1);
 	$dbh2=new PDO($dsn,$user,$password);
 	$stmt2=$dbh2->query("select count(*) from testtable1");
@@ -538,13 +542,17 @@
 	echo("\n");
 
 	echo("AUTOCOMMIT: \n");
-	checkSuccess($dbh->inTransaction(),0);
+	if (method_exists($dbh,"inTransaction")) {
+		checkSuccess($dbh->inTransaction(),0);
+	}
 	$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,TRUE);
 	checkSuccess($dbh->exec("insert into testtable1 values (1)"),1);
 	$stmt2=$dbh2->query("select count(*) from testtable1");
 	$result2=$stmt2->fetch();
 	checkSuccess($result2[0],2);
-	checkSuccess($dbh->inTransaction(),0);
+	if (method_exists($dbh,"inTransaction")) {
+		checkSuccess($dbh->inTransaction(),0);
+	}
 	$dbh->setAttribute(PDO::ATTR_AUTOCOMMIT,FALSE);
 	$dbh->beginTransaction();
 	checkSuccess($dbh->exec("insert into testtable1 values (1)"),1);

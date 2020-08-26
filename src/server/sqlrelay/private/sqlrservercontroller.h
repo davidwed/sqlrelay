@@ -31,9 +31,7 @@
 
 		void	initSession();
 
-		bool	announceAvailability(const char *unixsocket,
-						uint16_t inetport,
-						const char *connectionid);
+		bool	announceAvailability(const char *connectionid);
 
 		void	registerForHandoff();
 		void	deRegisterForHandoff();

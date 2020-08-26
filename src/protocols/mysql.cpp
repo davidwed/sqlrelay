@@ -6,6 +6,7 @@
 #include <rudiments/character.h>
 #include <rudiments/randomnumber.h>
 #include <rudiments/process.h>
+#include <rudiments/datetime.h>
 #include <rudiments/error.h>
 
 #include <defines.h>
@@ -1768,6 +1769,7 @@ void sqlrprotocol_mysql::parseHandshakeResponse320(
 	}
 
 	// with protocol 320, assume "mysql_old_password"
+	serverauthpluginname="mysql_old_password";
 	clientauthpluginname="mysql_old_password";
 
 	debugEnd();
@@ -1785,23 +1787,39 @@ static const char *supportedauthplugins[]={
 
 bool sqlrprotocol_mysql::negotiateAuthMethod() {
 
-	// protocol 320 only supports mysql_old_password
-	// if the client says it doesn't support protocol 41, then we must be
-	// using protocol 320, and so we must also be using mysql_old_password
-	if (!(clientcapabilityflags&CLIENT_PROTOCOL_41)) {
+	// if the client and server agree on the auth method, then we're good
+	//
+	// this will happen if:
+	// * the client indicated that it supports plugin auths and requested
+	//   the same auth that we offered
+	// * the client didn't indicate that it supports plugin auths, but
+	//   sent us a challenge response, indicating that it likes the
+	//   auth that we offered
+	// * the server was configured with handshake=9 (protocol 320,
+	//   mysql_old_password) and the client responded apropriately
+	// * the server was configured with handshake=10 (protocol 41) but
+	//   the client indicated that it doesn't support protocol 41 and
+	//   so we fell back to protocol 320 and mysql_old_password
+	if (!charstring::compare(clientauthpluginname,serverauthpluginname)) {
 		if (getDebug()) {
 			debugStart("negotiate auth method");
-			stdoutput.write("	mysql_old_password "
-					"(because using protocol 320)\n");
+			stdoutput.printf("	agreed on %s\n",
+						clientauthpluginname);
 			debugEnd();
 		}
 		return true;
 	}
 
-	// if the client doesn't support plugin auths, then we need to use
-	// the "old" auth switch request to request that it switch to
-	// mysql_old_password
-	if (!(clientcapabilityflags&CLIENT_PLUGIN_AUTH)) {
+	// at this point, the client must support protocol 41...
+
+	// If the client does not support plugin auth, then it must support
+	// mysql_old_password and mysql_native_password.  If it didn't send a
+	// challenge response, then it didn't like like the auth that we
+	// offered, which must have been mysql_native_password.  So, try
+	// switching to mysql_old_password using the "old auth swtich"
+	if (!(clientcapabilityflags&CLIENT_PLUGIN_AUTH) &&
+		charstring::isNullOrEmpty(clientauthpluginname)) {
+
 		serverauthpluginname="mysql_old_password";
 		if (getDebug()) {
 			debugStart("negotiate auth method");
@@ -1811,17 +1829,6 @@ bool sqlrprotocol_mysql::negotiateAuthMethod() {
 		}
 		generateChallenge();
 		return sendOldAuthSwitchRequest() && recvAuthResponse();
-	}
-
-	// if the client requested the auth that we offered, then we're good
-	if (!charstring::compare(clientauthpluginname,serverauthpluginname)) {
-		if (getDebug()) {
-			debugStart("negotiate auth method");
-			stdoutput.printf("	agreed on %s\n",
-						clientauthpluginname);
-			debugEnd();
-		}
-		return true;
 	}
 
 	// if the client requested an auth that we support, then offer it
@@ -1861,7 +1868,7 @@ bool sqlrprotocol_mysql::negotiateAuthMethod() {
 		}
 	}
 
-	// try all plugins, one at a time...
+	// otherwise, try all plugins, one at a time...
 	clientauthpluginname=NULL;
 	for (const char * const *plugin=supportedauthplugins;
 				*plugin && !clientauthpluginname; plugin++) {
@@ -3576,7 +3583,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 			int32_t	usec;
 			bool	isnegative;
 			// FIXME: set ddmm and yyyyddmm somehow
-			cont->parseDateTime(field,false,false,"/-.:",
+			datetime::parse(field,false,false,"/-.:",
 					&year,&month,&day,
 					&hour,&minute,&second,
 					&usec,&isnegative);
@@ -3632,7 +3639,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 			int16_t	second;
 			int32_t	usec;
 			bool	isnegative;
-			cont->parseDateTime(field,false,false,"/-.:",
+			datetime::parse(field,false,false,"/-.:",
 					&year,&month,&day,
 					&hour,&minute,&second,
 					&usec,&isnegative);
@@ -3812,7 +3819,6 @@ void sqlrprotocol_mysql::buildLobField(sqlrservercursor *cursor,
 	uint64_t	charstoread=sizeof(lobbuffer)/MAX_BYTES_PER_CHAR;
 	uint64_t	charsread=0;
 	uint64_t	offset=0;
-	bool		start=true;
 
 	// FIXME: kludgy
 	// this is necessary to open the lob, at least with mysql
@@ -3827,28 +3833,13 @@ void sqlrprotocol_mysql::buildLobField(sqlrservercursor *cursor,
 					offset,charstoread,&charsread) ||
 					!charsread) {
 
-			cont->closeLobField(cursor,col);
-
 			// if we fail to get a segment or got nothing...
-			if (start) {
-				// if we haven't started sending yet,
-				// then send a NULL as 0xfb
-				write(&resppacket,(char)0xfb);
-				return;
-			} else {
-				// otherwise just end normally
-				writeLenEncInt(&resppacket,
-							temp.getSize());
-				write(&resppacket,temp.getBuffer(),
-							temp.getSize());
-				return;
-			}
+			cont->closeLobField(cursor,col);
+			writeLenEncInt(&resppacket,temp.getSize());
+			write(&resppacket,temp.getBuffer(),temp.getSize());
+			return;
 
 		} else {
-
-			if (start) {
-				start=false;
-			}
 
 			// append the segment we just got
 			temp.append(lobbuffer,charsread);

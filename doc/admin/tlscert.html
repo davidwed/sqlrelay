@@ -8,32 +8,41 @@
 
 <p>SQL Relay supports a <b>tlscert</b> parameter in the SQL Relay server's configuration file, and as an argument to the various command line client programs.  In either case, it specifies the TLS certificate chain to use.</p>
 
-<p>On non-Windows platforms, it must specify a certificate chain file.  For example:</p>
+<p>Instead of requiring a certificate chain, some applications allow you to just configure them with a public and private key.  This enables the application to perform TLS encryption, but not auth.  SQL Relay doesn't (currently) allow this.  You have to provide a certificate chain, even if you only want to use TLS encryption and not auth.</p>
+
+<p>On non-Windows platforms, you must specify a certificate chain file.  For example:</p>
 
 <blockquote>
   <pre>/usr/local/firstworks/etc/sqlrserver.pem
+ or
 /usr/local/firstworks/etc/sqlrclient.pem
 </pre>
 
 </blockquote>
-<p>On Windows platforms it may specify a certificate chain file.  For example:</p>
+<p>On Windows platforms you may specify a certificate chain file.  For example:</p>
 
 <blockquote>
   <pre>C:\\Program Files\\Firstworks\\etc\\sqlrserver.pfx
+ or
 C:\\Program Files\\Firstworks\\etc\\sqlrclient.pfx
 </pre>
 
 </blockquote>
 <p>(note the double-backslashes)</p>
 
-<p>Or, it may specify a certificate in a Windows Certificate Store.  For example:</p>
+<p>Or, you may specify a certificate in a Windows Certificate Store.  For example:</p>
 
 <blockquote>
   <pre>CURRENT_USER:MY:sqlrserver
+ or
 MY:sqlrserver
+ or
 sqlrserver
+ or
 CURRENT_USER:MY:sqlrclient
+ or
 MY:sqlrclient
+ or
 sqlrclient
 </pre>
 
@@ -41,7 +50,7 @@ sqlrclient
 <p>For actual files:</p>
 
 <ul>
-  <li>The file should contain the server's certificate, private key, and signing certificates, as appropriate.</li>
+  <li>The file should contain the host's certificate, private key, and signing certificates, as appropriate (see <a href="createtlscert.html">Creating a TLS Certificate Chain File</a> for more information)</li>
   <li>On non-Windows systems, a variety of file formats are supported.</li>
   <li>On Windows systems it must be a .pfx file.</li>
 </ul>

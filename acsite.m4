@@ -1782,6 +1782,9 @@ then
 			AC_MSG_CHECKING(if PostgreSQL has PQsetSingleRowMode)
 			FW_TRY_LINK([#include <libpq-fe.h>
 #include <stdlib.h>],[PQsetSingleRowMode(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETSINGLEROWMODE,1,Some versions of postgresql have PQsetSingleRowMode)],[AC_MSG_RESULT(no)])
+			AC_MSG_CHECKING(if PostgreSQL has PQdescribePrepared)
+			FW_TRY_LINK([#include <libpq-fe.h>
+#include <stdlib.h>],[PQdescribePrepared(NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQDESCRIBEPREPARED,1,Some versions of postgresql have PQdescribePrepared)],[AC_MSG_RESULT(no)])
 		fi
 		AC_MSG_CHECKING(if PostgreSQL has PQserverVersion)
 		FW_TRY_LINK([#include <libpq-fe.h>
@@ -1928,7 +1931,7 @@ then
 			then
 				AC_MSG_CHECKING(if SQLite needs gdbm)
 				SQLITENEEDGDBM=""
-				FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$SQLITELIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
+				FW_TRY_LINK([#include <sqlite.h>],[sqlite *sqliteptr; char *errmesg; sqliteptr=sqlite_open("/tmp/testfile",666,&errmesg); sqlite_close(sqliteptr);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $SOCKETLIBS $PTHREADLIB],[$LD_LIBRARY_PATH:$SQLITELIBSPATH],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes); SQLITENEEDGDBM="yes"])
 			
 				if ( test -n "$SQLITENEEDGDBM" )
 				then
@@ -1960,23 +1963,23 @@ then
 
 		AC_MSG_CHECKING(for sqlite3_stmt)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_stmt *a=0;],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_STMT,1,SQLite supports sqlite3_stmt)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[sqlite3_stmt *a=0;],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_STMT,1,SQLite supports sqlite3_stmt)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(for sqlite3_prepare_v2)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_prepare_v2(0,0,0,0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_PREPARE_V2,1,SQLite supports sqlite3_prepare_v2)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[sqlite3_prepare_v2(0,0,0,0,0);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_PREPARE_V2,1,SQLite supports sqlite3_prepare_v2)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(for sqlite3_malloc)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_malloc(0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_MALLOC,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[sqlite3_malloc(0);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_MALLOC,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(for sqlite3_free with char * argument)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[char *a=0; sqlite3_free(a);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_FREE_WITH_CHAR,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[char *a=0; sqlite3_free(a);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_FREE_WITH_CHAR,1,SQLite supports sqlite3_malloc)],[AC_MSG_RESULT(no)])
 
 		AC_MSG_CHECKING(for sqlite3_column_table_name)
 		FW_TRY_LINK([#include <sqlite3.h>
-#include <stdlib.h>],[sqlite3_column_table_name(0,0);],[$SQLITESTATIC $SQLITEINCLUDES],[$SQLITELIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_COLUMN_TABLE_NAME,1,SQLite supports sqlite3_column_table_name)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[sqlite3_column_table_name(0,0);],[$SQLITESTATIC $SQLITEINCLUDES $PTHREADINCLUDES],[$SQLITELIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLITE3_COLUMN_TABLE_NAME,1,SQLite supports sqlite3_column_table_name)],[AC_MSG_RESULT(no)])
 
 	fi
 
@@ -2046,7 +2049,7 @@ then
 			dnl some versions of freetds need libiconv, see if
 			dnl a simple test will link
 			LINKFAILED=""
-			FW_TRY_LINK([],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[],[LINKFAILED="yes"])
+			FW_TRY_LINK([],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[],[LINKFAILED="yes"])
 
 			dnl if not, search for iconv
 			if ( test -n "$LINKFAILED" )
@@ -2060,7 +2063,7 @@ then
 				then
 					AC_MSG_CHECKING(whether freetds requires libiconv)
 
-					FW_TRY_LINK([],[],[$FREETDSINCLUDES $ICONVINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $ICONVLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[FREETDSINCLUDES="$FREETDSINCLUDES $ICONVINCLUDES"; FREETDSLIBS="$FREETDSLIBS $ICONVLIBS"; AC_MSG_RESULT(yes)],[FREETDSLIBS=""; FREETDSINCLUDES=""; AC_MSG_RESULT(no)])
+					FW_TRY_LINK([],[],[$FREETDSINCLUDES $ICONVINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $ICONVLIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[FREETDSINCLUDES="$FREETDSINCLUDES $ICONVINCLUDES"; FREETDSLIBS="$FREETDSLIBS $ICONVLIBS"; AC_MSG_RESULT(yes)],[FREETDSLIBS=""; FREETDSINCLUDES=""; AC_MSG_RESULT(no)])
 				else
 					FREETDSLIBS=""
 					FREETDSINCLUDES=""
@@ -2074,7 +2077,7 @@ then
 			then
 				AC_MSG_CHECKING(whether ctpublic.h contains function definitions)
 				FW_TRY_LINK([#include <ctpublic.h>
-#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[CS_CONTEXT *context; cs_ctx_alloc(CS_VERSION_100,&context);],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_FUNCTION_DEFINITIONS,1,Some versions of FreeTDS have function definitions)],[AC_MSG_RESULT(no)])
 			fi
 		fi
 
@@ -2082,7 +2085,7 @@ then
 		if ( test -n "$FREETDSLIBS" )
 		then
 			AC_MSG_CHECKING(whether tdsver.h exists)
-			FW_TRY_LINK([#include <tdsver.h>],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIBS],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_H,1,Some versions of FreeTDS have tdsver.h)],[AC_MSG_RESULT(no)])
+			FW_TRY_LINK([#include <tdsver.h>],[],[$FREETDSINCLUDES $PTHREADINCLUDES],[$FREETDSLIBS $PTHREADLIB],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_FREETDS_H,1,Some versions of FreeTDS have tdsver.h)],[AC_MSG_RESULT(no)])
 		fi
 
 		dnl if FREETDSLIBS isn't defined at this point, then freetds
@@ -2322,12 +2325,15 @@ then
 			HAVE_UNIXODBC="yes"
 		fi
 
-		dnl unixodbc (again, in a more common place)...
-		FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINCLUDES],[UNIXODBCLIBS],[UNIXODBCLIBSPATH],[UNIXODBCSTATIC])
-		if ( test -n "$UNIXODBCLIBS" )
+		if ( test -z "$UNIXODBCLIBS" )
 		then
-			FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[odbcinst],[sql.h],[odbcinst],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINSTINCLUDES],[UNIXODBCINSTLIBS],[UNIXODBCINSTLIBSPATH],[UNIXODBCINSTSTATIC])
-			HAVE_UNIXODBC="yes"
+			dnl unixodbc (again, in a more common place)...
+			FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[unixodbc],[sql.h],[odbc],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINCLUDES],[UNIXODBCLIBS],[UNIXODBCLIBSPATH],[UNIXODBCSTATIC])
+			if ( test -n "$UNIXODBCLIBS" )
+			then
+				FW_CHECK_HEADERS_AND_LIBS([$ODBCPATH],[odbcinst],[sql.h],[odbcinst],[$STATICFLAG],[$RPATHFLAG],[UNIXODBCINSTINCLUDES],[UNIXODBCINSTLIBS],[UNIXODBCINSTLIBSPATH],[UNIXODBCINSTSTATIC])
+				HAVE_UNIXODBC="yes"
+			fi
 		fi
 
 		dnl iodbc...
@@ -2443,17 +2449,27 @@ extern "C" SQLRETURN SQL_API SQLRowCount(SQLHSTMT statementhandle,
 		
 		AC_MSG_CHECKING(for SQLROWSETSIZE)
 		FW_TRY_LINK([#include <sql.h>
-#include <sqlext.h>],[SQLROWSETSIZE a;],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLROWSETSIZE,1,Some systems have SQLROWSETSIZE) ODBCUNICODE="yes"],[AC_MSG_RESULT(no)])
+#include <sqlext.h>],[SQLROWSETSIZE a;],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLROWSETSIZE,1,Some systems have SQLROWSETSIZE)],[AC_MSG_RESULT(no)])
 		
 		AC_MSG_CHECKING(parameters for SQLExtendedFetch)
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 extern "C" SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle, SQLUSMALLINT fetchorientation, SQLLEN fetchoffset, SQLULEN *pcrow, SQLUSMALLINT *rgfrowstatus) { return 0; }],[],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(SQLLEN/SQLULEN); AC_DEFINE(HAVE_SQLEXTENDEDFETCH_LEN,1,Some systems have SQLLEN/SQLULEN parameters for SQLExtendedFetch)],[AC_MSG_RESULT(SQLROWOFFSET/SQLROWSETSIZE)])
+		
+		AC_MSG_CHECKING(parameters for SQLParamOptions)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+extern "C" SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle, SQLULEN crow, SQLULEN *pirow) { return 0; }],[],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(SQLULEN); AC_DEFINE(HAVE_SQLPARAMOPTIONS_ULEN,1,Some systems have SQLULEN parameters for SQLParamOptions)],[AC_MSG_RESULT(SQLUINTEGER)])
 	fi
 
-	if ( test -z "$ODBCLIBS" -o -z "$ODBCUNICODE" )
+	if ( test -z "$ODBCLIBS" )
 	then
 		AC_MSG_WARN(ODBC connection support will not be built.)
+	fi
+
+	if ( test -z "$ODBCUNICODE" )
+	then
+		AC_MSG_WARN(unicode support missing... ODBC connection support will not be built.)
 	fi
 
 	if ( test -n "$ODBCLIBS" -a -n "$OBCUNICODE" -a -z "$HAVE_ICONV" )
@@ -2808,6 +2824,14 @@ then
 		then
 			AC_MSG_WARN(Firebird support will not be built.)
 		fi
+	fi
+
+	dnl freebsd + firebird 2.0.3 segfaults on isc_attach_database,
+	dnl when linked with -lfbclient, but works with -lgds
+	if ( test -n "$FIREBIRDLIBS" -a -n "`uname -a 2> /dev/null | grep FreeBSD`" -a -n "`pkg_info 2> /dev/null | grep firebird-client | grep 2\.0\.3`" )
+	then
+		FIREBIRDLIBS=`echo "$FIREBIRDLIBS" | sed -e "s|fbclient|gds|g"`
+		AC_MSG_WARN(replacng -lfbclient with -lgds on FreeBSD/Firebird-2.0.3)
 	fi
 
 	FW_INCLUDES(firebird,[$FIREBIRDINCLUDES])
@@ -3443,6 +3467,8 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.14* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.12* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.11* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.10* 2> /dev/null` \
@@ -3456,7 +3482,11 @@ then
 `ls -d /usr/lib64/jvm/jdk-10-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-11-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-12-* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/jdk-13-* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/jdk-14-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.14* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.12* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.11* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.10* 2> /dev/null` \
@@ -3470,6 +3500,8 @@ then
 `ls -d /usr/lib/jvm/jdk-10-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-11-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
 /System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local

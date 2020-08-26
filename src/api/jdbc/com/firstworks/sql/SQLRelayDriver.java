@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
-public class SQLRelayDriver implements Driver {
+public class SQLRelayDriver extends SQLRelayDebug implements Driver {
 
 	private static final int MAJOR_VERSION=1;
 	private static final int MINOR_VERSION=2;
@@ -23,6 +23,7 @@ public class SQLRelayDriver implements Driver {
 	}
 
 	public SQLRelayDriver() throws SQLException {
+		debugFunction();
 	}
 
 	/**
@@ -31,6 +32,7 @@ public class SQLRelayDriver implements Driver {
 	public Connection connect(String url,
 					Properties info)
 					throws SQLException {
+		debugFunction();
 		SQLRelayConnectInfo	ci=parseConnectInfo(url,info);
 		return (validConnectInfo(ci))?
 			new SQLRelayConnection(ci.host,ci.port,ci.socket,
@@ -41,6 +43,7 @@ public class SQLRelayDriver implements Driver {
 
 	public SQLRelayConnectInfo parseConnectInfo(String url,
 						Properties info) {
+		debugFunction();
 
 		String	host=null;
 		String	portstr=null;
@@ -153,6 +156,7 @@ public class SQLRelayDriver implements Driver {
 	}
 
 	private boolean validConnectInfo(SQLRelayConnectInfo ci) {
+		debugFunction();
 		return ((ci.host!=null && ci.port>0) || ci.socket!=null);
 	}
 
@@ -161,6 +165,7 @@ public class SQLRelayDriver implements Driver {
 	 *  the given URL.
 	 */
 	public boolean acceptsURL(String url) throws SQLException {
+		debugFunction();
 		return validConnectInfo(parseConnectInfo(url,null));
 	}
 
@@ -172,6 +177,7 @@ public class SQLRelayDriver implements Driver {
 	public DriverPropertyInfo[] getPropertyInfo(String url,
 							Properties info)
 							throws SQLException {
+		debugFunction();
 
 		SQLRelayConnectInfo	ci=parseConnectInfo(url,info);
 
@@ -235,6 +241,7 @@ public class SQLRelayDriver implements Driver {
 	 *   Get the driver's major version number.
 	 */
 	public int getMajorVersion() {
+		debugFunction();
 		return MAJOR_VERSION;
 	}
 
@@ -242,10 +249,12 @@ public class SQLRelayDriver implements Driver {
 	 *   Get the driver's minor version number.
 	 */
 	public int getMinorVersion() {
+		debugFunction();
 		return MINOR_VERSION;
 	}
 
 	public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+		debugFunction();
 		throw new SQLFeatureNotSupportedException();
 	}
 
@@ -253,6 +262,7 @@ public class SQLRelayDriver implements Driver {
 	 *  Report whether the Driver is a genuine JDBC COMPLIANT (tm) driver. 
 	 */
 	public boolean jdbcCompliant() {
+		debugFunction();
 		return false;
 	}
 }

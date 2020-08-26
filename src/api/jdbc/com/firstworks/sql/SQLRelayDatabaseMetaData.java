@@ -2,65 +2,89 @@ package com.firstworks.sql;
 	
 import java.sql.*;
 	
-public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
+public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseMetaData {
 
 	private SQLRelayConnection	connection;
 
 	public SQLRelayDatabaseMetaData() {
+		debugFunction();
 		connection=null;
 		// FIXME: set protected member variables?
 	}
 
 	public void setConnection(SQLRelayConnection connection) {
+		debugFunction();
 		this.connection=connection;
 	}
 
 	public boolean 	allProceduresAreCallable() throws SQLException {
+		debugFunction();
 		// Retrieves whether the current user can call all the
 		// procedures returned by the method getProcedures.
-		// FIXME: this is almost certainly not correct.
-		return true;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	allTablesAreSelectable() throws SQLException {
+		debugFunction();
 		// Retrieves whether the current user can use all the tables
 		// returned by the method getTables in a SELECT statement.
-		// FIXME: this is almost certainly not correct.
-		return true;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	autoCommitFailureClosesAllResultSets()
 							throws SQLException {
+		debugFunction();
 		// Retrieves whether a SQLException while autoCommit is true
 		// inidcates that all open ResultSets are closed, even ones
 		// that are holdable.
 		// FIXME: no idea if this is true or not
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	dataDefinitionCausesTransactionCommit()
 							throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	dataDefinitionIgnoredInTransactions()
 							throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	deletesAreDetected(int type) throws SQLException {
+		debugFunction();
 		// SQL Relay doesn't currenlty support ResultSet.RowDelete
-		return false;
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	doesMaxRowSizeIncludeBlobs() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	result=false;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public boolean 	generatedKeyAlwaysReturned() throws SQLException {
-		return true;
+		debugFunction();
+		boolean	result=true;
+		debugPrintln("  result: "+result);
+		return result;
 	}
 
 	public ResultSet 	getAttributes(String catalog,
@@ -68,6 +92,7 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String typeNamePattern,
 						String attributeNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow...
 		return null;
 	}
@@ -78,26 +103,45 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 							int scope,
 							boolean nullable)
 							throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow...
 		return null;
 	}
 
 	public ResultSet 	getCatalogs() throws SQLException {
-		// FIXME: implement this by calling sqlrcursor.getDatabases()
-		return null;
+		debugFunction();
+		SQLRelayResultSet	resultset=null;
+		SQLRelayStatement	stmt=(SQLRelayStatement)
+						connection.createStatement();
+		if (stmt.getSQLRCursor().getDatabaseList(null)) {
+			resultset=new SQLRelayResultSet();
+			resultset.setStatement(stmt);
+			resultset.setSQLRCursor(stmt.getSQLRCursor());
+		} else {
+			throw new SQLException(
+					stmt.getSQLRCursor().errorMessage());
+		}
+		return resultset;
 	}
 
 	public String 	getCatalogSeparator() throws SQLException {
+		debugFunction();
 		// FIXME: oracle uses @
-		return ".";
+		String	separator=".";
+		debugPrintln("  separator: "+separator);
+		return separator;
 	}
 
 	public String 	getCatalogTerm() throws SQLException {
+		debugFunction();
 		// FIXME: I think SQL Server uses catalog, maybe sybase
-		return "database";
+		String	term="database";
+		debugPrintln("  term: "+term);
+		return term;
 	}
 
 	public ResultSet 	getClientInfoProperties() throws SQLException {
+		debugFunction();
 		// FIXME: free form in SQL Relay
 		return null;
 	}
@@ -108,6 +152,7 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String table,
 						String columnNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
 		return null;
 	}
@@ -117,11 +162,13 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String tableNamePattern,
 						String columnNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this by calling sqlrcursor.getColumnList()
 		return null;
 	}
 
 	public Connection 	getConnection() throws SQLException {
+		debugFunction();
 		return connection;
 	}
 
@@ -132,58 +179,89 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String foreignSchema,
 						String foreignTable)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow...
 		return null;
 	}
 
 	public int 	getDatabaseMajorVersion() throws SQLException {
+		debugFunction();
 		// FIXME: SQL Relay or db?
-		return 0;
+		int	majorversion=0;
+		debugPrintln("  major version: "+majorversion);
+		return majorversion;
 	}
 
 	public int 	getDatabaseMinorVersion() throws SQLException {
+		debugFunction();
 		// FIXME: SQL Relay or db?
-		return 0;
+		int	minorversion=0;
+		debugPrintln("  minor version: "+minorversion);
+		return minorversion;
 	}
 
 	public String 	getDatabaseProductName() throws SQLException {
-		// FIXME: implement this by calling sqlrcon.identify()
-		return null;
+		debugFunction();
+		// FIXME: cache this...
+		String	id=connection.getSQLRConnection().identify();
+		debugPrintln("  id: "+id);
+		return id;
 	}
 
 	public String 	getDatabaseProductVersion() throws SQLException {
-		// FIXME: implement this by calling sqlrcon.dbVersion()
-		return null;
+		debugFunction();
+		// FIXME: cache this...
+		String	productversion=
+				connection.getSQLRConnection().dbVersion();
+		debugPrintln("  product version: "+productversion);
+		return productversion;
 	}
 
 	public int 	getDefaultTransactionIsolation() throws SQLException {
-		// FIXME: mysql is repeatable read
-		return Connection.TRANSACTION_READ_COMMITTED;
+		debugFunction();
+		int	isolation=(getDatabaseProductName().equals("mysql"))?
+					Connection.TRANSACTION_REPEATABLE_READ:
+					Connection.TRANSACTION_READ_COMMITTED;
+		debugPrintln("  isolation: "+isolation);
+		return isolation;
 	}
 
 	public int 	getDriverMajorVersion() {
+		debugFunction();
 		// FIXME: make this come from sqlrclient
-		return 1;
+		int	majorversion=1;
+		debugPrintln("  major version: "+majorversion);
+		return majorversion;
 	}
 
 	public int 	getDriverMinorVersion() {
+		debugFunction();
 		// FIXME: make this come from sqlrclient
-		return 2;
+		int	minorversion=2;
+		debugPrintln("  minor version: "+minorversion);
+		return minorversion;
 	}
 
 	public String 	getDriverName() throws SQLException {
-		return "sqlrelay";
+		debugFunction();
+		String	drivername="sqlrelay";
+		debugPrintln("  driver name: "+drivername);
+		return drivername;
 	}
 
 	public String 	getDriverVersion() throws SQLException {
+		debugFunction();
 		// FIXME: make this come from sqlrclient
-		return "1.2.0";
+		String	driverversion="1.2.0";
+		debugPrintln("  driver version: "+driverversion);
+		return driverversion;
 	}
 
 	public ResultSet 	getExportedKeys(String catalog,
 						String schema,
 						String table)
 						throws SQLException {
+		debugFunction();
 		// Retrieves a description of the foreign key columns that
 		// reference the given table's primary key columns (the foreign
 		// keys exported by a table).
@@ -192,8 +270,11 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 	}
 
 	public String 	getExtraNameCharacters() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return null;
+		String	extranamechars="#@";
+		debugPrintln("  extra name characters: "+extranamechars);
+		return extranamechars;
 	}
 
 	public ResultSet 	getFunctionColumns(
@@ -202,6 +283,7 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String functionNamePattern,
 						String columnNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement with
 		// sqlrcur.getProcedureBindAndColumnList()?
 		return null;
@@ -211,21 +293,27 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String schemaPattern,
 						String functionNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this by calling sqlrcur.getProcedures()?
 		return null;
 	}
 
 	public String 	getIdentifierQuoteString() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		// * mysql uses back-tick
 		// * sqlserver uses braces
-		return "\"";
+		String	identifierquotestring=
+			(getDatabaseProductName().equals("mysql"))?"`":"\"";
+		debugPrintln("  identifier quote string: "+
+					identifierquotestring);
+		return identifierquotestring;
 	}
 
 	public ResultSet 	getImportedKeys(String catalog,
 						String schema,
 						String table)
 						throws SQLException {
+		debugFunction();
 		// Retrieves a description of the primary key columns that are
 		// referenced by the given table's foreign key columns (the
 		// primary keys imported by a table).
@@ -239,128 +327,205 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						boolean unique,
 						boolean approximate)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement using sqlrcur.getKeyAndIndexList() ?
 		return null;
 	}
 
 	public int 	getJDBCMajorVersion() throws SQLException {
+		debugFunction();
 		// FIXME: make this come from sqlrclient
-		return 1;
+		int	jdbcmajorversion=1;
+		debugPrintln("  jdbc major version: "+jdbcmajorversion);
+		return jdbcmajorversion;
 	}
 
 	public int 	getJDBCMinorVersion() throws SQLException {
+		debugFunction();
 		// FIXME: make this come from sqlrclient
-		return 2;
+		int	jdbcminorversion=2;
+		debugPrintln("  jdbc minor version: "+jdbcminorversion);
+		return jdbcminorversion;
 	}
 
 	public int 	getMaxBinaryLiteralLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxbinaryliterallength=0;
+		debugPrintln("  max binary literal length: "+
+						maxbinaryliterallength);
+		return maxbinaryliterallength;
 	}
 
 	public int 	getMaxCatalogNameLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxcatalognamelength=0;
+		debugPrintln("  max catalog name length: "+
+						maxcatalognamelength);
+		return maxcatalognamelength;
 	}
 
 	public int 	getMaxCharLiteralLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxcharliterallength=0;
+		debugPrintln("  max char literal length: "+
+						maxcharliterallength);
+		return maxcharliterallength;
 	}
 
 	public int 	getMaxColumnNameLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxcolumnnamelength=0;
+		debugPrintln("  max column name length: "+
+						maxcolumnnamelength);
+		return maxcolumnnamelength;
 	}
 
 	public int 	getMaxColumnsInGroupBy() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxcolumnsingroup=0;
+		debugPrintln("  max columns in group: "+maxcolumnsingroup);
+		return maxcolumnsingroup;
 	}
 
 	public int 	getMaxColumnsInIndex() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxcolumnsinindex=0;
+		debugPrintln("  max columns in index: "+maxcolumnsinindex);
+		return maxcolumnsinindex;
 	}
 
 	public int 	getMaxColumnsInOrderBy() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxcolumnsinorderby=0;
+		debugPrintln("  max columns in order by: "+maxcolumnsinorderby);
+		return maxcolumnsinorderby;
 	}
 
 	public int 	getMaxColumnsInSelect() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxcolumnsinselect=0;
+		debugPrintln("  max columns in select: "+maxcolumnsinselect);
+		return maxcolumnsinselect;
 	}
 
 	public int 	getMaxColumnsInTable() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxcolumnsintable=0;
+		debugPrintln("  max columns in table: "+maxcolumnsintable);
+		return maxcolumnsintable;
 	}
 
 	public int 	getMaxConnections() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxconnections=0;
+		debugPrintln("  max connections: "+maxconnections);
+		return maxconnections;
 	}
 
 	public int 	getMaxCursorNameLength() throws SQLException {
-		return 0;
+		debugFunction();
+		int	maxcursornamelength=0;
+		debugPrintln("  max cursor name length: "+
+						maxcursornamelength);
+		return maxcursornamelength;
 	}
 
 	public int 	getMaxIndexLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxindexlength=0;
+		debugPrintln("  max index length: "+maxindexlength);
+		return maxindexlength;
 	}
 
 	public int 	getMaxProcedureNameLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxprocedurenamelength=0;
+		debugPrintln("  max procedure name length: "+
+						maxprocedurenamelength);
+		return maxprocedurenamelength;
 	}
 
 	public int 	getMaxRowSize() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxrowsize=0;
+		debugPrintln("  max row size: "+maxrowsize);
+		return maxrowsize;
 	}
 
 	public int 	getMaxSchemaNameLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxschemanamelength=0;
+		debugPrintln("  max schema name length: "+maxschemanamelength);
+		return maxschemanamelength;
 	}
 
 	public int 	getMaxStatementLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxstatementlength=0;
+		debugPrintln("  max statement length: "+maxstatementlength);
+		return maxstatementlength;
 	}
 
 	public int 	getMaxStatements() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxstatements=0;
+		debugPrintln("  max statements: "+maxstatements);
+		return maxstatements;
 	}
 
 	public int 	getMaxTableNameLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxtablenamelength=0;
+		debugPrintln("  max table name length: "+maxtablenamelength);
+		return maxtablenamelength;
 	}
 
 	public int 	getMaxTablesInSelect() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxtablesinselect=0;
+		debugPrintln("  max tables in select: "+maxtablesinselect);
+		return maxtablesinselect;
 	}
 
 	public int 	getMaxUserNameLength() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific (0 means no limit or unknown)
-		return 0;
+		int	maxusernamelength=0;
+		debugPrintln("  max user name length: "+maxusernamelength);
+		return maxusernamelength;
 	}
 
 	public String 	getNumericFunctions() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return null;
+		String	numericfunctions=null;
+		debugPrintln("  numeric functions: "+numericfunctions);
+		return numericfunctions;
 	}
 
 	public ResultSet 	getPrimaryKeys(String catalog,
 						String schema,
 						String table)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this by calling sqlrcon.getPrimaryKeysList()
 		return null;
 	}
@@ -371,6 +536,7 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String procedureNamePattern,
 						String columnNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this by calling
 		// sqlrcon.getProcedureBindAndColumnList()
 		return null;
@@ -380,12 +546,16 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String schemaPattern,
 						String procedureNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this by calling sqlrcon.getProcedureList()
 		return null;
 	}
 
 	public String 	getProcedureTerm() throws SQLException {
-		return "procedure";
+		debugFunction();
+		String	procedureterm="procedure";
+		debugPrintln("  procedure term: "+procedureterm);
+		return procedureterm;
 	}
 
 	public ResultSet 	getPseudoColumns(String catalog,
@@ -393,21 +563,46 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String tableNamePattern,
 						String columnNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
 		return null;
 	}
 
 	public int 	getResultSetHoldability() throws SQLException {
+		debugFunction();
 		// FIXME: is this correct?
-		return ResultSet.CLOSE_CURSORS_AT_COMMIT;
+		int	resultsetholdability=ResultSet.CLOSE_CURSORS_AT_COMMIT;
+		debugPrintln("  result set holdability: "+resultsetholdability);
+		return resultsetholdability;
 	}
 
 	public RowIdLifetime 	getRowIdLifetime() throws SQLException {
+		debugFunction();
 		// FIXME: some dbs do support rowid
-		return RowIdLifetime.ROWID_UNSUPPORTED;
+		RowIdLifetime	rowidlifetime=RowIdLifetime.ROWID_UNSUPPORTED;
+		debugPrint("  rowid lifetime: ");
+		switch (rowidlifetime) {
+			case ROWID_UNSUPPORTED:
+				debugPrint("ROWID_UNSUPPORTED");
+				break;
+			case ROWID_VALID_OTHER:
+				debugPrint("ROWID_VALID_OTHER");
+				break;
+			case ROWID_VALID_TRANSACTION:
+				debugPrint("ROWID_VALID_TRANSACTION");
+				break;
+			case ROWID_VALID_SESSION:
+				debugPrint("ROWID_VALID_SESSION");
+				break;
+			case ROWID_VALID_FOREVER:
+				debugPrint("ROWID_VALID_FOREVER");
+				break;
+		}
+		return rowidlifetime;
 	}
 
 	public ResultSet 	getSchemas() throws SQLException {
+		debugFunction();
 		// FIXME: implement this by calling sqlrcon.getSchemaList()
 		return null;
 	}
@@ -415,38 +610,55 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 	public ResultSet 	getSchemas(String catalog,
 						String schemaPattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this by calling sqlrcon.getSchemaList()
 		return null;
 	}
 
 	public String 	getSchemaTerm() throws SQLException {
-		return "schema";
+		debugFunction();
+		String	schematerm="schema";
+		debugPrintln("  schema term: "+schematerm);
+		return schematerm;
 	}
 
 	public String 	getSearchStringEscape() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return "\\";
+		String	searchstringescape="\\";
+		debugPrintln("  search string escape: "+searchstringescape);
+		return searchstringescape;
 	}
 
 	public String 	getSQLKeywords() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return null;
+		String	sqlkeywords=null;
+		debugPrintln("  sql keywords: "+sqlkeywords);
+		return sqlkeywords;
 	}
 
 	public int 	getSQLStateType() throws SQLException {
+		debugFunction();
 		// FIXME: no idea
-		return sqlStateSQL;
+		int	sqlstatetype=sqlStateSQL;
+		debugPrintln("  sql state type: "+sqlstatetype);
+		return sqlstatetype;
 	}
 
 	public String 	getStringFunctions() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return null;
+		String	stringfunctions=null;
+		debugPrintln("  string functions: "+stringfunctions);
+		return stringfunctions;
 	}
 
 	public ResultSet 	getSuperTables(String catalog,
 						String schemaPattern,
 						String tableNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
 		return null;
 	}
@@ -455,19 +667,24 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String schemaPattern,
 						String typeNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
 		return null;
 	}
 
 	public String 	getSystemFunctions() throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
-		return null;
+		String	systemfunctions=null;
+		debugPrintln("  system functions: "+systemfunctions);
+		return systemfunctions;
 	}
 
 	public ResultSet 	getTablePrivileges(String catalog,
 						String schemaPattern,
 						String tableNamePattern)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
 		return null;
 	}
@@ -477,21 +694,37 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String tableNamePattern,
 						String[] types)
 						throws SQLException {
-		// FIXME: implement this by calling sqlrcon.getTableList()
-		return null;
+		debugFunction();
+		SQLRelayResultSet	resultset=null;
+		SQLRelayStatement	stmt=(SQLRelayStatement)
+						connection.createStatement();
+		if (stmt.getSQLRCursor().getTableList(null)) {
+			resultset=new SQLRelayResultSet();
+			resultset.setStatement(stmt);
+			resultset.setSQLRCursor(stmt.getSQLRCursor());
+		} else {
+			throw new SQLException(
+					stmt.getSQLRCursor().errorMessage());
+		}
+		return resultset;
 	}
 
 	public ResultSet 	getTableTypes() throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
 		return null;
 	}
 
 	public String 	getTimeDateFunctions() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return null;
+		String	timedatefunctions=null;
+		debugPrintln("  timedate functions: "+timedatefunctions);
+		return timedatefunctions;
 	}
 
 	public ResultSet 	getTypeInfo() throws SQLException {
+		debugFunction();
 		// FIXME: implement this by calling sqlrcon.getTypeInfo()
 		return null;
 	}
@@ -501,11 +734,13 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 						String typeNamePattern,
 						int[] types)
 						throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
 		return null;
 	}
 
 	public String 	getURL() throws SQLException {
+		debugFunction();
 
 		String	host=connection.getHost();
 		short	port=connection.getPort();
@@ -526,493 +761,854 @@ public class SQLRelayDatabaseMetaData implements DatabaseMetaData {
 			url=url+":"+socket;
 		}
 
+		debugPrintln("  url: "+url);
+
 		return url;
 	}
 
 	public String 	getUserName() throws SQLException {
-		return connection.getUser();
+		debugFunction();
+		String	username=connection.getUser();
+		debugPrintln("  user name: "+username);
+		return username;
 	}
 
 	public ResultSet 	getVersionColumns(String catalog,
 							String schema,
 							String table)
 							throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
 		return null;
 	}
 
 	public boolean 	insertsAreDetected(int type) throws SQLException {
-		return false;
+		debugFunction();
+		boolean	insertsaredetected=false;
+		debugPrintln("  type: "+type);
+		debugPrintln("  inserts are detected: "+insertsaredetected);
+		return insertsaredetected;
 	}
 
 	public boolean 	isCatalogAtStart() throws SQLException {
+		debugFunction();
 		// FIXME: not in oracle
-		return true;
+		boolean	iscatalogatstart=true;
+		debugPrintln("  is catalog at start: "+iscatalogatstart);
+		return iscatalogatstart;
 	}
 
 	public boolean 	isReadOnly() throws SQLException {
+		debugFunction();
 		// FIXME: implement this somehow
-		return false;
+		boolean	isreadonly=false;
+		debugPrintln("  is read only: "+isreadonly);
+		return isreadonly;
 	}
 
 	public boolean 	locatorsUpdateCopy() throws SQLException {
+		debugFunction();
 		// FIXME: no idea, probably db-specific
-		return false;
+		boolean	locatorsupdatecopy=false;
+		debugPrintln("  locators update copy: "+locatorsupdatecopy);
+		return locatorsupdatecopy;
 	}
 
 	public boolean 	nullPlusNonNullIsNull() throws SQLException {
+		debugFunction();
 		// FIXME: generally true, but probably db-specific
-		return true;
+		boolean	nullplusnonnullisnull=true;
+		debugPrintln("  null plus non null is null: "+
+						nullplusnonnullisnull);
+		return nullplusnonnullisnull;
 	}
 
 	public boolean 	nullsAreSortedAtEnd() throws SQLException {
+		debugFunction();
 		// FIXME: generally true, but probably db-specific
-		return true;
+		boolean	nullsaresortedatend=true;
+		debugPrintln("  nulls are sorted at end: "+
+						nullsaresortedatend);
+		return nullsaresortedatend;
 	}
 
 	public boolean 	nullsAreSortedAtStart() throws SQLException {
+		debugFunction();
 		// FIXME: generally false, but probably db-specific
-		return false;
+		boolean	nullsaresortedatstart=false;
+		debugPrintln("  nulls are sorted at start: "+
+						nullsaresortedatstart);
+		return nullsaresortedatstart;
 	}
 
 	public boolean 	nullsAreSortedHigh() throws SQLException {
+		debugFunction();
 		// FIXME: generally true, but probably db-specific
-		return true;
+		boolean	nullsaresortedhigh=true;
+		debugPrintln("  nulls are sorted high: "+
+						nullsaresortedhigh);
+		return nullsaresortedhigh;
 	}
 
 	public boolean 	nullsAreSortedLow() throws SQLException {
+		debugFunction();
 		// FIXME: generally false, but probably db-specific
-		return false;
+		boolean	nullsaresortedlow=false;
+		debugPrintln("  nulls are sorted low: "+
+						nullsaresortedlow);
+		return nullsaresortedlow;
 	}
 
 	public boolean 	othersDeletesAreVisible(int type) throws SQLException {
-		return false;
+		debugFunction();
+		boolean	othersdeletesarevisible=false;
+		debugPrintln("  others deletes are visible: "+
+						othersdeletesarevisible);
+		return othersdeletesarevisible;
 	}
 
 	public boolean 	othersInsertsAreVisible(int type) throws SQLException {
-		return false;
+		debugFunction();
+		boolean	othersinsertssarevisible=false;
+		debugPrintln("  others inserts are visible: "+
+						othersinsertssarevisible);
+		return othersinsertssarevisible;
 	}
 
 	public boolean 	othersUpdatesAreVisible(int type) throws SQLException {
-		return false;
+		debugFunction();
+		boolean	othersupdatessarevisible=false;
+		debugPrintln("  others updates are visible: "+
+						othersupdatessarevisible);
+		return othersupdatessarevisible;
 	}
 
 	public boolean 	ownDeletesAreVisible(int type) throws SQLException {
-		return false;
+		debugFunction();
+		boolean	owndeletesarevisible=false;
+		debugPrintln("  own deletes are visible: "+
+						owndeletesarevisible);
+		return owndeletesarevisible;
 	}
 
 	public boolean 	ownInsertsAreVisible(int type) throws SQLException {
-		return false;
+		debugFunction();
+		boolean	owninsertsarevisible=false;
+		debugPrintln("  own inserts are visible: "+
+						owninsertsarevisible);
+		return owninsertsarevisible;
 	}
 
 	public boolean 	ownUpdatesAreVisible(int type) throws SQLException {
-		return false;
+		debugFunction();
+		boolean	ownupdatesarevisible=false;
+		debugPrintln("  own updates are visible: "+
+						ownupdatesarevisible);
+		return ownupdatesarevisible;
 	}
 
 	public boolean 	storesLowerCaseIdentifiers() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific but generally false
 		// oracle stores upper case identifiers
 		// other db's store mixed case identifiers
-		return false;
+		boolean	storeslowercaseidentifiers=false;
+		debugPrintln("  stores lower case identifiers: "+
+						storeslowercaseidentifiers);
+		return storeslowercaseidentifiers;
 	}
 
 	public boolean 	storesLowerCaseQuotedIdentifiers() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	storeslowercasequotedidentifiers=false;
+		debugPrintln("  stores lower case quoted identifiers: "+
+					storeslowercasequotedidentifiers);
+		return storeslowercasequotedidentifiers;
 	}
 
 	public boolean 	storesMixedCaseIdentifiers() throws SQLException {
+		debugFunction();
 		// FIXME: generally true, but db-specific, false for oracle
-		return true;
+		boolean	storesmixedcaseidentifiers=true;
+		debugPrintln("  stores mixed case identifiers: "+
+						storesmixedcaseidentifiers);
+		return storesmixedcaseidentifiers;
 	}
 
 	public boolean 	storesMixedCaseQuotedIdentifiers() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	storesmixedcasequotedidentifiers=true;
+		debugPrintln("  stores mixed case quoted identifiers: "+
+					storesmixedcasequotedidentifiers);
+		return storesmixedcasequotedidentifiers;
 	}
 
 	public boolean 	storesUpperCaseIdentifiers() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific but generally false
 		// oracle stores upper case identifiers
 		// other db's store mixed case identifiers
-		return false;
+		boolean	storesuppercaseidentifiers=false;
+		debugPrintln("  stores upper case identifiers: "+
+						storesuppercaseidentifiers);
+		return storesuppercaseidentifiers;
 	}
 
 	public boolean 	storesUpperCaseQuotedIdentifiers() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	storesuppercasequotedidentifiers=true;
+		debugPrintln("  stores upper case quoted identifiers: "+
+					storesuppercasequotedidentifiers);
+		return storesuppercasequotedidentifiers;
 	}
 
 	public boolean 	supportsAlterTableWithAddColumn() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsaltertablewithaddcommand=true;
+		debugPrintln("  supports alter table with add command: "+
+					supportsaltertablewithaddcommand);
+		return supportsaltertablewithaddcommand;
 	}
 
 	public boolean 	supportsAlterTableWithDropColumn() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsaltertablewithdropcommand=true;
+		debugPrintln("  supports alter table with drop command: "+
+					supportsaltertablewithdropcommand);
+		return supportsaltertablewithdropcommand;
 	}
 
 	public boolean 	supportsANSI92EntryLevelSQL() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsansi92entrylevelsql=true;
+		debugPrintln("  supports ansi92 entry level sql: "+
+						supportsansi92entrylevelsql);
+		return supportsansi92entrylevelsql;
 	}
 
 	public boolean 	supportsANSI92FullSQL() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsansi92fullsql=true;
+		debugPrintln("  supports ansi92 full sql: "+
+						supportsansi92fullsql);
+		return supportsansi92fullsql;
 	}
 
 	public boolean 	supportsANSI92IntermediateSQL() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsansi92intermediatesql=true;
+		debugPrintln("  supports ansi92 intermediate sql: "+
+						supportsansi92intermediatesql);
+		return supportsansi92intermediatesql;
 	}
 
 	public boolean 	supportsBatchUpdates() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return false;
+		boolean	supportsbatchupdates=false;
+		debugPrintln("  supports batch updates: "+supportsbatchupdates);
+		return supportsbatchupdates;
 	}
 
 	public boolean 	supportsCatalogsInDataManipulation()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportscatalogsindatamanipulation=true;
+		debugPrintln("  supports catalogs in data manipulations: "+
+					supportscatalogsindatamanipulation);
+		return supportscatalogsindatamanipulation;
 	}
 
 	public boolean 	supportsCatalogsInIndexDefinitions()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportscatalogsinindexdefinitions=true;
+		debugPrintln("  supports catalogs in index definitions: "+
+					supportscatalogsinindexdefinitions);
+		return supportscatalogsinindexdefinitions;
 	}
 
 	public boolean 	supportsCatalogsInPrivilegeDefinitions()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportscatalogsinprivilegedefinitions=true;
+		debugPrintln("  supports catalogs in privilege definitions: "+
+					supportscatalogsinprivilegedefinitions);
+		return supportscatalogsinprivilegedefinitions;
 	}
 
 	public boolean 	supportsCatalogsInProcedureCalls()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportscatalogsinprocedurecalls=true;
+		debugPrintln("  supports catalogs in procedure calls: "+
+					supportscatalogsinprocedurecalls);
+		return supportscatalogsinprocedurecalls;
 	}
 
 	public boolean 	supportsCatalogsInTableDefinitions()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportscatalogsintabledefinitions=true;
+		debugPrintln("  supports catalogs in table definitions: "+
+					supportscatalogsintabledefinitions);
+		return supportscatalogsintabledefinitions;
 	}
 
 	public boolean 	supportsColumnAliasing() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportscolumnaliasing=true;
+		debugPrintln("  supports column aliasing: "+
+					supportscolumnaliasing);
+		return supportscolumnaliasing;
 	}
 
 	public boolean 	supportsConvert() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsconvert=true;
+		debugPrintln("  supports convert: "+supportsconvert);
+		return supportsconvert;
 	}
 
 	public boolean 	supportsConvert(int fromType, int toType)
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-and-type-specific
-		return true;
+		boolean	supportsconvert=true;
+		debugPrintln("  from type: "+fromType);
+		debugPrintln("  to type: "+toType);
+		debugPrintln("  supports convert: "+supportsconvert);
+		return supportsconvert;
 	}
 
 	public boolean 	supportsCoreSQLGrammar() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportscoresqlgrammar=true;
+		debugPrintln("  supports core sql grammar: "+
+						supportscoresqlgrammar);
+		return supportscoresqlgrammar;
 	}
 
 	public boolean 	supportsCorrelatedSubqueries() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportscorrelatedsubqueries=true;
+		debugPrintln("  supports correlated subqueries: "+
+						supportscorrelatedsubqueries);
+		return supportscorrelatedsubqueries;
 	}
 
 	public boolean 	supportsDataDefinitionAndDataManipulationTransactions()
 							throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	sddadmt=true;
+		debugPrintln("  supports data definition "+
+			"and data manipulation transactions: "+sddadmt);
+		return sddadmt;
 	}
 
 	public boolean 	supportsDataManipulationTransactionsOnly()
 							throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return false;
+		boolean	sdmto=false;
+		debugPrintln("  supports data manipulation "+
+				"transactions only: "+sdmto);
+		return sdmto;
 	}
 
 	public boolean 	supportsDifferentTableCorrelationNames()
 							throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	sdtcn=true;
+		debugPrintln("  supports different table "+
+				"correlation names: "+sdtcn);
+		return sdtcn;
 	}
 
 	public boolean 	supportsExpressionsInOrderBy() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsexpressionsinorderby=true;
+		debugPrintln("  supports expressions in order by: "+
+						supportsexpressionsinorderby);
+		return supportsexpressionsinorderby;
 	}
 
 	public boolean 	supportsExtendedSQLGrammar() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsextendedsqlgrammar=true;
+		debugPrintln("  supports extended sql grammar: "+
+						supportsextendedsqlgrammar);
+		return supportsextendedsqlgrammar;
 	}
 
 	public boolean 	supportsFullOuterJoins() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsfullouterjoins=true;
+		debugPrintln("  supports full outer joins: "+
+						supportsfullouterjoins);
+		return supportsfullouterjoins;
 	}
 
 	public boolean 	supportsGetGeneratedKeys() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsgetgeneratedkeys=true;
+		debugPrintln("  supports get generated keys: "+
+						supportsgetgeneratedkeys);
+		return supportsgetgeneratedkeys;
 	}
 
 	public boolean 	supportsGroupBy() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsgroupby=true;
+		debugPrintln("  supports group by: "+supportsgroupby);
+		return supportsgroupby;
 	}
 
 	public boolean 	supportsGroupByBeyondSelect() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsgroupbybeyondselect=true;
+		debugPrintln("  supports group by beyond select: "+
+						supportsgroupbybeyondselect);
+		return supportsgroupbybeyondselect;
 	}
 
 	public boolean 	supportsGroupByUnrelated() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsgroupbyunrelated=true;
+		debugPrintln("  supports group by unrelated: "+
+						supportsgroupbyunrelated);
+		return supportsgroupbyunrelated;
 	}
 
 	public boolean 	supportsIntegrityEnhancementFacility()
 							throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return false;
+		boolean	supportsintegrityenhancementfacility=false;
+		debugPrintln("  supports integrity enhancement facility: "+
+					supportsintegrityenhancementfacility);
+		return supportsintegrityenhancementfacility;
 	}
 
 	public boolean 	supportsLikeEscapeClause() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportslikeescapeclause=true;
+		debugPrintln("  supports like escape clause: "+
+						supportslikeescapeclause);
+		return supportslikeescapeclause;
 	}
 
 	public boolean 	supportsLimitedOuterJoins() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportslimitedouterjoins=true;
+		debugPrintln("  supports limited outer joins: "+
+						supportslimitedouterjoins);
+		return supportslimitedouterjoins;
 	}
 
 	public boolean 	supportsMinimumSQLGrammar() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsminimumsqlgrammar=true;
+		debugPrintln("  supports minimum sql grammar: "+
+						supportsminimumsqlgrammar);
+		return supportsminimumsqlgrammar;
 	}
 
 	public boolean 	supportsMixedCaseIdentifiers() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific, oracle doesn't
-		return true;
+		boolean	supportsmixedcaseidentifiers=true;
+		debugPrintln("  supports mixed case identifiers: "+
+						supportsmixedcaseidentifiers);
+		return supportsmixedcaseidentifiers;
 	}
 
 	public boolean 	supportsMixedCaseQuotedIdentifiers()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsmixedcasequotedidentifiers=true;
+		debugPrintln("  supports mixed case quoted identifiers: "+
+					supportsmixedcasequotedidentifiers);
+		return supportsmixedcasequotedidentifiers;
 	}
 
 	public boolean 	supportsMultipleOpenResults() throws SQLException {
-		return true;
+		debugFunction();
+		boolean	supportsmultipleopenresults=true;
+		debugPrintln("  supports multiple open results: "+
+						supportsmultipleopenresults);
+		return supportsmultipleopenresults;
 	}
 
 	public boolean 	supportsMultipleResultSets() throws SQLException {
+		debugFunction();
 		// FIXME: in progress...
-		return false;
+		boolean	supportsmultipleresultsets=false;
+		debugPrintln("  supports multiple result sets: "+
+						supportsmultipleresultsets);
+		return supportsmultipleresultsets;
 	}
 
 	public boolean 	supportsMultipleTransactions() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	supportsmultipletransactions=false;
+		debugPrintln("  supports multiple transactions: "+
+						supportsmultipletransactions);
+		return supportsmultipletransactions;
 	}
 
 	public boolean 	supportsNamedParameters() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsnamedparameters=true;
+		debugPrintln("  supports named parameters: "+
+						supportsnamedparameters);
+		return supportsnamedparameters;
 	}
 
 	public boolean 	supportsNonNullableColumns() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsnonnullablecolumns=true;
+		debugPrintln("  supports non-nullable columns: "+
+						supportsnonnullablecolumns);
+		return supportsnonnullablecolumns;
 	}
 
 	public boolean 	supportsOpenCursorsAcrossCommit()
 						throws SQLException {
+		debugFunction();
 		// FIXME: not sure
-		return false;
+		boolean	supportsopencursorsacrosscommit=false;
+		debugPrintln("  supports open cursors across commit: "+
+					supportsopencursorsacrosscommit);
+		return supportsopencursorsacrosscommit;
 	}
 
 	public boolean 	supportsOpenCursorsAcrossRollback()
 						throws SQLException {
+		debugFunction();
 		// FIXME: not sure
-		return false;
+		boolean	supportsopencursorsacrossrollback=false;
+		debugPrintln("  supports open cursors across rollback: "+
+					supportsopencursorsacrossrollback);
+		return supportsopencursorsacrossrollback;
 	}
 
 	public boolean 	supportsOpenStatementsAcrossCommit()
 						throws SQLException {
+		debugFunction();
 		// FIXME: not sure
-		return false;
+		boolean	supportsopenstatementsacrosscommit=false;
+		debugPrintln("  supports open statements across commit: "+
+					supportsopenstatementsacrosscommit);
+		return supportsopenstatementsacrosscommit;
 	}
 
 	public boolean 	supportsOpenStatementsAcrossRollback()
 						throws SQLException {
+		debugFunction();
 		// FIXME: not sure
-		return false;
+		boolean	supportsopenstatementsacrossrollback=false;
+		debugPrintln("  supports open statements across rollback: "+
+					supportsopenstatementsacrossrollback);
+		return supportsopenstatementsacrossrollback;
 	}
 
 	public boolean 	supportsOrderByUnrelated() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsorderbyunrelated=true;
+		debugPrintln("  supports order by unrelated: "+
+					supportsorderbyunrelated);
+		return supportsorderbyunrelated;
 	}
 
 	public boolean 	supportsOuterJoins() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsouterjoins=true;
+		debugPrintln("  supports outer joins: "+supportsouterjoins);
+		return supportsouterjoins;
 	}
 
 	public boolean 	supportsPositionedDelete() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	supportspositioneddelete=false;
+		debugPrintln("  supports positioned delete: "+
+						supportspositioneddelete);
+		return supportspositioneddelete;
 	}
 
 	public boolean 	supportsPositionedUpdate() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	supportspositionedupdate=false;
+		debugPrintln("  supports positioned update: "+
+						supportspositionedupdate);
+		return supportspositionedupdate;
 	}
 
 	public boolean 	supportsResultSetConcurrency(int type,
 							int concurrency)
 							throws SQLException {
-		return (type==ResultSet.TYPE_FORWARD_ONLY &&
-			concurrency==ResultSet.CONCUR_READ_ONLY);
+		debugFunction();
+		boolean	supportsresultsetconcurrency=
+				(type==ResultSet.TYPE_FORWARD_ONLY &&
+				concurrency==ResultSet.CONCUR_READ_ONLY);
+		debugPrintln("  supports result set concurrency: "+
+						supportsresultsetconcurrency);
+		return supportsresultsetconcurrency;
 	}
 
 	public boolean 	supportsResultSetHoldability(int holdability)
 							throws SQLException {
-		return (holdability==ResultSet.CLOSE_CURSORS_AT_COMMIT);
+		debugFunction();
+		boolean	supportsresultsetholdability=
+			(holdability==ResultSet.CLOSE_CURSORS_AT_COMMIT);
+		debugPrintln("  supports result set holdability: "+
+						supportsresultsetholdability);
+		return supportsresultsetholdability;
 	}
 
 	public boolean 	supportsResultSetType(int type) throws SQLException {
-		return (type==ResultSet.TYPE_FORWARD_ONLY);
+		debugFunction();
+		boolean	supportsresultsettype=
+			(type==ResultSet.TYPE_FORWARD_ONLY);
+		debugPrintln("  supports result set type: "+
+						supportsresultsettype);
+		return supportsresultsettype;
 	}
 
 	public boolean 	supportsSavepoints() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	supportssavepoints=false;
+		debugPrintln("  supports savepoints: "+supportssavepoints);
+		return supportssavepoints;
 	}
 
 	public boolean 	supportsSchemasInDataManipulation()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsschemasindatamanipulation=true;
+		debugPrintln("  supports schemas in data manipulation: "+
+					supportsschemasindatamanipulation);
+		return supportsschemasindatamanipulation;
 	}
 
 	public boolean 	supportsSchemasInIndexDefinitions()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsschemasinindexdefinitions=true;
+		debugPrintln("  supports schemas in index definitions: "+
+					supportsschemasinindexdefinitions);
+		return supportsschemasinindexdefinitions;
 	}
 
 	public boolean 	supportsSchemasInPrivilegeDefinitions()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsschemasinprivilegedefinitions=true;
+		debugPrintln("  supports schemas in privilege definitions: "+
+					supportsschemasinprivilegedefinitions);
+		return supportsschemasinprivilegedefinitions;
 	}
 
 	public boolean 	supportsSchemasInProcedureCalls()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsschemasinprocedurecalls=true;
+		debugPrintln("  supports schemas in procedure calls: "+
+					supportsschemasinprocedurecalls);
+		return supportsschemasinprocedurecalls;
 	}
 
 	public boolean 	supportsSchemasInTableDefinitions()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsschemasintabledefinitions=true;
+		debugPrintln("  supports schemas in table definitions: "+
+					supportsschemasintabledefinitions);
+		return supportsschemasintabledefinitions;
 	}
 
 	public boolean 	supportsSelectForUpdate() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	supportsselectforupdate=false;
+		debugPrintln("  supports select for update: "+
+						supportsselectforupdate);
+		return supportsselectforupdate;
 	}
 
 	public boolean 	supportsStatementPooling() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	supportsstatementpooling=false;
+		debugPrintln("  supports statement pooling: "+
+						supportsstatementpooling);
+		return supportsstatementpooling;
 	}
 
 	public boolean 	supportsStoredFunctionsUsingCallSyntax()
 						throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return false;
+		boolean	ssfucs=false;
+		debugPrintln("  supports stored functions "+
+					"using call syntax: "+ssfucs);
+		return ssfucs;
 	}
 
 	public boolean 	supportsStoredProcedures() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsstoredprocedures=true;
+		debugPrintln("  supports stored procedures: "+
+						supportsstoredprocedures);
+		return supportsstoredprocedures;
 	}
 
 	public boolean 	supportsSubqueriesInComparisons() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportssubqueriesincomparisons=true;
+		debugPrintln("  supports subqueries in comparisons: "+
+					supportssubqueriesincomparisons);
+		return supportssubqueriesincomparisons;
 	}
 
 	public boolean 	supportsSubqueriesInExists() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportssubqueriesinexists=true;
+		debugPrintln("  supports subqueries in exists: "+
+						supportssubqueriesinexists);
+		return supportssubqueriesinexists;
 	}
 
 	public boolean 	supportsSubqueriesInIns() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportssubqueriesinins=true;
+		debugPrintln("  supports subqueries in ins: "+
+						supportssubqueriesinins);
+		return supportssubqueriesinins;
 	}
 
 	public boolean 	supportsSubqueriesInQuantifieds() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportssubqueriesinquantifieds=true;
+		debugPrintln("  supports subqueries in quantifieds: "+
+					supportssubqueriesinquantifieds);
+		return supportssubqueriesinquantifieds;
 	}
 
 	public boolean 	supportsTableCorrelationNames() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportssubqueriesincorrelationnames=true;
+		debugPrintln("  supports subqueries in correlation names: "+
+					supportssubqueriesincorrelationnames);
+		return supportssubqueriesincorrelationnames;
 	}
 
 	public boolean 	supportsTransactionIsolationLevel(int level)
 							throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportstransactionisolationlevel=true;
+		debugPrintln("  supports transaction isolation level: "+
+					supportstransactionisolationlevel);
+		return supportstransactionisolationlevel;
 	}
 
 	public boolean 	supportsTransactions() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportstransactions=true;
+		debugPrintln("  supports transactions: "+supportstransactions);
+		return supportstransactions;
 	}
 
 	public boolean 	supportsUnion() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsunion=true;
+		debugPrintln("  supports union: "+supportsunion);
+		return supportsunion;
 	}
 
 	public boolean 	supportsUnionAll() throws SQLException {
+		debugFunction();
 		// FIXME: db-specific
-		return true;
+		boolean	supportsunionall=true;
+		debugPrintln("  supports union all: "+supportsunionall);
+		return supportsunionall;
 	}
 
 	public boolean 	updatesAreDetected(int type) throws SQLException {
-		return false;
+		debugFunction();
+		boolean	updatesaredetected=false;
+		debugPrintln("  updates are detected: "+updatesaredetected);
+		return updatesaredetected;
 	}
 
 	public boolean 	usesLocalFilePerTable() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	useslocalfilepertable=false;
+		debugPrintln("  uses local file per table: "+
+						useslocalfilepertable);
+		return useslocalfilepertable;
 	}
 
 	public boolean 	usesLocalFiles() throws SQLException {
-		return false;
+		debugFunction();
+		boolean	useslocalfiles=false;
+		debugPrintln("  uses local files: "+useslocalfiles);
+		return useslocalfiles;
 	}
 
 	public boolean	isWrapperFor(Class<?> iface) throws SQLException {
-		// FIXME: implement this for SQLRCursor
+		debugFunction();
 		return false;
 	}
 
 	public <T> T	unwrap(Class<T> iface) throws SQLException {
-		// FIXME: implement this for SQLRCursor
+		debugFunction();
 		return null;
 	}
 };

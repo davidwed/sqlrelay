@@ -68,7 +68,6 @@ print("\n");
 $cur->sendQuery("drop table testtable");
 
 print("CREATE TEMPTABLE: \n");
-#$con->debugOn();
 checkSuccess($cur->sendQuery("create table testtable (testnumber number, testchar char(40), testvarchar varchar2(40), testdate date, testlong long, testclob clob, testblob blob)"),1);
 print("\n");
 
@@ -898,3 +897,5 @@ checkSuccess($cur->sendQuery("create table testtable"),0);
 checkSuccess($cur->sendQuery("create table testtable"),0);
 checkSuccess($cur->sendQuery("create table testtable"),0);
 print("\n");
+
+exit(0);

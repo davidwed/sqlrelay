@@ -1,5 +1,52 @@
-1.6.1 - added postgresql protocol module
+1.8.0 - unattended tests
+	added sqlrresultsetdomnode class to c++ client API
+	fixed datedelimiters parameter
+	added support for SQLParamOptions with SQLUINTEGER arguments
+	sqlr-import detects uppercase .CSV suffix now
+	fixed a csv number-detection but in sqlr-import
+	fixed a delete[] of a const in sqlr-import
+	it's possible to specify a commitcount of 0 with sqlr-import now
+	moved sqlrimportxml/csv classes into libsqlrclient
+	moved sqlrexportxml/csv classes into libsqlrclient
+	csv import/export is consistent now
+	added some event methods to sqlrexport
+	migrated parsedatetime functions to rudiments datetime class
+	different postgresql cursors use different stmtNames now
+	sqlrimportcsv can create a primary key that's not in the CSV now
+	sqlrexportcsv quotes 12+ digit numbers now
+	fixed subtle, count-related issues when validating bind variables on
+		the client side, that could cause a hang
+	added an aes128 pwdenc module
+	applied a patch to fix a crash in the debug logger (missing "%s")
+	added a tweak to getsitearchdir.rb to fix incorrect lib/lib64 reporting
+		on some centos x64 systems
+	fixed mysql getColumnList to distinquish proper db/schema
+
+1.7.0 - added postgresql protocol module
 	updated postgresql connection module to get column info pre-execute
+	fixed postgresql connection module type oid bug
+	added tag filter/moduledata
+	added moduledata(s)::closeResultSet()/endTransaction()/endSession()
+	mysql protocol returns empty lobs correctly now (not as nulls)
+	configure replaces -lfbclient with -lgds on freebsd/firebird-2.0.3
+	fixed a bug that could cause sqlr-stop to try to kill pid 0
+	fixed unixodbc detection on solaris 11.4
+	added configure test for PQdescribePrepared
+	test improvements
+	documentation improvements
+	split sqlrelay-crash directive into its own module
+	deprecated drop-in replacement libraries in favor of protocol support
+	fixed various mysql 4.x bugs
+	sqlr-status creates statistics on heap now instead of stack, to work
+		on platforms with a small default ulimit stack
+	mysql stored procedure test is bypassed for older mysql
+	tls test is bypassed for older openssl
+
+1.6.1 - added NULL handoff socket workaround
+	improved shutdown/crash handlers for sqlr-listener/connection
+	fixed hang when more-than-one address was specified in the
+		instance:addresses attribute
+	*_null used instead of *_unset on PHP 7.4
 
 1.6.0 - added begin, commit, rollback events
 	fixed array_init() calls for php-7.3

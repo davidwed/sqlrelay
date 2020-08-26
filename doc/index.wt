@@ -17,12 +17,12 @@
  [features/ha.html High Availability] - provides load balancing and failover with replicated or clustered databases[[br]]
  [features/queryrouting.html Query Routing] - conditionally sends queries to one database or another[[br]]
  [features/queryfiltering.html Query Filtering] - prevents queries that match certain patterns from being run at all[[br]]
+ [features/querytranslation.html Query Translation] - modifies queries before passing them to the database[[br]]
  [features/schedules.html Connection Schedules] - constrain database access to specified times[[br]]
 
  [features/databases.html Database Support] - a wide variety of commercial and open-source databases are supported[[br]]
+ [features/nativeprotocol.html Native Database Protocol Support] - allow !MySQL/MariaDB and !PostgreSQL applications to use SQL Relay without modification[[br]]
  [features/dbabstractionlayers.html Abstraction Layer Support] - drivers for most popular database abstraction layers are provided[[br]]
- [features/dropinreplacementlibs.html Drop-In Replacement Libraries] - allow many native !MySQL/MariaDB or !PostgreSQL applications to use SQL Relay without modification[[br]]
- [features/nativeprotocol.html MySQL Front-End Modules] - allow !MySQL/MariaDB applications to use SQL Relay without modification and without a drop-in replacement library[[br]]
  [features/languages.html Native API] - the powerful native SQL Relay client API supports a wide variety of programming languages[[br]]
 
  [features/substitutionandbindvars.html Substitution and Bind Variables] - make frequently run queries faster and more efficient[[br]]
@@ -48,7 +48,6 @@ Guides and references for SQL Relay administration.
  [admin/installing.html Building and Installing SQL Relay From Source][[br]]
  [admin/installingpkg.html Installing SQL Relay From Packages][[br]]
  [admin/configguide.html SQL Relay Configuration Guide][[br]]
- [admin/configure_mysql_frontend.html Configuring the MySQL Front-End Modules][[br]]
  [admin/configreference.html SQL Relay Configuration Reference][[br]]
  [admin/running.html SQL Relay Command Line Programs][[br]]
  [admin/tuning.html Tuning SQL Relay][[br]]
@@ -139,10 +138,3 @@ The native SQL Relay client APIs provide advanced features like suspended sessio
  [api/nodejs/html/annotated.html node.js][[br]]
 }}}
 }}}
-
-==== Drop-In Replacement Libraries ====
-
-Drop-In Replacement Libraries allow many native !MySQL/MariaDB or !PostgreSQL applications to use SQL Relay without modification.
-
- [dropin/mysql.html MySQL/MariaDB][[br]]
- [dropin/postgresql.html PostgreSQL][[br]]

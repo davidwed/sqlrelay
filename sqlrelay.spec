@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.6.1
+Version: 1.8.0
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: gcc-c++, rudiments-devel >= 1.2.0, systemd
+BuildRequires: gcc-c++, rudiments-devel >= 1.3.0, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -19,8 +19,8 @@ load balancing and query routing/filtering system for Unix and Linux supporting
 ODBC, Oracle, MySQL, PostgreSQL, SAP/Sybase, MS SQL Server, IBM DB2, Informix, 
 Firebird, SQLite and MS Access (minimally) with APIs for C, C++, .NET, Perl, 
 Perl-DBI, Python, Python-DB, PHP, PHP PDO, Ruby, Java, TCL, Erlang, and node.js,
-ODBC and ADO.NET drivers, drop-in replacement libraries for MySQL and
-PostgreSQL, command line clients and extensive documentation.  The APIs support
+ODBC and ADO.NET drivers, native support for MySQL and PostgreSQL client
+protocols, command line clients and extensive documentation.  The APIs support
 advanced database operations such as bind variables, multi-row fetches,
 client-side result set caching and suspended transactions.  It is ideal for
 speeding up database-driven web-based applications, accessing databases from
@@ -259,27 +259,10 @@ Mono bindings for the SQL Relay client API and ADO.NET driver.
 License: LGPLv2
 Summary: Nodejs bindings for the SQL Relay client API
 ExclusiveArch: %{nodejs_arches}
-BuildRequires: nodejs-packaging, node-gyp, nodejs-devel
+BuildRequires: nodejs-packaging, nodejs-devel
 
 %description -n nodejs-%{name}
 Nodejs bindings for the SQL Relay client API.
-
-
-%package dropin-mysql
-License: GPLv2
-Summary: Drop in replacement library that redirects MySQL clients to SQL Relay
-
-%description dropin-mysql
-Drop in replacement library that redirects MySQL clients to SQL Relay.
-
-
-%package dropin-postgresql
-License: PostgreSQL
-Summary: Drop in replacement library that redirects PostgreSQL clients to SQL Relay
-BuildRequires: postgresql-devel
-
-%description dropin-postgresql
-Drop in replacement library that redirects PostgreSQL clients to SQL Relay.
 
 
 %package oracle
@@ -358,6 +341,8 @@ BuildRequires: firebird-devel
 %description firebird
 Firebird back-end module for SQL Relay.
 
+
+%if 0%{?fedora} || 0%{?rhel} < 8
 %package mdbtools
 License: GPLv2 with exceptions
 Summary: MDB Tools back-end module for SQL Relay
@@ -365,6 +350,7 @@ BuildRequires: mdbtools-devel
 
 %description mdbtools
 MDB Tools back-end module for SQL Relay.
+%endif
 
 
 %package informix
@@ -481,9 +467,10 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-scaler
 %{_bindir}/sqlr-start
 %{_bindir}/sqlr-stop
+%{_bindir}/sqlr-status
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver.so.8
-%{_libdir}/libsqlrserver.so.8.*
+%{_libdir}/libsqlrserver.so.11
+%{_libdir}/libsqlrserver.so.11.*
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
@@ -506,6 +493,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/sqlr-scaler.*
 %{_mandir}/*/sqlr-start.*
 %{_mandir}/*/sqlr-stop.*
+%{_mandir}/*/sqlr-status.*
 %{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
@@ -536,6 +524,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrlogger.h
 %{_includedir}/%{name}/private/sqlrloggers.h
 %{_includedir}/%{name}/private/sqlrmysqlcredentials.h
+%{_includedir}/%{name}/private/sqlrpostgresqlcredentials.h
 %{_includedir}/%{name}/private/sqlrmoduledata.h
 %{_includedir}/%{name}/private/sqlrmoduledatas.h
 %{_includedir}/%{name}/private/sqlrnotification.h
@@ -574,6 +563,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrdirectives.h
 %{_includedir}/%{name}/private/sqlrresultsetheadertranslation.h
 %{_includedir}/%{name}/private/sqlrresultsetheadertranslations.h
+%{_includedir}/%{name}/private/sqlrmoduledata*.h
 %{_libdir}/libsqlrserver.so
 %exclude %{_libdir}/lib*.la
 
@@ -581,11 +571,9 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import
-%{_bindir}/sqlr-status
 %{_mandir}/*/sqlrsh.*
 %{_mandir}/*/sqlr-export.*
 %{_mandir}/*/sqlr-import.*
-%{_mandir}/*/sqlr-status.*
 
 %files cachemanager
 %{_unitdir}/sqlrcachemanager.service
@@ -600,8 +588,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %systemd_preun %{name}cachemanager.service
 
 %files common
-%{_libdir}/libsqlrutil.so.8
-%{_libdir}/libsqlrutil.so.8.*
+%{_libdir}/libsqlrutil.so.11
+%{_libdir}/libsqlrutil.so.11.*
 
 %files common-devel
 %dir %{_includedir}/%{name}
@@ -611,12 +599,12 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_libdir}/libsqlrutil.so
 
 %files c++
-%{_libdir}/libsqlrclient.so.5
-%{_libdir}/libsqlrclient.so.5.*
+%{_libdir}/libsqlrclient.so.6
+%{_libdir}/libsqlrclient.so.6.*
 
 %files c
-%{_libdir}/libsqlrclientwrapper.so.5
-%{_libdir}/libsqlrclientwrapper.so.5.*
+%{_libdir}/libsqlrclientwrapper.so.6
+%{_libdir}/libsqlrclientwrapper.so.6.*
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
@@ -626,6 +614,27 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrclientincludes.h
 %{_includedir}/%{name}/private/sqlrconnection.h
 %{_includedir}/%{name}/private/sqlrcursor.h
+%{_includedir}/%{name}/sqlrresultsetdomnode.h
+%{_includedir}/%{name}/private/sqlrresultsetdomnode.h
+%{_includedir}/%{name}/private/sqlrresultsetdomnodeincludes.h
+%{_includedir}/%{name}/sqlrimport.h
+%{_includedir}/%{name}/sqlrimportcsv.h
+%{_includedir}/%{name}/sqlrimportxml.h
+%{_includedir}/%{name}/private/sqlrimport.h
+%{_includedir}/%{name}/private/sqlrimportincludes.h
+%{_includedir}/%{name}/private/sqlrimportcsv.h
+%{_includedir}/%{name}/private/sqlrimportcsvincludes.h
+%{_includedir}/%{name}/private/sqlrimportxml.h
+%{_includedir}/%{name}/private/sqlrimportxmlincludes.h
+%{_includedir}/%{name}/sqlrexport.h
+%{_includedir}/%{name}/sqlrexportcsv.h
+%{_includedir}/%{name}/sqlrexportxml.h
+%{_includedir}/%{name}/private/sqlrexport.h
+%{_includedir}/%{name}/private/sqlrexportincludes.h
+%{_includedir}/%{name}/private/sqlrexportcsv.h
+%{_includedir}/%{name}/private/sqlrexportcsvincludes.h
+%{_includedir}/%{name}/private/sqlrexportxml.h
+%{_includedir}/%{name}/private/sqlrexportxmlincludes.h
 %{_libdir}/libsqlrclient.so
 %{_libdir}/pkgconfig/%{name}-c++.pc
 %exclude %{_libdir}/lib*.la
@@ -642,8 +651,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %exclude %{_libdir}/lib*.la
 
 %files -n odbc-%{name}
-%{_libdir}/libsqlrodbc.so.5
-%{_libdir}/libsqlrodbc.so.5.*
+%{_libdir}/libsqlrodbc.so.6
+%{_libdir}/libsqlrodbc.so.6.*
 %{_libdir}/libsqlrodbc.so
 
 %files -n perl-%{name}
@@ -660,7 +669,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/DBD::SQLRelay.*
 
 
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel} > 7
 
 %files -n python3-%{name}
 %dir %{python3_sitearch}/SQLRelay/__pycache__
@@ -723,13 +732,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %files -n nodejs-%{name}
 %{nodejs_sitearch}/%{name}
 
-
-%files dropin-mysql
-%{_libdir}/libmysql*%{name}.so.*
-
-%files dropin-postgresql
-%{_libdir}/libpq%{name}.so.*
-
 %files oracle
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_oracle*
@@ -769,10 +771,11 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_firebird*
 
+%if 0%{?fedora} || 0%{?rhel} < 8
 %files mdbtools
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_mdbtools*
-
+%endif
 
 %files informix
 %dir %{_libexecdir}/%{name}
@@ -792,8 +795,20 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon Aug 12 2019 David Muse <david.muse@firstworks.com> - 1.6.1-1
-- Updated to version 1.6.1.
+* Mon Aug 24 2020 David Muse <david.muse@firstworks.com> - 1.8.0-1
+- Updated to not require node-gyp.
+- Updated to not build mdbtools packages on rhel 8.
+- Fixed bug that prevented python 3 packages from being build on rhel 8.
+- Updated to version 1.8.0.
+- Added sqlrresultsetdomnode to C++ API.
+- Added sqlrimport/export to C++ API.
+
+* Fri Nov  8 2019 David Muse <david.muse@firstworks.com> - 1.7.0-1
+- Updated to version 1.7.0.
+- Removed drop-in replacement library packages.
+- Updated library versions.
+- Added some new header files.
+- Moved sqlr-status from sqlrelay-clients package to sqlrelay package.
 
 * Fri Jun 28 2019 David Muse <david.muse@firstworks.com> - 1.6.0-1
 - Updated to version 1.6.0.

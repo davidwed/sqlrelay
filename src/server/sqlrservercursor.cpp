@@ -356,8 +356,8 @@ void sqlrservercursor::dateToString(char *buffer, uint16_t buffersize,
 	}
 
 	// FIXME: it'd be nice if we could pass buffer/buffersize
-	// into convertDateTime
-	char	*newdate=conn->cont->convertDateTime(format,
+	// into this
+	char	*newdate=datetime::formatAs(format,
 						year,month,day,
 						hour,minute,second,
 						microsecond,isnegative);

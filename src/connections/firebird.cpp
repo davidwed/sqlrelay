@@ -405,6 +405,20 @@ bool firebirdconnection::logIn(const char **err, const char **warning) {
 					const_cast<char *>(database),&db,
 					dpblength,dpb)) {
 		db=0L;
+
+		errormsg.clear();
+
+		char		msg[512];
+		ISC_STATUS	*errstatus=error;
+		bool		first=false;
+		while (isc_interprete(msg,&errstatus)) {
+			if (first) {
+				errormsg.append(": ");
+			}
+			errormsg.append(msg);
+			first=true;
+		}
+		*err=errormsg.getString();
 		return false;
 	}
 

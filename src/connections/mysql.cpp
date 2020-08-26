@@ -153,6 +153,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 
 		bool		columnInfoIsValidAfterPrepare();
 
+		void		encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize);
+
 		MYSQL_RES	*mysqlresult;
 		MYSQL_FIELD	**mysqlfields;
 		unsigned int	ncols;
@@ -274,12 +277,16 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		char	*dbversion;
 		char	*dbhostname;
 
+		stringbuffer	columnlistquery;
+
 		static const my_bool	mytrue;
 		static const my_bool	myfalse;
 
 		bool		firstquery;
 
 		stringbuffer	loginerror;
+
+		bool		escapeblobs;
 };
 
 extern "C" {
@@ -416,6 +423,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	#ifdef CLIENT_MULTI_STATEMENTS
 		clientflag|=CLIENT_MULTI_STATEMENTS;
 	#endif
+//clientflag|=(1UL << 17);
 	#ifdef CLIENT_FOUND_ROWS
 		if (foundrows) {
 			clientflag|=CLIENT_FOUND_ROWS;
@@ -563,11 +571,14 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 #endif
 	connected=true;
 
-#ifdef HAVE_MYSQL_STMT_PREPARE
-	// fake binds when connected to older servers
+	// get server version to decide whether to fake binds and how to
+	// escape blobs
+	escapeblobs=false;
 #ifdef HAVE_MYSQL_GET_SERVER_VERSION
-	if (mysql_get_server_version(mysqlptr)<40102) {
+	unsigned long	serverversion=mysql_get_server_version(mysqlptr);
+	if (serverversion<40102) {
 		cont->setFakeInputBinds(true);
+		escapeblobs=true;
 	}
 #else
 	char		**list;
@@ -582,7 +593,9 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 		if (major>4 || (major==4 && minor>1) ||
 				(major==4 && minor==1 && patch>=2)) {
 			cont->setFakeInputBinds(true);
-		} 
+		}  else {
+			escapeblobs=true;
+		}
 		for (uint64_t index=0; index<listlen; index++) {
 			delete[] list[index];
 		}
@@ -598,8 +611,6 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	} else {
 		dbhostname=charstring::duplicate(hostinfo);
 	}
-
-#endif
 
 #ifdef HAVE_MYSQL_SET_CHARACTER_SET
 	// set the character set
@@ -668,24 +679,19 @@ const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 
 const char *mysqlconnection::getColumnListQuery(
 					const char *table, bool wild) {
-	return (wild)?"select "
-			"	column_name, "
-			"	data_type, "
-			"	character_maximum_length, "
-			"	numeric_precision, "
-			"	numeric_scale, "
-			"	is_nullable, "
-			"	column_key, "
-			"	column_default, "
-			"	extra, "
-			"	NULL "
-			"from "
-			"	information_schema.columns "
-			"where "
-			"	table_name='%s' "
-			"	and "
-			"	column_name like '%s'"
-			:
+
+	// split the table name into db/schema/table parts
+	const char	*currentdb="def";
+	char	*currentschema=getCurrentDatabase();
+	char	*dbname=NULL;
+	char	*schemaname=NULL;
+	char	*tablename=NULL;
+	cont->splitObjectName(currentdb,currentschema,table,
+				&dbname,&schemaname,&tablename);
+
+	// FIXME: use db/schema/tablename here
+	columnlistquery.clear();
+	columnlistquery.append(
 			"select "
 			"	column_name, "
 			"	data_type, "
@@ -700,7 +706,30 @@ const char *mysqlconnection::getColumnListQuery(
 			"from "
 			"	information_schema.columns "
 			"where "
-			"	table_name='%s' ";
+			"	table_catalog='");
+	columnlistquery.append(dbname);
+	columnlistquery.append(
+			"' "
+			"	and "
+			"	table_schema='");
+	columnlistquery.append(schemaname);
+	columnlistquery.append(
+			"' "
+			"	and "
+			"	table_name='%s' ");
+	if (wild) {
+		columnlistquery.append(
+			"	and "
+			"	column_name like '%s'");
+	}
+
+	// clean up
+	delete[] currentschema;
+	delete[] dbname;
+	delete[] schemaname;
+	delete[] tablename;
+
+	return columnlistquery.getString();
 }
 
 const char *mysqlconnection::selectDatabaseQuery() {
@@ -731,6 +760,33 @@ bool mysqlconnection::isTransactional() {
 bool mysqlconnection::autoCommitOn() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
 	return !mysql_autocommit(mysqlptr,true);
+#elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
+
+	// re-init error data
+	cont->clearError();
+
+	// init some variables
+	const char	*query="set autocommit=1";
+	int		querylen=16;
+
+	// run the query...
+	sqlrservercursor	*cur=cont->newCursor();
+	bool	retval=(cur->open() &&
+			cur->prepareQuery(query,querylen) &&
+			cur->executeQuery(query,querylen));
+
+	// If there was an error, copy it out.  We'll be destroying the
+	// cursor in a moment and the error will be lost otherwise.
+	if (!retval) {
+		cont->saveErrorFromCursor(cur);
+	}
+
+	// clean up
+	cur->closeResultSet();
+	cur->close();
+	cont->deleteCursor(cur);
+
+	return retval;
 #else
 	// do nothing
 	return true;
@@ -740,6 +796,33 @@ bool mysqlconnection::autoCommitOn() {
 bool mysqlconnection::autoCommitOff() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
 	return !mysql_autocommit(mysqlptr,false);
+#elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
+
+	// re-init error data
+	cont->clearError();
+
+	// init some variables
+	const char	*query="set autocommit=0";
+	int		querylen=16;
+
+	// run the query...
+	sqlrservercursor	*cur=cont->newCursor();
+	bool	retval=(cur->open() &&
+			cur->prepareQuery(query,querylen) &&
+			cur->executeQuery(query,querylen));
+
+	// If there was an error, copy it out.  We'll be destroying the
+	// cursor in a moment and the error will be lost otherwise.
+	if (!retval) {
+		cont->saveErrorFromCursor(cur);
+	}
+
+	// clean up
+	cur->closeResultSet();
+	cur->close();
+	cont->deleteCursor(cur);
+
+	return retval;
 #else
 	// do nothing
 	return true;
@@ -753,6 +836,9 @@ bool mysqlconnection::supportsAutoCommit() {
 bool mysqlconnection::commit() {
 #ifdef HAVE_MYSQL_COMMIT
 	return !mysql_commit(mysqlptr);
+#elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
+	// 4.x supports transactions but doesn't have a mysql_commit function
+	return sqlrserverconnection::commit();
 #else
 	// do nothing
 	return true;
@@ -762,6 +848,9 @@ bool mysqlconnection::commit() {
 bool mysqlconnection::rollback() {
 #ifdef HAVE_MYSQL_ROLLBACK
 	return !mysql_rollback(mysqlptr);
+#elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
+	// 4.x supports transactions but doesn't have a mysql_rollback function
+	return sqlrserverconnection::rollback();
 #else
 	// do nothing
 	return true;
@@ -943,8 +1032,11 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// connected directly to mysql
 	// FIXME: is this necessary since queryIsNotSelect() returns true?
 	if (mysqlconn->firstquery) {
-		mysqlconn->commit();
+		// NOTE: Set firstquery to false before calling commit().  So
+		// that it won't loop up if commit() needs to run a COMMIT
+		// query (which will require calling prepareQuery()).
 		mysqlconn->firstquery=false;
+		mysqlconn->commit();
 	}
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
@@ -1485,12 +1577,17 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		case FIELD_TYPE_STRING:
 			return STRING_DATATYPE;
 		case FIELD_TYPE_VAR_STRING:
-			//return CHAR_DATATYPE;
 			return VARSTRING_DATATYPE;
 		case FIELD_TYPE_DECIMAL:
 			return DECIMAL_DATATYPE;
 #ifdef HAVE_MYSQL_FIELD_TYPE_NEWDECIMAL
 		case FIELD_TYPE_NEWDECIMAL:
+			return DECIMAL_DATATYPE;
+#else
+		case 246:
+			// the FIELD_TYPE_NEWDECIMAL enum isn't defined on
+			// MySQL 4.x but the number 246 (the value of that
+			// enum) is used
 			return DECIMAL_DATATYPE;
 #endif
 		case FIELD_TYPE_TINY:
@@ -1540,25 +1637,27 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		case FIELD_TYPE_TINY_BLOB:
 			return TINY_BLOB_DATATYPE;
 		case FIELD_TYPE_BLOB:
-			// I originally thought that these were the
-			// lengths...
-			/*if (mysqlfields[col]->length<256) {
-				return TINY_BLOB_DATATYPE;
-			} else if (mysqlfields[col]->length<65536) {
-				return BLOB_DATATYPE;
-			} else if (mysqlfields[col]->length<16777216) {
-				return MEDIUM_BLOB_DATATYPE;
-			} else {
-				return LONG_BLOB_DATATYPE;
-			}*/
-			// But it appears that some platforms have larger
-			// lengths.  These appear to work most reliably...
+			#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=50000
 			if (mysqlfields[col]->length<766) {
 				return TINY_BLOB_DATATYPE;
 			} else if (mysqlfields[col]->length<196606) {
 				return BLOB_DATATYPE;
 			} else if (mysqlfields[col]->length<50441646) {
 				return MEDIUM_BLOB_DATATYPE;
+			#else
+			// MySQL 4 and lower uses these lengths for tiny and
+			// blob datatypes.  Medium and long both have the same
+			// length but are distinguishable by their max_lengths
+			// of 11 and 9 respectively.  No idea what the 11 and 9
+			// actually mean.
+			if (mysqlfields[col]->length<256) {
+				return TINY_BLOB_DATATYPE;
+			} else if (mysqlfields[col]->length<65536) {
+				return BLOB_DATATYPE;
+			} else if (mysqlfields[col]->length<16777216 &&
+					mysqlfields[col]->max_length==11) {
+				return MEDIUM_BLOB_DATATYPE;
+			#endif
 			} else {
 				return LONG_BLOB_DATATYPE;
 			}
@@ -1576,7 +1675,6 @@ uint32_t mysqlcursor::getColumnLength(uint32_t col) {
 	switch (getColumnType(col)) {
 		case STRING_DATATYPE:
 			return (uint32_t)mysqlfields[col]->length;
-		//case CHAR_DATATYPE:
 		case VARSTRING_DATATYPE:
 			return (uint32_t)mysqlfields[col]->length+1;
 		case DECIMAL_DATATYPE:
@@ -1895,4 +1993,45 @@ void mysqlcursor::closeResultSet() {
 
 bool mysqlcursor::columnInfoIsValidAfterPrepare() {
 	return true;
+}
+
+void mysqlcursor::encodeBlob(stringbuffer *buffer,
+					const char *data, uint32_t datasize) {
+	if (!mysqlconn->escapeblobs) {
+		return sqlrservercursor::encodeBlob(buffer,data,datasize);
+	}
+	buffer->append('\'');
+	for (uint32_t i=0; i<datasize; i++) {
+		switch (data[i]) {
+			case '\'':
+				buffer->append('\\');
+				buffer->append('\'');
+				break;
+			case '"':
+				buffer->append('\\');
+				buffer->append('"');
+				break;
+			case '\n':
+				buffer->append('\\');
+				buffer->append('n');
+				break;
+			case '\r':
+				buffer->append('\\');
+				buffer->append('r');
+				break;
+			case '\\':
+				buffer->append('\\');
+				buffer->append('\\');
+				break;
+			case 26:
+				buffer->append('\\');
+				buffer->append('Z');
+				break;
+			default:
+				// FIXME: what about binary data?
+				buffer->append(data[i]);
+				break;
+		}
+	}
+	buffer->append('\'');
 }

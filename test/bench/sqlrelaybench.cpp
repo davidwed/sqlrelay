@@ -38,7 +38,7 @@ class sqlrelaybenchconnection : public sqlrbenchconnection {
 
 		sqlrconnection	*sqlrcon;
 
-		bool		first=true;
+		bool		first;
 };
 
 class sqlrelaybenchcursor : public sqlrbenchcursor {
@@ -86,6 +86,7 @@ sqlrelaybenchconnection::sqlrelaybenchconnection(
 	if (debug) {
 		sqlrcon->debugOn();
 	}
+	first=true;
 }
 
 sqlrelaybenchconnection::~sqlrelaybenchconnection() {

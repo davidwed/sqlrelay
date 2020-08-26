@@ -51,4 +51,8 @@ print "sitearchdir = "
 print $sitearchdir.sub(drive, "").sub("$(DESTDIR)","")
 print "\n\n"
 print "all:\n"
-print "	echo $(sitearchdir)\n"
+
+# Some platforms (centos 5 x64) incorrectly return /usr/lib rather than
+# /usr/lib64 for some component above, ultimately resulting in the wrong
+# sitearchdir.  The weird sed command below fixes that.
+print "	echo $(sitearchdir) | sed -e 's|^/usr/lib/|$(libdir)/|'\n"

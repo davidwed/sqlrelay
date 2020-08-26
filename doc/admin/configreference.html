@@ -10,6 +10,7 @@
   <li><a href="#example">Example</a></li>
   <li><a href="#tags">Tags</a></li>
   <li><a href="#attributes">Attributes</a></li>
+  <li><a href="#advanced">Advanced Configuration</a></li>
 </ul>
 
 <a name="example"/><h2>Example</h2>
@@ -25,7 +26,7 @@
 <p>A fairly comprehensive example follows.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -347,7 +348,7 @@ or a tnsnames-style expression such as:
   <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 
-<br/><a name="postgresql"/><p>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;sslmode=SSLMODE;options=OPTIONS;typemangling=MANGLING;fakebinds=FAKEBINDS;charset=CHARSET;lastinsertidfunction=LASTINSERTDFUNCTION;identity=ID"</p>
+<br/><a name="postgresql"/><p>For <b>postgresql</b> databases, the connect string syntax is "user=USER;password=PASSWORD;db=DB;host=HOST;port=PORT;sslmode=SSLMODE;options=OPTIONS;typemangling=MANGLING;tablemangling=MANGLING;fakebinds=FAKEBINDS;charset=CHARSET;lastinsertidfunction=LASTINSERTDFUNCTION;identity=ID"</p>
 
 <ul>
   <li><b>user</b>: The username SQL Relay should use to log into the database.  Required.</li>
@@ -358,6 +359,7 @@ or a tnsnames-style expression such as:
   <li><b>sslmode</b>: The ssl mode of the connection.  Optional, defaults to disable (ie. not to use ssl).  Valid values include disable, allow, prefer, require, verify-ca and verify-full.  See <a target="_blank" href="http://www.postgresql.org/docs/devel/static/libpq-ssl.html#LIBPQ-SSL-SSLMODE-STATEMENTS">SSL Mode Descriptions</a> for more information.  If a mode other than disable is used, certificate and key files must be present in ~/.postgresql (in the home directory of the user that sqlrelay is running as).  See <a target="_blank" href="http://www.postgresql.org/docs/devel/static/libpq-ssl.html#LIBPQ-SSL-FILE-USAGE">SSL Client File Usage</a> for more information.</li>
   <li><b>options</b>: Command line options to be sent to the server.  Optional.</li>
   <li><b>typemangling</b>: If set to "yes" then column types are translated to standard types.  If set to "lookup" then the pg_type table is queried at startup and column type names are returned as they appear in that table.  By default (or if set to "no"), the type number is returned.</li>
+  <li><b>tablemangling</b>: If set to "lookup" then the pg_class table is queried at startup and table names are returned as they appear in that table for the table associated with a column.  By default (or if set to "no"), then the table number is returned.</li>
   <li><b>fakebinds</b>: Postgresql 8 supports bind variables natively.  Versions prior to 8 did not, and SQL Relay had to substitute the values of bind variables into the query itself (fake binds).  In Postgresql 8, bind variables are identified by $1, $2, $3, etc. in the query, while in versions prior to 8, bind variables are identified by :var1, :var2, :var3, etc.  Converting queries and code which was written to use Postgresql 7 syntax to use Postgresql 8 syntax can be a lot of work, so this parameter is provided to make code which was written to run against Postgresql 7 work against Postgresql 8.  This parameter may be set to "yes" (meaning allow only Postgresql 7 syntax and fake binds) or "no" (meaning only allow Postgresql 8 syntax and use native binds).</li>
   <li><b>charset</b>: The character set to translate data coming out of the database into.  Optional.</li>
   <li><b>lastinsertidfunction</b>: Many databases support auto-increment columns (also called serial or identity columns) and after an insert into a table containing one, the id that was generated may be retrieved via some stored procedure call, api call or special variable.  Postgresql doesn't support auto-increment columns but they can be simulated using triggers and sequences.  Trigger-sequence packages are often developed when migrating from a database that supports auto-increment columns to Postgresql.  When implementing a trigger-sequence package, it is possible to store the value that was most-recently fetched from the sequence in a package-local variable and provide a function to access it.  This parameter allows you to specify that function so that a call to getLastInsertId() by a SQL Relay client will return whatever value is returned by that function.</li>
@@ -411,9 +413,11 @@ or a tnsnames-style expression such as:
 
 <ul>
   <li><b>db</b>: The filename of the database open.  Required.</li>
-  <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
-</li>
+  <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
 </ul>
 
+<a name="advanced"/><h2>Advanced Configuration</h2>
+
+SQL Relay is highly modular, and there are additional tags and attributes that direct SQL Relay to load various filtering, translation, query routing, logging, notification, and other modules.  These are described in detail in the <a href="configguide.html">SQL Relay Configuration Guide</a>.
 </body>
 </html>

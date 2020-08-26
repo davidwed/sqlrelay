@@ -523,6 +523,7 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlruserpasswordcredentials.h $(includedir)/sqlrelay/private/sqlruserpasswordcredentials.h
 	$(CP) sqlrelay/private/sqlrmoduledata.h $(includedir)/sqlrelay/private/sqlrmoduledata.h
 	$(CP) sqlrelay/private/sqlrmoduledatas.h $(includedir)/sqlrelay/private/sqlrmoduledatas.h
+	$(CP) sqlrelay/private/sqlrmoduledata_tag.h $(includedir)/sqlrelay/private/sqlrmoduledata_tag.h
 	$(CP) sqlrelay/private/sqlrmysqlcredentials.h $(includedir)/sqlrelay/private/sqlrmysqlcredentials.h
 	$(CP) sqlrelay/private/sqlrpostgresqlcredentials.h $(includedir)/sqlrelay/private/sqlrpostgresqlcredentials.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrauth.h

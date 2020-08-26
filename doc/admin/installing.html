@@ -113,13 +113,30 @@ tar xf sqlrelay-X.XX.tar</b>
 <b>configure<br/>
 make</b>
 </blockquote>
-<p>The configure script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.  It also takes the --prefix option in case you want to install it somewhere other than /usr/local/firstworks.  For example:</p>
+<p>The configure script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.</p>
+
+<p>The configure script also takes the --prefix option in case you want to install it somewhere other than /usr/local/firstworks.  For example:</p>
 
 <blockquote>
 <b>configure --prefix=/usr/local</b>
 </blockquote>
 <p>This invocation would cause the libraries to be installed in /usr/local/lib, the header files in /usr/local/include, the binaries and scripts to be installed in /usr/local/bin, etc.</p>
 
+<p>To configure a build where only the client components are compiled, you can use the following option to disable the server components:</p>
+
+<blockquote>
+<b>configure --disable-server</b>
+</blockquote>
+<p>To configure a build where only the client command line programs are compiled, you can use the following options to disable the server components and client API's:</p>
+
+<blockquote>
+<b>configure --disable-server --disable-perl --disable-python --disable-php --disable-ruby --disable-tcl --disable-erlang --disable-mono --disable-java --disable-nodejs --disable-odbc-driver --disable-mysql-drop-in --disable-postgresql-drop-in</b>
+</blockquote>
+<p>To configure a build where only the server components are compiled, you can use the following options to disable everything but the server components:</p>
+
+<blockquote>
+<b>configure --disable-server --disable-perl --disable-python --disable-php --disable-ruby --disable-tcl --disable-erlang --disable-mono --disable-java --disable-nodejs --disable-odbc-driver --disable-mysql-drop-in --disable-postgresql-drop-in --disable-cmdline</b>
+</blockquote>
 <p>There are also options for using cross-compilers and enabling debug and profiling.  To see the full list of available options, run:</p>
 
 <blockquote>
@@ -171,6 +188,21 @@ nmake</b>
 </blockquote>
 <p>The configure.vbs script takes several command line options, most of which tell it where to find prerequisite software in case any of it is installed in non-standard locations.</p>
 
+<p>To configure a build where only the client components are compiled, you can use the following option to disable the server components:</p>
+
+<blockquote>
+<b>cscript /nologo configure.vbs --disable-server</b>
+</blockquote>
+<p>To configure a build where only the client command line programs are compiled, you can use the following options to disable the server components and client API's:</p>
+
+<blockquote>
+<b>cscript /nologo configure.vbs --disable-server --disable-perl --disable-python --disable-php --disable-ruby --disable-tcl --disable-erlang --disable-cs --disable-java --disable-nodejs --disable-odbc-driver --disable-mysql-drop-in --disable-postgresql-drop-in</b>
+</blockquote>
+<p>To configure a build where only the server components are compiled, you can use the following options to disable everything but the server components:</p>
+
+<blockquote>
+<b>cscript /nologo configure.vbs --disable-server --disable-perl --disable-python --disable-php --disable-ruby --disable-tcl --disable-erlang --disable-cs --disable-java --disable-nodejs --disable-odbc-driver --disable-mysql-drop-in --disable-postgresql-drop-in --disable-cmdline</b>
+</blockquote>
 <p>Though inconvenient, the <i>config.mk</i> file can also be modified manually prior to running <b>nmake</b> to alter paths or exclude support for certain languages or databases.</p>
 
 <a name="wininstalling"/><h2>Installing SQL Relay</h2>

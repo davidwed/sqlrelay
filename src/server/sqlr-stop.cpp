@@ -144,12 +144,26 @@ int main(int argc, const char **argv) {
 			uint64_t	pid=
 					charstring::toInteger(pidstr);
 
-			// kill the process
-			stdoutput.printf("killing process %lld\n",pid);
-			if (process::sendSignal(pid,SIGINT)) {
-				stdoutput.printf("   success\n");
+			if (pid) {
+
+				// kill the process
+				stdoutput.printf("killing process %lld\n",pid);
+				if (process::sendSignal(pid,SIGINT)) {
+					stdoutput.printf("   success\n");
+				} else {
+					stdoutput.printf("   failed\n");
+					file::remove(fqp.getString());
+				}
+
 			} else {
-				stdoutput.printf("   failed\n");
+
+				// Sometimes the pid file gets removed or
+				// truncated while it's being read and pid is
+				// 0.  In that case, just attempt to remove the
+				// pid file.  This might also fail becase it
+				// might already be in the process of being
+				// removed, so we don't need to check whether
+				// it succeeded or not.
 				file::remove(fqp.getString());
 			}
 		}

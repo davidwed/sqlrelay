@@ -8,7 +8,7 @@ fi
 
 for DIR in @TESTAPIS@
 do
-	echo "testing in $DIR"
+	echo "testing $1 in $DIR"
 	echo
 	cd $DIR
 
@@ -123,11 +123,11 @@ do
 			echo
 			echo "$1 failed in $DIR"
 			echo
-			echo "hit enter to continue or ctrl-c to stop..."
-			read PROMPT
+			printf "    % 8s: failed\n" "$DIR" >> ../testresults.log
 		else
 			echo
 			echo "test complete"
+			printf "    % 8s: success\n" "$DIR" >> ../testresults.log
 		fi
 	else
 		echo "no test found for $1 in $DIR"

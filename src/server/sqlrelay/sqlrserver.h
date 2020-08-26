@@ -778,18 +778,6 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *endptr);
 		const char	*skipWhitespaceAndComments(const char *query);
 
-		bool	parseDateTime(const char *datetime,
-				bool ddmm, bool yyyyddmm,
-				const char *datedelimiters,
-				int16_t *year, int16_t *month, int16_t *day,
-				int16_t *hour, int16_t *minute, int16_t *second,
-				int32_t *fraction, bool *isnegative);
-
-		char	*convertDateTime(const char *format,
-				int16_t year, int16_t month, int16_t day,
-				int16_t hour, int16_t minute, int16_t second,
-				int32_t fraction, bool isnegative);
-
 		const char	*asciiToHex(unsigned char ch);
 		const char	*asciiToOctal(unsigned char ch);
 
@@ -797,6 +785,12 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 							uint32_t querylen);
 		uint16_t	countBindVariables(const char *query,
 							uint32_t querylen);
+		void		splitObjectName(const char *currentdb,
+						const char *currentschema,
+						const char *combinedobject,
+						char **db,
+						char **schema,
+						char **object);
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);
@@ -2609,6 +2603,10 @@ class SQLRSERVER_DLLSPEC sqlrmoduledata {
 
 		domnode		*getParameters();
 
+		virtual void	closeResultSet(sqlrservercursor *sqlrcur);
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
 	#include <sqlrelay/private/sqlrmoduledata.h>
 };
 
@@ -2621,7 +2619,26 @@ class SQLRSERVER_DLLSPEC sqlrmoduledatas {
 
 		sqlrmoduledata	*getModuleData(const char *id);
 
+		void	closeResultSet(sqlrservercursor *sqlrcur);
+		void	endTransaction(bool commit);
+		void	endSession();
+
 	#include <sqlrelay/private/sqlrmoduledatas.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrmoduledata_tag : public sqlrmoduledata {
+	public:
+		sqlrmoduledata_tag(domnode *parameters);
+		~sqlrmoduledata_tag();
+		
+		void	addTag(uint16_t cursorid, const char *tag);
+		void	addTag(uint16_t cursorid, const char *tag, size_t size);
+		avltree<char *>	*getTags(uint16_t cursorid);
+		bool	tagExists(uint16_t cursorid, const char *tag);
+
+		void	closeResultSet(sqlrservercursor *sqlrcur);
+
+	#include <sqlrelay/private/sqlrmoduledata_tag.h>
 };
 
 #endif

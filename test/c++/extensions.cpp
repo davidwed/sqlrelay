@@ -315,7 +315,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnIsNullable(8),1);
 	printf("\n");
 
-	checkSuccess(cur->rowCount(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	checkSuccess(cur->getField(0,(uint32_t)1),"*");
 	checkSuccess(cur->getField(0,(uint32_t)4),"RETURN_RESULT_SET");

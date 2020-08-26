@@ -327,4 +327,6 @@ int	main(int argc, char **argv) {
 
 
 	mysql_close(&mysql);
+
+	return 0;
 }

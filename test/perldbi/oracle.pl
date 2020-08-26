@@ -750,7 +750,7 @@ print("\n");
 
 # get info
 print("GET INFO: \n");
-checkSuccessString($dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}),"TESTUSER");
+#checkSuccessString($dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}),"TESTUSER");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_NAME}),"oracle");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_VER}),"Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_USER_NAME}),"test");
@@ -795,3 +795,5 @@ print("\n");
 
 
 $dbh->disconnect();
+
+exit(0);

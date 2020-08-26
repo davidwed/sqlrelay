@@ -6,7 +6,6 @@ include ../../config.mk
 
 SRCS = configguide.wt \
 	configreference.wt \
-	configure_mysql_frontend.wt \
 	installing.wt \
 	installingpkg.wt \
 	oraclentier.wt \
@@ -14,11 +13,11 @@ SRCS = configguide.wt \
 	running.wt \
 	tuning.wt \
 	tlscert.wt \
-	tlsca.wt
+	tlsca.wt \
+	createtlscert.wt
 
 OBJS = configguide.html \
 	configreference.html \
-	configure_mysql_frontend.html \
 	installing.html \
 	installingpkg.html \
 	oraclentier.html \
@@ -26,7 +25,8 @@ OBJS = configguide.html \
 	running.html \
 	tuning.html \
 	tlscert.html \
-	tlsca.html
+	tlsca.html \
+	createtlscert.html
 
 .wt.html:
 	wt -i $< -o $@ -xhtml xhtml.conf

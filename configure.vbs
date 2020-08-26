@@ -233,7 +233,7 @@ end if
 
 
 ' version
-SQLR_VERSION="1.6.1"
+SQLR_VERSION="1.8.0"
 
 ' paths
 pfix="C:\\Program Files\\Firstworks"
@@ -442,8 +442,8 @@ end if
 ALLSERVER=""
 INSTALLSERVER=""
 if disableserver=false then
-	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-filters all-triggers all-connections"
-	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-filters install-triggers install-connections"
+	ALLSERVER="all-server all-configs all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections"
+	INSTALLSERVER="install-server install-configs install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-filters install-triggers install-moduledatas install-connections"
 end if
 
 
@@ -871,6 +871,8 @@ end if
 TESTDBS=""
 TESTAPIS=""
 
+HOSTNAME=LCase(WScript.CreateObject("WScript.Network").ComputerName)
+
 CMDLINEBUILD="no "
 CPPBUILD="no "
 PERLBUILD="no "
@@ -1000,7 +1002,8 @@ infiles=Array(_
 	"sqlrelay-c.pc.in",_
 	"sqlrelay-c++.pc.in",_
 	"msvc\\setupx64\\setupx64.vdproj.in",_
-	"msvc\\setupx86\\setupx86.vdproj.in"_
+	"msvc\\setupx86\\setupx86.vdproj.in",_
+	"test\\sqlrelay.conf.in"_
 	)
 outfiles=Array(_
 	"config.mk",_
@@ -1014,7 +1017,8 @@ outfiles=Array(_
 	"sqlrelay-c.pc",_
 	"sqlrelay-c++.pc",_
 	"msvc\\setupx64\\setupx64.vdproj",_
-	"msvc\\setupx86\\setupx86.vdproj"_
+	"msvc\\setupx86\\setupx86.vdproj",_
+	"test\\sqlrelay.conf"_
 	)
 
 
@@ -1179,6 +1183,9 @@ for i=lbound(infiles) to ubound(infiles)
 	' tests
 	content=replace(content,"@TESTDBS@",TESTDBS,1,-1,0)
 	content=replace(content,"@TESTAPIS@",TESTAPIS,1,-1,0)
+
+	' hostname
+	content=replace(content,"@HOSTNAME@",HOSTNAME,1,-1,0)
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)

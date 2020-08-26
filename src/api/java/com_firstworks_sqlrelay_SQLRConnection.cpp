@@ -312,6 +312,16 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getCurrent
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    getCurrentSchema
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_getCurrentSchema
+  (JNIEnv *env, jobject self) {
+	return conNewStringUTF(env,getSqlrConnection(env,self)->getCurrentSchema());
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    getLastInsertId
  * Signature: ()J
  */

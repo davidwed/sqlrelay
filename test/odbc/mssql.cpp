@@ -166,11 +166,11 @@ int	main(int argc, char **argv) {
 			&vallen);
 	//checkSuccessString((const char *)strval,"%");
 	checkSuccessInt((erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO)?1:0,1);
-	erg=SQLGetInfo(dbc,SQL_DATABASE_NAME,
+	/*erg=SQLGetInfo(dbc,SQL_DATABASE_NAME,
 			(SQLPOINTER)strval,
 			(SQLSMALLINT)sizeof(strval),
 			&vallen);
-	checkSuccessString((const char *)strval,"testdb");
+	checkSuccessString((const char *)strval,"testdb");*/
 	checkSuccessInt((erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO)?1:0,1);
 	erg=SQLGetInfo(dbc,SQL_DBMS_NAME,
 			(SQLPOINTER)strval,

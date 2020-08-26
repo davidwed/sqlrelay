@@ -6,7 +6,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-                        <connection string="user=testuser;password=testpassword;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"/>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
 		</connections>
 	</instance>
 
@@ -15,7 +15,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="user=testuser;password=testpassword;db=testdb;host=mysql;foundrows=yes"/>
+			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>
 	</instance>
 
@@ -24,7 +24,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="lastinsertidfunction=testfunc();user=testuser;password=testpassword;db=testdb;host=postgresql;typemangling=lookup;tablemangling=lookup"/>
+			<connection string="host=postgresql;user=testuser;password=testpassword;db=@HOSTNAME@;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
 		</connections>
 	</instance>
 
@@ -33,7 +33,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="db=/usr/local/firstworks/etc/sqlrelay.conf.d/sqlite/var/testdb;"/>
+			<connection string="db=/usr/local/firstworks/etc/sqlrelay.conf.d/sqlite/var/@HOSTNAME@;"/>
 		</connections>
 	</instance>
 
@@ -42,7 +42,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="freetds=/usr/local/firstworks/etc/sqlrelay.conf.d/freetds;server=sap;user=testuser;password=testpassword;db=testdb;maxselectlistsize=-1"/>
+			<connection string="freetds=/usr/local/firstworks/etc/sqlrelay.conf.d/freetds;server=sap;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
@@ -51,7 +51,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="sybase=/opt/sap;lang=en_US;server=SAP;user=testuser;password=testpassword;db=testdb"/>
+			<connection string="sybase=/opt/sap;lang=en_US;server=SAP;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
@@ -60,7 +60,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="db=testdb;user=db2inst1;password=testpassword;lang=C;timeout=120"/>
+			<connection string="user=db2inst1;password=testpassword;db=@SHORTHOSTNAME@;lang=C;timeout=120"/>
 		</connections>
 	</instance>
 
@@ -69,7 +69,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="user=testuser;password=testpassword;db=firebird:/opt/firebird/testdb.gdb;dialect=3"/>
+			<connection string="user=testuser;password=testpassword;db=firebird:/u02/@HOSTNAME@.gdb;dialect=3"/>
 		</connections>
 	</instance>
 
@@ -78,7 +78,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="db=/usr/local/firstworks/etc/sqlrelay.conf.d/mdbtools/var/testdb.mdb;"/>
+			<connection string="db=/usr/local/firstworks/etc/sqlrelay.conf.d/mdbtools/var/@HOSTNAME@.mdb;"/>
 		</connections>
 	</instance>
 
@@ -87,7 +87,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="informixdir=/opt/informix;servername=ol_informix1210;db=testdb;user=testuser;password=testpassword"/>
+			<connection string="informixdir=/opt/informix;servername=ol_informix1210;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
@@ -96,7 +96,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="user=testuser;password=testpassword;db=testdb;host=dbmaster.firstworks.com"/>
+			<connection string="host=mysqlmaster;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
@@ -105,7 +105,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="user=testuser;password=testpassword;db=testdb;host=dbslave.firstworks.com"/>
+			<connection string="host=mysqlslave;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
@@ -266,8 +266,7 @@
 			<logger module="slowqueries"/>
 		</loggers>
 		<connections>
-                        <connection string="lastinsertidfunction=last_insert_id();droptemptables=yes;faketransactionblocks=yes;autocommit=yes;fetchatonce=5;maxselectlistsize=-1;maxitembuffersize=6000;user=testuser;password=juijfqiimeht;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"
-					passwordencryptionid="rot16"/>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=testuser;password=juijfqiimeht;lastinsertidfunction=last_insert_id();droptemptables=yes;faketransactionblocks=yes;autocommit=yes;fetchatonce=5;maxselectlistsize=-1;maxitembuffersize=6000" passwordencryptionid="rot16"/>
 		</connections>
 	</instance>
 
@@ -282,7 +281,7 @@
 			<user user="client.localdomain"/>
 		</users>
 		<connections>
-                        <connection string="user=testuser;password=testpassword;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)))"/>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=testuser;password=testpassword"/>
 		</connections>
 	</instance>
 
@@ -296,7 +295,7 @@
 			</auth>
 		</auths>
 		<connections>
-			<connection string="host=mysql;user=testuser;password=testpassword;db=testdb;foundrows=yes"/>
+			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>
 	</instance>
 
