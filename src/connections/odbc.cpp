@@ -370,6 +370,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getcolumntables;
 		const char	*overrideschema;
 		bool		unicode;
+		const char	*ncharencoding;
 
 		stringbuffer	errormessage;
 
@@ -413,7 +414,7 @@ int ucslen(const char *str) {
 	return res;
 }
 
-char *conv_to_user_coding(const char *inbuf) {
+char *conv_to_user_coding(const char *inbuf, const char *fromencoding) {
 
 	// Insize is the number of unicode codepoints times 2.
 	// A full 16 bit codepoint might generate 3 bytes in the output utf, so
@@ -429,7 +430,8 @@ char *conv_to_user_coding(const char *inbuf) {
 	size_t	insizebefore=insize;
 	size_t	availbefore=avail;
 
-	iconv_t	cd=iconv_open(USER_CODING,"UCS-2");
+	//iconv_t	cd=iconv_open(USER_CODING,"UCS-2");
+	iconv_t	cd=iconv_open(USER_CODING,fromencoding);
 	if (cd==(iconv_t)-1) {
 		/* Something went wrong. */
 		printerror("error in iconv_open");
@@ -522,6 +524,7 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	getcolumntables=false;
 	overrideschema=NULL;
 	unicode=true;
+	ncharencoding=NULL;
 	columninfonotvalidyeterror=NULL;
 }
 
@@ -557,7 +560,10 @@ void odbcconnection::handleConnectString() {
 	}
 
 	unicode=!charstring::isNo(cont->getConnectStringValue("unicode"));
-
+	ncharencoding=cont->getConnectStringValue("ncharencoding");
+	if (charstring::isNullOrEmpty(ncharencoding)) {
+		ncharencoding="UCS-2";
+	}
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
@@ -3629,14 +3635,16 @@ bool odbccursor::fetchRow(bool *error) {
 	
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		//convert char and varchar data to user coding from ucs-2
+		//convert char and varchar data to user coding from the
+		//specified encoding (or ucs-2 by default)
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int i=0; i<ncols; i++) {
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
 				if (indicator[i]!=-1 && field[i]) {
 					char	*u=conv_to_user_coding(
-								field[i]);
+						field[i],
+						odbcconn->ncharencoding);
 					size_t	len=charstring::length(u);
 					if (len>=maxfieldlength) {
 						len=maxfieldlength-1;
