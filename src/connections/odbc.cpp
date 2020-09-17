@@ -430,7 +430,6 @@ char *conv_to_user_coding(const char *inbuf, const char *fromencoding) {
 	size_t	insizebefore=insize;
 	size_t	availbefore=avail;
 
-	//iconv_t	cd=iconv_open(USER_CODING,"UCS-2");
 	iconv_t	cd=iconv_open(USER_CODING,fromencoding);
 	if (cd==(iconv_t)-1) {
 		/* Something went wrong. */
@@ -2631,15 +2630,22 @@ bool odbccursor::outputBind(const char *variable,
 	outdatebind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
+	SQLLEN		bufferlength=valuesize;
+
+	if (odbcconn->maxallowedvarcharbindlength &&
+		valuesize>odbcconn->maxallowedvarcharbindlength) {
+		valuesize=odbcconn->maxvarcharbindlength;
+	}
+
 	erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				SQL_VARCHAR,
-				valuesize,
+				valuesize,		// in characters
 				0,
 				(SQLPOINTER)value,
-				valuesize,
+				bufferlength,		// in bytes
 				&(outisnull[pos-1]));
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
@@ -2772,6 +2778,8 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
 				sqlnulldata:charstring::length(value);
+
+	// FIXME: handle valuesize/buffersize like in inputBind/outputBind?
 
 	erg=SQLBindParameter(stmt,
 				pos,
