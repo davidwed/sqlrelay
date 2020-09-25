@@ -471,12 +471,11 @@ bool sqlrimportcsv::bodyEnd() {
 	// final commit
 	if (commitcount) {
 		sqlrcon->commit();
-	}
-
-	if (lg) {
-		lg->write(coarseloglevel,NULL,logindent,
-				"committed %lld rows (to %s)",
-				(unsigned long long)rowcount,table);
+		if (lg) {
+			lg->write(coarseloglevel,NULL,logindent,
+					"committed %lld rows (to %s)",
+					(unsigned long long)rowcount,table);
+		}
 	}
 	return true;
 }
