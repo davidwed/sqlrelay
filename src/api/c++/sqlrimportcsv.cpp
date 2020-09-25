@@ -423,8 +423,10 @@ bool sqlrimportcsv::rowEnd() {
 				lg->write(coarseloglevel,NULL,logindent,
 						"%s",sqlrcur->errorMessage());
 			}
-			sqlrcon->commit();
-			sqlrcon->begin();
+			if (commitcount) {
+				sqlrcon->commit();
+				sqlrcon->begin();
+			}
 		}
 
 		// bump the rowcount
@@ -467,7 +469,9 @@ bool sqlrimportcsv::rowEnd() {
 bool sqlrimportcsv::bodyEnd() {
 
 	// final commit
-	sqlrcon->commit();
+	if (commitcount) {
+		sqlrcon->commit();
+	}
 
 	if (lg) {
 		lg->write(coarseloglevel,NULL,logindent,
