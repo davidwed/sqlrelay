@@ -396,114 +396,224 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 #include <iconv.h>
 #include <wchar.h>
 
-#define USER_CODING "UTF8"
-
 void printerror(const char *error) {
 	char	*err=error::getErrorString();
 	stderror.printf("%s: %s\n",error,err);
 	delete[] err;
 }
 
-int ucslen(const char *str) {
+size_t isFixed2Byte(const char *encoding) {
+	return (charstring::contains(encoding,"UCS2") ||
+			charstring::contains(encoding,"UCS-2"));
+}
+
+size_t isVariable2Byte(const char *encoding) {
+	return (charstring::contains(encoding,"UTF16") ||
+			charstring::contains(encoding,"UTF-16"));
+}
+
+size_t isFixed4Byte(const char *encoding) {
+	return (charstring::contains(encoding,"UCS4") ||
+			charstring::contains(encoding,"UCS-4") ||
+			charstring::contains(encoding,"UTF32") ||
+			charstring::contains(encoding,"UTF-32"));
+}
+
+size_t isVariable1Byte(const char *encoding) {
+	return (charstring::contains(encoding,"UTF8") ||
+			charstring::contains(encoding,"UTF-8"));
+}
+
+// returns number of characters in the string
+size_t len(const char *str, const char *encoding) {
+
 	const char	*ptr=str;
-	int		res=0;
-	while (*ptr || *(ptr+1)) {
-		res++;
-		ptr+=2;
+	size_t		res=0;
+
+	if (isFixed2Byte(encoding)) {
+
+		while (*ptr || *(ptr+1)) {
+			res++;
+			ptr+=2;
+		}
+
+	} else if (isFixed4Byte(encoding)) {
+
+		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
+			res++;
+			ptr+=4;
+		}
+
+	} else if (isVariable2Byte(encoding)) {
+
+		while (*ptr || *(ptr+1)) {
+			res++;
+			if (*ptr) {
+				ptr+=4;
+			} else {
+				ptr+=2;
+			}
+		}
+
+	} else if (isVariable1Byte(encoding)) {
+
+		while (*ptr) {
+			res++;
+			if (*ptr<192) {
+				ptr++;
+			} else if (*ptr<224) {
+				ptr+=2;
+			} else if (*ptr<240) {
+				ptr+=3;
+			} else {
+				ptr+=4;
+			}
+		}
+		
+	} else {
+		res=charstring::length(str);
 	}
 	return res;
 }
 
-char *conv_to_user_coding(const char *inbuf, const char *fromencoding) {
+// returns number of bytes in the string
+size_t size(const char *str, const char *encoding) {
 
-	// Insize is the number of unicode codepoints times 2.
-	// A full 16 bit codepoint might generate 3 bytes in the output utf, so
-	// this conversion could make things bigger.
-	// It's possible to get errno=E2BIG if we do not have enough space, and
-	// that is eventually fatal.
-	// One more byte for zero termination.
-	
-	size_t	insize=ucslen(inbuf)*2;
-	size_t	avail=(insize/2)*3+1;
-	char	*outbuf=new char[avail];
-	char	*wrptr=outbuf;
-	size_t	insizebefore=insize;
-	size_t	availbefore=avail;
+	const char	*ptr=str;
+	size_t		res=0;
 
-	iconv_t	cd=iconv_open(USER_CODING,fromencoding);
+	if (isFixed2Byte(encoding)) {
+
+		while (*ptr || *(ptr+1)) {
+			res+=2;
+			ptr+=2;
+		}
+
+	} else if (isFixed4Byte(encoding)) {
+
+		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
+			res+=4;
+			ptr+=4;
+		}
+
+	} else if (isVariable2Byte(encoding)) {
+
+		while (*ptr || *(ptr+1)) {
+			if (*ptr) {
+				res+=4;
+				ptr+=4;
+			} else {
+				res+=2;
+				ptr+=2;
+			}
+		}
+
+	} else if (isVariable1Byte(encoding)) {
+
+		while (*ptr) {
+			if (*ptr<192) {
+				res++;
+				ptr++;
+			} else if (*ptr<224) {
+				res+=2;
+				ptr+=2;
+			} else if (*ptr<240) {
+				res+=3;
+				ptr+=3;
+			} else {
+				res+=4;
+				ptr+=4;
+			}
+		}
+		
+	} else {
+		res=charstring::length(str);
+	}
+	return res;
+}
+
+size_t nullSize(const char *encoding) {
+	if (isFixed2Byte(encoding) || isVariable2Byte(encoding)) {
+		return 2;
+	} else if (isFixed4Byte(encoding)) {
+		return 4;
+	} else {
+		return 1;
+	}
+}
+
+char *convertCharset(const char *inbuf,
+				size_t insize,
+				const char *fromencoding,
+				const char *toencoding) {
+
+	// get size of null terminator
+	size_t	nullsize=nullSize(toencoding);
+
+	// calculate size of output buffer (in bytes)
+	size_t	multiplier=4;
+	if (isFixed4Byte(fromencoding)) {
+		multiplier=1;
+	} else if (isFixed2Byte(fromencoding)) {
+		if (isFixed2Byte(fromencoding)) {
+			multiplier=1;
+		} else if (isFixed4Byte(fromencoding)) {
+			multiplier=2;
+		}
+	}
+	size_t	outsize=len(inbuf,fromencoding)*multiplier+nullsize;
+
+	// allocate the output buffer
+	char	*outbuf=new char[outsize];
+
+	// capture initial buffer positions and sizes
+	const char	*inptr=inbuf;
+	char		*outptr=outbuf;
+	size_t		insizebefore=insize;
+	size_t		outsizebefore=outsize;
+
+	// open converter
+	// FIXME: reuse this rather than re-creating it over and over
+	iconv_t	cd=iconv_open(toencoding,fromencoding);
 	if (cd==(iconv_t)-1) {
-		// Something went wrong.
 		printerror("error in iconv_open");
-
-		// Terminate the output string.
-		*outbuf='\0';
+		// null-terminate the output
+		bytestring::zero(outptr,nullsize);
 		return outbuf;
 	}
 
-	const char	*inptr=inbuf;
-		
-	#ifdef ICONV_CONST_CHAR
-	size_t	nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
-	#else
-	size_t	nconv=iconv(cd,(char **)&inptr,&insize,&wrptr,&avail);
-	#endif
-	if (nconv==(size_t)-1) {
-		stdoutput.printf("conv_to_user_coding: error in iconv = %d "
-				"insize=%ld/%ld avail=%ld/%ld before/after.\n",
-				errno,insizebefore,insize,availbefore,avail);
+	// convert
+	if (iconv(cd,
+			#ifndef ICONV_CONST_CHAR
+			(char **)
+			#endif
+			&inptr,
+			&insize,
+			&outptr,
+			&outsize)==(size_t)-1) {
+		stdoutput.printf(
+			"convertCharset: error in iconv = %d "
+			"insize=%ld/%ld outsize=%ld/%ld before/after.\n",
+			errno,insizebefore,insize,outsizebefore,outsize);
 	}		
-	
-	// Terminate the output string.
-	*(wrptr)='\0';
-				
+
+	// null-terminate the output
+	bytestring::zero(outptr,nullsize);
+
+	// close converter
 	if (iconv_close(cd)!=0) {
 		printerror("iconv_close");
 	}
 	return outbuf;
 }
 
-char *conv_to_ucs(const char *inbuf, size_t insize) {
-	
-	size_t	avail=insize*2+4;
-	char	*outbuf=new char[avail];
-	char	*wrptr=outbuf;
-
-	iconv_t	cd=iconv_open("UCS-2",USER_CODING);
-	if (cd==(iconv_t)-1) {
-		// Something went wrong.
-		printerror("error in iconv_open");
-
-		// Terminate the output string.
-		*outbuf=L'\0';
-		return outbuf;
-	}
-
-	const char	*inptr=inbuf;
-		
-	#ifdef ICONV_CONST_CHAR
-	size_t nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
-	#else
-	size_t nconv=iconv(cd,(char **)&inptr,&insize,&wrptr,&avail);
-	#endif
-	if (nconv==(size_t)-1) {
-		stdoutput.printf("conv_to_ucs: error in iconv\n");
-	}
-	
-	// Terminate the output string.
-	*((wchar_t *)wrptr)=L'\0';
-	
-	if (nconv==(size_t)-1) {
-		stdoutput.printf("inbuf='%s'\n",inbuf);
-	}
-
-	if (iconv_close(cd)!=0) {
-		printerror("error in iconv_close");
-	}
-	return outbuf;
-}
-
-char *conv_to_ucs(const char *inbuf) {
-	return conv_to_ucs(inbuf,charstring::length(inbuf));
+char *convertCharset(const char *inbuf,
+				const char *fromencoding,
+				const char *toencoding) {
+	return convertCharset(inbuf,
+				size(inbuf,fromencoding),
+				fromencoding,
+				toencoding);
 }
 #endif
 
@@ -702,11 +812,18 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 
 		#ifdef HAVE_SQLCONNECTW
 		if (unicode) {
-			char	*dsnucs=conv_to_ucs(dsnasc);
-			char	*userucs=
-				(userasc)?conv_to_ucs(userasc):NULL;
-			char	*passworducs=
-				(passwordasc)?conv_to_ucs(passwordasc):NULL;
+			char	*dsnucs=(dsnasc)?
+						convertCharset(dsnasc,
+								"UTF-8",
+								"UCS-2"):NULL;
+			char	*userucs=(userasc)?
+						convertCharset(userasc,
+								"UTF-8",
+								"UCS-2"):NULL;
+			char	*passworducs=(passwordasc)?
+						convertCharset(passwordasc,
+								"UTF-8",
+								"UCS-2"):NULL;
 			erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
 					(SQLWCHAR *)userucs,SQL_NTS,
 					(SQLWCHAR *)passworducs,SQL_NTS);
@@ -2271,7 +2388,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			return true;
 		}
 
-		char *query_ucs=conv_to_ucs((char*)query,length);
+		char *query_ucs=convertCharset(query,length,
+						"UTF-8","UCS-2");
 		erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
 		delete[] query_ucs;
 	} else {
@@ -2320,7 +2438,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 			ucsinbindstrings.clearAndArrayDelete();
 
-			char *query_ucs=conv_to_ucs((char*)query,length);
+			char *query_ucs=convertCharset(query,length,
+							"UTF-8","UCS-2");
 			erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
 			delete[] query_ucs;
 		} else {
@@ -2371,8 +2490,9 @@ bool odbccursor::inputBind(const char *variable,
 	SQLLEN		bufferlength=valuesize;
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		char	*value_ucs=conv_to_ucs((char*)value,valuesize);
-		valuesize=ucslen(value_ucs);
+		char	*value_ucs=convertCharset(value,valuesize,
+						"UTF-8","UCS-2");
+		valuesize=len(value_ucs,"UCS-2");
 		bufferlength=valuesize*2;
 		ucsinbindstrings.append(value_ucs);
 		val=(SQLPOINTER)value_ucs;
@@ -2650,7 +2770,9 @@ bool odbccursor::outputBind(const char *variable,
 				&(outisnull[pos-1]));
 
 		// convert to user coding
-		char	*u=conv_to_user_coding(value,odbcconn->ncharencoding);
+		char	*u=convertCharset(value,
+					odbcconn->ncharencoding,
+					"UTF-8");
 		size_t	len=charstring::length(u);
 		if (len>=valuesize) {
 			len=valuesize-1;
@@ -2979,7 +3101,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	if (getExecuteDirect()) {
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
-			char	*queryucs=conv_to_ucs((char*)query,length);
+			char	*queryucs=convertCharset(query,length,
+							"UTF-8","UCS-2");
 			erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
 			delete[] queryucs;
 		} else {
@@ -3680,9 +3803,10 @@ bool odbccursor::fetchRow(bool *error) {
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
 				if (indicator[i]!=-1 && field[i]) {
-					char	*u=conv_to_user_coding(
+					char	*u=convertCharset(
 						field[i],
-						odbcconn->ncharencoding);
+						odbcconn->ncharencoding,
+						"UTF-8");
 					size_t	len=charstring::length(u);
 					if (len>=maxfieldlength) {
 						len=maxfieldlength-1;
