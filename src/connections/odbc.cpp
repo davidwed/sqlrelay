@@ -432,10 +432,10 @@ char *conv_to_user_coding(const char *inbuf, const char *fromencoding) {
 
 	iconv_t	cd=iconv_open(USER_CODING,fromencoding);
 	if (cd==(iconv_t)-1) {
-		/* Something went wrong. */
+		// Something went wrong.
 		printerror("error in iconv_open");
 
-		/* Terminate the output string. */
+		// Terminate the output string.
 		*outbuf='\0';
 		return outbuf;
 	}
@@ -453,7 +453,7 @@ char *conv_to_user_coding(const char *inbuf, const char *fromencoding) {
 				errno,insizebefore,insize,availbefore,avail);
 	}		
 	
-	/* Terminate the output string. */
+	// Terminate the output string.
 	*(wrptr)='\0';
 				
 	if (iconv_close(cd)!=0) {
@@ -470,10 +470,10 @@ char *conv_to_ucs(const char *inbuf, size_t insize) {
 
 	iconv_t	cd=iconv_open("UCS-2",USER_CODING);
 	if (cd==(iconv_t)-1) {
-		/* Something went wrong.  */
+		// Something went wrong.
 		printerror("error in iconv_open");
 
-		/* Terminate the output string.  */
+		// Terminate the output string.
 		*outbuf=L'\0';
 		return outbuf;
 	}
@@ -489,7 +489,7 @@ char *conv_to_ucs(const char *inbuf, size_t insize) {
 		stdoutput.printf("conv_to_ucs: error in iconv\n");
 	}
 	
-	/* Terminate the output string.  */
+	// Terminate the output string.
 	*((wchar_t *)wrptr)=L'\0';
 	
 	if (nconv==(size_t)-1) {
@@ -857,15 +857,14 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 
 char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 
-	/* This would be a good candidate for promotion to rudiments,
-	   These format operators are enough to provide a unique log file
-	   name, per-process:
-	   %p means PID
-	   %t means a timestamp.
-	   %h means the hostname.
-	   If any of these appears more than once then the output filename
-	   may be truncated.
-	*/
+	// This would be a good candidate for promotion to rudiments,
+	// These format operators are enough to provide a unique log file
+	// name, per-process:
+	// %p means PID
+	// %t means a timestamp.
+	// %h means the hostname.
+	// If any of these appears more than once then the output filename
+	// may be truncated.
 
 	pid_t	pid=process::getProcessId();
 
@@ -928,16 +927,15 @@ char *odbcconnection::odbcDriverConnectionString(const char *userasc,
 	char	*buff=new char[buffsize];
 	char	*ptr=buff;
 
-	/* At least with unixODBC, we find that if the DSN is not the first
-	 * field, there will be an SQLDriverConnect error of:
-	 *
-	 *	state 08001
-	 *	errnum 0
-	 *	message [unixODBC][Microsoft][ODBC Driver 11 for SQL Server]Neither DSN nor SERVER keyword supplied
-	 *
-	 * If DSN is specified then the DRIVER seems to be ignored. This makes
-	 * sense actually.
-	 */
+	// At least with unixODBC, we find that if the DSN is not the first
+	// field, there will be an SQLDriverConnect error of:
+	//
+	//	state 08001
+	//	errnum 0
+	//	message [unixODBC][Microsoft][ODBC Driver 11 for SQL Server]Neither DSN nor SERVER keyword supplied
+	//
+	// If DSN is specified then the DRIVER seems to be ignored. This makes
+	// sense actually.
 
 	if (!charstring::isNullOrEmpty(dsn)) {
 		pushConnstrValue(&ptr,&buffavail,"DSN",dsn);
@@ -2637,7 +2635,33 @@ bool odbccursor::outputBind(const char *variable,
 		valuesize=odbcconn->maxvarcharbindlength;
 	}
 
-	erg=SQLBindParameter(stmt,
+	#ifdef HAVE_SQLCONNECTW
+	if (odbcconn->unicode) {
+
+		erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_OUTPUT,
+				SQL_C_CHAR,
+				SQL_WVARCHAR,
+				valuesize,		// in characters
+				0,
+				(SQLPOINTER)value,
+				bufferlength,		// in bytes
+				&(outisnull[pos-1]));
+
+		// convert to user coding
+		char	*u=conv_to_user_coding(value,odbcconn->ncharencoding);
+		size_t	len=charstring::length(u);
+		if (len>=valuesize) {
+			len=valuesize-1;
+		}
+		charstring::copy(value,u,len);
+		delete[] u;
+
+	} else {
+	#endif
+
+		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
@@ -2647,6 +2671,11 @@ bool odbccursor::outputBind(const char *variable,
 				(SQLPOINTER)value,
 				bufferlength,		// in bytes
 				&(outisnull[pos-1]));
+
+	#ifdef HAVE_SQLCONNECTW
+	}
+	#endif
+
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2780,6 +2809,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				sqlnulldata:charstring::length(value);
 
 	// FIXME: handle valuesize/buffersize like in inputBind/outputBind?
+	// FIXME: handle character conversion like in outputBind
 
 	erg=SQLBindParameter(stmt,
 				pos,
@@ -3643,8 +3673,8 @@ bool odbccursor::fetchRow(bool *error) {
 	
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		//convert char and varchar data to user coding from the
-		//specified encoding (or ucs-2 by default)
+		// convert char and varchar data to user coding from the
+		// specified encoding (or ucs-2 by default)
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int i=0; i<ncols; i++) {
 			if (column[i].type==SQL_WVARCHAR ||
