@@ -90,3 +90,6 @@ tls: tls.cpp tls.$(OBJ)
 
 deadlockreplay: deadlockreplay.cpp deadlockreplay.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) deadlockreplay.$(OBJ) $(CPPTESTLIBS)
+
+emoji: emoji.cpp emoji.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) emoji.$(OBJ) $(CPPTESTLIBS)

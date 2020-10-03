@@ -66,6 +66,11 @@ struct datebind {
 	char		*buffer;
 };
 
+struct charbind {
+	char		*value;
+	uint32_t	valuesize;
+};
+
 class odbcconnection;
 
 class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
@@ -244,6 +249,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
+		charbind	**outcharbind;
 		int16_t		**outisnullptr;
 		datebind	**inoutdatebind;
 		int16_t		**inoutisnullptr;
@@ -2271,6 +2277,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	stmt=NULL;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	outdatebind=new datebind *[maxbindcount];
+	outcharbind=new charbind *[maxbindcount];
 	inoutdatebind=new datebind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
 	inoutisnullptr=new int16_t *[maxbindcount];
@@ -2283,6 +2290,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	#endif
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
+		outcharbind[i]=NULL;
 		inoutdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
 		inoutisnullptr[i]=NULL;
@@ -2298,6 +2306,7 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 
 odbccursor::~odbccursor() {
 	delete[] outdatebind;
+	delete[] outcharbind;
 	delete[] inoutdatebind;
 	delete[] outisnullptr;
 	delete[] inoutisnullptr;
@@ -2388,10 +2397,10 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			return true;
 		}
 
-		char *query_ucs=convertCharset(query,length,
+		char *queryucs=convertCharset(query,length,
 						"UTF-8","UCS-2");
-		erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-		delete[] query_ucs;
+		erg=SQLPrepareW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
+		delete[] queryucs;
 	} else {
 	#endif
 		if (getExecuteDirect()) {
@@ -2438,10 +2447,10 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 			ucsinbindstrings.clearAndArrayDelete();
 
-			char *query_ucs=convertCharset(query,length,
+			char *queryucs=convertCharset(query,length,
 							"UTF-8","UCS-2");
-			erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-			delete[] query_ucs;
+			erg=SQLPrepareW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
+			delete[] queryucs;
 		} else {
 		#endif
 			erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -2490,12 +2499,12 @@ bool odbccursor::inputBind(const char *variable,
 	SQLLEN		bufferlength=valuesize;
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		char	*value_ucs=convertCharset(value,valuesize,
-						"UTF-8","UCS-2");
-		valuesize=len(value_ucs,"UCS-2");
-		bufferlength=valuesize*2;
-		ucsinbindstrings.append(value_ucs);
-		val=(SQLPOINTER)value_ucs;
+		char	*valueucs=convertCharset(value,valuesize,
+							"UTF-8","UCS-2");
+		valuesize=len(valueucs,"UCS-2");
+		bufferlength=size(valueucs,"UCS-2");
+		ucsinbindstrings.append(valueucs);
+		val=(SQLPOINTER)valueucs;
 		valtype=SQL_C_WCHAR;
 		paramtype=SQL_WVARCHAR;
 	} else {
@@ -2745,9 +2754,6 @@ bool odbccursor::outputBind(const char *variable,
 		return false;
 	}
 
-	outdatebind[pos-1]=NULL;
-	outisnullptr[pos-1]=isnull;
-
 	SQLLEN		bufferlength=valuesize;
 
 	if (odbcconn->maxallowedvarcharbindlength &&
@@ -2755,30 +2761,27 @@ bool odbccursor::outputBind(const char *variable,
 		valuesize=odbcconn->maxvarcharbindlength;
 	}
 
+	charbind	*cb=new charbind;
+	cb->value=value;
+	cb->valuesize=valuesize;
+
+	outdatebind[pos-1]=NULL;
+	outcharbind[pos-1]=cb;
+	outisnullptr[pos-1]=isnull;
+
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
 
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_OUTPUT,
-				SQL_C_CHAR,
+				SQL_C_WCHAR,
 				SQL_WVARCHAR,
 				valuesize,		// in characters
 				0,
 				(SQLPOINTER)value,
 				bufferlength,		// in bytes
 				&(outisnull[pos-1]));
-
-		// convert to user coding
-		char	*u=convertCharset(value,
-					odbcconn->ncharencoding,
-					"UTF-8");
-		size_t	len=charstring::length(u);
-		if (len>=valuesize) {
-			len=valuesize-1;
-		}
-		charstring::copy(value,u,len);
-		delete[] u;
 
 	} else {
 	#endif
@@ -2813,6 +2816,7 @@ bool odbccursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outcharbind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
 	*value=0;
@@ -2844,6 +2848,7 @@ bool odbccursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outcharbind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
 	*value=0.0;
@@ -2895,6 +2900,7 @@ bool odbccursor::outputBind(const char *variable,
 	db->buffer=buffer;
 
 	outdatebind[pos-1]=db;
+	outcharbind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
@@ -3170,6 +3176,23 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
 		}
+		#ifdef HAVE_SQLCONNECTW
+		if (odbcconn->unicode && outcharbind[i]) {
+			// convert wchar output binds to user coding
+			char		*value=outcharbind[i]->value;
+			uint32_t	valuesize=outcharbind[i]->valuesize;
+			char		*u=convertCharset(value,
+						odbcconn->ncharencoding,
+						"UTF-8");
+			size_t	s=size(u,"UTF-8");
+			if (s>=valuesize) {
+				s=valuesize-1;
+			}
+			// FIXME: use bytestring::copy?
+			charstring::copy(value,u,s);
+			delete[] u;
+		}
+		#endif
 		if (outisnullptr[i]) {
 			*(outisnullptr[i])=outisnull[i];
 			// FIXME: get these to work
@@ -3796,8 +3819,7 @@ bool odbccursor::fetchRow(bool *error) {
 	
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		// convert char and varchar data to user coding from the
-		// specified encoding (or ucs-2 by default)
+		// convert wvarchar/wchar fields to user coding
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int i=0; i<ncols; i++) {
 			if (column[i].type==SQL_WVARCHAR ||
@@ -3807,12 +3829,13 @@ bool odbccursor::fetchRow(bool *error) {
 						field[i],
 						odbcconn->ncharencoding,
 						"UTF-8");
-					size_t	len=charstring::length(u);
-					if (len>=maxfieldlength) {
-						len=maxfieldlength-1;
+					size_t	s=size(u,"UTF-8");
+					if (s>=maxfieldlength) {
+						s=maxfieldlength-1;
 					}
-					charstring::copy(field[i],u,len);
-					indicator[i]=len;
+					// FIXME: use bytestring::copy?
+					charstring::copy(field[i],u,s);
+					indicator[i]=s;
 					delete[] u;
 				}
 			}
@@ -3948,6 +3971,10 @@ void odbccursor::closeResultSet() {
 		delete outdatebind[i];
 	}
 
+	for (uint16_t i=0; i<getOutputBindCount(); i++) {
+		delete outcharbind[i];
+	}
+
 	for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
 		delete inoutdatebind[i];
 	}
@@ -3957,6 +3984,7 @@ void odbccursor::closeResultSet() {
 	// around...
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
+		outcharbind[i]=NULL;
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
 		inoutdatebind[i]=NULL;
