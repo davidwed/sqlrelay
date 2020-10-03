@@ -400,11 +400,10 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 
 #ifdef HAVE_SQLCONNECTW
 #include <iconv.h>
-#include <wchar.h>
 
 void printerror(const char *error) {
 	char	*err=error::getErrorString();
-	stderror.printf("%s: %s\n",error,err);
+	stderror.printf("%s: %d - %s\n",error,error::getErrorNumber(),err);
 	delete[] err;
 }
 
@@ -430,7 +429,7 @@ size_t isVariable1Byte(const char *encoding) {
 			charstring::contains(encoding,"UTF-8"));
 }
 
-// returns number of characters in the string
+// returns number of characters in the (null-terminated) string
 size_t len(const char *str, const char *encoding) {
 
 	const char	*ptr=str;
@@ -445,6 +444,8 @@ size_t len(const char *str, const char *encoding) {
 
 	} else if (isFixed4Byte(encoding)) {
 
+		// FIXME: look for byte-order mark,
+		// if not found then assume big-endian
 		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
 			res++;
 			ptr+=4;
@@ -452,9 +453,20 @@ size_t len(const char *str, const char *encoding) {
 
 	} else if (isVariable2Byte(encoding)) {
 
+		size_t	bigendian=0;
+
+		// look for byte-order mark and update endianness if necessary
+		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
+			ptr+=2;
+		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
+			bigendian=1;
+			ptr+=2;
+		}
+
 		while (*ptr || *(ptr+1)) {
 			res++;
-			if (*ptr) {
+			if (*(ptr+bigendian)>=(char)0xD8 &&
+				*(ptr+bigendian)<=(char)0xDF) {
 				ptr+=4;
 			} else {
 				ptr+=2;
@@ -482,7 +494,7 @@ size_t len(const char *str, const char *encoding) {
 	return res;
 }
 
-// returns number of bytes in the string
+// returns number of bytes in the (null-terminated) string
 size_t size(const char *str, const char *encoding) {
 
 	const char	*ptr=str;
@@ -504,8 +516,21 @@ size_t size(const char *str, const char *encoding) {
 
 	} else if (isVariable2Byte(encoding)) {
 
+		size_t	bigendian=0;
+
+		// look for byte-order mark and update endianness if necessary
+		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
+			res+=2;
+			ptr+=2;
+		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
+			bigendian=1;
+			res+=2;
+			ptr+=2;
+		}
+
 		while (*ptr || *(ptr+1)) {
-			if (*ptr) {
+			if (*(ptr+bigendian)>=(char)0xD8 &&
+				*(ptr+bigendian)<=(char)0xDF) {
 				res+=4;
 				ptr+=4;
 			} else {
@@ -550,24 +575,25 @@ size_t nullSize(const char *encoding) {
 
 char *convertCharset(const char *inbuf,
 				size_t insize,
-				const char *fromencoding,
-				const char *toencoding) {
+				const char *inenc,
+				const char *outenc) {
 
 	// get size of null terminator
-	size_t	nullsize=nullSize(toencoding);
+	size_t	nullsize=nullSize(outenc);
 
 	// calculate size of output buffer (in bytes)
 	size_t	multiplier=4;
-	if (isFixed4Byte(fromencoding)) {
+	if (isFixed4Byte(inenc)) {
 		multiplier=1;
-	} else if (isFixed2Byte(fromencoding)) {
-		if (isFixed2Byte(fromencoding)) {
+	} else if (isFixed2Byte(inenc)) {
+		if (isFixed2Byte(inenc)) {
 			multiplier=1;
-		} else if (isFixed4Byte(fromencoding)) {
+		} else if (isFixed4Byte(inenc)) {
 			multiplier=2;
 		}
 	}
-	size_t	outsize=len(inbuf,fromencoding)*multiplier+nullsize;
+	// +2 for the byte order mark
+	size_t	outsize=len(inbuf,inenc)*multiplier+2+nullsize;
 
 	// allocate the output buffer
 	char	*outbuf=new char[outsize];
@@ -580,7 +606,7 @@ char *convertCharset(const char *inbuf,
 
 	// open converter
 	// FIXME: reuse this rather than re-creating it over and over
-	iconv_t	cd=iconv_open(toencoding,fromencoding);
+	iconv_t	cd=iconv_open(outenc,inenc);
 	if (cd==(iconv_t)-1) {
 		printerror("error in iconv_open");
 		// null-terminate the output
@@ -597,11 +623,21 @@ char *convertCharset(const char *inbuf,
 			&insize,
 			&outptr,
 			&outsize)==(size_t)-1) {
+		printerror("error in iconv");
 		stdoutput.printf(
-			"convertCharset: error in iconv = %d "
-			"insize=%ld/%ld outsize=%ld/%ld before/after.\n",
-			errno,insizebefore,insize,outsizebefore,outsize);
-	}		
+			"insize=%ld/%ld outsize=%ld/%ld\n",
+			insizebefore,insize,outsizebefore,outsize);
+	}
+
+	// SQL Server doesn't like UTF-16 values to have a byte-order mark
+	// (and it wants them to be big-endian)
+	// FIXME: make this configurable somehow...
+	if (isVariable2Byte(outenc) &&
+		((outbuf[0]==(char)0xFF && outbuf[1]==(char)0xFE) ||
+		(outbuf[0]==(char)0xFE && outbuf[1]==(char)0xFF))) {
+		bytestring::copyWithOverlap(outbuf,outbuf+2,outptr-outbuf-2);
+		outptr-=2;
+	}
 
 	// null-terminate the output
 	bytestring::zero(outptr,nullsize);
@@ -614,12 +650,9 @@ char *convertCharset(const char *inbuf,
 }
 
 char *convertCharset(const char *inbuf,
-				const char *fromencoding,
-				const char *toencoding) {
-	return convertCharset(inbuf,
-				size(inbuf,fromencoding),
-				fromencoding,
-				toencoding);
+				const char *inenc,
+				const char *outenc) {
+	return convertCharset(inbuf,size(inbuf,inenc),inenc,outenc);
 }
 #endif
 
@@ -2499,10 +2532,13 @@ bool odbccursor::inputBind(const char *variable,
 	SQLLEN		bufferlength=valuesize;
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		char	*valueucs=convertCharset(value,valuesize,
-							"UTF-8","UCS-2");
-		valuesize=len(valueucs,"UCS-2");
-		bufferlength=size(valueucs,"UCS-2");
+
+		const char	*encoding=odbcconn->ncharencoding;
+		char	*valueucs=convertCharset(
+					value,valuesize,
+					"UTF-8",encoding);
+		valuesize=len(valueucs,encoding);
+		bufferlength=size(valueucs,encoding);
 		ucsinbindstrings.append(valueucs);
 		val=(SQLPOINTER)valueucs;
 		valtype=SQL_C_WCHAR;
@@ -3186,10 +3222,11 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 						"UTF-8");
 			size_t	s=size(u,"UTF-8");
 			if (s>=valuesize) {
-				s=valuesize-1;
+				// FIXME: this could make s<0
+				s=valuesize-nullSize("UTF-8");
 			}
-			// FIXME: use bytestring::copy?
-			charstring::copy(value,u,s);
+			bytestring::zero(value+s,nullSize("UTF-8"));
+			bytestring::copy(value,u,s);
 			delete[] u;
 		}
 		#endif
@@ -3824,17 +3861,20 @@ bool odbccursor::fetchRow(bool *error) {
 		for (int i=0; i<ncols; i++) {
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
-				if (indicator[i]!=-1 && field[i]) {
+				if (indicator[i]!=SQL_NULL_DATA && field[i]) {
 					char	*u=convertCharset(
 						field[i],
 						odbcconn->ncharencoding,
 						"UTF-8");
 					size_t	s=size(u,"UTF-8");
 					if (s>=maxfieldlength) {
-						s=maxfieldlength-1;
+						// FIXME: this could make s<0
+						s=maxfieldlength-
+							nullSize("UTF-8");
 					}
-					// FIXME: use bytestring::copy?
-					charstring::copy(field[i],u,s);
+					bytestring::zero(field[i]+s,
+							nullSize("UTF-8"));
+					bytestring::copy(field[i],u,s);
 					indicator[i]=s;
 					delete[] u;
 				}
