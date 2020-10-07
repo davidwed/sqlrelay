@@ -19,7 +19,7 @@ void checkSuccess(const char *value, const char *success) {
 			return;
 		} else {
 			stdoutput.printf("%s!=%s\n",value,success);
-			stdoutput.printf("failure ");
+			stdoutput.printf("failure: %s\n",cur->errorMessage());
 			delete cur;
 			delete con;
 			process::exit(1);
@@ -30,7 +30,7 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%s!=%s\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure: %s\n",cur->errorMessage());
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -43,7 +43,7 @@ void checkSuccess(int value, int success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%d!=%d\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure: %s\n",cur->errorMessage());
 		delete cur;
 		delete con;
 		process::exit(1);

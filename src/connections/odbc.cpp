@@ -226,6 +226,9 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		bool		isLob(SQLINTEGER type);
 #endif
 
+		void		setConvCharError(const char *baseerror,
+						const char *detailerror);
+
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
@@ -437,6 +440,13 @@ size_t len(const char *str, const char *encoding) {
 
 	if (isFixed2Byte(encoding)) {
 
+		// skip any byte-order mark
+		if (*ptr==(char)0xEF &&
+			*(ptr+1)==(char)0xBB &&
+			*(ptr+2)==(char)0xBF) {
+			ptr+=3;
+		}
+
 		while (*ptr || *(ptr+1)) {
 			res++;
 			ptr+=2;
@@ -444,8 +454,14 @@ size_t len(const char *str, const char *encoding) {
 
 	} else if (isFixed4Byte(encoding)) {
 
-		// FIXME: look for byte-order mark,
-		// if not found then assume big-endian
+		// skip any byte-order mark
+		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
+			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
+			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
+			*(ptr+2)=='\0' && *(ptr+3)=='\0')) {
+			ptr+=4;
+		}
+
 		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
 			res++;
 			ptr+=4;
@@ -453,20 +469,20 @@ size_t len(const char *str, const char *encoding) {
 
 	} else if (isVariable2Byte(encoding)) {
 
-		size_t	bigendian=0;
+		size_t	offset=0;
 
-		// look for byte-order mark and update endianness if necessary
+		// look for byte-order mark and update offset if necessary
 		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
 			ptr+=2;
 		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
-			bigendian=1;
+			offset=1;
 			ptr+=2;
 		}
 
 		while (*ptr || *(ptr+1)) {
 			res++;
-			if (*(ptr+bigendian)>=(char)0xD8 &&
-				*(ptr+bigendian)<=(char)0xDF) {
+			if (*(ptr+offset)>=(char)0xD8 &&
+				*(ptr+offset)<=(char)0xDF) {
 				ptr+=4;
 			} else {
 				ptr+=2;
@@ -502,12 +518,27 @@ size_t size(const char *str, const char *encoding) {
 
 	if (isFixed2Byte(encoding)) {
 
+		// skip any byte-order mark
+		if (*ptr==(char)0xEF &&
+			*(ptr+1)==(char)0xBB &&
+			*(ptr+2)==(char)0xBF) {
+			ptr+=3;
+		}
+
 		while (*ptr || *(ptr+1)) {
 			res+=2;
 			ptr+=2;
 		}
 
 	} else if (isFixed4Byte(encoding)) {
+
+		// skip any byte-order mark
+		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
+			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
+			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
+			*(ptr+2)=='\0' && *(ptr+3)=='\0')) {
+			ptr+=4;
+		}
 
 		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
 			res+=4;
@@ -516,21 +547,21 @@ size_t size(const char *str, const char *encoding) {
 
 	} else if (isVariable2Byte(encoding)) {
 
-		size_t	bigendian=0;
+		size_t	offset=0;
 
-		// look for byte-order mark and update endianness if necessary
+		// look for byte-order mark and update offset if necessary
 		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
 			res+=2;
 			ptr+=2;
 		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
-			bigendian=1;
+			offset=1;
 			res+=2;
 			ptr+=2;
 		}
 
 		while (*ptr || *(ptr+1)) {
-			if (*(ptr+bigendian)>=(char)0xD8 &&
-				*(ptr+bigendian)<=(char)0xDF) {
+			if (*(ptr+offset)>=(char)0xD8 &&
+				*(ptr+offset)<=(char)0xDF) {
 				res+=4;
 				ptr+=4;
 			} else {
@@ -573,13 +604,29 @@ size_t nullSize(const char *encoding) {
 	}
 }
 
+size_t byteOrderMarkSize(const char *encoding) {
+	if (isVariable1Byte(encoding)) {
+		return 3;
+	} else if (isVariable2Byte(encoding)) {
+		return 2;
+	} else if (isFixed4Byte(encoding)) {
+		return 4;
+	} else {
+		return 0;
+	}
+}
+
 char *convertCharset(const char *inbuf,
 				size_t insize,
 				const char *inenc,
-				const char *outenc) {
+				const char *outenc,
+				char **error) {
 
 	// get size of null terminator
 	size_t	nullsize=nullSize(outenc);
+
+	// get size of byte order mark
+	size_t	bosize=byteOrderMarkSize(outenc);
 
 	// calculate size of output buffer (in bytes)
 	size_t	multiplier=4;
@@ -592,8 +639,7 @@ char *convertCharset(const char *inbuf,
 			multiplier=2;
 		}
 	}
-	// +2 for the byte order mark
-	size_t	outsize=len(inbuf,inenc)*multiplier+2+nullsize;
+	size_t	outsize=len(inbuf,inenc)*multiplier+bosize+nullsize;
 
 	// allocate the output buffer
 	char	*outbuf=new char[outsize];
@@ -608,7 +654,11 @@ char *convertCharset(const char *inbuf,
 	// FIXME: reuse this rather than re-creating it over and over
 	iconv_t	cd=iconv_open(outenc,inenc);
 	if (cd==(iconv_t)-1) {
-		printerror("error in iconv_open");
+		if (error) {
+			char	*err=error::getErrorString();
+			charstring::printf(error,"iconv_open(): %s",err);
+			delete[] err;
+		}
 		// null-terminate the output
 		bytestring::zero(outptr,nullsize);
 		return outbuf;
@@ -623,10 +673,13 @@ char *convertCharset(const char *inbuf,
 			&insize,
 			&outptr,
 			&outsize)==(size_t)-1) {
-		printerror("error in iconv");
-		stdoutput.printf(
-			"insize=%ld/%ld outsize=%ld/%ld\n",
-			insizebefore,insize,outsizebefore,outsize);
+		if (error) {
+			char	*err=error::getErrorString();
+			charstring::printf(error,
+				"iconv(): %s (in=%ld/%ld out=%ld/%ld)",
+				err,insizebefore,insize,outsizebefore,outsize);
+			delete[] err;
+		}
 	}
 
 	// SQL Server doesn't like UTF-16 values to have a byte-order mark
@@ -644,15 +697,20 @@ char *convertCharset(const char *inbuf,
 
 	// close converter
 	if (iconv_close(cd)!=0) {
-		printerror("iconv_close");
+		if (error) {
+			char	*err=error::getErrorString();
+			charstring::printf(error,"iconv_open(): %s",err);
+			delete[] err;
+		}
 	}
 	return outbuf;
 }
 
 char *convertCharset(const char *inbuf,
 				const char *inenc,
-				const char *outenc) {
-	return convertCharset(inbuf,size(inbuf,inenc),inenc,outenc);
+				const char *outenc,
+				char **error) {
+	return convertCharset(inbuf,size(inbuf,inenc),inenc,outenc,error);
 }
 #endif
 
@@ -854,15 +912,18 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 			char	*dsnucs=(dsnasc)?
 						convertCharset(dsnasc,
 								"UTF-8",
-								"UCS-2"):NULL;
+								"UCS-2",
+								NULL):NULL;
 			char	*userucs=(userasc)?
 						convertCharset(userasc,
 								"UTF-8",
-								"UCS-2"):NULL;
+								"UCS-2",
+								NULL):NULL;
 			char	*passworducs=(passwordasc)?
 						convertCharset(passwordasc,
 								"UTF-8",
-								"UCS-2"):NULL;
+								"UCS-2",
+								NULL):NULL;
 			erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
 					(SQLWCHAR *)userucs,SQL_NTS,
 					(SQLWCHAR *)passworducs,SQL_NTS);
@@ -2430,8 +2491,15 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			return true;
 		}
 
-		char *queryucs=convertCharset(query,length,
-						"UTF-8","UCS-2");
+		char	*err=NULL;
+		char	*queryucs=convertCharset(query,length,
+						"UTF-8","UCS-2",
+						&err);
+		if (err) {
+			delete[] queryucs;
+			setConvCharError("prepare query",err);
+			return false;
+		}
 		erg=SQLPrepareW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
 		delete[] queryucs;
 	} else {
@@ -2481,7 +2549,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			ucsinbindstrings.clearAndArrayDelete();
 
 			char *queryucs=convertCharset(query,length,
-							"UTF-8","UCS-2");
+							"UTF-8","UCS-2",
+							NULL);
 			erg=SQLPrepareW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
 			delete[] queryucs;
 		} else {
@@ -2534,9 +2603,16 @@ bool odbccursor::inputBind(const char *variable,
 	if (odbcconn->unicode) {
 
 		const char	*encoding=odbcconn->ncharencoding;
+		char	*err=NULL;
 		char	*valueucs=convertCharset(
 					value,valuesize,
-					"UTF-8",encoding);
+					"UTF-8",encoding,
+					&err);
+		if (err) {
+			delete[] valueucs;
+			setConvCharError("input bind",err);
+			return false;
+		}
 		valuesize=len(valueucs,encoding);
 		bufferlength=size(valueucs,encoding);
 		ucsinbindstrings.append(valueucs);
@@ -3143,8 +3219,15 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	if (getExecuteDirect()) {
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
+			char	*err=NULL;
 			char	*queryucs=convertCharset(query,length,
-							"UTF-8","UCS-2");
+							"UTF-8","UCS-2",
+							&err);
+			if (err) {
+				delete[] queryucs;
+				setConvCharError("execute query",err);
+				return false;
+			}
 			erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
 			delete[] queryucs;
 		} else {
@@ -3217,9 +3300,15 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			// convert wchar output binds to user coding
 			char		*value=outcharbind[i]->value;
 			uint32_t	valuesize=outcharbind[i]->valuesize;
+			char		*err=NULL;
 			char		*u=convertCharset(value,
 						odbcconn->ncharencoding,
-						"UTF-8");
+						"UTF-8",&err);
+			if (err) {
+				delete[] u;
+				setConvCharError("output bind",err);
+				return false;
+			}
 			size_t	s=size(u,"UTF-8");
 			if (s>=valuesize) {
 				// FIXME: this could make s<0
@@ -3862,10 +3951,16 @@ bool odbccursor::fetchRow(bool *error) {
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
 				if (indicator[i]!=SQL_NULL_DATA && field[i]) {
+					char	*err=NULL;
 					char	*u=convertCharset(
 						field[i],
 						odbcconn->ncharencoding,
-						"UTF-8");
+						"UTF-8",&err);
+					if (err) {
+						delete[] u;
+						setConvCharError("fetch",err);
+						return false;
+					}
 					size_t	s=size(u,"UTF-8");
 					if (s>=maxfieldlength) {
 						// FIXME: this could make s<0
@@ -4065,4 +4160,13 @@ extern "C" {
 						sqlrservercontroller *cont) {
 		return new odbcconnection(cont);
 	}
+}
+
+void odbccursor::setConvCharError(const char *baseerror,
+						const char *detailerror) {
+
+	stringbuffer	err;
+	err.append(baseerror)->append(": ")->append(detailerror);
+	conn->cont->setError(this,err.getString(),
+				SQLR_ERROR_CHARACTER_CONVERSION_FAILED,true);
 }
