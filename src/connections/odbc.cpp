@@ -441,6 +441,7 @@ size_t len(const char *str, const char *encoding) {
 	if (isFixed2Byte(encoding)) {
 
 		// skip any byte-order mark
+		// FIXME: handle nulls
 		if (*ptr==(char)0xEF &&
 			*(ptr+1)==(char)0xBB &&
 			*(ptr+2)==(char)0xBF) {
@@ -455,6 +456,7 @@ size_t len(const char *str, const char *encoding) {
 	} else if (isFixed4Byte(encoding)) {
 
 		// skip any byte-order mark
+		// FIXME: handle nulls
 		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
 			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
 			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
@@ -472,6 +474,7 @@ size_t len(const char *str, const char *encoding) {
 		size_t	offset=0;
 
 		// look for byte-order mark and update offset if necessary
+		// FIXME: handle nulls
 		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
 			ptr+=2;
 		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
@@ -519,6 +522,7 @@ size_t size(const char *str, const char *encoding) {
 	if (isFixed2Byte(encoding)) {
 
 		// skip any byte-order mark
+		// FIXME: handle nulls
 		if (*ptr==(char)0xEF &&
 			*(ptr+1)==(char)0xBB &&
 			*(ptr+2)==(char)0xBF) {
@@ -533,6 +537,7 @@ size_t size(const char *str, const char *encoding) {
 	} else if (isFixed4Byte(encoding)) {
 
 		// skip any byte-order mark
+		// FIXME: handle nulls
 		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
 			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
 			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
@@ -550,6 +555,7 @@ size_t size(const char *str, const char *encoding) {
 		size_t	offset=0;
 
 		// look for byte-order mark and update offset if necessary
+		// FIXME: handle nulls
 		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
 			res+=2;
 			ptr+=2;
@@ -621,6 +627,11 @@ char *convertCharset(const char *inbuf,
 				const char *inenc,
 				const char *outenc,
 				char **error) {
+
+	// initialize error
+	if (error) {
+		*error=NULL;
+	}
 
 	// get size of null terminator
 	size_t	nullsize=nullSize(outenc);
@@ -697,7 +708,8 @@ char *convertCharset(const char *inbuf,
 
 	// close converter
 	if (iconv_close(cd)!=0) {
-		if (error) {
+		// don't override any previously set error here
+		if (error && !*error) {
 			char	*err=error::getErrorString();
 			charstring::printf(error,"iconv_open(): %s",err);
 			delete[] err;
