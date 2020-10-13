@@ -1,5 +1,6 @@
 1.9.0 - added missing inequality operators to end-of-bind detection
 	fixed commit/begin without commitcount error in sqlrimportcsv
+	fetch errors aren't returned if sqlrclient protocol version < 2
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
