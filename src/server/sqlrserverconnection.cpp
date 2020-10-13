@@ -214,6 +214,7 @@ bool sqlrserverconnection::begin() {
 
 	// run the query...
 	sqlrservercursor	*begincur=cont->newCursor();
+stdoutput.printf("%s\n",beginquery);
 	if (begincur->open() &&
 		begincur->prepareQuery(beginquery,beginquerylen)) {
 		retval=begincur->executeQuery(beginquery,beginquerylen);
@@ -254,6 +255,7 @@ bool sqlrserverconnection::commit() {
 
 	// run the query...
 	sqlrservercursor	*commitcur=cont->newCursor();
+stdoutput.printf("%s\n",commitquery);
 	if (commitcur->open() &&
 		commitcur->prepareQuery(commitquery,commitquerylen)) {
 		retval=commitcur->executeQuery(commitquery,commitquerylen);

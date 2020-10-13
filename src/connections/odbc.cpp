@@ -1079,6 +1079,9 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// A workaround is to use SQLBindCol in all cases and fetch
 		// LOBs as strings.
 		fetchlobsasstrings=true;
+
+		// SQL Server likes "BEGIN TRANSACTION" to begin transactions.
+		begintxquery="BEGIN TRANSACTION";
 	}
 
 	return true;
@@ -2296,6 +2299,7 @@ char *odbcconnection::getCurrentSchema() {
 
 #if (ODBCVER >= 0x0300)
 bool odbcconnection::autoCommitOn() {
+stdoutput.printf("autoCommitOn\n");
 	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
 	cont->closeAllResultSets();
 	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
@@ -2305,6 +2309,7 @@ bool odbcconnection::autoCommitOn() {
 }
 
 bool odbcconnection::autoCommitOff() {
+stdoutput.printf("autoCommitOff\n");
 	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
 	cont->closeAllResultSets();
 	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
@@ -2464,6 +2469,7 @@ void odbccursor::deallocateResultSetBuffers() {
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
+stdoutput.printf("%s\n",query);
 
 	bindformaterror=false;
 

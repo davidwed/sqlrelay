@@ -2232,6 +2232,7 @@ bool sqlrservercontroller::autoCommitOff() {
 }
 
 bool sqlrservercontroller::begin() {
+stdoutput.printf("begin()...\n");
 
 	if (pvt->_debugsql) {
 		stdoutput.printf("\n===================="
@@ -3004,14 +3005,19 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 	// something will follow it.
 	if (!charstring::compareIgnoringCase(query,"begin",5)) {
 
-		// make sure there are only spaces, comments or the word "work"
-		// after the begin
+		// make sure there are only spaces, comments or one of the words
+		// "work" or "transaction" after the begin
 		const char	*spaceptr=skipWhitespaceAndComments(query+5);
 		
 		if (*spaceptr=='\0' ||
-			!charstring::compareIgnoringCase(spaceptr,"work",4)) {
+			!charstring::compareIgnoringCase(
+						spaceptr,"work",4) ||
+			!charstring::compareIgnoringCase(
+						spaceptr,"transaction",11)) {
+stdoutput.printf("begin intercepted\n");
 			return true;
 		}
+stdoutput.printf("begin not intercepted\n");
 		return false;
 
 	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
