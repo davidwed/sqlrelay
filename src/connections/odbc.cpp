@@ -2299,7 +2299,6 @@ char *odbcconnection::getCurrentSchema() {
 
 #if (ODBCVER >= 0x0300)
 bool odbcconnection::autoCommitOn() {
-stdoutput.printf("autoCommitOn\n");
 	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
 	cont->closeAllResultSets();
 	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
@@ -2309,7 +2308,6 @@ stdoutput.printf("autoCommitOn\n");
 }
 
 bool odbcconnection::autoCommitOff() {
-stdoutput.printf("autoCommitOff\n");
 	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
 	cont->closeAllResultSets();
 	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
@@ -2469,7 +2467,6 @@ void odbccursor::deallocateResultSetBuffers() {
 }
 
 bool odbccursor::prepareQuery(const char *query, uint32_t length) {
-stdoutput.printf("%s\n",query);
 
 	bindformaterror=false;
 
@@ -4148,6 +4145,26 @@ void odbccursor::closeResultSet() {
 	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
+
+	// NOTE: this is a bit of a kludge.
+	//
+	// ncols is reset at the beginning of prepareQuery, and other methods,
+	// but, since we rely on it to decide whether there are rows to return,
+	// it really needs to be reset here.
+	//
+	// If sqlrservercontroller intercepts the query (eg. if it's a begin,
+	// commit, rollback, etc.) then prepareQuery() will never be called,
+	// and this won't be reset.  If it was > 0 from the previous query,
+	// then a begin (for example) will think that it has rows to return,
+	// and the subsequent SQLFetch will fail with a
+	// "function sequence error".  We can avoid that by setting ncols=0
+	// here, which will cause noRowsToReturn() to return false by default,
+	// and avoid the fetch.
+	//
+	// Arguably, other things should be reset here too
+	// (columninfoisvalidafterprepare, various row counts, etc.) but this
+	// is the critical one for now, so we'll sort that out later.
+	ncols=0;
 }
 
 bool odbccursor::columnInfoIsValidAfterPrepare() {
@@ -4173,13 +4190,6 @@ bool odbccursor::isLob(SQLINTEGER type) {
 		type==SQL_WLONGVARCHAR);
 }
 
-extern "C" {
-	SQLRSERVER_DLLSPEC sqlrserverconnection *new_odbcconnection(
-						sqlrservercontroller *cont) {
-		return new odbcconnection(cont);
-	}
-}
-
 void odbccursor::setConvCharError(const char *baseerror,
 						const char *detailerror) {
 
@@ -4187,4 +4197,11 @@ void odbccursor::setConvCharError(const char *baseerror,
 	err.append(baseerror)->append(": ")->append(detailerror);
 	conn->cont->setError(this,err.getString(),
 				SQLR_ERROR_CHARACTER_CONVERSION_FAILED,true);
+}
+
+extern "C" {
+	SQLRSERVER_DLLSPEC sqlrserverconnection *new_odbcconnection(
+						sqlrservercontroller *cont) {
+		return new odbcconnection(cont);
+	}
 }

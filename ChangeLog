@@ -3,6 +3,9 @@
 	fetch errors aren't returned if sqlrclient protocol version < 2
 	query-intercept catches "begin transaction" now
 	begin() runs "begin transaction" instead of just "begin" on SQL Server
+	fixed a column-count reset bug in odbc, db2, informix, and postgresql
+		that could cause begin queries to fail when fake transaction
+		blocks are used
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API

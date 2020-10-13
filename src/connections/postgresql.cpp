@@ -1574,6 +1574,26 @@ void postgresqlcursor::closeResultSet() {
 		pgresult=NULL;
 	}
 #endif
+
+	// NOTE: this is a bit of a kludge.
+	//
+	// ncols is reset at the beginning of prepareQuery, and other methods,
+	// but, since we rely on it to decide whether there are rows to return,
+	// it really needs to be reset here.
+	//
+	// If sqlrservercontroller intercepts the query (eg. if it's a begin,
+	// commit, rollback, etc.) then prepareQuery() will never be called,
+	// and this won't be reset.  If it was > 0 from the previous query,
+	// then a begin (for example) will think that it has rows to return,
+	// and the subsequent SQLFetch will fail with a
+	// "function sequence error".  We can avoid that by setting ncols=0
+	// here, which will cause noRowsToReturn() to return false by default,
+	// and avoid the fetch.
+	//
+	// Arguably, other things should be reset here too (eg. various row
+	// counts), but this is the critical one for now, so we'll sort that
+	// out later.
+	ncols=0;
 }
 
 #if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \

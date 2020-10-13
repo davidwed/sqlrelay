@@ -2232,7 +2232,6 @@ bool sqlrservercontroller::autoCommitOff() {
 }
 
 bool sqlrservercontroller::begin() {
-stdoutput.printf("begin()...\n");
 
 	if (pvt->_debugsql) {
 		stdoutput.printf("\n===================="
@@ -2762,6 +2761,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			if (pvt->_faketransactionblocks &&
 					pvt->_infaketransactionblock) {
@@ -2780,6 +2780,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			if (pvt->_faketransactionblocks &&
 					!pvt->_infaketransactionblock) {
@@ -2798,6 +2799,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			if (pvt->_faketransactionblocks &&
 					!pvt->_infaketransactionblock) {
@@ -2816,6 +2818,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			// FIXME: fake tx block issues here???
 			retval=autoCommitOn();
@@ -2824,6 +2827,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			// FIXME: fake tx block issues here???
 			retval=autoCommitOff();
@@ -3014,10 +3018,8 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 						spaceptr,"work",4) ||
 			!charstring::compareIgnoringCase(
 						spaceptr,"transaction",11)) {
-stdoutput.printf("begin intercepted\n");
 			return true;
 		}
-stdoutput.printf("begin not intercepted\n");
 		return false;
 
 	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
