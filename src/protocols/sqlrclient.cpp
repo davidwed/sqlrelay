@@ -3455,7 +3455,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 				// FIXME: kludgy
 				cont->nextRow(cursor);
 			} else {
-				if (error) {
+				if (error && protocolversion>=2) {
 					returnFetchError(cursor);
 				} else {
 					clientsock->write(endresultset);
