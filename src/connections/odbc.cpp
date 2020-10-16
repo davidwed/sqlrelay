@@ -277,7 +277,6 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 
 		#ifdef HAVE_SQLCONNECTW
 		singlylinkedlist<char *>	ucsinbindstrings;
-		singlylinkedlist<char *>	ucsinoutbindstrings;
 		#endif
 
 		bool		columninfoisvalidafterprepare;
@@ -2428,7 +2427,6 @@ odbccursor::~odbccursor() {
 	delete[] inoutisnull;
 	#ifdef HAVE_SQLCONNECTW
 	ucsinbindstrings.clearAndArrayDelete();
-	ucsinoutbindstrings.clearAndArrayDelete();
 	#endif
 	deallocateResultSetBuffers();
 }
@@ -2507,7 +2505,6 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	if (odbcconn->unicode) {
 
 		ucsinbindstrings.clearAndArrayDelete();
-		ucsinoutbindstrings.clearAndArrayDelete();
 
 		if (getExecuteDirect()) {
 			return true;
@@ -2569,7 +2566,6 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		if (odbcconn->unicode) {
 
 			ucsinbindstrings.clearAndArrayDelete();
-			ucsinoutbindstrings.clearAndArrayDelete();
 
 			char *queryucs=convertCharset(query,length,
 							"UTF-8","UCS-2",
@@ -3066,7 +3062,6 @@ bool odbccursor::inputOutputBind(const char *variable,
 		return false;
 	}
 
-	SQLPOINTER	val=NULL;
 	SQLSMALLINT	valtype=SQL_C_CHAR;
 	SQLSMALLINT	paramtype=SQL_CHAR;
 	SQLLEN		bufferlength=valuesize;
@@ -3076,7 +3071,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 		const char	*encoding=odbcconn->ncharencoding;
 		char	*err=NULL;
 		char	*valueucs=convertCharset(
-					value,valuesize,
+					value,size(value,"UTF-8"),
 					"UTF-8",encoding,
 					&err);
 		if (err) {
@@ -3084,20 +3079,17 @@ bool odbccursor::inputOutputBind(const char *variable,
 			setConvCharError("input-output bind",err);
 			return false;
 		}
-		// It's probably ok to reset valuesize, as I think it's used
-		// for the size (in characters) on input side.  I don't think
-		// bufferlength should be reset, as it defines the size (in
-		// bytes) of the buffer on the output side.
-		valuesize=len(valueucs,encoding);
-		//bufferlength=size(valueucs,encoding);
-		ucsinoutbindstrings.append(valueucs);
-		val=(SQLPOINTER)valueucs;
+		size_t	sizetocopy=size(valueucs,encoding)+nullSize(encoding);
+		if (sizetocopy<=valuesize) {
+			bytestring::copy(value,valueucs,sizetocopy);
+		} else {
+			bytestring::copy(value,valueucs,valuesize);
+			bytestring::zero(value+valuesize-nullSize(encoding),
+							nullSize(encoding));
+		}
+		delete[] valueucs;
 		valtype=SQL_C_WCHAR;
 		paramtype=SQL_WVARCHAR;
-	} else {
-	#endif
-		val=(SQLPOINTER)value;
-	#ifdef HAVE_SQLCONNECTW
 	}
 	#endif
 
@@ -3135,7 +3127,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				SQL_CHAR,
 				1,
 				0,
-				val,
+				(SQLPOINTER)value,
 				bufferlength,
 				&(inoutisnull[pos-1]));
 	} else {
@@ -3161,7 +3153,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				paramtype,
 				valuesize,	// in characters
 				0,
-				val,
+				(SQLPOINTER)value,
 				bufferlength,	// in bytes
 				&(inoutisnull[pos-1]));
 	}
@@ -3350,7 +3342,6 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	#ifdef HAVE_SQLCONNECTW
 		// free buffers used to convert string-binds to unicode
 		ucsinbindstrings.clearAndArrayDelete();
-		ucsinoutbindstrings.clearAndArrayDelete();
 	#endif
 
 	if (erg!=SQL_SUCCESS &&
