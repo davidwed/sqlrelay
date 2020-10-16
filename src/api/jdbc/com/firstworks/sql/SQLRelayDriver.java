@@ -158,6 +158,17 @@ public class SQLRelayDriver extends SQLRelayDebug implements Driver {
 		ci.triesstr = triesstr;
 		ci.tries = tries;
 
+		debugPrintln("host="+host);
+		debugPrintln("portstr="+portstr);
+		debugPrintln("port="+port);
+		debugPrintln("socket="+socket);
+		debugPrintln("user="+user);
+		debugPrintln("password="+password);
+		debugPrintln("retrytimestr="+retrytimestr);
+		debugPrintln("retrytime="+retrytime);
+		debugPrintln("triesstr="+triesstr);
+		debugPrintln("tries="+tries);
+
 		return ci;
 	}
 

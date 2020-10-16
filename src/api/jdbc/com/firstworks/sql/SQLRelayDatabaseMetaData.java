@@ -187,7 +187,13 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 	public int 	getDatabaseMajorVersion() throws SQLException {
 		debugFunction();
 		// FIXME: SQL Relay or db?
-		int	majorversion=0;
+		int		majorversion=-1;
+		String[]	parts=connection.
+					getSQLRConnection().
+					clientVersion().split(".");
+		if (parts!=null && parts.length>0) {
+			majorversion=Integer.parseInt(parts[0]);
+		}
 		debugPrintln("  major version: "+majorversion);
 		return majorversion;
 	}
@@ -195,7 +201,13 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 	public int 	getDatabaseMinorVersion() throws SQLException {
 		debugFunction();
 		// FIXME: SQL Relay or db?
-		int	minorversion=0;
+		int		minorversion=-1;
+		String[]	parts=connection.
+					getSQLRConnection().
+					clientVersion().split(".");
+		if (parts!=null && parts.length>1) {
+			minorversion=Integer.parseInt(parts[1]);
+		}
 		debugPrintln("  minor version: "+minorversion);
 		return minorversion;
 	}
