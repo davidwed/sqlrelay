@@ -1559,7 +1559,7 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_closeResultSet
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getDatabaseList
+ * Method:    getDatabaseListWithFormat
  * Signature: (Ljava/lang/String;I;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getDatabaseListWithFormat
@@ -1574,7 +1574,7 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getDatabaseLi
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRCursor
- * Method:    getSchemaList
+ * Method:    getSchemaListWithFormat
  * Signature: (Ljava/lang/String;I;)Z
  */
 JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getSchemaListWithFormat
@@ -1586,6 +1586,40 @@ JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getSchemaList
 	curReleaseStringUTFChars(env,wild,wildstring);
 	return retval;
 }
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getTableListWithFormat
+ * Signature: (Ljava/lang/String;I;S;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getTableListWithFormat
+  (JNIEnv *env, jobject self, jstring wild, jint listformat, jint objecttypes) {
+	char	*wildstring=curGetStringUTFChars(env,wild,0);
+	jboolean	retval=getSqlrCursor(env,self)->
+				getTableList(wildstring,
+					(sqlrclientlistformat_t)listformat,
+					(uint16_t)objecttypes);
+	curReleaseStringUTFChars(env,wild,wildstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getColumnListWithFormat
+ * Signature: (Ljava/lang/String;Ljava/lang/String;I;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getColumnListWithFormat
+  (JNIEnv *env, jobject self, jstring table, jstring wild, jint listformat) {
+	char	*tablestring=curGetStringUTFChars(env,table,0);
+	char	*wildstring=curGetStringUTFChars(env,wild,0);
+	jboolean	retval=getSqlrCursor(env,self)->
+				getColumnList(tablestring,wildstring,
+					(sqlrclientlistformat_t)listformat);
+	curReleaseStringUTFChars(env,wild,wildstring);
+	curReleaseStringUTFChars(env,table,tablestring);
+	return retval;
+}
+
 
 #ifdef __cplusplus
 }

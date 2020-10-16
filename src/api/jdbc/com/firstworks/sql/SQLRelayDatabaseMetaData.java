@@ -178,8 +178,38 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						String columnNamePattern)
 						throws SQLException {
 		debugFunction();
-		// FIXME: implement this by calling sqlrcursor.getColumnList()
-		return null;
+
+		SQLRelayResultSet	resultset=null;
+		SQLRelayStatement	stmt=(SQLRelayStatement)
+						connection.createStatement();
+		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
+
+		if (schemaPattern!=null && !schemaPattern.equals("")) {
+			// FIXME: not all db's use . and not all db's
+			// use schema.table...
+			tableNamePattern=schemaPattern+"."+tableNamePattern;
+		}
+
+		boolean	result=sqlrcur.getColumnListWithFormat(
+						tableNamePattern,
+						columnNamePattern,3);
+
+		debugPrintln("  result: "+result);
+
+		if (result) {
+
+			debugPrintln("  colcount: "+sqlrcur.colCount());
+
+			if (sqlrcur.colCount()>0) {
+				resultset=new SQLRelayResultSet();
+				resultset.setStatement(stmt);
+				resultset.setSQLRCursor(sqlrcur);
+			}
+		} else {
+			throwErrorMessageException(sqlrcur);
+		}
+		
+		return resultset;
 	}
 
 	public Connection 	getConnection() throws SQLException {
@@ -753,17 +783,56 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						String[] types)
 						throws SQLException {
 		debugFunction();
+
 		SQLRelayResultSet	resultset=null;
 		SQLRelayStatement	stmt=(SQLRelayStatement)
 						connection.createStatement();
-		if (stmt.getSQLRCursor().getTableList(null)) {
-			resultset=new SQLRelayResultSet();
-			resultset.setStatement(stmt);
-			resultset.setSQLRCursor(stmt.getSQLRCursor());
+		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
+
+		int	objecttypes=0;
+		if (types==null) {
+			objecttypes=1|2|3|4;
 		} else {
-			throw new SQLException(
-					stmt.getSQLRCursor().errorMessage());
+			for (String type: types) {
+				if (type.equals("TABLE") ||
+					type.equals("SYSTEM TABLE") ||
+					type.equals("GLOBAL TEMPORARY") ||
+					type.equals("LOCAL TEMPORARY")) {
+					objecttypes|=1;
+				} else if (type.equals("VIEW")) {
+					objecttypes|=2;
+				} else if (type.equals("ALIAS")) {
+					objecttypes|=3;
+				} else if (type.equals("SYNONYM")) {
+					objecttypes|=4;
+				}
+			}
 		}
+
+		if (schemaPattern!=null && !schemaPattern.equals("")) {
+			// FIXME: not all db's use . and not all db's
+			// use schema.table...
+			tableNamePattern=schemaPattern+"."+tableNamePattern;
+		}
+
+		boolean	result=sqlrcur.getTableListWithFormat(
+						tableNamePattern,3,objecttypes);
+
+		debugPrintln("  result: "+result);
+
+		if (result) {
+
+			debugPrintln("  colcount: "+sqlrcur.colCount());
+
+			if (sqlrcur.colCount()>0) {
+				resultset=new SQLRelayResultSet();
+				resultset.setStatement(stmt);
+				resultset.setSQLRCursor(sqlrcur);
+			}
+		} else {
+			throwErrorMessageException(sqlrcur);
+		}
+		
 		return resultset;
 	}
 

@@ -464,4 +464,10 @@ public class SQLRCursor {
 						String wild, int listformat);
 	public native boolean	getSchemaListWithFormat(
 						String wild, int listformat);
+	public native boolean	getTableListWithFormat(
+						String wild, int listformat,
+						int objecttypes);
+	public native boolean	getColumnListWithFormat(
+						String table, String wild,
+						int listformat);
 }
