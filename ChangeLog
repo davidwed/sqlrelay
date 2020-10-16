@@ -2,10 +2,15 @@
 	fixed commit/begin without commitcount error in sqlrimportcsv
 	fetch errors aren't returned if sqlrclient protocol version < 2
 	query-intercept catches "begin transaction" now
+	added ncharencoding option to odbc connection to enable UTF-16 values
+		in SQL Server nchars/nvarchars
+	fixed a bug that caused output binds of length 8000+ to fail on
+		SQL Server
 	begin() runs "begin transaction" instead of just "begin" on SQL Server
 	fixed a column-count reset bug in odbc, db2, informix, and postgresql
 		that could cause begin queries to fail when fake transaction
 		blocks are used
+	
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
