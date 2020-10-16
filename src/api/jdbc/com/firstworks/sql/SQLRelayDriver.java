@@ -59,7 +59,13 @@ public class SQLRelayDriver extends SQLRelayDebug implements Driver {
 			portstr=info.getProperty("Port");
 			socket=info.getProperty("Socket");
 			user=info.getProperty("User");
+			if (user==null) {
+				user=info.getProperty("user");
+			}
 			password=info.getProperty("Password");
+			if (password==null) {
+				password=info.getProperty("password");
+			}
 			retrytimestr=info.getProperty("Retry Time");
 			triesstr=info.getProperty("Tries");
 		}
