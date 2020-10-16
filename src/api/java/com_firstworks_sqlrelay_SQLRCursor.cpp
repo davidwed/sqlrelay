@@ -1557,6 +1557,36 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_closeResultSet
 	getSqlrCursor(env,self)->closeResultSet();
 }
 
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getDatabaseList
+ * Signature: (Ljava/lang/String;I;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getDatabaseListWithFormat
+  (JNIEnv *env, jobject self, jstring wild, jint listformat) {
+	char	*wildstring=curGetStringUTFChars(env,wild,0);
+	jboolean	retval=getSqlrCursor(env,self)->
+				getDatabaseList(wildstring,
+					(sqlrclientlistformat_t)listformat);
+	curReleaseStringUTFChars(env,wild,wildstring);
+	return retval;
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRCursor
+ * Method:    getSchemaList
+ * Signature: (Ljava/lang/String;I;)Z
+ */
+JNIEXPORT jboolean JNICALL Java_com_firstworks_sqlrelay_SQLRCursor_getSchemaListWithFormat
+  (JNIEnv *env, jobject self, jstring wild, jint listformat) {
+	char	*wildstring=curGetStringUTFChars(env,wild,0);
+	jboolean	retval=getSqlrCursor(env,self)->
+				getSchemaList(wildstring,
+					(sqlrclientlistformat_t)listformat);
+	curReleaseStringUTFChars(env,wild,wildstring);
+	return retval;
+}
+
 #ifdef __cplusplus
 }
 #endif

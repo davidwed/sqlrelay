@@ -31,7 +31,8 @@ enum sqlrclientbindvartype_t {
 enum sqlrclientlistformat_t {
 	SQLRCLIENTLISTFORMAT_NULL=0,
 	SQLRCLIENTLISTFORMAT_MYSQL,
-	SQLRCLIENTLISTFORMAT_ODBC
+	SQLRCLIENTLISTFORMAT_ODBC,
+	SQLRCLIENTLISTFORMAT_JDBC
 };
 
 class sqlrconnectionprivate;

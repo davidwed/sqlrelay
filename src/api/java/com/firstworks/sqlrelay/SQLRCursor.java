@@ -460,4 +460,8 @@ public class SQLRCursor {
 	public SQLRConnection	connection;
 	private native long	alloc(long con);
 	private native long	getOutputBindCursorInternal(String variable);
+	public native boolean	getDatabaseListWithFormat(
+						String wild, int listformat);
+	public native boolean	getSchemaListWithFormat(
+						String wild, int listformat);
 }

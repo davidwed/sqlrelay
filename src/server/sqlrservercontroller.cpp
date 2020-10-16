@@ -232,12 +232,28 @@ class sqlrservercontrollerprivate {
 	singlylinkedlist< char * >	_transtemptablesfortrunc;
 
 	dictionary< uint32_t, uint32_t >	*_columnmap;
+	dictionary< uint32_t, const char * >	*_columnnamemap;
+
 	dictionary< uint32_t, uint32_t >	_mysqldatabasescolumnmap;
 	dictionary< uint32_t, uint32_t >	_mysqltablescolumnmap;
 	dictionary< uint32_t, uint32_t >	_mysqlcolumnscolumnmap;
+	dictionary< uint32_t, const char * >	_mysqldatabasescolumnnamemap;
+	dictionary< uint32_t, const char * >	_mysqltablescolumnnamemap;
+	dictionary< uint32_t, const char * >	_mysqlcolumnscolumnnamemap;
+
 	dictionary< uint32_t, uint32_t >	_odbcdatabasescolumnmap;
 	dictionary< uint32_t, uint32_t >	_odbctablescolumnmap;
 	dictionary< uint32_t, uint32_t >	_odbccolumnscolumnmap;
+	dictionary< uint32_t, const char * >	_odbcdatabasescolumnnamemap;
+	dictionary< uint32_t, const char * >	_odbctablescolumnnamemap;
+	dictionary< uint32_t, const char * >	_odbccolumnscolumnnamemap;
+
+	dictionary< uint32_t, uint32_t >	_jdbcdatabasescolumnmap;
+	dictionary< uint32_t, uint32_t >	_jdbctablescolumnmap;
+	dictionary< uint32_t, uint32_t >	_jdbccolumnscolumnmap;
+	dictionary< uint32_t, const char * >	_jdbcdatabasescolumnnamemap;
+	dictionary< uint32_t, const char * >	_jdbctablescolumnnamemap;
+	dictionary< uint32_t, const char * >	_jdbccolumnscolumnnamemap;
 
 	const char	**_columnnames;
 	uint16_t	*_columnnamelengths;
@@ -418,6 +434,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_proxypid=0;
 
 	pvt->_columnmap=NULL;
+	pvt->_columnnamemap=NULL;
 
 	pvt->_bulkserveridfilename=NULL;
 	pvt->_bulkservershmem=NULL;
@@ -4306,6 +4323,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// reset column mapping
 	pvt->_columnmap=NULL;
+	pvt->_columnnamemap=NULL;
 
 	// sanity check
 	if (querylen>pvt->_maxquerysize) {
@@ -4932,21 +4950,36 @@ void sqlrservercontroller::setDatabaseListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
-			pvt->_columnmap=&(pvt->_mysqldatabasescolumnmap);
+			pvt->_columnmap=
+				&(pvt->_mysqldatabasescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_mysqldatabasescolumnnamemap);
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
-			pvt->_columnmap=&(pvt->_odbcdatabasescolumnmap);
+			pvt->_columnmap=
+				&(pvt->_odbcdatabasescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_odbcdatabasescolumnnamemap);
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			pvt->_columnmap=
+				&(pvt->_jdbcdatabasescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_jdbcdatabasescolumnnamemap);
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -4961,6 +4994,7 @@ void sqlrservercontroller::setSchemaListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -4970,17 +5004,26 @@ void sqlrservercontroller::setSchemaListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -4995,21 +5038,36 @@ void sqlrservercontroller::setTableListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
-			pvt->_columnmap=&(pvt->_mysqltablescolumnmap);
+			pvt->_columnmap=
+				&(pvt->_mysqltablescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_mysqltablescolumnnamemap);
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
-			pvt->_columnmap=&(pvt->_odbctablescolumnmap);
+			pvt->_columnmap=
+				&(pvt->_odbctablescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_odbctablescolumnnamemap);
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			pvt->_columnmap=
+				&(pvt->_jdbctablescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_jdbctablescolumnnamemap);
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5024,6 +5082,7 @@ void sqlrservercontroller::setTableTypeListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5033,17 +5092,26 @@ void sqlrservercontroller::setTableTypeListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5058,21 +5126,36 @@ void sqlrservercontroller::setColumnListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
-			pvt->_columnmap=&(pvt->_mysqlcolumnscolumnmap);
+			pvt->_columnmap=
+				&(pvt->_mysqlcolumnscolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_mysqlcolumnscolumnnamemap);
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
-			pvt->_columnmap=&(pvt->_odbccolumnscolumnmap);
+			pvt->_columnmap=
+				&(pvt->_odbccolumnscolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_odbccolumnscolumnnamemap);
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			pvt->_columnmap=
+				&(pvt->_jdbccolumnscolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_jdbccolumnscolumnnamemap);
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5087,6 +5170,7 @@ void sqlrservercontroller::setPrimaryKeyListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5096,17 +5180,26 @@ void sqlrservercontroller::setPrimaryKeyListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5121,6 +5214,7 @@ void sqlrservercontroller::setKeyAndIndexListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5130,17 +5224,26 @@ void sqlrservercontroller::setKeyAndIndexListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5155,6 +5258,7 @@ void sqlrservercontroller::setProcedureBindAndColumnListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5164,17 +5268,26 @@ void sqlrservercontroller::setProcedureBindAndColumnListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5189,6 +5302,7 @@ void sqlrservercontroller::setTypeInfoListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5198,17 +5312,26 @@ void sqlrservercontroller::setTypeInfoListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5223,6 +5346,7 @@ void sqlrservercontroller::setProcedureListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5232,36 +5356,50 @@ void sqlrservercontroller::setProcedureListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
 
 void sqlrservercontroller::buildColumnMaps() {
 
-	// Native/MySQL getDatabaseList:
+	// MySQL getDatabaseList:
 	//
 	// Database
 	pvt->_mysqldatabasescolumnmap.setValue(0,0);
+	pvt->_mysqldatabasescolumnnamemap.setValue(0,"Database");
 
 	// MySQL getTableList:
 	//
 	// Tables_in_xxx -> TABLE_NAME
 	pvt->_mysqltablescolumnmap.setValue(0,2);
+	pvt->_mysqltablescolumnnamemap.setValue(0,"Tables_in_xxx");
 
-	// Native/MySQL getColumnList:
-if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
+	// MySQL getColumnList:
 	//
+// FIXME: fudged...
+// The postgresql connection returns additional rows.
+// All connection modules should return the same as postgresql.
+if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// column_name
 	pvt->_mysqlcolumnscolumnmap.setValue(0,3);
 	// data_type
@@ -5281,7 +5419,6 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// extra
 	pvt->_mysqlcolumnscolumnmap.setValue(8,18);
 } else {
-	//
 	// column_name
 	pvt->_mysqlcolumnscolumnmap.setValue(0,0);
 	// data_type
@@ -5301,9 +5438,18 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// extra
 	pvt->_mysqlcolumnscolumnmap.setValue(8,8);
 }
+	pvt->_mysqlcolumnscolumnnamemap.setValue(0,"column_name");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(1,"data_type");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(2,"character_maximum_length");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(3,"numeric_precision");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(4,"numeric_scale");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(5,"is_nullable");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(6,"column_key");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(7,"column_default");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(8,"extra");
 
 
-	// Native/ODBC getDatabaseList:
+	// ODBC getDatabaseList:
 	//
 	// TABLE_CAT -> Database
 	pvt->_odbcdatabasescolumnmap.setValue(0,0);
@@ -5315,8 +5461,14 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbcdatabasescolumnmap.setValue(3,1);
 	// REMARKS -> NULL
 	pvt->_odbcdatabasescolumnmap.setValue(4,1);
+	pvt->_odbcdatabasescolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_odbcdatabasescolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_odbcdatabasescolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_odbcdatabasescolumnnamemap.setValue(3,"TABLE_TYPE");
+	pvt->_odbcdatabasescolumnnamemap.setValue(4,"REMARKS");
 
 	// ODBC getTableList:
+	//
 	// TABLE_CAT
 	pvt->_odbctablescolumnmap.setValue(0,0);
 	// TABLE_SCHEM
@@ -5327,9 +5479,17 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbctablescolumnmap.setValue(3,3);
 	// REMARKS
 	pvt->_odbctablescolumnmap.setValue(4,4);
+	pvt->_odbctablescolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_odbctablescolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_odbctablescolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_odbctablescolumnnamemap.setValue(3,"TABLE_TYPE");
+	pvt->_odbctablescolumnnamemap.setValue(4,"REMARKS");
 
 	// ODBC getColumnList:
 	//
+// FIXME: fudged...
+// The postgresql connection returns additional rows.
+// All connection modules should return the same as postgresql.
 if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// TABLE_CAT
 	pvt->_odbccolumnscolumnmap.setValue(0,0);
@@ -5345,7 +5505,7 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbccolumnscolumnmap.setValue(5,5);
 	// COLUMN_SIZE
 	pvt->_odbccolumnscolumnmap.setValue(6,6);
-	// BUFFER_LEGTH
+	// BUFFER_LENGTH
 	pvt->_odbccolumnscolumnmap.setValue(7,7);
 	// DECIMAL_DIGITS - smallint - scale
 	pvt->_odbccolumnscolumnmap.setValue(8,8);
@@ -5382,7 +5542,7 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbccolumnscolumnmap.setValue(5,1);
 	// COLUMN_SIZE -> character_maximum_length
 	pvt->_odbccolumnscolumnmap.setValue(6,2);
-	// BUFFER_LEGTH -> character_maximum_length
+	// BUFFER_LENGTH -> character_maximum_length
 	pvt->_odbccolumnscolumnmap.setValue(7,2);
 	// DECIMAL_DIGITS - smallint - scale
 	pvt->_odbccolumnscolumnmap.setValue(8,4);
@@ -5405,6 +5565,194 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// IS_NULLABLE -> NULL
 	pvt->_odbccolumnscolumnmap.setValue(17,5);
 }
+	pvt->_odbccolumnscolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_odbccolumnscolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_odbccolumnscolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_odbccolumnscolumnnamemap.setValue(3,"COLUMN_NAME");
+	pvt->_odbccolumnscolumnnamemap.setValue(4,"DATA_TYPE");
+	pvt->_odbccolumnscolumnnamemap.setValue(5,"TYPE_NAME");
+	pvt->_odbccolumnscolumnnamemap.setValue(6,"COLUMN_SIZE");
+	pvt->_odbccolumnscolumnnamemap.setValue(7,"BUFFER_LENGTH");
+	pvt->_odbccolumnscolumnnamemap.setValue(8,"DECIMAL_DIGITS");
+	pvt->_odbccolumnscolumnnamemap.setValue(9,"NUM_PREC_RADIX");
+	pvt->_odbccolumnscolumnnamemap.setValue(10,"NULLABLE");
+	pvt->_odbccolumnscolumnnamemap.setValue(11,"REMARKS");
+	pvt->_odbccolumnscolumnnamemap.setValue(12,"COLUMN_DEF");
+	pvt->_odbccolumnscolumnnamemap.setValue(13,"SQL_DATA_TYPE");
+	pvt->_odbccolumnscolumnnamemap.setValue(14,"SQL_DATETIME_SUB");
+	pvt->_odbccolumnscolumnnamemap.setValue(15,"CHAR_OCTET_LENGTH");
+	pvt->_odbccolumnscolumnnamemap.setValue(16,"ORDINAL_POSITION");
+	pvt->_odbccolumnscolumnnamemap.setValue(17,"IS_NULLABLE");
+
+
+
+	// JDBC getDatabaseList:
+	//
+	// TABLE_CAT
+	pvt->_jdbcdatabasescolumnmap.setValue(0,0);
+	pvt->_jdbcdatabasescolumnnamemap.setValue(0,"TABLE_CAT");
+
+	// JDBC getTableList:
+	//
+	// TABLE_CAT
+	pvt->_jdbctablescolumnmap.setValue(0,0);
+	// TABLE_SCHEM
+	pvt->_jdbctablescolumnmap.setValue(1,1);
+	// TABLE_NAME
+	pvt->_jdbctablescolumnmap.setValue(2,2);
+	// TABLE_TYPE
+	pvt->_jdbctablescolumnmap.setValue(3,3);
+	// REMARKS
+	pvt->_jdbctablescolumnmap.setValue(4,4);
+	// TYPE_CAT -> NULL
+	pvt->_jdbctablescolumnmap.setValue(5,5);
+	// TYPE_SCHEM -> NULL
+	pvt->_jdbctablescolumnmap.setValue(6,5);
+	// TYPE_NAME -> NULL
+	pvt->_jdbctablescolumnmap.setValue(7,5);
+	// SELF_REFERENCING_COL_NAME -> NULL
+	pvt->_jdbctablescolumnmap.setValue(8,5);
+	// REF_GENERATION -> NULL
+	pvt->_jdbctablescolumnmap.setValue(9,5);
+	pvt->_jdbctablescolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_jdbctablescolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_jdbctablescolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_jdbctablescolumnnamemap.setValue(3,"TABLE_TYPE");
+	pvt->_jdbctablescolumnnamemap.setValue(4,"REMARKS");
+	pvt->_jdbctablescolumnnamemap.setValue(5,"TYPE_CAT");
+	pvt->_jdbctablescolumnnamemap.setValue(6,"TYPE_SCHEM");
+	pvt->_jdbctablescolumnnamemap.setValue(7,"TYPE_NAME");
+	pvt->_jdbctablescolumnnamemap.setValue(8,"SELF_REFERENCING_COL_NAME");
+	pvt->_jdbctablescolumnnamemap.setValue(9,"REF_GENERATION");
+
+	// JDBC getColumnList:
+	//
+// FIXME: fudged
+// The postgresql connection returns additional rows.
+// All connection modules should return the same as postgresql.
+if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
+	// TABLE_CAT
+	pvt->_jdbccolumnscolumnmap.setValue(0,0);
+	// TABLE_SCHEM
+	pvt->_jdbccolumnscolumnmap.setValue(1,1);
+	// TABLE_NAME
+	pvt->_jdbccolumnscolumnmap.setValue(2,2);
+	// COLUMN_NAME
+	pvt->_jdbccolumnscolumnmap.setValue(3,3);
+	// DATA_TYPE (numeric)
+	pvt->_jdbccolumnscolumnmap.setValue(4,4);
+	// TYPE_NAME
+	pvt->_jdbccolumnscolumnmap.setValue(5,5);
+	// COLUMN_SIZE
+	pvt->_jdbccolumnscolumnmap.setValue(6,6);
+	// BUFFER_LENGTH
+	pvt->_jdbccolumnscolumnmap.setValue(7,7);
+	// DECIMAL_DIGITS - smallint - scale
+	pvt->_jdbccolumnscolumnmap.setValue(8,8);
+	// NUM_PREC_RADIX - smallint - precision
+	pvt->_jdbccolumnscolumnmap.setValue(9,9);
+	// NULLABLE
+	pvt->_jdbccolumnscolumnmap.setValue(10,10);
+	// REMARKS
+	pvt->_jdbccolumnscolumnmap.setValue(11,11);
+	// COLUMN_DEF
+	pvt->_jdbccolumnscolumnmap.setValue(12,12);
+	// SQL_DATA_TYPE
+	pvt->_jdbccolumnscolumnmap.setValue(13,13);
+	// SQL_DATETIME_SUB
+	pvt->_jdbccolumnscolumnmap.setValue(14,14);
+	// CHAR_OCTET_LENGTH
+	pvt->_jdbccolumnscolumnmap.setValue(15,15);
+	// ORDINAL_POSITION
+	pvt->_jdbccolumnscolumnmap.setValue(16,16);
+	// IS_NULLABLE
+	pvt->_jdbccolumnscolumnmap.setValue(17,17);
+	// SCOPE_CATALOG -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(18,18);
+	// SCOPE_SCHEMA -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(19,18);
+	// SCOPE_TABLE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(20,18);
+	// SOURCE_DATA_TYPE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(21,18);
+	// IS_AUTOINCREMENT -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(22,18);
+	// IS_GENERATEDCOLUMN -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(23,18);
+} else {
+	// TABLE_CAT -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(0,9);
+	// TABLE_SCHEM -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(1,9);
+	// TABLE_NAME -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(2,9);
+	// COLUMN_NAME -> column_name
+	pvt->_jdbccolumnscolumnmap.setValue(3,0);
+	// DATA_TYPE (numeric) -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(4,9);
+	// TYPE_NAME -> data_type
+	pvt->_jdbccolumnscolumnmap.setValue(5,1);
+	// COLUMN_SIZE -> character_maximum_length
+	pvt->_jdbccolumnscolumnmap.setValue(6,2);
+	// BUFFER_LENGTH -> character_maximum_length
+	pvt->_jdbccolumnscolumnmap.setValue(7,2);
+	// DECIMAL_DIGITS - smallint - scale
+	pvt->_jdbccolumnscolumnmap.setValue(8,4);
+	// NUM_PREC_RADIX - smallint - precision
+	pvt->_jdbccolumnscolumnmap.setValue(9,3);
+	// NULLABLE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(10,9);
+	// REMARKS -> extra
+	pvt->_jdbccolumnscolumnmap.setValue(11,8);
+	// COLUMN_DEF -> column_default
+	pvt->_jdbccolumnscolumnmap.setValue(12,7);
+	// SQL_DATA_TYPE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(13,9);
+	// SQL_DATETIME_SUB -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(14,9);
+	// CHAR_OCTET_LENGTH -> character_maximum_length
+	pvt->_jdbccolumnscolumnmap.setValue(15,2);
+	// ORDINAL_POSITION -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(16,9);
+	// IS_NULLABLE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(17,5);
+	// SCOPE_CATALOG -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(18,9);
+	// SCOPE_SCHEMA -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(19,9);
+	// SCOPE_TABLE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(20,9);
+	// SOURCE_DATA_TYPE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(21,9);
+	// IS_AUTOINCREMENT -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(22,9);
+	// IS_GENERATEDCOLUMN -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(23,9);
+}
+	pvt->_jdbccolumnscolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_jdbccolumnscolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_jdbccolumnscolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_jdbccolumnscolumnnamemap.setValue(3,"COLUMN_NAME");
+	pvt->_jdbccolumnscolumnnamemap.setValue(4,"DATA_TYPE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(5,"TYPE_NAME");
+	pvt->_jdbccolumnscolumnnamemap.setValue(6,"COLUMN_SIZE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(7,"BUFFER_LENGTH");
+	pvt->_jdbccolumnscolumnnamemap.setValue(8,"DECIMAL_DIGITS");
+	pvt->_jdbccolumnscolumnnamemap.setValue(9,"NUM_PREC_RADIX");
+	pvt->_jdbccolumnscolumnnamemap.setValue(10,"NULLABLE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(11,"REMARKS");
+	pvt->_jdbccolumnscolumnnamemap.setValue(12,"COLUMN_DEF");
+	pvt->_jdbccolumnscolumnnamemap.setValue(13,"SQL_DATA_TYPE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(14,"SQL_DATETIME_SUB");
+	pvt->_jdbccolumnscolumnnamemap.setValue(15,"CHAR_OCTET_LENGTH");
+	pvt->_jdbccolumnscolumnnamemap.setValue(16,"ORDINAL_POSITION");
+	pvt->_jdbccolumnscolumnnamemap.setValue(17,"IS_NULLABLE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(18,"SCOPE_CATALOG");
+	pvt->_jdbccolumnscolumnnamemap.setValue(19,"SCOPE_SCHEMA");
+	pvt->_jdbccolumnscolumnnamemap.setValue(20,"SCOPE_TABLE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(21,"SOURCE_DATA_TYPE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(22,"IS_AUTOINCREMENT");
+	pvt->_jdbccolumnscolumnnamemap.setValue(23,"IS_GENERATEDCOLUMN");
 }
 
 uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
@@ -8827,6 +9175,9 @@ const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return NULL;
 	}
+	if (pvt->_columnnamemap) {
+		return pvt->_columnnamemap->getValue(col);
+	}
 	return cursor->getColumnNameFromBuffer(mapColumn(col));
 }
 
@@ -8835,6 +9186,10 @@ uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 	// see comment in colCount()
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
+	}
+	if (pvt->_columnnamemap) {
+		// FIXME: use a static map for these
+		return charstring::length(pvt->_columnnamemap->getValue(col));
 	}
 	return cursor->getColumnNameLengthFromBuffer(mapColumn(col));
 }
