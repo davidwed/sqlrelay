@@ -10,7 +10,7 @@
 	fixed a column-count reset bug in odbc, db2, informix, and postgresql
 		that could cause begin queries to fail when fake transaction
 		blocks are used
-	
+	object lists have correct column names for mysql, odbc, and jdbc now
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
