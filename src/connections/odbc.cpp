@@ -255,6 +255,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		charbind	**outcharbind;
 		int16_t		**outisnullptr;
 		datebind	**inoutdatebind;
+		charbind	**inoutcharbind;
 		int16_t		**inoutisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
 		SQLLEN		*outisnull;
@@ -276,6 +277,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 
 		#ifdef HAVE_SQLCONNECTW
 		singlylinkedlist<char *>	ucsinbindstrings;
+		singlylinkedlist<char *>	ucsinoutbindstrings;
 		#endif
 
 		bool		columninfoisvalidafterprepare;
@@ -2387,8 +2389,9 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	outdatebind=new datebind *[maxbindcount];
 	outcharbind=new charbind *[maxbindcount];
-	inoutdatebind=new datebind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
+	inoutdatebind=new datebind *[maxbindcount];
+	inoutcharbind=new charbind *[maxbindcount];
 	inoutisnullptr=new int16_t *[maxbindcount];
 	#ifdef SQLBINDPARAMETER_SQLLEN
 	outisnull=new SQLLEN[maxbindcount];
@@ -2400,10 +2403,11 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
 		outcharbind[i]=NULL;
-		inoutdatebind[i]=NULL;
 		outisnullptr[i]=NULL;
-		inoutisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutdatebind[i]=NULL;
+		inoutcharbind[i]=NULL;
+		inoutisnullptr[i]=NULL;
 		inoutisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
@@ -2416,13 +2420,15 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 odbccursor::~odbccursor() {
 	delete[] outdatebind;
 	delete[] outcharbind;
-	delete[] inoutdatebind;
 	delete[] outisnullptr;
-	delete[] inoutisnullptr;
 	delete[] outisnull;
+	delete[] inoutdatebind;
+	delete[] inoutcharbind;
+	delete[] inoutisnullptr;
 	delete[] inoutisnull;
 	#ifdef HAVE_SQLCONNECTW
 	ucsinbindstrings.clearAndArrayDelete();
+	ucsinoutbindstrings.clearAndArrayDelete();
 	#endif
 	deallocateResultSetBuffers();
 }
@@ -2501,6 +2507,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	if (odbcconn->unicode) {
 
 		ucsinbindstrings.clearAndArrayDelete();
+		ucsinoutbindstrings.clearAndArrayDelete();
 
 		if (getExecuteDirect()) {
 			return true;
@@ -2562,6 +2569,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		if (odbcconn->unicode) {
 
 			ucsinbindstrings.clearAndArrayDelete();
+			ucsinoutbindstrings.clearAndArrayDelete();
 
 			char *queryucs=convertCharset(query,length,
 							"UTF-8","UCS-2",
@@ -2886,6 +2894,7 @@ bool odbccursor::outputBind(const char *variable,
 	if (odbcconn->maxallowedvarcharbindlength &&
 		valuesize>odbcconn->maxallowedvarcharbindlength) {
 		valuesize=odbcconn->maxvarcharbindlength;
+		// FIXME: should bufferlength also be reduced here
 	}
 
 	charbind	*cb=new charbind;
@@ -3057,16 +3066,54 @@ bool odbccursor::inputOutputBind(const char *variable,
 		return false;
 	}
 
+	SQLPOINTER	val=NULL;
+	SQLSMALLINT	valtype=SQL_C_CHAR;
+	SQLSMALLINT	paramtype=SQL_CHAR;
+	SQLLEN		bufferlength=valuesize;
+	#ifdef HAVE_SQLCONNECTW
+	if (odbcconn->unicode) {
+
+		const char	*encoding=odbcconn->ncharencoding;
+		char	*err=NULL;
+		char	*valueucs=convertCharset(
+					value,valuesize,
+					"UTF-8",encoding,
+					&err);
+		if (err) {
+			delete[] valueucs;
+			setConvCharError("input-output bind",err);
+			return false;
+		}
+		// It's probably ok to reset valuesize, as I think it's used
+		// for the size (in characters) on input side.  I don't think
+		// bufferlength should be reset, as it defines the size (in
+		// bytes) of the buffer on the output side.
+		valuesize=len(valueucs,encoding);
+		//bufferlength=size(valueucs,encoding);
+		ucsinoutbindstrings.append(valueucs);
+		val=(SQLPOINTER)valueucs;
+		valtype=SQL_C_WCHAR;
+		paramtype=SQL_WVARCHAR;
+	} else {
+	#endif
+		val=(SQLPOINTER)value;
+	#ifdef HAVE_SQLCONNECTW
+	}
+	#endif
+
+	charbind	*cb=new charbind;
+	cb->value=value;
+	cb->valuesize=valuesize;
+
 	inoutdatebind[pos-1]=NULL;
+	inoutcharbind[pos-1]=cb;
 	inoutisnullptr[pos-1]=isnull;
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
 				sqlnulldata:charstring::length(value);
 
-	// FIXME: handle valuesize/buffersize like in inputBind/outputBind?
-	// FIXME: handle character conversion like in outputBind
-
-	erg=SQLBindParameter(stmt,
+	// FIXME: original code...
+	/*erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT_OUTPUT,
 				SQL_C_CHAR,
@@ -3075,7 +3122,49 @@ bool odbccursor::inputOutputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
+				&(inoutisnull[pos-1]));*/
+
+	if (*isnull==SQL_NULL_DATA) {
+		// the 4th parameter (ValueType) must by
+		// SQL_C_BINARY (as opposed to SQL_C_WCHAR or SQL_C_CHAR)
+		// for this to work with blobs
+		erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_BINARY,
+				SQL_CHAR,
+				1,
+				0,
+				val,
+				bufferlength,
 				&(inoutisnull[pos-1]));
+	} else {
+
+		if (!valuesize) {
+			// In ODBC-2 mode, SQL Server Native Client 11.0
+			// (at least) allows a valuesize of 0, when the value
+			// is "".  In non-ODBC-2 mode, it throws:
+			// "Invalid precision value" Using a valuesize of 1
+			// works with all ODBC-modes.  Hopefully it works with
+			// all drivers.
+			valuesize=1;
+		} else if (odbcconn->maxallowedvarcharbindlength &&
+			valuesize>odbcconn->maxallowedvarcharbindlength) {
+			valuesize=odbcconn->maxvarcharbindlength;
+			// FIXME: should bufferlength also be reduced here
+		}
+
+		erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				valtype,
+				paramtype,
+				valuesize,	// in characters
+				0,
+				val,
+				bufferlength,	// in bytes
+				&(inoutisnull[pos-1]));
+	}
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -3091,6 +3180,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 	}
 
 	inoutdatebind[pos-1]=NULL;
+	inoutcharbind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
@@ -3123,6 +3213,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 	}
 
 	inoutdatebind[pos-1]=NULL;
+	inoutcharbind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
@@ -3181,6 +3272,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 	db->buffer=buffer;
 
 	inoutdatebind[pos-1]=db;
+	inoutcharbind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
@@ -3258,6 +3350,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	#ifdef HAVE_SQLCONNECTW
 		// free buffers used to convert string-binds to unicode
 		ucsinbindstrings.clearAndArrayDelete();
+		ucsinoutbindstrings.clearAndArrayDelete();
 	#endif
 
 	if (erg!=SQL_SUCCESS &&
@@ -3373,6 +3466,30 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
 		}
+		#ifdef HAVE_SQLCONNECTW
+		if (odbcconn->unicode && inoutcharbind[i]) {
+			// convert wchar output binds to user coding
+			char		*value=inoutcharbind[i]->value;
+			uint32_t	valuesize=inoutcharbind[i]->valuesize;
+			char		*err=NULL;
+			char		*u=convertCharset(value,
+						odbcconn->ncharencoding,
+						"UTF-8",&err);
+			if (err) {
+				delete[] u;
+				setConvCharError("input-output bind",err);
+				return false;
+			}
+			size_t	s=size(u,"UTF-8");
+			if (s>=valuesize) {
+				// FIXME: this could make s<0
+				s=valuesize-nullSize("UTF-8");
+			}
+			bytestring::zero(value+s,nullSize("UTF-8"));
+			bytestring::copy(value,u,s);
+			delete[] u;
+		}
+		#endif
 		if (inoutisnullptr[i]) {
 			*(inoutisnullptr[i])=inoutisnull[i];
 		}
@@ -4129,6 +4246,10 @@ void odbccursor::closeResultSet() {
 		delete inoutdatebind[i];
 	}
 
+	for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+		delete inoutcharbind[i];
+	}
+
 	// FIXME: inefficient, but there appears to be a case where
 	// closeResultSet isn't called, and stale ptrs get left lingering
 	// around...
@@ -4138,6 +4259,7 @@ void odbccursor::closeResultSet() {
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
 		inoutdatebind[i]=NULL;
+		inoutcharbind[i]=NULL;
 		inoutisnullptr[i]=NULL;
 		inoutisnull[i]=0;
 	}

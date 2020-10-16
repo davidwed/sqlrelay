@@ -3012,16 +3012,24 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 		// make sure there are only spaces, comments or one of the words
 		// "work" or "transaction" after the begin
 		const char	*spaceptr=skipWhitespaceAndComments(query+5);
-		
-		if (*spaceptr=='\0' ||
-			!charstring::compareIgnoringCase(
-						spaceptr,"work",4) ||
-			!charstring::compareIgnoringCase(
-						spaceptr,"transaction",11)) {
+
+		if (*spaceptr=='\0') {
 			return true;
+		} else if (!charstring::compareIgnoringCase(
+						spaceptr,"work",4)) {
+			spaceptr=skipWhitespaceAndComments(spaceptr+4);
+			if (*spaceptr=='\0') {
+				return true;
+			}
+		} else if (!charstring::compareIgnoringCase(
+						spaceptr,"transaction",11)) {
+			spaceptr=skipWhitespaceAndComments(spaceptr+11);
+			if (*spaceptr=='\0') {
+stdoutput.printf("intercept!!!\n");
+				return true;
+			}
 		}
 		return false;
-
 	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
 		return true;
 	} else if (!charstring::compareIgnoringCase(query,"bt",2) &&
