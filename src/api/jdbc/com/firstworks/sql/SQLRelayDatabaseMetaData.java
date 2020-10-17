@@ -179,9 +179,8 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						throws SQLException {
 		debugFunction();
 
-		debugPrintln("  catalog: "+catalog);
-		debugPrintln("  schema pattern: "+schemaPattern);
-		debugPrintln("  table name pattern: "+tableNamePattern);
+		String	wild=buildWild(catalog,schemaPattern,tableNamePattern);
+		debugPrintln("  wild: "+wild);
 		debugPrintln("  column name pattern: "+columnNamePattern);
 
 		SQLRelayResultSet	resultset=null;
@@ -189,15 +188,8 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						connection.createStatement();
 		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
 
-		if (schemaPattern!=null && !schemaPattern.equals("")) {
-			// FIXME: not all db's use . and not all db's
-			// use schema.table...
-			tableNamePattern=schemaPattern+"."+tableNamePattern;
-		}
-
 		boolean	result=sqlrcur.getColumnListWithFormat(
-						tableNamePattern,
-						columnNamePattern,3);
+						wild,columnNamePattern,3);
 
 		debugPrintln("  result: "+result);
 
@@ -683,6 +675,7 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						throws SQLException {
 		debugFunction();
 
+		// FIXME: use catalog
 		debugPrintln("  catalog: "+catalog);
 		debugPrintln("  schema pattern: "+schemaPattern);
 
@@ -792,40 +785,8 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						throws SQLException {
 		debugFunction();
 
-		String	wild=null;
-
-		// If tblname was empty or %, then leave "wild" NULL.
-		// Otherwise concatenate catalog/schema's until it's in one
-		// of the following formats:
-		// * table
-		// * schema.table
-		// * catalog.schema.table
-		// If tblname already contains a . then just use it as-is.
-		if (tableNamePattern.contains(".")) {
-
-			StringBuilder	wildstr;
-			if (catalog==null || catalog.equals("")) {
-				wildstr.append(catalog).append('.');
-			}
-			if (schemaPattern==null || schemaPattern.equals("")) {
-				wildstr.append(schemaPattern).append('.');
-			} else if (wildstr.length()) {
-				wildstr.append("%.");
-			}
-			if (!charstring::isNullOrEmpty(schname)) {
-				wildstr.append(tblname);
-			} else {
-				wildstr.append('%');
-			}
-			delete[] tblname;
-			tblname=wildstr.detachString();
-		}
-		wild=tblname;
-
-		SQLRelayResultSet	resultset=null;
-		SQLRelayStatement	stmt=(SQLRelayStatement)
-						connection.createStatement();
-		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
+		String	wild=buildWild(catalog,schemaPattern,tableNamePattern);
+		debugPrintln("  wild: "+wild);
 
 		debugPrint("  types: ");
 		int	objecttypes=0;
@@ -851,6 +812,11 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 			debugPrintln("");
 		}
 
+		SQLRelayResultSet	resultset=null;
+		SQLRelayStatement	stmt=(SQLRelayStatement)
+						connection.createStatement();
+		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
+
 		boolean	result=sqlrcur.getTableListWithFormat(
 						tableNamePattern,3,objecttypes);
 
@@ -870,6 +836,50 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 		}
 		
 		return resultset;
+	}
+
+	private String 	buildWild(String catalog,
+					String schema,
+					String object) {
+
+		// If object already contains a . then just use it
+		// as-is.
+		if (object.contains(".")) {
+			return object;
+		}
+
+		// Concatenate parts until wild is one of the following formats:
+		// * table
+		// * schema.table
+		// * catalog.schema.table
+
+		StringBuilder	wild=new StringBuilder();
+		if (catalog!=null) {
+			if (catalog.equals("")) {
+				// retrieve objects without a catalog
+				// FIXME: how???
+			} else {
+				wild.append(catalog).append('.');
+			}
+		}
+		if (schema!=null) {
+			if (schema.equals("")) {
+				// retrieve objects without a schema
+				// FIXME: how???
+			} else {
+				wild.append(schema).append('.');
+			}
+		} else if (wild.length()>0) {
+			// if schema was null, but a catalog was
+			// specified then include all schemas
+			wild.append("%.");
+		}
+		if (object!=null && !object.equals("")) {
+			wild.append(object);
+		} else {
+			wild.append('%');
+		}
+		return wild.toString();
 	}
 
 	public ResultSet 	getTableTypes() throws SQLException {
