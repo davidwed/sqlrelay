@@ -9317,7 +9317,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 			} else if (wildstr.getStringLength()) {
 				wildstr.append("%.");
 			}
-			if (!charstring::isNullOrEmpty(schname)) {
+			if (!charstring::isNullOrEmpty(tblname)) {
 				wildstr.append(tblname);
 			} else {
 				wildstr.append('%');

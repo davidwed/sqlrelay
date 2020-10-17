@@ -179,6 +179,11 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						throws SQLException {
 		debugFunction();
 
+		debugPrintln("  catalog: "+catalog);
+		debugPrintln("  schema pattern: "+schemaPattern);
+		debugPrintln("  table name pattern: "+tableNamePattern);
+		debugPrintln("  column name pattern: "+columnNamePattern);
+
 		SQLRelayResultSet	resultset=null;
 		SQLRelayStatement	stmt=(SQLRelayStatement)
 						connection.createStatement();
@@ -678,6 +683,9 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						throws SQLException {
 		debugFunction();
 
+		debugPrintln("  catalog: "+catalog);
+		debugPrintln("  schema pattern: "+schemaPattern);
+
 		SQLRelayResultSet	resultset=null;
 		SQLRelayStatement	stmt=(SQLRelayStatement)
 						connection.createStatement();
@@ -784,16 +792,49 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						throws SQLException {
 		debugFunction();
 
+		String	wild=null;
+
+		// If tblname was empty or %, then leave "wild" NULL.
+		// Otherwise concatenate catalog/schema's until it's in one
+		// of the following formats:
+		// * table
+		// * schema.table
+		// * catalog.schema.table
+		// If tblname already contains a . then just use it as-is.
+		if (tableNamePattern.contains(".")) {
+
+			StringBuilder	wildstr;
+			if (catalog==null || catalog.equals("")) {
+				wildstr.append(catalog).append('.');
+			}
+			if (schemaPattern==null || schemaPattern.equals("")) {
+				wildstr.append(schemaPattern).append('.');
+			} else if (wildstr.length()) {
+				wildstr.append("%.");
+			}
+			if (!charstring::isNullOrEmpty(schname)) {
+				wildstr.append(tblname);
+			} else {
+				wildstr.append('%');
+			}
+			delete[] tblname;
+			tblname=wildstr.detachString();
+		}
+		wild=tblname;
+
 		SQLRelayResultSet	resultset=null;
 		SQLRelayStatement	stmt=(SQLRelayStatement)
 						connection.createStatement();
 		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
 
+		debugPrint("  types: ");
 		int	objecttypes=0;
 		if (types==null) {
+			debugPrintln("null");
 			objecttypes=1|2|3|4;
 		} else {
 			for (String type: types) {
+				debugPrint(type+",");
 				if (type.equals("TABLE") ||
 					type.equals("SYSTEM TABLE") ||
 					type.equals("GLOBAL TEMPORARY") ||
@@ -807,12 +848,7 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 					objecttypes|=4;
 				}
 			}
-		}
-
-		if (schemaPattern!=null && !schemaPattern.equals("")) {
-			// FIXME: not all db's use . and not all db's
-			// use schema.table...
-			tableNamePattern=schemaPattern+"."+tableNamePattern;
+			debugPrintln("");
 		}
 
 		boolean	result=sqlrcur.getTableListWithFormat(
