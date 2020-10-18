@@ -1397,9 +1397,8 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	const char	*catalog=NULL;
 	char		schemabuffer[1024];
 	const char	*schema="";
-	const char	*table="";
-	char		**tableparts=NULL;
-	uint64_t	tablepartcount=0;
+	// FIXME: should this be SQL_ALL_TABLES?
+	const char	*table="%";
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1427,52 +1426,10 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 		}
 	}
 
-	// get the table name (or % for all tables)
-	if (charstring::isNullOrEmpty(wild)) {
-
-		// FIXME: should this be SQL_ALL_TABLES?
-		table="%";
-
-	} else {
-
-		// the table name might be in one
-		// of the following formats:
-		// * table
-		// * schema.table
-		// * catalog.schema.table
-		charstring::split(wild,".",true,
-				&tableparts,&tablepartcount);
-
-		// reset schema and catalog if necessary
-		switch (tablepartcount) {
-			case 3:
-				catalog=tableparts[0];
-				schema=tableparts[1];
-				table=tableparts[2];
-				break;
-			case 2:
-				// If there are 2 parts the it could
-				// mean:
-				// * catalog(.defaultschama).table
-				//   or
-				// * (currentcatalog.)schema.table...
-				// If the first part is not the same as
-				// the current catalog, then we'll
-				// guess (currentcatalog.)schema.table,
-				// but we don't really know for sure.
-				// The app may really mean to target
-				// another catalog.
-				if (charstring::compare(
-						tableparts[0],
-						catalogbuffer)) {
-					schema=tableparts[0];
-				}
-				table=tableparts[1];
-				break;
-			case 1:
-				table=tableparts[0];
-				break;
-		}
+	// split the object name
+	if (!charstring::isNullOrEmpty(wild)) {
+		cont->splitObjectName(catalogbuffer,schemabuffer,wild,
+						&catalog,&schema,&table);
 	}
 
 	stringbuffer	tabletype;
@@ -1498,22 +1455,14 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 		tabletype.append("SYNONYM");
 	}
 
+stdoutput.printf("%s.%s.%s\n",catalog,schema,table);
 	// get the table list
-stdoutput.printf("catalog: %s\n",catalog);
-stdoutput.printf(" schema: %s\n",schema);
-stdoutput.printf("  table: %s\n",table);
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)table,SQL_NTS,
 			(SQLCHAR *)tabletype.getString(),SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<tablepartcount; i++) {
-		delete[] tableparts[i];
-	}
-	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1578,8 +1527,6 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*tablename="";
-	char		**tableparts=NULL;
-	uint64_t	tablepartcount=0;
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1607,39 +1554,9 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 		}
 	}
 
-	// the table name might be in one
-	// of the following formats:
-	// * table
-	// * schema.table
-	// * catalog.schema.table
-	charstring::split(table,".",true,&tableparts,&tablepartcount);
-
-	// reset schema and catalog if necessary
-	switch (tablepartcount) {
-		case 3:
-			catalog=tableparts[0];
-			schema=tableparts[1];
-			tablename=tableparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).table
-			//   or
-			// * (currentcatalog.)schema.table...
-			// If the first part is not the same as the current
-			// catalog, then we'll guess
-			// (currentcatalog.)schema.table, but we don't really
-			// know for sure. The app may really mean to target
-			// another catalog.
-			if (charstring::compare(tableparts[0],catalogbuffer)) {
-				schema=tableparts[0];
-			}
-			tablename=tableparts[1];
-			break;
-		case 1:
-			tablename=tableparts[0];
-			break;
-	}
+	// split the table name
+	cont->splitObjectName(catalogbuffer,schemabuffer,table,
+						&catalog,&schema,&tablename);
 
 	// use % if wild was empty
 	wild=(!charstring::isNullOrEmpty(wild))?wild:"%";
@@ -1651,12 +1568,6 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 			(SQLCHAR *)tablename,SQL_NTS,
 			(SQLCHAR *)wild,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<tablepartcount; i++) {
-		delete[] tableparts[i];
-	}
-	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1689,8 +1600,6 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*tablename="";
-	char		**tableparts=NULL;
-	uint64_t	tablepartcount=0;
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1718,39 +1627,9 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 		}
 	}
 
-	// the table name might be in one
-	// of the following formats:
-	// * table
-	// * schema.table
-	// * catalog.schema.table
-	charstring::split(table,".",true,&tableparts,&tablepartcount);
-
-	// reset schema and catalog if necessary
-	switch (tablepartcount) {
-		case 3:
-			catalog=tableparts[0];
-			schema=tableparts[1];
-			tablename=tableparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).table
-			//   or
-			// * (currentcatalog.)schema.table...
-			// If the first part is not the same as the current
-			// catalog, then we'll guess
-			// (currentcatalog.)schema.table, but we don't really
-			// know for sure. The app may really mean to target
-			// another catalog.
-			if (charstring::compare(tableparts[0],catalogbuffer)) {
-				schema=tableparts[0];
-			}
-			tablename=tableparts[1];
-			break;
-		case 1:
-			tablename=tableparts[0];
-			break;
-	}
+	// split the table name
+	cont->splitObjectName(catalogbuffer,schemabuffer,table,
+						&catalog,&schema,&tablename);
 
 	// get the primary key list
 	erg=SQLPrimaryKeys(odbccur->stmt,
@@ -1758,12 +1637,6 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)tablename,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<tablepartcount; i++) {
-		delete[] tableparts[i];
-	}
-	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1796,8 +1669,6 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*tablename="";
-	char		**tableparts=NULL;
-	uint64_t	tablepartcount=0;
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1825,39 +1696,9 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 		}
 	}
 
-	// the table name might be in one
-	// of the following formats:
-	// * table
-	// * schema.table
-	// * catalog.schema.table
-	charstring::split(table,".",true,&tableparts,&tablepartcount);
-
-	// reset schema and catalog if necessary
-	switch (tablepartcount) {
-		case 3:
-			catalog=tableparts[0];
-			schema=tableparts[1];
-			tablename=tableparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).table
-			//   or
-			// * (currentcatalog.)schema.table...
-			// If the first part is not the same as the current
-			// catalog, then we'll guess
-			// (currentcatalog.)schema.table, but we don't really
-			// know for sure. The app may really mean to target
-			// another catalog.
-			if (charstring::compare(tableparts[0],catalogbuffer)) {
-				schema=tableparts[0];
-			}
-			tablename=tableparts[1];
-			break;
-		case 1:
-			tablename=tableparts[0];
-			break;
-	}
+	// split the table name
+	cont->splitObjectName(catalogbuffer,schemabuffer,table,
+						&catalog,&schema,&tablename);
 
 	// set uniqueness
 	SQLUSMALLINT	uniqueness=SQL_INDEX_UNIQUE;
@@ -1879,12 +1720,6 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 			uniqueness,
 			accuracy);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<tablepartcount; i++) {
-		delete[] tableparts[i];
-	}
-	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1915,12 +1750,13 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	// Unlike SQLColumns/SQLTables, SQLProcedureColumns wants NULL instead
 	// of "" for catalog/schema, to indicate the current catalog/schema.
 	// It interprets "" as meaning outside of any catalog/schema.
+	char		catalogbuffer[1024];
 	const char	*catalog=NULL;
+	char		schemabuffer[1024];
 	const char	*schema=NULL;
 	const char	*proc=NULL;
 
 	// get the current catalog (instance)
-	char		catalogbuffer[1024];
 	SQLINTEGER	cataloglen=0;
 	if (SQLGetConnectAttr(dbc,
 				SQL_CURRENT_QUALIFIER,
@@ -1930,40 +1766,24 @@ bool odbcconnection::getProcedureBindAndColumnList(
 		catalogbuffer[cataloglen]='\0';
 	}
 
-	// split the procedure name and extract the parts
-	char		**procparts=NULL;
-	uint64_t	procpartcount=0;
-	charstring::split(procedure,".",true,&procparts,&procpartcount);
-	switch (procpartcount) {
-		case 3:
-			catalog=procparts[0];
-			schema=procparts[1];
-			proc=procparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).proc
-			//   or
-			// * (currentcatalog.)schema.proc...
-			// If the first part is not the same as the
-			// current catalog, then we'll guess
-			// (currentcatalog.)schema.proc, but we don't really
-			// know for sure.  The app may really mean to target
-			// another catalog.
-			if (charstring::compare(procparts[0],
-						catalogbuffer)) {
-				schema=procparts[0];
-			}
-			proc=procparts[1];
-
-			// NOTE: Delphi was passing catalog.proc at one point,
-			// and we were assuming that instead.
-			//catalog=procparts[0];
-			break;
-		case 1:
-			proc=procparts[0];
-			break;
+	// get the current user (schema)
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
+
+	// split the procedure name
+	cont->splitObjectName(catalogbuffer,schemabuffer,procedure,
+						&catalog,&schema,&proc);
 
 	// SQLProcedureColumns takes non-const arguments, so we have to make
 	// a copy of the wild parameter.
@@ -1994,10 +1814,6 @@ bool odbcconnection::getProcedureBindAndColumnList(
 
 	// clean up
 	delete[] wildcopy;
-	for (uint64_t i=0; i<procpartcount; i++) {
-		delete[] procparts[i];
-	}
-	delete[] procparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -2185,9 +2001,7 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 	const char	*catalog=NULL;
 	char		schemabuffer[1024];
 	const char	*schema="";
-	const char	*procname="";
-	char		**procparts=NULL;
-	uint64_t	procpartcount=0;
+	const char	*procname="%";
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -2215,48 +2029,10 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 		}
 	}
 
-	// get the procedure name (or % for all procedures)
-	if (charstring::isNullOrEmpty(wild)) {
-
-		procname="%";
-
-	} else {
-
-		// the procedure name might be in one
-		// of the following formats:
-		// * procedure
-		// * schema.procedure
-		// * catalog.schema.procedure
-		charstring::split(wild,".",true,
-				&procparts,&procpartcount);
-
-		// reset schema and catalog if necessary
-		switch (procpartcount) {
-			case 3:
-				catalog=procparts[0];
-				schema=procparts[1];
-				procname=procparts[2];
-				break;
-			case 2:
-				// If there are 2 parts the it could mean:
-				// * catalog(.defaultschama).proc
-				//   or
-				// * (currentcatalog.)schema.proc...
-				// If the first part is not the same as the
-				// current catalog, then we'll guess
-				// (currentcatalog.)schema.proc, but we don't
-				// really know for sure.  The app may really
-				// mean to target another catalog.
-				if (charstring::compare(procparts[0],
-							catalogbuffer)) {
-					schema=procparts[0];
-				}
-				procname=procparts[1];
-				break;
-			case 1:
-				procname=procparts[0];
-				break;
-		}
+	// split the procedure name
+	if (!charstring::isNullOrEmpty(wild)) {
+		cont->splitObjectName(catalogbuffer,schemabuffer,wild,
+						&catalog,&schema,&procname);
 	}
 
 	// get the procedure list
@@ -2265,12 +2041,6 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)procname,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<procpartcount; i++) {
-		delete[] procparts[i];
-	}
-	delete[] procparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;

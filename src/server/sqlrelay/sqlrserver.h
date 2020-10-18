@@ -543,9 +543,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getProcedureListQuery(bool wild);
 		void		splitObjectName(const char *fqobject,
 						const char *currentcatalog,
-						char **catalog,
-						char **schema,
-						char **object);
+						const char **catalog,
+						const char **schema,
+						const char **object);
 
 		// column info
 		bool		columnInfoIsValidAfterPrepare(
@@ -794,9 +794,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		splitObjectName(const char *currentdb,
 						const char *currentschema,
 						const char *combinedobject,
-						char **db,
-						char **schema,
-						char **object);
+						const char **db,
+						const char **schema,
+						const char **object);
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);

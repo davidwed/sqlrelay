@@ -682,10 +682,10 @@ const char *mysqlconnection::getColumnListQuery(
 
 	// split the table name into db/schema/table parts
 	const char	*currentdb="def";
-	char	*currentschema=getCurrentDatabase();
-	char	*dbname=NULL;
-	char	*schemaname=NULL;
-	char	*tablename=NULL;
+	char		*currentschema=getCurrentDatabase();
+	const char	*dbname=NULL;
+	const char	*schemaname=NULL;
+	const char	*tablename=NULL;
 	cont->splitObjectName(currentdb,currentschema,table,
 				&dbname,&schemaname,&tablename);
 
@@ -725,9 +725,6 @@ const char *mysqlconnection::getColumnListQuery(
 
 	// clean up
 	delete[] currentschema;
-	delete[] dbname;
-	delete[] schemaname;
-	delete[] tablename;
 
 	return columnlistquery.getString();
 }

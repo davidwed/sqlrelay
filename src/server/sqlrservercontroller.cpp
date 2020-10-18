@@ -297,6 +297,10 @@ class sqlrservercontrollerprivate {
 	const unsigned char	*_bulkdataformat;
 	singlylinkedlist<const unsigned char *>	_bulkdata;
 	singlylinkedlist<uint64_t>		_bulkdatalen;
+
+	char	*_db;
+	char	*_schema;
+	char	*_object;
 };
 
 static signalhandler		alarmhandler;
@@ -450,6 +454,10 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_bulkquerylen=0;
 	pvt->_bulkquery=NULL;
 	pvt->_bulkdataformat=NULL;
+
+	pvt->_db=NULL;
+	pvt->_schema=NULL;
+	pvt->_object=NULL;
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -520,6 +528,10 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_bulkservershmem;
 	delete pvt->_bulkclientshmem;
 	delete pvt->_bulkcursor;
+
+	delete pvt->_db;
+	delete pvt->_schema;
+	delete pvt->_object;
 
 	delete pvt;
 }
@@ -2595,56 +2607,6 @@ const char *sqlrservercontroller::getProcedureListQuery(bool wild) {
 	return pvt->_conn->getProcedureListQuery(wild);
 }
 
-void sqlrservercontroller::splitObjectName(const char *fqobject,
-						const char *currentcatalog,
-						char **catalog,
-						char **schema,
-						char **object) {
-	*catalog=NULL;
-	*schema=NULL;
-	*object=NULL;
-
-	// the fully qualified object name might be in one
-	// of the following formats:
-	// * object
-	// * schema.object
-	// * catalog.schema.object
-	char		**objectparts=NULL;
-	uint64_t	objectpartcount=0;
-	charstring::split(fqobject,".",true,&objectparts,&objectpartcount);
-
-	// reset schema and catalog if necessary
-	switch (objectpartcount) {
-		case 3:
-			*catalog=objectparts[0];
-			*schema=objectparts[1];
-			*object=objectparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could
-			// mean:
-			// * catalog(.defaultschama).object
-			//   or
-			// * (currentcatalog.)schema.object...
-			// If the first part is not the same as
-			// the current catalog, then we'll
-			// guess (currentcatalog.)schema.object,
-			// but we don't really know for sure.
-			// The app may really mean to target
-			// another catalog.
-			if (charstring::compare(
-					objectparts[0],
-					currentcatalog)) {
-				*schema=objectparts[0];
-			}
-			*object=objectparts[1];
-			break;
-		case 1:
-			*object=objectparts[0];
-			break;
-	}
-}
-
 void sqlrservercontroller::saveError() {
 
 	// don't overwrite any message that's already been saved
@@ -3256,14 +3218,17 @@ uint16_t sqlrservercontroller::countBindVariables(const char *query,
 void sqlrservercontroller::splitObjectName(const char *currentdb,
 						const char *currentschema,
 						const char *combinedobject,
-						char **db,
-						char **schema,
-						char **object) {
+						const char **db,
+						const char **schema,
+						const char **object) {
 
 	// init return values
-	*db=NULL;
-	*schema=NULL;
-	*object=NULL;
+	delete[] pvt->_db;
+	delete[] pvt->_schema;
+	delete[] pvt->_object;
+	pvt->_db=NULL;
+	pvt->_schema=NULL;
+	pvt->_object=NULL;
 
 	// split the combined object
 	char		**parts=NULL;
@@ -3276,9 +3241,9 @@ void sqlrservercontroller::splitObjectName(const char *currentdb,
 	// * db.schema.object
 	switch (partcount) {
 		case 3:
-			*db=parts[0];
-			*schema=parts[1];
-			*object=parts[2];
+			pvt->_db=parts[0];
+			pvt->_schema=parts[1];
+			pvt->_object=parts[2];
 			break;
 		case 2:
 			// If there are 2 parts the it could mean:
@@ -3290,25 +3255,26 @@ void sqlrservercontroller::splitObjectName(const char *currentdb,
 			// but we don't really know for sure. The app may
 			// really mean to target another db.
 			if (!charstring::compare(parts[0],currentdb)) {
-				*db=parts[0];
-				*schema=charstring::duplicate(currentschema);
+				pvt->_db=parts[0];
+				pvt->_schema=
+					charstring::duplicate(currentschema);
 			} else {
-				*db=charstring::duplicate(currentdb);
-				*schema=parts[0];
+				pvt->_db=charstring::duplicate(currentdb);
+				pvt->_schema=parts[0];
 			}
-			*object=parts[1];
+			pvt->_object=parts[1];
 			break;
 		case 1:
-			*db=charstring::duplicate(currentdb);
-			*schema=charstring::duplicate(currentschema);
-			*object=parts[0];
+			pvt->_db=charstring::duplicate(currentdb);
+			pvt->_schema=charstring::duplicate(currentschema);
+			pvt->_object=parts[0];
 			break;
 	}
 
-	// clean up (we don't need to delete each individual part because
-	// they've all been passed out and will be cleaned up by the calling
-	// method)
-	delete[] parts;
+	// pass values out
+	*db=pvt->_db;
+	*schema=pvt->_schema;
+	*object=pvt->_object;
 }
 
 bool sqlrservercontroller::isBitType(const char *type) {
