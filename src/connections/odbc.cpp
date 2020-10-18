@@ -1499,6 +1499,9 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	}
 
 	// get the table list
+stdoutput.printf("catalog: %s\n",catalog);
+stdoutput.printf(" schema: %s\n",schema);
+stdoutput.printf("  table: %s\n",table);
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,

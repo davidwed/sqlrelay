@@ -2595,6 +2595,56 @@ const char *sqlrservercontroller::getProcedureListQuery(bool wild) {
 	return pvt->_conn->getProcedureListQuery(wild);
 }
 
+void sqlrservercontroller::splitObjectName(const char *fqobject,
+						const char *currentcatalog,
+						char **catalog,
+						char **schema,
+						char **object) {
+	*catalog=NULL;
+	*schema=NULL;
+	*object=NULL;
+
+	// the fully qualified object name might be in one
+	// of the following formats:
+	// * object
+	// * schema.object
+	// * catalog.schema.object
+	char		**objectparts=NULL;
+	uint64_t	objectpartcount=0;
+	charstring::split(fqobject,".",true,&objectparts,&objectpartcount);
+
+	// reset schema and catalog if necessary
+	switch (objectpartcount) {
+		case 3:
+			*catalog=objectparts[0];
+			*schema=objectparts[1];
+			*object=objectparts[2];
+			break;
+		case 2:
+			// If there are 2 parts the it could
+			// mean:
+			// * catalog(.defaultschama).object
+			//   or
+			// * (currentcatalog.)schema.object...
+			// If the first part is not the same as
+			// the current catalog, then we'll
+			// guess (currentcatalog.)schema.object,
+			// but we don't really know for sure.
+			// The app may really mean to target
+			// another catalog.
+			if (charstring::compare(
+					objectparts[0],
+					currentcatalog)) {
+				*schema=objectparts[0];
+			}
+			*object=objectparts[1];
+			break;
+		case 1:
+			*object=objectparts[0];
+			break;
+	}
+}
+
 void sqlrservercontroller::saveError() {
 
 	// don't overwrite any message that's already been saved

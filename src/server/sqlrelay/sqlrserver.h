@@ -541,6 +541,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getTypeInfoListQuery(const char *type,
 							bool wild);
 		const char	*getProcedureListQuery(bool wild);
+		void		splitObjectName(const char *fqobject,
+						const char *currentcatalog,
+						char **catalog,
+						char **schema,
+						char **object);
 
 		// column info
 		bool		columnInfoIsValidAfterPrepare(
