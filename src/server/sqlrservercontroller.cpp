@@ -3044,19 +3044,19 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 
 		if (*spaceptr=='\0') {
 			return true;
-		} else if (!charstring::compareIgnoringCase(
-						spaceptr,"work",4)) {
-			spaceptr=skipWhitespaceAndComments(spaceptr+4);
-			if (*spaceptr=='\0') {
-				return true;
-			}
-		} else if (!charstring::compareIgnoringCase(
-						spaceptr,"transaction",11)) {
-			spaceptr=skipWhitespaceAndComments(spaceptr+11);
-			if (*spaceptr=='\0') {
-stdoutput.printf("intercept!!!\n");
-				return true;
-			}
+		} else if ((!charstring::compareIgnoringCase(
+						spaceptr,"work",4) ||
+				!charstring::compareIgnoringCase(
+						spaceptr,"transaction",11)) &&
+
+				// also make sure the query isn't actually a
+				// block of queries that also contains a commit
+				// or rollback
+				!charstring::containsIgnoringCase(
+							spaceptr,"commit") &&
+				!charstring::containsIgnoringCase(
+							spaceptr,"rollback")) {
+			return true;
 		}
 		return false;
 	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {

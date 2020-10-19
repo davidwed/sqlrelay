@@ -2,6 +2,8 @@
 	fixed commit/begin without commitcount error in sqlrimportcsv
 	fetch errors aren't returned if sqlrclient protocol version < 2
 	query-intercept catches "begin transaction" now
+	query-intercept doesn't intercept various begin-type statements if the
+		query is actually a block of sql containing commit or rollback
 	added ncharencoding option to odbc connection to enable UTF-16 values
 		in SQL Server nchars/nvarchars
 	fixed a bug that caused output binds of length 8000+ to fail on
