@@ -3115,7 +3115,7 @@ bool sqlrservercontroller::blockCanBeIntercepted(const char *block) {
 	// started?
 	//
 	// Should I not intercept, but then set
-	// pvt->_infaketransactionblock=false in the second case?
+	// pvt->_infaketransactionblock=true in the second case?
 	//
 	// Sort this out...
 
