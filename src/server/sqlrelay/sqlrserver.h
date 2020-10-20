@@ -782,6 +782,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *endptr);
 		bool		skipWhitespace(const char **ptr,
 						const char *endptr);
+		const char	*skipWhitespace(const char *query);
+		const char	*skipComments(const char *query);
 		const char	*skipWhitespaceAndComments(const char *query);
 
 		const char	*asciiToHex(unsigned char ch);

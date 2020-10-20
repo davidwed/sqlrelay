@@ -2787,6 +2787,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 	bool	retval=false;
 	switch (querytype) {
 		case SQLRQUERYTYPE_BEGIN:
+stdoutput.printf("intercept begin!\n");
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
@@ -3048,14 +3049,10 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 						spaceptr,"work",4) ||
 				!charstring::compareIgnoringCase(
 						spaceptr,"transaction",11)) &&
-
 				// also make sure the query isn't actually a
 				// block of queries that also contains a commit
 				// or rollback
-				!charstring::containsIgnoringCase(
-							spaceptr,"commit") &&
-				!charstring::containsIgnoringCase(
-							spaceptr,"rollback")) {
+				!blockContainsCommitOrRollback(spaceptr)) {
 			return true;
 		}
 		return false;
@@ -3065,6 +3062,67 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 							*(query+2)=='\0') {
 		return true;
 	}
+	return false;
+}
+
+bool sqlrservercontroller::blockContainsCommitOrRollback(const char *block) {
+
+	// FIXME: handle other types of quoting - ", `, and []
+
+	bool		inquotes=false;
+	const char	*ptr=block;
+	const char	*prevptr=" ";
+	do {
+
+		if (!inquotes) {
+
+			ptr=skipWhitespaceAndComments(ptr);
+			if (!*ptr) {
+				return false;
+			}
+
+			if (ptr!=block) {
+				prevptr=ptr-1;
+			}
+
+			if (
+				// if the previous character is whitespace
+				// (note that it was initialized to whitespace
+				// so this also works if we're at the beginning
+				// of the block) and...
+				character::isWhitespace(*prevptr) &&
+
+				// we find a commit, followed by the
+				// end of the block, or whitespace or...
+				((!charstring::compareIgnoringCase(
+							ptr,"commit",6) &&
+				(!*(ptr+6) ||
+					character::isWhitespace(*(ptr+6)))) ||
+
+				// we find a rollback, followed by the
+				// end of the block, or whitespace
+				(!charstring::compareIgnoringCase(
+							ptr,"rollback",8) &&
+				(!*(ptr+8) ||
+					character::isWhitespace(*(ptr+8)))))) {
+
+stdoutput.printf("\nblock contains commit/rollback!\n");
+				// then we have a qualifying commit or
+				// rollback in the block
+				return true;
+			}
+		}
+		
+		// if we found a quote, flip our in-quotes flag
+		if (*ptr=='\'') {
+			inquotes=!inquotes;
+		}
+		ptr++;
+
+	} while (*ptr);
+
+	// if we got here, then we hit the end of the block without finding
+	// a qualifying commit or rollback
 	return false;
 }
 
@@ -3095,6 +3153,37 @@ bool sqlrservercontroller::skipWhitespace(const char **ptr,
 		(*ptr)++;
 	}
 	return *ptr!=endptr;
+}
+
+const char *sqlrservercontroller::skipComments(const char *query) {
+	if (!query) {
+		return NULL;
+	}
+	const char	*ptr=query;
+	while (*ptr) {
+		if (!charstring::compare(ptr,"--",2)) {
+			while (*ptr && *ptr!='\n') {
+				ptr++;
+			}
+			if (*ptr) {
+				ptr++;
+			}
+		} else {
+			return ptr;
+		}
+	}
+	return ptr;
+}
+
+const char *sqlrservercontroller::skipWhitespace(const char *query) {
+	if (!query) {
+		return NULL;
+	}
+	const char	*ptr=query;
+	while (*ptr && character::isWhitespace(*ptr)) {
+		ptr++;
+	}
+	return ptr;
 }
 
 const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
