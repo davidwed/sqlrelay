@@ -2787,7 +2787,6 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 	bool	retval=false;
 	switch (querytype) {
 		case SQLRQUERYTYPE_BEGIN:
-stdoutput.printf("begin intercepted\n");
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
@@ -3031,7 +3030,6 @@ bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
 }
 
 bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
-stdoutput.printf("query is: %s\n",query);
 
 	// See if it was any of the different queries used to start a
 	// transaction.  IMPORTANT: don't just look for the first 5 characters
