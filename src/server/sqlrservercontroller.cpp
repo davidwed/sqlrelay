@@ -2787,7 +2787,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 	bool	retval=false;
 	switch (querytype) {
 		case SQLRQUERYTYPE_BEGIN:
-stdoutput.printf("intercept begin!\n");
+stdoutput.printf("begin intercepted\n");
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
@@ -3031,6 +3031,7 @@ bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
 }
 
 bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
+stdoutput.printf("query is: %s\n",query);
 
 	// See if it was any of the different queries used to start a
 	// transaction.  IMPORTANT: don't just look for the first 5 characters
@@ -3046,13 +3047,11 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 		if (*spaceptr=='\0') {
 			return true;
 		} else if ((!charstring::compareIgnoringCase(
-						spaceptr,"work",4) ||
-				!charstring::compareIgnoringCase(
-						spaceptr,"transaction",11)) &&
-				// also make sure the query isn't actually a
-				// block of queries that also contains a commit
-				// or rollback
-				!blockContainsCommitOrRollback(spaceptr)) {
+						spaceptr,"work",4) &&
+				blockCanBeIntercepted(spaceptr+4)) ||
+				(!charstring::compareIgnoringCase(
+						spaceptr,"transaction",11) &&
+				blockCanBeIntercepted(spaceptr+11))) {
 			return true;
 		}
 		return false;
@@ -3065,8 +3064,68 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 	return false;
 }
 
-bool sqlrservercontroller::blockContainsCommitOrRollback(const char *block) {
+bool sqlrservercontroller::blockCanBeIntercepted(const char *block) {
 
+	// FIXME:
+	// I'm not really sure which of these implementations to use...
+	//
+	// 1) Any block of queries that contain their own commit/rollback
+	// should be passed through, and not intercepted.
+	//
+	// 2) However, really we ought to skip commit/rollbacks in comments, in
+	// (any kind of) quotes, or that aren't preceeded by and followed by
+	// whitespace (or the beginning/end of the string).  The other
+	// implementation does that, though currently lacks support for double
+	// quoting, back-tick quoting, and [] quoting.
+	//
+	// 3) Arguably though, if it's a block at all, then it shouldn't be
+	// intercepted, as this will prevent the non-begin statements from
+	// being executed.
+	//
+	//
+	// Currently 3 is selected.  This eventually seemed intuitive, but
+	// wasn't originally, before I wrote the others.
+	//
+	//
+	// What really happens in these cases though...
+	//
+	// If we're faking transaction blocks, and we pass a balanced block
+	// like:
+	//
+	// begin transaction
+	// select 1
+	// commit
+	// select 1
+	// begin transaction
+	// select 1
+	// commit
+	//
+	// through, does the db really end up back in autocommit mode like it
+	// started?
+	//
+	// If we're faking transaction blocks, and we pass an unbalanced block
+	// like:
+	//
+	// begin transaction
+	// select 1
+	// commit
+	// select 1
+	// begin transaction
+	// select 1
+	//
+	// through, does the db really end up in non-autocommit mode unlike it
+	// started?
+	//
+	// Should I not intercept, but then set
+	// pvt->_infaketransactionblock=false in the second case?
+	//
+	// Sort this out...
+
+#if 1
+	return !(charstring::containsIgnoringCase(block,"commit") ||
+		charstring::containsIgnoringCase(block,"rollback"));
+
+#elif 0
 	// FIXME: handle other types of quoting - ", `, and []
 
 	bool		inquotes=false;
@@ -3078,7 +3137,7 @@ bool sqlrservercontroller::blockContainsCommitOrRollback(const char *block) {
 
 			ptr=skipWhitespaceAndComments(ptr);
 			if (!*ptr) {
-				return false;
+				return true;
 			}
 
 			if (ptr!=block) {
@@ -3106,10 +3165,9 @@ bool sqlrservercontroller::blockContainsCommitOrRollback(const char *block) {
 				(!*(ptr+8) ||
 					character::isWhitespace(*(ptr+8)))))) {
 
-stdoutput.printf("\nblock contains commit/rollback!\n");
 				// then we have a qualifying commit or
 				// rollback in the block
-				return true;
+				return false;
 			}
 		}
 		
@@ -3123,7 +3181,10 @@ stdoutput.printf("\nblock contains commit/rollback!\n");
 
 	// if we got here, then we hit the end of the block without finding
 	// a qualifying commit or rollback
-	return false;
+	return true;
+#elif 0
+	return (*skipWhitespaceAndComments(block))=='\0';
+#endif
 }
 
 bool sqlrservercontroller::isCommitQuery(const char *query) {

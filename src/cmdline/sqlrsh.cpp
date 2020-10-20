@@ -86,6 +86,7 @@ class sqlrshenv {
 		bool		getasnumber;
 		bool		noelapsed;
 		bool		nextresultset;
+		bool		txqueries;
 };
 
 sqlrshenv::sqlrshenv() {
@@ -102,6 +103,7 @@ sqlrshenv::sqlrshenv() {
 	getasnumber=false;
 	noelapsed=false;
 	nextresultset=false;
+	txqueries=false;
 }
 
 sqlrshenv::~sqlrshenv() {
@@ -547,7 +549,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"translatedquery") ||
 		!charstring::compareIgnoringCase(ptr,"response timeout",16) ||
 		!charstring::compareIgnoringCase(ptr,"cache ",6) ||
-		!charstring::compareIgnoringCase(ptr,"opencache ",10)) {
+		!charstring::compareIgnoringCase(ptr,"opencache ",10) ||
+		!charstring::compareIgnoringCase(ptr,"txqueries ",10)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -737,6 +740,9 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return cache(env,sqlrcur,command);
 	} else if (!charstring::compareIgnoringCase(ptr,"opencache ",10)) {
 		return openCache(env,sqlrcur,command);
+	} else if (!charstring::compareIgnoringCase(ptr,"txqueries ",10)) {
+		ptr=ptr+10;
+		cmdtype=13;
 	} else {
 		return false;
 	}
@@ -837,6 +843,9 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		case 12:
 			env->lazyfetch=toggle;
 			break;
+		case 13:
+			env->txqueries=toggle;
+			break;
 	}
 	return true;
 }
@@ -848,7 +857,8 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	bool	retval=true;
 
 	// handle begin, commit and rollback
-	if (!charstring::compareIgnoringCase(command,"begin")) {
+	if (!env->txqueries &&
+		!charstring::compareIgnoringCase(command,"begin")) {
 
 		if (!sqlrcon->begin()) {
 			displayError(env,NULL,
@@ -857,7 +867,8 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			retval=false;
 		}
 
-	} else if (!charstring::compareIgnoringCase(command,"commit")) {
+	} else if (!env->txqueries &&
+		!charstring::compareIgnoringCase(command,"commit")) {
 
 		if (!sqlrcon->commit()) {
 			displayError(env,NULL,
@@ -866,7 +877,8 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			retval=false;
 		}
 
-	} else if (!charstring::compareIgnoringCase(command,"rollback")) {
+	} else if (!env->txqueries &&
+		!charstring::compareIgnoringCase(command,"rollback")) {
 
 		if (!sqlrcon->rollback()) {
 			displayError(env,NULL,
