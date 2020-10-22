@@ -7245,11 +7245,11 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	const unsigned char	*ptr=pvt->_bulkclientshm;
 
 	pvt->_bulkerrorfieldtable=(const char *)ptr;
-	ptr+=charstring::length(ptr);
+	ptr+=charstring::length((const char *)ptr);
 	ptr++;
 
 	pvt->_bulkerrorrowtable=(const char *)ptr;
-	ptr+=charstring::length(ptr);
+	ptr+=charstring::length((const char *)ptr);
 	ptr++;
 
 	// get max error count
