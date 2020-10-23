@@ -6106,16 +6106,40 @@ void sqlrservercontroller::endSession() {
 	// running session-end-queries.  Some queries, including drop table,
 	// cause an implicit commit.  If we need to rollback, then make sure
 	// that's done first.
-	if (pvt->_infaketransactionblock) {
+	if (
+		// NOTE: originally, the next line was:
+		//
+		//	pvt->_infaketransactionblock ||
+		//
+		// However...
+		//
+		// When using a database that supports sql blocks, it's
+		// possible to construct a block that confuses the
+		// begin-interceptor into not intercepting the begin.
+		//
+		// Eg:
+		//
+		// select 1
+		// begin transaction;
+		//
+		// (sent as a single query)
+		//
+		// If an app does this on purpose (intending to manually run a
+		// commit later) and then runs some DML and then ends up
+		// ending the session before running the commit/rollback, then
+		// a commit/rollback needs to be run here.
+		//
+		// Don't worry about whether we're actually in a fake
+		// transaction block, just call the commit/rollback if we're
+		// faking transaction blocks at all.
+		//
+		// Worst case, if we weren't in a fake transaction block (and
+		// were in autocommit mode) and the db cares, then it will
+		// throw an error, which will be ignored.
+		pvt->_faketransactionblocks ||
 
-		// if we're faking transaction blocks and the session was ended
-		// but we haven't ended the transaction block, then we need to
-		// rollback and end the block
-		rollback();
-		pvt->_infaketransactionblock=false;
-
-	} else if (pvt->_conn->isTransactional() &&
-				pvt->_needscommitorrollback) {
+		(pvt->_conn->isTransactional() &&
+			pvt->_needscommitorrollback)) {
 
 		// otherwise, commit or rollback as necessary
 		if (pvt->_cfg->getEndOfSessionCommit()) {
@@ -6127,6 +6151,8 @@ void sqlrservercontroller::endSession() {
 			rollback();
 			raiseDebugMessageEvent("done rolling back...");
 		}
+
+		pvt->_infaketransactionblock=false;
 	}
 
 	// truncate/drop temp tables

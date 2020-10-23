@@ -13,6 +13,12 @@
 		that could cause begin queries to fail when fake transaction
 		blocks are used
 	object lists have correct column names for mysql, odbc, and jdbc now
+	fixed a bug that caused rollback to be called insted of commit when
+		endofsession="commit" and faketransactionblocks=yes are used
+	commit/rollback is now called at the end of session when
+		faketransactoinblocks=yes is used, whether or not the server
+		believes it's in a transaction block, to catch cases where the
+		begin-interceptor is intentionally bypassed
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
