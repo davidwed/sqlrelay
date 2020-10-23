@@ -212,14 +212,14 @@ bool sqlrauth_postgresql_userlist::compare(const char *suppliedresponse,
 		md1.append((unsigned char *)user,
 				charstring::length(user));
 		char	*md1str=charstring::hexEncode(md1.getHash(),
-							md1.getHashLength());
+							md1.getHashSize());
 
 		// md5(concat(...above...,salt))
 		md5	md2;
 		md2.append((unsigned char *)md1str,charstring::length(md1str));
 		md2.append((unsigned char *)&salt,sizeof(salt));
 		char	*md2str=charstring::hexEncode(md2.getHash(),
-							md2.getHashLength());
+							md2.getHashSize());
 		
 		// concat('md5',...above...)
 		stringbuffer	result;

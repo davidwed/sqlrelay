@@ -201,25 +201,25 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 		s1.append((const unsigned char *)validpassword,
 				charstring::length(validpassword));
 		bytebuffer	sha1pass;
-		sha1pass.append(s1.getHash(),s1.getHashLength());
+		sha1pass.append(s1.getHash(),s1.getHashSize());
 
 		// sha1(sha1(password))))
 		sha1	s2;
 		s2.append(sha1pass.getBuffer(),sha1pass.getSize());
 		bytebuffer	sha1sha1pass;
-		sha1sha1pass.append(s2.getHash(),s2.getHashLength());
+		sha1sha1pass.append(s2.getHash(),s2.getHashSize());
 
 		// concat(randombytes,sha1(sha1(password)))
 		bytebuffer	rbsha1sha1pass;
 		rbsha1sha1pass.append(extra,charstring::length(extra));
 		rbsha1sha1pass.append(sha1sha1pass.getBuffer(),
-					sha1sha1pass.getSize());
+						sha1sha1pass.getSize());
 
 		// sha1(concat(randombytes,sha1(sha1(password))))
 		sha1	s3;
 		s3.append(rbsha1sha1pass.getBuffer(),rbsha1sha1pass.getSize());
 		bytebuffer	sha1rbsha1sha1pass;
-		sha1rbsha1sha1pass.append(s3.getHash(),s3.getHashLength());
+		sha1rbsha1sha1pass.append(s3.getHash(),s3.getHashSize());
 	
 		// sha1(password) xor
 		// sha1(concat(randombytes,sha1(sha1(password))))
@@ -245,15 +245,13 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 			s256.append((const unsigned char *)validpassword,
 					charstring::length(validpassword));
 			bytebuffer	sha256pass;
-			sha256pass.append(s256.getHash(),
-						s256.getHashLength());
+			sha256pass.append(s256.getHash(),s256.getHashSize());
 
 			// sha256(sha256(password))))
 			sha256	s2;
 			s2.append(sha256pass.getBuffer(),sha256pass.getSize());
 			bytebuffer	sha256sha256pass;
-			sha256sha256pass.append(s2.getHash(),
-						s2.getHashLength());
+			sha256sha256pass.append(s2.getHash(),s2.getHashSize());
 
 			// concat(randombytes,sha256(sha256(password)))
 			bytebuffer	rbsha256sha256pass;
@@ -268,7 +266,7 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 						rbsha256sha256pass.getSize());
 			bytebuffer	sha256rbsha256sha256pass;
 			sha256rbsha256sha256pass.append(s3.getHash(),
-						s3.getHashLength());
+							s3.getHashSize());
 
 			// sha256(password) xor
 			// sha256(concat(randombytes,sha256(sha256(password))))

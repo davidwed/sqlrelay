@@ -6892,7 +6892,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// * the id might not conform to valid file naming conventions
 	md5	m;
 	m.append((const unsigned char *)id,charstring::length(id));
-	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
+	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
 	// create a key file and key
@@ -7210,7 +7210,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	// get an md5 sum of the id (see bulkLoadBegin for why)
 	md5	m;
 	m.append((const unsigned char *)id,charstring::length(id));
-	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
+	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
 	// create the key

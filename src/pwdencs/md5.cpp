@@ -23,7 +23,7 @@ bool sqlrpwenc_md5::oneWay() {
 char *sqlrpwenc_md5::encrypt(const char *value) {
 	md5	m;
 	m.append((const unsigned char *)value,charstring::length(value));
-	return charstring::hexEncode(m.getHash(),m.getHashLength());
+	return charstring::hexEncode(m.getHash(),m.getHashSize());
 }
 
 extern "C" {

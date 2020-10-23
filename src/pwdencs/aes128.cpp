@@ -125,7 +125,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 			return NULL;
 		}
 		converted.append(aes.getDecryptedData(),
-					aes.getDecryptedDataLength());
+					aes.getDecryptedDataSize());
 		converted.append('\0');
 		return (char *)converted.detachBuffer();
 	} else {
@@ -136,7 +136,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 			return NULL;
 		}
 		converted.append(aes.getIv(),aes.getIvSize());
-		converted.append(data,aes.getEncryptedDataLength());
+		converted.append(data,aes.getEncryptedDataSize());
 		return charstring::hexEncode(converted.getBuffer(),
 						converted.getSize());
 	}
