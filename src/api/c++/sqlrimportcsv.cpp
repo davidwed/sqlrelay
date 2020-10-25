@@ -384,6 +384,23 @@ void sqlrimportcsv::appendField(stringbuffer *query,
 			if (microsecond==-1) {
 				microsecond=0;
 			}
+
+			// FIXME: make this configurable
+			// massage the year...
+			// If it's less than 100, then assume that the century
+			// wasn't given.  If what was given is > 10 years from
+			// the current year, then assume it was meant to be a
+			// date from the previous century.
+			if (year<100) {
+				datetime	dt;
+				dt.getSystemDateAndTime();
+				int32_t	century=dt.getCentury();
+				if (year>dt.getShortYear()+10) {
+					century--;
+				}
+				year=((century-1)*100)+year;
+			}
+
 			// FIXME: what about microseconds and negatives?
 			char	*dt=datetime::formatAs(
 						"YYYY-MM-DD HH24:MI:SS",

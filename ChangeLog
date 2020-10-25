@@ -19,6 +19,7 @@
 		faketransactoinblocks=yes is used, whether or not the server
 		believes it's in a transaction block, to catch cases where the
 		begin-interceptor is intentionally bypassed
+	sqlrimportcsv handles dates without centuries now
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
