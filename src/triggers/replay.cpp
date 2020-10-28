@@ -525,6 +525,8 @@ void sqlrtrigger_replay::getColumns(const char *query,
 	}
 	char	*table=charstring::duplicate(start,end-start);
 
+	// strip any quoting
+	charstring::stripSet(table,"\"'`[]");
 
 	// get all of the columns in the table
 	*allcolumns=colcache.getValue(table);
@@ -572,9 +574,18 @@ void sqlrtrigger_replay::getColumns(const char *query,
 		// that match the number of values
 		*cols=new char *[*colcount];
 		linkedlistnode<char *>	*node=(*allcolumns)->getFirst();
-		for (uint64_t i=0; i<*colcount; i++) {
-			(*cols)[i]=charstring::duplicate(node->getValue());
-			node=node->getNext();
+		if (node) {
+			for (uint64_t i=0; i<*colcount; i++) {
+				(*cols)[i]=charstring::duplicate(
+							node->getValue());
+				node=node->getNext();
+			}
+		} else {
+			// this can happen if various problems occur,
+			// eg. if the table name is invalid
+			for (uint64_t i=0; i<*colcount; i++) {
+				(*cols)[i]=NULL;
+			}
 		}
 	}
 
