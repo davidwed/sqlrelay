@@ -20,6 +20,7 @@
 		believes it's in a transaction block, to catch cases where the
 		begin-interceptor is intentionally bypassed
 	sqlrimportcsv handles dates without centuries now
+	fixed crash in replay module when table name is quoted
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
