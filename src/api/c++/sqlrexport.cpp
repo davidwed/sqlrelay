@@ -199,3 +199,7 @@ void sqlrexport::setFileDescriptor(filedescriptor *fd) {
 filedescriptor *sqlrexport::getFileDescriptor() {
 	return fd;
 }
+
+bool sqlrexport::exportToJsonDomNode(domnode *jsondomnode) {
+	return true;
+}

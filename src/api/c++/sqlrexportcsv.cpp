@@ -217,3 +217,159 @@ void sqlrexportcsv::escapeField(filedescriptor *fd, const char *field) {
 		}
 	}
 }
+
+bool sqlrexportcsv::exportToJsonDomNode(domnode *jsondomnode) {
+
+	// reset flags
+	setExportRow(true);
+	setCurrentRow(0);
+	setCurrentColumn(0);
+	setCurrentField(NULL);
+
+	// call the pre-header event
+	if (!headerStart()) {
+		return false;
+	}
+
+	sqlrcursor	*sqlrcur=getSqlrCursor();
+	const char * const *fieldstoignore=getFieldsToIgnore();
+
+	domnode	*columns=jsondomnode->appendTag("columns");
+	columns->setAttributeValue("t","a");
+
+	// export header
+	uint32_t	cols=sqlrcur->colCount();
+	clearNumberColumns();
+	for (setCurrentColumn(0);
+		getCurrentColumn()<cols;
+		setCurrentColumn(getCurrentColumn()+1)) {
+
+		setNumberColumn(getCurrentColumn(),
+			isNumberTypeChar(sqlrcur->getColumnType(
+						getCurrentColumn())));
+
+		setCurrentField(sqlrcur->getColumnName(getCurrentColumn()));
+		if (charstring::inSet(getCurrentField(),fieldstoignore)) {
+			continue;
+		}
+
+		if (!getIgnoreColumns()) {
+
+			// call the pre-column event
+			if (!columnStart()) {
+				return false;
+			}
+
+			bool	isnumber=
+				charstring::isNumber(getCurrentField());
+			domnode	*column=columns->appendTag("v");
+			if (isnumber) {
+				column->setAttributeValue("t","n");
+				column->setAttributeValue("v",
+						getCurrentField());
+			} else {
+				column->setAttributeValue("t","s");
+				column->setAttributeValue("v",
+						getCurrentField());
+			}
+
+			// call the post-column event
+			if (!columnEnd()) {
+				return false;
+			}
+		}
+	}
+
+	// call the post-header event
+	// (we call this before closing the header in case an overridden
+	// headerEnd() wants to add more columns or something)
+	if (!headerEnd()) {
+		return false;
+	}
+
+	// call the pre-rows event
+	if (!rowsStart()) {
+		return false;
+	}
+
+	// export rows...
+	do {
+
+		// reset export-row flag
+		setExportRow(true);
+
+		// call the pre-row event
+		if (!rowStart()) {
+			return false;
+		}
+
+		// if rowStart() didn't disable export of this row...
+		if (getExportRow()) {
+
+			domnode	*row=jsondomnode->appendTag("row");
+			row->setAttributeValue("t","a");
+
+			for (setCurrentColumn(0);
+				getCurrentColumn()<cols;
+				setCurrentColumn(getCurrentColumn()+1)) {
+
+				// ignore particular fields
+				if (fieldstoignore) {
+					if (charstring::inSet(
+						sqlrcur->getColumnName(
+							getCurrentColumn()),
+						fieldstoignore)) {
+						continue;
+					}
+				}
+
+				// get the field
+				setCurrentField(sqlrcur->getField(
+							getCurrentRow(),
+							getCurrentColumn()));
+				if (!getCurrentField()) {
+					break;
+				}
+
+				// call the pre-field event
+				if (!fieldStart()) {
+					return false;
+				}
+
+				domnode	*field=row->appendTag("v");
+				if (getNumberColumn(getCurrentColumn())) {
+					field->setAttributeValue("t","n");
+					field->setAttributeValue("v",
+							getCurrentField());
+				} else {
+					field->setAttributeValue("t","s");
+					field->setAttributeValue("v",
+							getCurrentField());
+				}
+
+				// call the post-field event
+				if (!fieldEnd()) {
+					return false;
+				}
+			}
+		}
+
+		// call the post-row event
+		// (we call this before closing the row in case an overridden
+		// rowEnd() wants to add more fields or something)
+		if (!rowEnd()) {
+			return false;
+		}
+
+		setCurrentRow(getCurrentRow()+1);
+
+	} while  (!sqlrcur->endOfResultSet() ||
+			getCurrentRow()<sqlrcur->rowCount());
+
+	// call the post-rows event
+	if (!rowsEnd()) {
+		return false;
+	}
+
+	return true;
+}
