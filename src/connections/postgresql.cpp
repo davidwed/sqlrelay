@@ -779,7 +779,6 @@ postgresqlcursor::~postgresqlcursor() {
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
-stdoutput.printf("%s - prepare\n",cursorid);
 
 	// initialize the column count
 	ncols=0;
@@ -851,7 +850,6 @@ bool postgresqlcursor::inputBind(const char *variable,
 					const char *value, 
 					uint32_t valuesize,
 					int16_t *isnull) {
-stdoutput.printf("%s - inputbind - %s=%s\n",cursorid,variable,value);
 
 	// "variable" should be something like ?1,?2,?3, etc.
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
@@ -1019,7 +1017,6 @@ void postgresqlcursor::encodeBlob(stringbuffer *buffer,
 }
 
 bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
-stdoutput.printf("%s - execute\n",cursorid);
 
 	// initialize the row counts
 	nrows=0;
@@ -1556,7 +1553,6 @@ void postgresqlcursor::getField(uint32_t col,
 }
 
 void postgresqlcursor::closeResultSet() {
-stdoutput.printf("%s - close result set\n",cursorid);
 
 #if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
