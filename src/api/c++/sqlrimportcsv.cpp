@@ -17,6 +17,7 @@ sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 	ignorecolumnswithemptynames=false;
 	ignoreemptyrows=false;
 	colcount=0;
+	currenttablecol=0;
 	currentcol=0;
 	numbercolumn=NULL;
 	datecolumn=NULL;
@@ -24,8 +25,9 @@ sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 	fieldcount=0;
 	rowcount=0;
 	committedcount=0;
-	needcomma=false;
 	columnswithemptynamesnode=NULL;
+	map=NULL;
+	mapcount=0;
 }
 
 sqlrimportcsv::~sqlrimportcsv() {
@@ -35,6 +37,7 @@ sqlrimportcsv::~sqlrimportcsv() {
 	delete[] datecolumn;
 	staticvaluecolumnnames.clearAndArrayDeleteValues();
 	staticvaluecolumnvalues.clearAndArrayDeleteValues();
+	delete[] map;
 }
 
 void sqlrimportcsv::insertPrimaryKey(const char *primarykeycolumnname,
@@ -58,6 +61,11 @@ void sqlrimportcsv::insertStaticValue(const char *columnname,
 			columnindex,charstring::duplicate(value));
 }
 
+void sqlrimportcsv::remapColumns(uint32_t *map, uint32_t mapcount) {
+	this->map=map;
+	this->mapcount=mapcount;
+}
+
 void sqlrimportcsv::setIgnoreColumnsWithEmptyNames(
 					bool ignorecolumnswithemptynames) {
 	this->ignorecolumnswithemptynames=ignorecolumnswithemptynames;
@@ -68,8 +76,6 @@ void sqlrimportcsv::setIgnoreEmptyRows(bool ignoreemptyrows) {
 }
 
 bool sqlrimportcsv::importFromFile(const char *filename) {
-
-	needcomma=false;
 
 	delete[] numbercolumn;
 	delete[] datecolumn;
@@ -91,14 +97,9 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 		// and we're building a list of column names...
 		if (!ignorecolumns) {
 
-			if (needcomma) {
-				columns.append(',');
-			}
-
 			// append the primary key name
-			columns.append(primarykeycolumnname);
-
-			needcomma=true;
+			columns[columns.getLength()]=
+				charstring::duplicate(primarykeycolumnname);
 		}
 		currentcol++;
 	}
@@ -119,14 +120,9 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 			// if we're building a list of column names...
 			if (!ignorecolumns) {
 
-				if (needcomma) {
-					columns.append(',');
-				}
-
 				// append the column name
-				columns.append(colname);
-
-				needcomma=true;
+				columns[columns.getLength()]=
+					charstring::duplicate(colname);
 			}
 			currentcol++;
 		}
@@ -155,14 +151,9 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 	// not ignoring this column because it's name was empty...
 	if (!ignorecolumns && includecolumn) {
 
-		if (needcomma) {
-			columns.append(',');
-		}
-
 		// append the column name to the list of column names
-		columns.append(name);
-
-		needcomma=true;
+		columns[columns.getLength()]=
+					charstring::duplicate(name);
 	}
 
 	// next...
@@ -181,7 +172,12 @@ bool sqlrimportcsv::headerEnd() {
 	if (ignorecolumns) {
 		query.append('*');
 	} else {
-		query.append(columns.getString());
+		for (uint64_t i=0; i<columns.getLength(); i++) {
+			if (i) {
+				query.append(',');
+			}
+			query.append(columns[i]);
+		}
 	}
 	query.append(" from ")->append(table);
 	sqlrcur->setResultSetBufferSize(1);
@@ -251,16 +247,8 @@ bool sqlrimportcsv::bodyStart() {
 
 bool sqlrimportcsv::rowStart() {
 
-	// reset the insert query
-	query.clear();
-	query.append("insert into ")->append(table);
-	if (!ignorecolumns) {
-		query.append(" (")->append(columns.getString())->append(")");
-	}
-	query.append(" values (");
-
 	// reset various flags and counters
-	needcomma=false;
+	currenttablecol=0;
 	currentcol=0;
 	fieldcount=0;
 	columnswithemptynamesnode=columnswithemptynames.getFirst();
@@ -273,18 +261,21 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 	// if we're manually adding the primary key, and this is the primary
 	// key position, then add it
 	if (primarykeycolumnname && currentcol==primarykeycolumnindex) {
-		if (needcomma) {
-			query.append(",");
-		}
 		if (primarykeysequence) {
-			query.append("nextval('");
-			query.append(primarykeysequence);
-			query.append("')");
+			stringbuffer	tmp;
+			tmp.append("nextval('");
+			tmp.append(primarykeysequence);
+			tmp.append("')");
+			fields[fields.getLength()]=
+					tmp.detachString();
 		} else {
-			query.append("null");
+			fields[fields.getLength()]=
+					charstring::duplicate("null");
 		}
-		needcomma=true;
+
+		// next...
 		currentcol++;
+		currenttablecol++;
 		fieldcount++;
 	}
 
@@ -305,15 +296,14 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 			const char	*colvalue=
 				staticvaluecolumnvalues.getValue(currentcol);
 
-			if (needcomma) {
-				query.append(',');
-			}
+			// append the field
+			stringbuffer	tmp;
+			appendField(&tmp,colvalue,0,true);
+			fields[fields.getLength()]=tmp.detachString();
 
-			// append the field to the query
-			appendField(&query,colvalue,currentcol);
-
-			needcomma=true;
+			// next...
 			currentcol++;
+			currenttablecol++;
 			fieldcount++;
 		}
 	}
@@ -331,30 +321,36 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 	// if we should include this field...
 	if (includefield) {
 
-		if (needcomma) {
-			query.append(",");
-		}
-
-		// append the field to the query
-		appendField(&query,value,currentcol);
-
-		needcomma=true;
+		// append the field
+		stringbuffer	tmp;
+		appendField(&tmp,value,currenttablecol,false);
+		fields[fields.getLength()]=tmp.detachString();
 
 		// next...
 		currentcol++;
+		currenttablecol++;
 		fieldcount++;
+
+	} else {
+
+		// next column...
+		currentcol++;
 	}
+
 	return true;
 }
 
 void sqlrimportcsv::appendField(stringbuffer *query,
 					const char *value,
-					uint32_t currentcol) {
+					uint32_t currenttablecol,
+					bool overrideisstring) {
 
 	if (!charstring::isNullOrEmpty(value)) {
 
-		bool	isnumber=(numbercolumn)?numbercolumn[currentcol]:false;
-		bool	isdate=(datecolumn)?datecolumn[currentcol]:false;
+		bool	isnumber=(!overrideisstring && numbercolumn)?
+					numbercolumn[currenttablecol]:false;
+		bool	isdate=(!overrideisstring && datecolumn)?
+					datecolumn[currenttablecol]:false;
 		if (!isnumber || isdate) {
 			query->append('\'');
 		}
@@ -409,6 +405,9 @@ void sqlrimportcsv::appendField(stringbuffer *query,
 						microsecond,isnegative);
 			query->append(dt);
 			delete[] dt;
+
+		} else if (isnumber && !charstring::isNumber(value)) {
+			query->append("NULL");
 		} else {
 			escapeField(query,value);
 		}
@@ -422,8 +421,31 @@ void sqlrimportcsv::appendField(stringbuffer *query,
 
 bool sqlrimportcsv::rowEnd() {
 
-	// terminate the values list in the query
+	// build query
+	// FIXME: apply map
+	query.clear();
+	query.append("insert into ")->append(table);
+	if (!ignorecolumns) {
+		query.append(" (");
+		for (uint64_t i=0; i<columns.getLength(); i++) {
+			if (i) {
+				query.append(',');
+			}
+			query.append(columns[i]);
+		}
+		query.append(")");
+	}
+	query.append(" values (");
+	for (uint64_t i=0; i<fields.getLength(); i++) {
+		if (i) {
+			query.append(',');
+		}
+		query.append(fields[i]);
+		delete[] fields[i];
+	}
+	fields.clear();
 	query.append(')');
+
 
 	// if there were any actual values (i.e. not an empty csv)
 	if (fieldcount) {
@@ -436,6 +458,7 @@ bool sqlrimportcsv::rowEnd() {
 
 		// send the query
 		if (!sqlrcur->sendQuery(query.getString())) {
+stdoutput.printf("%s",sqlrcur->errorMessage());
 			if (lg && logerrors) {
 				lg->write(coarseloglevel,NULL,logindent,
 						"%s",sqlrcur->errorMessage());
@@ -494,6 +517,12 @@ bool sqlrimportcsv::bodyEnd() {
 					(unsigned long long)rowcount,table);
 		}
 	}
+
+	// clean up column names
+	for (uint64_t i=0; i<columns.getLength(); i++) {
+		delete[] columns[i];
+	}
+
 	return true;
 }
 

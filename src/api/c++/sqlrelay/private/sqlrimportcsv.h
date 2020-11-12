@@ -4,7 +4,8 @@
 	private:
 		void	appendField(stringbuffer *query,
 					const char *value,
-					uint32_t currentcol);
+					uint32_t currentcol,
+					bool overrideisstring);
 		void	escapeField(stringbuffer *strb, const char *field);
 
 		char		*primarykeycolumnname;
@@ -15,8 +16,8 @@
 		bool		ignoreemptyrows;
 
 		stringbuffer	query;
-		stringbuffer	columns;
 		uint32_t	colcount;
+		uint32_t	currenttablecol;
 		uint32_t	currentcol;
 		bool		*numbercolumn;
 		bool		*datecolumn;
@@ -24,10 +25,15 @@
 		uint32_t	fieldcount;
 		uint64_t	rowcount;
 		uint64_t	committedcount;
-		bool		needcomma;
 
 		linkedlist<uint32_t>		columnswithemptynames;
 		linkedlistnode<uint32_t>	*columnswithemptynamesnode;
 
 		dictionary<uint32_t, char *>	staticvaluecolumnnames;
 		dictionary<uint32_t, char *>	staticvaluecolumnvalues;
+
+		dynamicarray<char *>		columns;
+		dynamicarray<char *>		fields;
+
+		uint32_t	*map;
+		uint32_t	mapcount;

@@ -17,6 +17,7 @@ class SQLRCLIENT_DLLSPEC sqlrimportcsv : public sqlrimport, public csvsax {
 		void	insertStaticValue(const char *columnname,
 						uint32_t columnindex,
 						const char *value);
+		void	remapColumns(uint32_t *map, uint32_t mapcount);
 
 		void	setIgnoreColumnsWithEmptyNames(
 					bool ignorecolumnswithemptynames);
