@@ -916,6 +916,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 			"^[ 	\r\n]*"
 			"(/\\*.*\\*/[ 	\r\n]+)*"
 			"(("
+				"explain|EXPLAIN|"
 				"create|CREATE|"
 				"drop|DROP|"
 				"procedure|PROCEDURE|"

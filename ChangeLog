@@ -21,6 +21,7 @@
 		begin-interceptor is intentionally bypassed
 	sqlrimportcsv handles dates without centuries now
 	fixed crash in replay module when table name is quoted
+	mysql explain statements work now
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
