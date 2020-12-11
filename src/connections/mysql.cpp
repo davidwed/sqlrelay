@@ -1039,6 +1039,11 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 
+// FIXME: shouldn't this go here?
+if (boundvariables) {
+	bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
+}
+
 	// reset the bind counter and flags
 	boundvariables=false;
 	bindformaterror=false;
@@ -1052,6 +1057,12 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	if (!supportsNativeBinds(query,length)) {
 		return true;
 	}
+
+// FIXME: shouldn't this go here?
+if (stmtfreeresult) {
+	mysql_stmt_free_result(stmt);
+	stmtfreeresult=false;
+}
 
 	// prepare the statement
 	if (mysql_stmt_prepare(stmt,query,length)) {
@@ -1944,20 +1955,22 @@ void mysqlcursor::closeLobField(uint32_t col) {
 void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		if (boundvariables) {
+		// FIXME: shouldn't this go in prepareQuery?
+		/*if (boundvariables) {
 			bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
 			boundvariables=false;
-		}
+		}*/
 
 		if (stmtreset) {
 			mysql_stmt_reset(stmt);
 			stmtreset=false;
 		}
 
-		if (stmtfreeresult) {
+		// FIXME: shouldn't this go in prepareQuery?
+		/*if (stmtfreeresult) {
 			mysql_stmt_free_result(stmt);
 			stmtfreeresult=false;
-		}
+		}*/
 
 		// In mariadb-client-lgpl_2.x, if a mysql_stmt_prepare fails,
 		// then subsequent attempts to prepare the same stmt again fail
