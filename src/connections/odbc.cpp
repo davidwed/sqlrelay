@@ -411,26 +411,30 @@ void printerror(const char *error) {
 	delete[] err;
 }
 
-size_t isFixed2Byte(const char *encoding) {
-	return (charstring::contains(encoding,"UCS2") ||
-			charstring::contains(encoding,"UCS-2"));
-}
-
-size_t isVariable2Byte(const char *encoding) {
-	return (charstring::contains(encoding,"UTF16") ||
-			charstring::contains(encoding,"UTF-16"));
-}
-
 size_t isFixed4Byte(const char *encoding) {
+	// FIXME: support other encodings
 	return (charstring::contains(encoding,"UCS4") ||
 			charstring::contains(encoding,"UCS-4") ||
 			charstring::contains(encoding,"UTF32") ||
 			charstring::contains(encoding,"UTF-32"));
 }
 
+size_t isFixed2Byte(const char *encoding) {
+	// FIXME: support other encodings
+	return (charstring::contains(encoding,"UCS2") ||
+			charstring::contains(encoding,"UCS-2"));
+}
+
+size_t isVariable2Byte(const char *encoding) {
+	// FIXME: support other encodings
+	return (charstring::contains(encoding,"UTF16") ||
+			charstring::contains(encoding,"UTF-16"));
+}
+
 size_t isVariable1Byte(const char *encoding) {
-	return (charstring::contains(encoding,"UTF8") ||
-			charstring::contains(encoding,"UTF-8"));
+	return (!isFixed4Byte(encoding) &&
+		!isFixed2Byte(encoding) &&
+		!isVariable2Byte(encoding));
 }
 
 // returns number of characters in the (null-terminated) string
@@ -442,6 +446,7 @@ size_t len(const char *str, const char *encoding) {
 	if (isFixed2Byte(encoding)) {
 
 		// skip any byte-order mark
+		// FIXME: assumes encoding supports a byte order mark
 		// FIXME: handle nulls
 		if (*ptr==(char)0xEF &&
 			*(ptr+1)==(char)0xBB &&
@@ -457,6 +462,7 @@ size_t len(const char *str, const char *encoding) {
 	} else if (isFixed4Byte(encoding)) {
 
 		// skip any byte-order mark
+		// FIXME: assumes encoding supports a byte order mark
 		// FIXME: handle nulls
 		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
 			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
@@ -475,6 +481,7 @@ size_t len(const char *str, const char *encoding) {
 		size_t	offset=0;
 
 		// look for byte-order mark and update offset if necessary
+		// FIXME: assumes encoding supports a byte order mark
 		// FIXME: handle nulls
 		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
 			ptr+=2;
@@ -485,6 +492,7 @@ size_t len(const char *str, const char *encoding) {
 
 		while (*ptr || *(ptr+1)) {
 			res++;
+			// FIXME: assumes UTF-16
 			if (*(ptr+offset)>=(char)0xD8 &&
 				*(ptr+offset)<=(char)0xDF) {
 				ptr+=4;
@@ -497,6 +505,7 @@ size_t len(const char *str, const char *encoding) {
 
 		while (*ptr) {
 			res++;
+			// FIXME: assumes UTF-8
 			if (*ptr<192) {
 				ptr++;
 			} else if (*ptr<224) {
@@ -523,6 +532,7 @@ size_t size(const char *str, const char *encoding) {
 	if (isFixed2Byte(encoding)) {
 
 		// skip any byte-order mark
+		// FIXME: assumes encoding supports a byte order mark
 		// FIXME: handle nulls
 		if (*ptr==(char)0xEF &&
 			*(ptr+1)==(char)0xBB &&
@@ -538,6 +548,7 @@ size_t size(const char *str, const char *encoding) {
 	} else if (isFixed4Byte(encoding)) {
 
 		// skip any byte-order mark
+		// FIXME: assumes encoding supports a byte order mark
 		// FIXME: handle nulls
 		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
 			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
@@ -556,6 +567,7 @@ size_t size(const char *str, const char *encoding) {
 		size_t	offset=0;
 
 		// look for byte-order mark and update offset if necessary
+		// FIXME: assumes encoding supports a byte order mark
 		// FIXME: handle nulls
 		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
 			res+=2;
@@ -567,6 +579,7 @@ size_t size(const char *str, const char *encoding) {
 		}
 
 		while (*ptr || *(ptr+1)) {
+			// FIXME: assumes UTF-16
 			if (*(ptr+offset)>=(char)0xD8 &&
 				*(ptr+offset)<=(char)0xDF) {
 				res+=4;
@@ -580,6 +593,7 @@ size_t size(const char *str, const char *encoding) {
 	} else if (isVariable1Byte(encoding)) {
 
 		while (*ptr) {
+			// FIXME: assumes UTF-8
 			if (*ptr<192) {
 				res++;
 				ptr++;
@@ -781,7 +795,7 @@ void odbcconnection::handleConnectString() {
 	unicode=!charstring::isNo(cont->getConnectStringValue("unicode"));
 	ncharencoding=cont->getConnectStringValue("ncharencoding");
 	if (charstring::isNullOrEmpty(ncharencoding)) {
-		ncharencoding="UCS-2";
+		ncharencoding="UCS-2//TRANSLIT";
 	}
 
 	// unixodbc doesn't support array fetches
@@ -923,20 +937,20 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		#ifdef HAVE_SQLCONNECTW
 		if (unicode) {
 			char	*dsnucs=(dsnasc)?
-						convertCharset(dsnasc,
-								"UTF-8",
-								"UCS-2",
-								NULL):NULL;
+					convertCharset(dsnasc,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							NULL):NULL;
 			char	*userucs=(userasc)?
-						convertCharset(userasc,
-								"UTF-8",
-								"UCS-2",
-								NULL):NULL;
+					convertCharset(userasc,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							NULL):NULL;
 			char	*passworducs=(passwordasc)?
-						convertCharset(passwordasc,
-								"UTF-8",
-								"UCS-2",
-								NULL):NULL;
+					convertCharset(passwordasc,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							NULL):NULL;
 			erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
 					(SQLWCHAR *)userucs,SQL_NTS,
 					(SQLWCHAR *)passworducs,SQL_NTS);
@@ -1455,7 +1469,6 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 		tabletype.append("SYNONYM");
 	}
 
-stdoutput.printf("%s.%s.%s\n",catalog,schema,table);
 	// get the table list
 	erg=SQLTables(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
@@ -2285,7 +2298,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 		char	*err=NULL;
 		char	*queryucs=convertCharset(query,length,
-						"UTF-8","UCS-2",
+						"UTF-8","UCS-2//TRANSLIT",
 						&err);
 		if (err) {
 			delete[] queryucs;
@@ -2341,7 +2354,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			ucsinbindstrings.clearAndArrayDelete();
 
 			char *queryucs=convertCharset(query,length,
-							"UTF-8","UCS-2",
+							"UTF-8",
+							"UCS-2//TRANSLIT",
 							NULL);
 			erg=SQLPrepareW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
 			delete[] queryucs;
@@ -3093,7 +3107,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		if (odbcconn->unicode) {
 			char	*err=NULL;
 			char	*queryucs=convertCharset(query,length,
-							"UTF-8","UCS-2",
+							"UTF-8",
+							"UCS-2//TRANSLIT",
 							&err);
 			if (err) {
 				delete[] queryucs;
