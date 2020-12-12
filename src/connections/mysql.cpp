@@ -150,6 +150,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 #endif
 
 		void		closeResultSet();
+		void		freeResult();
 
 		bool		columnInfoIsValidAfterPrepare();
 
@@ -1063,6 +1064,7 @@ if (stmtfreeresult) {
 	mysql_stmt_free_result(stmt);
 	stmtfreeresult=false;
 }
+freeResult();
 
 	// prepare the statement
 	if (mysql_stmt_prepare(stmt,query,length)) {
@@ -1982,8 +1984,15 @@ void mysqlcursor::closeResultSet() {
 			stmt=mysql_stmt_init(mysqlconn->mysqlptr);
 			stmtpreparefailed=false;
 		}
+	} else {
+		freeResult();
 	}
+#else
+	freeResult();
 #endif
+}
+
+void mysqlcursor::freeResult() {
 	if (mysqlresult!=(MYSQL_RES *)NULL) {
 		mysql_free_result(mysqlresult);
 		mysqlresult=NULL;

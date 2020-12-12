@@ -1221,6 +1221,33 @@ for (uint16_t a=0; a<50; a++) {
 		stdoutput.printf("\n");
 	}
 
+	// reexecute
+	stdoutput.printf("REEXECUTE: \n");
+	cur->prepareQuery("select 1");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->rowCount(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	stdoutput.printf("\n");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->rowCount(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	stdoutput.printf("\n");
+	cur->prepareQuery("select ?");
+	cur->inputBind("1",1);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->rowCount(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	stdoutput.printf("\n");
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->rowCount(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	stdoutput.printf("\n");
+	cur->inputBind("1",2);
+	checkSuccess(cur->executeQuery(),1);
+	checkSuccess(cur->rowCount(),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"2");
+	stdoutput.printf("\n");
+
 	// invalid queries...
 	stdoutput.printf("INVALID QUERIES: \n");
 	checkSuccess(cur->sendQuery("select * from testtable order by testtinyint"),0);
