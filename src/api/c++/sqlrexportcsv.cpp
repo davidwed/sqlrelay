@@ -99,7 +99,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	}
 
 	if (!getIgnoreColumns()) {
-		fd->printf("\n");
+		fd->write('\n');
 	}
 
 	// call the pre-rows event
@@ -108,7 +108,8 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	}
 
 	// export rows...
-	do {
+	while (!sqlrcur->endOfResultSet() ||
+			getCurrentRow()<sqlrcur->rowCount()) {
 
 		// reset export-row flag
 		setExportRow(true);
@@ -195,9 +196,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 		}
 
 		setCurrentRow(getCurrentRow()+1);
-
-	} while  (!sqlrcur->endOfResultSet() ||
-			getCurrentRow()<sqlrcur->rowCount());
+	}
 
 	// call the post-rows event
 	if (!rowsEnd()) {
