@@ -458,7 +458,6 @@ bool sqlrimportcsv::rowEnd() {
 
 		// send the query
 		if (!sqlrcur->sendQuery(query.getString())) {
-stdoutput.printf("%s",sqlrcur->errorMessage());
 			if (lg && logerrors) {
 				lg->write(coarseloglevel,NULL,logindent,
 						"%s",sqlrcur->errorMessage());
