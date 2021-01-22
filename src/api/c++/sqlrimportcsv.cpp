@@ -204,11 +204,13 @@ bool sqlrimportcsv::headerEnd() {
 	} 
 
 	// run through the columns, figuring out which are numbers and dates...
+	bool	fudgedprimarykey=false;
 	numbercolumn=new bool[colcount];
 	datecolumn=new bool[colcount];
 	for (uint32_t i=0, j=0; i<colcount;) {
 
-		if (!ignorecolumns &&
+		if (!fudgedprimarykey &&
+			!ignorecolumns &&
 			primarykeycolumnname &&
 			i==primarykeycolumnindex) {
 
@@ -219,6 +221,7 @@ bool sqlrimportcsv::headerEnd() {
 			// Don't increment i.
 			numbercolumn[j]=false;
 			datecolumn[j]=false;
+			fudgedprimarykey=true;
 
 		} else {
 
