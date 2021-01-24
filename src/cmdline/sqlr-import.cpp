@@ -241,7 +241,7 @@ int main(int argc, const char **argv) {
 	sqlri->setSqlrCursor(&sqlrcur);
 	sqlri->setDbType(sqlrcon.identify());
 	if (!charstring::isNullOrEmpty(table)) {
-		sqlri->setTable(table);
+		sqlri->setObjectName(table);
 	}
 	sqlri->setIgnoreColumns(ignorecolumns);
 	sqlri->setCommitCount(commitcount);

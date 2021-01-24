@@ -11,6 +11,7 @@
 #include <datatypes.h>
 
 sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
+	insertprimarykey=false;
 	primarykeycolumnname=NULL;
 	primarykeycolumnindex=0;
 	primarykeysequence=NULL;
@@ -26,8 +27,6 @@ sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 	rowcount=0;
 	committedcount=0;
 	columnswithemptynamesnode=NULL;
-	map=NULL;
-	mapcount=0;
 }
 
 sqlrimportcsv::~sqlrimportcsv() {
@@ -37,33 +36,39 @@ sqlrimportcsv::~sqlrimportcsv() {
 	delete[] datecolumn;
 	staticvaluecolumnnames.clearAndArrayDeleteValues();
 	staticvaluecolumnvalues.clearAndArrayDeleteValues();
-	delete[] map;
 }
 
 void sqlrimportcsv::insertPrimaryKey(const char *primarykeycolumnname,
 					uint32_t primarykeycolumnindex,
 					const char *primarykeysequence) {
-	delete[] this->primarykeycolumnname;
+	removePrimaryKey();
 	this->primarykeycolumnname=charstring::duplicate(primarykeycolumnname);
 	this->primarykeycolumnindex=primarykeycolumnindex;
-	delete[] this->primarykeysequence;
 	this->primarykeysequence=charstring::duplicate(primarykeysequence);
+	insertprimarykey=true;
+}
+
+void sqlrimportcsv::removePrimaryKey() {
+	delete[] this->primarykeycolumnname;
+	delete[] this->primarykeysequence;
+	this->primarykeycolumnname=NULL;
+	this->primarykeysequence=NULL;
+	insertprimarykey=false;
 }
 
 void sqlrimportcsv::insertStaticValue(const char *columnname,
 					uint32_t columnindex,
 					const char *value) {
-	staticvaluecolumnnames.removeAndArrayDeleteValue(columnindex);
-	staticvaluecolumnvalues.removeAndArrayDeleteValue(columnindex);
+	removeStaticValue(columnindex);
 	staticvaluecolumnnames.setValue(
 			columnindex,charstring::duplicate(columnname));
 	staticvaluecolumnvalues.setValue(
 			columnindex,charstring::duplicate(value));
 }
 
-void sqlrimportcsv::remapColumns(uint32_t *map, uint32_t mapcount) {
-	this->map=map;
-	this->mapcount=mapcount;
+void sqlrimportcsv::removeStaticValue(uint32_t columnindex) {
+	staticvaluecolumnnames.removeAndArrayDeleteValue(columnindex);
+	staticvaluecolumnvalues.removeAndArrayDeleteValue(columnindex);
 }
 
 void sqlrimportcsv::setIgnoreColumnsWithEmptyNames(
@@ -83,8 +88,8 @@ bool sqlrimportcsv::importFromFile(const char *filename) {
 	datecolumn=NULL;
 	columnswithemptynames.clear();
 
-	if (!table) {
-		table=file::basename(filename,".csv");
+	if (!objectname) {
+		objectname=file::basename(filename,".csv");
 	}
 	return csvsax::parseFile(filename);
 }
@@ -92,9 +97,11 @@ bool sqlrimportcsv::importFromFile(const char *filename) {
 bool sqlrimportcsv::column(const char *name, bool quoted) {
 
 	// if this column is the primary key...
-	if (primarykeycolumnname && currentcol==primarykeycolumnindex) {
+	if (insertprimarykey && currentcol==primarykeycolumnindex) {
 
-		// and we're building a list of column names...
+		// and we're building a list of column names from the ones
+		// specified in the CSV header, rather than just grabbing
+		// the columns from the table itself...
 		if (!ignorecolumns) {
 
 			// append the primary key name
@@ -117,7 +124,9 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 				break;
 			}
 
-			// if we're building a list of column names...
+			// and we're building a list of column names from the
+			// ones specified in the CSV header, rather than just
+			// grabbing the columns from the table itself...
 			if (!ignorecolumns) {
 
 				// append the column name
@@ -147,13 +156,13 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 		}
 	}
 
-	// if we're building a list of column names and
-	// not ignoring this column because it's name was empty...
+	// and we're building a list of column names from the ones specified in
+	// the CSV header, rather than just grabbing the columns from the table
+	// itself, and not ignoring this column because it's name was empty...
 	if (!ignorecolumns && includecolumn) {
 
 		// append the column name to the list of column names
-		columns[columns.getLength()]=
-					charstring::duplicate(name);
+		columns[columns.getLength()]=charstring::duplicate(name);
 	}
 
 	// next...
@@ -169,9 +178,14 @@ bool sqlrimportcsv::headerEnd() {
 	// get info about these columns from the database
 	query.clear();
 	query.append("select ");
+
 	if (ignorecolumns) {
+		// if we're ignoring the columns specified in the CSV header,
+		// then just grab the column names from the table itself
 		query.append('*');
 	} else {
+		// if we built a list of column names from the ones specified in
+		// the CSV header, then select those columns, specifically
 		for (uint64_t i=0; i<columns.getLength(); i++) {
 			if (i) {
 				query.append(',');
@@ -179,49 +193,49 @@ bool sqlrimportcsv::headerEnd() {
 			query.append(columns[i]);
 		}
 	}
-	query.append(" from ")->append(table);
+	query.append(" from ")->append(objectname);
 	sqlrcur->setResultSetBufferSize(1);
 	if (!sqlrcur->sendQuery(query.getString())) {
 		return false;
 	}
 
 	// get the column count
-	// this should match the number of columns in the csv,
-	// minus any that are being ignored because their names are empty,
-	// plus a primary key if we're adding that manually
 	colcount=sqlrcur->colCount();
 
-	// If a primary key name/position is specified, then we presume that
-	// the primary key isn't one of the columns in the csv.
+	// Primary key values could be provided in the CSV, but if we're
+	// inserting a primary key, then we can presume that they are not
+	// provided in the CSV.
 	//
-	// If we're ignoring columns, then the primary key will be in the
-	// columns selected by * above.
+	// So, if we're inserting a primary key, then...
 	//
-	// If we're not ignoring columns, then it will NOT be in the columns,
-	// explicitly selected by name above, so we need to bump the colcount.
-	if (!ignorecolumns) {
+	// If we ignored the columns specified in the CSV header, and just
+	// grabbed the column names from the table itself, then the primary
+	// key will be in the columns selected by * above.
+	//
+	// If we built a list of column names from the ones specified in
+	// the CSV header, then the primary key will NOT be among those
+	// columns, and in that case we need to bump the column count.
+	if (insertprimarykey && !ignorecolumns) {
 		colcount++;
 	} 
 
 	// run through the columns, figuring out which are numbers and dates...
-	bool	fudgedprimarykey=false;
 	numbercolumn=new bool[colcount];
 	datecolumn=new bool[colcount];
-	for (uint32_t i=0, j=0; i<colcount;) {
+	// "i" is the index into the set of column names selected above
+	// "j" is the index into the set number/datecolumn flags
+	// they will differ if we had to bump colcount above
+	for (uint32_t i=0, j=0; j<colcount;) {
 
-		if (!fudgedprimarykey &&
-			!ignorecolumns &&
-			primarykeycolumnname &&
-			i==primarykeycolumnindex) {
+		if (!ignorecolumns &&
+			insertprimarykey &&
+			j==primarykeycolumnindex) {
 
 			// If we're not ignoring columns, and this is the
-			// primary key column, then it won't be in the set of
-			// columns selected by name above.  Fudge it.  It's
-			// going to be a number and not a date.
-			// Don't increment i.
-			numbercolumn[j]=false;
+			// primary key column, then it will be a number and
+			// not a date.
+			numbercolumn[j]=true;
 			datecolumn[j]=false;
-			fudgedprimarykey=true;
 
 		} else {
 
@@ -263,7 +277,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 
 	// if we're manually adding the primary key, and this is the primary
 	// key position, then add it
-	if (primarykeycolumnname && currentcol==primarykeycolumnindex) {
+	if (insertprimarykey && currentcol==primarykeycolumnindex) {
 		if (primarykeysequence) {
 			stringbuffer	tmp;
 			tmp.append("nextval('");
@@ -425,9 +439,8 @@ void sqlrimportcsv::appendField(stringbuffer *query,
 bool sqlrimportcsv::rowEnd() {
 
 	// build query
-	// FIXME: apply map
 	query.clear();
-	query.append("insert into ")->append(table);
+	query.append("insert into ")->append(objectname);
 	if (!ignorecolumns) {
 		query.append(" (");
 		for (uint64_t i=0; i<columns.getLength(); i++) {
@@ -494,7 +507,7 @@ bool sqlrimportcsv::rowEnd() {
 						"committed %lld rows "
 						"(to %s)...",
 						(unsigned long long)rowcount,
-						table);
+						objectname);
 				} else {
 					lg->write(fineloglevel,NULL,logindent,
 						"committed %lld rows",
@@ -516,7 +529,8 @@ bool sqlrimportcsv::bodyEnd() {
 		if (lg) {
 			lg->write(coarseloglevel,NULL,logindent,
 					"committed %lld rows (to %s)",
-					(unsigned long long)rowcount,table);
+					(unsigned long long)rowcount,
+					objectname);
 		}
 	}
 

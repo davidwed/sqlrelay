@@ -8,6 +8,7 @@
 					bool overrideisstring);
 		void	escapeField(stringbuffer *strb, const char *field);
 
+		bool		insertprimarykey;
 		char		*primarykeycolumnname;
 		uint32_t	primarykeycolumnindex;
 		char		*primarykeysequence;
@@ -34,6 +35,3 @@
 
 		dynamicarray<char *>		columns;
 		dynamicarray<char *>		fields;
-
-		uint32_t	*map;
-		uint32_t	mapcount;
