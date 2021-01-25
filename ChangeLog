@@ -23,6 +23,7 @@
 	fixed crash in replay module when table name is quoted
 	mysql explain statements work now
 	fixed node-gyp.js detection on ubuntu 20.04
+	added configure options for PHP 8.x
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API

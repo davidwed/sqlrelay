@@ -35106,7 +35106,7 @@ then
 	else
 
 		PHPCONFIG=""
-		for file in "php-config" "php-config-5" "php-config-5.1" "php-config-5.2" "php-config-5.3" "php-config-5.3" "php-config-5.4" "php-config-5.5" "php-config-5.6" "php-config-5.7" "php-config-5.8" "php-config-7.0" "php-config-7.1" "php-config-7.2" "php-config-7.3" "php-config-7.4" "php-config-7.5"
+		for file in "php-config" "php-config-5" "php-config-5.1" "php-config-5.2" "php-config-5.3" "php-config-5.3" "php-config-5.4" "php-config-5.5" "php-config-5.6" "php-config-5.7" "php-config-5.8" "php-config-7.0" "php-config-7.1" "php-config-7.2" "php-config-7.3" "php-config-7.4" "php-config-8.0" "php-config-8.1" "php-config-8.2" "php-config-8.3" "php-config-8.4"
 		do
 			if ( test -n "$PHPPATH" )
 			then
