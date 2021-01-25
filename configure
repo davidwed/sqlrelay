@@ -35248,6 +35248,11 @@ $as_echo "$PHPCONFDIR - $PHPCONFSTYLE style" >&6; }
 
 
 
+cat >>confdefs.h <<_ACEOF
+#define PHPMAJORVERSION $PHPMAJORVERSION
+_ACEOF
+
+
 
 
 fi

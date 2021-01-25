@@ -455,6 +455,9 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION ""
 
+/* PHP major version */
+#define PHPMAJORVERSION 5
+
 /* Some systems use SQLLEN * in SQLBindCol */
 #define SQLBINDCOL_SQLLEN 1
 

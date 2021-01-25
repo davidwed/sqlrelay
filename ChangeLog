@@ -24,6 +24,7 @@
 	mysql explain statements work now
 	fixed node-gyp.js detection on ubuntu 20.04
 	added configure options for PHP 8.x
+	added php/pdo module tweaks for PHP 8
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API

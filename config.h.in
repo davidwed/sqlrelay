@@ -321,6 +321,9 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
+/* PHP major version */
+#undef PHPMAJORVERSION
+
 /* Some systems use SQLLEN * in SQLBindCol */
 #undef SQLBINDCOL_SQLLEN
 

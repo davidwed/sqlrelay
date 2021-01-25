@@ -9,6 +9,8 @@
 	#include <stdint.h>
 #endif
 
+#include <config.h>
+
 #include <sqlrelay/sqlrclient.h>
 
 // The various define/undef games below play havoc with inttypes.h
@@ -45,8 +47,10 @@ extern "C" {
 		#include <math.h>
 
 		#ifdef __cplusplus
-			#undef __cplusplus
-			#define cpluspluswasdefined
+			#if PHPMAJORVERSION < 8
+				#undef __cplusplus
+				#define cpluspluswasdefined
+			#endif
 		#endif
 		#ifndef HAVE_SOCKLEN_T
 			#define HAVE_SOCKLEN_T
@@ -107,11 +111,13 @@ extern "C" {
 
 	#define HASH_INDEX_FIND(a,b,c) c=zend_hash_index_find(a,b)
 
+	// for 7.2 and greater...
 	#if PHP_MAJOR_VERSION > 7 || PHP_MINOR_VERSION > 2
 		#define ARRAY_INIT_CANT_FAIL 1
 	#endif
 
-	#if PHP_MAJOR_VERSION > 7 || PHP_MINOR_VERSION < 4
+	// for earlier than 7.4...
+	#if PHP_MAJOR_VERSION == 7 && PHP_MINOR_VERSION < 4
 		#define ADD_ASSOC_NULL(a,b) add_assoc_unset(a,b)
 		#define	ADD_NEXT_INDEX_NULL(a) add_next_index_unset(a)
 	#else

@@ -94,6 +94,12 @@ extern "C" {
 	#define	getStmt()	(pdo_stmt_t *)Z_PDO_STMT_P(getThis())
 	#define	getDbh()	(pdo_dbh_t *)Z_PDO_DBH_P(getThis())
 
+	#if PHP_MAJOR_VERSION >= 8
+		#define TSRMLS_DC
+		#define TSRMLS_CC
+		#define TSRMLS_FETCH()
+	#endif
+
 #else
 
 	#define ZVAL zval**
@@ -1983,7 +1989,11 @@ static PHP_MINIT_FUNCTION(pdo_sqlrelay) {
 	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_CLIENT_INFO",
 				(long)PDO_SQLRELAY_ATTR_CLIENT_INFO);
 
-	return php_pdo_register_driver(&sqlrelayDriver);
+	return
+		#if PHP_MAJOR_VERSION >= 8
+		(zend_result)
+		#endif
+		php_pdo_register_driver(&sqlrelayDriver);
 }
 
 static PHP_MSHUTDOWN_FUNCTION(pdo_sqlrelay) {
