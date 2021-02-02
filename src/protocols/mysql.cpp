@@ -7,6 +7,7 @@
 #include <rudiments/randomnumber.h>
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
+#include <rudiments/file.h>
 #include <rudiments/error.h>
 
 #include <defines.h>
@@ -604,10 +605,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		void	buildHandshake10();
 		void	buildHandshake9();
 		bool	recvHandshakeResponse();
-		void	parseHandshakeResponse41(
+		bool	parseHandshakeResponse41(
 					const unsigned char *rp,
 					uint64_t rplen);
-		void	parseHandshakeResponse320(
+		bool	parseHandshakeResponse320(
 					const unsigned char *rp,
 					uint64_t rplen);
 		bool	negotiateAuthMethod();
@@ -840,11 +841,14 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 
 		filedescriptor	*clientsock;
 
+		tlscontext	tctx;
+
 		uint64_t	handshake;
 		uint64_t	clientprotocol;
 		bool		datetodatetime;
 		bool		zeroscaledecimaltobigint;
 		bool		oldmariadbjdbcservercapabilitieshack;
+		bool		usetls;
 
 		bytebuffer	resppacket;
 		unsigned char	seq;
@@ -918,6 +922,69 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 			parameters->getAttributeValue(
 				"oldmariadbjdbcservercapabilitieshack"));
 
+	usetls=charstring::isYes(parameters->getAttributeValue("tls"));
+	if (usetls) {
+		if (tls::supported()) {
+
+			// get the protocol version to use
+			tctx.setProtocolVersion(
+				parameters->getAttributeValue("tlsversion"));
+
+			// get the certificate chain file to use
+			const char	*tlscert=
+				parameters->getAttributeValue("tlscert");
+			if (file::readable(tlscert)) {
+				tctx.setCertificateChainFile(tlscert);
+			} else if (!charstring::isNullOrEmpty(tlscert)) {
+				stderror.printf("Warning: TLS certificate "
+						"file %s is not readable.\n",
+						tlscert);
+			}
+
+			// get the private key file to use
+			const char	*tlskey=
+				parameters->getAttributeValue("tlskey");
+			if (file::readable(tlskey)) {
+				tctx.setPrivateKeyFile(tlskey);
+			} else if (!charstring::isNullOrEmpty(tlskey)) {
+				stderror.printf("Warning: TLS private key "
+						"file %s is not readable.\n",
+						tlskey);
+			}
+
+			// get the private key password to use
+			tctx.setPrivateKeyPassword(
+				parameters->getAttributeValue("tlspassword"));
+
+			// get whether to validate
+			tctx.setValidatePeer(
+				charstring::isYes(
+				parameters->getAttributeValue("tlsvalidate")));
+
+			// get the certificate authority file to use
+			// FIXME: not-found warning
+			tctx.setCertificateAuthority(
+				parameters->getAttributeValue("tlsca"));
+
+			// get the cipher list to use
+			tctx.setCiphers(
+				parameters->getAttributeValue("tlsciphers"));
+
+			// get the validation depth
+			tctx.setValidationDepth(
+				charstring::toUnsignedInteger(
+				parameters->getAttributeValue("tlsdepth")));
+
+		} else {
+
+			usetls=false;
+
+			stderror.printf("Warning: TLS support requested "
+					"but platform doesn't support "
+					"TLS\n");
+		}
+	}
+
 	if (getDebug()) {
 		debugStart("parameters");
 		stdoutput.printf("	handshake: %d\n",handshake);
@@ -927,6 +994,27 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 				": %d\n",zeroscaledecimaltobigint);
 		stdoutput.printf("	oldmariadbjdbcservercapabilitieshack"
 				": %d\n",oldmariadbjdbcservercapabilitieshack);
+		if (usetls) {
+			stdoutput.printf("	tls: yes\n");
+			stdoutput.printf("	tls version: %s\n",
+						tctx.getProtocolVersion());
+			stdoutput.printf("	tls cert: %s\n",
+						tctx.getCertificateChainFile());
+			stdoutput.printf("	tls key: %s\n",
+						tctx.getPrivateKeyFile());
+			stdoutput.printf("	tls password: %s\n",
+						tctx.getPrivateKeyPassword());
+			stdoutput.printf("	tls validate: %d\n",
+						tctx.getValidatePeer());
+			stdoutput.printf("	tls ca: %s\n",
+						tctx.getCertificateAuthority());
+			stdoutput.printf("	tls ciphers: %s\n",
+						tctx.getCiphers());
+			stdoutput.printf("	tls depth: %d\n",
+						tctx.getValidationDepth());
+		} else {
+			stdoutput.printf("	tls: no\n");
+		}
 		debugEnd();
 	}
 
@@ -1421,7 +1509,6 @@ void sqlrprotocol_mysql::buildHandshake10() {
 			//CLIENT_IGNORE_SPACE|
 			((clientprotocol==41)?CLIENT_PROTOCOL_41:0)|
 			//CLIENT_INTERACTIVE|
-			//CLIENT_SSL|
 			//CLIENT_IGNORE_SIGPIPE| (client-only)
 			CLIENT_TRANSACTIONS|
 			//CLIENT_RESERVED|
@@ -1437,6 +1524,9 @@ void sqlrprotocol_mysql::buildHandshake10() {
 			CLIENT_DEPRECATE_EOF|
 			0
 			;
+	if (usetls) {
+		servercapabilityflags|=CLIENT_SSL;
+	}
 	servercharacterset=LATIN1_SWEDISH_CI;
 	uint16_t	statusflags=SERVER_STATUS_AUTOCOMMIT;
 	char		reserved[10]={0,0,0,0,0,0,0,0,0,0};
@@ -1546,14 +1636,12 @@ bool sqlrprotocol_mysql::recvHandshakeResponse() {
 	rp-=sizeof(uint32_t);
 
 	if (capabilityflags&CLIENT_PROTOCOL_41) {
-		parseHandshakeResponse41(rp,reqpacketsize);
-	} else {
-		parseHandshakeResponse320(rp,reqpacketsize);
+		return parseHandshakeResponse41(rp,reqpacketsize);
 	}
-	return true;
+	return parseHandshakeResponse320(rp,reqpacketsize);
 }
 
-void sqlrprotocol_mysql::parseHandshakeResponse41(
+bool sqlrprotocol_mysql::parseHandshakeResponse41(
 					const unsigned char *rp,
 					uint64_t rplen) {
 
@@ -1583,6 +1671,28 @@ void sqlrprotocol_mysql::parseHandshakeResponse41(
 
 	// reserved
 	rp+=23;
+
+#if 0
+	// check for ssl-request packet
+	if (rp==end && clientcapabilityflags&CLIENT_SSL) {
+
+		stdoutput.printf("	client requesting tls\n");
+
+		clientsock->setSecurityContext(&tctx);
+		tctx.setFileDescriptor(clientsock);
+
+		if (!tctx.accept()) {
+			stdoutput.printf("	tls accept failed: %s\n",
+							tctx.getErrorString());
+			debugEnd();
+			return false;
+		}
+
+		stdoutput.printf("	tls accept success\n");
+		debugEnd();
+		return recvHandshakeResponse();
+	}
+#endif
 
 	// username
 	delete[] username;
@@ -1711,13 +1821,19 @@ void sqlrprotocol_mysql::parseHandshakeResponse41(
 	}
 
 	debugEnd();
+
+	return true;
 }
 
-void sqlrprotocol_mysql::parseHandshakeResponse320(
+bool sqlrprotocol_mysql::parseHandshakeResponse320(
 					const unsigned char *rp,
 					uint64_t rplen) {
 
 	debugStart("handshake response 320");
+
+#if 0
+	const unsigned char	*end=rp+rplen;
+#endif
 
 	// capability flags
 	uint16_t	shortcapabilityflags;
@@ -1737,6 +1853,27 @@ void sqlrprotocol_mysql::parseHandshakeResponse320(
 	if (getDebug()) {
 		stdoutput.printf("	max-packet size: %d\n",maxpacketsize);
 	}
+
+#if 0
+	// check for ssl-request packet
+	if (rp==end && clientcapabilityflags&CLIENT_SSL) {
+
+		stdoutput.printf("	client requesting tls\n");
+
+		clientsock->setSecurityContext(&tctx);
+		tctx.setFileDescriptor(clientsock);
+
+		if (!tctx.accept()) {
+			stdoutput.printf("	tls accept failed\n");
+			debugEnd();
+			return false;
+		}
+
+		stdoutput.printf("	tls accept success\n");
+		debugEnd();
+		return recvHandshakeResponse();
+	}
+#endif
 
 	// username
 	delete[] username;
@@ -1773,6 +1910,8 @@ void sqlrprotocol_mysql::parseHandshakeResponse320(
 	clientauthpluginname="mysql_old_password";
 
 	debugEnd();
+
+	return true;
 }
 
 static const char *supportedauthplugins[]={
