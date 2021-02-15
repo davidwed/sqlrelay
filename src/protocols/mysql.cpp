@@ -1672,27 +1672,36 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 	// reserved
 	rp+=23;
 
-#if 0
 	// check for ssl-request packet
 	if (rp==end && clientcapabilityflags&CLIENT_SSL) {
 
-		stdoutput.printf("	client requesting tls\n");
+		if (getDebug()) {
+			stdoutput.printf("	client requesting tls\n");
+		}
 
 		clientsock->setSecurityContext(&tctx);
 		tctx.setFileDescriptor(clientsock);
 
 		if (!tctx.accept()) {
-			stdoutput.printf("	tls accept failed: %s\n",
-							tctx.getErrorString());
+			if (getDebug()) {
+				stdoutput.printf("	"
+						"tls accept failed: %s\n",
+						tctx.getErrorString());
+			}
 			debugEnd();
+			// FIXME: instead, fall back to non-secure
 			return false;
 		}
 
-		stdoutput.printf("	tls accept success\n");
+		if (getDebug()) {
+			stdoutput.printf("	tls accept success\n");
+		}
 		debugEnd();
 		return recvHandshakeResponse();
 	}
-#endif
+
+	// FIXME: if auth was done in the TLS step with a client cert, do we
+	// still valiate the user/password
 
 	// username
 	delete[] username;
@@ -1831,9 +1840,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 
 	debugStart("handshake response 320");
 
-#if 0
 	const unsigned char	*end=rp+rplen;
-#endif
 
 	// capability flags
 	uint16_t	shortcapabilityflags;
@@ -1854,7 +1861,6 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 		stdoutput.printf("	max-packet size: %d\n",maxpacketsize);
 	}
 
-#if 0
 	// check for ssl-request packet
 	if (rp==end && clientcapabilityflags&CLIENT_SSL) {
 
@@ -1873,7 +1879,6 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 		debugEnd();
 		return recvHandshakeResponse();
 	}
-#endif
 
 	// username
 	delete[] username;
