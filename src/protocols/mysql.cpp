@@ -611,6 +611,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		bool	parseHandshakeResponse320(
 					const unsigned char *rp,
 					uint64_t rplen);
+		bool	handleTlsRequest();
+		bool	noClientTls();
 		bool	negotiateAuthMethod();
 		bool	sendAuthSwitchRequest();
 		bool	sendOldAuthSwitchRequest();
@@ -1672,36 +1674,24 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 	// reserved
 	rp+=23;
 
-	// check for ssl-request packet
-	if (rp==end && clientcapabilityflags&CLIENT_SSL) {
-
-		if (getDebug()) {
-			stdoutput.printf("	client requesting tls\n");
+	// handle tls
+	if (clientcapabilityflags&CLIENT_SSL) {
+		// If the client supports TLS then it will include the
+		// CLIENT_SSL flag, terminate the packet here, perform a TLS
+		// handshake, and resend the full packet.
+		//
+		// We can distinguish between the first or second iteration by
+		// seeing if the packet is terminated here or not.  If it is
+		// then we're in the first iteration, and need to establish
+		// the TLS session.  If it's not then we're in the second
+		// iteration and we need to fall through and process the
+		// rest of the packet.
+		if (rp==end) {
+			return handleTlsRequest();
 		}
-
-		clientsock->setSecurityContext(&tctx);
-		tctx.setFileDescriptor(clientsock);
-
-		if (!tctx.accept()) {
-			if (getDebug()) {
-				stdoutput.printf("	"
-						"tls accept failed: %s\n",
-						tctx.getErrorString());
-			}
-			debugEnd();
-			// FIXME: instead, fall back to non-secure
-			return false;
-		}
-
-		if (getDebug()) {
-			stdoutput.printf("	tls accept success\n");
-		}
-		debugEnd();
-		return recvHandshakeResponse();
+	} else if (usetls) {
+		return noClientTls();
 	}
-
-	// FIXME: if auth was done in the TLS step with a client cert, do we
-	// still valiate the user/password
 
 	// username
 	delete[] username;
@@ -1861,23 +1851,23 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 		stdoutput.printf("	max-packet size: %d\n",maxpacketsize);
 	}
 
-	// check for ssl-request packet
-	if (rp==end && clientcapabilityflags&CLIENT_SSL) {
-
-		stdoutput.printf("	client requesting tls\n");
-
-		clientsock->setSecurityContext(&tctx);
-		tctx.setFileDescriptor(clientsock);
-
-		if (!tctx.accept()) {
-			stdoutput.printf("	tls accept failed\n");
-			debugEnd();
-			return false;
+	// handle tls
+	if (clientcapabilityflags&CLIENT_SSL) {
+		// If the client supports TLS then it will include the
+		// CLIENT_SSL flag, terminate the packet here, perform a TLS
+		// handshake, and resend the full packet.
+		//
+		// We can distinguish between the first or second iteration by
+		// seeing if the packet is terminated here or not.  If it is
+		// then we're in the first iteration, and need to establish
+		// the TLS session.  If it's not then we're in the second
+		// iteration and we need to fall through and process the
+		// rest of the packet.
+		if (rp==end) {
+			return handleTlsRequest();
 		}
-
-		stdoutput.printf("	tls accept success\n");
-		debugEnd();
-		return recvHandshakeResponse();
+	} else if (usetls) {
+		return noClientTls();
 	}
 
 	// username
@@ -1917,6 +1907,62 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 	debugEnd();
 
 	return true;
+}
+
+bool sqlrprotocol_mysql::handleTlsRequest() {
+
+	if (getDebug()) {
+		stdoutput.printf("	client requesting tls\n");
+	}
+
+	clientsock->setSecurityContext(&tctx);
+	tctx.setFileDescriptor(clientsock);
+
+	if (!tctx.accept()) {
+
+		if (getDebug()) {
+			stdoutput.printf("	"
+					"tls accept failed: %s\n",
+					tctx.getErrorString());
+		}
+		debugEnd();
+
+		stringbuffer	err;
+		err.append("SSL connection error: ");
+		err.append(tctx.getErrorString());
+		sendErrPacket(2026,err.getString(),
+					err.getStringLength(),"HY000");
+		// FIXME: The clients that I've tested with don't report this
+		// error.  Instead they just keep trying to connect using a
+		// non-tls connection. I suspect that if the client had an
+		// --ssl-mode=required option (or similar) then it would fail
+		// here.
+		return false;
+	}
+
+	if (getDebug()) {
+		stdoutput.printf("	tls accept success\n");
+	}
+	debugEnd();
+
+	// client will re-send the handshake, this time including user/password
+	return recvHandshakeResponse();
+}
+
+bool sqlrprotocol_mysql::noClientTls() {
+	stringbuffer	err;
+	err.append("SSL connection error: ");
+	const char	*errdetail=(tctx.getValidatePeer())?
+					"TLS mutual auth required":
+					"TLS required";
+	err.append(errdetail);
+	if (getDebug()) {
+		stdoutput.printf(
+			"%s but tls not enabled on client\n",errdetail);
+	}
+	debugEnd();
+	return sendErrPacket(2026,err.getString(),
+				err.getStringLength(),"HY000");
 }
 
 static const char *supportedauthplugins[]={
@@ -2050,7 +2096,7 @@ bool sqlrprotocol_mysql::negotiateAuthMethod() {
 		stdoutput.write("	could not agree on auth method\n");
 		debugEnd();
 	}
-	// FIXME: send error?
+	// FIXME: return error somehow?
 	return false;
 }
 
