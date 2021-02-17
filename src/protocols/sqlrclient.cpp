@@ -43,9 +43,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		clientsessionexitstatus_t	clientSession(
 							filedescriptor *cs);
 
-		gsscontext	*getGSSContext();
-		tlscontext	*getTLSContext();
-
 	private:
 		bool	acceptSecurityContext();
 		bool	getCommand(uint16_t *command);
@@ -213,13 +210,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		filedescriptor	*clientsock;
 
 		securitycontext	*ctx;
-		bool		usekrb;
-		bool		usetls;
-
-		gsscredentials	gcred;
-		gssmechanism	gmech;
-		gsscontext	gctx;
-		tlscontext	tctx;
 
 		int32_t		idleclienttimeout;
 
@@ -268,121 +258,13 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
 	clientsock=NULL;
-	ctx=NULL;
-	usekrb=charstring::isYes(parameters->getAttributeValue("krb"));
-	usetls=charstring::isYes(parameters->getAttributeValue("tls"));
 
-	if (usekrb) {
-		if (gss::supported()) {
-
-			// set the keytab file to use
-			const char	*keytab=
-				parameters->getAttributeValue("krbkeytab");
-			if (!charstring::isNullOrEmpty(keytab)) {
-				gcred.setKeytab(keytab);
-			}
-
-			// set the service to use
-			const char	*service=
-				parameters->getAttributeValue("krbservice");
-			if (charstring::isNullOrEmpty(service)) {
-				service=DEFAULT_KRBSERVICE;
-			}
-
-			// acquire service credentials
-			if (!gcred.acquireForService(service)) {
-				const char	*status=
-					gcred.getMechanismMinorStatus();
-				stderror.printf("kerberos acquire-"
-						"service %s failed:\n%s",
-						service,status);
-				if (charstring::contains(status,
-							"Permission denied")) {
-					char	*user=userentry::getName(
-							process::getUserId());
-					stderror.printf("(keytab file likely "
-							"not readable by user "
-							"%s)\n",user);
-					delete[] user;
-				}
-			}
-
-			// initialize the gss context
-			gmech.initialize(
-				parameters->getAttributeValue("krbmech"));
-			gctx.setDesiredMechanism(&gmech);
-			gctx.setDesiredFlags(
-				parameters->getAttributeValue("krbflags"));
-			gctx.setCredentials(&gcred);
-
-			// use the gss context
-			ctx=&gctx;
-
-		} else {
-			stderror.printf("Warning: kerberos support requested "
-					"but platform doesn't support "
-					"kerberos\n");
-		}
-	} else if (usetls) {
-		if (tls::supported()) {
-
-			// get the protocol version to use
-			tctx.setProtocolVersion(
-				parameters->getAttributeValue("tlsversion"));
-
-			// get the certificate chain file to use
-			const char	*tlscert=
-				parameters->getAttributeValue("tlscert");
-			if (file::readable(tlscert)) {
-				tctx.setCertificateChainFile(tlscert);
-			} else if (!charstring::isNullOrEmpty(tlscert)) {
-				stderror.printf("Warning: TLS certificate "
-						"file %s is not readable.\n",
-						tlscert);
-			}
-
-			// get the private key file to use
-			const char	*tlskey=
-				parameters->getAttributeValue("tlskey");
-			if (file::readable(tlskey)) {
-				tctx.setPrivateKeyFile(tlskey);
-			} else if (!charstring::isNullOrEmpty(tlskey)) {
-				stderror.printf("Warning: TLS private key "
-						"file %s is not readable.\n",
-						tlskey);
-			}
-
-			// get the private key password to use
-			tctx.setPrivateKeyPassword(
-				parameters->getAttributeValue("tlspassword"));
-
-			// get whether to validate
-			tctx.setValidatePeer(
-				charstring::isYes(
-				parameters->getAttributeValue("tlsvalidate")));
-
-			// get the certificate authority file to use
-			// FIXME: not-found warning
-			tctx.setCertificateAuthority(
-				parameters->getAttributeValue("tlsca"));
-
-			// get the cipher list to use
-			tctx.setCiphers(
-				parameters->getAttributeValue("tlsciphers"));
-
-			// get the validation depth
-			tctx.setValidationDepth(
-				charstring::toUnsignedInteger(
-				parameters->getAttributeValue("tlsdepth")));
-
-			// use the tls context
-			ctx=&tctx;
-
-		} else {
-			stderror.printf("Warning: TLS support requested "
-					"but platform doesn't support "
-					"TLS\n");
-		}
+	if (useKrb()) {
+		ctx=getGssContext();
+	} else if (useTls()) {
+		ctx=getTlsContext();
+	} else {
+		ctx=NULL;
 	}
 
 	protocolversion=0;
@@ -684,19 +566,19 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 
 bool sqlrprotocol_sqlrclient::acceptSecurityContext() {
 
-	if (!usekrb && !usetls) {
+	if (!useKrb() && !useTls()) {
 		return true;
 	}
 
 	cont->raiseDebugMessageEvent("accepting security context");
 
-	if (usekrb && !gss::supported()) {
+	if (useKrb() && !gss::supported()) {
 		cont->raiseInternalErrorEvent(NULL,
 				"failed to accept gss security "
 				"context (kerberos requested but "
 				"not supported)");
 		return false;
-	} else if (usetls && !tls::supported()) {
+	} else if (useTls() && !tls::supported()) {
 		cont->raiseInternalErrorEvent(NULL,
 				"failed to accept tls security "
 				"context (tls requested but "
@@ -872,7 +754,7 @@ bool sqlrprotocol_sqlrclient::authCommand() {
 	// build credentials...
 	sqlrcredentials	*cred=cont->getCredentials(
 					userbuffer,passwordbuffer,
-					usekrb,usetls);
+					useKrb(),useTls());
 
 	// auth
 	bool	success=cont->auth(cred);
@@ -4314,14 +4196,6 @@ bool sqlrprotocol_sqlrclient::getTranslatedQueryCommand(
 	clientsock->flushWriteBuffer(-1,-1);
 
 	return true;
-}
-
-gsscontext *sqlrprotocol_sqlrclient::getGSSContext() {
-	return &gctx;
-}
-
-tlscontext *sqlrprotocol_sqlrclient::getTLSContext() {
-	return &tctx;
 }
 
 extern "C" {

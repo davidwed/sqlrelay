@@ -2087,7 +2087,7 @@ sqlrcredentials *sqlrservercontroller::getCredentials(const char *user,
 	// try to use gss credentials
 	if (usegss) {
 
-		gsscontext	*ctx=getGSSContext();
+		gsscontext	*ctx=getGssContext();
 		if (ctx) {
 			sqlrgsscredentials	*gsscred=
 					new sqlrgsscredentials();
@@ -2101,7 +2101,7 @@ sqlrcredentials *sqlrservercontroller::getCredentials(const char *user,
 	// (unless a user was passed in)
 	if (usetls && charstring::isNullOrEmpty(user)) {
 
-		tlscontext	*ctx=getTLSContext();
+		tlscontext	*ctx=getTlsContext();
 		if (ctx) {
 			tlscertificate	*cert=ctx->getPeerCertificate();
 			if (cert) {
@@ -10204,14 +10204,14 @@ sqlrparser *sqlrservercontroller::getParser() {
 	return pvt->_sqlrp;
 }
 
-gsscontext *sqlrservercontroller::getGSSContext() {
+gsscontext *sqlrservercontroller::getGssContext() {
 	return (pvt->_currentprotocol)?
-			pvt->_currentprotocol->getGSSContext():NULL;
+			pvt->_currentprotocol->getGssContext():NULL;
 }
 
-tlscontext *sqlrservercontroller::getTLSContext() {
+tlscontext *sqlrservercontroller::getTlsContext() {
 	return (pvt->_currentprotocol)?
-			pvt->_currentprotocol->getTLSContext():NULL;
+			pvt->_currentprotocol->getTlsContext():NULL;
 }
 
 sqlrconfig *sqlrservercontroller::getConfig() {

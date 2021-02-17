@@ -843,14 +843,11 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 
 		filedescriptor	*clientsock;
 
-		tlscontext	tctx;
-
 		uint64_t	handshake;
 		uint64_t	clientprotocol;
 		bool		datetodatetime;
 		bool		zeroscaledecimaltobigint;
 		bool		oldmariadbjdbcservercapabilitieshack;
-		bool		usetls;
 
 		bytebuffer	resppacket;
 		unsigned char	seq;
@@ -924,69 +921,6 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 			parameters->getAttributeValue(
 				"oldmariadbjdbcservercapabilitieshack"));
 
-	usetls=charstring::isYes(parameters->getAttributeValue("tls"));
-	if (usetls) {
-		if (tls::supported()) {
-
-			// get the protocol version to use
-			tctx.setProtocolVersion(
-				parameters->getAttributeValue("tlsversion"));
-
-			// get the certificate chain file to use
-			const char	*tlscert=
-				parameters->getAttributeValue("tlscert");
-			if (file::readable(tlscert)) {
-				tctx.setCertificateChainFile(tlscert);
-			} else if (!charstring::isNullOrEmpty(tlscert)) {
-				stderror.printf("Warning: TLS certificate "
-						"file %s is not readable.\n",
-						tlscert);
-			}
-
-			// get the private key file to use
-			const char	*tlskey=
-				parameters->getAttributeValue("tlskey");
-			if (file::readable(tlskey)) {
-				tctx.setPrivateKeyFile(tlskey);
-			} else if (!charstring::isNullOrEmpty(tlskey)) {
-				stderror.printf("Warning: TLS private key "
-						"file %s is not readable.\n",
-						tlskey);
-			}
-
-			// get the private key password to use
-			tctx.setPrivateKeyPassword(
-				parameters->getAttributeValue("tlspassword"));
-
-			// get whether to validate
-			tctx.setValidatePeer(
-				charstring::isYes(
-				parameters->getAttributeValue("tlsvalidate")));
-
-			// get the certificate authority file to use
-			// FIXME: not-found warning
-			tctx.setCertificateAuthority(
-				parameters->getAttributeValue("tlsca"));
-
-			// get the cipher list to use
-			tctx.setCiphers(
-				parameters->getAttributeValue("tlsciphers"));
-
-			// get the validation depth
-			tctx.setValidationDepth(
-				charstring::toUnsignedInteger(
-				parameters->getAttributeValue("tlsdepth")));
-
-		} else {
-
-			usetls=false;
-
-			stderror.printf("Warning: TLS support requested "
-					"but platform doesn't support "
-					"TLS\n");
-		}
-	}
-
 	if (getDebug()) {
 		debugStart("parameters");
 		stdoutput.printf("	handshake: %d\n",handshake);
@@ -996,24 +930,24 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 				": %d\n",zeroscaledecimaltobigint);
 		stdoutput.printf("	oldmariadbjdbcservercapabilitieshack"
 				": %d\n",oldmariadbjdbcservercapabilitieshack);
-		if (usetls) {
+		if (useTls()) {
 			stdoutput.printf("	tls: yes\n");
 			stdoutput.printf("	tls version: %s\n",
-						tctx.getProtocolVersion());
+				getTlsContext()->getProtocolVersion());
 			stdoutput.printf("	tls cert: %s\n",
-						tctx.getCertificateChainFile());
+				getTlsContext()->getCertificateChainFile());
 			stdoutput.printf("	tls key: %s\n",
-						tctx.getPrivateKeyFile());
+				getTlsContext()->getPrivateKeyFile());
 			stdoutput.printf("	tls password: %s\n",
-						tctx.getPrivateKeyPassword());
+				getTlsContext()->getPrivateKeyPassword());
 			stdoutput.printf("	tls validate: %d\n",
-						tctx.getValidatePeer());
+				getTlsContext()->getValidatePeer());
 			stdoutput.printf("	tls ca: %s\n",
-						tctx.getCertificateAuthority());
+				getTlsContext()->getCertificateAuthority());
 			stdoutput.printf("	tls ciphers: %s\n",
-						tctx.getCiphers());
+				getTlsContext()->getCiphers());
 			stdoutput.printf("	tls depth: %d\n",
-						tctx.getValidationDepth());
+				getTlsContext()->getValidationDepth());
 		} else {
 			stdoutput.printf("	tls: no\n");
 		}
@@ -1526,7 +1460,7 @@ void sqlrprotocol_mysql::buildHandshake10() {
 			CLIENT_DEPRECATE_EOF|
 			0
 			;
-	if (usetls) {
+	if (useTls()) {
 		servercapabilityflags|=CLIENT_SSL;
 	}
 	servercharacterset=LATIN1_SWEDISH_CI;
@@ -1689,7 +1623,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 		if (rp==end) {
 			return handleTlsRequest();
 		}
-	} else if (usetls) {
+	} else if (useTls()) {
 		return noClientTls();
 	}
 
@@ -1866,7 +1800,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 		if (rp==end) {
 			return handleTlsRequest();
 		}
-	} else if (usetls) {
+	} else if (useTls()) {
 		return noClientTls();
 	}
 
@@ -1915,21 +1849,21 @@ bool sqlrprotocol_mysql::handleTlsRequest() {
 		stdoutput.printf("	client requesting tls\n");
 	}
 
-	clientsock->setSecurityContext(&tctx);
-	tctx.setFileDescriptor(clientsock);
+	clientsock->setSecurityContext(getTlsContext());
+	getTlsContext()->setFileDescriptor(clientsock);
 
-	if (!tctx.accept()) {
+	if (!getTlsContext()->accept()) {
 
 		if (getDebug()) {
 			stdoutput.printf("	"
 					"tls accept failed: %s\n",
-					tctx.getErrorString());
+					getTlsContext()->getErrorString());
 		}
 		debugEnd();
 
 		stringbuffer	err;
 		err.append("SSL connection error: ");
-		err.append(tctx.getErrorString());
+		err.append(getTlsContext()->getErrorString());
 		sendErrPacket(2026,err.getString(),
 					err.getStringLength(),"HY000");
 		// FIXME: The clients that I've tested with don't report this
@@ -1952,9 +1886,9 @@ bool sqlrprotocol_mysql::handleTlsRequest() {
 bool sqlrprotocol_mysql::noClientTls() {
 	stringbuffer	err;
 	err.append("SSL connection error: ");
-	const char	*errdetail=(tctx.getValidatePeer())?
-					"TLS mutual auth required":
-					"TLS required";
+	const char	*errdetail=(getTlsContext()->getValidatePeer())?
+						"TLS mutual auth required":
+						"TLS required";
 	err.append(errdetail);
 	if (getDebug()) {
 		stdoutput.printf(

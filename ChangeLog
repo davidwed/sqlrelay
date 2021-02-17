@@ -26,6 +26,7 @@
 	added configure options for PHP 8.x
 	added php/pdo module tweaks for PHP 8
 	mysql and postgresql protocol modules support TLS now
+	pushed most of tls/gss code up into sqlrprotocol parent class
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API

@@ -762,10 +762,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		sqlrparser	*getParser();
 
 		// gss
-		gsscontext	*getGSSContext();
+		gsscontext	*getGssContext();
 
 		// tls
-		tlscontext	*getTLSContext();
+		tlscontext	*getTlsContext();
 
 		// configuration
 		sqlrconfig	*getConfig();
@@ -1415,8 +1415,11 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		virtual clientsessionexitstatus_t
 				clientSession(filedescriptor *clientsock)=0;
 
-		virtual gsscontext	*getGSSContext();
-		virtual tlscontext	*getTLSContext();
+		virtual	bool		useKrb();
+		virtual gsscontext	*getGssContext();
+
+		virtual	bool		useTls();
+		virtual tlscontext	*getTlsContext();
 
 		virtual void	endTransaction(bool commit);
 		virtual void	endSession();

@@ -169,10 +169,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 
 		filedescriptor	*clientsock;
 
-		tlscontext	tctx;
-
-		bool		usetls;
-
 		bytebuffer	resppacket;
 
 		uint32_t	reqpacketsize;
@@ -224,69 +220,6 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 
 	clientsock=NULL;
 
-	usetls=charstring::isYes(parameters->getAttributeValue("tls"));
-	if (usetls) {
-		if (tls::supported()) {
-
-			// get the protocol version to use
-			tctx.setProtocolVersion(
-				parameters->getAttributeValue("tlsversion"));
-
-			// get the certificate chain file to use
-			const char	*tlscert=
-				parameters->getAttributeValue("tlscert");
-			if (file::readable(tlscert)) {
-				tctx.setCertificateChainFile(tlscert);
-			} else if (!charstring::isNullOrEmpty(tlscert)) {
-				stderror.printf("Warning: TLS certificate "
-						"file %s is not readable.\n",
-						tlscert);
-			}
-
-			// get the private key file to use
-			const char	*tlskey=
-				parameters->getAttributeValue("tlskey");
-			if (file::readable(tlskey)) {
-				tctx.setPrivateKeyFile(tlskey);
-			} else if (!charstring::isNullOrEmpty(tlskey)) {
-				stderror.printf("Warning: TLS private key "
-						"file %s is not readable.\n",
-						tlskey);
-			}
-
-			// get the private key password to use
-			tctx.setPrivateKeyPassword(
-				parameters->getAttributeValue("tlspassword"));
-
-			// get whether to validate
-			tctx.setValidatePeer(
-				charstring::isYes(
-				parameters->getAttributeValue("tlsvalidate")));
-
-			// get the certificate authority file to use
-			// FIXME: not-found warning
-			tctx.setCertificateAuthority(
-				parameters->getAttributeValue("tlsca"));
-
-			// get the cipher list to use
-			tctx.setCiphers(
-				parameters->getAttributeValue("tlsciphers"));
-
-			// get the validation depth
-			tctx.setValidationDepth(
-				charstring::toUnsignedInteger(
-				parameters->getAttributeValue("tlsdepth")));
-
-		} else {
-
-			usetls=false;
-
-			stderror.printf("Warning: TLS support requested "
-					"but platform doesn't support "
-					"TLS\n");
-		}
-	}
-
 	serverencoding=NULL;
 	clientencoding=NULL;
 	applicationname=NULL;
@@ -307,24 +240,24 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 	if (getDebug()) {
 		debugStart("parameters");
 		stdoutput.printf("	authmethod: %s\n",authmethod);
-		if (usetls) {
+		if (useTls()) {
 			stdoutput.printf("	tls: yes\n");
 			stdoutput.printf("	tls version: %s\n",
-						tctx.getProtocolVersion());
+				getTlsContext()->getProtocolVersion());
 			stdoutput.printf("	tls cert: %s\n",
-						tctx.getCertificateChainFile());
+				getTlsContext()->getCertificateChainFile());
 			stdoutput.printf("	tls key: %s\n",
-						tctx.getPrivateKeyFile());
+				getTlsContext()->getPrivateKeyFile());
 			stdoutput.printf("	tls password: %s\n",
-						tctx.getPrivateKeyPassword());
+				getTlsContext()->getPrivateKeyPassword());
 			stdoutput.printf("	tls validate: %d\n",
-						tctx.getValidatePeer());
+				getTlsContext()->getValidatePeer());
 			stdoutput.printf("	tls ca: %s\n",
-						tctx.getCertificateAuthority());
+				getTlsContext()->getCertificateAuthority());
 			stdoutput.printf("	tls ciphers: %s\n",
-						tctx.getCiphers());
+				getTlsContext()->getCiphers());
 			stdoutput.printf("	tls depth: %d\n",
-						tctx.getValidationDepth());
+				getTlsContext()->getValidationDepth());
 		} else {
 			stdoutput.printf("	tls: no\n");
 		}
@@ -668,7 +601,7 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 			debugEnd();
 
 			// Yes=S, No=N
-			const char	*response=(usetls)?"S":"N";
+			const char	*response=(useTls())?"S":"N";
 			debugStart(response);
 			debugEnd();
 
@@ -685,7 +618,7 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 			clientsock->flushWriteBuffer(-1,-1);
 
 			// handle TLS request
-			if (usetls) {
+			if (useTls()) {
 				if (!handleTlsRequest()) {
 					return false;
 				}
@@ -694,10 +627,10 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 
 		} else {
 
-			if (usetls && !usingtls) {
+			if (useTls() && !usingtls) {
 				sendErrorResponse(
 					"SSL Error","88P01",
-					(tctx.getValidatePeer())?
+					(getTlsContext()->getValidatePeer())?
 						"TLS mutual auth required":
 						"TLS required");
 				return false;
@@ -769,19 +702,20 @@ bool sqlrprotocol_postgresql::handleTlsRequest() {
 
 	debugStart("tls");
 
-	clientsock->setSecurityContext(&tctx);
-	tctx.setFileDescriptor(clientsock);
+	clientsock->setSecurityContext(getTlsContext());
+	getTlsContext()->setFileDescriptor(clientsock);
 
-	if (!tctx.accept()) {
+	if (!getTlsContext()->accept()) {
 
 		if (getDebug()) {
 			stdoutput.printf("	accept failed: %s\n",
-						tctx.getErrorString());
+					getTlsContext()->getErrorString());
 		}
 		debugEnd();
 
 		// FIXME: the client doesn't appear to receive this...
-		sendErrorResponse("SSL Error","88P01",tctx.getErrorString());
+		sendErrorResponse("SSL Error","88P01",
+					getTlsContext()->getErrorString());
 		return false;
 	}
 
