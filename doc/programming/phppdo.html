@@ -53,9 +53,9 @@ of the file may vary though.  Here are some common locations, by platform.</p>
 <ul>
   <li><b>Linux</b> - /etc/php.ini</li>
   <li><b>Solaris</b> - /etc/php/&lt;php version&gt;/php.ini</li>
-  <li><b><a href="FreeBSD">FreeBSD</a></b> - /usr/local/etc/php.ini</li>
-  <li><b><a href="NetBSD">NetBSD</a></b> - /usr/pkg/etc/php.ini</li>
-  <li><b><a href="OpenBSD">OpenBSD</a></b> - /etc/php-&lt;php version&gt;.ini</li>
+  <li><b>FreeBSD</b> - /usr/local/etc/php.ini</li>
+  <li><b>NetBSD</b> - /usr/pkg/etc/php.ini</li>
+  <li><b>OpenBSD</b> - /etc/php-&lt;php version&gt;.ini</li>
   <li><b>Windows</b> - C:\Windows\php.ini</li>
 </ul>
 
@@ -63,7 +63,7 @@ of the file may vary though.  Here are some common locations, by platform.</p>
 to the configuration file like:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -74,7 +74,7 @@ extension<font color="#990000">=</font>pdo_sqlrelay<font color="#990000">.</font
 <p>To load the php module on Windows, you usually need to add lines like:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -90,7 +90,7 @@ extension<font color="#990000">=</font>php_pdo_sqlrelay<font color="#990000">.</
 <p>Also, some Linux and Unix distributions have PDO compiled directly into the PHP module or binary and don't require pdo.so module to be loaded at all.  If you built PHP from source with the default options then this is likely.  You can verify this by running:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -120,7 +120,7 @@ pdo_sqlrelay.so or php_pdo_sqlrelay.dll</p>
 use.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -178,6 +178,7 @@ http://www.gnu.org/software/src-highlite -->
   <li><b>columnnamecase</b> - Indicates the case to convert column names to.  May be set to "mixed", "upper", or "lower".  Defaults to "mixed".</li>
   <li><b>dontgetcolumninfo</b> - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.</li>
   <li><b>nullsasnulls</b> - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings.  Defaults to 0.</li>
+  <li><b>fetchlobsasstrings</b> - If set to 0 then lob columns are returned as lobs.  If set to 1 then lob columns are returned as strings.  Useful if your application expects expects to deal with all results as strings.  Defaults to 0.</li>
 </ul>
 
 <p>Setting one of the statement attribute connect string variables has the same effect as if the corresponding statement handle attribute were set immediately after creating each statement.  See <a href="#driverspecific">Driver-Specific Attributes</a> below.</p>
@@ -203,7 +204,7 @@ session.</p>
 best used with DML or DDL queries.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -223,7 +224,7 @@ to fetch the result set.  This is best used with selects or other queries that
 return result sets.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -251,7 +252,7 @@ have no commit or rollback functions, the calls do nothing and the database
 throws no error.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -279,7 +280,7 @@ $dbh<font color="#990000">-&gt;</font><b><font color="#000000">beginTransaction<
 <p>The following command turns Autocommit on.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -290,7 +291,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following command turns Autocommit off.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -343,7 +344,7 @@ calling errorCode() or errorInfo() on the database handle or statement
 objects.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -377,7 +378,7 @@ must bind variable/value pairs to the statement.  Here is an example of using
 the bindValue() method.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -412,7 +413,7 @@ flag with the variable type.</dd>
 </dl>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -435,7 +436,7 @@ $stmt<font color="#990000">-&gt;</font><b><font color="#000000">execute</font></
 streams, so you have to use stream functions to access them.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -467,7 +468,7 @@ binding by position, the first bind parameter is number 1, not 0.</p>
 <p>With Oracle:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -477,7 +478,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>or</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -487,7 +488,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>With Sybase and MS SQL Server:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -497,7 +498,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>With DB2, <a href="MySQL">MySQL</a>/MariaDB and Firebird:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -507,7 +508,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>With <a href="PostgreSQL">PostgreSQL</a>:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -517,7 +518,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>With SQLite:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -527,7 +528,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>or</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -551,7 +552,7 @@ over and over without re-preparing it.  If your backend database natively
 supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -592,7 +593,7 @@ PDO::FETCH_ASSOC flag, it returns an array with only associative entries.</dd>
 arrays (the default).</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -615,7 +616,7 @@ values into preallocated variables.</dd>
 </dl>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -649,7 +650,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 an entire result set in one step.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -674,7 +675,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 set too.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -718,7 +719,7 @@ row.</p>
 <p>The following code sets the result set buffer size to 5.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -729,7 +730,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The following code retrieves the result set buffer size.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -747,7 +748,7 @@ iterate through its result set, inserting rows into another table, using only
 <p>For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -779,7 +780,7 @@ columnCount().  An associative array of column data, including column name,
 type, length and various flags are available from getColumnMeta().</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -832,7 +833,7 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -847,7 +848,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -862,7 +863,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -875,7 +876,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -888,7 +889,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -903,7 +904,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -916,7 +917,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -932,7 +933,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -947,7 +948,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -960,7 +961,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -975,7 +976,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -990,7 +991,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1003,7 +1004,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1019,7 +1020,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1034,7 +1035,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1047,7 +1048,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1062,7 +1063,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1079,7 +1080,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1104,7 +1105,7 @@ Oracle calls these functions.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1119,7 +1120,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1134,7 +1135,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1148,7 +1149,7 @@ parameter.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1163,7 +1164,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1180,7 +1181,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1197,7 +1198,7 @@ itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1210,7 +1211,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1227,7 +1228,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1240,7 +1241,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1256,7 +1257,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1275,7 +1276,7 @@ output bind variable is 1 rather than 4, even though there were 3 input bind
 variables.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1292,7 +1293,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1308,7 +1309,7 @@ than as return values of the procedure itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1323,7 +1324,7 @@ end
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1340,7 +1341,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1353,7 +1354,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1374,7 +1375,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1389,7 +1390,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1404,7 +1405,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the function, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1416,7 +1417,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1433,7 +1434,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the function, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1446,7 +1447,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1458,7 +1459,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1470,7 +1471,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1484,7 +1485,7 @@ procedure.</p>
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1496,7 +1497,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1512,7 +1513,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1536,7 +1537,7 @@ itself, but the rest must be returned through output parameters.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1553,7 +1554,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1574,7 +1575,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1587,7 +1588,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1602,7 +1603,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1623,7 +1624,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1636,7 +1637,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1654,7 +1655,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1669,7 +1670,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1682,7 +1683,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1699,7 +1700,7 @@ end
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1720,7 +1721,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1733,7 +1734,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1752,7 +1753,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1767,7 +1768,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1783,7 +1784,7 @@ set of a MySQL/MariaDB procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1795,7 +1796,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1812,7 +1813,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1826,7 +1827,7 @@ of a MySQL/MariaDB procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1838,7 +1839,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1854,7 +1855,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1880,7 +1881,7 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1892,7 +1893,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1904,7 +1905,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1930,7 +1931,7 @@ that return result sets.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1950,7 +1951,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1962,7 +1963,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1981,7 +1982,7 @@ currently SQL Relay can only fetch the first result set.</p>
 the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1993,7 +1994,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2005,7 +2006,7 @@ $result<font color="#990000">=</font>$stmt<font color="#990000">-&gt;</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2069,7 +2070,7 @@ invalidating the database handle.  The endSession method makes this
 possible.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2099,7 +2100,7 @@ is possible.</p>
 <p>First page:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2117,7 +2118,7 @@ $port<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><fon
 <p>Second page:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->

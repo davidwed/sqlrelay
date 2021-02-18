@@ -46,9 +46,9 @@ of the file may vary though.  Here are some common locations, by platform.
 
 * '''Linux''' - /etc/php.ini
 * '''Solaris''' - /etc/php/&lt;php version&gt;/php.ini
-* '''FreeBSD''' - /usr/local/etc/php.ini
-* '''NetBSD''' - /usr/pkg/etc/php.ini
-* '''OpenBSD''' - /etc/php-&lt;php version&gt;.ini
+* '''!FreeBSD''' - /usr/local/etc/php.ini
+* '''!NetBSD''' - /usr/pkg/etc/php.ini
+* '''!OpenBSD''' - /etc/php-&lt;php version&gt;.ini
 * '''Windows''' - C:\Windows\php.ini
 
 To load the php module on Linux or Unix, you usually just need to add lines
@@ -153,6 +153,7 @@ These additional connect string variables control the default statement attribut
 * '''columnnamecase''' - Indicates the case to convert column names to.  May be set to "mixed", "upper", or "lower".  Defaults to "mixed".
 * '''dontgetcolumninfo''' - If this is set to 1 then column info is not fetched with the result set.  If set to 0 then column info is fetched.  Defaults to 0.
 * '''nullsasnulls''' - If this is set to 1 then NULL values are returned as nulls.  If set to 0 then NULL values are returned as empty strings.  Defaults to 0.
+* '''fetchlobsasstrings''' - If set to 0 then lob columns are returned as lobs.  If set to 1 then lob columns are returned as strings.  Useful if your application expects expects to deal with all results as strings.  Defaults to 0.
 
 Setting one of the statement attribute connect string variables has the same effect as if the corresponding statement handle attribute were set immediately after creating each statement.  See [#driverspecific Driver-Specific Attributes] below.
 
