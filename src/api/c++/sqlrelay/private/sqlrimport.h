@@ -14,5 +14,5 @@
 		uint8_t		coarseloglevel;
 		uint8_t		fineloglevel;
 		uint32_t	logindent;
-		bool		shutdownflag;
+		bool		*shutdownflag;
 		bool		logerrors;
