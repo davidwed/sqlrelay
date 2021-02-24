@@ -153,6 +153,12 @@ extern "C" {
 	#define HASH_INDEX_FIND(a,b,c) zend_hash_index_find(a,b,(void **)&c)
 #endif
 
+#if PHP_MAJOR_VERSION >= 5
+	#define ARGINFO(a) a
+#else
+	#define ARGINFO(a) NULL
+#endif
+
 // old enough versions of PHP don't support TSRMLS macros
 #ifndef TSRMLS_DC
 	#define TSRMLS_DC
@@ -3910,134 +3916,644 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_clientversion) {
 	RETURN_FALSE;
 }
 
+// FIXME: flesh these out
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_alloc,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_free,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setconnecttimeout,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setauthenticationtimeout,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setresponsetimeout,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setbindvariabledelimiters,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getbindvariabledelimiterquestionmarksupported,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getbindvariabledelimitercolonsupported,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getbindvariabledelimiteratsignsupported,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getbindvariabledelimiterdollarsignsupported,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_enablekerberos,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_enabletls,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_disableencryption,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_endsession,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_suspendsession,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getconnectionport,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getconnectionsocket,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_resumesession,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_errormessage,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_errornumber,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_debugon,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_debugoff,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getdebug,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setdebugfile,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setclientinfo,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getclientinfo,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_alloc,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_free,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_setresultsetbuffersize,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getresultsetbuffersize,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_dontgetcolumninfo,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumninfo,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_mixedcasecolumnnames,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_uppercasecolumnnames,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_lowercasecolumnnames,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_cachetofile,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_setcachettl,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcachefilename,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_cacheoff,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getdatabaselist,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_gettablelist,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnlist,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_sendquery,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_sendquerywithlength,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_sendfilequery,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_preparequery,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_preparequerywithlength,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_preparefilequery,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_substitution,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_clearbinds,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_countbindvariables,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_inputbind,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_inputbindblob,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_inputbindclob,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_defineoutputbindstring,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_defineoutputbindinteger,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_defineoutputbinddouble,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_defineoutputbindblob,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_defineoutputbindclob,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_defineoutputbindcursor,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_substitutions,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_inputbinds,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_validatebinds,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_validbind,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_executequery,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_fetchfrombindcursor,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getoutputbindstring,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getoutputbindblob,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getoutputbindclob,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getoutputbindinteger,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getoutputbinddouble,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getoutputbindlength,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getoutputbindcursor,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_opencachedresultset,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_colcount,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_rowcount,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_totalrows,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_affectedrows,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_firstrowindex,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_endofresultset,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_errormessage,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_errornumber,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getnullsasemptystrings,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getnullsasnulls,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getfield,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getfieldasinteger,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getfieldasdouble,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getfieldlength,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getrow,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getrowassoc,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getrowlengths,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getrowlengthsassoc,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnnames,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnname,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumntype,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnlength,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnprecision,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnscale,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnisnullable,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnisprimarykey,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnisunique,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnispartofkey,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnisunsigned,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumniszerofilled,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnisbinary,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getcolumnisautoincrement,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getlongest,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_getresultsetid,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_suspendresultset,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_resumeresultset,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcur_resumecachedresultset,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_ping,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_identify,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_selectdatabase,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getcurrentdatabase,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_getlastinsertid,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_autocommiton,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_autocommitoff,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_begin,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_commit,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_rollback,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_bindformat,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_dbversion,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_dbhostname,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_dbipaddress,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_serverversion,0,0,0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_clientversion,0,0,0)
+ZEND_END_ARG_INFO()
+
+
 zend_function_entry sql_relay_functions[] = {
-	ZEND_FE(sqlrcon_alloc,NULL)
-	ZEND_FE(sqlrcon_free,NULL)
-	ZEND_FE(sqlrcon_setconnecttimeout,NULL)
-	ZEND_FE(sqlrcon_setauthenticationtimeout,NULL)
-	ZEND_FE(sqlrcon_setresponsetimeout,NULL)
-	ZEND_FE(sqlrcon_setbindvariabledelimiters,NULL)
-	ZEND_FE(sqlrcon_getbindvariabledelimiterquestionmarksupported,NULL)
-	ZEND_FE(sqlrcon_getbindvariabledelimitercolonsupported,NULL)
-	ZEND_FE(sqlrcon_getbindvariabledelimiteratsignsupported,NULL)
-	ZEND_FE(sqlrcon_getbindvariabledelimiterdollarsignsupported,NULL)
-	ZEND_FE(sqlrcon_enablekerberos,NULL)
-	ZEND_FE(sqlrcon_enabletls,NULL)
-	ZEND_FE(sqlrcon_disableencryption,NULL)
-	ZEND_FE(sqlrcon_endsession,NULL)
-	ZEND_FE(sqlrcon_suspendsession,NULL)
-	ZEND_FE(sqlrcon_getconnectionport,NULL)
-	ZEND_FE(sqlrcon_getconnectionsocket,NULL)
-	ZEND_FE(sqlrcon_resumesession,NULL)
-	ZEND_FE(sqlrcon_errormessage,NULL)
-	ZEND_FE(sqlrcon_errornumber,NULL)
-	ZEND_FE(sqlrcon_debugon,NULL)
-	ZEND_FE(sqlrcon_debugoff,NULL)
-	ZEND_FE(sqlrcon_getdebug,NULL)
-	ZEND_FE(sqlrcon_setdebugfile,NULL)
-	ZEND_FE(sqlrcon_setclientinfo,NULL)
-	ZEND_FE(sqlrcon_getclientinfo,NULL)
-	ZEND_FE(sqlrcur_alloc,NULL)
-	ZEND_FE(sqlrcur_free,NULL)
-	ZEND_FE(sqlrcur_setresultsetbuffersize,NULL)
-	ZEND_FE(sqlrcur_getresultsetbuffersize,NULL)
-	ZEND_FE(sqlrcur_dontgetcolumninfo,NULL)
-	ZEND_FE(sqlrcur_getcolumninfo,NULL)
-	ZEND_FE(sqlrcur_mixedcasecolumnnames,NULL)
-	ZEND_FE(sqlrcur_uppercasecolumnnames,NULL)
-	ZEND_FE(sqlrcur_lowercasecolumnnames,NULL)
-	ZEND_FE(sqlrcur_cachetofile,NULL)
-	ZEND_FE(sqlrcur_setcachettl,NULL)
-	ZEND_FE(sqlrcur_getcachefilename,NULL)
-	ZEND_FE(sqlrcur_cacheoff,NULL)
-	ZEND_FE(sqlrcur_getdatabaselist,NULL)
-	ZEND_FE(sqlrcur_gettablelist,NULL)
-	ZEND_FE(sqlrcur_getcolumnlist,NULL)
-	ZEND_FE(sqlrcur_sendquery,NULL)
-	ZEND_FE(sqlrcur_sendquerywithlength,NULL)
-	ZEND_FE(sqlrcur_sendfilequery,NULL)
-	ZEND_FE(sqlrcur_preparequery,NULL)
-	ZEND_FE(sqlrcur_preparequerywithlength,NULL)
-	ZEND_FE(sqlrcur_preparefilequery,NULL)
-	ZEND_FE(sqlrcur_substitution,NULL)
-	ZEND_FE(sqlrcur_clearbinds,NULL)
-	ZEND_FE(sqlrcur_countbindvariables,NULL)
-	ZEND_FE(sqlrcur_inputbind,NULL)
-	ZEND_FE(sqlrcur_inputbindblob,NULL)
-	ZEND_FE(sqlrcur_inputbindclob,NULL)
-	ZEND_FE(sqlrcur_defineoutputbindstring,NULL)
-	ZEND_FE(sqlrcur_defineoutputbindinteger,NULL)
-	ZEND_FE(sqlrcur_defineoutputbinddouble,NULL)
-	ZEND_FE(sqlrcur_defineoutputbindblob,NULL)
-	ZEND_FE(sqlrcur_defineoutputbindclob,NULL)
-	ZEND_FE(sqlrcur_defineoutputbindcursor,NULL)
-	ZEND_FE(sqlrcur_substitutions,NULL)
-	ZEND_FE(sqlrcur_inputbinds,NULL)
-	ZEND_FE(sqlrcur_validatebinds,NULL)
-	ZEND_FE(sqlrcur_validbind,NULL)
-	ZEND_FE(sqlrcur_executequery,NULL)
-	ZEND_FE(sqlrcur_fetchfrombindcursor,NULL)
-	ZEND_FE(sqlrcur_getoutputbindstring,NULL)
-	ZEND_FE(sqlrcur_getoutputbindblob,NULL)
-	ZEND_FE(sqlrcur_getoutputbindclob,NULL)
-	ZEND_FE(sqlrcur_getoutputbindinteger,NULL)
-	ZEND_FE(sqlrcur_getoutputbinddouble,NULL)
-	ZEND_FE(sqlrcur_getoutputbindlength,NULL)
-	ZEND_FE(sqlrcur_getoutputbindcursor,NULL)
-	ZEND_FE(sqlrcur_opencachedresultset,NULL)
-	ZEND_FE(sqlrcur_colcount,NULL)
-	ZEND_FE(sqlrcur_rowcount,NULL)
-	ZEND_FE(sqlrcur_totalrows,NULL)
-	ZEND_FE(sqlrcur_affectedrows,NULL)
-	ZEND_FE(sqlrcur_firstrowindex,NULL)
-	ZEND_FE(sqlrcur_endofresultset,NULL)
-	ZEND_FE(sqlrcur_errormessage,NULL)
-	ZEND_FE(sqlrcur_errornumber,NULL)
-	ZEND_FE(sqlrcur_getnullsasemptystrings,NULL)
-	ZEND_FE(sqlrcur_getnullsasnulls,NULL)
-	ZEND_FE(sqlrcur_getfield,NULL)
-	ZEND_FE(sqlrcur_getfieldasinteger,NULL)
-	ZEND_FE(sqlrcur_getfieldasdouble,NULL)
-	ZEND_FE(sqlrcur_getfieldlength,NULL)
-	ZEND_FE(sqlrcur_getrow,NULL)
-	ZEND_FE(sqlrcur_getrowassoc,NULL)
-	ZEND_FE(sqlrcur_getrowlengths,NULL)
-	ZEND_FE(sqlrcur_getrowlengthsassoc,NULL)
-	ZEND_FE(sqlrcur_getcolumnnames,NULL)
-	ZEND_FE(sqlrcur_getcolumnname,NULL)
-	ZEND_FE(sqlrcur_getcolumntype,NULL)
-	ZEND_FE(sqlrcur_getcolumnlength,NULL)
-	ZEND_FE(sqlrcur_getcolumnprecision,NULL)
-	ZEND_FE(sqlrcur_getcolumnscale,NULL)
-	ZEND_FE(sqlrcur_getcolumnisnullable,NULL)
-	ZEND_FE(sqlrcur_getcolumnisprimarykey,NULL)
-	ZEND_FE(sqlrcur_getcolumnisunique,NULL)
-	ZEND_FE(sqlrcur_getcolumnispartofkey,NULL)
-	ZEND_FE(sqlrcur_getcolumnisunsigned,NULL)
-	ZEND_FE(sqlrcur_getcolumniszerofilled,NULL)
-	ZEND_FE(sqlrcur_getcolumnisbinary,NULL)
-	ZEND_FE(sqlrcur_getcolumnisautoincrement,NULL)
-	ZEND_FE(sqlrcur_getlongest,NULL)
-	ZEND_FE(sqlrcur_getresultsetid,NULL)
-	ZEND_FE(sqlrcur_suspendresultset,NULL)
-	ZEND_FE(sqlrcur_resumeresultset,NULL)
-	ZEND_FE(sqlrcur_resumecachedresultset,NULL)
-	ZEND_FE(sqlrcon_ping,NULL)
-	ZEND_FE(sqlrcon_identify,NULL)
-	ZEND_FE(sqlrcon_selectdatabase,NULL)
-	ZEND_FE(sqlrcon_getcurrentdatabase,NULL)
-	ZEND_FE(sqlrcon_getlastinsertid,NULL)
-	ZEND_FE(sqlrcon_autocommiton,NULL)
-	ZEND_FE(sqlrcon_autocommitoff,NULL)
-	ZEND_FE(sqlrcon_begin,NULL)
-	ZEND_FE(sqlrcon_commit,NULL)
-	ZEND_FE(sqlrcon_rollback,NULL)
-	ZEND_FE(sqlrcon_bindformat,NULL)
-	ZEND_FE(sqlrcon_dbversion,NULL)
-	ZEND_FE(sqlrcon_dbhostname,NULL)
-	ZEND_FE(sqlrcon_dbipaddress,NULL)
-	ZEND_FE(sqlrcon_serverversion,NULL)
-	ZEND_FE(sqlrcon_clientversion,NULL)
+	ZEND_FE(sqlrcon_alloc,
+		ARGINFO(arginfo_sqlrcon_alloc))
+	ZEND_FE(sqlrcon_free,
+		ARGINFO(arginfo_sqlrcon_free))
+	ZEND_FE(sqlrcon_setconnecttimeout,
+		ARGINFO(arginfo_sqlrcon_setconnecttimeout))
+	ZEND_FE(sqlrcon_setauthenticationtimeout,
+		ARGINFO(arginfo_sqlrcon_setauthenticationtimeout))
+	ZEND_FE(sqlrcon_setresponsetimeout,
+		ARGINFO(arginfo_sqlrcon_setresponsetimeout))
+	ZEND_FE(sqlrcon_setbindvariabledelimiters,
+		ARGINFO(arginfo_sqlrcon_setbindvariabledelimiters))
+	ZEND_FE(sqlrcon_getbindvariabledelimiterquestionmarksupported,
+	ARGINFO(arginfo_sqlrcon_getbindvariabledelimiterquestionmarksupported))
+	ZEND_FE(sqlrcon_getbindvariabledelimitercolonsupported,
+	ARGINFO(arginfo_sqlrcon_getbindvariabledelimitercolonsupported))
+	ZEND_FE(sqlrcon_getbindvariabledelimiteratsignsupported,
+	ARGINFO(arginfo_sqlrcon_getbindvariabledelimiteratsignsupported))
+	ZEND_FE(sqlrcon_getbindvariabledelimiterdollarsignsupported,
+	ARGINFO(arginfo_sqlrcon_getbindvariabledelimiterdollarsignsupported))
+	ZEND_FE(sqlrcon_enablekerberos,
+		ARGINFO(arginfo_sqlrcon_enablekerberos))
+	ZEND_FE(sqlrcon_enabletls,
+		ARGINFO(arginfo_sqlrcon_enabletls))
+	ZEND_FE(sqlrcon_disableencryption,
+		ARGINFO(arginfo_sqlrcon_disableencryption))
+	ZEND_FE(sqlrcon_endsession,
+		ARGINFO(arginfo_sqlrcon_endsession))
+	ZEND_FE(sqlrcon_suspendsession,
+		ARGINFO(arginfo_sqlrcon_suspendsession))
+	ZEND_FE(sqlrcon_getconnectionport,
+		ARGINFO(arginfo_sqlrcon_getconnectionport))
+	ZEND_FE(sqlrcon_getconnectionsocket,
+		ARGINFO(arginfo_sqlrcon_getconnectionsocket))
+	ZEND_FE(sqlrcon_resumesession,
+		ARGINFO(arginfo_sqlrcon_resumesession))
+	ZEND_FE(sqlrcon_errormessage,
+		ARGINFO(arginfo_sqlrcon_errormessage))
+	ZEND_FE(sqlrcon_errornumber,
+		ARGINFO(arginfo_sqlrcon_errornumber))
+	ZEND_FE(sqlrcon_debugon,
+		ARGINFO(arginfo_sqlrcon_debugon))
+	ZEND_FE(sqlrcon_debugoff,
+		ARGINFO(arginfo_sqlrcon_debugoff))
+	ZEND_FE(sqlrcon_getdebug,
+		ARGINFO(arginfo_sqlrcon_getdebug))
+	ZEND_FE(sqlrcon_setdebugfile,
+		ARGINFO(arginfo_sqlrcon_setdebugfile))
+	ZEND_FE(sqlrcon_setclientinfo,
+		ARGINFO(arginfo_sqlrcon_setclientinfo))
+	ZEND_FE(sqlrcon_getclientinfo,
+		ARGINFO(arginfo_sqlrcon_getclientinfo))
+	ZEND_FE(sqlrcur_alloc,
+		ARGINFO(arginfo_sqlrcur_alloc))
+	ZEND_FE(sqlrcur_free,
+		ARGINFO(arginfo_sqlrcur_free))
+	ZEND_FE(sqlrcur_setresultsetbuffersize,
+		ARGINFO(arginfo_sqlrcur_setresultsetbuffersize))
+	ZEND_FE(sqlrcur_getresultsetbuffersize,
+		ARGINFO(arginfo_sqlrcur_getresultsetbuffersize))
+	ZEND_FE(sqlrcur_dontgetcolumninfo,
+		ARGINFO(arginfo_sqlrcur_dontgetcolumninfo))
+	ZEND_FE(sqlrcur_getcolumninfo,
+		ARGINFO(arginfo_sqlrcur_getcolumninfo))
+	ZEND_FE(sqlrcur_mixedcasecolumnnames,
+		ARGINFO(arginfo_sqlrcur_mixedcasecolumnnames))
+	ZEND_FE(sqlrcur_uppercasecolumnnames,
+		ARGINFO(arginfo_sqlrcur_uppercasecolumnnames))
+	ZEND_FE(sqlrcur_lowercasecolumnnames,
+		ARGINFO(arginfo_sqlrcur_lowercasecolumnnames))
+	ZEND_FE(sqlrcur_cachetofile,
+		ARGINFO(arginfo_sqlrcur_cachetofile))
+	ZEND_FE(sqlrcur_setcachettl,
+		ARGINFO(arginfo_sqlrcur_setcachettl))
+	ZEND_FE(sqlrcur_getcachefilename,
+		ARGINFO(arginfo_sqlrcur_getcachefilename))
+	ZEND_FE(sqlrcur_cacheoff,
+		ARGINFO(arginfo_sqlrcur_cacheoff))
+	ZEND_FE(sqlrcur_getdatabaselist,
+		ARGINFO(arginfo_sqlrcur_getdatabaselist))
+	ZEND_FE(sqlrcur_gettablelist,
+		ARGINFO(arginfo_sqlrcur_gettablelist))
+	ZEND_FE(sqlrcur_getcolumnlist,
+		ARGINFO(arginfo_sqlrcur_getcolumnlist))
+	ZEND_FE(sqlrcur_sendquery,
+		ARGINFO(arginfo_sqlrcur_sendquery))
+	ZEND_FE(sqlrcur_sendquerywithlength,
+		ARGINFO(arginfo_sqlrcur_sendquerywithlength))
+	ZEND_FE(sqlrcur_sendfilequery,
+		ARGINFO(arginfo_sqlrcur_sendfilequery))
+	ZEND_FE(sqlrcur_preparequery,
+		ARGINFO(arginfo_sqlrcur_preparequery))
+	ZEND_FE(sqlrcur_preparequerywithlength,
+		ARGINFO(arginfo_sqlrcur_preparequerywithlength))
+	ZEND_FE(sqlrcur_preparefilequery,
+		ARGINFO(arginfo_sqlrcur_preparefilequery))
+	ZEND_FE(sqlrcur_substitution,
+		ARGINFO(arginfo_sqlrcur_substitution))
+	ZEND_FE(sqlrcur_clearbinds,
+		ARGINFO(arginfo_sqlrcur_clearbinds))
+	ZEND_FE(sqlrcur_countbindvariables,
+		ARGINFO(arginfo_sqlrcur_countbindvariables))
+	ZEND_FE(sqlrcur_inputbind,
+		ARGINFO(arginfo_sqlrcur_inputbind))
+	ZEND_FE(sqlrcur_inputbindblob,
+		ARGINFO(arginfo_sqlrcur_inputbindblob))
+	ZEND_FE(sqlrcur_inputbindclob,
+		ARGINFO(arginfo_sqlrcur_inputbindclob))
+	ZEND_FE(sqlrcur_defineoutputbindstring,
+		ARGINFO(arginfo_sqlrcur_defineoutputbindstring))
+	ZEND_FE(sqlrcur_defineoutputbindinteger,
+		ARGINFO(arginfo_sqlrcur_defineoutputbindinteger))
+	ZEND_FE(sqlrcur_defineoutputbinddouble,
+		ARGINFO(arginfo_sqlrcur_defineoutputbinddouble))
+	ZEND_FE(sqlrcur_defineoutputbindblob,
+		ARGINFO(arginfo_sqlrcur_defineoutputbindblob))
+	ZEND_FE(sqlrcur_defineoutputbindclob,
+		ARGINFO(arginfo_sqlrcur_defineoutputbindclob))
+	ZEND_FE(sqlrcur_defineoutputbindcursor,
+		ARGINFO(arginfo_sqlrcur_defineoutputbindcursor))
+	ZEND_FE(sqlrcur_substitutions,
+		ARGINFO(arginfo_sqlrcur_substitutions))
+	ZEND_FE(sqlrcur_inputbinds,
+		ARGINFO(arginfo_sqlrcur_inputbinds))
+	ZEND_FE(sqlrcur_validatebinds,
+		ARGINFO(arginfo_sqlrcur_validatebinds))
+	ZEND_FE(sqlrcur_validbind,
+		ARGINFO(arginfo_sqlrcur_validbind))
+	ZEND_FE(sqlrcur_executequery,
+		ARGINFO(arginfo_sqlrcur_executequery))
+	ZEND_FE(sqlrcur_fetchfrombindcursor,
+		ARGINFO(arginfo_sqlrcur_fetchfrombindcursor))
+	ZEND_FE(sqlrcur_getoutputbindstring,
+		ARGINFO(arginfo_sqlrcur_getoutputbindstring))
+	ZEND_FE(sqlrcur_getoutputbindblob,
+		ARGINFO(arginfo_sqlrcur_getoutputbindblob))
+	ZEND_FE(sqlrcur_getoutputbindclob,
+		ARGINFO(arginfo_sqlrcur_getoutputbindclob))
+	ZEND_FE(sqlrcur_getoutputbindinteger,
+		ARGINFO(arginfo_sqlrcur_getoutputbindinteger))
+	ZEND_FE(sqlrcur_getoutputbinddouble,
+		ARGINFO(arginfo_sqlrcur_getoutputbinddouble))
+	ZEND_FE(sqlrcur_getoutputbindlength,
+		ARGINFO(arginfo_sqlrcur_getoutputbindlength))
+	ZEND_FE(sqlrcur_getoutputbindcursor,
+		ARGINFO(arginfo_sqlrcur_getoutputbindcursor))
+	ZEND_FE(sqlrcur_opencachedresultset,
+		ARGINFO(arginfo_sqlrcur_opencachedresultset))
+	ZEND_FE(sqlrcur_colcount,
+		ARGINFO(arginfo_sqlrcur_colcount))
+	ZEND_FE(sqlrcur_rowcount,
+		ARGINFO(arginfo_sqlrcur_rowcount))
+	ZEND_FE(sqlrcur_totalrows,
+		ARGINFO(arginfo_sqlrcur_totalrows))
+	ZEND_FE(sqlrcur_affectedrows,
+		ARGINFO(arginfo_sqlrcur_affectedrows))
+	ZEND_FE(sqlrcur_firstrowindex,
+		ARGINFO(arginfo_sqlrcur_firstrowindex))
+	ZEND_FE(sqlrcur_endofresultset,
+		ARGINFO(arginfo_sqlrcur_endofresultset))
+	ZEND_FE(sqlrcur_errormessage,
+		ARGINFO(arginfo_sqlrcur_errormessage))
+	ZEND_FE(sqlrcur_errornumber,
+		ARGINFO(arginfo_sqlrcur_errornumber))
+	ZEND_FE(sqlrcur_getnullsasemptystrings,
+		ARGINFO(arginfo_sqlrcur_getnullsasemptystrings))
+	ZEND_FE(sqlrcur_getnullsasnulls,
+		ARGINFO(arginfo_sqlrcur_getnullsasnulls))
+	ZEND_FE(sqlrcur_getfield,
+		ARGINFO(arginfo_sqlrcur_getfield))
+	ZEND_FE(sqlrcur_getfieldasinteger,
+		ARGINFO(arginfo_sqlrcur_getfieldasinteger))
+	ZEND_FE(sqlrcur_getfieldasdouble,
+		ARGINFO(arginfo_sqlrcur_getfieldasdouble))
+	ZEND_FE(sqlrcur_getfieldlength,
+		ARGINFO(arginfo_sqlrcur_getfieldlength))
+	ZEND_FE(sqlrcur_getrow,
+		ARGINFO(arginfo_sqlrcur_getrow))
+	ZEND_FE(sqlrcur_getrowassoc,
+		ARGINFO(arginfo_sqlrcur_getrowassoc))
+	ZEND_FE(sqlrcur_getrowlengths,
+		ARGINFO(arginfo_sqlrcur_getrowlengths))
+	ZEND_FE(sqlrcur_getrowlengthsassoc,
+		ARGINFO(arginfo_sqlrcur_getrowlengthsassoc))
+	ZEND_FE(sqlrcur_getcolumnnames,
+		ARGINFO(arginfo_sqlrcur_getcolumnnames))
+	ZEND_FE(sqlrcur_getcolumnname,
+		ARGINFO(arginfo_sqlrcur_getcolumnname))
+	ZEND_FE(sqlrcur_getcolumntype,
+		ARGINFO(arginfo_sqlrcur_getcolumntype))
+	ZEND_FE(sqlrcur_getcolumnlength,
+		ARGINFO(arginfo_sqlrcur_getcolumnlength))
+	ZEND_FE(sqlrcur_getcolumnprecision,
+		ARGINFO(arginfo_sqlrcur_getcolumnprecision))
+	ZEND_FE(sqlrcur_getcolumnscale,
+		ARGINFO(arginfo_sqlrcur_getcolumnscale))
+	ZEND_FE(sqlrcur_getcolumnisnullable,
+		ARGINFO(arginfo_sqlrcur_getcolumnisnullable))
+	ZEND_FE(sqlrcur_getcolumnisprimarykey,
+		ARGINFO(arginfo_sqlrcur_getcolumnisprimarykey))
+	ZEND_FE(sqlrcur_getcolumnisunique,
+		ARGINFO(arginfo_sqlrcur_getcolumnisunique))
+	ZEND_FE(sqlrcur_getcolumnispartofkey,
+		ARGINFO(arginfo_sqlrcur_getcolumnispartofkey))
+	ZEND_FE(sqlrcur_getcolumnisunsigned,
+		ARGINFO(arginfo_sqlrcur_getcolumnisunsigned))
+	ZEND_FE(sqlrcur_getcolumniszerofilled,
+		ARGINFO(arginfo_sqlrcur_getcolumniszerofilled))
+	ZEND_FE(sqlrcur_getcolumnisbinary,
+		ARGINFO(arginfo_sqlrcur_getcolumnisbinary))
+	ZEND_FE(sqlrcur_getcolumnisautoincrement,
+		ARGINFO(arginfo_sqlrcur_getcolumnisautoincrement))
+	ZEND_FE(sqlrcur_getlongest,
+		ARGINFO(arginfo_sqlrcur_getlongest))
+	ZEND_FE(sqlrcur_getresultsetid,
+		ARGINFO(arginfo_sqlrcur_getresultsetid))
+	ZEND_FE(sqlrcur_suspendresultset,
+		ARGINFO(arginfo_sqlrcur_suspendresultset))
+	ZEND_FE(sqlrcur_resumeresultset,
+		ARGINFO(arginfo_sqlrcur_resumeresultset))
+	ZEND_FE(sqlrcur_resumecachedresultset,
+		ARGINFO(arginfo_sqlrcur_resumecachedresultset))
+	ZEND_FE(sqlrcon_ping,
+		ARGINFO(arginfo_sqlrcon_ping))
+	ZEND_FE(sqlrcon_identify,
+		ARGINFO(arginfo_sqlrcon_identify))
+	ZEND_FE(sqlrcon_selectdatabase,
+		ARGINFO(arginfo_sqlrcon_selectdatabase))
+	ZEND_FE(sqlrcon_getcurrentdatabase,
+		ARGINFO(arginfo_sqlrcon_getcurrentdatabase))
+	ZEND_FE(sqlrcon_getlastinsertid,
+		ARGINFO(arginfo_sqlrcon_getlastinsertid))
+	ZEND_FE(sqlrcon_autocommiton,
+		ARGINFO(arginfo_sqlrcon_autocommiton))
+	ZEND_FE(sqlrcon_autocommitoff,
+		ARGINFO(arginfo_sqlrcon_autocommitoff))
+	ZEND_FE(sqlrcon_begin,
+		ARGINFO(arginfo_sqlrcon_begin))
+	ZEND_FE(sqlrcon_commit,
+		ARGINFO(arginfo_sqlrcon_commit))
+	ZEND_FE(sqlrcon_rollback,
+		ARGINFO(arginfo_sqlrcon_rollback))
+	ZEND_FE(sqlrcon_bindformat,
+		ARGINFO(arginfo_sqlrcon_bindformat))
+	ZEND_FE(sqlrcon_dbversion,
+		ARGINFO(arginfo_sqlrcon_dbversion))
+	ZEND_FE(sqlrcon_dbhostname,
+		ARGINFO(arginfo_sqlrcon_dbhostname))
+	ZEND_FE(sqlrcon_dbipaddress,
+		ARGINFO(arginfo_sqlrcon_dbipaddress))
+	ZEND_FE(sqlrcon_serverversion,
+		ARGINFO(arginfo_sqlrcon_serverversion))
+	ZEND_FE(sqlrcon_clientversion,
+		ARGINFO(arginfo_sqlrcon_clientversion))
 	{NULL,NULL,NULL}
 };
 
