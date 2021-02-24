@@ -1415,8 +1415,8 @@ Second page:
 }}}
 }}}
 
-Note the strange call of $stmt->prepare(null) above.  Resuming a result set
-requires an active statment to resume the result set into.  Ideally
+Note the strange call of $stmt->prepare("placeholder") above.  Resuming a
+result set requires an active statment to resume the result set into.  Ideally
 resumeResultSet() would be a method of the database handle and return a
 statement, but the PDO developer API doesn't currently provide a method for
 creating a statement programatically.  Until it does, this strangeness will be

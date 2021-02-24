@@ -2125,7 +2125,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><font color="#990000">...</font> get <font color="#008080">the</font> rs<font color="#990000">,</font> port and socket from <font color="#008080">previous</font> page <font color="#990000">...</font>
 
 $dbh<font color="#990000">=</font><b><font color="#0000FF">new</font></b> <b><font color="#000000">PDO</font></b><font color="#990000">(</font><font color="#FF0000">"sqlrelay:host=sqlrserver;port=9000;socket=/tmp/example.socket;tries=0;retrytime=1;debug=0"</font><font color="#990000">,</font><font color="#FF0000">"exampleuser"</font><font color="#990000">,</font><font color="#FF0000">"examplepassword"</font><font color="#990000">);</font>
-$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font>null<font color="#990000">);</font>
+$stmt<font color="#990000">=</font>$dbh<font color="#990000">-&gt;</font><b><font color="#000000">prepare</font></b><font color="#990000">(</font><font color="#FF0000">"placeholder"</font><font color="#990000">);</font>
 $dbh<font color="#990000">-&gt;</font><b><font color="#000000">resumeSession</font></b><font color="#990000">(</font>$port<font color="#990000">,</font>$socket<font color="#990000">);</font>
 $stmt<font color="#990000">-&gt;</font><b><font color="#000000">resumeResultSet</font></b><font color="#990000">(</font>$rs<font color="#990000">);</font>
 
@@ -2133,8 +2133,8 @@ $stmt<font color="#990000">-&gt;</font><b><font color="#000000">resumeResultSet<
 </tt></pre>
 
 </blockquote>
-<p>Note the strange call of $stmt->prepare(null) above.  Resuming a result set
-requires an active statment to resume the result set into.  Ideally
+<p>Note the strange call of $stmt->prepare("placeholder") above.  Resuming a
+result set requires an active statment to resume the result set into.  Ideally
 resumeResultSet() would be a method of the database handle and return a
 statement, but the PDO developer API doesn't currently provide a method for
 creating a statement programatically.  Until it does, this strangeness will be
