@@ -756,8 +756,12 @@ print("\n");
 
 # get info
 print("GET INFO: \n");
-my $shorthostname=uc(split(/\./,hostname()));
-checkSuccessString($dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}),$shorthostname);
+my $hostname=hostname();
+if (index($hostname,".")!=-1) {
+	($hostname)=split(/\./,$hostname);
+}
+$hostname=uc($hostname);
+checkSuccessString($dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}),$hostname);
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_NAME}),"oracle");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_VER}),"Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_USER_NAME}),"");
