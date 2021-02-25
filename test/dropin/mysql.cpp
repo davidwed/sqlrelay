@@ -1437,6 +1437,12 @@ int	main(int argc, char **argv) {
 					value,sizeof(value)),0);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("mysql_stmt_prepare/execute: drop\n");
+	query="drop table testtable";
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_execute(stmt),0);
+	stdoutput.printf("\n");
+
 	stdoutput.printf("mysql_stmt_close:\n");
 	checkSuccess(mysql_stmt_close(stmt),0);
 	stdoutput.printf("\n");

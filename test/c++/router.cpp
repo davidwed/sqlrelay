@@ -466,10 +466,9 @@ int	main(int argc, char **argv) {
 	checkSuccess(fieldlens[7],8);
 	stdoutput.printf("\n");
 
+	stdoutput.printf("SELECT: \n");
 	checkSuccess(con->commit(),1);
 	snooze::macrosnooze(2,0);
-
-	stdoutput.printf("SELECT: \n");
 	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
 	stdoutput.printf("\n");
 
