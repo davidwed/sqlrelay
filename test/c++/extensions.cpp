@@ -315,13 +315,23 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnIsNullable(8),1);
 	printf("\n");
 
-	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	checkSuccess(cur->getField(0,(uint32_t)1),"*");
-	checkSuccess(cur->getField(0,(uint32_t)4),"RETURN_RESULT_SET");
+	uint64_t	row=0;
+	bool		found=false;
+	for (uint64_t i=0; i<cur->rowCount(); i++) {
+		if (!charstring::compare(cur->getField(i,(uint32_t)8),
+							"sqlrcmd cstat")) {
+			found=true;
+			row=i;
+			break;
+		}
+	}
+	checkSuccess(found,true);
+	checkSuccess(cur->getField(row,(uint32_t)1),"*");
+	checkSuccess(cur->getField(row,(uint32_t)4),"RETURN_RESULT_SET");
 	// 127.0.0.1 on Windows
-	//checkSuccess(cur->getField(0,(uint32_t)6),"UNIX");
-	checkSuccess(cur->getField(0,(uint32_t)7),"extensionstest");
-	checkSuccess(cur->getField(0,(uint32_t)8),"sqlrcmd cstat");
+	//checkSuccess(cur->getField(row,(uint32_t)6),"UNIX");
+	checkSuccess(cur->getField(row,(uint32_t)7),"extensionstest");
+	checkSuccess(cur->getField(row,(uint32_t)8),"sqlrcmd cstat");
 	printf("\n\n");
 
 
