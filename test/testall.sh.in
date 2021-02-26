@@ -6,7 +6,7 @@ if ( test "$CHILD" != "1" )
 then
 	FIFO=testall.fifo
 	mkfifo $FIFO
-	CHILD=1 $0 $* > $FIFO &
+	CHILD=1 $0 $* > $FIFO 2>&1 &
 	PID=$!
 	tee testdetails.log <$FIFO &
 	wait $PID
