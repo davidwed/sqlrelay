@@ -108,6 +108,7 @@ distclean: clean
 		doc/admin/installingpkg.wt \
 		configure.lineno \
 		test/testresults.log
+		test/testdetails.log
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
 		src/api/cs/SQLRClient/bin \

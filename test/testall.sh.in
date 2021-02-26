@@ -1,5 +1,7 @@
 #!/bin/sh
 
+> testdetails.log
+
 echo "SQL Relay test results:" > testresults.log
 echo >> testresults.log
 
@@ -168,7 +170,7 @@ do
 					printf "    % 8s: failed\n" "dropin" >> testresults.log
 				fi
 			else
-				./test.sh $DB
+				./test.sh $DB | tee -a testdetails.log
 			fi
 		else
 			echo
