@@ -1015,7 +1015,12 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	checkSuccess(cur->sendQuery("truncate table temptablepreserve\n"),1);
-	checkSuccess(cur->sendQuery("drop table temptablepreserve\n"),1);
+	//checkSuccess(cur->sendQuery("drop table temptablepreserve\n"),1);
+bool	success=cur->sendQuery("drop table temptablepreserve\n");
+if (!success) {
+	stdoutput.printf("%s\n",cur->errorMessage());
+}
+	checkSuccess(success,1);
 	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),0);
 	stdoutput.printf("\n");
 
