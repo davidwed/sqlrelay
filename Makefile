@@ -107,8 +107,8 @@ distclean: clean
 		msvc/setupx86/setupx86.vdproj \
 		doc/admin/installingpkg.wt \
 		configure.lineno \
-		test/testresults.log
-		test/testdetails.log
+		test/testresults.log \
+		test/testdetails.log \
 		test/testall.fifo
 	$(RMTREE) autom4te.cache \
 		autom4te-*.cache \
