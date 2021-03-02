@@ -998,37 +998,6 @@ int	main(int argc, char **argv) {
 	cur->sendQuery("drop table testtable");
 
 
-	// temporary tables
-	stdoutput.printf("TEMPORARY TABLES: \n");
-	cur->sendQuery("drop table temptabledelete\n");
-	cur->sendQuery("create global temporary table temptabledelete (col1 number) on commit delete rows");
-	checkSuccess(cur->sendQuery("insert into temptabledelete values (1)"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	checkSuccess(con->commit(),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	cur->sendQuery("drop table temptabledelete\n");
-	stdoutput.printf("\n");
-	cur->sendQuery("truncate table temptablepreserve\n");
-	cur->sendQuery("drop table temptablepreserve\n");
-	cur->sendQuery("create global temporary table temptablepreserve (col1 number) on commit preserve rows");
-	checkSuccess(cur->sendQuery("insert into temptablepreserve values (1)"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	checkSuccess(con->commit(),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	con->endSession();
-	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
-	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	checkSuccess(cur->sendQuery("truncate table temptablepreserve\n"),1);
-	checkSuccess(cur->sendQuery("drop table temptablepreserve\n"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),0);
-	stdoutput.printf("\n");
-
-
 	// stored procedures
 	stdoutput.printf("STORED PROCEDURE: \n");
 	// return no value
