@@ -1048,6 +1048,7 @@ int	main(int argc, char **argv) {
 	cur->prepareQuery("truncate table $(HOSTNAME)_temptablepreserve");
 	cur->substitution("HOSTNAME",hostname);
 	checkSuccess(cur->executeQuery(),1);
+	snooze::macrosnooze(2);
 	cur->prepareQuery("drop table $(HOSTNAME)_temptablepreserve");
 	cur->substitution("HOSTNAME",hostname);
 	checkSuccess(cur->executeQuery(),1);
