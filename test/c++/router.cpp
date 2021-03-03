@@ -245,9 +245,28 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("SELECT: \n");
-	checkSuccess(con->commit(),1);
-	snooze::macrosnooze(3,0);
-	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
+	// It may take some time for the replication to actually occur.
+	// Exactly how long depends on how busy everything is.  So, loop
+	// until we get the value that we're looking for, or fail 10 times.
+	uint64_t	rowcount=0;
+	for (uint16_t i=0; i<10; i++) {
+		checkSuccess(con->commit(),1);
+		stdoutput.printf("loop %d...\n",i);
+		bool	success=cur->sendQuery(
+				"select * from testtable1 order by testint");
+		if (!success) {
+			checkSuccess(success,1);
+		}
+		rowcount=cur->rowCount();
+		if (rowcount==8) {
+			break;
+		}
+		snooze::macrosnooze(1,0);
+	}
+	stdoutput.printf("\n");
+
+	stdoutput.printf("ROW COUNT: \n");
+	checkSuccess(rowcount,8);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("COLUMN COUNT: \n");
@@ -345,10 +364,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest(7),8);
 	checkSuccess(cur->getLongest("testtime"),8);
 	stdoutput.printf("\n");*/
-
-	stdoutput.printf("ROW COUNT: \n");
-	checkSuccess(cur->rowCount(),8);
-	stdoutput.printf("\n");
 
 	stdoutput.printf("TOTAL ROWS: \n");
 	checkSuccess(cur->totalRows(),8);
@@ -467,9 +482,28 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	stdoutput.printf("SELECT: \n");
-	checkSuccess(con->commit(),1);
-	snooze::macrosnooze(3,0);
-	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
+	// It may take some time for the replication to actually occur.
+	// Exactly how long depends on how busy everything is.  So, loop
+	// until we get the value that we're looking for, or fail 10 times.
+	rowcount=0;
+	for (uint16_t i=0; i<10; i++) {
+		checkSuccess(con->commit(),1);
+		stdoutput.printf("loop %d...\n",i);
+		bool	success=cur->sendQuery(
+				"select * from testtable1 order by testint");
+		if (!success) {
+			checkSuccess(success,1);
+		}
+		rowcount=cur->rowCount();
+		if (rowcount==8) {
+			break;
+		}
+		snooze::macrosnooze(1,0);
+	}
+	stdoutput.printf("\n");
+
+	stdoutput.printf("ROW COUNT: \n");
+	checkSuccess(rowcount,8);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("COLUMN COUNT: \n");
@@ -562,10 +596,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getLongest("testdate"),10);
 	checkSuccess(cur->getLongest(7),8);
 	checkSuccess(cur->getLongest("testtime"),8);
-	stdoutput.printf("\n");
-
-	stdoutput.printf("ROW COUNT: \n");
-	checkSuccess(cur->rowCount(),8);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("TOTAL ROWS: \n");
@@ -688,10 +718,40 @@ int	main(int argc, char **argv) {
 	secondcon=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
-	checkSuccess(con->commit(),1);
-	snooze::macrosnooze(3,0);
-	checkSuccess(secondcon->commit(),1);
-	snooze::macrosnooze(3,0);
+	// It may take some time for the replication to actually occur.
+	// Exactly how long depends on how busy everything is.  So, loop
+	// until we get the values that we're looking for, or fail 10 times.
+	const char	*val="";
+	for (uint16_t i=0; i<10; i++) {
+		checkSuccess(con->commit(),1);
+		checkSuccess(secondcon->commit(),1);
+		stdoutput.printf("loop %d...\n",i);
+		bool	success=secondcur->sendQuery(
+					"select count(*) from testtable1");
+		if (!success) {
+			checkSuccess(success,1);
+		}
+		val=secondcur->getField(0,(uint32_t)0);
+		if (!charstring::compare(val,"8")) {
+			break;
+		}
+		snooze::macrosnooze(1,0);
+	}
+	for (uint16_t i=0; i<10; i++) {
+		checkSuccess(con->commit(),1);
+		checkSuccess(secondcon->commit(),1);
+		stdoutput.printf("loop %d...\n",i);
+		bool	success=secondcur->sendQuery(
+					"select count(*) from testtable2");
+		if (!success) {
+			checkSuccess(success,1);
+		}
+		val=secondcur->getField(0,(uint32_t)0);
+		if (!charstring::compare(val,"8")) {
+			break;
+		}
+		snooze::macrosnooze(1,0);
+	}
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable1"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable2"),1);
@@ -700,7 +760,35 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcon->autoCommitOn(),1);
 	checkSuccess(cur->sendQuery("insert into testtable1 values (10,10.1,10.1,10,'testchar10','testvarchar10','2010-01-01','10:00:00',NULL)"),1);
 	checkSuccess(cur->sendQuery("insert into testtable2 values (10,10.1,10.1,10,'testchar10','testvarchar10','2010-01-01','10:00:00',NULL)"),1);
-	snooze::macrosnooze(3,0);
+	// Same routine as above, but we won't commit each time because
+	// autocommit is enabled.
+	val="";
+	for (uint16_t i=0; i<10; i++) {
+		stdoutput.printf("loop %d...\n",i);
+		bool	success=secondcur->sendQuery(
+					"select count(*) from testtable1");
+		if (!success) {
+			checkSuccess(success,1);
+		}
+		val=secondcur->getField(0,(uint32_t)0);
+		if (!charstring::compare(val,"9")) {
+			break;
+		}
+		snooze::macrosnooze(1,0);
+	}
+	for (uint16_t i=0; i<10; i++) {
+		stdoutput.printf("loop %d...\n",i);
+		bool	success=secondcur->sendQuery(
+					"select count(*) from testtable2");
+		if (!success) {
+			checkSuccess(success,1);
+		}
+		val=secondcur->getField(0,(uint32_t)0);
+		if (!charstring::compare(val,"9")) {
+			break;
+		}
+		snooze::macrosnooze(1,0);
+	}
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable1"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable2"),1);
