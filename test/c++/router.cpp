@@ -246,7 +246,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("SELECT: \n");
 	checkSuccess(con->commit(),1);
-	snooze::macrosnooze(2,0);
+	snooze::macrosnooze(3,0);
 	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
 	stdoutput.printf("\n");
 
@@ -468,7 +468,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("SELECT: \n");
 	checkSuccess(con->commit(),1);
-	snooze::macrosnooze(2,0);
+	snooze::macrosnooze(3,0);
 	checkSuccess(cur->sendQuery("select * from testtable1 order by testint"),1);
 	stdoutput.printf("\n");
 
@@ -689,9 +689,9 @@ int	main(int argc, char **argv) {
 							"test","test",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(con->commit(),1);
-	snooze::macrosnooze(2,0);
+	snooze::macrosnooze(3,0);
 	checkSuccess(secondcon->commit(),1);
-	snooze::macrosnooze(2,0);
+	snooze::macrosnooze(3,0);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable1"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"8");
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable2"),1);
@@ -700,7 +700,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcon->autoCommitOn(),1);
 	checkSuccess(cur->sendQuery("insert into testtable1 values (10,10.1,10.1,10,'testchar10','testvarchar10','2010-01-01','10:00:00',NULL)"),1);
 	checkSuccess(cur->sendQuery("insert into testtable2 values (10,10.1,10.1,10,'testchar10','testvarchar10','2010-01-01','10:00:00',NULL)"),1);
-	snooze::macrosnooze(2,0);
+	snooze::macrosnooze(3,0);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable1"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"9");
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable2"),1);
