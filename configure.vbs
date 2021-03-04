@@ -233,7 +233,7 @@ end if
 
 
 ' version
-SQLR_VERSION="1.8.0"
+SQLR_VERSION="1.9.0"
 
 ' paths
 pfix="C:\\Program Files\\Firstworks"
