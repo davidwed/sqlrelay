@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.8.0
+Version: 1.9.0
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -795,6 +795,9 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Mon Mar 04 2020 David Muse <david.muse@firstworks.com> - 1.9.0-1
+- Updated to version 1.9.0.
+
 * Mon Aug 24 2020 David Muse <david.muse@firstworks.com> - 1.8.0-1
 - Updated to not require node-gyp.
 - Updated to not build mdbtools packages on rhel 8.
