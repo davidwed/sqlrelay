@@ -795,7 +795,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Mon Mar 04 2021 David Muse <david.muse@firstworks.com> - 1.9.0-1
+* Thu Mar 04 2021 David Muse <david.muse@firstworks.com> - 1.9.0-1
 - Updated to version 1.9.0.
 - Updated to require rudiments 1.4.0.
 
