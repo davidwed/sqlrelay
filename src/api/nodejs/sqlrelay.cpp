@@ -38,7 +38,11 @@ using namespace node;
 
 	#define newFunctionTemplate(func) FunctionTemplate::New(isolate,func)
 	#define newLocalFunction(func) Local<Function>::New(isolate,func)
+#if NODE_MAJOR_VERSION < 14
 	#define newString(val) String::NewFromUtf8(isolate,val)
+#else
+	#define newString(val) String::NewFromUtf8(isolate,val).ToLocalChecked()
+#endif
 	#define newBoolean(val) Boolean::New(isolate,val)
 	#define newInteger(val) Integer::New(isolate,val)
 	#define newUnsignedInteger(val) Integer::NewFromUnsigned(isolate,val)
