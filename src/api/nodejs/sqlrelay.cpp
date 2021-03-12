@@ -60,8 +60,10 @@ using namespace node;
 
 	#if NODE_MAJOR_VERSION < 14
 		#define set(a,b,c) a->Set(b,c)
+		#define get(a,b) a->Get(b)
 	#else
 		#define set(a,b,c) a->Set(isolate->GetCurrentContext(),b,c)
+		#define get(a,b) a->Get(isolate->GetCurrentContext(),b).ToLocalChecked()
 	#endif
 
 #else
@@ -98,6 +100,7 @@ using namespace node;
 	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); returnBoolean(false); }
 
 	#define set(a,b,c) a->Set(b,c)
+	#define get(a,b) a->Get(b)
 
 #endif
 
@@ -1279,7 +1282,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-					vals->Get(newInteger(0));
+					get(vals,newInteger(0));
 
 				if (first->IsString() || first->IsNull()) {
 
@@ -1289,10 +1292,10 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 						sqlrcur(args)->
 							substitution(
 
-							toString(vars->Get(
+							toString(get(vars,
 							newInteger(i))),
 
-							toString(vals->Get(
+							toString(get(vals,
 							newInteger(i)))
 							);
 					}
@@ -1305,10 +1308,10 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 						sqlrcur(args)->
 							substitution(
 
-							toString(vars->Get(
+							toString(get(vars,
 							newInteger(i))),
 
-							toInteger(vals->Get(
+							toInteger(get(vals,
 							newInteger(i))));
 					}
 
@@ -1332,7 +1335,7 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-					vals->Get(newInteger(0));
+					get(vals,newInteger(0));
 
 				if (first->IsNumber()) {
 
@@ -1341,19 +1344,19 @@ RET SQLRCursor::substitutions(const ARGS &args) {
 
 						sqlrcur(args)->substitution(
 
-							toString(vars->Get(
+							toString(get(vars,
 							newInteger(i))),
 
 							toNumber(
-							vals->Get(
+							get(vals,
 							newInteger(i))),
 
 							toUint32(
-							precs->Get(
+							get(precs,
 							newInteger(i))),
 
 							toUint32(
-							scales->Get(
+							get(scales,
 							newInteger(i))));
 					}
 
@@ -1467,7 +1470,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-					vals->Get(newInteger(0));
+					get(vals,newInteger(0));
 
 				if (first->IsString() || first->IsNull()) {
 
@@ -1477,10 +1480,10 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 						sqlrcur(args)->
 							inputBind(
 
-							toString(vars->Get(
+							toString(get(vars,
 							newInteger(i))),
 
-							toString(vals->Get(
+							toString(get(vals,
 							newInteger(i)))
 							);
 					}
@@ -1493,11 +1496,11 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 						sqlrcur(args)->
 							inputBind(
 
-							toString(vars->Get(
+							toString(get(vars,
 							newInteger(i))),
 
 							toInteger(
-							vals->Get(
+							get(vals,
 							newInteger(i))));
 					}
 
@@ -1521,7 +1524,7 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 			if (vars->Length()) {
 
 				Local<Value>	first=
-					vals->Get(newInteger(0));
+					get(vals,newInteger(0));
 
 				if (first->IsNumber()) {
 
@@ -1531,19 +1534,19 @@ RET SQLRCursor::inputBinds(const ARGS &args) {
 						sqlrcur(args)->inputBind(
 
 							toString(
-							vars->Get(
+							get(vars,
 							newInteger(i))),
 
 							toNumber(
-							vals->Get(
+							get(vals,
 							newInteger(i))),
 
 							toUint32(
-							precs->Get(
+							get(precs,
 							newInteger(i))),
 
 							toUint32(
-							scales->Get(
+							get(scales,
 							newInteger(i))));
 					}
 
