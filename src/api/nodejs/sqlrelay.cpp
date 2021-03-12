@@ -38,11 +38,11 @@ using namespace node;
 
 	#define newFunctionTemplate(func) FunctionTemplate::New(isolate,func)
 	#define newLocalFunction(func) Local<Function>::New(isolate,func)
-#if NODE_MAJOR_VERSION < 14
-	#define newString(val) String::NewFromUtf8(isolate,val)
-#else
-	#define newString(val) String::NewFromUtf8(isolate,val).ToLocalChecked()
-#endif
+	#if NODE_MAJOR_VERSION < 14
+		#define newString(val) String::NewFromUtf8(isolate,val)
+	#else
+		#define newString(val) String::NewFromUtf8(isolate,val).ToLocalChecked()
+	#endif
 	#define newBoolean(val) Boolean::New(isolate,val)
 	#define newInteger(val) Integer::New(isolate,val)
 	#define newUnsignedInteger(val) Integer::NewFromUnsigned(isolate,val)
@@ -57,6 +57,12 @@ using namespace node;
 	#endif
 
 	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); return; }
+
+	#if NODE_MAJOR_VERSION < 14
+		#define set(a,b,c) a->Set(b,c)
+	#else
+		#define set(a,b,c) a->Set(isolate->GetCurrentContext(),b,c)
+	#endif
 
 #else
 
@@ -90,6 +96,8 @@ using namespace node;
 	#define newInstance(argc,argv) cons->NewInstance(argc,argv)
 
 	#define checkArgCount(args,count) if (args.Length()!=count) { throwWrongNumberOfArguments(); returnBoolean(false); }
+
+	#define set(a,b,c) a->Set(b,c)
 
 #endif
 
@@ -353,7 +361,7 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getClientInfo",getClientInfo);
 
 	resetConstructor(constructor,tpl);
-	exports->Set(newString("SQLRConnection"),GetFunction(tpl));
+	set(exports,newString("SQLRConnection"),GetFunction(tpl));
 }
 
 SQLRConnection::SQLRConnection() {
@@ -979,7 +987,7 @@ void SQLRCursor::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"closeResultSet",closeResultSet);
 
 	resetConstructor(constructor,tpl);
-	exports->Set(newString("SQLRCursor"),GetFunction(tpl));
+	set(exports,newString("SQLRCursor"),GetFunction(tpl));
 }
 
 SQLRCursor::SQLRCursor() {
@@ -1993,7 +2001,7 @@ RET SQLRCursor::getRow(const ARGS &args) {
 
 	Handle<Array>	result=newArray(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(newInteger(i),newString(fields[i]));
+		set(result,newInteger(i),newString(fields[i]));
 	}
 
 	returnObject(result);
@@ -2011,8 +2019,7 @@ RET SQLRCursor::getRowLengths(const ARGS &args) {
 
 	Handle<Array>	result=newArray(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(newInteger(i),
-				newUint32(lengths[i]));
+		set(result,newInteger(i),newUint32(lengths[i]));
 	}
 
 	returnObject(result);
@@ -2029,7 +2036,7 @@ RET SQLRCursor::getColumnNames(const ARGS &args) {
 
 	Handle<Array>	result=newArray(colcount);
 	for (uint32_t i=0; i<colcount; i++) {
-		result->Set(newInteger(i),newString(names[i]));
+		set(result,newInteger(i),newString(names[i]));
 	}
 
 	returnObject(result);
