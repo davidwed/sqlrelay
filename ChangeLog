@@ -30,6 +30,7 @@
 	fixed subtle issues in mysql/postgresql database modules that could
 		sometimes cause reexecutes of the same query with the same
 		bind variables to return no results the second time
+	the configure script specifically looks for liberl_interface.a now
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API

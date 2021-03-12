@@ -3954,7 +3954,14 @@ END
 				then
 					ERLANGLIBS="-L$ERLANG_LIB_DIR"
 				fi
-				ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
+
+				ERLINTERFACELIB=""
+				if ( test -r "$ERLANG_LIB_DIR/liberl_interface.a" )
+				then
+					ERLINTERFACELIB="-lerl_interface"
+				fi
+
+				ERLANGLIBS="$ERLANGLIBS $ERLINTERFACELIB -lei"
 
 				HAVE_ERLANG="yes"
 			else
