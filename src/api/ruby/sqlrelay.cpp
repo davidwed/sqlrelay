@@ -414,7 +414,8 @@ static VALUE sqlrcon_suspendSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool	result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	RCON(sqlrcon,suspendSession);
+	//RCON(sqlrcon,suspendSession);
+	result=sqlrcon->suspendSession();
 	return INT2NUM(result);
 }
 
