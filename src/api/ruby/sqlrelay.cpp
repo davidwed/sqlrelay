@@ -17,6 +17,64 @@
 
 #include "rubyincludes.h"
 
+
+#include <ruby/thread.h>
+struct conparams {
+	sqlrconnection *sqlrcon;
+	VALUE one;
+	VALUE two;
+	VALUE three;
+	VALUE four;
+	VALUE five;
+	VALUE six;
+	VALUE seven;
+};
+
+#define	CALL(function,params) \
+	rb_thread_call_with_gvl((void *(*)(void *))function,&params);
+#define CON(psqlrcon,function) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	CALL(function,params)
+#define CON1(psqlrcon,function,pone) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	params.one=pone; \
+	CALL(function,params)
+#define CON2(psqlrcon,function,pone,ptwo) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	params.one=pone; \
+	params.two=ptwo; \
+	CALL(function,params)
+#define CON3(psqlrcon,function,pone,ptwo,pthree) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	params.one=pone; \
+	params.two=ptwo; \
+	params.three=pthree; \
+	CALL(function,params)
+#define CON7(psqlrcon,function,pone,ptwo,pthree,pfour,pfive,psix,pseven) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	params.one=pone; \
+	params.two=ptwo; \
+	params.three=pthree; \
+	params.four=pfour; \
+	params.five=pfive; \
+	params.six=psix; \
+	params.seven=pseven; \
+	CALL(function,params)
+
+#define	RCALL(function,params) \
+	result=rb_thread_call_with_gvl((void *(*)(void *))function,&params);
+#define RCON(psqlrcon,function) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	RCALL(function,params)
+
+
+
 extern "C" {
 
 // sqlrconnection methods
@@ -68,11 +126,14 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
  *  milliseconds.  Setting either parameter to -1 disables the
  *  timeout.  You can also set this timeout using the
  *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
+static void setConnectTimeout(conparams *p) {
+	p->sqlrcon->setConnectTimeout(NUM2INT(p->one),NUM2INT(p->two));
+}
 static VALUE sqlrcon_setConnectTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setConnectTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+	CON2(sqlrcon,setConnectTimeout,timeoutsec,timeoutusec)
 	return Qnil;
 }
 
@@ -84,12 +145,14 @@ static VALUE sqlrcon_setConnectTimeout(VALUE self,
  *  milliseconds.  Setting either parameter to -1 disables the
  *  timeout.   You can also set this timeout using the
  *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
+static void setAuthenticationTimeout(conparams *p) {
+	p->sqlrcon->setAuthenticationTimeout(NUM2INT(p->one),NUM2INT(p->two));
+}
 static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setAuthenticationTimeout(NUM2INT(timeoutsec),
-						NUM2INT(timeoutusec));
+	CON2(sqlrcon,setAuthenticationTimeout,timeoutsec,timeoutusec)
 	return Qnil;
 }
 
@@ -102,11 +165,14 @@ static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
  *  parameter to -1 disables the timeout.  You can also set
  *  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
  *  environment variable. */
+static void setResponseTimeout(conparams *p) {
+	p->sqlrcon->setResponseTimeout(NUM2INT(p->one),NUM2INT(p->two));
+}
 static VALUE sqlrcon_setResponseTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setResponseTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+	CON2(sqlrcon,setResponseTimeout,timeoutsec,timeoutusec)
 	return Qnil;
 }
 
@@ -117,50 +183,65 @@ static VALUE sqlrcon_setResponseTimeout(VALUE self,
  *  Sets which delimiters are used to identify bind variables
  *  in countBindVariables() and validateBinds().  Valid
  *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
-static VALUE setBindVariableDelimiters(VALUE self, VALUE delimiters) {
+static void setBindVariableDelimiters(conparams *p) {
+	p->sqlrcon->setBindVariableDelimiters(STR2CSTR(p->one));
+}
+static VALUE sqlrcon_setBindVariableDelimiters(VALUE self, VALUE delimiters) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setBindVariableDelimiters(STR2CSTR(delimiters));
+	CON1(sqlrcon,setBindVariableDelimiters,delimiters);
 	return Qnil;
 }
 
 /** Returns true if question marks (?) are considered to be
  *  valid bind variable delimiters. */
-static VALUE getBindVariableDelimiterQuestionMarkSupported(VALUE self) {
+static bool getBindVariableDelimiterQuestionMarkSupported(conparams *p) {
+	return p->sqlrcon->getBindVariableDelimiterQuestionMarkSupported();
+}
+static VALUE sqlrcon_getBindVariableDelimiterQuestionMarkSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	result=sqlrcon->getBindVariableDelimiterQuestionMarkSupported();
+	RCON(sqlrcon,getBindVariableDelimiterQuestionMarkSupported);
 	return INT2NUM(result);
 }
 
 /** Returns true if colons (:) are considered to be
  *  valid bind variable delimiters. */
-static VALUE getBindVariableDelimiterColonSupported(VALUE self) {
+static bool getBindVariableDelimiterColonSupported(conparams *p) {
+	return p->sqlrcon->getBindVariableDelimiterColonSupported();
+}
+static VALUE sqlrcon_getBindVariableDelimiterColonSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	result=sqlrcon->getBindVariableDelimiterColonSupported();
+	RCON(sqlrcon,getBindVariableDelimiterColonSupported);
 	return INT2NUM(result);
 }
 
 /** Returns true if at-signs (@) are considered to be
  *  valid bind variable delimiters. */
-static VALUE getBindVariableDelimiterAtSignSupported(VALUE self) {
+static bool getBindVariableDelimiterAtSignSupported(conparams *p) {
+	return p->sqlrcon->getBindVariableDelimiterAtSignSupported();
+}
+static VALUE sqlrcon_getBindVariableDelimiterAtSignSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	result=sqlrcon->getBindVariableDelimiterAtSignSupported();
+	RCON(sqlrcon,getBindVariableDelimiterAtSignSupported);
 	return INT2NUM(result);
 }
 
 /** Returns true if dollar signs ($) are considered to be
  *  valid bind variable delimiters. */
-static VALUE getBindVariableDelimiterDollarSignSupported(VALUE self) {
+static bool getBindVariableDelimiterDollarSignSupported(conparams *p) {
+	return p->sqlrcon->getBindVariableDelimiterDollarSignSupported();
+}
+static VALUE sqlrcon_getBindVariableDelimiterDollarSignSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	result=sqlrcon->getBindVariableDelimiterDollarSignSupported();
+	RCON(sqlrcon,getBindVariableDelimiterDollarSignSupported);
 	return INT2NUM(result);
 }
 
@@ -199,13 +280,16 @@ static VALUE getBindVariableDelimiterDollarSignSupported(VALUE self) {
  *  For a full list of flags, consult the GSSAPI documentation,
  *  though note that only the flags listed above are supported
  *  on Windows. */
+static void enableKerberos(conparams *p) {
+	p->sqlrcon->enableKerberos(STR2CSTR(p->one),
+					STR2CSTR(p->two),
+					STR2CSTR(p->three));
+}
 static VALUE sqlrcon_enableKerberos(VALUE self,
 				VALUE service, VALUE mech, VALUE flags) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->enableKerberos(STR2CSTR(service),
-				STR2CSTR(mech),
-				STR2CSTR(flags));
+	CON3(sqlrcon,enableKerberos,service,mech,flags);
 	return Qnil;
 }
 
@@ -278,45 +362,60 @@ static VALUE sqlrcon_enableKerberos(VALUE self,
  *  generally supported on Linux/Unix platfoms (.pem, .pfx,
  *  etc.) but only the .pfx format is currently supported on
  *  Windows. */
+
+static void enableTls(conparams *p) {
+	p->sqlrcon->enableTls(STR2CSTR(p->one),
+				STR2CSTR(p->two),
+				STR2CSTR(p->three),
+				STR2CSTR(p->four),
+				STR2CSTR(p->five),
+				STR2CSTR(p->six),
+				NUM2INT(p->seven));
+}
 static VALUE sqlrcon_enableTls(VALUE self,
 				VALUE version, VALUE cert, VALUE password,
 				VALUE ciphers, VALUE validate, VALUE ca,
 				VALUE depth) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->enableTls(STR2CSTR(version),
-				STR2CSTR(cert),
-				STR2CSTR(password),
-				STR2CSTR(ciphers),
-				STR2CSTR(validate),
-				STR2CSTR(ca),
-				NUM2INT(depth));
+	CON7(sqlrcon,enableTls,version,cert,password,ciphers,validate,ca,depth);
 	return Qnil;
 }
 
 /** Disables encryption. */
+static void disableEncryption(conparams *p) {
+	p->sqlrcon->disableEncryption();
+}
 static VALUE sqlrcon_disableEncryption(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->disableEncryption();
+	CON(sqlrcon,disableEncryption);
 	return Qnil;
 }
 
 /** Ends the session. */
+static void endSession(conparams *p) {
+	p->sqlrcon->endSession();
+}
 static VALUE sqlrcon_endSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->endSession();
+	CON(sqlrcon,endSession);
 	return Qnil;
 }
 
 /** Disconnects this connection from the current session but leaves the session
  *  open so that another connection can connect to it using
  *  sqlrcon_resumeSession(). */
+static bool suspendSession(conparams *p) {
+	return p->sqlrcon->suspendSession();
+}
 static VALUE sqlrcon_suspendSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool	result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->suspendSession());
+	RCON(sqlrcon,suspendSession);
+	return INT2NUM(result);
 }
 
 /** Returns the inet port that the connection is communicating over.  This
@@ -624,19 +723,19 @@ void Init_SQLRConnection() {
 	rb_define_method(csqlrconnection,"setResponseTimeout",
 				(CAST)sqlrcon_setResponseTimeout,2);
 	rb_define_method(csqlrconnection,"setBindVariableDelimiters",
-				(CAST)setBindVariableDelimiters,1);
+				(CAST)sqlrcon_setBindVariableDelimiters,1);
 	rb_define_method(csqlrconnection,
-			"getBindVariableDelimiterQuestionMarkSupported",
-			(CAST)getBindVariableDelimiterQuestionMarkSupported,0);
+		"getBindVariableDelimiterQuestionMarkSupported",
+		(CAST)sqlrcon_getBindVariableDelimiterQuestionMarkSupported,0);
 	rb_define_method(csqlrconnection,
-			"getBindVariableDelimiterColonSupported",
-			(CAST)getBindVariableDelimiterColonSupported,0);
+		"getBindVariableDelimiterColonSupported",
+		(CAST)sqlrcon_getBindVariableDelimiterColonSupported,0);
 	rb_define_method(csqlrconnection,
-			"getBindVariableDelimiterAtSignSupported",
-			(CAST)getBindVariableDelimiterAtSignSupported,0);
+		"getBindVariableDelimiterAtSignSupported",
+		(CAST)sqlrcon_getBindVariableDelimiterAtSignSupported,0);
 	rb_define_method(csqlrconnection,
-			"getBindVariableDelimiterDollarSignSupported",
-			(CAST)getBindVariableDelimiterDollarSignSupported,0);
+		"getBindVariableDelimiterDollarSignSupported",
+		(CAST)sqlrcon_getBindVariableDelimiterDollarSignSupported,0);
 	rb_define_method(csqlrconnection,"enableKerberos",
 				(CAST)sqlrcon_enableKerberos,3);
 	rb_define_method(csqlrconnection,"enableTls",
