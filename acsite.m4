@@ -3370,7 +3370,6 @@ then
 
 		if ( test -n "$HAVE_RUBY" )
 		then
-			AC_MSG_CHECKING(for ruby.h)
 			rm -f conftest.rb
 			cat > conftest.rb << END
 require "mkmf"
@@ -3408,6 +3407,7 @@ print "all:\n"
 print "	echo \$(hdrdir)\n"
 END
 
+			AC_MSG_CHECKING(for ruby.h)
 			HAVE_RUBY_H=""
 			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
 			do
@@ -3416,22 +3416,44 @@ END
 					HAVE_RUBY_H="yes"
 				fi
 			done
-			rm -f conftest.rb
-
-			dnl if we didn't have ruby.h then we don't have ruby
 			if ( test -z "$HAVE_RUBY_H" )
 			then
 				AC_MSG_RESULT(no)
+				dnl if we didn't have ruby.h
+				dnl then we don't have ruby
 				HAVE_RUBY=""
 			else
 				AC_MSG_RESULT(yes)
 			fi
+
+			AC_MSG_CHECKING(for ruby/thread.h)
+			HAVE_RUBY_THREAD_H=""
+			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
+			do
+				if ( test -r "$dir/ruby/thread.h" )
+				then
+					HAVE_RUBY_THREAD_H="yes"
+				fi
+			done
+			if ( test -z "$HAVE_RUBY_THREAD_H" )
+			then
+				AC_MSG_RESULT(no)
+			else
+				AC_MSG_RESULT(yes)
+			fi
+
+			rm -f conftest.rb
 		fi
 	fi
 
 	if ( test -z "$HAVE_RUBY" )
 	then
 		AC_MSG_WARN(The Ruby API will not be built.)
+	fi
+
+	if ( test -n "$HAVE_RUBY_THREAD_H" )
+	then
+		AC_DEFINE(HAVE_RUBY_THREAD_H,1,Some versions of Ruby have ruby/thread.h)
 	fi
 
 	AC_SUBST(HAVE_RUBY)

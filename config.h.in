@@ -222,6 +222,9 @@
 /* Some versions of postgresql have PQsetSingleRowMode */
 #undef HAVE_POSTGRESQL_PQSETSINGLEROWMODE
 
+/* Some versions of Ruby have ruby/thread.h */
+#undef HAVE_RUBY_THREAD_H
+
 /* Some systems have SQLConnectW */
 #undef HAVE_SQLCONNECTW
 

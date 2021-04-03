@@ -12,41 +12,82 @@
 	#define DLEXPORT
 #endif
 
+#ifndef STR2CSTR
+	#define STR2CSTR(v) StringValuePtr(v)
+#endif
+
 #include <ruby.h>
 #include "../c++/sqlrelay/sqlrclient.h"
 
 #include "rubyincludes.h"
 
-
+#ifdef HAVE_RUBY_THREAD_H
 #include <ruby/thread.h>
+#endif
 struct conparams {
-	sqlrconnection *sqlrcon;
-	VALUE one;
-	VALUE two;
-	VALUE three;
-	VALUE four;
-	VALUE five;
-	VALUE six;
-	VALUE seven;
+	sqlrconnection	*sqlrcon;
+	VALUE		one;
+	VALUE		two;
+	VALUE		three;
+	VALUE		four;
+	VALUE		five;
+	VALUE		six;
+	VALUE		seven;
+};
+struct curparams {
+	sqlrcursor	*sqlrcur;
+	VALUE		one;
+	VALUE		two;
+	VALUE		three;
+	VALUE		four;
+	VALUE		five;
+	VALUE		six;
+	VALUE		seven;
 };
 
-#define	CALL(function,params) \
-	rb_thread_call_with_gvl((void *(*)(void *))function,&params);
+#ifdef HAVE_RUBY_THREAD_H
+	// FIXME: some implementations of rb_thread_call_without_gvl have a
+	// final parameter "fail_if_interrupted"
+	#define	CALL(function,params) \
+		rb_thread_call_without_gvl((void *(*)(void *))function,&params,NULL,NULL);
+	#define	RCALL(resulttype,function,params) \
+		result=(resulttype)rb_thread_call_without_gvl((void *(*)(void *))function,&params,NULL,NULL);
+#else
+	#define	CALL(function,params) \
+		function(&params);
+	#define	RCALL(resulttype,function,params) \
+		result=function(&params);
+#endif
 #define CON(psqlrcon,function) \
 	struct conparams params; \
 	params.sqlrcon=psqlrcon; \
 	CALL(function,params)
+#define RCON(psqlrcon,resulttype,function) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	RCALL(resulttype,function,params)
 #define CON1(psqlrcon,function,pone) \
 	struct conparams params; \
 	params.sqlrcon=psqlrcon; \
 	params.one=pone; \
 	CALL(function,params)
+#define RCON1(psqlrcon,resulttype,function,pone) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	params.one=pone; \
+	RCALL(resulttype,function,params)
 #define CON2(psqlrcon,function,pone,ptwo) \
 	struct conparams params; \
 	params.sqlrcon=psqlrcon; \
 	params.one=pone; \
 	params.two=ptwo; \
 	CALL(function,params)
+#define RCON2(psqlrcon,resulttype,function,pone,ptwo) \
+	struct conparams params; \
+	params.sqlrcon=psqlrcon; \
+	params.one=pone; \
+	params.two=ptwo; \
+	RCALL(resulttype,function,params)
 #define CON3(psqlrcon,function,pone,ptwo,pthree) \
 	struct conparams params; \
 	params.sqlrcon=psqlrcon; \
@@ -66,25 +107,67 @@ struct conparams {
 	params.seven=pseven; \
 	CALL(function,params)
 
-#define	RCALL(function,params) \
-	result=rb_thread_call_with_gvl((void *(*)(void *))function,&params);
-#define RCON(psqlrcon,function) \
-	struct conparams params; \
-	params.sqlrcon=psqlrcon; \
-	RCALL(function,params)
+#define CUR(psqlrcur,function) \
+	struct curparams params; \
+	params.sqlrcur=psqlrcur; \
+	CALL(function,params)
+#define RCUR(psqlrcur,resulttype,function) \
+	struct curparams params; \
+	params.sqlrcur=psqlrcur; \
+	RCALL(resulttype,function,params)
+#define CUR1(psqlrcur,function,pone) \
+	struct curparams params; \
+	params.sqlrcur=psqlrcur; \
+	params.one=pone; \
+	CALL(function,params)
+#define RCUR1(psqlrcur,resulttype,function,pone) \
+	struct curparams params; \
+	params.sqlrcur=psqlrcur; \
+	params.one=pone; \
+	RCALL(resulttype,function,params)
+#define CUR2(psqlrcur,function,pone,ptwo) \
+	struct curparams params; \
+	params.sqlrcur=psqlrcur; \
+	params.one=pone; \
+	params.two=ptwo; \
+	CALL(function,params)
+#define RCUR2(psqlrcur,resulttype,function,pone,ptwo) \
+	struct curparams params; \
+	params.sqlrcur=psqlrcur; \
+	params.one=pone; \
+	params.two=ptwo; \
+	RCALL(resulttype,function,params)
+#define CUR3(psqlrcur,function,pone,ptwo,pthree) \
+	struct curparams params; \
+	params.sqlrcur=psqlrcur; \
+	params.one=pone; \
+	params.two=ptwo; \
+	params.three=pthree; \
+	CALL(function,params)
+#define CUR7(psqlrcur,function,pone,ptwo,pthree,pfour,pfive,psix,pseven) \
+	struct curparams params; \
+	params.sqlrcur=psqlrcur; \
+	params.one=pone; \
+	params.two=ptwo; \
+	params.three=pthree; \
+	params.four=pfour; \
+	params.five=pfive; \
+	params.six=psix; \
+	params.seven=pseven; \
+	CALL(function,params)
 
 
 
 extern "C" {
 
+struct rb_blocking_region_buffer;
+extern void rb_thread_blocking_region_end(struct rb_blocking_region_buffer *);
+extern struct rb_blocking_region_buffer *rb_thread_blocking_region_begin();
+
 // sqlrconnection methods
 static void sqlrcon_free(void *sqlrcon) {
 	delete (sqlrconnection *)sqlrcon;
 }
-
-#ifndef STR2CSTR
-	#define STR2CSTR(v) StringValuePtr(v)
-#endif
 
 /**
  *  call-seq:
@@ -118,6 +201,9 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 	return Data_Wrap_Struct(self,0,sqlrcon_free,(void *)sqlrcon);
 }
 
+static void setConnectTimeout(conparams *p) {
+	p->sqlrcon->setConnectTimeout(NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  setConnectTimeout(timeoutsec,timeoutusec)
@@ -126,9 +212,6 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
  *  milliseconds.  Setting either parameter to -1 disables the
  *  timeout.  You can also set this timeout using the
  *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
-static void setConnectTimeout(conparams *p) {
-	p->sqlrcon->setConnectTimeout(NUM2INT(p->one),NUM2INT(p->two));
-}
 static VALUE sqlrcon_setConnectTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
@@ -137,6 +220,9 @@ static VALUE sqlrcon_setConnectTimeout(VALUE self,
 	return Qnil;
 }
 
+static void setAuthenticationTimeout(conparams *p) {
+	p->sqlrcon->setAuthenticationTimeout(NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  setAuthenticationTimeout(timeoutsec,timeoutusec)
@@ -145,9 +231,6 @@ static VALUE sqlrcon_setConnectTimeout(VALUE self,
  *  milliseconds.  Setting either parameter to -1 disables the
  *  timeout.   You can also set this timeout using the
  *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
-static void setAuthenticationTimeout(conparams *p) {
-	p->sqlrcon->setAuthenticationTimeout(NUM2INT(p->one),NUM2INT(p->two));
-}
 static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
@@ -156,6 +239,9 @@ static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
 	return Qnil;
 }
 
+static void setResponseTimeout(conparams *p) {
+	p->sqlrcon->setResponseTimeout(NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  setResponseTimeout(timeoutsec,timeoutusec)
@@ -165,9 +251,6 @@ static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
  *  parameter to -1 disables the timeout.  You can also set
  *  this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT
  *  environment variable. */
-static void setResponseTimeout(conparams *p) {
-	p->sqlrcon->setResponseTimeout(NUM2INT(p->one),NUM2INT(p->two));
-}
 static VALUE sqlrcon_setResponseTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
@@ -176,6 +259,9 @@ static VALUE sqlrcon_setResponseTimeout(VALUE self,
 	return Qnil;
 }
 
+static void setBindVariableDelimiters(conparams *p) {
+	p->sqlrcon->setBindVariableDelimiters(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  setBindVariablesDelimiters(delimiters)
@@ -183,9 +269,6 @@ static VALUE sqlrcon_setResponseTimeout(VALUE self,
  *  Sets which delimiters are used to identify bind variables
  *  in countBindVariables() and validateBinds().  Valid
  *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
-static void setBindVariableDelimiters(conparams *p) {
-	p->sqlrcon->setBindVariableDelimiters(STR2CSTR(p->one));
-}
 static VALUE sqlrcon_setBindVariableDelimiters(VALUE self, VALUE delimiters) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -193,58 +276,63 @@ static VALUE sqlrcon_setBindVariableDelimiters(VALUE self, VALUE delimiters) {
 	return Qnil;
 }
 
-/** Returns true if question marks (?) are considered to be
- *  valid bind variable delimiters. */
 static bool getBindVariableDelimiterQuestionMarkSupported(conparams *p) {
 	return p->sqlrcon->getBindVariableDelimiterQuestionMarkSupported();
 }
+/** Returns true if question marks (?) are considered to be
+ *  valid bind variable delimiters. */
 static VALUE sqlrcon_getBindVariableDelimiterQuestionMarkSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	RCON(sqlrcon,getBindVariableDelimiterQuestionMarkSupported);
+	RCON(sqlrcon,bool,getBindVariableDelimiterQuestionMarkSupported);
 	return INT2NUM(result);
 }
 
-/** Returns true if colons (:) are considered to be
- *  valid bind variable delimiters. */
 static bool getBindVariableDelimiterColonSupported(conparams *p) {
 	return p->sqlrcon->getBindVariableDelimiterColonSupported();
 }
+/** Returns true if colons (:) are considered to be
+ *  valid bind variable delimiters. */
 static VALUE sqlrcon_getBindVariableDelimiterColonSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	RCON(sqlrcon,getBindVariableDelimiterColonSupported);
+	RCON(sqlrcon,bool,getBindVariableDelimiterColonSupported);
 	return INT2NUM(result);
 }
 
-/** Returns true if at-signs (@) are considered to be
- *  valid bind variable delimiters. */
 static bool getBindVariableDelimiterAtSignSupported(conparams *p) {
 	return p->sqlrcon->getBindVariableDelimiterAtSignSupported();
 }
+/** Returns true if at-signs (@) are considered to be
+ *  valid bind variable delimiters. */
 static VALUE sqlrcon_getBindVariableDelimiterAtSignSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	RCON(sqlrcon,getBindVariableDelimiterAtSignSupported);
+	RCON(sqlrcon,bool,getBindVariableDelimiterAtSignSupported);
 	return INT2NUM(result);
 }
 
-/** Returns true if dollar signs ($) are considered to be
- *  valid bind variable delimiters. */
 static bool getBindVariableDelimiterDollarSignSupported(conparams *p) {
 	return p->sqlrcon->getBindVariableDelimiterDollarSignSupported();
 }
+/** Returns true if dollar signs ($) are considered to be
+ *  valid bind variable delimiters. */
 static VALUE sqlrcon_getBindVariableDelimiterDollarSignSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	RCON(sqlrcon,getBindVariableDelimiterDollarSignSupported);
+	RCON(sqlrcon,bool,getBindVariableDelimiterDollarSignSupported);
 	return INT2NUM(result);
 }
 
+static void enableKerberos(conparams *p) {
+	p->sqlrcon->enableKerberos(STR2CSTR(p->one),
+					STR2CSTR(p->two),
+					STR2CSTR(p->three));
+}
 /** Enables Kerberos authentication and encryption.
  *
  *  "service" indicates the Kerberos service name of the
@@ -280,11 +368,6 @@ static VALUE sqlrcon_getBindVariableDelimiterDollarSignSupported(VALUE self) {
  *  For a full list of flags, consult the GSSAPI documentation,
  *  though note that only the flags listed above are supported
  *  on Windows. */
-static void enableKerberos(conparams *p) {
-	p->sqlrcon->enableKerberos(STR2CSTR(p->one),
-					STR2CSTR(p->two),
-					STR2CSTR(p->three));
-}
 static VALUE sqlrcon_enableKerberos(VALUE self,
 				VALUE service, VALUE mech, VALUE flags) {
 	sqlrconnection	*sqlrcon;
@@ -293,6 +376,16 @@ static VALUE sqlrcon_enableKerberos(VALUE self,
 	return Qnil;
 }
 
+
+static void enableTls(conparams *p) {
+	p->sqlrcon->enableTls(STR2CSTR(p->one),
+				STR2CSTR(p->two),
+				STR2CSTR(p->three),
+				STR2CSTR(p->four),
+				STR2CSTR(p->five),
+				STR2CSTR(p->six),
+				NUM2INT(p->seven));
+}
 /** Enables TLS/SSL encryption, and optionally authentication.
  *
  *  "version" specifies the TLS/SSL protocol version that the
@@ -362,16 +455,6 @@ static VALUE sqlrcon_enableKerberos(VALUE self,
  *  generally supported on Linux/Unix platfoms (.pem, .pfx,
  *  etc.) but only the .pfx format is currently supported on
  *  Windows. */
-
-static void enableTls(conparams *p) {
-	p->sqlrcon->enableTls(STR2CSTR(p->one),
-				STR2CSTR(p->two),
-				STR2CSTR(p->three),
-				STR2CSTR(p->four),
-				STR2CSTR(p->five),
-				STR2CSTR(p->six),
-				NUM2INT(p->seven));
-}
 static VALUE sqlrcon_enableTls(VALUE self,
 				VALUE version, VALUE cert, VALUE password,
 				VALUE ciphers, VALUE validate, VALUE ca,
@@ -382,10 +465,10 @@ static VALUE sqlrcon_enableTls(VALUE self,
 	return Qnil;
 }
 
-/** Disables encryption. */
 static void disableEncryption(conparams *p) {
 	p->sqlrcon->disableEncryption();
 }
+/** Disables encryption. */
 static VALUE sqlrcon_disableEncryption(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -393,10 +476,10 @@ static VALUE sqlrcon_disableEncryption(VALUE self) {
 	return Qnil;
 }
 
-/** Ends the session. */
 static void endSession(conparams *p) {
 	p->sqlrcon->endSession();
 }
+/** Ends the session. */
 static VALUE sqlrcon_endSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
@@ -404,39 +487,47 @@ static VALUE sqlrcon_endSession(VALUE self) {
 	return Qnil;
 }
 
-/** Disconnects this connection from the current session but leaves the session
- *  open so that another connection can connect to it using
- *  sqlrcon_resumeSession(). */
 static bool suspendSession(conparams *p) {
 	return p->sqlrcon->suspendSession();
 }
+/** Disconnects this connection from the current session but leaves the session
+ *  open so that another connection can connect to it using
+ *  sqlrcon_resumeSession(). */
 static VALUE sqlrcon_suspendSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
-	bool	result;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	//RCON(sqlrcon,suspendSession);
-	result=sqlrcon->suspendSession();
+	RCON(sqlrcon,bool,suspendSession);
 	return INT2NUM(result);
 }
 
+static uint16_t	getConnectionPort(conparams *p) {
+	return p->sqlrcon->getConnectionPort();
+}
 /** Returns the inet port that the connection is communicating over.  This
  *  parameter may be passed to another connection for use in the
  *  sqlrcon_resumeSession() command.  Note: The result this function returns
  *  is only valid after a call to suspendSession(). */
 static VALUE sqlrcon_getConnectionPort(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	uint64_t	result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->getConnectionPort());
+	RCON(sqlrcon,uint64_t,getConnectionPort);
+	return INT2NUM(result);
 }
 
+static const char *getConnectionSocket(conparams *p) {
+	return p->sqlrcon->getConnectionSocket();
+}
 /** Returns the unix socket that the connection is communicating over.  This
  *  parameter may be passed to another connection for use in the
  *  sqlrcon_resumeSession() command.  Note: The result this function returns
  *  is only valid after a call to suspendSession(). */
 static VALUE sqlrcon_getConnectionSocket(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->getConnectionSocket();
+	RCON(sqlrcon,const char *,getConnectionSocket);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -444,6 +535,9 @@ static VALUE sqlrcon_getConnectionSocket(VALUE self) {
 	}
 }
 
+static bool resumeSession(conparams *p) {
+	return p->sqlrcon->resumeSession(NUM2INT(p->one),STR2CSTR(p->two));
+}
 /**
  *  call-seq:
  *  resumeSession(port,socket)
@@ -452,23 +546,33 @@ static VALUE sqlrcon_getConnectionSocket(VALUE self) {
  *  Returns 1 on success and 0 on failure. */
 static VALUE sqlrcon_resumeSession(VALUE self, VALUE port, VALUE socket) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->resumeSession(NUM2INT(port), 
-							STR2CSTR(socket)));
+	RCON2(sqlrcon,bool,resumeSession,port,socket);
+	return INT2NUM(result);
 }
 
+static bool ping(conparams *p) {
+	return p->sqlrcon->ping();
+}
 /** Returns 1 if the database is up and 0 if it's down. */
 static VALUE sqlrcon_ping(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->ping());
+	RCON(sqlrcon,bool,ping);
+	return INT2NUM(result);
 }
 
+static const char *identify(conparams *p) {
+	return p->sqlrcon->identify();
+}
 /** Returns the type of database: oracle, postgresql, mysql, etc. */
 static VALUE sqlrcon_identify(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->identify();
+	RCON(sqlrcon,const char *,identify);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -476,11 +580,15 @@ static VALUE sqlrcon_identify(VALUE self) {
 	}
 }
 
+static const char *dbVersion(conparams *p) {
+	return p->sqlrcon->dbVersion();
+}
 /** Returns the version of the database */
 static VALUE sqlrcon_dbVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->dbVersion();
+	RCON(sqlrcon,const char *,dbVersion);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -488,11 +596,15 @@ static VALUE sqlrcon_dbVersion(VALUE self) {
 	}
 }
 
+static const char *dbHostName(conparams *p) {
+	return p->sqlrcon->dbHostName();
+}
 /** Returns the host name of the database */
 static VALUE sqlrcon_dbHostName(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->dbHostName();
+	RCON(sqlrcon,const char *,dbHostName);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -500,11 +612,15 @@ static VALUE sqlrcon_dbHostName(VALUE self) {
 	}
 }
 
+static const char *dbIpAddress(conparams *p) {
+	return p->sqlrcon->dbIpAddress();
+}
 /** Returns the ip address of the database */
 static VALUE sqlrcon_dbIpAddress(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->dbIpAddress();
+	RCON(sqlrcon,const char *,dbIpAddress);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -512,11 +628,15 @@ static VALUE sqlrcon_dbIpAddress(VALUE self) {
 	}
 }
 
+static const char *serverVersion(conparams *p) {
+	return p->sqlrcon->serverVersion();
+}
 /** Returns the version of the sqlrelay server software. */
 static VALUE sqlrcon_serverVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->serverVersion();
+	RCON(sqlrcon,const char *,serverVersion);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -524,11 +644,15 @@ static VALUE sqlrcon_serverVersion(VALUE self) {
 	}
 }
 
+static const char *clientVersion(conparams *p) {
+	return p->sqlrcon->clientVersion();
+}
 /** Returns the version of the sqlrelay client software. */
 static VALUE sqlrcon_clientVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->clientVersion();
+	RCON(sqlrcon,const char *,clientVersion);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -536,12 +660,16 @@ static VALUE sqlrcon_clientVersion(VALUE self) {
 	}
 }
 
+static const char *bindFormat(conparams *p) {
+	return p->sqlrcon->bindFormat();
+}
 /** Returns a string representing the format
  *  of the bind variables used in the db. */
 static VALUE sqlrcon_bindFormat(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->bindFormat();
+	RCON(sqlrcon,const char *,bindFormat);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -549,6 +677,9 @@ static VALUE sqlrcon_bindFormat(VALUE self) {
 	}
 }
 
+static bool selectDatabase(conparams *p) {
+	return p->sqlrcon->selectDatabase(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  selectDatabase(database)
@@ -556,15 +687,21 @@ static VALUE sqlrcon_bindFormat(VALUE self) {
  *  Sets the current database/schema to "database" */
 static VALUE sqlrcon_selectDatabase(VALUE self, VALUE db) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->selectDatabase(STR2CSTR(db)));
+	RCON1(sqlrcon,bool,selectDatabase,db);
+	return INT2NUM(result);
 }
 
+static const char *getCurrentDatabase(conparams *p) {
+	return p->sqlrcon->getCurrentDatabase();
+}
 /** Returns the database/schema that is currently in use. */
 static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->getCurrentDatabase();
+	RCON(sqlrcon,const char *,getCurrentDatabase);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -572,27 +709,45 @@ static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
 	}
 }
 
+static uint64_t getLastInsertId(conparams *p) {
+	return p->sqlrcon->getLastInsertId();
+}
 /** Returns the value of the autoincrement column for the last insert */
 static VALUE sqlrcon_getLastInsertId(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	uint64_t	result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->getLastInsertId());
+	RCON(sqlrcon,uint64_t,getLastInsertId);
+	return INT2NUM(result);
 }
 
+static bool autoCommitOn(conparams *p) {
+	return p->sqlrcon->autoCommitOn();
+}
 /** Instructs the database to perform a commit after every successful query. */
 static VALUE sqlrcon_autoCommitOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->autoCommitOn());
+	RCON(sqlrcon,bool,autoCommitOn);
+	return INT2NUM(result);
 }
 
+static bool autoCommitOff(conparams *p) {
+	return p->sqlrcon->autoCommitOff();
+}
 /** Instructs the database to wait for the client to tell it when to commit. */
 static VALUE sqlrcon_autoCommitOff(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->autoCommitOff());
+	RCON(sqlrcon,bool,autoCommitOff);
+	return INT2NUM(result);
 }
 
+static bool begin(conparams *p) {
+	return p->sqlrcon->begin();
+}
 /** Begins a transaction.  Returns true if the begin
  *  succeeded, false if it failed.  If the database
  *  automatically begins a new transaction when a
@@ -601,32 +756,48 @@ static VALUE sqlrcon_autoCommitOff(VALUE self) {
  *  blocks. */
 static VALUE sqlrcon_begin(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->begin());
+	RCON(sqlrcon,bool,begin);
+	return INT2NUM(result);
 }
 
+static bool commit(conparams *p) {
+	return p->sqlrcon->commit();
+}
 /** Issues a commit.  Returns true if the commit succeeded,
  *  false if it failed. */
 static VALUE sqlrcon_commit(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->commit());
+	RCON(sqlrcon,bool,commit);
+	return INT2NUM(result);
 }
 
+static bool rollback(conparams *p) {
+	return p->sqlrcon->rollback();
+}
 /** Issues a rollback.  Returns true if the rollback succeeded,
  *  false if it failed. */
 static VALUE sqlrcon_rollback(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->rollback());
+	RCON(sqlrcon,bool,rollback);
+	return INT2NUM(result);
 }
 
+static const char *errorMessage(conparams *p) {
+	return p->sqlrcon->errorMessage();
+}
 /** If an operation failed and generated an error, the error message is
  *  available here.  If there is no error then this method returns nil */
 static VALUE sqlrcon_errorMessage(VALUE self) {
 	sqlrconnection *sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->errorMessage();
+	RCON(sqlrcon,const char *,errorMessage);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -634,14 +805,22 @@ static VALUE sqlrcon_errorMessage(VALUE self) {
 	}
 }
 
+static int64_t errorNumber(conparams *p) {
+	return p->sqlrcon->errorNumber();
+}
 /** If an operation failed and generated an error, the error number is
  *  available here.  If there is no error then this method returns 0. */
 static VALUE sqlrcon_errorNumber(VALUE self) {
 	sqlrconnection *sqlrcon;
+	int64_t		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->errorNumber());
+	RCON(sqlrcon,int64_t,errorNumber);
+	return INT2NUM(result);
 }
 
+static void debugOn(conparams *p) {
+	p->sqlrcon->debugOn();
+}
 /** Causes verbose debugging information to be sent to standard output.
  *  Another way to do this is to start a query with "-- debug\n".  Yet
  *  another way is to set the environment variable SQLR_CLIENT_DEBUG
@@ -649,25 +828,36 @@ static VALUE sqlrcon_errorNumber(VALUE self) {
 static VALUE sqlrcon_debugOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->debugOn();
+	CON(sqlrcon,debugOn);
 	return Qnil;
 }
 
+static void debugOff(conparams *p) {
+	p->sqlrcon->debugOff();
+}
 /** Turns debugging off. */
 static VALUE sqlrcon_debugOff(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->debugOff();
+	CON(sqlrcon,debugOff);
 	return Qnil;
 }
 
+static bool getDebug(conparams *p) {
+	return p->sqlrcon->getDebug();
+}
 /** Returns 0 if debugging is off and 1 if debugging is on. */
 static VALUE sqlrcon_getDebug(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->getDebug());
+	RCON(sqlrcon,bool,getDebug);
+	return INT2NUM(result);
 }
 
+static void setDebugFile(conparams *p) {
+	p->sqlrcon->setDebugFile(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  setDebugFile(filename)
@@ -678,10 +868,13 @@ static VALUE sqlrcon_getDebug(VALUE self) {
 static VALUE sqlrcon_setDebugFile(VALUE self, VALUE filename) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setDebugFile(STR2CSTR(filename));
+	CON1(sqlrcon,setDebugFile,filename);
 	return Qnil;
 }
 
+static void setClientInfo(conparams *p) {
+	p->sqlrcon->setClientInfo(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  setClientInfo(clientinfo)
@@ -692,15 +885,19 @@ static VALUE sqlrcon_setDebugFile(VALUE self, VALUE filename) {
 static VALUE sqlrcon_setClientInfo(VALUE self, VALUE clientinfo) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setClientInfo(STR2CSTR(clientinfo));
+	CON1(sqlrcon,setClientInfo,clientinfo);
 	return Qnil;
 }
 
+static const char *getClientInfo(conparams *p) {
+	return p->sqlrcon->getClientInfo();
+}
 /** Returns the string that was set by setClientInfo(). */
 static VALUE sqlrcon_getClientInfo(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->getClientInfo();
+	RCON(sqlrcon,const char *,getClientInfo);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
