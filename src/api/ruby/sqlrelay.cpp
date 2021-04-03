@@ -46,8 +46,6 @@ struct curparams {
 };
 
 #ifdef HAVE_RUBY_THREAD_H
-	// FIXME: some implementations of rb_thread_call_without_gvl have a
-	// final parameter "fail_if_interrupted"
 	#define	CALL(function,params) \
 		rb_thread_call_without_gvl((void *(*)(void *))function,&params,NULL,NULL);
 	#define	RCALL(resulttype,function,params) \
