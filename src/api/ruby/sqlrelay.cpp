@@ -16,6 +16,7 @@
 	#define STR2CSTR(v) StringValuePtr(v)
 #endif
 
+#include <rudiments/bytestring.h>
 #include <ruby.h>
 #include "../c++/sqlrelay/sqlrclient.h"
 
@@ -41,6 +42,10 @@ struct params {
 		rb_thread_call_without_gvl((void *(*)(void *))function,&prms,NULL,NULL);
 	#define	RCALL(resulttype,function,prms) \
 		result=(resulttype)rb_thread_call_without_gvl((void *(*)(void *))function,&prms,NULL,NULL);
+	#define	RCALLNAME(resulttype,function,prms) \
+		name=(resulttype)rb_thread_call_without_gvl((void *(*)(void *))function,&prms,NULL,NULL);
+	#define	RCALLCOPY(resulttype,function,prms) \
+		bytestring::copy(&result,rb_thread_call_without_gvl((void *(*)(void *))function,&prms,NULL,NULL),sizeof(resulttype));
 	#define	RLCALL(restype,resfunc,resprms,lentype,lenfunc,lenprms) \
 		result=(restype)rb_thread_call_without_gvl((void *(*)(void *))resfunc,&resprms,NULL,NULL); \
 		length=(lentype)rb_thread_call_without_gvl((void *(*)(void *))lenfunc,&lenprms,NULL,NULL);
@@ -117,6 +122,16 @@ struct params {
 	prms.sqlrcur=psqlrcur; \
 	prms.one=pone; \
 	RCALL(resulttype,function,prms)
+#define RCUR1NAME(psqlrcur,resulttype,function,pone) \
+	struct params prms; \
+	prms.sqlrcur=psqlrcur; \
+	prms.one=pone; \
+	RCALLNAME(resulttype,function,prms)
+#define RCUR1COPY(psqlrcur,resulttype,function,pone) \
+	struct params prms; \
+	prms.sqlrcur=psqlrcur; \
+	prms.one=pone; \
+	RCALLCOPY(resulttype,function,prms)
 #define RLCUR1(psqlrcur,restype,resfunc,respone,lentype,lenfunc,lenone) \
 	struct params resprms; \
 	resprms.sqlrcur=psqlrcur; \
@@ -131,6 +146,18 @@ struct params {
 	prms.one=pone; \
 	prms.two=ptwo; \
 	CALL(function,prms)
+#define RCUR2(psqlrcur,resulttype,function,pone,ptwo) \
+	struct params prms; \
+	prms.sqlrcur=psqlrcur; \
+	prms.one=pone; \
+	prms.two=ptwo; \
+	RCALL(resulttype,function,prms)
+#define RCUR2COPY(psqlrcur,resulttype,function,pone,ptwo) \
+	struct params prms; \
+	prms.sqlrcur=psqlrcur; \
+	prms.one=pone; \
+	prms.two=ptwo; \
+	RCALLCOPY(resulttype,function,prms)
 #define RLCUR2(psqlrcur,restype,resfunc,respone,resptwo,lentype,lenfunc,lenone,lentwo) \
 	struct params resprms; \
 	resprms.sqlrcur=psqlrcur; \
@@ -141,12 +168,6 @@ struct params {
 	lenprms.one=lenone; \
 	lenprms.two=lentwo; \
 	RLCALL(restype,resfunc,resprms,lentype,lenfunc,lenprms);
-#define RCUR2(psqlrcur,resulttype,function,pone,ptwo) \
-	struct params prms; \
-	prms.sqlrcur=psqlrcur; \
-	prms.one=pone; \
-	prms.two=ptwo; \
-	RCALL(resulttype,function,prms)
 #define CUR3(psqlrcur,function,pone,ptwo,pthree) \
 	struct params prms; \
 	prms.sqlrcur=psqlrcur; \
@@ -519,7 +540,7 @@ static VALUE sqlrcon_suspendSession(VALUE self) {
 	return INT2NUM(result);
 }
 
-static uint16_t	getConnectionPort(params *p) {
+static uint16_t getConnectionPort(params *p) {
 	return p->sqlrcon->getConnectionPort();
 }
 /** Returns the inet port that the connection is communicating over.  This
@@ -528,7 +549,7 @@ static uint16_t	getConnectionPort(params *p) {
  *  is only valid after a call to suspendSession(). */
 static VALUE sqlrcon_getConnectionPort(VALUE self) {
 	sqlrconnection	*sqlrcon;
-	uint64_t	result;
+	uint16_t	result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
 	RCON(sqlrcon,uint64_t,getConnectionPort);
 	return INT2NUM(result);
@@ -1864,7 +1885,7 @@ static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
 	}
 }
 
-static int64_t	getOutputBindInteger(params *p) {
+static int64_t getOutputBindInteger(params *p) {
 	return p->sqlrcur->getOutputBindInteger(STR2CSTR(p->one));
 }
 /**
@@ -1881,8 +1902,8 @@ static VALUE sqlrcur_getOutputBindInteger(VALUE self, VALUE variable) {
 	return INT2NUM(result);
 }
 
-// FIXME: can't cast void * to double???
-/*static double	getOutputBindDouble(params *p) {
+// FIXME: get this working...
+/*static double getOutputBindDouble(params *p) {
 	return p->sqlrcur->getOutputBindDouble(STR2CSTR(p->one));
 }*/
 /**
@@ -1895,7 +1916,7 @@ static VALUE sqlrcur_getOutputBindDouble(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
 	double		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	//RCUR1(sqlrcur,double,getOutputBindDouble,variable);
+	//RCUR1COPY(sqlrcur,double,getOutputBindDouble,variable);
 	result=sqlrcur->getOutputBindDouble(STR2CSTR(variable));
 	return rb_float_new(result);
 }
@@ -1951,7 +1972,7 @@ static uint32_t colCount(params *p) {
 /** Returns the number of columns in the current result set. */
 static VALUE sqlrcur_colCount(VALUE self) {
 	sqlrcursor	*sqlrcur;
-	uint64_t	result;
+	uint32_t	result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	RCUR(sqlrcur,uint64_t,colCount);
 	return INT2NUM(result);
@@ -2141,7 +2162,12 @@ static VALUE sqlrcur_getFieldAsInteger(VALUE self, VALUE row, VALUE col) {
 	return INT2NUM(result);
 }
 
-// FIXME: can't cast void * to double???
+static double getFieldAsDoubleStr(params *p) {
+	return p->sqlrcur->getFieldAsDouble(NUM2INT(p->one),STR2CSTR(p->two));
+}
+static double getFieldAsDoubleInt(params *p) {
+	return p->sqlrcur->getFieldAsDouble(NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  getFieldAsDouble(row,col)
@@ -2153,9 +2179,9 @@ static VALUE sqlrcur_getFieldAsDouble(VALUE self, VALUE row, VALUE col) {
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	double	result;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		result=sqlrcur->getFieldAsDouble(NUM2INT(row),STR2CSTR(col));
+		RCUR2COPY(sqlrcur,double,getFieldAsDoubleStr,row,col);
 	} else {
-		result=sqlrcur->getFieldAsDouble(NUM2INT(row),NUM2INT(col));
+		RCUR2COPY(sqlrcur,double,getFieldAsDoubleInt,row,col);
 	}
 	return rb_float_new(result);
 }
@@ -2178,7 +2204,12 @@ static VALUE sqlrcur_getFieldLength(VALUE self, VALUE row, VALUE col) {
 	return INT2NUM(result);
 }
 
-// FIXME: quirky because of the two calls, but the macros use the same "result"
+static const char * const *getRow(params *p) {
+	return p->sqlrcur->getRow(NUM2INT(p->one));
+}
+static uint32_t *getRowLengths(params *p) {
+	return p->sqlrcur->getRowLengths(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getRow(row)
@@ -2186,14 +2217,16 @@ static VALUE sqlrcur_getFieldLength(VALUE self, VALUE row, VALUE col) {
  *  Returns an array of the values of the fields in the specified row. */
 static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
+	const char * const *result;
+	uint32_t	*length;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char * const *fields=sqlrcur->getRow(NUM2INT(row));
-	uint32_t	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
 	VALUE	fieldary=rb_ary_new2(sqlrcur->colCount());
+	RLCUR1(sqlrcur,const char * const *,getRow,row,
+				uint32_t *,getRowLengths,row);
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
-		if (fields[i]) {
-			rb_ary_store(fieldary,i,rb_str_new(fields[i],
-								lengths[i]));
+		if (result[i]) {
+			rb_ary_store(fieldary,i,rb_str_new(result[i],
+								length[i]));
 		} else {
 			rb_ary_store(fieldary,i,Qnil);
 		}
@@ -2201,7 +2234,9 @@ static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
 	return fieldary;
 }
 
-// FIXME: quirky because of the two calls, but the macros use the same "result"
+static const char *getColumnName(params *p) {
+	return p->sqlrcur->getColumnName(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getRowHash(row)
@@ -2209,27 +2244,28 @@ static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
  *  Returns a hash of the values of the fields in the specified row. */
 static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
+	const char * const *result;
+	uint32_t	*length;
+	const char	*name;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char * const *fields=sqlrcur->getRow(NUM2INT(row));
-	uint32_t	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
+	RLCUR1(sqlrcur,const char * const *,getRow,row,
+				uint32_t *,getRowLengths,row);
 	VALUE	fieldhash=rb_hash_new();
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
-		if (fields[i]) {
+		RCUR1NAME(sqlrcur,const char *,getColumnName,INT2NUM(i));
+		if (result[i]) {
 			rb_hash_aset(fieldhash,
-					rb_str_new2(sqlrcur->getColumnName(i)),
-					rb_str_new(fields[i],lengths[i]));
+					rb_str_new2(name),
+					rb_str_new(result[i],length[i]));
 		} else {
 			rb_hash_aset(fieldhash,
-					rb_str_new2(sqlrcur->getColumnName(i)),
+					rb_str_new2(name),
 					Qnil);
 		}
 	}
 	return fieldhash;
 }
 
-static uint32_t *getRowLengths(params *p) {
-	return p->sqlrcur->getRowLengths(NUM2INT(p->one));
-}
 /**
  *  call-seq:
  *  getRowLengths(row)
@@ -2258,12 +2294,14 @@ static VALUE sqlrcur_getRowLengths(VALUE self, VALUE row) {
 static VALUE sqlrcur_getRowLengthsHash(VALUE self, VALUE row) {
 	sqlrcursor	*sqlrcur;
 	uint32_t	*result;
+	const char	*name;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	RCUR1(sqlrcur,uint32_t *,getRowLengths,row);
 	VALUE	lengthhash=rb_hash_new();
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
+		RCUR1NAME(sqlrcur,const char *,getColumnName,INT2NUM(i));
 		rb_hash_aset(lengthhash,
-				rb_str_new2(sqlrcur->getColumnName(i)),
+				rb_str_new2(name),
 				INT2NUM(result[i]));
 	}
 	return lengthhash;
@@ -2292,9 +2330,6 @@ static VALUE sqlrcur_getColumnNames(VALUE self) {
 	return nameary;
 }
 
-static const char *getColumnName(params *p) {
-	return p->sqlrcur->getColumnName(NUM2INT(p->one));
-}
 /**
  *  call-seq:
  *  getColumnName(col)
@@ -2354,7 +2389,7 @@ static uint32_t getColumnLengthInt(params *p) {
  *  column name or number. */
 static VALUE sqlrcur_getColumnLength(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
-	uint64_t	result;
+	uint32_t	result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
 		RCUR1(sqlrcur,uint64_t,getColumnLengthStr,col);
@@ -2380,7 +2415,7 @@ static uint32_t getColumnPrecisionInt(params *p) {
  *  may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnPrecision(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
-	uint64_t	result;
+	uint32_t	result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
 		RCUR1(sqlrcur,uint64_t,getColumnPrecisionStr,col);
@@ -2405,7 +2440,7 @@ static uint32_t getColumnScaleInt(params *p) {
  *  scale of 2.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
-	uint64_t	result;
+	uint32_t	result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
 		RCUR1(sqlrcur,uint64_t,getColumnScaleStr,col);
@@ -2640,7 +2675,7 @@ static uint16_t getResultSetId(params *p) {
  *  suspendResultSet().*/
 static VALUE sqlrcur_getResultSetId(VALUE self) {
 	sqlrcursor	*sqlrcur;
-	uint64_t	result;
+	uint16_t	result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	RCUR(sqlrcur,uint64_t,getResultSetId);
 	return INT2NUM(result);
