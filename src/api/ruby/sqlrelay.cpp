@@ -41,6 +41,9 @@ struct params {
 		rb_thread_call_without_gvl((void *(*)(void *))function,&prms,NULL,NULL);
 	#define	RCALL(resulttype,function,prms) \
 		result=(resulttype)rb_thread_call_without_gvl((void *(*)(void *))function,&prms,NULL,NULL);
+	#define	RLCALL(restype,resfunc,resprms,lentype,lenfunc,lenprms) \
+		result=(restype)rb_thread_call_without_gvl((void *(*)(void *))resfunc,&resprms,NULL,NULL); \
+		length=(lentype)rb_thread_call_without_gvl((void *(*)(void *))lenfunc,&lenprms,NULL,NULL);
 #else
 	#define	CALL(function,prms) \
 		function(&prms);
@@ -114,12 +117,30 @@ struct params {
 	prms.sqlrcur=psqlrcur; \
 	prms.one=pone; \
 	RCALL(resulttype,function,prms)
+#define RLCUR1(psqlrcur,restype,resfunc,respone,lentype,lenfunc,lenone) \
+	struct params resprms; \
+	resprms.sqlrcur=psqlrcur; \
+	resprms.one=respone; \
+	struct params lenprms; \
+	lenprms.sqlrcur=psqlrcur; \
+	lenprms.one=lenone; \
+	RLCALL(restype,resfunc,resprms,lentype,lenfunc,lenprms);
 #define CUR2(psqlrcur,function,pone,ptwo) \
 	struct params prms; \
 	prms.sqlrcur=psqlrcur; \
 	prms.one=pone; \
 	prms.two=ptwo; \
 	CALL(function,prms)
+#define RLCUR2(psqlrcur,restype,resfunc,respone,resptwo,lentype,lenfunc,lenone,lentwo) \
+	struct params resprms; \
+	resprms.sqlrcur=psqlrcur; \
+	resprms.one=respone; \
+	resprms.two=resptwo; \
+	struct params lenprms; \
+	lenprms.sqlrcur=psqlrcur; \
+	lenprms.one=lenone; \
+	lenprms.two=lentwo; \
+	RLCALL(restype,resfunc,resprms,lentype,lenfunc,lenprms);
 #define RCUR2(psqlrcur,resulttype,function,pone,ptwo) \
 	struct params prms; \
 	prms.sqlrcur=psqlrcur; \
@@ -1772,7 +1793,12 @@ static VALUE sqlrcur_fetchFromBindCursor(VALUE self) {
 	return INT2NUM(result);
 }
 
-// FIXME: quirky because of the two calls, but the macros use the same "result"
+static const char *getOutputBindString(params *p) {
+	return p->sqlrcur->getOutputBindString(STR2CSTR(p->one));
+}
+static uint64_t getOutputBindLength(params *p) {
+	return p->sqlrcur->getOutputBindLength(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getOutputBindString(variable)
@@ -1780,10 +1806,11 @@ static VALUE sqlrcur_fetchFromBindCursor(VALUE self) {
  *  Get the value stored in a previously defined string output bind variable. */
 static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
+	const char	*result;
+	uint64_t	length;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*varname=STR2CSTR(variable);
-	const char	*result=sqlrcur->getOutputBindString(varname);
-	long		length=sqlrcur->getOutputBindLength(varname);
+	RLCUR1(sqlrcur,const char *,getOutputBindString,variable,
+				uint64_t,getOutputBindLength,variable);
 	if (result) {
 		return rb_str_new(result,length);
 	} else {
@@ -1791,7 +1818,9 @@ static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
 	}
 }
 
-// FIXME: quirky because of the two calls, but the macros use the same "result"
+static const char *getOutputBindBlob(params *p) {
+	return p->sqlrcur->getOutputBindBlob(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getOutputBindBlob(variable)
@@ -1800,10 +1829,11 @@ static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
  *  binary lob output bind variable. */
 static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
+	const char	*result;
+	uint64_t	length;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*varname=STR2CSTR(variable);
-	const char	*result=sqlrcur->getOutputBindBlob(varname);
-	long		length=sqlrcur->getOutputBindLength(varname);
+	RLCUR1(sqlrcur,const char *,getOutputBindBlob,variable,
+				uint64_t,getOutputBindLength,variable);
 	if (result) {
 		return rb_str_new(result,length);
 	} else {
@@ -1811,7 +1841,9 @@ static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
 	}
 }
 
-// FIXME: quirky because of the two calls, but the macros use the same "result"
+static const char *getOutputBindClob(params *p) {
+	return p->sqlrcur->getOutputBindClob(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getOutputBindClob(variable)
@@ -1820,10 +1852,11 @@ static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
  *  character lob output bind variable. */
 static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
 	sqlrcursor	*sqlrcur;
+	const char	*result;
+	long		length;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*varname=STR2CSTR(variable);
-	const char	*result=sqlrcur->getOutputBindClob(varname);
-	long		length=sqlrcur->getOutputBindLength(varname);
+	RLCUR1(sqlrcur,const char *,getOutputBindClob,variable,
+				uint64_t,getOutputBindLength,variable);
 	if (result) {
 		return rb_str_new(result,length);
 	} else {
@@ -1867,9 +1900,6 @@ static VALUE sqlrcur_getOutputBindDouble(VALUE self, VALUE variable) {
 	return rb_float_new(result);
 }
 
-static uint64_t	getOutputBindLength(params *p) {
-	return p->sqlrcur->getOutputBindLength(STR2CSTR(p->one));
-}
 /**
  *  call-seq:
  *  getOutputBindLength(variable)
@@ -2050,7 +2080,18 @@ static VALUE sqlrcur_getNullsAsNils(VALUE self) {
 	return Qnil;
 }
 
-// FIXME: quirky because of the two calls, but the macros use the same "result"
+static const char *getFieldStr(params *p) {
+	return p->sqlrcur->getField(NUM2INT(p->one),STR2CSTR(p->two));
+}
+static uint64_t getFieldLengthStr(params *p) {
+	return p->sqlrcur->getFieldLength(NUM2INT(p->one),STR2CSTR(p->two));
+}
+static const char *getFieldInt(params *p) {
+	return p->sqlrcur->getField(NUM2INT(p->one),NUM2INT(p->two));
+}
+static uint64_t getFieldLengthInt(params *p) {
+	return p->sqlrcur->getFieldLength(NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  getField(row,col)
@@ -2059,15 +2100,15 @@ static VALUE sqlrcur_getNullsAsNils(VALUE self) {
  *  column name or number. */
 static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
 	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	const char	*result;
-	long		length;
+	uint64_t	length;
+	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		result=sqlrcur->getField(NUM2INT(row),STR2CSTR(col));
-		length=sqlrcur->getFieldLength(NUM2INT(row),STR2CSTR(col));
+		RLCUR2(sqlrcur,const char *,getFieldStr,row,col,
+				uint64_t,getFieldLengthStr,row,col);
 	} else {
-		result=sqlrcur->getField(NUM2INT(row),NUM2INT(col));
-		length=sqlrcur->getFieldLength(NUM2INT(row),NUM2INT(col));
+		RLCUR2(sqlrcur,const char *,getFieldInt,row,col,
+				uint64_t,getFieldLengthInt,row,col);
 	}
 	if (result) {
 		return rb_str_new(result,length);
@@ -2119,12 +2160,6 @@ static VALUE sqlrcur_getFieldAsDouble(VALUE self, VALUE row, VALUE col) {
 	return rb_float_new(result);
 }
 
-static uint32_t getFieldLengthStr(params *p) {
-	return p->sqlrcur->getFieldLength(NUM2INT(p->one),STR2CSTR(p->two));
-}
-static uint32_t getFieldLengthInt(params *p) {
-	return p->sqlrcur->getFieldLength(NUM2INT(p->one),NUM2INT(p->two));
-}
 /**
  *  call-seq:
  *  getFieldLength(row,col)
