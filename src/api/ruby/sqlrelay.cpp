@@ -2380,6 +2380,12 @@ static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
 	return INT2NUM(result);
 }
 
+static bool getColumnIsNullableStr(params *p) {
+	return p->sqlrcur->getColumnIsNullable(STR2CSTR(p->one));
+}
+static bool getColumnIsNullableInt(params *p) {
+	return p->sqlrcur->getColumnIsNullable(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsNullable(col)
@@ -2388,14 +2394,22 @@ static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
  *  "col" may be specified as the colum name or number. */
 static VALUE sqlrcur_getColumnIsNullable(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsNullable(STR2CSTR(col)));
+		RCUR1(sqlrcur,bool,getColumnIsNullableStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsNullable(NUM2INT(col)));
+		RCUR1(sqlrcur,bool,getColumnIsNullableInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static bool getColumnIsPrimaryKeyStr(params *p) {
+	return p->sqlrcur->getColumnIsPrimaryKey(STR2CSTR(p->one));
+}
+static bool getColumnIsPrimaryKeyInt(params *p) {
+	return p->sqlrcur->getColumnIsPrimaryKey(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsPrimaryKey(col)
@@ -2404,14 +2418,22 @@ static VALUE sqlrcur_getColumnIsNullable(VALUE self, VALUE col) {
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsPrimaryKey(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsPrimaryKey(STR2CSTR(col)));
+		RCUR1(sqlrcur,bool,getColumnIsPrimaryKeyStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsPrimaryKey(NUM2INT(col)));
+		RCUR1(sqlrcur,bool,getColumnIsPrimaryKeyInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static bool getColumnIsUniqueStr(params *p) {
+	return p->sqlrcur->getColumnIsUnique(STR2CSTR(p->one));
+}
+static bool getColumnIsUniqueInt(params *p) {
+	return p->sqlrcur->getColumnIsUnique(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsUnique(col)
@@ -2420,14 +2442,22 @@ static VALUE sqlrcur_getColumnIsPrimaryKey(VALUE self, VALUE col) {
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsUnique(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsUnique(STR2CSTR(col)));
+		RCUR1(sqlrcur,bool,getColumnIsUniqueStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsUnique(NUM2INT(col)));
+		RCUR1(sqlrcur,bool,getColumnIsUniqueInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static bool getColumnIsPartOfKeyStr(params *p) {
+	return p->sqlrcur->getColumnIsPartOfKey(STR2CSTR(p->one));
+}
+static bool getColumnIsPartOfKeyInt(params *p) {
+	return p->sqlrcur->getColumnIsPartOfKey(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsPartOfKey(col)
@@ -2436,14 +2466,22 @@ static VALUE sqlrcur_getColumnIsUnique(VALUE self, VALUE col) {
  *  otherwise.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsPartOfKey(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsPartOfKey(STR2CSTR(col)));
+		RCUR1(sqlrcur,bool,getColumnIsPartOfKeyStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsPartOfKey(NUM2INT(col)));
+		RCUR1(sqlrcur,bool,getColumnIsPartOfKeyInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static bool getColumnIsUnsignedStr(params *p) {
+	return p->sqlrcur->getColumnIsUnsigned(STR2CSTR(p->one));
+}
+static bool getColumnIsUnsignedInt(params *p) {
+	return p->sqlrcur->getColumnIsUnsigned(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsUnsigned(col)
@@ -2452,14 +2490,22 @@ static VALUE sqlrcur_getColumnIsPartOfKey(VALUE self, VALUE col) {
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsUnsigned(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsUnsigned(STR2CSTR(col)));
+		RCUR1(sqlrcur,bool,getColumnIsUnsignedStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsUnsigned(NUM2INT(col)));
+		RCUR1(sqlrcur,bool,getColumnIsUnsignedInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static bool getColumnIsZeroFilledStr(params *p) {
+	return p->sqlrcur->getColumnIsZeroFilled(STR2CSTR(p->one));
+}
+static bool getColumnIsZeroFilledInt(params *p) {
+	return p->sqlrcur->getColumnIsZeroFilled(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsZeroFilled(col)
@@ -2468,14 +2514,22 @@ static VALUE sqlrcur_getColumnIsUnsigned(VALUE self, VALUE col) {
  *  0 otherwise.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsZeroFilled(STR2CSTR(col)));
+		RCUR1(sqlrcur,bool,getColumnIsZeroFilledStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsZeroFilled(NUM2INT(col)));
+		RCUR1(sqlrcur,bool,getColumnIsZeroFilledInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static bool getColumnIsBinaryStr(params *p) {
+	return p->sqlrcur->getColumnIsBinary(STR2CSTR(p->one));
+}
+static bool getColumnIsBinaryInt(params *p) {
+	return p->sqlrcur->getColumnIsBinary(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsBinary(col)
@@ -2484,14 +2538,22 @@ static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsBinary(STR2CSTR(col)));
+		RCUR1(sqlrcur,bool,getColumnIsBinaryStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsBinary(NUM2INT(col)));
+		RCUR1(sqlrcur,bool,getColumnIsBinaryInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static bool getColumnIsAutoIncrementStr(params *p) {
+	return p->sqlrcur->getColumnIsAutoIncrement(STR2CSTR(p->one));
+}
+static bool getColumnIsAutoIncrementInt(params *p) {
+	return p->sqlrcur->getColumnIsAutoIncrement(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsAutoIncrement(col)
@@ -2500,16 +2562,22 @@ static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsAutoIncrement(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(
-			sqlrcur->getColumnIsAutoIncrement(STR2CSTR(col)));
+		RCUR1(sqlrcur,bool,getColumnIsAutoIncrementStr,col);
 	} else {
-		return INT2NUM(
-			sqlrcur->getColumnIsAutoIncrement(NUM2INT(col)));
+		RCUR1(sqlrcur,bool,getColumnIsAutoIncrementInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static uint64_t getLongestStr(params *p) {
+	return p->sqlrcur->getLongest(STR2CSTR(p->one));
+}
+static uint64_t getLongestInt(params *p) {
+	return p->sqlrcur->getLongest(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getLongest(col)
@@ -2518,34 +2586,47 @@ static VALUE sqlrcur_getColumnIsAutoIncrement(VALUE self, VALUE col) {
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getLongest(VALUE self, VALUE col) {
 	sqlrcursor	*sqlrcur;
+	uint64_t	result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getLongest(STR2CSTR(col)));
+		RCUR1(sqlrcur,uint64_t,getLongestStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getLongest(NUM2INT(col)));
+		RCUR1(sqlrcur,uint64_t,getLongestInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static uint16_t getResultSetId(params *p) {
+	return p->sqlrcur->getResultSetId();
+}
 /** Returns the internal ID of this result set.  This parameter may be passed
  *  to another statement for use in the resumeResultSet() function.  Note: The
  *  value this function returns is only valid after a call to
  *  suspendResultSet().*/
 static VALUE sqlrcur_getResultSetId(VALUE self) {
 	sqlrcursor	*sqlrcur;
+	uint64_t	result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->getResultSetId());
+	RCUR(sqlrcur,uint64_t,getResultSetId);
+	return INT2NUM(result);
 }
 
+static void suspendResultSet(params *p) {
+	p->sqlrcur->suspendResultSet();
+}
 /** Tells the server to leave this result set open when the connection calls
  *  suspendSession() so that another connection can connect to it using
  *  resumeResultSet() after it calls resumeSession(). */
 static VALUE sqlrcur_suspendResultSet(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->suspendResultSet();
+	CUR(sqlrcur,suspendResultSet);
 	return Qnil;
 }
 
+static bool resumeResultSet(params *p) {
+	return p->sqlrcur->resumeResultSet(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  resumeResultSet(id)
@@ -2554,10 +2635,16 @@ static VALUE sqlrcur_suspendResultSet(VALUE self) {
  *  Returns 1 on success and 0 on failure. */
 static VALUE sqlrcur_resumeResultSet(VALUE self, VALUE id) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->resumeResultSet(NUM2INT(id)));
+	RCUR1(sqlrcur,bool,resumeResultSet,id);
+	return INT2NUM(result);
 }
 
+static bool resumeCachedResultSet(params *p) {
+	return p->sqlrcur->resumeCachedResultSet(
+				NUM2INT(p->one),STR2CSTR(p->two));
+}
 /**
  *  call-seq:
  *  resumeCachedResultSet(id,filename)
@@ -2568,11 +2655,15 @@ static VALUE sqlrcur_resumeResultSet(VALUE self, VALUE id) {
 static VALUE sqlrcur_resumeCachedResultSet(VALUE self, 
 						VALUE id, VALUE filename) {
 	sqlrcursor	*sqlrcur;
+	bool		result;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->resumeCachedResultSet(NUM2INT(id),
-							STR2CSTR(filename)));
+	RCUR2(sqlrcur,bool,resumeCachedResultSet,id,filename);
+	return INT2NUM(result);
 }
 
+static void closeResultSet(params *p) {
+	p->sqlrcur->closeResultSet();
+}
 /** Closes the current result set, if one is open.  Data
  *  that has been fetched already is still available but
  *  no more data may be fetched.  Server side resources
@@ -2580,7 +2671,7 @@ static VALUE sqlrcur_resumeCachedResultSet(VALUE self,
 static VALUE sqlrcur_closeResultSet(VALUE self) {
 	sqlrcursor	*sqlrcur;
 	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->closeResultSet();
+	CUR(sqlrcur,closeResultSet);
 	return Qnil;
 }
 
