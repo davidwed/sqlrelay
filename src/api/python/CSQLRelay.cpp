@@ -1262,17 +1262,21 @@ static PyObject *getField(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &row, &col))
     return NULL;
-  Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
-    rc=((sqlrcursor *)sqlrcur)->getField(row, PyString_AsString(col));
-    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyString_AsString(col));
-    type = ((sqlrcursor *)sqlrcur)->getColumnType(PyString_AsString(col));
+    const char *colname=PyString_AsString(col);
+    Py_BEGIN_ALLOW_THREADS
+    rc=((sqlrcursor *)sqlrcur)->getField(row, colname);
+    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, colname);
+    type = ((sqlrcursor *)sqlrcur)->getColumnType(colname);
+    Py_END_ALLOW_THREADS
   } else if (PyInt_Check(col)) {
-    rc=((sqlrcursor *)sqlrcur)->getField(row, PyInt_AsLong(col));
-    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
-    type = ((sqlrcursor *)sqlrcur)->getColumnType(PyInt_AsLong(col));
+    uint32_t colind=PyInt_AsLong(col);
+    Py_BEGIN_ALLOW_THREADS
+    rc=((sqlrcursor *)sqlrcur)->getField(row, colind);
+    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, colind);
+    type = ((sqlrcursor *)sqlrcur)->getColumnType(colind);
+    Py_END_ALLOW_THREADS
   }
-  Py_END_ALLOW_THREADS
   if (!rc) {
     Py_INCREF(Py_None);
     return Py_None;
@@ -1363,13 +1367,17 @@ static PyObject *getFieldLength(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &row, &col))
     return NULL;
-  Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
-    rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyString_AsString(col));
+    const char *colname=PyString_AsString(col);
+    Py_BEGIN_ALLOW_THREADS
+    rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, colname);
+    Py_END_ALLOW_THREADS
   } else if (PyInt_Check(col)) {
-    rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
+    uint32_t colind=PyInt_AsLong(col);
+    Py_BEGIN_ALLOW_THREADS
+    rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, colind);
+    Py_END_ALLOW_THREADS
   }
-  Py_END_ALLOW_THREADS
   // FIXME: lame, python doesn't support building values from uint32_t's
   return Py_BuildValue("l", (long)rc);
 }
