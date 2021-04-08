@@ -32,7 +32,8 @@
 		bind variables to return no results the second time
 	the configure script specifically looks for liberl_interface.a now
 	updated nodejs macros for node 14+
-	fixed a subtle bug in the Python API's getRowLengthsDictionary
+	fixed subtle bugs in Python getField, getFieldLength, and
+		getRowLengthsDictionary functions
 	added GVL management to the Ruby API
 
 1.8.0 - unattended tests
