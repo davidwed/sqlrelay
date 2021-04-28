@@ -469,8 +469,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-status
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver.so.11
-%{_libdir}/libsqlrserver.so.11.*
+%{_libdir}/libsqlrserver.so.12
+%{_libdir}/libsqlrserver.so.12.*
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
@@ -588,8 +588,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %systemd_preun %{name}cachemanager.service
 
 %files common
-%{_libdir}/libsqlrutil.so.11
-%{_libdir}/libsqlrutil.so.11.*
+%{_libdir}/libsqlrutil.so.12
+%{_libdir}/libsqlrutil.so.12.*
 
 %files common-devel
 %dir %{_includedir}/%{name}
