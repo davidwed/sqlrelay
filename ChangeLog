@@ -35,6 +35,8 @@
 	fixed subtle bugs in Python getField, getFieldLength, and
 		getRowLengthsDictionary functions
 	added GVL management to the Ruby API
+	applied patch from Igor to fix configure.vbs VC++ version detection
+		for non-US versions
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API

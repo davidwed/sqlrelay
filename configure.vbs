@@ -283,12 +283,7 @@ arch=parts(ubound(parts))
 if arch="80x86" then
 	arch="x86"
 end if
-version=""
-for i=lbound(parts) to ubound(parts)
-	if parts(i)="Version" then
-		version=parts(i+1)
-	end if
-next
+version=parts(ubound(parts)-2)
 parts=split(version,".")
 version=parts(0)
 
