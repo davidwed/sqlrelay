@@ -599,12 +599,12 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_libdir}/libsqlrutil.so
 
 %files c++
-%{_libdir}/libsqlrclient.so.6
-%{_libdir}/libsqlrclient.so.6.*
+%{_libdir}/libsqlrclient.so.7
+%{_libdir}/libsqlrclient.so.7.*
 
 %files c
-%{_libdir}/libsqlrclientwrapper.so.6
-%{_libdir}/libsqlrclientwrapper.so.6.*
+%{_libdir}/libsqlrclientwrapper.so.7
+%{_libdir}/libsqlrclientwrapper.so.7.*
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
@@ -651,8 +651,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %exclude %{_libdir}/lib*.la
 
 %files -n odbc-%{name}
-%{_libdir}/libsqlrodbc.so.6
-%{_libdir}/libsqlrodbc.so.6.*
+%{_libdir}/libsqlrodbc.so.7
+%{_libdir}/libsqlrodbc.so.7.*
 %{_libdir}/libsqlrodbc.so
 
 %files -n perl-%{name}
