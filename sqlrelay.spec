@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.9.0
+Version: 2.0.0
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: gcc-c++, rudiments-devel >= 1.4.0, systemd
+BuildRequires: gcc-c++, rudiments-devel >= 2.0.0, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -340,17 +340,6 @@ BuildRequires: firebird-devel
 
 %description firebird
 Firebird back-end module for SQL Relay.
-
-
-%if 0%{?fedora} || 0%{?rhel} < 8
-%package mdbtools
-License: GPLv2 with exceptions
-Summary: MDB Tools back-end module for SQL Relay
-BuildRequires: mdbtools-devel
-
-%description mdbtools
-MDB Tools back-end module for SQL Relay.
-%endif
 
 
 %package informix
@@ -771,12 +760,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_firebird*
 
-%if 0%{?fedora} || 0%{?rhel} < 8
-%files mdbtools
-%dir %{_libexecdir}/%{name}
-%{_libexecdir}/%{name}/sqlrconnection_mdbtools*
-%endif
-
 %files informix
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_informix*
@@ -795,6 +778,10 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Apr 30 2021 David Muse <david.muse@firstworks.com> - 2.0.0-1
+- Updated to version 2.0.0.
+- Removed support for mdbtools.
+
 * Thu Mar 04 2021 David Muse <david.muse@firstworks.com> - 1.9.0-1
 - Updated to version 1.9.0.
 - Updated to require rudiments 1.4.0.

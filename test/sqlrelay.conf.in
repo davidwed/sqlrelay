@@ -73,15 +73,6 @@
 		</connections>
 	</instance>
 
-	<instance id="mdbtoolstest" port="9000" socket="/tmp/test.socket" dbase="mdbtools">
-		<users>
-			<user user="test" password="test"/>
-		</users>
-		<connections>
-			<connection string="db=/usr/local/firstworks/etc/sqlrelay.conf.d/mdbtools/var/@HOSTNAME@.mdb;"/>
-		</connections>
-	</instance>
-
 	<instance id="informixtest" port="9000" socket="/tmp/test.socket" dbase="informix">
 		<users>
 			<user user="test" password="test"/>

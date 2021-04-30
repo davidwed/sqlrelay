@@ -23,7 +23,6 @@
       <li><a href="#db-postgresql">PostgreSQL</a></li>
       <li><a href="#db-firebird">Firebird</a></li>
       <li><a href="#db-sqlite">SQLite</a></li>
-      <li><a href="#db-msaccess">Microsoft Access</a></li>
       <li><a href="#db-odbc-teradata">Teradata (via ODBC)</a></li>
       <li><a href="#db-odbc-exasol">Exasol (via ODBC)</a></li>
       <li><a href="#db-odbc-hive">Apache Hive (via ODBC)</a></li>
@@ -875,41 +874,6 @@ http://www.gnu.org/software/src-highlite -->
 <p>See the <a href="configreference.html#sqlite">SQL Relay Configuration Reference</a> for other valid SQLite connect string options.</p>
 
 <p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-sqlite.html">Getting Started With SQLite</a> for general assistance installing and configuring a SQLite database.</p>
-
-<br/><a name="db-msaccess"/><h3>Microsoft Access</h3>
-
-<p>On Windows platforms, ODBC can be used to access a Microsoft Access database.</p>
-
-<p>On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via <a target="_blank" href="http://mdbtools.sourceforge.net">MDBTools</a>.</p>
-
-<blockquote>
-<!-- Generator: GNU source-highlight 3.1.9
-by Lorenzo Bettini
-http://www.lorenzobettini.it
-http://www.gnu.org/software/src-highlite -->
-<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
-<b><font color="#0000FF">&lt;instances&gt;</font></b>
-
-	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mdbtools"</font><b><font color="#0000FF">&gt;</font></b>
-		<b><font color="#0000FF">&lt;users&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/users&gt;</font></b>
-		<b><font color="#0000FF">&lt;connections&gt;</font></b>
-                        <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"db=/var/mdbtools/exampledb.mdb"</font><b><font color="#0000FF">/&gt;</font></b>
-		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
-	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
-
-<b><font color="#0000FF">&lt;/instances&gt;</font></b>
-</tt></pre>
-
-</blockquote>
-<p>The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.</p>
-
-<p>(Note that the database file must be readable by the user that the instance of SQL Relay runs as.)</p>
-
-<p>See the <a href="configreference.html#mdbtools">SQL Relay Configuration Reference</a> for other valid MDBTools connect string options.</p>
-
-<p>See <a target="_blank" href="http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html">Getting Started With MS Access (on a non-MS platform)</a> for general assistance with MS Access databases on non-MS platforms.</p>
 
 <br/><a name="db-odbc-teradata"/><h3>Teradata (via ODBC)</h3>
 

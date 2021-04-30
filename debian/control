@@ -233,13 +233,6 @@ Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
 Description: Firebird back-end module for SQL Relay
  Firebird back-end module for SQL Relay.
 
-Package: sqlrelay-mdbtools
-Section: libdevel
-Architecture: any
-Depends: sqlrelay (= ${binary:Version}), ${misc:Depends}
-Description: MDB Tools back-end module for SQL Relay
- MDB Tools back-end module for SQL Relay.
-
 Package: sqlrelay-informix
 Section: libdevel
 Architecture: any

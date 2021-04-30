@@ -33,7 +33,6 @@
             <xs:enumeration value="db2"/>
             <xs:enumeration value="informix"/>
             <xs:enumeration value="firebird"/>
-            <xs:enumeration value="mdbtools"/>
             <xs:enumeration value="router"/>
           </xs:restriction>
         </xs:simpleType>

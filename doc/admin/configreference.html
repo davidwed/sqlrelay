@@ -138,7 +138,7 @@ http://www.gnu.org/software/src-highlite -->
       <li><b>tlsdepth</b> - Sets the maximum certificate chain validation depth.  The absolute maximum depth is 9.  Defaults to "9".</li>
     </ul>
 
-    <li><b>dbase</b> - The type of database the connection daemon should connect to.  Should be one of: "oracle", "freetds", "sap", "db2", "informix", "mysql", "postgresql", "firebird", "sqlite", odbc", or "mdbtools".  Defaults to "oracle".  Note: For historical reasons, "oracle8" and "sybase" are also supported, and are synonymous with "oracle" and "sap".  "mariadb" is also supported, and is synonymous with "mysql".</li>
+    <li><b>dbase</b> - The type of database the connection daemon should connect to.  Should be one of: "oracle", "freetds", "sap", "db2", "informix", "mysql", "postgresql", "firebird", "sqlite", or "odbc".  Defaults to "oracle".  Note: For historical reasons, "oracle8" and "sybase" are also supported, and are synonymous with "oracle" and "sap".  "mariadb" is also supported, and is synonymous with "mysql".</li>
     <li><b>connections</b> - The number of database connections to open at startup.  This may be set to any positive number or 0.  Defaults to 5.  (Note: implicitly limited to a compile time limit, which is configurable, but defaults to 4096.)</li>
     <li><b>maxconnections</b> - The maximum number of database connections to scale up to.  If this is set to a number lower than the value for the <b>connections</b> parameter then it will be automatically bumped up to the value set for <b>connections</b>.  Defaults to the same value as <b>connections</b>.  (Note: implicitly limited to a compile time limit, which is configurable, but defaults to 4096.)</li>
     <li><b>maxqueuelength</b> - The size the queue of waiting clients has to grow to before more connections will be spawned.  Defaults to 0.</li>
@@ -410,14 +410,7 @@ or a tnsnames-style expression such as:
   <li><b>detachbeforelogin</b>: Whether or not to detach from the controlling terminal before login.  When set to yes, the process ID's in the ODBC trace file will match the process ID of the sqlr-connection process.  Otherwise they will not.  Defaults to no.</li>
 </ul>
 
-<br/><a name="mdbtools"/><p>For <b>mdbtools</b> databases, the connect string syntax is "db=DATABASE;identity=ID"</p>
-
-<ul>
-  <li><b>db</b>: The filename of the database open.  Required.</li>
-  <li><b>identity</b>: Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).</li>
-</ul>
-
-<a name="advanced"/><h2>Advanced Configuration</h2>
+<br/><a name="advanced"/><h2>Advanced Configuration</h2>
 
 SQL Relay is highly modular, and there are additional tags and attributes that direct SQL Relay to load various filtering, translation, query routing, logging, notification, and other modules.  These are described in detail in the <a href="configguide.html">SQL Relay Configuration Guide</a>.
 </body>

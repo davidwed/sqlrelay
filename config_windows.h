@@ -37,27 +37,6 @@
 /* Define to 1 if you have the `z' library (-lz). */
 /* #undef HAVE_LIBZ */
 
-/* Some versions of mdbtools have mdb_close() */
-/* #undef HAVE_MDB_CLOSE */
-
-/* Some versions of mdbtools have 5 param mdb_col_to_string */
-/* #undef HAVE_MDB_COL_TO_STRING_5_PARAM */
-
-/* Some versions of mdbtools have mdb_open() with 2 parameters */
-/* #undef HAVE_MDB_OPEN_2_PARAM 1 */
-
-/* Some versions of mdbtools have mdb_remove_backends() */
-/* #undef HAVE_MDB_REMOVE_BACKENDS */
-
-/* Some versions of mdbtools define mdb_run_query */
-/* #undef HAVE_MDB_RUN_QUERY */
-
-/* Some versions of mdbtools define mdb_sql_fetch_row */
-/* #undef HAVE_MDB_SQL_FETCH_ROW */
-
-/* Some versions of mdbtools define mdb_sql_run_query */
-/* #undef HAVE_MDB_SQL_RUN_QUERY */
-
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 

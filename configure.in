@@ -212,18 +212,6 @@ AC_ARG_ENABLE(informix-at-runtime,
 	[  --enable-informix-at-runtime  Disable static/dynamic linking against Informix client libraries and force the connection module to load them at runtime],
 	INFORMIXATRUNTIME="yes",
 	INFORMIXATRUNTIME="")
-AC_ARG_WITH(mdbtools-prefix,
-	[  --with-mdbtools-prefix        Location of MDB Tools],
-	MDBTOOLSPATH="$withval",
-	MDBTOOLSPATH="")
-AC_ARG_ENABLE(mdbtools,
-	[  --disable-mdbtools            Don't build MDB Tools connection module],
-	ENABLE_MDBTOOLS="",
-	ENABLE_MDBTOOLS="yes")
-AC_ARG_ENABLE(mdbtools-rpath,
-	[  --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module],
-	MDBTOOLSUSERPATH="yes",
-	MDBTOOLSUSERPATH="")
 AC_ARG_ENABLE(router,
 	[  --disable-router              Don't build router connection module],
 	ENABLE_ROUTER="",
@@ -441,7 +429,6 @@ then
 	ENABLE_DB2=""
 	ENABLE_FIREBIRD=""
 	ENABLE_INFORMIX=""
-	ENABLE_MDBTOOLS=""
 	ENABLE_ROUTER=""
 fi
 
@@ -506,7 +493,6 @@ AC_SUBST(ODBCUSERPATH)
 AC_SUBST(DB2USERPATH)
 AC_SUBST(FIREBIRDUSERPATH)
 AC_SUBST(INFORMIXUSERPATH)
-AC_SUBST(MDBTOOLSUSERPATH)
 AC_SUBST(ENABLE_ROUTER)
 AC_SUBST(OVERRIDEPERLSITEARCH)
 AC_SUBST(OVERRIDEPERLSITELIB)
@@ -577,9 +563,6 @@ if ( test -n "$DB2PATH" -a "`echo $DB2PATH | cut -c-3`" = "../" ); then
 fi
 if ( test -n "$FIREBIRDPATH" -a "`echo $FIREBIRDPATH | cut -c-3`" = "../" ); then
 	FIREBIRDPATH="$PWD/$FIREBIRDPATH"
-fi
-if ( test -n "$MDBTOOLSPATH" -a "`echo $MDBTOOLSPATH | cut -c-3`" = "../" ); then
-	MDBTOOLSPATH="$PWD/$MDBTOOLSPATH"
 fi
 if ( test -n "$PERLPATH" -a "`echo $PERLPATH | cut -c-3`" = "../" ); then
 	PERLPATH="$PWD/$PERLPATH"
@@ -794,14 +777,6 @@ echo "******************************"
 
 
 
-dnl Checks for MDB Tools.
-echo
-echo "***** MDB Tools **************"
-FW_CHECK_MDBTOOLS
-echo "******************************"
-
-
-
 dnl Checks for Perl.
 echo
 echo "***** Perl *******************"
@@ -881,7 +856,7 @@ dnl 2. MINOR when you make backwards-incompatible changes
 dnl    or add significant new features
 dnl    (and set PATCH to 0)
 dnl 3. PATCH when you make backwards-compatible changes
-SQLR_VERSION="1.9.0"
+SQLR_VERSION="2.0.0"
 AC_SUBST(SQLR_VERSION)
 AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
 
@@ -1044,7 +1019,6 @@ SYBASEBUILD="no        "
 ODBCBUILD="no        "
 DB2BUILD="no        "
 FIREBIRDBUILD="no        "
-MDBTOOLSBUILD="no        "
 INFORMIXBUILD="no        "
 ROUTERBUILD="no        "
 TESTDBS=""
@@ -1122,13 +1096,6 @@ if ( test -n "$FIREBIRDLIBS" ); then
 		FIREBIRDBUILD="static    "
 	fi
 	TESTDBS="$TESTDBS firebird"
-fi
-if ( test -n "$MDBTOOLSLIBS" ); then
-	MDBTOOLSBUILD="dynamic   "
-	if ( test -n "$MDBTOOLSSTATIC" ); then
-		MDBTOOLSBUILD="static    "
-	fi
-	TESTDBS="$TESTDBS mdbtools"
 fi
 if ( test -n "$INFORMIXLIBS" ); then
 	INFORMIXBUILD="dynamic   "
@@ -1231,8 +1198,8 @@ echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
 echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD    DB2        $DB2BUILD"
-echo "                Firebird    $FIREBIRDBUILD    MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD    Router     $ROUTERBUILD"
+echo "                Firebird    $FIREBIRDBUILD    Router     $ROUTERBUILD"
+echo "                Informix    $INFORMIXBUILD"
 echo "*************************************************************"
 echo
 echo "If you expected a Database or API that doesn't show up in the Summary"

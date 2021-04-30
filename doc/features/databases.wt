@@ -30,8 +30,6 @@
 }}}
 {{{#!td
 [[Image(../images/freetds.png,margin-left=10px,nolink)]]
-[[br]][[br]]
-[[Image(../images/mdbtools.png,margin-left=10px,nolink)]]
 }}}
 
 </div>
@@ -41,8 +39,6 @@ SQL Relay supports [http://oracle.com Oracle], [http://www.mysql.com MySQL]/[htt
 Support is provided for Microsoft SQL Server via the [http://www.freetds.org FreeTDS] library.  !FreeTDS supports SAP/Sybase as well.  So you can access both SQL Server and SAP/Sybase databases using !FreeTDS.
 
 ODBC is supported on Windows natively and on Linux/Unix platforms via the [http://www.unixodbc.org UnixODBC] and [http://www.iodbc.org iODBC] libraries.  ODBC drivers for are available for Windows and Linux for Microsoft SQL Server, Apache Hive and Impala, Amazon Redshift and Athena, and many other databases.
-
-Microsoft Access databases are supported on Windows via the ODBC driver and (minimally) on Linux/Unix platforms via the [http://mdbtools.sourceforge.net MDB Tools] library.
 
 <script language="Javascript">
 rotate();

@@ -212,7 +212,6 @@ bool sqlrimportxml::sequenceTagEnd() {
 	query.clear();
 
 	// sqlite, mysql, sap/sybase and mssql have autoincrementing fields
-	// mdbtools has nothing
 	// odbc can't tell what kind of underlying db we're using
 	if (charstring::contains(dbtype,"firebird") ||
 		charstring::contains(dbtype,"interbase")) {

@@ -14,7 +14,6 @@
   * [#db-postgresql PostgreSQL]
   * [#db-firebird Firebird]
   * [#db-sqlite SQLite]
-  * [#db-msaccess Microsoft Access]
   * [#db-odbc-teradata Teradata (via ODBC)]
   * [#db-odbc-exasol Exasol (via ODBC)]
   * [#db-odbc-hive Apache Hive (via ODBC)]
@@ -566,28 +565,6 @@ Note that the entire in-memory database will be lost when SQL Relay is stopped. 
 See the [configreference.html#sqlite SQL Relay Configuration Reference] for other valid SQLite connect string options.
 
 See [http://software.firstworks.com/p/getting-started-with-sqlite.html Getting Started With SQLite] for general assistance installing and configuring a SQLite database.
-
-
-[[br]][=#db-msaccess]
-=== Microsoft Access ===
-
-On Windows platforms, ODBC can be used to access a Microsoft Access database.
-
-On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via [http://mdbtools.sourceforge.net MDBTools].
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-msaccess.conf@
-}}}
-}}}
-
-The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.
-
-(Note that the database file must be readable by the user that the instance of SQL Relay runs as.)
-
-See the [configreference.html#mdbtools SQL Relay Configuration Reference] for other valid MDBTools connect string options.
-
-See [http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html Getting Started With MS Access (on a non-MS platform)] for general assistance with MS Access databases on non-MS platforms.
 
 
 [[br]][=#db-odbc-teradata]
