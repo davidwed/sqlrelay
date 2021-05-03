@@ -6,7 +6,7 @@
 
 #include <sqlrelay/private/sqlrclientincludes.h>
 
-class SQLRCLIENT_DLLSPEC sqlrconnection {
+class SQLRCLIENT_DLLSPEC sqlrconnection : public object {
 	public:
 		/** Initiates a connection to "server" on "port" or to the
 		 *  unix "socket" on the local machine and auths with "user"
@@ -374,7 +374,7 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 };
 
 
-class SQLRCLIENT_DLLSPEC sqlrcursor {
+class SQLRCLIENT_DLLSPEC sqlrcursor : public object {
 	public:
 			/** Creates a cursor to run queries and fetch result
 			 *  sets using connecton "sqlrc". */
