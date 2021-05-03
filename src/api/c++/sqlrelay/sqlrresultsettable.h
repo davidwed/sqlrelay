@@ -11,6 +11,9 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 	public:
 
 		sqlrresultsettable();
+		sqlrresultsettable(sqlrcursor *cursor);
+		sqlrresultsettable(sqlrconnection *connection,
+						sqlrcursor *cursor);
 		~sqlrresultsettable();
 
 		void	attachConnection(sqlrconnection *connection);

@@ -16,6 +16,21 @@ sqlrresultsettable::sqlrresultsettable() : tablecollection<const char *>() {
 	pvt->cursor=NULL;
 }
 
+sqlrresultsettable::sqlrresultsettable(sqlrcursor *cursor) :
+					tablecollection<const char *>() {
+	pvt=new sqlrresultsettableprivate;
+	pvt->connection=NULL;
+	pvt->cursor=cursor;
+}
+
+sqlrresultsettable::sqlrresultsettable(sqlrconnection *connection,
+						sqlrcursor *cursor) :
+					tablecollection<const char *>() {
+	pvt=new sqlrresultsettableprivate;
+	pvt->connection=connection;
+	pvt->cursor=cursor;
+}
+
 sqlrresultsettable::~sqlrresultsettable() {
 	delete pvt->connection;
 	delete pvt->cursor;
