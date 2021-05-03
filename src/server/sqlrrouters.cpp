@@ -71,7 +71,7 @@ bool sqlrrouters::load(domnode *parameters) {
 
 void sqlrrouters::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+	for (listnode< sqlrrouterplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrrouterplugin	*sqlrsp=node->getValue();
@@ -166,7 +166,7 @@ const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
 					const char **err,
 					int64_t *errn) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+	for (listnode< sqlrrouterplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		const char	*connid=node->getValue()->r->route(
@@ -180,7 +180,7 @@ const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
 
 bool sqlrrouters::routeEntireSession() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+	for (listnode< sqlrrouterplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		if (!node->getValue()->r->routeEntireSession()) {
@@ -191,7 +191,7 @@ bool sqlrrouters::routeEntireSession() {
 }
 
 void sqlrrouters::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+	for (listnode< sqlrrouterplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->r->endTransaction(commit);
@@ -199,7 +199,7 @@ void sqlrrouters::endTransaction(bool commit) {
 }
 
 void sqlrrouters::endSession() {
-	for (singlylinkedlistnode< sqlrrouterplugin * > *node=
+	for (listnode< sqlrrouterplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->r->endSession();

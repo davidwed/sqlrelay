@@ -513,7 +513,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete[] pvt->_reformattedfield;
 
-	for (singlylinkedlistnode< char * >
+	for (listnode< char * >
 			*sln=pvt->_globaltemptables.getFirst();
 						sln; sln=sln->getNext()) {
 		delete[] sln->getValue();
@@ -6308,7 +6308,7 @@ void sqlrservercontroller::endSession() {
 void sqlrservercontroller::dropTempTables(sqlrservercursor *cursor) {
 
 	// run through the temp table list, dropping tables
-	for (singlylinkedlistnode< char * >
+	for (listnode< char * >
 				*sln=pvt->_sessiontemptablesfordrop.getFirst();
 				sln; sln=sln->getNext()) {
 
@@ -6349,7 +6349,7 @@ void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 
 	// run through the temp table list, truncating tables
-	for (singlylinkedlistnode< char * >
+	for (listnode< char * >
 			*sln=pvt->_sessiontemptablesfortrunc.getFirst();
 			sln; sln=sln->getNext()) {
 		truncateTempTable(cursor,sln->getValue());
@@ -6391,7 +6391,7 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 	}
 
 	// specific tables...
-	for (singlylinkedlistnode< char * >
+	for (listnode< char * >
 			*sln=pvt->_globaltemptables.getFirst();
 						sln; sln=sln->getNext()) {
 		truncateTempTable(cursor,sln->getValue());
@@ -7366,9 +7366,9 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 
 		// run through the bulk data, binding and executing each row
 		uint64_t		errorcount=0;
-		singlylinkedlistnode<const unsigned char *>
+		listnode<const unsigned char *>
 				*datanode=pvt->_bulkdata.getFirst();
-		singlylinkedlistnode<uint64_t>
+		listnode<uint64_t>
 				*datalennode=pvt->_bulkdatalen.getFirst();
 		while (datanode) {
 
@@ -7421,8 +7421,8 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 	bool				havecols=false;
 	if (cols.getLength()) {
 		havecols=true;
-		linkedlistnode<char *> *bind=binds.getFirst();
-		linkedlistnode<char *> *col=cols.getFirst();
+		listnode<char *> *bind=binds.getFirst();
+		listnode<char *> *col=cols.getFirst();
 		while (bind && col) {
 			bindtocol.setValue(bind->getValue(),col->getValue());
 			bind=bind->getNext();
@@ -7452,7 +7452,7 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 
 			// run through the binds...
 			uint16_t	inbindcount=0;
-			linkedlistnode<char *> *bind=binds.getFirst();
+			listnode<char *> *bind=binds.getFirst();
 			while (bind) {
 
 				// set up the input bind name
@@ -8496,7 +8496,7 @@ uint32_t sqlrservercontroller::getStatisticsIndex() {
 
 void sqlrservercontroller::sessionStartQueries() {
 	// run a configurable set of queries at the start of each session
-	for (linkedlistnode< char * > *node=
+	for (listnode< char * > *node=
 			pvt->_cfg->getSessionStartQueries()->getFirst();
 			node; node=node->getNext()) {
 		sessionQuery(node->getValue());
@@ -8505,7 +8505,7 @@ void sqlrservercontroller::sessionStartQueries() {
 
 void sqlrservercontroller::sessionEndQueries() {
 	// run a configurable set of queries at the end of each session
-	for (linkedlistnode< char * > *node=
+	for (listnode< char * > *node=
 			pvt->_cfg->getSessionEndQueries()->getFirst();
 			node; node=node->getNext()) {
 		sessionQuery(node->getValue());

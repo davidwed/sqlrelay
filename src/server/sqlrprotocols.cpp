@@ -64,7 +64,7 @@ bool sqlrprotocols::load(domnode *parameters) {
 
 void sqlrprotocols::unload() {
 	debugFunction();
-	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
+	for (listnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
 			*node=pvt->_protos.getList()->getFirst();
 			node; node=node->getNext()) {
 		sqlrprotocolplugin	*sqlrpp=node->getValue()->getValue();
@@ -153,7 +153,7 @@ sqlrprotocol *sqlrprotocols::getProtocol(uint16_t index) {
 }
 
 void sqlrprotocols::endTransaction(bool commit) {
-	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
+	for (listnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
 			*node=pvt->_protos.getList()->getFirst();
 			node; node=node->getNext()) {
 		node->getValue()->getValue()->pr->endTransaction(commit);
@@ -161,7 +161,7 @@ void sqlrprotocols::endTransaction(bool commit) {
 }
 
 void sqlrprotocols::endSession() {
-	for (linkedlistnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
+	for (listnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
 			*node=pvt->_protos.getList()->getFirst();
 			node; node=node->getNext()) {
 		node->getValue()->getValue()->pr->endSession();

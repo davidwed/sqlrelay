@@ -1002,9 +1002,9 @@ then
 	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
 	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
 	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "1" -o "$V2" -lt "2" -o "$V3" -lt "0" )
+	if ( test "$V1" -lt "2")
 	then
-		AC_MSG_ERROR([Rudiments version must be >= 1.1.0, found version $RUDIMENTSVERSION])
+		AC_MSG_ERROR([Rudiments version must be >= 2.0.0, found version $RUDIMENTSVERSION])
 		exit
 	fi
 fi

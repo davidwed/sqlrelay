@@ -62,7 +62,7 @@ bool sqlrschedules::load(domnode *parameters) {
 
 void sqlrschedules::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrscheduleplugin * > *node=
+	for (listnode< sqlrscheduleplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrscheduleplugin	*sqlrsp=node->getValue();
@@ -152,7 +152,7 @@ void sqlrschedules::loadSchedule(domnode *schedule) {
 
 bool sqlrschedules::allowed(sqlrserverconnection *sqlrcon, const char *user) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrscheduleplugin * > *node=
+	for (listnode< sqlrscheduleplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		if (!node->getValue()->s->allowed(sqlrcon,user)) {

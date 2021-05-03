@@ -72,7 +72,7 @@ bool sqlrbindvariabletranslations::load(domnode *parameters) {
 
 void sqlrbindvariabletranslations::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrbindvariabletranslationplugin * > *node=
+	for (listnode< sqlrbindvariabletranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrbindvariabletranslationplugin	*sqlt=node->getValue();
@@ -181,7 +181,7 @@ bool sqlrbindvariabletranslations::run(sqlrserverconnection *sqlrcon,
 
 	pvt->_error=NULL;
 
-	for (singlylinkedlistnode< sqlrbindvariabletranslationplugin * > *node=
+	for (listnode< sqlrbindvariabletranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		if (pvt->_debug) {
@@ -202,7 +202,7 @@ const char *sqlrbindvariabletranslations::getError() {
 }
 
 void sqlrbindvariabletranslations::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrbindvariabletranslationplugin * > *node=
+	for (listnode< sqlrbindvariabletranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->bvtr->endTransaction(commit);
@@ -210,7 +210,7 @@ void sqlrbindvariabletranslations::endTransaction(bool commit) {
 }
 
 void sqlrbindvariabletranslations::endSession() {
-	for (singlylinkedlistnode< sqlrbindvariabletranslationplugin * > *node=
+	for (listnode< sqlrbindvariabletranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->bvtr->endSession();

@@ -28,7 +28,7 @@
 		uint64_t	committedcount;
 
 		linkedlist<uint32_t>		columnswithemptynames;
-		linkedlistnode<uint32_t>	*columnswithemptynamesnode;
+		listnode<uint32_t>		*columnswithemptynamesnode;
 
 		dictionary<uint32_t, char *>	staticvaluecolumnnames;
 		dictionary<uint32_t, char *>	staticvaluecolumnvalues;

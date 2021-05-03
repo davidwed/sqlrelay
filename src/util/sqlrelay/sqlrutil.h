@@ -83,7 +83,7 @@ class SQLRUTIL_DLLSPEC connectstringcontainer {
 		parameterstring	connectstring;
 };
 
-typedef linkedlistnode< connectstringcontainer * >	connectstringnode;
+typedef listnode< connectstringcontainer * >	connectstringnode;
 
 class SQLRUTIL_DLLSPEC routecontainer {
 	public:
@@ -114,7 +114,7 @@ class SQLRUTIL_DLLSPEC routecontainer {
 		linkedlist< regularexpression * >	regexlist;
 };
 
-typedef linkedlistnode< routecontainer * >	routenode;
+typedef listnode< routecontainer * >	routenode;
 
 class SQLRUTIL_DLLSPEC sqlrconfig {
 	public:

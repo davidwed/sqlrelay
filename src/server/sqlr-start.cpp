@@ -492,7 +492,7 @@ int main(int argc, const char **argv) {
 
 	// start each enabled instance
 	int32_t	exitstatus=0;
-	for (linkedlistnode< char * > *node=ids.getFirst();
+	for (listnode< char * > *node=ids.getFirst();
 					node; node=node->getNext()) {
 
 		// get the id

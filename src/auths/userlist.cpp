@@ -108,8 +108,7 @@ const char *sqlrauth_userlist::auth(sqlrcredentials *cred) {
 
 				// if subject alternate names were
 				// present then validate against those
-				for (linkedlistnode< char * > *
-						node=sans->getFirst();
+				for (listnode< char * > *node=sans->getFirst();
 						node; node=node->getNext()) {
 					if (!charstring::compare(
 						node->getValue(),users[i])) {

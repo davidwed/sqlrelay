@@ -234,7 +234,7 @@ void _bindFormatError() {
 }
 
 static void clearList(singlylinkedlist< char * > *list) {
-	for (singlylinkedlistnode< char * > *node=list->getFirst();
+	for (listnode< char * > *node=list->getFirst();
 					node; node=node->getNext()) {
 		delete[] node->getValue();
 	}

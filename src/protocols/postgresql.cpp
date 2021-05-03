@@ -686,7 +686,7 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 		stdoutput.printf("	database: %s\n",database);
 		stdoutput.printf("	replication: %s\n",replication);
 		linkedlist<char *>	*keys=options.getKeys();
-		for (linkedlistnode<char *> *key=keys->getFirst();
+		for (listnode<char *> *key=keys->getFirst();
 						key; key=key->getNext()) {
 			stdoutput.printf("	%s: %s\n",
 					key->getValue(),

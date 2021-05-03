@@ -2636,7 +2636,7 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 				return SQL_INVALID_HANDLE;
 			}
 
-			for (singlylinkedlistnode<CONN *>	*node=
+			for (listnode<CONN *>	*node=
 						env->connlist.getFirst();
 						node; node=node->getNext()) {
 
@@ -2937,7 +2937,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 
 	linkedlist<dictionarynode<int32_t, outputbind *> *>
 				*list=stmt->outputbinds.getList();
-	for (linkedlistnode<dictionarynode<int32_t, outputbind *> *>
+	for (listnode<dictionarynode<int32_t, outputbind *> *>
 					*node=list->getFirst();
 					node; node=node->getNext()) {
 
@@ -3279,7 +3279,7 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 
 	linkedlist<dictionarynode<int32_t, outputbind *> *>
 				*list=stmt->inputoutputbinds.getList();
-	for (linkedlistnode<dictionarynode<int32_t, outputbind *> *>
+	for (listnode<dictionarynode<int32_t, outputbind *> *>
 					*node=list->getFirst();
 					node; node=node->getNext()) {
 
@@ -8322,7 +8322,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 	if (stmt->dataatexeckeys->getLength()) {
 
 		// get the first bind number
-		linkedlistnode<SQLUSMALLINT>	*keynode=
+		listnode<SQLUSMALLINT>	*keynode=
 					stmt->dataatexeckeys->getFirst();
 
 		// get the corresponding bind buffer node
@@ -11843,7 +11843,7 @@ static bool writeDsn() {
 		dsnError();
 		return false;
 	}
-	for (linkedlistnode< char * > *key=dsndict.getKeys()->getFirst();
+	for (listnode< char * > *key=dsndict.getKeys()->getFirst();
 						key; key=key->getNext()) {
 		if (!charstring::compare(key->getValue(),"DSN")) {
 			continue;

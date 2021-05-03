@@ -1036,7 +1036,7 @@ void routerconnection::endSession() {
 	// reset pointers and index
 	currentcon=NULL;
 	currentconindex=0;
-	for (linkedlistnode< routercursor * > *node=routercursors.getFirst();
+	for (listnode< routercursor * > *node=routercursors.getFirst();
 						node; node=node->getNext()) {
 		routercursor	*rcur=node->getValue();
 		rcur->currentcon=NULL;

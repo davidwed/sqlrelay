@@ -76,7 +76,7 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 	}
 
 	const char	*query=sqlrcur->getQueryBuffer();
-	for (linkedlistnode< regularexpression *> *rn=relist.getFirst();
+	for (listnode< regularexpression *> *rn=relist.getFirst();
 							rn; rn=rn->getNext()) {
 		if (rn->getValue()->match(query)) {
 			if (debug) {

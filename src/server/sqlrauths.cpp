@@ -63,7 +63,7 @@ bool sqlrauths::load(domnode *parameters, sqlrpwdencs *sqlrpe) {
 
 void sqlrauths::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrauthplugin * > *node=
+	for (listnode< sqlrauthplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrauthplugin	*sqlrap=node->getValue();
@@ -152,7 +152,7 @@ const char *sqlrauths::auth(sqlrcredentials *cred) {
 	if (!cred) {
 		return NULL;
 	}
-	for (singlylinkedlistnode< sqlrauthplugin * > *node=
+	for (listnode< sqlrauthplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		const char	*autheduser=node->getValue()->au->auth(cred);

@@ -71,7 +71,7 @@ bool sqlrfilters::load(domnode *parameters) {
 
 void sqlrfilters::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+	for (listnode< sqlrfilterplugin * > *node=
 						pvt->_beforefilters.getFirst();
 						node; node=node->getNext()) {
 		sqlrfilterplugin	*sqlrfp=node->getValue();
@@ -80,7 +80,7 @@ void sqlrfilters::unload() {
 		delete sqlrfp;
 	}
 	pvt->_beforefilters.clear();
-	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+	for (listnode< sqlrfilterplugin * > *node=
 						pvt->_afterfilters.getFirst();
 						node; node=node->getNext()) {
 		sqlrfilterplugin	*sqlrfp=node->getValue();
@@ -211,7 +211,7 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 
 	xmldom	*tree=NULL;
 
-	for (singlylinkedlistnode< sqlrfilterplugin * > *node=list->getFirst();
+	for (listnode< sqlrfilterplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
 
 		if (pvt->_debug) {
@@ -271,12 +271,12 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 }
 
 void sqlrfilters::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+	for (listnode< sqlrfilterplugin * > *node=
 						pvt->_beforefilters.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->f->endTransaction(commit);
 	}
-	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+	for (listnode< sqlrfilterplugin * > *node=
 						pvt->_afterfilters.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->f->endTransaction(commit);
@@ -284,12 +284,12 @@ void sqlrfilters::endTransaction(bool commit) {
 }
 
 void sqlrfilters::endSession() {
-	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+	for (listnode< sqlrfilterplugin * > *node=
 						pvt->_beforefilters.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->f->endSession();
 	}
-	for (singlylinkedlistnode< sqlrfilterplugin * > *node=
+	for (listnode< sqlrfilterplugin * > *node=
 						pvt->_afterfilters.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->f->endSession();

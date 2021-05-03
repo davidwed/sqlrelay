@@ -726,7 +726,7 @@ bool sqlrconnection::validateCertificate() {
 	// names then validate against those
 	if (sans && sans->getLength()) {
 
-		for (linkedlistnode< char * > *node=sans->getFirst();
+		for (listnode< char * > *node=sans->getFirst();
 					node; node=node->getNext()) {
 
 			const char	*san=node->getValue();

@@ -371,7 +371,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 	/*if (debug) {
 		stdoutput.printf("-----------------------\n");
-		for (linkedlistnode<querydetails *> *node=log.getFirst();
+		for (listnode<querydetails *> *node=log.getFirst();
 						node; node=node->getNext()) {
 			stdoutput.printf("%s\n",node->getValue()->query);
 		}
@@ -573,7 +573,7 @@ void sqlrtrigger_replay::getColumns(const char *query,
 		// create array of columns from allcolumns
 		// that match the number of values
 		*cols=new char *[*colcount];
-		linkedlistnode<char *>	*node=(*allcolumns)->getFirst();
+		listnode<char *>	*node=(*allcolumns)->getFirst();
 		if (node) {
 			for (uint64_t i=0; i<*colcount; i++) {
 				(*cols)[i]=charstring::duplicate(
@@ -991,7 +991,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 	// If we're replaying the entire tx then start at the beginning of the
 	// log.  If we're just replaying the last query, then start at the end
 	// of the log.
-	linkedlistnode<querydetails *> *current=
+	listnode<querydetails *> *current=
 				(replaytx)?log.getFirst():log.getLast();
 
 	// replay...
@@ -1030,7 +1030,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 		if (debug && incount) {
 			stdoutput.printf("	input binds {\n");
 		}
-		linkedlistnode<sqlrserverbindvar *>	*inbindnode=
+		listnode<sqlrserverbindvar *>	*inbindnode=
 						qd->inbindvars.getFirst();
 		for (uint16_t i=0; i<incount; i++) {
 			sqlrserverbindvar	*bv=
@@ -1055,7 +1055,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 		if (debug && outcount) {
 			stdoutput.printf("	output binds {\n");
 		}
-		linkedlistnode<sqlrserverbindvar *>	*outbindnode=
+		listnode<sqlrserverbindvar *>	*outbindnode=
 					qd->outbindvars.getFirst();
 		for (uint16_t i=0; i<outcount; i++) {
 			sqlrserverbindvar	*bv=
@@ -1082,7 +1082,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 			stdoutput.printf("	"
 					"input-output binds {\n");
 		}
-		linkedlistnode<sqlrserverbindvar *>	*inoutbindnode=
+		listnode<sqlrserverbindvar *>	*inoutbindnode=
 					qd->inoutbindvars.getFirst();
 		for (uint16_t i=0; i<inoutcount; i++) {
 			sqlrserverbindvar	*bv=
@@ -1203,7 +1203,7 @@ bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur,
 						bool indent) {
 
 	// did we get a replay condition?
-	for (linkedlistnode<condition *> *node=conditions.getFirst();
+	for (listnode<condition *> *node=conditions.getFirst();
 						node; node=node->getNext()) {
 
 		condition	*val=node->getValue();
@@ -1412,7 +1412,7 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 	log.clearAndDelete();
 
 	// clear cache
-	for (linkedlistnode<dictionarynode<char *,linkedlist<char *> *> *>
+	for (listnode<dictionarynode<char *,linkedlist<char *> *> *>
 				*colcachenode=colcache.getList()->getFirst();
 				colcachenode;
 				colcachenode=colcachenode->getNext()) {

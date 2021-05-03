@@ -188,7 +188,7 @@ sqlrlistener::~sqlrlistener() {
 
 	// remove files that indicate whether the db is up or down
 	if (pvt->_cfg && pvt->_cfg->getConnectStringList()) {
-		for (linkedlistnode< connectstringcontainer * > *node=
+		for (listnode< connectstringcontainer * > *node=
 				pvt->_cfg->getConnectStringList()->getFirst();
 				node; node=node->getNext()) {
 			connectstringcontainer	*cs=node->getValue();
@@ -1718,7 +1718,7 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 		*alldbsdown=true;
 		linkedlist< connectstringcontainer * >	*csl=
 					pvt->_cfg->getConnectStringList();
-		for (linkedlistnode< connectstringcontainer * > *node=
+		for (listnode< connectstringcontainer * > *node=
 						csl->getFirst(); node;
 						node=node->getNext()) {
 			connectstringcontainer	*cs=node->getValue();

@@ -91,7 +91,7 @@ bool sqlrtranslations::load(domnode *parameters) {
 
 void sqlrtranslations::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
+	for (listnode< sqlrtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrtranslationplugin	*sqlt=node->getValue();
@@ -218,7 +218,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 	stringbuffer	tempquerystr1;
 	stringbuffer	tempquerystr2;
 	stringbuffer	*tempquerystr=&tempquerystr1;
-	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
+	for (listnode< sqlrtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 
@@ -464,7 +464,7 @@ bool sqlrtranslations::getReplacementName(
 				const char **newobject) {
 
 	*newobject=NULL;
-	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
+	for (listnode< dictionarynode< sqlrdatabaseobject *, char * > *>
 					*node=dict->getList()->getFirst();
 						node; node=node->getNext()) {
 
@@ -489,7 +489,7 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 	}
 
 	// remove any indices that depend on the table
-	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
+	for (listnode< dictionarynode< sqlrdatabaseobject *, char * > *>
 			*node=pvt->_indexnamemap.getList()->getFirst(); node;) {
 
 		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
@@ -521,7 +521,7 @@ bool sqlrtranslations::removeReplacement(
 				const char *schema,
 				const char *object) {
 
-	for (linkedlistnode< dictionarynode< sqlrdatabaseobject *, char * > *>
+	for (listnode< dictionarynode< sqlrdatabaseobject *, char * > *>
 				*node=dict->getList()->getFirst();
 					node; node=node->getNext()) {
 
@@ -543,7 +543,7 @@ bool sqlrtranslations::getUseOriginalOnError() {
 }
 
 void sqlrtranslations::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
+	for (listnode< sqlrtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->tr->endTransaction(commit);
@@ -553,7 +553,7 @@ void sqlrtranslations::endTransaction(bool commit) {
 void sqlrtranslations::endSession() {
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
-	for (singlylinkedlistnode< sqlrtranslationplugin * > *node=
+	for (listnode< sqlrtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->tr->endSession();

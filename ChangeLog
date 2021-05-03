@@ -1,4 +1,5 @@
 2.0.0 - removed support for mdbtools
+	updated to use new rudiments collection model
 
 1.9.0 - added missing inequality operators to end-of-bind detection
 	fixed commit/begin without commitcount error in sqlrimportcsv

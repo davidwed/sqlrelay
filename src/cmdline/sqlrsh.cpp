@@ -115,7 +115,7 @@ sqlrshenv::~sqlrshenv() {
 
 void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 
-	for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+	for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
 					*node=binds->getList()->getFirst();
 		node; node=node->getNext()) {
 
@@ -1218,7 +1218,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	if (env->inputbinds.getList()->getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
 				*node=env->inputbinds.getList()->getFirst();
 				node; node=node->getNext()) {
 
@@ -1254,7 +1254,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	if (env->outputbinds.getList()->getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
 			*node=env->outputbinds.getList()->getFirst();
 			node; node=node->getNext()) {
 
@@ -1276,7 +1276,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	if (env->inputoutputbinds.getList()->getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
 			*node=env->inputoutputbinds.getList()->getFirst();
 			node; node=node->getNext()) {
 
@@ -1313,7 +1313,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	if (env->outputbinds.getList()->getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
 			*node=env->outputbinds.getList()->getFirst();
 			node; node=node->getNext()) {
 
@@ -1346,7 +1346,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	if (env->inputoutputbinds.getList()->getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
 			*node=env->inputoutputbinds.getList()->getFirst();
 			node; node=node->getNext()) {
 
@@ -2213,7 +2213,7 @@ void sqlrsh::printbinds(const char *type,
 
 	stdoutput.printf("%s bind variables:\n",type);
 
-	for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
+	for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
 					*node=binds->getList()->getFirst();
 		node; node=node->getNext()) {
 
