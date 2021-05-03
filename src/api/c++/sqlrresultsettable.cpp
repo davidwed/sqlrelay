@@ -6,25 +6,36 @@
 class sqlrresultsettableprivate {
 	private:
 		friend class sqlrresultsettable;
+		sqlrconnection	*connection;
 		sqlrcursor	*cursor;
 };
 
 sqlrresultsettable::sqlrresultsettable() : tablecollection<const char *>() {
 	pvt=new sqlrresultsettableprivate;
+	pvt->connection=NULL;
 	pvt->cursor=NULL;
 }
 
 sqlrresultsettable::~sqlrresultsettable() {
+	delete pvt->connection;
 	delete pvt->cursor;
 	delete[] pvt;
+}
+
+void sqlrresultsettable::attachConnection(sqlrconnection *connection) {
+	pvt->connection=connection;
 }
 
 void sqlrresultsettable::attachCursor(sqlrcursor *cursor) {
 	pvt->cursor=cursor;
 }
 
-uint64_t sqlrresultsettable::getRowCount() {
-	return (pvt->cursor)?pvt->cursor->rowCount():0;
+void sqlrresultsettable::setColumnName(uint64_t col, const char *name) {
+	// do nothing
+}
+
+const char *sqlrresultsettable::getColumnName(uint64_t col) {
+	return (pvt->cursor)?pvt->cursor->getColumnName(col):"";
 }
 
 uint64_t sqlrresultsettable::getColCount() {
@@ -40,12 +51,12 @@ const char *sqlrresultsettable::getValue(uint64_t row, uint64_t col) {
 	return (pvt->cursor)?pvt->cursor->getField(row,col):"";
 }
 
-void sqlrresultsettable::setColumnName(uint64_t col, const char *name) {
-	// do nothing
+uint64_t sqlrresultsettable::getRowCount() {
+	return (pvt->cursor)?pvt->cursor->rowCount():0;
 }
 
-const char *sqlrresultsettable::getColumnName(uint64_t col) {
-	return (pvt->cursor)?pvt->cursor->getColumnName(col):"";
+bool sqlrresultsettable::allRowsAvailable() {
+	return (pvt->cursor)?pvt->cursor->endOfResultSet():true;
 }
 
 void sqlrresultsettable::clear() {

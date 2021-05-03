@@ -13,13 +13,15 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 		sqlrresultsettable();
 		~sqlrresultsettable();
 
+		void	attachConnection(sqlrconnection *connection);
 		void	attachCursor(sqlrcursor *cursor);
 
-		uint64_t	getRowCount();
+		const char	*getColumnName(uint64_t col);
 		uint64_t	getColCount();
 
-		const char	*getColumnName(uint64_t col);
 		const char	*getValue(uint64_t row, uint64_t col);
+		uint64_t	getRowCount();
+		bool		allRowsAvailable();
 	
 		#include <sqlrelay/private/sqlrresultsettable.h>
 };
