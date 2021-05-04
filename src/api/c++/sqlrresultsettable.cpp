@@ -66,6 +66,10 @@ const char *sqlrresultsettable::getValue(uint64_t row, uint64_t col) {
 	return (pvt->cursor)?pvt->cursor->getField(row,col):"";
 }
 
+const char *sqlrresultsettable::getValue(uint64_t row, const char *colname) {
+	return (pvt->cursor)?pvt->cursor->getField(row,colname):"";
+}
+
 uint64_t sqlrresultsettable::getRowCount() {
 	return (pvt->cursor)?pvt->cursor->rowCount():0;
 }

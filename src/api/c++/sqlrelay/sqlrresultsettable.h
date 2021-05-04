@@ -23,6 +23,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 		uint64_t	getColCount();
 
 		const char	*getValue(uint64_t row, uint64_t col);
+		const char	*getValue(uint64_t row, const char *colname);
 		uint64_t	getRowCount();
 		bool		allRowsAvailable();
 	
