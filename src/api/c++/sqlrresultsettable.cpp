@@ -21,7 +21,7 @@ sqlrresultsettable::sqlrresultsettable(sqlrcursor *cursor) :
 }
 
 sqlrresultsettable::~sqlrresultsettable() {
-	delete[] pvt;
+	delete pvt;
 }
 
 void sqlrresultsettable::setCursor(sqlrcursor *cursor) {
