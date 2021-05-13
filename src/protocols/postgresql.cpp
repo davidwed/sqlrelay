@@ -404,6 +404,9 @@ clientsessionexitstatus_t sqlrprotocol_postgresql::clientSession(
 
 	// end the session if necessary
 	if (endsession) {
+		stmtcursormap.clear();
+		portalcursormap.clear();
+		executeflag.clear();
 		cont->endSession();
 	}
 
@@ -1935,7 +1938,7 @@ bool sqlrprotocol_postgresql::parse() {
 
 		// map stmt -> cursor
 		stmtcursormap.setValue(charstring::duplicate(stmtname),cursor);
-	} 
+	}
 
 	// set the execute flag true
 	// (see execute() method for more info on this)
