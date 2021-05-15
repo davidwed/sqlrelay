@@ -5920,13 +5920,11 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 }
 
 uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
-	return (pvt->_columnmap)?
-			pvt->_columnmap->getValue(col):col;
+	return (pvt->_columnmap)?pvt->_columnmap->getValue(col):col;
 }
 
 uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
-	return (pvt->_columnmap)?
-			pvt->_columnmap->getList()->getLength():colcount;
+	return (pvt->_columnmap)?pvt->_columnmap->getLength():colcount;
 }
 
 bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,

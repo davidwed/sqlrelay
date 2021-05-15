@@ -112,7 +112,7 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 	}
 
 	// if there are any static columns...
-	if (staticvaluecolumnnames.getTree()->getLength()) {
+	if (staticvaluecolumnnames.getLength()) {
 
 		// loop, handling them
 		for (;;) {
@@ -297,7 +297,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 	}
 
 	// if there are any static columns...
-	if (staticvaluecolumnnames.getTree()->getLength()) {
+	if (staticvaluecolumnnames.getLength()) {
 
 		// loop, handling them
 		for (;;) {

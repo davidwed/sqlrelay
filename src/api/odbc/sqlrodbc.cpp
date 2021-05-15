@@ -2935,13 +2935,12 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 
-	linkedlist<dictionarynode<int32_t, outputbind *> *>
-				*list=stmt->outputbinds.getList();
-	for (listnode<dictionarynode<int32_t, outputbind *> *>
-					*node=list->getFirst();
-					node; node=node->getNext()) {
+	for (listnode<int32_t> *node=
+				stmt->outputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-		outputbind	*ob=node->getValue()->getValue();
+		outputbind	*ob=
+			stmt->outputbinds.getValue(node->getValue());
 
 		// convert parameternumber to a string
 		char	*parametername=charstring::parseNumber(
@@ -3277,13 +3276,12 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 
-	linkedlist<dictionarynode<int32_t, outputbind *> *>
-				*list=stmt->inputoutputbinds.getList();
-	for (listnode<dictionarynode<int32_t, outputbind *> *>
-					*node=list->getFirst();
-					node; node=node->getNext()) {
+	for (listnode<int32_t> *node=
+				stmt->inputoutputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-		outputbind	*ob=node->getValue()->getValue();
+		outputbind	*ob=
+			stmt->inputoutputbinds.getValue(node->getValue());
 
 		// convert parameternumber to a string
 		char	*parametername=charstring::parseNumber(
@@ -3866,7 +3864,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
 	stmt->currentstartrow=stmt->currentfetchrow;
 
 	// update column binds (if we have any)
-	if (stmt->fieldlist.getList()->getLength()) {
+	if (stmt->fieldlist.getLength()) {
 
 		for (uint64_t row=0; row<rowsfetched; row++) {
 
@@ -8324,18 +8322,14 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		// get the first bind number
 		listnode<SQLUSMALLINT>	*keynode=
 					stmt->dataatexeckeys->getFirst();
+		SQLUSMALLINT		key=keynode->getValue();
 
-		// get the corresponding bind buffer node
-		dictionarynode<SQLUSMALLINT,SQLPOINTER>	*valuenode=
-					stmt->dataatexecdict.getNode(
-							keynode->getValue());
+		// get the corresponding bind buffer
+		SQLPOINTER	val=stmt->dataatexecdict.getValue(key);
 
 		// keep track of the bind number
-		stmt->putdatabind=keynode->getValue();
+		stmt->putdatabind=key;
 		debugPrintf("  put-data bind: %d\n",stmt->putdatabind);
-
-		// get the bind buffer
-		SQLPOINTER	val=valuenode->getValue();
 
 		// pass the buffer out
 		if (value) {
@@ -8343,7 +8337,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		}
 
 		// remove the buffer and key
-		stmt->dataatexecdict.remove(valuenode);
+		stmt->dataatexecdict.remove(key);
 		stmt->dataatexeckeys->remove(keynode);
 
 		// reset the put data buffer

@@ -1412,11 +1412,11 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 	log.clearAndDelete();
 
 	// clear cache
-	for (listnode<dictionarynode<char *,linkedlist<char *> *> *>
-				*colcachenode=colcache.getList()->getFirst();
+	for (listnode<char *> *colcachenode=colcache.getKeys()->getFirst();
 				colcachenode;
 				colcachenode=colcachenode->getNext()) {
-		colcachenode->getValue()->getValue()->clearAndArrayDelete();
+		colcache.getValue(colcachenode->getValue())->
+						clearAndArrayDelete();
 	}
 	colcache.clearAndArrayDeleteKeysAndDeleteValues();
 	autoinccolcache.clear();

@@ -464,15 +464,14 @@ bool sqlrtranslations::getReplacementName(
 				const char **newobject) {
 
 	*newobject=NULL;
-	for (listnode< dictionarynode< sqlrdatabaseobject *, char * > *>
-					*node=dict->getList()->getFirst();
+	for (listnode<sqlrdatabaseobject *> *node=dict->getKeys()->getFirst();
 						node; node=node->getNext()) {
 
-		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
+		sqlrdatabaseobject	*dbo=node->getValue();
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(dbo->object,oldobject)) {
-			*newobject=node->getValue()->getValue();
+			*newobject=dict->getValue(dbo);
 			return true;
 		}
 	}
@@ -489,10 +488,10 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 	}
 
 	// remove any indices that depend on the table
-	for (listnode< dictionarynode< sqlrdatabaseobject *, char * > *>
-			*node=pvt->_indexnamemap.getList()->getFirst(); node;) {
+	for (listnode<sqlrdatabaseobject *> *node=
+			pvt->_indexnamemap.getKeys()->getFirst(); node;) {
 
-		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
+		sqlrdatabaseobject	*dbo=node->getValue();
 
 		// make sure to move on to the next node here rather than
 		// after calling remove, otherwise it could cause a
@@ -521,12 +520,11 @@ bool sqlrtranslations::removeReplacement(
 				const char *schema,
 				const char *object) {
 
-	for (listnode< dictionarynode< sqlrdatabaseobject *, char * > *>
-				*node=dict->getList()->getFirst();
-					node; node=node->getNext()) {
+	for (listnode<sqlrdatabaseobject *> *node=dict->getKeys()->getFirst();
+						node; node=node->getNext()) {
 
-		sqlrdatabaseobject	*dbo=node->getValue()->getKey();
-		const char	*replacementobject=node->getValue()->getValue();
+		sqlrdatabaseobject	*dbo=node->getValue();
+		const char		*replacementobject=dict->getValue(dbo);
 		if (!charstring::compare(dbo->database,database) &&
 			!charstring::compare(dbo->schema,schema) &&
 			!charstring::compare(replacementobject,object)) {

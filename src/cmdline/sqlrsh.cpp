@@ -115,18 +115,16 @@ sqlrshenv::~sqlrshenv() {
 
 void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 
-	for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
-					*node=binds->getList()->getFirst();
-		node; node=node->getNext()) {
+	for (listnode<char *> *node=binds->getKeys()->getFirst();
+						node; node=node->getNext()) {
 
-		delete[] node->getValue()->getKey();
-		sqlrshbindvalue	*bv=node->getValue()->getValue();
+		sqlrshbindvalue	*bv=binds->getValue(node->getValue());
 		if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 			delete[] bv->stringval;
 		}
 		delete bv;
 	}
-	binds->clear();
+	binds->clearAndArrayDeleteKeys();
 	inbindpool.clear();
 }
 
@@ -1216,14 +1214,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->clearBinds();
 
-	if (env->inputbinds.getList()->getLength()) {
+	if (env->inputbinds.getLength()) {
 
-		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
-				*node=env->inputbinds.getList()->getFirst();
+		for (listnode<char *> *node=
+				env->inputbinds.getKeys()->getFirst();
 				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->inputbinds.getValue(node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				sqlrcur->inputBind(name,bv->stringval);
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {
@@ -1252,14 +1251,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->outputbinds.getList()->getLength()) {
+	if (env->outputbinds.getLength()) {
 
-		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->outputbinds.getList()->getFirst();
-			node; node=node->getNext()) {
+		for (listnode<char *> *node=
+				env->outputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->outputbinds.getValue(node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				// FIXME: make buffer length variable
 				sqlrcur->defineOutputBindString(name,
@@ -1274,14 +1274,16 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->inputoutputbinds.getList()->getLength()) {
+	if (env->inputoutputbinds.getLength()) {
 
-		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->inputoutputbinds.getList()->getFirst();
-			node; node=node->getNext()) {
+		for (listnode<char *> *node=
+				env->inputoutputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->inputoutputbinds.getValue(
+						node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				sqlrcur->defineInputOutputBindString(name,
 						bv->stringval,
@@ -1311,14 +1313,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->executeQuery();
 
-	if (env->outputbinds.getList()->getLength()) {
+	if (env->outputbinds.getLength()) {
 
-		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->outputbinds.getList()->getFirst();
-			node; node=node->getNext()) {
+		for (listnode<char *> *node=
+				env->outputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->outputbinds.getValue(node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				delete[] bv->stringval;
 				bv->stringval=charstring::duplicate(
@@ -1344,14 +1347,16 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->inputoutputbinds.getList()->getLength()) {
+	if (env->inputoutputbinds.getLength()) {
 
-		for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->inputoutputbinds.getList()->getFirst();
-			node; node=node->getNext()) {
+		for (listnode<char *> *node=
+				env->inputoutputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->inputoutputbinds.getValue(
+						node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				delete[] bv->stringval;
 				bv->stringval=charstring::duplicate(
@@ -2213,12 +2218,11 @@ void sqlrsh::printbinds(const char *type,
 
 	stdoutput.printf("%s bind variables:\n",type);
 
-	for (listnode<dictionarynode<char *, sqlrshbindvalue *> *>
-					*node=binds->getList()->getFirst();
-		node; node=node->getNext()) {
+	for (listnode<char *> *node=binds->getKeys()->getFirst();
+						node; node=node->getNext()) {
 
-		stdoutput.printf("    %s ",node->getValue()->getKey());
-		sqlrshbindvalue	*bv=node->getValue()->getValue();
+		stdoutput.printf("    %s ",node->getValue());
+		sqlrshbindvalue	*bv=binds->getValue(node->getValue());
 		if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 			stdoutput.printf("(STRING) = %s\n",bv->stringval);
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {

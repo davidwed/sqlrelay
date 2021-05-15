@@ -64,10 +64,10 @@ bool sqlrprotocols::load(domnode *parameters) {
 
 void sqlrprotocols::unload() {
 	debugFunction();
-	for (listnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
-			*node=pvt->_protos.getList()->getFirst();
-			node; node=node->getNext()) {
-		sqlrprotocolplugin	*sqlrpp=node->getValue()->getValue();
+	for (listnode<uint16_t> *node=pvt->_protos.getKeys()->getFirst();
+						node; node=node->getNext()) {
+		sqlrprotocolplugin	*sqlrpp=
+					pvt->_protos.getValue(node->getValue());
 		delete sqlrpp->pr;
 		delete sqlrpp->dl;
 		delete sqlrpp;
@@ -153,17 +153,16 @@ sqlrprotocol *sqlrprotocols::getProtocol(uint16_t index) {
 }
 
 void sqlrprotocols::endTransaction(bool commit) {
-	for (listnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
-			*node=pvt->_protos.getList()->getFirst();
-			node; node=node->getNext()) {
-		node->getValue()->getValue()->pr->endTransaction(commit);
+	for (listnode<uint16_t> *node=pvt->_protos.getKeys()->getFirst();
+						node; node=node->getNext()) {
+		pvt->_protos.getValue(node->getValue())->
+					pr->endTransaction(commit);
 	}
 }
 
 void sqlrprotocols::endSession() {
-	for (listnode< dictionarynode< uint16_t, sqlrprotocolplugin * > *>
-			*node=pvt->_protos.getList()->getFirst();
-			node; node=node->getNext()) {
-		node->getValue()->getValue()->pr->endSession();
+	for (listnode<uint16_t> *node=pvt->_protos.getKeys()->getFirst();
+						node; node=node->getNext()) {
+		pvt->_protos.getValue(node->getValue())->pr->endSession();
 	}
 }

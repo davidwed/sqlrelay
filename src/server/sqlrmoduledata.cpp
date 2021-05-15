@@ -52,12 +52,9 @@ sqlrmoduledata_tag::sqlrmoduledata_tag(domnode *parameters) :
 }
 
 sqlrmoduledata_tag::~sqlrmoduledata_tag() {
-	avltree<dictionarynode<uint16_t, avltree<char *> *> *>
-						*tree=tags.getTree();
-	for (avltreenode<dictionarynode<uint16_t, avltree<char *> *> *>
-						*node=tree->getFirst();
-					node; node=tree->getNext(node)) {
-		node->getValue()->getValue()->clearAndArrayDelete();
+	for (listnode<uint16_t> *node=tags.getKeys()->getFirst();
+						node; node->getNext()) {
+		tags.getValue(node->getValue())->clearAndArrayDelete();
 	}
 	tags.clearAndDeleteValues();
 }
