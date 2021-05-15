@@ -3969,7 +3969,8 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 	bool	remapped=false;
 	for (i=0; i<3; i++) {
 
-		namevaluepairs		*mappings=cursor->getBindMappings();
+		dictionary<char *, char *>	*mappings=
+						cursor->getBindMappings();
 		uint16_t		count=0;
 		sqlrserverbindvar	*vars=NULL;
 		if (i==0) {
@@ -9918,7 +9919,7 @@ memorypool *sqlrservercontroller::getBindMappingsPool(
 	return cursor->getBindMappingsPool();
 }
 
-namevaluepairs *sqlrservercontroller::getBindMappings(
+dictionary<char *, char *> *sqlrservercontroller::getBindMappings(
 						sqlrservercursor *cursor) {
 	return cursor->getBindMappings();
 }
