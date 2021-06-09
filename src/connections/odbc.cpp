@@ -2401,60 +2401,144 @@ bool odbccursor::inputBind(const char *variable,
 		return false;
 	}
 
-	SQLPOINTER	val=NULL;
-	SQLSMALLINT	valtype=SQL_C_CHAR;
-	SQLSMALLINT	paramtype=SQL_CHAR;
-	SQLLEN		bufferlength=valuesize;
-	#ifdef HAVE_SQLCONNECTW
-	if (odbcconn->unicode) {
-
-		const char	*encoding=odbcconn->ncharencoding;
-		char	*err=NULL;
-		char	*valueucs=convertCharset(
-					value,valuesize,
-					"UTF-8",encoding,
-					&err);
-		if (err) {
-			delete[] valueucs;
-			setConvCharError("input bind",err);
-			return false;
-		}
-		valuesize=len(valueucs,encoding);
-		bufferlength=size(valueucs,encoding);
-		ucsinbindstrings.append(valueucs);
-		val=(SQLPOINTER)valueucs;
-		valtype=SQL_C_WCHAR;
-		paramtype=SQL_WVARCHAR;
-	} else {
-	#endif
-		val=(SQLPOINTER)value;
-	#ifdef HAVE_SQLCONNECTW
-	}
-	#endif
-
 	if (*isnull==SQL_NULL_DATA) {
-		// the 4th parameter (ValueType) must by
+
+		// We used to do something like this to bind a NULL:
+		//
+		//	erg=SQLBindParameter(stmt,
+		//			pos,
+		//			SQL_PARAM_INPUT,
+		//			SQL_C_BINARY,
+		//			SQL_CHAR,
+		//			1,		// in characters
+		//			0,
+		//			val,
+		//			bufferlength,	// in bytes
+		//			&sqlnulldata);
+		//
+		// (code to set val and bufferlength used to be above this if)
+		// (see #975 and the next "see #975" comment below
+		// for why there was a 1 for the 6th (ColumnSize) parameter)
+		//
+		// However, with ODBC Driver 17 for SQL Server (and possibly
+		// other versions, and other drivers) the above fails.
+		//
+		// It's not exactly clear what fails.  It's experimentally
+		// verifiable that, in this case, val="" and bufferlength=0.
+		// Somehow though, val gets interpreted as "*".
+		//
+		// It's also seemingly random what works.  Eg.
+		//
+		// This works:
+		//
+		//	select case when :foo is null then 'foo-null'
+		//	else 'foo-not-null' end as foo;
+		//
+		// It returns 'foo-null'
+		//
+		// However, this fails:
+		// 
+		//	select isnull(:foo, 99) as foo;
+		//
+		// It returns '*'
+		//
+		// Similarly, this also fails:
+		// 
+		//	select cast(isnull(:foo, 99) as int) as foo;
+		//
+		// It throws "Conversion failed when converting the varchar"
+		// "value '*' to data type int." as that '*' can't be converted
+		// to an int.
+		// 	
+		// It's strange.
+		//
+		// Setting the ColumnSize to 0 seems like an intuitive fix, but
+		// if ParameterType is SQL_CHAR, then we can't do that (see the
+		// "see #975" comment below for more detail on that).
+		//
+		// However, if we use a ParameterType of SQL_VARCHAR, then
+		// we can set ParameterValuePtr to NULL, ColumnSize to 0, and
+		// BufferLength to 0, and then it works.  Apparently a
+		// ColumnSize of 0 is allowed with SQL_VARCHARs and
+		// SQL_VARBINARYs, but not SQL_LONGVARCHARs or
+		// SQL_LONGVARBINARYs as it turns out.
+		//
+		// see #6232 for more detail
+		//
+		//
+		// NOTE: the 4th (ValueType) parameter must be
 		// SQL_C_BINARY (as opposed to SQL_C_WCHAR or SQL_C_CHAR)
 		// for this to work with blobs
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_BINARY,
-				SQL_CHAR,
-				1,
+				SQL_VARCHAR,
+				0,		// in characters
 				0,
-				val,
-				bufferlength,
+				NULL,
+				0,		// in bytes
 				&sqlnulldata);
+
 	} else {
 
+		SQLPOINTER	val=NULL;
+		SQLSMALLINT	valtype=SQL_C_CHAR;
+		SQLSMALLINT	paramtype=SQL_CHAR;
+		SQLLEN		bufferlength=valuesize;
+		#ifdef HAVE_SQLCONNECTW
+		if (odbcconn->unicode) {
+
+			const char	*encoding=odbcconn->ncharencoding;
+			char	*err=NULL;
+			char	*valueucs=convertCharset(
+						value,valuesize,
+						"UTF-8",encoding,
+						&err);
+			if (err) {
+				delete[] valueucs;
+				setConvCharError("input bind",err);
+				return false;
+			}
+			valuesize=len(valueucs,encoding);
+			bufferlength=size(valueucs,encoding);
+			ucsinbindstrings.append(valueucs);
+			val=(SQLPOINTER)valueucs;
+			valtype=SQL_C_WCHAR;
+			paramtype=SQL_WVARCHAR;
+		} else {
+		#endif
+			val=(SQLPOINTER)value;
+		#ifdef HAVE_SQLCONNECTW
+		}
+		#endif
+
 		if (!valuesize) {
-			// In ODBC-2 mode, SQL Server Native Client 11.0
-			// (at least) allows a valuesize of 0, when the value
-			// is "".  In non-ODBC-2 mode, it throws:
-			// "Invalid precision value" Using a valuesize of 1
-			// works with all ODBC-modes.  Hopefully it works with
-			// all drivers.
+			// see #975
+			// When binding an empty string, it's intuitive to set
+			// ColumnSize to 0, as ParameterValuePtr is "" and, as
+			// such, contains 0 characters.  This works with most
+			// drivers.
+			//
+			// However, with SQL Server Native Client ODBC Driver
+			// version 11.0 (and possibly later versions)...
+			//
+			// In ODBC-2 mode, it allows a ColumnSize of 0, but in
+			// non-ODBC-2 mode, it throws: "Invalid precision value"
+			//
+			// Setting ColumnSize to 1 appears to work around this,
+			// and works in all ODBC-modes.  BufferLength appears
+			// to override ColumnSize, so it's ok that the string
+			// is actually 0 characters long, even though we declare
+			// it to be 1.
+			//
+			// This workaound doesn't appear to break any other
+			// ODBC drivers either, so we'll go with it for now.
+			//
+			// NOTE: per the "see #6232" comment above...
+			// ColumnSize of 0 may only be invalid for a
+			// ParameterType of SQL_CHAR.  Using SQL_VARCHAR
+			// instead might be another solution to this problem.
 			valuesize=1;
 		} else if (odbcconn->maxallowedvarcharbindlength &&
 			valuesize>odbcconn->maxallowedvarcharbindlength) {
