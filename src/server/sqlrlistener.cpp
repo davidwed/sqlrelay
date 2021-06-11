@@ -551,9 +551,10 @@ void sqlrlistener::setHandoffMethod() {
         	char    *rel=sys::getOperatingSystemRelease();
         	double  ver=charstring::toFloatC(rel);
 	
-        	// force proxy for Cygwin and Linux < 2.2
+        	// force proxy Cygwin, Linux < 2.2, and Darwin
         	if (!charstring::compare(os,"CYGWIN",6) ||
-                	(!charstring::compare(os,"Linux",5) && ver<2.2)) {
+                	(!charstring::compare(os,"Linux",5) && ver<2.2) ||
+                	!charstring::compare(os,"Darwin",6)) {
 			pvt->_handoffmode=HANDOFF_PROXY;
 			stderror.printf("Warning: handoff=\"pass\" not "
 					"supported, falling back to "
