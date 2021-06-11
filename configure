@@ -16901,6 +16901,13 @@ $as_echo "no" >&6; }
 fi
 
 
+
+								BASH=`which bash`
+		if ( test -n "$BASH" )
+		then
+			SHELL="$BASH"
+
+		fi
 		;;
 	* )
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5

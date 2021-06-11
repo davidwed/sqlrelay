@@ -548,6 +548,16 @@ case $host_os in
 		DARWIN="yes"
 		AC_MSG_RESULT(yes)
 		FW_CHECK_WNOLONGDOUBLE
+
+		dnl prefer bash to the default shell, which could be tcsh or
+		dnl zsh on older versions, and which doesn't run libtool very
+		dnl well
+		BASH=`which bash`
+		if ( test -n "$BASH" )
+		then
+			SHELL="$BASH"
+			AC_SUBST(SHELL)
+		fi
 		;;
 	* )
 		AC_MSG_RESULT(no)
