@@ -137,7 +137,7 @@ Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 Perl DBI driver for SQL Relay.
 
 
-%if 0%{?fedora} || 0%{?rhel} > 7
+%if 0%{?fedora} || 0%{?rhel} > 6
 
 %package -n python3-%{name}
 License: ZPL 1.0 or MIT
@@ -658,7 +658,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/DBD::SQLRelay.*
 
 
-%if 0%{?fedora} || 0%{?rhel} > 7
+%if 0%{?fedora} || 0%{?rhel} > 6
 
 %files -n python3-%{name}
 %dir %{python3_sitearch}/SQLRelay/__pycache__
