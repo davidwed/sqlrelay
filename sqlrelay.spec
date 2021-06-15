@@ -137,7 +137,7 @@ Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 Perl DBI driver for SQL Relay.
 
 
-%if 0%{?fedora} || 0%{?rhel} > 7
+%if 0%{?fedora} || 0%{?rhel} > 6
 
 %package -n python3-%{name}
 License: ZPL 1.0 or MIT
@@ -658,7 +658,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/DBD::SQLRelay.*
 
 
-%if 0%{?fedora} || 0%{?rhel} > 7
+%if 0%{?fedora} || 0%{?rhel} > 6
 
 %files -n python3-%{name}
 %dir %{python3_sitearch}/SQLRelay/__pycache__
@@ -781,6 +781,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 * Fri Apr 30 2021 David Muse <david.muse@firstworks.com> - 2.0.0-1
 - Updated to version 2.0.0.
 - Removed support for mdbtools.
+- Updated to build python 3 packages for rhel > 6.
 
 * Thu Mar 04 2021 David Muse <david.muse@firstworks.com> - 1.9.0-1
 - Updated to version 1.9.0.
