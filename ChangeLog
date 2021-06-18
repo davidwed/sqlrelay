@@ -4,6 +4,7 @@
 	fixed some missing map clears in postgresql protocol module
 	fixed NULL-bind in the ODBC driver
 	updated spec file to build python 3 packages on rhel 7
+	added support for nested substitutions
 
 1.9.1 - backports from 2.0.0 branch:
 	fixed some missing map clears in postgresql protocol module

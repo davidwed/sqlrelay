@@ -500,9 +500,15 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("INDIVIDUAL SUBSTITUTIONS: \n");
 	cur->prepareQuery("select $(var1),'$(var2)',$(var3) from dual");
-	cur->substitution("var1",1);
-	cur->substitution("var2","hello");
-	cur->substitution("var3",10.5556,6,4);
+	cur->substitution("var1","$(var11)");
+	cur->substitution("var2","$(var21)");
+	cur->substitution("var3","$(var31)");
+	cur->substitution("var11","$(var111)");
+	cur->substitution("var21","$(var211)");
+	cur->substitution("var31","$(var311)");
+	cur->substitution("var111",1);
+	cur->substitution("var211","hello");
+	cur->substitution("var311",10.5556,6,4);
 	checkSuccess(cur->executeQuery(),1);
 	stdoutput.printf("\n");
 

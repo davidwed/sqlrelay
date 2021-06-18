@@ -13,7 +13,7 @@ class SQLRCLIENT_DLLSPEC sqlrconnection : public object {
 		 *  and "password".  Failed connections will be retried for
 		 *  "tries" times, waiting "retrytime" seconds between each
 		 *  try.  If "tries" is 0 then retries will continue forever.
-		 *  f "retrytime" is 0 then retries will be attempted on a
+		 *  If "retrytime" is 0 then retries will be attempted on a
 		 *  default interval.
 		 *
 		 *  If the "socket" parameter is neither NULL nor "" then an
