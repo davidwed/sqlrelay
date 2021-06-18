@@ -2372,6 +2372,13 @@ void sqlrcursor::performSubstitutions() {
 		}
 	}
 
+	// mark all vars that were substituted in as "done" so the next time
+	// this method gets called, they won't be processed.
+	for (uint64_t i=0; i<pvt->_subvars->getLength(); i++) {
+		(*pvt->_subvars)[i].donesubstituting=
+					(*pvt->_subvars)[i].substituted;
+	}
+
 	pvt->_dirtysubs=false;
 }
 
@@ -2509,13 +2516,6 @@ bool sqlrcursor::performSubstitutionsInternal() {
 			}
 			ptr++;
 		}
-	}
-
-	// mark all vars that were substituted in as "done" so the next time
-	// this method gets called, they won't be processed.
-	for (uint64_t i=0; i<pvt->_subvars->getLength(); i++) {
-		(*pvt->_subvars)[i].donesubstituting=
-					(*pvt->_subvars)[i].substituted;
 	}
 
 	delete[] pvt->_querybuffer;
