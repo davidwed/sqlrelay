@@ -126,7 +126,9 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 	private:
 				routercursor(sqlrserverconnection *conn,
 								uint16_t id);
+	public:
 				~routercursor();
+	private:
 		bool		prepareQuery(const char *query,
 						uint32_t length);
 		void		route(bool *routed, bool *err);
