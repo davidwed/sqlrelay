@@ -26,6 +26,7 @@
 #include <rudiments/inetsocketserver.h>
 #include <rudiments/listener.h>
 #include <rudiments/md5.h>
+#include <rudiments/sensitivevalue.h>
 
 #include <defines.h>
 #include <defaults.h>
@@ -108,7 +109,7 @@ class sqlrservercontrollerprivate {
 	sqlrprotocol	*_currentprotocol;
 
 	const char	*_user;
-	const char	*_password;
+	char		*_password;
 
 	bool		_dbchanged;
 	char		*_originaldb;
@@ -463,6 +464,8 @@ sqlrservercontroller::sqlrservercontroller() {
 sqlrservercontroller::~sqlrservercontroller() {
 
 	shutDown();
+
+	delete[] pvt->_password;
 
 	if (pvt->_connstats) {
 		bytestring::zero(pvt->_connstats,sizeof(sqlrconnstatistics));
@@ -8551,7 +8554,11 @@ void sqlrservercontroller::setUser(const char *user) {
 }
 
 void sqlrservercontroller::setPassword(const char *password) {
-	pvt->_password=password;
+	delete[] pvt->_password;
+	sensitivevalue	sv;
+	sv.parse(password);
+	// FIXME: options?
+	pvt->_password=sv.detachTextValue();
 }
 
 const char *sqlrservercontroller::getUser() {

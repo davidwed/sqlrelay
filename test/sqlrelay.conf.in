@@ -159,12 +159,27 @@
 				<user user="rot16test"
 					password="hej72juij"
 					passwordencryptionid="rot16"/>
+				<user user="rot13test"
+					password="ebg46grfg"
+					passwordencryptionid="rot13"/>
+				<user user="rot10test"
+					password="byd10docd"
+					passwordencryptionid="rot10"/>
 				<user user="md5test"
 					password="82da61aa724b5d149a9c5dc8682c2a45"
 					passwordencryptionid="md5"/>
+				<user user="sha1test"
+					password="12c4c60ee087ae0f12dc6abc88495e459f6f2654"
+					passwordencryptionid="sha1"/>
+				<user user="sha256test"
+					password="894152e00f8e37cf7b2f914362e2e0580c7b4be72c0eea8a3ceee615135305bc"
+					passwordencryptionid="sha256"/>
 				<user user="crypttest"
 					password="LlHuF6J06d6"
 					passwordencryptionid="crypt"/>
+				<user user="aes128test"
+					password="[aes128testcred]"
+					passwordencryptionid="aes128"/>
 			</auth>
 		</auths>
 		<passwordencryptions>
@@ -186,6 +201,15 @@
 			<passwordencryption module="crypt"
 						id="crypt"
 						salt="sr"/>
+			<passwordencryption module="aes128"
+						id="aes128"
+		keypath="/usr/local/firstworks/etc/sqlrelay.conf.d/aes128"
+						keybinext="aes128"
+						keyhexext="aes128hex"
+		credpath="/usr/local/firstworks/etc/sqlrelay.conf.d/aes128"
+						credbin="no"
+						credhexext="aes128"
+						key="[aes128testkey]"/>
 		</passwordencryptions>
 		<session>
 			<start>

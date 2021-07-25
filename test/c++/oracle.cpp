@@ -1049,7 +1049,6 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 	cur->prepareQuery("select count(*) from $(HOSTNAME)_temptablepreserve");
 	cur->substitution("HOSTNAME",hostname);
-con->debugOn();
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
 	cur->prepareQuery("truncate table $(HOSTNAME)_temptablepreserve");
