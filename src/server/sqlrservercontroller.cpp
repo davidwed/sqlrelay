@@ -109,7 +109,7 @@ class sqlrservercontrollerprivate {
 	sqlrprotocol	*_currentprotocol;
 
 	const char	*_user;
-	char		*_password;
+	const char	*_password;
 
 	bool		_dbchanged;
 	char		*_originaldb;
@@ -464,8 +464,6 @@ sqlrservercontroller::sqlrservercontroller() {
 sqlrservercontroller::~sqlrservercontroller() {
 
 	shutDown();
-
-	delete[] pvt->_password;
 
 	if (pvt->_connstats) {
 		bytestring::zero(pvt->_connstats,sizeof(sqlrconnstatistics));
@@ -8537,12 +8535,18 @@ const char *sqlrservercontroller::getConnectStringValue(const char *variable) {
 	const char	*peid=pvt->_constr->getPasswordEncryption();
 	if (pvt->_sqlrpe && charstring::length(peid) &&
 			!charstring::compare(variable,"password")) {
+
+		// handle password files
+		sensitivevalue	sv;
+		// FIXME: options?
+		sv.parse(pvt->_constr->getConnectStringValue(variable));
+
 		sqlrpwdenc	*pe=
 			pvt->_sqlrpe->getPasswordEncryptionById(peid);
 		if (!pe->oneWay()) {
 			delete[] pvt->_decrypteddbpassword;
-			pvt->_decrypteddbpassword=pe->decrypt(
-				pvt->_constr->getConnectStringValue(variable));
+			pvt->_decrypteddbpassword=
+					pe->decrypt(sv.getTextValue());
 			return pvt->_decrypteddbpassword;
 		}
 	}
@@ -8554,11 +8558,7 @@ void sqlrservercontroller::setUser(const char *user) {
 }
 
 void sqlrservercontroller::setPassword(const char *password) {
-	delete[] pvt->_password;
-	sensitivevalue	sv;
-	sv.parse(password);
-	// FIXME: options?
-	pvt->_password=sv.detachTextValue();
+	pvt->_password=password;
 }
 
 const char *sqlrservercontroller::getUser() {
