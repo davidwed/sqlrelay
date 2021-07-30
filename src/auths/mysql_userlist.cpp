@@ -6,6 +6,7 @@
 #include <rudiments/bytebuffer.h>
 #include <rudiments/sha1.h>
 #include <rudiments/sha256.h>
+#include <rudiments/sensitivevalue.h>
 
 class SQLRSERVER_DLLSPEC sqlrauth_mysql_userlist : public sqlrauth {
 	public:
@@ -24,6 +25,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_mysql_userlist : public sqlrauth {
 		const char	**passwords;
 		const char	**passwordencryptions;
 		uint64_t	usercount;
+
+		sensitivevalue	passwordvalue;
 
 		bool	debug;
 };
@@ -56,7 +59,9 @@ sqlrauth_mysql_userlist::sqlrauth_mysql_userlist(
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
-		passwords[i]=user->getAttributeValue("password");
+		// FIXME: options?
+		passwordvalue.parse(user->getAttributeValue("password"));
+		passwords[i]=passwordvalue.detachTextValue();
 
 		// support modern "passwordencryptionid" and fall back to
 		// older "passwordencryption" attribute
