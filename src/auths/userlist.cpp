@@ -47,11 +47,12 @@ sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
 	passwords=new char *[usercount];
 	passwordencryptions=new const char *[usercount];
 
+	passwordvalue.setPath(cont->getConfig()->getPasswordPath());
+
 	domnode *user=parameters->getFirstTagChild("user");
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
-		// FIXME: options?
 		passwordvalue.parse(user->getAttributeValue("password"));
 		passwords[i]=passwordvalue.detachTextValue();
 

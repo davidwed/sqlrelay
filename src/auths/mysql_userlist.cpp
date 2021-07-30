@@ -55,6 +55,8 @@ sqlrauth_mysql_userlist::sqlrauth_mysql_userlist(
 	passwords=new const char *[usercount];
 	passwordencryptions=new const char *[usercount];
 
+	passwordvalue.setPath(cont->getConfig()->getPasswordPath());
+
 	domnode *user=parameters->getFirstTagChild("user");
 	for (uint64_t i=0; i<usercount; i++) {
 

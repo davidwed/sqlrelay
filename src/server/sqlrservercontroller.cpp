@@ -8538,7 +8538,7 @@ const char *sqlrservercontroller::getConnectStringValue(const char *variable) {
 
 		// handle password files
 		sensitivevalue	sv;
-		// FIXME: options?
+		sv.setPath(pvt->_cfg->getPasswordPath());
 		sv.parse(pvt->_constr->getConnectStringValue(variable));
 
 		sqlrpwdenc	*pe=

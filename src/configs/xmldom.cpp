@@ -118,6 +118,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
 		bool		getWaitForDownDatabase();
+		const char	*getPasswordPath();
 
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
@@ -257,6 +258,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*isolationlevel;
 		bool		ignoreselectdb;
 		bool		waitfordowndb;
+		const char	*passwordpath;
 
 		linkedlist< char *>	sessionstartqueries;
 		linkedlist< char *>	sessionendqueries;
@@ -417,6 +419,7 @@ void sqlrconfig_xmldom::init() {
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
+	passwordpath=NULL;
 
 	defaultlistener=NULL;
 	defaultaddresses=NULL;
@@ -773,6 +776,9 @@ bool sqlrconfig_xmldom::getIgnoreSelectDatabase() {
 
 bool sqlrconfig_xmldom::getWaitForDownDatabase() {
 	return waitfordowndb;
+}
+const char *sqlrconfig_xmldom::getPasswordPath() {
+	return passwordpath;
 }
 
 linkedlist< char * > *sqlrconfig_xmldom::getSessionStartQueries() {
@@ -1925,6 +1931,10 @@ void sqlrconfig_xmldom::getTreeValues() {
 	attr=instance->getAttribute("waitfordowndatabase");
 	if (!attr->isNullNode()) {
 		waitfordowndb=charstring::isYes(attr->getValue());
+	}
+	attr=instance->getAttribute("passwordpath");
+	if (!attr->isNullNode()) {
+		passwordpath=attr->getValue();
 	}
 
 
