@@ -86,6 +86,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 
 	// get the credentials, either directly or from a file
 	credvalue.setVerbatimFormat((dec)?FORMAT_HEX:FORMAT_BINARY);
+	credvalue.parse(value);
 	uint64_t	credlen=credvalue.getValueSize();
 	unsigned char	*cred=credvalue.detachValue();
 	if (dec) {
