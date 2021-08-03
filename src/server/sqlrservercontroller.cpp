@@ -8917,11 +8917,9 @@ void sqlrservercontroller::raiseFilterViolationEvent(sqlrservercursor *cursor) {
 
 void sqlrservercontroller::raiseInternalErrorEvent(sqlrservercursor *cursor,
 							const char *info) {
-#if 0
 	if (!pvt->_sqlrlg && !pvt->_sqlrn) {
 		return;
 	}
-#endif
 	stringbuffer	errorbuffer;
 	errorbuffer.append(info);
 	if (error::getErrorNumber()) {
@@ -8929,8 +8927,6 @@ void sqlrservercontroller::raiseInternalErrorEvent(sqlrservercursor *cursor,
 		errorbuffer.append(": ")->append((error)?error:"");
 		delete[] error;
 	}
-stdoutput.printf("%s\n",errorbuffer.getString());
-#if 0
 	if (pvt->_sqlrlg) {
 		pvt->_sqlrlg->run(NULL,pvt->_conn,cursor,
 					SQLRLOGGER_LOGLEVEL_ERROR,
@@ -8942,7 +8938,6 @@ stdoutput.printf("%s\n",errorbuffer.getString());
 					SQLREVENT_INTERNAL_ERROR,
 					errorbuffer.getString());
 	}
-#endif
 }
 
 void sqlrservercontroller::raiseInternalWarningEvent(sqlrservercursor *cursor,
