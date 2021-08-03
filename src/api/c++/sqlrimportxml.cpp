@@ -196,6 +196,13 @@ bool sqlrimportxml::fieldTagStart() {
 
 
 bool sqlrimportxml::tableTagEnd() {
+
+	if (lg) {
+		lg->write(coarseloglevel,NULL,logindent,
+				"imported %lld rows",
+				(unsigned long long)rowcount);
+	}
+
 	if (commitcount) {
 		sqlrcon->commit();
 		if (lg) {
