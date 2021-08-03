@@ -10,7 +10,6 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 			sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
 						domnode *parameters);
-			~sqlrrouter_regex();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
@@ -30,6 +29,8 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
 						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
+	relist.setManageValues(true);
+
 	debug=cont->getConfig()->getDebugRouters();
 	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled && debug) {
@@ -56,10 +57,6 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 	if (debug && !relist.getLength()) {
 		stdoutput.printf("	WARNING! no patterns found\n");
 	}
-}
-
-sqlrrouter_regex::~sqlrrouter_regex() {
-	relist.clearAndDelete();
 }
 
 const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,

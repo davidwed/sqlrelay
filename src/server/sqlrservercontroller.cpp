@@ -1789,8 +1789,9 @@ int32_t sqlrservercontroller::waitForClient() {
 			if (pvt->_handoffsockun.read(&command)!=
 							sizeof(uint16_t)) {
 				raiseInternalErrorEvent(NULL,
-					"read handoff command failed");
-				raiseDebugMessageEvent("done waiting for client");
+						"read handoff command failed");
+				raiseDebugMessageEvent(
+						"done waiting for client");
 				// If this fails, then the listener most likely
 				// died because sqlr-stop was run.  Arguably
 				// this condition should initiate a shut down
@@ -1818,9 +1819,11 @@ int32_t sqlrservercontroller::waitForClient() {
 
 			// Receive the client file descriptor and use it.
 			if (!pvt->_handoffsockun.receiveSocket(&descriptor)) {
-				raiseInternalErrorEvent(NULL,"failed to receive "
+				raiseInternalErrorEvent(NULL,
+						"failed to receive "
 						"client file descriptor");
-				raiseDebugMessageEvent("done waiting for client");
+				raiseDebugMessageEvent(
+						"done waiting for client");
 				// If this fails, then the listener most likely
 				// died because sqlr-stop was run.  Arguably
 				// this condition should initiate a shut down
@@ -1839,7 +1842,8 @@ int32_t sqlrservercontroller::waitForClient() {
 				return -1;
 			}
 
-			raiseDebugMessageEvent("listener is proxying the client");
+			raiseDebugMessageEvent(
+					"listener is proxying the client");
 
 			// get the listener's pid
 			if (pvt->_handoffsockun.read(&pvt->_proxypid)!=
@@ -1866,7 +1870,8 @@ int32_t sqlrservercontroller::waitForClient() {
 
 		} else {
 
-			raiseInternalErrorEvent(NULL,"received invalid handoff mode");
+			raiseInternalErrorEvent(NULL,
+					"received invalid handoff mode");
 			return -1;
 		}
 
@@ -1889,7 +1894,8 @@ int32_t sqlrservercontroller::waitForClient() {
 		// a client to reconnect...
 
 		if (pvt->_lsnr.listen(pvt->_accepttimeout,0)<1) {
-			raiseInternalErrorEvent(NULL,"wait for client connect failed");
+			raiseInternalErrorEvent(NULL,
+					"wait for client connect failed");
 			return 0;
 		}
 
@@ -1930,7 +1936,8 @@ bool sqlrservercontroller::getProtocol() {
 
 	// get protocol index
 	if (pvt->_handoffsockun.read(&pvt->_protocolindex)!=sizeof(uint16_t)) {
-		raiseDebugMessageEvent("failed to get the client protocol index");
+		raiseDebugMessageEvent(
+			"failed to get the client protocol index");
 		return false;
 	}
 
@@ -7411,7 +7418,9 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 	// get the table, column names, and binds from the query...
 	char			*table=NULL;
 	linkedlist<char *>	cols;
+	cols.setManageArrayValues(true);
 	linkedlist<char *>	binds;
+	binds.setManageArrayValues(true);
 	bulkLoadParseInsert(pvt->_bulkquery,
 				pvt->_bulkquerylen,
 				&table,&cols,&binds);
@@ -7528,8 +7537,6 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 
 	// clean up
 	delete[] table;
-	cols.clearAndArrayDelete();
-	binds.clearAndArrayDelete();
 }
 
 void sqlrservercontroller::bulkLoadParseInsert(const char *query,
@@ -8910,9 +8917,11 @@ void sqlrservercontroller::raiseFilterViolationEvent(sqlrservercursor *cursor) {
 
 void sqlrservercontroller::raiseInternalErrorEvent(sqlrservercursor *cursor,
 							const char *info) {
+#if 0
 	if (!pvt->_sqlrlg && !pvt->_sqlrn) {
 		return;
 	}
+#endif
 	stringbuffer	errorbuffer;
 	errorbuffer.append(info);
 	if (error::getErrorNumber()) {
@@ -8920,6 +8929,8 @@ void sqlrservercontroller::raiseInternalErrorEvent(sqlrservercursor *cursor,
 		errorbuffer.append(": ")->append((error)?error:"");
 		delete[] error;
 	}
+stdoutput.printf("%s\n",errorbuffer.getString());
+#if 0
 	if (pvt->_sqlrlg) {
 		pvt->_sqlrlg->run(NULL,pvt->_conn,cursor,
 					SQLRLOGGER_LOGLEVEL_ERROR,
@@ -8931,6 +8942,7 @@ void sqlrservercontroller::raiseInternalErrorEvent(sqlrservercursor *cursor,
 					SQLREVENT_INTERNAL_ERROR,
 					errorbuffer.getString());
 	}
+#endif
 }
 
 void sqlrservercontroller::raiseInternalWarningEvent(sqlrservercursor *cursor,

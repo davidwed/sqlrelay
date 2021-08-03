@@ -50,7 +50,6 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		sqlrtrigger_replay(sqlrservercontroller *cont,
 						sqlrtriggers *ts,
 						domnode *parameters);
-		~sqlrtrigger_replay();
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						bool before,
@@ -142,6 +141,9 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 
 	debug=cont->getConfig()->getDebugTriggers();
 
+	log.setManageValues(true);
+	conditions.setManageValues(true);
+
 	// get whether to include selects
 	includeselects=charstring::isYes(
 			parameters->getAttributeValue("includeselects"));
@@ -191,10 +193,6 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 	wasintx=false;
 
 	disabled=false;
-}
-
-sqlrtrigger_replay::~sqlrtrigger_replay() {
-	conditions.clearAndDelete();
 }
 
 bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
@@ -248,14 +246,14 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	// to log the current query.  Clear the log.
 	if (!cont->inTransaction()) {
 		logpool.clear();
-		log.clearAndDelete();
+		log.clear();
 	}
 
 	// If we weren't in a transaction, but are now,
 	// then we also need to clear the log.
 	if (cont->inTransaction() && !wasintx) {
 		logpool.clear();
-		log.clearAndDelete();
+		log.clear();
 		wasintx=true;
 	}
 
@@ -389,7 +387,7 @@ void sqlrtrigger_replay::disableUntilEndOfTx(const char *query,
 	// and disable replay altogether until end-of-transaction.
 	if (cont->inTransaction()) {
 		logpool.clear();
-		log.clearAndDelete();
+		log.clear();
 		disabled=true;
 		if (debug) {
 			stdoutput.printf("%s query encountered, "
@@ -603,6 +601,7 @@ void sqlrtrigger_replay::getColumnsFromDb(char *table,
 					const char **autoinccolumn) {
 
 	*allcolumns=new linkedlist<char *>();
+	(*allcolumns)->setManageArrayValues(true);
 
 	// get all of the columns in the table
 	sqlrservercursor        *gclcur=cont->newCursor();
@@ -1189,7 +1188,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 		// roll back and clear the log on error
 		cont->rollback();
 		logpool.clear();
-		log.clearAndDelete();
+		log.clear();
 	}
 
 	// start logging queries again
@@ -1409,14 +1408,13 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 	}
 
 	logpool.clear();
-	log.clearAndDelete();
+	log.clear();
 
 	// clear cache
 	for (listnode<char *> *colcachenode=colcache.getKeys()->getFirst();
 				colcachenode;
 				colcachenode=colcachenode->getNext()) {
-		colcache.getValue(colcachenode->getValue())->
-						clearAndArrayDelete();
+		colcache.getValue(colcachenode->getValue())->clear();
 	}
 	colcache.clearAndArrayDeleteKeysAndDeleteValues();
 	autoinccolcache.clear();

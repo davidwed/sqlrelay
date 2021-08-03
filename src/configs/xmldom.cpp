@@ -24,7 +24,6 @@
 class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 	public:
 			sqlrconfig_xmldom();
-			~sqlrconfig_xmldom();
 
 		void	getEnabledIds(const char *urlname,
 					linkedlist< char * > *idlist);
@@ -288,7 +287,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		linkedlist< routecontainer *>		routelist;
 		linkedlist< connectstringcontainer * >	connectstringlist;
 
-		domnode	*defaultlistener;
+		domnode		*defaultlistener;
 		const char	*defaultaddresses;
 		uint16_t	defaultport;
 		const char	*defaultsocket;
@@ -312,12 +311,6 @@ sqlrconfig_xmldom::sqlrconfig_xmldom() : sqlrconfig(), xmldom(false) {
 	debugFunction();
 
 	init();
-}
-
-sqlrconfig_xmldom::~sqlrconfig_xmldom() {
-	debugFunction();
-
-	clear();
 }
 
 void sqlrconfig_xmldom::init() {
@@ -421,6 +414,11 @@ void sqlrconfig_xmldom::init() {
 	waitfordowndb=true;
 	passwordpath=NULL;
 
+	connectstringlist.setManageValues(true);
+	routelist.setManageValues(true);
+	sessionstartqueries.setManageArrayValues(true);
+	sessionendqueries.setManageArrayValues(true);
+
 	defaultlistener=NULL;
 	defaultaddresses=NULL;
 	defaultport=0;
@@ -439,10 +437,10 @@ void sqlrconfig_xmldom::init() {
 void sqlrconfig_xmldom::clear() {
 	debugFunction();
 
-	connectstringlist.clearAndDelete();
-	routelist.clearAndDelete();
-	sessionstartqueries.clearAndArrayDelete();
-	sessionendqueries.clearAndArrayDelete();
+	connectstringlist.clear();
+	routelist.clear();
+	sessionstartqueries.clear();
+	sessionendqueries.clear();
 }
 
 const char *sqlrconfig_xmldom::getDefaultAddresses() {
