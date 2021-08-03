@@ -503,7 +503,7 @@ bool sqlrimportcsv::rowEnd() {
 
 			if (lg) {
 				if (!(committedcount%10)) {
-					lg->write(coarseloglevel,NULL,logindent,
+					lg->write(fineloglevel,NULL,logindent,
 						"committed %lld rows "
 						"(to %s)...",
 						(unsigned long long)rowcount,
@@ -522,6 +522,12 @@ bool sqlrimportcsv::rowEnd() {
 }
 
 bool sqlrimportcsv::bodyEnd() {
+
+	if (lg) {
+		lg->write(coarseloglevel,NULL,logindent,
+				"imported %lld rows",
+				(unsigned long long)rowcount);
+	}
 
 	// final commit
 	if (commitcount) {
