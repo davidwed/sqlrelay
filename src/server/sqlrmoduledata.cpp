@@ -54,7 +54,7 @@ sqlrmoduledata_tag::sqlrmoduledata_tag(domnode *parameters) :
 sqlrmoduledata_tag::~sqlrmoduledata_tag() {
 	for (listnode<uint16_t> *node=tags.getKeys()->getFirst();
 						node; node->getNext()) {
-		tags.getValue(node->getValue())->clearAndArrayDelete();
+		tags.getValue(node->getValue())->clear();
 	}
 	tags.clearAndDeleteValues();
 }
@@ -66,6 +66,7 @@ void sqlrmoduledata_tag::addTag(uint16_t cursorid, const char *tag) {
 	}
 	if (!tree) {
 		tree=new avltree<char *>();
+		tree->setManageArrayValues(true);
 		tags.setValue(cursorid,tree);
 	}
 	tree->insert(charstring::duplicate(tag));
@@ -79,6 +80,7 @@ void sqlrmoduledata_tag::addTag(uint16_t cursorid,
 	}
 	if (!tree) {
 		tree=new avltree<char *>();
+		tree->setManageArrayValues(true);
 		tags.setValue(cursorid,tree);
 	}
 	tree->insert(charstring::duplicate(tag,size));
@@ -96,7 +98,7 @@ bool sqlrmoduledata_tag::tagExists(uint16_t cursorid, const char *tag) {
 void sqlrmoduledata_tag::closeResultSet(sqlrservercursor *sqlrcur) {
 	avltree<char *>	*tree=tags.getValue(sqlrcur->getId());
 	if (tree) {
-		tree->clearAndArrayDelete();
+		tree->clear();
 		tags.removeAndDeleteValue(sqlrcur->getId());
 	}
 }

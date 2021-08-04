@@ -2197,6 +2197,9 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	bindformaterror=false;
+	#ifdef HAVE_SQLCONNECTW
+	ucsinbindstrings.setManageArrayValues(true);
+	#endif
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 	initializeColCounts();
 	initializeRowCounts();
@@ -2212,7 +2215,7 @@ odbccursor::~odbccursor() {
 	delete[] inoutisnullptr;
 	delete[] inoutisnull;
 	#ifdef HAVE_SQLCONNECTW
-	ucsinbindstrings.clearAndArrayDelete();
+	ucsinbindstrings.clear();
 	#endif
 	deallocateResultSetBuffers();
 }
@@ -2290,7 +2293,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
 
-		ucsinbindstrings.clearAndArrayDelete();
+		ucsinbindstrings.clear();
 
 		if (getExecuteDirect()) {
 			return true;
@@ -2351,7 +2354,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
 
-			ucsinbindstrings.clearAndArrayDelete();
+			ucsinbindstrings.clear();
 
 			char *queryucs=convertCharset(query,length,
 							"UTF-8",
@@ -3212,8 +3215,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	#ifdef HAVE_SQLCONNECTW
-		// free buffers used to convert string-binds to unicode
-		ucsinbindstrings.clearAndArrayDelete();
+	// free buffers used to convert string-binds to unicode
+	ucsinbindstrings.clear();
 	#endif
 
 	if (erg!=SQL_SUCCESS &&

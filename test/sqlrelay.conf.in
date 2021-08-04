@@ -203,10 +203,10 @@
 						salt="sr"/>
 			<passwordencryption module="aes128"
 						id="aes128"
-		keypath="/usr/local/firstworks/etc/sqlrelay.conf.d/aes128"
+		keypath="/usr/local/firstworks/etc/sqlrelay.conf.d/extensions"
 						keybinext="aes128"
 						keyhexext="aes128hex"
-		credpath="/usr/local/firstworks/etc/sqlrelay.conf.d/aes128"
+		credpath="/usr/local/firstworks/etc/sqlrelay.conf.d/extensions"
 						credbin="no"
 						credhexext="aes128"
 						key="[aes128testkey]"/>

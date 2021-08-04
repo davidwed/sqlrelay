@@ -4,6 +4,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
+#include <rudiments/signalclasses.h>
 #include <sqlrelay/sqlrclient.h>
 #include <string.h>
 #include <stdlib.h>
@@ -93,6 +94,20 @@ void checkSuccess(double value, double success) {
 }
 
 int	main(int argc, char **argv) {
+
+	// The extensionstest instance uses connections="0", so the
+	// sqlr-connection process exits after each client session.  When the
+	// client sends its final endSession(), and the server can receive it,
+	// process it, and exit, before the client's final write() system call
+	// returns, causing the client to receive a SIGPIPE.  It all depends on
+	// timing though, and doesn't happen every time.  We'll ignore SIGPIPE
+	// here to manage this.
+	#ifdef SIGPIPE
+	signalset	set;
+	set.removeAllSignals();
+	set.addSignal(SIGPIPE);
+	signalmanager::ignoreSignals(&set);
+	#endif
 
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
@@ -440,7 +455,6 @@ int	main(int argc, char **argv) {
 		NULL
 	};
 	for (const char **usrpwd=usrpwds; *usrpwd; usrpwd++) {
-stdoutput.printf("%s\n",*usrpwd);
 		con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							*usrpwd,*usrpwd,0,1);
 		cur=new sqlrcursor(con);
