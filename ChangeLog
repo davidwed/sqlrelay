@@ -9,6 +9,9 @@
 	updates aes128 pwdenc module to use sensitivevalue class instead of
 		its built-in implementation
 	updated debug logger to not log null/empty info
+	fixed a subtle bug that could cause closeResultSet()/clearError() not
+		to be called between reexecutes if the previous execute resulted
+		in an error
 
 1.9.1 - backports from 2.0.0 branch:
 	fixed some missing map clears in postgresql protocol module

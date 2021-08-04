@@ -4950,9 +4950,10 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	success=cursor->executeQuery(query,querylen);
 
 	// set flag indicating that the query has been executed
-	if (success) {
-		cursor->setQueryHasBeenExecuted(true);
-	}
+	// NOTE: We want to do this whether the query succeeds or fails so that
+	// if its reexecuted, closeResultSet() and clearError() will be called
+	// before the reexecution.
+	cursor->setQueryHasBeenExecuted(true);
 
 	// set the query end time
 	dt.getSystemDateAndTime();
