@@ -385,6 +385,10 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->coloffsets=NULL;
 				stmt->paramsprocessed=NULL;
 				stmt->parambindoffsetptr=NULL;
+				stmt->inputbindstrings.
+					setManageArrayValues(true);
+				stmt->outputbinds.setManageValues(true);
+				stmt->inputoutputbinds.setManageValues(true);
 
 				// set flags
 				if (!charstring::compare(
@@ -719,9 +723,9 @@ static void SQLR_ResetParams(STMT *stmt) {
 	debugFunction();
 
 	stmt->cur->clearBinds();
-	stmt->inputbindstrings.clearAndArrayDeleteValues();
-	stmt->outputbinds.clearAndDeleteValues();
-	stmt->inputoutputbinds.clearAndDeleteValues();
+	stmt->inputbindstrings.clear();
+	stmt->outputbinds.clear();
+	stmt->inputoutputbinds.clear();
 }
 
 static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {

@@ -27,6 +27,8 @@ sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 	rowcount=0;
 	committedcount=0;
 	columnswithemptynamesnode=NULL;
+	staticvaluecolumnnames.setManageArrayValues(true);
+	staticvaluecolumnvalues.setManageArrayValues(true);
 }
 
 sqlrimportcsv::~sqlrimportcsv() {
@@ -34,8 +36,6 @@ sqlrimportcsv::~sqlrimportcsv() {
 	delete[] primarykeysequence;
 	delete[] numbercolumn;
 	delete[] datecolumn;
-	staticvaluecolumnnames.clearAndArrayDeleteValues();
-	staticvaluecolumnvalues.clearAndArrayDeleteValues();
 }
 
 void sqlrimportcsv::insertPrimaryKey(const char *primarykeycolumnname,
@@ -67,8 +67,8 @@ void sqlrimportcsv::insertStaticValue(const char *columnname,
 }
 
 void sqlrimportcsv::removeStaticValue(uint32_t columnindex) {
-	staticvaluecolumnnames.removeAndArrayDeleteValue(columnindex);
-	staticvaluecolumnvalues.removeAndArrayDeleteValue(columnindex);
+	staticvaluecolumnnames.remove(columnindex);
+	staticvaluecolumnvalues.remove(columnindex);
 }
 
 void sqlrimportcsv::setIgnoreColumnsWithEmptyNames(

@@ -139,6 +139,10 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 					sqlrtrigger(cont,ts,parameters) {
 	this->cont=cont;
 
+	colcache.setManageArrayKeys(true);
+	colcache.setManageValues(true);
+	
+
 	debug=cont->getConfig()->getDebugTriggers();
 
 	log.setManageValues(true);
@@ -1416,7 +1420,7 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 				colcachenode=colcachenode->getNext()) {
 		colcache.getValue(colcachenode->getValue())->clear();
 	}
-	colcache.clearAndArrayDeleteKeysAndDeleteValues();
+	colcache.clear();
 	autoinccolcache.clear();
 
 	wasintx=false;

@@ -233,6 +233,9 @@ postgresqlconnection::postgresqlconnection(sqlrservercontroller *cont) :
 	lastinsertidquery=NULL;
 	identity=NULL;
 	hostname=NULL;
+
+	datatypes.setManageArrayValues(true);
+	tables.setManageArrayValues(true);
 }
 
 postgresqlconnection::~postgresqlconnection() {
@@ -293,12 +296,12 @@ bool postgresqlconnection::logIn(const char **error,
 
 	// clear the datatype dictionary
 	if (typemangling==2) {
-		datatypes.clearAndArrayDeleteValues();
+		datatypes.clear();
 	}
 
 	// clear the table dictionary
 	if (tablemangling==2) {
-		tables.clearAndArrayDeleteValues();
+		tables.clear();
 	}
 
 	// log in
@@ -432,12 +435,12 @@ void postgresqlconnection::logOut() {
 
 	// clear the datatype dictionary
 	if (typemangling==2) {
-		datatypes.clearAndArrayDeleteValues();
+		datatypes.clear();
 	}
 
 	// clear the table dictionary
 	if (typemangling==2) {
-		tables.clearAndArrayDeleteValues();
+		tables.clear();
 	}
 }
 

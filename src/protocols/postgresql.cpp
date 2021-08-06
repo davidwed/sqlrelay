@@ -231,6 +231,12 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 	integerdatetimes=NULL;
 	stdconfstr=NULL;
 
+	stmtcursormap.setManageArrayKeys(true);
+	portalcursormap.setManageArrayKeys(true);
+	options.setManageArrayKeys(true);
+	options.setManageArrayValues(true);
+	paramoids.setManageArrayValues(true);
+
 	authmethod="postgresql_md5";
 	const char	*pwds=parameters->getAttributeValue("passwords");
 	if (!charstring::compareIgnoringCase(pwds,"cleartext")) {
@@ -290,8 +296,6 @@ sqlrprotocol_postgresql::~sqlrprotocol_postgresql() {
 	}
 	delete[] bindvarnames;
 
-	paramoids.clearAndArrayDeleteValues();
-
 	free();
 	delete[] reqpacket;
 
@@ -321,7 +325,7 @@ void sqlrprotocol_postgresql::free() {
 	delete[] password;
 	delete[] database;
 	delete[] replication;
-	options.clearAndArrayDelete();
+	options.clear();
 }
 
 
@@ -1965,7 +1969,7 @@ bool sqlrprotocol_postgresql::parse() {
 	for (uint16_t i=0; i<paramcount; i++) {
 		readBE(rp,&(paramtypes[i]),&rp);
 	}
-	paramoids.removeAndArrayDeleteValue(cursor);
+	paramoids.remove(cursor);
 	paramoids.setValue(cursor,paramtypes);
 
 	// debug
@@ -2757,7 +2761,7 @@ bool sqlrprotocol_postgresql::close() {
 	}
 
 	// remove stmt/portal -> cursor mapping
-	dict->removeAndArrayDeleteKey((char *)name.getString());
+	dict->remove((char *)name.getString());
 
 	// mark the cursor available
 	cont->setState(cursor,SQLRCURSORSTATE_AVAILABLE);

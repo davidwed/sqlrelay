@@ -49,6 +49,7 @@ void sqlrmoduledata::endSession() {
 
 sqlrmoduledata_tag::sqlrmoduledata_tag(domnode *parameters) :
 					sqlrmoduledata(parameters) {
+	tags.setManageValues(true);
 }
 
 sqlrmoduledata_tag::~sqlrmoduledata_tag() {
@@ -56,7 +57,7 @@ sqlrmoduledata_tag::~sqlrmoduledata_tag() {
 						node; node->getNext()) {
 		tags.getValue(node->getValue())->clear();
 	}
-	tags.clearAndDeleteValues();
+	tags.clear();
 }
 
 void sqlrmoduledata_tag::addTag(uint16_t cursorid, const char *tag) {
@@ -99,6 +100,6 @@ void sqlrmoduledata_tag::closeResultSet(sqlrservercursor *sqlrcur) {
 	avltree<char *>	*tree=tags.getValue(sqlrcur->getId());
 	if (tree) {
 		tree->clear();
-		tags.removeAndDeleteValue(sqlrcur->getId());
+		tags.remove(sqlrcur->getId());
 	}
 }

@@ -104,6 +104,9 @@ sqlrshenv::sqlrshenv() {
 	noelapsed=false;
 	nextresultset=false;
 	txqueries=false;
+	inputbinds.setManageArrayKeys(true);
+	outputbinds.setManageArrayKeys(true);
+	inputoutputbinds.setManageArrayKeys(true);
 }
 
 sqlrshenv::~sqlrshenv() {
@@ -124,7 +127,7 @@ void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 		}
 		delete bv;
 	}
-	binds->clearAndArrayDeleteKeys();
+	binds->clear();
 	inbindpool.clear();
 }
 
