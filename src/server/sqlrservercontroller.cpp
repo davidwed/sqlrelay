@@ -2056,6 +2056,17 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 	// if we can't create any new cursors then return an error
 	if (pvt->_cursorcount==pvt->_maxcursorcount) {
 		raiseDebugMessageEvent("all cursors are busy");
+		for (uint16_t i=0; i<pvt->_cursorcount; i++) {
+			pvt->_debugstr.clear();
+			uint32_t	querylen=pvt->_cur[i]->getQueryLength();
+			if (querylen>40) {
+				querylen=40;
+			}
+			pvt->_debugstr.append("cursor ")->
+				append(i)->append(": ")->
+				append(pvt->_cur[i]->getQueryBuffer(),querylen);
+			raiseDebugMessageEvent(pvt->_debugstr.getString());
+		}
 		return NULL;
 	}
 

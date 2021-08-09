@@ -13,6 +13,10 @@
 		to be called between reexecutes if the previous execute resulted
 		in an error
 
+1.9.2 - ruby cursor constructor marks associated ruby connection object now
+	updated bad-command and no-cursor-available handling in sqlrclient
+		protocol module
+
 1.9.1 - backports from 2.0.0 branch:
 	fixed some missing map clears in postgresql protocol module
 	fixed NULL-bind in the ODBC driver

@@ -337,6 +337,15 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 			break;
 		} else
 
+		// handle bad commands
+		if (command>MAXCOMMAND) {
+			debugstr.clear();
+			debugstr.append("bad command: ")->append(command);
+			cont->raiseDebugMessageEvent(debugstr.getString());
+			endsession=true;
+			break;
+		} else
+
 		// these commands are all handled at the connection level
 		if (command==AUTH) {
 			cont->incrementAuthCount();
@@ -524,7 +533,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 	// socket.  We have to absorb all of that data.  We shouldn't just loop
 	// forever though, that would provide a point of entry for a DOS attack.
 	// We'll read the maximum number of bytes that could be sent.
-	cont->closeClientConnection(
+	uint32_t	bytecount=
 				// sending auth
 				(sizeof(uint16_t)+
 				// user/password
@@ -535,6 +544,8 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 				sizeof(uint16_t)+
 				// executing new query
 				sizeof(uint16_t)+
+				// client info
+				sizeof(uint64_t)+maxclientinfolength+
 				// query size and query
 				sizeof(uint32_t)+maxquerysize+
 				// input bind var count
@@ -547,13 +558,24 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 				// output bind vars
 				maxbindcount*(2*sizeof(uint16_t)+
 						maxbindnamelength)+
+				// inputoutput bind var count
+				sizeof(uint16_t)+
+				// inputoutput bind vars
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// get column info
 				sizeof(uint16_t)+
 				// skip/fetch
 				2*sizeof(uint32_t)
 				// divide by two because we're
 				// reading 2 bytes at a time
-				)/2);
+				)/2;
+
+	debugstr.clear();
+	debugstr.append("absorbing ")->append(bytecount)->append(" bytes");
+	cont->raiseDebugMessageEvent(debugstr.getString());
+
+	cont->closeClientConnection(bytecount);
 
 	// end the session if necessary
 	if (endsession) {
@@ -697,7 +719,7 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	debugFunction();
 
 	// If no cursor was available, the client
-	// cound send an entire query and bind vars
+	// could send an entire query and bind vars
 	// before it reads the error and closes the
 	// socket.  We have to absorb all of that
 	// data.  We shouldn't just loop forever
@@ -705,6 +727,8 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	// for a DOS attack.  We'll read the maximum
 	// number of bytes that could be sent.
 	uint32_t	size=(
+				// client info
+				sizeof(uint64_t)+maxclientinfolength+
 				// query size and query
 				sizeof(uint32_t)+maxquerysize+
 				// input bind var count
@@ -717,16 +741,28 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 				// output bind vars
 				maxbindcount*(2*sizeof(uint16_t)+
 						maxbindnamelength)+
+				// inputoutput bind var count
+				sizeof(uint16_t)+
+				// inputoutput bind vars
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// get column info
 				sizeof(uint16_t)+
 				// skip/fetch
 				2*sizeof(uint32_t));
+	debugstr.clear();
+	debugstr.append("absorbing ")->append(size)->append(" bytes");
+	cont->raiseDebugMessageEvent(debugstr.getString());
 
 	clientsock->useNonBlockingMode();
 	unsigned char	*dummy=new unsigned char[size];
-	clientsock->read(dummy,size,idleclienttimeout,0);
+	ssize_t	bytesread=clientsock->read(dummy,size,idleclienttimeout,0);
 	clientsock->useBlockingMode();
 	delete[] dummy;
+
+	debugstr.clear();
+	debugstr.append("absorbed ")->append(bytesread)->append(" bytes");
+	cont->raiseDebugMessageEvent(debugstr.getString());
 
 	// indicate that an error has occurred
 	clientsock->write((uint16_t)ERROR_OCCURRED);
