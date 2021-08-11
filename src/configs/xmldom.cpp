@@ -775,6 +775,7 @@ bool sqlrconfig_xmldom::getIgnoreSelectDatabase() {
 bool sqlrconfig_xmldom::getWaitForDownDatabase() {
 	return waitfordowndb;
 }
+
 const char *sqlrconfig_xmldom::getPasswordPath() {
 	return passwordpath;
 }
