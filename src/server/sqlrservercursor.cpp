@@ -32,7 +32,7 @@ class sqlrservercursorprivate {
 
 		memorypool	_bindpool;
 		memorypool	_bindmappingspool;
-		namevaluepairs	*_bindmappings;
+		dictionary<char *, char *>	*_bindmappings;
 
 		uint16_t		_inbindcount;
 		sqlrserverbindvar	*_inbindvars;
@@ -123,7 +123,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	pvt->_maxerrorlength=conn->cont->getConfig()->getMaxErrorLength();
 
-	pvt->_bindmappings=new namevaluepairs;
+	pvt->_bindmappings=new dictionary<char *, char *>();
 
 	setInputBindCount(0);
 	pvt->_inbindvars=new sqlrserverbindvar[
@@ -1089,7 +1089,7 @@ memorypool *sqlrservercursor::getBindPool() {
 	return &pvt->_bindpool;
 }
 
-namevaluepairs *sqlrservercursor::getBindMappings() {
+dictionary<char *, char *> *sqlrservercursor::getBindMappings() {
 	return pvt->_bindmappings;
 }
 

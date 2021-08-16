@@ -10,7 +10,6 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 			sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
 						domnode *parameters);
-			~sqlrrouter_regex();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
@@ -30,6 +29,8 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
 						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
+	relist.setManageValues(true);
+
 	debug=cont->getConfig()->getDebugRouters();
 	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled && debug) {
@@ -58,10 +59,6 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 	}
 }
 
-sqlrrouter_regex::~sqlrrouter_regex() {
-	relist.clearAndDelete();
-}
-
 const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char **err,
@@ -76,7 +73,7 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 	}
 
 	const char	*query=sqlrcur->getQueryBuffer();
-	for (linkedlistnode< regularexpression *> *rn=relist.getFirst();
+	for (listnode< regularexpression *> *rn=relist.getFirst();
 							rn; rn=rn->getNext()) {
 		if (rn->getValue()->match(query)) {
 			if (debug) {

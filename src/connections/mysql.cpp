@@ -150,6 +150,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 #endif
 
 		void		closeResultSet();
+		void		freeResult();
 
 		bool		columnInfoIsValidAfterPrepare();
 
@@ -682,10 +683,10 @@ const char *mysqlconnection::getColumnListQuery(
 
 	// split the table name into db/schema/table parts
 	const char	*currentdb="def";
-	char	*currentschema=getCurrentDatabase();
-	char	*dbname=NULL;
-	char	*schemaname=NULL;
-	char	*tablename=NULL;
+	char		*currentschema=getCurrentDatabase();
+	const char	*dbname=NULL;
+	const char	*schemaname=NULL;
+	const char	*tablename=NULL;
 	cont->splitObjectName(currentdb,currentschema,table,
 				&dbname,&schemaname,&tablename);
 
@@ -725,9 +726,6 @@ const char *mysqlconnection::getColumnListQuery(
 
 	// clean up
 	delete[] currentschema;
-	delete[] dbname;
-	delete[] schemaname;
-	delete[] tablename;
 
 	return columnlistquery.getString();
 }
@@ -919,6 +917,7 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 			"^[ 	\r\n]*"
 			"(/\\*.*\\*/[ 	\r\n]+)*"
 			"(("
+				"explain|EXPLAIN|"
 				"create|CREATE|"
 				"drop|DROP|"
 				"procedure|PROCEDURE|"
@@ -1041,7 +1040,10 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 
-	// reset the bind counter and flags
+	// reset bind-related stuff
+	if (boundvariables) {
+		bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
+	}
 	boundvariables=false;
 	bindformaterror=false;
 
@@ -1054,6 +1056,15 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	if (!supportsNativeBinds(query,length)) {
 		return true;
 	}
+
+	// free any lingering statements
+	if (stmtfreeresult) {
+		mysql_stmt_free_result(stmt);
+		stmtfreeresult=false;
+	}
+
+	// free any lingering result sets
+	freeResult();
 
 	// prepare the statement
 	if (mysql_stmt_prepare(stmt,query,length)) {
@@ -1946,19 +1957,10 @@ void mysqlcursor::closeLobField(uint32_t col) {
 void mysqlcursor::closeResultSet() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
-		if (boundvariables) {
-			bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
-			boundvariables=false;
-		}
 
 		if (stmtreset) {
 			mysql_stmt_reset(stmt);
 			stmtreset=false;
-		}
-
-		if (stmtfreeresult) {
-			mysql_stmt_free_result(stmt);
-			stmtfreeresult=false;
 		}
 
 		// In mariadb-client-lgpl_2.x, if a mysql_stmt_prepare fails,
@@ -1971,8 +1973,15 @@ void mysqlcursor::closeResultSet() {
 			stmt=mysql_stmt_init(mysqlconn->mysqlptr);
 			stmtpreparefailed=false;
 		}
+	} else {
+		freeResult();
 	}
+#else
+	freeResult();
 #endif
+}
+
+void mysqlcursor::freeResult() {
 	if (mysqlresult!=(MYSQL_RES *)NULL) {
 		mysql_free_result(mysqlresult);
 		mysqlresult=NULL;

@@ -64,7 +64,7 @@ bool sqlrdirectives::load(domnode *parameters) {
 
 void sqlrdirectives::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrdirectiveplugin * > *node=
+	for (listnode< sqlrdirectiveplugin * > *node=
 						pvt->_dlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrdirectiveplugin	*sqlt=node->getValue();
@@ -166,7 +166,7 @@ bool sqlrdirectives::run(sqlrserverconnection *sqlrcon,
 		return false;
 	}
 
-	for (singlylinkedlistnode< sqlrdirectiveplugin * > *node=
+	for (listnode< sqlrdirectiveplugin * > *node=
 						pvt->_dlist.getFirst();
 						node; node=node->getNext()) {
 

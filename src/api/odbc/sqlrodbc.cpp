@@ -385,6 +385,10 @@ static SQLRETURN SQLR_SQLAllocHandle(SQLSMALLINT handletype,
 				stmt->coloffsets=NULL;
 				stmt->paramsprocessed=NULL;
 				stmt->parambindoffsetptr=NULL;
+				stmt->inputbindstrings.
+					setManageArrayValues(true);
+				stmt->outputbinds.setManageValues(true);
+				stmt->inputoutputbinds.setManageValues(true);
 
 				// set flags
 				if (!charstring::compare(
@@ -719,9 +723,9 @@ static void SQLR_ResetParams(STMT *stmt) {
 	debugFunction();
 
 	stmt->cur->clearBinds();
-	stmt->inputbindstrings.clearAndArrayDeleteValues();
-	stmt->outputbinds.clearAndDeleteValues();
-	stmt->inputoutputbinds.clearAndDeleteValues();
+	stmt->inputbindstrings.clear();
+	stmt->outputbinds.clear();
+	stmt->inputoutputbinds.clear();
 }
 
 static SQLRETURN SQLR_SQLCloseCursor(SQLHSTMT statementhandle) {
@@ -2115,7 +2119,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 					tablename,namelength3);
 
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length(columnname);
+		namelength4=charstring::length((const char *)columnname);
 	}
 	char	*wild=charstring::duplicate(
 				(const char *)columnname,namelength4);
@@ -2174,7 +2178,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 
 	// copy the dsn, sometimes it's not NULL-terminated
 	if (dsnlength==SQL_NTS) {
-		dsnlength=charstring::length(dsn);
+		dsnlength=charstring::length((const char *)dsn);
 	}
 	if ((size_t)dsnlength>=sizeof(conn->dsn)) {
 		dsnlength=sizeof(conn->dsn)-1;
@@ -2199,9 +2203,9 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Socket","",
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
-	if (!charstring::isNullOrEmpty(user)) {
+	if (!charstring::isNullOrEmpty((const char *)user)) {
 		if (userlength==SQL_NTS) {
-			userlength=charstring::length(user);
+			userlength=charstring::length((const char *)user);
 		}
 		if ((size_t)userlength>=sizeof(conn->user)) {
 			userlength=sizeof(conn->user)-1;
@@ -2217,16 +2221,17 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 						ODBC_INI);
 	}
 	parameterstring	pstr;
-	if (!charstring::isNullOrEmpty(password)) {
+	if (!charstring::isNullOrEmpty((const char *)password)) {
 		if (passwordlength==SQL_NTS) {
-			passwordlength=charstring::length(password);
+			passwordlength=charstring::length(
+					(const char *)password);
 		}
 	} else {
 		// SQLGetPrivateProfileString doesn't appear to be able to
 		// extract Passwords on all platforms.
 		pstr.parse(conn->dsn);
 		password=(SQLCHAR *)pstr.getValue("Password");
-		passwordlength=charstring::length(password);
+		passwordlength=charstring::length((const char *)password);
 	}
 	if ((size_t)passwordlength>=sizeof(conn->password)) {
 		passwordlength=sizeof(conn->password)-1;
@@ -2579,7 +2584,7 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 		debugPrintf("  columnname   : %s\n",columnname);
 	}
 	if (namelength) {
-		*namelength=charstring::length(columnname);
+		*namelength=charstring::length((const char *)columnname);
 		debugPrintf("  namelength   : %d\n",*namelength);
 	}
 	if (datatype) {
@@ -2635,7 +2640,7 @@ static SQLRETURN SQLR_SQLEndTran(SQLSMALLINT handletype,
 				return SQL_INVALID_HANDLE;
 			}
 
-			for (singlylinkedlistnode<CONN *>	*node=
+			for (listnode<CONN *>	*node=
 						env->connlist.getFirst();
 						node; node=node->getNext()) {
 
@@ -2934,13 +2939,12 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 
-	linkedlist<dictionarynode<int32_t, outputbind *> *>
-				*list=stmt->outputbinds.getList();
-	for (linkedlistnode<dictionarynode<int32_t, outputbind *> *>
-					*node=list->getFirst();
-					node; node=node->getNext()) {
+	for (listnode<int32_t> *node=
+				stmt->outputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-		outputbind	*ob=node->getValue()->getValue();
+		outputbind	*ob=
+			stmt->outputbinds.getValue(node->getValue());
 
 		// convert parameternumber to a string
 		char	*parametername=charstring::parseNumber(
@@ -3276,13 +3280,12 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 
 	STMT	*stmt=(STMT *)statementhandle;
 
-	linkedlist<dictionarynode<int32_t, outputbind *> *>
-				*list=stmt->inputoutputbinds.getList();
-	for (linkedlistnode<dictionarynode<int32_t, outputbind *> *>
-					*node=list->getFirst();
-					node; node=node->getNext()) {
+	for (listnode<int32_t> *node=
+				stmt->inputoutputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-		outputbind	*ob=node->getValue()->getValue();
+		outputbind	*ob=
+			stmt->inputoutputbinds.getValue(node->getValue());
 
 		// convert parameternumber to a string
 		char	*parametername=charstring::parseNumber(
@@ -3865,7 +3868,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
 	stmt->currentstartrow=stmt->currentfetchrow;
 
 	// update column binds (if we have any)
-	if (stmt->fieldlist.getList()->getLength()) {
+	if (stmt->fieldlist.getLength()) {
 
 		for (uint64_t row=0; row<rowsfetched; row++) {
 
@@ -5210,7 +5213,7 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 		charstring::safeCopy((char *)messagetext,
 					(size_t)bufferlength,
 					error);
-		valuelength=charstring::length(messagetext);
+		valuelength=charstring::length((const char *)messagetext);
 
 		// make sure to null-terminate
 		// (even if data has to be truncated)
@@ -8321,20 +8324,16 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 	if (stmt->dataatexeckeys->getLength()) {
 
 		// get the first bind number
-		linkedlistnode<SQLUSMALLINT>	*keynode=
+		listnode<SQLUSMALLINT>	*keynode=
 					stmt->dataatexeckeys->getFirst();
+		SQLUSMALLINT		key=keynode->getValue();
 
-		// get the corresponding bind buffer node
-		dictionarynode<SQLUSMALLINT,SQLPOINTER>	*valuenode=
-					stmt->dataatexecdict.getNode(
-							keynode->getValue());
+		// get the corresponding bind buffer
+		SQLPOINTER	val=stmt->dataatexecdict.getValue(key);
 
 		// keep track of the bind number
-		stmt->putdatabind=keynode->getValue();
+		stmt->putdatabind=key;
 		debugPrintf("  put-data bind: %d\n",stmt->putdatabind);
-
-		// get the bind buffer
-		SQLPOINTER	val=valuenode->getValue();
 
 		// pass the buffer out
 		if (value) {
@@ -8342,7 +8341,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 		}
 
 		// remove the buffer and key
-		stmt->dataatexecdict.remove(valuenode);
+		stmt->dataatexecdict.remove(key);
 		stmt->dataatexeckeys->remove(keynode);
 
 		// reset the put data buffer
@@ -9235,16 +9234,16 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	// normalize the names
 	if (namelength1==SQL_NTS) {
-		namelength1=charstring::length(catalogname);
+		namelength1=charstring::length((const char *)catalogname);
 	}
 	if (namelength2==SQL_NTS) {
-		namelength2=charstring::length(schemaname);
+		namelength2=charstring::length((const char *)schemaname);
 	}
 	if (namelength3==SQL_NTS) {
-		namelength3=charstring::length(tablename);
+		namelength3=charstring::length((const char *)tablename);
 	}
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length(tabletype);
+		namelength4=charstring::length((const char *)tabletype);
 	}
 	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
@@ -9317,7 +9316,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 			} else if (wildstr.getStringLength()) {
 				wildstr.append("%.");
 			}
-			if (!charstring::isNullOrEmpty(schname)) {
+			if (!charstring::isNullOrEmpty(tblname)) {
 				wildstr.append(tblname);
 			} else {
 				wildstr.append('%');
@@ -9412,7 +9411,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 
 	// the connect string may not be null terminated, so make a copy that is
 	if (cbconnstrin==SQL_NTS) {
-		cbconnstrin=charstring::length(szconnstrin);
+		cbconnstrin=charstring::length((const char *)szconnstrin);
 	}
 	char	*nulltermconnstr=charstring::duplicate(
 					(const char *)szconnstrin,
@@ -9468,7 +9467,8 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	// output the updated connect string
 	if (pcbconnstrout) {
 		if (cbconnstrin==SQL_NTS) {
-			*pcbconnstrout=charstring::length(szconnstrin);
+			*pcbconnstrout=charstring::length(
+						(const char *)szconnstrin);
 		} else {
 			*pcbconnstrout=cbconnstrin;
 		}
@@ -9842,7 +9842,7 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 					procedurename,namelength3);
 
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length(columnname);
+		namelength4=charstring::length((const char *)columnname);
 	}
 	char	*wild=charstring::duplicate(
 				(const char *)columnname,namelength4);
@@ -9900,13 +9900,13 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 
 	// normalize the names
 	if (namelength1==SQL_NTS) {
-		namelength1=charstring::length(catalogname);
+		namelength1=charstring::length((const char *)catalogname);
 	}
 	if (namelength2==SQL_NTS) {
-		namelength2=charstring::length(schemaname);
+		namelength2=charstring::length((const char *)schemaname);
 	}
 	if (namelength3==SQL_NTS) {
-		namelength3=charstring::length(procname);
+		namelength3=charstring::length((const char *)procname);
 	}
 	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
@@ -11841,7 +11841,7 @@ static bool writeDsn() {
 		dsnError();
 		return false;
 	}
-	for (linkedlistnode< char * > *key=dsndict.getKeys()->getFirst();
+	for (listnode< char * > *key=dsndict.getKeys()->getFirst();
 						key; key=key->getNext()) {
 		if (!charstring::compare(key->getValue(),"DSN")) {
 			continue;

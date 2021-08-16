@@ -6,6 +6,7 @@
 #include <rudiments/bytebuffer.h>
 #include <rudiments/process.h>
 #include <rudiments/randomnumber.h>
+#include <rudiments/file.h>
 #include <rudiments/error.h>
 
 #include <datatypes.h>
@@ -88,6 +89,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 
 		bool	initialHandshake();
 		bool	recvStartupMessage();
+		bool	handleTlsRequest();
 		void	parseOptions(const char *opts);
 		bool	sendStartupMessageResponse();
 		bool	sendAuthenticationCleartextPassword();
@@ -229,6 +231,12 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 	integerdatetimes=NULL;
 	stdconfstr=NULL;
 
+	stmtcursormap.setManageArrayKeys(true);
+	portalcursormap.setManageArrayKeys(true);
+	options.setManageArrayKeys(true);
+	options.setManageArrayValues(true);
+	paramoids.setManageArrayValues(true);
+
 	authmethod="postgresql_md5";
 	const char	*pwds=parameters->getAttributeValue("passwords");
 	if (!charstring::compareIgnoringCase(pwds,"cleartext")) {
@@ -238,6 +246,27 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 	if (getDebug()) {
 		debugStart("parameters");
 		stdoutput.printf("	authmethod: %s\n",authmethod);
+		if (useTls()) {
+			stdoutput.printf("	tls: yes\n");
+			stdoutput.printf("	tls version: %s\n",
+				getTlsContext()->getProtocolVersion());
+			stdoutput.printf("	tls cert: %s\n",
+				getTlsContext()->getCertificateChainFile());
+			stdoutput.printf("	tls key: %s\n",
+				getTlsContext()->getPrivateKeyFile());
+			stdoutput.printf("	tls password: %s\n",
+				getTlsContext()->getPrivateKeyPassword());
+			stdoutput.printf("	tls validate: %d\n",
+				getTlsContext()->getValidatePeer());
+			stdoutput.printf("	tls ca: %s\n",
+				getTlsContext()->getCertificateAuthority());
+			stdoutput.printf("	tls ciphers: %s\n",
+				getTlsContext()->getCiphers());
+			stdoutput.printf("	tls depth: %d\n",
+				getTlsContext()->getValidationDepth());
+		} else {
+			stdoutput.printf("	tls: no\n");
+		}
 		debugEnd();
 	}
 
@@ -266,8 +295,6 @@ sqlrprotocol_postgresql::~sqlrprotocol_postgresql() {
 		delete[] bindvarnames[i];
 	}
 	delete[] bindvarnames;
-
-	paramoids.clearAndArrayDeleteValues();
 
 	free();
 	delete[] reqpacket;
@@ -298,7 +325,7 @@ void sqlrprotocol_postgresql::free() {
 	delete[] password;
 	delete[] database;
 	delete[] replication;
-	options.clearAndArrayDelete();
+	options.clear();
 }
 
 
@@ -381,6 +408,9 @@ clientsessionexitstatus_t sqlrprotocol_postgresql::clientSession(
 
 	// end the session if necessary
 	if (endsession) {
+		stmtcursormap.clear();
+		portalcursormap.clear();
+		executeflag.clear();
 		cont->endSession();
 	}
 
@@ -539,6 +569,8 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 	const unsigned char	*rp=NULL;
 	const unsigned char	*rpend=NULL;
 
+	bool	usingtls=false;
+
 	bool	first=true;
 	for (;;) {
 
@@ -575,26 +607,50 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 			}
 			debugEnd();
 
-			debugStart("N");
+			// Yes=S, No=N
+			const char	*response=(useTls())?"S":"N";
+			debugStart(response);
 			debugEnd();
 
-			// return a single byte 'N'
-			if (clientsock->write('N')!=sizeof(char)) {
+			// return a single byte
+			if (clientsock->write(response[0])!=sizeof(char)) {
 				if (getDebug()) {
-					stdoutput.write("write SSL N failed\n");
+					stdoutput.printf(
+						"write SSL %s failed\n",
+						response);
 					debugSystemError();
 				}
 				return false;
 			}
 			clientsock->flushWriteBuffer(-1,-1);
 
-		} else if (protocolversion!=196608) {
-
-			// FIXME: NegotiateProtocolVersion
-			sendErrorResponse("FATAL","88P01","Invalid protocol");
-			return false;
+			// handle TLS request
+			if (useTls()) {
+				if (!handleTlsRequest()) {
+					return false;
+				}
+				usingtls=true;
+			}
 
 		} else {
+
+			if (useTls() && !usingtls) {
+				sendErrorResponse(
+					"SSL Error","88P01",
+					(getTlsContext()->getValidatePeer())?
+						"TLS mutual auth required":
+						"TLS required");
+				return false;
+			}
+
+			if (protocolversion!=196608) {
+				// FIXME: NegotiateProtocolVersion
+				sendErrorResponse("FATAL",
+							"88P01",
+							"Invalid protocol");
+				return false;
+			}
+
 			break;
 		}
 
@@ -637,7 +693,7 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 		stdoutput.printf("	database: %s\n",database);
 		stdoutput.printf("	replication: %s\n",replication);
 		linkedlist<char *>	*keys=options.getKeys();
-		for (linkedlistnode<char *> *key=keys->getFirst();
+		for (listnode<char *> *key=keys->getFirst();
 						key; key=key->getNext()) {
 			stdoutput.printf("	%s: %s\n",
 					key->getValue(),
@@ -645,6 +701,35 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 		}
 		debugEnd();
 	}
+
+	return true;
+}
+
+bool sqlrprotocol_postgresql::handleTlsRequest() {
+
+	debugStart("tls");
+
+	clientsock->setSecurityContext(getTlsContext());
+	getTlsContext()->setFileDescriptor(clientsock);
+
+	if (!getTlsContext()->accept()) {
+
+		if (getDebug()) {
+			stdoutput.printf("	accept failed: %s\n",
+					getTlsContext()->getErrorString());
+		}
+		debugEnd();
+
+		// FIXME: the client doesn't appear to receive this...
+		sendErrorResponse("SSL Error","88P01",
+					getTlsContext()->getErrorString());
+		return false;
+	}
+
+	if (getDebug()) {
+		stdoutput.printf("	accept success\n");
+	}
+	debugEnd();
 
 	return true;
 }
@@ -1857,7 +1942,7 @@ bool sqlrprotocol_postgresql::parse() {
 
 		// map stmt -> cursor
 		stmtcursormap.setValue(charstring::duplicate(stmtname),cursor);
-	} 
+	}
 
 	// set the execute flag true
 	// (see execute() method for more info on this)
@@ -1884,7 +1969,7 @@ bool sqlrprotocol_postgresql::parse() {
 	for (uint16_t i=0; i<paramcount; i++) {
 		readBE(rp,&(paramtypes[i]),&rp);
 	}
-	paramoids.removeAndArrayDeleteValue(cursor);
+	paramoids.remove(cursor);
 	paramoids.setValue(cursor,paramtypes);
 
 	// debug
@@ -2676,7 +2761,7 @@ bool sqlrprotocol_postgresql::close() {
 	}
 
 	// remove stmt/portal -> cursor mapping
-	dict->removeAndArrayDeleteKey((char *)name.getString());
+	dict->remove((char *)name.getString());
 
 	// mark the cursor available
 	cont->setState(cursor,SQLRCURSORSTATE_AVAILABLE);

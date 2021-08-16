@@ -75,7 +75,7 @@ bool sqlrmoduledatas::load(domnode *parameters) {
 
 void sqlrmoduledatas::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrmoduledataplugin * > *node=
+	for (listnode< sqlrmoduledataplugin * > *node=
 						pvt->_mlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrmoduledataplugin	*sqlt=node->getValue();
@@ -170,7 +170,7 @@ sqlrmoduledata *sqlrmoduledatas::getModuleData(const char *id) {
 }
 
 void sqlrmoduledatas::closeResultSet(sqlrservercursor *sqlrcur) {
-	for (singlylinkedlistnode< sqlrmoduledataplugin * >
+	for (listnode< sqlrmoduledataplugin * >
 				*node=pvt->_mlist.getFirst();
 				node; node=node->getNext()) {
 		node->getValue()->md->closeResultSet(sqlrcur);
@@ -178,7 +178,7 @@ void sqlrmoduledatas::closeResultSet(sqlrservercursor *sqlrcur) {
 }
 
 void sqlrmoduledatas::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrmoduledataplugin * >
+	for (listnode< sqlrmoduledataplugin * >
 				*node=pvt->_mlist.getFirst();
 				node; node=node->getNext()) {
 		node->getValue()->md->endTransaction(commit);
@@ -186,7 +186,7 @@ void sqlrmoduledatas::endTransaction(bool commit) {
 }
 
 void sqlrmoduledatas::endSession() {
-	for (singlylinkedlistnode< sqlrmoduledataplugin * >
+	for (listnode< sqlrmoduledataplugin * >
 				*node=pvt->_mlist.getFirst();
 				node; node=node->getNext()) {
 		node->getValue()->md->endSession();

@@ -84,6 +84,7 @@ routecontainer::routecontainer() {
 	socket=NULL;
 	user=NULL;
 	password=NULL;
+	regexlist.setManageValues(true);
 }
 
 routecontainer::~routecontainer() {
@@ -91,7 +92,6 @@ routecontainer::~routecontainer() {
 	delete[] socket;
 	delete[] user;
 	delete[] password;
-	regexlist.clearAndDelete();
 }
 
 void routecontainer::setIsFilter(bool isfilter) {

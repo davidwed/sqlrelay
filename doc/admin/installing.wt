@@ -66,14 +66,13 @@ To build the database connection modules, you need to install one or more of
 
 On Linux/Unix, you can also install 
 [http://www.unixodbc.org unixODBC] or [http://www.iodbc.org iODBC]
-to access databases using ODBC,
+to access databases using ODBC, and
 [http://www.freetds.org FreeTDS] to access
 [http://www.microsof.com/sql/default.html MS SQL Server] (or
-[http://scn.sap.com/community/developer-center/oltp-db SAP/Sybase]), and
-[http://mdbtools.sourceforge.net MDB Tools] to access MS Access Databases.
+[http://scn.sap.com/community/developer-center/oltp-db SAP/Sybase]).
 
 
-On Windows, no additional software needs to be installed to access ODBC databases, and MS SQL Server and MS Access are accessible via ODBC.
+On Windows, no additional software needs to be installed to access ODBC databases, and MS SQL Server is accessible via ODBC.
 
 See [prerequisites.html Installing SQL Relay Prerequisites] for detailed information on installing prerequisite software.
 

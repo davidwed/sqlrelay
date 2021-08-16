@@ -5,6 +5,13 @@
 #include <rudiments/bytestring.h>
 #include <rudiments/filedescriptor.h>
 #include <rudiments/process.h>
+#include <rudiments/userentry.h>
+#include <rudiments/file.h>
+#include <rudiments/gss.h>
+#include <rudiments/tls.h>
+
+#include <config.h>
+#include <defaults.h>
 
 class sqlrprotocolprivate {
 	friend class sqlrprotocol;
@@ -13,29 +20,167 @@ class sqlrprotocolprivate {
 		domnode			*_parameters;
 		bool			_bigendian;
 		bool			_debug;
+		bool			_usekrb;
+		bool			_usetls;
+		gsscredentials		_gcred;
+		gssmechanism		_gmech;
+		gsscontext		_gctx;
+		tlscontext		_tctx;
 };
 
 sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 				sqlrprotocols *ps,
 				domnode *parameters) {
+
 	pvt=new sqlrprotocolprivate;
 	this->cont=cont;
 	pvt->_ps=ps;
 	pvt->_parameters=parameters;
 	pvt->_bigendian=false;
 	pvt->_debug=cont->getConfig()->getDebugProtocols();
+
+	// tls initialization
+	pvt->_usetls=charstring::isYes(parameters->getAttributeValue("tls"));
+	pvt->_usekrb=charstring::isYes(parameters->getAttributeValue("krb"));
+
+	if (pvt->_usekrb) {
+
+		if (gss::supported()) {
+
+			// set the keytab file to use
+			const char	*keytab=
+				parameters->getAttributeValue("krbkeytab");
+			if (!charstring::isNullOrEmpty(keytab)) {
+				pvt->_gcred.setKeytab(keytab);
+			}
+
+			// set the service to use
+			const char	*service=
+				parameters->getAttributeValue("krbservice");
+			if (charstring::isNullOrEmpty(service)) {
+				service=DEFAULT_KRBSERVICE;
+			}
+
+			// acquire service credentials
+			if (!pvt->_gcred.acquireForService(service)) {
+				const char	*status=
+					pvt->_gcred.getMechanismMinorStatus();
+				stderror.printf("kerberos acquire-"
+						"service %s failed:\n%s",
+						service,status);
+				if (charstring::contains(status,
+							"Permission denied")) {
+					char	*user=userentry::getName(
+							process::getUserId());
+					stderror.printf("(keytab file likely "
+							"not readable by user "
+							"%s)\n",user);
+					delete[] user;
+				}
+			}
+
+			// initialize the gss context
+			pvt->_gmech.initialize(
+				parameters->getAttributeValue("krbmech"));
+			pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
+			pvt->_gctx.setDesiredFlags(
+				parameters->getAttributeValue("krbflags"));
+			pvt->_gctx.setCredentials(&pvt->_gcred);
+
+		} else {
+			stderror.printf("Warning: kerberos support requested "
+					"but platform doesn't support "
+					"kerberos\n");
+		}
+
+	} else if (pvt->_usetls) {
+
+		if (tls::supported()) {
+
+			// get the protocol version to use
+			pvt->_tctx.setProtocolVersion(
+				parameters->getAttributeValue("tlsversion"));
+
+			// get the certificate chain file to use
+			const char	*tlscert=
+				parameters->getAttributeValue("tlscert");
+			if (file::readable(tlscert)) {
+				pvt->_tctx.setCertificateChainFile(tlscert);
+			} else if (!charstring::isNullOrEmpty(tlscert)) {
+				stderror.printf("Warning: TLS certificate "
+						"file %s is not readable.\n",
+						tlscert);
+			}
+
+			// get the private key file to use
+			const char	*tlskey=
+				parameters->getAttributeValue("tlskey");
+			if (file::readable(tlskey)) {
+				pvt->_tctx.setPrivateKeyFile(tlskey);
+			} else if (!charstring::isNullOrEmpty(tlskey)) {
+				stderror.printf("Warning: TLS private key "
+						"file %s is not readable.\n",
+						tlskey);
+			}
+
+			// get the private key password to use
+			pvt->_tctx.setPrivateKeyPassword(
+				parameters->getAttributeValue("tlspassword"));
+
+			// get whether to validate
+			pvt->_tctx.setValidatePeer(
+				charstring::isYes(
+				parameters->getAttributeValue("tlsvalidate")));
+
+			// get the certificate authority file to use
+			const char	*tlsca=
+				parameters->getAttributeValue("tlsca");
+			if (file::readable(tlsca)) {
+				pvt->_tctx.setCertificateAuthority(tlsca);
+			} else if (!charstring::isNullOrEmpty(tlsca)) {
+				stderror.printf("Warning: TLS certificate "
+						"authority file %s is not "
+						"readable.\n",tlsca);
+			}
+
+			// get the cipher list to use
+			pvt->_tctx.setCiphers(
+				parameters->getAttributeValue("tlsciphers"));
+
+			// get the validation depth
+			pvt->_tctx.setValidationDepth(
+				charstring::toUnsignedInteger(
+				parameters->getAttributeValue("tlsdepth")));
+
+		} else {
+
+			pvt->_usetls=false;
+
+			stderror.printf("Warning: TLS support requested "
+					"but platform doesn't support "
+					"TLS\n");
+		}
+	}
 }
 
 sqlrprotocol::~sqlrprotocol() {
 	delete pvt;
 }
 
-gsscontext *sqlrprotocol::getGSSContext() {
-	return NULL;
+gsscontext *sqlrprotocol::getGssContext() {
+	return &pvt->_gctx;
 }
 
-tlscontext *sqlrprotocol::getTLSContext() {
-	return NULL;
+bool sqlrprotocol::useKrb() {
+	return pvt->_usekrb;
+}
+
+tlscontext *sqlrprotocol::getTlsContext() {
+	return &pvt->_tctx;
+}
+
+bool sqlrprotocol::useTls() {
+	return pvt->_usetls;
 }
 
 void sqlrprotocol::endTransaction(bool commit) {

@@ -233,6 +233,9 @@ postgresqlconnection::postgresqlconnection(sqlrservercontroller *cont) :
 	lastinsertidquery=NULL;
 	identity=NULL;
 	hostname=NULL;
+
+	datatypes.setManageArrayValues(true);
+	tables.setManageArrayValues(true);
 }
 
 postgresqlconnection::~postgresqlconnection() {
@@ -293,12 +296,12 @@ bool postgresqlconnection::logIn(const char **error,
 
 	// clear the datatype dictionary
 	if (typemangling==2) {
-		datatypes.clearAndArrayDeleteValues();
+		datatypes.clear();
 	}
 
 	// clear the table dictionary
 	if (tablemangling==2) {
-		tables.clearAndArrayDeleteValues();
+		tables.clear();
 	}
 
 	// log in
@@ -432,21 +435,11 @@ void postgresqlconnection::logOut() {
 
 	// clear the datatype dictionary
 	if (typemangling==2) {
-		for (avltreenode< dictionarynode<int32_t,char *> *>
-					*node=datatypes.getTree()->getFirst();
-					node; node=node->getNext()) {
-			delete[] node->getValue()->getValue();
-		}
 		datatypes.clear();
 	}
 
 	// clear the table dictionary
 	if (typemangling==2) {
-		for (avltreenode< dictionarynode<int32_t,char *> *>
-					*node=tables.getTree()->getFirst();
-					node; node=node->getNext()) {
-			delete[] node->getValue()->getValue();
-		}
 		tables.clear();
 	}
 }
@@ -1082,14 +1075,21 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-#if !((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
+	// NOTE: this is a bit of a kludge.
+	//
+	// As this is set in prepareQuery(), originally, we only did this here
+	// if we don't support prepared queries.  However, since it's set to 0
+	// in closeResultSet() (see long note there as to why), we must reset
+	// it to the correct count here so that ncols will be correct for
+	// reexecuted queries.
+/*#if !((defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) || \
-		!(defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED))
+		!(defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED))*/
 	// get the col count
 	ncols=PQnfields(pgresult);
-#endif
+//#endif
 
 	// validate column count
 	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
@@ -1574,6 +1574,26 @@ void postgresqlcursor::closeResultSet() {
 		pgresult=NULL;
 	}
 #endif
+
+	// NOTE: this is a bit of a kludge.
+	//
+	// ncols is reset at the beginning of prepareQuery, and other methods,
+	// but, since we rely on it to decide whether there are rows to return,
+	// it really needs to be reset here.
+	//
+	// If sqlrservercontroller intercepts the query (eg. if it's a begin,
+	// commit, rollback, etc.) then prepareQuery() will never be called,
+	// and this won't be reset.  If it was > 0 from the previous query,
+	// then a begin (for example) will think that it has rows to return,
+	// and the subsequent SQLFetch will fail with a
+	// "function sequence error".  We can avoid that by setting ncols=0
+	// here, which will cause noRowsToReturn() to return false by default,
+	// and avoid the fetch.
+	//
+	// Arguably, other things should be reset here too (eg. various row
+	// counts), but this is the critical one for now, so we'll sort that
+	// out later.
+	ncols=0;
 }
 
 #if (defined(HAVE_POSTGRESQL_PQEXECPREPARED) && \

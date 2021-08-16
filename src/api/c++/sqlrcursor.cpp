@@ -219,6 +219,7 @@ class sqlrcursorprivate {
 		// substitution variables
 		dynamicarray<sqlrclientbindvar>	*_subvars;
 		bool				_dirtysubs;
+		uint16_t			_maxsubstitutionpasses;
 
 		// bind variables
 		dynamicarray<sqlrclientbindvar>	*_inbindvars;
@@ -414,6 +415,7 @@ void sqlrcursor::init(sqlrconnection *sqlrc, bool copyreferences) {
 	pvt->_cs=NULL;
 
 	// initialize all bind/substitution-related variables
+	pvt->_maxsubstitutionpasses=10;
 	pvt->_subvars=new dynamicarray<sqlrclientbindvar>(
 					OPTIMISTIC_BIND_COUNT,16);
 	pvt->_inbindvars=new dynamicarray<sqlrclientbindvar>(
@@ -2364,6 +2366,24 @@ void sqlrcursor::performSubstitutions() {
 		return;
 	}
 
+	for (uint16_t i=0; i<pvt->_maxsubstitutionpasses; i++) {
+		if (!performSubstitutionsInternal()) {
+			break;
+		}
+	}
+
+	// mark all vars that were substituted in as "done" so the next time
+	// this method gets called, they won't be processed.
+	for (uint64_t i=0; i<pvt->_subvars->getLength(); i++) {
+		(*pvt->_subvars)[i].donesubstituting=
+					(*pvt->_subvars)[i].substituted;
+	}
+
+	pvt->_dirtysubs=false;
+}
+
+bool sqlrcursor::performSubstitutionsInternal() {
+
 	// perform substitutions
 	stringbuffer	container;
 	const char	*ptr=pvt->_queryptr;
@@ -2373,6 +2393,7 @@ void sqlrcursor::performSubstitutions() {
 	bool		inbraces=false;
 	int		len=0;
 	stringbuffer	*braces=NULL;
+	bool		subsperformed=false;
 
 	// iterate through the string
 	while (ptr<endptr) {
@@ -2463,9 +2484,11 @@ void sqlrcursor::performSubstitutions() {
 					if (inbraces) {
 						performSubstitution(
 							braces,i);
+						subsperformed=true;
 					} else {
 						performSubstitution(
 							&container,i);
+						subsperformed=true;
 					}
 					ptr=ptr+3+len;
 					found=true;
@@ -2495,19 +2518,12 @@ void sqlrcursor::performSubstitutions() {
 		}
 	}
 
-	// mark all vars that were substituted in as "done" so the next time
-	// this method gets called, they won't be processed.
-	for (uint64_t i=0; i<pvt->_subvars->getLength(); i++) {
-		(*pvt->_subvars)[i].donesubstituting=
-					(*pvt->_subvars)[i].substituted;
-	}
-
 	delete[] pvt->_querybuffer;
 	pvt->_querylen=container.getSize();
 	pvt->_querybuffer=container.detachString();
 	pvt->_queryptr=pvt->_querybuffer;
 
-	pvt->_dirtysubs=false;
+	return subsperformed;
 }
 
 void sqlrcursor::validateBindsInternal() {

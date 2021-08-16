@@ -66,6 +66,11 @@ struct datebind {
 	char		*buffer;
 };
 
+struct charbind {
+	char		*value;
+	uint32_t	valuesize;
+};
+
 class odbcconnection;
 
 class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
@@ -221,6 +226,9 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		bool		isLob(SQLINTEGER type);
 #endif
 
+		void		setConvCharError(const char *baseerror,
+						const char *detailerror);
+
 
 		SQLRETURN	erg;
 		SQLHSTMT	stmt;
@@ -244,8 +252,10 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 
 		uint16_t	maxbindcount;
 		datebind	**outdatebind;
+		charbind	**outcharbind;
 		int16_t		**outisnullptr;
 		datebind	**inoutdatebind;
+		charbind	**inoutcharbind;
 		int16_t		**inoutisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
 		SQLLEN		*outisnull;
@@ -370,6 +380,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getcolumntables;
 		const char	*overrideschema;
 		bool		unicode;
+		const char	*ncharencoding;
 
 		stringbuffer	errormessage;
 
@@ -393,116 +404,340 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 
 #ifdef HAVE_SQLCONNECTW
 #include <iconv.h>
-#include <wchar.h>
-
-#define USER_CODING "UTF8"
 
 void printerror(const char *error) {
 	char	*err=error::getErrorString();
-	stderror.printf("%s: %s\n",error,err);
+	stderror.printf("%s: %d - %s\n",error,error::getErrorNumber(),err);
 	delete[] err;
 }
 
-int ucslen(const char *str) {
+size_t isFixed4Byte(const char *encoding) {
+	// FIXME: support other encodings
+	return (charstring::contains(encoding,"UCS4") ||
+			charstring::contains(encoding,"UCS-4") ||
+			charstring::contains(encoding,"UTF32") ||
+			charstring::contains(encoding,"UTF-32"));
+}
+
+size_t isFixed2Byte(const char *encoding) {
+	// FIXME: support other encodings
+	return (charstring::contains(encoding,"UCS2") ||
+			charstring::contains(encoding,"UCS-2"));
+}
+
+size_t isVariable2Byte(const char *encoding) {
+	// FIXME: support other encodings
+	return (charstring::contains(encoding,"UTF16") ||
+			charstring::contains(encoding,"UTF-16"));
+}
+
+size_t isVariable1Byte(const char *encoding) {
+	return (!isFixed4Byte(encoding) &&
+		!isFixed2Byte(encoding) &&
+		!isVariable2Byte(encoding));
+}
+
+// returns number of characters in the (null-terminated) string
+size_t len(const char *str, const char *encoding) {
+
 	const char	*ptr=str;
-	int		res=0;
-	while (*ptr || *(ptr+1)) {
-		res++;
-		ptr+=2;
+	size_t		res=0;
+
+	if (isFixed2Byte(encoding)) {
+
+		// skip any byte-order mark
+		// FIXME: assumes encoding supports a byte order mark
+		// FIXME: handle nulls
+		if (*ptr==(char)0xEF &&
+			*(ptr+1)==(char)0xBB &&
+			*(ptr+2)==(char)0xBF) {
+			ptr+=3;
+		}
+
+		while (*ptr || *(ptr+1)) {
+			res++;
+			ptr+=2;
+		}
+
+	} else if (isFixed4Byte(encoding)) {
+
+		// skip any byte-order mark
+		// FIXME: assumes encoding supports a byte order mark
+		// FIXME: handle nulls
+		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
+			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
+			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
+			*(ptr+2)=='\0' && *(ptr+3)=='\0')) {
+			ptr+=4;
+		}
+
+		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
+			res++;
+			ptr+=4;
+		}
+
+	} else if (isVariable2Byte(encoding)) {
+
+		size_t	offset=0;
+
+		// look for byte-order mark and update offset if necessary
+		// FIXME: assumes encoding supports a byte order mark
+		// FIXME: handle nulls
+		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
+			ptr+=2;
+		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
+			offset=1;
+			ptr+=2;
+		}
+
+		while (*ptr || *(ptr+1)) {
+			res++;
+			// FIXME: assumes UTF-16
+			if (*(ptr+offset)>=(char)0xD8 &&
+				*(ptr+offset)<=(char)0xDF) {
+				ptr+=4;
+			} else {
+				ptr+=2;
+			}
+		}
+
+	} else if (isVariable1Byte(encoding)) {
+
+		while (*ptr) {
+			res++;
+			// FIXME: assumes UTF-8
+			if (*ptr<192) {
+				ptr++;
+			} else if (*ptr<224) {
+				ptr+=2;
+			} else if (*ptr<240) {
+				ptr+=3;
+			} else {
+				ptr+=4;
+			}
+		}
+		
+	} else {
+		res=charstring::length(str);
 	}
 	return res;
 }
 
-char *conv_to_user_coding(const char *inbuf) {
+// returns number of bytes in the (null-terminated) string
+size_t size(const char *str, const char *encoding) {
 
-	// Insize is the number of unicode codepoints times 2.
-	// A full 16 bit codepoint might generate 3 bytes in the output utf, so
-	// this conversion could make things bigger.
-	// It's possible to get errno=E2BIG if we do not have enough space, and
-	// that is eventually fatal.
-	// One more byte for zero termination.
-	
-	size_t	insize=ucslen(inbuf)*2;
-	size_t	avail=(insize/2)*3+1;
-	char	*outbuf=new char[avail];
-	char	*wrptr=outbuf;
-	size_t	insizebefore=insize;
-	size_t	availbefore=avail;
+	const char	*ptr=str;
+	size_t		res=0;
 
-	iconv_t	cd=iconv_open(USER_CODING,"UCS-2");
+	if (isFixed2Byte(encoding)) {
+
+		// skip any byte-order mark
+		// FIXME: assumes encoding supports a byte order mark
+		// FIXME: handle nulls
+		if (*ptr==(char)0xEF &&
+			*(ptr+1)==(char)0xBB &&
+			*(ptr+2)==(char)0xBF) {
+			ptr+=3;
+		}
+
+		while (*ptr || *(ptr+1)) {
+			res+=2;
+			ptr+=2;
+		}
+
+	} else if (isFixed4Byte(encoding)) {
+
+		// skip any byte-order mark
+		// FIXME: assumes encoding supports a byte order mark
+		// FIXME: handle nulls
+		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
+			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
+			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
+			*(ptr+2)=='\0' && *(ptr+3)=='\0')) {
+			ptr+=4;
+		}
+
+		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
+			res+=4;
+			ptr+=4;
+		}
+
+	} else if (isVariable2Byte(encoding)) {
+
+		size_t	offset=0;
+
+		// look for byte-order mark and update offset if necessary
+		// FIXME: assumes encoding supports a byte order mark
+		// FIXME: handle nulls
+		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
+			res+=2;
+			ptr+=2;
+		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
+			offset=1;
+			res+=2;
+			ptr+=2;
+		}
+
+		while (*ptr || *(ptr+1)) {
+			// FIXME: assumes UTF-16
+			if (*(ptr+offset)>=(char)0xD8 &&
+				*(ptr+offset)<=(char)0xDF) {
+				res+=4;
+				ptr+=4;
+			} else {
+				res+=2;
+				ptr+=2;
+			}
+		}
+
+	} else if (isVariable1Byte(encoding)) {
+
+		while (*ptr) {
+			// FIXME: assumes UTF-8
+			if (*ptr<192) {
+				res++;
+				ptr++;
+			} else if (*ptr<224) {
+				res+=2;
+				ptr+=2;
+			} else if (*ptr<240) {
+				res+=3;
+				ptr+=3;
+			} else {
+				res+=4;
+				ptr+=4;
+			}
+		}
+		
+	} else {
+		res=charstring::length(str);
+	}
+	return res;
+}
+
+size_t nullSize(const char *encoding) {
+	if (isFixed2Byte(encoding) || isVariable2Byte(encoding)) {
+		return 2;
+	} else if (isFixed4Byte(encoding)) {
+		return 4;
+	} else {
+		return 1;
+	}
+}
+
+size_t byteOrderMarkSize(const char *encoding) {
+	if (isVariable1Byte(encoding)) {
+		return 3;
+	} else if (isVariable2Byte(encoding)) {
+		return 2;
+	} else if (isFixed4Byte(encoding)) {
+		return 4;
+	} else {
+		return 0;
+	}
+}
+
+char *convertCharset(const char *inbuf,
+				size_t insize,
+				const char *inenc,
+				const char *outenc,
+				char **error) {
+
+	// initialize error
+	if (error) {
+		*error=NULL;
+	}
+
+	// get size of null terminator
+	size_t	nullsize=nullSize(outenc);
+
+	// get size of byte order mark
+	size_t	bosize=byteOrderMarkSize(outenc);
+
+	// calculate size of output buffer (in bytes)
+	size_t	multiplier=4;
+	if (isFixed4Byte(inenc)) {
+		multiplier=1;
+	} else if (isFixed2Byte(inenc)) {
+		if (isFixed2Byte(inenc)) {
+			multiplier=1;
+		} else if (isFixed4Byte(inenc)) {
+			multiplier=2;
+		}
+	}
+	size_t	outsize=len(inbuf,inenc)*multiplier+bosize+nullsize;
+
+	// allocate the output buffer
+	char	*outbuf=new char[outsize];
+
+	// capture initial buffer positions and sizes
+	const char	*inptr=inbuf;
+	char		*outptr=outbuf;
+	size_t		insizebefore=insize;
+	size_t		outsizebefore=outsize;
+
+	// open converter
+	// FIXME: reuse this rather than re-creating it over and over
+	iconv_t	cd=iconv_open(outenc,inenc);
 	if (cd==(iconv_t)-1) {
-		/* Something went wrong. */
-		printerror("error in iconv_open");
-
-		/* Terminate the output string. */
-		*outbuf='\0';
+		if (error) {
+			char	*err=error::getErrorString();
+			charstring::printf(error,"iconv_open(): %s",err);
+			delete[] err;
+		}
+		// null-terminate the output
+		bytestring::zero(outptr,nullsize);
 		return outbuf;
 	}
 
-	const char	*inptr=inbuf;
-		
-	#ifdef ICONV_CONST_CHAR
-	size_t	nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
-	#else
-	size_t	nconv=iconv(cd,(char **)&inptr,&insize,&wrptr,&avail);
-	#endif
-	if (nconv==(size_t)-1) {
-		stdoutput.printf("conv_to_user_coding: error in iconv = %d "
-				"insize=%ld/%ld avail=%ld/%ld before/after.\n",
-				errno,insizebefore,insize,availbefore,avail);
-	}		
-	
-	/* Terminate the output string. */
-	*(wrptr)='\0';
-				
+	// convert
+	if (iconv(cd,
+			#ifndef ICONV_CONST_CHAR
+			(char **)
+			#endif
+			&inptr,
+			&insize,
+			&outptr,
+			&outsize)==(size_t)-1) {
+		if (error) {
+			char	*err=error::getErrorString();
+			charstring::printf(error,
+				"iconv(): %s (in=%ld/%ld out=%ld/%ld)",
+				err,insizebefore,insize,outsizebefore,outsize);
+			delete[] err;
+		}
+	}
+
+	// SQL Server doesn't like UTF-16 values to have a byte-order mark
+	// (and it wants them to be big-endian)
+	// FIXME: make this configurable somehow...
+	if (isVariable2Byte(outenc) &&
+		((outbuf[0]==(char)0xFF && outbuf[1]==(char)0xFE) ||
+		(outbuf[0]==(char)0xFE && outbuf[1]==(char)0xFF))) {
+		bytestring::copyWithOverlap(outbuf,outbuf+2,outptr-outbuf-2);
+		outptr-=2;
+	}
+
+	// null-terminate the output
+	bytestring::zero(outptr,nullsize);
+
+	// close converter
 	if (iconv_close(cd)!=0) {
-		printerror("iconv_close");
+		// don't override any previously set error here
+		if (error && !*error) {
+			char	*err=error::getErrorString();
+			charstring::printf(error,"iconv_open(): %s",err);
+			delete[] err;
+		}
 	}
 	return outbuf;
 }
 
-char *conv_to_ucs(const char *inbuf, size_t insize) {
-	
-	size_t	avail=insize*2+4;
-	char	*outbuf=new char[avail];
-	char	*wrptr=outbuf;
-
-	iconv_t	cd=iconv_open("UCS-2",USER_CODING);
-	if (cd==(iconv_t)-1) {
-		/* Something went wrong.  */
-		printerror("error in iconv_open");
-
-		/* Terminate the output string.  */
-		*outbuf=L'\0';
-		return outbuf;
-	}
-
-	const char	*inptr=inbuf;
-		
-	#ifdef ICONV_CONST_CHAR
-	size_t nconv=iconv(cd,&inptr,&insize,&wrptr,&avail);
-	#else
-	size_t nconv=iconv(cd,(char **)&inptr,&insize,&wrptr,&avail);
-	#endif
-	if (nconv==(size_t)-1) {
-		stdoutput.printf("conv_to_ucs: error in iconv\n");
-	}
-	
-	/* Terminate the output string.  */
-	*((wchar_t *)wrptr)=L'\0';
-	
-	if (nconv==(size_t)-1) {
-		stdoutput.printf("inbuf='%s'\n",inbuf);
-	}
-
-	if (iconv_close(cd)!=0) {
-		printerror("error in iconv_close");
-	}
-	return outbuf;
-}
-
-char *conv_to_ucs(const char *inbuf) {
-	return conv_to_ucs(inbuf,charstring::length(inbuf));
+char *convertCharset(const char *inbuf,
+				const char *inenc,
+				const char *outenc,
+				char **error) {
+	return convertCharset(inbuf,size(inbuf,inenc),inenc,outenc,error);
 }
 #endif
 
@@ -522,6 +757,7 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	getcolumntables=false;
 	overrideschema=NULL;
 	unicode=true;
+	ncharencoding=NULL;
 	columninfonotvalidyeterror=NULL;
 }
 
@@ -557,7 +793,10 @@ void odbcconnection::handleConnectString() {
 	}
 
 	unicode=!charstring::isNo(cont->getConnectStringValue("unicode"));
-
+	ncharencoding=cont->getConnectStringValue("ncharencoding");
+	if (charstring::isNullOrEmpty(ncharencoding)) {
+		ncharencoding="UCS-2//TRANSLIT";
+	}
 
 	// unixodbc doesn't support array fetches
 	cont->setFetchAtOnce(1);
@@ -697,11 +936,21 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 
 		#ifdef HAVE_SQLCONNECTW
 		if (unicode) {
-			char	*dsnucs=conv_to_ucs(dsnasc);
-			char	*userucs=
-				(userasc)?conv_to_ucs(userasc):NULL;
-			char	*passworducs=
-				(passwordasc)?conv_to_ucs(passwordasc):NULL;
+			char	*dsnucs=(dsnasc)?
+					convertCharset(dsnasc,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							NULL):NULL;
+			char	*userucs=(userasc)?
+					convertCharset(userasc,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							NULL):NULL;
+			char	*passworducs=(passwordasc)?
+					convertCharset(passwordasc,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							NULL):NULL;
 			erg=SQLConnectW(dbc,(SQLWCHAR *)dsnucs,SQL_NTS,
 					(SQLWCHAR *)userucs,SQL_NTS,
 					(SQLWCHAR *)passworducs,SQL_NTS);
@@ -845,6 +1094,9 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// A workaround is to use SQLBindCol in all cases and fetch
 		// LOBs as strings.
 		fetchlobsasstrings=true;
+
+		// SQL Server likes "BEGIN TRANSACTION" to begin transactions.
+		begintxquery="BEGIN TRANSACTION";
 	}
 
 	return true;
@@ -852,15 +1104,14 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 
 char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 
-	/* This would be a good candidate for promotion to rudiments,
-	   These format operators are enough to provide a unique log file
-	   name, per-process:
-	   %p means PID
-	   %t means a timestamp.
-	   %h means the hostname.
-	   If any of these appears more than once then the output filename
-	   may be truncated.
-	*/
+	// This would be a good candidate for promotion to rudiments,
+	// These format operators are enough to provide a unique log file
+	// name, per-process:
+	// %p means PID
+	// %t means a timestamp.
+	// %h means the hostname.
+	// If any of these appears more than once then the output filename
+	// may be truncated.
 
 	pid_t	pid=process::getProcessId();
 
@@ -923,16 +1174,15 @@ char *odbcconnection::odbcDriverConnectionString(const char *userasc,
 	char	*buff=new char[buffsize];
 	char	*ptr=buff;
 
-	/* At least with unixODBC, we find that if the DSN is not the first
-	 * field, there will be an SQLDriverConnect error of:
-	 *
-	 *	state 08001
-	 *	errnum 0
-	 *	message [unixODBC][Microsoft][ODBC Driver 11 for SQL Server]Neither DSN nor SERVER keyword supplied
-	 *
-	 * If DSN is specified then the DRIVER seems to be ignored. This makes
-	 * sense actually.
-	 */
+	// At least with unixODBC, we find that if the DSN is not the first
+	// field, there will be an SQLDriverConnect error of:
+	//
+	//	state 08001
+	//	errnum 0
+	//	message [unixODBC][Microsoft][ODBC Driver 11 for SQL Server]Neither DSN nor SERVER keyword supplied
+	//
+	// If DSN is specified then the DRIVER seems to be ignored. This makes
+	// sense actually.
 
 	if (!charstring::isNullOrEmpty(dsn)) {
 		pushConnstrValue(&ptr,&buffavail,"DSN",dsn);
@@ -1161,9 +1411,8 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 	const char	*catalog=NULL;
 	char		schemabuffer[1024];
 	const char	*schema="";
-	const char	*table="";
-	char		**tableparts=NULL;
-	uint64_t	tablepartcount=0;
+	// FIXME: should this be SQL_ALL_TABLES?
+	const char	*table="%";
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1191,52 +1440,10 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 		}
 	}
 
-	// get the table name (or % for all tables)
-	if (charstring::isNullOrEmpty(wild)) {
-
-		// FIXME: should this be SQL_ALL_TABLES?
-		table="%";
-
-	} else {
-
-		// the table name might be in one
-		// of the following formats:
-		// * table
-		// * schema.table
-		// * catalog.schema.table
-		charstring::split(wild,".",true,
-				&tableparts,&tablepartcount);
-
-		// reset schema and catalog if necessary
-		switch (tablepartcount) {
-			case 3:
-				catalog=tableparts[0];
-				schema=tableparts[1];
-				table=tableparts[2];
-				break;
-			case 2:
-				// If there are 2 parts the it could
-				// mean:
-				// * catalog(.defaultschama).table
-				//   or
-				// * (currentcatalog.)schema.table...
-				// If the first part is not the same as
-				// the current catalog, then we'll
-				// guess (currentcatalog.)schema.table,
-				// but we don't really know for sure.
-				// The app may really mean to target
-				// another catalog.
-				if (charstring::compare(
-						tableparts[0],
-						catalogbuffer)) {
-					schema=tableparts[0];
-				}
-				table=tableparts[1];
-				break;
-			case 1:
-				table=tableparts[0];
-				break;
-		}
+	// split the object name
+	if (!charstring::isNullOrEmpty(wild)) {
+		cont->splitObjectName(catalogbuffer,schemabuffer,wild,
+						&catalog,&schema,&table);
 	}
 
 	stringbuffer	tabletype;
@@ -1269,12 +1476,6 @@ bool odbcconnection::getTableList(sqlrservercursor *cursor,
 			(SQLCHAR *)table,SQL_NTS,
 			(SQLCHAR *)tabletype.getString(),SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<tablepartcount; i++) {
-		delete[] tableparts[i];
-	}
-	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1339,8 +1540,6 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*tablename="";
-	char		**tableparts=NULL;
-	uint64_t	tablepartcount=0;
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1368,39 +1567,9 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 		}
 	}
 
-	// the table name might be in one
-	// of the following formats:
-	// * table
-	// * schema.table
-	// * catalog.schema.table
-	charstring::split(table,".",true,&tableparts,&tablepartcount);
-
-	// reset schema and catalog if necessary
-	switch (tablepartcount) {
-		case 3:
-			catalog=tableparts[0];
-			schema=tableparts[1];
-			tablename=tableparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).table
-			//   or
-			// * (currentcatalog.)schema.table...
-			// If the first part is not the same as the current
-			// catalog, then we'll guess
-			// (currentcatalog.)schema.table, but we don't really
-			// know for sure. The app may really mean to target
-			// another catalog.
-			if (charstring::compare(tableparts[0],catalogbuffer)) {
-				schema=tableparts[0];
-			}
-			tablename=tableparts[1];
-			break;
-		case 1:
-			tablename=tableparts[0];
-			break;
-	}
+	// split the table name
+	cont->splitObjectName(catalogbuffer,schemabuffer,table,
+						&catalog,&schema,&tablename);
 
 	// use % if wild was empty
 	wild=(!charstring::isNullOrEmpty(wild))?wild:"%";
@@ -1412,12 +1581,6 @@ bool odbcconnection::getColumnList(sqlrservercursor *cursor,
 			(SQLCHAR *)tablename,SQL_NTS,
 			(SQLCHAR *)wild,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<tablepartcount; i++) {
-		delete[] tableparts[i];
-	}
-	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1450,8 +1613,6 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*tablename="";
-	char		**tableparts=NULL;
-	uint64_t	tablepartcount=0;
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1479,39 +1640,9 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 		}
 	}
 
-	// the table name might be in one
-	// of the following formats:
-	// * table
-	// * schema.table
-	// * catalog.schema.table
-	charstring::split(table,".",true,&tableparts,&tablepartcount);
-
-	// reset schema and catalog if necessary
-	switch (tablepartcount) {
-		case 3:
-			catalog=tableparts[0];
-			schema=tableparts[1];
-			tablename=tableparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).table
-			//   or
-			// * (currentcatalog.)schema.table...
-			// If the first part is not the same as the current
-			// catalog, then we'll guess
-			// (currentcatalog.)schema.table, but we don't really
-			// know for sure. The app may really mean to target
-			// another catalog.
-			if (charstring::compare(tableparts[0],catalogbuffer)) {
-				schema=tableparts[0];
-			}
-			tablename=tableparts[1];
-			break;
-		case 1:
-			tablename=tableparts[0];
-			break;
-	}
+	// split the table name
+	cont->splitObjectName(catalogbuffer,schemabuffer,table,
+						&catalog,&schema,&tablename);
 
 	// get the primary key list
 	erg=SQLPrimaryKeys(odbccur->stmt,
@@ -1519,12 +1650,6 @@ bool odbcconnection::getPrimaryKeyList(sqlrservercursor *cursor,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)tablename,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<tablepartcount; i++) {
-		delete[] tableparts[i];
-	}
-	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1557,8 +1682,6 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 	char		schemabuffer[1024];
 	const char	*schema="";
 	const char	*tablename="";
-	char		**tableparts=NULL;
-	uint64_t	tablepartcount=0;
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1586,39 +1709,9 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 		}
 	}
 
-	// the table name might be in one
-	// of the following formats:
-	// * table
-	// * schema.table
-	// * catalog.schema.table
-	charstring::split(table,".",true,&tableparts,&tablepartcount);
-
-	// reset schema and catalog if necessary
-	switch (tablepartcount) {
-		case 3:
-			catalog=tableparts[0];
-			schema=tableparts[1];
-			tablename=tableparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).table
-			//   or
-			// * (currentcatalog.)schema.table...
-			// If the first part is not the same as the current
-			// catalog, then we'll guess
-			// (currentcatalog.)schema.table, but we don't really
-			// know for sure. The app may really mean to target
-			// another catalog.
-			if (charstring::compare(tableparts[0],catalogbuffer)) {
-				schema=tableparts[0];
-			}
-			tablename=tableparts[1];
-			break;
-		case 1:
-			tablename=tableparts[0];
-			break;
-	}
+	// split the table name
+	cont->splitObjectName(catalogbuffer,schemabuffer,table,
+						&catalog,&schema,&tablename);
 
 	// set uniqueness
 	SQLUSMALLINT	uniqueness=SQL_INDEX_UNIQUE;
@@ -1640,12 +1733,6 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 			uniqueness,
 			accuracy);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<tablepartcount; i++) {
-		delete[] tableparts[i];
-	}
-	delete[] tableparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1676,12 +1763,13 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	// Unlike SQLColumns/SQLTables, SQLProcedureColumns wants NULL instead
 	// of "" for catalog/schema, to indicate the current catalog/schema.
 	// It interprets "" as meaning outside of any catalog/schema.
+	char		catalogbuffer[1024];
 	const char	*catalog=NULL;
+	char		schemabuffer[1024];
 	const char	*schema=NULL;
 	const char	*proc=NULL;
 
 	// get the current catalog (instance)
-	char		catalogbuffer[1024];
 	SQLINTEGER	cataloglen=0;
 	if (SQLGetConnectAttr(dbc,
 				SQL_CURRENT_QUALIFIER,
@@ -1691,40 +1779,24 @@ bool odbcconnection::getProcedureBindAndColumnList(
 		catalogbuffer[cataloglen]='\0';
 	}
 
-	// split the procedure name and extract the parts
-	char		**procparts=NULL;
-	uint64_t	procpartcount=0;
-	charstring::split(procedure,".",true,&procparts,&procpartcount);
-	switch (procpartcount) {
-		case 3:
-			catalog=procparts[0];
-			schema=procparts[1];
-			proc=procparts[2];
-			break;
-		case 2:
-			// If there are 2 parts the it could mean:
-			// * catalog(.defaultschama).proc
-			//   or
-			// * (currentcatalog.)schema.proc...
-			// If the first part is not the same as the
-			// current catalog, then we'll guess
-			// (currentcatalog.)schema.proc, but we don't really
-			// know for sure.  The app may really mean to target
-			// another catalog.
-			if (charstring::compare(procparts[0],
-						catalogbuffer)) {
-				schema=procparts[0];
-			}
-			proc=procparts[1];
-
-			// NOTE: Delphi was passing catalog.proc at one point,
-			// and we were assuming that instead.
-			//catalog=procparts[0];
-			break;
-		case 1:
-			proc=procparts[0];
-			break;
+	// get the current user (schema)
+	if (overrideschema) {
+		schema=overrideschema;
+	} else {
+		SQLSMALLINT	schemalen=0;
+		if (SQLGetInfo(dbc,
+				SQL_USER_NAME,
+				schemabuffer,
+				sizeof(schemabuffer),
+				&schemalen)==SQL_SUCCESS) {
+			schemabuffer[schemalen]='\0';
+			schema=schemabuffer;
+		}
 	}
+
+	// split the procedure name
+	cont->splitObjectName(catalogbuffer,schemabuffer,procedure,
+						&catalog,&schema,&proc);
 
 	// SQLProcedureColumns takes non-const arguments, so we have to make
 	// a copy of the wild parameter.
@@ -1755,10 +1827,6 @@ bool odbcconnection::getProcedureBindAndColumnList(
 
 	// clean up
 	delete[] wildcopy;
-	for (uint64_t i=0; i<procpartcount; i++) {
-		delete[] procparts[i];
-	}
-	delete[] procparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -1946,9 +2014,7 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 	const char	*catalog=NULL;
 	char		schemabuffer[1024];
 	const char	*schema="";
-	const char	*procname="";
-	char		**procparts=NULL;
-	uint64_t	procpartcount=0;
+	const char	*procname="%";
 
 	// get the current catalog (instance)
 	SQLINTEGER	cataloglen=0;
@@ -1976,48 +2042,10 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 		}
 	}
 
-	// get the procedure name (or % for all procedures)
-	if (charstring::isNullOrEmpty(wild)) {
-
-		procname="%";
-
-	} else {
-
-		// the procedure name might be in one
-		// of the following formats:
-		// * procedure
-		// * schema.procedure
-		// * catalog.schema.procedure
-		charstring::split(wild,".",true,
-				&procparts,&procpartcount);
-
-		// reset schema and catalog if necessary
-		switch (procpartcount) {
-			case 3:
-				catalog=procparts[0];
-				schema=procparts[1];
-				procname=procparts[2];
-				break;
-			case 2:
-				// If there are 2 parts the it could mean:
-				// * catalog(.defaultschama).proc
-				//   or
-				// * (currentcatalog.)schema.proc...
-				// If the first part is not the same as the
-				// current catalog, then we'll guess
-				// (currentcatalog.)schema.proc, but we don't
-				// really know for sure.  The app may really
-				// mean to target another catalog.
-				if (charstring::compare(procparts[0],
-							catalogbuffer)) {
-					schema=procparts[0];
-				}
-				procname=procparts[1];
-				break;
-			case 1:
-				procname=procparts[0];
-				break;
-		}
+	// split the procedure name
+	if (!charstring::isNullOrEmpty(wild)) {
+		cont->splitObjectName(catalogbuffer,schemabuffer,wild,
+						&catalog,&schema,&procname);
 	}
 
 	// get the procedure list
@@ -2026,12 +2054,6 @@ bool odbcconnection::getProcedureList(sqlrservercursor *cursor,
 			(SQLCHAR *)schema,SQL_NTS,
 			(SQLCHAR *)procname,SQL_NTS);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-
-	// clean up
-	for (uint64_t i=0; i<procpartcount; i++) {
-		delete[] procparts[i];
-	}
-	delete[] procparts;
 
 	// parse the column information
 	return (retval)?odbccur->handleColumns(true,true):false;
@@ -2151,8 +2173,10 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	stmt=NULL;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	outdatebind=new datebind *[maxbindcount];
-	inoutdatebind=new datebind *[maxbindcount];
+	outcharbind=new charbind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
+	inoutdatebind=new datebind *[maxbindcount];
+	inoutcharbind=new charbind *[maxbindcount];
 	inoutisnullptr=new int16_t *[maxbindcount];
 	#ifdef SQLBINDPARAMETER_SQLLEN
 	outisnull=new SQLLEN[maxbindcount];
@@ -2163,14 +2187,19 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	#endif
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
-		inoutdatebind[i]=NULL;
+		outcharbind[i]=NULL;
 		outisnullptr[i]=NULL;
-		inoutisnullptr[i]=NULL;
 		outisnull[i]=0;
+		inoutdatebind[i]=NULL;
+		inoutcharbind[i]=NULL;
+		inoutisnullptr[i]=NULL;
 		inoutisnull[i]=0;
 	}
 	sqlnulldata=SQL_NULL_DATA;
 	bindformaterror=false;
+	#ifdef HAVE_SQLCONNECTW
+	ucsinbindstrings.setManageArrayValues(true);
+	#endif
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 	initializeColCounts();
 	initializeRowCounts();
@@ -2178,13 +2207,15 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 
 odbccursor::~odbccursor() {
 	delete[] outdatebind;
-	delete[] inoutdatebind;
+	delete[] outcharbind;
 	delete[] outisnullptr;
-	delete[] inoutisnullptr;
 	delete[] outisnull;
+	delete[] inoutdatebind;
+	delete[] inoutcharbind;
+	delete[] inoutisnullptr;
 	delete[] inoutisnull;
 	#ifdef HAVE_SQLCONNECTW
-	ucsinbindstrings.clearAndArrayDelete();
+	ucsinbindstrings.clear();
 	#endif
 	deallocateResultSetBuffers();
 }
@@ -2262,15 +2293,23 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
 
-		ucsinbindstrings.clearAndArrayDelete();
+		ucsinbindstrings.clear();
 
 		if (getExecuteDirect()) {
 			return true;
 		}
 
-		char *query_ucs=conv_to_ucs((char*)query,length);
-		erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-		delete[] query_ucs;
+		char	*err=NULL;
+		char	*queryucs=convertCharset(query,length,
+						"UTF-8","UCS-2//TRANSLIT",
+						&err);
+		if (err) {
+			delete[] queryucs;
+			setConvCharError("prepare query",err);
+			return false;
+		}
+		erg=SQLPrepareW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
+		delete[] queryucs;
 	} else {
 	#endif
 		if (getExecuteDirect()) {
@@ -2315,11 +2354,14 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
 
-			ucsinbindstrings.clearAndArrayDelete();
+			ucsinbindstrings.clear();
 
-			char *query_ucs=conv_to_ucs((char*)query,length);
-			erg=SQLPrepareW(stmt,(SQLWCHAR *)query_ucs,SQL_NTS);
-			delete[] query_ucs;
+			char *queryucs=convertCharset(query,length,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							NULL);
+			erg=SQLPrepareW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
+			delete[] queryucs;
 		} else {
 		#endif
 			erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
@@ -2362,49 +2404,144 @@ bool odbccursor::inputBind(const char *variable,
 		return false;
 	}
 
-	SQLPOINTER	val=NULL;
-	SQLSMALLINT	valtype=SQL_C_CHAR;
-	SQLSMALLINT	paramtype=SQL_CHAR;
-	SQLLEN		bufferlength=valuesize;
-	#ifdef HAVE_SQLCONNECTW
-	if (odbcconn->unicode) {
-		char	*value_ucs=conv_to_ucs((char*)value,valuesize);
-		valuesize=ucslen(value_ucs);
-		bufferlength=valuesize*2;
-		ucsinbindstrings.append(value_ucs);
-		val=(SQLPOINTER)value_ucs;
-		valtype=SQL_C_WCHAR;
-		paramtype=SQL_WVARCHAR;
-	} else {
-	#endif
-		val=(SQLPOINTER)value;
-	#ifdef HAVE_SQLCONNECTW
-	}
-	#endif
-
 	if (*isnull==SQL_NULL_DATA) {
-		// the 4th parameter (ValueType) must by
+
+		// We used to do something like this to bind a NULL:
+		//
+		//	erg=SQLBindParameter(stmt,
+		//			pos,
+		//			SQL_PARAM_INPUT,
+		//			SQL_C_BINARY,
+		//			SQL_CHAR,
+		//			1,		// in characters
+		//			0,
+		//			val,
+		//			bufferlength,	// in bytes
+		//			&sqlnulldata);
+		//
+		// (code to set val and bufferlength used to be above this if)
+		// (see #975 and the next "see #975" comment below
+		// for why there was a 1 for the 6th (ColumnSize) parameter)
+		//
+		// However, with ODBC Driver 17 for SQL Server (and possibly
+		// other versions, and other drivers) the above fails.
+		//
+		// It's not exactly clear what fails.  It's experimentally
+		// verifiable that, in this case, val="" and bufferlength=0.
+		// Somehow though, val gets interpreted as "*".
+		//
+		// It's also seemingly random what works.  Eg.
+		//
+		// This works:
+		//
+		//	select case when :foo is null then 'foo-null'
+		//	else 'foo-not-null' end as foo;
+		//
+		// It returns 'foo-null'
+		//
+		// However, this fails:
+		// 
+		//	select isnull(:foo, 99) as foo;
+		//
+		// It returns '*'
+		//
+		// Similarly, this also fails:
+		// 
+		//	select cast(isnull(:foo, 99) as int) as foo;
+		//
+		// It throws "Conversion failed when converting the varchar"
+		// "value '*' to data type int." as that '*' can't be converted
+		// to an int.
+		// 	
+		// It's strange.
+		//
+		// Setting the ColumnSize to 0 seems like an intuitive fix, but
+		// if ParameterType is SQL_CHAR, then we can't do that (see the
+		// "see #975" comment below for more detail on that).
+		//
+		// However, if we use a ParameterType of SQL_VARCHAR, then
+		// we can set ParameterValuePtr to NULL, ColumnSize to 0, and
+		// BufferLength to 0, and then it works.  Apparently a
+		// ColumnSize of 0 is allowed with SQL_VARCHARs and
+		// SQL_VARBINARYs, but not SQL_LONGVARCHARs or
+		// SQL_LONGVARBINARYs as it turns out.
+		//
+		// see #6232 for more detail
+		//
+		//
+		// NOTE: the 4th (ValueType) parameter must be
 		// SQL_C_BINARY (as opposed to SQL_C_WCHAR or SQL_C_CHAR)
 		// for this to work with blobs
 		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT,
 				SQL_C_BINARY,
-				SQL_CHAR,
-				1,
+				SQL_VARCHAR,
+				0,		// in characters
 				0,
-				val,
-				bufferlength,
+				NULL,
+				0,		// in bytes
 				&sqlnulldata);
+
 	} else {
 
+		SQLPOINTER	val=NULL;
+		SQLSMALLINT	valtype=SQL_C_CHAR;
+		SQLSMALLINT	paramtype=SQL_CHAR;
+		SQLLEN		bufferlength=valuesize;
+		#ifdef HAVE_SQLCONNECTW
+		if (odbcconn->unicode) {
+
+			const char	*encoding=odbcconn->ncharencoding;
+			char	*err=NULL;
+			char	*valueucs=convertCharset(
+						value,valuesize,
+						"UTF-8",encoding,
+						&err);
+			if (err) {
+				delete[] valueucs;
+				setConvCharError("input bind",err);
+				return false;
+			}
+			valuesize=len(valueucs,encoding);
+			bufferlength=size(valueucs,encoding);
+			ucsinbindstrings.append(valueucs);
+			val=(SQLPOINTER)valueucs;
+			valtype=SQL_C_WCHAR;
+			paramtype=SQL_WVARCHAR;
+		} else {
+		#endif
+			val=(SQLPOINTER)value;
+		#ifdef HAVE_SQLCONNECTW
+		}
+		#endif
+
 		if (!valuesize) {
-			// In ODBC-2 mode, SQL Server Native Client 11.0
-			// (at least) allows a valuesize of 0, when the value
-			// is "".  In non-ODBC-2 mode, it throws:
-			// "Invalid precision value" Using a valuesize of 1
-			// works with all ODBC-modes.  Hopefully it works with
-			// all drivers.
+			// see #975
+			// When binding an empty string, it's intuitive to set
+			// ColumnSize to 0, as ParameterValuePtr is "" and, as
+			// such, contains 0 characters.  This works with most
+			// drivers.
+			//
+			// However, with SQL Server Native Client ODBC Driver
+			// version 11.0 (and possibly later versions)...
+			//
+			// In ODBC-2 mode, it allows a ColumnSize of 0, but in
+			// non-ODBC-2 mode, it throws: "Invalid precision value"
+			//
+			// Setting ColumnSize to 1 appears to work around this,
+			// and works in all ODBC-modes.  BufferLength appears
+			// to override ColumnSize, so it's ok that the string
+			// is actually 0 characters long, even though we declare
+			// it to be 1.
+			//
+			// This workaound doesn't appear to break any other
+			// ODBC drivers either, so we'll go with it for now.
+			//
+			// NOTE: per the "see #6232" comment above...
+			// ColumnSize of 0 may only be invalid for a
+			// ParameterType of SQL_CHAR.  Using SQL_VARCHAR
+			// instead might be another solution to this problem.
 			valuesize=1;
 		} else if (odbcconn->maxallowedvarcharbindlength &&
 			valuesize>odbcconn->maxallowedvarcharbindlength) {
@@ -2622,19 +2759,54 @@ bool odbccursor::outputBind(const char *variable,
 		return false;
 	}
 
+	SQLLEN		bufferlength=valuesize;
+
+	if (odbcconn->maxallowedvarcharbindlength &&
+		valuesize>odbcconn->maxallowedvarcharbindlength) {
+		valuesize=odbcconn->maxvarcharbindlength;
+		// FIXME: should bufferlength also be reduced here
+	}
+
+	charbind	*cb=new charbind;
+	cb->value=value;
+	cb->valuesize=valuesize;
+
 	outdatebind[pos-1]=NULL;
+	outcharbind[pos-1]=cb;
 	outisnullptr[pos-1]=isnull;
 
-	erg=SQLBindParameter(stmt,
+	#ifdef HAVE_SQLCONNECTW
+	if (odbcconn->unicode) {
+
+		erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_OUTPUT,
+				SQL_C_WCHAR,
+				SQL_WVARCHAR,
+				valuesize,		// in characters
+				0,
+				(SQLPOINTER)value,
+				bufferlength,		// in bytes
+				&(outisnull[pos-1]));
+
+	} else {
+	#endif
+
+		erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_OUTPUT,
 				SQL_C_CHAR,
 				SQL_VARCHAR,
-				valuesize,
+				valuesize,		// in characters
 				0,
 				(SQLPOINTER)value,
-				valuesize,
+				bufferlength,		// in bytes
 				&(outisnull[pos-1]));
+
+	#ifdef HAVE_SQLCONNECTW
+	}
+	#endif
+
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2650,6 +2822,7 @@ bool odbccursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outcharbind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
 	*value=0;
@@ -2681,6 +2854,7 @@ bool odbccursor::outputBind(const char *variable,
 	}
 
 	outdatebind[pos-1]=NULL;
+	outcharbind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
 	*value=0.0;
@@ -2732,6 +2906,7 @@ bool odbccursor::outputBind(const char *variable,
 	db->buffer=buffer;
 
 	outdatebind[pos-1]=db;
+	outcharbind[pos-1]=NULL;
 	outisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
@@ -2761,13 +2936,50 @@ bool odbccursor::inputOutputBind(const char *variable,
 		return false;
 	}
 
+	SQLSMALLINT	valtype=SQL_C_CHAR;
+	SQLSMALLINT	paramtype=SQL_CHAR;
+	SQLLEN		bufferlength=valuesize;
+	#ifdef HAVE_SQLCONNECTW
+	if (odbcconn->unicode) {
+
+		const char	*encoding=odbcconn->ncharencoding;
+		char	*err=NULL;
+		char	*valueucs=convertCharset(
+					value,size(value,"UTF-8"),
+					"UTF-8",encoding,
+					&err);
+		if (err) {
+			delete[] valueucs;
+			setConvCharError("input-output bind",err);
+			return false;
+		}
+		size_t	sizetocopy=size(valueucs,encoding)+nullSize(encoding);
+		if (sizetocopy<=valuesize) {
+			bytestring::copy(value,valueucs,sizetocopy);
+		} else {
+			bytestring::copy(value,valueucs,valuesize);
+			bytestring::zero(value+valuesize-nullSize(encoding),
+							nullSize(encoding));
+		}
+		delete[] valueucs;
+		valtype=SQL_C_WCHAR;
+		paramtype=SQL_WVARCHAR;
+	}
+	#endif
+
+	charbind	*cb=new charbind;
+	cb->value=value;
+	cb->valuesize=valuesize;
+
 	inoutdatebind[pos-1]=NULL;
+	inoutcharbind[pos-1]=cb;
 	inoutisnullptr[pos-1]=isnull;
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
 				sqlnulldata:charstring::length(value);
 
-	erg=SQLBindParameter(stmt,
+	// FIXME: original code...
+	/*erg=SQLBindParameter(stmt,
 				pos,
 				SQL_PARAM_INPUT_OUTPUT,
 				SQL_C_CHAR,
@@ -2776,7 +2988,49 @@ bool odbccursor::inputOutputBind(const char *variable,
 				0,
 				(SQLPOINTER)value,
 				valuesize,
+				&(inoutisnull[pos-1]));*/
+
+	if (*isnull==SQL_NULL_DATA) {
+		// the 4th parameter (ValueType) must by
+		// SQL_C_BINARY (as opposed to SQL_C_WCHAR or SQL_C_CHAR)
+		// for this to work with blobs
+		erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				SQL_C_BINARY,
+				SQL_CHAR,
+				1,
+				0,
+				(SQLPOINTER)value,
+				bufferlength,
 				&(inoutisnull[pos-1]));
+	} else {
+
+		if (!valuesize) {
+			// In ODBC-2 mode, SQL Server Native Client 11.0
+			// (at least) allows a valuesize of 0, when the value
+			// is "".  In non-ODBC-2 mode, it throws:
+			// "Invalid precision value" Using a valuesize of 1
+			// works with all ODBC-modes.  Hopefully it works with
+			// all drivers.
+			valuesize=1;
+		} else if (odbcconn->maxallowedvarcharbindlength &&
+			valuesize>odbcconn->maxallowedvarcharbindlength) {
+			valuesize=odbcconn->maxvarcharbindlength;
+			// FIXME: should bufferlength also be reduced here
+		}
+
+		erg=SQLBindParameter(stmt,
+				pos,
+				SQL_PARAM_INPUT_OUTPUT,
+				valtype,
+				paramtype,
+				valuesize,	// in characters
+				0,
+				(SQLPOINTER)value,
+				bufferlength,	// in bytes
+				&(inoutisnull[pos-1]));
+	}
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2792,6 +3046,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 	}
 
 	inoutdatebind[pos-1]=NULL;
+	inoutcharbind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
@@ -2824,6 +3079,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 	}
 
 	inoutdatebind[pos-1]=NULL;
+	inoutcharbind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
@@ -2882,6 +3138,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 	db->buffer=buffer;
 
 	inoutdatebind[pos-1]=db;
+	inoutcharbind[pos-1]=NULL;
 	inoutisnullptr[pos-1]=isnull;
 
 	erg=SQLBindParameter(stmt,
@@ -2935,7 +3192,16 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	if (getExecuteDirect()) {
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
-			char	*queryucs=conv_to_ucs((char*)query,length);
+			char	*err=NULL;
+			char	*queryucs=convertCharset(query,length,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							&err);
+			if (err) {
+				delete[] queryucs;
+				setConvCharError("execute query",err);
+				return false;
+			}
 			erg=SQLExecDirectW(stmt,(SQLWCHAR *)queryucs,SQL_NTS);
 			delete[] queryucs;
 		} else {
@@ -2949,8 +3215,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	}
 
 	#ifdef HAVE_SQLCONNECTW
-		// free buffers used to convert string-binds to unicode
-		ucsinbindstrings.clearAndArrayDelete();
+	// free buffers used to convert string-binds to unicode
+	ucsinbindstrings.clear();
 	#endif
 
 	if (erg!=SQL_SUCCESS &&
@@ -3003,6 +3269,30 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
 		}
+		#ifdef HAVE_SQLCONNECTW
+		if (odbcconn->unicode && outcharbind[i]) {
+			// convert wchar output binds to user coding
+			char		*value=outcharbind[i]->value;
+			uint32_t	valuesize=outcharbind[i]->valuesize;
+			char		*err=NULL;
+			char		*u=convertCharset(value,
+						odbcconn->ncharencoding,
+						"UTF-8",&err);
+			if (err) {
+				delete[] u;
+				setConvCharError("output bind",err);
+				return false;
+			}
+			size_t	s=size(u,"UTF-8");
+			if (s>=valuesize) {
+				// FIXME: this could make s<0
+				s=valuesize-nullSize("UTF-8");
+			}
+			bytestring::zero(value+s,nullSize("UTF-8"));
+			bytestring::copy(value,u,s);
+			delete[] u;
+		}
+		#endif
 		if (outisnullptr[i]) {
 			*(outisnullptr[i])=outisnull[i];
 			// FIXME: get these to work
@@ -3042,6 +3332,30 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			*(db->microsecond)=ts->fraction/1000;
 			*(db->tz)=NULL;
 		}
+		#ifdef HAVE_SQLCONNECTW
+		if (odbcconn->unicode && inoutcharbind[i]) {
+			// convert wchar output binds to user coding
+			char		*value=inoutcharbind[i]->value;
+			uint32_t	valuesize=inoutcharbind[i]->valuesize;
+			char		*err=NULL;
+			char		*u=convertCharset(value,
+						odbcconn->ncharencoding,
+						"UTF-8",&err);
+			if (err) {
+				delete[] u;
+				setConvCharError("input-output bind",err);
+				return false;
+			}
+			size_t	s=size(u,"UTF-8");
+			if (s>=valuesize) {
+				// FIXME: this could make s<0
+				s=valuesize-nullSize("UTF-8");
+			}
+			bytestring::zero(value+s,nullSize("UTF-8"));
+			bytestring::copy(value,u,s);
+			delete[] u;
+		}
+		#endif
 		if (inoutisnullptr[i]) {
 			*(inoutisnullptr[i])=inoutisnull[i];
 		}
@@ -3629,20 +3943,32 @@ bool odbccursor::fetchRow(bool *error) {
 	
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
-		//convert char and varchar data to user coding from ucs-2
+		// convert wvarchar/wchar fields to user coding
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int i=0; i<ncols; i++) {
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
-				if (indicator[i]!=-1 && field[i]) {
-					char	*u=conv_to_user_coding(
-								field[i]);
-					size_t	len=charstring::length(u);
-					if (len>=maxfieldlength) {
-						len=maxfieldlength-1;
+				if (indicator[i]!=SQL_NULL_DATA && field[i]) {
+					char	*err=NULL;
+					char	*u=convertCharset(
+						field[i],
+						odbcconn->ncharencoding,
+						"UTF-8",&err);
+					if (err) {
+						delete[] u;
+						setConvCharError("fetch",err);
+						return false;
 					}
-					charstring::copy(field[i],u,len);
-					indicator[i]=len;
+					size_t	s=size(u,"UTF-8");
+					if (s>=maxfieldlength) {
+						// FIXME: this could make s<0
+						s=maxfieldlength-
+							nullSize("UTF-8");
+					}
+					bytestring::zero(field[i]+s,
+							nullSize("UTF-8"));
+					bytestring::copy(field[i],u,s);
+					indicator[i]=s;
 					delete[] u;
 				}
 			}
@@ -3778,8 +4104,16 @@ void odbccursor::closeResultSet() {
 		delete outdatebind[i];
 	}
 
+	for (uint16_t i=0; i<getOutputBindCount(); i++) {
+		delete outcharbind[i];
+	}
+
 	for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
 		delete inoutdatebind[i];
+	}
+
+	for (uint16_t i=0; i<getInputOutputBindCount(); i++) {
+		delete inoutcharbind[i];
 	}
 
 	// FIXME: inefficient, but there appears to be a case where
@@ -3787,9 +4121,11 @@ void odbccursor::closeResultSet() {
 	// around...
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		outdatebind[i]=NULL;
+		outcharbind[i]=NULL;
 		outisnullptr[i]=NULL;
 		outisnull[i]=0;
 		inoutdatebind[i]=NULL;
+		inoutcharbind[i]=NULL;
 		inoutisnullptr[i]=NULL;
 		inoutisnull[i]=0;
 	}
@@ -3797,6 +4133,26 @@ void odbccursor::closeResultSet() {
 	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}
+
+	// NOTE: this is a bit of a kludge.
+	//
+	// ncols is reset at the beginning of prepareQuery, and other methods,
+	// but, since we rely on it to decide whether there are rows to return,
+	// it really needs to be reset here.
+	//
+	// If sqlrservercontroller intercepts the query (eg. if it's a begin,
+	// commit, rollback, etc.) then prepareQuery() will never be called,
+	// and this won't be reset.  If it was > 0 from the previous query,
+	// then a begin (for example) will think that it has rows to return,
+	// and the subsequent SQLFetch will fail with a
+	// "function sequence error".  We can avoid that by setting ncols=0
+	// here, which will cause noRowsToReturn() to return false by default,
+	// and avoid the fetch.
+	//
+	// Arguably, other things should be reset here too
+	// (columninfoisvalidafterprepare, various row counts, etc.) but this
+	// is the critical one for now, so we'll sort that out later.
+	ncols=0;
 }
 
 bool odbccursor::columnInfoIsValidAfterPrepare() {
@@ -3820,6 +4176,15 @@ bool odbccursor::isLob(SQLINTEGER type) {
 	return (type==SQL_LONGVARCHAR ||
 		type==SQL_LONGVARBINARY ||
 		type==SQL_WLONGVARCHAR);
+}
+
+void odbccursor::setConvCharError(const char *baseerror,
+						const char *detailerror) {
+
+	stringbuffer	err;
+	err.append(baseerror)->append(": ")->append(detailerror);
+	conn->cont->setError(this,err.getString(),
+				SQLR_ERROR_CHARACTER_CONVERSION_FAILED,true);
 }
 
 extern "C" {

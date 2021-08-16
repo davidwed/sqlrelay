@@ -71,7 +71,7 @@ bool sqlrresultsetrowtranslations::load(domnode *parameters) {
 
 void sqlrresultsetrowtranslations::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
+	for (listnode< sqlrresultsetrowtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		sqlrresultsetrowtranslationplugin	*sqlt=node->getValue();
@@ -184,7 +184,7 @@ bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
 
 	pvt->_error=NULL;
 
-	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
+	for (listnode< sqlrresultsetrowtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		if (pvt->_debug) {
@@ -207,7 +207,7 @@ const char *sqlrresultsetrowtranslations::getError() {
 }
 
 void sqlrresultsetrowtranslations::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
+	for (listnode< sqlrresultsetrowtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->rstr->endTransaction(commit);
@@ -215,7 +215,7 @@ void sqlrresultsetrowtranslations::endTransaction(bool commit) {
 }
 
 void sqlrresultsetrowtranslations::endSession() {
-	for (singlylinkedlistnode< sqlrresultsetrowtranslationplugin * > *node=
+	for (listnode< sqlrresultsetrowtranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->rstr->endSession();

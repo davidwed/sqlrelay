@@ -80,7 +80,8 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 
 	// export rows
 	fd->printf("<rows>\n");
-	do {
+	while (!sqlrcur->endOfResultSet() ||
+			getCurrentRow()<sqlrcur->rowCount()) {
 
 		// reset export-row flag
 		setExportRow(true);
@@ -145,9 +146,7 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 		}
 
 		setCurrentRow(getCurrentRow()+1);
-
-	} while (!sqlrcur->endOfResultSet() ||
-			getCurrentRow()<sqlrcur->rowCount());
+	}
 
 	fd->printf("</rows>\n");
 	fd->printf("</table>\n");

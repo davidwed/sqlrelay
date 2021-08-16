@@ -1,5 +1,23 @@
 #!/bin/sh
 
+
+# tee output to testdetails.log
+if ( test "$CHILD" != "1" )
+then
+	#FIFO=testall.fifo
+	#rm -f $FIFO
+	#mkfifo $FIFO
+	#CHILD=1 $0 $* > $FIFO 2>&1 &
+	CHILD=1 $0 2>&1 | tee testdetails.log &
+	PID=$!
+	#tee testdetails.log <$FIFO &
+	wait $PID
+	#rm -f $FIFO
+	exit $?
+fi
+
+
+
 echo "SQL Relay test results:" > testresults.log
 echo >> testresults.log
 

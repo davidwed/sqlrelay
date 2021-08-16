@@ -3,7 +3,9 @@
 
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
+#include <rudiments/sys.h>
 #include <rudiments/process.h>
+#include <rudiments/snooze.h>
 #include <rudiments/stdio.h>
 
 sqlrconnection	*con;
@@ -498,9 +500,15 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("INDIVIDUAL SUBSTITUTIONS: \n");
 	cur->prepareQuery("select $(var1),'$(var2)',$(var3) from dual");
-	cur->substitution("var1",1);
-	cur->substitution("var2","hello");
-	cur->substitution("var3",10.5556,6,4);
+	cur->substitution("var1","$(var11)");
+	cur->substitution("var2","$(var21)");
+	cur->substitution("var3","$(var31)");
+	cur->substitution("var11","$(var111)");
+	cur->substitution("var21","$(var211)");
+	cur->substitution("var31","$(var311)");
+	cur->substitution("var111",1);
+	cur->substitution("var211","hello");
+	cur->substitution("var311",10.5556,6,4);
 	checkSuccess(cur->executeQuery(),1);
 	stdoutput.printf("\n");
 
@@ -990,34 +998,71 @@ int	main(int argc, char **argv) {
 
 
 	// temporary tables
+	char	*hostname=sys::getHostName();
+	char	*dot=(char *)charstring::findFirstOrEnd(hostname,'.');
+	*dot='\0';
 	stdoutput.printf("TEMPORARY TABLES: \n");
-	cur->sendQuery("drop table temptabledelete\n");
-	cur->sendQuery("create global temporary table temptabledelete (col1 number) on commit delete rows");
-	checkSuccess(cur->sendQuery("insert into temptabledelete values (1)"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
+	cur->prepareQuery("drop table $(HOSTNAME)_temptabledelete");
+	cur->substitution("HOSTNAME",hostname);
+	cur->executeQuery();
+	cur->prepareQuery("create global temporary table $(HOSTNAME)_temptabledelete (col1 number) on commit delete rows");
+	cur->substitution("HOSTNAME",hostname);
+	cur->executeQuery();
+	cur->prepareQuery("insert into $(HOSTNAME)_temptabledelete values (1)");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
+	cur->prepareQuery("select count(*) from $(HOSTNAME)_temptabledelete");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(con->commit(),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptabledelete"),1);
+	cur->prepareQuery("select count(*) from $(HOSTNAME)_temptabledelete");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	cur->sendQuery("drop table temptabledelete\n");
+	cur->prepareQuery("drop table $(HOSTNAME)_temptabledelete");
+	cur->substitution("HOSTNAME",hostname);
+	cur->executeQuery();
 	stdoutput.printf("\n");
-	cur->sendQuery("truncate table temptablepreserve\n");
-	cur->sendQuery("drop table temptablepreserve\n");
-	cur->sendQuery("create global temporary table temptablepreserve (col1 number) on commit preserve rows");
-	checkSuccess(cur->sendQuery("insert into temptablepreserve values (1)"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
+	cur->prepareQuery("truncate table $(HOSTNAME)_temptablepreserve");
+	cur->substitution("HOSTNAME",hostname);
+	cur->executeQuery();
+	cur->prepareQuery("drop table $(HOSTNAME)_temptablepreserve");
+	cur->substitution("HOSTNAME",hostname);
+	cur->executeQuery();
+	cur->prepareQuery("create global temporary table $(HOSTNAME)_temptablepreserve (col1 number) on commit preserve rows");
+	cur->substitution("HOSTNAME",hostname);
+	cur->executeQuery();
+	cur->prepareQuery("insert into $(HOSTNAME)_temptablepreserve values (1)");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
+	cur->prepareQuery("select count(*) from $(HOSTNAME)_temptablepreserve");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	checkSuccess(con->commit(),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
+	cur->prepareQuery("select count(*) from $(HOSTNAME)_temptablepreserve");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
 	con->endSession();
 	stdoutput.printf("\n");
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),1);
+	cur->prepareQuery("select count(*) from $(HOSTNAME)_temptablepreserve");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	checkSuccess(cur->sendQuery("truncate table temptablepreserve\n"),1);
-	checkSuccess(cur->sendQuery("drop table temptablepreserve\n"),1);
-	checkSuccess(cur->sendQuery("select count(*) from temptablepreserve"),0);
+	cur->prepareQuery("truncate table $(HOSTNAME)_temptablepreserve");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
+	snooze::macrosnooze(2);
+	cur->prepareQuery("drop table $(HOSTNAME)_temptablepreserve");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),1);
+	cur->prepareQuery("select count(*) from $(HOSTNAME)_temptablepreserve");
+	cur->substitution("HOSTNAME",hostname);
+	checkSuccess(cur->executeQuery(),0);
 	stdoutput.printf("\n");
+	delete[] hostname;
 
 
 	// stored procedures

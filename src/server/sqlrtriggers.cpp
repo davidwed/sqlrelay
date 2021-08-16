@@ -95,7 +95,7 @@ bool sqlrtriggers::load(domnode *parameters) {
 
 void sqlrtriggers::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrtriggerplugin * > *bnode=
+	for (listnode< sqlrtriggerplugin * > *bnode=
 				pvt->_beforetriggers.getFirst();
 					bnode; bnode=bnode->getNext()) {
 		sqlrtriggerplugin	*sqlt=bnode->getValue();
@@ -106,7 +106,7 @@ void sqlrtriggers::unload() {
 		}
 	}
 	pvt->_beforetriggers.clear();
-	for (singlylinkedlistnode< sqlrtriggerplugin * > *anode=
+	for (listnode< sqlrtriggerplugin * > *anode=
 				pvt->_aftertriggers.getFirst();
 					anode; anode=anode->getNext()) {
 		sqlrtriggerplugin	*sqlt=anode->getValue();
@@ -218,7 +218,7 @@ void sqlrtriggers::run(sqlrserverconnection *sqlrcon,
 				bool before,
 				bool *success) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrtriggerplugin * > *node=list->getFirst();
+	for (listnode< sqlrtriggerplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
 		if (pvt->_debug) {
 			stdoutput.printf("\nrunning %s trigger...\n\n",
@@ -229,12 +229,12 @@ void sqlrtriggers::run(sqlrserverconnection *sqlrcon,
 }
 
 void sqlrtriggers::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrtriggerplugin * >
+	for (listnode< sqlrtriggerplugin * >
 				*node=pvt->_beforetriggers.getFirst();
 				node; node=node->getNext()) {
 		node->getValue()->tr->endTransaction(commit);
 	}
-	for (singlylinkedlistnode< sqlrtriggerplugin * >
+	for (listnode< sqlrtriggerplugin * >
 				*node=pvt->_aftertriggers.getFirst();
 				node; node=node->getNext()) {
 		node->getValue()->tr->endTransaction(commit);
@@ -242,12 +242,12 @@ void sqlrtriggers::endTransaction(bool commit) {
 }
 
 void sqlrtriggers::endSession() {
-	for (singlylinkedlistnode< sqlrtriggerplugin * >
+	for (listnode< sqlrtriggerplugin * >
 				*node=pvt->_beforetriggers.getFirst();
 				node; node=node->getNext()) {
 		node->getValue()->tr->endSession();
 	}
-	for (singlylinkedlistnode< sqlrtriggerplugin * >
+	for (listnode< sqlrtriggerplugin * >
 				*node=pvt->_aftertriggers.getFirst();
 				node; node=node->getNext()) {
 		node->getValue()->tr->endSession();

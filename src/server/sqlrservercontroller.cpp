@@ -26,6 +26,7 @@
 #include <rudiments/inetsocketserver.h>
 #include <rudiments/listener.h>
 #include <rudiments/md5.h>
+#include <rudiments/sensitivevalue.h>
 
 #include <defines.h>
 #include <defaults.h>
@@ -232,12 +233,28 @@ class sqlrservercontrollerprivate {
 	singlylinkedlist< char * >	_transtemptablesfortrunc;
 
 	dictionary< uint32_t, uint32_t >	*_columnmap;
+	dictionary< uint32_t, const char * >	*_columnnamemap;
+
 	dictionary< uint32_t, uint32_t >	_mysqldatabasescolumnmap;
 	dictionary< uint32_t, uint32_t >	_mysqltablescolumnmap;
 	dictionary< uint32_t, uint32_t >	_mysqlcolumnscolumnmap;
+	dictionary< uint32_t, const char * >	_mysqldatabasescolumnnamemap;
+	dictionary< uint32_t, const char * >	_mysqltablescolumnnamemap;
+	dictionary< uint32_t, const char * >	_mysqlcolumnscolumnnamemap;
+
 	dictionary< uint32_t, uint32_t >	_odbcdatabasescolumnmap;
 	dictionary< uint32_t, uint32_t >	_odbctablescolumnmap;
 	dictionary< uint32_t, uint32_t >	_odbccolumnscolumnmap;
+	dictionary< uint32_t, const char * >	_odbcdatabasescolumnnamemap;
+	dictionary< uint32_t, const char * >	_odbctablescolumnnamemap;
+	dictionary< uint32_t, const char * >	_odbccolumnscolumnnamemap;
+
+	dictionary< uint32_t, uint32_t >	_jdbcdatabasescolumnmap;
+	dictionary< uint32_t, uint32_t >	_jdbctablescolumnmap;
+	dictionary< uint32_t, uint32_t >	_jdbccolumnscolumnmap;
+	dictionary< uint32_t, const char * >	_jdbcdatabasescolumnnamemap;
+	dictionary< uint32_t, const char * >	_jdbctablescolumnnamemap;
+	dictionary< uint32_t, const char * >	_jdbccolumnscolumnnamemap;
 
 	const char	**_columnnames;
 	uint16_t	*_columnnamelengths;
@@ -281,6 +298,10 @@ class sqlrservercontrollerprivate {
 	const unsigned char	*_bulkdataformat;
 	singlylinkedlist<const unsigned char *>	_bulkdata;
 	singlylinkedlist<uint64_t>		_bulkdatalen;
+
+	char	*_db;
+	char	*_schema;
+	char	*_object;
 };
 
 static signalhandler		alarmhandler;
@@ -418,6 +439,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_proxypid=0;
 
 	pvt->_columnmap=NULL;
+	pvt->_columnnamemap=NULL;
 
 	pvt->_bulkserveridfilename=NULL;
 	pvt->_bulkservershmem=NULL;
@@ -433,6 +455,10 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_bulkquerylen=0;
 	pvt->_bulkquery=NULL;
 	pvt->_bulkdataformat=NULL;
+
+	pvt->_db=NULL;
+	pvt->_schema=NULL;
+	pvt->_object=NULL;
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -488,7 +514,7 @@ sqlrservercontroller::~sqlrservercontroller() {
 
 	delete[] pvt->_reformattedfield;
 
-	for (singlylinkedlistnode< char * >
+	for (listnode< char * >
 			*sln=pvt->_globaltemptables.getFirst();
 						sln; sln=sln->getNext()) {
 		delete[] sln->getValue();
@@ -503,6 +529,10 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_bulkservershmem;
 	delete pvt->_bulkclientshmem;
 	delete pvt->_bulkcursor;
+
+	delete pvt->_db;
+	delete pvt->_schema;
+	delete pvt->_object;
 
 	delete pvt;
 }
@@ -1759,8 +1789,9 @@ int32_t sqlrservercontroller::waitForClient() {
 			if (pvt->_handoffsockun.read(&command)!=
 							sizeof(uint16_t)) {
 				raiseInternalErrorEvent(NULL,
-					"read handoff command failed");
-				raiseDebugMessageEvent("done waiting for client");
+						"read handoff command failed");
+				raiseDebugMessageEvent(
+						"done waiting for client");
 				// If this fails, then the listener most likely
 				// died because sqlr-stop was run.  Arguably
 				// this condition should initiate a shut down
@@ -1788,9 +1819,11 @@ int32_t sqlrservercontroller::waitForClient() {
 
 			// Receive the client file descriptor and use it.
 			if (!pvt->_handoffsockun.receiveSocket(&descriptor)) {
-				raiseInternalErrorEvent(NULL,"failed to receive "
+				raiseInternalErrorEvent(NULL,
+						"failed to receive "
 						"client file descriptor");
-				raiseDebugMessageEvent("done waiting for client");
+				raiseDebugMessageEvent(
+						"done waiting for client");
 				// If this fails, then the listener most likely
 				// died because sqlr-stop was run.  Arguably
 				// this condition should initiate a shut down
@@ -1809,7 +1842,8 @@ int32_t sqlrservercontroller::waitForClient() {
 				return -1;
 			}
 
-			raiseDebugMessageEvent("listener is proxying the client");
+			raiseDebugMessageEvent(
+					"listener is proxying the client");
 
 			// get the listener's pid
 			if (pvt->_handoffsockun.read(&pvt->_proxypid)!=
@@ -1836,7 +1870,8 @@ int32_t sqlrservercontroller::waitForClient() {
 
 		} else {
 
-			raiseInternalErrorEvent(NULL,"received invalid handoff mode");
+			raiseInternalErrorEvent(NULL,
+					"received invalid handoff mode");
 			return -1;
 		}
 
@@ -1859,7 +1894,8 @@ int32_t sqlrservercontroller::waitForClient() {
 		// a client to reconnect...
 
 		if (pvt->_lsnr.listen(pvt->_accepttimeout,0)<1) {
-			raiseInternalErrorEvent(NULL,"wait for client connect failed");
+			raiseInternalErrorEvent(NULL,
+					"wait for client connect failed");
 			return 0;
 		}
 
@@ -1900,7 +1936,8 @@ bool sqlrservercontroller::getProtocol() {
 
 	// get protocol index
 	if (pvt->_handoffsockun.read(&pvt->_protocolindex)!=sizeof(uint16_t)) {
-		raiseDebugMessageEvent("failed to get the client protocol index");
+		raiseDebugMessageEvent(
+			"failed to get the client protocol index");
 		return false;
 	}
 
@@ -2019,6 +2056,17 @@ sqlrservercursor *sqlrservercontroller::getCursor() {
 	// if we can't create any new cursors then return an error
 	if (pvt->_cursorcount==pvt->_maxcursorcount) {
 		raiseDebugMessageEvent("all cursors are busy");
+		for (uint16_t i=0; i<pvt->_cursorcount; i++) {
+			pvt->_debugstr.clear();
+			uint32_t	querylen=pvt->_cur[i]->getQueryLength();
+			if (querylen>40) {
+				querylen=40;
+			}
+			pvt->_debugstr.append("cursor ")->
+				append(i)->append(": ")->
+				append(pvt->_cur[i]->getQueryBuffer(),querylen);
+			raiseDebugMessageEvent(pvt->_debugstr.getString());
+		}
 		return NULL;
 	}
 
@@ -2058,7 +2106,7 @@ sqlrcredentials *sqlrservercontroller::getCredentials(const char *user,
 	// try to use gss credentials
 	if (usegss) {
 
-		gsscontext	*ctx=getGSSContext();
+		gsscontext	*ctx=getGssContext();
 		if (ctx) {
 			sqlrgsscredentials	*gsscred=
 					new sqlrgsscredentials();
@@ -2072,7 +2120,7 @@ sqlrcredentials *sqlrservercontroller::getCredentials(const char *user,
 	// (unless a user was passed in)
 	if (usetls && charstring::isNullOrEmpty(user)) {
 
-		tlscontext	*ctx=getTLSContext();
+		tlscontext	*ctx=getTlsContext();
 		if (ctx) {
 			tlscertificate	*cert=ctx->getPeerCertificate();
 			if (cert) {
@@ -2761,6 +2809,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			if (pvt->_faketransactionblocks &&
 					pvt->_infaketransactionblock) {
@@ -2779,6 +2828,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			if (pvt->_faketransactionblocks &&
 					!pvt->_infaketransactionblock) {
@@ -2797,6 +2847,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			if (pvt->_faketransactionblocks &&
 					!pvt->_infaketransactionblock) {
@@ -2815,6 +2866,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			// FIXME: fake tx block issues here???
 			retval=autoCommitOn();
@@ -2823,6 +2875,7 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setQueryWasIntercepted(true);
 			cursor->setInputBindCount(0);
 			cursor->setOutputBindCount(0);
+			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			// FIXME: fake tx block issues here???
 			retval=autoCommitOff();
@@ -3004,16 +3057,21 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 	// something will follow it.
 	if (!charstring::compareIgnoringCase(query,"begin",5)) {
 
-		// make sure there are only spaces, comments or the word "work"
-		// after the begin
+		// make sure there are only spaces, comments or one of the words
+		// "work" or "transaction" after the begin
 		const char	*spaceptr=skipWhitespaceAndComments(query+5);
-		
-		if (*spaceptr=='\0' ||
-			!charstring::compareIgnoringCase(spaceptr,"work",4)) {
+
+		if (*spaceptr=='\0') {
+			return true;
+		} else if ((!charstring::compareIgnoringCase(
+						spaceptr,"work",4) &&
+				blockCanBeIntercepted(spaceptr+4)) ||
+				(!charstring::compareIgnoringCase(
+						spaceptr,"transaction",11) &&
+				blockCanBeIntercepted(spaceptr+11))) {
 			return true;
 		}
 		return false;
-
 	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
 		return true;
 	} else if (!charstring::compareIgnoringCase(query,"bt",2) &&
@@ -3021,6 +3079,129 @@ bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
 		return true;
 	}
 	return false;
+}
+
+bool sqlrservercontroller::blockCanBeIntercepted(const char *block) {
+
+	// FIXME:
+	// I'm not really sure which of these implementations to use...
+	//
+	// 1) Any block of queries that contain their own commit/rollback
+	// should be passed through, and not intercepted.
+	//
+	// 2) However, really we ought to skip commit/rollbacks in comments, in
+	// (any kind of) quotes, or that aren't preceeded by and followed by
+	// whitespace (or the beginning/end of the string).  The other
+	// implementation does that, though currently lacks support for double
+	// quoting, back-tick quoting, and [] quoting.
+	//
+	// 3) Arguably though, if it's a block at all, then it shouldn't be
+	// intercepted, as this will prevent the non-begin statements from
+	// being executed.
+	//
+	//
+	// Currently 3 is selected.  This eventually seemed intuitive, but
+	// wasn't originally, before I wrote the others.
+	//
+	//
+	// What really happens in these cases though...
+	//
+	// If we're faking transaction blocks, and we pass a balanced block
+	// like:
+	//
+	// begin transaction
+	// select 1
+	// commit
+	// select 1
+	// begin transaction
+	// select 1
+	// commit
+	//
+	// through, does the db really end up back in autocommit mode like it
+	// started?
+	//
+	// If we're faking transaction blocks, and we pass an unbalanced block
+	// like:
+	//
+	// begin transaction
+	// select 1
+	// commit
+	// select 1
+	// begin transaction
+	// select 1
+	//
+	// through, does the db really end up in non-autocommit mode unlike it
+	// started?
+	//
+	// Should I not intercept, but then set
+	// pvt->_infaketransactionblock=true in the second case?
+	//
+	// Sort this out...
+
+#if 1
+	return !(charstring::containsIgnoringCase(block,"commit") ||
+		charstring::containsIgnoringCase(block,"rollback"));
+
+#elif 0
+	// FIXME: handle other types of quoting - ", `, and []
+
+	bool		inquotes=false;
+	const char	*ptr=block;
+	const char	*prevptr=" ";
+	do {
+
+		if (!inquotes) {
+
+			ptr=skipWhitespaceAndComments(ptr);
+			if (!*ptr) {
+				return true;
+			}
+
+			if (ptr!=block) {
+				prevptr=ptr-1;
+			}
+
+			if (
+				// if the previous character is whitespace
+				// (note that it was initialized to whitespace
+				// so this also works if we're at the beginning
+				// of the block) and...
+				character::isWhitespace(*prevptr) &&
+
+				// we find a commit, followed by the
+				// end of the block, or whitespace or...
+				((!charstring::compareIgnoringCase(
+							ptr,"commit",6) &&
+				(!*(ptr+6) ||
+					character::isWhitespace(*(ptr+6)))) ||
+
+				// we find a rollback, followed by the
+				// end of the block, or whitespace
+				(!charstring::compareIgnoringCase(
+							ptr,"rollback",8) &&
+				(!*(ptr+8) ||
+					character::isWhitespace(*(ptr+8)))))) {
+
+				// then we have a qualifying commit or
+				// rollback in the block
+				return false;
+			}
+		}
+		
+		// if we found a quote, flip our in-quotes flag
+		if (*ptr=='\'') {
+			inquotes=!inquotes;
+		}
+		ptr++;
+
+	} while (*ptr);
+
+	// if we got here, then we hit the end of the block without finding
+	// a qualifying commit or rollback
+	return true;
+#elif 0
+	return (*skipWhitespaceAndComments(block))=='\0';
+#endif
 }
 
 bool sqlrservercontroller::isCommitQuery(const char *query) {
@@ -3050,6 +3231,37 @@ bool sqlrservercontroller::skipWhitespace(const char **ptr,
 		(*ptr)++;
 	}
 	return *ptr!=endptr;
+}
+
+const char *sqlrservercontroller::skipComments(const char *query) {
+	if (!query) {
+		return NULL;
+	}
+	const char	*ptr=query;
+	while (*ptr) {
+		if (!charstring::compare(ptr,"--",2)) {
+			while (*ptr && *ptr!='\n') {
+				ptr++;
+			}
+			if (*ptr) {
+				ptr++;
+			}
+		} else {
+			return ptr;
+		}
+	}
+	return ptr;
+}
+
+const char *sqlrservercontroller::skipWhitespace(const char *query) {
+	if (!query) {
+		return NULL;
+	}
+	const char	*ptr=query;
+	while (*ptr && character::isWhitespace(*ptr)) {
+		ptr++;
+	}
+	return ptr;
 }
 
 const char *sqlrservercontroller::skipWhitespaceAndComments(const char *query) {
@@ -3173,14 +3385,17 @@ uint16_t sqlrservercontroller::countBindVariables(const char *query,
 void sqlrservercontroller::splitObjectName(const char *currentdb,
 						const char *currentschema,
 						const char *combinedobject,
-						char **db,
-						char **schema,
-						char **object) {
+						const char **db,
+						const char **schema,
+						const char **object) {
 
 	// init return values
-	*db=NULL;
-	*schema=NULL;
-	*object=NULL;
+	delete[] pvt->_db;
+	delete[] pvt->_schema;
+	delete[] pvt->_object;
+	pvt->_db=NULL;
+	pvt->_schema=NULL;
+	pvt->_object=NULL;
 
 	// split the combined object
 	char		**parts=NULL;
@@ -3193,9 +3408,9 @@ void sqlrservercontroller::splitObjectName(const char *currentdb,
 	// * db.schema.object
 	switch (partcount) {
 		case 3:
-			*db=parts[0];
-			*schema=parts[1];
-			*object=parts[2];
+			pvt->_db=parts[0];
+			pvt->_schema=parts[1];
+			pvt->_object=parts[2];
 			break;
 		case 2:
 			// If there are 2 parts the it could mean:
@@ -3207,25 +3422,26 @@ void sqlrservercontroller::splitObjectName(const char *currentdb,
 			// but we don't really know for sure. The app may
 			// really mean to target another db.
 			if (!charstring::compare(parts[0],currentdb)) {
-				*db=parts[0];
-				*schema=charstring::duplicate(currentschema);
+				pvt->_db=parts[0];
+				pvt->_schema=
+					charstring::duplicate(currentschema);
 			} else {
-				*db=charstring::duplicate(currentdb);
-				*schema=parts[0];
+				pvt->_db=charstring::duplicate(currentdb);
+				pvt->_schema=parts[0];
 			}
-			*object=parts[1];
+			pvt->_object=parts[1];
 			break;
 		case 1:
-			*db=charstring::duplicate(currentdb);
-			*schema=charstring::duplicate(currentschema);
-			*object=parts[0];
+			pvt->_db=charstring::duplicate(currentdb);
+			pvt->_schema=charstring::duplicate(currentschema);
+			pvt->_object=parts[0];
 			break;
 	}
 
-	// clean up (we don't need to delete each individual part because
-	// they've all been passed out and will be cleaned up by the calling
-	// method)
-	delete[] parts;
+	// pass values out
+	*db=pvt->_db;
+	*schema=pvt->_schema;
+	*object=pvt->_object;
 }
 
 bool sqlrservercontroller::isBitType(const char *type) {
@@ -3772,7 +3988,8 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 	bool	remapped=false;
 	for (i=0; i<3; i++) {
 
-		namevaluepairs		*mappings=cursor->getBindMappings();
+		dictionary<char *, char *>	*mappings=
+						cursor->getBindMappings();
 		uint16_t		count=0;
 		sqlrserverbindvar	*vars=NULL;
 		if (i==0) {
@@ -4290,6 +4507,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// reset column mapping
 	pvt->_columnmap=NULL;
+	pvt->_columnnamemap=NULL;
 
 	// sanity check
 	if (querylen>pvt->_maxquerysize) {
@@ -4743,9 +4961,10 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	success=cursor->executeQuery(query,querylen);
 
 	// set flag indicating that the query has been executed
-	if (success) {
-		cursor->setQueryHasBeenExecuted(true);
-	}
+	// NOTE: We want to do this whether the query succeeds or fails so that
+	// if its reexecuted, closeResultSet() and clearError() will be called
+	// before the reexecution.
+	cursor->setQueryHasBeenExecuted(true);
 
 	// set the query end time
 	dt.getSystemDateAndTime();
@@ -4916,21 +5135,36 @@ void sqlrservercontroller::setDatabaseListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
-			pvt->_columnmap=&(pvt->_mysqldatabasescolumnmap);
+			pvt->_columnmap=
+				&(pvt->_mysqldatabasescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_mysqldatabasescolumnnamemap);
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
-			pvt->_columnmap=&(pvt->_odbcdatabasescolumnmap);
+			pvt->_columnmap=
+				&(pvt->_odbcdatabasescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_odbcdatabasescolumnnamemap);
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			pvt->_columnmap=
+				&(pvt->_jdbcdatabasescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_jdbcdatabasescolumnnamemap);
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -4945,6 +5179,7 @@ void sqlrservercontroller::setSchemaListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -4954,17 +5189,26 @@ void sqlrservercontroller::setSchemaListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -4979,21 +5223,36 @@ void sqlrservercontroller::setTableListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
-			pvt->_columnmap=&(pvt->_mysqltablescolumnmap);
+			pvt->_columnmap=
+				&(pvt->_mysqltablescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_mysqltablescolumnnamemap);
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
-			pvt->_columnmap=&(pvt->_odbctablescolumnmap);
+			pvt->_columnmap=
+				&(pvt->_odbctablescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_odbctablescolumnnamemap);
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			pvt->_columnmap=
+				&(pvt->_jdbctablescolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_jdbctablescolumnnamemap);
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5008,6 +5267,7 @@ void sqlrservercontroller::setTableTypeListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5017,17 +5277,26 @@ void sqlrservercontroller::setTableTypeListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5042,21 +5311,36 @@ void sqlrservercontroller::setColumnListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
-			pvt->_columnmap=&(pvt->_mysqlcolumnscolumnmap);
+			pvt->_columnmap=
+				&(pvt->_mysqlcolumnscolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_mysqlcolumnscolumnnamemap);
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
-			pvt->_columnmap=&(pvt->_odbccolumnscolumnmap);
+			pvt->_columnmap=
+				&(pvt->_odbccolumnscolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_odbccolumnscolumnnamemap);
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			pvt->_columnmap=
+				&(pvt->_jdbccolumnscolumnmap);
+			pvt->_columnnamemap=
+				&(pvt->_jdbccolumnscolumnnamemap);
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5071,6 +5355,7 @@ void sqlrservercontroller::setPrimaryKeyListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5080,17 +5365,26 @@ void sqlrservercontroller::setPrimaryKeyListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5105,6 +5399,7 @@ void sqlrservercontroller::setKeyAndIndexListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5114,17 +5409,26 @@ void sqlrservercontroller::setKeyAndIndexListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5139,6 +5443,7 @@ void sqlrservercontroller::setProcedureBindAndColumnListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5148,17 +5453,26 @@ void sqlrservercontroller::setProcedureBindAndColumnListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5173,6 +5487,7 @@ void sqlrservercontroller::setTypeInfoListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5182,17 +5497,26 @@ void sqlrservercontroller::setTypeInfoListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
@@ -5207,6 +5531,7 @@ void sqlrservercontroller::setProcedureListColumnMap(
 	// but wouldn't if either ODBC were replaced with something else
 	if (pvt->_conn->getListsByApiCalls()) {
 		pvt->_columnmap=NULL;
+		pvt->_columnnamemap=NULL;
 		return;
 	}
 
@@ -5216,36 +5541,50 @@ void sqlrservercontroller::setProcedureListColumnMap(
 	switch (listformat) {
 		case SQLRSERVERLISTFORMAT_NULL:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_MYSQL:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		case SQLRSERVERLISTFORMAT_ODBC:
 			// FIXME: implement this
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
+			break;
+		case SQLRSERVERLISTFORMAT_JDBC:
+			// FIXME: implement this
+			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 		default:
 			pvt->_columnmap=NULL;
+			pvt->_columnnamemap=NULL;
 			break;
 	}
 }
 
 void sqlrservercontroller::buildColumnMaps() {
 
-	// Native/MySQL getDatabaseList:
+	// MySQL getDatabaseList:
 	//
 	// Database
 	pvt->_mysqldatabasescolumnmap.setValue(0,0);
+	pvt->_mysqldatabasescolumnnamemap.setValue(0,"Database");
 
 	// MySQL getTableList:
 	//
 	// Tables_in_xxx -> TABLE_NAME
 	pvt->_mysqltablescolumnmap.setValue(0,2);
+	pvt->_mysqltablescolumnnamemap.setValue(0,"Tables_in_xxx");
 
-	// Native/MySQL getColumnList:
-if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
+	// MySQL getColumnList:
 	//
+// FIXME: fudged...
+// The postgresql connection returns additional rows.
+// All connection modules should return the same as postgresql.
+if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// column_name
 	pvt->_mysqlcolumnscolumnmap.setValue(0,3);
 	// data_type
@@ -5265,7 +5604,6 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// extra
 	pvt->_mysqlcolumnscolumnmap.setValue(8,18);
 } else {
-	//
 	// column_name
 	pvt->_mysqlcolumnscolumnmap.setValue(0,0);
 	// data_type
@@ -5285,9 +5623,18 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// extra
 	pvt->_mysqlcolumnscolumnmap.setValue(8,8);
 }
+	pvt->_mysqlcolumnscolumnnamemap.setValue(0,"column_name");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(1,"data_type");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(2,"character_maximum_length");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(3,"numeric_precision");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(4,"numeric_scale");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(5,"is_nullable");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(6,"column_key");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(7,"column_default");
+	pvt->_mysqlcolumnscolumnnamemap.setValue(8,"extra");
 
 
-	// Native/ODBC getDatabaseList:
+	// ODBC getDatabaseList:
 	//
 	// TABLE_CAT -> Database
 	pvt->_odbcdatabasescolumnmap.setValue(0,0);
@@ -5299,8 +5646,14 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbcdatabasescolumnmap.setValue(3,1);
 	// REMARKS -> NULL
 	pvt->_odbcdatabasescolumnmap.setValue(4,1);
+	pvt->_odbcdatabasescolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_odbcdatabasescolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_odbcdatabasescolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_odbcdatabasescolumnnamemap.setValue(3,"TABLE_TYPE");
+	pvt->_odbcdatabasescolumnnamemap.setValue(4,"REMARKS");
 
 	// ODBC getTableList:
+	//
 	// TABLE_CAT
 	pvt->_odbctablescolumnmap.setValue(0,0);
 	// TABLE_SCHEM
@@ -5311,9 +5664,17 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbctablescolumnmap.setValue(3,3);
 	// REMARKS
 	pvt->_odbctablescolumnmap.setValue(4,4);
+	pvt->_odbctablescolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_odbctablescolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_odbctablescolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_odbctablescolumnnamemap.setValue(3,"TABLE_TYPE");
+	pvt->_odbctablescolumnnamemap.setValue(4,"REMARKS");
 
 	// ODBC getColumnList:
 	//
+// FIXME: fudged...
+// The postgresql connection returns additional rows.
+// All connection modules should return the same as postgresql.
 if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// TABLE_CAT
 	pvt->_odbccolumnscolumnmap.setValue(0,0);
@@ -5329,7 +5690,7 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbccolumnscolumnmap.setValue(5,5);
 	// COLUMN_SIZE
 	pvt->_odbccolumnscolumnmap.setValue(6,6);
-	// BUFFER_LEGTH
+	// BUFFER_LENGTH
 	pvt->_odbccolumnscolumnmap.setValue(7,7);
 	// DECIMAL_DIGITS - smallint - scale
 	pvt->_odbccolumnscolumnmap.setValue(8,8);
@@ -5366,7 +5727,7 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbccolumnscolumnmap.setValue(5,1);
 	// COLUMN_SIZE -> character_maximum_length
 	pvt->_odbccolumnscolumnmap.setValue(6,2);
-	// BUFFER_LEGTH -> character_maximum_length
+	// BUFFER_LENGTH -> character_maximum_length
 	pvt->_odbccolumnscolumnmap.setValue(7,2);
 	// DECIMAL_DIGITS - smallint - scale
 	pvt->_odbccolumnscolumnmap.setValue(8,4);
@@ -5389,16 +5750,202 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// IS_NULLABLE -> NULL
 	pvt->_odbccolumnscolumnmap.setValue(17,5);
 }
+	pvt->_odbccolumnscolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_odbccolumnscolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_odbccolumnscolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_odbccolumnscolumnnamemap.setValue(3,"COLUMN_NAME");
+	pvt->_odbccolumnscolumnnamemap.setValue(4,"DATA_TYPE");
+	pvt->_odbccolumnscolumnnamemap.setValue(5,"TYPE_NAME");
+	pvt->_odbccolumnscolumnnamemap.setValue(6,"COLUMN_SIZE");
+	pvt->_odbccolumnscolumnnamemap.setValue(7,"BUFFER_LENGTH");
+	pvt->_odbccolumnscolumnnamemap.setValue(8,"DECIMAL_DIGITS");
+	pvt->_odbccolumnscolumnnamemap.setValue(9,"NUM_PREC_RADIX");
+	pvt->_odbccolumnscolumnnamemap.setValue(10,"NULLABLE");
+	pvt->_odbccolumnscolumnnamemap.setValue(11,"REMARKS");
+	pvt->_odbccolumnscolumnnamemap.setValue(12,"COLUMN_DEF");
+	pvt->_odbccolumnscolumnnamemap.setValue(13,"SQL_DATA_TYPE");
+	pvt->_odbccolumnscolumnnamemap.setValue(14,"SQL_DATETIME_SUB");
+	pvt->_odbccolumnscolumnnamemap.setValue(15,"CHAR_OCTET_LENGTH");
+	pvt->_odbccolumnscolumnnamemap.setValue(16,"ORDINAL_POSITION");
+	pvt->_odbccolumnscolumnnamemap.setValue(17,"IS_NULLABLE");
+
+
+
+	// JDBC getDatabaseList:
+	//
+	// TABLE_CAT
+	pvt->_jdbcdatabasescolumnmap.setValue(0,0);
+	pvt->_jdbcdatabasescolumnnamemap.setValue(0,"TABLE_CAT");
+
+	// JDBC getTableList:
+	//
+	// TABLE_CAT
+	pvt->_jdbctablescolumnmap.setValue(0,0);
+	// TABLE_SCHEM
+	pvt->_jdbctablescolumnmap.setValue(1,1);
+	// TABLE_NAME
+	pvt->_jdbctablescolumnmap.setValue(2,2);
+	// TABLE_TYPE
+	pvt->_jdbctablescolumnmap.setValue(3,3);
+	// REMARKS
+	pvt->_jdbctablescolumnmap.setValue(4,4);
+	// TYPE_CAT -> NULL
+	pvt->_jdbctablescolumnmap.setValue(5,5);
+	// TYPE_SCHEM -> NULL
+	pvt->_jdbctablescolumnmap.setValue(6,5);
+	// TYPE_NAME -> NULL
+	pvt->_jdbctablescolumnmap.setValue(7,5);
+	// SELF_REFERENCING_COL_NAME -> NULL
+	pvt->_jdbctablescolumnmap.setValue(8,5);
+	// REF_GENERATION -> NULL
+	pvt->_jdbctablescolumnmap.setValue(9,5);
+	pvt->_jdbctablescolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_jdbctablescolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_jdbctablescolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_jdbctablescolumnnamemap.setValue(3,"TABLE_TYPE");
+	pvt->_jdbctablescolumnnamemap.setValue(4,"REMARKS");
+	pvt->_jdbctablescolumnnamemap.setValue(5,"TYPE_CAT");
+	pvt->_jdbctablescolumnnamemap.setValue(6,"TYPE_SCHEM");
+	pvt->_jdbctablescolumnnamemap.setValue(7,"TYPE_NAME");
+	pvt->_jdbctablescolumnnamemap.setValue(8,"SELF_REFERENCING_COL_NAME");
+	pvt->_jdbctablescolumnnamemap.setValue(9,"REF_GENERATION");
+
+	// JDBC getColumnList:
+	//
+// FIXME: fudged
+// The postgresql connection returns additional rows.
+// All connection modules should return the same as postgresql.
+if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
+	// TABLE_CAT
+	pvt->_jdbccolumnscolumnmap.setValue(0,0);
+	// TABLE_SCHEM
+	pvt->_jdbccolumnscolumnmap.setValue(1,1);
+	// TABLE_NAME
+	pvt->_jdbccolumnscolumnmap.setValue(2,2);
+	// COLUMN_NAME
+	pvt->_jdbccolumnscolumnmap.setValue(3,3);
+	// DATA_TYPE (numeric)
+	pvt->_jdbccolumnscolumnmap.setValue(4,4);
+	// TYPE_NAME
+	pvt->_jdbccolumnscolumnmap.setValue(5,5);
+	// COLUMN_SIZE
+	pvt->_jdbccolumnscolumnmap.setValue(6,6);
+	// BUFFER_LENGTH
+	pvt->_jdbccolumnscolumnmap.setValue(7,7);
+	// DECIMAL_DIGITS - smallint - scale
+	pvt->_jdbccolumnscolumnmap.setValue(8,8);
+	// NUM_PREC_RADIX - smallint - precision
+	pvt->_jdbccolumnscolumnmap.setValue(9,9);
+	// NULLABLE
+	pvt->_jdbccolumnscolumnmap.setValue(10,10);
+	// REMARKS
+	pvt->_jdbccolumnscolumnmap.setValue(11,11);
+	// COLUMN_DEF
+	pvt->_jdbccolumnscolumnmap.setValue(12,12);
+	// SQL_DATA_TYPE
+	pvt->_jdbccolumnscolumnmap.setValue(13,13);
+	// SQL_DATETIME_SUB
+	pvt->_jdbccolumnscolumnmap.setValue(14,14);
+	// CHAR_OCTET_LENGTH
+	pvt->_jdbccolumnscolumnmap.setValue(15,15);
+	// ORDINAL_POSITION
+	pvt->_jdbccolumnscolumnmap.setValue(16,16);
+	// IS_NULLABLE
+	pvt->_jdbccolumnscolumnmap.setValue(17,17);
+	// SCOPE_CATALOG -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(18,18);
+	// SCOPE_SCHEMA -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(19,18);
+	// SCOPE_TABLE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(20,18);
+	// SOURCE_DATA_TYPE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(21,18);
+	// IS_AUTOINCREMENT -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(22,18);
+	// IS_GENERATEDCOLUMN -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(23,18);
+} else {
+	// TABLE_CAT -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(0,9);
+	// TABLE_SCHEM -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(1,9);
+	// TABLE_NAME -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(2,9);
+	// COLUMN_NAME -> column_name
+	pvt->_jdbccolumnscolumnmap.setValue(3,0);
+	// DATA_TYPE (numeric) -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(4,9);
+	// TYPE_NAME -> data_type
+	pvt->_jdbccolumnscolumnmap.setValue(5,1);
+	// COLUMN_SIZE -> character_maximum_length
+	pvt->_jdbccolumnscolumnmap.setValue(6,2);
+	// BUFFER_LENGTH -> character_maximum_length
+	pvt->_jdbccolumnscolumnmap.setValue(7,2);
+	// DECIMAL_DIGITS - smallint - scale
+	pvt->_jdbccolumnscolumnmap.setValue(8,4);
+	// NUM_PREC_RADIX - smallint - precision
+	pvt->_jdbccolumnscolumnmap.setValue(9,3);
+	// NULLABLE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(10,9);
+	// REMARKS -> extra
+	pvt->_jdbccolumnscolumnmap.setValue(11,8);
+	// COLUMN_DEF -> column_default
+	pvt->_jdbccolumnscolumnmap.setValue(12,7);
+	// SQL_DATA_TYPE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(13,9);
+	// SQL_DATETIME_SUB -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(14,9);
+	// CHAR_OCTET_LENGTH -> character_maximum_length
+	pvt->_jdbccolumnscolumnmap.setValue(15,2);
+	// ORDINAL_POSITION -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(16,9);
+	// IS_NULLABLE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(17,5);
+	// SCOPE_CATALOG -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(18,9);
+	// SCOPE_SCHEMA -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(19,9);
+	// SCOPE_TABLE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(20,9);
+	// SOURCE_DATA_TYPE -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(21,9);
+	// IS_AUTOINCREMENT -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(22,9);
+	// IS_GENERATEDCOLUMN -> NULL
+	pvt->_jdbccolumnscolumnmap.setValue(23,9);
+}
+	pvt->_jdbccolumnscolumnnamemap.setValue(0,"TABLE_CAT");
+	pvt->_jdbccolumnscolumnnamemap.setValue(1,"TABLE_SCHEM");
+	pvt->_jdbccolumnscolumnnamemap.setValue(2,"TABLE_NAME");
+	pvt->_jdbccolumnscolumnnamemap.setValue(3,"COLUMN_NAME");
+	pvt->_jdbccolumnscolumnnamemap.setValue(4,"DATA_TYPE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(5,"TYPE_NAME");
+	pvt->_jdbccolumnscolumnnamemap.setValue(6,"COLUMN_SIZE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(7,"BUFFER_LENGTH");
+	pvt->_jdbccolumnscolumnnamemap.setValue(8,"DECIMAL_DIGITS");
+	pvt->_jdbccolumnscolumnnamemap.setValue(9,"NUM_PREC_RADIX");
+	pvt->_jdbccolumnscolumnnamemap.setValue(10,"NULLABLE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(11,"REMARKS");
+	pvt->_jdbccolumnscolumnnamemap.setValue(12,"COLUMN_DEF");
+	pvt->_jdbccolumnscolumnnamemap.setValue(13,"SQL_DATA_TYPE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(14,"SQL_DATETIME_SUB");
+	pvt->_jdbccolumnscolumnnamemap.setValue(15,"CHAR_OCTET_LENGTH");
+	pvt->_jdbccolumnscolumnnamemap.setValue(16,"ORDINAL_POSITION");
+	pvt->_jdbccolumnscolumnnamemap.setValue(17,"IS_NULLABLE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(18,"SCOPE_CATALOG");
+	pvt->_jdbccolumnscolumnnamemap.setValue(19,"SCOPE_SCHEMA");
+	pvt->_jdbccolumnscolumnnamemap.setValue(20,"SCOPE_TABLE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(21,"SOURCE_DATA_TYPE");
+	pvt->_jdbccolumnscolumnnamemap.setValue(22,"IS_AUTOINCREMENT");
+	pvt->_jdbccolumnscolumnnamemap.setValue(23,"IS_GENERATEDCOLUMN");
 }
 
 uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
-	return (pvt->_columnmap)?
-			pvt->_columnmap->getValue(col):col;
+	return (pvt->_columnmap)?pvt->_columnmap->getValue(col):col;
 }
 
 uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
-	return (pvt->_columnmap)?
-			pvt->_columnmap->getList()->getLength():colcount;
+	return (pvt->_columnmap)?pvt->_columnmap->getLength():colcount;
 }
 
 bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,
@@ -5578,16 +6125,40 @@ void sqlrservercontroller::endSession() {
 	// running session-end-queries.  Some queries, including drop table,
 	// cause an implicit commit.  If we need to rollback, then make sure
 	// that's done first.
-	if (pvt->_infaketransactionblock) {
+	if (
+		// NOTE: originally, the next line was:
+		//
+		//	pvt->_infaketransactionblock ||
+		//
+		// However...
+		//
+		// When using a database that supports sql blocks, it's
+		// possible to construct a block that confuses the
+		// begin-interceptor into not intercepting the begin.
+		//
+		// Eg:
+		//
+		// select 1
+		// begin transaction;
+		//
+		// (sent as a single query)
+		//
+		// If an app does this on purpose (intending to manually run a
+		// commit later) and then runs some DML and then ends up
+		// ending the session before running the commit/rollback, then
+		// a commit/rollback needs to be run here.
+		//
+		// Don't worry about whether we're actually in a fake
+		// transaction block, just call the commit/rollback if we're
+		// faking transaction blocks at all.
+		//
+		// Worst case, if we weren't in a fake transaction block (and
+		// were in autocommit mode) and the db cares, then it will
+		// throw an error, which will be ignored.
+		pvt->_faketransactionblocks ||
 
-		// if we're faking transaction blocks and the session was ended
-		// but we haven't ended the transaction block, then we need to
-		// rollback and end the block
-		rollback();
-		pvt->_infaketransactionblock=false;
-
-	} else if (pvt->_conn->isTransactional() &&
-				pvt->_needscommitorrollback) {
+		(pvt->_conn->isTransactional() &&
+			pvt->_needscommitorrollback)) {
 
 		// otherwise, commit or rollback as necessary
 		if (pvt->_cfg->getEndOfSessionCommit()) {
@@ -5599,6 +6170,8 @@ void sqlrservercontroller::endSession() {
 			rollback();
 			raiseDebugMessageEvent("done rolling back...");
 		}
+
+		pvt->_infaketransactionblock=false;
 	}
 
 	// truncate/drop temp tables
@@ -5754,7 +6327,7 @@ void sqlrservercontroller::endSession() {
 void sqlrservercontroller::dropTempTables(sqlrservercursor *cursor) {
 
 	// run through the temp table list, dropping tables
-	for (singlylinkedlistnode< char * >
+	for (listnode< char * >
 				*sln=pvt->_sessiontemptablesfordrop.getFirst();
 				sln; sln=sln->getNext()) {
 
@@ -5795,7 +6368,7 @@ void sqlrservercontroller::dropTempTable(sqlrservercursor *cursor,
 void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 
 	// run through the temp table list, truncating tables
-	for (singlylinkedlistnode< char * >
+	for (listnode< char * >
 			*sln=pvt->_sessiontemptablesfortrunc.getFirst();
 			sln; sln=sln->getNext()) {
 		truncateTempTable(cursor,sln->getValue());
@@ -5837,7 +6410,7 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 	}
 
 	// specific tables...
-	for (singlylinkedlistnode< char * >
+	for (listnode< char * >
 			*sln=pvt->_globaltemptables.getFirst();
 						sln; sln=sln->getNext()) {
 		truncateTempTable(cursor,sln->getValue());
@@ -6364,7 +6937,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// * the id might not conform to valid file naming conventions
 	md5	m;
 	m.append((const unsigned char *)id,charstring::length(id));
-	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
+	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
 	// create a key file and key
@@ -6682,7 +7255,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	// get an md5 sum of the id (see bulkLoadBegin for why)
 	md5	m;
 	m.append((const unsigned char *)id,charstring::length(id));
-	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashLength());
+	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
 	// create the key
@@ -6717,11 +7290,11 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	const unsigned char	*ptr=pvt->_bulkclientshm;
 
 	pvt->_bulkerrorfieldtable=(const char *)ptr;
-	ptr+=charstring::length(ptr);
+	ptr+=charstring::length((const char *)ptr);
 	ptr++;
 
 	pvt->_bulkerrorrowtable=(const char *)ptr;
-	ptr+=charstring::length(ptr);
+	ptr+=charstring::length((const char *)ptr);
 	ptr++;
 
 	// get max error count
@@ -6812,9 +7385,9 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 
 		// run through the bulk data, binding and executing each row
 		uint64_t		errorcount=0;
-		singlylinkedlistnode<const unsigned char *>
+		listnode<const unsigned char *>
 				*datanode=pvt->_bulkdata.getFirst();
-		singlylinkedlistnode<uint64_t>
+		listnode<uint64_t>
 				*datalennode=pvt->_bulkdatalen.getFirst();
 		while (datanode) {
 
@@ -6857,7 +7430,9 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 	// get the table, column names, and binds from the query...
 	char			*table=NULL;
 	linkedlist<char *>	cols;
+	cols.setManageArrayValues(true);
 	linkedlist<char *>	binds;
+	binds.setManageArrayValues(true);
 	bulkLoadParseInsert(pvt->_bulkquery,
 				pvt->_bulkquerylen,
 				&table,&cols,&binds);
@@ -6867,8 +7442,8 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 	bool				havecols=false;
 	if (cols.getLength()) {
 		havecols=true;
-		linkedlistnode<char *> *bind=binds.getFirst();
-		linkedlistnode<char *> *col=cols.getFirst();
+		listnode<char *> *bind=binds.getFirst();
+		listnode<char *> *col=cols.getFirst();
 		while (bind && col) {
 			bindtocol.setValue(bind->getValue(),col->getValue());
 			bind=bind->getNext();
@@ -6898,7 +7473,7 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 
 			// run through the binds...
 			uint16_t	inbindcount=0;
-			linkedlistnode<char *> *bind=binds.getFirst();
+			listnode<char *> *bind=binds.getFirst();
 			while (bind) {
 
 				// set up the input bind name
@@ -6974,8 +7549,6 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 
 	// clean up
 	delete[] table;
-	cols.clearAndArrayDelete();
-	binds.clearAndArrayDelete();
 }
 
 void sqlrservercontroller::bulkLoadParseInsert(const char *query,
@@ -7942,7 +8515,7 @@ uint32_t sqlrservercontroller::getStatisticsIndex() {
 
 void sqlrservercontroller::sessionStartQueries() {
 	// run a configurable set of queries at the start of each session
-	for (linkedlistnode< char * > *node=
+	for (listnode< char * > *node=
 			pvt->_cfg->getSessionStartQueries()->getFirst();
 			node; node=node->getNext()) {
 		sessionQuery(node->getValue());
@@ -7951,7 +8524,7 @@ void sqlrservercontroller::sessionStartQueries() {
 
 void sqlrservercontroller::sessionEndQueries() {
 	// run a configurable set of queries at the end of each session
-	for (linkedlistnode< char * > *node=
+	for (listnode< char * > *node=
 			pvt->_cfg->getSessionEndQueries()->getFirst();
 			node; node=node->getNext()) {
 		sessionQuery(node->getValue());
@@ -7981,12 +8554,18 @@ const char *sqlrservercontroller::getConnectStringValue(const char *variable) {
 	const char	*peid=pvt->_constr->getPasswordEncryption();
 	if (pvt->_sqlrpe && charstring::length(peid) &&
 			!charstring::compare(variable,"password")) {
+
+		// handle password files
+		sensitivevalue	sv;
+		sv.setPath(pvt->_cfg->getPasswordPath());
+		sv.parse(pvt->_constr->getConnectStringValue(variable));
+
 		sqlrpwdenc	*pe=
 			pvt->_sqlrpe->getPasswordEncryptionById(peid);
 		if (!pe->oneWay()) {
 			delete[] pvt->_decrypteddbpassword;
-			pvt->_decrypteddbpassword=pe->decrypt(
-				pvt->_constr->getConnectStringValue(variable));
+			pvt->_decrypteddbpassword=
+					pe->decrypt(sv.getTextValue());
 			return pvt->_decrypteddbpassword;
 		}
 	}
@@ -8811,6 +9390,9 @@ const char *sqlrservercontroller::getColumnName(sqlrservercursor *cursor,
 	if (!cursor->getColumnInfoIsValid()) {
 		return NULL;
 	}
+	if (pvt->_columnnamemap) {
+		return pvt->_columnnamemap->getValue(col);
+	}
 	return cursor->getColumnNameFromBuffer(mapColumn(col));
 }
 
@@ -8819,6 +9401,10 @@ uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 	// see comment in colCount()
 	if (!cursor->getColumnInfoIsValid()) {
 		return 0;
+	}
+	if (pvt->_columnnamemap) {
+		// FIXME: use a static map for these
+		return charstring::length(pvt->_columnnamemap->getValue(col));
 	}
 	return cursor->getColumnNameLengthFromBuffer(mapColumn(col));
 }
@@ -9359,7 +9945,7 @@ memorypool *sqlrservercontroller::getBindMappingsPool(
 	return cursor->getBindMappingsPool();
 }
 
-namevaluepairs *sqlrservercontroller::getBindMappings(
+dictionary<char *, char *> *sqlrservercontroller::getBindMappings(
 						sqlrservercursor *cursor) {
 	return cursor->getBindMappings();
 }
@@ -9643,14 +10229,14 @@ sqlrparser *sqlrservercontroller::getParser() {
 	return pvt->_sqlrp;
 }
 
-gsscontext *sqlrservercontroller::getGSSContext() {
+gsscontext *sqlrservercontroller::getGssContext() {
 	return (pvt->_currentprotocol)?
-			pvt->_currentprotocol->getGSSContext():NULL;
+			pvt->_currentprotocol->getGssContext():NULL;
 }
 
-tlscontext *sqlrservercontroller::getTLSContext() {
+tlscontext *sqlrservercontroller::getTlsContext() {
 	return (pvt->_currentprotocol)?
-			pvt->_currentprotocol->getTLSContext():NULL;
+			pvt->_currentprotocol->getTlsContext():NULL;
 }
 
 sqlrconfig *sqlrservercontroller::getConfig() {

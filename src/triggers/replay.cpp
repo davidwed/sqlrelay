@@ -50,7 +50,6 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		sqlrtrigger_replay(sqlrservercontroller *cont,
 						sqlrtriggers *ts,
 						domnode *parameters);
-		~sqlrtrigger_replay();
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						bool before,
@@ -140,7 +139,14 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 					sqlrtrigger(cont,ts,parameters) {
 	this->cont=cont;
 
+	colcache.setManageArrayKeys(true);
+	colcache.setManageValues(true);
+	
+
 	debug=cont->getConfig()->getDebugTriggers();
+
+	log.setManageValues(true);
+	conditions.setManageValues(true);
 
 	// get whether to include selects
 	includeselects=charstring::isYes(
@@ -191,10 +197,6 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 	wasintx=false;
 
 	disabled=false;
-}
-
-sqlrtrigger_replay::~sqlrtrigger_replay() {
-	conditions.clearAndDelete();
 }
 
 bool sqlrtrigger_replay::run(sqlrserverconnection *sqlrcon,
@@ -248,14 +250,14 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	// to log the current query.  Clear the log.
 	if (!cont->inTransaction()) {
 		logpool.clear();
-		log.clearAndDelete();
+		log.clear();
 	}
 
 	// If we weren't in a transaction, but are now,
 	// then we also need to clear the log.
 	if (cont->inTransaction() && !wasintx) {
 		logpool.clear();
-		log.clearAndDelete();
+		log.clear();
 		wasintx=true;
 	}
 
@@ -371,7 +373,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 	/*if (debug) {
 		stdoutput.printf("-----------------------\n");
-		for (linkedlistnode<querydetails *> *node=log.getFirst();
+		for (listnode<querydetails *> *node=log.getFirst();
 						node; node=node->getNext()) {
 			stdoutput.printf("%s\n",node->getValue()->query);
 		}
@@ -389,7 +391,7 @@ void sqlrtrigger_replay::disableUntilEndOfTx(const char *query,
 	// and disable replay altogether until end-of-transaction.
 	if (cont->inTransaction()) {
 		logpool.clear();
-		log.clearAndDelete();
+		log.clear();
 		disabled=true;
 		if (debug) {
 			stdoutput.printf("%s query encountered, "
@@ -525,6 +527,8 @@ void sqlrtrigger_replay::getColumns(const char *query,
 	}
 	char	*table=charstring::duplicate(start,end-start);
 
+	// strip any quoting
+	charstring::stripSet(table,"\"'`[]");
 
 	// get all of the columns in the table
 	*allcolumns=colcache.getValue(table);
@@ -571,10 +575,19 @@ void sqlrtrigger_replay::getColumns(const char *query,
 		// create array of columns from allcolumns
 		// that match the number of values
 		*cols=new char *[*colcount];
-		linkedlistnode<char *>	*node=(*allcolumns)->getFirst();
-		for (uint64_t i=0; i<*colcount; i++) {
-			(*cols)[i]=charstring::duplicate(node->getValue());
-			node=node->getNext();
+		listnode<char *>	*node=(*allcolumns)->getFirst();
+		if (node) {
+			for (uint64_t i=0; i<*colcount; i++) {
+				(*cols)[i]=charstring::duplicate(
+							node->getValue());
+				node=node->getNext();
+			}
+		} else {
+			// this can happen if various problems occur,
+			// eg. if the table name is invalid
+			for (uint64_t i=0; i<*colcount; i++) {
+				(*cols)[i]=NULL;
+			}
 		}
 	}
 
@@ -592,6 +605,7 @@ void sqlrtrigger_replay::getColumnsFromDb(char *table,
 					const char **autoinccolumn) {
 
 	*allcolumns=new linkedlist<char *>();
+	(*allcolumns)->setManageArrayValues(true);
 
 	// get all of the columns in the table
 	sqlrservercursor        *gclcur=cont->newCursor();
@@ -980,7 +994,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 	// If we're replaying the entire tx then start at the beginning of the
 	// log.  If we're just replaying the last query, then start at the end
 	// of the log.
-	linkedlistnode<querydetails *> *current=
+	listnode<querydetails *> *current=
 				(replaytx)?log.getFirst():log.getLast();
 
 	// replay...
@@ -1019,7 +1033,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 		if (debug && incount) {
 			stdoutput.printf("	input binds {\n");
 		}
-		linkedlistnode<sqlrserverbindvar *>	*inbindnode=
+		listnode<sqlrserverbindvar *>	*inbindnode=
 						qd->inbindvars.getFirst();
 		for (uint16_t i=0; i<incount; i++) {
 			sqlrserverbindvar	*bv=
@@ -1044,7 +1058,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 		if (debug && outcount) {
 			stdoutput.printf("	output binds {\n");
 		}
-		linkedlistnode<sqlrserverbindvar *>	*outbindnode=
+		listnode<sqlrserverbindvar *>	*outbindnode=
 					qd->outbindvars.getFirst();
 		for (uint16_t i=0; i<outcount; i++) {
 			sqlrserverbindvar	*bv=
@@ -1071,7 +1085,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 			stdoutput.printf("	"
 					"input-output binds {\n");
 		}
-		linkedlistnode<sqlrserverbindvar *>	*inoutbindnode=
+		listnode<sqlrserverbindvar *>	*inoutbindnode=
 					qd->inoutbindvars.getFirst();
 		for (uint16_t i=0; i<inoutcount; i++) {
 			sqlrserverbindvar	*bv=
@@ -1178,7 +1192,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
 		// roll back and clear the log on error
 		cont->rollback();
 		logpool.clear();
-		log.clearAndDelete();
+		log.clear();
 	}
 
 	// start logging queries again
@@ -1192,7 +1206,7 @@ bool sqlrtrigger_replay::replayCondition(sqlrservercursor *sqlrcur,
 						bool indent) {
 
 	// did we get a replay condition?
-	for (linkedlistnode<condition *> *node=conditions.getFirst();
+	for (listnode<condition *> *node=conditions.getFirst();
 						node; node=node->getNext()) {
 
 		condition	*val=node->getValue();
@@ -1398,16 +1412,15 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 	}
 
 	logpool.clear();
-	log.clearAndDelete();
+	log.clear();
 
 	// clear cache
-	for (linkedlistnode<dictionarynode<char *,linkedlist<char *> *> *>
-				*colcachenode=colcache.getList()->getFirst();
+	for (listnode<char *> *colcachenode=colcache.getKeys()->getFirst();
 				colcachenode;
 				colcachenode=colcachenode->getNext()) {
-		colcachenode->getValue()->getValue()->clearAndArrayDelete();
+		colcache.getValue(colcachenode->getValue())->clear();
 	}
-	colcache.clearAndArrayDeleteKeysAndDeleteValues();
+	colcache.clear();
 	autoinccolcache.clear();
 
 	wasintx=false;

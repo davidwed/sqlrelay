@@ -76,7 +76,7 @@ bool sqlrnotifications::load(domnode *parameters) {
 
 void sqlrnotifications::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
+	for (listnode< sqlrnotificationplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrnotificationplugin	*sqlrnp=node->getValue();
@@ -168,7 +168,7 @@ void sqlrnotifications::run(sqlrlistener *sqlrl,
 					sqlrevent_t event,
 					const char *info) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
+	for (listnode< sqlrnotificationplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->n->run(sqlrl,sqlrcon,sqlrcur,event,info);
@@ -176,7 +176,7 @@ void sqlrnotifications::run(sqlrlistener *sqlrl,
 }
 
 void sqlrnotifications::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
+	for (listnode< sqlrnotificationplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->n->endTransaction(commit);
@@ -184,7 +184,7 @@ void sqlrnotifications::endTransaction(bool commit) {
 }
 
 void sqlrnotifications::endSession() {
-	for (singlylinkedlistnode< sqlrnotificationplugin * > *node=
+	for (listnode< sqlrnotificationplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->n->endSession();

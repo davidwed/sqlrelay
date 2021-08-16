@@ -548,6 +548,16 @@ case $host_os in
 		DARWIN="yes"
 		AC_MSG_RESULT(yes)
 		FW_CHECK_WNOLONGDOUBLE
+
+		dnl prefer bash to the default shell, which could be tcsh or
+		dnl zsh on older versions, and which doesn't run libtool very
+		dnl well
+		BASH=`which bash`
+		if ( test -n "$BASH" )
+		then
+			SHELL="$BASH"
+			AC_SUBST(SHELL)
+		fi
 		;;
 	* )
 		AC_MSG_RESULT(no)
@@ -1002,9 +1012,9 @@ then
 	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
 	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
 	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "1" -o "$V2" -lt "2" -o "$V3" -lt "0" )
+	if ( test "$V1" -lt "2")
 	then
-		AC_MSG_ERROR([Rudiments version must be >= 1.1.0, found version $RUDIMENTSVERSION])
+		AC_MSG_ERROR([Rudiments version must be >= 2.0.0, found version $RUDIMENTSVERSION])
 		exit
 	fi
 fi
@@ -1837,42 +1847,6 @@ fi
 FW_LIBS(gdbm,[$GDBMLIBS])
 
 AC_SUBST(GDBMLIBS)
-])
-
-
-AC_DEFUN([FW_CHECK_GLIB],
-[
-
-if ( test "$cross_compiling" = "yes" )
-then
-	dnl cross compiling ...
-	echo "cross compiling"
-	if ( test -n "$GLIBPATH" )
-	then
-		GLIBINCLUDES="-I$GLIBPATH/include/glib-2.0 -I$GLIBPATH/lib/glib/include"
-		GLIBLIBS="-L$GLIBPATH/lib -lglib-2.0"
-		GLIBLIBSPATH="$GLIBPATH/lib"
-	fi
-else
-	GLIBINCLUDES="`pkg-config glib-2.0 --cflags 2> /dev/null`"
-	GLIBLIBS="`pkg-config glib-2.0 --libs 2> /dev/null`"
-	if ( test -z "$GLIBINCLUDES" -a -z "$GLIBLIBS" )
-	then
-		FW_CHECK_HEADERS_AND_LIBS([$LIBGLIBPATH],[glib-2.0],[glib.h],[glib-2.0],[$STATICFLAG],[$RPATHFLAG],[GLIBINCLUDES],[GLIBLIBS],[GLIBLIBSPATH],[GLIBSTATIC])
-		if ( test -n "$GLIBINCLUDES" )
-		then
-			PATHNAME=`echo $GLIBINCLUDES | sed -e "s|-I||"`
-			DIRNAME1=`dirname $PATHNAME 2> /dev/null`
-			DIRNAME2=`dirname $DIRNAME1 2> /dev/null`
-			GLIBINCLUDES="$GLIBINCLUDES -I$DIRNAME2/lib/glib/include -I$DIRNAME2/lib/glib-2.0/include"
-		fi
-	fi
-fi
-
-FW_INCLUDES(glib,[$GLIBINCLUDES])
-FW_LIBS(glib,[$GLIBLIBS])
-
-AC_SUBST(GLIBLIBS)
 ])
 
 
@@ -2846,107 +2820,6 @@ fi
 
 
 
-AC_DEFUN([FW_CHECK_MDBTOOLS],
-[
-if ( test "$ENABLE_MDBTOOLS" = "yes" )
-then
-	FW_CHECK_GLIB
-
-	MDBTOOLSINCLUDES=""
-	MDBTOOLSLIBS=""
-	MDBTOOLSLIBSPATH=""
-	MDBTOOLSSTATIC=""
-
-	if ( test -n "$GLIBINCLUDES" -a -n "$GLIBLIBS" )
-	then
-
-		if ( test "$cross_compiling" = "yes" )
-		then
-
-			dnl cross compiling ...
-			echo "cross compiling"
-			if ( test -n "$MDBTOOLSPATH" )
-			then
-				MDBTOOLSINCLUDES="-I$MDBTOOLSPATH/include $GLIBINCLUDES"
-				MDBTOOLSLIBS="-L$MDBTOOLSPATH/lib -lmdbsql -lmdb $GLIBLIBS"
-				MDBTOOLSLIBSPATH="$MDBTOOLSPATH/lib"
-			fi
-
-		else
-
-			STATICFLAG=""
-			if ( test -n "$STATICLINK" )
-			then
-				STATICFLAG="-static"
-			fi
-
-			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdb],[mdbsql.h],[mdbsql],[$STATICFLAG],[$RPATHFLAG],[MDBSQLINCLUDES],[MDBSQLLIBS],[MDBSQLLIBSPATH],[MDBSQLSTATIC])
-			FW_CHECK_HEADERS_AND_LIBS([$MDBTOOLSPATH],[mdb],[mdbtools.h],[mdb],[$STATICFLAG],[$RPATHFLAG],[MDBINCLUDES],[MDBLIBS],[MDBTOOLSLIBSPATH],[MDBTOOLSSTATIC])
-
-			if ( test -n "$MDBSQLINCLUDES" -o -n "$MDBSQLLIBS" -o -n "$MDBINCLUDES" -o -n "$MDBLIBS" )
-			then
-				MDBTOOLSINCLUDES="$MDBINCLUDES $MDBSQLINCLUDES $GLIBINCLUDES"
-				MDBTOOLSLIBS="$MDBSQLLIBS $MDBLIBS $GLIBLIBS"
-				AC_MSG_CHECKING(if MDB Tools has mdb_run_query)
-				FW_TRY_LINK([extern "C" {
-#include <mdbsql.h>
-}
-#include <stdlib.h>],[mdb_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_RUN_QUERY,1,Some versions of mdbtools define mdb_run_query)],[AC_MSG_RESULT(no)])
-				AC_MSG_CHECKING(if MDB Tools has mdb_sql_run_query)
-				FW_TRY_LINK([extern "C" {
-#include <mdbsql.h>
-}
-#include <stdlib.h>],[mdb_sql_run_query(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_SQL_RUN_QUERY,1,Some versions of mdbtools define mdb_sql_run_query)],[AC_MSG_RESULT(no)])
-				AC_MSG_CHECKING(if MDB Tools has mdb_sql_fetch_row)
-				FW_TRY_LINK([extern "C" {
-#include <mdbsql.h>
-}
-#include <stdlib.h>],[mdb_sql_fetch_row(NULL,NULL);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_SQL_FETCH_ROW,1,Some versions of mdbtools define mdb_sql_fetch_row)],[AC_MSG_RESULT(no)])
-				AC_MSG_CHECKING(if mdb_col_to_string has 5 parameters)
-				FW_TRY_LINK([extern "C" {
-#include <mdbsql.h>
-}
-#include <stdlib.h>],[mdb_col_to_string(NULL,NULL,0,0,0);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_COL_TO_STRING_5_PARAM,1,Some versions of mdbtools have 5 param mdb_col_to_string)],[AC_MSG_RESULT(no)])
-
-				AC_MSG_CHECKING(if MDB Tools has mdb_remove_backends)
-				FW_TRY_LINK([extern "C" {
-#include <mdbtools.h>
-}
-#include <stdlib.h>],[mdb_remove_backends();],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_REMOVE_BACKENDS,1,Some versions of mdbtools have mdb_remove_backends())],[AC_MSG_RESULT(no)])
-
-				AC_MSG_CHECKING(if MDB Tools has mdb_open with 2 params)
-				FW_TRY_LINK([extern "C" {
-#include <mdbtools.h>
-}
-#include <stdlib.h>],[mdb_open(0,MDB_NOFLAGS);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_OPEN_2_PARAM,1,Some versions of mdbtools have mdb_open() with 2 parameters)],[AC_MSG_RESULT(no)])
-
-				AC_MSG_CHECKING(if MDB Tools has mdb_close)
-				FW_TRY_LINK([extern "C" {
-#include <mdbtools.h>
-}
-#include <stdlib.h>],[mdb_close(0);],[$MDBTOOLSINCLUDES],[$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm],[$LD_LIBRARY_PATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_MDB_CLOSE,1,Some versions of mdbtools have mdb_close())],[AC_MSG_RESULT(no)])
-			fi
-		
-		fi
-	fi
-
-	if ( test -z "$MDBTOOLSLIBS" )
-	then
-		AC_MSG_WARN(MDB Tools support will not be built.)
-	fi
-
-	FW_INCLUDES(mdbtools,[$MDBTOOLSINCLUDES])
-	FW_LIBS(mdbtools,[$MDBTOOLSLIBS])
-
-	AC_SUBST(MDBTOOLSINCLUDES)
-	AC_SUBST(MDBTOOLSLIBS)
-	AC_SUBST(MDBTOOLSLIBSPATH)
-	AC_SUBST(MDBTOOLSSTATIC)
-fi
-])
-
-
-
 AC_DEFUN([FW_CHECK_PERL],
 [
 if ( test "$ENABLE_PERL" = "yes" )
@@ -3370,7 +3243,6 @@ then
 
 		if ( test -n "$HAVE_RUBY" )
 		then
-			AC_MSG_CHECKING(for ruby.h)
 			rm -f conftest.rb
 			cat > conftest.rb << END
 require "mkmf"
@@ -3408,6 +3280,7 @@ print "all:\n"
 print "	echo \$(hdrdir)\n"
 END
 
+			AC_MSG_CHECKING(for ruby.h)
 			HAVE_RUBY_H=""
 			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
 			do
@@ -3416,22 +3289,44 @@ END
 					HAVE_RUBY_H="yes"
 				fi
 			done
-			rm -f conftest.rb
-
-			dnl if we didn't have ruby.h then we don't have ruby
 			if ( test -z "$HAVE_RUBY_H" )
 			then
 				AC_MSG_RESULT(no)
+				dnl if we didn't have ruby.h
+				dnl then we don't have ruby
 				HAVE_RUBY=""
 			else
 				AC_MSG_RESULT(yes)
 			fi
+
+			AC_MSG_CHECKING(for ruby/thread.h)
+			HAVE_RUBY_THREAD_H=""
+			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
+			do
+				if ( test -r "$dir/ruby/thread.h" )
+				then
+					HAVE_RUBY_THREAD_H="yes"
+				fi
+			done
+			if ( test -z "$HAVE_RUBY_THREAD_H" )
+			then
+				AC_MSG_RESULT(no)
+			else
+				AC_MSG_RESULT(yes)
+			fi
+
+			rm -f conftest.rb
 		fi
 	fi
 
 	if ( test -z "$HAVE_RUBY" )
 	then
 		AC_MSG_WARN(The Ruby API will not be built.)
+	fi
+
+	if ( test -n "$HAVE_RUBY_THREAD_H" )
+	then
+		AC_DEFINE(HAVE_RUBY_THREAD_H,1,Some versions of Ruby have ruby/thread.h)
 	fi
 
 	AC_SUBST(HAVE_RUBY)
@@ -3636,7 +3531,7 @@ then
 	else
 
 		PHPCONFIG=""
-		for file in "php-config" "php-config-5" "php-config-5.1" "php-config-5.2" "php-config-5.3" "php-config-5.3" "php-config-5.4" "php-config-5.5" "php-config-5.6" "php-config-5.7" "php-config-5.8" "php-config-7.0" "php-config-7.1" "php-config-7.2" "php-config-7.3" "php-config-7.4" "php-config-7.5" 
+		for file in "php-config" "php-config-5" "php-config-5.1" "php-config-5.2" "php-config-5.3" "php-config-5.3" "php-config-5.4" "php-config-5.5" "php-config-5.6" "php-config-5.7" "php-config-5.8" "php-config-7.0" "php-config-7.1" "php-config-7.2" "php-config-7.3" "php-config-7.4" "php-config-8.0" "php-config-8.1" "php-config-8.2" "php-config-8.3" "php-config-8.4"
 		do
 			if ( test -n "$PHPPATH" )
 			then
@@ -3773,6 +3668,7 @@ then
 	AC_SUBST(PHPEXTDIR)
 	AC_SUBST(PHPVERSION)
 	AC_SUBST(PHPMAJORVERSION)
+	AC_DEFINE_UNQUOTED(PHPMAJORVERSION,[$PHPMAJORVERSION],PHP major version)
 	AC_SUBST(PHPLIB)
 	AC_SUBST(PHPCONFDIR)
 	AC_SUBST(PHPCONFSTYLE)
@@ -3953,7 +3849,14 @@ END
 				then
 					ERLANGLIBS="-L$ERLANG_LIB_DIR"
 				fi
-				ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
+
+				ERLINTERFACELIB=""
+				if ( test -r "$ERLANG_LIB_DIR/liberl_interface.a" )
+				then
+					ERLINTERFACELIB="-lerl_interface"
+				fi
+
+				ERLANGLIBS="$ERLANGLIBS $ERLINTERFACELIB -lei"
 
 				HAVE_ERLANG="yes"
 			else

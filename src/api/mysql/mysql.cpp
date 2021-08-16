@@ -1343,14 +1343,14 @@ MYSQL_ROW_OFFSET mysql_row_seek(MYSQL_RES *result, MYSQL_ROW_OFFSET offset) {
 	MYSQL_ROW_OFFSET	currentoffset=mysql_row_tell(result);
 	result->previousrow=result->currentrow;
 	result->currentrow=
-		((linkedlistnode< my_ulonglong > *)offset)->getValue();
+		((listnode< my_ulonglong > *)offset)->getValue();
 	return (MYSQL_ROW_OFFSET)currentoffset;
 }
 
 MYSQL_ROW_OFFSET mysql_row_tell(MYSQL_RES *result) {
 	debugFunction();
-	linkedlistnode< my_ulonglong >	*rowcachenode=
-		new linkedlistnode< my_ulonglong >(result->currentrow);
+	listnode< my_ulonglong >	*rowcachenode=
+		new listnode< my_ulonglong >(result->currentrow);
 	result->rowcache.append(rowcachenode);
 	return (MYSQL_ROW_OFFSET)rowcachenode;
 }

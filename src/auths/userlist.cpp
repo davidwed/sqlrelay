@@ -3,6 +3,7 @@
 
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
+#include <rudiments/sensitivevalue.h>
 
 class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 	public:
@@ -18,9 +19,11 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 						const char *password,
 						uint64_t index);
 		const char	**users;
-		const char	**passwords;
+		char		**passwords;
 		const char	**passwordencryptions;
 		uint64_t	usercount;
+
+		sensitivevalue	passwordvalue;
 };
 
 sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
@@ -41,14 +44,17 @@ sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
 	// users and passwords from the configuration in them
 	// this is faster than running through the xml over and over
 	users=new const char *[usercount];
-	passwords=new const char *[usercount];
+	passwords=new char *[usercount];
 	passwordencryptions=new const char *[usercount];
+
+	passwordvalue.setPath(cont->getConfig()->getPasswordPath());
 
 	domnode *user=parameters->getFirstTagChild("user");
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
-		passwords[i]=user->getAttributeValue("password");
+		passwordvalue.parse(user->getAttributeValue("password"));
+		passwords[i]=passwordvalue.detachTextValue();
 
 		// support modern "passwordencryptionid" and fall back to
 		// older "passwordencryption" attribute
@@ -65,6 +71,9 @@ sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
 
 sqlrauth_userlist::~sqlrauth_userlist() {
 	delete[] users;
+	for (uint64_t i=0; i<usercount; i++) {
+		delete[] passwords[i];
+	}
 	delete[] passwords;
 	delete[] passwordencryptions;
 }
@@ -108,8 +117,7 @@ const char *sqlrauth_userlist::auth(sqlrcredentials *cred) {
 
 				// if subject alternate names were
 				// present then validate against those
-				for (linkedlistnode< char * > *
-						node=sans->getFirst();
+				for (listnode< char * > *node=sans->getFirst();
 						node; node=node->getNext()) {
 					if (!charstring::compare(
 						node->getValue(),users[i])) {

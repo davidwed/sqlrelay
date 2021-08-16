@@ -119,6 +119,13 @@ int main(int argc, const char **argv) {
 	bool		verbose=cmdline.found("verbose");
 	const char	*table=cmdline.getValue("table");
 	bool 		ignorecolumns=cmdline.found("ignorecolumns");
+	const char	*primarykeyname=
+				cmdline.getValue("primarykeyname");
+	uint32_t	primarykeyposition=
+				charstring::toUnsignedInteger(
+					cmdline.getValue("primarykeyposition"));
+	const char	*primarykeysequence=
+				cmdline.getValue("primarykeysequence");
 
 	// at least id, host or socket, and file are required
 	if ((charstring::isNullOrEmpty(id) &&
@@ -220,6 +227,13 @@ int main(int argc, const char **argv) {
 	if (!charstring::compareIgnoringCase(
 			charstring::findLast(file,'.'),".csv")) {
 		sqlri=new sqlrimportcsv();
+		if (!charstring::isNullOrEmpty(primarykeyname) &&
+			!charstring::isNullOrEmpty(primarykeysequence)) {
+			((sqlrimportcsv *)sqlri)->insertPrimaryKey(
+							primarykeyname,
+							primarykeyposition,
+							primarykeysequence);
+		}
 	} else {
 		sqlri=new sqlrimportxml();
 	}
@@ -227,7 +241,7 @@ int main(int argc, const char **argv) {
 	sqlri->setSqlrCursor(&sqlrcur);
 	sqlri->setDbType(sqlrcon.identify());
 	if (!charstring::isNullOrEmpty(table)) {
-		sqlri->setTable(table);
+		sqlri->setObjectName(table);
 	}
 	sqlri->setIgnoreColumns(ignorecolumns);
 	sqlri->setCommitCount(commitcount);

@@ -2,7 +2,7 @@
 %{!?tcl_sitearch: %global tcl_sitearch %{_libdir}/tcl%{tcl_version}}
 
 Name: sqlrelay
-Version: 1.8.0
+Version: 2.0.0
 Release: 1%{?dist}
 Summary: Database proxy
 
@@ -11,7 +11,7 @@ URL: http://sqlrelay.sourceforge.net
 Source0: http://downloads.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 
 %{?systemd_requires}
-BuildRequires: gcc-c++, rudiments-devel >= 1.3.0, systemd
+BuildRequires: gcc-c++, rudiments-devel >= 2.0.0, systemd
 
 %description
 SQL Relay is a persistent database connection pooling, proxying, throttling,
@@ -88,7 +88,7 @@ The SQL Relay C client library.
 %package c++-devel
 License: LGPLv2
 Summary: Development files for the SQL Relay C++ client library
-Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.2.0
+Requires: %{name}-c++%{?_isa} = %{version}-%{release}, rudiments-devel >= 1.4.0
 
 %description c++-devel
 Development files for the SQL Relay C++ client library.
@@ -137,7 +137,7 @@ Requires: perl-%{name}%{?_isa} = %{version}-%{release}
 Perl DBI driver for SQL Relay.
 
 
-%if 0%{?fedora} || 0%{?rhel} > 7
+%if 0%{?fedora} || 0%{?rhel} > 6
 
 %package -n python3-%{name}
 License: ZPL 1.0 or MIT
@@ -342,17 +342,6 @@ BuildRequires: firebird-devel
 Firebird back-end module for SQL Relay.
 
 
-%if 0%{?fedora} || 0%{?rhel} < 8
-%package mdbtools
-License: GPLv2 with exceptions
-Summary: MDB Tools back-end module for SQL Relay
-BuildRequires: mdbtools-devel
-
-%description mdbtools
-MDB Tools back-end module for SQL Relay.
-%endif
-
-
 %package informix
 License: GPLv2 with exceptions
 Summary: Informix back-end module for SQL Relay
@@ -469,8 +458,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-status
 %{_bindir}/sqlr-pwdenc
-%{_libdir}/libsqlrserver.so.11
-%{_libdir}/libsqlrserver.so.11.*
+%{_libdir}/libsqlrserver.so.12
+%{_libdir}/libsqlrserver.so.12.*
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
@@ -588,8 +577,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %systemd_preun %{name}cachemanager.service
 
 %files common
-%{_libdir}/libsqlrutil.so.11
-%{_libdir}/libsqlrutil.so.11.*
+%{_libdir}/libsqlrutil.so.12
+%{_libdir}/libsqlrutil.so.12.*
 
 %files common-devel
 %dir %{_includedir}/%{name}
@@ -599,12 +588,12 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_libdir}/libsqlrutil.so
 
 %files c++
-%{_libdir}/libsqlrclient.so.6
-%{_libdir}/libsqlrclient.so.6.*
+%{_libdir}/libsqlrclient.so.7
+%{_libdir}/libsqlrclient.so.7.*
 
 %files c
-%{_libdir}/libsqlrclientwrapper.so.6
-%{_libdir}/libsqlrclientwrapper.so.6.*
+%{_libdir}/libsqlrclientwrapper.so.7
+%{_libdir}/libsqlrclientwrapper.so.7.*
 
 %files c++-devel
 %{_bindir}/sqlrclient-config
@@ -651,8 +640,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %exclude %{_libdir}/lib*.la
 
 %files -n odbc-%{name}
-%{_libdir}/libsqlrodbc.so.6
-%{_libdir}/libsqlrodbc.so.6.*
+%{_libdir}/libsqlrodbc.so.7
+%{_libdir}/libsqlrodbc.so.7.*
 %{_libdir}/libsqlrodbc.so
 
 %files -n perl-%{name}
@@ -669,7 +658,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/DBD::SQLRelay.*
 
 
-%if 0%{?fedora} || 0%{?rhel} > 7
+%if 0%{?fedora} || 0%{?rhel} > 6
 
 %files -n python3-%{name}
 %dir %{python3_sitearch}/SQLRelay/__pycache__
@@ -771,12 +760,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_firebird*
 
-%if 0%{?fedora} || 0%{?rhel} < 8
-%files mdbtools
-%dir %{_libexecdir}/%{name}
-%{_libexecdir}/%{name}/sqlrconnection_mdbtools*
-%endif
-
 %files informix
 %dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrconnection_informix*
@@ -795,6 +778,15 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
+* Fri Apr 30 2021 David Muse <david.muse@firstworks.com> - 2.0.0-1
+- Updated to version 2.0.0.
+- Removed support for mdbtools.
+- Updated to build python 3 packages for rhel > 6.
+
+* Thu Mar 04 2021 David Muse <david.muse@firstworks.com> - 1.9.0-1
+- Updated to version 1.9.0.
+- Updated to require rudiments 1.4.0.
+
 * Mon Aug 24 2020 David Muse <david.muse@firstworks.com> - 1.8.0-1
 - Updated to not require node-gyp.
 - Updated to not build mdbtools packages on rhel 8.

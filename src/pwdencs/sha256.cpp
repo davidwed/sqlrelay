@@ -23,7 +23,7 @@ bool sqlrpwenc_sha256::oneWay() {
 char *sqlrpwenc_sha256::encrypt(const char *value) {
 	sha256	s;
 	s.append((const unsigned char *)value,charstring::length(value));
-	return charstring::hexEncode(s.getHash(),s.getHashLength());
+	return charstring::hexEncode(s.getHash(),s.getHashSize());
 }
 
 extern "C" {

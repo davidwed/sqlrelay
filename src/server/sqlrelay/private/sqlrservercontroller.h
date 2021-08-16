@@ -47,6 +47,7 @@
 		bool	interceptQuery(sqlrservercursor *cursor);
 		bool	isBeginTransactionQuery(sqlrservercursor *cursor);
 		bool	isBeginTransactionQuery(const char *query);
+		bool	blockCanBeIntercepted(const char *block);
 		bool	isCommitQuery(const char *query);
 		bool	isRollbackQuery(const char *query);
 		bool	isAutoCommitOnQuery(const char *query);

@@ -61,7 +61,7 @@ bool sqlrqueries::load(domnode *parameters) {
 
 void sqlrqueries::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+	for (listnode< sqlrqueryplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrqueryplugin	*sqlrlp=node->getValue();
@@ -153,7 +153,7 @@ sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
 					uint32_t querylength,
 					uint16_t id) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+	for (listnode< sqlrqueryplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrquery	*qr=node->getValue()->qr;
@@ -165,7 +165,7 @@ sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
 }
 
 void sqlrqueries::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+	for (listnode< sqlrqueryplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->qr->endTransaction(commit);
@@ -173,7 +173,7 @@ void sqlrqueries::endTransaction(bool commit) {
 }
 
 void sqlrqueries::endSession() {
-	for (singlylinkedlistnode< sqlrqueryplugin * > *node=
+	for (listnode< sqlrqueryplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->qr->endSession();

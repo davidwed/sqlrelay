@@ -1262,17 +1262,21 @@ static PyObject *getField(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &row, &col))
     return NULL;
-  Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
-    rc=((sqlrcursor *)sqlrcur)->getField(row, PyString_AsString(col));
-    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyString_AsString(col));
-    type = ((sqlrcursor *)sqlrcur)->getColumnType(PyString_AsString(col));
+    const char *colname=PyString_AsString(col);
+    Py_BEGIN_ALLOW_THREADS
+    rc=((sqlrcursor *)sqlrcur)->getField(row, colname);
+    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, colname);
+    type = ((sqlrcursor *)sqlrcur)->getColumnType(colname);
+    Py_END_ALLOW_THREADS
   } else if (PyInt_Check(col)) {
-    rc=((sqlrcursor *)sqlrcur)->getField(row, PyInt_AsLong(col));
-    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
-    type = ((sqlrcursor *)sqlrcur)->getColumnType(PyInt_AsLong(col));
+    uint32_t colind=PyInt_AsLong(col);
+    Py_BEGIN_ALLOW_THREADS
+    rc=((sqlrcursor *)sqlrcur)->getField(row, colind);
+    rl=((sqlrcursor *)sqlrcur)->getFieldLength(row, colind);
+    type = ((sqlrcursor *)sqlrcur)->getColumnType(colind);
+    Py_END_ALLOW_THREADS
   }
-  Py_END_ALLOW_THREADS
   if (!rc) {
     Py_INCREF(Py_None);
     return Py_None;
@@ -1363,13 +1367,17 @@ static PyObject *getFieldLength(PyObject *self, PyObject *args) {
 #endif
 	&sqlrcur, &row, &col))
     return NULL;
-  Py_BEGIN_ALLOW_THREADS
   if (PyString_Check(col)) {
-    rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyString_AsString(col));
+    const char *colname=PyString_AsString(col);
+    Py_BEGIN_ALLOW_THREADS
+    rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, colname);
+    Py_END_ALLOW_THREADS
   } else if (PyInt_Check(col)) {
-    rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, PyInt_AsLong(col));
+    uint32_t colind=PyInt_AsLong(col);
+    Py_BEGIN_ALLOW_THREADS
+    rc=((sqlrcursor *)sqlrcur)->getFieldLength(row, colind);
+    Py_END_ALLOW_THREADS
   }
-  Py_END_ALLOW_THREADS
   // FIXME: lame, python doesn't support building values from uint32_t's
   return Py_BuildValue("l", (long)rc);
 }
@@ -1576,6 +1584,8 @@ static PyObject *getRowLengthsDictionary(PyObject *self, PyObject *args) {
   long sqlrcur;
   uint64_t row;
   PyObject *my_dictionary;
+  const char *name;
+  long fieldlength;
   if (!PyArg_ParseTuple(args,
 #ifdef SUPPORTS_UNSIGNED
 	"lK",
@@ -1586,12 +1596,19 @@ static PyObject *getRowLengthsDictionary(PyObject *self, PyObject *args) {
     return NULL;
   my_dictionary=PyDict_New();
   for (uint32_t counter=0; counter<((sqlrcursor *)sqlrcur)->colCount(); counter++) {
+    // Don't be tempted to embed this call inside of PyDict_SetItem.  Since
+    // it might have to fetch data from the server, it needs to be embedded
+    // in Py_BEGIN/END_ALLOW_THREADS.  On some platforms, embedding the entire
+    // PyDict_SetItem() call works, but on some, it doesn't.  I'm not sure
+    // why, exactly, but that's the case.  It's safe to call getColumnName()
+    // outside of Py_BEGIN/END_ALLOW_THREADS because it will never have to
+    // talk to the server.  It could be embedded in PyDict_SetItem, but I'll
+    // do it this way for consistency with getRowDictionary().
     Py_BEGIN_ALLOW_THREADS
-    PyDict_SetItem(my_dictionary,
-        Py_BuildValue("s",((sqlrcursor *)sqlrcur)->getColumnName(counter)),
-        // FIXME: lame, python doesn't support building values from uint32_t's
-        Py_BuildValue("l",(long)((sqlrcursor *)sqlrcur)->getFieldLength(row,counter)));
+    fieldlength=(long)((sqlrcursor *)sqlrcur)->getFieldLength(row,counter);
     Py_END_ALLOW_THREADS
+    name=((sqlrcursor *)sqlrcur)->getColumnName(counter);
+    PyDict_SetItem(my_dictionary,Py_BuildValue("s",name),Py_BuildValue("l",fieldlength));
   }
   return my_dictionary;
 }

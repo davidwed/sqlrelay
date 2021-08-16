@@ -86,6 +86,7 @@ class sqlrshenv {
 		bool		getasnumber;
 		bool		noelapsed;
 		bool		nextresultset;
+		bool		txqueries;
 };
 
 sqlrshenv::sqlrshenv() {
@@ -102,6 +103,10 @@ sqlrshenv::sqlrshenv() {
 	getasnumber=false;
 	noelapsed=false;
 	nextresultset=false;
+	txqueries=false;
+	inputbinds.setManageArrayKeys(true);
+	outputbinds.setManageArrayKeys(true);
+	inputoutputbinds.setManageArrayKeys(true);
 }
 
 sqlrshenv::~sqlrshenv() {
@@ -113,12 +118,10 @@ sqlrshenv::~sqlrshenv() {
 
 void sqlrshenv::clearbinds(dictionary<char *, sqlrshbindvalue *> *binds) {
 
-	for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-					*node=binds->getList()->getFirst();
-		node; node=node->getNext()) {
+	for (listnode<char *> *node=binds->getKeys()->getFirst();
+						node; node=node->getNext()) {
 
-		delete[] node->getValue()->getKey();
-		sqlrshbindvalue	*bv=node->getValue()->getValue();
+		sqlrshbindvalue	*bv=binds->getValue(node->getValue());
 		if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 			delete[] bv->stringval;
 		}
@@ -547,7 +550,8 @@ int sqlrsh::commandType(const char *command) {
 		!charstring::compareIgnoringCase(ptr,"translatedquery") ||
 		!charstring::compareIgnoringCase(ptr,"response timeout",16) ||
 		!charstring::compareIgnoringCase(ptr,"cache ",6) ||
-		!charstring::compareIgnoringCase(ptr,"opencache ",10)) {
+		!charstring::compareIgnoringCase(ptr,"opencache ",10) ||
+		!charstring::compareIgnoringCase(ptr,"txqueries ",10)) {
 
 		// return value of 1 is internal command
 		return 1;
@@ -737,6 +741,9 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		return cache(env,sqlrcur,command);
 	} else if (!charstring::compareIgnoringCase(ptr,"opencache ",10)) {
 		return openCache(env,sqlrcur,command);
+	} else if (!charstring::compareIgnoringCase(ptr,"txqueries ",10)) {
+		ptr=ptr+10;
+		cmdtype=13;
 	} else {
 		return false;
 	}
@@ -837,6 +844,9 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 		case 12:
 			env->lazyfetch=toggle;
 			break;
+		case 13:
+			env->txqueries=toggle;
+			break;
 	}
 	return true;
 }
@@ -848,7 +858,8 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 	bool	retval=true;
 
 	// handle begin, commit and rollback
-	if (!charstring::compareIgnoringCase(command,"begin")) {
+	if (!env->txqueries &&
+		!charstring::compareIgnoringCase(command,"begin")) {
 
 		if (!sqlrcon->begin()) {
 			displayError(env,NULL,
@@ -857,7 +868,8 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			retval=false;
 		}
 
-	} else if (!charstring::compareIgnoringCase(command,"commit")) {
+	} else if (!env->txqueries &&
+		!charstring::compareIgnoringCase(command,"commit")) {
 
 		if (!sqlrcon->commit()) {
 			displayError(env,NULL,
@@ -866,7 +878,8 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			retval=false;
 		}
 
-	} else if (!charstring::compareIgnoringCase(command,"rollback")) {
+	} else if (!env->txqueries &&
+		!charstring::compareIgnoringCase(command,"rollback")) {
 
 		if (!sqlrcon->rollback()) {
 			displayError(env,NULL,
@@ -905,10 +918,22 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 
 		// send the query
 		if (!charstring::compareIgnoringCase(command,
+						"show databases mysql",20)) {
+			char	*wild=getWild(command);
+			sqlrcur->getDatabaseList(wild,
+					SQLRCLIENTLISTFORMAT_MYSQL);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 						"show databases odbc",19)) {
 			char	*wild=getWild(command);
 			sqlrcur->getDatabaseList(wild,
 					SQLRCLIENTLISTFORMAT_ODBC);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show databases jdbc",19)) {
+			char	*wild=getWild(command);
+			sqlrcur->getDatabaseList(wild,
+					SQLRCLIENTLISTFORMAT_JDBC);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 						"show databases",14)) {
@@ -916,9 +941,37 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			sqlrcur->getDatabaseList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show schemas mysql",18)) {
+			char	*wild=getWild(command);
+			sqlrcur->getSchemaList(wild,
+					SQLRCLIENTLISTFORMAT_MYSQL);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show schemas odbc",17)) {
+			char	*wild=getWild(command);
+			sqlrcur->getSchemaList(wild,
+					SQLRCLIENTLISTFORMAT_ODBC);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show schemas jdbc",17)) {
+			char	*wild=getWild(command);
+			sqlrcur->getSchemaList(wild,
+					SQLRCLIENTLISTFORMAT_JDBC);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 						"show schemas",12)) {
 			char	*wild=getWild(command);
 			sqlrcur->getSchemaList(wild);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show tables mysql",17)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_MYSQL,
+					DB_OBJECT_TABLE|
+					DB_OBJECT_VIEW|
+					DB_OBJECT_ALIAS|
+					DB_OBJECT_SYNONYM);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 						"show tables odbc",16)) {
@@ -931,11 +984,42 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 					DB_OBJECT_SYNONYM);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show tables jdbc",16)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_JDBC,
+					DB_OBJECT_TABLE|
+					DB_OBJECT_VIEW|
+					DB_OBJECT_ALIAS|
+					DB_OBJECT_SYNONYM);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show only tables mysql",22)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_MYSQL,
+					DB_OBJECT_TABLE);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 						"show only tables odbc",21)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild,
 					SQLRCLIENTLISTFORMAT_ODBC,
 					DB_OBJECT_TABLE);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show only tables jdbc",21)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_JDBC,
+					DB_OBJECT_TABLE);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show only views mysql",21)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_MYSQL,
+					DB_OBJECT_VIEW);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
 						"show only views odbc",20)) {
@@ -945,6 +1029,20 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 					DB_OBJECT_VIEW);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show only views jdbc",20)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_JDBC,
+					DB_OBJECT_VIEW);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show only aliases mysql",23)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_MYSQL,
+					DB_OBJECT_ALIAS);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 						"show only aliases odbc",22)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild,
@@ -952,10 +1050,31 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 					DB_OBJECT_ALIAS);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show only aliases jdbc",22)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_JDBC,
+					DB_OBJECT_ALIAS);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+					"show only synonyms mysql",24)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_MYSQL,
+					DB_OBJECT_SYNONYM);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 						"show only synonyms odbc",23)) {
 			char	*wild=getWild(command);
 			sqlrcur->getTableList(wild,
 					SQLRCLIENTLISTFORMAT_ODBC,
+					DB_OBJECT_SYNONYM);
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show only synonyms jdbc",23)) {
+			char	*wild=getWild(command);
+			sqlrcur->getTableList(wild,
+					SQLRCLIENTLISTFORMAT_JDBC,
 					DB_OBJECT_SYNONYM);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
@@ -969,11 +1088,27 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			sqlrcur->getTableTypeList(wild);
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
+						"show columns mysql",18)) {
+			char	*table=getTable(command,true);
+			char	*wild=getWild(command);
+			sqlrcur->getColumnList(table,wild,
+					SQLRCLIENTLISTFORMAT_MYSQL);
+			delete[] table;
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
 						"show columns odbc",17)) {
 			char	*table=getTable(command,true);
 			char	*wild=getWild(command);
 			sqlrcur->getColumnList(table,wild,
 					SQLRCLIENTLISTFORMAT_ODBC);
+			delete[] table;
+			delete[] wild;
+		} else if (!charstring::compareIgnoringCase(command,
+						"show columns jdbc",17)) {
+			char	*table=getTable(command,true);
+			char	*wild=getWild(command);
+			sqlrcur->getColumnList(table,wild,
+					SQLRCLIENTLISTFORMAT_JDBC);
 			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
@@ -1082,14 +1217,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->clearBinds();
 
-	if (env->inputbinds.getList()->getLength()) {
+	if (env->inputbinds.getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-				*node=env->inputbinds.getList()->getFirst();
+		for (listnode<char *> *node=
+				env->inputbinds.getKeys()->getFirst();
 				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->inputbinds.getValue(node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				sqlrcur->inputBind(name,bv->stringval);
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {
@@ -1118,14 +1254,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->outputbinds.getList()->getLength()) {
+	if (env->outputbinds.getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->outputbinds.getList()->getFirst();
-			node; node=node->getNext()) {
+		for (listnode<char *> *node=
+				env->outputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->outputbinds.getValue(node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				// FIXME: make buffer length variable
 				sqlrcur->defineOutputBindString(name,
@@ -1140,14 +1277,16 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->inputoutputbinds.getList()->getLength()) {
+	if (env->inputoutputbinds.getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->inputoutputbinds.getList()->getFirst();
-			node; node=node->getNext()) {
+		for (listnode<char *> *node=
+				env->inputoutputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->inputoutputbinds.getValue(
+						node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				sqlrcur->defineInputOutputBindString(name,
 						bv->stringval,
@@ -1177,14 +1316,15 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->executeQuery();
 
-	if (env->outputbinds.getList()->getLength()) {
+	if (env->outputbinds.getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->outputbinds.getList()->getFirst();
-			node; node=node->getNext()) {
+		for (listnode<char *> *node=
+				env->outputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->outputbinds.getValue(node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				delete[] bv->stringval;
 				bv->stringval=charstring::duplicate(
@@ -1210,14 +1350,16 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->inputoutputbinds.getList()->getLength()) {
+	if (env->inputoutputbinds.getLength()) {
 
-		for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-			*node=env->inputoutputbinds.getList()->getFirst();
-			node; node=node->getNext()) {
+		for (listnode<char *> *node=
+				env->inputoutputbinds.getKeys()->getFirst();
+				node; node=node->getNext()) {
 
-			const char	*name=node->getValue()->getKey();
-			sqlrshbindvalue	*bv=node->getValue()->getValue();
+			const char	*name=node->getValue();
+			sqlrshbindvalue	*bv=
+				env->inputoutputbinds.getValue(
+						node->getValue());
 			if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 				delete[] bv->stringval;
 				bv->stringval=charstring::duplicate(
@@ -2079,12 +2221,11 @@ void sqlrsh::printbinds(const char *type,
 
 	stdoutput.printf("%s bind variables:\n",type);
 
-	for (linkedlistnode<dictionarynode<char *, sqlrshbindvalue *> *>
-					*node=binds->getList()->getFirst();
-		node; node=node->getNext()) {
+	for (listnode<char *> *node=binds->getKeys()->getFirst();
+						node; node=node->getNext()) {
 
-		stdoutput.printf("    %s ",node->getValue()->getKey());
-		sqlrshbindvalue	*bv=node->getValue()->getValue();
+		stdoutput.printf("    %s ",node->getValue());
+		sqlrshbindvalue	*bv=binds->getValue(node->getValue());
 		if (bv->type==SQLRCLIENTBINDVARTYPE_STRING) {
 			stdoutput.printf("(STRING) = %s\n",bv->stringval);
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_INTEGER) {

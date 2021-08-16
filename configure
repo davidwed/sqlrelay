@@ -709,11 +709,6 @@ PERLCCFLAGS
 PERLLIB
 HAVE_PERL
 PERL
-MDBTOOLSSTATIC
-MDBTOOLSLIBSPATH
-MDBTOOLSLIBS
-MDBTOOLSINCLUDES
-GLIBLIBS
 FIREBIRDSTATIC
 FIREBIRDLIBSPATH
 FIREBIRDLIBS
@@ -870,7 +865,6 @@ OVERRIDEPERLINSTALLMAN3DIR
 OVERRIDEPERLSITELIB
 OVERRIDEPERLSITEARCH
 ENABLE_ROUTER
-MDBTOOLSUSERPATH
 INFORMIXUSERPATH
 FIREBIRDUSERPATH
 DB2USERPATH
@@ -904,6 +898,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -978,9 +973,6 @@ with_informix_prefix
 enable_informix
 enable_informix_rpath
 enable_informix_at_runtime
-with_mdbtools_prefix
-enable_mdbtools
-enable_mdbtools_rpath
 enable_router
 enable_odbc_driver
 with_perl_prefix
@@ -1094,6 +1086,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE}'
@@ -1346,6 +1339,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1483,7 +1485,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1636,6 +1638,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -1703,8 +1706,6 @@ Optional Features:
   --disable-informix            Don't build Informix connection module
   --disable-informix-rpath      Don't use -rpath when building Informix connection module
   --enable-informix-at-runtime  Disable static/dynamic linking against Informix client libraries and force the connection module to load them at runtime
-  --disable-mdbtools            Don't build MDB Tools connection module
-  --enable-mdbtools-rpath       Use -rpath when building MDB Tools connection module
   --disable-router              Don't build router connection module
   --disable-odbc-driver         Don't build ODBC driver
   --disable-perl                Don't build Perl api
@@ -1753,7 +1754,6 @@ Optional Packages:
   --with-db2-version            DB2 Version (7 or 8)
   --with-firebird-prefix        Location of Firebird
   --with-informix-prefix        Location of Informix
-  --with-mdbtools-prefix        Location of MDB Tools
   --with-perl-prefix            Location of Perl
   --with-pod2man                Full pathname of pod2man
   --with-perl-site-arch         Override Perl's built-in PERLSITEARCH variable (location to install binary perl modules)
@@ -3088,28 +3088,6 @@ else
   INFORMIXATRUNTIME=""
 fi
 
-
-# Check whether --with-mdbtools-prefix was given.
-if test "${with_mdbtools_prefix+set}" = set; then :
-  withval=$with_mdbtools_prefix; MDBTOOLSPATH="$withval"
-else
-  MDBTOOLSPATH=""
-fi
-
-# Check whether --enable-mdbtools was given.
-if test "${enable_mdbtools+set}" = set; then :
-  enableval=$enable_mdbtools; ENABLE_MDBTOOLS=""
-else
-  ENABLE_MDBTOOLS="yes"
-fi
-
-# Check whether --enable-mdbtools-rpath was given.
-if test "${enable_mdbtools_rpath+set}" = set; then :
-  enableval=$enable_mdbtools_rpath; MDBTOOLSUSERPATH="yes"
-else
-  MDBTOOLSUSERPATH=""
-fi
-
 # Check whether --enable-router was given.
 if test "${enable_router+set}" = set; then :
   enableval=$enable_router; ENABLE_ROUTER=""
@@ -3503,7 +3481,6 @@ then
 	ENABLE_DB2=""
 	ENABLE_FIREBIRD=""
 	ENABLE_INFORMIX=""
-	ENABLE_MDBTOOLS=""
 	ENABLE_ROUTER=""
 fi
 
@@ -3554,7 +3531,6 @@ if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
 then
 	ENABLE_UTIL=""
 fi
-
 
 
 
@@ -3660,9 +3636,6 @@ if ( test -n "$DB2PATH" -a "`echo $DB2PATH | cut -c-3`" = "../" ); then
 fi
 if ( test -n "$FIREBIRDPATH" -a "`echo $FIREBIRDPATH | cut -c-3`" = "../" ); then
 	FIREBIRDPATH="$PWD/$FIREBIRDPATH"
-fi
-if ( test -n "$MDBTOOLSPATH" -a "`echo $MDBTOOLSPATH | cut -c-3`" = "../" ); then
-	MDBTOOLSPATH="$PWD/$MDBTOOLSPATH"
 fi
 if ( test -n "$PERLPATH" -a "`echo $PERLPATH | cut -c-3`" = "../" ); then
 	PERLPATH="$PWD/$PERLPATH"
@@ -16928,6 +16901,13 @@ $as_echo "no" >&6; }
 fi
 
 
+
+								BASH=`which bash`
+		if ( test -n "$BASH" )
+		then
+			SHELL="$BASH"
+
+		fi
 		;;
 	* )
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
@@ -18756,9 +18736,9 @@ then
 	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
 	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
 	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "1" -o "$V2" -lt "2" -o "$V3" -lt "0" )
+	if ( test "$V1" -lt "2")
 	then
-		as_fn_error $? "Rudiments version must be >= 1.1.0, found version $RUDIMENTSVERSION" "$LINENO" 5
+		as_fn_error $? "Rudiments version must be >= 2.0.0, found version $RUDIMENTSVERSION" "$LINENO" 5
 		exit
 	fi
 fi
@@ -32525,1377 +32505,6 @@ echo "******************************"
 
 
 echo
-echo "***** MDB Tools **************"
-
-if ( test "$ENABLE_MDBTOOLS" = "yes" )
-then
-
-
-if ( test "$cross_compiling" = "yes" )
-then
-		echo "cross compiling"
-	if ( test -n "$GLIBPATH" )
-	then
-		GLIBINCLUDES="-I$GLIBPATH/include/glib-2.0 -I$GLIBPATH/lib/glib/include"
-		GLIBLIBS="-L$GLIBPATH/lib -lglib-2.0"
-		GLIBLIBSPATH="$GLIBPATH/lib"
-	fi
-else
-	GLIBINCLUDES="`pkg-config glib-2.0 --cflags 2> /dev/null`"
-	GLIBLIBS="`pkg-config glib-2.0 --libs 2> /dev/null`"
-	if ( test -z "$GLIBINCLUDES" -a -z "$GLIBLIBS" )
-	then
-
-
-SEARCHPATH=$LIBGLIBPATH
-NAME=glib-2.0
-HEADER=glib.h
-LIBNAME=glib-2.0
-LINKSTATIC=$STATICFLAG
-LINKRPATH=$RPATHFLAG
-USEFULLLIBPATH=
-INCLUDESTRING=""
-LIBSTRING=""
-LIBPATH=""
-STATIC=""
-HEADERSANDLIBSPATH=""
-
-eval "GLIBINCLUDES=\"\""
-eval "GLIBLIBS=\"\""
-eval "GLIBLIBSPATH=\"\""
-eval "GLIBSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
-
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources/firstworks" "/Library/$NAME" "/usr/local/firstworks"
-do
-	if ( test -n "$path" -a -d "$path" )
-	then
-
-		if ( test "$path" = "/" )
-		then
-						if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-Wl,/lib/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-Wl,/lib64/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-
-						path=""
-		fi
-
-
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
-		do
-
-			if ( test -n "$LIBSTRING" )
-			then
-				break
-			fi
-
-			for includepath in "$path/include" "$path/include/$NAME"
-			do
-
-				if ( test -n "$LIBSTRING" )
-				then
-					break
-				fi
-
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				fi
-			done
-		done
-
-		if ( test -n "$LIBSTRING" )
-		then
-			HEADERSANDLIBSPATH="$path"
-			break
-		fi
-	fi
-done
-
-INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
-
-eval "GLIBINCLUDES=\"$INCLUDESTRING\""
-eval "GLIBLIBS=\"$LIBSTRING\""
-eval "GLIBLIBSPATH=\"$LIBPATH\""
-eval "GLIBSTATIC=\"$STATIC\""
-if ( test -n "" )
-then
-	eval "=\"$HEADERSANDLIBSPATH\""
-fi
-
-		if ( test -n "$GLIBINCLUDES" )
-		then
-			PATHNAME=`echo $GLIBINCLUDES | sed -e "s|-I||"`
-			DIRNAME1=`dirname $PATHNAME 2> /dev/null`
-			DIRNAME2=`dirname $DIRNAME1 2> /dev/null`
-			GLIBINCLUDES="$GLIBINCLUDES -I$DIRNAME2/lib/glib/include -I$DIRNAME2/lib/glib-2.0/include"
-		fi
-	fi
-fi
-
-
-if ( test -n "$GLIBINCLUDES" )
-then
-	echo "glib includes... $GLIBINCLUDES"
-fi
-
-
-if ( test -n "$GLIBLIBS" )
-then
-	echo "glib libs... $GLIBLIBS"
-fi
-
-
-
-
-
-	MDBTOOLSINCLUDES=""
-	MDBTOOLSLIBS=""
-	MDBTOOLSLIBSPATH=""
-	MDBTOOLSSTATIC=""
-
-	if ( test -n "$GLIBINCLUDES" -a -n "$GLIBLIBS" )
-	then
-
-		if ( test "$cross_compiling" = "yes" )
-		then
-
-						echo "cross compiling"
-			if ( test -n "$MDBTOOLSPATH" )
-			then
-				MDBTOOLSINCLUDES="-I$MDBTOOLSPATH/include $GLIBINCLUDES"
-				MDBTOOLSLIBS="-L$MDBTOOLSPATH/lib -lmdbsql -lmdb $GLIBLIBS"
-				MDBTOOLSLIBSPATH="$MDBTOOLSPATH/lib"
-			fi
-
-		else
-
-			STATICFLAG=""
-			if ( test -n "$STATICLINK" )
-			then
-				STATICFLAG="-static"
-			fi
-
-
-
-SEARCHPATH=$MDBTOOLSPATH
-NAME=mdb
-HEADER=mdbsql.h
-LIBNAME=mdbsql
-LINKSTATIC=$STATICFLAG
-LINKRPATH=$RPATHFLAG
-USEFULLLIBPATH=
-INCLUDESTRING=""
-LIBSTRING=""
-LIBPATH=""
-STATIC=""
-HEADERSANDLIBSPATH=""
-
-eval "MDBSQLINCLUDES=\"\""
-eval "MDBSQLLIBS=\"\""
-eval "MDBSQLLIBSPATH=\"\""
-eval "MDBSQLSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
-
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources/firstworks" "/Library/$NAME" "/usr/local/firstworks"
-do
-	if ( test -n "$path" -a -d "$path" )
-	then
-
-		if ( test "$path" = "/" )
-		then
-						if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-Wl,/lib/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-Wl,/lib64/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-
-						path=""
-		fi
-
-
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
-		do
-
-			if ( test -n "$LIBSTRING" )
-			then
-				break
-			fi
-
-			for includepath in "$path/include" "$path/include/$NAME"
-			do
-
-				if ( test -n "$LIBSTRING" )
-				then
-					break
-				fi
-
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				fi
-			done
-		done
-
-		if ( test -n "$LIBSTRING" )
-		then
-			HEADERSANDLIBSPATH="$path"
-			break
-		fi
-	fi
-done
-
-INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
-
-eval "MDBSQLINCLUDES=\"$INCLUDESTRING\""
-eval "MDBSQLLIBS=\"$LIBSTRING\""
-eval "MDBSQLLIBSPATH=\"$LIBPATH\""
-eval "MDBSQLSTATIC=\"$STATIC\""
-if ( test -n "" )
-then
-	eval "=\"$HEADERSANDLIBSPATH\""
-fi
-
-
-
-SEARCHPATH=$MDBTOOLSPATH
-NAME=mdb
-HEADER=mdbtools.h
-LIBNAME=mdb
-LINKSTATIC=$STATICFLAG
-LINKRPATH=$RPATHFLAG
-USEFULLLIBPATH=
-INCLUDESTRING=""
-LIBSTRING=""
-LIBPATH=""
-STATIC=""
-HEADERSANDLIBSPATH=""
-
-eval "MDBINCLUDES=\"\""
-eval "MDBLIBS=\"\""
-eval "MDBTOOLSLIBSPATH=\"\""
-eval "MDBTOOLSSTATIC=\"\""
-if ( test -n "" )
-then
-	eval "=\"\""
-fi
-
-
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources/firstworks" "/Library/$NAME" "/usr/local/firstworks"
-do
-	if ( test -n "$path" -a -d "$path" )
-	then
-
-		if ( test "$path" = "/" )
-		then
-						if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-Wl,/lib/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-Wl,/lib64/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "/usr/include/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "/lib64/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval ""
-		eval "LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\""
-	fi
-else
-	if ( test -n "/lib64/lib$LIBNAME.a" -a -n "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "/lib64/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval ""
-			eval "LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-			fi
-
-
-						path=""
-		fi
-
-
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
-		do
-
-			if ( test -n "$LIBSTRING" )
-			then
-				break
-			fi
-
-			for includepath in "$path/include" "$path/include/$NAME"
-			do
-
-				if ( test -n "$LIBSTRING" )
-				then
-					break
-				fi
-
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				else
-
-FOUNDHEADER=""
-FOUNDLIB=""
-
-if ( test -r "$includepath/$HEADER" )
-then
-	eval "FOUNDHEADER=\"yes\""
-fi
-
-
-if ( test -r "$libpath/lib$LIBNAME.$SOSUFFIX" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\""
-	fi
-else
-	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"" )
-	then
-
-if ( test -r "$libpath/lib$LIBNAME.a" )
-then
-	eval "FOUNDLIB=\"yes\""
-fi
-
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "INCLUDESTRING=\"-I$includepath\""
-			eval "LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\""
-		fi
-	fi
-fi
-
-				fi
-			done
-		done
-
-		if ( test -n "$LIBSTRING" )
-		then
-			HEADERSANDLIBSPATH="$path"
-			break
-		fi
-	fi
-done
-
-INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
-
-eval "MDBINCLUDES=\"$INCLUDESTRING\""
-eval "MDBLIBS=\"$LIBSTRING\""
-eval "MDBTOOLSLIBSPATH=\"$LIBPATH\""
-eval "MDBTOOLSSTATIC=\"$STATIC\""
-if ( test -n "" )
-then
-	eval "=\"$HEADERSANDLIBSPATH\""
-fi
-
-
-			if ( test -n "$MDBSQLINCLUDES" -o -n "$MDBSQLLIBS" -o -n "$MDBINCLUDES" -o -n "$MDBLIBS" )
-			then
-				MDBTOOLSINCLUDES="$MDBINCLUDES $MDBSQLINCLUDES $GLIBINCLUDES"
-				MDBTOOLSLIBS="$MDBSQLLIBS $MDBLIBS $GLIBLIBS"
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if MDB Tools has mdb_run_query" >&5
-$as_echo_n "checking if MDB Tools has mdb_run_query... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-extern "C" {
-#include <mdbsql.h>
-}
-#include <stdlib.h>
-int
-main ()
-{
-mdb_run_query(NULL,NULL);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; };
-$as_echo "#define HAVE_MDB_RUN_QUERY 1" >>confdefs.h
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if MDB Tools has mdb_sql_run_query" >&5
-$as_echo_n "checking if MDB Tools has mdb_sql_run_query... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-extern "C" {
-#include <mdbsql.h>
-}
-#include <stdlib.h>
-int
-main ()
-{
-mdb_sql_run_query(NULL,NULL);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; };
-$as_echo "#define HAVE_MDB_SQL_RUN_QUERY 1" >>confdefs.h
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if MDB Tools has mdb_sql_fetch_row" >&5
-$as_echo_n "checking if MDB Tools has mdb_sql_fetch_row... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-extern "C" {
-#include <mdbsql.h>
-}
-#include <stdlib.h>
-int
-main ()
-{
-mdb_sql_fetch_row(NULL,NULL);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; };
-$as_echo "#define HAVE_MDB_SQL_FETCH_ROW 1" >>confdefs.h
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if mdb_col_to_string has 5 parameters" >&5
-$as_echo_n "checking if mdb_col_to_string has 5 parameters... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-extern "C" {
-#include <mdbsql.h>
-}
-#include <stdlib.h>
-int
-main ()
-{
-mdb_col_to_string(NULL,NULL,0,0,0);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; };
-$as_echo "#define HAVE_MDB_COL_TO_STRING_5_PARAM 1" >>confdefs.h
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if MDB Tools has mdb_remove_backends" >&5
-$as_echo_n "checking if MDB Tools has mdb_remove_backends... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-extern "C" {
-#include <mdbtools.h>
-}
-#include <stdlib.h>
-int
-main ()
-{
-mdb_remove_backends();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; };
-$as_echo "#define HAVE_MDB_REMOVE_BACKENDS 1" >>confdefs.h
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if MDB Tools has mdb_open with 2 params" >&5
-$as_echo_n "checking if MDB Tools has mdb_open with 2 params... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-extern "C" {
-#include <mdbtools.h>
-}
-#include <stdlib.h>
-int
-main ()
-{
-mdb_open(0,MDB_NOFLAGS);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; };
-$as_echo "#define HAVE_MDB_OPEN_2_PARAM 1" >>confdefs.h
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-
-				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if MDB Tools has mdb_close" >&5
-$as_echo_n "checking if MDB Tools has mdb_close... " >&6; }
-
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$MDBTOOLSINCLUDES"
-LIBS="$MDBTOOLSLIBS $SOCKETLIBS $DLLIB -lm"
-LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-extern "C" {
-#include <mdbtools.h>
-}
-#include <stdlib.h>
-int
-main ()
-{
-mdb_close(0);
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; };
-$as_echo "#define HAVE_MDB_CLOSE 1" >>confdefs.h
-
-else
-  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-
-			fi
-
-		fi
-	fi
-
-	if ( test -z "$MDBTOOLSLIBS" )
-	then
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: MDB Tools support will not be built." >&5
-$as_echo "$as_me: WARNING: MDB Tools support will not be built." >&2;}
-	fi
-
-
-if ( test -n "$MDBTOOLSINCLUDES" )
-then
-	echo "mdbtools includes... $MDBTOOLSINCLUDES"
-fi
-
-
-if ( test -n "$MDBTOOLSLIBS" )
-then
-	echo "mdbtools libs... $MDBTOOLSLIBS"
-fi
-
-
-
-
-
-
-fi
-
-echo "******************************"
-
-
-
-echo
 echo "***** Perl *******************"
 
 if ( test "$ENABLE_PERL" = "yes" )
@@ -34471,8 +33080,6 @@ fi
 
 		if ( test -n "$HAVE_RUBY" )
 		then
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ruby.h" >&5
-$as_echo_n "checking for ruby.h... " >&6; }
 			rm -f conftest.rb
 			cat > conftest.rb << END
 require "mkmf"
@@ -34510,6 +33117,8 @@ print "all:\n"
 print "	echo \$(hdrdir)\n"
 END
 
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ruby.h" >&5
+$as_echo_n "checking for ruby.h... " >&6; }
 			HAVE_RUBY_H=""
 			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
 			do
@@ -34518,17 +33127,36 @@ END
 					HAVE_RUBY_H="yes"
 				fi
 			done
-			rm -f conftest.rb
-
-						if ( test -z "$HAVE_RUBY_H" )
+			if ( test -z "$HAVE_RUBY_H" )
 			then
 				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-				HAVE_RUBY=""
+												HAVE_RUBY=""
 			else
 				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 			fi
+
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ruby/thread.h" >&5
+$as_echo_n "checking for ruby/thread.h... " >&6; }
+			HAVE_RUBY_THREAD_H=""
+			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
+			do
+				if ( test -r "$dir/ruby/thread.h" )
+				then
+					HAVE_RUBY_THREAD_H="yes"
+				fi
+			done
+			if ( test -z "$HAVE_RUBY_THREAD_H" )
+			then
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+			else
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+			fi
+
+			rm -f conftest.rb
 		fi
 	fi
 
@@ -34536,6 +33164,13 @@ $as_echo "yes" >&6; }
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The Ruby API will not be built." >&5
 $as_echo "$as_me: WARNING: The Ruby API will not be built." >&2;}
+	fi
+
+	if ( test -n "$HAVE_RUBY_THREAD_H" )
+	then
+
+$as_echo "#define HAVE_RUBY_THREAD_H 1" >>confdefs.h
+
 	fi
 
 
@@ -35106,7 +33741,7 @@ then
 	else
 
 		PHPCONFIG=""
-		for file in "php-config" "php-config-5" "php-config-5.1" "php-config-5.2" "php-config-5.3" "php-config-5.3" "php-config-5.4" "php-config-5.5" "php-config-5.6" "php-config-5.7" "php-config-5.8" "php-config-7.0" "php-config-7.1" "php-config-7.2" "php-config-7.3" "php-config-7.4" "php-config-7.5"
+		for file in "php-config" "php-config-5" "php-config-5.1" "php-config-5.2" "php-config-5.3" "php-config-5.3" "php-config-5.4" "php-config-5.5" "php-config-5.6" "php-config-5.7" "php-config-5.8" "php-config-7.0" "php-config-7.1" "php-config-7.2" "php-config-7.3" "php-config-7.4" "php-config-8.0" "php-config-8.1" "php-config-8.2" "php-config-8.3" "php-config-8.4"
 		do
 			if ( test -n "$PHPPATH" )
 			then
@@ -35246,6 +33881,11 @@ $as_echo "$PHPCONFDIR - $PHPCONFSTYLE style" >&6; }
 
 
 
+
+
+cat >>confdefs.h <<_ACEOF
+#define PHPMAJORVERSION $PHPMAJORVERSION
+_ACEOF
 
 
 
@@ -35738,7 +34378,14 @@ END
 				then
 					ERLANGLIBS="-L$ERLANG_LIB_DIR"
 				fi
-				ERLANGLIBS="$ERLANGLIBS -lerl_interface -lei"
+
+				ERLINTERFACELIB=""
+				if ( test -r "$ERLANG_LIB_DIR/liberl_interface.a" )
+				then
+					ERLINTERFACELIB="-lerl_interface"
+				fi
+
+				ERLANGLIBS="$ERLANGLIBS $ERLINTERFACELIB -lei"
 
 				HAVE_ERLANG="yes"
 			else
@@ -36148,7 +34795,7 @@ fi
 echo "******************************"
 
 
-SQLR_VERSION="1.8.0"
+SQLR_VERSION="2.0.0"
 
 
 cat >>confdefs.h <<_ACEOF
@@ -36157,8 +34804,8 @@ _ACEOF
 
 
 
-SRV_SONAME_VERSION_INFO="11:0:0"
-CLT_SONAME_VERSION_INFO="6:0:0"
+SRV_SONAME_VERSION_INFO="12:0:0"
+CLT_SONAME_VERSION_INFO="7:0:0"
 
 
 
@@ -36309,7 +34956,6 @@ SYBASEBUILD="no        "
 ODBCBUILD="no        "
 DB2BUILD="no        "
 FIREBIRDBUILD="no        "
-MDBTOOLSBUILD="no        "
 INFORMIXBUILD="no        "
 ROUTERBUILD="no        "
 TESTDBS=""
@@ -36387,13 +35033,6 @@ if ( test -n "$FIREBIRDLIBS" ); then
 		FIREBIRDBUILD="static    "
 	fi
 	TESTDBS="$TESTDBS firebird"
-fi
-if ( test -n "$MDBTOOLSLIBS" ); then
-	MDBTOOLSBUILD="dynamic   "
-	if ( test -n "$MDBTOOLSSTATIC" ); then
-		MDBTOOLSBUILD="static    "
-	fi
-	TESTDBS="$TESTDBS mdbtools"
 fi
 if ( test -n "$INFORMIXLIBS" ); then
 	INFORMIXBUILD="dynamic   "
@@ -38861,6 +37500,12 @@ then
 	mv libtool.new libtool
 fi
 
+if ( test -r "libtool" -a -n "$DARWIN" )
+then
+	sed -e "s|print -r --|printf %s\\\\\\\\n|g" libtool > libtool.new
+	mv libtool.new libtool
+fi
+
 
 echo
 echo "***** Summary ***********************************************"
@@ -38882,8 +37527,8 @@ echo " Databases    : Oracle      $ORACLEBUILD    MySQL      $MYSQLBUILD"
 echo "                PostgreSQL  $POSTGRESQLBUILD    SQLite     $SQLITEBUILD"
 echo "                FreeTDS     $FREETDSBUILD    SAP/Sybase $SYBASEBUILD"
 echo "                ODBC        $ODBCBUILD    DB2        $DB2BUILD"
-echo "                Firebird    $FIREBIRDBUILD    MDB Tools  $MDBTOOLSBUILD"
-echo "                Informix    $INFORMIXBUILD    Router     $ROUTERBUILD"
+echo "                Firebird    $FIREBIRDBUILD    Router     $ROUTERBUILD"
+echo "                Informix    $INFORMIXBUILD"
 echo "*************************************************************"
 echo
 echo "If you expected a Database or API that doesn't show up in the Summary"

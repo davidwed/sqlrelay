@@ -1,3 +1,67 @@
+2.0.0 - removed support for mdbtools
+	updated to use new rudiments collection model
+	added sqlrresultsettable class
+	fixed some missing map clears in postgresql protocol module
+	fixed NULL-bind in the ODBC driver
+	updated spec file to build python 3 packages on rhel 7
+	added support for nested substitutions
+	updated userlist auth module to support password files
+	updates aes128 pwdenc module to use sensitivevalue class instead of
+		its built-in implementation
+	updated debug logger to not log null/empty info
+	fixed a subtle bug that could cause closeResultSet()/clearError() not
+		to be called between reexecutes if the previous execute resulted
+		in an error
+
+1.9.2 - ruby cursor constructor marks associated ruby connection object now
+	updated bad-command and no-cursor-available handling in sqlrclient
+		protocol module
+
+1.9.1 - backports from 2.0.0 branch:
+	fixed some missing map clears in postgresql protocol module
+	fixed NULL-bind in the ODBC driver
+	updated spec file to build python 3 packages on rhel 7
+
+1.9.0 - added missing inequality operators to end-of-bind detection
+	fixed commit/begin without commitcount error in sqlrimportcsv
+	fetch errors aren't returned if sqlrclient protocol version < 2
+	query-intercept catches "begin transaction" now
+	query-intercept doesn't intercept various begin-type statements if the
+		query is actually a block of sql containing commit or rollback
+	added ncharencoding option to odbc connection to enable UTF-16 values
+		in SQL Server nchars/nvarchars
+	fixed a bug that caused output binds of length 8000+ to fail on
+		SQL Server
+	begin() runs "begin transaction" instead of just "begin" on SQL Server
+	fixed a column-count reset bug in odbc, db2, informix, and postgresql
+		that could cause begin queries to fail when fake transaction
+		blocks are used
+	object lists have correct column names for mysql, odbc, and jdbc now
+	fixed a bug that caused rollback to be called insted of commit when
+		endofsession="commit" and faketransactionblocks=yes are used
+	commit/rollback is now called at the end of session when
+		faketransactoinblocks=yes is used, whether or not the server
+		believes it's in a transaction block, to catch cases where the
+		begin-interceptor is intentionally bypassed
+	sqlrimportcsv handles dates without centuries now
+	fixed crash in replay module when table name is quoted
+	mysql explain statements work now
+	fixed node-gyp.js detection on ubuntu 20.04
+	added configure options for PHP 8.x
+	added php/pdo module tweaks for PHP 8
+	mysql and postgresql protocol modules support TLS now
+	pushed most of tls/gss code up into sqlrprotocol parent class
+	fixed subtle issues in mysql/postgresql database modules that could
+		sometimes cause reexecutes of the same query with the same
+		bind variables to return no results the second time
+	the configure script specifically looks for liberl_interface.a now
+	updated nodejs macros for node 14+
+	fixed subtle bugs in Python getField, getFieldLength, and
+		getRowLengthsDictionary functions
+	added GVL management to the Ruby API
+	applied patch from Igor to fix configure.vbs VC++ version detection
+		for non-US versions
+
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
 	fixed datedelimiters parameter

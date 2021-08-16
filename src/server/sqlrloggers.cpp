@@ -61,7 +61,7 @@ bool sqlrloggers::load(domnode *parameters) {
 
 void sqlrloggers::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+	for (listnode< sqlrloggerplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrloggerplugin	*sqlrlp=node->getValue();
@@ -148,7 +148,7 @@ void sqlrloggers::loadLogger(domnode *logger) {
 void sqlrloggers::init(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+	for (listnode< sqlrloggerplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->lg->init(sqlrl,sqlrcon);
@@ -162,7 +162,7 @@ void sqlrloggers::run(sqlrlistener *sqlrl,
 				sqlrevent_t event,
 				const char *info) {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+	for (listnode< sqlrloggerplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->lg->run(sqlrl,sqlrcon,sqlrcur,
@@ -171,7 +171,7 @@ void sqlrloggers::run(sqlrlistener *sqlrl,
 }
 
 void sqlrloggers::endTransaction(bool commit) {
-	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+	for (listnode< sqlrloggerplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->lg->endTransaction(commit);
@@ -179,7 +179,7 @@ void sqlrloggers::endTransaction(bool commit) {
 }
 
 void sqlrloggers::endSession() {
-	for (singlylinkedlistnode< sqlrloggerplugin * > *node=
+	for (listnode< sqlrloggerplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->lg->endSession();

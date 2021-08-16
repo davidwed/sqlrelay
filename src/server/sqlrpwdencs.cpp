@@ -64,7 +64,7 @@ bool sqlrpwdencs::load(domnode *parameters) {
 
 void sqlrpwdencs::unload() {
 	debugFunction();
-	for (singlylinkedlistnode< sqlrpwdencplugin * > *node=
+	for (listnode< sqlrpwdencplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrpwdencplugin	*sqlrpe=node->getValue();
@@ -154,7 +154,7 @@ void sqlrpwdencs::loadPasswordEncryption(domnode *pwdenc) {
 }
 
 sqlrpwdenc *sqlrpwdencs::getPasswordEncryptionById(const char *id) {
-	for (singlylinkedlistnode< sqlrpwdencplugin * > *node=
+	for (listnode< sqlrpwdencplugin * > *node=
 						pvt->_llist.getFirst();
 						node; node=node->getNext()) {
 		sqlrpwdenc	*pe=node->getValue()->pe;

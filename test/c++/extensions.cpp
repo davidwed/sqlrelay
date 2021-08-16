@@ -4,6 +4,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
 #include <rudiments/datetime.h>
+#include <rudiments/signalclasses.h>
 #include <sqlrelay/sqlrclient.h>
 #include <string.h>
 #include <stdlib.h>
@@ -18,11 +19,11 @@ void checkSuccess(const char *value, const char *success) {
 
 	if (!success) {
 		if (!value) {
-			printf("success ");
+			stdoutput.printf("success ");
 			return;
 		} else {
-			printf("%s!=%s\n",value,success);
-			printf("failure ");
+			stdoutput.printf("%s!=%s\n",value,success);
+			stdoutput.printf("failure ");
 			delete cur;
 			delete con;
 			process::exit(1);
@@ -30,10 +31,10 @@ void checkSuccess(const char *value, const char *success) {
 	}
 
 	if (!charstring::compare(value,success)) {
-		printf("success ");
+		stdoutput.printf("success ");
 	} else {
-		printf("%s!=%s\n",value,success);
-		printf("failure ");
+		stdoutput.printf("%s!=%s\n",value,success);
+		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -44,11 +45,11 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 
 	if (!success) {
 		if (!value) {
-			printf("success ");
+			stdoutput.printf("success ");
 			return;
 		} else {
-			printf("%s!=%s\n",value,success);
-			printf("failure ");
+			stdoutput.printf("%s!=%s\n",value,success);
+			stdoutput.printf("failure ");
 			delete cur;
 			delete con;
 			process::exit(1);
@@ -56,10 +57,10 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 	}
 
 	if (!strncmp(value,success,length)) {
-		printf("success ");
+		stdoutput.printf("success ");
 	} else {
-		printf("%s!=%s\n",value,success);
-		printf("failure ");
+		stdoutput.printf("%s!=%s\n",value,success);
+		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -69,10 +70,10 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 void checkSuccess(int value, int success) {
 
 	if (value==success) {
-		printf("success ");
+		stdoutput.printf("success ");
 	} else {
-		printf("%d!=%d\n",value,success);
-		printf("failure ");
+		stdoutput.printf("%d!=%d\n",value,success);
+		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -82,10 +83,10 @@ void checkSuccess(int value, int success) {
 void checkSuccess(double value, double success) {
 
 	if (value==success) {
-		printf("success ");
+		stdoutput.printf("success ");
 	} else {
-		printf("%f!=%f\n",value,success);
-		printf("failure ");
+		stdoutput.printf("%f!=%f\n",value,success);
+		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -93,6 +94,20 @@ void checkSuccess(double value, double success) {
 }
 
 int	main(int argc, char **argv) {
+
+	// The extensionstest instance uses connections="0", so the
+	// sqlr-connection process exits after each client session.  When the
+	// client sends its final endSession(), and the server can receive it,
+	// process it, and exit, before the client's final write() system call
+	// returns, causing the client to receive a SIGPIPE.  It all depends on
+	// timing though, and doesn't happen every time.  We'll ignore SIGPIPE
+	// here to manage this.
+	#ifdef SIGPIPE
+	signalset	set;
+	set.removeAllSignals();
+	set.addSignal(SIGPIPE);
+	signalmanager::ignoreSignals(&set);
+	#endif
 
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
@@ -102,15 +117,15 @@ int	main(int argc, char **argv) {
 	con->setClientInfo("extensionstest");
 
 
-	printf("IGNORE SELECT DATABASE:\n");
+	stdoutput.printf("IGNORE SELECT DATABASE:\n");
 	const char	*originaldb=con->getCurrentDatabase();
 	checkSuccess((originaldb!=NULL),true);
 	checkSuccess(con->selectDatabase("nonexistentdb"),true);
 	checkSuccess(con->getCurrentDatabase(),originaldb);
-	printf("\n\n");
+	stdoutput.printf("\n\n");
 
 
-	printf("TRANSLATE BIND VARIABLES:\n");
+	stdoutput.printf("TRANSLATE BIND VARIABLES:\n");
 	cur->prepareQuery("select :1 from dual where 'hel''lo'='hel''lo' and 1=:2 and 2=:3");
 	cur->validateBinds();
 	cur->inputBind("1","hello");
@@ -124,7 +139,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
 	cur->clearBinds();
-	printf("\n");
+	stdoutput.printf("\n");
 
 	cur->prepareQuery("select @1 from dual where 'hel''lo'='hel''lo' and 1=@2 and 2=@3");
 	cur->validateBinds();
@@ -139,7 +154,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
 	cur->clearBinds();
-	printf("\n");
+	stdoutput.printf("\n");
 
 	cur->prepareQuery("select $1 from dual where 'hel''lo'='hel''lo' and 1=$2 and 2=$3");
 	cur->validateBinds();
@@ -154,7 +169,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
 	cur->clearBinds();
-	printf("\n");
+	stdoutput.printf("\n");
 
 	cur->prepareQuery("select ? from dual where 'hel''lo'='hel''lo' and 1=? and 2=?");
 	cur->validateBinds();
@@ -169,10 +184,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"hello");
 	cur->clearBinds();
-	printf("\n\n");
+	stdoutput.printf("\n\n");
 
 
-	printf("FAKE INPUT BIND VARIABLES:\n");
+	stdoutput.printf("FAKE INPUT BIND VARIABLES:\n");
 	cur->prepareQuery("select '',1,'',:hello,'''','\\'' from dual where 1=:one");
 	cur->inputBind("hello","hello");
 	cur->inputBind("one","1");
@@ -184,10 +199,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(0,(uint32_t)3),"hello");
 	checkSuccess(cur->getField(0,(uint32_t)4),"'");
 	checkSuccess(cur->getField(0,(uint32_t)5),"'");
-	printf("\n\n");
+	stdoutput.printf("\n\n");
 
 
-	printf("ISOLATION LEVELS: \n");
+	stdoutput.printf("ISOLATION LEVELS: \n");
 
 	// set autocommit off
 	checkSuccess(con->autoCommitOff(),1);
@@ -204,7 +219,7 @@ int	main(int argc, char **argv) {
 
 	// change the isolation level
 	checkSuccess(secondcur->sendQuery("alter session set isolation_level=serializable"),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// in the second connection, select from the table, it should be empty
 	checkSuccess(secondcur->sendQuery("select * from testtable"),1);
@@ -219,7 +234,7 @@ int	main(int argc, char **argv) {
 
 	// in the first connecton, commit
 	checkSuccess(con->commit(),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	// in the second connection, select again, it should STILL be empty
 	checkSuccess(secondcur->sendQuery("select * from testtable"),1);
@@ -241,13 +256,13 @@ int	main(int argc, char **argv) {
 	cur=new sqlrcursor(con);
 	checkSuccess(cur->sendQuery("drop table testtable"),1);
 	con->setClientInfo("extensionstest");
-	printf("\n\n");
+	stdoutput.printf("\n\n");
 
 
-	printf("SQLRCMD CSTAT: \n");
+	stdoutput.printf("SQLRCMD CSTAT: \n");
 	checkSuccess(cur->sendQuery("sqlrcmd cstat"),1);
 	checkSuccess(cur->colCount(),9);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	checkSuccess(cur->getColumnName((uint32_t)0),"INDEX");
 	checkSuccess(cur->getColumnName(1),"MINE");
@@ -258,7 +273,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnName(6),"CLIENT_ADDR");
 	checkSuccess(cur->getColumnName(7),"CLIENT_INFO");
 	checkSuccess(cur->getColumnName(8),"SQL_TEXT");
-	printf("\n");
+	stdoutput.printf("\n");
 
 	checkSuccess(cur->getColumnType((uint32_t)0),"NUMBER");
 	checkSuccess(cur->getColumnType(1),"VARCHAR2");
@@ -269,7 +284,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnType(6),"VARCHAR2");
 	checkSuccess(cur->getColumnType(7),"VARCHAR2");
 	checkSuccess(cur->getColumnType(8),"VARCHAR2");
-	printf("\n");
+	stdoutput.printf("\n");
 
 	checkSuccess(cur->getColumnLength((uint32_t)0),10);
 	checkSuccess(cur->getColumnLength(1),1);
@@ -280,7 +295,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnLength(6),24);
 	checkSuccess(cur->getColumnLength(7),511);
 	checkSuccess(cur->getColumnLength(8),511);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	checkSuccess(cur->getColumnPrecision((uint32_t)0),10);
 	checkSuccess(cur->getColumnPrecision(1),0);
@@ -291,7 +306,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnPrecision(6),0);
 	checkSuccess(cur->getColumnPrecision(7),0);
 	checkSuccess(cur->getColumnPrecision(8),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	checkSuccess(cur->getColumnScale((uint32_t)0),0);
 	checkSuccess(cur->getColumnScale(1),0);
@@ -302,7 +317,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnScale(6),0);
 	checkSuccess(cur->getColumnScale(7),0);
 	checkSuccess(cur->getColumnScale(8),0);
-	printf("\n");
+	stdoutput.printf("\n");
 
 	checkSuccess(cur->getColumnIsNullable((uint32_t)0),0);
 	checkSuccess(cur->getColumnIsNullable(1),0);
@@ -313,19 +328,29 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getColumnIsNullable(6),0);
 	checkSuccess(cur->getColumnIsNullable(7),1);
 	checkSuccess(cur->getColumnIsNullable(8),1);
-	printf("\n");
+	stdoutput.printf("\n");
 
-	checkSuccess(cur->getField(0,(uint32_t)0),"0");
-	checkSuccess(cur->getField(0,(uint32_t)1),"*");
-	checkSuccess(cur->getField(0,(uint32_t)4),"RETURN_RESULT_SET");
+	uint64_t	row=0;
+	bool		found=false;
+	for (uint64_t i=0; i<cur->rowCount(); i++) {
+		if (!charstring::compare(cur->getField(i,(uint32_t)8),
+							"sqlrcmd cstat")) {
+			found=true;
+			row=i;
+			break;
+		}
+	}
+	checkSuccess(found,true);
+	checkSuccess(cur->getField(row,(uint32_t)1),"*");
+	checkSuccess(cur->getField(row,(uint32_t)4),"RETURN_RESULT_SET");
 	// 127.0.0.1 on Windows
-	//checkSuccess(cur->getField(0,(uint32_t)6),"UNIX");
-	checkSuccess(cur->getField(0,(uint32_t)7),"extensionstest");
-	checkSuccess(cur->getField(0,(uint32_t)8),"sqlrcmd cstat");
-	printf("\n\n");
+	//checkSuccess(cur->getField(row,(uint32_t)6),"UNIX");
+	checkSuccess(cur->getField(row,(uint32_t)7),"extensionstest");
+	checkSuccess(cur->getField(row,(uint32_t)8),"sqlrcmd cstat");
+	stdoutput.printf("\n\n");
 
 
-	printf("SQLRCMD GSTAT: \n");
+	stdoutput.printf("SQLRCMD GSTAT: \n");
 	checkSuccess(cur->sendQuery("sqlrcmd gstat"),1);
 
 	checkSuccess(cur->colCount(),2);
@@ -375,10 +400,10 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->getField(33,(uint32_t)0),"peak_session");
 	checkSuccess(cur->getField(34,(uint32_t)0),"peak_session_1min");
 	checkSuccess(cur->getField(35,(uint32_t)0),"peak_session_1min_time");
-	printf("\n\n");
+	stdoutput.printf("\n\n");
 
 
-	printf("SESSION QUERIES: Date Format\n");
+	stdoutput.printf("SESSION QUERIES: Date Format\n");
 	checkSuccess(cur->sendQuery("select sysdate from dual"),1);
 	datetime	dt;
 	dt.getSystemDateAndTime();
@@ -401,20 +426,45 @@ int	main(int argc, char **argv) {
 	delete[] month;
 	delete[] hour;
 	delete[] minute;
-	printf("\n\n");
+	stdoutput.printf("\n\n");
 
 
-	printf("FILTERS:\n");
+	stdoutput.printf("FILTERS:\n");
 	checkSuccess(cur->sendQuery("select * from badstring"),0);
 	checkSuccess(cur->errorMessage(),"badstring encountered");
 	checkSuccess(cur->sendQuery("select * from badregex"),0);
 	checkSuccess(cur->errorMessage(),"badregex encountered");
 	checkSuccess(cur->errorNumber(),100);
 	checkSuccess(cur->sendQuery("select * from badpattern"),0);
-	printf("\n\n");
+	stdoutput.printf("\n\n");
 
 	delete cur;
 	delete con;
+
+	stdoutput.printf("PWDENCS:\n");
+	const char	*usrpwds[]={
+		"test",
+		"rot16test",
+		"rot13test",
+		"rot10test",
+		"md5test",
+		"sha1test",
+		"sha256test",
+		"crypttest",
+		"aes128test",
+		NULL
+	};
+	for (const char **usrpwd=usrpwds; *usrpwd; usrpwd++) {
+		con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
+							*usrpwd,*usrpwd,0,1);
+		cur=new sqlrcursor(con);
+		checkSuccess(cur->sendQuery("select 1 from dual"),1);
+		stdoutput.printf("\n");
+		delete cur;
+		delete con;
+	}
+	stdoutput.printf("done\n");
+	stdoutput.printf("\n\n");
 
 	return 0;
 }

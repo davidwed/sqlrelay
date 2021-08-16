@@ -26,6 +26,7 @@
 				uint16_t objecttypes);
 		void	sendCursorStatus();
 		void	performSubstitutions();
+		bool	performSubstitutionsInternal();
 		void	validateBindsInternal();
 		bool	validateBind(const char *variable);
 		void	sendInputBinds();

@@ -47,27 +47,27 @@ sqlrschedulerule::sqlrschedulerule(bool allow,
 }
 
 sqlrschedulerule::~sqlrschedulerule() {
-	for (linkedlistnode< sqlrscheduleperiod * > *n=
+	for (listnode< sqlrscheduleperiod * > *n=
 						pvt->_years.getFirst();
 						n; n=n->getNext()) {
 		delete n->getValue();
 	}
-	for (linkedlistnode< sqlrscheduleperiod * > *n=
+	for (listnode< sqlrscheduleperiod * > *n=
 						pvt->_months.getFirst();
 						n; n=n->getNext()) {
 		delete n->getValue();
 	}
-	for (linkedlistnode< sqlrscheduleperiod * > *n=
+	for (listnode< sqlrscheduleperiod * > *n=
 						pvt->_daysofmonth.getFirst();
 						n; n=n->getNext()) {
 		delete n->getValue();
 	}
-	for (linkedlistnode< sqlrscheduleperiod * > *n=
+	for (listnode< sqlrscheduleperiod * > *n=
 						pvt->_daysofweek.getFirst();
 						n; n=n->getNext()) {
 		delete n->getValue();
 	}
-	for (linkedlistnode< sqlrscheduledaypart * > *n=
+	for (listnode< sqlrscheduledaypart * > *n=
 						pvt->_dayparts.getFirst();
 						n; n=n->getNext()) {
 		delete n->getValue();
@@ -129,7 +129,7 @@ bool sqlrschedulerule::inPeriods(
 		}
 	#endif
 	
-	for (linkedlistnode< sqlrscheduleperiod * > *pn=periods->getFirst();
+	for (listnode< sqlrscheduleperiod * > *pn=periods->getFirst();
 							pn; pn=pn->getNext()) {
 
 		sqlrscheduleperiod	*p=pn->getValue();
@@ -151,7 +151,7 @@ bool sqlrschedulerule::inDayParts(int32_t hour, int32_t minute) {
 
 	debugPrintf("dayparts...\n");
 
-	for (linkedlistnode< sqlrscheduledaypart * >
+	for (listnode< sqlrscheduledaypart * >
 				*dpn=pvt->_dayparts.getFirst();
 				dpn; dpn=dpn->getNext()) {
 
@@ -326,7 +326,7 @@ sqlrschedule::sqlrschedule(sqlrservercontroller *cont,
 }
 
 sqlrschedule::~sqlrschedule() {
-	for (linkedlistnode< sqlrschedulerule * > *r=pvt->_rules.getFirst();
+	for (listnode< sqlrschedulerule * > *r=pvt->_rules.getFirst();
 							r; r=r->getNext()) {
 		delete r->getValue();
 	}
@@ -350,7 +350,7 @@ void sqlrschedule::addRule(bool allow,
 }
 
 bool sqlrschedule::rulesAllow(datetime *dt, bool currentlyallowed) {
-	for (linkedlistnode< sqlrschedulerule * > *r=pvt->_rules.getFirst();
+	for (listnode< sqlrschedulerule * > *r=pvt->_rules.getFirst();
 							r; r=r->getNext()) {
 		currentlyallowed=r->getValue()->allowed(dt,currentlyallowed);
 	}

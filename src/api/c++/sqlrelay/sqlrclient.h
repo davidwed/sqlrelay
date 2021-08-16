@@ -6,32 +6,30 @@
 
 #include <sqlrelay/private/sqlrclientincludes.h>
 
-class SQLRCLIENT_DLLSPEC sqlrconnection {
+class SQLRCLIENT_DLLSPEC sqlrconnection : public object {
 	public:
-			/** Initiates a connection to "server" on "port"
-			 *  or to the unix "socket" on the local machine
-			 *  and auths with "user" and "password".
-			 *  Failed connections will be retried for 
-			 *  "tries" times, waiting "retrytime" seconds
-			 *  between each try.  If "tries" is 0 then retries
-			 *  will continue forever.  If "retrytime" is 0 then
-			 *  retries will be attempted on a default interval.
-			 *
-			 *  If the "socket" parameter is neither 
-			 *  NULL nor "" then an attempt will be made to 
-			 *  connect through it before attempting to 
-			 *  connect to "server" on "port".  If it is 
-			 *  NULL or "" then no attempt will be made to 
-			 *  connect through the socket. */
-			sqlrconnection(const char *server, uint16_t port,
-					const char *socket,
-					const char *user, const char *password,
-					int32_t retrytime, int32_t tries);
+		/** Initiates a connection to "server" on "port" or to the
+		 *  unix "socket" on the local machine and auths with "user"
+		 *  and "password".  Failed connections will be retried for
+		 *  "tries" times, waiting "retrytime" seconds between each
+		 *  try.  If "tries" is 0 then retries will continue forever.
+		 *  If "retrytime" is 0 then retries will be attempted on a
+		 *  default interval.
+		 *
+		 *  If the "socket" parameter is neither NULL nor "" then an
+		 *  attempt will be made to connect through it before
+		 *  attempting to connect to "server" on "port".  If it is NULL
+		 *  or "" then no attempt will be made to connect through the
+		 *  socket. */
+		sqlrconnection(const char *server, uint16_t port,
+				const char *socket,
+				const char *user, const char *password,
+				int32_t retrytime, int32_t tries);
 
 
-			/** Disconnects and ends the session if
-			 * it hasn't been ended already. */
-			~sqlrconnection();
+		/** Disconnects and ends the session if it hasn't been ended
+		 *  already. */
+		~sqlrconnection();
 
 
 
@@ -376,7 +374,7 @@ class SQLRCLIENT_DLLSPEC sqlrconnection {
 };
 
 
-class SQLRCLIENT_DLLSPEC sqlrcursor {
+class SQLRCLIENT_DLLSPEC sqlrcursor : public object {
 	public:
 			/** Creates a cursor to run queries and fetch result
 			 *  sets using connecton "sqlrc". */

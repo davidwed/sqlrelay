@@ -63,7 +63,7 @@ Below is a description of the attributes for each tag.
   * '''tlsca''' - Specifies the location of a certificate store containing the certificate of the certificate authority to use, in addition to the system's root certificates, when validating the client's certificate.  This is useful if the client's certificate is self-signed, or signed in-house.  On non-Windows platforms, this parameter can be either a certificate store file or the name of a directory containing multiple certificate store files.  On Windows platforms it may specify a certificate store file or a Windows Certificate Store.  (See [tlsca.html The tlsca Parameter] for more information.)
   * '''tlsciphers''' - Specifies a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If omitted or left empty then a default set of ciphers is used.  For a list of valid ciphers on Linux/Unix platforms, see: man ciphers.  For a list of valid ciphers on Windows platforms, see: [https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx this link].  On Windows platforms, the ciphers (alg_id's) should omit CALG_ and may be given with underscores or dashes. For example: 3DES_112.  Only set this if you know that you have a good reason to.
   * '''tlsdepth''' - Sets the maximum certificate chain validation depth.  The absolute maximum depth is 9.  Defaults to "9".
- * '''dbase''' - The type of database the connection daemon should connect to.  Should be one of: "oracle", "freetds", "sap", "db2", "informix", "mysql", "postgresql", "firebird", "sqlite", odbc", or "mdbtools".  Defaults to "oracle".  Note: For historical reasons, "oracle8" and "sybase" are also supported, and are synonymous with "oracle" and "sap".  "mariadb" is also supported, and is synonymous with "mysql".
+ * '''dbase''' - The type of database the connection daemon should connect to.  Should be one of: "oracle", "freetds", "sap", "db2", "informix", "mysql", "postgresql", "firebird", "sqlite", or "odbc".  Defaults to "oracle".  Note: For historical reasons, "oracle8" and "sybase" are also supported, and are synonymous with "oracle" and "sap".  "mariadb" is also supported, and is synonymous with "mysql".
  * '''connections''' - The number of database connections to open at startup.  This may be set to any positive number or 0.  Defaults to 5.  (Note: implicitly limited to a compile time limit, which is configurable, but defaults to 4096.)
  * '''maxconnections''' - The maximum number of database connections to scale up to.  If this is set to a number lower than the value for the '''connections''' parameter then it will be automatically bumped up to the value set for '''connections'''.  Defaults to the same value as '''connections'''.  (Note: implicitly limited to a compile time limit, which is configurable, but defaults to 4096.)
  * '''maxqueuelength''' - The size the queue of waiting clients has to grow to before more connections will be spawned.  Defaults to 0.
@@ -302,7 +302,7 @@ For '''sqlite''' databases, the connect string syntax is "db=DB;identity=ID"
 
 
 [=#odbc]
-For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;connecttimeout=CONNECTTIMEOUT;odbcversion=ODBCVERSION;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no;trace=yes/no/default;tracefile=TRACEFILE;detachbeforelogin=yes/no"
+For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSWORD;dsn=DSN;autocommit=yes/no;connecttimeout=CONNECTTIMEOUT;odbcversion=ODBCVERSION;ncharencoding=NCHARENCODING;maxselectlistsize=MAXSELECTLISTSIZE;maxitembuffersize=MAXITEMBUFFERSIZE;maxoutlobbindsize=MAXOUTLOBBINDSIZE;identity=ID;mars=yes/no;trace=yes/no/default;tracefile=TRACEFILE;detachbeforelogin=yes/no"
 
 * '''user''': The username SQL Relay should use to log into the database.  Required.
 * '''password''': The password SQL Relay should use to log into the database.  Required.  Required.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
@@ -310,6 +310,7 @@ For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSW
 * '''autocommit''': Whether to commit each insert, update or delete immediately or not.  Optional, defaults to no.
 * '''connecttimeout''': Specifies the number of seconds to wait for a successful connection to the database.  Defaults to 5 seconds if omitted.  Setting a timeout of 0 means to wait forever.
 * '''odbcversion''': Tells the driver to exhibit behavior from the specified version of ODBC.  Valid values include: 2, 3, and 3.8.  Defaults to 3.  It may be necessary to set this to 2 for some drivers that only support ODBC 2.
+* '''ncharencoding''': Whether to encode bind variables as UCS-2 or UTF-16 when inserting into a NCHAR/NVARCHAR field, and whether to interpret data from NCHAR/NVARCHAR fields as UCS-2 or UTF-16.  Defaults to UCS-2.
 * '''maxselectlistsize''': The maximum number of columns that can be fetched in a query.  Defaults to 256.  Setting this parameter to -1 causes result set buffers to be dynamically allocated, allowing any number of columns to be fetched.  Using -1 is flexible and conserves memory but there is a performance penalty.  (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''maxitembuffersize''': The maximum size of a field.  Fields longer than this will be truncated.  Defaults to 32768. (see [tuning.html#memoryusage here] for more info on this parameter)
 * '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
@@ -318,12 +319,6 @@ For '''odbc''' databases, the connect string syntax is "user=USER;password=PASSW
 * '''tracefile''': Allows you to override the default ODBC trace file name, or the trace file name specified in the DSN.  If omitted then the trace file name specified in the DSN will be used.  If that is omitted then the default trace file name will be used.
 * '''detachbeforelogin''': Whether or not to detach from the controlling terminal before login.  When set to yes, the process ID's in the ODBC trace file will match the process ID of the sqlr-connection process.  Otherwise they will not.  Defaults to no.
 
-
-[=#mdbtools]
-For '''mdbtools''' databases, the connect string syntax is "db=DATABASE;identity=ID"
-
-* '''db''': The filename of the database open.  Required.
-* '''identity''': Overrides the default value returned when a client request the database identity using the identify() method (or similar method/function).
 
 [=#advanced]
 == Advanced Configuration ==

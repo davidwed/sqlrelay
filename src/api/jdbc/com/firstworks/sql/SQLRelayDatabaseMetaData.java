@@ -1,6 +1,9 @@
 package com.firstworks.sql;
 	
 import java.sql.*;
+import java.util.regex.*;
+
+import com.firstworks.sqlrelay.*;
 	
 public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseMetaData {
 
@@ -110,17 +113,29 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 
 	public ResultSet 	getCatalogs() throws SQLException {
 		debugFunction();
+
 		SQLRelayResultSet	resultset=null;
 		SQLRelayStatement	stmt=(SQLRelayStatement)
 						connection.createStatement();
-		if (stmt.getSQLRCursor().getDatabaseList(null)) {
-			resultset=new SQLRelayResultSet();
-			resultset.setStatement(stmt);
-			resultset.setSQLRCursor(stmt.getSQLRCursor());
+		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
+
+		boolean	result=sqlrcur.getDatabaseListWithFormat(null,3);
+
+		debugPrintln("  result: "+result);
+
+		if (result) {
+
+			debugPrintln("  colcount: "+sqlrcur.colCount());
+
+			if (sqlrcur.colCount()>0) {
+				resultset=new SQLRelayResultSet();
+				resultset.setStatement(stmt);
+				resultset.setSQLRCursor(sqlrcur);
+			}
 		} else {
-			throw new SQLException(
-					stmt.getSQLRCursor().errorMessage());
+			throwErrorMessageException(sqlrcur);
 		}
+		
 		return resultset;
 	}
 
@@ -163,8 +178,35 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						String columnNamePattern)
 						throws SQLException {
 		debugFunction();
-		// FIXME: implement this by calling sqlrcursor.getColumnList()
-		return null;
+
+		String	wild=buildWild(catalog,schemaPattern,tableNamePattern);
+		debugPrintln("  wild: "+wild);
+		debugPrintln("  column name pattern: "+columnNamePattern);
+
+		SQLRelayResultSet	resultset=null;
+		SQLRelayStatement	stmt=(SQLRelayStatement)
+						connection.createStatement();
+		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
+
+		boolean	result=sqlrcur.getColumnListWithFormat(
+						wild,columnNamePattern,3);
+
+		debugPrintln("  result: "+result);
+
+		if (result) {
+
+			debugPrintln("  colcount: "+sqlrcur.colCount());
+
+			if (sqlrcur.colCount()>0) {
+				resultset=new SQLRelayResultSet();
+				resultset.setStatement(stmt);
+				resultset.setSQLRCursor(sqlrcur);
+			}
+		} else {
+			throwErrorMessageException(sqlrcur);
+		}
+		
+		return resultset;
 	}
 
 	public Connection 	getConnection() throws SQLException {
@@ -186,23 +228,34 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 
 	public int 	getDatabaseMajorVersion() throws SQLException {
 		debugFunction();
-		// FIXME: SQL Relay or db?
-		int	majorversion=0;
+		int	majorversion=getDatabaseVersion(true);
 		debugPrintln("  major version: "+majorversion);
 		return majorversion;
 	}
 
 	public int 	getDatabaseMinorVersion() throws SQLException {
 		debugFunction();
-		// FIXME: SQL Relay or db?
-		int	minorversion=0;
+		int	minorversion=getDatabaseVersion(false);
 		debugPrintln("  minor version: "+minorversion);
 		return minorversion;
 	}
 
+	private int	getDatabaseVersion(boolean major) {
+		// FIXME: cache/fetch dbVersion
+		Matcher	matcher=Pattern.compile("[0-9]*\\.[0-9]*").
+			matcher(connection.getSQLRConnection().dbVersion());
+		if (matcher.find()) {
+			String[]	parts=matcher.group().split("\\.");
+			if (parts!=null && parts.length>((major)?0:1)) {
+				return Integer.parseInt(parts[(major)?0:1]);
+			}
+		}
+		return -1;
+	}
+
 	public String 	getDatabaseProductName() throws SQLException {
 		debugFunction();
-		// FIXME: cache this...
+		// FIXME: cache/fetch identify
 		String	id=connection.getSQLRConnection().identify();
 		debugPrintln("  id: "+id);
 		return id;
@@ -210,7 +263,7 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 
 	public String 	getDatabaseProductVersion() throws SQLException {
 		debugFunction();
-		// FIXME: cache this...
+		// FIXME: cache/fetch dbVersion
 		String	productversion=
 				connection.getSQLRConnection().dbVersion();
 		debugPrintln("  product version: "+productversion);
@@ -228,16 +281,26 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 
 	public int 	getDriverMajorVersion() {
 		debugFunction();
-		// FIXME: make this come from sqlrclient
-		int	majorversion=1;
+		int		majorversion=-1;
+		String[]	parts=connection.
+					getSQLRConnection().
+					clientVersion().split(".");
+		if (parts!=null && parts.length>0) {
+			majorversion=Integer.parseInt(parts[0]);
+		}
 		debugPrintln("  major version: "+majorversion);
 		return majorversion;
 	}
 
 	public int 	getDriverMinorVersion() {
 		debugFunction();
-		// FIXME: make this come from sqlrclient
-		int	minorversion=2;
+		int		minorversion=-1;
+		String[]	parts=connection.
+					getSQLRConnection().
+					clientVersion().split(".");
+		if (parts!=null && parts.length>1) {
+			minorversion=Integer.parseInt(parts[1]);
+		}
 		debugPrintln("  minor version: "+minorversion);
 		return minorversion;
 	}
@@ -251,8 +314,9 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 
 	public String 	getDriverVersion() throws SQLException {
 		debugFunction();
-		// FIXME: make this come from sqlrclient
-		String	driverversion="1.2.0";
+		String	driverversion=connection.
+					getSQLRConnection().
+					clientVersion();
 		debugPrintln("  driver version: "+driverversion);
 		return driverversion;
 	}
@@ -334,16 +398,16 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 
 	public int 	getJDBCMajorVersion() throws SQLException {
 		debugFunction();
-		// FIXME: make this come from sqlrclient
-		int	jdbcmajorversion=1;
+		// FIXME: get this from ???
+		int	jdbcmajorversion=4;
 		debugPrintln("  jdbc major version: "+jdbcmajorversion);
 		return jdbcmajorversion;
 	}
 
 	public int 	getJDBCMinorVersion() throws SQLException {
 		debugFunction();
-		// FIXME: make this come from sqlrclient
-		int	jdbcminorversion=2;
+		// FIXME: get this from ???
+		int	jdbcminorversion=3;
 		debugPrintln("  jdbc minor version: "+jdbcminorversion);
 		return jdbcminorversion;
 	}
@@ -603,16 +667,41 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 
 	public ResultSet 	getSchemas() throws SQLException {
 		debugFunction();
-		// FIXME: implement this by calling sqlrcon.getSchemaList()
-		return null;
+		return getSchemas(null,null);
 	}
 
 	public ResultSet 	getSchemas(String catalog,
 						String schemaPattern)
 						throws SQLException {
 		debugFunction();
-		// FIXME: implement this by calling sqlrcon.getSchemaList()
-		return null;
+
+		// FIXME: use catalog
+		debugPrintln("  catalog: "+catalog);
+		debugPrintln("  schema pattern: "+schemaPattern);
+
+		SQLRelayResultSet	resultset=null;
+		SQLRelayStatement	stmt=(SQLRelayStatement)
+						connection.createStatement();
+		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
+
+		boolean	result=sqlrcur.getSchemaListWithFormat(schemaPattern,3);
+
+		debugPrintln("  result: "+result);
+
+		if (result) {
+
+			debugPrintln("  colcount: "+sqlrcur.colCount());
+
+			if (sqlrcur.colCount()>0) {
+				resultset=new SQLRelayResultSet();
+				resultset.setStatement(stmt);
+				resultset.setSQLRCursor(sqlrcur);
+			}
+		} else {
+			throwErrorMessageException(sqlrcur);
+		}
+		
+		return resultset;
 	}
 
 	public String 	getSchemaTerm() throws SQLException {
@@ -695,18 +784,102 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 						String[] types)
 						throws SQLException {
 		debugFunction();
+
+		String	wild=buildWild(catalog,schemaPattern,tableNamePattern);
+		debugPrintln("  wild: "+wild);
+
+		debugPrint("  types: ");
+		int	objecttypes=0;
+		if (types==null) {
+			debugPrintln("null");
+			objecttypes=1|2|3|4;
+		} else {
+			for (String type: types) {
+				debugPrint(type+",");
+				if (type.equals("TABLE") ||
+					type.equals("SYSTEM TABLE") ||
+					type.equals("GLOBAL TEMPORARY") ||
+					type.equals("LOCAL TEMPORARY")) {
+					objecttypes|=1;
+				} else if (type.equals("VIEW")) {
+					objecttypes|=2;
+				} else if (type.equals("ALIAS")) {
+					objecttypes|=3;
+				} else if (type.equals("SYNONYM")) {
+					objecttypes|=4;
+				}
+			}
+			debugPrintln("");
+		}
+
 		SQLRelayResultSet	resultset=null;
 		SQLRelayStatement	stmt=(SQLRelayStatement)
 						connection.createStatement();
-		if (stmt.getSQLRCursor().getTableList(null)) {
-			resultset=new SQLRelayResultSet();
-			resultset.setStatement(stmt);
-			resultset.setSQLRCursor(stmt.getSQLRCursor());
+		SQLRCursor		sqlrcur=stmt.getSQLRCursor();
+
+		boolean	result=sqlrcur.getTableListWithFormat(
+						tableNamePattern,3,objecttypes);
+
+		debugPrintln("  result: "+result);
+
+		if (result) {
+
+			debugPrintln("  colcount: "+sqlrcur.colCount());
+
+			if (sqlrcur.colCount()>0) {
+				resultset=new SQLRelayResultSet();
+				resultset.setStatement(stmt);
+				resultset.setSQLRCursor(sqlrcur);
+			}
 		} else {
-			throw new SQLException(
-					stmt.getSQLRCursor().errorMessage());
+			throwErrorMessageException(sqlrcur);
 		}
+		
 		return resultset;
+	}
+
+	private String 	buildWild(String catalog,
+					String schema,
+					String object) {
+
+		// If object already contains a . then just use it
+		// as-is.
+		if (object.contains(".")) {
+			return object;
+		}
+
+		// Concatenate parts until wild is one of the following formats:
+		// * table
+		// * schema.table
+		// * catalog.schema.table
+
+		StringBuilder	wild=new StringBuilder();
+		if (catalog!=null) {
+			if (catalog.equals("")) {
+				// retrieve objects without a catalog
+				// FIXME: how???
+			} else {
+				wild.append(catalog).append('.');
+			}
+		}
+		if (schema!=null) {
+			if (schema.equals("")) {
+				// retrieve objects without a schema
+				// FIXME: how???
+			} else {
+				wild.append(schema).append('.');
+			}
+		} else if (wild.length()>0) {
+			// if schema was null, but a catalog was
+			// specified then include all schemas
+			wild.append("%.");
+		}
+		if (object!=null && !object.equals("")) {
+			wild.append(object);
+		} else {
+			wild.append('%');
+		}
+		return wild.toString();
 	}
 
 	public ResultSet 	getTableTypes() throws SQLException {
@@ -1600,6 +1773,12 @@ public class SQLRelayDatabaseMetaData extends SQLRelayDebug implements DatabaseM
 		boolean	useslocalfiles=false;
 		debugPrintln("  uses local files: "+useslocalfiles);
 		return useslocalfiles;
+	}
+
+	protected void throwErrorMessageException(SQLRCursor sqlrcur)
+							throws SQLException {
+		debugFunction();
+		throw new SQLException(sqlrcur.errorMessage());
 	}
 
 	public boolean	isWrapperFor(Class<?> iface) throws SQLException {

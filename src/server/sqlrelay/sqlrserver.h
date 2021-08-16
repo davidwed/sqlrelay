@@ -70,7 +70,8 @@ enum sqlrserverbindvartype_t {
 enum sqlrserverlistformat_t {
 	SQLRSERVERLISTFORMAT_NULL=0,
 	SQLRSERVERLISTFORMAT_MYSQL,
-	SQLRSERVERLISTFORMAT_ODBC
+	SQLRSERVERLISTFORMAT_ODBC,
+	SQLRSERVERLISTFORMAT_JDBC
 };
 
 class SQLRSERVER_DLLSPEC sqlrserverbindvar {
@@ -411,7 +412,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		// bind variables
 		memorypool	*getBindPool(sqlrservercursor *cursor);
 		memorypool	*getBindMappingsPool(sqlrservercursor *cursor);
-		namevaluepairs	*getBindMappings(sqlrservercursor *cursor);
+		dictionary<char *, char *>	*getBindMappings(
+						sqlrservercursor *cursor);
 
 		// input bind variables
 		void		setFakeInputBindsForThisQuery(
@@ -540,6 +542,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getTypeInfoListQuery(const char *type,
 							bool wild);
 		const char	*getProcedureListQuery(bool wild);
+		void		splitObjectName(const char *fqobject,
+						const char *currentcatalog,
+						const char **catalog,
+						const char **schema,
+						const char **object);
 
 		// column info
 		bool		columnInfoIsValidAfterPrepare(
@@ -756,10 +763,10 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		sqlrparser	*getParser();
 
 		// gss
-		gsscontext	*getGSSContext();
+		gsscontext	*getGssContext();
 
 		// tls
-		tlscontext	*getTLSContext();
+		tlscontext	*getTlsContext();
 
 		// configuration
 		sqlrconfig	*getConfig();
@@ -776,6 +783,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char *endptr);
 		bool		skipWhitespace(const char **ptr,
 						const char *endptr);
+		const char	*skipWhitespace(const char *query);
+		const char	*skipComments(const char *query);
 		const char	*skipWhitespaceAndComments(const char *query);
 
 		const char	*asciiToHex(unsigned char ch);
@@ -788,9 +797,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		splitObjectName(const char *currentdb,
 						const char *currentschema,
 						const char *combinedobject,
-						char **db,
-						char **schema,
-						char **object);
+						const char **db,
+						const char **schema,
+						const char **object);
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);
@@ -1208,7 +1217,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 
 		memorypool	*getBindPool();
 		memorypool	*getBindMappingsPool();
-		namevaluepairs	*getBindMappings();
+		dictionary<char *, char *>	*getBindMappings();
 
 		void		setInputBindCount(uint16_t inbindcount);
 		uint16_t	getInputBindCount();
@@ -1407,8 +1416,11 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		virtual clientsessionexitstatus_t
 				clientSession(filedescriptor *clientsock)=0;
 
-		virtual gsscontext	*getGSSContext();
-		virtual tlscontext	*getTLSContext();
+		virtual	bool		useKrb();
+		virtual gsscontext	*getGssContext();
+
+		virtual	bool		useTls();
+		virtual tlscontext	*getTlsContext();
 
 		virtual void	endTransaction(bool commit);
 		virtual void	endSession();

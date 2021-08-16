@@ -14,8 +14,6 @@ all-freetds: $(SQLR)connection_freetds.$(LIBEXT)
 
 all-informix: $(SQLR)connection_informix.$(LIBEXT)
 
-all-mdbtools: $(SQLR)connection_mdbtools.$(LIBEXT)
-
 all-mysql: $(SQLR)connection_mysql.$(LIBEXT)
 
 all-odbc: $(SQLR)connection_odbc.$(LIBEXT)
@@ -77,17 +75,6 @@ informix.obj: informix.cpp
 
 $(SQLR)connection_informix.$(LIBEXT): informix.$(OBJ) informix.cpp
 	$(LTLINK) $(LINK) $(OUT)$@ informix.$(OBJ) $(LDFLAGS) $(INFORMIXCONNECTIONLIBS) $(MODLINKFLAGS)
-
-
-
-mdbtools.lo: mdbtools.cpp
-	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(MDBTOOLSCONNECTIONCPPFLAGS) $(COMPILE) $< $(OUT)$@
-
-mdbtools.obj: mdbtools.cpp
-	$(CXX) $(CXXFLAGS) $(MDBTOOLSCONNECTIONCPPFLAGS) $(COMPILE) mdbtools.cpp
-
-$(SQLR)connection_mdbtools.$(LIBEXT): mdbtools.$(OBJ) mdbtools.cpp
-	$(LTLINK) $(LINK) $(OUT)$@ mdbtools.$(OBJ) $(LDFLAGS) $(MDBTOOLSCONNECTIONLIBS) $(MODLINKFLAGS)
 
 
 
@@ -188,10 +175,6 @@ installdll-informix:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)connection_informix.$(LIBEXT) $(libexecdir)
 
-installdll-mdbtools:
-	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)connection_mdbtools.$(LIBEXT) $(libexecdir)
-
 installdll-mysql:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)connection_mysql.$(LIBEXT) $(libexecdir)
@@ -252,13 +235,6 @@ installsharedlib-informix:
 	$(RM) $(libexecdir)/$(SQLR)connection_informix.a
 	$(RM) $(libexecdir)/$(SQLR)connection_informix.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)connection_informix.so so $(MODULESUFFIX)
-
-installsharedlib-mdbtools:
-	$(MKINSTALLDIRS) $(libexecdir)
-	$(LTINSTALL) $(CP) $(SQLR)connection_mdbtools.$(LIBEXT) $(libexecdir)
-	$(RM) $(libexecdir)/$(SQLR)connection_mdbtools.a
-	$(RM) $(libexecdir)/$(SQLR)connection_mdbtools.$(LIBEXT)
-	$(MODULERENAME) $(libexecdir)/$(SQLR)connection_mdbtools.so so $(MODULESUFFIX)
 
 installsharedlib-mysql:
 	$(MKINSTALLDIRS) $(libexecdir)

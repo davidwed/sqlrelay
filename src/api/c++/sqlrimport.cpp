@@ -9,20 +9,20 @@ sqlrimport::sqlrimport() {
 	sqlrcon=NULL;
 	sqlrcur=NULL;
 	dbtype=NULL;
-	table=NULL;
+	objectname=NULL;
 	ignorecolumns=false;
 	commitcount=0;
 	lg=NULL;
 	coarseloglevel=0;
-	fineloglevel=0;
+	fineloglevel=9;
 	logindent=0;
-	shutdownflag=false;
+	shutdownflag=NULL;
 	logerrors=true;
 }
 
 sqlrimport::~sqlrimport() {
 	delete[] dbtype;
-	delete[] table;
+	delete[] objectname;
 }
 
 void sqlrimport::setSqlrConnection(sqlrconnection *sqlrcon) {
@@ -38,9 +38,9 @@ void sqlrimport::setDbType(const char *dbtype) {
 	this->dbtype=charstring::duplicate(dbtype);
 }
 
-void sqlrimport::setTable(const char *table) {
-	delete[] this->table;
-	this->table=charstring::duplicate(table);
+void sqlrimport::setObjectName(const char *objectname) {
+	delete[] this->objectname;
+	this->objectname=charstring::duplicate(objectname);
 }
 
 void sqlrimport::setIgnoreColumns(bool ignorecolumns) {

@@ -12,10 +12,200 @@
 	#define DLEXPORT
 #endif
 
+#ifndef STR2CSTR
+	#define STR2CSTR(v) StringValuePtr(v)
+#endif
+
+#include <rudiments/bytestring.h>
 #include <ruby.h>
 #include "../c++/sqlrelay/sqlrclient.h"
 
 #include "rubyincludes.h"
+
+
+// macros and other things to help with the global VM lock
+#ifdef HAVE_RUBY_THREAD_H
+#include <ruby/thread.h>
+#endif
+struct params {
+	union {
+		sqlrconnection	*sqlrcon;
+		sqlrcursor	*sqlrcur;
+	} sqlrc;
+	VALUE		one;
+	VALUE		two;
+	VALUE		three;
+	VALUE		four;
+	VALUE		five;
+	VALUE		six;
+	VALUE		seven;
+	union {
+		bool			br;
+		uint16_t		u16r;
+		uint32_t		u32r;
+		uint64_t		u64r;
+		uint64_t		i64r;
+		const char		*ccpr;
+		const char * const	*ccpcpr;
+		uint32_t		*u32pr;
+		double			dr;
+		sqlrcursor		*scr;
+	} result;
+};
+
+#ifdef HAVE_RUBY_THREAD_H
+	#define	CALL(function,prms) \
+		rb_thread_call_without_gvl((void *(*)(void *))function,&prms,NULL,NULL);
+#else
+	#define	CALL(function,prms) \
+		function(&prms);
+#endif
+
+#define	RCALL(res,resultmember,function,prms) \
+	CALL(function,prms) \
+	res=prms.result.resultmember;
+
+#define CON(psqlrcon,function) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcon=psqlrcon; \
+		CALL(function,prms) \
+	}
+#define RCON(result,resultmember,psqlrcon,function) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcon=psqlrcon; \
+		RCALL(result,resultmember,function,prms) \
+	}
+#define CON1(psqlrcon,function,pone) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcon=psqlrcon; \
+		prms.one=pone; \
+		CALL(function,prms) \
+	}
+#define RCON1(result,resultmember,psqlrcon,function,pone) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcon=psqlrcon; \
+		prms.one=pone; \
+		RCALL(result,resultmember,function,prms) \
+	}
+#define CON2(psqlrcon,function,pone,ptwo) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcon=psqlrcon; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		CALL(function,prms) \
+	}
+#define RCON2(result,resultmember,psqlrcon,function,pone,ptwo) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcon=psqlrcon; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		RCALL(result,resultmember,function,prms) \
+	}
+#define CON3(psqlrcon,function,pone,ptwo,pthree) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcon=psqlrcon; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		prms.three=pthree; \
+		CALL(function,prms) \
+	}
+#define CON7(psqlrcon,function,pone,ptwo,pthree,pfour,pfive,psix,pseven) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcon=psqlrcon; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		prms.three=pthree; \
+		prms.four=pfour; \
+		prms.five=pfive; \
+		prms.six=psix; \
+		prms.seven=pseven; \
+		CALL(function,prms) \
+	}
+
+#define CUR(psqlrcur,function) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		CALL(function,prms) \
+	}
+#define RCUR(result,resultmember,psqlrcur,function) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		RCALL(result,resultmember,function,prms) \
+	}
+#define CUR1(psqlrcur,function,pone) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		prms.one=pone; \
+		CALL(function,prms) \
+	}
+#define RCUR1(result,resultmember,psqlrcur,function,pone) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		prms.one=pone; \
+		RCALL(result,resultmember,function,prms) \
+	}
+#define CUR2(psqlrcur,function,pone,ptwo) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		CALL(function,prms) \
+	}
+#define RCUR2(result,resultmember,psqlrcur,function,pone,ptwo) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		RCALL(result,resultmember,function,prms) \
+	}
+#define CUR3(psqlrcur,function,pone,ptwo,pthree) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		prms.three=pthree; \
+		CALL(function,prms) \
+	}
+#define CUR4(psqlrcur,function,pone,ptwo,pthree,pfour) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		prms.three=pthree; \
+		prms.four=pfour; \
+		CALL(function,prms) \
+	}
+#define CUR7(psqlrcur,function,pone,ptwo,pthree,pfour,pfive,psix,pseven) \
+	{ \
+		struct params prms; \
+		prms.sqlrc.sqlrcur=psqlrcur; \
+		prms.one=pone; \
+		prms.two=ptwo; \
+		prms.three=pthree; \
+		prms.four=pfour; \
+		prms.five=pfive; \
+		prms.six=psix; \
+		prms.seven=pseven; \
+		CALL(function,prms) \
+	}
+
+
 
 extern "C" {
 
@@ -23,10 +213,6 @@ extern "C" {
 static void sqlrcon_free(void *sqlrcon) {
 	delete (sqlrconnection *)sqlrcon;
 }
-
-#ifndef STR2CSTR
-	#define STR2CSTR(v) StringValuePtr(v)
-#endif
 
 /**
  *  call-seq:
@@ -60,6 +246,9 @@ static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
 	return Data_Wrap_Struct(self,0,sqlrcon_free,(void *)sqlrcon);
 }
 
+static void setConnectTimeout(params *p) {
+	p->sqlrc.sqlrcon->setConnectTimeout(NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  setConnectTimeout(timeoutsec,timeoutusec)
@@ -72,10 +261,14 @@ static VALUE sqlrcon_setConnectTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setConnectTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+	CON2(sqlrcon,setConnectTimeout,timeoutsec,timeoutusec)
 	return Qnil;
 }
 
+static void setAuthenticationTimeout(params *p) {
+	p->sqlrc.sqlrcon->setAuthenticationTimeout(
+					NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  setAuthenticationTimeout(timeoutsec,timeoutusec)
@@ -88,11 +281,13 @@ static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setAuthenticationTimeout(NUM2INT(timeoutsec),
-						NUM2INT(timeoutusec));
+	CON2(sqlrcon,setAuthenticationTimeout,timeoutsec,timeoutusec)
 	return Qnil;
 }
 
+static void setResponseTimeout(params *p) {
+	p->sqlrc.sqlrcon->setResponseTimeout(NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  setResponseTimeout(timeoutsec,timeoutusec)
@@ -106,10 +301,13 @@ static VALUE sqlrcon_setResponseTimeout(VALUE self,
 				VALUE timeoutsec, VALUE timeoutusec) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setResponseTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+	CON2(sqlrcon,setResponseTimeout,timeoutsec,timeoutusec)
 	return Qnil;
 }
 
+static void setBindVariableDelimiters(params *p) {
+	p->sqlrc.sqlrcon->setBindVariableDelimiters(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  setBindVariablesDelimiters(delimiters)
@@ -117,53 +315,74 @@ static VALUE sqlrcon_setResponseTimeout(VALUE self,
  *  Sets which delimiters are used to identify bind variables
  *  in countBindVariables() and validateBinds().  Valid
  *  delimiters include ?,:,@, and $.  Defaults to "?:@$" */
-static VALUE setBindVariableDelimiters(VALUE self, VALUE delimiters) {
+static VALUE sqlrcon_setBindVariableDelimiters(VALUE self, VALUE delimiters) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setBindVariableDelimiters(STR2CSTR(delimiters));
+	CON1(sqlrcon,setBindVariableDelimiters,delimiters);
 	return Qnil;
 }
 
+static void getBindVariableDelimiterQuestionMarkSupported(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->
+			getBindVariableDelimiterQuestionMarkSupported();
+}
 /** Returns true if question marks (?) are considered to be
  *  valid bind variable delimiters. */
-static VALUE getBindVariableDelimiterQuestionMarkSupported(VALUE self) {
+static VALUE sqlrcon_getBindVariableDelimiterQuestionMarkSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	result=sqlrcon->getBindVariableDelimiterQuestionMarkSupported();
+	RCON(result,br,sqlrcon,getBindVariableDelimiterQuestionMarkSupported);
 	return INT2NUM(result);
 }
 
+static void getBindVariableDelimiterColonSupported(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->
+			getBindVariableDelimiterColonSupported();
+}
 /** Returns true if colons (:) are considered to be
  *  valid bind variable delimiters. */
-static VALUE getBindVariableDelimiterColonSupported(VALUE self) {
+static VALUE sqlrcon_getBindVariableDelimiterColonSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	result=sqlrcon->getBindVariableDelimiterColonSupported();
+	RCON(result,br,sqlrcon,getBindVariableDelimiterColonSupported);
 	return INT2NUM(result);
 }
 
+static void getBindVariableDelimiterAtSignSupported(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->
+			getBindVariableDelimiterAtSignSupported();
+}
 /** Returns true if at-signs (@) are considered to be
  *  valid bind variable delimiters. */
-static VALUE getBindVariableDelimiterAtSignSupported(VALUE self) {
+static VALUE sqlrcon_getBindVariableDelimiterAtSignSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	result=sqlrcon->getBindVariableDelimiterAtSignSupported();
+	RCON(result,br,sqlrcon,getBindVariableDelimiterAtSignSupported);
 	return INT2NUM(result);
 }
 
+static void getBindVariableDelimiterDollarSignSupported(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->
+			getBindVariableDelimiterDollarSignSupported();
+}
 /** Returns true if dollar signs ($) are considered to be
  *  valid bind variable delimiters. */
-static VALUE getBindVariableDelimiterDollarSignSupported(VALUE self) {
+static VALUE sqlrcon_getBindVariableDelimiterDollarSignSupported(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	bool result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	result=sqlrcon->getBindVariableDelimiterDollarSignSupported();
+	RCON(result,br,sqlrcon,getBindVariableDelimiterDollarSignSupported);
 	return INT2NUM(result);
 }
 
+static void enableKerberos(params *p) {
+	p->sqlrc.sqlrcon->enableKerberos(STR2CSTR(p->one),
+						STR2CSTR(p->two),
+						STR2CSTR(p->three));
+}
 /** Enables Kerberos authentication and encryption.
  *
  *  "service" indicates the Kerberos service name of the
@@ -203,12 +422,20 @@ static VALUE sqlrcon_enableKerberos(VALUE self,
 				VALUE service, VALUE mech, VALUE flags) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->enableKerberos(STR2CSTR(service),
-				STR2CSTR(mech),
-				STR2CSTR(flags));
+	CON3(sqlrcon,enableKerberos,service,mech,flags);
 	return Qnil;
 }
 
+
+static void enableTls(params *p) {
+	p->sqlrc.sqlrcon->enableTls(STR2CSTR(p->one),
+					STR2CSTR(p->two),
+					STR2CSTR(p->three),
+					STR2CSTR(p->four),
+					STR2CSTR(p->five),
+					STR2CSTR(p->six),
+					NUM2INT(p->seven));
+}
 /** Enables TLS/SSL encryption, and optionally authentication.
  *
  *  "version" specifies the TLS/SSL protocol version that the
@@ -284,59 +511,73 @@ static VALUE sqlrcon_enableTls(VALUE self,
 				VALUE depth) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->enableTls(STR2CSTR(version),
-				STR2CSTR(cert),
-				STR2CSTR(password),
-				STR2CSTR(ciphers),
-				STR2CSTR(validate),
-				STR2CSTR(ca),
-				NUM2INT(depth));
+	CON7(sqlrcon,enableTls,version,cert,password,ciphers,validate,ca,depth);
 	return Qnil;
 }
 
+static void disableEncryption(params *p) {
+	p->sqlrc.sqlrcon->disableEncryption();
+}
 /** Disables encryption. */
 static VALUE sqlrcon_disableEncryption(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->disableEncryption();
+	CON(sqlrcon,disableEncryption);
 	return Qnil;
 }
 
+static void endSession(params *p) {
+	p->sqlrc.sqlrcon->endSession();
+}
 /** Ends the session. */
 static VALUE sqlrcon_endSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->endSession();
+	CON(sqlrcon,endSession);
 	return Qnil;
 }
 
+static void suspendSession(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->suspendSession();
+}
 /** Disconnects this connection from the current session but leaves the session
  *  open so that another connection can connect to it using
  *  sqlrcon_resumeSession(). */
 static VALUE sqlrcon_suspendSession(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->suspendSession());
+	RCON(result,br,sqlrcon,suspendSession);
+	return INT2NUM(result);
 }
 
+static void getConnectionPort(params *p) {
+	p->result.u16r=p->sqlrc.sqlrcon->getConnectionPort();
+}
 /** Returns the inet port that the connection is communicating over.  This
  *  parameter may be passed to another connection for use in the
  *  sqlrcon_resumeSession() command.  Note: The result this function returns
  *  is only valid after a call to suspendSession(). */
 static VALUE sqlrcon_getConnectionPort(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	uint16_t	result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->getConnectionPort());
+	RCON(result,u16r,sqlrcon,getConnectionPort);
+	return INT2NUM(result);
 }
 
+static void getConnectionSocket(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->getConnectionSocket();
+}
 /** Returns the unix socket that the connection is communicating over.  This
  *  parameter may be passed to another connection for use in the
  *  sqlrcon_resumeSession() command.  Note: The result this function returns
  *  is only valid after a call to suspendSession(). */
 static VALUE sqlrcon_getConnectionSocket(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->getConnectionSocket();
+	RCON(result,ccpr,sqlrcon,getConnectionSocket);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -344,6 +585,10 @@ static VALUE sqlrcon_getConnectionSocket(VALUE self) {
 	}
 }
 
+static void resumeSession(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->resumeSession(
+					NUM2INT(p->one),STR2CSTR(p->two));
+}
 /**
  *  call-seq:
  *  resumeSession(port,socket)
@@ -352,23 +597,33 @@ static VALUE sqlrcon_getConnectionSocket(VALUE self) {
  *  Returns 1 on success and 0 on failure. */
 static VALUE sqlrcon_resumeSession(VALUE self, VALUE port, VALUE socket) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->resumeSession(NUM2INT(port), 
-							STR2CSTR(socket)));
+	RCON2(result,br,sqlrcon,resumeSession,port,socket);
+	return INT2NUM(result);
 }
 
+static void ping(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->ping();
+}
 /** Returns 1 if the database is up and 0 if it's down. */
 static VALUE sqlrcon_ping(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->ping());
+	RCON(result,br,sqlrcon,ping);
+	return INT2NUM(result);
 }
 
+static void identify(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->identify();
+}
 /** Returns the type of database: oracle, postgresql, mysql, etc. */
 static VALUE sqlrcon_identify(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->identify();
+	RCON(result,ccpr,sqlrcon,identify);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -376,11 +631,15 @@ static VALUE sqlrcon_identify(VALUE self) {
 	}
 }
 
+static void dbVersion(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->dbVersion();
+}
 /** Returns the version of the database */
 static VALUE sqlrcon_dbVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->dbVersion();
+	RCON(result,ccpr,sqlrcon,dbVersion);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -388,11 +647,15 @@ static VALUE sqlrcon_dbVersion(VALUE self) {
 	}
 }
 
+static void dbHostName(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->dbHostName();
+}
 /** Returns the host name of the database */
 static VALUE sqlrcon_dbHostName(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->dbHostName();
+	RCON(result,ccpr,sqlrcon,dbHostName);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -400,11 +663,15 @@ static VALUE sqlrcon_dbHostName(VALUE self) {
 	}
 }
 
+static void dbIpAddress(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->dbIpAddress();
+}
 /** Returns the ip address of the database */
 static VALUE sqlrcon_dbIpAddress(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->dbIpAddress();
+	RCON(result,ccpr,sqlrcon,dbIpAddress);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -412,11 +679,15 @@ static VALUE sqlrcon_dbIpAddress(VALUE self) {
 	}
 }
 
+static void serverVersion(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->serverVersion();
+}
 /** Returns the version of the sqlrelay server software. */
 static VALUE sqlrcon_serverVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->serverVersion();
+	RCON(result,ccpr,sqlrcon,serverVersion);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -424,11 +695,15 @@ static VALUE sqlrcon_serverVersion(VALUE self) {
 	}
 }
 
+static void clientVersion(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->clientVersion();
+}
 /** Returns the version of the sqlrelay client software. */
 static VALUE sqlrcon_clientVersion(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->clientVersion();
+	RCON(result,ccpr,sqlrcon,clientVersion);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -436,12 +711,16 @@ static VALUE sqlrcon_clientVersion(VALUE self) {
 	}
 }
 
+static void bindFormat(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->bindFormat();
+}
 /** Returns a string representing the format
  *  of the bind variables used in the db. */
 static VALUE sqlrcon_bindFormat(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->bindFormat();
+	RCON(result,ccpr,sqlrcon,bindFormat);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -449,6 +728,9 @@ static VALUE sqlrcon_bindFormat(VALUE self) {
 	}
 }
 
+static void selectDatabase(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->selectDatabase(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  selectDatabase(database)
@@ -456,15 +738,21 @@ static VALUE sqlrcon_bindFormat(VALUE self) {
  *  Sets the current database/schema to "database" */
 static VALUE sqlrcon_selectDatabase(VALUE self, VALUE db) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->selectDatabase(STR2CSTR(db)));
+	RCON1(result,br,sqlrcon,selectDatabase,db);
+	return INT2NUM(result);
 }
 
+static void getCurrentDatabase(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->getCurrentDatabase();
+}
 /** Returns the database/schema that is currently in use. */
 static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->getCurrentDatabase();
+	RCON(result,ccpr,sqlrcon,getCurrentDatabase);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -472,27 +760,45 @@ static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
 	}
 }
 
+static void getLastInsertId(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcon->getLastInsertId();
+}
 /** Returns the value of the autoincrement column for the last insert */
 static VALUE sqlrcon_getLastInsertId(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	uint64_t	result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->getLastInsertId());
+	RCON(result,u64r,sqlrcon,getLastInsertId);
+	return INT2NUM(result);
 }
 
+static void autoCommitOn(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->autoCommitOn();
+}
 /** Instructs the database to perform a commit after every successful query. */
 static VALUE sqlrcon_autoCommitOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->autoCommitOn());
+	RCON(result,br,sqlrcon,autoCommitOn);
+	return INT2NUM(result);
 }
 
+static void autoCommitOff(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->autoCommitOff();
+}
 /** Instructs the database to wait for the client to tell it when to commit. */
 static VALUE sqlrcon_autoCommitOff(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->autoCommitOff());
+	RCON(result,br,sqlrcon,autoCommitOff);
+	return INT2NUM(result);
 }
 
+static void begin(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->begin();
+}
 /** Begins a transaction.  Returns true if the begin
  *  succeeded, false if it failed.  If the database
  *  automatically begins a new transaction when a
@@ -501,32 +807,48 @@ static VALUE sqlrcon_autoCommitOff(VALUE self) {
  *  blocks. */
 static VALUE sqlrcon_begin(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->begin());
+	RCON(result,br,sqlrcon,begin);
+	return INT2NUM(result);
 }
 
+static void commit(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->commit();
+}
 /** Issues a commit.  Returns true if the commit succeeded,
  *  false if it failed. */
 static VALUE sqlrcon_commit(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->commit());
+	RCON(result,br,sqlrcon,commit);
+	return INT2NUM(result);
 }
 
+static void rollback(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->rollback();
+}
 /** Issues a rollback.  Returns true if the rollback succeeded,
  *  false if it failed. */
 static VALUE sqlrcon_rollback(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->rollback());
+	RCON(result,br,sqlrcon,rollback);
+	return INT2NUM(result);
 }
 
+static void conErrorMessage(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->errorMessage();
+}
 /** If an operation failed and generated an error, the error message is
  *  available here.  If there is no error then this method returns nil */
 static VALUE sqlrcon_errorMessage(VALUE self) {
 	sqlrconnection *sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->errorMessage();
+	RCON(result,ccpr,sqlrcon,conErrorMessage);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -534,14 +856,22 @@ static VALUE sqlrcon_errorMessage(VALUE self) {
 	}
 }
 
+static void conErrorNumber(params *p) {
+	p->result.i64r=p->sqlrc.sqlrcon->errorNumber();
+}
 /** If an operation failed and generated an error, the error number is
  *  available here.  If there is no error then this method returns 0. */
 static VALUE sqlrcon_errorNumber(VALUE self) {
 	sqlrconnection *sqlrcon;
+	int64_t		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->errorNumber());
+	RCON(result,i64r,sqlrcon,conErrorNumber);
+	return INT2NUM(result);
 }
 
+static void debugOn(params *p) {
+	p->sqlrc.sqlrcon->debugOn();
+}
 /** Causes verbose debugging information to be sent to standard output.
  *  Another way to do this is to start a query with "-- debug\n".  Yet
  *  another way is to set the environment variable SQLR_CLIENT_DEBUG
@@ -549,25 +879,36 @@ static VALUE sqlrcon_errorNumber(VALUE self) {
 static VALUE sqlrcon_debugOn(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->debugOn();
+	CON(sqlrcon,debugOn);
 	return Qnil;
 }
 
+static void debugOff(params *p) {
+	p->sqlrc.sqlrcon->debugOff();
+}
 /** Turns debugging off. */
 static VALUE sqlrcon_debugOff(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->debugOff();
+	CON(sqlrcon,debugOff);
 	return Qnil;
 }
 
+static void getDebug(params *p) {
+	p->result.br=p->sqlrc.sqlrcon->getDebug();
+}
 /** Returns 0 if debugging is off and 1 if debugging is on. */
 static VALUE sqlrcon_getDebug(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	bool		result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	return INT2NUM(sqlrcon->getDebug());
+	RCON(result,br,sqlrcon,getDebug);
+	return INT2NUM(result);
 }
 
+static void setDebugFile(params *p) {
+	p->sqlrc.sqlrcon->setDebugFile(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  setDebugFile(filename)
@@ -578,10 +919,13 @@ static VALUE sqlrcon_getDebug(VALUE self) {
 static VALUE sqlrcon_setDebugFile(VALUE self, VALUE filename) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setDebugFile(STR2CSTR(filename));
+	CON1(sqlrcon,setDebugFile,filename);
 	return Qnil;
 }
 
+static void setClientInfo(params *p) {
+	p->sqlrc.sqlrcon->setClientInfo(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  setClientInfo(clientinfo)
@@ -592,15 +936,19 @@ static VALUE sqlrcon_setDebugFile(VALUE self, VALUE filename) {
 static VALUE sqlrcon_setClientInfo(VALUE self, VALUE clientinfo) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	sqlrcon->setClientInfo(STR2CSTR(clientinfo));
+	CON1(sqlrcon,setClientInfo,clientinfo);
 	return Qnil;
 }
 
+static void getClientInfo(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->getClientInfo();
+}
 /** Returns the string that was set by setClientInfo(). */
 static VALUE sqlrcon_getClientInfo(VALUE self) {
 	sqlrconnection	*sqlrcon;
+	const char	*result;
 	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	const char	*result=sqlrcon->getClientInfo();
+	RCON(result,ccpr,sqlrcon,getClientInfo);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -624,19 +972,19 @@ void Init_SQLRConnection() {
 	rb_define_method(csqlrconnection,"setResponseTimeout",
 				(CAST)sqlrcon_setResponseTimeout,2);
 	rb_define_method(csqlrconnection,"setBindVariableDelimiters",
-				(CAST)setBindVariableDelimiters,1);
+				(CAST)sqlrcon_setBindVariableDelimiters,1);
 	rb_define_method(csqlrconnection,
-			"getBindVariableDelimiterQuestionMarkSupported",
-			(CAST)getBindVariableDelimiterQuestionMarkSupported,0);
+		"getBindVariableDelimiterQuestionMarkSupported",
+		(CAST)sqlrcon_getBindVariableDelimiterQuestionMarkSupported,0);
 	rb_define_method(csqlrconnection,
-			"getBindVariableDelimiterColonSupported",
-			(CAST)getBindVariableDelimiterColonSupported,0);
+		"getBindVariableDelimiterColonSupported",
+		(CAST)sqlrcon_getBindVariableDelimiterColonSupported,0);
 	rb_define_method(csqlrconnection,
-			"getBindVariableDelimiterAtSignSupported",
-			(CAST)getBindVariableDelimiterAtSignSupported,0);
+		"getBindVariableDelimiterAtSignSupported",
+		(CAST)sqlrcon_getBindVariableDelimiterAtSignSupported,0);
 	rb_define_method(csqlrconnection,
-			"getBindVariableDelimiterDollarSignSupported",
-			(CAST)getBindVariableDelimiterDollarSignSupported,0);
+		"getBindVariableDelimiterDollarSignSupported",
+		(CAST)sqlrcon_getBindVariableDelimiterDollarSignSupported,0);
 	rb_define_method(csqlrconnection,"enableKerberos",
 				(CAST)sqlrcon_enableKerberos,3);
 	rb_define_method(csqlrconnection,"enableTls",
@@ -708,8 +1056,18 @@ void Init_SQLRConnection() {
 // sqlrcursor methods
 VALUE csqlrcursor;
 
-static void sqlrcur_free(void *sqlrcur) {
-	delete (sqlrcursor *)sqlrcur;
+struct sqlrcursordata {
+	sqlrcursor	*cur;
+	VALUE		con;
+};
+
+static void sqlrcur_free(void *curdata) {
+	delete (sqlrcursor *)(((sqlrcursordata *)curdata)->cur);
+	delete (sqlrcursordata *)curdata;
+}
+
+static void sqlrcur_mark(void *curdata) {
+	rb_gc_mark(((sqlrcursordata *)curdata)->con);
 }
 
 /**
@@ -722,9 +1080,15 @@ static VALUE sqlrcur_new(VALUE self, VALUE connection) {
 	sqlrconnection	*sqlrcon;
 	Data_Get_Struct(connection,sqlrconnection,sqlrcon);
 	sqlrcursor	*sqlrcur=new sqlrcursor(sqlrcon,true);
-	return Data_Wrap_Struct(self,0,sqlrcur_free,(void *)sqlrcur);
+	sqlrcursordata	*curdata=new sqlrcursordata;
+	curdata->cur=sqlrcur;
+	curdata->con=connection;
+	return Data_Wrap_Struct(self,sqlrcur_mark,sqlrcur_free,(void *)curdata);
 }
 
+static void setResultSetBufferSize(params *p) {
+	p->sqlrc.sqlrcur->setResultSetBufferSize(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  setResultSetBufferSize(rows)
@@ -732,63 +1096,86 @@ static VALUE sqlrcur_new(VALUE self, VALUE connection) {
  *  Sets the number of rows of the result set to buffer at a time.
  *  0 (the default) means buffer the entire result set. */
 static VALUE sqlrcur_setResultSetBufferSize(VALUE self, VALUE rows) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->setResultSetBufferSize(NUM2INT(rows));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,setResultSetBufferSize,rows);
 	return Qnil;
 }
 
+static void getResultSetBufferSize(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->getResultSetBufferSize();
+}
 /** Returns the number of result set rows that will be buffered at a time or
  *  0 for the entire result set. */
 static VALUE sqlrcur_getResultSetBufferSize(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->getResultSetBufferSize());
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u64r,sqlrcurdata->cur,getResultSetBufferSize);
+	return INT2NUM(result);
 }
 
+static void dontGetColumnInfo(params *p) {
+	p->sqlrc.sqlrcur->dontGetColumnInfo();
+}
 /** Tells the server not to send any column info (names, types, sizes).  If
  *  you don't need that info, you should call this function to improve
  *  performance. */
 static VALUE sqlrcur_dontGetColumnInfo(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->dontGetColumnInfo();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,dontGetColumnInfo);
 	return Qnil;
 }
 
+static void getColumnInfo(params *p) {
+	p->sqlrc.sqlrcur->getColumnInfo();
+}
 /** Tells the server to send column info. */
 static VALUE sqlrcur_getColumnInfo(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->getColumnInfo();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,getColumnInfo);
 	return Qnil;
 }
 
+static void mixedCaseColumnNames(params *p) {
+	p->sqlrc.sqlrcur->mixedCaseColumnNames();
+}
 /** Columns names are returned in the same case as they are defined in the
  *  database.  This is the default. */
 static VALUE sqlrcur_mixedCaseColumnNames(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->mixedCaseColumnNames();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,mixedCaseColumnNames);
 	return Qnil;
 }
 
+static void upperCaseColumnNames(params *p) {
+	p->sqlrc.sqlrcur->upperCaseColumnNames();
+}
 /** Columns names are converted to upper case. */
 static VALUE sqlrcur_upperCaseColumnNames(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->upperCaseColumnNames();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,upperCaseColumnNames);
 	return Qnil;
 }
 
+static void lowerCaseColumnNames(params *p) {
+	p->sqlrc.sqlrcur->lowerCaseColumnNames();
+}
 /** Columns names are converted to lower case. */
 static VALUE sqlrcur_lowerCaseColumnNames(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->lowerCaseColumnNames();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,lowerCaseColumnNames);
 	return Qnil;
 }
 
+static void cacheToFile(params *p) {
+	p->sqlrc.sqlrcur->cacheToFile(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  cacheToFile(filename)
@@ -803,12 +1190,15 @@ static VALUE sqlrcur_lowerCaseColumnNames(VALUE self) {
  *  cacheToFile() changes which file to cache to or a call to
  *  cacheOff() turns off caching. */
 static VALUE sqlrcur_cacheToFile(VALUE self, VALUE filename) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->cacheToFile(STR2CSTR(filename));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,cacheToFile,filename);
 	return Qnil;
 }
 
+static void setCacheTtl(params *p) {
+	p->sqlrc.sqlrcur->setCacheTtl(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  setCacheTtl(ttl)
@@ -817,18 +1207,22 @@ static VALUE sqlrcur_cacheToFile(VALUE self, VALUE filename) {
  *  remove each cached result set "ttl" seconds after it's created, provided
  *  it's scanning the directory containing the cache files. */
 static VALUE sqlrcur_setCacheTtl(VALUE self, VALUE ttl) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->setCacheTtl(NUM2INT(ttl));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,setCacheTtl,ttl);
 	return Qnil;
 }
 
+static void getCacheFileName(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getCacheFileName();
+}
 /** Returns the name of the file containing
  *  the most recently cached result set. */
 static VALUE sqlrcur_getCacheFileName(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*result=sqlrcur->getCacheFileName();
+	sqlrcursordata	*sqlrcurdata;
+	const char	*result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,ccpr,sqlrcurdata->cur,getCacheFileName);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -836,14 +1230,20 @@ static VALUE sqlrcur_getCacheFileName(VALUE self) {
 	}
 }
 
+static void cacheOff(params *p) {
+	p->sqlrc.sqlrcur->cacheOff();
+}
 /** Sets query caching off. */
 static VALUE sqlrcur_cacheOff(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->cacheOff();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,cacheOff);
 	return Qnil;
 }
 
+static void getDatabaseList(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getDatabaseList(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getDatabaseList(wild)
@@ -852,11 +1252,16 @@ static VALUE sqlrcur_cacheOff(VALUE self) {
  *  If wild is empty or nil then a list of all databases/schemas will be
  *  returned. */
 static VALUE sqlrcur_getDatabaseList(VALUE self, VALUE wild) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->getDatabaseList(STR2CSTR(wild)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,br,sqlrcurdata->cur,getDatabaseList,wild);
+	return INT2NUM(result);
 }
 
+static void getTableList(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getTableList(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getTableList(wild)
@@ -864,11 +1269,17 @@ static VALUE sqlrcur_getDatabaseList(VALUE self, VALUE wild) {
  *  Sends a query that returns a list of tables matching "wild".  If wild is
  *  empty or nil then a list of all tables will be returned. */
 static VALUE sqlrcur_getTableList(VALUE self, VALUE wild) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->getTableList(STR2CSTR(wild)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,br,sqlrcurdata->cur,getTableList,wild);
+	return INT2NUM(result);
 }
 
+static void getColumnList(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnList(
+					STR2CSTR(p->one),STR2CSTR(p->two));
+}
 /**
  *  call-seq:
  *  getColumnList(table,wild)
@@ -877,22 +1288,33 @@ static VALUE sqlrcur_getTableList(VALUE self, VALUE wild) {
  *  "table" parameter matching "wild".  If wild is empty or nil then a list of
  *  all columns will be returned. */
 static VALUE sqlrcur_getColumnList(VALUE self, VALUE table, VALUE wild) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->getColumnList(STR2CSTR(table),STR2CSTR(wild)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR2(result,br,sqlrcurdata->cur,getColumnList,table,wild);
+	return INT2NUM(result);
 }
 
+static void sendQuery(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->sendQuery(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  sendQuery(query)
  *
  *  Sends "query" directly and gets a result set. */
 static VALUE sqlrcur_sendQuery(VALUE self, VALUE query) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->sendQuery(STR2CSTR(query)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,br,sqlrcurdata->cur,sendQuery,query);
+	return INT2NUM(result);
 }
 
+static void sendQueryWithLength(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->sendQuery(
+					STR2CSTR(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  sendQueryWithLength(query,length)
@@ -901,35 +1323,48 @@ static VALUE sqlrcur_sendQuery(VALUE self, VALUE query) {
  *  function must be used if the query contains binary data. */
 static VALUE sqlrcur_sendQueryWithLength(VALUE self,
 					VALUE query, VALUE length) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->sendQuery(STR2CSTR(query),NUM2INT(length)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR2(result,br,sqlrcurdata->cur,sendQueryWithLength,query,length);
+	return INT2NUM(result);
 }
 
+static void sendFileQuery(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->sendFileQuery(
+					STR2CSTR(p->one),STR2CSTR(p->two));
+}
 /**
  *  call-seq:
  *  sendFileQuery(path,filename)
  *
  *  Sends the query in file "path"/"filename" and gets a result set. */
 static VALUE sqlrcur_sendFileQuery(VALUE self, VALUE path, VALUE filename) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->sendFileQuery(STR2CSTR(path),
-						STR2CSTR(filename))); 
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR2(result,br,sqlrcurdata->cur,sendFileQuery,path,filename);
+	return INT2NUM(result);
 }
 
+static void prepareQuery(params *p) {
+	p->sqlrc.sqlrcur->prepareQuery(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  prepareQuery(query)
  *
  *  Prepare to execute "query". */
 static VALUE sqlrcur_prepareQuery(VALUE self, VALUE query) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->prepareQuery(STR2CSTR(query));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,prepareQuery,query);
 	return Qnil;
 }
 
+static void prepareQueryWithLength(params *p) {
+	p->sqlrc.sqlrcur->prepareQuery(STR2CSTR(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  prepareQuery(query,length)
@@ -938,40 +1373,67 @@ static VALUE sqlrcur_prepareQuery(VALUE self, VALUE query) {
  *  used if the query contains binary data. */
 static VALUE sqlrcur_prepareQueryWithLength(VALUE self,
 					VALUE query, VALUE length) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->prepareQuery(STR2CSTR(query),NUM2INT(length));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR2(sqlrcurdata->cur,prepareQueryWithLength,query,length);
 	return Qnil;
 }
 
+static void prepareFileQuery(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->prepareFileQuery(
+					STR2CSTR(p->one),STR2CSTR(p->two));
+}
 /**
  *  call-seq:
  *  prepareFileQuery(path,filename)
  *
  *  Prepare to execute the contents of "path"/"filename". */
 static VALUE sqlrcur_prepareFileQuery(VALUE self, VALUE path, VALUE filename) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->prepareFileQuery(STR2CSTR(path),
-						STR2CSTR(filename)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR2(result,br,sqlrcurdata->cur,prepareFileQuery,path,filename);
+	return INT2NUM(result);
 }
 
+static void clearBinds(params *p) {
+	p->sqlrc.sqlrcur->clearBinds();
+}
 /** Clears all bind variables. */
 static VALUE sqlrcur_clearBinds(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->clearBinds();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,clearBinds);
 	return Qnil;
 }
 
+static void countBindVariables(params *p) {
+	p->result.u16r=p->sqlrc.sqlrcur->countBindVariables();
+}
 /** Parses the previously prepared query, counts the number of bind variables
  *  defined in it and returns that number. */
 static VALUE sqlrcur_countBindVariables(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->countBindVariables());
+	sqlrcursordata	*sqlrcurdata;
+	uint16_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u16r,sqlrcurdata->cur,countBindVariables);
+	return INT2NUM(result);
 }
 
+static void substitutionStr(params *p) {
+	p->sqlrc.sqlrcur->substitution(STR2CSTR(p->one),STR2CSTR(p->two));
+}
+static void substitutionInt(params *p) {
+	p->sqlrc.sqlrcur->substitution(STR2CSTR(p->one),NUM2INT(p->two));
+}
+static void substitutionDbl(params *p) {
+	p->sqlrc.sqlrcur->substitution(STR2CSTR(p->one),NUM2DBL(p->two), 
+					(unsigned short)NUM2INT(p->three),
+					(unsigned short)NUM2INT(p->four));
+}
+static void substitutionNull(params *p) {
+	p->sqlrc.sqlrcur->substitution(STR2CSTR(p->one),(const char *)NULL);
+}
 /**
  *  call-seq:
  *  substitution(variable,value,(precision),(scale))
@@ -980,33 +1442,50 @@ static VALUE sqlrcur_countBindVariables(VALUE self) {
  *  decimal.  If it is a decimal then the precision and scale may be
  *  specified. */
 static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
-	sqlrcursor	*sqlrcur;
+	sqlrcursordata	*sqlrcurdata;
 	VALUE	variable;
 	VALUE	value;
 	VALUE	precision;
 	VALUE	scale;
 	bool	result=true;
 	rb_scan_args(argc,argv,"22",&variable,&value,&precision,&scale);
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
-		sqlrcur->substitution(STR2CSTR(variable),STR2CSTR(value));
+		CUR2(sqlrcurdata->cur,substitutionStr,variable,value);
 	} else if (rb_obj_is_instance_of(value,rb_cBignum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
-		sqlrcur->substitution(STR2CSTR(variable),NUM2INT(value));
+		CUR2(sqlrcurdata->cur,substitutionInt,variable,value);
 	} else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
-		sqlrcur->substitution(STR2CSTR(variable),NUM2DBL(value), 
-					(unsigned short)NUM2INT(precision),
-					(unsigned short)NUM2INT(scale));
+		CUR4(sqlrcurdata->cur,substitutionDbl,variable,value,precision,scale);
 	} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
-		sqlrcur->substitution(STR2CSTR(variable),(const char *)NULL);
+		CUR1(sqlrcurdata->cur,substitutionNull,variable);
 	} else {
 		result=false;
 	}
 	return INT2NUM(result);
 }
 
+static void inputBindStrLen(params *p) {
+	p->sqlrc.sqlrcur->inputBind(STR2CSTR(p->one),
+					STR2CSTR(p->two),
+					NUM2INT(p->three));
+}
+static void inputBindStr(params *p) {
+	p->sqlrc.sqlrcur->inputBind(STR2CSTR(p->one),STR2CSTR(p->two));
+}
+static void inputBindInt(params *p) {
+	p->sqlrc.sqlrcur->inputBind(STR2CSTR(p->one),NUM2INT(p->two));
+}
+static void inputBindDbl(params *p) {
+	p->sqlrc.sqlrcur->inputBind(STR2CSTR(p->one),NUM2DBL(p->two), 
+					(unsigned short)NUM2INT(p->three),
+					(unsigned short)NUM2INT(p->four));
+}
+static void inputBindNull(params *p) {
+	p->sqlrc.sqlrcur->inputBind(STR2CSTR(p->one),(const char *)NULL);
+}
 /**
  *  call-seq:
  *  inputBind(variable,value,(precision),(scale))
@@ -1017,14 +1496,14 @@ static VALUE sqlrcur_substitution(int argc, VALUE *argv, VALUE self) {
  *  both to 0.  However in that case you may get unexpected rounding behavior
  *  if the server is faking binds. */
 static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
-	sqlrcursor	*sqlrcur;
+	sqlrcursordata	*sqlrcurdata;
 	VALUE	variable;
 	VALUE	value;
 	VALUE	precision;
 	VALUE	scale;
 	bool	success=true;
 	rb_scan_args(argc,argv,"22",&variable,&value,&precision,&scale);
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
 		if ((rb_obj_is_instance_of(precision,rb_cBignum)==Qtrue ||
 			rb_obj_is_instance_of(precision,rb_cFixnum)==Qtrue ||
@@ -1033,28 +1512,35 @@ static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
 			NUM2INT(precision)>0) {
 			// in this case, the precision parameter is actually
 			// the string length
-			sqlrcur->inputBind(STR2CSTR(variable),
-					STR2CSTR(value),NUM2INT(precision));
+			CUR3(sqlrcurdata->cur,inputBindStrLen,variable,value,precision);
 		} else {
-			sqlrcur->inputBind(STR2CSTR(variable),STR2CSTR(value));
+			CUR2(sqlrcurdata->cur,inputBindStr,variable,value);
 		}
 	} else if (rb_obj_is_instance_of(value,rb_cBignum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
-		sqlrcur->inputBind(STR2CSTR(variable),NUM2INT(value));
+		CUR2(sqlrcurdata->cur,inputBindInt,variable,value);
 	} else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
-		sqlrcur->inputBind(STR2CSTR(variable),NUM2DBL(value), 
-					(unsigned short)NUM2INT(precision),
-					(unsigned short)NUM2INT(scale));
+		CUR4(sqlrcurdata->cur,inputBindDbl,variable,value,precision,scale);
 	} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
-		sqlrcur->inputBind(STR2CSTR(variable),(const char *)NULL);
+		CUR1(sqlrcurdata->cur,inputBindNull,variable);
 	} else {
 		success=false;
 	}
 	return INT2NUM(success);
 }
 
+static void inputBindBlob(params *p) {
+	p->sqlrc.sqlrcur->inputBindBlob(STR2CSTR(p->one),
+					STR2CSTR(p->two),
+					NUM2INT(p->three));
+}
+static void inputBindBlobNull(params *p) {
+	p->sqlrc.sqlrcur->inputBindBlob(STR2CSTR(p->one),
+					NULL,
+					NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  inputBindBlob(variable,value,size)
@@ -1062,20 +1548,29 @@ static VALUE sqlrcur_inputBind(int argc, VALUE *argv, VALUE self) {
  *  Defines a binary lob input bind variable. */
 static VALUE sqlrcur_inputBindBlob(VALUE self, VALUE variable,
 					VALUE value, VALUE size) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	bool	success=true;
 	if (value==Qnil) {
-		sqlrcur->inputBindBlob(STR2CSTR(variable),NULL,NUM2INT(size));
+		CUR2(sqlrcurdata->cur,inputBindBlobNull,variable,size);
 	} else if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
-		sqlrcur->inputBindBlob(STR2CSTR(variable),
-				STR2CSTR(value),NUM2INT(size));
+		CUR3(sqlrcurdata->cur,inputBindBlob,variable,value,size);
 	} else {
 		success=false;
 	}
 	return INT2NUM(success);
 }
 
+static void inputBindClob(params *p) {
+	p->sqlrc.sqlrcur->inputBindClob(STR2CSTR(p->one),
+					STR2CSTR(p->two),
+					NUM2INT(p->three));
+}
+static void inputBindClobNull(params *p) {
+	p->sqlrc.sqlrcur->inputBindClob(STR2CSTR(p->one),
+					NULL,
+					NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  inputBindClob(variable,value,size)
@@ -1083,20 +1578,23 @@ static VALUE sqlrcur_inputBindBlob(VALUE self, VALUE variable,
  *  Defines a character lob input bind variable. */
 static VALUE sqlrcur_inputBindClob(VALUE self, VALUE variable,
 					VALUE value, VALUE size) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	bool	success=true;
 	if (value==Qnil) {
-		sqlrcur->inputBindClob(STR2CSTR(variable),NULL,NUM2INT(size));
+		CUR2(sqlrcurdata->cur,inputBindClobNull,variable,size);
 	} else if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
-		sqlrcur->inputBindClob(STR2CSTR(variable),
-				STR2CSTR(value),NUM2INT(size));
+		CUR3(sqlrcurdata->cur,inputBindClob,variable,value,size);
 	} else {
 		success=false;
 	}
 	return INT2NUM(success);
 }
 
+static void defineOutputBindString(params *p) {
+	p->sqlrc.sqlrcur->defineOutputBindString(
+					STR2CSTR(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  defineOutputBindString(variable,length)
@@ -1105,69 +1603,84 @@ static VALUE sqlrcur_inputBindClob(VALUE self, VALUE variable,
  *  "length" bytes will be reserved to store the value. */
 static VALUE sqlrcur_defineOutputBindString(VALUE self, VALUE variable,
 							VALUE bufferlength) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->defineOutputBindString(STR2CSTR(variable),NUM2INT(bufferlength));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR2(sqlrcurdata->cur,defineOutputBindString,variable,bufferlength);
 	return Qnil;
 }
 
+static void defineOutputBindInteger(params *p) {
+	p->sqlrc.sqlrcur->defineOutputBindInteger(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  defineOutputBindInteger(variable)
  *
  *  Defines an integer output bind variable. */
 static VALUE sqlrcur_defineOutputBindInteger(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->defineOutputBindInteger(STR2CSTR(variable));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,defineOutputBindInteger,variable);
 	return Qnil;
 }
 
+static void defineOutputBindDouble(params *p) {
+	p->sqlrc.sqlrcur->defineOutputBindDouble(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  defineOutputBindDouble(variable)
  *
  *  Defines an decimal output bind variable. */
 static VALUE sqlrcur_defineOutputBindDouble(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->defineOutputBindDouble(STR2CSTR(variable));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,defineOutputBindDouble,variable);
 	return Qnil;
 }
 
+static void defineOutputBindBlob(params *p) {
+	p->sqlrc.sqlrcur->defineOutputBindBlob(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  defineOuptutBindBlob(variable)
  *
  *  Defines a binary lob output bind variable */
 static VALUE sqlrcur_defineOutputBindBlob(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->defineOutputBindBlob(STR2CSTR(variable));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,defineOutputBindBlob,variable);
 	return Qnil;
 }
 
+static void defineOutputBindClob(params *p) {
+	p->sqlrc.sqlrcur->defineOutputBindClob(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  defineOutputBindClob(variable)
  *
  *  Defines a character lob output bind variable */
 static VALUE sqlrcur_defineOutputBindClob(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->defineOutputBindClob(STR2CSTR(variable));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,defineOutputBindClob,variable);
 	return Qnil;
 }
 
+static void defineOutputBindCursor(params *p) {
+	p->sqlrc.sqlrcur->defineOutputBindCursor(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  defineOutputBindCursor(variable)
  *
  *  Defines a cursor output bind variable */
 static VALUE sqlrcur_defineOutputBindCursor(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->defineOutputBindCursor(STR2CSTR(variable));
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR1(sqlrcurdata->cur,defineOutputBindCursor,variable);
 	return Qnil;
 }
 
@@ -1179,14 +1692,14 @@ static VALUE sqlrcur_defineOutputBindCursor(VALUE self, VALUE variable) {
  *  integers or decimals.  If they are decimals then the precisions and scales
  *  may also be specified. */
 static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
-	sqlrcursor	*sqlrcur;
+	sqlrcursordata	*sqlrcurdata;
 	VALUE	variables;
 	VALUE	values;
 	VALUE	precisions;
 	VALUE	scales;
 	int	argcount=rb_scan_args(argc,argv,"22",
 					&variables,&values,&precisions,&scales);
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (variables==Qnil || values==Qnil) {
 		return Qnil;
 	}
@@ -1206,22 +1719,17 @@ static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
 			scale=rb_ary_shift(scales);
 		}
 		if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
-			sqlrcur->substitution(STR2CSTR(variable),
-						STR2CSTR(value));
+			CUR2(sqlrcurdata->cur,substitutionStr,variable,value);
 		} else if (rb_obj_is_instance_of(value,rb_cBignum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
-			sqlrcur->substitution(STR2CSTR(variable),
-						NUM2INT(value));
+			CUR2(sqlrcurdata->cur,substitutionInt,variable,value);
 		} else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
-			sqlrcur->substitution(STR2CSTR(variable),
-					NUM2DBL(value), 
-					(unsigned short)NUM2INT(precision),
-					(unsigned short)NUM2INT(scale));
+			CUR4(sqlrcurdata->cur,substitutionDbl,variable,
+						value,precision,scale);
 		} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
-			sqlrcur->substitution(STR2CSTR(variable),
-						(const char *)NULL);
+			CUR1(sqlrcurdata->cur,substitutionNull,variable);
 		} else {
 			success=false;
 		}
@@ -1237,14 +1745,14 @@ static VALUE sqlrcur_substitutions(int argc, VALUE *argv, VALUE self) {
  *  integers or decimals.  If they are decimals then the precisions and scales
  *  may also be specified. */
 static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
-	sqlrcursor	*sqlrcur;
+	sqlrcursordata	*sqlrcurdata;
 	VALUE	variables;
 	VALUE	values;
 	VALUE	precisions;
 	VALUE	scales;
 	int	argcount=rb_scan_args(argc,argv,"22",
 				&variables,&values,&precisions,&scales);
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (variables==Qnil || values==Qnil) {
 		return Qnil;
 	}
@@ -1264,19 +1772,17 @@ static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 			scale=rb_ary_shift(scales);
 		}
 		if (rb_obj_is_instance_of(value,rb_cString)==Qtrue) {
-			sqlrcur->inputBind(STR2CSTR(variable),STR2CSTR(value));
+			CUR2(sqlrcurdata->cur,inputBindStr,variable,value);
 		} else if (rb_obj_is_instance_of(value,rb_cBignum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cFixnum)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cInteger)==Qtrue ||
 			rb_obj_is_instance_of(value,rb_cNumeric)==Qtrue) {
-			sqlrcur->inputBind(STR2CSTR(variable),NUM2INT(value));
+			CUR2(sqlrcurdata->cur,inputBindInt,variable,value);
 		} else if (rb_obj_is_instance_of(value,rb_cFloat)==Qtrue) {
-			sqlrcur->inputBind(STR2CSTR(variable),NUM2DBL(value), 
-					(unsigned short)NUM2INT(precision),
-					(unsigned short)NUM2INT(scale));
+			CUR4(sqlrcurdata->cur,inputBindDbl,variable,
+						value,precision,scale);
 		} else if (rb_obj_is_instance_of(value,rb_cNilClass)==Qtrue) {
-			sqlrcur->inputBind(STR2CSTR(variable),
-						(const char *)NULL);
+			CUR1(sqlrcurdata->cur,inputBindNull,variable);
 		} else {
 			success=false;
 		}
@@ -1284,53 +1790,78 @@ static VALUE sqlrcur_inputBinds(int argc, VALUE *argv, VALUE self) {
 	return INT2NUM(success);
 }
 
+static void validateBinds(params *p) {
+	p->sqlrc.sqlrcur->validateBinds();
+}
 /** If you are binding to any variables that might not actually be in your
  *  query, call this to ensure that the database won't try to bind them unless
  *  they really are in the query.  There is a performance penalty for calling
  *  this function */
 static VALUE sqlrcur_validateBinds(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->validateBinds();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,validateBinds);
 	return Qnil;
 }
 
+static void validBind(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->validBind(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  validBind(variable)
  *
  *  Returns true if "variable" was a valid bind variable of the query. */
 static VALUE sqlrcur_validBind(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->validBind(STR2CSTR(variable)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,br,sqlrcurdata->cur,validBind,variable);
+	return INT2NUM(result);
 }
 
+static void executeQuery(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->executeQuery();
+}
 /** Execute the query that was previously prepared and bound. */
 static VALUE sqlrcur_executeQuery(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->executeQuery());
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,br,sqlrcurdata->cur,executeQuery);
+	return INT2NUM(result);
 }
 
+static void fetchFromBindCursor(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->fetchFromBindCursor();
+}
 /** Fetch from a cursor that was returned as an output bind variable. */
 static VALUE sqlrcur_fetchFromBindCursor(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->fetchFromBindCursor());
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,br,sqlrcurdata->cur,fetchFromBindCursor);
+	return INT2NUM(result);
 }
 
+static void getOutputBindString(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getOutputBindString(STR2CSTR(p->one));
+}
+static void getOutputBindLength(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->getOutputBindLength(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getOutputBindString(variable)
  *
  *  Get the value stored in a previously defined string output bind variable. */
 static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*varname=STR2CSTR(variable);
-	const char	*result=sqlrcur->getOutputBindString(varname);
-	long		length=sqlrcur->getOutputBindLength(varname);
+	sqlrcursordata	*sqlrcurdata;
+	const char	*result;
+	uint64_t	length;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,ccpr,sqlrcurdata->cur,getOutputBindString,variable);
+	RCUR1(length,u64r,sqlrcurdata->cur,getOutputBindLength,variable);
 	if (result) {
 		return rb_str_new(result,length);
 	} else {
@@ -1338,6 +1869,9 @@ static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
 	}
 }
 
+static void getOutputBindBlob(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getOutputBindBlob(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getOutputBindBlob(variable)
@@ -1345,11 +1879,12 @@ static VALUE sqlrcur_getOutputBindString(VALUE self, VALUE variable) {
  *  Get the value stored in a previously defined
  *  binary lob output bind variable. */
 static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*varname=STR2CSTR(variable);
-	const char	*result=sqlrcur->getOutputBindBlob(varname);
-	long		length=sqlrcur->getOutputBindLength(varname);
+	sqlrcursordata	*sqlrcurdata;
+	const char	*result;
+	uint64_t	length;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,ccpr,sqlrcurdata->cur,getOutputBindBlob,variable);
+	RCUR1(length,u64r,sqlrcurdata->cur,getOutputBindLength,variable);
 	if (result) {
 		return rb_str_new(result,length);
 	} else {
@@ -1357,6 +1892,9 @@ static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
 	}
 }
 
+static void getOutputBindClob(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getOutputBindClob(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getOutputBindClob(variable)
@@ -1364,11 +1902,12 @@ static VALUE sqlrcur_getOutputBindBlob(VALUE self, VALUE variable) {
  *  Get the value stored in a previously defined
  *  character lob output bind variable. */
 static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*varname=STR2CSTR(variable);
-	const char	*result=sqlrcur->getOutputBindClob(varname);
-	long		length=sqlrcur->getOutputBindLength(varname);
+	sqlrcursordata	*sqlrcurdata;
+	const char	*result;
+	long		length;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,ccpr,sqlrcurdata->cur,getOutputBindClob,variable);
+	RCUR1(length,u64r,sqlrcurdata->cur,getOutputBindLength,variable);
 	if (result) {
 		return rb_str_new(result,length);
 	} else {
@@ -1376,6 +1915,9 @@ static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
 	}
 }
 
+static void getOutputBindInteger(params *p) {
+	p->result.i64r=p->sqlrc.sqlrcur->getOutputBindInteger(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getOutputBindInteger(variable)
@@ -1383,13 +1925,16 @@ static VALUE sqlrcur_getOutputBindClob(VALUE self, VALUE variable) {
  *  Get the value stored in a previously defined
  *  integer output bind variable. */
 static VALUE sqlrcur_getOutputBindInteger(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*varname=STR2CSTR(variable);
-	long		result=sqlrcur->getOutputBindInteger(varname);
+	sqlrcursordata	*sqlrcurdata;
+	int64_t		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,i64r,sqlrcurdata->cur,getOutputBindInteger,variable);
 	return INT2NUM(result);
 }
 
+static void getOutputBindDouble(params *p) {
+	p->result.dr=p->sqlrc.sqlrcur->getOutputBindDouble(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  getOutputBindDouble(variable)
@@ -1397,10 +1942,10 @@ static VALUE sqlrcur_getOutputBindInteger(VALUE self, VALUE variable) {
  *  Get the value stored in a previously defined
  *  decimal output bind variable. */
 static VALUE sqlrcur_getOutputBindDouble(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*varname=STR2CSTR(variable);
-	double		result=sqlrcur->getOutputBindDouble(varname);
+	sqlrcursordata	*sqlrcurdata;
+	double		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,dr,sqlrcurdata->cur,getOutputBindDouble,variable);
 	return rb_float_new(result);
 }
 
@@ -1411,94 +1956,141 @@ static VALUE sqlrcur_getOutputBindDouble(VALUE self, VALUE variable) {
  *  Get the length of the value stored in a previously
  *  defined output bind variable. */
 static VALUE sqlrcur_getOutputBindLength(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->getOutputBindLength(STR2CSTR(variable)));
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,u64r,sqlrcurdata->cur,getOutputBindLength,variable);
+	return INT2NUM(result);
 }
 
+static void getOutputBindCursor(params *p) {
+	p->result.scr=p->sqlrc.sqlrcur->getOutputBindCursor(
+						STR2CSTR(p->one),true);
+}
 /**
  *  call-seq:
  *  getOutputBindCursor(variable)
  *
  *  Get the cursor associated with a previously defined output bind variable. */
 static VALUE sqlrcur_getOutputBindCursor(VALUE self, VALUE variable) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcursor	*returnsqlrcur=sqlrcur->getOutputBindCursor(
-							STR2CSTR(variable),
-							true);
-	return Data_Wrap_Struct(csqlrcursor,0,sqlrcur_free,
-					(void *)returnsqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	sqlrcursor	*result;
+	RCUR1(result,scr,sqlrcurdata->cur,getOutputBindCursor,variable);
+	sqlrcursordata	*resultdata=new sqlrcursordata;
+	resultdata->con=sqlrcurdata->con;
+	resultdata->cur=result;
+	return Data_Wrap_Struct(csqlrcursor,sqlrcur_mark,sqlrcur_free,
+							(void *)resultdata);
 }
 
+static void openCachedResultSet(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->openCachedResultSet(STR2CSTR(p->one));
+}
 /**
  *  call-seq:
  *  openCachedResultSet(filename)
  *
  *  Opens a cached result set.  Returns 1 on success and 0 on failure. */
 static VALUE sqlrcur_openCachedResultSet(VALUE self, VALUE filename) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->openCachedResultSet(STR2CSTR(filename)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,br,sqlrcurdata->cur,openCachedResultSet,filename);
+	return INT2NUM(result);
 }
 
+static void colCount(params *p) {
+	p->result.u32r=p->sqlrc.sqlrcur->colCount();
+}
 /** Returns the number of columns in the current result set. */
 static VALUE sqlrcur_colCount(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->colCount());
+	sqlrcursordata	*sqlrcurdata;
+	uint32_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u32r,sqlrcurdata->cur,colCount);
+	return INT2NUM(result);
 }
 
+static void rowCount(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->rowCount();
+}
 /** Returns the number of rows in the current result set. */
 static VALUE sqlrcur_rowCount(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->rowCount());
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u32r,sqlrcurdata->cur,rowCount);
+	return INT2NUM(result);
 }
 
+static void totalRows(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->totalRows();
+}
 /** Returns the total number of rows that will be returned in the result set.
  *  Not all databases support this call.  Don't use it for applications which
  *  are designed to be portable across databases.  -1 is returned by databases
  *  which don't support this option. */
 static VALUE sqlrcur_totalRows(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->totalRows());
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u64r,sqlrcurdata->cur,totalRows);
+	return INT2NUM(result);
 }
 
+static void affectedRows(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->affectedRows();
+}
 /** Returns the number of rows that were updated, inserted or deleted by the
  *  query.  Not all databases support this call.  Don't use it for applications
  *  which are designed to be portable across databases.  -1 is returned by
  *  databases which don't support this option. */
 static VALUE sqlrcur_affectedRows(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->affectedRows());
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u64r,sqlrcurdata->cur,affectedRows);
+	return INT2NUM(result);
 }
 
+static void firstRowIndex(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->firstRowIndex();
+}
 /** Returns the index of the first buffered row.  This is useful when buffering
  *  only part of the result set at a time. */
 static VALUE sqlrcur_firstRowIndex(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->firstRowIndex());
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u64r,sqlrcurdata->cur,firstRowIndex);
+	return INT2NUM(result);
 }
 
+static void endOfResultSet(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->endOfResultSet();
+}
 /** Returns 0 if part of the result set is still pending on the server and 1 if
  *  not.  This function can only return 0 if setResultSetBufferSize() has been
  *  called with a parameter other than 0. */
 static VALUE sqlrcur_endOfResultSet(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->endOfResultSet());
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,br,sqlrcurdata->cur,endOfResultSet);
+	return INT2NUM(result);
 }
 
+static void curErrorMessage(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->errorMessage();
+}
 /** If a query failed and generated an error, the error message is available
  *  here.  If the query succeeded then this function returns a nil. */
 static VALUE sqlrcur_errorMessage(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*result=sqlrcur->errorMessage();
+	sqlrcursordata	*sqlrcurdata;
+	const char	*result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,ccpr,sqlrcurdata->cur,curErrorMessage);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -1506,32 +2098,59 @@ static VALUE sqlrcur_errorMessage(VALUE self) {
 	}
 }
 
+static void curErrorNumber(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->errorNumber();
+}
 /** If a query failed and generated an error, the error number is
  *  available here.  If there is no error then this method returns 0. */
 static VALUE sqlrcur_errorNumber(VALUE self) {
-	sqlrcursor *sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->errorNumber());
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u64r,sqlrcurdata->cur,curErrorNumber);
+	return INT2NUM(result);
 }
 
+static void getNullsAsEmptyStrings(params *p) {
+	p->sqlrc.sqlrcur->getNullsAsEmptyStrings();
+}
 /** Tells the connection to return NULL fields and output bind variables as
  *  empty strings.  This is the default. */
 static VALUE sqlrcur_getNullsAsEmptyStrings(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->getNullsAsEmptyStrings();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,getNullsAsEmptyStrings);
 	return Qnil;
 }
 
+static void getNullsAsNulls(params *p) {
+	p->sqlrc.sqlrcur->getNullsAsNulls();
+}
 /** Tells the connection to return NULL fields
  *  and output bind variables as nil's. */
 static VALUE sqlrcur_getNullsAsNils(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->getNullsAsNulls();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,getNullsAsNulls);
 	return Qnil;
 }
 
+static void getFieldStr(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getField(
+					NUM2INT(p->one),STR2CSTR(p->two));
+}
+static void getFieldLengthStr(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->getFieldLength(
+					NUM2INT(p->one),STR2CSTR(p->two));
+}
+static void getFieldInt(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getField(
+					NUM2INT(p->one),NUM2INT(p->two));
+}
+static void getFieldLengthInt(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->getFieldLength(
+					NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  getField(row,col)
@@ -1539,16 +2158,16 @@ static VALUE sqlrcur_getNullsAsNils(VALUE self) {
  *  Returns the specified field as a string.  "col" may be specified as the 
  *  column name or number. */
 static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
 	const char	*result;
-	long		length;
+	uint64_t	length;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		result=sqlrcur->getField(NUM2INT(row),STR2CSTR(col));
-		length=sqlrcur->getFieldLength(NUM2INT(row),STR2CSTR(col));
+		RCUR2(result,ccpr,sqlrcurdata->cur,getFieldStr,row,col);
+		RCUR2(length,u64r,sqlrcurdata->cur,getFieldLengthStr,row,col);
 	} else {
-		result=sqlrcur->getField(NUM2INT(row),NUM2INT(col));
-		length=sqlrcur->getFieldLength(NUM2INT(row),NUM2INT(col));
+		RCUR2(result,ccpr,sqlrcurdata->cur,getFieldInt,row,col);
+		RCUR2(length,u64r,sqlrcurdata->cur,getFieldLengthInt,row,col);
 	}
 	if (result) {
 		return rb_str_new(result,length);
@@ -1557,6 +2176,14 @@ static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
 	}
 }
   
+static void getFieldAsIntegerStr(params *p) {
+	p->result.i64r=p->sqlrc.sqlrcur->getFieldAsInteger(
+					NUM2INT(p->one),STR2CSTR(p->two));
+}
+static void getFieldAsIntegerInt(params *p) {
+	p->result.i64r=p->sqlrc.sqlrcur->getFieldAsInteger(
+					NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  getFieldAsInteger(row,col)
@@ -1564,17 +2191,25 @@ static VALUE sqlrcur_getField(VALUE self, VALUE row, VALUE col) {
  *  Returns the specified field as an integer.  "col" may be specified as the
  *  column name or number. */
 static VALUE sqlrcur_getFieldAsInteger(VALUE self, VALUE row, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	long	result;
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	int64_t	result;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		result=sqlrcur->getFieldAsInteger(NUM2INT(row),STR2CSTR(col));
+		RCUR2(result,i64r,sqlrcurdata->cur,getFieldAsIntegerStr,row,col);
 	} else {
-		result=sqlrcur->getFieldAsInteger(NUM2INT(row),NUM2INT(col));
+		RCUR2(result,i64r,sqlrcurdata->cur,getFieldAsIntegerInt,row,col);
 	}
 	return INT2NUM(result);
 }
 
+static void getFieldAsDoubleStr(params *p) {
+	p->result.dr=p->sqlrc.sqlrcur->getFieldAsDouble(
+					NUM2INT(p->one),STR2CSTR(p->two));
+}
+static void getFieldAsDoubleInt(params *p) {
+	p->result.dr=p->sqlrc.sqlrcur->getFieldAsDouble(
+					NUM2INT(p->one),NUM2INT(p->two));
+}
 /**
  *  call-seq:
  *  getFieldAsDouble(row,col)
@@ -1582,13 +2217,13 @@ static VALUE sqlrcur_getFieldAsInteger(VALUE self, VALUE row, VALUE col) {
  *  Returns the specified field as an decimal.  "col" may be specified as the
  *  column name or number. */
 static VALUE sqlrcur_getFieldAsDouble(VALUE self, VALUE row, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	double	result;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		result=sqlrcur->getFieldAsDouble(NUM2INT(row),STR2CSTR(col));
+		RCUR2(result,dr,sqlrcurdata->cur,getFieldAsDoubleStr,row,col);
 	} else {
-		result=sqlrcur->getFieldAsDouble(NUM2INT(row),NUM2INT(col));
+		RCUR2(result,dr,sqlrcurdata->cur,getFieldAsDoubleInt,row,col);
 	}
 	return rb_float_new(result);
 }
@@ -1600,32 +2235,42 @@ static VALUE sqlrcur_getFieldAsDouble(VALUE self, VALUE row, VALUE col) {
  *  Returns the length of the specified row and column.  "col" may be specified
  *  as the column name or number. */
 static VALUE sqlrcur_getFieldLength(VALUE self, VALUE row, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM((int)sqlrcur->getFieldLength(NUM2INT(row),
-								STR2CSTR(col)));
+		RCUR2(result,u64r,sqlrcurdata->cur,getFieldLengthStr,row,col);
 	} else {
-		return INT2NUM((int)sqlrcur->getFieldLength(NUM2INT(row),
-								NUM2INT(col)));
+		RCUR2(result,u64r,sqlrcurdata->cur,getFieldLengthInt,row,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getRow(params *p) {
+	p->result.ccpcpr=p->sqlrc.sqlrcur->getRow(NUM2INT(p->one));
+}
+static void getRowLengths(params *p) {
+	p->result.u32pr=p->sqlrc.sqlrcur->getRowLengths(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getRow(row)
  *
  *  Returns an array of the values of the fields in the specified row. */
 static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
+	sqlrcursordata	*sqlrcurdata;
 	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char * const *fields=sqlrcur->getRow(NUM2INT(row));
-	uint32_t	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
+	const char * const *result;
+	uint32_t	*length;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	sqlrcur=sqlrcurdata->cur;
 	VALUE	fieldary=rb_ary_new2(sqlrcur->colCount());
+	RCUR1(result,ccpcpr,sqlrcur,getRow,row);
+	RCUR1(length,u32pr,sqlrcur,getRowLengths,row);
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
-		if (fields[i]) {
-			rb_ary_store(fieldary,i,rb_str_new(fields[i],
-								lengths[i]));
+		if (result[i]) {
+			rb_ary_store(fieldary,i,rb_str_new(result[i],
+								length[i]));
 		} else {
 			rb_ary_store(fieldary,i,Qnil);
 		}
@@ -1633,25 +2278,34 @@ static VALUE sqlrcur_getRow(VALUE self, VALUE row) {
 	return fieldary;
 }
 
+static void getColumnName(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getColumnName(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getRowHash(row)
  *
  *  Returns a hash of the values of the fields in the specified row. */
 static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
+	sqlrcursordata	*sqlrcurdata;
 	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char * const *fields=sqlrcur->getRow(NUM2INT(row));
-	uint32_t	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
+	const char * const *result;
+	uint32_t	*length;
+	const char	*name;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	sqlrcur=sqlrcurdata->cur;
+	RCUR1(result,ccpcpr,sqlrcur,getRow,row);
+	RCUR1(length,u32pr,sqlrcur,getRowLengths,row);
 	VALUE	fieldhash=rb_hash_new();
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
-		if (fields[i]) {
+		RCUR1(name,ccpr,sqlrcur,getColumnName,INT2NUM(i));
+		if (result[i]) {
 			rb_hash_aset(fieldhash,
-					rb_str_new2(sqlrcur->getColumnName(i)),
-					rb_str_new(fields[i],lengths[i]));
+					rb_str_new2(name),
+					rb_str_new(result[i],length[i]));
 		} else {
 			rb_hash_aset(fieldhash,
-					rb_str_new2(sqlrcur->getColumnName(i)),
+					rb_str_new2(name),
 					Qnil);
 		}
 	}
@@ -1664,15 +2318,18 @@ static VALUE sqlrcur_getRowHash(VALUE self, VALUE row) {
  *
  *  Returns an array of the lengths of the fields in the specified row. */
 static VALUE sqlrcur_getRowLengths(VALUE self, VALUE row) {
+	sqlrcursordata	*sqlrcurdata;
 	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	uint32_t	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
-	if (!lengths) {
+	uint32_t	*result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	sqlrcur=sqlrcurdata->cur;
+	RCUR1(result,u32pr,sqlrcur,getRowLengths,row);
+	if (!result) {
 		return Qnil;
 	}
 	VALUE	lengthary=rb_ary_new2(sqlrcur->colCount());
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
-		rb_ary_store(lengthary,i,INT2NUM(lengths[i]));
+		rb_ary_store(lengthary,i,INT2NUM(result[i]));
 	}
 	return lengthary;
 }
@@ -1683,30 +2340,41 @@ static VALUE sqlrcur_getRowLengths(VALUE self, VALUE row) {
  *
  *  Returns a hash of the lengths of the fields in the specified row. */
 static VALUE sqlrcur_getRowLengthsHash(VALUE self, VALUE row) {
+	sqlrcursordata	*sqlrcurdata;
 	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	uint32_t	*lengths=sqlrcur->getRowLengths(NUM2INT(row));
+	uint32_t	*result;
+	const char	*name;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	sqlrcur=sqlrcurdata->cur;
+	RCUR1(result,u32pr,sqlrcur,getRowLengths,row);
 	VALUE	lengthhash=rb_hash_new();
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
+		RCUR1(name,ccpr,sqlrcur,getColumnName,INT2NUM(i));
 		rb_hash_aset(lengthhash,
-				rb_str_new2(sqlrcur->getColumnName(i)),
-				INT2NUM(lengths[i]));
+				rb_str_new2(name),
+				INT2NUM(result[i]));
 	}
 	return lengthhash;
 }
 
+static void getColumnNames(params *p) {
+	p->result.ccpcpr=p->sqlrc.sqlrcur->getColumnNames();
+}
 /** Returns an array of the column names of the current result set. */
 static VALUE sqlrcur_getColumnNames(VALUE self) {
+	sqlrcursordata	*sqlrcurdata;
 	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char * const *names=sqlrcur->getColumnNames();
-	if (!names) {
+	const char * const *result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	sqlrcur=sqlrcurdata->cur;
+	RCUR(result,ccpcpr,sqlrcur,getColumnNames);
+	if (!result) {
 		return Qnil;
 	}
 	VALUE	nameary=rb_ary_new2(sqlrcur->colCount());
 	for (uint32_t i=0; i<sqlrcur->colCount(); i++) {
-		if (names[i]) {
-			rb_ary_store(nameary,i,rb_str_new2(names[i]));
+		if (result[i]) {
+			rb_ary_store(nameary,i,rb_str_new2(result[i]));
 		} else {
 			rb_ary_store(nameary,i,Qnil);
 		}
@@ -1720,9 +2388,10 @@ static VALUE sqlrcur_getColumnNames(VALUE self) {
  *
  *  Returns the name of the specified column. */
 static VALUE sqlrcur_getColumnName(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	const char	*result=sqlrcur->getColumnName(NUM2INT(col));
+	sqlrcursordata	*sqlrcurdata;
+	const char	*result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,ccpr,sqlrcurdata->cur,getColumnName,col);
 	if (result) {
 		return rb_str_new2(result);
 	} else {
@@ -1730,6 +2399,12 @@ static VALUE sqlrcur_getColumnName(VALUE self, VALUE col) {
 	}
 }
 
+static void getColumnTypeStr(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getColumnType(STR2CSTR(p->one));
+}
+static void getColumnTypeInt(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcur->getColumnType(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnType(col)
@@ -1737,13 +2412,13 @@ static VALUE sqlrcur_getColumnName(VALUE self, VALUE col) {
  *  Returns the type of the specified column. "col" may be specified as the
  *  column name or number. */
 static VALUE sqlrcur_getColumnType(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	const char	*result;
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		result=sqlrcur->getColumnType(STR2CSTR(col));
+		RCUR1(result,ccpr,sqlrcurdata->cur,getColumnTypeStr,col);
 	} else {
-		result=sqlrcur->getColumnType(NUM2INT(col));
+		RCUR1(result,ccpr,sqlrcurdata->cur,getColumnTypeInt,col);
 	}
 	if (result) {
 		return rb_str_new2(result);
@@ -1752,6 +2427,12 @@ static VALUE sqlrcur_getColumnType(VALUE self, VALUE col) {
 	}
 }
  
+static void getColumnLengthStr(params *p) {
+	p->result.u32r=p->sqlrc.sqlrcur->getColumnLength(STR2CSTR(p->one));
+}
+static void getColumnLengthInt(params *p) {
+	p->result.u32r=p->sqlrc.sqlrcur->getColumnLength(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnLength(col)
@@ -1759,15 +2440,23 @@ static VALUE sqlrcur_getColumnType(VALUE self, VALUE col) {
  *  Returns the length of the specified column. "col" may be specified as the
  *  column name or number. */
 static VALUE sqlrcur_getColumnLength(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	uint32_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnLength(STR2CSTR(col)));
+		RCUR1(result,u32r,sqlrcurdata->cur,getColumnLengthStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnLength(NUM2INT(col)));
+		RCUR1(result,u32r,sqlrcurdata->cur,getColumnLengthInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnPrecisionStr(params *p) {
+	p->result.u32r=p->sqlrc.sqlrcur->getColumnPrecision(STR2CSTR(p->one));
+}
+static void getColumnPrecisionInt(params *p) {
+	p->result.u32r=p->sqlrc.sqlrcur->getColumnPrecision(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnPrecision(col)
@@ -1777,15 +2466,23 @@ static VALUE sqlrcur_getColumnLength(VALUE self, VALUE col) {
  *  non-numeric types, it's the number of characters in the string.  "col"
  *  may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnPrecision(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	uint32_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnPrecision(STR2CSTR(col)));
+		RCUR1(result,u32r,sqlrcurdata->cur,getColumnPrecisionStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnPrecision(NUM2INT(col)));
+		RCUR1(result,u32r,sqlrcurdata->cur,getColumnPrecisionInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnScaleStr(params *p) {
+	p->result.u32r=p->sqlrc.sqlrcur->getColumnScale(STR2CSTR(p->one));
+}
+static void getColumnScaleInt(params *p) {
+	p->result.u32r=p->sqlrc.sqlrcur->getColumnScale(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnScale(col)
@@ -1794,15 +2491,23 @@ static VALUE sqlrcur_getColumnPrecision(VALUE self, VALUE col) {
  *  digits to the right of the decimal point in a number.  eg: 123.45 has a
  *  scale of 2.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	uint32_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnScale(STR2CSTR(col)));
+		RCUR1(result,u64r,sqlrcurdata->cur,getColumnScaleStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnScale(NUM2INT(col)));
+		RCUR1(result,u64r,sqlrcurdata->cur,getColumnScaleInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnIsNullableStr(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsNullable(STR2CSTR(p->one));
+}
+static void getColumnIsNullableInt(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsNullable(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsNullable(col)
@@ -1810,15 +2515,23 @@ static VALUE sqlrcur_getColumnScale(VALUE self, VALUE col) {
  *  Returns 1 if the specified column can contain nulls and 0 otherwise.
  *  "col" may be specified as the colum name or number. */
 static VALUE sqlrcur_getColumnIsNullable(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsNullable(STR2CSTR(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsNullableStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsNullable(NUM2INT(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsNullableInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnIsPrimaryKeyStr(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsPrimaryKey(STR2CSTR(p->one));
+}
+static void getColumnIsPrimaryKeyInt(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsPrimaryKey(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsPrimaryKey(col)
@@ -1826,15 +2539,23 @@ static VALUE sqlrcur_getColumnIsNullable(VALUE self, VALUE col) {
  *  Returns 1 if the specified column is a primary key and 0 otherwise.
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsPrimaryKey(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsPrimaryKey(STR2CSTR(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsPrimaryKeyStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsPrimaryKey(NUM2INT(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsPrimaryKeyInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnIsUniqueStr(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsUnique(STR2CSTR(p->one));
+}
+static void getColumnIsUniqueInt(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsUnique(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsUnique(col)
@@ -1842,15 +2563,23 @@ static VALUE sqlrcur_getColumnIsPrimaryKey(VALUE self, VALUE col) {
  *  Returns 1 if the specified column is unique and 0 otherwise. 
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsUnique(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsUnique(STR2CSTR(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsUniqueStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsUnique(NUM2INT(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsUniqueInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnIsPartOfKeyStr(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsPartOfKey(STR2CSTR(p->one));
+}
+static void getColumnIsPartOfKeyInt(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsPartOfKey(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsPartOfKey(col)
@@ -1858,15 +2587,23 @@ static VALUE sqlrcur_getColumnIsUnique(VALUE self, VALUE col) {
  *  Returns 1 if the specified column is part of a composite key and 0
  *  otherwise.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsPartOfKey(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsPartOfKey(STR2CSTR(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsPartOfKeyStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsPartOfKey(NUM2INT(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsPartOfKeyInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnIsUnsignedStr(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsUnsigned(STR2CSTR(p->one));
+}
+static void getColumnIsUnsignedInt(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsUnsigned(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsUnsigned(col)
@@ -1874,15 +2611,23 @@ static VALUE sqlrcur_getColumnIsPartOfKey(VALUE self, VALUE col) {
  *  Returns 1 if the specified column is an unsigned number and 0 otherwise.
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsUnsigned(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsUnsigned(STR2CSTR(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsUnsignedStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsUnsigned(NUM2INT(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsUnsignedInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnIsZeroFilledStr(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsZeroFilled(STR2CSTR(p->one));
+}
+static void getColumnIsZeroFilledInt(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsZeroFilled(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsZeroFilled(col)
@@ -1890,15 +2635,23 @@ static VALUE sqlrcur_getColumnIsUnsigned(VALUE self, VALUE col) {
  *  Returns 1 if the specified column was created with the zero-fill flag and
  *  0 otherwise.  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsZeroFilled(STR2CSTR(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsZeroFilledStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsZeroFilled(NUM2INT(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsZeroFilledInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnIsBinaryStr(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsBinary(STR2CSTR(p->one));
+}
+static void getColumnIsBinaryInt(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsBinary(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsBinary(col)
@@ -1906,15 +2659,25 @@ static VALUE sqlrcur_getColumnIsZeroFilled(VALUE self, VALUE col) {
  *  Returns 1 if the specified column contains binary data and 0 otherwise.
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getColumnIsBinary(STR2CSTR(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsBinaryStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getColumnIsBinary(NUM2INT(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsBinaryInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getColumnIsAutoIncrementStr(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsAutoIncrement(
+							STR2CSTR(p->one));
+}
+static void getColumnIsAutoIncrementInt(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->getColumnIsAutoIncrement(
+							NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getColumnIsAutoIncrement(col)
@@ -1922,17 +2685,23 @@ static VALUE sqlrcur_getColumnIsBinary(VALUE self, VALUE col) {
  *  Returns 1 if the specified column auto-increments and 0 otherwise.
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getColumnIsAutoIncrement(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(
-			sqlrcur->getColumnIsAutoIncrement(STR2CSTR(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsAutoIncrementStr,col);
 	} else {
-		return INT2NUM(
-			sqlrcur->getColumnIsAutoIncrement(NUM2INT(col)));
+		RCUR1(result,br,sqlrcurdata->cur,getColumnIsAutoIncrementInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getLongestStr(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->getLongest(STR2CSTR(p->one));
+}
+static void getLongestInt(params *p) {
+	p->result.u64r=p->sqlrc.sqlrcur->getLongest(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  getLongest(col)
@@ -1940,35 +2709,48 @@ static VALUE sqlrcur_getColumnIsAutoIncrement(VALUE self, VALUE col) {
  *  Returns the length of the longest field in the specified column.
  *  "col" may be specified as the column name or number. */
 static VALUE sqlrcur_getLongest(VALUE self, VALUE col) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
+	sqlrcursordata	*sqlrcurdata;
+	uint64_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
 	if (rb_obj_is_instance_of(col,rb_cString)==Qtrue) {
-		return INT2NUM(sqlrcur->getLongest(STR2CSTR(col)));
+		RCUR1(result,u64r,sqlrcurdata->cur,getLongestStr,col);
 	} else {
-		return INT2NUM(sqlrcur->getLongest(NUM2INT(col)));
+		RCUR1(result,u64r,sqlrcurdata->cur,getLongestInt,col);
 	}
+	return INT2NUM(result);
 }
 
+static void getResultSetId(params *p) {
+	p->result.u16r=p->sqlrc.sqlrcur->getResultSetId();
+}
 /** Returns the internal ID of this result set.  This parameter may be passed
  *  to another statement for use in the resumeResultSet() function.  Note: The
  *  value this function returns is only valid after a call to
  *  suspendResultSet().*/
 static VALUE sqlrcur_getResultSetId(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->getResultSetId());
+	sqlrcursordata	*sqlrcurdata;
+	uint16_t	result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR(result,u16r,sqlrcurdata->cur,getResultSetId);
+	return INT2NUM(result);
 }
 
+static void suspendResultSet(params *p) {
+	p->sqlrc.sqlrcur->suspendResultSet();
+}
 /** Tells the server to leave this result set open when the connection calls
  *  suspendSession() so that another connection can connect to it using
  *  resumeResultSet() after it calls resumeSession(). */
 static VALUE sqlrcur_suspendResultSet(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->suspendResultSet();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,suspendResultSet);
 	return Qnil;
 }
 
+static void resumeResultSet(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->resumeResultSet(NUM2INT(p->one));
+}
 /**
  *  call-seq:
  *  resumeResultSet(id)
@@ -1976,11 +2758,17 @@ static VALUE sqlrcur_suspendResultSet(VALUE self) {
  *  Resumes a result set previously left open using suspendSession().
  *  Returns 1 on success and 0 on failure. */
 static VALUE sqlrcur_resumeResultSet(VALUE self, VALUE id) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->resumeResultSet(NUM2INT(id)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR1(result,br,sqlrcurdata->cur,resumeResultSet,id);
+	return INT2NUM(result);
 }
 
+static void resumeCachedResultSet(params *p) {
+	p->result.br=p->sqlrc.sqlrcur->resumeCachedResultSet(
+					NUM2INT(p->one),STR2CSTR(p->two));
+}
 /**
  *  call-seq:
  *  resumeCachedResultSet(id,filename)
@@ -1990,20 +2778,24 @@ static VALUE sqlrcur_resumeResultSet(VALUE self, VALUE id) {
  *  on failure. */
 static VALUE sqlrcur_resumeCachedResultSet(VALUE self, 
 						VALUE id, VALUE filename) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	return INT2NUM(sqlrcur->resumeCachedResultSet(NUM2INT(id),
-							STR2CSTR(filename)));
+	sqlrcursordata	*sqlrcurdata;
+	bool		result;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	RCUR2(result,br,sqlrcurdata->cur,resumeCachedResultSet,id,filename);
+	return INT2NUM(result);
 }
 
+static void closeResultSet(params *p) {
+	p->sqlrc.sqlrcur->closeResultSet();
+}
 /** Closes the current result set, if one is open.  Data
  *  that has been fetched already is still available but
  *  no more data may be fetched.  Server side resources
  *  for the result set are freed as well. */
 static VALUE sqlrcur_closeResultSet(VALUE self) {
-	sqlrcursor	*sqlrcur;
-	Data_Get_Struct(self,sqlrcursor,sqlrcur);
-	sqlrcur->closeResultSet();
+	sqlrcursordata	*sqlrcurdata;
+	Data_Get_Struct(self,sqlrcursordata,sqlrcurdata);
+	CUR(sqlrcurdata->cur,closeResultSet);
 	return Qnil;
 }
 

@@ -24,7 +24,6 @@
 class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 	public:
 			sqlrconfig_xmldom();
-			~sqlrconfig_xmldom();
 
 		void	getEnabledIds(const char *urlname,
 					linkedlist< char * > *idlist);
@@ -118,6 +117,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getIsolationLevel();
 		bool		getIgnoreSelectDatabase();
 		bool		getWaitForDownDatabase();
+		const char	*getPasswordPath();
 
 		linkedlist< char *>	*getSessionStartQueries();
 		linkedlist< char *>	*getSessionEndQueries();
@@ -257,6 +257,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*isolationlevel;
 		bool		ignoreselectdb;
 		bool		waitfordowndb;
+		const char	*passwordpath;
 
 		linkedlist< char *>	sessionstartqueries;
 		linkedlist< char *>	sessionendqueries;
@@ -286,7 +287,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		linkedlist< routecontainer *>		routelist;
 		linkedlist< connectstringcontainer * >	connectstringlist;
 
-		domnode	*defaultlistener;
+		domnode		*defaultlistener;
 		const char	*defaultaddresses;
 		uint16_t	defaultport;
 		const char	*defaultsocket;
@@ -310,12 +311,6 @@ sqlrconfig_xmldom::sqlrconfig_xmldom() : sqlrconfig(), xmldom(false) {
 	debugFunction();
 
 	init();
-}
-
-sqlrconfig_xmldom::~sqlrconfig_xmldom() {
-	debugFunction();
-
-	clear();
 }
 
 void sqlrconfig_xmldom::init() {
@@ -417,6 +412,12 @@ void sqlrconfig_xmldom::init() {
 	isolationlevel=NULL;
 	ignoreselectdb=false;
 	waitfordowndb=true;
+	passwordpath=NULL;
+
+	connectstringlist.setManageValues(true);
+	routelist.setManageValues(true);
+	sessionstartqueries.setManageArrayValues(true);
+	sessionendqueries.setManageArrayValues(true);
 
 	defaultlistener=NULL;
 	defaultaddresses=NULL;
@@ -436,10 +437,10 @@ void sqlrconfig_xmldom::init() {
 void sqlrconfig_xmldom::clear() {
 	debugFunction();
 
-	connectstringlist.clearAndDelete();
-	routelist.clearAndDelete();
-	sessionstartqueries.clearAndArrayDelete();
-	sessionendqueries.clearAndArrayDelete();
+	connectstringlist.clear();
+	routelist.clear();
+	sessionstartqueries.clear();
+	sessionendqueries.clear();
 }
 
 const char *sqlrconfig_xmldom::getDefaultAddresses() {
@@ -773,6 +774,10 @@ bool sqlrconfig_xmldom::getIgnoreSelectDatabase() {
 
 bool sqlrconfig_xmldom::getWaitForDownDatabase() {
 	return waitfordowndb;
+}
+
+const char *sqlrconfig_xmldom::getPasswordPath() {
+	return passwordpath;
 }
 
 linkedlist< char * > *sqlrconfig_xmldom::getSessionStartQueries() {
@@ -1926,6 +1931,10 @@ void sqlrconfig_xmldom::getTreeValues() {
 	if (!attr->isNullNode()) {
 		waitfordowndb=charstring::isYes(attr->getValue());
 	}
+	attr=instance->getAttribute("passwordpath");
+	if (!attr->isNullNode()) {
+		passwordpath=attr->getValue();
+	}
 
 
 	// xmls...
@@ -2125,7 +2134,7 @@ routecontainer *sqlrconfig_xmldom::routeAlreadyExists(routecontainer *cur) {
 void sqlrconfig_xmldom::moveRegexList(routecontainer *cur,
 					routecontainer *existing) {
 
-	for (linkedlistnode< regularexpression * > *re=
+	for (listnode< regularexpression * > *re=
 				cur->getRegexList()->getFirst();
 						re; re=re->getNext()) {
 		existing->getRegexList()->append(re->getValue());
@@ -2323,7 +2332,7 @@ void sqlrconfig_xmldom::getEnabledIds(const char *urlname,
 
 	#ifdef DEBUG_MESSAGES
 		debugPrintf("enabled ids:\n");
-		for (linkedlistnode< char * > *n=idlist->getFirst();
+		for (listnode< char * > *n=idlist->getFirst();
 						n; n=n->getNext()) {
 			debugPrintf("  %s\n",n->getValue());
 		}

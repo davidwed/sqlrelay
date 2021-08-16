@@ -59,7 +59,13 @@ public class SQLRelayDriver extends SQLRelayDebug implements Driver {
 			portstr=info.getProperty("Port");
 			socket=info.getProperty("Socket");
 			user=info.getProperty("User");
+			if (user==null) {
+				user=info.getProperty("user");
+			}
 			password=info.getProperty("Password");
+			if (password==null) {
+				password=info.getProperty("password");
+			}
 			retrytimestr=info.getProperty("Retry Time");
 			triesstr=info.getProperty("Tries");
 		}
@@ -151,6 +157,17 @@ public class SQLRelayDriver extends SQLRelayDebug implements Driver {
 		ci.retrytime = retrytime;
 		ci.triesstr = triesstr;
 		ci.tries = tries;
+
+		debugPrintln("  host: "+host);
+		debugPrintln("  portstr: "+portstr);
+		debugPrintln("  port: "+port);
+		debugPrintln("  socket: "+socket);
+		debugPrintln("  user: "+user);
+		debugPrintln("  password: "+password);
+		debugPrintln("  retrytimestr: "+retrytimestr);
+		debugPrintln("  retrytime: "+retrytime);
+		debugPrintln("  triesstr: "+triesstr);
+		debugPrintln("  tries: "+tries);
 
 		return ci;
 	}

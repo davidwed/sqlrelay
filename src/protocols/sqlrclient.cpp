@@ -43,9 +43,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		clientsessionexitstatus_t	clientSession(
 							filedescriptor *cs);
 
-		gsscontext	*getGSSContext();
-		tlscontext	*getTLSContext();
-
 	private:
 		bool	acceptSecurityContext();
 		bool	getCommand(uint16_t *command);
@@ -213,13 +210,6 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		filedescriptor	*clientsock;
 
 		securitycontext	*ctx;
-		bool		usekrb;
-		bool		usetls;
-
-		gsscredentials	gcred;
-		gssmechanism	gmech;
-		gsscontext	gctx;
-		tlscontext	tctx;
 
 		int32_t		idleclienttimeout;
 
@@ -268,121 +258,13 @@ sqlrprotocol_sqlrclient::sqlrprotocol_sqlrclient(
 	waitfordowndb=cont->getConfig()->getWaitForDownDatabase();
 	clientinfo=new char[maxclientinfolength+1];
 	clientsock=NULL;
-	ctx=NULL;
-	usekrb=charstring::isYes(parameters->getAttributeValue("krb"));
-	usetls=charstring::isYes(parameters->getAttributeValue("tls"));
 
-	if (usekrb) {
-		if (gss::supported()) {
-
-			// set the keytab file to use
-			const char	*keytab=
-				parameters->getAttributeValue("krbkeytab");
-			if (!charstring::isNullOrEmpty(keytab)) {
-				gcred.setKeytab(keytab);
-			}
-
-			// set the service to use
-			const char	*service=
-				parameters->getAttributeValue("krbservice");
-			if (charstring::isNullOrEmpty(service)) {
-				service=DEFAULT_KRBSERVICE;
-			}
-
-			// acquire service credentials
-			if (!gcred.acquireForService(service)) {
-				const char	*status=
-					gcred.getMechanismMinorStatus();
-				stderror.printf("kerberos acquire-"
-						"service %s failed:\n%s",
-						service,status);
-				if (charstring::contains(status,
-							"Permission denied")) {
-					char	*user=userentry::getName(
-							process::getUserId());
-					stderror.printf("(keytab file likely "
-							"not readable by user "
-							"%s)\n",user);
-					delete[] user;
-				}
-			}
-
-			// initialize the gss context
-			gmech.initialize(
-				parameters->getAttributeValue("krbmech"));
-			gctx.setDesiredMechanism(&gmech);
-			gctx.setDesiredFlags(
-				parameters->getAttributeValue("krbflags"));
-			gctx.setCredentials(&gcred);
-
-			// use the gss context
-			ctx=&gctx;
-
-		} else {
-			stderror.printf("Warning: kerberos support requested "
-					"but platform doesn't support "
-					"kerberos\n");
-		}
-	} else if (usetls) {
-		if (tls::supported()) {
-
-			// get the protocol version to use
-			tctx.setProtocolVersion(
-				parameters->getAttributeValue("tlsversion"));
-
-			// get the certificate chain file to use
-			const char	*tlscert=
-				parameters->getAttributeValue("tlscert");
-			if (file::readable(tlscert)) {
-				tctx.setCertificateChainFile(tlscert);
-			} else if (!charstring::isNullOrEmpty(tlscert)) {
-				stderror.printf("Warning: TLS certificate "
-						"file %s is not readable.\n",
-						tlscert);
-			}
-
-			// get the private key file to use
-			const char	*tlskey=
-				parameters->getAttributeValue("tlskey");
-			if (file::readable(tlskey)) {
-				tctx.setPrivateKeyFile(tlskey);
-			} else if (!charstring::isNullOrEmpty(tlskey)) {
-				stderror.printf("Warning: TLS private key "
-						"file %s is not readable.\n",
-						tlskey);
-			}
-
-			// get the private key password to use
-			tctx.setPrivateKeyPassword(
-				parameters->getAttributeValue("tlspassword"));
-
-			// get whether to validate
-			tctx.setValidatePeer(
-				charstring::isYes(
-				parameters->getAttributeValue("tlsvalidate")));
-
-			// get the certificate authority file to use
-			// FIXME: not-found warning
-			tctx.setCertificateAuthority(
-				parameters->getAttributeValue("tlsca"));
-
-			// get the cipher list to use
-			tctx.setCiphers(
-				parameters->getAttributeValue("tlsciphers"));
-
-			// get the validation depth
-			tctx.setValidationDepth(
-				charstring::toUnsignedInteger(
-				parameters->getAttributeValue("tlsdepth")));
-
-			// use the tls context
-			ctx=&tctx;
-
-		} else {
-			stderror.printf("Warning: TLS support requested "
-					"but platform doesn't support "
-					"TLS\n");
-		}
+	if (useKrb()) {
+		ctx=getGssContext();
+	} else if (useTls()) {
+		ctx=getTlsContext();
+	} else {
+		ctx=NULL;
 	}
 
 	protocolversion=0;
@@ -452,6 +334,15 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 				continue;
 			}
 			endsession=false;
+			break;
+		} else
+
+		// handle bad commands
+		if (command>MAXCOMMAND) {
+			debugstr.clear();
+			debugstr.append("bad command: ")->append(command);
+			cont->raiseDebugMessageEvent(debugstr.getString());
+			endsession=true;
 			break;
 		} else
 
@@ -642,7 +533,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 	// socket.  We have to absorb all of that data.  We shouldn't just loop
 	// forever though, that would provide a point of entry for a DOS attack.
 	// We'll read the maximum number of bytes that could be sent.
-	cont->closeClientConnection(
+	uint32_t	bytecount=
 				// sending auth
 				(sizeof(uint16_t)+
 				// user/password
@@ -653,6 +544,8 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 				sizeof(uint16_t)+
 				// executing new query
 				sizeof(uint16_t)+
+				// client info
+				sizeof(uint64_t)+maxclientinfolength+
 				// query size and query
 				sizeof(uint32_t)+maxquerysize+
 				// input bind var count
@@ -665,13 +558,24 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 				// output bind vars
 				maxbindcount*(2*sizeof(uint16_t)+
 						maxbindnamelength)+
+				// inputoutput bind var count
+				sizeof(uint16_t)+
+				// inputoutput bind vars
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// get column info
 				sizeof(uint16_t)+
 				// skip/fetch
 				2*sizeof(uint32_t)
 				// divide by two because we're
 				// reading 2 bytes at a time
-				)/2);
+				)/2;
+
+	debugstr.clear();
+	debugstr.append("absorbing ")->append(bytecount)->append(" bytes");
+	cont->raiseDebugMessageEvent(debugstr.getString());
+
+	cont->closeClientConnection(bytecount);
 
 	// end the session if necessary
 	if (endsession) {
@@ -684,19 +588,19 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 
 bool sqlrprotocol_sqlrclient::acceptSecurityContext() {
 
-	if (!usekrb && !usetls) {
+	if (!useKrb() && !useTls()) {
 		return true;
 	}
 
 	cont->raiseDebugMessageEvent("accepting security context");
 
-	if (usekrb && !gss::supported()) {
+	if (useKrb() && !gss::supported()) {
 		cont->raiseInternalErrorEvent(NULL,
 				"failed to accept gss security "
 				"context (kerberos requested but "
 				"not supported)");
 		return false;
-	} else if (usetls && !tls::supported()) {
+	} else if (useTls() && !tls::supported()) {
 		cont->raiseInternalErrorEvent(NULL,
 				"failed to accept tls security "
 				"context (tls requested but "
@@ -815,7 +719,7 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	debugFunction();
 
 	// If no cursor was available, the client
-	// cound send an entire query and bind vars
+	// could send an entire query and bind vars
 	// before it reads the error and closes the
 	// socket.  We have to absorb all of that
 	// data.  We shouldn't just loop forever
@@ -823,6 +727,8 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	// for a DOS attack.  We'll read the maximum
 	// number of bytes that could be sent.
 	uint32_t	size=(
+				// client info
+				sizeof(uint64_t)+maxclientinfolength+
 				// query size and query
 				sizeof(uint32_t)+maxquerysize+
 				// input bind var count
@@ -835,16 +741,28 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 				// output bind vars
 				maxbindcount*(2*sizeof(uint16_t)+
 						maxbindnamelength)+
+				// inputoutput bind var count
+				sizeof(uint16_t)+
+				// inputoutput bind vars
+				maxbindcount*(2*sizeof(uint16_t)+
+						maxbindnamelength)+
 				// get column info
 				sizeof(uint16_t)+
 				// skip/fetch
 				2*sizeof(uint32_t));
+	debugstr.clear();
+	debugstr.append("absorbing ")->append(size)->append(" bytes");
+	cont->raiseDebugMessageEvent(debugstr.getString());
 
 	clientsock->useNonBlockingMode();
 	unsigned char	*dummy=new unsigned char[size];
-	clientsock->read(dummy,size,idleclienttimeout,0);
+	ssize_t	bytesread=clientsock->read(dummy,size,idleclienttimeout,0);
 	clientsock->useBlockingMode();
 	delete[] dummy;
+
+	debugstr.clear();
+	debugstr.append("absorbed ")->append(bytesread)->append(" bytes");
+	cont->raiseDebugMessageEvent(debugstr.getString());
 
 	// indicate that an error has occurred
 	clientsock->write((uint16_t)ERROR_OCCURRED);
@@ -872,7 +790,7 @@ bool sqlrprotocol_sqlrclient::authCommand() {
 	// build credentials...
 	sqlrcredentials	*cred=cont->getCredentials(
 					userbuffer,passwordbuffer,
-					usekrb,usetls);
+					useKrb(),useTls());
 
 	// auth
 	bool	success=cont->auth(cred);
@@ -3455,7 +3373,7 @@ bool sqlrprotocol_sqlrclient::returnResultSetData(sqlrservercursor *cursor,
 				// FIXME: kludgy
 				cont->nextRow(cursor);
 			} else {
-				if (error) {
+				if (error && protocolversion>=2) {
 					returnFetchError(cursor);
 				} else {
 					clientsock->write(endresultset);
@@ -4314,14 +4232,6 @@ bool sqlrprotocol_sqlrclient::getTranslatedQueryCommand(
 	clientsock->flushWriteBuffer(-1,-1);
 
 	return true;
-}
-
-gsscontext *sqlrprotocol_sqlrclient::getGSSContext() {
-	return &gctx;
-}
-
-tlscontext *sqlrprotocol_sqlrclient::getTLSContext() {
-	return &tctx;
 }
 
 extern "C" {

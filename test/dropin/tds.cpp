@@ -425,7 +425,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(ct_send(cmd),CS_SUCCEED);
 	stdoutput.printf("\n");
 
-
 	stdoutput.printf("ct_results:\n");
 	results=ct_results(cmd,&resultstype);
 	checkSuccess(results,CS_SUCCEED);

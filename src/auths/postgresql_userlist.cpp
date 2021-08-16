@@ -5,6 +5,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/bytebuffer.h>
 #include <rudiments/md5.h>
+#include <rudiments/sensitivevalue.h>
 
 class SQLRSERVER_DLLSPEC sqlrauth_postgresql_userlist : public sqlrauth {
 	public:
@@ -24,6 +25,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_postgresql_userlist : public sqlrauth {
 		const char	**passwords;
 		const char	**passwordencryptions;
 		uint64_t	usercount;
+
+		sensitivevalue	passwordvalue;
 
 		bool	debug;
 };
@@ -52,11 +55,15 @@ sqlrauth_postgresql_userlist::sqlrauth_postgresql_userlist(
 	passwords=new const char *[usercount];
 	passwordencryptions=new const char *[usercount];
 
+	passwordvalue.setPath(cont->getConfig()->getPasswordPath());
+
 	domnode *user=parameters->getFirstTagChild("user");
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
-		passwords[i]=user->getAttributeValue("password");
+		// FIXME: options?
+		passwordvalue.parse(user->getAttributeValue("password"));
+		passwords[i]=passwordvalue.detachTextValue();
 
 		// support modern "passwordencryptionid" and fall back to
 		// older "passwordencryption" attribute
@@ -212,14 +219,14 @@ bool sqlrauth_postgresql_userlist::compare(const char *suppliedresponse,
 		md1.append((unsigned char *)user,
 				charstring::length(user));
 		char	*md1str=charstring::hexEncode(md1.getHash(),
-							md1.getHashLength());
+							md1.getHashSize());
 
 		// md5(concat(...above...,salt))
 		md5	md2;
 		md2.append((unsigned char *)md1str,charstring::length(md1str));
 		md2.append((unsigned char *)&salt,sizeof(salt));
 		char	*md2str=charstring::hexEncode(md2.getHash(),
-							md2.getHashLength());
+							md2.getHashSize());
 		
 		// concat('md5',...above...)
 		stringbuffer	result;

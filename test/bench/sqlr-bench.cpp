@@ -462,12 +462,12 @@ void graphStats(const char *graph, const char *db,
 			permissions::evalPermString("rw-r--r--"));
 
 	uint32_t	count=0;
-	for (linkedlistnode< float > *node=stats->getKeys()->getFirst();
+	for (listnode< float > *node=stats->getKeys()->getFirst();
 						node; node=node->getNext()) {
 		f.printf("%f",node->getValue());
 		linkedlist< float >	*l=stats->getValue(node->getValue());
 		count=l->getLength();
-		for (linkedlistnode< float > *lnode=l->getFirst();
+		for (listnode< float > *lnode=l->getFirst();
 						lnode; lnode=lnode->getNext()) {
 			f.printf(",%f",lnode->getValue());
 		}

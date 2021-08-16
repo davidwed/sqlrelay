@@ -42,7 +42,7 @@ dnf -y install gcc-c++ make perl-devel php-devel php-pdo \
 python-devel ruby-devel ruby-libs ruby tcl-devel java-1.8.0-openjdk-devel \
 erlang nodejs-devel node-gyp mono-devel mono-data-oracle mariadb-devel \
 postgresql-devel firebird-devel firebird-libfbclient sqlite-devel \
-unixODBC-devel freetds-devel mdbtools-devel mdbtools-libs
+unixODBC-devel freetds-devel
 }}}
 }}}
 
@@ -132,7 +132,7 @@ zypper install gcc-c++ make perl php5-devel php5-pdo \
 python-devel ruby-devel ruby2.1 tcl-devel java-1.8.0-openjdk-devel erlang \
 nodejs-devel node-gyp mono-devel mono-data-oracle libmyqlclient-devel \
 postgresql93-devel firebird-devel libsqlite3-devel unixODBC-devel \
-freetds-devel mdbtools-devel
+freetds-devel
 }}}
 }}}
 
@@ -178,7 +178,7 @@ To install the rest of the prerequisites at once, execute the following command,
 apt-get install g++ make perl php5-dev python-dev ruby-dev \
 tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel \
 libmariadbclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev \
-unixodbc-dev freetds-dev mdbtools-dev
+unixodbc-dev freetds-dev
 }}}
 }}}
 
@@ -222,7 +222,7 @@ To install the rest of the prerequisites at once, execute the following command,
 apt-get install g++ make perl php5-dev python-dev ruby-dev \
 tcl-dev openjdk-7-jdk erlang-dev nodejs-dev node-gyp mono-devel \
 libmysqlclient-dev libpq-dev firebird-dev libfbclient2 libsqlite3-dev \
-unixodbc-dev freetds-dev mdbtools-dev
+unixodbc-dev freetds-dev
 }}}
 }}}
 
@@ -269,7 +269,7 @@ To install the rest of the prerequisites at once, execute the following command,
 {{{
 pkg install clang gmake perl php55 php55-pdo python ruby tcl86 \
 openjdk8 erlang node npm pkgconf mono mysql56-client postgresql92-client \
-firebird25-client sqlite3 unixODBC freetds mdbtools
+firebird25-client sqlite3 unixODBC freetds
 npm install node-gyp
 }}}
 }}}
@@ -305,7 +305,7 @@ To install the rest of the prerequisites at once, execute the following command,
 {{{
 pkgin install g++ gmake perl php55 php55-pdo python27 ruby tcl \
 openjdk7 erlang nodejs pkg-config mono mysql-client postgresql92-client \
-sqlite3 unixodbc freetds mdbtools
+sqlite3 unixodbc freetds
 }}}
 }}}
 
@@ -345,7 +345,7 @@ installpath = ftp://ftp.usa.openbsd.org/pub/OpenBSD/5.8/packages/amd64/
 {{{#!blockquote
 {{{
 pkg_add -r g++ gmake perl php python ruby tcl erlang node mono \
-mariadb-client postgresql-client iodbc freetds mdbtools
+mariadb-client postgresql-client iodbc freetds
 }}}
 }}}
 
@@ -369,7 +369,7 @@ To install the rest of the prerequisites at once, execute the following command,
 {{{#!blockquote
 {{{
 pkgin install clang binutils gmake perl python27 tcl mysql \
-postgresql84 iodbc freetds mdbtools
+postgresql84 iodbc freetds
 }}}
 }}}
 

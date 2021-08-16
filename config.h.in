@@ -36,27 +36,6 @@
 /* Define to 1 if you have the `z' library (-lz). */
 #undef HAVE_LIBZ
 
-/* Some versions of mdbtools have mdb_close() */
-#undef HAVE_MDB_CLOSE
-
-/* Some versions of mdbtools have 5 param mdb_col_to_string */
-#undef HAVE_MDB_COL_TO_STRING_5_PARAM
-
-/* Some versions of mdbtools have mdb_open() with 2 parameters */
-#undef HAVE_MDB_OPEN_2_PARAM
-
-/* Some versions of mdbtools have mdb_remove_backends() */
-#undef HAVE_MDB_REMOVE_BACKENDS
-
-/* Some versions of mdbtools define mdb_run_query */
-#undef HAVE_MDB_RUN_QUERY
-
-/* Some versions of mdbtools define mdb_sql_fetch_row */
-#undef HAVE_MDB_SQL_FETCH_ROW
-
-/* Some versions of mdbtools define mdb_sql_run_query */
-#undef HAVE_MDB_SQL_RUN_QUERY
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -222,6 +201,9 @@
 /* Some versions of postgresql have PQsetSingleRowMode */
 #undef HAVE_POSTGRESQL_PQSETSINGLEROWMODE
 
+/* Some versions of Ruby have ruby/thread.h */
+#undef HAVE_RUBY_THREAD_H
+
 /* Some systems have SQLConnectW */
 #undef HAVE_SQLCONNECTW
 
@@ -320,6 +302,9 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
+
+/* PHP major version */
+#undef PHPMAJORVERSION
 
 /* Some systems use SQLLEN * in SQLBindCol */
 #undef SQLBINDCOL_SQLLEN

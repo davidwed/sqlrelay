@@ -14,7 +14,6 @@
   * [#db-postgresql PostgreSQL]
   * [#db-firebird Firebird]
   * [#db-sqlite SQLite]
-  * [#db-msaccess Microsoft Access]
   * [#db-odbc-teradata Teradata (via ODBC)]
   * [#db-odbc-exasol Exasol (via ODBC)]
   * [#db-odbc-hive Apache Hive (via ODBC)]
@@ -31,25 +30,33 @@
  * [#listener Listener Configuration]
  * [#instances Multiple Instances]
  * [#autostart Starting Instances Automatically]
-* [#authoptions Authentication/Authorization Options]
- * [#userlistauth User List Auth]
- * [#dbauth Database Auth]
- * [#proxiedauth Proxied Auth]
- * [#krb Kerberos and Active Directory Encryption and Authentication]
- * [#tls TLS/SSL Encryption and Authentication]
 * [#protocoloptions Client Protocol Options]
  * [#sqlrclientprotocol SQLRClient Protocol]
+  * [#sqlrclientconfiguration Basic Configuration]
+  * [#sqlrclientlistener Listener Options]
+  * [#sqlrclientauth Authentication/Authorization/Encryption Options]
+   * [#sqlrclientuserlistauth User List Auth]
+   * [#sqlrclientdbauth Database Auth]
+   * [#sqlrclientproxiedauth Proxied Auth]
+   * [#sqlrclientkrb Kerberos and Active Directory Encryption and Authentication]
+   * [#sqlrclienttls TLS/SSL Encryption and Authentication]
+  * [#sqlrclientlimitations Limitations]
  * [#mysqlprotocol MySQL Protocol]
   * [#mysqlconfiguration Basic Configuration]
   * [#mysqllistener Listener Options]
-  * [#mysqlauth Authentication/Authorization Options]
+  * [#mysqlauth Authentication/Authorization/Encryption Options]
+   * [#mysqluserlistauth User List Auth]
+   * [#mysqldbauth Database Auth]
+   * [#mysqltls TLS/SSL Encryption and Authentication]
   * [#mysqlforeignbackend Foreign Backend]
   * [#mysqlspecialpurpose Special-Purpose Options]
   * [#mysqllimitations Limitations]
  * [#postgresqlprotocol PostgreSQL Protocol]
   * [#postgresqlconfiguration Basic Configuration]
   * [#postgresqllistener Listener Options]
-  * [#postgresqlauth Authentication/Authorization Options]
+  * [#postgresqlauth Authentication/Authorization/Encryption Options]
+   * [#postgresqluserlistauth User List Auth]
+   * [#postgresqltls TLS/SSL Encryption and Authentication]
   * [#postgresqlforeignbackend Foreign Backend]
   * [#postgresqllimitations Limitations]
 * [#ha High Availability]
@@ -560,28 +567,6 @@ See the [configreference.html#sqlite SQL Relay Configuration Reference] for othe
 See [http://software.firstworks.com/p/getting-started-with-sqlite.html Getting Started With SQLite] for general assistance installing and configuring a SQLite database.
 
 
-[[br]][=#db-msaccess]
-=== Microsoft Access ===
-
-On Windows platforms, ODBC can be used to access a Microsoft Access database.
-
-On Linux and Unix platforms, limited read-only access to Microsoft Access databases is available via [http://mdbtools.sourceforge.net MDBTools].
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-msaccess.conf@
-}}}
-}}}
-
-The db option indicates that SQL Relay should connect to the database /var/mdbtools/exampledb.mdb.
-
-(Note that the database file must be readable by the user that the instance of SQL Relay runs as.)
-
-See the [configreference.html#mdbtools SQL Relay Configuration Reference] for other valid MDBTools connect string options.
-
-See [http://software.firstworks.com/p/getting-started-with-access-on-non-ms.html Getting Started With MS Access (on a non-MS platform)] for general assistance with MS Access databases on non-MS platforms.
-
-
 [[br]][=#db-odbc-teradata]
 === Teradata (via ODBC) ===
 
@@ -1036,6 +1021,8 @@ It can also be configured to listen on a unix socket...
 }}}
 }}}
 
+(Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)
+
 ...and accessed from the local server using:
 
 {{{#!blockquote
@@ -1159,13 +1146,116 @@ sqlrelay_flags=""
 
 ----
 
-[[br]][=#authoptions]
-= Authentication/Authorization Options =
+[[br]][=#protocoloptions]
+= Client Protocol Options =
+
+Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using //SQLRClient//, the native SQL Relay client-server protocol.
+
+[[Image(../images/sqlrelaynativeprotocol.png,nolink)]]
+
+However, SQL Relay also supports the !MySQL and !PostgreSQL client-server protocols.  When SQL Relay is configured to use one of these, it allows !MySQL/MariaDB and !PostgreSQL apps to communicate directly with SQL Relay without modification, without having to install any software on the client.
+
+[[Image(../images/sqlrelaymysqlprotocol.png,nolink)]]
+
+[[Image(../images/sqlrelaypostgresqlprotocol.png,nolink)]]
+
+In these configurations, SQL Relay becomes a transparent proxy.  !MySQL/MariaDB or !PostgreSQL apps aimed at SQL Relay still think that they're talking to a !MySQL/MariaDB or !PostgreSQL database, but in fact, are talking to SQL Relay.
+
+[[br]][=#sqlrclientprotocol]
+== SQLRClient Protocol ==
+
+SQLRClient is the native SQL Relay protocol, enabled by default.  The example configurations above and throughout most of the rest of the guide configure SQL Relay to speak this protocol.
+
+If an instance speaks the SQLRClient client-server protocol, and supports the native SQL Relay authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQL Relay format.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+
+[=#sqlrclientconfiguration]
+=== Basic Configuration ===
+
+SQLRClient is the native SQL Relay protocol, no special tags or attributes are required to enable it.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-minimal.conf@
+}}}
+}}}
+
+In this configuration:
+
+* The connection tag instructs the instance to log in to the //orcl// database as user //scott// with password //tiger//.
+* By default, SQL Relay loads the //sqlrclient// protocol module, and listens on port 9000.
+* The users tag instructs SQL Relay to load the //userlist// auth module.
+* The user tag defines the user //sqlruser// with password //sqlrpassword//.
+
+The instance can be started using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-start -id example
+}}}
+}}}
+
+and accessed from the local machine using:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host localhost -user sqlruser -password sqlrpassword
+}}}
+}}}
+
+It can also be accessed from the mysql command line program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.
+
+The instance can be stopped using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-stop -id example
+}}}
+}}}
+
+Since this instance speaks the SQLRClient client-server protocol, and supports the native SQLRClient authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQLRClient format.  This means that software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+
+[=#sqlrclientlistener]
+=== Listener Options ===
+
+By default, SQL Relay listens on port 9000.
+
+However, it can be configured to listen on a different port.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-port.conf@
+}}}
+}}}
+
+If the server has multiple network interfaces, SQL Relay can also be configured to listen on specific IP addresses.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-addresses.conf@
+}}}
+}}}
+
+In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+
+It can also be configured to listen on a unix socket by adding a socket attribute to the instance tag.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-socket.conf@
+}}}
+}}}
+
+(Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)
+
+If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
+
+[=#sqlrclientauth]
+=== Authentication/Authorization/Encryption Options ===
 
 There are several options for controlling which users are allowed to access an instance of SQL Relay.
 
-[[br]][=#userlistauth]
-== User List Auth ==
+[=#sqlrclientuserlistauth]
+=== User List Auth ===
 
 The standard authentication/authorization option is //user list// auth.
 
@@ -1179,8 +1269,8 @@ To enable user list auth, you must provide a list of valid user/password combina
 }}}
 }}}
 
-[[br]][=#dbauth]
-== Database Auth ==
+[=#sqlrclientdbauth]
+=== Database Auth ===
 
 Another popular authentication/authorization option is //database// auth.
 
@@ -1200,8 +1290,8 @@ To enable database auth, omit the list of user/passwords and configure authtier=
 ( '''NOTE:''' Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.)
 }}}
 
-[[br]][=#proxiedauth]
-== Proxied Auth ==
+[=#sqlrclientproxiedauth]
+=== Proxied Auth ===
 
 Another authentication/authorization option is //proxied// auth.
 
@@ -1221,8 +1311,8 @@ To enable proxied auth, omit the list of user/passwords and configure authtier="
 ( '''NOTE:''' Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.)
 }}}
 
-[[br]][=#krb]
-== Kerberos and Active Directory Encryption and Authentication ==
+[=#sqlrclientkrb]
+=== Kerberos and Active Directory Encryption and Authentication ===
 
 SQL Relay supports Kerberos encryption and authentication between the SQL Relay client and SQL Relay Server.
 
@@ -1300,11 +1390,10 @@ While Kerberos authenticated and encrypted sessions are substantially more secur
 * Kerberos imposes a limit on the amount of data that can be sent or received at once, so more round trips may be required when processing queries.
 * Without dedicated encryption hardware and a Kerberos implementation that supports it, the computation involved in encrypting and decrypting data can also introduce delays.
 
-Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.
+Any kind of full session encryption should be used with caution in performance-sensitive applications.
 
-
-[[br]][=#tls]
-== TLS/SSL Encryption and Authentication ==
+[=#sqlrclienttls]
+=== TLS/SSL Encryption and Authentication ===
 
 SQL Relay supports TLS/SSL encryption and authentication between the SQL Relay client and SQL Relay Server.
 
@@ -1313,12 +1402,12 @@ When TLS/SSL encryption and authentication is used:
 * All communications between the SQL Relay client and SQL Relay server are encrypted.
 * SQL Relay clients and servers may optionally validate each other's certificates and identities.
 
-When using TLS/SSL encryption and authentication, at minimum, a certificate must be supplied to the SQL Relay server.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.
+When using TLS/SSL encryption and authentication, at minimum, the SQL Relay server must be configured to load a certificate.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.
 
 
 === Encryption Only ===
 
-The following configuration enables TLS/SSL encryption for an instance of SQL relay:
+The following configuration enables TLS/SSL encryption for an instance of SQL Relay:
 
 {{{#!blockquote
 {{{#!code
@@ -1353,7 +1442,6 @@ sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate 
 
 This establishes a TLS/SSL-encrypted session but does not validate the server's certificate or identity.  The session will only continue if the server's certificate is is well-formed and hasn't expired, '''but the client is still vulnerable to various attacks'''.
 
-[[br]]
 === Certificate Validation ===
 
 For a more secure session, the client may validate that the server's certificate was signed by a trusted certificate authority, known to the system, as follows:
@@ -1376,7 +1464,6 @@ sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate 
 
 This establishes a TLS/SSL-encrypted session with the server and validates the server's certificate, but does not validate the server's identity.  The session will only continue if the server's certificate is valid, '''but the client is still vulnerable to various attacks'''.
 
-[[br]]
 === Host Name Validation ===
 
 For a more secure session, the client may validate that the host name provided by the server's certificate matches the host name that the client meant to connect to, as follows:
@@ -1391,7 +1478,6 @@ sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tl
 
 Note that the fully qualified host name was provided.  Note also the use of the ca+host value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the host name will also be validated.  If the certificate contains Subject Alternative Names, then the host name will be compared to each of them.  If no Subject Alternative Names are provided then the host name will be compared to the certificate's Common Name.  The session will only continue if the sever's certificate and identity are both valid.
 
-[[br]]
 === Domain Name Validation ===
 
 Unless self-signed, certificates can be expensive, so certificates are often shared by multiple servers across a domain.  To manage environments like this, the host name validation can be relaxed as follows, to just domain name validation:
@@ -1406,12 +1492,11 @@ sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tl
 
 Note that the fully qualified host name was provided.  Note also the use of the ca+domain value for the tlsvalidate parameter.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the domain name portion of the host name will also be validated.  If the certificate contains Subject Alternative Names, then the domain name portion of the host name will be compared to the domain name portion of each of them.  If no Subject Alternative Names are provided then the domain name portion of the host name will be compared to the domain name portion of the certificate's Common Name.  The session will only continue if the sever's certificate and domain identity are both valid.
 
-[[br]]
 === Mutual Authentication ===
 
 For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.
 
-The following configuration enables these checks for an instance of SQL relay:
+The following configuration enables these checks for an instance of SQL Relay:
 
 {{{#!blockquote
 {{{#!code
@@ -1452,7 +1537,6 @@ sqlrsh -host sqlrserver.firstworks.com -tls -tlscert /usr/local/firstworks/etc/s
 
 In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.
 
-[[br]]
 === Performance Considerations ===
 
 While TLS/SSL authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:
@@ -1461,34 +1545,12 @@ While TLS/SSL authenticated and encrypted sessions are substantially more secure
 * Some TLS/SSL implementations impose a limit on the amount of data that can be sent or received at once, so more round trips may be required when processing queries.
 * Without dedicated encryption hardware and a TLS/SSL implementation that supports it, the computation involved in encrypting and decrypting data can also introduce delays.
 
-Any kind of full SQL Relay session encryption should be used with caution in performance-sensitive applications.
-
-----
-
-[[br]][=#protocoloptions]
-= Client Protocol Options =
-
-Whether written using the native SQL Relay API, or a connector of some sort, SQL Relay apps generally communicate with SQL Relay using //SQLRClient//, the native SQL Relay client-server protocol.
-
-[[Image(../images/sqlrelaynativeprotocol.png,nolink)]]
-
-However, SQL Relay also supports the !MySQL and !PostgreSQL client-server protocols.  When SQL Relay is configured to use one of these, it allows !MySQL and !PostgreSQL apps to communicate directly with SQL Relay without modification, without having to install any software on the client.
-
-[[Image(../images/sqlrelaymysqlprotocol.png,nolink)]]
-
-[[Image(../images/sqlrelaypostgresqlprotocol.png,nolink)]]
-
-In these configurations, SQL Relay becomes a transparent proxy.  !MySQL or !PostgreSQL apps aimed at SQL Relay still think that they're talking to a !MySQL or !PostgreSQL database, but in fact, are talking to SQL Relay.
-
-[[br]][=#sqlrclientprotocol]
-== SQLRClient Protocol ==
-
-SQLRClient is the native SQL Relay protocol, enabled by default.  The example configurations above and throughout most of the rest of the guide configure SQL Relay to speak this protocol.
-
-If an instance speaks the SQLRClient client-server protocol, and supports the native SQL Relay authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQL Relay format.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+Any kind of full session encryption should be used with caution in performance-sensitive applications.
 
 [[br]][=#mysqlprotocol]
 == !MySQL Protocol ==
+
+SQL Relay can be configured to speak the native !MySQL protocol, enabling client programs for !MySQL/MariaDB (eg. the mysql command line program and !MySQL Workbench) to access SQL Relay directly.
 
 [=#mysqlconfiguration]
 === Basic Configuration ===
@@ -1526,7 +1588,7 @@ mysql --host=127.0.0.1 --port=3307 --user=sqlruser --password=sqlrpassword
 
 ( '''NOTE:''' 127.0.0.1 is used instead of "localhost" because "localhost" instructs the mysql client to use a predefined unix socket.)
 
-It can also be accessed from a mysql client program running on a remote machine by replacing 127.0.0.1 with the hostname of the machine running SQL Relay.
+It can also be accessed from the mysql command line program running on a remote machine by replacing 127.0.0.1 with the hostname of the machine running SQL Relay.
 
 The instance can be stopped using:
 
@@ -1536,12 +1598,12 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the !MySQL client-server protocol, and supports the native !MySQL authorization/authentication procedure, any client that wishes to use it must also speak the !MySQL client-server protocol and present credentials in the native !MySQL format.  This means that most software written using the !MySQL native API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.
+Since this instance speaks the !MySQL client-server protocol, and supports the native !MySQL authorization/authentication procedure, any client that wishes to use it must also speak the !MySQL client-server protocol and present credentials in the native !MySQL format.  This means that most software written using the !MySQL native API, or written using a database abstraction layer which loads a driver for !MySQL/MariaDB can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.
 
 [=#mysqllistener]
 === Listener Options ===
 
-In the example above, the instance is configured to listen on port 3307.  The !MySQL database typically listens on port 3306, so port 3307 was chosen to avoid collisions with the database itself.
+In the example above, the instance is configured to listen on port 3307.  The !MySQL/MariaDB database typically listens on port 3306, so port 3307 was chosen to avoid collisions with the database itself.
 
 However, if SQL Relay is run on a different server than the database, then it can be configured to run on port 3306.  This is desirable when using SQL Relay as a transparent proxy.
 
@@ -1571,9 +1633,12 @@ It can also be configured to listen on a unix socket by adding a //socket// attr
 
 (Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)
 
-[=#mysqlauth]
-=== Authentication/Authorization Options ===
+If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
 
+[=#mysqlauth]
+=== Authentication/Authorization/Encryption Options ===
+
+[=#mysqluserlistauth]
 === User List Auth ===
 
 In the examples above, the instance is configured to load the //mysql_userlist// auth module and defines a user //sqlruser// with password //sqlrpassword//.
@@ -1588,6 +1653,7 @@ In this configuration, a client must present //sqlruser/sqlrpassword// credentia
 
 When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.
 
+[=#mysqldbauth]
 === Database Auth ===
 
 If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the //mysql_database// module can be used to auth users directly against the database.
@@ -1625,9 +1691,9 @@ A subsequent connection using //anotheruser/anotherpassword// won't require a re
 Though this module is convenient, it has two disadvantages.
 
 * Logging in and out of the database over and over partially defeats SQL Relay's persistent connection pooling.
-* The mysql_database module requires that the !MySQL client send it an unencrypted password.
+* The mysql_database module requires that the !MySQL/MariaDB client send it an unencrypted password.
 
-The second disadvantage may or may not be a problem, depending on how secure communications on your network need to be.  However, it may require reconfiguration (or modification) of your app to use the mysql_clear_password auth plugin.  For example, to send an unencrypted password from the mysql command line client:
+The second disadvantage may or may not be a problem, depending on how secure communications on your network need to be.  However, it may require reconfiguration (or modification) of your app to use the mysql_clear_password auth plugin.  For example, to send an unencrypted password from the mysql command line program:
 
 {{{#!blockquote
 {{{#!code
@@ -1637,10 +1703,138 @@ mysql --host=127.0.0.1 --port=3307 --user=anotheruser --password=anotherpassword
 
 Another issue is that some !MySQL and !MariaDB distributions omit the necessary mysql_clear_password module.  For example, the distributions available in the default !CentOS 6 and 7 repositories omit the module.  On these platforms, an alternative distribution of !MySQL/MariaDB would have to be installed or built from source.
 
+[=#mysqltls]
+=== TLS/SSL Encryption and Authentication ===
+
+SQL Relay supports TLS/SSL encryption and authentication between the !MySQL/MariaDB client and SQL Relay Server.
+
+When TLS/SSL encryption and authentication is used:
+
+* All communications between the !MySQL/MariaDB client and SQL Relay server are encrypted.
+* !MySQL/MariaDB clients and servers may optionally validate each other's certificates and identities.
+
+When using TLS/SSL encryption and authentication, at minimum, the SQL Relay server must be configured to load a certificate.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.
+
+
+=== Encryption Only ===
+
+The following configuration enables TLS/SSL encryption for an instance of SQL Relay:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqltls.conf@
+}}}
+}}}
+
+* The '''tls''' attribute enables (or disables) TLS/SSL encryption.
+* The '''tlscert''' attribute specifies the TLS/SSL certificate chain to use.
+ * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlscert.html The tlscert Parameter] for details.)
+* User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
+
+To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:
+
+{{{#!blockquote
+{{{
+sqlr-start -id example
+}}}
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+}}}
+
+The instance may be accessed as follows:
+
+{{{#!blockquote
+{{{
+mysql --host=sqlrserver --user=sqlruser --password=sqlrpassword --ssl
+}}}
+}}}
+
+(The "--ssl" option enables SSL/TLS encryption.  As !MySQL predates TLS, and originally used SSL, it's various SSL/TLS-related options all still begin with "--ssl".)
+
+This establishes a TLS/SSL-encrypted session but does not validate the server's certificate or identity.  The session will only continue if the server's certificate is is well-formed and hasn't expired, '''but the client is still vulnerable to various attacks'''.
+
+=== Certificate Validation ===
+
+For a more secure session, the client may validate that the server's certificate was signed by a trusted certificate authority, known to the system, as follows:
+
+{{{#!blockquote
+{{{
+mysql --host=sqlrserver --user=sqlruser --password=sqlrpassword --ssl-verify-server-cert
+}}}
+}}}
+
+(The --ssl option is not necessary in this invocation, as the --ssl-verify-server-cert option implies it.)
+
+If the server's certificate is self-signed, then the certificate authority won't be known to the system, but it's certificate may be specified by the tlsca parameter as follows:
+
+{{{#!blockquote
+{{{
+mysql --host=sqlrserver --user=sqlruser --password=sqlrpassword --ssl-verify-server-cert --ssl-ca=/usr/local/firstworks/etc/myca.pem
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See [tlsca.html The tlsca Parameter] for details.)
+
+This establishes a TLS/SSL-encrypted session with the server and validates the server's certificate, but does not validate the server's identity.  The session will only continue if the server's certificate is valid, '''but the client is still vulnerable to various attacks'''.
+
+Unfortunately, !MySQL/MariaDB doesn't currently support host or domain name validation, so at present, the server's certificate can be validated, but the server's identity cannot.
+
+=== Mutual Authentication ===
+
+For an even more secure session, the server may also request a certificate from the client and validate the certificate.
+
+The following configuration enables these checks for an instance of SQL Relay:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqltls-validate.conf@
+}}}
+}}}
+
+* The '''tlsvalidate''' attribute enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca attribute.
+* The '''tlsca''' attribute specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
+ * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlsca.html The tlsca Parameter] for details.)
+
+To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:
+
+{{{#!blockquote
+{{{
+mysql --host=sqlrserver --user=sqlruser --password=sqlrpassword --ssl-cert=/usr/local/firstworks/etc/sqlrclient.pem
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See [tlscert.html The tlscert Parameter] for details.)
+
+In a more likely use case though, mutual authentication occurs - the client validates the server's certificate and the server validates the client's certificate, as follows:
+
+{{{#!blockquote
+{{{
+mysql --host=sqlrserver --user=sqlruser --password=sqlrpassword --ssl-cert=/usr/local/firstworks/etc/sqlrclient.pem --ssl-verify-server-cert --ssl-ca=/usr/local/firstworks/etc/myca.pem
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See [tlscert.html The tlscert Parameter] and [tlsca.html The tlsca Parameter] for details.)
+
+In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.
+
+SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a !MySQL/MariaDB username.  As such, a username and password must still be supplied for authentication/authorization in this configuration.
+
+=== Performance Considerations ===
+
+While TLS/SSL authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:
+
+* When establishing the secure session, a significant amount of data must be sent back and forth between the client and server over multiple network round-trips.
+* Some TLS/SSL implementations impose a limit on the amount of data that can be sent or received at once, so more round trips may be required when processing queries.
+* Without dedicated encryption hardware and a TLS/SSL implementation that supports it, the computation involved in encrypting and decrypting data can also introduce delays.
+
+Any kind of full session encryption should be used with caution in performance-sensitive applications.
+
 [=#mysqlforeignbackend]
 === Foreign Backend ===
 
-Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the !MySQL database it was originally written to use.
+Since SQL Relay supports a variety of database backends, the app can also be redirected to any of these databases, instead of the !MySQL/MariaDB database it was originally written to use.
 
 This is as simple as specifying a different database using the //dbase// attribute in the instance tag and specifying the appropriate database connection string in the //string// attribute of the connection tag.
 
@@ -1650,7 +1844,7 @@ This is as simple as specifying a different database using the //dbase// attribu
 }}}
 }}}
 
-In this example, a !MySQL frontend provides !MySQL applications access to an Oracle backend database.
+In this example, a !MySQL frontend provides !MySQL/MariaDB applications access to an Oracle backend database.
 
 When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
 
@@ -1663,7 +1857,7 @@ When targeting a foreign backend...
 
 Some backend databases, like Oracle, don't have integer types.  An integer type is really just a DECIMAL with a scale of 0.
 
-By default, the !MySQL Front-End Modules map zero-scale DECIMAL types to the !MySQL DECIMAL type.  Buy you might want to map them to the !MySQL BIGINT type instead.
+By default, the !MySQL frontend module maps zero-scale DECIMAL types to the !MySQL DECIMAL type.  Buy you might want to map them to the !MySQL BIGINT type instead.
 
 The //zeroscaledecimaltobigint// option instructs the module to do this mapping.
 
@@ -1679,7 +1873,7 @@ When targeting a foreign backend...
 
 Some backend databases, like Oracle, don't have separate DATE and DATETIME types.  Instead, they just have a DATE type, which can store date and time parts, and which parts are returned depend on a parameter like NLS_DATE_FORMAT.
 
-By default, the !MySQL Front-End Modules map the DATE type to the !MySQL DATE type.  But, if you are using DATE type fields to store date/times and have the database configured to return date and time parts, then you might want the DATE type mapped to the !MySQL DATETIME type.
+By default, the !MySQL frontend module maps the DATE type to the !MySQL DATE type.  But, if you are using DATE type fields to store date/times and have the database configured to return date and time parts, then you might want the DATE type mapped to the !MySQL DATETIME type.
 
 The //datetodatetime// option instructs the module to do this mapping.
 
@@ -1708,7 +1902,6 @@ The //oldmariadbjdbcservercapabilitieshack// option instructs the module to retu
 
 The implementation of the !MySQL protocol is likely sufficient for most applications, but it isn't 100% complete.  Some notable limitations follow:
 
-* SSL/TLS authentication and encryption are currently not supported.
 * Only LATIN1_SWEDISH_CI and UTF8_GENERAL_CI character sets are supported.
 * Only the mysql_native_password and mysql_clear_password auth methods are supported.  Notably, mysql_old_password and authentication_windows_client are not supported.
 * Multi-statement queries are not supported.
@@ -1716,17 +1909,20 @@ The implementation of the !MySQL protocol is likely sufficient for most applicat
 * mysql_send_long_data() is not supported.
 * mysql_info() will always returns NULL when used with SQL Relay.
 * MYSQL_FIELD.org_name/org_name_length and MYSQL_FIELD.org_table/org_table_length are not supported.
+* Kerberos auth and encryption are not supported.
 
 Most of SQL Relay's core features are available when it is configured to speak the !MySQL protocol, but there are a few incompatible configurations:
 
 * Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any //addresses//, //port//, and //socket// attributes in the instance tag.
 * Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an //authtier// attribute in the instance tag.
-* As SSL/TLS authentication and encryption are currently not supported, and as !MySQL doesn't support Kerberos at all, you should not configure any attributes related to SSL/TLS or Kerberos in the instance tag.
+* As Kerberos auth and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
 
 Otherwise, all other tags and attributes are compatbile.
 
 [[br]][=#postgresqlprotocol]
 == !PostgreSQL Protocol ==
+
+SQL Relay can be configured to speak the native !PostgreSQL protocol, enabling client programs for !PostgreSQL (eg. the psql command line program) to access SQL Relay directly.
 
 [=#postgresqlconfiguration]
 === Basic Configuration ===
@@ -1758,11 +1954,11 @@ and accessed from the local machine using:
 
 {{{#!blockquote
 {{{#!code
-psql -h localhost -p 5433 -u sqlruser
+psql -h localhost -p 5433 -U sqlruser
 }}}
 }}}
 
-It can also be accessed from a psql client program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.
+It can also be accessed from the psql command line program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.
 
 The instance can be stopped using:
 
@@ -1777,7 +1973,7 @@ Since this instance speaks the !PostgreSQL client-server protocol, and supports 
 [=#postgresqllistener]
 === Listener Options ===
 
-In the example above, the instance is configured to listen on port 5433.  The !MySQL database typically listens on port 5432, so port 5433 was chosen to avoid collisions with the database itself.
+In the example above, the instance is configured to listen on port 5433.  The !MySQL/MariaDB database typically listens on port 5432, so port 5433 was chosen to avoid collisions with the database itself.
 
 However, if SQL Relay is run on a different server than the database, then it can be configured to run on port 5432.  This is desirable when using SQL Relay as a transparent proxy.
 
@@ -1807,9 +2003,12 @@ It can also be configured to listen on a unix socket by adding a //socket// attr
 
 (Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)
 
-[=#postgresqlauth]
-=== Authentication/Authorization Options ===
+If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
 
+[=#postgresqlauth]
+=== Authentication/Authorization/Encryption Options ===
+
+[=#postgresqluserlistauth]
 === User List Auth ===
 
 In the examples above, the instance is configured to load the //postgresql_userlist// auth module and defines a user //sqlruser// with password //sqlrpassword//.
@@ -1825,6 +2024,151 @@ In this configuration, a client must present //sqlruser/sqlrpassword// credentia
 When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.
 
 If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  Unfortunately there isn't currently a //postgresql_database// auth module that can be used to auth users directly against the database, so for now this is the only option.
+
+[=#postgresqltls]
+=== TLS/SSL Encryption and Authentication ===
+
+SQL Relay supports TLS/SSL encryption and authentication between the !MySQL/MariaDB client and SQL Relay Server.
+
+When TLS/SSL encryption and authentication is used:
+
+* All communications between the !MySQL/MariaDB client and SQL Relay server are encrypted.
+* !MySQL/MariaDB clients and servers may optionally validate each other's certificates and identities.
+
+When using TLS/SSL encryption and authentication, at minimum, the SQL Relay server must be configured to load a certificate.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.
+
+
+=== Encryption Only ===
+
+The following configuration enables TLS/SSL encryption for an instance of SQL Relay:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqltls.conf@
+}}}
+}}}
+
+* The '''tls''' attribute enables (or disables) TLS/SSL encryption.
+* The '''tlscert''' attribute specifies the TLS/SSL certificate chain to use.
+ * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlscert.html The tlscert Parameter] for details.)
+* User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
+
+To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:
+
+{{{#!blockquote
+{{{
+sqlr-start -id example
+}}}
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+}}}
+
+The instance may be accessed as follows:
+
+{{{#!blockquote
+{{{
+PGSSLMODE=require psql -h sqlrserver -U sqlruser
+}}}
+}}}
+
+This establishes a TLS/SSL-encrypted session but does not validate the server's certificate or identity.  The session will only continue if the server's certificate is is well-formed and hasn't expired, '''but the client is still vulnerable to various attacks'''.
+
+=== Certificate Validation ===
+
+For a more secure session, the client may validate that the server's certificate was signed by a trusted certificate authority, known to the system, as follows:
+
+{{{#!blockquote
+{{{
+PGSSLMODE=verify-ca psql -h sqlrserver -U sqlruser
+}}}
+}}}
+
+If the server's certificate is self-signed, then the certificate authority won't be known to the system, but it's certificate may be specified by the tlsca parameter as follows:
+
+{{{#!blockquote
+{{{
+PGSSLMODE=verify-ca PGSSLROOTCERT=/usr/local/firstworks/etc/myca.pem psql -h sqlrserver -U sqlruser
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See [tlsca.html The tlsca Parameter] for details.)
+
+This establishes a TLS/SSL-encrypted session with the server and validates the server's certificate, but does not validate the server's identity.  The session will only continue if the server's certificate is valid, '''but the client is still vulnerable to various attacks'''.
+
+=== Host Name Validation ===
+
+For a more secure session, the client may validate that the host name provided by the server's certificate matches the host name that the client meant to connect to, as follows:
+
+{{{#!blockquote
+{{{
+PGSSLMODE=verify-full PGSSLROOTCERT=/usr/local/firstworks/etc/myca.pem psql -h sqlrserver.firstworks.com -U sqlruser
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See [tlsca.html The tlsca Parameter] for details.)
+
+Note that the fully qualified host name was provided.  Note also the use of the verify-full value for the PGSSLMODE environment variable.  With these parameters, in addition to validating that the server's certificate was signed by a trusted certificate authority, the host name will also be validated.  If the certificate contains Subject Alternative Names, then the host name will be compared to each of them.  If no Subject Alternative Names are provided then the host name will be compared to the certificate's Common Name.  The session will only continue if the sever's certificate and identity are both valid.
+
+The !PostgreSQL client only appears to support fully qualified host name validation.  It does not appear possible to instruct the client to only validate the domain portion of the host name.
+
+=== Mutual Authentication ===
+
+For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.
+
+The following configuration enables these checks for an instance of SQL Relay:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqltls-validate.conf@
+}}}
+}}}
+
+* The '''tlsvalidate''' attribute enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca attribute.
+* The '''tlsca''' attribute specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
+ * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlsca.html The tlsca Parameter] for details.)
+* User list auth is also used.
+
+Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authorized against the list of valid names.
+
+Note also that when '''tlsvalidate''' is set to "yes", database and proxied auth cannot currently be used.  This is because database and proxied auth both require a user name and password but the client certificate doesn't provide either.
+
+To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:
+
+{{{#!blockquote
+{{{
+PGSSLMODE=verify-full PGSSLCERT=/usr/local/firstworks/etc/sqlrclient.pem PGSSLKEY=/usr/local/firstworks/etc/sqlrclient.pem psql -h sqlrserver.firstworks.com -U sqlruser
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See [tlscert.html The tlscert Parameter] for details.)
+
+Note that the PGSSLCERT and PGSSLKEY parameters specify the same file.  psql requires that the client certificate and private key both be specified.  If the certificate file contains the key then the same file may be specified in both environment variables.  If the certificate and key are contained in separate files, then each may be specified individually.
+
+In a more likely use case though, mutual authentication occurs - the client validates the server's certificate and the server validates the client's certificate, as follows:
+
+{{{#!blockquote
+{{{
+PGSSLMODE=verify-full PGSSLCERT=/usr/local/firstworks/etc/sqlrclient.pem PGSSLKEY=/usr/local/firstworks/etc/sqlrclient.pem PGSSLROOTCERT=/usr/local/firstworks/etc/myca.pem psql -h sqlrserver.firstworks.com -U sqlruser
+}}}
+}}}
+
+(.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See [tlscert.html The tlscert Parameter] and [tlsca.html The tlsca Parameter] for details.)
+
+In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.
+
+SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a !PostgreSQL username.  As such, a username and password must still be supplied for authentication/authorization in this configuration.
+
+=== Performance Considerations ===
+
+While TLS/SSL authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:
+
+* When establishing the secure session, a significant amount of data must be sent back and forth between the client and server over multiple network round-trips.
+* Some TLS/SSL implementations impose a limit on the amount of data that can be sent or received at once, so more round trips may be required when processing queries.
+* Without dedicated encryption hardware and a TLS/SSL implementation that supports it, the computation involved in encrypting and decrypting data can also introduce delays.
+
+Any kind of full session encryption should be used with caution in performance-sensitive applications.
 
 [=#postgresqlforeignbackend]
 === Foreign Backend ===
@@ -1848,8 +2192,7 @@ When targeting a foreign backend, some queries may have to be modified to use th
 
 The implementation of the !PostgreSQL protocol is likely sufficient for most applications, but it isn't 100% complete.  Some notable limitations follow:
 
-* SSL/TLS authentication and encryption are currently not supported.
-* Kerberos authentication and encryption are currently not supported.
+* Kerberos auth and encryption are not supported.
 * Multi-statement queries are not supported.
 
 Most of SQL Relay's core features are available when it is configured to speak the !PostgreSQL protocol, but there are a few incompatible configurations:
@@ -1857,7 +2200,7 @@ Most of SQL Relay's core features are available when it is configured to speak t
 * Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any //addresses//, //port//, and //socket// attributes in the instance tag.
 * Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an //authtier// attribute in the instance tag.
 * Database-auth (authenticating/authorizing users directly against the database) is not currently supported.
-* As SSL/TLS and Kerberos authentication and encryption are currently not supported, you should not configure any attributes related to SSL/TLS or Kerberos in the instance tag.
+* As Kerberos auth and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
 
 Otherwise, all other tags and attributes are compatbile.
 
@@ -2005,7 +2348,9 @@ SQL Relay offers several features to enhance security.
 [[br]][=#frontendencryption]
 == Front-End Encryption and Secure Authentication ==
 
-As mentioned in the [#authoptions Authentication/Authorization Options] section above, SQL Relay supports [#krb Kerberos and Active Directory Encryption and Authentication] and [#tls TLS/SSL Encryption and Authentication] between the SQL Relay client and SQL Relay server.
+When configured to use the SQLRClient front-end protocol (the default), SQL Relay supports [#sqlrclientkrb Kerberos and Active Directory Encryption and Authentication] and [#sqlrclienttls TLS/SSL Encryption and Authentication] between the SQL Relay client and SQL Relay server.
+
+When configured to use the !MySQL or !PostgreSQL front-end protocols, SQL Relay supports TLS/SSL encryption and authentication between the SQL Relay client and SQL Relay server.  See [#mysqltls MySQL TLS/SSL Encryption and Authentication] and [#postgresqltls PostgreSQL TLS/SSL Encryption and Authentication] for details.
 
 [[br]][=#backendencryption]
 == Back-End Encryption and Secure Authentication ==
