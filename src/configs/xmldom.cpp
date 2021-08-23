@@ -86,6 +86,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugResultSetRowTranslations();
 		bool		getDebugResultSetRowBlockTranslations();
 		bool		getDebugResultSetHeaderTranslations();
+		bool		getDebugErrorTranslations();
 		bool		getDebugProtocols();
 		bool		getDebugAuths();
 		bool		getDebugPasswordEncryptions();
@@ -132,6 +133,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		domnode	*getResultSetRowTranslations();
 		domnode	*getResultSetRowBlockTranslations();
 		domnode	*getResultSetHeaderTranslations();
+		domnode	*getErrorTranslations();
 		domnode	*getTriggers();
 		domnode	*getLoggers();
 		domnode	*getNotifications();
@@ -225,6 +227,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugresultsetrowtranslations;
 		bool		debugresultsetrowblocktranslations;
 		bool		debugresultsetheadertranslations;
+		bool		debugerrortranslations;
 		bool		debugprotocols;
 		bool		debugauths;
 		bool		debugpwdencs;
@@ -272,6 +275,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		domnode	*resultsetrowtranslationsxml;
 		domnode	*resultsetrowblocktranslationsxml;
 		domnode	*resultsetheadertranslationsxml;
+		domnode	*errortranslationsxml;
 		domnode	*triggersxml;
 		domnode	*loggersxml;
 		domnode	*notificationsxml;
@@ -374,6 +378,8 @@ void sqlrconfig_xmldom::init() {
 		hasDebug(debug,"resultsetrowblocktranslations");
 	debugresultsetheadertranslations=
 		hasDebug(debug,"resultsetheadertranslations");
+	debugerrortranslations=
+		hasDebug(debug,"errortranslations");
 	debugprotocols=hasDebug(debug,"protocols");
 	debugauths=hasDebug(debug,"auths");
 	debugpwdencs=hasDebug(debug,"passwordencrypytions");
@@ -652,6 +658,10 @@ bool sqlrconfig_xmldom::getDebugResultSetHeaderTranslations() {
 	return debugresultsetheadertranslations;
 }
 
+bool sqlrconfig_xmldom::getDebugErrorTranslations() {
+	return debugerrortranslations;
+}
+
 bool sqlrconfig_xmldom::getDebugProtocols() {
 	return debugprotocols;
 }
@@ -826,6 +836,10 @@ domnode *sqlrconfig_xmldom::getResultSetRowBlockTranslations() {
 
 domnode *sqlrconfig_xmldom::getResultSetHeaderTranslations() {
 	return resultsetheadertranslationsxml;
+}
+
+domnode *sqlrconfig_xmldom::getErrorTranslations() {
+	return errortranslationsxml;
 }
 
 domnode *sqlrconfig_xmldom::getTriggers() {
@@ -1835,6 +1849,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 			hasDebug(debug,"resultsetrowblocktranslations");
 		debugresultsetheadertranslations=
 			hasDebug(debug,"resultsetheadertranslations");
+		debugerrortranslations=
+			hasDebug(debug,"errortranslations");
 		debugprotocols=hasDebug(debug,"protocols");
 		debugauths=hasDebug(debug,"auths");
 		debugpwdencs=hasDebug(debug,"passwordencryptions");
@@ -1953,6 +1969,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 					"resultsetrowblocktranslations");
 	resultsetheadertranslationsxml=instance->getFirstTagChild(
 					"resultsetheadertranslations");
+	errortranslationsxml=instance->getFirstTagChild(
+					"errortranslations");
 	triggersxml=instance->getFirstTagChild("triggers");
 	loggersxml=instance->getFirstTagChild("loggers");
 	notificationsxml=instance->getFirstTagChild("notifications");

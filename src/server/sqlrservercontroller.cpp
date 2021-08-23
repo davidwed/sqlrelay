@@ -90,10 +90,11 @@ class sqlrservercontrollerprivate {
 	sqlrtranslations			*_sqlrt;
 	sqlrfilters				*_sqlrf;
 	sqlrbindvariabletranslations		*_sqlrbvt;
+	sqlrresultsetheadertranslations		*_sqlrrsht;
 	sqlrresultsettranslations		*_sqlrrst;
 	sqlrresultsetrowtranslations		*_sqlrrsrt;
 	sqlrresultsetrowblocktranslations	*_sqlrrsrbt;
-	sqlrresultsetheadertranslations		*_sqlrrsht;
+	sqlrerrortranslations			*_sqlret;
 	sqlrtriggers				*_sqlrtr;
 	sqlrloggers				*_sqlrlg;
 	sqlrnotifications			*_sqlrn;
@@ -167,6 +168,7 @@ class sqlrservercontrollerprivate {
 	bool		_debugsqlrresultsetrowtranslation;
 	bool		_debugsqlrresultsetrowblocktranslation;
 	bool		_debugsqlrresultsetheadertranslation;
+	bool		_debugsqlrerrortranslation;
 	bool		_debugsqlrmoduledata;
 
 	dynamiclib	_conndl;
@@ -388,10 +390,11 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_sqlrt=NULL;
 	pvt->_sqlrf=NULL;
 	pvt->_sqlrbvt=NULL;
+	pvt->_sqlrrsht=NULL;
 	pvt->_sqlrrst=NULL;
 	pvt->_sqlrrsrt=NULL;
 	pvt->_sqlrrsrbt=NULL;
-	pvt->_sqlrrsht=NULL;
+	pvt->_sqlret=NULL;
 	pvt->_sqlrtr=NULL;
 	pvt->_sqlrlg=NULL;
 	pvt->_sqlrn=NULL;
@@ -492,10 +495,11 @@ sqlrservercontroller::~sqlrservercontroller() {
 	delete pvt->_sqlrt;
 	delete pvt->_sqlrf;
 	delete pvt->_sqlrbvt;
+	delete pvt->_sqlrrsht;
 	delete pvt->_sqlrrst;
 	delete pvt->_sqlrrsrt;
 	delete pvt->_sqlrrsrbt;
-	delete pvt->_sqlrrsht;
+	delete pvt->_sqlret;
 	delete pvt->_sqlrtr;
 	delete pvt->_sqlrlg;
 	delete pvt->_sqlrn;
@@ -731,6 +735,16 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		pvt->_sqlrbvt->load(bindvariabletranslations);
 	}
 
+	// get the result set header translations
+	pvt->_debugsqlrresultsetheadertranslation=
+			pvt->_cfg->getDebugResultSetHeaderTranslations();
+	domnode	*resultsetheadertranslations=
+			pvt->_cfg->getResultSetHeaderTranslations();
+	if (!resultsetheadertranslations->isNullNode()) {
+		pvt->_sqlrrsht=new sqlrresultsetheadertranslations(this);
+		pvt->_sqlrrsht->load(resultsetheadertranslations);
+	}
+
 	// get the result set translations
 	pvt->_debugsqlrresultsettranslation=
 				pvt->_cfg->getDebugResultSetTranslations();
@@ -761,14 +775,14 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		pvt->_sqlrrsrbt->load(resultsetrowblocktranslations);
 	}
 
-	// get the result set header translations
-	pvt->_debugsqlrresultsetheadertranslation=
-			pvt->_cfg->getDebugResultSetHeaderTranslations();
-	domnode	*resultsetheadertranslations=
-			pvt->_cfg->getResultSetHeaderTranslations();
-	if (!resultsetheadertranslations->isNullNode()) {
-		pvt->_sqlrrsht=new sqlrresultsetheadertranslations(this);
-		pvt->_sqlrrsht->load(resultsetheadertranslations);
+	// get the error translations
+	pvt->_debugsqlrerrortranslation=
+			pvt->_cfg->getDebugErrorTranslations();
+	domnode	*errortranslations=
+			pvt->_cfg->getErrorTranslations();
+	if (!errortranslations->isNullNode()) {
+		pvt->_sqlret=new sqlrerrortranslations(this);
+		pvt->_sqlret->load(errortranslations);
 	}
 
 	// get the triggers
@@ -2400,6 +2414,11 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	// reset result set row block translation modules
 	if (pvt->_sqlrrsrbt) {
 		pvt->_sqlrrsrbt->endTransaction(commit);
+	}
+
+	// reset error translation modules
+	if (pvt->_sqlret) {
+		pvt->_sqlret->endTransaction(commit);
 	}
 
 	// reset trigger modules
@@ -6253,6 +6272,11 @@ void sqlrservercontroller::endSession() {
 	// reset result set row block translation modules
 	if (pvt->_sqlrrsrbt) {
 		pvt->_sqlrrsrbt->endSession();
+	}
+
+	// reset error translation modules
+	if (pvt->_sqlret) {
+		pvt->_sqlret->endSession();
 	}
 
 	// reset trigger modules
