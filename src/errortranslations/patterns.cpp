@@ -42,7 +42,8 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslation_patterns :
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					stringbuffer *translatederror);
+					const char **translatederror,
+					uint32_t *translatederrorlength);
 	private:
 		void	buildPatternsTree(domnode *root,
 						pattern_t **p,
@@ -63,6 +64,8 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslation_patterns :
 
 		pattern_t	*patterns;
 		uint32_t	patterncount;
+
+		stringbuffer	te;
 
 		bool	enabled;
 
@@ -187,21 +190,33 @@ bool sqlrerrortranslation_patterns::run(sqlrserverconnection *sqlrcon,
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					stringbuffer *translatederror) {
+					const char **translatederror,
+					uint32_t *translatederrorlength) {
 	debugFunction();
 
-	// FIXME: process errornumber
-
 	if (!enabled) {
-		translatederror->append(error);
+		*translatederrornumber=errornumber;
+		*translatederror=error;
+		*translatederrorlength=errorlength;
 		return true;
 	}
 
 	if (debug) {
+		stdoutput.printf("original error number:\n\"%ld\"\n\n",
+								errornumber);
 		stdoutput.printf("original error:\n\"%s\"\n\n",error);
 	}
 
-	applyPatterns(error,patterns,patterncount,translatederror);
+	te.clear();
+
+	applyPatterns(error,patterns,patterncount,&te);
+
+	// FIXME: translate errornumber
+	*translatederrornumber=errornumber;
+
+	*translatederror=te.getString();
+	*translatederrorlength=te.getStringLength();
+	
 
 	return true;
 }

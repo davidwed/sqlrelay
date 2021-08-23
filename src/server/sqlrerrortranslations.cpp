@@ -169,12 +169,12 @@ void sqlrerrortranslations::loadErrorTranslation(domnode *errortranslation) {
 
 bool sqlrerrortranslations::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrparser *sqlrp,
 					int64_t errornumber,
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					stringbuffer *translatederror) {
+					const char **translatederror,
+					uint32_t *translatederrorlength) {
 	debugFunction();
 
 	pvt->_error=NULL;
@@ -189,11 +189,12 @@ bool sqlrerrortranslations::run(sqlrserverconnection *sqlrcon,
 		}
 
 		if (!node->getValue()->etr->run(sqlrcon,sqlrcur,
-							errornumber,
-							error,
-							errorlength,
-							translatederrornumber,
-							translatederror)) {
+						errornumber,
+						error,
+						errorlength,
+						translatederrornumber,
+						translatederror,
+						translatederrorlength)) {
 			pvt->_error=node->getValue()->etr->getError();
 			return false;
 		}

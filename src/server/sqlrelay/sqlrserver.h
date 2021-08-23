@@ -2519,7 +2519,8 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslation {
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					stringbuffer *translatederror);
+					const char **translatederror,
+					uint32_t *translatederrorlength);
 
 		virtual const char	*getError();
 
@@ -2540,13 +2541,13 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslations {
 
 		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
-						sqlrparser *sqlrp,
-						int64_t errornumber,
-						const char *error,
-						uint32_t errorlength,
-						int64_t *translatederrornumber,
-						stringbuffer *translatederror);
+					sqlrservercursor *sqlrcur,
+					int64_t errornumber,
+					const char *error,
+					uint32_t errorlength,
+					int64_t *translatederrornumber,
+					const char **translatederror,
+					uint32_t *translatederrorlength);
 
 		const char	*getError();
 

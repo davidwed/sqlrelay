@@ -2704,6 +2704,24 @@ void sqlrservercontroller::errorMessage(const char **errorbuffer,
 	*errorlength=pvt->_conn->getErrorLength();
 	*errorcode=pvt->_conn->getErrorNumber();
 	*liveconnection=pvt->_conn->getLiveConnection();
+
+	if (pvt->_sqlret) {
+		int64_t		tec=*errorcode;
+		const char	*teb=*errorbuffer;
+		uint32_t	tel=*errorlength;
+		if (pvt->_sqlret->run(pvt->_conn,NULL,
+						*errorcode,
+						*errorbuffer,
+						*errorlength,
+						&tec,
+						&teb,
+						&tel)) {
+			*errorcode=tec;
+			*errorbuffer=teb;
+			*errorlength=tel;
+		}
+		// FIXME: report error if this fails?
+	}
 }
 
 void sqlrservercontroller::errorMessage(char *errorbuffer,
