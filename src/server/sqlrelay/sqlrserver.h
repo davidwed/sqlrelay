@@ -2506,6 +2506,56 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslations {
 	#include <sqlrelay/private/sqlrresultsetheadertranslations.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlrerrortranslation {
+	public:
+		sqlrerrortranslation(sqlrservercontroller *cont,
+					sqlrerrortranslations *sqlts,
+					domnode *parameters);
+		virtual	~sqlrerrortranslation();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					int64_t errornumber,
+					const char *error,
+					uint32_t errorlength,
+					int64_t *translatederrornumber,
+					stringbuffer *translatederror);
+
+		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
+	protected:
+		sqlrerrortranslations	*getErrorTranslations();
+		domnode			*getParameters();
+
+	#include <sqlrelay/private/sqlrerrortranslation.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrerrortranslations {
+	public:
+		sqlrerrortranslations(sqlrservercontroller *cont);
+		~sqlrerrortranslations();
+
+		bool	load(domnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
+						sqlrservercursor *sqlrcur,
+						sqlrparser *sqlrp,
+						int64_t errornumber,
+						const char *error,
+						uint32_t errorlength,
+						int64_t *translatederrornumber,
+						stringbuffer *translatederror);
+
+		const char	*getError();
+
+		void	endTransaction(bool commit);
+		void	endSession();
+
+	#include <sqlrelay/private/sqlrerrortranslations.h>
+};
+
 class SQLRSERVER_DLLSPEC sqlrtrigger {
 	public:
 		sqlrtrigger(sqlrservercontroller *cont,

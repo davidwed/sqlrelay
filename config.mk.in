@@ -878,8 +878,8 @@ SRCALLSUBDIRS += all-util all-configs
 SRCINSTALLSUBDIRS += install-util install-configs
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections
-SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-filters install-triggers install-moduledatas install-connections
+SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-errortranslations all-filters all-triggers all-moduledatas all-connections
+SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-errortranslations install-filters install-triggers install-moduledatas install-connections
 endif
 else
 SRCALLSUBDIRS = all-api
@@ -890,7 +890,7 @@ SRCINSTALLSUBDIRS += install-configs install-util
 endif
 ifeq ($(ENABLE_SERVER),yes)
 SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections all-server
-SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-filters install-triggers install-moduledatas install-connections install-server
+SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-filters install-triggers install-moduledatas install-connections install-server
 endif
 endif
 ifeq ($(ENABLE_CMDLINE),yes)

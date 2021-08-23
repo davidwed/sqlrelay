@@ -24,6 +24,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrresultsetrowblocktranslation.cpp \
 	sqlrresultsetheadertranslations.cpp \
 	sqlrresultsetheadertranslation.cpp \
+	sqlrerrortranslations.cpp \
+	sqlrerrortranslation.cpp \
 	sqlrtriggers.cpp \
 	sqlrtrigger.cpp \
 	sqlrloggers.cpp \
@@ -69,6 +71,8 @@ LIBSQLRSERVERLOBJS = \
 	sqlrresultsetrowblocktranslation.$(OBJ) \
 	sqlrresultsetheadertranslations.$(OBJ) \
 	sqlrresultsetheadertranslation.$(OBJ) \
+	sqlrerrortranslations.$(OBJ) \
+	sqlrerrortranslation.$(OBJ) \
 	sqlrtriggers.$(OBJ) \
 	sqlrtrigger.$(OBJ) \
 	sqlrloggers.$(OBJ) \
@@ -499,6 +503,8 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrresultsetrowblocktranslations.h $(includedir)/sqlrelay/private/sqlrresultsetrowblocktranslations.h
 	$(CP) sqlrelay/private/sqlrresultsetheadertranslation.h $(includedir)/sqlrelay/private/sqlrresultsetheadertranslation.h
 	$(CP) sqlrelay/private/sqlrresultsetheadertranslations.h $(includedir)/sqlrelay/private/sqlrresultsetheadertranslations.h
+	$(CP) sqlrelay/private/sqlrerrortranslation.h $(includedir)/sqlrelay/private/sqlrerrortranslation.h
+	$(CP) sqlrelay/private/sqlrerrortranslations.h $(includedir)/sqlrelay/private/sqlrerrortranslations.h
 	$(CP) sqlrelay/private/sqlrbindvariabletranslation.h $(includedir)/sqlrelay/private/sqlrbindvariabletranslation.h
 	$(CP) sqlrelay/private/sqlrbindvariabletranslations.h $(includedir)/sqlrelay/private/sqlrbindvariabletranslations.h
 	$(CP) sqlrelay/private/sqlrresultsettranslation.h $(includedir)/sqlrelay/private/sqlrresultsettranslation.h
@@ -549,6 +555,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetrowblocktranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetheadertranslation.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetheadertranslations.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrerrortranslation.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrerrortranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrbindvariabletranslation.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrbindvariabletranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsettranslation.h
@@ -610,6 +618,8 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrqueries.h \
 		$(includedir)/sqlrelay/private/sqlrquerycursor.h \
 		$(includedir)/sqlrelay/private/sqlrquery.h \
+		$(includedir)/sqlrelay/private/sqlrerrortranslation.h \
+		$(includedir)/sqlrelay/private/sqlrerrortranslations.h \
 		$(includedir)/sqlrelay/private/sqlrresultsetheadertranslation.h \
 		$(includedir)/sqlrelay/private/sqlrresultsetheadertranslations.h \
 		$(includedir)/sqlrelay/private/sqlrresultsetrowtranslation.h \
