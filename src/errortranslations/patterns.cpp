@@ -194,16 +194,15 @@ bool sqlrerrortranslation_patterns::run(sqlrserverconnection *sqlrcon,
 					uint32_t *translatederrorlength) {
 	debugFunction();
 
+	*translatederrornumber=errornumber;
+
 	if (!enabled) {
-		*translatederrornumber=errornumber;
 		*translatederror=error;
 		*translatederrorlength=errorlength;
 		return true;
 	}
 
 	if (debug) {
-		stdoutput.printf("original error number:\n\"%ld\"\n\n",
-								errornumber);
 		stdoutput.printf("original error:\n\"%s\"\n\n",error);
 	}
 
@@ -211,11 +210,8 @@ bool sqlrerrortranslation_patterns::run(sqlrserverconnection *sqlrcon,
 
 	applyPatterns(error,patterns,patterncount,&te);
 
-	*translatederrornumber=errornumber;
-
 	*translatederror=te.getString();
 	*translatederrorlength=te.getStringLength();
-	
 
 	return true;
 }

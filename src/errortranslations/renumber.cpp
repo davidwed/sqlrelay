@@ -2,9 +2,6 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
-#include <rudiments/stringbuffer.h>
-#include <rudiments/regularexpression.h>
-#include <rudiments/character.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
@@ -25,6 +22,8 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslation_renumber :
 					const char **translatederror,
 					uint32_t *translatederrorlength);
 	private:
+		dictionary<int64_t,int64_t>	map;
+
 		bool	enabled;
 
 		bool	debug;
@@ -43,6 +42,17 @@ sqlrerrortranslation_renumber::sqlrerrortranslation_renumber(
 	if (!enabled) {
 		return;
 	}
+
+	for (domnode *node=parameters->getFirstTagChild("renumber");
+		!node->isNullNode(); node=node->getNextTagSibling("renumber")) {
+		const char	*from=node->getAttributeValue("from");
+		const char	*to=node->getAttributeValue("to");
+		if (!charstring::isNullOrEmpty(from) &&
+				!charstring::isNullOrEmpty(to)) {
+			map.setValue(charstring::toInteger(from),
+					charstring::toInteger(to));
+		}
+	}
 }
 
 bool sqlrerrortranslation_renumber::run(sqlrserverconnection *sqlrcon,
@@ -55,23 +65,28 @@ bool sqlrerrortranslation_renumber::run(sqlrserverconnection *sqlrcon,
 					uint32_t *translatederrorlength) {
 	debugFunction();
 
-	if (!enabled) {
-		*translatederrornumber=errornumber;
-		*translatederror=error;
-		*translatederrorlength=errorlength;
-		return true;
-	}
-
-	if (debug) {
-		stdoutput.printf("original error number:\n\"%ld\"\n\n",
-								errornumber);
-	}
-
-	// FIXME: renumber...
 	*translatederrornumber=errornumber;
 	*translatederror=error;
 	*translatederrorlength=errorlength;
 
+	if (!enabled) {
+		return true;
+	}
+
+	if (debug) {
+		stdoutput.printf("original error number:\n\"%lld\"\n\n",
+								errornumber);
+	}
+
+	int64_t	to;
+	if (map.getValue(errornumber,&to)) {
+		*translatederrornumber=to;
+	}
+
+	if (debug) {
+		stdoutput.printf("translated to:\n\"%lld\"\n\n",
+							*translatederrornumber);
+	}
 	return true;
 }
 

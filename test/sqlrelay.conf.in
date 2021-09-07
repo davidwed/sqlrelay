@@ -254,6 +254,11 @@
 			</filter>
 		</filters>
 		<errortranslations>
+			<errortranslation module="renumber">
+				<renumber from="123" to="345"/>
+				<renumber from="234" to="456"/>
+				<renumber from="345" to="789"/>
+			</errortranslation>
 			<errortranslation module="patterns">
 				<pattern type="string" from="foo" to="bar" scope="outsidequotes"/>
 				<pattern type="cistring" from="foo" to="bar" scope="outsidequotes"/>
