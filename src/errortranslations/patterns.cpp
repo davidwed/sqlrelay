@@ -211,7 +211,6 @@ bool sqlrerrortranslation_patterns::run(sqlrserverconnection *sqlrcon,
 
 	applyPatterns(error,patterns,patterncount,&te);
 
-	// FIXME: translate errornumber
 	*translatederrornumber=errornumber;
 
 	*translatederror=te.getString();

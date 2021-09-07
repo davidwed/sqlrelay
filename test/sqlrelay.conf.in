@@ -253,6 +253,17 @@
 						type="regex"/>
 			</filter>
 		</filters>
+		<errortranslations>
+			<errortranslation module="patterns">
+				<pattern type="string" from="foo" to="bar" scope="outsidequotes"/>
+				<pattern type="cistring" from="foo" to="bar" scope="outsidequotes"/>
+				<pattern type="regex" from="foo" to="bar"/>
+				<pattern type="regex" match="foo.">
+					<pattern type="regex" from="foo1" to="foo2"/>
+					<pattern type="regex" from="foo3" to="foo4"/>
+				</pattern>
+			</errortranslation>
+		</errortranslations>
 		<queries>
 			<query module="sqlrcmdcstat"/>
 			<query module="sqlrcmdgstat"/>
