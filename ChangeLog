@@ -5,7 +5,7 @@
 	fixed NULL-bind in the ODBC driver
 	updated spec file to build python 3 packages on rhel 7
 	added support for nested substitutions
-	updated userlist auth module to support password files
+	updated userlist auth modules to support password files
 	updates aes128 pwdenc module to use sensitivevalue class instead of
 		its built-in implementation
 	updated debug logger to not log null/empty info
