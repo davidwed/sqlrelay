@@ -54,6 +54,7 @@ extern	CS_INT	cs_convert(CS_CONTEXT *,CS_DATAFMT *,CS_VOID *,CS_DATAFMT *,CS_VOI
 extern	CS_INT	cs_loc_drop(CS_CONTEXT *,CS_LOCALE *);
 extern	CS_INT	ct_cancel(CS_CONNECTION *,CS_COMMAND *,CS_INT);
 extern	CS_INT	ct_dynamic(CS_COMMAND *,CS_INT,CS_CHAR *,CS_INT,CS_CHAR *,CS_INT);
+extern	CS_INT	cs_dt_crack(CS_CONTEXT *,CS_INT,CS_VOID *,CS_DATEREC *);
 
 }
 #endif
