@@ -1,4 +1,5 @@
 #include <libpq-fe.h>
+#include <config.h>
 #include <rudiments/charstring.h>
 #include <rudiments/process.h>
 #include <rudiments/environment.h>
@@ -38,6 +39,8 @@ void checkSuccess(int value, int success) {
 }
 
 int	main(int argc, char **argv) {
+
+#ifdef HAVE_POSTGRESQL_PQEXECPREPARED
 
 	const char	*host="127.0.0.1";
 	const char	*port;
@@ -333,6 +336,7 @@ int	main(int argc, char **argv) {
 	PQclear(pgresult);*/
 
 	PQfinish(pgconn);
+#endif
 
 	return 0;
 }
