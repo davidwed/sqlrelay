@@ -12,7 +12,8 @@ include ../../config.mk
 
 all: $(SQLR)protocol_sqlrclient.$(LIBEXT) \
 	$(SQLR)protocol_mysql.$(LIBEXT) \
-	$(SQLR)protocol_postgresql.$(LIBEXT)
+	$(SQLR)protocol_postgresql.$(LIBEXT) \
+	$(SQLR)protocol_tds.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
@@ -26,6 +27,9 @@ $(SQLR)protocol_mysql.$(LIBEXT): mysql.cpp mysql.$(OBJ)
 
 $(SQLR)protocol_postgresql.$(LIBEXT): postgresql.cpp postgresql.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ postgresql.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
+$(SQLR)protocol_tds.$(LIBEXT): tds.cpp tds.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ tds.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
