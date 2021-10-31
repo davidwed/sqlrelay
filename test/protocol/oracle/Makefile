@@ -10,13 +10,13 @@ include ../../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPTESTCPPFLAGS) $(ORACEINCLUDES) $(COMPILE) $<
 
-.java.class:
-	$(JAVAC) $<
-
 all: oracle oracle.class
 
+oracle.class: oracle.java
+	$(JAVAC) $<
+
 oracle: oracle.cpp oracle.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) oracle.$(OBJ) $(ORACLELIBS) $(DROPINTESTLIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) oracle.$(OBJ) $(ORACLELIBS) $(RUDIMENTSLIBS)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class oracle$(EXE)

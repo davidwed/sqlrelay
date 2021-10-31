@@ -13,13 +13,13 @@ include ../../../config.mk
 all: mysql bind mysqldatetodatetime
 
 mysql: mysql.cpp mysql.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysql.$(OBJ) $(MYSQLLIBS) $(RUDIMENTSLIBS)
 
 bind: bind.cpp bind.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) bind.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) bind.$(OBJ) $(MYSQLLIBS) $(RUDIMENTSLIBS)
 
 mysqldatetodatetime: mysqldatetodatetime.cpp mysqldatetodatetime.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysqldatetodatetime.$(OBJ) $(MYSQLLIBS) $(DROPINTESTLIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysqldatetodatetime.$(OBJ) $(MYSQLLIBS) $(RUDIMENTSLIBS)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class mysql$(EXE) mysqldatetodatetime$(EXE) bind$(EXE)

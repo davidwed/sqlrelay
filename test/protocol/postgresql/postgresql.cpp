@@ -15,7 +15,7 @@ void checkSuccess(const char *value, const char *success) {
 		} else {
 			stdoutput.printf("failure ");
 			stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
-			process::exit(0);
+			process::exit(1);
 		}
 	}
 
@@ -24,7 +24,7 @@ void checkSuccess(const char *value, const char *success) {
 	} else {
 		stdoutput.printf("failure ");
 		stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -34,7 +34,7 @@ void checkSuccess(int value, int success) {
 	} else {
 		stdoutput.printf("failure ");
 		stdoutput.printf("\"%d\"!=\"%d\"\n",value,success);
-		process::exit(0);
+		process::exit(1);
 	}
 }
 
@@ -53,7 +53,7 @@ int	main(int argc, char **argv) {
 		host=argv[1];
 		db="testdb";
 	} else {
-		db="";
+		db="testuser";
 	}
 	port="5432";
 	user="testuser";
@@ -304,30 +304,11 @@ int	main(int argc, char **argv) {
 	checkSuccess(PQgetlength(pgresult,1,7),8);
 	stdoutput.printf("\n");
 
-#if 0
-	stdoutput.printf("PQescapeString:\n");
-	char	to[1024];
-	const char	*from=" \\ ' ";
-	checkSuccess(PQescapeString(to,from,charstring::length(from)),6);
-	checkSuccess(to," \\ '' ");
-	stdoutput.printf("\n");
-#endif
-
-	//PQescapeBytea
-	// PQunescapeBytea
-
 	PQclear(pgresult);
 
-	for (uint32_t i=0; i<10000; i++) {
-		stringbuffer	str;
-		str.append("insert into testtable values (")->append(i)->append(",1.1,1.1,1,'testchar1','testvarchar1','01/01/2001','01:00:00',NULL)");
-		pgresult=PQexec(pgconn,str.getString());
-		PQclear(pgresult);
-	}
-
-	/*query="drop table testtable";
+	query="drop table testtable";
 	pgresult=PQexec(pgconn,query);
-	PQclear(pgresult);*/
+	PQclear(pgresult);
 
 	PQfinish(pgconn);
 #endif

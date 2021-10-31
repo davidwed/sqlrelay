@@ -13,7 +13,7 @@ include ../../../config.mk
 all: postgresql
 
 postgresql: postgresql.cpp postgresql.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) postgresql.$(OBJ) $(POSTGRESQLLIBS) $(DROPINTESTLIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) postgresql.$(OBJ) $(POSTGRESQLLIBS) $(RUDIMENTSLIBS)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class postgresql$(EXE)

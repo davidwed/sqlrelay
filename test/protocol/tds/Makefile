@@ -13,7 +13,7 @@ include ../../../config.mk
 all: tds
 
 tds: tds.cpp tds.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tds.$(OBJ) $(FREETDSLIBS) $(DROPINTESTLIBS)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tds.$(OBJ) $(FREETDSLIBS) $(RUDIMENTSLIBS)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class tds$(EXE)
