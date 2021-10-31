@@ -4,7 +4,7 @@ include ../../config.mk
 
 .SUFFIXES: .lo
 
-all: all-mysql all-postgresql
+all: $(TESTPROTOCOLSUBDIRS)
 
 all-mysql: 
 	cd mysql $(AND) $(MAKE) all
