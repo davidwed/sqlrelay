@@ -281,3 +281,22 @@ const char *sqlroraclecredentials::getMethod() {
 const char *sqlroraclecredentials::getExtra() {
 	return extra;
 }
+
+sqlrteradatacredentials::sqlrteradatacredentials() : sqlrcredentials() {
+	fd=NULL;
+}
+
+sqlrteradatacredentials::~sqlrteradatacredentials() {
+}
+
+const char *sqlrteradatacredentials::getType() {
+	return "teradata";
+}
+
+void sqlrteradatacredentials::setClientFileDescriptor(filedescriptor *fd) {
+	this->fd=fd;
+}
+
+filedescriptor *sqlrteradatacredentials::getClientFileDescriptor() {
+	return fd;
+}

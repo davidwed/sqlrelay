@@ -14,7 +14,8 @@ all: $(SQLR)protocol_sqlrclient.$(LIBEXT) \
 	$(SQLR)protocol_mysql.$(LIBEXT) \
 	$(SQLR)protocol_postgresql.$(LIBEXT) \
 	$(SQLR)protocol_tds.$(LIBEXT) \
-	$(SQLR)protocol_oracle.$(LIBEXT)
+	$(SQLR)protocol_oracle.$(LIBEXT) \
+	$(SQLR)protocol_teradata.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
@@ -34,6 +35,9 @@ $(SQLR)protocol_tds.$(LIBEXT): tds.cpp tds.$(OBJ)
 
 $(SQLR)protocol_oracle.$(LIBEXT): oracle.cpp oracle.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ oracle.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
+$(SQLR)protocol_teradata.$(LIBEXT): teradata.cpp teradata.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ teradata.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

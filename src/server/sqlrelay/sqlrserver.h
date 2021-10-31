@@ -1719,6 +1719,19 @@ class SQLRSERVER_DLLSPEC sqlroraclecredentials : public sqlrcredentials {
 	#include <sqlrelay/private/sqlroraclecredentials.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlrteradatacredentials : public sqlrcredentials {
+	public:
+			sqlrteradatacredentials();
+		virtual	~sqlrteradatacredentials();
+		const char	*getType();
+
+		void	setClientFileDescriptor(filedescriptor *fd);
+
+		filedescriptor	*getClientFileDescriptor();
+
+	#include <sqlrelay/private/sqlrteradatacredentials.h>
+};
+
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 		sqlrauth(sqlrservercontroller *cont,

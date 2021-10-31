@@ -13,7 +13,7 @@
 		to be called between reexecutes if the previous execute resulted
 		in an error
 	added error translations framework
-	migrated tds and oracle protocols to public distro
+	migrated tds, oracle, and teradata protocols to public distro
 		(built but not currently installed though)
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
