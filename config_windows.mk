@@ -411,7 +411,7 @@ CONNECTIONSINSTALLTARGETS = @INSTALLDB2@ @INSTALLFIREBIRD@ @INSTALLMYSQL@ @INSTA
 
 
 # tests
-TESTALLSUBDIRS = all-dropin all-c all-cpp all-cs all-java all-stress all-tcl
+TESTALLSUBDIRS = all-c all-cpp all-cs all-java all-protocol all-stress all-tcl
 
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
 CPPTESTLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib $(RUDIMENTSLIBS)
@@ -421,10 +421,6 @@ CTESTLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib lib$(SQLR)clientwrapper.lib 
 
 ODBCTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(ODBCINCLUDES)
 ODBCTESTLIBS = $(RUDIMENTSLIBS) $(ODBCLIBS)
-
-DROPINTESTTARGETS = mysql postgresql
-DROPINTESTCPPFLAGS = $(BASECPPFLAGS) /I $(top_builddir) /I $(includedir) $(RUDIMENTSINCLUDES)
-DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 
 # bench

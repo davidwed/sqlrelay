@@ -22,15 +22,15 @@ all-stress:
 all-tcl:
 	cd tcl $(AND) $(MAKE) all
 
-all-dropin:
-	cd dropin $(AND) $(MAKE) all
+all-protocol:
+	cd protocol $(AND) $(MAKE) all
 
 clean:
 	cd bench $(AND) $(MAKE) clean
 	cd c $(AND) $(MAKE) clean
 	cd c++ $(AND) $(MAKE) clean
 	cd cs $(AND) $(MAKE) clean
-	cd dropin $(AND) $(MAKE) clean
+	cd protocol $(AND) $(MAKE) clean
 	cd java $(AND) $(MAKE) clean
 	cd jdbc $(AND) $(MAKE) clean
 	cd nodejs $(AND) $(MAKE) clean

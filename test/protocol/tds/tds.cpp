@@ -118,24 +118,17 @@ int	main(int argc, char **argv) {
 	const char	*db;
 	const char	*language="us_english";
 	const char	*charset="utf-8";
-	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		server="localhost";
-		user="test";
-		password="test";
+	// to run against a real instance, provide a server name
+	// eg: ./tds mssql
+	if (argc==2) {
+		server=argv[1];
 		db="testdb";
 	} else {
-		// to run against a real instance, provide a server name
-		// eg: ./tds mssql
-		if (argc==2) {
-			server=argv[1];
-			db="testdb";
-		} else {
-			server="localhost";
-			db="";
-		}
-		user="testuser";
-		password="testpassword";
+		server="localhost";
+		db="";
 	}
+	user="testuser";
+	password="testpassword";
 
 
 	CS_CONTEXT	*context=NULL;

@@ -64,29 +64,21 @@ int	main(int argc, char **argv) {
 	const char	*user;
 	const char	*password;
 	const char	*db;
-	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		port="9000";
-		socket="/tmp/test.socket";
-		user="test";
-		password="test";
-		db="";
+	// to run against a real mysql instance, provide a host name
+	// eg: ./mysql db64
+	if (argc==2) {
+		host=argv[1];
+	}
+	port="3306";
+	socket="/var/lib/mysql/mysql.sock";
+	user="testuser";
+	password="testpassword";
+	// set the db when running against a real mysql instance,
+	// otherwise use whatever sqlrelay defaults to
+	if (argc==2) {
+		db="testdb";
 	} else {
-		// to run against a real mysql instance, provide a host name
-		// eg: ./mysql db64
-		if (argc==2) {
-			host=argv[1];
-		}
-		port="3306";
-		socket="/var/lib/mysql/mysql.sock";
-		user="testuser";
-		password="testpassword";
-		// set the db when running against a real mysql instance,
-		// otherwise use whatever sqlrelay defaults to
-		if (argc==2) {
-			db="testdb";
-		} else {
-			db="";
-		}
+		db="";
 	}
 
 

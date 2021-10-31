@@ -370,15 +370,6 @@ NODEJSCFLAGS = @NODEJSCXXFLAGS@ -I@TOP_BUILDDIR_ABS@/src/api/c++ $(RUDIMENTSINCL
 NODEJSLIBS = -L@TOP_BUILDDIR_ABS@/src/api/c++/.libs -l$(SQLR)client $(RUDIMENTSLIBS)
 
 
-# mysql drop-in
-ENABLE_MYSQL_DROP_IN = @ENABLE_MYSQL_DROP_IN@
-
-
-# postgresql drop-in
-ENABLE_POSTGRESQL_DROP_IN = @ENABLE_POSTGRESQL_DROP_IN@
-PSQLUSERPATH = @PSQLUSERPATH@
-
-
 # libsocket
 SOCKETLIBS = @SOCKETLIBS@
 
@@ -410,13 +401,6 @@ MYSQLLIBS += -R $(MYSQLLIBSPATH)
 endif
 endif
 endif
-MYSQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
-ifneq ($(strip $(libdir)),)
-ifeq ($(MYSQLUSERPATH),yes)
-MYSQLDRLIBLIBS = -R $(libdir)
-endif
-endif
 
 
 # postgresql
@@ -429,13 +413,6 @@ ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
 ifeq ($(POSTGRESQLUSERPATH),yes)
 POSTGRESQLLIBS += -R $(POSTGRESQLLIBSPATH)
 endif
-endif
-endif
-POSTGRESQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-POSTGRESQLDRLIBLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
-ifneq ($(strip $(libdir)),)
-ifeq ($(PSQLUSERPATH),yes)
-POSTGRESQLDRLIBLIBS += -R $(libdir)
 endif
 endif
 
@@ -810,7 +787,7 @@ endif
 
 
 # tests
-TESTALLSUBDIRS = all-dropin all-c all-cpp all-java all-stress all-tcl
+TESTALLSUBDIRS = all-c all-cpp all-java all-protocol all-stress all-tcl
 ifneq ($(HAVE_MONO),)
 	TESTALLSUBDIRS += all-cs
 endif
@@ -823,16 +800,6 @@ CTESTLIBS = -L$(libdir) -l$(SQLR)client -l$(SQLR)clientwrapper $(RUDIMENTSLIBS) 
 
 ODBCTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(ODBCINCLUDES)
 ODBCTESTLIBS = $(RUDIMENTSLIBS) $(ODBCLIBS) $(LIBEFENCE)
-
-DROPTINTESTTARGETS = 
-ifneq ($(strip $(MYSQLLIBS)),)
-	DROPINTESTTARGETS += mysql
-endif
-ifneq ($(strip $(POSTGRESQLLIBS)),)
-	DROPINTESTTARGETS += postgresql
-endif
-DROPINTESTCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(includedir) $(RUDIMENTSINCLUDES)
-DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 
 # bench
@@ -912,14 +879,6 @@ APIALLSUBDIRS += all-cs
 APIINSTALLSUBDIRS += install-cs
 endif
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-ifeq ($(ENABLE_MYSQL_DROP_IN),yes)
-APIALLSUBDIRS += all-mysql
-APIINSTALLSUBDIRS += install-mysql
-endif
-ifeq ($(ENABLE_POSTGRESQL_DROP_IN),yes)
-APIALLSUBDIRS += all-postgresql
-APIINSTALLSUBDIRS += install-postgresql
-endif
 ifneq ($(ENABLE_ODBC_DRIVER),)
 ifneq ($(ODBCLIBS),)
 APIALLSUBDIRS += all-odbc

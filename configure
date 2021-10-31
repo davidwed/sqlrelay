@@ -850,9 +850,6 @@ SQLRELAY
 SQLR
 LIBEFENCE
 LIBDMALLOC
-PSQLUSERPATH
-ENABLE_POSTGRESQL_DROP_IN
-ENABLE_MYSQL_DROP_IN
 CUSERPATH
 ERLANGUSERPATH
 TCLUSERPATH
@@ -1008,9 +1005,6 @@ enable_mono
 with_nodejs_prefix
 enable_nodejs
 enable_c_rpath
-enable_mysql_drop_in
-enable_postgresql_drop_in
-enable_psql_rpath
 with_pthread_prefix
 with_system_libtool
 enable_dmalloc
@@ -1723,9 +1717,6 @@ Optional Features:
   --disable-mono                Don't build Mono/C# api
   --disable-nodejs              Don't build node.js api
   --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library
-  --enable-mysql-drop-in        Build deprecated mysql drop-in-replacement library
-  --enable-postgresql-drop-in   Build deprecated postgresql drop-in-replacement library
-  --enable-psql-rpath           Use -rpath when linking the postgresql drop-in replacement library against the SQL Relay client library
   --enable-dmalloc              Use the dmalloc library
   --enable-efence               Use the efence library
   --disable-doc                 Don't install docs or man pages
@@ -3351,27 +3342,6 @@ else
   CUSERPATH=""
 fi
 
-# Check whether --enable-mysql-drop-in was given.
-if test "${enable_mysql_drop_in+set}" = set; then :
-  enableval=$enable_mysql_drop_in; ENABLE_MYSQL_DROP_IN="yes"
-else
-  ENABLE_MYSQL_DROP_IN=""
-fi
-
-# Check whether --enable-postgresql-drop-in was given.
-if test "${enable_postgresql_drop_in+set}" = set; then :
-  enableval=$enable_postgresql_drop_in; ENABLE_POSTGRESQL_DROP_IN="yes"
-else
-  ENABLE_POSTGRESQL_DROP_IN=""
-fi
-
-# Check whether --enable-psql-rpath was given.
-if test "${enable_psql_rpath+set}" = set; then :
-  enableval=$enable_psql_rpath; PSQLUSERPATH="yes"
-else
-  PSQLUSERPATH=""
-fi
-
 
 # Check whether --with-pthread-prefix was given.
 if test "${with_pthread_prefix+set}" = set; then :
@@ -3499,8 +3469,6 @@ then
 	ENABLE_ERLANG=""
 	ENABLE_MONO=""
 	ENABLE_NODEJS=""
-	ENABLE_MYSQL_DROP_IN=""
-	ENABLE_POSTGRESQL_DROP_IN=""
 	ENABLE_ROUTER=""
 fi
 
@@ -3516,8 +3484,6 @@ then
 	ENABLE_ERLANG=""
 	ENABLE_MONO=""
 	ENABLE_NODEJS=""
-	ENABLE_MYSQL_DROP_IN=""
-	ENABLE_POSTGRESQL_DROP_IN=""
 	else
 
 cat >>confdefs.h <<_ACEOF
@@ -3531,9 +3497,6 @@ if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
 then
 	ENABLE_UTIL=""
 fi
-
-
-
 
 
 
@@ -34936,15 +34899,6 @@ if ( test -n "$HAVE_NODEJS" ); then
 fi
 if ( test -n "$ENABLE_ODBC_DRIVER" ); then
 	ODBCDRIVERBUILD="yes"
-fi
-
-MYSQLDIBUILD="no    "
-POSTGRESQLDIBUILD="no    "
-if ( test -n "$ENABLE_MYSQL_DROP_IN" ); then
-	MYSQLDIBUILD="yes   "
-fi
-if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
-	POSTGRESQLDIBUILD="yes   "
 fi
 
 ORACLEBUILD="no        "

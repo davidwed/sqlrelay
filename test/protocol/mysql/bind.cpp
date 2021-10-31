@@ -56,35 +56,26 @@ int	main(int argc, char **argv) {
 	const char	*user;
 	const char	*password;
 	const char	*db;
-	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		host="127.0.0.1";
-		port="9000";
-		socket="/tmp/test.socket";
-		user="test";
-		password="test";
-		db="";
+	// to run against a real mysql instance, provide a host name
+	// eg: ./mysql db64
+	if (argc==2) {
+		host=argv[1];
 	} else {
-		// to run against a real mysql instance, provide a host name
-		// eg: ./mysql db64
-		if (argc==2) {
-			host=argv[1];
-		} else {
-			host="127.0.0.1";
-		}
-#ifdef FULL
-		db="testdb";
-		port="3306";
-		socket="/var/lib/mysql/mysql.sock";
-		user="testuser";
-		password="testpassword";
-#else
-		db="dbtest_enc";
-		port="6033";
-		socket="/var/lib/mysql/mysql.sock";
-		user="secured";
-		password="pwd4secured";
-#endif
+		host="127.0.0.1";
 	}
+#ifdef FULL
+	db="testdb";
+	port="3306";
+	socket="/var/lib/mysql/mysql.sock";
+	user="testuser";
+	password="testpassword";
+#else
+	db="dbtest_enc";
+	port="6033";
+	socket="/var/lib/mysql/mysql.sock";
+	user="secured";
+	password="pwd4secured";
+#endif
 
 
 	stdoutput.printf("\n============ Traditional API ============\n\n");

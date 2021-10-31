@@ -47,23 +47,17 @@ int	main(int argc, char **argv) {
 	const char	*user;
 	const char	*password;
 	const char	*db;
-	if (!charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		port="9000";
-		user="test";
-		password="test";
+	// to run against a real postgresql instance, provide a host
+	// name eg: ./postgresql db64
+	if (argc==2) {
+		host=argv[1];
+		db="testdb";
 	} else {
-		// to run against a real postgresql instance, provide a host
-		// name eg: ./postgresql db64
-		if (argc==2) {
-			host=argv[1];
-			db="testdb";
-		} else {
-			db="";
-		}
-		port="5432";
-		user="testuser";
-		password="testpassword";
+		db="";
 	}
+	port="5432";
+	user="testuser";
+	password="testpassword";
 
 	stdoutput.printf("PQresStatus:\n");
 	checkSuccess(PQresStatus(PGRES_EMPTY_QUERY),"PGRES_EMPTY_QUERY");

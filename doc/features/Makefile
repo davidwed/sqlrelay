@@ -7,7 +7,6 @@ include ../../config.mk
 SRCS = connectionpooling.wt \
 	databases.wt \
 	dbabstractionlayers.wt \
-	dropinreplacementlibs.wt \
 	ha.wt \
 	languages.wt \
 	multirowfetches.wt \
@@ -25,7 +24,6 @@ SRCS = connectionpooling.wt \
 OBJS = connectionpooling.html \
 	databases.html \
 	dbabstractionlayers.html \
-	dropinreplacementlibs.html \
 	ha.html \
 	languages.html \
 	multirowfetches.html \

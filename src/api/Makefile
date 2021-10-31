@@ -11,12 +11,6 @@ all-c:
 all-cs:
 	cd cs $(AND) $(MAKE) all
 
-all-postgresql:
-	cd postgresql $(AND) $(MAKE) all
-
-all-mysql:
-	cd mysql $(AND) $(MAKE) all
-
 all-odbc:
 	cd odbc $(AND) $(MAKE) all
 
@@ -60,12 +54,6 @@ clean-c:
 
 clean-cs:
 	cd cs $(AND) $(MAKE) clean
-
-clean-postgresql:
-	cd postgresql $(AND) $(MAKE) clean
-
-clean-mysql:
-	cd mysql $(AND) $(MAKE) clean
 
 clean-odbc:
 	cd odbc $(AND) $(MAKE) clean
@@ -112,12 +100,6 @@ install-c:
 install-cs:
 	cd cs $(AND) $(MAKE) install
 
-install-postgresql:
-	cd postgresql $(AND) $(MAKE) install
-
-install-mysql:
-	cd mysql $(AND) $(MAKE) install
-
 install-odbc:
 	cd odbc $(AND) $(MAKE) install
 
@@ -161,12 +143,6 @@ uninstall-c:
 
 uninstall-cs:
 	cd cs $(AND) $(MAKE) uninstall
-
-uninstall-postgresql:
-	cd postgresql $(AND) $(MAKE) uninstall
-
-uninstall-mysql:
-	cd mysql $(AND) $(MAKE) uninstall
 
 uninstall-odbc:
 	cd odbc $(AND) $(MAKE) uninstall

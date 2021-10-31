@@ -12,7 +12,6 @@ OBJS = index.html faq.html
 
 all: $(OBJS)
 	cd admin $(AND) $(MAKE)
-	cd dropin $(AND) $(MAKE)
 	cd features $(AND) $(MAKE)
 	cd programming $(AND) $(MAKE)
 
@@ -37,7 +36,6 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
 	$(MKINSTALLDIRS) $(docdir)/api/erlang/html
 	$(MKINSTALLDIRS) $(docdir)/api/nodejs/html
-	$(MKINSTALLDIRS) $(docdir)/dropin
 	$(MKINSTALLDIRS) $(docdir)/features
 	$(MKINSTALLDIRS) $(docdir)/images
 	$(MKINSTALLDIRS) $(docdir)/js
@@ -147,8 +145,6 @@ install:
 	$(CHMOD) 644 $(docdir)/api/nodejs/html/*.png
 	$(CP) api/nodejs/html/*.js $(docdir)/api/nodejs/html
 	$(CHMOD) 644 $(docdir)/api/nodejs/html/*.js
-	$(CP) dropin/*.html $(docdir)/dropin
-	$(CHMOD) 644 $(docdir)/dropin/*.html
 	$(CP) features/*.html $(docdir)/features
 	$(CHMOD) 644 $(docdir)/features/*.html
 	$(CP) images/*.png $(docdir)/images
@@ -166,7 +162,6 @@ uninstall:
 clean:
 	$(RM) $(OBJS)
 	cd admin $(AND) $(MAKE) clean
-	cd dropin $(AND) $(MAKE) clean
 	cd features $(AND) $(MAKE) clean
 	cd programming $(AND) $(MAKE) clean
 	cd howtos $(AND) $(MAKE) clean

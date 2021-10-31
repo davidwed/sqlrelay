@@ -352,18 +352,6 @@ AC_ARG_ENABLE(c-rpath,
 	[  --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library],
 	CUSERPATH="yes",
 	CUSERPATH="")
-AC_ARG_ENABLE(mysql-drop-in,
-	[  --enable-mysql-drop-in        Build deprecated mysql drop-in-replacement library],
-	ENABLE_MYSQL_DROP_IN="yes",
-	ENABLE_MYSQL_DROP_IN="")
-AC_ARG_ENABLE(postgresql-drop-in,
-	[  --enable-postgresql-drop-in   Build deprecated postgresql drop-in-replacement library],
-	ENABLE_POSTGRESQL_DROP_IN="yes",
-	ENABLE_POSTGRESQL_DROP_IN="")
-AC_ARG_ENABLE(psql-rpath,
-	[  --enable-psql-rpath           Use -rpath when linking the postgresql drop-in replacement library against the SQL Relay client library],
-	PSQLUSERPATH="yes",
-	PSQLUSERPATH="")
 AC_ARG_WITH(pthread-prefix,
 	[  --with-pthread-prefix         Location of pthread library],
 	PTHREADPATH="$withval",
@@ -447,8 +435,6 @@ then
 	ENABLE_ERLANG=""
 	ENABLE_MONO=""
 	ENABLE_NODEJS=""
-	ENABLE_MYSQL_DROP_IN=""
-	ENABLE_POSTGRESQL_DROP_IN=""
 	ENABLE_ROUTER=""
 fi
 
@@ -464,8 +450,6 @@ then
 	ENABLE_ERLANG=""
 	ENABLE_MONO=""
 	ENABLE_NODEJS=""
-	ENABLE_MYSQL_DROP_IN=""
-	ENABLE_POSTGRESQL_DROP_IN=""
 	dnl FIXME: disable dynamic linking against db's
 else
 	AC_DEFINE_UNQUOTED(SQLRELAY_ENABLE_SHARED,1,Platform supports shared libraries)
@@ -505,9 +489,6 @@ AC_SUBST(PHPUSERPATH)
 AC_SUBST(TCLUSERPATH)
 AC_SUBST(ERLANGUSERPATH)
 AC_SUBST(CUSERPATH)
-AC_SUBST(ENABLE_MYSQL_DROP_IN)
-AC_SUBST(ENABLE_POSTGRESQL_DROP_IN)
-AC_SUBST(PSQLUSERPATH)
 AC_SUBST(LIBDMALLOC)
 AC_SUBST(LIBEFENCE)
 AC_SUBST(SQLR)
@@ -999,15 +980,6 @@ if ( test -n "$HAVE_NODEJS" ); then
 fi
 if ( test -n "$ENABLE_ODBC_DRIVER" ); then
 	ODBCDRIVERBUILD="yes"
-fi
-
-MYSQLDIBUILD="no    "
-POSTGRESQLDIBUILD="no    "
-if ( test -n "$ENABLE_MYSQL_DROP_IN" ); then
-	MYSQLDIBUILD="yes   "
-fi
-if ( test -n "$ENABLE_POSTGRESQL_DROP_IN" ); then
-	POSTGRESQLDIBUILD="yes   "
 fi
 
 ORACLEBUILD="no        "
