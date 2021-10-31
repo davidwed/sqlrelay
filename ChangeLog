@@ -13,6 +13,7 @@
 		to be called between reexecutes if the previous execute resulted
 		in an error
 	added error translations framework
+	migrated tds and oracle protocols to public distro
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
