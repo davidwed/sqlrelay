@@ -206,48 +206,48 @@ do
 
 			if ( test "$DB" = "mysqlprotocol" )
 			then
-				./dropin/mysql
+				./protocol/mysql/mysql
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "dropin" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
-					printf "    % 8s: failed\n" "dropin" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
 			elif ( test "$DB" = "postgresqlprotocol" )
 			then
-				./dropin/postgresql
+				./protocol/postgresql/postgresql
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "dropin" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
-					printf "    % 8s: failed\n" "dropin" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
 			elif ( test "$DB" = "tdsprotocol" )
 			then
-				./dropin/tds
+				./protocol/tds/tds
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "dropin" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
-					printf "    % 8s: failed\n" "dropin" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
 			elif ( test "$DB" = "oracleprotocol" )
 			then
-				./dropin/oracle
+				./protocol/oracle/oracle
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "dropin" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
-					printf "    % 8s: failed\n" "dropin" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
 			elif ( test "$DB" = "teradataprotocol" )
 			then
-				./dropin/teradata
+				./protocol/teradata/teradata
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "dropin" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
-					printf "    % 8s: failed\n" "dropin" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
 			else
 				./test.sh $DB

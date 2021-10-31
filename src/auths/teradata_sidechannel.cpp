@@ -393,7 +393,6 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromBackend() {
 	}
 
 	// copy out values from lan header
-	unsigned char	messagekind;
 	uint16_t	lowordermessagelength;
 	uint16_t	highordermessagelength;
 	unsigned char	*ptr=sidechannelrecvheader;
