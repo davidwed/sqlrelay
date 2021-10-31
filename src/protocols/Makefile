@@ -13,7 +13,8 @@ include ../../config.mk
 all: $(SQLR)protocol_sqlrclient.$(LIBEXT) \
 	$(SQLR)protocol_mysql.$(LIBEXT) \
 	$(SQLR)protocol_postgresql.$(LIBEXT) \
-	$(SQLR)protocol_tds.$(LIBEXT)
+	$(SQLR)protocol_tds.$(LIBEXT) \
+	$(SQLR)protocol_oracle.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
@@ -30,6 +31,9 @@ $(SQLR)protocol_postgresql.$(LIBEXT): postgresql.cpp postgresql.$(OBJ)
 
 $(SQLR)protocol_tds.$(LIBEXT): tds.cpp tds.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ tds.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
+$(SQLR)protocol_oracle.$(LIBEXT): oracle.cpp oracle.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ oracle.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

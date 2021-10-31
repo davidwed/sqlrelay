@@ -1698,6 +1698,27 @@ class SQLRSERVER_DLLSPEC sqlrpostgresqlcredentials : public sqlrcredentials {
 	#include <sqlrelay/private/sqlrpostgresqlcredentials.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlroraclecredentials : public sqlrcredentials {
+	public:
+			sqlroraclecredentials();
+		virtual	~sqlroraclecredentials();
+		const char	*getType();
+
+		void	setUser(const char *user);
+		void	setPassword(const char *password);
+		void	setPasswordLength(uint64_t passwordlength);
+		void	setMethod(const char *method);
+		void	setExtra(const char *extra);
+
+		const char	*getUser();
+		const char	*getPassword();
+		uint64_t	getPasswordLength();
+		const char	*getMethod();
+		const char	*getExtra();
+
+	#include <sqlrelay/private/sqlroraclecredentials.h>
+};
+
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 		sqlrauth(sqlrservercontroller *cont,

@@ -18,6 +18,7 @@ all-base: $(SQLR)auth_userlist.$(LIBEXT) \
 		$(SQLR)auth_mysql_userlist.$(LIBEXT) \
 		$(SQLR)auth_mysql_database.$(LIBEXT) \
 		$(SQLR)auth_postgresql_userlist.$(LIBEXT) \
+		$(SQLR)auth_oracle_userlist.$(LIBEXT) \
 
 all-sqlrelay: $(SQLR)auth_sqlrelay.$(LIBEXT)
 
@@ -45,6 +46,9 @@ $(SQLR)auth_mysql_database.$(LIBEXT): mysql_database.cpp mysql_database.$(OBJ)
 
 $(SQLR)auth_postgresql_userlist.$(LIBEXT): postgresql_userlist.cpp postgresql_userlist.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ postgresql_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
+$(SQLR)auth_oracle_userlist.$(LIBEXT): oracle_userlist.cpp oracle_userlist.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ oracle_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 
