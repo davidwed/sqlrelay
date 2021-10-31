@@ -330,6 +330,21 @@
 		</connections>
 	</instance>
 
+	<instance id="postgresqlprotocoltest" dbase="postgresql">
+		<listeners>
+			<listener protocol="postgresql" port="5432"/>
+		</listeners>
+		<auths>
+			<auth module="postgresql_userlist">
+				<user user="testuser" password="testpassword"/>
+			</auth>
+		</auths>
+		<connections>
+			<connection string="lastinsertidfunction=testfunc();user=testuser;password=testpassword;db=@HOSTNAME@;host=postgresql;typemangling=lookup;tablemangling=no"/>
+
+		</connections>
+	</instance>
+
 	<instance id="tdsprotocoltest" dbase="odbc">
 		<listeners>
 			<listener protocol="tds" port="1433"/>
