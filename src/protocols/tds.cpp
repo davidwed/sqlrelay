@@ -2,11 +2,10 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
+#include <rudiments/process.h>
 #include <rudiments/sys.h>
 #include <rudiments/datetime.h>
 #include <rudiments/error.h>
-
-#include <fwpk/fwpkincludes.h>
 
 #include <wchar.h>
 

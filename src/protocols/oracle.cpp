@@ -9,8 +9,6 @@
 #include <rudiments/process.h>
 #include <rudiments/error.h>
 
-#include <fwpk/fwpkincludes.h>
-
 // packet types
 #define	PACKET_CONNECT		1
 #define	PACKET_ACCEPT 		2
