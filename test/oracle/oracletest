@@ -1,0 +1,8 @@
+export TNS_ADMIN=./
+rm -f cli*.trc
+rm -f sqlnet.log
+
+#sqlplus64 scott/tiger@ora1
+~/src/sqlrelay/test/dropin/oracle ora1
+mv cli_*.trc oracle.trc
+rm -f sqlnet.log
