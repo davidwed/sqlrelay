@@ -153,6 +153,13 @@ do
 			then
 				PING="The database is up."
 			fi
+		elif ( test "$DB" = "teradataprotocol" )
+		then
+			PING="0: Couldn't connect to the listener."
+			if ( test -n "`netstat -an 2> /dev/null | grep LISTEN | grep 1025`" )
+			then
+				PING="The database is up."
+			fi
 		else
 			PING=`$PREFIX/bin/sqlrsh -id ${DB}test -command ping 2>&1`
 		fi
@@ -227,6 +234,15 @@ do
 			elif ( test "$DB" = "oracleprotocol" )
 			then
 				./dropin/oracle
+				if ( test "$?" = "0" )
+				then
+					printf "    % 8s: success\n" "dropin" >> testresults.log
+				else
+					printf "    % 8s: failed\n" "dropin" >> testresults.log
+				fi
+			elif ( test "$DB" = "teradataprotocol" )
+			then
+				./dropin/teradata
 				if ( test "$?" = "0" )
 				then
 					printf "    % 8s: success\n" "dropin" >> testresults.log
