@@ -6,8 +6,6 @@
 #include <rudiments/bytebuffer.h>
 #include <rudiments/sha1.h>
 
-#include <fwpk/fwpkincludes.h>
-
 class SQLRSERVER_DLLSPEC sqlrauth_oracle_userlist : public sqlrauth {
 	public:
 			sqlrauth_oracle_userlist(sqlrservercontroller *cont,

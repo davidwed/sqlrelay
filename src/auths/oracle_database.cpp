@@ -6,8 +6,6 @@
 #include <rudiments/charstring.h>
 #include <rudiments/stringbuffer.h>
 
-#include <fwpk/fwpkincludes.h>
-
 class SQLRSERVER_DLLSPEC sqlrauth_oracle_database : public sqlrauth {
 	public:
 			sqlrauth_oracle_database(sqlrservercontroller *cont,
@@ -113,17 +111,6 @@ extern "C" {
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-
-		#define FWPK_NAME "sqlrenterprise_oracle_frontend"
-		#ifdef _WIN32
-			#define FWPK_KEY_LOCATION \
-			"C:\\firstworks\\sqlrenterprise_oracle_frontend.key"
-		#else
-			#define FWPK_KEY_LOCATION \
-			"/etc/firstworks/sqlrenterprise_oracle_frontend.key"
-		#endif
-		#include <fwpk/fwpk.h>
-
 		return new sqlrauth_oracle_database(cont,auths,
 							sqlrpe,parameters);
 	}
