@@ -324,7 +324,7 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromClient() {
 	// receive lan data
 	clientrecvdata=clientrecvmessagepool->allocate(clientrecvdatalength);
 	if (clientsock->read(clientrecvdata,clientrecvdatalength)!=
-							clientrecvdatalength) {
+						(ssize_t)clientrecvdatalength) {
 		if (debug) {
 			stdoutput.write("read data from client failed\n");
 		}
@@ -438,7 +438,7 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromBackend() {
 
 	// receive lan data
 	if (isc.read(sidechannelrecvdata,sidechannelrecvdatalength)!=
-						sidechannelrecvdatalength) {
+					(ssize_t)sidechannelrecvdatalength) {
 		if (debug) {
 			stdoutput.write("sidechannel recv data failed\n");
 		}
@@ -477,7 +477,7 @@ bool sqlrauth_teradata_sidechannel::forwardBackendMessageToClient() {
 	}
 	if (clientsock->write(sidechannelrecvdata,
 				sidechannelrecvdatalength)!=
-				sidechannelrecvdatalength) {
+				(ssize_t)sidechannelrecvdatalength) {
 		if (debug) {
 			stdoutput.write("clientsock write failed\n");
 		}
