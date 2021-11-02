@@ -6,6 +6,13 @@
 #include <rudiments/stdio.h>
 #include <config.h>
 
+// MySQL 8+ doesn't have my_bool, but MariaDB 10+ does
+#ifndef MARIADB_BASE_VERSION
+	#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=80000
+		typedef bool my_bool;
+	#endif
+#endif
+
 //#define FULL 1
 
 MYSQL		mysql;
