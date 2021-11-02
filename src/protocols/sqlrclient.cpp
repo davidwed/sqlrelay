@@ -761,7 +761,9 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	delete[] dummy;
 
 	debugstr.clear();
-	debugstr.append("absorbed ")->append(bytesread)->append(" bytes");
+	debugstr.append("absorbed ");
+	debugstr.append((int64_t)bytesread);
+	debugstr.append(" bytes");
 	cont->raiseDebugMessageEvent(debugstr.getString());
 
 	// indicate that an error has occurred
