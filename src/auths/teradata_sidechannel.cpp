@@ -367,7 +367,7 @@ bool sqlrauth_teradata_sidechannel::forwardClientMessageToBackend() {
 		return false;
 	}
 	if (isc.write(clientrecvdata,clientrecvdatalength)!=
-						clientrecvdatalength) {
+					(ssize_t)clientrecvdatalength) {
 		if (debug) {
 			stdoutput.write("send client data "
 					"to sidechannel failed\n");
