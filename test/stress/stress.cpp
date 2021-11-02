@@ -138,7 +138,7 @@ void queriesTest(void *id) {
 				for (int32_t j=1; j<curcount; j++) {
 					delete cursors[j];
 				}
-				delete cursors;
+				delete[] cursors;
 			}
 	
 			// drop the table
