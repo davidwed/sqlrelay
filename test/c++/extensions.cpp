@@ -118,10 +118,11 @@ int	main(int argc, char **argv) {
 
 
 	stdoutput.printf("IGNORE SELECT DATABASE:\n");
-	const char	*originaldb=con->getCurrentDatabase();
+	char	*originaldb=charstring::duplicate(con->getCurrentDatabase());
 	checkSuccess((originaldb!=NULL),true);
 	checkSuccess(con->selectDatabase("nonexistentdb"),true);
 	checkSuccess(con->getCurrentDatabase(),originaldb);
+	delete[] originaldb;
 	stdoutput.printf("\n\n");
 
 
