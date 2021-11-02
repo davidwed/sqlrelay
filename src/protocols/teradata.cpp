@@ -2582,8 +2582,8 @@ bool sqlrprotocol_teradata::forwardBackendResponseToClient() {
 		}
 		return false;
 	}
-	if (clientsock->write(backendreqdata,
-				backendreqdatalength)!=backendreqdatalength) {
+	if (clientsock->write(backendreqdata,backendreqdatalength)!=
+						(ssize_t)backendreqdatalength) {
 		if (getDebug()) {
 			stdoutput.write("clientsock write failed\n");
 		}
