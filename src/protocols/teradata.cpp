@@ -2188,7 +2188,7 @@ bool sqlrprotocol_teradata::recvRequestFromClient() {
 	// receive lan data
 	clientreqdata=clientreqmessagepool->allocate(clientreqdatalength);
 	if (clientsock->read(clientreqdata,clientreqdatalength)!=
-							clientreqdatalength) {
+						(ssize_t)clientreqdatalength) {
 		if (getDebug()) {
 			stdoutput.write("read data from client failed\n");
 		}
