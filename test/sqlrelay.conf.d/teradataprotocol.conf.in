@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<instances>
+
+	<instance id="teradatatest" dbase="odbc" translatebindvariables="yes">
+		<listeners>
+			<listener protocol="teradata" port="1025"/>
+		</listeners>
+		<auths>
+			<auth module="teradata_sidechannel" host="teradata" port="1025"/>
+		</auths>
+		<connections>
+			<connection string="dsn=teradata;user=testuser;password=testpassword;autocommit=yes"/>
+		</connections>
+	</instance>
+
+</instances>
