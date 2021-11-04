@@ -1117,7 +1117,7 @@ AC_SUBST(HOSTNAME)
 AC_SUBST(SHORTHOSTNAME)
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf doc/admin/installingpkg.wt"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf doc/admin/installingpkg.wt"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config

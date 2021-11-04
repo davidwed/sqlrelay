@@ -4,15 +4,9 @@
 # tee output to testdetails.log
 if ( test "$CHILD" != "1" )
 then
-	#FIFO=testall.fifo
-	#rm -f $FIFO
-	#mkfifo $FIFO
-	#CHILD=1 $0 $* > $FIFO 2>&1 &
 	CHILD=1 $0 2>&1 | tee testdetails.log &
 	PID=$!
-	#tee testdetails.log <$FIFO &
 	wait $PID
-	#rm -f $FIFO
 	exit $?
 fi
 
@@ -101,15 +95,15 @@ do
 	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
 	then
-		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id routermaster -backtrace `pwd`
+		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf.d/${DB}.conf -id routermaster -backtrace `pwd`
 		sleep 2
 
-		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id routerslave -backtrace `pwd`
+		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf.d/${DB}.conf -id routerslave -backtrace `pwd`
 		sleep 2
 	fi
 
 	# start the instance
-	$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id ${DB}test -backtrace `pwd`
+	$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf.d/${DB}.conf -id ${DB}test -backtrace `pwd`
 	sleep 2
 
 	# make sure that the instance is up
@@ -161,7 +155,8 @@ do
 				PING="The database is up."
 			fi
 		else
-			PING=`$PREFIX/bin/sqlrsh -id ${DB}test -command ping 2>&1`
+			CURRENTDIR=`pwd`
+			PING=`$PREFIX/bin/sqlrsh -config $CURRENTDIR/sqlrelay.conf.d/${DB}.conf -id ${DB}test -command ping 2>&1`
 		fi
 
 		# (this collapses whitespace)
@@ -264,12 +259,12 @@ do
 	if ( test "$DB" = "router" )
 	then
 		sleep 2
-		$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id routermaster
+		$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf.d/${DB}.conf -id routermaster
 		sleep 2
-		$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id routerslave
+		$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf.d/${DB}.conf -id routerslave
 	fi
 	sleep 2
-	$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id ${DB}test
+	$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf.d/${DB}.conf -id ${DB}test
 	sleep 2
 
 	echo

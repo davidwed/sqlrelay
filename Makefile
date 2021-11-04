@@ -102,7 +102,7 @@ distclean: clean
 		test/testall.vbs \
 		test/test.sh \
 		test/test.bat \
-		test/sqlrelay.conf \
+		test/sqlrelay.conf.d/*.conf \
 		msvc/setupx64/setupx64.vdproj \
 		msvc/setupx86/setupx86.vdproj \
 		doc/admin/installingpkg.wt \
