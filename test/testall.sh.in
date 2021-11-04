@@ -88,6 +88,19 @@ do
 		fi
 	fi
 
+	# for mssql tests, also verify that we have an odbc config for it
+	if ( test "$DB" = "mssql" )
+	then
+		if ( test -z "`grep mssqlodbc /etc/odbc.ini 2> /dev/null`" )
+		then
+			echo "skipping $DB..."
+			echo
+			echo "================================================================================"
+			echo
+			continue
+		fi
+	fi
+
 	# testing...
 	echo "testing $DB (from `hostname`)..."
 	echo "$DB..." >> testresults.log
