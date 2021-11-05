@@ -27,7 +27,7 @@
 			translatebindvariables="yes"
 			ignoreselectdatabase="yes"
 			isolationlevel="read committed"
-			passwordpath="/usr/local/firstworks/etc/sqlrelay.conf.d/extensions">
+			passwordpath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc">
 		<auths>
 			<auth module="userlist">
 				<user user="test"
@@ -79,10 +79,10 @@
 						salt="sr"/>
 			<passwordencryption module="aes128"
 						id="aes128"
-		keypath="/usr/local/firstworks/etc/sqlrelay.conf.d/extensions"
+		keypath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc"
 						keybinext="aes128"
 						keyhexext="aes128hex"
-		credpath="/usr/local/firstworks/etc/sqlrelay.conf.d/extensions"
+		credpath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc"
 						credbin="no"
 						credhexext="aes128"
 						key="[aes128testkey]"/>
@@ -154,20 +154,20 @@
 			<logger module="custom_nw"/>
 			<logger module="custom_sc"/>
 			<logger module="custom_sc"
-				path="/usr/local/firstworks/var/log/sqlrelay"/>
+				path="@abs_top_builddir@/test/log"/>
 			<logger module="custom_sc"
-				path="/usr/local/firstworks/var/log/sqlrelay"
+				path="@abs_top_builddir@/test/log"
 				name="sc.log"/>
 			<logger module="custom_sc"
-				path="/usr/local/firstworks/var/log/sqlrelay"
+				path="@abs_top_builddir@/test/log"
 				name="sc-info.log"
 				loglevel="info"/>
 			<logger module="custom_sc"
-				path="/usr/local/firstworks/var/log/sqlrelay"
+				path="@abs_top_builddir@/test/log"
 				name="sc-warning.log"
 				loglevel="warning"/>
 			<logger module="custom_sc"
-				path="/usr/local/firstworks/var/log/sqlrelay"
+				path="@abs_top_builddir@/test/log"
 				name="sc-error.log"
 				loglevel="error"/>
 			<logger module="slowqueries"/>

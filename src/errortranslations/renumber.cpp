@@ -12,7 +12,6 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslation_renumber :
 						sqlrservercontroller *cont,
 						sqlrerrortranslations *sqlts,
 						domnode *parameters);
-			~sqlrerrortranslation_renumber();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					int64_t errornumber,
