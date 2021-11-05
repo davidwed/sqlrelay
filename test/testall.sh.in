@@ -128,7 +128,7 @@ do
 		echo "pinging $DB..."
 		if ( test "$DB" = "tls" )
 		then
-			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert $PREFIX/etc/sqlrelay.conf.d/client.pem -tlsca $PREFIX/etc/sqlrelay.conf.d/ca.pem -tlsvalidate ca -command ping 2>&1`
+			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert @abs_top_builddir@/test/sqlrelay.conf.d/tls/client.pem -tlsca @abs_top_builddir@/test/sqlrelay.conf.d/tls/ca.pem -tlsvalidate ca -command ping 2>&1`
 		elif ( test "$DB" = "extensions" )
 		then
 			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping 2>&1`
@@ -169,7 +169,7 @@ do
 			fi
 		else
 			CURRENTDIR=`pwd`
-			PING=`$PREFIX/bin/sqlrsh -config $CURRENTDIR/sqlrelay.conf.d/${DB}.conf -id ${DB}test -command ping 2>&1`
+			PING=`$PREFIX/bin/sqlrsh -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id ${DB}test -command ping 2>&1`
 		fi
 
 		# (this collapses whitespace)
@@ -214,49 +214,59 @@ do
 
 			if ( test "$DB" = "mysqlprotocol" )
 			then
-				./protocol/mysql/mysql
+				cd protocol/mysql
+				./mysql
 				if ( test "$?" = "0" )
 				then
 					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
 					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
+				cd ../..
 			elif ( test "$DB" = "postgresqlprotocol" )
 			then
-				./protocol/postgresql/postgresql
+				cd protocol/postgresql
+				./postgresql
 				if ( test "$?" = "0" )
 				then
 					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
 					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
+				cd ../..
 			elif ( test "$DB" = "tdsprotocol" )
 			then
-				./protocol/tds/tds
+				cd protocol/tds
+				./tds
 				if ( test "$?" = "0" )
 				then
 					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
 					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
+				cd ../..
 			elif ( test "$DB" = "oracleprotocol" )
 			then
-				./protocol/oracle/oracle
+				cd protocol/oracle
+				./oracle
 				if ( test "$?" = "0" )
 				then
 					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
 					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
+				cd ../..
 			elif ( test "$DB" = "teradataprotocol" )
 			then
-				./protocol/teradata/teradata
+				cd protocol/teradata
+				./teradata
 				if ( test "$?" = "0" )
 				then
 					printf "    % 8s: success\n" "protocol" >> testresults.log
 				else
 					printf "    % 8s: failed\n" "protocol" >> testresults.log
 				fi
+				cd ../..
 			else
 				./test.sh $DB
 			fi

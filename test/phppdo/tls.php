@@ -18,11 +18,11 @@
 	$socket="/tmp/test.socket";
 	$user="";
 	$password="";
-	$tlscert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem";
-	$tlsca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem";
+	$tlscert="../sqlrelay.conf.d/tls/client.pem";
+	$tlsca="../sqlrelay.conf.d/tls/ca.pem";
 	if (strtoupper(substr(PHP_OS,0,3))==='WIN') {
-		$tlscert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx";
-		$tlsca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx";
+		$tlscert="..\\sqlrelay.conf.d\\tls\\client.pfx";
+		$tlsca="..\\sqlrelay.conf.d\\tls\\ca.pfx";
 	}
 	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;tls=yes;tlscert=$tlscert;tlsvalidate=ca;tlsca=$tlsca;debug=0";
 

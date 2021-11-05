@@ -142,12 +142,12 @@ namespace SQLRClientTest
         public static void Main(String[] args)
         {
 
-            tlscert = "/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem";
-            tlsca = "/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem";
+            tlscert = "../sqlrelay.conf.d/tls/client.pem";
+            tlsca = "../sqlrelay.conf.d/tls/ca.pem";
             if (Environment.OSVersion.ToString().Contains("Windows"))
             {
-                tlscert = "C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx";
-                tlsca = "C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx";
+                tlscert = "..\\sqlrelay.conf.d\\tls\\client.pfx";
+                tlsca = "..\\sqlrelay.conf.d\\tls\\ca.pfx";
             }
 
             // open connection and command
