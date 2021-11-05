@@ -217,9 +217,9 @@ do
 				./mysql
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "protocol" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
 				else
-					printf "    % 8s: failed\n" "protocol" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
 				fi
 				cd ../..
 			elif ( test "$DB" = "postgresqlprotocol" )
@@ -228,9 +228,9 @@ do
 				./postgresql
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "protocol" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
 				else
-					printf "    % 8s: failed\n" "protocol" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
 				fi
 				cd ../..
 			elif ( test "$DB" = "tdsprotocol" )
@@ -239,9 +239,9 @@ do
 				./tds
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "protocol" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
 				else
-					printf "    % 8s: failed\n" "protocol" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
 				fi
 				cd ../..
 			elif ( test "$DB" = "oracleprotocol" )
@@ -250,9 +250,9 @@ do
 				./oracle
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "protocol" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
 				else
-					printf "    % 8s: failed\n" "protocol" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
 				fi
 				cd ../..
 			elif ( test "$DB" = "teradataprotocol" )
@@ -261,9 +261,9 @@ do
 				./teradata
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "protocol" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
 				else
-					printf "    % 8s: failed\n" "protocol" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
 				fi
 				cd ../..
 			else

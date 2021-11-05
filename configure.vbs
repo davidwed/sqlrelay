@@ -979,6 +979,9 @@ end if
 if disablemysql=false then
 	TESTDBS=TESTDBs&"""mysqlprotocol"","
 end if
+if disablepostgresql=false then
+	TESTDBS=TESTDBs&"""postgresqlprotocol"","
+end if
 
 ' truncate the trailing comma
 TESTDBS=left(TESTDBS,len(TESTDBS)-1)

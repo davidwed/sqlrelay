@@ -1088,6 +1088,9 @@ fi
 if ( test -n "$MYSQLLIBS" ); then
 	TESTDBS="$TESTDBS mysqlprotocol"
 fi
+if ( test -n "$POSTGRESQLLIBS" ); then
+	TESTDBS="$TESTDBS postgresqlprotocol"
+fi
 AC_SUBST(TESTDBS)
 AC_SUBST(TESTAPIS)
 
