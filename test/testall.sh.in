@@ -108,15 +108,15 @@ do
 	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
 	then
-		$PREFIX/bin/sqlr-start -config @abs_top_builddir@/sqlrelay.conf.d/${DB}.conf -id routermaster -backtrace @abs_top_builddir@
+		$PREFIX/bin/sqlr-start -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id routermaster -backtrace @abs_top_builddir@/test
 		sleep 2
 
-		$PREFIX/bin/sqlr-start -config @abs_top_builddir@/sqlrelay.conf.d/${DB}.conf -id routerslave -backtrace @abs_top_builddir@
+		$PREFIX/bin/sqlr-start -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id routerslave -backtrace @abs_top_builddir@/test
 		sleep 2
 	fi
 
 	# start the instance
-	$PREFIX/bin/sqlr-start -config @abs_top_builddir@/sqlrelay.conf.d/${DB}.conf -id ${DB}test -backtrace @abs_top_builddir@
+	$PREFIX/bin/sqlr-start -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id ${DB}test -backtrace @abs_top_builddir@/test
 	sleep 2
 
 	# make sure that the instance is up
@@ -281,12 +281,12 @@ do
 	if ( test "$DB" = "router" )
 	then
 		sleep 2
-		$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/sqlrelay.conf.d/${DB}.conf -id routermaster
+		$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id routermaster
 		sleep 2
-		$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/sqlrelay.conf.d/${DB}.conf -id routerslave
+		$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id routerslave
 	fi
 	sleep 2
-	$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/sqlrelay.conf.d/${DB}.conf -id ${DB}test
+	$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id ${DB}test
 	sleep 2
 
 	rm -f log/*.log
