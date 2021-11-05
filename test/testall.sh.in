@@ -51,10 +51,22 @@ do
 			continue
 		fi
 
-	# for the mysqlprotocol test, verify that we support the mysql
+	# for the mysqlprotocol test, verify that we support the mysql database
 	elif ( test "$DB" = "mysqlprotocol" )
 	then
 		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_mysql.so 2> /dev/null`" )
+		then
+			echo "skipping $DB..."
+			echo
+			echo "================================================================================"
+			echo
+			continue
+		fi
+
+	# for the postgresqlprotocol test, verify that we support the postgresql database
+	elif ( test "$DB" = "postgresqlprotocol" )
+	then
+		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_postgresql.so 2> /dev/null`" )
 		then
 			echo "skipping $DB..."
 			echo
