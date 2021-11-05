@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.SUFFIXES: .lo .xs
+.SUFFIXES: .lo .obj .xs
 
 .xs.cpp:
 	$(PERL) $(XSUBPP) -C++ -typemap $(PERLLIB)/ExtUtils/typemap -typemap perlobject.map -typemap typemap $< > $<c

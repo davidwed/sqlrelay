@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.SUFFIXES: .lo
+.SUFFIXES: .lo .obj .cpp
 
 .cpp.lo:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPTESTCPPFLAGS) $(POSTGRESQLINCLUDES) $(COMPILE) $< $(OUT)$@

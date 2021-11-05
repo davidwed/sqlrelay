@@ -2,7 +2,7 @@ top_builddir = ../..
 
 include ../../config.mk
 
-.SUFFIXES: .lo
+.SUFFIXES: .lo .obj
 
 .c.lo:
 	$(LTCOMPILE) $(CC) $(CFLAGS) $(CTESTCPPFLAGS) $(COMPILE) $< $(OUT)$@

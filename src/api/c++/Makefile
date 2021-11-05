@@ -23,7 +23,7 @@ LOBJS = sqlrconnection.$(OBJ) \
 	sqlrexportxml.$(OBJ) \
 	sqlrexportcsv.$(OBJ)
 
-.SUFFIXES: .lo
+.SUFFIXES: .lo .obj .cpp
 
 .cpp.lo:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CPPCPPFLAGS) $(COMPILE) $< $(OUT)$@

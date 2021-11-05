@@ -95,7 +95,7 @@ LIBSQLRSERVERLOBJS = \
 	sqlrmoduledatas.$(OBJ) \
 	sqlrmoduledata.$(OBJ)
 
-.SUFFIXES: .lo .cpp.in
+.SUFFIXES: .lo .obj .cpp .cpp.in
 
 .cpp.lo:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(SERVERCPPFLAGS) $(COMPILE) $< $(OUT)$@

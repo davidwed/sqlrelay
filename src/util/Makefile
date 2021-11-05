@@ -13,7 +13,7 @@ LOBJS = sqlrcmdline.$(OBJ) \
 	sqlrconfig.$(OBJ) \
 	sqlrconfigs.$(OBJ)
 
-.SUFFIXES: .lo
+.SUFFIXES: .lo .obj .cpp
 
 .cpp.lo:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(UTILCPPFLAGS) $(COMPILE) $< $(OUT)$@
