@@ -16,6 +16,10 @@
 	migrated tds, oracle, and teradata protocols to public distro
 		(built but not currently installed though)
 	removed drop-in replacement modules for mysql and postgresql
+	refactored testing framework so that it doesn't rely on config or
+		other supporting files being installed on the build host's
+		filesystem
+	fixed a potential reference-after-free in the mysql connection module
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
