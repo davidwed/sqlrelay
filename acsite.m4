@@ -693,6 +693,24 @@ else
 fi
 ])
 
+dnl Checks for irix and adds some macros if it is
+AC_DEFUN([FW_CHECK_IRIX],
+[
+AC_MSG_CHECKING(for irix)
+case $host_os in
+	*irix* )
+		CPPFLAGS="$CPPFLAGS -D_XOPEN_SOURCE=500"
+		if ( test "$CXX" = "CC" )
+		then
+			CPPFLAGS="$CPPFLAGS -D__SGICXX"
+		fi
+		AC_MSG_RESULT(yes)
+		;;
+	* )
+		AC_MSG_RESULT(no)
+		;;
+esac
+])
 
 AC_DEFUN([FW_CHECK_F_NO_BUILTIN],
 [
