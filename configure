@@ -16879,6 +16879,26 @@ $as_echo "no" >&6; }
 esac
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for irix" >&5
+$as_echo_n "checking for irix... " >&6; }
+case $host_os in
+	*irix* )
+		CPPFLAGS="$CPPFLAGS -D_XOPEN_SOURCE=500"
+		if ( test "$CXX" = "CC" )
+		then
+			# define __SGICXX and interpret #error as an error
+			CPPFLAGS="$CPPFLAGS -D__SGICXX -diag_error 1035 -LANG:ansi-for-init-scope=on"
+		fi
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		;;
+	* )
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		;;
+esac
+
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for dynamic library extensions" >&5
 $as_echo_n "checking for dynamic library extensions... " >&6; }
 SOSUFFIX="so"

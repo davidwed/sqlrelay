@@ -694,6 +694,27 @@ fi
 ])
 
 
+dnl Checks for irix and adds some macros if it is
+AC_DEFUN([FW_CHECK_IRIX],
+[
+AC_MSG_CHECKING(for irix)
+case $host_os in
+	*irix* )
+		CPPFLAGS="$CPPFLAGS -D_XOPEN_SOURCE=500"
+		if ( test "$CXX" = "CC" )
+		then
+			# define __SGICXX and interpret #error as an error
+			CPPFLAGS="$CPPFLAGS -D__SGICXX -diag_error 1035 -LANG:ansi-for-init-scope=on"
+		fi
+		AC_MSG_RESULT(yes)
+		;;
+	* )
+		AC_MSG_RESULT(no)
+		;;
+esac
+])
+
+
 AC_DEFUN([FW_CHECK_F_NO_BUILTIN],
 [
 dnl Some environments throw warnings if stdlib is used because it redefines
