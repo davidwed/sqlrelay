@@ -123,7 +123,7 @@ ifeq ($(initroot),)
 		then \
 			/usr/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/sbin/systemctl enable sqlrelay.service; \
 		fi; \
-	elif ( test -x "/sbin/chkconfig" ); \
+	elif ( test -x "/sbin/chkconfig" -a "$(UNAME)" != "IRIX" ); \
 	then \
 		/sbin/chkconfig --add sqlrelay; \
 		/sbin/chkconfig --add sqlrcachemanager; \

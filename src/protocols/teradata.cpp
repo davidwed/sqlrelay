@@ -18,6 +18,7 @@
 #include <openssl/evp.h>
 #include <openssl/err.h>
 
+//#define DECRYPT 1
 
 // passthrough modes
 enum passthroughmode_t {
@@ -778,9 +779,11 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 		void	debugExtStart(const char *extname);
 		void	debugExtEnd();
 
+#ifdef DECRYPT
 		bool	decrypt(const unsigned char *encdata,
 					uint64_t encdatasize,
 					bytebuffer *decdata);
+#endif
 		bool	encrypt(const unsigned char *decdata,
 					uint64_t decdatasize,
 					bytebuffer *encdata);
@@ -1298,7 +1301,7 @@ bool sqlrprotocol_teradata::copKindConnect() {
 	// parse request
 	debugStart("copkind_connect");
 
-#if 1
+#ifdef DECRYPT
 	// FIXME: parse request, it should contain:
 	// * logon parcel - 36
 	// * session option parcel - 114
@@ -5626,31 +5629,13 @@ void sqlrprotocol_teradata::appendGatewayConfigParcel() {
 		0x10, 0x14, 0x0C, 0x01
 	};
 	uint16_t	field3=3;
-	unsigned char	data3[]={
-		// always empty?
-	};
 	uint16_t	field4=4;
 	uint16_t	data4=33;
 	uint16_t	field5=5;
-	unsigned char	data5[]={
-		// always empty?
-	};
 	uint16_t	field6=6;
-	unsigned char	data6[]={
-		// always empty?
-	};
 	uint16_t	field7=7;
-	unsigned char	data7[]={
-		// always empty?
-	};
 	uint16_t	field8=8;
-	unsigned char	data8[]={
-		// always empty?
-	};
 	uint16_t	field9=9;
-	unsigned char	data9[]={
-		// always empty?
-	};
 	uint16_t	field10=10;
 	unsigned char	data10[]={
 		0x01
@@ -5665,9 +5650,6 @@ void sqlrprotocol_teradata::appendGatewayConfigParcel() {
 	};
 	// no field 13?
 	uint16_t	field14=14;
-	unsigned char	data14[]={
-		// always empty?
-	};
 	write(&respdata,marker);
 	write(&respdata,field1);
 	write(&respdata,(uint16_t)(sizeof(uint16_t)+
@@ -5679,42 +5661,30 @@ void sqlrprotocol_teradata::appendGatewayConfigParcel() {
 						sizeof(uint16_t)+
 						sizeof(releasedata)));
 	write(&respdata,releasedata,sizeof(releasedata));
+	// field 3 always empty?
 	write(&respdata,field3);
-	write(&respdata,(uint16_t)(sizeof(uint16_t)+
-						sizeof(uint16_t)+
-						sizeof(data3)));
-	write(&respdata,data3,sizeof(data3));
+	write(&respdata,(uint16_t)(sizeof(uint16_t)+sizeof(uint16_t)));
 	write(&respdata,field4);
 	write(&respdata,(uint16_t)(sizeof(uint16_t)+
 						sizeof(uint16_t)+
 						sizeof(data4)));
 	write(&respdata,data4);
 	// note that 5 and 6 are reversed
+	// field 6 always empty?
 	write(&respdata,field6);
-	write(&respdata,(uint16_t)(sizeof(uint16_t)+
-						sizeof(uint16_t)+
-						sizeof(data6)));
-	write(&respdata,data6,sizeof(data6));
+	write(&respdata,(uint16_t)(sizeof(uint16_t)+sizeof(uint16_t)));
+	// field 5 always empty?
 	write(&respdata,field5);
-	write(&respdata,(uint16_t)(sizeof(uint16_t)+
-						sizeof(uint16_t)+
-						sizeof(data5)));
-	write(&respdata,data5,sizeof(data5));
+	write(&respdata,(uint16_t)(sizeof(uint16_t)+sizeof(uint16_t)));
+	// field 7 always empty?
 	write(&respdata,field7);
-	write(&respdata,(uint16_t)(sizeof(uint16_t)+
-						sizeof(uint16_t)+
-						sizeof(data7)));
-	write(&respdata,data7,sizeof(data7));
+	write(&respdata,(uint16_t)(sizeof(uint16_t)+sizeof(uint16_t)));
+	// field 8 always empty?
 	write(&respdata,field8);
-	write(&respdata,(uint16_t)(sizeof(uint16_t)+
-						sizeof(uint16_t)+
-						sizeof(data8)));
-	write(&respdata,data8,sizeof(data8));
+	write(&respdata,(uint16_t)(sizeof(uint16_t)+sizeof(uint16_t)));
+	// field 9 always empty?
 	write(&respdata,field9);
-	write(&respdata,(uint16_t)(sizeof(uint16_t)+
-						sizeof(uint16_t)+
-						sizeof(data9)));
-	write(&respdata,data9,sizeof(data9));
+	write(&respdata,(uint16_t)(sizeof(uint16_t)+sizeof(uint16_t)));
 	write(&respdata,field10);
 	write(&respdata,(uint16_t)(sizeof(uint16_t)+
 						sizeof(uint16_t)+
@@ -5730,11 +5700,9 @@ void sqlrprotocol_teradata::appendGatewayConfigParcel() {
 						sizeof(uint16_t)+
 						sizeof(data12)));
 	write(&respdata,data12,sizeof(data12));
+	// field 14 always empty?
 	write(&respdata,field14);
-	write(&respdata,(uint16_t)(sizeof(uint16_t)+
-						sizeof(uint16_t)+
-						sizeof(data14)));
-	write(&respdata,data14,sizeof(data14));
+	write(&respdata,(uint16_t)(sizeof(uint16_t)+sizeof(uint16_t)));
 	if (getDebug()) {
 		stdoutput.printf("		marker: %d\n",marker);
 		stdoutput.printf("		field 1:\n");
@@ -5742,19 +5710,13 @@ void sqlrprotocol_teradata::appendGatewayConfigParcel() {
 		stdoutput.printf("		release:\n");
 		debugHexDump(releasedata,sizeof(releasedata),3);
 		stdoutput.printf("		field 3:\n");
-		debugHexDump(data3,sizeof(data3),3);
 		stdoutput.printf("		field 4:\n");
 		stdoutput.printf("			%d\n",data4);
 		stdoutput.printf("		field 6:\n");
-		debugHexDump(data6,sizeof(data6),3);
 		stdoutput.printf("		field 5:\n");
-		debugHexDump(data5,sizeof(data5),3);
 		stdoutput.printf("		field 7:\n");
-		debugHexDump(data7,sizeof(data7),3);
 		stdoutput.printf("		field 8:\n");
-		debugHexDump(data8,sizeof(data8),3);
 		stdoutput.printf("		field 9:\n");
-		debugHexDump(data9,sizeof(data9),3);
 		stdoutput.printf("		field 10:\n");
 		debugHexDump(data10,sizeof(data10),3);
 		stdoutput.printf("		field 11:\n");
@@ -5762,7 +5724,6 @@ void sqlrprotocol_teradata::appendGatewayConfigParcel() {
 		stdoutput.printf("		field 12:\n");
 		debugHexDump(data12,sizeof(data12),3);
 		stdoutput.printf("		field 14:\n");
-		debugHexDump(data14,sizeof(data14),3);
 	}
 
 	debugParcelEnd();
@@ -7963,6 +7924,7 @@ void sqlrprotocol_teradata::debugExtEnd() {
 	}
 }
 
+#ifdef DECRYPT
 bool sqlrprotocol_teradata::decrypt(const unsigned char *encdata,
 						uint64_t encdatasize,
 						bytebuffer *decdata) {
@@ -8125,6 +8087,7 @@ debugHexDump(out,outsize);
 
 	return success;
 }
+#endif
 
 bool sqlrprotocol_teradata::encrypt(const unsigned char *decdata,
 						uint64_t decdatasize,

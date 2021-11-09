@@ -5090,7 +5090,7 @@ void sqlrprotocol_oracle::putLobField(sqlrservercursor *cursor, uint32_t col) {
 }
 
 void sqlrprotocol_oracle::putError(const char *error) {
-	return putError(error,charstring::length(error));
+	putError(error,charstring::length(error));
 }
 
 void sqlrprotocol_oracle::putError(const char *error, uint32_t errorlength) {
