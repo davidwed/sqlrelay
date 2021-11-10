@@ -16651,10 +16651,6 @@ MULTIARCHDIR="`$CC $CPPFLAGS -print-multiarch 2> /dev/null`"
 
 if ( test -z "$MULTIARCHDIR" )
 then
-fi
-
-if ( test -z "$MULTIARCHDIR" )
-then
 	MAARCH=`uname -m 2> /dev/null`
 	MAOS=`uname -o 2> /dev/null`
 	if ( test "$MAOS" = "GNU/Linux" )

@@ -482,10 +482,6 @@ dnl but we need the multiarch dir to find python on some platforms,
 dnl (eg. python3.6 on fedora 26) so, we'll attempt to finagle it...
 if ( test -z "$MULTIARCHDIR" )
 then
-fi
-
-if ( test -z "$MULTIARCHDIR" )
-then
 	MAARCH=`uname -m 2> /dev/null`
 	MAOS=`uname -o 2> /dev/null`
 	if ( test "$MAOS" = "GNU/Linux" )
