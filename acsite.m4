@@ -150,35 +150,27 @@ then
 fi
 
 
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources/firstworks" "/Library/$NAME" "/usr/local/firstworks"
+for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources/firstworks" "/Library/$NAME" "/usr/local/firstworks"
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
 
 		if ( test "$path" = "/" )
 		then
-			dnl look in /usr/include and /lib and /lib64
+			dnl look in /usr/include and /$LIBDIR
 			if ( test "$USEFULLLIBPATH" = "yes" )
 			then
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib\"; LIBSTRING=\"-Wl,/lib/lib$LIBNAME.$SOSUFFIX\"],[/lib/lib$LIBNAME.a],[LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\"],[/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 			else
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\"],[/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-l$LIBNAME\"],[/$LIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
-
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib64/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib64\"; LIBSTRING=\"-Wl,/lib64/lib$LIBNAME.$SOSUFFIX\"],[/lib64/lib$LIBNAME.a],[LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-			else
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib64/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\"],[/lib64/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-			fi
-			
 
 			dnl set path to "" so we won't get //'s from here on
 			path=""
 		fi
 
 
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
+		for libpath in "$path/$LIBDIR" "$path/$LIBDIR/$NAME" "$path/$LIBDIR/opt" "$path/$LIBDIR/$MULTIARCHDIR"
 		do
 
 			if ( test -n "$LIBSTRING" )
@@ -194,6 +186,7 @@ do
 					break
 				fi
 
+				dnl look in $path/$LIBDIR
 				if ( test "$USEFULLLIBPATH" = "yes" )
 				then
 					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
@@ -448,6 +441,36 @@ AC_DEFUN([FW_CHECK_NEW_DTAGS],
 ])
 
 
+AC_DEFUN([FW_CHECK_LIBDIR],
+[
+AC_MSG_CHECKING(for library directory)
+if ( test -n "$MULTIARCHDIR" )
+then
+	LIBDIR="lib"
+else
+	case $host_cpu in
+		x86_64 )
+			LIBDIR="lib64"
+			;;
+		mips64 )
+			LIBDIR="lib64"
+			;;
+		mips )
+			LIBDIR="lib32"
+			;;
+		* )
+			LIBDIR="lib"
+			;;
+	esac
+fi
+if ( test "$LIBDIR" = "lib64" -a ! -d "/lib64" )
+then
+	LIBDIR="lib"
+fi
+AC_MSG_RESULT($LIBDIR)
+])
+
+
 dnl Checks for multiarch platform
 AC_DEFUN([FW_CHECK_MULTIARCH],
 [
@@ -457,6 +480,10 @@ MULTIARCHDIR="`$CC $CPPFLAGS -print-multiarch 2> /dev/null`"
 dnl $CC -print-multiarch doesn't return anything on most platforms,
 dnl but we need the multiarch dir to find python on some platforms,
 dnl (eg. python3.6 on fedora 26) so, we'll attempt to finagle it...
+if ( test -z "$MULTIARCHDIR" )
+then
+fi
+
 if ( test -z "$MULTIARCHDIR" )
 then
 	MAARCH=`uname -m 2> /dev/null`
@@ -691,25 +718,6 @@ then
 else
 	AC_MSG_RESULT(no)
 fi
-])
-
-dnl Checks for irix and adds some macros if it is
-AC_DEFUN([FW_CHECK_IRIX],
-[
-AC_MSG_CHECKING(for irix)
-case $host_os in
-	*irix* )
-		CPPFLAGS="$CPPFLAGS -D_XOPEN_SOURCE=500"
-		if ( test "$CXX" = "CC" )
-		then
-			CPPFLAGS="$CPPFLAGS -D__SGICXX"
-		fi
-		AC_MSG_RESULT(yes)
-		;;
-	* )
-		AC_MSG_RESULT(no)
-		;;
-esac
 ])
 
 dnl Checks for irix and adds some macros if it is
@@ -1021,7 +1029,7 @@ then
 
 else
 
-	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/opt/csw" "/usr/pkg" "/sw" "/usr/local/firstworks" "/boot/common" "/resources/index" "/resources/firstworks"
+	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/opt/csw" "/usr/pkg" "/sw" "/usr/freeware" "/usr/local/firstworks" "/boot/common" "/resources/index" "/resources/firstworks"
 	do
 		if ( test -n "$i" -a -d "$i" )
 		then
@@ -1439,7 +1447,7 @@ then
 		dnl try mysql_config first...
 		if ( test -z "$MYSQLLIBS" )
 		then
-			for dir in "$MYSQLPATHBIN" "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` "/usr/local/mariadb/bin" "/opt/sfw/mariadb/bin" "/usr/sfw/mariadb/bin" `ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
+			for dir in "$MYSQLPATHBIN" "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` "/usr/local/mariadb/bin" "/opt/sfw/mariadb/bin" "/usr/sfw/mariadb/bin" `ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
 			do
 
 				dnl try mysql_config, and if that fails,
@@ -2884,7 +2892,7 @@ then
 			AC_CHECK_PROG(PERL,perl,"perl")
 			if ( test -z "$PERL" )
 			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
+				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
 				do
 					if ( test -d "$i" )
 					then
@@ -3034,7 +3042,7 @@ then
 		for pyversion in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
 		do
 
-			for pyprefix in "$PYTHONPATH" "/usr" "/usr/local" "/usr/pkg" "/usr/local/python$pyversion" "/opt/sfw" "/usr/sfw" "/opt/csw" "/sw" "/System/Library/Frameworks/Python.framework/Versions/Current" "/boot/common"
+			for pyprefix in "$PYTHONPATH" "/usr" "/usr/local" "/usr/pkg" "/usr/local/python$pyversion" "/opt/sfw" "/usr/sfw" "/opt/csw" "/sw" "/usr/freeware" "/System/Library/Frameworks/Python.framework/Versions/Current" "/boot/common"
 			do
 
 				if ( test -n "$pyprefix" )
@@ -3227,7 +3235,7 @@ then
 				AC_CHECK_PROG(RUBY,"$ruby","$ruby")
 				if ( test -z "$RUBY" )
 				then
-					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
+					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
 					do
 						FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
 						if ( test -n "$RUBY" )
@@ -3576,7 +3584,7 @@ then
 			then
 				FW_CHECK_FILE("$PHPPATH/bin/$file",[PHPCONFIG=\"$PHPPATH/bin/$file\"])
 			else
-				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/opt/csw/php4/bin" "/opt/csw/php5/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
+				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/opt/csw/php4/bin" "/opt/csw/php5/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
 				do
 					FW_CHECK_FILE("$i/$file",[PHPCONFIG=\"$i/$file\"])
 					if ( test -n "$PHPCONFIG" )
@@ -3784,7 +3792,7 @@ then
 			AC_MSG_CHECKING(for alternative erlc/erl)
 			for version in "" "20" "19" "18" "17" "16" "15"
 			do
-				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
+				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
 				do
 					if ( test -r "$path/bin/erl$version" -a -r "$path/bin/erlc$version" )
 					then
@@ -3943,7 +3951,7 @@ then
 		do
 			AC_MSG_CHECKING(for $compiler)
 
-			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 			do
 				if ( test -r "$path/bin/$compiler" )
 				then
@@ -3971,7 +3979,7 @@ then
 		SN=""
 		AC_MSG_CHECKING(for sn)
 
-		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 		do
 			if ( test -r "$path/bin/sn" )
 			then
@@ -3992,7 +4000,7 @@ then
 		ILDASM=""
 		AC_MSG_CHECKING(for monodis)
 
-		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 		do
 			if ( test -r "$path/bin/monodis" )
 			then
@@ -4013,7 +4021,7 @@ then
 		ILASM=""
 		AC_MSG_CHECKING(for ilasm)
 
-		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 		do
 			if ( test -r "$path/bin/ilasm" )
 			then
@@ -4034,7 +4042,7 @@ then
 		GACUTIL=""
 		AC_MSG_CHECKING(for gacutil)
 
-		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 		do
 			if ( test -r "$path/bin/gacutil" )
 			then
@@ -4171,7 +4179,7 @@ then
 		NODEJSCXXFLAGS=""
 		AC_MSG_CHECKING(for node)
 
-		for path in "$NODEJSPATH" "/usr" "/" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
+		for path in "$NODEJSPATH" "/usr" "/" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/node"
 		do
 			if ( test -z "$path" )
 			then
@@ -4286,7 +4294,7 @@ then
 	else
 
 		dnl Checks for TCL.
-		for i in "/sw/include" "/opt/csw/include" "/usr/sfw/include" "/opt/sfw/include" "/usr/pkg/include" "/usr/local/include" "$prefix/include" "/usr/include" "$TCLINCLUDEPATH"
+		for i in "/sw/include" "/usr/freeware/include" "/opt/csw/include" "/usr/sfw/include" "/opt/sfw/include" "/usr/pkg/include" "/usr/local/include" "$prefix/include" "/usr/include" "$TCLINCLUDEPATH"
 		do
 			for j in "" "/tcl8.0" "/tcl8.1" "/tcl8.2" "/tcl8.3" "/tcl8.4" "/tcl8.5" "/tcl8.6" "/tcl8.7" "/tcl8.8" "/tcl8.9"
 			do
@@ -4296,7 +4304,7 @@ then
 		dnl first look for a dynamic libtcl
 		if ( test -n "$TCLINCLUDE" )
 		then
-			for i in "/sw/lib" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/usr/freeware/$IRIXLIB" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
@@ -4335,7 +4343,7 @@ then
 		dnl if we didn't find it, look for a dynamic libtclstub
 		if ( test -n "$TCLINCLUDE " -a -z "$TCLLIB" )
 		then
-			for i in "/sw/lib" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/usr/freeware/$IRIXLIB" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
