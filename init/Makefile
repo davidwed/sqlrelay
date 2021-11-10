@@ -235,7 +235,7 @@ uninstall:
 	then \
 		/bin/launchctl unload /Library/LaunchDaemons/com.firstworks.sqlrelay.plist; \
 		/bin/launchctl unload /Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
-	elif ( test ! -x "/sbin/chkconfig" -o "$(UNAME)" != "IRIX" ); \
+	elif ( test ! -x "/sbin/chkconfig" -o "$(UNAME)" = "IRIX" ); \
 	then \
 		$(RM) /etc/rc0.d/*sqlrelay \
 			/etc/rc1.d/*sqlrelay \
