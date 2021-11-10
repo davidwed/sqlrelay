@@ -16946,7 +16946,7 @@ $as_echo_n "checking for library directory... " >&6; }
 LIBDIR="lib"
 FREEWARELIBDIR="lib"
 if ( test -z "$MULTIARCHDIR" )
-else
+then
 	case $host_cpu in
 		x86_64 )
 			LIBDIR="lib64"

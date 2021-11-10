@@ -461,7 +461,7 @@ AC_MSG_CHECKING(for library directory)
 LIBDIR="lib"
 FREEWARELIBDIR="lib"
 if ( test -z "$MULTIARCHDIR" )
-else
+then
 	case $host_cpu in
 		x86_64 )
 			LIBDIR="lib64"
