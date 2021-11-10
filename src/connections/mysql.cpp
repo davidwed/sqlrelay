@@ -2021,7 +2021,8 @@ bool mysqlcursor::columnInfoIsValidAfterPrepare() {
 void mysqlcursor::encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize) {
 	if (!mysqlconn->escapeblobs) {
-		return sqlrservercursor::encodeBlob(buffer,data,datasize);
+		sqlrservercursor::encodeBlob(buffer,data,datasize);
+		return;
 	}
 	buffer->append('\'');
 	for (uint32_t i=0; i<datasize; i++) {
