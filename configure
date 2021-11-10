@@ -16672,6 +16672,7 @@ else
 $as_echo "no" >&6; }
 fi
 
+WL="-Wl,"
 
 ARCH=""
 if ( test "$host_cpu" = "ia64" -o "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64" )
@@ -16891,6 +16892,7 @@ case $host_os in
 		then
 			# define __SGICXX and interpret #error as an error
 			CPPFLAGS="$CPPFLAGS -D__SGICXX -diag_error 1035 -LANG:ansi-for-init-scope=on"
+			WL=""
 		fi
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -17621,7 +17623,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -17729,7 +17731,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -18218,7 +18220,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -18326,7 +18328,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -18879,11 +18881,11 @@ fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
 				CLNTSH="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`"
 				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
-				ORACLELIBS="-Wl,$CLNTSH -L$ORACLE_INSTANTCLIENT_PREFIX -l$NNZ"
+				ORACLELIBS="$WL$CLNTSH -L$ORACLE_INSTANTCLIENT_PREFIX -l$NNZ"
 				if ( test "$ORACLEVERSION" = "12c" )
 				then
 					CLNTSHCORE="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
-					ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE"
+					ORACLELIBS="$ORACLELIBS -lons $WL$CLNTSHCORE"
 				fi
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
@@ -19611,7 +19613,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -19719,7 +19721,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -19859,7 +19861,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -19967,7 +19969,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -21716,7 +21718,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -21824,7 +21826,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -21964,7 +21966,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -22072,7 +22074,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -22213,7 +22215,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -22321,7 +22323,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -22464,7 +22466,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -22572,7 +22574,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -23472,7 +23474,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -23580,7 +23582,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -23755,7 +23757,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -23863,7 +23865,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -24002,7 +24004,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -24110,7 +24112,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -24588,7 +24590,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -24696,7 +24698,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -25908,7 +25910,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -26016,7 +26018,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -26155,7 +26157,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -26263,7 +26265,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -26405,7 +26407,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -26513,7 +26515,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -26652,7 +26654,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -26760,7 +26762,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -26901,7 +26903,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -27009,7 +27011,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -27148,7 +27150,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -27256,7 +27258,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -29904,7 +29906,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -30012,7 +30014,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -30149,7 +30151,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -30257,7 +30259,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -30394,7 +30396,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval ""
-		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"-Wl,/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"/$LIBDIR\"; LIBSTRING=\"$WL/$LIBDIR/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "/$LIBDIR/lib$LIBNAME.a" -a -n "LIBSTRING=\"/$LIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )
@@ -30502,7 +30504,7 @@ then
 	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
 	then
 		eval "INCLUDESTRING=\"-I$includepath\""
-		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\""
+		eval "LIBPATH=\"$libpath\"; LIBSTRING=\"$WL$libpath/lib$LIBNAME.$SOSUFFIX\""
 	fi
 else
 	if ( test -n "$libpath/lib$LIBNAME.a" -a -n "LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"" )

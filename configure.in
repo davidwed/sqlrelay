@@ -607,6 +607,7 @@ echo
 echo "***** Platform ***************"
 FW_CHECK_UNAME
 FW_CHECK_MULTIARCH
+WL="-Wl,"
 FW_CHECK_X64
 FW_CHECK_MICROSOFT
 FW_CHECK_MINIX
