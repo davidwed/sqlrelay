@@ -168,39 +168,29 @@ do
 			dnl set path to "" so we won't get //'s from here on
 			path=""
 		fi
-
-		if ( test "$path" = "/usr/freeware" )
+		if ( test -n "$LIBSTRING" )
 		then
-			dnl look in /usr/freeware/include and
-			dnl /usr/freeware/$FREEWARELIBDIR
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-				FW_CHECK_HEADER_LIB([$path/include/$HEADER],[],[$path/$FREEWARELIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$path/$FREEWARELIBDIR\"; LIBSTRING=\"-Wl,$path/$FREEWARELIBDIR/lib$LIBNAME.$SOSUFFIX\"],[$path/$FREEWARELIBDIR/lib$LIBNAME.a],[LIBSTRING=\"$path/$FREEWARELIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-			else
-				FW_CHECK_HEADER_LIB([$path/include/$HEADER],[],[$path/$FREEWARELIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$path/$FREEWARELIBDIR\"; LIBSTRING=\"-l$LIBNAME\"],[$path/$FREEWARELIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-			fi
-
-			dnl set path to "" so we won't get //'s from here on
-			path=""
+			HEADERSANDLIBSPATH="$path"
+			break
 		fi
 
-		for libpath in "$path/$LIBDIR" "$path/$LIBDIR/$NAME" "$path/$LIBDIR/opt" "$path/$LIBDIR/$MULTIARCHDIR"
+		TEMPLIBDIR=$LIBDIR
+		if ( test "$path" = "/usr/freeware" )
+		then
+			TEMPLIBDIR=$LIBARCHDIR
+		fi
+		for libpath in "$path/$TEMPLIBDIR" "$path/$TEMPLIBDIR/$NAME" "$path/$TEMPLIBDIR/opt" "$path/$TEMPLIBDIR/$MULTIARCHDIR"
 		do
-
 			if ( test -n "$LIBSTRING" )
 			then
 				break
 			fi
-
 			for includepath in "$path/include" "$path/include/$NAME"
 			do
-
 				if ( test -n "$LIBSTRING" )
 				then
 					break
 				fi
-
-				dnl look in $path/$LIBDIR
 				if ( test "$USEFULLLIBPATH" = "yes" )
 				then
 					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
@@ -209,7 +199,6 @@ do
 				fi
 			done
 		done
-
 		if ( test -n "$LIBSTRING" )
 		then
 			HEADERSANDLIBSPATH="$path"
@@ -459,20 +448,20 @@ AC_DEFUN([FW_CHECK_LIBDIR],
 [
 AC_MSG_CHECKING(for library directory)
 LIBDIR="lib"
-FREEWARELIBDIR="lib"
+LIBARCHDIR="lib"
 if ( test -z "$MULTIARCHDIR" )
 then
 	case $host_cpu in
-		x86_64 )
+		x86_64)
 			LIBDIR="lib64"
-			FREEWARELIBDIR="lib64"
+			LIBARCHDIR="lib64"
 			;;
-		mips64 )
+		mips64)
 			LIBDIR="lib64"
-			FREEWARELIBDIR="lib64"
+			LIBARCHDIR="lib64"
 			;;
-		mips )
-			FREEWARELIBDIR="lib32"
+		mips)
+			LIBARCHDIR="lib32"
 			;;
 	esac
 fi
@@ -480,7 +469,7 @@ if ( test "$LIBDIR" = "lib64" -a ! -d "/lib64" )
 then
 	LIBDIR="lib"
 fi
-AC_MSG_RESULT($LIBDIR)
+AC_MSG_RESULT($LIBDIR and $LIBARCHDIR)
 ])
 
 
@@ -501,7 +490,10 @@ then
 	then
 		MAOS="linux-gnu"
 	fi
-	MULTIARCHDIR="$MAARCH-$MAOS"
+	if ( test -n "$MAARCH" -a -n "$MAOS" )
+	then
+		MULTIARCHDIR="$MAARCH-$MAOS"
+	fi
 fi
 
 if ( test -n "$MULTIARCHDIR" )
@@ -4313,7 +4305,7 @@ then
 		dnl first look for a dynamic libtcl
 		if ( test -n "$TCLINCLUDE" )
 		then
-			for i in "/sw/lib" "/usr/freeware/$FREEWARELIBDIR" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/usr/freeware/$LIBARCHDIR" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
@@ -4352,7 +4344,7 @@ then
 		dnl if we didn't find it, look for a dynamic libtclstub
 		if ( test -n "$TCLINCLUDE " -a -z "$TCLLIB" )
 		then
-			for i in "/sw/lib" "/usr/freeware/$FREEWARELIBDIR" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/usr/freeware/$LIBARCHDIR" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
