@@ -169,6 +169,20 @@ do
 			path=""
 		fi
 
+		if ( test "$path" = "/usr/freeware" )
+		then
+			dnl look in /usr/freeware/include and
+			dnl /usr/freeware/$FREEWARELIBDIR
+			if ( test "$USEFULLLIBPATH" = "yes" )
+			then
+				FW_CHECK_HEADER_LIB([$path/include/$HEADER],[],[$path/$FREEWARELIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$path/$FREEWARELIBDIR\"; LIBSTRING=\"-Wl,$path/$FREEWARELIBDIR/lib$LIBNAME.$SOSUFFIX\"],[$path/$FREEWARELIBDIR/lib$LIBNAME.a],[LIBSTRING=\"$path/$FREEWARELIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+			else
+				FW_CHECK_HEADER_LIB([$path/include/$HEADER],[],[$path/$FREEWARELIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$path/$FREEWARELIBDIR\"; LIBSTRING=\"-l$LIBNAME\"],[$path/$FREEWARELIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+			fi
+
+			dnl set path to "" so we won't get //'s from here on
+			path=""
+		fi
 
 		for libpath in "$path/$LIBDIR" "$path/$LIBDIR/$NAME" "$path/$LIBDIR/opt" "$path/$LIBDIR/$MULTIARCHDIR"
 		do
@@ -444,22 +458,21 @@ AC_DEFUN([FW_CHECK_NEW_DTAGS],
 AC_DEFUN([FW_CHECK_LIBDIR],
 [
 AC_MSG_CHECKING(for library directory)
-if ( test -n "$MULTIARCHDIR" )
-then
-	LIBDIR="lib"
+LIBDIR="lib"
+FREEWARELIBDIR="lib"
+if ( test -z "$MULTIARCHDIR" )
 else
 	case $host_cpu in
 		x86_64 )
 			LIBDIR="lib64"
+			FREEWARELIBDIR="lib64"
 			;;
 		mips64 )
 			LIBDIR="lib64"
+			FREEWARELIBDIR="lib64"
 			;;
 		mips )
-			LIBDIR="lib32"
-			;;
-		* )
-			LIBDIR="lib"
+			FREEWARELIBDIR="lib32"
 			;;
 	esac
 fi
@@ -4300,7 +4313,7 @@ then
 		dnl first look for a dynamic libtcl
 		if ( test -n "$TCLINCLUDE" )
 		then
-			for i in "/sw/lib" "/usr/freeware/$IRIXLIB" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/usr/freeware/$FREEWARELIBDIR" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
@@ -4339,7 +4352,7 @@ then
 		dnl if we didn't find it, look for a dynamic libtclstub
 		if ( test -n "$TCLINCLUDE " -a -z "$TCLLIB" )
 		then
-			for i in "/sw/lib" "/usr/freeware/$IRIXLIB" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/usr/freeware/$FREEWARELIBDIR" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
