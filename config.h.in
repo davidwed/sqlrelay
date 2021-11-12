@@ -276,9 +276,6 @@
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
-/* Mingw32 environment */
-#undef MINGW32
-
 /* Some versions of glibc-2.3 need a fixup */
 #undef NEED_REDHAT_9_GLIBC_2_3_2_HACK
 
@@ -347,3 +344,24 @@
 
 /* Load SAP/Sybase libraries at runtime. */
 #undef SYBASE_AT_RUNTIME
+
+/* Haiku OS */
+#undef _HAIKU
+
+/* Irix OS */
+#undef _IRIX
+
+/* Minix */
+#undef _MINIX
+
+/* SCO OSR5 OS */
+#undef _SCO_OSR5
+
+/* SCO OSR6 OS */
+#undef _SCO_OSR6
+
+/* SCO UnixWare OS */
+#undef _SCO_UW
+
+/* Syllable OS */
+#undef _SYLLABLE
