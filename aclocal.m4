@@ -9684,6 +9684,10 @@ AC_SUBST(WNODEPRECATEDDECLARATIONS)
 dnl checks to see if the C++ compiler allows undefined functions
 dnl if it does, then WERROR is added to CPPFLAGS then sets WERROR to "" so it
 dnl won't be put back in again later
+dnl FIXME: I don't remember the exact purpose of this working this way.  I think
+dnl -Werror needs to be added to CPPFLAGS so that the configure script uses it
+dnl when testing for the presence of functions.  I'm not sure why it's set to
+dnl "" though.
 AC_DEFUN([FW_CHECK_UNDEFINED_FUNCTIONS],
 [
 AC_MSG_CHECKING(for whether undefined functions are allowed)
