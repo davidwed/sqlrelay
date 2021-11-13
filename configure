@@ -17492,7 +17492,6 @@ $as_echo "no" >&6; }
 
 
 
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -fno-builtin needs to be used" >&5
 $as_echo_n "checking whether -fno-builtin needs to be used... " >&6; }
 
@@ -17550,12 +17549,10 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
 fi
 
-
 if ( test -n "`echo $LDFLAGS | grep '\-Wl,\-z,relro'`" )
 then
 	CPPFLAGS="-fPIC $CPPFLAGS"
 fi
-
 echo "******************************"
 
 
@@ -18080,7 +18077,6 @@ echo
 echo "***** Libraries **************"
 
 
-
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for socket libraries" >&5
 $as_echo_n "checking for socket libraries... " >&6; }
 
@@ -18093,7 +18089,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 	SOCKETLIBS=""
 	DONE=""
-	for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet" "-lwsock32 -lnetapi32" "-lnetwork"
+	for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet" "-lwsock32 -lws2_32 -lnetapi32" "-lnetwork"
 	do
 
 SAVECPPFLAGS="$CPPFLAGS"
@@ -18105,28 +18101,27 @@ LD_LIBRARY_PATH=""
 export LD_LIBRARY_PATH
 cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
-#ifdef HAVE_STDLIB_H
-	#include <stdlib.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-	#include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-#endif
-#ifdef __MINGW32__
-	#include <winsock2.h>
-#endif
+
+void connect(int,void *,int);
+void listen(int,int);
+void bind(int,void *,int);
+void accept(int,void *,int);
+void send(int,void *,int,int);
+void sendto(int,void *,int,int,void *,int);
+void gethostbyname(void *);
+
 int
 main ()
 {
-connect(0,NULL,0);
+
+connect(0,0,0);
 listen(0,0);
-bind(0,NULL,0);
-accept(0,NULL,0);
-send(0,NULL,0,0);
-sendto(0,NULL,0,0,NULL,0);
-gethostbyname(NULL);
+bind(0,0,0);
+accept(0,0,0);
+send(0,0,0,0);
+sendto(0,0,0,0,0,0);
+gethostbyname(0);
+
   ;
   return 0;
 }
@@ -18300,7 +18295,6 @@ fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
 	fi
-
 
 
 
@@ -18714,7 +18708,6 @@ export LD_LIBRARY_PATH
 
 
 
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -lm required for ceil" >&5
 $as_echo_n "checking whether -lm required for ceil... " >&6; }
 
@@ -18749,7 +18742,6 @@ CPPFLAGS="$SAVECPPFLAGS"
 LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
-
 
 
 echo "******************************"
