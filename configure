@@ -17647,28 +17647,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -18299,28 +18328,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -18726,17 +18784,64 @@ then
 
 else
 
-	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/opt/csw" "/usr/pkg" "/sw" "/usr/freeware" "/usr/local/firstworks" "/boot/common" "/resources/index" "/resources/firstworks"
+
+EXTRAPATH="$RUDIMENTSPATH"
+NAME="rudiments"
+SUFFIX="bin"
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
 	do
-		if ( test -n "$i" -a -d "$i" )
+		if ( test "$p" = "/" )
 		then
-			RUDIMENTSCONFIG="$i/bin/rudiments-config"
-			if ( test -r "$RUDIMENTSCONFIG" )
-			then
-				RUDIMENTSVERSION="`$RUDIMENTSCONFIG --version`"
-				RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
-				RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
-			fi
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+	for i in $SEARCHPATHS
+	do
+		RUDIMENTSCONFIG="$i/rudiments-config"
+		if ( test -r "$RUDIMENTSCONFIG" )
+		then
+			RUDIMENTSVERSION="`$RUDIMENTSCONFIG --version`"
+			RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
+			RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
 		fi
 		if ( test -n "$RUDIMENTSLIBS" )
 		then
@@ -19747,28 +19852,57 @@ then
 	eval "dummy=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -20050,28 +20184,57 @@ then
 	eval "dummy=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -20353,28 +20516,57 @@ then
 	eval "dummy=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -20656,28 +20848,57 @@ then
 	eval "dummy=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -22568,28 +22789,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -22871,28 +23121,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -23175,28 +23454,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -23481,28 +23789,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -24544,28 +24881,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -24882,28 +25248,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -25184,28 +25579,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -25825,28 +26249,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -27277,28 +27730,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -27579,28 +28061,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -27884,28 +28395,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -28186,28 +28726,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -28490,28 +29059,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -28792,28 +29390,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -31890,28 +32517,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -32190,28 +32846,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -32490,28 +33175,57 @@ then
 	eval "=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+
+EXTRAPATH="$SEARCHPATH"
+NAME="$NAME"
+SUFFIX=""
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "SEARCHPATHS=\"$SWPATHS\""
+else
+	eval "SEARCHPATHS=\"$SWPREFIXES\""
+fi
+
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then

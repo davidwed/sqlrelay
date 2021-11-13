@@ -9053,6 +9053,75 @@ m4_ifndef([_LT_PROG_ECHO_BACKSLASH],	[AC_DEFUN([_LT_PROG_ECHO_BACKSLASH])])
 m4_ifndef([_LT_PROG_F77],		[AC_DEFUN([_LT_PROG_F77])])
 m4_ifndef([_LT_PROG_FC],		[AC_DEFUN([_LT_PROG_FC])])
 m4_ifndef([_LT_PROG_CXX],		[AC_DEFUN([_LT_PROG_CXX])])
+dnl prefixes to search for software packages
+dnl	$1 - an specific prefix to also search in addition to standard prefixes
+dnl		(may be left empty)
+dnl		(should not contain spaces)
+dnl	$2 - generic name of api or package, will be appended to various
+dnl		partial prefixes in an attempt to search more exhaustively
+dnl		eg. ssl, mysql, openssl, etc.
+dnl		(may be left empty)
+dnl		(should not contain spaces)
+dnl	$3 - path to append to the prefix
+dnl		eg. include, lib, bin, etc.
+dnl		(may be left empty)
+dnl		(should not contain spaces)
+dnl	$4 - variable that will be set to the set of paths
+AC_DEFUN([FW_SEARCH_PATHS],
+[
+EXTRAPATH="$1"
+NAME="$2"
+SUFFIX="$3"
+
+SWPREFIXES="$EXTRAPATH / /usr"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/local/$NAME /opt/$NAME /usr/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local /usr/pkg"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/pkg/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /opt/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/sfw"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /usr/sfw/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /opt/csw /sw /usr/freeware /boot/common /resources/index"
+SWPREFIXES="$SWPREFIXES /resources/firstworks"
+if ( test -n "$NAME" )
+then
+	SWPREFIXES="$SWPREFIXES /Library/$NAME"
+fi
+SWPREFIXES="$SWPREFIXES /usr/local/firstworks"
+
+if ( test -n "$SUFFIX" )
+then
+	SWPATHS=""
+	for p in $SWPREFIXES
+	do
+		if ( test "$p" = "/" )
+		then
+			SWPATHS="$SWPATHS /$SUFFIX"
+		else
+			SWPATHS="$SWPATHS $p/$SUFFIX"
+		fi
+	done
+	eval "$4=\"$SWPATHS\""
+else
+	eval "$4=\"$SWPREFIXES\""
+fi
+])
+
+
+
+
 dnl sets UNAME to the uname of the machine
 AC_DEFUN([FW_CHECK_UNAME],
 [
@@ -9285,28 +9354,8 @@ then
 	eval "$11=\"\""
 fi
 
-for path in \
-	"$SEARCHPATH" \
-	"/" \
-	"/usr" \
-	"/usr/local/$NAME" \
-	"/opt/$NAME" \
-	"/usr/$NAME" \
-	"/usr/local" \
-	"/usr/pkg" \
-	"/usr/pkg/$NAME" \
-	"/opt/sfw" \
-	"/opt/sfw/$NAME" \
-	"/usr/sfw" \
-	"/usr/sfw/$NAME" \
-	"/opt/csw" \
-	"/sw" \
-	"/usr/freeware" \
-	"/boot/common" \
-	"/resources/index" \
-	"/resources/firstworks" \
-	"/Library/$NAME" \
-	"/usr/local/firstworks"
+FW_SEARCH_PATHS([$SEARCHPATH],[$NAME],[],[SEARCHPATHS])
+for path in $SEARCHPATHS
 do
 	if ( test -n "$path" -a -d "$path" )
 	then
@@ -10199,4 +10248,80 @@ else
 	AC_MSG_RESULT(no)
 fi
 AC_DEFINE_UNQUOTED(INLINE,$INLINE,Some compliers dont support the inline keyword)
+])
+dnl checks for the rudiments library
+dnl requires:
+dnl 	cross_compiling, RUDIMENTSPATH
+dnl sets:
+dnl	RUDIMENTSPATH, RUDIMENTSINCLUDES, RUDIMENTSLIBS, RUDIMENTSLIBSPATH
+AC_DEFUN([FW_CHECK_RUDIMENTS],
+[
+
+RUDIMENTSVERSION=""
+RUDIMENTSLIBS=""
+RUDIMENTSLIBSPATH=""
+RUDIMENTSINCLUDES=""
+
+if ( test "$cross_compiling" = "yes" )
+then
+
+	dnl cross compiling
+	echo "cross compiling"
+	if ( test -n "$RUDIMENTSPATH" )
+	then
+		RUDIMENTSCONFIG="$RUDIMENTSPATH/bin/rudiments-config"
+		if ( test -r "$RUDIMENTSCONFIG" )
+		then
+			RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
+			RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
+		else
+			RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
+			RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"
+		fi
+	fi
+
+else
+
+	FW_SEARCH_PATHS([$RUDIMENTSPATH],[rudiments],[bin],[SEARCHPATHS])
+	for i in $SEARCHPATHS
+	do
+		RUDIMENTSCONFIG="$i/rudiments-config"
+		if ( test -r "$RUDIMENTSCONFIG" )
+		then
+			RUDIMENTSVERSION="`$RUDIMENTSCONFIG --version`"
+			RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
+			RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
+		fi
+		if ( test -n "$RUDIMENTSLIBS" )
+		then
+			break
+		fi
+	done
+fi
+
+if ( test -z "$RUDIMENTSLIBS" )
+then
+	AC_MSG_ERROR(Rudiments not found.  SQL-Relay requires this package.)
+	exit
+fi
+
+if ( test -n "$RUDIMENTSVERSION" )
+then
+	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
+	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
+	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
+	if ( test "$V1" -lt "2")
+	then
+		AC_MSG_ERROR([Rudiments version must be >= 2.0.0, found version $RUDIMENTSVERSION])
+		exit
+	fi
+fi
+
+FW_INCLUDES(rudiments,[$RUDIMENTSINCLUDES])
+FW_LIBS(rudiments,[$RUDIMENTSLIBS])
+
+AC_SUBST(RUDIMENTSPATH)
+AC_SUBST(RUDIMENTSINCLUDES)
+AC_SUBST(RUDIMENTSLIBS)
+AC_SUBST(RUDIMENTSLIBSPATH)
 ])
