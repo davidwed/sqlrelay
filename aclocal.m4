@@ -10249,6 +10249,156 @@ else
 fi
 AC_DEFINE_UNQUOTED(INLINE,$INLINE,Some compliers dont support the inline keyword)
 ])
+
+
+dnl checks for the pthreads library
+dnl requires:  PTHREADPATH, RPATHFLAG, cross_compiling
+dnl sets: HAVE_PTHREAD, PTHREADINCLUDES, PTHREADLIB
+AC_DEFUN([FW_CHECK_PTHREAD],
+[
+
+AC_MSG_CHECKING(if -pthread works during compile phase)
+if ( test -n "`$CXX -pthread 2>&1 | grep 'unrecognized option' | grep pthread`" )
+then
+	PTHREAD_COMPILE=""
+else
+	PTHREAD_COMPILE="-pthread"
+fi
+if ( test -n "$PTHREAD_COMPILE" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+
+HAVE_PTHREAD=""
+PTHREADINCLUDES=""
+PTHREADLIB=""
+
+if ( test "$cross_compiling" = "yes" )
+then
+
+	dnl cross compiling
+	echo "cross compiling"
+
+	if ( test -z "$MINGW32" )
+	then
+		if ( test -n "$PTHREADPATH" )
+		then
+			PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
+			PTHREADLIB="-L$PTHREADPATH/lib -lpthread -pthread"
+		else
+			PTHREADINCLUDES="$PTHREAD_COMPILE"
+			PTHREADLIB="-lpthread -pthread"
+		fi
+	fi
+	HAVE_PTHREAD="yes"
+
+else
+
+	dnl check pthread.h and standard thread libraries
+	for i in "pthread" "thread" "pthreads" "gthreads" ""
+	do
+		if ( test -n "$i" )
+		then
+			AC_MSG_CHECKING(for lib$i)
+		else
+			AC_MSG_CHECKING(for no library)
+		fi
+
+		INCLUDEDIR="pthread"
+		if ( test "$i" = "gthreads" )
+		then
+			INCLUDEDIR="FSU"
+		fi
+
+		if ( test -n "$i" )
+		then
+			FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[$INCLUDEDIR],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
+		fi
+
+		if ( test -n "$PTHREADLIB" -o -z "$i" )
+		then
+
+			AC_MSG_RESULT(yes)
+
+			dnl  If we found a set of headers and libs, try
+			dnl  linking with them a bunch of different ways
+			for try in 1 2 3 4 5 6 7 8
+			do
+
+				if ( test "$try" = "1" )
+				then
+					dnl for minix
+					TESTINCLUDES="$PTHREADINCLUDES"
+					TESTLIB="-lmthread $PTHREADLIB"
+				elif ( test "$try" = "2" )
+				then
+					dnl for minix
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="-lmthread $PTHREADLIB"
+				elif ( test "$try" = "3" )
+				then
+					TESTINCLUDES="$PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB"
+				elif ( test "$try" = "4" )
+				then
+					TESTINCLUDES="$PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB -pthread"
+				elif ( test "$try" = "5" )
+				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB"
+				elif ( test "$try" = "6" )
+				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="$PTHREADLIB -pthread"
+				elif ( test "$try" = "7" )
+				then
+					TESTINCLUDES="$PTHREADINCLUDES"
+					TESTLIB="-pthread"
+				elif ( test "$try" = "8" )
+				then
+					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
+					TESTLIB="-pthread"
+				fi
+
+				HAVE_PTHREAD=""
+				dnl try to link
+				AC_MSG_CHECKING(whether $TESTINCLUDES ... $TESTLIB works)
+				FW_TRY_LINK([#include <stddef.h>
+#include <pthread.h>],[pthread_exit(NULL);],[$CPPFLAGS $TESTINCLUDES],[$TESTLIB],[],[AC_MSG_RESULT(yes); HAVE_PTHREAD="yes"],[AC_MSG_RESULT(no)])
+
+				dnl  If the link succeeded then keep
+				dnl  the flags.
+				if ( test -n "$HAVE_PTHREAD" )
+				then
+					PTHREADINCLUDES="$TESTINCLUDES"
+					PTHREADLIB="$TESTLIB"
+					break
+				fi
+
+				dnl  If the link failed, reset the flags
+				TESTLIB=""
+				TESTINCLUDES=""
+			done
+
+			if ( test -n "$HAVE_PTHREAD" )
+			then
+				break
+			fi
+		else
+			AC_MSG_RESULT(no)
+		fi
+	done
+fi
+
+FW_INCLUDES(pthreads,[$PTHREADINCLUDES])
+FW_LIBS(pthreads,[$PTHREADLIB])
+
+AC_SUBST(PTHREADINCLUDES)
+AC_SUBST(PTHREADLIB)
+])
 dnl checks for the rudiments library
 dnl requires:
 dnl 	cross_compiling, RUDIMENTSPATH

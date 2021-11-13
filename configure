@@ -18042,15 +18042,14 @@ export LD_LIBRARY_PATH
 					break
 				fi
 
-								TESTINCLUDES=""
-				TESTLIB=""
+								TESTLIB=""
+				TESTINCLUDES=""
 			done
 
 			if ( test -n "$HAVE_PTHREAD" )
 			then
 				break
 			fi
-
 		else
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
