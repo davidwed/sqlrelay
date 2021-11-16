@@ -22,6 +22,7 @@ mandir = @mandir@
 datadir = @datadir@
 docdir = ${datadir}/doc/$(SQLRELAY)
 licensedir = ${datadir}/licenses/$(SQLRELAY)
+acdir = ${datadir}/$(SQLRELAY)/autoconf
 EXAMPLEDIR = ${datadir}/$(SQLRELAY)/examples
 tmpdir = ${localstatedir}/run/$(SQLRELAY)
 cachedir = ${localstatedir}/cache/$(SQLRELAY)
@@ -835,14 +836,14 @@ MODULERENAME = $(top_builddir)/modulerename.sh
 
 
 # build directories
-INSTALLSUBDIRS = install-src install-bin install-etc install-init install-license
+INSTALLSUBDIRS = install-src install-bin install-etc install-init install-license install-autoconf
 ifeq ($(ENABLE_CPP),yes)
 INSTALLSUBDIRS += install-pkgconfig
 endif
 ifeq ($(ENABLE_DOC),yes)
 INSTALLSUBDIRS += install-man install-doc
 endif
-UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-license uninstall-pkgconfig uninstall-man uninstall-doc
+UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-license uninstall-autoconf uninstall-pkgconfig uninstall-man uninstall-doc
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 SRCALLSUBDIRS = all-api

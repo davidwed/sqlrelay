@@ -35,6 +35,9 @@ install-license:
 	$(CP) COPYING $(licensedir)
 	$(CHMOD) 0644 $(licensedir)/COPYING
 
+install-autoconf:
+	cd autoconf $(AND) $(MAKE) install
+
 install-pkgconfig:
 	$(MKINSTALLDIRS) $(libdir)/pkgconfig
 	$(CP) sqlrelay-c.pc $(libdir)/pkgconfig/$(SQLRELAY)-c.pc
@@ -65,6 +68,9 @@ uninstall-doc:
 
 uninstall-license:
 	$(RMTREE) $(licensedir)
+
+uninstall-autoconf:
+	cd autoconf $(AND) $(MAKE) uninstall
 
 uninstall-pkgconfig:
 	$(RM) $(libdir)/pkgconfig/$(SQLRELAY)-c.pc \

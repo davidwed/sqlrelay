@@ -20,6 +20,7 @@ mandir = "@mandir@"
 datadir = "@datadir@"
 docdir = $(datadir)\\doc\\$(SQLRELAY)
 licensedir = $(datadir)\\licenses\\$(SQLRELAY)
+acdir = $(datadir)\\$(SQLRELAY)\\autoconf
 EXAMPLEDIR = $(datadir)\\$(SQLRELAY)\\examples
 tmpdir = $(localstatedir)\\run\\$(SQLRELAY)
 cachedir = $(localstatedir)\\cache\\$(SQLRELAY)

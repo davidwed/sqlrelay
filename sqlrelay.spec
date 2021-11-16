@@ -586,6 +586,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/sqlrutil.h
 %{_includedir}/%{name}/private/sqlrutilincludes.h
 %{_libdir}/libsqlrutil.so
+%{_datadir}/sqlrelay
 
 %files c++
 %{_libdir}/libsqlrclient.so.7
