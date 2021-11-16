@@ -123,7 +123,7 @@ PTHREADLIB =
 
 
 # rudiments library
-RUDIMENTSPATH =
+RUDIMENTSPREFIX =
 RUDIMENTSINCLUDES = /I"C:\Program Files\Firstworks\include"
 RUDIMENTSLIBS = /LIBPATH:"C:\Program Files\Firstworks\lib" librudiments.lib
 

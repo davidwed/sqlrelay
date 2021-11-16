@@ -759,7 +759,7 @@ ORACLEVERSION
 RUDIMENTSLIBSPATH
 RUDIMENTSLIBS
 RUDIMENTSCFLAGS
-RUDIMENTSPATH
+RUDIMENTSPREFIX
 MATHLIB
 ICONVLIBS
 ICONVINCLUDES
@@ -2801,9 +2801,9 @@ fi
 
 # Check whether --with-rudiments-prefix was given.
 if test "${with_rudiments_prefix+set}" = set; then :
-  withval=$with_rudiments_prefix; RUDIMENTSPATH="$withval"
+  withval=$with_rudiments_prefix; RUDIMENTSPREFIX="$withval"
 else
-  RUDIMENTSPATH=""
+  RUDIMENTSPREFIX=""
 fi
 
 
@@ -3577,8 +3577,8 @@ _ACEOF
 
 
 PWD=`pwd`
-if ( test -n "$RUDIMENTSPATH"  -a "`echo $RUDIMENTSPATH | cut -c-3`" = "../" ); then
-	RUDIMENTSPATH="$PWD/$RUDIMENTSPATH"
+if ( test -n "$RUDIMENTSPREFIX"  -a "`echo $RUDIMENTSPREFIX | cut -c-3`" = "../" ); then
+	RUDIMENTSPREFIX="$PWD/$RUDIMENTSPREFIX"
 fi
 if ( test -n "$GDBMPATH" -a "`echo $GDBMPATH | cut -c-3`" = "../" ); then
 	GDBMPATH="$PWD/$GDBMPATH"
@@ -18760,23 +18760,23 @@ if ( test "$cross_compiling" = "yes" )
 then
 
 		echo "cross compiling"
-	if ( test -n "$RUDIMENTSPATH" )
+	if ( test -n "$RUDIMENTSPREFIX" )
 	then
-		RUDIMENTSCONFIG="$RUDIMENTSPATH/bin/rudiments-config"
+		RUDIMENTSCONFIG="$RUDIMENTSPREFIX/bin/rudiments-config"
 		if ( test -r "$RUDIMENTSCONFIG" )
 		then
 			RUDIMENTSCFLAGS="`$RUDIMENTSCONFIG --cflags`"
 			RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
 		else
-			RUDIMENTSCFLAGS="-I$RUDIMENTSPATH/include"
-			RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"
+			RUDIMENTSCFLAGS="-I$RUDIMENTSPREFIX/include"
+			RUDIMENTSLIBS="-L$RUDIMENTSPREFIX/lib -lrudiments"
 		fi
 	fi
 
 else
 
 
-EXTRAPATH="$RUDIMENTSPATH"
+EXTRAPATH="$RUDIMENTSPREFIX"
 NAME="rudiments"
 SUFFIX="bin"
 
