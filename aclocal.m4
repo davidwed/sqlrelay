@@ -9133,7 +9133,7 @@ AC_SUBST(UNAME)
 dnl sets MAKE="make" if "make" is GNU make
 dnl sets MAKE="gmake" if "gmake" is GNU make
 dnl otherwise leaves MAKE unchanged
-AC_DEFUN([FW_GMAKE],
+AC_DEFUN([FW_CHECK_GMAKE],
 [
 AC_MSG_CHECKING(for GNU Make)
 if ( test -n "make -v | grep 'GNU Make'" )
@@ -9188,16 +9188,13 @@ then
 		then
 			AC_MSG_RESULT(yes - $VERSION found)
 		else
-			AC_MSG_RESULT(no - $VERSION found)
-			exit
+			AC_MSG_ERROR(no - $VERSION found)
 		fi
 	else
-		AC_MSG_RESULT(no - $VERSION found)
-		exit
+		AC_MSG_ERROR(no - $VERSION found)
 	fi
 else
-	AC_MSG_RESULT(no - $VERSION found)
-	exit
+	AC_MSG_ERROR(no - $VERSION found)
 fi
 ])
 

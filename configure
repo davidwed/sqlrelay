@@ -18898,19 +18898,13 @@ $as_echo "yes - $VERSION found" >&6; }
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes - $VERSION found" >&5
 $as_echo "yes - $VERSION found" >&6; }
 		else
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no - $VERSION found" >&5
-$as_echo "no - $VERSION found" >&6; }
-			exit
+			as_fn_error $? "no - $VERSION found" "$LINENO" 5
 		fi
 	else
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no - $VERSION found" >&5
-$as_echo "no - $VERSION found" >&6; }
-		exit
+		as_fn_error $? "no - $VERSION found" "$LINENO" 5
 	fi
 else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no - $VERSION found" >&5
-$as_echo "no - $VERSION found" >&6; }
-	exit
+	as_fn_error $? "no - $VERSION found" "$LINENO" 5
 fi
 
 echo "******************************"

@@ -577,7 +577,7 @@ fi
 dnl Checks for programs.
 echo
 echo "***** Programs ***************"
-FW_GMAKE
+FW_CHECK_GMAKE
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_CPP
