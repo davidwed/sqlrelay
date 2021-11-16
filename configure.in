@@ -669,6 +669,7 @@ dnl Checks for Rudiments.
 echo
 echo "***** Rudiments **************"
 FW_CHECK_RUDIMENTS
+FW_CHECK_VERSION([Rudiments],[$RUDIMENTSVERSION],[2.0.0])
 echo "******************************"
 
 

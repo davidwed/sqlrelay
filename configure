@@ -756,7 +756,6 @@ ORACLELIBSPATH
 ORACLELIBS
 ORACLEINCLUDES
 ORACLEVERSION
-RUDIMENTSLIBSPATH
 RUDIMENTSLIBS
 RUDIMENTSCFLAGS
 RUDIMENTSPREFIX
@@ -18753,7 +18752,6 @@ echo "***** Rudiments **************"
 
 RUDIMENTSVERSION=""
 RUDIMENTSLIBS=""
-RUDIMENTSLIBSPATH=""
 RUDIMENTSCFLAGS=""
 
 if ( test "$cross_compiling" = "yes" )
@@ -18765,9 +18763,11 @@ then
 		RUDIMENTSCONFIG="$RUDIMENTSPREFIX/bin/rudiments-config"
 		if ( test -r "$RUDIMENTSCONFIG" )
 		then
+			RUDIMENTSVERSION="`$RUDIMENTSCONFIG --version`"
 			RUDIMENTSCFLAGS="`$RUDIMENTSCONFIG --cflags`"
 			RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
 		else
+			RUDIMENTSVERSION=""
 			RUDIMENTSCFLAGS="-I$RUDIMENTSPREFIX/include"
 			RUDIMENTSLIBS="-L$RUDIMENTSPREFIX/lib -lrudiments"
 		fi
@@ -18847,18 +18847,6 @@ then
 	exit
 fi
 
-if ( test -n "$RUDIMENTSVERSION" )
-then
-	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
-	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
-	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "2")
-	then
-		as_fn_error $? "Rudiments version must be >= 2.0.0, found version $RUDIMENTSVERSION" "$LINENO" 5
-		exit
-	fi
-fi
-
 
 if ( test -n "$RUDIMENTSCFLAGS" )
 then
@@ -18876,6 +18864,54 @@ fi
 
 
 
+
+
+NAME=Rudiments
+VERSION=$RUDIMENTSVERSION
+TESTVERSION=2.0.0
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $NAME >= $TESTVERSION" >&5
+$as_echo_n "checking for $NAME >= $TESTVERSION... " >&6; }
+
+V1=`echo $VERSION | cut -d. -f1`
+V2=`echo $VERSION | cut -d. -f2`
+V3=`echo $VERSION | cut -d. -f3`
+
+TV1=`echo $TESTVERSION | cut -d. -f1`
+TV2=`echo $TESTVERSION | cut -d. -f2`
+TV3=`echo $TESTVERSION | cut -d. -f3`
+
+if ( test "$V1" -gt "$TV1")
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes - $VERSION found" >&5
+$as_echo "yes - $VERSION found" >&6; }
+elif ( test "$V1" -eq "$TV1")
+then
+	if ( test "$V2" -gt "$TV2")
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes - $VERSION found" >&5
+$as_echo "yes - $VERSION found" >&6; }
+	elif ( test "$V2" -eq "$TV2")
+	then
+		if ( test "$V3" -ge "$TV3")
+		then
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes - $VERSION found" >&5
+$as_echo "yes - $VERSION found" >&6; }
+		else
+			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no - $VERSION found" >&5
+$as_echo "no - $VERSION found" >&6; }
+			exit
+		fi
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no - $VERSION found" >&5
+$as_echo "no - $VERSION found" >&6; }
+		exit
+	fi
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no - $VERSION found" >&5
+$as_echo "no - $VERSION found" >&6; }
+	exit
+fi
 
 echo "******************************"
 

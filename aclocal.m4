@@ -9153,6 +9153,55 @@ fi
 ])
 
 
+dnl verifies that a version number is greater than the specified version
+dnl	$1 - generic name of api or package
+dnl	$2 - version of the api or package
+dnl	$3 - version to test against
+AC_DEFUN([FW_CHECK_VERSION],
+[
+
+NAME=$1
+VERSION=$2
+TESTVERSION=$3
+
+AC_MSG_CHECKING(for $NAME >= $TESTVERSION)
+
+V1=`echo $VERSION | cut -d. -f1`
+V2=`echo $VERSION | cut -d. -f2`
+V3=`echo $VERSION | cut -d. -f3`
+
+TV1=`echo $TESTVERSION | cut -d. -f1`
+TV2=`echo $TESTVERSION | cut -d. -f2`
+TV3=`echo $TESTVERSION | cut -d. -f3`
+
+if ( test "$V1" -gt "$TV1")
+then
+	AC_MSG_RESULT(yes - $VERSION found)
+elif ( test "$V1" -eq "$TV1")
+then
+	if ( test "$V2" -gt "$TV2")
+	then
+		AC_MSG_RESULT(yes - $VERSION found)
+	elif ( test "$V2" -eq "$TV2")
+	then
+		if ( test "$V3" -ge "$TV3")
+		then
+			AC_MSG_RESULT(yes - $VERSION found)
+		else
+			AC_MSG_RESULT(no - $VERSION found)
+			exit
+		fi
+	else
+		AC_MSG_RESULT(no - $VERSION found)
+		exit
+	fi
+else
+	AC_MSG_RESULT(no - $VERSION found)
+	exit
+fi
+])
+
+
 dnl displays a message indicating that the version of $1 is $2
 AC_DEFUN([FW_VERSION],
 [
@@ -10427,13 +10476,12 @@ dnl checks for the rudiments library
 dnl requires:
 dnl 	cross_compiling, RUDIMENTSPREFIX
 dnl sets:
-dnl	RUDIMENTSPREFIX, RUDIMENTSCFLAGS, RUDIMENTSLIBS, RUDIMENTSLIBSPATH
+dnl	RUDIMENTSPREFIX, RUDIMENTSCFLAGS, RUDIMENTSLIBS, RUDIMENTSVERSION
 AC_DEFUN([FW_CHECK_RUDIMENTS],
 [
 
 RUDIMENTSVERSION=""
 RUDIMENTSLIBS=""
-RUDIMENTSLIBSPATH=""
 RUDIMENTSCFLAGS=""
 
 if ( test "$cross_compiling" = "yes" )
@@ -10446,9 +10494,11 @@ then
 		RUDIMENTSCONFIG="$RUDIMENTSPREFIX/bin/rudiments-config"
 		if ( test -r "$RUDIMENTSCONFIG" )
 		then
+			RUDIMENTSVERSION="`$RUDIMENTSCONFIG --version`"
 			RUDIMENTSCFLAGS="`$RUDIMENTSCONFIG --cflags`"
 			RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
 		else
+			RUDIMENTSVERSION=""
 			RUDIMENTSCFLAGS="-I$RUDIMENTSPREFIX/include"
 			RUDIMENTSLIBS="-L$RUDIMENTSPREFIX/lib -lrudiments"
 		fi
@@ -10479,23 +10529,10 @@ then
 	exit
 fi
 
-if ( test -n "$RUDIMENTSVERSION" )
-then
-	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
-	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
-	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "2")
-	then
-		AC_MSG_ERROR([Rudiments version must be >= 2.0.0, found version $RUDIMENTSVERSION])
-		exit
-	fi
-fi
-
 FW_INCLUDES(rudiments,[$RUDIMENTSCFLAGS])
 FW_LIBS(rudiments,[$RUDIMENTSLIBS])
 
 AC_SUBST(RUDIMENTSPREFIX)
 AC_SUBST(RUDIMENTSCFLAGS)
 AC_SUBST(RUDIMENTSLIBS)
-AC_SUBST(RUDIMENTSLIBSPATH)
 ])
