@@ -18866,9 +18866,9 @@ fi
 
 
 
-NAME=Rudiments
-VERSION=$RUDIMENTSVERSION
-TESTVERSION=2.0.0
+NAME="Rudiments"
+VERSION="$RUDIMENTSVERSION"
+TESTVERSION="2.0.0"
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $NAME >= $TESTVERSION" >&5
 $as_echo_n "checking for $NAME >= $TESTVERSION... " >&6; }
