@@ -10469,6 +10469,34 @@ gethostbyname(0);
 
 	AC_SUBST(SOCKETLIBS)
 ])
+
+
+dnl fixes various libtool issues
+AC_DEFUN([FW_FIX_LIBTOOL],
+[
+
+dnl Some versions of NetBSD create a libtool with -lgcc_s -lgcc in it, but don't
+dnl provide a shared libgcc.
+dnl Also, some versions of NetBSD create a libtool with -lgcc_s_pic in it, but
+dnl don't provide a shraed libgcc_s_pic.
+dnl These cause all kinds of link failures.  Fix them
+if ( test -r "libtool" )
+then
+	sed -e "s|-lgcc_s -lgcc |-lgcc_s |g" \
+		-e "s|-lgcc_s -lgcc\"|-lgcc_s\"|g" \
+		-e "s|-lgcc_s_pic|-lgcc_s|g" \
+		libtool > libtool.new
+	mv libtool.new libtool
+fi
+
+dnl On some versions of OS X, the libtool config erroneusly finds "Print" and
+dnl tries to use it as "print -r --".  Replace this with "printf %s\\n".
+if ( test -r "libtool" -a -n "$DARWIN" )
+then
+	sed -e "s|print -r --|printf %s\\\\\\\\n|g" libtool > libtool.new
+	mv libtool.new libtool
+fi
+])
 dnl checks for the rudiments library
 dnl requires:
 dnl 	cross_compiling, RUDIMENTSPREFIX
