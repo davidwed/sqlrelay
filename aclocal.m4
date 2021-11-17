@@ -9501,6 +9501,17 @@ eval "$1=\"$STRIPPED\""
 ])
 
 
+dnl if LDFLAGS contains -Wl,-z,relro the CPPFLAGS requires -fPIC
+dnl libtool adds it at compile time but we need it for configure tests too
+AC_DEFUN([FW_CHECK_RELRO_FPIC],
+[
+if ( test -n "`echo $LDFLAGS | grep '\-Wl,\-z,relro'`" )
+then
+	CPPFLAGS="-fPIC $CPPFLAGS"
+fi
+])
+
+
 dnl if the variable USE_SYSTEM_LIBTOOL = "yes" then the variable LIBTOOL is
 dnl overridden and set to "libtool" rather than its current value
 dnl (likely "$(top_builddir)/libtool" so that the system-supplied libtool is

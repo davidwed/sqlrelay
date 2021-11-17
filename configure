@@ -17548,10 +17548,12 @@ $as_echo "yes" >&6; }
 $as_echo "no" >&6; }
 fi
 
+
 if ( test -n "`echo $LDFLAGS | grep '\-Wl,\-z,relro'`" )
 then
 	CPPFLAGS="-fPIC $CPPFLAGS"
 fi
+
 echo "******************************"
 
 
