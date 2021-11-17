@@ -10534,7 +10534,10 @@ AC_DEFUN([FW_SET_VERSION],
 
 	eval "$1=\"$2\""
 	AC_SUBST([$1])
-	AC_DEFINE([$1],["$2"],Version)
+	if ( test "$1" != "SONAME_VERSION_INFO" )
+	then
+		AC_DEFINE([$1],["$2"],Version)
+	fi
 ])
 dnl checks for the rudiments library
 dnl requires:
