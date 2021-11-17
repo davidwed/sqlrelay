@@ -3,6 +3,9 @@
 /* On some platforms NewObjectArray requires a cast */
 #undef CAST_NEW_OBJECT_ARRAY
 
+/* Version */
+#undef CLT_SONAME_VERSION_INFO
+
 /* Version of DB2 */
 #undef DB2VERSION
 
@@ -338,6 +341,9 @@
 
 /* replacement for "SQL Relay" */
 #undef SQL_RELAY
+
+/* Version */
+#undef SRV_SONAME_VERSION_INFO
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS

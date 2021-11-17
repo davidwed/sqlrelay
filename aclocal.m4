@@ -10508,6 +10508,34 @@ then
 	mv libtool.new libtool
 fi
 ])
+
+
+dnl set project, soname, or other version
+dnl	$1 - variable that will be set to the project version
+dnl	$2 - project version
+AC_DEFUN([FW_SET_VERSION],
+[
+	dnl intuitive versioning
+	dnl Given a version number MAJOR.MINOR.PATCH, increment the:
+	dnl 1. MAJOR when you make very significant changes
+	dnl    (and set MINOR and PATCH to 0)
+	dnl 2. MINOR when you make backwards-incompatible changes
+	dnl    or add significant new features
+	dnl    (and set PATCH to 0)
+	dnl 3. PATCH when you make backwards-compatible changes
+
+	dnl Libtool Versioning
+	dnl For CURRENT:REVISION:AGE version info,
+	dnl apply the following rules in order:
+	dnl if library source changed at all,         c:r:a -> c:r+1:a
+	dnl if interfaces added, removed, or changed, c:r:a -> c+1:0:a
+	dnl if interfaces added,                      c:r:a -> c:r:a+1
+	dnl if interfaces removed,                    c:r:a -> c:r:0
+
+	eval "$1=\"$2\""
+	AC_SUBST([$1])
+	AC_DEFINE_UNQUOTED([$1],[$2],Version)
+])
 dnl checks for the rudiments library
 dnl requires:
 dnl 	cross_compiling, RUDIMENTSPREFIX

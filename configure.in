@@ -820,29 +820,9 @@ FW_CHECK_NODEJS
 echo "******************************"
 
 
-dnl intuitive versioning
-dnl Given a version number MAJOR.MINOR.PATCH, increment the:
-dnl 1. MAJOR when you make very significant changes
-dnl    (and set MINOR and PATCH to 0)
-dnl 2. MINOR when you make backwards-incompatible changes
-dnl    or add significant new features
-dnl    (and set PATCH to 0)
-dnl 3. PATCH when you make backwards-compatible changes
-SQLR_VERSION="2.0.0"
-AC_SUBST(SQLR_VERSION)
-AC_DEFINE_UNQUOTED(SQLR_VERSION,"$SQLR_VERSION",Version)
-
-
-dnl rules for CURRENT:REVISION:AGE version info:
-dnl apply the following rules in order:
-dnl if library source changed at all,         c:r:a -> c:r+1:a
-dnl if interfaces added, removed, or changed, c:r:a -> c+1:0:a
-dnl if interfaces added,                      c:r:a -> c:r:a+1
-dnl if interfaces removed,                    c:r:a -> c:r:0
-SRV_SONAME_VERSION_INFO="12:0:0"
-CLT_SONAME_VERSION_INFO="7:0:0"
-AC_SUBST(SRV_SONAME_VERSION_INFO)
-AC_SUBST(CLT_SONAME_VERSION_INFO)
+FW_SET_VERSION([SQLR_VERSION],[2.0.0])
+FW_SET_VERSION([SRV_SONAME_VERSION_INFO],[12:0:0])
+FW_SET_VERSION([CLT_SONAME_VERSION_INFO],[7:0:0])
 
 
 AC_SUBST(STATICLINK)

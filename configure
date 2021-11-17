@@ -36054,17 +36054,37 @@ fi
 echo "******************************"
 
 
-SQLR_VERSION="2.0.0"
+
+
+
+	eval "SQLR_VERSION=\"2.0.0\""
 
 
 cat >>confdefs.h <<_ACEOF
-#define SQLR_VERSION "$SQLR_VERSION"
+#define SQLR_VERSION 2.0.0
 _ACEOF
 
 
 
-SRV_SONAME_VERSION_INFO="12:0:0"
-CLT_SONAME_VERSION_INFO="7:0:0"
+
+
+	eval "SRV_SONAME_VERSION_INFO=\"12:0:0\""
+
+
+cat >>confdefs.h <<_ACEOF
+#define SRV_SONAME_VERSION_INFO 12:0:0
+_ACEOF
+
+
+
+
+
+	eval "CLT_SONAME_VERSION_INFO=\"7:0:0\""
+
+
+cat >>confdefs.h <<_ACEOF
+#define CLT_SONAME_VERSION_INFO 7:0:0
+_ACEOF
 
 
 
