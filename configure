@@ -34508,6 +34508,8 @@ then
 		then
 			for i in \
 `ls -d /etc/alternatives/java_sdk /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* 2> /dev/null` \
+/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK \
+/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr/java \
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
@@ -34547,7 +34549,6 @@ then
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
-/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local
 			do
@@ -35758,12 +35759,12 @@ then
 
 	else
 
-				CSC=""
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for compiler" >&5
+$as_echo_n "checking for compiler... " >&6; }
+		CSC=""
 		CSCFLAGS=""
 		for compiler in "mcs" "gmcs" "dmcs" "smcs"
 		do
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $compiler" >&5
-$as_echo_n "checking for $compiler... " >&6; }
 
 			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 			do
@@ -35781,7 +35782,7 @@ $as_echo_n "checking for $compiler... " >&6; }
 			fi
 		done
 
-		if ( test -r "$CSC" )
+		if ( test -n "$CSC" )
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $CSC" >&5
 $as_echo "$CSC" >&6; }

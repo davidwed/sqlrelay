@@ -2369,6 +2369,8 @@ then
 		then
 			for i in \
 `ls -d /etc/alternatives/java_sdk /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* 2> /dev/null` \
+/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK \
+/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr/java \
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
@@ -2408,7 +2410,6 @@ then
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
-/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local
 			do
@@ -2917,11 +2918,11 @@ then
 	else
 
 		dnl look for the compiler
+		AC_MSG_CHECKING(for compiler)
 		CSC=""
 		CSCFLAGS=""
 		for compiler in "mcs" "gmcs" "dmcs" "smcs"
 		do
-			AC_MSG_CHECKING(for $compiler)
 
 			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 			do
@@ -2939,7 +2940,7 @@ then
 			fi
 		done
 
-		if ( test -r "$CSC" )
+		if ( test -n "$CSC" )
 		then
 			AC_MSG_RESULT($CSC)
 		else
