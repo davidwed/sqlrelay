@@ -24,10 +24,10 @@ com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.class: com$(SLASH)firstw
 	$(JAVAC) $(CURSORCLASSPATH) com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.java
 
 libSQLRConnection.$(LIBEXT): com_firstworks_sqlrelay_SQLRConnection.cpp com_firstworks_sqlrelay_SQLRConnection.$(OBJ)
-	$(MACOSXDEPLOYMENTTARGET) $(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRConnection.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRConnection.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(MODLINKFLAGS)
 
 libSQLRCursor.$(LIBEXT): com_firstworks_sqlrelay_SQLRCursor.cpp com_firstworks_sqlrelay_SQLRCursor.$(OBJ)
-	$(MACOSXDEPLOYMENTTARGET) $(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRCursor.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(JAVARPATH) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ com_firstworks_sqlrelay_SQLRCursor.$(OBJ) $(LDFLAGS) $(JAVALIBS) $(JAVARPATH) $(MODLINKFLAGS)
 
 sqlrelay.jar: com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRConnection.class com$(SLASH)firstworks$(SLASH)sqlrelay$(SLASH)SQLRCursor.class
 	$(JAR) -cf $@ com/firstworks/sqlrelay/SQLRConnection.class com/firstworks/sqlrelay/SQLRCursor.class

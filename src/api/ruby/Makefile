@@ -46,7 +46,7 @@ clean:
 	$(RMTREE) .libs
 
 sqlrelay.$(LIBEXT): sqlrelay.cpp sqlrelay.$(OBJ)
-	$(MACOSXDEPLOYMENTTARGET) $(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(RUBYLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrelay.$(OBJ) $(LDFLAGS) $(RUBYLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

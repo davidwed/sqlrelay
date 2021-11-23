@@ -18,7 +18,7 @@ clean:
 	$(RMTREE) .libs
 
 sqlrelay.$(LIBEXT): sqlrelayCmd.cpp sqlrelayCmd.$(OBJ)
-	$(MACOSXDEPLOYMENTTARGET) $(LTLINK) $(LINK) $(OUT)$@ sqlrelayCmd.$(OBJ) $(LDFLAGS) $(TCLLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ sqlrelayCmd.$(OBJ) $(LDFLAGS) $(TCLLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 	$(CP) pkgIndex.tcl $(DESTDIR)$(TCLLIBSPATH)/sqlrelay
