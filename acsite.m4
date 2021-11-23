@@ -2182,46 +2182,59 @@ then
 					for separator in "" "."
 					do
 
-			ruby="ruby$major$separator$minor"
-			if ( test -n "$patchlevel" )
-			then
-				ruby="ruby$major$separator$minor$separator$patchlevel"
-			fi
+						ruby="ruby$major$separator$minor"
+						if ( test -n "$patchlevel" )
+						then
+							ruby="ruby$major$separator$minor$separator$patchlevel"
+						fi
 
-			HAVE_RUBY=""
-			RUBY=""
-			RUBYLIB=""
+						HAVE_RUBY=""
+						RUBY=""
+						RUBYLIB=""
 
-			if ( test -n "$RUBYPATH" )
-			then
-				FW_CHECK_FILE("$RUBYPATH/bin/$ruby",[RUBY=\"$RUBYPATH/bin/$ruby\"])
-			else
-				AC_CHECK_PROG(RUBY,"$ruby","$ruby")
-				if ( test -z "$RUBY" )
-				then
-					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
-					do
-						FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
+						if ( test -n "$RUBYPATH" )
+						then
+							FW_CHECK_FILE("$RUBYPATH/bin/$ruby",[RUBY=\"$RUBYPATH/bin/$ruby\"])
+						else
+							AC_CHECK_PROG(RUBY,"$ruby","$ruby")
+							if ( test -z "$RUBY" )
+							then
+								for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
+								do
+									FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
+									if ( test -n "$RUBY" )
+									then
+										found="yes"
+										break
+									fi
+								done
+							fi
+						fi
+
 						if ( test -n "$RUBY" )
 						then
+							HAVE_RUBY="yes"
+
+							dnl for cygwin and early mac os x, add -lruby
+							if ( test -n "$CYGWIN" )
+							then
+								dnl FIXME: we really should include a -L option
+								RUBYLIB="-lruby"
+							elif ( test -n "$DARWIN" )
+							then
+								if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+								then
+									RUBYLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+								elif ( test -n "$BUNDLE_LOADER" )
+								then
+									RUBYLIB="-Wl,$BUNDLE_LOADER -Wl,$RUBY"
+								fi
+							fi
+
 							found="yes"
 							break
 						fi
-					done
-				fi
-			fi
 
-			if ( test -n "$RUBY" )
-			then
-				HAVE_RUBY="yes"
-				dnl for cygwin and OSX include -lruby
-				if ( test -n "$CYGWIN" -o -n "$DARWIN" )
-				then
-					RUBYLIB="-lruby"
-				fi
-				found="yes"
-				break
-			fi
 						if ( test -z "$major" -o -z "$minor" -o -z "$patchlevel" )
 						then
 							break

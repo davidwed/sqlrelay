@@ -34268,26 +34268,26 @@ then
 					for separator in "" "."
 					do
 
-			ruby="ruby$major$separator$minor"
-			if ( test -n "$patchlevel" )
-			then
-				ruby="ruby$major$separator$minor$separator$patchlevel"
-			fi
+						ruby="ruby$major$separator$minor"
+						if ( test -n "$patchlevel" )
+						then
+							ruby="ruby$major$separator$minor$separator$patchlevel"
+						fi
 
-			HAVE_RUBY=""
-			RUBY=""
-			RUBYLIB=""
+						HAVE_RUBY=""
+						RUBY=""
+						RUBYLIB=""
 
-			if ( test -n "$RUBYPATH" )
-			then
+						if ( test -n "$RUBYPATH" )
+						then
 
 if ( test -r ""$RUBYPATH/bin/$ruby"" )
 then
 	eval "RUBY=\"$RUBYPATH/bin/$ruby\""
 fi
 
-			else
-				# Extract the first word of ""$ruby"", so it can be a program name with args.
+						else
+							# Extract the first word of ""$ruby"", so it can be a program name with args.
 set dummy "$ruby"; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
@@ -34324,35 +34324,47 @@ $as_echo "no" >&6; }
 fi
 
 
-				if ( test -z "$RUBY" )
-				then
-					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
-					do
+							if ( test -z "$RUBY" )
+							then
+								for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
+								do
 
 if ( test -r ""$i/$ruby"" )
 then
 	eval "RUBY=\"$i/$ruby\""
 fi
 
+									if ( test -n "$RUBY" )
+									then
+										found="yes"
+										break
+									fi
+								done
+							fi
+						fi
+
 						if ( test -n "$RUBY" )
 						then
+							HAVE_RUBY="yes"
+
+														if ( test -n "$CYGWIN" )
+							then
+																RUBYLIB="-lruby"
+							elif ( test -n "$DARWIN" )
+							then
+								if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+								then
+									RUBYLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+								elif ( test -n "$BUNDLE_LOADER" )
+								then
+									RUBYLIB="-Wl,$BUNDLE_LOADER -Wl,$RUBY"
+								fi
+							fi
+
 							found="yes"
 							break
 						fi
-					done
-				fi
-			fi
 
-			if ( test -n "$RUBY" )
-			then
-				HAVE_RUBY="yes"
-								if ( test -n "$CYGWIN" -o -n "$DARWIN" )
-				then
-					RUBYLIB="-lruby"
-				fi
-				found="yes"
-				break
-			fi
 						if ( test -z "$major" -o -z "$minor" -o -z "$patchlevel" )
 						then
 							break
@@ -36276,7 +36288,7 @@ if ( test -n "$HAVE_NODEJS" ); then
 	NODEJSBUILD="yes"
 	TESTAPIS="$TESTAPIS nodejs"
 fi
-if ( test -n "$ENABLE_ODBC_DRIVER" ); then
+if ( test -n "$ENABLE_ODBC_DRIVER" -a -n "$ODBCLIBS" ); then
 	ODBCDRIVERBUILD="yes"
 fi
 

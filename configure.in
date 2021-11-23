@@ -944,7 +944,7 @@ if ( test -n "$HAVE_NODEJS" ); then
 	NODEJSBUILD="yes"
 	TESTAPIS="$TESTAPIS nodejs"
 fi
-if ( test -n "$ENABLE_ODBC_DRIVER" ); then
+if ( test -n "$ENABLE_ODBC_DRIVER" -a -n "$ODBCLIBS" ); then
 	ODBCDRIVERBUILD="yes"
 fi
 
