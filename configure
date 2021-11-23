@@ -687,6 +687,7 @@ HAVE_RUBY
 RUBY
 EXCEPTIONSSTANDARDERROR
 IMPORTEXCEPTIONS
+PYTHONFRAMEWORK
 PYTHON
 PYTHONLIB
 PYTHONSITEDIR
@@ -777,11 +778,11 @@ WALL
 WERROR
 FPIC
 PIPE
-PYTHONFRAMEWORK
 JNISUFFIX
 MODULESUFFIX
 SOSUFFIX
 IRIX
+MACOSXDEPLOYMENTTARGET
 WNOLONGDOUBLE
 CRTLIB
 SCO_UW
@@ -16897,13 +16898,17 @@ fi
 
 
 DARWIN=""
+BUNDLE_LOADER=""
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for OSX" >&5
 $as_echo_n "checking for OSX... " >&6; }
 case $host_os in
 	*darwin* )
 		DARWIN="yes"
-		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
+
+				PRODUCTVERSION="`sw_vers -productVersion`"
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PRODUCTVERSION" >&5
+$as_echo "$PRODUCTVERSION" >&6; }
+
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-long-double option" >&5
 $as_echo_n "checking for -Wno-long-double option... " >&6; }
@@ -16953,14 +16958,29 @@ fi
 		if ( test -n "$BASH" )
 		then
 			SHELL="$BASH"
-
 		fi
+
+		MACOSXDEPLOYMENTTARGET="MACOSX_DEPLOYMENT_TARGET=$PRODUCTVERSION"
+
+				case "$PRODUCTVERSION" in
+			10.0 )
+				;;
+			10.12 )
+				BUNDLE_LOADER="-bundle_loader"
+				;;
+			* )
+				UNDEFINED_DYNAMIC_LOOKUP="-Wl,-undefined -Wl,dynamic_lookup"
+				;;
+		esac
 		;;
 	* )
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 		;;
 esac
+
+
+
 
 
 IRIX=""
@@ -17016,26 +17036,9 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for plugin dependencies" >&5
-$as_echo_n "checking for plugin dependencies... " >&6; }
-PYTHONFRAMEWORK=""
-if (test -n "$DARWIN" )
-then
-	PYTHONFRAMEWORK="-framework Python"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: OSX style" >&5
-$as_echo "OSX style" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: standard unix style" >&5
-$as_echo "standard unix style" >&6; }
-fi
-
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ld -rpath works" >&5
 $as_echo_n "checking whether ld -rpath works... " >&6; }
-ld -rpath /usr/lib 2> conftest
-INVALID="`grep 'no input files' conftest`"
-if ( test -n "$INVALID" )
+if ( test -n "`ld -rpath /usr/lib 2>&1 | grep 'no input files'`" )
 then
 	RPATHFLAG="yes"
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -17045,7 +17048,6 @@ else
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi
-rm conftest
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -pipe option" >&5
@@ -34027,6 +34029,21 @@ then
 				if ( test -n "$pyprefix" )
 				then
 
+					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
+					do
+						if ( test -x "$pyprefix/bin/$pyexe" )
+						then
+							PYTHON="$pyprefix/bin/$pyexe"
+
+														if ( test -n "$BUNDLE_LOADER" )
+							then
+								PYTHONLIB="-Wl,$BUNDLE_LOADER -Wl,$PYTHON"
+							fi
+
+							break
+						fi
+					done
+
 					PYTHONINCLUDES=""
 					for ext in "mu" "m" "u" ""
 					do
@@ -34048,16 +34065,14 @@ then
 
 							if ( test -d "$pylibdir/$k" )
 							then
-																								if ( test -n "$CYGWIN" -a -r "$pylibdir/$k/libpython$pyversion.dll.a" )
+								PYTHONDIR="$pylibdir"
+
+																if ( test -n "$CYGWIN" -a -r "$pylibdir/$k/libpython$pyversion.dll.a" )
 								then
-									PYTHONDIR="$pylibdir"
 									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
-								elif ( test -n "$DARWIN" )
+								elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
 								then
-									PYTHONDIR="$pylibdir"
-									PYTHONLIB="-lpython$pyversion"
-								else
-									PYTHONDIR="$pylibdir"
+									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
 								fi
 								if ( test -n "$PYTHONDIR" )
 								then
@@ -34067,15 +34082,6 @@ then
 						done
 						if ( test -n "$PYTHONDIR" )
 						then
-							break
-						fi
-					done
-
-					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
-					do
-						if ( test -x "$pyprefix/bin/$pyexe" )
-						then
-							PYTHON="$pyprefix/bin/$pyexe"
 							break
 						fi
 					done
@@ -34152,10 +34158,26 @@ CPPFLAGS="$SAVECPPFLAGS"
 		fi
 	fi
 
+		if (test -n "$DARWIN" )
+	then
+		PYTHONINCLUDES="-framework Python $PYTHONINCLUDES"
+	fi
+
+		if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PYTHONLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 
 if ( test -n "$PYTHONINCLUDES" )
 then
 	echo "python includes... $PYTHONINCLUDES"
+fi
+
+
+if ( test -n "$PYTHONLIB" )
+then
+	echo "python libs... $PYTHONLIB"
 fi
 
 
@@ -34164,19 +34186,22 @@ fi
 		PYTHONDIR="$OVERRIDEPYTHONDIR"
 	fi
 
-	IMPORTEXCEPTIONS=""
+
+
+
+
+
+
+
+
+
+		IMPORTEXCEPTIONS=""
 	EXCEPTIONSSTANDARDERROR="Exception"
 	if ( test "$PYTHONVERSION" = "2" )
 	then
 		IMPORTEXCEPTIONS="import exceptions"
 		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 	fi
-
-
-
-
-
-
 
 
 

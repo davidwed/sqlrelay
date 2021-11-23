@@ -1,18 +1,3 @@
-dnl Determines what options need to be used when building plugins
-AC_DEFUN([FW_CHECK_PLUGIN_DEPENDENCIES],
-[
-AC_MSG_CHECKING(for plugin dependencies)
-PYTHONFRAMEWORK=""
-if (test -n "$DARWIN" )
-then
-	PYTHONFRAMEWORK="-framework Python"
-	AC_MSG_RESULT(OSX style)
-else
-	AC_MSG_RESULT(standard unix style)
-fi
-AC_SUBST(PYTHONFRAMEWORK)
-])
-
 AC_DEFUN([FW_CHECK_ORACLE],
 [
 if ( test -z "$ORACLEATRUNTIME" )
@@ -1991,6 +1976,22 @@ then
 				if ( test -n "$pyprefix" )
 				then
 
+					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
+					do
+						if ( test -x "$pyprefix/bin/$pyexe" )
+						then
+							PYTHON="$pyprefix/bin/$pyexe"
+
+							dnl on mac os x with -bundle_loader, set PYTHONLIB
+							if ( test -n "$BUNDLE_LOADER" )
+							then
+								PYTHONLIB="-Wl,$BUNDLE_LOADER -Wl,$PYTHON"
+							fi
+
+							break
+						fi
+					done
+
 					PYTHONINCLUDES=""
 					for ext in "mu" "m" "u" ""
 					do
@@ -2012,18 +2013,15 @@ then
 
 							if ( test -d "$pylibdir/$k" )
 							then
-								dnl for cygwin and mac os x
-								dnl add -lpython
+								PYTHONDIR="$pylibdir"
+
+								dnl for cygwin and early mac os x, add -lpython or similar
 								if ( test -n "$CYGWIN" -a -r "$pylibdir/$k/libpython$pyversion.dll.a" )
 								then
-									PYTHONDIR="$pylibdir"
 									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
-								elif ( test -n "$DARWIN" )
+								elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
 								then
-									PYTHONDIR="$pylibdir"
-									PYTHONLIB="-lpython$pyversion"
-								else
-									PYTHONDIR="$pylibdir"
+									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
 								fi
 								if ( test -n "$PYTHONDIR" )
 								then
@@ -2033,15 +2031,6 @@ then
 						done
 						if ( test -n "$PYTHONDIR" )
 						then
-							break
-						fi
-					done
-
-					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
-					do
-						if ( test -x "$pyprefix/bin/$pyexe" )
-						then
-							PYTHON="$pyprefix/bin/$pyexe"
 							break
 						fi
 					done
@@ -2097,19 +2086,24 @@ then
 		fi
 	fi
 
+	dnl on mac os x, add -framework Python to the includes
+	if (test -n "$DARWIN" )
+	then
+		PYTHONINCLUDES="-framework Python $PYTHONINCLUDES"
+	fi
+
+	dnl on mac os x with -undefined dynamic_loader, use that for PYTHONLIB
+	if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PYTHONLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
+	FW_LIBS(python,[$PYTHONLIB])
 
 	if ( test -n "$OVERRIDEPYTHONDIR" )
 	then
 		PYTHONDIR="$OVERRIDEPYTHONDIR"
-	fi
-
-	IMPORTEXCEPTIONS=""
-	EXCEPTIONSSTANDARDERROR="Exception"
-	if ( test "$PYTHONVERSION" = "2" )
-	then
-		IMPORTEXCEPTIONS="import exceptions"
-		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 	fi
 
 	AC_SUBST(HAVE_PYTHON)
@@ -2118,8 +2112,20 @@ then
 	AC_SUBST(PYTHONSITEDIR)
 	AC_SUBST(PYTHONLIB)
 	AC_SUBST(PYTHON)
+	AC_SUBST(PYTHONFRAMEWORK)
+
+
+	dnl some flags for the python tests
+	IMPORTEXCEPTIONS=""
+	EXCEPTIONSSTANDARDERROR="Exception"
+	if ( test "$PYTHONVERSION" = "2" )
+	then
+		IMPORTEXCEPTIONS="import exceptions"
+		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+	fi
 	AC_SUBST(IMPORTEXCEPTIONS)
 	AC_SUBST(EXCEPTIONSSTANDARDERROR)
+
 
 	if ( test "$HAVE_PYTHON" = "" )
 	then

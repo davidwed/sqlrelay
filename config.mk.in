@@ -72,6 +72,7 @@ WNOMISMATCHEDTAGS = @WNOMISMATCHEDTAGS@
 INC = -I
 OBJ = lo
 DIRCPPFLAG = -DBINDIR=\"$(bindir)/\" -DLOCALSTATEDIR=\"$(localstatedir)/\" -DSYSCONFDIR=\"$(sysconfdir)/\" -DLIBEXECDIR=\"$(libexecdir)/\"
+MACOSXDEPLOYMENTTARGET = @MACOSXDEPLOYMENTTARGET@
 
 
 # linker flags
