@@ -21,10 +21,10 @@ clean:
 	$(RMTREE) .libs
 
 Connection.$(LIBEXT): Connection.xs Connection.cpp Connection.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ Connection.$(OBJ) $(LDFLAGS) $(PERLCONLIBS) $(MODLINKFLAGS)
+	$(MACOSXDEPLOYMENTTARGET) $(LTLINK) $(LINK) $(OUT)$@ Connection.$(OBJ) $(LDFLAGS) $(PERLCONLIBS) $(MODLINKFLAGS)
 
 Cursor.$(LIBEXT): Cursor.xs Cursor.cpp Cursor.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ Cursor.$(OBJ) $(LDFLAGS) $(PERLCURLIBS) $(MODLINKFLAGS)
+	$(MACOSXDEPLOYMENTTARGET) $(LTLINK) $(LINK) $(OUT)$@ Cursor.$(OBJ) $(LDFLAGS) $(PERLCURLIBS) $(MODLINKFLAGS)
 
 
 install: $(INSTALLLIB) installmod $(PERLINSTALLMAN)

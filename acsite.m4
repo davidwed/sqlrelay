@@ -1803,6 +1803,7 @@ then
 	HAVE_PERL=""
 	PERL=""
 	PERLLIB=""
+	PERLLIBS=""
 	PERLPREFIX=""
 
 	if ( test "$cross_compiling" = "yes" )
@@ -1836,15 +1837,22 @@ then
 			fi
 		fi
 
-		dnl for cygwin and mac os x add -lperl
+		dnl for cygwin and early mac os x add -lperl
 		if ( test -n "$PERL" )
 		then
-			if ( test -n "$CYGWIN" -o -n "$DARWIN" )
+			if ( test -n "$CYGWIN" )
 			then
 				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
 				do
-					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIB=\"-L$dir/CORE -lperl\"])
+					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
+				done
+			elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
+			then
+				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+				for dir in $DIRS
+				do
+					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
 				done
 			fi
 		fi
@@ -1915,6 +1923,12 @@ then
 		fi
 	fi
 
+	dnl on mac os x with -undefined dynamic_loader, add that to PERLLIBS
+	if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PERLLIBS="$UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 	if ( test -z "$HAVE_PERL" )
 	then
 		AC_MSG_CHECKING(for sys/vnode.h)
@@ -1924,6 +1938,7 @@ then
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
 	AC_SUBST(PERLLIB)
+	AC_SUBST(PERLLIBS)
 	AC_SUBST(PERLCCFLAGS)
 	AC_SUBST(PERLOPTIMIZE)
 	AC_SUBST(PERLSITEARCH)
@@ -2092,10 +2107,10 @@ then
 		PYTHONINCLUDES="-framework Python $PYTHONINCLUDES"
 	fi
 
-	dnl on mac os x with -undefined dynamic_loader, use that for PYTHONLIB
+	dnl on mac os x with -undefined dynamic_loader, add that to PYTHONLIB
 	if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
 	then
-		PYTHONLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+		PYTHONLIB="$PYTHONLIB $UNDEFINED_DYNAMIC_LOOKUP"
 	fi
 
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
@@ -2556,18 +2571,26 @@ then
 			PHPEXTDIR=`$PHPCONFIG --extension-dir`
 			PHPVERSION=`$PHPCONFIG --version`
 			PHPMAJORVERSION=`echo "$PHPVERSION" | cut -d'.' -f1`
+
+			dnl for cygwin and early mac os x...
+			if ( test -n "$CYGWIN" )
+			then
+				dnl FIXME: we really should include a -L option
+				PHPLIB="-lphp"
+			elif ( test -n "$DARWIN" )
+			then
+				if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+				then
+					PHPLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+				elif ( test -n "$BUNDLE_LOADER" )
+				then
+					PHPLIB="-Wl,$BUNDLE_LOADER -Wl,`$PHPCONFIG --php-binary`"
+				fi
+			fi
 		else
 			HAVE_PHP=""
 			AC_MSG_WARN(The PHP API will not be built.)
 		fi
-
-		dnl on os x add -lphp - this isn't necessary any more
-		dnl and I can't figure out what platforms it was required on
-		dnl any more either
-		dnl if ( test -n "$PHPCONFIG" -a -n "$DARWIN" )
-		dnl then
-			dnl PHPLIB="-lphp"
-		dnl fi
 	fi
 
 	FW_INCLUDES(php,[$PHPINCLUDES])

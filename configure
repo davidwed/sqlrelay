@@ -707,6 +707,7 @@ PERLSITELIB
 PERLSITEARCH
 PERLOPTIMIZE
 PERLCCFLAGS
+PERLLIBS
 PERLLIB
 HAVE_PERL
 PERL
@@ -33775,6 +33776,7 @@ then
 	HAVE_PERL=""
 	PERL=""
 	PERLLIB=""
+	PERLLIBS=""
 	PERLPREFIX=""
 
 	if ( test "$cross_compiling" = "yes" )
@@ -33860,7 +33862,7 @@ fi
 
 				if ( test -n "$PERL" )
 		then
-			if ( test -n "$CYGWIN" -o -n "$DARWIN" )
+			if ( test -n "$CYGWIN" )
 			then
 				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
@@ -33868,7 +33870,19 @@ fi
 
 if ( test -r ""$dir/CORE/libperl.$SOSUFFIX"" )
 then
-	eval "PERLLIB=\"-L$dir/CORE -lperl\""
+	eval "PERLLIBS=\"-L$dir/CORE -lperl\""
+fi
+
+				done
+			elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
+			then
+				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+				for dir in $DIRS
+				do
+
+if ( test -r ""$dir/CORE/libperl.$SOSUFFIX"" )
+then
+	eval "PERLLIBS=\"-L$dir/CORE -lperl\""
 fi
 
 				done
@@ -33946,6 +33960,11 @@ $as_echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 		fi
 	fi
 
+		if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PERLLIBS="$UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 	if ( test -z "$HAVE_PERL" )
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sys/vnode.h" >&5
@@ -33972,6 +33991,7 @@ $as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 	fi
+
 
 
 
@@ -34165,7 +34185,7 @@ CPPFLAGS="$SAVECPPFLAGS"
 
 		if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
 	then
-		PYTHONLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+		PYTHONLIB="$PYTHONLIB $UNDEFINED_DYNAMIC_LOOKUP"
 	fi
 
 
@@ -35061,13 +35081,26 @@ fi
 			PHPEXTDIR=`$PHPCONFIG --extension-dir`
 			PHPVERSION=`$PHPCONFIG --version`
 			PHPMAJORVERSION=`echo "$PHPVERSION" | cut -d'.' -f1`
+
+						if ( test -n "$CYGWIN" )
+			then
+								PHPLIB="-lphp"
+			elif ( test -n "$DARWIN" )
+			then
+				if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+				then
+					PHPLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+				elif ( test -n "$BUNDLE_LOADER" )
+				then
+					PHPLIB="-Wl,$BUNDLE_LOADER -Wl,`$PHPCONFIG --php-binary`"
+				fi
+			fi
 		else
 			HAVE_PHP=""
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The PHP API will not be built." >&5
 $as_echo "$as_me: WARNING: The PHP API will not be built." >&2;}
 		fi
-
-																fi
+	fi
 
 
 if ( test -n "$PHPINCLUDES" )

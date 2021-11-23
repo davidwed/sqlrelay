@@ -157,6 +157,8 @@ extern "C" {
 	#define ARGINFO(a) a
 #else
 	#define ARGINFO(a) NULL
+	#define ZEND_BEGIN_ARG_INFO_EX(a,b,c,d)
+	#define ZEND_END_ARG_INFO()
 #endif
 
 // old enough versions of PHP don't support TSRMLS macros
