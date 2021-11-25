@@ -9540,9 +9540,8 @@ dnl if it does not, then it sets the enviroment variable RPATHFLAG=""
 AC_DEFUN([FW_CHECK_LD_RPATH],
 [
 AC_MSG_CHECKING(whether ld -rpath works)
-ld -rpath /usr/lib 2> conftest
-INVALID="`grep 'no input files' conftest`"
-if ( test -n "$INVALID" )
+dnl FIXME: this can also return "missing argument" if it works
+if ( test -n "`ld -rpath /usr/lib 2>&1 | grep 'no input files'`" )
 then
 	RPATHFLAG="yes"
 	AC_MSG_RESULT(yes)
@@ -9550,7 +9549,6 @@ else
 	RPATHFLAG=""
 	AC_MSG_RESULT(no)
 fi
-rm conftest
 ])
 
 
@@ -10024,14 +10022,20 @@ AC_SUBST(EXE)
 dnl checks for Mac OS X platform
 dnl sets DARWIN to "yes" as appropriate
 dnl sets SHELL="...path to bash shell..." if the bash shell is available
+dnl sets BUNDLE_LOADER="-bundle_loader" if the ld flag is supported
 AC_DEFUN([FW_CHECK_OSX],
 [
 DARWIN=""
+BUNDLE_LOADER=""
 AC_MSG_CHECKING(for OSX)
 case $host_os in
 	*darwin* )
 		DARWIN="yes"
-		AC_MSG_RESULT(yes)
+
+		dnl get the actual mac os version
+		PRODUCTVERSION="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t'`"
+		AC_MSG_RESULT($PRODUCTVERSION)
+
 		FW_CHECK_WNOLONGDOUBLE
 
 		dnl prefer bash to the default shell, which could be tcsh or
@@ -10041,13 +10045,29 @@ case $host_os in
 		if ( test -n "$BASH" )
 		then
 			SHELL="$BASH"
-			AC_SUBST(SHELL)
 		fi
+
+		MACOSXDEPLOYMENTTARGET="MACOSX_DEPLOYMENT_TARGET=$PRODUCTVERSION"
+
+		dnl set some version-specific stuff
+		case "$PRODUCTVERSION" in
+			10.0 )
+				;;
+			10.[12] )
+				BUNDLE_LOADER="-bundle_loader"
+				;;
+			* )
+				UNDEFINED_DYNAMIC_LOOKUP="-Wl,-undefined -Wl,dynamic_lookup"
+				;;
+		esac
 		;;
 	* )
 		AC_MSG_RESULT(no)
 		;;
 esac
+
+AC_SUBST(SHELL)
+AC_SUBST(MACOSXDEPLOYMENTTARGET)
 ])
 
 
