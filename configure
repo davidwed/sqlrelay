@@ -16906,7 +16906,9 @@ case $host_os in
 	*darwin* )
 		DARWIN="yes"
 
-				PRODUCTVERSION="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t'`"
+				PV1="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t' | cut -d'.' -f1`"
+		PV2="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t' | cut -d'.' -f2`"
+		PRODUCTVERSION="$PV1.$PV2"
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $PRODUCTVERSION" >&5
 $as_echo "$PRODUCTVERSION" >&6; }
 

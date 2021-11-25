@@ -62,6 +62,12 @@ extern "C" {
 			#define _WCHAR_T_DEFINED_
 		#endif
 	#endif
+	// On some versions of Mac OS X (10.4), php.h ultimately includes
+	// dyld.h, but somehow _Bool avoids getting defined by stdbool.h
+	// Define it here.
+	#ifdef RUDIMENTS_HAVE_MACH_O_DYLD_H
+		typedef int     _Bool;
+	#endif
 	#include <php.h>
 	#ifndef WIN32
 		#ifdef cpluspluswasdefined
