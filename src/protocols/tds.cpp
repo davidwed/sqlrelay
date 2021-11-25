@@ -7,6 +7,8 @@
 #include <rudiments/datetime.h>
 #include <rudiments/error.h>
 
+#ifdef RUDIMENTS_HAVE_WCHAR_H
+
 #include <wchar.h>
 
 // helper class for strings of 32-bit wide characters
@@ -5708,11 +5710,17 @@ void sqlrprotocol_tds::debugSystemError() {
 	delete[] err;
 }
 
+#endif
+
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_tds(
 						sqlrservercontroller *cont,
 						sqlrprotocols *ps,
 						domnode *parameters) {
-		return new sqlrprotocol_tds(cont,ps,parameters);
+		#ifdef RUDIMENTS_HAVE_WCHAR_H
+			return new sqlrprotocol_tds(cont,ps,parameters);
+		#else
+			return NULL;
+		#endif
 	}
 }
