@@ -10053,7 +10053,7 @@ case $host_os in
 		case "$PRODUCTVERSION" in
 			10.0 )
 				;;
-			10.[12] )
+			10.[[12]] )
 				BUNDLE_LOADER="-bundle_loader"
 				;;
 			* )
