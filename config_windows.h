@@ -210,6 +210,9 @@
 /* Some systems have SQLLEN/SQLULEN parameters for SQLExtendedFetch */
 #define HAVE_SQLEXTENDEDFETCH_LEN 1
 
+/* Some systems have SQLGetPrivateProfileString */
+#define HAVE_SQLGETPRIVATEPROFILESTRING 1
+
 /* SQLite supports sqlite3_column_table_name */
 #define HAVE_SQLITE3_COLUMN_TABLE_NAME 1
 
@@ -323,6 +326,9 @@
 
 /* Platform supports shared libraries */
 #define SQLRELAY_ENABLE_SHARED 1
+
+/* Some systems have odbcinst.h */
+#define SQLRELAY_HAVE_ODBCINST_H 1
 
 /* Some systems have sys/vnode.h */
 /* #undef SQLRELAY_HAVE_SYS_VNODE_H */

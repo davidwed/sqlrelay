@@ -14,6 +14,9 @@
 #include <rudiments/datetime.h>
 #include <rudiments/stdio.h>
 #include <rudiments/error.h>
+#ifndef HAVE_SQLGETPRIVATEPROFILESTRING
+	#include <rudiments/inidom.h>
+#endif
 /*#ifdef _WIN32
 	#define DEBUG_MESSAGES 1
 	#define DEBUG_TO_FILE 1
@@ -39,7 +42,9 @@
 
 #include <sql.h>
 #include <sqlext.h>
-#include <odbcinst.h>
+#ifdef HAVE_ODBCINST_H
+	#include <odbcinst.h>
+#endif
 
 #include <defines.h>
 
@@ -2159,6 +2164,44 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 	return retval;
 }
 
+#ifndef HAVE_SQLGETPRIVATEPROFILESTRING
+static int SQLGetPrivateProfileString(const char *section,
+					const char *entry,
+					const char *def,
+					char *retbuffer,
+					int retbufferlen,
+					const char *filename) {
+
+	// fudge the filename
+	if (!charstring::compare(filename,"odbc.ini")) {
+		filename="/etc/odbc.ini";
+	}
+	
+	// parse the file
+	inidom	i;
+	if (!i.parseFile(filename)) {
+		return 0;
+	}
+
+	// init the value to the default
+	const char	*value=def;
+
+	// attempt to get the actual value
+	domnode	*d=i.getRootNode()->
+			getFirstTagChild("s","v",section)->
+			getFirstTagChild("k","k",entry);
+	if (!d->isNullNode()) {
+		value=d->getAttributeValue("v");
+	}
+
+	// copy out the value
+	charstring::safeCopy(retbuffer,retbufferlen,value);
+
+	// return number of characters copied oud
+	int	len=(int)charstring::length(value)+1;
+	return (retbufferlen>len)?len:retbufferlen;
+}
+#endif
 
 static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					parameterstring *connparams,
