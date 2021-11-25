@@ -228,6 +228,7 @@ else
 PERLMAN3EXT_LOCAL = $(OVERRIDEPERLMAN3EXT)
 endif
 PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
+PERLLIBS = @PERLLIBS@
 PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection $(PERLLIBS)
 PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor $(PERLLIBS)
 ifneq ($(strip $(libdir)),)
@@ -242,7 +243,6 @@ ifneq ($(PERLINSTALLMAN3DIR_LOCAL),)
 PERLINSTALLMAN = installman
 endif
 endif
-PERLLIBS = @PERLLIBS@
 
 
 # python

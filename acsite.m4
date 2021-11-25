@@ -367,7 +367,27 @@ then
 		dnl try mysql_config first...
 		if ( test -z "$MYSQLLIBS" )
 		then
-			for dir in "$MYSQLPATHBIN" "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` "/usr/local/mariadb/bin" "/opt/sfw/mariadb/bin" "/usr/sfw/mariadb/bin" `ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
+			for dir in \
+				"$MYSQLPATHBIN" \
+				"" \
+				"/usr/bin" \
+				"/usr/local/bin" \
+				"/usr/pkg/bin" \
+				"/usr/local/mysql/bin" \
+				"/opt/sfw/bin" \
+				"/opt/sfw/mysql/bin" \
+				"/usr/sfw/bin" \
+				"/usr/sfw/mysql/bin" \
+				"/opt/csw/bin" \
+				"/sw/bin" \
+				"/usr/freeware/bin" \
+				"/boot/common/bin" \
+				"/resources/index/bin" \
+				`ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` \
+				"/usr/local/mariadb/bin" \
+				"/opt/sfw/mariadb/bin" \
+				"/usr/sfw/mariadb/bin" \
+				`ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
 			do
 
 				dnl try mysql_config, and if that fails,
@@ -1629,7 +1649,13 @@ then
 	INFORMIXESQLLIBSPATH=""
 	INFORMIXSTATIC=""
 
-	for dir in "$INFORMIXPATH" "$INFORMIXDIR" "/opt/informix" "/opt/IBM/informix" "/home/informix" "/usr/local/informix"
+	for dir in \
+		"$INFORMIXPATH" \
+		"$INFORMIXDIR" \
+		"/opt/informix" \
+		"/opt/IBM/informix" \
+		"/home/informix" \
+		"/usr/local/informix"
 	do
 		if ( test -z "$dir" )
 		then
@@ -1821,7 +1847,18 @@ then
 			AC_CHECK_PROG(PERL,perl,"perl")
 			if ( test -z "$PERL" )
 			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
+				for i in \
+					"/usr/bin" \
+					"/usr/local/bin" \
+					"/usr/pkg/bin" \
+					"/usr/local/perl/bin" \
+					"/opt/sfw/bin" \
+					"/usr/sfw/bin" \
+					"/opt/csw/bin" \
+					"/sw/bin" \
+					"/usr/freeware/bin" \
+					"/boot/common/bin" \
+					"/resources/index/bin"
 				do
 					if ( test -d "$i" )
 					then
@@ -1842,18 +1879,34 @@ then
 		then
 			if ( test -n "$CYGWIN" )
 			then
-				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+				DIRS=`$PERL -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
 				do
 					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
 				done
-			elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
+			elif ( test -n "$DARWIN" )
 			then
-				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
-				for dir in $DIRS
-				do
-					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
-				done
+				if ( test -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
+				then
+					DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+					for dir in $DIRS
+					do
+						FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
+					done
+				elif ( test -n "$BUNDLE_LOADER" )
+				then
+					if ( test ! -r "$PERL" )
+					then
+						PERL="`which $PERL`"
+					fi
+					PERLLIBS="-Wl,$BUNDLE_LOADER -Wl,$PERL"
+				else
+					DIRS=`$PERL -e 'foreach (@INC) { print("$_\n"); }'`
+					for dir in $DIRS
+					do
+						FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
+					done
+				fi
 			fi
 		fi
 
@@ -1982,16 +2035,51 @@ then
 
 		pyext=""
 
-		for pyversion in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+		for pyversion in \
+				"3.9" \
+				"3.8" \
+				"3.7" \
+				"3.6" \
+				"3.5" \
+				"3.4" \
+				"3.3" \
+				"3.2" \
+				"3.1" \
+				"3.0" \
+				"2.9" \
+				"2.8" \
+				"2.7" \
+				"2.6" \
+				"2.5" \
+				"2.4" \
+				"2.3" \
+				"2.2" \
+				"2.1"
 		do
 
-			for pyprefix in "$PYTHONPATH" "/usr" "/usr/local" "/usr/pkg" "/usr/local/python$pyversion" "/opt/sfw" "/usr/sfw" "/opt/csw" "/sw" "/usr/freeware" "/System/Library/Frameworks/Python.framework/Versions/Current" "/boot/common"
+			for pyprefix in \
+				"$PYTHONPATH" \
+				"/usr" \
+				"/usr/local" \
+				"/usr/pkg" \
+				"/usr/local/python$pyversion" \
+				"/opt/sfw" \
+				"/usr/sfw" \
+				"/opt/csw" \
+				"/sw" \
+				"/usr/freeware" \
+				"/System/Library/Frameworks/Python.framework/Versions/Current" \
+				"/boot/common"
 			do
 
 				if ( test -n "$pyprefix" )
 				then
 
-					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
+					for pyexe in \
+						"python$pyversion$pyext" \
+						"python$PYTHONVERSION$pyext" \
+						"python$pyversion" \
+						"python$PYTHONVERSION" "python"
 					do
 						if ( test -x "$pyprefix/bin/$pyexe" )
 						then
@@ -2019,11 +2107,23 @@ then
 						fi
 					done
 
-					for pylibdir in "$pyprefix/lib64/python$pyversion" "$pyprefix/lib/python$pyversion"
+					for pylibdir in \
+						"$pyprefix/lib64/python$pyversion" \
+						"$pyprefix/lib/python$pyversion"
 					do
 
 						PYTHONDIR=""
-						for k in "config" "config-$MULTIARCHDIR" "config-$pyversion-$MULTIARCHDIR" "config-$pyversion" "config-${pyversion}mu-$MULTIARCHDIR" "config-${pyversion}mu" "config-${pyversion}m-$MULTIARCHDIR" "config-${pyversion}m" "config-${pyversion}u-$MULTIARCHDIR" "config-${pyversion}u"
+						for k in \
+							"config" \
+							"config-$MULTIARCHDIR" \
+							"config-$pyversion-$MULTIARCHDIR" \
+							"config-$pyversion" \
+							"config-${pyversion}mu-$MULTIARCHDIR" \
+							"config-${pyversion}mu" \
+							"config-${pyversion}m-$MULTIARCHDIR" \
+							"config-${pyversion}m" \
+							"config-${pyversion}u-$MULTIARCHDIR" \
+							"config-${pyversion}u"
 						do
 
 							if ( test -d "$pylibdir/$k" )
@@ -2173,10 +2273,32 @@ then
 		for major in "" "1" "2"
 		do
 
-			for minor in "" "9" "8" "7" "6" "5" "4" "3" "2" "1" "0"
+			for minor in \
+				"" \
+				"9" \
+				"8" \
+				"7" \
+				"6" \
+				"5" \
+				"4" \
+				"3" \
+				"2" \
+				"1" \
+				"0"
 			do
 
-				for patchlevel in "" "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+				for patchlevel in \
+						"" \
+						"0" \
+						"1" \
+						"2" \
+						"3" \
+						"4" \
+						"5" \
+						"6" \
+						"7" \
+						"8" \
+						"9"
 				do
 
 					for separator in "" "."
@@ -2228,6 +2350,9 @@ then
 								elif ( test -n "$BUNDLE_LOADER" )
 								then
 									RUBYLIB="-Wl,$BUNDLE_LOADER -Wl,$RUBY"
+								else
+									dnl FIXME: we really should include a -L option
+									RUBYLIB="-lruby"
 								fi
 							fi
 
@@ -2306,7 +2431,7 @@ END
 
 			AC_MSG_CHECKING(for ruby.h)
 			HAVE_RUBY_H=""
-			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
+			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - 2> /dev/null | grep -v Entering | grep -v Leaving`
 			do
 				if ( test -r "$dir/ruby.h" )
 				then
@@ -2325,7 +2450,7 @@ END
 
 			AC_MSG_CHECKING(for ruby/thread.h)
 			HAVE_RUBY_THREAD_H=""
-			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
+			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - 2> /dev/null | grep -v Entering | grep -v Leaving`
 			do
 				if ( test -r "$dir/ruby/thread.h" )
 				then
@@ -2598,7 +2723,29 @@ then
 					PHPLIB="$UNDEFINED_DYNAMIC_LOOKUP"
 				elif ( test -n "$BUNDLE_LOADER" )
 				then
-					PHPLIB="-Wl,$BUNDLE_LOADER -Wl,`$PHPCONFIG --php-binary`"
+					AC_MSG_CHECKING(for php executable)
+					PHP="`$PHPCONFIG --php-binary 2>&1 | grep -v Usage`"
+					if ( test -z "$PHP" )
+					then
+						if ( test ! -r "$PHPCONFIG" )
+						then
+							PHPCONFIG="`which $PHPCONFIG`"
+						fi
+						BINDIR=`dirname $PHPCONFIG`
+						PHP=$BINDIR/php
+					fi
+					if ( test -r "$PHP" )
+					then
+						AC_MSG_RESULT($PHP)
+						PHPLIB="-Wl,$BUNDLE_LOADER -Wl,$PHP"
+					else
+						AC_MSG_RESULT(no)
+						HAVE_PHP=""
+						AC_MSG_WARN(The PHP API will not be built.)
+					fi
+				else
+					dnl FIXME: we really should include a -L option
+					PHPLIB="-lphp"
 				fi
 			fi
 		else
@@ -2607,7 +2754,10 @@ then
 		fi
 	fi
 
-	FW_INCLUDES(php,[$PHPINCLUDES])
+	if ( test -n "$HAVE_PHP" )
+	then
+		FW_INCLUDES(php,[$PHPINCLUDES])
+	fi
 
 	if ( test -n "$OVERRIDEPHPEXTDIR" )
 	then
