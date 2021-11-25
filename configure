@@ -687,6 +687,7 @@ HAVE_RUBY
 RUBY
 EXCEPTIONSSTANDARDERROR
 IMPORTEXCEPTIONS
+PYTHONFRAMEWORK
 PYTHON
 PYTHONLIB
 PYTHONSITEDIR
@@ -706,6 +707,7 @@ PERLSITELIB
 PERLSITEARCH
 PERLOPTIMIZE
 PERLCCFLAGS
+PERLLIBS
 PERLLIB
 HAVE_PERL
 PERL
@@ -777,7 +779,6 @@ WALL
 WERROR
 FPIC
 PIPE
-PYTHONFRAMEWORK
 JNISUFFIX
 MODULESUFFIX
 SOSUFFIX
@@ -17034,21 +17035,6 @@ $as_echo "so=>$SOSUFFIX module=>$MODULESUFFIX jni=>$JNISUFFIX" >&6; }
 cat >>confdefs.h <<_ACEOF
 #define SQLRELAY_MODULESUFFIX "$MODULESUFFIX"
 _ACEOF
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for plugin dependencies" >&5
-$as_echo_n "checking for plugin dependencies... " >&6; }
-PYTHONFRAMEWORK=""
-if (test -n "$DARWIN" )
-then
-	PYTHONFRAMEWORK="-framework Python"
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: OSX style" >&5
-$as_echo "OSX style" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: standard unix style" >&5
-$as_echo "standard unix style" >&6; }
-fi
-
 
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether ld -rpath works" >&5
@@ -33790,6 +33776,7 @@ then
 	HAVE_PERL=""
 	PERL=""
 	PERLLIB=""
+	PERLLIBS=""
 	PERLPREFIX=""
 
 	if ( test "$cross_compiling" = "yes" )
@@ -33875,7 +33862,7 @@ fi
 
 				if ( test -n "$PERL" )
 		then
-			if ( test -n "$CYGWIN" -o -n "$DARWIN" )
+			if ( test -n "$CYGWIN" )
 			then
 				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
@@ -33883,7 +33870,19 @@ fi
 
 if ( test -r ""$dir/CORE/libperl.$SOSUFFIX"" )
 then
-	eval "PERLLIB=\"-L$dir/CORE -lperl\""
+	eval "PERLLIBS=\"-L$dir/CORE -lperl\""
+fi
+
+				done
+			elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
+			then
+				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+				for dir in $DIRS
+				do
+
+if ( test -r ""$dir/CORE/libperl.$SOSUFFIX"" )
+then
+	eval "PERLLIBS=\"-L$dir/CORE -lperl\""
 fi
 
 				done
@@ -33961,6 +33960,11 @@ $as_echo "$as_me: WARNING: The Perl API will not be built." >&2;}
 		fi
 	fi
 
+		if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PERLLIBS="$UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 	if ( test -z "$HAVE_PERL" )
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for sys/vnode.h" >&5
@@ -33987,6 +33991,7 @@ $as_echo "no" >&6; }
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 	fi
+
 
 
 
@@ -34044,6 +34049,21 @@ then
 				if ( test -n "$pyprefix" )
 				then
 
+					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
+					do
+						if ( test -x "$pyprefix/bin/$pyexe" )
+						then
+							PYTHON="$pyprefix/bin/$pyexe"
+
+														if ( test -n "$BUNDLE_LOADER" )
+							then
+								PYTHONLIB="-Wl,$BUNDLE_LOADER -Wl,$PYTHON"
+							fi
+
+							break
+						fi
+					done
+
 					PYTHONINCLUDES=""
 					for ext in "mu" "m" "u" ""
 					do
@@ -34065,16 +34085,14 @@ then
 
 							if ( test -d "$pylibdir/$k" )
 							then
-																								if ( test -n "$CYGWIN" -a -r "$pylibdir/$k/libpython$pyversion.dll.a" )
+								PYTHONDIR="$pylibdir"
+
+																if ( test -n "$CYGWIN" -a -r "$pylibdir/$k/libpython$pyversion.dll.a" )
 								then
-									PYTHONDIR="$pylibdir"
 									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
-								elif ( test -n "$DARWIN" )
+								elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
 								then
-									PYTHONDIR="$pylibdir"
-									PYTHONLIB="-lpython$pyversion"
-								else
-									PYTHONDIR="$pylibdir"
+									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
 								fi
 								if ( test -n "$PYTHONDIR" )
 								then
@@ -34084,15 +34102,6 @@ then
 						done
 						if ( test -n "$PYTHONDIR" )
 						then
-							break
-						fi
-					done
-
-					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
-					do
-						if ( test -x "$pyprefix/bin/$pyexe" )
-						then
-							PYTHON="$pyprefix/bin/$pyexe"
 							break
 						fi
 					done
@@ -34169,10 +34178,26 @@ CPPFLAGS="$SAVECPPFLAGS"
 		fi
 	fi
 
+		if (test -n "$DARWIN" )
+	then
+		PYTHONINCLUDES="-framework Python $PYTHONINCLUDES"
+	fi
+
+		if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PYTHONLIB="$PYTHONLIB $UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 
 if ( test -n "$PYTHONINCLUDES" )
 then
 	echo "python includes... $PYTHONINCLUDES"
+fi
+
+
+if ( test -n "$PYTHONLIB" )
+then
+	echo "python libs... $PYTHONLIB"
 fi
 
 
@@ -34181,19 +34206,22 @@ fi
 		PYTHONDIR="$OVERRIDEPYTHONDIR"
 	fi
 
-	IMPORTEXCEPTIONS=""
+
+
+
+
+
+
+
+
+
+		IMPORTEXCEPTIONS=""
 	EXCEPTIONSSTANDARDERROR="Exception"
 	if ( test "$PYTHONVERSION" = "2" )
 	then
 		IMPORTEXCEPTIONS="import exceptions"
 		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 	fi
-
-
-
-
-
-
 
 
 
@@ -34240,26 +34268,26 @@ then
 					for separator in "" "."
 					do
 
-			ruby="ruby$major$separator$minor"
-			if ( test -n "$patchlevel" )
-			then
-				ruby="ruby$major$separator$minor$separator$patchlevel"
-			fi
+						ruby="ruby$major$separator$minor"
+						if ( test -n "$patchlevel" )
+						then
+							ruby="ruby$major$separator$minor$separator$patchlevel"
+						fi
 
-			HAVE_RUBY=""
-			RUBY=""
-			RUBYLIB=""
+						HAVE_RUBY=""
+						RUBY=""
+						RUBYLIB=""
 
-			if ( test -n "$RUBYPATH" )
-			then
+						if ( test -n "$RUBYPATH" )
+						then
 
 if ( test -r ""$RUBYPATH/bin/$ruby"" )
 then
 	eval "RUBY=\"$RUBYPATH/bin/$ruby\""
 fi
 
-			else
-				# Extract the first word of ""$ruby"", so it can be a program name with args.
+						else
+							# Extract the first word of ""$ruby"", so it can be a program name with args.
 set dummy "$ruby"; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
@@ -34296,35 +34324,47 @@ $as_echo "no" >&6; }
 fi
 
 
-				if ( test -z "$RUBY" )
-				then
-					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
-					do
+							if ( test -z "$RUBY" )
+							then
+								for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
+								do
 
 if ( test -r ""$i/$ruby"" )
 then
 	eval "RUBY=\"$i/$ruby\""
 fi
 
+									if ( test -n "$RUBY" )
+									then
+										found="yes"
+										break
+									fi
+								done
+							fi
+						fi
+
 						if ( test -n "$RUBY" )
 						then
+							HAVE_RUBY="yes"
+
+														if ( test -n "$CYGWIN" )
+							then
+																RUBYLIB="-lruby"
+							elif ( test -n "$DARWIN" )
+							then
+								if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+								then
+									RUBYLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+								elif ( test -n "$BUNDLE_LOADER" )
+								then
+									RUBYLIB="-Wl,$BUNDLE_LOADER -Wl,$RUBY"
+								fi
+							fi
+
 							found="yes"
 							break
 						fi
-					done
-				fi
-			fi
 
-			if ( test -n "$RUBY" )
-			then
-				HAVE_RUBY="yes"
-								if ( test -n "$CYGWIN" -o -n "$DARWIN" )
-				then
-					RUBYLIB="-lruby"
-				fi
-				found="yes"
-				break
-			fi
 						if ( test -z "$major" -o -z "$minor" -o -z "$patchlevel" )
 						then
 							break
@@ -34480,6 +34520,8 @@ then
 		then
 			for i in \
 `ls -d /etc/alternatives/java_sdk /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* 2> /dev/null` \
+/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK \
+/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr/java \
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
@@ -34519,7 +34561,6 @@ then
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
-/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local
 			do
@@ -35053,13 +35094,26 @@ fi
 			PHPEXTDIR=`$PHPCONFIG --extension-dir`
 			PHPVERSION=`$PHPCONFIG --version`
 			PHPMAJORVERSION=`echo "$PHPVERSION" | cut -d'.' -f1`
+
+						if ( test -n "$CYGWIN" )
+			then
+								PHPLIB="-lphp"
+			elif ( test -n "$DARWIN" )
+			then
+				if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+				then
+					PHPLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+				elif ( test -n "$BUNDLE_LOADER" )
+				then
+					PHPLIB="-Wl,$BUNDLE_LOADER -Wl,`$PHPCONFIG --php-binary`"
+				fi
+			fi
 		else
 			HAVE_PHP=""
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: The PHP API will not be built." >&5
 $as_echo "$as_me: WARNING: The PHP API will not be built." >&2;}
 		fi
-
-																fi
+	fi
 
 
 if ( test -n "$PHPINCLUDES" )
@@ -35717,12 +35771,12 @@ then
 
 	else
 
-				CSC=""
+				{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for compiler" >&5
+$as_echo_n "checking for compiler... " >&6; }
+		CSC=""
 		CSCFLAGS=""
 		for compiler in "mcs" "gmcs" "dmcs" "smcs"
 		do
-			{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $compiler" >&5
-$as_echo_n "checking for $compiler... " >&6; }
 
 			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 			do
@@ -35740,7 +35794,7 @@ $as_echo_n "checking for $compiler... " >&6; }
 			fi
 		done
 
-		if ( test -r "$CSC" )
+		if ( test -n "$CSC" )
 		then
 			{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $CSC" >&5
 $as_echo "$CSC" >&6; }
@@ -36234,7 +36288,7 @@ if ( test -n "$HAVE_NODEJS" ); then
 	NODEJSBUILD="yes"
 	TESTAPIS="$TESTAPIS nodejs"
 fi
-if ( test -n "$ENABLE_ODBC_DRIVER" ); then
+if ( test -n "$ENABLE_ODBC_DRIVER" -a -n "$ODBCLIBS" ); then
 	ODBCDRIVERBUILD="yes"
 fi
 

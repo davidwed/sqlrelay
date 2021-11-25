@@ -28,6 +28,18 @@ void sqlrresultsettable::setCursor(sqlrcursor *cursor) {
 	pvt->cursor=cursor;
 }
 
+bool sqlrresultsettable::getIsReadOnly() {
+	return true;
+}
+
+bool sqlrresultsettable::getIsBlockBased() {
+	return true;
+}
+
+bool sqlrresultsettable::getIsSequentialAccess() {
+	return true;
+}
+
 void sqlrresultsettable::setColumnName(uint64_t col, const char *name) {
 	// do nothing
 }
@@ -57,7 +69,11 @@ uint64_t sqlrresultsettable::getRowCount() {
 	return (pvt->cursor)?pvt->cursor->rowCount():0;
 }
 
-bool sqlrresultsettable::allRowsAvailable() {
+uint64_t sqlrresultsettable::getRowBlockSize() {
+	return (pvt->cursor)?pvt->cursor->getResultSetBufferSize():0;
+}
+
+bool sqlrresultsettable::getAllRowsAvailable() {
 	return (pvt->cursor)?pvt->cursor->endOfResultSet():true;
 }
 

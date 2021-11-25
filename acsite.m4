@@ -1,18 +1,3 @@
-dnl Determines what options need to be used when building plugins
-AC_DEFUN([FW_CHECK_PLUGIN_DEPENDENCIES],
-[
-AC_MSG_CHECKING(for plugin dependencies)
-PYTHONFRAMEWORK=""
-if (test -n "$DARWIN" )
-then
-	PYTHONFRAMEWORK="-framework Python"
-	AC_MSG_RESULT(OSX style)
-else
-	AC_MSG_RESULT(standard unix style)
-fi
-AC_SUBST(PYTHONFRAMEWORK)
-])
-
 AC_DEFUN([FW_CHECK_ORACLE],
 [
 if ( test -z "$ORACLEATRUNTIME" )
@@ -1818,6 +1803,7 @@ then
 	HAVE_PERL=""
 	PERL=""
 	PERLLIB=""
+	PERLLIBS=""
 	PERLPREFIX=""
 
 	if ( test "$cross_compiling" = "yes" )
@@ -1851,15 +1837,22 @@ then
 			fi
 		fi
 
-		dnl for cygwin and mac os x add -lperl
+		dnl for cygwin and early mac os x add -lperl
 		if ( test -n "$PERL" )
 		then
-			if ( test -n "$CYGWIN" -o -n "$DARWIN" )
+			if ( test -n "$CYGWIN" )
 			then
 				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
 				do
-					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIB=\"-L$dir/CORE -lperl\"])
+					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
+				done
+			elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
+			then
+				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+				for dir in $DIRS
+				do
+					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
 				done
 			fi
 		fi
@@ -1930,6 +1923,12 @@ then
 		fi
 	fi
 
+	dnl on mac os x with -undefined dynamic_loader, add that to PERLLIBS
+	if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PERLLIBS="$UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 	if ( test -z "$HAVE_PERL" )
 	then
 		AC_MSG_CHECKING(for sys/vnode.h)
@@ -1939,6 +1938,7 @@ then
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
 	AC_SUBST(PERLLIB)
+	AC_SUBST(PERLLIBS)
 	AC_SUBST(PERLCCFLAGS)
 	AC_SUBST(PERLOPTIMIZE)
 	AC_SUBST(PERLSITEARCH)
@@ -1991,6 +1991,22 @@ then
 				if ( test -n "$pyprefix" )
 				then
 
+					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
+					do
+						if ( test -x "$pyprefix/bin/$pyexe" )
+						then
+							PYTHON="$pyprefix/bin/$pyexe"
+
+							dnl on mac os x with -bundle_loader, set PYTHONLIB
+							if ( test -n "$BUNDLE_LOADER" )
+							then
+								PYTHONLIB="-Wl,$BUNDLE_LOADER -Wl,$PYTHON"
+							fi
+
+							break
+						fi
+					done
+
 					PYTHONINCLUDES=""
 					for ext in "mu" "m" "u" ""
 					do
@@ -2012,18 +2028,15 @@ then
 
 							if ( test -d "$pylibdir/$k" )
 							then
-								dnl for cygwin and mac os x
-								dnl add -lpython
+								PYTHONDIR="$pylibdir"
+
+								dnl for cygwin and early mac os x, add -lpython or similar
 								if ( test -n "$CYGWIN" -a -r "$pylibdir/$k/libpython$pyversion.dll.a" )
 								then
-									PYTHONDIR="$pylibdir"
 									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
-								elif ( test -n "$DARWIN" )
+								elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
 								then
-									PYTHONDIR="$pylibdir"
-									PYTHONLIB="-lpython$pyversion"
-								else
-									PYTHONDIR="$pylibdir"
+									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
 								fi
 								if ( test -n "$PYTHONDIR" )
 								then
@@ -2033,15 +2046,6 @@ then
 						done
 						if ( test -n "$PYTHONDIR" )
 						then
-							break
-						fi
-					done
-
-					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
-					do
-						if ( test -x "$pyprefix/bin/$pyexe" )
-						then
-							PYTHON="$pyprefix/bin/$pyexe"
 							break
 						fi
 					done
@@ -2097,19 +2101,24 @@ then
 		fi
 	fi
 
+	dnl on mac os x, add -framework Python to the includes
+	if (test -n "$DARWIN" )
+	then
+		PYTHONINCLUDES="-framework Python $PYTHONINCLUDES"
+	fi
+
+	dnl on mac os x with -undefined dynamic_loader, add that to PYTHONLIB
+	if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PYTHONLIB="$PYTHONLIB $UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
+	FW_LIBS(python,[$PYTHONLIB])
 
 	if ( test -n "$OVERRIDEPYTHONDIR" )
 	then
 		PYTHONDIR="$OVERRIDEPYTHONDIR"
-	fi
-
-	IMPORTEXCEPTIONS=""
-	EXCEPTIONSSTANDARDERROR="Exception"
-	if ( test "$PYTHONVERSION" = "2" )
-	then
-		IMPORTEXCEPTIONS="import exceptions"
-		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 	fi
 
 	AC_SUBST(HAVE_PYTHON)
@@ -2118,8 +2127,20 @@ then
 	AC_SUBST(PYTHONSITEDIR)
 	AC_SUBST(PYTHONLIB)
 	AC_SUBST(PYTHON)
+	AC_SUBST(PYTHONFRAMEWORK)
+
+
+	dnl some flags for the python tests
+	IMPORTEXCEPTIONS=""
+	EXCEPTIONSSTANDARDERROR="Exception"
+	if ( test "$PYTHONVERSION" = "2" )
+	then
+		IMPORTEXCEPTIONS="import exceptions"
+		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+	fi
 	AC_SUBST(IMPORTEXCEPTIONS)
 	AC_SUBST(EXCEPTIONSSTANDARDERROR)
+
 
 	if ( test "$HAVE_PYTHON" = "" )
 	then
@@ -2161,46 +2182,59 @@ then
 					for separator in "" "."
 					do
 
-			ruby="ruby$major$separator$minor"
-			if ( test -n "$patchlevel" )
-			then
-				ruby="ruby$major$separator$minor$separator$patchlevel"
-			fi
+						ruby="ruby$major$separator$minor"
+						if ( test -n "$patchlevel" )
+						then
+							ruby="ruby$major$separator$minor$separator$patchlevel"
+						fi
 
-			HAVE_RUBY=""
-			RUBY=""
-			RUBYLIB=""
+						HAVE_RUBY=""
+						RUBY=""
+						RUBYLIB=""
 
-			if ( test -n "$RUBYPATH" )
-			then
-				FW_CHECK_FILE("$RUBYPATH/bin/$ruby",[RUBY=\"$RUBYPATH/bin/$ruby\"])
-			else
-				AC_CHECK_PROG(RUBY,"$ruby","$ruby")
-				if ( test -z "$RUBY" )
-				then
-					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
-					do
-						FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
+						if ( test -n "$RUBYPATH" )
+						then
+							FW_CHECK_FILE("$RUBYPATH/bin/$ruby",[RUBY=\"$RUBYPATH/bin/$ruby\"])
+						else
+							AC_CHECK_PROG(RUBY,"$ruby","$ruby")
+							if ( test -z "$RUBY" )
+							then
+								for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
+								do
+									FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
+									if ( test -n "$RUBY" )
+									then
+										found="yes"
+										break
+									fi
+								done
+							fi
+						fi
+
 						if ( test -n "$RUBY" )
 						then
+							HAVE_RUBY="yes"
+
+							dnl for cygwin and early mac os x, add -lruby
+							if ( test -n "$CYGWIN" )
+							then
+								dnl FIXME: we really should include a -L option
+								RUBYLIB="-lruby"
+							elif ( test -n "$DARWIN" )
+							then
+								if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+								then
+									RUBYLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+								elif ( test -n "$BUNDLE_LOADER" )
+								then
+									RUBYLIB="-Wl,$BUNDLE_LOADER -Wl,$RUBY"
+								fi
+							fi
+
 							found="yes"
 							break
 						fi
-					done
-				fi
-			fi
 
-			if ( test -n "$RUBY" )
-			then
-				HAVE_RUBY="yes"
-				dnl for cygwin and OSX include -lruby
-				if ( test -n "$CYGWIN" -o -n "$DARWIN" )
-				then
-					RUBYLIB="-lruby"
-				fi
-				found="yes"
-				break
-			fi
 						if ( test -z "$major" -o -z "$minor" -o -z "$patchlevel" )
 						then
 							break
@@ -2348,6 +2382,8 @@ then
 		then
 			for i in \
 `ls -d /etc/alternatives/java_sdk /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* 2> /dev/null` \
+/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK \
+/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr/java \
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
@@ -2387,7 +2423,6 @@ then
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
-/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local
 			do
@@ -2550,18 +2585,26 @@ then
 			PHPEXTDIR=`$PHPCONFIG --extension-dir`
 			PHPVERSION=`$PHPCONFIG --version`
 			PHPMAJORVERSION=`echo "$PHPVERSION" | cut -d'.' -f1`
+
+			dnl for cygwin and early mac os x...
+			if ( test -n "$CYGWIN" )
+			then
+				dnl FIXME: we really should include a -L option
+				PHPLIB="-lphp"
+			elif ( test -n "$DARWIN" )
+			then
+				if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+				then
+					PHPLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+				elif ( test -n "$BUNDLE_LOADER" )
+				then
+					PHPLIB="-Wl,$BUNDLE_LOADER -Wl,`$PHPCONFIG --php-binary`"
+				fi
+			fi
 		else
 			HAVE_PHP=""
 			AC_MSG_WARN(The PHP API will not be built.)
 		fi
-
-		dnl on os x add -lphp - this isn't necessary any more
-		dnl and I can't figure out what platforms it was required on
-		dnl any more either
-		dnl if ( test -n "$PHPCONFIG" -a -n "$DARWIN" )
-		dnl then
-			dnl PHPLIB="-lphp"
-		dnl fi
 	fi
 
 	FW_INCLUDES(php,[$PHPINCLUDES])
@@ -2888,11 +2931,11 @@ then
 	else
 
 		dnl look for the compiler
+		AC_MSG_CHECKING(for compiler)
 		CSC=""
 		CSCFLAGS=""
 		for compiler in "mcs" "gmcs" "dmcs" "smcs"
 		do
-			AC_MSG_CHECKING(for $compiler)
 
 			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 			do
@@ -2910,7 +2953,7 @@ then
 			fi
 		done
 
-		if ( test -r "$CSC" )
+		if ( test -n "$CSC" )
 		then
 			AC_MSG_RESULT($CSC)
 		else

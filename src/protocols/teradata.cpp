@@ -8180,13 +8180,13 @@ bool sqlrprotocol_teradata::generateSharedSecret() {
 	// compute the shared secret
 	// (NOTE: sharedsecretsize might be less
 	// than the size allocated for the buffer)
-	sharedsecretsize=DH_compute_key(sharedsecret,cpkbn,dh);
+	int	result=DH_compute_key(sharedsecret,cpkbn,dh);
 
 	// clean up
 	BN_free(cpkbn);
 
 	// handle success/failure
-	if ((int64_t)sharedsecretsize==-1) {
+	if (result==-1) {
 		delete[] sharedsecret;
 		sharedsecret=NULL;
 		sharedsecretsize=0;
@@ -8195,6 +8195,8 @@ bool sqlrprotocol_teradata::generateSharedSecret() {
 			stdoutput.printf("generate shared secret failed\n");
 		}
 		return false;
+	} else {
+		sharedsecretsize=result;
 	}
 
 	// get sha2 hash of the sharedsecret
