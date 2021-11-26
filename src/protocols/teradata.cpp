@@ -13,12 +13,14 @@
 #include <rudiments/sys.h>
 #include <rudiments/sha256.h>
 
-#include <openssl/conf.h>
-#include <openssl/dh.h>
-#include <openssl/evp.h>
-#include <openssl/err.h>
-
 //#define DECRYPT 1
+
+#ifdef DECRYPT
+	#include <openssl/conf.h>
+	#include <openssl/dh.h>
+	#include <openssl/evp.h>
+	#include <openssl/err.h>
+#endif
 
 // passthrough modes
 enum passthroughmode_t {
@@ -783,12 +785,12 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 		bool	decrypt(const unsigned char *encdata,
 					uint64_t encdatasize,
 					bytebuffer *decdata);
-#endif
 		bool	encrypt(const unsigned char *decdata,
 					uint64_t decdatasize,
 					bytebuffer *encdata);
 		bool	generateServerPublicKey();
 		bool	generateSharedSecret();
+#endif
 
 		passthroughmode_t	passthroughmode;
 
@@ -861,7 +863,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 		unsigned char	dhg[256];
 		unsigned char	serverpubkey[256];
 		unsigned char	clientpubkey[256];
+#ifdef DECRYPT
 		DH		*dh;
+#endif
 		unsigned  char	*sharedsecret;
 		uint32_t	sharedsecretsize;
 		unsigned  char	sha2sharedsecret[32];
@@ -1045,7 +1049,9 @@ sqlrprotocol_teradata::sqlrprotocol_teradata(sqlrservercontroller *cont,
 	};
 	bytestring::copy(dhg,dhgdefault,sizeof(dhgdefault));
 
+#ifdef DECRYPT
 	dh=NULL;
+#endif
 	sharedsecret=NULL;
 	sharedsecretsize=0;
 	bytestring::zero(sha2sharedsecret,sizeof(sha2sharedsecret));
@@ -1055,7 +1061,9 @@ sqlrprotocol_teradata::sqlrprotocol_teradata(sqlrservercontroller *cont,
 
 sqlrprotocol_teradata::~sqlrprotocol_teradata() {
 	delete[] sharedsecret;
+#ifdef DECRYPT
 	DH_free(dh);
+#endif
 	free();
 	delete clientreqmessagepool;
 	delete backendreqmessagepool;
@@ -3206,9 +3214,11 @@ bool sqlrprotocol_teradata::parseSsoParcel(
 	read(ptr,clientpubkey,clientpubkeysize,&ptr);
 
 	if (passthroughmode!=PASSTHROUGHMODE_ENABLED) {
+#ifdef ENCRYPT
 		if (!generateSharedSecret()) {
 			// FIXME: fail somehow
 		}
+#endif
 	}
 
 	if (getDebug()) {
@@ -6000,9 +6010,11 @@ void sqlrprotocol_teradata::appendSsoResponseParcel() {
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	};
+#ifdef DECRYPT
 	if (!generateServerPublicKey()) {
 		// FIXME: fail somehow
 	}
+#endif
 
 	write(&respdata,marker,sizeof(marker));
 	write(&respdata,postmarkerlength);
@@ -8087,7 +8099,6 @@ debugHexDump(out,outsize);
 
 	return success;
 }
-#endif
 
 bool sqlrprotocol_teradata::encrypt(const unsigned char *decdata,
 						uint64_t decdatasize,
@@ -8217,6 +8228,7 @@ bool sqlrprotocol_teradata::generateSharedSecret() {
 	bytestring::copy(sha2sharedsecret,hash,32);
 	return true;
 }
+#endif
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_teradata(
