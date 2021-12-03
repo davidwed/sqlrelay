@@ -69,7 +69,7 @@ uint64_t sqlrresultsettable::getRowCount() {
 	return (pvt->cursor)?pvt->cursor->rowCount():0;
 }
 
-uint64_t sqlrresultsettable::getRowBlockSize() {
+uint64_t sqlrresultsettable::getBlockSize() {
 	return (pvt->cursor)?pvt->cursor->getResultSetBufferSize():0;
 }
 

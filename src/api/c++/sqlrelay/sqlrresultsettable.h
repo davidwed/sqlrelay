@@ -28,7 +28,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 		const char	*getValue(uint64_t row, const char *colname);
 
 		uint64_t	getRowCount();
-		uint64_t	getRowBlockSize();
+		uint64_t	getBlockSize();
 		bool		getAllRowsAvailable();
 	
 		#include <sqlrelay/private/sqlrresultsettable.h>
