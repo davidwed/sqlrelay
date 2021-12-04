@@ -1820,7 +1820,6 @@ void sqlrconDelete(ClientData data) {
  * Synopsis:
  *  $con free
  *  $con setConnectTimeout
- *  $con setAuthenticationTimeout
  *  $con setResponseTimeout
  *  $con setBindVariableDelimiters
  *  $con getBindVariableDelimiterQuestionMarkSupported
@@ -1865,7 +1864,6 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
   static CONSTCHAR *options[] = {
     "free",
     "setConnectTimeout",
-    "setAuthenticationTimeout",
     "setResponseTimeout",
     "setBindVariableDelimiters",
     "getBindVariableDelimiterQuestionMarkSupported",
@@ -1906,7 +1904,6 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
   enum options {
     SQLR_FREE,
     SQLR_SETCONNECTTIMEOUT,
-    SQLR_SETAUTHENTICATIONTIMEOUT,
     SQLR_SETRESPONSETIMEOUT,
     SQLR_SETBINDVARIABLEDELIMITERS,
     SQLR_GETBINDVARIABLEDELIMITERQUESTIONMARKSUPPORTED,
@@ -1978,22 +1975,6 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
       return TCL_ERROR;
     }
     con->setConnectTimeout(timeoutsec,timeoutusec);
-    break;
-  }
-  case SQLR_SETAUTHENTICATIONTIMEOUT: {
-    int timeoutsec;
-    int timeoutusec;
-    if (objc > 4) {
-      Tcl_WrongNumArgs(interp, 2, objv, "timeoutsec timeoutusec");
-      return TCL_ERROR;
-    }
-    if (Tcl_GetIntFromObj(interp, objv[2], &timeoutsec) != TCL_OK) {
-      return TCL_ERROR;
-    }
-    if (Tcl_GetIntFromObj(interp, objv[3], &timeoutusec) != TCL_OK) {
-      return TCL_ERROR;
-    }
-    con->setAuthenticationTimeout(timeoutsec,timeoutusec);
     break;
   }
   case SQLR_SETRESPONSETIMEOUT: {

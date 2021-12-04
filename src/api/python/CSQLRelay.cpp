@@ -92,16 +92,6 @@ static PyObject *setConnectTimeout(PyObject *self, PyObject *args) {
   return Py_BuildValue("h", 0);
 }
 
-static PyObject *setAuthenticationTimeout(PyObject *self, PyObject *args) {
-  long sqlrcon;
-  int32_t timeoutsec;
-  int32_t timeoutusec;
-  if (!PyArg_ParseTuple(args, "lii", &sqlrcon, &timeoutsec, &timeoutusec))
-    return NULL;
-  ((sqlrconnection *)sqlrcon)->setAuthenticationTimeout(timeoutsec,timeoutusec);
-  return Py_BuildValue("h", 0);
-}
-
 static PyObject *setResponseTimeout(PyObject *self, PyObject *args) {
   long sqlrcon;
   int32_t timeoutsec;
@@ -1976,7 +1966,6 @@ static PyMethodDef SQLRMethods[] = {
   {"sqlrcon_alloc",  sqlrcon_alloc, METH_VARARGS},
   {"sqlrcon_free", sqlrcon_free, METH_VARARGS},
   {"setConnectTimeout", setConnectTimeout, METH_VARARGS},
-  {"setAuthenticationTimeout", setAuthenticationTimeout, METH_VARARGS},
   {"setResponseTimeout", setResponseTimeout, METH_VARARGS},
   {"setBindVariableDelimiters", setBindVariableDelimiters, METH_VARARGS},
   {"getBindVariableDelimiterQuestionMarkSupported", getBindVariableDelimiterQuestionMarkSupported, METH_VARARGS},

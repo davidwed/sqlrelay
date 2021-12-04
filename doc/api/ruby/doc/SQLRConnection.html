@@ -8,14 +8,17 @@
 
 <script type="text/javascript">
   var rdoc_rel_prefix = "./";
+  var index_rel_prefix = "./";
 </script>
 
-<script src="./js/jquery.js"></script>
-<script src="./js/darkfish.js"></script>
+<script src="./js/navigation.js" defer></script>
+<script src="./js/search.js" defer></script>
+<script src="./js/search_index.js" defer></script>
+<script src="./js/searcher.js" defer></script>
+<script src="./js/darkfish.js" defer></script>
 
 <link href="./css/fonts.css" rel="stylesheet">
 <link href="./css/rdoc.css" rel="stylesheet">
-
 
 
 <body id="top" role="document" class="class">
@@ -54,94 +57,61 @@
 
   <div id="class-metadata">
     
-    <div id="parent-class-section" class="nav-section">
+    
+<div id="parent-class-section" class="nav-section">
   <h3>Parent</h3>
 
-  
   <p class="link">Object
-  
 </div>
 
     
     
-    <!-- Method Quickref -->
+    
+<!-- Method Quickref -->
 <div id="method-list-section" class="nav-section">
   <h3>Methods</h3>
 
   <ul class="link-list" role="directory">
-    
     <li ><a href="#method-c-new">::new</a>
-    
     <li ><a href="#method-i-autoCommitOff">#autoCommitOff</a>
-    
     <li ><a href="#method-i-autoCommitOn">#autoCommitOn</a>
-    
     <li ><a href="#method-i-begin">#begin</a>
-    
     <li ><a href="#method-i-bindFormat">#bindFormat</a>
-    
     <li ><a href="#method-i-clientVersion">#clientVersion</a>
-    
     <li ><a href="#method-i-commit">#commit</a>
-    
     <li ><a href="#method-i-dbHostName">#dbHostName</a>
-    
     <li ><a href="#method-i-dbIpAddress">#dbIpAddress</a>
-    
     <li ><a href="#method-i-dbVersion">#dbVersion</a>
-    
     <li ><a href="#method-i-debugOff">#debugOff</a>
-    
     <li ><a href="#method-i-debugOn">#debugOn</a>
-    
     <li ><a href="#method-i-disableEncryption">#disableEncryption</a>
-    
     <li ><a href="#method-i-enableKerberos">#enableKerberos</a>
-    
     <li ><a href="#method-i-enableTls">#enableTls</a>
-    
     <li ><a href="#method-i-endSession">#endSession</a>
-    
     <li ><a href="#method-i-errorMessage">#errorMessage</a>
-    
     <li ><a href="#method-i-errorNumber">#errorNumber</a>
-    
+    <li ><a href="#method-i-getBindVariableDelimiterAtSignSupported">#getBindVariableDelimiterAtSignSupported</a>
+    <li ><a href="#method-i-getBindVariableDelimiterColonSupported">#getBindVariableDelimiterColonSupported</a>
+    <li ><a href="#method-i-getBindVariableDelimiterDollarSignSupported">#getBindVariableDelimiterDollarSignSupported</a>
+    <li ><a href="#method-i-getBindVariableDelimiterQuestionMarkSupported">#getBindVariableDelimiterQuestionMarkSupported</a>
     <li ><a href="#method-i-getClientInfo">#getClientInfo</a>
-    
     <li ><a href="#method-i-getConnectionPort">#getConnectionPort</a>
-    
     <li ><a href="#method-i-getConnectionSocket">#getConnectionSocket</a>
-    
     <li ><a href="#method-i-getCurrentDatabase">#getCurrentDatabase</a>
-    
     <li ><a href="#method-i-getDebug">#getDebug</a>
-    
     <li ><a href="#method-i-getLastInsertId">#getLastInsertId</a>
-    
     <li ><a href="#method-i-identify">#identify</a>
-    
     <li ><a href="#method-i-ping">#ping</a>
-    
     <li ><a href="#method-i-resumeSession">#resumeSession</a>
-    
     <li ><a href="#method-i-rollback">#rollback</a>
-    
     <li ><a href="#method-i-selectDatabase">#selectDatabase</a>
-    
     <li ><a href="#method-i-serverVersion">#serverVersion</a>
-    
-    <li ><a href="#method-i-setAuthenticationTimeout">#setAuthenticationTimeout</a>
-    
+    <li ><a href="#method-i-setBindVariableDelimiters">#setBindVariableDelimiters</a>
     <li ><a href="#method-i-setClientInfo">#setClientInfo</a>
-    
     <li ><a href="#method-i-setConnectTimeout">#setConnectTimeout</a>
-    
     <li ><a href="#method-i-setDebugFile">#setDebugFile</a>
-    
     <li ><a href="#method-i-setResponseTimeout">#setResponseTimeout</a>
-    
     <li ><a href="#method-i-suspendSession">#suspendSession</a>
-    
   </ul>
 </div>
 
@@ -157,53 +127,28 @@
     
   </section>
 
-  
-  
-  
   <section id="5Buntitled-5D" class="documentation-section">
-    
 
-    
 
-    
 
-    
 
-    
+
      <section id="public-class-5Buntitled-5D-method-details" class="method-section">
        <header>
          <h3>Public Class Methods</h3>
        </header>
 
-    
       <div id="method-c-new" class="method-detail ">
-        
-        
         <div class="method-heading">
           <span class="method-callseq">
             new(host, port, socket, user, password, retrytime, tries)
           </span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
-        
 
         <div class="method-description">
-          
-          <p>Initiates a connection to “host” on “port” or to the unix “socket” on the
-local machine and auths with “user” and “password”.  Failed connections
-will be retried for “tries” times, waiting “retrytime” seconds between each
-try.  If “tries” is 0 then retries will continue forever.  If “retrytime”
-is 0 then retries will be attempted on a default interval.  If the “socket”
-parameter is nether nil nor “” then an attempt will be made to connect
-through it before attempting to connect to “host” on “port”.  If it is nil
-or “” then no attempt will be made to connect through the socket.</p>
-          
-          
+          <p>Initiates a connection to “host” on “port” or to the unix “socket” on the local machine and auths with “user” and “password”.  Failed connections will be retried for “tries” times, waiting “retrytime” seconds between each try.  If “tries” is 0 then retries will continue forever.  If “retrytime” is 0 then retries will be attempted on a default interval.  If the “socket” parameter is nether nil nor “” then an attempt will be made to connect through it before attempting to connect to “host” on “port”.  If it is nil or “” then no attempt will be made to connect through the socket.</p>
 
-          
           <div class="method-source-code" id="new-source">
             <pre>static VALUE sqlrcon_new(VALUE self, VALUE host, VALUE port, VALUE socket,
                                 VALUE user, VALUE password, 
@@ -225,152 +170,106 @@ or “” then no attempt will be made to connect through the socket.</p>
         return Data_Wrap_Struct(self,0,sqlrcon_free,(void *)sqlrcon);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
     </section>
-  
+
      <section id="public-instance-5Buntitled-5D-method-details" class="method-section">
        <header>
          <h3>Public Instance Methods</h3>
        </header>
 
-    
       <div id="method-i-autoCommitOff" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">autoCommitOff</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Instructs the database to wait for the client to tell it when to commit.</p>
-          
-          
 
-          
           <div class="method-source-code" id="autoCommitOff-source">
             <pre>static VALUE sqlrcon_autoCommitOff(VALUE self) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;autoCommitOff());
+        RCON(result,br,sqlrcon,autoCommitOff);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-autoCommitOn" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">autoCommitOn</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Instructs the database to perform a commit after every successful query.</p>
-          
-          
 
-          
           <div class="method-source-code" id="autoCommitOn-source">
             <pre>static VALUE sqlrcon_autoCommitOn(VALUE self) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;autoCommitOn());
+        RCON(result,br,sqlrcon,autoCommitOn);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-begin" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">begin</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>Begins a transaction.  Returns true if the begin succeeded, false if it
-failed.  If the database automatically begins a new transaction when a
-commit or rollback is issued then this doesn&#39;t do anything unless SQL
-Relay is faking transaction blocks.</p>
-          
-          
+          <p>Begins a transaction.  Returns true if the begin succeeded, false if it failed.  If the database automatically begins a new transaction when a commit or rollback is issued then this doesn&#39;t do anything unless SQL Relay is faking transaction blocks.</p>
 
-          
           <div class="method-source-code" id="begin-source">
             <pre>static VALUE sqlrcon_begin(VALUE self) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;begin());
+        RCON(result,br,sqlrcon,begin);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-bindFormat" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">bindFormat</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>Returns a string representing the format of the bind variables used in the
-db.</p>
-          
-          
+          <p>Returns a string representing the format of the bind variables used in the db.</p>
 
-          
           <div class="method-source-code" id="bindFormat-source">
             <pre>static VALUE sqlrcon_bindFormat(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;bindFormat();
+        RCON(result,ccpr,sqlrcon,bindFormat);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -378,38 +277,27 @@ db.</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-clientVersion" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">clientVersion</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the version of the sqlrelay client software.</p>
-          
-          
 
-          
           <div class="method-source-code" id="clientVersion-source">
             <pre>static VALUE sqlrcon_clientVersion(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;clientVersion();
+        RCON(result,ccpr,sqlrcon,clientVersion);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -417,72 +305,51 @@ db.</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-commit" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">commit</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Issues a commit.  Returns true if the commit succeeded, false if it failed.</p>
-          
-          
 
-          
           <div class="method-source-code" id="commit-source">
             <pre>static VALUE sqlrcon_commit(VALUE self) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;commit());
+        RCON(result,br,sqlrcon,commit);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-dbHostName" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">dbHostName</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the host name of the database</p>
-          
-          
 
-          
           <div class="method-source-code" id="dbHostName-source">
             <pre>static VALUE sqlrcon_dbHostName(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;dbHostName();
+        RCON(result,ccpr,sqlrcon,dbHostName);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -490,38 +357,27 @@ db.</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-dbIpAddress" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">dbIpAddress</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the ip address of the database</p>
-          
-          
 
-          
           <div class="method-source-code" id="dbIpAddress-source">
             <pre>static VALUE sqlrcon_dbIpAddress(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;dbIpAddress();
+        RCON(result,ccpr,sqlrcon,dbIpAddress);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -529,38 +385,27 @@ db.</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-dbVersion" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">dbVersion</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the version of the database</p>
-          
-          
 
-          
           <div class="method-source-code" id="dbVersion-source">
             <pre>static VALUE sqlrcon_dbVersion(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;dbVersion();
+        RCON(result,ccpr,sqlrcon,dbVersion);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -568,147 +413,93 @@ db.</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-debugOff" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">debugOff</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Turns debugging off.</p>
-          
-          
 
-          
           <div class="method-source-code" id="debugOff-source">
             <pre>static VALUE sqlrcon_debugOff(VALUE self) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;debugOff();
+        CON(sqlrcon,debugOff);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-debugOn" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">debugOn</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>Causes verbose debugging information to be sent to standard output. Another
-way to do this is to start a query with “– debugn”.  Yet another way is to
-set the environment variable SQLR_CLIENT_DEBUG to “ON”</p>
-          
-          
+          <p>Causes verbose debugging information to be sent to standard output. Another way to do this is to start a query with “– debugn”.  Yet another way is to set the environment variable SQLR_CLIENT_DEBUG to “ON”</p>
 
-          
           <div class="method-source-code" id="debugOn-source">
             <pre>static VALUE sqlrcon_debugOn(VALUE self) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;debugOn();
+        CON(sqlrcon,debugOn);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-disableEncryption" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">disableEncryption</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Disables encryption.</p>
-          
-          
 
-          
           <div class="method-source-code" id="disableEncryption-source">
             <pre>static VALUE sqlrcon_disableEncryption(VALUE self) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;disableEncryption();
+        CON(sqlrcon,disableEncryption);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-enableKerberos" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">enableKerberos</span><span
             class="method-args">(p1, p2, p3)</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Enables Kerberos authentication and encryption.</p>
 
-<p>“service” indicates the Kerberos service name of the SQL Relay server.  If
-left empty or NULL then the service name “sqlrelay” will be used.
-“sqlrelay” is the default service name of the SQL Relay server.  Note that
-on Windows platforms the service name must be fully qualified, including
-the host and realm name.  For example:
-“sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM”.</p>
+<p>“service” indicates the Kerberos service name of the SQL Relay server.  If left empty or NULL then the service name “sqlrelay” will be used. “sqlrelay” is the default service name of the SQL Relay server.  Note that on Windows platforms the service name must be fully qualified, including the host and realm name.  For example: “sqlrelay/sqlrserver.firstworks.com@AD.FIRSTWORKS.COM”.</p>
 
-<p>“mech” indicates the specific Kerberos mechanism to use. On Linux/Unix
-platforms, this should be a string representation of the mechnaism&#39;s
-OID, such as:</p>
+<p>“mech” indicates the specific Kerberos mechanism to use. On Linux/Unix platforms, this should be a string representation of the mechnaism&#39;s OID, such as:</p>
 
 <pre>{ 1 2 840 113554 1 2 2 }</pre>
 
@@ -717,13 +508,9 @@ OID, such as:</p>
 <pre class="ruby"><span class="ruby-constant">Kerberos</span>
 </pre>
 
-<p>If left empty or NULL then the default mechanism will be used.  Only set
-this if you know that you have a good reason to.</p>
+<p>If left empty or NULL then the default mechanism will be used.  Only set this if you know that you have a good reason to.</p>
 
-<p>“flags” indicates what Kerberos flags to use.  Multiple flags may be
-specified, separated by commas.  If left empty or NULL then a defalt set of
-flags will be used. Only set this if you know that you have a good reason
-to.</p>
+<p>“flags” indicates what Kerberos flags to use.  Multiple flags may be specified, separated by commas.  If left empty or NULL then a defalt set of flags will be used. Only set this if you know that you have a good reason to.</p>
 
 <p>Valid flags include:</p>
 
@@ -733,64 +520,39 @@ to.</p>
 * GSS_C_CONF_FLAG
 * GSS_C_INTEG_FLAG</pre>
 
-<p>For a full list of flags, consult the GSSAPI documentation, though note
-that only the flags listed above are supported on Windows.</p>
-          
-          
+<p>For a full list of flags, consult the GSSAPI documentation, though note that only the flags listed above are supported on Windows.</p>
 
-          
           <div class="method-source-code" id="enableKerberos-source">
             <pre>static VALUE sqlrcon_enableKerberos(VALUE self,
                                 VALUE service, VALUE mech, VALUE flags) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;enableKerberos(STR2CSTR(service),
-                                STR2CSTR(mech),
-                                STR2CSTR(flags));
+        CON3(sqlrcon,enableKerberos,service,mech,flags);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-enableTls" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">enableTls</span><span
             class="method-args">(p1, p2, p3, p4, p5, p6, p7)</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Enables TLS/SSL encryption, and optionally authentication.</p>
 
-<p>“version” specifies the TLS/SSL protocol version that the client will
-attempt to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or
-any more recent version of TLS, as supported by and enabled in the
-underlying TLS/SSL library.  If left blank or empty then the highest
-supported version will be negotiated.</p>
+<p>“version” specifies the TLS/SSL protocol version that the client will attempt to use.  Valid values include SSL2, SSL3, TLS1, TLS1.1, TLS1.2 or any more recent version of TLS, as supported by and enabled in the underlying TLS/SSL library.  If left blank or empty then the highest supported version will be negotiated.</p>
 
-<p>“cert” is the file name of the certificate chain file to send to the SQL
-Relay server.  This is only necessary if the SQL Relay server is configured
-to authenticate and authorize clients by certificate.</p>
+<p>“cert” is the file name of the certificate chain file to send to the SQL Relay server.  This is only necessary if the SQL Relay server is configured to authenticate and authorize clients by certificate.</p>
 
-<p>If “cert” contains a password-protected private key, then “password” may be
-supplied to access it.  If the private key is not password-protected, then
-this argument is ignored, and may be left empty or NULL.</p>
+<p>If “cert” contains a password-protected private key, then “password” may be supplied to access it.  If the private key is not password-protected, then this argument is ignored, and may be left empty or NULL.</p>
 
-<p>“ciphers” is a list of ciphers to allow.  Ciphers may be separated by
-spaces, commas, or colons.  If “ciphers” is empty or NULL then a default
-set is used.  Only set this if you know that you have a good reason to.</p>
+<p>“ciphers” is a list of ciphers to allow.  Ciphers may be separated by spaces, commas, or colons.  If “ciphers” is empty or NULL then a default set is used.  Only set this if you know that you have a good reason to.</p>
 
 <p>For a list of valid ciphers on Linux/Unix platforms, see:</p>
 
@@ -801,11 +563,9 @@ set is used.  Only set this if you know that you have a good reason to.</p>
 
 <pre>https://msdn.microsoft.com/en-us/library/windows/desktop/aa375549%28v=vs.85%29.aspx</pre>
 
-<p>On Windows platforms, the ciphers (alg_id&#39;s) should omit CALG_ and may
-be given with underscores or dashes. For example: 3DES_112</p>
+<p>On Windows platforms, the ciphers (alg_id&#39;s) should omit CALG_ and may be given with underscores or dashes. For example: 3DES_112</p>
 
-<p>“validate” indicates whether to validate the SQL Relay&#39;s server
-certificate, and may be set to one of the following:</p>
+<p>“validate” indicates whether to validate the SQL Relay&#39;s server certificate, and may be set to one of the following:</p>
 
 <pre>&quot;no&quot; - Don&#39;t validate the server&#39;s certificate.
 &quot;ca&quot; - Validate that the server&#39;s certificate was
@@ -823,26 +583,14 @@ certificate, and may be set to one of the following:</p>
        domain name of the host parameter.  (Falls back
        to &quot;ca&quot; validation when a unix socket is used.)</pre>
 
-<p>“ca” is the location of a certificate authority file to use, in addition to
-the system&#39;s root certificates, when validating the SQL Relay
-server&#39;s certificate.  This is useful if the SQL Relay server&#39;s
-certificate is self-signed.</p>
+<p>“ca” is the location of a certificate authority file to use, in addition to the system&#39;s root certificates, when validating the SQL Relay server&#39;s certificate.  This is useful if the SQL Relay server&#39;s certificate is self-signed.</p>
 
 <p>On Windows, “ca” must be a file name.</p>
 
-<p>On non-Windows systems, “ca” can be either a file or directory name.  If it
-is a directory name, then all certificate authority files found in that
-directory will be used.  If it a file name, then only that file will be
-used.</p>
+<p>On non-Windows systems, “ca” can be either a file or directory name.  If it is a directory name, then all certificate authority files found in that directory will be used.  If it a file name, then only that file will be used.</p>
 
-<p>Note that the supported “cert” and “ca” file formats may vary between
-platforms.  A variety of file formats are generally supported on Linux/Unix
-platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported
-on Windows.</p>
-          
-          
+<p>Note that the supported “cert” and “ca” file formats may vary between platforms.  A variety of file formats are generally supported on Linux/Unix platfoms (.pem, .pfx, etc.) but only the .pfx format is currently supported on Windows.</p>
 
-          
           <div class="method-source-code" id="enableTls-source">
             <pre>static VALUE sqlrcon_enableTls(VALUE self,
                                 VALUE version, VALUE cert, VALUE password,
@@ -850,84 +598,54 @@ on Windows.</p>
                                 VALUE depth) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;enableTls(STR2CSTR(version),
-                                STR2CSTR(cert),
-                                STR2CSTR(password),
-                                STR2CSTR(ciphers),
-                                STR2CSTR(validate),
-                                STR2CSTR(ca),
-                                NUM2INT(depth));
+        CON7(sqlrcon,enableTls,version,cert,password,ciphers,validate,ca,depth);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-endSession" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">endSession</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Ends the session.</p>
-          
-          
 
-          
           <div class="method-source-code" id="endSession-source">
             <pre>static VALUE sqlrcon_endSession(VALUE self) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;endSession();
+        CON(sqlrcon,endSession);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-errorMessage" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">errorMessage</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>If an operation failed and generated an error, the error message is
-available here.  If there is no error then this method returns nil</p>
-          
-          
+          <p>If an operation failed and generated an error, the error message is available here.  If there is no error then this method returns nil</p>
 
-          
           <div class="method-source-code" id="errorMessage-source">
             <pre>static VALUE sqlrcon_errorMessage(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;errorMessage();
+        RCON(result,ccpr,sqlrcon,conErrorMessage);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -935,73 +653,147 @@ available here.  If there is no error then this method returns nil</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-errorNumber" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">errorNumber</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>If an operation failed and generated an error, the error number is
-available here.  If there is no error then this method returns 0.</p>
-          
-          
+          <p>If an operation failed and generated an error, the error number is available here.  If there is no error then this method returns 0.</p>
 
-          
           <div class="method-source-code" id="errorNumber-source">
             <pre>static VALUE sqlrcon_errorNumber(VALUE self) {
         sqlrconnection *sqlrcon;
+        int64_t                result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;errorNumber());
+        RCON(result,i64r,sqlrcon,conErrorNumber);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
+      <div id="method-i-getBindVariableDelimiterAtSignSupported" class="method-detail ">
+        <div class="method-heading">
+          <span class="method-name">getBindVariableDelimiterAtSignSupported</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+
+        <div class="method-description">
+          <p>Returns true if at-signs (@) are considered to be valid bind variable delimiters.</p>
+
+          <div class="method-source-code" id="getBindVariableDelimiterAtSignSupported-source">
+            <pre>static VALUE sqlrcon_getBindVariableDelimiterAtSignSupported(VALUE self) {
+        sqlrconnection *sqlrcon;
+        bool result;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        RCON(result,br,sqlrcon,getBindVariableDelimiterAtSignSupported);
+        return INT2NUM(result);
+}</pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-i-getBindVariableDelimiterColonSupported" class="method-detail ">
+        <div class="method-heading">
+          <span class="method-name">getBindVariableDelimiterColonSupported</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+
+        <div class="method-description">
+          <p>Returns true if colons (:) are considered to be valid bind variable delimiters.</p>
+
+          <div class="method-source-code" id="getBindVariableDelimiterColonSupported-source">
+            <pre>static VALUE sqlrcon_getBindVariableDelimiterColonSupported(VALUE self) {
+        sqlrconnection *sqlrcon;
+        bool result;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        RCON(result,br,sqlrcon,getBindVariableDelimiterColonSupported);
+        return INT2NUM(result);
+}</pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-i-getBindVariableDelimiterDollarSignSupported" class="method-detail ">
+        <div class="method-heading">
+          <span class="method-name">getBindVariableDelimiterDollarSignSupported</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+
+        <div class="method-description">
+          <p>Returns true if dollar signs ($) are considered to be valid bind variable delimiters.</p>
+
+          <div class="method-source-code" id="getBindVariableDelimiterDollarSignSupported-source">
+            <pre>static VALUE sqlrcon_getBindVariableDelimiterDollarSignSupported(VALUE self) {
+        sqlrconnection *sqlrcon;
+        bool result;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        RCON(result,br,sqlrcon,getBindVariableDelimiterDollarSignSupported);
+        return INT2NUM(result);
+}</pre>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div id="method-i-getBindVariableDelimiterQuestionMarkSupported" class="method-detail ">
+        <div class="method-heading">
+          <span class="method-name">getBindVariableDelimiterQuestionMarkSupported</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+
+        <div class="method-description">
+          <p>Returns true if question marks (?) are considered to be valid bind variable delimiters.</p>
+
+          <div class="method-source-code" id="getBindVariableDelimiterQuestionMarkSupported-source">
+            <pre>static VALUE sqlrcon_getBindVariableDelimiterQuestionMarkSupported(VALUE self) {
+        sqlrconnection *sqlrcon;
+        bool result;
+        Data_Get_Struct(self,sqlrconnection,sqlrcon);
+        RCON(result,br,sqlrcon,getBindVariableDelimiterQuestionMarkSupported);
+        return INT2NUM(result);
+}</pre>
+          </div>
+        </div>
+
+
+      </div>
+
       <div id="method-i-getClientInfo" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">getClientInfo</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the string that was set by setClientInfo().</p>
-          
-          
 
-          
           <div class="method-source-code" id="getClientInfo-source">
             <pre>static VALUE sqlrcon_getClientInfo(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;getClientInfo();
+        RCON(result,ccpr,sqlrcon,getClientInfo);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -1009,78 +801,51 @@ available here.  If there is no error then this method returns 0.</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-getConnectionPort" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">getConnectionPort</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>Returns the inet port that the connection is communicating over.  This
-parameter may be passed to another connection for use in the
-sqlrcon_resumeSession() command.  Note: The result this function returns is
-only valid after a call to suspendSession().</p>
-          
-          
+          <p>Returns the inet port that the connection is communicating over.  This parameter may be passed to another connection for use in the sqlrcon_resumeSession() command.  Note: The result this function returns is only valid after a call to suspendSession().</p>
 
-          
           <div class="method-source-code" id="getConnectionPort-source">
             <pre>static VALUE sqlrcon_getConnectionPort(VALUE self) {
         sqlrconnection *sqlrcon;
+        uint16_t       result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;getConnectionPort());
+        RCON(result,u16r,sqlrcon,getConnectionPort);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-getConnectionSocket" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">getConnectionSocket</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>Returns the unix socket that the connection is communicating over.  This
-parameter may be passed to another connection for use in the
-sqlrcon_resumeSession() command.  Note: The result this function returns is
-only valid after a call to suspendSession().</p>
-          
-          
+          <p>Returns the unix socket that the connection is communicating over.  This parameter may be passed to another connection for use in the sqlrcon_resumeSession() command.  Note: The result this function returns is only valid after a call to suspendSession().</p>
 
-          
           <div class="method-source-code" id="getConnectionSocket-source">
             <pre>static VALUE sqlrcon_getConnectionSocket(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;getConnectionSocket();
+        RCON(result,ccpr,sqlrcon,getConnectionSocket);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -1088,38 +853,27 @@ only valid after a call to suspendSession().</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-getCurrentDatabase" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">getCurrentDatabase</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the database/schema that is currently in use.</p>
-          
-          
 
-          
           <div class="method-source-code" id="getCurrentDatabase-source">
             <pre>static VALUE sqlrcon_getCurrentDatabase(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;getCurrentDatabase();
+        RCON(result,ccpr,sqlrcon,getCurrentDatabase);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -1127,106 +881,75 @@ only valid after a call to suspendSession().</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-getDebug" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">getDebug</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns 0 if debugging is off and 1 if debugging is on.</p>
-          
-          
 
-          
           <div class="method-source-code" id="getDebug-source">
             <pre>static VALUE sqlrcon_getDebug(VALUE self) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;getDebug());
+        RCON(result,br,sqlrcon,getDebug);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-getLastInsertId" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">getLastInsertId</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the value of the autoincrement column for the last insert</p>
-          
-          
 
-          
           <div class="method-source-code" id="getLastInsertId-source">
             <pre>static VALUE sqlrcon_getLastInsertId(VALUE self) {
         sqlrconnection *sqlrcon;
+        uint64_t       result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;getLastInsertId());
+        RCON(result,u64r,sqlrcon,getLastInsertId);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-identify" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">identify</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the type of database: oracle, postgresql, mysql, etc.</p>
-          
-          
 
-          
           <div class="method-source-code" id="identify-source">
             <pre>static VALUE sqlrcon_identify(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;identify();
+        RCON(result,ccpr,sqlrcon,identify);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -1234,183 +957,125 @@ only valid after a call to suspendSession().</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-ping" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">ping</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns 1 if the database is up and 0 if it&#39;s down.</p>
-          
-          
 
-          
           <div class="method-source-code" id="ping-source">
             <pre>static VALUE sqlrcon_ping(VALUE self) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;ping());
+        RCON(result,br,sqlrcon,ping);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-resumeSession" class="method-detail ">
-        
-        
         <div class="method-heading">
           <span class="method-callseq">
             resumeSession(port,socket)
           </span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
-        
 
         <div class="method-description">
-          
-          <p>Resumes a session previously left open using sqlrcon_suspendSession().
-Returns 1 on success and 0 on failure.</p>
-          
-          
+          <p>Resumes a session previously left open using sqlrcon_suspendSession(). Returns 1 on success and 0 on failure.</p>
 
-          
           <div class="method-source-code" id="resumeSession-source">
             <pre>static VALUE sqlrcon_resumeSession(VALUE self, VALUE port, VALUE socket) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;resumeSession(NUM2INT(port), 
-                                                        STR2CSTR(socket)));
+        RCON2(result,br,sqlrcon,resumeSession,port,socket);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-rollback" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">rollback</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>Issues a rollback.  Returns true if the rollback succeeded, false if it
-failed.</p>
-          
-          
+          <p>Issues a rollback.  Returns true if the rollback succeeded, false if it failed.</p>
 
-          
           <div class="method-source-code" id="rollback-source">
             <pre>static VALUE sqlrcon_rollback(VALUE self) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;rollback());
+        RCON(result,br,sqlrcon,rollback);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-selectDatabase" class="method-detail ">
-        
-        
         <div class="method-heading">
           <span class="method-callseq">
             selectDatabase(database)
           </span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
-        
 
         <div class="method-description">
-          
           <p>Sets the current database/schema to “database”</p>
-          
-          
 
-          
           <div class="method-source-code" id="selectDatabase-source">
             <pre>static VALUE sqlrcon_selectDatabase(VALUE self, VALUE db) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;selectDatabase(STR2CSTR(db)));
+        RCON1(result,br,sqlrcon,selectDatabase,db);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-serverVersion" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">serverVersion</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
           <p>Returns the version of the sqlrelay server software.</p>
-          
-          
 
-          
           <div class="method-source-code" id="serverVersion-source">
             <pre>static VALUE sqlrcon_serverVersion(VALUE self) {
         sqlrconnection *sqlrcon;
+        const char     *result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        const char     *result=sqlrcon-&gt;serverVersion();
+        RCON(result,ccpr,sqlrcon,serverVersion);
         if (result) {
                 return rb_str_new2(result);
         } else {
@@ -1418,265 +1083,166 @@ failed.</p>
         }
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
-      <div id="method-i-setAuthenticationTimeout" class="method-detail ">
-        
-        
+      <div id="method-i-setBindVariableDelimiters" class="method-detail ">
         <div class="method-heading">
           <span class="method-callseq">
-            setAuthenticationTimeout(timeoutsec,timeoutusec)
+            setBindVariablesDelimiters(delimiters)
           </span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
-        
 
         <div class="method-description">
-          
-          <p>Sets the authentication timeout in seconds and milliseconds.  Setting
-either parameter to -1 disables the timeout.   You can also set this
-timeout using the SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable.</p>
-          
-          
+          <p>Sets which delimiters are used to identify bind variables in countBindVariables() and validateBinds().  Valid delimiters include ?,:,@, and $.  Defaults to “?:@$”</p>
 
-          
-          <div class="method-source-code" id="setAuthenticationTimeout-source">
-            <pre>static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
-                                VALUE timeoutsec, VALUE timeoutusec) {
+          <div class="method-source-code" id="setBindVariableDelimiters-source">
+            <pre>static VALUE sqlrcon_setBindVariableDelimiters(VALUE self, VALUE delimiters) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;setAuthenticationTimeout(NUM2INT(timeoutsec),
-                                                NUM2INT(timeoutusec));
+        CON1(sqlrcon,setBindVariableDelimiters,delimiters);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-setClientInfo" class="method-detail ">
-        
-        
         <div class="method-heading">
           <span class="method-callseq">
             setClientInfo(clientinfo)
           </span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
-        
 
         <div class="method-description">
-          
-          <p>Allows you to set a string that will be passed to the server and ultimately
-included in server-side logging along with queries that were run by this
-instance of the client.</p>
-          
-          
+          <p>Allows you to set a string that will be passed to the server and ultimately included in server-side logging along with queries that were run by this instance of the client.</p>
 
-          
           <div class="method-source-code" id="setClientInfo-source">
             <pre>static VALUE sqlrcon_setClientInfo(VALUE self, VALUE clientinfo) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;setClientInfo(STR2CSTR(clientinfo));
+        CON1(sqlrcon,setClientInfo,clientinfo);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-setConnectTimeout" class="method-detail ">
-        
-        
         <div class="method-heading">
           <span class="method-callseq">
             setConnectTimeout(timeoutsec,timeoutusec)
           </span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
-        
 
         <div class="method-description">
-          
-          <p>Sets the server connect timeout in seconds and milliseconds.  Setting
-either parameter to -1 disables the timeout.  You can also set this timeout
-using the SQLR_CLIENT_CONNECT_TIMEOUT environment variable.</p>
-          
-          
+          <p>Sets the server connect timeout in seconds and milliseconds.  Setting either parameter to -1 disables the timeout.  You can also set this timeout using the SQLR_CLIENT_CONNECT_TIMEOUT environment variable.</p>
 
-          
           <div class="method-source-code" id="setConnectTimeout-source">
             <pre>static VALUE sqlrcon_setConnectTimeout(VALUE self,
                                 VALUE timeoutsec, VALUE timeoutusec) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;setConnectTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+        CON2(sqlrcon,setConnectTimeout,timeoutsec,timeoutusec)
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-setDebugFile" class="method-detail ">
-        
-        
         <div class="method-heading">
           <span class="method-callseq">
             setDebugFile(filename)
           </span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
-        
 
         <div class="method-description">
-          
-          <p>Allows you to specify a file to write debug to. Setting “filename” to NULL
-or an empty string causes debug to be written to standard output (the
-default).</p>
-          
-          
+          <p>Allows you to specify a file to write debug to. Setting “filename” to NULL or an empty string causes debug to be written to standard output (the default).</p>
 
-          
           <div class="method-source-code" id="setDebugFile-source">
             <pre>static VALUE sqlrcon_setDebugFile(VALUE self, VALUE filename) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;setDebugFile(STR2CSTR(filename));
+        CON1(sqlrcon,setDebugFile,filename);
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-setResponseTimeout" class="method-detail ">
-        
-        
         <div class="method-heading">
           <span class="method-callseq">
             setResponseTimeout(timeoutsec,timeoutusec)
           </span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
-        
 
         <div class="method-description">
-          
-          <p>Sets the response timeout (for queries, commits, rollbacks, pings, etc.) in
-seconds and milliseconds.  Setting either parameter to -1 disables the
-timeout.  You can also set this timeout using the
-SQLR_CLIENT_RESPONSE_TIMEOUT environment variable.</p>
-          
-          
+          <p>Sets the response timeout (for queries, commits, rollbacks, pings, etc.) in seconds and milliseconds.  Setting either parameter to -1 disables the timeout.  You can also set this timeout using the SQLR_CLIENT_RESPONSE_TIMEOUT environment variable.</p>
 
-          
           <div class="method-source-code" id="setResponseTimeout-source">
             <pre>static VALUE sqlrcon_setResponseTimeout(VALUE self,
                                 VALUE timeoutsec, VALUE timeoutusec) {
         sqlrconnection *sqlrcon;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        sqlrcon-&gt;setResponseTimeout(NUM2INT(timeoutsec),NUM2INT(timeoutusec));
+        CON2(sqlrcon,setResponseTimeout,timeoutsec,timeoutusec)
         return Qnil;
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
       <div id="method-i-suspendSession" class="method-detail ">
-        
         <div class="method-heading">
           <span class="method-name">suspendSession</span><span
             class="method-args">()</span>
-          
           <span class="method-click-advice">click to toggle source</span>
-          
         </div>
-        
 
         <div class="method-description">
-          
-          <p>Disconnects this connection from the current session but leaves the session
-open so that another connection can connect to it using
-sqlrcon_resumeSession().</p>
-          
-          
+          <p>Disconnects this connection from the current session but leaves the session open so that another connection can connect to it using sqlrcon_resumeSession().</p>
 
-          
           <div class="method-source-code" id="suspendSession-source">
             <pre>static VALUE sqlrcon_suspendSession(VALUE self) {
         sqlrconnection *sqlrcon;
+        bool           result;
         Data_Get_Struct(self,sqlrconnection,sqlrcon);
-        return INT2NUM(sqlrcon-&gt;suspendSession());
+        RCON(result,br,sqlrcon,suspendSession);
+        return INT2NUM(result);
 }</pre>
           </div>
-          
         </div>
 
-        
 
-        
       </div>
 
-    
     </section>
-  
+
   </section>
 </main>
 
 
 <footer id="validator-badges" role="contentinfo">
-  <p><a href="http://validator.w3.org/check/referer">Validate</a>
-  <p>Generated by <a href="http://docs.seattlerb.org/rdoc/">RDoc</a> 4.2.0.
+  <p><a href="https://validator.w3.org/check/referer">Validate</a>
+  <p>Generated by <a href="https://ruby.github.io/rdoc/">RDoc</a> 6.3.0.
   <p>Based on <a href="http://deveiate.org/projects/Darkfish-RDoc/">Darkfish</a> by <a href="http://deveiate.org">Michael Granger</a>.
 </footer>
 

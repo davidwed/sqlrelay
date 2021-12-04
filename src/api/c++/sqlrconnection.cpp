@@ -44,8 +44,6 @@ class sqlrconnectionprivate {
 		char		_connectionunixportbuffer[MAXPATHLEN+1];
 		int32_t		_connecttimeoutsec;
 		int32_t		_connecttimeoutusec;
-		int32_t		_authtimeoutsec;
-		int32_t		_authtimeoutusec;
 		int32_t		_responsetimeoutsec;
 		int32_t		_responsetimeoutusec;
 		int32_t		_retrytime;
@@ -176,8 +174,6 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	// initialize timeouts
 	setTimeoutFromEnv("SQLR_CLIENT_CONNECT_TIMEOUT",
 			&pvt->_connecttimeoutsec,&pvt->_connecttimeoutusec);
-	setTimeoutFromEnv("SQLR_CLIENT_AUTHENTICATION_TIMEOUT",
-			&pvt->_authtimeoutsec,&pvt->_authtimeoutusec);
 	setTimeoutFromEnv("SQLR_CLIENT_RESPONSE_TIMEOUT",
 			&pvt->_responsetimeoutsec,&pvt->_responsetimeoutusec);
 
@@ -468,12 +464,6 @@ void sqlrconnection::setConnectTimeout(int32_t timeoutsec,
 	pvt->_connecttimeoutusec=timeoutusec;
 }
 
-void sqlrconnection::setAuthenticationTimeout(int32_t timeoutsec,
-						int32_t timeoutusec) {
-	pvt->_authtimeoutsec=timeoutsec;
-	pvt->_authtimeoutusec=timeoutusec;
-}
-
 void sqlrconnection::setResponseTimeout(int32_t timeoutsec,
 						int32_t timeoutusec) {
 	pvt->_responsetimeoutsec=timeoutsec;
@@ -499,12 +489,6 @@ void sqlrconnection::getConnectTimeout(int32_t *timeoutsec,
 					int32_t *timeoutusec) {
 	*timeoutsec=pvt->_connecttimeoutsec;
 	*timeoutusec=pvt->_connecttimeoutusec;
-}
-
-void sqlrconnection::getAuthenticationTimeout(int32_t *timeoutsec,
-						int32_t *timeoutusec) {
-	*timeoutsec=pvt->_authtimeoutsec;
-	*timeoutusec=pvt->_authtimeoutusec;
 }
 
 void sqlrconnection::getResponseTimeout(int32_t *timeoutsec,

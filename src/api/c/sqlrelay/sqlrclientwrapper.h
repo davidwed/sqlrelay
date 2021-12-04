@@ -44,15 +44,6 @@ void	sqlrcon_setConnectTimeout(sqlrcon sqlrconref,
 				int32_t timeoutsec, int32_t timeoutusec);
 
 /** @ingroup sqlrclientwrapper
- *  Sets the auth timeout in seconds and
- *  milliseconds.  Setting either parameter to -1 disables the
- *  timeout.   You can also set this timeout using the
- *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
-SQLRCLIENT_DLLSPEC
-void	sqlrcon_setAuthenticationTimeout(sqlrcon sqlrconref,
-				int32_t timeoutsec, int32_t timeoutusec);
-
-/** @ingroup sqlrclientwrapper
  *  Sets the response timeout (for queries, commits, rollbacks,
  *  pings, etc.) in seconds and milliseconds.  Setting either
  *  parameter to -1 disables the timeout.  You can also set
@@ -67,12 +58,6 @@ void	sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
  *  Gets the server connect timeout in seconds and microseconds. */
 SQLRCLIENT_DLLSPEC
 void	sqlrcon_getConnectTimeout(sqlrcon sqlrconref,
-				int32_t *timeoutsec, int32_t *timeoutusec);
-
-/** @ingroup sqlrclientwrapper
- *  Gets the authentication timeout in seconds and microseconds. */
-SQLRCLIENT_DLLSPEC
-void	sqlrcon_getAuthenticationTimeout(sqlrcon sqlrconref,
 				int32_t *timeoutsec, int32_t *timeoutusec);
 
 /** @ingroup sqlrclientwrapper

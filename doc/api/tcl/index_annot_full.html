@@ -182,6 +182,22 @@ Z
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Returns the index of the first buffered row.
 <dt><h3><a name="G">G</a></h3>
+<dt><a href="sqlrconCmd.tcl-annot.html#getBindVariableDelimiterAtSignSupported">getBindVariableDelimiterAtSignSupported</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns true if at-signs (@) are considered to be
+ valid bind variable delimiters.
+<dt><a href="sqlrconCmd.tcl-annot.html#getBindVariableDelimiterColonSupported">getBindVariableDelimiterColonSupported</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns true if colons (:) are considered to be
+ valid bind variable delimiters.
+<dt><a href="sqlrconCmd.tcl-annot.html#getBindVariableDelimiterDollarSignSupported">getBindVariableDelimiterDollarSignSupported</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns true if dollar signs ($) are considered to be
+ valid bind variable delimiters.
+<dt><a href="sqlrconCmd.tcl-annot.html#getBindVariableDelimiterQuestionMarkSupported">getBindVariableDelimiterQuestionMarkSupported</a> {  } - 
+<a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
+<dd>Returns true if question marks (?) are considered to be
+ valid bind variable delimiters.
 <dt><a href="sqlrcurCmd.tcl-annot.html#getCacheFileName">getCacheFileName</a> {  } - 
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Returns the name of the file containing the
@@ -492,10 +508,10 @@ Z
 <dt><a href="sqlrconCmd.tcl-annot.html#serverVersion">serverVersion</a> {  } - 
 <a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
 <dd>Returns the version of the sqlrelay server
-<dt><a href="sqlrconCmd.tcl-annot.html#setAuthenticationTimeout">setAuthenticationTimeout</a> { timeoutsec timeoutusec } - 
+<dt><a href="sqlrconCmd.tcl-annot.html#setBindVariableDelimiters">setBindVariableDelimiters</a> { delimiters } - 
 <a href="./sqlrconCmd.tcl-annot.html">sqlrconCmd.tcl</a>
-<dd>Sets the authentication timeout in seconds and
- milliseconds.
+<dd>Sets which delimiters are used to identify bind variables
+ in countBindVariables() and validateBinds().
 <dt><a href="sqlrcurCmd.tcl-annot.html#setCacheTtl">setCacheTtl</a> { ttl } - 
 <a href="./sqlrcurCmd.tcl-annot.html">sqlrcurCmd.tcl</a>
 <dd>Sets the time-to-live for cached result
@@ -591,7 +607,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2016-03-15 at 02:51.</cite>
+<cite>File generated 2021-12-04 at 01:40.</cite>
 </font>
 </body>
 </html>

@@ -178,7 +178,6 @@ enum {
 	PDO_SQLRELAY_ATTR_BIND_FORMAT,
 	PDO_SQLRELAY_ATTR_CURRENT_DB,
 	PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT,
-	PDO_SQLRELAY_ATTR_AUTHENTICATION_TIMEOUT,
 	PDO_SQLRELAY_ATTR_RESPONSE_TIMEOUT,
 	PDO_SQLRELAY_ATTR_SQLRELAY_VERSION,
 	PDO_SQLRELAY_ATTR_RUDIMENTS_VERSION,
@@ -1295,18 +1294,12 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 			// all timeouts in seconds
 			convert_to_long(val);
 			sqlrcon->setConnectTimeout(Z_LVAL_P(val),0);
-			sqlrcon->setAuthenticationTimeout(Z_LVAL_P(val),0);
 			sqlrcon->setResponseTimeout(Z_LVAL_P(val),0);
 			return 1;
 	        case PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT:
 			// connection timeout in seconds
 			convert_to_long(val);
 			sqlrcon->setConnectTimeout(Z_LVAL_P(val),0);
-			return 1;
-	        case PDO_SQLRELAY_ATTR_AUTHENTICATION_TIMEOUT:
-			// authentication timeout in seconds
-			convert_to_long(val);
-			sqlrcon->setAuthenticationTimeout(Z_LVAL_P(val),0);
 			return 1;
 	        case PDO_SQLRELAY_ATTR_RESPONSE_TIMEOUT:
 			// cresponse timeout in seconds
@@ -1448,12 +1441,6 @@ static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
 			return 1;
 		case PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT:
 			sqlrcon->getConnectTimeout(&timeoutsec,&timeoutusec);
-			timeout=timeoutsec+timeoutusec*1.0E-6;
-			ZVAL_DOUBLE(retval,timeout);
-			return 1;
-		case PDO_SQLRELAY_ATTR_AUTHENTICATION_TIMEOUT:
-			sqlrcon->getAuthenticationTimeout(&timeoutsec,
-								&timeoutusec);
 			timeout=timeoutsec+timeoutusec*1.0E-6;
 			ZVAL_DOUBLE(retval,timeout);
 			return 1;
@@ -1978,8 +1965,6 @@ static PHP_MINIT_FUNCTION(pdo_sqlrelay) {
 				(long)PDO_SQLRELAY_ATTR_CURRENT_DB);
 	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_CONNECTION_TIMEOUT",
 				(long)PDO_SQLRELAY_ATTR_CONNECTION_TIMEOUT);
-	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_AUTHENTICATION_TIMEOUT",
-				(long)PDO_SQLRELAY_ATTR_AUTHENTICATION_TIMEOUT);
 	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_RESPONSE_TIMEOUT",
 				(long)PDO_SQLRELAY_ATTR_RESPONSE_TIMEOUT);
 	REGISTER_PDO_CLASS_CONST_LONG("SQLRELAY_ATTR_SQLRELAY_VERSION",

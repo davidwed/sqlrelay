@@ -42,11 +42,6 @@ void sqlrcon_setConnectTimeout(sqlrcon sqlrconref,
 	sqlrconref->setConnectTimeout(timeoutsec,timeoutusec);
 }
 
-void sqlrcon_setAuthenticationTimeout(sqlrcon sqlrconref,
-			int32_t timeoutsec, int32_t timeoutusec) {
-	sqlrconref->setAuthenticationTimeout(timeoutsec,timeoutusec);
-}
-
 void sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 			int32_t timeoutsec, int32_t timeoutusec) {
 	sqlrconref->setResponseTimeout(timeoutsec,timeoutusec);
@@ -56,11 +51,6 @@ void sqlrcon_setResponseTimeout(sqlrcon sqlrconref,
 void sqlrcon_getConnectTimeout(sqlrcon sqlrconref,
 			int32_t *timeoutsec, int32_t *timeoutusec) {
 	sqlrconref->getConnectTimeout(timeoutsec,timeoutusec);
-}
-
-void sqlrcon_getAuthenticationTimeout(sqlrcon sqlrconref,
-			int32_t *timeoutsec, int32_t *timeoutusec) {
-	sqlrconref->getAuthenticationTimeout(timeoutsec,timeoutusec);
 }
 
 void sqlrcon_getResponseTimeout(sqlrcon sqlrconref,
