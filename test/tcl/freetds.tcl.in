@@ -284,10 +284,10 @@ checkSuccess [$cur getLongestByName "testtinyint"] 1
 #checkSuccess [$cur getLongestByName "testreal"] 3
 #checkSuccess [$cur getLongestByIndex 4] 17
 #checkSuccess [$cur getLongestByName "testfloat"] 17
-checkSuccess [$cur getLongestByIndex 5] 3
-checkSuccess [$cur getLongestByName "testdecimal"] 3
-checkSuccess [$cur getLongestByIndex 6] 3
-checkSuccess [$cur getLongestByName "testnumeric"] 3
+#checkSuccess [$cur getLongestByIndex 5] 3
+#checkSuccess [$cur getLongestByName "testdecimal"] 3
+#checkSuccess [$cur getLongestByIndex 6] 3
+#checkSuccess [$cur getLongestByName "testnumeric"] 3
 #checkSuccess [$cur getLongestByIndex 7] 4
 #checkSuccess [$cur getLongestByName "testmoney"] 4
 #checkSuccess [$cur getLongestByIndex 8] 4
@@ -358,8 +358,8 @@ checkSuccess [$cur getFieldLengthByIndex 0 1] 1
 checkSuccess [$cur getFieldLengthByIndex 0 2] 1
 #checkSuccess [$cur getFieldLengthByIndex 0 3] 3
 #checkSuccess [$cur getFieldLengthByIndex 0 4] 3
-checkSuccess [$cur getFieldLengthByIndex 0 5] 3
-checkSuccess [$cur getFieldLengthByIndex 0 6] 3
+#checkSuccess [$cur getFieldLengthByIndex 0 5] 3
+#checkSuccess [$cur getFieldLengthByIndex 0 6] 3
 #checkSuccess [$cur getFieldLengthByIndex 0 7] 4
 #checkSuccess [$cur getFieldLengthByIndex 0 8] 4
 #checkSuccess [$cur getFieldLengthByIndex 0 9] 26
@@ -373,8 +373,8 @@ checkSuccess [$cur getFieldLengthByIndex 7 1] 1
 checkSuccess [$cur getFieldLengthByIndex 7 2] 1
 #checkSuccess [$cur getFieldLengthByIndex 7 3] 3
 #checkSuccess [$cur getFieldLengthByIndex 7 4] 17
-checkSuccess [$cur getFieldLengthByIndex 7 5] 3
-checkSuccess [$cur getFieldLengthByIndex 7 6] 3
+#checkSuccess [$cur getFieldLengthByIndex 7 5] 3
+#checkSuccess [$cur getFieldLengthByIndex 7 6] 3
 #checkSuccess [$cur getFieldLengthByIndex 7 7] 4
 #checkSuccess [$cur getFieldLengthByIndex 7 8] 4
 #checkSuccess [$cur getFieldLengthByIndex 7 9] 26
@@ -422,8 +422,8 @@ checkSuccess [$cur getFieldLengthByName 0 "testsmallint"] 1
 checkSuccess [$cur getFieldLengthByName 0 "testtinyint"] 1
 #checkSuccess [$cur getFieldLengthByName 0 "testreal"] 3
 #checkSuccess [$cur getFieldLengthByName 0 "testfloat"] 3
-checkSuccess [$cur getFieldLengthByName 0 "testdecimal"] 3
-checkSuccess [$cur getFieldLengthByName 0 "testnumeric"] 3
+#checkSuccess [$cur getFieldLengthByName 0 "testdecimal"] 3
+#checkSuccess [$cur getFieldLengthByName 0 "testnumeric"] 3
 #checkSuccess [$cur getFieldLengthByName 0 "testmoney"] 4
 #checkSuccess [$cur getFieldLengthByName 0 "testsmallmoney"] 4
 #checkSuccess [$cur getFieldLengthByName 0 "testdatetime"] 26
@@ -437,8 +437,8 @@ checkSuccess [$cur getFieldLengthByName 7 "testsmallint"] 1
 checkSuccess [$cur getFieldLengthByName 7 "testtinyint"] 1
 #checkSuccess [$cur getFieldLengthByName 7 "testreal"] 3
 #checkSuccess [$cur getFieldLengthByName 7 "testfloat"] 17
-checkSuccess [$cur getFieldLengthByName 7 "testdecimal"] 3
-checkSuccess [$cur getFieldLengthByName 7 "testnumeric"] 3
+#checkSuccess [$cur getFieldLengthByName 7 "testdecimal"] 3
+#checkSuccess [$cur getFieldLengthByName 7 "testnumeric"] 3
 #checkSuccess [$cur getFieldLengthByName 7 "testmoney"] 4
 #checkSuccess [$cur getFieldLengthByName 7 "testsmallmoney"] 4
 #checkSuccess [$cur getFieldLengthByName 7 "testdatetime"] 26

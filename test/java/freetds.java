@@ -349,10 +349,10 @@ class freetds {
 		//checkSuccess(cur.getLongest("testreal"),3);
 		//checkSuccess(cur.getLongest(4),17);
 		//checkSuccess(cur.getLongest("testfloat"),17);
-		checkSuccess(cur.getLongest(5),3);
-		checkSuccess(cur.getLongest("testdecimal"),3);
-		checkSuccess(cur.getLongest(6),3);
-		checkSuccess(cur.getLongest("testnumeric"),3);
+		//checkSuccess(cur.getLongest(5),3);
+		//checkSuccess(cur.getLongest("testdecimal"),3);
+		//checkSuccess(cur.getLongest(6),3);
+		//checkSuccess(cur.getLongest("testnumeric"),3);
 		//checkSuccess(cur.getLongest(7),4);
 		//checkSuccess(cur.getLongest("testmoney"),4);
 		//checkSuccess(cur.getLongest(8),4);
@@ -423,8 +423,8 @@ class freetds {
 		checkSuccess(cur.getFieldLength(0,2),1);
 		//checkSuccess(cur.getFieldLength(0,3),3);
 		//checkSuccess(cur.getFieldLength(0,4),3);
-		checkSuccess(cur.getFieldLength(0,5),3);
-		checkSuccess(cur.getFieldLength(0,6),3);
+		//checkSuccess(cur.getFieldLength(0,5),3);
+		//checkSuccess(cur.getFieldLength(0,6),3);
 		//checkSuccess(cur.getFieldLength(0,7),4);
 		//checkSuccess(cur.getFieldLength(0,8),4);
 		//checkSuccess(cur.getFieldLength(0,9),26);
@@ -438,8 +438,8 @@ class freetds {
 		checkSuccess(cur.getFieldLength(7,2),1);
 		//checkSuccess(cur.getFieldLength(7,3),3);
 		//checkSuccess(cur.getFieldLength(7,4),17);
-		checkSuccess(cur.getFieldLength(7,5),3);
-		checkSuccess(cur.getFieldLength(7,6),3);
+		//checkSuccess(cur.getFieldLength(7,5),3);
+		//checkSuccess(cur.getFieldLength(7,6),3);
 		//checkSuccess(cur.getFieldLength(7,7),4);
 		//checkSuccess(cur.getFieldLength(7,8),4);
 		//checkSuccess(cur.getFieldLength(7,9),26);
@@ -487,8 +487,8 @@ class freetds {
 		checkSuccess(cur.getFieldLength(0,"testtinyint"),1);
 		//checkSuccess(cur.getFieldLength(0,"testreal"),3);
 		//checkSuccess(cur.getFieldLength(0,"testfloat"),3);
-		checkSuccess(cur.getFieldLength(0,"testdecimal"),3);
-		checkSuccess(cur.getFieldLength(0,"testnumeric"),3);
+		//checkSuccess(cur.getFieldLength(0,"testdecimal"),3);
+		//checkSuccess(cur.getFieldLength(0,"testnumeric"),3);
 		//checkSuccess(cur.getFieldLength(0,"testmoney"),4);
 		//checkSuccess(cur.getFieldLength(0,"testsmallmoney"),4);
 		//checkSuccess(cur.getFieldLength(0,"testdatetime"),26);
@@ -502,8 +502,8 @@ class freetds {
 		checkSuccess(cur.getFieldLength(7,"testtinyint"),1);
 		//checkSuccess(cur.getFieldLength(7,"testreal"),3);
 		//checkSuccess(cur.getFieldLength(7,"testfloat"),17);
-		checkSuccess(cur.getFieldLength(7,"testdecimal"),3);
-		checkSuccess(cur.getFieldLength(7,"testnumeric"),3);
+		//checkSuccess(cur.getFieldLength(7,"testdecimal"),3);
+		//checkSuccess(cur.getFieldLength(7,"testnumeric"),3);
 		//checkSuccess(cur.getFieldLength(7,"testmoney"),4);
 		//checkSuccess(cur.getFieldLength(7,"testsmallmoney"),4);
 		//checkSuccess(cur.getFieldLength(7,"testdatetime"),26);

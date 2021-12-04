@@ -25,6 +25,7 @@
 	added some configure fixes for older OS X
 	added some fixes for older PHP
 	removed authentication timeout methods/functions
+	added some hacks for older freetds
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

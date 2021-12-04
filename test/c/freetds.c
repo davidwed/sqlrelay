@@ -342,12 +342,12 @@ int	main(int argc, char **argv) {
 	/*checkSuccessInt(sqlrcur_getLongestByIndex(cur,3),3);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testreal"),3);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,4),17);
-	checkSuccessInt(sqlrcur_getLongestByName(cur,"testfloat"),17);*/
+	checkSuccessInt(sqlrcur_getLongestByName(cur,"testfloat"),17);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,5),3);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testdecimal"),3);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,6),3);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testnumeric"),3);
-	/*checkSuccessInt(sqlrcur_getLongestByIndex(cur,7),4);
+	checkSuccessInt(sqlrcur_getLongestByIndex(cur,7),4);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testmoney"),4);
 	checkSuccessInt(sqlrcur_getLongestByIndex(cur,8),4);
 	checkSuccessInt(sqlrcur_getLongestByName(cur,"testsmallmoney"),4);
@@ -416,10 +416,10 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,1),1);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,2),1);
 	/*checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,3),3);
-	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,4),3);*/
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,4),3);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,5),3);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,6),3);
-	/*checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,7),4);
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,7),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,8),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,9),26);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,0,10),26);*/
@@ -431,10 +431,10 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,1),1);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,2),1);
 	/*checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,3),3);
-	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,4),17);*/
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,4),17);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,5),3);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,6),3);
-	/*checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,7),4);
+	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,7),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,8),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,9),26);
 	checkSuccessInt(sqlrcur_getFieldLengthByIndex(cur,7,10),26);*/
@@ -480,10 +480,10 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testsmallint"),1);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testtinyint"),1);
 	/*checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testreal"),3);
-	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testfloat"),3);*/
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testfloat"),3);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testdecimal"),3);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testnumeric"),3);
-	/*checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testmoney"),4);
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testmoney"),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testsmallmoney"),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testdatetime"),26);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,0,"testsmalldatetime"),26);*/
@@ -495,10 +495,10 @@ int	main(int argc, char **argv) {
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testsmallint"),1);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testtinyint"),1);
 	/*checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testreal"),3);
-	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testfloat"),17);*/
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testfloat"),17);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testdecimal"),3);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testnumeric"),3);
-	/*checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testmoney"),4);
+	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testmoney"),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testsmallmoney"),4);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testdatetime"),26);
 	checkSuccessInt(sqlrcur_getFieldLengthByName(cur,7,"testsmalldatetime"),26);*/
