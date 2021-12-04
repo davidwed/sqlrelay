@@ -27,9 +27,8 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/php/media
 	$(MKINSTALLDIRS) $(docdir)/api/php/sql_relay
 	$(MKINSTALLDIRS) $(docdir)/api/python
-	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/classes/SQLRConnection.src
-	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/classes/SQLRCursor.src
-	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/files
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/css
+	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/fonts
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/images
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/js
 	$(MKINSTALLDIRS) $(docdir)/api/java
@@ -111,20 +110,18 @@ install:
 	$(CHMOD) 644 $(docdir)/api/python/*.html
 	$(CP) api/ruby/doc/*.html $(docdir)/api/ruby/doc
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/*.html
-	$(CP) api/ruby/doc/*.css $(docdir)/api/ruby/doc
-	$(CHMOD) 644 $(docdir)/api/ruby/doc/*.css
-	$(CP) api/ruby/doc/classes/*.html $(docdir)/api/ruby/doc/classes
-	$(CHMOD) 644 $(docdir)/api/ruby/doc/classes/*.html
-	$(CP) api/ruby/doc/classes/SQLRConnection.src/*.html $(docdir)/api/ruby/doc/classes/SQLRConnection.src
-	$(CHMOD) 644 $(docdir)/api/ruby/doc/classes/SQLRConnection.src/*.html
-	$(CP) api/ruby/doc/classes/SQLRCursor.src/*.html $(docdir)/api/ruby/doc/classes/SQLRCursor.src
-	$(CHMOD) 644 $(docdir)/api/ruby/doc/classes/SQLRCursor.src/*.html
-	$(CP) api/ruby/doc/files/*.html $(docdir)/api/ruby/doc/files
-	$(CHMOD) 644 $(docdir)/api/ruby/doc/files/*.html
+	$(CP) api/ruby/doc/*.rid $(docdir)/api/ruby/doc
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/*.rid
+	$(CP) api/ruby/doc/css/*.css $(docdir)/api/ruby/doc/css
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/css/*.css
 	$(CP) api/ruby/doc/images/*.png $(docdir)/api/ruby/doc/images
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/images/*.png
+	$(CP) api/ruby/doc/images/*.gif $(docdir)/api/ruby/doc/images
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/images/*.gif
 	$(CP) api/ruby/doc/js/*.js $(docdir)/api/ruby/doc/js
 	$(CHMOD) 644 $(docdir)/api/ruby/doc/js/*.js
+	$(CP) api/ruby/doc/js/*.js.gz $(docdir)/api/ruby/doc/js
+	$(CHMOD) 644 $(docdir)/api/ruby/doc/js/*.js.gz
 	$(CP) api/java/*.html $(docdir)/api/java
 	$(CHMOD) 644 $(docdir)/api/java/*.html
 	$(CP) api/java/*.js $(docdir)/api/java
