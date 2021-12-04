@@ -1,0 +1,1 @@
+typeSearchIndex = [{"l":"All Classes","url":"allclasses-index.html"},{"p":"com.firstworks.sqlrelay","l":"SQLRConnection"},{"p":"com.firstworks.sqlrelay","l":"SQLRCursor"}]
