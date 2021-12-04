@@ -36,7 +36,7 @@
 use the SQLRClient namespace.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -96,7 +96,7 @@ mcs -pkg:dotnet /out:sqlrexample.exe sqlrexample.cs /reference:SQLRClient.dll
 <p>To use SQL Relay, you have to first open a connection.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -174,7 +174,7 @@ session.</p>
 <p>In any case, you must create an instance of SQLRelayCommand and set its CommandText.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -243,7 +243,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>If you need to execute a commit or rollback, you should create an instance of the SQLRelayTransaction class and use its commit() and rollback() methods rather than sending "commit" or "rollback" queries.  There are two reasons for this.  First, it's much more efficient to call the methods.  Second, if you're writing code that can run on transactional or non-transactional databases, some non-transactional databases will throw errors if they receive a "commit" or "rollback" query, but by calling the commit() and rollback() methods you instruct the database connection daemon to call the commit and rollback API methods for that database rather than issuing them as queries.  If the API's have no commit or rollback methods, the calls do nothing and the database throws no error.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -305,7 +305,7 @@ directly to the database.</p>
 <p>If your calls to ExecuteNonQuery, ExecuteScalar or ExecuteReader fail, you can catch the error an exception.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -351,7 +351,7 @@ for using bind variables (also known as parameters) in those queries.</p>
 <p>To use bind variables (parameters) with the ADO.NET API, you must add variable/value pairs to the parameter collection associated with each instance of SQLRelayCommand.  For numeric, string or date variables, this is straightforward, you can just use the Parameters.Add() method.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -391,7 +391,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>You can also bind CLOB's and BLOB's.  It is a little more complex but not terribly.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -443,7 +443,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Output bind variables can be used too.  The Direction and DbType attributes of the parameter must be specified though and for strings, the Size of the buffer to allocate for the return value must be specified as well.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -518,7 +518,7 @@ over and over without re-preparing it.  If your backend database natively
 supports this paradigm, you can reap a substantial performance improvement.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -589,7 +589,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Further, the raw data for each field can be coaxed into a native type using the GetBoolean(), GetByte(), GetBytes(), GetChar(), GetChars(), GetGuid(), GetInt16(), GetInt32(), GetInt64(), GetFloat(), GetDouble(), GetString(), GetDecimal() and GetDateTime() methods.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -676,7 +676,7 @@ iterate through its result set, inserting rows into another table, using only
 <p>For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -736,7 +736,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>After executing a query, the column count is stored in the FieldCount property of the SQLRelayDataReader class.  Column names are accessible via the GetName() method.  Column types are available from the GetDataTypeName().  The native .NET data type for the field is avialable from the GetFieldType() method.  They may be used as follows:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -782,7 +782,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>Extended column information is available from the GetSchemaTable method.  Usage is best illustrated by example.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -887,7 +887,7 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -902,7 +902,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -918,7 +918,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -931,7 +931,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -944,7 +944,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -960,7 +960,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -973,7 +973,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -989,7 +989,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1005,7 +1005,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1018,7 +1018,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1033,7 +1033,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1049,7 +1049,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1062,7 +1062,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1078,7 +1078,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1094,7 +1094,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1107,7 +1107,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1122,7 +1122,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1140,7 +1140,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1165,7 +1165,7 @@ Oracle calls these functions.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1180,7 +1180,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1196,7 +1196,7 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1210,7 +1210,7 @@ parameter.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1225,7 +1225,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1247,7 +1247,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1264,7 +1264,7 @@ itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1277,7 +1277,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1299,7 +1299,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1312,7 +1312,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1328,7 +1328,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1348,7 +1348,7 @@ output bind variable is 1 rather than 4, even though there were 3 input bind
 variables.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1370,7 +1370,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1386,7 +1386,7 @@ than as return values of the procedure itself.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1401,7 +1401,7 @@ end
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1423,7 +1423,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1436,7 +1436,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1457,7 +1457,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1473,7 +1473,7 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1488,7 +1488,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the function, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1500,7 +1500,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1518,7 +1518,7 @@ sqlrcom<font color="#990000">.</font>Parameters<font color="#990000">.</font><b>
 <p>To drop the function, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1531,7 +1531,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1543,7 +1543,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1556,7 +1556,7 @@ sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> 
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1570,7 +1570,7 @@ procedure.</p>
 <p>To create the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1582,7 +1582,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1602,7 +1602,7 @@ sqlrcom<font color="#990000">.</font>CommandText <font color="#990000">=</font> 
 <p>To drop the procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1626,7 +1626,7 @@ itself, but the rest must be returned through output parameters.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1643,7 +1643,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1678,7 +1678,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1691,7 +1691,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1706,7 +1706,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1741,7 +1741,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1754,7 +1754,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1772,7 +1772,7 @@ end<font color="#990000">;</font>
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1797,7 +1797,7 @@ first output bind variable is 1 rather than 4, even though there were 3 input
 bind variables.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1832,7 +1832,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1845,7 +1845,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1862,7 +1862,7 @@ end
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1897,7 +1897,7 @@ sqlrcom<font color="#990000">.</font><b><font color="#000000">ExecuteNonQuery</f
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1910,7 +1910,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1929,7 +1929,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1950,7 +1950,7 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1966,7 +1966,7 @@ set of a MySQL/MariaDB procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -1978,7 +1978,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2001,7 +2001,7 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2015,7 +2015,7 @@ of a MySQL/MariaDB procedure.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2027,7 +2027,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2051,7 +2051,7 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2070,7 +2070,7 @@ each database that SQL Relay supports.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2094,7 +2094,7 @@ end<font color="#990000">;</font>
 <p>For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2126,7 +2126,7 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <p>For example:</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2153,7 +2153,7 @@ datareader<font color="#990000">.</font><b><font color="#000000">Read</font></b>
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2167,7 +2167,7 @@ drop package types
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2179,7 +2179,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2199,7 +2199,7 @@ out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2225,7 +2225,7 @@ that return result sets.</p>
 <p>To create the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2245,7 +2245,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2265,7 +2265,7 @@ out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2284,7 +2284,7 @@ currently SQL Relay can only fetch the first result set.</p>
 the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2296,7 +2296,7 @@ http://www.gnu.org/software/src-highlite -->
 following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
@@ -2316,7 +2316,7 @@ out3 <font color="#990000">=</font> datareader<font color="#990000">.</font><b><
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
-<!-- Generator: GNU source-highlight 3.1.8
+<!-- Generator: GNU source-highlight 3.1.9
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->

@@ -33,10 +33,10 @@ install:
 	$(MKINSTALLDIRS) $(docdir)/api/ruby/doc/js
 	$(MKINSTALLDIRS) $(docdir)/api/java
 	$(MKINSTALLDIRS) $(docdir)/api/java/com/firstworks/sqlrelay
-	$(MKINSTALLDIRS) $(docdir)/api/java/jquery/external
+	$(MKINSTALLDIRS) $(docdir)/api/java/jquery/external/jquery
 	$(MKINSTALLDIRS) $(docdir)/api/java/jquery/images
-	$(MKINSTALLDIRS) $(docdir)/api/java/jszip/dist
-	$(MKINSTALLDIRS) $(docdir)/api/java/jszip-utils/dist
+	$(MKINSTALLDIRS) $(docdir)/api/java/jquery/jszip/dist
+	$(MKINSTALLDIRS) $(docdir)/api/java/jquery/jszip-utils/dist
 	$(MKINSTALLDIRS) $(docdir)/api/java/resources
 	$(MKINSTALLDIRS) $(docdir)/api/tcl
 	$(MKINSTALLDIRS) $(docdir)/api/erlang/html
@@ -148,10 +148,10 @@ install:
 	$(CHMOD) 644 $(docdir)/api/java/jquery/external/jquery/*.js
 	$(CP) api/java/jquery/images/*.png $(docdir)/api/java/jquery/images
 	$(CHMOD) 644 $(docdir)/api/java/jquery/images/*.png
-	$(CP) api/java/jquery/jszip/dist/*.js $(docdir)/api/java/jquery/jszip
-	$(CHMOD) 644 $(docdir)/api/java/jquery/jszip/*.js
-	$(CP) api/java/jquery/jszip-utils/dist/*.js $(docdir)/api/java/jquery/jszip-utils
-	$(CHMOD) 644 $(docdir)/api/java/jquery/jszip-utils/*.js
+	$(CP) api/java/jquery/jszip/dist/*.js $(docdir)/api/java/jquery/jszip/dist
+	$(CHMOD) 644 $(docdir)/api/java/jquery/jszip/dist/*.js
+	$(CP) api/java/jquery/jszip-utils/dist/*.js $(docdir)/api/java/jquery/jszip-utils/dist
+	$(CHMOD) 644 $(docdir)/api/java/jquery/jszip-utils/dist/*.js
 	$(CP) api/tcl/*.html $(docdir)/api/tcl
 	$(CHMOD) 644 $(docdir)/api/tcl/*.html
 	$(CP) api/tcl/*.txt $(docdir)/api/tcl
