@@ -53,7 +53,7 @@ class SQLRCLIENT_DLLSPEC sqlrimportcsv : public sqlrimport, public csvsax {
 		 *  CSV, which may be important to keep in mind when specifying
 		 *  indexes for primary keys or static values.
 		 *
-		 *  Note that "ignorecolumsnwithemptyname" is observed even if
+		 *  Note that "ignorecolumsnwithemptynames" is observed even if
 		 *  setIgnoreColumns(true) is set. */
 		void	setIgnoreColumnsWithEmptyNames(
 					bool ignorecolumnswithemptynames);
