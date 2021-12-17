@@ -53,6 +53,15 @@ class SQLRCLIENT_DLLSPEC sqlrimport {
 		 *  Defaults to false. */
 		void	setIgnoreColumns(bool ignorecolumns);
 
+		/** Leaves column names as-is. */
+		void	mixedCaseColumnNames(bool mixedcasecolumnnames);
+
+		/** Lower-cases colum names. */
+		void	lowerCaseColumnNames(bool lowercasecolumnnames);
+
+		/** Upper-cases colum names. */
+		void	upperCaseColumnNames(bool uppercasecolumnnames);
+
 		/** Maps column name "from" to "to".  If "to" is NULL then
 		 *  the column is unmapped. */
 		void	mapColumnName(const char *from, const char *to);

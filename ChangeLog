@@ -27,6 +27,7 @@
 	removed authentication timeout methods/functions
 	added some hacks for older freetds
 	added column-mapping to the sqlrimport class
+	added upper/lower/mixed-case of column names to the sqlrimport class
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

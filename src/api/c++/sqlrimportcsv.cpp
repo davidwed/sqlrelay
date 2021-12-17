@@ -452,7 +452,14 @@ bool sqlrimportcsv::rowEnd() {
 			if (m) {
 				c=m;
 			}
-			query.append(c);
+			char	*cm=charstring::duplicate(c);
+			if (lowercasecolumnnames) {
+				charstring::lower(cm);
+			} else if (uppercasecolumnnames) {
+				charstring::upper(cm);
+			}
+			query.append(cm);
+			delete[] cm;
 		}
 		query.append(")");
 	}

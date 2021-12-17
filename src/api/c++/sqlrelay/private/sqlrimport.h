@@ -17,4 +17,6 @@
 		bool		*shutdownflag;
 		bool		logerrors;
 
+		bool		lowercasecolumnnames;
+		bool		uppercasecolumnnames;
 		dictionary<const char *, const char *>	columnmap;

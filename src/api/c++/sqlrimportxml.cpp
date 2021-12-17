@@ -116,7 +116,14 @@ bool sqlrimportxml::attributeValue(const char *value) {
 				if (m) {
 					c=m;
 				}
-				columns.append(c);
+				char	*cm=charstring::duplicate(c);
+				if (lowercasecolumnnames) {
+					charstring::lower(cm);
+				} else if (uppercasecolumnnames) {
+					charstring::upper(cm);
+				}
+				query.append(cm);
+				delete[] cm;
 				if (currentcol<colcount-1) {
 					columns.append(',');
 				}
