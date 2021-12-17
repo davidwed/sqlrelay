@@ -45,7 +45,7 @@ class SQLRCLIENT_DLLSPEC sqlrimport {
 		 *
 		 *  If "ignorecolumns" is set true, then any column information
 		 *  included in the import file will be ignored.  Import data
-		 *  will be assumed to be in the same coumn-order as the
+		 *  will be assumed to be in the same column-order as the
 		 *  column-order of the table.  This is useful, for example,
 		 *  when a CSV header contains different column names than the
 		 *  table.
