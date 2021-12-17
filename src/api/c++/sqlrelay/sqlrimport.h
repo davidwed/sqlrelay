@@ -53,6 +53,10 @@ class SQLRCLIENT_DLLSPEC sqlrimport {
 		 *  Defaults to false. */
 		void	setIgnoreColumns(bool ignorecolumns);
 
+		/** Maps column name "from" to "to".  If "to" is NULL then
+		 *  the column is unmapped. */
+		void	mapColumnName(const char *from, const char *to);
+
 		/** Leaves column names as-is. */
 		void	mixedCaseColumnNames(bool mixedcasecolumnnames);
 
@@ -61,10 +65,6 @@ class SQLRCLIENT_DLLSPEC sqlrimport {
 
 		/** Upper-cases colum names. */
 		void	upperCaseColumnNames(bool uppercasecolumnnames);
-
-		/** Maps column name "from" to "to".  If "to" is NULL then
-		 *  the column is unmapped. */
-		void	mapColumnName(const char *from, const char *to);
 
 		/** Call commit after every "commitcount" inserts.  If set to 0
 		 *  then no commits will be called and the commit behavior will
