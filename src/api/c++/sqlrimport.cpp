@@ -57,17 +57,17 @@ void sqlrimport::mapColumnName(const char *from, const char *to) {
 	}
 }
 
-void sqlrimport::mixedCaseColumnNames(bool mixedcasecolumnnames) {
+void sqlrimport::mixedCaseColumnNames() {
 	lowercasecolumnnames=false;
 	uppercasecolumnnames=false;
 }
 
-void sqlrimport::lowerCaseColumnNames(bool lowercasecolumnnames) {
+void sqlrimport::lowerCaseColumnNames() {
 	lowercasecolumnnames=true;
 	uppercasecolumnnames=false;
 }
 
-void sqlrimport::upperCaseColumnNames(bool uppercasecolumnnames) {
+void sqlrimport::upperCaseColumnNames() {
 	lowercasecolumnnames=false;
 	uppercasecolumnnames=true;
 }

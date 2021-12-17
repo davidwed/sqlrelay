@@ -58,13 +58,13 @@ class SQLRCLIENT_DLLSPEC sqlrimport {
 		void	mapColumnName(const char *from, const char *to);
 
 		/** Leaves column names as-is. */
-		void	mixedCaseColumnNames(bool mixedcasecolumnnames);
+		void	mixedCaseColumnNames();
 
 		/** Lower-cases colum names. */
-		void	lowerCaseColumnNames(bool lowercasecolumnnames);
+		void	lowerCaseColumnNames();
 
 		/** Upper-cases colum names. */
-		void	upperCaseColumnNames(bool uppercasecolumnnames);
+		void	upperCaseColumnNames();
 
 		/** Call commit after every "commitcount" inserts.  If set to 0
 		 *  then no commits will be called and the commit behavior will
