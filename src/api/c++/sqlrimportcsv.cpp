@@ -447,7 +447,12 @@ bool sqlrimportcsv::rowEnd() {
 			if (i) {
 				query.append(',');
 			}
-			query.append(columns[i]);
+			const char	*c=columns[i];
+			const char	*m=columnmap.getValue(c);
+			if (m) {
+				c=m;
+			}
+			query.append(c);
 		}
 		query.append(")");
 	}

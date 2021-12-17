@@ -47,6 +47,14 @@ void sqlrimport::setIgnoreColumns(bool ignorecolumns) {
 	this->ignorecolumns=ignorecolumns;
 }
 
+void sqlrimport::mapColumnName(const char *from, const char *to) {
+	if (!to) {
+		columnmap.remove(from);
+	} else {
+		columnmap.setValue(from,to);
+	}
+}
+
 void sqlrimport::setCommitCount(uint64_t commitcount) {
 	this->commitcount=commitcount;
 }

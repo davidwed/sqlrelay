@@ -111,7 +111,12 @@ bool sqlrimportxml::attributeValue(const char *value) {
 			break;
 		case COLUMNTAG:
 			if (!charstring::compare(currentattribute,"name")) {
-				columns.append(value);
+				const char	*c=value;
+				const char	*m=columnmap.getValue(c);
+				if (m) {
+					c=m;
+				}
+				columns.append(c);
 				if (currentcol<colcount-1) {
 					columns.append(',');
 				}
