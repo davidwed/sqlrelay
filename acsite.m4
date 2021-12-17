@@ -2616,7 +2616,7 @@ then
 	fi
 
 	dnl if java is really gcj 2.x then don't use it
-	if ( test "`basename $JAVAC`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
+	if ( test "`basename $JAVAC 2> /dev/null`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
 	then
 		AC_MSG_WARN(javac appears to be gcj 2.xx, which is not supported)
 		HAVE_JAVA=""

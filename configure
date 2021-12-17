@@ -34865,7 +34865,7 @@ $as_echo "$as_me: WARNING: javac appears to use kaffe" >&2;}
 		HAVE_JAVA=""
 	fi
 
-		if ( test "`basename $JAVAC`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
+		if ( test "`basename $JAVAC 2> /dev/null`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
 	then
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: javac appears to be gcj 2.xx" >&5
 $as_echo "$as_me: WARNING: javac appears to be gcj 2.xx" >&2;}
