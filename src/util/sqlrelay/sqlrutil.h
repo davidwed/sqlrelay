@@ -268,6 +268,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual uint32_t		getMetricTotal()=0;
 
 		virtual linkedlist< routecontainer * >	*getRouteList()=0;
+
+	#include <sqlrelay/private/sqlrconfig.h>
 };
 
 class SQLRUTIL_DLLSPEC sqlrconfigs {

@@ -52,7 +52,9 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrutil.h
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(CP) sqlrelay/private/sqlrutilincludes.h $(includedir)/sqlrelay/private
+	$(CP) sqlrelay/private/sqlrconfig.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrutilincludes.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconfig.h
 
 installdll:
 	$(MKINSTALLDIRS) $(bindir)
