@@ -35,7 +35,7 @@ sqlrerrortranslation_renumber::sqlrerrortranslation_renumber(
 				sqlrerrortranslation(cont,sqlts,parameters) {
 	debugFunction();
 
-	debug=cont->getConfig()->getDebugTranslations();
+	debug=cont->getConfig()->getDebugErrorTranslations();
 
 	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	if (!enabled) {

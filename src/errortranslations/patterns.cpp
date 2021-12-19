@@ -79,7 +79,7 @@ sqlrerrortranslation_patterns::sqlrerrortranslation_patterns(
 				sqlrerrortranslation(cont,sqlts,parameters) {
 	debugFunction();
 
-	debug=cont->getConfig()->getDebugTranslations();
+	debug=cont->getConfig()->getDebugErrorTranslations();
 
 	patterns=NULL;
 	patterncount=0;

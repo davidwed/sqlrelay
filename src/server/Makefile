@@ -10,8 +10,8 @@ LIBSQLRSERVERSRCS = \
 	sqlrprotocols.cpp \
 	sqlrprotocol.cpp \
 	sqlrparser.cpp \
-	sqlrtranslations.cpp \
-	sqlrtranslation.cpp \
+	sqlrquerytranslations.cpp \
+	sqlrquerytranslation.cpp \
 	sqlrfilters.cpp \
 	sqlrfilter.cpp \
 	sqlrbindvariabletranslations.cpp \
@@ -57,8 +57,8 @@ LIBSQLRSERVERLOBJS = \
 	sqlrprotocols.$(OBJ) \
 	sqlrprotocol.$(OBJ) \
 	sqlrparser.$(OBJ) \
-	sqlrtranslations.$(OBJ) \
-	sqlrtranslation.$(OBJ) \
+	sqlrquerytranslations.$(OBJ) \
+	sqlrquerytranslation.$(OBJ) \
 	sqlrfilters.$(OBJ) \
 	sqlrfilter.$(OBJ) \
 	sqlrbindvariabletranslations.$(OBJ) \
@@ -305,7 +305,7 @@ sqlrdirectiveassignments.cpp: sqlrdirectiveassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
+sqlrquerytranslationdeclarations.cpp: sqlrquerytranslationdeclarations.cpp.in
 	$(RM) $@
 	for file in `ls ../translations/*.$(OBJ) 2> /dev/null`; \
 	do \
@@ -313,7 +313,7 @@ sqlrtranslationdeclarations.cpp: sqlrtranslationdeclarations.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
-sqlrtranslationassignments.cpp: sqlrtranslationassignments.cpp.in
+sqlrquerytranslationassignments.cpp: sqlrquerytranslationassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../translations/*.$(OBJ) 2> /dev/null`; \
 	do \
@@ -522,8 +522,8 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrtlscredentials.h $(includedir)/sqlrelay/private/sqlrtlscredentials.h
 	$(CP) sqlrelay/private/sqlrdirective.h $(includedir)/sqlrelay/private/sqlrdirective.h
 	$(CP) sqlrelay/private/sqlrdirectives.h $(includedir)/sqlrelay/private/sqlrdirectives.h
-	$(CP) sqlrelay/private/sqlrtranslation.h $(includedir)/sqlrelay/private/sqlrtranslation.h
-	$(CP) sqlrelay/private/sqlrtranslations.h $(includedir)/sqlrelay/private/sqlrtranslations.h
+	$(CP) sqlrelay/private/sqlrquerytranslation.h $(includedir)/sqlrelay/private/sqlrquerytranslation.h
+	$(CP) sqlrelay/private/sqlrquerytranslations.h $(includedir)/sqlrelay/private/sqlrquerytranslations.h
 	$(CP) sqlrelay/private/sqlrtrigger.h $(includedir)/sqlrelay/private/sqlrtrigger.h
 	$(CP) sqlrelay/private/sqlrtriggers.h $(includedir)/sqlrelay/private/sqlrtriggers.h
 	$(CP) sqlrelay/private/sqlruserpasswordcredentials.h $(includedir)/sqlrelay/private/sqlruserpasswordcredentials.h
@@ -575,8 +575,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrserverincludes.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrshm.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrtlscredentials.h
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrtranslation.h
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrtranslations.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrquerytranslation.h
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrquerytranslations.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrtrigger.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrtriggers.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlruserpasswordcredentials.h
@@ -647,8 +647,8 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrserverincludes.h \
 		$(includedir)/sqlrelay/private/sqlrshm.h \
 		$(includedir)/sqlrelay/private/sqlrtlscredentials.h \
-		$(includedir)/sqlrelay/private/sqlrtranslation.h \
-		$(includedir)/sqlrelay/private/sqlrtranslations.h \
+		$(includedir)/sqlrelay/private/sqlrquerytranslation.h \
+		$(includedir)/sqlrelay/private/sqlrquerytranslations.h \
 		$(includedir)/sqlrelay/private/sqlrtrigger.h \
 		$(includedir)/sqlrelay/private/sqlrtriggers.h \
 		$(includedir)/sqlrelay/private/sqlruserpasswordcredentials.h \

@@ -27,4 +27,4 @@
 				const char *schema,
 				const char *oldobject);
 
-		sqlrtranslationsprivate	*pvt;
+		sqlrquerytranslationsprivate	*pvt;

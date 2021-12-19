@@ -183,7 +183,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getDebugBulkLoad()=0;
 		virtual bool		getDebugParser()=0;
 		virtual bool		getDebugDirectives()=0;
-		virtual bool		getDebugTranslations()=0;
+		virtual bool		getDebugQueryTranslations()=0;
 		virtual bool		getDebugFilters()=0;
 		virtual bool		getDebugTriggers()=0;
 		virtual bool		getDebugBindTranslations()=0;
@@ -242,7 +242,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual domnode	*getListeners()=0;
 		virtual domnode	*getParser()=0;
 		virtual domnode	*getDirectives()=0;
-		virtual domnode	*getTranslations()=0;
+		virtual domnode	*getQueryTranslations()=0;
 		virtual domnode	*getFilters()=0;
 		virtual domnode	*getBindVariableTranslations()=0;
 		virtual domnode	*getResultSetTranslations()=0;

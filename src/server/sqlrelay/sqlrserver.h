@@ -2115,12 +2115,12 @@ class SQLRSERVER_DLLSPEC sqlrdirectives {
 	#include <sqlrelay/private/sqlrdirectives.h>
 };
 
-class SQLRSERVER_DLLSPEC sqlrtranslation {
+class SQLRSERVER_DLLSPEC sqlrquerytranslation {
 	public:
-		sqlrtranslation(sqlrservercontroller *cont,
-					sqlrtranslations *sqlts,
+		sqlrquerytranslation(sqlrservercontroller *cont,
+					sqlrquerytranslations *sqlts,
 					domnode *parameters);
-		virtual	~sqlrtranslation();
+		virtual	~sqlrquerytranslation();
 
 		virtual bool	usesTree();
 
@@ -2140,16 +2140,16 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 		virtual void	endSession();
 
 	protected:
-		sqlrtranslations	*getTranslations();
+		sqlrquerytranslations	*getQueryTranslations();
 		domnode			*getParameters();
 
-	#include <sqlrelay/private/sqlrtranslation.h>
+	#include <sqlrelay/private/sqlrquerytranslation.h>
 };
 
-class SQLRSERVER_DLLSPEC sqlrtranslations {
+class SQLRSERVER_DLLSPEC sqlrquerytranslations {
 	public:
-		sqlrtranslations(sqlrservercontroller *cont);
-		~sqlrtranslations();
+		sqlrquerytranslations(sqlrservercontroller *cont);
+		~sqlrquerytranslations();
 
 		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -2192,7 +2192,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 
 		bool	getUseOriginalOnError();
 
-	#include <sqlrelay/private/sqlrtranslations.h>
+	#include <sqlrelay/private/sqlrquerytranslations.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrfilter {

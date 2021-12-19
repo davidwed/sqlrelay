@@ -44,8 +44,8 @@ all-auths:
 all-directives:
 	cd directives $(AND) $(MAKE) all
 
-all-translations:
-	cd translations $(AND) $(MAKE) all
+all-querytranslations:
+	cd querytranslations $(AND) $(MAKE) all
 
 all-bindvariabletranslations:
 	cd bindvariabletranslations $(AND) $(MAKE) all
@@ -94,7 +94,7 @@ clean:
 	cd pwdencs $(AND) $(MAKE) clean
 	cd auths $(AND) $(MAKE) clean
 	cd directives $(AND) $(MAKE) clean
-	cd translations $(AND) $(MAKE) clean
+	cd querytranslations $(AND) $(MAKE) clean
 	cd bindvariabletranslations $(AND) $(MAKE) clean
 	cd resultsettranslations $(AND) $(MAKE) clean
 	cd resultsetrowtranslations $(AND) $(MAKE) clean
@@ -152,8 +152,8 @@ install-auths:
 install-directives:
 	cd directives $(AND) $(MAKE) install
 
-install-translations:
-	cd translations $(AND) $(MAKE) install
+install-querytranslations:
+	cd querytranslations $(AND) $(MAKE) install
 
 install-bindvariabletranslations:
 	cd bindvariabletranslations $(AND) $(MAKE) install
@@ -202,7 +202,7 @@ uninstall:
 	cd pwdencs $(AND) $(MAKE) uninstall
 	cd auths $(AND) $(MAKE) uninstall
 	cd directives $(AND) $(MAKE) uninstall
-	cd translations $(AND) $(MAKE) uninstall
+	cd querytranslations $(AND) $(MAKE) uninstall
 	cd bindvariabletranslations $(AND) $(MAKE) uninstall
 	cd resultsettranslations $(AND) $(MAKE) uninstall
 	cd resultsetrowtranslations $(AND) $(MAKE) uninstall

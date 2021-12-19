@@ -2,4 +2,4 @@
 // See the file COPYING for more information
 
 	private:
-		sqlrtranslationprivate	*pvt;
+		sqlrquerytranslationprivate	*pvt;

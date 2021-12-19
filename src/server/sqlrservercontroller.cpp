@@ -87,7 +87,7 @@ class sqlrservercontrollerprivate {
 	sqlrprotocols				*_sqlrpr;
 	sqlrparser				*_sqlrp;
 	sqlrdirectives				*_sqlrd;
-	sqlrtranslations			*_sqlrt;
+	sqlrquerytranslations			*_sqlrt;
 	sqlrfilters				*_sqlrf;
 	sqlrbindvariabletranslations		*_sqlrbvt;
 	sqlrresultsetheadertranslations		*_sqlrrsht;
@@ -160,7 +160,7 @@ class sqlrservercontrollerprivate {
 	bool		_debugbulkload;
 	bool		_debugsqlrparser;
 	bool		_debugsqlrdirectives;
-	bool		_debugsqlrtranslations;
+	bool		_debugsqlrquerytranslations;
 	bool		_debugsqlrfilters;
 	bool		_debugbindtranslation;
 	bool		_debugsqlrbindvariabletranslation;
@@ -410,7 +410,7 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_debugbulkload=false;
 	pvt->_debugsqlrparser=false;
 	pvt->_debugsqlrdirectives=false;
-	pvt->_debugsqlrtranslations=false;
+	pvt->_debugsqlrquerytranslations=false;
 	pvt->_debugsqlrfilters=false;
 	pvt->_debugbindtranslation=false;
 	pvt->_debugsqlrbindvariabletranslation=false;
@@ -706,12 +706,12 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get the query translations
-	pvt->_debugsqlrtranslations=pvt->_cfg->getDebugTranslations();
-	domnode	*translations=pvt->_cfg->getTranslations();
-	if (!translations->isNullNode()) {
+	pvt->_debugsqlrquerytranslations=pvt->_cfg->getDebugQueryTranslations();
+	domnode	*querytranslations=pvt->_cfg->getQueryTranslations();
+	if (!querytranslations->isNullNode()) {
 		pvt->_sqlrp=newParser();
-		pvt->_sqlrt=new sqlrtranslations(this);
-		pvt->_sqlrt->load(translations);
+		pvt->_sqlrt=new sqlrquerytranslations(this);
+		pvt->_sqlrt->load(querytranslations);
 	}
 
 	// get the query filters
@@ -3578,7 +3578,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 	const char	*query=cursor->getQueryBuffer();
 	uint32_t	querylen=cursor->getQueryLength();
 
-	if (pvt->_debugsqlrtranslations) {
+	if (pvt->_debugsqlrquerytranslations) {
 		stdoutput.write("\n===================="
 				 "===================="
 				 "===================="
@@ -3599,7 +3599,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 					query,querylen,translatedquery)) {
 		raiseTranslationFailureEvent(cursor,query);
 		if (pvt->_sqlrt->getUseOriginalOnError()) {
-			if (pvt->_debugsqlrtranslations) {
+			if (pvt->_debugsqlrquerytranslations) {
 				stdoutput.write("translation failed, "
 						"using original:\n\"");
 				stdoutput.safePrint(query,querylen);
@@ -3617,7 +3617,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 		cursor->setQueryTree(pvt->_sqlrp->detachTree());
 	}
 
-	if (pvt->_debugsqlrtranslations) {
+	if (pvt->_debugsqlrquerytranslations) {
 		stdoutput.write("translated:\n\"");
 		stdoutput.safePrint(translatedquery->getString(),
 					translatedquery->getSize());
@@ -3626,7 +3626,7 @@ bool sqlrservercontroller::translateQuery(sqlrservercursor *cursor) {
 
 	// bail if the translated query is too large
 	if (translatedquery->getSize()>pvt->_maxquerysize) {
-		if (pvt->_debugsqlrtranslations) {
+		if (pvt->_debugsqlrquerytranslations) {
 			stdoutput.write("translated query too large\n");
 		}
 		return false;
@@ -4628,7 +4628,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	query=cursor->getQueryBuffer();
 	querylen=cursor->getQueryLength();
 	if (enabletranslations && pvt->_sqlrt &&
-			pvt->_debugsql && !pvt->_debugsqlrtranslations) {
+			pvt->_debugsql && !pvt->_debugsqlrquerytranslations) {
 		stdoutput.printf("\n%d:%d:translated:\n%.*s\n",
 					process::getProcessId(),
 					cursor->getId(),

@@ -113,9 +113,9 @@
 				</runquery>
 			</end>
 		</session>
-		<translations>
-			<translation module="normalize"/>
-		</translations>
+		<querytranslations>
+			<querytranslation module="normalize"/>
+		</querytranslations>
 		<filters>
 			<filter module="string"
 				pattern="badstring"

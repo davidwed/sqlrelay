@@ -1,3 +1,0 @@
-	if (!charstring::compare(module,"@module@")) {
-		tr=new_sqlrtranslation_@module@(pvt->_cont,this,translation);
-	} else

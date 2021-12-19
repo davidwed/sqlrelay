@@ -7,11 +7,13 @@
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
 
-class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
+class SQLRSERVER_DLLSPEC sqlrquerytranslation_normalize :
+					public sqlrquerytranslation {
 	public:
-			sqlrtranslation_normalize(sqlrservercontroller *cont,
-							sqlrtranslations *sqlts,
-							domnode *parameters);
+			sqlrquerytranslation_normalize(
+						sqlrservercontroller *cont,
+						sqlrquerytranslations *sqlts,
+						domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
@@ -61,14 +63,14 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_normalize : public sqlrtranslation {
 		bool	debug;
 };
 
-sqlrtranslation_normalize::sqlrtranslation_normalize(
+sqlrquerytranslation_normalize::sqlrquerytranslation_normalize(
 					sqlrservercontroller *cont,
-					sqlrtranslations *sqlts,
+					sqlrquerytranslations *sqlts,
 					domnode *parameters) :
-				sqlrtranslation(cont,sqlts,parameters) {
+				sqlrquerytranslation(cont,sqlts,parameters) {
 	debugFunction();
 
-	debug=cont->getConfig()->getDebugTranslations();
+	debug=cont->getConfig()->getDebugQueryTranslations();
 
 	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 
@@ -130,7 +132,7 @@ sqlrtranslation_normalize::sqlrtranslation_normalize(
 static const char beforeset[]=" +-/*=<>(";
 static const char afterset[]=" +-/*=<>)";
 
-bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
+bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
 					uint32_t querylength,
@@ -563,7 +565,7 @@ bool sqlrtranslation_normalize::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
+bool sqlrquerytranslation_normalize::skipQuotedStrings(const char *ptr,
 						const char *end,
 						stringbuffer *sb,
 						const char **newptr,
@@ -656,7 +658,7 @@ bool sqlrtranslation_normalize::skipQuotedStrings(const char *ptr,
 	return found;
 }
 
-bool sqlrtranslation_normalize::caseConvertQuotedStrings(
+bool sqlrquerytranslation_normalize::caseConvertQuotedStrings(
 						const char *ptr,
 						const char *end,
 						stringbuffer *sb,
@@ -721,7 +723,7 @@ bool sqlrtranslation_normalize::caseConvertQuotedStrings(
 	return found;
 }
 
-bool sqlrtranslation_normalize::removeQuotes(
+bool sqlrquerytranslation_normalize::removeQuotes(
 					const char *ptr,
 					const char *end,
 					stringbuffer *sb,
@@ -786,10 +788,12 @@ bool sqlrtranslation_normalize::removeQuotes(
 
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrtranslation *new_sqlrtranslation_normalize(
+	SQLRSERVER_DLLSPEC sqlrquerytranslation
+				*new_sqlrquerytranslation_normalize(
 						sqlrservercontroller *cont,
-						sqlrtranslations *sqlts,
+						sqlrquerytranslations *sqlts,
 						domnode *parameters) {
-		return new sqlrtranslation_normalize(cont,sqlts,parameters);
+		return new sqlrquerytranslation_normalize(
+						cont,sqlts,parameters);
 	}
 }

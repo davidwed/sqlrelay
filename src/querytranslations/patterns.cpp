@@ -28,12 +28,14 @@ struct pattern_t {
 	uint32_t		patterncount;
 };
 
-class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
+class SQLRSERVER_DLLSPEC sqlrquerytranslation_patterns :
+					public sqlrquerytranslation {
 	public:
-			sqlrtranslation_patterns(sqlrservercontroller *cont,
-						sqlrtranslations *sqlts,
+			sqlrquerytranslation_patterns(
+						sqlrservercontroller *cont,
+						sqlrquerytranslations *sqlts,
 						domnode *parameters);
-			~sqlrtranslation_patterns();
+			~sqlrquerytranslation_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
@@ -65,13 +67,14 @@ class SQLRSERVER_DLLSPEC sqlrtranslation_patterns : public sqlrtranslation {
 		bool	debug;
 };
 
-sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
-						sqlrtranslations *sqlts,
+sqlrquerytranslation_patterns::sqlrquerytranslation_patterns(
+						sqlrservercontroller *cont,
+						sqlrquerytranslations *sqlts,
 						domnode *parameters) :
-					sqlrtranslation(cont,sqlts,parameters) {
+				sqlrquerytranslation(cont,sqlts,parameters) {
 	debugFunction();
 
-	debug=cont->getConfig()->getDebugTranslations();
+	debug=cont->getConfig()->getDebugQueryTranslations();
 
 	patterns=NULL;
 	patterncount=0;
@@ -84,10 +87,10 @@ sqlrtranslation_patterns::sqlrtranslation_patterns(sqlrservercontroller *cont,
 	buildPatternsTree(parameters,&patterns,&patterncount,true);
 }
 
-void sqlrtranslation_patterns::buildPatternsTree(domnode *root,
-						pattern_t **p,
-						uint32_t *pcount,
-						bool toplevel) {
+void sqlrquerytranslation_patterns::buildPatternsTree(domnode *root,
+							pattern_t **p,
+							uint32_t *pcount,
+							bool toplevel) {
 
 	// count patterns
 	(*pcount)=0;
@@ -159,7 +162,8 @@ void sqlrtranslation_patterns::buildPatternsTree(domnode *root,
 	}
 }
 
-void sqlrtranslation_patterns::freePatternsTree(pattern_t *p, uint32_t pcount) {
+void sqlrquerytranslation_patterns::freePatternsTree(pattern_t *p,
+							uint32_t pcount) {
 	if (!p || !pcount) {
 		return;
 	}
@@ -171,11 +175,11 @@ void sqlrtranslation_patterns::freePatternsTree(pattern_t *p, uint32_t pcount) {
 	delete[] p;
 }
 
-sqlrtranslation_patterns::~sqlrtranslation_patterns() {
+sqlrquerytranslation_patterns::~sqlrquerytranslation_patterns() {
 	freePatternsTree(patterns,patterncount);
 }
 
-bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
+bool sqlrquerytranslation_patterns::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query,
 					uint32_t querylength,
@@ -196,10 +200,10 @@ bool sqlrtranslation_patterns::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-void sqlrtranslation_patterns::applyPatterns(const char *str,
-						pattern_t *p,
-						uint32_t pcount,
-						stringbuffer *outb) {
+void sqlrquerytranslation_patterns::applyPatterns(const char *str,
+							pattern_t *p,
+							uint32_t pcount,
+							stringbuffer *outb) {
 
 	// run through the patterns
 	stringbuffer	querybuffer1;
@@ -275,9 +279,9 @@ void sqlrtranslation_patterns::applyPatterns(const char *str,
 	}
 }
 
-void sqlrtranslation_patterns::applyPattern(const char *str,
-						pattern_t *p,
-						stringbuffer *outb) {
+void sqlrquerytranslation_patterns::applyPattern(const char *str,
+							pattern_t *p,
+							stringbuffer *outb) {
 
 	ssize_t		pfromlen=(debug)?charstring::length(p->from):0;
 	const char	*fromellipses="";
@@ -360,9 +364,9 @@ void sqlrtranslation_patterns::applyPattern(const char *str,
 	}
 }
 
-void sqlrtranslation_patterns::matchAndReplace(const char *str,
-						pattern_t *p,
-						stringbuffer *outb) {
+void sqlrquerytranslation_patterns::matchAndReplace(const char *str,
+							pattern_t *p,
+							stringbuffer *outb) {
 
 	const char	*start=str;
 	for (;;) {
@@ -411,11 +415,11 @@ void sqlrtranslation_patterns::matchAndReplace(const char *str,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrtranslation
-			*new_sqlrtranslation_patterns(
+	SQLRSERVER_DLLSPEC sqlrquerytranslation
+			*new_sqlrquerytranslation_patterns(
 						sqlrservercontroller *cont,
-						sqlrtranslations *ts,
+						sqlrquerytranslations *ts,
 						domnode *parameters) {
-		return new sqlrtranslation_patterns(cont,ts,parameters);
+		return new sqlrquerytranslation_patterns(cont,ts,parameters);
 	}
 }

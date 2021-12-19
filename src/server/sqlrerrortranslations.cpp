@@ -40,7 +40,7 @@ sqlrerrortranslations::sqlrerrortranslations(sqlrservercontroller *cont) {
 	debugFunction();
 	pvt=new sqlrerrortranslationsprivate;
 	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugTranslations();
+	pvt->_debug=cont->getConfig()->getDebugErrorTranslations();
 	pvt->_error=NULL;
 }
 

@@ -13,15 +13,15 @@
 
 #ifndef SQLRELAY_ENABLE_SHARED
 	extern "C" {
-		#include "sqlrtranslationdeclarations.cpp"
+		#include "sqlrquerytranslationdeclarations.cpp"
 	}
 #endif
 
-class sqlrtranslationplugin {
+class sqlrquerytranslationplugin {
 	public:
-		sqlrtranslation	*tr;
-		dynamiclib	*dl;
-		const char	*module;
+		sqlrquerytranslation	*tr;
+		dynamiclib		*dl;
+		const char		*module;
 };
 
 class sqlrdatabaseobject {
@@ -32,8 +32,8 @@ class sqlrdatabaseobject {
 		const char	*dependency;
 };
 
-class sqlrtranslationsprivate {
-	friend class sqlrtranslations;
+class sqlrquerytranslationsprivate {
+	friend class sqlrquerytranslations;
 	private:
 		sqlrservercontroller	*_cont;
 		
@@ -42,7 +42,7 @@ class sqlrtranslationsprivate {
 
 		const char	*_error;
 
-		singlylinkedlist< sqlrtranslationplugin * >	_tlist;
+		singlylinkedlist< sqlrquerytranslationplugin * >	_tlist;
 
 		bool		_useoriginalonerror;
 
@@ -50,23 +50,23 @@ class sqlrtranslationsprivate {
 		dictionary< sqlrdatabaseobject *, char * >	_indexnamemap;
 };
 
-sqlrtranslations::sqlrtranslations(sqlrservercontroller *cont) {
+sqlrquerytranslations::sqlrquerytranslations(sqlrservercontroller *cont) {
 	debugFunction();
-	pvt=new sqlrtranslationsprivate;
+	pvt=new sqlrquerytranslationsprivate;
 	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugTranslations();
+	pvt->_debug=cont->getConfig()->getDebugQueryTranslations();
 	pvt->_error=NULL;
 	pvt->_tree=NULL;
 	pvt->_useoriginalonerror=true;
 }
 
-sqlrtranslations::~sqlrtranslations() {
+sqlrquerytranslations::~sqlrquerytranslations() {
 	debugFunction();
 	unload();
 	delete pvt;
 }
 
-bool sqlrtranslations::load(domnode *parameters) {
+bool sqlrquerytranslations::load(domnode *parameters) {
 	debugFunction();
 
 	unload();
@@ -89,12 +89,12 @@ bool sqlrtranslations::load(domnode *parameters) {
 	return true;
 }
 
-void sqlrtranslations::unload() {
+void sqlrquerytranslations::unload() {
 	debugFunction();
-	for (listnode< sqlrtranslationplugin * > *node=
+	for (listnode< sqlrquerytranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
-		sqlrtranslationplugin	*sqlt=node->getValue();
+		sqlrquerytranslationplugin	*sqlt=node->getValue();
 		delete sqlt->tr;
 		delete sqlt->dl;
 		delete sqlt;
@@ -102,11 +102,11 @@ void sqlrtranslations::unload() {
 	pvt->_tlist.clear();
 }
 
-void sqlrtranslations::loadTranslation(domnode *translation) {
+void sqlrquerytranslations::loadTranslation(domnode *translation) {
 	debugFunction();
 
 	// ignore non-translations
-	if (charstring::compare(translation->getName(),"translation")) {
+	if (charstring::compare(translation->getName(),"querytranslation")) {
 		return;
 	}
 
@@ -129,12 +129,12 @@ void sqlrtranslations::loadTranslation(domnode *translation) {
 	stringbuffer	modulename;
 	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
-	modulename.append("translation_");
+	modulename.append("querytranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
 		stdoutput.printf("failed to load "
-				"translation module: %s\n",module);
+				"query translation module: %s\n",module);
 		char	*error=dl->getError();
 		stdoutput.printf("%s\n",(error)?error:"");
 		delete[] error;
@@ -144,12 +144,12 @@ void sqlrtranslations::loadTranslation(domnode *translation) {
 
 	// load the translation itself
 	stringbuffer	functionname;
-	functionname.append("new_sqlrtranslation_")->append(module);
-	sqlrtranslation *(*newTranslation)(sqlrservercontroller *,
-						sqlrtranslations *,
+	functionname.append("new_sqlrquerytranslation_")->append(module);
+	sqlrquerytranslation *(*newTranslation)(sqlrservercontroller *,
+						sqlrquerytranslations *,
 						domnode *)=
-		(sqlrtranslation *(*)(sqlrservercontroller *,
-						sqlrtranslations *,
+		(sqlrquerytranslation *(*)(sqlrservercontroller *,
+						sqlrquerytranslations *,
 						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newTranslation) {
@@ -161,12 +161,13 @@ void sqlrtranslations::loadTranslation(domnode *translation) {
 		delete dl;
 		return;
 	}
-	sqlrtranslation	*tr=(*newTranslation)(pvt->_cont,this,translation);
+	sqlrquerytranslation	*tr=(*newTranslation)(pvt->_cont,this,
+								translation);
 
 #else
 	dynamiclib	*dl=NULL;
-	sqlrtranslation	*tr;
-	#include "sqlrtranslationassignments.cpp"
+	sqlrquerytranslation	*tr;
+	#include "sqlrquerytranslationassignments.cpp"
 	{
 		tr=NULL;
 	}
@@ -177,14 +178,14 @@ void sqlrtranslations::loadTranslation(domnode *translation) {
 	}
 
 	// add the plugin to the list
-	sqlrtranslationplugin	*sqltp=new sqlrtranslationplugin;
+	sqlrquerytranslationplugin	*sqltp=new sqlrquerytranslationplugin;
 	sqltp->tr=tr;
 	sqltp->dl=dl;
 	sqltp->module=module;
 	pvt->_tlist.append(sqltp);
 }
 
-bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
+bool sqlrquerytranslations::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					sqlrparser *sqlrp,
 					const char *query,
@@ -218,7 +219,7 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 	stringbuffer	tempquerystr1;
 	stringbuffer	tempquerystr2;
 	stringbuffer	*tempquerystr=&tempquerystr1;
-	for (listnode< sqlrtranslationplugin * > *node=
+	for (listnode< sqlrquerytranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 
@@ -227,12 +228,12 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 						node->getValue()->module);
 		}
 
-		sqlrtranslation	*tr=node->getValue()->tr;
+		sqlrquerytranslation	*tr=node->getValue()->tr;
 
 		if (tr->usesTree()) {
 
 			if (!sqlrp) {
-				pvt->_error="translation requires query "
+				pvt->_error="query translation requires query "
 						"tree but no parser available";
 				if (pvt->_debug) {
 					stdoutput.printf("\n%s\n\n",
@@ -343,11 +344,11 @@ bool sqlrtranslations::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-const char *sqlrtranslations::getError() {
+const char *sqlrquerytranslations::getError() {
 	return pvt->_error;
 }
 
-sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(
+sqlrdatabaseobject *sqlrquerytranslations::createDatabaseObject(
 						const char *database,
 						const char *schema,
 						const char *object,
@@ -402,7 +403,7 @@ sqlrdatabaseobject *sqlrtranslations::createDatabaseObject(
 	return dbo;
 }
 
-void sqlrtranslations::setReplacementTableName(
+void sqlrquerytranslations::setReplacementTableName(
 					const char *database,
 					const char *schema,
 					const char *oldtable,
@@ -416,7 +417,7 @@ void sqlrtranslations::setReplacementTableName(
 				newtable);
 }
 
-void sqlrtranslations::setReplacementIndexName(
+void sqlrquerytranslations::setReplacementIndexName(
 					const char *database,
 					const char *schema,
 					const char *oldindex,
@@ -431,14 +432,14 @@ void sqlrtranslations::setReplacementIndexName(
 				newindex);
 }
 
-void sqlrtranslations::setReplacementName(
+void sqlrquerytranslations::setReplacementName(
 				dictionary< sqlrdatabaseobject *, char *> *dict,
 				sqlrdatabaseobject *oldobject,
 				const char *newobject) {
 	dict->setValue(oldobject,(char *)newobject);
 }
 
-bool sqlrtranslations::getReplacementTableName(const char *database,
+bool sqlrquerytranslations::getReplacementTableName(const char *database,
 						const char *schema,
 						const char *oldtable,
 						const char **newtable) {
@@ -447,7 +448,7 @@ bool sqlrtranslations::getReplacementTableName(const char *database,
 					oldtable,newtable);
 }
 
-bool sqlrtranslations::getReplacementIndexName(const char *database,
+bool sqlrquerytranslations::getReplacementIndexName(const char *database,
 						const char *schema,
 						const char *oldtable,
 						const char **newtable) {
@@ -456,7 +457,7 @@ bool sqlrtranslations::getReplacementIndexName(const char *database,
 						oldtable,newtable);
 }
 
-bool sqlrtranslations::getReplacementName(
+bool sqlrquerytranslations::getReplacementName(
 				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
@@ -478,7 +479,7 @@ bool sqlrtranslations::getReplacementName(
 	return false;
 }
 
-bool sqlrtranslations::removeReplacementTable(const char *database,
+bool sqlrquerytranslations::removeReplacementTable(const char *database,
 						const char *schema,
 						const char *table) {
 
@@ -508,13 +509,13 @@ bool sqlrtranslations::removeReplacementTable(const char *database,
 	return true;
 }
 
-bool sqlrtranslations::removeReplacementIndex(const char *database,
+bool sqlrquerytranslations::removeReplacementIndex(const char *database,
 						const char *schema,
 						const char *index) {
 	return removeReplacement(&pvt->_indexnamemap,database,schema,index);
 }
 
-bool sqlrtranslations::removeReplacement(
+bool sqlrquerytranslations::removeReplacement(
 				dictionary< sqlrdatabaseobject *, char *> *dict,
 				const char *database,
 				const char *schema,
@@ -536,22 +537,22 @@ bool sqlrtranslations::removeReplacement(
 	return false;
 }
 
-bool sqlrtranslations::getUseOriginalOnError() {
+bool sqlrquerytranslations::getUseOriginalOnError() {
 	return pvt->_useoriginalonerror;
 }
 
-void sqlrtranslations::endTransaction(bool commit) {
-	for (listnode< sqlrtranslationplugin * > *node=
+void sqlrquerytranslations::endTransaction(bool commit) {
+	for (listnode< sqlrquerytranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->tr->endTransaction(commit);
 	}
 }
 
-void sqlrtranslations::endSession() {
+void sqlrquerytranslations::endSession() {
 	pvt->_tablenamemap.clear();
 	pvt->_indexnamemap.clear();
-	for (listnode< sqlrtranslationplugin * > *node=
+	for (listnode< sqlrquerytranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
 		node->getValue()->tr->endSession();
