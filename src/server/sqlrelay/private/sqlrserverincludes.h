@@ -126,3 +126,6 @@ class sqlrmoduledata;
 class sqlrmoduledataprivate;
 class sqlrmoduledatas;
 class sqlrmoduledatasprivate;
+
+typedef sqlrquerytranslation sqlrtranslation;
+typedef sqlrquerytranslations sqlrtranslations;

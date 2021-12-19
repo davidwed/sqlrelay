@@ -133,35 +133,59 @@ void sqlrquerytranslations::loadTranslation(domnode *translation) {
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
 	dynamiclib	*dl=new dynamiclib();
 	if (!dl->open(modulename.getString(),true,true)) {
-		stdoutput.printf("failed to load "
+
+		// try again with sqlrtranslation_...
+		// (the old naming convention)
+		modulename.clear();
+		modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+		modulename.append(SQLR);
+		modulename.append("translation_");
+		modulename.append(module)->append(".");
+		modulename.append(SQLRELAY_MODULESUFFIX);
+		if (!dl->open(modulename.getString(),true,true)) {
+			stdoutput.printf("failed to load "
 				"query translation module: %s\n",module);
-		char	*error=dl->getError();
-		stdoutput.printf("%s\n",(error)?error:"");
-		delete[] error;
-		delete dl;
-		return;
+			char	*error=dl->getError();
+			stdoutput.printf("%s\n",(error)?error:"");
+			delete[] error;
+			delete dl;
+			return;
+		}
 	}
 
 	// load the translation itself
 	stringbuffer	functionname;
 	functionname.append("new_sqlrquerytranslation_")->append(module);
-	sqlrquerytranslation *(*newTranslation)(sqlrservercontroller *,
+	sqlrquerytranslation *(*newQueryTranslation)(sqlrservercontroller *,
 						sqlrquerytranslations *,
 						domnode *)=
 		(sqlrquerytranslation *(*)(sqlrservercontroller *,
 						sqlrquerytranslations *,
 						domnode *))
 				dl->getSymbol(functionname.getString());
-	if (!newTranslation) {
-		stdoutput.printf("failed to load translation: %s\n",module);
-		char	*error=dl->getError();
-		stdoutput.printf("%s\n",(error)?error:"");
-		delete[] error;
-		dl->close();
-		delete dl;
-		return;
+	if (!newQueryTranslation) {
+
+		// try again with new_sqlrtranslation_...
+		// (the old naming convention)
+		functionname.clear();
+		functionname.append("new_sqlrtranslation_")->append(module);
+		newQueryTranslation=
+		(sqlrquerytranslation *(*)(sqlrservercontroller *,
+						sqlrquerytranslations *,
+						domnode *))
+				dl->getSymbol(functionname.getString());
+		if (!newQueryTranslation) {
+			stdoutput.printf("failed to load query "
+						"translation: %s\n",module);
+			char	*error=dl->getError();
+			stdoutput.printf("%s\n",(error)?error:"");
+			delete[] error;
+			dl->close();
+			delete dl;
+			return;
+		}
 	}
-	sqlrquerytranslation	*tr=(*newTranslation)(pvt->_cont,this,
+	sqlrquerytranslation	*tr=(*newQueryTranslation)(pvt->_cont,this,
 								translation);
 
 #else
