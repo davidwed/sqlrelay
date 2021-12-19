@@ -2,44 +2,17 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrserver.h>
+#include <rudiments/wcharstring.h>
 #include <rudiments/process.h>
 #include <rudiments/sys.h>
 #include <rudiments/datetime.h>
 #include <rudiments/error.h>
 
-#ifdef RUDIMENTS_HAVE_WCHAR_H
-
-#include <wchar.h>
-
 // helper class for strings of 32-bit wide characters
 class SQLRSERVER_DLLSPEC char32string {
 	public:
-		static size_t	length(const wchar_t *str);
-		static wchar_t	*duplicate(const char *str);
-		static wchar_t	*duplicate(const char *str, size_t length);
 		static wchar_t	*duplicate(const char16_t *str, size_t length);
 };
-
-size_t char32string::length(const wchar_t *str) {
-	return (str)?wcslen(str):0;
-}
-
-wchar_t *char32string::duplicate(const char *str) {
-	return duplicate(str,charstring::length(str));
-}
-
-wchar_t *char32string::duplicate(const char *str, size_t length) {
-	if (!str) {
-		return NULL;
-	}
-	wchar_t	*buffer=new wchar_t[length+1];
-	for (size_t i=0; i<length; i++) {
-		// FIXME: use iconv...
-		buffer[i]=(wchar_t)str[i];
-	}
-	buffer[length]=L'\0';
-	return buffer;
-}
 
 wchar_t *char32string::duplicate(const char16_t *str, size_t length) {
 	if (!str) {
@@ -2283,7 +2256,7 @@ bool sqlrprotocol_tds::tds7Login() {
 
 		char		*olddatabase=cont->getCurrentDatabase();
 		uint32_t	olddatabaselen=charstring::length(olddatabase);
-		wchar_t		*olddatabase32=char32string::duplicate(
+		wchar_t		*olddatabase32=wcharstring::duplicate(
 						olddatabase,olddatabaselen);
 
 		if (changeDatabase(database,cchdatabase)) {
@@ -2696,11 +2669,11 @@ void sqlrprotocol_tds::envChangePacketSize() {
 
 	char		*npsize=charstring::parseNumber(negotiatedpacketsize);
 	uint32_t	npsizelen=charstring::length(npsize);
-	wchar_t		*npsize32=char32string::duplicate(npsize,npsizelen);
+	wchar_t		*npsize32=wcharstring::duplicate(npsize,npsizelen);
 
 	char		*opsize=charstring::parseNumber(oldpacketsize);
 	uint32_t	opsizelen=charstring::length(opsize);
-	wchar_t		*opsize32=char32string::duplicate(opsize,opsizelen);
+	wchar_t		*opsize32=wcharstring::duplicate(opsize,opsizelen);
 
 	envChange(ENV_CHANGE_PACKET_SIZE,
 				npsize32,npsizelen,
@@ -5710,17 +5683,16 @@ void sqlrprotocol_tds::debugSystemError() {
 	delete[] err;
 }
 
-#endif
-
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_tds(
 						sqlrservercontroller *cont,
 						sqlrprotocols *ps,
 						domnode *parameters) {
-		#ifdef RUDIMENTS_HAVE_WCHAR_H
+		if (wcharstring::supported()) {
 			return new sqlrprotocol_tds(cont,ps,parameters);
-		#else
+		} else {
+			// FIXME: set error somehow...
 			return NULL;
-		#endif
+		}
 	}
 }
