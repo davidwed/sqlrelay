@@ -29,6 +29,7 @@
 	added column-mapping to the sqlrimport class
 	added upper/lower/mixed-case of column names to the sqlrimport class
 	reamed "translation" modules to "querytranslation" modules
+	updated configure script to support oracle 18 instantclient
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

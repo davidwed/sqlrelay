@@ -44,6 +44,7 @@ then
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore11.a],[ORACLEVERSION=\"11g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore12.a],[ORACLEVERSION=\"12c\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore18.a],[ORACLEVERSION=\"18c\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
 		fi
 
@@ -81,14 +82,21 @@ then
 				then
 					ORACLEVERSION="12c"
 				fi
+				if ( test -n "`basename $ORACLE_INSTANTCLIENT_PREFIX | grep 18`" )
+				then
+					ORACLEVERSION="18c"
+				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
 				CLNTSH="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`"
 				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 				ORACLELIBS="-Wl,$CLNTSH -L$ORACLE_INSTANTCLIENT_PREFIX -l$NNZ"
 				if ( test "$ORACLEVERSION" = "12c" )
 				then
+					ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
+				elif ( test "$ORACLEVERSION" = "18c" )
+				then
 					CLNTSHCORE="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
-					ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE"
+					ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE -lmql1 -lipc1"
 				fi
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
@@ -101,47 +109,43 @@ then
 		then
 			for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
 			do
-				if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client/oci.h" )
+				ORACLEVERSION="10g"
+				if ( test -n "`echo $version | grep 11`" )
 				then
-					ORACLEVERSION="10g"
-					if ( test -n "`echo $version | grep 11`" )
-					then
-						ORACLEVERSION="11g"
-					fi
-					if ( test -n "`echo $version | grep 12`" )
-					then
-						ORACLEVERSION="12c"
-					fi
-					ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
-					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
-					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -l$NNZ"
-					if ( test "$ORACLEVERSION" = "12c" )
-					then
-						ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
-					fi
-					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
+					ORACLEVERSION="11g"
+				fi
+				if ( test -n "`echo $version | grep 12`" )
+				then
+					ORACLEVERSION="12c"
+				fi
+				if ( test -n "`echo $version | grep 18`" )
+				then
+					ORACLEVERSION="18c"
 				fi
 
 				dnl x86_64 uses client64 rather than client
-				if ( test -r "/usr/lib/oracle/$version/client64/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client64/oci.h" )
+				OCLIENT=""
+				if ( test -r "/usr/lib/oracle/$version/client" )
 				then
-					ORACLEVERSION="10g"
-					if ( test -n "`echo $version | grep 11`" )
-					then
-						ORACLEVERSION="11g"
-					fi
-					if ( test -n "`echo $version | grep 12`" )
-					then
-						ORACLEVERSION="12c"
-					fi
-					ORACLELIBSPATH="/usr/lib/oracle/$version/client64/lib"
+					OCLIENT="client"
+				elif ( test -r "/usr/lib/oracle/$version/client64" )
+				then
+					OCLIENT="client64"
+				fi
+				if ( test -r "/usr/lib/oracle/$version/$OCLIENT/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/$OCLIENT/oci.h" )
+				then
+					ORACLELIBSPATH="/usr/lib/oracle/$version/$OCLIENT/lib"
 					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
-					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -l$NNZ"
+					ORACLELIBS="-L/usr/lib/oracle/$version/$OCLIENT/lib -lclntsh -l$NNZ"
 					if ( test "$ORACLEVERSION" = "12c" )
 					then
 						ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
+					elif ( test "$ORACLEVERSION" = "18c" )
+					then
+						CLNTSHCORE="`ls /usr/lib/oracle/$version/$OCLIENT/lib/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
+						ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE -lmql1 -lipc1"
 					fi
-					ORACLEINCLUDES="-I/usr/include/oracle/$version/client64"
+					ORACLEINCLUDES="-I/usr/include/oracle/$version/$OCLIENT"
 				fi
 			done
 		fi
