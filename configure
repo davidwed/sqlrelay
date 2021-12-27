@@ -19150,6 +19150,33 @@ fi
 
 FOUNDLIB=""
 
+if ( test -r "$ORACLE_HOME/lib/libcore19.a" )
+then
+	eval "FOUNDLIB="yes""
+fi
+
+if ( test -n "$FOUNDLIB" )
+then
+	eval "ORACLEVERSION=\"19c\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\""
+else
+	if ( test -n "" )
+	then
+
+if ( test -r "" )
+then
+	eval "FOUNDLIB="yes""
+fi
+
+		if ( test -n "$FOUNDLIB" )
+		then
+			eval ""
+		fi
+	fi
+fi
+
+
+FOUNDLIB=""
+
 if ( test -r "$ORACLE_HOME/lib/libclntsh.a" )
 then
 	eval "FOUNDLIB="yes""
@@ -19181,7 +19208,11 @@ fi
 
 									if ( test -z "$ORACLE_INSTANTCLIENT_PREFIX" )
 			then
-				for i in "/usr" "/usr/lib" "/usr/local" "/opt"
+				for i in \
+					"/usr" \
+					"/usr/lib" \
+					"/usr/local" \
+					"/opt"
 				do
 					INSTCLNT=`ls -d $i/instantclient* 2> /dev/null | tail -1`
 					if ( test -n "$INSTCLNT" )
@@ -19192,7 +19223,19 @@ fi
 				done
 			fi
 
-												if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
+						if ( test -z "$ORACLE_INSTANTCLIENT_PREFIX" )
+			then
+				for i in `ls -d /u*/app/*/product/*/client* 2> /dev/null`
+				do
+					if ( test -n "$i/instantclient" )
+					then
+						ORACLE_INSTANTCLIENT_PREFIX=$i
+						break
+					fi
+				done
+			fi
+
+															if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
 			then
 				ORACLEVERSION="10g"
 				if ( test -n "`basename $ORACLE_INSTANTCLIENT_PREFIX | grep 11`" )
@@ -19207,6 +19250,14 @@ fi
 				then
 					ORACLEVERSION="18c"
 				fi
+				if ( test -n "`echo $ORACLE_INSTANTCLIENT_PREFIX | grep 19`" )
+				then
+					ORACLEVERSION="19c"
+				fi
+				if ( test -n "`echo $ORACLE_INSTANTCLIENT_PREFIX | grep 21`" )
+				then
+					ORACLEVERSION="21c"
+				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
 				CLNTSH="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`"
 				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
@@ -19218,6 +19269,10 @@ fi
 				then
 					CLNTSHCORE="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
 					ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE -lmql1 -lipc1"
+				elif ( test "$ORACLEVERSION" = "19c" -o "$ORACLEVERSION" = "21c" )
+				then
+					CLNTSHCORE="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
+					ORACLELIBS="$ORACLELIBS -Wl,$CLNTSHCORE -lmql1 -lipc1"
 				fi
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
@@ -19305,6 +19360,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -19345,6 +19401,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -19395,6 +19452,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -19481,6 +19539,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -19568,6 +19627,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -19654,6 +19714,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 #ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
