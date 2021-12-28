@@ -391,6 +391,13 @@ static bool loadLibraries(stringbuffer *errormessage) {
 	}
 	alreadyopen=true;
 
+	// FIXME: look for
+	// 	$ORACLE_HOME/lib/libclntsh.so(.*)
+	// 	/usr/lib/oracle/<version>/client(64)/lib/libclntsh.so(.*)
+	// 	/opt/instantclient_<version>/libclntsh.so(.*)
+	// 	/usr/local/instantclient_<version>/libclntsh.so(.*)
+	// 	/u01/app/oracle/product/<version>/client_*/libclntsh.so(.*)
+
 	// build lib names
 	const char	**libnames=new const char *[11];
 	uint16_t	p=0;
