@@ -2,6 +2,8 @@
 // See the file COPYING for more information
 
 #include <rudiments/dynamiclib.h>
+#include <rudiments/environment.h>
+#include <rudiments/linkedlist.h>
 #include <rudiments/file.h>
 
 
@@ -391,58 +393,45 @@ static bool loadLibraries(stringbuffer *errormessage) {
 	}
 	alreadyopen=true;
 
-	// FIXME: look for
-	// 	$ORACLE_HOME/lib/libclntsh.so(.*)
-	// 	/usr/lib/oracle/<version>/client(64)/lib/libclntsh.so(.*)
-	// 	/opt/instantclient_<version>/libclntsh.so(.*)
-	// 	/usr/local/instantclient_<version>/libclntsh.so(.*)
-	// 	/u01/app/oracle/product/<version>/client_*/libclntsh.so(.*)
-
-	// build lib names
-	const char	**libnames=new const char *[11];
-	uint16_t	p=0;
-	stringbuffer	libdir;
+	// build a set of library file name patterns to search for
+	const char	*fp[5];
 	const char	*oraclehome=environment::getValue("ORACLE_HOME");
+	stringbuffer	oh;
 	if (!charstring::isNullOrEmpty(oraclehome)) {
-		libdir.append(oraclehome)->append("/lib/libclntsh.so");
-		libnames[p++]=libdir.getString();
+		oh.append(oraclehome)->append("/lib/libclntsh.so*");
+	}
+	fp[0]=oh.getString();
+	fp[1]=(sizeof(long)==8)?
+			"/usr/lib/oracle/*/client64/lib/libclntsh.so*":
+			"/usr/lib/oracle/*/client/lib/libclntsh.so*";
+	fp[2]="/opt/instantclient_*/libclntsh.so*";
+	fp[3]="/opt/instantclient_*/libclntsh.so*";
+	fp[4]="/u01/app/oracle/product/*/client_*/libclntsh.so*";
+
+	// search for the patterns, store them in lists, sort the lists
+	linkedlist<char *>	l[5];
+	for (uint16_t i=0; i<5; i++) {
+		l[i].setManageArrayValues(true);
+		file::getMatchingFileNames(fp[i],&(l[i]));
+		l[i].getComparator()->setReverse(true);
+		l[i].getComparator()->setNatural(true);
+		l[i].getComparator()->setNumberDelimiters("._");
+		l[i].heapSort();
 	}
 
-	if (sizeof(long)==8) {
-		libnames[p++]="/usr/lib/oracle/12.1/client64/lib/libclntsh.so";
-	} else {
-		libnames[p++]="/usr/lib/oracle/12.1/client/lib/libclntsh.so";
-	}
-	libnames[p++]="/opt/instantclient_12_1/libclntsh.so.12.1";
-	libnames[p++]="/usr/local/instantclient_12_1/libclntsh.so.12.1";
-
-	if (sizeof(long)==8) {
-		libnames[p++]="/usr/lib/oracle/11.2/client64/lib/libclntsh.so";
-	} else {
-		libnames[p++]="/usr/lib/oracle/11.2/client/lib/libclntsh.so";
-	}
-	libnames[p++]="/opt/instantclient_11_2/libclntsh.so.11.2";
-	libnames[p++]="/usr/local/instantclient_11_2/libclntsh.so.11.2";
-
-	if (sizeof(long)==8) {
-		libnames[p++]="/usr/lib/oracle/10.2/client64/lib/libclntsh.so";
-	} else {
-		libnames[p++]="/usr/lib/oracle/10.2/client/lib/libclntsh.so";
-	}
-	libnames[p++]="/opt/instantclient_10_2/libclntsh.so.10.2";
-	libnames[p++]="/usr/local/instantclient_10_2/libclntsh.so.10.2";
-
-	libnames[p++]=NULL;
-
-	// look for the library
-	const char	**libname=libnames;
-	while (*libname) {
-		if (file::readable(*libname)) {
-			break;
+	// combine the lists, excluding any unreadable library files
+	linkedlist<const char *>	libnames;
+	for (uint16_t i=0; i<5; i++) {
+		for (listnode<char *> *n=l[i].getFirst(); n; n=n->getNext()) {
+			const char *libname=n->getValue();
+			if (file::readable(libname)) {
+				libnames.append(libname);
+			}
 		}
-		libname++;
 	}
-	if (!*libname) {
+
+	// bail if we didn't find any readable library files
+	if (!libnames.getFirst()) {
 		errormessage->clear();
 		errormessage->append("\nFailed to load Oracle libraries.\n");
 		if (charstring::isNullOrEmpty(oraclehome)) {
@@ -451,7 +440,7 @@ static bool loadLibraries(stringbuffer *errormessage) {
 			errormessage->append("None");
 		}
 		errormessage->append(" of these libraries were found:\n");
-		libname=libnames;
+		const char * const *libname=fp;
 		while (*libname) {
 			errormessage->append('	');
 			errormessage->append(*libname)->append('\n');
@@ -460,8 +449,9 @@ static bool loadLibraries(stringbuffer *errormessage) {
 		return false;
 	}
 
-	// open the library
-	if (!lib.open(*libname,true,true)) {
+	// attempt to open the first library
+	const char	*libname=libnames.getFirst()->getValue();
+	if (!lib.open(libname,true,true)) {
 		goto error;
 	}
 
@@ -857,8 +847,8 @@ error:
 	errormessage->append(error)->append('\n');
 	#ifndef _WIN32
 	if (charstring::contains(error,"No such file or directory")) {
-		char		*path=file::dirname(*libname);
-		const char	*lib=(*libname)+charstring::length(path)+1;
+		char		*path=file::dirname(libname);
+		const char	*lib=libname+charstring::length(path)+1;
 		errormessage->append("\n(NOTE: The error message above may "
 					"be misleading.  Most likely it means "
 					"that a library that ");
