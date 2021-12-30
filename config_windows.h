@@ -147,6 +147,9 @@
 /* oci.h */
 #define HAVE_OCI_H
 
+/* Some systems have odbcinst.h */
+#define HAVE_ODBCINST_H 1
+
 /* Oracle 8i or greater */
 #define HAVE_ORACLE_8i
 
@@ -326,9 +329,6 @@
 
 /* Platform supports shared libraries */
 #define SQLRELAY_ENABLE_SHARED 1
-
-/* Some systems have odbcinst.h */
-#define SQLRELAY_HAVE_ODBCINST_H 1
 
 /* Some systems have sys/vnode.h */
 /* #undef SQLRELAY_HAVE_SYS_VNODE_H */

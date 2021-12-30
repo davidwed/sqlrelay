@@ -1472,7 +1472,7 @@ extern "C" SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle, SQLUSMAL
 extern "C" SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle, SQLULEN crow, SQLULEN *pirow) { return 0; }],[],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(SQLULEN); AC_DEFINE(HAVE_SQLPARAMOPTIONS_ULEN,1,Some systems have SQLULEN parameters for SQLParamOptions)],[AC_MSG_RESULT(SQLUINTEGER)])
 
 		AC_MSG_CHECKING(for odbcinst.h)
-		AC_TRY_COMPILE([#include <odbcinst.h>],[],AC_DEFINE(SQLRELAY_HAVE_ODBCINST_H, 1, Some systems have odbcinst.h) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
+		AC_TRY_COMPILE([#include <odbcinst.h>],[],AC_DEFINE(HAVE_ODBCINST_H, 1, Some systems have odbcinst.h) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
 		
 		AC_MSG_CHECKING(for SQLGetPrivateProfileString)
 		FW_TRY_LINK([#include <sql.h>
