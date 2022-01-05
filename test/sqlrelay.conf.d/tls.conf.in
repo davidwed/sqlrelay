@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<instances>
+
+	<instance id="tlstest" port="9000"
+		socket="/tmp/test.socket"
+		tls="yes"
+		tlscert="@abs_top_builddir@/test/sqlrelay.conf.d/tls/server.pem"
+		tlspassword="password"
+		tlsvalidate="yes"
+		tlsca="@abs_top_builddir@/test/sqlrelay.conf.d/tls/ca.pem">
+		<users>
+			<user user="client.localdomain"/>
+		</users>
+		<connections>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
+		</connections>
+	</instance>
+
+</instances>

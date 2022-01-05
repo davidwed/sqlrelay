@@ -1,3 +1,0 @@
-sqlrtranslation	*new_sqlrtranslation_@module@(sqlrservercontroller *cont,
-							sqlrtranslations *sqlts,
-							domnode *parameters);

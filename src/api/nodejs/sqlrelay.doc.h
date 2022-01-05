@@ -31,13 +31,6 @@ class SQLRConnection {
 		 *  SQLR_CLIENT_CONNECT_TIMEOUT environment variable. */
 		function setConnectTimeout(var timeoutsec, var timeoutusec);
 
-		/** Sets the authentication timeout in seconds and
-		 *  milliseconds.  Setting either parameter to -1 disables the
-		 *  timeout.   You can also set this timeout using the
-		 *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
-		function setAuthenticationTimeout(var timeoutsec,
-							var timeoutusec);
-
 		/** Sets the response timeout (for queries, commits, rollbacks,
 		 *  pings, etc.) in seconds and milliseconds.  Setting either
 		 *  parameter to -1 disables the timeout.  You can also set

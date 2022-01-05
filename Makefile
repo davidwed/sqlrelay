@@ -35,6 +35,9 @@ install-license:
 	$(CP) COPYING $(licensedir)
 	$(CHMOD) 0644 $(licensedir)/COPYING
 
+install-autoconf:
+	cd autoconf $(AND) $(MAKE) install
+
 install-pkgconfig:
 	$(MKINSTALLDIRS) $(libdir)/pkgconfig
 	$(CP) sqlrelay-c.pc $(libdir)/pkgconfig/$(SQLRELAY)-c.pc
@@ -65,6 +68,9 @@ uninstall-doc:
 
 uninstall-license:
 	$(RMTREE) $(licensedir)
+
+uninstall-autoconf:
+	cd autoconf $(AND) $(MAKE) uninstall
 
 uninstall-pkgconfig:
 	$(RM) $(libdir)/pkgconfig/$(SQLRELAY)-c.pc \
@@ -102,7 +108,7 @@ distclean: clean
 		test/testall.vbs \
 		test/test.sh \
 		test/test.bat \
-		test/sqlrelay.conf \
+		test/sqlrelay.conf.d/*.conf \
 		msvc/setupx64/setupx64.vdproj \
 		msvc/setupx86/setupx86.vdproj \
 		doc/admin/installingpkg.wt \

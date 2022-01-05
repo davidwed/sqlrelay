@@ -1,0 +1,11 @@
+#!/bin/sh
+
+export CLASSPATH=$CLASSPATH:`pwd`/terajdbc4.jar:`pwd`/tdgssconfig.jar
+
+# need oracle jvm for -Xtrace:print ???
+#rm -f xtrace.log
+#/opt/ibm/java-x86_64-80/bin/java \
+	#-Xtrace:properties=xtrace.prop \
+	#-Djava.library.path=`pwd` teradata $@ 2> xtrace.log
+#sed -i '/.*<.*/d' xtrace.log
+java -Djava.library.path=`pwd` teradata $@

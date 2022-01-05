@@ -22,6 +22,7 @@ mandir = @mandir@
 datadir = @datadir@
 docdir = ${datadir}/doc/$(SQLRELAY)
 licensedir = ${datadir}/licenses/$(SQLRELAY)
+acdir = ${datadir}/$(SQLRELAY)/autoconf
 EXAMPLEDIR = ${datadir}/$(SQLRELAY)/examples
 tmpdir = ${localstatedir}/run/$(SQLRELAY)
 cachedir = ${localstatedir}/cache/$(SQLRELAY)
@@ -71,10 +72,11 @@ WNOMISMATCHEDTAGS = @WNOMISMATCHEDTAGS@
 INC = -I
 OBJ = lo
 DIRCPPFLAG = -DBINDIR=\"$(bindir)/\" -DLOCALSTATEDIR=\"$(localstatedir)/\" -DSYSCONFDIR=\"$(sysconfdir)/\" -DLIBEXECDIR=\"$(libexecdir)/\"
+MACOSXDEPLOYMENTTARGET = @MACOSXDEPLOYMENTTARGET@
 
 
 # linker flags
-LTLINK = $(LIBTOOL) --mode=link
+LTLINK = $(MACOSXDEPLOYMENTTARGET) $(LIBTOOL) --mode=link
 LINK = @CXX@
 CCLINK = @CC@
 AR = @AR@
@@ -134,8 +136,8 @@ MICROSOFT = @MICROSOFT@
 
 
 # rudiments library
-RUDIMENTSPATH = @RUDIMENTSPATH@
-RUDIMENTSINCLUDES = @RUDIMENTSINCLUDES@
+RUDIMENTSPREFIX = @RUDIMENTSPREFIX@
+RUDIMENTSINCLUDES = @RUDIMENTSCFLAGS@
 RUDIMENTSLIBS = @RUDIMENTSLIBS@
 RUDIMENTSLIBSPATH = @RUDIMENTSLIBSPATH@ 
 
@@ -226,8 +228,9 @@ else
 PERLMAN3EXT_LOCAL = $(OVERRIDEPERLMAN3EXT)
 endif
 PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
-PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection
-PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor
+PERLLIBS = @PERLLIBS@
+PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection $(PERLLIBS)
+PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor $(PERLLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PERLUSERPATH),yes)
 PERLCONLIBS += -R $(libdir)
@@ -370,15 +373,6 @@ NODEJSCFLAGS = @NODEJSCXXFLAGS@ -I@TOP_BUILDDIR_ABS@/src/api/c++ $(RUDIMENTSINCL
 NODEJSLIBS = -L@TOP_BUILDDIR_ABS@/src/api/c++/.libs -l$(SQLR)client $(RUDIMENTSLIBS)
 
 
-# mysql drop-in
-ENABLE_MYSQL_DROP_IN = @ENABLE_MYSQL_DROP_IN@
-
-
-# postgresql drop-in
-ENABLE_POSTGRESQL_DROP_IN = @ENABLE_POSTGRESQL_DROP_IN@
-PSQLUSERPATH = @PSQLUSERPATH@
-
-
 # libsocket
 SOCKETLIBS = @SOCKETLIBS@
 
@@ -410,13 +404,6 @@ MYSQLLIBS += -R $(MYSQLLIBSPATH)
 endif
 endif
 endif
-MYSQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-MYSQLDRLIBLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
-ifneq ($(strip $(libdir)),)
-ifeq ($(MYSQLUSERPATH),yes)
-MYSQLDRLIBLIBS = -R $(libdir)
-endif
-endif
 
 
 # postgresql
@@ -429,13 +416,6 @@ ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
 ifeq ($(POSTGRESQLUSERPATH),yes)
 POSTGRESQLLIBS += -R $(POSTGRESQLLIBSPATH)
 endif
-endif
-endif
-POSTGRESQLDRLIBCPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-POSTGRESQLDRLIBLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
-ifneq ($(strip $(libdir)),)
-ifeq ($(PSQLUSERPATH),yes)
-POSTGRESQLDRLIBLIBS += -R $(libdir)
 endif
 endif
 
@@ -810,12 +790,19 @@ endif
 
 
 # tests
-TESTALLSUBDIRS = all-dropin all-c all-cpp all-java all-stress all-tcl
+TESTALLSUBDIRS = all-c all-cpp all-java all-protocol all-stress all-tcl
 ifneq ($(HAVE_MONO),)
-	TESTALLSUBDIRS += all-cs
+TESTALLSUBDIRS += all-cs
+endif
+TESTPROTOCOLSUBDIRS =
+ifneq ($(strip $(MYSQLLIBS)),)
+TESTPROTOCOLSUBDIRS += all-mysql
+endif
+ifneq ($(strip $(POSTGRESQLLIBS)),)
+TESTPROTOCOLSUBDIRS += all-postgresql
 endif
 
-CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
+CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES) -I$(top_builddir)
 CPPTESTLIBS = -L$(libdir) -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBEFENCE)
 
 CTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES)
@@ -823,16 +810,6 @@ CTESTLIBS = -L$(libdir) -l$(SQLR)client -l$(SQLR)clientwrapper $(RUDIMENTSLIBS) 
 
 ODBCTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(ODBCINCLUDES)
 ODBCTESTLIBS = $(RUDIMENTSLIBS) $(ODBCLIBS) $(LIBEFENCE)
-
-DROPTINTESTTARGETS = 
-ifneq ($(strip $(MYSQLLIBS)),)
-	DROPINTESTTARGETS += mysql
-endif
-ifneq ($(strip $(POSTGRESQLLIBS)),)
-	DROPINTESTTARGETS += postgresql
-endif
-DROPINTESTCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(includedir) $(RUDIMENTSINCLUDES)
-DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 
 # bench
@@ -861,14 +838,14 @@ MODULERENAME = $(top_builddir)/modulerename.sh
 
 
 # build directories
-INSTALLSUBDIRS = install-src install-bin install-etc install-init install-license
+INSTALLSUBDIRS = install-src install-bin install-etc install-init install-license install-autoconf
 ifeq ($(ENABLE_CPP),yes)
 INSTALLSUBDIRS += install-pkgconfig
 endif
 ifeq ($(ENABLE_DOC),yes)
 INSTALLSUBDIRS += install-man install-doc
 endif
-UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-license uninstall-pkgconfig uninstall-man uninstall-doc
+UNINSTALLSUBDIRS = uninstall-src uninstall-bin uninstall-etc uninstall-init uninstall-license uninstall-autoconf uninstall-pkgconfig uninstall-man uninstall-doc
 
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 SRCALLSUBDIRS = all-api
@@ -878,8 +855,8 @@ SRCALLSUBDIRS += all-util all-configs
 SRCINSTALLSUBDIRS += install-util install-configs
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections
-SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-filters install-triggers install-moduledatas install-connections
+SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-querytranslations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-errortranslations all-filters all-triggers all-moduledatas all-connections
+SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-querytranslations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-errortranslations install-filters install-triggers install-moduledatas install-connections
 endif
 else
 SRCALLSUBDIRS = all-api
@@ -889,8 +866,8 @@ SRCALLSUBDIRS += all-configs all-util
 SRCINSTALLSUBDIRS += install-configs install-util
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-translations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections all-server
-SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-translations install-bindvariabletranslations install-resultsettranslations install-filters install-triggers install-moduledatas install-connections install-server
+SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-querytranslations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections all-server
+SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-querytranslations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-filters install-triggers install-moduledatas install-connections install-server
 endif
 endif
 ifeq ($(ENABLE_CMDLINE),yes)
@@ -900,9 +877,9 @@ endif
 
 
 APIALLSUBDIRS =
-APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-mysql clean-postgresql clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-jdbc clean-tcl clean-erlang
+APICLEANSUBDIRS = clean-cpp clean-c clean-cs clean-odbc clean-python clean-perl clean-ruby clean-php clean-phppdo clean-java clean-jdbc clean-tcl clean-erlang
 APIINSTALLSUBDIRS =
-APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-mysql uninstall-postgresql uninstall-odbc uninstall-java uninstall-jdbc
+APIUNINSTALLSUBDIRS = uninstall-cpp uninstall-c uninstall-cs uninstall-odbc uninstall-java uninstall-jdbc
 ifneq ($(ENABLE_CPP),)
 APIALLSUBDIRS += all-cpp all-c
 APIINSTALLSUBDIRS += install-cpp install-c
@@ -912,14 +889,6 @@ APIALLSUBDIRS += all-cs
 APIINSTALLSUBDIRS += install-cs
 endif
 ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
-ifeq ($(ENABLE_MYSQL_DROP_IN),yes)
-APIALLSUBDIRS += all-mysql
-APIINSTALLSUBDIRS += install-mysql
-endif
-ifeq ($(ENABLE_POSTGRESQL_DROP_IN),yes)
-APIALLSUBDIRS += all-postgresql
-APIINSTALLSUBDIRS += install-postgresql
-endif
 ifneq ($(ENABLE_ODBC_DRIVER),)
 ifneq ($(ODBCLIBS),)
 APIALLSUBDIRS += all-odbc

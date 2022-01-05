@@ -19,11 +19,11 @@ def checkSuccess(value,success)
 end
 
 
-cert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem"
-ca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem"
+cert="../sqlrelay.conf.d/tls/client.pem"
+ca="../sqlrelay.conf.d/tls/ca.pem"
 if RbConfig::CONFIG['host_os'] =~ /mswin/
-	cert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx"
-	ca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx"
+	cert="..\\sqlrelay.conf.d\\tls\\client.pfx"
+	ca="..\\sqlrelay.conf.d\\tls\\ca.pfx"
 end
 
 

@@ -54,6 +54,7 @@ extern	CS_INT	cs_convert(CS_CONTEXT *,CS_DATAFMT *,CS_VOID *,CS_DATAFMT *,CS_VOI
 extern	CS_INT	cs_loc_drop(CS_CONTEXT *,CS_LOCALE *);
 extern	CS_INT	ct_cancel(CS_CONNECTION *,CS_COMMAND *,CS_INT);
 extern	CS_INT	ct_dynamic(CS_COMMAND *,CS_INT,CS_CHAR *,CS_INT,CS_CHAR *,CS_INT);
+extern	CS_INT	cs_dt_crack(CS_CONTEXT *,CS_INT,CS_VOID *,CS_DATEREC *);
 
 }
 #endif
@@ -1832,6 +1833,28 @@ uint16_t freetdscursor::getColumnType(uint32_t col) {
 		case CS_REAL_TYPE:
 			return REAL_DATATYPE;
 		case CS_FLOAT_TYPE:
+			// 0.91 (and earlier?) report decimal/numeric types as
+			// float, at least against sybase.  If we get a float
+			// type, then check for the library version and check
+			// the usertype to decide what it really is, and update
+			// its datatype and maxlength.  The usertype appears to
+			// consistently be 26 for decimals and 10 for numerics.
+			// 
+			// It's a bit of a hack to do this here, because
+			// there's no guarantee that getColumnType will be
+			// called before getColumnLength, or at all, for that
+			// matter, but all existing protocol modules do.
+			if (majorversion==0 && minorversion<=91) {
+				if (column[col].usertype==26) {
+					column[col].datatype=CS_DECIMAL_TYPE;
+					column[col].maxlength=35;
+					return DECIMAL_DATATYPE;
+				} else if (column[col].usertype==10) {
+					column[col].datatype=CS_NUMERIC_TYPE;
+					column[col].maxlength=35;
+					return NUMERIC_DATATYPE;
+				}
+			}
 			return FLOAT_DATATYPE;
 		case CS_TEXT_TYPE:
 			return TEXT_DATATYPE;

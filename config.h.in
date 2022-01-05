@@ -3,6 +3,9 @@
 /* On some platforms NewObjectArray requires a cast */
 #undef CAST_NEW_OBJECT_ARRAY
 
+/* Version */
+#undef CLT_SONAME_VERSION_INFO
+
 /* Version of DB2 */
 #undef DB2VERSION
 
@@ -147,6 +150,9 @@
 /* oci.h */
 #undef HAVE_OCI_H
 
+/* Some systems have odbcinst.h */
+#undef HAVE_ODBCINST_H
+
 /* Oracle 8i or greater */
 #undef HAVE_ORACLE_8i
 
@@ -209,6 +215,9 @@
 
 /* Some systems have SQLLEN/SQLULEN parameters for SQLExtendedFetch */
 #undef HAVE_SQLEXTENDEDFETCH_LEN
+
+/* Some systems have SQLGetPrivateProfileString */
+#undef HAVE_SQLGETPRIVATEPROFILESTRING
 
 /* SQLite supports sqlite3_column_table_name */
 #undef HAVE_SQLITE3_COLUMN_TABLE_NAME
@@ -276,9 +285,6 @@
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
-/* Mingw32 environment */
-#undef MINGW32
-
 /* Some versions of glibc-2.3 need a fixup */
 #undef NEED_REDHAT_9_GLIBC_2_3_2_HACK
 
@@ -342,8 +348,32 @@
 /* replacement for "SQL Relay" */
 #undef SQL_RELAY
 
+/* Version */
+#undef SRV_SONAME_VERSION_INFO
+
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
 /* Load SAP/Sybase libraries at runtime. */
 #undef SYBASE_AT_RUNTIME
+
+/* Haiku OS */
+#undef _HAIKU
+
+/* Irix OS */
+#undef _IRIX
+
+/* Minix */
+#undef _MINIX
+
+/* SCO OSR5 OS */
+#undef _SCO_OSR5
+
+/* SCO OSR6 OS */
+#undef _SCO_OSR6
+
+/* SCO UnixWare OS */
+#undef _SCO_UW
+
+/* Syllable OS */
+#undef _SYLLABLE

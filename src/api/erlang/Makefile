@@ -5,7 +5,7 @@ include ../../../config.mk
 SRCS = erl_comm.c relay_driver.c
 LOBJS = erl_comm.$(OBJ) relay_driver.$(OBJ)
  
-.SUFFIXES: .lo .erl .beam
+.SUFFIXES: .lo .obj .erl .beam
 
 .c.lo:
 	$(LTCOMPILE) $(CC) $(CCFLAGS) $(ERLANGCPPFLAGS) $(COMPILE) $< $(OUT)$@

@@ -39,11 +39,11 @@ var	arraybindvars=["var1","var2","var3","var4","var5"];
 var	arraybindvals=["7","testchar7","testvarchar7","01-JAN-2007","testlong7"];
 var	fieldlens;
 	
-var	cert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem";
-var	ca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem";
+var	cert="../sqlrelay.conf.d/tls/client.pem";
+var	ca="../sqlrelay.conf.d/tls/ca.pem";
 if (/^win/.test(process.platform)) {
-	cert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx";
-	ca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx";
+	cert="..\\sqlrelay.conf.d\\tls\\client.pfx";
+	ca="..\\sqlrelay.conf.d\\tls\\ca.pfx";
 }
 
 // with node10+ we need to use tls1.1 to avoid no-ciphers error on some

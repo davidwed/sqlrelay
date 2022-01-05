@@ -146,7 +146,6 @@ class SQLRConnection : public ObjectWrap {
 		static RET	New(const ARGS &args);
 
 		static RET	setConnectTimeout(const ARGS &args);
-		static RET	setAuthenticationTimeout(const ARGS &args);
 		static RET	setResponseTimeout(const ARGS &args);
 		static RET	setBindVariableDelimiters(const ARGS &args);
 		static RET	getBindVariableDelimiterQuestionMarkSupported(
@@ -311,8 +310,6 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setConnectTimeout",setConnectTimeout);
-	NODE_SET_PROTOTYPE_METHOD(tpl,"setAuthenticationTimeout",
-						setAuthenticationTimeout);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"setResponseTimeout",setResponseTimeout);
 	NODE_SET_PROTOTYPE_METHOD(tpl,
 			"setBindVariableDelimiters",
@@ -411,18 +408,6 @@ RET SQLRConnection::setConnectTimeout(const ARGS &args) {
 	checkArgCount(args,2);
 
 	sqlrcon(args)->setConnectTimeout(toInt32(args[0]),toInt32(args[1]));
-
-	returnVoid();
-}
-
-RET SQLRConnection::setAuthenticationTimeout(const ARGS &args) {
-
-	initLocalScope();
-
-	checkArgCount(args,2);
-
-	sqlrcon(args)->setAuthenticationTimeout(toInt32(args[0]),
-						toInt32(args[1]));
 
 	returnVoid();
 }

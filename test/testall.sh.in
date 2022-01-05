@@ -4,15 +4,9 @@
 # tee output to testdetails.log
 if ( test "$CHILD" != "1" )
 then
-	#FIFO=testall.fifo
-	#rm -f $FIFO
-	#mkfifo $FIFO
-	#CHILD=1 $0 $* > $FIFO 2>&1 &
 	CHILD=1 $0 2>&1 | tee testdetails.log &
 	PID=$!
-	#tee testdetails.log <$FIFO &
 	wait $PID
-	#rm -f $FIFO
 	exit $?
 fi
 
@@ -42,7 +36,7 @@ fi
 sleep 2
 
 # for each database/configuration...
-for DB in  @TESTDBS@
+for DB in @TESTDBS@
 do
 
 	# for tls, krb, and extensions tests, verify that we support oracle
@@ -57,10 +51,22 @@ do
 			continue
 		fi
 
-	# for the mysqlprotocol test, verify that we support the mysql
+	# for the mysqlprotocol test, verify that we support the mysql database
 	elif ( test "$DB" = "mysqlprotocol" )
 	then
 		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_mysql.so 2> /dev/null`" )
+		then
+			echo "skipping $DB..."
+			echo
+			echo "================================================================================"
+			echo
+			continue
+		fi
+
+	# for the postgresqlprotocol test, verify that we support the postgresql database
+	elif ( test "$DB" = "postgresqlprotocol" )
+	then
+		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_postgresql.so 2> /dev/null`" )
 		then
 			echo "skipping $DB..."
 			echo
@@ -94,6 +100,19 @@ do
 		fi
 	fi
 
+	# for mssql tests, also verify that we have an odbc config for it
+	if ( test "$DB" = "mssql" )
+	then
+		if ( test -z "`grep mssqlodbc /etc/odbc.ini 2> /dev/null`" )
+		then
+			echo "skipping $DB..."
+			echo
+			echo "================================================================================"
+			echo
+			continue
+		fi
+	fi
+
 	# testing...
 	echo "testing $DB (from `hostname`)..."
 	echo "$DB..." >> testresults.log
@@ -101,15 +120,15 @@ do
 	# for the router test, start the master/slave instances
 	if ( test "$DB" = "router" )
 	then
-		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id routermaster -backtrace `pwd`
+		$PREFIX/bin/sqlr-start -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id routermaster -backtrace @abs_top_builddir@/test
 		sleep 2
 
-		$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id routerslave -backtrace `pwd`
+		$PREFIX/bin/sqlr-start -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id routerslave -backtrace @abs_top_builddir@/test
 		sleep 2
 	fi
 
 	# start the instance
-	$PREFIX/bin/sqlr-start -config `pwd`/sqlrelay.conf -id ${DB}test -backtrace `pwd`
+	$PREFIX/bin/sqlr-start -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id ${DB}test -backtrace @abs_top_builddir@/test
 	sleep 2
 
 	# make sure that the instance is up
@@ -121,7 +140,7 @@ do
 		echo "pinging $DB..."
 		if ( test "$DB" = "tls" )
 		then
-			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert $PREFIX/etc/sqlrelay.conf.d/client.pem -tlsca $PREFIX/etc/sqlrelay.conf.d/ca.pem -tlsvalidate ca -command ping 2>&1`
+			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert @abs_top_builddir@/test/sqlrelay.conf.d/tls/client.pem -tlsca @abs_top_builddir@/test/sqlrelay.conf.d/tls/ca.pem -tlsvalidate ca -command ping 2>&1`
 		elif ( test "$DB" = "extensions" )
 		then
 			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping 2>&1`
@@ -132,8 +151,36 @@ do
 			then
 				PING="The database is up."
 			fi
+		elif ( test "$DB" = "postgresqlprotocol" )
+		then
+			PING="0: Couldn't connect to the listener."
+			if ( test -n "`netstat -an 2> /dev/null | grep LISTEN | grep 5432`" )
+			then
+				PING="The database is up."
+			fi
+		elif ( test "$DB" = "tdsprotocol" )
+		then
+			PING="0: Couldn't connect to the listener."
+			if ( test -n "`netstat -an 2> /dev/null | grep LISTEN | grep 1433`" )
+			then
+				PING="The database is up."
+			fi
+		elif ( test "$DB" = "oracleprotocol" )
+		then
+			PING="0: Couldn't connect to the listener."
+			if ( test -n "`netstat -an 2> /dev/null | grep LISTEN | grep 1521`" )
+			then
+				PING="The database is up."
+			fi
+		elif ( test "$DB" = "teradataprotocol" )
+		then
+			PING="0: Couldn't connect to the listener."
+			if ( test -n "`netstat -an 2> /dev/null | grep LISTEN | grep 1025`" )
+			then
+				PING="The database is up."
+			fi
 		else
-			PING=`$PREFIX/bin/sqlrsh -id ${DB}test -command ping 2>&1`
+			PING=`$PREFIX/bin/sqlrsh -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id ${DB}test -command ping 2>&1`
 		fi
 
 		# (this collapses whitespace)
@@ -178,13 +225,59 @@ do
 
 			if ( test "$DB" = "mysqlprotocol" )
 			then
-				./dropin/mysql
+				cd protocol/mysql
+				./mysql
 				if ( test "$?" = "0" )
 				then
-					printf "    % 8s: success\n" "dropin" >> testresults.log
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
 				else
-					printf "    % 8s: failed\n" "dropin" >> testresults.log
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
 				fi
+				cd ../..
+			elif ( test "$DB" = "postgresqlprotocol" )
+			then
+				cd protocol/postgresql
+				./postgresql
+				if ( test "$?" = "0" )
+				then
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
+				else
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
+				fi
+				cd ../..
+			elif ( test "$DB" = "tdsprotocol" )
+			then
+				cd protocol/tds
+				./tds
+				if ( test "$?" = "0" )
+				then
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
+				else
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
+				fi
+				cd ../..
+			elif ( test "$DB" = "oracleprotocol" )
+			then
+				cd protocol/oracle
+				./oracle
+				if ( test "$?" = "0" )
+				then
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
+				else
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
+				fi
+				cd ../..
+			elif ( test "$DB" = "teradataprotocol" )
+			then
+				cd protocol/teradata
+				./teradata
+				if ( test "$?" = "0" )
+				then
+					printf "    % 8s: success\n" "protocol" >> ../../testresults.log
+				else
+					printf "    % 8s: failed\n" "protocol" >> ../../testresults.log
+				fi
+				cd ../..
 			else
 				./test.sh $DB
 			fi
@@ -200,13 +293,15 @@ do
 	if ( test "$DB" = "router" )
 	then
 		sleep 2
-		$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id routermaster
+		$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id routermaster
 		sleep 2
-		$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id routerslave
+		$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id routerslave
 	fi
 	sleep 2
-	$PREFIX/bin/sqlr-stop -config `pwd`/sqlrelay.conf -id ${DB}test
+	$PREFIX/bin/sqlr-stop -config @abs_top_builddir@/test/sqlrelay.conf.d/${DB}.conf -id ${DB}test
 	sleep 2
+
+	rm -f log/*.log
 
 	echo
 	echo "================================================================================"

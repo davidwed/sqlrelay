@@ -265,26 +265,6 @@ static VALUE sqlrcon_setConnectTimeout(VALUE self,
 	return Qnil;
 }
 
-static void setAuthenticationTimeout(params *p) {
-	p->sqlrc.sqlrcon->setAuthenticationTimeout(
-					NUM2INT(p->one),NUM2INT(p->two));
-}
-/**
- *  call-seq:
- *  setAuthenticationTimeout(timeoutsec,timeoutusec)
- *
- *  Sets the authentication timeout in seconds and
- *  milliseconds.  Setting either parameter to -1 disables the
- *  timeout.   You can also set this timeout using the
- *  SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable. */
-static VALUE sqlrcon_setAuthenticationTimeout(VALUE self,
-				VALUE timeoutsec, VALUE timeoutusec) {
-	sqlrconnection	*sqlrcon;
-	Data_Get_Struct(self,sqlrconnection,sqlrcon);
-	CON2(sqlrcon,setAuthenticationTimeout,timeoutsec,timeoutusec)
-	return Qnil;
-}
-
 static void setResponseTimeout(params *p) {
 	p->sqlrc.sqlrcon->setResponseTimeout(NUM2INT(p->one),NUM2INT(p->two));
 }
@@ -967,8 +947,6 @@ void Init_SQLRConnection() {
 				(CAST)sqlrcon_new,7);
 	rb_define_method(csqlrconnection,"setConnectTimeout",
 				(CAST)sqlrcon_setConnectTimeout,2);
-	rb_define_method(csqlrconnection,"setAuthenticationTimeout",
-				(CAST)sqlrcon_setAuthenticationTimeout,2);
 	rb_define_method(csqlrconnection,"setResponseTimeout",
 				(CAST)sqlrcon_setResponseTimeout,2);
 	rb_define_method(csqlrconnection,"setBindVariableDelimiters",

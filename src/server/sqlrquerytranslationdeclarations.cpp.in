@@ -1,0 +1,4 @@
+sqlrquerytranslation	*new_sqlrquerytranslation_@module@(
+						sqlrservercontroller *cont,
+						sqlrquerytranslations *sqlts,
+						domnode *parameters);

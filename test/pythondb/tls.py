@@ -12,11 +12,11 @@ import platform
 
 def main():
 
-	tlscert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem"
-	tlsca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem"
+	tlscert="../sqlrelay.conf.d/tls/client.pem"
+	tlsca="../sqlrelay.conf.d/tls/ca.pem"
 	if platform.system()=="Windows":
-		tlscert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx"
-		tlsca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx"
+		tlscert="..\\sqlrelay.conf.d\\tls\\client.pfx"
+		tlsca="..\\sqlrelay.conf.d\\tls\\ca.pfx"
 
 	CSQLRelay.getNumericFieldsAsNumbers()
 

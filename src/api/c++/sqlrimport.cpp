@@ -18,6 +18,8 @@ sqlrimport::sqlrimport() {
 	logindent=0;
 	shutdownflag=NULL;
 	logerrors=true;
+	lowercasecolumnnames=false;
+	uppercasecolumnnames=false;
 }
 
 sqlrimport::~sqlrimport() {
@@ -45,6 +47,29 @@ void sqlrimport::setObjectName(const char *objectname) {
 
 void sqlrimport::setIgnoreColumns(bool ignorecolumns) {
 	this->ignorecolumns=ignorecolumns;
+}
+
+void sqlrimport::mapColumnName(const char *from, const char *to) {
+	if (!to) {
+		columnmap.remove(from);
+	} else {
+		columnmap.setValue(from,to);
+	}
+}
+
+void sqlrimport::mixedCaseColumnNames() {
+	lowercasecolumnnames=false;
+	uppercasecolumnnames=false;
+}
+
+void sqlrimport::lowerCaseColumnNames() {
+	lowercasecolumnnames=true;
+	uppercasecolumnnames=false;
+}
+
+void sqlrimport::upperCaseColumnNames() {
+	lowercasecolumnnames=false;
+	uppercasecolumnnames=true;
 }
 
 void sqlrimport::setCommitCount(uint64_t commitcount) {

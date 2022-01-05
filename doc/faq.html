@@ -308,7 +308,7 @@ through the connection maintained by that daemon.</p>
 
 <p>As of version 1.6.0, the SQL Relay server supports the MySQL/MariaDB client-server protocol, and as of version 1.7.0 supports the PostgreSQL client-server protocol.  All features of the drop-in replacement libraries are covered, support for the protocols is a server-only solution.  See <a href="admin/protocoloptions.html">Client Protocol Options</a> in the configuration guide for details about how to configure SQL Relay to speak the MySQL/MariaDB and PostgreSQL protocols.</p>
 
-<p>The drop-in replacement modules can still be manually enabled in the configure script when building SQL Relay from source.</p>
+<p>Until the 2.0.0 release, the drop-in replacement libraries could still be manually enabled in the configure script when building SQL Relay from source.  In version 2.0.0, the drop-in replacement libraries were removed altogether.</p>
 
 <br/><a name="filtering"/><h3>Can SQL Relay be configured to filter out certain queries?</h3>
 

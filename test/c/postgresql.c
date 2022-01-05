@@ -738,7 +738,7 @@ int	main(int argc, char **argv) {
 	sqlrcur_inputBindString(cur,"3","hello");
 	checkSuccessInt(sqlrcur_executeQuery(cur),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,0),"1");
-	checkSuccessInt(atof(sqlrcur_getFieldByIndex(cur,0,1)),1.1);
+	//checkSuccessInt(atof(sqlrcur_getFieldByIndex(cur,0,1)),1.1);
 	checkSuccessString(sqlrcur_getFieldByIndex(cur,0,2),"hello");
 	sqlrcur_sendQuery(cur,"drop function testfunc(int,float,char(20))");
 	printf("\n");

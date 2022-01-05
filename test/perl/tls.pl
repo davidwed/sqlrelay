@@ -47,11 +47,11 @@ sub checkSuccessString {
 	}
 }
 
-$cert="/usr/local/firstworks/etc/sqlrelay.conf.d/client.pem";
-$ca="/usr/local/firstworks/etc/sqlrelay.conf.d/ca.pem";
+$cert="../sqlrelay.conf.d/tls/client.pem";
+$ca="../sqlrelay.conf.d/tls/ca.pem";
 if ($^O eq "MSWin32") {
-	$cert="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\client.pfx";
-	$ca="C:\\Program Files\\Firstworks\\etc\\sqlrelay.conf.d\\ca.pfx";
+	$cert="..\\sqlrelay.conf.d\\tls\\client.pfx";
+	$ca="..\\sqlrelay.conf.d\\tls\\ca.pfx";
 }
 
 

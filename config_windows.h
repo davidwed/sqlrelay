@@ -1,4 +1,3 @@
-/* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.in by autoheader.  */
 
 /* On some platforms NewObjectArray requires a cast */
@@ -148,6 +147,9 @@
 /* oci.h */
 #define HAVE_OCI_H
 
+/* Some systems have odbcinst.h */
+#define HAVE_ODBCINST_H 1
+
 /* Oracle 8i or greater */
 #define HAVE_ORACLE_8i
 
@@ -202,140 +204,20 @@
 /* Some versions of postgresql have PQsetSingleRowMode */
 #define HAVE_POSTGRESQL_PQSETSINGLEROWMODE 1
 
-/* Do we have SIGABRT */
-#define HAVE_SIGABRT 1
-
-/* Do we have SIGALRM */
-/* #undef HAVE_SIGALRM */
-
-/* Do we have SIGBUS */
-/* #undef HAVE_SIGBUS */
-
-/* Do we have SIGCANCEL */
-/* #undef HAVE_SIGCANCEL */
-
-/* Do we have SIGCHLD */
-/* #undef HAVE_SIGCHLD */
-
-/* Do we have SIGCLD */
-/* #undef HAVE_SIGCLD */
-
-/* Do we have SIGCONT */
-/* #undef HAVE_SIGCONT */
-
-/* Do we have SIGEMT */
-/* #undef HAVE_SIGEMT */
-
-/* Do we have SIGFPE */
-#define HAVE_SIGFPE 1
-
-/* Do we have SIGFREEZE */
-/* #undef HAVE_SIGFREEZE */
-
-/* Do we have SIGHUP */
-/* #undef HAVE_SIGHUP */
-
-/* Do we have SIGILL */
-#define HAVE_SIGILL 1
-
-/* Do we have SIGINT */
-#define HAVE_SIGINT 1
-
-/* Do we have SIGIO */
-/* #undef HAVE_SIGIO */
-
-/* Do we have SIGIOT */
-/* #undef HAVE_SIGIOT */
-
-/* Do we have SIGKILL */
-/* #undef HAVE_SIGKILL */
-
-/* Do we have SIGLOST */
-/* #undef HAVE_SIGLOST */
-
-/* Do we have SIGLWP */
-/* #undef HAVE_SIGLWP */
-
-/* Do we have SIGPIPE */
-/* #undef HAVE_SIGPIPE */
-
-/* Do we have SIGPOLL */
-/* #undef HAVE_SIGPOLL */
-
-/* Do we have SIGPROF */
-/* #undef HAVE_SIGPROF */
-
-/* Do we have SIGPWR */
-/* #undef HAVE_SIGPWR */
-
-/* Do we have SIGQUIT */
-/* #undef HAVE_SIGQUIT */
-
-/* Do we have SIGRTMAX */
-/* #undef HAVE_SIGRTMAX */
-
-/* Do we have SIGRTMIN */
-/* #undef HAVE_SIGRTMIN */
-
-/* Do we have SIGSEGV */
-#define HAVE_SIGSEGV 1
-
-/* Do we have SIGSTKFLT */
-/* #undef HAVE_SIGSTKFLT */
-
-/* Do we have SIGSTOP */
-/* #undef HAVE_SIGSTOP */
-
-/* Do we have SIGSYS */
-/* #undef HAVE_SIGSYS */
-
-/* Do we have SIGTERM */
-#define HAVE_SIGTERM 1
-
-/* Do we have SIGTHAW */
-/* #undef HAVE_SIGTHAW */
-
-/* Do we have SIGTRAP */
-/* #undef HAVE_SIGTRAP */
-
-/* Do we have SIGTSTP */
-/* #undef HAVE_SIGTSTP */
-
-/* Do we have SIGTTIN */
-/* #undef HAVE_SIGTTIN */
-
-/* Do we have SIGTTOU */
-/* #undef HAVE_SIGTTOU */
-
-/* Do we have SIGUNUSED */
-/* #undef HAVE_SIGUNUSED */
-
-/* Do we have SIGURG */
-/* #undef HAVE_SIGURG */
-
-/* Do we have SIGUSR1 */
-/* #undef HAVE_SIGUSR1 */
-
-/* Do we have SIGUSR2 */
-/* #undef HAVE_SIGUSR2 */
-
-/* Do we have SIGVTALRM */
-/* #undef HAVE_SIGVTALRM */
-
-/* Do we have SIGWAITING */
-/* #undef HAVE_SIGWAITING */
-
-/* Do we have SIGWINCH */
-/* #undef HAVE_SIGWINCH */
-
-/* Do we have SIGXCPU */
-/* #undef HAVE_SIGXCPU */
-
-/* Do we have SIGXFSZ */
-/* #undef HAVE_SIGXFSZ */
+/* Some versions of Ruby have ruby/thread.h */
+#define HAVE_RUBY_THREAD_H 1
 
 /* Some systems have SQLConnectW */
-/* #undef HAVE_SQLCONNECTW */
+/* #define HAVE_SQLCONNECTW 1 */
+
+/* Some systems have SQLLEN/SQLULEN parameters for SQLExtendedFetch */
+#define HAVE_SQLEXTENDEDFETCH_LEN 1
+
+/* Some systems have SQLGetPrivateProfileString */
+#define HAVE_SQLGETPRIVATEPROFILESTRING 1
+
+/* SQLite supports sqlite3_column_table_name */
+#define HAVE_SQLITE3_COLUMN_TABLE_NAME 1
 
 /* SQLite supports sqlite3_malloc */
 #define HAVE_SQLITE3_FREE_WITH_CHAR 1
@@ -391,24 +273,14 @@
 /* UnixODBC */
 /* #undef HAVE_UNIXODBC */
 
-/* Do we have _SIGRTMAX */
-/* #undef HAVE__SIGRTMAX */
-
-/* Do we have _SIGRTMIN */
-/* #undef HAVE__SIGRTMIN */
-
 /* Some iconv implementations use a const char ** parameter */
 /* #undef ICONV_CONST_CHAR */
 
 /* Load Informix libraries at runtime. */
 /* #undef INFORMIX_AT_RUNTIME */
 
-/* Define to the sub-directory in which libtool stores uninstalled libraries.
-   */
+/* Define to the sub-directory in which libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
-
-/* Mingw32 environment */
-#define MINGW32 1
 
 /* Some versions of glibc-2.3 need a fixup */
 /* #undef NEED_REDHAT_9_GLIBC_2_3_2_HACK */
@@ -479,5 +351,23 @@
 /* Load SAP/Sybase libraries at runtime. */
 /* #undef SYBASE_AT_RUNTIME */
 
-/* Define to `int' if <sys/types.h> does not define. */
-/* #undef mode_t */
+/* Haiku OS */
+/* #undef _HAIKU */
+
+/* Irix OS */
+/* #undef _IRIX */
+
+/* Minix */
+/* #undef _MINIX */
+
+/* SCO OSR5 OS */
+/* #undef _SCO_OSR5 */
+
+/* SCO OSR6 OS */
+/* #undef _SCO_OSR6 */
+
+/* SCO UnixWare OS */
+/* #undef _SCO_UW */
+
+/* Syllable OS */
+/* #undef _SYLLABLE */

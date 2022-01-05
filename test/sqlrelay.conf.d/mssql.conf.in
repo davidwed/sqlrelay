@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<instances>
+
+	<instance id="mssqltest" port="9000" socket="/tmp/test.socket" dbase="odbc">
+		<users>
+			<user user="testuser" password="testpassword"/>
+		</users>
+		<connections>
+			<connection string="dsn=mssqlodbc;user=testuser;password=testpassword"/>
+		</connections>
+	</instance>
+
+</instances>

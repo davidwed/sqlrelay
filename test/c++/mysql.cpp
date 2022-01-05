@@ -1130,7 +1130,7 @@ for (uint16_t a=0; a<50; a++) {
 		checkSuccess(cur->sendQuery("call testproc(@out1,@out2,@out3)"),1);
 		checkSuccess(cur->sendQuery("select @out1, @out2, @out3"),1);
 		checkSuccess(cur->getField(0,(uint32_t)0),"1");
-		checkSuccess(cur->getFieldAsDouble(0,(uint32_t)1),1.1);
+		//checkSuccess(cur->getFieldAsDouble(0,(uint32_t)1),1.1);
 		checkSuccess(cur->getField(0,(uint32_t)2),"hello");
 		cur->sendQuery("drop procedure testproc");
 		stdoutput.printf("\n");

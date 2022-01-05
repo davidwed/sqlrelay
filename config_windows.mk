@@ -20,6 +20,7 @@ mandir = "@mandir@"
 datadir = "@datadir@"
 docdir = $(datadir)\\doc\\$(SQLRELAY)
 licensedir = $(datadir)\\licenses\\$(SQLRELAY)
+acdir = $(datadir)\\$(SQLRELAY)\\autoconf
 EXAMPLEDIR = $(datadir)\\$(SQLRELAY)\\examples
 tmpdir = $(localstatedir)\\run\\$(SQLRELAY)
 cachedir = $(localstatedir)\\cache\\$(SQLRELAY)
@@ -123,7 +124,7 @@ PTHREADLIB =
 
 
 # rudiments library
-RUDIMENTSPATH =
+RUDIMENTSPREFIX =
 RUDIMENTSINCLUDES = /I"C:\Program Files\Firstworks\include"
 RUDIMENTSLIBS = /LIBPATH:"C:\Program Files\Firstworks\lib" librudiments.lib
 
@@ -411,7 +412,8 @@ CONNECTIONSINSTALLTARGETS = @INSTALLDB2@ @INSTALLFIREBIRD@ @INSTALLMYSQL@ @INSTA
 
 
 # tests
-TESTALLSUBDIRS = all-dropin all-c all-cpp all-cs all-java all-stress all-tcl
+TESTALLSUBDIRS = all-c all-cpp all-cs all-java all-protocol all-stress all-tcl
+TESTPROTOCOLSUBDIRS =
 
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(RUDIMENTSINCLUDES)
 CPPTESTLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib $(RUDIMENTSLIBS)
@@ -421,10 +423,6 @@ CTESTLIBS = /LIBPATH:$(libdir) lib$(SQLR)client.lib lib$(SQLR)clientwrapper.lib 
 
 ODBCTESTCPPFLAGS = $(BASECPPFLAGS) /I $(includedir) $(ODBCINCLUDES)
 ODBCTESTLIBS = $(RUDIMENTSLIBS) $(ODBCLIBS)
-
-DROPINTESTTARGETS = mysql postgresql
-DROPINTESTCPPFLAGS = $(BASECPPFLAGS) /I $(top_builddir) /I $(includedir) $(RUDIMENTSINCLUDES)
-DROPINTESTLIBS = $(RUDIMENTSLIBS)
 
 
 # bench

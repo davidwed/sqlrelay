@@ -49,15 +49,6 @@ class sqlrconnection:
         """
         return CSQLRelay.setConnectTimeout(self.connection, timeoutsec, timeoutusec)
 
-    def setAuthenticationTimeout(self, timeoutsec, timeoutusec):
-        """
-        Sets the authentication timeout in seconds and
-        milliseconds.  Setting either parameter to -1 disables the
-        timeout.   You can also set this timeout using the
-        SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment variable.
-        """
-        return CSQLRelay.setAuthenticationTimeout(self.connection, timeoutsec, timeoutusec)
-
     def setResponseTimeout(self, timeoutsec, timeoutusec):
         """
         Sets the response timeout (for queries, commits, rollbacks,

@@ -717,7 +717,7 @@ void sqlrprotocol::debugStart(const char *title, uint16_t indent) {
 }
 
 void sqlrprotocol::debugEnd() {
-	return debugEnd(0);
+	debugEnd(0);
 }
 
 void sqlrprotocol::debugEnd(uint16_t indent) {
@@ -730,7 +730,7 @@ void sqlrprotocol::debugEnd(uint16_t indent) {
 }
 
 void sqlrprotocol::debugHexDump(const unsigned char *data, uint64_t size) {
-	return debugHexDump(data,size,1);
+	debugHexDump(data,size,1);
 }
 
 void sqlrprotocol::debugHexDump(const unsigned char *data,

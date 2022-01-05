@@ -1894,7 +1894,7 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;users&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password1"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password2"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password2"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password3"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/users&gt;</font></b>
 		...
 	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
@@ -1903,6 +1903,83 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
+<p>If you would prefer not to include passwords directly in the config file, then you can put them in external files, and enclose the full path of each file in square brackets as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/user1.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/user2.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/user3.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example...</p>
+
+<p>The contents of the file /usr/local/firsworks/etc/user1.pwd would be used to authenticate user1, and would contain the text:</p>
+
+<blockquote>
+  <pre>password1
+</pre>
+
+</blockquote>
+<p>The contents of the file /usr/local/firsworks/etc/user2.pwd would be used to authenticate user2, and would contain the text:</p>
+
+<blockquote>
+  <pre>password2
+</pre>
+
+</blockquote>
+<p>The contents of the file /usr/local/firsworks/etc/user3.pwd would be used to authenticate user3, and would contain the text:</p>
+
+<blockquote>
+  <pre>password3
+</pre>
+
+</blockquote>
+<p>This approach is useful if you want to give the files containing the passwords more restrictive permissions than the config file itself, or possibly for other reasons.</p>
+
+<p>( <b>NOTE:</b> Trailing whitespace is ignored when passwords are stored in external files.)</p>
+
+<p>If you would prefer not to use full pathnames inside of each set of square brackets, then you can  specify a <i>passwordpath</i> attribute in the instance tag, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	...
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> ... <font color="#009900">passwordpath</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc"</font><b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;users&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[user1.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[user2.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[user3.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/users&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+	...
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this case, the path /usr/local/firstworks/etc will be searched for the files user1.pwd, user2.pwd, and user3.pwd.</p>
+
 <a name="sqlrclientdbauth"/><h3>Database Auth</h3>
 
 <p>Another popular authentication/authorization option is <i>database</i> auth.</p>
@@ -2471,6 +2548,95 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
+<p>If you would prefer not to include passwords directly in the config file, then you can put them in external files, and enclose the full path of each file in square brackets as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oneuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/oneuser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"anotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/anotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"yetanotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/yetanotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example...</p>
+
+<p>The contents of the file /usr/local/firsworks/etc/oneuser.pwd would be used to authenticate oneuser, and would contain the text:</p>
+
+<blockquote>
+  <pre>onepassword
+</pre>
+
+</blockquote>
+<p>The contents of the file /usr/local/firsworks/etc/anotheruser.pwd would be used to authenticate anotheruser, and would contain the text:</p>
+
+<blockquote>
+  <pre>anotherpassword
+</pre>
+
+</blockquote>
+<p>The contents of the file /usr/local/firsworks/etc/yetanotheruser.pwd would be used to authenticate yetanotheruser, and would contain the text:</p>
+
+<blockquote>
+  <pre>yetanotherpassword
+</pre>
+
+</blockquote>
+<p>This approach is useful if you want to give the files containing the passwords more restrictive permissions than the config file itself, or possibly for other reasons.</p>
+
+<p>( <b>NOTE:</b> Trailing whitespace is ignored when passwords are stored in external files.)</p>
+
+<p>If you would prefer not to use full pathnames inside of each set of square brackets, then you can  specify a <i>passwordpath</i> attribute in the instance tag, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">passwordpath</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oneuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[oneuser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"anotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[anotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"yetanotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[yetanotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this case, the path /usr/local/firstworks/etc will be searched for the files oneuser.pwd, anotheruser.pwd, and yetanotheruser.pwd.</p>
+
 <p>When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.</p>
 
 <a name="mysqldbauth"/><h3>Database Auth</h3>
@@ -3101,6 +3267,95 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
+<p>If you would prefer not to include passwords directly in the config file, then you can put them in external files, and enclose the full path of each file in square brackets as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oneuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/oneuser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"anotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/anotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"yetanotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/yetanotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this example...</p>
+
+<p>The contents of the file /usr/local/firsworks/etc/oneuser.pwd would be used to authenticate oneuser, and would contain the text:</p>
+
+<blockquote>
+  <pre>onepassword
+</pre>
+
+</blockquote>
+<p>The contents of the file /usr/local/firsworks/etc/anotheruser.pwd would be used to authenticate anotheruser, and would contain the text:</p>
+
+<blockquote>
+  <pre>anotherpassword
+</pre>
+
+</blockquote>
+<p>The contents of the file /usr/local/firsworks/etc/yetanotheruser.pwd would be used to authenticate yetanotheruser, and would contain the text:</p>
+
+<blockquote>
+  <pre>yetanotherpassword
+</pre>
+
+</blockquote>
+<p>This approach is useful if you want to give the files containing the passwords more restrictive permissions than the config file itself, or possibly for other reasons.</p>
+
+<p>( <b>NOTE:</b> Trailing whitespace is ignored when passwords are stored in external files.)</p>
+
+<p>If you would prefer not to use full pathnames inside of each set of square brackets, then you can  specify a <i>passwordpath</i> attribute in the instance tag, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">passwordpath</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oneuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[oneuser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"anotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[anotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"yetanotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[yetanotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this case, the path /usr/local/firstworks/etc will be searched for the files oneuser.pwd, anotheruser.pwd, and yetanotheruser.pwd.</p>
+
 <p>When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.</p>
 
 <p>If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  Unfortunately there isn't currently a <i>postgresql_database</i> auth module that can be used to auth users directly against the database, so for now this is the only option.</p>

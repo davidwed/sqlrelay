@@ -16,3 +16,7 @@
 		uint32_t	logindent;
 		bool		*shutdownflag;
 		bool		logerrors;
+
+		bool		lowercasecolumnnames;
+		bool		uppercasecolumnnames;
+		dictionary<const char *, const char *>	columnmap;

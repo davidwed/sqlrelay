@@ -183,7 +183,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getDebugBulkLoad()=0;
 		virtual bool		getDebugParser()=0;
 		virtual bool		getDebugDirectives()=0;
-		virtual bool		getDebugTranslations()=0;
+		virtual bool		getDebugQueryTranslations()=0;
 		virtual bool		getDebugFilters()=0;
 		virtual bool		getDebugTriggers()=0;
 		virtual bool		getDebugBindTranslations()=0;
@@ -192,6 +192,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getDebugResultSetRowTranslations()=0;
 		virtual bool		getDebugResultSetRowBlockTranslations()=0;
 		virtual bool		getDebugResultSetHeaderTranslations()=0;
+		virtual bool		getDebugErrorTranslations()=0;
 		virtual bool		getDebugProtocols()=0;
 		virtual bool		getDebugAuths()=0;
 		virtual bool		getDebugPasswordEncryptions()=0;
@@ -241,13 +242,14 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual domnode	*getListeners()=0;
 		virtual domnode	*getParser()=0;
 		virtual domnode	*getDirectives()=0;
-		virtual domnode	*getTranslations()=0;
+		virtual domnode	*getQueryTranslations()=0;
 		virtual domnode	*getFilters()=0;
 		virtual domnode	*getBindVariableTranslations()=0;
 		virtual domnode	*getResultSetTranslations()=0;
 		virtual domnode	*getResultSetRowTranslations()=0;
 		virtual domnode	*getResultSetRowBlockTranslations()=0;
 		virtual domnode	*getResultSetHeaderTranslations()=0;
+		virtual domnode	*getErrorTranslations()=0;
 		virtual domnode	*getTriggers()=0;
 		virtual domnode	*getLoggers()=0;
 		virtual domnode	*getNotifications()=0;
@@ -266,6 +268,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual uint32_t		getMetricTotal()=0;
 
 		virtual linkedlist< routecontainer * >	*getRouteList()=0;
+
+	#include <sqlrelay/private/sqlrconfig.h>
 };
 
 class SQLRUTIL_DLLSPEC sqlrconfigs {

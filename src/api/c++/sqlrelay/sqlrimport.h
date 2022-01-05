@@ -45,13 +45,26 @@ class SQLRCLIENT_DLLSPEC sqlrimport {
 		 *
 		 *  If "ignorecolumns" is set true, then any column information
 		 *  included in the import file will be ignored.  Import data
-		 *  will be assumed to be in the same coumn-order as the
+		 *  will be assumed to be in the same column-order as the
 		 *  column-order of the table.  This is useful, for example,
 		 *  when a CSV header contains different column names than the
 		 *  table.
 		 *
 		 *  Defaults to false. */
 		void	setIgnoreColumns(bool ignorecolumns);
+
+		/** Maps column name "from" to "to".  If "to" is NULL then
+		 *  the column is unmapped. */
+		void	mapColumnName(const char *from, const char *to);
+
+		/** Leaves column names as-is. */
+		void	mixedCaseColumnNames();
+
+		/** Lower-cases colum names. */
+		void	lowerCaseColumnNames();
+
+		/** Upper-cases colum names. */
+		void	upperCaseColumnNames();
 
 		/** Call commit after every "commitcount" inserts.  If set to 0
 		 *  then no commits will be called and the commit behavior will

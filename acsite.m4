@@ -1,1036 +1,3 @@
-AC_DEFUN([FW_GMAKE],
-[
-AC_MSG_CHECKING(for GNU Make)
-if ( test -n "make -v | grep 'GNU Make'" )
-then
-	MAKE="make"
-	AC_MSG_RESULT(yes)
-else
-	if ( test -n "gmake -v | grep 'GNU Make'" )
-	then
-		MAKE="gmake"
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-		AC_MSG_ERROR(GNU make not found.  SQL-Relay requires GNU make.)
-	fi
-fi
-])
-
-AC_DEFUN([FW_VERSION],
-[
-if ( test -n "$2" )
-then
-	echo "$1 version... $2"
-fi
-])
-
-AC_DEFUN([FW_INCLUDES],
-[
-if ( test -n "$2" )
-then
-	echo "$1 includes... $2"
-fi
-])
-
-AC_DEFUN([FW_LIBS],
-[
-if ( test -n "$2" )
-then
-	echo "$1 libs... $2"
-fi
-])
-
-AC_DEFUN([FW_CHECK_FILE],
-[
-dnl echo "check: $1"
-if ( test -r "$1" )
-then
-	eval "$2"
-fi
-])
-
-AC_DEFUN([FW_TRY_LINK],
-[
-SAVECPPFLAGS="$CPPFLAGS"
-SAVELIBS="$LIBS"
-SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
-CPPFLAGS="$3"
-LIBS="$4"
-LD_LIBRARY_PATH="$5"
-export LD_LIBRARY_PATH
-AC_TRY_LINK([$1],[$2],[$6],[$7])
-CPPFLAGS="$SAVECPPFLAGS"
-LIBS="$SAVELIBS"
-LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
-export LD_LIBRARY_PATH
-])
-
-
-AC_DEFUN([FW_TRY_COMPILE],
-[
-SAVECPPFLAGS="$CPPFLAGS"
-CPPFLAGS="$3"
-AC_TRY_COMPILE([$1],[$2],[$4],[$5])
-CPPFLAGS="$SAVECPPFLAGS"
-])
-
-
-AC_DEFUN([FW_CHECK_LIB],
-[
-FOUNDLIB=""
-FW_CHECK_FILE($1,[FOUNDLIB=\"yes\"])
-if ( test -n "$FOUNDLIB" )
-then
-	eval "$2"
-else
-	if ( test -n "$3" )
-	then
-		FW_CHECK_FILE($3,[FOUNDLIB=\"yes\"])
-		if ( test -n "$FOUNDLIB" )
-		then
-			eval "$4"
-		fi
-	fi
-fi
-])
-
-
-AC_DEFUN([FW_CHECK_HEADER_LIB],
-[
-FOUNDHEADER=""
-FOUNDLIB=""
-FW_CHECK_FILE([$1],[FOUNDHEADER=\"yes\"])
-FW_CHECK_FILE([$3],[FOUNDLIB=\"yes\"])
-if ( test -n "$FOUNDLIB" )
-then
-	if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-	then
-		eval "$2"
-		eval "$4"
-	fi
-else
-	if ( test -n "$5" -a -n "$6" )
-	then
-		FW_CHECK_FILE([$5],[FOUNDLIB=\"yes\"])
-		if ( test -n "$FOUNDHEADER" -a -n "$FOUNDLIB" )
-		then
-			eval "$2"
-			eval "$6"
-		fi
-	fi
-fi
-])
-
-
-
-AC_DEFUN([FW_CHECK_HEADERS_AND_LIBS],
-[
-
-SEARCHPATH=$1
-NAME=$2
-HEADER=$3
-LIBNAME=$4
-LINKSTATIC=$5
-LINKRPATH=$6
-USEFULLLIBPATH=$12
-INCLUDESTRING=""
-LIBSTRING=""
-LIBPATH=""
-STATIC=""
-HEADERSANDLIBSPATH=""
-
-eval "$7=\"\""
-eval "$8=\"\""
-eval "$9=\"\""
-eval "$10=\"\""
-if ( test -n "$11" )
-then
-	eval "$11=\"\""
-fi
-
-
-for path in "$SEARCHPATH" "/" "/usr" "/usr/local/$NAME" "/opt/$NAME" "/usr/$NAME" "/usr/local" "/usr/pkg" "/usr/pkg/$NAME" "/opt/sfw" "/opt/sfw/$NAME" "/usr/sfw" "/usr/sfw/$NAME" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources/firstworks" "/Library/$NAME" "/usr/local/firstworks"
-do
-	if ( test -n "$path" -a -d "$path" )
-	then
-
-		if ( test "$path" = "/" )
-		then
-			dnl look in /usr/include and /lib and /lib64
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib\"; LIBSTRING=\"-Wl,/lib/lib$LIBNAME.$SOSUFFIX\"],[/lib/lib$LIBNAME.a],[LIBSTRING=\"/lib/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-			else
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib\"; LIBSTRING=\"-l$LIBNAME\"],[/lib/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-			fi
-
-			if ( test "$USEFULLLIBPATH" = "yes" )
-			then
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib64/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib64\"; LIBSTRING=\"-Wl,/lib64/lib$LIBNAME.$SOSUFFIX\"],[/lib64/lib$LIBNAME.a],[LIBSTRING=\"/lib64/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-			else
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/lib64/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/lib64\"; LIBSTRING=\"-l$LIBNAME\"],[/lib64/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-			fi
-			
-
-			dnl set path to "" so we won't get //'s from here on
-			path=""
-		fi
-
-
-		for libpath in "$path/lib64" "$path/lib64/$NAME" "$path/lib64/opt" "$path/lib64/$MULTIARCHDIR" "$path/lib" "$path/lib/$NAME" "$path/lib/opt" "$path/lib/$MULTIARCHDIR"
-		do
-
-			if ( test -n "$LIBSTRING" )
-			then
-				break
-			fi
-
-			for includepath in "$path/include" "$path/include/$NAME"
-			do
-
-				if ( test -n "$LIBSTRING" )
-				then
-					break
-				fi
-
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
-			done
-		done
-
-		if ( test -n "$LIBSTRING" )
-		then
-			HEADERSANDLIBSPATH="$path"
-			break
-		fi
-	fi
-done
-
-dnl remove -I/usr/include, -L/lib, -L/usr/lib, -L/lib64 and -L/usr/lib64
-INCLUDESTRING=`echo $INCLUDESTRING | sed -e "s|-I/usr/include$||g" -e "s|-I/usr/include ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib$||g" -e "s|-L/lib$||g" -e "s|-L/usr/lib ||g" -e "s|-L/lib ||g"`
-LIBSTRING=`echo $LIBSTRING | sed -e "s|-L/usr/lib64$||g" -e "s|-L/lib64$||g" -e "s|-L/usr/lib64 ||g" -e "s|-L/lib64 ||g"`
-
-eval "$7=\"$INCLUDESTRING\""
-eval "$8=\"$LIBSTRING\""
-eval "$9=\"$LIBPATH\""
-eval "$10=\"$STATIC\""
-if ( test -n "$11" )
-then
-	eval "$11=\"$HEADERSANDLIBSPATH\""
-fi
-])
-
-
-dnl override libtool if so desired
-dnl a bit crude, but AC_PROG_LIBTOOL sets vital
-dnl environment variables, it seems
-AC_DEFUN([FW_CHECK_USE_SYSTEM_LIBTOOL],
-[
-if ( test "$USE_SYSTEM_LIBTOOL" = "yes" )
-then
-  LIBTOOL="libtool"
-fi
-])
-
-
-dnl checks if the linker supports -rpath
-dnl sets the enviroment variable RPATHFLAG
-AC_DEFUN([FW_CHECK_LD_RPATH],
-[
-AC_MSG_CHECKING(whether ld -rpath works)
-ld -rpath /usr/lib 2> conftest
-INVALID="`grep 'no input files' conftest`"
-if ( test -n "$INVALID" )
-then
-	RPATHFLAG="yes"
-	AC_MSG_RESULT(yes)
-else
-	RPATHFLAG=""
-	AC_MSG_RESULT(no)
-fi
-rm conftest
-])
-
-
-dnl sets the substitution variable UNAME with the uname of the machine
-AC_DEFUN([FW_CHECK_UNAME],
-[
-UNAME=`uname -s`
-AC_SUBST(UNAME)
-])
-
-
-dnl checks to see if -pipe option to gcc works or not
-AC_DEFUN([FW_CHECK_PIPE],
-[
-AC_MSG_CHECKING(for -pipe option)
-FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-pipe],[],[],[PIPE="-pipe"],[PIPE=""])
-if ( test -n "$PIPE" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-AC_SUBST(PIPE)
-])
-
-
-dnl checks to see if -fPIC option to gcc works or not
-AC_DEFUN([FW_CHECK_FPIC],
-[
-AC_MSG_CHECKING(for -fPIC option)
-FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-fPIC],[],[],[FPIC="-fPIC"],[FPIC=""])
-if ( test -n "$FPIC" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-AC_SUBST(FPIC)
-])
-
-
-dnl checks to see if -Werror option works or not
-AC_DEFUN([FW_CHECK_WERROR],
-[
-WERROR=""
-if ( test "$ENABLE_WERROR" = "yes" )
-then
-
-	AC_MSG_CHECKING(for -Werror)
-	FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Werror],[],[],[WERROR="-Werror"])
-
-	dnl if -Werror appers to be supported...
-	if ( test -n "$WERROR" )
-	then
-
-		dnl disable -Werror with gcc < 2.7 because
-		dnl it misinterprets placement new
-		CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
-
-		dnl Newer versions of gcc output the version differently
-		dnl and the above results in "g+".  These all work correctly.
-		if ( test "$CXX_VERSION" != "g+" )
-		then
-			dnl older versions output something like 27, 28, 29, etc.
-			if (  test "$CXX_VERSION" -lt "27" )
-			then
-				WERROR=""
-			fi
-		fi
-
-	fi
-
-	if ( test -n "$WERROR" )
-	then
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi
-fi
-AC_SUBST(WERROR)
-])
-
-
-dnl checks to see if -Wall option works or not
-AC_DEFUN([FW_CHECK_WALL],
-[
-WALL=""
-if ( test "$ENABLE_WALL" = "yes" )
-then
-	AC_MSG_CHECKING(for -Wall)
-	FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wall],[],[],[WALL="-Wall"])
-	if ( test -n "$WALL" )
-	then
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi
-
-	if ( test -n "$WALL" )
-	then
-		dnl Sometimes -Wall includes -Wunused-variables and
-		dnl -Wunused-parameters which we don't care about.  Disable it
-		dnl if it does.
-		OLDCPPFLAGS=$CPPFLAGS
-		CPPFLAGS="$WALL $WERROR $CPPFLAGS"
-		AC_MSG_CHECKING(whether -Wall includes -Wunused-*)
-		AC_TRY_COMPILE([void f(int a) { return; }],[f(1);],AC_MSG_RESULT(no),WALL=""; AC_MSG_RESULT(yes))	
-		CPPFLAGS=$OLDCPPFLAGS
-	fi
-fi
-	
-AC_SUBST(WALL)
-])
-
-
-
-dnl checks to see if -Wno-overloaded-virtual option is needed
-AC_DEFUN([FW_CHECK_WNOOVERLOADEDVIRTUAL],
-[
-
-WNOOVERLOADEDVIRTUAL=""
-AC_MSG_CHECKING(whether -Wno-overloaded-virtual is needed)
-
-# clang's -Wall includes -Woverloaded-virtual, which we don't want
-if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
-then
-	WNOOVERLOADEDVIRTUAL="-Wno-overloaded-virtual"
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-
-AC_SUBST(WNOOVERLOADEDVIRTUAL)
-])
-
-
-
-dnl checks to see if -Wno-mismatched-tags option is needed
-AC_DEFUN([FW_CHECK_WNOMISMATCHEDTAGS],
-[
-
-WNOMISMATCHEDTAGS=""
-AC_MSG_CHECKING(whether -Wno-mismatched-tags is needed)
-
-# clang's -Wall includes -Wmismatched-tags, which we don't want
-if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
-then
-	WNOMISMATCHEDTAGS="-Wno-mismatched-tags"
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-
-AC_SUBST(WNOMISMATCHEDTAGS)
-])
-
-
-
-dnl checks to see if -g3 option works or not
-AC_DEFUN([FW_CHECK_DEBUG],
-[
-if ( test "$DEBUG" = "yes" )
-then
-	AC_MSG_CHECKING(for -g3)
-	FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-g3],[],[],[DBG="-g3"],[DBG="-g"])
-	if ( test "$DBG" = "-g3" )
-	then
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi
-	CFLAGS="$CFLAGS $DBG"
-	CXXFLAGS="$CXXFLAGS $DBG"
-fi
-])
-
-
-
-dnl checks to see if ld --disable-new-dtags option works or not
-AC_DEFUN([FW_CHECK_NEW_DTAGS],
-[
-	AC_MSG_CHECKING(for -disable-new-dtags)
-	FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wl,--disable-new-dtags],[],[],[DISABLE_NEW_DTAGS="-Wl,--disable-new-dtags"],[DISABLE_NEW_DTAGS=""])
-	if ( test "$DISABLE_NEW_DTAGS" = "-Wl,--disable-new-dtags" )
-	then
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi
-	AC_SUBST(DISABLE_NEW_DTAGS)
-])
-
-
-dnl Checks for multiarch platform
-AC_DEFUN([FW_CHECK_MULTIARCH],
-[
-AC_MSG_CHECKING(for multiarch platform)
-MULTIARCHDIR="`$CC $CPPFLAGS -print-multiarch 2> /dev/null`"
-
-dnl $CC -print-multiarch doesn't return anything on most platforms,
-dnl but we need the multiarch dir to find python on some platforms,
-dnl (eg. python3.6 on fedora 26) so, we'll attempt to finagle it...
-if ( test -z "$MULTIARCHDIR" )
-then
-	MAARCH=`uname -m 2> /dev/null`
-	MAOS=`uname -o 2> /dev/null`
-	if ( test "$MAOS" = "GNU/Linux" )
-	then
-		MAOS="linux-gnu"
-	fi
-	MULTIARCHDIR="$MAARCH-$MAOS"
-fi
-
-if ( test -n "$MULTIARCHDIR" )
-then
-	AC_MSG_RESULT($MULTIARCHDIR)
-else
-	AC_MSG_RESULT(no)
-fi
-])
-
-
-dnl check for x64 platform - important for SAP/Sybase and DB2 detection
-AC_DEFUN([FW_CHECK_X64],
-[
-ARCH=""
-if ( test "$host_cpu" = "ia64" -o "$host_cpu" = "x86_64" -o "$host_cpu" = "amd64" )
-then
-	ARCH="x64"
-fi
-])
-
-
-dnl Checks for microsoft platform.
-dnl sets the substitution variables MINGW32, CYGWIN and UWIN as appropriate
-dnl sets the enviroment variable MICROSOFT
-AC_DEFUN([FW_CHECK_MICROSOFT],
-[
-AC_MSG_CHECKING(for microsoft platform)
-CYGWIN=""
-MINGW32=""
-UWIN=""
-case $host_os in
-	*cygwin* )
-		CYGWIN="yes"
-		AC_MSG_RESULT(cygwin)
-		;;
-	*mingw32* )
-		MINGW32="yes"
-		AC_MSG_RESULT(mingw32)
-		;;
-	*uwin* )
-		UWIN="yes"
-		AC_MSG_RESULT(uwin)
-		;;
-	* )
-		AC_MSG_RESULT(no)
-		;;
-esac
-EXE=""
-AC_SUBST(MINGW32)
-AC_SUBST(CYGWIN)
-AC_SUBST(UWIN)
-
-MICROSOFT=""
-if ( test "$UWIN" = "yes" -o "$MINGW32" = "yes" -o "$CYGWIN" = "yes" )
-then
-	MICROSOFT="yes"
-	EXE=".exe"
-fi
-
-AC_SUBST(EXE)
-AC_SUBST(MICROSOFT)
-
-if ( test "$MINGW32" )
-then
-	AC_DEFINE(MINGW32,1,Mingw32 environment)
-
-	dnl if we're building mingw32, we're cross-compiling by definition
-	cross_compiling="yes"
-fi
-])
-
-
-AC_DEFUN([FW_CHECK_OSX],
-[
-DARWIN=""
-AC_MSG_CHECKING(for OSX)
-case $host_os in
-	*darwin* )
-		DARWIN="yes"
-		AC_MSG_RESULT(yes)
-		FW_CHECK_WNOLONGDOUBLE
-
-		dnl prefer bash to the default shell, which could be tcsh or
-		dnl zsh on older versions, and which doesn't run libtool very
-		dnl well
-		BASH=`which bash`
-		if ( test -n "$BASH" )
-		then
-			SHELL="$BASH"
-			AC_SUBST(SHELL)
-		fi
-		;;
-	* )
-		AC_MSG_RESULT(no)
-		;;
-esac
-])
-
-
-dnl checks to see if -Wno-unknown-pragmas option to gcc works or not
-dnl (old versions of gcc with old versions of java might need this)
-AC_DEFUN([FW_CHECK_WNOUNKNOWNPRAGMAS],
-[
-AC_MSG_CHECKING(for -Wno-unknown-pragmas option)
-FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wno-unknown-pragmas],[],[],[WNOUNKNOWNPRAGMAS="-Wno-unknown-pragmas"],[WNOUNKNOWNPRAGMAS=""])
-if ( test -n "$WNOUNKNOWNPRAGMAS" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-AC_SUBST(WNOUNKNOWNPRAGMAS)
-])
-
-
-dnl checks to see if -Wno-long-double option to gcc works or not
-AC_DEFUN([FW_CHECK_WNOLONGDOUBLE],
-[
-AC_MSG_CHECKING(for -Wno-long-double option)
-FW_TRY_LINK([#include <stdio.h>],[printf("hello");],[-Wall -Wno-long-double -Werror],[],[],[WNOLONGDOUBLE="-Wno-long-double"],[WNOLONGDOUBLE=""])
-if ( test -n "$WNOLONGDOUBLE" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-AC_SUBST(WNOLONGDOUBLE)
-])
-
-
-dnl checks to see if -Wno-error=date-time
-AC_DEFUN([FW_CHECK_WNOERRORDATETIME],
-[
-AC_MSG_CHECKING(for -Wno-error=date-time)
-FW_TRY_LINK([#include <stdio.h>],[printf("%s %s\n",__DATE__,__TIME__);],[-Wall -Werror -Wno-error=date-time],[],[],[WNOERRORDATETIME="-Wno-error=date-time"],[WNOERRORDATETIME=""])
-if ( test -n "$WNOERRORDATETIME" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-AC_SUBST(WNOERRORDATETIME)
-])
-
-
-dnl Checks for minix and adds some macros if it is
-AC_DEFUN([FW_CHECK_MINIX],
-[
-AC_MSG_CHECKING(for minix)
-case $host_os in
-	*minix* )
-		CPPFLAGS="$CPPFLAGS -D_MINIX -D_POSIX_SOURCE -D_NETBSD_SOURCE -D_XOPEN_SOURCE -D_XOPEN_SOURCE_EXTENDED"
-		AC_MSG_RESULT(yes)
-		;;
-	* )
-		AC_MSG_RESULT(no)
-		;;
-esac
-])
-
-dnl Checks for haiku and adds some macros if it is
-AC_DEFUN([FW_CHECK_HAIKU],
-[
-AC_MSG_CHECKING(for haiku)
-case $host_os in
-	*haiku* )
-		if ( test "$prefix" = "NONE" )
-		then
-			prefix="/boot/common"
-		fi
-		AC_MSG_RESULT(yes)
-		;;
-	* )
-		AC_MSG_RESULT(no)
-		;;
-esac
-])
-
-dnl Checks for syllable
-AC_DEFUN([FW_CHECK_SYLLABLE],
-[
-AC_MSG_CHECKING(for syllable)
-case $host_os in
-	*syllable* )
-		if ( test "$prefix" = "NONE" )
-		then
-			prefix="/resources/firstworks"
-		fi
-		AC_MSG_RESULT(yes)
-		;;
-	* )
-		AC_MSG_RESULT(no)
-		;;
-esac
-])
-
-AC_DEFUN([FW_CHECK_SCO_OSR6],
-[
-AC_MSG_CHECKING(for SCO OSR = 6.0.0)
-if ( test "`uname -s`" = "SCO_SV" )
-then
-	if ( test "`uname -v | tr -d '.'`" -eq "600" )
-	then
-		CPPFLAGS="$CPPFLAGS -D__STDC__=0"
-		AC_MSG_RESULT(yes)
-	else
-		AC_MSG_RESULT(no)
-	fi
-else
-	AC_MSG_RESULT(no)
-fi
-])
-
-AC_DEFUN([FW_CHECK_SCO_UW],
-[
-HAVE_SCO_UW=""
-AC_MSG_CHECKING(for UnixWare)
-if ( test "`uname -s`" = "UnixWare" -a "`uname os_provider 2> /dev/null`" = "SCO" )
-then
-	HAVE_SCO_UW="yes"
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-])
-
-
-AC_DEFUN([FW_CHECK_F_NO_BUILTIN],
-[
-dnl Some environments throw warnings if stdlib is used because it redefines
-dnl built-in functions abort() exit().  On those platforms we'll include the
-dnl -fno-builtin flag.
-OLDCPPFLAGS="$CPPFLAGS"
-CPPFLAGS="-Wall -Werror $CPPFLAGS"
-AC_MSG_CHECKING(whether -fno-builtin needs to be used)
-
-STDLIB_TEST="no"
-AC_TRY_COMPILE([#include <stdlib.h>],[],STDLIB_TEST="yes")
-CPPFLAGS="$OLDCPPFLAGS"
-
-dnl If that failed, try again with -fno-builtin
-if ( test "$STDLIB_TEST" = "no" )
-then
-	OLDCPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="-fno-builtin -Wall -Werror $CPPFLAGS"
-	AC_TRY_COMPILE([#include <stdlib.h>],[],STDLIB_TEST="yes")
-
-	dnl if that also failed then restore CPPFLAGS,
-	dnl the platform probably just doesn't have stdlib.h
-	if ( test "$STDLIB_TEST" = "no" )
-	then
-		CPPFLAGS="$OLDCPPFLAGS"
-		AC_MSG_RESULT(no)
-	else
-		CPPFLAGS="-fno-builtin $OLDCPPFLAGS"
-		AC_MSG_RESULT(yes)
-	fi
- else
-	AC_MSG_RESULT(no)
-fi
-])
-
-
-dnl Determines what extension shared object files have
-AC_DEFUN([FW_CHECK_SO_EXT],
-[
-AC_MSG_CHECKING(for dynamic library extensions)
-SOSUFFIX="so"
-MODULESUFFIX="so"
-JNISUFFIX="so"
-if ( test -n "$CYGWIN" )
-then
-	SOSUFFIX="dll.a"
-fi
-if ( test -n "$DARWIN" )
-then
-	SOSUFFIX="dylib"
-	MODULESUFFIX="bundle"
-	JNISUFFIX="jnilib"
-fi
-AC_MSG_RESULT(so=>$SOSUFFIX module=>$MODULESUFFIX jni=>$JNISUFFIX)
-AC_SUBST(SOSUFFIX)
-AC_SUBST(MODULESUFFIX)
-AC_SUBST(JNISUFFIX)
-AC_DEFINE_UNQUOTED(SQLRELAY_MODULESUFFIX,"$MODULESUFFIX",Suffix for loadable modules)
-])
-
-dnl Determines what extension shared object files have
-AC_DEFUN([FW_CHECK_PLUGIN_DEPENDENCIES],
-[
-AC_MSG_CHECKING(for plugin dependencies)
-PYTHONFRAMEWORK=""
-if (test -n "$DARWIN" )
-then
-	PYTHONFRAMEWORK="-framework Python"
-	AC_MSG_RESULT(OSX style)
-else
-	AC_MSG_RESULT(standard unix style)
-fi
-AC_SUBST(PYTHONFRAMEWORK)
-])
-
-dnl checks if the compiler supports the inline keyword
-dnl defines the macro INLINE
-AC_DEFUN([FW_CHECK_INLINE],
-[
-AC_MSG_CHECKING(inline)
-INLINE="inline"
-dnl intel optimizing compiler doesn't have inlines, assume that CC doesn't
-dnl either even though it might, this test needs to be more robust
-if ( test "$CXX" = "icc" -o "$CXX" = "CC" )
-then
-	INLINE=""
-else 
-	dnl redhat's gcc 2.96 has problems with inlines
-	CXX_VERSION=`$CXX --version`
-	if ( test "$CXX_VERSION" = "2.96" )
-	then
-		INLINE=""
-	fi
-fi
-if ( test "$INLINE" = "inline" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-AC_DEFINE_UNQUOTED(INLINE,$INLINE,Some compliers don't support the inline keyword)
-])
-
-
-dnl checks for the pthreads library
-dnl requires:  PTHREADPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variable PTHREADLIB
-AC_DEFUN([FW_CHECK_PTHREAD],
-[
-
-AC_MSG_CHECKING(if -pthread works during compile phase)
-if ( test -n "`$CXX -pthread 2>&1 | grep 'unrecognized option' | grep pthread`" )
-then
-	PTHREAD_COMPILE=""
-else
-	PTHREAD_COMPILE="-pthread"
-fi
-if ( test -n "$PTHREAD_COMPILE" )
-then
-	AC_MSG_RESULT(yes)
-else
-	AC_MSG_RESULT(no)
-fi
-
-HAVE_PTHREAD=""
-PTHREADINCLUDES=""
-PTHREADLIB=""
-
-if ( test "$cross_compiling" = "yes" )
-then
-
-	dnl cross compiling
-	echo "cross compiling"
-	
-	if ( test -z "$MINGW32" )
-	then
-		if ( test -n "$PTHREADPATH" )
-		then
-			PTHREADINCLUDES="$PTHREAD_COMPILE -I$PTHREADPATH/include"
-			PTHREADLIB="-L$PTHREADPATH/lib -lpthread -pthread"
-		else
-			PTHREADINCLUDES="$PTHREAD_COMPILE"
-			PTHREADLIB="-lpthread -pthread"
-		fi
-	fi
-	HAVE_PTHREAD="yes"
-
-else
-
-	dnl check pthread.h and standard thread libraries
-	for i in "pthread" "thread" "pthreads" "gthreads" ""
-	do
-		if ( test -n "$i" )
-		then
-			AC_MSG_CHECKING(for lib$i)
-		else
-			AC_MSG_CHECKING(for no library)
-		fi
-
-		INCLUDEDIR="pthread"
-		if ( test "$i" = "gthreads" )
-		then
-			INCLUDEDIR="FSU"
-		fi
-
-		if ( test -n "$i" )
-		then
-			FW_CHECK_HEADERS_AND_LIBS([$PTHREADPATH],[$INCLUDEDIR],[pthread.h],[$i],[""],[""],[PTHREADINCLUDES],[PTHREADLIB],[PTHREADLIBPATH],[PTHREADSTATIC])
-		fi
-
-		if ( test -n "$PTHREADLIB" -o -z "$i" )
-		then
-
-			AC_MSG_RESULT(yes)
-
-			dnl  If we found a set of headers and libs, try
-			dnl  linking with them a bunch of different ways.
-			for try in 1 2 3 4 5 6 7 8
-			do
-
-				if ( test "$try" = "1" )
-				then
-					dnl for minix
-					TESTINCLUDES="$PTHREADINCLUDES"
-					TESTLIB="-lmthread $PTHREADLIB"
-				elif ( test "$try" = "2" )
-				then
-					dnl for minix
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
-					TESTLIB="-lmthread $PTHREADLIB"
-				elif ( test "$try" = "3" )
-				then
-					TESTINCLUDES="$PTHREADINCLUDES"
-					TESTLIB="$PTHREADLIB"
-				elif ( test "$try" = "4" )
-				then
-					TESTINCLUDES="$PTHREADINCLUDES"
-					TESTLIB="$PTHREADLIB -pthread"
-				elif ( test "$try" = "5" )
-				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
-					TESTLIB="$PTHREADLIB"
-				elif ( test "$try" = "6" )
-				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
-					TESTLIB="$PTHREADLIB -pthread"
-				elif ( test "$try" = "7" )
-				then
-					TESTINCLUDES="$PTHREADINCLUDES"
-					TESTLIB="-pthread"
-				elif ( test "$try" = "8" )
-				then
-					TESTINCLUDES="$PTHREAD_COMPILE $PTHREADINCLUDES"
-					TESTLIB="-pthread"
-				fi
-
-				HAVE_PTHREAD=""
-				dnl try to link
-				AC_MSG_CHECKING(whether $TESTINCLUDES ... $TESTLIB works)
-				FW_TRY_LINK([#include <stddef.h>
-#include <pthread.h>],[pthread_exit(NULL);],[$CPPFLAGS $TESTINCLUDES],[$TESTLIB],[],[AC_MSG_RESULT(yes); HAVE_PTHREAD="yes"],[AC_MSG_RESULT(no)])
-
-				dnl  If the link succeeded then keep
-				dnl  the flags.
-				if ( test -n "$HAVE_PTHREAD" )
-				then
-					PTHREADINCLUDES="$TESTINCLUDES"
-					PTHREADLIB="$TESTLIB"
-					break
-				fi
-
-				dnl  If the link failed, reset the flags
-				TESTINCLUDES=""
-				TESTLIB=""
-			done
-
-			if ( test -n "$HAVE_PTHREAD" )
-			then
-				break
-			fi
-
-		else
-			AC_MSG_RESULT(no)
-		fi
-	done
-fi
-
-FW_INCLUDES(pthreads,[$PTHREADINCLUDES])
-FW_LIBS(pthreads,[$PTHREADLIB])
-
-AC_SUBST(PTHREADINCLUDES)
-AC_SUBST(PTHREADLIB)
-])
-
-
-
-dnl checks for the rudiments library
-dnl requires:  MICROSOFT, RUDIMENTSPATH, RPATHFLAG, cross_compiling
-dnl sets the substitution variables RUDIMENTSLIBS, RUDIMENTSLIBSPATH,
-dnl RUDIMENTSLIBSINCLUDES
-AC_DEFUN([FW_CHECK_RUDIMENTS],
-[
-
-RUDIMENTSVERSION=""
-RUDIMENTSLIBS=""
-RUDIMENTSLIBSPATH=""
-RUDIMENTSINCLUDES=""
-
-if ( test "$cross_compiling" = "yes" )
-then
-
-	dnl cross compiling
-	echo "cross compiling"
-	if ( test -n "$RUDIMENTSPATH" )
-	then
-		RUDIMENTSCONFIG="$RUDIMENTSPATH/bin/rudiments-config"
-		if ( test -r "$RUDIMENTSCONFIG" )
-		then
-			RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
-			RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
-		else
-			RUDIMENTSINCLUDES="-I$RUDIMENTSPATH/include"
-			RUDIMENTSLIBS="-L$RUDIMENTSPATH/lib -lrudiments"
-		fi
-	fi
-
-else
-
-	for i in "$RUDIMENTSPATH" "/usr" "/usr/local" "/opt/sfw" "/usr/sfw" "/opt/csw" "/usr/pkg" "/sw" "/usr/local/firstworks" "/boot/common" "/resources/index" "/resources/firstworks"
-	do
-		if ( test -n "$i" -a -d "$i" )
-		then
-			RUDIMENTSCONFIG="$i/bin/rudiments-config"
-			if ( test -r "$RUDIMENTSCONFIG" )
-			then
-				RUDIMENTSVERSION="`$RUDIMENTSCONFIG --version`"
-				RUDIMENTSINCLUDES="`$RUDIMENTSCONFIG --cflags`"
-				RUDIMENTSLIBS="`$RUDIMENTSCONFIG --libs`"
-			fi
-		fi
-		if ( test -n "$RUDIMENTSLIBS" )
-		then
-			break
-		fi
-	done
-fi
-
-if ( test -z "$RUDIMENTSLIBS" )
-then
-	AC_MSG_ERROR(Rudiments not found.  SQL-Relay requires this package.)
-	exit
-fi
-
-if ( test -n "$RUDIMENTSVERSION" )
-then
-	V1=`echo $RUDIMENTSVERSION | cut -d. -f1`
-	V2=`echo $RUDIMENTSVERSION | cut -d. -f2`
-	V3=`echo $RUDIMENTSVERSION | cut -d. -f3`
-	if ( test "$V1" -lt "2")
-	then
-		AC_MSG_ERROR([Rudiments version must be >= 2.0.0, found version $RUDIMENTSVERSION])
-		exit
-	fi
-fi
-
-FW_INCLUDES(rudiments,[$RUDIMENTSINCLUDES])
-FW_LIBS(rudiments,[$RUDIMENTSLIBS])
-
-AC_SUBST(RUDIMENTSPATH)
-AC_SUBST(RUDIMENTSINCLUDES)
-AC_SUBST(RUDIMENTSLIBS)
-AC_SUBST(RUDIMENTSLIBSPATH)
-])
-
-
-
-
 AC_DEFUN([FW_CHECK_ORACLE],
 [
 if ( test -z "$ORACLEATRUNTIME" )
@@ -1077,6 +44,8 @@ then
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore10.a],[ORACLEVERSION=\"10g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore11.a],[ORACLEVERSION=\"11g\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore12.a],[ORACLEVERSION=\"12c\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore18.a],[ORACLEVERSION=\"18c\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
+			FW_CHECK_LIB([$ORACLE_HOME/lib/libcore19.a],[ORACLEVERSION=\"19c\"; ORACLELIBSPATH=\"$ORACLE_HOME/lib\"; ORACLELIBS=\"-L$ORACLE_HOME/lib -lclntsh $SYSLIBLIST\"])
 			FW_CHECK_LIB([$ORACLE_HOME/lib/libclntsh.a],[ORACLESTATIC=\"$STATICFLAG\"])
 		fi
 
@@ -1089,7 +58,11 @@ then
 			dnl look in some common places
 			if ( test -z "$ORACLE_INSTANTCLIENT_PREFIX" )
 			then
-				for i in "/usr" "/usr/lib" "/usr/local" "/opt"
+				for i in \
+					"/usr" \
+					"/usr/lib" \
+					"/usr/local" \
+					"/opt"
 				do
 					INSTCLNT=`ls -d $i/instantclient* 2> /dev/null | tail -1`
 					if ( test -n "$INSTCLNT" )
@@ -1100,9 +73,23 @@ then
 				done
 			fi
 
-			dnl For some reason libclntsh.so is not included in the
-			dnl non-RPM versions, so we have to look for and use
-			dnl the file with a version number tacked on to the end.
+			dnl check for 19c/21c-style instantclient
+			if ( test -z "$ORACLE_INSTANTCLIENT_PREFIX" )
+			then
+				for i in `ls -d /u*/app/*/product/*/client* 2> /dev/null`
+				do
+					if ( test -n "$i/instantclient" )
+					then
+						ORACLE_INSTANTCLIENT_PREFIX=$i
+						break
+					fi
+				done
+			fi
+
+			dnl For some reason libclntsh.so isn't always included
+			dnl in the non-RPM versions, so we have to look for and
+			dnl use the file with a version number tacked on to the
+			dnl end.
 			if ( test -n "$ORACLE_INSTANTCLIENT_PREFIX" -a -r "`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`" -a -r "$ORACLE_INSTANTCLIENT_PREFIX/sdk/include/oci.h" )
 			then
 				ORACLEVERSION="10g"
@@ -1114,14 +101,33 @@ then
 				then
 					ORACLEVERSION="12c"
 				fi
+				if ( test -n "`basename $ORACLE_INSTANTCLIENT_PREFIX | grep 18`" )
+				then
+					ORACLEVERSION="18c"
+				fi
+				if ( test -n "`echo $ORACLE_INSTANTCLIENT_PREFIX | grep 19`" )
+				then
+					ORACLEVERSION="19c"
+				fi
+				if ( test -n "`echo $ORACLE_INSTANTCLIENT_PREFIX | grep 21`" )
+				then
+					ORACLEVERSION="21c"
+				fi
 				ORACLELIBSPATH="$ORACLE_INSTANTCLIENT_PREFIX"
 				CLNTSH="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntsh.$SOSUFFIX.* 2> /dev/null | tail -1`"
 				NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
 				ORACLELIBS="-Wl,$CLNTSH -L$ORACLE_INSTANTCLIENT_PREFIX -l$NNZ"
 				if ( test "$ORACLEVERSION" = "12c" )
 				then
+					ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
+				elif ( test "$ORACLEVERSION" = "18c" )
+				then
 					CLNTSHCORE="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
-					ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE"
+					ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE -lmql1 -lipc1"
+				elif ( test "$ORACLEVERSION" = "19c" -o "$ORACLEVERSION" = "21c" )
+				then
+					CLNTSHCORE="`ls $ORACLE_INSTANTCLIENT_PREFIX/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
+					ORACLELIBS="$ORACLELIBS -Wl,$CLNTSHCORE -lmql1 -lipc1"
 				fi
 				ORACLEINCLUDES="-I$ORACLE_INSTANTCLIENT_PREFIX/sdk/include"
 			fi
@@ -1134,47 +140,43 @@ then
 		then
 			for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
 			do
-				if ( test -r "/usr/lib/oracle/$version/client/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client/oci.h" )
+				ORACLEVERSION="10g"
+				if ( test -n "`echo $version | grep 11`" )
 				then
-					ORACLEVERSION="10g"
-					if ( test -n "`echo $version | grep 11`" )
-					then
-						ORACLEVERSION="11g"
-					fi
-					if ( test -n "`echo $version | grep 12`" )
-					then
-						ORACLEVERSION="12c"
-					fi
-					ORACLELIBSPATH="/usr/lib/oracle/$version/client/lib"
-					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
-					ORACLELIBS="-L/usr/lib/oracle/$version/client/lib -lclntsh -l$NNZ"
-					if ( test "$ORACLEVERSION" = "12c" )
-					then
-						ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
-					fi
-					ORACLEINCLUDES="-I/usr/include/oracle/$version/client"
+					ORACLEVERSION="11g"
+				fi
+				if ( test -n "`echo $version | grep 12`" )
+				then
+					ORACLEVERSION="12c"
+				fi
+				if ( test -n "`echo $version | grep 18`" )
+				then
+					ORACLEVERSION="18c"
 				fi
 
 				dnl x86_64 uses client64 rather than client
-				if ( test -r "/usr/lib/oracle/$version/client64/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/client64/oci.h" )
+				OCLIENT=""
+				if ( test -r "/usr/lib/oracle/$version/client" )
 				then
-					ORACLEVERSION="10g"
-					if ( test -n "`echo $version | grep 11`" )
-					then
-						ORACLEVERSION="11g"
-					fi
-					if ( test -n "`echo $version | grep 12`" )
-					then
-						ORACLEVERSION="12c"
-					fi
-					ORACLELIBSPATH="/usr/lib/oracle/$version/client64/lib"
+					OCLIENT="client"
+				elif ( test -r "/usr/lib/oracle/$version/client64" )
+				then
+					OCLIENT="client64"
+				fi
+				if ( test -r "/usr/lib/oracle/$version/$OCLIENT/lib/libclntsh.$SOSUFFIX" -a -r "/usr/include/oracle/$version/$OCLIENT/oci.h" )
+				then
+					ORACLELIBSPATH="/usr/lib/oracle/$version/$OCLIENT/lib"
 					NNZ=`basename $ORACLELIBSPATH/libnnz*.$SOSUFFIX | sed -e "s|lib||" -e "s|.$SOSUFFIX||"`
-					ORACLELIBS="-L/usr/lib/oracle/$version/client64/lib -lclntsh -l$NNZ"
+					ORACLELIBS="-L/usr/lib/oracle/$version/$OCLIENT/lib -lclntsh -l$NNZ"
 					if ( test "$ORACLEVERSION" = "12c" )
 					then
 						ORACLELIBS="$ORACLELIBS -lons -lclntshcore"
+					elif ( test "$ORACLEVERSION" = "18c" )
+					then
+						CLNTSHCORE="`ls /usr/lib/oracle/$version/$OCLIENT/lib/libclntshcore.$SOSUFFIX.* 2> /dev/null | tail -1`"
+						ORACLELIBS="$ORACLELIBS -lons -Wl,$CLNTSHCORE -lmql1 -lipc1"
 					fi
-					ORACLEINCLUDES="-I/usr/include/oracle/$version/client64"
+					ORACLEINCLUDES="-I/usr/include/oracle/$version/$OCLIENT"
 				fi
 			done
 		fi
@@ -1204,6 +206,7 @@ then
 				FW_TRY_LINK([#ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -1212,6 +215,7 @@ $GLIBC23HACKCODE],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKET
 				FW_TRY_LINK([#ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -1229,6 +233,7 @@ $GLIBC23HACKCODE],[exit(0)],[$ORACLESTATIC $ORACLEINCLUDES],[$ORACLELIBS $SOCKET
 				FW_TRY_LINK([#ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -1250,6 +255,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC
 					FW_TRY_LINK([#ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -1274,6 +280,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,"",-1,"",-1,"",-1,OCI_LM_DEF);],[$ORACLESTATIC
 				FW_TRY_LINK([#ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -1295,6 +302,7 @@ $GLIBC23HACKCODE],[olog(NULL,NULL,NULL,-1,NULL,-1,NULL,-1,OCI_LM_DEF);],[$ORACLE
 					FW_TRY_LINK([#ifdef __CYGWIN__
 	#define _int64 long long
 #endif
+#define OCIVER_ORACLE 1
 #include <oci.h>
 #include <stdlib.h>
 $GLIBC23HACKINCLUDE
@@ -1400,7 +408,27 @@ then
 		dnl try mysql_config first...
 		if ( test -z "$MYSQLLIBS" )
 		then
-			for dir in "$MYSQLPATHBIN" "" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/mysql/bin" "/opt/sfw/bin" "/opt/sfw/mysql/bin" "/usr/sfw/bin" "/usr/sfw/mysql/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin" `ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` "/usr/local/mariadb/bin" "/opt/sfw/mariadb/bin" "/usr/sfw/mariadb/bin" `ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
+			for dir in \
+				"$MYSQLPATHBIN" \
+				"" \
+				"/usr/bin" \
+				"/usr/local/bin" \
+				"/usr/pkg/bin" \
+				"/usr/local/mysql/bin" \
+				"/opt/sfw/bin" \
+				"/opt/sfw/mysql/bin" \
+				"/usr/sfw/bin" \
+				"/usr/sfw/mysql/bin" \
+				"/opt/csw/bin" \
+				"/sw/bin" \
+				"/usr/freeware/bin" \
+				"/boot/common/bin" \
+				"/resources/index/bin" \
+				`ls -d /usr/mysql/*/bin 2> /dev/null | sort -r` \
+				"/usr/local/mariadb/bin" \
+				"/opt/sfw/mariadb/bin" \
+				"/usr/sfw/mariadb/bin" \
+				`ls -d /usr/mariadb/*/bin 2> /dev/null | sort -r`
 			do
 
 				dnl try mysql_config, and if that fails,
@@ -1457,11 +485,19 @@ then
 		dnl to just looking directly for headers and libs
 		if ( test -z "$MYSQLLIBS" )
 		then
+			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mysql],[mysql.h],[mysqlclient],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[no])
+		fi
+		if ( test -z "$MYSQLLIBS" )
+		then
 			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mysql],[mysql.h],[mysqlclient],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[yes])
 		fi
 		if ( test -z "$MYSQLLIBS" )
 		then
 			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mariadb],[mysql.h],[mariadb],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[yes])
+		fi
+		if ( test -z "$MYSQLLIBS" )
+		then
+			FW_CHECK_HEADERS_AND_LIBS([$MYSQLPATH],[mariadb],[mysql.h],[mariadb],[$STATICFLAG],[$RPATHFLAG],[MYSQLINCLUDES],[MYSQLLIBS],[MYSQLLIBSPATH],[MYSQLSTATIC],[dummy],[no])
 		fi
 
 		dnl on some platforms, mysql_config returns options
@@ -2118,7 +1154,7 @@ then
 		then
 			FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libct.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"],[$SYBASEPATH/lib/libct.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lblk -lcs -lct -lcomn -lsybtcl -lsybdb -lintl -linsck\"; SYBASESTATIC=\"$STATICFLAG\"])
 
-			if ( test "$ARCH" = "x64" )
+			if ( test "$X64" = "x64" )
 			then
 				FW_CHECK_HEADER_LIB([$SYBASEPATH/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I$SYBASEPATH/include\"],[$SYBASEPATH/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"$SYBASEPATH/lib\"; SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"],[$SYBASEPATH/lib/libsybct64.a],[SYBASELIBS=\"-L$SYBASEPATH/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybdb64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
 			fi
@@ -2143,7 +1179,7 @@ then
 				FW_CHECK_LIB([/opt/sap/OCS-16_0/lib/libsybunic.so],[SYBASELIBS=\"$SYBASELIBS -lsybunic\"])
 			fi
 
-			if ( test "$ARCH" = "x64" )
+			if ( test "$X64" = "x64" )
 			then
 
 				FW_CHECK_HEADER_LIB([/opt/sybase/OCS-15_0/include/ctpublic.h],[SYBASEINCLUDES=\"-DSYB_LP64 -I/opt/sybase/OCS-15_0/include\"],[/opt/sybase/OCS-15_0/lib/libsybct64.$SOSUFFIX],[SYBASELIBSPATH=\"/opt/sybase/OCS-15_0/lib\"; SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"],[/opt/sybase/OCS-15_0/lib/libsybct64.a],[SYBASELIBS=\"-L/opt/sybase/OCS-15_0/lib -lsybblk64 -lsybct64 -lsybcs64 -lsybcomn64 -lsybtcl64 -lsybintl64\"; SYBASESTATIC=\"$STATICFLAG\"])
@@ -2434,6 +1470,16 @@ extern "C" SQLRETURN SQL_API SQLExtendedFetch(SQLHSTMT statementhandle, SQLUSMAL
 		FW_TRY_LINK([#include <sql.h>
 #include <sqlext.h>
 extern "C" SQLRETURN SQL_API SQLParamOptions(SQLHSTMT statementhandle, SQLULEN crow, SQLULEN *pirow) { return 0; }],[],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(SQLULEN); AC_DEFINE(HAVE_SQLPARAMOPTIONS_ULEN,1,Some systems have SQLULEN parameters for SQLParamOptions)],[AC_MSG_RESULT(SQLUINTEGER)])
+
+		AC_MSG_CHECKING(for odbcinst.h)
+		AC_TRY_COMPILE([#include <odbcinst.h>],[],AC_DEFINE(HAVE_ODBCINST_H, 1, Some systems have odbcinst.h) AC_MSG_RESULT(yes),AC_MSG_RESULT(no))
+		
+		AC_MSG_CHECKING(for SQLGetPrivateProfileString)
+		FW_TRY_LINK([#include <sql.h>
+#include <sqlext.h>
+#ifdef HAVE_ODBCINST_H
+	#include <odbcinst.h>
+#endif],[SQLGetPrivateProfileString(0,0,0,0,0,0);],[$ODBCSTATIC $ODBCINCLUDES],[$ODBCLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$ODBCLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_SQLGETPRIVATEPROFILESTRING,1,Some systems have SQLGetPrivateProfileString)],[AC_MSG_RESULT(no)])
 	fi
 
 	if ( test -z "$ODBCLIBS" )
@@ -2531,7 +1577,7 @@ then
 			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.1/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/ibm/db2/V9.1/lib\"; DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/ibm/db2/V9.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V9.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V9.1/include\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V9.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V9.1/lib -ldb2\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V9.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.1/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/ibm/db2/V9.1/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.1/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/ibm/db2/V9.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
-			if ( test "$ARCH" = "x64" )
+			if ( test "$X64" = "x64" )
 			then
 				FW_CHECK_HEADER_LIB([/opt/IBM/db2/V9.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V9.1/include\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.1/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V9.1/lib64\"; DB2LIBS=\"-L/opt/IBM/db2/V9.1/lib64 -ldb2\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.1/lib64/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V9.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 			fi
@@ -2542,7 +1588,7 @@ then
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V9.5/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V9.5/include\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.5/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V9.5/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V9.5/lib -ldb2\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.5/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V9.5/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.5/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.5/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/ibm/db2/V9.5/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.5/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/ibm/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V9.5/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V9.5/include\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.5/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/IBM/db2/V9.5/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V9.5/lib32 -ldb2\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.5/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/IBM/db2/V9.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
-			if ( test "$ARCH" = "x64" )
+			if ( test "$X64" = "x64" )
 			then
 				FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.5/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.5/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.5/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/ibm/db2/V9.5/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.5/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/ibm/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 				FW_CHECK_HEADER_LIB([/opt/IBM/db2/V9.5/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V9.5/include\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.5/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/IBM/db2/V9.5/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V9.5/lib64 -ldb2\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.5/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/IBM/db2/V9.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
@@ -2553,7 +1599,7 @@ then
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V9.7/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V9.7/include\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.7/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V9.7/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V9.7/lib -ldb2\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.7/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V9.7/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.7/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.7/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/ibm/db2/V9.7/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.7/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/ibm/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V9.7/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V9.7/include\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.7/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/IBM/db2/V9.7/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V9.7/lib32 -ldb2\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.7/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/IBM/db2/V9.7/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
-			if ( test "$ARCH" = "x64" )
+			if ( test "$X64" = "x64" )
 			then
 				FW_CHECK_HEADER_LIB([/opt/ibm/db2/V9.7/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V9.7/include\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.7/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/ibm/db2/V9.7/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2VERSION=\"9\"],[/opt/ibm/db2/V9.7/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/ibm/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
 				FW_CHECK_HEADER_LIB([/opt/IBM/db2/V9.7/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V9.7/include\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.7/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/IBM/db2/V9.7/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V9.7/lib64 -ldb2\"; DB2VERSION=\"9\"],[/opt/IBM/db2/V9.7/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/IBM/db2/V9.7/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"9\"])
@@ -2564,7 +1610,7 @@ then
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V10.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V10.1/include\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V10.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V10.1/lib -ldb2\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V10.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
 			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V10.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V10.1/include\"; DB2VERSION=\"10\"],[/opt/ibm/db2/V10.1/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/ibm/db2/V10.1/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V10.1/lib32 -ldb2\"; DB2VERSION=\"10\"],[/opt/ibm/db2/V10.1/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/ibm/db2/V10.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V10.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V10.1/include\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.1/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/IBM/db2/V10.1/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V10.1/lib32 -ldb2\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.1/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/IBM/db2/V10.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
-			if ( test "$ARCH" = "x64" )
+			if ( test "$X64" = "x64" )
 			then
 				FW_CHECK_HEADER_LIB([/opt/ibm/db2/V10.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V10.1/include\"; DB2VERSION=\"10\"],[/opt/ibm/db2/V10.1/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/ibm/db2/V10.1/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V10.1/lib64 -ldb2\"; DB2VERSION=\"10\"],[/opt/ibm/db2/V10.1/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/ibm/db2/V10.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
 				FW_CHECK_HEADER_LIB([/opt/IBM/db2/V10.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V10.1/include\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.1/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/IBM/db2/V10.1/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V10.1/lib64 -ldb2\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.1/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/IBM/db2/V10.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
@@ -2575,7 +1621,7 @@ then
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V10.5/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.5/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V10.5/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V10.5/lib -ldb2\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.5/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V10.5/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
 			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V10.5/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V10.5/include\"; DB2VERSION=\"10\"],[/opt/ibm/db2/V10.5/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/ibm/db2/V10.5/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V10.5/lib32 -ldb2\"; DB2VERSION=\"10\"],[/opt/ibm/db2/V10.5/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/ibm/db2/V10.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V10.5/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.5/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/IBM/db2/V10.5/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V10.5/lib32 -ldb2\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.5/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/IBM/db2/V10.5/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
-			if ( test "$ARCH" = "x64" )
+			if ( test "$X64" = "x64" )
 			then
 				FW_CHECK_HEADER_LIB([/opt/ibm/db2/V10.5/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V10.5/include\"; DB2VERSION=\"10\"],[/opt/ibm/db2/V10.5/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/ibm/db2/V10.5/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V10.5/lib64 -ldb2\"; DB2VERSION=\"10\"],[/opt/ibm/db2/V10.5/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/ibm/db2/V10.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
 				FW_CHECK_HEADER_LIB([/opt/IBM/db2/V10.5/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V10.5/include\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.5/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/IBM/db2/V10.5/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V10.5/lib64 -ldb2\"; DB2VERSION=\"10\"],[/opt/IBM/db2/V10.5/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/IBM/db2/V10.5/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"10\"])
@@ -2586,7 +1632,7 @@ then
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V11.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\"],[/opt/IBM/db2/V11.1/lib/libdb2.$SOSUFFIX],[DB2LIBSPATH=\"/opt/IBM/db2/V11.1/lib\"; DB2LIBS=\"-L/opt/IBM/db2/V11.1/lib -ldb2\"; DB2VERSION=\"11\"],[/opt/IBM/db2/V11.1/lib/libdb2.a],[DB2LIBS=\"-L/opt/IBM/db2/V11.1/lib -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"])
 			FW_CHECK_HEADER_LIB([/opt/ibm/db2/V11.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V11.1/include\"; DB2VERSION=\"11\"],[/opt/ibm/db2/V11.1/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/ibm/db2/V11.1/lib32\"; DB2LIBS32=\"-L/opt/ibm/db2/V11.1/lib32 -ldb2\"; DB2VERSION=\"11\"],[/opt/ibm/db2/V11.1/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/ibm/db2/V11.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"])
 			FW_CHECK_HEADER_LIB([/opt/IBM/db2/V11.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\"],[/opt/IBM/db2/V11.1/lib32/libdb2.$SOSUFFIX],[DB2LIBSPATH32=\"/opt/IBM/db2/V11.1/lib32\"; DB2LIBS32=\"-L/opt/IBM/db2/V11.1/lib32 -ldb2\"; DB2VERSION=\"11\"],[/opt/IBM/db2/V11.1/lib32/libdb2.a],[DB2LIBS32=\"-L/opt/IBM/db2/V11.1/lib32 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"])
-			if ( test "$ARCH" = "x64" )
+			if ( test "$X64" = "x64" )
 			then
 				FW_CHECK_HEADER_LIB([/opt/ibm/db2/V11.1/include/sql.h],[DB2INCLUDES=\"-I/opt/ibm/db2/V11.1/include\"; DB2VERSION=\"11\"],[/opt/ibm/db2/V11.1/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/ibm/db2/V11.1/lib64\"; DB2LIBS64=\"-L/opt/ibm/db2/V11.1/lib64 -ldb2\"; DB2VERSION=\"11\"],[/opt/ibm/db2/V11.1/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/ibm/db2/V11.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"])
 				FW_CHECK_HEADER_LIB([/opt/IBM/db2/V11.1/include/sql.h],[DB2INCLUDES=\"-I/opt/IBM/db2/V11.1/include\"; DB2VERSION=\"11\"],[/opt/IBM/db2/V11.1/lib64/libdb2.$SOSUFFIX],[DB2LIBSPATH64=\"/opt/IBM/db2/V11.1/lib64\"; DB2LIBS64=\"-L/opt/IBM/db2/V11.1/lib64 -ldb2\"; DB2VERSION=\"11\"],[/opt/IBM/db2/V11.1/lib64/libdb2.a],[DB2LIBS64=\"-L/opt/IBM/db2/V11.1/lib64 -ldb2\"; DB2STATIC=\"$STATICFLAG\"; DB2VERSION=\"11\"])
@@ -2654,7 +1700,13 @@ then
 	INFORMIXESQLLIBSPATH=""
 	INFORMIXSTATIC=""
 
-	for dir in "$INFORMIXPATH" "$INFORMIXDIR" "/opt/informix" "/opt/IBM/informix" "/home/informix" "/usr/local/informix"
+	for dir in \
+		"$INFORMIXPATH" \
+		"$INFORMIXDIR" \
+		"/opt/informix" \
+		"/opt/IBM/informix" \
+		"/home/informix" \
+		"/usr/local/informix"
 	do
 		if ( test -z "$dir" )
 		then
@@ -2828,6 +1880,7 @@ then
 	HAVE_PERL=""
 	PERL=""
 	PERLLIB=""
+	PERLLIBS=""
 	PERLPREFIX=""
 
 	if ( test "$cross_compiling" = "yes" )
@@ -2845,7 +1898,18 @@ then
 			AC_CHECK_PROG(PERL,perl,"perl")
 			if ( test -z "$PERL" )
 			then
-				for i in "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/usr/local/perl/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
+				for i in \
+					"/usr/bin" \
+					"/usr/local/bin" \
+					"/usr/pkg/bin" \
+					"/usr/local/perl/bin" \
+					"/opt/sfw/bin" \
+					"/usr/sfw/bin" \
+					"/opt/csw/bin" \
+					"/sw/bin" \
+					"/usr/freeware/bin" \
+					"/boot/common/bin" \
+					"/resources/index/bin"
 				do
 					if ( test -d "$i" )
 					then
@@ -2861,16 +1925,39 @@ then
 			fi
 		fi
 
-		dnl for cygwin and mac os x add -lperl
+		dnl for cygwin and early mac os x add -lperl
 		if ( test -n "$PERL" )
 		then
-			if ( test -n "$CYGWIN" -o -n "$DARWIN" )
+			if ( test -n "$CYGWIN" )
 			then
-				DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+				DIRS=`$PERL -e 'foreach (@INC) { print("$_\n"); }'`
 				for dir in $DIRS
 				do
-					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIB=\"-L$dir/CORE -lperl\"])
+					FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
 				done
+			elif ( test -n "$DARWIN" )
+			then
+				if ( test -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
+				then
+					DIRS=`perl -e 'foreach (@INC) { print("$_\n"); }'`
+					for dir in $DIRS
+					do
+						FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
+					done
+				elif ( test -n "$BUNDLE_LOADER" )
+				then
+					if ( test ! -r "$PERL" )
+					then
+						PERL="`which $PERL`"
+					fi
+					PERLLIBS="-Wl,$BUNDLE_LOADER -Wl,$PERL"
+				else
+					DIRS=`$PERL -e 'foreach (@INC) { print("$_\n"); }'`
+					for dir in $DIRS
+					do
+						FW_CHECK_FILE("$dir/CORE/libperl.$SOSUFFIX",[PERLLIBS=\"-L$dir/CORE -lperl\"])
+					done
+				fi
 			fi
 		fi
 
@@ -2940,6 +2027,12 @@ then
 		fi
 	fi
 
+	dnl on mac os x with -undefined dynamic_loader, add that to PERLLIBS
+	if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PERLLIBS="$UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 	if ( test -z "$HAVE_PERL" )
 	then
 		AC_MSG_CHECKING(for sys/vnode.h)
@@ -2949,6 +2042,7 @@ then
 	AC_SUBST(HAVE_PERL)
 	AC_SUBST(PERL)
 	AC_SUBST(PERLLIB)
+	AC_SUBST(PERLLIBS)
 	AC_SUBST(PERLCCFLAGS)
 	AC_SUBST(PERLOPTIMIZE)
 	AC_SUBST(PERLSITEARCH)
@@ -2992,14 +2086,65 @@ then
 
 		pyext=""
 
-		for pyversion in "3.9" "3.8" "3.7" "3.6" "3.5" "3.4" "3.3" "3.2" "3.1" "3.0" "2.9" "2.8" "2.7" "2.6" "2.5" "2.4" "2.3" "2.2" "2.1"
+		for pyversion in \
+				"3.9" \
+				"3.8" \
+				"3.7" \
+				"3.6" \
+				"3.5" \
+				"3.4" \
+				"3.3" \
+				"3.2" \
+				"3.1" \
+				"3.0" \
+				"2.9" \
+				"2.8" \
+				"2.7" \
+				"2.6" \
+				"2.5" \
+				"2.4" \
+				"2.3" \
+				"2.2" \
+				"2.1"
 		do
 
-			for pyprefix in "$PYTHONPATH" "/usr" "/usr/local" "/usr/pkg" "/usr/local/python$pyversion" "/opt/sfw" "/usr/sfw" "/opt/csw" "/sw" "/System/Library/Frameworks/Python.framework/Versions/Current" "/boot/common"
+			for pyprefix in \
+				"$PYTHONPATH" \
+				"/usr" \
+				"/usr/local" \
+				"/usr/pkg" \
+				"/usr/local/python$pyversion" \
+				"/opt/sfw" \
+				"/usr/sfw" \
+				"/opt/csw" \
+				"/sw" \
+				"/usr/freeware" \
+				"/System/Library/Frameworks/Python.framework/Versions/Current" \
+				"/boot/common"
 			do
 
 				if ( test -n "$pyprefix" )
 				then
+
+					for pyexe in \
+						"python$pyversion$pyext" \
+						"python$PYTHONVERSION$pyext" \
+						"python$pyversion" \
+						"python$PYTHONVERSION" "python"
+					do
+						if ( test -x "$pyprefix/bin/$pyexe" )
+						then
+							PYTHON="$pyprefix/bin/$pyexe"
+
+							dnl on mac os x with -bundle_loader, set PYTHONLIB
+							if ( test -n "$BUNDLE_LOADER" )
+							then
+								PYTHONLIB="-Wl,$BUNDLE_LOADER -Wl,$PYTHON"
+							fi
+
+							break
+						fi
+					done
 
 					PYTHONINCLUDES=""
 					for ext in "mu" "m" "u" ""
@@ -3013,27 +2158,36 @@ then
 						fi
 					done
 
-					for pylibdir in "$pyprefix/lib64/python$pyversion" "$pyprefix/lib/python$pyversion"
+					for pylibdir in \
+						"$pyprefix/lib64/python$pyversion" \
+						"$pyprefix/lib/python$pyversion"
 					do
 
 						PYTHONDIR=""
-						for k in "config" "config-$MULTIARCHDIR" "config-$pyversion-$MULTIARCHDIR" "config-$pyversion" "config-${pyversion}mu-$MULTIARCHDIR" "config-${pyversion}mu" "config-${pyversion}m-$MULTIARCHDIR" "config-${pyversion}m" "config-${pyversion}u-$MULTIARCHDIR" "config-${pyversion}u"
+						for k in \
+							"config" \
+							"config-$MULTIARCHDIR" \
+							"config-$pyversion-$MULTIARCHDIR" \
+							"config-$pyversion" \
+							"config-${pyversion}mu-$MULTIARCHDIR" \
+							"config-${pyversion}mu" \
+							"config-${pyversion}m-$MULTIARCHDIR" \
+							"config-${pyversion}m" \
+							"config-${pyversion}u-$MULTIARCHDIR" \
+							"config-${pyversion}u"
 						do
 
 							if ( test -d "$pylibdir/$k" )
 							then
-								dnl for cygwin and mac os x
-								dnl add -lpython
+								PYTHONDIR="$pylibdir"
+
+								dnl for cygwin and early mac os x, add -lpython or similar
 								if ( test -n "$CYGWIN" -a -r "$pylibdir/$k/libpython$pyversion.dll.a" )
 								then
-									PYTHONDIR="$pylibdir"
 									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
-								elif ( test -n "$DARWIN" )
+								elif ( test -n "$DARWIN" -a -z "$BUNDLE_LOADER" -a -z "$UNDEFINED_DYNAMIC_LOOKUP" )
 								then
-									PYTHONDIR="$pylibdir"
-									PYTHONLIB="-lpython$pyversion"
-								else
-									PYTHONDIR="$pylibdir"
+									PYTHONLIB="-L$PYTHONDIR/$k -lpython$pyversion"
 								fi
 								if ( test -n "$PYTHONDIR" )
 								then
@@ -3043,15 +2197,6 @@ then
 						done
 						if ( test -n "$PYTHONDIR" )
 						then
-							break
-						fi
-					done
-
-					for pyexe in "python$pyversion$pyext" "python$PYTHONVERSION$pyext" "python$pyversion" "python$PYTHONVERSION" "python"
-					do
-						if ( test -x "$pyprefix/bin/$pyexe" )
-						then
-							PYTHON="$pyprefix/bin/$pyexe"
 							break
 						fi
 					done
@@ -3107,19 +2252,24 @@ then
 		fi
 	fi
 
+	dnl on mac os x, add -framework Python to the includes
+	if (test -n "$DARWIN" )
+	then
+		PYTHONINCLUDES="-framework Python $PYTHONINCLUDES"
+	fi
+
+	dnl on mac os x with -undefined dynamic_loader, add that to PYTHONLIB
+	if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+	then
+		PYTHONLIB="$PYTHONLIB $UNDEFINED_DYNAMIC_LOOKUP"
+	fi
+
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
+	FW_LIBS(python,[$PYTHONLIB])
 
 	if ( test -n "$OVERRIDEPYTHONDIR" )
 	then
 		PYTHONDIR="$OVERRIDEPYTHONDIR"
-	fi
-
-	IMPORTEXCEPTIONS=""
-	EXCEPTIONSSTANDARDERROR="Exception"
-	if ( test "$PYTHONVERSION" = "2" )
-	then
-		IMPORTEXCEPTIONS="import exceptions"
-		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 	fi
 
 	AC_SUBST(HAVE_PYTHON)
@@ -3128,8 +2278,20 @@ then
 	AC_SUBST(PYTHONSITEDIR)
 	AC_SUBST(PYTHONLIB)
 	AC_SUBST(PYTHON)
+	AC_SUBST(PYTHONFRAMEWORK)
+
+
+	dnl some flags for the python tests
+	IMPORTEXCEPTIONS=""
+	EXCEPTIONSSTANDARDERROR="Exception"
+	if ( test "$PYTHONVERSION" = "2" )
+	then
+		IMPORTEXCEPTIONS="import exceptions"
+		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
+	fi
 	AC_SUBST(IMPORTEXCEPTIONS)
 	AC_SUBST(EXCEPTIONSSTANDARDERROR)
+
 
 	if ( test "$HAVE_PYTHON" = "" )
 	then
@@ -3162,55 +2324,93 @@ then
 		for major in "" "1" "2"
 		do
 
-			for minor in "" "9" "8" "7" "6" "5" "4" "3" "2" "1" "0"
+			for minor in \
+				"" \
+				"9" \
+				"8" \
+				"7" \
+				"6" \
+				"5" \
+				"4" \
+				"3" \
+				"2" \
+				"1" \
+				"0"
 			do
 
-				for patchlevel in "" "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"
+				for patchlevel in \
+						"" \
+						"0" \
+						"1" \
+						"2" \
+						"3" \
+						"4" \
+						"5" \
+						"6" \
+						"7" \
+						"8" \
+						"9"
 				do
 
 					for separator in "" "."
 					do
 
-			ruby="ruby$major$separator$minor"
-			if ( test -n "$patchlevel" )
-			then
-				ruby="ruby$major$separator$minor$separator$patchlevel"
-			fi
+						ruby="ruby$major$separator$minor"
+						if ( test -n "$patchlevel" )
+						then
+							ruby="ruby$major$separator$minor$separator$patchlevel"
+						fi
 
-			HAVE_RUBY=""
-			RUBY=""
-			RUBYLIB=""
+						HAVE_RUBY=""
+						RUBY=""
+						RUBYLIB=""
 
-			if ( test -n "$RUBYPATH" )
-			then
-				FW_CHECK_FILE("$RUBYPATH/bin/$ruby",[RUBY=\"$RUBYPATH/bin/$ruby\"])
-			else
-				AC_CHECK_PROG(RUBY,"$ruby","$ruby")
-				if ( test -z "$RUBY" )
-				then
-					for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
-					do
-						FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
+						if ( test -n "$RUBYPATH" )
+						then
+							FW_CHECK_FILE("$RUBYPATH/bin/$ruby",[RUBY=\"$RUBYPATH/bin/$ruby\"])
+						else
+							AC_CHECK_PROG(RUBY,"$ruby","$ruby")
+							if ( test -z "$RUBY" )
+							then
+								for i in "/usr/local/ruby/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
+								do
+									FW_CHECK_FILE("$i/$ruby",[RUBY=\"$i/$ruby\"])
+									if ( test -n "$RUBY" )
+									then
+										found="yes"
+										break
+									fi
+								done
+							fi
+						fi
+
 						if ( test -n "$RUBY" )
 						then
+							HAVE_RUBY="yes"
+
+							dnl for cygwin and early mac os x, add -lruby
+							if ( test -n "$CYGWIN" )
+							then
+								dnl FIXME: we really should include a -L option
+								RUBYLIB="-lruby"
+							elif ( test -n "$DARWIN" )
+							then
+								if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+								then
+									RUBYLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+								elif ( test -n "$BUNDLE_LOADER" )
+								then
+									RUBYLIB="-Wl,$BUNDLE_LOADER -Wl,$RUBY"
+								else
+									dnl FIXME: we really should include a -L option
+									RUBYLIB="-lruby"
+								fi
+							fi
+
 							found="yes"
 							break
 						fi
-					done
-				fi
-			fi
 
-			if ( test -n "$RUBY" )
-			then
-				HAVE_RUBY="yes"
-				dnl for cygwin and OSX include -lruby
-				if ( test -n "$CYGWIN" -o -n "$DARWIN" )
-				then
-					RUBYLIB="-lruby"
-				fi
-				found="yes"
-				break
-			fi
 						if ( test -z "$major" -o -z "$minor" -o -z "$patchlevel" )
 						then
 							break
@@ -3282,7 +2482,7 @@ END
 
 			AC_MSG_CHECKING(for ruby.h)
 			HAVE_RUBY_H=""
-			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
+			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - 2> /dev/null | grep -v Entering | grep -v Leaving`
 			do
 				if ( test -r "$dir/ruby.h" )
 				then
@@ -3301,7 +2501,7 @@ END
 
 			AC_MSG_CHECKING(for ruby/thread.h)
 			HAVE_RUBY_THREAD_H=""
-			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - | grep -v Entering | grep -v Leaving`
+			for dir in `eval $RUBY conftest.rb 2>/dev/null | sed -e "s|-x.* | |g" -e "s|-belf||g" -e "s|-mtune=.* | |g" | $MAKE -s -f - 2> /dev/null | grep -v Entering | grep -v Leaving`
 			do
 				if ( test -r "$dir/ruby/thread.h" )
 				then
@@ -3358,6 +2558,8 @@ then
 		then
 			for i in \
 `ls -d /etc/alternatives/java_sdk /usr/java/jdk* /usr/java/j2sdk* /usr/local/jdk* 2> /dev/null` \
+/System/Library/Frameworks/JavaVM.framework/Versions/CurrentJDK \
+/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr/java \
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
@@ -3397,7 +2599,6 @@ then
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
-/System/Library/Frameworks/JavaVM.framework/Versions/Current \
 /usr \
 /usr/local
 			do
@@ -3456,7 +2657,7 @@ then
 	fi
 
 	dnl if java is really gcj 2.x then don't use it
-	if ( test "`basename $JAVAC`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
+	if ( test "`basename $JAVAC 2> /dev/null`" = "gcj" -a "`$JAVAC --version 2>/dev/null | cut -d'.' -f1`" = "2" )
 	then
 		AC_MSG_WARN(javac appears to be gcj 2.xx, which is not supported)
 		HAVE_JAVA=""
@@ -3537,7 +2738,7 @@ then
 			then
 				FW_CHECK_FILE("$PHPPATH/bin/$file",[PHPCONFIG=\"$PHPPATH/bin/$file\"])
 			else
-				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/opt/csw/php4/bin" "/opt/csw/php5/bin" "/sw/bin" "/boot/common/bin" "/resources/index/bin"
+				for i in "/usr/local/php/bin" "/usr/bin" "/usr/local/bin" "/usr/pkg/bin" "/opt/sfw/bin" "/usr/sfw/bin" "/opt/csw/bin" "/opt/csw/php4/bin" "/opt/csw/php5/bin" "/sw/bin" "/usr/freeware/bin" "/boot/common/bin" "/resources/index/bin"
 				do
 					FW_CHECK_FILE("$i/$file",[PHPCONFIG=\"$i/$file\"])
 					if ( test -n "$PHPCONFIG" )
@@ -3560,21 +2761,54 @@ then
 			PHPEXTDIR=`$PHPCONFIG --extension-dir`
 			PHPVERSION=`$PHPCONFIG --version`
 			PHPMAJORVERSION=`echo "$PHPVERSION" | cut -d'.' -f1`
+
+			dnl for cygwin and early mac os x...
+			if ( test -n "$CYGWIN" )
+			then
+				dnl FIXME: we really should include a -L option
+				PHPLIB="-lphp"
+			elif ( test -n "$DARWIN" )
+			then
+				if ( test -n "$UNDEFINED_DYNAMIC_LOOKUP" )
+				then
+					PHPLIB="$UNDEFINED_DYNAMIC_LOOKUP"
+				elif ( test -n "$BUNDLE_LOADER" )
+				then
+					AC_MSG_CHECKING(for php executable)
+					PHP="`$PHPCONFIG --php-binary 2>&1 | grep -v Usage`"
+					if ( test -z "$PHP" )
+					then
+						if ( test ! -r "$PHPCONFIG" )
+						then
+							PHPCONFIG="`which $PHPCONFIG`"
+						fi
+						BINDIR=`dirname $PHPCONFIG`
+						PHP=$BINDIR/php
+					fi
+					if ( test -r "$PHP" )
+					then
+						AC_MSG_RESULT($PHP)
+						PHPLIB="-Wl,$BUNDLE_LOADER -Wl,$PHP"
+					else
+						AC_MSG_RESULT(no)
+						HAVE_PHP=""
+						AC_MSG_WARN(The PHP API will not be built.)
+					fi
+				else
+					dnl FIXME: we really should include a -L option
+					PHPLIB="-lphp"
+				fi
+			fi
 		else
 			HAVE_PHP=""
 			AC_MSG_WARN(The PHP API will not be built.)
 		fi
-
-		dnl on os x add -lphp - this isn't necessary any more
-		dnl and I can't figure out what platforms it was required on
-		dnl any more either
-		dnl if ( test -n "$PHPCONFIG" -a -n "$DARWIN" )
-		dnl then
-			dnl PHPLIB="-lphp"
-		dnl fi
 	fi
 
-	FW_INCLUDES(php,[$PHPINCLUDES])
+	if ( test -n "$HAVE_PHP" )
+	then
+		FW_INCLUDES(php,[$PHPINCLUDES])
+	fi
 
 	if ( test -n "$OVERRIDEPHPEXTDIR" )
 	then
@@ -3745,7 +2979,7 @@ then
 			AC_MSG_CHECKING(for alternative erlc/erl)
 			for version in "" "20" "19" "18" "17" "16" "15"
 			do
-				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
+				for path in "/" "/usr" "/usr/local/erlang" "/opt/erlang" "/usr/erlang" "/usr/local" "/usr/pkg" "/usr/pkg/erlang" "/opt/sfw" "/opt/sfw/erlang" "/usr/sfw" "/usr/sfw/erlang" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/erlang"
 				do
 					if ( test -r "$path/bin/erl$version" -a -r "$path/bin/erlc$version" )
 					then
@@ -3898,13 +3132,13 @@ then
 	else
 
 		dnl look for the compiler
+		AC_MSG_CHECKING(for compiler)
 		CSC=""
 		CSCFLAGS=""
 		for compiler in "mcs" "gmcs" "dmcs" "smcs"
 		do
-			AC_MSG_CHECKING(for $compiler)
 
-			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+			for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 			do
 				if ( test -r "$path/bin/$compiler" )
 				then
@@ -3920,7 +3154,7 @@ then
 			fi
 		done
 
-		if ( test -r "$CSC" )
+		if ( test -n "$CSC" )
 		then
 			AC_MSG_RESULT($CSC)
 		else
@@ -3932,7 +3166,7 @@ then
 		SN=""
 		AC_MSG_CHECKING(for sn)
 
-		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 		do
 			if ( test -r "$path/bin/sn" )
 			then
@@ -3953,7 +3187,7 @@ then
 		ILDASM=""
 		AC_MSG_CHECKING(for monodis)
 
-		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 		do
 			if ( test -r "$path/bin/monodis" )
 			then
@@ -3974,7 +3208,7 @@ then
 		ILASM=""
 		AC_MSG_CHECKING(for ilasm)
 
-		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 		do
 			if ( test -r "$path/bin/ilasm" )
 			then
@@ -3995,7 +3229,7 @@ then
 		GACUTIL=""
 		AC_MSG_CHECKING(for gacutil)
 
-		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/mono"
+		for path in "$MONOPATH" "/" "/usr" "/usr/local/mono" "/opt/mono" "/usr/mono" "/usr/local" "/usr/pkg" "/usr/pkg/mono" "/opt/sfw" "/opt/sfw/mono" "/usr/sfw" "/usr/sfw/mono" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/mono"
 		do
 			if ( test -r "$path/bin/gacutil" )
 			then
@@ -4132,7 +3366,7 @@ then
 		NODEJSCXXFLAGS=""
 		AC_MSG_CHECKING(for node)
 
-		for path in "$NODEJSPATH" "/usr" "/" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/boot/common" "/resources/index" "/resources" "/resources/node"
+		for path in "$NODEJSPATH" "/usr" "/" "/usr/local/node" "/opt/node" "/usr/node" "/usr/local" "/usr/pkg" "/usr/pkg/node" "/opt/sfw" "/opt/sfw/node" "/usr/sfw" "/usr/sfw/node" "/opt/csw" "/sw" "/usr/freeware" "/boot/common" "/resources/index" "/resources" "/resources/node"
 		do
 			if ( test -z "$path" )
 			then
@@ -4247,7 +3481,7 @@ then
 	else
 
 		dnl Checks for TCL.
-		for i in "/sw/include" "/opt/csw/include" "/usr/sfw/include" "/opt/sfw/include" "/usr/pkg/include" "/usr/local/include" "$prefix/include" "/usr/include" "$TCLINCLUDEPATH"
+		for i in "/sw/include" "/usr/freeware/include" "/opt/csw/include" "/usr/sfw/include" "/opt/sfw/include" "/usr/pkg/include" "/usr/local/include" "$prefix/include" "/usr/include" "$TCLINCLUDEPATH"
 		do
 			for j in "" "/tcl8.0" "/tcl8.1" "/tcl8.2" "/tcl8.3" "/tcl8.4" "/tcl8.5" "/tcl8.6" "/tcl8.7" "/tcl8.8" "/tcl8.9"
 			do
@@ -4257,7 +3491,7 @@ then
 		dnl first look for a dynamic libtcl
 		if ( test -n "$TCLINCLUDE" )
 		then
-			for i in "/sw/lib" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/usr/freeware/$LIBARCHDIR" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
@@ -4296,7 +3530,7 @@ then
 		dnl if we didn't find it, look for a dynamic libtclstub
 		if ( test -n "$TCLINCLUDE " -a -z "$TCLLIB" )
 		then
-			for i in "/sw/lib" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
+			for i in "/sw/lib" "/usr/freeware/$LIBARCHDIR" "/opt/csw/lib" "/usr/sfw/lib" "/opt/sfw/lib" "/usr/pkg/lib" "/usr/local/lib" "/usr/local/lib64" "$prefix/lib" "$prefix/lib64" "/usr/lib" "/usr/lib64" "/usr/lib/$MULTIARCHDIR" "/usr/lib64/$MULTIARCHDIR" "$TCLLIBSPATH"
 			do
 				for j in "" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6" "8.7" "8.8" "8.9" "80" "81" "82" "83" "84" "85" "86" "87" "88" "89"
 				do
@@ -4355,56 +3589,4 @@ AC_DEFUN([FW_CHECK_NEED_REDHAT_9_GLIBC_2_3_2_HACK],
 	__ctype_toupper('a');
 #endif],[AC_MSG_RESULT(no)],[AC_MSG_RESULT(yes) AC_DEFINE_UNQUOTED(NEED_REDHAT_9_GLIBC_2_3_2_HACK,1,Some versions of glibc-2.3 need a fixup) GLIBC23HACKINCLUDE="#include <ctype.h>"; GLIBC23HACKCODE=" const unsigned short int **__ctype_b() { return __ctype_b_loc(); } const __int32_t **__ctype_toupper() { return __ctype_toupper_loc(); } const __int32_t **__ctype_tolower() { return __ctype_tolower_loc(); }"])
 	fi
-])
-
-dnl check to see which should be used of -lsocket, -lnsl and -lxnet
-AC_DEFUN([FW_CHECK_SOCKET_LIBS],
-[
-
-	AC_MSG_CHECKING(for socket libraries)
-
-	AC_LANG_SAVE
-	AC_LANG(C)
-	SOCKETLIBS=""
-	DONE=""
-	for i in "" "-lnsl" "-lsocket" "-lsocket -lnsl" "-lxnet" "-lwsock32 -lnetapi32" "-lnetwork"
-	do
-		FW_TRY_LINK([#ifdef HAVE_STDLIB_H
-	#include <stdlib.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-	#include <sys/types.h>
-#endif
-#ifdef HAVE_SYS_SOCKET_H
-	#include <sys/socket.h>
-#endif
-#ifdef __MINGW32__
-	#include <winsock2.h>
-#endif],[connect(0,NULL,0);
-listen(0,0);
-bind(0,NULL,0);
-accept(0,NULL,0);
-send(0,NULL,0,0);
-sendto(0,NULL,0,0,NULL,0);
-gethostbyname(NULL);],[$CPPFLAGS],[$i],[],[SOCKETLIBS="$i"; DONE="yes"],[])
-		if ( test -n "$DONE" )
-		then
-			break
-		fi
-	done
-	AC_LANG_RESTORE
-
-	if ( test -z "$DONE" )
-	then
-		AC_MSG_ERROR(no combination of networking libraries was found.)
-	fi
-
-	if ( test -z "$SOCKETLIBS" )
-	then
-		AC_MSG_RESULT(none)
-	else
-		AC_MSG_RESULT($SOCKETLIBS)
-	fi
-
-	AC_SUBST(SOCKETLIBS)
 ])

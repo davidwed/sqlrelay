@@ -226,3 +226,77 @@ const char *sqlrpostgresqlcredentials::getMethod() {
 uint32_t sqlrpostgresqlcredentials::getSalt() {
 	return salt;
 }
+
+sqlroraclecredentials::sqlroraclecredentials() : sqlrcredentials() {
+	user=NULL;
+	password=NULL;
+	passwordlength=0;
+	method=NULL;
+	extra=NULL;
+}
+
+sqlroraclecredentials::~sqlroraclecredentials() {
+}
+
+const char *sqlroraclecredentials::getType() {
+	return "oracle";
+}
+
+void sqlroraclecredentials::setUser(const char *user) {
+	this->user=user;
+}
+
+void sqlroraclecredentials::setPassword(const char *password) {
+	this->password=password;
+}
+
+void sqlroraclecredentials::setPasswordLength(uint64_t passwordlength) {
+	this->passwordlength=passwordlength;
+}
+
+void sqlroraclecredentials::setMethod(const char *method) {
+	this->method=method;
+}
+
+void sqlroraclecredentials::setExtra(const char *extra) {
+	this->extra=extra;
+}
+
+const char *sqlroraclecredentials::getUser() {
+	return user;
+}
+
+const char *sqlroraclecredentials::getPassword() {
+	return password;
+}
+
+uint64_t sqlroraclecredentials::getPasswordLength() {
+	return passwordlength;
+}
+
+const char *sqlroraclecredentials::getMethod() {
+	return method;
+}
+
+const char *sqlroraclecredentials::getExtra() {
+	return extra;
+}
+
+sqlrteradatacredentials::sqlrteradatacredentials() : sqlrcredentials() {
+	fd=NULL;
+}
+
+sqlrteradatacredentials::~sqlrteradatacredentials() {
+}
+
+const char *sqlrteradatacredentials::getType() {
+	return "teradata";
+}
+
+void sqlrteradatacredentials::setClientFileDescriptor(filedescriptor *fd) {
+	this->fd=fd;
+}
+
+filedescriptor *sqlrteradatacredentials::getClientFileDescriptor() {
+	return fd;
+}

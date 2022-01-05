@@ -6,6 +6,7 @@
 
 #include <sqlrelay/private/sqlrresultsettableincludes.h>
 
+/** Read-only, block-based, sequential-access. */
 class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 				public tablecollection<const char *> {
 	public:
@@ -16,13 +17,19 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 
 		void	setCursor(sqlrcursor *cursor);
 
+		bool		getIsReadOnly();
+		bool		getIsBlockBased();
+		bool		getIsSequentialAccess();
+
 		const char	*getColumnName(uint64_t col);
 		uint64_t	getColCount();
 
 		const char	*getValue(uint64_t row, uint64_t col);
 		const char	*getValue(uint64_t row, const char *colname);
+
 		uint64_t	getRowCount();
-		bool		allRowsAvailable();
+		uint64_t	getBlockSize();
+		bool		getAllRowsAvailable();
 	
 		#include <sqlrelay/private/sqlrresultsettable.h>
 };

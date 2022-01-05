@@ -1,0 +1,11 @@
+ora1 =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521))
+    (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1))
+  )
+
+sqlrelay =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL= TCP)(Host= sqlrelay.firstworks.com)(Port= 1521))
+    (CONNECT_DATA = (SID = ora1))
+  )

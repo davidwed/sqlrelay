@@ -1698,6 +1698,40 @@ class SQLRSERVER_DLLSPEC sqlrpostgresqlcredentials : public sqlrcredentials {
 	#include <sqlrelay/private/sqlrpostgresqlcredentials.h>
 };
 
+class SQLRSERVER_DLLSPEC sqlroraclecredentials : public sqlrcredentials {
+	public:
+			sqlroraclecredentials();
+		virtual	~sqlroraclecredentials();
+		const char	*getType();
+
+		void	setUser(const char *user);
+		void	setPassword(const char *password);
+		void	setPasswordLength(uint64_t passwordlength);
+		void	setMethod(const char *method);
+		void	setExtra(const char *extra);
+
+		const char	*getUser();
+		const char	*getPassword();
+		uint64_t	getPasswordLength();
+		const char	*getMethod();
+		const char	*getExtra();
+
+	#include <sqlrelay/private/sqlroraclecredentials.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrteradatacredentials : public sqlrcredentials {
+	public:
+			sqlrteradatacredentials();
+		virtual	~sqlrteradatacredentials();
+		const char	*getType();
+
+		void	setClientFileDescriptor(filedescriptor *fd);
+
+		filedescriptor	*getClientFileDescriptor();
+
+	#include <sqlrelay/private/sqlrteradatacredentials.h>
+};
+
 class SQLRSERVER_DLLSPEC sqlrauth {
 	public:
 		sqlrauth(sqlrservercontroller *cont,
@@ -2081,12 +2115,12 @@ class SQLRSERVER_DLLSPEC sqlrdirectives {
 	#include <sqlrelay/private/sqlrdirectives.h>
 };
 
-class SQLRSERVER_DLLSPEC sqlrtranslation {
+class SQLRSERVER_DLLSPEC sqlrquerytranslation {
 	public:
-		sqlrtranslation(sqlrservercontroller *cont,
-					sqlrtranslations *sqlts,
+		sqlrquerytranslation(sqlrservercontroller *cont,
+					sqlrquerytranslations *sqlts,
 					domnode *parameters);
-		virtual	~sqlrtranslation();
+		virtual	~sqlrquerytranslation();
 
 		virtual bool	usesTree();
 
@@ -2106,16 +2140,16 @@ class SQLRSERVER_DLLSPEC sqlrtranslation {
 		virtual void	endSession();
 
 	protected:
-		sqlrtranslations	*getTranslations();
+		sqlrquerytranslations	*getQueryTranslations();
 		domnode			*getParameters();
 
-	#include <sqlrelay/private/sqlrtranslation.h>
+	#include <sqlrelay/private/sqlrquerytranslation.h>
 };
 
-class SQLRSERVER_DLLSPEC sqlrtranslations {
+class SQLRSERVER_DLLSPEC sqlrquerytranslations {
 	public:
-		sqlrtranslations(sqlrservercontroller *cont);
-		~sqlrtranslations();
+		sqlrquerytranslations(sqlrservercontroller *cont);
+		~sqlrquerytranslations();
 
 		bool	load(domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -2158,7 +2192,7 @@ class SQLRSERVER_DLLSPEC sqlrtranslations {
 
 		bool	getUseOriginalOnError();
 
-	#include <sqlrelay/private/sqlrtranslations.h>
+	#include <sqlrelay/private/sqlrquerytranslations.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrfilter {
@@ -2504,6 +2538,57 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslations {
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrresultsetheadertranslations.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrerrortranslation {
+	public:
+		sqlrerrortranslation(sqlrservercontroller *cont,
+					sqlrerrortranslations *sqlts,
+					domnode *parameters);
+		virtual	~sqlrerrortranslation();
+
+		virtual bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					int64_t errornumber,
+					const char *error,
+					uint32_t errorlength,
+					int64_t *translatederrornumber,
+					const char **translatederror,
+					uint32_t *translatederrorlength);
+
+		virtual const char	*getError();
+
+		virtual void	endTransaction(bool commit);
+		virtual void	endSession();
+
+	protected:
+		sqlrerrortranslations	*getErrorTranslations();
+		domnode			*getParameters();
+
+	#include <sqlrelay/private/sqlrerrortranslation.h>
+};
+
+class SQLRSERVER_DLLSPEC sqlrerrortranslations {
+	public:
+		sqlrerrortranslations(sqlrservercontroller *cont);
+		~sqlrerrortranslations();
+
+		bool	load(domnode *parameters);
+		bool	run(sqlrserverconnection *sqlrcon,
+					sqlrservercursor *sqlrcur,
+					int64_t errornumber,
+					const char *error,
+					uint32_t errorlength,
+					int64_t *translatederrornumber,
+					const char **translatederror,
+					uint32_t *translatederrorlength);
+
+		const char	*getError();
+
+		void	endTransaction(bool commit);
+		void	endSession();
+
+	#include <sqlrelay/private/sqlrerrortranslations.h>
 };
 
 class SQLRSERVER_DLLSPEC sqlrtrigger {

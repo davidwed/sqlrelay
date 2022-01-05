@@ -62,6 +62,12 @@ extern "C" {
 			#define _WCHAR_T_DEFINED_
 		#endif
 	#endif
+	// On some versions of Mac OS X (10.4), php.h ultimately includes
+	// dyld.h, but somehow _Bool avoids getting defined by stdbool.h
+	// Define it here.
+	#ifdef RUDIMENTS_HAVE_MACH_O_DYLD_H
+		typedef int     _Bool;
+	#endif
 	#include <php.h>
 	#ifndef WIN32
 		#ifdef cpluspluswasdefined
@@ -157,6 +163,8 @@ extern "C" {
 	#define ARGINFO(a) a
 #else
 	#define ARGINFO(a) NULL
+	#define ZEND_BEGIN_ARG_INFO_EX(a,b,c,d)
+	#define ZEND_END_ARG_INFO()
 #endif
 
 // old enough versions of PHP don't support TSRMLS macros
@@ -285,34 +293,6 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_setconnecttimeout) {
 	if (connection) {
 		connection->setConnectTimeout(LVAL(timeoutsec),
 						LVAL(timeoutusec));
-	}
-}
-
-DLEXPORT ZEND_FUNCTION(sqlrcon_setauthenticationtimeout) {
-	ZVAL sqlrcon;
-	ZVAL timeoutsec;
-	ZVAL timeoutusec;
-	if (ZEND_NUM_ARGS() != 3 || 
-		GET_PARAMETERS(
-				ZEND_NUM_ARGS() TSRMLS_CC,
-				PARAMS("zzz")
-				&sqlrcon,
-				&timeoutsec,
-				&timeoutusec) == FAILURE) {
-		WRONG_PARAM_COUNT;
-	}
-	convert_to_long_ex(timeoutsec);
-	convert_to_long_ex(timeoutusec);
-	sqlrconnection *connection=NULL;
-	ZEND_FETCH_RESOURCE(connection,
-				sqlrconnection *,
-				sqlrcon,
-				-1,
-				"sqlrelay connection",
-				sqlrelay_connection);
-	if (connection) {
-		connection->setAuthenticationTimeout(LVAL(timeoutsec),
-							LVAL(timeoutusec));
 	}
 }
 
@@ -3926,9 +3906,6 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setconnecttimeout,0,0,0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setauthenticationtimeout,0,0,0)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_setresponsetimeout,0,0,0)
 ZEND_END_ARG_INFO()
 
@@ -4306,8 +4283,6 @@ zend_function_entry sql_relay_functions[] = {
 		ARGINFO(arginfo_sqlrcon_free))
 	ZEND_FE(sqlrcon_setconnecttimeout,
 		ARGINFO(arginfo_sqlrcon_setconnecttimeout))
-	ZEND_FE(sqlrcon_setauthenticationtimeout,
-		ARGINFO(arginfo_sqlrcon_setauthenticationtimeout))
 	ZEND_FE(sqlrcon_setresponsetimeout,
 		ARGINFO(arginfo_sqlrcon_setresponsetimeout))
 	ZEND_FE(sqlrcon_setbindvariabledelimiters,

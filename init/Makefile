@@ -123,7 +123,7 @@ ifeq ($(initroot),)
 		then \
 			/usr/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/sbin/systemctl enable sqlrelay.service; \
 		fi; \
-	elif ( test -x "/sbin/chkconfig" ); \
+	elif ( test -x "/sbin/chkconfig" -a "$(UNAME)" != "IRIX" ); \
 	then \
 		/sbin/chkconfig --add sqlrelay; \
 		/sbin/chkconfig --add sqlrcachemanager; \
@@ -199,7 +199,7 @@ uninstall:
 	then \
 		/usr/sbin/systemctl disable sqlrelay.service; \
 		/usr/sbin/systemctl disable sqlrcachemanager.service; \
-	elif ( test -x "/sbin/chkconfig" ); \
+	elif ( test -x "/sbin/chkconfig" -a "$(UNAME)" != "IRIX" ); \
 	then \
 		if ( test -n "`/sbin/chkconfig --list sqlrelay 2> /dev/null`"); \
 		then \
@@ -235,7 +235,7 @@ uninstall:
 	then \
 		/bin/launchctl unload /Library/LaunchDaemons/com.firstworks.sqlrelay.plist; \
 		/bin/launchctl unload /Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
-	elif ( test ! -x "/sbin/chkconfig" ); \
+	elif ( test ! -x "/sbin/chkconfig" -o "$(UNAME)" = "IRIX" ); \
 	then \
 		$(RM) /etc/rc0.d/*sqlrelay \
 			/etc/rc1.d/*sqlrelay \

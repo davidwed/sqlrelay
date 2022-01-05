@@ -447,7 +447,19 @@ bool sqlrimportcsv::rowEnd() {
 			if (i) {
 				query.append(',');
 			}
-			query.append(columns[i]);
+			const char	*c=columns[i];
+			const char	*m=columnmap.getValue(c);
+			if (m) {
+				c=m;
+			}
+			char	*cm=charstring::duplicate(c);
+			if (lowercasecolumnnames) {
+				charstring::lower(cm);
+			} else if (uppercasecolumnnames) {
+				charstring::upper(cm);
+			}
+			query.append(cm);
+			delete[] cm;
 		}
 		query.append(")");
 	}

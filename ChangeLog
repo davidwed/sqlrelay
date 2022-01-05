@@ -5,13 +5,32 @@
 	fixed NULL-bind in the ODBC driver
 	updated spec file to build python 3 packages on rhel 7
 	added support for nested substitutions
-	updated userlist auth module to support password files
+	updated userlist auth modules to support password files
 	updates aes128 pwdenc module to use sensitivevalue class instead of
 		its built-in implementation
 	updated debug logger to not log null/empty info
 	fixed a subtle bug that could cause closeResultSet()/clearError() not
 		to be called between reexecutes if the previous execute resulted
 		in an error
+	added error translations framework
+	migrated tds, oracle, and teradata protocols to public distro
+		(built but not currently installed though)
+	removed drop-in replacement modules for mysql and postgresql
+	refactored testing framework so that it doesn't rely on config or
+		other supporting files being installed on the build host's
+		filesystem
+	fixed a potential reference-after-free in the mysql connection module
+	updated to use acfirstworks.m4 and acrudiments.m4 from rudiments
+	added acsqlrelay.m4 for other projects to use in their configure scripts
+	added some configure fixes for older OS X
+	added some fixes for older PHP
+	removed authentication timeout methods/functions
+	added some hacks for older freetds
+	added column-mapping to the sqlrimport class
+	added upper/lower/mixed-case of column names to the sqlrimport class
+	reamed "translation" modules to "querytranslation" modules
+	updated configure script to support oracle 18c and 19c instantclient
+	refactored find-oracle-libs-at-runtime logic
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

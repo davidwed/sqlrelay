@@ -77,7 +77,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugBulkLoad();
 		bool		getDebugParser();
 		bool		getDebugDirectives();
-		bool		getDebugTranslations();
+		bool		getDebugQueryTranslations();
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
 		bool		getDebugBindTranslations();
@@ -86,6 +86,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugResultSetRowTranslations();
 		bool		getDebugResultSetRowBlockTranslations();
 		bool		getDebugResultSetHeaderTranslations();
+		bool		getDebugErrorTranslations();
 		bool		getDebugProtocols();
 		bool		getDebugAuths();
 		bool		getDebugPasswordEncryptions();
@@ -125,13 +126,14 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		domnode	*getListeners();
 		domnode	*getParser();
 		domnode	*getDirectives();
-		domnode	*getTranslations();
+		domnode	*getQueryTranslations();
 		domnode	*getFilters();
 		domnode	*getBindVariableTranslations();
 		domnode	*getResultSetTranslations();
 		domnode	*getResultSetRowTranslations();
 		domnode	*getResultSetRowBlockTranslations();
 		domnode	*getResultSetHeaderTranslations();
+		domnode	*getErrorTranslations();
 		domnode	*getTriggers();
 		domnode	*getLoggers();
 		domnode	*getNotifications();
@@ -216,7 +218,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugbulkload;
 		bool		debugparser;
 		bool		debugdirectives;
-		bool		debugtranslations;
+		bool		debugquerytranslations;
 		bool		debugfilters;
 		bool		debugtriggers;
 		bool		debugbindtranslations;
@@ -225,6 +227,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugresultsetrowtranslations;
 		bool		debugresultsetrowblocktranslations;
 		bool		debugresultsetheadertranslations;
+		bool		debugerrortranslations;
 		bool		debugprotocols;
 		bool		debugauths;
 		bool		debugpwdencs;
@@ -265,13 +268,14 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		domnode	*listenersxml;
 		domnode	*parserxml;
 		domnode	*directivesxml;
-		domnode	*translationsxml;
+		domnode	*querytranslationsxml;
 		domnode	*filtersxml;
 		domnode	*bindvariabletranslationsxml;
 		domnode	*resultsettranslationsxml;
 		domnode	*resultsetrowtranslationsxml;
 		domnode	*resultsetrowblocktranslationsxml;
 		domnode	*resultsetheadertranslationsxml;
+		domnode	*errortranslationsxml;
 		domnode	*triggersxml;
 		domnode	*loggersxml;
 		domnode	*notificationsxml;
@@ -359,7 +363,7 @@ void sqlrconfig_xmldom::init() {
 	debugbulkload=hasDebug(debug,"bulkload");
 	debugparser=hasDebug(debug,"parser");
 	debugdirectives=hasDebug(debug,"directives");
-	debugtranslations=hasDebug(debug,"translations");
+	debugquerytranslations=hasDebug(debug,"querytranslations");
 	debugfilters=hasDebug(debug,"filters");
 	debugtriggers=hasDebug(debug,"triggers");
 	debugbindtranslations=
@@ -374,6 +378,8 @@ void sqlrconfig_xmldom::init() {
 		hasDebug(debug,"resultsetrowblocktranslations");
 	debugresultsetheadertranslations=
 		hasDebug(debug,"resultsetheadertranslations");
+	debugerrortranslations=
+		hasDebug(debug,"errortranslations");
 	debugprotocols=hasDebug(debug,"protocols");
 	debugauths=hasDebug(debug,"auths");
 	debugpwdencs=hasDebug(debug,"passwordencrypytions");
@@ -616,8 +622,8 @@ bool sqlrconfig_xmldom::getDebugDirectives() {
 	return debugdirectives;
 }
 
-bool sqlrconfig_xmldom::getDebugTranslations() {
-	return debugtranslations;
+bool sqlrconfig_xmldom::getDebugQueryTranslations() {
+	return debugquerytranslations;
 }
 
 bool sqlrconfig_xmldom::getDebugFilters() {
@@ -650,6 +656,10 @@ bool sqlrconfig_xmldom::getDebugResultSetRowBlockTranslations() {
 
 bool sqlrconfig_xmldom::getDebugResultSetHeaderTranslations() {
 	return debugresultsetheadertranslations;
+}
+
+bool sqlrconfig_xmldom::getDebugErrorTranslations() {
+	return debugerrortranslations;
 }
 
 bool sqlrconfig_xmldom::getDebugProtocols() {
@@ -800,8 +810,8 @@ domnode *sqlrconfig_xmldom::getDirectives() {
 	return directivesxml;
 }
 
-domnode *sqlrconfig_xmldom::getTranslations() {
-	return translationsxml;
+domnode *sqlrconfig_xmldom::getQueryTranslations() {
+	return querytranslationsxml;
 }
 
 domnode *sqlrconfig_xmldom::getFilters() {
@@ -826,6 +836,10 @@ domnode *sqlrconfig_xmldom::getResultSetRowBlockTranslations() {
 
 domnode *sqlrconfig_xmldom::getResultSetHeaderTranslations() {
 	return resultsetheadertranslationsxml;
+}
+
+domnode *sqlrconfig_xmldom::getErrorTranslations() {
+	return errortranslationsxml;
 }
 
 domnode *sqlrconfig_xmldom::getTriggers() {
@@ -1179,9 +1193,11 @@ bool sqlrconfig_xmldom::load(const char *urlname, const char *id) {
 		getRootNode()->write(&stdoutput);
 		debugPrintf("\n");
 	#endif
-/*stdoutput.printf("normalized tree:\n");
-getRootNode()->write(&stdoutput);
-stdoutput.printf("\n");*/
+	#if 0
+		stdoutput.printf("normalized tree:\n");
+		getRootNode()->write(&stdoutput);
+		stdoutput.printf("\n");
+	#endif
 
 	// get values from the tree
 	getTreeValues();
@@ -1703,6 +1719,39 @@ void sqlrconfig_xmldom::normalizeTree() {
 		// delete the old router tag
 		router->getParent()->deleteChild(router);
 	}
+
+	// translations/translation -> querytranslations/querytranslation
+	domnode	*translations=instance->getFirstTagChild("translations");
+	if (!translations->isNullNode()) {
+		translations->setName("querytranslations");
+		for (domnode *translation=translations->
+					getFirstTagChild("translation");
+				!translation->isNullNode();
+				translation=translation->
+					getNextTagSibling("translation")) {
+			translation->setName("querytranslation");
+		}
+	}
+
+	// debug="... translations" -> debug="... querytranslations"
+	const char	*d=instance->getAttributeValue("debug");
+	if (charstring::contains(d,"translations")) {
+		stringbuffer	dstr;
+		char		**parts;
+		uint64_t	partcount;
+		charstring::split(d," ",true,&parts,&partcount);
+		for (uint64_t i=0; i<partcount; i++) {
+			if (i) {
+				dstr.append(' ');
+			}
+			if (!charstring::compare(parts[i],"translations")) {
+				dstr.append("querytranslations");
+			} else {
+				dstr.append(parts[i]);
+			}
+		}
+		instance->setAttributeValue("debug",dstr.getString());
+	}
 }
 
 void sqlrconfig_xmldom::getTreeValues() {
@@ -1821,7 +1870,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 		debugbulkload=hasDebug(debug,"bulkload");
 		debugparser=hasDebug(debug,"parser");
 		debugdirectives=hasDebug(debug,"directives");
-		debugtranslations=hasDebug(debug,"translations");
+		debugquerytranslations=hasDebug(debug,"querytranslations");
 		debugfilters=hasDebug(debug,"filters");
 		debugtriggers=hasDebug(debug,"triggers");
 		debugbindtranslations=hasDebug(debug,"bindtranslations");
@@ -1835,6 +1884,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 			hasDebug(debug,"resultsetrowblocktranslations");
 		debugresultsetheadertranslations=
 			hasDebug(debug,"resultsetheadertranslations");
+		debugerrortranslations=
+			hasDebug(debug,"errortranslations");
 		debugprotocols=hasDebug(debug,"protocols");
 		debugauths=hasDebug(debug,"auths");
 		debugpwdencs=hasDebug(debug,"passwordencryptions");
@@ -1941,7 +1992,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 	listenersxml=instance->getFirstTagChild("listeners");
 	parserxml=instance->getFirstTagChild("parser");
 	directivesxml=instance->getFirstTagChild("directives");
-	translationsxml=instance->getFirstTagChild("translations");
+	querytranslationsxml=instance->getFirstTagChild("querytranslations");
 	filtersxml=instance->getFirstTagChild("filters");
 	bindvariabletranslationsxml=instance->getFirstTagChild(
 					"bindvariabletranslations");
@@ -1953,6 +2004,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 					"resultsetrowblocktranslations");
 	resultsetheadertranslationsxml=instance->getFirstTagChild(
 					"resultsetheadertranslations");
+	errortranslationsxml=instance->getFirstTagChild(
+					"errortranslations");
 	triggersxml=instance->getFirstTagChild("triggers");
 	loggersxml=instance->getFirstTagChild("loggers");
 	notificationsxml=instance->getFirstTagChild("notifications");

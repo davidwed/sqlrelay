@@ -2,7 +2,7 @@ top_builddir = ../../..
 
 include ../../../config.mk
 
-.SUFFIXES: .lo
+.SUFFIXES: .lo .obj .cpp
 
 .cpp.lo:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(PYTHONCPPFLAGS) $(COMPILE) $< $(OUT)$@
@@ -14,7 +14,7 @@ all: CSQLRelay.$(LIBEXT) PySQLRDB.py
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest PySQLRDB.py temp.py.in *.pyc *.ii
-	$(RMTREE) .libs
+	$(RMTREE) .libs __pycache__
 
 CSQLRelay.$(LIBEXT): CSQLRelay.cpp CSQLRelay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ CSQLRelay.$(OBJ) $(LDFLAGS) $(PYTHONLIBS) $(MODLINKFLAGS)

@@ -1,0 +1,9 @@
+rm -f cli*.trc
+
+java -cp `pwd`/jnettrace.jar oracle.net.trace.OracleJavaNetTrace localhost 1521 1522 &
+
+java -cp `pwd`/ojdbc8.jar:/home/dmuse/src/sqlrelay/test/dropin oracle
+
+mv client_*.trc jdbcsqlrelay.trc
+
+kill `ps -efa | grep jnettrace | grep -v grep | cut -c10-15`

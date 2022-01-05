@@ -57,15 +57,6 @@ public class SQLRConnection : IDisposable
         sqlrcon_setConnectTimeout(sqlrconref, timeoutsec, timeoutusec);
     }
     
-    /** Sets the authentication timeout in seconds and milliseconds.  Setting
-     *  either parameter to -1 disables the timeout.   You can also set this
-     *  timeout using the SQLR_CLIENT_AUTHENTICATION_TIMEOUT environment
-     *  variable. */
-    public void setAuthenticationTimeout(Int32 timeoutsec, Int32 timeoutusec)
-    {
-        sqlrcon_setAuthenticationTimeout(sqlrconref, timeoutsec, timeoutusec);
-    }
-    
     /** Sets the response timeout (for queries, commits, rollbacks, pings,
       * etc.) in seconds and milliseconds.  Setting either parameter to -1
       * disables the timeout.  You can also set this timeout using the
@@ -475,9 +466,6 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_setConnectTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
-    
-    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
-    private static extern void sqlrcon_setAuthenticationTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern void sqlrcon_setResponseTimeout(IntPtr sqlrconref, Int32 timeoutsec, Int32 timeoutusec);

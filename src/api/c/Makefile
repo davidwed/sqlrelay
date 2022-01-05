@@ -5,7 +5,7 @@ include ../../../config.mk
 SRCS = sqlrclientwrapper.cpp
 LOBJS = sqlrclientwrapper.$(OBJ)
 
-.SUFFIXES: .lo
+.SUFFIXES: .lo .obj .cpp
 
 .cpp.lo:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(CCPPFLAGS) $(COMPILE) $< $(OUT)$@

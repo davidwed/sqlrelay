@@ -38,6 +38,7 @@ extern "C" {
 		#define _int64 long long
 	#endif
 	#ifndef ORACLE_AT_RUNTIME
+		#define OCIVER_ORACLE
 		#include <oci.h>
 	#endif
 

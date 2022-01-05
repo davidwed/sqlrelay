@@ -946,12 +946,6 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 
 mysqlcursor::~mysqlcursor() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
-	if (stmtfreeresult) {
-		mysql_stmt_free_result(stmt);
-	}
-	if (mysqlresult) {
-		mysql_free_result(mysqlresult);
-	}
 	delete[] bind;
 	delete[] bindvaluesize;
 #endif
@@ -1015,7 +1009,27 @@ bool mysqlcursor::open() {
 }
 
 bool mysqlcursor::close() {
-	mysql_stmt_close(stmt);
+	if (stmtfreeresult) {
+		mysql_stmt_free_result(stmt);
+		stmtfreeresult=false;
+	}
+	if (mysqlresult) {
+		mysql_free_result(mysqlresult);
+		mysqlresult=NULL;
+#ifdef HAVE_MYSQL_NEXT_RESULT
+		while (!mysql_next_result(mysqlconn->mysqlptr)) {
+			mysqlresult=mysql_store_result(mysqlconn->mysqlptr);
+			if (mysqlresult) {
+				mysql_free_result(mysqlresult);
+				mysqlresult=NULL;
+			}
+		}
+#endif
+	}
+	if (stmt) {
+		mysql_stmt_close(stmt);
+		stmt=NULL;
+	}
 	return true;
 }
 #endif
@@ -1982,13 +1996,13 @@ void mysqlcursor::closeResultSet() {
 }
 
 void mysqlcursor::freeResult() {
-	if (mysqlresult!=(MYSQL_RES *)NULL) {
+	if (mysqlresult) {
 		mysql_free_result(mysqlresult);
 		mysqlresult=NULL;
 #ifdef HAVE_MYSQL_NEXT_RESULT
 		while (!mysql_next_result(mysqlconn->mysqlptr)) {
 			mysqlresult=mysql_store_result(mysqlconn->mysqlptr);
-			if (mysqlresult!=(MYSQL_RES *)NULL) {
+			if (mysqlresult) {
 				mysql_free_result(mysqlresult);
 				mysqlresult=NULL;
 			}
@@ -2007,7 +2021,8 @@ bool mysqlcursor::columnInfoIsValidAfterPrepare() {
 void mysqlcursor::encodeBlob(stringbuffer *buffer,
 					const char *data, uint32_t datasize) {
 	if (!mysqlconn->escapeblobs) {
-		return sqlrservercursor::encodeBlob(buffer,data,datasize);
+		sqlrservercursor::encodeBlob(buffer,data,datasize);
+		return;
 	}
 	buffer->append('\'');
 	for (uint32_t i=0; i<datasize; i++) {

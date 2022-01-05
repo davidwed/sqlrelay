@@ -89,17 +89,6 @@ JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setConnectTim
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
- * Method:    setAuthenticationTimeout
- * Signature: (II)V
- */
-JNIEXPORT void JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_setAuthenticationTimeout
-  (JNIEnv *env, jobject self, jint timeoutsec, jint timeoutusec) {
-	getSqlrConnection(env,self)->
-		setAuthenticationTimeout((int32_t)timeoutsec,(int32_t)timeoutusec);
-}
-
-/*
- * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    setResponseTimeout
  * Signature: (II)V
  */
