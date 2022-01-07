@@ -28,15 +28,15 @@ void sqlrresultsettable::setCursor(sqlrcursor *cursor) {
 	pvt->cursor=cursor;
 }
 
-bool sqlrresultsettable::getIsReadOnly() {
+bool sqlrresultsettable::getIsReadOnly() const {
 	return true;
 }
 
-bool sqlrresultsettable::getIsBlockBased() {
+bool sqlrresultsettable::getIsBlockBased() const {
 	return true;
 }
 
-bool sqlrresultsettable::getIsSequentialAccess() {
+bool sqlrresultsettable::getIsSequentialAccess() const {
 	return true;
 }
 
@@ -44,11 +44,11 @@ void sqlrresultsettable::setColumnName(uint64_t col, const char *name) {
 	// do nothing
 }
 
-const char *sqlrresultsettable::getColumnName(uint64_t col) {
+const char *sqlrresultsettable::getColumnName(uint64_t col) const {
 	return (pvt->cursor)?pvt->cursor->getColumnName(col):"";
 }
 
-uint64_t sqlrresultsettable::getColCount() {
+uint64_t sqlrresultsettable::getColCount() const {
 	return (pvt->cursor)?pvt->cursor->colCount():0;
 }
 
@@ -57,23 +57,25 @@ void sqlrresultsettable::setValue(uint64_t row,
 					const char *value) {
 }
 
-const char *sqlrresultsettable::getValue(uint64_t row, uint64_t col) {
+const char *sqlrresultsettable::getValue(uint64_t row,
+						uint64_t col) const {
 	return (pvt->cursor)?pvt->cursor->getField(row,col):"";
 }
 
-const char *sqlrresultsettable::getValue(uint64_t row, const char *colname) {
+const char *sqlrresultsettable::getValue(uint64_t row,
+						const char *colname) const {
 	return (pvt->cursor)?pvt->cursor->getField(row,colname):"";
 }
 
-uint64_t sqlrresultsettable::getRowCount() {
+uint64_t sqlrresultsettable::getRowCount() const {
 	return (pvt->cursor)?pvt->cursor->rowCount():0;
 }
 
-uint64_t sqlrresultsettable::getBlockSize() {
+uint64_t sqlrresultsettable::getBlockSize() const {
 	return (pvt->cursor)?pvt->cursor->getResultSetBufferSize():0;
 }
 
-bool sqlrresultsettable::getAllRowsAvailable() {
+bool sqlrresultsettable::getAllRowsAvailable() const {
 	return (pvt->cursor)?pvt->cursor->endOfResultSet():true;
 }
 

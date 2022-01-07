@@ -17,19 +17,21 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 
 		void	setCursor(sqlrcursor *cursor);
 
-		bool		getIsReadOnly();
-		bool		getIsBlockBased();
-		bool		getIsSequentialAccess();
+		bool		getIsReadOnly() const;
+		bool		getIsBlockBased() const;
+		bool		getIsSequentialAccess() const;
 
-		const char	*getColumnName(uint64_t col);
-		uint64_t	getColCount();
+		const char	*getColumnName(uint64_t col) const;
+		uint64_t	getColCount() const;
 
-		const char	*getValue(uint64_t row, uint64_t col);
-		const char	*getValue(uint64_t row, const char *colname);
+		const char	*getValue(uint64_t row,
+						uint64_t col) const;
+		const char	*getValue(uint64_t row,
+						const char *colname) const;
 
-		uint64_t	getRowCount();
-		uint64_t	getBlockSize();
-		bool		getAllRowsAvailable();
+		uint64_t	getRowCount() const;
+		uint64_t	getBlockSize() const;
+		bool		getAllRowsAvailable() const;
 	
 		#include <sqlrelay/private/sqlrresultsettable.h>
 };
