@@ -544,17 +544,8 @@ void sqlrlistener::setHandoffMethod() {
 
 	if (!charstring::compare(pvt->_cfg->getHandoff(),"pass")) {
 
-        	// on some OS'es, force proxy, even if pass was specified...
-
-        	// get the os and version
-        	char    *os=sys::getOperatingSystemName();
-        	char    *rel=sys::getOperatingSystemRelease();
-        	double  ver=charstring::toFloatC(rel);
-	
-        	// force proxy Cygwin, Linux < 2.2, and Darwin
-        	if (!charstring::compare(os,"CYGWIN",6) ||
-                	(!charstring::compare(os,"Linux",5) && ver<2.2) ||
-                	!charstring::compare(os,"Darwin",6)) {
+        	// force proxy on platforms that don't support passing sockets
+        	if (!filedescriptor::supportsPassReceiveSocket()) {
 			pvt->_handoffmode=HANDOFF_PROXY;
 			stderror.printf("Warning: handoff=\"pass\" not "
 					"supported, falling back to "
@@ -563,18 +554,10 @@ void sqlrlistener::setHandoffMethod() {
 			pvt->_handoffmode=HANDOFF_PASS;
 		}
 
-        	// clean up
-        	delete[] os;
-        	delete[] rel;
-
 	} else {
 
         	// on some OS'es, force pass, even if proxy was specified...
-
-        	// get the os and version
         	char    *os=sys::getOperatingSystemName();
-	
-        	// force pass for Windows
         	if (!charstring::compare(os,"Windows",7)) {
 			pvt->_handoffmode=HANDOFF_PASS;
 			stderror.printf("Warning: handoff=\"proxy\" not "
@@ -583,8 +566,6 @@ void sqlrlistener::setHandoffMethod() {
 		} else {
 			pvt->_handoffmode=HANDOFF_PROXY;
 		}
-
-        	// clean up
         	delete[] os;
 	}
 
