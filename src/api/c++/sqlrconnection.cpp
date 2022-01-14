@@ -906,8 +906,8 @@ bool sqlrconnection::reConfigureSockets() {
 		pvt->_ctx=NULL;
 	}
 
-	pvt->_ucs.setSecurityContext(pvt->_ctx);
-	pvt->_ics.setSecurityContext(pvt->_ctx);
+	pvt->_ucs.setSocketLayer(pvt->_ctx);
+	pvt->_ics.setSocketLayer(pvt->_ctx);
 
 	return true;
 }

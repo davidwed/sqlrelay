@@ -709,7 +709,7 @@ bool sqlrprotocol_postgresql::handleTlsRequest() {
 
 	debugStart("tls");
 
-	clientsock->setSecurityContext(getTlsContext());
+	clientsock->setSocketLayer(getTlsContext());
 	getTlsContext()->setFileDescriptor(clientsock);
 
 	if (!getTlsContext()->accept()) {

@@ -609,7 +609,7 @@ bool sqlrprotocol_sqlrclient::acceptSecurityContext() {
 	}
 
 	// attach the context and file descriptor to each other
-	clientsock->setSecurityContext(ctx);
+	clientsock->setSocketLayer(ctx);
 	ctx->setFileDescriptor(clientsock);
 
 	// accept the security context

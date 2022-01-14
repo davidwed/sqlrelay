@@ -1849,7 +1849,7 @@ bool sqlrprotocol_mysql::handleTlsRequest() {
 		stdoutput.printf("	client requesting tls\n");
 	}
 
-	clientsock->setSecurityContext(getTlsContext());
+	clientsock->setSocketLayer(getTlsContext());
 	getTlsContext()->setFileDescriptor(clientsock);
 
 	if (!getTlsContext()->accept()) {
