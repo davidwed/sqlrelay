@@ -232,6 +232,10 @@ AC_ARG_ENABLE(perl,
 	[  --disable-perl                Don't build Perl api],
 	ENABLE_PERL="",
 	ENABLE_PERL="yes")
+AC_ARG_ENABLE(perl-rpath,
+	[  --enable-perl-rpath           Use -rpath when linking the Perl library against the SQL Relay client library],
+	PERLSERPATH="yes",
+	PERLSERPATH="")
 AC_ARG_WITH(perl-site-arch,
 	[  --with-perl-site-arch         Override Perl's built-in PERLSITEARCH variable (location to install binary perl modules)],
 	OVERRIDEPERLSITEARCH="$withval",
@@ -272,6 +276,10 @@ AC_ARG_ENABLE(ruby,
 	[  --disable-ruby                Don't build Ruby api],
 	ENABLE_RUBY="",
 	ENABLE_RUBY="yes")
+AC_ARG_ENABLE(ruby-rpath,
+	[  --enable-ruby-rpath           Use -rpath when linking the Ruby library against the SQL Relay client library],
+	RUBYUSERPATH="yes",
+	RUBYUSERPATH="")
 AC_ARG_WITH(ruby-site-arch-dir,
 	[  --with-ruby-site-arch-dir     Override Ruby's built-in sitearchdir variable (location to install binary ruby modules)],
 	OVERRIDERUBYSITEARCHDIR="$withval",
@@ -478,11 +486,13 @@ AC_SUBST(DB2USERPATH)
 AC_SUBST(FIREBIRDUSERPATH)
 AC_SUBST(INFORMIXUSERPATH)
 AC_SUBST(ENABLE_ROUTER)
+AC_SUBST(PERLUSERPATH)
 AC_SUBST(OVERRIDEPERLSITEARCH)
 AC_SUBST(OVERRIDEPERLSITELIB)
 AC_SUBST(OVERRIDEPERLINSTALLMAN3DIR)
 AC_SUBST(OVERRIDEPERLMAN3EXT)
 AC_SUBST(PYTHONUSERPATH)
+AC_SUBST(RUBYUSERPATH)
 AC_SUBST(OVERRIDERUBYSITEARCHDIR)
 AC_SUBST(JAVAUSERPATH)
 AC_SUBST(PHPUSERPATH)

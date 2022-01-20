@@ -868,11 +868,13 @@ TCLUSERPATH
 PHPUSERPATH
 JAVAUSERPATH
 OVERRIDERUBYSITEARCHDIR
+RUBYUSERPATH
 PYTHONUSERPATH
 OVERRIDEPERLMAN3EXT
 OVERRIDEPERLINSTALLMAN3DIR
 OVERRIDEPERLSITELIB
 OVERRIDEPERLSITEARCH
+PERLUSERPATH
 ENABLE_ROUTER
 INFORMIXUSERPATH
 FIREBIRDUSERPATH
@@ -987,6 +989,7 @@ enable_odbc_driver
 with_perl_prefix
 with_pod2man
 enable_perl
+enable_perl_rpath
 with_perl_site_arch
 with_perl_site_lib
 with_perl_install_man3_dir
@@ -997,6 +1000,7 @@ enable_python_rpath
 with_python_dir
 with_ruby_prefix
 enable_ruby
+enable_ruby_rpath
 with_ruby_site_arch_dir
 with_java_prefix
 enable_java
@@ -1715,9 +1719,11 @@ Optional Features:
   --disable-router              Don't build router connection module
   --disable-odbc-driver         Don't build ODBC driver
   --disable-perl                Don't build Perl api
+  --enable-perl-rpath           Use -rpath when linking the Perl library against the SQL Relay client library
   --disable-python              Don't build Python api
   --enable-python-rpath         Use -rpath when linking the Python library against the SQL Relay client library
   --disable-ruby                Don't build Ruby api
+  --enable-ruby-rpath           Use -rpath when linking the Ruby library against the SQL Relay client library
   --disable-java                Don't build Java api
   --enable-java-rpath           Use -rpath when linking the Java library against the SQL Relay client library
   --disable-php                 Don't build PHP api
@@ -3128,6 +3134,13 @@ else
   ENABLE_PERL="yes"
 fi
 
+# Check whether --enable-perl-rpath was given.
+if test "${enable_perl_rpath+set}" = set; then :
+  enableval=$enable_perl_rpath; PERLSERPATH="yes"
+else
+  PERLSERPATH=""
+fi
+
 
 # Check whether --with-perl-site-arch was given.
 if test "${with_perl_site_arch+set}" = set; then :
@@ -3203,6 +3216,13 @@ if test "${enable_ruby+set}" = set; then :
   enableval=$enable_ruby; ENABLE_RUBY=""
 else
   ENABLE_RUBY="yes"
+fi
+
+# Check whether --enable-ruby-rpath was given.
+if test "${enable_ruby_rpath+set}" = set; then :
+  enableval=$enable_ruby_rpath; RUBYUSERPATH="yes"
+else
+  RUBYUSERPATH=""
 fi
 
 
@@ -3509,6 +3529,8 @@ if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
 then
 	ENABLE_UTIL=""
 fi
+
+
 
 
 

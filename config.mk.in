@@ -75,18 +75,37 @@ DIRCPPFLAG = -DBINDIR=\"$(bindir)/\" -DLOCALSTATEDIR=\"$(localstatedir)/\" -DSYS
 MACOSXDEPLOYMENTTARGET = @MACOSXDEPLOYMENTTARGET@
 
 
-# linker flags
+# linker commands and flags
 LTLINK = $(MACOSXDEPLOYMENTTARGET) $(LIBTOOL) --mode=link
 LINK = @CXX@
 CCLINK = @CC@
 AR = @AR@
 LDFLAGS = @LDFLAGS@
-SRVLINKFLAGS = -rpath $(libdir) -version-info $(SRV_SONAME_VERSION_INFO) -no-undefined
-CLTLINKFLAGS = -rpath $(libdir) -version-info $(CLT_SONAME_VERSION_INFO) -no-undefined
-MODLINKFLAGS = -rpath $(libexecdir) -avoid-version -module -no-undefined
 INSTALLLIB = installlib
 UNINSTALLLIB = uninstalllib
 LIBEXT = la
+
+
+# client/server rpath flags
+CLIENTUSERPATH = @CLIENTUSERPATH@
+SERVERUSERPATH = @SERVERUSERPATH@
+
+
+# client/server/module linker flags
+SRVLINKFLAGS = -version-info $(SRV_SONAME_VERSION_INFO) -no-undefined
+#@DISABLE_NEW_DTAGS@ -rpath $(libdir)
+CLTLINKFLAGS = -version-info $(CLT_SONAME_VERSION_INFO) -no-undefined
+ifneq ($(strip $(libdir)),)
+ifeq ($(CLIENTUSERPATH),yes)
+CLTLINKFLAGS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
+endif
+endif
+MODLINKFLAGS = -avoid-version -module -no-undefined
+ifneq ($(strip $(libdir)),)
+ifeq ($(SERVERUSERPATH),yes)
+MODLINKFLAGS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
+endif
+endif
 
 
 # install commands
@@ -113,11 +132,6 @@ SYMLINK = ln -s
 
 # uname -s
 UNAME = @UNAME@
-
-
-# client/server rpath flags
-CLIENTUSERPATH = @CLIENTUSERPATH@
-SERVERUSERPATH = @SERVERUSERPATH@
 
 
 # math library
@@ -167,7 +181,7 @@ CCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(WNOMISMATCHEDTAGS) -I./ -I$(top_builddir
 CLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(CUSERPATH),yes)
-CLIBS += -rpath $(libdir)
+CLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 
@@ -187,6 +201,7 @@ GACUTIL = @GACUTIL@
 HAVE_PERL = @HAVE_PERL@
 PERL = @PERL@
 PERLPREFIX = @PERLPREFIX@
+PERLUSERPATH = @PERLUSERPATH@
 PERLLIB = @PERLLIB@
 PERLINC = @PERLINC@
 PERLCCFLAGS = @PERLCCFLAGS@ @PERL500@ @PERLREALLYOLD@
@@ -228,12 +243,14 @@ PERLMAN3EXT_LOCAL = $(OVERRIDEPERLMAN3EXT)
 endif
 PERLCPPFLAGS = $(BASECPPFLAGS) $(PERLOPTIMIZE_LOCAL) $(PERLCCFLAGS_LOCAL) -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PERLINC_LOCAL)
 PERLLIBS = @PERLLIBS@
-PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection $(PERLLIBS)
-PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor $(PERLLIBS)
+PERLCONLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) $(PERLLIBS)
+#@DISABLE_NEW_DTAGS@ -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Connection $(PERLLIBS)
+PERLCURLIBS = $(PERLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) $(PERLLIBS)
+#@DISABLE_NEW_DTAGS@ -rpath $(PERLSITEARCH_LOCAL)/auto/SQLRelay/Cursor $(PERLLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PERLUSERPATH),yes)
-PERLCONLIBS += -rpath $(libdir)
-PERLCURLIBS += -rpath $(libdir)
+PERLCONLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
+PERLCURLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 PERLINSTALLMAN =
@@ -253,10 +270,11 @@ PYTHONUSERPATH = @PYTHONUSERPATH@
 PYTHONLIB = @PYTHONLIB@
 PYTHON = @PYTHON@
 PYTHONCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-PYTHONLIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(PYTHONDIR)/$(PYTHONSITEDIR)/SQLRelay
+PYTHONLIBS = $(PYTHONLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+#@DISABLE_NEW_DTAGS@ -rpath $(PYTHONDIR)/$(PYTHONSITEDIR)/SQLRelay
 ifneq ($(strip $(libdir)),)
 ifeq ($(PYTHONUSERPATH),yes)
-PYTHONLIBS += -rpath $(libdir)
+PYTHONLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 IMPORTEXCEPTIONS = @IMPORTEXCEPTIONS@
@@ -266,6 +284,7 @@ EXCEPTIONSSTANDARDERROR = @EXCEPTIONSSTANDARDERROR@
 # ruby
 HAVE_RUBY = @HAVE_RUBY@
 RUBY = @RUBY@
+RUBYUSERPATH = @RUBYUSERPATH@
 RUBYLIB = @RUBYLIB@
 OVERRIDERUBYSITEARCHDIR = @OVERRIDERUBYSITEARCHDIR@
 
@@ -278,10 +297,11 @@ RUBYSITEARCHDIR = $(OVERRIDERUBYSITEARCHDIR)
 endif
 
 RUBYCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(RUBYCFLAGS) -I./ -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-RUBYLIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(RUBYSITEARCHDIR)
+RUBYLIBS = $(RUBYLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+#@DISABLE_NEW_DTAGS@ -rpath $(RUBYSITEARCHDIR)
 ifneq ($(strip $(libdir)),)
 ifeq ($(RUBYUSERPATH),yes)
-RUBYLIBS += -rpath $(libdir)
+RUBYLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 
@@ -298,17 +318,19 @@ PHPCONFDIR = @PHPCONFDIR@
 PHPCONFSTYLE = @PHPCONFSTYLE@
 HAVE_PHP_PDO = @HAVE_PHP_PDO@
 PHPCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
-PHPLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
+#@DISABLE_NEW_DTAGS@ -rpath $(PHPEXTDIR)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)
-PHPLIBS += -rpath $(libdir)
+PHPLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 PHPPDOCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(PHPINCLUDES) -DCOMPILE_DL=1
-PHPPDOLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) -rpath $(PHPEXTDIR)
+PHPPDOLIBS = $(PHPLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
+#@DISABLE_NEW_DTAGS@ -rpath $(PHPEXTDIR)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PHPUSERPATH),yes)
-PHPPDOLIBS += -rpath $(libdir)
+PHPPDOLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 
@@ -320,11 +342,12 @@ JAR = @JAR@
 JAVAINCLUDES = @JAVAINCLUDES@
 JAVAUSERPATH = @JAVAUSERPATH@
 JAVACPPFLAGS = $(WERROR) $(WNOUNKNOWNPRAGMAS) $(BASECPPFLAGS) -I./ -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES) $(JAVAINCLUDES)
-JAVALIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) -rpath $(javadir)/com/firstworks/sqlrelay
+JAVALIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS)
+#@DISABLE_NEW_DTAGS@ -rpath $(javadir)/com/firstworks/sqlrelay
 CURSORCLASSPATH=@CURSORCLASSPATH@
 ifneq ($(strip $(libdir)),)
 ifeq ($(JAVAUSERPATH),yes)
-JAVALIBS += -rpath $(libdir)
+JAVALIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 
@@ -336,10 +359,11 @@ TCLLIB = @TCLLIB@
 TCLLIBSPATH = @TCLLIBSPATH@
 TCLUSERPATH = @TCLUSERPATH@
 TCLCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(TCLINCLUDE) -I$(top_builddir) -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-TCLLIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE) -rpath $(TCLLIBSPATH)/sqlrelay
+TCLLIBS = $(TCLLIB) -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+#@DISABLE_NEW_DTAGS@ -rpath $(TCLLIBSPATH)/sqlrelay
 ifneq ($(strip $(libdir)),)
 ifeq ($(TCLUSERPATH),yes)
-TCLLIBS += -rpath $(libdir)
+TCLLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 
@@ -358,7 +382,7 @@ ERLANGCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(ERLANGINCLUDES) -I$(top_builddi
 ERLANGLIBS = $(ERLANGLIB) -L$(top_builddir)/src/api/c -L$(top_builddir)/src/api/c++ -l$(SQLR)clientwrapper -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(ERLANGUSERPATH),yes)
-ERLANGLIBS += -rpath $(libdir)
+ERLANGLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 
@@ -399,7 +423,7 @@ MYSQLUSERPATH = @MYSQLUSERPATH@
 ifneq ($(strip $(MYSQLLIBS)),)
 ifneq ($(strip $(MYSQLLIBSPATH)),)
 ifeq ($(MYSQLUSERPATH),yes)
-MYSQLLIBS += -rpath $(MYSQLLIBSPATH)
+MYSQLLIBS += @DISABLE_NEW_DTAGS@ -rpath $(MYSQLLIBSPATH)
 endif
 endif
 endif
@@ -413,7 +437,7 @@ POSTGRESQLUSERPATH = @POSTGRESQLUSERPATH@
 ifneq ($(strip $(POSTGRESQLLIBS)),)
 ifneq ($(strip $(POSTGRESQLLIBSPATH)),)
 ifeq ($(POSTGRESQLUSERPATH),yes)
-POSTGRESQLLIBS += -rpath $(POSTGRESQLLIBSPATH)
+POSTGRESQLLIBS += @DISABLE_NEW_DTAGS@ -rpath $(POSTGRESQLLIBSPATH)
 endif
 endif
 endif
@@ -427,7 +451,7 @@ SQLITEUSERPATH = @SQLITEUSERPATH@
 ifneq ($(strip $(SQLITELIBS)),)
 ifneq ($(strip $(SQLITELIBSPATH)),)
 ifeq ($(SQLITEUSERPATH),yes)
-SQLITELIBS += -rpath $(SQLITELIBSPATH)
+SQLITELIBS += @DISABLE_NEW_DTAGS@ -rpath $(SQLITELIBSPATH)
 endif
 endif
 endif
@@ -441,7 +465,7 @@ FREETDSUSERPATH = @FREETDSUSERPATH@
 ifneq ($(strip $(FREETDSLIBS)),)
 ifneq ($(strip $(FREETDSLIBSPATH)),)
 ifeq ($(FREETDSUSERPATH),yes)
-FREETDSLIBS += -rpath $(FREETDSLIBSPATH)
+FREETDSLIBS += @DISABLE_NEW_DTAGS@ -rpath $(FREETDSLIBSPATH)
 endif
 endif
 endif
@@ -472,7 +496,7 @@ ODBCUSERPATH = @ODBCUSERPATH@
 ifneq ($(strip $(ODBCLIBS)),)
 ifneq ($(strip $(ODBCLIBSPATH)),)
 ifeq ($(ODBCUSERPATH),yes)
-ODBCLIBS += -rpath $(ODBCLIBSPATH)
+ODBCLIBS += @DISABLE_NEW_DTAGS@ -rpath $(ODBCLIBSPATH)
 endif
 endif
 endif
@@ -481,7 +505,7 @@ ODBCDRIVERCPPFLAGS = $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/co
 ODBCDRIVERLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(ODBCLIBS)
 ifneq ($(strip $(libdir)),)
 ifeq ($(ODBCUSERPATH),yes)
-ODBCDRIVERLIBS += -rpath $(libdir)
+ODBCDRIVERLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 
@@ -509,7 +533,7 @@ FIREBIRDUSERPATH = @FIREBIRDUSERPATH@
 ifneq ($(strip $(FIREBIRDLIBS)),)
 ifneq ($(strip $(FIREBIRDLIBSPATH)),)
 ifeq ($(FIREBIRDUSERPATH),yes)
-FIREBIRDLIBS += -rpath $(FIREBIRDLIBSPATH)
+FIREBIRDLIBS += @DISABLE_NEW_DTAGS@ -rpath $(FIREBIRDLIBSPATH)
 endif
 endif
 endif
@@ -570,6 +594,11 @@ UTILLIBS = $(RUDIMENTSLIBS)
 ENABLE_CMDLINE = @ENABLE_CMDLINE@
 CMDLINECPPFLAGS = $(WERROR) $(BASECPPFLAGS) -I$(top_builddir)/ -I$(top_builddir)/src/common -I$(top_builddir)/src/util -I$(top_builddir)/src/server -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
 CMDLINELIBS = -L$(top_builddir)/src/util -l$(SQLR)util -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
+ifneq ($(strip $(libdir)),)
+ifeq ($(CLIENTUSERPATH),yes)
+	CMDLINELIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
+endif
+endif
 
 
 # util
@@ -659,7 +688,7 @@ SERVERLIBS = -L./ -l$(SQLR)server $(STATICPLUGINLIBS) -L$(top_builddir)/src/util
 CACHEMANAGERLIBS = -L$(top_builddir)/src/util -l$(SQLR)util $(RUDIMENTSLIBS) $(MATHLIB) $(EXTRALIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(SERVERUSERPATH),yes)
-	SERVERLIBS += -rpath $(libdir)
+	SERVERLIBS += @DISABLE_NEW_DTAGS@ -rpath $(libdir)
 endif
 endif
 
@@ -713,7 +742,7 @@ ROUTERCONNECTIONCPPFLAGS = -I$(top_builddir)/src/api/c++ $(CONNECTIONCPPFLAGS)
 ROUTERCONNECTIONLIBS = -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(CONNECTIONLIBS)
 ifneq ($(strip $(ROUTERLIBSPATH)),)
 ifeq ($(ROUTERUSERPATH),yes)
-ROUTERCONNECTIONLIBS += -rpath $(ROUTERLIBSPATH)
+ROUTERCONNECTIONLIBS += @DISABLE_NEW_DTAGS@ -rpath $(ROUTERLIBSPATH)
 endif
 endif
 
