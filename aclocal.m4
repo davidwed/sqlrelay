@@ -10538,6 +10538,19 @@ then
 	sed -e "s|print -r --|printf %s\\\\\\\\n|g" libtool > libtool.new
 	mv libtool.new libtool
 fi
+
+dnl On SCO UnixWare...
+if ( test -r "libtool" -a -n "$SCO_UW" )
+then
+	dnl The linker doesn't support -R at all
+	sed -e "s|hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=\"\"|g" libtool > libtool.new
+	mv libtool.new libtool
+
+	dnl And libtool wants to use the -Wl,-h option which causes all kinds
+	dnl of problems.
+	sed -e "s|\\\\\$wl-h,\\\\\$soname ||g" libtool > libtool.new
+	mv libtool.new libtool
+fi
 ])
 
 

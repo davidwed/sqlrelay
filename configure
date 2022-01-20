@@ -39197,6 +39197,15 @@ then
 	mv libtool.new libtool
 fi
 
+if ( test -r "libtool" -a -n "$SCO_UW" )
+then
+		sed -e "s|hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=\"\"|g" libtool > libtool.new
+	mv libtool.new libtool
+
+			sed -e "s|\\\\\$wl-h,\\\\\$soname ||g" libtool > libtool.new
+	mv libtool.new libtool
+fi
+
 
 
 echo
