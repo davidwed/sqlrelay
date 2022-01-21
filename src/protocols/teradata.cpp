@@ -7389,7 +7389,12 @@ void sqlrprotocol_teradata::appendIndicatorModeField(uint16_t col,
 	// append to nibuffer
 	unsigned char	ni=(req->currentfield%8)?
 				req->nibuffer[req->currentfield/8]:0;
-	ni|=((unsigned char)null)<<(7-(req->currentfield%8));
+
+	// make sure to cast the right side of the << to an unsigned char
+	// or some compilers (native CC on Unixware 7.0.1) will fail with:
+	// internal compiler error: ... Runs out of registers
+	ni|=((unsigned char)null)<<((unsigned char)(7-(req->currentfield%8)));
+
 	req->nibuffer[req->currentfield/8]=ni;
 
 	// append to rowbuffer (also increments currentfield)
