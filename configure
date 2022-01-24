@@ -16870,7 +16870,7 @@ esac
 
 SCO_OSR5=""
 SCO_OSR6=""
-SCO_UW="yes"
+SCO_UW=""
 CRTLIB=""
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SCO" >&5
