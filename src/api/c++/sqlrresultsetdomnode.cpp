@@ -1,7 +1,7 @@
 // Copyright (c) 2018 David Muse
 // See the COPYING file for more information.
 
-#include <sqlrelay/sqlrresultsetdomnode.h>
+#include <sqlrelay/sqlrcollections.h>
 
 enum sqlrresultsetdomnodestate {
 	RESULTSET,

@@ -23,7 +23,6 @@ class SQLRCLIENT_DLLSPEC sqlrrowlinkedlistnode :
 		#include <sqlrelay/private/sqlrrowlinkedlistnode.h>
 };
 
-/** Read-only. */
 class SQLRCLIENT_DLLSPEC sqlrrowlinkedlist :
 				public listcollection<const char *> {
 	public:
@@ -189,30 +188,71 @@ class SQLRCLIENT_DLLSPEC sqlrrowlinkedlist :
 		#include <sqlrelay/private/sqlrrowlinkedlist.h>
 };
 
-/** Read-only. */
 class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 				public dictionarycollection<const char *,
 								const char *> {
 	public:
+
+		/** Creates an empty instance of the sqlrrowdictionary class. */
 		sqlrrowdictionary();
+
+		/** Creates an instance of the sqlrrowdictionary class and
+		 *  sets "cursor" to the cursor used by the class. */
 		sqlrrowdictionary(sqlrcursor *cursor);
+
+		/** Creates an instance of the sqlrrowdictionary class.
+		 *  Sets "cursor" to the cursor used by the class and "row"
+		 *  to the row that the class returns fields from. */
+		sqlrrowdictionary(sqlrcursor *cursor, uint64_t row);
+
+		/** Deletes this intance of the sqlrrowdictionary class. */
 		~sqlrrowdictionary();
 
+		/** Sets the cursor used by this instance to "cursor". */
 		void	setCursor(sqlrcursor *cursor);
+
+		/** Sets the row used by this instance to "row". */
 		void	setRow(uint64_t row);
 
+		/** Returns true. */
 		bool	getIsReadOnly() const;
 
+		/** Sets "value" to the value (field in this row) associated
+		 *  with "key" (column name).
+		 *
+		 *  Returns true on success or false if "key" wasn't
+		 *  found. */
 		bool	getValue(const char *key, const char **value) const;
+
+		/** Returns the value (field in this row) associated with "key"
+		 *  (column name) or NULL if "key" wasn't found (was an invalid
+		 *  column name).  Note that there is no way to distinguish
+		 *  between failure to find "key" and a valid value of NULL
+		 *  associated with "key". */
 		const char	*getValue(const char *key) const;
 
+		/** Sets "k" to the key (column name) associated with "key"
+		 *  (also the column name).  Returns true on success or false
+		 *  if "key" wasn't found (invalid column name). */
 		bool	getKey(const char *key, const char **k) const;
+
+		/** Returns the key (column name) associated with "key" (also
+		 *  column name) or NULL if "key" (also the column name) wasn't
+		 *  found (was an invalid column name).  Note that there is no
+		 *  way to distinguish between failure to find "key" and a
+		 *  valid key (column name) of NULL associated with "key" (also
+		 *  column name). */
 		const char	*getKey(const char *key) const;
 
+		/** Returns a list of the keys (column names) in the
+		 *  dictionary. */
 		linkedlist<const char *>	*getKeys() const;
 
+		/** Returns the number of key/value (column name/field) pairs
+		 *  in the dictionary. */
 		uint64_t	getLength() const;
 
+		/** Prints out a representation of the dictionary (row). */
 		void	print() const;
 	
 		#include <sqlrelay/private/sqlrrowdictionary.h>

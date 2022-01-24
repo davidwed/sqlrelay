@@ -4,8 +4,10 @@ include ../../../config.mk
 
 SRCS = sqlrconnection.cpp \
 	sqlrcursor.cpp \
-	sqlrresultsetdomnode.cpp \
+	sqlrrowlinkedlist.cpp \
+	sqlrrowdictionary.cpp \
 	sqlrresultsettable.cpp \
+	sqlrresultsetdomnode.cpp \
 	sqlrimport.cpp \
 	sqlrimportxml.cpp \
 	sqlrimportcsv.cpp \
@@ -14,8 +16,10 @@ SRCS = sqlrconnection.cpp \
 	sqlrexportcsv.cpp
 LOBJS = sqlrconnection.$(OBJ) \
 	sqlrcursor.$(OBJ) \
-	sqlrresultsetdomnode.$(OBJ) \
+	sqlrrowlinkedlist.$(OBJ) \
+	sqlrrowdictionary.$(OBJ) \
 	sqlrresultsettable.$(OBJ) \
+	sqlrresultsetdomnode.$(OBJ) \
 	sqlrimport.$(OBJ) \
 	sqlrimportxml.$(OBJ) \
 	sqlrimportcsv.$(OBJ) \
@@ -47,10 +51,8 @@ install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(CP) sqlrelay/sqlrclient.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclient.h
-	$(CP) sqlrelay/sqlrresultsetdomnode.h $(includedir)/sqlrelay
-	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrresultsetdomnode.h
-	$(CP) sqlrelay/sqlrresultsettable.h $(includedir)/sqlrelay
-	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrresultsettable.h
+	$(CP) sqlrelay/sqlrcollections.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrcollections.h
 	$(CP) sqlrelay/sqlrimport.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimport.h
 	$(CP) sqlrelay/sqlrimportcsv.h $(includedir)/sqlrelay
@@ -69,14 +71,18 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
 	$(CP) sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcursor.h
-	$(CP) sqlrelay/private/sqlrresultsetdomnodeincludes.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnodeincludes.h
-	$(CP) sqlrelay/private/sqlrresultsetdomnode.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnode.h
-	$(CP) sqlrelay/private/sqlrresultsettableincludes.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsettableincludes.h
+	$(CP) sqlrelay/private/sqlrrowlinkedlistnode.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrowlinkedlistnode.h
+	$(CP) sqlrelay/private/sqlrrowlinkedlist.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrowlinkedlist.h
+	$(CP) sqlrelay/private/sqlrrowdictionary.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrowdictionary.h
 	$(CP) sqlrelay/private/sqlrresultsettable.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsettable.h
+	$(CP) sqlrelay/private/sqlrresultsetdomnode.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnode.h
+	$(CP) sqlrelay/private/sqlrcollectionsincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcollectionsincludes.h
 	$(CP) sqlrelay/private/sqlrimportincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportincludes.h
 	$(CP) sqlrelay/private/sqlrimport.h $(includedir)/sqlrelay/private
