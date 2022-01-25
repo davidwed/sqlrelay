@@ -32,25 +32,25 @@ class sqlrresultsetdomnodeprivate {
 
 sqlrresultsetdomnode::sqlrresultsetdomnode(dom *dom,
 					domnode *nullnode,
-					sqlrcursor *sqlrcur) :
+					sqlrcursor *cursor) :
 						cursordomnode(dom,nullnode) {
-	init(true,sqlrcur);
+	init(true,cursor);
 }
 
 sqlrresultsetdomnode::sqlrresultsetdomnode(dom *dom,
 					domnode *nullnode,
 					const char *ns,
-					sqlrcursor *sqlrcur) :
+					sqlrcursor *cursor) :
 						cursordomnode(dom,nullnode,ns) {
-	init(true,sqlrcur);
+	init(true,cursor);
 }
 
 sqlrresultsetdomnode::sqlrresultsetdomnode(dom *dom,
 					domnode *nullnode,
-					sqlrcursor *sqlrcur,
+					sqlrcursor *cursor,
 					bool createattrnode) :
 						cursordomnode(dom,nullnode) {
-	init(createattrnode,sqlrcur);
+	init(createattrnode,cursor);
 }
 
 sqlrresultsetdomnode::~sqlrresultsetdomnode() {
@@ -59,9 +59,9 @@ sqlrresultsetdomnode::~sqlrresultsetdomnode() {
 	delete pvt;
 }
 
-void sqlrresultsetdomnode::init(bool createattrnode, sqlrcursor *sqlrcur) {
+void sqlrresultsetdomnode::init(bool createattrnode, sqlrcursor *cursor) {
 	pvt=new sqlrresultsetdomnodeprivate;
-	pvt->_sqlrcur=sqlrcur;
+	pvt->_sqlrcur=cursor;
 	pvt->_state=RESULTSET;
 	pvt->_col=0;
 	pvt->_row=0;
@@ -69,7 +69,7 @@ void sqlrresultsetdomnode::init(bool createattrnode, sqlrcursor *sqlrcur) {
 	pvt->_affectedrows=NULL;
 	if (createattrnode) {
 		pvt->_attrnode=new sqlrresultsetdomnode(
-				getTree(),getNullNode(),sqlrcur,false);
+				getTree(),getNullNode(),cursor,false);
 		pvt->_attrnode->pvt->_state=ATTR;
 		pvt->_attrnode->setParent(this);
 	} else {
@@ -77,11 +77,11 @@ void sqlrresultsetdomnode::init(bool createattrnode, sqlrcursor *sqlrcur) {
 	}
 }
 
-void sqlrresultsetdomnode::setSqlrCursor(sqlrcursor *sqlrcur) {
-	pvt->_sqlrcur=sqlrcur;
+void sqlrresultsetdomnode::setCursor(sqlrcursor *cursor) {
+	pvt->_sqlrcur=cursor;
 }
 
-sqlrcursor *sqlrresultsetdomnode::getSqlrCursor() {
+sqlrcursor *sqlrresultsetdomnode::getCursor() {
 	return pvt->_sqlrcur;
 }
 

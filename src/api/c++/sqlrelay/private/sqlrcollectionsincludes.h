@@ -7,8 +7,9 @@
 #include <rudiments/tablecollection.h>
 #include <rudiments/cursordomnode.h>
 
-class sqlrrowlinkedlistnodeprivate;
+class sqlrlinkedlistnodeprivate;
 class sqlrrowlinkedlistprivate;
+class sqlrresultsetlinkedlistprivate;
 class sqlrrowdictionaryprivate;
 class sqlrresultsettableprivate;
 class sqlrresultsetdomnodeprivate;

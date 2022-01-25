@@ -48,7 +48,7 @@ const char *sqlrresultsettable::getColumnName(uint64_t col) const {
 	return (pvt->_cursor)?pvt->_cursor->getColumnName(col):"";
 }
 
-uint64_t sqlrresultsettable::getColCount() const {
+uint64_t sqlrresultsettable::getColumnCount() const {
 	return (pvt->_cursor)?pvt->_cursor->colCount():0;
 }
 
