@@ -75,6 +75,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcursor.h
 	$(CP) sqlrelay/private/sqlrscalar.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrscalar.h
+	$(CP) sqlrelay/private/sqlrlinkedlistnode.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrlinkedlistnode.h
 	$(CP) sqlrelay/private/sqlrrowlinkedlist.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrowlinkedlist.h
 	$(CP) sqlrelay/private/sqlrresultsetlinkedlist.h $(includedir)/sqlrelay/private
