@@ -6,6 +6,45 @@
 
 #include <sqlrelay/private/sqlrcollectionsincludes.h>
 
+class SQLRCLIENT_DLLSPEC sqlrscalar : public scalarcollection<const char *> {
+	public:
+		/** Creates an empty instance of the sqlrscalar class. */
+		sqlrscalar();
+
+		/** Creates an instance of the sqlrscalar class and
+		 *  sets the cursor used by the instance to "cursor". */
+		sqlrscalar(sqlrcursor *cursor);
+
+		/** Creates an instance of the sqlrscalar class.
+		 *  Sets the cursor used by the instance to "cursor", the
+		 *  row that the instance returns fields from to "row", and the
+		 *  column that the instance returns fields from to "column". */
+		sqlrscalar(sqlrcursor *cursor, uint64_t row, uint64_t column);
+
+		/** Deletes this intance of the sqlrscalar class. */
+		~sqlrscalar();
+
+		/** Returns true. */
+		bool	getIsReadOnly() const;
+
+		/** Sets the cursor used by this instance to "cursor". */
+		void	setCursor(sqlrcursor *cursor);
+
+		/** Sets the row that this instance returns fields from
+		 *  to "row". */
+		void	setRow(uint64_t row);
+
+		/** Sets the column that this instance returns fields from
+		 *  to "col". */
+		void	setColumn(uint32_t col);
+
+		/** Returns the value stored in this intance.  Returns NULL or
+		 *  0 if no value has been stored. */
+		const char	*getValue() const;
+
+		#include <sqlrelay/private/sqlrscalar.h>
+};
+
 class SQLRCLIENT_DLLSPEC sqlrlinkedlistnode :
 				public listnode<const char *> {
 	public:
@@ -49,10 +88,10 @@ class SQLRCLIENT_DLLSPEC sqlrrowlinkedlist :
 		void	setRow(uint64_t row);
 
 		/** Returns true. */
-		bool		getIsReadOnly() const;
+		bool	getIsReadOnly() const;
 
 		/** Returns true. */
-		bool		getIsBlockBased() const;
+		bool	getIsBlockBased() const;
 
 		/** Returns 1. */
 		uint64_t	getBlockSize() const;
@@ -93,7 +132,6 @@ class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 				public dictionarycollection<const char *,
 								const char *> {
 	public:
-
 		/** Creates an instance of the sqlrrowdictionary class. */
 		sqlrrowdictionary();
 
@@ -185,13 +223,13 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlinkedlist :
 
 		/** Sets the column that this instance returns fields from
 		 *  to "col". */
-		void	setColumn(uint64_t col);
+		void	setColumn(uint32_t col);
 
 		/** Returns true. */
-		bool		getIsReadOnly() const;
+		bool	getIsReadOnly() const;
 
 		/** Returns true. */
-		bool		getIsBlockBased() const;
+		bool	getIsBlockBased() const;
 
 		/** Returns the result set buffer size of the cursor used by
  		 *  this intance.  Returns 0 if the cursor is configured to
@@ -221,7 +259,8 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlinkedlist :
 		listnode<const char *>	*find(listnode<const char *> *startnode,
 						const char *value) const;
 
-		/** Prints out a representation of the sqlrresultsetlinkedlist. */
+		/** Prints out a representation of the
+ 		 *  sqlrresultsetlinkedlist. */
 		void	print() const;
 
 		/** Prints out a representation of the first "count"
@@ -235,7 +274,6 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlinkedlist :
 class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 				public tablecollection<const char *> {
 	public:
-
 		/** Creates an instance of the sqlrresultsettable class. */
 		sqlrresultsettable();
 
@@ -292,7 +330,6 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 
 class SQLRCLIENT_DLLSPEC sqlrresultsetdomnode : public cursordomnode {
 	public:
-
 		/** Creates a new node, intializes its member variables to
  		 *  NULL, and sets the cursor used by the instance to
  		 *  "cursor". */

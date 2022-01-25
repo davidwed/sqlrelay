@@ -320,7 +320,7 @@ void sqlrresultsetlinkedlist::setCursor(sqlrcursor *cursor) {
 	pvt->_node.setCursor(cursor);
 }
 
-void sqlrresultsetlinkedlist::setColumn(uint64_t col) {
+void sqlrresultsetlinkedlist::setColumn(uint32_t col) {
 	pvt->_node.setColumn(col);
 }
 
