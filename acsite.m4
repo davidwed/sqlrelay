@@ -2332,7 +2332,7 @@ then
 
 		found="no"
 
-		for major in "" "1" "2"
+		for major in "" "1" "2" "3"
 		do
 
 			for minor in \
