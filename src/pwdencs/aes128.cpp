@@ -24,8 +24,6 @@ class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 sqlrpwenc_aes128::sqlrpwenc_aes128(domnode *parameters, bool debug) :
 						sqlrpwdenc(parameters,debug) {
 
-	this->debug=parameters->getAttributeValue("debug");
-
 	// get optional flags, paths, and extensions
 	const char	*keypath=parameters->getAttributeValue("keypath");
 	if (charstring::isNullOrEmpty(keypath)) {
