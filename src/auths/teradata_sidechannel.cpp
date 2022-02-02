@@ -111,9 +111,6 @@ class SQLRSERVER_DLLSPEC sqlrauth_teradata_sidechannel : public sqlrauth {
 		unsigned char	requestauth[8];
 		uint32_t	requestno;
 
-		datetime	sadt;
-		unsigned char	responseauth[8];
-
 		inetsocketclient	isc;
 };
 
