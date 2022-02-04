@@ -1189,8 +1189,12 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 
 	// Don't fork unless we have to.
 	//
-	// If there are no busy listeners and there are available connections,
-	// then we don't need to fork a child.  Otherwise we do.
+	// We have to if we're using HANDOFF_PROXY, otherwise this process will
+	// talk to the connection for an arbitrary amount of time instead of
+	// looping back to listen for another client.
+	//
+	// Otherwise, if there are no busy listeners and there are available
+	// connections, then we don't need to fork a child.
 	//
 	// It's possible that getValue(2) will be 0, indicating no connections
 	// are available, but one will become available immediately after this
@@ -1204,7 +1208,8 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	// id as this one and that is checked at startup.  However, if it did
 	// happen, getValue(10) would return something greater than 0 and we
 	// would have forked anyway.
-	if (pvt->_dynamicscaling ||
+	if (pvt->_handoffmode==HANDOFF_PROXY ||
+			pvt->_dynamicscaling ||
 			getBusyListeners() ||
 			!pvt->_semset->getValue(2)) {
 		forkChild(clientsock,protocolindex);
