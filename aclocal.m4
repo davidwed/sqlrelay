@@ -10142,6 +10142,25 @@ AC_SUBST(WNOSTRINGPLUSINT)
 ])
 
 
+dnl checks to see if -fdeclspec compiler option works or not
+dnl if it does, then it sets the variable FDECLSPEC="-fdeclspec"
+dnl if it does not , then it sets the variable FDECLSPEC=""
+AC_DEFUN([FW_CHECK_FDECLSPEC],
+[
+AC_MSG_CHECKING(for -fdeclspec option)
+FW_TRY_LINK([],[int a; a=1;],[-fdeclspec],[],[],[FDECLSPEC="-fdeclspec"],[FDECLSPEC=""])
+if ( test -n "$FDECLSPEC" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(FDECLSPEC)
+])
+
+
+
+
 dnl checks for minix platform and adds some defines to CPPFLAGS if it is
 AC_DEFUN([FW_CHECK_MINIX],
 [
