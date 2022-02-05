@@ -2047,10 +2047,17 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	clientsock->allowShortReads();
 	clientsock->useNonBlockingMode();
 
-	// Set up a listener to listen on both client and server sockets.
-	listener	proxy;
-	proxy.addReadFileDescriptor(serversock);
-	proxy.addReadFileDescriptor(clientsock);
+	// set up read and write listeners
+	listener	readlistener;
+	readlistener.addReadFileDescriptor(serversock);
+	readlistener.addReadFileDescriptor(clientsock);
+	listener	clientwritelistener;
+	clientwritelistener.addWriteFileDescriptor(clientsock);
+	listener	serverwritelistener;
+	serverwritelistener.addWriteFileDescriptor(serversock);
+	filedescriptor	*rfd=NULL;
+	listener	*wl=NULL;
+	filedescriptor	*wfd=NULL;
 
 	// set up a read buffer
 	unsigned char	readbuffer[8192];
@@ -2062,7 +2069,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 		// wait for data to be available from the client or server
 		error::clearError();
-		int32_t	waitcount=proxy.listen(-1,-1);
+		int32_t	waitcount=readlistener.listen(-1,-1);
 
 		// The wait fell through but nobody had data.  This is just here
 		// for good measure now.  I'm not sure what could cause this.
@@ -2076,11 +2083,10 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		}
 
 		// get the file descriptor that data was available from
-		filedescriptor	*fd=
-			proxy.getReadReadyList()->getFirst()->getValue();
+		rfd=readlistener.getReadReadyList()->getFirst()->getValue();
 
 		// read whatever data was available
-		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
+		ssize_t	readcount=rfd->read(readbuffer,sizeof(readbuffer));
 		if (readcount<1) {
 			if (pvt->_sqlrlg || pvt->_sqlrn) {
 				stringbuffer	debugstr;
@@ -2092,31 +2098,35 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 				delete[] err;
 				raiseDebugMessageEvent(debugstr.getString());
 			}
-			endsession=(fd==clientsock);
+			endsession=(rfd==clientsock);
 			break;
 		}
 
-		// write the data to the other side
-		if (fd==serversock) {
-			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				stringbuffer	debugstr;
-				debugstr.append("read ");
-				debugstr.append((uint32_t)readcount);
-				debugstr.append(" bytes from server");
-				raiseDebugMessageEvent(debugstr.getString());
-			}
-			clientsock->write(readbuffer,readcount);
-			clientsock->flushWriteBuffer(-1,-1);
-		} else if (fd==clientsock) {
-			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				stringbuffer	debugstr;
-				debugstr.append("read ");
-				debugstr.append((uint32_t)readcount);
-				debugstr.append(" bytes from client");
-				raiseDebugMessageEvent(debugstr.getString());
-			}
-			serversock->write(readbuffer,readcount);
-			serversock->flushWriteBuffer(-1,-1);
+		// log/notify
+		if (pvt->_sqlrlg || pvt->_sqlrn) {
+			stringbuffer	debugstr;
+			debugstr.append("read ");
+			debugstr.append((uint32_t)readcount);
+			debugstr.append(" bytes from ");
+			debugstr.append((rfd==serversock)?"server":"client");
+			raiseDebugMessageEvent(debugstr.getString());
+		}
+
+		// decide which listener/filedescriptor to use to write
+		if (rfd==serversock) {
+			wl=&clientwritelistener;
+			wfd=clientsock;
+		} else {
+			wl=&serverwritelistener;
+			wfd=serversock;
+		}
+
+		// write all of whatever we read
+		ssize_t	writecount=0;
+		while (writecount!=readcount) {
+			wl->listen(-1,-1);
+			writecount+=wfd->write(readbuffer,readcount);
+			wfd->flushWriteBuffer(-1,-1);
 		}
 	}
 

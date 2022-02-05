@@ -34,7 +34,7 @@
 	added configure test for python 3.10+
 	added configure test for ruby 3+
 	added -fdeclspec configure test for ruby with clang
-	fixed a potential hang when handoff="pass"
+	fixed potential hangs and short-writes when handoff="proxy"
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
