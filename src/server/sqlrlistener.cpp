@@ -749,42 +749,44 @@ void sqlrlistener::keyError(const char *idfilename) {
 void sqlrlistener::shmError(const char *id, int shmid) {
 	char	*err=error::getErrorString();
 	stderror.printf("\n%s-listener error:\n"
-			"	Unable to create a shared memory "
-			"segment.  This is usally because an \n"
-			"	%s-listener is already running for "
-			"the %s instance.\n\n"
-			"	If it is not running, something may "
-			"have crashed and left an old segment\n"
-			"	lying around.  Use the ipcs command "
-			"to inspect existing shared memory \n"
-			"	segments and the ipcrm command to "
-			"remove the shared memory segment with "
-			"\n	id %d.\n\n"
-			"	Error was: %s\n\n",
-			SQLR,SQLR,id,shmid,err);
+			"	Unable to create a shared memory segment.\n\n",
+			SQLR);
+	if (shmid!=-1) {
+		stderror.printf("This is usally because an \n"
+				"	%s-listener is already running for "
+				"the %s instance.\n\n"
+				"	If it is not running, something may "
+				"have crashed and left an old segment\n"
+				"	lying around.  Use the ipcs command "
+				"to inspect existing shared memory \n"
+				"	segments and the ipcrm command to "
+				"remove the shared memory segment with \n"
+				"	id %d.\n\n",
+				SQLR,id,shmid);
+	}
+	stderror.printf("	Error was: %s\n\n",err);
 	delete[] err;
 }
 
 void sqlrlistener::semError(const char *id, int semid) {
 	char	*err=error::getErrorString();
 	stderror.printf("\n%s-listener error:\n"
-			"	Unable to create a semaphore "
-			"set.  This is usally because an \n"
-			"	%s-listener is already "
-			"running for the %s"
-			" instance.\n\n"
-			"	If it is not running, "
-			"something may have crashed and left "
-			"an old semaphore set\n"
-			"	lying around.  Use the ipcs "
-			"command to inspect existing "
-			"semaphore sets \n"
-			"	and the ipcrm "
-			"command to remove the semaphore set "
-			"with \n"
-			"	id %d.\n\n"
-			"	Error was: %s\n\n"
-			SQLR,SQLR,id,semid,err);
+			"	Unable to create a semaphore set.\n\n",
+			SQLR);
+	if (semid!=-1) {
+		stderror.printf("This is usally because an \n"
+				"	%s-listener is already running for "
+				"the %s instance.\n\n"
+				"	If it is not running, something may "
+				"have crashed and left an old semaphore set\n"
+				"	lying around.  Use the ipcs command "
+				"to inspect existing semaphore sets \n"
+				"	and the ipcrm command to "
+				"remove the semaphore set with \n"
+				"	id %d.\n\n"
+				SQLR,id,semid);
+	}
+	stderror.printf("	Error was: %s\n\n",err);
 	delete[] err;
 }
 
