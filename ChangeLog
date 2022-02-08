@@ -31,7 +31,7 @@
 	reamed "translation" modules to "querytranslation" modules
 	updated configure script to support oracle 18c and 19c instantclient
 	refactored find-oracle-libs-at-runtime logic
-	added configure test for python 3.10+
+	added configure tests for python 3.10+
 	added configure test for ruby 3+
 	added -fdeclspec configure test for ruby with clang
 	fixed potential hangs and short-writes when handoff="proxy"

@@ -2164,6 +2164,8 @@ then
 						then
 							PYTHONINCLUDES="-I$pyprefix/include/python$pyversion$ext"
 							PYTHONVERSION=`echo $pyversion | sed -e "s|\.||"`
+							PYTHONMAJOR=`echo $pyversion | cut -d'.' -f1`
+							PYTHONMINOR=`echo $pyversion | cut -d'.' -f2`
 							pyext="$ext"
 							break;
 						fi
@@ -2275,6 +2277,16 @@ then
 		PYTHONLIB="$PYTHONLIB $UNDEFINED_DYNAMIC_LOOKUP"
 	fi
 
+	dnl Python 3.10+ requires PY_SSIZE_T_CLEAN to be defined before
+	dnl including Python.h, so we'll set a flag 
+	if ( test "$PYTHONMAJOR" -ge "3" )
+	then
+		if ( test "$PYTHONMAJOR" -gt "3" -o "$PYTHONMINOR" -ge "10" )
+		then
+			AC_DEFINE(SQLRELAY_NEED_PY_SSIZE_T_CLEAN, 1, Some systems have Python 3.10+)
+		fi
+        fi
+
 	FW_INCLUDES(python,[$PYTHONINCLUDES])
 	FW_LIBS(python,[$PYTHONLIB])
 
@@ -2295,7 +2307,7 @@ then
 	dnl some flags for the python tests
 	IMPORTEXCEPTIONS=""
 	EXCEPTIONSSTANDARDERROR="Exception"
-	if ( test "$PYTHONVERSION" = "2" )
+	if ( test "$PYTHONMAJOR" = "2" )
 	then
 		IMPORTEXCEPTIONS="import exceptions"
 		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"

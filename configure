@@ -34403,6 +34403,8 @@ then
 						then
 							PYTHONINCLUDES="-I$pyprefix/include/python$pyversion$ext"
 							PYTHONVERSION=`echo $pyversion | sed -e "s|\.||"`
+							PYTHONMAJOR=`echo $pyversion | cut -d'.' -f1`
+							PYTHONMINOR=`echo $pyversion | cut -d'.' -f2`
 							pyext="$ext"
 							break;
 						fi
@@ -34532,6 +34534,16 @@ CPPFLAGS="$SAVECPPFLAGS"
 		PYTHONLIB="$PYTHONLIB $UNDEFINED_DYNAMIC_LOOKUP"
 	fi
 
+			if ( test "$PYTHONMAJOR" -ge "3" )
+	then
+		if ( test "$PYTHONMAJOR" -gt "3" -o "$PYTHONMINOR" -ge "10" )
+		then
+
+$as_echo "#define SQLRELAY_NEED_PY_SSIZE_T_CLEAN 1" >>confdefs.h
+
+		fi
+        fi
+
 
 if ( test -n "$PYTHONINCLUDES" )
 then
@@ -34561,7 +34573,7 @@ fi
 
 		IMPORTEXCEPTIONS=""
 	EXCEPTIONSSTANDARDERROR="Exception"
-	if ( test "$PYTHONVERSION" = "2" )
+	if ( test "$PYTHONMAJOR" = "2" )
 	then
 		IMPORTEXCEPTIONS="import exceptions"
 		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"

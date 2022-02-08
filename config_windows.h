@@ -336,6 +336,9 @@
 /* Suffix for loadable modules */
 #define SQLRELAY_MODULESUFFIX "dll"
 
+/* Some systems have Python 3.10+ */
+@SQLRELAY_NEED_PY_SSIZE_T_CLEAN@
+
 /* Some systems use SQLLEN * in SQLRowCount */
 #define SQLROWCOUNT_SQLLEN 1
 

@@ -47,6 +47,8 @@ PERLPREFIX=""
 PERLVERSION=""
 PYTHONPREFIX=""
 PYTHONVERSION=""
+PYTHONMAJOR=""
+PYTHONMINOR=""
 RUBYPREFIX=""
 RUBYVERSION=""
 JAVAPREFIX=""
@@ -687,16 +689,26 @@ if PYTHONPREFIX="" then
 	findPrefix "C:\","Python",PYTHONPREFIX,disablepython
 end if
 
+PYTHONMAJOR=mid(PYTHONVERSION,1,1)
+PYTHONMINOR=mid(PYTHONVERSION,2)
+
 if PYTHONPREFIX<>"" and PYTHONVERSION="" then
 	findVersion PYTHONPREFIX & "\libs","python",".lib",PYTHONVERSION
 end if
 
-if PYTHONVERSION<30 then
+if PYTHONMAJOR=2 then
 	IMPORTEXCEPTIONS="import exceptions"
 	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 else
 	IMPORTEXCEPTIONS=""
 	EXCEPTIONSSTANDARDERROR="Exception"
+end if
+
+SQLRELAY_NEED_PY_SSIZE_T_CLEAN=""
+if PYTHONMAJOR>=3 then
+	if PYTHONMAJOR>3 or PYTHONMINOR>=10 then
+		SQLRELAY_NEED_PY_SSIZE_T_CLEAN="#define SQLRELAY_NEED_PY_SSIZE_T_CLEAN 1"
+	end if
 end if
 
 if disablepython=false then
@@ -1078,6 +1090,7 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@PYTHONVERSION@",PYTHONVERSION,1,-1,0)
 	content=replace(content,"@IMPORTEXCEPTIONS@",IMPORTEXCEPTIONS,1,-1,0)
 	content=replace(content,"@EXCEPTIONSSTANDARDERROR@",EXCEPTIONSSTANDARDERROR,1,-1,0)
+	content=replace(content,"@SQLRELAY_NEED_PY_SSIZE_T_CLEAN@",SQLRELAY_NEED_PY_SSIZE_T_CLEAN,1,-1,0)
 
 	' ruby
 	content=replace(content,"@RUBYPREFIX@",RUBYPREFIX,1,-1,0)
