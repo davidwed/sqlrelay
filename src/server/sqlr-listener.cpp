@@ -14,7 +14,7 @@
 static sqlrlistener	*_lsnr;
 static const char	*_backtrace=NULL;
 
-//#define SHUTDOWNFLAG 1
+#define SHUTDOWNFLAG 1
 
 #ifndef SHUTDOWNFLAG
 volatile sig_atomic_t	shutdowninprogress=0;
