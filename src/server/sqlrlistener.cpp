@@ -1086,7 +1086,7 @@ void sqlrlistener::listen() {
 
 		if (!handleTraffic(waitForTraffic()) &&
 			error::getErrorNumber()==EMFILE) {
-			!snooze::macrosnooze(1);
+			snooze::macrosnooze(1);
 		}
 	}
 }
