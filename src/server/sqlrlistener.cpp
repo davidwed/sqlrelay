@@ -1052,6 +1052,11 @@ void sqlrlistener::listen() {
 
 	// wait until all of the connections have started
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return;
+		}
+
 		int32_t	opendbconnections=pvt->_shm->open_db_connections;
 
 		if (opendbconnections<
@@ -1072,10 +1077,16 @@ void sqlrlistener::listen() {
 	}
 
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return;
+		}
+
 		error::clearError();
+
 		if (!handleTraffic(waitForTraffic()) &&
 			error::getErrorNumber()==EMFILE) {
-			snooze::macrosnooze(1);
+			!snooze::macrosnooze(1);
 		}
 	}
 }
@@ -1084,10 +1095,21 @@ filedescriptor *sqlrlistener::waitForTraffic() {
 
 	raiseDebugMessageEvent("waiting for traffic...");
 
-	// wait for data on one of the sockets...
-	// if something bad happened, return an invalid file descriptor
-	if (pvt->_lsnr.listen(-1,-1)<1) {
-		return NULL;
+	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return NULL;
+		}
+
+		// wait for data on one of the sockets...
+		int32_t	result=pvt->_lsnr.listen(1,0);
+		if (result>=1) {
+			break;
+		} else if (result!=RESULT_TIMEOUT) {
+			// if something bad happened,
+			// return an invalid file descriptor
+			return NULL;
+		}
 	}
 
 	// return first file descriptor that had data available or an invalid
@@ -1544,6 +1566,10 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 	// loop in case client doesn't get handed off successfully
 	for (;;) {
 
+		if (process::getShutDownFlag()) {
+			return false;
+		}
+
 		if (!getAConnection(&connectionpid,&inetport,
 					unixportstr,&unixportstrlen,
 					sock,thr)) {
@@ -1649,7 +1675,8 @@ bool sqlrlistener::semWait(int32_t index, thread *thr,
 				result=pvt->_semset->wait(index);
 			}
 		} while (!result && error::getErrorNumber()==EINTR &&
-							alarmrang!=1);
+						!process::getShutDownFlag() &&
+						alarmrang!=1);
 		*timeout=(alarmrang==1);
 		signalmanager::alarm(0);
 		pvt->_semset->retryInterruptedOperations();
@@ -1774,6 +1801,10 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					thread *thr) {
 
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return false;
+		}
 
 		raiseDebugMessageEvent("getting a connection...");
 
@@ -2069,6 +2100,10 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 	for (;;) {
 
+		if (process::getShutDownFlag()) {
+			return false;
+		}
+
 		// wait for data to be available from the client or server
 		error::clearError();
 		int32_t	waitcount=readlistener.listen(-1,-1);
@@ -2126,6 +2161,9 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		// write all of whatever we read
 		ssize_t	writecount=0;
 		while (writecount!=readcount) {
+			if (process::getShutDownFlag()) {
+				return false;
+			}
 			wl->listen(-1,-1);
 			writecount+=wfd->write(readbuffer,readcount);
 			wfd->flushWriteBuffer(-1,-1);
