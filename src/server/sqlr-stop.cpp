@@ -148,7 +148,7 @@ int main(int argc, const char **argv) {
 
 				// kill the process
 				stdoutput.printf("killing process %lld\n",pid);
-				if (process::sendSignal(pid,SIGINT)) {
+				if (process::sendSignal(pid,SIGTERM)) {
 					stdoutput.printf("   success\n");
 				} else {
 					stdoutput.printf("   failed\n");

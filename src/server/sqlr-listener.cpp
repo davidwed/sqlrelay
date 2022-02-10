@@ -11,8 +11,8 @@
 #include <config.h>
 #include <version.h>
 
-static sqlrlistener	*_lsnr;
-static const char	*_backtrace=NULL;
+static sqlrlistener	*lsnr;
+static const char	*backtrace=NULL;
 
 #define SHUTDOWNFLAG 1
 
@@ -40,9 +40,9 @@ static void shutDown(int32_t signum) {
 
 	shutdowninprogress=1;
 
-	if (!charstring::isNullOrEmpty(_backtrace) && signum!=SIGINT) {
+	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGTERM) {
 		stringbuffer	filename;
-		filename.append(_backtrace);
+		filename.append(backtrace);
 		filename.append(sys::getDirectorySeparator());
 		filename.append("sqlr-listener.");
 		filename.append((uint32_t)process::getProcessId());
@@ -55,7 +55,7 @@ static void shutDown(int32_t signum) {
 		}
 	}
 
-	delete _lsnr;
+	delete lsnr;
 	process::exit(0);
 }
 #endif
@@ -97,7 +97,7 @@ int main(int argc, const char **argv) {
 	}
 
 	// enable/disable backtrace
-	_backtrace=cmdl.getValue("-backtrace");
+	backtrace=cmdl.getValue("-backtrace");
 
 	// set up default signal handling
 	process::exitOnShutDown();
@@ -106,7 +106,7 @@ int main(int argc, const char **argv) {
 	}
 
 	// create the listener
-	_lsnr=new sqlrlistener();
+	lsnr=new sqlrlistener();
 
 #ifdef SHUTDOWNFLAG
 	// handle kill and crash signals
@@ -125,35 +125,48 @@ int main(int argc, const char **argv) {
 	// handle child processes
 	process::waitForChildren();
 
-	// ignore all other signals except SIGALRM and SIGCHLD
+	// ignore various signals
 	signalset	set;
 	set.addAllSignals();
 	set.removeShutDownSignals();
 	set.removeCrashSignals();
-	// alarm and chld
+	// timeouts
 	#ifdef SIGALRM
 	set.removeSignal(SIGALRM);
 	#endif
+	// child
 	#ifdef SIGCHLD
 	set.removeSignal(SIGCHLD);
+	#endif
+	// CPU consumption soft limit
+	#ifdef SIGXCPU
+	set.removeSignal(SIGXCPU);
+	#endif
+	// File size limit exceeded
+	#ifdef SIGXFSZ
+	set.removeSignal(SIGXFSZ);
+	#endif
+	// power failure
+	#ifdef SIGPWR
+	set.removeSignal(SIGPWR);
 	#endif
 	signalmanager::ignoreSignals(&set);
 
 	// initialize
-	if (_lsnr->init(argc,argv)) {
+	if (lsnr->init(argc,argv)) {
 
 		// wait for client connections
-		_lsnr->listen();
+		lsnr->listen();
 	}
 
 #ifdef SHUTDOWNFLAG
 	// generate a backtrace if necessary
 	if (process::getShutDownFlag() &&
-			process::getShutDownSignal()!=SIGINT &&
-			!charstring::isNullOrEmpty(_backtrace)) {
+			!charstring::isNullOrEmpty(backtrace) &&
+			process::getShutDownSignal()!=SIGTERM) {
 
 		stringbuffer	filename;
-		filename.append(_backtrace);
+		filename.append(backtrace);
 		filename.append(sys::getDirectorySeparator());
 		filename.append("sqlr-listener.");
 		filename.append((uint32_t)process::getProcessId());
@@ -168,6 +181,6 @@ int main(int argc, const char **argv) {
 #endif
 
 	// clean up and exit
-	delete _lsnr;
+	delete lsnr;
 	process::exit(1);
 }

@@ -33,7 +33,7 @@
 
 		bool	announceAvailability(const char *connectionid);
 
-		void	registerForHandoff();
+		bool	registerForHandoff();
 		void	deRegisterForHandoff();
 
 		int32_t	waitForClient();

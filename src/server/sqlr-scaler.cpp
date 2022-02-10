@@ -34,8 +34,6 @@ class SQLRSERVER_DLLSPEC scaler {
 		bool	initScaler(int argc, const char **argv);
 		void	loop();
 
-		static	void	shutDown(int32_t signum);
-
 	private:
 		void	cleanUp();
 
@@ -87,11 +85,7 @@ class SQLRSERVER_DLLSPEC scaler {
 
 		const char	*backtrace;
 		bool		disablecrashhandler;
-
-		static	bool	shutdown;
 };
-
-bool	scaler::shutdown=false;
 
 scaler::scaler() {
 
@@ -129,14 +123,14 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// read the commandline
 	cmdl=new sqlrcmdline(argc,argv);
 
-	// handle kill and crash signals
-	process::handleShutDown(shutDown);
 	disablecrashhandler=cmdl->found("-disable-crash-handler");
-	if (!disablecrashhandler) {
-		process::handleCrash(shutDown);
-	}
-
 	backtrace=cmdl->getValue("-backtrace");
+
+	// handle kill and crash signals
+	process::setShutDownFlagOnShutDown();
+	if (!disablecrashhandler) {
+		process::setShutDownFlagOnCrash();
+	}
 
 	init=true;
 
@@ -387,10 +381,6 @@ bool scaler::initScaler(int argc, const char **argv) {
 	return true;
 }
 
-void scaler::shutDown(int32_t signum) {
-	shutdown=true;
-}
-
 void scaler::cleanUp() {
 
 	delete semset;
@@ -543,14 +533,14 @@ bool scaler::openMoreConnections() {
 		// be accessed.  Most likely the sqlr-listener has been killed.
 		// Shut down.
 		if (!waitresult && error::getErrorNumber()!=EAGAIN) {
-			shutdown=true;
+			return false;
 		}
 	} else {
 		snooze::microsnooze(0,100000);
 	}
 
 	// exit if a shutdown request has been made
-	if (shutdown) {
+	if (process::getShutDownFlag()) {
 		return false;
 	}
 
@@ -588,7 +578,7 @@ bool scaler::openMoreConnections() {
 		while (!connpid) {
 
 			// exit if a shutdown request has been made
-			if (shutdown) {
+			if (process::getShutDownFlag()) {
 				return false;
 			}
 
@@ -778,6 +768,25 @@ void scaler::decrementConnectionCount() {
 
 void scaler::loop() {
 	while (openMoreConnections()) {}
+
+	// generate a backtrace if necessary
+	if (process::getShutDownFlag() &&
+			!charstring::isNullOrEmpty(backtrace) &&
+			process::getShutDownSignal()!=SIGTERM) {
+
+		stringbuffer	filename;
+		filename.append(backtrace);
+		filename.append(sys::getDirectorySeparator());
+		filename.append("sqlr-scaler.");
+		filename.append((uint32_t)process::getProcessId());
+		filename.append(".bt");
+		file	f;
+		if (f.create(filename.getString(),
+				permissions::evalPermString("rw-------"))) {
+			f.printf("signal: %d\n\n",process::getShutDownSignal());
+			process::backtrace(&f);
+		}
+	}
 }
 
 static void helpmessage(const char *progname) {
@@ -821,5 +830,5 @@ int main(int argc, const char **argv) {
 			s.loop();
 		}
 	}
-	process::exit(1);
+	process::exit(0);
 }

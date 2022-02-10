@@ -685,6 +685,9 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (reloginatstart) {
 		while (!attemptLogIn(false)) {
 			snooze::macrosnooze(5);
+			if (process::getShutDownFlag()) {
+				return false;
+			}
 		}
 	}
 	initConnStats();
@@ -988,6 +991,10 @@ bool sqlrservercontroller::handlePidFile() {
 	bool	retval=true;
 	bool	found=false;
 	for (uint16_t i=0; !found && i<listenertimeout; i++) {
+		if (process::getShutDownFlag()) {
+			retval=false;
+			break;
+		}
 		if (i) {
 			snooze::microsnooze(0,100000);
 		}
@@ -1415,6 +1422,10 @@ bool sqlrservercontroller::listen() {
 
 	for (;;) {
 
+		if (process::getShutDownFlag()) {
+			return false;
+		}
+
 		waitForAvailableDatabase();
 		initSession();
 		if (!announceAvailability(pvt->_connectionid)) {
@@ -1424,6 +1435,10 @@ bool sqlrservercontroller::listen() {
 		// loop to handle suspended sessions
 		bool	loopback=false;
 		for (;;) {
+
+			if (process::getShutDownFlag()) {
+				return false;
+			}
 
 			int	success=waitForClient();
 
@@ -1553,6 +1568,11 @@ void sqlrservercontroller::reLogIn() {
 	closeCursors(false);
 	logOut();
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			delete[] currentdb;
+			return;
+		}
 			
 		raiseDebugMessageEvent("trying...");
 
@@ -1613,7 +1633,9 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	// connect to listener if we haven't already
 	// and pass it this process's pid
 	if (!pvt->_connected) {
-		registerForHandoff();
+		if (!registerForHandoff()) {
+			return false;
+		}
 	}
 
 	// save the original ttl
@@ -1700,7 +1722,7 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	return success;
 }
 
-void sqlrservercontroller::registerForHandoff() {
+bool sqlrservercontroller::registerForHandoff() {
 
 	raiseDebugMessageEvent("registering for handoff...");
 
@@ -1720,6 +1742,10 @@ void sqlrservercontroller::registerForHandoff() {
 	// try again.
 	pvt->_connected=false;
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			break;
+		}
 
 		raiseDebugMessageEvent("trying...");
 
@@ -1741,6 +1767,8 @@ void sqlrservercontroller::registerForHandoff() {
 	raiseDebugMessageEvent("done registering for handoff");
 
 	delete[] handoffsockname;
+
+	return pvt->_connected;
 }
 
 void sqlrservercontroller::deRegisterForHandoff() {
@@ -6370,8 +6398,8 @@ void sqlrservercontroller::dropTempTables(sqlrservercursor *cursor) {
 
 	// run through the temp table list, dropping tables
 	for (listnode< char * >
-				*sln=pvt->_sessiontemptablesfordrop.getFirst();
-				sln; sln=sln->getNext()) {
+			*sln=pvt->_sessiontemptablesfordrop.getFirst();
+			sln; sln=sln->getNext()) {
 
 		// some databases (oracle) require us to truncate the
 		// table before it can be dropped
@@ -6454,7 +6482,7 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 	// specific tables...
 	for (listnode< char * >
 			*sln=pvt->_globaltemptables.getFirst();
-						sln; sln=sln->getNext()) {
+			sln; sln=sln->getNext()) {
 		truncateTempTable(cursor,sln->getValue());
 	}
 }
@@ -6500,7 +6528,8 @@ void sqlrservercontroller::closeClientConnection(uint32_t bytes) {
 	}
 	pvt->_clientsock->useBlockingMode();
 	
-	raiseDebugMessageEvent("done waiting for client to close the connection");
+	raiseDebugMessageEvent("done waiting for client to "
+					"close the connection");
 
 	// close the client socket
 	raiseDebugMessageEvent("closing the client socket...");
@@ -6751,9 +6780,9 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 		do {
 			error::setErrorNumber(0);
 			result=pvt->_semset->waitWithUndo(0);
-		} while (!result &&
-				error::getErrorNumber()==EINTR &&
-				!alarmrang);
+		} while (!result && error::getErrorNumber()==EINTR &&
+					!process::getShutDownFlag() &&
+					!alarmrang);
 		signalmanager::alarm(0);
 		pvt->_semset->retryInterruptedOperations();
 	} else {
@@ -6799,9 +6828,9 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 		do {
 			error::setErrorNumber(0);
 			result=pvt->_semset->wait(3);
-		} while (!result &&
-				error::getErrorNumber()==EINTR &&
-				!alarmrang);
+		} while (!result && error::getErrorNumber()==EINTR &&
+					!process::getShutDownFlag() &&
+					!alarmrang);
 		signalmanager::alarm(0);
 		pvt->_semset->retryInterruptedOperations();
 	} else {
