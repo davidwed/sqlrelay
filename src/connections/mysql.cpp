@@ -1703,6 +1703,7 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 					return MEDIUM_BLOB_DATATYPE;
 				} else {
 					return LONG_BLOB_DATATYPE;
+				}
 			#else
 				// MySQL 5/8 appears to use these lengths
 				// for both blobs and texts
