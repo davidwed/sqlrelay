@@ -2108,11 +2108,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		error::clearError();
 		int32_t	waitcount=readlistener.listen(-1,-1);
 
-		// The wait fell through but nobody had data.  This is just here
-		// for good measure now.  I'm not sure what could cause this.
-		// I originally thought it could happen if one side or the other
-		// closed the socket, but it appears in that case, the wait does		// fall through with the side that closed the socket indicated
-		// as ready and then the read fails.
+		// The wait fell through but nobody had data.  A shutdown could
+		// cause this. 
 		if (waitcount<1) {
 			raiseDebugMessageEvent("wait exited with no data");
 			endsession=true;
