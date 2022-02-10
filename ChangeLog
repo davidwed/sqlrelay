@@ -39,7 +39,7 @@
 	servers use the rudiments process class shutdown flag framework now to
 		avoid calling non-async-signal-safe functions from within
 		signal handlers
-	mysql connection supports MariaDB 10.6's updated text lob lengths
+	mysql connection supports MariaDB 10.6's updated text/blob lengths
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
