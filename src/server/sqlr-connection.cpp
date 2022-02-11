@@ -51,7 +51,7 @@ static void shutDown(int32_t signum) {
 		}
 	}
 
-	if (!signalhandler::isSignalHandlerIntUsed()) {
+	if (!signalhandler::supportsSignalHandlerParameter()) {
 		delete cont;
 		process::exit(0);
 	}
