@@ -177,26 +177,6 @@ int main(int argc, const char **argv) {
 	if (!cmdl.found("-disable-crash-handler")) {
 		process::handleCrash(shutDown);
 	}
-
-	// handle various other shutdown conditions
-	signalhandler		shutdownhandler;
-	shutdownhandler.setHandler(shutDown);
-	// timeouts
-	#ifdef SIGALRM
-	shutdownhandler.handleSignal(SIGALRM);
-	#endif
-	// CPU consumption soft limit
-	#ifdef SIGXCPU
-	shutdownhandler.handleSignal(SIGXCPU);
-	#endif
-	// File size limit exceeded
-	#ifdef SIGXFSZ
-	shutdownhandler.handleSignal(SIGXFSZ);
-	#endif
-	// power failure
-	#ifdef SIGPWR
-	shutdownhandler.handleSignal(SIGPWR);
-	#endif
 #endif
 
 	// ignore various signals
@@ -204,26 +184,14 @@ int main(int argc, const char **argv) {
 	set.addAllSignals();
 	set.removeShutDownSignals();
 	set.removeCrashSignals();
-	// timeouts
+	// don't ignore alarms (we use these to implement semaphore timeouts
+	// on platforms that don't support timed semaphore operations)
 	#ifdef SIGALRM
 	set.removeSignal(SIGALRM);
 	#endif
-	// CPU consumption soft limit
-	#ifdef SIGXCPU
-	set.removeSignal(SIGXCPU);
-	#endif
-	// File size limit exceeded
-	#ifdef SIGXFSZ
-	set.removeSignal(SIGXFSZ);
-	#endif
-	// power failure
-	#ifdef SIGPWR
-	set.removeSignal(SIGPWR);
-	#endif
 	signalmanager::ignoreSignals(&set);
 
-
-	// connect to the db
+	// initialize
 	bool	result=cont->init(argc,argv);
 	if (result) {
 		// wait for client connections

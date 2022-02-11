@@ -130,57 +130,62 @@ int main(int argc, const char **argv) {
 	set.addAllSignals();
 	set.removeShutDownSignals();
 	set.removeCrashSignals();
-	// timeouts
+	// don't ignore alarms (we use these to implement semaphore timeouts
+	// on platforms that don't support timed semaphore operations)
 	#ifdef SIGALRM
 	set.removeSignal(SIGALRM);
 	#endif
-	// child
+	// don't ignore child-exits (necessary when we're forking child
+	// processes to handle clients rather than forking child threads)
 	#ifdef SIGCHLD
 	set.removeSignal(SIGCHLD);
-	#endif
-	// CPU consumption soft limit
-	#ifdef SIGXCPU
-	set.removeSignal(SIGXCPU);
-	#endif
-	// File size limit exceeded
-	#ifdef SIGXFSZ
-	set.removeSignal(SIGXFSZ);
-	#endif
-	// power failure
-	#ifdef SIGPWR
-	set.removeSignal(SIGPWR);
 	#endif
 	signalmanager::ignoreSignals(&set);
 
 	// initialize
-	if (lsnr->init(argc,argv)) {
-
+	bool	result=lsnr->init(argc,argv);
+	if (result) {
 		// wait for client connections
 		lsnr->listen();
 	}
 
 #ifdef SHUTDOWNFLAG
-	// generate a backtrace if necessary
-	if (process::getShutDownFlag() &&
-			!charstring::isNullOrEmpty(backtrace) &&
-			process::getShutDownSignal()!=SIGTERM) {
+	if (process::getShutDownFlag()) {
 
-		stringbuffer	filename;
-		filename.append(backtrace);
-		filename.append(sys::getDirectorySeparator());
-		filename.append("sqlr-listener.");
-		filename.append((uint32_t)process::getProcessId());
-		filename.append(".bt");
-		file	f;
-		if (f.create(filename.getString(),
+		int32_t	signum=process::getShutDownSignal();
+
+		// generate a backtrace if necessary
+		if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGTERM) {
+
+			stringbuffer	filename;
+			filename.append(backtrace);
+			filename.append(sys::getDirectorySeparator());
+			filename.append("sqlr-listener.");
+			filename.append((uint32_t)process::getProcessId());
+			filename.append(".bt");
+			file	f;
+			if (f.create(filename.getString(),
 				permissions::evalPermString("rw-------"))) {
-			f.printf("signal: %d\n\n",process::getShutDownSignal());
-			process::backtrace(&f);
+				f.printf("signal: %d\n\n",signum);
+				process::backtrace(&f);
+			}
+		}
+
+		// print exit message (on abnormal shutdown)
+		if (signum!=SIGINT && signum!=SIGTERM && signum!=SIGQUIT) {
+			stderror.printf("%s-listener (pid=%d) "
+				"Abnormal termination: signal %d received\n",
+				SQLR,(uint32_t)process::getProcessId(),signum);
+		}
+
+		// set successful exit on SIGTERM
+		if (signum==SIGTERM) {
+			result=true;
 		}
 	}
 #endif
 
 	// clean up and exit
 	delete lsnr;
-	process::exit(1);
+	process::exit((result)?0:1);
 }
