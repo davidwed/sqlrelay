@@ -117,32 +117,19 @@ int	main(int argc, char **argv) {
 	#endif
 
 	stdoutput.printf("mysql_character_set_name:\n");
-	#if !defined(MARIADB_BASE_VERSION) && \
-		defined(MYSQL_VERSION_ID) && \
-		MYSQL_VERSION_ID>=80000
-	checkSuccess((char *)mysql_character_set_name(&mysql),"utf8mb4");
-	#else
 	const char	*charset=mysql_character_set_name(&mysql);
 	checkSuccess(!charstring::compare(charset,"latin1") ||
-				!charstring::compare(charset,"utf8"),true);
-	#endif
+				!charstring::compare(charset,"utf8") ||
+				!charstring::compare(charset,"utf8mb4"),true);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_list_dbs\n");
 	result=mysql_list_dbs(&mysql,NULL);
-	// FIXME: crashes with drop-in lib
-	//checkSuccess(mysql_field_count(&mysql),1);
+	checkSuccess(mysql_field_count(&mysql),1);
 	checkSuccess(mysql_num_fields(result),1);
 	field=mysql_fetch_field_direct(result,0);
-	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		checkSuccess(
-			!charstring::compare(field->name,"Database") || 
+	checkSuccess(!charstring::compare(field->name,"Database") || 
 			!charstring::compare(field->name,"Database (%)"),1);
-	} else {
-		// sqlrelay calls this column schema_name rather
-		// than Database so the drop-in lib does too
-		checkSuccess(field->name,"schema_name");
-	}
 	mysql_free_result(result);
 	stdoutput.printf("\n");
 
@@ -157,18 +144,10 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_list_tables\n");
 	result=mysql_list_tables(&mysql,NULL);
-	// FIXME: crashes with drop-in lib
-	//checkSuccess(mysql_field_count(&mysql),1);
+	checkSuccess(mysql_field_count(&mysql),1);
 	checkSuccess(mysql_num_fields(result),1);
 	field=mysql_fetch_field_direct(result,0);
-	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		checkSuccess(
-			!charstring::compare(field->name,"Tables_in_",10),1);
-	} else {
-		// sqlrelay calls this column schema_name rather
-		// than Database so the drop-in lib does too
-		checkSuccess(field->name,"table_name");
-	}
+	checkSuccess(!charstring::compare(field->name,"Tables_in_",10),1);
 	row=mysql_fetch_row(result);
 	checkSuccess(row[0],"testtable");
 	row=mysql_fetch_row(result);
@@ -178,8 +157,11 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_list_fields\n");
 	result=mysql_list_fields(&mysql,"testtable",NULL);
-	// FIXME: crashes with drop-in lib
-	//checkSuccess(mysql_field_count(&mysql),19);
+	// this specific case of mysql_field_count returns 0 on mariadb 10.6
+	#if defined(MARIADB_VERSION_ID) && \
+		(MARIADB_VERSION_ID<100600 || MARIADB_VERSION_ID>100700)
+		checkSuccess(mysql_field_count(&mysql),19);
+	#endif
 	checkSuccess(mysql_num_fields(result),19);
 	stdoutput.printf("\n");
 
@@ -765,11 +747,9 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 
-	if (charstring::isNullOrEmpty(environment::getValue("LD_PRELOAD"))) {
-		stdoutput.printf("mysql_thread_id\n");
-		checkSuccess((mysql_thread_id(&mysql)!=0),1);
-		stdoutput.printf("\n");
-	}
+	stdoutput.printf("mysql_thread_id\n");
+	checkSuccess((mysql_thread_id(&mysql)!=0),1);
+	stdoutput.printf("\n");
 
 
 	// some versions of mariadb crash when you call this
