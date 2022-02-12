@@ -40,6 +40,10 @@
 		avoid calling non-async-signal-safe functions from within
 		signal handlers
 	mysql connection supports MariaDB 10.6's updated text/blob lengths
+	ODBC driver can set autocommit prior to connect now
+	ODBC driver supports SQLGetInfo for some more 3.8.0 options now
+	ODBC driver returns SUCCES_WITH_INFO if connect succeeds but
+		afterwards autocommit or select-db fail now
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
