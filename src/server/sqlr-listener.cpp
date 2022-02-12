@@ -142,12 +142,8 @@ int main(int argc, const char **argv) {
 	#endif
 	signalmanager::ignoreSignals(&set);
 
-	// initialize
-	bool	result=lsnr->init(argc,argv);
-	if (result) {
-		// wait for client connections
-		lsnr->listen();
-	}
+	// initialize and wait for client connections
+	int32_t exitstatus=(lsnr->init(argc,argv) && lsnr->listen())?0:1;
 
 #ifdef SHUTDOWNFLAG
 	if (process::getShutDownFlag()) {
@@ -178,14 +174,13 @@ int main(int argc, const char **argv) {
 				SQLR,(uint32_t)process::getProcessId(),signum);
 		}
 
-		// set successful exit on SIGTERM
-		if (signum==SIGTERM) {
-			result=true;
-		}
+		// set successful exit on SIGTERM, otherwise set
+		// the exit status to 128 + the signal number
+		exitstatus=(signum==SIGTERM)?0:128+signum;
 	}
 #endif
 
 	// clean up and exit
 	delete lsnr;
-	process::exit((result)?0:1);
+	process::exit(exitstatus);
 }

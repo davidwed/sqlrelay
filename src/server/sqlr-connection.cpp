@@ -191,15 +191,10 @@ int main(int argc, const char **argv) {
 	#endif
 	signalmanager::ignoreSignals(&set);
 
-	// initialize
-	bool	result=cont->init(argc,argv);
-	if (result) {
-		// wait for client connections
-		result=cont->listen();
-	}
+	// initialize and wait for client connections
+	int32_t exitstatus=(cont->init(argc,argv) && cont->listen())?0:1;
 
 #ifdef SHUTDOWNFLAG
-
 	if (process::getShutDownFlag()) {
 
 		int32_t	signum=process::getShutDownSignal();
@@ -230,10 +225,9 @@ int main(int argc, const char **argv) {
 				"Abnormal termination: signal %d received\n",
 			signum);
 
-		// set successful exit on SIGTERM
-		if (signum==SIGTERM) {
-			result=true;
-		}
+		// set successful exit on SIGTERM, otherwise set
+		// the exit status to 128 + the signal number
+		exitstatus=(signum==SIGTERM)?0:128+signum;
 	}
 #else
 	// If sqlr-stop has been run, we may be here because the sqlr-listener
@@ -248,5 +242,5 @@ int main(int argc, const char **argv) {
 
 	// clean up and exit
 	delete cont;
-	process::exit((result)?0:1);
+	process::exit(exitstatus);
 }

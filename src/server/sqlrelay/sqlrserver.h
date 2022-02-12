@@ -12,7 +12,7 @@ class SQLRSERVER_DLLSPEC sqlrlistener {
 		~sqlrlistener();
 
 		bool	init(int argc, const char **argv);
-		void	listen();
+		bool	listen();
 
 		const char	*getId();
 		const char	*getLogDir();

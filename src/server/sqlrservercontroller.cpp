@@ -1423,13 +1423,13 @@ bool sqlrservercontroller::listen() {
 	for (;;) {
 
 		if (process::getShutDownFlag()) {
-			return false;
+			return true;
 		}
 
 		waitForAvailableDatabase();
 		initSession();
 		if (!announceAvailability(pvt->_connectionid)) {
-			return true;
+			return false;
 		}
 
 		// loop to handle suspended sessions

@@ -1048,13 +1048,13 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 	return success;
 }
 
-void sqlrlistener::listen() {
+bool sqlrlistener::listen() {
 
 	// wait until all of the connections have started
 	for (;;) {
 
 		if (process::getShutDownFlag()) {
-			return;
+			return false;
 		}
 
 		int32_t	opendbconnections=pvt->_shm->open_db_connections;
@@ -1073,20 +1073,25 @@ void sqlrlistener::listen() {
 
 	// listen for client connections
 	if (!listenOnClientSockets()) {
-		return;
+		return false;
 	}
 
 	for (;;) {
 
 		if (process::getShutDownFlag()) {
-			return;
+			return true;
 		}
 
 		error::clearError();
 
-		if (!handleTraffic(waitForTraffic()) &&
-			error::getErrorNumber()==EMFILE) {
-			snooze::macrosnooze(1);
+		if (!handleTraffic(waitForTraffic())) {
+
+			// if something inside of handleTraffic() failed with
+			// EMFILE (too many open files) then wait a second
+			// before trying again so we don't slam the system
+			if (error::getErrorNumber()==EMFILE) {
+				snooze::macrosnooze(1);
+			}
 		}
 	}
 }
