@@ -30,6 +30,9 @@ enum sqlrcursorstate_t {
 enum sqlrquerytype_t {
 	SQLRQUERYTYPE_SELECT=0,
 	SQLRQUERYTYPE_INSERT,
+	SQLRQUERYTYPE_INSERTSELECT,
+	SQLRQUERYTYPE_SELECTINTO,
+	SQLRQUERYTYPE_MULTIINSERT,
 	SQLRQUERYTYPE_UPDATE,
 	SQLRQUERYTYPE_DELETE,
 	SQLRQUERYTYPE_CREATE,
@@ -800,6 +803,16 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char **db,
 						const char **schema,
 						const char **object);
+		void		parseInsert(const char *query,
+					uint32_t querylen,
+					sqlrquerytype_t *querytype,
+					char ***cols,
+					uint64_t *colcount,
+					linkedlist<char *> **allcolumns,
+					const char **autoinccolumn,
+					bool *columnsincludeautoinccolumn,
+					uint64_t *liid);
+
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);

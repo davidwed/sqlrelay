@@ -131,6 +131,20 @@
 		void	sessionEndQueries();
 		void	sessionQuery(const char *query);
 
+		void	getColumnsFromInsertQuery(
+				const char *query,
+				uint32_t querylen,
+				char ***cols,
+				uint64_t *colcount,
+				linkedlist<char *> **allcolumns,
+				const char **autoinccolumn,
+				bool *columnsincludeautoinccolumn);
+		void	getColumnsFromDb(char *table, 
+				linkedlist<char *> **allcolumns,
+				const char **autoinccolumn);
+		uint64_t	countValuesInInsertQuery(const char *values);
+		bool		isMultiInsert(const char *ptr, const char *end);
+
 		static void     alarmHandler(int32_t signum);
 
 		sqlrservercontrollerprivate	*pvt;

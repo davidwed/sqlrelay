@@ -304,6 +304,9 @@ class sqlrservercontrollerprivate {
 	char	*_db;
 	char	*_schema;
 	char	*_object;
+
+	dictionary<char *,linkedlist<char *> *>	_colcache;
+	dictionary<char *,const char *>		_autoinccolcache;
 };
 
 static signalhandler		alarmhandler;
@@ -462,6 +465,9 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_db=NULL;
 	pvt->_schema=NULL;
 	pvt->_object=NULL;
+
+	pvt->_colcache.setManageArrayKeys(true);
+	pvt->_colcache.setManageValues(true);
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -2474,6 +2480,15 @@ void sqlrservercontroller::endTransaction(bool commit) {
 		pvt->_sqlrmd->endTransaction(commit);
 	}
 
+	// clear column caches
+	for (listnode<char *> *colcachenode=
+			pvt->_colcache.getKeys()->getFirst();
+			colcachenode; colcachenode=colcachenode->getNext()) {
+		pvt->_colcache.getValue(colcachenode->getValue())->clear();
+	}
+	pvt->_colcache.clear();
+	pvt->_autoinccolcache.clear();
+
 	// clear per-session pool
 	pvt->_txpool.clear();
 
@@ -3507,6 +3522,353 @@ void sqlrservercontroller::splitObjectName(const char *currentdb,
 	*db=pvt->_db;
 	*schema=pvt->_schema;
 	*object=pvt->_object;
+}
+
+void sqlrservercontroller::parseInsert(const char *query,
+					uint32_t querylen,
+					sqlrquerytype_t *querytype,
+					char ***cols,
+					uint64_t *colcount,
+					linkedlist<char *> **allcolumns,
+					const char **autoinccolumn,
+					bool *columnsincludeautoinccolumn,
+					uint64_t *liid) {
+
+	*querytype=SQLRQUERYTYPE_ETC;
+	*autoinccolumn=NULL;
+
+	const char	*start=skipWhitespaceAndComments(query);
+	const char	*end=query+querylen;
+
+	// FIXME: assumes normalized query...
+
+	if (querylen>12 && !charstring::compare(start,"insert into ",12)) {
+
+		*querytype=SQLRQUERYTYPE_INSERT;
+
+		// detect insert-select...
+
+		// skip to either "(" before columns, "values", or "select"
+		// FIXME: the table name could be quoted and contain a space
+		const char	*ptr=charstring::findFirst(start+12,' ')+1;
+		if (ptr>=end) {
+			return;
+		}
+
+		// if we found columns, then skip to "values" or "select"
+		if (*ptr=='(') {
+			ptr=charstring::findFirst(ptr,')')+2;
+		}
+		if (ptr>=end) {
+			return;
+		}
+		
+		// if we find "values " then it's an insert,
+		// or possibly a multi-insert
+		// FIXME: kind-of a kludge...
+		// sometimes queries are written:
+		//	insert into blah values(...);
+		// with no space after "values", and the normalize translation
+		// doesn't fix this (though it ought to)
+		const char	*values=NULL;
+		if (end>ptr+7) {
+			values=charstring::findFirst(ptr,"values(");
+		}
+		if (values) {
+			values+=7;
+		} else if (end>ptr+8) {
+			values=charstring::findFirst(ptr,"values (");
+			if (values) {
+				values+=8;
+			}
+		}
+		if (values) {
+
+			if (isMultiInsert(values,end)) {
+				*querytype=SQLRQUERYTYPE_MULTIINSERT;
+			}
+
+			// get last insert id
+			// (get it here because getColumnsFromInsertQuery()
+			// will reset it)
+			getLastInsertId(liid);
+
+			// get the columns
+			getColumnsFromInsertQuery(
+					query,querylen,
+					cols,colcount,
+					allcolumns,autoinccolumn,
+					columnsincludeautoinccolumn);
+			return;
+		}
+
+		// otherwise it's some kind of insert ... select
+		*querytype=SQLRQUERYTYPE_INSERTSELECT;
+
+	} else if (querylen>7 && !charstring::compare(start,"select ",7)) {
+
+		*querytype=SQLRQUERYTYPE_SELECT;
+
+		// FIXME: detect select-into
+	}
+}
+
+void sqlrservercontroller::getColumnsFromInsertQuery(
+				const char *query,
+				uint32_t querylen,
+				char ***cols,
+				uint64_t *colcount,
+				linkedlist<char *> **allcolumns,
+				const char **autoinccolumn,
+				bool *columnsincludeautoinccolumn) {
+
+	// init return values
+	*cols=NULL;
+	*colcount=0;
+	*autoinccolumn=NULL;
+	*columnsincludeautoinccolumn=false;
+
+	// get table name...
+	const char	*start=skipWhitespaceAndComments(query)+12;
+	const char	*end=charstring::findFirst(start,' ');
+	if (!end) {
+		return;
+	}
+	char	*table=charstring::duplicate(start,end-start);
+
+	// strip any quoting
+	charstring::stripSet(table,"\"'`[]");
+
+	// get all of the columns in the table
+	*allcolumns=pvt->_colcache.getValue(table);
+	*autoinccolumn=pvt->_autoinccolcache.getValue(table);
+	if (!(*allcolumns)) {
+		getColumnsFromDb(table,allcolumns,autoinccolumn);
+	}
+
+
+	// get the list of columns that we're actually inserting into
+	const char	*colsstart=end+1;
+
+	if (*colsstart=='(') {
+
+		// parse columns provided in the query
+		const char	*colsend=
+				charstring::findFirst(colsstart,')');
+		char		*colscopy=
+				charstring::duplicate(colsstart+1,
+							colsend-colsstart-1);
+		charstring::split(colscopy,",",true,cols,colcount);
+		delete[] colscopy;
+
+	} else {
+
+		// count values
+		// FIXME: kind-of a kludge...
+		// sometimes queries are written:
+		//	insert into blah values(...);
+		// with no space after "values", and the normalize translation
+		// doesn't fix this (though it ought to)
+		const char	*values=charstring::findFirst(
+						colsstart,"values(");
+		if (values) {
+			values+=7;
+		} else {
+			values=charstring::findFirst(colsstart,"values (");
+			if (values) {
+				values+=8;
+			}
+		}
+		*colcount=countValuesInInsertQuery(values);
+
+		// create array of columns from allcolumns
+		// that match the number of values
+		*cols=new char *[*colcount];
+		listnode<char *>	*node=(*allcolumns)->getFirst();
+		if (node) {
+			for (uint64_t i=0; i<*colcount; i++) {
+				(*cols)[i]=charstring::duplicate(
+							node->getValue());
+				node=node->getNext();
+			}
+		} else {
+			// this can happen if various problems occur,
+			// eg. if the table name is invalid
+			for (uint64_t i=0; i<*colcount; i++) {
+				(*cols)[i]=NULL;
+			}
+		}
+	}
+
+	// does the list of columns that we're actually
+	// inserting into contain the autoincrement column?
+	for (uint64_t i=0; i<*colcount; i++) {
+		if (!charstring::compare((*cols)[i],*autoinccolumn)) {
+			*columnsincludeautoinccolumn=true;
+		}
+	}
+}
+
+void sqlrservercontroller::getColumnsFromDb(char *table, 
+					linkedlist<char *> **allcolumns,
+					const char **autoinccolumn) {
+
+	*allcolumns=new linkedlist<char *>();
+	(*allcolumns)->setManageArrayValues(true);
+
+	// get all of the columns in the table
+	sqlrservercursor        *gclcur=newCursor();
+	if (open(gclcur)) {
+
+		bool	retval=false;
+		if (getListsByApiCalls()) {
+			setColumnListColumnMap(
+					SQLRSERVERLISTFORMAT_MYSQL);
+			retval=getColumnList(gclcur,table,NULL);
+		} else {
+			const char	*q=
+				getColumnListQuery(table,false);
+			// FIXME: clean up buffers to avoid SQL injection
+			// FIXME: bounds checking
+			char	*querybuffer=getQueryBuffer(gclcur);
+			charstring::printf(querybuffer,
+					getConfig()->getMaxQuerySize()+1,
+					q,table);
+			setQueryLength(gclcur,
+					charstring::length(querybuffer));
+			retval=prepareQuery(gclcur,
+					getQueryBuffer(gclcur),
+					getQueryLength(gclcur),
+					false,false,false) &&
+				executeQuery(gclcur,
+					false,false,false,false);
+		}
+		if (retval) {
+
+			bool    error;
+			while (fetchRow(gclcur,&error)) {
+
+				const char	*column;
+				const char	*extra;
+				uint64_t	fieldlength;
+				bool		blob;
+				bool		null;
+				getField(gclcur,0,&column,
+						&fieldlength,&blob,&null);
+				getField(gclcur,8,&extra,
+						&fieldlength,&blob,&null);
+
+				char	*dup=charstring::duplicate(column);
+				(*allcolumns)->append(dup);
+				if (charstring::contains(extra,
+							"auto_increment")) {
+					*autoinccolumn=dup;
+				}
+
+				// FIXME: kludgy
+				nextRow(gclcur);
+			}
+		}
+	}
+	closeResultSet(gclcur);
+	close(gclcur);
+	deleteCursor(gclcur);
+
+	// cache table -> columns/autoinccolumns mappings
+	pvt->_colcache.setValue(table,*allcolumns);
+	pvt->_autoinccolcache.setValue(table,*autoinccolumn);
+}
+
+uint64_t sqlrservercontroller::countValuesInInsertQuery(const char *values) {
+
+	uint64_t	valuecount=0;
+	const char	*c=values;
+	char		prevc='\0';
+	bool		inquotes=false;
+	uint32_t	parens=0;
+	for (;;) {
+
+		// end-of-values condition
+		if (!inquotes && !parens && *c==')') {
+			valuecount++;
+			break;
+		}
+
+		// handle quotes...
+		if (!inquotes && *c=='\'') {
+			inquotes=true;
+		} else if (inquotes && *c=='\'' && prevc!='\\') {
+			inquotes=false;
+		}
+
+		if (!inquotes) {
+
+			// handle parentheses...
+			if (*c=='(') {
+				parens++;
+			} else if (parens && *c==')') {
+				parens--;
+			} else {
+				// bump the value count if we found a comma
+				if (*c==',') {
+					valuecount++;
+				}
+			}
+		}
+
+		// keep going
+		prevc=*c;
+		c++;
+	}
+
+	return valuecount;
+}
+
+bool sqlrservercontroller::isMultiInsert(const char *ptr, const char *end) {
+
+	// ptr should be sitting right after the opening paren...
+
+	// skip to right after the closing paren...
+	const char	*c=ptr;
+	char		prevc='\0';
+	bool		inquotes=false;
+	uint32_t	parens=0;
+	for (;;) {
+
+		// closing paren condition
+		if (!inquotes && !parens && *c==')') {
+			c++;
+			break;
+		}
+
+		// handle quotes...
+		if (!inquotes && *c=='\'') {
+			inquotes=true;
+		} else if (inquotes && *c=='\'' && prevc!='\\') {
+			inquotes=false;
+		}
+
+		if (!inquotes) {
+
+			// handle parentheses...
+			if (*c=='(') {
+				parens++;
+			} else if (parens && *c==')') {
+				parens--;
+			}
+		}
+
+		// keep going
+		if (prevc=='\\' && *c=='\\') {
+			prevc='\0';
+		} else {
+			prevc=*c;
+		}
+		c++;
+	}
+	
+	// if there's a comma after the closing paren, then it's a multi-insert
+	return (c!=end && *c==',');
 }
 
 bool sqlrservercontroller::isBitType(const char *type) {

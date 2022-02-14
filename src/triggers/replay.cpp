@@ -24,15 +24,6 @@ enum condition_t {
 	CONDITION_ERRORCODE
 };
 
-enum querytype_t {
-	QUERYTYPE_SELECT=0,
-	QUERYTYPE_INSERT,
-	QUERYTYPE_INSERTSELECT,
-	QUERYTYPE_SELECTINTO,
-	QUERYTYPE_MULTIINSERT,
-	QUERYTYPE_OTHER
-};
-
 class condition {
 	public:
 		condition_t	cond;
@@ -67,29 +58,9 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		void	logReplayCondition(condition *cond);
 
 
-		void	parseQuery(const char *query,
-					uint32_t querylen,
-					querytype_t *querytype,
-					char ***cols,
-					uint64_t *colcount,
-					linkedlist<char *> **allcolumns,
-					const char **autoinccolumn,
-					bool *columnsincludeautoinccolumn,
-					uint64_t *liid);
-		void	getColumns(const char *query,
-					uint32_t querylen,
-					char ***cols,
-					uint64_t *colcount,
-					linkedlist<char *> **allcolumns,
-					const char **autoinccolumn,
-					bool *columnsincludeautoinccolumn);
-		void	getColumnsFromDb(char *table, 
-					linkedlist<char *> **allcolumns,
-					const char **autoinccolumn);
-		bool	isMultiInsert(const char *ptr, const char *end);
 		void	disableUntilEndOfTx(const char *query, 
 						int32_t querylen,
-						querytype_t querytype);
+						sqlrquerytype_t querytype);
 		void	copyQuery(querydetails *qd,
 					const char *query,
 					uint32_t querylen);
@@ -101,9 +72,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 					const char *autoinccolumn,
 					uint64_t liid,
 					bool columnsincludeautoinccolumn);
-		uint64_t	countValues(const char *values);
-		void		deleteCols(char **cols, uint64_t colcount);
-		void		appendValues(stringbuffer *newquery,
+		void	deleteCols(char **cols, uint64_t colcount);
+		void	appendValues(stringbuffer *newquery,
 						const char *values,
 						char **cols,
 						uint64_t liid,
@@ -123,9 +93,6 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		linkedlist<condition *>		conditions;
 		memorypool			logpool;
 
-		dictionary<char *,linkedlist<char *> *>	colcache;
-		dictionary<char *,const char *>		autoinccolcache;
-
 		bool	logqueries;
 
 		bool	wasintx;
@@ -138,10 +105,6 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 					domnode *parameters) :
 					sqlrtrigger(cont,ts,parameters) {
 	this->cont=cont;
-
-	colcache.setManageArrayKeys(true);
-	colcache.setManageValues(true);
-	
 
 	debug=cont->getConfig()->getDebugTriggers();
 
@@ -264,14 +227,14 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	// get query type
 	const char		*query=sqlrcur->getQueryBuffer();
 	uint32_t		querylen=sqlrcur->getQueryLength();
-	querytype_t		querytype=QUERYTYPE_OTHER;
+	sqlrquerytype_t		querytype=SQLRQUERYTYPE_ETC;
 	char			**cols=NULL;
 	uint64_t		colcount=0;
 	linkedlist<char *>	*allcolumns=NULL;
 	const char 		*autoinccolumn=NULL;
 	bool			columnsincludeautoinccolumn=false;
 	uint64_t		liid=0;
-	parseQuery(query,querylen,
+	cont->parseInsert(query,querylen,
 			&querytype,
 			&cols,&colcount,
 			&allcolumns,
@@ -280,7 +243,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 			&liid);
 
 	// bail if the query was a select, and we're ignoring selects
-	if (!includeselects && querytype==QUERYTYPE_SELECT) {
+	if (!includeselects && querytype==SQLRQUERYTYPE_SELECT) {
 		if (debug) {
 			stdoutput.printf("ignoring query:\n%.*s\n}\n",
 						sqlrcur->getQueryLength(),
@@ -291,7 +254,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	}
 
 	// We can't select-into during replay.
-	if (querytype==QUERYTYPE_SELECTINTO) {
+	if (querytype==SQLRQUERYTYPE_SELECTINTO) {
 		disableUntilEndOfTx(query,querylen,querytype);
 		deleteCols(cols,colcount);
 		return true;
@@ -299,7 +262,8 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 	// log the query...
 	querydetails	*qd=new querydetails;
-	if (querytype==QUERYTYPE_INSERT || querytype==QUERYTYPE_MULTIINSERT) {
+	if (querytype==SQLRQUERYTYPE_INSERT ||
+		 querytype==SQLRQUERYTYPE_MULTIINSERT) {
 
 // FIXME: there's a case we're not handling...  if the query contains a null
 // for the auto-increment column, then we need to replace it with the
@@ -314,7 +278,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 			// copy.
 			copyQuery(qd,query,querylen);
 
-		} else if (querytype==QUERYTYPE_INSERT) {
+		} else if (querytype==SQLRQUERYTYPE_INSERT) {
 
 			rewriteQuery(qd,query,querylen,
 					cols,colcount,autoinccolumn,liid,
@@ -330,7 +294,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 			return true;
 		}
 
-	} else if (querytype==QUERYTYPE_INSERTSELECT) {
+	} else if (querytype==SQLRQUERYTYPE_INSERTSELECT) {
 
 		// There's no way (currently) to handle these.
 		disableUntilEndOfTx(query,querylen,querytype);
@@ -384,7 +348,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 void sqlrtrigger_replay::disableUntilEndOfTx(const char *query, 
 						int32_t querylen,
-						querytype_t querytype) {
+						sqlrquerytype_t querytype) {
 
 	// If we weren't in a transaction, then just don't log the
 	// query.  If we weren't in a transaction, then clear the log
@@ -397,9 +361,9 @@ void sqlrtrigger_replay::disableUntilEndOfTx(const char *query,
 			stdoutput.printf("%s query encountered, "
 				"disabling replay until "
 				"end-of-transaction:\n%.*s\n}\n",
-				((querytype==QUERYTYPE_INSERTSELECT)?
+				((querytype==SQLRQUERYTYPE_INSERTSELECT)?
 							"insert-select":
-				((querytype==QUERYTYPE_SELECTINTO)?
+				((querytype==SQLRQUERYTYPE_SELECTINTO)?
 							"select-into":
 				"multi-insert")),
 				querylen,query);
@@ -417,304 +381,6 @@ void sqlrtrigger_replay::copyQuery(querydetails *qd,
 	bytestring::copy(qd->query,query,querylen);
 	// (make sure to null terminate)
 	qd->query[querylen]='\0';
-}
-
-void sqlrtrigger_replay::parseQuery(const char *query,
-					uint32_t querylen,
-					querytype_t *querytype,
-					char ***cols,
-					uint64_t *colcount,
-					linkedlist<char *> **allcolumns,
-					const char **autoinccolumn,
-					bool *columnsincludeautoinccolumn,
-					uint64_t *liid) {
-
-	*querytype=QUERYTYPE_OTHER;
-	*autoinccolumn=NULL;
-
-	const char	*start=cont->skipWhitespaceAndComments(query);
-	const char	*end=query+querylen;
-
-	// FIXME: assumes normalized query...
-
-	if (querylen>12 && !charstring::compare(start,"insert into ",12)) {
-
-		*querytype=QUERYTYPE_INSERT;
-
-		// detect insert-select...
-
-		// skip to either "(" before columns, "values", or "select"
-		// FIXME: the table name could be quoted and contain a space
-		const char	*ptr=charstring::findFirst(start+12,' ')+1;
-		if (ptr>=end) {
-			return;
-		}
-
-		// if we found columns, then skip to "values" or "select"
-		if (*ptr=='(') {
-			ptr=charstring::findFirst(ptr,')')+2;
-		}
-		if (ptr>=end) {
-			return;
-		}
-		
-		// if we find "values " then it's an insert,
-		// or possibly a multi-insert
-		// FIXME: kind-of a kludge...
-		// sometimes queries are written:
-		//	insert into blah values(...);
-		// with no space after "values", and the normalize translation
-		// doesn't fix this (though it ought to)
-		const char	*values=NULL;
-		if (end>ptr+7) {
-			values=charstring::findFirst(ptr,"values(");
-		}
-		if (values) {
-			values+=7;
-		} else if (end>ptr+8) {
-			values=charstring::findFirst(ptr,"values (");
-			if (values) {
-				values+=8;
-			}
-		}
-		if (values) {
-
-			if (isMultiInsert(values,end)) {
-				*querytype=QUERYTYPE_MULTIINSERT;
-			}
-
-			// get last insert id
-			// (get it here because getColumns() will reset it)
-			cont->getLastInsertId(liid);
-
-			// get the columns
-			getColumns(query,querylen,cols,colcount,
-						allcolumns,autoinccolumn,
-						columnsincludeautoinccolumn);
-			return;
-		}
-
-		// otherwise it's some kind of insert ... select
-		*querytype=QUERYTYPE_INSERTSELECT;
-
-	} else if (querylen>7 && !charstring::compare(start,"select ",7)) {
-
-		*querytype=QUERYTYPE_SELECT;
-
-		// FIXME: detect select-into
-	}
-}
-
-void sqlrtrigger_replay::getColumns(const char *query,
-					uint32_t querylen,
-					char ***cols,
-					uint64_t *colcount,
-					linkedlist<char *> **allcolumns,
-					const char **autoinccolumn,
-					bool *columnsincludeautoinccolumn) {
-
-	// init return values
-	*cols=NULL;
-	*colcount=0;
-	*autoinccolumn=NULL;
-	*columnsincludeautoinccolumn=false;
-
-	// get table name...
-	const char	*start=cont->skipWhitespaceAndComments(query)+12;
-	const char	*end=charstring::findFirst(start,' ');
-	if (!end) {
-		return;
-	}
-	char	*table=charstring::duplicate(start,end-start);
-
-	// strip any quoting
-	charstring::stripSet(table,"\"'`[]");
-
-	// get all of the columns in the table
-	*allcolumns=colcache.getValue(table);
-	*autoinccolumn=autoinccolcache.getValue(table);
-	if (!(*allcolumns)) {
-		getColumnsFromDb(table,allcolumns,autoinccolumn);
-	}
-
-
-	// get the list of columns that we're actually inserting into
-	const char	*colsstart=end+1;
-
-	if (*colsstart=='(') {
-
-		// parse columns provided in the query
-		const char	*colsend=
-				charstring::findFirst(colsstart,')');
-		char		*colscopy=
-				charstring::duplicate(colsstart+1,
-							colsend-colsstart-1);
-		charstring::split(colscopy,",",true,cols,colcount);
-		delete[] colscopy;
-
-	} else {
-
-		// count values
-		// FIXME: kind-of a kludge...
-		// sometimes queries are written:
-		//	insert into blah values(...);
-		// with no space after "values", and the normalize translation
-		// doesn't fix this (though it ought to)
-		const char	*values=charstring::findFirst(
-						colsstart,"values(");
-		if (values) {
-			values+=7;
-		} else {
-			values=charstring::findFirst(colsstart,"values (");
-			if (values) {
-				values+=8;
-			}
-		}
-		*colcount=countValues(values);
-
-		// create array of columns from allcolumns
-		// that match the number of values
-		*cols=new char *[*colcount];
-		listnode<char *>	*node=(*allcolumns)->getFirst();
-		if (node) {
-			for (uint64_t i=0; i<*colcount; i++) {
-				(*cols)[i]=charstring::duplicate(
-							node->getValue());
-				node=node->getNext();
-			}
-		} else {
-			// this can happen if various problems occur,
-			// eg. if the table name is invalid
-			for (uint64_t i=0; i<*colcount; i++) {
-				(*cols)[i]=NULL;
-			}
-		}
-	}
-
-	// does the list of columns that we're actually
-	// inserting into contain the autoincrement column?
-	for (uint64_t i=0; i<*colcount; i++) {
-		if (!charstring::compare((*cols)[i],*autoinccolumn)) {
-			*columnsincludeautoinccolumn=true;
-		}
-	}
-}
-
-void sqlrtrigger_replay::getColumnsFromDb(char *table, 
-					linkedlist<char *> **allcolumns,
-					const char **autoinccolumn) {
-
-	*allcolumns=new linkedlist<char *>();
-	(*allcolumns)->setManageArrayValues(true);
-
-	// get all of the columns in the table
-	sqlrservercursor        *gclcur=cont->newCursor();
-	if (cont->open(gclcur)) {
-
-		bool	retval=false;
-		if (cont->getListsByApiCalls()) {
-			cont->setColumnListColumnMap(
-					SQLRSERVERLISTFORMAT_MYSQL);
-			retval=cont->getColumnList(gclcur,table,NULL);
-		} else {
-			const char	*q=
-				cont->getColumnListQuery(table,false);
-			// FIXME: clean up buffers to avoid SQL injection
-			// FIXME: bounds checking
-			char	*querybuffer=cont->getQueryBuffer(gclcur);
-			charstring::printf(querybuffer,
-					cont->getConfig()->getMaxQuerySize()+1,
-					q,table);
-			cont->setQueryLength(gclcur,
-					charstring::length(querybuffer));
-			retval=cont->prepareQuery(gclcur,
-					cont->getQueryBuffer(gclcur),
-					cont->getQueryLength(gclcur),
-					false,false,false) &&
-				cont->executeQuery(gclcur,
-					false,false,false,false);
-		}
-		if (retval) {
-
-			bool    error;
-			while (cont->fetchRow(gclcur,&error)) {
-
-				const char	*column;
-				const char	*extra;
-				uint64_t	fieldlength;
-				bool		blob;
-				bool		null;
-				cont->getField(gclcur,0,&column,
-						&fieldlength,&blob,&null);
-				cont->getField(gclcur,8,&extra,
-						&fieldlength,&blob,&null);
-
-				char	*dup=charstring::duplicate(column);
-				(*allcolumns)->append(dup);
-				if (charstring::contains(extra,
-							"auto_increment")) {
-					*autoinccolumn=dup;
-				}
-
-				// FIXME: kludgy
-				cont->nextRow(gclcur);
-			}
-		}
-	}
-	cont->closeResultSet(gclcur);
-	cont->close(gclcur);
-	cont->deleteCursor(gclcur);
-
-	// cache table -> columns/autoinccolumns mappings
-	colcache.setValue(table,*allcolumns);
-	autoinccolcache.setValue(table,*autoinccolumn);
-}
-
-bool sqlrtrigger_replay::isMultiInsert(const char *ptr, const char *end) {
-
-	// ptr should be sitting right after the opening paren...
-
-	// skip to right after the closing paren...
-	const char	*c=ptr;
-	char		prevc='\0';
-	bool		inquotes=false;
-	uint32_t	parens=0;
-	for (;;) {
-
-		// closing paren condition
-		if (!inquotes && !parens && *c==')') {
-			c++;
-			break;
-		}
-
-		// handle quotes...
-		if (!inquotes && *c=='\'') {
-			inquotes=true;
-		} else if (inquotes && *c=='\'' && prevc!='\\') {
-			inquotes=false;
-		}
-
-		if (!inquotes) {
-
-			// handle parentheses...
-			if (*c=='(') {
-				parens++;
-			} else if (parens && *c==')') {
-				parens--;
-			}
-		}
-
-		// keep going
-		if (prevc=='\\' && *c=='\\') {
-			prevc='\0';
-		} else {
-			prevc=*c;
-		}
-		c++;
-	}
-	
-	// if there's a comma after the closing paren, then it's a multi-insert
-	return (c!=end && *c==',');
 }
 
 void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
@@ -780,51 +446,6 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 
 	// copy out the rewritten query
 	copyQuery(qd,newquery.getString(),newquery.getStringLength());
-}
-
-uint64_t sqlrtrigger_replay::countValues(const char *values) {
-
-	uint64_t	valuecount=0;
-	const char	*c=values;
-	char		prevc='\0';
-	bool		inquotes=false;
-	uint32_t	parens=0;
-	for (;;) {
-
-		// end-of-values condition
-		if (!inquotes && !parens && *c==')') {
-			valuecount++;
-			break;
-		}
-
-		// handle quotes...
-		if (!inquotes && *c=='\'') {
-			inquotes=true;
-		} else if (inquotes && *c=='\'' && prevc!='\\') {
-			inquotes=false;
-		}
-
-		if (!inquotes) {
-
-			// handle parentheses...
-			if (*c=='(') {
-				parens++;
-			} else if (parens && *c==')') {
-				parens--;
-			} else {
-				// bump the value count if we found a comma
-				if (*c==',') {
-					valuecount++;
-				}
-			}
-		}
-
-		// keep going
-		prevc=*c;
-		c++;
-	}
-
-	return valuecount;
 }
 
 void sqlrtrigger_replay::deleteCols(char **cols, uint64_t colcount) {
@@ -1413,15 +1034,6 @@ void sqlrtrigger_replay::endTransaction(bool commit) {
 
 	logpool.clear();
 	log.clear();
-
-	// clear cache
-	for (listnode<char *> *colcachenode=colcache.getKeys()->getFirst();
-				colcachenode;
-				colcachenode=colcachenode->getNext()) {
-		colcache.getValue(colcachenode->getValue())->clear();
-	}
-	colcache.clear();
-	autoinccolcache.clear();
 
 	wasintx=false;
 
