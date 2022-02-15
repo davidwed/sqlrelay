@@ -196,6 +196,9 @@ bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 	dictionary<const char *,const char *>	valuemap;
 	for (uint64_t i=0; i<colcount; i++) {
 
+		// FIXME: ignore the primary key
+		// FIXME: ignore the autoincrement key
+
 		// get the column/value pair
 		const char	*col=cols[i];
 		const char	*val=vals[i];
