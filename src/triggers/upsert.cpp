@@ -26,6 +26,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 		bool	insertToUpdate(const char *table,
 					char **cols,
 					uint64_t colcount,
+					const char *autoinccolumn,
 					const char *values,
 					domnode *tablenode,
 					stringbuffer *query);
@@ -94,9 +95,10 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	char		**cols=NULL;
 	uint64_t	colcount=0;
 	const char	*values=NULL;
+	const char	*autoinccolumn=NULL;
 	cont->parseInsert(query,querylen,&querytype,
 				&table,&cols,&colcount,
-				NULL,NULL,NULL,&values);
+				NULL,&autoinccolumn,NULL,&values);
 
 	// bail if the query wasn't a simple insert
 	if (querytype!=SQLRQUERYTYPE_INSERT) {
@@ -123,6 +125,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// copy input binds from sqlrcur to newsqlrcur,
 	// prepare and execute the query
 	*success=insertToUpdate(table,cols,colcount,
+				autoinccolumn,
 				values,tablenode,&update) &&
 		copyInputBinds(sqlrcur,newsqlrcur) &&
 		cont->prepareQuery(newsqlrcur,
@@ -179,6 +182,7 @@ domnode *sqlrtrigger_upsert::tableEncountered(const char *table) {
 bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 					char **cols,
 					uint64_t colcount,
+					const char *autoinccolumn,
 					const char *values,
 					domnode *tablenode,
 					stringbuffer *query) {
@@ -197,7 +201,11 @@ bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 	for (uint64_t i=0; i<colcount; i++) {
 
 		// FIXME: ignore the primary key
-		// FIXME: ignore the autoincrement key
+
+		// ignore any auto-increment columns
+		if (!charstring::compare(cols[i],autoinccolumn)) {
+			continue;
+		}
 
 		// get the column/value pair
 		const char	*col=cols[i];
