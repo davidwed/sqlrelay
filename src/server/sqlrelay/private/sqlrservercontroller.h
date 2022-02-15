@@ -132,14 +132,14 @@
 		void	sessionQuery(const char *query);
 
 		void	getColumnsFromInsertQuery(
-				const char *query,
-				uint32_t querylen,
+				const char *colsstart,
+				const char *table,
 				char ***cols,
 				uint64_t *colcount,
 				linkedlist<char *> **allcolumns,
 				const char **autoinccolumn,
 				bool *columnsincludeautoinccolumn);
-		void	getColumnsFromDb(char *table, 
+		void	getColumnsFromDb(const char *table, 
 				linkedlist<char *> **allcolumns,
 				const char **autoinccolumn);
 		uint64_t	countValuesInInsertQuery(const char *values);

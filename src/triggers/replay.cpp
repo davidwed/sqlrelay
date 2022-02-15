@@ -71,7 +71,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 					uint64_t colcount,
 					const char *autoinccolumn,
 					uint64_t liid,
-					bool columnsincludeautoinccolumn);
+					bool columnsincludeautoinccolumn,
+					const char *values);
 		void	deleteCols(char **cols, uint64_t colcount);
 		void	appendValues(stringbuffer *newquery,
 						const char *values,
@@ -224,6 +225,11 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 		wasintx=true;
 	}
 
+	// get the last insert id, we'll need it later, and it might
+	// be reset by parseInsert(), so we need to get it here
+	uint64_t	liid=0;
+	bool		gotliid=cont->getLastInsertId(&liid);
+
 	// get query type
 	const char		*query=sqlrcur->getQueryBuffer();
 	uint32_t		querylen=sqlrcur->getQueryLength();
@@ -233,14 +239,15 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	linkedlist<char *>	*allcolumns=NULL;
 	const char 		*autoinccolumn=NULL;
 	bool			columnsincludeautoinccolumn=false;
-	uint64_t		liid=0;
+	const char		*values=NULL;
 	cont->parseInsert(query,querylen,
 			&querytype,
+			NULL,
 			&cols,&colcount,
 			&allcolumns,
 			&autoinccolumn,
 			&columnsincludeautoinccolumn,
-			&liid);
+			&values);
 
 	// bail if the query was a select, and we're ignoring selects
 	if (!includeselects && querytype==SQLRQUERYTYPE_SELECT) {
@@ -269,7 +276,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 // for the auto-increment column, then we need to replace it with the
 // last-insert-id
 
-		if (!liid || !autoinccolumn || columnsincludeautoinccolumn) {
+		if (!gotliid || !autoinccolumn || columnsincludeautoinccolumn) {
 
 			// If there was no last-insert-id or auto-increment
 			// column, or if there was an auto-increment column,
@@ -282,7 +289,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 			rewriteQuery(qd,query,querylen,
 					cols,colcount,autoinccolumn,liid,
-					columnsincludeautoinccolumn);
+					columnsincludeautoinccolumn,values);
 
 		} else {
 
@@ -390,7 +397,8 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 					uint64_t colcount,
 					const char *autoinccolumn,
 					uint64_t liid,
-					bool columnsincludeautoinccolumn) {
+					bool columnsincludeautoinccolumn,
+					const char *values) {
 	stringbuffer	newquery;
 
 	// did the query contain column names?
@@ -404,22 +412,6 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 	// skip to either "(" before columns or "values"
 	// FIXME: the table name could be quoted and contain a space
 	const char	*colsstart=charstring::findFirst(table,' ')+1;
-
-	// skip to first value (after ") values (")
-	// FIXME: kind-of a kludge...
-	// sometimes queries are written:
-	//	insert into blah values(...);
-	// with no space after "values", and the normalize translation
-	// doesn't fix this (though it ought to)
-	const char	*values=charstring::findFirst(colsstart,"values(");
-	if (values) {
-		values+=7;
-	} else {
-		values=charstring::findFirst(colsstart,"values (");
-		if (values) {
-			values+=8;
-		}
-	}
 
 	// append up to the columns
 	newquery.append(start,colsstart-start);
@@ -581,8 +573,7 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 	}
 }
 
-bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur,
-					bool replaytx) {
+bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
 
 	// don't log any queries that we run during the replay
 	logqueries=false;

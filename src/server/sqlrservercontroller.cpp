@@ -3524,18 +3524,47 @@ void sqlrservercontroller::splitObjectName(const char *currentdb,
 	*object=pvt->_object;
 }
 
-void sqlrservercontroller::parseInsert(const char *query,
+bool sqlrservercontroller::parseInsert(const char *query,
 					uint32_t querylen,
 					sqlrquerytype_t *querytype,
+					char **table,
 					char ***cols,
 					uint64_t *colcount,
 					linkedlist<char *> **allcolumns,
 					const char **autoinccolumn,
 					bool *columnsincludeautoinccolumn,
-					uint64_t *liid) {
+					const char **values) {
 
-	*querytype=SQLRQUERYTYPE_ETC;
-	*autoinccolumn=NULL;
+	// init return values
+	if (querytype) {
+		*querytype=SQLRQUERYTYPE_ETC;
+	}
+	if (table) {
+		*table=NULL;
+	}
+	if (cols) {
+		*cols=NULL;
+	}
+	if (colcount) {
+		*colcount=0;
+	}
+	if (allcolumns) {
+		*allcolumns=NULL;
+	}
+	if (autoinccolumn) {
+		*autoinccolumn=NULL;
+	}
+	if (columnsincludeautoinccolumn) {
+		*columnsincludeautoinccolumn=false;
+	}
+	if (values) {
+		*values=NULL;
+	}
+
+	// init local values
+	sqlrquerytype_t	localquerytype=SQLRQUERYTYPE_ETC;
+	char		*localtable=NULL;
+	const char	*localvalues=NULL;
 
 	const char	*start=skipWhitespaceAndComments(query);
 	const char	*end=query+querylen;
@@ -3544,111 +3573,126 @@ void sqlrservercontroller::parseInsert(const char *query,
 
 	if (querylen>12 && !charstring::compare(start,"insert into ",12)) {
 
-		*querytype=SQLRQUERYTYPE_INSERT;
+		localquerytype=SQLRQUERYTYPE_INSERT;
 
-		// detect insert-select...
+		// skip past "insert into "
+		start+=12;
 
-		// skip to either "(" before columns, "values", or "select"
+		// find first space after table name
 		// FIXME: the table name could be quoted and contain a space
-		const char	*ptr=charstring::findFirst(start+12,' ')+1;
+		const char	*ptr=charstring::findFirst(start+12,' ');
 		if (ptr>=end) {
-			return;
+			return false;
 		}
 
-		// if we found columns, then skip to "values" or "select"
+		// get table name...
+		localtable=charstring::duplicate(start,ptr-start);
+
+		// strip any quoting
+		charstring::stripSet(localtable,"\"'`[]");
+
+		// skip ahead to whatever is past the table name,
+		// which should be one of:
+		// * the "(" before the list of columns
+		// * the word "values"
+		// * the word "select"
+		ptr++;
+		if (ptr>=end) {
+			return false;
+		}
+
+		// keep track of this location, we may need it later
+		const char	*colsstart=ptr;
+
+		// if we found the "(" before the list of columns,
+		// then skip past the columns to "values"/"select"
 		if (*ptr=='(') {
 			ptr=charstring::findFirst(ptr,')')+2;
 		}
 		if (ptr>=end) {
-			return;
+			return false;
 		}
 		
 		// if we find "values " then it's an insert,
 		// or possibly a multi-insert
-		// FIXME: kind-of a kludge...
+		// FIXME: the below is kind-of a kludge...
 		// sometimes queries are written:
 		//	insert into blah values(...);
 		// with no space after "values", and the normalize translation
 		// doesn't fix this (though it ought to)
-		const char	*values=NULL;
 		if (end>ptr+7) {
-			values=charstring::findFirst(ptr,"values(");
+			localvalues=charstring::findFirst(ptr,"values(");
 		}
-		if (values) {
-			values+=7;
+		if (localvalues) {
+			localvalues+=7;
 		} else if (end>ptr+8) {
-			values=charstring::findFirst(ptr,"values (");
-			if (values) {
-				values+=8;
+			localvalues=charstring::findFirst(ptr,"values (");
+			if (localvalues) {
+				localvalues+=8;
 			}
 		}
-		if (values) {
+		if (localvalues) {
 
-			if (isMultiInsert(values,end)) {
-				*querytype=SQLRQUERYTYPE_MULTIINSERT;
+			if (isMultiInsert(localvalues,end)) {
+				localquerytype=SQLRQUERYTYPE_MULTIINSERT;
 			}
-
-			// get last insert id
-			// (get it here because getColumnsFromInsertQuery()
-			// will reset it)
-			getLastInsertId(liid);
 
 			// get the columns
-			getColumnsFromInsertQuery(
-					query,querylen,
-					cols,colcount,
-					allcolumns,autoinccolumn,
-					columnsincludeautoinccolumn);
-			return;
-		}
+			getColumnsFromInsertQuery(colsstart,
+						localtable,
+						cols,colcount,
+						allcolumns,autoinccolumn,
+						columnsincludeautoinccolumn);
+		} else {
 
-		// otherwise it's some kind of insert ... select
-		*querytype=SQLRQUERYTYPE_INSERTSELECT;
+			// otherwise it's some kind of insert ... select
+			localquerytype=SQLRQUERYTYPE_INSERTSELECT;
+		}
 
 	} else if (querylen>7 && !charstring::compare(start,"select ",7)) {
 
-		*querytype=SQLRQUERYTYPE_SELECT;
+		localquerytype=SQLRQUERYTYPE_SELECT;
 
 		// FIXME: detect select-into
 	}
+
+	// copy values out
+	if (querytype) {
+		*querytype=localquerytype;
+	}
+	if (table) {
+		*table=localtable;
+	} else {
+		delete[] localtable;
+	}
+	if (values) {
+		*values=localvalues;
+	}
+
+	return true;
 }
 
 void sqlrservercontroller::getColumnsFromInsertQuery(
-				const char *query,
-				uint32_t querylen,
+				const char *colsstart,
+				const char *table,
 				char ***cols,
 				uint64_t *colcount,
 				linkedlist<char *> **allcolumns,
 				const char **autoinccolumn,
 				bool *columnsincludeautoinccolumn) {
 
-	// init return values
-	*cols=NULL;
-	*colcount=0;
-	*autoinccolumn=NULL;
-	*columnsincludeautoinccolumn=false;
-
-	// get table name...
-	const char	*start=skipWhitespaceAndComments(query)+12;
-	const char	*end=charstring::findFirst(start,' ');
-	if (!end) {
-		return;
-	}
-	char	*table=charstring::duplicate(start,end-start);
-
-	// strip any quoting
-	charstring::stripSet(table,"\"'`[]");
-
-	// get all of the columns in the table
-	*allcolumns=pvt->_colcache.getValue(table);
-	*autoinccolumn=pvt->_autoinccolcache.getValue(table);
-	if (!(*allcolumns)) {
-		getColumnsFromDb(table,allcolumns,autoinccolumn);
+	// get the full list of columns that are in the table
+	linkedlist<char *>	*localallcolumns=
+				pvt->_colcache.getValue((char *)table);
+	const char		*localautoinccolumn=
+				pvt->_autoinccolcache.getValue((char *)table);
+	if (!localallcolumns) {
+		getColumnsFromDb(table,&localallcolumns,&localautoinccolumn);
 	}
 
-
-	// get the list of columns that we're actually inserting into
-	const char	*colsstart=end+1;
+	// local variable for the column count
+	char		**localcols=NULL;
+	uint64_t	localcolcount=0;
 
 	if (*colsstart=='(') {
 
@@ -3658,13 +3702,13 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 		char		*colscopy=
 				charstring::duplicate(colsstart+1,
 							colsend-colsstart-1);
-		charstring::split(colscopy,",",true,cols,colcount);
+		charstring::split(colscopy,",",true,&localcols,&localcolcount);
 		delete[] colscopy;
 
 	} else {
 
 		// count values
-		// FIXME: kind-of a kludge...
+		// FIXME: the below is kind-of a kludge...
 		// sometimes queries are written:
 		//	insert into blah values(...);
 		// with no space after "values", and the normalize translation
@@ -3679,37 +3723,60 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 				values+=8;
 			}
 		}
-		*colcount=countValuesInInsertQuery(values);
+		localcolcount=countValuesInInsertQuery(values);
 
 		// create array of columns from allcolumns
 		// that match the number of values
-		*cols=new char *[*colcount];
-		listnode<char *>	*node=(*allcolumns)->getFirst();
+		localcols=new char *[localcolcount];
+		listnode<char *>	*node=localallcolumns->getFirst();
 		if (node) {
-			for (uint64_t i=0; i<*colcount; i++) {
-				(*cols)[i]=charstring::duplicate(
-							node->getValue());
+			for (uint64_t i=0; i<localcolcount; i++) {
+				localcols[i]=
+				charstring::duplicate(node->getValue());
 				node=node->getNext();
 			}
 		} else {
 			// this can happen if various problems occur,
 			// eg. if the table name is invalid
-			for (uint64_t i=0; i<*colcount; i++) {
-				(*cols)[i]=NULL;
+			for (uint64_t i=0; i<localcolcount; i++) {
+				localcols[i]=NULL;
 			}
 		}
 	}
 
 	// does the list of columns that we're actually
 	// inserting into contain the autoincrement column?
-	for (uint64_t i=0; i<*colcount; i++) {
-		if (!charstring::compare((*cols)[i],*autoinccolumn)) {
-			*columnsincludeautoinccolumn=true;
+	bool	localcolumnsincludeautoinccolumn=true;
+	for (uint64_t i=0; i<localcolcount; i++) {
+		if (!charstring::compare(localcols[i],localautoinccolumn)) {
+			localcolumnsincludeautoinccolumn=true;
 		}
+	}
+
+	// copy values out
+	if (*cols) {
+		*cols=localcols;
+	} else {
+		for (uint64_t i=0; i<localcolcount; i++) {
+			delete[] localcols[i];
+		}
+		delete[] localcols;
+	}
+	if (*colcount) {
+		*colcount=localcolcount;
+	}
+	if (allcolumns) {
+		*allcolumns=localallcolumns;
+	}
+	if (autoinccolumn) {
+		*autoinccolumn=localautoinccolumn;
+	}
+	if (columnsincludeautoinccolumn) {
+		*columnsincludeautoinccolumn=localcolumnsincludeautoinccolumn;
 	}
 }
 
-void sqlrservercontroller::getColumnsFromDb(char *table, 
+void sqlrservercontroller::getColumnsFromDb(const char *table, 
 					linkedlist<char *> **allcolumns,
 					const char **autoinccolumn) {
 
@@ -3775,8 +3842,8 @@ void sqlrservercontroller::getColumnsFromDb(char *table,
 	deleteCursor(gclcur);
 
 	// cache table -> columns/autoinccolumns mappings
-	pvt->_colcache.setValue(table,*allcolumns);
-	pvt->_autoinccolcache.setValue(table,*autoinccolumn);
+	pvt->_colcache.setValue((char *)table,*allcolumns);
+	pvt->_autoinccolcache.setValue((char *)table,*autoinccolumn);
 }
 
 uint64_t sqlrservercontroller::countValuesInInsertQuery(const char *values) {

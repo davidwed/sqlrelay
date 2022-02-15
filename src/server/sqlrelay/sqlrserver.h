@@ -803,15 +803,16 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char **db,
 						const char **schema,
 						const char **object);
-		void		parseInsert(const char *query,
+		bool		parseInsert(const char *query,
 					uint32_t querylen,
 					sqlrquerytype_t *querytype,
+					char **table,
 					char ***cols,
 					uint64_t *colcount,
 					linkedlist<char *> **allcolumns,
 					const char **autoinccolumn,
 					bool *columnsincludeautoinccolumn,
-					uint64_t *liid);
+					const char **values);
 
 
 		bool	isBitType(const char *type);
