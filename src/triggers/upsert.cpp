@@ -47,8 +47,6 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 		domnode	*errors;
 		domnode	*tables;
 
-		bool	disabled;
-
 		dictionary<const char *, const char *>	wherebinds;
 };
 
