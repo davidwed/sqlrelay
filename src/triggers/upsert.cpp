@@ -24,7 +24,16 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 	private:
 		bool	errorEncountered(sqlrservercursor *icur);
 		domnode	*tableEncountered(const char *table);
-		bool	insertToUpdate(const char *table,
+		bool	copyInputBinds(sqlrservercursor *dest,
+					sqlrservercursor *source);
+		void	copyInputBind(memorypool *pool,
+					bool where,
+					sqlrserverbindvar *dest,
+					sqlrserverbindvar *source,
+					uint16_t bindindex);
+		bool	convertInsertToUpdate(
+					sqlrservercursor *ucur,
+					const char *table,
 					const char * const *cols,
 					uint64_t colcount,
 					const char *autoinccolumn,
@@ -33,13 +42,6 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 					domnode *tablenode,
 					stringbuffer *query);
 		bool	isBind(const char *var);
-		bool	copyInputBinds(sqlrservercursor *dest,
-					sqlrservercursor *source);
-		void	copyInputBind(memorypool *pool,
-					bool where,
-					sqlrserverbindvar *dest,
-					sqlrserverbindvar *source,
-					uint16_t bindindex);
 		void	deleteCols(char **cols, uint64_t colcount);
 
 		sqlrservercontroller	*cont;
@@ -103,7 +105,10 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// error that should trigger an update
 	if (!errorEncountered(icur)) {
 		if (debug) {
-			stdoutput.printf("	no matching error found\n}\n");
+			stdoutput.printf("	no matching error "
+					"found for:\n%d: %s}\n",
+					icur->getErrorNumber(),
+					icur->getErrorBuffer());
 		}
 		return *success;
 	}
@@ -170,55 +175,47 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		}
 	}
 
-	// If we made it here, then the original insert failed with some error,
-	// so *success=false.  Reset it to true.  We'll set it false again if
-	// some step below fails.
+	// If we made it here, then the original insert failed with some error
+	// that triggered all of this to happen.  So *success=false.  Reset it
+	// to true.  We'll set it false again if some step below fails.
 	*success=true;
 
-	// Create an update cursor to run the update.
-	// Preserve the insert cursor in case the
-	// client wants to reexecute the insert.
+	// Create an separate cursor to run the update rather than just using
+	// the cursor that ran the original insert.  This preserves the insert
+	// cursor in case the client wants to use it to reexecute the insert.
 	sqlrservercursor	*ucur=cont->newCursor();
 	if (!ucur) {
 		*success=false;
-		if (!*success && debug) {
-			stdoutput.printf("	failed to create cursor\n");
-		}
+		cont->setError(icur,"upsert failed - "
+					"failed to create update cursor",
+					SQLR_ERROR_TRIGGER,true);
 	}
 
-	// open the cursor
+	// open the update cursor
 	if (*success) {
 		*success=cont->open(ucur);
-		if (!*success && debug) {
-			stdoutput.printf("	failed to open cursor\n");
+		if (!*success) {
+			cont->setError(icur,"upsert failed - "
+						"failed to open update cursor",
+						SQLR_ERROR_TRIGGER,true);
 		}
 	}
 
-	// copy input binds from icur to ucur
-	if (*success) {
-		*success=copyInputBinds(ucur,icur);
-		if (!*success && debug) {
-			stdoutput.printf("	failed to copy input binds\n");
-		}
-	}
-
-	// convert the insert to an update
+	// copy input binds from icur to ucur, convert the insert
+	// to an update, then prepare and execute the update query
+	// (each of these sets the error message internally if they fail)
 	stringbuffer		update;
 	if (*success) {
-		*success=insertToUpdate(table,cols,colcount,
-				autoinccolumn,primarykeycolumn,
-				values,tablenode,&update);
-		if (!*success && debug) {
-			stdoutput.printf("	failed to convert "
-						"insert to update\n");
-		}
-	}
-
-	// prepare the query
-	if (*success) {
-		*success=cont->prepareQuery(ucur,update.getString(),
-						update.getStringLength());
-		if (!*success && debug) {
+		*success=copyInputBinds(ucur,icur) &&
+				convertInsertToUpdate(ucur,table,cols,colcount,
+						autoinccolumn,primarykeycolumn,
+						values,tablenode,&update) &&
+				cont->prepareQuery(ucur,update.getString(),
+						update.getStringLength()) &&
+				cont->executeQuery(ucur);
+		if (!*success) {
+			// copy the error from the cursor used to run the
+			// update to the cursor used to run the original insert
         		const char      *errorstring;
         		uint32_t        errorlength;
         		int64_t         errnum;
@@ -227,27 +224,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 							&errorlength,
                                         		&errnum,
 							&liveconnection);
-			stdoutput.printf("	failed to prepare "
-						"update query:\n%.*s\n",
-						errorlength,errorstring);
-		}
-	}
-
-	// execute the query
-	if (*success) {
-		*success=cont->executeQuery(ucur);
-		if (!*success && debug) {
-        		const char      *errorstring;
-        		uint32_t        errorlength;
-        		int64_t         errnum;
-        		bool            liveconnection;
-        		cont->errorMessage(ucur,&errorstring,
-							&errorlength,
-                                        		&errnum,
-							&liveconnection);
-			stdoutput.printf("	failed to execute "
-						"update query:\n%.*s\n",
-						errorlength,errorstring);
+			cont->setError(icur,errorstring,errnum,liveconnection);
 		}
 	}
 
@@ -258,24 +235,26 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// returns them directly from the cursor, so, currently, there's no
 	// way to set the affected rows.
 
-	// icur currenty contains the error that triggered the upsert,
-	// either clear that error, or copy ucur's error over to icur
 	if (*success) {
+		// icur currenty contains the error that
+		// triggered the upsert, clear that error
 		cont->clearError();
 		cont->clearError(icur);
-	} else {
-        	const char      *errorstring;
-        	uint32_t        errorlength;
-        	int64_t         errnum;
-        	bool            liveconnection;
-        	cont->errorMessage(ucur,&errorstring,
-						&errorlength,
-                                       		&errnum,
-						&liveconnection);
-		cont->setError(icur,errorstring,errnum,liveconnection);
 	}
 
 	if (debug) {
+		if (!*success) {
+        		const char      *errorstring;
+        		uint32_t        errorlength;
+        		int64_t         errnum;
+        		bool            liveconnection;
+        		cont->errorMessage(icur,&errorstring,
+							&errorlength,
+                                        		&errnum,
+							&liveconnection);
+			stdoutput.printf("error: %d - %.*s\n",
+					errnum,errorlength,errorstring);
+		}
 		stdoutput.printf("}\n");
 	}
 
@@ -324,8 +303,133 @@ domnode *sqlrtrigger_upsert::tableEncountered(const char *table) {
 	}
 	return NULL;
 }
+bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
+					sqlrservercursor *source) {
 
-bool sqlrtrigger_upsert::insertToUpdate(const char *table,
+	wherebinds.clear();
+
+	// make 2 copies of source's input binds in dest:
+	// * one of each bind to use in the set clause
+	// * one of each bind to use in the where clause
+
+	// count source's binds and make sure we
+	// can allocate twice as many in dest
+	uint16_t	ibcount=cont->getInputBindCount(source);
+	if (ibcount*2>cont->getConfig()->getMaxBindCount()) {
+		cont->setError(dest,"upsert failed - update would "
+					"exceed maximum bind count",
+					SQLR_ERROR_TRIGGER,true);
+		return false;
+	}
+
+	if (ibcount && debug) {
+		stdoutput.printf("	binds:\n");
+	}
+
+	// copy the input binds, making one copy for the set clause and
+	// another copy for the where clause
+	memorypool		*destpool=cont->getBindPool(dest);
+	sqlrserverbindvar	*sinvars=cont->getInputBinds(source);
+	sqlrserverbindvar	*dinvars=cont->getInputBinds(dest);
+	for (uint16_t i=0; i<ibcount; i++) {
+		copyInputBind(destpool,
+			false,&(dinvars[i]),&(sinvars[i]),i);
+		copyInputBind(destpool,
+			true,&(dinvars[ibcount+i]),&(sinvars[i]),ibcount+i);
+	}
+
+	// set the input bind count
+	cont->setInputBindCount(dest,ibcount*2);
+
+	return true;
+}
+
+void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
+						sqlrserverbindvar *dest,
+						sqlrserverbindvar *source,
+						uint16_t bindindex) {
+
+	// byte-copy everything
+	bytestring::copy(dest,source,sizeof(sqlrserverbindvar));
+
+	// The shallow-copy above will aim the variable, value.stringval,
+	// and value.dateval.buffer pointers to the strings stored in the
+	// main cursor's memorypool.  There's no need to make a copy of
+	// those strings, as they will persist for as long as these binds do.
+
+	// So, for the copy of the bind that we'll use in the set clause,
+	// we can bail here.
+	if (!where) {
+		if (debug) {
+			stdoutput.printf("		%s=",dest->variable);
+			if (dest->type==SQLRSERVERBINDVARTYPE_STRING) {
+				stdoutput.printf("%s\n",dest->value.stringval);
+			} else {
+				stdoutput.printf("...\n");
+			}
+		}
+		return;
+	}
+
+	// We do need to rename the variable for the copy of the bind that
+	// we'll use in the where clause though....
+
+	if (charstring::contains(cont->bindFormat(),'*')) {
+
+		// if we support named binds, then prepend "where_"
+		// to the variable name
+		dest->variablesize+=6;
+		dest->variable=(char *)pool->allocate(dest->variablesize+1);
+		charstring::printf(dest->variable,
+					dest->variablesize+1,
+					"%c%s%s",
+					source->variable[0],
+					"where_",
+					source->variable+1);
+
+		// map the source -> dest variable name for
+		// easier lookup when building the update query
+		wherebinds.setValue(source->variable,dest->variable);
+
+	} else {
+
+		// if we only support numeric binds or bind-by-position,
+		// then use the bind index that we were passed in
+		// NOTE: bindindex is 0 based, but numeric bind names are
+		// 1-based, so we'll add one to bindindex to get the numeric
+		// bind name
+		dest->variablesize=1+charstring::integerLength(bindindex+1);
+		dest->variable=(char *)pool->allocate(dest->variablesize+1);
+		charstring::printf(dest->variable,
+					dest->variablesize+1,
+					"%c%hd",
+					source->variable[0],
+					bindindex+1);
+
+		// unless we only support bind-by-position...
+		if (cont->bindFormat()[0]!='?') {
+
+			// map the source -> dest variable name for
+			// easier lookup when building the update query
+			wherebinds.setValue(source->variable,dest->variable);
+		}
+	}
+
+	if (debug) {
+		stdoutput.printf("		%s=",dest->variable);
+		if (dest->type==SQLRSERVERBINDVARTYPE_STRING) {
+			stdoutput.printf("%s\n",dest->value.stringval);
+		} else {
+			stdoutput.printf("...\n");
+		}
+		stdoutput.printf("			%s -> %s\n",
+					source->variable,dest->variable);
+	}
+}
+
+bool sqlrtrigger_upsert::convertInsertToUpdate(
+					sqlrservercursor *ucur,
+					const char *table,
 					const char * const *cols,
 					uint64_t colcount,
 					const char *autoinccolumn,
@@ -388,15 +492,13 @@ bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 		const char	*val;
 		if (!valuemap.getValue(col,&val)) {
 			// bail if we didn't find a value for this column
-			// FIXME: maybe we should set an error here, if we
-			// don't then the original error that the insert failed
-			// with will still be the error, and the fact that it
-			// didn't contain a column that we need to perform the
-			// update won't be immediately obvious
-			if (debug) {
-				stdoutput.printf("	no value found "
-							"for column: %s\n",col);
-			}
+			stringbuffer	err;
+			err.append("upsert failed - in conversion of "
+					"insert to update, no value was found "
+					"in the original insert for column: ")->
+					append(col);
+			cont->setError(ucur,err.getString(),
+						SQLR_ERROR_TRIGGER,true);
 			retval=false;
 			break;
 		}
@@ -407,9 +509,12 @@ bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 		}
 		query->append(col)->append('=');
 
-		if (isBind(val)) {
-			// if val is a bind then use the
-			// where-clause version of it
+		// If "val" is a bind variable (and not just a ?) then append
+		// the corresponding bind variable that we created earlier in
+		// copyInputBinds for use in the where clause.
+		// If "val" is not a bind variable (or it is, but it's just a ?)
+		// then append "val" literally.
+		if (isBind(val) && val[0]!='?') {
 			query->append(wherebinds.getValue(val));
 		} else {
 			query->append(val);
@@ -443,117 +548,6 @@ bool sqlrtrigger_upsert::isBind(const char *var) {
 				getBindVariableDelimiterDollarSignSupported());
 }
 
-bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
-					sqlrservercursor *source) {
-
-	wherebinds.clear();
-
-	// make 2 copies of source's input binds in dest:
-	// * one of each bind to use in the set clause
-	// * one of each bind to use in the where clause
-
-	// count source's binds and make sure we
-	// can allocate twice as many in dest
-	uint16_t	ibcount=cont->getInputBindCount(source);
-	if (ibcount*2>cont->getConfig()->getMaxBindCount()) {
-		cont->setError(dest,SQLR_ERROR_MAXBINDCOUNT_STRING,
-					SQLR_ERROR_MAXBINDCOUNT,true);
-		return false;
-	}
-
-	if (ibcount && debug) {
-		stdoutput.printf("	binds:\n");
-	}
-
-	// copy the input binds, making one copy for the set clause and
-	// another copy for the where clause
-	memorypool		*destpool=cont->getBindPool(dest);
-	sqlrserverbindvar	*sinvars=cont->getInputBinds(source);
-	sqlrserverbindvar	*dinvars=cont->getInputBinds(dest);
-	for (uint16_t i=0; i<ibcount; i++) {
-		copyInputBind(destpool,
-			false,&(dinvars[i]),&(sinvars[i]),i);
-		copyInputBind(destpool,
-			true,&(dinvars[ibcount+i]),&(sinvars[i]),ibcount+i);
-	}
-
-	// set the input bind count
-	cont->setInputBindCount(dest,ibcount*2);
-
-	return true;
-}
-
-void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
-						sqlrserverbindvar *dest,
-						sqlrserverbindvar *source,
-						uint16_t bindindex) {
-
-	// byte-copy everything
-	bytestring::copy(dest,source,sizeof(sqlrserverbindvar));
-
-	// The shallow-copy above will aim the variable, value.stringval,
-	// and value.dateval.buffer pointers to the strings stored in the
-	// main cursor's memorypool.  There's no need to make a copy of
-	// those strings, as they will persist for as long as these binds do.
-
-	// So, for the copy of the bind that we'll use in the set clause,
-	// we can bail here.
-	if (!where) {
-		if (debug) {
-			stdoutput.printf("		%s=",dest->variable);
-			if (dest->type==SQLRSERVERBINDVARTYPE_STRING) {
-				stdoutput.printf("%s\n",dest->value.stringval);
-			} else {
-				stdoutput.printf("...\n");
-			}
-		}
-		return;
-	}
-
-	// We do need to rename the variable for the copy of the bind that
-	// we'll use in the where clause though....
-
-	if (charstring::contains(cont->bindFormat(),'*')) {
-		// if we support named binds, then prepend "where_"
-		// to the variable name
-		dest->variablesize+=6;
-		dest->variable=(char *)pool->allocate(dest->variablesize+1);
-		charstring::printf(dest->variable,
-					dest->variablesize+1,
-					"%c%s%s",
-					source->variable[0],
-					"where_",
-					source->variable+1);
-	} else {
-		// if we only support numeric binds, then use the bind index
-		// that we were passed in
-		// NOTE: bindindex is 0 based, but numeric bind names are
-		// 1-based, so we'll add one to bindindex to get the numeric
-		// bind name
-		dest->variablesize=1+charstring::integerLength(bindindex+1);
-		dest->variable=(char *)pool->allocate(dest->variablesize+1);
-		charstring::printf(dest->variable,
-					dest->variablesize+1,
-					"%c%hd",
-					source->variable[0],
-					bindindex+1);
-	}
-
-	// map the source -> dest variable name for
-	// easier lookup when building the update query
-	wherebinds.setValue(source->variable,dest->variable);
-
-	if (debug) {
-		stdoutput.printf("		%s=",dest->variable);
-		if (dest->type==SQLRSERVERBINDVARTYPE_STRING) {
-			stdoutput.printf("%s\n",dest->value.stringval);
-		} else {
-			stdoutput.printf("...\n");
-		}
-		stdoutput.printf("			%s -> %s\n",
-					source->variable,dest->variable);
-	}
-}
 
 void sqlrtrigger_upsert::deleteCols(char **cols, uint64_t colcount) {
 	for (uint64_t i=0; i<colcount; i++) {

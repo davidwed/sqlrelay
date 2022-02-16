@@ -27,8 +27,7 @@
 			translatebindvariables="yes"
 			ignoreselectdatabase="yes"
 			isolationlevel="read committed"
-			passwordpath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc"
-			debug="triggers">
+			passwordpath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc">
 		<auths>
 			<auth module="userlist">
 				<user user="test"
