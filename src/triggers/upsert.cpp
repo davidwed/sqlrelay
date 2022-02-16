@@ -249,15 +249,28 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		}
 	}
 
+	// FIXME: Ideally we'd copy the affected rows from ucur to icur.
+	// icur's affected rows will be 0 here because the insert failed.
+	// Also, it's not impossible that ucur updated more than 1 row.  But,
+	// the controller doesn't keep a copy of the affected rows, it just
+	// returns them directly from the cursor, so, currently, there's no
+	// way to set the affected rows.
 
-	// FIXME: copy affected rows to icur
-
+	// icur currenty contains the error that triggered the upsert,
+	// either clear that error, or copy ucur's error over to icur
 	if (*success) {
 		cont->clearError();
 		cont->clearError(icur);
 	} else {
-		// FIXME: currently icur has the error that triggered
-		// the upsert, copy ucur's error over to icur
+        	const char      *errorstring;
+        	uint32_t        errorlength;
+        	int64_t         errnum;
+        	bool            liveconnection;
+        	cont->errorMessage(ucur,&errorstring,
+						&errorlength,
+                                       		&errnum,
+						&liveconnection);
+		cont->setError(icur,errorstring,errnum,liveconn);
 	}
 
 	if (debug) {
@@ -441,7 +454,8 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
 	// can allocate twice as many in dest
 	uint16_t	ibcount=source->getInputBindCount();
 	if (ibcount*2>cont->getConfig()->getMaxBindCount()) {
-		// FIXME: set an error, like too many binds or something
+		cont->setError(ucur,SQLR_ERROR_MAXBINDCOUNT_STRING,
+					SQLR_ERROR_MAXBINDCOUNT,true);
 		return false;
 	}
 
@@ -449,19 +463,27 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
 		stdoutput.printf("	binds:\n");
 	}
 
-	// copy the input binds, making two copies of each in dest
+	// copy the input binds...
+	// Do this in two passes because so we can bump the input bind count
+	// each time we do a copy.  For platforms that don't support named
+	// binds, we have to use incrementing numbers for the new binds that
+	// we create for the where clause, and we need to know the current bind
+	// count to do that.
 	memorypool		*destpool=cont->getBindPool(dest);
 	sqlrserverbindvar	*sinvars=source->getInputBinds();
 	sqlrserverbindvar	*dinvars=dest->getInputBinds();
+
+	// copy for the set clause
 	for (uint16_t i=0; i<ibcount; i++) {
 		copyInputBind(destpool,
 				false,&(dinvars[i]),&(sinvars[i]));
+	}
+
+	// copy for the where clause
+	for (uint16_t i=0; i<ibcount; i++) {
 		copyInputBind(destpool,
 				true,&(dinvars[ibcount+i]),&(sinvars[i]));
 	}
-
-	// set dest's input bind count
-	dest->setInputBindCount(ibcount*2);
 
 	return true;
 }
@@ -469,6 +491,10 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
 void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 						sqlrserverbindvar *dest,
 						sqlrserverbindvar *source) {
+
+	// (pre) bump the input bind count
+	uint16_t	ibcount=dest->getInputBindCount()+1;
+	dest->setInputBindCount(ibcount);
 
 	// byte-copy everything
 	bytestring::copy(dest,source,sizeof(sqlrserverbindvar));
@@ -495,12 +521,31 @@ void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 	// We do need to rename the variable for the copy of the bind that
 	// we'll use in the where clause though....
 
-	// prepend "where_" to the variable name
-	// FIXME: not all db's support named binds
-	dest->variablesize+=6;
-	dest->variable=(char *)pool->allocate(dest->variablesize+1);
-	charstring::printf(dest->variable,dest->variablesize+1,"%c%s%s",
-			source->variable[0],"where_",source->variable+1);
+	if (charstring::contains(cont->bindFormat(),'*')) {
+		// if we support named binds, then prepend "where_"
+		// to the variable name
+		dest->variablesize+=6;
+		dest->variable=(char *)pool->allocate(dest->variablesize+1);
+		charstring::printf(dest->variable,
+					dest->variablesize+1,
+					"%c%s%s",
+					source->variable[0],
+					"where_",
+					source->variable+1);
+	} else if (charstring::contains(cont->bindFormat(),'1')) {
+		// if we only support numeric binds, then use the current
+		// input bind count (which we pre-incremented above)
+		dest->variablesize=1+charstring::integerLength(ibcount);
+		dest->variable=(char *)pool->allocate(dest->variablesize+1);
+		charstring::printf(dest->variable,
+					dest->variablesize+1,
+					"%c%hd",
+					source->variable[0],
+					ibcount);
+	} else {
+		// if we only support ? binds, then also use the current
+		// input bind count (which we pre-incremented above)
+	}
 
 	// map the source -> dest variable name for
 	// easier lookup when building the update query

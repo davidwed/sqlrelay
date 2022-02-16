@@ -2132,7 +2132,8 @@ bool sqlrprotocol_sqlrclient::getBindVarName(sqlrservercursor *cursor,
 		debugstr.clear();
 		debugstr.append("get binds failed: bad variable name length: ");
 		debugstr.append(bindnamesize);
-		cont->raiseClientProtocolErrorEvent(cursor,debugstr.getString(),1);
+		cont->raiseClientProtocolErrorEvent(
+				cursor,debugstr.getString(),1);
 		return false;
 	}
 
