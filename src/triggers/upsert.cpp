@@ -9,6 +9,7 @@
 
 #define NEED_IS_BIND_DELIMITER 1
 #include <bindvariables.h>
+#include <defines.h>
 
 class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 	public:
@@ -37,7 +38,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 		void	copyInputBind(memorypool *pool,
 					bool where,
 					sqlrserverbindvar *dest,
-					sqlrserverbindvar *source);
+					sqlrserverbindvar *source,
+					uint16_t bindindex);
 		void	deleteCols(char **cols, uint64_t colcount);
 
 		sqlrservercontroller	*cont;
@@ -270,7 +272,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 						&errorlength,
                                        		&errnum,
 						&liveconnection);
-		cont->setError(icur,errorstring,errnum,liveconn);
+		cont->setError(icur,errorstring,errnum,liveconnection);
 	}
 
 	if (debug) {
@@ -452,9 +454,9 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
 
 	// count source's binds and make sure we
 	// can allocate twice as many in dest
-	uint16_t	ibcount=source->getInputBindCount();
+	uint16_t	ibcount=cont->getInputBindCount(source);
 	if (ibcount*2>cont->getConfig()->getMaxBindCount()) {
-		cont->setError(ucur,SQLR_ERROR_MAXBINDCOUNT_STRING,
+		cont->setError(dest,SQLR_ERROR_MAXBINDCOUNT_STRING,
 					SQLR_ERROR_MAXBINDCOUNT,true);
 		return false;
 	}
@@ -463,38 +465,28 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
 		stdoutput.printf("	binds:\n");
 	}
 
-	// copy the input binds...
-	// Do this in two passes because so we can bump the input bind count
-	// each time we do a copy.  For platforms that don't support named
-	// binds, we have to use incrementing numbers for the new binds that
-	// we create for the where clause, and we need to know the current bind
-	// count to do that.
+	// copy the input binds, making one copy for the set clause and
+	// another copy for the where clause
 	memorypool		*destpool=cont->getBindPool(dest);
-	sqlrserverbindvar	*sinvars=source->getInputBinds();
-	sqlrserverbindvar	*dinvars=dest->getInputBinds();
-
-	// copy for the set clause
+	sqlrserverbindvar	*sinvars=cont->getInputBinds(source);
+	sqlrserverbindvar	*dinvars=cont->getInputBinds(dest);
 	for (uint16_t i=0; i<ibcount; i++) {
 		copyInputBind(destpool,
-				false,&(dinvars[i]),&(sinvars[i]));
+			false,&(dinvars[i]),&(sinvars[i]),i);
+		copyInputBind(destpool,
+			true,&(dinvars[ibcount+i]),&(sinvars[i]),ibcount+i);
 	}
 
-	// copy for the where clause
-	for (uint16_t i=0; i<ibcount; i++) {
-		copyInputBind(destpool,
-				true,&(dinvars[ibcount+i]),&(sinvars[i]));
-	}
+	// set the input bind count
+	cont->setInputBindCount(dest,ibcount*2);
 
 	return true;
 }
 
 void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 						sqlrserverbindvar *dest,
-						sqlrserverbindvar *source) {
-
-	// (pre) bump the input bind count
-	uint16_t	ibcount=dest->getInputBindCount()+1;
-	dest->setInputBindCount(ibcount);
+						sqlrserverbindvar *source,
+						uint16_t bindindex) {
 
 	// byte-copy everything
 	bytestring::copy(dest,source,sizeof(sqlrserverbindvar));
@@ -532,19 +524,19 @@ void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 					source->variable[0],
 					"where_",
 					source->variable+1);
-	} else if (charstring::contains(cont->bindFormat(),'1')) {
-		// if we only support numeric binds, then use the current
-		// input bind count (which we pre-incremented above)
-		dest->variablesize=1+charstring::integerLength(ibcount);
+	} else {
+		// if we only support numeric binds, then use the bind index
+		// that we were passed in
+		// NOTE: bindindex is 0 based, but numeric bind names are
+		// 1-based, so we'll add one to bindindex to get the numeric
+		// bind name
+		dest->variablesize=1+charstring::integerLength(bindindex+1);
 		dest->variable=(char *)pool->allocate(dest->variablesize+1);
 		charstring::printf(dest->variable,
 					dest->variablesize+1,
 					"%c%hd",
 					source->variable[0],
-					ibcount);
-	} else {
-		// if we only support ? binds, then also use the current
-		// input bind count (which we pre-incremented above)
+					bindindex+1);
 	}
 
 	// map the source -> dest variable name for
