@@ -109,7 +109,6 @@ int	main(int argc, char **argv) {
 	signalmanager::ignoreSignals(&set);
 	#endif
 
-#if 0
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
@@ -466,7 +465,6 @@ int	main(int argc, char **argv) {
 		delete con;
 	}
 	stdoutput.printf("\n");
-#endif
 
 	stdoutput.printf("UPSERT:\n");
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
