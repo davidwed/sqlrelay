@@ -138,10 +138,13 @@
 				uint64_t *colcount,
 				linkedlist<char *> **allcolumns,
 				const char **autoinccolumn,
-				bool *columnsincludeautoinccolumn);
+				bool *columnsincludeautoinccolumn,
+				const char **primarykeycolumn,
+				bool *columnsincludeprimarykeycolumn);
 		void	getColumnsFromDb(const char *table, 
 				linkedlist<char *> **allcolumns,
-				const char **autoinccolumn);
+				const char **autoinccolumn,
+				const char **primarykeycolumn);
 		uint64_t	countValuesInInsertQuery(const char *values);
 		bool		isMultiInsert(const char *ptr, const char *end);
 

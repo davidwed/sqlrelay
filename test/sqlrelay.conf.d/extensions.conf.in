@@ -27,7 +27,8 @@
 			translatebindvariables="yes"
 			ignoreselectdatabase="yes"
 			isolationlevel="read committed"
-			passwordpath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc">
+			passwordpath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc"
+			debug="triggers">
 		<auths>
 			<auth module="userlist">
 				<user user="test"
@@ -129,6 +130,21 @@
 						type="regex"/>
 			</filter>
 		</filters>
+		<triggers>
+			<trigger module="upsert" when="after">
+				<errors>
+					<error number="1"/>
+					<error string="ORA-00001"/>
+				</errors>
+				<tables>
+					<table name="student">
+						<primarykey name="ID"/>
+						<column name="FIRSTNAME"/>
+						<column name="LASTNAME"/>
+					</table>
+				</tables>
+			</trigger>
+		</triggers>
 		<errortranslations>
 			<errortranslation module="renumber">
 				<renumber from="123" to="345"/>

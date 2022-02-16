@@ -109,6 +109,7 @@ int	main(int argc, char **argv) {
 	signalmanager::ignoreSignals(&set);
 	#endif
 
+#if 0
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
@@ -464,6 +465,83 @@ int	main(int argc, char **argv) {
 		delete cur;
 		delete con;
 	}
+	stdoutput.printf("\n");
+#endif
+
+	stdoutput.printf("UPSERT:\n");
+	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
+							"test","test",0,1);
+	cur=new sqlrcursor(con);
+	cur->sendQuery("drop table student");
+	cur->sendQuery("drop sequence student_id");
+	checkSuccess(cur->sendQuery("create sequence student_id"),1);
+	checkSuccess(cur->sendQuery("create table student ("
+					"id int, "
+					"firstname varchar(20), "
+					"lastname varchar(20), "
+					"grade varchar(20), "
+					"major varchar(20), "
+					"gpa varchar(20), "
+					"primary key (id), "
+					"unique (firstname,lastname) "
+					")"),1);
+	stdoutput.printf("\n");
+	checkSuccess(cur->sendQuery("insert into student values "
+				"(student_id.nextval,"
+				"'David','Muse','Freshman','ME','4.0')"),1);
+	checkSuccess(cur->sendQuery("select count(*) from student"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->sendQuery("select * from student"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->getField(0,1),"David");
+	checkSuccess(cur->getField(0,2),"Muse");
+	checkSuccess(cur->getField(0,3),"Freshman");
+	checkSuccess(cur->getField(0,4),"ME");
+	checkSuccess(cur->getField(0,5),"4.0");
+	stdoutput.printf("\n");
+	checkSuccess(cur->sendQuery("insert into student values "
+				"(student_id.nextval,"
+				"'David','Muse','Sophomore','ME','3.5')"),1);
+	checkSuccess(cur->sendQuery("select count(*) from student"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->sendQuery("select * from student"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->getField(0,1),"David");
+	checkSuccess(cur->getField(0,2),"Muse");
+	checkSuccess(cur->getField(0,3),"Sophomore");
+	checkSuccess(cur->getField(0,4),"ME");
+	checkSuccess(cur->getField(0,5),"3.5");
+	stdoutput.printf("\n");
+	checkSuccess(cur->sendQuery("insert into student values "
+				"(student_id.nextval,"
+				"'David','Muse','Junior','CS','3.0')"),1);
+	checkSuccess(cur->sendQuery("select count(*) from student"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->sendQuery("select * from student"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->getField(0,1),"David");
+	checkSuccess(cur->getField(0,2),"Muse");
+	checkSuccess(cur->getField(0,3),"Junior");
+	checkSuccess(cur->getField(0,4),"CS");
+	checkSuccess(cur->getField(0,5),"3.0");
+	stdoutput.printf("\n");
+	checkSuccess(cur->sendQuery("insert into student values "
+				"(student_id.nextval,"
+				"'David','Muse','Senior','CS','2.5')"),1);
+	checkSuccess(cur->sendQuery("select count(*) from student"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->sendQuery("select * from student"),1);
+	checkSuccess(cur->getField(0,(uint32_t)0),"1");
+	checkSuccess(cur->getField(0,1),"David");
+	checkSuccess(cur->getField(0,2),"Muse");
+	checkSuccess(cur->getField(0,3),"Senior");
+	checkSuccess(cur->getField(0,4),"CS");
+	checkSuccess(cur->getField(0,5),"2.5");
+	stdoutput.printf("\n");
+	checkSuccess(cur->sendQuery("drop table student"),1);
+	checkSuccess(cur->sendQuery("drop sequence student_id"),1);
+	stdoutput.printf("\n\n");
+
 	stdoutput.printf("done\n");
 	stdoutput.printf("\n\n");
 

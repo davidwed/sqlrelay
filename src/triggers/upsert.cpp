@@ -17,22 +17,23 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 						domnode *parameters);
 
 		bool	run(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
+						sqlrservercursor *icur,
 						bool before,
 						bool *success);
 	private:
-		bool	errorEncountered(sqlrservercursor *sqlrcur);
+		bool	errorEncountered(sqlrservercursor *icur);
 		domnode	*tableEncountered(const char *table);
 		bool	insertToUpdate(const char *table,
-					char **cols,
+					const char * const *cols,
 					uint64_t colcount,
 					const char *autoinccolumn,
+					const char *primarykeycolumn,
 					const char *values,
 					domnode *tablenode,
 					stringbuffer *query);
 		bool	isBind(const char *var);
-		bool	copyInputBinds(sqlrservercursor *cursqlrcur,
-					sqlrservercursor *newsqlrcur);
+		bool	copyInputBinds(sqlrservercursor *dest,
+					sqlrservercursor *source);
 		void	copyInputBind(memorypool *pool,
 					bool where,
 					sqlrserverbindvar *dest,
@@ -64,7 +65,7 @@ sqlrtrigger_upsert::sqlrtrigger_upsert(sqlrservercontroller *cont,
 }
 
 bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
-						sqlrservercursor *sqlrcur,
+						sqlrservercursor *icur,
 						bool before,
 						bool *success) {
 
@@ -79,13 +80,31 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	//
 	// NOTE: for now queryType() groups simple insert, multi-insert,
 	// insert/select and select-into into SQLRQUERYTYPE_INSERT
-	const char		*query=sqlrcur->getQueryBuffer();
-	uint32_t		querylen=sqlrcur->getQueryLength();
-	sqlrquerytype_t		querytype=sqlrcur->queryType(query,querylen);
+	const char		*query=icur->getQueryBuffer();
+	uint32_t		querylen=icur->getQueryLength();
+	sqlrquerytype_t		querytype=icur->queryType(query,querylen);
+
+	if (debug) {
+		stdoutput.printf("upsert {\n");
+		stdoutput.printf("	triggering query:\n%.*s\n",
+							querylen,query);
+	}
 
 	// bail if the query wasn't an insert, or if the insert didn't
 	// encounter an error that should trigger an update
-	if (querytype!=SQLRQUERYTYPE_INSERT || !errorEncountered(sqlrcur)) {
+	if (querytype!=SQLRQUERYTYPE_INSERT) {
+		if (debug) {
+			stdoutput.printf("	query was not an insert\n}\n");
+		}
+		return *success;
+	}
+
+	// bail if insert didn't encounter an
+	// error that should trigger an update
+	if (!errorEncountered(icur)) {
+		if (debug) {
+			stdoutput.printf("	no matching error found\n}\n");
+		}
 		return *success;
 	}
 
@@ -94,14 +113,33 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	char		*table=NULL;
 	char		**cols=NULL;
 	uint64_t	colcount=0;
-	const char	*values=NULL;
 	const char	*autoinccolumn=NULL;
+	const char	*primarykeycolumn=NULL;
+	const char	*values=NULL;
 	cont->parseInsert(query,querylen,&querytype,
-				&table,&cols,&colcount,
-				NULL,&autoinccolumn,NULL,&values);
+				&table,&cols,&colcount,NULL,
+				&autoinccolumn,NULL,
+				&primarykeycolumn,NULL,
+				&values);
+
+	if (debug) {
+		stdoutput.printf("	table: %s\n",table);
+		stdoutput.printf("	columns:\n");
+		for (uint64_t i=0; i<colcount; i++) {
+			stdoutput.printf("		%s\n",cols[i]);
+		}
+		stdoutput.printf("	auto-increment column: %s\n",
+							autoinccolumn);
+		stdoutput.printf("	primary key column (from db): %s\n",
+							primarykeycolumn);
+		stdoutput.printf("	values: %s\n",values);
+	}
 
 	// bail if the query wasn't a simple insert
 	if (querytype!=SQLRQUERYTYPE_INSERT) {
+		if (debug) {
+			stdoutput.printf("	not a simple insert\n}\n");
+		}
 		deleteCols(cols,colcount);
 		delete[] table;
 		return *success;
@@ -110,44 +148,131 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// bail if the table isn't one that we want to update
 	domnode	*tablenode=tableEncountered(table);
 	if (!tablenode) {
+		if (debug) {
+			stdoutput.printf("	table not "
+					"configured for upsert\n}\n");
+		}
 		deleteCols(cols,colcount);
 		delete[] table;
 		return *success;
 	}
 
-	// Declare a buffer to store the update query and open a new cursor
-	// to run the update.  We don't want to just use the current cursor
-	// because the client may want to reexecute the insert.
+	// if parseInsert didn't find a primary key
+	// then try to get it from the table node
+	if (!primarykeycolumn) {
+		primarykeycolumn=tablenode->
+					getFirstTagChild("primarykey")->
+					getAttributeValue("name");
+		if (debug) {
+			stdoutput.printf("	primary key column "
+						"(from config): %s\n",
+						primarykeycolumn);
+		}
+	}
+
+	// convert the insert to an update
 	stringbuffer		update;
-	sqlrservercursor	*newsqlrcur=cont->newCursor();
-
-	// convert the insert to an update,
-	// copy input binds from sqlrcur to newsqlrcur,
-	// prepare and execute the query
 	*success=insertToUpdate(table,cols,colcount,
-				autoinccolumn,
-				values,tablenode,&update) &&
-		copyInputBinds(sqlrcur,newsqlrcur) &&
-		cont->prepareQuery(newsqlrcur,
-				update.getString(),
-				update.getStringLength()) &&
-		cont->executeQuery(newsqlrcur);
+				autoinccolumn,primarykeycolumn,
+				values,tablenode,&update);
+	if (!*success && debug) {
+		stdoutput.printf("	failed to convert insert to update\n");
+	}
 
-	// FIXME: copy errors and affected rows to sqlrcur
+	// Create an update cursor to run the update.
+	// Preserve the insert cursor in case the
+	// client wants to reexecute the insert.
+	sqlrservercursor	*ucur=NULL;
+	if (*success) {
+		ucur=cont->newCursor();
+		if (!ucur) {
+			*success=false;
+		}
+	}
+
+	// open the cursor
+	if (*success) {
+		*success=cont->open(ucur);
+		if (!*success && debug) {
+			stdoutput.printf("	failed to open cursor\n");
+		}
+	}
+
+	// copy input binds from icur to ucur
+	if (*success) {
+		*success=copyInputBinds(ucur,icur);
+		if (!*success && debug) {
+			stdoutput.printf("	failed to copy input binds\n");
+		}
+	}
+
+	// prepare the query
+	if (*success) {
+		*success=cont->prepareQuery(ucur,update.getString(),
+						update.getStringLength());
+		if (!*success && debug) {
+        		const char      *errorstring;
+        		uint32_t        errorlength;
+        		int64_t         errnum;
+        		bool            liveconnection;
+        		cont->errorMessage(ucur,&errorstring,
+							&errorlength,
+                                        		&errnum,
+							&liveconnection);
+			stdoutput.printf("	failed to prepare "
+						"update query:\n%.*s\n",
+						errorlength,errorstring);
+		}
+	}
+
+	// execute the query
+	if (*success) {
+		*success=cont->executeQuery(ucur);
+		if (!*success && debug) {
+        		const char      *errorstring;
+        		uint32_t        errorlength;
+        		int64_t         errnum;
+        		bool            liveconnection;
+        		cont->errorMessage(ucur,&errorstring,
+							&errorlength,
+                                        		&errnum,
+							&liveconnection);
+			stdoutput.printf("	failed to execute "
+						"update query:\n%.*s\n",
+						errorlength,errorstring);
+		}
+	}
+
+
+	// FIXME: copy affected rows to icur
+
+	if (*success) {
+		cont->clearError();
+		cont->clearError(icur);
+	} else {
+		// FIXME: currently icur has the error that triggered
+		// the upsert, copy ucur's error over to icur
+	}
+
+	if (debug) {
+		stdoutput.printf("}\n");
+	}
 
 	// clean up
-	cont->closeResultSet(newsqlrcur);
-	cont->close(newsqlrcur);
-	cont->deleteCursor(newsqlrcur);
+	if (ucur) {
+		cont->closeResultSet(ucur);
+		cont->close(ucur);
+		cont->deleteCursor(ucur);
+	}
 	deleteCols(cols,colcount);
 	delete[] table;
 	return *success;
 }
 
-bool sqlrtrigger_upsert::errorEncountered(sqlrservercursor *sqlrcur) {
+bool sqlrtrigger_upsert::errorEncountered(sqlrservercursor *icur) {
 
 	// look through the errors and see if we find
-	// one that matches the sqlrcur's error
+	// one that matches the icur's error
 	// FIXME: maybe cache the number using
 	// domnode::setData() for future lookups
 	for (domnode *node=errors->getFirstTagChild("error");
@@ -156,8 +281,8 @@ bool sqlrtrigger_upsert::errorEncountered(sqlrservercursor *sqlrcur) {
 		const char	*string=node->getAttributeValue("string");
 		const char	*number=node->getAttributeValue("number");
 		if ((string && charstring::contains(
-					sqlrcur->getErrorBuffer(),string)) ||
-			(number && sqlrcur->getErrorNumber()==
+					icur->getErrorBuffer(),string)) ||
+			(number && icur->getErrorNumber()==
 					charstring::toInteger(number))) {
 			return true;
 		}
@@ -180,9 +305,10 @@ domnode *sqlrtrigger_upsert::tableEncountered(const char *table) {
 }
 
 bool sqlrtrigger_upsert::insertToUpdate(const char *table,
-					char **cols,
+					const char * const *cols,
 					uint64_t colcount,
 					const char *autoinccolumn,
+					const char *primarykeycolumn,
 					const char *values,
 					domnode *tablenode,
 					stringbuffer *query) {
@@ -190,29 +316,34 @@ bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 	// split values
 	char		**vals;
 	uint64_t	valscount;
-	// FIXME: use a split that considers quoting
-	charstring::split(values,",",false,&vals,&valscount);
+	// FIXME: use a split that considers quoting and ignores the trailing )
+	char	*tempvalues=charstring::duplicate(values);
+	tempvalues[charstring::length(tempvalues)-1]='\0';
+	charstring::split(tempvalues,",",false,&vals,&valscount);
+	delete[] tempvalues;
 
 	// begin building the update query
 	query->append("update ")->append(table)->append(" set ");
 
 	// build the set clause and map column names to values
 	dictionary<const char *,const char *>	valuemap;
+	bool	first=true;
 	for (uint64_t i=0; i<colcount; i++) {
-
-		// FIXME: ignore the primary key
-
-		// ignore any auto-increment columns
-		if (!charstring::compare(cols[i],autoinccolumn)) {
-			continue;
-		}
 
 		// get the column/value pair
 		const char	*col=cols[i];
 		const char	*val=vals[i];
 
-		// append them to the set clause
-		if (i) {
+		// don't attempt to set auto-increment or primary key columns
+		if (!charstring::compare(col,autoinccolumn) ||
+			!charstring::compare(col,primarykeycolumn)) {
+			continue;
+		}
+
+		// append the column/value pair to the set clause
+		if (first) {
+			first=false;
+		} else {
 			query->append(',');
 		}
 		query->append(col)->append('=')->append(val);
@@ -226,7 +357,7 @@ bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 
 	// build the where clause
 	bool	retval=true;
-	bool	first=true;
+	first=true;
 	for (domnode *node=tablenode->getFirstTagChild("column");
 				!node->isNullNode();
 				node=node->getNextTagSibling("column")) {
@@ -241,7 +372,12 @@ bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 			// with will still be the error, and the fact that it
 			// didn't contain a column that we need to perform the
 			// update won't be immediately obvious
+			if (debug) {
+				stdoutput.printf("	no value found "
+							"for column: %s\n",col);
+			}
 			retval=false;
+			break;
 		}
 
 		// append them to the where clause
@@ -259,6 +395,11 @@ bool sqlrtrigger_upsert::insertToUpdate(const char *table,
 			query->append(val);
 		}
 		first=false;
+	}
+
+	if (debug) {
+		stdoutput.printf("	update query:\n%s\n",
+						query->getString());
 	}
 
 	// clean up
@@ -282,34 +423,34 @@ bool sqlrtrigger_upsert::isBind(const char *var) {
 				getBindVariableDelimiterDollarSignSupported());
 }
 
-bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *cursqlrcur,
-					sqlrservercursor *newsqlrcur) {
+bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
+					sqlrservercursor *source) {
 
-	// make 2 copies of cursqlrcur's input binds in newsqlrcur:
+	// make 2 copies of source's input binds in dest:
 	// * one of each bind to use in the set clause
 	// * one of each bind to use in the where clause
 
-	// count cursqlrcur's binds and make sure we
-	// can allocate twice as many in newsqlrcur
-	uint16_t	incount=cursqlrcur->getInputBindCount();
+	// count source's binds and make sure we
+	// can allocate twice as many in dest
+	uint16_t	incount=source->getInputBindCount();
 	if (incount*2>cont->getConfig()->getMaxBindCount()) {
 		// FIXME: set an error, like too many binds or something
 		return false;
 	}
 
-	// copy the input binds, making two copies of each in newsqlrcur
-	memorypool		*newsqlrcurpool=cont->getBindPool(newsqlrcur);
-	sqlrserverbindvar	*curinvars=cursqlrcur->getInputBinds();
-	sqlrserverbindvar	*newinvars=newsqlrcur->getInputBinds();
+	// copy the input binds, making two copies of each in dest
+	memorypool		*destpool=cont->getBindPool(dest);
+	sqlrserverbindvar	*sinvars=source->getInputBinds();
+	sqlrserverbindvar	*dinvars=dest->getInputBinds();
 	for (uint16_t i=0; i<incount; i++) {
-		copyInputBind(newsqlrcurpool,
-				false,&(newinvars[i]),&(curinvars[i]));
-		copyInputBind(newsqlrcurpool,
-				true,&(newinvars[incount+i]),&(curinvars[i]));
+		copyInputBind(destpool,
+				false,&(dinvars[i]),&(sinvars[i]));
+		copyInputBind(destpool,
+				true,&(dinvars[incount+i]),&(sinvars[i]));
 	}
 
-	// set newsqlrcur's input bind count
-	newsqlrcur->setInputBindCount(incount*2);
+	// set dest's input bind count
+	dest->setInputBindCount(incount*2);
 
 	return true;
 }

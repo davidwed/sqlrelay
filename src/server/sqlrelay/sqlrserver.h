@@ -812,6 +812,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 					linkedlist<char *> **allcolumns,
 					const char **autoinccolumn,
 					bool *columnsincludeautoinccolumn,
+					const char **primarykeycolumn,
+					bool *columnsincludeprimarykeycolumn,
 					const char **values);
 
 

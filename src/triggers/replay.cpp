@@ -247,6 +247,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 			&allcolumns,
 			&autoinccolumn,
 			&columnsincludeautoinccolumn,
+			NULL,NULL,
 			&values);
 
 	// bail if the query was a select, and we're ignoring selects

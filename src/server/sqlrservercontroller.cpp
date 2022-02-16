@@ -307,6 +307,7 @@ class sqlrservercontrollerprivate {
 
 	dictionary<char *,linkedlist<char *> *>	_colcache;
 	dictionary<char *,const char *>		_autoinccolcache;
+	dictionary<char *,const char *>		_primarykeycolcache;
 };
 
 static signalhandler		alarmhandler;
@@ -2488,6 +2489,7 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	}
 	pvt->_colcache.clear();
 	pvt->_autoinccolcache.clear();
+	pvt->_primarykeycolcache.clear();
 
 	// clear per-session pool
 	pvt->_txpool.clear();
@@ -3533,6 +3535,8 @@ bool sqlrservercontroller::parseInsert(const char *query,
 					linkedlist<char *> **allcolumns,
 					const char **autoinccolumn,
 					bool *columnsincludeautoinccolumn,
+					const char **primarykeycolumn,
+					bool *columnsincludeprimarykeycolumn,
 					const char **values) {
 
 	// init return values
@@ -3580,7 +3584,7 @@ bool sqlrservercontroller::parseInsert(const char *query,
 
 		// find first space after table name
 		// FIXME: the table name could be quoted and contain a space
-		const char	*ptr=charstring::findFirst(start+12,' ');
+		const char	*ptr=charstring::findFirst(start,' ');
 		if (ptr>=end) {
 			return false;
 		}
@@ -3602,6 +3606,9 @@ bool sqlrservercontroller::parseInsert(const char *query,
 		}
 
 		// keep track of this location, we may need it later
+		// NOTE: "colsstart" is a bit of a misnomer, it's really:
+		// either-the-start-of-the-columns-list-or-the-values-keyword
+		// but that's really wordy, so we're calling it colsstart
 		const char	*colsstart=ptr;
 
 		// if we found the "(" before the list of columns,
@@ -3641,8 +3648,11 @@ bool sqlrservercontroller::parseInsert(const char *query,
 			getColumnsFromInsertQuery(colsstart,
 						localtable,
 						cols,colcount,
-						allcolumns,autoinccolumn,
-						columnsincludeautoinccolumn);
+						allcolumns,
+						autoinccolumn,
+						columnsincludeautoinccolumn,
+						primarykeycolumn,
+						columnsincludeprimarykeycolumn);
 		} else {
 
 			// otherwise it's some kind of insert ... select
@@ -3679,16 +3689,21 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 				uint64_t *colcount,
 				linkedlist<char *> **allcolumns,
 				const char **autoinccolumn,
-				bool *columnsincludeautoinccolumn) {
+				bool *columnsincludeautoinccolumn,
+				const char **primarykeycolumn,
+				bool *columnsincludeprimarykeycolumn) {
+
+	// NOTE: "colsstart" is a bit of a misnomer, it's really:
+	// either-the-start-of-the-columns-list-or-the-values-keyword
+	// but that's really wordy, so we're calling it colsstart
 
 	// get the full list of columns that are in the table
-	linkedlist<char *>	*localallcolumns=
-				pvt->_colcache.getValue((char *)table);
-	const char		*localautoinccolumn=
-				pvt->_autoinccolcache.getValue((char *)table);
-	if (!localallcolumns) {
-		getColumnsFromDb(table,&localallcolumns,&localautoinccolumn);
-	}
+	linkedlist<char *>	*localallcolumns;
+	const char		*localautoinccolumn;
+	const char		*localprimarykeycolumn;
+	getColumnsFromDb(table,&localallcolumns,
+				&localautoinccolumn,
+				&localprimarykeycolumn);
 
 	// local variable for the column count
 	char		**localcols=NULL;
@@ -3744,17 +3759,21 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 		}
 	}
 
-	// does the list of columns that we're actually
-	// inserting into contain the autoincrement column?
+	// does the list of columns that we're actually inserting
+	// into contain the autoincrement or primary key columns?
 	bool	localcolumnsincludeautoinccolumn=true;
+	bool	localcolumnsincludeprimarykeycolumn=true;
 	for (uint64_t i=0; i<localcolcount; i++) {
 		if (!charstring::compare(localcols[i],localautoinccolumn)) {
 			localcolumnsincludeautoinccolumn=true;
 		}
+		if (!charstring::compare(localcols[i],localprimarykeycolumn)) {
+			localcolumnsincludeprimarykeycolumn=true;
+		}
 	}
 
 	// copy values out
-	if (*cols) {
+	if (cols) {
 		*cols=localcols;
 	} else {
 		for (uint64_t i=0; i<localcolcount; i++) {
@@ -3762,7 +3781,7 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 		}
 		delete[] localcols;
 	}
-	if (*colcount) {
+	if (colcount) {
 		*colcount=localcolcount;
 	}
 	if (allcolumns) {
@@ -3772,14 +3791,34 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 		*autoinccolumn=localautoinccolumn;
 	}
 	if (columnsincludeautoinccolumn) {
-		*columnsincludeautoinccolumn=localcolumnsincludeautoinccolumn;
+		*columnsincludeautoinccolumn=
+			localcolumnsincludeautoinccolumn;
+	}
+	if (primarykeycolumn) {
+		*primarykeycolumn=localprimarykeycolumn;
+	}
+	if (columnsincludeprimarykeycolumn) {
+		*columnsincludeprimarykeycolumn=
+			localcolumnsincludeprimarykeycolumn;
 	}
 }
 
 void sqlrservercontroller::getColumnsFromDb(const char *table, 
 					linkedlist<char *> **allcolumns,
-					const char **autoinccolumn) {
+					const char **autoinccolumn,
+					const char **primarykeycolumn) {
 
+	// attempt to get the columns from various caches
+	*allcolumns=pvt->_colcache.getValue((char *)table);
+	*autoinccolumn=pvt->_autoinccolcache.getValue((char *)table);
+	*primarykeycolumn=pvt->_primarykeycolcache.getValue((char *)table);
+	if (*allcolumns) {
+		return;
+	}
+
+	// failing that, look them up in the database (and cache them)...
+
+	// create a new linkedlist to store the columns for this table
 	*allcolumns=new linkedlist<char *>();
 	(*allcolumns)->setManageArrayValues(true);
 
@@ -3816,17 +3855,24 @@ void sqlrservercontroller::getColumnsFromDb(const char *table,
 			while (fetchRow(gclcur,&error)) {
 
 				const char	*column;
+				const char	*columnkey;
 				const char	*extra;
 				uint64_t	fieldlength;
 				bool		blob;
 				bool		null;
 				getField(gclcur,0,&column,
 						&fieldlength,&blob,&null);
+				getField(gclcur,6,&columnkey,
+						&fieldlength,&blob,&null);
 				getField(gclcur,8,&extra,
 						&fieldlength,&blob,&null);
 
 				char	*dup=charstring::duplicate(column);
 				(*allcolumns)->append(dup);
+				if (charstring::contains(columnkey,
+							"PRI")) {
+					*primarykeycolumn=dup;
+				}
 				if (charstring::contains(extra,
 							"auto_increment")) {
 					*autoinccolumn=dup;
@@ -3842,8 +3888,10 @@ void sqlrservercontroller::getColumnsFromDb(const char *table,
 	deleteCursor(gclcur);
 
 	// cache table -> columns/autoinccolumns mappings
-	pvt->_colcache.setValue((char *)table,*allcolumns);
-	pvt->_autoinccolcache.setValue((char *)table,*autoinccolumn);
+	char	*tablecopy=charstring::duplicate(table);
+	pvt->_colcache.setValue(tablecopy,*allcolumns);
+	pvt->_autoinccolcache.setValue(tablecopy,*autoinccolumn);
+	pvt->_primarykeycolcache.setValue(tablecopy,*primarykeycolumn);
 }
 
 uint64_t sqlrservercontroller::countValuesInInsertQuery(const char *values) {
