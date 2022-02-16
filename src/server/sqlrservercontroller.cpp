@@ -3826,10 +3826,10 @@ void sqlrservercontroller::getColumnsFromDb(const char *table,
 	sqlrservercursor        *gclcur=newCursor();
 	if (open(gclcur)) {
 
+stdoutput.printf("columnmap=%08x\n",pvt->_columnmap);
+
 		bool	retval=false;
 		if (getListsByApiCalls()) {
-			setColumnListColumnMap(
-					SQLRSERVERLISTFORMAT_MYSQL);
 			retval=getColumnList(gclcur,table,NULL);
 		} else {
 			const char	*q=
@@ -3850,6 +3850,8 @@ void sqlrservercontroller::getColumnsFromDb(const char *table,
 					false,false,false,false);
 		}
 		if (retval) {
+
+			setColumnListColumnMap(SQLRSERVERLISTFORMAT_MYSQL);
 
 			bool    error;
 			while (fetchRow(gclcur,&error)) {
@@ -6124,8 +6126,9 @@ void sqlrservercontroller::buildColumnMaps() {
 	// MySQL getColumnList:
 	//
 // FIXME: fudged...
-// The postgresql connection returns additional rows.
-// All connection modules should return the same as postgresql.
+// The postgresql connection returns additional columns.
+// Really, all connection modules should return the same as postgresql,
+// but they currently return the same as mysql.
 if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// column_name
 	pvt->_mysqlcolumnscolumnmap.setValue(0,3);
@@ -6215,8 +6218,9 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// ODBC getColumnList:
 	//
 // FIXME: fudged...
-// The postgresql connection returns additional rows.
-// All connection modules should return the same as postgresql.
+// The postgresql connection returns additional columns.
+// Really, all connection modules should return the same as postgresql,
+// but they currently return the same as mysql.
 if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// TABLE_CAT
 	pvt->_odbccolumnscolumnmap.setValue(0,0);
@@ -6355,8 +6359,9 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// JDBC getColumnList:
 	//
 // FIXME: fudged
-// The postgresql connection returns additional rows.
-// All connection modules should return the same as postgresql.
+// The postgresql connection returns additional columns.
+// Really, all connection modules should return the same as postgresql,
+// but they currently return the same as mysql.
 if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// TABLE_CAT
 	pvt->_jdbccolumnscolumnmap.setValue(0,0);
