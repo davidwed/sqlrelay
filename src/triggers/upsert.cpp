@@ -24,6 +24,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 	private:
 		bool	errorEncountered(sqlrservercursor *icur);
 		domnode	*tableEncountered(const char *table);
+		void	splitValues(const char *values,
+					char ***vals, uint64_t *valcount);
 		bool	copyInputBinds(sqlrservercursor *ucur,
 					sqlrservercursor *icur,
 					const char * const *cols,
@@ -85,8 +87,8 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// get the query and query type
 	// NOTE: for now queryType() groups simple insert, multi-insert,
 	// insert/select and select-into into SQLRQUERYTYPE_INSERT
-	const char		*query=icur->getQueryBuffer();
-	uint32_t		querylen=icur->getQueryLength();
+	const char		*query=cont->getQueryBuffer(icur);
+	uint32_t		querylen=cont->getQueryLength(icur);
 	sqlrquerytype_t		querytype=icur->queryType(query,querylen);
 	if (debug) {
 		stdoutput.printf("upsert {\n");
@@ -177,13 +179,9 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	}
 
 	// split values
-	// FIXME: use a split that considers quoting and ignores the trailing )
 	char		**vals;
 	uint64_t	valcount;
-	char	*tempvalues=charstring::duplicate(values);
-	tempvalues[charstring::length(tempvalues)-1]='\0';
-	charstring::split(tempvalues,",",false,&vals,&valcount);
-	delete[] tempvalues;
+	splitValues(values,&vals,&valcount);
 
 	// debug
 	if (debug) {
@@ -307,8 +305,6 @@ bool sqlrtrigger_upsert::errorEncountered(sqlrservercursor *icur) {
 
 	// look through the errors and see if we find
 	// one that matches the icur's error
-	// FIXME: maybe cache the number using
-	// domnode::setData() for future lookups
 	for (domnode *node=errors->getFirstTagChild("error");
 				!node->isNullNode();
 				node=node->getNextTagSibling("error")) {
@@ -335,6 +331,15 @@ domnode *sqlrtrigger_upsert::tableEncountered(const char *table) {
 		}
 	}
 	return NULL;
+}
+
+void sqlrtrigger_upsert::splitValues(const char *values,
+					char ***vals, uint64_t *valcount) {
+	// FIXME: use a split that considers quoting and ignores the trailing )
+	char	*tempvalues=charstring::duplicate(values);
+	tempvalues[charstring::length(tempvalues)-1]='\0';
+	charstring::split(tempvalues,",",false,vals,valcount);
+	delete[] tempvalues;
 }
 
 bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
