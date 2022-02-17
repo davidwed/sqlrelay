@@ -177,9 +177,6 @@ int	main(int argc, char **argv) {
 	checkSuccess(secondcur->getField(0,5),"3.0");
 	stdoutput.printf("\n");
 	// reexecute with bind variables, should also be converted to an update
-cur->prepareQuery("insert into student values "
-			"(nextval('student_id'),"
-			"$1,$2,$3,$4,$5)");
 	cur->inputBind("1","David");
 	cur->inputBind("2","Muse");
 	cur->inputBind("3","Senior");

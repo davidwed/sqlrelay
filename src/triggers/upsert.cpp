@@ -75,29 +75,26 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 						bool before,
 						bool *success) {
 
-	// in the before phase, don't do anything
+	// before the query has been run, don't do anything
 	if (before) {
 		return *success;
 	}
 
-	// in the after phase...
+	// after the query has been run...
 
 	// get the query and query type
-	//
 	// NOTE: for now queryType() groups simple insert, multi-insert,
 	// insert/select and select-into into SQLRQUERYTYPE_INSERT
 	const char		*query=icur->getQueryBuffer();
 	uint32_t		querylen=icur->getQueryLength();
 	sqlrquerytype_t		querytype=icur->queryType(query,querylen);
-
 	if (debug) {
 		stdoutput.printf("upsert {\n");
 		stdoutput.printf("	triggering query:\n%.*s\n",
 							querylen,query);
 	}
 
-	// bail if the query wasn't an insert, or if the insert didn't
-	// encounter an error that should trigger an update
+	// bail if the query wasn't an insert
 	if (querytype!=SQLRQUERYTYPE_INSERT) {
 		if (debug) {
 			stdoutput.printf("	query was not an insert\n}\n");
@@ -105,8 +102,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		return *success;
 	}
 
-	// bail if insert didn't encounter an
-	// error that should trigger an update
+	// bail if the query didn't throw an error that we care about
 	if (!errorEncountered(icur)) {
 		if (debug) {
 			stdoutput.printf("	no matching error "
@@ -155,7 +151,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		return *success;
 	}
 
-	// bail if the table isn't one that we want to update
+	// bail if the table isn't one that we care about
 	domnode	*tablenode=tableEncountered(table);
 	if (!tablenode) {
 		if (debug) {
@@ -168,7 +164,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	}
 
 	// if parseInsert didn't find a primary key
-	// then try to get it from the table node
+	// then try to get it from the configuration
 	if (!primarykeycolumn) {
 		primarykeycolumn=tablenode->
 					getFirstTagChild("primarykey")->
@@ -205,8 +201,8 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	}
 
 	// If we made it here, then the original insert failed with some error
-	// that triggered all of this to happen.  So *success=false.  Reset it
-	// to true.  We'll set it false again if some step below fails.
+	// that triggered all of this to happen.  So *success ought to be false.
+	// Reset it to true.  We'll set it false again if some step below fails.
 	*success=true;
 
 	// Create an separate cursor to run the update rather than just using
@@ -232,7 +228,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 
 	// copy input binds from icur to ucur, convert the insert
 	// to an update, then prepare and execute the update query
-	// (each of these sets the error message internally if they fail)
+	// (each of these sets the error message internally if it fails)
 	stringbuffer		update;
 	if (*success) {
 		*success=copyInputBinds(ucur,icur,cols,vals,
@@ -255,7 +251,8 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 							&errorlength,
                                         		&errnum,
 							&liveconnection);
-			cont->setError(icur,errorstring,errnum,liveconnection);
+			cont->setError(icur,errorstring,errorlength,
+						errnum,liveconnection);
 		}
 	}
 
@@ -602,6 +599,7 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 					"in the original insert for column: ")->
 					append(col);
 			cont->setError(ucur,err.getString(),
+						err.getStringLength(),
 						SQLR_ERROR_TRIGGER,true);
 			retval=false;
 			break;

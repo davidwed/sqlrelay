@@ -695,6 +695,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		clearError(sqlrservercursor *cursor);
 		void		setError(sqlrservercursor *cursor,
 						const char *err,
+						uint32_t errlen,
+						int64_t errn,
+						bool liveconn);
+		void		setError(sqlrservercursor *cursor,
+						const char *err,
 						int64_t errn,
 						bool liveconn);
 		char		*getErrorBuffer(sqlrservercursor *cursor);

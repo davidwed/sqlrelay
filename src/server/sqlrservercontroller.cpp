@@ -10720,21 +10720,28 @@ void sqlrservercontroller::clearError(sqlrservercursor *cursor) {
 
 void sqlrservercontroller::setError(sqlrservercursor *cursor,
 						const char *err,
+						uint32_t errlen,
 						int64_t errn,
 						bool liveconn) {
 
 	char		*errorbuffer=cursor->getErrorBuffer();
-	uint32_t	errorlength=charstring::length(err);
-	if (errorlength>pvt->_maxerrorlength) {
-		errorlength=pvt->_maxerrorlength;
+	if (errlen>pvt->_maxerrorlength) {
+		errlen=pvt->_maxerrorlength;
 	}
-	charstring::safeCopy(errorbuffer,pvt->_maxerrorlength,err,errorlength);
-	if (errorlength<pvt->_maxerrorlength) {
-		errorbuffer[errorlength]='\0';
+	charstring::safeCopy(errorbuffer,pvt->_maxerrorlength,err,errlen);
+	if (errlen<pvt->_maxerrorlength) {
+		errorbuffer[errlen]='\0';
 	}
-	cursor->setErrorLength(errorlength);
+	cursor->setErrorLength(errlen);
 	cursor->setErrorNumber(errn);
 	cursor->setLiveConnection(liveconn);
+}
+
+void sqlrservercontroller::setError(sqlrservercursor *cursor,
+						const char *err,
+						int64_t errn,
+						bool liveconn) {
+	setError(cursor,err,charstring::length(err),errn,liveconn);
 }
 
 char *sqlrservercontroller::getErrorBuffer(sqlrservercursor *cursor) {
