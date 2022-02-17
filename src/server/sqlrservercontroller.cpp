@@ -3530,8 +3530,7 @@ bool sqlrservercontroller::parseInsert(const char *query,
 					uint32_t querylen,
 					sqlrquerytype_t *querytype,
 					char **table,
-					char ***cols,
-					uint64_t *colcount,
+					linkedlist<char *> **columns,
 					linkedlist<char *> **allcolumns,
 					const char **autoinccolumn,
 					bool *columnsincludeautoinccolumn,
@@ -3546,11 +3545,8 @@ bool sqlrservercontroller::parseInsert(const char *query,
 	if (table) {
 		*table=NULL;
 	}
-	if (cols) {
-		*cols=NULL;
-	}
-	if (colcount) {
-		*colcount=0;
+	if (columns) {
+		*columns=NULL;
 	}
 	if (allcolumns) {
 		*allcolumns=NULL;
@@ -3589,11 +3585,11 @@ bool sqlrservercontroller::parseInsert(const char *query,
 			return false;
 		}
 
-		// get table name...
+		// get table name and strip any quoting
 		localtable=charstring::duplicate(start,ptr-start);
-
-		// strip any quoting
 		charstring::stripSet(localtable,"\"'`[]");
+
+		// FIXME: get allcolumns/autoinc/pkey here...
 
 		// skip ahead to whatever is past the table name,
 		// which should be one of:
@@ -3614,6 +3610,8 @@ bool sqlrservercontroller::parseInsert(const char *query,
 		// if we found the "(" before the list of columns,
 		// then skip past the columns to "values"/"select"
 		if (*ptr=='(') {
+			// FIXME: split the columns here and populate
+			// the columns linkedlist
 			ptr=charstring::findFirst(ptr,')')+2;
 		}
 		if (ptr>=end) {
@@ -3640,14 +3638,23 @@ bool sqlrservercontroller::parseInsert(const char *query,
 		}
 		if (localvalues) {
 
+			// FIXME: split (the first set of) values here,
+			// returning a linkedlist and a flag indicating
+			// whether there are more or not...
+
+			// FIXME: just check the flag from the previous call
 			if (isMultiInsert(localvalues,end)) {
 				localquerytype=SQLRQUERYTYPE_MULTIINSERT;
 			}
 
+			// FIXME: if we didn't find any columns earlier then
+			// derive them from allcolumns and values->getLength()
+			// here
+
 			// get the columns
 			getColumnsFromInsertQuery(colsstart,
 						localtable,
-						cols,colcount,
+						columns,
 						allcolumns,
 						autoinccolumn,
 						columnsincludeautoinccolumn,
@@ -3685,8 +3692,7 @@ bool sqlrservercontroller::parseInsert(const char *query,
 void sqlrservercontroller::getColumnsFromInsertQuery(
 				const char *colsstart,
 				const char *table,
-				char ***cols,
-				uint64_t *colcount,
+				linkedlist<char *> **columns,
 				linkedlist<char *> **allcolumns,
 				const char **autoinccolumn,
 				bool *columnsincludeautoinccolumn,
@@ -3705,24 +3711,23 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 				&localautoinccolumn,
 				&localprimarykeycolumn);
 
-	// local variable for the column count
-	char		**localcols=NULL;
-	uint64_t	localcolcount=0;
+	// local variables for the columns
+	linkedlist<char *>	*localcolumns=new linkedlist<char *>();
+	localcolumns->setManageArrayValues(true);
 
 	if (*colsstart=='(') {
 
 		// parse columns provided in the query
-		const char	*colsend=
-				charstring::findFirst(colsstart,')');
-		char		*colscopy=
-				charstring::duplicate(colsstart+1,
-							colsend-colsstart-1);
-		charstring::split(colscopy,",",true,&localcols,&localcolcount);
-		delete[] colscopy;
+		const char	*colsend=charstring::findFirst(colsstart,')');
+		char		**cols=NULL;
+		uint64_t	colcount=0;
+		charstring::split(colsstart,colsend-colsstart,
+						",",true,&cols,&colcount);
+		localcolumns->listcollection::append(cols,colcount);
 
 	} else {
 
-		// count values
+		// skip into the values
 		// FIXME: the below is kind-of a kludge...
 		// sometimes queries are written:
 		//	insert into blah values(...);
@@ -3738,24 +3743,19 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 				values+=8;
 			}
 		}
-		localcolcount=countValuesInInsertQuery(values);
 
-		// create array of columns from allcolumns
-		// that match the number of values
-		localcols=new char *[localcolcount];
+		// count the values
+		uint64_t	valcount=countValuesInInsertQuery(values);
+
+		// create a list of the first valcount columns from allcolumns
 		listnode<char *>	*node=localallcolumns->getFirst();
-		if (node) {
-			for (uint64_t i=0; i<localcolcount; i++) {
-				localcols[i]=
-				charstring::duplicate(node->getValue());
-				node=node->getNext();
-			}
-		} else {
-			// this can happen if various problems occur,
-			// eg. if the table name is invalid
-			for (uint64_t i=0; i<localcolcount; i++) {
-				localcols[i]=NULL;
-			}
+		uint64_t		count=0;
+		while (node && count<valcount) {
+			localcolumns->append(
+					charstring::duplicate(
+						node->getValue()));
+			node=node->getNext();
+			count++;
 		}
 	}
 
@@ -3763,26 +3763,20 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 	// into contain the autoincrement or primary key columns?
 	bool	localcolumnsincludeautoinccolumn=true;
 	bool	localcolumnsincludeprimarykeycolumn=true;
-	for (uint64_t i=0; i<localcolcount; i++) {
-		if (!charstring::compare(localcols[i],localautoinccolumn)) {
+	for (listnode<char *> *node=localcolumns->getFirst();
+					node; node=node->getNext()) {
+		const char	*col=node->getValue();
+		if (!charstring::compare(col,localautoinccolumn)) {
 			localcolumnsincludeautoinccolumn=true;
 		}
-		if (!charstring::compare(localcols[i],localprimarykeycolumn)) {
+		if (!charstring::compare(col,localprimarykeycolumn)) {
 			localcolumnsincludeprimarykeycolumn=true;
 		}
 	}
 
 	// copy values out
-	if (cols) {
-		*cols=localcols;
-	} else {
-		for (uint64_t i=0; i<localcolcount; i++) {
-			delete[] localcols[i];
-		}
-		delete[] localcols;
-	}
-	if (colcount) {
-		*colcount=localcolcount;
+	if (columns) {
+		*columns=localcolumns;
 	}
 	if (allcolumns) {
 		*allcolumns=localallcolumns;

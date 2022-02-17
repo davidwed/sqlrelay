@@ -28,9 +28,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 					char ***vals, uint64_t *valcount);
 		bool	copyInputBinds(sqlrservercursor *ucur,
 					sqlrservercursor *icur,
-					const char * const *cols,
+					linkedlist<char *> *cols,
 					const char * const *vals,
-					uint64_t colcount,
 					domnode *tablenode);
 		void	copyInputBind(memorypool *pool,
 					bool where,
@@ -40,9 +39,8 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 		bool	convertInsertToUpdate(
 					sqlrservercursor *ucur,
 					const char *table,
-					const char * const *cols,
+					linkedlist<char *> *cols,
 					const char * const *vals,
-					uint64_t colcount,
 					const char *autoinccolumn,
 					const char *primarykeycolumn,
 					domnode *tablenode,
@@ -118,14 +116,14 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 
 	// parse the query
 	// NOTE: parseInsert will populate querytype with a more specific value
-	char		*table=NULL;
-	char		**cols=NULL;
-	uint64_t	colcount=0;
-	const char	*autoinccolumn=NULL;
-	const char	*primarykeycolumn=NULL;
-	const char	*values=NULL;
+	char			*table=NULL;
+	linkedlist<char *>	*cols=NULL;
+	// FIXME: cols needs to be deleted eventually
+	const char		*autoinccolumn=NULL;
+	const char		*primarykeycolumn=NULL;
+	const char		*values=NULL;
 	cont->parseInsert(query,querylen,&querytype,
-				&table,&cols,&colcount,NULL,
+				&table,&cols,NULL,
 				&autoinccolumn,NULL,
 				&primarykeycolumn,NULL,
 				&values);
@@ -134,8 +132,9 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	if (debug) {
 		stdoutput.printf("	table: %s\n",table);
 		stdoutput.printf("	columns:\n");
-		for (uint64_t i=0; i<colcount; i++) {
-			stdoutput.printf("		%s\n",cols[i]);
+		for (listnode<char *> *node=cols->getFirst();
+						node; node=node->getNext()) {
+			stdoutput.printf("		%s\n",node->getValue());
 		}
 		stdoutput.printf("	auto-increment column: %s\n",
 							autoinccolumn);
@@ -148,8 +147,8 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		if (debug) {
 			stdoutput.printf("	not a simple insert\n}\n");
 		}
-		deleteArray(cols,colcount);
 		delete[] table;
+		delete cols;
 		return *success;
 	}
 
@@ -160,8 +159,8 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 			stdoutput.printf("	table not "
 					"configured for upsert\n}\n");
 		}
-		deleteArray(cols,colcount);
 		delete[] table;
+		delete cols;
 		return *success;
 	}
 
@@ -229,10 +228,9 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// (each of these sets the error message internally if it fails)
 	stringbuffer		update;
 	if (*success) {
-		*success=copyInputBinds(ucur,icur,cols,vals,
-						colcount,tablenode) &&
+		*success=copyInputBinds(ucur,icur,cols,vals,tablenode) &&
 				convertInsertToUpdate(ucur,table,
-						cols,vals,colcount,
+						cols,vals,
 						autoinccolumn,primarykeycolumn,
 						tablenode,&update) &&
 				cont->prepareQuery(ucur,update.getString(),
@@ -290,9 +288,9 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		cont->close(ucur);
 		cont->deleteCursor(ucur);
 	}
-	deleteArray(cols,colcount);
 	deleteArray(vals,valcount);
 	delete[] table;
+	delete cols;
 	return *success;
 }
 
@@ -344,9 +342,8 @@ void sqlrtrigger_upsert::splitValues(const char *values,
 
 bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
 					sqlrservercursor *icur,
-					const char * const *cols,
+					linkedlist<char *> *cols,
 					const char * const *vals,
-					uint64_t colcount,
 					domnode *tablenode) {
 
 	settowhere.clear();
@@ -364,8 +361,11 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
 	if (debug) {
 		stdoutput.printf("	bind-to-col map:\n");
 	}
-	for (uint64_t i=0; i<colcount; i++) {
-		const char	*col=cols[i];
+
+	uint64_t 	i=0;
+	for (listnode<char *> *node=cols->getFirst();
+				node; node=node->getNext()) {
+		const char	*col=node->getValue();
 		const char	*val=vals[i];
 		if (isBind(val)) {
 			if (cont->bindFormat()[0]=='?') {
@@ -391,6 +391,7 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
 				}
 			}
 		}
+		i++;
 	}
 
 	// make 2 copies of icur's input binds in ucur:
@@ -538,9 +539,8 @@ void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 bool sqlrtrigger_upsert::convertInsertToUpdate(
 					sqlrservercursor *ucur,
 					const char *table,
-					const char * const *cols,
+					linkedlist<char *> *cols,
 					const char * const *vals,
-					uint64_t colcount,
 					const char *autoinccolumn,
 					const char *primarykeycolumn,
 					domnode *tablenode,
@@ -555,15 +555,18 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 	if (debug) {
 		stdoutput.printf("	col-to-val map:\n");
 	}
-	for (uint64_t i=0; i<colcount; i++) {
+	uint64_t	i=0;
+	for (listnode<char *> *node=cols->getFirst();
+				node; node=node->getNext()) {
 
 		// get the column/value pair
-		const char	*col=cols[i];
+		const char	*col=node->getValue();
 		const char	*val=vals[i];
 
 		// don't attempt to set auto-increment or primary key columns
 		if (!charstring::compare(col,autoinccolumn) ||
 			!charstring::compare(col,primarykeycolumn)) {
+			i++;
 			continue;
 		}
 
@@ -581,6 +584,7 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 		if (debug) {
 			stdoutput.printf("		%s -> %s\n",col,val);
 		}
+		i++;
 	}
 
 	// begin building the where clause

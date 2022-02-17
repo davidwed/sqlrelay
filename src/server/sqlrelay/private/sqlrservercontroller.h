@@ -134,8 +134,7 @@
 		void	getColumnsFromInsertQuery(
 				const char *colsstart,
 				const char *table,
-				char ***cols,
-				uint64_t *colcount,
+				linkedlist<char *> **columns,
 				linkedlist<char *> **allcolumns,
 				const char **autoinccolumn,
 				bool *columnsincludeautoinccolumn,

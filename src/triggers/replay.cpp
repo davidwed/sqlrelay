@@ -67,16 +67,14 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_replay : public sqlrtrigger {
 		void	rewriteQuery(querydetails *qd,
 					const char *query,
 					uint32_t querylen,
-					char **cols,
-					uint64_t colcount,
+					linkedlist<char *> *columns,
 					const char *autoinccolumn,
 					uint64_t liid,
 					bool columnsincludeautoinccolumn,
 					const char *values);
-		void	deleteCols(char **cols, uint64_t colcount);
 		void	appendValues(stringbuffer *newquery,
 						const char *values,
-						char **cols,
+						linkedlist<char *> *columns,
 						uint64_t liid,
 						const char *autoinccolumn);
 
@@ -234,8 +232,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	const char		*query=sqlrcur->getQueryBuffer();
 	uint32_t		querylen=sqlrcur->getQueryLength();
 	sqlrquerytype_t		querytype=SQLRQUERYTYPE_ETC;
-	char			**cols=NULL;
-	uint64_t		colcount=0;
+	linkedlist<char *>	*columns=NULL;
 	linkedlist<char *>	*allcolumns=NULL;
 	const char 		*autoinccolumn=NULL;
 	bool			columnsincludeautoinccolumn=false;
@@ -243,7 +240,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	cont->parseInsert(query,querylen,
 			&querytype,
 			NULL,
-			&cols,&colcount,
+			&columns,
 			&allcolumns,
 			&autoinccolumn,
 			&columnsincludeautoinccolumn,
@@ -257,14 +254,16 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 						sqlrcur->getQueryLength(),
 						sqlrcur->getQueryBuffer());
 		}
-		deleteCols(cols,colcount);
+		delete columns;
+		delete allcolumns;
 		return true;
 	}
 
 	// We can't select-into during replay.
 	if (querytype==SQLRQUERYTYPE_SELECTINTO) {
 		disableUntilEndOfTx(query,querylen,querytype);
-		deleteCols(cols,colcount);
+		delete columns;
+		delete allcolumns;
 		return true;
 	}
 
@@ -289,7 +288,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 		} else if (querytype==SQLRQUERYTYPE_INSERT) {
 
 			rewriteQuery(qd,query,querylen,
-					cols,colcount,autoinccolumn,liid,
+					columns,autoinccolumn,liid,
 					columnsincludeautoinccolumn,values);
 
 		} else {
@@ -298,7 +297,8 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 			// an autoincrement column, which generated an id.
 			// There's no way (currently) to handle these.
 			disableUntilEndOfTx(query,querylen,querytype);
-			deleteCols(cols,colcount);
+			delete columns;
+			delete allcolumns;
 			return true;
 		}
 
@@ -306,7 +306,8 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 		// There's no way (currently) to handle these.
 		disableUntilEndOfTx(query,querylen,querytype);
-		deleteCols(cols,colcount);
+		delete columns;
+		delete allcolumns;
 		return true;
 
 	} else {
@@ -350,7 +351,9 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 			stdoutput.printf("%s\n",node->getValue()->query);
 		}
 	}*/
-	deleteCols(cols,colcount);
+
+	delete columns;
+	delete allcolumns;
 	return true;
 }
 
@@ -394,8 +397,7 @@ void sqlrtrigger_replay::copyQuery(querydetails *qd,
 void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 					const char *query,
 					uint32_t querylen,
-					char **cols,
-					uint64_t colcount,
+					linkedlist<char *> *columns,
 					const char *autoinccolumn,
 					uint64_t liid,
 					bool columnsincludeautoinccolumn,
@@ -422,11 +424,15 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 	if (!columnsincludeautoinccolumn) {
 		newquery.append(autoinccolumn)->append(',');
 	}
-	for (uint64_t i=0; i<colcount; i++) {
-		if (i) {
+	bool	first=true;
+	for (listnode<char *> *node=columns->getFirst();
+				node; node=node->getNext()) {
+		if (first) {
+			first=false;
+		} else {
 			newquery.append(',');
 		}
-		newquery.append(cols[i]);
+		newquery.append(node->getValue());
 	}
 
 	// append values
@@ -434,34 +440,25 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 	if (!columnsincludeautoinccolumn) {
 		newquery.append(liid)->append(',')->append(values);
 	} else {
-		appendValues(&newquery,values,cols,liid,autoinccolumn);
+		appendValues(&newquery,values,columns,liid,autoinccolumn);
 	}
 
 	// copy out the rewritten query
 	copyQuery(qd,newquery.getString(),newquery.getStringLength());
 }
 
-void sqlrtrigger_replay::deleteCols(char **cols, uint64_t colcount) {
-
-	// clean up
-	for (uint64_t i=0; i<colcount; i++) {
-		delete[] cols[i];
-	}
-	delete[] cols;
-}
-
 void sqlrtrigger_replay::appendValues(stringbuffer *newquery,
 						const char *values,
-						char **cols,
+						linkedlist<char *> *columns,
 						uint64_t liid,
 						const char *autoinccolumn) {
 
-	stringbuffer	value;
-	uint64_t	valueindex=0;
-	const char	*c=values;
-	char		prevc='\0';
-	bool		inquotes=false;
-	uint32_t	parens=0;
+	listnode<char *>	*col=columns->getFirst();
+	stringbuffer		value;
+	const char		*c=values;
+	char			prevc='\0';
+	bool			inquotes=false;
+	uint32_t		parens=0;
 	for (;;) {
 
 		// end-of-values condition
@@ -471,7 +468,7 @@ void sqlrtrigger_replay::appendValues(stringbuffer *newquery,
 			// the autoincrement column, then
 			// append the last-insert-id,
 			// otherwise just append the value
-			if (!charstring::compare(cols[valueindex],
+			if (!charstring::compare(col->getValue(),
 							autoinccolumn) &&
 				!charstring::compare(value.getString(),
 								"null")) {
@@ -511,7 +508,7 @@ void sqlrtrigger_replay::appendValues(stringbuffer *newquery,
 					// append the last-insert-id,
 					// otherwise just append the value
 					if (!charstring::compare(
-							cols[valueindex],
+							col->getValue(),
 							autoinccolumn) &&
 						!charstring::compare(
 							value.getString(),
@@ -525,7 +522,7 @@ void sqlrtrigger_replay::appendValues(stringbuffer *newquery,
 					// append the comma
 					newquery->append(',');
 
-					valueindex++;
+					col=col->getNext();
 					value.clear();
 				} else {
 					value.append(*c);
