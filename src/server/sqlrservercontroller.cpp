@@ -3826,8 +3826,6 @@ void sqlrservercontroller::getColumnsFromDb(const char *table,
 	sqlrservercursor        *gclcur=newCursor();
 	if (open(gclcur)) {
 
-stdoutput.printf("columnmap=%08x\n",pvt->_columnmap);
-
 		bool	retval=false;
 		if (getListsByApiCalls()) {
 			retval=getColumnList(gclcur,table,NULL);

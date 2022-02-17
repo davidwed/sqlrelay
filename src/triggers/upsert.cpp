@@ -24,25 +24,29 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 	private:
 		bool	errorEncountered(sqlrservercursor *icur);
 		domnode	*tableEncountered(const char *table);
-		bool	copyInputBinds(sqlrservercursor *dest,
-					sqlrservercursor *source);
+		bool	copyInputBinds(sqlrservercursor *ucur,
+					sqlrservercursor *icur,
+					const char * const *cols,
+					const char * const *vals,
+					uint64_t colcount,
+					domnode *tablenode);
 		void	copyInputBind(memorypool *pool,
 					bool where,
-					sqlrserverbindvar *dest,
-					sqlrserverbindvar *source,
-					uint16_t bindindex);
+					sqlrserverbindvar *ubind,
+					sqlrserverbindvar *ibind,
+					uint16_t bindnumber);
 		bool	convertInsertToUpdate(
 					sqlrservercursor *ucur,
 					const char *table,
 					const char * const *cols,
+					const char * const *vals,
 					uint64_t colcount,
 					const char *autoinccolumn,
 					const char *primarykeycolumn,
-					const char *values,
 					domnode *tablenode,
 					stringbuffer *query);
 		bool	isBind(const char *var);
-		void	deleteCols(char **cols, uint64_t colcount);
+		void	deleteArray(char **vals, uint64_t valcount);
 
 		sqlrservercontroller	*cont;
 
@@ -51,7 +55,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 		domnode	*errors;
 		domnode	*tables;
 
-		dictionary<const char *, const char *>	wherebinds;
+		dictionary<const char *, const char *>	settowhere;
 };
 
 sqlrtrigger_upsert::sqlrtrigger_upsert(sqlrservercontroller *cont,
@@ -106,9 +110,10 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	if (!errorEncountered(icur)) {
 		if (debug) {
 			stdoutput.printf("	no matching error "
-					"found for:\n%d: %s}\n",
-					icur->getErrorNumber(),
-					icur->getErrorBuffer());
+					"found for:\n%d: %.*s}\n",
+					cont->getErrorNumber(icur),
+					cont->getErrorLength(icur),
+					cont->getErrorBuffer(icur));
 		}
 		return *success;
 	}
@@ -127,6 +132,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 				&primarykeycolumn,NULL,
 				&values);
 
+	// debug
 	if (debug) {
 		stdoutput.printf("	table: %s\n",table);
 		stdoutput.printf("	columns:\n");
@@ -137,7 +143,6 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 							autoinccolumn);
 		stdoutput.printf("	primary key column (from db): %s\n",
 							primarykeycolumn);
-		stdoutput.printf("	values: %s\n",values);
 	}
 
 	// bail if the query wasn't a simple insert
@@ -145,7 +150,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		if (debug) {
 			stdoutput.printf("	not a simple insert\n}\n");
 		}
-		deleteCols(cols,colcount);
+		deleteArray(cols,colcount);
 		delete[] table;
 		return *success;
 	}
@@ -157,7 +162,7 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 			stdoutput.printf("	table not "
 					"configured for upsert\n}\n");
 		}
-		deleteCols(cols,colcount);
+		deleteArray(cols,colcount);
 		delete[] table;
 		return *success;
 	}
@@ -172,6 +177,30 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 			stdoutput.printf("	primary key column "
 						"(from config): %s\n",
 						primarykeycolumn);
+		}
+	}
+
+	// split values
+	// FIXME: use a split that considers quoting and ignores the trailing )
+	char		**vals;
+	uint64_t	valcount;
+	char	*tempvalues=charstring::duplicate(values);
+	tempvalues[charstring::length(tempvalues)-1]='\0';
+	charstring::split(tempvalues,",",false,&vals,&valcount);
+	delete[] tempvalues;
+
+	// debug
+	if (debug) {
+		stdoutput.printf("	values:\n");
+		for (uint64_t i=0; i<valcount; i++) {
+			stdoutput.printf("		%s\n",vals[i]);
+		}
+		stdoutput.printf("	where-clause columns:\n");
+		for (domnode *node=tablenode->getFirstTagChild("column");
+				!node->isNullNode();
+				node=node->getNextTagSibling("column")) {
+			stdoutput.printf("		%s\n",
+					node->getAttributeValue("name"));
 		}
 	}
 
@@ -206,10 +235,12 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// (each of these sets the error message internally if they fail)
 	stringbuffer		update;
 	if (*success) {
-		*success=copyInputBinds(ucur,icur) &&
-				convertInsertToUpdate(ucur,table,cols,colcount,
+		*success=copyInputBinds(ucur,icur,cols,vals,
+						colcount,tablenode) &&
+				convertInsertToUpdate(ucur,table,
+						cols,vals,colcount,
 						autoinccolumn,primarykeycolumn,
-						values,tablenode,&update) &&
+						tablenode,&update) &&
 				cont->prepareQuery(ucur,update.getString(),
 						update.getStringLength()) &&
 				cont->executeQuery(ucur);
@@ -264,12 +295,18 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		cont->close(ucur);
 		cont->deleteCursor(ucur);
 	}
-	deleteCols(cols,colcount);
+	deleteArray(cols,colcount);
+	deleteArray(vals,valcount);
 	delete[] table;
 	return *success;
 }
 
 bool sqlrtrigger_upsert::errorEncountered(sqlrservercursor *icur) {
+
+	// the error buffer may not be terminated, but contains() below
+	// needs a terminated string, so make a copy of it here
+	stringbuffer	err;
+	err.append(cont->getErrorBuffer(icur),cont->getErrorLength(icur));
 
 	// look through the errors and see if we find
 	// one that matches the icur's error
@@ -280,9 +317,8 @@ bool sqlrtrigger_upsert::errorEncountered(sqlrservercursor *icur) {
 				node=node->getNextTagSibling("error")) {
 		const char	*string=node->getAttributeValue("string");
 		const char	*number=node->getAttributeValue("number");
-		if ((string && charstring::contains(
-					icur->getErrorBuffer(),string)) ||
-			(number && icur->getErrorNumber()==
+		if ((string && charstring::contains(err.getString(),string)) ||
+			(number && cont->getErrorNumber(icur)==
 					charstring::toInteger(number))) {
 			return true;
 		}
@@ -303,20 +339,85 @@ domnode *sqlrtrigger_upsert::tableEncountered(const char *table) {
 	}
 	return NULL;
 }
-bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
-					sqlrservercursor *source) {
 
-	wherebinds.clear();
+bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
+					sqlrservercursor *icur,
+					const char * const *cols,
+					const char * const *vals,
+					uint64_t colcount,
+					domnode *tablenode) {
 
-	// make 2 copies of source's input binds in dest:
+	settowhere.clear();
+
+	// bail if there are no input binds
+	uint16_t	ibcount=cont->getInputBindCount(icur);
+	if (!ibcount) {
+		return true;
+	}
+
+	// build a bind -> col map
+	dictionary<char *, const char *>	bindtocol;
+	bindtocol.setManageArrayKeys(true);
+	uint16_t	bindnum=1;
+	if (debug) {
+		stdoutput.printf("	bind-to-col map:\n");
+	}
+	for (uint64_t i=0; i<colcount; i++) {
+		const char	*col=cols[i];
+		const char	*val=vals[i];
+		if (isBind(val)) {
+			if (cont->bindFormat()[0]=='?') {
+				// If we only support bind-by-position then
+				// val wil just be a ?.  In that case, append
+				// the bind number to it.
+				char	*bindname;
+				charstring::printf(&bindname,"?%hd",bindnum);
+				bindtocol.setValue(bindname,col);
+				bindnum++;
+				if (debug) {
+					stdoutput.printf("		"
+								"%s -> %s\n",
+								bindname,col);
+				}
+			} else {
+				bindtocol.setValue(
+					charstring::duplicate(val),col);
+				if (debug) {
+					stdoutput.printf("		"
+								"%s -> %s\n",
+								val,col);
+				}
+			}
+		}
+	}
+
+	// make 2 copies of icur's input binds in ucur:
 	// * one of each bind to use in the set clause
 	// * one of each bind to use in the where clause
 
-	// count source's binds and make sure we
-	// can allocate twice as many in dest
-	uint16_t	ibcount=cont->getInputBindCount(source);
-	if (ibcount*2>cont->getConfig()->getMaxBindCount()) {
-		cont->setError(dest,"upsert failed - update would "
+	// run through the binds, counting the ones
+	// that we'll need to make copies of
+	sqlrserverbindvar	*ivars=cont->getInputBinds(icur);
+	sqlrserverbindvar	*uvars=cont->getInputBinds(ucur);
+	uint16_t		ubcount=0;
+	for (uint16_t i=0; i<ibcount; i++) {
+
+		// for the set clause, copy all bind vars
+		ubcount++;
+
+		// for the where clause, only copy the bind vars that
+		// correspond to columns that will be used in the where clause
+		if (tablenode->getFirstTagChild("column","name",
+				bindtocol.getValue(ivars[i].variable))->
+				isNullNode()) {
+			continue;
+		}
+		ubcount++;
+	}
+
+	// make sure we can allocate as many binds as we need
+	if (ubcount>cont->getConfig()->getMaxBindCount()) {
+		cont->setError(ucur,"upsert failed - update would "
 					"exceed maximum bind count",
 					SQLR_ERROR_TRIGGER,true);
 		return false;
@@ -328,29 +429,37 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *dest,
 
 	// copy the input binds, making one copy for the set clause and
 	// another copy for the where clause
-	memorypool		*destpool=cont->getBindPool(dest);
-	sqlrserverbindvar	*sinvars=cont->getInputBinds(source);
-	sqlrserverbindvar	*dinvars=cont->getInputBinds(dest);
+	memorypool	*upool=cont->getBindPool(ucur);
+	uint16_t	ui=ibcount;
 	for (uint16_t i=0; i<ibcount; i++) {
-		copyInputBind(destpool,
-			false,&(dinvars[i]),&(sinvars[i]),i);
-		copyInputBind(destpool,
-			true,&(dinvars[ibcount+i]),&(sinvars[i]),ibcount+i);
+
+		// for the set clause, copy all bind vars
+		copyInputBind(upool,false,&(uvars[i]),&(ivars[i]),i);
+
+		// for the where clause, only copy the bind vars that
+		// correspond to columns that will be used in the where clause
+		if (tablenode->getFirstTagChild("column","name",
+				bindtocol.getValue(ivars[i].variable))->
+				isNullNode()) {
+			continue;
+		}
+		copyInputBind(upool,true,&(uvars[ui]),&(ivars[i]),ui+1);
+		ui++;
 	}
 
 	// set the input bind count
-	cont->setInputBindCount(dest,ibcount*2);
+	cont->setInputBindCount(ucur,ubcount);
 
 	return true;
 }
 
 void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
-						sqlrserverbindvar *dest,
-						sqlrserverbindvar *source,
-						uint16_t bindindex) {
+						sqlrserverbindvar *ubind,
+						sqlrserverbindvar *ibind,
+						uint16_t bindnumber) {
 
 	// byte-copy everything
-	bytestring::copy(dest,source,sizeof(sqlrserverbindvar));
+	bytestring::copy(ubind,ibind,sizeof(sqlrserverbindvar));
 
 	// The shallow-copy above will aim the variable, value.stringval,
 	// and value.dateval.buffer pointers to the strings stored in the
@@ -361,9 +470,9 @@ void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 	// we can bail here.
 	if (!where) {
 		if (debug) {
-			stdoutput.printf("		%s=",dest->variable);
-			if (dest->type==SQLRSERVERBINDVARTYPE_STRING) {
-				stdoutput.printf("%s\n",dest->value.stringval);
+			stdoutput.printf("		%s=",ubind->variable);
+			if (ubind->type==SQLRSERVERBINDVARTYPE_STRING) {
+				stdoutput.printf("%s\n",ubind->value.stringval);
 			} else {
 				stdoutput.printf("...\n");
 			}
@@ -378,52 +487,49 @@ void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 
 		// if we support named binds, then prepend "where_"
 		// to the variable name
-		dest->variablesize+=6;
-		dest->variable=(char *)pool->allocate(dest->variablesize+1);
-		charstring::printf(dest->variable,
-					dest->variablesize+1,
+		ubind->variablesize+=6;
+		ubind->variable=(char *)pool->allocate(ubind->variablesize+1);
+		charstring::printf(ubind->variable,
+					ubind->variablesize+1,
 					"%c%s%s",
-					source->variable[0],
+					ibind->variable[0],
 					"where_",
-					source->variable+1);
+					ibind->variable+1);
 
-		// map the source -> dest variable name for
+		// map the set ->where variable name for
 		// easier lookup when building the update query
-		wherebinds.setValue(source->variable,dest->variable);
+		settowhere.setValue(ibind->variable,ubind->variable);
 
 	} else {
 
 		// if we only support numeric binds or bind-by-position,
-		// then use the bind index that we were passed in
-		// NOTE: bindindex is 0 based, but numeric bind names are
-		// 1-based, so we'll add one to bindindex to get the numeric
-		// bind name
-		dest->variablesize=1+charstring::integerLength(bindindex+1);
-		dest->variable=(char *)pool->allocate(dest->variablesize+1);
-		charstring::printf(dest->variable,
-					dest->variablesize+1,
+		// then use the bind number that we were passed in
+		ubind->variablesize=1+charstring::integerLength(bindnumber);
+		ubind->variable=(char *)pool->allocate(ubind->variablesize+1);
+		charstring::printf(ubind->variable,
+					ubind->variablesize+1,
 					"%c%hd",
-					source->variable[0],
-					bindindex+1);
+					ibind->variable[0],
+					bindnumber);
 
 		// unless we only support bind-by-position...
 		if (cont->bindFormat()[0]!='?') {
 
-			// map the source -> dest variable name for
+			// map the set -> where bind variable name for
 			// easier lookup when building the update query
-			wherebinds.setValue(source->variable,dest->variable);
+			settowhere.setValue(ibind->variable,ubind->variable);
 		}
 	}
 
 	if (debug) {
-		stdoutput.printf("		%s=",dest->variable);
-		if (dest->type==SQLRSERVERBINDVARTYPE_STRING) {
-			stdoutput.printf("%s\n",dest->value.stringval);
+		stdoutput.printf("		%s=",ubind->variable);
+		if (ubind->type==SQLRSERVERBINDVARTYPE_STRING) {
+			stdoutput.printf("%s\n",ubind->value.stringval);
 		} else {
 			stdoutput.printf("...\n");
 		}
 		stdoutput.printf("			%s -> %s\n",
-					source->variable,dest->variable);
+					ibind->variable,ubind->variable);
 	}
 }
 
@@ -431,28 +537,22 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 					sqlrservercursor *ucur,
 					const char *table,
 					const char * const *cols,
+					const char * const *vals,
 					uint64_t colcount,
 					const char *autoinccolumn,
 					const char *primarykeycolumn,
-					const char *values,
 					domnode *tablenode,
 					stringbuffer *query) {
-
-	// split values
-	char		**vals;
-	uint64_t	valscount;
-	// FIXME: use a split that considers quoting and ignores the trailing )
-	char	*tempvalues=charstring::duplicate(values);
-	tempvalues[charstring::length(tempvalues)-1]='\0';
-	charstring::split(tempvalues,",",false,&vals,&valscount);
-	delete[] tempvalues;
 
 	// begin building the update query
 	query->append("update ")->append(table)->append(" set ");
 
 	// build the set clause and map column names to values
-	dictionary<const char *,const char *>	valuemap;
+	dictionary<const char *, const char *>	coltoval;
 	bool	first=true;
+	if (debug) {
+		stdoutput.printf("	col-to-val map:\n");
+	}
 	for (uint64_t i=0; i<colcount; i++) {
 
 		// get the column/value pair
@@ -474,7 +574,11 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 		query->append(col)->append('=')->append(val);
 
 		// map column -> value for use in the where clause later
-		valuemap.setValue(col,val);
+		coltoval.setValue(col,val);
+
+		if (debug) {
+			stdoutput.printf("		%s -> %s\n",col,val);
+		}
 	}
 
 	// begin building the where clause
@@ -490,7 +594,7 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 		// get the column/value pair
 		const char	*col=node->getAttributeValue("name");
 		const char	*val;
-		if (!valuemap.getValue(col,&val)) {
+		if (!coltoval.getValue(col,&val)) {
 			// bail if we didn't find a value for this column
 			stringbuffer	err;
 			err.append("upsert failed - in conversion of "
@@ -515,7 +619,7 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 		// If "val" is not a bind variable (or it is, but it's just a ?)
 		// then append "val" literally.
 		if (isBind(val) && val[0]!='?') {
-			query->append(wherebinds.getValue(val));
+			query->append(settowhere.getValue(val));
 		} else {
 			query->append(val);
 		}
@@ -526,12 +630,6 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 		stdoutput.printf("	update query:\n%s\n",
 						query->getString());
 	}
-
-	// clean up
-	for (uint64_t i=0; i<valscount; i++) {
-		delete[] vals[i];
-	}
-	delete[] vals;
 	
 	return retval;
 }
@@ -549,11 +647,11 @@ bool sqlrtrigger_upsert::isBind(const char *var) {
 }
 
 
-void sqlrtrigger_upsert::deleteCols(char **cols, uint64_t colcount) {
-	for (uint64_t i=0; i<colcount; i++) {
-		delete[] cols[i];
+void sqlrtrigger_upsert::deleteArray(char **vals, uint64_t valcount) {
+	for (uint64_t i=0; i<valcount; i++) {
+		delete[] vals[i];
 	}
-	delete[] cols;
+	delete[] vals;
 }
 
 extern "C" {
