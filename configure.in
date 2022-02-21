@@ -989,14 +989,14 @@ if ( test -n "$MYSQLLIBS" ); then
 	if ( test -n "$MYSQLSTATIC" ); then
 		MYSQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS mysql"
+	TESTDBS="$TESTDBS mysql mysqlupsert"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
 	POSTGRESQLBUILD="dynamic   "
 	if ( test -n "$POSTGRESQLSTATIC" ); then
 		POSTGRESQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS postgresql"
+	TESTDBS="$TESTDBS postgresql postgresqlupsert"
 fi
 if ( test -n "$SQLITELIBS" ); then
 	SQLITEBUILD="dynamic   "

@@ -959,11 +959,11 @@ if disableoracle=false then
 end if
 if disablemysql=false then
 	MYSQLBUILD="yes    "
-	TESTDBS=TESTDBs&"""mysql"","
+	TESTDBS=TESTDBs&"""mysql"",""mysqlupsert"","
 end if
 if disablepostgresql=false then
 	POSTGRESQLBUILD="yes    "
-	TESTDBS=TESTDBs&"""postgresql"","
+	TESTDBS=TESTDBs&"""postgresql"",""postgresqlupsert"","
 end if
 if disablesap=false then
 	SYBASEBUILD="yes    "
