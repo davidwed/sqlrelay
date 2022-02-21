@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="mysqltest" port="9000" socket="/tmp/test.socket" dbase="mysql" debug="triggers">
+	<instance id="mysqlupserttest" port="9000" socket="/tmp/test.socket" dbase="mysql">
 		<users>
 			<user user="test" password="test"/>
 		</users>
