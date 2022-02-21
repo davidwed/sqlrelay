@@ -3536,7 +3536,8 @@ bool sqlrservercontroller::parseInsert(const char *query,
 					bool *columnsincludeautoinccolumn,
 					const char **primarykeycolumn,
 					bool *columnsincludeprimarykeycolumn,
-					const char **values) {
+					linkedlist<char *> **values,
+					const char **rawvalues) {
 
 	// init return values
 	if (querytype) {
@@ -3560,12 +3561,14 @@ bool sqlrservercontroller::parseInsert(const char *query,
 	if (values) {
 		*values=NULL;
 	}
+	if (rawvalues) {
+		*rawvalues=NULL;
+	}
 
-	// init local values
+	// init query type
 	sqlrquerytype_t	localquerytype=SQLRQUERYTYPE_ETC;
-	char		*localtable=NULL;
-	const char	*localvalues=NULL;
 
+	// get the start and end of the query
 	const char	*start=skipWhitespaceAndComments(query);
 	const char	*end=query+querylen;
 
@@ -3573,6 +3576,11 @@ bool sqlrservercontroller::parseInsert(const char *query,
 
 	if (querylen>12 && !charstring::compare(start,"insert into ",12)) {
 
+		// if it was an insert...
+
+		// initialize the query type to plain insert, if it turns out
+		// to be a multi-insert or insert-select then we'll determine
+		// that later and update this accordingly
 		localquerytype=SQLRQUERYTYPE_INSERT;
 
 		// skip past "insert into "
@@ -3586,10 +3594,8 @@ bool sqlrservercontroller::parseInsert(const char *query,
 		}
 
 		// get table name and strip any quoting
-		localtable=charstring::duplicate(start,ptr-start);
+		char	*localtable=charstring::duplicate(start,ptr-start);
 		charstring::stripSet(localtable,"\"'`[]");
-
-		// FIXME: get allcolumns/autoinc/pkey here...
 
 		// skip ahead to whatever is past the table name,
 		// which should be one of:
@@ -3601,72 +3607,142 @@ bool sqlrservercontroller::parseInsert(const char *query,
 			return false;
 		}
 
-		// keep track of this location, we may need it later
-		// NOTE: "colsstart" is a bit of a misnomer, it's really:
-		// either-the-start-of-the-columns-list-or-the-values-keyword
-		// but that's really wordy, so we're calling it colsstart
-		const char	*colsstart=ptr;
+		// get the full list of columns that are in the table,
+		// as well as any auto_increment and primarky key columns
+		linkedlist<char *>	*localallcolumns;
+		const char		*localautoinccolumn;
+		const char		*localprimarykeycolumn;
+		getColumnsInTable(localtable,&localallcolumns,
+						&localautoinccolumn,
+						&localprimarykeycolumn);
 
-		// if we found the "(" before the list of columns,
-		// then skip past the columns to "values"/"select"
+		// create the list of columns to return
+		linkedlist<char *>	*localcolumns=new linkedlist<char *>();
+		localcolumns->setManageArrayValues(true);
+
+		// if we found the "(" before a list of columns,
+		// then parse the list of columns directly
 		if (*ptr=='(') {
-			// FIXME: split the columns here and populate
-			// the columns linkedlist
-			ptr=charstring::findFirst(ptr,')')+2;
+			ptr++;
+			const char	*colsend=
+					charstring::findFirst(ptr,')')+2;
+			getColumnsFromInsertQuery(ptr,colsend,localcolumns);
+			ptr=colsend;
 		}
 		if (ptr>=end) {
 			return false;
 		}
 		
-		// if we find "values " then it's an insert,
-		// or possibly a multi-insert
+		// look for the "values (" keyword
 		// FIXME: the below is kind-of a kludge...
 		// sometimes queries are written:
 		//	insert into blah values(...);
 		// with no space after "values", and the normalize translation
 		// doesn't fix this (though it ought to)
+		const char	*localrawvalues=NULL;
 		if (end>ptr+7) {
-			localvalues=charstring::findFirst(ptr,"values(");
+			localrawvalues=charstring::findFirst(ptr,"values(");
 		}
-		if (localvalues) {
-			localvalues+=7;
+		if (localrawvalues) {
+			localrawvalues+=7;
 		} else if (end>ptr+8) {
-			localvalues=charstring::findFirst(ptr,"values (");
-			if (localvalues) {
-				localvalues+=8;
+			localrawvalues=charstring::findFirst(ptr,"values (");
+			if (localrawvalues) {
+				localrawvalues+=8;
 			}
 		}
-		if (localvalues) {
 
-			// FIXME: split (the first set of) values here,
-			// returning a linkedlist and a flag indicating
-			// whether there are more or not...
+		if (localrawvalues) {
 
-			// FIXME: just check the flag from the previous call
-			if (isMultiInsert(localvalues,end)) {
+			// if we found the "values (" keyword then this is
+			// either a plain insert or multi-insert...
+
+			// split the (first set of) values here
+			linkedlist<char *>	*localvalues=
+						new linkedlist<char *>();
+			localvalues->setManageArrayValues(true);
+			bool			multiinsert;
+			getFirstValuesFromInsertQuery(localrawvalues,
+						localvalues,&multiinsert);
+
+			// if there were multiple sets of values
+			// then this query is a multi-insert
+			if (multiinsert) {
 				localquerytype=SQLRQUERYTYPE_MULTIINSERT;
 			}
 
-			// FIXME: if we didn't find any columns earlier then
-			// derive them from allcolumns and values->getLength()
-			// here
+			// if the query didn't contain a list of columns,
+			// then derive the columns from the number of values
+			// and the columns from allcolumns...
+			if (!localcolumns->getLength()) {
+				deriveColumnsFromInsertQuery(
+							localvalues,
+							localallcolumns,
+							localcolumns);
+			}
 
-			// get the columns
-			getColumnsFromInsertQuery(colsstart,
-						localtable,
-						columns,
-						allcolumns,
-						autoinccolumn,
-						columnsincludeautoinccolumn,
-						primarykeycolumn,
-						columnsincludeprimarykeycolumn);
+			// determine if the list of columns contains the
+			// autoincrement or primary key columns
+			bool	localcolsincludeautoinccol=true;
+			bool	localcolsincludeprimarykeycol=true;
+			for (listnode<char *> *node=localcolumns->getFirst();
+						node; node=node->getNext()) {
+				const char	*col=node->getValue();
+				if (!charstring::compare(col,
+						localautoinccolumn)) {
+					localcolsincludeautoinccol=true;
+				}
+				if (!charstring::compare(col,
+						localprimarykeycolumn)) {
+					localcolsincludeprimarykeycol=true;
+				}
+			}
+
+			// copy values out
+			if (values) {
+				*values=localvalues;
+			}
+			if (rawvalues) {
+				*rawvalues=localrawvalues;
+			}
+			if (columnsincludeautoinccolumn) {
+				*columnsincludeautoinccolumn=
+					localcolsincludeautoinccol;
+			}
+			if (columnsincludeprimarykeycolumn) {
+				*columnsincludeprimarykeycolumn=
+					localcolsincludeprimarykeycol;
+			}
+
 		} else {
 
-			// otherwise it's some kind of insert ... select
+			// if we didn't find the "values (" keyword then
+			// this must be some kind of insert ... select
 			localquerytype=SQLRQUERYTYPE_INSERTSELECT;
 		}
 
+		// copy values out
+		if (table) {
+			*table=localtable;
+		} else {
+			delete[] localtable;
+		}
+		if (columns) {
+			*columns=localcolumns;
+		}
+		if (allcolumns) {
+			*allcolumns=localallcolumns;
+		}
+		if (autoinccolumn) {
+			*autoinccolumn=localautoinccolumn;
+		}
+		if (primarykeycolumn) {
+			*primarykeycolumn=localprimarykeycolumn;
+		}
+
 	} else if (querylen>7 && !charstring::compare(start,"select ",7)) {
+
+		// if it was a select...
 
 		localquerytype=SQLRQUERYTYPE_SELECT;
 
@@ -3677,144 +3753,28 @@ bool sqlrservercontroller::parseInsert(const char *query,
 	if (querytype) {
 		*querytype=localquerytype;
 	}
-	if (table) {
-		*table=localtable;
-	} else {
-		delete[] localtable;
-	}
-	if (values) {
-		*values=localvalues;
-	}
 
 	return true;
 }
 
-void sqlrservercontroller::getColumnsFromInsertQuery(
-				const char *colsstart,
-				const char *table,
-				linkedlist<char *> **columns,
-				linkedlist<char *> **allcolumns,
-				const char **autoinccolumn,
-				bool *columnsincludeautoinccolumn,
-				const char **primarykeycolumn,
-				bool *columnsincludeprimarykeycolumn) {
-
-	// NOTE: "colsstart" is a bit of a misnomer, it's really:
-	// either-the-start-of-the-columns-list-or-the-values-keyword
-	// but that's really wordy, so we're calling it colsstart
-
-	// get the full list of columns that are in the table
-	linkedlist<char *>	*localallcolumns;
-	const char		*localautoinccolumn;
-	const char		*localprimarykeycolumn;
-	getColumnsFromDb(table,&localallcolumns,
-				&localautoinccolumn,
-				&localprimarykeycolumn);
-
-	// local variables for the columns
-	linkedlist<char *>	*localcolumns=new linkedlist<char *>();
-	localcolumns->setManageArrayValues(true);
-
-	if (*colsstart=='(') {
-
-		// parse columns provided in the query
-		const char	*colsend=charstring::findFirst(colsstart,')');
-		char		**cols=NULL;
-		uint64_t	colcount=0;
-		charstring::split(colsstart,colsend-colsstart,
-						",",true,&cols,&colcount);
-		localcolumns->listcollection::append(cols,colcount);
-
-	} else {
-
-		// skip into the values
-		// FIXME: the below is kind-of a kludge...
-		// sometimes queries are written:
-		//	insert into blah values(...);
-		// with no space after "values", and the normalize translation
-		// doesn't fix this (though it ought to)
-		const char	*values=charstring::findFirst(
-						colsstart,"values(");
-		if (values) {
-			values+=7;
-		} else {
-			values=charstring::findFirst(colsstart,"values (");
-			if (values) {
-				values+=8;
-			}
-		}
-
-		// count the values
-		uint64_t	valcount=countValuesInInsertQuery(values);
-
-		// create a list of the first valcount columns from allcolumns
-		listnode<char *>	*node=localallcolumns->getFirst();
-		uint64_t		count=0;
-		while (node && count<valcount) {
-			localcolumns->append(
-					charstring::duplicate(
-						node->getValue()));
-			node=node->getNext();
-			count++;
-		}
-	}
-
-	// does the list of columns that we're actually inserting
-	// into contain the autoincrement or primary key columns?
-	bool	localcolumnsincludeautoinccolumn=true;
-	bool	localcolumnsincludeprimarykeycolumn=true;
-	for (listnode<char *> *node=localcolumns->getFirst();
-					node; node=node->getNext()) {
-		const char	*col=node->getValue();
-		if (!charstring::compare(col,localautoinccolumn)) {
-			localcolumnsincludeautoinccolumn=true;
-		}
-		if (!charstring::compare(col,localprimarykeycolumn)) {
-			localcolumnsincludeprimarykeycolumn=true;
-		}
-	}
-
-	// copy values out
-	if (columns) {
-		*columns=localcolumns;
-	}
-	if (allcolumns) {
-		*allcolumns=localallcolumns;
-	}
-	if (autoinccolumn) {
-		*autoinccolumn=localautoinccolumn;
-	}
-	if (columnsincludeautoinccolumn) {
-		*columnsincludeautoinccolumn=
-			localcolumnsincludeautoinccolumn;
-	}
-	if (primarykeycolumn) {
-		*primarykeycolumn=localprimarykeycolumn;
-	}
-	if (columnsincludeprimarykeycolumn) {
-		*columnsincludeprimarykeycolumn=
-			localcolumnsincludeprimarykeycolumn;
-	}
-}
-
-void sqlrservercontroller::getColumnsFromDb(const char *table, 
-					linkedlist<char *> **allcolumns,
+void sqlrservercontroller::getColumnsInTable(const char *table, 
+					linkedlist<char *> **columns,
 					const char **autoinccolumn,
 					const char **primarykeycolumn) {
 
 	// attempt to get the columns from various caches
-	*allcolumns=pvt->_colcache.getValue((char *)table);
+	*columns=pvt->_colcache.getValue((char *)table);
 	*autoinccolumn=pvt->_autoinccolcache.getValue((char *)table);
 	*primarykeycolumn=pvt->_primarykeycolcache.getValue((char *)table);
-	if (*allcolumns) {
+	if (*columns) {
 		return;
 	}
 
 	// failing that, look them up in the database (and cache them)...
 
 	// create a new linkedlist to store the columns for this table
-	*allcolumns=new linkedlist<char *>();
-	(*allcolumns)->setManageArrayValues(true);
+	*columns=new linkedlist<char *>();
+	(*columns)->setManageArrayValues(true);
 
 	// get all of the columns in the table
 	sqlrservercursor        *gclcur=newCursor();
@@ -3862,7 +3822,7 @@ void sqlrservercontroller::getColumnsFromDb(const char *table,
 						&fieldlength,&blob,&null);
 
 				char	*dup=charstring::duplicate(column);
-				(*allcolumns)->append(dup);
+				(*columns)->append(dup);
 				if (charstring::contains(columnkey,
 							"PRI")) {
 					*primarykeycolumn=dup;
@@ -3883,24 +3843,45 @@ void sqlrservercontroller::getColumnsFromDb(const char *table,
 
 	// cache table -> columns/autoinccolumns mappings
 	char	*tablecopy=charstring::duplicate(table);
-	pvt->_colcache.setValue(tablecopy,*allcolumns);
+	pvt->_colcache.setValue(tablecopy,*columns);
 	pvt->_autoinccolcache.setValue(tablecopy,*autoinccolumn);
 	pvt->_primarykeycolcache.setValue(tablecopy,*primarykeycolumn);
 }
 
-uint64_t sqlrservercontroller::countValuesInInsertQuery(const char *values) {
+void sqlrservercontroller::getColumnsFromInsertQuery(
+					const char *start,
+					const char *end,
+					linkedlist<char *> *columns) {
+	// split the provided set of comma-separated columns
+	char		**cols=NULL;
+	uint64_t	colcount=0;
+	charstring::split(start,end-start,",",true,&cols,&colcount);
+	columns->listcollection::append(cols,colcount);
+}
 
-	uint64_t	valuecount=0;
-	const char	*c=values;
+void sqlrservercontroller::getFirstValuesFromInsertQuery(
+						const char *start,
+						linkedlist<char *> *values,
+						bool *multiinsert) {
+	const char	*c=start;
 	char		prevc='\0';
 	bool		inquotes=false;
 	uint32_t	parens=0;
+	const char	*startofvalue=c;
 	for (;;) {
 
 		// end-of-values condition
 		if (!inquotes && !parens && *c==')') {
-			valuecount++;
-			break;
+			// copy out the last value
+			values->append(charstring::duplicate(
+							startofvalue,
+							c-startofvalue));
+
+			// if there's a comma after the closing
+			// paren, then this is a multi-insert
+			c++;
+			*multiinsert=(*c==',');
+			return;
 		}
 
 		// handle quotes...
@@ -3918,9 +3899,12 @@ uint64_t sqlrservercontroller::countValuesInInsertQuery(const char *values) {
 			} else if (parens && *c==')') {
 				parens--;
 			} else {
-				// bump the value count if we found a comma
+				// copy out the value if we found a comma
 				if (*c==',') {
-					valuecount++;
+					values->append(charstring::duplicate(
+							startofvalue,
+							c-startofvalue));
+					startofvalue=c+1;
 				}
 			}
 		}
@@ -3929,55 +3913,21 @@ uint64_t sqlrservercontroller::countValuesInInsertQuery(const char *values) {
 		prevc=*c;
 		c++;
 	}
-
-	return valuecount;
 }
 
-bool sqlrservercontroller::isMultiInsert(const char *ptr, const char *end) {
-
-	// ptr should be sitting right after the opening paren...
-
-	// skip to right after the closing paren...
-	const char	*c=ptr;
-	char		prevc='\0';
-	bool		inquotes=false;
-	uint32_t	parens=0;
-	for (;;) {
-
-		// closing paren condition
-		if (!inquotes && !parens && *c==')') {
-			c++;
-			break;
-		}
-
-		// handle quotes...
-		if (!inquotes && *c=='\'') {
-			inquotes=true;
-		} else if (inquotes && *c=='\'' && prevc!='\\') {
-			inquotes=false;
-		}
-
-		if (!inquotes) {
-
-			// handle parentheses...
-			if (*c=='(') {
-				parens++;
-			} else if (parens && *c==')') {
-				parens--;
-			}
-		}
-
-		// keep going
-		if (prevc=='\\' && *c=='\\') {
-			prevc='\0';
-		} else {
-			prevc=*c;
-		}
-		c++;
+void sqlrservercontroller::deriveColumnsFromInsertQuery(
+					linkedlist<char *> *values,
+					linkedlist<char *> *allcolumns,
+					linkedlist<char *> *columns) {
+	// step through the values, populating columns
+	// with the corresponding column from allcolumns
+	listnode<char *>	*vnode=values->getFirst();
+	listnode<char *>	*acnode=allcolumns->getFirst();
+	while (vnode){
+		columns->append(charstring::duplicate(acnode->getValue()));
+		vnode=vnode->getNext();
+		acnode=acnode->getNext();
 	}
-	
-	// if there's a comma after the closing paren, then it's a multi-insert
-	return (c!=end && *c==',');
 }
 
 bool sqlrservercontroller::isBitType(const char *type) {

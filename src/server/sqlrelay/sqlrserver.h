@@ -818,8 +818,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 					bool *columnsincludeautoinccolumn,
 					const char **primarykeycolumn,
 					bool *columnsincludeprimarykeycolumn,
-					const char **values);
-
+					linkedlist<char *> **values,
+					const char **rawvalues);
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);

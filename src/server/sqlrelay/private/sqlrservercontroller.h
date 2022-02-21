@@ -131,21 +131,22 @@
 		void	sessionEndQueries();
 		void	sessionQuery(const char *query);
 
+		void	getColumnsInTable(const char *table, 
+					linkedlist<char *> **columns,
+					const char **autoinccolumn,
+					const char **primarykeycolumn);
 		void	getColumnsFromInsertQuery(
-				const char *colsstart,
-				const char *table,
-				linkedlist<char *> **columns,
-				linkedlist<char *> **allcolumns,
-				const char **autoinccolumn,
-				bool *columnsincludeautoinccolumn,
-				const char **primarykeycolumn,
-				bool *columnsincludeprimarykeycolumn);
-		void	getColumnsFromDb(const char *table, 
-				linkedlist<char *> **allcolumns,
-				const char **autoinccolumn,
-				const char **primarykeycolumn);
-		uint64_t	countValuesInInsertQuery(const char *values);
-		bool		isMultiInsert(const char *ptr, const char *end);
+					const char *start,
+					const char *end,
+					linkedlist<char *> *columns);
+		void	getFirstValuesFromInsertQuery(
+					const char *start,
+					linkedlist<char *> *values,
+					bool *mutiinsert);
+		void	deriveColumnsFromInsertQuery(
+					linkedlist<char *> *values,
+					linkedlist<char *> *allcolumns,
+					linkedlist<char *> *columns);
 
 		static void     alarmHandler(int32_t signum);
 

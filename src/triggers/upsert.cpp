@@ -24,12 +24,10 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 	private:
 		bool	errorEncountered(sqlrservercursor *icur);
 		domnode	*tableEncountered(const char *table);
-		void	splitValues(const char *values,
-					char ***vals, uint64_t *valcount);
 		bool	copyInputBinds(sqlrservercursor *ucur,
 					sqlrservercursor *icur,
 					linkedlist<char *> *cols,
-					const char * const *vals,
+					linkedlist<char *> *vals,
 					domnode *tablenode);
 		void	copyInputBind(memorypool *pool,
 					bool where,
@@ -40,7 +38,7 @@ class SQLRSERVER_DLLSPEC sqlrtrigger_upsert : public sqlrtrigger {
 					sqlrservercursor *ucur,
 					const char *table,
 					linkedlist<char *> *cols,
-					const char * const *vals,
+					linkedlist<char *> *vals,
 					const char *autoinccolumn,
 					const char *primarykeycolumn,
 					domnode *tablenode,
@@ -118,38 +116,30 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// NOTE: parseInsert will populate querytype with a more specific value
 	char			*table=NULL;
 	linkedlist<char *>	*cols=NULL;
-	// FIXME: cols needs to be deleted eventually
 	const char		*autoinccolumn=NULL;
 	const char		*primarykeycolumn=NULL;
-	const char		*values=NULL;
+	linkedlist<char *>	*vals=NULL;
 	cont->parseInsert(query,querylen,&querytype,
 				&table,&cols,NULL,
 				&autoinccolumn,NULL,
 				&primarykeycolumn,NULL,
-				&values);
-
-	// debug
-	if (debug) {
-		stdoutput.printf("	table: %s\n",table);
-		stdoutput.printf("	columns:\n");
-		for (listnode<char *> *node=cols->getFirst();
-						node; node=node->getNext()) {
-			stdoutput.printf("		%s\n",node->getValue());
-		}
-		stdoutput.printf("	auto-increment column: %s\n",
-							autoinccolumn);
-		stdoutput.printf("	primary key column (from db): %s\n",
-							primarykeycolumn);
-	}
+				&vals,NULL);
 
 	// bail if the query wasn't a simple insert
 	if (querytype!=SQLRQUERYTYPE_INSERT) {
 		if (debug) {
-			stdoutput.printf("	not a simple insert\n}\n");
+			stdoutput.printf("	query was not a "
+						"simple insert\n}\n");
 		}
 		delete[] table;
 		delete cols;
+		delete vals;
 		return *success;
+	}
+
+	// debug
+	if (debug) {
+		stdoutput.printf("	table: %s\n",table);
 	}
 
 	// bail if the table isn't one that we care about
@@ -161,7 +151,21 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		}
 		delete[] table;
 		delete cols;
+		delete vals;
 		return *success;
+	}
+
+	// debug
+	if (debug) {
+		stdoutput.printf("	columns:\n");
+		for (listnode<char *> *node=cols->getFirst();
+						node; node=node->getNext()) {
+			stdoutput.printf("		%s\n",node->getValue());
+		}
+		stdoutput.printf("	auto-increment column: %s\n",
+							autoinccolumn);
+		stdoutput.printf("	primary key column (from db): %s\n",
+							primarykeycolumn);
 	}
 
 	// if parseInsert didn't find a primary key
@@ -177,16 +181,12 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		}
 	}
 
-	// split values
-	char		**vals;
-	uint64_t	valcount;
-	splitValues(values,&vals,&valcount);
-
 	// debug
 	if (debug) {
 		stdoutput.printf("	values:\n");
-		for (uint64_t i=0; i<valcount; i++) {
-			stdoutput.printf("		%s\n",vals[i]);
+		for (listnode<char *> *node=vals->getFirst();
+						node; node=node->getNext()) {
+			stdoutput.printf("		%s\n",node->getValue());
 		}
 		stdoutput.printf("	where-clause columns:\n");
 		for (domnode *node=tablenode->getFirstTagChild("column");
@@ -288,9 +288,9 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		cont->close(ucur);
 		cont->deleteCursor(ucur);
 	}
-	deleteArray(vals,valcount);
 	delete[] table;
 	delete cols;
+	delete vals;
 	return *success;
 }
 
@@ -331,19 +331,10 @@ domnode *sqlrtrigger_upsert::tableEncountered(const char *table) {
 	return NULL;
 }
 
-void sqlrtrigger_upsert::splitValues(const char *values,
-					char ***vals, uint64_t *valcount) {
-	// FIXME: use a split that considers quoting and ignores the trailing )
-	char	*tempvalues=charstring::duplicate(values);
-	tempvalues[charstring::length(tempvalues)-1]='\0';
-	charstring::split(tempvalues,",",false,vals,valcount);
-	delete[] tempvalues;
-}
-
 bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
 					sqlrservercursor *icur,
 					linkedlist<char *> *cols,
-					const char * const *vals,
+					linkedlist<char *> *vals,
 					domnode *tablenode) {
 
 	settowhere.clear();
@@ -354,24 +345,32 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
 		return true;
 	}
 
-	// build a bind -> col map
-	dictionary<char *, const char *>	bindtocol;
-	bindtocol.setManageArrayKeys(true);
-	uint16_t	bindnum=1;
 	if (debug) {
 		stdoutput.printf("	bind-to-col map:\n");
 	}
 
-	uint64_t 	i=0;
-	for (listnode<char *> *node=cols->getFirst();
-				node; node=node->getNext()) {
-		const char	*col=node->getValue();
-		const char	*val=vals[i];
+	// build a bind -> col map
+	dictionary<char *, const char *>	bindtocol;
+	bindtocol.setManageArrayKeys(true);
+	uint16_t		bindnum=1;
+	listnode<char *>	*cnode=cols->getFirst();
+	listnode<char *>	*vnode=vals->getFirst();
+	while (cnode && vnode) {
+
+		// get the column/value pair
+		const char	*col=cnode->getValue();
+		const char	*val=vnode->getValue();
+
+		// if val is a bind variable then map
+		// it to the corresponding column
 		if (isBind(val)) {
+
 			if (cont->bindFormat()[0]=='?') {
-				// If we only support bind-by-position then
-				// val wil just be a ?.  In that case, append
-				// the bind number to it.
+
+				// we only support bind by position...
+
+				// val wil just be a ?, append
+				// the bind number to it
 				char	*bindname;
 				charstring::printf(&bindname,"?%hd",bindnum);
 				bindtocol.setValue(bindname,col);
@@ -381,7 +380,10 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
 								"%s -> %s\n",
 								bindname,col);
 				}
+
 			} else {
+
+				// we support bind by name/number
 				bindtocol.setValue(
 					charstring::duplicate(val),col);
 				if (debug) {
@@ -391,7 +393,10 @@ bool sqlrtrigger_upsert::copyInputBinds(sqlrservercursor *ucur,
 				}
 			}
 		}
-		i++;
+
+		// next...
+		cnode=cnode->getNext();
+		vnode=vnode->getNext();
 	}
 
 	// make 2 copies of icur's input binds in ucur:
@@ -540,7 +545,7 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 					sqlrservercursor *ucur,
 					const char *table,
 					linkedlist<char *> *cols,
-					const char * const *vals,
+					linkedlist<char *> *vals,
 					const char *autoinccolumn,
 					const char *primarykeycolumn,
 					domnode *tablenode,
@@ -549,24 +554,26 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 	// begin building the update query
 	query->append("update ")->append(table)->append(" set ");
 
-	// build the set clause and map column names to values
-	dictionary<const char *, const char *>	coltoval;
-	bool	first=true;
 	if (debug) {
 		stdoutput.printf("	col-to-val map:\n");
 	}
-	uint64_t	i=0;
-	for (listnode<char *> *node=cols->getFirst();
-				node; node=node->getNext()) {
+
+	// build the set clause and map column names to values
+	dictionary<const char *, const char *>	coltoval;
+	bool			first=true;
+	listnode<char *>	*cnode=cols->getFirst();
+	listnode<char *>	*vnode=vals->getFirst();
+	while (cnode && vnode) {
 
 		// get the column/value pair
-		const char	*col=node->getValue();
-		const char	*val=vals[i];
+		const char	*col=cnode->getValue();
+		const char	*val=vnode->getValue();
 
 		// don't attempt to set auto-increment or primary key columns
 		if (!charstring::compare(col,autoinccolumn) ||
 			!charstring::compare(col,primarykeycolumn)) {
-			i++;
+ 			cnode=cnode->getNext();
+ 			vnode=vnode->getNext();
 			continue;
 		}
 
@@ -584,7 +591,10 @@ bool sqlrtrigger_upsert::convertInsertToUpdate(
 		if (debug) {
 			stdoutput.printf("		%s -> %s\n",col,val);
 		}
-		i++;
+
+		// next...
+ 		cnode=cnode->getNext();
+ 		vnode=vnode->getNext();
 	}
 
 	// begin building the where clause

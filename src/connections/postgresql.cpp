@@ -720,13 +720,9 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 		defined(HAVE_POSTGRESQL_PQPREPARE)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
-	if (id) {
-		charstring::printf(&cursorid,"%s-%d",
-					conn->cont->getConnectionId(),id);
-		charstring::replace(cursorid,'-','_');
-	} else {
-		cursorid=charstring::duplicate("");
-	}
+	charstring::printf(&cursorid,"%s-%d",conn->cont->getConnectionId(),id);
+	charstring::replace(cursorid,'-','_');
+stdoutput.printf("%d - %s\n",id,cursorid);
 	deallocatecursorid.append("deallocate ")->append(cursorid);
 	allocated=false;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();

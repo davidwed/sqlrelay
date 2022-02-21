@@ -236,16 +236,16 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	linkedlist<char *>	*allcolumns=NULL;
 	const char 		*autoinccolumn=NULL;
 	bool			columnsincludeautoinccolumn=false;
-	const char		*values=NULL;
+	const char		*rawvalues=NULL;
 	cont->parseInsert(query,querylen,
-			&querytype,
-			NULL,
-			&columns,
-			&allcolumns,
-			&autoinccolumn,
-			&columnsincludeautoinccolumn,
-			NULL,NULL,
-			&values);
+				&querytype,
+				NULL,
+				&columns,
+				&allcolumns,
+				&autoinccolumn,
+				&columnsincludeautoinccolumn,
+				NULL,NULL,NULL,
+				&rawvalues);
 
 	// bail if the query was a select, and we're ignoring selects
 	if (!includeselects && querytype==SQLRQUERYTYPE_SELECT) {
@@ -255,7 +255,6 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 						sqlrcur->getQueryBuffer());
 		}
 		delete columns;
-		delete allcolumns;
 		return true;
 	}
 
@@ -263,7 +262,6 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	if (querytype==SQLRQUERYTYPE_SELECTINTO) {
 		disableUntilEndOfTx(query,querylen,querytype);
 		delete columns;
-		delete allcolumns;
 		return true;
 	}
 
@@ -289,7 +287,7 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 
 			rewriteQuery(qd,query,querylen,
 					columns,autoinccolumn,liid,
-					columnsincludeautoinccolumn,values);
+					columnsincludeautoinccolumn,rawvalues);
 
 		} else {
 
@@ -298,7 +296,6 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 			// There's no way (currently) to handle these.
 			disableUntilEndOfTx(query,querylen,querytype);
 			delete columns;
-			delete allcolumns;
 			return true;
 		}
 
@@ -307,7 +304,6 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 		// There's no way (currently) to handle these.
 		disableUntilEndOfTx(query,querylen,querytype);
 		delete columns;
-		delete allcolumns;
 		return true;
 
 	} else {
@@ -353,7 +349,6 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	}*/
 
 	delete columns;
-	delete allcolumns;
 	return true;
 }
 
@@ -401,7 +396,7 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 					const char *autoinccolumn,
 					uint64_t liid,
 					bool columnsincludeautoinccolumn,
-					const char *values) {
+					const char *rawvalues) {
 	stringbuffer	newquery;
 
 	// did the query contain column names?
@@ -438,9 +433,9 @@ void sqlrtrigger_replay::rewriteQuery(querydetails *qd,
 	// append values
 	newquery.append(") values (");
 	if (!columnsincludeautoinccolumn) {
-		newquery.append(liid)->append(',')->append(values);
+		newquery.append(liid)->append(',')->append(rawvalues);
 	} else {
-		appendValues(&newquery,values,columns,liid,autoinccolumn);
+		appendValues(&newquery,rawvalues,columns,liid,autoinccolumn);
 	}
 
 	// copy out the rewritten query
