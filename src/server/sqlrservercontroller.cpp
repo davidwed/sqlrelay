@@ -3856,7 +3856,7 @@ void sqlrservercontroller::getColumnsFromInsertQuery(
 	char		**cols=NULL;
 	uint64_t	colcount=0;
 	charstring::split(start,end-start,",",true,&cols,&colcount);
-	columns->listcollection::append(cols,colcount);
+	columns->listcollection<char *>::append(cols,colcount);
 }
 
 void sqlrservercontroller::getFirstValuesFromInsertQuery(
