@@ -722,7 +722,6 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
 	charstring::printf(&cursorid,"%s-%d",conn->cont->getConnectionId(),id);
 	charstring::replace(cursorid,'-','_');
-stdoutput.printf("%d - %s\n",id,cursorid);
 	deallocatecursorid.append("deallocate ")->append(cursorid);
 	allocated=false;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
