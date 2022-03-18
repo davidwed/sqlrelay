@@ -1549,7 +1549,6 @@ bool postgresqlcursor::fetchRow(bool *error) {
 void postgresqlcursor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
-stdoutput.printf("getField\n");
 
 	// handle NULLs
 	if (PQgetisnull(pgresult,currentrow,col)) {
