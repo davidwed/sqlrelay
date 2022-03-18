@@ -175,6 +175,12 @@ bool sqlrimportcsv::headerEnd() {
 
 	// we need to figure out which columns are numbers or dates...
 
+	// bail if there were no columns
+	// (eg. if the csv file was completely empty)
+	if (!columns.getLength()) {
+		return true;
+	}
+
 	// get info about these columns from the database
 	query.clear();
 	query.append("select ");
