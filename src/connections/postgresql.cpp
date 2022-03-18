@@ -1072,19 +1072,12 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 
 	// NOTE: this is a bit of a kludge.
 	//
-	// As this is set in prepareQuery(), originally, we only did this here
-	// if we don't support prepared queries.  However, since it's set to 0
-	// in closeResultSet() (see long note there as to why), we must reset
-	// it to the correct count here so that ncols will be correct for
-	// reexecuted queries.
-/*#if !((defined(HAVE_POSTGRESQL_PQPREPARE) && \
-		defined(HAVE_POSTGRESQL_PQEXECPREPARED)) || \
-		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
-		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))) || \
-		!(defined(HAVE_POSTGRESQL_PQDESCRIBEPREPARED))*/
-	// get the col count
+	// Since we set ncols in prepareQuery(), you'd think we would only need
+	// to set it here if we don't support prepared queries.  However, since
+	// it's set to 0 in closeResultSet() (see long note there as to why),
+	// we must set it again here so that it will be correct for reexecuted
+	// queries.
 	ncols=PQnfields(pgresult);
-//#endif
 
 	// validate column count
 	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
@@ -1491,7 +1484,35 @@ bool postgresqlcursor::noRowsToReturn() {
 	// if there are no columns, then there can't be any rows either
 	return (ncols)?false:true;
 #else
-	return (!nrows);
+	// Why test ncols below, if we can just test nrows?
+	//
+	// It's a bit of a kludge to improve performance, but also to work
+	// around an issue with the sqlrclient protocol.
+	//
+	// Queries which don't specify columns like "select from test"
+	// are apparently valid in postgresql.  For those queries, ncols will
+	// be set to 0 but nrows will be set to the correct row count.
+	//
+	// Unless we also check ncols here, then the server will end up spinning
+	// through all of the rows, returning nothing for each row.
+	//
+	// This is inefficient, so also checking for ncols=0 allows the server
+	// to immediately tell the client that there are no rows and proceed
+	// to closeResultSet().
+	//
+	// However, spinning through the rows, returning nothing also causes
+	// problems for the sqlrclient protocol when the result set buffer size
+	// is larger than the nrows.
+	// 
+	// For each row, the client sits there waiting for either a field type,
+	// or and end-of-result-set flag.  The server sends nothing for the
+	// first set of rows, then waits for the client to tell it to send more
+	// rows.  So, both sides end up waiting on the other.
+	//
+	// Other protocols send a marker for each row, so it wouldn't be a
+	// problem for them, but since it helps sqlrclient and generally helps
+	// improve performance, we'll go ahead and test ncols here too.
+	return (!ncols || !nrows);
 #endif
 }
 
@@ -1528,6 +1549,7 @@ bool postgresqlcursor::fetchRow(bool *error) {
 void postgresqlcursor::getField(uint32_t col,
 				const char **field, uint64_t *fieldlength,
 				bool *blob, bool *null) {
+stdoutput.printf("getField\n");
 
 	// handle NULLs
 	if (PQgetisnull(pgresult,currentrow,col)) {
