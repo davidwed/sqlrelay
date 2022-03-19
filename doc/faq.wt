@@ -476,13 +476,13 @@ Leaving the mangletypes parameter out altogether is the same as setting it to "n
 
 SQL Relay uses the libpq API to run queries against !PostgreSQL.  libpq provides 2 modes for fetching result sets.  It can either fetch and buffer the entire result set at once before allowing SQL Relay to start sending rows back to the client, or it can fetch and buffer one row at a time and allow SQL Relay to send one row at a time back to the client.
 
-fetchatonce=0 (the default) enables the first mode.  fetchatonce=1 enables the second mode.
+On the server side, fetchatonce=0 (the default) enables the first mode, and fetchatonce=1 enables the second mode.  If your queries tend to have large result sets, then you might be need to set fetchatonce=1 to conserve memory on the server side.
 
-If your queries tend to have large result sets, then you might be need to set fetchatonce=1 to conserve memory on the server side.  However, due to the quirky way PostgreSQL implements fetching one row at a time, when the result set of the nested query is closed, the result set of the outer query also ends up being closed.  This can cause unexpected behavior.
+On the clent side, the SQL Relay client has a similar option to fetchatonce - setResultSetBufferSize().  If it is set to 0 (the default) then the SQL Relay client fetches and buffers the entire result set after running a query.  If it is set to a non-0 value, then the SQL Relay client fetches and buffers the result set in blocks, where each block contains the number of specified rows.
 
-The SQL Relay client has a similar option to fetchatonce - setResultSetBufferSize().  If it is set to 0 (the default) then the SQL Relay client fetches and buffers the entire result set after running a query.  If it is set to a non-0 value, then the SQL Relay client fetches and buffers the result set in blocks, where each block contains the number of specified rows.
+The way libpq implements fetching one row at a time is quirky.  If you are running nested queries, when the result set of the inner query is closed, there is no way for the SQL Relay server to keep from also closing the result set of the outer query.  As a result, depending on how setResultSetBufferSize() has been set, problems may arise.
 
-So, if fetchatonce=1 then...
+If fetchatonce=1 then...
 
 If the SQL Relay client is using setResultSetBufferSize(0) then even though the SQL Relay server is stepping through the result set one row at a time, it will have stepped through and returned all rows of the outer query to the client, and closed the result set, before the even running the first nested query.  In this case, queries work, and memory is conserved on the server, but as the client has to buffer the entire result set, memory is not conserved on the client side.
 
@@ -493,7 +493,7 @@ So, your options are:
 * use fetchatonce=0 and expect that the server may require a lot of memory to process large result sets
 * use fetchatonce=1, always use setResultSetBufferSize(0) when running nested queries, and expect that the client may require a lot of memory to process large result sets
 
-Unfortunately, at present, with PostgreSQL, those are the only two options.
+Unfortunately, at present, with !PostgreSQL, those are the only two options.
 
 
 [[br]][=#nlslang]
