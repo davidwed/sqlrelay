@@ -482,10 +482,7 @@ then
 					done
 					if ( test -n "`ls $LIBPATH/lib$LIBNAME.*$SOSUFFIX 2> /dev/null`" )
 					then
-echo "$LIBPATH/lib$LIBNAME.*$SOSUFFIX* exists"
 						MYSQLLIBS=$MYSQLLIBSR
-					else
-echo "$LIBPATH/lib$LIBNAME.*$SOSUFFIX* does not exist"
 					fi
 				fi
 
