@@ -493,7 +493,7 @@ So, your main options are:
 * use fetchatonce=0 and expect that the server may require a lot of memory to process large result sets
 * use fetchatonce=1, always use setResultSetBufferSize(0) when running nested queries, and expect that the client may require a lot of memory to process large result sets
 
-However, there is also a "singlestep" directive module that allows you to configure the instance one way but override that configuration on a query-by-query basis.  See [admin/configguide.html#singlestep] for details.
+However, there is also a "singlestep" query directive module that allows you to configure the instance one way but override that configuration on a query-by-query basis.  See [admin/configguide.html#directives Query Directives] for general information about query directive modules and [admin/configguide.html#singlestep singlestep] for details about the singlestep module.
 
 
 [[br]][=#nlslang]
