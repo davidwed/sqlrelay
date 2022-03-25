@@ -458,7 +458,33 @@ then
 				MYSQLLIBSR=`$MYSQLCONFIG --libs_r 2> /dev/null | sed -e "s|'||g"`
 				if ( test -n "$MYSQLLIBSR" -a -z "`echo $MYSQLLIBSR | grep Usage:`" )
 				then
-					MYSQLLIBS=$MYSQLLIBSR
+
+					dnl extract the libs path and libname
+					dnl and verify that a file actually
+					dnl exists at that path
+					LIBPATH=""
+					LIBNAME=""
+					for part in `echo "$MYSQLLIBSR"`
+					do
+						if ( test "`echo $part | cut -c1-2`" = "-L" )
+						then
+							LIBPATH="`echo $part | cut -c3-1000`"
+						fi
+					done
+					for part in `echo "$MYSQLLIBSR"`
+					do
+						if ( test "`echo $part | cut -c1-2`" = "-l" )
+						then
+							LIBNAME="`echo $part | cut -c3-1000`"
+						fi
+					done
+					if ( test -n "`ls $LIBPATH/lib$LIBNAME.*$SOSUFFIX 2> /dev/null`" )
+					then
+echo "$LIBPATH/lib$LIBNAME.*$SOSUFFIX* exists"
+						MYSQLLIBS=$MYSQLLIBSR
+					else
+echo "$LIBPATH/lib$LIBNAME.*$SOSUFFIX* does not exist"
+					fi
 				fi
 
 				dnl extract the libs path
