@@ -488,12 +488,12 @@ If the SQL Relay client is using setResultSetBufferSize(0) then even though the 
 
 If the SQL Relay client calls setResultSetBufferSize() with a non-zero argument, then the SQL Relay server will only have stepped through some rows of the outer query's result set before running the first nested query, and when the nested query's result set is closed, the outer query's result set will also be closed.  At that point, the client will only be able to access whatever rows from the outer query that it had already buffered.  In this case, rows could end up being truncated in the outer query.
 
-So, your options are:
+So, your main options are:
 
 * use fetchatonce=0 and expect that the server may require a lot of memory to process large result sets
 * use fetchatonce=1, always use setResultSetBufferSize(0) when running nested queries, and expect that the client may require a lot of memory to process large result sets
 
-Unfortunately, at present, with !PostgreSQL, those are the only two options.
+However, there is also a "singlestep" directive module that allows you to configure the instance one way but override that configuration on a query-by-query basis.  See [admin/configguide.html#singlestep] for details.
 
 
 [[br]][=#nlslang]
