@@ -188,9 +188,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		bool		getFakeInputBinds();
 
 		// fetch info
-		void		setFetchAtOnce(uint32_t fao);
-		void		setMaxColumnCount(uint32_t mcc);
-		void		setMaxFieldLength(uint32_t mfl);
+		void		setFetchAtOnce(uint32_t fethatonce);
+		void		setMaxColumnCount(uint32_t maxcolumncount);
+		void		setMaxFieldLength(uint32_t maxfieldlength);
 		uint32_t	getFetchAtOnce();
 		uint32_t	getMaxColumnCount();
 		uint32_t	getMaxFieldLength();
@@ -1407,6 +1407,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		bool		getExecuteDirect();
 		void		setExecuteRpc(bool executerpc);
 		bool		getExecuteRpc();
+		void		setFetchAtOnce(uint32_t fetchatonce);
+		uint32_t	getFetchAtOnce();
 
 		void		setResultSetHeaderHasBeenHandled(
 					bool resultsetheaderhasbeenhandled);

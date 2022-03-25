@@ -9155,16 +9155,16 @@ bool sqlrservercontroller::getFakeInputBinds() {
 	return pvt->_fakeinputbinds;
 }
 
-void sqlrservercontroller::setFetchAtOnce(uint32_t fao) {
-	pvt->_fetchatonce=fao;
+void sqlrservercontroller::setFetchAtOnce(uint32_t fetchatonce) {
+	pvt->_fetchatonce=fetchatonce;
 }
 
-void sqlrservercontroller::setMaxColumnCount(uint32_t mcc) {
-	pvt->_maxcolumncount=mcc;
+void sqlrservercontroller::setMaxColumnCount(uint32_t maxcolumncount) {
+	pvt->_maxcolumncount=maxcolumncount;
 }
 
-void sqlrservercontroller::setMaxFieldLength(uint32_t mfl) {
-	pvt->_maxfieldlength=mfl;
+void sqlrservercontroller::setMaxFieldLength(uint32_t maxfieldlength) {
+	pvt->_maxfieldlength=maxfieldlength;
 }
 
 uint32_t sqlrservercontroller::getFetchAtOnce() {

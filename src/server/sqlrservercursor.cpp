@@ -109,6 +109,7 @@ class sqlrservercursorprivate {
 		uint64_t	_querytimeout;
 		bool		_executedirect;
 		bool		_executerpc;
+		uint32_t	_fetchatonce;
 
 		bool		_resultsetheaderhasbeenhandled;
 
@@ -225,6 +226,7 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_querytimeout=conn->cont->getQueryTimeout();
 	pvt->_executedirect=conn->cont->getExecuteDirect();
 	pvt->_executerpc=false;
+	pvt->_fetchatonce=conn->cont->getFetchAtOnce();
 
 	pvt->_resultsetheaderhasbeenhandled=false;
 }
@@ -1677,6 +1679,14 @@ void sqlrservercursor::setExecuteRpc(bool executerpc) {
 
 bool sqlrservercursor::getExecuteRpc() {
 	return pvt->_executerpc;
+}
+
+void sqlrservercursor::setFetchAtOnce(uint32_t fetchatonce) {
+	pvt->_fetchatonce=fetchatonce;
+}
+
+uint32_t sqlrservercursor::getFetchAtOnce() {
+	return pvt->_fetchatonce;
 }
 
 void sqlrservercursor::setResultSetHeaderHasBeenHandled(

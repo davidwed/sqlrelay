@@ -796,7 +796,7 @@ void db2cursor::allocateResultSetBuffers(int32_t columncount) {
 		loblocator=new SQLINTEGER *[columncount];
 		loblength=new SQLINTEGER *[columncount];
 		indicator=new SQLINTEGER *[columncount];
-		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		uint32_t	fetchatonce=getFetchAtOnce();
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		#if (DB2VERSION>7)
 		rowstat=new SQLUSMALLINT[fetchatonce];
@@ -845,7 +845,7 @@ bool db2cursor::open() {
 
 		// set the row array size
 		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)conn->cont->getFetchAtOnce(),0);
+					(SQLPOINTER)getFetchAtOnce(),0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
@@ -1716,7 +1716,7 @@ bool db2cursor::fetchRow(bool *error) {
 
 	*error=false;
 
-	if (rowgroupindex==conn->cont->getFetchAtOnce()) {
+	if (rowgroupindex==getFetchAtOnce()) {
 		rowgroupindex=0;
 	}
 	if (rowgroupindex>0 && rowgroupindex==totalinrowgroup) {
@@ -1744,7 +1744,7 @@ bool db2cursor::fetchRow(bool *error) {
 		// SQL_ATTR_ROW_NUMBER to always be 1, running through
 		// the row status buffer appears to work though.
 		uint32_t	index=0;
-		while (index<conn->cont->getFetchAtOnce() &&
+		while (index<getFetchAtOnce() &&
 			(rowstat[index]==SQL_ROW_SUCCESS ||
 			rowstat[index]==SQL_ROW_SUCCESS_WITH_INFO)) {
 			index++;

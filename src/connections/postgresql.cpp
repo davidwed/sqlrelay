@@ -1053,7 +1053,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	bool	getrowcount=false;
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
-	if (conn->cont->getFetchAtOnce()) {
+	if (getFetchAtOnce()) {
 		int	result=1;
 		if (bindcounter) {
 			result=PQsendQueryPrepared(postgresqlconn->pgconn,
@@ -1195,7 +1195,7 @@ void postgresqlcursor::errorMessage(char *errorbuffer,
 bool postgresqlcursor::knowsRowCount() {
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
-	if (conn->cont->getFetchAtOnce()) {
+	if (getFetchAtOnce()) {
 		return false;
 	}
 #endif
@@ -1528,7 +1528,7 @@ bool postgresqlcursor::noRowsToReturn() {
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	// if there are no columns, then there can't be any rows either
-	if (conn->cont->getFetchAtOnce()) {
+	if (getFetchAtOnce()) {
 		return !ncols;
 	} else {
 #endif
@@ -1578,7 +1578,7 @@ bool postgresqlcursor::fetchRow(bool *error) {
 
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
-	if (conn->cont->getFetchAtOnce()) {
+	if (getFetchAtOnce()) {
 		if (!justexecuted) {
 			PQclear(pgresult);
 			pgresult=PQgetResult(postgresqlconn->pgconn);
@@ -1631,7 +1631,7 @@ void postgresqlcursor::closeResultSet() {
 
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
-	if (conn->cont->getFetchAtOnce()) {
+	if (getFetchAtOnce()) {
 		for (;;) {
 			if (pgresult) {
 				PQclear(pgresult);

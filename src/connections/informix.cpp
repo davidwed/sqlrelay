@@ -831,7 +831,7 @@ void informixcursor::allocateResultSetBuffers(int32_t columncount) {
 		loblength=new SQLLEN *[columncount];
 		indicator=new SQLLEN *[columncount];
 		column=new informixcolumn[columncount];
-		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		uint32_t	fetchatonce=getFetchAtOnce();
 		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int32_t i=0; i<columncount; i++) {
 			column[i].name=new char[4096];
@@ -870,7 +870,7 @@ bool informixcursor::open() {
 
 		// set the row array size
 		erg=SQLSetStmtAttr(stmt,SQL_ATTR_ROW_ARRAY_SIZE,
-				(SQLPOINTER)conn->cont->getFetchAtOnce(),0);
+					(SQLPOINTER)getFetchAtOnce(),0);
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 			return false;
 		}
@@ -1739,7 +1739,7 @@ bool informixcursor::fetchRow(bool *error) {
 		return false;
 	}
 
-	if (rowgroupindex==conn->cont->getFetchAtOnce()) {
+	if (rowgroupindex==getFetchAtOnce()) {
 		rowgroupindex=0;
 	}
 	if (rowgroupindex>0 && rowgroupindex==totalinrowgroup) {

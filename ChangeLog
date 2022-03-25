@@ -47,6 +47,7 @@
 	postgresql connection checks ncols and nrows in noRowsToReturn() now
 	fetchatonce=0 is the default for postgresql now, and single-stepping
 		is only used if fetchatonce=1
+	added singlestep directive to override postgresql fetchatonce option
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

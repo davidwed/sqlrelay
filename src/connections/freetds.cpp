@@ -936,7 +936,7 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	templatecolumn.scale=CS_UNUSED;
 	templatecolumn.precision=CS_UNUSED;
 	templatecolumn.status=CS_UNUSED;
-	templatecolumn.count=conn->cont->getFetchAtOnce();
+	templatecolumn.count=getFetchAtOnce();
 	templatecolumn.usertype=CS_UNUSED;
 	templatecolumn.locale=NULL;
 }
@@ -969,7 +969,7 @@ void freetdscursor::allocateResultSetBuffers(int32_t columncount) {
 		data=new char *[columncount];
 		datalength=new CS_INT *[columncount];
 		nullindicator=new CS_SMALLINT *[columncount];
-		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		uint32_t	fetchatonce=getFetchAtOnce();
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int32_t i=0; i<columncount; i++) {
 			data[i]=new char[fetchatonce*maxfieldlength];
@@ -1535,7 +1535,7 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 		if (ct_cursor(cursorcmd,CS_CURSOR_ROWS,
 					NULL,CS_UNUSED,
 					NULL,CS_UNUSED,
-					(CS_INT)conn->cont->getFetchAtOnce())!=
+					(CS_INT)getFetchAtOnce())!=
 					CS_SUCCEED) {
 			return false;
 		}
@@ -2001,7 +2001,7 @@ bool freetdscursor::fetchRow(bool *error) {
 	*error=false;
 	// FIXME: set error if an error occurs
 
-	if (row==(CS_INT)conn->cont->getFetchAtOnce()) {
+	if (row==(CS_INT)getFetchAtOnce()) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {

@@ -1175,8 +1175,7 @@ routercursor::routercursor(sqlrserverconnection *conn, uint16_t id) :
 			continue;
 		}
 		curs[index]=new sqlrcursor(routerconn->cons[index]);
-		curs[index]->setResultSetBufferSize(
-					conn->cont->getFetchAtOnce());
+		curs[index]->setResultSetBufferSize(getFetchAtOnce());
 	}
 
 	obv=new outputbindvar[conn->cont->getConfig()->getMaxBindCount()];
@@ -1647,8 +1646,7 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 		if (!rcur->currentcur) {
 			return false;
 		}
-		rcur->currentcur->setResultSetBufferSize(
-					conn->cont->getFetchAtOnce());
+		rcur->currentcur->setResultSetBufferSize(getFetchAtOnce());
 		rcur->isbindcur=true;
 		rcur->nextrow=0;
 		if (!rcur->currentcur->fetchFromBindCursor()) {
