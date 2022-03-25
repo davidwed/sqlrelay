@@ -469,6 +469,7 @@ then
 						if ( test "`echo $part | cut -c1-2`" = "-L" )
 						then
 							LIBPATH="`echo $part | cut -c3-1000`"
+							break
 						fi
 					done
 					for part in `echo "$MYSQLLIBSR"`
@@ -476,6 +477,7 @@ then
 						if ( test "`echo $part | cut -c1-2`" = "-l" )
 						then
 							LIBNAME="`echo $part | cut -c3-1000`"
+							break
 						fi
 					done
 					if ( test -n "`ls $LIBPATH/lib$LIBNAME.*$SOSUFFIX 2> /dev/null`" )
@@ -495,14 +497,10 @@ echo "$LIBPATH/lib$LIBNAME.*$SOSUFFIX* does not exist"
 						if ( test "`echo $part | cut -c1-2`" = "-L" )
 						then
 							MYSQLLIBSPATH="`echo $part | cut -c3-1000`"
+							break
 						fi
 					done
-					break;
-				fi
-
-				if ( test -n "$MYSQLLIBS" )
-				then
-					break;
+					break
 				fi
 			done
 		fi
