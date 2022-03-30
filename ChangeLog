@@ -48,6 +48,7 @@
 	fetchatonce=0 is the default for postgresql now, and single-stepping
 		is only used if fetchatonce=1
 	added singlestep directive to override postgresql fetchatonce option
+	added support for PDO in PHP 8.1
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
