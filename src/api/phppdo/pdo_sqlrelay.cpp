@@ -508,9 +508,9 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 				// ...but empty strings must be returned
 				// as empty streams
 				PHP_STREAM_TO_ZVAL_P(
-					php_stream_memory_create(
-						TEMP_STREAM_DEFAULT),
-					result);
+						php_stream_memory_create(
+							TEMP_STREAM_DEFAULT),
+						result);
 				if (coltype) {
 					*coltype=PDO_PARAM_LOB;
 				}
