@@ -516,7 +516,6 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 				}
 			}
 		} else {
-#if 1
 			php_stream	*strm=php_stream_memory_create(
 							TEMP_STREAM_DEFAULT);
 			TSRMLS_FETCH();
@@ -526,12 +525,6 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 			if (coltype) {
 				*coltype=PDO_PARAM_LOB;
 			}
-#else
-			ZVAL_STRINGL(result,ptr,len);
-			if (coltype) {
-				*coltype=PDO_PARAM_STR;
-			}
-#endif
 		}
 	} else if (isBoolTypeChar(type)) {
 		if (!sqlrcur->getFieldLength(sqlrstmt->currentrow,colno)) {
