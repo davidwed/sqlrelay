@@ -29,7 +29,10 @@
 	$dbtype=$dbh->getAttribute(PDO::SQLRELAY_ATTR_DB_TYPE);
 
 	if ($dbtype!="firebird") {
-		$dbh->exec("drop table testtable");
+		try {
+			$dbh->exec("drop table testtable");
+		} catch (Exception $e) {
+		}
 		echo("CREATE TEMPTABLE: \n");
 		checkSuccess($dbh->exec("create table testtable (testinteger int)"),0);
 		echo("\n");

@@ -28,7 +28,10 @@
 	}
 
 	# drop existing table
-	$dbh->exec("drop table testtable");
+	try {
+		$dbh->exec("drop table testtable");
+	} catch (Exception $e) {
+	}
 
 	echo("CREATE TEMPTABLE: \n");
 	$dbh->exec("create table testtable (testfloat float, testdouble double)");

@@ -471,88 +471,73 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 			return 1;
 	}
 #else
-	const char	*type=sqlrcur->getColumnType(colno);
-	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
-		if (isFloatTypeChar(type)) {
-			// FIXME: is this correct, there is no
-			// PDO_PARAM_ZVAL or PDO_PARAM_DOUBLE,
-			// or should I just make a string out of it?
-			ZVAL_DOUBLE(result,
-				sqlrcur->getFieldAsDouble(
-						sqlrstmt->currentrow,colno));
-			if (coltype) {
-				*coltype=PDO_PARAM_STR;
-			}
-		} else {
-			ZVAL_LONG(result,
-				sqlrcur->getFieldAsInteger(
-						sqlrstmt->currentrow,colno));
-			if (coltype) {
-				*coltype=PDO_PARAM_INT;
-			}
-		}
-	} else if (isBlobTypeChar(type)) {
-		// lobs can be usually be returned as strings...
-		const char	*ptr=
+	enum pdo_param_type ctype;
+
+	const char	*ptr=
 			sqlrcur->getField(sqlrstmt->currentrow,colno);
-		uint64_t	 len=
+	uint64_t	 len=
 			sqlrcur->getFieldLength(sqlrstmt->currentrow,colno);
-		if (!len) {
-			if (!ptr) {
-				// NULLs can be returned as NULLs
-				ZVAL_NULL(result);
-				if (coltype) {
-					*coltype=PDO_PARAM_NULL;
-				}
-			} else {
-				// ...but empty strings must be returned
-				// as empty streams
-				PHP_STREAM_TO_ZVAL_P(
+	const char	*type=sqlrcur->getColumnType(colno);
+
+	if (!len) {
+
+		// handle NULLs and empty strings
+		if (ptr) {
+			if (isBlobTypeChar(type)) {
+				// empty lobs must be sent as empty streams
+				php_stream	*strm=
 						php_stream_memory_create(
-							TEMP_STREAM_DEFAULT),
-						result);
-				if (coltype) {
-					*coltype=PDO_PARAM_LOB;
-				}
+							TEMP_STREAM_DEFAULT);
+				PHP_STREAM_TO_ZVAL_P(strm,result);
+				ctype=PDO_PARAM_LOB;
+			} else {
+				ZVAL_STRINGL(result,ptr,0);
+				ctype=PDO_PARAM_STR;
 			}
 		} else {
+			ZVAL_NULL(result);
+			ctype=PDO_PARAM_NULL;
+		}
+
+	} else {
+
+		if (isBitTypeChar(type) || isNumberTypeChar(type)) {
+			if (isFloatTypeChar(type)) {
+				// FIXME: is this correct, there is no
+				// PDO_PARAM_ZVAL or PDO_PARAM_DOUBLE,
+				// or should I just make a string out of it?
+				ZVAL_DOUBLE(result,
+					sqlrcur->getFieldAsDouble(
+						sqlrstmt->currentrow,colno));
+				ctype=PDO_PARAM_STR;
+			} else {
+				ZVAL_LONG(result,
+					sqlrcur->getFieldAsInteger(
+						sqlrstmt->currentrow,colno));
+				ctype=PDO_PARAM_INT;
+			}
+		} else if (isBlobTypeChar(type)) {
 			php_stream	*strm=php_stream_memory_create(
 							TEMP_STREAM_DEFAULT);
 			TSRMLS_FETCH();
 			php_stream_write(strm,ptr,len);
 			php_stream_seek(strm,0,SEEK_SET);
 			PHP_STREAM_TO_ZVAL_P(strm,result);
-			if (coltype) {
-				*coltype=PDO_PARAM_LOB;
-			}
-		}
-	} else if (isBoolTypeChar(type)) {
-		if (!sqlrcur->getFieldLength(sqlrstmt->currentrow,colno)) {
-			// handle NULLs/empty-strings
-			ZVAL_STRINGL(result,
-					sqlrcur->getField(
-						sqlrstmt->currentrow,colno),0);
-			if (coltype) {
-				*coltype=PDO_PARAM_STR;
-			}
-		} else {
+			ctype=PDO_PARAM_LOB;
+		} else if (isBoolTypeChar(type)) {
 			ZVAL_BOOL(result,
-				(bool)sqlrcur->
-					getFieldAsInteger(
+				(bool)sqlrcur->getFieldAsInteger(
 						sqlrstmt->currentrow,colno));
-			if (coltype) {
-				*coltype=PDO_PARAM_BOOL;
-			}
-		}
-	} else {
-		ZVAL_STRINGL(result,sqlrcur->getField(
-						sqlrstmt->currentrow,colno),
-					sqlrcur->getFieldLength(
-						sqlrstmt->currentrow,colno));
-		if (coltype) {
-			*coltype=PDO_PARAM_STR;
+			ctype=PDO_PARAM_BOOL;
+		} else {
+			ZVAL_STRINGL(result,ptr,len);
+			ctype=PDO_PARAM_STR;
 		}
 	}
+	if (coltype) {
+		*coltype=ctype;
+	}
+	return 1;
 #endif
 	return 1;
 }

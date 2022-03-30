@@ -28,7 +28,10 @@
 	}
 
 	# drop existing table
-	$dbh->exec("drop table testtable");
+	try {
+		$dbh->exec("drop table testtable");
+	} catch (Exception $e) {
+	}
 
 	echo("CREATE TEMPTABLE: \n");
 	checkSuccess($dbh->exec("create table testtable (testnumber number, testchar char(40), testvarchar varchar(40), testdate date, testlong long, testclob clob, testblob blob)"),0);
@@ -512,7 +515,10 @@
 	echo("\n");
 
 	echo("COMMIT AND ROLLBACK: \n");
-	$dbh->exec("drop table testtable1");
+	try {
+		$dbh->exec("drop table testtable1");
+	} catch (Exception $e) {
+	}
 	checkSuccess($dbh->exec("create table testtable1 (testnumber number)"),0);
 	if (method_exists($dbh,"inTransaction")) {
 		checkSuccess($dbh->inTransaction(),0);
@@ -578,8 +584,14 @@
 	echo("\n");
 
 	# drop testtables
-	$dbh->exec("drop table testtable");
-	$dbh->exec("drop table testtable1");
+	try {
+		$dbh->exec("drop table testtable");
+	} catch (Exception $e) {
+	}
+	try {
+		$dbh->exec("drop table testtable1");
+	} catch (Exception $e) {
+	}
 
 # output binds don't appear to work with PDO for PHP7
 if (PHP_VERSION_ID < 70000) {
@@ -606,7 +618,10 @@ if (PHP_VERSION_ID < 70000) {
 	echo("\n");
 
 	echo("CLOB AND BLOB OUTPUT BIND: \n");
-	$dbh->exec("drop table testtable1");
+	try {
+		$dbh->exec("drop table testtable1");
+	} catch (Exception $e) {
+	}
 	checkSuccess($dbh->exec("create table testtable1 (testclob clob, testblob blob)"),0);
 	$stmt=$dbh->prepare("insert into testtable1 values ('hello',:var1)");
 	checkSuccess($stmt->bindValue("var1","hello",PDO::PARAM_LOB),true);
@@ -619,7 +634,10 @@ if (PHP_VERSION_ID < 70000) {
 	echo("\n");
 
 	echo("CLOB AND BLOB OUTPUT BIND TO AND FROM FILE: \n");
-	$dbh->exec("drop table testtable1");
+	try {
+		$dbh->exec("drop table testtable1");
+	} catch (Exception $e) {
+	}
 	checkSuccess($dbh->exec("create table testtable1 (testclob clob, testblob blob)"),0);
 	$stmt=$dbh->prepare("insert into testtable1 values ('hello',:var1)");
 	$stream=fopen("test.blob","w+b");
@@ -679,6 +697,9 @@ if (PHP_VERSION_ID < 70000) {
 	#checkSuccess($stmt->bindValue(1,1,9999),true);
 	echo("\n");
 
-	$dbh->exec("drop table testtable");
+	try {
+		$dbh->exec("drop table testtable");
+	} catch (Exception $e) {
+	}
 
 ?></pre></html>
