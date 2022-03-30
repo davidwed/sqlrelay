@@ -354,7 +354,6 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	const char	*n=sqlrcur->getColumnName(colno);
-	const char	*type=sqlrcur->getColumnType(colno);
 #if PHP_MAJOR_VERSION >= 7
 	stmt->columns[colno].name=zend_string_init(n,charstring::length(n),0);
 #else
@@ -363,6 +362,8 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	stmt->columns[colno].namelen=charstring::length(name);
 #endif
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+	const char	*type=sqlrcur->getColumnType(colno);
 	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
 		if (isFloatTypeChar(type)) {
 			#ifdef HAVE_PHP_PDO_PARAM_ZVAL
@@ -382,23 +383,31 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	} else {
 		stmt->columns[colno].param_type=PDO_PARAM_STR;
 	}
+#endif
 	stmt->columns[colno].precision=sqlrcur->getColumnPrecision(colno);
 	return 1;
 }
 
 static int sqlrcursorGetField(pdo_stmt_t *stmt,
 				int colno,
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 				char **ptr,
-#if PHP_MAJOR_VERSION >= 7
+	#if PHP_MAJOR_VERSION >= 7
 				size_t *len,
-#else
+	#else
 				unsigned long *len,
+	#endif
+				int *caller_frees TSRMLS_DC
+#else
+				zval *result,
+				enum pdo_param_type *coltype TSRMLS_DC
 #endif
-				int *caller_frees TSRMLS_DC) {
+				) {
 
 	sqlrstatement	*sqlrstmt=(sqlrstatement *)stmt->driver_data;
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	*caller_frees=0;
 
 	switch (stmt->columns[colno].param_type) {
@@ -461,6 +470,97 @@ static int sqlrcursorGetField(pdo_stmt_t *stmt,
 		default:
 			return 1;
 	}
+#else
+	const char	*type=sqlrcur->getColumnType(colno);
+	if (isBitTypeChar(type) || isNumberTypeChar(type)) {
+		if (isFloatTypeChar(type)) {
+			// FIXME: is this correct, there is no
+			// PDO_PARAM_ZVAL or PDO_PARAM_DOUBLE,
+			// or should I just make a string out of it?
+			ZVAL_DOUBLE(result,
+				sqlrcur->getFieldAsDouble(
+						sqlrstmt->currentrow,colno));
+			if (coltype) {
+				*coltype=PDO_PARAM_STR;
+			}
+		} else {
+			ZVAL_LONG(result,
+				sqlrcur->getFieldAsInteger(
+						sqlrstmt->currentrow,colno));
+			if (coltype) {
+				*coltype=PDO_PARAM_INT;
+			}
+		}
+	} else if (isBlobTypeChar(type)) {
+		// lobs can be usually be returned as strings...
+		const char	*ptr=
+			sqlrcur->getField(sqlrstmt->currentrow,colno);
+		uint64_t	 len=
+			sqlrcur->getFieldLength(sqlrstmt->currentrow,colno);
+		if (!len) {
+			if (!ptr) {
+				// NULLs can be returned as NULLs
+				ZVAL_NULL(result);
+				if (coltype) {
+					*coltype=PDO_PARAM_NULL;
+				}
+			} else {
+				// ...but empty strings must be returned
+				// as empty streams
+				PHP_STREAM_TO_ZVAL_P(
+					php_stream_memory_create(
+						TEMP_STREAM_DEFAULT),
+					result);
+				if (coltype) {
+					*coltype=PDO_PARAM_LOB;
+				}
+			}
+		} else {
+#if 1
+			php_stream	*strm=php_stream_memory_create(
+							TEMP_STREAM_DEFAULT);
+			TSRMLS_FETCH();
+			php_stream_write(strm,ptr,len);
+			php_stream_seek(strm,0,SEEK_SET);
+			PHP_STREAM_TO_ZVAL_P(strm,result);
+			if (coltype) {
+				*coltype=PDO_PARAM_LOB;
+			}
+#else
+			ZVAL_STRINGL(result,ptr,len);
+			if (coltype) {
+				*coltype=PDO_PARAM_STR;
+			}
+#endif
+		}
+	} else if (isBoolTypeChar(type)) {
+		if (!sqlrcur->getFieldLength(sqlrstmt->currentrow,colno)) {
+			// handle NULLs/empty-strings
+			ZVAL_STRINGL(result,
+					sqlrcur->getField(
+						sqlrstmt->currentrow,colno),0);
+			if (coltype) {
+				*coltype=PDO_PARAM_STR;
+			}
+		} else {
+			ZVAL_BOOL(result,
+				(bool)sqlrcur->
+					getFieldAsInteger(
+						sqlrstmt->currentrow,colno));
+			if (coltype) {
+				*coltype=PDO_PARAM_BOOL;
+			}
+		}
+	} else {
+		ZVAL_STRINGL(result,sqlrcur->getField(
+						sqlrstmt->currentrow,colno),
+					sqlrcur->getFieldLength(
+						sqlrstmt->currentrow,colno));
+		if (coltype) {
+			*coltype=PDO_PARAM_STR;
+		}
+	}
+#endif
 	return 1;
 }
 
@@ -949,11 +1049,20 @@ static struct pdo_stmt_methods sqlrcursorMethods={
 };
 
 
-static int sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+int
+#else
+void
+#endif
+sqlrconnectionClose(pdo_dbh_t *dbh TSRMLS_DC) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	delete sqlrdbh->sqlrcon;
 	dbh->is_closed=1;
+	#if PHP_MAJOR_VERSION < 8 || \
+		(PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	return 0;
+	#endif
 }
 
 static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
@@ -1078,14 +1187,25 @@ static void sqlrconnectionRewriteQuery(sqlrconnection *sqlrcon,
 	} while (ptr<endptr);
 }
 
-static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
-#if PHP_MAJOR_VERSION >= 7
-					size_t sqllen,
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+int
 #else
-					long sqllen,
+bool
 #endif
-					pdo_stmt_t *stmt,
-					zval *driveroptions TSRMLS_DC) {
+sqlrconnectionPrepare(pdo_dbh_t *dbh,
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+				const char *sql,
+	#if PHP_MAJOR_VERSION >= 7
+				size_t sqllen,
+	#else
+				long sqllen,
+	#endif
+#else
+				zend_string *zsql,
+#endif
+				pdo_stmt_t *stmt,
+				zval *driveroptions TSRMLS_DC) {
 
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrstatement	*sqlrstmt=new sqlrstatement;
@@ -1135,6 +1255,11 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	// hopefully this is ok.
 	stmt->supports_placeholders=PDO_PLACEHOLDER_POSITIONAL;
 
+#if PHP_MAJOR_VERSION > 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION >= 1)
+	const char	*sql=ZSTR_VAL(zsql);
+	size_t		sqllen=ZSTR_LEN(zsql);
+#endif
+
 	if (sqlrdbh->usesubvars) {
 		sqlrconnectionRewriteQuery(sqlrdbh->sqlrcon,sql,sqllen,
 							&sqlrstmt->subvarquery);
@@ -1150,7 +1275,12 @@ static int sqlrconnectionPrepare(pdo_dbh_t *dbh, const char *sql,
 	if (!charstring::isNullOrEmpty(sql)) {
 		sqlrstmt->sqlrcur->prepareQuery(sql,sqllen);
 	}
+
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	return 1;
+#else
+	return true;
+#endif
 }
 
 static
@@ -1160,13 +1290,23 @@ zend_long
 long
 #endif
 sqlrconnectionExecute(pdo_dbh_t *dbh,
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 					const char *sql,
-#if PHP_MAJOR_VERSION >= 7
+	#if PHP_MAJOR_VERSION >= 7
 					size_t sqllen TSRMLS_DC
-#else
+	#else
 					long sqllen TSRMLS_DC
+	#endif
+#else
+					const zend_string *zsql TSRMLS_DC
 #endif
 					) {
+
+#if PHP_MAJOR_VERSION > 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION >= 1)
+	const char	*sql=ZSTR_VAL(zsql);
+	size_t		sqllen=ZSTR_LEN(zsql);
+#endif
+
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	sqlrcursor	sqlrcur((sqlrconnection *)sqlrdbh->sqlrcon);
 	if (sqlrcur.sendQuery(sql,sqllen)) {
@@ -1176,18 +1316,28 @@ sqlrconnectionExecute(pdo_dbh_t *dbh,
 	return -1;
 }
 
-static int sqlrconnectionQuote(pdo_dbh_t *dbh,
-					const char *unquoted,
-#if PHP_MAJOR_VERSION >= 7
-					size_t unquotedlen,
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+int
 #else
-					int unquotedlen,
+zend_string *
 #endif
+sqlrconnectionQuote(pdo_dbh_t *dbh,
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+					const char *unquoted,
+	#if PHP_MAJOR_VERSION >= 7
+					size_t unquotedlen,
+	#else
+					int unquotedlen,
+	#endif
 					char **quoted,
-#if PHP_MAJOR_VERSION >= 7
+	#if PHP_MAJOR_VERSION >= 7
 					size_t *quotedlen,
-#else
+	#else
 					int *quotedlen,
+	#endif
+#else
+					const zend_string *zunquoted,
 #endif
 					enum pdo_param_type paramtype TSRMLS_DC
 					) {
@@ -1198,10 +1348,22 @@ static int sqlrconnectionQuote(pdo_dbh_t *dbh,
 	int	i;
 #endif
 
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	// fail if quoted/quotedlen weren't provided
 	if (!quoted || !quotedlen) {
 		return 0;
 	}
+#else
+	const char	*unquoted=ZSTR_VAL(zunquoted);
+	size_t		unquotedlen=ZSTR_LEN(zunquoted);
+
+	// this is awkward, but it allows us to use
+	// the exisiting code below with PHP 8.1+
+	char	*q=NULL;
+	size_t	qlen=0;
+	char	**quoted=&q;
+	size_t	*quotedlen=&qlen;
+#endif
 
 	// determine size of new string
 	*quotedlen=unquotedlen+2;
@@ -1230,10 +1392,21 @@ static int sqlrconnectionQuote(pdo_dbh_t *dbh,
 	ptr++;
 	*ptr='\0';
 
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	return 1;
+#else
+	// FIXME: free q?
+	return zend_string_init(q,qlen,0);
+#endif
 }
 
-static int sqlrconnectionBegin(pdo_dbh_t *dbh TSRMLS_DC) {
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+int
+#else
+bool
+#endif
+sqlrconnectionBegin(pdo_dbh_t *dbh TSRMLS_DC) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	if (((sqlrconnection *)sqlrdbh->sqlrcon)->begin()) {
 		return 1;
@@ -1242,7 +1415,13 @@ static int sqlrconnectionBegin(pdo_dbh_t *dbh TSRMLS_DC) {
 	return 0;
 }
 
-static int sqlrconnectionCommit(pdo_dbh_t *dbh TSRMLS_DC) {
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+int
+#else
+bool
+#endif
+sqlrconnectionCommit(pdo_dbh_t *dbh TSRMLS_DC) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	if (((sqlrconnection *)sqlrdbh->sqlrcon)->commit()) {
 		return 1;
@@ -1251,7 +1430,13 @@ static int sqlrconnectionCommit(pdo_dbh_t *dbh TSRMLS_DC) {
 	return 0;
 }
 
-static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) { 
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+int
+#else
+bool
+#endif
+sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) { 
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	if (((sqlrconnection *)sqlrdbh->sqlrcon)->rollback()) {
 		return 1;
@@ -1260,7 +1445,13 @@ static int sqlrconnectionRollback(pdo_dbh_t *dbh TSRMLS_DC) {
 	return 0;
 }
 
-static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+int
+#else
+bool
+#endif
+sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 #if PHP_MAJOR_VERSION >= 7
 					zend_long attr,
 #else
@@ -1363,26 +1554,43 @@ static int sqlrconnectionSetAttribute(pdo_dbh_t *dbh,
 	}
 }
 
-static char *sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
-					const char *name,
-#if PHP_MAJOR_VERSION >= 7
-					size_t *len TSRMLS_DC
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+char *
 #else
+zend_string *
+#endif
+sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+					const char *name,
+	#if PHP_MAJOR_VERSION >= 7
+					size_t *len TSRMLS_DC
+	#else
 					unsigned int *len TSRMLS_DC
+	#endif
+#else
+					const zend_string *name TSRMLS_DC
 #endif
 					) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
-	char	*id=php_pdo_int64_to_str(
+	char	*id=charstring::parseNumber(
 				((sqlrconnection *)sqlrdbh->sqlrcon)->
-							getLastInsertId()
-				TSRMLS_CC);
+							getLastInsertId());
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	*len=charstring::length(id);
 	return id;
+#else
+	return zend_string_init(id,charstring::length(id),0);
+#endif
 }
 
-static int sqlrconnectionError(pdo_dbh_t *dbh,
-					pdo_stmt_t *stmt,
-					zval *info TSRMLS_DC) {
+static
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
+int
+#else
+void
+#endif
+sqlrconnectionError(pdo_dbh_t *dbh, pdo_stmt_t *stmt, zval *info TSRMLS_DC) {
 
 	// FIXME: the first index in the info array should be the sqlstate
 	// currently we're leaving it at HY000 but it really ought to be
@@ -1410,7 +1618,9 @@ static int sqlrconnectionError(pdo_dbh_t *dbh,
 			ADD_NEXT_INDEX_STRING_P(info,msg);
 		}
 	}
+#if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	return 1;
+#endif
 }
 
 static int sqlrconnectionGetAttribute(pdo_dbh_t *dbh,
