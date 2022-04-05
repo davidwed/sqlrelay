@@ -14,7 +14,8 @@ SRCS = sqlrconnection.cpp \
 	sqlrimportcsv.cpp \
 	sqlrexport.cpp \
 	sqlrexportxml.cpp \
-	sqlrexportcsv.cpp
+	sqlrexportcsv.cpp \
+	sqlrcrud.cpp
 LOBJS = sqlrconnection.$(OBJ) \
 	sqlrcursor.$(OBJ) \
 	sqlrscalar.$(OBJ) \
@@ -27,7 +28,8 @@ LOBJS = sqlrconnection.$(OBJ) \
 	sqlrimportcsv.$(OBJ) \
 	sqlrexport.$(OBJ) \
 	sqlrexportxml.$(OBJ) \
-	sqlrexportcsv.$(OBJ)
+	sqlrexportcsv.$(OBJ) \
+	sqlrcrud.$(OBJ)
 
 .SUFFIXES: .lo .obj .cpp
 

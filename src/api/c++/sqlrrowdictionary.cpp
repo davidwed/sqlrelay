@@ -56,7 +56,7 @@ bool sqlrrowdictionary::getIsReadOnly() const {
 	return true;
 }
 
-bool sqlrrowdictionary::getTrackInsertionOrder() {
+bool sqlrrowdictionary::getTrackInsertionOrder() const {
 	return true;
 }
 
