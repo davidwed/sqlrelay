@@ -57,6 +57,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrclient.h
 	$(CP) sqlrelay/sqlrcollections.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrcollections.h
+	$(CP) sqlrelay/sqlrcrud.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrcrud.h
 	$(CP) sqlrelay/sqlrimport.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimport.h
 	$(CP) sqlrelay/sqlrimportcsv.h $(includedir)/sqlrelay
@@ -73,6 +75,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrclientincludes.h
 	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconnection.h
+	$(CP) sqlrelay/private/sqlrcrud.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcrud.h
 	$(CP) sqlrelay/private/sqlrcursor.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcursor.h
 	$(CP) sqlrelay/private/sqlrscalar.h $(includedir)/sqlrelay/private
@@ -91,6 +95,8 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnode.h
 	$(CP) sqlrelay/private/sqlrcollectionsincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcollectionsincludes.h
+	$(CP) sqlrelay/private/sqlrcrudincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcrudincludes.h
 	$(CP) sqlrelay/private/sqlrimportincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportincludes.h
 	$(CP) sqlrelay/private/sqlrimport.h $(includedir)/sqlrelay/private
