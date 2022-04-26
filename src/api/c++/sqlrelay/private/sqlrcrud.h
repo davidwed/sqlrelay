@@ -6,10 +6,21 @@
 		uint64_t	countColumns(const char * const *columns);
 		void		copyColumns(const char * const *columns);
 
-		void	buildWhere(const char * const *criteria,
-						stringbuffer *wherestr);
-		void	buildOrderBy(const char * const *sort,
-						stringbuffer *orderbystr);
+		bool	buildWhere(const char *criteria,
+					stringbuffer *wherestr);
+		bool	buildOrderBy(const char *sort,
+					stringbuffer *orderbystr);
+		bool	buildClause(const char *domstr,
+					stringbuffer *strb,
+					bool where);
+		bool	buildJSONWhere(domnode *criteria,
+					stringbuffer *wherestr);
+		bool	buildXMLWhere(domnode *criteria,
+					stringbuffer *wherestr);
+		bool	buildJSONOrderBy(domnode *sort,
+					stringbuffer *orderbystr);
+		bool	buildXMLOrderBy(domnode *sort,
+					stringbuffer *orderbystr);
 
 		sqlrconnection	*con;
 		sqlrcursor	*cur;
@@ -30,3 +41,6 @@
 		sqlrrowdictionary	rdct;
 		sqlrresultsetlinkedlist	rslst;
 		sqlrresultsettable	rstbl;
+
+		xmldom	x;
+		jsondom	j;

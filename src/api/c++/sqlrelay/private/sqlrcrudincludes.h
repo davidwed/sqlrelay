@@ -2,3 +2,5 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrcollections.h>
+#include <rudiments/jsondom.h>
+#include <rudiments/xmldom.h>

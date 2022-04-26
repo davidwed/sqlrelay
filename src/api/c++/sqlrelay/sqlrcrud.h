@@ -37,17 +37,16 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		const char	*getDeleteQuery();
 
 		bool	doCreate(const char * const *columns,
-				const char * const *values);
+					const char * const *values);
 
-		bool	doRead(const char * const *criteria,
-				const char * const *sort,
-				uint64_t skip, uint64_t fetch);
+		bool	doRead(const char *criteria, const char *sort,
+					uint64_t skip, uint64_t fetch);
 
 		bool	doUpdate(const char * const * columns,
-				const char * const *values,
-				const char * const *criteria);
+					const char * const *values,
+					const char *criteria);
 
-		bool	doDelete(const char * const *criteria);
+		bool	doDelete(const char *criteria);
 
 		const char	*getErrorMessage();
 		int64_t		getErrorCode();

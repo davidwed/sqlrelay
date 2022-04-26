@@ -256,17 +256,22 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	return cur->executeQuery();
 }
 
-bool sqlrcrud::doRead(const char * const *criteria,
-			const char * const *sort,
-			uint64_t skip, uint64_t fetch) {
+bool sqlrcrud::doRead(const char *criteria, const char *sort,
+				uint64_t skip, uint64_t fetch) {
 
 	// build $(WHERE)
 	stringbuffer	wherestr;
-	buildWhere(criteria,&wherestr);
+	if (!buildWhere(criteria,&wherestr)) {
+		// FIXME: set error
+		return false;
+	}
 
 	// build $(ORDERBY)
 	stringbuffer	orderbystr;
-	buildOrderBy(sort,&orderbystr);
+	if (!buildOrderBy(sort,&orderbystr)) {
+		// FIXME: set error
+		return false;
+	}
 
 	// FIXME: implement skip/fetch
 
@@ -277,19 +282,96 @@ bool sqlrcrud::doRead(const char * const *criteria,
 	return cur->executeQuery();
 }
 
-void sqlrcrud::buildWhere(const char * const *criteria,
-					stringbuffer *wherestr) {
-	// FIXME: implement this
+bool sqlrcrud::buildWhere(const char *criteria, stringbuffer *wherestr) {
+	return buildClause(criteria,wherestr,true);
 }
 
-void sqlrcrud::buildOrderBy(const char * const *sort,
-					stringbuffer *orderbystr) {
-	// FIXME: implement this
+bool sqlrcrud::buildOrderBy(const char *sort, stringbuffer *orderbystr) {
+	return buildClause(sort,orderbystr,false);
+}
+
+bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
+
+	// domstr should be an XML or JSON string, parse it...
+
+	// skip whitespace
+	const char *c=domstr;
+	while (character::isWhitespace(*c)) {
+		 c++;
+	}
+	if (!c) {
+		return true;
+	}
+
+	// if it's JSON...
+	if (*c=='{') {
+
+		// parse the JSON and build the where clause
+		if (!j.parseString(c)) {
+			// FIXME: set error
+			return false;
+		}
+		return (where)?buildJSONWhere(j.getRootNode(),strb):
+				buildJSONOrderBy(j.getRootNode(),strb);
+	} else
+
+	// if it's XML
+	if (*c=='<') {
+
+		// parse the XML and build the where clause
+		if (!x.parseString(c)) {
+			// FIXME: set error
+			return false;
+		}
+		return (where)?buildXMLWhere(x.getRootNode(),strb):
+				buildXMLOrderBy(x.getRootNode(),strb);
+	}
+	
+	// FIXME: set error
+	return false;
+}
+
+bool sqlrcrud::buildJSONWhere(domnode *critera, stringbuffer *wherestr) {
+
+	// critera should be something like:
+	// <field t="s" v="col1"/>
+	// <operator t="s" v="="/>
+	// <value t="s" v="val1"/>
+	// <boolean t="s" v="and"/>
+	// <field t="s" v="col2"/>
+	// <operator t="s" v="in"/>
+	// <list t="a">
+	//   <v t="s" v="val1"/>
+	//   <v t="s" v="val2"/>
+	//   <v t="s" v="val3"/>
+	// </list>
+	// <boolean t="s" v="and"/>
+	// <group t="o">
+	// ...
+	// </group>
+
+	// FIXME: implement this...
+	return true;
+}
+
+bool sqlrcrud::buildXMLWhere(domnode *critera, stringbuffer *wherestr) {
+	// FIXME: implement this...
+	return true;
+}
+
+bool sqlrcrud::buildJSONOrderBy(domnode *sort, stringbuffer *orderbystr) {
+	// FIXME: implement this...
+	return true;
+}
+
+bool sqlrcrud::buildXMLOrderBy(domnode *sort, stringbuffer *orderbystr) {
+	// FIXME: implement this...
+	return true;
 }
 
 bool sqlrcrud::doUpdate(const char * const *columns,
 			const char * const *values,
-			const char * const *criteria) {
+			const char *criteria) {
 
 	// build $(SET)
 	stringbuffer	setstr;
@@ -340,7 +422,10 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 
 	// build $(WHERE)
 	stringbuffer	wherestr;
-	buildWhere(criteria,&wherestr);
+	if (!buildWhere(criteria,&wherestr)) {
+		// FIXME: set error
+		return false;
+	}
 
 	// prepare and execute
 	cur->prepareQuery(updatequery.getString());
@@ -349,11 +434,14 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 	return cur->executeQuery();
 }
 
-bool sqlrcrud::doDelete(const char * const *criteria) {
+bool sqlrcrud::doDelete(const char *criteria) {
 
 	// build $(WHERE)
 	stringbuffer	wherestr;
-	buildWhere(criteria,&wherestr);
+	if (!buildWhere(criteria,&wherestr)) {
+		// FIXME: set error
+		return false;
+	}
 
 	// prepare and execute
 	cur->prepareQuery(deletequery.getString());
