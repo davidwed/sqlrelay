@@ -392,6 +392,10 @@ bool sqlrimportxml::fieldTagEnd() {
 
 bool sqlrimportxml::text(const char *string) {
 	if (infield) {
+		const char	*s=fieldmap.getValue(string);
+		if (s) {
+			string=s;
+		}
 		foundfieldtext=true;
 		if (!charstring::isNullOrEmpty(string)) {
 			if (!numbercolumn[currentcol]) {

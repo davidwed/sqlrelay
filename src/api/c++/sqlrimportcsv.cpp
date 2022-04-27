@@ -344,6 +344,12 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 	// if we should include this field...
 	if (includefield) {
 
+		// if this value has a mapping, then get that
+		const char	*v=fieldmap.getValue(value);
+		if (v) {
+			value=v;
+		}
+
 		// append the field
 		stringbuffer	tmp;
 		appendField(&tmp,value,currenttablecol,false);

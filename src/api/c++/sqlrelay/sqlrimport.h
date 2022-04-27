@@ -66,6 +66,10 @@ class SQLRCLIENT_DLLSPEC sqlrimport {
 		/** Upper-cases colum names. */
 		void	upperCaseColumnNames();
 
+		/** Maps field value "from" to "to".  If "to" is NULL then
+		 *  the field is unmapped. */
+		void	mapFieldValue(const char *from, const char *to);
+
 		/** Call commit after every "commitcount" inserts.  If set to 0
 		 *  then no commits will be called and the commit behavior will
 		 *  depend on the behavior of the instance of sqlrelay that we
