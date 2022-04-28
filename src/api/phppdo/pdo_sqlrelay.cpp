@@ -1551,11 +1551,13 @@ sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 #endif
 					) {
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
-	char	*id=charstring::parseNumber(
-				((sqlrconnection *)sqlrdbh->sqlrcon)->
-							getLastInsertId());
+	uint64_t	lastid=((sqlrconnection *)sqlrdbh->sqlrcon)->
+							getLastInsertId();
+	uint16_t	idlen=charstring::integerLength(lastid)+1;
+	char		*id=(char *)safe_emalloc(idlen,sizeof(char),0);
+	charstring::printf(id,idlen,"%d",lastid);
 #if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
-	*len=charstring::length(id);
+	*len=idlen;
 	return id;
 #else
 	return zend_string_init(id,charstring::length(id),0);
