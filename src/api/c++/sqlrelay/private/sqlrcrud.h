@@ -13,13 +13,13 @@
 		bool	buildClause(const char *domstr,
 					stringbuffer *strb,
 					bool where);
-		bool	buildJSONWhere(domnode *criteria,
+		bool	buildJsonWhere(domnode *criteria,
 					stringbuffer *wherestr);
-		bool	buildXMLWhere(domnode *criteria,
+		bool	buildXmlWhere(domnode *criteria,
 					stringbuffer *wherestr);
-		bool	buildJSONOrderBy(domnode *sort,
+		bool	buildJsonOrderBy(domnode *sort,
 					stringbuffer *orderbystr);
-		bool	buildXMLOrderBy(domnode *sort,
+		bool	buildXmlOrderBy(domnode *sort,
 					stringbuffer *orderbystr);
 
 		sqlrconnection	*con;

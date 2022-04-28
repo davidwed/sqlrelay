@@ -311,8 +311,8 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 			// FIXME: set error
 			return false;
 		}
-		return (where)?buildJSONWhere(j.getRootNode(),strb):
-				buildJSONOrderBy(j.getRootNode(),strb);
+		return (where)?buildJsonWhere(j.getRootNode(),strb):
+				buildJsonOrderBy(j.getRootNode(),strb);
 	} else
 
 	// if it's XML
@@ -323,17 +323,17 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 			// FIXME: set error
 			return false;
 		}
-		return (where)?buildXMLWhere(x.getRootNode(),strb):
-				buildXMLOrderBy(x.getRootNode(),strb);
+		return (where)?buildXmlWhere(x.getRootNode(),strb):
+				buildXmlOrderBy(x.getRootNode(),strb);
 	}
 	
 	// FIXME: set error
 	return false;
 }
 
-bool sqlrcrud::buildJSONWhere(domnode *critera, stringbuffer *wherestr) {
+bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 
-	// critera should be something like:
+	// criteria should be something like:
 	// <field t="s" v="col1"/>
 	// <operator t="s" v="="/>
 	// <value t="s" v="val1"/>
@@ -350,21 +350,107 @@ bool sqlrcrud::buildJSONWhere(domnode *critera, stringbuffer *wherestr) {
 	// ...
 	// </group>
 
+	bool	first=true;
+	for (domnode *node=criteria->getFirstTagChild();
+				!node->isNullNode();
+				node=node->getNextTagSibling()) {
+		if (first) {
+			first=false;
+		} else {
+			wherestr->append(' ');
+		}
+
+		const char	*v=node->getAttributeValue("v");
+		if (!charstring::compare(node->getName(),"field")) {
+			// FIXME: validate v
+			wherestr->append(v);
+		} else if (!charstring::compare(node->getName(),"operator")) {
+			// FIXME: validate v
+			wherestr->append(v);
+		} else if (!charstring::compare(node->getName(),"boolean")) {
+			// FIXME: validate v
+			wherestr->append(v);
+		} else if (!charstring::compare(node->getName(),"value")) {
+			bool	isstr=!charstring::compare(
+					node->getAttributeValue("t"),"s");
+			if (isstr) {
+				wherestr->append("'");
+			}
+			// FIXME: validate v
+			wherestr->append(v);
+			if (isstr) {
+				wherestr->append("'");
+			}
+		} else if (!charstring::compare(node->getName(),"list")) {
+			wherestr->append("in (");
+			bool	firstin=true;
+			for (domnode *innode=criteria->getFirstTagChild();
+					!innode->isNullNode();
+					innode=innode->getNextTagSibling()) {
+				if (firstin) {
+					firstin=false;
+				} else {
+					wherestr->append(',');
+				}
+				bool	isstr=!charstring::compare(
+					innode->getAttributeValue("t"),"s");
+				if (isstr) {
+					wherestr->append("'");
+				}
+				// FIXME: validate v
+				wherestr->append(v);
+				if (isstr) {
+					wherestr->append("'");
+				}
+			}
+		} else if (!charstring::compare(node->getName(),"group")) {
+			wherestr->append("(");
+			if (!buildJsonWhere(node,wherestr)) {
+				return false;
+			}
+			wherestr->append(")");
+		}
+	}
+	return true;
+}
+
+bool sqlrcrud::buildXmlWhere(domnode *criteria, stringbuffer *wherestr) {
 	// FIXME: implement this...
 	return true;
 }
 
-bool sqlrcrud::buildXMLWhere(domnode *critera, stringbuffer *wherestr) {
-	// FIXME: implement this...
+bool sqlrcrud::buildJsonOrderBy(domnode *sort, stringbuffer *orderbystr) {
+
+	// sort should be something like:
+	// <field t="s" v="col1"/>
+	// <field t="s" v="col2"/>
+	// <order t="s" v="asc"/>
+	// <field t="s" v="col3"/>
+	// <order t="s" v="desc"/>
+
+	bool	first=true;
+	for (domnode *node=sort->getFirstTagChild();
+				!node->isNullNode();
+				node=node->getNextTagSibling()) {
+		if (first) {
+			first=false;
+		} else {
+			orderbystr->append(", ");
+		}
+
+		const char	*v=node->getAttributeValue("v");
+		if (!charstring::compare(node->getName(),"field")) {
+			// FIXME: validate v
+			orderbystr->append(v);
+		} else if (!charstring::compare(node->getName(),"order")) {
+			// FIXME: validate v
+			orderbystr->append(' ')->append(v);
+		}
+	}
 	return true;
 }
 
-bool sqlrcrud::buildJSONOrderBy(domnode *sort, stringbuffer *orderbystr) {
-	// FIXME: implement this...
-	return true;
-}
-
-bool sqlrcrud::buildXMLOrderBy(domnode *sort, stringbuffer *orderbystr) {
+bool sqlrcrud::buildXmlOrderBy(domnode *sort, stringbuffer *orderbystr) {
 	// FIXME: implement this...
 	return true;
 }
