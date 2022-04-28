@@ -1711,6 +1711,8 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	// display stats
 	stdoutput.write('\n');
+	stdoutput.printf("	Affected Rows   : ");
+	stdoutput.printf("%lld\n",(long long)sqlrcur->affectedRows());
 	stdoutput.printf("	Rows Returned   : ");
 	stdoutput.printf("%lld\n",(long long)sqlrcur->rowCount());
 	stdoutput.printf("	Fields Returned : ");
