@@ -26,6 +26,7 @@
 		sqlrcursor	*cur;
 
 		char	*table;
+		char	*idsequence;
 		char	*primarykey;
 		char	*autoinc;
 

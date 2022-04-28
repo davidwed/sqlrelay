@@ -61,6 +61,11 @@ void sqlrcrud::setTable(const char *table) {
 	this->table=charstring::duplicate(table);
 }
 
+void sqlrcrud::setIdSequence(const char *idsequence) {
+	delete[] this->idsequence;
+	this->idsequence=charstring::duplicate(idsequence);
+}
+
 void sqlrcrud::setPrimaryKeyColumn(const char *primarykey) {
 	delete[] this->primarykey;
 	this->primarykey=charstring::duplicate(primarykey);
@@ -78,6 +83,10 @@ void sqlrcrud::setColumns(const char * const *columns) {
 
 const char *sqlrcrud::getTable() {
 	return table;
+}
+
+const char *sqlrcrud::getIdSequence() {
+	return idsequence;
 }
 
 const char *sqlrcrud::getPrimaryKeyColumn() {
@@ -217,6 +226,11 @@ bool sqlrcrud::doCreate(const char * const *columns,
 			if (!charstring::compare(*c,autoinc)) {
 				continue;
 			}
+			if (!charstring::compare(*c,primarykey)) {
+				valstr.append("nextval('");
+				valstr.append(idsequence);
+				valstr.append("')");
+			}
 			if (first) {
 				first=false;
 			} else {
@@ -230,6 +244,11 @@ bool sqlrcrud::doCreate(const char * const *columns,
 			if (!charstring::compare(*c,autoinc)) {
 				continue;
 			}
+			if (!charstring::compare(*c,primarykey)) {
+				valstr.append("nextval('");
+				valstr.append(idsequence);
+				valstr.append("')");
+			}
 			if (col>1) {
 				valstr.append(',');
 			}
@@ -241,6 +260,11 @@ bool sqlrcrud::doCreate(const char * const *columns,
 		for (const char * const *c=columns; *c; c++) {
 			if (!charstring::compare(*c,autoinc)) {
 				continue;
+			}
+			if (!charstring::compare(*c,primarykey)) {
+				valstr.append("nextval('");
+				valstr.append(idsequence);
+				valstr.append("')");
 			}
 			if (first) {
 				first=false;

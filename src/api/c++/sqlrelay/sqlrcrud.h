@@ -15,11 +15,13 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		void	setSqlrCursor(sqlrcursor *cur);
 
 		void	setTable(const char *table);
+		void	setIdSequence(const char *idsequence);
 		void	setPrimaryKeyColumn(const char *primarykey);
 		void	setAutoIncrementColumn(const char *autoinc);
 		void	setColumns(const char * const *columns);
 
 		const char	*getTable();
+		const char	*getIdSequence();
 		const char	*getPrimaryKeyColumn();
 		const char	*getAutoIncrementColumn();
 		const char * const *getColumns();
