@@ -31,6 +31,8 @@
 
 		char	**columns;
 
+		stringbuffer	error;
+
 		stringbuffer	createquery;
 		stringbuffer	readquery;
 		stringbuffer	updatequery;

@@ -39,8 +39,9 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		bool	doCreate(const char * const *columns,
 					const char * const *values);
 
-		bool	doRead(const char *criteria, const char *sort,
-					uint64_t skip, uint64_t fetch);
+		bool	doRead(const char *criteria,
+					const char *sort,
+					uint64_t skip);
 
 		bool	doUpdate(const char * const * columns,
 					const char * const *values,

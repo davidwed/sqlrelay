@@ -190,6 +190,9 @@ const char *sqlrcrud::getDeleteQuery() {
 bool sqlrcrud::doCreate(const char * const *columns,
 			const char * const *values) {
 
+	// clear any previous error
+	error.clear();
+
 	// build $(COLUMNS)
 	stringbuffer	colstr;
 	bool	first=true;
@@ -256,30 +259,33 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	return cur->executeQuery();
 }
 
-bool sqlrcrud::doRead(const char *criteria, const char *sort,
-				uint64_t skip, uint64_t fetch) {
+bool sqlrcrud::doRead(const char *criteria, const char *sort, uint64_t skip) {
+
+	// clear any previous error
+	error.clear();
 
 	// build $(WHERE)
 	stringbuffer	wherestr;
 	if (!buildWhere(criteria,&wherestr)) {
-		// FIXME: set error
 		return false;
 	}
 
 	// build $(ORDERBY)
 	stringbuffer	orderbystr;
 	if (!buildOrderBy(sort,&orderbystr)) {
-		// FIXME: set error
 		return false;
 	}
-
-	// FIXME: implement skip/fetch
 
 	// prepare and execute
 	cur->prepareQuery(readquery.getString());
 	cur->substitution("WHERE",wherestr.getString());
 	cur->substitution("ORDERBY",orderbystr.getString());
-	return cur->executeQuery();
+	bool	success=cur->executeQuery();
+
+	// skip to the "skip"th row
+	cur->getField(skip,(uint32_t)0);
+
+	return success;
 }
 
 bool sqlrcrud::buildWhere(const char *criteria, stringbuffer *wherestr) {
@@ -308,7 +314,7 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 
 		// parse the JSON and build the where clause
 		if (!j.parseString(c)) {
-			// FIXME: set error
+			error.append(j.getError());
 			return false;
 		}
 		return (where)?buildJsonWhere(j.getRootNode(),strb):
@@ -320,14 +326,17 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 
 		// parse the XML and build the where clause
 		if (!x.parseString(c)) {
-			// FIXME: set error
+			error.append(x.getError());
 			return false;
 		}
 		return (where)?buildXmlWhere(x.getRootNode(),strb):
 				buildXmlOrderBy(x.getRootNode(),strb);
 	}
 	
-	// FIXME: set error
+	// unrecognized format
+	error.append("unrecognized ")->
+		append((where)?"where":"order by")->
+		append(" clause format");
 	return false;
 }
 
@@ -459,6 +468,9 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 			const char * const *values,
 			const char *criteria) {
 
+	// clear any previous error
+	error.clear();
+
 	// build $(SET)
 	stringbuffer	setstr;
 	const char	*bindformat=con->bindFormat();
@@ -509,7 +521,6 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 	// build $(WHERE)
 	stringbuffer	wherestr;
 	if (!buildWhere(criteria,&wherestr)) {
-		// FIXME: set error
 		return false;
 	}
 
@@ -522,10 +533,12 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 
 bool sqlrcrud::doDelete(const char *criteria) {
 
+	// clear any previous error
+	error.clear();
+
 	// build $(WHERE)
 	stringbuffer	wherestr;
 	if (!buildWhere(criteria,&wherestr)) {
-		// FIXME: set error
 		return false;
 	}
 
@@ -536,10 +549,16 @@ bool sqlrcrud::doDelete(const char *criteria) {
 }
 
 const char *sqlrcrud::getErrorMessage() {
+	if (error.getSize()) {
+		return error.getString();
+	}
 	return cur->errorMessage();
 }
 
 int64_t sqlrcrud::getErrorCode() {
+	if (error.getSize()) {
+		return 0;
+	}
 	return cur->errorNumber();
 }
 
