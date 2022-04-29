@@ -2,9 +2,11 @@
 // See the file COPYING for more information
 
 #include <sqlrelay/sqlrcrud.h>
+#include <rudiments/memorypool.h>
 
 sqlrcrud::sqlrcrud() {
 	table=NULL;
+	idsequence=NULL;
 	primarykey=NULL;
 	autoinc=NULL;
 	columns=NULL;
@@ -211,9 +213,6 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	stringbuffer	colstr;
 	bool	first=true;
 	for (const char * const *c=columns; *c; c++) {
-		if (!charstring::compare(*c,autoinc)) {
-			continue;
-		}
 		if (first) {
 			first=false;
 		} else {
@@ -225,66 +224,77 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	// build $(VALUES)
 	stringbuffer	valstr;
 	const char	*bindformat=con->bindFormat();
-	if (bindformat[0]=='?') {
-		first=true;
-		for (const char * const *c=columns; *c; c++) {
-			if (!charstring::compare(*c,autoinc)) {
-				continue;
-			}
-			if (!charstring::compare(*c,primarykey)) {
-				valstr.append("nextval('");
-				valstr.append(idsequence);
-				valstr.append("')");
-			}
-			if (first) {
-				first=false;
-			} else {
-				valstr.append(',');
-			}
-			valstr.append('?');
+	uint64_t	col=1;
+	first=true;
+	for (const char * const *c=columns; *c; c++) {
+		if (first) {
+			first=false;
+		} else {
+			valstr.append(',');
 		}
-	} else if (bindformat[0]=='$') {
-		uint64_t	col=1;
-		for (const char * const *c=columns; *c; c++) {
-			if (!charstring::compare(*c,autoinc)) {
-				continue;
+		if (!charstring::compareIgnoringCase(*c,autoinc)) {
+			valstr.append("null");
+		} else if (!charstring::compareIgnoringCase(
+						*c,primarykey)) {
+			// FIXME: this works for oracle and ???
+			valstr.append(idsequence);
+			valstr.append(".nextval");
+			// FIXME: this works for postgresql and ???
+			//valstr.append("nextval('");
+			//valstr.append(idsequence);
+			//valstr.append("')");
+		} else {
+			if (bindformat[0]=='?') {
+				valstr.append('?');
+			} else if (bindformat[0]=='$') {
+				valstr.append('$')->append(col);
+				col++;
+			} else if (bindformat[0]=='@' || bindformat[0]==':') {
+				valstr.append(bindformat[0])->append(*c);
 			}
-			if (!charstring::compare(*c,primarykey)) {
-				valstr.append("nextval('");
-				valstr.append(idsequence);
-				valstr.append("')");
-			}
-			if (col>1) {
-				valstr.append(',');
-			}
-			valstr.append('$')->append(col);
-			col++;
-		}
-	} else if (bindformat[0]=='@' || bindformat[0]==':') {
-		first=true;
-		for (const char * const *c=columns; *c; c++) {
-			if (!charstring::compare(*c,autoinc)) {
-				continue;
-			}
-			if (!charstring::compare(*c,primarykey)) {
-				valstr.append("nextval('");
-				valstr.append(idsequence);
-				valstr.append("')");
-			}
-			if (first) {
-				first=false;
-			} else {
-				valstr.append(',');
-			}
-			valstr.append(bindformat[0]);
-			valstr.append(*c);
 		}
 	}
 
-	// prepare and execute
+	// prepare
 	cur->prepareQuery(createquery.getString());
+
+	// substitute
 	cur->substitution("COLUMNS",colstr.getString());
 	cur->substitution("VALUES",valstr.getString());
+
+	// bind
+	const char * const *c=columns;
+	const char * const *v=values;
+	memorypool	m;
+	if (bindformat[0]=='?'|| bindformat[0]=='$') {
+		uint64_t	i=1;
+		while (*v) {
+			if (charstring::compareIgnoringCase(
+							*c,autoinc) &&
+				charstring::compareIgnoringCase(
+							*c,primarykey)) {
+				uint16_t	len=
+						charstring::integerLength(i);
+				char		*b=(char *)m.allocate(len+1);
+				charstring::printf(b,len,"%lld",i);
+				cur->inputBind(b,*v);
+			}
+			v++;
+		}
+	} else if (bindformat[0]=='@' || bindformat[0]==':') {
+		while (*c && *v) {
+			if (charstring::compareIgnoringCase(
+							*c,autoinc) &&
+				charstring::compareIgnoringCase(
+							*c,primarykey)) {
+				cur->inputBind(*c,*v);
+			}
+			c++;
+			v++;
+		}
+	}
+
+	// execute
 	return cur->executeQuery();
 }
 
