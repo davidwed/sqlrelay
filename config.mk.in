@@ -796,7 +796,7 @@ endif
 
 
 # tests
-TESTALLSUBDIRS = all-c all-cpp all-java all-protocol all-stress all-tcl
+TESTALLSUBDIRS = all-c all-cpp all-java all-protocol all-stress all-tcl all-crud
 ifneq ($(HAVE_MONO),)
 TESTALLSUBDIRS += all-cs
 endif

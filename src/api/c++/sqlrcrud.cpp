@@ -59,6 +59,11 @@ void sqlrcrud::setSqlrCursor(sqlrcursor *cur) {
 void sqlrcrud::setTable(const char *table) {
 	delete[] this->table;
 	this->table=charstring::duplicate(table);
+
+	if (charstring::isNullOrEmpty(idsequence)) {
+		delete[] idsequence;
+		charstring::printf(&idsequence,"%s_ids",table);
+	}
 }
 
 void sqlrcrud::setIdSequence(const char *idsequence) {
