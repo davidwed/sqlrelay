@@ -399,6 +399,8 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 	// </group>
 
 	bool	first=true;
+	// FIXME: I need to be able to print this out
+	// as an xmldom to debug this easily...
 	for (domnode *node=criteria->getFirstTagChild();
 				!node->isNullNode();
 				node=node->getNextTagSibling()) {

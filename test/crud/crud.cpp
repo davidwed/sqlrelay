@@ -7,6 +7,7 @@
 
 sqlrconnection	*con;
 sqlrcursor	*cur;
+sqlrcrud	*crud;
 
 void checkSuccess(const char *value, const char *success) {
 
@@ -16,7 +17,11 @@ void checkSuccess(const char *value, const char *success) {
 			return;
 		} else {
 			stdoutput.printf("%s!=%s\n",value,success);
-			stdoutput.printf("failure ");
+			stdoutput.printf("failure\n");
+			stdoutput.printf("%lld: %s\n",
+					crud->getErrorCode(),
+					crud->getErrorMessage());
+			delete crud;
 			delete cur;
 			delete con;
 			process::exit(1);
@@ -27,7 +32,11 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%s!=%s\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure\n");
+		stdoutput.printf("%lld: %s\n",
+				crud->getErrorCode(),
+				crud->getErrorMessage());
+		delete crud;
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -42,7 +51,11 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 			return;
 		} else {
 			stdoutput.printf("%s!=%s\n",value,success);
-			stdoutput.printf("failure ");
+			stdoutput.printf("failure\n");
+			stdoutput.printf("%lld: %s\n",
+					crud->getErrorCode(),
+					crud->getErrorMessage());
+			delete crud;
 			delete cur;
 			delete con;
 			process::exit(1);
@@ -53,7 +66,11 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%s!=%s\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure\n");
+		stdoutput.printf("%lld: %s\n",
+				crud->getErrorCode(),
+				crud->getErrorMessage());
+		delete crud;
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -66,7 +83,11 @@ void checkSuccess(int value, int success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%d!=%d\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure\n");
+		stdoutput.printf("%lld: %s\n",
+				crud->getErrorCode(),
+				crud->getErrorMessage());
+		delete crud;
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -79,7 +100,11 @@ void checkSuccess(double value, double success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%f!=%f\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure\n");
+		stdoutput.printf("%lld: %s\n",
+				crud->getErrorCode(),
+				crud->getErrorMessage());
+		delete crud;
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -92,11 +117,11 @@ int main(int argc, char **argv) {
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
-	sqlrcrud	c;
-	c.setSqlrConnection(con);
-	c.setSqlrCursor(cur);
-	c.setTable("testtable");
-	c.buildQueries();
+	crud=new sqlrcrud;
+	crud->setSqlrConnection(con);
+	crud->setSqlrCursor(cur);
+	crud->setTable("testtable");
+	crud->buildQueries();
 
 	// drop existing table and sequence
 	cur->sendQuery("drop table testtable");
@@ -108,46 +133,45 @@ int main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	// create (insert)
-con->debugOn();
 	stdoutput.printf("CREATE (insert): \n");
 	const char	*cols[]={"testtable_id","col1","col2","col3",NULL};
-	const char	*vals1[]={"","val1","1","current_date",NULL};
-	const char	*vals2[]={"","val2","2","current_date",NULL};
-	const char	*vals3[]={"","val3","3","current_date",NULL};
-	const char	*vals4[]={"","val4","4","current_date",NULL};
-	const char	*vals5[]={"","val5","5","current_date",NULL};
-	checkSuccess(c.doCreate(cols,vals1),true);
-	checkSuccess(c.doCreate(cols,vals2),true);
-	checkSuccess(c.doCreate(cols,vals3),true);
-	checkSuccess(c.doCreate(cols,vals4),true);
-	checkSuccess(c.doCreate(cols,vals5),true);
+	const char	*vals1[]={"","val1","1","01-JAN-2000",NULL};
+	const char	*vals2[]={"","val2","2","02-FEB-2000",NULL};
+	const char	*vals3[]={"","val3","3","03-MAR-2000",NULL};
+	const char	*vals4[]={"","val4","4","04-APR-2000",NULL};
+	const char	*vals5[]={"","val5","5","05-MAY-2000",NULL};
+	checkSuccess(crud->doCreate(cols,vals1),true);
+	checkSuccess(crud->doCreate(cols,vals2),true);
+	checkSuccess(crud->doCreate(cols,vals3),true);
+	checkSuccess(crud->doCreate(cols,vals4),true);
+	checkSuccess(crud->doCreate(cols,vals5),true);
 	stdoutput.printf("\n");
 
 	// read (select)
 	stdoutput.printf("READ (select): \n");
 	const char	*criteria=
-	"{"
-	"	field: 'col1',"
-	"	operator: '=',"
-	"	value: 'val11',"
-	"	boolean: 'and',"
-	"	field: 'col2',"
-	"	operator: '=',"
-	"	value: 'val12'"
-	"	boolean: 'and',"
-	"	field: 'col3',"
-	"	operator: '=',"
-	"	value: 'val13'"
-	"}";
+	"{\n"
+	"	\"field\": \"col1\",\n"
+	"	\"operator\": \"=\",\n"
+	"	\"value\": \"val11\",\n"
+	"	\"boolean\": \"and\",\n"
+	"	\"field\": \"col2\",\n"
+	"	\"operator\": \"=\",\n"
+	"	\"value\": \"val12\",\n"
+	"	\"boolean\": \"and\",\n"
+	"	\"field\": \"col3\",\n"
+	"	\"operator\": \"=\",\n"
+	"	\"value\": \"val13\"\n"
+	"}\n";
 	const char	*sort=
-	"{"
-	"	field: 'col1',"
-	"	field: 'col2',"
-	"	order: 'asc',"
-	"	field: 'col3',"
-	"	order: 'desc'"
-	"}";
-	checkSuccess(c.doRead(criteria,sort,0),true);
+	"{\n"
+	"	\"field\": \"col1\",\n"
+	"	\"field\": \"col2\",\n"
+	"	\"order\": \"asc\",\n"
+	"	\"field\": \"col3\",\n"
+	"	\"order\": \"desc\"\n"
+	"}\n";
+	checkSuccess(crud->doRead(criteria,sort,0),true);
 	stdoutput.printf("\n");
 
 	// drop table and sequence
