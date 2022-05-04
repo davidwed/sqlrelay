@@ -382,32 +382,39 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 
 	// criteria should be something like:
-	// <field t="s" v="col1"/>
-	// <operator t="s" v="="/>
-	// <value t="s" v="val1"/>
-	// <boolean t="s" v="and"/>
-	// <field t="s" v="col2"/>
-	// <operator t="s" v="in"/>
-	// <list t="a">
-	//   <v t="s" v="val1"/>
-	//   <v t="s" v="val2"/>
-	//   <v t="s" v="val3"/>
-	// </list>
-	// <boolean t="s" v="and"/>
-	// <group t="o">
-	// ...
-	// </group>
+	// <r t="s">
+	//   <field t="s" v="col1"/>
+	//   <operator t="s" v="="/>
+	//   <value t="s" v="val1"/>
+	//   <boolean t="s" v="and"/>
+	//   <field t="s" v="col2"/>
+	//   <operator t="s" v="in"/>
+	//   <list t="a">
+	//     <v t="s" v="val1"/>
+	//     <v t="s" v="val2"/>
+	//     <v t="s" v="val3"/>
+	//   </list>
+	//   <boolean t="s" v="and"/>
+	//   <group t="o">
+	//   ...
+	//   </group>
+	// </r>
+	//
+	// or it may be some nested part of that
+
+	// skip into any "r" (json root object) nodes
+	if (!charstring::compare(criteria->getFirstTagChild()->getName(),"r")) {
+		criteria=criteria->getFirstTagChild();
+	}
 
 	bool	first=true;
-	// FIXME: I need to be able to print this out
-	// as an xmldom to debug this easily...
 	for (domnode *node=criteria->getFirstTagChild();
-				!node->isNullNode();
-				node=node->getNextTagSibling()) {
+					!node->isNullNode();
+					node=node->getNextTagSibling()) {
+
 		if (first) {
+			wherestr->append(" where ");
 			first=false;
-		} else {
-			wherestr->append(' ');
 		}
 
 		const char	*v=node->getAttributeValue("v");
@@ -419,7 +426,7 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 			wherestr->append(v);
 		} else if (!charstring::compare(node->getName(),"boolean")) {
 			// FIXME: validate v
-			wherestr->append(v);
+			wherestr->append(' ')->append(v)->append(' ');
 		} else if (!charstring::compare(node->getName(),"value")) {
 			bool	isstr=!charstring::compare(
 					node->getAttributeValue("t"),"s");
@@ -472,25 +479,33 @@ bool sqlrcrud::buildXmlWhere(domnode *criteria, stringbuffer *wherestr) {
 bool sqlrcrud::buildJsonOrderBy(domnode *sort, stringbuffer *orderbystr) {
 
 	// sort should be something like:
-	// <field t="s" v="col1"/>
-	// <field t="s" v="col2"/>
-	// <order t="s" v="asc"/>
-	// <field t="s" v="col3"/>
-	// <order t="s" v="desc"/>
+	// <r t="o">
+	//   <field t="s" v="col1"/>
+	//   <field t="s" v="col2"/>
+	//   <order t="s" v="asc"/>
+	//   <field t="s" v="col3"/>
+	//   <order t="s" v="desc"/>
+	// </r>
+
+	// skip into any "r" (json root object) nodes
+	if (!charstring::compare(sort->getFirstTagChild()->getName(),"r")) {
+		sort=sort->getFirstTagChild();
+	}
 
 	bool	first=true;
 	for (domnode *node=sort->getFirstTagChild();
 				!node->isNullNode();
 				node=node->getNextTagSibling()) {
-		if (first) {
-			first=false;
-		} else {
-			orderbystr->append(", ");
-		}
 
 		const char	*v=node->getAttributeValue("v");
 		if (!charstring::compare(node->getName(),"field")) {
 			// FIXME: validate v
+			if (first) {
+				orderbystr->append(" order by ");
+				first=false;
+			} else {
+				orderbystr->append(", ");
+			}
 			orderbystr->append(v);
 		} else if (!charstring::compare(node->getName(),"order")) {
 			// FIXME: validate v
