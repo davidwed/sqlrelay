@@ -134,18 +134,18 @@ int main(int argc, char **argv) {
 					"col2 int, "
 					"col3 date)"),true);
 	checkSuccess(cur->sendQuery("create sequence testtable_ids"),true);
-	stdoutput.printf("\n");
+	stdoutput.printf("\n\n");
 
 	// set up columns and values
 	const char	*cols[]={
 		"testtable_id","col1","col2","col3",NULL
 	};
 	const char	*vals[][4]={
-		{"val1","1","01-JAN-2000",NULL},
-		{"val2","2","02-JAN-2000",NULL},
-		{"val3","3","03-JAN-2000",NULL},
-		{"val4","4","04-JAN-2000",NULL},
-		{"val5","5","05-JAN-2000",NULL},
+		{"val1","1","01-JAN-00",NULL},
+		{"val2","2","02-JAN-00",NULL},
+		{"val3","3","03-JAN-00",NULL},
+		{"val4","4","04-JAN-00",NULL},
+		{"val5","5","05-JAN-00",NULL},
 	};
 
 	// create (insert)
@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
 		checkSuccess(crud->doCreate(cols,v),true);
 		delete[] v;
 	}
-	stdoutput.printf("\n");
+	stdoutput.printf("\n\n");
 
 	// read (select)
 	stdoutput.printf("READ (select): \n");
@@ -180,7 +180,7 @@ int main(int argc, char **argv) {
 			// contains more columns in the where/sort clause:
 			// 	1) col1=val1
 			// 	2) col1=val1 and col2=1
-			// 	3) col1=val1 and col2=1 and col3=01-JAN-2000
+			// 	3) col1=val1 and col2=1 and col3=01-JAN-00
 			// 	etc.
 
 
@@ -216,12 +216,13 @@ int main(int argc, char **argv) {
 			// check col/row counts
 			checkSuccess(cur->colCount(),4);
 			checkSuccess(cur->rowCount(),1);
+			stdoutput.printf("\n");
 
 			// check results
-			for (uint16_t k=1; k<j; k++) {
+			for (uint16_t k=0; k<3; k++) {
 				checkSuccess(!charstring::compare(
-							cur->getField(0,k),
-							vals[i][k-1]),true);
+							cur->getField(0,k+1),
+							vals[i][k]),true);
 			}
 			stdoutput.printf("\n");
 
@@ -267,7 +268,7 @@ int main(int argc, char **argv) {
 			// 	etc.
 			v[0]=(j>0)?"0":vals[i][0];
 			v[1]=(j>1)?"0":vals[i][1];
-			v[2]=(j>2)?"12-DEC-2000":vals[i][2];
+			v[2]=(j>2)?"12-DEC-00":vals[i][2];
 			v[3]=NULL;
 
 			// run the query
@@ -284,8 +285,8 @@ int main(int argc, char **argv) {
 			checkSuccess(cur->colCount(),4);
 			checkSuccess(cur->rowCount(),1);
 			stdoutput.printf("\n");
-			for (uint16_t k=1; k<=3; k++) {
-				checkSuccess(cur->getField(0,k),v[k-1]);
+			for (uint16_t k=0; k<3; k++) {
+				checkSuccess(cur->getField(0,k+1),v[k]);
 			}
 			stdoutput.printf("\n");
 		}
@@ -293,12 +294,48 @@ int main(int argc, char **argv) {
 		// clean up
 		criteria.clear();
 	}
+	stdoutput.printf("\n");
 
 	// clean up
 	delete[] c;
 	delete[] v;
 
 	// delete
+	stdoutput.printf("DELETE: \n");
+	criteria.clear();
+	for (uint16_t i=0; i<5; i++) {
+
+		// build criteria:
+		// 	1) testtable_id=1
+		// 	2) testtable_id=2
+		// 	3) testtable_id=3
+		// 	etc.
+		criteria.appendFormatted(
+			"{\n"
+			"	\"field\": \"testtable_id\",\n"
+			"	\"operator\": \"=\",\n"
+			"	\"value\": \"%d\"\n"
+			"}\n",
+			i+1);
+
+		// run the query
+		checkSuccess(crud->doDelete(criteria.getString()),true);
+
+		// check affected rows
+		checkSuccess(cur->affectedRows(),1);
+
+		// validate updates to the row
+		checkSuccess(
+			cur->sendQuery("select count(*) from testtable"),true);
+		checkSuccess(charstring::toInteger(
+			cur->getField(0,(uint32_t)0)),4-i);
+		stdoutput.printf("\n");
+
+		// clean up
+		criteria.clear();
+	}
+	stdoutput.printf("\n");
+
 
 	// drop table and sequence
 	cur->sendQuery("drop table testtable");
