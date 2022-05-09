@@ -263,6 +263,18 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	cur->substitution("VALUES",valstr.getString());
 
 	// bind
+	bind(bindformat,columns,values);
+
+	// execute
+	return cur->executeQuery();
+}
+
+void sqlrcrud::bind(const char *bindformat,
+				const char * const *columns,
+				const char * const *values) {
+
+	// FIXME: there's no way to bind a NULL or non-string with this...
+
 	const char * const *c=columns;
 	const char * const *v=values;
 	memorypool	m;
@@ -293,9 +305,6 @@ bool sqlrcrud::doCreate(const char * const *columns,
 			v++;
 		}
 	}
-
-	// execute
-	return cur->executeQuery();
 }
 
 bool sqlrcrud::doRead(const char *criteria, const char *sort, uint64_t skip) {
@@ -336,6 +345,10 @@ bool sqlrcrud::buildOrderBy(const char *sort, stringbuffer *orderbystr) {
 }
 
 bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
+
+	if (!domstr) {
+		return true;
+	}
 
 	// domstr should be an XML or JSON string, parse it...
 
@@ -580,10 +593,17 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 		return false;
 	}
 
-	// prepare and execute
+	// prepare
 	cur->prepareQuery(updatequery.getString());
+
+	// substitute
 	cur->substitution("SET",setstr.getString());
 	cur->substitution("WHERE",wherestr.getString());
+
+	// bind
+	bind(bindformat,columns,values);
+
+	// execute
 	return cur->executeQuery();
 }
 

@@ -6,6 +6,10 @@
 		uint64_t	countColumns(const char * const *columns);
 		void		copyColumns(const char * const *columns);
 
+		void		bind(const char *bindformat,
+					const char * const *columns,
+					const char * const *values);
+
 		bool	buildWhere(const char *criteria,
 					stringbuffer *wherestr);
 		bool	buildOrderBy(const char *sort,
