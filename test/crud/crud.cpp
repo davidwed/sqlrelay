@@ -213,15 +213,17 @@ int main(int argc, char **argv) {
 			checkSuccess(crud->doRead(criteria.getString(),
 						sort.getString(),0),true);
 
+			sqlrresultsettable	*t=crud->getResultSetTable();
+
 			// check col/row counts
-			checkSuccess(cur->colCount(),4);
-			checkSuccess(cur->rowCount(),1);
+			checkSuccess(t->getColumnCount(),4);
+			checkSuccess(t->getRowCount(),1);
 			stdoutput.printf("\n");
 
 			// check results
 			for (uint16_t k=0; k<3; k++) {
 				checkSuccess(!charstring::compare(
-							cur->getField(0,k+1),
+							t->getValue(0,k+1),
 							vals[i][k]),true);
 			}
 			stdoutput.printf("\n");
@@ -276,17 +278,19 @@ int main(int argc, char **argv) {
 					c,v,criteria.getString()),true);
 
 			// check affected rows
-			checkSuccess(cur->affectedRows(),1);
+			checkSuccess(crud->getAffectedRows(),1);
 			stdoutput.printf("\n");
+
+			sqlrresultsettable	*t=crud->getResultSetTable();
 
 			// validate updates to the row
 			checkSuccess(crud->doRead(
 					criteria.getString(),NULL,0),true);
-			checkSuccess(cur->colCount(),4);
-			checkSuccess(cur->rowCount(),1);
+			checkSuccess(t->getColumnCount(),4);
+			checkSuccess(t->getRowCount(),1);
 			stdoutput.printf("\n");
 			for (uint16_t k=0; k<3; k++) {
-				checkSuccess(cur->getField(0,k+1),v[k]);
+				checkSuccess(t->getValue(0,k+1),v[k]);
 			}
 			stdoutput.printf("\n");
 		}
@@ -322,7 +326,7 @@ int main(int argc, char **argv) {
 		checkSuccess(crud->doDelete(criteria.getString()),true);
 
 		// check affected rows
-		checkSuccess(cur->affectedRows(),1);
+		checkSuccess(crud->getAffectedRows(),1);
 
 		// validate updates to the row
 		checkSuccess(
