@@ -346,106 +346,15 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 	return false;
 }
 
-#if 0
-bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
-
-	// criteria should be something like:
-	// <r t="s">
-	//   <field t="s" v="col1"/>
-	//   <operator t="s" v="="/>
-	//   <value t="s" v="val1"/>
-	//   <boolean t="s" v="and"/>
-	//   <field t="s" v="col2"/>
-	//   <operator t="s" v="in"/>
-	//   <list t="a">
-	//     <v t="s" v="val1"/>
-	//     <v t="s" v="val2"/>
-	//     <v t="s" v="val3"/>
-	//   </list>
-	//   <boolean t="s" v="and"/>
-	//   <group t="o">
-	//   ...
-	//   </group>
-	// </r>
-	//
-	// or it may be some nested part of that
-
-	// skip into any "r" (json root object) nodes
-	if (!charstring::compare(criteria->getFirstTagChild()->getName(),"r")) {
-		criteria=criteria->getFirstTagChild();
-	}
-
-	bool	first=true;
-	for (domnode *node=criteria->getFirstTagChild();
-					!node->isNullNode();
-					node=node->getNextTagSibling()) {
-
-		if (first) {
-			wherestr->append(" where ");
-			first=false;
-		}
-
-		const char	*v=node->getAttributeValue("v");
-		if (!charstring::compare(node->getName(),"field")) {
-			// FIXME: validate v
-			wherestr->append(v);
-		} else if (!charstring::compare(node->getName(),"operator")) {
-			// FIXME: validate v
-			wherestr->append(v);
-		} else if (!charstring::compare(node->getName(),"boolean")) {
-			// FIXME: validate v
-			wherestr->append(' ')->append(v)->append(' ');
-		} else if (!charstring::compare(node->getName(),"value")) {
-			bool	isstr=!charstring::compare(
-					node->getAttributeValue("t"),"s");
-			if (isstr) {
-				wherestr->append("'");
-			}
-			// FIXME: validate v
-			wherestr->append(v);
-			if (isstr) {
-				wherestr->append("'");
-			}
-		} else if (!charstring::compare(node->getName(),"list")) {
-			wherestr->append("in (");
-			bool	firstin=true;
-			for (domnode *innode=criteria->getFirstTagChild();
-					!innode->isNullNode();
-					innode=innode->getNextTagSibling()) {
-				if (firstin) {
-					firstin=false;
-				} else {
-					wherestr->append(',');
-				}
-				bool	isstr=!charstring::compare(
-					innode->getAttributeValue("t"),"s");
-				if (isstr) {
-					wherestr->append("'");
-				}
-				// FIXME: validate v
-				wherestr->append(v);
-				if (isstr) {
-					wherestr->append("'");
-				}
-			}
-		} else if (!charstring::compare(node->getName(),"group")) {
-			wherestr->append("(");
-			if (!buildJsonWhere(node,wherestr)) {
-				return false;
-			}
-			wherestr->append(")");
-		}
-	}
-	return true;
-}
-#else
 bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 
 	// criteria should be in jsonlogic format - http://jsonlogic.com
 
-	// skip into any "r" (json root object) nodes
-	if (!charstring::compare(criteria->getFirstTagChild()->getName(),"r")) {
-		criteria=criteria->getFirstTagChild();
+	// we might be at the root of the dom tree, or at the root json object,
+	// in either case, descend
+	if (criteria->getType()==ROOT_DOMNODETYPE ||
+		!charstring::compare(criteria->getName(),"r")) {
+		return buildJsonWhere(criteria->getFirstTagChild(),wherestr);
 	}
 
 	// this node should be a var or operation
@@ -458,6 +367,8 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 
 		// the top-level can't be a variable
 		if (!wherestr->getSize()) {
+			error.append("in criteria, top-level JSON object "
+							"must be an operation");
 			return false;
 		}
 
@@ -466,8 +377,15 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 		return true;
 	}
 
-	// handle operations
-	// (they should have an array of child nodes)
+	// handle operations...
+
+	// it should be an array
+	if (charstring::compare(criteria->getAttributeValue("t"),"a")) {
+		error.append("in criteria, array expected");
+		return false;
+	}
+
+	// run through the child nodes...
 	bool	first=true;
 	for (domnode *node=criteria->getFirstTagChild();
 					!node->isNullNode();
@@ -517,10 +435,18 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 
 			// either a var or nested operation
 			case 'o':
-				if (!buildJsonWhere(node,wherestr)) {
+				if (!buildJsonWhere(
+						node->getFirstTagChild(),
+						wherestr)) {
 					return false;
 				}
 				break;
+
+			// unexpected node encountered
+			default:
+				error.append("in criteria, unexpected "
+						"json dom node encountered");
+				return false;
 		}
 
 		// special handling for isnull and isnotnull
@@ -558,27 +484,24 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 
 	return true;
 }
-#endif
 
 bool sqlrcrud::buildXmlWhere(domnode *criteria, stringbuffer *wherestr) {
 	// FIXME: implement this...
-	return true;
+	return false;
 }
 
 bool sqlrcrud::buildJsonOrderBy(domnode *sort, stringbuffer *orderbystr) {
 
 	// sort should be something like:
 	// <r t="o">
-	//   <field t="s" v="col1"/>
-	//   <field t="s" v="col2"/>
-	//   <order t="s" v="asc"/>
-	//   <field t="s" v="col3"/>
-	//   <order t="s" v="desc"/>
+	//   <col1 t="s" v="asc"/>
+	//   <col2 t="s" v="asc"/>
+	//   <col3 t="s" v="desc"/>
 	// </r>
 
-	// skip into any "r" (json root object) nodes
-	if (!charstring::compare(sort->getFirstTagChild()->getName(),"r")) {
-		sort=sort->getFirstTagChild();
+	// we might be at the root of the dom tree, descend
+	if (sort->getType()==ROOT_DOMNODETYPE) {
+		return buildJsonOrderBy(sort->getFirstTagChild(),orderbystr);
 	}
 
 	bool	first=true;
@@ -586,27 +509,23 @@ bool sqlrcrud::buildJsonOrderBy(domnode *sort, stringbuffer *orderbystr) {
 				!node->isNullNode();
 				node=node->getNextTagSibling()) {
 
-		const char	*v=node->getAttributeValue("v");
-		if (!charstring::compare(node->getName(),"field")) {
-			// FIXME: validate v
-			if (first) {
-				orderbystr->append(" order by ");
-				first=false;
-			} else {
-				orderbystr->append(", ");
-			}
-			orderbystr->append(v);
-		} else if (!charstring::compare(node->getName(),"order")) {
-			// FIXME: validate v
-			orderbystr->append(' ')->append(v);
+		const char	*var=node->getName();
+		const char	*order=node->getAttributeValue("v");
+		// FIXME: validate var
+		if (first) {
+			orderbystr->append(" order by ");
+			first=false;
+		} else {
+			orderbystr->append(", ");
 		}
+		orderbystr->append(var)->append(' ')->append(order);
 	}
 	return true;
 }
 
 bool sqlrcrud::buildXmlOrderBy(domnode *sort, stringbuffer *orderbystr) {
 	// FIXME: implement this...
-	return true;
+	return false;
 }
 
 bool sqlrcrud::doUpdate(const char * const *columns,

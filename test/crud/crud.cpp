@@ -183,30 +183,30 @@ int main(int argc, char **argv) {
 			// 	3) col1=val1 and col2=1 and col3=01-JAN-00
 			// 	etc.
 
-
 			// build criteria/sort json
-			criteria.append("{\n");
+			if (j>1) {
+				criteria.append("{ \"and\" : [\n");
+			}
 			sort.append("{\n");
 			for (uint16_t k=1; k<=j; k++) {
 				criteria.appendFormatted(
-					"	\"field\": \"%s\",\n"
-					"	\"operator\": \"=\",\n"
-					"	\"value\": \"%s\"",
+					"{ \"=\" : [ { \"var\" : \"%s\" }, "
+					"\"%s\" ] }",
 					cols[k],vals[i][k-1]);
 				sort.appendFormatted(
-					"	\"field\": \"%s\",\n"
-					"	\"order\": \"asc\"",
+					"	\"%s\": \"asc\"",
 					cols[k]);
-				if (k<j) {
-					criteria.append(",\n"
-					"	\"boolean\": \"and\",\n");
+				if (j>1 && k<j) {
+					criteria.append(",\n");
 					sort.append(",\n");
 				} else {
 					criteria.append('\n');
 					sort.append('\n');
 				}
 			}
-			criteria.append("}\n");
+			if (j>1) {
+				criteria.append("] }\n");
+			}
 			sort.append("}\n");
 
 			// run the query
@@ -254,11 +254,8 @@ int main(int argc, char **argv) {
 		// 	3) testtable_id=3
 		// 	etc.
 		criteria.appendFormatted(
-			"{\n"
-			"	\"field\": \"testtable_id\",\n"
-			"	\"operator\": \"=\",\n"
-			"	\"value\": \"%d\"\n"
-			"}\n",
+			"{ \"=\" : [ { \"var\" : "
+			"\"testtable_id\" }, \"%d\" ] }\n",
 			i+1);
 
 		for (uint16_t j=1; j<=3; j++) {
@@ -317,11 +314,8 @@ int main(int argc, char **argv) {
 		// 	3) testtable_id=3
 		// 	etc.
 		criteria.appendFormatted(
-			"{\n"
-			"	\"field\": \"testtable_id\",\n"
-			"	\"operator\": \"=\",\n"
-			"	\"value\": \"%d\"\n"
-			"}\n",
+			"{ \"=\" : [ { \"var\" : "
+			"\"testtable_id\" }, \"%d\" ] }\n",
 			i+1);
 
 		// run the query

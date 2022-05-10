@@ -31,26 +31,30 @@
  *  }
  *
  *  Various methods such as doRead(), doUpdate(), and doDelete() take a
- *  "criteria" argument.  This should be an XML or JSON string conforming to
- *  one of the following formats, that will be used to construct the where
- *  clause for these operations:
+ *  "criteria" argument.  This should be a JSON string in jsonlogic format
+ *  (http://jsonlogic.com), and will be used to construct the where clause for
+ *  these operations:
  *
- *  XML:
- *  ... describe format here ... 
+ *    { "and" : [
+ *      { "=" : [
+ *        { "var" : "col1" },
+ *        1
+ *      ] },
+ *      { "!=" : [
+ *        { "var" : "col2" },
+ *        "one"
+ *      ] }
+ *    ] }
  *
- *  JSON:
- *  ... describe format here ... 
+ *  The doRead() method also takes a "sort" argument.  This should be a JSON
+ *  string conforming to the following format, and will be used to construct
+ *  the order-by clause for these operations:
  *
- *  The doRead() method also takes a "sort" argument.  This should be an XML or
- *  JSON string conforming to one of the following formats, that will be used
- *  to construct the order-by clause for these operations:
- *
- *  XML:
- *  ... describe format here ... 
- *
- *  JSON:
- *  ... describe format here ... 
- *
+ *    {
+ *      "col1" : "asc",
+ *      "col2" : "asc",
+ *      "col3" : "desc"
+ *    }
  *
  *  The class also provides methods for overriding the template queries that
  *  are automatically built by buildQueries() as well as any primary key or
@@ -234,13 +238,13 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		/** Executes the read (select) query as either built by
 		 *  buildQueries() or overridden by setReadQuery().
 		 *
-		 *  "criteria" should be an XML or JSON string representing
-		 *  the criteria that will be used to build the where clause,
+		 *  "criteria" should be a JSON string representing the
+		 *  criteria that will be used to build the where clause,
 		 *  conforming to the format described in the class description.
 		 *
-		 *  "sort" should be an XML or JSON string representing
-		 *  the criteria that will be used to build the order-by clause,
-		 *  conforming to the format described in the class description.
+		 *  "sort" should be a JSON string representing the criteria
+		 *  that will be used to build the order-by clause, conforming
+		 *  to the format described in the class description.
 		 *
 		 *  "skip" indicates how many rows to skip immediately (useful
 		 *  for paging).
@@ -258,8 +262,8 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		 *  "columns" and "values" should be set to the column/value
 		 *  pairs to be updated.
 		 *
-		 *  "criteria" should be an XML or JSON string representing
-		 *  the criteria that will be used to build the where clause,
+		 *  "criteria" should be a JSON string representing the
+		 *  criteria that will be used to build the where clause,
 		 *  conforming to the format described in the class description.
 		 *
 		 *  Returns true on success and false on error.  On error, the
@@ -272,8 +276,8 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		/** Executes the delete query as either built by buildQueries()
 		 *  or overridden by setDeleteQuery().
 		 *
-		 *  "criteria" should be an XML or JSON string representing
-		 *  the criteria that will be used to build the where clause,
+		 *  "criteria" should be a JSON string representing the
+		 *  criteria that will be used to build the where clause,
 		 *  conforming to the format described in the class description.
 		 *
 		 *  Returns true on success and false on error.  On error, the
