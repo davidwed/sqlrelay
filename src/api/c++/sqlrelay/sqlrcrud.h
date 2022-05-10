@@ -298,32 +298,32 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		 *  field of the first row of the result set if doRead() was
 		 *  most recently called, or an empty sqlrscalar if doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called. */
-		sqlrscalar		*getScalar();
+		const sqlrscalar	*getScalar();
 
 		/** Returns an instance of sqlrrowlinkedlist, representing the
 		 *  first row of the result set if doRead() was most recently
 		 *  called, or an empty sqlrrowlinkedlist if doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called. */
-		sqlrrowlinkedlist	*getRowLinkedList();
+		const sqlrrowlinkedlist	*getRowLinkedList();
 
 		/** Returns an instance of sqlrrowdictionary, representing the
 		 *  first row of the result set if doRead() was most recently
 		 *  called, or an empty sqlrrowdictionary if doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called. */
-		sqlrrowdictionary	*getRowDictionary();
+		const sqlrrowdictionary	*getRowDictionary();
 
 		/** Returns an instance of sqlrrowdictionary, representing the
 		 *  first column of each row of the result set if doRead() was
 		 *  most recently called, or an empty sqlrresultsetlinkedlist
 		 *  if doCreate(), doUpdate(), or doDelete() was most recently
 		 *  called. */
-		sqlrresultsetlinkedlist	*getResultSetLinkedList();
+		const sqlrresultsetlinkedlist	*getResultSetLinkedList();
 
 		/** Returns an instance of sqlresultsettable, representing the
 		 *  result set if doRead() was most recently called, or an
 		 *  empty sqlrresultsettable if doCreate(), doUpdate(), or
 		 *  doDelete() was most recently called. */
-		sqlrresultsettable	*getResultSetTable();
+		const sqlrresultsettable	*getResultSetTable();
 
 	#include <sqlrelay/private/sqlrcrud.h>
 };

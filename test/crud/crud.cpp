@@ -213,7 +213,8 @@ int main(int argc, char **argv) {
 			checkSuccess(crud->doRead(criteria.getString(),
 						sort.getString(),0),true);
 
-			sqlrresultsettable	*t=crud->getResultSetTable();
+			const sqlrresultsettable	*t=
+						crud->getResultSetTable();
 
 			// check col/row counts
 			checkSuccess(t->getColumnCount(),4);
@@ -281,7 +282,8 @@ int main(int argc, char **argv) {
 			checkSuccess(crud->getAffectedRows(),1);
 			stdoutput.printf("\n");
 
-			sqlrresultsettable	*t=crud->getResultSetTable();
+			const sqlrresultsettable	*t=
+						crud->getResultSetTable();
 
 			// validate updates to the row
 			checkSuccess(crud->doRead(
