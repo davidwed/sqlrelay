@@ -9,45 +9,11 @@ sqlrcrud::sqlrcrud() {
 	idsequence=NULL;
 	primarykey=NULL;
 	autoinc=NULL;
-	columns=NULL;
 }
 
 sqlrcrud::~sqlrcrud() {
 	delete[] primarykey;
 	delete[] table;
-	deleteColumns();
-}
-
-void sqlrcrud::deleteColumns() {
-	if (columns) {
-		for (char **c=columns; *c; c++) {
-			delete[] *c;
-		}
-		delete[] columns;
-	}
-}
-
-uint64_t sqlrcrud::countColumns(const char * const *columns) {
-	uint64_t	count=0;
-	if (columns) {
-		for (const char * const *c=columns; *c; c++) {
-			count++;
-		}
-	}
-	return count;
-}
-
-void sqlrcrud::copyColumns(const char * const *columns) {
-	uint64_t	count=countColumns(columns);
-	this->columns=new char *[count+1];
-	count=0;
-	if (columns) {
-		for (const char * const *c=columns; *c; c++) {
-			this->columns[count]=charstring::duplicate(*c);
-			count++;
-		}
-	}
-	this->columns[count]=NULL;
 }
 
 void sqlrcrud::setSqlrConnection(sqlrconnection *con) {
@@ -83,11 +49,6 @@ void sqlrcrud::setAutoIncrementColumn(const char *autoinc) {
 	this->autoinc=charstring::duplicate(autoinc);
 }
 
-void sqlrcrud::setColumns(const char * const *columns) {
-	deleteColumns();
-	copyColumns(columns);
-}
-
 const char *sqlrcrud::getTable() {
 	return table;
 }
@@ -104,10 +65,6 @@ const char *sqlrcrud::getAutoIncrementColumn() {
 	return autoinc;
 }
 
-const char * const *sqlrcrud::getColumns() {
-	return columns;
-}
-
 bool sqlrcrud::buildQueries() {
 
 	// bail if we don't have a connection, cursor, or table
@@ -115,32 +72,29 @@ bool sqlrcrud::buildQueries() {
 		return false;
 	}
 
-	// get the columns for this table
-	delete[] primarykey;
-	deleteColumns();
+	// find the primary key and autoincrement column
 	cur->lowerCaseColumnNames();
 	if (!cur->getColumnList(table,NULL)) {
 		return false;
 	}
-	columns=new char *[cur->rowCount()+1];
 	for (uint64_t i=0; i<cur->rowCount(); i++) {
 
-		// get the column name and "key"
+		// get the column name, "key", and "extra"
 		const char	*colname=cur->getField(0,"column_name");
 		const char	*colkey=cur->getField(0,"column_key");
+		const char	*extra=cur->getField(0,"extra");
 
-		// copy the primary key
+		// copy the primary key and autoincrement column
 		// FIXME: this is valid for mysql, but maybe not for other dbs,
 		// we need a standardized way of doing this, like
 		// cur->getPrimaryKey() or something
 		if (!charstring::compare(colkey,"PRI")) {
-			primarykey=charstring::duplicate(colname);
+			setPrimaryKeyColumn(colname);
 		}
-
-		// copy the column name
-		columns[i]=charstring::duplicate(colname);
+		if (!charstring::compare(extra,"auto_increment")) {
+			setAutoIncrementColumn(colname);
+		}
 	}
-	columns[cur->rowCount()]=NULL;
 	// FIXME: set this back to whatever it was, which might not be mixed,
 	// but there's currently no way to find out what it's currently set to
 	cur->mixedCaseColumnNames();
