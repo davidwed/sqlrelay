@@ -224,6 +224,47 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		const char	*getDeleteQuery();
 
 
+		/** Indicates that the read (select) query contains a partial
+		 *  where clause.  This affects the behavior of doRead() when
+		 *  it builds a where clause from "criteria". */
+		void	setReadQueryContainsPartialWhere(
+						bool containspartial);
+
+		/** Indicates that the read (select) query contains a partial
+		 *  order-by clause.  This affects the behavior of doRead()
+		 *  when it builds an order-by clause from the "sort". */
+		void	setReadQueryContainsPartialOrderBy(
+						bool containspartial);
+
+		/** Indicates that the update query contains a partial where
+		 *  clause.  This affects the behavior of doUpdate() when
+		 *  it builds a where clause from "criteria". */
+		void	setUpdateQueryContainsPartialWhere(
+						bool containspartial);
+
+		/** Indicates that the delete query contains a partial where
+		 *  clause.  This affects the behavior of doDelete() when
+		 *  it builds a where clause from "criteria". */
+		void	setDeleteQueryContainsPartialWhere(
+						bool containspartial);
+
+		/** Returns true if the read (select) query contains a partial
+		 *  where clause and false otherwise. */
+		bool	getReadQueryContainsPartialWhere();
+
+		/** Returns true if the read (select) query contains a partial
+		 *  order-by clause and false otherwise. */
+		bool	getReadQueryContainsPartialOrderBy();
+
+		/** Returns true if the update query contains a partial where
+		 *  clause and false otherwise. */
+		bool	getUpdateQueryContainsPartialWhere();
+
+		/** Returns true if the delete query contains a partial where
+		 *  clause and false otherwise. */
+		bool	getDeleteQueryContainsPartialWhere();
+
+
 		/** Executes the create (insert) query as either built by
 		 *  buildQueries() or overridden by setCreateQuery(),
 		 *  substituting "columns" into $(COLUMNS) and "values" into

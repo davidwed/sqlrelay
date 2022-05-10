@@ -9,6 +9,10 @@ sqlrcrud::sqlrcrud() {
 	idsequence=NULL;
 	primarykey=NULL;
 	autoinc=NULL;
+	readcontainspartialwhere=false;
+	readcontainspartialorderby=false;
+	updatecontainspartialwhere=false;
+	deletecontainspartialwhere=false;
 }
 
 sqlrcrud::~sqlrcrud() {
@@ -118,6 +122,12 @@ bool sqlrcrud::buildQueries() {
 	deletequery.clear();
 	deletequery.append("delete from ")->append(table)->append("$(WHERE)");
 
+	// reset partial where flags
+	readcontainspartialwhere=false;
+	readcontainspartialorderby=false;
+	updatecontainspartialwhere=false;
+	deletecontainspartialwhere=false;
+
 	return true;
 }
 
@@ -155,6 +165,38 @@ const char *sqlrcrud::getUpdateQuery() {
 
 const char *sqlrcrud::getDeleteQuery() {
 	return deletequery.getString();
+}
+
+void sqlrcrud::setReadQueryContainsPartialWhere(bool containspartial) {
+	readcontainspartialwhere=containspartial;
+}
+
+void sqlrcrud::setReadQueryContainsPartialOrderBy(bool containspartial) {
+	readcontainspartialorderby=containspartial;
+}
+
+void sqlrcrud::setUpdateQueryContainsPartialWhere(bool containspartial) {
+	updatecontainspartialwhere=containspartial;
+}
+
+void sqlrcrud::setDeleteQueryContainsPartialWhere(bool containspartial) {
+	deletecontainspartialwhere=containspartial;
+}
+
+bool sqlrcrud::getReadQueryContainsPartialWhere() {
+	return readcontainspartialwhere;
+}
+
+bool sqlrcrud::getReadQueryContainsPartialOrderBy() {
+	return readcontainspartialorderby;
+}
+
+bool sqlrcrud::getUpdateQueryContainsPartialWhere() {
+	return updatecontainspartialwhere;
+}
+
+bool sqlrcrud::getDeleteQueryContainsPartialWhere() {
+	return deletecontainspartialwhere;
 }
 
 bool sqlrcrud::doCreate(const char * const *columns,
@@ -268,13 +310,13 @@ bool sqlrcrud::doRead(const char *criteria, const char *sort, uint64_t skip) {
 
 	// build $(WHERE)
 	stringbuffer	wherestr;
-	if (!buildWhere(criteria,&wherestr)) {
+	if (!buildWhere(criteria,&wherestr,readcontainspartialwhere)) {
 		return false;
 	}
 
 	// build $(ORDERBY)
 	stringbuffer	orderbystr;
-	if (!buildOrderBy(sort,&orderbystr)) {
+	if (!buildOrderBy(sort,&orderbystr,readcontainspartialorderby)) {
 		return false;
 	}
 
@@ -290,15 +332,20 @@ bool sqlrcrud::doRead(const char *criteria, const char *sort, uint64_t skip) {
 	return success;
 }
 
-bool sqlrcrud::buildWhere(const char *criteria, stringbuffer *wherestr) {
-	return buildClause(criteria,wherestr,true);
+bool sqlrcrud::buildWhere(const char *criteria,
+				stringbuffer *wherestr,
+				bool containspartial) {
+	return buildClause(criteria,wherestr,true,containspartial);
 }
 
-bool sqlrcrud::buildOrderBy(const char *sort, stringbuffer *orderbystr) {
-	return buildClause(sort,orderbystr,false);
+bool sqlrcrud::buildOrderBy(const char *sort,
+				stringbuffer *orderbystr,
+				bool containspartial) {
+	return buildClause(sort,orderbystr,false,containspartial);
 }
 
-bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
+bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb,
+					bool where, bool containspartial) {
 
 	if (!domstr) {
 		return true;
@@ -323,8 +370,9 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 			error.append(j.getError());
 			return false;
 		}
-		return (where)?buildJsonWhere(j.getRootNode(),strb):
-				buildJsonOrderBy(j.getRootNode(),strb);
+		return (where)?
+			buildJsonWhere(j.getRootNode(),strb,containspartial):
+			buildJsonOrderBy(j.getRootNode(),strb,containspartial);
 	} else
 
 	// if it's XML
@@ -335,8 +383,9 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 			error.append(x.getError());
 			return false;
 		}
-		return (where)?buildXmlWhere(x.getRootNode(),strb):
-				buildXmlOrderBy(x.getRootNode(),strb);
+		return (where)?
+			buildXmlWhere(x.getRootNode(),strb,containspartial):
+			buildXmlOrderBy(x.getRootNode(),strb,containspartial);
 	}
 	
 	// unrecognized format
@@ -346,7 +395,9 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 	return false;
 }
 
-bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
+bool sqlrcrud::buildJsonWhere(domnode *criteria,
+				stringbuffer *wherestr,
+				bool containspartial) {
 
 	// criteria should be in jsonlogic format - http://jsonlogic.com
 
@@ -354,7 +405,8 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 	// in either case, descend
 	if (criteria->getType()==ROOT_DOMNODETYPE ||
 		!charstring::compare(criteria->getName(),"r")) {
-		return buildJsonWhere(criteria->getFirstTagChild(),wherestr);
+		return buildJsonWhere(criteria->getFirstTagChild(),
+						wherestr,containspartial);
 	}
 
 	// this node should be a var or operation
@@ -395,7 +447,8 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 
 			// begin the where clause
 			if (!wherestr->getSize()) {
-				wherestr->append(" where ");
+				wherestr->append((containspartial)?
+							" and ":" where ");
 			}
 
 			// begin the group...
@@ -437,7 +490,7 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 			case 'o':
 				if (!buildJsonWhere(
 						node->getFirstTagChild(),
-						wherestr)) {
+						wherestr,containspartial)) {
 					return false;
 				}
 				break;
@@ -485,12 +538,16 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 	return true;
 }
 
-bool sqlrcrud::buildXmlWhere(domnode *criteria, stringbuffer *wherestr) {
+bool sqlrcrud::buildXmlWhere(domnode *criteria,
+				stringbuffer *wherestr,
+				bool containspartial) {
 	// FIXME: implement this...
 	return false;
 }
 
-bool sqlrcrud::buildJsonOrderBy(domnode *sort, stringbuffer *orderbystr) {
+bool sqlrcrud::buildJsonOrderBy(domnode *sort,
+				stringbuffer *orderbystr,
+				bool containspartial) {
 
 	// sort should be something like:
 	// <r t="o">
@@ -501,7 +558,8 @@ bool sqlrcrud::buildJsonOrderBy(domnode *sort, stringbuffer *orderbystr) {
 
 	// we might be at the root of the dom tree, descend
 	if (sort->getType()==ROOT_DOMNODETYPE) {
-		return buildJsonOrderBy(sort->getFirstTagChild(),orderbystr);
+		return buildJsonOrderBy(sort->getFirstTagChild(),
+					orderbystr,containspartial);
 	}
 
 	bool	first=true;
@@ -513,7 +571,8 @@ bool sqlrcrud::buildJsonOrderBy(domnode *sort, stringbuffer *orderbystr) {
 		const char	*order=node->getAttributeValue("v");
 		// FIXME: validate var
 		if (first) {
-			orderbystr->append(" order by ");
+			orderbystr->append((containspartial)?
+						", ":" order by ");
 			first=false;
 		} else {
 			orderbystr->append(", ");
@@ -523,7 +582,9 @@ bool sqlrcrud::buildJsonOrderBy(domnode *sort, stringbuffer *orderbystr) {
 	return true;
 }
 
-bool sqlrcrud::buildXmlOrderBy(domnode *sort, stringbuffer *orderbystr) {
+bool sqlrcrud::buildXmlOrderBy(domnode *sort,
+				stringbuffer *orderbystr,
+				bool containspartial) {
 	// FIXME: implement this...
 	return false;
 }
@@ -584,7 +645,7 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 
 	// build $(WHERE)
 	stringbuffer	wherestr;
-	if (!buildWhere(criteria,&wherestr)) {
+	if (!buildWhere(criteria,&wherestr,updatecontainspartialwhere)) {
 		return false;
 	}
 
@@ -609,7 +670,7 @@ bool sqlrcrud::doDelete(const char *criteria) {
 
 	// build $(WHERE)
 	stringbuffer	wherestr;
-	if (!buildWhere(criteria,&wherestr)) {
+	if (!buildWhere(criteria,&wherestr,deletecontainspartialwhere)) {
 		return false;
 	}
 

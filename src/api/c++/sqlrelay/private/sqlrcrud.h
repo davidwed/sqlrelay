@@ -11,20 +11,27 @@
 					const char * const *values);
 
 		bool	buildWhere(const char *criteria,
-					stringbuffer *wherestr);
+					stringbuffer *wherestr,
+					bool containspartial);
 		bool	buildOrderBy(const char *sort,
-					stringbuffer *orderbystr);
+					stringbuffer *orderbystr,
+					bool containspartial);
 		bool	buildClause(const char *domstr,
 					stringbuffer *strb,
-					bool where);
+					bool where,
+					bool containspartial);
 		bool	buildJsonWhere(domnode *criteria,
-					stringbuffer *wherestr);
+					stringbuffer *wherestr,
+					bool containspartial);
 		bool	buildXmlWhere(domnode *criteria,
-					stringbuffer *wherestr);
+					stringbuffer *wherestr,
+					bool containspartial);
 		bool	buildJsonOrderBy(domnode *sort,
-					stringbuffer *orderbystr);
+					stringbuffer *orderbystr,
+					bool containspartial);
 		bool	buildXmlOrderBy(domnode *sort,
-					stringbuffer *orderbystr);
+					stringbuffer *orderbystr,
+					bool containspartial);
 
 		sqlrconnection	*con;
 		sqlrcursor	*cur;
@@ -42,6 +49,11 @@
 		stringbuffer	readquery;
 		stringbuffer	updatequery;
 		stringbuffer	deletequery;
+
+		bool	readcontainspartialwhere;
+		bool	readcontainspartialorderby;
+		bool	updatecontainspartialwhere;
+		bool	deletecontainspartialwhere;
 
 		sqlrscalar		scl;
 		sqlrrowlinkedlist	rlst;
