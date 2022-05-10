@@ -346,6 +346,7 @@ bool sqlrcrud::buildClause(const char *domstr, stringbuffer *strb, bool where) {
 	return false;
 }
 
+#if 0
 bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 
 	// criteria should be something like:
@@ -437,6 +438,127 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
 	}
 	return true;
 }
+#else
+bool sqlrcrud::buildJsonWhere(domnode *criteria, stringbuffer *wherestr) {
+
+	// criteria should be in jsonlogic format - http://jsonlogic.com
+
+	// skip into any "r" (json root object) nodes
+	if (!charstring::compare(criteria->getFirstTagChild()->getName(),"r")) {
+		criteria=criteria->getFirstTagChild();
+	}
+
+	// this node should be a var or operation
+
+	// get the op
+	const char	*op=criteria->getName();
+
+	// handle variables
+	if (!charstring::compare(op,"var")) {
+
+		// the top-level can't be a variable
+		if (!wherestr->getSize()) {
+			return false;
+		}
+
+		// append the variable name
+		wherestr->append(criteria->getAttributeValue("v"));
+		return true;
+	}
+
+	// handle operations
+	// (they should have an array of child nodes)
+	bool	first=true;
+	for (domnode *node=criteria->getFirstTagChild();
+					!node->isNullNode();
+					node=node->getNextTagSibling()) {
+
+		if (first) {
+
+			// begin the where clause
+			if (!wherestr->getSize()) {
+				wherestr->append(" where ");
+			}
+
+			// begin the group...
+			wherestr->append('(');
+		}
+
+		// get array member type
+		const char	*t=node->getAttributeValue("t");
+		const char	*v=node->getAttributeValue("v");
+
+		switch (t[0]) {
+
+			// string literals
+			case 's':
+				wherestr->append('\'')->append(v)->append('\'');
+				break;
+
+			// numeric literals
+			case 'n':
+				wherestr->append(v);
+				break;
+
+			// true
+			case 't':
+				wherestr->append("true");
+				break;
+
+			// false
+			case 'f':
+				wherestr->append("false");
+				break;
+
+			// null
+			case 'u':
+				wherestr->append("null");
+				break;
+
+			// either a var or nested operation
+			case 'o':
+				if (!buildJsonWhere(node,wherestr)) {
+					return false;
+				}
+				break;
+		}
+
+		// special handling for isnull and isnotnull
+		if (!charstring::compare(op,"isnull")) {
+			wherestr->append(" is null)");
+			break;
+		}
+		if (!charstring::compare(op,"isnotnull")) {
+			wherestr->append(" is not null)");
+			break;
+		}
+
+		// are we on the last member?
+		bool	last=node->getNextTagSibling()->isNullNode();
+
+		// special handling for in
+		if (!charstring::compare(op,"in")) {
+			if (first) {
+				wherestr->append(" in (");
+			} else if (last) {
+				wherestr->append("))");
+			}
+		} else {
+			if (last) {
+				// end the group...
+				wherestr->append(')');
+			} else {
+				// append the operator between members
+				wherestr->append(' ')->append(op)->append(' ');
+			}
+		}
+
+		first=false;
+	}
+
+	return true;
+}
+#endif
 
 bool sqlrcrud::buildXmlWhere(domnode *criteria, stringbuffer *wherestr) {
 	// FIXME: implement this...
