@@ -270,6 +270,7 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		const char	*setIsolationLevelQuery();
 		const char	*noopQuery();
 		const char	*bindFormat();
+		const char	*nextvalFormat();
 
 		SQLHENV		env;
 		SQLRETURN	erg;
@@ -722,6 +723,10 @@ const char *db2connection::getColumnListQuery(const char *table, bool wild) {
 
 const char *db2connection::bindFormat() {
 	return "?";
+}
+
+const char *db2connection::nextvalFormat() {
+	return "(nextval for %s)";
 }
 
 const char *db2connection::selectDatabaseQuery() {

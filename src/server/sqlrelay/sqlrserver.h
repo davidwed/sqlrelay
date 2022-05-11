@@ -187,6 +187,9 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setFakeInputBinds(bool fake);
 		bool		getFakeInputBinds();
 
+		// sequences
+		const char	*nextvalFormat();
+
 		// fetch info
 		void		setFetchAtOnce(uint32_t fethatonce);
 		void		setMaxColumnCount(uint32_t maxcolumncount);
@@ -987,6 +990,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual	int16_t		nonNullBindValue();
 		virtual	int16_t		nullBindValue();
 		virtual bool		bindValueIsNull(int16_t isnull);
+
+		virtual const char	*nextvalFormat();
 
 		virtual const char	*tempTableDropPrefix();
 		virtual bool		tempTableTruncateBeforeDrop();

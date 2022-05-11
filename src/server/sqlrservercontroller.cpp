@@ -9147,6 +9147,10 @@ bool sqlrservercontroller::bindValueIsNull(int16_t isnull) {
 	return pvt->_conn->bindValueIsNull(isnull);
 }
 
+const char *sqlrservercontroller::nextvalFormat() {
+	return pvt->_conn->nextvalFormat();
+}
+
 void sqlrservercontroller::setFakeInputBinds(bool fake) {
 	pvt->_fakeinputbinds=fake;
 }

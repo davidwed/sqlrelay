@@ -105,6 +105,9 @@ class sqlrconnectionprivate {
 		// bind format
 		char		*_bindformat;
 
+		// nextval format
+		char		*_nextvalformat;
+
 		// bind delimiters
 		bool		_questionmarksupported;
 		bool		_colonsupported;
@@ -1449,7 +1452,7 @@ const char *sqlrconnection::bindFormat() {
 	}
 
 
-	// get the bindformat size
+	// get the bind format size
 	uint16_t	size;
 	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
 				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
@@ -1458,7 +1461,7 @@ const char *sqlrconnection::bindFormat() {
 		return NULL;
 	}
 
-	// get the bindformat
+	// get the bind format
 	delete[] pvt->_bindformat;
 	pvt->_bindformat=new char[size+1];
 	if (pvt->_cs->read(pvt->_bindformat,size)!=size) {
@@ -1477,6 +1480,60 @@ const char *sqlrconnection::bindFormat() {
 		debugPreEnd();
 	}
 	return pvt->_bindformat;
+}
+
+const char *sqlrconnection::nextvalFormat() {
+
+	if (!openSession()) {
+		return NULL;
+	}
+
+	clearError();
+
+	if (pvt->_debug) {
+		debugPreStart();
+		debugPrint("nextval format...");
+		debugPrint("\n");
+		debugPreEnd();
+	}
+
+	// tell the server we want the nextval format
+	pvt->_cs->write((uint16_t)NEXTVALFORMAT);
+	flushWriteBuffer();
+
+	if (gotError()) {
+		return NULL;
+	}
+
+
+	// get the nextval format size
+	uint16_t	size;
+	if (pvt->_cs->read(&size,pvt->_responsetimeoutsec,
+				pvt->_responsetimeoutusec)!=sizeof(uint16_t)) {
+		setError("Failed to get nextval format.\n"
+				"A network error may have occurred.");
+		return NULL;
+	}
+
+	// get the nextval format
+	delete[] pvt->_nextvalformat;
+	pvt->_nextvalformat=new char[size+1];
+	if (pvt->_cs->read(pvt->_nextvalformat,size)!=size) {
+		setError("Failed to get nextval format.\n"
+				"A network error may have occurred.");
+		delete[] pvt->_nextvalformat;
+		pvt->_nextvalformat=NULL;
+		return NULL;
+	}
+	pvt->_nextvalformat[size]='\0';
+
+	if (pvt->_debug) {
+		debugPreStart();
+		debugPrint(pvt->_nextvalformat);
+		debugPrint("\n");
+		debugPreEnd();
+	}
+	return pvt->_nextvalformat;
 }
 
 bool sqlrconnection::selectDatabase(const char *database) {

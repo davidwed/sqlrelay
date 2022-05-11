@@ -263,6 +263,10 @@ class SQLRCLIENT_DLLSPEC sqlrconnection : public object {
 		 *  of the bind variables used in the db. */
 		const char	*bindFormat();
 
+		/** Returns a string representing the format of the
+		 *  sequence nextval command used in the db. */
+		const char	*nextvalFormat();
+
 
 
 		/** Sets the current database/schema to "database" */

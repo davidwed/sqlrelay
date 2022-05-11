@@ -98,6 +98,16 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->ping(),1);
 	stdoutput.printf("\n");
 
+	// bind format
+	stdoutput.printf("BIND FORMAT: \n");
+	checkSuccess(con->bindFormat(),"?");
+	stdoutput.printf("\n");
+
+	// nextval format
+	stdoutput.printf("NEXTVAL FORMAT: \n");
+	checkSuccess(con->nextvalFormat(),"next value for %s");
+	stdoutput.printf("\n");
+
 	// clean up table
 	cur->sendQuery("delete from testtable");
 	con->commit();

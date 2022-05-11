@@ -215,6 +215,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		const char	*bindFormat();
 #endif
+		const char	*nextvalFormat();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
@@ -661,6 +662,10 @@ const char *mysqlconnection::bindFormat() {
 	return "?";
 }
 #endif
+
+const char *mysqlconnection::nextvalFormat() {
+	return "";
+}
 
 const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 	return (wild)?"select "

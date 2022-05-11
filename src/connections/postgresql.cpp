@@ -50,6 +50,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getLastInsertIdQuery();
 		const char	*noopQuery();
 		const char	*bindFormat();
+		const char	*nextvalFormat();
 
 		dictionary< int32_t, char *>	datatypes;
 		dictionary< int32_t, char *>	tables;
@@ -728,6 +729,10 @@ const char *postgresqlconnection::bindFormat() {
 #else
 	return sqlrserverconnection::bindFormat();
 #endif
+}
+
+const char *postgresqlconnection::nextvalFormat() {
+	return "nextval('%s')";
 }
 
 postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :

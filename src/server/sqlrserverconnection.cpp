@@ -956,6 +956,10 @@ bool sqlrserverconnection::bindValueIsNull(int16_t isnull) {
 	return (isnull==nullBindValue());
 }
 
+const char *sqlrserverconnection::nextvalFormat() {
+	return "%s.nextval";
+}
+
 const char *sqlrserverconnection::tempTableDropPrefix() {
 	return "";
 }

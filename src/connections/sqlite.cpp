@@ -75,6 +75,8 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 
 		void		clearErrors();
 
+		const char	*nextvalFormat();
+
 		char		*db;
 
 		const char	*identity;
@@ -427,6 +429,10 @@ void sqliteconnection::clearErrors() {
 		errmesg=NULL;
 		errcode=0;
 	}
+}
+
+const char *sqliteconnection::nextvalFormat() {
+	return "";
 }
 
 sqlitecursor::sqlitecursor(sqlrserverconnection *conn, uint16_t id) :
