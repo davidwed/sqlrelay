@@ -113,15 +113,10 @@ void checkSuccess(double value, double success) {
 
 int main(int argc, char **argv) {
 
-	// instantiation
+	// init connection/cursor
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
 	cur=new sqlrcursor(con);
-	crud=new sqlrcrud;
-	crud->setSqlrConnection(con);
-	crud->setSqlrCursor(cur);
-	crud->setTable("testtable");
-	crud->buildQueries();
 
 	// drop existing table and sequence
 	cur->sendQuery("drop table testtable");
@@ -135,6 +130,13 @@ int main(int argc, char **argv) {
 					"col3 date)"),true);
 	checkSuccess(cur->sendQuery("create sequence testtable_ids"),true);
 	stdoutput.printf("\n\n");
+
+	// init crud
+	crud=new sqlrcrud;
+	crud->setSqlrConnection(con);
+	crud->setSqlrCursor(cur);
+	crud->setTable("testtable");
+	crud->buildQueries();
 
 	// set up columns and values
 	const char	*cols[]={
