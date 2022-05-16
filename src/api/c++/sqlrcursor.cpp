@@ -573,6 +573,7 @@ const char *sqlrcursor::getCacheFileName() {
 }
 
 void sqlrcursor::cacheOff() {
+	flushToCache();
 	pvt->_cacheon=false;
 }
 
@@ -601,6 +602,7 @@ void sqlrcursor::startCaching() {
 	pvt->_cachedest=new file();
 	pvt->_cachedestind=new file();
 	if (!pvt->_resumed) {
+		// FIXME: these can fail
 		pvt->_cachedest->open(pvt->_cachedestname,
 					O_RDWR|O_TRUNC|O_CREAT,
 					permissions::ownerReadWrite());
@@ -608,26 +610,26 @@ void sqlrcursor::startCaching() {
 					O_RDWR|O_TRUNC|O_CREAT,
 					permissions::ownerReadWrite());
 	} else {
+		// FIXME: these can fail
 		pvt->_cachedest->open(pvt->_cachedestname,
-					O_RDWR|O_CREAT|O_APPEND,
+					O_RDWR|O_CREAT,
 					permissions::ownerReadWrite());
 		pvt->_cachedestind->open(pvt->_cachedestindname,
-					O_RDWR|O_CREAT|O_APPEND,
+					O_RDWR|O_CREAT,
 					permissions::ownerReadWrite());
 	}
 
 	if (pvt->_cachedest && pvt->_cachedestind) {
 
 		// calculate and set write buffer size
-		// FIXME: I think rudiments bugs keep this from working...
-		/*filesystem	fs;
+		filesystem	fs;
 		if (fs.open(pvt->_cachedestname)) {
 			off64_t	optblocksize=fs.getOptimumTransferBlockSize();
 			pvt->_cachedest->setWriteBufferSize(
 					(optblocksize)?optblocksize:1024);
 			pvt->_cachedestind->setWriteBufferSize(
 					(optblocksize)?optblocksize:1024);
-		}*/
+		}
 
 		if (!pvt->_resumed) {
 
@@ -641,6 +643,14 @@ void sqlrcursor::startCaching() {
 			int64_t	expiration=dt.getEpoch()+pvt->_cachettl;
 			pvt->_cachedest->write(expiration);
 			pvt->_cachedestind->write(expiration);
+
+		} else {
+
+			// go to the end
+			// we don't want to just open with O_APPEND
+			// because that interferes with buffering
+			pvt->_cachedest->setPositionRelativeToEnd(0);
+			pvt->_cachedestind->setPositionRelativeToEnd(0);
 		}
 
 	} else {
@@ -837,8 +847,12 @@ void sqlrcursor::cacheData() {
 		// seek to the right place in the index file and write the
 		// destination file offset
 		pvt->_cachedestind->setPositionRelativeToBeginning(
-				13+sizeof(int64_t)+
-				((pvt->_firstrowindex+i)*sizeof(int64_t)));
+				// magicid
+				13+
+				// ttl
+				sizeof(int64_t)+
+				// row
+				(pvt->_firstrowindex+i)*sizeof(int64_t));
 		pvt->_cachedestind->write(position);
 
 		// write the row to the cache file
@@ -880,18 +894,23 @@ void sqlrcursor::finishCaching() {
 
 	// terminate the result set
 	pvt->_cachedest->write((uint16_t)END_RESULT_SET);
-	// FIXME: I think rudiments bugs keep this from working...
-	/*pvt->_cachedest->flushWriteBuffer(-1,-1);
-	pvt->_cachedestind->flushWriteBuffer(-1,-1);*/
 
-	// close the cache file and clean up
+	// close the cache file
 	clearCacheDest();
+}
+
+void sqlrcursor::flushToCache() {
+	if (pvt->_cachedest) {
+		pvt->_cachedest->flushWriteBuffer(-1,-1);
+		pvt->_cachedestind->flushWriteBuffer(-1,-1);
+	}
 }
 
 void sqlrcursor::clearCacheDest() {
 
 	// close the cache file and clean up
 	if (pvt->_cachedest) {
+		flushToCache();
 		pvt->_cachedest->close();
 		delete pvt->_cachedest;
 		pvt->_cachedest=NULL;
@@ -3585,7 +3604,11 @@ bool sqlrcursor::skipRows(bool initial, uint64_t rowstoskip) {
 
 		// get the row offset from the index
 		pvt->_cachesourceind->setPositionRelativeToBeginning(
-					13+sizeof(int64_t)+
+					// magicid
+					13+
+					// ttl
+					sizeof(int64_t)+
+					// row
 					(pvt->_rowcount*sizeof(int64_t)));
 		int64_t	rowoffset;
 		if (pvt->_cachesourceind->read(&rowoffset)!=sizeof(int64_t)) {
@@ -5823,8 +5846,18 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	// open the file
 	pvt->_cachesource=new file();
 	pvt->_cachesourceind=new file();
-	if ((pvt->_cachesource->open(filename,O_RDWR)) &&
-		(pvt->_cachesourceind->open(indexfilename,O_RDWR))) {
+	if (pvt->_cachesource->open(filename,O_RDWR) &&
+		pvt->_cachesourceind->open(indexfilename,O_RDWR)) {
+
+		// calculate and set write buffer size
+		filesystem	fs;
+		if (fs.open(filename)) {
+			off64_t	optblocksize=fs.getOptimumTransferBlockSize();
+			pvt->_cachesource->setReadBufferSize(
+					(optblocksize)?optblocksize:1024);
+			pvt->_cachesourceind->setReadBufferSize(
+					(optblocksize)?optblocksize:1024);
+		}
 
 		delete[] indexfilename;
 
