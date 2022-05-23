@@ -522,7 +522,7 @@
 
 	echo("COMMIT AND ROLLBACK: \n");
 	try {
-		$dbh->exec("drop table testtable");
+		$dbh->exec("drop table testtable1");
 	} catch (Exception $e) {
 	}
 	checkSuccess($dbh->exec("create table testtable1 (testnumber number)"),0);
