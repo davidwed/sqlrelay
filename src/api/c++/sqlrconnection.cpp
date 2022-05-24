@@ -231,6 +231,9 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	// bind format
 	pvt->_bindformat=NULL;
 
+	// nextval format
+	pvt->_nextvalformat=NULL;
+
 	// bind delimiters
 	pvt->_questionmarksupported=true;
 	pvt->_colonsupported=true;
@@ -309,6 +312,9 @@ sqlrconnection::~sqlrconnection() {
 
 	// deallocate bindformat
 	delete[] pvt->_bindformat;
+
+	// deallocate nextvalformat
+	delete[] pvt->_nextvalformat;
 
 	// deallocate client info
 	delete[] pvt->_clientinfo;
