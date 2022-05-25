@@ -24523,7 +24523,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQconnectdb(NULL);
+PQconnectdb(0);
   ;
   return 0;
 }
@@ -24561,7 +24561,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQfmod(NULL,0);
+PQfmod(0,0);
   ;
   return 0;
 }
@@ -24599,7 +24599,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQsetNoticeProcessor(NULL,NULL,NULL);
+PQsetNoticeProcessor(0,0,0);
   ;
   return 0;
 }
@@ -24639,7 +24639,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQprepare(NULL,NULL,NULL,NULL,NULL);
+PQprepare(0,0,0,0,0);
   ;
   return 0;
 }
@@ -24677,7 +24677,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQexecPrepared(NULL,NULL,0,NULL,NULL,NULL,0);
+PQexecPrepared(0,0,0,0,0,0,0);
   ;
   return 0;
 }
@@ -24715,7 +24715,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQsendQueryPrepared(NULL,NULL,0,NULL,NULL,NULL,0);
+PQsendQueryPrepared(0,0,0,0,0,0,0);
   ;
   return 0;
 }
@@ -24753,7 +24753,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQsetSingleRowMode(NULL);
+PQsetSingleRowMode(0);
   ;
   return 0;
 }
@@ -24791,7 +24791,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQdescribePrepared(NULL,NULL);
+PQdescribePrepared(0,0);
   ;
   return 0;
 }
@@ -24830,7 +24830,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQserverVersion(NULL);
+PQserverVersion(0);
   ;
   return 0;
 }
@@ -24868,7 +24868,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQparameterStatus(NULL,NULL);
+PQparameterStatus(0,0);
   ;
   return 0;
 }
@@ -24906,7 +24906,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQsetClientEncoding(NULL,NULL);
+PQsetClientEncoding(0,0);
   ;
   return 0;
 }
@@ -24944,7 +24944,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQoidValue(NULL);
+PQoidValue(0);
   ;
   return 0;
 }
@@ -24982,7 +24982,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQbinaryTuples(NULL);
+PQbinaryTuples(0);
   ;
   return 0;
 }
@@ -25020,7 +25020,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQftable(NULL,0);
+PQftable(0,0);
   ;
   return 0;
 }

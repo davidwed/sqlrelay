@@ -828,49 +828,49 @@ then
 	then
 		AC_MSG_CHECKING(if PostgreSQL has PQconnectdb)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQconnectdb(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQCONNECTDB,1,Some versions of postgresql have PQconnectdb)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQconnectdb(0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQCONNECTDB,1,Some versions of postgresql have PQconnectdb)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQfmod)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQfmod(NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQFMOD,1,Some versions of postgresql have PQfmod)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQfmod(0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQFMOD,1,Some versions of postgresql have PQfmod)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQsetNoticeProcessor)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQsetNoticeProcessor(NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR,1,Some versions of postgresql have PQsetNoticeProcessor)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQsetNoticeProcessor(0,0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETNOTICEPROCESSOR,1,Some versions of postgresql have PQsetNoticeProcessor)],[AC_MSG_RESULT(no)])
 		if ( test -n "$ENABLE_POSTGRESQL8API" )
 		then
 			AC_MSG_CHECKING(if PostgreSQL has PQprepare)
 			FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQprepare(NULL,NULL,NULL,NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQPREPARE,1,Some versions of postgresql have PQprepare)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQprepare(0,0,0,0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQPREPARE,1,Some versions of postgresql have PQprepare)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(if PostgreSQL has PQexecPrepared)
 			FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQexecPrepared(NULL,NULL,0,NULL,NULL,NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQEXECPREPARED,1,Some versions of postgresql have PQexecPrepared)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQexecPrepared(0,0,0,0,0,0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQEXECPREPARED,1,Some versions of postgresql have PQexecPrepared)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(if PostgreSQL has PQsendQueryPrepared)
 			FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQsendQueryPrepared(NULL,NULL,0,NULL,NULL,NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSENDQUERYPREPARED,1,Some versions of postgresql have PQsendQueryPrepared)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQsendQueryPrepared(0,0,0,0,0,0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSENDQUERYPREPARED,1,Some versions of postgresql have PQsendQueryPrepared)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(if PostgreSQL has PQsetSingleRowMode)
 			FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQsetSingleRowMode(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETSINGLEROWMODE,1,Some versions of postgresql have PQsetSingleRowMode)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQsetSingleRowMode(0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETSINGLEROWMODE,1,Some versions of postgresql have PQsetSingleRowMode)],[AC_MSG_RESULT(no)])
 			AC_MSG_CHECKING(if PostgreSQL has PQdescribePrepared)
 			FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQdescribePrepared(NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQDESCRIBEPREPARED,1,Some versions of postgresql have PQdescribePrepared)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQdescribePrepared(0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQDESCRIBEPREPARED,1,Some versions of postgresql have PQdescribePrepared)],[AC_MSG_RESULT(no)])
 		fi
 		AC_MSG_CHECKING(if PostgreSQL has PQserverVersion)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQserverVersion(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSERVERVERSION,1,Some versions of postgresql have PQserverVersion)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQserverVersion(0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSERVERVERSION,1,Some versions of postgresql have PQserverVersion)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQparameterStatus)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQparameterStatus(NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQPARAMETERSTATUS,1,Some versions of postgresql have PQparameterStatus)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQparameterStatus(0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQPARAMETERSTATUS,1,Some versions of postgresql have PQparameterStatus)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQsetClientEncoding)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQsetClientEncoding(NULL,NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETCLIENTENCODING,1,Some versions of postgresql have PQsetClientEncoding)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQsetClientEncoding(0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQSETCLIENTENCODING,1,Some versions of postgresql have PQsetClientEncoding)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQoidValue)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQoidValue(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQOIDVALUE,1,Some versions of postgresql have PQoidValue)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQoidValue(0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQOIDVALUE,1,Some versions of postgresql have PQoidValue)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQbinaryTuples)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQbinaryTuples(NULL);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQBINARYTUPLES,1,Some versions of postgresql have PQbinaryTuples)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQbinaryTuples(0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQBINARYTUPLES,1,Some versions of postgresql have PQbinaryTuples)],[AC_MSG_RESULT(no)])
 		AC_MSG_CHECKING(if PostgreSQL has PQftable)
 		FW_TRY_LINK([#include <libpq-fe.h>
-#include <stdlib.h>],[PQftable(NULL,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQFTABLE,1,Some versions of postgresql have PQftable)],[AC_MSG_RESULT(no)])
+#include <stdlib.h>],[PQftable(0,0);],[$POSTGRESQLINCLUDES],[$POSTGRESQLLIBS $SOCKETLIBS],[$LD_LIBRARY_PATH:$POSTGRESQLLIBSPATH],[AC_MSG_RESULT(yes); AC_DEFINE(HAVE_POSTGRESQL_PQFTABLE,1,Some versions of postgresql have PQftable)],[AC_MSG_RESULT(no)])
 	fi
 
 	FW_INCLUDES(postgresql,[$POSTGRESQLINCLUDES])
