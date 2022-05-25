@@ -232,13 +232,7 @@ bool sqlrcrud::doCreate(const char * const *columns,
 			valstr.append("null");
 		} else if (!charstring::compareIgnoringCase(
 						*c,primarykey)) {
-			// FIXME: this works for oracle and ???
-			valstr.append(idsequence);
-			valstr.append(".nextval");
-			// FIXME: this works for postgresql and ???
-			//valstr.append("nextval('");
-			//valstr.append(idsequence);
-			//valstr.append("')");
+			valstr.writeFormatted(con->nextvalFormat(),idsequence);
 		} else {
 			if (bindformat[0]=='?') {
 				valstr.append('?');
