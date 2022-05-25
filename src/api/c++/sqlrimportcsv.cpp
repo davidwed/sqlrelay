@@ -289,11 +289,9 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 	if (insertprimarykey && currentcol==primarykeycolumnindex) {
 		if (primarykeysequence) {
 			stringbuffer	tmp;
-			tmp.append("nextval('");
-			tmp.append(primarykeysequence);
-			tmp.append("')");
-			fields[fields.getLength()]=
-					tmp.detachString();
+			tmp.writeFormatted(sqlrcon->nextvalFormat(),
+							primarykeysequence);
+			fields[fields.getLength()]=tmp.detachString();
 		} else {
 			fields[fields.getLength()]=
 					charstring::duplicate("null");
