@@ -4,3 +4,4 @@
 #include <sqlrelay/sqlrcollections.h>
 #include <rudiments/jsondom.h>
 #include <rudiments/xmldom.h>
+#include <rudiments/mvc.h>

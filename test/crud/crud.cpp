@@ -215,7 +215,7 @@ int main(int argc, char **argv) {
 			checkSuccess(crud->doRead(criteria.getString(),
 						sort.getString(),0),true);
 
-			const sqlrresultsettable	*t=
+			const tablecollection<const char *>	*t=
 						crud->getResultSetTable();
 
 			// check col/row counts
@@ -281,7 +281,7 @@ int main(int argc, char **argv) {
 			checkSuccess(crud->getAffectedRows(),1);
 			stdoutput.printf("\n");
 
-			const sqlrresultsettable	*t=
+			const tablecollection<const char *>	*t=
 						crud->getResultSetTable();
 
 			// validate updates to the row

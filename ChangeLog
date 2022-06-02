@@ -51,6 +51,7 @@
 	added support for PDO in PHP 8.1
 	added affected rows to sqlrsh stats
 	NULL -> 0 in PostgreSQL function tests
+	added sqlrcrud class
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

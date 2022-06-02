@@ -9,26 +9,31 @@
 /** The sqlrcrud class provides a generic CRUD (create, read, update, and
  *  delete) interface to SQL Relay.
  *
- *  A typical invocation would be:
+ *  A typical invocation of a mycrud class which implements mvccrud, from
+ *  within the dao tier of an MVC application, would be something like:
  *
- *  sqlrconnection	con(...);
- *  sqlrcursor		cur(&con);
- *  sqlrcrud		crud;
  *
- *  crud.setSqlrConnection(&con);
- *  crud.setSqlrCursor(&cur);
- *  crud.setTable("mytable");
- *  crud.setIdSequence("mytable_ids");
+ *  // initialize crud
+ *  sqlrconnection	*con=new sqlrconnection(...);
+ *  sqlrcursor		*cur=new sqlrcursor(con);
+ *  sqlrcrud		*crud=new sqlrcrud();
  *
- *  crud.buildQueries();
+ *  crud->setSqlrConnection(con);
+ *  crud->setSqlrCursor(cur);
+ *  crud->setTable("mytable");
+ *  crud->setIdSequence("mytable_ids");
+ *  crud->buildQueries();
  *
- *  crud.doRead(...);
+ *  // read data
+ *  crud->doRead(...);
  *
- *  sqlrresultsettable	*t=getResultSetTable();
+ *  // return results via instance of mvcresults
+ *  mvcr->setSuccess();
+ *  mvcr->attachData("myresults","table",crud->getResultSetTable());
+ *  mvcr->getWatebasket()->attach(crud);
+ *  mvcr->getWatebasket()->attach(con);
+ *  mvcr->getWatebasket()->attach(cur);
  *
- *  for (...) {
- *  	... process result set ...
- *  }
  *
  *  Various methods such as doRead(), doUpdate(), and doDelete() take a
  *  "criteria" argument.  This should be a JSON string in jsonlogic format
@@ -59,12 +64,8 @@
  *  The class also provides methods for overriding the template queries that
  *  are automatically built by buildQueries() as well as any primary key or
  *  autoincrement columns detected by buildQueries().
- *
- *  This class might be used in an MVC application, in which a tableview
- *  requests various CRUD operations, optionally providing JSON-formatted
- *  criteria and sort parameters.
  */
-class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
+class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 	public:
 		/** Creates an instance of the sqlrcrud class. */
 		sqlrcrud();
@@ -343,32 +344,34 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public object {
 		 *  field of the first row of the result set if doRead() was
 		 *  most recently called, or an empty sqlrscalar if doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called. */
-		const sqlrscalar	*getScalar();
+		const scalarcollection<const char *>	*getScalar();
 
 		/** Returns an instance of sqlrrowlinkedlist, representing the
 		 *  first row of the result set if doRead() was most recently
 		 *  called, or an empty sqlrrowlinkedlist if doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called. */
-		const sqlrrowlinkedlist	*getRowLinkedList();
+		const listcollection<const char *>	*getRowLinkedList();
 
 		/** Returns an instance of sqlrrowdictionary, representing the
 		 *  first row of the result set if doRead() was most recently
 		 *  called, or an empty sqlrrowdictionary if doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called. */
-		const sqlrrowdictionary	*getRowDictionary();
+		const dictionarycollection<const char *, const char *>
+							*getRowDictionary();
 
 		/** Returns an instance of sqlrrowdictionary, representing the
 		 *  first column of each row of the result set if doRead() was
 		 *  most recently called, or an empty sqlrresultsetlinkedlist
 		 *  if doCreate(), doUpdate(), or doDelete() was most recently
 		 *  called. */
-		const sqlrresultsetlinkedlist	*getResultSetLinkedList();
+		const listcollection<const char *>
+					*getResultSetLinkedList();
 
 		/** Returns an instance of sqlresultsettable, representing the
 		 *  result set if doRead() was most recently called, or an
 		 *  empty sqlrresultsettable if doCreate(), doUpdate(), or
 		 *  doDelete() was most recently called. */
-		const sqlrresultsettable	*getResultSetTable();
+		const tablecollection<const char *>	*getResultSetTable();
 
 	#include <sqlrelay/private/sqlrcrud.h>
 };

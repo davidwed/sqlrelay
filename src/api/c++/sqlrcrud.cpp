@@ -692,27 +692,28 @@ uint64_t sqlrcrud::getAffectedRows() {
 	return cur->affectedRows();
 }
 
-const sqlrscalar *sqlrcrud::getScalar() {
+const scalarcollection<const char *> *sqlrcrud::getScalar() {
 	scl.setCursor(cur);
 	return &scl;
 }
 
-const sqlrrowlinkedlist *sqlrcrud::getRowLinkedList() {
+const listcollection<const char *> *sqlrcrud::getRowLinkedList() {
 	rlst.setCursor(cur);
 	return &rlst;
 }
 
-const sqlrrowdictionary *sqlrcrud::getRowDictionary() {
+const dictionarycollection<const char *,const char *>
+					*sqlrcrud::getRowDictionary() {
 	rdct.setCursor(cur);
 	return &rdct;
 }
 
-const sqlrresultsetlinkedlist *sqlrcrud::getResultSetLinkedList() {
+const listcollection<const char *> *sqlrcrud::getResultSetLinkedList() {
 	rslst.setCursor(cur);
 	return &rslst;
 }
 
-const sqlrresultsettable *sqlrcrud::getResultSetTable() {
+const tablecollection<const char *> *sqlrcrud::getResultSetTable() {
 	rstbl.setCursor(cur);
 	return &rstbl;
 }
