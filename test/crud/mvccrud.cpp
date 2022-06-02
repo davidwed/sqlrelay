@@ -297,7 +297,7 @@ void testdao::updateTest(dictionary<const char *, const char *> *kvp,
 	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
 
 	// FIXME: I need a way to quickly decompose a dictionary into keys
-	// and values, or a way to pass doCreate a dictionary
+	// and values, or a way to pass doUpdate a dictionary
 	const char * const *cols=NULL;
 	const char * const *vals=NULL;
 
@@ -339,10 +339,11 @@ void testdao::deleteTest(dictionary<const char *, const char *> *kvp,
 
 bool httpModuleMain(httpserverapi *sapi) {
 
+	// set up request/response
 	httprequest	req(sapi);
 	httpresponse	resp(sapi);
 
-	// get the path and truncate any params
+	// get the path from the request and truncate any params
 	char	*path=charstring::duplicate(
 				req.getEnvironmentVariable("PATH_INFO"));
 	char	*query=charstring::findFirst(path,'?');
@@ -350,6 +351,7 @@ bool httpModuleMain(httpserverapi *sapi) {
 		*query='\0';
 	}
 
+	// set up properties (normally these would be in a file)
 	mvcproperties	prop;
 	prop.parseString(
 		"sqlr.host=localhost\n"
@@ -359,16 +361,21 @@ bool httpModuleMain(httpserverapi *sapi) {
 		"sqlr.password=test\n"
 		"table=testtable");
 
+	// set up the view
 	testview	tv;
 	tv.setRequest(&req);
 	tv.setResponse(&resp);
 	tv.setProperties(&prop);
 	tv.setPath(path);
 
+	// run the view
 	bool	handled=false;
 	bool	result=tv.run(&handled);
+
+	// clean up
 	delete[] path;
 
+	// handle success/error conditions
 	if (!result) {
 		return false;
 	}
