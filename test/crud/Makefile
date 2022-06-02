@@ -10,11 +10,14 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPTESTCPPFLAGS) $(COMPILE) $<
 
-all: crud
+all: crud mvccrud.cgi
 
 crud: crud.cpp crud.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) crud.$(OBJ) $(CPPTESTLIBS)
 
+mvccrud.cgi: mvccrud.cpp mvccrud.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mvccrud.$(OBJ) $(CPPTESTLIBS)
+
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj crud$(EXE)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj crud$(EXE) mvccrud.cgi
 	$(RMTREE) .libs

@@ -205,42 +205,50 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	// clear any previous error
 	error.clear();
 
-	// build $(COLUMNS)
 	stringbuffer	colstr;
-	bool	first=true;
-	for (const char * const *c=columns; *c; c++) {
-		if (first) {
-			first=false;
-		} else {
-			colstr.append(',');
-		}
-		colstr.append(*c);
-	}
-
-	// build $(VALUES)
 	stringbuffer	valstr;
-	const char	*bindformat=con->bindFormat();
-	uint64_t	col=1;
-	first=true;
-	for (const char * const *c=columns; *c; c++) {
-		if (first) {
-			first=false;
-		} else {
-			valstr.append(',');
+	const char	*bindformat=NULL;
+
+	if (columns && values) {
+
+		// build $(COLUMNS)
+		bool	first=true;
+		for (const char * const *c=columns; *c; c++) {
+			if (first) {
+				first=false;
+			} else {
+				colstr.append(',');
+			}
+			colstr.append(*c);
 		}
-		if (!charstring::compareIgnoringCase(*c,autoinc)) {
-			valstr.append("null");
-		} else if (!charstring::compareIgnoringCase(
-						*c,primarykey)) {
-			valstr.writeFormatted(con->nextvalFormat(),idsequence);
-		} else {
-			if (bindformat[0]=='?') {
-				valstr.append('?');
-			} else if (bindformat[0]=='$') {
-				valstr.append('$')->append(col);
-				col++;
-			} else if (bindformat[0]=='@' || bindformat[0]==':') {
-				valstr.append(bindformat[0])->append(*c);
+
+		// build $(VALUES)
+		bindformat=con->bindFormat();
+		uint64_t	col=1;
+		first=true;
+		for (const char * const *c=columns; *c; c++) {
+			if (first) {
+				first=false;
+			} else {
+				valstr.append(',');
+			}
+			if (!charstring::compareIgnoringCase(*c,autoinc)) {
+				valstr.append("null");
+			} else if (!charstring::compareIgnoringCase(
+							*c,primarykey)) {
+				valstr.writeFormatted(
+					con->nextvalFormat(),idsequence);
+			} else {
+				if (bindformat[0]=='?') {
+					valstr.append('?');
+				} else if (bindformat[0]=='$') {
+					valstr.append('$')->append(col);
+					col++;
+				} else if (bindformat[0]=='@' ||
+						bindformat[0]==':') {
+					valstr.append(bindformat[0])->
+								append(*c);
+				}
 			}
 		}
 	}
@@ -248,12 +256,15 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	// prepare
 	cur->prepareQuery(createquery.getString());
 
+
 	// substitute
 	cur->substitution("COLUMNS",colstr.getString());
 	cur->substitution("VALUES",valstr.getString());
 
 	// bind
-	bind(bindformat,columns,values);
+	if (columns && values) {
+		bind(bindformat,columns,values);
+	}
 
 	// execute
 	return cur->executeQuery();
@@ -590,50 +601,55 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 	// clear any previous error
 	error.clear();
 
-	// build $(SET)
 	stringbuffer	setstr;
-	const char	*bindformat=con->bindFormat();
-	if (bindformat[0]=='?') {
-		bool	first=true;
-		for (const char * const *c=columns; *c; c++) {
-			if (!charstring::compare(*c,autoinc)) {
-				continue;
+	const char	*bindformat=NULL;
+
+	if (columns && values) {
+
+		// build $(SET)
+		bindformat=con->bindFormat();
+		if (bindformat[0]=='?') {
+			bool	first=true;
+			for (const char * const *c=columns; *c; c++) {
+				if (!charstring::compare(*c,autoinc)) {
+					continue;
+				}
+				if (first) {
+					first=false;
+				} else {
+					setstr.append(',');
+				}
+				setstr.append(*c)->append('=');
+				setstr.append('?');
 			}
-			if (first) {
-				first=false;
-			} else {
-				setstr.append(',');
+		} else if (bindformat[0]=='$') {
+			uint64_t	col=1;
+			for (const char * const *c=columns; *c; c++) {
+				if (!charstring::compare(*c,autoinc)) {
+					continue;
+				}
+				if (col>1) {
+					setstr.append(',');
+				}
+				setstr.append(*c)->append('=');
+				setstr.append('$')->append(col);
+				col++;
 			}
-			setstr.append(*c)->append('=');
-			setstr.append('?');
-		}
-	} else if (bindformat[0]=='$') {
-		uint64_t	col=1;
-		for (const char * const *c=columns; *c; c++) {
-			if (!charstring::compare(*c,autoinc)) {
-				continue;
+		} else if (bindformat[0]=='@' || bindformat[0]==':') {
+			bool	first=true;
+			for (const char * const *c=columns; *c; c++) {
+				if (!charstring::compare(*c,autoinc)) {
+					continue;
+				}
+				if (first) {
+					first=false;
+				} else {
+					setstr.append(',');
+				}
+				setstr.append(*c)->append('=');
+				setstr.append(bindformat[0]);
+				setstr.append(*c);
 			}
-			if (col>1) {
-				setstr.append(',');
-			}
-			setstr.append(*c)->append('=');
-			setstr.append('$')->append(col);
-			col++;
-		}
-	} else if (bindformat[0]=='@' || bindformat[0]==':') {
-		bool	first=true;
-		for (const char * const *c=columns; *c; c++) {
-			if (!charstring::compare(*c,autoinc)) {
-				continue;
-			}
-			if (first) {
-				first=false;
-			} else {
-				setstr.append(',');
-			}
-			setstr.append(*c)->append('=');
-			setstr.append(bindformat[0]);
-			setstr.append(*c);
 		}
 	}
 
@@ -651,7 +667,9 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 	cur->substitution("WHERE",wherestr.getString());
 
 	// bind
-	bind(bindformat,columns,values);
+	if (columns && values) {
+		bind(bindformat,columns,values);
+	}
 
 	// execute
 	return cur->executeQuery();
