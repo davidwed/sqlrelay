@@ -111,6 +111,8 @@ bool testview::run(bool *handled) {
 	testcontroller	tc;
 	tc.setProperties(getProperties());
 
+	// FIXME: get POSTed JSON instead of params...
+
 	// build params
 	dictionary<const char *, const char *>	params;
 	params.setValues(getRequest()->getAllVariables(),
