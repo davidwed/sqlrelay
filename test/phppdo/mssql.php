@@ -3,12 +3,12 @@
 # See the file COPYING for more information.
 
 	$host="sqlrelay";
-	$port=8000;
+	$port=9000;
 	$socket="/tmp/test.socket";
 	$user="test";
 	$password="test";
 	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;fetchlobsasstrings=1;debug=1";
-	#$dsn = "odbc:dsn=mssqlodbc;uid=testuser;pwd=testpassword";
+	#$dsn = "odbc:dsn=mssqlodbc;uid=test;pwd=test";
 
 	$dbh=new PDO($dsn,$user,$password);
 	$stmt=$dbh->query("select ".
