@@ -1555,7 +1555,7 @@ sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 							getLastInsertId();
 	uint16_t	idlen=charstring::integerLength(lastid)+1;
 	char		*id=(char *)safe_emalloc(idlen,sizeof(char),0);
-	charstring::printf(id,idlen,"%d",lastid);
+	charstring::printf(id,idlen,"%lld",lastid);
 #if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	*len=idlen;
 	return id;
