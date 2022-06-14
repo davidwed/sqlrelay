@@ -130,9 +130,9 @@ void sqlrrowdictionary::clear() {
 
 void sqlrrowdictionary::print() const {
 	for (uint32_t i=0; i<pvt->_cursor->colCount(); i++) {
-		node_print(pvt->_cursor->getColumnName(i));
+		this->getWriter()->write(pvt->_cursor->getColumnName(i));
 		stdoutput.printf(":");
-		node_print(pvt->_cursor->getField(pvt->_row,i));
+		this->getWriter()->write(pvt->_cursor->getField(pvt->_row,i));
 		stdoutput.printf("\n");
 	}
 }

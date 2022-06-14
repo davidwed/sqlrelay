@@ -179,7 +179,7 @@ bool sqlrlogger_stalecursors::run(sqlrlistener *sqlrl,
 		// build the date string
 		dt.getSystemDateAndTime();
 		dtstr.clear();
-		dtstr.writeFormatted("%04d-%02d-%02d %02d:%02d:%02d",
+		dtstr.printf("%04d-%02d-%02d %02d:%02d:%02d",
 				dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
 				dt.getHour(),dt.getMinutes(),dt.getSeconds());
 

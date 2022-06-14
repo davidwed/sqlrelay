@@ -236,8 +236,7 @@ bool sqlrcrud::doCreate(const char * const *columns,
 				valstr.append("null");
 			} else if (!charstring::compareIgnoringCase(
 							*c,primarykey)) {
-				valstr.writeFormatted(
-					con->nextvalFormat(),idsequence);
+				valstr.printf(con->nextvalFormat(),idsequence);
 			} else {
 				if (bindformat[0]=='?') {
 					valstr.append('?');

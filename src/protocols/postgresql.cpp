@@ -2412,7 +2412,7 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 				if (!i) {
 					str.append(digit);
 				} else {
-					str.writeFormatted("%04d",digit);
+					str.printf("%04d",digit);
 				}
 			}
 			

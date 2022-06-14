@@ -7646,7 +7646,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable1(
 
 	bool	retval=true;
 	stringbuffer	str;
-	str.writeFormatted(errorfieldtablequery,errorfieldtable);
+	str.printf(errorfieldtablequery,errorfieldtable);
 	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
 							!executeQuery(cursor)) {
 		saveErrorFromCursor(cursor);
@@ -7712,7 +7712,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable2(
 
 	bool	retval=true;
 	stringbuffer	str;
-	str.writeFormatted(errorrowtablequery,errorrowtable,table);
+	str.printf(errorrowtablequery,errorrowtable,table);
 	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
 							!executeQuery(cursor)) {
 		saveErrorFromCursor(cursor);
@@ -8476,13 +8476,13 @@ bool sqlrservercontroller::bulkLoadStoreError(int64_t errorcode,
 		const char	*errorquery=
 				"insert into %s values (%lld,'%s','%s')";
 		stringbuffer	query;
-		query.writeFormatted(errorquery,
-					bulkerrorfieldtable,
-					errorcode,
-					// FIXME: get the column somehow
-					"bad_column",
-					// FIXME: get the data somehow
-					"bad_data");
+		query.printf(errorquery,
+				bulkerrorfieldtable,
+				errorcode,
+				// FIXME: get the column somehow
+				"bad_column",
+				// FIXME: get the data somehow
+				"bad_data");
 
 		if (!prepareQuery(cur,query.getString(),
 					query.getStringLength()) ||
