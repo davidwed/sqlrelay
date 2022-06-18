@@ -136,9 +136,10 @@ then
 		dnl if we didn't find anything yet, look for RPM-based
 		dnl instantclient, which, oddly enough, does contain
 		dnl libclntsh.so
-		if ( test -z "$ORACLELIBS" )
+		if ( test -z "$ORACLELIBS" -a -d "/usr/lib/oracle" )
 		then
-			for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
+			cd /usr/lib/oracle
+			for version in `ls -d * 2> /dev/null`
 			do
 				ORACLEVERSION="10g"
 				if ( test -n "`echo $version | grep 11`" )
@@ -179,6 +180,7 @@ then
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/$OCLIENT"
 				fi
 			done
+			cd -
 		fi
 		
 		if ( test -n "$ORACLEVERSION" )
