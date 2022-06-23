@@ -1047,25 +1047,25 @@ outfiles=Array(_
 	"sqlrelay-c++.pc",_
 	"msvc\\setupx64\\setupx64.vdproj",_
 	"msvc\\setupx86\\setupx86.vdproj",_
-	"test\\sqlrelay.conf.d\\db2.conf.in"_
-	"test\\sqlrelay.conf.d\\extensions.conf.in"_
-	"test\\sqlrelay.conf.d\\firebird.conf.in"_
-	"test\\sqlrelay.conf.d\\freetds.conf.in"_
-	"test\\sqlrelay.conf.d\\informix.conf.in"_
-	"test\\sqlrelay.conf.d\\mssql.conf.in"_
-	"test\\sqlrelay.conf.d\\mysql.conf.in"_
-	"test\\sqlrelay.conf.d\\mysqlprotocol.conf.in"_
-	"test\\sqlrelay.conf.d\\mysqlupsert.conf.in"_
-	"test\\sqlrelay.conf.d\\oracle.conf.in"_
-	"test\\sqlrelay.conf.d\\oracleprotocol.conf.in"_
-	"test\\sqlrelay.conf.d\\postgresql.conf.in"_
-	"test\\sqlrelay.conf.d\\postgresqlprotocol.conf.in"_
-	"test\\sqlrelay.conf.d\\postgresqlupsert.conf.in"_
-	"test\\sqlrelay.conf.d\\router.conf.in"_
-	"test\\sqlrelay.conf.d\\sap.conf.in"_
-	"test\\sqlrelay.conf.d\\sqlite.conf.in"_
-	"test\\sqlrelay.conf.d\\tdsprotocol.conf.in"_
-	"test\\sqlrelay.conf.d\\teradataprotocol.conf.in"_
+	"test\\sqlrelay.conf.d\\db2.conf.in",_
+	"test\\sqlrelay.conf.d\\extensions.conf.in",_
+	"test\\sqlrelay.conf.d\\firebird.conf.in",_
+	"test\\sqlrelay.conf.d\\freetds.conf.in",_
+	"test\\sqlrelay.conf.d\\informix.conf.in",_
+	"test\\sqlrelay.conf.d\\mssql.conf.in",_
+	"test\\sqlrelay.conf.d\\mysql.conf.in",_
+	"test\\sqlrelay.conf.d\\mysqlprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\mysqlupsert.conf.in",_
+	"test\\sqlrelay.conf.d\\oracle.conf.in",_
+	"test\\sqlrelay.conf.d\\oracleprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresql.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresqlprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresqlupsert.conf.in",_
+	"test\\sqlrelay.conf.d\\router.conf.in",_
+	"test\\sqlrelay.conf.d\\sap.conf.in",_
+	"test\\sqlrelay.conf.d\\sqlite.conf.in",_
+	"test\\sqlrelay.conf.d\\tdsprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\teradataprotocol.conf.in",_
 	"test\\sqlrelay.conf.d\\tls.conf.in"_
 	)
 
