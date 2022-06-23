@@ -220,7 +220,12 @@ int main(int argc, const char **argv) {
 		stderror.printf("%s-connection (pid=%d) ",
 				SQLR,(uint32_t)process::getProcessId());
 		stderror.printf(
-			(signum==SIGINT || signum==SIGTERM || signum==SIGQUIT)?
+				(signum==SIGINT ||
+					signum==SIGTERM
+					#ifdef SIGQUIT
+					|| signum==SIGQUIT
+					#endif
+					)?
 				"Process terminated with signal %d\n":
 				"Abnormal termination: signal %d received\n",
 			signum);

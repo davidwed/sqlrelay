@@ -168,7 +168,12 @@ int main(int argc, const char **argv) {
 		}
 
 		// print exit message (on abnormal shutdown)
-		if (signum!=SIGINT && signum!=SIGTERM && signum!=SIGQUIT) {
+		if (signum!=SIGINT &&
+				signum!=SIGTERM
+				#ifdef SIGQUIT
+				&& signum!=SIGQUIT
+				#endif
+				) {
 			stderror.printf("%s-listener (pid=%d) "
 				"Abnormal termination: signal %d received\n",
 				SQLR,(uint32_t)process::getProcessId(),signum);
