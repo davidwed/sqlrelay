@@ -96,7 +96,6 @@ class sqlrlistenerprivate {
 		int32_t		_idleclienttimeout;
 
 		bool	_isforkedchild;
-		bool	_isforkedthread;
 
 		bool	_usethreads;
 };
@@ -152,7 +151,6 @@ sqlrlistener::sqlrlistener() {
 	pvt->_idleclienttimeout=-1;
 
 	pvt->_isforkedchild=false;
-	pvt->_isforkedthread=false;
 	pvt->_handoffmode=HANDOFF_PASS;
 
 	pvt->_usethreads=false;
@@ -1454,7 +1452,6 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		// spawn the thread
 		if (thr->spawn((void *(*)(void *))clientSessionThread,
 							(void *)csa,true)) {
-			pvt->_isforkedthread=true;
 			return;
 		}
 
@@ -1466,6 +1463,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 			SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
 		raiseInternalErrorEvent(
 			SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
+		// FIXME: I think we need to delete clientsock here too
 		delete csa;
 		delete thr;
 		return;
