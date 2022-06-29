@@ -161,7 +161,7 @@ enum columncase {
 };
 
 
-class sqlrclientbindvar {
+class sqlrclientbindvar : public object {
 	friend class sqlrcursor;
 	friend class sqlrcursorprivate;
 	private:
