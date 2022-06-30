@@ -2448,7 +2448,7 @@ void sqlrsh::displayHelp(sqlrshenv *env) {
 	stdoutput.printf("		inputbind [variable] = [stringvalue]\n");
 	stdoutput.printf("		inputbind [variable] = [integervalue]\n");
 	stdoutput.printf("		inputbind [variable] = [doublevalue]\n");
-	stdoutput.printf("		inputbind [variable] = [MM/DD/YYYY HH:MM:SS:uS TZN]\n");
+	stdoutput.printf("		inputbind [variable] = [MM/DD/YYYY HH24:MM:SS:uS TZN]\n");
 	stdoutput.printf("		inputbindblob [variable] = [value]\n");
 	stdoutput.printf("	outputbind ...                 - ");
 	stdoutput.printf("defines an output bind variable\n");

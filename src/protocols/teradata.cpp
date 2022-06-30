@@ -6434,9 +6434,11 @@ void sqlrprotocol_teradata::getFieldFormat(bytebuffer *fieldformat,
 	} else if (!charstring::compare(type,"DATE")) {
 		fieldformat->write("YY/MM/DD");
 	} else if (!charstring::compare(type,"TIME")) {
+		// FIXME: HH24?
 		fieldformat->write("HH:MI:SS.S(6)");
 	} else if (!charstring::compare(type,"TIMESTAMP") ||
 			!charstring::compare(type,"DATETIME")) {
+		// FIXME: HH24?
 		fieldformat->write("YYYY-MM-DDBHH:MI:SS.S(6)");
 	} else {
 		// fall back to char/varchar

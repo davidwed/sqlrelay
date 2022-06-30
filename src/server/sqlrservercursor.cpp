@@ -354,7 +354,7 @@ void sqlrservercursor::dateToString(char *buffer, uint16_t buffersize,
 	const char	*format=conn->cont->getConfig()->
 					getFakeInputBindVariablesDateFormat();
 	if (charstring::isNullOrEmpty(format)) {
-		format="YYYY-MM-DD HH:MI:SS";
+		format="YYYY-MM-DD HH24:MI:SS";
 	}
 
 	// FIXME: it'd be nice if we could pass buffer/buffersize
