@@ -15,7 +15,6 @@
 		const char * &getValue();
 		void	setNext(listnode<const char *> *next);
 		void	setPrevious(listnode<const char *> *next);
-		void	print() const;
 
 	private:
 		sqlrlinkedlistnodeprivate	*pvt;

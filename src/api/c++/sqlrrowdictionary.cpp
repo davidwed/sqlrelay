@@ -128,11 +128,18 @@ void sqlrrowdictionary::clear() {
 	// do nothing
 }
 
-void sqlrrowdictionary::print() const {
-	for (uint32_t i=0; i<pvt->_cursor->colCount(); i++) {
-		this->getWriter()->write(pvt->_cursor->getColumnName(i));
-		stdoutput.printf(":");
-		this->getWriter()->write(pvt->_cursor->getField(pvt->_row,i));
-		stdoutput.printf("\n");
+ssize_t sqlrrowdictionary::write(output *out) const {
+	ssize_t	retval=0;
+	for (uint32_t i=0; i<pvt->_cursor->colCount() &&
+		incOrErr(&retval,
+			writeDelegate(out,
+				pvt->_cursor->getColumnName(i))) &&
+		incOrErr(&retval,out->write(':')) &&
+		incOrErr(&retval,
+			writeDelegate(out,
+				pvt->_cursor->getField(pvt->_row,i))) &&
+		incOrErr(&retval,out->write('\n'));
+		i++) {
 	}
+	return retval;
 }

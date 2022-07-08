@@ -117,13 +117,6 @@ class SQLRCLIENT_DLLSPEC sqlrrowlinkedlist :
 		 *  if "value" was not found. */
 		listnode<const char *>	*find(listnode<const char *> *startnode,
 						const char *value) const;
-
-		/** Prints out a representation of the sqlrrowlinkedlist. */
-		void	print() const;
-
-		/** Prints out a representation of the first "count"
-		 *  nodes of the sqlrrowlinkedlist. */
-		void	print(uint64_t count) const;
 	
 		#include <sqlrelay/private/sqlrrowlinkedlist.h>
 };
@@ -192,8 +185,9 @@ class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 		 *  in the dictionary. */
 		uint64_t	getLength() const;
 
-		/** Prints out a representation of the dictionary (row). */
-		void	print() const;
+		/** Writes out a representation of the dictionary (row) to
+		 *  "out". */
+		ssize_t		write(output *out) const;
 	
 		#include <sqlrelay/private/sqlrrowdictionary.h>
 };
@@ -258,14 +252,6 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlinkedlist :
 		 *  if "value" was not found. */
 		listnode<const char *>	*find(listnode<const char *> *startnode,
 						const char *value) const;
-
-		/** Prints out a representation of the
- 		 *  sqlrresultsetlinkedlist. */
-		void	print() const;
-
-		/** Prints out a representation of the first "count"
-		 *  nodes of the sqlrresultsetlinkedlist. */
-		void	print(uint64_t count) const;
 	
 		#include <sqlrelay/private/sqlrresultsetlinkedlist.h>
 };

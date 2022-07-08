@@ -102,10 +102,6 @@ listnode<const char *> *sqlrlinkedlistnode::getNext() const {
 	} 
 }
 
-void sqlrlinkedlistnode::print() const {
-	// FIXME: implement this
-}
-
 class sqlrrowlinkedlistprivate {
 	private:
 		friend class sqlrrowlinkedlist;
@@ -270,14 +266,6 @@ void sqlrrowlinkedlist::heapSort() {
 
 void sqlrrowlinkedlist::clear() {
 	// do nothing
-}
-
-void sqlrrowlinkedlist::print() const {
-	// FIXME: implement this
-}
-
-void sqlrrowlinkedlist::print(uint64_t count) const {
-	// FIXME: implement this
 }
 
 class sqlrresultsetlinkedlistprivate {
@@ -449,12 +437,4 @@ void sqlrresultsetlinkedlist::heapSort() {
 
 void sqlrresultsetlinkedlist::clear() {
 	// do nothing
-}
-
-void sqlrresultsetlinkedlist::print() const {
-	// FIXME: implement this
-}
-
-void sqlrresultsetlinkedlist::print(uint64_t count) const {
-	// FIXME: implement this
 }

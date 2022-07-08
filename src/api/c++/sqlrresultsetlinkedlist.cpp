@@ -103,10 +103,6 @@ listnode<const char *> *sqlrresultsetlinkedlistnode::getNext() const {
 	} 
 }
 
-void sqlrresultsetlinkedlistnode::print() const {
-	// FIXME: implement this
-}
-
 class sqlrresultsetlinkedlistprivate {
 	private:
 		friend class sqlrresultsetlinkedlist;
@@ -273,10 +269,12 @@ void sqlrresultsetlinkedlist::clear() {
 	// do nothing
 }
 
-void sqlrresultsetlinkedlist::print() const {
+ssize_t sqlrresultsetlinkedlist::write(output *out) const {
 	// FIXME: implement this
+	return 0;
 }
 
-void sqlrresultsetlinkedlist::print(uint64_t count) const {
+ssize_t sqlrresultsetlinkedlist::write(output *out, uint64_t count) const {
 	// FIXME: implement this
+	return 0;
 }

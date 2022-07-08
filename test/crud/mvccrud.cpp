@@ -118,40 +118,51 @@ bool testview::run(bool *handled) {
 	params.setValues(getRequest()->getAllVariables(),
 				getRequest()->getAllValues());
 
-	// run the appropriate controller method
-	mvcresult	r;
-	*handled=true;
+	// run the appropriate controller method and get the result;
+	mvcresult		r;
+	const collection	*result=NULL;
 	if (!charstring::compare(path,"/create.html")) {
 
 		// normally we wouldn't pass params directly down
 		// from the view, as-is, but it's fine for this test
 		tc.createTest(&params,&r);
-		// FIXME: do something with the result
+		result=r.getData("affectedrows");
 
 	} else if (!charstring::compare(path,"/read.html")) {
 
 		// normally we wouldn't pass params directly down
 		// from the view, as-is, but it's fine for this test
 		tc.readTest(&params,&r);
-		// FIXME: do something with the result
+		result=r.getData("resultset");
 
 	} else if (!charstring::compare(path,"/update.html")) {
 
 		// normally we wouldn't pass params directly down
 		// from the view, as-is, but it's fine for this test
 		tc.updateTest(&params,&r);
-		// FIXME: do something with the result
+		result=r.getData("affectedrows");
 
 	} else if (!charstring::compare(path,"/delete.html")) {
 
 		// normally we wouldn't pass params directly down
 		// from the view, as-is, but it's fine for this test
 		tc.deleteTest(&params,&r);
-		// FIXME: do something with the result
-
+		result=r.getData("affectedrows");
 	} else {
 		*handled=false;
 	}
+
+	// respond
+	getResponse()->textHtml();
+	if (result) {
+		result->writeJson(getResponse());
+	} else {
+		// FIXME: some kind of error response
+	}
+
+	// clean up
+	r.getWastebasket()->empty();
+
 	return true;
 }
 
@@ -265,7 +276,9 @@ void testdao::createTest(dictionary<const char *, const char *> *kvp,
 
 		scalar<uint64_t>	*s=new scalar<uint64_t>();
 		s->setValue(crud->getAffectedRows());
-		r->attachData("affectedrows","scalar",s);
+		r->setData("affectedrows","scalar",s);
+
+		r->getWastebasket()->attach(s);
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -283,10 +296,7 @@ void testdao::readTest(dictionary<const char *, const char *> *kvp,
 
 	if (crud->doRead(criteria,sort,0)) {
 		r->setSuccess();
-
-		scalar<uint64_t>	*s=new scalar<uint64_t>();
-		s->setValue(crud->getAffectedRows());
-		r->attachData("affectedrows","scalar",s);
+		r->setData("resultset","table",crud->getResultSetTable());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -311,7 +321,9 @@ void testdao::updateTest(dictionary<const char *, const char *> *kvp,
 
 		scalar<uint64_t>	*s=new scalar<uint64_t>();
 		s->setValue(crud->getAffectedRows());
-		r->attachData("affectedrows","scalar",s);
+		r->setData("affectedrows","scalar",s);
+
+		r->getWastebasket()->attach(s);
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -331,7 +343,9 @@ void testdao::deleteTest(dictionary<const char *, const char *> *kvp,
 
 		scalar<uint64_t>	*s=new scalar<uint64_t>();
 		s->setValue(crud->getAffectedRows());
-		r->attachData("affectedrows","scalar",s);
+		r->setData("affectedrows","scalar",s);
+
+		r->getWastebasket()->attach(s);
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
