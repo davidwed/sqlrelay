@@ -126,38 +126,45 @@ bool testview::run(bool *handled) {
 		// normally we wouldn't pass params directly down
 		// from the view, as-is, but it's fine for this test
 		tc.createTest(&params,&r);
-		result=r.getData("affectedrows");
+		if (r.getSuccess()) {
+			result=r.getData("affectedrows");
+		}
 
 	} else if (!charstring::compare(path,"/read.html")) {
 
 		// normally we wouldn't pass params directly down
 		// from the view, as-is, but it's fine for this test
 		tc.readTest(&params,&r);
-		result=r.getData("resultset");
+		if (r.getSuccess()) {
+			result=r.getData("resultset");
+		}
 
 	} else if (!charstring::compare(path,"/update.html")) {
 
 		// normally we wouldn't pass params directly down
 		// from the view, as-is, but it's fine for this test
 		tc.updateTest(&params,&r);
-		result=r.getData("affectedrows");
+		if (r.getSuccess()) {
+			result=r.getData("affectedrows");
+		}
 
 	} else if (!charstring::compare(path,"/delete.html")) {
 
 		// normally we wouldn't pass params directly down
 		// from the view, as-is, but it's fine for this test
 		tc.deleteTest(&params,&r);
-		result=r.getData("affectedrows");
+		if (r.getSuccess()) {
+			result=r.getData("affectedrows");
+		}
 	} else {
 		*handled=false;
 	}
 
 	// respond
 	getResponse()->textHtml();
+	// FIXME: implement mvcresult->writeJson(getResponse());
 	if (result) {
 		result->writeJson(getResponse());
-	} else {
-		// FIXME: some kind of error response
 	}
 
 	// clean up
@@ -334,14 +341,6 @@ bool httpModuleMain(httpserverapi *sapi) {
 	httprequest	req(sapi);
 	httpresponse	resp(sapi);
 
-	// get the path from the request and truncate any params
-	char	*path=charstring::duplicate(
-				req.getEnvironmentVariable("PATH_INFO"));
-	char	*query=charstring::findFirst(path,'?');
-	if (query) {
-		*query='\0';
-	}
-
 	// set up properties (normally these would be in a file)
 	mvcproperties	prop;
 	prop.parseString(
@@ -351,6 +350,14 @@ bool httpModuleMain(httpserverapi *sapi) {
 		"sqlr.user=test\n"
 		"sqlr.password=test\n"
 		"table=testtable");
+
+	// get the path from the request and truncate any params
+	char	*path=charstring::duplicate(
+				req.getEnvironmentVariable("PATH_INFO"));
+	char	*query=charstring::findFirst(path,'?');
+	if (query) {
+		*query='\0';
+	}
 
 	// set up the view
 	testview	tv;
@@ -371,7 +378,8 @@ bool httpModuleMain(httpserverapi *sapi) {
 		return false;
 	}
 	if (!handled) {
-		// FIXME: handle with an errorview
+		// normally an errorview would handle this
+		stdoutput.printf("URL unhandled!\n");
 	}
 	return true;
 }
