@@ -5,7 +5,7 @@ include ../../../config.mk
 SRCS = sqlrconnection.cpp \
 	sqlrcursor.cpp \
 	sqlrscalar.cpp \
-	sqlrlinkedlist.cpp \
+	sqlrlist.cpp \
 	sqlrrowdictionary.cpp \
 	sqlrresultsettable.cpp \
 	sqlrresultsetdomnode.cpp \
@@ -19,7 +19,7 @@ SRCS = sqlrconnection.cpp \
 LOBJS = sqlrconnection.$(OBJ) \
 	sqlrcursor.$(OBJ) \
 	sqlrscalar.$(OBJ) \
-	sqlrlinkedlist.$(OBJ) \
+	sqlrlist.$(OBJ) \
 	sqlrrowdictionary.$(OBJ) \
 	sqlrresultsettable.$(OBJ) \
 	sqlrresultsetdomnode.$(OBJ) \
@@ -81,12 +81,12 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcursor.h
 	$(CP) sqlrelay/private/sqlrscalar.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrscalar.h
-	$(CP) sqlrelay/private/sqlrlinkedlistnode.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrlinkedlistnode.h
-	$(CP) sqlrelay/private/sqlrrowlinkedlist.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrowlinkedlist.h
-	$(CP) sqlrelay/private/sqlrresultsetlinkedlist.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetlinkedlist.h
+	$(CP) sqlrelay/private/sqlrlistnode.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrlistnode.h
+	$(CP) sqlrelay/private/sqlrrowlist.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrowlist.h
+	$(CP) sqlrelay/private/sqlrresultsetlist.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetlist.h
 	$(CP) sqlrelay/private/sqlrrowdictionary.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrowdictionary.h
 	$(CP) sqlrelay/private/sqlrresultsettable.h $(includedir)/sqlrelay/private

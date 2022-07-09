@@ -36,7 +36,7 @@
 		sqlrconnection	*con;
 		sqlrcursor	*cur;
 
-		char	*table;
+		char	*tbl;
 		char	*idsequence;
 		char	*primarykey;
 		char	*autoinc;
@@ -55,11 +55,16 @@
 		bool	updatecontainspartialwhere;
 		bool	deletecontainspartialwhere;
 
-		sqlrscalar		scl;
-		sqlrrowlinkedlist	rlst;
-		sqlrrowdictionary	rdct;
-		sqlrresultsetlinkedlist	rslst;
-		sqlrresultsettable	rstbl;
+		scalar<uint64_t>			ars;
+		linkedlist<uint64_t>			arl;
+		dictionary<const char *, uint64_t>	ard;
+		table<uint64_t>				art;
+
+		sqlrscalar		ffs;
+		sqlrrowlist		frl;
+		sqlrrowdictionary	frd;
+		sqlrresultsetlist	fcl;
+		sqlrresultsettable	rst;
 
 		xmldom	x;
 		jsondom	j;

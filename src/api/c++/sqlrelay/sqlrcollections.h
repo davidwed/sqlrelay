@@ -45,40 +45,38 @@ class SQLRCLIENT_DLLSPEC sqlrscalar : public scalarcollection<const char *> {
 		#include <sqlrelay/private/sqlrscalar.h>
 };
 
-class SQLRCLIENT_DLLSPEC sqlrlinkedlistnode :
-				public listnode<const char *> {
+class SQLRCLIENT_DLLSPEC sqlrlistnode : public listnode<const char *> {
 	public:
 		/** Return the value (field) stored in the node. */
 		const char	*getValue() const;
 
-		/** Returns the previous node in the sqlrlinkedlist or NULL
+		/** Returns the previous node in the sqlrlist or NULL
 		 *  if this node is the first node in the list. */
 		listnode<const char *>	*getPrevious() const;
 
-		/** Returns the next node in the sqlrlinkedlist or NULL
+		/** Returns the next node in the sqlrlist or NULL
 		 * if this node is the last node in the list. */
 		listnode<const char *>	*getNext() const;
 
-		#include <sqlrelay/private/sqlrlinkedlistnode.h>
+		#include <sqlrelay/private/sqlrlistnode.h>
 };
 
-class SQLRCLIENT_DLLSPEC sqlrrowlinkedlist :
-				public listcollection<const char *> {
+class SQLRCLIENT_DLLSPEC sqlrrowlist : public listcollection<const char *> {
 	public:
-		/** Creates an empty instance of the sqlrrowlinkedlist class. */
-		sqlrrowlinkedlist();
+		/** Creates an empty instance of the sqlrrowlist class. */
+		sqlrrowlist();
 
-		/** Creates an instance of the sqlrrowlinkedlist class and
-		 *  sets the cursor used by the instance to "cursor". */
-		sqlrrowlinkedlist(sqlrcursor *cursor);
+		/** Creates an instance of the sqlrrowlist class and sets the
+		 *  cursor used by the instance to "cursor". */
+		sqlrrowlist(sqlrcursor *cursor);
 
-		/** Creates an instance of the sqlrrowlinkedlist class.
-		 *  Sets the cursor used by the instance to "cursor" and the
-		 *  row that the instance returns fields from to "row". */
-		sqlrrowlinkedlist(sqlrcursor *cursor, uint64_t row);
+		/** Creates an instance of the sqlrrowlist class.  Sets the
+		 *  cursor used by the instance to "cursor" and the row that
+		 *  the instance returns fields from to "row". */
+		sqlrrowlist(sqlrcursor *cursor, uint64_t row);
 
-		/** Deletes this intance of the sqlrrowlinkedlist class. */
-		~sqlrrowlinkedlist();
+		/** Deletes this intance of the sqlrrowlist class. */
+		~sqlrrowlist();
 
 		/** Sets the cursor used by this instance to "cursor". */
 		void	setCursor(sqlrcursor *cursor);
@@ -96,10 +94,10 @@ class SQLRCLIENT_DLLSPEC sqlrrowlinkedlist :
 		/** Returns 1. */
 		uint64_t	getBlockSize() const;
 
-		/** Returns the number of nodes in the sqlrrowlinkedlist. */
+		/** Returns the number of nodes in the sqlrrowlist. */
 		uint64_t	getLength() const;
 
-		/** Returns the first node in the sqlrrowlinkedlist. */
+		/** Returns the first node in the sqlrrowlist. */
 		listnode<const char *>	*getFirst() const;
 
 		/** Returns the node after "node" or NULL if this node is the
@@ -118,12 +116,11 @@ class SQLRCLIENT_DLLSPEC sqlrrowlinkedlist :
 		listnode<const char *>	*find(listnode<const char *> *startnode,
 						const char *value) const;
 	
-		#include <sqlrelay/private/sqlrrowlinkedlist.h>
+		#include <sqlrelay/private/sqlrrowlist.h>
 };
 
 class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
-				public dictionarycollection<const char *,
-								const char *> {
+		public dictionarycollection<const char *, const char *> {
 	public:
 		/** Creates an instance of the sqlrrowdictionary class. */
 		sqlrrowdictionary();
@@ -184,33 +181,29 @@ class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 		/** Returns the number of key/value (column name/field) pairs
 		 *  in the dictionary. */
 		uint64_t	getLength() const;
-
-		/** Writes out a representation of the dictionary (row) to
-		 *  "out". */
-		ssize_t		write(output *out) const;
 	
 		#include <sqlrelay/private/sqlrrowdictionary.h>
 };
 
-class SQLRCLIENT_DLLSPEC sqlrresultsetlinkedlist :
+class SQLRCLIENT_DLLSPEC sqlrresultsetlist :
 				public listcollection<const char *> {
 	public:
-		/** Creates an empty instance of the sqlrresultsetlinkedlist
+		/** Creates an empty instance of the sqlrresultsetlist
 		 *  class. */
-		sqlrresultsetlinkedlist();
+		sqlrresultsetlist();
 
-		/** Creates an instance of the sqlrresultsetlinkedlist class
-		 *  and sets the cursor used by the instance to "cursor". */
-		sqlrresultsetlinkedlist(sqlrcursor *cursor);
+		/** Creates an instance of the sqlrresultsetlist class and
+		 *  sets the cursor used by the instance to "cursor". */
+		sqlrresultsetlist(sqlrcursor *cursor);
 
-		/** Creates an instance of the sqlrresultsetlinkedlist class.
+		/** Creates an instance of the sqlrresultsetlist class.
 		 *  Sets the cursor used by the instance to "cursor" and the
 		 *  column that the instance returns fields from to "col". */
-		sqlrresultsetlinkedlist(sqlrcursor *cursor, uint64_t col);
+		sqlrresultsetlist(sqlrcursor *cursor, uint64_t col);
 
-		/** Deletes this intance of the sqlrresultsetlinkedlist
+		/** Deletes this intance of the sqlrresultsetlist
 		 *  class. */
-		~sqlrresultsetlinkedlist();
+		~sqlrresultsetlist();
 
 		/** Sets the cursor used by this instance to "cursor". */
 		void	setCursor(sqlrcursor *cursor);
@@ -230,11 +223,10 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlinkedlist :
  		 *  fetch all rows at once. */
 		uint64_t	getBlockSize() const;
 
-		/** Returns the number of nodes in the
-		 *  sqlrresultsetlinkedlist. */
+		/** Returns the number of nodes in the sqlrresultsetlist. */
 		uint64_t	getLength() const;
 
-		/** Returns the first node in the sqlrresultsetlinkedlist. */
+		/** Returns the first node in the sqlrresultsetlist. */
 		listnode<const char *>	*getFirst() const;
 
 		/** Returns the node after "node" or NULL if this node is the
@@ -253,7 +245,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlinkedlist :
 		listnode<const char *>	*find(listnode<const char *> *startnode,
 						const char *value) const;
 	
-		#include <sqlrelay/private/sqlrresultsetlinkedlist.h>
+		#include <sqlrelay/private/sqlrresultsetlist.h>
 };
 
 /** Read-only, block-based, sequential-access. */

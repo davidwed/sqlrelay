@@ -115,8 +115,8 @@ bool testview::run(bool *handled) {
 
 	// build params
 	dictionary<const char *, const char *>	params;
-	params.setValues(getRequest()->getAllVariables(),
-				getRequest()->getAllValues());
+	params.setValues(getRequest()->getParameterVariables(),
+				getRequest()->getParameterValues());
 
 	// run the appropriate controller method and get the result;
 	mvcresult		r;
@@ -262,23 +262,13 @@ void testservice::deleteTest(
 
 void testdao::createTest(dictionary<const char *, const char *> *kvp,
 							mvcresult *r) {
-	stdoutput.printf("create!\n");
 
 	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
 
-	// FIXME: I need a way to quickly decompose a dictionary into keys
-	// and values, or a way to pass doCreate a dictionary
-	const char * const *cols=NULL;
-	const char * const *vals=NULL;
-
-	if (crud->doCreate(cols,vals)) {
+	if (crud->doCreate(kvp)) {
 		r->setSuccess();
-
-		scalar<uint64_t>	*s=new scalar<uint64_t>();
-		s->setValue(crud->getAffectedRows());
-		r->setData("affectedrows","scalar",s);
-
-		r->getWastebasket()->attach(s);
+		r->setData("affectedrows","scalar",
+					crud->getAffectedRowsDictionary());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -286,7 +276,6 @@ void testdao::createTest(dictionary<const char *, const char *> *kvp,
 
 void testdao::readTest(dictionary<const char *, const char *> *kvp,
 							mvcresult *r) {
-	stdoutput.printf("read!\n");
 
 	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
 
@@ -296,7 +285,8 @@ void testdao::readTest(dictionary<const char *, const char *> *kvp,
 
 	if (crud->doRead(criteria,sort,0)) {
 		r->setSuccess();
-		r->setData("resultset","table",crud->getResultSetTable());
+		r->setData("resultset","table",
+					crud->getResultSetTable());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -304,26 +294,16 @@ void testdao::readTest(dictionary<const char *, const char *> *kvp,
 
 void testdao::updateTest(dictionary<const char *, const char *> *kvp,
 							mvcresult *r) {
-	stdoutput.printf("update!\n");
 
 	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
-
-	// FIXME: I need a way to quickly decompose a dictionary into keys
-	// and values, or a way to pass doUpdate a dictionary
-	const char * const *cols=NULL;
-	const char * const *vals=NULL;
 
 	// FIXME: build this
 	const char	*criteria=NULL;
 
-	if (crud->doUpdate(cols,vals,criteria)) {
+	if (crud->doUpdate(kvp,criteria)) {
 		r->setSuccess();
-
-		scalar<uint64_t>	*s=new scalar<uint64_t>();
-		s->setValue(crud->getAffectedRows());
-		r->setData("affectedrows","scalar",s);
-
-		r->getWastebasket()->attach(s);
+		r->setData("affectedrows","scalar",
+					crud->getAffectedRowsDictionary());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -331,7 +311,6 @@ void testdao::updateTest(dictionary<const char *, const char *> *kvp,
 
 void testdao::deleteTest(dictionary<const char *, const char *> *kvp,
 							mvcresult *r) {
-	stdoutput.printf("delete!\n");
 
 	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
 
@@ -340,12 +319,8 @@ void testdao::deleteTest(dictionary<const char *, const char *> *kvp,
 
 	if (crud->doDelete(criteria)) {
 		r->setSuccess();
-
-		scalar<uint64_t>	*s=new scalar<uint64_t>();
-		s->setValue(crud->getAffectedRows());
-		r->setData("affectedrows","scalar",s);
-
-		r->getWastebasket()->attach(s);
+		r->setData("affectedrows","scalar",
+					crud->getAffectedRowsDictionary());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}

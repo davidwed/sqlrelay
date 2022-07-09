@@ -26,4 +26,4 @@
 		void	clear();
 	
 	private:
-		sqlrresultsetlinkedlistprivate	*pvt;
+		sqlrrowlistprivate	*pvt;

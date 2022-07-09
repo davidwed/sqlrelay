@@ -5,7 +5,7 @@
 #include <rudiments/memorypool.h>
 
 sqlrcrud::sqlrcrud() {
-	table=NULL;
+	tbl=NULL;
 	idsequence=NULL;
 	primarykey=NULL;
 	autoinc=NULL;
@@ -17,7 +17,7 @@ sqlrcrud::sqlrcrud() {
 
 sqlrcrud::~sqlrcrud() {
 	delete[] primarykey;
-	delete[] table;
+	delete[] tbl;
 }
 
 void sqlrcrud::setSqlrConnection(sqlrconnection *con) {
@@ -28,13 +28,13 @@ void sqlrcrud::setSqlrCursor(sqlrcursor *cur) {
 	this->cur=cur;
 }
 
-void sqlrcrud::setTable(const char *table) {
-	delete[] this->table;
-	this->table=charstring::duplicate(table);
+void sqlrcrud::setTable(const char *tbl) {
+	delete[] this->tbl;
+	this->tbl=charstring::duplicate(tbl);
 
 	if (charstring::isNullOrEmpty(idsequence)) {
 		delete[] idsequence;
-		charstring::printf(&idsequence,"%s_ids",table);
+		charstring::printf(&idsequence,"%s_ids",tbl);
 	}
 }
 
@@ -54,7 +54,7 @@ void sqlrcrud::setAutoIncrementColumn(const char *autoinc) {
 }
 
 const char *sqlrcrud::getTable() {
-	return table;
+	return tbl;
 }
 
 const char *sqlrcrud::getIdSequence() {
@@ -72,13 +72,13 @@ const char *sqlrcrud::getAutoIncrementColumn() {
 bool sqlrcrud::buildQueries() {
 
 	// bail if we don't have a connection, cursor, or table
-	if (!con || !cur || !table) {
+	if (!con || !cur || !tbl) {
 		return false;
 	}
 
 	// find the primary key and autoincrement column
 	cur->lowerCaseColumnNames();
-	if (!cur->getColumnList(table,NULL)) {
+	if (!cur->getColumnList(tbl,NULL)) {
 		return false;
 	}
 	for (uint64_t i=0; i<cur->rowCount(); i++) {
@@ -105,22 +105,22 @@ bool sqlrcrud::buildQueries() {
 
 	// build create (insert) query
 	createquery.clear();
-	createquery.append("insert into ")->append(table);
+	createquery.append("insert into ")->append(tbl);
 	createquery.append(" ($(COLUMNS)) values ($(VALUES))");
 
 	// build read (select) query
 	readquery.clear();
-	readquery.append("select * from ")->append(table);
+	readquery.append("select * from ")->append(tbl);
 	readquery.append("$(WHERE)$(ORDERBY)");
 
 	// build update query
 	updatequery.clear();
-	updatequery.append("update ")->append(table)->append(" set ");
+	updatequery.append("update ")->append(tbl)->append(" set ");
 	updatequery.append("$(SET)$(WHERE)");
 
 	// build delete query
 	deletequery.clear();
-	deletequery.append("delete from ")->append(table)->append("$(WHERE)");
+	deletequery.append("delete from ")->append(tbl)->append("$(WHERE)");
 
 	// reset partial where flags
 	readcontainspartialwhere=false;
@@ -224,29 +224,35 @@ bool sqlrcrud::doCreate(const char * const *columns,
 
 		// build $(VALUES)
 		bindformat=con->bindFormat();
-		uint64_t	col=1;
-		first=true;
-		for (const char * const *c=columns; *c; c++) {
-			if (first) {
-				first=false;
-			} else {
-				valstr.append(',');
-			}
-			if (!charstring::compareIgnoringCase(*c,autoinc)) {
-				valstr.append("null");
-			} else if (!charstring::compareIgnoringCase(
+		if (!charstring::isNullOrEmpty(bindformat)) {
+			uint64_t	col=1;
+			first=true;
+			for (const char * const *c=columns; *c; c++) {
+				if (first) {
+					first=false;
+				} else {
+					valstr.append(',');
+				}
+				if (!charstring::compareIgnoringCase(
+							*c,autoinc)) {
+					valstr.append("null");
+				} else if (!charstring::compareIgnoringCase(
 							*c,primarykey)) {
-				valstr.printf(con->nextvalFormat(),idsequence);
-			} else {
-				if (bindformat[0]=='?') {
-					valstr.append('?');
-				} else if (bindformat[0]=='$') {
-					valstr.append('$')->append(col);
-					col++;
-				} else if (bindformat[0]=='@' ||
-						bindformat[0]==':') {
-					valstr.append(bindformat[0])->
+					valstr.printf(
+						con->nextvalFormat(),
+						idsequence);
+				} else {
+					if (bindformat[0]=='?') {
+						valstr.append('?');
+					} else if (bindformat[0]=='$') {
+						valstr.append('$')->append(col);
+						col++;
+					} else if (bindformat[0]=='@' ||
+							bindformat[0]==':') {
+						valstr.append(
+							bindformat[0])->
 								append(*c);
+					}
 				}
 			}
 		}
@@ -269,9 +275,39 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	return cur->executeQuery();
 }
 
+bool sqlrcrud::doCreate(dictionary<const char *, const char *> *kvp) {
+
+	// decompose the dictionary
+	linkedlist<const char *>	*keys=kvp->getKeys();
+	const char	**columns=new const char *[keys->getLength()+1];
+	const char	**values=new const char *[keys->getLength()+1];
+	uint64_t	i=0;
+	for (listnode<const char *> *node=keys->getFirst();
+					node; node=node->getNext()) {
+		columns[i]=node->getValue();
+		values[i]=kvp->getValue(node->getValue());
+		i++;
+	}
+	columns[i]=NULL;
+	values[i]=NULL;
+
+	// create
+	bool	result=doCreate(columns,values);
+
+	// clean up
+	delete[] columns;
+	delete[] values;
+
+	return result;
+}
+
 void sqlrcrud::bind(const char *bindformat,
 				const char * const *columns,
 				const char * const *values) {
+
+	if (charstring::isNullOrEmpty(bindformat)) {
+		return;
+	}
 
 	// FIXME: there's no way to bind a NULL or non-string with this...
 
@@ -607,47 +643,49 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 
 		// build $(SET)
 		bindformat=con->bindFormat();
-		if (bindformat[0]=='?') {
-			bool	first=true;
-			for (const char * const *c=columns; *c; c++) {
-				if (!charstring::compare(*c,autoinc)) {
-					continue;
+		if (!charstring::isNullOrEmpty(bindformat)) {
+			if (bindformat[0]=='?') {
+				bool	first=true;
+				for (const char * const *c=columns; *c; c++) {
+					if (!charstring::compare(*c,autoinc)) {
+						continue;
+					}
+					if (first) {
+						first=false;
+					} else {
+						setstr.append(',');
+					}
+					setstr.append(*c)->append('=');
+					setstr.append('?');
 				}
-				if (first) {
-					first=false;
-				} else {
-					setstr.append(',');
+			} else if (bindformat[0]=='$') {
+				uint64_t	col=1;
+				for (const char * const *c=columns; *c; c++) {
+					if (!charstring::compare(*c,autoinc)) {
+						continue;
+					}
+					if (col>1) {
+						setstr.append(',');
+					}
+					setstr.append(*c)->append('=');
+					setstr.append('$')->append(col);
+					col++;
 				}
-				setstr.append(*c)->append('=');
-				setstr.append('?');
-			}
-		} else if (bindformat[0]=='$') {
-			uint64_t	col=1;
-			for (const char * const *c=columns; *c; c++) {
-				if (!charstring::compare(*c,autoinc)) {
-					continue;
+			} else if (bindformat[0]=='@' || bindformat[0]==':') {
+				bool	first=true;
+				for (const char * const *c=columns; *c; c++) {
+					if (!charstring::compare(*c,autoinc)) {
+						continue;
+					}
+					if (first) {
+						first=false;
+					} else {
+						setstr.append(',');
+					}
+					setstr.append(*c)->append('=');
+					setstr.append(bindformat[0]);
+					setstr.append(*c);
 				}
-				if (col>1) {
-					setstr.append(',');
-				}
-				setstr.append(*c)->append('=');
-				setstr.append('$')->append(col);
-				col++;
-			}
-		} else if (bindformat[0]=='@' || bindformat[0]==':') {
-			bool	first=true;
-			for (const char * const *c=columns; *c; c++) {
-				if (!charstring::compare(*c,autoinc)) {
-					continue;
-				}
-				if (first) {
-					first=false;
-				} else {
-					setstr.append(',');
-				}
-				setstr.append(*c)->append('=');
-				setstr.append(bindformat[0]);
-				setstr.append(*c);
 			}
 		}
 	}
@@ -672,6 +710,33 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 
 	// execute
 	return cur->executeQuery();
+}
+
+bool sqlrcrud::doUpdate(dictionary<const char *, const char *> *kvp,
+						const char *criteria) {
+
+	// decompose the dictionary
+	linkedlist<const char *>	*keys=kvp->getKeys();
+	const char	**columns=new const char *[keys->getLength()+1];
+	const char	**values=new const char *[keys->getLength()+1];
+	uint64_t	i=0;
+	for (listnode<const char *> *node=keys->getFirst();
+					node; node=node->getNext()) {
+		columns[i]=node->getValue();
+		values[i]=kvp->getValue(node->getValue());
+		i++;
+	}
+	columns[i]=NULL;
+	values[i]=NULL;
+
+	// update
+	bool	result=doUpdate(columns,values,criteria);
+
+	// clean up
+	delete[] columns;
+	delete[] values;
+
+	return result;
 }
 
 bool sqlrcrud::doDelete(const char *criteria) {
@@ -709,28 +774,54 @@ uint64_t sqlrcrud::getAffectedRows() {
 	return cur->affectedRows();
 }
 
-const scalarcollection<const char *> *sqlrcrud::getScalar() {
-	scl.setCursor(cur);
-	return &scl;
+const scalarcollection<uint64_t> *sqlrcrud::getAffectedRowsScalar() {
+	ars.clear();
+	ars.setValue(getAffectedRows());
+	return &ars;
 }
 
-const listcollection<const char *> *sqlrcrud::getRowLinkedList() {
-	rlst.setCursor(cur);
-	return &rlst;
+const listcollection<uint64_t> *sqlrcrud::getAffectedRowsList() {
+	arl.clear();
+	arl.append(getAffectedRows());
+	return &arl;
+}
+
+const dictionarycollection<const char *, uint64_t>
+				*sqlrcrud::getAffectedRowsDictionary() {
+	ard.clear();
+	ard.setValue("affectedrows",getAffectedRows());
+	return &ard;
+}
+
+const tablecollection<uint64_t> *sqlrcrud::getAffectedRowsTable() {
+	art.clear();
+	art.setColumnName(0,"affectedrows");
+	art.setValue(0,0,getAffectedRows());
+	return &art;
+}
+
+const scalarcollection<const char *> *sqlrcrud::getFirstFieldScalar() {
+	ffs.setCursor(cur);
+	return &ffs;
+}
+
+const listcollection<const char *> *sqlrcrud::getFirstRowList() {
+	frl.setCursor(cur);
+	return &frl;
 }
 
 const dictionarycollection<const char *,const char *>
-					*sqlrcrud::getRowDictionary() {
-	rdct.setCursor(cur);
-	return &rdct;
+					*sqlrcrud::getFirstRowDictionary() {
+	frd.setCursor(cur);
+	return &frd;
 }
 
-const listcollection<const char *> *sqlrcrud::getResultSetLinkedList() {
-	rslst.setCursor(cur);
-	return &rslst;
+const listcollection<const char *> *sqlrcrud::getFirstColumnList() {
+	fcl.setCursor(cur);
+	return &fcl;
 }
 
 const tablecollection<const char *> *sqlrcrud::getResultSetTable() {
-	rstbl.setCursor(cur);
-	return &rstbl;
+	rst.setCursor(cur);
+	return &rst;
 }

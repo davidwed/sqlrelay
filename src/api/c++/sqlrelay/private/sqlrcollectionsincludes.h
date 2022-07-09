@@ -9,9 +9,9 @@
 #include <rudiments/cursordomnode.h>
 
 class sqlrscalarprivate;
-class sqlrlinkedlistnodeprivate;
-class sqlrrowlinkedlistprivate;
-class sqlrresultsetlinkedlistprivate;
+class sqlrlistnodeprivate;
+class sqlrrowlistprivate;
+class sqlrresultsetlistprivate;
 class sqlrrowdictionaryprivate;
 class sqlrresultsettableprivate;
 class sqlrresultsetdomnodeprivate;

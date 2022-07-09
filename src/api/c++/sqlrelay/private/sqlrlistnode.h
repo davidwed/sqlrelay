@@ -1,11 +1,10 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 
-		sqlrlinkedlistnode();
-		sqlrlinkedlistnode(sqlrcursor *cursor);
-		sqlrlinkedlistnode(sqlrcursor *cursor,
-					uint64_t row, uint64_t col);
-		~sqlrlinkedlistnode();
+		sqlrlistnode();
+		sqlrlistnode(sqlrcursor *cursor);
+		sqlrlistnode(sqlrcursor *cursor, uint64_t row, uint64_t col);
+		~sqlrlistnode();
 		void	setCursor(sqlrcursor *cursor);
 		sqlrcursor	*getCursor() const;
 		void	setRepresentsARow(bool representsarow);
@@ -17,4 +16,4 @@
 		void	setPrevious(listnode<const char *> *next);
 
 	private:
-		sqlrlinkedlistnodeprivate	*pvt;
+		sqlrlistnodeprivate	*pvt;
