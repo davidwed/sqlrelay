@@ -277,7 +277,7 @@ bool sqlrcrud::doCreate(const char * const *columns,
 
 bool sqlrcrud::doCreate(dictionary<const char *, const char *> *kvp) {
 
-	// decompose the dictionary
+	// build columns/values
 	linkedlist<const char *>	*keys=kvp->getKeys();
 	const char	**columns=new const char *[keys->getLength()+1];
 	const char	**values=new const char *[keys->getLength()+1];
@@ -286,6 +286,34 @@ bool sqlrcrud::doCreate(dictionary<const char *, const char *> *kvp) {
 					node; node=node->getNext()) {
 		columns[i]=node->getValue();
 		values[i]=kvp->getValue(node->getValue());
+		i++;
+	}
+	columns[i]=NULL;
+	values[i]=NULL;
+
+	// create
+	bool	result=doCreate(columns,values);
+
+	// clean up
+	delete[] columns;
+	delete[] values;
+
+	return result;
+}
+
+bool sqlrcrud::doCreate(jsondom *j) {
+
+	// build columns/values
+	domnode		*datanode=j->getRootNode()->
+					getFirstTagChild("r")->
+					getFirstTagChild("data");
+	const char	**columns=new const char *[datanode->getChildCount()+1];
+	const char	**values=new const char *[datanode->getChildCount()+1];
+	uint64_t	i=0;
+	for (domnode *node=datanode->getFirstTagChild();
+			!node->isNullNode(); node=node->getNextTagSibling()) {
+		columns[i]=node->getName();
+		values[i]=node->getAttributeValue("v");
 		i++;
 	}
 	columns[i]=NULL;
@@ -360,10 +388,55 @@ bool sqlrcrud::doRead(const char *criteria, const char *sort, uint64_t skip) {
 		return false;
 	}
 
+	// read
+	return doReadDelegate(wherestr.getString(),orderbystr.getString(),skip);
+}
+
+bool sqlrcrud::doRead(jsondom *j) {
+
+	// clear any previous error
+	error.clear();
+
+	// build $(WHERE)
+	domnode		*criterianode=j->getRootNode()->
+					getFirstTagChild("r")->
+					getFirstTagChild("criteria")->
+					getFirstTagChild();
+	stringbuffer	wherestr;
+	if (!buildJsonWhere(criterianode,&wherestr,
+					readcontainspartialwhere)) {
+		return false;
+	}
+
+	// build $(ORDERBY)
+	domnode		*sortnode=j->getRootNode()->
+					getFirstTagChild("r")->
+					getFirstTagChild("sort");
+	stringbuffer	orderbystr;
+	if (!buildJsonOrderBy(sortnode,&orderbystr,
+					readcontainspartialorderby)) {
+		return false;
+	}
+
+	// get skip
+	domnode		*skipnode=j->getRootNode()->
+					getFirstTagChild("r")->
+					getFirstTagChild("skip");
+	uint64_t	skip=charstring::toInteger(
+					skipnode->getAttributeValue("v"));
+
+	// read
+	return doReadDelegate(wherestr.getString(),orderbystr.getString(),skip);
+}
+
+bool sqlrcrud::doReadDelegate(const char *where,
+				const char *orderby,
+				uint64_t skip) {
+
 	// prepare and execute
 	cur->prepareQuery(readquery.getString());
-	cur->substitution("WHERE",wherestr.getString());
-	cur->substitution("ORDERBY",orderbystr.getString());
+	cur->substitution("WHERE",where);
+	cur->substitution("ORDERBY",orderby);
 	bool	success=cur->executeQuery();
 
 	// skip to the "skip"th row
@@ -440,6 +513,11 @@ bool sqlrcrud::buildJsonWhere(domnode *criteria,
 				bool containspartial) {
 
 	// criteria should be in jsonlogic format - http://jsonlogic.com
+
+	// handle degenerate case
+	if (criteria->isNullNode()) {
+		return true;
+	}
 
 	// we might be at the root of the dom tree, or at the root json object,
 	// in either case, descend
@@ -596,6 +674,11 @@ bool sqlrcrud::buildJsonOrderBy(domnode *sort,
 	//   <col3 t="s" v="desc"/>
 	// </r>
 
+	// handle degenerate case
+	if (sort->isNullNode()) {
+		return true;
+	}
+
 	// we might be at the root of the dom tree, descend
 	if (sort->getType()==ROOT_DOMNODETYPE) {
 		return buildJsonOrderBy(sort->getFirstTagChild(),
@@ -635,6 +718,91 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 
 	// clear any previous error
 	error.clear();
+
+	// build $(WHERE)
+	stringbuffer	wherestr;
+	if (!buildWhere(criteria,&wherestr,updatecontainspartialwhere)) {
+		return false;
+	}
+
+	// update
+	return doUpdateDelegate(columns,values,wherestr.getString());
+}
+
+bool sqlrcrud::doUpdate(dictionary<const char *, const char *> *kvp,
+						const char *criteria) {
+
+	// build columns/values
+	linkedlist<const char *>	*keys=kvp->getKeys();
+	const char	**columns=new const char *[keys->getLength()+1];
+	const char	**values=new const char *[keys->getLength()+1];
+	uint64_t	i=0;
+	for (listnode<const char *> *node=keys->getFirst();
+					node; node=node->getNext()) {
+		columns[i]=node->getValue();
+		values[i]=kvp->getValue(node->getValue());
+		i++;
+	}
+	columns[i]=NULL;
+	values[i]=NULL;
+
+	// update
+	bool	result=doUpdate(columns,values,criteria);
+
+	// clean up
+	delete[] columns;
+	delete[] values;
+
+	return result;
+}
+
+bool sqlrcrud::doUpdate(jsondom *j) {
+
+	// clear any previous error
+	error.clear();
+
+	// build columns/values
+	domnode		*datanode=j->getRootNode()->
+					getFirstTagChild("r")->
+					getFirstTagChild("data");
+	const char	**columns=new const char *[datanode->getChildCount()+1];
+	const char	**values=new const char *[datanode->getChildCount()+1];
+	uint64_t	i=0;
+	for (domnode *node=datanode->getFirstTagChild();
+			!node->isNullNode(); node=node->getNextTagSibling()) {
+		columns[i]=node->getName();
+		values[i]=node->getAttributeValue("v");
+		i++;
+	}
+	columns[i]=NULL;
+	values[i]=NULL;
+
+	// build $(WHERE)
+	domnode		*criterianode=j->getRootNode()->
+					getFirstTagChild("r")->
+					getFirstTagChild("criteria")->
+					getFirstTagChild();
+	stringbuffer	wherestr;
+	if (!buildJsonWhere(criterianode,&wherestr,
+					updatecontainspartialwhere)) {
+		delete[] columns;
+		delete[] values;
+		return false;
+	}
+
+	// update
+	bool	result=doUpdateDelegate(columns,values,wherestr.getString());
+
+	// clean up
+	delete[] columns;
+	delete[] values;
+
+	return result;
+}
+
+bool sqlrcrud::doUpdateDelegate(const char * const *columns,
+				const char * const *values,
+				const char *where) {
 
 	stringbuffer	setstr;
 	const char	*bindformat=NULL;
@@ -690,18 +858,12 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 		}
 	}
 
-	// build $(WHERE)
-	stringbuffer	wherestr;
-	if (!buildWhere(criteria,&wherestr,updatecontainspartialwhere)) {
-		return false;
-	}
-
 	// prepare
 	cur->prepareQuery(updatequery.getString());
 
 	// substitute
 	cur->substitution("SET",setstr.getString());
-	cur->substitution("WHERE",wherestr.getString());
+	cur->substitution("WHERE",where);
 
 	// bind
 	if (columns && values) {
@@ -710,33 +872,6 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 
 	// execute
 	return cur->executeQuery();
-}
-
-bool sqlrcrud::doUpdate(dictionary<const char *, const char *> *kvp,
-						const char *criteria) {
-
-	// decompose the dictionary
-	linkedlist<const char *>	*keys=kvp->getKeys();
-	const char	**columns=new const char *[keys->getLength()+1];
-	const char	**values=new const char *[keys->getLength()+1];
-	uint64_t	i=0;
-	for (listnode<const char *> *node=keys->getFirst();
-					node; node=node->getNext()) {
-		columns[i]=node->getValue();
-		values[i]=kvp->getValue(node->getValue());
-		i++;
-	}
-	columns[i]=NULL;
-	values[i]=NULL;
-
-	// update
-	bool	result=doUpdate(columns,values,criteria);
-
-	// clean up
-	delete[] columns;
-	delete[] values;
-
-	return result;
 }
 
 bool sqlrcrud::doDelete(const char *criteria) {
@@ -750,9 +885,35 @@ bool sqlrcrud::doDelete(const char *criteria) {
 		return false;
 	}
 
+	// delete
+	return doDeleteDelegate(wherestr.getString());
+}
+
+bool sqlrcrud::doDelete(jsondom *j) {
+
+	// clear any previous error
+	error.clear();
+
+	// build $(WHERE)
+	domnode		*criterianode=j->getRootNode()->
+					getFirstTagChild("r")->
+					getFirstTagChild("criteria")->
+					getFirstTagChild();
+	stringbuffer	wherestr;
+	if (!buildJsonWhere(criterianode,&wherestr,
+					deletecontainspartialwhere)) {
+		return false;
+	}
+
+	// delete
+	return doDeleteDelegate(wherestr.getString());
+}
+
+bool sqlrcrud::doDeleteDelegate(const char *where) {
+
 	// prepare and execute
 	cur->prepareQuery(deletequery.getString());
-	cur->substitution("WHERE",wherestr.getString());
+	cur->substitution("WHERE",where);
 	return cur->executeQuery();
 }
 

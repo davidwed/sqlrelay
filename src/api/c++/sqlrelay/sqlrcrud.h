@@ -267,9 +267,10 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 
 
 		/** Executes the create (insert) query as either built by
-		 *  buildQueries() or overridden by setCreateQuery(),
-		 *  substituting "columns" into $(COLUMNS) and "values" into
-		 *  $(VALUES) as appropriate.
+		 *  buildQueries() or overridden by setCreateQuery().
+		 *
+		 *  "columns" should contain the set of columns that
+		 *  corresponding elements of "values" will be inserted into.
 		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
@@ -277,16 +278,28 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		bool	doCreate(const char * const *columns,
 					const char * const *values);
 
-
 		/** Executes the create (insert) query as either built by
-		 *  buildQueries() or overridden by setCreateQuery(),
-		 *  substituting keys of "kvp" into $(COLUMNS) and values of
-		 *  "kvp" into $(VALUES) as appropriate.
+		 *  buildQueries() or overridden by setCreateQuery().
+		 *
+		 * "kvp" should contain the column/value pairs to be inserted.
 		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
 		 *  getErrorMessage(). */
 		bool	doCreate(dictionary<const char *, const char *> *kvp);
+
+		/** Executes the create (insert) query as either built by
+		 *  buildQueries() or overridden by setCreateQuery(),
+		 *
+		 *  "j" should be a jsondom containing 1 object:
+		 *
+		 *  "data" should be a JSON object consisting of the
+		 *  column/value pairs to be inserted.
+		 *
+		 *  Returns true on success and false on error.  On error, the
+		 *  code and message can be retrieved using getErrorCode() and
+		 *  getErrorMessage(). */
+		bool	doCreate(jsondom *j);
 
 		/** Executes the read (select) query as either built by
 		 *  buildQueries() or overridden by setReadQuery().
@@ -308,6 +321,27 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		bool	doRead(const char *criteria,
 					const char *sort,
 					uint64_t skip);
+
+		/** Executes the read (select) query as either built by
+		 *  buildQueries() or overridden by setReadQuery().
+		 *
+		 *  "j" should be a jsondom containing 3 objects:
+		 *
+		 *  "criteria" should be a JSON object representing the
+		 *  criteria that will be used to build the where clause,
+		 *  conforming to the format described in the class description.
+		 *
+		 *  "sort" should be a JSON object representing the criteria
+		 *  that will be used to build the order-by clause, conforming
+		 *  to the format described in the class description.
+		 *
+		 *  "skip" should be a number indicating how many rows to skip
+		 *  immediately (useful for paging).
+		 *
+		 *  Returns true on success and false on error.  On error, the
+		 *  code and message can be retrieved using getErrorCode() and
+		 *  getErrorMessage(). */
+		bool	doRead(jsondom *j);
 
 		/** Executes the update query as either built by buildQueries()
 		 *  or overridden by setUpdateQuery().
@@ -342,6 +376,23 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		bool	doUpdate(dictionary<const char *, const char *> *kvp,
 					const char *criteria);
 
+		/** Executes the update query as either built by buildQueries()
+		 *  or overridden by setUpdateQuery().
+		 *
+		 *  "j" should be a jsondom containing 2 objects:
+		 *
+		 *  "criteria" should be a JSON object representing the
+		 *  criteria that will be used to build the where clause,
+		 *  conforming to the format described in the class description.
+		 *
+		 *  "data" should be a JSON object consisting of the
+		 *  column/value pairs to be updated.
+		 *
+		 *  Returns true on success and false on error.  On error, the
+		 *  code and message can be retrieved using getErrorCode() and
+		 *  getErrorMessage(). */
+		bool	doUpdate(jsondom *j);
+
 		/** Executes the delete query as either built by buildQueries()
 		 *  or overridden by setDeleteQuery().
 		 *
@@ -353,6 +404,20 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  code and message can be retrieved using getErrorCode() and
 		 *  getErrorMessage(). */
 		bool	doDelete(const char *criteria);
+
+		/** Executes the delete query as either built by buildQueries()
+		 *  or overridden by setDeleteQuery().
+		 *
+		 *  "j" should be a jsondom containing 1 object:
+		 *
+		 *  "criteria" should be a JSON object representing the
+		 *  criteria that will be used to build the where clause,
+		 *  conforming to the format described in the class description.
+		 *
+		 *  Returns true on success and false on error.  On error, the
+		 *  code and message can be retrieved using getErrorCode() and
+		 *  getErrorMessage(). */
+		bool	doDelete(jsondom *j);
 
 		/** Returns whatever error message may have been set by the
 		 *  most recent failed method call. */

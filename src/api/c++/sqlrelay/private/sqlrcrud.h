@@ -10,6 +10,14 @@
 					const char * const *columns,
 					const char * const *values);
 
+		bool	doReadDelegate(const char *where,
+					const char *orderby,
+					uint64_t skip);
+		bool	doUpdateDelegate(const char * const *columns,
+					const char * const *values,
+					const char *where);
+		bool	doDeleteDelegate(const char *where);
+
 		bool	buildWhere(const char *criteria,
 					stringbuffer *wherestr,
 					bool containspartial);

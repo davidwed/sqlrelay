@@ -12,7 +12,8 @@
 
 class factory {
 	public:
-		static sqlrcrud	*getSqlrCrud(mvcproperties *p, mvcresult *r);
+		static mvccrud	*getSqlrCrud(mvcproperties *prop,
+						mvcresult *response);
 };
 
 class testview : public mvcview {
@@ -25,76 +26,53 @@ class testview : public mvcview {
 
 class testcontroller : public mvccontroller {
 	public:
-		void	createTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	readTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	updateTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	deleteTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
+		void	createTest(jsondom *request, mvcresult *response);
+		void	readTest(jsondom *request, mvcresult *response);
+		void	updateTest(jsondom *request, mvcresult *response);
+		void	deleteTest(jsondom *request, mvcresult *response);
 };
 
 class testservice : public mvcservice {
 	public:
-		void	createTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	readTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	updateTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	deleteTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
+		void	createTest(jsondom *request, mvcresult *response);
+		void	readTest(jsondom *request, mvcresult *response);
+		void	updateTest(jsondom *request, mvcresult *response);
+		void	deleteTest(jsondom *request, mvcresult *response);
 };
 
 class testdao : public mvcdao {
 	public:
-		void	createTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	readTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	updateTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
-		void	deleteTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r);
+		void	createTest(jsondom *request, mvcresult *response);
+		void	readTest(jsondom *request, mvcresult *response);
+		void	updateTest(jsondom *request, mvcresult *response);
+		void	deleteTest(jsondom *request, mvcresult *response);
 };
 
 
 
-sqlrcrud *factory::getSqlrCrud(mvcproperties *p, mvcresult *r) {
+mvccrud *factory::getSqlrCrud(mvcproperties *prop, mvcresult *response) {
 
 	// create connection, cursor, and crud
 	sqlrconnection	*con=new sqlrconnection(
-				p->getValue("sqlr.host"),
-				charstring::toInteger(p->getValue("sqlr.port")),
-				p->getValue("sqlr.socket"),
-				p->getValue("sqlr.user"),
-				p->getValue("sqlr.password"),0,1);
+				prop->getValue("sqlr.host"),
+				charstring::toInteger(
+					prop->getValue("sqlr.port")),
+				prop->getValue("sqlr.socket"),
+				prop->getValue("sqlr.user"),
+				prop->getValue("sqlr.password"),0,1);
 	sqlrcursor	*cur=new sqlrcursor(con);
 	sqlrcrud	*crud=new sqlrcrud();
 
 	// initialize crud
 	crud->setSqlrConnection(con);
 	crud->setSqlrCursor(cur);
-	crud->setTable(p->getValue("table"));
+	crud->setTable(prop->getValue("table"));
 	crud->buildQueries();
 
 	// attach everything to the wastebasket
-	r->getWastebasket()->attach(crud);
-	r->getWastebasket()->attach(cur);
-	r->getWastebasket()->attach(con);
+	response->getWastebasket()->attach(crud);
+	response->getWastebasket()->attach(cur);
+	response->getWastebasket()->attach(con);
 
 	return crud;
 }
@@ -111,206 +89,158 @@ bool testview::run(bool *handled) {
 	testcontroller	tc;
 	tc.setProperties(getProperties());
 
-	// FIXME: get POSTed JSON instead of params...
+	// get posted json
+	jsondom	request;
+	request.parseString(getRequest()->getJson());
 
-	// build params
-	dictionary<const char *, const char *>	params;
-	params.setValues(getRequest()->getParameterVariables(),
-				getRequest()->getParameterValues());
+	// ... reformat request as appropriate for the backend ...
 
-	// run the appropriate controller method and get the result;
-	mvcresult		r;
+	// run the appropriate controller method and get the result
+	mvcresult	response;
+	*handled=true;
 	if (!charstring::compare(path,"/create.html")) {
-
-		// normally we wouldn't pass params directly down
-		// from the view, as-is, but it's fine for this test
-		tc.createTest(&params,&r);
-
+		tc.createTest(&request,&response);
 	} else if (!charstring::compare(path,"/read.html")) {
-
-		// normally we wouldn't pass params directly down
-		// from the view, as-is, but it's fine for this test
-		tc.readTest(&params,&r);
-
+		tc.readTest(&request,&response);
 	} else if (!charstring::compare(path,"/update.html")) {
-
-		// normally we wouldn't pass params directly down
-		// from the view, as-is, but it's fine for this test
-		tc.updateTest(&params,&r);
-
+		tc.updateTest(&request,&response);
 	} else if (!charstring::compare(path,"/delete.html")) {
-
-		// normally we wouldn't pass params directly down
-		// from the view, as-is, but it's fine for this test
-		tc.deleteTest(&params,&r);
-
+		tc.deleteTest(&request,&response);
 	} else {
 		*handled=false;
 	}
 
+	// ... reformat response as appropriate for the frontend ...
+
 	// respond
 	getResponse()->textHtml();
-	r.writeJson(getResponse());
+	response.writeJson(getResponse());
 
 	// clean up
-	r.getWastebasket()->empty();
+	response.getWastebasket()->empty();
 
 	return true;
 }
 
 
 
-void testcontroller::createTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r) {
+void testcontroller::createTest(jsondom *request, mvcresult *response) {
 
 	// normally we'd get ts from a factory based on an
 	// impl type, but it's fine to do this for this test
 	testservice	ts;
 	ts.setProperties(getProperties());
-	ts.createTest(kvp,r);
+	ts.createTest(request,response);
 }
 
-void testcontroller::readTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r) {
+void testcontroller::readTest(jsondom *request, mvcresult *response) {
 
 	// normally we'd get ts from a factory based on an
 	// impl type, but it's fine to do this for this test
 	testservice	ts;
 	ts.setProperties(getProperties());
-	ts.readTest(kvp,r);
+	ts.readTest(request,response);
 }
 
-void testcontroller::updateTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r) {
+void testcontroller::updateTest(jsondom *request, mvcresult *response) {
 
 	// normally we'd get ts from a factory based on an
 	// impl type, but it's fine to do this for this test
 	testservice	ts;
 	ts.setProperties(getProperties());
-	ts.updateTest(kvp,r);
+	ts.updateTest(request,response);
 }
 
-void testcontroller::deleteTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r) {
+void testcontroller::deleteTest(jsondom *request, mvcresult *response) {
 
 	// normally we'd get ts from a factory based on an
 	// impl type, but it's fine to do this for this test
 	testservice	ts;
 	ts.setProperties(getProperties());
-	ts.deleteTest(kvp,r);
+	ts.deleteTest(request,response);
 }
 
 
 
-void testservice::createTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r) {
+void testservice::createTest(jsondom *request, mvcresult *response) {
 
 	// normally we'd get td from a factory based on an
 	// impl type, but it's fine to do this for this test
 	testdao	td;
 	td.setProperties(getProperties());
-	td.createTest(kvp,r);
+	td.createTest(request,response);
 }
 
-void testservice::readTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r) {
+void testservice::readTest(jsondom *request, mvcresult *response) {
 
 	// normally we'd get td from a factory based on an
 	// impl type, but it's fine to do this for this test
 	testdao	td;
 	td.setProperties(getProperties());
-	td.readTest(kvp,r);
+	td.readTest(request,response);
 }
 
-void testservice::updateTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r) {
+void testservice::updateTest(jsondom *request, mvcresult *response) {
 
 	// normally we'd get td from a factory based on an
 	// impl type, but it's fine to do this for this test
 	testdao	td;
 	td.setProperties(getProperties());
-	td.updateTest(kvp,r);
+	td.updateTest(request,response);
 }
 
-void testservice::deleteTest(
-			dictionary<const char *, const char *> *kvp,
-			mvcresult *r) {
+void testservice::deleteTest(jsondom *request, mvcresult *response) {
 
 	// normally we'd get td from a factory based on an
 	// impl type, but it's fine to do this for this test
 	testdao	td;
 	td.setProperties(getProperties());
-	td.deleteTest(kvp,r);
+	td.deleteTest(request,response);
 }
 
 
 
-void testdao::createTest(dictionary<const char *, const char *> *kvp,
-							mvcresult *r) {
-
-	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
-
-	if (crud->doCreate(kvp)) {
-		r->setSuccess();
-		r->setData("ar",crud->getAffectedRowsDictionary());
+void testdao::createTest(jsondom *request, mvcresult *response) {
+	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
+	if (crud->doCreate(request)) {
+		response->setSuccess();
+		response->setData("ar",crud->getAffectedRowsDictionary());
 	} else {
-		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
+		response->setFailed(crud->getErrorCode(),
+					crud->getErrorMessage());
 	}
 }
 
-void testdao::readTest(dictionary<const char *, const char *> *kvp,
-							mvcresult *r) {
-
-	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
-
-	// FIXME: build these
-	const char	*criteria=NULL;
-	const char	*sort=NULL;
-
-	if (crud->doRead(criteria,sort,0)) {
-		r->setSuccess();
-		r->setData("rs",crud->getResultSetTable());
+void testdao::readTest(jsondom *request, mvcresult *response) {
+	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
+	if (crud->doRead(request)) {
+		response->setSuccess();
+		response->setData("rs",crud->getResultSetTable());
 	} else {
-		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
+		response->setFailed(crud->getErrorCode(),
+					crud->getErrorMessage());
 	}
 }
 
-void testdao::updateTest(dictionary<const char *, const char *> *kvp,
-							mvcresult *r) {
-
-	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
-
-	// FIXME: build this
-	const char	*criteria=NULL;
-
-	if (crud->doUpdate(kvp,criteria)) {
-		r->setSuccess();
-		r->setData("ar",crud->getAffectedRowsDictionary());
+void testdao::updateTest(jsondom *request, mvcresult *response) {
+	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
+	if (crud->doUpdate(request)) {
+		response->setSuccess();
+		response->setData("ar",crud->getAffectedRowsDictionary());
 	} else {
-		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
+		response->setFailed(crud->getErrorCode(),
+					crud->getErrorMessage());
 	}
 }
 
-void testdao::deleteTest(dictionary<const char *, const char *> *kvp,
-							mvcresult *r) {
-
-	sqlrcrud	*crud=factory::getSqlrCrud(getProperties(),r);
-
-	// FIXME: build this
-	const char	*criteria=NULL;
-
-	if (crud->doDelete(criteria)) {
-		r->setSuccess();
-		r->setData("ar",crud->getAffectedRowsDictionary());
+void testdao::deleteTest(jsondom *request, mvcresult *response) {
+	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
+	if (crud->doDelete(request)) {
+		response->setSuccess();
+		response->setData("ar",crud->getAffectedRowsDictionary());
 	} else {
-		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
+		response->setFailed(crud->getErrorCode(),
+					crud->getErrorMessage());
 	}
 }
 
