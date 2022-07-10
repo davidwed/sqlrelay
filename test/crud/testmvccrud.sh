@@ -2,18 +2,15 @@ sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "drop tabl
 sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "create table testtable (col1 varchar2(128), col2 varchar2(128), col3 varchar2(128))"
 
 
-REQUEST_METHOD="GET"
-export REQUEST_METHOD
-
 
 # create test
+echo "======================================================================"
 echo "create:"
 unset PATH_INFO
-unset QUERY_STRING
+unset REQUEST_METHOD
+unset CONTENT_TYPE
 PATH_INFO="/create.html"
 export PATH_INFO
-#QUERY_STRING="col1=val1&col2=val2&col3=val3"
-#export QUERY_STRING
 REQUEST_METHOD="post"
 export REQUEST_METHOD
 CONTENT_TYPE="application/json"
@@ -31,9 +28,11 @@ echo
 
 
 # read test
+echo "======================================================================"
 echo "read:"
 unset PATH_INFO
-unset QUERY_STRING
+unset REQUEST_METHOD
+unset CONTENT_TYPE
 PATH_INFO="/read.html"
 export PATH_INFO
 REQUEST_METHOD="post"
@@ -69,13 +68,13 @@ echo
 
 
 # update test
+echo "======================================================================"
 echo "update:"
 unset PATH_INFO
-unset QUERY_STRING
+unset REQUEST_METHOD
+unset CONTENT_TYPE
 PATH_INFO="/update.html"
 export PATH_INFO
-#QUERY_STRING="col1=newval1&col2=newval2&col3=newval3"
-#export QUERY_STRING
 REQUEST_METHOD="post"
 export REQUEST_METHOD
 CONTENT_TYPE="application/json"
@@ -98,14 +97,27 @@ EOF
 echo
 
 
+# read-after-update test
+echo "======================================================================"
+echo "read-after-update:"
+unset PATH_INFO
+unset REQUEST_METHOD
+unset CONTENT_TYPE
+PATH_INFO="/read.html"
+export PATH_INFO
+./mvccrud.cgi
+echo
+
+
+
 # delete test
+echo "======================================================================"
 echo "delete:"
 unset PATH_INFO
-unset QUERY_STRING
+unset REQUEST_METHOD
+unset CONTENT_TYPE
 PATH_INFO="/delete.html"
 export PATH_INFO
-#QUERY_STRING="col1=newval1"
-#export QUERY_STRING
 REQUEST_METHOD="post"
 export REQUEST_METHOD
 CONTENT_TYPE="application/json"
@@ -122,4 +134,17 @@ export CONTENT_TYPE
 EOF
 echo
 
+
+# read-after-delete test
+echo "======================================================================"
+echo "read-after-update:"
+unset PATH_INFO
+unset REQUEST_METHOD
+unset CONTENT_TYPE
+PATH_INFO="/read.html"
+export PATH_INFO
+./mvccrud.cgi
+echo
+
+echo "======================================================================"
 sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "drop table testtable"
