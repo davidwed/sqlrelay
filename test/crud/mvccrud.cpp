@@ -259,7 +259,7 @@ void testdao::createTest(dictionary<const char *, const char *> *kvp,
 
 	if (crud->doCreate(kvp)) {
 		r->setSuccess();
-		r->setData("ar","scalar",crud->getAffectedRowsDictionary());
+		r->setData("ar",crud->getAffectedRowsDictionary());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -276,7 +276,7 @@ void testdao::readTest(dictionary<const char *, const char *> *kvp,
 
 	if (crud->doRead(criteria,sort,0)) {
 		r->setSuccess();
-		r->setData("rs","table",crud->getResultSetTable());
+		r->setData("rs",crud->getResultSetTable());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -292,7 +292,7 @@ void testdao::updateTest(dictionary<const char *, const char *> *kvp,
 
 	if (crud->doUpdate(kvp,criteria)) {
 		r->setSuccess();
-		r->setData("ar","scalar",crud->getAffectedRowsDictionary());
+		r->setData("ar",crud->getAffectedRowsDictionary());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
@@ -308,7 +308,7 @@ void testdao::deleteTest(dictionary<const char *, const char *> *kvp,
 
 	if (crud->doDelete(criteria)) {
 		r->setSuccess();
-		r->setData("ar","scalar",crud->getAffectedRowsDictionary());
+		r->setData("ar",crud->getAffectedRowsDictionary());
 	} else {
 		r->setFailed(crud->getErrorCode(),crud->getErrorMessage());
 	}
