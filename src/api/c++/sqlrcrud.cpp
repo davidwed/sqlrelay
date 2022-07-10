@@ -789,13 +789,13 @@ const listcollection<uint64_t> *sqlrcrud::getAffectedRowsList() {
 const dictionarycollection<const char *, uint64_t>
 				*sqlrcrud::getAffectedRowsDictionary() {
 	ard.clear();
-	ard.setValue("affectedrows",getAffectedRows());
+	ard.setValue("r",getAffectedRows());
 	return &ard;
 }
 
 const tablecollection<uint64_t> *sqlrcrud::getAffectedRowsTable() {
 	art.clear();
-	art.setColumnName(0,"affectedrows");
+	art.setColumnName(0,"r");
 	art.setValue(0,0,getAffectedRows());
 	return &art;
 }
