@@ -10,18 +10,58 @@
 #define HTTP_MODULE_CGI
 #include <rudiments/httpserverapimain.h>
 
-class factory {
+class testview : public mvcview {
 	public:
-		static mvccrud	*getSqlrCrud(mvcproperties *prop,
-						mvcresult *response);
+		virtual void	setPath(char *path)=0;
+		virtual bool	run(bool *handled)=0;
 };
 
-class testview : public mvcview {
+class defaulttestview : public testview {
 	public:
 		void	setPath(char *path);
 		bool	run(bool *handled);
 	private:
 		char	*path;
+};
+
+class testservice : public mvcservice {
+	public:
+		virtual void	createTest(jsondom *request,
+						mvcresult *response)=0;
+		virtual void	readTest(jsondom *request,
+						mvcresult *response)=0;
+		virtual void	updateTest(jsondom *request,
+						mvcresult *response)=0;
+		virtual void	deleteTest(jsondom *request,
+						mvcresult *response)=0;
+};
+
+class defaulttestservice : public testservice {
+	public:
+		void	createTest(jsondom *request, mvcresult *response);
+		void	readTest(jsondom *request, mvcresult *response);
+		void	updateTest(jsondom *request, mvcresult *response);
+		void	deleteTest(jsondom *request, mvcresult *response);
+};
+
+class testdao : public mvcdao {
+	public:
+		virtual void	createTest(jsondom *request,
+						mvcresult *response)=0;
+		virtual void	readTest(jsondom *request,
+						mvcresult *response)=0;
+		virtual void	updateTest(jsondom *request,
+						mvcresult *response)=0;
+		virtual void	deleteTest(jsondom *request,
+						mvcresult *response)=0;
+};
+
+class defaulttestdao : public testdao {
+	public:
+		void	createTest(jsondom *request, mvcresult *response);
+		void	readTest(jsondom *request, mvcresult *response);
+		void	updateTest(jsondom *request, mvcresult *response);
+		void	deleteTest(jsondom *request, mvcresult *response);
 };
 
 class testcontroller : public mvccontroller {
@@ -32,23 +72,40 @@ class testcontroller : public mvccontroller {
 		void	deleteTest(jsondom *request, mvcresult *response);
 };
 
-class testservice : public mvcservice {
+class factory {
 	public:
-		void	createTest(jsondom *request, mvcresult *response);
-		void	readTest(jsondom *request, mvcresult *response);
-		void	updateTest(jsondom *request, mvcresult *response);
-		void	deleteTest(jsondom *request, mvcresult *response);
-};
-
-class testdao : public mvcdao {
-	public:
-		void	createTest(jsondom *request, mvcresult *response);
-		void	readTest(jsondom *request, mvcresult *response);
-		void	updateTest(jsondom *request, mvcresult *response);
-		void	deleteTest(jsondom *request, mvcresult *response);
+		static testview		*getTestView(mvcproperties *prop);
+		static testservice	*getTestService(mvcproperties *prop);
+		static testdao		*getTestDao(mvcproperties *prop);
+		static mvccrud		*getSqlrCrud(mvcproperties *prop,
+							mvcresult *response);
 };
 
 
+
+testview *factory::getTestView(mvcproperties *prop) {
+	const char	*impl=prop->getValue("testview.impl");
+	if (!charstring::compare(impl,"default")) {
+		return new defaulttestview();
+	}
+	return NULL;
+}
+
+testservice *factory::getTestService(mvcproperties *prop) {
+	const char	*impl=prop->getValue("testservice.impl");
+	if (!charstring::compare(impl,"default")) {
+		return new defaulttestservice();
+	}
+	return NULL;
+}
+
+testdao *factory::getTestDao(mvcproperties *prop) {
+	const char	*impl=prop->getValue("testdao.impl");
+	if (!charstring::compare(impl,"default")) {
+		return new defaulttestdao();
+	}
+	return NULL;
+}
 
 mvccrud *factory::getSqlrCrud(mvcproperties *prop, mvcresult *response) {
 
@@ -79,13 +136,16 @@ mvccrud *factory::getSqlrCrud(mvcproperties *prop, mvcresult *response) {
 
 
 
-void testview::setPath(char *path) {
+void defaulttestview::setPath(char *path) {
 	this->path=path;
 }
 
-bool testview::run(bool *handled) {
+bool defaulttestview::run(bool *handled) {
 
 	// get a controller
+	// FIXME: the view shouldn't create the controller,
+	// the controller should already exist and the view
+	// should just get a handle to it
 	testcontroller	tc;
 	tc.setProperties(getProperties());
 
@@ -125,82 +185,66 @@ bool testview::run(bool *handled) {
 
 
 void testcontroller::createTest(jsondom *request, mvcresult *response) {
-
-	// normally we'd get ts from a factory based on an
-	// impl type, but it's fine to do this for this test
-	testservice	ts;
-	ts.setProperties(getProperties());
-	ts.createTest(request,response);
+	testservice	*ts=factory::getTestService(getProperties());
+	ts->setProperties(getProperties());
+	ts->createTest(request,response);
+	delete ts;
 }
 
 void testcontroller::readTest(jsondom *request, mvcresult *response) {
-
-	// normally we'd get ts from a factory based on an
-	// impl type, but it's fine to do this for this test
-	testservice	ts;
-	ts.setProperties(getProperties());
-	ts.readTest(request,response);
+	testservice	*ts=factory::getTestService(getProperties());
+	ts->setProperties(getProperties());
+	ts->readTest(request,response);
+	delete ts;
 }
 
 void testcontroller::updateTest(jsondom *request, mvcresult *response) {
-
-	// normally we'd get ts from a factory based on an
-	// impl type, but it's fine to do this for this test
-	testservice	ts;
-	ts.setProperties(getProperties());
-	ts.updateTest(request,response);
+	testservice	*ts=factory::getTestService(getProperties());
+	ts->setProperties(getProperties());
+	ts->updateTest(request,response);
+	delete ts;
 }
 
 void testcontroller::deleteTest(jsondom *request, mvcresult *response) {
-
-	// normally we'd get ts from a factory based on an
-	// impl type, but it's fine to do this for this test
-	testservice	ts;
-	ts.setProperties(getProperties());
-	ts.deleteTest(request,response);
+	testservice	*ts=factory::getTestService(getProperties());
+	ts->setProperties(getProperties());
+	ts->deleteTest(request,response);
+	delete ts;
 }
 
 
 
-void testservice::createTest(jsondom *request, mvcresult *response) {
-
-	// normally we'd get td from a factory based on an
-	// impl type, but it's fine to do this for this test
-	testdao	td;
-	td.setProperties(getProperties());
-	td.createTest(request,response);
+void defaulttestservice::createTest(jsondom *request, mvcresult *response) {
+	testdao	*td=factory::getTestDao(getProperties());
+	td->setProperties(getProperties());
+	td->createTest(request,response);
+	delete td;
 }
 
-void testservice::readTest(jsondom *request, mvcresult *response) {
-
-	// normally we'd get td from a factory based on an
-	// impl type, but it's fine to do this for this test
-	testdao	td;
-	td.setProperties(getProperties());
-	td.readTest(request,response);
+void defaulttestservice::readTest(jsondom *request, mvcresult *response) {
+	testdao	*td=factory::getTestDao(getProperties());
+	td->setProperties(getProperties());
+	td->readTest(request,response);
+	delete td;
 }
 
-void testservice::updateTest(jsondom *request, mvcresult *response) {
-
-	// normally we'd get td from a factory based on an
-	// impl type, but it's fine to do this for this test
-	testdao	td;
-	td.setProperties(getProperties());
-	td.updateTest(request,response);
+void defaulttestservice::updateTest(jsondom *request, mvcresult *response) {
+	testdao	*td=factory::getTestDao(getProperties());
+	td->setProperties(getProperties());
+	td->updateTest(request,response);
+	delete td;
 }
 
-void testservice::deleteTest(jsondom *request, mvcresult *response) {
-
-	// normally we'd get td from a factory based on an
-	// impl type, but it's fine to do this for this test
-	testdao	td;
-	td.setProperties(getProperties());
-	td.deleteTest(request,response);
+void defaulttestservice::deleteTest(jsondom *request, mvcresult *response) {
+	testdao	*td=factory::getTestDao(getProperties());
+	td->setProperties(getProperties());
+	td->deleteTest(request,response);
+	delete td;
 }
 
 
 
-void testdao::createTest(jsondom *request, mvcresult *response) {
+void defaulttestdao::createTest(jsondom *request, mvcresult *response) {
 	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
 	if (crud->doCreate(request)) {
 		response->setSuccess();
@@ -211,7 +255,7 @@ void testdao::createTest(jsondom *request, mvcresult *response) {
 	}
 }
 
-void testdao::readTest(jsondom *request, mvcresult *response) {
+void defaulttestdao::readTest(jsondom *request, mvcresult *response) {
 	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
 	if (crud->doRead(request)) {
 		response->setSuccess();
@@ -222,7 +266,7 @@ void testdao::readTest(jsondom *request, mvcresult *response) {
 	}
 }
 
-void testdao::updateTest(jsondom *request, mvcresult *response) {
+void defaulttestdao::updateTest(jsondom *request, mvcresult *response) {
 	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
 	if (crud->doUpdate(request)) {
 		response->setSuccess();
@@ -233,7 +277,7 @@ void testdao::updateTest(jsondom *request, mvcresult *response) {
 	}
 }
 
-void testdao::deleteTest(jsondom *request, mvcresult *response) {
+void defaulttestdao::deleteTest(jsondom *request, mvcresult *response) {
 	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
 	if (crud->doDelete(request)) {
 		response->setSuccess();
@@ -248,10 +292,6 @@ void testdao::deleteTest(jsondom *request, mvcresult *response) {
 
 bool httpModuleMain(httpserverapi *sapi) {
 
-	// set up request/response
-	httprequest	req(sapi);
-	httpresponse	resp(sapi);
-
 	// set up properties (normally these would be in a file)
 	mvcproperties	prop;
 	prop.parseString(
@@ -260,7 +300,14 @@ bool httpModuleMain(httpserverapi *sapi) {
 		"sqlr.socket=\n"
 		"sqlr.user=test\n"
 		"sqlr.password=test\n"
-		"table=testtable");
+		"table=testtable\n"
+		"testview.impl=default\n"
+		"testservice.impl=default\n"
+		"testdao.impl=default\n");
+
+	// set up request/response
+	httprequest	req(sapi);
+	httpresponse	resp(sapi);
 
 	// get the path from the request and truncate any params
 	char	*path=charstring::duplicate(
@@ -270,19 +317,20 @@ bool httpModuleMain(httpserverapi *sapi) {
 		*query='\0';
 	}
 
-	// set up the view
-	testview	tv;
-	tv.setRequest(&req);
-	tv.setResponse(&resp);
-	tv.setProperties(&prop);
-	tv.setPath(path);
+	// set up the testview
+	testview	*tv=factory::getTestView(&prop);
+	tv->setRequest(&req);
+	tv->setResponse(&resp);
+	tv->setProperties(&prop);
+	tv->setPath(path);
 
 	// run the view
 	bool	handled=false;
-	bool	result=tv.run(&handled);
+	bool	result=tv->run(&handled);
 
 	// clean up
 	delete[] path;
+	delete tv;
 
 	// handle success/error conditions
 	if (!result) {
