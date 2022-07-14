@@ -10,18 +10,36 @@
 #define HTTP_MODULE_CGI
 #include <rudiments/httpserverapimain.h>
 
+class factory {
+	public:
+		static testcontroller	*getTestController(mvcproperties *prop);
+		static testview		*getTestView(mvcproperties *prop);
+		static testservice	*getTestService(mvcproperties *prop);
+		static testdao		*getTestDao(mvcproperties *prop);
+		static mvccrud		*getSqlrCrud(mvcproperties *prop,
+							mvcresult *response);
+};
+
 class testview : public mvcview {
 	public:
 		virtual void	setPath(char *path)=0;
 		virtual bool	run(bool *handled)=0;
 };
 
-class defaulttestview : public testview {
+class ajaxtestview : public testview {
 	public:
 		void	setPath(char *path);
 		bool	run(bool *handled);
 	private:
 		char	*path;
+};
+
+class testcontroller : public mvccontroller {
+	public:
+		void	createTest(jsondom *request, mvcresult *response);
+		void	readTest(jsondom *request, mvcresult *response);
+		void	updateTest(jsondom *request, mvcresult *response);
+		void	deleteTest(jsondom *request, mvcresult *response);
 };
 
 class testservice : public mvcservice {
@@ -56,7 +74,7 @@ class testdao : public mvcdao {
 						mvcresult *response)=0;
 };
 
-class defaulttestdao : public testdao {
+class sqlrtestdao : public testdao {
 	public:
 		void	createTest(jsondom *request, mvcresult *response);
 		void	readTest(jsondom *request, mvcresult *response);
@@ -64,45 +82,44 @@ class defaulttestdao : public testdao {
 		void	deleteTest(jsondom *request, mvcresult *response);
 };
 
-class testcontroller : public mvccontroller {
-	public:
-		void	createTest(jsondom *request, mvcresult *response);
-		void	readTest(jsondom *request, mvcresult *response);
-		void	updateTest(jsondom *request, mvcresult *response);
-		void	deleteTest(jsondom *request, mvcresult *response);
-};
-
-class factory {
-	public:
-		static testview		*getTestView(mvcproperties *prop);
-		static testservice	*getTestService(mvcproperties *prop);
-		static testdao		*getTestDao(mvcproperties *prop);
-		static mvccrud		*getSqlrCrud(mvcproperties *prop,
-							mvcresult *response);
-};
 
 
+testcontroller *factory::getTestController(mvcproperties *prop) {
+	// FIXME: use pools
+	testcontroller	*c=new testcontroller();
+	c->setProperties(prop);
+	return c;
+}
 
 testview *factory::getTestView(mvcproperties *prop) {
+	// FIXME: use pools
 	const char	*impl=prop->getValue("testview.impl");
-	if (!charstring::compare(impl,"default")) {
-		return new defaulttestview();
+	if (!charstring::compare(impl,"ajax")) {
+		testview	*v=new ajaxtestview();
+		v->setProperties(prop);
+		return v;
 	}
 	return NULL;
 }
 
 testservice *factory::getTestService(mvcproperties *prop) {
+	// FIXME: use pools
 	const char	*impl=prop->getValue("testservice.impl");
 	if (!charstring::compare(impl,"default")) {
-		return new defaulttestservice();
+		testservice	*s=new defaulttestservice();
+		s->setProperties(prop);
+		return s;
 	}
 	return NULL;
 }
 
 testdao *factory::getTestDao(mvcproperties *prop) {
+	// FIXME: use pools
 	const char	*impl=prop->getValue("testdao.impl");
-	if (!charstring::compare(impl,"default")) {
-		return new defaulttestdao();
+	if (!charstring::compare(impl,"sqlr")) {
+		testdao	*d=new sqlrtestdao();
+		d->setProperties(prop);
+		return d;
 	}
 	return NULL;
 }
@@ -136,18 +153,14 @@ mvccrud *factory::getSqlrCrud(mvcproperties *prop, mvcresult *response) {
 
 
 
-void defaulttestview::setPath(char *path) {
+void ajaxtestview::setPath(char *path) {
 	this->path=path;
 }
 
-bool defaulttestview::run(bool *handled) {
+bool ajaxtestview::run(bool *handled) {
 
 	// get a controller
-	// FIXME: the view shouldn't create the controller,
-	// the controller should already exist and the view
-	// should just get a handle to it
-	testcontroller	tc;
-	tc.setProperties(getProperties());
+	testcontroller	*tc=factory::getTestController(getProperties());
 
 	// get posted json
 	jsondom	request;
@@ -159,13 +172,13 @@ bool defaulttestview::run(bool *handled) {
 	mvcresult	response;
 	*handled=true;
 	if (!charstring::compare(path,"/create.html")) {
-		tc.createTest(&request,&response);
+		tc->createTest(&request,&response);
 	} else if (!charstring::compare(path,"/read.html")) {
-		tc.readTest(&request,&response);
+		tc->readTest(&request,&response);
 	} else if (!charstring::compare(path,"/update.html")) {
-		tc.updateTest(&request,&response);
+		tc->updateTest(&request,&response);
 	} else if (!charstring::compare(path,"/delete.html")) {
-		tc.deleteTest(&request,&response);
+		tc->deleteTest(&request,&response);
 	} else {
 		*handled=false;
 	}
@@ -178,6 +191,7 @@ bool defaulttestview::run(bool *handled) {
 
 	// clean up
 	response.getWastebasket()->empty();
+	delete tc;
 
 	return true;
 }
@@ -186,28 +200,24 @@ bool defaulttestview::run(bool *handled) {
 
 void testcontroller::createTest(jsondom *request, mvcresult *response) {
 	testservice	*ts=factory::getTestService(getProperties());
-	ts->setProperties(getProperties());
 	ts->createTest(request,response);
 	delete ts;
 }
 
 void testcontroller::readTest(jsondom *request, mvcresult *response) {
 	testservice	*ts=factory::getTestService(getProperties());
-	ts->setProperties(getProperties());
 	ts->readTest(request,response);
 	delete ts;
 }
 
 void testcontroller::updateTest(jsondom *request, mvcresult *response) {
 	testservice	*ts=factory::getTestService(getProperties());
-	ts->setProperties(getProperties());
 	ts->updateTest(request,response);
 	delete ts;
 }
 
 void testcontroller::deleteTest(jsondom *request, mvcresult *response) {
 	testservice	*ts=factory::getTestService(getProperties());
-	ts->setProperties(getProperties());
 	ts->deleteTest(request,response);
 	delete ts;
 }
@@ -216,35 +226,31 @@ void testcontroller::deleteTest(jsondom *request, mvcresult *response) {
 
 void defaulttestservice::createTest(jsondom *request, mvcresult *response) {
 	testdao	*td=factory::getTestDao(getProperties());
-	td->setProperties(getProperties());
 	td->createTest(request,response);
 	delete td;
 }
 
 void defaulttestservice::readTest(jsondom *request, mvcresult *response) {
 	testdao	*td=factory::getTestDao(getProperties());
-	td->setProperties(getProperties());
 	td->readTest(request,response);
 	delete td;
 }
 
 void defaulttestservice::updateTest(jsondom *request, mvcresult *response) {
 	testdao	*td=factory::getTestDao(getProperties());
-	td->setProperties(getProperties());
 	td->updateTest(request,response);
 	delete td;
 }
 
 void defaulttestservice::deleteTest(jsondom *request, mvcresult *response) {
 	testdao	*td=factory::getTestDao(getProperties());
-	td->setProperties(getProperties());
 	td->deleteTest(request,response);
 	delete td;
 }
 
 
 
-void defaulttestdao::createTest(jsondom *request, mvcresult *response) {
+void sqlrtestdao::createTest(jsondom *request, mvcresult *response) {
 	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
 	if (crud->doCreate(request)) {
 		response->setSuccess();
@@ -255,7 +261,7 @@ void defaulttestdao::createTest(jsondom *request, mvcresult *response) {
 	}
 }
 
-void defaulttestdao::readTest(jsondom *request, mvcresult *response) {
+void sqlrtestdao::readTest(jsondom *request, mvcresult *response) {
 	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
 	if (crud->doRead(request)) {
 		response->setSuccess();
@@ -266,7 +272,7 @@ void defaulttestdao::readTest(jsondom *request, mvcresult *response) {
 	}
 }
 
-void defaulttestdao::updateTest(jsondom *request, mvcresult *response) {
+void sqlrtestdao::updateTest(jsondom *request, mvcresult *response) {
 	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
 	if (crud->doUpdate(request)) {
 		response->setSuccess();
@@ -277,7 +283,7 @@ void defaulttestdao::updateTest(jsondom *request, mvcresult *response) {
 	}
 }
 
-void defaulttestdao::deleteTest(jsondom *request, mvcresult *response) {
+void sqlrtestdao::deleteTest(jsondom *request, mvcresult *response) {
 	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
 	if (crud->doDelete(request)) {
 		response->setSuccess();
@@ -301,9 +307,9 @@ bool httpModuleMain(httpserverapi *sapi) {
 		"sqlr.user=test\n"
 		"sqlr.password=test\n"
 		"table=testtable\n"
-		"testview.impl=default\n"
+		"testview.impl=ajax\n"
 		"testservice.impl=default\n"
-		"testdao.impl=default\n");
+		"testdao.impl=sqlr\n");
 
 	// set up request/response
 	httprequest	req(sapi);
@@ -321,7 +327,6 @@ bool httpModuleMain(httpserverapi *sapi) {
 	testview	*tv=factory::getTestView(&prop);
 	tv->setRequest(&req);
 	tv->setResponse(&resp);
-	tv->setProperties(&prop);
 	tv->setPath(path);
 
 	// run the view
