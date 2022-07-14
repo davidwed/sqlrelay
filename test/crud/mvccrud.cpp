@@ -7,18 +7,12 @@
 #include <rudiments/scalar.h>
 
 #define HTTP_MODULE_NAME mvccrud
-#define HTTP_MODULE_CGI
+#ifdef APACHE
+	#define HTTP_MODULE_APACHE
+#else
+	#define HTTP_MODULE_CGI
+#endif
 #include <rudiments/httpserverapimain.h>
-
-class factory {
-	public:
-		static testcontroller	*getTestController(mvcproperties *prop);
-		static testview		*getTestView(mvcproperties *prop);
-		static testservice	*getTestService(mvcproperties *prop);
-		static testdao		*getTestDao(mvcproperties *prop);
-		static mvccrud		*getSqlrCrud(mvcproperties *prop,
-							mvcresult *response);
-};
 
 class testview : public mvcview {
 	public:
@@ -80,6 +74,16 @@ class sqlrtestdao : public testdao {
 		void	readTest(jsondom *request, mvcresult *response);
 		void	updateTest(jsondom *request, mvcresult *response);
 		void	deleteTest(jsondom *request, mvcresult *response);
+};
+
+class factory {
+	public:
+		static testcontroller	*getTestController(mvcproperties *prop);
+		static testview		*getTestView(mvcproperties *prop);
+		static testservice	*getTestService(mvcproperties *prop);
+		static testdao		*getTestDao(mvcproperties *prop);
+		static mvccrud		*getSqlrCrud(mvcproperties *prop,
+							mvcresult *response);
 };
 
 
@@ -171,13 +175,13 @@ bool ajaxtestview::run(bool *handled) {
 	// run the appropriate controller method and get the result
 	mvcresult	response;
 	*handled=true;
-	if (!charstring::compare(path,"/create.html")) {
+	if (!charstring::compare(path,"/create")) {
 		tc->createTest(&request,&response);
-	} else if (!charstring::compare(path,"/read.html")) {
+	} else if (!charstring::compare(path,"/read")) {
 		tc->readTest(&request,&response);
-	} else if (!charstring::compare(path,"/update.html")) {
+	} else if (!charstring::compare(path,"/update")) {
 		tc->updateTest(&request,&response);
-	} else if (!charstring::compare(path,"/delete.html")) {
+	} else if (!charstring::compare(path,"/delete")) {
 		tc->deleteTest(&request,&response);
 	} else {
 		*handled=false;

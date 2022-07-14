@@ -6,16 +6,10 @@ sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "create ta
 # create test
 echo "======================================================================"
 echo "create:"
-unset PATH_INFO
-unset REQUEST_METHOD
-unset CONTENT_TYPE
-PATH_INFO="/create"
-export PATH_INFO
-REQUEST_METHOD="post"
-export REQUEST_METHOD
-CONTENT_TYPE="application/json"
-export CONTENT_TYPE
-./mvccrud.cgi << EOF
+curl -X POST \
+	-H "Content-type: application/json" \
+	--data-binary @- \
+	http://localhost/mvccrud.cgi/create << EOF
 {
 	"data": {
 		"col1": "val1",
@@ -30,16 +24,10 @@ echo
 # read test
 echo "======================================================================"
 echo "read:"
-unset PATH_INFO
-unset REQUEST_METHOD
-unset CONTENT_TYPE
-PATH_INFO="/read"
-export PATH_INFO
-REQUEST_METHOD="post"
-export REQUEST_METHOD
-CONTENT_TYPE="application/json"
-export CONTENT_TYPE
-./mvccrud.cgi << EOF
+curl -X POST \
+	-H "Content-type: application/json" \
+	--data-binary @- \
+	http://localhost/mvccrud.cgi/read << EOF
 {
 	"criteria" : {
 		"and" : [
@@ -70,16 +58,10 @@ echo
 # update test
 echo "======================================================================"
 echo "update:"
-unset PATH_INFO
-unset REQUEST_METHOD
-unset CONTENT_TYPE
-PATH_INFO="/update"
-export PATH_INFO
-REQUEST_METHOD="post"
-export REQUEST_METHOD
-CONTENT_TYPE="application/json"
-export CONTENT_TYPE
-./mvccrud.cgi << EOF
+curl -X POST \
+	-H "Content-type: application/json" \
+	--data-binary @- \
+	http://localhost/mvccrud.cgi/update << EOF
 {
 	"criteria" : {
 		"=" : [
@@ -100,12 +82,11 @@ echo
 # read-after-update test
 echo "======================================================================"
 echo "read-after-update:"
-unset PATH_INFO
-unset REQUEST_METHOD
-unset CONTENT_TYPE
-PATH_INFO="/read"
-export PATH_INFO
-./mvccrud.cgi
+curl -X POST \
+	-H "Content-type: application/json" \
+	--data-binary @- \
+	http://localhost/mvccrud.cgi/read << EOF
+EOF
 echo
 
 
@@ -113,16 +94,10 @@ echo
 # delete test
 echo "======================================================================"
 echo "delete:"
-unset PATH_INFO
-unset REQUEST_METHOD
-unset CONTENT_TYPE
-PATH_INFO="/delete"
-export PATH_INFO
-REQUEST_METHOD="post"
-export REQUEST_METHOD
-CONTENT_TYPE="application/json"
-export CONTENT_TYPE
-./mvccrud.cgi << EOF
+curl -X POST \
+	-H "Content-type: application/json" \
+	--data-binary @- \
+	http://localhost/mvccrud.cgi/delete << EOF
 {
 	"criteria" : {
 		"=" : [
@@ -138,12 +113,11 @@ echo
 # read-after-delete test
 echo "======================================================================"
 echo "read-after-delete:"
-unset PATH_INFO
-unset REQUEST_METHOD
-unset CONTENT_TYPE
-PATH_INFO="/read"
-export PATH_INFO
-./mvccrud.cgi
+curl -X POST \
+	-H "Content-type: application/json" \
+	--data-binary @- \
+	http://localhost/mvccrud.cgi/delete << EOF
+EOF
 echo
 
 echo "======================================================================"
