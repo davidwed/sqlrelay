@@ -1,15 +1,26 @@
+#!/bin/sh
+
+# use the provided extension or fall back to cgi
+EXT=cgi
+if ( test -n "$1" )
+then
+	EXT=$1
+fi
+URL=http://localhost/mvccrud.$EXT
+
+
 sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "drop table testtable"
 sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "create table testtable (col1 varchar2(128), col2 varchar2(128), col3 varchar2(128))"
-
 
 
 # create test
 echo "======================================================================"
 echo "create:"
+echo $URL/create
 curl -X POST \
 	-H "Content-type: application/json" \
 	--data-binary @- \
-	http://localhost/mvccrud.cgi/create << EOF
+	$URL/create << EOF
 {
 	"data": {
 		"col1": "val1",
@@ -24,10 +35,11 @@ echo
 # read test
 echo "======================================================================"
 echo "read:"
+echo $URL/read
 curl -X POST \
 	-H "Content-type: application/json" \
 	--data-binary @- \
-	http://localhost/mvccrud.cgi/read << EOF
+	$URL/read << EOF
 {
 	"criteria" : {
 		"and" : [
@@ -58,10 +70,11 @@ echo
 # update test
 echo "======================================================================"
 echo "update:"
+echo $URL/update
 curl -X POST \
 	-H "Content-type: application/json" \
 	--data-binary @- \
-	http://localhost/mvccrud.cgi/update << EOF
+	$URL/update << EOF
 {
 	"criteria" : {
 		"=" : [
@@ -82,10 +95,11 @@ echo
 # read-after-update test
 echo "======================================================================"
 echo "read-after-update:"
+echo $URL/read
 curl -X POST \
 	-H "Content-type: application/json" \
 	--data-binary @- \
-	http://localhost/mvccrud.cgi/read << EOF
+	$URL/read << EOF
 EOF
 echo
 
@@ -94,10 +108,11 @@ echo
 # delete test
 echo "======================================================================"
 echo "delete:"
+echo $URL/delete
 curl -X POST \
 	-H "Content-type: application/json" \
 	--data-binary @- \
-	http://localhost/mvccrud.cgi/delete << EOF
+	$URL/delete << EOF
 {
 	"criteria" : {
 		"=" : [
@@ -113,10 +128,11 @@ echo
 # read-after-delete test
 echo "======================================================================"
 echo "read-after-delete:"
+echo $URL/read
 curl -X POST \
 	-H "Content-type: application/json" \
 	--data-binary @- \
-	http://localhost/mvccrud.cgi/delete << EOF
+	$URL/delete << EOF
 EOF
 echo
 

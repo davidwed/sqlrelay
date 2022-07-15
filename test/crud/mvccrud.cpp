@@ -187,11 +187,14 @@ bool ajaxtestview::run(bool *handled) {
 		*handled=false;
 	}
 
-	// ... reformat response as appropriate for the frontend ...
-
 	// respond
-	getResponse()->textHtml();
-	response.writeJson(getResponse());
+	if (*handled) {
+
+		// ... reformat response as appropriate for the frontend ...
+
+		getResponse()->textHtml();
+		response.writeJson(getResponse());
+	}
 
 	// clean up
 	response.getWastebasket()->empty();
@@ -347,7 +350,8 @@ bool httpModuleMain(httpserverapi *sapi) {
 	}
 	if (!handled) {
 		// normally an errorview would handle this
-		stdoutput.printf("URL unhandled!\n");
+		resp.textHtml();
+		resp.write("URL unhandled!\n");
 	}
 	return true;
 }
