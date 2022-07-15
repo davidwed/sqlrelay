@@ -29,12 +29,25 @@ clean:
 	$(RMTREE) .libs
 
 install:
-	$(LTINSTALL) $(CP) mvccrud.cgi /var/www/html
+	if ( test -d "/var/www/html" ); \
+	then \
+		$(LTINSTALL) $(CP) mvccrud.cgi /var/www/html; \
+	fi
+	if ( test -d "/home/httpd/html" ); \
+	then \
+		$(LTINSTALL) $(CP) mvccrud.cgi /home/httpd/html; \
+	fi
 	$(LTINSTALL) $(CP) mod_mvccrud.$(LIBEXT) /etc/httpd/modules
 	$(RM) /etc/httpd/modules/mod_mvccrud.a
 	$(RM) /etc/httpd/modules/mod_mvccrud.la
-	systemctl restart httpd
+	if ( test -x "/etc/rc.d/init.d/httpd" ); \
+	then \
+		/etc/rc.d/init.d/httpd restart; \
+	else \
+		systemctl restart httpd; \
+	fi
 
 uninstall:
 	$(RM) /var/www/html/mvccrud.cgi
+	$(RM) /home/httpd/html/mvccrud.cgi
 	$(RM) /etc/httpd/modules/mod_mvccrud.*
