@@ -301,12 +301,11 @@ void sqlrtestdao::deleteTest(jsondom *request, mvcresult *response) {
 	}
 }
 
+mvcproperties	prop;
 
-
-bool httpModuleMain(httpserverapi *sapi) {
+bool httpModuleInit(httpserverapi *sapi) {
 
 	// set up properties (normally these would be in a file)
-	mvcproperties	prop;
 	prop.parseString(
 		"sqlr.host=localhost\n"
 		"sqlr.port=9000\n"
@@ -317,6 +316,18 @@ bool httpModuleMain(httpserverapi *sapi) {
 		"testview.impl=ajax\n"
 		"testservice.impl=default\n"
 		"testdao.impl=sqlr\n");
+
+	// initialize pools
+	uint64_t	tpp=sapi->getThreadsPerProcess();
+	for (uint64_t i=0; i<tpp; i++) {
+		// FIXME: create one controller, view, service,
+		// and dao for each thread
+	}
+
+	return true;
+}
+
+bool httpModuleMain(httpserverapi *sapi) {
 
 	// set up request/response
 	httprequest	req(sapi);
@@ -353,5 +364,9 @@ bool httpModuleMain(httpserverapi *sapi) {
 		resp.textHtml();
 		resp.write("URL unhandled!\n");
 	}
+	return true;
+}
+
+bool httpModuleExit(httpserverapi *sapi) {
 	return true;
 }
