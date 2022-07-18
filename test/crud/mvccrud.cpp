@@ -3,8 +3,8 @@
 
 #include <sqlrelay/sqlrcrud.h>
 #include <rudiments/mvc.h>
+#include <rudiments/resourcepool.h>
 #include <rudiments/httprequest.h>
-#include <rudiments/scalar.h>
 
 #define HTTP_MODULE_NAME mvccrud
 #ifdef APACHE
@@ -22,6 +22,7 @@ class testview : public mvcview {
 
 class ajaxtestview : public testview {
 	public:
+		const char	*getType() const;
 		void	setPath(char *path);
 		bool	run(bool *handled);
 	private:
@@ -50,6 +51,7 @@ class testservice : public mvcservice {
 
 class defaulttestservice : public testservice {
 	public:
+		const char	*getType() const;
 		void	createTest(jsondom *request, mvcresult *response);
 		void	readTest(jsondom *request, mvcresult *response);
 		void	updateTest(jsondom *request, mvcresult *response);
@@ -70,6 +72,7 @@ class testdao : public mvcdao {
 
 class sqlrtestdao : public testdao {
 	public:
+		const char	*getType() const;
 		void	createTest(jsondom *request, mvcresult *response);
 		void	readTest(jsondom *request, mvcresult *response);
 		void	updateTest(jsondom *request, mvcresult *response);
@@ -78,57 +81,91 @@ class sqlrtestdao : public testdao {
 
 class factory {
 	public:
-		static testcontroller	*getTestController(mvcproperties *prop);
-		static testview		*getTestView(mvcproperties *prop);
-		static testservice	*getTestService(mvcproperties *prop);
-		static testdao		*getTestDao(mvcproperties *prop);
-		static mvccrud		*getSqlrCrud(mvcproperties *prop,
+		static testcontroller	*allocateTestController(
+							mvcproperties *prop);
+		static void		freeTestController(testcontroller *tc);
+
+		static testview		*allocateTestView(mvcproperties *prop);
+		static void		freeTestView(testview *tv);
+
+		static testservice	*allocateTestService(
+							mvcproperties *prop);
+		static void		freeTestService(testservice *ts);
+
+		static testdao		*allocateTestDao(mvcproperties *prop);
+		static void		freeTestDao(testdao *td);
+
+		static mvccrud		*allocateSqlrCrud(
+							mvcproperties *prop,
 							mvcresult *response);
 };
 
+resourcepool<testcontroller>		testcontrollerpool;
+resourcepool<ajaxtestview>		ajaxtestviewpool;
+resourcepool<defaulttestservice>	defaulttestservicepool;
+resourcepool<sqlrtestdao>		sqlrtestdaopool;
+mvcproperties				prop;
 
 
-testcontroller *factory::getTestController(mvcproperties *prop) {
-	// FIXME: use pools
-	testcontroller	*c=new testcontroller();
+testcontroller *factory::allocateTestController(mvcproperties *prop) {
+	testcontroller	*c=testcontrollerpool.borrowResource();
 	c->setProperties(prop);
 	return c;
 }
 
-testview *factory::getTestView(mvcproperties *prop) {
-	// FIXME: use pools
+void factory::freeTestController(testcontroller *tc) {
+	testcontrollerpool.returnResource(tc);
+}
+
+testview *factory::allocateTestView(mvcproperties *prop) {
 	const char	*impl=prop->getValue("testview.impl");
 	if (!charstring::compare(impl,"ajax")) {
-		testview	*v=new ajaxtestview();
+		testview	*v=ajaxtestviewpool.borrowResource();
 		v->setProperties(prop);
 		return v;
 	}
 	return NULL;
 }
 
-testservice *factory::getTestService(mvcproperties *prop) {
-	// FIXME: use pools
+void factory::freeTestView(testview *tv) {
+	if (!charstring::compare(tv->getType(),"ajaxtestview")) {
+		ajaxtestviewpool.returnResource((ajaxtestview *)tv);
+	}
+}
+
+testservice *factory::allocateTestService(mvcproperties *prop) {
 	const char	*impl=prop->getValue("testservice.impl");
 	if (!charstring::compare(impl,"default")) {
-		testservice	*s=new defaulttestservice();
+		testservice	*s=defaulttestservicepool.borrowResource();
 		s->setProperties(prop);
 		return s;
 	}
 	return NULL;
 }
 
-testdao *factory::getTestDao(mvcproperties *prop) {
-	// FIXME: use pools
+void factory::freeTestService(testservice *ts) {
+	if (!charstring::compare(ts->getType(),"defaulttestservice")) {
+		defaulttestservicepool.returnResource((defaulttestservice *)ts);
+	}
+}
+
+testdao *factory::allocateTestDao(mvcproperties *prop) {
 	const char	*impl=prop->getValue("testdao.impl");
 	if (!charstring::compare(impl,"sqlr")) {
-		testdao	*d=new sqlrtestdao();
+		testdao	*d=sqlrtestdaopool.borrowResource();
 		d->setProperties(prop);
 		return d;
 	}
 	return NULL;
 }
 
-mvccrud *factory::getSqlrCrud(mvcproperties *prop, mvcresult *response) {
+void factory::freeTestDao(testdao *td) {
+	if (!charstring::compare(td->getType(),"sqlrtestdao")) {
+		sqlrtestdaopool.returnResource((sqlrtestdao *)td);
+	}
+}
+
+mvccrud *factory::allocateSqlrCrud(mvcproperties *prop, mvcresult *response) {
 
 	// create connection, cursor, and crud
 	sqlrconnection	*con=new sqlrconnection(
@@ -157,6 +194,10 @@ mvccrud *factory::getSqlrCrud(mvcproperties *prop, mvcresult *response) {
 
 
 
+const char *ajaxtestview::getType() const {
+	return "ajaxtestview";
+}
+
 void ajaxtestview::setPath(char *path) {
 	this->path=path;
 }
@@ -164,7 +205,7 @@ void ajaxtestview::setPath(char *path) {
 bool ajaxtestview::run(bool *handled) {
 
 	// get a controller
-	testcontroller	*tc=factory::getTestController(getProperties());
+	testcontroller	*tc=factory::allocateTestController(getProperties());
 
 	// get posted json
 	jsondom	request;
@@ -198,7 +239,7 @@ bool ajaxtestview::run(bool *handled) {
 
 	// clean up
 	response.getWastebasket()->empty();
-	delete tc;
+	factory::freeTestController(tc);
 
 	return true;
 }
@@ -206,59 +247,67 @@ bool ajaxtestview::run(bool *handled) {
 
 
 void testcontroller::createTest(jsondom *request, mvcresult *response) {
-	testservice	*ts=factory::getTestService(getProperties());
+	testservice	*ts=factory::allocateTestService(getProperties());
 	ts->createTest(request,response);
-	delete ts;
+	factory::freeTestService(ts);
 }
 
 void testcontroller::readTest(jsondom *request, mvcresult *response) {
-	testservice	*ts=factory::getTestService(getProperties());
+	testservice	*ts=factory::allocateTestService(getProperties());
 	ts->readTest(request,response);
-	delete ts;
+	factory::freeTestService(ts);
 }
 
 void testcontroller::updateTest(jsondom *request, mvcresult *response) {
-	testservice	*ts=factory::getTestService(getProperties());
+	testservice	*ts=factory::allocateTestService(getProperties());
 	ts->updateTest(request,response);
-	delete ts;
+	factory::freeTestService(ts);
 }
 
 void testcontroller::deleteTest(jsondom *request, mvcresult *response) {
-	testservice	*ts=factory::getTestService(getProperties());
+	testservice	*ts=factory::allocateTestService(getProperties());
 	ts->deleteTest(request,response);
-	delete ts;
+	factory::freeTestService(ts);
 }
 
 
 
+const char *defaulttestservice::getType() const {
+	return "defaulttestservice";
+}
+
 void defaulttestservice::createTest(jsondom *request, mvcresult *response) {
-	testdao	*td=factory::getTestDao(getProperties());
+	testdao	*td=factory::allocateTestDao(getProperties());
 	td->createTest(request,response);
-	delete td;
+	factory::freeTestDao(td);
 }
 
 void defaulttestservice::readTest(jsondom *request, mvcresult *response) {
-	testdao	*td=factory::getTestDao(getProperties());
+	testdao	*td=factory::allocateTestDao(getProperties());
 	td->readTest(request,response);
-	delete td;
+	factory::freeTestDao(td);
 }
 
 void defaulttestservice::updateTest(jsondom *request, mvcresult *response) {
-	testdao	*td=factory::getTestDao(getProperties());
+	testdao	*td=factory::allocateTestDao(getProperties());
 	td->updateTest(request,response);
-	delete td;
+	factory::freeTestDao(td);
 }
 
 void defaulttestservice::deleteTest(jsondom *request, mvcresult *response) {
-	testdao	*td=factory::getTestDao(getProperties());
+	testdao	*td=factory::allocateTestDao(getProperties());
 	td->deleteTest(request,response);
-	delete td;
+	factory::freeTestDao(td);
 }
 
 
 
+const char *sqlrtestdao::getType() const {
+	return "sqlrtestdao";
+}
+
 void sqlrtestdao::createTest(jsondom *request, mvcresult *response) {
-	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
+	mvccrud	*crud=factory::allocateSqlrCrud(getProperties(),response);
 	if (crud->doCreate(request)) {
 		response->setSuccess();
 		response->setData("ar",crud->getAffectedRowsDictionary());
@@ -269,7 +318,7 @@ void sqlrtestdao::createTest(jsondom *request, mvcresult *response) {
 }
 
 void sqlrtestdao::readTest(jsondom *request, mvcresult *response) {
-	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
+	mvccrud	*crud=factory::allocateSqlrCrud(getProperties(),response);
 	if (crud->doRead(request)) {
 		response->setSuccess();
 		response->setData("rs",crud->getResultSetTable());
@@ -280,7 +329,7 @@ void sqlrtestdao::readTest(jsondom *request, mvcresult *response) {
 }
 
 void sqlrtestdao::updateTest(jsondom *request, mvcresult *response) {
-	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
+	mvccrud	*crud=factory::allocateSqlrCrud(getProperties(),response);
 	if (crud->doUpdate(request)) {
 		response->setSuccess();
 		response->setData("ar",crud->getAffectedRowsDictionary());
@@ -291,7 +340,7 @@ void sqlrtestdao::updateTest(jsondom *request, mvcresult *response) {
 }
 
 void sqlrtestdao::deleteTest(jsondom *request, mvcresult *response) {
-	mvccrud	*crud=factory::getSqlrCrud(getProperties(),response);
+	mvccrud	*crud=factory::allocateSqlrCrud(getProperties(),response);
 	if (crud->doDelete(request)) {
 		response->setSuccess();
 		response->setData("ar",crud->getAffectedRowsDictionary());
@@ -300,8 +349,6 @@ void sqlrtestdao::deleteTest(jsondom *request, mvcresult *response) {
 					crud->getErrorMessage());
 	}
 }
-
-mvcproperties	prop;
 
 bool httpModuleInit(httpserverapi *sapi) {
 
@@ -317,12 +364,21 @@ bool httpModuleInit(httpserverapi *sapi) {
 		"testservice.impl=default\n"
 		"testdao.impl=sqlr\n");
 
-	// initialize pools
-	uint64_t	tpp=sapi->getThreadsPerProcess();
-	for (uint64_t i=0; i<tpp; i++) {
-		// FIXME: create one controller, view, service,
-		// and dao for each thread
+	// determine how many threads we have per process
+	uint16_t	threadsperprocess=1;
+	if (!charstring::compare(sapi->getType(),"apache2")) {
+		threadsperprocess=25;
 	}
+
+	// initialize pools
+	testcontrollerpool.setMin(threadsperprocess);
+	testcontrollerpool.initialize();
+	ajaxtestviewpool.setMin(threadsperprocess);
+	ajaxtestviewpool.initialize();
+	defaulttestservicepool.setMin(threadsperprocess);
+	defaulttestservicepool.initialize();
+	sqlrtestdaopool.setMin(threadsperprocess);
+	sqlrtestdaopool.initialize();
 
 	return true;
 }
@@ -342,7 +398,7 @@ bool httpModuleMain(httpserverapi *sapi) {
 	}
 
 	// set up the testview
-	testview	*tv=factory::getTestView(&prop);
+	testview	*tv=factory::allocateTestView(&prop);
 	tv->setRequest(&req);
 	tv->setResponse(&resp);
 	tv->setPath(path);
@@ -353,7 +409,8 @@ bool httpModuleMain(httpserverapi *sapi) {
 
 	// clean up
 	delete[] path;
-	delete tv;
+	// FIXME: move to factory
+	ajaxtestviewpool.returnResource((ajaxtestview *)tv);
 
 	// handle success/error conditions
 	if (!result) {
