@@ -409,8 +409,7 @@ bool httpModuleMain(httpserverapi *sapi) {
 
 	// clean up
 	delete[] path;
-	// FIXME: move to factory
-	ajaxtestviewpool.returnResource((ajaxtestview *)tv);
+	factory::freeTestView(tv);
 
 	// handle success/error conditions
 	if (!result) {
