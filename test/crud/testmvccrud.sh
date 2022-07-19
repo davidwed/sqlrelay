@@ -1,5 +1,5 @@
-sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "drop table testtable"
-sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "create table testtable (col1 varchar2(128), col2 varchar2(128), col3 varchar2(128))"
+sqlrsh -config ../sqlrelay.conf.d/postgresql.conf -id postgresqltest -command "drop table testtable"
+sqlrsh -config ../sqlrelay.conf.d/postgresql.conf -id postgresqltest -command "create table testtable (col1 varchar(128), col2 varchar(128), col3 varchar(128))"
 
 
 
@@ -147,4 +147,4 @@ export PATH_INFO
 echo
 
 echo "======================================================================"
-sqlrsh -config ../sqlrelay.conf.d/oracle.conf -id oracletest -command "drop table testtable"
+sqlrsh -config ../sqlrelay.conf.d/postgresql.conf -id postgresqltest -command "drop table testtable"

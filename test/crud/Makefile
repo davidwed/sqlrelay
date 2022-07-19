@@ -28,7 +28,15 @@ clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii crud$(EXE) mvccrud.cgi
 	$(RMTREE) .libs
 
-install:
+install: installcgi installmod
+	if ( test -x "/etc/rc.d/init.d/httpd" ); \
+	then \
+		/etc/rc.d/init.d/httpd restart; \
+	else \
+		systemctl restart httpd; \
+	fi
+
+installcgi:
 	if ( test -d "/var/www/html" ); \
 	then \
 		$(LTINSTALL) $(CP) mvccrud.cgi /var/www/html; \
@@ -37,15 +45,11 @@ install:
 	then \
 		$(LTINSTALL) $(CP) mvccrud.cgi /home/httpd/html; \
 	fi
+
+installmod:
 	$(LTINSTALL) $(CP) mod_mvccrud.$(LIBEXT) /etc/httpd/modules
 	$(RM) /etc/httpd/modules/mod_mvccrud.a
 	$(RM) /etc/httpd/modules/mod_mvccrud.la
-	if ( test -x "/etc/rc.d/init.d/httpd" ); \
-	then \
-		/etc/rc.d/init.d/httpd restart; \
-	else \
-		systemctl restart httpd; \
-	fi
 
 uninstall:
 	$(RM) /var/www/html/mvccrud.cgi
