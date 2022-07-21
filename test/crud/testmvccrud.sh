@@ -105,7 +105,8 @@ unset REQUEST_METHOD
 unset CONTENT_TYPE
 PATH_INFO="/read"
 export PATH_INFO
-./mvccrud.cgi
+./mvccrud.cgi << EOF
+EOF
 echo
 
 
@@ -143,7 +144,8 @@ unset REQUEST_METHOD
 unset CONTENT_TYPE
 PATH_INFO="/read"
 export PATH_INFO
-./mvccrud.cgi
+./mvccrud.cgi << EOF
+EOF
 echo
 
 echo "======================================================================"

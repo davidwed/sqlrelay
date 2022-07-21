@@ -207,9 +207,16 @@ bool ajaxtestview::run(bool *handled) {
 	// get a controller
 	testcontroller	*tc=factory::allocateTestController(getProperties());
 
+	// verify that we were posted json
+	if (!getRequest()->methodAllowed(NULL,"POST") ||
+		!getRequest()->contentTypeAllowed(NULL,"application/json")) {
+		*handled=false;
+		return true;
+	}
+
 	// get posted json
 	jsondom	request;
-	request.parseString(getRequest()->getJson());
+	request.parse(getRequest());
 
 	// ... reformat request as appropriate for the backend ...
 
