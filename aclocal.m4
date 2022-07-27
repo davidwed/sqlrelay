@@ -10074,6 +10074,165 @@ AC_SUBST(MACOSXDEPLOYMENTTARGET)
 ])
 
 
+
+dnl checks for apache module api
+AC_DEFUN([FW_CHECK_APACHE],
+[
+APACHEINCLUDES=""
+APACHELINKFLAGS=""
+
+if ( test "$INCLUDE_APACHE" = "1" )
+then
+	FW_CHECK_APXS
+	FW_CHECK_APRCONFIG
+	FW_CHECK_APUCONFIG
+
+	if ( test -n "$APACHEINCLUDES" )
+	then
+		if ( test -n "$DARWIN" )
+		then
+			if ( test -n "$BUNDLE_LOADER" )
+			then
+				APACHE=""
+				for apache in apache2 apache httpd
+				do
+					APACHE=`which $apache | grep -v "$no "`
+					if ( test -n "$APACHE" )
+					then	
+						break
+					fi
+				done
+				APACHELINKFLAGS="-Wl,$BUNDLE_LOADER -Wl,$APACHE"
+			else
+				APACHELINKFLAGS="$UNDEFINED_DYNAMIC_LOOKUP"
+			fi
+		fi
+	else
+		INCLUDE_APACHE="0"
+	fi
+else
+	echo "disabled"
+fi
+
+AC_SUBST(APACHEINCLUDES)
+AC_SUBST(APACHELINKFLAGS)
+])
+
+
+
+dnl checks for apache's apxs2
+AC_DEFUN([FW_CHECK_APXS],
+[
+
+if ( test -n "$APXS" )
+then
+	AC_PATH_PROG(APXS,$APXS,"")
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		AC_PATH_PROG(APXS2,apxs2,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin)
+		if ( test -z "$APXS2" )
+		then
+			AC_PATH_PROG(APXS,apxs,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin)
+		fi
+		if ( test -n "$APXS2" )
+		then
+			APXS="$APXS2"
+		fi
+	fi
+fi
+
+if ( test -n "$APXS" )
+then
+	APACHEINCLUDES="-I`$APXS -q INCLUDEDIR`"
+fi
+
+])
+
+
+
+dnl checks for apache2's apr-1-mt-config, apr-1-config or apr-config
+AC_DEFUN([FW_CHECK_APRCONFIG],
+[
+
+if ( test -n "$APR_CONFIG" )
+then
+	AC_PATH_PROG(APR_CONFIG,$APR_CONFIG,"")
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		AC_PATH_PROG(APR_1_MT_CONFIG,apr-1-mt-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin)
+		if ( test -z "$APR_1_MT_CONFIG" )
+		then
+			AC_PATH_PROG(APR_1_CONFIG,apr-1-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			if ( test -z "$APR_1_CONFIG" )
+			then
+				AC_PATH_PROG(APR_CONFIG,apr-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			fi
+		fi
+		if ( test -n "$APR_1_CONFIG" )
+		then
+			APR_CONFIG="$APR_1_CONFIG"
+		fi
+		if ( test -n "$APR_1_MT_CONFIG" )
+		then
+			APR_CONFIG="$APR_1_MT_CONFIG"
+		fi
+	fi
+fi
+
+if ( test -n "$APR_CONFIG" )
+then
+	APACHEINCLUDES="$APACHEINCLUDES `$APR_CONFIG --cppflags --includes | sed -e 's|-mt ||'` -DAPACHE_2"
+fi
+])
+
+
+
+dnl checks for apache2's apr-1-mt-config, apr-1-config or apr-config
+AC_DEFUN([FW_CHECK_APUCONFIG],
+[
+
+if ( test -n "$APU_CONFIG" )
+then
+	AC_PATH_PROG(APU_CONFIG,$APU_CONFIG,"")
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		AC_PATH_PROG(APU_1_MT_CONFIG,apu-1-mt-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin)
+		if ( test -z "$APU_1_MT_CONFIG" )
+		then
+			AC_PATH_PROG(APU_1_CONFIG,apu-1-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			if ( test -z "$APU_1_CONFIG" )
+			then
+				AC_PATH_PROG(APU_CONFIG,apu-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			fi
+		fi
+		if ( test -n "$APU_1_CONFIG" )
+		then
+			APU_CONFIG="$APU_1_CONFIG"
+		fi
+		if ( test -n "$APU_1_MT_CONFIG" )
+		then
+			APU_CONFIG="$APU_1_MT_CONFIG"
+		fi
+	fi
+fi
+
+if ( test -n "$APU_CONFIG" )
+then
+	APACHEINCLUDES="$APACHEINCLUDES `$APU_CONFIG --includes | sed -e 's|-mt ||'`"
+fi
+])
+
+
+
 dnl checks to see if the -Wno-long-double option compiler works or not
 dnl if it does, then WNOLONGDOUBLE="-Wno-long-double" is set
 dnl if it does not, then WNOLONGDOUBLE="" is set

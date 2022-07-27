@@ -827,6 +827,20 @@ FW_CHECK_NODEJS
 echo "******************************"
 
 
+
+dnl Checks for apache (for mvccrud test)
+echo
+echo "***** Apache *****************"
+INCLUDE_APACHE="1"
+FW_CHECK_APACHE
+if ( test "$INCLUDE_APACHE" = "1" )
+then
+	APACHELINKFLAGS="$APACHELINKFLAGS \$(MODLINKFLAGS)"
+fi
+AC_SUBST(APACHELINKFLAGS)
+echo "******************************"
+
+
 FW_SET_VERSION([SQLR_VERSION],[2.0.0])
 FW_SET_VERSION([SRV_SONAME_VERSION_INFO],[12:0:0])
 FW_SET_VERSION([CLT_SONAME_VERSION_INFO],[7:0:0])

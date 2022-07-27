@@ -90,8 +90,7 @@ LIBEXT = la
 SRVLINKFLAGS = -rpath $(libdir) -version-info $(SRV_SONAME_VERSION_INFO) -no-undefined
 CLTLINKFLAGS = -rpath $(libdir) -version-info $(CLT_SONAME_VERSION_INFO) -no-undefined
 MODLINKFLAGS = -rpath $(libexecdir) -avoid-version -module -no-undefined
-APACHELINKFLAGS = $(MODLINKFLAGS)
-#APACHELINKFLAGS = @APACHELINKFLAGS@
+APACHELINKFLAGS = @APACHELINKFLAGS@
 
 
 # install commands
