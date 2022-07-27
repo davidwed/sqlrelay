@@ -29,12 +29,6 @@ clean:
 	$(RMTREE) .libs
 
 install: installcgi installmod
-	if ( test -x "/etc/rc.d/init.d/httpd" ); \
-	then \
-		/etc/rc.d/init.d/httpd restart; \
-	else \
-		systemctl restart httpd; \
-	fi
 
 installcgi:
 	if ( test -d "/var/www/html" ); \

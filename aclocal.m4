@@ -10093,16 +10093,16 @@ then
 		then
 			if ( test -n "$BUNDLE_LOADER" )
 			then
-				APACHE=""
-				for apache in apache2 apache httpd
+				APACHEHTTPD=""
+				for prog in httpd apache2 apache
 				do
-					APACHE=`which $apache | grep -v "$no "`
-					if ( test -n "$APACHE" )
-					then	
+					AC_PATH_PROG(APACHEHTTPD,$prog,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin)
+					if ( test -n "$APACHEHTTPD" )
+					then
 						break
 					fi
 				done
-				APACHELINKFLAGS="-Wl,$BUNDLE_LOADER -Wl,$APACHE"
+				APACHELINKFLAGS="-Wl,$BUNDLE_LOADER -Wl,$APACHEHTTPD"
 			else
 				APACHELINKFLAGS="$UNDEFINED_DYNAMIC_LOOKUP"
 			fi
