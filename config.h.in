@@ -360,6 +360,9 @@
 /* Load SAP/Sybase libraries at runtime. */
 #undef SYBASE_AT_RUNTIME
 
+/* Darwin */
+#undef _DARWIN
+
 /* Haiku OS */
 #undef _HAIKU
 

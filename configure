@@ -16931,6 +16931,9 @@ case $host_os in
 	*darwin* )
 		DARWIN="yes"
 
+$as_echo "#define _DARWIN 1" >>confdefs.h
+
+
 				PV1="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t' | cut -d'.' -f1`"
 		PV2="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t' | cut -d'.' -f2`"
 		PRODUCTVERSION="$PV1.$PV2"
@@ -17204,11 +17207,11 @@ export LD_LIBRARY_PATH
 		if ( test -n "$WERROR" )
 	then
 
-						CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+						CXX_VERSION=`$CXX --version 2> /dev/null | head -1`
 
-						if ( test "$CXX_VERSION" != "g+" )
+						if ( test -n "$CXX_VERSION" -a -z "`echo $CXX_VERSION | grep g++`" )
 		then
-						if (  test "$CXX_VERSION" -lt "27" )
+						if (  test "`echo $CXX_VERSION | tr -d'.' | cut -c1-2`" -lt "27" )
 			then
 				WERROR=""
 			fi
