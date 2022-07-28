@@ -54,7 +54,7 @@ installmod:
 			$(RM) $$path/mod_mvccrud.a; \
 			$(RM) $$path/mod_mvccrud.la; \
 		fi; \
-	fi
+	done
 
 uninstall:
 	for path in $(DOCROOTS); \
