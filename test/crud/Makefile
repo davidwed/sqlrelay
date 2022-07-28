@@ -30,22 +30,38 @@ clean:
 
 install: installcgi installmod
 
+DOCROOTS=/var/www/html \
+		/home/httpd/html
+
+MODULEDIRS=/etc/httpd/modules \
+		/usr/libexec/httpd/modules
+
 installcgi:
-	if ( test -d "/var/www/html" ); \
-	then \
-		$(LTINSTALL) $(CP) mvccrud.cgi /var/www/html; \
-	fi
-	if ( test -d "/home/httpd/html" ); \
-	then \
-		$(LTINSTALL) $(CP) mvccrud.cgi /home/httpd/html; \
-	fi
+	for path in $(DOCROOTS); \
+	do \
+		if ( test -d "$$path" ); \
+		then \
+			$(LTINSTALL) $(CP) mvccrud.cgi $$path; \
+		fi; \
+	done
 
 installmod:
-	$(LTINSTALL) $(CP) mod_mvccrud.$(LIBEXT) /etc/httpd/modules
-	$(RM) /etc/httpd/modules/mod_mvccrud.a
-	$(RM) /etc/httpd/modules/mod_mvccrud.la
+	for path in $(MODULEDIRS); \
+	do \
+		if ( test -d "$$path" ); \
+		then \
+			$(LTINSTALL) $(CP) mod_mvccrud.$(LIBEXT) $$path; \
+			$(RM) $$path/mod_mvccrud.a; \
+			$(RM) $$path/mod_mvccrud.la; \
+		fi; \
+	fi
 
 uninstall:
-	$(RM) /var/www/html/mvccrud.cgi
-	$(RM) /home/httpd/html/mvccrud.cgi
-	$(RM) /etc/httpd/modules/mod_mvccrud.*
+	for path in $(DOCROOTS); \
+	do \
+		$(RM) $$path/mvccrud.cgi; \
+	done
+	for path in $(MODULEDIRS); \
+	do \
+		$(RM) $$path/mod_mvccrud.*; \
+	done
