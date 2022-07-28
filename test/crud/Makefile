@@ -34,7 +34,7 @@ DOCROOTS=/var/www/html \
 		/home/httpd/html
 
 MODULEDIRS=/etc/httpd/modules \
-		/usr/libexec/httpd/modules
+		/usr/libexec/httpd
 
 installcgi:
 	for path in $(DOCROOTS); \
