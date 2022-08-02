@@ -52,6 +52,8 @@
 	added affected rows to sqlrsh stats
 	NULL -> 0 in PostgreSQL function tests
 	added sqlrcrud class
+	applied patch from Kyle to use HH24 instead of HH in default
+		fakeinputbindvariablesdateformat string
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
@@ -101,8 +103,6 @@
 	added GVL management to the Ruby API
 	applied patch from Igor to fix configure.vbs VC++ version detection
 		for non-US versions
-	applied patch from Kyle to use HH24 instead of HH in default
-		fakeinputbindvariablesdateformat string
 
 1.8.0 - unattended tests
 	added sqlrresultsetdomnode class to c++ client API
