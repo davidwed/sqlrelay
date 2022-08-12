@@ -6,7 +6,6 @@
 #include <rudiments/listcollection.h>
 #include <rudiments/dictionarycollection.h>
 #include <rudiments/tablecollection.h>
-#include <rudiments/cursordomnode.h>
 
 class sqlrscalarprivate;
 class sqlrlistnodeprivate;
@@ -14,4 +13,3 @@ class sqlrrowlistprivate;
 class sqlrresultsetlistprivate;
 class sqlrrowdictionaryprivate;
 class sqlrresultsettableprivate;
-class sqlrresultsetdomnodeprivate;

@@ -8,7 +8,6 @@ SRCS = sqlrconnection.cpp \
 	sqlrlist.cpp \
 	sqlrrowdictionary.cpp \
 	sqlrresultsettable.cpp \
-	sqlrresultsetdomnode.cpp \
 	sqlrimport.cpp \
 	sqlrimportxml.cpp \
 	sqlrimportcsv.cpp \
@@ -22,7 +21,6 @@ LOBJS = sqlrconnection.$(OBJ) \
 	sqlrlist.$(OBJ) \
 	sqlrrowdictionary.$(OBJ) \
 	sqlrresultsettable.$(OBJ) \
-	sqlrresultsetdomnode.$(OBJ) \
 	sqlrimport.$(OBJ) \
 	sqlrimportxml.$(OBJ) \
 	sqlrimportcsv.$(OBJ) \
@@ -91,8 +89,6 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrrowdictionary.h
 	$(CP) sqlrelay/private/sqlrresultsettable.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsettable.h
-	$(CP) sqlrelay/private/sqlrresultsetdomnode.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrresultsetdomnode.h
 	$(CP) sqlrelay/private/sqlrcollectionsincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrcollectionsincludes.h
 	$(CP) sqlrelay/private/sqlrcrudincludes.h $(includedir)/sqlrelay/private
