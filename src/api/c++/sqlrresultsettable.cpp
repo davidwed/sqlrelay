@@ -7,11 +7,13 @@ class sqlrresultsettableprivate {
 	private:
 		friend class sqlrresultsettable;
 		sqlrcursor	*_cursor;
+		const char	*_null;
 };
 
 sqlrresultsettable::sqlrresultsettable() : tablecollection<const char *>() {
 	pvt=new sqlrresultsettableprivate;
 	pvt->_cursor=NULL;
+	pvt->_null=NULL;
 }
 
 sqlrresultsettable::sqlrresultsettable(sqlrcursor *cursor) :
@@ -57,13 +59,15 @@ void sqlrresultsettable::setValue(uint64_t row,
 					const char *value) {
 }
 
-const char *sqlrresultsettable::getValue(uint64_t row,
-						uint64_t col) {
+const char *sqlrresultsettable::getValue(uint64_t row, uint64_t col) {
 	return (pvt->_cursor)?pvt->_cursor->getField(row,col):"";
 }
 
-const char *sqlrresultsettable::getValue(uint64_t row,
-						const char *colname) {
+const char * &sqlrresultsettable::getReference(uint64_t row, uint64_t col) {
+	return pvt->_null;
+}
+
+const char *sqlrresultsettable::getValue(uint64_t row, const char *colname) {
 	return (pvt->_cursor)?pvt->_cursor->getField(row,colname):"";
 }
 

@@ -10,6 +10,8 @@ class sqlrscalarprivate {
 		sqlrcursor	*_cursor;
 		uint64_t	_row;
 		uint32_t	_col;
+
+		const char	*_null;
 };
 
 sqlrscalar::sqlrscalar() : scalarcollection<const char *>() {
@@ -17,10 +19,10 @@ sqlrscalar::sqlrscalar() : scalarcollection<const char *>() {
 	pvt->_cursor=NULL;
 	pvt->_row=0;
 	pvt->_col=0;
+	pvt->_null=NULL;
 }
 
-sqlrscalar::sqlrscalar(sqlrcursor *cursor) :
-					scalarcollection<const char *>() {
+sqlrscalar::sqlrscalar(sqlrcursor *cursor) : scalarcollection<const char *>() {
 	pvt=new sqlrscalarprivate;
 	pvt->_cursor=cursor;
 	pvt->_row=0;
@@ -62,6 +64,10 @@ void sqlrscalar::setValue(const char *value) {
 
 const char *sqlrscalar::getValue() {
 	return pvt->_cursor->getField(pvt->_row,pvt->_col);
+}
+
+const char * &sqlrscalar::getReference() {
+	return pvt->_null;
 }
 
 void sqlrscalar::clear() {

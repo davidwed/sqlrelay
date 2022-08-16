@@ -42,6 +42,9 @@ class SQLRCLIENT_DLLSPEC sqlrscalar : public scalarcollection<const char *> {
 		 *  0 if no value has been stored. */
 		const char	*getValue();
 
+		/** Returns a reference to the value stored in this intance. */
+		const char *	&getReference();
+
 		#include <sqlrelay/private/sqlrscalar.h>
 };
 
@@ -291,8 +294,10 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 
 		/** Returns the value at "row", "col".  Returns NULL or 0 if
 		 *  there is no value at that address. */
-		const char	*getValue(uint64_t row,
-						uint64_t col);
+		const char	*getValue(uint64_t row, uint64_t col);
+
+		/** Returns the value at "row", "col". */
+		const char *	&getReference(uint64_t row, uint64_t col);
 
 		/** Returns the value at "row", "colname".  Returns NULL or 0
 		 *  if there is no value at that address. */
