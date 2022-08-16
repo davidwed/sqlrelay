@@ -11,7 +11,6 @@
 		void	setRow(uint64_t row);
 		void	setColumn(uint32_t col);
 		void	setValue(const char *value);
-		const char * &getValue();
 		void	setNext(listnode<const char *> *next);
 		void	setPrevious(listnode<const char *> *next);
 

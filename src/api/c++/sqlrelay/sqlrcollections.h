@@ -47,8 +47,12 @@ class SQLRCLIENT_DLLSPEC sqlrscalar : public scalarcollection<const char *> {
 
 class SQLRCLIENT_DLLSPEC sqlrlistnode : public listnode<const char *> {
 	public:
-		/** Return the value (field) stored in the node. */
+		/** Returns the value (field) stored in the node. */
 		const char	*getValue();
+
+		/** Returns a reference to the value (field) stored in the
+		 *  node. */
+		const char *	&getReference();
 
 		/** Returns the previous node in the sqlrlist or NULL
 		 *  if this node is the first node in the list. */

@@ -64,7 +64,7 @@ const char *sqlrlistnode::getValue() {
 	return pvt->_cursor->getField(pvt->_row,pvt->_col);
 }
 
-const char * &sqlrlistnode::getValue() {
+const char * &sqlrlistnode::getReference() {
 	return pvt->_null;
 }
 
