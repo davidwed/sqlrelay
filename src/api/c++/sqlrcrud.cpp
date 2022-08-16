@@ -935,54 +935,54 @@ uint64_t sqlrcrud::getAffectedRows() {
 	return cur->affectedRows();
 }
 
-const scalarcollection<uint64_t> *sqlrcrud::getAffectedRowsScalar() {
+scalarcollection<uint64_t> *sqlrcrud::getAffectedRowsScalar() {
 	ars.clear();
 	ars.setValue(getAffectedRows());
 	return &ars;
 }
 
-const listcollection<uint64_t> *sqlrcrud::getAffectedRowsList() {
+listcollection<uint64_t> *sqlrcrud::getAffectedRowsList() {
 	arl.clear();
 	arl.append(getAffectedRows());
 	return &arl;
 }
 
-const dictionarycollection<const char *, uint64_t>
+dictionarycollection<const char *, uint64_t>
 				*sqlrcrud::getAffectedRowsDictionary() {
 	ard.clear();
 	ard.setValue("r",getAffectedRows());
 	return &ard;
 }
 
-const tablecollection<uint64_t> *sqlrcrud::getAffectedRowsTable() {
+tablecollection<uint64_t> *sqlrcrud::getAffectedRowsTable() {
 	art.clear();
 	art.setColumnName(0,"r");
 	art.setValue(0,0,getAffectedRows());
 	return &art;
 }
 
-const scalarcollection<const char *> *sqlrcrud::getFirstFieldScalar() {
+scalarcollection<const char *> *sqlrcrud::getFirstFieldScalar() {
 	ffs.setCursor(cur);
 	return &ffs;
 }
 
-const listcollection<const char *> *sqlrcrud::getFirstRowList() {
+listcollection<const char *> *sqlrcrud::getFirstRowList() {
 	frl.setCursor(cur);
 	return &frl;
 }
 
-const dictionarycollection<const char *,const char *>
+dictionarycollection<const char *,const char *>
 					*sqlrcrud::getFirstRowDictionary() {
 	frd.setCursor(cur);
 	return &frd;
 }
 
-const listcollection<const char *> *sqlrcrud::getFirstColumnList() {
+listcollection<const char *> *sqlrcrud::getFirstColumnList() {
 	fcl.setCursor(cur);
 	return &fcl;
 }
 
-const tablecollection<const char *> *sqlrcrud::getResultSetTable() {
+tablecollection<const char *> *sqlrcrud::getResultSetTable() {
 	rst.setCursor(cur);
 	return &rst;
 }

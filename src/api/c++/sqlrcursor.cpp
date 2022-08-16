@@ -63,8 +63,8 @@ class sqlrclientrow {
 		void	addField(uint32_t column, 
 				const char *buffer, uint32_t length);
 
-		char		*getField(uint32_t column) const;
-		uint32_t	getFieldLength(uint32_t column) const;
+		char		*getField(uint32_t column);
+		uint32_t	getFieldLength(uint32_t column);
 
 		sqlrclientrow	*next;
 
@@ -115,7 +115,7 @@ void sqlrclientrow::addField(uint32_t column,
 	}
 }
 
-char *sqlrclientrow::getField(uint32_t column) const {
+char *sqlrclientrow::getField(uint32_t column) {
 	if (column<OPTIMISTIC_COLUMN_COUNT) {
 		return fields[column];
 	} else {
@@ -123,7 +123,7 @@ char *sqlrclientrow::getField(uint32_t column) const {
 	}
 }
 
-uint32_t sqlrclientrow::getFieldLength(uint32_t column) const {
+uint32_t sqlrclientrow::getFieldLength(uint32_t column) {
 	if (column<OPTIMISTIC_COLUMN_COUNT) {
 		return fieldlengths[column];
 	} else {
@@ -1367,7 +1367,7 @@ void sqlrcursor::attachToBindCursor(uint16_t bindcursorid) {
 	pvt->_cursorid=bindcursorid;
 }
 
-uint16_t sqlrcursor::countBindVariables() const {
+uint16_t sqlrcursor::countBindVariables() {
 	return ::countBindVariables(pvt->_queryptr,pvt->_querylen,
 		pvt->_sqlrc->getBindVariableDelimiterQuestionMarkSupported(),
 		pvt->_sqlrc->getBindVariableDelimiterColonSupported(),

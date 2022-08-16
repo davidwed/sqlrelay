@@ -1,7 +1,7 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information.
 
-		bool	getTrackInsertionOrder() const;
+		bool	getTrackInsertionOrder();
 		void	setValue(const char *key, const char *value);
 		void	setValues(const char **key, const char **value);
 		void	setValues(const char **key, const char **value,

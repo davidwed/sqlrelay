@@ -436,49 +436,44 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  number of affected rows if doCreate(), doUpdate(), or
 		 *  doDelete() was most recently called or an empty scalar if
 		 *  doRead() was most recently called. */
-		const scalarcollection<uint64_t>
-					*getAffectedRowsScalar();
+		scalarcollection<uint64_t>	*getAffectedRowsScalar();
 
 		/** Returns an instance of listcollection with a single element,
 		 *  containing the affected rows doCreate(), doUpdate(), or
 		 *  doDelete() was most recently called or an empty list if
 		 *  doRead() was most recently called. */
-		const listcollection<uint64_t>
-					*getAffectedRowsList();
+		listcollection<uint64_t>	*getAffectedRowsList();
 
 		/** Returns an instance of dictionarycollection with a single
 		 *  element, containing the affected rows doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called or an
 		 *  empty dictionary if doRead() was most recently called. */
-		const dictionarycollection<const char *, uint64_t>
+		dictionarycollection<const char *, uint64_t>
 					*getAffectedRowsDictionary();
 
 		/** Returns an instance of tablecollection with a single
 		 *  field, containing the affected rows doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called or an
 		 *  empty table if doRead() was most recently called. */
-		const tablecollection<uint64_t>
-					*getAffectedRowsTable();
+		tablecollection<uint64_t>	*getAffectedRowsTable();
 
 		/** Returns an instance of sqlrscalar, representing the first
 		 *  field of the first row of the result set if doRead() was
 		 *  most recently called, or an empty sqlrscalar if doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called. */
-		const scalarcollection<const char *>
-					*getFirstFieldScalar();
+		scalarcollection<const char *>	*getFirstFieldScalar();
 
 		/** Returns an instance of sqlrrowlist, representing the
 		 *  first row of the result set if doRead() was most recently
 		 *  called, or an empty sqlrrowlist if doCreate(), doUpdate(),
 		 *  or doDelete() was most recently called. */
-		const listcollection<const char *>
-					*getFirstRowList();
+		listcollection<const char *>	*getFirstRowList();
 
 		/** Returns an instance of sqlrrowdictionary, representing the
 		 *  first row of the result set if doRead() was most recently
 		 *  called, or an empty sqlrrowdictionary if doCreate(),
 		 *  doUpdate(), or doDelete() was most recently called. */
-		const dictionarycollection<const char *, const char *>
+		dictionarycollection<const char *, const char *>
 						*getFirstRowDictionary();
 
 		/** Returns an instance of sqlrrowdictionary, representing the
@@ -486,15 +481,13 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  most recently called, or an empty sqlrresultsetlist if
 		 *  doCreate(), doUpdate(), or doDelete() was most recently
 		 *  called. */
-		const listcollection<const char *>
-					*getFirstColumnList();
+		listcollection<const char *>	*getFirstColumnList();
 
 		/** Returns an instance of sqlresultsettable, representing the
 		 *  result set if doRead() was most recently called, or an
 		 *  empty sqlrresultsettable if doCreate(), doUpdate(), or
 		 *  doDelete() was most recently called. */
-		const tablecollection<const char *>
-					*getResultSetTable();
+		tablecollection<const char *>	*getResultSetTable();
 
 	#include <sqlrelay/private/sqlrcrud.h>
 };

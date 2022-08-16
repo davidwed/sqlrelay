@@ -38,7 +38,7 @@ sqlrscalar::sqlrscalar(sqlrcursor *cursor, uint64_t row, uint64_t col) :
 sqlrscalar::~sqlrscalar() {
 }
 
-bool sqlrscalar::getIsReadOnly() const {
+bool sqlrscalar::getIsReadOnly() {
 	return true;
 }
 
@@ -60,7 +60,7 @@ void sqlrscalar::setValue(const char *value) {
 	// do nothing
 }
 
-const char *sqlrscalar::getValue() const {
+const char *sqlrscalar::getValue() {
 	return pvt->_cursor->getField(pvt->_row,pvt->_col);
 }
 

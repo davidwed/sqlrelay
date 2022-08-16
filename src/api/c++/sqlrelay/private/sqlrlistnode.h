@@ -6,7 +6,7 @@
 		sqlrlistnode(sqlrcursor *cursor, uint64_t row, uint64_t col);
 		~sqlrlistnode();
 		void	setCursor(sqlrcursor *cursor);
-		sqlrcursor	*getCursor() const;
+		sqlrcursor	*getCursor();
 		void	setRepresentsARow(bool representsarow);
 		void	setRow(uint64_t row);
 		void	setColumn(uint32_t col);

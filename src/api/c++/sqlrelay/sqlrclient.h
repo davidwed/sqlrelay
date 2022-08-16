@@ -360,7 +360,7 @@ class SQLRCLIENT_DLLSPEC sqlrconnection : public object {
 		void		setClientInfo(const char *clientinfo);
 
 		/** Returns the string that was set by setClientInfo(). */
-		const char	*getClientInfo() const;
+		const char	*getClientInfo();
 
 	#include <sqlrelay/private/sqlrconnection.h>
 };
@@ -623,7 +623,7 @@ class SQLRCLIENT_DLLSPEC sqlrcursor : public object {
 		/** Parses the previously prepared query,
 		 *  counts the number of bind variables defined
 		 *  in it and returns that number. */
-		uint16_t	countBindVariables() const;
+		uint16_t	countBindVariables();
 
 		/** If you are binding to any variables that 
 		 *  might not actually be in your query, call 

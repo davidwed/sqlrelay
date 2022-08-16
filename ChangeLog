@@ -55,6 +55,7 @@
 	applied patch from Kyle to use HH24 instead of HH in default
 		fakeinputbindvariablesdateformat string
 	removed sqlrresultsetdomnode class
+	de-consted some things
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

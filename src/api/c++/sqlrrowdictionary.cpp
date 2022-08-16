@@ -52,11 +52,11 @@ void sqlrrowdictionary::setRow(uint64_t row) {
 	pvt->_row=row;
 }
 
-bool sqlrrowdictionary::getIsReadOnly() const {
+bool sqlrrowdictionary::getIsReadOnly() {
 	return true;
 }
 
-bool sqlrrowdictionary::getTrackInsertionOrder() const {
+bool sqlrrowdictionary::getTrackInsertionOrder() {
 	return true;
 }
 
@@ -84,7 +84,7 @@ void sqlrrowdictionary::setValues(const char * const *key,
 	// do nothing
 }
 
-bool sqlrrowdictionary::getValue(const char *key, const char **value) const {
+bool sqlrrowdictionary::getValue(const char *key, const char **value) {
 	// FIXME: arguably this should check that the key is a legitimate
 	// column name, which could be a bit of a rabbit-hole to do 
 	// efficiently
@@ -92,20 +92,20 @@ bool sqlrrowdictionary::getValue(const char *key, const char **value) const {
 	return true;
 }
 
-const char *sqlrrowdictionary::getValue(const char *key) const {
+const char *sqlrrowdictionary::getValue(const char *key) {
 	return pvt->_cursor->getField(pvt->_row,key);
 }
 
-bool sqlrrowdictionary::getKey(const char *key, const char **k) const {
+bool sqlrrowdictionary::getKey(const char *key, const char **k) {
 	*k=key;
 	return true;
 }
 
-const char *sqlrrowdictionary::getKey(const char *key) const {
+const char *sqlrrowdictionary::getKey(const char *key) {
 	return key;
 }
 
-linkedlist<const char *> *sqlrrowdictionary::getKeys() const {
+linkedlist<const char *> *sqlrrowdictionary::getKeys() {
 	if (!pvt->_keys) {
 		pvt->_keys=new linkedlist<const char *>();
 	}
@@ -115,7 +115,7 @@ linkedlist<const char *> *sqlrrowdictionary::getKeys() const {
 	return pvt->_keys;
 }
 
-uint64_t sqlrrowdictionary::getLength() const {
+uint64_t sqlrrowdictionary::getLength() {
 	return pvt->_cursor->colCount();
 }
 

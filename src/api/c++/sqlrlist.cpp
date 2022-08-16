@@ -34,7 +34,7 @@ void sqlrlistnode::setCursor(sqlrcursor *cursor) {
 	pvt->_col=0;
 }
 
-sqlrcursor *sqlrlistnode::getCursor() const {
+sqlrcursor *sqlrlistnode::getCursor() {
 	return pvt->_cursor;
 }
 
@@ -76,7 +76,7 @@ void sqlrlistnode::setPrevious(listnode<const char *> *next) {
 	// do nothing
 }
 
-listnode<const char *> *sqlrlistnode::getPrevious() const {
+listnode<const char *> *sqlrlistnode::getPrevious() {
 	if (!pvt->_col) {
 		return NULL;
 	} else {
@@ -89,7 +89,7 @@ listnode<const char *> *sqlrlistnode::getPrevious() const {
 	} 
 }
 
-listnode<const char *> *sqlrlistnode::getNext() const {
+listnode<const char *> *sqlrlistnode::getNext() {
 	if (pvt->_col==pvt->_cursor->colCount()-1) {
 		return NULL;
 	} else {
@@ -141,15 +141,15 @@ void sqlrrowlist::setRow(uint64_t row) {
 	pvt->_node.setRow(row);
 }
 
-bool sqlrrowlist::getIsReadOnly() const {
+bool sqlrrowlist::getIsReadOnly() {
 	return true;
 }
 
-bool sqlrrowlist::getIsBlockBased() const {
+bool sqlrrowlist::getIsBlockBased() {
 	return true;
 }
 
-uint64_t sqlrrowlist::getBlockSize() const {
+uint64_t sqlrrowlist::getBlockSize() {
 	return 1;
 }
 
@@ -218,21 +218,21 @@ bool sqlrrowlist::remove(listnode<const char *> *node) {
 	return true;
 }
 
-uint64_t sqlrrowlist::getLength() const {
+uint64_t sqlrrowlist::getLength() {
 	return pvt->_node.getCursor()->colCount();
 }
 
-listnode<const char *> *sqlrrowlist::getFirst() const {
+listnode<const char *> *sqlrrowlist::getFirst() {
 	pvt->_node.setColumn(0);
 	return &pvt->_node;
 }
 
 listnode<const char *> *sqlrrowlist::getNext(
-					listnode<const char *> *node) const {
+					listnode<const char *> *node) {
 	return pvt->_node.getNext();
 }
 
-listnode<const char *> *sqlrrowlist::find(const char *value) const {
+listnode<const char *> *sqlrrowlist::find(const char *value) {
 	pvt->_node.setColumn(0);
 	for (listnode<const char *> *n=&pvt->_node; n; n=n->getNext()) {
 		if (getComparator()->compare(value,n->getValue())) {
@@ -244,7 +244,7 @@ listnode<const char *> *sqlrrowlist::find(const char *value) const {
 
 listnode<const char *> *sqlrrowlist::find(
 					listnode<const char *> *startnode,
-					const char *value) const {
+					const char *value) {
 	// since this implementation is block-based, we can't really start at
 	// a specific node, so we'll just start at the current node and search
 	// from there
@@ -310,15 +310,15 @@ void sqlrresultsetlist::setColumn(uint32_t col) {
 	pvt->_node.setColumn(col);
 }
 
-bool sqlrresultsetlist::getIsReadOnly() const {
+bool sqlrresultsetlist::getIsReadOnly() {
 	return true;
 }
 
-bool sqlrresultsetlist::getIsBlockBased() const {
+bool sqlrresultsetlist::getIsBlockBased() {
 	return true;
 }
 
-uint64_t sqlrresultsetlist::getBlockSize() const {
+uint64_t sqlrresultsetlist::getBlockSize() {
 	return 1;
 }
 
@@ -387,21 +387,21 @@ bool sqlrresultsetlist::remove(listnode<const char *> *node) {
 	return true;
 }
 
-uint64_t sqlrresultsetlist::getLength() const {
+uint64_t sqlrresultsetlist::getLength() {
 	return pvt->_node.getCursor()->colCount();
 }
 
-listnode<const char *> *sqlrresultsetlist::getFirst() const {
+listnode<const char *> *sqlrresultsetlist::getFirst() {
 	pvt->_node.setRow(0);
 	return &pvt->_node;
 }
 
 listnode<const char *> *sqlrresultsetlist::getNext(
-					listnode<const char *> *node) const {
+					listnode<const char *> *node) {
 	return pvt->_node.getNext();
 }
 
-listnode<const char *> *sqlrresultsetlist::find(const char *value) const {
+listnode<const char *> *sqlrresultsetlist::find(const char *value) {
 	pvt->_node.setRow(0);
 	for (listnode<const char *> *n=&pvt->_node; n; n=n->getNext()) {
 		if (getComparator()->compare(value,n->getValue())) {
@@ -413,7 +413,7 @@ listnode<const char *> *sqlrresultsetlist::find(const char *value) const {
 
 listnode<const char *> *sqlrresultsetlist::find(
 					listnode<const char *> *startnode,
-					const char *value) const {
+					const char *value) {
 	// since this implementation is block-based, we can't really start at
 	// a specific node, so we'll just start at the current node and search
 	// from there

@@ -2053,7 +2053,7 @@ void sqlrconnection::setClientInfo(const char *clientinfo) {
 	pvt->_clientinfolen=charstring::length(clientinfo);
 }
 
-const char *sqlrconnection::getClientInfo() const {
+const char *sqlrconnection::getClientInfo() {
 	return pvt->_clientinfo;
 }
 
