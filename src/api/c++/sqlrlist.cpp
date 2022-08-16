@@ -60,7 +60,7 @@ void sqlrlistnode::setValue(const char *value) {
 	// do nothing
 }
 
-const char *sqlrlistnode::getValue() const {
+const char *sqlrlistnode::getValue() {
 	return pvt->_cursor->getField(pvt->_row,pvt->_col);
 }
 
