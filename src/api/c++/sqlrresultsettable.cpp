@@ -1,23 +1,25 @@
 // Copyright (c) 1999-2018 David Muse
 // See the COPYING file for more information.
 
-#include <sqlrelay/sqlrresultsettable.h>
+#include <sqlrelay/sqlrcollections.h>
 
 class sqlrresultsettableprivate {
 	private:
 		friend class sqlrresultsettable;
-		sqlrcursor	*cursor;
+		sqlrcursor	*_cursor;
+		const char	*_null;
 };
 
 sqlrresultsettable::sqlrresultsettable() : tablecollection<const char *>() {
 	pvt=new sqlrresultsettableprivate;
-	pvt->cursor=NULL;
+	pvt->_cursor=NULL;
+	pvt->_null=NULL;
 }
 
 sqlrresultsettable::sqlrresultsettable(sqlrcursor *cursor) :
 					tablecollection<const char *>() {
 	pvt=new sqlrresultsettableprivate;
-	pvt->cursor=cursor;
+	pvt->_cursor=cursor;
 }
 
 sqlrresultsettable::~sqlrresultsettable() {
@@ -25,7 +27,7 @@ sqlrresultsettable::~sqlrresultsettable() {
 }
 
 void sqlrresultsettable::setCursor(sqlrcursor *cursor) {
-	pvt->cursor=cursor;
+	pvt->_cursor=cursor;
 }
 
 bool sqlrresultsettable::getIsReadOnly() {
@@ -45,11 +47,11 @@ void sqlrresultsettable::setColumnName(uint64_t col, const char *name) {
 }
 
 const char *sqlrresultsettable::getColumnName(uint64_t col) {
-	return (pvt->cursor)?pvt->cursor->getColumnName(col):"";
+	return (pvt->_cursor)?pvt->_cursor->getColumnName(col):"";
 }
 
-uint64_t sqlrresultsettable::getColCount() {
-	return (pvt->cursor)?pvt->cursor->colCount():0;
+uint64_t sqlrresultsettable::getColumnCount() {
+	return (pvt->_cursor)?pvt->_cursor->colCount():0;
 }
 
 void sqlrresultsettable::setValue(uint64_t row,
@@ -58,23 +60,27 @@ void sqlrresultsettable::setValue(uint64_t row,
 }
 
 const char *sqlrresultsettable::getValue(uint64_t row, uint64_t col) {
-	return (pvt->cursor)?pvt->cursor->getField(row,col):"";
+	return (pvt->_cursor)?pvt->_cursor->getField(row,col):"";
+}
+
+const char * &sqlrresultsettable::getReference(uint64_t row, uint64_t col) {
+	return pvt->_null;
 }
 
 const char *sqlrresultsettable::getValue(uint64_t row, const char *colname) {
-	return (pvt->cursor)?pvt->cursor->getField(row,colname):"";
+	return (pvt->_cursor)?pvt->_cursor->getField(row,colname):"";
 }
 
 uint64_t sqlrresultsettable::getRowCount() {
-	return (pvt->cursor)?pvt->cursor->rowCount():0;
+	return (pvt->_cursor)?pvt->_cursor->rowCount():0;
 }
 
 uint64_t sqlrresultsettable::getBlockSize() {
-	return (pvt->cursor)?pvt->cursor->getResultSetBufferSize():0;
+	return (pvt->_cursor)?pvt->_cursor->getResultSetBufferSize():0;
 }
 
 bool sqlrresultsettable::getAllRowsAvailable() {
-	return (pvt->cursor)?pvt->cursor->endOfResultSet():true;
+	return (pvt->_cursor)?pvt->_cursor->endOfResultSet():true;
 }
 
 void sqlrresultsettable::clear() {

@@ -96,7 +96,6 @@ class sqlrlistenerprivate {
 		int32_t		_idleclienttimeout;
 
 		bool	_isforkedchild;
-		bool	_isforkedthread;
 
 		bool	_usethreads;
 };
@@ -152,7 +151,6 @@ sqlrlistener::sqlrlistener() {
 	pvt->_idleclienttimeout=-1;
 
 	pvt->_isforkedchild=false;
-	pvt->_isforkedthread=false;
 	pvt->_handoffmode=HANDOFF_PASS;
 
 	pvt->_usethreads=false;
@@ -515,7 +513,7 @@ void sqlrlistener::setSessionHandlerMethod() {
 	pvt->_usethreads=false;
 	if (!charstring::compare(pvt->_cfg->getSessionHandler(),"thread")) {
 
-		if (!thread::supported()) {
+		if (!thread::supported() || !thread::reliable()) {
 			stderror.printf("Warning: sessionhandler=\"thread\" "
 					"not supported, falling back to "
 					"sessionhandler=\"process\".  "
@@ -544,17 +542,8 @@ void sqlrlistener::setHandoffMethod() {
 
 	if (!charstring::compare(pvt->_cfg->getHandoff(),"pass")) {
 
-        	// on some OS'es, force proxy, even if pass was specified...
-
-        	// get the os and version
-        	char    *os=sys::getOperatingSystemName();
-        	char    *rel=sys::getOperatingSystemRelease();
-        	double  ver=charstring::toFloatC(rel);
-	
-        	// force proxy Cygwin, Linux < 2.2, and Darwin
-        	if (!charstring::compare(os,"CYGWIN",6) ||
-                	(!charstring::compare(os,"Linux",5) && ver<2.2) ||
-                	!charstring::compare(os,"Darwin",6)) {
+        	// force proxy on platforms that don't support passing sockets
+        	if (!filedescriptor::supportsPassReceiveSocket()) {
 			pvt->_handoffmode=HANDOFF_PROXY;
 			stderror.printf("Warning: handoff=\"pass\" not "
 					"supported, falling back to "
@@ -563,18 +552,10 @@ void sqlrlistener::setHandoffMethod() {
 			pvt->_handoffmode=HANDOFF_PASS;
 		}
 
-        	// clean up
-        	delete[] os;
-        	delete[] rel;
-
 	} else {
 
         	// on some OS'es, force pass, even if proxy was specified...
-
-        	// get the os and version
         	char    *os=sys::getOperatingSystemName();
-	
-        	// force pass for Windows
         	if (!charstring::compare(os,"Windows",7)) {
 			pvt->_handoffmode=HANDOFF_PASS;
 			stderror.printf("Warning: handoff=\"proxy\" not "
@@ -583,8 +564,6 @@ void sqlrlistener::setHandoffMethod() {
 		} else {
 			pvt->_handoffmode=HANDOFF_PROXY;
 		}
-
-        	// clean up
         	delete[] os;
 	}
 
@@ -728,7 +707,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// issue warning about listener timeout if necessary
 	if (pvt->_cfg->getListenerTimeout()>0 &&
 		!charstring::compare(pvt->_cfg->getSessionHandler(),"thread") &&
-		thread::supported() &&
+		thread::supported() && thread::reliable() &&
 		!pvt->_semset->supportsTimedSemaphoreOperations()) {
 		stderror.printf("Warning: listenertimeout disabled...\n"
 				"         sessionhandler=\"thread\" requested "
@@ -768,42 +747,44 @@ void sqlrlistener::keyError(const char *idfilename) {
 void sqlrlistener::shmError(const char *id, int shmid) {
 	char	*err=error::getErrorString();
 	stderror.printf("\n%s-listener error:\n"
-			"	Unable to create a shared memory "
-			"segment.  This is usally because an \n"
-			"	%s-listener is already running for "
-			"the %s instance.\n\n"
-			"	If it is not running, something may "
-			"have crashed and left an old segment\n"
-			"	lying around.  Use the ipcs command "
-			"to inspect existing shared memory \n"
-			"	segments and the ipcrm command to "
-			"remove the shared memory segment with "
-			"\n	id %d.\n\n"
-			"	Error was: %s\n\n",
-			SQLR,SQLR,id,shmid,err);
+			"	Unable to create a shared memory segment.\n\n",
+			SQLR);
+	if (shmid!=-1) {
+		stderror.printf("This is usally because an \n"
+				"	%s-listener is already running for "
+				"the %s instance.\n\n"
+				"	If it is not running, something may "
+				"have crashed and left an old segment\n"
+				"	lying around.  Use the ipcs command "
+				"to inspect existing shared memory \n"
+				"	segments and the ipcrm command to "
+				"remove the shared memory segment with \n"
+				"	id %d.\n\n",
+				SQLR,id,shmid);
+	}
+	stderror.printf("	Error was: %s\n\n",err);
 	delete[] err;
 }
 
 void sqlrlistener::semError(const char *id, int semid) {
 	char	*err=error::getErrorString();
 	stderror.printf("\n%s-listener error:\n"
-			"	Unable to create a semaphore "
-			"set.  This is usally because an \n"
-			"	%s-listener is already "
-			"running for the %s"
-			" instance.\n\n"
-			"	If it is not running, "
-			"something may have crashed and left "
-			"an old semaphore set\n"
-			"	lying around.  Use the ipcs "
-			"command to inspect existing "
-			"semaphore sets \n"
-			"	and the ipcrm "
-			"command to remove the semaphore set "
-			"with \n"
-			"	id %d.\n\n"
-			"	Error was: %s\n\n"
-			SQLR,SQLR,id,semid,err);
+			"	Unable to create a semaphore set.\n\n",
+			SQLR);
+	if (semid!=-1) {
+		stderror.printf("This is usally because an \n"
+				"	%s-listener is already running for "
+				"the %s instance.\n\n"
+				"	If it is not running, something may "
+				"have crashed and left an old semaphore set\n"
+				"	lying around.  Use the ipcs command "
+				"to inspect existing semaphore sets \n"
+				"	and the ipcrm command to "
+				"remove the semaphore set with \n"
+				"	id %d.\n\n"
+				SQLR,id,semid);
+	}
+	stderror.printf("	Error was: %s\n\n",err);
 	delete[] err;
 }
 
@@ -1065,10 +1046,15 @@ bool sqlrlistener::listenOnFixupSocket(const char *id) {
 	return success;
 }
 
-void sqlrlistener::listen() {
+bool sqlrlistener::listen() {
 
 	// wait until all of the connections have started
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return false;
+		}
+
 		int32_t	opendbconnections=pvt->_shm->open_db_connections;
 
 		if (opendbconnections<
@@ -1085,14 +1071,25 @@ void sqlrlistener::listen() {
 
 	// listen for client connections
 	if (!listenOnClientSockets()) {
-		return;
+		return false;
 	}
 
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return true;
+		}
+
 		error::clearError();
-		if (!handleTraffic(waitForTraffic()) &&
-			error::getErrorNumber()==EMFILE) {
-			snooze::macrosnooze(1);
+
+		if (!handleTraffic(waitForTraffic())) {
+
+			// if something inside of handleTraffic() failed with
+			// EMFILE (too many open files) then wait a second
+			// before trying again so we don't slam the system
+			if (error::getErrorNumber()==EMFILE) {
+				snooze::macrosnooze(1);
+			}
 		}
 	}
 }
@@ -1101,10 +1098,21 @@ filedescriptor *sqlrlistener::waitForTraffic() {
 
 	raiseDebugMessageEvent("waiting for traffic...");
 
-	// wait for data on one of the sockets...
-	// if something bad happened, return an invalid file descriptor
-	if (pvt->_lsnr.listen(-1,-1)<1) {
-		return NULL;
+	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return NULL;
+		}
+
+		// wait for data on one of the sockets...
+		int32_t	result=pvt->_lsnr.listen(1,0);
+		if (result>=1) {
+			break;
+		} else if (result!=RESULT_TIMEOUT) {
+			// if something bad happened,
+			// return an invalid file descriptor
+			return NULL;
+		}
 	}
 
 	// return first file descriptor that had data available or an invalid
@@ -1208,8 +1216,12 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 
 	// Don't fork unless we have to.
 	//
-	// If there are no busy listeners and there are available connections,
-	// then we don't need to fork a child.  Otherwise we do.
+	// We have to if we're using HANDOFF_PROXY, otherwise this process will
+	// talk to the connection for an arbitrary amount of time instead of
+	// looping back to listen for another client.
+	//
+	// Otherwise, if there are no busy listeners and there are available
+	// connections, then we don't need to fork a child.
 	//
 	// It's possible that getValue(2) will be 0, indicating no connections
 	// are available, but one will become available immediately after this
@@ -1223,7 +1235,8 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	// id as this one and that is checked at startup.  However, if it did
 	// happen, getValue(10) would return something greater than 0 and we
 	// would have forked anyway.
-	if (pvt->_dynamicscaling ||
+	if (pvt->_handoffmode==HANDOFF_PROXY ||
+			pvt->_dynamicscaling ||
 			getBusyListeners() ||
 			!pvt->_semset->getValue(2)) {
 		forkChild(clientsock,protocolindex);
@@ -1439,7 +1452,6 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		// spawn the thread
 		if (thr->spawn((void *(*)(void *))clientSessionThread,
 							(void *)csa,true)) {
-			pvt->_isforkedthread=true;
 			return;
 		}
 
@@ -1451,6 +1463,7 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 			SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
 		raiseInternalErrorEvent(
 			SQLR_ERROR_ERRORFORKINGLISTENER_STRING);
+		// FIXME: I think we need to delete clientsock here too
 		delete csa;
 		delete thr;
 		return;
@@ -1555,6 +1568,10 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 
 	// loop in case client doesn't get handed off successfully
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return false;
+		}
 
 		if (!getAConnection(&connectionpid,&inetport,
 					unixportstr,&unixportstrlen,
@@ -1661,7 +1678,8 @@ bool sqlrlistener::semWait(int32_t index, thread *thr,
 				result=pvt->_semset->wait(index);
 			}
 		} while (!result && error::getErrorNumber()==EINTR &&
-							alarmrang!=1);
+						!process::getShutDownFlag() &&
+						alarmrang!=1);
 		*timeout=(alarmrang==1);
 		signalmanager::alarm(0);
 		pvt->_semset->retryInterruptedOperations();
@@ -1786,6 +1804,10 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					thread *thr) {
 
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			return false;
+		}
 
 		raiseDebugMessageEvent("getting a connection...");
 
@@ -2061,10 +2083,17 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	clientsock->allowShortReads();
 	clientsock->useNonBlockingMode();
 
-	// Set up a listener to listen on both client and server sockets.
-	listener	proxy;
-	proxy.addReadFileDescriptor(serversock);
-	proxy.addReadFileDescriptor(clientsock);
+	// set up read and write listeners
+	listener	readlistener;
+	readlistener.addReadFileDescriptor(serversock);
+	readlistener.addReadFileDescriptor(clientsock);
+	listener	clientwritelistener;
+	clientwritelistener.addWriteFileDescriptor(clientsock);
+	listener	serverwritelistener;
+	serverwritelistener.addWriteFileDescriptor(serversock);
+	filedescriptor	*rfd=NULL;
+	listener	*wl=NULL;
+	filedescriptor	*wfd=NULL;
 
 	// set up a read buffer
 	unsigned char	readbuffer[8192];
@@ -2074,15 +2103,16 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 	for (;;) {
 
+		if (process::getShutDownFlag()) {
+			return false;
+		}
+
 		// wait for data to be available from the client or server
 		error::clearError();
-		int32_t	waitcount=proxy.listen(-1,-1);
+		int32_t	waitcount=readlistener.listen(-1,-1);
 
-		// The wait fell through but nobody had data.  This is just here
-		// for good measure now.  I'm not sure what could cause this.
-		// I originally thought it could happen if one side or the other
-		// closed the socket, but it appears in that case, the wait does		// fall through with the side that closed the socket indicated
-		// as ready and then the read fails.
+		// The wait fell through but nobody had data.  A shutdown could
+		// cause this. 
 		if (waitcount<1) {
 			raiseDebugMessageEvent("wait exited with no data");
 			endsession=true;
@@ -2090,11 +2120,10 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 		}
 
 		// get the file descriptor that data was available from
-		filedescriptor	*fd=
-			proxy.getReadReadyList()->getFirst()->getValue();
+		rfd=readlistener.getReadReadyList()->getFirst()->getValue();
 
 		// read whatever data was available
-		ssize_t	readcount=fd->read(readbuffer,sizeof(readbuffer));
+		ssize_t	readcount=rfd->read(readbuffer,sizeof(readbuffer));
 		if (readcount<1) {
 			if (pvt->_sqlrlg || pvt->_sqlrn) {
 				stringbuffer	debugstr;
@@ -2106,31 +2135,38 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 				delete[] err;
 				raiseDebugMessageEvent(debugstr.getString());
 			}
-			endsession=(fd==clientsock);
+			endsession=(rfd==clientsock);
 			break;
 		}
 
-		// write the data to the other side
-		if (fd==serversock) {
-			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				stringbuffer	debugstr;
-				debugstr.append("read ");
-				debugstr.append((uint32_t)readcount);
-				debugstr.append(" bytes from server");
-				raiseDebugMessageEvent(debugstr.getString());
+		// log/notify
+		if (pvt->_sqlrlg || pvt->_sqlrn) {
+			stringbuffer	debugstr;
+			debugstr.append("read ");
+			debugstr.append((uint32_t)readcount);
+			debugstr.append(" bytes from ");
+			debugstr.append((rfd==serversock)?"server":"client");
+			raiseDebugMessageEvent(debugstr.getString());
+		}
+
+		// decide which listener/filedescriptor to use to write
+		if (rfd==serversock) {
+			wl=&clientwritelistener;
+			wfd=clientsock;
+		} else {
+			wl=&serverwritelistener;
+			wfd=serversock;
+		}
+
+		// write all of whatever we read
+		ssize_t	writecount=0;
+		while (writecount!=readcount) {
+			if (process::getShutDownFlag()) {
+				return false;
 			}
-			clientsock->write(readbuffer,readcount);
-			clientsock->flushWriteBuffer(-1,-1);
-		} else if (fd==clientsock) {
-			if (pvt->_sqlrlg || pvt->_sqlrn) {
-				stringbuffer	debugstr;
-				debugstr.append("read ");
-				debugstr.append((uint32_t)readcount);
-				debugstr.append(" bytes from client");
-				raiseDebugMessageEvent(debugstr.getString());
-			}
-			serversock->write(readbuffer,readcount);
-			serversock->flushWriteBuffer(-1,-1);
+			wl->listen(-1,-1);
+			writecount+=wfd->write(readbuffer,readcount);
+			wfd->flushWriteBuffer(-1,-1);
 		}
 	}
 

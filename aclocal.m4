@@ -9603,14 +9603,14 @@ then
 
 		dnl disable -Werror with gcc < 2.7 because
 		dnl it misinterprets placement new
-		CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+		CXX_VERSION=`$CXX --version 2> /dev/null | head -1`
 
 		dnl Newer versions of gcc output the version differently
 		dnl and the above results in "g+".  These all work correctly.
-		if ( test "$CXX_VERSION" != "g+" )
+		if ( test -n "$CXX_VERSION" -a -z "`echo $CXX_VERSION | grep g++`" )
 		then
 			dnl older versions output something like 27, 28, 29, etc.
-			if (  test "$CXX_VERSION" -lt "27" )
+			if (  test "`echo $CXX_VERSION | tr -d'.' | cut -c1-2`" -lt "27" )
 			then
 				WERROR=""
 			fi
@@ -9710,7 +9710,7 @@ if ( test -n "$WERROR" )
 then
 	OLDCPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$WALL $WERROR $CPPFLAGS"
-	AC_MSG_CHECKING(whether -Wno-format is needed)
+	AC_MSG_CHECKING(for -Wno-format option)
 	AC_TRY_COMPILE([#include <stdio.h>
 
 class charstring {
@@ -9735,7 +9735,7 @@ AC_DEFUN([FW_CHECK_WNOOVERLOADEDVIRTUAL],
 [
 
 WNOOVERLOADEDVIRTUAL=""
-AC_MSG_CHECKING(whether -Wno-overloaded-virtual is needed)
+AC_MSG_CHECKING(for -Wno-overloaded-virtual option)
 
 # clang's -Wall includes -Woverloaded-virtual, which we don't want
 if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
@@ -9757,7 +9757,7 @@ AC_DEFUN([FW_CHECK_WNOMISMATCHEDTAGS],
 [
 
 WNOMISMATCHEDTAGS=""
-AC_MSG_CHECKING(whether -Wno-mismatched-tags is needed)
+AC_MSG_CHECKING(for -Wno-mismatched-tags option)
 
 # clang's -Wall includes -Wmismatched-tags, which we don't want
 if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
@@ -9785,7 +9785,7 @@ if ( test -n "$WERROR" )
 then
 	OLDCPPFLAGS=$CPPFLAGS
 	CPPFLAGS="$CPPFLAGS -Wno-deprecated-declarations"
-	AC_MSG_CHECKING(whether -Wno-deprecated-declarations is permitted)
+	AC_MSG_CHECKING(for -Wno-deprecated-declarations option)
 	AC_TRY_COMPILE([#include <stdio.h>],[printf("hello");],AC_MSG_RESULT(yes); WNODEPRECATEDDECLARATIONS="-Wno-deprecated-declarations",AC_MSG_RESULT(yes))	
 	CPPFLAGS=$OLDCPPFLAGS
 fi
@@ -10031,6 +10031,7 @@ AC_MSG_CHECKING(for OSX)
 case $host_os in
 	*darwin* )
 		DARWIN="yes"
+		AC_DEFINE(_DARWIN,1,Darwin)
 
 		dnl get the actual mac os version
 		PV1="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t' | cut -d'.' -f1`"
@@ -10073,6 +10074,165 @@ AC_SUBST(MACOSXDEPLOYMENTTARGET)
 ])
 
 
+
+dnl checks for apache module api
+AC_DEFUN([FW_CHECK_APACHE],
+[
+APACHEINCLUDES=""
+APACHELINKFLAGS=""
+
+if ( test "$INCLUDE_APACHE" = "1" )
+then
+	FW_CHECK_APXS
+	FW_CHECK_APRCONFIG
+	FW_CHECK_APUCONFIG
+
+	if ( test -n "$APACHEINCLUDES" )
+	then
+		if ( test -n "$DARWIN" )
+		then
+			if ( test -n "$BUNDLE_LOADER" )
+			then
+				APACHEHTTPD=""
+				for prog in httpd apache2 apache
+				do
+					AC_PATH_PROG(APACHEHTTPD,$prog,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin)
+					if ( test -n "$APACHEHTTPD" )
+					then
+						break
+					fi
+				done
+				APACHELINKFLAGS="-Wl,$BUNDLE_LOADER -Wl,$APACHEHTTPD"
+			else
+				APACHELINKFLAGS="$UNDEFINED_DYNAMIC_LOOKUP"
+			fi
+		fi
+	else
+		INCLUDE_APACHE="0"
+	fi
+else
+	echo "disabled"
+fi
+
+AC_SUBST(APACHEINCLUDES)
+AC_SUBST(APACHELINKFLAGS)
+])
+
+
+
+dnl checks for apache's apxs2
+AC_DEFUN([FW_CHECK_APXS],
+[
+
+if ( test -n "$APXS" )
+then
+	AC_PATH_PROG(APXS,$APXS,"")
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		AC_PATH_PROG(APXS2,apxs2,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin)
+		if ( test -z "$APXS2" )
+		then
+			AC_PATH_PROG(APXS,apxs,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin)
+		fi
+		if ( test -n "$APXS2" )
+		then
+			APXS="$APXS2"
+		fi
+	fi
+fi
+
+if ( test -n "$APXS" )
+then
+	APACHEINCLUDES="-I`$APXS -q INCLUDEDIR`"
+fi
+
+])
+
+
+
+dnl checks for apache2's apr-1-mt-config, apr-1-config or apr-config
+AC_DEFUN([FW_CHECK_APRCONFIG],
+[
+
+if ( test -n "$APR_CONFIG" )
+then
+	AC_PATH_PROG(APR_CONFIG,$APR_CONFIG,"")
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		AC_PATH_PROG(APR_1_MT_CONFIG,apr-1-mt-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin)
+		if ( test -z "$APR_1_MT_CONFIG" )
+		then
+			AC_PATH_PROG(APR_1_CONFIG,apr-1-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			if ( test -z "$APR_1_CONFIG" )
+			then
+				AC_PATH_PROG(APR_CONFIG,apr-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			fi
+		fi
+		if ( test -n "$APR_1_CONFIG" )
+		then
+			APR_CONFIG="$APR_1_CONFIG"
+		fi
+		if ( test -n "$APR_1_MT_CONFIG" )
+		then
+			APR_CONFIG="$APR_1_MT_CONFIG"
+		fi
+	fi
+fi
+
+if ( test -n "$APR_CONFIG" )
+then
+	APACHEINCLUDES="$APACHEINCLUDES `$APR_CONFIG --cppflags --includes | sed -e 's|-mt ||'` -DAPACHE_2"
+fi
+])
+
+
+
+dnl checks for apache2's apr-1-mt-config, apr-1-config or apr-config
+AC_DEFUN([FW_CHECK_APUCONFIG],
+[
+
+if ( test -n "$APU_CONFIG" )
+then
+	AC_PATH_PROG(APU_CONFIG,$APU_CONFIG,"")
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		AC_PATH_PROG(APU_1_MT_CONFIG,apu-1-mt-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin)
+		if ( test -z "$APU_1_MT_CONFIG" )
+		then
+			AC_PATH_PROG(APU_1_CONFIG,apu-1-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			if ( test -z "$APU_1_CONFIG" )
+			then
+				AC_PATH_PROG(APU_CONFIG,apu-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			fi
+		fi
+		if ( test -n "$APU_1_CONFIG" )
+		then
+			APU_CONFIG="$APU_1_CONFIG"
+		fi
+		if ( test -n "$APU_1_MT_CONFIG" )
+		then
+			APU_CONFIG="$APU_1_MT_CONFIG"
+		fi
+	fi
+fi
+
+if ( test -n "$APU_CONFIG" )
+then
+	APACHEINCLUDES="$APACHEINCLUDES `$APU_CONFIG --includes | sed -e 's|-mt ||'`"
+fi
+])
+
+
+
 dnl checks to see if the -Wno-long-double option compiler works or not
 dnl if it does, then WNOLONGDOUBLE="-Wno-long-double" is set
 dnl if it does not, then WNOLONGDOUBLE="" is set
@@ -10113,7 +10273,7 @@ dnl if it does, then WNOERRORDATETIME="-Wno-error=date-time" is set
 dnl if it does not, then WNOERRORDATETIME="" is set
 AC_DEFUN([FW_CHECK_WNOERRORDATETIME],
 [
-AC_MSG_CHECKING(for -Wno-error=date-time)
+AC_MSG_CHECKING(for -Wno-error=date-time option)
 FW_TRY_LINK([#include <stdio.h>],[printf("%s %s\n",__DATE__,__TIME__);],[-Wall -Werror -Wno-error=date-time],[],[],[WNOERRORDATETIME="-Wno-error=date-time"],[WNOERRORDATETIME=""])
 if ( test -n "$WNOERRORDATETIME" )
 then
@@ -10123,6 +10283,42 @@ else
 fi
 AC_SUBST(WNOERRORDATETIME)
 ])
+
+
+dnl checks to see if the -Wno-string-plus-int compiler option works or not
+dnl if it does, then WNOSTRINGPLUSINT="-Wno-string-plus-int" is set
+dnl if it does not, then WNOSTRINGPLUSINT="" is set
+AC_DEFUN([FW_CHECK_WNOSTRINGPLUSINT],
+[
+AC_MSG_CHECKING(for -Wno-string-plus-int option)
+FW_TRY_LINK([#include <stdio.h>],[const char *a="12345"; unsigned short i=1; const char *b; b=a+i+1;],[-Wall -Werror -Wno-string-plus-int],[],[],[WNOSTRINGPLUSINT="-Wno-string-plus-int"],[WNOSTRINGPLUSINT=""])
+if ( test -n "$WNOSTRINGPLUSINT" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(WNOSTRINGPLUSINT)
+])
+
+
+dnl checks to see if -fdeclspec compiler option works or not
+dnl if it does, then it sets the variable FDECLSPEC="-fdeclspec"
+dnl if it does not , then it sets the variable FDECLSPEC=""
+AC_DEFUN([FW_CHECK_FDECLSPEC],
+[
+AC_MSG_CHECKING(for -fdeclspec option)
+FW_TRY_LINK([],[int a; a=1;],[-fdeclspec],[],[],[FDECLSPEC="-fdeclspec"],[FDECLSPEC=""])
+if ( test -n "$FDECLSPEC" )
+then
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(FDECLSPEC)
+])
+
+
 
 
 dnl checks for minix platform and adds some defines to CPPFLAGS if it is
@@ -10220,7 +10416,7 @@ AC_DEFUN([FW_CHECK_SCO],
 [
 SCO_OSR5=""
 SCO_OSR6=""
-SCO_UW="yes"
+SCO_UW=""
 CRTLIB=""
 
 AC_MSG_CHECKING(for SCO)
@@ -10536,6 +10732,19 @@ dnl tries to use it as "print -r --".  Replace this with "printf %s\\n".
 if ( test -r "libtool" -a -n "$DARWIN" )
 then
 	sed -e "s|print -r --|printf %s\\\\\\\\n|g" libtool > libtool.new
+	mv libtool.new libtool
+fi
+
+dnl On SCO UnixWare...
+if ( test -r "libtool" -a -n "$SCO_UW" )
+then
+	dnl The linker doesn't support -R at all
+	sed -e "s|hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=\"\"|g" libtool > libtool.new
+	mv libtool.new libtool
+
+	dnl And libtool wants to use the -Wl,-h option which causes all kinds
+	dnl of problems.
+	sed -e "s|\\\\\$wl-h,\\\\\$soname ||g" libtool > libtool.new
 	mv libtool.new libtool
 fi
 ])

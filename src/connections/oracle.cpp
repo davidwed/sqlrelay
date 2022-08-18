@@ -2526,7 +2526,7 @@ void oraclecursor::allocateResultSetBuffers(int32_t columncount) {
 		def_indp=new sb2 *[columncount];
 		def_col_retlen=new ub2 *[columncount];
 		def_col_retcode=new ub2 *[columncount];
-		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		uint32_t	fetchatonce=getFetchAtOnce();
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
 		for (int32_t i=0; i<columncount; i++) {
 			def_lob[i]=new OCILobLocator *[fetchatonce];
@@ -2589,7 +2589,7 @@ bool oraclecursor::open() {
 	}
 
 	// set the number of rows to prefetch
-	uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+	uint32_t	fetchatonce=getFetchAtOnce();
 	return (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
 				(dvoid *)&fetchatonce,
 				(ub4)0,OCI_ATTR_PREFETCH_ROWS,
@@ -2694,7 +2694,7 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 
 		// set the number of rows to prefetch
 		// FIXME: we set this in open(), does it need to be reset?
-		uint32_t	fetchatonce=conn->cont->getFetchAtOnce();
+		uint32_t	fetchatonce=getFetchAtOnce();
 		return (OCIAttrSet((dvoid *)stmt,OCI_HTYPE_STMT,
 				(dvoid *)&fetchatonce,
 				(ub4)0,OCI_ATTR_PREFETCH_ROWS,
@@ -3672,12 +3672,10 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 				// set the NULL indicators to false
 				bytestring::zero(def_indp[i],
 						sizeof(sb2)*
-						conn->cont->getFetchAtOnce());
+						getFetchAtOnce());
 
 				// allocate a lob descriptor
-				for (uint32_t j=0;
-					j<conn->cont->getFetchAtOnce();
-					j++) {
+				for (uint32_t j=0; j<getFetchAtOnce(); j++) {
 					if (OCIDescriptorAlloc(
 						(void *)oracleconn->env,
 						(void **)&def_lob[i][j],
@@ -3728,9 +3726,7 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 				}
 
 				// set the lob member to NULL
-				for (uint32_t j=0;
-					j<conn->cont->getFetchAtOnce();
-					j++) {
+				for (uint32_t j=0; j<getFetchAtOnce(); j++) {
 					def_lob[i][j]=NULL;
 				}
 			}
@@ -3984,7 +3980,7 @@ bool oraclecursor::fetchRow(bool *error) {
 
 	*error=false;
 
-	if (row==conn->cont->getFetchAtOnce()) {
+	if (row==getFetchAtOnce()) {
 		row=0;
 	}
 	if (row>0 && row==maxrow) {
@@ -3992,7 +3988,7 @@ bool oraclecursor::fetchRow(bool *error) {
 	}
 	if (!row) {
 		OCIStmtFetch(stmt,oracleconn->err,
-				(ub4)conn->cont->getFetchAtOnce(),
+				(ub4)getFetchAtOnce(),
 				OCI_FETCH_NEXT,OCI_DEFAULT);
 		ub4	currentrow;
 		OCIAttrGet(stmt,OCI_HTYPE_STMT,
@@ -4112,8 +4108,7 @@ void oraclecursor::closeResultSet() {
 		for (int32_t i=0; i<columncount; i++) {
 
 			// free lob resources
-			for (uint32_t j=0;
-				j<conn->cont->getFetchAtOnce(); j++) {
+			for (uint32_t j=0; j<getFetchAtOnce(); j++) {
 				if (def_lob[i][j]) {
 					OCIDescriptorFree(
 						def_lob[i][j],OCI_DTYPE_LOB);

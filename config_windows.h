@@ -268,7 +268,7 @@
 /* #undef HAVE_TCL_WIDEINT */
 
 /* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
+/* #undef HAVE_UNISTD_H */
 
 /* UnixODBC */
 /* #undef HAVE_UNIXODBC */
@@ -335,6 +335,9 @@
 
 /* Suffix for loadable modules */
 #define SQLRELAY_MODULESUFFIX "dll"
+
+/* Some systems have Python 3.10+ */
+@SQLRELAY_NEED_PY_SSIZE_T_CLEAN@
 
 /* Some systems use SQLLEN * in SQLRowCount */
 #define SQLROWCOUNT_SQLLEN 1

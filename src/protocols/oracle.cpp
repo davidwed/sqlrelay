@@ -838,12 +838,12 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		unsigned char	resppackettype;
 
 		randomnumber	r;
-		uint32_t	seed;
+		//uint32_t	seed;
 
 		char		*username;
 		char		*authsessionkey;
 		char		*response;
-		uint64_t	responselength;
+		//uint64_t	responselength;
 
 		uint16_t	maxcursorcount;
 		uint32_t	maxquerysize;
@@ -1808,7 +1808,7 @@ bool sqlrprotocol_oracle::getSupervisorService(const unsigned char *rp,
 
 	uint32_t	pid;
 	uint32_t	connectiontype;
-	uint16_t	*drivers;
+	uint16_t	*drivers=NULL;
 	uint32_t	drivercount;
 	if (!getAnoVersionField(rp,&supervisorversion,&rp) ||
 		!getAnoConnectionInfoField(rp,&pid,&connectiontype,&rp) ||
@@ -1860,7 +1860,7 @@ bool sqlrprotocol_oracle::getEncryptionService(const unsigned char *rp,
 		stdoutput.write("	encryption {\n");
 	}
 
-	uint16_t	*drivers;
+	uint16_t	*drivers=NULL;
 	uint32_t	drivercount;
 	unsigned char	constant;
 	if (!getAnoVersionField(rp,&encryptionversion,&rp) ||
@@ -1894,7 +1894,7 @@ bool sqlrprotocol_oracle::getCryptoChecksummingService(
 		stdoutput.write("	crypto-checksumming {\n");
 	}
 
-	uint16_t	*drivers;
+	uint16_t	*drivers=NULL;
 	uint32_t	drivercount;
 	if (!getAnoVersionField(rp,&cryptochecksummingversion,&rp) ||
 		!getAnoArrayField(rp,&drivers,&drivercount,&rp)) {

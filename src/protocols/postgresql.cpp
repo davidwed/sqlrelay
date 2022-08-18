@@ -709,7 +709,7 @@ bool sqlrprotocol_postgresql::handleTlsRequest() {
 
 	debugStart("tls");
 
-	clientsock->setSecurityContext(getTlsContext());
+	clientsock->setSocketLayer(getTlsContext());
 	getTlsContext()->setFileDescriptor(clientsock);
 
 	if (!getTlsContext()->accept()) {
@@ -2412,7 +2412,7 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 				if (!i) {
 					str.append(digit);
 				} else {
-					str.writeFormatted("%04d",digit);
+					str.printf("%04d",digit);
 				}
 			}
 			

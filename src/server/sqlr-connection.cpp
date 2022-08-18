@@ -14,10 +14,12 @@
 #include <version.h>
 
 sqlrservercontroller	*cont=NULL;
-volatile sig_atomic_t	shutdowninprogress=0;
-signalhandler		shutdownhandler;
 const char		*backtrace=NULL;
 
+#define SHUTDOWNFLAG 1
+
+#ifndef SHUTDOWNFLAG
+volatile sig_atomic_t	shutdowninprogress=0;
 static void shutDown(int32_t signum) {
 
 	// Since this handler is established for more than one kind of signal,
@@ -34,7 +36,7 @@ static void shutDown(int32_t signum) {
 	}
 	shutdowninprogress=1;
 
-	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGINT) {
+	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGTERM) {
 		stringbuffer    filename;
 		filename.append(backtrace);
 		filename.append(sys::getDirectorySeparator());
@@ -49,7 +51,7 @@ static void shutDown(int32_t signum) {
 		}
 	}
 
-	if (!signalhandler::isSignalHandlerIntUsed()) {
+	if (!signalhandler::supportsSignalHandlerParameter()) {
 		delete cont;
 		process::exit(0);
 	}
@@ -103,6 +105,7 @@ static void shutDown(int32_t signum) {
 	delete cont;
 	process::exit(exitcode);
 }
+#endif
 
 static void helpmessage(const char *progname) {
 	stdoutput.printf(
@@ -162,74 +165,87 @@ int main(int argc, const char **argv) {
 	// create the controller
 	cont=new sqlrservercontroller;
 
-
+#ifdef SHUTDOWNFLAG
+	// handle kill and crash signals
+	process::setShutDownFlagOnShutDown();
+	if (!cmdl.found("-disable-crash-handler")) {
+		process::setShutDownFlagOnCrash();
+	}
+#else
 	// handle kill and crash signals
 	process::handleShutDown(shutDown);
 	if (!cmdl.found("-disable-crash-handler")) {
 		process::handleCrash(shutDown);
 	}
+#endif
 
-	// handle various other shutdown conditions
-	shutdownhandler.setHandler(shutDown);
-	// timeouts
-	#ifdef SIGALRM
-	shutdownhandler.handleSignal(SIGALRM);
-	#endif
-	// CPU consumption soft limit
-	#ifdef SIGXCPU
-	shutdownhandler.handleSignal(SIGXCPU);
-	#endif
-	// File size limit exceeded
-	#ifdef SIGXFSZ
-	shutdownhandler.handleSignal(SIGXFSZ);
-	#endif
-	// power failure
-	#ifdef SIGPWR
-	shutdownhandler.handleSignal(SIGPWR);
-	#endif
-
-	// ignore others
+	// ignore various signals
 	signalset	set;
 	set.addAllSignals();
 	set.removeShutDownSignals();
 	set.removeCrashSignals();
+	// don't ignore alarms (we use these to implement semaphore timeouts
+	// on platforms that don't support timed semaphore operations)
 	#ifdef SIGALRM
 	set.removeSignal(SIGALRM);
 	#endif
-	// CPU consumption soft limit
-	#ifdef SIGXCPU
-	set.removeSignal(SIGXCPU);
-	#endif
-	// File size limit exceeded
-	#ifdef SIGXFSZ
-	set.removeSignal(SIGXFSZ);
-	#endif
-	// power failure
-	#ifdef SIGPWR
-	set.removeSignal(SIGPWR);
-	#endif
 	signalmanager::ignoreSignals(&set);
 
+	// initialize and wait for client connections
+	int32_t exitstatus=(cont->init(argc,argv) && cont->listen())?0:1;
 
-	// connect to the db
-	bool	result=cont->init(argc,argv);
-	if (result) {
-		// wait for client connections
-		result=cont->listen();
+#ifdef SHUTDOWNFLAG
+	if (process::getShutDownFlag()) {
+
+		int32_t	signum=process::getShutDownSignal();
+
+		// generate a backtrace if necessary
+		if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGTERM) {
+
+			stringbuffer    filename;
+			filename.append(backtrace);
+			filename.append(sys::getDirectorySeparator());
+			filename.append("sqlr-connection.");
+			filename.append((uint32_t)process::getProcessId());
+			filename.append(".bt");
+			file	f;
+			if (f.create(filename.getString(),
+				permissions::evalPermString("rw-------"))) {
+				f.printf("signal: %d\n\n",signum);
+				process::backtrace(&f);
+			}
+		}
+
+		// print exit message
+		stderror.printf("%s-connection (pid=%d) ",
+				SQLR,(uint32_t)process::getProcessId());
+		stderror.printf(
+				(signum==SIGINT ||
+					signum==SIGTERM
+					#ifdef SIGQUIT
+					|| signum==SIGQUIT
+					#endif
+					)?
+				"Process terminated with signal %d\n":
+				"Abnormal termination: signal %d received\n",
+			signum);
+
+		// set successful exit on SIGTERM, otherwise set
+		// the exit status to 128 + the signal number
+		exitstatus=(signum==SIGTERM)?0:128+signum;
 	}
-
+#else
 	// If sqlr-stop has been run, we may be here because the sqlr-listener
-	// has been killed.  In that case, we'll get a SIGINT soon, but we
+	// has been killed.  In that case, we'll get a SIGTERM soon, but we
 	// want to ignore it and just let the shutdown proceed normally,
 	// otherwise we could be halfway through cleanUp() below when we
 	// get it, which will ultimately run cleanUp() again and result in
-	// double-free's and a crash.  If we happen to receive the SIGINT
+	// double-free's and a crash.  If we happen to receive the SIGTERM
 	// before this point, then the shutdown will proceed that way.
 	shutdowninprogress=1;
+#endif
 
-	// unsuccessful completion
+	// clean up and exit
 	delete cont;
-
-	// return successful or unsuccessful completion based on listenresult
-	process::exit((result)?0:1);
+	process::exit(exitstatus);
 }

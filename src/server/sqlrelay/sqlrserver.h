@@ -12,7 +12,7 @@ class SQLRSERVER_DLLSPEC sqlrlistener {
 		~sqlrlistener();
 
 		bool	init(int argc, const char **argv);
-		void	listen();
+		bool	listen();
 
 		const char	*getId();
 		const char	*getLogDir();
@@ -30,6 +30,9 @@ enum sqlrcursorstate_t {
 enum sqlrquerytype_t {
 	SQLRQUERYTYPE_SELECT=0,
 	SQLRQUERYTYPE_INSERT,
+	SQLRQUERYTYPE_INSERTSELECT,
+	SQLRQUERYTYPE_SELECTINTO,
+	SQLRQUERYTYPE_MULTIINSERT,
 	SQLRQUERYTYPE_UPDATE,
 	SQLRQUERYTYPE_DELETE,
 	SQLRQUERYTYPE_CREATE,
@@ -184,10 +187,13 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setFakeInputBinds(bool fake);
 		bool		getFakeInputBinds();
 
+		// sequences
+		const char	*nextvalFormat();
+
 		// fetch info
-		void		setFetchAtOnce(uint32_t fao);
-		void		setMaxColumnCount(uint32_t mcc);
-		void		setMaxFieldLength(uint32_t mfl);
+		void		setFetchAtOnce(uint32_t fethatonce);
+		void		setMaxColumnCount(uint32_t maxcolumncount);
+		void		setMaxFieldLength(uint32_t maxfieldlength);
 		uint32_t	getFetchAtOnce();
 		uint32_t	getMaxColumnCount();
 		uint32_t	getMaxFieldLength();
@@ -692,6 +698,11 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		clearError(sqlrservercursor *cursor);
 		void		setError(sqlrservercursor *cursor,
 						const char *err,
+						uint32_t errlen,
+						int64_t errn,
+						bool liveconn);
+		void		setError(sqlrservercursor *cursor,
+						const char *err,
 						int64_t errn,
 						bool liveconn);
 		char		*getErrorBuffer(sqlrservercursor *cursor);
@@ -800,6 +811,18 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						const char **db,
 						const char **schema,
 						const char **object);
+		bool		parseInsert(const char *query,
+					uint32_t querylen,
+					sqlrquerytype_t *querytype,
+					char **table,
+					linkedlist<char *> **columns,
+					linkedlist<char *> **allcolumns,
+					const char **autoinccolumn,
+					bool *columnsincludeautoinccolumn,
+					const char **primarykeycolumn,
+					bool *columnsincludeprimarykeycolumn,
+					linkedlist<char *> **values,
+					const char **rawvalues);
 
 		bool	isBitType(const char *type);
 		bool	isBitType(int16_t type);
@@ -967,6 +990,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual	int16_t		nonNullBindValue();
 		virtual	int16_t		nullBindValue();
 		virtual bool		bindValueIsNull(int16_t isnull);
+
+		virtual const char	*nextvalFormat();
 
 		virtual const char	*tempTableDropPrefix();
 		virtual bool		tempTableTruncateBeforeDrop();
@@ -1387,6 +1412,8 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		bool		getExecuteDirect();
 		void		setExecuteRpc(bool executerpc);
 		bool		getExecuteRpc();
+		void		setFetchAtOnce(uint32_t fetchatonce);
+		uint32_t	getFetchAtOnce();
 
 		void		setResultSetHeaderHasBeenHandled(
 					bool resultsetheaderhasbeenhandled);

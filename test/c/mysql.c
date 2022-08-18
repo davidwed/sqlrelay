@@ -65,6 +65,8 @@ int	main(int argc, char **argv) {
 	uint16_t	id;
 	char		*filename;
 	uint32_t	*fieldlens;
+	const char	*dbversion;
+	uint32_t	majorversion;
 
 
 	// instantiation
@@ -78,8 +80,8 @@ int	main(int argc, char **argv) {
 	printf("\n");
 
 	// get the db version
-	const char	*dbversion=sqlrcon_dbVersion(con);
-	uint32_t	majorversion=dbversion[0]-'0';
+	dbversion=sqlrcon_dbVersion(con);
+	majorversion=dbversion[0]-'0';
 
 	// ping
 	printf("PING: \n");

@@ -11,10 +11,13 @@
 #include <config.h>
 #include <version.h>
 
-sqlrlistener		*lsnr;
-volatile sig_atomic_t	shutdowninprogress=0;
-const char		*backtrace=NULL;
+static sqlrlistener	*lsnr;
+static const char	*backtrace=NULL;
 
+#define SHUTDOWNFLAG 1
+
+#ifndef SHUTDOWNFLAG
+volatile sig_atomic_t	shutdowninprogress=0;
 static void shutDown(int32_t signum) {
 
 	// A shutdown loop can occur sometimes, on some platforms, if:
@@ -37,7 +40,7 @@ static void shutDown(int32_t signum) {
 
 	shutdowninprogress=1;
 
-	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGINT) {
+	if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGTERM) {
 		stringbuffer	filename;
 		filename.append(backtrace);
 		filename.append(sys::getDirectorySeparator());
@@ -55,6 +58,7 @@ static void shutDown(int32_t signum) {
 	delete lsnr;
 	process::exit(0);
 }
+#endif
 
 static void helpmessage(const char *progname) {
 	stdoutput.printf(
@@ -104,37 +108,84 @@ int main(int argc, const char **argv) {
 	// create the listener
 	lsnr=new sqlrlistener();
 
+#ifdef SHUTDOWNFLAG
+	// handle kill and crash signals
+	process::setShutDownFlagOnShutDown();
+	if (!cmdl.found("-disable-crash-handler")) {
+		process::setShutDownFlagOnCrash();
+	}
+#else
 	// handle kill and crash signals
 	process::handleShutDown(shutDown);
 	if (!cmdl.found("-disable-crash-handler")) {
 		process::handleCrash(shutDown);
 	}
+#endif
 
 	// handle child processes
 	process::waitForChildren();
 
-	// ignore all other signals except SIGALRM and SIGCHLD
+	// ignore various signals
 	signalset	set;
 	set.addAllSignals();
 	set.removeShutDownSignals();
 	set.removeCrashSignals();
-	// alarm and chld
+	// don't ignore alarms (we use these to implement semaphore timeouts
+	// on platforms that don't support timed semaphore operations)
 	#ifdef SIGALRM
 	set.removeSignal(SIGALRM);
 	#endif
+	// don't ignore child-exits (necessary when we're forking child
+	// processes to handle clients rather than forking child threads)
 	#ifdef SIGCHLD
 	set.removeSignal(SIGCHLD);
 	#endif
 	signalmanager::ignoreSignals(&set);
 
-	// initialize
-	if (lsnr->init(argc,argv)) {
+	// initialize and wait for client connections
+	int32_t exitstatus=(lsnr->init(argc,argv) && lsnr->listen())?0:1;
 
-		// wait for client connections
-		lsnr->listen();
+#ifdef SHUTDOWNFLAG
+	if (process::getShutDownFlag()) {
+
+		int32_t	signum=process::getShutDownSignal();
+
+		// generate a backtrace if necessary
+		if (!charstring::isNullOrEmpty(backtrace) && signum!=SIGTERM) {
+
+			stringbuffer	filename;
+			filename.append(backtrace);
+			filename.append(sys::getDirectorySeparator());
+			filename.append("sqlr-listener.");
+			filename.append((uint32_t)process::getProcessId());
+			filename.append(".bt");
+			file	f;
+			if (f.create(filename.getString(),
+				permissions::evalPermString("rw-------"))) {
+				f.printf("signal: %d\n\n",signum);
+				process::backtrace(&f);
+			}
+		}
+
+		// print exit message (on abnormal shutdown)
+		if (signum!=SIGINT &&
+				signum!=SIGTERM
+				#ifdef SIGQUIT
+				&& signum!=SIGQUIT
+				#endif
+				) {
+			stderror.printf("%s-listener (pid=%d) "
+				"Abnormal termination: signal %d received\n",
+				SQLR,(uint32_t)process::getProcessId(),signum);
+		}
+
+		// set successful exit on SIGTERM, otherwise set
+		// the exit status to 128 + the signal number
+		exitstatus=(signum==SIGTERM)?0:128+signum;
 	}
+#endif
 
 	// clean up and exit
 	delete lsnr;
-	process::exit(1);
+	process::exit(exitstatus);
 }

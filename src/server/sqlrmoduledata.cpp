@@ -54,7 +54,7 @@ sqlrmoduledata_tag::sqlrmoduledata_tag(domnode *parameters) :
 
 sqlrmoduledata_tag::~sqlrmoduledata_tag() {
 	for (listnode<uint16_t> *node=tags.getKeys()->getFirst();
-						node; node->getNext()) {
+						node; node=node->getNext()) {
 		tags.getValue(node->getValue())->clear();
 	}
 	tags.clear();

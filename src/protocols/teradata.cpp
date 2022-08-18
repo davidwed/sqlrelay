@@ -6413,7 +6413,7 @@ void sqlrprotocol_teradata::getFieldFormat(bytebuffer *fieldformat,
 	if (!charstring::compare(type,"TINYINT") ||
 		!charstring::compare(type,"SMALLINT") ||
 		!charstring::compare(type,"INTEGER")) {
-		fieldformat->writeFormatted("-(%d)9",
+		fieldformat->printf("-(%d)9",
 				cont->getColumnLength(req->cur,col));
 	} else if (!charstring::compare(type,"DECIMAL")) {
 		uint16_t	prec=cont->getColumnPrecision(req->cur,col);
@@ -6434,13 +6434,15 @@ void sqlrprotocol_teradata::getFieldFormat(bytebuffer *fieldformat,
 	} else if (!charstring::compare(type,"DATE")) {
 		fieldformat->write("YY/MM/DD");
 	} else if (!charstring::compare(type,"TIME")) {
+		// FIXME: HH24?
 		fieldformat->write("HH:MI:SS.S(6)");
 	} else if (!charstring::compare(type,"TIMESTAMP") ||
 			!charstring::compare(type,"DATETIME")) {
+		// FIXME: HH24?
 		fieldformat->write("YYYY-MM-DDBHH:MI:SS.S(6)");
 	} else {
 		// fall back to char/varchar
-		fieldformat->writeFormatted("X(%d)",
+		fieldformat->printf("X(%d)",
 				cont->getColumnLength(req->cur,col));
 	}
 }
@@ -7266,7 +7268,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 		if (null) {
 			write(&req->rowbuffer,"         ");
 			if (scale) {
-				req->rowbuffer.writeFormatted("%*s",scale,"");
+				req->rowbuffer.printf("%*s",scale,"");
 			}
 		} else {
 			// apparently returned as text in this format:
@@ -7291,18 +7293,17 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 						&second,
 						&fraction,
 						&isnegative)) {
-				req->rowbuffer.writeFormatted(
+				req->rowbuffer.printf(
 						"%02d:%02d:%02d",
 						hour,minute,second);
 				if (scale) {
-					req->rowbuffer.writeFormatted(".%0*d",
+					req->rowbuffer.printf(".%0*d",
 								scale,fraction);
 				}
 			} else {
 				write(&req->rowbuffer,"         ");
 				if (scale) {
-					req->rowbuffer.writeFormatted(
-								"%*s",scale,"");
+					req->rowbuffer.printf("%*s",scale,"");
 				}
 			}
 		}
@@ -7314,7 +7315,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 		if (null) {
 			write(&req->rowbuffer,"                   ");
 			if (scale) {
-				req->rowbuffer.writeFormatted("%*s",scale,"");
+				req->rowbuffer.printf("%*s",scale,"");
 			}
 		} else {
 			// apparently returned as text in this format:
@@ -7360,19 +7361,18 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 				if (fraction<0) {
 					fraction=0;
 				}
-				req->rowbuffer.writeFormatted(
+				req->rowbuffer.printf(
 					"%04d-%02d-%02d %02d:%02d:%02d",
 					year,month,day,
 					hour,minute,second);
 				if (scale) {
-					req->rowbuffer.writeFormatted(".%0*d",
+					req->rowbuffer.printf(".%0*d",
 								scale,fraction);
 				}
 			} else {
 				write(&req->rowbuffer,"                   ");
 				if (scale) {
-					req->rowbuffer.writeFormatted(
-								"%*s",scale,"");
+					req->rowbuffer.printf("%*s",scale,"");
 				}
 			}
 		}
@@ -7389,7 +7389,12 @@ void sqlrprotocol_teradata::appendIndicatorModeField(uint16_t col,
 	// append to nibuffer
 	unsigned char	ni=(req->currentfield%8)?
 				req->nibuffer[req->currentfield/8]:0;
-	ni|=((unsigned char)null)<<(7-(req->currentfield%8));
+
+	// make sure to cast the right side of the << to an unsigned char
+	// or some compilers (native CC on Unixware 7.0.1) will fail with:
+	// internal compiler error: ... Runs out of registers
+	ni|=((unsigned char)null)<<((unsigned char)(7-(req->currentfield%8)));
+
 	req->nibuffer[req->currentfield/8]=ni;
 
 	// append to rowbuffer (also increments currentfield)

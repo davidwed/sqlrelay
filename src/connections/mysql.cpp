@@ -215,6 +215,7 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		const char	*bindFormat();
 #endif
+		const char	*nextvalFormat();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
@@ -661,6 +662,10 @@ const char *mysqlconnection::bindFormat() {
 	return "?";
 }
 #endif
+
+const char *mysqlconnection::nextvalFormat() {
+	return "";
+}
 
 const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 	return (wild)?"select "
@@ -1655,37 +1660,88 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		case FIELD_TYPE_SET:
 			return SET_DATATYPE;
 #endif
-	// For some versions of mysql, tinyblobs, mediumblobs and longblobs all
-	// show up as FIELD_TYPE_BLOB despite field types being defined for
-	// those types.  The different types have predictable lengths though,
-	// so we'll use those to differentiate them. 
 		case FIELD_TYPE_TINY_BLOB:
 			return TINY_BLOB_DATATYPE;
+		// For some versions of mysql, tinyblobs, mediumblobs and
+		// longblobs all show up as FIELD_TYPE_BLOB despite field types
+		// being defined for those types.  The different types have
+		// predictable lengths though, so we'll use those to
+		// differentiate them. 
 		case FIELD_TYPE_BLOB:
-			#if defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=50000
-			if (mysqlfields[col]->length<766) {
-				return TINY_BLOB_DATATYPE;
-			} else if (mysqlfields[col]->length<196606) {
-				return BLOB_DATATYPE;
-			} else if (mysqlfields[col]->length<50441646) {
-				return MEDIUM_BLOB_DATATYPE;
+			#if defined(MYSQL_VERSION_ID) && \
+					MYSQL_VERSION_ID>=100600
+				if (mysqlfields[col]->flags&BINARY_FLAG) {
+					// MariaDB 10.6+ appears to use
+					// these lengths for blobs
+					if (mysqlfields[col]->length<=255) {
+						return TINY_BLOB_DATATYPE;
+					} else if (mysqlfields[col]->
+							length<=65535) {
+						return BLOB_DATATYPE;
+					} else if (mysqlfields[col]->
+							length<=16777215) {
+						return MEDIUM_BLOB_DATATYPE;
+					} else {
+						return LONG_BLOB_DATATYPE;
+					}
+				} else {
+					// ...and these lengths for texts
+					if (mysqlfields[col]->length<=1020) {
+						return TINY_BLOB_DATATYPE;
+					} else if (mysqlfields[col]->
+							length<=262140) {
+						return BLOB_DATATYPE;
+					} else if (mysqlfields[col]->
+							length<=67108860) {
+						return MEDIUM_BLOB_DATATYPE;
+					} else {
+						return LONG_BLOB_DATATYPE;
+					}
+				}
+			#elif defined(MYSQL_VERSION_ID) && \
+					MYSQL_VERSION_ID>=100000
+				// MariaDB 10.5- appears to use these lengths
+				// for both blobs and texts
+				if (mysqlfields[col]->length<=255) {
+					return TINY_BLOB_DATATYPE;
+				} else if (mysqlfields[col]->length<=65535) {
+					return BLOB_DATATYPE;
+				} else if (mysqlfields[col]->length<=16777215) {
+					return MEDIUM_BLOB_DATATYPE;
+				} else {
+					return LONG_BLOB_DATATYPE;
+				}
+			#elif defined(MYSQL_VERSION_ID) && \
+					MYSQL_VERSION_ID>=50000
+				// MySQL 5/8 appears to use these lengths
+				// for both blobs and texts
+				if (mysqlfields[col]->length<=765) {
+					return TINY_BLOB_DATATYPE;
+				} else if (mysqlfields[col]->length<=196605) {
+					return BLOB_DATATYPE;
+				} else if (mysqlfields[col]->length<=50441645) {
+					return MEDIUM_BLOB_DATATYPE;
+				} else {
+					return LONG_BLOB_DATATYPE;
+				}
 			#else
-			// MySQL 4 and lower uses these lengths for tiny and
-			// blob datatypes.  Medium and long both have the same
-			// length but are distinguishable by their max_lengths
-			// of 11 and 9 respectively.  No idea what the 11 and 9
-			// actually mean.
-			if (mysqlfields[col]->length<256) {
-				return TINY_BLOB_DATATYPE;
-			} else if (mysqlfields[col]->length<65536) {
-				return BLOB_DATATYPE;
-			} else if (mysqlfields[col]->length<16777216 &&
+				// MySQL 3/4 uses these lengths for tiny and
+				// blob datatypes.  Medium and long both use
+				// the same length but are distinguishable by
+				// their max_lengths of 11 and 9 respectively.
+				// No idea what the 11 and 9 actually mean.
+				// Text types are the same.
+				if (mysqlfields[col]->length<=255) {
+					return TINY_BLOB_DATATYPE;
+				} else if (mysqlfields[col]->length<=65535) {
+					return BLOB_DATATYPE;
+				} else if (mysqlfields[col]->length<=16777215 &&
 					mysqlfields[col]->max_length==11) {
-				return MEDIUM_BLOB_DATATYPE;
+					return MEDIUM_BLOB_DATATYPE;
+				} else {
+					return LONG_BLOB_DATATYPE;
+				}
 			#endif
-			} else {
-				return LONG_BLOB_DATATYPE;
-			}
 		case FIELD_TYPE_MEDIUM_BLOB:
 			return MEDIUM_BLOB_DATATYPE;
 		case FIELD_TYPE_LONG_BLOB:

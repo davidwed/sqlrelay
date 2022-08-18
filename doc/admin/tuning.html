@@ -435,50 +435,50 @@ finding it may dramatically improve that query's performance.</p>
 
 <a name="memoryusage""/><h2>Memory Usage</h2>
 
-<p>Many database API's allocate memory internally to store result sets.  However, Oracle, DB2, Informix, SAP/Sybase, FreeTDS, MySQL/MariaDB, Firebird and ODBC allow you to allocate buffers yourself and fetch result sets into these buffers.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each result set.  This improves performance at the cost of memory.  There are parameters for tuning the size of the result set buffer though.</p>
+<p>On the back end, SQL Relay uses a native database API to connect to the database, run queries, etc.  For example, to connect to Oracle, SQL Relay uses the Oracle OCI API.</p>
 
-<p>The size of the result set buffer is determined by 3 parameters:</p>
+<p>Some database API's allocate memory internally to buffer result sets.  How much memory, and exactly how it is used is hidden from the user.  However, the API's for Oracle, DB2, Informix, SAP/Sybase, FreeTDS, MySQL/MariaDB, Firebird and ODBC allow you to allocate a result set buffer yourself and fetch rows into it.  When using these databases, SQL Relay preallocates a result set buffer and re-uses it over and over rather than dynamically allocating memory for each row or field.  When tuned properly, this improves performance significantly, at the cost of memory.</p>
+
+<p>There are three connect string options that can be used to tune the size of the result set buffer:</p>
 
 <ul>
-  <li>The maximum number of columns in the result set.</li>
+  <li>maxselectlistsize - the maximum number of columns in the result set.</li>
   <ul>
     <li>Defaults to 256</li>
     <li>Setting to -1 causes buffers to be allocated dynamically</li>
   </ul>
 
-  <li>The maximum size of an individual non-LOB field.</li>
+  <li>maxitembuffersize - the maximum size of an individual non-LOB field.</li>
   <ul>
     <li>Defaults to 32768, the maximum size of a varchar and varbinary types</li>
   </ul>
 
-  <li>The number of rows of the result set to fetch at once.</li>
+  <li>fetchatonce - the number of rows of the result set to fetch at once.</li>
   <ul>
-    <li>Defaults to 10</li>
+    <li>Defaults to 10 (for databases that support it and 1 otherwise)</li>
   </ul>
 
 </ul>
 
-<p>The third parameter might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and SAP/Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.  This can improve performance significantly.</p>
+<p>The third option might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and SAP/Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.</p>
 
-<p>The default result set buffer size for Oracle, DB2, Informix, and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).  Informix, FreeTDS, MySQL/MariaDB, Firebird, and ODBC don't support multi-row fetches so its default buffer size is about 8mb (256*32768*1 bytes).</p>
+<p>The result set buffer size is determined (in bytes) by the formula: maxselectlistsize * maxitembuffersize * fetchatonce.</p>
 
-<p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.</p>
+<p>The default result set buffer size for Oracle, DB2, Informix, and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).</p>
 
-<p>For example, if you open 10 connections with 2 cursors each, then since each cursor will consume 80mb, each connection will consume about 160mb, and all 10 connections will consume about 1.6g.</p>
+<p>Informix, FreeTDS, MySQL/MariaDB, Firebird, and ODBC don't support multi-row fetches so the default buffer size when using those database is about 8mb (256 * 32768 * 1 bytes).</p>
 
-<p>If that seems like more memory than you'd like to allocate to SQL Relay then you can tune it down.</p>
+<p>It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.  For example, if you configure SQL Relay to open 5 connections with 2 cursors each, then if each cursor consumes 80mb, each connection will consume about 160mb, and all 5 connections will consume about 800mb.  If that seems like more memory than you'd like to allocate to SQL Relay then you can tune it down.</p>
 
-<p>For the best performance/memory-usage trade-off, the "maximum number of columns in the result set" should be set to the largest number of columns that a query run by your apps could return.  However, this parameter can also be set to -1, causing column buffers to be allocated dynamically for each result set.  This won't perform as well but will conserve memory.</p>
+<p>For the best performance/memory-usage trade-off, the maxselectlistsize option should be set to the largest number of columns that a query run by your apps could return.  However, this option can also be set to -1, causing column buffers to be allocated dynamically for each result set.  This won't perform as well but will conserve memory.</p>
 
-<p>The "maximum size of an individual non-LOB field" parameter should be set to the longest non-LOB field that your app could fetch.</p>
+<p>The maxitembuffersize option should be set to the longest non-LOB field that your app could fetch.</p>
 
-<p>There is no rule of thumb for the "number of rows of the result set to fetch at once" parameter.  More tends to be better, but not always.  You may have to tune this by trial and error.</p>
+<p>There is no rule of thumb for the fetchatonce option.  More tends to be better, but not always.  You may have to tune this by trial and error.</p>
 
-<p>For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce parameters of the string attribute of the connection tag in the configuration file may be set to control these values at run time.  For Informix, MySQL/MariaDB, Firebird, FreeTDS, and ODBC, the maxselectlistsize and maxitembuffersize parameters are available but the fetchatonce parameter is not.  When routing queries or sessions, only the fetchatonce parameter is available.</p>
+<p>For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce connect string options may be set to control these values at run time.  For Informix, MySQL/MariaDB, Firebird, FreeTDS, and ODBC, the maxselectlistsize and maxitembuffersize options are available but the fetchatonce option is not.  When routing queries or sessions, only the fetchatonce option is available.</p>
 
 <p>See the <a href="configreference.html">SQL Relay Configuration Reference</a> for details.</p>
-
-<p>Possibly more important than the parameters controlling the result set buffer size though, are the cursors and connections parameters as they are both multipliers.  See tips below for each.</p>
 
 <a name="howmanyconnections""/><h2>How Many Connections Should I Run?</h2>
 

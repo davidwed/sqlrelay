@@ -33,7 +33,7 @@
 
 		bool	announceAvailability(const char *connectionid);
 
-		void	registerForHandoff();
+		bool	registerForHandoff();
 		void	deRegisterForHandoff();
 
 		int32_t	waitForClient();
@@ -130,6 +130,23 @@
 		void	sessionStartQueries();
 		void	sessionEndQueries();
 		void	sessionQuery(const char *query);
+
+		void	getColumnsInTable(const char *table, 
+					linkedlist<char *> **columns,
+					const char **autoinccolumn,
+					const char **primarykeycolumn);
+		void	getColumnsFromInsertQuery(
+					const char *start,
+					const char *end,
+					linkedlist<char *> *columns);
+		void	getFirstValuesFromInsertQuery(
+					const char *start,
+					linkedlist<char *> *values,
+					bool *mutiinsert);
+		void	deriveColumnsFromInsertQuery(
+					linkedlist<char *> *values,
+					linkedlist<char *> *allcolumns,
+					linkedlist<char *> *columns);
 
 		static void     alarmHandler(int32_t signum);
 

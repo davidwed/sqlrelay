@@ -107,6 +107,7 @@
 		void	cacheOutputBinds(uint32_t count);
 		void	cacheInputOutputBinds(uint32_t count);
 		void	cacheData();
+		void	flushToCache();
 		void	finishCaching();
  
 		bool	fetchRowIntoBuffer(uint64_t row,

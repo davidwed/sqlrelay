@@ -31,6 +31,31 @@
 	reamed "translation" modules to "querytranslation" modules
 	updated configure script to support oracle 18c and 19c instantclient
 	refactored find-oracle-libs-at-runtime logic
+	added configure tests for python 3.10+
+	added configure test for ruby 3+
+	added -fdeclspec configure test for ruby with clang
+	fixed potential hangs and short-writes when handoff="proxy"
+	sqlr-stop uses SIGTERM rather than SIGINT to shut down processes now
+	servers use the rudiments process class shutdown flag framework now to
+		avoid calling non-async-signal-safe functions from within
+		signal handlers
+	mysql connection supports MariaDB 10.6's updated text/blob lengths
+	ODBC driver can set autocommit prior to connect now
+	ODBC driver supports SQLGetInfo for some more 3.8.0 options now
+	ODBC driver returns SUCCES_WITH_INFO if connect succeeds but
+		afterwards autocommit or select-db fail now
+	postgresql connection checks ncols and nrows in noRowsToReturn() now
+	fetchatonce=0 is the default for postgresql now, and single-stepping
+		is only used if fetchatonce=1
+	added singlestep directive to override postgresql fetchatonce option
+	added support for PDO in PHP 8.1
+	added affected rows to sqlrsh stats
+	NULL -> 0 in PostgreSQL function tests
+	added sqlrcrud class
+	applied patch from Kyle to use HH24 instead of HH in default
+		fakeinputbindvariablesdateformat string
+	removed sqlrresultsetdomnode class
+	de-consted some things
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

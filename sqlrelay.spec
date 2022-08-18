@@ -604,9 +604,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrclientincludes.h
 %{_includedir}/%{name}/private/sqlrconnection.h
 %{_includedir}/%{name}/private/sqlrcursor.h
-%{_includedir}/%{name}/sqlrresultsetdomnode.h
-%{_includedir}/%{name}/private/sqlrresultsetdomnode.h
-%{_includedir}/%{name}/private/sqlrresultsetdomnodeincludes.h
 %{_includedir}/%{name}/sqlrimport.h
 %{_includedir}/%{name}/sqlrimportcsv.h
 %{_includedir}/%{name}/sqlrimportxml.h
@@ -779,10 +776,11 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Apr 30 2021 David Muse <david.muse@firstworks.com> - 2.0.0-1
+* Fri Aug 12 2022 David Muse <david.muse@firstworks.com> - 2.0.0-1
 - Updated to version 2.0.0.
 - Removed support for mdbtools.
 - Updated to build python 3 packages for rhel > 6.
+- Removed sqlrresultsetdomnode.
 
 * Thu Mar 04 2021 David Muse <david.muse@firstworks.com> - 1.9.0-1
 - Updated to version 1.9.0.

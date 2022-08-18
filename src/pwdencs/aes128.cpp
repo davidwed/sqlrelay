@@ -13,8 +13,6 @@ class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 	private:
 		char	*convert(const char *value, bool dec);
 
-		const char	*debug;
-
 		sensitivevalue	keyvalue;
 		sensitivevalue	credvalue;
 
@@ -25,8 +23,6 @@ class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 
 sqlrpwenc_aes128::sqlrpwenc_aes128(domnode *parameters, bool debug) :
 						sqlrpwdenc(parameters,debug) {
-
-	debug=parameters->getAttributeValue("debug");
 
 	// get optional flags, paths, and extensions
 	const char	*keypath=parameters->getAttributeValue("keypath");

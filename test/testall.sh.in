@@ -39,58 +39,32 @@ sleep 2
 for DB in @TESTDBS@
 do
 
-	# for tls, krb, and extensions tests, verify that we support oracle
-	if ( test "$DB" = "tls" -o "$DB" = "krb" -o "$DB" = "extensions" )
+	# make sure that support for the appropriate database exists
+	MODULE=$DB
+	case "$DB" in
+		tls|krb|extensions)
+			MODULE=oracle
+			;;
+		mysql*)
+			MODULE=mysql
+			;;
+		postgresql*)
+			MODULE=postgresql
+			;;
+	esac
+	if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_$MODULE.* 2> /dev/null`" )
 	then
-		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_oracle.so 2> /dev/null`" )
-		then
-			echo "skipping $DB..."
-			echo
-			echo "================================================================================"
-			echo
-			continue
-		fi
-
-	# for the mysqlprotocol test, verify that we support the mysql database
-	elif ( test "$DB" = "mysqlprotocol" )
-	then
-		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_mysql.so 2> /dev/null`" )
-		then
-			echo "skipping $DB..."
-			echo
-			echo "================================================================================"
-			echo
-			continue
-		fi
-
-	# for the postgresqlprotocol test, verify that we support the postgresql database
-	elif ( test "$DB" = "postgresqlprotocol" )
-	then
-		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_postgresql.so 2> /dev/null`" )
-		then
-			echo "skipping $DB..."
-			echo
-			echo "================================================================================"
-			echo
-			continue
-		fi
-
-	# for other tests, verify that we support the database
-	else
-		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_$DB.so 2> /dev/null`" )
-		then
-			echo "skipping $DB..."
-			echo
-			echo "================================================================================"
-			echo
-			continue
-		fi
+		echo "skipping $DB..."
+		echo
+		echo "================================================================================"
+		echo
+		continue
 	fi
 
 	# for router tests, also verify that we support mysql
 	if ( test "$DB" = "router" )
 	then
-		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_mysql.so 2> /dev/null`" )
+		if ( test -z "`ls $PREFIX/lib*/sqlrelay/sqlrconnection_mysql.* 2> /dev/null`" )
 		then
 			echo "skipping $DB..."
 			echo

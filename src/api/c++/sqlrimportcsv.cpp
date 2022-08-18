@@ -24,6 +24,7 @@ sqlrimportcsv::sqlrimportcsv() : sqlrimport(), csvsax() {
 	datecolumn=NULL;
 	foundfieldtext=false;
 	fieldcount=0;
+	emptyrow=true;
 	rowcount=0;
 	committedcount=0;
 	columnswithemptynamesnode=NULL;
@@ -175,6 +176,12 @@ bool sqlrimportcsv::headerEnd() {
 
 	// we need to figure out which columns are numbers or dates...
 
+	// bail if there were no columns
+	// (eg. if the csv file was completely empty)
+	if (!columns.getLength()) {
+		return true;
+	}
+
 	// get info about these columns from the database
 	query.clear();
 	query.append("select ");
@@ -268,6 +275,7 @@ bool sqlrimportcsv::rowStart() {
 	currenttablecol=0;
 	currentcol=0;
 	fieldcount=0;
+	emptyrow=true;
 	columnswithemptynamesnode=columnswithemptynames.getFirst();
 
 	return true;
@@ -277,14 +285,12 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 
 	// if we're manually adding the primary key, and this is the primary
 	// key position, then add it
+	// (don't count this when determining if a row was empty or not)
 	if (insertprimarykey && currentcol==primarykeycolumnindex) {
 		if (primarykeysequence) {
 			stringbuffer	tmp;
-			tmp.append("nextval('");
-			tmp.append(primarykeysequence);
-			tmp.append("')");
-			fields[fields.getLength()]=
-					tmp.detachString();
+			tmp.printf(sqlrcon->nextvalFormat(),primarykeysequence);
+			fields[fields.getLength()]=tmp.detachString();
 		} else {
 			fields[fields.getLength()]=
 					charstring::duplicate("null");
@@ -297,6 +303,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 	}
 
 	// if there are any static columns...
+	// (don't count these when determining if a row was empty or not)
 	if (staticvaluecolumnnames.getLength()) {
 
 		// loop, handling them
@@ -337,6 +344,19 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 
 	// if we should include this field...
 	if (includefield) {
+
+		// if this value has a mapping, then get that
+		const char	*v=fieldmap.getValue(value);
+		if (v) {
+			value=v;
+		}
+
+		// check for a non-empty field
+		// (do this AFTER remapping the field in case some set
+		// of values get mapped to empty strings or NULLs)
+		if (emptyrow && !charstring::isNullOrEmpty(value)) {
+			emptyrow=false;
+		}
 
 		// append the field
 		stringbuffer	tmp;
@@ -437,6 +457,11 @@ void sqlrimportcsv::appendField(stringbuffer *query,
 }
 
 bool sqlrimportcsv::rowEnd() {
+
+	// ignore empty rows, if we're configured to do so
+	if (ignoreemptyrows && emptyrow) {
+		return true;
+	}
 
 	// build query
 	query.clear();

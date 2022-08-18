@@ -47,6 +47,8 @@ PERLPREFIX=""
 PERLVERSION=""
 PYTHONPREFIX=""
 PYTHONVERSION=""
+PYTHONMAJOR=""
+PYTHONMINOR=""
 RUBYPREFIX=""
 RUBYVERSION=""
 JAVAPREFIX=""
@@ -691,12 +693,22 @@ if PYTHONPREFIX<>"" and PYTHONVERSION="" then
 	findVersion PYTHONPREFIX & "\libs","python",".lib",PYTHONVERSION
 end if
 
-if PYTHONVERSION<30 then
+PYTHONMAJOR=mid(PYTHONVERSION,1,1)
+PYTHONMINOR=mid(PYTHONVERSION,2)
+
+if PYTHONMAJOR=2 then
 	IMPORTEXCEPTIONS="import exceptions"
 	EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
 else
 	IMPORTEXCEPTIONS=""
 	EXCEPTIONSSTANDARDERROR="Exception"
+end if
+
+SQLRELAY_NEED_PY_SSIZE_T_CLEAN="/* #undef SQLRELAY_NEED_PY_SSIZE_T_CLEAN */"
+if PYTHONMAJOR>=3 then
+	if PYTHONMAJOR>3 or PYTHONMINOR>=10 then
+		SQLRELAY_NEED_PY_SSIZE_T_CLEAN="#define SQLRELAY_NEED_PY_SSIZE_T_CLEAN 1"
+	end if
 end if
 
 if disablepython=false then
@@ -947,11 +959,11 @@ if disableoracle=false then
 end if
 if disablemysql=false then
 	MYSQLBUILD="yes    "
-	TESTDBS=TESTDBs&"""mysql"","
+	TESTDBS=TESTDBs&"""mysql"",""mysqlupsert"","
 end if
 if disablepostgresql=false then
 	POSTGRESQLBUILD="yes    "
-	TESTDBS=TESTDBs&"""postgresql"","
+	TESTDBS=TESTDBs&"""postgresql"",""postgresqlupsert"","
 end if
 if disablesap=false then
 	SYBASEBUILD="yes    "
@@ -1001,7 +1013,26 @@ infiles=Array(_
 	"sqlrelay-c++.pc.in",_
 	"msvc\\setupx64\\setupx64.vdproj.in",_
 	"msvc\\setupx86\\setupx86.vdproj.in",_
-	"test\\sqlrelay.conf.in"_
+	"test\\sqlrelay.conf.d\\db2.conf.in",_
+	"test\\sqlrelay.conf.d\\extensions.conf.in",_
+	"test\\sqlrelay.conf.d\\firebird.conf.in",_
+	"test\\sqlrelay.conf.d\\freetds.conf.in",_
+	"test\\sqlrelay.conf.d\\informix.conf.in",_
+	"test\\sqlrelay.conf.d\\mssql.conf.in",_
+	"test\\sqlrelay.conf.d\\mysql.conf.in",_
+	"test\\sqlrelay.conf.d\\mysqlprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\mysqlupsert.conf.in",_
+	"test\\sqlrelay.conf.d\\oracle.conf.in",_
+	"test\\sqlrelay.conf.d\\oracleprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresql.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresqlprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresqlupsert.conf.in",_
+	"test\\sqlrelay.conf.d\\router.conf.in",_
+	"test\\sqlrelay.conf.d\\sap.conf.in",_
+	"test\\sqlrelay.conf.d\\sqlite.conf.in",_
+	"test\\sqlrelay.conf.d\\tdsprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\teradataprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\tls.conf.in"_
 	)
 outfiles=Array(_
 	"config.mk",_
@@ -1016,7 +1047,26 @@ outfiles=Array(_
 	"sqlrelay-c++.pc",_
 	"msvc\\setupx64\\setupx64.vdproj",_
 	"msvc\\setupx86\\setupx86.vdproj",_
-	"test\\sqlrelay.conf"_
+	"test\\sqlrelay.conf.d\\db2.conf.in",_
+	"test\\sqlrelay.conf.d\\extensions.conf.in",_
+	"test\\sqlrelay.conf.d\\firebird.conf.in",_
+	"test\\sqlrelay.conf.d\\freetds.conf.in",_
+	"test\\sqlrelay.conf.d\\informix.conf.in",_
+	"test\\sqlrelay.conf.d\\mssql.conf.in",_
+	"test\\sqlrelay.conf.d\\mysql.conf.in",_
+	"test\\sqlrelay.conf.d\\mysqlprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\mysqlupsert.conf.in",_
+	"test\\sqlrelay.conf.d\\oracle.conf.in",_
+	"test\\sqlrelay.conf.d\\oracleprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresql.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresqlprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\postgresqlupsert.conf.in",_
+	"test\\sqlrelay.conf.d\\router.conf.in",_
+	"test\\sqlrelay.conf.d\\sap.conf.in",_
+	"test\\sqlrelay.conf.d\\sqlite.conf.in",_
+	"test\\sqlrelay.conf.d\\tdsprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\teradataprotocol.conf.in",_
+	"test\\sqlrelay.conf.d\\tls.conf.in"_
 	)
 
 
@@ -1078,6 +1128,7 @@ for i=lbound(infiles) to ubound(infiles)
 	content=replace(content,"@PYTHONVERSION@",PYTHONVERSION,1,-1,0)
 	content=replace(content,"@IMPORTEXCEPTIONS@",IMPORTEXCEPTIONS,1,-1,0)
 	content=replace(content,"@EXCEPTIONSSTANDARDERROR@",EXCEPTIONSSTANDARDERROR,1,-1,0)
+	content=replace(content,"@SQLRELAY_NEED_PY_SSIZE_T_CLEAN@",SQLRELAY_NEED_PY_SSIZE_T_CLEAN,1,-1,0)
 
 	' ruby
 	content=replace(content,"@RUBYPREFIX@",RUBYPREFIX,1,-1,0)

@@ -93,6 +93,16 @@ int	main(int argc, char **argv) {
 	checkSuccess(con->ping(),1);
 	stdoutput.printf("\n");
 
+	// bind format
+	stdoutput.printf("BIND FORMAT: \n");
+	checkSuccess(con->bindFormat(),"$1");
+	stdoutput.printf("\n");
+
+	// nextval format
+	stdoutput.printf("NEXTVAL FORMAT: \n");
+	checkSuccess(con->nextvalFormat(),"nextval('%s')");
+	stdoutput.printf("\n");
+
 	// drop existing table
 	cur->sendQuery("drop table testtable");
 

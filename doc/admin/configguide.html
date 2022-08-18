@@ -166,6 +166,7 @@
   <li><a href="#directives">Query Directives</a></li>
   <ul>
     <li><a href="#custom_wf">custom_wf</a></li>
+    <li><a href="#singlestep">singlestep</a></li>
   </ul>
 
   <li><a href="#queryrouting">Query Routing</a></li>
@@ -6106,12 +6107,33 @@ http://www.gnu.org/software/src-highlite -->
 
 <ul>
   <li><b>custom_wf</b></li>
+  <li><b>singlestep</b></li>
 </ul>
 
 <p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
 
 <br/><a name="custom_wf"/><h2>custom_wf</h2>
 
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;directives&gt;</font></b>
+                        <b><font color="#0000FF">&lt;directive</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"custom_wf"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/directives&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
 <p>The <b>custom_wf</b> module examines the comments preceeding the query and looks for one or more of the following directives:</p>
 
 <ul>
@@ -6170,6 +6192,71 @@ select <font color="#990000">*</font> from exampletable
 
 <p>Note that (currently) the only database backend that supports query timeouts is ODBC.  It is known to work with the MS SQL Server driver, though it likely works with some other ODBC drivers as well.</p>
 
+<br/><a name="singlestep"/><h2>singlestep</h2>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+
+	<b><font color="#0000FF">&lt;instance</font></b> ...<b><font color="#0000FF">&gt;</font></b>
+		...
+		<b><font color="#0000FF">&lt;directives&gt;</font></b>
+                        <b><font color="#0000FF">&lt;directive</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"singlestep"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/directives&gt;</font></b>
+		...
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>The <b>singlestep</b> module only works when using a PostgreSQL database.  Attempts to use it with a different database will have no effect.</p>
+
+<p>When using a PostgreSQL database, the connect string option fetchatonce can be set to 0 or 1.  When set to 0, the SQL Relay server fetches and buffers all rows of the result set from the database before returning any to the SQL Relay client. When set to 1, the SQL Relay server "single-steps" through the rows of the result set, fetching one row at a time from the database, and sending each row back to the SQL Relay client as it is fetched.</p>
+
+<p>Using fetchatonce=0 can cause the SQL Relay serve to consume large amounts of memory when a query returns a large number of rows.  On the other hand, when using fetchatonce=1, due to the quirky way that PostgreSQL implements fetching one row at a time, if you run a set of nested queries, rows will be truncated in the outer query, if the client uses a non-zero result set buffer size.  See <a href="../faq.html#postgresqlfetchatonce">the faq</a> for more details.</p>
+
+<p>The <b>singlestep</b> module allows you to configure the instance one way, but override that configuration on a query-by-query basis.</p>
+
+<p>The module examines the comments preceeding the query and looks for one or more of the following directives:</p>
+
+<ul>
+  <li>singlestep=on</li>
+  <li>singlestep=off</li>
+</ul>
+
+<br/><h3>singlestep=on</h3>
+
+<p>If the singlestep=on directive is used, the SQL Relay Server "single-steps" through the rows of the result set of the associated query, fetching one row at a time from the database and sending each row back to the SQL Reay client as it is fetched.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">--</font> singlestep<font color="#990000">=</font>on
+select <font color="#990000">*</font> from largetable
+</tt></pre>
+
+</blockquote>
+<br/><h3>singlestep=off</h3>
+
+<p>If singlestep=off is set, then the SQL Relay Server will fetch and buffer all rows of the result set of the associated query before returning any to the SQL Relay client.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><font color="#990000">--</font> singlestep<font color="#990000">=</font>off
+select <font color="#990000">*</font> from smalltable
+</tt></pre>
+
+</blockquote>
 <hr/>
 
 <br/><a name="queryrouting"/><h1>Query Routing</h1>

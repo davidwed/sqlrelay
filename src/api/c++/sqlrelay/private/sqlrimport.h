@@ -20,3 +20,4 @@
 		bool		lowercasecolumnnames;
 		bool		uppercasecolumnnames;
 		dictionary<const char *, const char *>	columnmap;
+		dictionary<const char *, const char *>	fieldmap;

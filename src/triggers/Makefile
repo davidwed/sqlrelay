@@ -10,7 +10,8 @@ include ../../config.mk
 .cpp.obj:
 	$(LTCOMPILE) $(CXX) $(CXXFLAGS) $(WERROR) $(PLUGINCPPFLAGS) $(COMPILE) $<
 
-all: $(SQLR)trigger_replay.$(LIBEXT)
+all: $(SQLR)trigger_replay.$(LIBEXT) \
+	$(SQLR)trigger_upsert.$(LIBEXT)
 
 clean:
 	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
@@ -19,11 +20,15 @@ clean:
 $(SQLR)trigger_replay.$(LIBEXT): replay.cpp replay.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ replay.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
+$(SQLR)trigger_upsert.$(LIBEXT): upsert.cpp upsert.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ upsert.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
 install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)trigger_replay.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)trigger_upsert.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
@@ -33,7 +38,12 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)trigger_replay.a
 	$(RM) $(libexecdir)/$(SQLR)trigger_replay.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)trigger_replay.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)trigger_upsert.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)trigger_upsert.a
+	$(RM) $(libexecdir)/$(SQLR)trigger_upsert.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)trigger_upsert.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/$(SQLR)trigger_replay.*
 	$(RM) $(libexecdir)/$(SQLR)trigger_deadlock_replay.*
+	$(RM) $(libexecdir)/$(SQLR)trigger_upsert.*

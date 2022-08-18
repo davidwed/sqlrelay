@@ -24,6 +24,7 @@
 		bool		*datecolumn;
 		bool		foundfieldtext;
 		uint32_t	fieldcount;
+		bool		emptyrow;
 		uint64_t	rowcount;
 		uint64_t	committedcount;
 

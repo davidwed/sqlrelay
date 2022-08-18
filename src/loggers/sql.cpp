@@ -25,9 +25,6 @@ class SQLRSERVER_DLLSPEC sqlrlogger_sql : public sqlrlogger {
 	private:
 		char		*querylogname;
 		file		querylog;
-		uint64_t	sec;
-		uint64_t	usec;
-		uint64_t	totalusec;
 		bool		enabled;
 		pid_t		pid;
 };

@@ -72,6 +72,14 @@ void sqlrimport::upperCaseColumnNames() {
 	uppercasecolumnnames=true;
 }
 
+void sqlrimport::mapFieldValue(const char *from, const char *to) {
+	if (!to) {
+		fieldmap.remove(from);
+	} else {
+		fieldmap.setValue(from,to);
+	}
+}
+
 void sqlrimport::setCommitCount(uint64_t commitcount) {
 	this->commitcount=commitcount;
 }

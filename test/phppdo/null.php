@@ -19,9 +19,6 @@
 	$user="test";
 	$password="test";
 	$dsn = "sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=0";
-	#$user="testuser";
-	#$password="testpassword";
-	#$dsn = "mysql:host=db64;port=3306;dbname=testdb";
 
 
 	# instantiation
@@ -31,7 +28,10 @@
 	}
 
 	# drop existing table
-	$dbh->exec("drop table testtable");
+	try {
+		$dbh->exec("drop table testtable");
+	} catch (Exception $e) {
+	}
 
 	echo("CREATE TEMPTABLE: \n");
 	$dbh->exec("create table testtable (testint int, testfloat float, testchar varchar(20), testblob blob, testdate datetime)");
@@ -40,7 +40,7 @@
 	echo("INSERT: \n");
 	checkSuccess($dbh->exec("insert into testtable values (NULL,NULL,NULL,NULL,NULL)"),1);
 	checkSuccess($dbh->exec("insert into testtable values (1,1.1,'1','1','2001-01-01')"),1);
-	checkSuccess($dbh->exec("insert into testtable values (0,0.0,'0','0','0000-00-00 00:00:00')"),1);
+	checkSuccess($dbh->exec("insert into testtable values (0,0.0,'0','0','0000-01-01 00:00:00')"),1);
 	echo("\n");
 
 	echo("FIELDS BY INDEX (as NULL): \n");
@@ -68,7 +68,7 @@ echo("\n");
 	checkSuccess($result[1],0.0);
 	checkSuccess($result[2],"0");
 	checkSuccess(stream_get_contents($result[3]),"0");
-	checkSuccess($result[4],"0000-00-00 00:00:00");
+	checkSuccess($result[4],"0000-01-01 00:00:00");
 echo("\n");
 print_r($result);
 echo("\n");
@@ -130,6 +130,9 @@ echo("\n");
 	checkSuccess($result[1],null);
 	echo("\n");
 
-	$dbh->exec("drop table testtable");
+	try {
+		$dbh->exec("drop table testtable");
+	} catch (Exception $e) {
+	}
 
 ?></pre></html>

@@ -304,6 +304,10 @@ class sqlrservercontrollerprivate {
 	char	*_db;
 	char	*_schema;
 	char	*_object;
+
+	dictionary<char *,linkedlist<char *> *>	_colcache;
+	dictionary<char *,const char *>		_autoinccolcache;
+	dictionary<char *,const char *>		_primarykeycolcache;
 };
 
 static signalhandler		alarmhandler;
@@ -462,6 +466,9 @@ sqlrservercontroller::sqlrservercontroller() {
 	pvt->_db=NULL;
 	pvt->_schema=NULL;
 	pvt->_object=NULL;
+
+	pvt->_colcache.setManageArrayKeys(true);
+	pvt->_colcache.setManageValues(true);
 }
 
 sqlrservercontroller::~sqlrservercontroller() {
@@ -685,6 +692,9 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (reloginatstart) {
 		while (!attemptLogIn(false)) {
 			snooze::macrosnooze(5);
+			if (process::getShutDownFlag()) {
+				return false;
+			}
 		}
 	}
 	initConnStats();
@@ -988,6 +998,10 @@ bool sqlrservercontroller::handlePidFile() {
 	bool	retval=true;
 	bool	found=false;
 	for (uint16_t i=0; !found && i<listenertimeout; i++) {
+		if (process::getShutDownFlag()) {
+			retval=false;
+			break;
+		}
 		if (i) {
 			snooze::microsnooze(0,100000);
 		}
@@ -1415,15 +1429,23 @@ bool sqlrservercontroller::listen() {
 
 	for (;;) {
 
+		if (process::getShutDownFlag()) {
+			return true;
+		}
+
 		waitForAvailableDatabase();
 		initSession();
 		if (!announceAvailability(pvt->_connectionid)) {
-			return true;
+			return false;
 		}
 
 		// loop to handle suspended sessions
 		bool	loopback=false;
 		for (;;) {
+
+			if (process::getShutDownFlag()) {
+				return false;
+			}
 
 			int	success=waitForClient();
 
@@ -1553,6 +1575,11 @@ void sqlrservercontroller::reLogIn() {
 	closeCursors(false);
 	logOut();
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			delete[] currentdb;
+			return;
+		}
 			
 		raiseDebugMessageEvent("trying...");
 
@@ -1613,7 +1640,9 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	// connect to listener if we haven't already
 	// and pass it this process's pid
 	if (!pvt->_connected) {
-		registerForHandoff();
+		if (!registerForHandoff()) {
+			return false;
+		}
 	}
 
 	// save the original ttl
@@ -1700,7 +1729,7 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	return success;
 }
 
-void sqlrservercontroller::registerForHandoff() {
+bool sqlrservercontroller::registerForHandoff() {
 
 	raiseDebugMessageEvent("registering for handoff...");
 
@@ -1720,6 +1749,10 @@ void sqlrservercontroller::registerForHandoff() {
 	// try again.
 	pvt->_connected=false;
 	for (;;) {
+
+		if (process::getShutDownFlag()) {
+			break;
+		}
 
 		raiseDebugMessageEvent("trying...");
 
@@ -1741,6 +1774,8 @@ void sqlrservercontroller::registerForHandoff() {
 	raiseDebugMessageEvent("done registering for handoff");
 
 	delete[] handoffsockname;
+
+	return pvt->_connected;
 }
 
 void sqlrservercontroller::deRegisterForHandoff() {
@@ -2445,6 +2480,16 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	if (pvt->_sqlrmd) {
 		pvt->_sqlrmd->endTransaction(commit);
 	}
+
+	// clear column caches
+	for (listnode<char *> *colcachenode=
+			pvt->_colcache.getKeys()->getFirst();
+			colcachenode; colcachenode=colcachenode->getNext()) {
+		pvt->_colcache.getValue(colcachenode->getValue())->clear();
+	}
+	pvt->_colcache.clear();
+	pvt->_autoinccolcache.clear();
+	pvt->_primarykeycolcache.clear();
 
 	// clear per-session pool
 	pvt->_txpool.clear();
@@ -3479,6 +3524,410 @@ void sqlrservercontroller::splitObjectName(const char *currentdb,
 	*db=pvt->_db;
 	*schema=pvt->_schema;
 	*object=pvt->_object;
+}
+
+bool sqlrservercontroller::parseInsert(const char *query,
+					uint32_t querylen,
+					sqlrquerytype_t *querytype,
+					char **table,
+					linkedlist<char *> **columns,
+					linkedlist<char *> **allcolumns,
+					const char **autoinccolumn,
+					bool *columnsincludeautoinccolumn,
+					const char **primarykeycolumn,
+					bool *columnsincludeprimarykeycolumn,
+					linkedlist<char *> **values,
+					const char **rawvalues) {
+
+	// init return values
+	if (querytype) {
+		*querytype=SQLRQUERYTYPE_ETC;
+	}
+	if (table) {
+		*table=NULL;
+	}
+	if (columns) {
+		*columns=NULL;
+	}
+	if (allcolumns) {
+		*allcolumns=NULL;
+	}
+	if (autoinccolumn) {
+		*autoinccolumn=NULL;
+	}
+	if (columnsincludeautoinccolumn) {
+		*columnsincludeautoinccolumn=false;
+	}
+	if (values) {
+		*values=NULL;
+	}
+	if (rawvalues) {
+		*rawvalues=NULL;
+	}
+
+	// init query type
+	sqlrquerytype_t	localquerytype=SQLRQUERYTYPE_ETC;
+
+	// get the start and end of the query
+	const char	*start=skipWhitespaceAndComments(query);
+	const char	*end=query+querylen;
+
+	// FIXME: assumes normalized query...
+
+	if (querylen>12 && !charstring::compare(start,"insert into ",12)) {
+
+		// if it was an insert...
+
+		// initialize the query type to plain insert, if it turns out
+		// to be a multi-insert or insert-select then we'll determine
+		// that later and update this accordingly
+		localquerytype=SQLRQUERYTYPE_INSERT;
+
+		// skip past "insert into "
+		start+=12;
+
+		// find first space after table name
+		// FIXME: the table name could be quoted and contain a space
+		const char	*ptr=charstring::findFirst(start,' ');
+		if (ptr>=end) {
+			return false;
+		}
+
+		// get table name and strip any quoting
+		char	*localtable=charstring::duplicate(start,ptr-start);
+		charstring::stripSet(localtable,"\"'`[]");
+
+		// skip ahead to whatever is past the table name,
+		// which should be one of:
+		// * the "(" before the list of columns
+		// * the word "values"
+		// * the word "select"
+		ptr++;
+		if (ptr>=end) {
+			return false;
+		}
+
+		// get the full list of columns that are in the table,
+		// as well as any auto_increment and primarky key columns
+		linkedlist<char *>	*localallcolumns;
+		const char		*localautoinccolumn;
+		const char		*localprimarykeycolumn;
+		getColumnsInTable(localtable,&localallcolumns,
+						&localautoinccolumn,
+						&localprimarykeycolumn);
+
+		// create the list of columns to return
+		linkedlist<char *>	*localcolumns=new linkedlist<char *>();
+		localcolumns->setManageArrayValues(true);
+
+		// if we found the "(" before a list of columns,
+		// then parse the list of columns directly
+		if (*ptr=='(') {
+			ptr++;
+			const char	*colsend=
+					charstring::findFirst(ptr,')')+2;
+			getColumnsFromInsertQuery(ptr,colsend,localcolumns);
+			ptr=colsend;
+		}
+		if (ptr>=end) {
+			return false;
+		}
+		
+		// look for the "values (" keyword
+		// FIXME: the below is kind-of a kludge...
+		// sometimes queries are written:
+		//	insert into blah values(...);
+		// with no space after "values", and the normalize translation
+		// doesn't fix this (though it ought to)
+		const char	*localrawvalues=NULL;
+		if (end>ptr+7) {
+			localrawvalues=charstring::findFirst(ptr,"values(");
+		}
+		if (localrawvalues) {
+			localrawvalues+=7;
+		} else if (end>ptr+8) {
+			localrawvalues=charstring::findFirst(ptr,"values (");
+			if (localrawvalues) {
+				localrawvalues+=8;
+			}
+		}
+
+		if (localrawvalues) {
+
+			// if we found the "values (" keyword then this is
+			// either a plain insert or multi-insert...
+
+			// split the (first set of) values here
+			linkedlist<char *>	*localvalues=
+						new linkedlist<char *>();
+			localvalues->setManageArrayValues(true);
+			bool			multiinsert;
+			getFirstValuesFromInsertQuery(localrawvalues,
+						localvalues,&multiinsert);
+
+			// if there were multiple sets of values
+			// then this query is a multi-insert
+			if (multiinsert) {
+				localquerytype=SQLRQUERYTYPE_MULTIINSERT;
+			}
+
+			// if the query didn't contain a list of columns,
+			// then derive the columns from the number of values
+			// and the columns from allcolumns...
+			if (!localcolumns->getLength()) {
+				deriveColumnsFromInsertQuery(
+							localvalues,
+							localallcolumns,
+							localcolumns);
+			}
+
+			// determine if the list of columns contains the
+			// autoincrement or primary key columns
+			bool	localcolsincludeautoinccol=true;
+			bool	localcolsincludeprimarykeycol=true;
+			for (listnode<char *> *node=localcolumns->getFirst();
+						node; node=node->getNext()) {
+				const char	*col=node->getValue();
+				if (!charstring::compare(col,
+						localautoinccolumn)) {
+					localcolsincludeautoinccol=true;
+				}
+				if (!charstring::compare(col,
+						localprimarykeycolumn)) {
+					localcolsincludeprimarykeycol=true;
+				}
+			}
+
+			// copy values out
+			if (values) {
+				*values=localvalues;
+			}
+			if (rawvalues) {
+				*rawvalues=localrawvalues;
+			}
+			if (columnsincludeautoinccolumn) {
+				*columnsincludeautoinccolumn=
+					localcolsincludeautoinccol;
+			}
+			if (columnsincludeprimarykeycolumn) {
+				*columnsincludeprimarykeycolumn=
+					localcolsincludeprimarykeycol;
+			}
+
+		} else {
+
+			// if we didn't find the "values (" keyword then
+			// this must be some kind of insert ... select
+			localquerytype=SQLRQUERYTYPE_INSERTSELECT;
+		}
+
+		// copy values out
+		if (table) {
+			*table=localtable;
+		} else {
+			delete[] localtable;
+		}
+		if (columns) {
+			*columns=localcolumns;
+		}
+		if (allcolumns) {
+			*allcolumns=localallcolumns;
+		}
+		if (autoinccolumn) {
+			*autoinccolumn=localautoinccolumn;
+		}
+		if (primarykeycolumn) {
+			*primarykeycolumn=localprimarykeycolumn;
+		}
+
+	} else if (querylen>7 && !charstring::compare(start,"select ",7)) {
+
+		// if it was a select...
+
+		localquerytype=SQLRQUERYTYPE_SELECT;
+
+		// FIXME: detect select-into
+	}
+
+	// copy values out
+	if (querytype) {
+		*querytype=localquerytype;
+	}
+
+	return true;
+}
+
+void sqlrservercontroller::getColumnsInTable(const char *table, 
+					linkedlist<char *> **columns,
+					const char **autoinccolumn,
+					const char **primarykeycolumn) {
+
+	// attempt to get the columns from various caches
+	*columns=pvt->_colcache.getValue((char *)table);
+	*autoinccolumn=pvt->_autoinccolcache.getValue((char *)table);
+	*primarykeycolumn=pvt->_primarykeycolcache.getValue((char *)table);
+	if (*columns) {
+		return;
+	}
+
+	// failing that, look them up in the database (and cache them)...
+
+	// create a new linkedlist to store the columns for this table
+	*columns=new linkedlist<char *>();
+	(*columns)->setManageArrayValues(true);
+
+	// get all of the columns in the table
+	sqlrservercursor        *gclcur=newCursor();
+	if (open(gclcur)) {
+
+		bool	retval=false;
+		if (getListsByApiCalls()) {
+			retval=getColumnList(gclcur,table,NULL);
+		} else {
+			const char	*q=
+				getColumnListQuery(table,false);
+			// FIXME: clean up buffers to avoid SQL injection
+			// FIXME: bounds checking
+			char	*querybuffer=getQueryBuffer(gclcur);
+			charstring::printf(querybuffer,
+					getConfig()->getMaxQuerySize()+1,
+					q,table);
+			setQueryLength(gclcur,
+					charstring::length(querybuffer));
+			retval=prepareQuery(gclcur,
+					getQueryBuffer(gclcur),
+					getQueryLength(gclcur),
+					false,false,false) &&
+				executeQuery(gclcur,
+					false,false,false,false);
+		}
+		if (retval) {
+
+			setColumnListColumnMap(SQLRSERVERLISTFORMAT_MYSQL);
+
+			bool    error;
+			while (fetchRow(gclcur,&error)) {
+
+				const char	*column;
+				const char	*columnkey;
+				const char	*extra;
+				uint64_t	fieldlength;
+				bool		blob;
+				bool		null;
+				getField(gclcur,0,&column,
+						&fieldlength,&blob,&null);
+				getField(gclcur,6,&columnkey,
+						&fieldlength,&blob,&null);
+				getField(gclcur,8,&extra,
+						&fieldlength,&blob,&null);
+
+				char	*dup=charstring::duplicate(column);
+				(*columns)->append(dup);
+				if (charstring::contains(columnkey,
+							"PRI")) {
+					*primarykeycolumn=dup;
+				}
+				if (charstring::contains(extra,
+							"auto_increment")) {
+					*autoinccolumn=dup;
+				}
+
+				// FIXME: kludgy
+				nextRow(gclcur);
+			}
+		}
+	}
+	closeResultSet(gclcur);
+	close(gclcur);
+	deleteCursor(gclcur);
+
+	// cache table -> columns/autoinccolumns mappings
+	char	*tablecopy=charstring::duplicate(table);
+	pvt->_colcache.setValue(tablecopy,*columns);
+	pvt->_autoinccolcache.setValue(tablecopy,*autoinccolumn);
+	pvt->_primarykeycolcache.setValue(tablecopy,*primarykeycolumn);
+}
+
+void sqlrservercontroller::getColumnsFromInsertQuery(
+					const char *start,
+					const char *end,
+					linkedlist<char *> *columns) {
+	// split the provided set of comma-separated columns
+	char		**cols=NULL;
+	uint64_t	colcount=0;
+	charstring::split(start,end-start,",",true,&cols,&colcount);
+	columns->listcollection<char *>::append(cols,colcount);
+}
+
+void sqlrservercontroller::getFirstValuesFromInsertQuery(
+						const char *start,
+						linkedlist<char *> *values,
+						bool *multiinsert) {
+	const char	*c=start;
+	char		prevc='\0';
+	bool		inquotes=false;
+	uint32_t	parens=0;
+	const char	*startofvalue=c;
+	for (;;) {
+
+		// end-of-values condition
+		if (!inquotes && !parens && *c==')') {
+			// copy out the last value
+			values->append(charstring::duplicate(
+							startofvalue,
+							c-startofvalue));
+
+			// if there's a comma after the closing
+			// paren, then this is a multi-insert
+			c++;
+			*multiinsert=(*c==',');
+			return;
+		}
+
+		// handle quotes...
+		if (!inquotes && *c=='\'') {
+			inquotes=true;
+		} else if (inquotes && *c=='\'' && prevc!='\\') {
+			inquotes=false;
+		}
+
+		if (!inquotes) {
+
+			// handle parentheses...
+			if (*c=='(') {
+				parens++;
+			} else if (parens && *c==')') {
+				parens--;
+			} else {
+				// copy out the value if we found a comma
+				if (*c==',') {
+					values->append(charstring::duplicate(
+							startofvalue,
+							c-startofvalue));
+					startofvalue=c+1;
+				}
+			}
+		}
+
+		// keep going
+		prevc=*c;
+		c++;
+	}
+}
+
+void sqlrservercontroller::deriveColumnsFromInsertQuery(
+					linkedlist<char *> *values,
+					linkedlist<char *> *allcolumns,
+					linkedlist<char *> *columns) {
+	// step through the values, populating columns
+	// with the corresponding column from allcolumns
+	listnode<char *>	*vnode=values->getFirst();
+	listnode<char *>	*acnode=allcolumns->getFirst();
+	while (vnode){
+		columns->append(charstring::duplicate(acnode->getValue()));
+		vnode=vnode->getNext();
+		acnode=acnode->getNext();
+	}
 }
 
 bool sqlrservercontroller::isBitType(const char *type) {
@@ -5619,8 +6068,9 @@ void sqlrservercontroller::buildColumnMaps() {
 	// MySQL getColumnList:
 	//
 // FIXME: fudged...
-// The postgresql connection returns additional rows.
-// All connection modules should return the same as postgresql.
+// The postgresql connection returns additional columns.
+// Really, all connection modules should return the same as postgresql,
+// but they currently return the same as mysql.
 if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// column_name
 	pvt->_mysqlcolumnscolumnmap.setValue(0,3);
@@ -5710,8 +6160,9 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// ODBC getColumnList:
 	//
 // FIXME: fudged...
-// The postgresql connection returns additional rows.
-// All connection modules should return the same as postgresql.
+// The postgresql connection returns additional columns.
+// Really, all connection modules should return the same as postgresql,
+// but they currently return the same as mysql.
 if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// TABLE_CAT
 	pvt->_odbccolumnscolumnmap.setValue(0,0);
@@ -5850,8 +6301,9 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// JDBC getColumnList:
 	//
 // FIXME: fudged
-// The postgresql connection returns additional rows.
-// All connection modules should return the same as postgresql.
+// The postgresql connection returns additional columns.
+// Really, all connection modules should return the same as postgresql,
+// but they currently return the same as mysql.
 if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	// TABLE_CAT
 	pvt->_jdbccolumnscolumnmap.setValue(0,0);
@@ -6370,8 +6822,8 @@ void sqlrservercontroller::dropTempTables(sqlrservercursor *cursor) {
 
 	// run through the temp table list, dropping tables
 	for (listnode< char * >
-				*sln=pvt->_sessiontemptablesfordrop.getFirst();
-				sln; sln=sln->getNext()) {
+			*sln=pvt->_sessiontemptablesfordrop.getFirst();
+			sln; sln=sln->getNext()) {
 
 		// some databases (oracle) require us to truncate the
 		// table before it can be dropped
@@ -6454,7 +6906,7 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 	// specific tables...
 	for (listnode< char * >
 			*sln=pvt->_globaltemptables.getFirst();
-						sln; sln=sln->getNext()) {
+			sln; sln=sln->getNext()) {
 		truncateTempTable(cursor,sln->getValue());
 	}
 }
@@ -6500,7 +6952,8 @@ void sqlrservercontroller::closeClientConnection(uint32_t bytes) {
 	}
 	pvt->_clientsock->useBlockingMode();
 	
-	raiseDebugMessageEvent("done waiting for client to close the connection");
+	raiseDebugMessageEvent("done waiting for client to "
+					"close the connection");
 
 	// close the client socket
 	raiseDebugMessageEvent("closing the client socket...");
@@ -6751,9 +7204,9 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 		do {
 			error::setErrorNumber(0);
 			result=pvt->_semset->waitWithUndo(0);
-		} while (!result &&
-				error::getErrorNumber()==EINTR &&
-				!alarmrang);
+		} while (!result && error::getErrorNumber()==EINTR &&
+					!process::getShutDownFlag() &&
+					!alarmrang);
 		signalmanager::alarm(0);
 		pvt->_semset->retryInterruptedOperations();
 	} else {
@@ -6799,9 +7252,9 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 		do {
 			error::setErrorNumber(0);
 			result=pvt->_semset->wait(3);
-		} while (!result &&
-				error::getErrorNumber()==EINTR &&
-				!alarmrang);
+		} while (!result && error::getErrorNumber()==EINTR &&
+					!process::getShutDownFlag() &&
+					!alarmrang);
 		signalmanager::alarm(0);
 		pvt->_semset->retryInterruptedOperations();
 	} else {
@@ -7193,7 +7646,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable1(
 
 	bool	retval=true;
 	stringbuffer	str;
-	str.writeFormatted(errorfieldtablequery,errorfieldtable);
+	str.printf(errorfieldtablequery,errorfieldtable);
 	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
 							!executeQuery(cursor)) {
 		saveErrorFromCursor(cursor);
@@ -7259,7 +7712,7 @@ bool sqlrservercontroller::bulkLoadCreateErrorTable2(
 
 	bool	retval=true;
 	stringbuffer	str;
-	str.writeFormatted(errorrowtablequery,errorrowtable,table);
+	str.printf(errorrowtablequery,errorrowtable,table);
 	if (!prepareQuery(cursor,str.getString(),str.getStringLength()) ||
 							!executeQuery(cursor)) {
 		saveErrorFromCursor(cursor);
@@ -8023,13 +8476,13 @@ bool sqlrservercontroller::bulkLoadStoreError(int64_t errorcode,
 		const char	*errorquery=
 				"insert into %s values (%lld,'%s','%s')";
 		stringbuffer	query;
-		query.writeFormatted(errorquery,
-					bulkerrorfieldtable,
-					errorcode,
-					// FIXME: get the column somehow
-					"bad_column",
-					// FIXME: get the data somehow
-					"bad_data");
+		query.printf(errorquery,
+				bulkerrorfieldtable,
+				errorcode,
+				// FIXME: get the column somehow
+				"bad_column",
+				// FIXME: get the data somehow
+				"bad_data");
 
 		if (!prepareQuery(cur,query.getString(),
 					query.getStringLength()) ||
@@ -8694,6 +9147,10 @@ bool sqlrservercontroller::bindValueIsNull(int16_t isnull) {
 	return pvt->_conn->bindValueIsNull(isnull);
 }
 
+const char *sqlrservercontroller::nextvalFormat() {
+	return pvt->_conn->nextvalFormat();
+}
+
 void sqlrservercontroller::setFakeInputBinds(bool fake) {
 	pvt->_fakeinputbinds=fake;
 }
@@ -8702,16 +9159,16 @@ bool sqlrservercontroller::getFakeInputBinds() {
 	return pvt->_fakeinputbinds;
 }
 
-void sqlrservercontroller::setFetchAtOnce(uint32_t fao) {
-	pvt->_fetchatonce=fao;
+void sqlrservercontroller::setFetchAtOnce(uint32_t fetchatonce) {
+	pvt->_fetchatonce=fetchatonce;
 }
 
-void sqlrservercontroller::setMaxColumnCount(uint32_t mcc) {
-	pvt->_maxcolumncount=mcc;
+void sqlrservercontroller::setMaxColumnCount(uint32_t maxcolumncount) {
+	pvt->_maxcolumncount=maxcolumncount;
 }
 
-void sqlrservercontroller::setMaxFieldLength(uint32_t mfl) {
-	pvt->_maxfieldlength=mfl;
+void sqlrservercontroller::setMaxFieldLength(uint32_t maxfieldlength) {
+	pvt->_maxfieldlength=maxfieldlength;
 }
 
 uint32_t sqlrservercontroller::getFetchAtOnce() {
@@ -10211,21 +10668,28 @@ void sqlrservercontroller::clearError(sqlrservercursor *cursor) {
 
 void sqlrservercontroller::setError(sqlrservercursor *cursor,
 						const char *err,
+						uint32_t errlen,
 						int64_t errn,
 						bool liveconn) {
 
 	char		*errorbuffer=cursor->getErrorBuffer();
-	uint32_t	errorlength=charstring::length(err);
-	if (errorlength>pvt->_maxerrorlength) {
-		errorlength=pvt->_maxerrorlength;
+	if (errlen>pvt->_maxerrorlength) {
+		errlen=pvt->_maxerrorlength;
 	}
-	charstring::safeCopy(errorbuffer,pvt->_maxerrorlength,err,errorlength);
-	if (errorlength<pvt->_maxerrorlength) {
-		errorbuffer[errorlength]='\0';
+	charstring::safeCopy(errorbuffer,pvt->_maxerrorlength,err,errlen);
+	if (errlen<pvt->_maxerrorlength) {
+		errorbuffer[errlen]='\0';
 	}
-	cursor->setErrorLength(errorlength);
+	cursor->setErrorLength(errlen);
 	cursor->setErrorNumber(errn);
 	cursor->setLiveConnection(liveconn);
+}
+
+void sqlrservercontroller::setError(sqlrservercursor *cursor,
+						const char *err,
+						int64_t errn,
+						bool liveconn) {
+	setError(cursor,err,charstring::length(err),errn,liveconn);
 }
 
 char *sqlrservercontroller::getErrorBuffer(sqlrservercursor *cursor) {

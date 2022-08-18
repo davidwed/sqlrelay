@@ -25,6 +25,9 @@ all-tcl:
 all-protocol:
 	cd protocol $(AND) $(MAKE) all
 
+all-crud:
+	cd crud $(AND) $(MAKE) all
+
 clean:
 	cd bench $(AND) $(MAKE) clean
 	cd c $(AND) $(MAKE) clean
@@ -41,6 +44,7 @@ clean:
 	cd ruby $(AND) $(MAKE) clean
 	cd stress $(AND) $(MAKE) clean
 	cd tcl $(AND) $(MAKE) clean
+	cd crud $(AND) $(MAKE) clean
 	$(RM) sqlr-*.*.bt sybinit.err log/*.log sqlrelay.conf.d/sqlite/sqlite.db temp1 temp2 temp3
 
 tests: all

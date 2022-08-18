@@ -101,6 +101,7 @@
  * [#moduledata Module Data]
 * [#directives Query Directives]
  * [#custom_wf custom_wf]
+ * [#singlestep singlestep]
 * [#queryrouting Query Routing]
  * [#regex regex]
  * [#userlist userlist]
@@ -3820,12 +3821,19 @@ At startup, the SQL Relay server creates instances of the specified directive mo
 Currently, the following directive modules are available in the standard SQL Relay distribution:
 
 * '''custom_wf'''
+* '''singlestep'''
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 
 [[br]][=#custom_wf]
 == custom_wf ==
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-custom_wf.conf@
+}}}
+}}}
 
 The '''custom_wf''' module examines the comments preceeding the query and looks for one or more of the following directives:
 
@@ -3875,6 +3883,51 @@ The querytimeout directive sets a timeout (in seconds) for the query.  The follo
 Note that this directive takes a colon-delimited parameter, the number of seconds.  Setting a timeout of 0 seconds (or removing the parameter) disables the timeout.
 
 Note that (currently) the only database backend that supports query timeouts is ODBC.  It is known to work with the MS SQL Server driver, though it likely works with some other ODBC drivers as well.
+
+
+[[br]][=#singlestep]
+== singlestep ==
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-singlestep.conf@
+}}}
+}}}
+
+The '''singlestep''' module only works when using a !PostgreSQL database.  Attempts to use it with a different database will have no effect.
+
+When using a !PostgreSQL database, the connect string option fetchatonce can be set to 0 or 1.  When set to 0, the SQL Relay server fetches and buffers all rows of the result set from the database before returning any to the SQL Relay client. When set to 1, the SQL Relay server "single-steps" through the rows of the result set, fetching one row at a time from the database, and sending each row back to the SQL Relay client as it is fetched.
+
+Using fetchatonce=0 can cause the SQL Relay serve to consume large amounts of memory when a query returns a large number of rows.  On the other hand, when using fetchatonce=1, due to the quirky way that !PostgreSQL implements fetching one row at a time, if you run a set of nested queries, rows will be truncated in the outer query, if the client uses a non-zero result set buffer size.  See [../faq.html#postgresqlfetchatonce the faq] for more details.
+
+The '''singlestep''' module allows you to configure the instance one way, but override that configuration on a query-by-query basis.
+
+The module examines the comments preceeding the query and looks for one or more of the following directives:
+
+* singlestep=on
+* singlestep=off
+
+[[br]]
+=== singlestep=on ===
+
+If the singlestep=on directive is used, the SQL Relay Server "single-steps" through the rows of the result set of the associated query, fetching one row at a time from the database and sending each row back to the SQL Reay client as it is fetched.
+
+{{{#!blockquote
+{{{#!code
+@parts/singlestepon.sql@
+}}}
+}}}
+
+[[br]]
+=== singlestep=off ===
+
+If singlestep=off is set, then the SQL Relay Server will fetch and buffer all rows of the result set of the associated query before returning any to the SQL Relay client.
+
+{{{#!blockquote
+{{{#!code
+@parts/singlestepoff.sql@
+}}}
+}}}
 
 ----
 

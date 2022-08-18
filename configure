@@ -642,6 +642,17 @@ STATICLINK
 CLT_SONAME_VERSION_INFO
 SRV_SONAME_VERSION_INFO
 SQLR_VERSION
+APACHELINKFLAGS
+APACHEINCLUDES
+APACHEHTTPD
+APU_1_CONFIG
+APU_1_MT_CONFIG
+APU_CONFIG
+APR_1_CONFIG
+APR_1_MT_CONFIG
+APR_CONFIG
+APXS2
+APXS
 TOP_BUILDDIR_ABS
 NODEJSCXXFLAGS
 NODEMODULEDIR
@@ -770,6 +781,7 @@ DLLIB
 SOCKETLIBS
 PTHREADLIB
 PTHREADINCLUDES
+FDECLSPEC
 DISABLE_NEW_DTAGS
 WNOERRORDATETIME
 WNOUNKNOWNPRAGMAS
@@ -855,6 +867,7 @@ ENABLE_UTIL
 ENABLE_SERVER
 ENABLE_CMDLINE
 ENABLE_ODBC_DRIVER
+ENABLE_ODBC
 ENABLE_CPP
 SQL_RELAY
 SQLRELAY
@@ -867,11 +880,13 @@ TCLUSERPATH
 PHPUSERPATH
 JAVAUSERPATH
 OVERRIDERUBYSITEARCHDIR
+RUBYUSERPATH
 PYTHONUSERPATH
 OVERRIDEPERLMAN3EXT
 OVERRIDEPERLINSTALLMAN3DIR
 OVERRIDEPERLSITELIB
 OVERRIDEPERLSITEARCH
+PERLUSERPATH
 ENABLE_ROUTER
 INFORMIXUSERPATH
 FIREBIRDUSERPATH
@@ -986,6 +1001,7 @@ enable_odbc_driver
 with_perl_prefix
 with_pod2man
 enable_perl
+enable_perl_rpath
 with_perl_site_arch
 with_perl_site_lib
 with_perl_install_man3_dir
@@ -996,6 +1012,7 @@ enable_python_rpath
 with_python_dir
 with_ruby_prefix
 enable_ruby
+enable_ruby_rpath
 with_ruby_site_arch_dir
 with_java_prefix
 enable_java
@@ -1714,9 +1731,11 @@ Optional Features:
   --disable-router              Don't build router connection module
   --disable-odbc-driver         Don't build ODBC driver
   --disable-perl                Don't build Perl api
+  --enable-perl-rpath           Use -rpath when linking the Perl library against the SQL Relay client library
   --disable-python              Don't build Python api
   --enable-python-rpath         Use -rpath when linking the Python library against the SQL Relay client library
   --disable-ruby                Don't build Ruby api
+  --enable-ruby-rpath           Use -rpath when linking the Ruby library against the SQL Relay client library
   --disable-java                Don't build Java api
   --enable-java-rpath           Use -rpath when linking the Java library against the SQL Relay client library
   --disable-php                 Don't build PHP api
@@ -3127,6 +3146,13 @@ else
   ENABLE_PERL="yes"
 fi
 
+# Check whether --enable-perl-rpath was given.
+if test "${enable_perl_rpath+set}" = set; then :
+  enableval=$enable_perl_rpath; PERLSERPATH="yes"
+else
+  PERLSERPATH=""
+fi
+
 
 # Check whether --with-perl-site-arch was given.
 if test "${with_perl_site_arch+set}" = set; then :
@@ -3202,6 +3228,13 @@ if test "${enable_ruby+set}" = set; then :
   enableval=$enable_ruby; ENABLE_RUBY=""
 else
   ENABLE_RUBY="yes"
+fi
+
+# Check whether --enable-ruby-rpath was given.
+if test "${enable_ruby_rpath+set}" = set; then :
+  enableval=$enable_ruby_rpath; RUBYUSERPATH="yes"
+else
+  RUBYUSERPATH=""
 fi
 
 
@@ -3508,6 +3541,9 @@ if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
 then
 	ENABLE_UTIL=""
 fi
+
+
+
 
 
 
@@ -16846,7 +16882,7 @@ esac
 
 SCO_OSR5=""
 SCO_OSR6=""
-SCO_UW="yes"
+SCO_UW=""
 CRTLIB=""
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for SCO" >&5
@@ -16905,6 +16941,9 @@ $as_echo_n "checking for OSX... " >&6; }
 case $host_os in
 	*darwin* )
 		DARWIN="yes"
+
+$as_echo "#define _DARWIN 1" >>confdefs.h
+
 
 				PV1="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t' | cut -d'.' -f1`"
 		PV2="`sw_vers | grep ProductVersion | cut -d':' -f2 | tr -d '\t' | cut -d'.' -f2`"
@@ -17179,11 +17218,11 @@ export LD_LIBRARY_PATH
 		if ( test -n "$WERROR" )
 	then
 
-						CXX_VERSION=`$CXX --version 2> /dev/null | head -1 | tr -d '.' | cut -c1-2`
+						CXX_VERSION=`$CXX --version 2> /dev/null | head -1`
 
-						if ( test "$CXX_VERSION" != "g+" )
+						if ( test -n "$CXX_VERSION" -a -z "`echo $CXX_VERSION | grep g++`" )
 		then
-						if (  test "$CXX_VERSION" -lt "27" )
+						if (  test "`echo $CXX_VERSION | tr -d'.' | cut -c1-2`" -lt "27" )
 			then
 				WERROR=""
 			fi
@@ -17281,8 +17320,8 @@ fi
 
 
 WNOOVERLOADEDVIRTUAL=""
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -Wno-overloaded-virtual is needed" >&5
-$as_echo_n "checking whether -Wno-overloaded-virtual is needed... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-overloaded-virtual option" >&5
+$as_echo_n "checking for -Wno-overloaded-virtual option... " >&6; }
 
 # clang's -Wall includes -Woverloaded-virtual, which we don't want
 if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
@@ -17300,8 +17339,8 @@ fi
 
 
 WNOMISMATCHEDTAGS=""
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether -Wno-mismatched-tags is needed" >&5
-$as_echo_n "checking whether -Wno-mismatched-tags is needed... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-mismatched-tags option" >&5
+$as_echo_n "checking for -Wno-mismatched-tags option... " >&6; }
 
 # clang's -Wall includes -Wmismatched-tags, which we don't want
 if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
@@ -17361,8 +17400,8 @@ fi
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-error=date-time" >&5
-$as_echo_n "checking for -Wno-error=date-time... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-error=date-time option" >&5
+$as_echo_n "checking for -Wno-error=date-time option... " >&6; }
 
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
@@ -17559,6 +17598,50 @@ if ( test -n "`echo $LDFLAGS | grep '\-Wl,\-z,relro'`" )
 then
 	CPPFLAGS="-fPIC $CPPFLAGS"
 fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -fdeclspec option" >&5
+$as_echo_n "checking for -fdeclspec option... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="-fdeclspec"
+LIBS=""
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+int
+main ()
+{
+int a; a=1;
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  FDECLSPEC="-fdeclspec"
+else
+  FDECLSPEC=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+if ( test -n "$FDECLSPEC" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
 
 echo "******************************"
 
@@ -19278,9 +19361,10 @@ fi
 			fi
 		fi
 
-								if ( test -z "$ORACLELIBS" )
+								if ( test -z "$ORACLELIBS" -a -d "/usr/lib/oracle" )
 		then
-			for version in `cd /usr/lib/oracle 2> /dev/null; ls -d * 2> /dev/null`
+			cd /usr/lib/oracle
+			for version in `ls -d * 2> /dev/null`
 			do
 				ORACLEVERSION="10g"
 				if ( test -n "`echo $version | grep 11`" )
@@ -19320,6 +19404,7 @@ fi
 					ORACLEINCLUDES="-I/usr/include/oracle/$version/$OCLIENT"
 				fi
 			done
+			cd -
 		fi
 
 		if ( test -n "$ORACLEVERSION" )
@@ -19944,7 +20029,29 @@ then
 				MYSQLLIBSR=`$MYSQLCONFIG --libs_r 2> /dev/null | sed -e "s|'||g"`
 				if ( test -n "$MYSQLLIBSR" -a -z "`echo $MYSQLLIBSR | grep Usage:`" )
 				then
-					MYSQLLIBS=$MYSQLLIBSR
+
+																				LIBPATH=""
+					LIBNAME=""
+					for part in `echo "$MYSQLLIBSR"`
+					do
+						if ( test "`echo $part | cut -c1-2`" = "-L" )
+						then
+							LIBPATH="`echo $part | cut -c3-1000`"
+							break
+						fi
+					done
+					for part in `echo "$MYSQLLIBSR"`
+					do
+						if ( test "`echo $part | cut -c1-2`" = "-l" )
+						then
+							LIBNAME="`echo $part | cut -c3-1000`"
+							break
+						fi
+					done
+					if ( test -n "`ls $LIBPATH/lib$LIBNAME.*$SOSUFFIX 2> /dev/null`" )
+					then
+						MYSQLLIBS=$MYSQLLIBSR
+					fi
 				fi
 
 								if ( test -n "$MYSQLLIBS" )
@@ -19954,14 +20061,10 @@ then
 						if ( test "`echo $part | cut -c1-2`" = "-L" )
 						then
 							MYSQLLIBSPATH="`echo $part | cut -c3-1000`"
+							break
 						fi
 					done
-					break;
-				fi
-
-				if ( test -n "$MYSQLLIBS" )
-				then
-					break;
+					break
 				fi
 			done
 		fi
@@ -24436,7 +24539,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQconnectdb(NULL);
+PQconnectdb(0);
   ;
   return 0;
 }
@@ -24474,7 +24577,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQfmod(NULL,0);
+PQfmod(0,0);
   ;
   return 0;
 }
@@ -24512,7 +24615,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQsetNoticeProcessor(NULL,NULL,NULL);
+PQsetNoticeProcessor(0,0,0);
   ;
   return 0;
 }
@@ -24552,7 +24655,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQprepare(NULL,NULL,NULL,NULL,NULL);
+PQprepare(0,0,0,0,0);
   ;
   return 0;
 }
@@ -24590,7 +24693,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQexecPrepared(NULL,NULL,0,NULL,NULL,NULL,0);
+PQexecPrepared(0,0,0,0,0,0,0);
   ;
   return 0;
 }
@@ -24628,7 +24731,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQsendQueryPrepared(NULL,NULL,0,NULL,NULL,NULL,0);
+PQsendQueryPrepared(0,0,0,0,0,0,0);
   ;
   return 0;
 }
@@ -24666,7 +24769,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQsetSingleRowMode(NULL);
+PQsetSingleRowMode(0);
   ;
   return 0;
 }
@@ -24704,7 +24807,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQdescribePrepared(NULL,NULL);
+PQdescribePrepared(0,0);
   ;
   return 0;
 }
@@ -24743,7 +24846,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQserverVersion(NULL);
+PQserverVersion(0);
   ;
   return 0;
 }
@@ -24781,7 +24884,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQparameterStatus(NULL,NULL);
+PQparameterStatus(0,0);
   ;
   return 0;
 }
@@ -24819,7 +24922,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQsetClientEncoding(NULL,NULL);
+PQsetClientEncoding(0,0);
   ;
   return 0;
 }
@@ -24857,7 +24960,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQoidValue(NULL);
+PQoidValue(0);
   ;
   return 0;
 }
@@ -24895,7 +24998,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQbinaryTuples(NULL);
+PQbinaryTuples(0);
   ;
   return 0;
 }
@@ -24933,7 +25036,7 @@ cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 int
 main ()
 {
-PQftable(NULL,0);
+PQftable(0,0);
   ;
   return 0;
 }
@@ -34258,6 +34361,17 @@ then
 		pyext=""
 
 		for pyversion in \
+				"3.20" \
+				"3.19" \
+				"3.18" \
+				"3.17" \
+				"3.16" \
+				"3.15" \
+				"3.14" \
+				"3.13" \
+				"3.12" \
+				"3.11" \
+				"3.10" \
 				"3.9" \
 				"3.8" \
 				"3.7" \
@@ -34323,6 +34437,8 @@ then
 						then
 							PYTHONINCLUDES="-I$pyprefix/include/python$pyversion$ext"
 							PYTHONVERSION=`echo $pyversion | sed -e "s|\.||"`
+							PYTHONMAJOR=`echo $pyversion | cut -d'.' -f1`
+							PYTHONMINOR=`echo $pyversion | cut -d'.' -f2`
 							pyext="$ext"
 							break;
 						fi
@@ -34452,6 +34568,16 @@ CPPFLAGS="$SAVECPPFLAGS"
 		PYTHONLIB="$PYTHONLIB $UNDEFINED_DYNAMIC_LOOKUP"
 	fi
 
+			if ( test "$PYTHONMAJOR" -ge "3" )
+	then
+		if ( test "$PYTHONMAJOR" -gt "3" -o "$PYTHONMINOR" -ge "10" )
+		then
+
+$as_echo "#define SQLRELAY_NEED_PY_SSIZE_T_CLEAN 1" >>confdefs.h
+
+		fi
+        fi
+
 
 if ( test -n "$PYTHONINCLUDES" )
 then
@@ -34481,7 +34607,7 @@ fi
 
 		IMPORTEXCEPTIONS=""
 	EXCEPTIONSSTANDARDERROR="Exception"
-	if ( test "$PYTHONVERSION" = "2" )
+	if ( test "$PYTHONMAJOR" = "2" )
 	then
 		IMPORTEXCEPTIONS="import exceptions"
 		EXCEPTIONSSTANDARDERROR="exceptions.StandardError"
@@ -34520,7 +34646,7 @@ then
 
 		found="no"
 
-		for major in "" "1" "2"
+		for major in "" "1" "2" "3"
 		do
 
 			for minor in \
@@ -36443,6 +36569,642 @@ echo "******************************"
 
 
 
+echo
+echo "***** Apache *****************"
+INCLUDE_APACHE="1"
+
+APACHEINCLUDES=""
+APACHELINKFLAGS=""
+
+if ( test "$INCLUDE_APACHE" = "1" )
+then
+
+
+if ( test -n "$APXS" )
+then
+	# Extract the first word of "$APXS", so it can be a program name with args.
+set dummy $APXS; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APXS+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APXS in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APXS="$APXS" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APXS="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APXS" && ac_cv_path_APXS=""""
+  ;;
+esac
+fi
+APXS=$ac_cv_path_APXS
+if test -n "$APXS"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APXS" >&5
+$as_echo "$APXS" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		# Extract the first word of "apxs2", so it can be a program name with args.
+set dummy apxs2; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APXS2+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APXS2 in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APXS2="$APXS2" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APXS2="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APXS2" && ac_cv_path_APXS2=""""
+  ;;
+esac
+fi
+APXS2=$ac_cv_path_APXS2
+if test -n "$APXS2"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APXS2" >&5
+$as_echo "$APXS2" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+		if ( test -z "$APXS2" )
+		then
+			# Extract the first word of "apxs", so it can be a program name with args.
+set dummy apxs; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APXS+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APXS in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APXS="$APXS" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APXS="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APXS" && ac_cv_path_APXS=""""
+  ;;
+esac
+fi
+APXS=$ac_cv_path_APXS
+if test -n "$APXS"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APXS" >&5
+$as_echo "$APXS" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+		fi
+		if ( test -n "$APXS2" )
+		then
+			APXS="$APXS2"
+		fi
+	fi
+fi
+
+if ( test -n "$APXS" )
+then
+	APACHEINCLUDES="-I`$APXS -q INCLUDEDIR`"
+fi
+
+
+
+
+if ( test -n "$APR_CONFIG" )
+then
+	# Extract the first word of "$APR_CONFIG", so it can be a program name with args.
+set dummy $APR_CONFIG; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APR_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APR_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APR_CONFIG="$APR_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APR_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APR_CONFIG" && ac_cv_path_APR_CONFIG=""""
+  ;;
+esac
+fi
+APR_CONFIG=$ac_cv_path_APR_CONFIG
+if test -n "$APR_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APR_CONFIG" >&5
+$as_echo "$APR_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		# Extract the first word of "apr-1-mt-config", so it can be a program name with args.
+set dummy apr-1-mt-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APR_1_MT_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APR_1_MT_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APR_1_MT_CONFIG="$APR_1_MT_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APR_1_MT_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APR_1_MT_CONFIG" && ac_cv_path_APR_1_MT_CONFIG=""""
+  ;;
+esac
+fi
+APR_1_MT_CONFIG=$ac_cv_path_APR_1_MT_CONFIG
+if test -n "$APR_1_MT_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APR_1_MT_CONFIG" >&5
+$as_echo "$APR_1_MT_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+		if ( test -z "$APR_1_MT_CONFIG" )
+		then
+			# Extract the first word of "apr-1-config", so it can be a program name with args.
+set dummy apr-1-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APR_1_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APR_1_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APR_1_CONFIG="$APR_1_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APR_1_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APR_1_CONFIG" && ac_cv_path_APR_1_CONFIG=""""
+  ;;
+esac
+fi
+APR_1_CONFIG=$ac_cv_path_APR_1_CONFIG
+if test -n "$APR_1_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APR_1_CONFIG" >&5
+$as_echo "$APR_1_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+			if ( test -z "$APR_1_CONFIG" )
+			then
+				# Extract the first word of "apr-config", so it can be a program name with args.
+set dummy apr-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APR_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APR_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APR_CONFIG="$APR_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APR_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APR_CONFIG" && ac_cv_path_APR_CONFIG=""""
+  ;;
+esac
+fi
+APR_CONFIG=$ac_cv_path_APR_CONFIG
+if test -n "$APR_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APR_CONFIG" >&5
+$as_echo "$APR_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+			fi
+		fi
+		if ( test -n "$APR_1_CONFIG" )
+		then
+			APR_CONFIG="$APR_1_CONFIG"
+		fi
+		if ( test -n "$APR_1_MT_CONFIG" )
+		then
+			APR_CONFIG="$APR_1_MT_CONFIG"
+		fi
+	fi
+fi
+
+if ( test -n "$APR_CONFIG" )
+then
+	APACHEINCLUDES="$APACHEINCLUDES `$APR_CONFIG --cppflags --includes | sed -e 's|-mt ||'` -DAPACHE_2"
+fi
+
+
+
+if ( test -n "$APU_CONFIG" )
+then
+	# Extract the first word of "$APU_CONFIG", so it can be a program name with args.
+set dummy $APU_CONFIG; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APU_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APU_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APU_CONFIG="$APU_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APU_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APU_CONFIG" && ac_cv_path_APU_CONFIG=""""
+  ;;
+esac
+fi
+APU_CONFIG=$ac_cv_path_APU_CONFIG
+if test -n "$APU_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APU_CONFIG" >&5
+$as_echo "$APU_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+else
+	if ( test "$cross_compiling" = "yes" )
+	then
+		echo "cross compiling"
+	else
+		# Extract the first word of "apu-1-mt-config", so it can be a program name with args.
+set dummy apu-1-mt-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APU_1_MT_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APU_1_MT_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APU_1_MT_CONFIG="$APU_1_MT_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APU_1_MT_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APU_1_MT_CONFIG" && ac_cv_path_APU_1_MT_CONFIG=""""
+  ;;
+esac
+fi
+APU_1_MT_CONFIG=$ac_cv_path_APU_1_MT_CONFIG
+if test -n "$APU_1_MT_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APU_1_MT_CONFIG" >&5
+$as_echo "$APU_1_MT_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+		if ( test -z "$APU_1_MT_CONFIG" )
+		then
+			# Extract the first word of "apu-1-config", so it can be a program name with args.
+set dummy apu-1-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APU_1_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APU_1_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APU_1_CONFIG="$APU_1_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APU_1_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APU_1_CONFIG" && ac_cv_path_APU_1_CONFIG=""""
+  ;;
+esac
+fi
+APU_1_CONFIG=$ac_cv_path_APU_1_CONFIG
+if test -n "$APU_1_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APU_1_CONFIG" >&5
+$as_echo "$APU_1_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+			if ( test -z "$APU_1_CONFIG" )
+			then
+				# Extract the first word of "apu-config", so it can be a program name with args.
+set dummy apu-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APU_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APU_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APU_CONFIG="$APU_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APU_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APU_CONFIG" && ac_cv_path_APU_CONFIG=""""
+  ;;
+esac
+fi
+APU_CONFIG=$ac_cv_path_APU_CONFIG
+if test -n "$APU_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APU_CONFIG" >&5
+$as_echo "$APU_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+			fi
+		fi
+		if ( test -n "$APU_1_CONFIG" )
+		then
+			APU_CONFIG="$APU_1_CONFIG"
+		fi
+		if ( test -n "$APU_1_MT_CONFIG" )
+		then
+			APU_CONFIG="$APU_1_MT_CONFIG"
+		fi
+	fi
+fi
+
+if ( test -n "$APU_CONFIG" )
+then
+	APACHEINCLUDES="$APACHEINCLUDES `$APU_CONFIG --includes | sed -e 's|-mt ||'`"
+fi
+
+
+	if ( test -n "$APACHEINCLUDES" )
+	then
+		if ( test -n "$DARWIN" )
+		then
+			if ( test -n "$BUNDLE_LOADER" )
+			then
+				APACHEHTTPD=""
+				for prog in httpd apache2 apache
+				do
+					# Extract the first word of "$prog", so it can be a program name with args.
+set dummy $prog; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_APACHEHTTPD+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $APACHEHTTPD in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_APACHEHTTPD="$APACHEHTTPD" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/opt/sfw/bin:/opt/sfw/sbin:/usr/pkg/bin:/usr/pkg/sbin:/sw/bin:/usr/freeware/bin:/usr/local/apache/bin:/usr/local/apache/sbin:/boot/common/bin:/resources/index/bin"
+for as_dir in $as_dummy
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_APACHEHTTPD="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_APACHEHTTPD" && ac_cv_path_APACHEHTTPD=""""
+  ;;
+esac
+fi
+APACHEHTTPD=$ac_cv_path_APACHEHTTPD
+if test -n "$APACHEHTTPD"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APACHEHTTPD" >&5
+$as_echo "$APACHEHTTPD" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+					if ( test -n "$APACHEHTTPD" )
+					then
+						break
+					fi
+				done
+				APACHELINKFLAGS="-Wl,$BUNDLE_LOADER -Wl,$APACHEHTTPD"
+			else
+				APACHELINKFLAGS="$UNDEFINED_DYNAMIC_LOOKUP"
+			fi
+		fi
+	else
+		INCLUDE_APACHE="0"
+	fi
+else
+	echo "disabled"
+fi
+
+
+
+
+if ( test "$INCLUDE_APACHE" = "1" )
+then
+	APACHELINKFLAGS="$APACHELINKFLAGS \$(MODLINKFLAGS)"
+fi
+
+echo "******************************"
+
+
+
 
 
 	eval "SQLR_VERSION=\"2.0.0\""
@@ -36637,14 +37399,14 @@ if ( test -n "$MYSQLLIBS" ); then
 	if ( test -n "$MYSQLSTATIC" ); then
 		MYSQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS mysql"
+	TESTDBS="$TESTDBS mysql mysqlupsert"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
 	POSTGRESQLBUILD="dynamic   "
 	if ( test -n "$POSTGRESQLSTATIC" ); then
 		POSTGRESQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS postgresql"
+	TESTDBS="$TESTDBS postgresql postgresqlupsert"
 fi
 if ( test -n "$SQLITELIBS" ); then
 	SQLITEBUILD="dynamic   "
@@ -36747,7 +37509,7 @@ sed -e "s|^centos|co|" \
 
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf doc/admin/installingpkg.wt"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf test/sqlrelay.conf.d/postgresqlupsert.conf test/sqlrelay.conf.d/mysqlupsert.conf doc/admin/installingpkg.wt"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF
@@ -39170,6 +39932,15 @@ fi
 if ( test -r "libtool" -a -n "$DARWIN" )
 then
 	sed -e "s|print -r --|printf %s\\\\\\\\n|g" libtool > libtool.new
+	mv libtool.new libtool
+fi
+
+if ( test -r "libtool" -a -n "$SCO_UW" )
+then
+		sed -e "s|hardcode_libdir_flag_spec=.*|hardcode_libdir_flag_spec=\"\"|g" libtool > libtool.new
+	mv libtool.new libtool
+
+			sed -e "s|\\\\\$wl-h,\\\\\$soname ||g" libtool > libtool.new
 	mv libtool.new libtool
 fi
 

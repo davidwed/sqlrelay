@@ -60,6 +60,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_sqlrclient : public sqlrprotocol {
 		void	rollbackCommand();
 		void	dbVersionCommand();
 		void	bindFormatCommand();
+		void	nextvalFormatCommand();
 		void	serverVersionCommand();
 		void	selectDatabaseCommand();
 		void	getCurrentDatabaseCommand();
@@ -397,6 +398,11 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 			cont->incrementBindFormatCount();
 			bindFormatCommand();
 			continue;
+		} else if (command==NEXTVALFORMAT) {
+			// FIXME: add this
+			//cont->incrementNextvalFormatCount();
+			nextvalFormatCommand();
+			continue;
 		} else if (command==SERVERVERSION) {
 			cont->incrementServerVersionCount();
 			serverVersionCommand();
@@ -410,6 +416,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 			getCurrentDatabaseCommand();
 			continue;
 		} else if (command==GET_CURRENT_SCHEMA) {
+			// FIXME: add this
 			//cont->incrementGetCurrentSchemaCount();
 			getCurrentSchemaCommand();
 			continue;
@@ -609,7 +616,7 @@ bool sqlrprotocol_sqlrclient::acceptSecurityContext() {
 	}
 
 	// attach the context and file descriptor to each other
-	clientsock->setSecurityContext(ctx);
+	clientsock->setSocketLayer(ctx);
 	ctx->setFileDescriptor(clientsock);
 
 	// accept the security context
@@ -1027,6 +1034,22 @@ void sqlrprotocol_sqlrclient::bindFormatCommand() {
 	uint16_t	bflen=charstring::length(bf);
 	clientsock->write(bflen);
 	clientsock->write(bf,bflen);
+	clientsock->flushWriteBuffer(-1,-1);
+}
+
+void sqlrprotocol_sqlrclient::nextvalFormatCommand() {
+	debugFunction();
+
+	cont->raiseDebugMessageEvent("nextval format");
+
+	// get the nextval format
+	const char	*nf=cont->nextvalFormat();
+
+	// send it to the client
+	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
+	uint16_t	nflen=charstring::length(nf);
+	clientsock->write(nflen);
+	clientsock->write(nf,nflen);
 	clientsock->flushWriteBuffer(-1,-1);
 }
 
@@ -2132,7 +2155,8 @@ bool sqlrprotocol_sqlrclient::getBindVarName(sqlrservercursor *cursor,
 		debugstr.clear();
 		debugstr.append("get binds failed: bad variable name length: ");
 		debugstr.append(bindnamesize);
-		cont->raiseClientProtocolErrorEvent(cursor,debugstr.getString(),1);
+		cont->raiseClientProtocolErrorEvent(
+				cursor,debugstr.getString(),1);
 		return false;
 	}
 

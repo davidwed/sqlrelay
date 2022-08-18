@@ -232,6 +232,10 @@ AC_ARG_ENABLE(perl,
 	[  --disable-perl                Don't build Perl api],
 	ENABLE_PERL="",
 	ENABLE_PERL="yes")
+AC_ARG_ENABLE(perl-rpath,
+	[  --enable-perl-rpath           Use -rpath when linking the Perl library against the SQL Relay client library],
+	PERLSERPATH="yes",
+	PERLSERPATH="")
 AC_ARG_WITH(perl-site-arch,
 	[  --with-perl-site-arch         Override Perl's built-in PERLSITEARCH variable (location to install binary perl modules)],
 	OVERRIDEPERLSITEARCH="$withval",
@@ -272,6 +276,10 @@ AC_ARG_ENABLE(ruby,
 	[  --disable-ruby                Don't build Ruby api],
 	ENABLE_RUBY="",
 	ENABLE_RUBY="yes")
+AC_ARG_ENABLE(ruby-rpath,
+	[  --enable-ruby-rpath           Use -rpath when linking the Ruby library against the SQL Relay client library],
+	RUBYUSERPATH="yes",
+	RUBYUSERPATH="")
 AC_ARG_WITH(ruby-site-arch-dir,
 	[  --with-ruby-site-arch-dir     Override Ruby's built-in sitearchdir variable (location to install binary ruby modules)],
 	OVERRIDERUBYSITEARCHDIR="$withval",
@@ -478,11 +486,13 @@ AC_SUBST(DB2USERPATH)
 AC_SUBST(FIREBIRDUSERPATH)
 AC_SUBST(INFORMIXUSERPATH)
 AC_SUBST(ENABLE_ROUTER)
+AC_SUBST(PERLUSERPATH)
 AC_SUBST(OVERRIDEPERLSITEARCH)
 AC_SUBST(OVERRIDEPERLSITELIB)
 AC_SUBST(OVERRIDEPERLINSTALLMAN3DIR)
 AC_SUBST(OVERRIDEPERLMAN3EXT)
 AC_SUBST(PYTHONUSERPATH)
+AC_SUBST(RUBYUSERPATH)
 AC_SUBST(OVERRIDERUBYSITEARCHDIR)
 AC_SUBST(JAVAUSERPATH)
 AC_SUBST(PHPUSERPATH)
@@ -495,6 +505,7 @@ AC_SUBST(SQLR)
 AC_SUBST(SQLRELAY)
 AC_SUBST(SQL_RELAY)
 AC_SUBST(ENABLE_CPP)
+AC_SUBST(ENABLE_ODBC)
 AC_SUBST(ENABLE_ODBC_DRIVER)
 AC_SUBST(ENABLE_CMDLINE)
 AC_SUBST(ENABLE_SERVER)
@@ -629,6 +640,7 @@ FW_CHECK_DEBUG
 FW_CHECK_NEW_DTAGS
 FW_CHECK_F_NO_BUILTIN
 FW_CHECK_RELRO_FPIC
+FW_CHECK_FDECLSPEC
 echo "******************************"
 
 
@@ -815,6 +827,20 @@ FW_CHECK_NODEJS
 echo "******************************"
 
 
+
+dnl Checks for apache (for mvccrud test)
+echo
+echo "***** Apache *****************"
+INCLUDE_APACHE="1"
+FW_CHECK_APACHE
+if ( test "$INCLUDE_APACHE" = "1" )
+then
+	APACHELINKFLAGS="$APACHELINKFLAGS \$(MODLINKFLAGS)"
+fi
+AC_SUBST(APACHELINKFLAGS)
+echo "******************************"
+
+
 FW_SET_VERSION([SQLR_VERSION],[2.0.0])
 FW_SET_VERSION([SRV_SONAME_VERSION_INFO],[12:0:0])
 FW_SET_VERSION([CLT_SONAME_VERSION_INFO],[7:0:0])
@@ -977,14 +1003,14 @@ if ( test -n "$MYSQLLIBS" ); then
 	if ( test -n "$MYSQLSTATIC" ); then
 		MYSQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS mysql"
+	TESTDBS="$TESTDBS mysql mysqlupsert"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
 	POSTGRESQLBUILD="dynamic   "
 	if ( test -n "$POSTGRESQLSTATIC" ); then
 		POSTGRESQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS postgresql"
+	TESTDBS="$TESTDBS postgresql postgresqlupsert"
 fi
 if ( test -n "$SQLITELIBS" ); then
 	SQLITEBUILD="dynamic   "
@@ -1087,7 +1113,7 @@ AC_SUBST(HOSTNAME)
 AC_SUBST(SHORTHOSTNAME)
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf doc/admin/installingpkg.wt"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf test/sqlrelay.conf.d/postgresqlupsert.conf test/sqlrelay.conf.d/mysqlupsert.conf doc/admin/installingpkg.wt"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config
