@@ -808,6 +808,9 @@ endif
 ifneq ($(strip $(POSTGRESQLLIBS)),)
 TESTPROTOCOLSUBDIRS += all-postgresql
 endif
+ifneq ($(strip $(APACHELINKFLAGS)),)
+MODMVCCRUD=mod_mvccrud.$(LIBEXT)
+endif
 
 CPPTESTCPPFLAGS = $(BASECPPFLAGS) -I$(includedir) $(RUDIMENTSINCLUDES) -I$(top_builddir)
 CPPTESTLIBS = -L$(libdir) -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBEFENCE)

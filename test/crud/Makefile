@@ -10,7 +10,7 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPTESTCPPFLAGS) $(COMPILE) $<
 
-all: crud mvccrud.cgi mod_mvccrud.$(LIBEXT)
+all: crud mvccrud.cgi $(MODMVCCRUD)
 
 crud: crud.cpp crud.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) crud.$(OBJ) $(CPPTESTLIBS)
