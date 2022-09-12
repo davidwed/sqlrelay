@@ -419,7 +419,7 @@ int	main(int argc, char **argv) {
 	checkSuccess((int)charstring::toInteger(year),(int)dt.getYear());
 	checkSuccess((int)charstring::toInteger(hour),(int)dt.getHour());
 	int	dbmin=(int)charstring::toInteger(minute);
-	int	min=(int)dt.getMinutes();
+	int	min=(int)dt.getMinute();
 	bool	success=((dbmin==min) || (dbmin==min-1) || (dbmin-1==min));
 	checkSuccess(success,1);
 	delete[] year;
