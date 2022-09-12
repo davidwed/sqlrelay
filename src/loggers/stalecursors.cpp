@@ -181,7 +181,7 @@ bool sqlrlogger_stalecursors::run(sqlrlistener *sqlrl,
 		dtstr.clear();
 		dtstr.printf("%04d-%02d-%02d %02d:%02d:%02d",
 				dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
-				dt.getHour(),dt.getMinutes(),dt.getSeconds());
+				dt.getHour(),dt.getMinute(),dt.getSecond());
 
 		// update row
 		updatesqlrcur->inputBind("most_recent_query",

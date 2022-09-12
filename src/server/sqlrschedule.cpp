@@ -82,7 +82,7 @@ bool sqlrschedulerule::allowed(datetime *dt, bool currentlyallowed) {
 		inPeriods(&pvt->_months,dt->getMonth()) &&
 		inPeriods(&pvt->_daysofmonth,dt->getDayOfMonth()) &&
 		inPeriods(&pvt->_daysofweek,dt->getDayOfWeek()) &&
-		inDayParts(dt->getHour(),dt->getMinutes())) {
+		inDayParts(dt->getHour(),dt->getMinute())) {
 
 		// if the rule contradicts the current state then
 		// return the opposite of the current state

@@ -1047,8 +1047,8 @@ bool sqlrservercontroller::attemptLogIn(bool printerrors) {
 	// get stats
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	pvt->_loggedinsec=dt.getSeconds();
-	pvt->_loggedinusec=dt.getMicroseconds();
+	pvt->_loggedinsec=dt.getSecond();
+	pvt->_loggedinusec=dt.getMicrosecond();
 
 	raiseDebugMessageEvent("done logging in");
 	return true;
@@ -5115,7 +5115,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// set the query start time (in case the prepare fails)
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	// prepare the query
 	bool	success=cursor->prepareQuery(query,querylen);
@@ -5129,8 +5129,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 		// set the query end time
 		dt.getSystemDateAndTime();
-		cursor->setQueryEnd(dt.getSeconds(),
-					dt.getMicroseconds());
+		cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 		// update query and error counts
 		incrementQueryCounts(cursor->queryType(query,querylen));
@@ -5294,7 +5293,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// in case the prepare failed)
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	// init result
 	bool	success=false;
@@ -5307,8 +5306,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 			// set the query end time
 			dt.getSystemDateAndTime();
-			cursor->setQueryEnd(dt.getSeconds(),
-						dt.getMicroseconds());
+			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			if (success) {
 				cursor->setQueryStatus(SQLRQUERYSTATUS_SUCCESS);
@@ -5339,7 +5337,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		// set the query start time (in case the prepare fails)
 		dt.getSystemDateAndTime();
-		cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+		cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 		// prepare the query
 		success=cursor->prepareQuery(query,querylen);
@@ -5353,8 +5351,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 			// set the query end time
 			dt.getSystemDateAndTime();
-			cursor->setQueryEnd(dt.getSeconds(),
-						dt.getMicroseconds());
+			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			// update query and error counts
 			incrementQueryCounts(cursor->queryType(query,querylen));
@@ -5391,14 +5388,13 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 		// set the query start time (in case handleBinds fails)
 		dt.getSystemDateAndTime();
-		cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+		cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 		if (!handleBinds(cursor)) {
 
 			// set the query end time
 			dt.getSystemDateAndTime();
-			cursor->setQueryEnd(dt.getSeconds(),
-						dt.getMicroseconds());
+			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			// update query and error counts
 			incrementQueryCounts(cursor->queryType(query,querylen));
@@ -5429,7 +5425,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// (re)set the query start time
 	dt.getSystemDateAndTime();
-	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	if (pvt->_debugsql) {
 		stdoutput.printf("\n===================="
@@ -5454,7 +5450,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 
 	// set the query end time
 	dt.getSystemDateAndTime();
-	cursor->setQueryEnd(dt.getSeconds(),dt.getMicroseconds());
+	cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 	// special case intercepts...
 	// rather than actually intercepting these, we
@@ -8543,8 +8539,8 @@ void sqlrservercontroller::setState(enum sqlrconnectionstate_t state) {
 	pvt->_connstats->state=state;
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	pvt->_connstats->statestartsec=dt.getSeconds();
-	pvt->_connstats->statestartusec=dt.getMicroseconds();
+	pvt->_connstats->statestartsec=dt.getSecond();
+	pvt->_connstats->statestartusec=dt.getMicrosecond();
 }
 
 enum sqlrconnectionstate_t sqlrservercontroller::getState() {
@@ -8560,8 +8556,8 @@ void sqlrservercontroller::setClientSessionStartTime() {
 	}
 	datetime	dt;
 	dt.getSystemDateAndTime();
-	pvt->_connstats->clientsessionsec=dt.getSeconds();
-	pvt->_connstats->clientsessionusec=dt.getMicroseconds();
+	pvt->_connstats->clientsessionsec=dt.getSecond();
+	pvt->_connstats->clientsessionusec=dt.getMicrosecond();
 }
 
 void sqlrservercontroller::setCurrentUser(const char *user,

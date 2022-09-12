@@ -122,7 +122,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 	charstring::printf(datebuffer,sizeof(datebuffer),
 				"%04d-%02d-%02d %02d:%02d:%02d",
 				dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
-				dt.getHour(),dt.getMinutes(),dt.getSeconds());
+				dt.getHour(),dt.getMinute(),dt.getSecond());
 	logbuffer.append(datebuffer)->append(' ');
 
 	// append the event type and log level

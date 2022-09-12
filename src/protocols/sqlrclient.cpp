@@ -451,7 +451,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 
 		// set the command start-time
 		cont->setCommandStart(cursor,
-				dt.getSeconds(),dt.getMicroseconds());
+				dt.getSecond(),dt.getMicrosecond());
 
 		// these commands are all handled at the cursor level
 		if (command==NEW_QUERY) {
@@ -523,7 +523,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		// set the command end-time
 		dt.getSystemDateAndTime();
 		cont->setCommandEnd(cursor,
-				dt.getSeconds(),dt.getMicroseconds());
+				dt.getSecond(),dt.getMicrosecond());
 
 		// free memory used by binds...
 		// FIXME: can we move this inside of processQueryOrBindCursor?

@@ -2289,12 +2289,11 @@ bool sqlrprotocol_teradata::sendResponseToClient() {
 		responseauth[1]=0;
 		responseauth[2]=0x72;
 		responseauth[3]=0x77;
-		responseauth[4]=
-			sadt.getMinutes()%4*64+sadt.getSeconds();
+		responseauth[4]=sadt.getMinute()%4*64+sadt.getSecond();
 		if (messagekind==COPKIND_START) {
-			responseauth[5]=sadt.getMinutes()/4+176;
+			responseauth[5]=sadt.getMinute()/4+176;
 		} else {
-			responseauth[5]=sadt.getMinutes()/4+128;
+			responseauth[5]=sadt.getMinute()/4+128;
 		}
 		responseauth[6]=
 			sadt.getHour()%8*32+sadt.getDayOfMonth();

@@ -231,9 +231,9 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 			datetime	dt;
 			dt.getSystemDateAndTime();
 			double	statetime=
-				((double)(dt.getSeconds()-
+				((double)(dt.getSecond()-
 					cs->statestartsec))+
-				((double)(dt.getMicroseconds()-
+				((double)(dt.getMicrosecond()-
 					cs->statestartusec))/1000000.0;
 			fieldbuffer[col]=charstring::parseNumber(statetime,
 					colinfo[5].precision,colinfo[5].scale);

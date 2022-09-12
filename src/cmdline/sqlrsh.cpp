@@ -1704,9 +1704,9 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 	datetime	end;
 	end.getSystemDateAndTime();
 	uint64_t	startusec=start.getEpoch()*1000000+
-					start.getMicroseconds();
+					start.getMicrosecond();
 	uint64_t	endusec=end.getEpoch()*1000000+
-					end.getMicroseconds();
+					end.getMicrosecond();
 	double		time=((double)(endusec-startusec))/1000000;
 
 	// display stats

@@ -151,8 +151,8 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 					dt.getMonthAbbreviation(),
 					dt.getDayOfMonth(),
 					dt.getHour(),
-					dt.getMinutes(),
-					dt.getSeconds());
+					dt.getMinute(),
+					dt.getSecond());
 		
 		stringbuffer	logentry;
 		logentry.append(datebuffer)->append(" :\n");
