@@ -327,8 +327,8 @@ void sqlrbench::benchSelect(
 
 		// calculate total time
 		uint32_t	sec=end.getEpoch()-start.getEpoch();
-		int32_t		usec=end.getMicroseconds()-
-					start.getMicroseconds();
+		int32_t		usec=end.getMicrosecond()-
+					start.getMicrosecond();
  		if (usec<0) {
 			sec--;
 			usec=usec+1000000;
@@ -507,8 +507,8 @@ void sqlrbench::benchDML(
 
 		// calculate total time
 		uint32_t	sec=end.getEpoch()-start.getEpoch();
-		int32_t		usec=end.getMicroseconds()-
-					start.getMicroseconds();
+		int32_t		usec=end.getMicrosecond()-
+					start.getMicrosecond();
  		if (usec<0) {
 			sec--;
 			usec=usec+1000000;
