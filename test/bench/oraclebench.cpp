@@ -6,6 +6,7 @@
 #include <rudiments/environment.h>
 
 extern "C" {
+	#define OCIVER_ORACLE
 	#include <oci.h>
 }
 

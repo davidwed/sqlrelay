@@ -155,6 +155,8 @@ int main(int argc, const char **argv) {
 	// init stats
 	dictionary< float, linkedlist< float > *>	selectstats;
 	dictionary< float, linkedlist< float > *>	dmlstats;
+	selectstats.setManageValues(true);
+	dmlstats.setManageValues(true);
 
 	// for each database...
 	dynamiclib	sqlrdl;
@@ -404,10 +406,6 @@ int main(int argc, const char **argv) {
 		graphStats(graph,db,&selectstats);
 		// FIXME: graph dml stats
 	}
-
-	// clean up
-	selectstats.clearAndDeleteValues();
-	dmlstats.clearAndDeleteValues();
 
 	// exit
 	process::exit(0);
