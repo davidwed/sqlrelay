@@ -80,7 +80,7 @@ sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 			}
 
 			// initialize the gss context
-			pvt->_gmech.initialize(
+			pvt->_gmech.init(
 				parameters->getAttributeValue("krbmech"));
 			pvt->_gctx.setDesiredMechanism(&pvt->_gmech);
 			pvt->_gctx.setDesiredFlags(

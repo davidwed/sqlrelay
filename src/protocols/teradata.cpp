@@ -2241,7 +2241,7 @@ bool sqlrprotocol_teradata::sendResponseToClient() {
 		// [7]       - appears to be a sequence number
 
 		// initialize a datetime from [3,4,5,6]
-		sadt.initialize(leToHost(time));
+		sadt.init(leToHost(time));
 
 		// responseauth is:
 		// [0] - always 0

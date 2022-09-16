@@ -10,6 +10,8 @@ class SQLRSERVER_DLLSPEC sqlrpwdenc_crypt : public sqlrpwdenc {
 			sqlrpwdenc_crypt(domnode *parameters, bool debug);
 		bool	oneWay();
 		char	*encrypt(const char *value);
+
+		crypt	c;
 };
 
 sqlrpwdenc_crypt::sqlrpwdenc_crypt(domnode *parameters, bool debug) :
@@ -22,16 +24,20 @@ bool sqlrpwdenc_crypt::oneWay() {
 
 char *sqlrpwdenc_crypt::encrypt(const char *value) {
 
-	// the first two characters of the result string
-	// are the salt, so don't include them, if possible
-	char	*encrypted=crypt::encrypt(value,getParameters()->
-						getAttributeValue("salt"));
-	if (charstring::length(encrypted)<2) {
-		return encrypted;
-	}
-	char	*retval=charstring::duplicate(encrypted+2);
-	delete[] encrypted;
-	return retval;
+	c.setIv((const unsigned char *)
+			getParameters()->getAttributeValue("salt"),
+			c.getIvSize());
+
+	c.append((const unsigned char *)value,
+			charstring::length(value));
+
+	const char	*encrypted=(const char *)c.getEncryptedData();
+
+	// the first two characters of the result string are the salt,
+	// so don't include them in the result, if possible
+	return (charstring::length(encrypted)<2)?
+			charstring::duplicate(encrypted):
+			charstring::duplicate(encrypted+2);
 }
 
 extern "C" {

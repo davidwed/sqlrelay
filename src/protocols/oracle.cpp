@@ -4881,7 +4881,7 @@ void sqlrprotocol_oracle::putIov() {
 	// software/db install date,
 	// which was Oct 4, 2012.
 	datetime	dtsince;
-	dtsince.initialize("12/15/2012 11:15:00 EST");
+	dtsince.init("12/15/2012 11:15:00 EST");
 	datetime	dt;
 	dt.getSystemDateAndTime();
 	uint32_t	timestamp=dt.getEpoch()-dtsince.getEpoch();

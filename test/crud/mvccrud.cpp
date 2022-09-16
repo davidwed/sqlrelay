@@ -379,13 +379,13 @@ bool httpModuleInit(httpserverapi *sapi) {
 
 	// initialize pools
 	testcontrollerpool.setMin(threadsperprocess);
-	testcontrollerpool.initialize();
+	testcontrollerpool.init();
 	ajaxtestviewpool.setMin(threadsperprocess);
-	ajaxtestviewpool.initialize();
+	ajaxtestviewpool.init();
 	defaulttestservicepool.setMin(threadsperprocess);
-	defaulttestservicepool.initialize();
+	defaulttestservicepool.init();
 	sqlrtestdaopool.setMin(threadsperprocess);
-	sqlrtestdaopool.initialize();
+	sqlrtestdaopool.init();
 
 	return true;
 }
