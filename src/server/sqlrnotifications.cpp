@@ -370,7 +370,7 @@ char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
 
 	// get various bits of data for substitutions
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	char	*hostname=NULL;
 	char	*pid=NULL;
 

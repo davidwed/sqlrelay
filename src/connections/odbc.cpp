@@ -1117,7 +1117,7 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 	pid_t	pid=process::getProcessId();
 
 	datetime dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	time_t	now=dt.getEpoch();
 
 	char	*hostname=sys::getHostName();

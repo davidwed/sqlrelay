@@ -172,7 +172,7 @@ void sqlrcachemanager::erase(const char *dirname, const char *filename) {
 	
 			// delete the file if the ttl has expired
 			datetime	dt;
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			if (ttl<dt.getEpoch()) {
 				file::remove(fullpathname);
 			}

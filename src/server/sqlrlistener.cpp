@@ -2021,8 +2021,8 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 
 	// connect to the fixup socket of the parent listener
 	unixsocketclient	fixupclientsockun;
-	if (fixupclientsockun.connect(pvt->_fixupsockname,-1,-1,0,1)
-							!=RESULT_SUCCESS) {
+	fixupclientsockun.setFilename(pvt->_fixupsockname);
+	if (fixupclientsockun.connect()!=RESULT_SUCCESS) {
 		raiseInternalErrorEvent("fixup failed to connect");
 		return false;
 	}
@@ -2268,7 +2268,7 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 
 void sqlrlistener::setStartTime() {
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	pvt->_shm->starttime=dt.getEpoch();
 }
 
@@ -2298,7 +2298,7 @@ void sqlrlistener::incrementConnectedClientCount() {
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	if (pvt->_shm->connectedclients>
 			pvt->_shm->peak_connectedclients_1min ||
 		dt.getEpoch()/60>
@@ -2385,7 +2385,7 @@ void sqlrlistener::incrementBusyListeners() {
 
 	// update the peak listeners over the previous minute count
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	if (busylisteners>pvt->_shm->peak_listeners_1min ||
 		dt.getEpoch()/60>pvt->_shm->peak_listeners_1min_time/60) {
 		pvt->_shm->peak_listeners_1min=busylisteners;

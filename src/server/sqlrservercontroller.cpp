@@ -1046,7 +1046,7 @@ bool sqlrservercontroller::attemptLogIn(bool printerrors) {
 
 	// get stats
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	pvt->_loggedinsec=dt.getSecond();
 	pvt->_loggedinusec=dt.getMicrosecond();
 
@@ -1120,7 +1120,7 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 	// Determine when to re-login next.
 	if (pvt->_constr->getBehindLoadBalancer()) {
 		datetime	dt;
-		if (dt.getSystemDateAndTime()) {
+		if (dt.initFromSystemDateTime()) {
 			if (!pvt->_reloginseed) {
 				// Ideally we'd use randomnumber:getSeed for
 				// this, but on some platforms that's generated
@@ -1423,7 +1423,7 @@ bool sqlrservercontroller::listen() {
 
 	int32_t		softttl=pvt->_cfg->getSoftTtl();
 	datetime	startdt;
-	startdt.getSystemDateAndTime();
+	startdt.initFromSystemDateTime();
 
 	bool		clientconnectfailed=false;
 
@@ -1528,7 +1528,7 @@ bool sqlrservercontroller::listen() {
 				// if we've been alive for too long...
 				if (softttl>0) {
 					datetime	currentdt;
-					currentdt.getSystemDateAndTime();
+					currentdt.initFromSystemDateTime();
 					if (currentdt.getEpoch()-
 						startdt.getEpoch()>=softttl) {
 						return true;
@@ -1652,7 +1652,7 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	time_t	before=0;
 	if (originalttl>0) {
 		datetime	dt;
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		before=dt.getEpoch();
 	}
 
@@ -1678,7 +1678,7 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	// get the time after announcing and update the ttl
 	if (originalttl>0) {
 		datetime	dt;
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		pvt->_ttl=pvt->_ttl-(dt.getEpoch()-before);
 	}
 
@@ -1756,9 +1756,9 @@ bool sqlrservercontroller::registerForHandoff() {
 
 		raiseDebugMessageEvent("trying...");
 
-		if (pvt->_handoffsockun.connect(handoffsockname,
-							-1,-1,1,0)==
-							RESULT_SUCCESS) {
+		pvt->_handoffsockun.setFilename(handoffsockname);
+		pvt->_handoffsockun.setRetryWait(1);
+		if (pvt->_handoffsockun.connect()==RESULT_SUCCESS) {
 			if (pvt->_handoffsockun.write(
 				(uint32_t)process::getProcessId())==
 							sizeof(uint32_t)) {
@@ -1796,7 +1796,9 @@ void sqlrservercontroller::deRegisterForHandoff() {
 
 	// attach to the socket and write the process id
 	unixsocketclient	removehandoffsockun;
-	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
+	removehandoffsockun.setFilename(removehandoffsockname);
+	removehandoffsockun.setTries(1);
+	removehandoffsockun.connect();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
 	removehandoffsockun.flushWriteBuffer(-1,-1);
 
@@ -5114,7 +5116,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// set the query start time (in case the prepare fails)
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	// prepare the query
@@ -5128,7 +5130,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	if (!success) {
 
 		// set the query end time
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 		// update query and error counts
@@ -5292,7 +5294,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// (which may have been set earlier during prepare,
 	// in case the prepare failed)
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	// init result
@@ -5305,7 +5307,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		if (cursor->getQueryWasIntercepted()) {
 
 			// set the query end time
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			if (success) {
@@ -5336,7 +5338,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		raiseDebugMessageEvent("preparing query...");
 
 		// set the query start time (in case the prepare fails)
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 		// prepare the query
@@ -5350,7 +5352,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		if (!success) {
 
 			// set the query end time
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			// update query and error counts
@@ -5387,13 +5389,13 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	if (!cursor->getBindsWereFaked()) {
 
 		// set the query start time (in case handleBinds fails)
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 		if (!handleBinds(cursor)) {
 
 			// set the query end time
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			// update query and error counts
@@ -5424,7 +5426,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	}
 
 	// (re)set the query start time
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	if (pvt->_debugsql) {
@@ -5449,7 +5451,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	cursor->setQueryHasBeenExecuted(true);
 
 	// set the query end time
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 	// special case intercepts...
@@ -6802,7 +6804,7 @@ void sqlrservercontroller::endSession() {
 		raiseDebugMessageEvent("relogging in to "
 				"redistribute connections");
 		datetime	dt;
-		if (dt.getSystemDateAndTime()) {
+		if (dt.initFromSystemDateTime()) {
 			if (dt.getEpoch()>=pvt->_relogintime) {
 				reLogIn();
 			}
@@ -7164,7 +7166,7 @@ void sqlrservercontroller::decrementConnectedClientCount() {
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	if (pvt->_shm->connectedclients>
 			pvt->_shm->peak_connectedclients_1min ||
 		dt.getEpoch()/60>
@@ -8538,7 +8540,7 @@ void sqlrservercontroller::setState(enum sqlrconnectionstate_t state) {
 	}
 	pvt->_connstats->state=state;
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	pvt->_connstats->statestartsec=dt.getSecond();
 	pvt->_connstats->statestartusec=dt.getMicrosecond();
 }
@@ -8555,7 +8557,7 @@ void sqlrservercontroller::setClientSessionStartTime() {
 		return;
 	}
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	pvt->_connstats->clientsessionsec=dt.getSecond();
 	pvt->_connstats->clientsessionusec=dt.getMicrosecond();
 }
@@ -8714,7 +8716,7 @@ void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 
 	// re-init stats if necessary
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	time_t	now=dt.getEpoch();
 	int	index=now%STATQPSKEEP;
 	if (pvt->_shm->timestamp[index]!=now) {

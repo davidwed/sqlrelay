@@ -1464,7 +1464,7 @@ void sqlrsh::initStats(sqlrshenv *env) {
 		return;
 	}
 
-	start.getSystemDateAndTime();
+	start.initFromSystemDateTime();
 }
 
 void sqlrsh::displayError(sqlrshenv *env,
@@ -1702,7 +1702,7 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	// calculate elapsed time
 	datetime	end;
-	end.getSystemDateAndTime();
+	end.initFromSystemDateTime();
 	uint64_t	startusec=start.getEpoch()*1000000+
 					start.getMicrosecond();
 	uint64_t	endusec=end.getEpoch()*1000000+

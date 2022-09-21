@@ -321,7 +321,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 
 		// get the command start time
 		datetime	dt;
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 
 		// handle client protocol version as a command, for now
 		if (command==PROTOCOLVERSION) {
@@ -521,7 +521,7 @@ clientsessionexitstatus_t sqlrprotocol_sqlrclient::clientSession(
 		}
 
 		// set the command end-time
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		cont->setCommandEnd(cursor,
 				dt.getSecond(),dt.getMicrosecond());
 

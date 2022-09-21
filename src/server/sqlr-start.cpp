@@ -325,17 +325,23 @@ static bool waitForInstance(sqlrpaths *sqlrpth,
 		// try to connect
 		if (cfg->getListenOnUnix()) {
 			unixsocketclient	s;
-			if (s.connect(cfg->getDefaultSocket(),1,0,0,1)==
-							RESULT_SUCCESS) {
+			s.setFilename(cfg->getDefaultSocket());
+			s.setTimeoutSeconds(1);
+			s.setTimeoutMicroseconds(0);
+			s.setTries(1);
+			if (s.connect()==RESULT_SUCCESS) {
 				retval=true;
 				break;
 			}
 
 		} else if (cfg->getListenOnInet()) {
 			inetsocketclient	s;
-			if (s.connect("localhost",
-					cfg->getDefaultPort(),1,0,0,1)==
-							RESULT_SUCCESS) {
+			s.setHost("localhost");
+			s.setPort(cfg->getDefaultPort());
+			s.setTimeoutSeconds(1);
+			s.setTimeoutMicroseconds(0);
+			s.setTries(1);
+			if (s.connect()==RESULT_SUCCESS) {
 				retval=true;
 				break;
 			}

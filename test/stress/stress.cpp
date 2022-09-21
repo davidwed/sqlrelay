@@ -158,11 +158,14 @@ void heartbeatTest(void *id) {
 	uint32_t	seed=threadid;
 
 	inetsocketclient	isc;
+	isc.setHost(host);
+	isc.setPort(port);
+	isc.setTries(1);
 
 	uint64_t	i=0;
 	while (!terminated) {
 
-		if (isc.connect(host,port,-1,-1,0,1)==RESULT_SUCCESS) {
+		if (isc.connect()==RESULT_SUCCESS) {
 
 			stdoutput.printf(
 				"%lld: %d: connect success\n",threadid,i);

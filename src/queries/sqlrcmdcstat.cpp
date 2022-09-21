@@ -229,7 +229,7 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 			// state_time -
 			// seconds the connection has been in its current state
 			datetime	dt;
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			double	statetime=
 				((double)(dt.getSecond()-
 					cs->statestartsec))+

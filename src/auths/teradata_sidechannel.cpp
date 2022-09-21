@@ -153,8 +153,10 @@ const char *sqlrauth_teradata_sidechannel::auth(sqlrcredentials *cred) {
 	clientsock=((sqlrteradatacredentials *)cred)->getClientFileDescriptor();
 
 	isc.close();
+	isc.setHost(host);
+	isc.setPort(port);
 	// FIXME: buffering
-	if (!isc.connect(host,port,-1,-1,0,0)) {
+	if (!isc.connect()) {
 		// FIXME: display/report error
 		return NULL;
 	}

@@ -884,7 +884,7 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 
 	// delimiter and timestamp
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	stringbuffer	str;
 	str.append("========================================"
 			"=======================================\n");

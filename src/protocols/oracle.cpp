@@ -4883,7 +4883,7 @@ void sqlrprotocol_oracle::putIov() {
 	datetime	dtsince;
 	dtsince.init("12/15/2012 11:15:00 EST");
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	uint32_t	timestamp=dt.getEpoch()-dtsince.getEpoch();
 	writeBE(&reqpacket,timestamp);
 }

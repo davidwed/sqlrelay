@@ -607,10 +607,12 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
-		openresult=pvt->_ucs.connect(pvt->_listenerunixport,
-						pvt->_connecttimeoutsec,
-						pvt->_connecttimeoutusec,
-						pvt->_retrytime,pvt->_tries);
+		pvt->_ucs.setFilename(pvt->_listenerunixport);
+		pvt->_ucs.setTimeoutSeconds(pvt->_connecttimeoutsec);
+		pvt->_ucs.setTimeoutMicroseconds(pvt->_connecttimeoutusec);
+		pvt->_ucs.setRetryWait(pvt->_retrytime);
+		pvt->_ucs.setTries(pvt->_tries);
+		openresult=pvt->_ucs.connect();
 		if (openresult==RESULT_SUCCESS) {
 
 			pvt->_ucs.setSocketReadBufferSize(65536);
@@ -633,11 +635,13 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
-		openresult=pvt->_ics.connect(pvt->_server,
-						pvt->_listenerinetport,
-						pvt->_connecttimeoutsec,
-						pvt->_connecttimeoutusec,
-						pvt->_retrytime,pvt->_tries);
+		pvt->_ics.setHost(pvt->_server);
+		pvt->_ics.setPort(pvt->_listenerinetport);
+		pvt->_ics.setTimeoutSeconds(pvt->_connecttimeoutsec);
+		pvt->_ics.setTimeoutMicroseconds(pvt->_connecttimeoutusec);
+		pvt->_ics.setRetryWait(pvt->_retrytime);
+		pvt->_ics.setTries(pvt->_tries);
+		openresult=pvt->_ics.connect();
 		if (openresult==RESULT_SUCCESS) {
 
 			pvt->_ics.setSocketReadBufferSize(65536);
@@ -1101,10 +1105,12 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// first, try for the unix port
 	if (!charstring::isNullOrEmpty(socket)) {
-		pvt->_connected=(pvt->_ucs.connect(
-					socket,-1,-1,
-					pvt->_retrytime,
-					pvt->_tries)==RESULT_SUCCESS);
+		pvt->_ucs.setFilename(socket);
+		pvt->_ucs.setTimeoutSeconds(-1);
+		pvt->_ucs.setTimeoutMicroseconds(-1);
+		pvt->_ucs.setRetryWait(pvt->_retrytime);
+		pvt->_ucs.setTries(pvt->_tries);
+		pvt->_connected=(pvt->_ucs.connect()==RESULT_SUCCESS);
 		if (pvt->_connected) {
 			pvt->_cs=&pvt->_ucs;
 		}
@@ -1112,10 +1118,13 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// then try for the inet port
 	if (!pvt->_connected) {
-		pvt->_connected=(pvt->_ics.connect(
-					pvt->_server,port,-1,-1,
-					pvt->_retrytime,
-					pvt->_tries)==RESULT_SUCCESS);
+		pvt->_ics.setHost(pvt->_server);
+		pvt->_ics.setPort(port);
+		pvt->_ics.setTimeoutSeconds(-1);
+		pvt->_ics.setTimeoutMicroseconds(-1);
+		pvt->_ics.setRetryWait(pvt->_retrytime);
+		pvt->_ics.setTries(pvt->_tries);
+		pvt->_connected=(pvt->_ics.connect()==RESULT_SUCCESS);
 		if (pvt->_connected) {
 			pvt->_cs=&pvt->_ics;
 		}

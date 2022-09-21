@@ -142,7 +142,7 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 	if (queryusec>=totalusec) {
 
 		datetime	dt;
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		char	datebuffer[26];
 		charstring::printf(datebuffer,sizeof(datebuffer),
 					"%s %d %s % 2d  %02d:%02d:%02d",

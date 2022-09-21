@@ -112,7 +112,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 	// get the current date
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 
 	// clear log buffer
 	logbuffer.clear();

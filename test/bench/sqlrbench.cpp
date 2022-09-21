@@ -250,7 +250,7 @@ void sqlrbench::benchSelect(
 
 		// get start time
 		datetime	start;
-		start.getSystemDateAndTime();
+		start.initFromSystemDateTime();
 
 		// run all of this some number of times and average the results
 		for (uint16_t iter=0; iter<samples && !shutdown; iter++) {
@@ -323,7 +323,7 @@ void sqlrbench::benchSelect(
 
 		// get end time
 		datetime	end;
-		end.getSystemDateAndTime();
+		end.initFromSystemDateTime();
 
 		// calculate total time
 		uint32_t	sec=end.getEpoch()-start.getEpoch();
@@ -419,7 +419,7 @@ void sqlrbench::benchDML(
 
 		// get start time
 		datetime	start;
-		start.getSystemDateAndTime();
+		start.initFromSystemDateTime();
 
 		// run all of this some number of times and average the results
 		for (uint16_t iter=0; iter<samples && !shutdown; iter++) {
@@ -503,7 +503,7 @@ void sqlrbench::benchDML(
 
 		// get end time
 		datetime	end;
-		end.getSystemDateAndTime();
+		end.initFromSystemDateTime();
 
 		// calculate total time
 		uint32_t	sec=end.getEpoch()-start.getEpoch();

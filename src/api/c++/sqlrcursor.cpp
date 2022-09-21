@@ -639,7 +639,7 @@ void sqlrcursor::startCaching() {
 			
 			// write ttl to files
 			datetime	dt;
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			int64_t	expiration=dt.getEpoch()+pvt->_cachettl;
 			pvt->_cachedest->write(expiration);
 			pvt->_cachedestind->write(expiration);

@@ -426,7 +426,7 @@ void sqlrimportcsv::appendField(stringbuffer *query,
 			// date from the previous century.
 			if (year<100) {
 				datetime	dt;
-				dt.getSystemDateAndTime();
+				dt.initFromSystemDateTime();
 				int32_t	century=dt.getCentury();
 				if (year>dt.getShortYear()+10) {
 					century--;

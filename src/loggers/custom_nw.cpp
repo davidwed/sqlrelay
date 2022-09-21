@@ -133,7 +133,7 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 	
 	// get the current date/time
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 
 	// write everything into an output buffer, pipe-delimited
 	charstring::printf(querylogbuf,sizeof(querylogbuf)-1,

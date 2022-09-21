@@ -367,7 +367,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// set up random number generator
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	currentseed=dt.getEpoch();
 
 	if (!cmdl->found("-nodetach")) {
@@ -664,7 +664,7 @@ void scaler::killConnection(pid_t connpid) {
 	// signal on sem(8) and must be killed.
 
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	stderror.printf("%s Connection (pid=%ld) failed to get ready\n",
 						dt.getString(),(long)connpid);
 
@@ -673,7 +673,7 @@ void scaler::killConnection(pid_t connpid) {
 	bool	dead=false;
 	for (int tries=0; tries<3 && !dead; tries++) {
 		if (tries) {
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			stderror.printf("%s %s connection (pid=%ld)\n",
 				dt.getString(),
 				(tries==1)?"Terminating":"Killing",

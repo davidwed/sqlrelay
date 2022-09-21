@@ -177,7 +177,7 @@ bool sqlrlogger_stalecursors::run(sqlrlistener *sqlrl,
 		sqlrclientcon->begin();
 
 		// build the date string
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		dtstr.clear();
 		dtstr.printf("%04d-%02d-%02d %02d:%02d:%02d",
 				dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),

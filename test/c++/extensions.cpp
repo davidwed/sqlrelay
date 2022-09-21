@@ -407,7 +407,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("SESSION QUERIES: Date Format\n");
 	checkSuccess(cur->sendQuery("select sysdate from dual"),1);
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	const char	*field=cur->getField(0,(uint32_t)0);
 	char	*day=charstring::subString(field,0,1);
 	char	*month=charstring::subString(field,3,4);
