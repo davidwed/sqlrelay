@@ -124,6 +124,7 @@ bool sqlrrowdictionary::remove(const char *key) {
 	return true;
 }
 
-void sqlrrowdictionary::clear() {
+bool sqlrrowdictionary::clear() {
 	// do nothing
+	return true;
 }

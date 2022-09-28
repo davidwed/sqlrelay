@@ -264,8 +264,9 @@ void sqlrrowlist::heapSort() {
 	// do nothing
 }
 
-void sqlrrowlist::clear() {
+bool sqlrrowlist::clear() {
 	// do nothing
+	return true;
 }
 
 class sqlrresultsetlistprivate {
@@ -433,6 +434,7 @@ void sqlrresultsetlist::heapSort() {
 	// do nothing
 }
 
-void sqlrresultsetlist::clear() {
+bool sqlrresultsetlist::clear() {
 	// do nothing
+	return true;
 }

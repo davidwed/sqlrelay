@@ -23,7 +23,7 @@
 		bool	remove(listnode<const char *> *node);
 		void	insertionSort();
 		void	heapSort();
-		void	clear();
+		bool	clear();
 	
 	private:
 		sqlrrowlistprivate	*pvt;

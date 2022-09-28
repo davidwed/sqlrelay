@@ -83,6 +83,7 @@ bool sqlrresultsettable::getAllRowsAvailable() {
 	return (pvt->_cursor)?pvt->_cursor->endOfResultSet():true;
 }
 
-void sqlrresultsettable::clear() {
+bool sqlrresultsettable::clear() {
 	// do nothing
+	return true;
 }

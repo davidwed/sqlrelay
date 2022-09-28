@@ -70,6 +70,7 @@ const char * &sqlrscalar::getReference() {
 	return pvt->_null;
 }
 
-void sqlrscalar::clear() {
+bool sqlrscalar::clear() {
 	// do nothing
+	return true;
 }

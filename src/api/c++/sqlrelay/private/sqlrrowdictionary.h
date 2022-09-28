@@ -12,7 +12,7 @@
 						const char * const *value,
 						uint64_t count);
 		bool	remove(const char *key);
-		void	clear();
+		bool	clear();
 
 	private:
 		sqlrrowdictionaryprivate	*pvt;

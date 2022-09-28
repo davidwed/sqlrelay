@@ -162,7 +162,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		done;
 
 		void	init();
-		void	clear();
+		bool	clear();
 
 		void	parseUrl(const char *urlname);
 		void	normalizeTree();
@@ -440,13 +440,14 @@ void sqlrconfig_xmldom::init() {
 	defaultpassword=NULL;
 }
 
-void sqlrconfig_xmldom::clear() {
+bool sqlrconfig_xmldom::clear() {
 	debugFunction();
 
 	connectstringlist.clear();
 	routelist.clear();
 	sessionstartqueries.clear();
 	sessionendqueries.clear();
+	return true;
 }
 
 const char *sqlrconfig_xmldom::getDefaultAddresses() {
