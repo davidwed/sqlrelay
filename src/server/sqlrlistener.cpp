@@ -2021,7 +2021,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 
 	// connect to the fixup socket of the parent listener
 	unixsocketclient	fixupclientsockun;
-	fixupclientsockun.setFilename(pvt->_fixupsockname);
+	fixupclientsockun.setFileName(pvt->_fixupsockname);
 	if (fixupclientsockun.connect()!=RESULT_SUCCESS) {
 		raiseInternalErrorEvent("fixup failed to connect");
 		return false;

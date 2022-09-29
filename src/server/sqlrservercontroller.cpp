@@ -1756,7 +1756,7 @@ bool sqlrservercontroller::registerForHandoff() {
 
 		raiseDebugMessageEvent("trying...");
 
-		pvt->_handoffsockun.setFilename(handoffsockname);
+		pvt->_handoffsockun.setFileName(handoffsockname);
 		pvt->_handoffsockun.setRetryWait(1);
 		if (pvt->_handoffsockun.connect()==RESULT_SUCCESS) {
 			if (pvt->_handoffsockun.write(
@@ -1796,7 +1796,7 @@ void sqlrservercontroller::deRegisterForHandoff() {
 
 	// attach to the socket and write the process id
 	unixsocketclient	removehandoffsockun;
-	removehandoffsockun.setFilename(removehandoffsockname);
+	removehandoffsockun.setFileName(removehandoffsockname);
 	removehandoffsockun.setTries(1);
 	removehandoffsockun.connect();
 	removehandoffsockun.write((uint32_t)process::getProcessId());

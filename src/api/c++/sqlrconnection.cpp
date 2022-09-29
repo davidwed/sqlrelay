@@ -607,7 +607,7 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
-		pvt->_ucs.setFilename(pvt->_listenerunixport);
+		pvt->_ucs.setFileName(pvt->_listenerunixport);
 		pvt->_ucs.setTimeoutSeconds(pvt->_connecttimeoutsec);
 		pvt->_ucs.setTimeoutMicroseconds(pvt->_connecttimeoutusec);
 		pvt->_ucs.setRetryWait(pvt->_retrytime);
@@ -1104,7 +1104,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// first, try for the unix port
 	if (!charstring::isNullOrEmpty(socket)) {
-		pvt->_ucs.setFilename(socket);
+		pvt->_ucs.setFileName(socket);
 		pvt->_ucs.setTimeoutSeconds(-1);
 		pvt->_ucs.setTimeoutMicroseconds(-1);
 		pvt->_ucs.setRetryWait(pvt->_retrytime);

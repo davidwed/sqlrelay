@@ -325,7 +325,7 @@ static bool waitForInstance(sqlrpaths *sqlrpth,
 		// try to connect
 		if (cfg->getListenOnUnix()) {
 			unixsocketclient	s;
-			s.setFilename(cfg->getDefaultSocket());
+			s.setFileName(cfg->getDefaultSocket());
 			s.setTimeoutSeconds(1);
 			s.setTimeoutMicroseconds(0);
 			s.setTries(1);
