@@ -695,8 +695,8 @@ void scaler::killConnection(pid_t connpid) {
 void scaler::getRandomConnectionId() {
 
 	// get a scaled random number
-	currentseed=randomnumber::generateNumber(currentseed);
-	int32_t	scalednum=randomnumber::scaleNumber(currentseed,0,metrictotal);
+	currentseed=randomnumber::generate(currentseed);
+	int32_t	scalednum=randomnumber::scale(currentseed,0,metrictotal);
 
 	// run through list, decrementing scalednum by the metric
 	// for each, when scalednum is 0, pick that connection id

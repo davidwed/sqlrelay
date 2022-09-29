@@ -1452,8 +1452,8 @@ void sqlrprotocol_oracle::generateAuthSessionKey(uint16_t bytes) {
 	stringbuffer	str;
 	uint32_t	number;
 	for (uint16_t i=0; i<bytes; i++) {
-		r.generateNumber(&number);
-		int32_t	scalednumber=randomnumber::scaleNumber(number,0,16);
+		r.generate(&number);
+		int32_t	scalednumber=randomnumber::scale(number,0,16);
 		str.append((char)(scalednumber+((scalednumber<10)?'0':'A'-10)));
 	}
 	delete[] authsessionkey;

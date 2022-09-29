@@ -814,8 +814,7 @@ bool sqlrconnection::reConfigureSockets() {
 			debugPreEnd();
 		}
 
-		pvt->_gmech.clear();
-		pvt->_gmech.init(pvt->_krbmech);
+		pvt->_gmech.open(pvt->_krbmech);
 
 		pvt->_gcred.clearDesiredMechanisms();
 		pvt->_gcred.addDesiredMechanism(&pvt->_gmech);

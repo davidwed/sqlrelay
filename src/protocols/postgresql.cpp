@@ -826,7 +826,7 @@ bool sqlrprotocol_postgresql::sendAuthenticationMD5Password() {
 
 	// set values to send
 	uint32_t	authtype=AUTH_MD5;
-	rand.generateNumber(&salt);
+	rand.generate(&salt);
 
 	// debug
 	if (getDebug()) {
@@ -953,7 +953,7 @@ bool sqlrprotocol_postgresql::sendBackendKeyData() {
 
 	// set values to send
 	uint32_t	pid=process::getProcessId();
-	rand.generateNumber(&secretkey);
+	rand.generate(&secretkey);
 
 	// debug
 	if (getDebug()) {

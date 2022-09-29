@@ -207,7 +207,7 @@ char *sqlrbench::insertQuery(uint32_t cols, uint32_t colsize) {
 void sqlrbench::appendRandomString(stringbuffer *str, uint32_t colsize) {
 	for (uint32_t j=0; j<colsize; j++) {
 		int32_t	result;
-		rnd.generateScaledNumber('a','z',&result);
+		rnd.generate(&result,'a','z');
 		str->append((char)result);
 	}
 }

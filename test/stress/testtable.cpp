@@ -78,11 +78,11 @@ int main(int argc, const char **argv) {
 		query.append(table);
 		query.append(" values (");
 		for (int32_t j=0; j<colcount; j++) {
-			seed=randomnumber::generateNumber(seed);
+			seed=randomnumber::generate(seed);
 			if (j) {
 				query.append(", ");
 			}
-			query.append(randomnumber::scaleNumber(seed,1,100000));
+			query.append(randomnumber::scale(seed,1,100000));
 		}
 		query.append(")");
 		if (!sqlrcur.sendQuery(query.getString())) {

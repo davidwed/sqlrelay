@@ -1397,8 +1397,8 @@ void sqlrprotocol_mysql::generateChallenge() {
 	stringbuffer	str;
 	uint32_t	number;
 	for (uint16_t i=0; i<bytes; i++) {
-		r.generateNumber(&number);
-		str.append((char)randomnumber::scaleNumber(number,' ','~'));
+		r.generate(&number);
+		str.append((char)randomnumber::scale(number,' ','~'));
 	}
 	delete[] challenge;
 	challenge=str.detachString();

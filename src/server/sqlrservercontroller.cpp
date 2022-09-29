@@ -1129,9 +1129,9 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 				// id is guaranteed unique.
 				pvt->_reloginseed=process::getProcessId();
 			}
-			pvt->_reloginseed=randomnumber::generateNumber(
+			pvt->_reloginseed=randomnumber::generate(
 							pvt->_reloginseed);
-			int32_t	seconds=randomnumber::scaleNumber(
+			int32_t	seconds=randomnumber::scale(
 							pvt->_reloginseed,
 							600,900);
 			pvt->_relogintime=dt.getEpoch()+seconds;
