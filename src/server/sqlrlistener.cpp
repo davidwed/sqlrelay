@@ -1791,9 +1791,11 @@ bool sqlrlistener::doneAcceptingAvailableConnection() {
 }
 
 void sqlrlistener::waitForConnectionToBeReadyForHandoff() {
-	raiseDebugMessageEvent("waiting for connection to be ready for handoff");
+	raiseDebugMessageEvent(
+		"waiting for connection to be ready for handoff");
 	pvt->_semset->wait(12);
-	raiseDebugMessageEvent("done waiting for connection to be ready for handoff");
+	raiseDebugMessageEvent(
+		"done waiting for connection to be ready for handoff");
 }
 
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
@@ -1843,6 +1845,13 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// execute this only if code above executed without errors...
 		if (ok) {
+
+			// FIXME: If a connection was spawned and has signaled
+			// on semaphore 12, but some step above failed, then
+			// waitForConnectionToBeReadyForHandoff below won't
+			// be called, causing semaphore 12 to grow and grow.
+			// Somehow this also leads to new connections not
+			// being spawned.  See #5570
 
 			// wait for the connection to let us know that it's
 			// ready to have a client handed off to it

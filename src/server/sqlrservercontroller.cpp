@@ -1724,6 +1724,14 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	// did occur, and this connection is going to exit, that's OK.  Since
 	// the handoff socket was closed above, the handoff will fail, and the
 	// listener will loop back and try again with a different connection.
+	//
+	// FIXME: this doesn't actually seem to be ok, at least not in all
+	// cases.  If the listener's wait(2) times out then it won't signal(3)
+	// and this waitForListenerToFinishReading() (wait(3)) will also
+	// time out.  In that case, this will signal semaphore 12, but the
+	// listener won't wait on it and 12 will stay incremented, which can
+	// fool the listener in the future into thinking that a future
+	// connection is ready when it might not be.
 	signalListenerToHandoff();
 
 	return success;
@@ -3764,6 +3772,7 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 					const char **autoinccolumn,
 					const char **primarykeycolumn) {
 
+#if 0
 	// attempt to get the columns from various caches
 	*columns=pvt->_colcache.getValue((char *)table);
 	*autoinccolumn=pvt->_autoinccolcache.getValue((char *)table);
@@ -3771,6 +3780,10 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 	if (*columns) {
 		return;
 	}
+#else
+	*autoinccolumn=NULL;
+	*primarykeycolumn=NULL;
+#endif
 
 	// failing that, look them up in the database (and cache them)...
 
@@ -3843,11 +3856,13 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 	close(gclcur);
 	deleteCursor(gclcur);
 
+#if 0
 	// cache table -> columns/autoinccolumns mappings
 	char	*tablecopy=charstring::duplicate(table);
 	pvt->_colcache.setValue(tablecopy,*columns);
 	pvt->_autoinccolcache.setValue(tablecopy,*autoinccolumn);
 	pvt->_primarykeycolcache.setValue(tablecopy,*primarykeycolumn);
+#endif
 }
 
 void sqlrservercontroller::getColumnsFromInsertQuery(
@@ -3925,7 +3940,7 @@ void sqlrservercontroller::deriveColumnsFromInsertQuery(
 	// with the corresponding column from allcolumns
 	listnode<char *>	*vnode=values->getFirst();
 	listnode<char *>	*acnode=allcolumns->getFirst();
-	while (vnode){
+	while (vnode && acnode) {
 		columns->append(charstring::duplicate(acnode->getValue()));
 		vnode=vnode->getNext();
 		acnode=acnode->getNext();
@@ -7139,7 +7154,8 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 		return false;
 	}
 
-	raiseDebugMessageEvent("done attaching to shared memory and semaphores");
+	raiseDebugMessageEvent("done attaching to "
+				"shared memory and semaphores");
 
 	delete[] idfilename;
 
@@ -7214,7 +7230,7 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 		raiseDebugMessageEvent("done acquiring announce mutex");
 	} else {
 		raiseDebugMessageEvent("ttl reached, aborting "
-				"acquiring announce mutex");
+					"acquiring announce mutex");
 	}
 	return result;
 }
@@ -7261,7 +7277,8 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	if (result) {
 		raiseDebugMessageEvent("done waiting for listener");
 	} else {
-		raiseDebugMessageEvent("ttl reached, aborting waiting for listener");
+		raiseDebugMessageEvent("ttl reached, "
+					"aborting waiting for listener");
 	}
 
 	// Reset this semaphore to 0.  It can get left incremented if another
