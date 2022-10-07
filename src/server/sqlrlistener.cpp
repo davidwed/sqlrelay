@@ -1641,14 +1641,6 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 bool sqlrlistener::semWait(int32_t index, thread *thr,
 					bool withundo, bool *timeout) {
 
-	// If dynamic scaling is enabled then we need to adjust the
-	// listenertimeout.  In all cases where semWait() is called, the scaler
-	// could be off trying to start connections, or connections could be
-	// slow to start.  So, we must wait long enough to accommodate that,
-	// plus a little grace.  If listenertimeout is too short, then it needs
-	// to be made longer.
-	// FIXME: arguably, this should just be done at startup...
-
 	bool	result=true;
 	*timeout=false;
 	if (pvt->_listenertimeout>0 &&
