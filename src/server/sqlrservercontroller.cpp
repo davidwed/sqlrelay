@@ -1682,17 +1682,17 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 		pvt->_ttl=pvt->_ttl-(dt.getEpoch()-before);
 	}
 
-	// This will fall through if the ttl was reached while waiting.
-	// Since we acquired the announce mutex earlier though, we need to
-	// release it in either case.
+	// this will fall through if the ttl was reached while waiting
 	bool	success=false;
 	if (originalttl<=0 || pvt->_ttl) {
 		success=waitForListenerToFinishReading();
 	}
 
+	// release the announce mutex earlier
 	releaseAnnounceMutex();
 
 	if (success) {
+
 		// reset ttl
 		pvt->_ttl=originalttl;
 
@@ -1724,14 +1724,6 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	// did occur, and this connection is going to exit, that's OK.  Since
 	// the handoff socket was closed above, the handoff will fail, and the
 	// listener will loop back and try again with a different connection.
-	//
-	// FIXME: this doesn't actually seem to be ok, at least not in all
-	// cases.  If the listener's wait(2) times out then it won't signal(3)
-	// and this waitForListenerToFinishReading() (wait(3)) will also
-	// time out.  In that case, this will signal semaphore 12, but the
-	// listener won't wait on it and 12 will stay incremented, which can
-	// fool the listener in the future into thinking that a future
-	// connection is ready when it might not be.
 	signalListenerToHandoff();
 
 	return success;

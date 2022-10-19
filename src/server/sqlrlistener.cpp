@@ -1841,9 +1841,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// FIXME: If a connection was spawned and has signaled
 			// on semaphore 12, but some step above failed, then
 			// waitForConnectionToBeReadyForHandoff below won't
-			// be called, causing semaphore 12 to grow and grow.
-			// Somehow this also leads to new connections not
-			// being spawned.  See #5570
+			// be called, and semaphore 12 will grow and grow.
 
 			// wait for the connection to let us know that it's
 			// ready to have a client handed off to it
