@@ -17222,7 +17222,7 @@ export LD_LIBRARY_PATH
 
 						if ( test -n "$CXX_VERSION" -a -z "`echo $CXX_VERSION | grep g++`" )
 		then
-						if (  test "`echo $CXX_VERSION | tr -d'.' | cut -c1-2`" -lt "27" )
+						if (  test "`echo $CXX_VERSION | tr -d '.' | cut -c1-2`" -lt "27" )
 			then
 				WERROR=""
 			fi
@@ -34940,6 +34940,12 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.20* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.19* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.18* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.17* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.16* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.15* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.14* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.12* 2> /dev/null` \
@@ -34958,6 +34964,12 @@ then
 `ls -d /usr/lib64/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-14-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.20* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.19* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.18* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.17* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.16* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.15* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.14* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.12* 2> /dev/null` \
@@ -34975,6 +34987,12 @@ then
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-15-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-16-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-17-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-18-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-19-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-20-* 2> /dev/null` \
 /usr \
 /usr/local
 			do

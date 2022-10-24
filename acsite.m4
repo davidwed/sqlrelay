@@ -2610,6 +2610,12 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.20* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.19* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.18* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.17* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.16* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.15* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.14* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.12* 2> /dev/null` \
@@ -2628,6 +2634,12 @@ then
 `ls -d /usr/lib64/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-14-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.20* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.19* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.18* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.17* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.16* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.15* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.14* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.12* 2> /dev/null` \
@@ -2645,6 +2657,12 @@ then
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-15-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-16-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-17-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-18-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-19-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-20-* 2> /dev/null` \
 /usr \
 /usr/local
 			do

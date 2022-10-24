@@ -9610,7 +9610,7 @@ then
 		if ( test -n "$CXX_VERSION" -a -z "`echo $CXX_VERSION | grep g++`" )
 		then
 			dnl older versions output something like 27, 28, 29, etc.
-			if (  test "`echo $CXX_VERSION | tr -d'.' | cut -c1-2`" -lt "27" )
+			if (  test "`echo $CXX_VERSION | tr -d '.' | cut -c1-2`" -lt "27" )
 			then
 				WERROR=""
 			fi
