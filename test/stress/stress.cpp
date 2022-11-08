@@ -160,7 +160,6 @@ void heartbeatTest(void *id) {
 	inetsocketclient	isc;
 	isc.setHost(host);
 	isc.setPort(port);
-	isc.setTries(1);
 
 	uint64_t	i=0;
 	while (!terminated) {

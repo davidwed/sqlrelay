@@ -328,7 +328,6 @@ static bool waitForInstance(sqlrpaths *sqlrpth,
 			s.setFileName(cfg->getDefaultSocket());
 			s.setTimeoutSeconds(1);
 			s.setTimeoutMicroseconds(0);
-			s.setTries(1);
 			if (s.connect()==RESULT_SUCCESS) {
 				retval=true;
 				break;
@@ -340,7 +339,6 @@ static bool waitForInstance(sqlrpaths *sqlrpth,
 			s.setPort(cfg->getDefaultPort());
 			s.setTimeoutSeconds(1);
 			s.setTimeoutMicroseconds(0);
-			s.setTries(1);
 			if (s.connect()==RESULT_SUCCESS) {
 				retval=true;
 				break;

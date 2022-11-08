@@ -1797,7 +1797,6 @@ void sqlrservercontroller::deRegisterForHandoff() {
 	// attach to the socket and write the process id
 	unixsocketclient	removehandoffsockun;
 	removehandoffsockun.setFileName(removehandoffsockname);
-	removehandoffsockun.setTries(1);
 	removehandoffsockun.connect();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
 	removehandoffsockun.flushWriteBuffer(-1,-1);
