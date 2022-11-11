@@ -1785,6 +1785,9 @@ void sqlrconfig_xmldom::getTreeValues() {
 			maxconnections=connections;
 		}
 	}
+	if (!maxconnections) {
+		maxconnections=charstring::toInteger(DEFAULT_CONNECTIONS);
+	}
 	attr=instance->getAttribute("maxqueuelength");
 	if (!attr->isNullNode()) {
 		maxqueuelength=atouint32_t(attr->getValue(),

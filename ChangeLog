@@ -57,6 +57,8 @@
 	removed sqlrresultsetdomnode class
 	de-consted some things
 	added detection of newer java versions
+	if connections=0 and maxconnections is unspecified then it defaults
+		to 5 now
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
