@@ -11,7 +11,7 @@ class SQLRSERVER_DLLSPEC sqlrpwdenc_crypt : public sqlrpwdenc {
 		bool	oneWay();
 		char	*encrypt(const char *value);
 
-		crypt	c;
+		class crypt	c;
 };
 
 sqlrpwdenc_crypt::sqlrpwdenc_crypt(domnode *parameters, bool debug) :
