@@ -1264,9 +1264,11 @@ const char *odbcconnection::logInError(const char *errmsg) {
 	SQLSMALLINT	errlength;
 
 	bytestring::zero(state,sizeof(state));
+	bytestring::zero(errorbuffer,sizeof(errorbuffer));
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
-					errorbuffer,1024,&errlength);
+				errorbuffer,sizeof(errorbuffer),&errlength);
+
 	errormessage.append(errorbuffer,errlength);
 	return errormessage.getString();
 }
