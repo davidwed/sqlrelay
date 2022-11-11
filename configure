@@ -875,6 +875,7 @@ SQLR
 LIBEFENCE
 LIBDMALLOC
 CUSERPATH
+NODEGYPPYTHON
 ERLANGUSERPATH
 TCLUSERPATH
 PHPUSERPATH
@@ -1032,6 +1033,7 @@ with_mono_prefix
 enable_mono
 with_nodejs_prefix
 enable_nodejs
+with_node_gyp_python
 enable_c_rpath
 with_pthread_prefix
 with_system_libtool
@@ -1793,6 +1795,7 @@ Optional Packages:
   --with-erlang-prefix          Location of Erlang
   --with-mono-prefix            Location of Mono (C#)
   --with-nodejs-prefix          Location of node.js
+  --with-node-gyp-python        Location of alternative python to use with node-gyp
   --with-pthread-prefix         Location of pthread library
   --with-system-libtool   use system libtool instead of ./libtool
   --with-sqlr                   replacement for "sqlr"
@@ -3379,6 +3382,14 @@ else
   ENABLE_NODEJS="yes"
 fi
 
+
+# Check whether --with-node-gyp-python was given.
+if test "${with_node_gyp_python+set}" = set; then :
+  withval=$with_node_gyp_python; NODEGYPPYTHON="--python $withval"
+else
+  NODEGYPPYTHON=""
+fi
+
 # Check whether --enable-c-rpath was given.
 if test "${enable_c_rpath+set}" = set; then :
   enableval=$enable_c_rpath; CUSERPATH="yes"
@@ -3541,6 +3552,7 @@ if ( test -z "$ENABLE_SERVER" -a -z "$ENABLE_CMDLINE" )
 then
 	ENABLE_UTIL=""
 fi
+
 
 
 

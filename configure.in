@@ -356,6 +356,10 @@ AC_ARG_ENABLE(nodejs,
 	[  --disable-nodejs              Don't build node.js api],
 	ENABLE_NODEJS="",
 	ENABLE_NODEJS="yes")
+AC_ARG_WITH(node-gyp-python,
+	[  --with-node-gyp-python        Location of alternative python to use with node-gyp],
+	NODEGYPPYTHON="--python $withval",
+	NODEGYPPYTHON="")
 AC_ARG_ENABLE(c-rpath,
 	[  --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library],
 	CUSERPATH="yes",
@@ -498,6 +502,7 @@ AC_SUBST(JAVAUSERPATH)
 AC_SUBST(PHPUSERPATH)
 AC_SUBST(TCLUSERPATH)
 AC_SUBST(ERLANGUSERPATH)
+AC_SUBST(NODEGYPPYTHON)
 AC_SUBST(CUSERPATH)
 AC_SUBST(LIBDMALLOC)
 AC_SUBST(LIBEFENCE)
