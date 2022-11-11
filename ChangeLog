@@ -59,6 +59,7 @@
 	added detection of newer java versions
 	if connections=0 and maxconnections is unspecified then it defaults
 		to 5 now
+	implemented workaround for broken last-insert-id in libmariadbclient 18
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

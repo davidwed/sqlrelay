@@ -289,6 +289,8 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		stringbuffer	loginerror;
 
 		bool		escapeblobs;
+
+		uint64_t	lastinsertid;
 };
 
 extern "C" {
@@ -318,6 +320,8 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 #ifdef HAVE_MYSQL_OPT_SSL_MODE
 	sslmode=0;
 #endif
+
+	lastinsertid=0;
 }
 
 mysqlconnection::~mysqlconnection() {
@@ -748,7 +752,16 @@ const char *mysqlconnection::setIsolationLevelQuery() {
 }
 
 bool mysqlconnection::getLastInsertId(uint64_t *id) {
-	*id=mysql_insert_id(mysqlptr);
+	// Some versions of mariadb client (10.1) incorrectly reset the last
+	// insert id after each query instead of hanging on to it until another
+	// insert overrides it, or until end-of-session.
+	//
+	// To enforce the correct behavior we'll:
+	// * keep our own last insert id
+	// * call mysql_insert_id() after each execute and update our last
+	//   insert id if it returns non-zero
+	// * reset our last insert id to 0 at end-of-session
+	*id=lastinsertid;
 	return true;
 }
 
@@ -893,6 +906,7 @@ int16_t mysqlconnection::nullBindValue() {
 
 void mysqlconnection::endSession() {
 	firstquery=true;
+	lastinsertid=0;
 }
 
 mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
@@ -1405,7 +1419,15 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// execute the query
-		if ((queryresult=mysql_stmt_execute(stmt))) {
+		queryresult=mysql_stmt_execute(stmt);
+
+		// see note inside of getLastInsertId() for why we do this here
+		uint64_t	id=mysql_insert_id(mysqlconn->mysqlptr);
+		if (id) {
+			mysqlconn->lastinsertid=id;
+		}
+
+		if (queryresult) {
 			return false;
 		}
 
@@ -1425,8 +1447,15 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		mysqlresult=NULL;
 
 		// execute the query
-		if ((queryresult=mysql_real_query(mysqlconn->mysqlptr,
-							query,length))) {
+		queryresult=mysql_real_query(mysqlconn->mysqlptr,query,length);
+
+		// see note inside of getLastInsertId() for why we do this here
+		uint64_t	id=mysql_insert_id(mysqlconn->mysqlptr);
+		if (id) {
+			mysqlconn->lastinsertid=id;
+		}
+
+		if (queryresult) {
 			return false;
 		}
 
