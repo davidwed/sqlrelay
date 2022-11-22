@@ -123,7 +123,7 @@
       <li><a href="#md5">md5</a></li>
       <li><a href="#sha1">sha1</a></li>
       <li><a href="#sha256">sha256</a></li>
-      <li><a href="#crypt">crypt</a></li>
+      <li><a href="#des">des</a></li>
       <li><a href="#aes128">aes128</a></li>
     </ul>
 
@@ -4514,7 +4514,7 @@ rknzcyrcnffjbeq
   <li>md5</li>
   <li>sha1</li>
   <li>sha256</li>
-  <li>crypt</li>
+  <li>des</li>
 </ul>
 
 <p>Custom modules may also be developed.  For more information, please contact <a href="mailto:dev@firstworks.com">dev@firstworks.com</a>. <a target="_blank" href="http://sqlrelay.sourceforge.net/images/us.png"><img src="http://sqlrelay.sourceforge.net/images/us.png"/></a> <a target="_blank" href="http://sqlrelay.sourceforge.net/images/br.png"><img src="http://sqlrelay.sourceforge.net/images/br.png"/></a></p>
@@ -4633,9 +4633,9 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>Since the SHA-256 algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.</p>
 
-<br/><a name="crypt"/><h3>crypt</h3>
+<br/><a name="des"/><h3>des</h3>
 
-<p>The <b>crypt</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">DES</a> algorithm using a salt specified in the <i>salt</i> attribute.  The salt is required and must be a 2 digit alphanumeric code.</p>
+<p>The <b>des</b> module is a one-way encryption module that encrypts the password using the <a target="_blank" href="http://en.wikipedia.org/wiki/Data_Encryption_Standard">DES</a> algorithm using a salt specified in the <i>salt</i> attribute.  The salt is required and must be a 2 digit alphanumeric code.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9

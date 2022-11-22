@@ -1753,6 +1753,18 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 		instance->setAttributeValue("debug",dstr.getString());
 	}
+
+	// passwordencryptions crypt -> des
+	for (domnode *pwdenc=instance->
+				getFirstTagChild("passwordencryptions")->
+				getFirstTagChild("passwordencryption");
+		!pwdenc->isNullNode();
+		pwdenc=pwdenc->getNextTagSibling("passwordencryption")) {
+		if (!charstring::compare(
+				pwdenc->getAttributeValue("module"),"crypt")) {
+			pwdenc->setAttributeValue("module","des");
+		}
+	}
 }
 
 void sqlrconfig_xmldom::getTreeValues() {

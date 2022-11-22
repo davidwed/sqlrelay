@@ -78,7 +78,7 @@
   * [#md5 md5]
   * [#sha1 sha1]
   * [#sha256 sha256]
-  * [#crypt crypt]
+  * [#des des]
   * [#aes128 aes128]
  * [#schedules Connection Schedules]
   * [#cron_userlist cron_userlist]
@@ -2908,7 +2908,7 @@ Currently, the following password encryption modules are available in the standa
 * md5
 * sha1
 * sha256
-* crypt
+* des
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
@@ -2969,14 +2969,14 @@ The '''sha256''' module is a one-way encryption module that encrypts the passwor
 Since the SHA-256 algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.
 
 
-[[br]][=#crypt]
-=== crypt ===
+[[br]][=#des]
+=== des ===
 
-The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
+The '''des''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-pwdencs-crypt.conf@
+@parts/sqlrelay-pwdencs-des.conf@
 }}}
 }}}
 
