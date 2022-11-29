@@ -5688,11 +5688,6 @@ extern "C" {
 						sqlrservercontroller *cont,
 						sqlrprotocols *ps,
 						domnode *parameters) {
-		if (wcharstring::supported()) {
-			return new sqlrprotocol_tds(cont,ps,parameters);
-		} else {
-			// FIXME: set error somehow...
-			return NULL;
-		}
+		return new sqlrprotocol_tds(cont,ps,parameters);
 	}
 }
