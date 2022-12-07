@@ -10383,6 +10383,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 					SQLULEN lengthprecision,
 					SQLSMALLINT parameterscale,
 					SQLPOINTER parametervalue,
+					SQLLEN bufferlength,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
 
@@ -10441,7 +10442,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 				debugPrintf("  value: \"%s\"\n",
 							parametervalue);
 				stmt->cur->inputBind(parametername,
-					(const char *)parametervalue);
+					(const char *)parametervalue,
+					bufferlength);
 			}
 			break;
 		case SQL_C_LONG:
@@ -11052,6 +11054,7 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 							lengthprecision,
 							parameterscale,
 							parametervalue,
+							bufferlength,
 							strlen_or_ind);
 		case SQL_PARAM_INPUT_OUTPUT:
 			debugPrintf("  inputoutputtype: "
