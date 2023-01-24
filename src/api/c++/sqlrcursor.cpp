@@ -140,7 +140,7 @@ class sqlrclientcolumn {
 		uint16_t	typestringlength;
 		uint32_t	length;
 		uint32_t	longest;
-		unsigned char	longdatatype;
+		byte_t		longdatatype;
 		uint32_t	precision;
 		uint32_t	scale;
 		uint16_t	nullable;
@@ -1347,7 +1347,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 
 	// read the file into the query buffer
 	pvt->_querylen=queryfile.getSize();
-	queryfile.read((unsigned char *)pvt->_querybuffer,pvt->_querylen);
+	queryfile.read((byte_t *)pvt->_querybuffer,pvt->_querylen);
 	pvt->_querybuffer[pvt->_querylen]='\0';
 
 	queryfile.close();

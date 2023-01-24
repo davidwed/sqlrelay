@@ -478,7 +478,7 @@ SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
 static SQLLEN SQLR_GetCColumnTypeSize(SQLSMALLINT targettype) {
 	switch (targettype) {
 		case SQL_C_BIT:
-			return sizeof(unsigned char);
+			return sizeof(byte_t);
 		case SQL_C_SHORT:
 		case SQL_C_SSHORT:
 			return sizeof(SQLSMALLINT);
@@ -488,7 +488,7 @@ static SQLLEN SQLR_GetCColumnTypeSize(SQLSMALLINT targettype) {
 		case SQL_C_STINYINT:
 			return sizeof(SQLCHAR);
 		case SQL_C_UTINYINT:
-			return sizeof(unsigned char);
+			return sizeof(byte_t);
 		case SQL_C_LONG:
 		case SQL_C_SLONG:
 			return sizeof(SQLINTEGER);
@@ -3041,13 +3041,13 @@ static void SQLR_ParseGuid(SQLGUID *guid,
 
 	// dash
 
-	// 4 hex digits (unsigned char)
+	// 4 hex digits (byte_t)
 	guid->Data4[0]=SQLR_CharToHex(value[19])*16+SQLR_CharToHex(value[20]);
 	guid->Data4[1]=SQLR_CharToHex(value[21])*16+SQLR_CharToHex(value[22]);
 
 	// dash
 
-	// 12 hex digits (unsigned char)
+	// 12 hex digits (byte_t)
 	guid->Data4[2]=SQLR_CharToHex(value[24])*16+SQLR_CharToHex(value[25]);
 	guid->Data4[3]=SQLR_CharToHex(value[26])*16+SQLR_CharToHex(value[27]);
 	guid->Data4[4]=SQLR_CharToHex(value[28])*16+SQLR_CharToHex(value[29]);
@@ -3343,7 +3343,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				const char	*val=
 					stmt->cur->getOutputBindString(
 								parametername);
-				((unsigned char *)ob->parametervalue)[0]=
+				((byte_t *)ob->parametervalue)[0]=
 					(charstring::contains("YyTt",val) ||
 					charstring::toInteger(val))?'1':'0';
 				}
@@ -3374,8 +3374,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				break;
 			case SQL_C_UTINYINT:
 				debugPrintf("  valuetype: SQL_C_UTINYINT\n");
-				*((unsigned char *)ob->parametervalue)=
-				(unsigned char)stmt->cur->getOutputBindInteger(
+				*((byte_t *)ob->parametervalue)=
+				(byte_t)stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_GUID:
@@ -3689,7 +3689,7 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 				const char	*val=
 					stmt->cur->getInputOutputBindString(
 								parametername);
-				((unsigned char *)ob->parametervalue)[0]=
+				((byte_t *)ob->parametervalue)[0]=
 					(charstring::contains("YyTt",val) ||
 					charstring::toInteger(val))?'1':'0';
 				}
@@ -3720,8 +3720,8 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 				break;
 			case SQL_C_UTINYINT:
 				debugPrintf("  valuetype: SQL_C_UTINYINT\n");
-				*((unsigned char *)ob->parametervalue)=
-				(unsigned char)stmt->cur->
+				*((byte_t *)ob->parametervalue)=
+				(byte_t)stmt->cur->
 						getInputOutputBindInteger(
 								parametername);
 				break;
@@ -4008,9 +4008,9 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
 				}
 
 				// handle the targetvalue
-				unsigned char	*targetvalue=NULL;
+				byte_t	*targetvalue=NULL;
 				if (field->targetvalue) {
-					targetvalue=((unsigned char *)
+					targetvalue=((byte_t *)
 						field->targetvalue)+
 						(field->bufferlength*row);
 				}
@@ -4788,11 +4788,11 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		case SQL_C_BIT:
 			debugPrintf("  targettype: SQL_C_BIT\n");
 			if (targetvalue) {
-				((unsigned char *)targetvalue)[0]=
+				((byte_t *)targetvalue)[0]=
 					(charstring::contains("YyTt",field) ||
 					charstring::toInteger(field))?'1':'0';
 				debugPrintf("  value: %c\n",
-					*((unsigned char *)targetvalue));
+					*((byte_t *)targetvalue));
 			}
 			break;
 		case SQL_C_STINYINT:
@@ -8613,7 +8613,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 	debugPrintf("  copying out data: \"%.*s\"\n",strlen_or_ind,data);
 
 	// copy data to putdata
-	stmt->putdatabuffer.append((unsigned char *)data,strlen_or_ind);
+	stmt->putdatabuffer.append((byte_t *)data,strlen_or_ind);
 
 	return SQL_SUCCESS;
 }
@@ -10358,7 +10358,7 @@ static const char *SQLR_BuildGuid(STMT *stmt,
 
 	uint16_t	byte=0;
 	for (uint16_t index=20; index<36; index=index+2) {
-		unsigned char	data=guid->Data4[byte];
+		byte_t	data=guid->Data4[byte];
 		string[index+1]=SQLR_HexToChar(data%16);
 		data=data/16;
 		string[index]=SQLR_HexToChar(data%16);
@@ -10621,9 +10621,9 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_UTINYINT:
 			debugPrintf("  valuetype: SQL_C_UTINYINT\n");
 			debugPrintf("  value: \"%lld\"\n",
-				(int64_t)(*((unsigned char *)parametervalue)));
+				(int64_t)(*((byte_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
-				(int64_t)(*((unsigned char *)parametervalue)));
+				(int64_t)(*((byte_t *)parametervalue)));
 			break;
 		case SQL_C_GUID:
 			{
@@ -10779,9 +10779,9 @@ static SQLRETURN SQLR_InputOutputBindParameter(
 		case SQL_C_UTINYINT:
 			debugPrintf("  valuetype: SQL_C_UTINYINT\n");
 			debugPrintf("  value: \"%lld\"\n",
-				(int64_t)(*((unsigned char *)parametervalue)));
+				(int64_t)(*((byte_t *)parametervalue)));
 			stmt->cur->defineInputOutputBindInteger(parametername,
-				(int64_t)(*((unsigned char *)parametervalue)));
+				(int64_t)(*((byte_t *)parametervalue)));
 			break;
 		case SQL_C_FLOAT:
 			debugPrintf("  valuetype: SQL_C_FLOAT\n");

@@ -2063,8 +2063,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	serversock->flushWriteBuffer(-1,-1);
 
 	// wait up to 5 seconds for a response
-	unsigned char	ack=0;
-	if (serversock->read(&ack,5,0)!=sizeof(unsigned char)) {
+	byte_t	ack=0;
+	if (serversock->read(&ack,5,0)!=sizeof(byte_t)) {
 		raiseDebugMessageEvent("proxying client failed: "
 					"failed to receive ack");
 		return false;
@@ -2095,7 +2095,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	filedescriptor	*wfd=NULL;
 
 	// set up a read buffer
-	unsigned char	readbuffer[8192];
+	byte_t	readbuffer[8192];
 
 	// should we send an end session command to the connection?
 	bool	endsession=false;

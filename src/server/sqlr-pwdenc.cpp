@@ -98,7 +98,7 @@ int main(int argc, const char **argv) {
 	// encrypt the password and print the result
 	char	*encryptedpassword=sqlrp->encrypt(password);
 	if (binary) {
-		unsigned char	*bin;
+		byte_t		*bin;
 		uint64_t	binlen;
 		charstring::hexDecode(encryptedpassword,
 					charstring::length(encryptedpassword),

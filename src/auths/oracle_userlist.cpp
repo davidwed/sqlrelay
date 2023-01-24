@@ -202,7 +202,7 @@ bool sqlrauth_oracle_userlist::compare(const char *suppliedresponse,
 
 	// sha1(password)
 	sha1	s1;
-	s1.append((const unsigned char *)validpassword,
+	s1.append((const byte_t *)validpassword,
 			charstring::length(validpassword));
 	bytebuffer	sha1pass;
 	sha1pass.append(s1.getHash(),s1.getHashSize());
@@ -226,10 +226,10 @@ bool sqlrauth_oracle_userlist::compare(const char *suppliedresponse,
 	
 	// sha1(password) xor sha1(concat(randombytes,sha1(sha1(password))))
 	bytebuffer	expectedresponse;
-	const unsigned char	*bytes1=sha1pass.getBuffer();
-	const unsigned char	*bytes2=sha1rbsha1sha1pass.getBuffer();
+	const byte_t	*bytes1=sha1pass.getBuffer();
+	const byte_t	*bytes2=sha1rbsha1sha1pass.getBuffer();
 	for (uint64_t i=0; i<sha1pass.getSize(); i++) {
-		expectedresponse.append((unsigned char)(bytes1[i]^bytes2[i]));
+		expectedresponse.append((byte_t)(bytes1[i]^bytes2[i]));
 	}
 
 	if (debug) {

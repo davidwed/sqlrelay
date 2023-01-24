@@ -205,18 +205,15 @@ bool sqlrprotocol::getProtocolIsBigEndian() {
 	return pvt->_bigendian;
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					char *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, char *value, const byte_t **rpout) {
 	*value=(char)*rp;
 	*rpout=rp+sizeof(char);
 }
 
-bool sqlrprotocol::read(const unsigned char *rp,
-					char *value,
-					const char *name,
-					char expected,
-					const unsigned char **rpout) {
+bool sqlrprotocol::read(const byte_t *rp, char *value,
+						const char *name,
+						char expected,
+						const byte_t **rpout) {
 	read(rp,value,rpout);
 	if (*value!=expected) {
 		if (pvt->_debug) {
@@ -229,18 +226,16 @@ bool sqlrprotocol::read(const unsigned char *rp,
 	return true;
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					unsigned char *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, byte_t *value,
+						const byte_t **rpout) {
 	*value=*rp;
-	*rpout=rp+sizeof(unsigned char);
+	*rpout=rp+sizeof(byte_t);
 }
 
-bool sqlrprotocol::read(const unsigned char *rp,
-					unsigned char *value,
-					const char *name,
-					unsigned char expected,
-					const unsigned char **rpout) {
+bool sqlrprotocol::read(const byte_t *rp, byte_t *value,
+						const char *name,
+						byte_t expected,
+						const byte_t **rpout) {
 	read(rp,value,rpout);
 	if (*value!=expected) {
 		if (pvt->_debug) {
@@ -253,66 +248,58 @@ bool sqlrprotocol::read(const unsigned char *rp,
 	return true;
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					char *value,
-					size_t length,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, char *value,
+						size_t length,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,length);
 	*rpout=rp+length;
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					unsigned char *value,
-					size_t length,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, byte_t *value,
+						size_t length,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,length);
 	*rpout=rp+length;
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					char16_t *value,
-					size_t length,
-					const unsigned char **rpout) {
-	bytestring::copy(value,rp,length*sizeof(char16_t));
-	*rpout=rp+length*sizeof(char16_t);
+void sqlrprotocol::read(const byte_t *rp, ucs2_t *value,
+						size_t length,
+						const byte_t **rpout) {
+	bytestring::copy(value,rp,length*sizeof(ucs2_t));
+	*rpout=rp+length*sizeof(ucs2_t);
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					float *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, float *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(float));
 	*rpout=rp+sizeof(float);
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					double *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, double *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(double));
 	*rpout=rp+sizeof(double);
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					uint16_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, uint16_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint16_t));
 	*value=toHost(*value);
 	*rpout=rp+sizeof(uint16_t);
 }
 
 
-void sqlrprotocol::readLE(const unsigned char *rp,
-					uint16_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::readLE(const byte_t *rp, uint16_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint16_t));
 	*value=leToHost(*value);
 	*rpout=rp+sizeof(uint16_t);
 }
 
-bool sqlrprotocol::readLE(const unsigned char *rp,
-					uint16_t *value,
-					const char *name,
-					uint16_t expected,
-					const unsigned char **rpout) {
+bool sqlrprotocol::readLE(const byte_t *rp, uint16_t *value,
+						const char *name,
+						uint16_t expected,
+						const byte_t **rpout) {
 	readLE(rp,value,rpout);
 	if (*value!=expected) {
 		if (getDebug()) {
@@ -325,19 +312,18 @@ bool sqlrprotocol::readLE(const unsigned char *rp,
 	return true;
 }
 
-void sqlrprotocol::readBE(const unsigned char *rp,
-					uint16_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::readBE(const byte_t *rp, uint16_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint16_t));
 	*value=beToHost(*value);
 	*rpout=rp+sizeof(uint16_t);
 }
 
-bool sqlrprotocol::readBE(const unsigned char *rp,
+bool sqlrprotocol::readBE(const byte_t *rp,
 					uint16_t *value,
 					const char *name,
 					uint16_t expected,
-					const unsigned char **rpout) {
+					const byte_t **rpout) {
 	readBE(rp,value,rpout);
 	if (*value!=expected) {
 		if (pvt->_debug) {
@@ -350,27 +336,24 @@ bool sqlrprotocol::readBE(const unsigned char *rp,
 	return true;
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					uint32_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, uint32_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint32_t));
 	*value=toHost(*value);
 	*rpout=rp+sizeof(uint32_t);
 }
 
-void sqlrprotocol::readLE(const unsigned char *rp,
-					uint32_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::readLE(const byte_t *rp, uint32_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint32_t));
 	*value=leToHost(*value);
 	*rpout=rp+sizeof(uint32_t);
 }
 
-bool sqlrprotocol::readLE(const unsigned char *rp,
-					uint32_t *value,
-					const char *name,
-					uint32_t expected,
-					const unsigned char **rpout) {
+bool sqlrprotocol::readLE(const byte_t *rp, uint32_t *value,
+						const char *name,
+						uint32_t expected,
+						const byte_t **rpout) {
 	readLE(rp,value,rpout);
 	if (*value!=expected) {
 		if (getDebug()) {
@@ -383,19 +366,17 @@ bool sqlrprotocol::readLE(const unsigned char *rp,
 	return true;
 }
 
-void sqlrprotocol::readBE(const unsigned char *rp,
-					uint32_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::readBE(const byte_t *rp, uint32_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint32_t));
 	*value=beToHost(*value);
 	*rpout=rp+sizeof(uint32_t);
 }
 
-bool sqlrprotocol::readBE(const unsigned char *rp,
-					uint32_t *value,
-					const char *name,
-					uint32_t expected,
-					const unsigned char **rpout) {
+bool sqlrprotocol::readBE(const byte_t *rp, uint32_t *value,
+						const char *name,
+						uint32_t expected,
+						const byte_t **rpout) {
 	readBE(rp,value,rpout);
 	if (*value!=expected) {
 		if (pvt->_debug) {
@@ -408,27 +389,24 @@ bool sqlrprotocol::readBE(const unsigned char *rp,
 	return true;
 }
 
-void sqlrprotocol::read(const unsigned char *rp,
-					uint64_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::read(const byte_t *rp, uint64_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint64_t));
 	*value=toHost(*value);
 	*rpout=rp+sizeof(uint64_t);
 }
 
-void sqlrprotocol::readLE(const unsigned char *rp,
-					uint64_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::readLE(const byte_t *rp, uint64_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint64_t));
 	*value=leToHost(*value);
 	*rpout=rp+sizeof(uint64_t);
 }
 
-bool sqlrprotocol::readLE(const unsigned char *rp,
-					uint64_t *value,
-					const char *name,
-					uint64_t expected,
-					const unsigned char **rpout) {
+bool sqlrprotocol::readLE(const byte_t *rp, uint64_t *value,
+						const char *name,
+						uint64_t expected,
+						const byte_t **rpout) {
 	readLE(rp,value,rpout);
 	if (*value!=expected) {
 		if (getDebug()) {
@@ -441,19 +419,17 @@ bool sqlrprotocol::readLE(const unsigned char *rp,
 	return true;
 }
 
-void sqlrprotocol::readBE(const unsigned char *rp,
-					uint64_t *value,
-					const unsigned char **rpout) {
+void sqlrprotocol::readBE(const byte_t *rp, uint64_t *value,
+						const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint64_t));
 	*value=beToHost(*value);
 	*rpout=rp+sizeof(uint64_t);
 }
 
-bool sqlrprotocol::readBE(const unsigned char *rp,
-					uint64_t *value,
-					const char *name,
-					uint64_t expected,
-					const unsigned char **rpout) {
+bool sqlrprotocol::readBE(const byte_t *rp, uint64_t *value,
+						const char *name,
+						uint64_t expected,
+						const byte_t **rpout) {
 	readBE(rp,value,rpout);
 	if (*value!=expected) {
 		if (pvt->_debug) {
@@ -466,8 +442,7 @@ bool sqlrprotocol::readBE(const unsigned char *rp,
 	return true;
 }
 
-uint64_t sqlrprotocol::readLenEncInt(const unsigned char *rp,
-					const unsigned char **rpout) {
+uint64_t sqlrprotocol::readLenEncInt(const byte_t *rp, const byte_t **rpout) {
 	uint64_t	retval=0;
 	switch (*rp) {
 		case 0xfe:
@@ -480,7 +455,7 @@ uint64_t sqlrprotocol::readLenEncInt(const unsigned char *rp,
 		case 0xfd:
 			{
 			uint32_t	val=0;
-			unsigned char	*valbytes=(unsigned char *)&val;
+			byte_t		*valbytes=(byte_t *)&val;
 			rp++;
 			valbytes[3]=*rp;
 			rp++;
@@ -512,7 +487,7 @@ void sqlrprotocol::write(bytebuffer *buffer, char value) {
 	buffer->append(value);
 }
 
-void sqlrprotocol::write(bytebuffer *buffer, unsigned char value) {
+void sqlrprotocol::write(bytebuffer *buffer, byte_t value) {
 	buffer->append(value);
 }
 
@@ -525,22 +500,13 @@ void sqlrprotocol::write(bytebuffer *buffer, const char *value,
 	buffer->append(value,length);
 }
 
-void sqlrprotocol::write(bytebuffer *buffer, const unsigned char *value,
+void sqlrprotocol::write(bytebuffer *buffer, const byte_t *value,
 							size_t length) {
 	buffer->append(value,length);
 }
 
-void sqlrprotocol::write(bytebuffer *buffer, char16_t *str, size_t length) {
-	// Ideally there would be a
-	// bytebuffer::append(char16_t *str, size_t length);
-	for (size_t i=0; i<length; i++) {
-		// Ideally there would be a bytebuffer::append(char16_t ch);
-		// There isn't, and it apparently automatically converts
-		// each char16_t to void * or something, which are 4 bytes,
-		// rather than 2.  To make sure that only 2 bytes are appended,
-		// per char16_t, we have to cast to a uint16_t.
-		buffer->append((uint16_t)str[i]);
-	}
+void sqlrprotocol::write(bytebuffer *buffer, const ucs2_t *str, size_t length) {
+	buffer->appendUcs2(str,length);
 }
 
 void sqlrprotocol::write(bytebuffer *buffer, float value) {
@@ -604,7 +570,7 @@ void sqlrprotocol::writeLenEncInt(bytebuffer *buffer, uint64_t value) {
 
 void sqlrprotocol::writeTriplet(bytebuffer *buffer, uint32_t value) {
 	value=hostToBE(value);
-	unsigned char	*valuebytes=(unsigned char *)&value;
+	byte_t	*valuebytes=(byte_t *)&value;
 	buffer->append(valuebytes[3]);
 	buffer->append(valuebytes[2]);
 	buffer->append(valuebytes[1]);
@@ -729,11 +695,11 @@ void sqlrprotocol::debugEnd(uint16_t indent) {
 	}
 }
 
-void sqlrprotocol::debugHexDump(const unsigned char *data, uint64_t size) {
+void sqlrprotocol::debugHexDump(const byte_t *data, uint64_t size) {
 	debugHexDump(data,size,1);
 }
 
-void sqlrprotocol::debugHexDump(const unsigned char *data,
+void sqlrprotocol::debugHexDump(const byte_t *data,
 						uint64_t size,
 						uint16_t indent) {
 	if (!pvt->_debug) {

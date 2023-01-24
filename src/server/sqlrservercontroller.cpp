@@ -285,11 +285,11 @@ class sqlrservercontrollerprivate {
 
 	char			*_bulkserveridfilename;
 	sharedmemory		*_bulkservershmem;
-	unsigned char 		*_bulkservershm;
-	unsigned char 		*_bulkservershmquery;
-	unsigned char 		*_bulkservershmdataformat;
+	byte_t	 		*_bulkservershm;
+	byte_t	 		*_bulkservershmquery;
+	byte_t	 		*_bulkservershmdataformat;
 	sharedmemory		*_bulkclientshmem;
-	unsigned char		*_bulkclientshm;
+	byte_t			*_bulkclientshm;
 	sqlrservercursor	*_bulkcursor;
 	const char		*_bulkerrorfieldtable;
 	const char		*_bulkerrorrowtable;
@@ -297,8 +297,8 @@ class sqlrservercontrollerprivate {
 	uint64_t		_bulkdroperrortables;
 	uint64_t		_bulkquerylen;
 	const char		*_bulkquery;
-	const unsigned char	*_bulkdataformat;
-	singlylinkedlist<const unsigned char *>	_bulkdata;
+	const byte_t		*_bulkdataformat;
+	singlylinkedlist<const byte_t *>	_bulkdata;
 	singlylinkedlist<uint64_t>		_bulkdatalen;
 
 	char	*_db;
@@ -1911,7 +1911,7 @@ int32_t sqlrservercontroller::waitForClient() {
 
 			// acknowledge
 			#define ACK	6
-			pvt->_handoffsockun.write((unsigned char)ACK);
+			pvt->_handoffsockun.write((byte_t)ACK);
 			pvt->_handoffsockun.flushWriteBuffer(-1,-1);
 
 			descriptor=pvt->_handoffsockun.getFileDescriptor();
@@ -3404,7 +3404,7 @@ static const char *asciitohex[]={
 	"F8","F9","FA","FB","FC","FD","FE","FF"
 };
 
-const char *sqlrservercontroller::asciiToHex(unsigned char ch) {
+const char *sqlrservercontroller::asciiToHex(byte_t ch) {
 	return asciitohex[ch];
 }
 
@@ -3443,7 +3443,7 @@ static const char *asciitooctal[]={
 	"370","371","372","373","374","375","376","377"
 };
 
-const char *sqlrservercontroller::asciiToOctal(unsigned char ch) {
+const char *sqlrservercontroller::asciiToOctal(byte_t ch) {
 	return asciitooctal[ch];
 }
 
@@ -7437,7 +7437,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// * the id could be sensitive information
 	// * the id might not conform to valid file naming conventions
 	md5	m;
-	m.append((const unsigned char *)id,charstring::length(id));
+	m.append((const byte_t *)id,charstring::length(id));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
@@ -7481,13 +7481,12 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 		bulkLoadEnd();
 		return false;
 	}
-	pvt->_bulkservershm=
-		(unsigned char *)pvt->_bulkservershmem->getPointer();
+	pvt->_bulkservershm=(byte_t *)pvt->_bulkservershmem->getPointer();
 	bytestring::zero(pvt->_bulkservershm,pvt->_maxquerysize+1);
 
 	// put error tables, maxerrorcount,
 	// and drop error tables flag in shared memory
-	unsigned char	*ptr=pvt->_bulkservershm;
+	byte_t	*ptr=pvt->_bulkservershm;
 
 	uint64_t	len=charstring::length(errorfieldtable);
 	pvt->_bulkerrorfieldtable=(const char *)ptr;
@@ -7557,7 +7556,7 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 	}
 
 	// put the query length and query in shared memory
-	unsigned char	*qptr=pvt->_bulkservershmquery;
+	byte_t	*qptr=pvt->_bulkservershmquery;
 	*((uint64_t *)qptr)=querylen;
 	qptr+=sizeof(uint64_t);
 	bytestring::copy(qptr,query,querylen);
@@ -7755,7 +7754,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 
 	// get an md5 sum of the id (see bulkLoadBegin for why)
 	md5	m;
-	m.append((const unsigned char *)id,charstring::length(id));
+	m.append((const byte_t *)id,charstring::length(id));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
@@ -7784,11 +7783,10 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 				SQLR_ERROR_BULKLOADJOIN_SHM,true);
 		return false;
 	}
-	pvt->_bulkclientshm=
-		(unsigned char *)pvt->_bulkclientshmem->getPointer();
+	pvt->_bulkclientshm=(byte_t *)pvt->_bulkclientshmem->getPointer();
 
 	// get error tables
-	const unsigned char	*ptr=pvt->_bulkclientshm;
+	const byte_t	*ptr=pvt->_bulkclientshm;
 
 	pvt->_bulkerrorfieldtable=(const char *)ptr;
 	ptr+=charstring::length((const char *)ptr);
@@ -7813,7 +7811,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	ptr+=pvt->_maxquerysize+1;
 
 	// get data format definitions
-	pvt->_bulkdataformat=(const unsigned char *)ptr;
+	pvt->_bulkdataformat=(const byte_t *)ptr;
 
 	// clear bulk data lists
 	pvt->_bulkdata.clear();
@@ -7836,7 +7834,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	return true;
 }
 
-bool sqlrservercontroller::bulkLoadInputBind(const unsigned char *data,
+bool sqlrservercontroller::bulkLoadInputBind(const byte_t *data,
 							uint64_t datalen) {
 
 	if (pvt->_debugbulkload) {
@@ -7886,7 +7884,7 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 
 		// run through the bulk data, binding and executing each row
 		uint64_t		errorcount=0;
-		listnode<const unsigned char *>
+		listnode<const byte_t *>
 				*datanode=pvt->_bulkdata.getFirst();
 		listnode<uint64_t>
 				*datalennode=pvt->_bulkdatalen.getFirst();
@@ -8208,7 +8206,7 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 	}
 }
 
-void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
+void sqlrservercontroller::bulkLoadBindRow(const byte_t *data,
 							uint64_t datalen) {
 
 	if (pvt->_debugbulkload) {
@@ -8216,8 +8214,8 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 	}
 
 	// get the number of data format elements...
-	const unsigned char	*ptr=pvt->_bulkdataformat;
-	uint16_t		formatcount=*((uint16_t *)ptr);
+	const byte_t	*ptr=pvt->_bulkdataformat;
+	uint16_t	formatcount=*((uint16_t *)ptr);
 	ptr+=sizeof(uint16_t);
 
 	// get the input bind count and input binds
@@ -8263,7 +8261,7 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 
 		// get the bind value
 		sqlrserverbindvar	*inbind=&(inbinds[inbindindex]);
-		const unsigned char	*val=data;
+		const byte_t		*val=data;
 		inbind->valuesize=size;
 		data+=size;
 
@@ -10767,10 +10765,10 @@ sqlrmoduledata *sqlrservercontroller::getModuleData(const char *id) {
 	return (pvt->_sqlrmd)?pvt->_sqlrmd->getModuleData(id):NULL;
 }
 
-bool sqlrservercontroller::send(unsigned char *data, size_t size) {
+bool sqlrservercontroller::send(byte_t *data, size_t size) {
 	return pvt->_conn->send(data,size);
 }
 
-bool sqlrservercontroller::recv(unsigned char **data, size_t *size) {
+bool sqlrservercontroller::recv(byte_t **data, size_t *size) {
 	return pvt->_conn->recv(data,size);
 }

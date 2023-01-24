@@ -2039,8 +2039,7 @@ bool mysqlcursor::getLobFieldSegment(uint32_t col,
 	}
 
 	// copy out the data
-	bytestring::copy(buffer,
-		(unsigned char *)lobfield.buffer+offset,*charsread);
+	bytestring::copy(buffer,(byte_t *)lobfield.buffer+offset,*charsread);
 
 	return true;
 }

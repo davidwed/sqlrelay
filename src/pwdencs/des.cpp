@@ -24,12 +24,11 @@ bool sqlrpwdenc_des::oneWay() {
 
 char *sqlrpwdenc_des::encrypt(const char *value) {
 
-	d.setIv((const unsigned char *)
+	d.setIv((const byte_t *)
 			getParameters()->getAttributeValue("salt"),
 			d.getIvSize());
 
-	d.append((const unsigned char *)value,
-			charstring::length(value));
+	d.append((const byte_t *)value,charstring::length(value));
 
 	const char	*encrypted=(const char *)d.getEncryptedData();
 

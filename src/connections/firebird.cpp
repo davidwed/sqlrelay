@@ -774,8 +774,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	outbindcount=0;
 
 	// set up input binds
-	inbindsqlda=(XSQLDA ISC_FAR *)new unsigned char[
-					XSQLDA_LENGTH(maxbindcount)];
+	inbindsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(maxbindcount)];
 	inbindsqlda->version=SQLDA_VERSION1;
 	inbindsqlda->sqln=maxbindcount;
 	inbindblobid=new ISC_QUAD[maxbindcount];
@@ -783,8 +782,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 
 
 	// set up output binds
-	outbindsqlda=(XSQLDA ISC_FAR *)new unsigned char[
-					XSQLDA_LENGTH(maxbindcount)];
+	outbindsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(maxbindcount)];
 	outbindsqlda->version=SQLDA_VERSION1;
 	outbindsqlda->sqln=maxbindcount;
 	outbindblobid=new ISC_QUAD[maxbindcount];
@@ -822,7 +820,7 @@ firebirdcursor::~firebirdcursor() {
 void firebirdcursor::allocateResultSetBuffers(int32_t columncount) {
 
 	if (!columncount) {
-		outsqlda=(XSQLDA ISC_FAR *)new unsigned char[XSQLDA_LENGTH(1)];
+		outsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(1)];
 		outsqlda->version=SQLDA_VERSION1;
 		outsqlda->sqln=1;
 		field=NULL;
@@ -830,7 +828,7 @@ void firebirdcursor::allocateResultSetBuffers(int32_t columncount) {
 		if (outsqlda) {
 			delete[] outsqlda;
 		}
-		outsqlda=(XSQLDA ISC_FAR *)new unsigned char[
+		outsqlda=(XSQLDA ISC_FAR *)new byte_t[
 						XSQLDA_LENGTH(columncount)];
 		outsqlda->version=SQLDA_VERSION1;
 		outsqlda->sqln=columncount;
@@ -845,7 +843,7 @@ void firebirdcursor::allocateResultSetBuffers(int32_t columncount) {
 void firebirdcursor::deallocateResultSetBuffers() {
 
 	delete[] outsqlda;
-	outsqlda=(XSQLDA ISC_FAR *)new unsigned char[XSQLDA_LENGTH(1)];
+	outsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(1)];
 	outsqlda->version=SQLDA_VERSION1;
 	outsqlda->sqln=1;
 

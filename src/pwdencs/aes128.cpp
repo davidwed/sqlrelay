@@ -73,7 +73,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	// get the key, either directly or from a file
 	keyvalue.parse(getParameters()->getAttributeValue("key"));
 	uint64_t	keylen=keyvalue.getValueSize();
-	unsigned char	*key=keyvalue.detachValue();
+	byte_t		*key=keyvalue.detachValue();
 	if (keylen<aes.getKeySize()) {
 		delete[] key;
 		return NULL;
@@ -84,7 +84,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	credvalue.setVerbatimFormat((dec)?FORMAT_HEX:FORMAT_BINARY);
 	credvalue.parse(value);
 	uint64_t	credlen=credvalue.getValueSize();
-	unsigned char	*cred=credvalue.detachValue();
+	byte_t		*cred=credvalue.detachValue();
 	if (dec) {
 		if (credlen<aes.getIvSize()) {
 			delete[] key;
@@ -111,7 +111,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	// string.  In the case of decryption, returning an empty string would
 	// allow an empty password to succeed!
 	if (dec) {
-		const unsigned char	*data=aes.getDecryptedData();
+		const byte_t	*data=aes.getDecryptedData();
 		if (!data) {
 			return NULL;
 		}
@@ -122,7 +122,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 	} else {
 		// if the encrypted data was NULL (an error occurred),
 		// then also return NULL, indicating than an error occurred
-		const unsigned char	*data=aes.getEncryptedData();
+		const byte_t	*data=aes.getEncryptedData();
 		if (!data) {
 			return NULL;
 		}

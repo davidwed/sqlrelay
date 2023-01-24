@@ -1195,7 +1195,7 @@ char *odbcconnection::odbcDriverConnectionString(const char *userasc,
 		// we push this extra info right after the DSN or DRIVER
 		// so that we can clearly see it in the unixODBC trace which
 		// tends to truncate at about 130 characters.
-		unsigned char	*rawdriverconnect=
+		byte_t	*rawdriverconnect=
 				charstring::base64Decode(driverconnect);
 		pushConnstrValue(&ptr,&buffavail,NULL,
 				(const char *)rawdriverconnect);

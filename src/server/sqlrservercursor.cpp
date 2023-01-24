@@ -113,7 +113,7 @@ class sqlrservercursorprivate {
 
 		bool		_resultsetheaderhasbeenhandled;
 
-		unsigned char	_moduledata[1024];
+		byte_t		_moduledata[1024];
 };
 
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
@@ -1698,6 +1698,6 @@ bool sqlrservercursor::getResultSetHeaderHasBeenHandled() {
 	return pvt->_resultsetheaderhasbeenhandled;
 }
 
-unsigned char *sqlrservercursor::getModuleData() {
+byte_t *sqlrservercursor::getModuleData() {
 	return pvt->_moduledata;
 }

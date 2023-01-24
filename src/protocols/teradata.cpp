@@ -45,22 +45,22 @@ const char	*mechstr[]={
 	"krb",
 	"krbcompat"
 };
-unsigned char	td2mech[]={
+byte_t	td2mech[]={
 	0x2B, 0x06, 0x01, 0x04, 0x01, 0x81, 0x3F, 0x01,
 	0x87, 0x74, 0x01, 0x01, 0x09
 };
-unsigned char	tdnegomech[]={
+byte_t	tdnegomech[]={
 	0x2B, 0x06, 0x01, 0x04, 0x01, 0x81, 0x3F, 0x01,
 	0x87, 0x74, 0x01, 0x14
 };
-unsigned char	ldapmech[]={
+byte_t	ldapmech[]={
 	0x2A, 0x86, 0x48, 0x86, 0xF7, 0x12, 0x01, 0x02,
 	0x02
 };
-unsigned char	krbmech[]={
+byte_t	krbmech[]={
 	0x2B, 0x06, 0x01, 0x05, 0x05, 0x02
 };
-unsigned char	krbcompatmech[]={
+byte_t	krbcompatmech[]={
 	0x2B, 0x06, 0x01, 0x04, 0x01, 0x81, 0xE0, 0x1A,
 	0x04, 0x82, 0x2E, 0x01, 0x03,
 };
@@ -471,8 +471,8 @@ class request {
 		uint32_t	fieldcount;
 		uint64_t	currentfield;
 
-		dynamicarray<unsigned char>	nibuffer;
-		bytebuffer			rowbuffer;
+		dynamicarray<byte_t>	nibuffer;
+		bytebuffer		rowbuffer;
 
 		size_t		parcelsizepos;
 
@@ -574,110 +574,110 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 		bool	recvResponseFromBackend();
 		bool	forwardBackendResponseToClient();
 
-		void	parseParcelHeader(const unsigned char *parcel,
+		void	parseParcelHeader(const byte_t *parcel,
 					uint16_t *flavor,
 					uint32_t *datalength,
-					const unsigned char **parcelout);
-		bool	parseClientConfigParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	parseConfigParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	parseAssignParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	parseSsoRequestParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		void	confAlg(unsigned char val);
-		void	intAlg(unsigned char val);
-		void	kexAlg(unsigned char val);
-		void	confAlgMode(unsigned char val);
-		void	confAlgPadding(unsigned char val);
-		void	confAlgKeySize(unsigned char conf, uint16_t val);
-		void	kexAlgKeySize(unsigned char kex, uint16_t val);
-		bool	parseSsoParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	parseLogoffParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	parseOptionsParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	parseGenericReqParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
+					const byte_t **parcelout);
+		bool	parseClientConfigParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	parseConfigParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	parseAssignParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	parseSsoRequestParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		void	confAlg(byte_t val);
+		void	intAlg(byte_t val);
+		void	kexAlg(byte_t val);
+		void	confAlgMode(byte_t val);
+		void	confAlgPadding(byte_t val);
+		void	confAlgKeySize(byte_t conf, uint16_t val);
+		void	kexAlgKeySize(byte_t kex, uint16_t val);
+		bool	parseSsoParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	parseLogoffParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	parseOptionsParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	parseGenericReqParcel(const byte_t *parcel,
+					const byte_t **parcelout);
 		bool	parseGenericRunStartupParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout);
+					const byte_t *parcel,
+					const byte_t **parcelout);
 		bool	parseGenericRespParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	isBulkLoadData(const unsigned char *parcel);
-		bool	parseSetPositionParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	parseDataParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		void	parseTinyIntBind(const unsigned char *ptr,
+					const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	isBulkLoadData(const byte_t *parcel);
+		bool	parseSetPositionParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	parseDataParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		void	parseTinyIntBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseSmallIntBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseSmallIntBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseIntegerBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseIntegerBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseBigIntBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseBigIntBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseCharBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseCharBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseVarCharBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseVarCharBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseByteBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseByteBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseVarByteBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseVarByteBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseFloatBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseFloatBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseDateBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseDateBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseTimeBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseTimeBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
-		void	parseTimestampBind(const unsigned char *ptr,
+						const byte_t **outptr);
+		void	parseTimestampBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr);
+						const byte_t **outptr);
 		bool	parseStatementInfoParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout);
+					const byte_t *parcel,
+					const byte_t **parcelout);
 		bool	parseStatementInfoExtensions(
-						const unsigned char *ext,
+						const byte_t *ext,
 						uint32_t extlen);
-		bool	parseParameterExtension(const unsigned char *ext,
+		bool	parseParameterExtension(const byte_t *ext,
 							uint32_t extlen,
 							uint16_t ibcount);
 		bool	parseStatementInfoEndParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout);
+					const byte_t *parcel,
+					const byte_t **parcelout);
 		bool	parseMultipartIndicDataParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout);
+					const byte_t *parcel,
+					const byte_t **parcelout);
 		bool	parseEndMultipartIndicDataParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout);
-		bool	parse215Parcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
+					const byte_t *parcel,
+					const byte_t **parcelout);
+		bool	parse215Parcel(const byte_t *parcel,
+					const byte_t **parcelout);
 		void	parseUsing();
 		void	translateInsertToSelect();
 		bool	prepareQuery();
 		bool	executeQuery();
-		bool	parseCancelParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
-		void	parseGenericParcels(const unsigned char *parcel,
-					const unsigned char *end);
-		bool	parseGenericParcel(const unsigned char *parcel,
-					const unsigned char **parcelout);
+		bool	parseCancelParcel(const byte_t *parcel,
+					const byte_t **parcelout);
+		void	parseGenericParcels(const byte_t *parcel,
+					const byte_t *end);
+		bool	parseGenericParcel(const byte_t *parcel,
+					const byte_t **parcelout);
 		void	appendParcelHeader(uint16_t flavor,
 						uint32_t datalength);
 		void	appendLargeParcelHeader(uint16_t flavor,
@@ -772,7 +772,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 						const char *flavorname,
 						uint16_t parcelflavor,
 						uint32_t parceldatalength);
-		void	debugParcelEnd(const unsigned char *parceldata,
+		void	debugParcelEnd(const byte_t *parceldata,
 						uint32_t parceldatalength);
 		void	debugParcelStart(const char *direction,
 						const char *flavorname,
@@ -782,10 +782,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 		void	debugExtEnd();
 
 #ifdef DECRYPT
-		bool	decrypt(const unsigned char *encdata,
+		bool	decrypt(const byte_t *encdata,
 					uint64_t encdatasize,
 					bytebuffer *decdata);
-		bool	encrypt(const unsigned char *decdata,
+		bool	encrypt(const byte_t *decdata,
 					uint64_t decdatasize,
 					bytebuffer *encdata);
 		bool	generateServerPublicKey();
@@ -797,14 +797,14 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 		// request buffers
 		filedescriptor	*clientsock;
 		memorypool	*clientreqmessagepool;
-		unsigned char	*clientreqheader;
-		unsigned char	*clientreqdata;
+		byte_t		*clientreqheader;
+		byte_t		*clientreqdata;
 		uint32_t	clientreqdatalength;
 
 		// passthrough buffers
 		memorypool	*backendreqmessagepool;
-		unsigned char	*backendreqheader;
-		unsigned char	*backendreqdata;
+		byte_t		*backendreqheader;
+		byte_t		*backendreqdata;
 		uint32_t	backendreqdatalength;
 
 		// response buffers
@@ -812,14 +812,14 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 		bytebuffer	respdata;
 
 		// message
-		unsigned char	messagekind;
+		byte_t		messagekind;
 		uint32_t	sessionno;
-		unsigned char	requestauth[8];
+		byte_t		requestauth[8];
 		uint32_t	requestno;
-		unsigned char	gtwbyte;
-		unsigned char	hostcharset;
+		byte_t		gtwbyte;
+		byte_t		hostcharset;
 		datetime	sadt;
-		unsigned char	responseauth[8];
+		byte_t		responseauth[8];
 
 		// requests
 		request		*req;
@@ -859,10 +859,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_teradata : public sqlrprotocol {
 		bool		dh2048supported;
 		uint16_t	negotiatedmech;
 		uint16_t	negotiatedqop;
-		unsigned char	dhp[256];
-		unsigned char	dhg[256];
-		unsigned char	serverpubkey[256];
-		unsigned char	clientpubkey[256];
+		byte_t		dhp[256];
+		byte_t		dhg[256];
+		byte_t		serverpubkey[256];
+		byte_t		clientpubkey[256];
 #ifdef DECRYPT
 		DH		*dh;
 #endif
@@ -965,7 +965,7 @@ sqlrprotocol_teradata::sqlrprotocol_teradata(sqlrservercontroller *cont,
 	dh2048supported=false;
 	negotiatedmech=MECH_NONE;
 	negotiatedqop=QOP_NONE;
-	unsigned char	dhpdefault[]={
+	byte_t	dhpdefault[]={
 		// DHKeyP2048 from Teradata 2 section in:
 		// /opt/teradata/tdgss/etc/TdgssLibraryConfigFile.xml
 		// or
@@ -1007,7 +1007,7 @@ sqlrprotocol_teradata::sqlrprotocol_teradata(sqlrservercontroller *cont,
 	};
 	bytestring::copy(dhp,dhpdefault,sizeof(dhpdefault));
 
-	unsigned char	dhgdefault[]={
+	byte_t	dhgdefault[]={
 		// DHKeyG2048 from Teradata 2 section in:
 		// /opt/teradata/tdgss/etc/TdgssLibraryConfigFile.xml
 		// or
@@ -1211,7 +1211,7 @@ bool sqlrprotocol_teradata::copKindCfg() {
 	debugStart("copkind_cfg");
 
 	// parse parcels
-	const unsigned char	*parcel=clientreqdata;
+	const byte_t	*parcel=clientreqdata;
 	if (!parseClientConfigParcel(parcel,&parcel)) {
 		debugEnd();
 		return false;
@@ -1246,7 +1246,7 @@ bool sqlrprotocol_teradata::copKindAssign() {
 	debugStart("copkind_assign");
 
 	// parse parcels
-	const unsigned char	*parcel=clientreqdata;
+	const byte_t	*parcel=clientreqdata;
 	parseAssignParcel(parcel,&parcel);
 	if (!parseSsoRequestParcel(parcel,&parcel)) {
 		debugEnd();
@@ -1282,7 +1282,7 @@ bool sqlrprotocol_teradata::copKindSsoReq() {
 	debugStart("copkind_ssoreq");
 
 	// parse parcels
-	const unsigned char	*parcel=clientreqdata;
+	const byte_t	*parcel=clientreqdata;
 	if (!parseSsoParcel(parcel,&parcel)) {
 		debugEnd();
 		return false;
@@ -1353,7 +1353,7 @@ bool sqlrprotocol_teradata::copKindConnect() {
 	// ideally we'd encrypt this with the same secret that we used to
 	// generate serverpubkey, but for now, we'll just use matching canned
 	// responses for both (still doesn't work though)
-	unsigned char	response[]={
+	byte_t	response[]={
 		0x18, 0xe1, 0xaf, 0xc0, 0xa6, 0xe8, 0xad, 0x83,
 		0xf7, 0x17, 0xa2, 0xf7, 0x18, 0x18, 0x21, 0xfe,
 		0xcb, 0xcd, 0xbc, 0x77, 0x17, 0x25, 0xfe, 0x15,
@@ -1447,8 +1447,8 @@ bool sqlrprotocol_teradata::copKindContinue() {
 	debugStart("copkind_continue");
 
 	// parse parcels
-	bool			cancel=false;
-	const unsigned char	*parcel=clientreqdata;
+	bool		cancel=false;
+	const byte_t	*parcel=clientreqdata;
 	if (!parseGenericRespParcel(parcel,&parcel)) {
 		if (parseCancelParcel(parcel,&parcel)) {
 			cancel=true;
@@ -1523,7 +1523,7 @@ bool sqlrprotocol_teradata::copKindLogoff() {
 	debugStart("copkind_logoff");
 
 	// parse parcels
-	const unsigned char	*parcel=clientreqdata;
+	const byte_t	*parcel=clientreqdata;
 	if (!parseLogoffParcel(parcel,&parcel)) {
 		debugEnd();
 		return false;
@@ -1654,8 +1654,8 @@ bool sqlrprotocol_teradata::copKindStart() {
 	bool	eors=true;
 
 	// parse parcels
-	bool			retval=true;
-	const unsigned char	*parcel=clientreqdata;
+	bool		retval=true;
+	const byte_t	*parcel=clientreqdata;
 	if (parseOptionsParcel(parcel,&parcel)) {
 
 		if (!parseGenericReqParcel(parcel,&parcel) &&
@@ -1721,7 +1721,7 @@ bool sqlrprotocol_teradata::copKindStart() {
 
 			respdata.clear();
 
-			const unsigned char	*parcel=clientreqdata;
+			const byte_t	*parcel=clientreqdata;
 
 
 			// generate the id
@@ -1751,9 +1751,9 @@ bool sqlrprotocol_teradata::copKindStart() {
 
 			// bind the data
 			for (;;) {
-				uint16_t		parcelflavor;
-				const unsigned char	*parceldata;
-				uint32_t		parceldatalength;
+				uint16_t	parcelflavor;
+				const byte_t	*parceldata;
+				uint32_t	parceldatalength;
 				parseParcelHeader(parcel,&parcelflavor,
 							&parceldatalength,
 							&parceldata);
@@ -1919,7 +1919,7 @@ bool sqlrprotocol_teradata::copKindStart() {
 			appendStatementStatusParcel();
 			req->nibuffer.clear();
 			req->rowbuffer.clear();
-			const unsigned char unknown1[]={
+			const byte_t unknown1[]={
 				0x02, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x30, 0x09, 0x01, 0x00, 0x01, 0x00,
 				0x00, 0x00
@@ -1932,7 +1932,7 @@ bool sqlrprotocol_teradata::copKindStart() {
 			appendStatementStatusParcel();
 			req->nibuffer.clear();
 			req->rowbuffer.clear();
-			const unsigned char unknown2[]={
+			const byte_t unknown2[]={
 				0x00, 0x00
 			};
 			write(&req->rowbuffer,unknown2,sizeof(unknown2));
@@ -2111,18 +2111,18 @@ bool sqlrprotocol_teradata::recvRequestFromClient() {
 	}
 
 	// lan header fields
-	unsigned char	version;
-	unsigned char	messageclass;
+	byte_t		version;
+	byte_t		messageclass;
 	uint16_t	highordermessagelength;
-	unsigned char	bytevar;
+	byte_t		bytevar;
 	uint16_t	wordvar;
 	uint16_t	lowordermessagelength;
 	uint16_t 	resforexpan[3];
 	uint16_t	corrtag[2];
-	unsigned char	spare[14];
+	byte_t		spare[14];
 
 	// copy out values from lan header
-	const unsigned char	*ptr=clientreqheader;
+	const byte_t	*ptr=clientreqheader;
 	read(ptr,&version,&ptr);
 	read(ptr,&messageclass,&ptr);
 	read(ptr,&messagekind,&ptr);
@@ -2131,15 +2131,15 @@ bool sqlrprotocol_teradata::recvRequestFromClient() {
 	readBE(ptr,&wordvar,&ptr);
 	readBE(ptr,&lowordermessagelength,&ptr);
 	// FIXME: net-to-host these?
-	read(ptr,(unsigned char *)resforexpan,sizeof(resforexpan),&ptr);
+	read(ptr,(byte_t *)resforexpan,sizeof(resforexpan),&ptr);
 	// FIXME: net-to-host these?
-	read(ptr,(unsigned char *)corrtag,sizeof(corrtag),&ptr);
+	read(ptr,(byte_t *)corrtag,sizeof(corrtag),&ptr);
 	readBE(ptr,&sessionno,&ptr);
-	read(ptr,(unsigned char *)requestauth,sizeof(requestauth),&ptr);
+	read(ptr,(byte_t *)requestauth,sizeof(requestauth),&ptr);
 	readBE(ptr,&requestno,&ptr);
 	read(ptr,&gtwbyte,&ptr);
 	read(ptr,&hostcharset,&ptr);
-	read(ptr,(unsigned char *)spare,sizeof(spare),&ptr);
+	read(ptr,(byte_t *)spare,sizeof(spare),&ptr);
 
 	clientreqdatalength=(((uint32_t)highordermessagelength)<<16)|
 					((uint32_t)lowordermessagelength);
@@ -2156,11 +2156,10 @@ bool sqlrprotocol_teradata::recvRequestFromClient() {
 		stdoutput.printf("	low order message length: %d\n",
 						(int)lowordermessagelength);
 		stdoutput.write("	res for expan: ");
-		stdoutput.safePrint((unsigned char *)resforexpan,
-						sizeof(resforexpan));
+		stdoutput.safePrint((byte_t *)resforexpan,sizeof(resforexpan));
 		stdoutput.write('\n');
 		stdoutput.write("	correlation tag: ");
-		stdoutput.safePrint((unsigned char *)corrtag,sizeof(corrtag));
+		stdoutput.safePrint((byte_t *)corrtag,sizeof(corrtag));
 		stdoutput.write('\n');
 		stdoutput.printf("	session no: %d\n",(int)sessionno);
 		stdoutput.printf("	request auth: "
@@ -2218,12 +2217,12 @@ bool sqlrprotocol_teradata::recvRequestFromClient() {
 bool sqlrprotocol_teradata::sendResponseToClient() {
 
 	// lan header fields
-	unsigned char	version=3;
-	unsigned char	messageclass=2;
+	byte_t		version=3;
+	byte_t		messageclass=2;
 	uint32_t	messagelength=respdata.getSize();
 	uint16_t	highordermessagelength=(messagelength>>16);
 	// FIXME: There are cfg/assign cases where bytevar should be 8.
-	unsigned char	bytevar=0;
+	byte_t		bytevar=0;
 	uint16_t	wordvar=0;
 	uint16_t	lowordermessagelength=((messagelength<<16)>>16);
 	uint16_t 	resforexpan[3]={0,0,0};
@@ -2310,7 +2309,7 @@ bool sqlrprotocol_teradata::sendResponseToClient() {
 
 	gtwbyte=(messagekind==COPKIND_CFG || messagekind==COPKIND_ASSIGN)?5:0;
 	hostcharset=0x7F;
-	unsigned char	spare[14]={0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+	byte_t	spare[14]={0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
 	// build lan header
 	respheader.clear();
@@ -2322,9 +2321,9 @@ bool sqlrprotocol_teradata::sendResponseToClient() {
 	writeBE(&respheader,wordvar);
 	writeBE(&respheader,lowordermessagelength);
 	// FIXME: host-to-net this?
-	write(&respheader,(unsigned char *)resforexpan,sizeof(resforexpan));
+	write(&respheader,(byte_t *)resforexpan,sizeof(resforexpan));
 	// FIXME: host-to-net this?
-	write(&respheader,(unsigned char *)corrtag,sizeof(corrtag));
+	write(&respheader,(byte_t *)corrtag,sizeof(corrtag));
 	writeBE(&respheader,sessionno);
 	write(&respheader,responseauth,sizeof(responseauth));
 	// FIXME: requestno, gtwbyte, and hostcharset
@@ -2346,11 +2345,10 @@ bool sqlrprotocol_teradata::sendResponseToClient() {
 		stdoutput.printf("	low order message length: %d\n",
 						(int)lowordermessagelength);
 		stdoutput.write("	res for expan: ");
-		stdoutput.safePrint((unsigned char *)resforexpan,
-						sizeof(resforexpan));
+		stdoutput.safePrint((byte_t *)resforexpan,sizeof(resforexpan));
 		stdoutput.write('\n');
 		stdoutput.write("	correlation tag: ");
-		stdoutput.safePrint((unsigned char *)corrtag,sizeof(corrtag));
+		stdoutput.safePrint((byte_t *)corrtag,sizeof(corrtag));
 		stdoutput.write('\n');
 		stdoutput.printf("	session no: %d\n",(int)sessionno);
 		stdoutput.printf("	response auth: "
@@ -2454,8 +2452,8 @@ bool sqlrprotocol_teradata::forwardClientRequestToBackend() {
 bool sqlrprotocol_teradata::recvResponseFromBackend() {
 
 	// receive message
-	unsigned char	*backendreqmessage=NULL;
-	size_t		backendreqmessagesize=0;
+	byte_t	*backendreqmessage=NULL;
+	size_t	backendreqmessagesize=0;
 	if (!cont->recv(&backendreqmessage,&backendreqmessagesize)) {
 		if (getDebug()) {
 			stdoutput.write("recv message from backend failed\n");
@@ -2466,22 +2464,22 @@ bool sqlrprotocol_teradata::recvResponseFromBackend() {
 	backendreqheader=backendreqmessage;
 
 	// lan header fields
-	unsigned char	version;
-	unsigned char	messageclass;
+	byte_t		version;
+	byte_t		messageclass;
 	uint16_t	highordermessagelength;
-	unsigned char	bytevar;
+	byte_t		bytevar;
 	uint16_t	wordvar;
 	uint16_t	lowordermessagelength;
 	uint16_t 	resforexpan[3];
 	uint16_t	corrtag[2];
 	uint32_t	sessionno;
 	uint32_t	berequestno;
-	unsigned char	begtwbyte;
-	unsigned char	behostcharset;
-	unsigned char	spare[14];
+	byte_t		begtwbyte;
+	byte_t		behostcharset;
+	byte_t		spare[14];
 
 	// copy out values from lan header
-	const unsigned char	*ptr=backendreqheader;
+	const byte_t	*ptr=backendreqheader;
 	read(ptr,&version,&ptr);
 	read(ptr,&messageclass,&ptr);
 	read(ptr,&messagekind,&ptr);
@@ -2490,16 +2488,15 @@ bool sqlrprotocol_teradata::recvResponseFromBackend() {
 	readBE(ptr,&wordvar,&ptr);
 	readBE(ptr,&lowordermessagelength,&ptr);
 	// FIXME: net-to-host this?
-	read(ptr,(unsigned char *)resforexpan,sizeof(resforexpan),&ptr);
+	read(ptr,(byte_t *)resforexpan,sizeof(resforexpan),&ptr);
 	// FIXME: net-to-host this?
-	read(ptr,(unsigned char *)corrtag,sizeof(corrtag),&ptr);
+	read(ptr,(byte_t *)corrtag,sizeof(corrtag),&ptr);
 	readBE(ptr,&sessionno,&ptr);
-	read(ptr,(unsigned char *)responseauth,
-				sizeof(responseauth),&ptr);
+	read(ptr,(byte_t *)responseauth,sizeof(responseauth),&ptr);
 	readBE(ptr,&berequestno,&ptr);
 	read(ptr,&begtwbyte,&ptr);
 	read(ptr,&behostcharset,&ptr);
-	read(ptr,(unsigned char *)spare,sizeof(spare),&ptr);
+	read(ptr,(byte_t *)spare,sizeof(spare),&ptr);
 
 	backendreqdatalength=(((uint32_t)highordermessagelength)<<16)|
 				((uint32_t)lowordermessagelength);
@@ -2516,11 +2513,10 @@ bool sqlrprotocol_teradata::recvResponseFromBackend() {
 		stdoutput.printf("	low order message length: %d\n",
 						(int)lowordermessagelength);
 		stdoutput.write("	res for expan: ");
-		stdoutput.safePrint((unsigned char *)resforexpan,
-						sizeof(resforexpan));
+		stdoutput.safePrint((byte_t *)resforexpan,sizeof(resforexpan));
 		stdoutput.write('\n');
 		stdoutput.write("	correlation tag: ");
-		stdoutput.safePrint((unsigned char *)corrtag,sizeof(corrtag));
+		stdoutput.safePrint((byte_t *)corrtag,sizeof(corrtag));
 		stdoutput.write('\n');
 		stdoutput.printf("	session no: %d\n",(int)sessionno);
 		stdoutput.printf("	response auth: "
@@ -2603,13 +2599,13 @@ bool sqlrprotocol_teradata::forwardBackendResponseToClient() {
 	return true;
 }
 
-void sqlrprotocol_teradata::parseParcelHeader(const unsigned char *parcel,
+void sqlrprotocol_teradata::parseParcelHeader(const byte_t *parcel,
 					uint16_t *flavor,
 					uint32_t *datalength,
-					const unsigned char **parcelout) {
+					const byte_t **parcelout) {
 	
 	// get the parcel flavor
-	const unsigned char	*start=parcel;
+	const byte_t	*start=parcel;
 	read(parcel,flavor,&parcel);
 	// if it's invalid, then try the other endianness
 	if ((*flavor&0x7fff)>512) {
@@ -2644,13 +2640,13 @@ void sqlrprotocol_teradata::parseParcelHeader(const unsigned char *parcel,
 }
 
 bool sqlrprotocol_teradata::parseClientConfigParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -2663,8 +2659,8 @@ bool sqlrprotocol_teradata::parseClientConfigParcel(
 	debugParcelStart("recv","client config",parcelflavor,parceldatalength);
 
 	// parse parcel data
-	const unsigned char	*ptr=parceldata;
-	const unsigned char	*end=parceldata+parceldatalength;
+	const byte_t	*ptr=parceldata;
+	const byte_t	*end=parceldata+parceldatalength;
 
 	uint32_t	unknown;
 	read(ptr,&unknown,&ptr);
@@ -2695,13 +2691,13 @@ bool sqlrprotocol_teradata::parseClientConfigParcel(
 }
 
 bool sqlrprotocol_teradata::parseConfigParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -2724,13 +2720,13 @@ bool sqlrprotocol_teradata::parseConfigParcel(
 }
 
 bool sqlrprotocol_teradata::parseAssignParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -2762,13 +2758,13 @@ bool sqlrprotocol_teradata::parseAssignParcel(
 }
 
 bool sqlrprotocol_teradata::parseSsoRequestParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -2781,18 +2777,18 @@ bool sqlrprotocol_teradata::parseSsoRequestParcel(
 	debugParcelStart("recv","sso request",parcelflavor,parceldatalength);
 
 	// parse parcel data
-	const unsigned char	*ptr=parceldata;
-	const unsigned char	*end=parceldata+parceldatalength;
+	const byte_t	*ptr=parceldata;
+	const byte_t	*end=parceldata+parceldatalength;
 
-	uint16_t		marker;
-	uint16_t		postmarkerlength;
-	const unsigned char	*unknown1;
-	unsigned char		bodylength;
-	const unsigned char	*unknown2;
-	const unsigned char	*unknown3;
-	//const unsigned char	*padding1;
-	unsigned char		fieldslength;
-	//const unsigned char	*padding2;
+	uint16_t	marker;
+	uint16_t	postmarkerlength;
+	const byte_t	*unknown1;
+	byte_t		bodylength;
+	const byte_t	*unknown2;
+	const byte_t	*unknown3;
+	//const byte_t	*padding1;
+	byte_t		fieldslength;
+	//const byte_t	*padding2;
 	read(ptr,&marker,&ptr);
 	read(ptr,&postmarkerlength,&ptr);
 	unknown1=ptr;
@@ -2829,16 +2825,16 @@ bool sqlrprotocol_teradata::parseSsoRequestParcel(
 	}
 
 	// parse supported algorithms...
-	const unsigned char	*fieldsend=ptr+fieldslength;
+	const byte_t	*fieldsend=ptr+fieldslength;
 	while (ptr<fieldsend) {
 
 		// get supported algorithms field
-		unsigned char	algs;
+		byte_t	algs;
 		read(ptr,&algs,&ptr);
 		if (algs!=SUPPORTED_ALGORITHMS) {
 			break;
 		}
-		unsigned char	algslen;
+		byte_t	algslen;
 		read(ptr,&algslen,&ptr);
 
 		if (getDebug()) {
@@ -2847,16 +2843,16 @@ bool sqlrprotocol_teradata::parseSsoRequestParcel(
 		}
 
 		// parse each supported algorithm
-		const unsigned char	*algsend=ptr+algslen;
+		const byte_t	*algsend=ptr+algslen;
 		while (ptr<algsend) {
 
 			// get supported algorithm
-			unsigned char	alg;
+			byte_t	alg;
 			read(ptr,&alg,&ptr);
 			if (alg!=SUPPORTED_ALGORITHM) {
 				break;
 			}
-			unsigned char	alglen;
+			byte_t	alglen;
 			read(ptr,&alglen,&ptr);
 
 			if (getDebug()) {
@@ -2865,15 +2861,15 @@ bool sqlrprotocol_teradata::parseSsoRequestParcel(
 			}
 
 			// get algorithm details
-			const unsigned char	*algend=ptr+alglen;
-			unsigned char		currentconf=ALG_NONE;
-			unsigned char		currentkex=ALG_NONE;
+			const byte_t	*algend=ptr+alglen;
+			byte_t		currentconf=ALG_NONE;
+			byte_t		currentkex=ALG_NONE;
 			while (ptr<algend) {
 
 				// get algorithm details field
-				unsigned char	algfield;
+				byte_t	algfield;
 				read(ptr,&algfield,&ptr);
-				unsigned char	dlen;
+				byte_t	dlen;
 				read(ptr,&dlen,&ptr);
 
 				if (getDebug()) {
@@ -2886,7 +2882,7 @@ bool sqlrprotocol_teradata::parseSsoRequestParcel(
 
 				if (dlen==1) {
 
-					unsigned char	val;
+					byte_t	val;
 					read(ptr,&val,&ptr);
 
 					switch (algfield) {
@@ -2950,9 +2946,9 @@ bool sqlrprotocol_teradata::parseSsoRequestParcel(
 	// FIXME: sanity check on location...
 
 	// parse requested mech...
-	unsigned char		reqmechfield;
-	unsigned char		reqmechlength;
-	const unsigned char	*reqmech;
+	byte_t		reqmechfield;
+	byte_t		reqmechlength;
+	const byte_t	*reqmech;
 	read(ptr,&reqmechfield,&ptr);
 	read(ptr,&reqmechlength,&ptr);
 	reqmech=ptr;
@@ -3034,8 +3030,8 @@ bool sqlrprotocol_teradata::parseSsoRequestParcel(
 	}
 
 	// trailer...
-	const unsigned char	*trailer=ptr;
-	uint16_t		trailerlength=end-trailer;
+	const byte_t	*trailer=ptr;
+	uint16_t	trailerlength=end-trailer;
 	if (getDebug()) {
 		stdoutput.write("		trailer:\n");
 		debugHexDump(trailer,trailerlength);
@@ -3050,7 +3046,7 @@ bool sqlrprotocol_teradata::parseSsoRequestParcel(
 	return true;
 }
 
-void sqlrprotocol_teradata::confAlg(unsigned char val) {
+void sqlrprotocol_teradata::confAlg(byte_t val) {
 	switch (val) {
 		case ALG_BLOWFISH:
 			blowfishsupported=true;
@@ -3064,7 +3060,7 @@ void sqlrprotocol_teradata::confAlg(unsigned char val) {
 	}
 }
 
-void sqlrprotocol_teradata::intAlg(unsigned char val) {
+void sqlrprotocol_teradata::intAlg(byte_t val) {
 	switch (val) {
 		case ALG_MD5:
 			md5supported=true;
@@ -3084,7 +3080,7 @@ void sqlrprotocol_teradata::intAlg(unsigned char val) {
 	}
 }
 
-void sqlrprotocol_teradata::kexAlg(unsigned char val) {
+void sqlrprotocol_teradata::kexAlg(byte_t val) {
 	switch (val) {
 		case ALG_DH:
 			dhsupported=true;
@@ -3095,7 +3091,7 @@ void sqlrprotocol_teradata::kexAlg(unsigned char val) {
 	}
 }
 
-void sqlrprotocol_teradata::confAlgMode(unsigned char val) {
+void sqlrprotocol_teradata::confAlgMode(byte_t val) {
 	switch (val) {
 		case CONF_ALG_MODE_CBC:
 			cbcsupported=true;
@@ -3124,7 +3120,7 @@ void sqlrprotocol_teradata::confAlgMode(unsigned char val) {
 	}
 }
 
-void sqlrprotocol_teradata::confAlgPadding(unsigned char val) {
+void sqlrprotocol_teradata::confAlgPadding(byte_t val) {
 	switch (val) {
 		case CONF_ALG_PADDING_OAEP:
 			oaepsupported=true;
@@ -3144,7 +3140,7 @@ void sqlrprotocol_teradata::confAlgPadding(unsigned char val) {
 	}
 }
 
-void sqlrprotocol_teradata::confAlgKeySize(unsigned char conf, uint16_t val) {
+void sqlrprotocol_teradata::confAlgKeySize(byte_t conf, uint16_t val) {
 	if (conf==ALG_AES) {
 		switch (val) {
 			case 128:
@@ -3163,7 +3159,7 @@ void sqlrprotocol_teradata::confAlgKeySize(unsigned char conf, uint16_t val) {
 	}
 }
 
-void sqlrprotocol_teradata::kexAlgKeySize(unsigned char kex, uint16_t val) {
+void sqlrprotocol_teradata::kexAlgKeySize(byte_t kex, uint16_t val) {
 	if (kex==ALG_DH) {
 		switch (val) {
 			case 2048:
@@ -3175,14 +3171,13 @@ void sqlrprotocol_teradata::kexAlgKeySize(unsigned char kex, uint16_t val) {
 	}
 }
 
-bool sqlrprotocol_teradata::parseSsoParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+bool sqlrprotocol_teradata::parseSsoParcel(const byte_t *parcel,
+						const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3195,12 +3190,12 @@ bool sqlrprotocol_teradata::parseSsoParcel(
 	debugParcelStart("recv","sso",parcelflavor,parceldatalength);
 
 	// parse parcel data
-	const unsigned char	*ptr=parceldata;
-	//const unsigned char	*end=parceldata+parceldatalength;
+	const byte_t	*ptr=parceldata;
+	//const byte_t	*end=parceldata+parceldatalength;
 
-	uint16_t		unknown1;
-	unsigned char		unknown2;
-	const unsigned char	*token;
+	uint16_t	unknown1;
+	byte_t		unknown2;
+	const byte_t	*token;
 	readBE(ptr,&unknown1,&ptr);
 	read(ptr,&unknown2,&ptr);
 	token=ptr;
@@ -3254,13 +3249,13 @@ bool sqlrprotocol_teradata::parseSsoParcel(
 }
 
 bool sqlrprotocol_teradata::parseLogoffParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3283,13 +3278,13 @@ bool sqlrprotocol_teradata::parseLogoffParcel(
 }
 
 bool sqlrprotocol_teradata::parseOptionsParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3319,7 +3314,7 @@ bool sqlrprotocol_teradata::parseOptionsParcel(
 	cont->setInputBindCount(req->cur,0);
 
 	// parse parcel data
-	const unsigned char	*ptr=parceldata;
+	const byte_t	*ptr=parceldata;
 	read(ptr,&req->requestmode,&ptr);
 	read(ptr,&req->function,&ptr);
 	read(ptr,&req->selectdata,&ptr);
@@ -3439,13 +3434,13 @@ bool sqlrprotocol_teradata::parseOptionsParcel(
 }
 
 bool sqlrprotocol_teradata::parseGenericReqParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3743,13 +3738,13 @@ void sqlrprotocol_teradata::translateInsertToSelect() {
 }
 
 bool sqlrprotocol_teradata::parseGenericRunStartupParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3775,13 +3770,13 @@ bool sqlrprotocol_teradata::parseGenericRunStartupParcel(
 }
 
 bool sqlrprotocol_teradata::parseGenericRespParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3817,13 +3812,13 @@ bool sqlrprotocol_teradata::parseGenericRespParcel(
 	return true;
 }
 
-bool sqlrprotocol_teradata::isBulkLoadData(const unsigned char *parcel) {
+bool sqlrprotocol_teradata::isBulkLoadData(const byte_t *parcel) {
 
 	// if we find a data parcel, then (in the context that this
 	// method is called) the message must be data for a bulk load
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3831,13 +3826,13 @@ bool sqlrprotocol_teradata::isBulkLoadData(const unsigned char *parcel) {
 }
 
 bool sqlrprotocol_teradata::parseSetPositionParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3861,13 +3856,13 @@ bool sqlrprotocol_teradata::parseSetPositionParcel(
 }
 
 bool sqlrprotocol_teradata::parseDataParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -3887,7 +3882,7 @@ bool sqlrprotocol_teradata::parseDataParcel(
 	}
 
 	// parse bind values
-	const unsigned char	*bd=parceldata;
+	const byte_t	*bd=parceldata;
 
 	sqlrserverbindvar	*inbinds=cont->getInputBinds(req->cur);
 	uint16_t		inbindcount=cont->getInputBindCount(req->cur);
@@ -4012,9 +4007,9 @@ bool sqlrprotocol_teradata::parseDataParcel(
 	return true;
 }
 
-void sqlrprotocol_teradata::parseTinyIntBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseTinyIntBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	char	val;
 	read(ptr,&val,outptr);
 	inbind->value.integerval=val;
@@ -4024,9 +4019,9 @@ void sqlrprotocol_teradata::parseTinyIntBind(const unsigned char *ptr,
 	}
 }
 
-void sqlrprotocol_teradata::parseSmallIntBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseSmallIntBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	uint16_t	val;
 	read(ptr,&val,outptr);
 	inbind->value.integerval=val;
@@ -4036,9 +4031,9 @@ void sqlrprotocol_teradata::parseSmallIntBind(const unsigned char *ptr,
 	}
 }
 
-void sqlrprotocol_teradata::parseIntegerBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseIntegerBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	int32_t	val;
 	read(ptr,(uint32_t *)&val,outptr);
 	inbind->type=SQLRSERVERBINDVARTYPE_INTEGER;
@@ -4048,9 +4043,9 @@ void sqlrprotocol_teradata::parseIntegerBind(const unsigned char *ptr,
 	}
 }
 
-void sqlrprotocol_teradata::parseBigIntBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseBigIntBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	int64_t	val;
 	read(ptr,(uint64_t *)&val,outptr);
 	inbind->type=SQLRSERVERBINDVARTYPE_INTEGER;
@@ -4060,9 +4055,9 @@ void sqlrprotocol_teradata::parseBigIntBind(const unsigned char *ptr,
 	}
 }
 
-void sqlrprotocol_teradata::parseCharBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseCharBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	char	*val=(char *)ptr;
 	*outptr=ptr+inbind->valuesize;
 	inbind->type=SQLRSERVERBINDVARTYPE_STRING;
@@ -4072,9 +4067,9 @@ void sqlrprotocol_teradata::parseCharBind(const unsigned char *ptr,
 	}
 }
 
-void sqlrprotocol_teradata::parseVarCharBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseVarCharBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	uint16_t	len;
 	read(ptr,&len,&ptr);
 	char	*val=(char *)ptr;
@@ -4087,22 +4082,22 @@ void sqlrprotocol_teradata::parseVarCharBind(const unsigned char *ptr,
 	}
 }
 
-void sqlrprotocol_teradata::parseByteBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseByteBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	char	*val=(char *)ptr;
 	*outptr=ptr+inbind->valuesize;
 	inbind->type=SQLRSERVERBINDVARTYPE_BLOB;
 	inbind->value.stringval=val;
 	if (getDebug()) {
 		stdoutput.write('\n');
-		debugHexDump((unsigned char *)val,inbind->valuesize);
+		debugHexDump((byte_t *)val,inbind->valuesize);
 	}
 }
 
-void sqlrprotocol_teradata::parseVarByteBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseVarByteBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	uint16_t	len;
 	read(ptr,&len,&ptr);
 	char	*val=(char *)ptr;
@@ -4112,13 +4107,13 @@ void sqlrprotocol_teradata::parseVarByteBind(const unsigned char *ptr,
 	inbind->value.stringval=val;
 	if (getDebug()) {
 		stdoutput.write('\n');
-		debugHexDump((unsigned char *)val,len);
+		debugHexDump((byte_t *)val,len);
 	}
 }
 
-void sqlrprotocol_teradata::parseFloatBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseFloatBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 	uint64_t	val;
 	read(ptr,&val,outptr);
 	inbind->value.doubleval.value=*((double *)&val);
@@ -4134,9 +4129,9 @@ void sqlrprotocol_teradata::parseFloatBind(const unsigned char *ptr,
 	}
 }
 
-void sqlrprotocol_teradata::parseDateBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseDateBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 
 	memorypool		*bindpool=cont->getBindPool(req->cur);
 
@@ -4185,9 +4180,9 @@ void sqlrprotocol_teradata::parseDateBind(const unsigned char *ptr,
 	delete[] tmp;
 }
 
-void sqlrprotocol_teradata::parseTimeBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseTimeBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 
 	memorypool		*bindpool=cont->getBindPool(req->cur);
 
@@ -4237,9 +4232,9 @@ void sqlrprotocol_teradata::parseTimeBind(const unsigned char *ptr,
 	delete[] tmp;
 }
 
-void sqlrprotocol_teradata::parseTimestampBind(const unsigned char *ptr,
+void sqlrprotocol_teradata::parseTimestampBind(const byte_t *ptr,
 						sqlrserverbindvar *inbind,
-						const unsigned char **outptr) {
+						const byte_t **outptr) {
 
 	memorypool		*bindpool=cont->getBindPool(req->cur);
 
@@ -4293,13 +4288,13 @@ void sqlrprotocol_teradata::parseTimestampBind(const unsigned char *ptr,
 }
 
 bool sqlrprotocol_teradata::parseStatementInfoParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -4322,7 +4317,7 @@ bool sqlrprotocol_teradata::parseStatementInfoParcel(
 }
 
 bool sqlrprotocol_teradata::parseStatementInfoExtensions(
-					const unsigned char *ext,
+					const byte_t *ext,
 					uint32_t extlen) {
 
 	// The spec doesn't even mention that we could receive a
@@ -4380,7 +4375,7 @@ bool sqlrprotocol_teradata::parseStatementInfoExtensions(
 }
 
 bool sqlrprotocol_teradata::parseParameterExtension(
-						const unsigned char *ext,
+						const byte_t *ext,
 						uint32_t extlen,
 						uint16_t ibcount) {
 
@@ -4546,13 +4541,13 @@ bool sqlrprotocol_teradata::parseParameterExtension(
 }
 
 bool sqlrprotocol_teradata::parseStatementInfoEndParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -4575,13 +4570,13 @@ bool sqlrprotocol_teradata::parseStatementInfoEndParcel(
 }
 
 bool sqlrprotocol_teradata::parseMultipartIndicDataParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -4594,14 +4589,14 @@ bool sqlrprotocol_teradata::parseMultipartIndicDataParcel(
 	debugParcelStart("recv","142",parcelflavor,parceldatalength);
 
 	// parse parcel data...
-	const unsigned char	*ptr=parceldata;
+	const byte_t	*ptr=parceldata;
 
 	sqlrserverbindvar	*inbinds=cont->getInputBinds(req->cur);
 	uint16_t		ibcount=cont->getInputBindCount(req->cur);
 
 	// parse null indicator
 	uint32_t	nisize=ibcount/8+1;
-	unsigned char	ni=*ptr;
+	byte_t		ni=*ptr;
 	if (getDebug()) {
 		stdoutput.printf("		null indicator:\n");
 		for (uint16_t i=0; i<nisize; i++) {
@@ -4714,13 +4709,13 @@ bool sqlrprotocol_teradata::parseMultipartIndicDataParcel(
 }
 
 bool sqlrprotocol_teradata::parseEndMultipartIndicDataParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+					const byte_t *parcel,
+					const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -4742,14 +4737,13 @@ bool sqlrprotocol_teradata::parseEndMultipartIndicDataParcel(
 	return true;
 }
 
-bool sqlrprotocol_teradata::parse215Parcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+bool sqlrprotocol_teradata::parse215Parcel(const byte_t *parcel,
+						const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -4866,14 +4860,13 @@ bool sqlrprotocol_teradata::executeQuery() {
 	return retval;
 }
 
-bool sqlrprotocol_teradata::parseCancelParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+bool sqlrprotocol_teradata::parseCancelParcel(const byte_t *parcel,
+						const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -4893,22 +4886,20 @@ bool sqlrprotocol_teradata::parseCancelParcel(
 	return true;
 }
 
-void sqlrprotocol_teradata::parseGenericParcels(
-					const unsigned char *parcel,
-					const unsigned char *end) {
+void sqlrprotocol_teradata::parseGenericParcels(const byte_t *parcel,
+							const byte_t *end) {
 	while (parcel!=end) {
 		parseGenericParcel(parcel,&parcel);
 	}
 }
 
-bool sqlrprotocol_teradata::parseGenericParcel(
-					const unsigned char *parcel,
-					const unsigned char **parcelout) {
+bool sqlrprotocol_teradata::parseGenericParcel(const byte_t *parcel,
+						const byte_t **parcelout) {
 
 	// parse parcel header
-	uint16_t		parcelflavor;
-	const unsigned char	*parceldata;
-	uint32_t		parceldatalength;
+	uint16_t	parcelflavor;
+	const byte_t	*parceldata;
+	uint32_t	parceldatalength;
 	parseParcelHeader(parcel,&parcelflavor,
 					&parceldatalength,
 					&parceldata);
@@ -4999,8 +4990,8 @@ void sqlrprotocol_teradata::appendConfigResponseParcelHeader() {
 	uint16_t	unknown6=2;
 	uint16_t	unknown7=0;
 	uint16_t	unknown8=1;
-	unsigned char	unknown9=(!getProtocolIsBigEndian())?0x7F:0xFF;
-	unsigned char	unknown10=0;
+	byte_t		unknown9=(!getProtocolIsBigEndian())?0x7F:0xFF;
+	byte_t		unknown10=0;
 	write(&respdata,unknown1);
 	write(&respdata,unknown2);
 	write(&respdata,unknown3);
@@ -5041,15 +5032,15 @@ void sqlrprotocol_teradata::appendConfigResponseParcelHeader() {
 
 	// supported character sets...
 	uint16_t	count=4;
-	unsigned char	codes1[]={
+	byte_t		codes1[]={
 		0x3e, 0x3f, 0x7f, 0x40
 	};
-	unsigned char	codes2[]={
+	byte_t		codes2[]={
 		0xbe, 0xbf, 0xff, 0xc0
 	};
-	const unsigned char	*codes=
+	const byte_t		*codes=
 				(!getProtocolIsBigEndian())?codes1:codes2;
-	unsigned char	marker=0;
+	byte_t		marker=0;
 	const char	*strings[]={
 		"UTF16                         ",
 		"UTF8                          ",
@@ -5075,8 +5066,8 @@ void sqlrprotocol_teradata::appendConfigResponseParcelHeader() {
 void sqlrprotocol_teradata::appendConfigResponseField78() {
 
 	// ???
-	unsigned char	field=78;
-	unsigned char	unknown1=1;
+	byte_t		field=78;
+	byte_t		unknown1=1;
 	uint16_t	unknown2=1;
 	uint16_t	unknown3=1;
 	write(&respdata,field);
@@ -5098,7 +5089,7 @@ void sqlrprotocol_teradata::appendConfigResponseField78() {
 void sqlrprotocol_teradata::appendConfigResponseField84() {
 
 	// ???
-	unsigned char	field=84;
+	byte_t		field=84;
 	uint16_t	unknown1=7;
 	uint16_t	unknown2=140;
 	write(&respdata,field);
@@ -5117,33 +5108,33 @@ void sqlrprotocol_teradata::appendConfigResponseField84() {
 void sqlrprotocol_teradata::appendConfigResponseField49() {
 
 	// ???
-	unsigned char	field=49;
-	unsigned char	unknown1=0;
+	byte_t		field=49;
+	byte_t		unknown1=0;
 	uint16_t	unknown2=100;
-	unsigned char	unknown3=0;
+	byte_t		unknown3=0;
 	uint16_t	unknown4=250;
-	unsigned char	unknown5=0;
-	unsigned char	unknown6=(!getProtocolIsBigEndian())?64:0;
+	byte_t		unknown5=0;
+	byte_t		unknown6=(!getProtocolIsBigEndian())?64:0;
 	uint16_t	unknown7=3906;
-	unsigned char	unknown8_1[]={
+	byte_t		unknown8_1[]={
 		0x00, 0x00, 0x06
 	};
-	unsigned char	unknown8_2[]={
+	byte_t		unknown8_2[]={
 		0x40, 0x00, 0x00, 0x00, 0x00
 	};
-	const unsigned char	*unknown8=(!getProtocolIsBigEndian())?
+	const byte_t	*unknown8=(!getProtocolIsBigEndian())?
 							unknown8_1:unknown8_2;
 	uint16_t	unknown8size=(!getProtocolIsBigEndian())?
 							sizeof(unknown8_1):
 							sizeof(unknown8_2);
 	uint16_t	unknown9=31999;
-	unsigned char	unknown10_1[]={
+	byte_t		unknown10_1[]={
 		0x00, 0x00, 0x00, 0x00, 0x00
 	};
-	unsigned char	unknown10_2[]={
+	byte_t		unknown10_2[]={
 		0x06, 0x00, 0x00
 	};
-	const unsigned char	*unknown10=(!getProtocolIsBigEndian())?
+	const byte_t	*unknown10=(!getProtocolIsBigEndian())?
 							unknown10_1:unknown10_2;
 	uint16_t	unknown10size=(!getProtocolIsBigEndian())?
 							sizeof(unknown10_1):
@@ -5153,7 +5144,7 @@ void sqlrprotocol_teradata::appendConfigResponseField49() {
 	uint16_t	unknown13=65528;
 	uint16_t	unknown14=0;
 	uint16_t	unknown15=1;
-	unsigned char	unknown16=0;
+	byte_t		unknown16=0;
 	uint32_t	unknown17=191;
 	uint32_t	unknown18=16;
 	uint16_t	unknown19=0;
@@ -5167,16 +5158,16 @@ void sqlrprotocol_teradata::appendConfigResponseField49() {
 	uint16_t	unknown27=0;
 
 	uint16_t	unknown28=2536;
-	unsigned char	unknown29=0;
+	byte_t		unknown29=0;
 	uint32_t	unknown30=262144000;
-	unsigned char	unknown31=0;
+	byte_t		unknown31=0;
 	uint16_t	unknown32=62000;
 	uint16_t	unknown32a=0;
 	uint16_t	unknown33=31000;
 	uint16_t	unknown34=0;
 	uint16_t	unknown35=38;
 	uint16_t	unknown35a=0;
-	unsigned char	unknown36=0;
+	byte_t		unknown36=0;
 	uint16_t	unknown37=250;
 	uint16_t	unknown38=0;
 	uint16_t	unknown39=250;
@@ -5190,21 +5181,21 @@ void sqlrprotocol_teradata::appendConfigResponseField49() {
 	uint16_t	unknown47=250;
 	uint16_t	unknown48=0;
 	uint16_t	unknown49=250;
-	unsigned char	unknown50=0;
+	byte_t		unknown50=0;
 	uint32_t	unknown51=2536;
 	uint32_t	unknown52=6;
 	uint32_t	unknown53=6;
 	uint32_t	unknown54=6;
 	uint32_t	unknown55=1000;
-	unsigned char	unknown56=0;
+	byte_t		unknown56=0;
 	uint16_t	unknown57=4000;
 	uint16_t	unknown58=0;
 	uint16_t	unknown59=65532;
-	unsigned char	unknown60=0;
+	byte_t		unknown60=0;
 	uint32_t	unknown61=1048500;
-	unsigned char	unknown62=0;
+	byte_t		unknown62=0;
 	uint16_t	unknown63=250;
-	unsigned char	unknown64=0;
+	byte_t		unknown64=0;
 
 	write(&respdata,field);
 	write(&respdata,unknown1);
@@ -5437,7 +5428,7 @@ void sqlrprotocol_teradata::appendConfigResponseField9() {
 
 	uint16_t	field=9;
 	uint16_t	unknown1=1;
-	unsigned char	unknown2=1;
+	byte_t		unknown2=1;
 	write(&respdata,field);
 	write(&respdata,unknown1);
 	write(&respdata,unknown2);
@@ -5454,7 +5445,7 @@ void sqlrprotocol_teradata::appendConfigResponseField9() {
 void sqlrprotocol_teradata::appendConfigResponseField10() {
 
 	uint16_t	field=10;
-	unsigned char	data[]={
+	byte_t		data[]={
 		0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02,
 		0x01, 0x00, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01,
 		0x01, 0x00, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01,
@@ -5474,7 +5465,7 @@ void sqlrprotocol_teradata::appendConfigResponseField10() {
 void sqlrprotocol_teradata::appendConfigResponseField11() {
 
 	uint16_t	field=11;
-	unsigned char	data[]={
+	byte_t		data[]={
 		0x01, 0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01,
 		0x01, 0x01, 0x01, 0x01, 0x02, 0x01, 0x01, 0x01,
 		0x01, 0x01, 0x01, 0x01, 0x00, 0x01, 0x01, 0x01,
@@ -5495,7 +5486,7 @@ void sqlrprotocol_teradata::appendConfigResponseField11() {
 void sqlrprotocol_teradata::appendConfigResponseField12() {
 
 	uint16_t	field=12;
-	unsigned char	data[]={
+	byte_t		data[]={
 		0x01, 0x01, 0x01, 0x02, 0x01, 0x01
 	};
 	write(&respdata,field);
@@ -5541,7 +5532,7 @@ void sqlrprotocol_teradata::appendConfigResponseVersions() {
 void sqlrprotocol_teradata::appendConfigResponseField14() {
 
 	uint16_t	field=14;
-	unsigned char	data[]={
+	byte_t		data[]={
 		0x03, 0x03, 0x02, 0x03
 	};
 	write(&respdata,field);
@@ -5558,7 +5549,7 @@ void sqlrprotocol_teradata::appendConfigResponseField14() {
 void sqlrprotocol_teradata::appendConfigResponseField15() {
 
 	uint16_t	field=15;
-	unsigned char	data[]={
+	byte_t		data[]={
 		0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01,
 		0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01,
 		0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00,
@@ -5579,12 +5570,12 @@ void sqlrprotocol_teradata::appendConfigResponseField15() {
 void sqlrprotocol_teradata::appendConfigResponseField16() {
 
 	uint16_t	field=16;
-	unsigned char	data1[]={
+	byte_t		data1[]={
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00
 	};
 	uint16_t	unknown=32770;
-	unsigned char	data2[]={
+	byte_t		data2[]={
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	};
 	write(&respdata,field);
@@ -5607,7 +5598,7 @@ void sqlrprotocol_teradata::appendConfigResponseField16() {
 void sqlrprotocol_teradata::appendConfigResponseField6() {
 
 	uint16_t	field=6;
-	unsigned char	data[]={
+	byte_t		data[]={
 		0x01, 0x49
 	};
 	write(&respdata,field);
@@ -5629,11 +5620,11 @@ void sqlrprotocol_teradata::appendGatewayConfigParcel() {
 
 	uint32_t	marker=1;
 	uint16_t	field1=1;
-	unsigned char	data1[]={
+	byte_t		data1[]={
 		0x01
 	};
 	uint16_t	releasefield=2;
-	unsigned char	releasedata[]={
+	byte_t		releasedata[]={
 		// 16.20.12.01
 		0x10, 0x14, 0x0C, 0x01
 	};
@@ -5646,15 +5637,15 @@ void sqlrprotocol_teradata::appendGatewayConfigParcel() {
 	uint16_t	field8=8;
 	uint16_t	field9=9;
 	uint16_t	field10=10;
-	unsigned char	data10[]={
+	byte_t		data10[]={
 		0x01
 	};
 	uint16_t	field11=11;
-	unsigned char	data11[]={
+	byte_t		data11[]={
 		0x01
 	};
 	uint16_t	field12=12;
-	unsigned char	data12[]={
+	byte_t		data12[]={
 		0x01
 	};
 	// no field 13?
@@ -5963,7 +5954,7 @@ void sqlrprotocol_teradata::appendAssignResponseParcel() {
 	appendSmallParcelHeader(101,94);
 
 	const char	*unknownspaces1="        ";
-	unsigned char	unknowndata1[]={
+	byte_t		unknowndata1[]={
 		0x01, 0x04, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5993,11 +5984,11 @@ void sqlrprotocol_teradata::appendSsoResponseParcel() {
 
 	appendSmallParcelHeader(134,956);
 
-	unsigned char	marker[]={
+	byte_t		marker[]={
 		0x00, 0x00, 0x01, 0x00
 	};
 	uint16_t	postmarkerlength=950;
-	unsigned char	unknown[]={
+	byte_t		unknown[]={
 		0x03, 0x02, 0x01, 0x01, 0x00, 0x00, 0x03, 0xA6,
 		0x00, 0x00, 0x00, 0x15, 0x00, 0x00, 0x00, 0x00,
 		0x10, 0x14, 0x0C, 0x01, 0x00, 0x00, 0x01, 0x00,
@@ -6035,12 +6026,12 @@ void sqlrprotocol_teradata::appendSsoResponseParcel() {
 	}
 
 	// get qop parameters
-	unsigned char	confalg=ALG_AES;
-	unsigned char	mode=CONF_ALG_MODE_GCM;
-	unsigned char	padding=CONF_ALG_PADDING_PKCS5;
+	byte_t		confalg=ALG_AES;
+	byte_t		mode=CONF_ALG_MODE_GCM;
+	byte_t		padding=CONF_ALG_PADDING_PKCS5;
 	uint16_t	confalgkeysize=128;
-	unsigned char	intalg=ALG_SHA256;
-	unsigned char	kexalg=ALG_DH;
+	byte_t		intalg=ALG_SHA256;
+	byte_t		kexalg=ALG_DH;
 	uint16_t	kexalgkeysize=2048;
 	switch (negotiatedqop) {
 		case QOP_AES_K128_GCM_PKCS5Padding_SHA2:
@@ -6068,55 +6059,55 @@ void sqlrprotocol_teradata::appendSsoResponseParcel() {
 	}
 
 	// supported QOPs (Quality of Protection)
-	write(&respdata,(unsigned char)0xe3);
-	write(&respdata,(unsigned char)100);
+	write(&respdata,(byte_t)0xe3);
+	write(&respdata,(byte_t)100);
 	if (getDebug()) {
 		stdoutput.printf("		supported QOPs {\n");
 	}
 
 	// the server sends 4 QOPs, and for some reason all 4 are the same...
-	unsigned char	qops[]={
+	byte_t	qops[]={
 		0xe4, 0xe5, 0xe6, 0xe7
 	};
-	for (unsigned char i=0; i<4; i++) {
+	for (byte_t i=0; i<4; i++) {
 
 		// QOP
 		write(&respdata,qops[i]);
-		write(&respdata,(unsigned char)23);
+		write(&respdata,(byte_t)23);
 
 		// confidentiality algorithm
-		write(&respdata,(unsigned char)CONF_ALG);
-		write(&respdata,(unsigned char)1);
+		write(&respdata,(byte_t)CONF_ALG);
+		write(&respdata,(byte_t)1);
 		write(&respdata,confalg);
 
 		// mode
-		write(&respdata,(unsigned char)CONF_ALG_MODE);
-		write(&respdata,(unsigned char)1);
+		write(&respdata,(byte_t)CONF_ALG_MODE);
+		write(&respdata,(byte_t)1);
 		write(&respdata,mode);
 
 		// padding
-		write(&respdata,(unsigned char)CONF_ALG_PADDING);
-		write(&respdata,(unsigned char)1);
+		write(&respdata,(byte_t)CONF_ALG_PADDING);
+		write(&respdata,(byte_t)1);
 		write(&respdata,padding);
 
 		// confidentiality algorithm key size
-		write(&respdata,(unsigned char)CONF_ALG_KEY_SIZE);
-		write(&respdata,(unsigned char)2);
+		write(&respdata,(byte_t)CONF_ALG_KEY_SIZE);
+		write(&respdata,(byte_t)2);
 		writeBE(&respdata,confalgkeysize);
 
 		// integrity algorithm
-		write(&respdata,(unsigned char)INT_ALG);
-		write(&respdata,(unsigned char)1);
+		write(&respdata,(byte_t)INT_ALG);
+		write(&respdata,(byte_t)1);
 		write(&respdata,intalg);
 
 		// key exchange algorithm
-		write(&respdata,(unsigned char)KEX_ALG);
-		write(&respdata,(unsigned char)1);
+		write(&respdata,(byte_t)KEX_ALG);
+		write(&respdata,(byte_t)1);
 		write(&respdata,kexalg);
 
 		// key exchange algorithm key size
-		write(&respdata,(unsigned char)KEX_ALG_KEY_SIZE);
-		write(&respdata,(unsigned char)2);
+		write(&respdata,(byte_t)KEX_ALG_KEY_SIZE);
+		write(&respdata,(byte_t)2);
 		writeBE(&respdata,kexalgkeysize);
 
 		if (getDebug()) {
@@ -6151,7 +6142,7 @@ void sqlrprotocol_teradata::appendSsoParcel() {
 
 	appendSmallParcelHeader(134,7);
 
-	unsigned char	data[]={
+	byte_t	data[]={
 		0x00, 0x01, 0x03, 0x00, 0x00, 0x00
 	};
 	write(&respdata,data,sizeof(data));
@@ -6265,10 +6256,10 @@ void sqlrprotocol_teradata::appendStatementStatusParcel(
 	bool	includeext=(req->activity==SQL_SELECT && req->requestmode!='R');
 
 	// statement status ???
-	unsigned char	statementstatus=0;
+	byte_t	statementstatus=0;
 
 	// response mode
-	unsigned char	responsemode=0;
+	byte_t	responsemode=0;
 	switch (req->requestmode) {
 		case 'F':
 			responsemode=1;
@@ -6341,7 +6332,7 @@ void sqlrprotocol_teradata::appendStatementStatusParcel(
 		// FIXME: I don't know which of those this is...
 		uint16_t	ext1=32;
 		uint32_t	ext2=12;
-		unsigned char ext[]={
+		byte_t		ext[]={
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00
 		};
@@ -6448,7 +6439,7 @@ void sqlrprotocol_teradata::getFieldFormat(bytebuffer *fieldformat,
 
 void sqlrprotocol_teradata::appendFieldParcel(const char *data, uint16_t size) {
 	debugParcelStart("send","field",18);
-	debugHexDump((const unsigned char *)data,size,2);
+	debugHexDump((const byte_t *)data,size,2);
 	debugParcelEnd();
 	appendParcelHeader(18,size);
 	write(&respdata,data,size);
@@ -6600,8 +6591,8 @@ void sqlrprotocol_teradata::appendQueryExtension(uint16_t col) {
 	// column format
 	bytebuffer	fieldformat;
 	getFieldFormat(&fieldformat,col);
-	uint16_t		pbtifflen=fieldformat.getSize();
-	const unsigned char	*pbtiff=fieldformat.getBuffer();
+	uint16_t	pbtifflen=fieldformat.getSize();
+	const byte_t	*pbtiff=fieldformat.getBuffer();
 
 	// PBTIFDV
 	// default (FIXME: we don't know this)
@@ -6683,7 +6674,7 @@ void sqlrprotocol_teradata::appendQueryExtension(uint16_t col) {
 	// 5 = Kanji
 	// 0 = not char data
 	// (FIXME: we don't know this)
-	unsigned char	pbtifct=(cont->isBitType(type) ||
+	byte_t	pbtifct=(cont->isBitType(type) ||
 				cont->isBoolType(type) ||
 				cont->isFloatType(type) ||
 				cont->isNumberType(type) ||
@@ -6908,7 +6899,7 @@ void sqlrprotocol_teradata::appendQueryExtension(uint16_t col) {
 		write(&respdata,pbtifso);
 
 		// ??? (not described in spec)
-		unsigned char	unknown[]={
+		byte_t	unknown[]={
 			0x55,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 		};
@@ -7124,10 +7115,10 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 	if (!charstring::compare(type,"TINYINT")) {
 
 		if (null) {
-			write(&req->rowbuffer,(unsigned char)0);
+			write(&req->rowbuffer,(byte_t)0);
 		} else {
 			uint16_t	val=charstring::toInteger(field);
-			write(&req->rowbuffer,(unsigned char)val);
+			write(&req->rowbuffer,(byte_t)val);
 		}
 
 	} else if (!charstring::compare(type,"SMALLINT")) {
@@ -7186,7 +7177,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 			uint16_t	prec=cont->getColumnPrecision(
 								req->cur,col);
 			if (prec<3) {
-				write(&req->rowbuffer,(unsigned char)0);
+				write(&req->rowbuffer,(byte_t)0);
 			} else if (prec<5) {
 				write(&req->rowbuffer,(uint16_t)0);
 			} else if (prec<10) {
@@ -7203,7 +7194,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 			uint16_t	prec=cont->getColumnPrecision(
 								req->cur,col);
 			if (prec<3) {
-				write(&req->rowbuffer,(unsigned char)val);
+				write(&req->rowbuffer,(byte_t)val);
 			} else if (prec<5) {
 				write(&req->rowbuffer,(uint16_t)val);
 			} else if (prec<10) {
@@ -7386,13 +7377,12 @@ void sqlrprotocol_teradata::appendIndicatorModeField(uint16_t col,
 							bool null) {
 
 	// append to nibuffer
-	unsigned char	ni=(req->currentfield%8)?
-				req->nibuffer[req->currentfield/8]:0;
+	byte_t	ni=(req->currentfield%8)?req->nibuffer[req->currentfield/8]:0;
 
-	// make sure to cast the right side of the << to an unsigned char
+	// make sure to cast the right side of the << to a byte
 	// or some compilers (native CC on Unixware 7.0.1) will fail with:
 	// internal compiler error: ... Runs out of registers
-	ni|=((unsigned char)null)<<((unsigned char)(7-(req->currentfield%8)));
+	ni|=((byte_t)null)<<((byte_t)(7-(req->currentfield%8)));
 
 	req->nibuffer[req->currentfield/8]=ni;
 
@@ -7471,7 +7461,7 @@ void sqlrprotocol_teradata::appendFailureParcel(const char *errorstring,
 	write(&respdata,(uint16_t)0);
 
 	// code (FIXME: ???)
-	unsigned char code[]={
+	byte_t code[]={
 		0xdf, 0x0e
 	};
 	write(&respdata,code,sizeof(code));
@@ -7486,7 +7476,7 @@ void sqlrprotocol_teradata::appendFailureParcel(const char *errorstring,
 	write(&respdata,(uint16_t)1);
 
 	// ins traid ???
-	unsigned char instriad[]={
+	byte_t instriad[]={
 		0x00, 0x08, 0x0a
 	};
 	write(&respdata,instriad,sizeof(instriad));
@@ -7513,7 +7503,7 @@ void sqlrprotocol_teradata::appendErrorParcel(const char *errorstring) {
 	write(&respdata,(uint16_t)0);
 
 	// code (FIXME: ???)
-	unsigned char code[]={
+	byte_t code[]={
 		0xa3, 0x0e
 	};
 	write(&respdata,code,sizeof(code));
@@ -7525,7 +7515,7 @@ void sqlrprotocol_teradata::appendErrorParcel(const char *errorstring) {
 	write(&respdata,errorstring);
 
 	// ??? (not described in spec)
-	unsigned char	unknown[]={
+	byte_t	unknown[]={
 		0x00, 0x00
 	};
 	write(&respdata,unknown,sizeof(unknown));
@@ -7905,7 +7895,7 @@ void sqlrprotocol_teradata::debugParcelStart(const char *direction,
 	}
 }
 
-void sqlrprotocol_teradata::debugParcelEnd(const unsigned char *parceldata,
+void sqlrprotocol_teradata::debugParcelEnd(const byte_t *parceldata,
 						uint32_t parceldatalength) {
 	if (getDebug()) {
 		debugHexDump(parceldata,parceldatalength);
@@ -7941,7 +7931,7 @@ void sqlrprotocol_teradata::debugExtEnd() {
 }
 
 #ifdef DECRYPT
-bool sqlrprotocol_teradata::decrypt(const unsigned char *encdata,
+bool sqlrprotocol_teradata::decrypt(const byte_t *encdata,
 						uint64_t encdatasize,
 						bytebuffer *decdata) {
 
@@ -7998,8 +7988,8 @@ bool sqlrprotocol_teradata::decrypt(const unsigned char *encdata,
 	//  * try...
 	//   * left x bits of sha256 hash
 	//   * pbkdf2
-	const unsigned char	*key=sha2sharedsecret;
-	uint32_t		keylength=sizeof(sha2sharedsecret);
+	const byte_t	*key=sha2sharedsecret;
+	uint32_t	keylength=sizeof(sha2sharedsecret);
 	
 	// get the initialization vector
 	//
@@ -8015,8 +8005,8 @@ bool sqlrprotocol_teradata::decrypt(const unsigned char *encdata,
 	// Even if these are correct, who knows what order they go in...
 // FIXME: hey... apparently it's semi-conventional to generate a random IV and
 // send it to the other side as the first 16 bytes of the data
-	unsigned char	iv[16];
-	unsigned char	*ptr=iv;
+	byte_t		iv[16];
+	byte_t		*ptr=iv;
 	uint16_t	temp16=hostToBE((uint16_t)sessionno);
 	bytestring::copy(ptr,&temp16,sizeof(temp16));
 	ptr+=sizeof(temp16);
@@ -8060,7 +8050,7 @@ stdoutput.printf("enc data size: %d\n",encdatasize);
 	// fit in "out", or what to do in that case.
 	// I imagine maybe EVP_DecryptUpdate will fail, and maybe outsize will
 	// contain the necessary size, but that's just a guess.)
-	unsigned char	out[1024];
+	byte_t		out[1024];
 	int		outsize=0;
 	int		totaloutsize=0;
 	bool		success=true;
@@ -8104,7 +8094,7 @@ debugHexDump(out,outsize);
 	return success;
 }
 
-bool sqlrprotocol_teradata::encrypt(const unsigned char *decdata,
+bool sqlrprotocol_teradata::encrypt(const byte_t *decdata,
 						uint64_t decdatasize,
 						bytebuffer *encdata) {
 	// FIXME: push down to rudiments
@@ -8189,7 +8179,7 @@ bool sqlrprotocol_teradata::generateSharedSecret() {
 
 	// reallocate the shared secret buffers
 	delete[] sharedsecret;
-	sharedsecret=new unsigned char[DH_size(dh)];
+	sharedsecret=new byte_t[DH_size(dh)];
 	bytestring::zero(sha2sharedsecret,sizeof(sha2sharedsecret));
 
 	// compute the shared secret
@@ -8222,7 +8212,7 @@ bool sqlrprotocol_teradata::generateSharedSecret() {
 		}
 		return false;
 	}
-	const unsigned char	*hash=s256.getHash();
+	const byte_t	*hash=s256.getHash();
 	if (!hash) {
 		if (getDebug()) {
 			stdoutput.printf("sha2-getHash failed\n");

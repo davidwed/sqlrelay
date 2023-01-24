@@ -51,18 +51,18 @@ void checkSuccess(int value, int success) {
 }
 
 // utf-8
-const unsigned char yo8[]={'y','o','\0'};
-const unsigned char grin8[]={0xF0,0x9F,0x98,0x84,'\0'};
-const unsigned char horn8[]={0xF0,0x9F,0x91,0xBF,'\0'};
-const unsigned char cool8[]={0xF0,0x9F,0x98,0x8E,'\0'};
-const unsigned char *emoji8[]={yo8,grin8,horn8,cool8,NULL};
+const byte_t yo8[]={'y','o','\0'};
+const byte_t grin8[]={0xF0,0x9F,0x98,0x84,'\0'};
+const byte_t horn8[]={0xF0,0x9F,0x91,0xBF,'\0'};
+const byte_t cool8[]={0xF0,0x9F,0x98,0x8E,'\0'};
+const byte_t *emoji8[]={yo8,grin8,horn8,cool8,NULL};
 
 // utf-16
-const unsigned char yo16[]={'y','\0','o','\0','\0','\0'};
-const unsigned char grin16[]={0x3D,0xD8,0x04,0xDE,'\0','\0'};
-const unsigned char horn16[]={0x3D,0xD8,0x7F,0xDC,'\0','\0'};
-const unsigned char cool16[]={0x3D,0xD8,0x0E,0xDE,'\0','\0'};
-const unsigned char *emoji16[]={yo16,grin16,horn16,cool16,NULL};
+const byte_t yo16[]={'y','\0','o','\0','\0','\0'};
+const byte_t grin16[]={0x3D,0xD8,0x04,0xDE,'\0','\0'};
+const byte_t horn16[]={0x3D,0xD8,0x7F,0xDC,'\0','\0'};
+const byte_t cool16[]={0x3D,0xD8,0x0E,0xDE,'\0','\0'};
+const byte_t *emoji16[]={yo16,grin16,horn16,cool16,NULL};
 
 
 int	main(int argc, char **argv) {
@@ -82,8 +82,8 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("INSERT: \n");
 	cur->prepareQuery("insert into testtable values (:1,null,:2)");
-	const unsigned char **e16=emoji16;
-	const unsigned char **e8=emoji8;
+	const byte_t **e16=emoji16;
+	const byte_t **e8=emoji8;
 	for (; *e16; e16++,e8++) {
 
 		cur->inputBind("1",(const char *)*e8);
@@ -106,7 +106,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("select * from testtable"),1);
 	stdoutput.printf("\n");
 	uint64_t	row=0;
-	for (const unsigned char **e=emoji8; *e; e++) {
+	for (const byte_t **e=emoji8; *e; e++) {
 		checkSuccess(cur->getField(row,"emojidirect"),
 							(const char *)*e);
 		checkSuccess(cur->getField(row,"emojifrombase64"),
@@ -117,7 +117,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("OUTPUT BIND: \n");
 	row=1;
-	for (const unsigned char **e=emoji8; *e; e++) {
+	for (const byte_t **e=emoji8; *e; e++) {
 
 		cur->prepareQuery("set :output=(select emojidirect from testtable where i=$(row))");
 		cur->substitution("row",row);

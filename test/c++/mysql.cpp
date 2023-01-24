@@ -1175,7 +1175,7 @@ for (uint16_t a=0; a<50; a++) {
 	if (majorversion>3) {
 		stdoutput.printf("BINARY DATA: \n");
 		checkSuccess(cur->sendQuery("create table testtable (col1 longblob)"),true);
-		unsigned char	buffer[256];
+		byte_t	buffer[256];
 		for (uint16_t i=0; i<256; i++) {
 			buffer[i]=i;
 		}

@@ -762,7 +762,7 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	cont->raiseDebugMessageEvent(debugstr.getString());
 
 	clientsock->useNonBlockingMode();
-	unsigned char	*dummy=new unsigned char[size];
+	byte_t	*dummy=new byte_t[size];
 	ssize_t	bytesread=clientsock->read(dummy,size,idleclienttimeout,0);
 	clientsock->useBlockingMode();
 	delete[] dummy;
