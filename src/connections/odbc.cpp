@@ -404,7 +404,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 };
 
 #ifdef HAVE_SQLCONNECTW
-#include <iconv.h>
+#include <rudiments/iconvert.h>
 
 void printerror(const char *error) {
 	char	*err=error::getErrorString();
@@ -669,44 +669,37 @@ char *convertCharset(const char *inbuf,
 	size_t	outsize=len(inbuf,inenc)*multiplier+bosize+nullsize;
 
 	// allocate the output buffer
-	char	*outbuf=new char[outsize];
+	byte_t	*outbuf=new byte_t[outsize];
 
 	// capture initial buffer positions and sizes
-	const char	*inptr=inbuf;
-	char		*outptr=outbuf;
+	const byte_t	*inptr=(const byte_t *)inbuf;
+	byte_t		*outptr=outbuf;
 	size_t		insizebefore=insize;
 	size_t		outsizebefore=outsize;
 
 	// open converter
 	// FIXME: reuse this rather than re-creating it over and over
-	iconv_t	cd=iconv_open(outenc,inenc);
-	if (cd==(iconv_t)-1) {
+	iconvert	ic;
+	ic.setFromEncoding(inenc);
+	ic.setFromBuffer(inptr);
+	ic.setFromBufferSize(insize);
+	ic.setToEncoding(outenc);
+	ic.setToBuffer(outptr);
+	ic.setToBufferSize(outsize);
+
+	// convert
+	if (!ic.convert()) {
 		if (error) {
 			char	*err=error::getErrorString();
-			charstring::printf(error,"iconv_open(): %s",err);
+			charstring::printf(error,
+				"iconvert::convert(): %s "
+				"(in=%ld/%ld out=%ld/%ld)",
+				err,insizebefore,insize,outsizebefore,outsize);
 			delete[] err;
 		}
 		// null-terminate the output
 		bytestring::zero(outptr,nullsize);
-		return outbuf;
-	}
-
-	// convert
-	if (iconv(cd,
-			#ifndef ICONV_CONST_CHAR
-			(char **)
-			#endif
-			&inptr,
-			&insize,
-			&outptr,
-			&outsize)==(size_t)-1) {
-		if (error) {
-			char	*err=error::getErrorString();
-			charstring::printf(error,
-				"iconv(): %s (in=%ld/%ld out=%ld/%ld)",
-				err,insizebefore,insize,outsizebefore,outsize);
-			delete[] err;
-		}
+		return (char *)outbuf;
 	}
 
 	// SQL Server doesn't like UTF-16 values to have a byte-order mark
@@ -723,15 +716,15 @@ char *convertCharset(const char *inbuf,
 	bytestring::zero(outptr,nullsize);
 
 	// close converter
-	if (iconv_close(cd)!=0) {
+	if (!ic.close()) {
 		// don't override any previously set error here
 		if (error && !*error) {
 			char	*err=error::getErrorString();
-			charstring::printf(error,"iconv_open(): %s",err);
+			charstring::printf(error,"iconvert::close(): %s",err);
 			delete[] err;
 		}
 	}
-	return outbuf;
+	return (char *)outbuf;
 }
 
 char *convertCharset(const char *inbuf,
