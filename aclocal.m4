@@ -10450,11 +10450,16 @@ dnl if it's 6.0.0 then:
 dnl 	sets SCO_OSR6="yes"
 dnl 	adds -D__STDC__=0 to CPPFLAGS
 dnl 	sets CRTLIB="-lcrt"
+dnl 	defines _SCO_OSR6
 dnl if it's < 6.0.0 then:
 dnl 	sets SCO_OSR5="yes"
 dnl	defines RUDIMENTS_HAVE_BAD_SCO_MSGHDR=1
 dnl	if it's 5.0.0 then:
 dnl 		adds -D_SVID3 to CPPFLAGS
+dnl 	defines _SCO_OSR5
+dnl if it's UnixWare then:
+dnl 	sets SCO_UW="yes"
+dnl 	defines _SCO_UW
 AC_DEFUN([FW_CHECK_SCO],
 [
 SCO_OSR5=""

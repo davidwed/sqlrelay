@@ -13,6 +13,7 @@ include ../../config.mk
 all: $(SQLR)protocol_sqlrclient.$(LIBEXT) \
 	$(SQLR)protocol_mysql.$(LIBEXT) \
 	$(SQLR)protocol_postgresql.$(LIBEXT) \
+	$(SQLR)protocol_firebird.$(LIBEXT) \
 	$(SQLR)protocol_tds.$(LIBEXT) \
 	$(SQLR)protocol_oracle.$(LIBEXT) \
 	$(SQLR)protocol_teradata.$(LIBEXT)
@@ -30,6 +31,9 @@ $(SQLR)protocol_mysql.$(LIBEXT): mysql.cpp mysql.$(OBJ)
 $(SQLR)protocol_postgresql.$(LIBEXT): postgresql.cpp postgresql.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ postgresql.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
+$(SQLR)protocol_firebird.$(LIBEXT): firebird.cpp firebird.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ firebird.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
 $(SQLR)protocol_tds.$(LIBEXT): tds.cpp tds.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ tds.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
@@ -46,6 +50,7 @@ installdll:
 	$(LTINSTALL) $(CP) $(SQLR)protocol_sqlrclient.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)protocol_mysql.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)protocol_postgresql.$(LIBEXT) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)protocol_firebird.$(LIBEXT) $(libexecdir)
 
 installlib: $(INSTALLSHAREDLIB)
 
@@ -63,9 +68,14 @@ installsharedlib:
 	$(RM) $(libexecdir)/$(SQLR)protocol_postgresql.a
 	$(RM) $(libexecdir)/$(SQLR)protocol_postgresql.$(LIBEXT)
 	$(MODULERENAME) $(libexecdir)/$(SQLR)protocol_postgresql.so so $(MODULESUFFIX)
+	$(LTINSTALL) $(CP) $(SQLR)protocol_firebird.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)protocol_firebird.a
+	$(RM) $(libexecdir)/$(SQLR)protocol_firebird.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)protocol_firebird.so so $(MODULESUFFIX)
 
 uninstall:
 	$(RM) $(libexecdir)/$(SQLR)protocol_sqlrclient.* \
 		$(libexecdir)/sqlrprotocol_sqlrclient.* \
 		$(libexecdir)/sqlrprotocol_mysql.* \
-		$(libexecdir)/sqlrprotocol_postgresql.*
+		$(libexecdir)/sqlrprotocol_postgresql.* \
+		$(libexecdir)/sqlrprotocol_firebird.*
