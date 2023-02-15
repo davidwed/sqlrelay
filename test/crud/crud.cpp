@@ -191,11 +191,11 @@ int main(int argc, char **argv) {
 			}
 			sort.append("{\n");
 			for (uint16_t k=1; k<=j; k++) {
-				criteria.appendFormatted(
+				criteria.printf(
 					"{ \"=\" : [ { \"var\" : \"%s\" }, "
 					"\"%s\" ] }",
 					cols[k],vals[i][k-1]);
-				sort.appendFormatted(
+				sort.printf(
 					"	\"%s\": \"asc\"",
 					cols[k]);
 				if (j>1 && k<j) {
@@ -255,7 +255,7 @@ int main(int argc, char **argv) {
 		// 	2) testtable_id=2
 		// 	3) testtable_id=3
 		// 	etc.
-		criteria.appendFormatted(
+		criteria.printf(
 			"{ \"=\" : [ { \"var\" : "
 			"\"testtable_id\" }, \"%d\" ] }\n",
 			i+1);
@@ -315,7 +315,7 @@ int main(int argc, char **argv) {
 		// 	2) testtable_id=2
 		// 	3) testtable_id=3
 		// 	etc.
-		criteria.appendFormatted(
+		criteria.printf(
 			"{ \"=\" : [ { \"var\" : "
 			"\"testtable_id\" }, \"%d\" ] }\n",
 			i+1);
