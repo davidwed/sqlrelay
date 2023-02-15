@@ -1257,7 +1257,7 @@ bool sqlrprotocol_mysql::sendPacket(bool flush) {
 	// FIXME: what if resppacket.getSize() > maxpacketlength?
 
 	// overwrite the first 4 bytes of the resppacket
-	resppacket.setPosition(0);
+	resppacket.setPositionRelativeToBeginning(0);
 
 	// size
 	// 3 bytes

@@ -4340,7 +4340,7 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 
 	// replace the bind variable delimiter with whatever we would expect to
 	// find for this database
-	currentbind->setPosition(0);
+	currentbind->setPositionRelativeToBeginning(0);
 	currentbind->write(bindformat[0]);
 
 	// append the first character of the bind format to the new query

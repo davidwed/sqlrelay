@@ -4945,12 +4945,12 @@ void sqlrprotocol_teradata::appendParcelHeader(uint16_t flavor) {
 
 void sqlrprotocol_teradata::endParcel() {
 	size_t	originalpos=respdata.getPosition();
-	respdata.setPosition(req->parcelsizepos);
+	respdata.setPositionRelativeToBeginning(req->parcelsizepos);
 	respdata.write(hostTo((uint32_t)(2+2+4+
 					originalpos-
 					req->parcelsizepos-
 					sizeof(uint32_t))));
-	respdata.setPosition(originalpos);
+	respdata.setPositionRelativeToBeginning(originalpos);
 }
 
 void sqlrprotocol_teradata::appendConfigResponseParcel() {
@@ -6908,9 +6908,9 @@ void sqlrprotocol_teradata::appendQueryExtension(uint16_t col) {
 
 	// backpatch length
 	size_t	endpos=respdata.getPosition();
-	respdata.setPosition(lengthpos);
+	respdata.setPositionRelativeToBeginning(lengthpos);
 	respdata.write(hostTo((uint16_t)(endpos-startpos)));
-	respdata.setPosition(endpos);
+	respdata.setPositionRelativeToBeginning(endpos);
 }
 
 void sqlrprotocol_teradata::appendEndQueryExtension() {
@@ -6998,13 +6998,13 @@ void sqlrprotocol_teradata::appendRowParcels(bool *eors) {
 
 void sqlrprotocol_teradata::backpatchActivityCount() {
 	size_t	originalpos=respdata.getPosition();
-	respdata.setPosition(req->activitycountpos);
+	respdata.setPositionRelativeToBeginning(req->activitycountpos);
 	if (req->activitycountsize==4) {
 		respdata.write(hostTo((uint32_t)req->activitycount));
 	} else {
 		respdata.write(hostTo(req->activitycount));
 	}
-	respdata.setPosition(originalpos);
+	respdata.setPositionRelativeToBeginning(originalpos);
 }
 
 void sqlrprotocol_teradata::appendTitleStartParcel() {

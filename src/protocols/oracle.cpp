@@ -1167,7 +1167,7 @@ bool sqlrprotocol_oracle::sendPacket(bool flush) {
 	uint16_t	headerchecksum=0;
 
 	// overwrite the first 8 bytes of the reqpacket with the packet header
-	reqpacket.setPosition(0);
+	reqpacket.setPositionRelativeToBeginning(0);
 	reqpacket.write(hostToBE(reqpacketsize));
 	reqpacket.write(hostToBE(packetchecksum));
 	reqpacket.write(reqpackettype);
@@ -2144,9 +2144,9 @@ bool sqlrprotocol_oracle::sendAnoResponse() {
 
 
 	// backpatch the overall length and servicecount
-	reqpacket.setPosition(overalllengthpos);
+	reqpacket.setPositionRelativeToBeginning(overalllengthpos);
 	reqpacket.write(hostToBE(overalllength));
-	reqpacket.setPosition(servicecountpos);
+	reqpacket.setPositionRelativeToBeginning(servicecountpos);
 	reqpacket.write(hostToBE(servicecount));
 
 	if (getDebug()) {

@@ -535,8 +535,7 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		// convert static concatenations
 		if (ptr!=start && !charstring::compare(ptr-1,"'||'",4)) {
 			ptr=ptr+3;
-			translatedquery->setPosition(
-					translatedquery->getPosition()-1);
+			translatedquery->setPositionRelativeToCurrent(-1);
 			skipQuotedStrings(ptr,end,translatedquery,&ptr,
 							true,true,true,true);
 			continue;
