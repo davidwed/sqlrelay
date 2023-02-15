@@ -715,15 +715,6 @@ char *convertCharset(const char *inbuf,
 	// null-terminate the output
 	bytestring::zero(outptr,nullsize);
 
-	// close converter
-	if (!ic.close()) {
-		// don't override any previously set error here
-		if (error && !*error) {
-			char	*err=error::getErrorString();
-			charstring::printf(error,"iconvert::close(): %s",err);
-			delete[] err;
-		}
-	}
 	return (char *)outbuf;
 }
 
