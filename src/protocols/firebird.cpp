@@ -265,14 +265,16 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 
 		bool	initialHandshake();
 		bool	connect();
-		void	debugOpCode(uint32_t opcode);
-		void	debugArchType(uint32_t archtype);
-		void	debugProtocolVersion(uint32_t protoversion);
-		void	debugProtocolType(const char *title,
-						uint32_t protocoltype);
 		bool	connectResponse();
 		bool	attach();
 		bool	attachResponse();
+
+		bool	genericResponse(const char *title,
+						uint32_t objecthandle,
+						uint32_t objectid,
+						uint32_t bufferlen,
+						byte_t *buffer,
+						byte_t *statusvector);
 	
 		bool	authenticate();
 
@@ -326,8 +328,21 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 		bool	cancelEvents();
 		bool	sendNotImplementedError();
 
+		void	keepReading(int32_t sec, int32_t usec);
+
+		void	readString(const byte_t *in,
+					const char *name,
+					char **buf,
+					const byte_t **out);
+
 		void	debugSystemError();
-		void	keepReading();
+		void	debugOpCode(uint32_t opcode);
+		void	debugArchType(uint32_t archtype);
+		void	debugProtocolVersion(uint32_t protoversion);
+		void	debugProtocolType(const char *title,
+						uint32_t protocoltype);
+		void	debugDpbVersion(uint32_t dpbversion);
+		void	debugDpbParam(uint32_t dpbparam);
 
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -335,6 +350,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 		filedescriptor	*clientsock;
 
 		uint32_t	opcode;
+
+		char	*username;
+		char	*password;
+		char	*wd;
 };
 
 
@@ -359,9 +378,15 @@ sqlrprotocol_firebird::~sqlrprotocol_firebird() {
 }
 
 void sqlrprotocol_firebird::init() {
+	username=NULL;
+	password=NULL;
+	wd=NULL;
 }
 
 void sqlrprotocol_firebird::free() {
+	delete[] username;
+	delete[] password;
+	delete[] wd;
 }
 
 clientsessionexitstatus_t sqlrprotocol_firebird::clientSession(
@@ -740,11 +765,14 @@ if (connectversion==3) {
 		return false;
 	}
 	if (getDebug()) {
-		stdoutput.printf("	user id: %s\n",userid);
+		stdoutput.printf("	user id:\n");
+		stdoutput.printHex(userid,useridlen);
 	}
 
 	// get protocols...
 	for (uint32_t i=0; i<protocount; i++) {
+
+		// FIXME: I seem to get nonsensical values for these...
 
 		stdoutput.printf("	protocol %d...\n",i);
 
@@ -823,12 +851,1049 @@ if (connectversion==3) {
 			stdoutput.printf("	preference "
 						"weight: %d\n",prefwt);
 		}
-
-		// FIXME: decide on protocol...
 	}
+
+	// FIXME: Weird... If I keep reading, it just times out, but if I don't,
+	// then I get 2048 instead of 19 for the op code during the attach()
+	// phase.  If I use -1,-1 for the timeouts, then it blocks forever.
+	keepReading(0,0);
+
+	debugEnd();
+
+	// FIXME: decide whether to accept to connection or not...
+
+	// FIXME: decide which protocol to use...
+
+	return true;
+}
+
+bool sqlrprotocol_firebird::connectResponse() {
+
+	// response packet data structure:
+	//
+	// data {
+	// 	int32_t		op_accept
+	// 	int32_t		arch type
+	// 	int32_t		minimum type
+	// }
+
+	debugStart("connect response");
+
+	uint32_t	opcode=op_accept;
+	if (clientsock->write(opcode)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write op code failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
+
+	// FIXME: this should be the chosen protocol index
+	uint32_t	protoindex=0;
+	if (clientsock->write(protoindex)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write protocol index failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	protocol index: %d\n",
+							protoindex);
+	}
+
+	// FIXME: set this to the arch of this machine?
+	uint32_t	archtype=arch_linux;
+	if (clientsock->write(archtype)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write arch type failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugArchType(archtype);
+	}
+
+	// FIXME: do we support batch send?
+	uint32_t	mintype=ptype_rpc;
+	if (clientsock->write(mintype)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write min type failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugProtocolType("min type",mintype);
+	}
+
+	debugEnd();
+
+	clientsock->flushWriteBuffer(-1,-1);
+
+	return true;
+}
+
+bool sqlrprotocol_firebird::attach() {
+
+	// request packet data structure:
+	//
+	// data {
+	// 	int32_t		op_attach
+	// 	int32_t		db object id
+	// 	int32_t		db length
+	// 	char[]		db path or alias
+	// 	int32_t		db parameter buffer length
+	// 	byte_t[]	db parameter buffer
+	// 	...
+	// }
+
+	debugStart("attach");
+
+	// get op_attach
+	uint32_t	opcode=0;
+	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read attach op code failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
+	if (opcode!=op_attach) {
+		if (getDebug()) {
+			stdoutput.printf("	invalid attach op code - "
+							"got %d, expected %d\n",
+							opcode,op_attach);
+			debugEnd();
+		}
+		return false;
+	}
+
+	// get db object id
+	uint32_t	dbobjectid=0;
+	if (clientsock->read(&dbobjectid)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read db object id failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db object id: %d\n",dbobjectid);
+	}
+
+	// get db
+	uint32_t	dblen=0;
+	if (clientsock->read(&dblen)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read db length failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db len: %d\n",dblen);
+	}
+	char	*db=new char[dblen+1];
+	if (clientsock->read(db,dblen)!=dblen) {
+		if (getDebug()) {
+			stdoutput.write("	read db path failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db: %s\n",db);
+	}
+
+	// get db parameters buffer
+	uint32_t	dpblen=0;
+	if (clientsock->read(&dpblen)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read db param buffer "
+							"length failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db param buffer len: %d\n",dpblen);
+	}
+	byte_t	*dpb=new byte_t[dpblen+1];
+	if (clientsock->read(dpb,dpblen)!=dpblen) {
+		if (getDebug()) {
+			stdoutput.write("	read db param buffer failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db param buffer:\n");
+		stdoutput.printHex(dpb,dpblen);
+	}
+
+	// process db parameters buffer...
+	const byte_t	*dpbptr=dpb;
+	const byte_t	*dpbendptr=dpb+dpblen;
+
+	// get the dpb version
+	// FIXME: do something with this...
+	byte_t		dpbversion;
+	read(dpbptr,&dpbversion,&dpbptr);
+	if (getDebug()) {
+		debugDpbVersion(dpbversion);
+	}
+
+	// get each parameter...
+	while (dpbptr!=dpbendptr) {
+		
+		// get the parameter
+		byte_t	dpbparam;
+		read(dpbptr,&dpbparam,&dpbptr);
+		if (getDebug()) {
+			debugDpbParam(dpbparam);
+		}
+
+		// process the parameter...
+		switch (dpbparam) {
+			case isc_dpb_cdd_pathname:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_allocation:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_journal:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_page_size:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_num_buffers:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_buffer_length:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_debug:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_garbage_collect:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_verify:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_sweep:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_enable_journal:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_disable_journal:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_dbkey_scope:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_number_of_users:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_trace:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_no_garbage_collect:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_damaged:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_license:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_sys_user_name:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_encrypt_key:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_activate_shadow:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_sweep_interval:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_delete_shadow:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_force_write:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_begin_log:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_quit_log:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_no_reserve:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_user_name:
+				readString(dpbptr,"user name",
+						&username,&dpbptr);
+				break;
+
+			case isc_dpb_password:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_password_enc:
+				readString(dpbptr,"password",
+						&password,&dpbptr);
+				break;
+
+
+			case isc_dpb_sys_user_name_enc:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_interp:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_online_dump:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_old_file_size:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_old_num_files:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_old_file:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_old_start_page:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_old_start_seqno:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_old_start_file:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_drop_walfile:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_old_dump_id:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_wal_backup_dir:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_wal_chkptlen:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_wal_numbufs:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_wal_bufsize:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_wal_grp_cmt_wait:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_lc_messages:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_lc_ctype:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_cache_manager:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_shutdown:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_online:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_shutdown_delay:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_reserved:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_overwrite:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_sec_attach:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_disable_wal:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_connect_timeout:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_dummy_packet_interval:
+				char	*val;
+				readString(dpbptr,"val",&val,&dpbptr);
+				delete[] val;
+				break;
+
+			case isc_dpb_gbak_attach:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_sql_role_name:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_set_page_buffers:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_working_directory:
+				readString(dpbptr,"working directory",
+								&wd,&dpbptr);
+				break;
+
+			case isc_dpb_sql_dialect:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_set_db_readonly:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_set_db_sql_dialect:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_gfix_attach:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_gstat_attach:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_set_db_charset:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_gsec_attach:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_address_path:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_process_id:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_no_db_triggers:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_trusted_auth:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_process_name:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_trusted_role:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_org_filename:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_utf8_filename:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_ext_call_depth:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_auth_block:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_client_version:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_remote_protocol:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_host_name:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_os_user:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_specific_auth_data:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_auth_plugin_list:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_auth_plugin_name:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_config:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_nolinger:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_reset_icu:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_map_attach:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_session_time_zone:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_set_db_replica:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_set_bind:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_decfloat_round:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_decfloat_traps:
+				// FIXME: do something...
+				break;
+
+			case isc_dpb_clear_map:
+				// FIXME: do something...
+				break;
+
+			default:
+				// FIXME: do something...
+				break;
+		}
+	}
+
 	debugEnd();
 
 	return true;
+}
+
+bool sqlrprotocol_firebird::attachResponse() {
+	// FIXME:
+	// object handle should be the database handle ???
+	// no idea what the object id is
+	// no idea what should be in the buffer
+	// no idea what should be in the status vector
+	byte_t	buffer[1]={0};
+	byte_t	statusvector[20]={
+		1, // ???
+		0, // not an error (>0 for error)
+		0, // no idea from here on...
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		0
+	};
+	return genericResponse("attach response",0,0,1,buffer,statusvector);
+}
+
+bool sqlrprotocol_firebird::genericResponse(const char *title,
+						uint32_t objecthandle,
+						uint32_t objectid,
+						uint32_t bufferlen,
+						byte_t *buffer,
+						byte_t *statusvector) {
+	// response packet data structure:
+	//
+	// data {
+	// 	int32_t		op_response
+	// 	int32_t		object handle
+	// 	int32_t		object id
+	// 	int32_t		buffer length
+	// 	byte_t[]	buffer
+	// 	byte_t[]	status vector
+	// }
+
+	debugStart("attach response");
+
+	// write the opcode
+	uint32_t	opcode=op_response;
+	if (clientsock->write(opcode)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write op code failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
+
+	// write the object handle
+	if (clientsock->write(objecthandle)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write object handle failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	object handle: %d\n",objecthandle);
+	}
+
+	if (clientsock->write(objectid)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write object id failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	object id: %d\n",objectid);
+	}
+
+	// write the buffer
+	if (clientsock->write(bufferlen)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write buffer length failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	buffer len: %d\n",bufferlen);
+	}
+	if (clientsock->write(buffer,bufferlen)!=bufferlen) {
+		if (getDebug()) {
+			stdoutput.write("	write buffer failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	buffer:\n");
+		stdoutput.printHex(buffer,bufferlen);
+	}
+
+	// write the status vector
+	if (clientsock->write(statusvector,20)!=20) {
+		if (getDebug()) {
+			stdoutput.write("	write status vector failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	status vector:\n");
+		stdoutput.printHex(statusvector,20);
+	}
+
+	debugEnd();
+
+	clientsock->flushWriteBuffer(-1,-1);
+
+	return true;
+}
+
+bool sqlrprotocol_firebird::authenticate() {
+
+#if 0
+	// build auth credentials
+	sqlrfirebirdcredentials	cred;
+	cred.setUser(user);
+	cred.setPassword(password);
+	cred.setPasswordLength(charstring::length(password));
+	cred.setMethod(authmethod);
+	cred.setSalt(salt);
+
+	// authenticate
+	bool	retval=cont->auth(&cred);
+
+	// debug
+	if (getDebug()) {
+		debugStart("authenticate");
+		stdoutput.printf("	auth %s\n",(retvale?"success":"failed");
+		debugEnd();
+	}
+
+	// error
+	if (!retval) {
+		stringbuffer	err;
+		err.append("password authentication failed for user \"");
+		err.append(user);
+		err.append("\"");
+		sendErrorResponse("FATAL","28P01",
+					err.getString(),err.getStringLength());
+		return false;
+	}
+
+	// success
+	return sendAuthenticationOk();
+#endif
+	return false;
+}
+
+bool sqlrprotocol_firebird::getOpCode() {
+
+	debugStart("get op code");
+	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read op code failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
+	debugEnd();
+	return true;
+}
+
+bool sqlrprotocol_firebird::detach() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::create() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::dropDatabase() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::infoDatabase() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::disconnect() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::transaction() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::commit() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::rollback() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::commitRetaining() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::prepare() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::prepare2() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::transactionInfo() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::allocateStatement() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::freeStatement() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::prepareStatement() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::execute() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::execute2() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::fetch() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::setCursor() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::infoSql() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::createBlob() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::createBlob2() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::openBlob() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::openBlob2() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::getSegment() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchSegment() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::seekBlob() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::cancelBlob() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::closeBlob() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::getSlice() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::putSlice() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchCreate() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchMsg() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchExec() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchRls() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchCancel() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchSync() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchSetBpb() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchRegBlob() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::batchBlobStream() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::serviceAttach() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::serviceDetach() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::serviceStart() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::serviceInfo() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::connectRequest() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::queEvents() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::cancelEvents() {
+	return false;
+}
+
+bool sqlrprotocol_firebird::sendNotImplementedError() {
+	return false;
+}
+
+void sqlrprotocol_firebird::keepReading(int32_t sec, int32_t usec) {
+	for (;;) {
+		byte_t	buffer[1024];
+		ssize_t	r=clientsock->read(&buffer,1024,sec,usec);
+		if (getDebug()) {
+			stdoutput.printf("read %d more bytes...\n",r);
+		}
+		if (r<1) {
+			break;
+		}
+		debugHexDump(buffer,r);
+	}
+}
+
+void sqlrprotocol_firebird::readString(const byte_t *in,
+					const char *name,
+					char **buf,
+					const byte_t **out) {
+
+	// get the length
+	byte_t	len;
+	read(in,&len,out);
+
+	// get the value
+	*buf=new char[len+1];
+	read(*out,*buf,len,out);
+	(*buf)[len]='\0';
+	if (getDebug()) {
+		stdoutput.printf("	%s: %s\n",name,*buf);
+	}
+}
+
+void sqlrprotocol_firebird::debugSystemError() {
+	char	*err=error::getErrorString();
+	stdoutput.printf("%s\n",err);
+	delete[] err;
 }
 
 void sqlrprotocol_firebird::debugOpCode(uint32_t opcode) {
@@ -1111,462 +2176,320 @@ void sqlrprotocol_firebird::debugProtocolType(const char *title,
 				title,protocoltype,protocoltypestr);
 }
 
-bool sqlrprotocol_firebird::connectResponse() {
-
-	// response packet data structure:
-	//
-	// data {
-	// 	int32_t		op_accept
-	// 	int32_t		arch type
-	// 	int32_t		minimum type
-	// }
-
-	debugStart("connect response");
-
-	// FIXME: we might not want to accept...
-	uint32_t	opcode=op_accept;
-	if (clientsock->write(opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
-
-	// FIXME: this should depend on offered protocols...
-	uint32_t	protoversionnumber=0;
-	if (clientsock->write(protoversionnumber)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write protocol "
-						"version numberfailed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	protocol version number: %d\n",
-							protoversionnumber);
-	}
-
-	// FIXME: set this to our arch?
-	uint32_t	archtype=arch_linux;
-	if (clientsock->write(archtype)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write arch type failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		debugArchType(archtype);
-	}
-
-	// FIXME: do we support batch send?
-	uint32_t	mintype=ptype_rpc;
-	if (clientsock->write(mintype)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write min type failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		debugProtocolType("min type",mintype);
-	}
-
-	debugEnd();
-
-	clientsock->flushWriteBuffer(-1,-1);
-
-	return true;
-}
-
-bool sqlrprotocol_firebird::attach() {
-
-	// request packet data structure:
-	//
-	// data {
-	// 	int32_t		op_attach
-	// 	int32_t		db object id
-	// 	int32_t		db length
-	// 	char[]		db path or alias
-	// 	int32_t		db parameter buffer length
-	// 	byte_t[]	db parameters
-	// 	...
-	// }
-
-	debugStart("attach");
-
-	// get op_attach
-	uint32_t	opcode=0;
-	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read attach op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
-	if (opcode!=op_attach) {
-		if (getDebug()) {
-			stdoutput.printf("	invalid attach op code - "
-							"got %d, expected %d\n",
-							opcode,op_attach);
-			debugEnd();
-		}
-		return false;
-	}
-
-	// get db object id
-	uint32_t	dbobjectid=0;
-	if (clientsock->read(&dbobjectid)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read db object id failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db object id: %d\n",dbobjectid);
-	}
-
-	// get db
-	uint32_t	dblen=0;
-	if (clientsock->read(&dblen)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read db length failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db len: %d\n",dblen);
-	}
-	char	*db=new char[dblen+1];
-	if (clientsock->read(db,dblen)!=dblen) {
-		if (getDebug()) {
-			stdoutput.write("	read db path failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db: %s\n",db);
-	}
-
-	// get db parameters
-	uint32_t	dbplen=0;
-	if (clientsock->read(&dbplen)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read db parameters "
-							"length failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db params len: %d\n",dbplen);
-	}
-	char	*dbp=new char[dbplen+1];
-	if (clientsock->read(dbp,dbplen)!=dbplen) {
-		if (getDebug()) {
-			stdoutput.write("	read db params failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db params:\n%s\n",dbp);
-	}
-
-	debugEnd();
-
-	return true;
-}
-
-bool sqlrprotocol_firebird::attachResponse() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::authenticate() {
-
-#if 0
-	// build auth credentials
-	sqlrfirebirdcredentials	cred;
-	cred.setUser(user);
-	cred.setPassword(password);
-	cred.setPasswordLength(charstring::length(password));
-	cred.setMethod(authmethod);
-	cred.setSalt(salt);
-
-	// authenticate
-	bool	retval=cont->auth(&cred);
-
-	// debug
-	if (getDebug()) {
-		debugStart("authenticate");
-		stdoutput.printf("	auth %s\n",(retval)?"success":"failed");
-		debugEnd();
-	}
-
-	// error
-	if (!retval) {
-		stringbuffer	err;
-		err.append("password authentication failed for user \"");
-		err.append(user);
-		err.append("\"");
-		sendErrorResponse("FATAL","28P01",
-					err.getString(),err.getStringLength());
-		return false;
-	}
-
-	// success
-	return sendAuthenticationOk();
-#endif
-	return false;
-}
-
-bool sqlrprotocol_firebird::getOpCode() {
-
-	debugStart("get op code");
-	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
-	debugEnd();
-	return true;
-}
-
-bool sqlrprotocol_firebird::detach() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::create() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::dropDatabase() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::infoDatabase() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::disconnect() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::transaction() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::commit() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::rollback() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::commitRetaining() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::prepare() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::prepare2() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::transactionInfo() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::allocateStatement() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::freeStatement() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::prepareStatement() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::execute() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::execute2() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::fetch() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::setCursor() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::infoSql() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::createBlob() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::createBlob2() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::openBlob() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::openBlob2() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::getSegment() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchSegment() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::seekBlob() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::cancelBlob() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::closeBlob() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::getSlice() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::putSlice() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchCreate() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchMsg() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchExec() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchRls() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchCancel() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchSync() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchSetBpb() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchRegBlob() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::batchBlobStream() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::serviceAttach() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::serviceDetach() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::serviceStart() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::serviceInfo() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::connectRequest() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::queEvents() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::cancelEvents() {
-	return false;
-}
-
-bool sqlrprotocol_firebird::sendNotImplementedError() {
-	return false;
-}
-
-void sqlrprotocol_firebird::debugSystemError() {
-	char	*err=error::getErrorString();
-	stdoutput.printf("%s\n",err);
-	delete[] err;
-}
-
-void sqlrprotocol_firebird::keepReading() {
-	for (;;) {
-		byte_t	buffer[1024];
-		ssize_t	r=clientsock->read(&buffer,1024,1,0);
-		stdoutput.printf("read %d more bytes...\n",r);
-		if (r<1) {
+void sqlrprotocol_firebird::debugDpbVersion(uint32_t dpbversion) {
+	const char	*dpbversionstr=NULL;
+	switch (dpbversion) {
+		case isc_dpb_version1:
+			dpbversionstr="isc_dpb_version1";
 			break;
-		}
-		debugHexDump(buffer,r);
+		case isc_dpb_version2:
+			dpbversionstr="isc_dpb_version2";
+			break;
+		default:
+			dpbversionstr="unknown";
+			break;
 	}
+	stdoutput.printf("	dpb version: %d (%s)\n",
+				dpbversion,dpbversionstr);
+}
+
+void sqlrprotocol_firebird::debugDpbParam(uint32_t dpbparam) {
+	const char	*dpbparamstr=NULL;
+	switch (dpbparam) {
+		case isc_dpb_cdd_pathname:
+			dpbparamstr="isc_dpb_cdd_pathname";
+			break;
+		case isc_dpb_allocation:
+			dpbparamstr="isc_dpb_allocation";
+			break;
+		case isc_dpb_journal:
+			dpbparamstr="isc_dpb_journal";
+			break;
+		case isc_dpb_page_size:
+			dpbparamstr="isc_dpb_page_size";
+			break;
+		case isc_dpb_num_buffers:
+			dpbparamstr="isc_dpb_num_buffers";
+			break;
+		case isc_dpb_buffer_length:
+			dpbparamstr="isc_dpb_buffer_length";
+			break;
+		case isc_dpb_debug:
+			dpbparamstr="isc_dpb_debug";
+			break;
+		case isc_dpb_garbage_collect:
+			dpbparamstr="isc_dpb_garbage_collect";
+			break;
+		case isc_dpb_verify:
+			dpbparamstr="isc_dpb_verify";
+			break;
+		case isc_dpb_sweep:
+			dpbparamstr="isc_dpb_sweep";
+			break;
+		case isc_dpb_enable_journal:
+			dpbparamstr="isc_dpb_enable_journal";
+			break;
+		case isc_dpb_disable_journal:
+			dpbparamstr="isc_dpb_disable_journal";
+			break;
+		case isc_dpb_dbkey_scope:
+			dpbparamstr="isc_dpb_dbkey_scope";
+			break;
+		case isc_dpb_number_of_users:
+			dpbparamstr="isc_dpb_number_of_users";
+			break;
+		case isc_dpb_trace:
+			dpbparamstr="isc_dpb_trace";
+			break;
+		case isc_dpb_no_garbage_collect:
+			dpbparamstr="isc_dpb_no_garbage_collect";
+			break;
+		case isc_dpb_damaged:
+			dpbparamstr="isc_dpb_damaged";
+			break;
+		case isc_dpb_license:
+			dpbparamstr="isc_dpb_license";
+			break;
+		case isc_dpb_sys_user_name:
+			dpbparamstr="isc_dpb_sys_user_name";
+			break;
+		case isc_dpb_encrypt_key:
+			dpbparamstr="isc_dpb_encrypt_key";
+			break;
+		case isc_dpb_activate_shadow:
+			dpbparamstr="isc_dpb_activate_shadow";
+			break;
+		case isc_dpb_sweep_interval:
+			dpbparamstr="isc_dpb_sweep_interval";
+			break;
+		case isc_dpb_delete_shadow:
+			dpbparamstr="isc_dpb_delete_shadow";
+			break;
+		case isc_dpb_force_write:
+			dpbparamstr="isc_dpb_force_write";
+			break;
+		case isc_dpb_begin_log:
+			dpbparamstr="isc_dpb_begin_log";
+			break;
+		case isc_dpb_quit_log:
+			dpbparamstr="isc_dpb_quit_log";
+			break;
+		case isc_dpb_no_reserve:
+			dpbparamstr="isc_dpb_no_reserve";
+			break;
+		case isc_dpb_user_name:
+			dpbparamstr="isc_dpb_user_name";
+			break;
+		case isc_dpb_password:
+			dpbparamstr="isc_dpb_password";
+			break;
+		case isc_dpb_password_enc:
+			dpbparamstr="isc_dpb_password_enc";
+			break;
+		case isc_dpb_sys_user_name_enc:
+			dpbparamstr="isc_dpb_sys_user_name_enc";
+			break;
+		case isc_dpb_interp:
+			dpbparamstr="isc_dpb_interp";
+			break;
+		case isc_dpb_online_dump:
+			dpbparamstr="isc_dpb_online_dump";
+			break;
+		case isc_dpb_old_file_size:
+			dpbparamstr="isc_dpb_old_file_size";
+			break;
+		case isc_dpb_old_num_files:
+			dpbparamstr="isc_dpb_old_num_files";
+			break;
+		case isc_dpb_old_file:
+			dpbparamstr="isc_dpb_old_file";
+			break;
+		case isc_dpb_old_start_page:
+			dpbparamstr="isc_dpb_old_start_page";
+			break;
+		case isc_dpb_old_start_seqno:
+			dpbparamstr="isc_dpb_old_start_seqno";
+			break;
+		case isc_dpb_old_start_file:
+			dpbparamstr="isc_dpb_old_start_file";
+			break;
+		case isc_dpb_drop_walfile:
+			dpbparamstr="isc_dpb_drop_walfile";
+			break;
+		case isc_dpb_old_dump_id:
+			dpbparamstr="isc_dpb_old_dump_id";
+			break;
+		case isc_dpb_wal_backup_dir:
+			dpbparamstr="isc_dpb_wal_backup_dir";
+			break;
+		case isc_dpb_wal_chkptlen:
+			dpbparamstr="isc_dpb_wal_chkptlen";
+			break;
+		case isc_dpb_wal_numbufs:
+			dpbparamstr="isc_dpb_wal_numbufs";
+			break;
+		case isc_dpb_wal_bufsize:
+			dpbparamstr="isc_dpb_wal_bufsize";
+			break;
+		case isc_dpb_wal_grp_cmt_wait:
+			dpbparamstr="isc_dpb_wal_grp_cmt_wait";
+			break;
+		case isc_dpb_lc_messages:
+			dpbparamstr="isc_dpb_lc_messages";
+			break;
+		case isc_dpb_lc_ctype:
+			dpbparamstr="isc_dpb_lc_ctype";
+			break;
+		case isc_dpb_cache_manager:
+			dpbparamstr="isc_dpb_cache_manager";
+			break;
+		case isc_dpb_shutdown:
+			dpbparamstr="isc_dpb_shutdown";
+			break;
+		case isc_dpb_online:
+			dpbparamstr="isc_dpb_online";
+			break;
+		case isc_dpb_shutdown_delay:
+			dpbparamstr="isc_dpb_shutdown_delay";
+			break;
+		case isc_dpb_reserved:
+			dpbparamstr="isc_dpb_reserved";
+			break;
+		case isc_dpb_overwrite:
+			dpbparamstr="isc_dpb_overwrite";
+			break;
+		case isc_dpb_sec_attach:
+			dpbparamstr="isc_dpb_sec_attach";
+			break;
+		case isc_dpb_disable_wal:
+			dpbparamstr="isc_dpb_disable_wal";
+			break;
+		case isc_dpb_connect_timeout:
+			dpbparamstr="isc_dpb_connect_timeout";
+			break;
+		case isc_dpb_dummy_packet_interval:
+			dpbparamstr="isc_dpb_dummy_packet_interval";
+			break;
+		case isc_dpb_gbak_attach:
+			dpbparamstr="isc_dpb_gbak_attach";
+			break;
+		case isc_dpb_sql_role_name:
+			dpbparamstr="isc_dpb_sql_role_name";
+			break;
+		case isc_dpb_set_page_buffers:
+			dpbparamstr="isc_dpb_set_page_buffers";
+			break;
+		case isc_dpb_working_directory:
+			dpbparamstr="isc_dpb_working_directory";
+			break;
+		case isc_dpb_sql_dialect:
+			dpbparamstr="isc_dpb_sql_dialect";
+			break;
+		case isc_dpb_set_db_readonly:
+			dpbparamstr="isc_dpb_set_db_readonly";
+			break;
+		case isc_dpb_set_db_sql_dialect:
+			dpbparamstr="isc_dpb_set_db_sql_dialect";
+			break;
+		case isc_dpb_gfix_attach:
+			dpbparamstr="isc_dpb_gfix_attach";
+			break;
+		case isc_dpb_gstat_attach:
+			dpbparamstr="isc_dpb_gstat_attach";
+			break;
+		case isc_dpb_set_db_charset:
+			dpbparamstr="isc_dpb_set_db_charset";
+			break;
+		case isc_dpb_gsec_attach:
+			dpbparamstr="isc_dpb_gsec_attach";
+			break;
+		case isc_dpb_address_path:
+			dpbparamstr="isc_dpb_address_path";
+			break;
+		case isc_dpb_process_id:
+			dpbparamstr="isc_dpb_process_id";
+			break;
+		case isc_dpb_no_db_triggers:
+			dpbparamstr="isc_dpb_no_db_triggers";
+			break;
+		case isc_dpb_trusted_auth:
+			dpbparamstr="isc_dpb_trusted_auth";
+			break;
+		case isc_dpb_process_name:
+			dpbparamstr="isc_dpb_process_name";
+			break;
+		case isc_dpb_trusted_role:
+			dpbparamstr="isc_dpb_trusted_role";
+			break;
+		case isc_dpb_org_filename:
+			dpbparamstr="isc_dpb_org_filename";
+			break;
+		case isc_dpb_utf8_filename:
+			dpbparamstr="isc_dpb_utf8_filename";
+			break;
+		case isc_dpb_ext_call_depth:
+			dpbparamstr="isc_dpb_ext_call_depth";
+			break;
+		case isc_dpb_auth_block:
+			dpbparamstr="isc_dpb_auth_block";
+			break;
+		case isc_dpb_client_version:
+			dpbparamstr="isc_dpb_client_version";
+			break;
+		case isc_dpb_remote_protocol:
+			dpbparamstr="isc_dpb_remote_protocol";
+			break;
+		case isc_dpb_host_name:
+			dpbparamstr="isc_dpb_host_name";
+			break;
+		case isc_dpb_os_user:
+			dpbparamstr="isc_dpb_os_user";
+			break;
+		case isc_dpb_specific_auth_data:
+			dpbparamstr="isc_dpb_specific_auth_data";
+			break;
+		case isc_dpb_auth_plugin_list:
+			dpbparamstr="isc_dpb_auth_plugin_list";
+			break;
+		case isc_dpb_auth_plugin_name:
+			dpbparamstr="isc_dpb_auth_plugin_name";
+			break;
+		case isc_dpb_config:
+			dpbparamstr="isc_dpb_config";
+			break;
+		case isc_dpb_nolinger:
+			dpbparamstr="isc_dpb_nolinger";
+			break;
+		case isc_dpb_reset_icu:
+			dpbparamstr="isc_dpb_reset_icu";
+			break;
+		case isc_dpb_map_attach:
+			dpbparamstr="isc_dpb_map_attach";
+			break;
+		case isc_dpb_session_time_zone:
+			dpbparamstr="isc_dpb_session_time_zone";
+			break;
+		case isc_dpb_set_db_replica:
+			dpbparamstr="isc_dpb_set_db_replica";
+			break;
+		case isc_dpb_set_bind:
+			dpbparamstr="isc_dpb_set_bind";
+			break;
+		case isc_dpb_decfloat_round:
+			dpbparamstr="isc_dpb_decfloat_round";
+			break;
+		case isc_dpb_decfloat_traps:
+			dpbparamstr="isc_dpb_decfloat_traps";
+			break;
+		case isc_dpb_clear_map:
+			dpbparamstr="isc_dpb_clear_map";
+			break;
+		default:
+			dpbparamstr="unknown";
+			break;
+	}
+	stdoutput.printf("	dpb param: %d 0x%02x (%s)\n",
+				dpbparam,dpbparam,dpbparamstr);
 }
 
 extern "C" {
