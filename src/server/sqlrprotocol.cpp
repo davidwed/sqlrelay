@@ -705,43 +705,5 @@ void sqlrprotocol::debugHexDump(const byte_t *data,
 	if (!pvt->_debug) {
 		return;
 	}
-	if (!size) {
-		return;
-	}
-	for (uint16_t j=0; j<indent; j++) {
-		stdoutput.write("	");
-	}
-	for (uint64_t i=0; i<size; i++) {
-		stdoutput.printf("%02x  ",data[i]);
-		if (!((i+1)%8)) {
-			stdoutput.write("   ");
-		}
-		if (!((i+1)%16)) {
-			stdoutput.write("\n");
-			for (uint16_t j=0; j<indent; j++) {
-				stdoutput.write("	");
-			}
-		}
-	}
-	stdoutput.write("\n");
-	for (uint16_t i=0; i<indent; i++) {
-		stdoutput.write("	");
-	}
-	for (uint64_t i=0; i<size; i++) {
-		if (data[i]>=' ' && data[i]<='~') {
-			stdoutput.printf("%c   ",data[i]);
-		} else {
-			stdoutput.write(".   ");
-		}
-		if (!((i+1)%8)) {
-			stdoutput.write("   ");
-		}
-		if (!((i+1)%16)) {
-			stdoutput.write("\n");
-			for (uint16_t j=0; j<indent; j++) {
-				stdoutput.write("	");
-			}
-		}
-	}
-	stdoutput.write('\n');
+	stdoutput.printHex(data,size,indent);
 }

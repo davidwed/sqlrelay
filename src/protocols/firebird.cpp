@@ -265,6 +265,11 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 
 		bool	initialHandshake();
 		bool	connect();
+		void	debugOpCode(uint32_t opcode);
+		void	debugArchType(uint32_t archtype);
+		void	debugProtocolVersion(uint32_t protoversion);
+		void	debugProtocolType(const char *title,
+						uint32_t protocoltype);
 		bool	connectResponse();
 		bool	attach();
 		bool	attachResponse();
@@ -322,6 +327,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 		bool	sendNotImplementedError();
 
 		void	debugSystemError();
+		void	keepReading();
 
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -339,10 +345,8 @@ sqlrprotocol_firebird::sqlrprotocol_firebird(sqlrservercontroller *cont,
 
 	clientsock=NULL;
 
-	if (getDebug()) {
-		debugStart("parameters");
-		debugEnd();
-	}
+	debugStart("parameters");
+	debugEnd();
 
 	maxquerysize=cont->getConfig()->getMaxQuerySize();
 	maxbindcount=cont->getConfig()->getMaxBindCount();
@@ -586,46 +590,48 @@ bool sqlrprotocol_firebird::connect() {
 	// 	...
 	// }
 
-	if (getDebug()) {
-		debugStart("connect");
-	}
+	debugStart("connect");
 
 	// get op_connect
-	uint32_t	op=0;
-	if (clientsock->read(&op)!=sizeof(uint32_t)) {
+	uint32_t	opcode=0;
+	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
 		if (getDebug()) {
-			stdoutput.write("	read connect op failed\n");
+			stdoutput.write("	read connect op code failed\n");
 			debugSystemError();
 			debugEnd();
 		}
 		return false;
 	}
-	if (op!=op_connect) {
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
+	if (opcode!=op_connect) {
 		if (getDebug()) {
-			stdoutput.printf("	invalid connect op - "
+			stdoutput.printf("	invalid connect op code - "
 							"got %d, expected %d\n",
-							op,op_connect);
-			debugSystemError();
+							opcode,op_connect);
 			debugEnd();
 		}
 		return false;
 	}
 
 	// get op_attach
-	if (clientsock->read(&op)!=sizeof(uint32_t)) {
+	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
 		if (getDebug()) {
-			stdoutput.write("	read attach op failed\n");
+			stdoutput.write("	read attach op code failed\n");
 			debugSystemError();
 			debugEnd();
 		}
 		return false;
 	}
-	if (op!=op_attach) {
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
+	if (opcode!=op_attach) {
 		if (getDebug()) {
-			stdoutput.printf("	invalid attach op - "
+			stdoutput.printf("	invalid attach op code - "
 							"got %d, expected %d\n",
-							op,op_attach);
-			debugSystemError();
+							opcode,op_attach);
 			debugEnd();
 		}
 		return false;
@@ -641,7 +647,9 @@ bool sqlrprotocol_firebird::connect() {
 		}
 		return false;
 	}
-	stdoutput.printf("	connect version: %d\n",connectversion);
+	if (getDebug()) {
+		stdoutput.printf("	connect version: %d\n",connectversion);
+	}
 
 	if (connectversion==2) {
 		// ...
@@ -651,7 +659,7 @@ bool sqlrprotocol_firebird::connect() {
 		// FIXME: not supported
 	}
 
-	// get archtype
+	// get arch type
 	uint32_t	archtype=0;
 	if (clientsock->read(&archtype)!=sizeof(uint32_t)) {
 		if (getDebug()) {
@@ -661,57 +669,8 @@ bool sqlrprotocol_firebird::connect() {
 		}
 		return false;
 	}
-	stdoutput.printf("	arch type: %d\n",archtype);
-
-	switch (archtype) {
-		case arch_generic:
-			// ...
-			break;
-		case arch_sun:
-			// ...
-			break;
-		case arch_sun4:
-			// ...
-			break;
-		case arch_sunx86:
-			// ...
-			break;
-		case arch_hpux:
-			// ...
-			break;
-		case arch_rt:
-			// ...
-			break;
-		case arch_intel_32:
-			// ...
-			break;
-		case arch_linux:
-			// ...
-			break;
-		case arch_freebsd:
-			// ...
-			break;
-		case arch_netbsd:
-			// ...
-			break;
-		case arch_darwin_ppc:
-			// ...
-			break;
-		case arch_winnt_64:
-			// ...
-			break;
-		case arch_darwin_x64:
-			// ...
-			break;
-		case arch_darwin_ppc64:
-			// ...
-			break;
-		case arch_arm:
-			// ...
-			break;
-		default:
-			// ...
-			break;
+	if (getDebug()) {
+		debugArchType(archtype);
 	}
 
 	// get db
@@ -724,7 +683,9 @@ bool sqlrprotocol_firebird::connect() {
 		}
 		return false;
 	}
-	stdoutput.printf("	db len: %d\n",dblen);
+	if (getDebug()) {
+		stdoutput.printf("	db len: %d\n",dblen);
+	}
 	char	*db=new char[dblen+1];
 	if (clientsock->read(db,dblen)!=dblen) {
 		if (getDebug()) {
@@ -734,7 +695,9 @@ bool sqlrprotocol_firebird::connect() {
 		}
 		return false;
 	}
-	stdoutput.printf("	db: %s\n",db);
+	if (getDebug()) {
+		stdoutput.printf("	db: %s\n",db);
+	}
 
 if (connectversion==3) {
 	// FIXME: connect version 3 is somehow different here...
@@ -750,7 +713,9 @@ if (connectversion==3) {
 		}
 		return false;
 	}
-	stdoutput.printf("	protocol count: %d\n",protocount);
+	if (getDebug()) {
+		stdoutput.printf("	protocol count: %d\n",protocount);
+	}
 
 	// get user identification
 	uint32_t	useridlen=0;
@@ -762,7 +727,9 @@ if (connectversion==3) {
 		}
 		return false;
 	}
-	stdoutput.printf("	user id len: %d\n",useridlen);
+	if (getDebug()) {
+		stdoutput.printf("	user id len: %d\n",useridlen);
+	}
 	byte_t	*userid=new byte_t[useridlen+1];
 	if (clientsock->read(userid,useridlen)!=useridlen) {
 		if (getDebug()) {
@@ -772,7 +739,9 @@ if (connectversion==3) {
 		}
 		return false;
 	}
-	stdoutput.printf("	user id: %s\n",userid);
+	if (getDebug()) {
+		stdoutput.printf("	user id: %s\n",userid);
+	}
 
 	// get protocols...
 	for (uint32_t i=0; i<protocount; i++) {
@@ -790,7 +759,9 @@ if (connectversion==3) {
 			}
 			return false;
 		}
-		stdoutput.printf("	protocol version: %d\n",protoversion);
+		if (getDebug()) {
+			debugProtocolVersion(protoversion);
+		}
 
 		// get arch type
 		uint32_t	archtype=0;
@@ -803,7 +774,9 @@ if (connectversion==3) {
 			}
 			return false;
 		}
-		stdoutput.printf("	arch type: %d\n",archtype);
+		if (getDebug()) {
+			debugArchType(archtype);
+		}
 
 		// get minimum type
 		uint32_t	mintype=0;
@@ -816,7 +789,9 @@ if (connectversion==3) {
 			}
 			return false;
 		}
-		stdoutput.printf("	min type: %d\n",mintype);
+		if (getDebug()) {
+			debugProtocolType("min type",mintype);
+		}
 
 		// get maximum type
 		uint32_t	maxtype=0;
@@ -829,7 +804,9 @@ if (connectversion==3) {
 			}
 			return false;
 		}
-		stdoutput.printf("	max type: %d\n",maxtype);
+		if (getDebug()) {
+			debugProtocolType("max type",maxtype);
+		}
 
 		// get preference weight
 		uint32_t	prefwt=0;
@@ -842,7 +819,10 @@ if (connectversion==3) {
 			}
 			return false;
 		}
-		stdoutput.printf("	preference weight: %d\n",prefwt);
+		if (getDebug()) {
+			stdoutput.printf("	preference "
+						"weight: %d\n",prefwt);
+		}
 
 		// FIXME: decide on protocol...
 	}
@@ -851,12 +831,472 @@ if (connectversion==3) {
 	return true;
 }
 
+void sqlrprotocol_firebird::debugOpCode(uint32_t opcode) {
+	const char	*opcodestr=NULL;
+	switch (opcode) {
+		case op_connect:
+			opcodestr="op_connect";
+			break;
+		case op_attach:
+			opcodestr="op_attach";
+			break;
+		case op_detach:
+			opcodestr="op_detach";
+			break;
+		case op_create:
+			opcodestr="op_create";
+			break;
+		case op_drop_database:
+			opcodestr="op_drop_database";
+			break;
+		case op_info_database:
+			opcodestr="op_info_database";
+			break;
+		case op_disconnect:
+			opcodestr="op_disconnect";
+			break;
+		case op_transaction:
+			opcodestr="op_transaction";
+			break;
+		case op_commit:
+			opcodestr="op_commit";
+			break;
+		case op_rollback:
+			opcodestr="op_rollback";
+			break;
+		case op_commit_retaining:
+			opcodestr="op_commit_retaining";
+			break;
+		case op_prepare:
+			opcodestr="op_prepare";
+			break;
+		case op_prepare2:
+			opcodestr="op_prepare2";
+			break;
+		case op_transaction_info:
+			opcodestr="op_transaction_info";
+			break;
+		case op_allocate_statement:
+			opcodestr="op_allocate_statement";
+			break;
+		case op_free_statement:
+			opcodestr="op_free_statement";
+			break;
+		case op_prepare_statement:
+			opcodestr="op_prepare_statement";
+			break;
+		case op_execute:
+			opcodestr="op_execute";
+			break;
+		case op_execute2:
+			opcodestr="op_execute2";
+			break;
+		case op_fetch:
+			opcodestr="op_fetch";
+			break;
+		case op_set_cursor:
+			opcodestr="op_set_cursor";
+			break;
+		case op_info_sql:
+			opcodestr="op_info_sql";
+			break;
+		case op_create_blob:
+			opcodestr="op_create_blob";
+			break;
+		case op_create_blob2:
+			opcodestr="op_create_blob2";
+			break;
+		case op_open_blob:
+			opcodestr="op_open_blob";
+			break;
+		case op_open_blob2:
+			opcodestr="op_open_blob2";
+			break;
+		case op_get_segment:
+			opcodestr="op_get_segment";
+			break;
+		case op_batch_segment:
+			opcodestr="op_batch_segment";
+			break;
+		case op_seek_blob:
+			opcodestr="op_seek_blob";
+			break;
+		case op_cancel_blob:
+			opcodestr="op_cancel_blob";
+			break;
+		case op_close_blob:
+			opcodestr="op_close_blob";
+			break;
+		case op_get_slice:
+			opcodestr="op_get_slice";
+			break;
+		case op_put_slice:
+			opcodestr="op_put_slice";
+			break;
+		case op_batch_create:
+			opcodestr="op_batch_create";
+			break;
+		case op_batch_msg:
+			opcodestr="op_batch_msg";
+			break;
+		case op_batch_exec:
+			opcodestr="op_batch_exec";
+			break;
+		case op_batch_rls:
+			opcodestr="op_batch_rls";
+			break;
+		case op_batch_cancel:
+			opcodestr="op_batch_cancel";
+			break;
+		case op_batch_sync:
+			opcodestr="op_batch_sync";
+			break;
+		case op_batch_set_bpb:
+			opcodestr="op_batch_set_bpb";
+			break;
+		case op_batch_regblob:
+			opcodestr="op_batch_regblob";
+			break;
+		case op_batch_blob_stream:
+			opcodestr="op_batch_blob_stream";
+			break;
+		case op_service_attach:
+			opcodestr="op_service_attach";
+			break;
+		case op_service_detach:
+			opcodestr="op_service_detach";
+			break;
+		case op_service_start:
+			opcodestr="op_service_start";
+			break;
+		case op_service_info:
+			opcodestr="op_service_info";
+			break;
+		case op_connect_request:
+			opcodestr="op_connect_request";
+			break;
+		case op_que_events:
+			opcodestr="op_que_events";
+			break;
+		case op_cancel_events:
+			opcodestr="op_cancel_events";
+			break;
+		case op_accept:
+			opcodestr="op_accept";
+			break;
+		case op_response:
+			opcodestr="op_response";
+			break;
+		case op_sql_response:
+			opcodestr="op_sql_response";
+			break;
+		case op_fetch_response:
+			opcodestr="op_fetch_response";
+			break;
+		case op_slice:
+			opcodestr="op_slice";
+			break;
+		default:
+			opcodestr="unknown";
+			break;
+	}
+	stdoutput.printf("	op code: %d (%s)\n",opcode,opcodestr);
+}
+
+void sqlrprotocol_firebird::debugArchType(uint32_t archtype) {
+	const char	*archtypestr=NULL;
+	switch (archtype) {
+		case arch_generic:
+			archtypestr="arch_generic";
+			break;
+		case arch_sun:
+			archtypestr="arch_sun";
+			break;
+		case arch_sun4:
+			archtypestr="arch_sun4";
+			break;
+		case arch_sunx86:
+			archtypestr="arch_sunx86";
+			break;
+		case arch_hpux:
+			archtypestr="arch_hpux";
+			break;
+		case arch_rt:
+			archtypestr="arch_rt";
+			break;
+		case arch_intel_32:
+			archtypestr="arch_intel_32";
+			break;
+		case arch_linux:
+			archtypestr="arch_linux";
+			break;
+		case arch_freebsd:
+			archtypestr="arch_freebsd";
+			break;
+		case arch_netbsd:
+			archtypestr="arch_netbsd";
+			break;
+		case arch_darwin_ppc:
+			archtypestr="arch_darwin_ppc";
+			break;
+		case arch_winnt_64:
+			archtypestr="arch_winnt_64";
+			break;
+		case arch_darwin_x64:
+			archtypestr="arch_darwin_x64";
+			break;
+		case arch_darwin_ppc64:
+			archtypestr="arch_darwin_ppc64";
+			break;
+		case arch_arm:
+			archtypestr="arch_arm";
+			break;
+		default:
+			archtypestr="unknown";
+			break;
+	}
+	stdoutput.printf("	arch type: %d (%s)\n",archtype,archtypestr);
+}
+
+void sqlrprotocol_firebird::debugProtocolVersion(uint32_t protoversion) {
+	const char	*protoversionstr=NULL;
+	switch (protoversion) {
+		case PROTOCOL_VERSION10:
+			protoversionstr="PROTOCOL_VERSION10";
+			break;
+		case PROTOCOL_VERSION11:
+			protoversionstr="PROTOCOL_VERSION11";
+			break;
+		case PROTOCOL_VERSION12:
+			protoversionstr="PROTOCOL_VERSION12";
+			break;
+		case PROTOCOL_VERSION13:
+			protoversionstr="PROTOCOL_VERSION13";
+			break;
+		case PROTOCOL_VERSION14:
+			protoversionstr="PROTOCOL_VERSION14";
+			break;
+		case PROTOCOL_VERSION15:
+			protoversionstr="PROTOCOL_VERSION15";
+			break;
+		case PROTOCOL_VERSION16:
+			protoversionstr="PROTOCOL_VERSION16";
+			break;
+		case PROTOCOL_VERSION17:
+			protoversionstr="PROTOCOL_VERSION17";
+			break;
+		default:
+			protoversionstr="unknown";
+			break;
+	}
+	stdoutput.printf("	protocol version: %d (%s)\n",
+						protoversion,protoversionstr);
+}
+
+void sqlrprotocol_firebird::debugProtocolType(const char *title,
+						uint32_t protocoltype) {
+	const char	*protocoltypestr=NULL;
+	switch (protocoltype) {
+		case ptype_rpc:
+			protocoltypestr="ptype_rpc";
+			break;
+		case ptype_batch_send:
+			protocoltypestr="ptype_batch_send";
+			break;
+		default:
+			protocoltypestr="unknown";
+			break;
+	}
+	stdoutput.printf("	%s: %d (%s)\n",
+				title,protocoltype,protocoltypestr);
+}
+
 bool sqlrprotocol_firebird::connectResponse() {
-	return false;
+
+	// response packet data structure:
+	//
+	// data {
+	// 	int32_t		op_accept
+	// 	int32_t		arch type
+	// 	int32_t		minimum type
+	// }
+
+	debugStart("connect response");
+
+	// FIXME: we might not want to accept...
+	uint32_t	opcode=op_accept;
+	if (clientsock->write(opcode)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write op code failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
+
+	// FIXME: this should depend on offered protocols...
+	uint32_t	protoversionnumber=0;
+	if (clientsock->write(protoversionnumber)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write protocol "
+						"version numberfailed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	protocol version number: %d\n",
+							protoversionnumber);
+	}
+
+	// FIXME: set this to our arch?
+	uint32_t	archtype=arch_linux;
+	if (clientsock->write(archtype)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write arch type failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugArchType(archtype);
+	}
+
+	// FIXME: do we support batch send?
+	uint32_t	mintype=ptype_rpc;
+	if (clientsock->write(mintype)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	write min type failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugProtocolType("min type",mintype);
+	}
+
+	debugEnd();
+
+	clientsock->flushWriteBuffer(-1,-1);
+
+	return true;
 }
 
 bool sqlrprotocol_firebird::attach() {
-	return false;
+
+	// request packet data structure:
+	//
+	// data {
+	// 	int32_t		op_attach
+	// 	int32_t		db object id
+	// 	int32_t		db length
+	// 	char[]		db path or alias
+	// 	int32_t		db parameter buffer length
+	// 	byte_t[]	db parameters
+	// 	...
+	// }
+
+	debugStart("attach");
+
+	// get op_attach
+	uint32_t	opcode=0;
+	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read attach op code failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
+	if (opcode!=op_attach) {
+		if (getDebug()) {
+			stdoutput.printf("	invalid attach op code - "
+							"got %d, expected %d\n",
+							opcode,op_attach);
+			debugEnd();
+		}
+		return false;
+	}
+
+	// get db object id
+	uint32_t	dbobjectid=0;
+	if (clientsock->read(&dbobjectid)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read db object id failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db object id: %d\n",dbobjectid);
+	}
+
+	// get db
+	uint32_t	dblen=0;
+	if (clientsock->read(&dblen)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read db length failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db len: %d\n",dblen);
+	}
+	char	*db=new char[dblen+1];
+	if (clientsock->read(db,dblen)!=dblen) {
+		if (getDebug()) {
+			stdoutput.write("	read db path failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db: %s\n",db);
+	}
+
+	// get db parameters
+	uint32_t	dbplen=0;
+	if (clientsock->read(&dbplen)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.write("	read db parameters "
+							"length failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db params len: %d\n",dbplen);
+	}
+	char	*dbp=new char[dbplen+1];
+	if (clientsock->read(dbp,dbplen)!=dbplen) {
+		if (getDebug()) {
+			stdoutput.write("	read db params failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	db params:\n%s\n",dbp);
+	}
+
+	debugEnd();
+
+	return true;
 }
 
 bool sqlrprotocol_firebird::attachResponse() {
@@ -912,7 +1352,9 @@ bool sqlrprotocol_firebird::getOpCode() {
 		}
 		return false;
 	}
-	stdoutput.write("	op code: %d\n",opcode);
+	if (getDebug()) {
+		debugOpCode(opcode);
+	}
 	debugEnd();
 	return true;
 }
@@ -1113,6 +1555,18 @@ void sqlrprotocol_firebird::debugSystemError() {
 	char	*err=error::getErrorString();
 	stdoutput.printf("%s\n",err);
 	delete[] err;
+}
+
+void sqlrprotocol_firebird::keepReading() {
+	for (;;) {
+		byte_t	buffer[1024];
+		ssize_t	r=clientsock->read(&buffer,1024,1,0);
+		stdoutput.printf("read %d more bytes...\n",r);
+		if (r<1) {
+			break;
+		}
+		debugHexDump(buffer,r);
+	}
 }
 
 extern "C" {
