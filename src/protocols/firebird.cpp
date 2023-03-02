@@ -370,16 +370,44 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 
 		void	keepReading(int32_t sec, int32_t usec);
 
-		void	readString(const byte_t *in,
-					const char *name,
-					char **buf,
-					const byte_t **out);
+		void	readStringFromBuffer(const byte_t *in,
+						const char *name,
+						char **buf,
+						const byte_t **out);
 
-		bool	readPadding(uint32_t bytesreadin,
-					uint32_t *bytesreadout);
+		bool	readInt(uint32_t *val,
+					const char *name,
+					uint32_t *bytesread);
+		bool	readInt(uint32_t *val,
+					const char *name,
+					uint32_t expected,
+					uint32_t *bytesread);
+		bool	readString(char **val,
+					const char *name,
+					uint32_t *bytesread);
+		bool	readString(char **val,
+					uint32_t *len,
+					const char *name,
+					uint32_t *bytesread);
+		bool	readBuffer(byte_t **val,
+					const char *name,
+					uint32_t *bytesread);
+		bool	readBuffer(byte_t **val,
+					uint32_t *len,
+					const char *name,
+					uint32_t *bytesread);
+		bool	readPadding(uint32_t *bytesread);
+
+		bool	writeInt(uint32_t val,
+					const char *name,
+					uint32_t *byteswritten);
+		bool	writeBuffer(byte_t *val,
+					uint32_t len,
+					const char *name,
+					uint32_t *byteswritten);
 
 		void	debugSystemError();
-		void	debugOpCode(uint32_t opcode);
+		void	debugOpCode(const char *name, uint32_t opcode);
 		void	debugArchType(uint32_t archtype);
 		void	debugProtocolVersion(uint32_t protoversion);
 		void	debugProtocolType(const char *title,
@@ -671,253 +699,86 @@ bool sqlrprotocol_firebird::connect() {
 	uint32_t	bytesread=0;
 
 	// get op_connect
-	uint32_t	opcode=0;
-	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read connect op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!readInt(&opcode,"connect op code",op_connect,&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
-	if (opcode!=op_connect) {
-		if (getDebug()) {
-			stdoutput.printf("	invalid connect op code - "
-							"got %d, expected %d\n",
-							opcode,op_connect);
-			debugEnd();
-		}
-		return false;
-	}
-	bytesread+=sizeof(uint32_t);
+	debugOpCode("connect op code",opcode);
 
 	// get op_attach
-	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read attach op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!readInt(&opcode,"attach op code",op_attach,&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
-	if (opcode!=op_attach) {
-		if (getDebug()) {
-			stdoutput.printf("	invalid attach op code - "
-							"got %d, expected %d\n",
-							opcode,op_attach);
-			debugEnd();
-		}
-		return false;
-	}
-	bytesread+=sizeof(uint32_t);
+	debugOpCode("attach op code",opcode);
 
 	// get connect version
 	uint32_t	connectversion=0;
-	if (clientsock->read(&connectversion)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read connect version failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!readInt(&connectversion,"connect version",&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		stdoutput.printf("	connect version: %d\n",connectversion);
-	}
-	bytesread+=sizeof(uint32_t);
 
 	// get arch type
 	uint32_t	archtype=0;
-	if (clientsock->read(&archtype)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read arch type failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!readInt(&archtype,"arch type",&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugArchType(archtype);
-	}
-	bytesread+=sizeof(uint32_t);
+	debugArchType(archtype);
 
 	// get db
-	uint32_t	dblen=0;
-	if (clientsock->read(&dblen)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read db length failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db len: %d\n",dblen);
-	}
-	bytesread+=sizeof(uint32_t);
-	db=new char[dblen+1];
-	if (clientsock->read(db,dblen)!=dblen) {
-		if (getDebug()) {
-			stdoutput.write("	read db path failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	db[dblen]='\0';
-	if (getDebug()) {
-		stdoutput.printf("	db: %s\n",db);
-	}
-	bytesread+=dblen;
-
-	// padding
-	if (!readPadding(bytesread,&bytesread)) {
+	if (!readString(&db,"db",&bytesread)) {
 		return false;
 	}
 
 	// get protocol count
 	uint32_t	protocount=0;
-	if (clientsock->read(&protocount)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read proto count failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!readInt(&protocount,"protocol count",&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		stdoutput.printf("	protocol count: %d\n",protocount);
-	}
-	bytesread+=sizeof(uint32_t);
 
 	// get user identification
-	uint32_t	useridlen=0;
-	if (clientsock->read(&useridlen)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read user id length failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	byte_t	*userid;
+	if (!readBuffer(&userid,"user id",&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		stdoutput.printf("	user id len: %d\n",useridlen);
-	}
-	bytesread+=sizeof(uint32_t);
-	byte_t	*userid=new byte_t[useridlen+1];
-	if (clientsock->read(userid,useridlen)!=useridlen) {
-		if (getDebug()) {
-			stdoutput.write("	read user id failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	userid[useridlen]='\0';
-	if (getDebug()) {
-		stdoutput.printf("	user id:\n");
-		stdoutput.printHex(userid,useridlen);
-	}
-	bytesread+=useridlen;
-
-	// padding
-	if (!readPadding(bytesread,&bytesread)) {
-		return false;
-	}
+	// FIXME: parse userid
 
 	// get protocols...
 	for (uint32_t i=0; i<protocount; i++) {
-
-		// FIXME: I seem to get nonsensical values for these...
 
 		stdoutput.printf("	protocol %d...\n",i);
 
 		// get protocol version
 		uint32_t	protoversion=0;
-		if (clientsock->read(&protoversion)!=sizeof(uint32_t)) {
-			if (getDebug()) {
-				stdoutput.write("	read proto "
-							"version failed\n");
-				debugSystemError();
-				debugEnd();
-			}
+		if (!readInt(&protoversion,"protocol version",&bytesread)) {
 			return false;
 		}
-		if (getDebug()) {
-			debugProtocolVersion(protoversion);
-		}
-		bytesread+=sizeof(uint32_t);
+		debugProtocolVersion(protoversion);
 
 		// get arch type
 		uint32_t	archtype=0;
-		if (clientsock->read(&archtype)!=sizeof(uint32_t)) {
-			if (getDebug()) {
-				stdoutput.write("	read arch type "
-								"failed\n");
-				debugSystemError();
-				debugEnd();
-			}
+		if (!readInt(&archtype,"arch type",&bytesread)) {
 			return false;
 		}
-		if (getDebug()) {
-			debugArchType(archtype);
-		}
-		bytesread+=sizeof(uint32_t);
+		debugArchType(archtype);
 
 		// get minimum type
 		uint32_t	mintype=0;
-		if (clientsock->read(&mintype)!=sizeof(uint32_t)) {
-			if (getDebug()) {
-				stdoutput.write("	read min type "
-								"failed\n");
-				debugSystemError();
-				debugEnd();
-			}
+		if (!readInt(&mintype,"min type",&bytesread)) {
 			return false;
 		}
-		if (getDebug()) {
-			debugProtocolType("min type",mintype);
-		}
-		bytesread+=sizeof(uint32_t);
+		debugProtocolType("min type",mintype);
 
 		// get maximum type
 		uint32_t	maxtype=0;
-		if (clientsock->read(&maxtype)!=sizeof(uint32_t)) {
-			if (getDebug()) {
-				stdoutput.write("	read max type "
-								"failed\n");
-				debugSystemError();
-				debugEnd();
-			}
+		if (!readInt(&maxtype,"max type",&bytesread)) {
 			return false;
 		}
-		if (getDebug()) {
-			debugProtocolType("max type",maxtype);
-		}
-		bytesread+=sizeof(uint32_t);
+		debugProtocolType("max type",maxtype);
 
 		// get preference weight
 		uint32_t	prefwt=0;
-		if (clientsock->read(&prefwt)!=sizeof(uint32_t)) {
-			if (getDebug()) {
-				stdoutput.write("	read preference weight"
-								"failed\n");
-				debugSystemError();
-				debugEnd();
-			}
+		if (!readInt(&prefwt,"preference weight",&bytesread)) {
 			return false;
 		}
-		if (getDebug()) {
-			stdoutput.printf("	preference "
-						"weight: %d\n",prefwt);
-		}
-		bytesread+=sizeof(uint32_t);
 	}
 
 	debugEnd();
@@ -941,62 +802,34 @@ bool sqlrprotocol_firebird::connectResponse() {
 
 	debugStart("connect response");
 
-	uint32_t	opcode=op_accept;
-	if (clientsock->write(opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	uint32_t	byteswritten=0;
+
+	opcode=op_accept;
+	if (!writeInt(opcode,"accept op code",&byteswritten)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
+	debugOpCode("accept op code",opcode);
 
 	// FIXME: determine this somehow
 	uint32_t	protoversion=PROTOCOL_VERSION10;
-	if (clientsock->write(protoversion)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write protocol "
-						"version failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!writeInt(protoversion,"protocol version",&byteswritten)) {
 		return false;
 	}
-	if (getDebug()) {
-		stdoutput.printf("	protocol version: %d\n",
-							protoversion);
-	}
+	debugProtocolVersion(protoversion);
 
 	// FIXME: determine this somehow
 	uint32_t	archtype=arch_generic;
-	if (clientsock->write(archtype)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write arch type failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!writeInt(archtype,"arch type",&byteswritten)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugArchType(archtype);
-	}
+	debugArchType(archtype);
 
 	// FIXME: determine this somehow
 	uint32_t	mintype=ptype_rpc;
-	if (clientsock->write(mintype)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write min type failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!writeInt(mintype,"min type",&byteswritten)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugProtocolType("min type",mintype);
-	}
+	debugProtocolType("min type",mintype);
 
 	debugEnd();
 
@@ -1024,111 +857,27 @@ bool sqlrprotocol_firebird::attach() {
 	uint32_t	bytesread=0;
 
 	// get op_attach
-	uint32_t	opcode=0;
-	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read attach op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!readInt(&opcode,"attach op code",op_attach,&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
-	if (opcode!=op_attach) {
-		if (getDebug()) {
-			stdoutput.printf("	invalid attach op code - "
-							"got %d, expected %d\n",
-							opcode,op_attach);
-			debugEnd();
-		}
-		return false;
-	}
-	bytesread+=sizeof(uint32_t);
+	debugOpCode("attach op code",opcode);
 
 	// get db object id
 	uint32_t	dbobjectid=0;
-	if (clientsock->read(&dbobjectid)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read db object id failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!readInt(&dbobjectid,"db object id",&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		stdoutput.printf("	db object id: %d\n",dbobjectid);
-	}
-	bytesread+=sizeof(uint32_t);
 
-	// get db (FIXME: override db from connect?)
-	uint32_t	dblen=0;
-	if (clientsock->read(&dblen)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read db length failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db len: %d\n",dblen);
-	}
-	bytesread+=sizeof(uint32_t);
+	// get db (override db from connect)
 	delete[] db;
-	db=new char[dblen+1];
-	if (clientsock->read(db,dblen)!=dblen) {
-		if (getDebug()) {
-			stdoutput.write("	read db failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	db[dblen]='\0';
-	if (getDebug()) {
-		stdoutput.printf("	db: %s\n",db);
-	}
-	bytesread+=dblen;
-
-	// padding
-	if (!readPadding(bytesread,&bytesread)) {
+	if (!readString(&db,"db",&bytesread)) {
 		return false;
 	}
 
 	// get db parameters buffer
-	uint32_t	dpblen=0;
-	if (clientsock->read(&dpblen)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read db param buffer "
-							"length failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db param buffer len: %d\n",dpblen);
-	}
-	bytesread+=sizeof(uint32_t);
-	byte_t	*dpb=new byte_t[dpblen+1];
-	if (clientsock->read(dpb,dpblen)!=dpblen) {
-		if (getDebug()) {
-			stdoutput.write("	read db param buffer failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	db param buffer:\n");
-		stdoutput.printHex(dpb,dpblen);
-	}
-	bytesread+=dpblen;
-
-	// padding
-	if (!readPadding(bytesread,&bytesread)) {
+	uint32_t	dpblen;
+	byte_t		*dpb;
+	if (!readBuffer(&dpb,&dpblen,"db param buffer",&bytesread)) {
 		return false;
 	}
 
@@ -1140,9 +889,7 @@ bool sqlrprotocol_firebird::attach() {
 	// FIXME: do something with this...
 	byte_t		dpbversion;
 	read(dpbptr,&dpbversion,&dpbptr);
-	if (getDebug()) {
-		debugDpbVersion(dpbversion);
-	}
+	debugDpbVersion(dpbversion);
 
 	// get each parameter...
 	while (dpbptr!=dpbendptr) {
@@ -1150,9 +897,7 @@ bool sqlrprotocol_firebird::attach() {
 		// get the parameter
 		byte_t	dpbparam;
 		read(dpbptr,&dpbparam,&dpbptr);
-		if (getDebug()) {
-			debugDpbParam(dpbparam);
-		}
+		debugDpbParam(dpbparam);
 
 		// process the parameter...
 		switch (dpbparam) {
@@ -1265,8 +1010,8 @@ bool sqlrprotocol_firebird::attach() {
 				break;
 
 			case isc_dpb_user_name:
-				readString(dpbptr,"user name",
-						&username,&dpbptr);
+				readStringFromBuffer(
+					dpbptr,"user name",&username,&dpbptr);
 				break;
 
 			case isc_dpb_password:
@@ -1274,8 +1019,8 @@ bool sqlrprotocol_firebird::attach() {
 				break;
 
 			case isc_dpb_password_enc:
-				readString(dpbptr,"password",
-						&password,&dpbptr);
+				readStringFromBuffer(
+					dpbptr,"password",&password,&dpbptr);
 				break;
 
 
@@ -1389,7 +1134,8 @@ bool sqlrprotocol_firebird::attach() {
 
 			case isc_dpb_dummy_packet_interval:
 				char	*val;
-				readString(dpbptr,"val",&val,&dpbptr);
+				readStringFromBuffer(
+					dpbptr,"val",&val,&dpbptr);
 				delete[] val;
 				break;
 
@@ -1406,8 +1152,8 @@ bool sqlrprotocol_firebird::attach() {
 				break;
 
 			case isc_dpb_working_directory:
-				readString(dpbptr,"working directory",
-								&wd,&dpbptr);
+				readStringFromBuffer(
+					dpbptr,"working directory",&wd,&dpbptr);
 				break;
 
 			case isc_dpb_sql_dialect:
@@ -1602,68 +1348,28 @@ bool sqlrprotocol_firebird::genericResponse(const char *title,
 
 	debugStart("attach response");
 
+	uint32_t	byteswritten=0;
+
 	// write the opcode
-	uint32_t	opcode=op_response;
-	if (clientsock->write(opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	opcode=op_response;
+	if (!writeInt(opcode,"response op code",&byteswritten)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
+	debugOpCode("response op code",opcode);
 
 	// write the object handle
-	if (clientsock->write(objecthandle)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write object handle failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!writeInt(objecthandle,"object handle",&byteswritten)) {
 		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	object handle: %d\n",objecthandle);
 	}
 
-	if (clientsock->write(objectid)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write object id failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	// write the object id
+	if (!writeInt(objectid,"object id",&byteswritten)) {
 		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	object id: %d\n",objectid);
 	}
 
 	// write the buffer
-	if (clientsock->write(bufferlen)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	write buffer length failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+	if (!writeBuffer(buffer,bufferlen,"buffer",&byteswritten)) {
 		return false;
-	}
-	if (getDebug()) {
-		stdoutput.printf("	buffer len: %d\n",bufferlen);
-	}
-	if (clientsock->write(buffer,bufferlen)!=bufferlen) {
-		if (getDebug()) {
-			stdoutput.write("	write buffer failed\n");
-			debugSystemError();
-			debugEnd();
-		}
-		return false;
-	}
-	if (getDebug()) {
-		stdoutput.write("	buffer:\n");
-		stdoutput.printHex(buffer,bufferlen);
 	}
 
 	// write the status vector
@@ -1677,6 +1383,7 @@ bool sqlrprotocol_firebird::genericResponse(const char *title,
 			}
 			return false;
 		}
+		byteswritten+=sizeof(uint64_t);
 	}
 	if (getDebug()) {
 		debugStatusVector(statusvector,statusvectorlen);
@@ -1730,17 +1437,13 @@ bool sqlrprotocol_firebird::authenticate() {
 bool sqlrprotocol_firebird::getOpCode() {
 
 	debugStart("get op code");
-	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
-		if (getDebug()) {
-			stdoutput.write("	read op code failed\n");
-			debugSystemError();
-			debugEnd();
-		}
+
+	uint32_t	bytesread=0;
+	
+	if (!readInt(&opcode,"op code",&bytesread)) {
 		return false;
 	}
-	if (getDebug()) {
-		debugOpCode(opcode);
-	}
+	debugOpCode("op code",opcode);
 	debugEnd();
 	return true;
 }
@@ -1962,10 +1665,10 @@ void sqlrprotocol_firebird::keepReading(int32_t sec, int32_t usec) {
 	}
 }
 
-void sqlrprotocol_firebird::readString(const byte_t *in,
-					const char *name,
-					char **buf,
-					const byte_t **out) {
+void sqlrprotocol_firebird::readStringFromBuffer(const byte_t *in,
+						const char *name,
+						char **buf,
+						const byte_t **out) {
 
 	// get the length
 	byte_t	len;
@@ -1980,15 +1683,154 @@ void sqlrprotocol_firebird::readString(const byte_t *in,
 	}
 }
 
-bool sqlrprotocol_firebird::readPadding(uint32_t bytesreadin,
-					uint32_t *bytesreadout) {
+bool sqlrprotocol_firebird::readInt(uint32_t *val,
+					const char *name,
+					uint32_t *bytesread) {
+	
+	if (clientsock->read(val)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.printf("	read %s failed\n",name);
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	(*bytesread)+=sizeof(uint32_t);
+	if (getDebug()) {
+		stdoutput.printf("	%s: %d\n",name,*val);
+	}
+	return true;
+}
 
-	// initialize return value
-	*bytesreadout=bytesreadin;
+bool sqlrprotocol_firebird::readInt(uint32_t *val,
+					const char *name,
+					uint32_t expected,
+					uint32_t *bytesread) {
+
+	if (!readInt(val,name,bytesread)) {
+		return false;
+	}
+	if (*val!=expected) {
+		if (getDebug()) {
+			stdoutput.printf("	invalid %s - "
+						"got %d, expected %d\n",
+						name,*val,expected);
+			debugEnd();
+		}
+		return false;
+	}
+	return true;
+}
+
+bool sqlrprotocol_firebird::readString(char **val,
+					const char *name,
+					uint32_t *bytesread) {
+	return readString(val,NULL,name,bytesread);
+}
+
+bool sqlrprotocol_firebird::readString(char **val,
+					uint32_t *len,
+					const char *name,
+					uint32_t *bytesread) {
+
+	// read length
+	uint32_t	vallen=0;
+	if (clientsock->read(&vallen)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.printf("	read %s length failed\n",name);
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	%s length: %d\n",name,vallen);
+	}
+	(*bytesread)+=sizeof(uint32_t);
+
+	// allocate buffer
+	*val=new char[vallen+1];
+
+	// read buffer
+	if (clientsock->read(*val,vallen)!=vallen) {
+		if (getDebug()) {
+			stdoutput.printf("	read %s failed\n",name);
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	(*val)[vallen]='\0';
+	if (getDebug()) {
+		stdoutput.printf("	%s: %s\n",name,*val);
+	}
+	(*bytesread)+=vallen;
+
+	if (len) {
+		*len=vallen;
+	}
+
+	// read padding
+	return readPadding(bytesread);
+}
+
+bool sqlrprotocol_firebird::readBuffer(byte_t **val,
+					const char *name,
+					uint32_t *bytesread) {
+	return readBuffer(val,NULL,name,bytesread);
+}
+
+bool sqlrprotocol_firebird::readBuffer(byte_t **val,
+					uint32_t *len,
+					const char *name,
+					uint32_t *bytesread) {
+
+	// read length
+	uint32_t	vallen=0;
+	if (clientsock->read(&vallen)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.printf("	read %s length failed\n",name);
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	%s length: %d\n",name,vallen);
+	}
+	(*bytesread)+=sizeof(uint32_t);
+
+	// allocate buffer
+	*val=new byte_t[vallen];
+
+	// read buffer
+	if (clientsock->read(*val,vallen)!=vallen) {
+		if (getDebug()) {
+			stdoutput.printf("	read %s failed\n",name);
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	%s:\n",name);
+		stdoutput.printHex(*val,vallen);
+	}
+	(*bytesread)+=vallen;
+
+	if (len) {
+		*len=vallen;
+	}
+
+	// read padding
+	return readPadding(bytesread);
+}
+
+bool sqlrprotocol_firebird::readPadding(uint32_t *bytesread) {
 
 	// how much padding do we need to read?
 	// (pad to a 4-byte boundary)
-	uint32_t	pad=(((bytesreadin/4)+1)*4)-bytesreadin;
+	uint32_t	pad=((((*bytesread)/4)+1)*4)-(*bytesread);
 
 	// bail if we don't need to read any padding
 	if (!pad) {
@@ -2006,21 +1848,82 @@ bool sqlrprotocol_firebird::readPadding(uint32_t bytesreadin,
 			}
 			return false;
 		}
-		(*bytesreadout)++;
+		(*bytesread)++;
 	}
 	if (getDebug()) {
-		stdoutput.printf("	read %d bytes of padding\n",pad);
+		stdoutput.printf("	(%d bytes of padding)\n",pad);
 	}
 	return true;
 }
 
+bool sqlrprotocol_firebird::writeInt(uint32_t val,
+					const char *name,
+					uint32_t *byteswritten) {
+	
+	if (clientsock->write(val)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.printf("	write %s failed\n",name);
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	(*byteswritten)+=sizeof(uint32_t);
+	if (getDebug()) {
+		stdoutput.printf("	%s: %d\n",name,val);
+	}
+	return true;
+}
+
+bool sqlrprotocol_firebird::writeBuffer(byte_t *val,
+					uint32_t len,
+					const char *name,
+					uint32_t *byteswritten) {
+
+	// write length
+	if (clientsock->write(len)!=sizeof(uint32_t)) {
+		if (getDebug()) {
+			stdoutput.printf("	write %s length failed\n",name);
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	%s len: %d\n",name,len);
+	}
+
+	// write buffer
+	if (clientsock->write(val,len)!=len) {
+		if (getDebug()) {
+			stdoutput.printf("	write %s failed\n",name);
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	%s:\n",name);
+		stdoutput.printHex(val,len);
+	}
+
+	// FIXME: write padding?
+	return true;
+}
+
 void sqlrprotocol_firebird::debugSystemError() {
+	if (!getDebug()) {
+		return;
+	}
 	char	*err=error::getErrorString();
 	stdoutput.printf("%s\n",err);
 	delete[] err;
 }
 
-void sqlrprotocol_firebird::debugOpCode(uint32_t opcode) {
+void sqlrprotocol_firebird::debugOpCode(const char *name, uint32_t opcode) {
+	if (!getDebug()) {
+		return;
+	}
 	const char	*opcodestr=NULL;
 	switch (opcode) {
 		case op_connect:
@@ -2192,10 +2095,13 @@ void sqlrprotocol_firebird::debugOpCode(uint32_t opcode) {
 			opcodestr="unknown";
 			break;
 	}
-	stdoutput.printf("	op code: %d (%s)\n",opcode,opcodestr);
+	stdoutput.printf("	%s: %s\n",name,opcodestr);
 }
 
 void sqlrprotocol_firebird::debugArchType(uint32_t archtype) {
+	if (!getDebug()) {
+		return;
+	}
 	const char	*archtypestr=NULL;
 	switch (archtype) {
 		case arch_generic:
@@ -2247,10 +2153,13 @@ void sqlrprotocol_firebird::debugArchType(uint32_t archtype) {
 			archtypestr="unknown";
 			break;
 	}
-	stdoutput.printf("	arch type: %d (%s)\n",archtype,archtypestr);
+	stdoutput.printf("	arch type: %s\n",archtypestr);
 }
 
 void sqlrprotocol_firebird::debugProtocolVersion(uint32_t protoversion) {
+	if (!getDebug()) {
+		return;
+	}
 	const char	*protoversionstr=NULL;
 	switch (protoversion) {
 		case PROTOCOL_VERSION2:
@@ -2305,12 +2214,15 @@ void sqlrprotocol_firebird::debugProtocolVersion(uint32_t protoversion) {
 			protoversionstr="unknown";
 			break;
 	}
-	stdoutput.printf("	protocol version: %d (0x%04x) (%s)\n",
-				protoversion,protoversion,protoversionstr);
+	stdoutput.printf("	protocol version: 0x%04x %s\n",
+				protoversion,protoversionstr);
 }
 
 void sqlrprotocol_firebird::debugProtocolType(const char *title,
 						uint32_t protocoltype) {
+	if (!getDebug()) {
+		return;
+	}
 	const char	*protocoltypestr=NULL;
 	switch (protocoltype) {
 		case ptype_rpc:
@@ -2329,11 +2241,14 @@ void sqlrprotocol_firebird::debugProtocolType(const char *title,
 			protocoltypestr="unknown";
 			break;
 	}
-	stdoutput.printf("	%s: %d (%s)\n",
-				title,protocoltype,protocoltypestr);
+	stdoutput.printf("	%s: %s\n",
+				title,protocoltypestr);
 }
 
 void sqlrprotocol_firebird::debugDpbVersion(uint32_t dpbversion) {
+	if (!getDebug()) {
+		return;
+	}
 	const char	*dpbversionstr=NULL;
 	switch (dpbversion) {
 		case isc_dpb_version1:
@@ -2351,6 +2266,9 @@ void sqlrprotocol_firebird::debugDpbVersion(uint32_t dpbversion) {
 }
 
 void sqlrprotocol_firebird::debugDpbParam(uint32_t dpbparam) {
+	if (!getDebug()) {
+		return;
+	}
 	const char	*dpbparamstr=NULL;
 	switch (dpbparam) {
 		case isc_dpb_cdd_pathname:
@@ -2651,6 +2569,9 @@ void sqlrprotocol_firebird::debugDpbParam(uint32_t dpbparam) {
 
 void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						uint8_t statusvectorlen) {
+	if (!getDebug()) {
+		return;
+	}
 	stdoutput.write("	status vector:\n");
 	uint32_t	cluster=1;
 	uint8_t		i=0;
