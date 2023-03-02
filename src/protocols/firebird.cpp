@@ -230,11 +230,117 @@
 #define isc_dpb_decfloat_traps		95
 #define isc_dpb_clear_map		96
 
+// common structural codes
+#define isc_info_end			1
+#define isc_info_truncated		2
+#define isc_info_error			3
+#define isc_info_data_not_ready		4
+#define isc_info_length			126
+#define isc_info_flag_end		127
+
+// db information items
+#define isc_info_db_id			4
+#define isc_info_reads			5
+#define isc_info_writes			6
+#define isc_info_fetches		7
+#define isc_info_marks			8
+#define isc_info_implementation		11
+#define isc_info_isc_version		12
+#define isc_info_base_level		13
+#define isc_info_page_size		14
+#define isc_info_num_buffers		15
+#define isc_info_limbo			16
+#define isc_info_current_memory		17
+#define isc_info_max_memory		18
+#define isc_info_window_turns		19
+#define isc_info_license		20
+#define isc_info_allocation		21
+#define isc_info_attachment_id		22
+#define isc_info_read_seq_count		23
+#define isc_info_read_idx_count		24
+#define isc_info_insert_count		25
+#define isc_info_update_count		26
+#define isc_info_delete_count		27
+#define isc_info_backout_count		28
+#define isc_info_purge_count		29
+#define isc_info_expunge_count		30
+#define isc_info_sweep_interval		31
+#define isc_info_ods_version		32
+#define isc_info_ods_minor_version	33
+#define isc_info_no_reserve		34
+#define isc_info_logfile		35
+#define isc_info_cur_logfile_name	36
+#define isc_info_cur_log_part_offset	37
+#define isc_info_num_wal_buffers	38
+#define isc_info_wal_buffer_size	39
+#define isc_info_wal_ckpt_length	40
+#define isc_info_wal_cur_ckpt_interval	41
+#define isc_info_wal_prv_ckpt_fname	42
+#define isc_info_wal_prv_ckpt_poffset	43
+#define isc_info_wal_recv_ckpt_fname	44
+#define isc_info_wal_recv_ckpt_poffset	45
+#define isc_info_wal_grpc_wait_usecs	47
+#define isc_info_wal_num_io		48
+#define isc_info_wal_avg_io_size	49
+#define isc_info_wal_num_commits	50
+#define isc_info_wal_avg_grpc_size	51
+#define isc_info_forced_writes		52
+#define isc_info_user_names		53
+#define isc_info_page_errors		54
+#define isc_info_record_errors		55
+#define isc_info_bpage_errors		56
+#define isc_info_dpage_errors		57
+#define isc_info_ipage_errors		58
+#define isc_info_ppage_errors		59
+#define isc_info_tpage_errors		60
+#define isc_info_set_page_buffers	61
+#define isc_info_db_sql_dialect		62
+#define isc_info_db_read_only		63
+#define isc_info_db_size_in_pages	64
+#define frb_info_att_charset		101
+#define isc_info_db_class		102
+#define isc_info_firebird_version	103
+#define isc_info_oldest_transaction	104
+#define isc_info_oldest_active		105
+#define isc_info_oldest_snapshot	106
+#define isc_info_next_transaction	107
+#define isc_info_db_provider		108
+#define isc_info_active_transactions	109
+#define isc_info_active_tran_count	110
+#define isc_info_creation_date		111
+#define isc_info_db_file_size		112
+#define fb_info_page_contents		113
+
+// transaction parameters
+#define isc_tpb_version1                  1
+#define isc_tpb_version3                  3
+#define isc_tpb_consistency               1
+#define isc_tpb_concurrency               2
+#define isc_tpb_shared                    3
+#define isc_tpb_protected                 4
+#define isc_tpb_exclusive                 5
+#define isc_tpb_wait                      6
+#define isc_tpb_nowait                    7
+#define isc_tpb_read                      8
+#define isc_tpb_write                     9
+#define isc_tpb_lock_read                 10
+#define isc_tpb_lock_write                11
+#define isc_tpb_verb_time                 12
+#define isc_tpb_commit_time               13
+#define isc_tpb_ignore_limbo              14
+#define isc_tpb_read_committed	          15
+#define isc_tpb_autocommit                16
+#define isc_tpb_rec_version               17
+#define isc_tpb_no_rec_version            18
+#define isc_tpb_restart_requests          19
+#define isc_tpb_no_auto_undo              20
+#define isc_tpb_lock_timeout              21
+
 // free statement flags
 #define DSQL_close	1
 #define DSQL_drop	2
 
-// information items
+// sql information items
 #define isc_info_sql_select			4
 #define isc_info_sql_bind			5
 #define isc_info_sql_num_variables		6
@@ -303,17 +409,23 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 
 		bool	initialHandshake();
 		bool	connect();
-		bool	connectResponse();
 		bool	attach();
-		bool	attachResponse();
 
 		bool	genericResponse(const char *title,
 						uint32_t objecthandle,
 						uint32_t objectid,
+						const byte_t *buffer,
 						uint32_t bufferlen,
-						byte_t *buffer,
-						uint64_t *statusvector,
-						uint8_t statusvectorlen);
+						uint64_t *sv,
+						uint8_t svlen);
+		bool	genericResponse(const char *title,
+						uint32_t objecthandle,
+						uint32_t objectid,
+						bool padding,
+						const byte_t *buffer,
+						uint32_t bufferlen,
+						uint64_t *sv,
+						uint8_t svlen);
 	
 		bool	authenticate();
 
@@ -401,7 +513,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 		bool	writeInt(uint32_t val,
 					const char *name,
 					uint32_t *byteswritten);
-		bool	writeBuffer(byte_t *val,
+		bool	writeBuffer(const byte_t *val,
 					uint32_t len,
 					const char *name,
 					uint32_t *byteswritten);
@@ -412,10 +524,12 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 		void	debugProtocolVersion(uint32_t protoversion);
 		void	debugProtocolType(const char *title,
 						uint32_t protocoltype);
-		void	debugDpbVersion(uint32_t dpbversion);
-		void	debugDpbParam(uint32_t dpbparam);
-		void	debugStatusVector(uint64_t *statusvector,
-						uint8_t statusvectorlen);
+		void	debugDpbVersion(byte_t dpbversion);
+		void	debugDpbParam(byte_t dpbparam);
+		void	debugDbInfoItem(byte_t dbinfoitem);
+		void	debugTpbVersion(byte_t tpbversion);
+		void	debugTpbParam(byte_t tpbparam);
+		void	debugStatusVector(uint64_t *sv, uint8_t svlen);
 
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -424,10 +538,16 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 
 		uint32_t	opcode;
 
-		char	*db;
-		char	*username;
-		char	*password;
-		char	*wd;
+		char		*db;
+		char		*username;
+		char		*password;
+		char		*wd;
+		uint32_t	dbhandle;
+
+		uint64_t	statusvector[20];
+		uint8_t		statusvectorlen;
+
+		bytebuffer	respbuffer;
 };
 
 
@@ -456,6 +576,7 @@ void sqlrprotocol_firebird::init() {
 	username=NULL;
 	password=NULL;
 	wd=NULL;
+	dbhandle=0;
 }
 
 void sqlrprotocol_firebird::free() {
@@ -667,7 +788,7 @@ clientsessionexitstatus_t sqlrprotocol_firebird::clientSession(
 }
 
 bool sqlrprotocol_firebird::initialHandshake() {
-	return connect() && connectResponse() && attach() && attachResponse();
+	return connect() && attach();
 }
 
 bool sqlrprotocol_firebird::connect() {
@@ -787,11 +908,6 @@ bool sqlrprotocol_firebird::connect() {
 
 	// FIXME: decide which protocol to use...
 
-	return true;
-}
-
-bool sqlrprotocol_firebird::connectResponse() {
-
 	// response packet data structure:
 	//
 	// data {
@@ -818,7 +934,7 @@ bool sqlrprotocol_firebird::connectResponse() {
 	debugProtocolVersion(protoversion);
 
 	// FIXME: determine this somehow
-	uint32_t	archtype=arch_generic;
+	archtype=arch_generic;
 	if (!writeInt(archtype,"arch type",&byteswritten)) {
 		return false;
 	}
@@ -886,10 +1002,12 @@ bool sqlrprotocol_firebird::attach() {
 	const byte_t	*dpbendptr=dpb+dpblen;
 
 	// get the dpb version
-	// FIXME: do something with this...
-	byte_t		dpbversion;
-	read(dpbptr,&dpbversion,&dpbptr);
-	debugDpbVersion(dpbversion);
+	if (dpbptr) {
+		byte_t		dpbversion;
+		read(dpbptr,&dpbversion,&dpbptr);
+		debugDpbVersion(dpbversion);
+		// FIXME: do something with this...
+	}
 
 	// get each parameter...
 	while (dpbptr!=dpbendptr) {
@@ -1300,10 +1418,8 @@ bool sqlrprotocol_firebird::attach() {
 
 	debugEnd();
 
-	return true;
-}
-
-bool sqlrprotocol_firebird::attachResponse() {
+	// clean up
+	delete[] dpb;
 
 	// FIXME: object handle should be the database handle ???
 	// FIXME: no idea what the database handle is
@@ -1313,27 +1429,38 @@ bool sqlrprotocol_firebird::attachResponse() {
 	uint32_t	objectid=0;
 
 	// status vector...
-	uint64_t	statusvector[20];
 	bytestring::zero(statusvector,sizeof(statusvector));
 	// interbase error...
 	statusvector[0]=isc_arg_gds;
 	// no error...
 	statusvector[1]=0;
-	uint8_t		statusvectorlen=2;
+	statusvectorlen=2;
 
 	return genericResponse("attach response",
 				objecthandle,objectid,
-				0,NULL,
+				NULL,0,
 				statusvector,statusvectorlen);
 }
 
 bool sqlrprotocol_firebird::genericResponse(const char *title,
 						uint32_t objecthandle,
 						uint32_t objectid,
+						const byte_t *buffer,
 						uint32_t bufferlen,
-						byte_t *buffer,
-						uint64_t *statusvector,
-						uint8_t statusvectorlen) {
+						uint64_t *sv,
+						uint8_t svlen) {
+	return genericResponse(title,objecthandle,objectid,false,
+						buffer,bufferlen,sv,svlen);
+}
+
+bool sqlrprotocol_firebird::genericResponse(const char *title,
+						uint32_t objecthandle,
+						uint32_t objectid,
+						bool padding,
+						const byte_t *buffer,
+						uint32_t bufferlen,
+						uint64_t *sv,
+						uint8_t svlen) {
 
 	// response packet data structure:
 	//
@@ -1341,12 +1468,13 @@ bool sqlrprotocol_firebird::genericResponse(const char *title,
 	// 	int32_t		op_response
 	// 	int32_t		object handle
 	// 	int32_t		object id
+	// 	int32_t		padding sometimes???
 	// 	int32_t		buffer length
 	// 	byte_t[]	buffer
 	// 	byte_t[]	status vector
 	// }
 
-	debugStart("attach response");
+	debugStart(title);
 
 	uint32_t	byteswritten=0;
 
@@ -1367,14 +1495,20 @@ bool sqlrprotocol_firebird::genericResponse(const char *title,
 		return false;
 	}
 
+	if (padding) {
+		if (!writeInt(0,"padding",&byteswritten)) {
+			return false;
+		}
+	}
+
 	// write the buffer
 	if (!writeBuffer(buffer,bufferlen,"buffer",&byteswritten)) {
 		return false;
 	}
 
 	// write the status vector
-	for (uint8_t i=0; i<statusvectorlen; i++) {
-		if (clientsock->write(statusvector[i])!=sizeof(uint64_t)) {
+	for (uint8_t i=0; i<svlen; i++) {
+		if (clientsock->write(sv[i])!=sizeof(uint64_t)) {
 			if (getDebug()) {
 				stdoutput.printf("	write status "
 						"vector [%d] failed\n",i);
@@ -1386,8 +1520,9 @@ bool sqlrprotocol_firebird::genericResponse(const char *title,
 		byteswritten+=sizeof(uint64_t);
 	}
 	if (getDebug()) {
-		debugStatusVector(statusvector,statusvectorlen);
+		debugStatusVector(sv,svlen);
 	}
+	// FIXME: write padding?
 
 	debugEnd();
 
@@ -1461,7 +1596,455 @@ bool sqlrprotocol_firebird::dropDatabase() {
 }
 
 bool sqlrprotocol_firebird::infoDatabase() {
-	return false;
+
+	// request packet data structure:
+	//
+	// data {
+	// 	int32_t		db handle
+	// 	int32_t		object id
+	// 	int32_t		requested db info items length
+	// 	byte_t[]	requested db info items
+	// 	int32_t		response buffer length
+	// }
+
+	debugStart("info database");
+
+	uint32_t	bytesread=0;
+
+	// get database handle
+	uint32_t	clientdbhandle;
+	if (!readInt(&clientdbhandle,"db handle",&bytesread)) {
+		return false;
+	}
+
+	// get object id
+	uint32_t	objectid;
+	if (!readInt(&objectid,"object id",&bytesread)) {
+		return false;
+	}
+
+	// get requested db info items
+	uint32_t	dbinfolen;
+	byte_t		*dbinfo;
+	if (!readBuffer(&dbinfo,&dbinfolen,
+			"requested db info items",&bytesread)) {
+		return false;
+	}
+
+	// get response buffer length
+	uint32_t	respbufferlen;
+	if (!readInt(&respbufferlen,"response buffer length",&bytesread)) {
+		return false;
+	}
+
+	// process requested db info items
+	const byte_t	*dbinfoptr=dbinfo;
+	const byte_t	*dbinfoendptr=dbinfo+dbinfolen;
+
+	// build response buffer...
+	respbuffer.clear();
+	while (dbinfoptr!=dbinfoendptr) {
+		
+		// get the requetted db info item
+		byte_t	dbinfoitem;
+		read(dbinfoptr,&dbinfoitem,&dbinfoptr);
+		debugDbInfoItem(dbinfoitem);
+
+		// append the db info item
+		respbuffer.append(dbinfoitem);
+
+		switch (dbinfoitem) {
+			case isc_info_end:
+				// there might be multiple of these, but if we
+				// hit one of them then just append one and bail
+				dbinfoptr=dbinfoendptr;
+				break;
+
+			case isc_info_db_id:
+				// FIXME: do something
+				break;
+
+			case isc_info_reads:
+				// FIXME: do something
+				break;
+
+			case isc_info_writes:
+				// FIXME: do something
+				break;
+
+			case isc_info_fetches:
+				// FIXME: do something
+				break;
+
+			case isc_info_marks:
+				// FIXME: do something
+				break;
+
+			case isc_info_implementation:
+				// FIXME: do something
+				break;
+
+			case isc_info_isc_version:
+				// FIXME: do something
+				break;
+
+			case isc_info_base_level:
+				// FIXME: do something
+				break;
+
+			case isc_info_page_size:
+				// FIXME: do something
+				break;
+
+			case isc_info_num_buffers:
+				// FIXME: do something
+				break;
+
+			case isc_info_limbo:
+				// FIXME: do something
+				break;
+
+			case isc_info_current_memory:
+				// FIXME: do something
+				break;
+
+			case isc_info_max_memory:
+				// FIXME: do something
+				break;
+
+			case isc_info_window_turns:
+				// FIXME: do something
+				break;
+
+			case isc_info_license:
+				// FIXME: do something
+				break;
+
+			case isc_info_allocation:
+				// FIXME: do something
+				break;
+
+			case isc_info_attachment_id:
+				// FIXME: do something
+				break;
+
+			case isc_info_read_seq_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_read_idx_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_insert_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_update_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_delete_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_backout_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_purge_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_expunge_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_sweep_interval:
+				// FIXME: do something
+				break;
+
+			case isc_info_ods_version:
+				respbuffer.append((byte_t)4);
+				// FIXME: ???
+				respbuffer.append((byte_t)0);
+				// FIXME: ???
+				respbuffer.append((byte_t)0x0c);
+				respbuffer.append((byte_t)0);
+				respbuffer.append((byte_t)0);
+				respbuffer.append((byte_t)0);
+				break;
+
+			case isc_info_ods_minor_version:
+				respbuffer.append((byte_t)4);
+				// FIXME: ???
+				respbuffer.append((byte_t)0);
+				// FIXME: ???
+				respbuffer.append((byte_t)0);
+				respbuffer.append((byte_t)0);
+				respbuffer.append((byte_t)0);
+				respbuffer.append((byte_t)0);
+				break;
+
+			case isc_info_no_reserve:
+				// FIXME: do something
+				break;
+
+			case isc_info_logfile:
+				// FIXME: do something
+				break;
+
+			case isc_info_cur_logfile_name:
+				// FIXME: do something
+				break;
+
+			case isc_info_cur_log_part_offset:
+				// FIXME: do something
+				break;
+
+			case isc_info_num_wal_buffers:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_buffer_size:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_ckpt_length:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_cur_ckpt_interval:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_prv_ckpt_fname:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_prv_ckpt_poffset:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_recv_ckpt_fname:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_recv_ckpt_poffset:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_grpc_wait_usecs:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_num_io:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_avg_io_size:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_num_commits:
+				// FIXME: do something
+				break;
+
+			case isc_info_wal_avg_grpc_size:
+				// FIXME: do something
+				break;
+
+			case isc_info_forced_writes:
+				// FIXME: do something
+				break;
+
+			case isc_info_user_names:
+				// FIXME: do something
+				break;
+
+			case isc_info_page_errors:
+				// FIXME: do something
+				break;
+
+			case isc_info_record_errors:
+				// FIXME: do something
+				break;
+
+			case isc_info_bpage_errors:
+				// FIXME: do something
+				break;
+
+			case isc_info_dpage_errors:
+				// FIXME: do something
+				break;
+
+			case isc_info_ipage_errors:
+				// FIXME: do something
+				break;
+
+			case isc_info_ppage_errors:
+				// FIXME: do something
+				break;
+
+			case isc_info_tpage_errors:
+				// FIXME: do something
+				break;
+
+			case isc_info_set_page_buffers:
+				// FIXME: do something
+				break;
+
+			case isc_info_db_sql_dialect:
+				respbuffer.append((byte_t)1);
+				// FIXME: ???
+				respbuffer.append((byte_t)0);
+				// FIXME: ???
+				respbuffer.append((byte_t)3);
+				break;
+
+			case isc_info_db_read_only:
+				// FIXME: do something
+				break;
+
+			case isc_info_db_size_in_pages:
+				// FIXME: do something
+				break;
+
+			case frb_info_att_charset:
+				// FIXME: do something
+				break;
+
+			case isc_info_db_class:
+				// FIXME: do something
+				break;
+
+			case isc_info_firebird_version:
+				// FIXME: do something
+				break;
+
+			case isc_info_oldest_transaction:
+				// FIXME: do something
+				break;
+
+			case isc_info_oldest_active:
+				// FIXME: do something
+				break;
+
+			case isc_info_oldest_snapshot:
+				// FIXME: do something
+				break;
+
+			case isc_info_next_transaction:
+				// FIXME: do something
+				break;
+
+			case isc_info_db_provider:
+				// FIXME: do something
+				break;
+
+			case isc_info_active_transactions:
+				// FIXME: do something
+				break;
+
+			case isc_info_active_tran_count:
+				// FIXME: do something
+				break;
+
+			case isc_info_creation_date:
+				// FIXME: do something
+				break;
+
+			case isc_info_db_file_size:
+				// FIXME: do something
+				break;
+
+			case fb_info_page_contents:
+				// FIXME: do something
+				break;
+
+			default:
+				// FIXME: do something
+				break;
+		}
+	}
+
+	// FIXME: handle cases where
+	// respbuffer.getSize() > response buffer length
+
+	debugEnd();
+
+	// clean up
+	delete[] dbinfo;
+
+	// response packet data structure:
+	//
+	// data {
+	// 	int32_t		op_response
+	// 	int32_t		object handle
+	// 	int32_t		object id
+	// 	int32_t		padding???
+	// 	int32_t		response buffer length
+	// 	byte_t[]	response buffer
+	// 	byte_t		1 ???
+	// 	int32_t		0 ???
+	// 	byte_t		1 ???
+	// 	int32_t		0 ???
+	// }
+
+	debugStart("info database response");
+
+	uint32_t	byteswritten=0;
+
+	// write the opcode
+	opcode=op_response;
+	if (!writeInt(opcode,"response op code",&byteswritten)) {
+		return false;
+	}
+	debugOpCode("response op code",opcode);
+
+	// write the db handle
+	if (!writeInt(dbhandle,"db handle",&byteswritten)) {
+		return false;
+	}
+
+	// write the object id
+	if (!writeInt(objectid,"object id",&byteswritten)) {
+		return false;
+	}
+
+	// write the padding, or whatever this is
+	if (!writeInt(0,"padding",&byteswritten)) {
+		return false;
+	}
+
+	// write the response buffer
+	if (!writeBuffer(respbuffer.getBuffer(),
+				respbuffer.getSize(),
+				"response buffer",
+				&byteswritten)) {
+		return false;
+	}
+
+	// write whatever this is
+	byte_t	trailer[]={0,0,0,0,1,0,0,0,0,0,0,0,0};
+	if (!clientsock->write(trailer,sizeof(trailer))) {
+		if (getDebug()) {
+			stdoutput.write("	write trailer failed\n");
+			debugSystemError();
+			debugEnd();
+		}
+		return false;
+	}
+	if (getDebug()) {
+		stdoutput.write("	trailer:\n");
+		stdoutput.printHex(trailer,sizeof(trailer));
+	}
+
+	debugEnd();
+
+	clientsock->flushWriteBuffer(-1,-1);
+
+	return true;
 }
 
 bool sqlrprotocol_firebird::disconnect() {
@@ -1476,7 +2059,167 @@ bool sqlrprotocol_firebird::disconnect() {
 }
 
 bool sqlrprotocol_firebird::transaction() {
-	return false;
+
+	// request packet data structure:
+	//
+	// data {
+	// 	int32_t		db handle
+	// 	int32_t		tx parameters buffer length
+	// 	byte_t[]	tx parameters buffer
+	// }
+
+	debugStart("transaction");
+
+	uint32_t	bytesread=0;
+
+	// get database handle
+	uint32_t	clientdbhandle;
+	if (!readInt(&clientdbhandle,"db handle",&bytesread)) {
+		return false;
+	}
+
+	// get tx parameters buffer
+	uint32_t	tpblen;
+	byte_t		*tpb;
+	if (!readBuffer(&tpb,&tpblen,"tx param buffer",&bytesread)) {
+		return false;
+	}
+
+	// process tx parameters buffer...
+	const byte_t	*tpbptr=tpb;
+	const byte_t	*tpbendptr=tpb+tpblen;
+
+	// get the tpb version
+	if (tpbptr) {
+		byte_t		tpbversion;
+		read(tpbptr,&tpbversion,&tpbptr);
+		debugTpbVersion(tpbversion);
+		// FIXME: do something with this...
+	}
+
+	// get each parameter...
+	while (tpbptr!=tpbendptr) {
+		
+		// get the parameter
+		byte_t	tpbparam;
+		read(tpbptr,&tpbparam,&tpbptr);
+		debugTpbParam(tpbparam);
+
+		// process the parameter...
+		switch (tpbparam) {
+			case isc_tpb_consistency:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_concurrency:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_shared:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_protected:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_exclusive:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_wait:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_nowait:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_read:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_write:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_lock_read:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_lock_write:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_verb_time:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_commit_time:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_ignore_limbo:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_read_committed:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_autocommit:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_rec_version:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_no_rec_version:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_restart_requests:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_no_auto_undo:
+				// FIXME: do something
+				break;
+
+			case isc_tpb_lock_timeout:
+				// FIXME: do something
+				break;
+
+			default:
+				// FIXME: do something
+				break;
+		}
+	}
+
+	debugEnd();
+
+	// clean up
+	delete[] tpb;
+
+	// increment the dbhandle, apparently???
+	dbhandle++;
+
+	// FIXME: object id should be the transaction handle???
+	uint32_t	objectid=0;
+
+	// status vector...
+	bytestring::zero(statusvector,sizeof(statusvector));
+	// interbase error...
+	statusvector[0]=isc_arg_gds;
+	// no error...
+	statusvector[1]=0;
+	statusvectorlen=2;
+
+	return genericResponse("transaction response",
+				dbhandle,objectid,
+				NULL,0,
+				statusvector,statusvectorlen);
 }
 
 bool sqlrprotocol_firebird::commit() {
@@ -1748,23 +2491,29 @@ bool sqlrprotocol_firebird::readString(char **val,
 	}
 	(*bytesread)+=sizeof(uint32_t);
 
-	// allocate buffer
-	*val=new char[vallen+1];
+	// init buffer
+	*val=NULL;
 
-	// read buffer
-	if (clientsock->read(*val,vallen)!=vallen) {
-		if (getDebug()) {
-			stdoutput.printf("	read %s failed\n",name);
-			debugSystemError();
-			debugEnd();
+	if (vallen) {
+
+		// allocate buffer
+		*val=new char[vallen+1];
+
+		// read buffer
+		if (clientsock->read(*val,vallen)!=vallen) {
+			if (getDebug()) {
+				stdoutput.printf("	read %s failed\n",name);
+				debugSystemError();
+				debugEnd();
+			}
+			return false;
 		}
-		return false;
+		(*val)[vallen]='\0';
+		if (getDebug()) {
+			stdoutput.printf("	%s: %s\n",name,*val);
+		}
+		(*bytesread)+=vallen;
 	}
-	(*val)[vallen]='\0';
-	if (getDebug()) {
-		stdoutput.printf("	%s: %s\n",name,*val);
-	}
-	(*bytesread)+=vallen;
 
 	if (len) {
 		*len=vallen;
@@ -1800,23 +2549,29 @@ bool sqlrprotocol_firebird::readBuffer(byte_t **val,
 	}
 	(*bytesread)+=sizeof(uint32_t);
 
-	// allocate buffer
-	*val=new byte_t[vallen];
+	// init buffer
+	*val=NULL;
 
-	// read buffer
-	if (clientsock->read(*val,vallen)!=vallen) {
-		if (getDebug()) {
-			stdoutput.printf("	read %s failed\n",name);
-			debugSystemError();
-			debugEnd();
+	if (vallen) {
+
+		// allocate buffer
+		*val=new byte_t[vallen];
+
+		// read buffer
+		if (clientsock->read(*val,vallen)!=vallen) {
+			if (getDebug()) {
+				stdoutput.printf("	read %s failed\n",name);
+				debugSystemError();
+				debugEnd();
+			}
+			return false;
 		}
-		return false;
+		if (getDebug()) {
+			stdoutput.printf("	%s:\n",name);
+			stdoutput.printHex(*val,vallen);
+		}
+		(*bytesread)+=vallen;
 	}
-	if (getDebug()) {
-		stdoutput.printf("	%s:\n",name);
-		stdoutput.printHex(*val,vallen);
-	}
-	(*bytesread)+=vallen;
 
 	if (len) {
 		*len=vallen;
@@ -1827,6 +2582,14 @@ bool sqlrprotocol_firebird::readBuffer(byte_t **val,
 }
 
 bool sqlrprotocol_firebird::readPadding(uint32_t *bytesread) {
+
+	// handle degenerate case
+	if (!(*bytesread%4)) {
+		if (getDebug()) {
+			stdoutput.write("	(0 bytes of padding)\n");
+		}
+		return true;
+	}
 
 	// how much padding do we need to read?
 	// (pad to a 4-byte boundary)
@@ -1875,7 +2638,7 @@ bool sqlrprotocol_firebird::writeInt(uint32_t val,
 	return true;
 }
 
-bool sqlrprotocol_firebird::writeBuffer(byte_t *val,
+bool sqlrprotocol_firebird::writeBuffer(const byte_t *val,
 					uint32_t len,
 					const char *name,
 					uint32_t *byteswritten) {
@@ -2095,7 +2858,7 @@ void sqlrprotocol_firebird::debugOpCode(const char *name, uint32_t opcode) {
 			opcodestr="unknown";
 			break;
 	}
-	stdoutput.printf("	%s: %s\n",name,opcodestr);
+	stdoutput.printf("	%s: 0x%02x %s\n",name,opcode,opcodestr);
 }
 
 void sqlrprotocol_firebird::debugArchType(uint32_t archtype) {
@@ -2245,7 +3008,7 @@ void sqlrprotocol_firebird::debugProtocolType(const char *title,
 				title,protocoltypestr);
 }
 
-void sqlrprotocol_firebird::debugDpbVersion(uint32_t dpbversion) {
+void sqlrprotocol_firebird::debugDpbVersion(byte_t dpbversion) {
 	if (!getDebug()) {
 		return;
 	}
@@ -2265,7 +3028,7 @@ void sqlrprotocol_firebird::debugDpbVersion(uint32_t dpbversion) {
 				dpbversion,dpbversionstr);
 }
 
-void sqlrprotocol_firebird::debugDpbParam(uint32_t dpbparam) {
+void sqlrprotocol_firebird::debugDpbParam(byte_t dpbparam) {
 	if (!getDebug()) {
 		return;
 	}
@@ -2567,17 +3330,343 @@ void sqlrprotocol_firebird::debugDpbParam(uint32_t dpbparam) {
 				dpbparam,dpbparam,dpbparamstr);
 }
 
-void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
-						uint8_t statusvectorlen) {
+void sqlrprotocol_firebird::debugDbInfoItem(byte_t dbinfoitem) {
+	if (!getDebug()) {
+		return;
+	}
+	const char	*dbinfoitemstr=NULL;
+	switch (dbinfoitem) {
+		case isc_info_end:
+			dbinfoitemstr="isc_info_end";
+			break;
+		case isc_info_db_id:
+			dbinfoitemstr="isc_info_db_id";
+			break;
+		case isc_info_reads:
+			dbinfoitemstr="isc_info_reads";
+			break;
+		case isc_info_writes:
+			dbinfoitemstr="isc_info_writes";
+			break;
+		case isc_info_fetches:
+			dbinfoitemstr="isc_info_fetches";
+			break;
+		case isc_info_marks:
+			dbinfoitemstr="isc_info_marks";
+			break;
+		case isc_info_implementation:
+			dbinfoitemstr="isc_info_implementation";
+			break;
+		case isc_info_isc_version:
+			dbinfoitemstr="isc_info_isc_version";
+			break;
+		case isc_info_base_level:
+			dbinfoitemstr="isc_info_base_level";
+			break;
+		case isc_info_page_size:
+			dbinfoitemstr="isc_info_page_size";
+			break;
+		case isc_info_num_buffers:
+			dbinfoitemstr="isc_info_num_buffers";
+			break;
+		case isc_info_limbo:
+			dbinfoitemstr="isc_info_limbo";
+			break;
+		case isc_info_current_memory:
+			dbinfoitemstr="isc_info_current_memory";
+			break;
+		case isc_info_max_memory:
+			dbinfoitemstr="isc_info_max_memory";
+			break;
+		case isc_info_window_turns:
+			dbinfoitemstr="isc_info_window_turns";
+			break;
+		case isc_info_license:
+			dbinfoitemstr="isc_info_license";
+			break;
+		case isc_info_allocation:
+			dbinfoitemstr="isc_info_allocation";
+			break;
+		case isc_info_attachment_id:
+			dbinfoitemstr="isc_info_attachment_id";
+			break;
+		case isc_info_read_seq_count:
+			dbinfoitemstr="isc_info_read_seq_count";
+			break;
+		case isc_info_read_idx_count:
+			dbinfoitemstr="isc_info_read_idx_count";
+			break;
+		case isc_info_insert_count:
+			dbinfoitemstr="isc_info_insert_count";
+			break;
+		case isc_info_update_count:
+			dbinfoitemstr="isc_info_update_count";
+			break;
+		case isc_info_delete_count:
+			dbinfoitemstr="isc_info_delete_count";
+			break;
+		case isc_info_backout_count:
+			dbinfoitemstr="isc_info_backout_count";
+			break;
+		case isc_info_purge_count:
+			dbinfoitemstr="isc_info_purge_count";
+			break;
+		case isc_info_expunge_count:
+			dbinfoitemstr="isc_info_expunge_count";
+			break;
+		case isc_info_sweep_interval:
+			dbinfoitemstr="isc_info_sweep_interval";
+			break;
+		case isc_info_ods_version:
+			dbinfoitemstr="isc_info_ods_version";
+			break;
+		case isc_info_ods_minor_version:
+			dbinfoitemstr="isc_info_ods_minor_version";
+			break;
+		case isc_info_no_reserve:
+			dbinfoitemstr="isc_info_no_reserve";
+			break;
+		case isc_info_logfile:
+			dbinfoitemstr="isc_info_logfile";
+			break;
+		case isc_info_cur_logfile_name:
+			dbinfoitemstr="isc_info_cur_logfile_name";
+			break;
+		case isc_info_cur_log_part_offset:
+			dbinfoitemstr="isc_info_cur_log_part_offset";
+			break;
+		case isc_info_num_wal_buffers:
+			dbinfoitemstr="isc_info_num_wal_buffers";
+			break;
+		case isc_info_wal_buffer_size:
+			dbinfoitemstr="isc_info_wal_buffer_size";
+			break;
+		case isc_info_wal_ckpt_length:
+			dbinfoitemstr="isc_info_wal_ckpt_length";
+			break;
+		case isc_info_wal_cur_ckpt_interval:
+			dbinfoitemstr="isc_info_wal_cur_ckpt_interval";
+			break;
+		case isc_info_wal_prv_ckpt_fname:
+			dbinfoitemstr="isc_info_wal_prv_ckpt_fname";
+			break;
+		case isc_info_wal_prv_ckpt_poffset:
+			dbinfoitemstr="isc_info_wal_prv_ckpt_poffset";
+			break;
+		case isc_info_wal_recv_ckpt_fname:
+			dbinfoitemstr="isc_info_wal_recv_ckpt_fname";
+			break;
+		case isc_info_wal_recv_ckpt_poffset:
+			dbinfoitemstr="isc_info_wal_recv_ckpt_poffset";
+			break;
+		case isc_info_wal_grpc_wait_usecs:
+			dbinfoitemstr="isc_info_wal_grpc_wait_usecs";
+			break;
+		case isc_info_wal_num_io:
+			dbinfoitemstr="isc_info_wal_num_io";
+			break;
+		case isc_info_wal_avg_io_size:
+			dbinfoitemstr="isc_info_wal_avg_io_size";
+			break;
+		case isc_info_wal_num_commits:
+			dbinfoitemstr="isc_info_wal_num_commits";
+			break;
+		case isc_info_wal_avg_grpc_size:
+			dbinfoitemstr="isc_info_wal_avg_grpc_size";
+			break;
+		case isc_info_forced_writes:
+			dbinfoitemstr="isc_info_forced_writes";
+			break;
+		case isc_info_user_names:
+			dbinfoitemstr="isc_info_user_names";
+			break;
+		case isc_info_page_errors:
+			dbinfoitemstr="isc_info_page_errors";
+			break;
+		case isc_info_record_errors:
+			dbinfoitemstr="isc_info_record_errors";
+			break;
+		case isc_info_bpage_errors:
+			dbinfoitemstr="isc_info_bpage_errors";
+			break;
+		case isc_info_dpage_errors:
+			dbinfoitemstr="isc_info_dpage_errors";
+			break;
+		case isc_info_ipage_errors:
+			dbinfoitemstr="isc_info_ipage_errors";
+			break;
+		case isc_info_ppage_errors:
+			dbinfoitemstr="isc_info_ppage_errors";
+			break;
+		case isc_info_tpage_errors:
+			dbinfoitemstr="isc_info_tpage_errors";
+			break;
+		case isc_info_set_page_buffers:
+			dbinfoitemstr="isc_info_set_page_buffers";
+			break;
+		case isc_info_db_sql_dialect:
+			dbinfoitemstr="isc_info_db_sql_dialect";
+			break;
+		case isc_info_db_read_only:
+			dbinfoitemstr="isc_info_db_read_only";
+			break;
+		case isc_info_db_size_in_pages:
+			dbinfoitemstr="isc_info_db_size_in_pages";
+			break;
+		case frb_info_att_charset:
+			dbinfoitemstr="frb_info_att_charset";
+			break;
+		case isc_info_db_class:
+			dbinfoitemstr="isc_info_db_class";
+			break;
+		case isc_info_firebird_version:
+			dbinfoitemstr="isc_info_firebird_version";
+			break;
+		case isc_info_oldest_transaction:
+			dbinfoitemstr="isc_info_oldest_transaction";
+			break;
+		case isc_info_oldest_active:
+			dbinfoitemstr="isc_info_oldest_active";
+			break;
+		case isc_info_oldest_snapshot:
+			dbinfoitemstr="isc_info_oldest_snapshot";
+			break;
+		case isc_info_next_transaction:
+			dbinfoitemstr="isc_info_next_transaction";
+			break;
+		case isc_info_db_provider:
+			dbinfoitemstr="isc_info_db_provider";
+			break;
+		case isc_info_active_transactions:
+			dbinfoitemstr="isc_info_active_transactions";
+			break;
+		case isc_info_active_tran_count:
+			dbinfoitemstr="isc_info_active_tran_count";
+			break;
+		case isc_info_creation_date:
+			dbinfoitemstr="isc_info_creation_date";
+			break;
+		case isc_info_db_file_size:
+			dbinfoitemstr="isc_info_db_file_size";
+			break;
+		case fb_info_page_contents:
+			dbinfoitemstr="fb_info_page_contents";
+			break;
+		default:
+			dbinfoitemstr="unknown";
+			break;
+	}
+	stdoutput.printf("	info item: %d (0x%02x) (%s)\n",
+				dbinfoitem,dbinfoitem,dbinfoitemstr);
+}
+
+void sqlrprotocol_firebird::debugTpbVersion(byte_t tpbversion) {
+	if (!getDebug()) {
+		return;
+	}
+	const char	*tpbversionstr=NULL;
+	switch (tpbversion) {
+		case isc_tpb_version1:
+			tpbversionstr="isc_tpb_version1";
+			break;
+		case isc_tpb_version3:
+			tpbversionstr="isc_tpb_version3";
+			break;
+		default:
+			tpbversionstr="unknown";
+			break;
+	}
+	stdoutput.printf("	tpb version: %d (%s)\n",
+				tpbversion,tpbversionstr);
+}
+
+void sqlrprotocol_firebird::debugTpbParam(byte_t tpbparam) {
+	if (!getDebug()) {
+		return;
+	}
+	const char	*tpbparamstr=NULL;
+	switch (tpbparam) {
+		case isc_tpb_consistency:
+			tpbparamstr="isc_tpb_consistency";
+			break;
+		case isc_tpb_concurrency:
+			tpbparamstr="isc_tpb_concurrency";
+			break;
+		case isc_tpb_shared:
+			tpbparamstr="isc_tpb_shared";
+			break;
+		case isc_tpb_protected:
+			tpbparamstr="isc_tpb_protected";
+			break;
+		case isc_tpb_exclusive:
+			tpbparamstr="isc_tpb_exclusive";
+			break;
+		case isc_tpb_wait:
+			tpbparamstr="isc_tpb_wait";
+			break;
+		case isc_tpb_nowait:
+			tpbparamstr="isc_tpb_nowait";
+			break;
+		case isc_tpb_read:
+			tpbparamstr="isc_tpb_read";
+			break;
+		case isc_tpb_write:
+			tpbparamstr="isc_tpb_write";
+			break;
+		case isc_tpb_lock_read:
+			tpbparamstr="isc_tpb_lock_read";
+			break;
+		case isc_tpb_lock_write:
+			tpbparamstr="isc_tpb_lock_write";
+			break;
+		case isc_tpb_verb_time:
+			tpbparamstr="isc_tpb_verb_time";
+			break;
+		case isc_tpb_commit_time:
+			tpbparamstr="isc_tpb_commit_time";
+			break;
+		case isc_tpb_ignore_limbo:
+			tpbparamstr="isc_tpb_ignore_limbo";
+			break;
+		case isc_tpb_read_committed:
+			tpbparamstr="isc_tpb_read_committed";
+			break;
+		case isc_tpb_autocommit:
+			tpbparamstr="isc_tpb_autocommit";
+			break;
+		case isc_tpb_rec_version:
+			tpbparamstr="isc_tpb_rec_version";
+			break;
+		case isc_tpb_no_rec_version:
+			tpbparamstr="isc_tpb_no_rec_version";
+			break;
+		case isc_tpb_restart_requests:
+			tpbparamstr="isc_tpb_restart_requests";
+			break;
+		case isc_tpb_no_auto_undo:
+			tpbparamstr="isc_tpb_no_auto_undo";
+			break;
+		case isc_tpb_lock_timeout:
+			tpbparamstr="isc_tpb_lock_timeout";
+			break;
+		default:
+			tpbparamstr="unknown";
+			break;
+	}
+	stdoutput.printf("	tpb param: %d (0x%02x) (%s)\n",
+				tpbparam,tpbparam,tpbparamstr);
+}
+
+void sqlrprotocol_firebird::debugStatusVector(uint64_t *sv, uint8_t svlen) {
 	if (!getDebug()) {
 		return;
 	}
 	stdoutput.write("	status vector:\n");
 	uint32_t	cluster=1;
 	uint8_t		i=0;
-	while (i<statusvectorlen) {
+	while (i<svlen) {
 		stdoutput.printf("		cluster %d:\n",cluster);
-		switch (statusvector[i]) {
+		switch (sv[i]) {
 			case isc_arg_end:
 				stdoutput.write("			"
 						"code: isc_arg_end\n");
@@ -2588,8 +3677,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_gds\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_string:
@@ -2597,8 +3685,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_string\n");
 				i++;
 				stdoutput.printf("			"
-						"address: %lld\n",
-						statusvector[i]);
+						"address: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_cstring:
@@ -2606,12 +3693,10 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_cstring\n");
 				i++;
 				stdoutput.printf("			"
-						"length: %lld\n",
-						statusvector[i]);
+						"length: %lld\n",sv[i]);
 				i++;
 				stdoutput.printf("			"
-						"address: %lld\n",
-						statusvector[i]);
+						"address: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_number:
@@ -2619,8 +3704,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_number\n");
 				i++;
 				stdoutput.printf("			"
-						"number: %lld\n",
-						statusvector[i]);
+						"number: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_interpreted:
@@ -2628,8 +3712,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_interpreted\n");
 				i++;
 				stdoutput.printf("			"
-						"address: %lld\n",
-						statusvector[i]);
+						"address: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_vms:
@@ -2637,8 +3720,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_vms\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_unix:
@@ -2646,8 +3728,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_unix\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_domain:
@@ -2655,8 +3736,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_domain\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_dos:
@@ -2664,8 +3744,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_dos\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_mpexl:
@@ -2673,8 +3752,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_mpexl\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_mpexl_ipc:
@@ -2682,8 +3760,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_mpexl_ipc\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_mach:
@@ -2691,8 +3768,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_mach\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_netware:
@@ -2700,8 +3776,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_netware\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_win32:
@@ -2709,8 +3784,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_win32\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_warning:
@@ -2718,8 +3792,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_warning\n");
 				i++;
 				stdoutput.printf("			"
-						"warning: %lld\n",
-						statusvector[i]);
+						"warning: %lld\n",sv[i]);
 				i++;
 				break;
 			case isc_arg_sql_state:
@@ -2727,8 +3800,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: isc_arg_sql_state\n");
 				i++;
 				stdoutput.printf("			"
-						"sql state: %lld\n",
-						statusvector[i]);
+						"sql state: %lld\n",sv[i]);
 				i++;
 				break;
 			default:
@@ -2736,14 +3808,12 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
 						"code: unknown\n");
 				i++;
 				stdoutput.printf("			"
-						"error: %lld\n",
-						statusvector[i]);
+						"error: %lld\n",sv[i]);
 				i++;
 				break;
 		}
 		cluster++;
 	}
-	stdoutput.printf("\n");
 }
 
 extern "C" {
