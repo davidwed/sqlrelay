@@ -45,6 +45,7 @@
 #define op_close_blob		39
 #define op_get_slice		58
 #define op_put_slice		59
+#define op_cancel		91
 #define op_batch_create		99
 #define op_batch_msg		100
 #define op_batch_exec		101
@@ -89,26 +90,44 @@
 #define arch_arm		43
 
 // protocol versions
+#define PROTOCOL_VERSION2	2
+#define PROTOCOL_VERSION3	3
+// 4 supports server management functions
+#define PROTOCOL_VERSION4	4
+// 5 supports d_float data type
+#define PROTOCOL_VERSION5	5
+// 6 supports cancel remote events, blob seek, and unknown message type
+#define PROTOCOL_VERSION6	6
+// 7 supports dsql
+#define PROTOCOL_VERSION7	7
+// 8 supports includes collapsing first receive into a send, drop db,
+// DSQL execute 2, DSQL execute immediate 2, DSQL insert, services, and
+// transact request
+#define PROTOCOL_VERSION8	8
+// 9 includes support for SPX32
+#define PROTOCOL_VERSION9	9
 // 10 supports warnings, removes requirement for encoding/decoding status codes
 #define PROTOCOL_VERSION10	10
 // 11 supports user-auth-related operations
-#define PROTOCOL_VERSION11	(0x8000|11)
+#define PROTOCOL_VERSION11	(0xffff8000|11)
 // 12 supports asynchronous calls
-#define PROTOCOL_VERSION12	(0x8000|12)
+#define PROTOCOL_VERSION12	(0xffff8000|12)
 // 13 supports auth plugins
-#define PROTOCOL_VERSION13	(0x8000|13)
+#define PROTOCOL_VERSION13	(0xffff8000|13)
 // 14 bug-fix
-#define PROTOCOL_VERSION14	(0x8000|14)
+#define PROTOCOL_VERSION14	(0xffff8000|14)
 // 15 supports crypt key callback during connect
-#define PROTOCOL_VERSION15	(0x8000|15)
+#define PROTOCOL_VERSION15	(0xffff8000|15)
 // 16 supports statement timeouts
-#define PROTOCOL_VERSION16	(0x8000|16)
+#define PROTOCOL_VERSION16	(0xffff8000|16)
 // 17 supports op_batch_sync, op_batch_info
-#define PROTOCOL_VERSION17	(0x8000|17)
+#define PROTOCOL_VERSION17	(0xffff8000|17)
 
 // ptype codes
 #define ptype_rpc		2
 #define ptype_batch_send	3
+#define ptype_out_of_band	4
+#define ptype_lazy_send		5
 
 // database parameters
 #define isc_dpb_version1		1
@@ -246,6 +265,25 @@
 #define isc_info_sql_exec_path_blr_bytes	31
 #define isc_info_sql_exec_path_blr_text		32
 
+// status vector items
+#define isc_arg_end		0
+#define isc_arg_gds		1
+#define isc_arg_string		2
+#define isc_arg_cstring		3
+#define isc_arg_number		4
+#define isc_arg_interpreted	5
+#define isc_arg_vms		6
+#define isc_arg_unix		7
+#define isc_arg_domain		8
+#define isc_arg_dos		9
+#define isc_arg_mpexl		10
+#define isc_arg_mpexl_ipc	11
+#define isc_arg_mach		15
+#define isc_arg_netware		16
+#define isc_arg_win32		17
+#define isc_arg_warning		18
+#define isc_arg_sql_state	19
+
 // connection type
 #define P_REQ_async	1
 
@@ -274,7 +312,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 						uint32_t objectid,
 						uint32_t bufferlen,
 						byte_t *buffer,
-						byte_t *statusvector);
+						uint64_t *statusvector,
+						uint8_t statusvectorlen);
 	
 		bool	authenticate();
 
@@ -310,6 +349,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 		bool	closeBlob();
 		bool	getSlice();
 		bool	putSlice();
+		bool	cancel();
 		bool	batchCreate();
 		bool	batchMsg();
 		bool	batchExec();
@@ -335,6 +375,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 					char **buf,
 					const byte_t **out);
 
+		bool	readPadding(uint32_t bytesreadin,
+					uint32_t *bytesreadout);
+
 		void	debugSystemError();
 		void	debugOpCode(uint32_t opcode);
 		void	debugArchType(uint32_t archtype);
@@ -343,6 +386,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 						uint32_t protocoltype);
 		void	debugDpbVersion(uint32_t dpbversion);
 		void	debugDpbParam(uint32_t dpbparam);
+		void	debugStatusVector(uint64_t *statusvector,
+						uint8_t statusvectorlen);
 
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
@@ -351,6 +396,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 
 		uint32_t	opcode;
 
+		char	*db;
 		char	*username;
 		char	*password;
 		char	*wd;
@@ -378,12 +424,14 @@ sqlrprotocol_firebird::~sqlrprotocol_firebird() {
 }
 
 void sqlrprotocol_firebird::init() {
+	db=NULL;
 	username=NULL;
 	password=NULL;
 	wd=NULL;
 }
 
 void sqlrprotocol_firebird::free() {
+	delete[] db;
 	delete[] username;
 	delete[] password;
 	delete[] wd;
@@ -519,6 +567,9 @@ clientsessionexitstatus_t sqlrprotocol_firebird::clientSession(
 				case op_put_slice:
 					loop=putSlice();
 					break;
+				case op_cancel:
+					loop=cancel();
+					break;
 				case op_batch_create:
 					loop=batchCreate();
 					break;
@@ -617,6 +668,8 @@ bool sqlrprotocol_firebird::connect() {
 
 	debugStart("connect");
 
+	uint32_t	bytesread=0;
+
 	// get op_connect
 	uint32_t	opcode=0;
 	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
@@ -639,6 +692,7 @@ bool sqlrprotocol_firebird::connect() {
 		}
 		return false;
 	}
+	bytesread+=sizeof(uint32_t);
 
 	// get op_attach
 	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
@@ -661,6 +715,7 @@ bool sqlrprotocol_firebird::connect() {
 		}
 		return false;
 	}
+	bytesread+=sizeof(uint32_t);
 
 	// get connect version
 	uint32_t	connectversion=0;
@@ -675,14 +730,7 @@ bool sqlrprotocol_firebird::connect() {
 	if (getDebug()) {
 		stdoutput.printf("	connect version: %d\n",connectversion);
 	}
-
-	if (connectversion==2) {
-		// ...
-	} else if (connectversion==3) {
-		// ...
-	} else {
-		// FIXME: not supported
-	}
+	bytesread+=sizeof(uint32_t);
 
 	// get arch type
 	uint32_t	archtype=0;
@@ -697,6 +745,7 @@ bool sqlrprotocol_firebird::connect() {
 	if (getDebug()) {
 		debugArchType(archtype);
 	}
+	bytesread+=sizeof(uint32_t);
 
 	// get db
 	uint32_t	dblen=0;
@@ -711,7 +760,8 @@ bool sqlrprotocol_firebird::connect() {
 	if (getDebug()) {
 		stdoutput.printf("	db len: %d\n",dblen);
 	}
-	char	*db=new char[dblen+1];
+	bytesread+=sizeof(uint32_t);
+	db=new char[dblen+1];
 	if (clientsock->read(db,dblen)!=dblen) {
 		if (getDebug()) {
 			stdoutput.write("	read db path failed\n");
@@ -720,13 +770,16 @@ bool sqlrprotocol_firebird::connect() {
 		}
 		return false;
 	}
+	db[dblen]='\0';
 	if (getDebug()) {
 		stdoutput.printf("	db: %s\n",db);
 	}
+	bytesread+=dblen;
 
-if (connectversion==3) {
-	// FIXME: connect version 3 is somehow different here...
-}
+	// padding
+	if (!readPadding(bytesread,&bytesread)) {
+		return false;
+	}
 
 	// get protocol count
 	uint32_t	protocount=0;
@@ -741,6 +794,7 @@ if (connectversion==3) {
 	if (getDebug()) {
 		stdoutput.printf("	protocol count: %d\n",protocount);
 	}
+	bytesread+=sizeof(uint32_t);
 
 	// get user identification
 	uint32_t	useridlen=0;
@@ -755,6 +809,7 @@ if (connectversion==3) {
 	if (getDebug()) {
 		stdoutput.printf("	user id len: %d\n",useridlen);
 	}
+	bytesread+=sizeof(uint32_t);
 	byte_t	*userid=new byte_t[useridlen+1];
 	if (clientsock->read(userid,useridlen)!=useridlen) {
 		if (getDebug()) {
@@ -764,9 +819,16 @@ if (connectversion==3) {
 		}
 		return false;
 	}
+	userid[useridlen]='\0';
 	if (getDebug()) {
 		stdoutput.printf("	user id:\n");
 		stdoutput.printHex(userid,useridlen);
+	}
+	bytesread+=useridlen;
+
+	// padding
+	if (!readPadding(bytesread,&bytesread)) {
+		return false;
 	}
 
 	// get protocols...
@@ -790,6 +852,7 @@ if (connectversion==3) {
 		if (getDebug()) {
 			debugProtocolVersion(protoversion);
 		}
+		bytesread+=sizeof(uint32_t);
 
 		// get arch type
 		uint32_t	archtype=0;
@@ -805,6 +868,7 @@ if (connectversion==3) {
 		if (getDebug()) {
 			debugArchType(archtype);
 		}
+		bytesread+=sizeof(uint32_t);
 
 		// get minimum type
 		uint32_t	mintype=0;
@@ -820,6 +884,7 @@ if (connectversion==3) {
 		if (getDebug()) {
 			debugProtocolType("min type",mintype);
 		}
+		bytesread+=sizeof(uint32_t);
 
 		// get maximum type
 		uint32_t	maxtype=0;
@@ -835,6 +900,7 @@ if (connectversion==3) {
 		if (getDebug()) {
 			debugProtocolType("max type",maxtype);
 		}
+		bytesread+=sizeof(uint32_t);
 
 		// get preference weight
 		uint32_t	prefwt=0;
@@ -851,12 +917,8 @@ if (connectversion==3) {
 			stdoutput.printf("	preference "
 						"weight: %d\n",prefwt);
 		}
+		bytesread+=sizeof(uint32_t);
 	}
-
-	// FIXME: Weird... If I keep reading, it just times out, but if I don't,
-	// then I get 2048 instead of 19 for the op code during the attach()
-	// phase.  If I use -1,-1 for the timeouts, then it blocks forever.
-	keepReading(0,0);
 
 	debugEnd();
 
@@ -892,23 +954,24 @@ bool sqlrprotocol_firebird::connectResponse() {
 		debugOpCode(opcode);
 	}
 
-	// FIXME: this should be the chosen protocol index
-	uint32_t	protoindex=0;
-	if (clientsock->write(protoindex)!=sizeof(uint32_t)) {
+	// FIXME: determine this somehow
+	uint32_t	protoversion=PROTOCOL_VERSION10;
+	if (clientsock->write(protoversion)!=sizeof(uint32_t)) {
 		if (getDebug()) {
-			stdoutput.write("	write protocol index failed\n");
+			stdoutput.write("	write protocol "
+						"version failed\n");
 			debugSystemError();
 			debugEnd();
 		}
 		return false;
 	}
 	if (getDebug()) {
-		stdoutput.printf("	protocol index: %d\n",
-							protoindex);
+		stdoutput.printf("	protocol version: %d\n",
+							protoversion);
 	}
 
-	// FIXME: set this to the arch of this machine?
-	uint32_t	archtype=arch_linux;
+	// FIXME: determine this somehow
+	uint32_t	archtype=arch_generic;
 	if (clientsock->write(archtype)!=sizeof(uint32_t)) {
 		if (getDebug()) {
 			stdoutput.write("	write arch type failed\n");
@@ -921,7 +984,7 @@ bool sqlrprotocol_firebird::connectResponse() {
 		debugArchType(archtype);
 	}
 
-	// FIXME: do we support batch send?
+	// FIXME: determine this somehow
 	uint32_t	mintype=ptype_rpc;
 	if (clientsock->write(mintype)!=sizeof(uint32_t)) {
 		if (getDebug()) {
@@ -958,6 +1021,8 @@ bool sqlrprotocol_firebird::attach() {
 
 	debugStart("attach");
 
+	uint32_t	bytesread=0;
+
 	// get op_attach
 	uint32_t	opcode=0;
 	if (clientsock->read(&opcode)!=sizeof(uint32_t)) {
@@ -980,6 +1045,7 @@ bool sqlrprotocol_firebird::attach() {
 		}
 		return false;
 	}
+	bytesread+=sizeof(uint32_t);
 
 	// get db object id
 	uint32_t	dbobjectid=0;
@@ -994,8 +1060,9 @@ bool sqlrprotocol_firebird::attach() {
 	if (getDebug()) {
 		stdoutput.printf("	db object id: %d\n",dbobjectid);
 	}
+	bytesread+=sizeof(uint32_t);
 
-	// get db
+	// get db (FIXME: override db from connect?)
 	uint32_t	dblen=0;
 	if (clientsock->read(&dblen)!=sizeof(uint32_t)) {
 		if (getDebug()) {
@@ -1008,17 +1075,26 @@ bool sqlrprotocol_firebird::attach() {
 	if (getDebug()) {
 		stdoutput.printf("	db len: %d\n",dblen);
 	}
-	char	*db=new char[dblen+1];
+	bytesread+=sizeof(uint32_t);
+	delete[] db;
+	db=new char[dblen+1];
 	if (clientsock->read(db,dblen)!=dblen) {
 		if (getDebug()) {
-			stdoutput.write("	read db path failed\n");
+			stdoutput.write("	read db failed\n");
 			debugSystemError();
 			debugEnd();
 		}
 		return false;
 	}
+	db[dblen]='\0';
 	if (getDebug()) {
 		stdoutput.printf("	db: %s\n",db);
+	}
+	bytesread+=dblen;
+
+	// padding
+	if (!readPadding(bytesread,&bytesread)) {
+		return false;
 	}
 
 	// get db parameters buffer
@@ -1035,6 +1111,7 @@ bool sqlrprotocol_firebird::attach() {
 	if (getDebug()) {
 		stdoutput.printf("	db param buffer len: %d\n",dpblen);
 	}
+	bytesread+=sizeof(uint32_t);
 	byte_t	*dpb=new byte_t[dpblen+1];
 	if (clientsock->read(dpb,dpblen)!=dpblen) {
 		if (getDebug()) {
@@ -1047,6 +1124,12 @@ bool sqlrprotocol_firebird::attach() {
 	if (getDebug()) {
 		stdoutput.printf("	db param buffer:\n");
 		stdoutput.printHex(dpb,dpblen);
+	}
+	bytesread+=dpblen;
+
+	// padding
+	if (!readPadding(bytesread,&bytesread)) {
+		return false;
 	}
 
 	// process db parameters buffer...
@@ -1475,35 +1558,27 @@ bool sqlrprotocol_firebird::attach() {
 }
 
 bool sqlrprotocol_firebird::attachResponse() {
-	// FIXME:
-	// object handle should be the database handle ???
-	// no idea what the object id is
-	// no idea what should be in the buffer
-	// no idea what should be in the status vector
-	byte_t	buffer[1]={0};
-	byte_t	statusvector[20]={
-		1, // ???
-		0, // not an error (>0 for error)
-		0, // no idea from here on...
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0,
-		0
-	};
-	return genericResponse("attach response",0,0,1,buffer,statusvector);
+
+	// FIXME: object handle should be the database handle ???
+	// FIXME: no idea what the database handle is
+	uint32_t	objecthandle=0;
+
+	// FIXME: no idea what the object id is
+	uint32_t	objectid=0;
+
+	// status vector...
+	uint64_t	statusvector[20];
+	bytestring::zero(statusvector,sizeof(statusvector));
+	// interbase error...
+	statusvector[0]=isc_arg_gds;
+	// no error...
+	statusvector[1]=0;
+	uint8_t		statusvectorlen=2;
+
+	return genericResponse("attach response",
+				objecthandle,objectid,
+				0,NULL,
+				statusvector,statusvectorlen);
 }
 
 bool sqlrprotocol_firebird::genericResponse(const char *title,
@@ -1511,7 +1586,9 @@ bool sqlrprotocol_firebird::genericResponse(const char *title,
 						uint32_t objectid,
 						uint32_t bufferlen,
 						byte_t *buffer,
-						byte_t *statusvector) {
+						uint64_t *statusvector,
+						uint8_t statusvectorlen) {
+
 	// response packet data structure:
 	//
 	// data {
@@ -1585,22 +1662,24 @@ bool sqlrprotocol_firebird::genericResponse(const char *title,
 		return false;
 	}
 	if (getDebug()) {
-		stdoutput.printf("	buffer:\n");
+		stdoutput.write("	buffer:\n");
 		stdoutput.printHex(buffer,bufferlen);
 	}
 
 	// write the status vector
-	if (clientsock->write(statusvector,20)!=20) {
-		if (getDebug()) {
-			stdoutput.write("	write status vector failed\n");
-			debugSystemError();
-			debugEnd();
+	for (uint8_t i=0; i<statusvectorlen; i++) {
+		if (clientsock->write(statusvector[i])!=sizeof(uint64_t)) {
+			if (getDebug()) {
+				stdoutput.printf("	write status "
+						"vector [%d] failed\n",i);
+				debugSystemError();
+				debugEnd();
+			}
+			return false;
 		}
-		return false;
 	}
 	if (getDebug()) {
-		stdoutput.printf("	status vector:\n");
-		stdoutput.printHex(statusvector,20);
+		debugStatusVector(statusvector,statusvectorlen);
 	}
 
 	debugEnd();
@@ -1683,6 +1762,13 @@ bool sqlrprotocol_firebird::infoDatabase() {
 }
 
 bool sqlrprotocol_firebird::disconnect() {
+
+	// no response packet
+
+	debugStart("disconnect");
+	debugEnd();
+
+	// return false on purpose here
 	return false;
 }
 
@@ -1790,6 +1876,10 @@ bool sqlrprotocol_firebird::putSlice() {
 	return false;
 }
 
+bool sqlrprotocol_firebird::cancel() {
+	return false;
+}
+
 bool sqlrprotocol_firebird::batchCreate() {
 	return false;
 }
@@ -1888,6 +1978,40 @@ void sqlrprotocol_firebird::readString(const byte_t *in,
 	if (getDebug()) {
 		stdoutput.printf("	%s: %s\n",name,*buf);
 	}
+}
+
+bool sqlrprotocol_firebird::readPadding(uint32_t bytesreadin,
+					uint32_t *bytesreadout) {
+
+	// initialize return value
+	*bytesreadout=bytesreadin;
+
+	// how much padding do we need to read?
+	// (pad to a 4-byte boundary)
+	uint32_t	pad=(((bytesreadin/4)+1)*4)-bytesreadin;
+
+	// bail if we don't need to read any padding
+	if (!pad) {
+		return true;
+	}
+
+	// read the padding
+	byte_t		dummy;
+	for (uint32_t i=0; i<pad; i++) {
+		if (clientsock->read(&dummy)!=sizeof(byte_t)) {
+			if (getDebug()) {
+				stdoutput.write("	read padding failed\n");
+				debugSystemError();
+				debugEnd();
+			}
+			return false;
+		}
+		(*bytesreadout)++;
+	}
+	if (getDebug()) {
+		stdoutput.printf("	read %d bytes of padding\n",pad);
+	}
+	return true;
 }
 
 void sqlrprotocol_firebird::debugSystemError() {
@@ -1997,6 +2121,9 @@ void sqlrprotocol_firebird::debugOpCode(uint32_t opcode) {
 			break;
 		case op_put_slice:
 			opcodestr="op_put_slice";
+			break;
+		case op_cancel:
+			opcodestr="op_cancel";
 			break;
 		case op_batch_create:
 			opcodestr="op_batch_create";
@@ -2126,6 +2253,30 @@ void sqlrprotocol_firebird::debugArchType(uint32_t archtype) {
 void sqlrprotocol_firebird::debugProtocolVersion(uint32_t protoversion) {
 	const char	*protoversionstr=NULL;
 	switch (protoversion) {
+		case PROTOCOL_VERSION2:
+			protoversionstr="PROTOCOL_VERSION2";
+			break;
+		case PROTOCOL_VERSION3:
+			protoversionstr="PROTOCOL_VERSION3";
+			break;
+		case PROTOCOL_VERSION4:
+			protoversionstr="PROTOCOL_VERSION4";
+			break;
+		case PROTOCOL_VERSION5:
+			protoversionstr="PROTOCOL_VERSION5";
+			break;
+		case PROTOCOL_VERSION6:
+			protoversionstr="PROTOCOL_VERSION6";
+			break;
+		case PROTOCOL_VERSION7:
+			protoversionstr="PROTOCOL_VERSION7";
+			break;
+		case PROTOCOL_VERSION8:
+			protoversionstr="PROTOCOL_VERSION8";
+			break;
+		case PROTOCOL_VERSION9:
+			protoversionstr="PROTOCOL_VERSION9";
+			break;
 		case PROTOCOL_VERSION10:
 			protoversionstr="PROTOCOL_VERSION10";
 			break;
@@ -2154,8 +2305,8 @@ void sqlrprotocol_firebird::debugProtocolVersion(uint32_t protoversion) {
 			protoversionstr="unknown";
 			break;
 	}
-	stdoutput.printf("	protocol version: %d (%s)\n",
-						protoversion,protoversionstr);
+	stdoutput.printf("	protocol version: %d (0x%04x) (%s)\n",
+				protoversion,protoversion,protoversionstr);
 }
 
 void sqlrprotocol_firebird::debugProtocolType(const char *title,
@@ -2167,6 +2318,12 @@ void sqlrprotocol_firebird::debugProtocolType(const char *title,
 			break;
 		case ptype_batch_send:
 			protocoltypestr="ptype_batch_send";
+			break;
+		case ptype_out_of_band:
+			protocoltypestr="ptype_out_of_band";
+			break;
+		case ptype_lazy_send:
+			protocoltypestr="ptype_lazy_send";
 			break;
 		default:
 			protocoltypestr="unknown";
@@ -2488,8 +2645,184 @@ void sqlrprotocol_firebird::debugDpbParam(uint32_t dpbparam) {
 			dpbparamstr="unknown";
 			break;
 	}
-	stdoutput.printf("	dpb param: %d 0x%02x (%s)\n",
+	stdoutput.printf("	dpb param: %d (0x%02x) (%s)\n",
 				dpbparam,dpbparam,dpbparamstr);
+}
+
+void sqlrprotocol_firebird::debugStatusVector(uint64_t *statusvector,
+						uint8_t statusvectorlen) {
+	stdoutput.write("	status vector:\n");
+	uint32_t	cluster=1;
+	uint8_t		i=0;
+	while (i<statusvectorlen) {
+		stdoutput.printf("		cluster %d:\n",cluster);
+		switch (statusvector[i]) {
+			case isc_arg_end:
+				stdoutput.write("			"
+						"code: isc_arg_end\n");
+				i++;
+				break;
+			case isc_arg_gds:
+				stdoutput.write("			"
+						"code: isc_arg_gds\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_string:
+				stdoutput.write("			"
+						"code: isc_arg_string\n");
+				i++;
+				stdoutput.printf("			"
+						"address: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_cstring:
+				stdoutput.write("			"
+						"code: isc_arg_cstring\n");
+				i++;
+				stdoutput.printf("			"
+						"length: %lld\n",
+						statusvector[i]);
+				i++;
+				stdoutput.printf("			"
+						"address: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_number:
+				stdoutput.write("			"
+						"code: isc_arg_number\n");
+				i++;
+				stdoutput.printf("			"
+						"number: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_interpreted:
+				stdoutput.write("			"
+						"code: isc_arg_interpreted\n");
+				i++;
+				stdoutput.printf("			"
+						"address: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_vms:
+				stdoutput.write("			"
+						"code: isc_arg_vms\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_unix:
+				stdoutput.write("			"
+						"code: isc_arg_unix\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_domain:
+				stdoutput.write("			"
+						"code: isc_arg_domain\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_dos:
+				stdoutput.write("			"
+						"code: isc_arg_dos\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_mpexl:
+				stdoutput.write("			"
+						"code: isc_arg_mpexl\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_mpexl_ipc:
+				stdoutput.write("			"
+						"code: isc_arg_mpexl_ipc\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_mach:
+				stdoutput.write("			"
+						"code: isc_arg_mach\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_netware:
+				stdoutput.write("			"
+						"code: isc_arg_netware\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_win32:
+				stdoutput.write("			"
+						"code: isc_arg_win32\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_warning:
+				stdoutput.write("			"
+						"code: isc_arg_warning\n");
+				i++;
+				stdoutput.printf("			"
+						"warning: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			case isc_arg_sql_state:
+				stdoutput.write("			"
+						"code: isc_arg_sql_state\n");
+				i++;
+				stdoutput.printf("			"
+						"sql state: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+			default:
+				stdoutput.write("			"
+						"code: unknown\n");
+				i++;
+				stdoutput.printf("			"
+						"error: %lld\n",
+						statusvector[i]);
+				i++;
+				break;
+		}
+		cluster++;
+	}
+	stdoutput.printf("\n");
 }
 
 extern "C" {
