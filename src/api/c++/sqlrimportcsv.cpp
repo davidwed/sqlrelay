@@ -97,6 +97,12 @@ bool sqlrimportcsv::importFromFile(const char *filename) {
 
 bool sqlrimportcsv::column(const char *name, bool quoted) {
 
+	// remap the name, if the name has been mapped
+	const char	*mappedname=columnmap.getValue(name);
+	if (mappedname) {
+		name=mappedname;
+	}
+
 	// if this column is the primary key...
 	if (insertprimarykey && currentcol==primarykeycolumnindex) {
 
