@@ -62,6 +62,8 @@
 	implemented workaround for broken last-insert-id in libmariadbclient 18
 	added --with-node-gyp-python configure option
 	pwdenc_crypt -> pwdenc_des
+	in sqlrimportcsv, calling setIgnoreColumnsWithEmptyNames(true) and
+		mapColumnName("foo","") causes column "foo" to be ignored now
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
