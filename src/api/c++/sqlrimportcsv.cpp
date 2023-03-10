@@ -197,8 +197,11 @@ bool sqlrimportcsv::headerEnd() {
 		// then just grab the column names from the table itself
 		query.append('*');
 	} else {
-		// if we built a list of column names from the ones specified in
-		// the CSV header, then select those columns, specifically
+		// if we built a list of column names from the ones specified
+		// in the CSV header, then select those specific columns
+		//
+		// NOTE: columns[] should contain the full list of columns,
+		// including any inserted primary key or static columns
 		for (uint64_t i=0; i<columns.getLength(); i++) {
 			if (i) {
 				query.append(',');
@@ -215,50 +218,12 @@ bool sqlrimportcsv::headerEnd() {
 	// get the column count
 	colcount=sqlrcur->colCount();
 
-	// Primary key values could be provided in the CSV, but if we're
-	// inserting a primary key, then we can presume that they are not
-	// provided in the CSV.
-	//
-	// So, if we're inserting a primary key, then...
-	//
-	// If we ignored the columns specified in the CSV header, and just
-	// grabbed the column names from the table itself, then the primary
-	// key will be in the columns selected by * above.
-	//
-	// If we built a list of column names from the ones specified in
-	// the CSV header, then the primary key will NOT be among those
-	// columns, and in that case we need to bump the column count.
-	if (insertprimarykey && !ignorecolumns) {
-		colcount++;
-	} 
-
 	// run through the columns, figuring out which are numbers and dates...
 	numbercolumn=new bool[colcount];
 	datecolumn=new bool[colcount];
-	// "i" is the index into the set of column names selected above
-	// "j" is the index into the set number/datecolumn flags
-	// they will differ if we had to bump colcount above
-	for (uint32_t i=0, j=0; j<colcount;) {
-
-		if (!ignorecolumns &&
-			insertprimarykey &&
-			j==primarykeycolumnindex) {
-
-			// If we're not ignoring columns, and this is the
-			// primary key column, then it will be a number and
-			// not a date.
-			numbercolumn[j]=true;
-			datecolumn[j]=false;
-
-		} else {
-
-			numbercolumn[j]=isNumberTypeChar(
-						sqlrcur->getColumnType(i));
-			datecolumn[j]=isDateTimeTypeChar(
-						sqlrcur->getColumnType(i));
-			i++;
-		}
-		j++;
+	for (uint32_t i=0; i<colcount; i++) {
+		numbercolumn[i]=isNumberTypeChar(sqlrcur->getColumnType(i));
+		datecolumn[i]=isDateTimeTypeChar(sqlrcur->getColumnType(i));
 	}
 
 	if (lg) {
