@@ -2338,7 +2338,7 @@ void sqlrprotocol_tds::loginAck() {
 	write(&resppacket,hostToLE(tokenlength));
 	write(&resppacket,iface);
 	writeBE(&resppacket,tdsversion);
-	write(&resppacket,prognamelen);
+	write(&resppacket,(byte_t)prognamelen);
 	write(&resppacket,progname16,prognamelen);
 	write(&resppacket,majorver);
 	write(&resppacket,minorver);
@@ -3248,7 +3248,7 @@ void sqlrprotocol_tds::tableName(byte_t tdstype) {
 		size_t		partnamelen=charstring::length(partname8);
 		ucs2_t		*partname=ucs2charstring::duplicate(
 							partname8,partnamelen);
-		write(&resppacket,partnamelen);
+		write(&resppacket,(uint16_t)partnamelen);
 		write(&resppacket,partname,partnamelen);
 		delete[] partname;
 
@@ -3301,7 +3301,7 @@ void sqlrprotocol_tds::colName(sqlrservercursor *cursor,
 	size_t 		namelen=cont->getColumnNameLength(cursor,col);
 	const char	*name=cont->getColumnName(cursor,col);
 	ucs2_t		*name16=ucs2charstring::duplicate(name,namelen);
-	write(&resppacket,namelen);
+	write(&resppacket,(byte_t)namelen);
 	write(&resppacket,name16,namelen);
 
 	if (getDebug()) {
@@ -5388,7 +5388,7 @@ void sqlrprotocol_tds::envChange(byte_t type,
 	if (newvaluelensize==sizeof(byte_t)) {
 		write(&resppacket,(byte_t)newvaluelen);
 	} else {
-		write(&resppacket,newvaluelen);
+		write(&resppacket,(uint32_t)newvaluelen);
 	}
 	write(&resppacket,newvalue16,newvaluelen);
 	write(&resppacket,(byte_t)oldvaluelen);
@@ -5470,11 +5470,11 @@ void sqlrprotocol_tds::infoOrError(byte_t token,
 	write(&resppacket,hostToLE(number));
 	write(&resppacket,state);
 	write(&resppacket,infoerrclass);
-	write(&resppacket,hostToLE(msgtextlen));
+	write(&resppacket,hostToLE((uint16_t)msgtextlen));
 	write(&resppacket,msgtext16,msgtextlen);
-	write(&resppacket,srvnamelen);
+	write(&resppacket,(byte_t)srvnamelen);
 	write(&resppacket,srvname16,srvnamelen);
-	write(&resppacket,procnamelen);
+	write(&resppacket,(byte_t)procnamelen);
 	write(&resppacket,procname16,procnamelen);
 	if (negotiatedtdsversion<720) {
 		write(&resppacket,hostToLE((uint16_t)linenumber));
