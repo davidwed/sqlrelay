@@ -24,13 +24,13 @@ bool sqlrpwdenc_des::oneWay() {
 
 char *sqlrpwdenc_des::encrypt(const char *value) {
 
-	d.setIv((const byte_t *)
+	d.setSalt((const byte_t *)
 			getParameters()->getAttributeValue("salt"),
-			d.getIvSize());
+			d.getSaltSize());
 
 	d.append((const byte_t *)value,charstring::length(value));
 
-	const char	*encrypted=(const char *)d.getEncryptedData();
+	const char	*encrypted=(const char *)d.getHash();
 
 	// the first two characters of the result string are the salt,
 	// so don't include them in the result, if possible
