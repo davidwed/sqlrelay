@@ -2500,7 +2500,7 @@ bool sqlrprotocol_firebird::readString(char **val,
 		*val=new char[vallen+1];
 
 		// read buffer
-		if (clientsock->read(*val,vallen)!=vallen) {
+		if (clientsock->read(*val,vallen)!=(ssize_t)vallen) {
 			if (getDebug()) {
 				stdoutput.printf("	read %s failed\n",name);
 				debugSystemError();
@@ -2558,7 +2558,7 @@ bool sqlrprotocol_firebird::readBuffer(byte_t **val,
 		*val=new byte_t[vallen];
 
 		// read buffer
-		if (clientsock->read(*val,vallen)!=vallen) {
+		if (clientsock->read(*val,vallen)!=(ssize_t)vallen) {
 			if (getDebug()) {
 				stdoutput.printf("	read %s failed\n",name);
 				debugSystemError();
@@ -2657,7 +2657,7 @@ bool sqlrprotocol_firebird::writeBuffer(const byte_t *val,
 	}
 
 	// write buffer
-	if (clientsock->write(val,len)!=len) {
+	if (clientsock->write(val,len)!=(ssize_t)len) {
 		if (getDebug()) {
 			stdoutput.printf("	write %s failed\n",name);
 			debugSystemError();
