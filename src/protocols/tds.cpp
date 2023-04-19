@@ -2298,9 +2298,9 @@ void sqlrprotocol_tds::loginAck() {
 	uint32_t	tdsversion=
 			tdsVersionDecToHex(negotiatedtdsversion,true);
 	const char	*progname=dbversion;
-	size_t		prognamelen=charstring::length(progname);
+	byte_t		prognamelen=(byte_t)charstring::length(progname);
 	ucs2_t		*progname16=ucs2charstring::duplicate(progname,
-								prognamelen);
+							(size_t)prognamelen);
 	byte_t		majorver=0;
 	byte_t		minorver=0;
 	byte_t		buildnumhi=0;
@@ -2338,7 +2338,7 @@ void sqlrprotocol_tds::loginAck() {
 	write(&resppacket,hostToLE(tokenlength));
 	write(&resppacket,iface);
 	writeBE(&resppacket,tdsversion);
-	write(&resppacket,(byte_t)prognamelen);
+	write(&resppacket,prognamelen);
 	write(&resppacket,progname16,prognamelen);
 	write(&resppacket,majorver);
 	write(&resppacket,minorver);
@@ -3245,10 +3245,11 @@ void sqlrprotocol_tds::tableName(byte_t tdstype) {
 
 	for (uint16_t i=0; i<numparts; i++) {
 		const char	*partname8="";
-		size_t		partnamelen=charstring::length(partname8);
+		uint16_t	partnamelen=charstring::length(partname8);
 		ucs2_t		*partname=ucs2charstring::duplicate(
-							partname8,partnamelen);
-		write(&resppacket,(uint16_t)partnamelen);
+							partname8,
+							(size_t)partnamelen);
+		write(&resppacket,partnamelen);
 		write(&resppacket,partname,partnamelen);
 		delete[] partname;
 
@@ -5429,12 +5430,15 @@ void sqlrprotocol_tds::infoOrError(byte_t token,
 					const char *procname,
 					uint32_t linenumber) {
 
-	size_t	msgtextlen=charstring::length(msgtext);
-	ucs2_t	*msgtext16=ucs2charstring::duplicate(msgtext,msgtextlen);
-	size_t	srvnamelen=charstring::length(srvname);
-	ucs2_t	*srvname16=ucs2charstring::duplicate(srvname,srvnamelen);
-	size_t	procnamelen=charstring::length(procname);
-	ucs2_t	*procname16=ucs2charstring::duplicate(procname,procnamelen);
+	uint16_t	msgtextlen=charstring::length(msgtext);
+	ucs2_t		*msgtext16=ucs2charstring::duplicate(
+					msgtext,(size_t)msgtextlen);
+	byte_t		srvnamelen=charstring::length(srvname);
+	ucs2_t		*srvname16=ucs2charstring::duplicate(
+					srvname,(size_t)srvnamelen);
+	byte_t		procnamelen=charstring::length(procname);
+	ucs2_t		*procname16=ucs2charstring::duplicate(
+					procname,(size_t)procnamelen);
 
 	uint16_t	tokenlength=sizeof(uint32_t)+
 					sizeof(byte_t)+
@@ -5472,9 +5476,9 @@ void sqlrprotocol_tds::infoOrError(byte_t token,
 	write(&resppacket,infoerrclass);
 	write(&resppacket,hostToLE((uint16_t)msgtextlen));
 	write(&resppacket,msgtext16,msgtextlen);
-	write(&resppacket,(byte_t)srvnamelen);
+	write(&resppacket,srvnamelen);
 	write(&resppacket,srvname16,srvnamelen);
-	write(&resppacket,(byte_t)procnamelen);
+	write(&resppacket,procnamelen);
 	write(&resppacket,procname16,procnamelen);
 	if (negotiatedtdsversion<720) {
 		write(&resppacket,hostToLE((uint16_t)linenumber));
