@@ -842,7 +842,7 @@ void sqlrcursor::cacheData() {
 	for (uint32_t i=0; i<rowbuffercount; i++) {
 
 		// get the current offset in the cache destination file
-		int64_t	position=pvt->_cachedest->getCurrentPosition();
+		int64_t	position=pvt->_cachedest->getPosition();
 
 		// seek to the right place in the index file and write the
 		// destination file offset
