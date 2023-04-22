@@ -104,7 +104,7 @@ sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 			// get the certificate chain file to use
 			const char	*tlscert=
 				parameters->getAttributeValue("tlscert");
-			if (file::readable(tlscert)) {
+			if (file::getIsReadable(tlscert)) {
 				pvt->_tctx.setCertificateChainFile(tlscert);
 			} else if (!charstring::isNullOrEmpty(tlscert)) {
 				stderror.printf("Warning: TLS certificate "
@@ -115,7 +115,7 @@ sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 			// get the private key file to use
 			const char	*tlskey=
 				parameters->getAttributeValue("tlskey");
-			if (file::readable(tlskey)) {
+			if (file::getIsReadable(tlskey)) {
 				pvt->_tctx.setPrivateKeyFile(tlskey);
 			} else if (!charstring::isNullOrEmpty(tlskey)) {
 				stderror.printf("Warning: TLS private key "
@@ -135,7 +135,7 @@ sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 			// get the certificate authority file to use
 			const char	*tlsca=
 				parameters->getAttributeValue("tlsca");
-			if (file::readable(tlsca)) {
+			if (file::getIsReadable(tlsca)) {
 				pvt->_tctx.setCertificateAuthority(tlsca);
 			} else if (!charstring::isNullOrEmpty(tlsca)) {
 				stderror.printf("Warning: TLS certificate "

@@ -606,7 +606,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 				sys::getDirectorySeparator(),
 				sys::getDirectorySeparator(),
 				sys::getDirectorySeparator());
-		if (!file::readable(tnsnamesora)) {
+		if (!file::getIsReadable(tnsnamesora)) {
 			stderror.printf(
 				"Warning: %s is not readable by %s:%s\n",
 				tnsnamesora,

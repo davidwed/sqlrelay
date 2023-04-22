@@ -41,7 +41,7 @@ static void help(int argc, const char **argv) {
 	}
 
 	// strip off any leading directories
-	char	*progname=file::basename(argv[0]);
+	char	*progname=file::getBaseName(argv[0]);
 
 	// strip off any libtool prefixes
 	if (!charstring::compare(progname,"lt-",3)) {

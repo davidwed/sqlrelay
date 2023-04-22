@@ -134,7 +134,7 @@ int main(int argc, const char **argv) {
 			fqp.append(file);
 
 			// skip the pid file if it's not readable
-			if (!file::readable(fqp.getString())) {
+			if (!file::getIsReadable(fqp.getString())) {
 				continue;
 			}
 			

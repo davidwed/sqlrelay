@@ -717,7 +717,7 @@ bool scaler::availableDatabase() {
 	char	*updown=NULL;
 	charstring::printf(&updown,"%s%s-%s.up",
 				sqlrpth->getIpcDir(),id,connectionid);
-	bool	retval=file::exists(updown);
+	bool	retval=file::getExists(updown);
 	delete[] updown;
 	return retval;
 }

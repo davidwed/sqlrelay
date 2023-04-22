@@ -281,14 +281,14 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	const char	*slash="/";
 #endif
 	const char	*tmpdir=pvt->_sqlrpth->getTmpDir();
-	if (!file::exists(tmpdir)) {
+	if (!file::getExists(tmpdir)) {
 		char		**parts=NULL;
 		uint64_t	partcount=0;
 		charstring::split(tmpdir,slash,true,&parts,&partcount);
 		stringbuffer	path;
 		for (uint64_t i=0; i<partcount; i++) {
 			path.append(slash)->append(parts[i]);
-			if (!file::exists(path.getString())) {
+			if (!file::getExists(path.getString())) {
 				mode_t	mode=(i==partcount-1)?
 					permissions::evalPermString(
 							"rwxrwxrwx"):
@@ -694,7 +694,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// issue warning about ttl if necessary
 	if (pvt->_cfg->getTtl()>0 &&
 		!pvt->_semset->supportsTimedSemaphoreOperations() &&
-		!sys::signalsInterruptSystemCalls()) {
+		!sys::getSignalsInterruptSystemCalls()) {
 		stderror.printf("Warning: ttl forced to 0...\n"
 				"         semaphore waits cannot be "
 				"interrupted:\n"
@@ -1654,7 +1654,7 @@ bool sqlrlistener::semWait(int32_t index, thread *thr,
 		}
 		*timeout=(!result && error::getErrorNumber()==EAGAIN);
 	} else if (pvt->_listenertimeout>0 &&
-			!thr && sys::signalsInterruptSystemCalls()) {
+			!thr && sys::getSignalsInterruptSystemCalls()) {
 		// We can't use this when using threads because alarmrang isn't
 		// thread-local and there's no way to make it be.  Also, the
 		// alarm doesn't reliably interrupt the wait() when it's called
@@ -1901,7 +1901,7 @@ bool sqlrlistener::connectionIsUp(const char *connectionid) {
 	charstring::printf(&updown,"%s%s-%s.up",
 				pvt->_sqlrpth->getIpcDir(),
 				pvt->_cmdl->getId(),connectionid);
-	bool	retval=file::exists(updown);
+	bool	retval=file::getExists(updown);
 	delete[] updown;
 	return retval;
 }

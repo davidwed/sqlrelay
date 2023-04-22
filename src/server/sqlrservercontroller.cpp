@@ -670,7 +670,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// then force the ttl to zero
 	if (pvt->_ttl>0 &&
 			!pvt->_semset->supportsTimedSemaphoreOperations() &&
-			!sys::signalsInterruptSystemCalls()) {
+			!sys::getSignalsInterruptSystemCalls()) {
 		pvt->_ttl=0;
 	}
 
@@ -874,7 +874,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	#ifdef SIGALRM
 	if (pvt->_ttl>0 &&
 			!pvt->_semset->supportsTimedSemaphoreOperations() &&
-			sys::signalsInterruptSystemCalls()) {
+			sys::getSignalsInterruptSystemCalls()) {
 		alarmhandler.setHandler(alarmHandler);
 		alarmhandler.handleSignal(SIGALRM);
 	}
@@ -1545,7 +1545,7 @@ void sqlrservercontroller::waitForAvailableDatabase() {
 
 	setState(WAIT_FOR_AVAIL_DB);
 
-	if (!file::exists(pvt->_updown)) {
+	if (!file::getExists(pvt->_updown)) {
 		raiseDebugMessageEvent("database is not available");
 		reLogIn();
 		markDatabaseAvailable();
@@ -7202,7 +7202,7 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 	bool	result=false;
 	if (pvt->_ttl>0 && pvt->_semset->supportsTimedSemaphoreOperations()) {
 		result=pvt->_semset->waitWithUndo(0,pvt->_ttl,0);
-	} else if (pvt->_ttl>0 && sys::signalsInterruptSystemCalls()) {
+	} else if (pvt->_ttl>0 && sys::getSignalsInterruptSystemCalls()) {
 		pvt->_semset->dontRetryInterruptedOperations();
 		alarmrang=0;
 		signalmanager::alarm(pvt->_ttl);
@@ -7250,7 +7250,7 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	bool	result=false;
 	if (pvt->_ttl>0 && pvt->_semset->supportsTimedSemaphoreOperations()) {
 		result=pvt->_semset->wait(3,pvt->_ttl,0);
-	} else if (pvt->_ttl>0 && sys::signalsInterruptSystemCalls()) {
+	} else if (pvt->_ttl>0 && sys::getSignalsInterruptSystemCalls()) {
 		pvt->_semset->dontRetryInterruptedOperations();
 		alarmrang=0;
 		signalmanager::alarm(pvt->_ttl);

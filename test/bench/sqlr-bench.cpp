@@ -488,7 +488,7 @@ void graphStats(const char *graph, const char *db,
 
 	// move temp.csv to a similar file name as the graph
 	stringbuffer	tempcsv;
-	char	*base=file::basename(graph,".png");
+	char	*base=file::getBaseName(graph,".png");
 	tempcsv.append(base)->append(".csv");
 	delete[] base;
 	file::rename("temp.csv",tempcsv.getString());

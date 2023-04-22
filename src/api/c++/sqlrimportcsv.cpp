@@ -90,7 +90,7 @@ bool sqlrimportcsv::importFromFile(const char *filename) {
 	columnswithemptynames.clear();
 
 	if (!objectname) {
-		objectname=file::basename(filename,".csv");
+		objectname=file::getBaseName(filename,".csv");
 	}
 	return csvsax::parseFile(filename);
 }

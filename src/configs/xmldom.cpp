@@ -2346,8 +2346,8 @@ void sqlrconfig_xmldom::parseLinkFile(const char *urlname) {
 		if (fs.open(urlname)) {
 			fl.setReadBufferSize(fs.getOptimumTransferBlockSize());
 		}
-		fl.sequentialAccess(0,fl.getSize());
-		fl.onlyOnce(0,fl.getSize());
+		fl.adviseSequentialAccess(0,fl.getSize());
+		fl.adviseOnlyOnce(0,fl.getSize());
 
 		// set fd
 		fd=&fl;
