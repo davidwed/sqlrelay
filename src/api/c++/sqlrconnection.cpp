@@ -819,7 +819,7 @@ bool sqlrconnection::reConfigureSockets() {
 		pvt->_gcred.clearDesiredMechanisms();
 		pvt->_gcred.addDesiredMechanism(&pvt->_gmech);
 
-		if (!pvt->_gcred.acquired() &&
+		if (!pvt->_gcred.getAreAcquired() &&
 				!charstring::isNullOrEmpty(pvt->_user)) {
 
 			if (pvt->_gcred.acquireForUser(pvt->_user)) {
