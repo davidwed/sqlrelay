@@ -15,10 +15,10 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.found("host") ||
-			!cmdl.found("port") ||
-			!cmdl.found("colcount") ||
-			!cmdl.found("rowcount")) {
+	if (!cmdl.getWasFound("host") ||
+			!cmdl.getWasFound("port") ||
+			!cmdl.getWasFound("colcount") ||
+			!cmdl.getWasFound("rowcount")) {
 		stdoutput.printf("usage: testtable -host host -port port -socket socket [-user user] [-password password] [-table tablename] -colcount count -rowcount count\n");
 		process::exit(1);
 	}

@@ -145,9 +145,9 @@ int main(int argc, const char **argv) {
 			"[-connection-detail [-query]]\n",SQLR);
 		process::exit(1);
 	}
-	bool		shortoutput=cmdl.found("-short");
-	bool		connoutput=cmdl.found("-connection-detail");
-	bool		queryoutput=cmdl.found("-query");
+	bool		shortoutput=cmdl.getWasFound("-short");
+	bool		connoutput=cmdl.getWasFound("-connection-detail");
+	bool		queryoutput=cmdl.getWasFound("-query");
 	
 	// get the id filename and key
 	sqlrpaths	sqlrp(&cmdl);

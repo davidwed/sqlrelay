@@ -379,7 +379,7 @@ bool sqlrlistener::init(int argc, const char **argv) {
 		return false;
 	}
 
-	if (!pvt->_cmdl->found("-nodetach")) {
+	if (!pvt->_cmdl->getWasFound("-nodetach")) {
 		process::detach();
 	}
 

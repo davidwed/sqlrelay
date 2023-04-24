@@ -88,7 +88,7 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.found("-id")) {
+	if (!cmdl.getWasFound("-id")) {
 		stdoutput.printf("usage:\n"
 			" %s-listener [-config config] -id id "
 			"[-localstatedir dir] [-nodetach]\n",
@@ -101,7 +101,7 @@ int main(int argc, const char **argv) {
 
 	// set up default signal handling
 	process::exitOnShutDown();
-	if (!cmdl.found("-disable-crash-handler")) {
+	if (!cmdl.getWasFound("-disable-crash-handler")) {
 		process::exitOnCrash();
 	}
 
@@ -111,13 +111,13 @@ int main(int argc, const char **argv) {
 #ifdef SHUTDOWNFLAG
 	// handle kill and crash signals
 	process::setShutDownFlagOnShutDown();
-	if (!cmdl.found("-disable-crash-handler")) {
+	if (!cmdl.getWasFound("-disable-crash-handler")) {
 		process::setShutDownFlagOnCrash();
 	}
 #else
 	// handle kill and crash signals
 	process::handleShutDown(shutDown);
-	if (!cmdl.found("-disable-crash-handler")) {
+	if (!cmdl.getWasFound("-disable-crash-handler")) {
 		process::handleCrash(shutDown);
 	}
 #endif

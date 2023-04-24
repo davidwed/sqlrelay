@@ -52,19 +52,19 @@ int main(int argc, const char **argv) {
 	bool		nosettle=false;
 
 	// override defaults with command line parameters
-	if (cmdl.found("db")) {
+	if (cmdl.getWasFound("db")) {
 		db=cmdl.getValue("db");
 	}
-	if (cmdl.found("dbconnectstring")) {
+	if (cmdl.getWasFound("dbconnectstring")) {
 		dbconnectstring=cmdl.getValue("dbconnectstring");
 	}
-	if (cmdl.found("proxyconnectstring")) {
+	if (cmdl.getWasFound("proxyconnectstring")) {
 		proxyconnectstring=cmdl.getValue("proxyconnectstring");
 	}
-	if (cmdl.found("sqlrconnectstring")) {
+	if (cmdl.getWasFound("sqlrconnectstring")) {
 		sqlrconnectstring=cmdl.getValue("sqlrconnectstring");
 	}
-	if (cmdl.found("sqlr")) {
+	if (cmdl.getWasFound("sqlr")) {
 		sqlr=cmdl.getValue("sqlr");
 		if (charstring::compare(sqlr,"local") &&
 			charstring::compare(sqlr,"remote") &&
@@ -72,43 +72,43 @@ int main(int argc, const char **argv) {
 			usage=true;
 		}
 	}
-	if (cmdl.found("queries")) {
+	if (cmdl.getWasFound("queries")) {
 		queries=charstring::toInteger(cmdl.getValue("queries"));
 	}
-	if (cmdl.found("rows")) {
+	if (cmdl.getWasFound("rows")) {
 		rows=charstring::toInteger(cmdl.getValue("rows"));
 	}
-	if (cmdl.found("cols")) {
+	if (cmdl.getWasFound("cols")) {
 		cols=charstring::toInteger(cmdl.getValue("cols"));
 	}
-	if (cmdl.found("colsize")) {
+	if (cmdl.getWasFound("colsize")) {
 		colsize=charstring::toInteger(cmdl.getValue("colsize"));
 	}
-	if (cmdl.found("samples")) {
+	if (cmdl.getWasFound("samples")) {
 		samples=charstring::toInteger(cmdl.getValue("samples"));
 	}
-	if (cmdl.found("rsbs")) {
+	if (cmdl.getWasFound("rsbs")) {
 		rsbs=charstring::toInteger(cmdl.getValue("rsbs"));
 	}
-	if (cmdl.found("bench")) {
+	if (cmdl.getWasFound("bench")) {
 		const char	*bench=cmdl.getValue("bench");
 		benchsqlrelay=charstring::contains(bench,"sqlrelay");
 		benchproxy=charstring::contains(bench,"proxy");
 		benchdb=charstring::contains(bench,"db");
 	}
-	if (cmdl.found("querytypes")) {
+	if (cmdl.getWasFound("querytypes")) {
 		const char	*queries=cmdl.getValue("querytypes");
 		selectqueries=charstring::contains(queries,"selects");
 		dmlqueries=charstring::contains(queries,"dml");
 	}
-	if (cmdl.found("debug")) {
+	if (cmdl.getWasFound("debug")) {
 		debug=true;
 	}
-	if (cmdl.found("nosettle")) {
+	if (cmdl.getWasFound("nosettle")) {
 		nosettle=true;
 	}
 	stringbuffer	graphname;
-	if (cmdl.found("graph")) {
+	if (cmdl.getWasFound("graph")) {
 		graph=cmdl.getValue("graph");
 		graphname.append(graph);
 		if (charstring::compare(
@@ -119,7 +119,7 @@ int main(int argc, const char **argv) {
 		graphname.append(db)->append("-bench.png");
 	}
 	graph=graphname.getString();
-	if (cmdl.found("help","h")) {
+	if (cmdl.getWasFound("help","h")) {
 		usage=true;
 	}
 

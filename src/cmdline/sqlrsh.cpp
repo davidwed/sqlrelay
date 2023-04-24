@@ -2573,22 +2573,22 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	const char	*id=cmdline->getValue("id");
 	const char	*host=cmdline->getValue("host");
 	uint16_t	port=charstring::toInteger(
-				(cmdline->found("port"))?
+				(cmdline->getWasFound("port"))?
 				cmdline->getValue("port"):DEFAULT_PORT);
 	const char	*socket=cmdline->getValue("socket");
 	const char	*user=cmdline->getValue("user");
 	const char	*password=cmdline->getValue("password");
-	bool		usekrb=cmdline->found("krb");
+	bool		usekrb=cmdline->getWasFound("krb");
 	const char	*krbservice=cmdline->getValue("krbservice");
 	const char	*krbmech=cmdline->getValue("krbmech");
 	const char	*krbflags=cmdline->getValue("krbflags");
-	bool		usetls=cmdline->found("tls");
+	bool		usetls=cmdline->getWasFound("tls");
 	const char	*tlsversion=cmdline->getValue("tlsversion");
 	const char	*tlscert=cmdline->getValue("tlscert");
 	const char	*tlspassword=cmdline->getValue("tlspassword");
 	const char	*tlsciphers=cmdline->getValue("tlsciphers");
 	const char	*tlsvalidate="no";
-	if (cmdline->found("tlsvalidate")) {
+	if (cmdline->getWasFound("tlsvalidate")) {
 		tlsvalidate=cmdline->getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline->getValue("tlsca");
@@ -2639,34 +2639,34 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	if (!charstring::isNullOrEmpty(id)) {
 		sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
 		if (cfg) {
-			if (!cmdline->found("host")) {
+			if (!cmdline->getWasFound("host")) {
 				host="localhost";
 			}
-			if (!cmdline->found("port")) {
+			if (!cmdline->getWasFound("port")) {
 				port=cfg->getDefaultPort();
 			}
-			if (!cmdline->found("socket")) {
+			if (!cmdline->getWasFound("socket")) {
 				socket=cfg->getDefaultSocket();
 			}
-			if (!cmdline->found("krb")) {
+			if (!cmdline->getWasFound("krb")) {
 				usekrb=cfg->getDefaultKrb();
 			}
-			if (!cmdline->found("krbservice")) {
+			if (!cmdline->getWasFound("krbservice")) {
 				krbservice=cfg->getDefaultKrbService();
 			}
-			if (!cmdline->found("krbmech")) {
+			if (!cmdline->getWasFound("krbmech")) {
 				krbmech=cfg->getDefaultKrbMech();
 			}
-			if (!cmdline->found("krbflags")) {
+			if (!cmdline->getWasFound("krbflags")) {
 				krbflags=cfg->getDefaultKrbFlags();
 			}
-			if (!cmdline->found("tls")) {
+			if (!cmdline->getWasFound("tls")) {
 				usetls=cfg->getDefaultTls();
 			}
 			if (!cmdline->getValue("tlsciphers")) {
 				tlsciphers=cfg->getDefaultTlsCiphers();
 			}
-			if (!cmdline->found("user")) {
+			if (!cmdline->getWasFound("user")) {
 				user=cfg->getDefaultUser();
 				password=cfg->getDefaultPassword();
 			}
@@ -2702,7 +2702,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	sqlrshenv	env;
 
 	// handle quiet flag
-	if (cmdline->found("quiet")) {
+	if (cmdline->getWasFound("quiet")) {
 		env.headers=false;
 		env.stats=false;
 	}
@@ -2713,15 +2713,15 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	}
 
 	// handle the result set buffer size
-	if (cmdline->found("resultsetbuffersize")) {
+	if (cmdline->getWasFound("resultsetbuffersize")) {
 		env.rsbs=charstring::toInteger(
 				cmdline->getValue("resultsetbuffersize"));
 	}
 
 	// FIXME: make these commands instead of commandline args
-	env.getasnumber=cmdline->found("getasnumber");
-	env.noelapsed=cmdline->found("noelapsed");
-	env.nextresultset=cmdline->found("nextresultset");
+	env.getasnumber=cmdline->getWasFound("getasnumber");
+	env.noelapsed=cmdline->getWasFound("noelapsed");
+	env.nextresultset=cmdline->getWasFound("nextresultset");
 
 	// process RC files
 	userRcFile(&sqlrcon,&sqlrcur,&env);

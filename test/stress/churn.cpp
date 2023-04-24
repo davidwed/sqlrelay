@@ -28,7 +28,7 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.found("concount")) {
+	if (!cmdl.getWasFound("concount")) {
 		stdoutput.printf("usage: churn -host host -port port -socket socket -user user -password password -concount concount\n");
 		process::exit(1);
 	}
