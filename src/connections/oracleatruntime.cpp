@@ -416,7 +416,7 @@ static bool loadLibraries(stringbuffer *errormessage) {
 		l[i].getComparator()->setReverse(true);
 		l[i].getComparator()->setNatural(true);
 		l[i].getComparator()->setNumberDelimiters("._");
-		l[i].heapSort();
+		l[i].sortQuickly();
 	}
 
 	// combine the lists, excluding any unreadable library files

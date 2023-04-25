@@ -21,8 +21,8 @@
 		bool	remove(const char *value);
 		bool	removeAll(const char *value);
 		bool	remove(listnode<const char *> *node);
-		void	insertionSort();
-		void	heapSort();
+		void	sortInexpensively();
+		void	sortQuickly();
 		bool	clear();
 	
 	private:

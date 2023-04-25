@@ -256,11 +256,11 @@ listnode<const char *> *sqlrrowlist::find(
 	return NULL;
 }
 
-void sqlrrowlist::insertionSort() {
+void sqlrrowlist::sortInexpensively() {
 	// do nothing
 }
 
-void sqlrrowlist::heapSort() {
+void sqlrrowlist::sortQuickly() {
 	// do nothing
 }
 
@@ -426,11 +426,11 @@ listnode<const char *> *sqlrresultsetlist::find(
 	return NULL;
 }
 
-void sqlrresultsetlist::insertionSort() {
+void sqlrresultsetlist::sortInexpensively() {
 	// do nothing
 }
 
-void sqlrresultsetlist::heapSort() {
+void sqlrresultsetlist::sortQuickly() {
 	// do nothing
 }
 
