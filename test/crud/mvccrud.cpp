@@ -208,8 +208,10 @@ bool ajaxtestview::run(bool *handled) {
 	testcontroller	*tc=factory::allocateTestController(getProperties());
 
 	// verify that we were posted json
-	if (!getRequest()->methodAllowed(NULL,"POST") ||
-		!getRequest()->contentTypeAllowed(NULL,"application/json")) {
+	if (!getRequest()->getMethodIsAllowed(
+					NULL,"POST") ||
+		!getRequest()->getContentTypeIsAllowed(
+					NULL,"application/json")) {
 		*handled=false;
 		return true;
 	}

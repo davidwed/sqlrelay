@@ -2046,7 +2046,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	// possibly other systems, it ends up in non-blocking mode
 	// in this process, independent of its mode in the other
 	// process.  So, we force it to blocking mode here.
-	connectionsock->useBlockingMode();
+	connectionsock->setUseNonBlockingMode(false);
 
 	raiseDebugMessageEvent("received socket of newly spawned connection");
 	return true;
@@ -2078,9 +2078,9 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 	// allow short reads and use non blocking mode
 	serversock->allowShortReads();
-	serversock->useNonBlockingMode();
+	serversock->setUseNonBlockingMode(true);
 	clientsock->allowShortReads();
-	clientsock->useNonBlockingMode();
+	clientsock->setUseNonBlockingMode(true);
 
 	// set up read and write listeners
 	listener	readlistener;
@@ -2186,9 +2186,9 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 
 	// set everything back to normal
 	serversock->dontAllowShortReads();
-	serversock->useBlockingMode();
+	serversock->setUseNonBlockingMode(false);
 	clientsock->dontAllowShortReads();
-	clientsock->useBlockingMode();
+	clientsock->setUseNonBlockingMode(false);
 
 	raiseDebugMessageEvent("finished proxying client");
 
@@ -2225,7 +2225,7 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 		// number of bytes that could be sent.
 
 		uint32_t	counter=0;
-		clientsock->useNonBlockingMode();
+		clientsock->setUseNonBlockingMode(true);
 		while (clientsock->read(&dummy,pvt->_idleclienttimeout,0)>0 &&
 					counter<
 					// sending auth
@@ -2261,7 +2261,7 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 					)/2) {
 			counter++;
 		}
-		clientsock->useBlockingMode();
+		clientsock->setUseNonBlockingMode(false);
 	}
 }
 

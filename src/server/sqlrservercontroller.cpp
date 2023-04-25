@@ -1934,7 +1934,7 @@ int32_t sqlrservercontroller::waitForClient() {
 		// possibly other systems, it ends up in non-blocking mode
 		// in this process, independent of its mode in the other
 		// process.  So, we force it to blocking mode here.
-		pvt->_clientsock->useBlockingMode();
+		pvt->_clientsock->setUseNonBlockingMode(false);
 
 		raiseDebugMessageEvent("done waiting for client");
 
@@ -6949,12 +6949,12 @@ void sqlrservercontroller::closeClientConnection(uint32_t bytes) {
 	raiseDebugMessageEvent("waiting for client to close the connection...");
 	uint16_t	dummy;
 	uint32_t	counter=0;
-	pvt->_clientsock->useNonBlockingMode();
+	pvt->_clientsock->setUseNonBlockingMode(true);
 	while (pvt->_clientsock->read(&dummy,pvt->_idleclienttimeout,0)>0 &&
 								counter<bytes) {
 		counter++;
 	}
-	pvt->_clientsock->useBlockingMode();
+	pvt->_clientsock->setUseNonBlockingMode(false);
 	
 	raiseDebugMessageEvent("done waiting for client to "
 					"close the connection");
