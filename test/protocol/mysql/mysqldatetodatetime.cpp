@@ -100,11 +100,11 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	const char	*query="drop table testtable";
-	mysql_real_query(&mysql,query,charstring::length(query));
+	mysql_real_query(&mysql,query,charstring::getLength(query));
 
 	stdoutput.printf("create\n");
 	query="create table testtable (col1 date)";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("list fields\n");
@@ -115,23 +115,23 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("alter nls_date_format\n");
 	query="alter session set nls_date_format='YYYY-MM-DD HH24:MI:SS'";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 
 	stdoutput.printf("insert\n");
 	query="insert into testtable values ('2001-01-01 01:00:00')";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("select\n");
 	query="select * from testtable";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	field=mysql_fetch_field_direct(result,0);
 	checkSuccess(field->type,MYSQL_TYPE_DATETIME);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("drop\n");
 	query="drop table testtable";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_info(&mysql),NULL);
 	stdoutput.printf("\n");
 

@@ -134,11 +134,11 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	const char	*query="drop table testtable";
-	mysql_real_query(&mysql,query,charstring::length(query));
+	mysql_real_query(&mysql,query,charstring::getLength(query));
 
 	stdoutput.printf("mysql_real_query: create\n");
 	query="create table testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_info(&mysql),NULL);
 	stdoutput.printf("\n");
 
@@ -359,14 +359,14 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_real_query: insert\n");
 	query="insert into testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_info(&mysql),NULL);
 	checkSuccess(mysql_affected_rows(&mysql),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("mysql_send_query: insert\n");
 	query="insert into testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)";
-	checkSuccess(mysql_send_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_send_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_info(&mysql),NULL);
 	checkSuccess(mysql_read_query_result(&mysql),0);
 	checkSuccess(mysql_affected_rows(&mysql),1);
@@ -374,7 +374,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_real_query: select\n");
 	query="select * from testtable";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_info(&mysql),NULL);
 	stdoutput.printf("\n");
 
@@ -639,7 +639,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_real_query: select\n");
 	query="select * from testtable";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_info(&mysql),NULL);
 	stdoutput.printf("\n");
 
@@ -697,7 +697,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_real_query: drop\n");
 	query="drop table testtable";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_info(&mysql),NULL);
 	stdoutput.printf("\n");
 
@@ -718,24 +718,24 @@ int	main(int argc, char **argv) {
 	
 	stdoutput.printf("mysql_insert_id\n");
 	query="create table testtable (col1 int not null primary key auto_increment, col2 int)";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	query="insert into testtable (col2) values (1)";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_insert_id(&mysql),1);
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_insert_id(&mysql),2);
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_insert_id(&mysql),3);
 	query="drop table testtable";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	stdoutput.printf("\n");
 
 	
 	stdoutput.printf("mysql_error/mysql_errno\n");
 	query="known bad query";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),1);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),1);
 	char	*error=charstring::duplicate(mysql_error(&mysql));
-	if (charstring::length(error)>36) {
+	if (charstring::getLength(error)>36) {
 		error[36]='\0';
 	}
 	checkSuccess(error,"You have an error in your SQL syntax");
@@ -882,7 +882,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("mysql_stmt_prepare: create\n");
 	query="create table testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)";
 	checkSuccess(mysql_stmt_prepare(stmt,query,
-				charstring::length(query)),0);
+				charstring::getLength(query)),0);
 	stdoutput.printf("\n");
 
 
@@ -893,21 +893,21 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_prepare/execute: insert\n");
 	query="insert into testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',NULL)";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	stdoutput.printf("\n");
 
 
 	stdoutput.printf("mysql_stmt_prepare/execute: insert\n");
 	query="insert into testtable values (2,2,2,2,2,2.1,2.1,2.1,'2002-01-01','02:00:00','2002-01-01 02:00:00','2002','char2','text2','varchar2','tinytext2','mediumtext2','longtext2',NULL)";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	stdoutput.printf("\n");
 
 
 	stdoutput.printf("mysql_stmt_prepare: select\n");
 	query="select * from testtable";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	stdoutput.printf("\n");
 
 
@@ -1053,14 +1053,14 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_prepare/execute: drop\n");
 	query="drop table testtable";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	stdoutput.printf("\n");
 
 
 	stdoutput.printf("mysql_stmt_prepare/execute: select with odd NULLS\n");
 	query="select NULL,1,NULL,1,NULL,1";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
@@ -1077,7 +1077,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_prepare/execute: select with even NULLS\n");
 	query="select 1,NULL,1,NULL,1,NULL";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
 	checkSuccess(mysql_stmt_fetch(stmt),0);
@@ -1096,7 +1096,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_prepare/execute: select with binds\n");
 	query="select ?,?,?,?,?,?,?,?,?,?,?,?,?,?";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	MYSQL_BIND	bind[14];
 	unsigned long	bindlength[14];
 	my_bool		bindisnull[14];
@@ -1268,7 +1268,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_prepare/execute: select with even null binds\n");
 	query="select ?,?,?,?";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	bytestring::zero(&bind,sizeof(bind));
 	bytestring::zero(&bindlength,sizeof(bindlength));
 	bytestring::zero(&bindisnull,sizeof(bindisnull));
@@ -1321,7 +1321,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_prepare/execute: select with odd null binds\n");
 	query="select ?,?,?,?";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	bytestring::zero(&bind,sizeof(bind));
 	bytestring::zero(&bindlength,sizeof(bindlength));
 	bytestring::zero(&bindisnull,sizeof(bindisnull));
@@ -1378,7 +1378,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_prepare/execute: binary data\n");
 	query="create table testtable (col1 longblob)";
-	checkSuccess(mysql_real_query(&mysql,query,charstring::length(query)),0);
+	checkSuccess(mysql_real_query(&mysql,query,charstring::getLength(query)),0);
 	const char	value[]={0,'"','"','\n'};
 	stringbuffer	q;
 	q.append("insert into testtable values (_binary'");
@@ -1387,7 +1387,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_real_query(&mysql,q.getString(),q.getSize()),0);
 	stmt=mysql_stmt_init(&mysql);
 	query="select col1 from testtable";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_stmt_bind_result(stmt,fieldbind),0);
 	for (uint16_t i=0; i<19; i++) {
 		bytestring::zero(&fieldbind[i],sizeof(MYSQL_BIND));
@@ -1408,7 +1408,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("mysql_stmt_prepare/execute: drop\n");
 	query="drop table testtable";
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	stdoutput.printf("\n");
 

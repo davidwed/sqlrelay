@@ -371,7 +371,7 @@ bool postgresqlconnection::logIn(const char **error,
 #endif
 
 #if defined(HAVE_POSTGRESQL_PQSETCLIENTENCODING)
-	if (charstring::length(charset)) {
+	if (charstring::getLength(charset)) {
 		PQsetClientEncoding(pgconn,charset);
 	}
 #endif
@@ -469,7 +469,7 @@ void postgresqlconnection::errorMessage(char *errorbuffer,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	const char	*errorstring=PQerrorMessage(pgconn);
-	*errorlength=charstring::length(errorstring);
+	*errorlength=charstring::getLength(errorstring);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errorstring,*errorlength);
 	// PostgreSQL doesn't have an error number per-se.  We'll set it
@@ -521,7 +521,7 @@ const char *postgresqlconnection::dbVersion() {
 		int64_t	minor=charstring::toInteger(parts[1]);
 		int64_t	patch=charstring::toInteger(parts[2]);
 		charstring::printf(dbversion,
-					charstring::length(dbversion)+1,
+					charstring::getLength(dbversion)+1,
 					"%s%02lld%02lld",
 					parts[0],
 					(long long)minor,(long long)patch);
@@ -536,7 +536,7 @@ const char *postgresqlconnection::dbVersion() {
 
 const char *postgresqlconnection::dbHostName() {
 	const char	*dbhostname=sqlrserverconnection::dbHostName();
-	if (charstring::length(dbhostname)) {
+	if (charstring::getLength(dbhostname)) {
 		return dbhostname;
 	}
 	if (!hostname) {
@@ -551,7 +551,7 @@ const char *postgresqlconnection::dbIpAddressQuery() {
 
 const char *postgresqlconnection::dbIpAddress() {
 	const char	*ipaddress=sqlrserverconnection::dbIpAddress();
-	return (charstring::length(ipaddress))?ipaddress:"127.0.0.1";
+	return (charstring::getLength(ipaddress))?ipaddress:"127.0.0.1";
 }
 
 const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
@@ -903,7 +903,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 	}
 
 	bindvalues[pos]=charstring::parseNumber(*value);
-	bindlengths[pos]=charstring::length(bindvalues[pos]);
+	bindlengths[pos]=charstring::getLength(bindvalues[pos]);
 	bindformats[pos]=0;
 	bindcounter++;
 	return true;
@@ -928,7 +928,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 	}
 
 	bindvalues[pos]=charstring::parseNumber(*value,precision,scale);
-	bindlengths[pos]=charstring::length(bindvalues[pos]);
+	bindlengths[pos]=charstring::getLength(bindvalues[pos]);
 	bindformats[pos]=0;
 	bindcounter++;
 	return true;
@@ -1184,7 +1184,7 @@ void postgresqlcursor::errorMessage(char *errorbuffer,
 			(bindformaterror)?
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING:
 				PQerrorMessage(postgresqlconn->pgconn);
-	*errorlength=charstring::length(errorstring);
+	*errorlength=charstring::getLength(errorstring);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errorstring,*errorlength);
 	// PostgreSQL doesn't have an error number per-se.  We'll set it

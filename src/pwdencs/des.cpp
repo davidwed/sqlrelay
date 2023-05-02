@@ -28,13 +28,13 @@ char *sqlrpwdenc_des::encrypt(const char *value) {
 			getParameters()->getAttributeValue("salt"),
 			d.getSaltSize());
 
-	d.append((const byte_t *)value,charstring::length(value));
+	d.append((const byte_t *)value,charstring::getLength(value));
 
 	const char	*encrypted=(const char *)d.getHash();
 
 	// the first two characters of the result string are the salt,
 	// so don't include them in the result, if possible
-	return (charstring::length(encrypted)<2)?
+	return (charstring::getLength(encrypted)<2)?
 			charstring::duplicate(encrypted):
 			charstring::duplicate(encrypted+2);
 }

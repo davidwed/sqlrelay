@@ -209,7 +209,7 @@ bool sqlrserverconnection::begin() {
 
 	// init some variables
 	const char	*beginquery=beginTransactionQuery();
-	int		beginquerylen=charstring::length(beginquery);
+	int		beginquerylen=charstring::getLength(beginquery);
 	bool		retval=false;
 
 	// run the query...
@@ -334,8 +334,8 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	}
 
 	// bounds checking
-	size_t		sdquerylen=charstring::length(sdquerybase)+
-					charstring::length(database)+1;
+	size_t		sdquerylen=charstring::getLength(sdquerybase)+
+					charstring::getLength(database)+1;
 	if (sdquerylen>pvt->_maxquerysize) {
 		return false;
 	}
@@ -343,7 +343,7 @@ bool sqlrserverconnection::selectDatabase(const char *database) {
 	// create the select database query
 	char	*sdquery=new char[sdquerylen];
 	charstring::printf(sdquery,sdquerylen,sdquerybase,database);
-	sdquerylen=charstring::length(sdquery);
+	sdquerylen=charstring::getLength(sdquery);
 
 	// run the query...
 	// (enable translations, triggers, etc. for this one)
@@ -383,7 +383,7 @@ char *sqlrserverconnection::getCurrentDatabase() {
 		return NULL;
 	}
 
-	size_t		gcdquerylen=charstring::length(gcdquery);
+	size_t		gcdquerylen=charstring::getLength(gcdquery);
 
 	// run the query...
 	char	*retval=NULL;
@@ -424,7 +424,7 @@ char *sqlrserverconnection::getCurrentSchema() {
 		return NULL;
 	}
 
-	size_t		gcsquerylen=charstring::length(gcsquery);
+	size_t		gcsquerylen=charstring::getLength(gcsquery);
 
 	// run the query...
 	char	*retval=NULL;
@@ -472,7 +472,7 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 		return false;
 	}
 
-	size_t	liiquerylen=charstring::length(liiquery);
+	size_t	liiquerylen=charstring::getLength(liiquery);
 
 	// run the query...
 	bool	retval=false;
@@ -524,7 +524,7 @@ const char *sqlrserverconnection::noopQuery() {
 bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
 
 	// if no isolation level was passed in then bail
-	if (!charstring::length(isolevel)) {
+	if (!charstring::getLength(isolevel)) {
 		return false;
 	}
 
@@ -533,13 +533,13 @@ bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
 
 	// If there is no query for this then the db we're using doesn't
 	// support switching.  Return true as if it succeeded though.
-	if (!charstring::length(silquerybase)) {
+	if (!charstring::getLength(silquerybase)) {
 		return true;
 	}
 
 	// bounds checking
-	size_t		silquerylen=charstring::length(silquerybase)+
-					charstring::length(isolevel)+1;
+	size_t		silquerylen=charstring::getLength(silquerybase)+
+					charstring::getLength(isolevel)+1;
 	if (silquerylen>pvt->_maxquerysize) {
 		return false;
 	}
@@ -547,7 +547,7 @@ bool sqlrserverconnection::setIsolationLevel(const char *isolevel) {
 	// create the set isolation level query
 	char	*silquery=new char[silquerylen];
 	charstring::printf(silquery,silquerylen,silquerybase,isolevel);
-	silquerylen=charstring::length(silquery);
+	silquerylen=charstring::getLength(silquery);
 
 	// run the query...
 	bool	retval=false;
@@ -577,7 +577,7 @@ const char *sqlrserverconnection::setIsolationLevelQuery() {
 
 bool sqlrserverconnection::ping() {
 	const char	*pingquery=pingQuery();
-	int		pingquerylen=charstring::length(pingquery);
+	int		pingquerylen=charstring::getLength(pingquery);
 	sqlrservercursor	*pingcur=cont->newCursor();
 	if (pingcur->open() &&
 		pingcur->prepareQuery(pingquery,pingquerylen) &&
@@ -623,7 +623,7 @@ const char *sqlrserverconnection::dbHostName() {
 	const char	*dbhnquery=dbHostNameQuery();
 	if (dbhnquery) {
 
-		size_t		dbhnquerylen=charstring::length(dbhnquery);
+		size_t		dbhnquerylen=charstring::getLength(dbhnquery);
 		sqlrservercursor	*dbhncur=cont->newCursor();
 		if (dbhncur->open() &&
 			dbhncur->prepareQuery(dbhnquery,dbhnquerylen) &&
@@ -682,7 +682,7 @@ const char *sqlrserverconnection::dbIpAddress() {
 	const char	*dbiaquery=dbIpAddressQuery();
 	if (dbiaquery) {
 
-		size_t		dbiaquerylen=charstring::length(dbiaquery);
+		size_t		dbiaquerylen=charstring::getLength(dbiaquery);
 		sqlrservercursor	*dbiacur=cont->newCursor();
 		if (dbiacur->open() &&
 			dbiacur->prepareQuery(dbiaquery,dbiaquerylen) &&
@@ -916,11 +916,11 @@ bool sqlrserverconnection::isSynonym(const char *table) {
 	}
 
 	// rebuild it to include the table
-	size_t	synquerylen=charstring::length(synquerybase)+
-					charstring::length(table);
+	size_t	synquerylen=charstring::getLength(synquerybase)+
+					charstring::getLength(table);
 	char	*synquery=new char[synquerylen+1];
 	charstring::printf(synquery,synquerylen+1,synquerybase,table);
-	synquerylen=charstring::length(synquery);
+	synquerylen=charstring::getLength(synquery);
 
 	sqlrservercursor	*syncur=cont->newCursor();
 	bool	error=false;

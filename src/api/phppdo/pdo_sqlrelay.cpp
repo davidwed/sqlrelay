@@ -66,11 +66,11 @@ extern "C" {
 	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b)
 
 	#define RET_STRING(a,b) \
-		RETURN_STR(zend_string_init(a,charstring::length(a),0))
+		RETURN_STR(zend_string_init(a,charstring::getLength(a),0))
 
 	#define ADD_ASSOC_STRING(a,b,c,d) \
 		add_assoc_string(a,b,\
-			zend_string_init(c,charstring::length(c),0)->val)
+			zend_string_init(c,charstring::getLength(c),0)->val)
 
 	#define CONVERT_TO_STRING(a) convert_to_string(&(a))
 	#define CONVERT_TO_STRING_EX(a) convert_to_string_ex(&(a))
@@ -355,11 +355,11 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	const char	*n=sqlrcur->getColumnName(colno);
 #if PHP_MAJOR_VERSION >= 7
-	stmt->columns[colno].name=zend_string_init(n,charstring::length(n),0);
+	stmt->columns[colno].name=zend_string_init(n,charstring::getLength(n),0);
 #else
 	char		*name=estrdup((n)?n:"");
 	stmt->columns[colno].name=name;
-	stmt->columns[colno].namelen=charstring::length(name);
+	stmt->columns[colno].namelen=charstring::getLength(name);
 #endif
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
 #if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
@@ -1560,7 +1560,7 @@ sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 	*len=idlen;
 	return id;
 #else
-	return zend_string_init(id,charstring::length(id),0);
+	return zend_string_init(id,charstring::getLength(id),0);
 #endif
 }
 

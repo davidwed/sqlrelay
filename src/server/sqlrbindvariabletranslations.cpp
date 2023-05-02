@@ -96,10 +96,10 @@ void sqlrbindvariabletranslations::loadBindVariableTranslation(
 	// get the bind variable translation name
 	const char	*module=
 			bindvariabletranslation->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=bindvariabletranslation->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

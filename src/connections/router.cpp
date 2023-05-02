@@ -736,8 +736,8 @@ void routerconnection::errorMessage(char *errorbuffer,
 
 	for (uint16_t index=0; index<concount; index++) {
 		const char	*errormessage=cons[index]->errorMessage();
-		if (!charstring::length(errormessage)) {
-			*errorlength=charstring::length(errormessage);
+		if (!charstring::getLength(errormessage)) {
+			*errorlength=charstring::getLength(errormessage);
 			charstring::safeCopy(errorbuffer,errorbufferlength,
 						errormessage,*errorlength);
 			*errorcode=cons[index]->errorNumber();
@@ -1663,7 +1663,7 @@ void routercursor::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	const char	*errormessage=
 			(currentcur)?currentcur->errorMessage():"";
-	*errorlength=charstring::length(errormessage);
+	*errorlength=charstring::getLength(errormessage);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errormessage,*errorlength);
 	*errorcode=(currentcur)?currentcur->errorNumber():0;

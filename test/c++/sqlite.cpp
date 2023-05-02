@@ -668,7 +668,7 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->colCount(),1);
 	checkSuccess(cur->rowCount(),1);
 	checkSuccess(cur->getColumnName(0),"LASTINSERTROWID");
-	checkSuccess(!charstring::length(cur->getField(0,(uint32_t)0)),0);
+	checkSuccess(!charstring::getLength(cur->getField(0,(uint32_t)0)),0);
 	stdoutput.printf("\n");
 
 	// invalid queries...

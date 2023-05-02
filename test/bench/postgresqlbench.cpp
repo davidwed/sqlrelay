@@ -82,7 +82,7 @@ postgresqlbenchconnection::postgresqlbenchconnection(
 	user=getParam("user");
 	password=getParam("password");
 	sslmode=getParam("sslmode");
-	if (!charstring::length(sslmode)) {
+	if (!charstring::getLength(sslmode)) {
 		sslmode="disable";
 	}
 	pgconn=NULL;

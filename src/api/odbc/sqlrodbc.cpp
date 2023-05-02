@@ -1633,7 +1633,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				*stringlength=charstring::length(name);
+				*stringlength=charstring::getLength(name);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
 			} else {
@@ -1772,7 +1772,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  label: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				*stringlength=charstring::length(name);
+				*stringlength=charstring::getLength(name);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
 			} else {
@@ -1878,7 +1878,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  local type name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				*stringlength=charstring::length(name);
+				*stringlength=charstring::getLength(name);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
 			} else {
@@ -1939,7 +1939,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  type name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				*stringlength=charstring::length(name);
+				*stringlength=charstring::getLength(name);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
 			} else {
@@ -2138,7 +2138,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 					tablename,namelength3);
 
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length((const char *)columnname);
+		namelength4=charstring::getLength((const char *)columnname);
 	}
 	char	*wild=charstring::duplicate(
 				(const char *)columnname,namelength4);
@@ -2212,7 +2212,7 @@ static int SQLGetPrivateProfileString(const char *section,
 	charstring::safeCopy(retbuffer,retbufferlen,value);
 
 	// return number of characters copied oud
-	int	len=(int)charstring::length(value)+1;
+	int	len=(int)charstring::getLength(value)+1;
 	return (retbufferlen>len)?len:retbufferlen;
 }
 #endif
@@ -2235,7 +2235,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 
 	// copy the dsn, sometimes it's not NULL-terminated
 	if (dsnlength==SQL_NTS) {
-		dsnlength=charstring::length((const char *)dsn);
+		dsnlength=charstring::getLength((const char *)dsn);
 	}
 	if ((size_t)dsnlength>=sizeof(conn->dsn)) {
 		dsnlength=sizeof(conn->dsn)-1;
@@ -2262,7 +2262,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					ODBC_INI);
 	if (!charstring::isNullOrEmpty((const char *)user)) {
 		if (userlength==SQL_NTS) {
-			userlength=charstring::length((const char *)user);
+			userlength=charstring::getLength((const char *)user);
 		}
 		if ((size_t)userlength>=sizeof(conn->user)) {
 			userlength=sizeof(conn->user)-1;
@@ -2280,7 +2280,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	parameterstring	pstr;
 	if (!charstring::isNullOrEmpty((const char *)password)) {
 		if (passwordlength==SQL_NTS) {
-			passwordlength=charstring::length(
+			passwordlength=charstring::getLength(
 					(const char *)password);
 		}
 	} else {
@@ -2288,7 +2288,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 		// extract Passwords on all platforms.
 		pstr.parse(conn->dsn);
 		password=(SQLCHAR *)pstr.getValue("Password");
-		passwordlength=charstring::length((const char *)password);
+		passwordlength=charstring::getLength((const char *)password);
 	}
 	if ((size_t)passwordlength>=sizeof(conn->password)) {
 		passwordlength=sizeof(conn->password)-1;
@@ -2697,7 +2697,7 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 		debugPrintf("  columnname   : %s\n",columnname);
 	}
 	if (namelength) {
-		*namelength=charstring::length((const char *)columnname);
+		*namelength=charstring::getLength((const char *)columnname);
 		debugPrintf("  namelength   : %d\n",*namelength);
 	}
 	if (datatype) {
@@ -3749,7 +3749,7 @@ static uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 	// find the length of the string
 	uint32_t	length=0;
 	if (textlength==SQL_NTS) {
-		length=charstring::length((const char *)statementtext);
+		length=charstring::getLength((const char *)statementtext);
 	} else {
 		length=textlength;
 	}
@@ -4360,7 +4360,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			break;
 		case 0:
 			debugPrintf("  strval: %s\n",val.strval);
-			valuelength=charstring::length(val.strval);
+			valuelength=charstring::getLength(val.strval);
 			debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 			if (value && bufferlength) {
 
@@ -4447,7 +4447,7 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT statementhandle,
 					bufferlength,stmt->name);
 	}
 	if (namelength) {
-		*namelength=charstring::length(stmt->name);
+		*namelength=charstring::getLength(stmt->name);
 	}
 
 	return SQL_SUCCESS;
@@ -5191,7 +5191,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 			break;
 		case 0:
 			debugPrintf("  strval: %s\n",val.strval);
-			valuelength=charstring::length(val.strval);
+			valuelength=charstring::getLength(val.strval);
 			if (diaginfo && bufferlength) {
 
 				charstring::safeCopy((char *)diaginfo,
@@ -5338,13 +5338,13 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 				"(not copying out: %s)\n",(sqlst)?sqlst:"");
 	}
 
-	SQLSMALLINT	valuelength=charstring::length(error);
+	SQLSMALLINT	valuelength=charstring::getLength(error);
 	if (messagetext && bufferlength) {
 
 		charstring::safeCopy((char *)messagetext,
 					(size_t)bufferlength,
 					error);
-		valuelength=charstring::length((const char *)messagetext);
+		valuelength=charstring::getLength((const char *)messagetext);
 
 		// make sure to null-terminate
 		// (even if data has to be truncated)
@@ -7775,7 +7775,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case 0:
 			debugPrintf("  strval: %s\n",val.strval);
-			valuelength=charstring::length(val.strval);
+			valuelength=charstring::getLength(val.strval);
 			debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 			if (infovalue && bufferlength) {
 
@@ -8596,7 +8596,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 
 	// handle null-terminated strings
 	if (strlen_or_ind==SQL_NTS) {
-		strlen_or_ind=charstring::length((const char *)data);
+		strlen_or_ind=charstring::getLength((const char *)data);
 	}
 
 	// handle null/empty data
@@ -9406,16 +9406,16 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	// normalize the names
 	if (namelength1==SQL_NTS) {
-		namelength1=charstring::length((const char *)catalogname);
+		namelength1=charstring::getLength((const char *)catalogname);
 	}
 	if (namelength2==SQL_NTS) {
-		namelength2=charstring::length((const char *)schemaname);
+		namelength2=charstring::getLength((const char *)schemaname);
 	}
 	if (namelength3==SQL_NTS) {
-		namelength3=charstring::length((const char *)tablename);
+		namelength3=charstring::getLength((const char *)tablename);
 	}
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length((const char *)tabletype);
+		namelength4=charstring::getLength((const char *)tabletype);
 	}
 	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
@@ -9583,7 +9583,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 
 	// the connect string may not be null terminated, so make a copy that is
 	if (cbconnstrin==SQL_NTS) {
-		cbconnstrin=charstring::length((const char *)szconnstrin);
+		cbconnstrin=charstring::getLength((const char *)szconnstrin);
 	}
 	char	*nulltermconnstr=charstring::duplicate(
 					(const char *)szconnstrin,
@@ -9639,7 +9639,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	// output the updated connect string
 	if (pcbconnstrout) {
 		if (cbconnstrin==SQL_NTS) {
-			*pcbconnstrout=charstring::length(
+			*pcbconnstrout=charstring::getLength(
 						(const char *)szconnstrin);
 		} else {
 			*pcbconnstrout=cbconnstrin;
@@ -9714,11 +9714,11 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	return SQLR_SQLConnect(hdbc,
 				&pstr,
 				(SQLCHAR *)dsn,
-				charstring::length(dsn),
+				charstring::getLength(dsn),
 				(SQLCHAR *)uid,
-				charstring::length(uid),
+				charstring::getLength(uid),
 				(SQLCHAR *)pwd,
-				charstring::length(pwd));
+				charstring::getLength(pwd));
 }
 
 SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
@@ -10014,7 +10014,7 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 					procedurename,namelength3);
 
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length((const char *)columnname);
+		namelength4=charstring::getLength((const char *)columnname);
 	}
 	char	*wild=charstring::duplicate(
 				(const char *)columnname,namelength4);
@@ -10072,13 +10072,13 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 
 	// normalize the names
 	if (namelength1==SQL_NTS) {
-		namelength1=charstring::length((const char *)catalogname);
+		namelength1=charstring::getLength((const char *)catalogname);
 	}
 	if (namelength2==SQL_NTS) {
-		namelength2=charstring::length((const char *)schemaname);
+		namelength2=charstring::getLength((const char *)schemaname);
 	}
 	if (namelength3==SQL_NTS) {
-		namelength3=charstring::length((const char *)procname);
+		namelength3=charstring::getLength((const char *)procname);
 	}
 	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
@@ -11563,7 +11563,7 @@ static void parseDsn(const char *dsn) {
 
 	// dsn is formatted like:
 	// DSN=xxx\0Server=xxx\0Port=xxx\0\0
-	for (const char *c=dsn; c && *c; c=c+charstring::length(c)+1) {
+	for (const char *c=dsn; c && *c; c=c+charstring::getLength(c)+1) {
 		char		**parts;
 		uint64_t	partcount;
 		charstring::split(c,"=",true,&parts,&partcount);

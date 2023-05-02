@@ -1011,7 +1011,7 @@ bool freetdscursor::open() {
 	bool	retval=true;
 	if (!charstring::isNullOrEmpty(freetdsconn->db) &&
 					!freetdsconn->dbused) {
-		uint32_t	len=charstring::length(freetdsconn->db)+4;
+		uint32_t	len=charstring::getLength(freetdsconn->db)+4;
 		char		*query=new char[len+1];
 		charstring::printf(query,len+1,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
@@ -1044,7 +1044,7 @@ bool freetdscursor::open() {
 		for (uint32_t i=0; query[i] && !freetdsconn->dbversion; i++) {
 
 			const char	*q=query[i];
-			int32_t		len=charstring::length(q);
+			int32_t		len=charstring::getLength(q);
 			bool		error=false;
 
 			if (prepareQuery(q,len) &&
@@ -1349,7 +1349,7 @@ bool freetdscursor::inputBind(const char *variable,
 	charstring::append(buffer,(int64_t)microsecond);
 	charstring::append(buffer,ampm);
 	return inputBind(variable,variablesize,
-				buffer,charstring::length(buffer),isnull);
+				buffer,charstring::getLength(buffer),isnull);
 }
 
 bool freetdscursor::outputBind(const char *variable, 

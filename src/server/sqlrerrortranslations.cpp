@@ -91,10 +91,10 @@ void sqlrerrortranslations::loadErrorTranslation(domnode *errortranslation) {
 
 	// get the error translation name
 	const char	*module=errortranslation->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=errortranslation->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

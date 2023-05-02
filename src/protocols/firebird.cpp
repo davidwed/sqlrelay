@@ -1538,7 +1538,7 @@ bool sqlrprotocol_firebird::authenticate() {
 	sqlrfirebirdcredentials	cred;
 	cred.setUser(user);
 	cred.setPassword(password);
-	cred.setPasswordLength(charstring::length(password));
+	cred.setPasswordLength(charstring::getLength(password));
 	cred.setMethod(authmethod);
 	cred.setSalt(salt);
 

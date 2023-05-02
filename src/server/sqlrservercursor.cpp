@@ -691,7 +691,7 @@ const char *sqlrservercursor::getColumnName(uint32_t col) {
 }
 
 uint16_t sqlrservercursor::getColumnNameLength(uint32_t col) {
-	return charstring::length(getColumnName(col));
+	return charstring::getLength(getColumnName(col));
 }
 
 uint16_t sqlrservercursor::getColumnType(uint32_t col) {
@@ -703,7 +703,7 @@ const char *sqlrservercursor::getColumnTypeName(uint32_t col) {
 }
 
 uint16_t sqlrservercursor::getColumnTypeNameLength(uint32_t col) {
-	return charstring::length(getColumnTypeName(col));
+	return charstring::getLength(getColumnTypeName(col));
 }
 
 uint32_t sqlrservercursor::getColumnLength(uint32_t col) {
@@ -755,7 +755,7 @@ const char *sqlrservercursor::getColumnTable(uint32_t col) {
 }
 
 uint16_t sqlrservercursor::getColumnTableLength(uint32_t col) {
-	return charstring::length(getColumnTable(col));
+	return charstring::getLength(getColumnTable(col));
 }
 
 bool sqlrservercursor::ignoreDateDdMmParameter(uint32_t col,

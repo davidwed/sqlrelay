@@ -273,7 +273,7 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 
 	// build rcfilename
-	size_t	userrcfilelen=charstring::length(home)+10+1;
+	size_t	userrcfilelen=charstring::getLength(home)+10+1;
 	char	*userrcfile=new char[userrcfilelen];
 	charstring::copy(userrcfile,home);
 	charstring::append(userrcfile,"/.sqlrshrc");
@@ -1247,7 +1247,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.isnegative);
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB) {
 				sqlrcur->inputBindBlob(name,bv->stringval,
-					charstring::length(bv->stringval));
+					charstring::getLength(bv->stringval));
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_NULL) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 			}
@@ -1512,7 +1512,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 		// write the column name
 		name=sqlrcur->getColumnName(ci);
-		namelen=charstring::length(name);
+		namelen=charstring::getLength(name);
 		if (env->format==SQLRSH_FORMAT_PLAIN) {
 			stdoutput.write(name);
 		} else {
@@ -1522,7 +1522,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			// spreadsheet apps) likes to convert 12+
 			// digit numbers to scientific notation.
 			bool	quote=(!charstring::isNumber(name) ||
-					charstring::length(name)>=12);
+					charstring::getLength(name)>=12);
 			if (quote) {
 				stdoutput.write('"');
 			}
@@ -1632,7 +1632,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 					charstring::printf(&numberfieldbuffer[0], sizeof(numberfieldbuffer), "%ld", fi);
 				}
 				field=numberfieldbuffer;
-				fieldlength=charstring::length(field);
+				fieldlength=charstring::getLength(field);
 			}
 
 			// check for end-of-result-set condition
@@ -1666,7 +1666,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 				// spreadsheet apps) likes to convert 12+
 				// digit numbers to scientific notation.
 				bool	quote=(!charstring::isNumber(field) ||
-						charstring::length(field)>=12);
+						charstring::getLength(field)>=12);
 				if (quote) {
 					stdoutput.write('"');
 				}
@@ -1680,7 +1680,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			if (env->format==SQLRSH_FORMAT_PLAIN) {
 				longest=sqlrcur->getLongest(col);
 				if (env->headers) {
-					namelen=charstring::length(
+					namelen=charstring::getLength(
 						sqlrcur->getColumnName(col));
 					if (namelen>longest) {
 						longest=namelen;
@@ -1858,7 +1858,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	// get the value
 	char	*value=charstring::duplicate(ptr);
 	charstring::bothTrim(value);
-	size_t	valuelen=charstring::length(value);
+	size_t	valuelen=charstring::getLength(value);
 
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
@@ -1969,7 +1969,7 @@ bool sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 	// get the value
 	char	*value=charstring::duplicate(ptr);
 	charstring::bothTrim(value);
-	size_t	valuelen=charstring::length(value);
+	size_t	valuelen=charstring::getLength(value);
 
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
@@ -2112,7 +2112,7 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 		charstring::bothTrim(value);
 		charstring::bothTrim(value,'\'');
 	} else if (charstring::compare(
-			command+charstring::length(command)-8," is null")) {
+			command+charstring::getLength(command)-8," is null")) {
 		// FIXME: usage...
 		return false;
 	}
@@ -2255,7 +2255,7 @@ void sqlrsh::printbinds(const char *type,
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB) {
 			stdoutput.printf("(BLOB) = ");
 			stdoutput.safePrint(bv->stringval,
-					charstring::length(bv->stringval));
+					charstring::getLength(bv->stringval));
 			stdoutput.printf("\n");
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_NULL) {
 			stdoutput.printf("NULL\n");
@@ -2538,7 +2538,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				return;
 			}
 
-			size_t	len=charstring::length(cmd);
+			size_t	len=charstring::getLength(cmd);
 
 			// len=0 and cmd="" if you just hit return
 			if (len) {
@@ -2730,7 +2730,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	// handle the history file
 	const char	*home=environment::getValue("HOME");
 	if (!charstring::isNullOrEmpty(home)) {
-		char	*filename=new char[charstring::length(home)+16+1];
+		char	*filename=new char[charstring::getLength(home)+16+1];
 		charstring::copy(filename,home);
 		charstring::append(filename,"/.sqlrsh_history");
 		pr.setHistoryFile(filename);

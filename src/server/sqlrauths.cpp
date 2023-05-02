@@ -79,10 +79,10 @@ void sqlrauths::loadAuth(domnode *auth, sqlrpwdencs *sqlrpe) {
 
 	// get the auth name
 	const char	*module=auth->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=auth->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			// fall back to default if no module is specified
 			module="default";
 		}

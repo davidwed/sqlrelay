@@ -964,7 +964,7 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 	bindvarnamesizes=new int16_t[maxbindcount];
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		charstring::printf(&bindvarnames[i],"?%d",i+1);
-		bindvarnamesizes[i]=charstring::length(bindvarnames[i]);
+		bindvarnamesizes[i]=charstring::getLength(bindvarnames[i]);
 	}
 
 	pcounts=new uint16_t[maxcursorcount];
@@ -1494,7 +1494,7 @@ void sqlrprotocol_mysql::buildHandshake10() {
 
 	// build packet
 	write(&resppacket,protocolversion);
-	write(&resppacket,serverversion,charstring::length(serverversion)+1);
+	write(&resppacket,serverversion,charstring::getLength(serverversion)+1);
 	writeLE(&resppacket,connectionid);
 	write(&resppacket,challenge,8);
 	write(&resppacket,(char)0x00);
@@ -1511,18 +1511,18 @@ void sqlrprotocol_mysql::buildHandshake10() {
 		writeLE(&resppacket,highservercapabilityflags);
 	}
 	if (servercapabilityflags&CLIENT_PLUGIN_AUTH) {
-		write(&resppacket,(byte_t)(charstring::length(challenge)+1));
+		write(&resppacket,(byte_t)(charstring::getLength(challenge)+1));
 	} else {
 		write(&resppacket,(char)0x00);
 	}
 	write(&resppacket,reserved,sizeof(reserved));
 	if (servercapabilityflags&CLIENT_SECURE_CONNECTION) {
 		write(&resppacket,challenge+8,
-				charstring::length(challenge+8)+1);
+				charstring::getLength(challenge+8)+1);
 	}
 	if (servercapabilityflags&CLIENT_PLUGIN_AUTH) {
 		write(&resppacket,serverauthpluginname,
-				charstring::length(serverauthpluginname)+1);
+				charstring::getLength(serverauthpluginname)+1);
 	}
 }
 
@@ -1553,9 +1553,9 @@ void sqlrprotocol_mysql::buildHandshake9() {
 
 	// build packet
 	write(&resppacket,protocolversion);
-	write(&resppacket,serverversion,charstring::length(serverversion)+1);
+	write(&resppacket,serverversion,charstring::getLength(serverversion)+1);
 	writeLE(&resppacket,connectionid);
-	write(&resppacket,challenge,charstring::length(challenge)+1);
+	write(&resppacket,challenge,charstring::getLength(challenge)+1);
 }
 
 bool sqlrprotocol_mysql::recvHandshakeResponse() {
@@ -1629,7 +1629,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 	// username
 	delete[] username;
 	username=charstring::duplicate((const char *)rp);
-	rp+=charstring::length(username)+1;
+	rp+=charstring::getLength(username)+1;
 	if (getDebug()) {
 		stdoutput.printf("	username: \"%s\"\n",username);
 	}
@@ -1695,7 +1695,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 	database=NULL;
 	if (rp<end && clientcapabilityflags&CLIENT_CONNECT_WITH_DB) {
 		database=charstring::duplicate((const char *)rp);
-		rp+=charstring::length(database)+1;
+		rp+=charstring::getLength(database)+1;
 		if (getDebug()) {
 			stdoutput.printf("	database: \"%s\"\n",database);
 		}
@@ -1704,7 +1704,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 	// auth plugin name
 	if (rp<end && clientcapabilityflags&CLIENT_PLUGIN_AUTH) {
 		clientauthpluginname=(const char *)rp;
-		rp+=charstring::length(clientauthpluginname)+1;
+		rp+=charstring::getLength(clientauthpluginname)+1;
 		if (getDebug()) {
 			stdoutput.printf("	auth plugin name: \"%s\"\n",
 							clientauthpluginname);
@@ -1806,7 +1806,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 	// username
 	delete[] username;
 	username=charstring::duplicate((const char *)rp);
-	rp+=charstring::length(username)+1;
+	rp+=charstring::getLength(username)+1;
 	if (getDebug()) {
 		stdoutput.printf("	username: \"%s\"\n",username);
 	}
@@ -1814,8 +1814,8 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 	// challenge response
 	delete[] response;
 	response=charstring::duplicate((const char *)rp);
-	responselength=charstring::length(response);
-	rp+=charstring::length(response)+1;
+	responselength=charstring::getLength(response);
+	rp+=charstring::getLength(response)+1;
 	if (getDebug()) {
 		stdoutput.write("	challenge response: ");
 		stdoutput.safePrint(response);
@@ -1827,7 +1827,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 	database=NULL;
 	if (clientcapabilityflags&CLIENT_CONNECT_WITH_DB) {
 		database=charstring::duplicate((const char *)rp);
-		rp+=charstring::length(database)+1;
+		rp+=charstring::getLength(database)+1;
 		if (getDebug()) {
 			stdoutput.printf("	database: \"%s\"\n",database);
 		}
@@ -2047,8 +2047,8 @@ bool sqlrprotocol_mysql::sendAuthSwitchRequest() {
 
 	write(&resppacket,(char)0xFE);
 	write(&resppacket,serverauthpluginname,
-			charstring::length(serverauthpluginname)+1);
-	write(&resppacket,challenge,charstring::length(challenge)+1);
+			charstring::getLength(serverauthpluginname)+1);
+	write(&resppacket,challenge,charstring::getLength(challenge)+1);
 
 	return sendPacket(true);
 }
@@ -2254,7 +2254,7 @@ bool sqlrprotocol_mysql::sendOkPacket(bool noteof,
 			writeLenEncStr(&resppacket,sessionstatechangedata);
 		}
 	} else {
-		write(&resppacket,info,charstring::length(info));
+		write(&resppacket,info,charstring::getLength(info));
 	}
 
 	return sendPacket(true);
@@ -2264,7 +2264,7 @@ bool sqlrprotocol_mysql::sendErrPacket(uint16_t errorcode,
 					const char *errormessage,
 					const char *sqlstate) {
 	return sendErrPacket(errorcode,errormessage,
-				charstring::length(errormessage),sqlstate);
+				charstring::getLength(errormessage),sqlstate);
 }
 
 bool sqlrprotocol_mysql::sendErrPacket(uint16_t errorcode,
@@ -2845,7 +2845,7 @@ bool sqlrprotocol_mysql::comStatistics() {
 		debugEnd();
 	}
 	resetSendPacketBuffer();
-	write(&resppacket,statistics,charstring::length(statistics));
+	write(&resppacket,statistics,charstring::getLength(statistics));
 	return sendPacket(true);
 }
 
@@ -3068,7 +3068,7 @@ bool sqlrprotocol_mysql::comQuery(sqlrservercursor *cursor) {
 
 bool sqlrprotocol_mysql::sendQuery(sqlrservercursor *cursor,
 						const char *query) {
-	return sendQuery(cursor,query,charstring::length(query));
+	return sendQuery(cursor,query,charstring::getLength(query));
 }
 
 bool sqlrprotocol_mysql::sendQuery(sqlrservercursor *cursor,
@@ -3321,7 +3321,7 @@ bool sqlrprotocol_mysql::sendColumnDefinition(sqlrservercursor *cursor,
 
 	if (fieldlistcommand) {
 		if (!charstring::isNullOrEmpty(defaults)) {
-			uint64_t	len=charstring::length(defaults);
+			uint64_t	len=charstring::getLength(defaults);
 			writeLenEncInt(&resppacket,len);
 			write(&resppacket,defaults,len);
 		} else {
@@ -3982,8 +3982,8 @@ bool sqlrprotocol_mysql::comFieldList(sqlrservercursor *cursor) {
 
 	// get the table
 	char	*table=charstring::duplicate((const char *)rp);
-	rp+=charstring::length(table);
-	rplen-=charstring::length(table);
+	rp+=charstring::getLength(table);
+	rplen-=charstring::getLength(table);
 
 	// get the wildcard
 	char	*wild=charstring::duplicate((const char *)rp,rplen);
@@ -4065,7 +4065,7 @@ bool sqlrprotocol_mysql::getListByQuery(sqlrservercursor *cursor,
 	// build the appropriate query
 	const char	*query=NULL;
 	uint32_t	querylen=0;
-	bool		havewild=charstring::length(wild);
+	bool		havewild=charstring::getLength(wild);
 	switch (listtype) {
 		case MYSQLLISTTYPE_DATABASE_LIST:
 			query=cont->getDatabaseListQuery(havewild);
@@ -4115,7 +4115,7 @@ bool sqlrprotocol_mysql::buildListQuery(sqlrservercursor *cursor,
 	escapeParameter(&tablebuf,table);
 
 	// bounds checking
-	cont->setQueryLength(cursor,charstring::length(query)+
+	cont->setQueryLength(cursor,charstring::getLength(query)+
 					wildbuf.getStringLength()+
 					tablebuf.getStringLength());
 	if (cont->getQueryLength(cursor)>maxquerysize) {
@@ -4138,7 +4138,7 @@ bool sqlrprotocol_mysql::buildListQuery(sqlrservercursor *cursor,
 		charstring::printf(querybuffer,maxquerysize+1,
 						query,wildbuf.getString());
 	}
-	cont->setQueryLength(cursor,charstring::length(querybuffer));
+	cont->setQueryLength(cursor,charstring::getLength(querybuffer));
 	return true;
 }
 
@@ -4211,7 +4211,7 @@ bool sqlrprotocol_mysql::sendFieldListResponse(sqlrservercursor *cursor) {
 		uint32_t	prec=charstring::toInteger(precstring);
 		uint32_t	scale=charstring::toInteger(scalestring);
 		char		type=getColumnType(typestring,
-						charstring::length(typestring),
+						charstring::getLength(typestring),
 						scale);
 		uint32_t	length=0;
 		if (!charstring::isNullOrEmpty(lengthstring)) {

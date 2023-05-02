@@ -96,10 +96,10 @@ void sqlrresultsettranslations::loadResultSetTranslation(
 	// get the result set translation name
 	const char	*module=
 			resultsettranslation->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=resultsettranslation->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

@@ -124,7 +124,7 @@ int	main(int argc, char **argv) {
 #else
 	const char	*query="select ?,?";
 #endif
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 #ifdef FULL
 	MYSQL_BIND	bind[14];
 	unsigned long	bindlength[14];

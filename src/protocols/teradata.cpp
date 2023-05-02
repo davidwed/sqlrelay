@@ -4405,7 +4405,7 @@ bool sqlrprotocol_teradata::parseParameterExtension(
 
 	// set bind variable name
 	char	*var=charstring::parseNumber(ibcount+1);
-	inbind->variablesize=charstring::length(var)+1;
+	inbind->variablesize=charstring::getLength(var)+1;
 	inbind->variable=(char *)bindpool->allocate(inbind->variablesize+1);
 	inbind->variable[0]=cont->bindFormat()[0];
 	charstring::copy(inbind->variable+1,var,inbind->variablesize);
@@ -4516,7 +4516,7 @@ bool sqlrprotocol_teradata::parseParameterExtension(
 			break;
 	}
 	inbindtype->type=typestr;
-	inbindtype->typelen=charstring::length(inbindtype->type);
+	inbindtype->typelen=charstring::getLength(inbindtype->type);
 	inbind->valuesize=0;
 
 	if (getDebug()) {
@@ -5929,7 +5929,7 @@ void sqlrprotocol_teradata::appendLogonFailureParcel(const char *errorstring) {
 	debugParcelEnd();
 
 	// failure parcel
-	appendParcelHeader(9,2+2+charstring::length(errorstring));
+	appendParcelHeader(9,2+2+charstring::getLength(errorstring));
 
 	// statement number
 	write(&respdata,(uint16_t)0);
@@ -7484,7 +7484,7 @@ void sqlrprotocol_teradata::appendFailureParcel(const char *errorstring,
 
 void sqlrprotocol_teradata::appendErrorParcel(const char *errorstring) {
 
-	uint16_t	errorlength=charstring::length(errorstring);
+	uint16_t	errorlength=charstring::getLength(errorstring);
 
 	debugParcelStart("send","error",49);
 	if (getDebug()) {

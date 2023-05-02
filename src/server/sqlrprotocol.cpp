@@ -492,7 +492,7 @@ void sqlrprotocol::write(bytebuffer *buffer, byte_t value) {
 }
 
 void sqlrprotocol::write(bytebuffer *buffer, const char *value) {
-	write(buffer,value,charstring::length(value));
+	write(buffer,value,charstring::getLength(value));
 }
 
 void sqlrprotocol::write(bytebuffer *buffer, const char *value,
@@ -578,7 +578,7 @@ void sqlrprotocol::writeTriplet(bytebuffer *buffer, uint32_t value) {
 
 void sqlrprotocol::writeLenEncStr(bytebuffer *buffer,
 						const char *string) {
-	writeLenEncInt(buffer,charstring::length(string));
+	writeLenEncInt(buffer,charstring::getLength(string));
 	buffer->append(string);
 }
 

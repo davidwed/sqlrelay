@@ -2206,7 +2206,7 @@ bool sqlrservercontroller::auth(sqlrcredentials *cred) {
 	if (autheduser) {
 
 		raiseDebugMessageEvent("auth success");
-		setCurrentUser(autheduser,charstring::length(autheduser));
+		setCurrentUser(autheduser,charstring::getLength(autheduser));
 
 		// consult connection schedules
 		if (pvt->_sqlrs &&
@@ -2797,7 +2797,7 @@ void sqlrservercontroller::setError(const char *err,
 					bool liveconn) {
 
 	char		*errorbuffer=pvt->_conn->getErrorBuffer();
-	uint32_t	errorlength=charstring::length(err);
+	uint32_t	errorlength=charstring::getLength(err);
 	if (errorlength>pvt->_maxerrorlength) {
 		errorlength=pvt->_maxerrorlength;
 	}
@@ -3799,7 +3799,7 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 					getConfig()->getMaxQuerySize()+1,
 					q,table);
 			setQueryLength(gclcur,
-					charstring::length(querybuffer));
+					charstring::getLength(querybuffer));
 			retval=prepareQuery(gclcur,
 					getQueryBuffer(gclcur),
 					getQueryLength(gclcur),
@@ -4308,7 +4308,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 bool sqlrservercontroller::matchesNativeBindFormat(const char *bind) {
 
 	const char	*bindformat=pvt->_conn->bindFormat();
-	size_t		bindformatlen=charstring::length(bindformat);
+	size_t		bindformatlen=charstring::getLength(bindformat);
 
 	// the bind variable name matches the format if...
 	// * the first character of the bind variable name matches the 
@@ -4408,7 +4408,7 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 
 	// create the new bind var name and get its length
 	char		*tempnumber=charstring::parseNumber(bindindex);
-	uint16_t	tempnumberlen=charstring::length(tempnumber);
+	uint16_t	tempnumberlen=charstring::getLength(tempnumber);
 
 	char	*oldvariable=(char *)cursor->getBindMappingsPool()->
 						allocate(bindvariablelen+1);
@@ -4506,7 +4506,7 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 			char	*newvariable;
 			if (mappings->getValue(b->variable,&newvariable)) {
 				b->variable=newvariable;
-				b->variablesize=charstring::length(b->variable);
+				b->variablesize=charstring::getLength(b->variable);
 				remapped=true;
 			}
 		}
@@ -4571,7 +4571,7 @@ void sqlrservercontroller::translateBeginTransaction(sqlrservercursor *cursor) {
 
 	// translate query
 	const char	*beginquery=pvt->_conn->beginTransactionQuery();
-	uint32_t	querylength=charstring::length(beginquery);
+	uint32_t	querylength=charstring::getLength(beginquery);
 	charstring::copy(querybuffer,beginquery,querylength);
 	querybuffer[querylength]='\0';
 	cursor->setQueryLength(querylength);
@@ -6571,7 +6571,7 @@ bool sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 						year,month,day,
 						hour,minute,second,
 						microsecond,isnegative);
-	pvt->_reformattedfieldlength=charstring::length(pvt->_reformattedfield);
+	pvt->_reformattedfieldlength=charstring::getLength(pvt->_reformattedfield);
 
 	if (pvt->_debugsqlrresultsettranslation) {
 		stdoutput.printf("\nconverted date "
@@ -6887,7 +6887,7 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 
 		sqlrservercursor	*gttcur=newCursor();
 		if (open(gttcur) &&
-			prepareQuery(gttcur,query,charstring::length(query)) &&
+			prepareQuery(gttcur,query,charstring::getLength(query)) &&
 			executeQuery(gttcur)) {
 
 			bool	error;
@@ -7437,7 +7437,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// * the id could be sensitive information
 	// * the id might not conform to valid file naming conventions
 	md5	m;
-	m.append((const byte_t *)id,charstring::length(id));
+	m.append((const byte_t *)id,charstring::getLength(id));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
@@ -7462,8 +7462,8 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	}
 
 	// calculate shared memory segment size
-	uint64_t	shmsize=charstring::length(errorfieldtable)+1+
-				charstring::length(errorrowtable)+1+
+	uint64_t	shmsize=charstring::getLength(errorfieldtable)+1+
+				charstring::getLength(errorrowtable)+1+
 				sizeof(uint64_t)+
 				sizeof(bool)+
 				pvt->_maxquerysize+1+
@@ -7488,14 +7488,14 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// and drop error tables flag in shared memory
 	byte_t	*ptr=pvt->_bulkservershm;
 
-	uint64_t	len=charstring::length(errorfieldtable);
+	uint64_t	len=charstring::getLength(errorfieldtable);
 	pvt->_bulkerrorfieldtable=(const char *)ptr;
 	bytestring::copy(ptr,errorfieldtable,len);
 	ptr+=len;
 	*ptr='\0';
 	ptr++;
 
-	len=charstring::length(errorrowtable);
+	len=charstring::getLength(errorrowtable);
 	pvt->_bulkerrorrowtable=(const char *)ptr;
 	bytestring::copy(ptr,errorrowtable,len);
 	ptr+=len;
@@ -7754,7 +7754,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 
 	// get an md5 sum of the id (see bulkLoadBegin for why)
 	md5	m;
-	m.append((const byte_t *)id,charstring::length(id));
+	m.append((const byte_t *)id,charstring::getLength(id));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
@@ -7789,11 +7789,11 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	const byte_t	*ptr=pvt->_bulkclientshm;
 
 	pvt->_bulkerrorfieldtable=(const char *)ptr;
-	ptr+=charstring::length((const char *)ptr);
+	ptr+=charstring::getLength((const char *)ptr);
 	ptr++;
 
 	pvt->_bulkerrorrowtable=(const char *)ptr;
-	ptr+=charstring::length((const char *)ptr);
+	ptr+=charstring::getLength((const char *)ptr);
 	ptr++;
 
 	// get max error count
@@ -7979,7 +7979,7 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 				sqlrserverbindvar	*inbind=
 							&(inbinds[inbindcount]);
 				char		*var=bind->getValue();
-				uint16_t	varsize=charstring::length(var);
+				uint16_t	varsize=charstring::getLength(var);
 				inbind->variable=
 					(char *)bindpool->allocate(varsize+1);
 				charstring::copy(inbind->variable,var);
@@ -9033,7 +9033,7 @@ void sqlrservercontroller::sessionEndQueries() {
 void sqlrservercontroller::sessionQuery(const char *query) {
 
 	// create the select database query
-	size_t	querylen=charstring::length(query);
+	size_t	querylen=charstring::getLength(query);
 
 	sqlrservercursor	*cur=newCursor();
 	if (open(cur) &&
@@ -9051,7 +9051,7 @@ const char *sqlrservercontroller::getConnectStringValue(const char *variable) {
 	// then return the decrypted version of the password, otherwise just
 	// return the value as-is.
 	const char	*peid=pvt->_constr->getPasswordEncryption();
-	if (pvt->_sqlrpe && charstring::length(peid) &&
+	if (pvt->_sqlrpe && charstring::getLength(peid) &&
 			!charstring::compare(variable,"password")) {
 
 		// handle password files
@@ -9195,7 +9195,7 @@ bool sqlrservercontroller::getColumnNames(const char *query,
 		return false;
 	}
 
-	size_t		querylen=charstring::length(query);
+	size_t		querylen=charstring::getLength(query);
 
 	sqlrservercursor	*gcncur=newCursor();
 	if (open(gcncur) &&
@@ -9907,7 +9907,7 @@ uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 	}
 	if (pvt->_columnnamemap) {
 		// FIXME: use a static map for these
-		return charstring::length(pvt->_columnnamemap->getValue(col));
+		return charstring::getLength(pvt->_columnnamemap->getValue(col));
 	}
 	return cursor->getColumnNameLengthFromBuffer(mapColumn(col));
 }
@@ -10693,7 +10693,7 @@ void sqlrservercontroller::setError(sqlrservercursor *cursor,
 						const char *err,
 						int64_t errn,
 						bool liveconn) {
-	setError(cursor,err,charstring::length(err),errn,liveconn);
+	setError(cursor,err,charstring::getLength(err),errn,liveconn);
 }
 
 char *sqlrservercontroller::getErrorBuffer(sqlrservercursor *cursor) {

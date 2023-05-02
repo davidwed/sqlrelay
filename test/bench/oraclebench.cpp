@@ -169,7 +169,7 @@ bool oraclebenchconnection::connect() {
 
 	// attach to the server
 	if (OCIServerAttach(srv,err,
-			(text *)sid,charstring::length(sid),0)!=OCI_SUCCESS) {
+			(text *)sid,charstring::getLength(sid),0)!=OCI_SUCCESS) {
 		stdoutput.printf("OCIServerAttach Failed\n");
 		return false;
 	}
@@ -193,14 +193,14 @@ bool oraclebenchconnection::connect() {
 	// set username and password
 	if (OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)user,
-				(ub4)charstring::length(user),
+				(ub4)charstring::getLength(user),
 				(ub4)OCI_ATTR_USERNAME,err)!=OCI_SUCCESS) {
 		stdoutput.printf("OCIAttrSet (user) Failed\n");
 		return false;
 	}
 	if (OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)password,
-				(ub4)charstring::length(password),
+				(ub4)charstring::getLength(password),
 				(ub4)OCI_ATTR_PASSWORD,err)!=OCI_SUCCESS) {
 		stdoutput.printf("OCIAttrSet (password) Failed\n");
 		return false;
@@ -289,7 +289,7 @@ bool oraclebenchcursor::query(const char *query, bool getcolumns) {
 
 	// prepare the query
 	if (OCIStmtPrepare(stmt,orabcon->err,(text *)query,
-				(ub4)charstring::length(query),
+				(ub4)charstring::getLength(query),
 				(ub4)OCI_NTV_SYNTAX,
 				(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
 		//stdoutput.printf("OCIStmtPrepare Failed\n");

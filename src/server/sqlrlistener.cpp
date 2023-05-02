@@ -1397,7 +1397,7 @@ void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 	// get auth and ignore the result
 	clientsock->write((uint16_t)ERROR_OCCURRED);
 	clientsock->write((uint64_t)errnum);
-	clientsock->write((uint16_t)charstring::length(err));
+	clientsock->write((uint16_t)charstring::getLength(err));
 	clientsock->write(err);
 	clientsock->flushWriteBuffer(-1,-1);
 	// FIXME: hmm, if the client is just spewing
@@ -1872,7 +1872,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					"a connection: timeout");
 			sock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
 			sock->write((uint64_t)SQLR_ERROR_HANDOFFFAILED);
-			sock->write((uint16_t)charstring::length(
+			sock->write((uint16_t)charstring::getLength(
 					SQLR_ERROR_HANDOFFFAILED_STRING));
 			sock->write(SQLR_ERROR_HANDOFFFAILED_STRING);
 			sock->flushWriteBuffer(-1,-1);
@@ -1885,7 +1885,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					"a connection: all dbs were down");
 			sock->write((uint16_t)ERROR_OCCURRED);
 			sock->write((uint64_t)SQLR_ERROR_DBSDOWN);
-			sock->write((uint16_t)charstring::length(
+			sock->write((uint16_t)charstring::getLength(
 						SQLR_ERROR_DBSDOWN_STRING));
 			sock->write(SQLR_ERROR_DBSDOWN_STRING);
 			sock->flushWriteBuffer(-1,-1);

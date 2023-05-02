@@ -780,7 +780,7 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	clientsock->write((uint64_t)SQLR_ERROR_NOCURSORS);
 
 	// send the error itself
-	uint16_t	len=charstring::length(SQLR_ERROR_NOCURSORS_STRING);
+	uint16_t	len=charstring::getLength(SQLR_ERROR_NOCURSORS_STRING);
 	clientsock->write(len);
 	clientsock->write(SQLR_ERROR_NOCURSORS_STRING,len);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -815,7 +815,7 @@ bool sqlrprotocol_sqlrclient::authCommand() {
 	// indicate that an error has occurred
 	clientsock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
 	clientsock->write((uint64_t)SQLR_ERROR_AUTHENTICATIONERROR);
-	clientsock->write((uint16_t)charstring::length(
+	clientsock->write((uint16_t)charstring::getLength(
 				SQLR_ERROR_AUTHENTICATIONERROR_STRING));
 	clientsock->write(SQLR_ERROR_AUTHENTICATIONERROR_STRING);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -888,7 +888,7 @@ void sqlrprotocol_sqlrclient::suspendSessionCommand() {
 	const char	*unixsocketname=NULL;
 	uint16_t	inetportnumber=0;
 	cont->suspendSession(&unixsocketname,&inetportnumber);
-	uint16_t	unixsocketsize=charstring::length(unixsocketname);
+	uint16_t	unixsocketsize=charstring::getLength(unixsocketname);
 
 	// pass the socket info to the client
 	cont->raiseDebugMessageEvent("passing socket info to client...");
@@ -931,7 +931,7 @@ void sqlrprotocol_sqlrclient::identifyCommand() {
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	idlen=charstring::length(ident);
+	uint16_t	idlen=charstring::getLength(ident);
 	clientsock->write(idlen);
 	clientsock->write(ident,idlen);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -1015,7 +1015,7 @@ void sqlrprotocol_sqlrclient::dbVersionCommand() {
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	dbvlen=charstring::length(dbversion);
+	uint16_t	dbvlen=charstring::getLength(dbversion);
 	clientsock->write(dbvlen);
 	clientsock->write(dbversion,dbvlen);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -1031,7 +1031,7 @@ void sqlrprotocol_sqlrclient::bindFormatCommand() {
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	bflen=charstring::length(bf);
+	uint16_t	bflen=charstring::getLength(bf);
 	clientsock->write(bflen);
 	clientsock->write(bf,bflen);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -1047,7 +1047,7 @@ void sqlrprotocol_sqlrclient::nextvalFormatCommand() {
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	nflen=charstring::length(nf);
+	uint16_t	nflen=charstring::getLength(nf);
 	clientsock->write(nflen);
 	clientsock->write(nf,nflen);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -1063,7 +1063,7 @@ void sqlrprotocol_sqlrclient::serverVersionCommand() {
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	svrvlen=charstring::length(svrversion);
+	uint16_t	svrvlen=charstring::getLength(svrversion);
 	clientsock->write(svrvlen);
 	clientsock->write(svrversion,svrvlen);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -1135,7 +1135,7 @@ void sqlrprotocol_sqlrclient::getCurrentDatabaseCommand() {
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	currentdbsize=charstring::length(currentdb);
+	uint16_t	currentdbsize=charstring::getLength(currentdb);
 	clientsock->write(currentdbsize);
 	clientsock->write(currentdb,currentdbsize);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -1154,7 +1154,7 @@ void sqlrprotocol_sqlrclient::getCurrentSchemaCommand() {
 
 	// send it to the client
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	currentschemasize=charstring::length(currentschema);
+	uint16_t	currentschemasize=charstring::getLength(currentschema);
 	clientsock->write(currentschemasize);
 	clientsock->write(currentschema,currentschemasize);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -1185,7 +1185,7 @@ void sqlrprotocol_sqlrclient::dbHostNameCommand() {
 
 	const char	*hostname=cont->dbHostName();
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	hostnamelen=charstring::length(hostname);
+	uint16_t	hostnamelen=charstring::getLength(hostname);
 	clientsock->write(hostnamelen);
 	clientsock->write(hostname,hostnamelen);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -1198,7 +1198,7 @@ void sqlrprotocol_sqlrclient::dbIpAddressCommand() {
 
 	const char	*ipaddress=cont->dbIpAddress();
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);
-	uint16_t	ipaddresslen=charstring::length(ipaddress);
+	uint16_t	ipaddresslen=charstring::getLength(ipaddress);
 	clientsock->write(ipaddresslen);
 	clientsock->write(ipaddress,ipaddresslen);
 	clientsock->flushWriteBuffer(-1,-1);
@@ -2859,7 +2859,7 @@ void sqlrprotocol_sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 			}
 
 			clientsock->write((uint16_t)STRING_DATA);
-			bv->valuesize=charstring::length(
+			bv->valuesize=charstring::getLength(
 						(char *)bv->value.stringval);
 			clientsock->write(bv->valuesize);
 			clientsock->write(bv->value.stringval,bv->valuesize);
@@ -2929,7 +2929,7 @@ void sqlrprotocol_sqlrclient::returnOutputBindValues(sqlrservercursor *cursor) {
 			clientsock->write((uint16_t)bv->value.dateval.second);
 			clientsock->write((uint32_t)bv->value.
 							dateval.microsecond);
-			uint16_t	length=charstring::length(
+			uint16_t	length=charstring::getLength(
 							bv->value.dateval.tz);
 			clientsock->write(length);
 			clientsock->write(bv->value.dateval.tz,length);
@@ -3100,7 +3100,7 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 			}
 
 			clientsock->write((uint16_t)STRING_DATA);
-			bv->valuesize=charstring::length(
+			bv->valuesize=charstring::getLength(
 						(char *)bv->value.stringval);
 			clientsock->write(bv->valuesize);
 			clientsock->write(bv->value.stringval,bv->valuesize);
@@ -3170,7 +3170,7 @@ void sqlrprotocol_sqlrclient::returnInputOutputBindValues(
 			clientsock->write((uint16_t)bv->value.dateval.second);
 			clientsock->write((uint32_t)bv->value.
 							dateval.microsecond);
-			uint16_t	length=charstring::length(
+			uint16_t	length=charstring::getLength(
 							bv->value.dateval.tz);
 			clientsock->write(length);
 			clientsock->write(bv->value.dateval.tz,length);
@@ -3743,7 +3743,7 @@ bool sqlrprotocol_sqlrclient::resumeResultSetCommand(
 		clientsock->write((uint64_t)SQLR_ERROR_RESULTSETNOTSUSPENDED);
 
 		// send the error itself
-		uint16_t	len=charstring::length(
+		uint16_t	len=charstring::getLength(
 				SQLR_ERROR_RESULTSETNOTSUSPENDED_STRING);
 		clientsock->write(len);
 		clientsock->write(SQLR_ERROR_RESULTSETNOTSUSPENDED_STRING,len);
@@ -4114,7 +4114,7 @@ bool sqlrprotocol_sqlrclient::getListByQuery(sqlrservercursor *cursor,
 
 	// build the appropriate query
 	const char	*query=NULL;
-	bool		havewild=charstring::length(wild);
+	bool		havewild=charstring::getLength(wild);
 	switch (querytype) {
 		case SQLRCLIENTQUERYTYPE_DATABASE_LIST:
 			query=cont->getDatabaseListQuery(havewild);
@@ -4181,7 +4181,7 @@ bool sqlrprotocol_sqlrclient::buildListQuery(sqlrservercursor *cursor,
 	escapeParameter(&objectbuf,realobject);
 
 	// bounds checking
-	cont->setQueryLength(cursor,charstring::length(query)+
+	cont->setQueryLength(cursor,charstring::getLength(query)+
 					wildbuf.getStringLength()+
 					objectbuf.getStringLength());
 	if (cont->getQueryLength(cursor)>maxquerysize) {
@@ -4198,7 +4198,7 @@ bool sqlrprotocol_sqlrclient::buildListQuery(sqlrservercursor *cursor,
 		charstring::printf(querybuffer,maxquerysize+1,
 						query,wildbuf.getString());
 	}
-	cont->setQueryLength(cursor,charstring::length(querybuffer));
+	cont->setQueryLength(cursor,charstring::getLength(querybuffer));
 	return true;
 }
 
@@ -4249,7 +4249,7 @@ bool sqlrprotocol_sqlrclient::getTranslatedQueryCommand(
 
 	// get the query
 	const char	*query=cont->getTranslatedQuery(cursor);
-	uint64_t	querylen=charstring::length(query);
+	uint64_t	querylen=charstring::getLength(query);
 
 	// send the tree
 	clientsock->write((uint16_t)NO_ERROR_OCCURRED);

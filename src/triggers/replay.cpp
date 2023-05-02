@@ -554,7 +554,7 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 	} else if (source->type==SQLRSERVERBINDVARTYPE_DATE) {
 		dest->value.dateval.tz=
 			(char *)pool->allocate(
-				charstring::length(source->value.dateval.tz)+1);
+				charstring::getLength(source->value.dateval.tz)+1);
 		charstring::copy(dest->value.dateval.tz,
 					source->value.dateval.tz);
 		dest->value.dateval.buffer=
@@ -901,7 +901,7 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 	}
 	if (success) {
 		success=cont->prepareQuery(logcur,cond->query,
-					charstring::length(cond->query));
+					charstring::getLength(cond->query));
 		if (!success && debug) {
         		const char      *errorstring;
         		uint32_t        errorlength;

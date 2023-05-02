@@ -558,7 +558,7 @@ void sqlrcursor::cacheToFile(const char *filename) {
 
 	// create the index name
 	delete[] pvt->_cachedestindname;
-	size_t	cachedestindnamelen=charstring::length(filename)+5;
+	size_t	cachedestindnamelen=charstring::getLength(filename)+5;
 	pvt->_cachedestindname=new char[cachedestindnamelen];
 	charstring::copy(pvt->_cachedestindname,filename);
 	charstring::append(pvt->_cachedestindname,".ind");
@@ -731,7 +731,7 @@ void sqlrcursor::cacheColumnInfo() {
 			whichcolumn=getColumnInternal(i);
 
 			// write the name
-			namelen=charstring::length(whichcolumn->name);
+			namelen=charstring::getLength(whichcolumn->name);
 			pvt->_cachedest->write(namelen);
 			pvt->_cachedest->write(whichcolumn->name,namelen);
 
@@ -762,7 +762,7 @@ void sqlrcursor::cacheColumnInfo() {
 			pvt->_cachedest->write(whichcolumn->autoincrement);
 
 			// write the table
-			tablelen=charstring::length(whichcolumn->table);
+			tablelen=charstring::getLength(whichcolumn->table);
 			pvt->_cachedest->write(tablelen);
 			pvt->_cachedest->write(whichcolumn->table,tablelen);
 		}
@@ -781,7 +781,7 @@ void sqlrcursor::cacheOutputBinds(uint32_t count) {
 
 		pvt->_cachedest->write((uint16_t)(*pvt->_outbindvars)[i].type);
 
-		len=charstring::length((*pvt->_outbindvars)[i].variable);
+		len=charstring::getLength((*pvt->_outbindvars)[i].variable);
 		pvt->_cachedest->write(len);
 		pvt->_cachedest->write((*pvt->_outbindvars)[i].variable,len);
 
@@ -862,7 +862,7 @@ void sqlrcursor::cacheData() {
 			char		*field=getFieldInternal(i,j);
 			if (field) {
 				type=STRING_DATA;
-				len=charstring::length(field);
+				len=charstring::getLength(field);
 				pvt->_cachedest->write(type);
 				pvt->_cachedest->write(len);
 				if (len>0) {
@@ -1180,7 +1180,7 @@ bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
 	pvt->_cs->write((uint16_t)listformat);
 
 	// send the wild parameter
-	uint32_t	len=charstring::length(wild);
+	uint32_t	len=charstring::getLength(wild);
 	pvt->_cs->write(len);
 	if (len) {
 		pvt->_cs->write(wild,len);
@@ -1188,7 +1188,7 @@ bool sqlrcursor::getList(uint16_t command, sqlrclientlistformat_t listformat,
 
 	// send the table parameter
 	if (table) {
-		len=charstring::length(table);
+		len=charstring::getLength(table);
 		pvt->_cs->write(len);
 		if (len) {
 			pvt->_cs->write(table,len);
@@ -1227,7 +1227,7 @@ bool sqlrcursor::sendFileQuery(const char *path, const char *filename) {
 }
 
 void sqlrcursor::prepareQuery(const char *query) {
-	prepareQuery(query,charstring::length(query));
+	prepareQuery(query,charstring::getLength(query));
 }
 
 void sqlrcursor::prepareQuery(const char *query, uint32_t length) {
@@ -1323,7 +1323,7 @@ bool sqlrcursor::prepareFileQuery(const char *path, const char *filename) {
 	if (!queryfile.open(pvt->_fullpath,O_RDONLY)) {
 
 		// set the error
-		char	*err=new char[32+charstring::length(pvt->_fullpath)];
+		char	*err=new char[32+charstring::getLength(pvt->_fullpath)];
 		charstring::append(err,"The file ");
 		charstring::append(err,pvt->_fullpath);
 		charstring::append(err," could not be opened.\n");
@@ -1706,7 +1706,7 @@ void sqlrcursor::inputBinds(const char **variables, const double *values,
 void sqlrcursor::stringVar(sqlrclientbindvar *var,
 					const char *variable,
 					const char *value) {
-	stringVar(var,variable,value,charstring::length(value));
+	stringVar(var,variable,value,charstring::getLength(value));
 }
 
 void sqlrcursor::stringVar(sqlrclientbindvar *var,
@@ -2492,7 +2492,7 @@ bool sqlrcursor::performSubstitutionsInternal() {
 				// if we find a match, write the 
 				// value to the container and skip 
 				// past the $(variable)
-				len=charstring::length(
+				len=charstring::getLength(
 						(*pvt->_subvars)[i].variable);
 				if (!(*pvt->_subvars)[i].donesubstituting &&
 					!charstring::compare((ptr+2),
@@ -2597,7 +2597,7 @@ bool sqlrcursor::validateBind(const char *variable) {
 	queryparsestate_t	parsestate=IN_QUERY;
 	stringbuffer		currentbind;
 
-	size_t	len=charstring::length(variable);
+	size_t	len=charstring::getLength(variable);
 
 	// run through the querybuffer...
 	const char	*ptr=pvt->_queryptr;
@@ -2912,7 +2912,7 @@ void sqlrcursor::sendInputBinds() {
 		}
 
 		// send the variable
-		size=charstring::length((*pvt->_inbindvars)[i].variable);
+		size=charstring::getLength((*pvt->_inbindvars)[i].variable);
 		pvt->_cs->write(size);
 		pvt->_cs->write((*pvt->_inbindvars)[i].variable,(size_t)size);
 		if (pvt->_sqlrc->debug()) {
@@ -3018,7 +3018,7 @@ void sqlrcursor::sendInputBinds() {
 						value.dateval.second);
 			pvt->_cs->write((uint32_t)(*pvt->_inbindvars)[i].
 						value.dateval.microsecond);
-			pvt->_cs->write((uint16_t)charstring::length(
+			pvt->_cs->write((uint16_t)charstring::getLength(
 						(*pvt->_inbindvars)[i].
 							value.dateval.tz));
 			pvt->_cs->write((*pvt->_inbindvars)[i].
@@ -3147,7 +3147,7 @@ void sqlrcursor::sendOutputBinds() {
 		}
 
 		// send the variable, type and size that the buffer needs to be
-		size=charstring::length((*pvt->_outbindvars)[i].variable);
+		size=charstring::getLength((*pvt->_outbindvars)[i].variable);
 		pvt->_cs->write(size);
 		pvt->_cs->write((*pvt->_outbindvars)[i].variable,(size_t)size);
 		pvt->_cs->write((uint16_t)(*pvt->_outbindvars)[i].type);
@@ -3251,7 +3251,7 @@ void sqlrcursor::sendInputOutputBinds() {
 
 		// send the variable, type, size that the buffer needs to be,
 		// and value
-		size=charstring::length((*pvt->_inoutbindvars)[i].variable);
+		size=charstring::getLength((*pvt->_inoutbindvars)[i].variable);
 		pvt->_cs->write(size);
 		pvt->_cs->write((*pvt->_inoutbindvars)[i].variable,
 							(size_t)size);
@@ -3301,7 +3301,7 @@ void sqlrcursor::sendInputOutputBinds() {
 							value.dateval.second);
 			pvt->_cs->write((uint32_t)(*pvt->_inoutbindvars)[i].
 						value.dateval.microsecond);
-			pvt->_cs->write((uint16_t)charstring::length(
+			pvt->_cs->write((uint16_t)charstring::getLength(
 						(*pvt->_inoutbindvars)[i].
 						value.dateval.tz));
 			pvt->_cs->write((*pvt->_inoutbindvars)[i].
@@ -5838,7 +5838,7 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 	pvt->_endofresultset=false;
 
 	// create the index file name
-	size_t	indexfilenamelen=charstring::length(filename)+5;
+	size_t	indexfilenamelen=charstring::getLength(filename)+5;
 	char	*indexfilename=new char[indexfilenamelen];
 	charstring::copy(indexfilename,filename);
 	charstring::append(indexfilename,".ind");

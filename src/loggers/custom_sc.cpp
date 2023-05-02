@@ -64,11 +64,11 @@ bool sqlrlogger_custom_sc::init(sqlrlistener *sqlrl,
 
 	// get log path and name
 	const char	*path=getParameters()->getAttributeValue("path");
-	if (!charstring::length(path)) {
+	if (!charstring::getLength(path)) {
 		path=(sqlrcon)?sqlrcon->cont->getLogDir():sqlrl->getLogDir();
 	}
 	const char	*name=getParameters()->getAttributeValue("name");
-	if (!charstring::length(name)) {
+	if (!charstring::getLength(name)) {
 		name="sqlrelay.log";
 	}
 
@@ -203,7 +203,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 	// append info, if there was any
 	// (except for db errors/warnings which are handled specially)
-	if (charstring::length(info) &&
+	if (charstring::getLength(info) &&
 		(event!=SQLREVENT_DB_ERROR && event!=SQLREVENT_DB_WARNING)) {
 		logbuffer.append(": ");
 		logbuffer.append(info);

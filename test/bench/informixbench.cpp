@@ -116,7 +116,7 @@ informixbenchconnection::informixbenchconnection(
 
 bool informixbenchconnection::connect() {
 
-	if (charstring::length(informixdir) &&
+	if (charstring::getLength(informixdir) &&
 		!environment::setValue("INFORMIXDIR",informixdir)) {
 		stdoutput.printf("Failed to set INFORMIXDIR "
 					"environment variable");
@@ -198,7 +198,7 @@ bool informixbenchcursor::open() {
 
 bool informixbenchcursor::query(const char *query, bool getcolumns) {
 
-	erg=SQLPrepare(stmt,(SQLCHAR *)query,charstring::length(query));
+	erg=SQLPrepare(stmt,(SQLCHAR *)query,charstring::getLength(query));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		stdoutput.printf("SQLPrepare failed\n");
 		return false;

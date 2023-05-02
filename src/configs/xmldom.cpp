@@ -1121,8 +1121,8 @@ bool sqlrconfig_xmldom::comment(const char *value) {
 
 bool sqlrconfig_xmldom::hasDebug(const char *str, const char *debugstr) {
 
-	const char	*end=str+charstring::length(str);
-	size_t		debugstrlen=charstring::length(debugstr);
+	const char	*end=str+charstring::getLength(str);
+	size_t		debugstrlen=charstring::getLength(debugstr);
 
 	while(str<end) {
 

@@ -42,7 +42,7 @@ sqlrlogger_debug::sqlrlogger_debug(sqlrloggers *ls,
 	debuglogger=NULL;
 	dbgfilename=NULL;
 	const char	*permstring=parameters->getAttributeValue("perms");
-	if (!charstring::length(permstring)) {
+	if (!charstring::getLength(permstring)) {
 		permstring="rw-------";
 	}
 	dbgfileperms=permissions::evalPermString(permstring);

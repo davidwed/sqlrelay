@@ -347,14 +347,14 @@ void informixconnection::handleConnectString() {
 bool informixconnection::logIn(const char **error, const char **warning) {
 
 	// set the INFORMIX environment variable
-	if (charstring::length(informixdir) &&
+	if (charstring::getLength(informixdir) &&
 		!environment::setValue("INFORMIXDIR",informixdir)) {
 		*error="Failed to set INFORMIXDIR environment variable";
 		return false;
 	}
 
 	// set the LANG environment variable
-	if (charstring::length(lang) &&
+	if (charstring::getLength(lang) &&
 		!environment::setValue("LANG",lang)) {
 		*error="Failed to set LANG environment variable";
 		return false;
@@ -1472,7 +1472,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 				return false;
 			}
 			column[i].tablelength=
-				charstring::length(column[i].table);
+				charstring::getLength(column[i].table);
 		}
 
 		if (column[i].type==SQL_LONGVARBINARY ||
@@ -1531,7 +1531,7 @@ void informixcursor::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,

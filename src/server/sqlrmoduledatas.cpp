@@ -96,10 +96,10 @@ void sqlrmoduledatas::loadModuleData(domnode *moduledata) {
 
 	// get the moduledata name
 	const char	*module=moduledata->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=moduledata->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

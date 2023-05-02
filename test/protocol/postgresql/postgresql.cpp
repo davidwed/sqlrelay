@@ -92,7 +92,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("PQport:\n");
 	checkSuccess(PQport(pgconn),
-			(charstring::length(port)?port:(char *)"5432"));
+			(charstring::getLength(port)?port:(char *)"5432"));
 	stdoutput.printf("\n");
 
 	stdoutput.printf("PQtty:\n");

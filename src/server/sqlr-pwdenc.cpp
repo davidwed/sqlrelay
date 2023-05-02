@@ -101,7 +101,7 @@ int main(int argc, const char **argv) {
 		byte_t		*bin;
 		uint64_t	binlen;
 		charstring::hexDecode(encryptedpassword,
-					charstring::length(encryptedpassword),
+					charstring::getLength(encryptedpassword),
 					&bin,&binlen);
 		stdoutput.write(bin,binlen);
 	} else {

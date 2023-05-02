@@ -519,7 +519,7 @@ size_t len(const char *str, const char *encoding) {
 		}
 		
 	} else {
-		res=charstring::length(str);
+		res=charstring::getLength(str);
 	}
 	return res;
 }
@@ -611,7 +611,7 @@ size_t size(const char *str, const char *encoding) {
 		}
 		
 	} else {
-		res=charstring::length(str);
+		res=charstring::getLength(str);
 	}
 	return res;
 }
@@ -906,7 +906,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		erg=SQLDriverConnect(dbc,
 				(SQLHWND)NULL,
 				(SQLCHAR *)sqlconnectdriverstring,
-				(SQLSMALLINT)charstring::length(
+				(SQLSMALLINT)charstring::getLength(
 						sqlconnectdriverstring),
 				outconnectionstring,
 				(SQLSMALLINT)sizeof(outconnectionstring),
@@ -1106,10 +1106,10 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 
 	char	*hostname=sys::getHostName();
 
-	size_t	tracefilenamebuffersize=charstring::length(tracefilenameformat);
+	size_t	tracefilenamebuffersize=charstring::getLength(tracefilenameformat);
 	tracefilenamebuffersize+=charstring::integerLength((int64_t)pid);
 	tracefilenamebuffersize+=charstring::integerLength((int64_t)now);
-	tracefilenamebuffersize+=charstring::length(hostname);
+	tracefilenamebuffersize+=charstring::getLength(hostname);
 	tracefilenamebuffersize+=1;
 
 	char		*tracefilename=new char[tracefilenamebuffersize];
@@ -1137,7 +1137,7 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 					outptr,outptrsize,"%ld",insertnumber);
 			}
 			ptr++;
-			size_t	outptrinc=charstring::length(outptr);
+			size_t	outptrinc=charstring::getLength(outptr);
 			outptrsize-=outptrinc;
 			outptr+=outptrinc;
 		} else {
@@ -1227,7 +1227,7 @@ void odbcconnection::pushConnstrValue(char **pptr, size_t *pbuffavail,
 		charstring::printf(ptr,buffavail,"%s=%s%s%s;",
 				keyword,openbracket,value,closebracket);
 	}
-	size_t	ptrinc=charstring::length(ptr);
+	size_t	ptrinc=charstring::getLength(ptr);
 	ptr+=ptrinc;
 	buffavail-=ptrinc;
 	*pptr=ptr;
@@ -1807,13 +1807,13 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	// get the column list
 	erg=SQLProcedureColumns(odbccur->stmt,
 			(SQLCHAR *)catalog,
-			charstring::length(catalog),
+			charstring::getLength(catalog),
 			(SQLCHAR *)schema,
-			charstring::length(schema),
+			charstring::getLength(schema),
 			(SQLCHAR *)proc,
-			charstring::length(proc),
+			charstring::getLength(proc),
 			(SQLCHAR *)wildcopy,
-			charstring::length(wildcopy)
+			charstring::getLength(wildcopy)
 			);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
@@ -2968,7 +2968,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 	inoutisnullptr[pos-1]=isnull;
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
-				sqlnulldata:charstring::length(value);
+				sqlnulldata:charstring::getLength(value);
 
 	// FIXME: original code...
 	/*erg=SQLBindParameter(stmt,
@@ -3429,7 +3429,7 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					return false;
 				}
 				column[i].namelength=
-					charstring::length(column[i].name);
+					charstring::getLength(column[i].name);
 
 				// column length
 				erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
@@ -3539,11 +3539,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					charstring::copy(column[i].name,
 							columnnamescratch);
 					column[i].namelength=
-						charstring::length(
+						charstring::getLength(
 							column[i].name);
 				}
 				column[i].tablelength=
-					charstring::length(column[i].table);
+					charstring::getLength(column[i].table);
 
 #else
 				// column name
@@ -3670,11 +3670,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					charstring::copy(column[i].name,
 							columnnamescratch);
 					column[i].namelength=
-						charstring::length(
+						charstring::getLength(
 							column[i].name);
 				}
 				column[i].tablelength=
-					charstring::length(column[i].table);
+					charstring::getLength(column[i].table);
 #endif
 			}
 		}
@@ -3738,7 +3738,7 @@ void odbccursor::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,

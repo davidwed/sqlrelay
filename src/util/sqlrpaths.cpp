@@ -76,9 +76,9 @@ sqlrpaths::sqlrpaths(sqlrcmdline *cmdl) {
 	// localstatedir when building other paths off of it
 	const char	*lsdterm=
 #ifdef _WIN32
-	(*(localstatedir+charstring::length(localstatedir)-1)=='\\')?"":"\\";
+	(*(localstatedir+charstring::getLength(localstatedir)-1)=='\\')?"":"\\";
 #else
-	(*(localstatedir+charstring::length(localstatedir)-1)=='/')?"":"/";
+	(*(localstatedir+charstring::getLength(localstatedir)-1)=='/')?"":"/";
 #endif
 
 	scratch.append(localstatedir)->append(lsdterm)->append("run")->

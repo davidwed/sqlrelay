@@ -157,13 +157,13 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 
 	// write that buffer to the log file
 	return ((size_t)querylog.write(querylogbuf)==
-				charstring::length(querylogbuf));
+				charstring::getLength(querylogbuf));
 }
 
 int sqlrlogger_custom_nw::strescape(const char *str, char *buf, int limit) {
 	// from oracpool my_strescape()
 	char		*q=buf;
-	const char	*strend=str+charstring::length(str);
+	const char	*strend=str+charstring::getLength(str);
 	for (const char *p=str; p<strend; p++) {
 		if (q-buf>=limit-1) {
 			break;

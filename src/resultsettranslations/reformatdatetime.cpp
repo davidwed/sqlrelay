@@ -58,8 +58,8 @@ sqlrresultsettranslation_reformatdatetime::
 			parameters->getAttributeValue("dateddmm");
 	const char	*dateyyyyddmm=
 			parameters->getAttributeValue("dateyyyyddmm");
-	if (charstring::length(dateddmm) &&
-		!charstring::length(dateyyyyddmm)) {
+	if (charstring::getLength(dateddmm) &&
+		!charstring::getLength(dateyyyyddmm)) {
 		dateyyyyddmm=dateddmm;
 	}
 	ddmm=charstring::isYes(dateddmm);

@@ -164,7 +164,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 				// digit numbers to scientific notation.
 				bool	quote=
 					(!getNumberColumn(getCurrentColumn()) ||
-					charstring::length(
+					charstring::getLength(
 						getCurrentField())>=12);
 
 				// export the field

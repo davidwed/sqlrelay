@@ -84,10 +84,10 @@ void sqlrschedules::loadSchedule(domnode *schedule) {
 
 	// get the schedule name
 	const char	*module=schedule->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=schedule->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

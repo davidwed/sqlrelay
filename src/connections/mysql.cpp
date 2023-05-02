@@ -620,7 +620,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 
 #ifdef HAVE_MYSQL_SET_CHARACTER_SET
 	// set the character set
-	if (charstring::length(charset)) {
+	if (charstring::getLength(charset)) {
 		mysql_set_character_set(mysqlptr,charset);
 	}
 #endif
@@ -879,7 +879,7 @@ void mysqlconnection::errorMessage(char *errorbuffer,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	const char	*errorstring=mysql_error(mysqlptr);
-	*errorlength=charstring::length(errorstring);
+	*errorlength=charstring::getLength(errorstring);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errorstring,*errorlength);
 	*errorcode=mysql_errno(mysqlptr);
@@ -1596,7 +1596,7 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 	}
 
 	// set return values
-	*errorlength=charstring::length(err);
+	*errorlength=charstring::getLength(err);
 	charstring::safeCopy(errorbuffer,errorbufferlength,err,*errorlength);
 	*errorcode=errn;
 }

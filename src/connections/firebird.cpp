@@ -377,13 +377,13 @@ bool firebirdconnection::logIn(const char **err, const char **warning) {
 	dpbptr++;
 
 	// set the character set
-	if (charstring::length(charset)) {
+	if (charstring::getLength(charset)) {
 		*dpbptr=isc_dpb_lc_ctype;
 		dpbptr++;
-		*dpbptr=charstring::length(charset);
+		*dpbptr=charstring::getLength(charset);
 		dpbptr++;
 		charstring::copy(dpbptr,charset);
-		dpbptr+=charstring::length(charset);
+		dpbptr+=charstring::getLength(charset);
 	}
 
 	// determine the parameter buffer length
@@ -402,7 +402,7 @@ bool firebirdconnection::logIn(const char **err, const char **warning) {
 	// attach to the database
 	db=0L;
 	tr=0L;
-	if (isc_attach_database(error,charstring::length(database),
+	if (isc_attach_database(error,charstring::getLength(database),
 					const_cast<char *>(database),&db,
 					dpblength,dpb)) {
 		db=0L;
@@ -492,7 +492,7 @@ void firebirdconnection::errorMessage(char *errorbuffer,
 	isc_sql_interprete(sqlcode,errorbuffer,errorbufferlength);
 
 	// set return values
-	*errorlength=charstring::length(errorbuffer);
+	*errorlength=charstring::getLength(errorbuffer);
 	*errorcode=sqlcode;
 	*liveconnection=!(charstring::contains(
 				errormsg.getString(),
@@ -1632,7 +1632,7 @@ void firebirdcursor::errorMessage(char *errorbuffer,
 
 	// handle bind format errors
 	if (bindformaterror) {
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,
@@ -1825,7 +1825,7 @@ void firebirdcursor::getField(uint32_t col,
 			outsqlda->sqlvar[col].sqltype==SQL_TEXT+1) {
 
 		size_t	maxlen=outsqlda->sqlvar[col].sqllen;
-		size_t	reallen=charstring::length(field[col].textbuffer);
+		size_t	reallen=charstring::getLength(field[col].textbuffer);
 		if (reallen>maxlen) {
 			reallen=maxlen;
 		}

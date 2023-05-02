@@ -125,7 +125,7 @@ const char *sqlrauth_postgresql_userlist::auth(sqlrcredentials *cred) {
 		if (!charstring::compare(user,users[i])) {
 
 			if (getPasswordEncryptions() &&
-				charstring::length(passwordencryptions[i])) {
+				charstring::getLength(passwordencryptions[i])) {
 
 				// if password encryption is being used...
 
@@ -215,15 +215,15 @@ bool sqlrauth_postgresql_userlist::compare(const char *suppliedresponse,
 		// md5(concat(password,user))
 		md5	md1;
 		md1.append((byte_t *)validpassword,
-				charstring::length(validpassword));
+				charstring::getLength(validpassword));
 		md1.append((byte_t *)user,
-				charstring::length(user));
+				charstring::getLength(user));
 		char	*md1str=charstring::hexEncode(md1.getHash(),
 							md1.getHashSize());
 
 		// md5(concat(...above...,salt))
 		md5	md2;
-		md2.append((byte_t *)md1str,charstring::length(md1str));
+		md2.append((byte_t *)md1str,charstring::getLength(md1str));
 		md2.append((byte_t *)&salt,sizeof(salt));
 		char	*md2str=charstring::hexEncode(md2.getHash(),
 							md2.getHashSize());
@@ -231,7 +231,7 @@ bool sqlrauth_postgresql_userlist::compare(const char *suppliedresponse,
 		// concat('md5',...above...)
 		stringbuffer	result;
 		result.append("md5",3);
-		result.append(md2str,charstring::length(md2str));
+		result.append(md2str,charstring::getLength(md2str));
 		delete[] md2str;
 
 		return (result.getSize()==suppliedresponselength) &&

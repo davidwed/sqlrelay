@@ -29,7 +29,7 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
-stdoutput.printf("%d!=%d\n",charstring::length(value),charstring::length(success));
+stdoutput.printf("%d!=%d\n",charstring::getLength(value),charstring::getLength(success));
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;

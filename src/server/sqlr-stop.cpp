@@ -65,7 +65,7 @@ int main(int argc, const char **argv) {
 
 	// get the id
 	const char	*id=cmdl.getValue("-id");
-	size_t		idlen=charstring::length(id);
+	size_t		idlen=charstring::getLength(id);
 
 	// get the pid directory
 	sqlrpaths	sqlrpth(&cmdl);

@@ -338,7 +338,7 @@ bool db2connection::mustDetachBeforeLogIn() {
 bool db2connection::logIn(const char **error, const char **warning) {
 
 	// set the LANG environment variable
-	if (charstring::length(lang) && !environment::setValue("LANG",lang)) {
+	if (charstring::getLength(lang) && !environment::setValue("LANG",lang)) {
 		*error="Failed to set LANG environment variable";
 		return false;
 	}
@@ -1494,7 +1494,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 				return false;
 			}
 			column[i].tablelength=
-				charstring::length(column[i].table);
+				charstring::getLength(column[i].table);
 		}
 
 		// bind the column to a lob locator or buffer
@@ -1557,7 +1557,7 @@ void db2cursor::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,

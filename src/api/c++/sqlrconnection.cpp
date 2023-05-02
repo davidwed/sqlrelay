@@ -187,8 +187,8 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_password=(pvt->_copyrefs)?
 			charstring::duplicate(password):
 			(char *)password;
-	pvt->_userlen=charstring::length(user);
-	pvt->_passwordlen=charstring::length(password);
+	pvt->_userlen=charstring::getLength(user);
+	pvt->_passwordlen=charstring::getLength(password);
 	pvt->_usekrb=false;
 	pvt->_krbservice=NULL;
 	pvt->_krbmech=NULL;
@@ -1086,7 +1086,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// set the connectionunixport and connectioninetport values
 	if (pvt->_copyrefs) {
-		if (charstring::length(socket)<=MAXPATHLEN) {
+		if (charstring::getLength(socket)<=MAXPATHLEN) {
 			charstring::copy(pvt->_connectionunixportbuffer,socket);
 			pvt->_connectionunixport=pvt->_connectionunixportbuffer;
 		} else {
@@ -1552,7 +1552,7 @@ const char *sqlrconnection::nextvalFormat() {
 
 bool sqlrconnection::selectDatabase(const char *database) {
 
-	if (!charstring::length(database)) {
+	if (!charstring::getLength(database)) {
 		return true;
 	}
 
@@ -1574,7 +1574,7 @@ bool sqlrconnection::selectDatabase(const char *database) {
 	pvt->_cs->write((uint16_t)SELECT_DATABASE);
 
 	// send the database name
-	uint32_t	len=charstring::length(database);
+	uint32_t	len=charstring::getLength(database);
 	pvt->_cs->write(len);
 	if (len) {
 		pvt->_cs->write(database,len);
@@ -2058,7 +2058,7 @@ void sqlrconnection::debugPrintClob(const char *clob, uint32_t length) {
 void sqlrconnection::setClientInfo(const char *clientinfo) {
 	delete[] pvt->_clientinfo;
 	pvt->_clientinfo=charstring::duplicate(clientinfo);
-	pvt->_clientinfolen=charstring::length(clientinfo);
+	pvt->_clientinfolen=charstring::getLength(clientinfo);
 }
 
 const char *sqlrconnection::getClientInfo() {

@@ -113,15 +113,15 @@ void sqlrdirective_custom_wf::parseDirective(
 		sqlrcur->setExecuteDirect(false);
 	}
 
-	if ((length>charstring::length(KEYWORD_QUERYTIMEOUT)) &&
+	if ((length>charstring::getLength(KEYWORD_QUERYTIMEOUT)) &&
 		(!charstring::compare(directivestart,
 				KEYWORD_QUERYTIMEOUT,
-				charstring::length(KEYWORD_QUERYTIMEOUT)))) {
+				charstring::getLength(KEYWORD_QUERYTIMEOUT)))) {
 
 		int32_t		argumentsize=length-
-				charstring::length(KEYWORD_QUERYTIMEOUT);
+				charstring::getLength(KEYWORD_QUERYTIMEOUT);
 		const char	*argument=&directivestart[
-				charstring::length(KEYWORD_QUERYTIMEOUT)];
+				charstring::getLength(KEYWORD_QUERYTIMEOUT)];
 
 		if (charstring::isInteger(argument,argumentsize)) {
 			// well, I know that the directive is always zero

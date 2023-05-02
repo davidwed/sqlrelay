@@ -848,7 +848,7 @@ error:
 	#ifndef _WIN32
 	if (charstring::contains(error,"No such file or directory")) {
 		char		*path=file::dirname(libname);
-		const char	*lib=libname+charstring::length(path)+1;
+		const char	*lib=libname+charstring::getLength(path)+1;
 		errormessage->append("\n(NOTE: The error message above may "
 					"be misleading.  Most likely it means "
 					"that a library that ");

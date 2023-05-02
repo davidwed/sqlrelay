@@ -125,7 +125,7 @@ const char *sqlrauth_mysql_userlist::auth(sqlrcredentials *cred) {
 		if (!charstring::compare(user,users[i])) {
 
 			if (getPasswordEncryptions() &&
-				charstring::length(passwordencryptions[i])) {
+				charstring::getLength(passwordencryptions[i])) {
 
 				// if password encryption is being used...
 
@@ -206,7 +206,7 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 		// sha1(password)
 		sha1	s1;
 		s1.append((const byte_t *)validpassword,
-				charstring::length(validpassword));
+				charstring::getLength(validpassword));
 		bytebuffer	sha1pass;
 		sha1pass.append(s1.getHash(),s1.getHashSize());
 
@@ -218,7 +218,7 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 
 		// concat(randombytes,sha1(sha1(password)))
 		bytebuffer	rbsha1sha1pass;
-		rbsha1sha1pass.append(extra,charstring::length(extra));
+		rbsha1sha1pass.append(extra,charstring::getLength(extra));
 		rbsha1sha1pass.append(sha1sha1pass.getBuffer(),
 						sha1sha1pass.getSize());
 
@@ -249,7 +249,7 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 			// sha256(password)
 			sha256	s256;
 			s256.append((const byte_t *)validpassword,
-					charstring::length(validpassword));
+					charstring::getLength(validpassword));
 			bytebuffer	sha256pass;
 			sha256pass.append(s256.getHash(),s256.getHashSize());
 
@@ -262,7 +262,7 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 			// concat(randombytes,sha256(sha256(password)))
 			bytebuffer	rbsha256sha256pass;
 			rbsha256sha256pass.append(extra,
-						charstring::length(extra));
+						charstring::getLength(extra));
 			rbsha256sha256pass.append(sha256sha256pass.getBuffer(),
 						sha256sha256pass.getSize());
 

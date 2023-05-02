@@ -283,13 +283,13 @@ void sqlrquerytranslation_patterns::applyPattern(const char *str,
 							pattern_t *p,
 							stringbuffer *outb) {
 
-	ssize_t		pfromlen=(debug)?charstring::length(p->from):0;
+	ssize_t		pfromlen=(debug)?charstring::getLength(p->from):0;
 	const char	*fromellipses="";
 	if (pfromlen>77) {
 		pfromlen=74;
 		fromellipses="...";
 	}
-	ssize_t		ptolen=(debug)?charstring::length(p->to):0;
+	ssize_t		ptolen=(debug)?charstring::getLength(p->to):0;
 	const char	*toellipses="";
 	if (ptolen>77) {
 		ptolen=74;

@@ -283,7 +283,7 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 	bindvarnamesizes=new int16_t[maxbindcount];
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		charstring::printf(&bindvarnames[i],"$%d",i+1);
-		bindvarnamesizes[i]=charstring::length(bindvarnames[i]);
+		bindvarnamesizes[i]=charstring::getLength(bindvarnames[i]);
 	}
 
 	init();
@@ -885,7 +885,7 @@ bool sqlrprotocol_postgresql::authenticate() {
 	sqlrpostgresqlcredentials	cred;
 	cred.setUser(user);
 	cred.setPassword(password);
-	cred.setPasswordLength(charstring::length(password));
+	cred.setPasswordLength(charstring::getLength(password));
 	cred.setMethod(authmethod);
 	cred.setSalt(salt);
 
@@ -986,7 +986,7 @@ bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
 			char		*major=NULL;
 			char		*minor=NULL;
 			char		*patch=NULL;
-			if (charstring::length(dbversion)==5) {
+			if (charstring::getLength(dbversion)==5) {
 				major=charstring::duplicate(ptr,1);
 				ptr++;
 			} else {
@@ -1152,7 +1152,7 @@ bool sqlrprotocol_postgresql::sendReadyForQuery() {
 bool sqlrprotocol_postgresql::sendErrorResponse(const char *errorstring) {
 	return sendErrorResponse("ERROR","",
 				errorstring,
-				charstring::length(errorstring));
+				charstring::getLength(errorstring));
 }
 
 bool sqlrprotocol_postgresql::sendErrorResponse(const char *errorstring,
@@ -1165,7 +1165,7 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 						const char *errorstring) {
 	return sendErrorResponse(severity,sqlstate,
 				errorstring,
-				charstring::length(errorstring));
+				charstring::getLength(errorstring));
 }
 
 bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,

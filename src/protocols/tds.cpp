@@ -1679,7 +1679,7 @@ bool sqlrprotocol_tds::preLogin() {
 	// instopt
 	write(&resppacket,(byte_t)PL_INSTOPT);
 	writeBE(&resppacket,ploptoff);
-	ploptlen=charstring::length(instvalidity)+1;
+	ploptlen=charstring::getLength(instvalidity)+1;
 	ploptoff+=ploptlen;
 	writeBE(&resppacket,ploptlen);
 	// FIXME: we should probably send an accurate instopt
@@ -2169,7 +2169,7 @@ bool sqlrprotocol_tds::tds7Login() {
 	if (retval && cchdatabase) {
 
 		char		*olddatabase=cont->getCurrentDatabase();
-		uint32_t	olddatabaselen=charstring::length(olddatabase);
+		uint32_t	olddatabaselen=charstring::getLength(olddatabase);
 		wchar_t		*olddatabase32=wcharstring::duplicate(
 						olddatabase,olddatabaselen);
 
@@ -2298,7 +2298,7 @@ void sqlrprotocol_tds::loginAck() {
 	uint32_t	tdsversion=
 			tdsVersionDecToHex(negotiatedtdsversion,true);
 	const char	*progname=dbversion;
-	byte_t		prognamelen=(byte_t)charstring::length(progname);
+	byte_t		prognamelen=(byte_t)charstring::getLength(progname);
 	ucs2_t		*progname16=ucs2charstring::duplicate(progname,
 							(size_t)prognamelen);
 	byte_t		majorver=0;
@@ -2582,11 +2582,11 @@ void sqlrprotocol_tds::negotiatePacketSize(uint32_t packetsize) {
 void sqlrprotocol_tds::envChangePacketSize() {
 
 	char		*npsize=charstring::parseNumber(negotiatedpacketsize);
-	uint32_t	npsizelen=charstring::length(npsize);
+	uint32_t	npsizelen=charstring::getLength(npsize);
 	wchar_t		*npsize32=wcharstring::duplicate(npsize,npsizelen);
 
 	char		*opsize=charstring::parseNumber(oldpacketsize);
-	uint32_t	opsizelen=charstring::length(opsize);
+	uint32_t	opsizelen=charstring::getLength(opsize);
 	wchar_t		*opsize32=wcharstring::duplicate(opsize,opsizelen);
 
 	envChange(ENV_CHANGE_PACKET_SIZE,
@@ -3245,7 +3245,7 @@ void sqlrprotocol_tds::tableName(byte_t tdstype) {
 
 	for (uint16_t i=0; i<numparts; i++) {
 		const char	*partname8="";
-		uint16_t	partnamelen=charstring::length(partname8);
+		uint16_t	partnamelen=charstring::getLength(partname8);
 		ucs2_t		*partname=ucs2charstring::duplicate(
 							partname8,
 							(size_t)partnamelen);
@@ -3505,7 +3505,7 @@ void sqlrprotocol_tds::lobData(byte_t tdstype) {
 
 	// dummy textpointer
 	const char	*textptr="dummy textptr   ";
-	byte_t		textptrlen=charstring::length(textptr);
+	byte_t		textptrlen=charstring::getLength(textptr);
 	write(&resppacket,textptrlen);
 	write(&resppacket,textptr,textptrlen);
 
@@ -4176,7 +4176,7 @@ void sqlrprotocol_tds::decimal(const char *field,
 				byte_t *len,
 				byte_t *val) {
 
-	uint32_t	precision=charstring::length(field);
+	uint32_t	precision=charstring::getLength(field);
 
 	*ispositive=1;
 	if (field[0]=='-') {
@@ -4833,7 +4833,7 @@ bool sqlrprotocol_tds::param(sqlrservercursor *cursor,
 	// FIXME: use pname/pnamelen if pnamelen>0
 	if (bv) {
 		bv->variable=bindvarnames[param];
-		bv->variablesize=charstring::length(bv->variable);
+		bv->variablesize=charstring::getLength(bv->variable);
 	}
 
 	// param data...
@@ -5032,7 +5032,7 @@ bool sqlrprotocol_tds::param(sqlrservercursor *cursor,
 				// FIXME: kludgy
 				char	*num=charstring::parseNumber(
 						bv->value.doubleval.value);
-				size_t	len=charstring::length(num);
+				size_t	len=charstring::getLength(num);
 				bv->value.doubleval.precision=len-
 					(charstring::contains(num,'-')?1:0)-
 					(charstring::contains(num,'.')?1:0);
@@ -5092,7 +5092,7 @@ bool sqlrprotocol_tds::param(sqlrservercursor *cursor,
 				// FIXME: kludgy
 				char	*num=charstring::parseNumber(
 						bv->value.doubleval.value);
-				size_t	len=charstring::length(num);
+				size_t	len=charstring::getLength(num);
 				bv->value.doubleval.precision=len-
 					(charstring::contains(num,'-')?1:0)-
 					(charstring::contains(num,'.')?1:0);
@@ -5430,13 +5430,13 @@ void sqlrprotocol_tds::infoOrError(byte_t token,
 					const char *procname,
 					uint32_t linenumber) {
 
-	uint16_t	msgtextlen=charstring::length(msgtext);
+	uint16_t	msgtextlen=charstring::getLength(msgtext);
 	ucs2_t		*msgtext16=ucs2charstring::duplicate(
 					msgtext,(size_t)msgtextlen);
-	byte_t		srvnamelen=charstring::length(srvname);
+	byte_t		srvnamelen=charstring::getLength(srvname);
 	ucs2_t		*srvname16=ucs2charstring::duplicate(
 					srvname,(size_t)srvnamelen);
-	byte_t		procnamelen=charstring::length(procname);
+	byte_t		procnamelen=charstring::getLength(procname);
 	ucs2_t		*procname16=ucs2charstring::duplicate(
 					procname,(size_t)procnamelen);
 

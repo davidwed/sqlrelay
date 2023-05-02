@@ -2838,8 +2838,8 @@ authsessionkey=charstring::duplicate("64760F3160DCEF82");
 void sqlrprotocol_oracle::putAuthField(const char *fieldname,
 						const char *field) {
 
-	byte_t	fieldnamelength=charstring::length(fieldname);
-	byte_t	fieldlength=charstring::length(field);
+	byte_t	fieldnamelength=charstring::getLength(fieldname);
+	byte_t	fieldlength=charstring::getLength(field);
 
 	// field name...
 	write(&reqpacket,fieldnamelength);
@@ -3684,7 +3684,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 
 		// the bind variable name should be something like :1, :2, etc.
 		bv->variable=bindvarnames[i];
-		bv->variablesize=charstring::length(bv->variable);
+		bv->variablesize=charstring::getLength(bv->variable);
 
 		if (getDebug()) {
 			stdoutput.printf("bind %d {\n",i);
@@ -5088,7 +5088,7 @@ void sqlrprotocol_oracle::putLobField(sqlrservercursor *cursor, uint32_t col) {
 }
 
 void sqlrprotocol_oracle::putError(const char *error) {
-	putError(error,charstring::length(error));
+	putError(error,charstring::getLength(error));
 }
 
 void sqlrprotocol_oracle::putError(const char *error, uint32_t errorlength) {
@@ -5277,7 +5277,7 @@ bool sqlrprotocol_oracle::sendVersionResponse() {
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
 	// writeLE?
-	writeHost(&reqpacket,(uint16_t)charstring::length(serverversion));
+	writeHost(&reqpacket,(uint16_t)charstring::getLength(serverversion));
 	write(&reqpacket,serverversion);
 	reqpacket.append(unknown,sizeof(unknown));
 
