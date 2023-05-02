@@ -40,7 +40,7 @@ sqlrscalar::sqlrscalar(sqlrcursor *cursor, uint64_t row, uint64_t col) :
 sqlrscalar::~sqlrscalar() {
 }
 
-bool sqlrscalar::getIsReadOnly() {
+bool sqlrscalar::isReadOnly() {
 	return true;
 }
 

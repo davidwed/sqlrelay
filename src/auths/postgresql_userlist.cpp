@@ -114,7 +114,7 @@ const char *sqlrauth_postgresql_userlist::auth(sqlrcredentials *cred) {
 	}
 
 	// sanity check on method
-	if (!charstring::inSet(method,supportedmethods)) {
+	if (!charstring::isInSet(method,supportedmethods)) {
 		return NULL;
 	}
 

@@ -1302,10 +1302,10 @@ static PyObject *getField(PyObject *self, PyObject *args) {
   } else if (isBitTypeChar(type)) {
     return Py_BuildValue("l",bitStringToLong(rc));
   } else if (isBoolTypeChar(type)) {
-    if (rc && character::toLowerCase(rc[0]) == 't') {
+    if (rc && character::lower(rc[0]) == 't') {
       Py_INCREF(Py_True);
       return Py_True;
-    } else if (rc && character::toLowerCase(rc[0]) == 'f') {
+    } else if (rc && character::lower(rc[0]) == 'f') {
       Py_INCREF(Py_False);
       return Py_False;
     } else {
@@ -1436,10 +1436,10 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
     } else if (isBitTypeChar(type)) {
       PyList_SetItem(my_list, counter, Py_BuildValue("l", bitStringToLong(row_data[counter])));
     } else if (isBoolTypeChar(type)) {
-      if (row_data[counter] && character::toLowerCase(row_data[counter][0]) == 't') {
+      if (row_data[counter] && character::lower(row_data[counter][0]) == 't') {
         Py_INCREF(Py_True);
         PyList_SetItem(my_list, counter, Py_True);
-      } else if (row_data[counter] && character::toLowerCase(row_data[counter][0]) == 'f') {
+      } else if (row_data[counter] && character::lower(row_data[counter][0]) == 'f') {
         Py_INCREF(Py_False);
         PyList_SetItem(my_list, counter, Py_False);
       } else {
@@ -1506,10 +1506,10 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     } else if (isBitTypeChar(type)) {
       PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("l", bitStringToLong(field)));
     } else if (isBoolTypeChar(type)) {
-      if (field && character::toLowerCase(field[0]) == 't') {
+      if (field && character::lower(field[0]) == 't') {
         Py_INCREF(Py_True);
         PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_True);
-      } else if (field && character::toLowerCase(field[0]) == 'f') {
+      } else if (field && character::lower(field[0]) == 'f') {
         Py_INCREF(Py_False);
         PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_False);
       } else {

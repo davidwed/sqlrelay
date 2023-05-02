@@ -1215,7 +1215,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 			if (character::isWhitespace(c)) {
 				nquery[i]=' ';
 			} else {
-				nquery[i]=character::toLowerCase(c);
+				nquery[i]=character::lower(c);
 			}
 		}
 	}

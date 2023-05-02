@@ -141,11 +141,11 @@ void sqlrrowlist::setRow(uint64_t row) {
 	pvt->_node.setRow(row);
 }
 
-bool sqlrrowlist::getIsReadOnly() {
+bool sqlrrowlist::isReadOnly() {
 	return true;
 }
 
-bool sqlrrowlist::getIsBlockBased() {
+bool sqlrrowlist::isBlockBased() {
 	return true;
 }
 
@@ -311,11 +311,11 @@ void sqlrresultsetlist::setColumn(uint32_t col) {
 	pvt->_node.setColumn(col);
 }
 
-bool sqlrresultsetlist::getIsReadOnly() {
+bool sqlrresultsetlist::isReadOnly() {
 	return true;
 }
 
-bool sqlrresultsetlist::getIsBlockBased() {
+bool sqlrresultsetlist::isBlockBased() {
 	return true;
 }
 

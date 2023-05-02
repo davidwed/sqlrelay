@@ -52,7 +52,7 @@ void sqlrrowdictionary::setRow(uint64_t row) {
 	pvt->_row=row;
 }
 
-bool sqlrrowdictionary::getIsReadOnly() {
+bool sqlrrowdictionary::isReadOnly() {
 	return true;
 }
 

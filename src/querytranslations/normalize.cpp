@@ -241,9 +241,9 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 
 		// case-convert the character and append it
 		if (uppercase) {
-			pass1.append((char)character::toUpperCase(*ptr));
+			pass1.append((char)character::upper(*ptr));
 		} else if (lowercase) {
-			pass1.append((char)character::toLowerCase(*ptr));
+			pass1.append((char)character::lower(*ptr));
 		} else {
 			pass1.append(*ptr);
 		}
@@ -336,11 +336,11 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 
 					// *before is one of a valid set of
 					// characters that can preceed a decimal
-					character::inSet(*before,beforeset) &&
+					character::isInSet(*before,beforeset) &&
 
 					// *after is one of a valid set of
 					// characters that can follow a decimal
-					(character::inSet(*after,afterset) ||
+					(character::isInSet(*after,afterset) ||
 
 					// *after is at the end of the query
 					!*after ||
@@ -393,8 +393,8 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		static const char symbols[]="!%^-+=[{}\\|;,<.>/";
 		if (
 			(*ptr==' ' &&
-			(character::inSet(*(ptr+1),symbols) ||
-			character::inSet(*(ptr-1),symbols) ||
+			(character::isInSet(*(ptr+1),symbols) ||
+			character::isInSet(*(ptr-1),symbols) ||
 			!charstring::compare(ptr+1,":=",2))) &&
 
 			// actually, - and ! also require special handling
@@ -599,7 +599,7 @@ bool sqlrquerytranslation_normalize::skipQuotedStrings(const char *ptr,
 
 	// if we're on a quote, or are already one-character inside of a
 	// quoted string...
-	if (character::inSet(*ptr,set) || alreadyinside) {
+	if (character::isInSet(*ptr,set) || alreadyinside) {
 
 		found=true;
 
@@ -698,11 +698,9 @@ bool sqlrquerytranslation_normalize::caseConvertQuotedStrings(
 			// if we didn't find escaped quotes...
 			{
 				if (upper) {
-					sb->write((char)character::
-							toUpperCase(*ptr));
+					sb->write((char)character::upper(*ptr));
 				} else {
-					sb->write((char)character::
-							toLowerCase(*ptr));
+					sb->write((char)character::lower(*ptr));
 				}
 				ptr++;
 			}
@@ -760,11 +758,9 @@ bool sqlrquerytranslation_normalize::removeQuotes(
 			// if we didn't find escaped quotes...
 			{
 				if (upper) {
-					sb->write((char)character::
-							toUpperCase(*ptr));
+					sb->write((char)character::upper(*ptr));
 				} else if (lower) {
-					sb->write((char)character::
-							toLowerCase(*ptr));
+					sb->write((char)character::lower(*ptr));
 				} else {
 					sb->write(*ptr);
 				}

@@ -47,7 +47,7 @@ sqlrfilter_string::sqlrfilter_string(sqlrservercontroller *cont,
 	if (ignorecase) {
 		lowerpattern=charstring::duplicate(pattern);
 		for (char *c=lowerpattern; *c; c++) {
-			*c=character::toLowerCase(*c);
+			*c=character::lower(*c);
 		}
 		pattern=lowerpattern;
 	}
@@ -70,7 +70,7 @@ bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
 	if (ignorecase) {
 		lowered=charstring::duplicate(query);
 		for (char *c=lowered; *c; c++) {
-			*c=character::toLowerCase(*c);
+			*c=character::lower(*c);
 		}
 		query=lowered;
 	}

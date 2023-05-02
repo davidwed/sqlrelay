@@ -146,14 +146,14 @@ bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
 
 					lowquery=charstring::duplicate(query);
 					for (char *cq=lowquery; *cq; cq++) {
-						*cq=character::toLowerCase(*cq);
+						*cq=character::lower(*cq);
 					}
 					qry=lowquery;
 
 					lowpattern=charstring::duplicate(
 								pc->pattern);
 					for (char *cp=lowpattern; *cp; cp++) {
-						*cp=character::toLowerCase(*cp);
+						*cp=character::lower(*cp);
 					}
 					ptrn=lowpattern;
 				}
@@ -198,7 +198,7 @@ bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
 
 					lowpart=charstring::duplicate(parts[j]);
 					for (char *cq=lowpart; *cq; cq++) {
-						*cq=character::toLowerCase(*cq);
+						*cq=character::lower(*cq);
 					}
 					prt=lowpart;
 
@@ -206,7 +206,7 @@ bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
 					lowpattern=charstring::duplicate(
 								pc->pattern);
 					for (char *cp=lowpattern; *cp; cp++) {
-						*cp=character::toLowerCase(*cp);
+						*cp=character::lower(*cp);
 					}
 					ptrn=lowpattern;
 				}

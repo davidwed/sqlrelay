@@ -114,7 +114,7 @@ const char *sqlrauth_mysql_userlist::auth(sqlrcredentials *cred) {
 	}
 
 	// sanity check on method
-	if (!charstring::inSet(method,supportedauthplugins)) {
+	if (!charstring::isInSet(method,supportedauthplugins)) {
 		return NULL;
 	}
 

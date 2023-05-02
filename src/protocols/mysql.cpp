@@ -1955,7 +1955,7 @@ bool sqlrprotocol_mysql::negotiateAuthMethod() {
 	}
 
 	// if the client requested an auth that we support, then offer it
-	if (charstring::inSet(clientauthpluginname,supportedauthplugins)) {
+	if (charstring::isInSet(clientauthpluginname,supportedauthplugins)) {
 
 		// generate challenge...
 		for (const char * const *plugin=supportedauthplugins;

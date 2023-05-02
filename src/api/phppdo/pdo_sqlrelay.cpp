@@ -837,7 +837,7 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	// Chop any :, @ or $'s off of the front of the name.  We have to
 	// iterate because PDO itself prepends a : if the name doesn't already
 	// have one.
-	while (character::inSet(*name,":@$")) {
+	while (character::isInSet(*name,":@$")) {
 		name++;
 	}
 

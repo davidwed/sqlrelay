@@ -2992,7 +2992,7 @@ static void SQLR_ParseInterval(SQL_INTERVAL_STRUCT *is,
 static char SQLR_CharToHex(const char input) {
 	debugFunction();
 	char	ch=input;
-	character::toUpperCase(ch);
+	character::upper(ch);
 	if (ch>='0' && ch<='9') {
 		ch=ch-'0';
 	} else if (ch>='A' && ch<='F') {
@@ -5097,7 +5097,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 						"SQL_DIAG_SUBCLASS_ORIGIN\n");
 					debugPrintf("  sqlstate: %s\n",
 							conn->sqlstate);
-					if (charstring::inSet(
+					if (charstring::isInSet(
 							conn->sqlstate,
 							odbc3states)) {
 						val.strval="ODBC 3.0";

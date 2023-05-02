@@ -13,7 +13,7 @@ enum queryparsestate_t {
 
 #ifdef NEED_BEFORE_BIND_VARIABLE
 static bool beforeBindVariable(const char *c) {
-	return character::inSet(*c," \t\n\r=<>,(+-*/%|&!~^");
+	return character::isInSet(*c," \t\n\r=<>,(+-*/%|&!~^");
 }
 #endif
 
@@ -32,7 +32,7 @@ static bool isBindDelimiter(const char *c,
 
 #ifdef NEED_AFTER_BIND_VARIABLE
 static bool afterBindVariable(const char *c) {
-	return (character::inSet(*c," \t\n\r,);=<>!") ||
+	return (character::isInSet(*c," \t\n\r,);=<>!") ||
 				(*c==':' && *(c+1)=='='));
 }
 #endif
