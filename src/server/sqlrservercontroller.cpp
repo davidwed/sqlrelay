@@ -574,7 +574,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the time to live from the command line
 	const char	*ttlstr=pvt->_cmdl->getValue("-ttl");
 	pvt->_ttl=(!charstring::isNullOrEmpty(ttlstr))?
-				charstring::toInteger(ttlstr):-1;
+				charstring::convertToInteger(ttlstr):-1;
 
 	// should we run quietly?
 	pvt->_silent=pvt->_cmdl->getWasFound("-silent");
@@ -8291,7 +8291,7 @@ void sqlrservercontroller::bulkLoadBindRow(const byte_t *data,
 
 			case SQLRSERVERBINDVARTYPE_INTEGER:
 				inbind->value.integerval=
-					charstring::toInteger((char *)val);
+					charstring::convertToInteger((char *)val);
 				inbind->isnull=nonNullBindValue();
 				if (pvt->_debugbulkload) {
 					stdoutput.printf("%d\n",
@@ -8304,7 +8304,7 @@ void sqlrservercontroller::bulkLoadBindRow(const byte_t *data,
 				temp=charstring::duplicate(
 					(char *)val,inbind->valuesize);
 				inbind->value.doubleval.value=
-					charstring::toFloat(temp);
+					charstring::convertToFloat(temp);
 				inbind->value.doubleval.precision=
 					inbind->valuesize-
 					((inbind->value.

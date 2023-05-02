@@ -3657,7 +3657,7 @@ void sqlrprotocol_tds::field(byte_t tdstype,
 		case TDS_TYPE_INT1:
 		case TDS_TYPE_BIT:
 			{
-			char	data=charstring::toInteger(field);
+			char	data=charstring::convertToInteger(field);
 			write(&resppacket,data);
 			if (getDebug()) {
 				stdoutput.write("		data: ");
@@ -3667,7 +3667,7 @@ void sqlrprotocol_tds::field(byte_t tdstype,
 			break;
 		case TDS_TYPE_INT2:
 			{
-			int16_t	data=charstring::toInteger(field);
+			int16_t	data=charstring::convertToInteger(field);
 			write(&resppacket,hostToLE((uint16_t)data));
 			if (getDebug()) {
 				stdoutput.write("		data: ");
@@ -3677,7 +3677,7 @@ void sqlrprotocol_tds::field(byte_t tdstype,
 			break;
 		case TDS_TYPE_INT4:
 			{
-			int32_t	data=charstring::toInteger(field);
+			int32_t	data=charstring::convertToInteger(field);
 			write(&resppacket,hostToLE((uint32_t)data));
 			if (getDebug()) {
 				stdoutput.write("		data: ");
@@ -3705,7 +3705,7 @@ void sqlrprotocol_tds::field(byte_t tdstype,
 			break;
 		case TDS_TYPE_FLT4:
 			{
-			float	data=charstring::toFloat(field);
+			float	data=charstring::convertToFloat(field);
 			write(&resppacket,data);
 			if (getDebug()) {
 				stdoutput.write("		data: ");
@@ -3717,7 +3717,7 @@ void sqlrprotocol_tds::field(byte_t tdstype,
 			{
 			char	*copy=charstring::duplicate(field);
 			charstring::strip(copy,'.');
-			int64_t	data=charstring::toInteger(copy)*100;
+			int64_t	data=charstring::convertToInteger(copy)*100;
 			delete[] copy;
 			write(&resppacket,
 				hostToLE(
@@ -3751,7 +3751,7 @@ void sqlrprotocol_tds::field(byte_t tdstype,
 			break;
 		case TDS_TYPE_FLT8:
 			{
-			double	data=charstring::toFloat(field);
+			double	data=charstring::convertToFloat(field);
 			write(&resppacket,data);
 			if (getDebug()) {
 				stdoutput.write("		data: ");
@@ -3763,7 +3763,7 @@ void sqlrprotocol_tds::field(byte_t tdstype,
 			{
 			char	*copy=charstring::duplicate(field);
 			charstring::strip(copy,'.');
-			int32_t	data=charstring::toInteger(copy)*100;
+			int32_t	data=charstring::convertToInteger(copy)*100;
 			delete[] copy;
 			write(&resppacket,hostToLE((uint32_t)data));
 			if (getDebug()) {
@@ -3774,7 +3774,7 @@ void sqlrprotocol_tds::field(byte_t tdstype,
 			break;
 		case TDS_TYPE_INT8:
 			{
-			int64_t	data=charstring::toInteger(field);
+			int64_t	data=charstring::convertToInteger(field);
 			write(&resppacket,hostToLE((uint64_t)data));
 			if (getDebug()) {
 				stdoutput.write("		data: ");
@@ -4192,12 +4192,12 @@ void sqlrprotocol_tds::decimal(const char *field,
 
 	if (precision>=1 && precision<=9) {
 		*len=4;
-		int32_t	v=charstring::toInteger((*ispositive)?copy:copy+1);
+		int32_t	v=charstring::convertToInteger((*ispositive)?copy:copy+1);
 		v=hostToLE((uint32_t)v);
 		bytestring::copy(val,&v,sizeof(v));
 	} else if (precision>=10 && precision<=19) {
 		*len=8;
-		int64_t	v=charstring::toInteger((*ispositive)?copy:copy+1);
+		int64_t	v=charstring::convertToInteger((*ispositive)?copy:copy+1);
 		v=hostToLE((uint64_t)v);
 		bytestring::copy(val,&v,sizeof(v));
 	} else if (precision>=20 && precision<=28) {
@@ -4312,17 +4312,17 @@ void sqlrprotocol_tds::sqlBatchError(sqlrservercursor *cursor) {
 
 		severityptr=charstring::findFirst(errptr," severity(");
 		if (severityptr) {
-			errclass=charstring::toInteger(severityptr+10);
+			errclass=charstring::convertToInteger(severityptr+10);
 		}
 
 		char	*stateptr=charstring::findFirst(errptr," state(");
 		if (stateptr) {
-			state=charstring::toInteger(stateptr+7);
+			state=charstring::convertToInteger(stateptr+7);
 		}
 
 		char	*lineptr=charstring::findFirst(errptr," line(");
 		if (lineptr) {
-			linenumber=charstring::toInteger(lineptr+6);
+			linenumber=charstring::convertToInteger(lineptr+6);
 		}
 
 		char	*srvptr=charstring::findFirst(errptr," Server Name:");

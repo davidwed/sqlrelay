@@ -407,7 +407,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set packetsize
-	uint16_t	ps=charstring::toInteger(packetsize);
+	uint16_t	ps=charstring::convertToInteger(packetsize);
 	if (!charstring::isNullOrEmpty(packetsize) &&
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 			(CS_VOID *)&ps,sizeof(ps),
@@ -687,7 +687,7 @@ sapcursor::sapcursor(sqlrserverconnection *conn, uint16_t id) :
 	languagecmd=NULL;
 	cursorcmd=NULL;
 
-	cursornamelength=charstring::integerLength(id);
+	cursornamelength=charstring::getIntegerLength(id);
 	cursorname=charstring::parseNumber(id);
 
 	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
@@ -1442,10 +1442,10 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 							data[i],length);
 			} else if (outbindtype[i]==CS_INT_TYPE) {
 				*outbindints[i]=
-					charstring::toInteger(data[i]);
+					charstring::convertToInteger(data[i]);
 			} else if (outbindtype[i]==CS_FLOAT_TYPE) {
 				*outbinddoubles[i]=
-					charstring::toFloatC(data[i]);
+					charstring::convertToFloatC(data[i]);
 			} else if (outbindtype[i]==CS_DATETIME_TYPE) {
 
 				// convert to a CS_DATEREC

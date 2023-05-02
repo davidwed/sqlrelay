@@ -1107,8 +1107,8 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 	char	*hostname=sys::getHostName();
 
 	size_t	tracefilenamebuffersize=charstring::getLength(tracefilenameformat);
-	tracefilenamebuffersize+=charstring::integerLength((int64_t)pid);
-	tracefilenamebuffersize+=charstring::integerLength((int64_t)now);
+	tracefilenamebuffersize+=charstring::getIntegerLength((int64_t)pid);
+	tracefilenamebuffersize+=charstring::getIntegerLength((int64_t)now);
 	tracefilenamebuffersize+=charstring::getLength(hostname);
 	tracefilenamebuffersize+=1;
 
@@ -2390,7 +2390,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint32_t valuesize,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2558,7 +2558,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t *value) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2583,7 +2583,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint32_t precision,
 				uint32_t scale) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2617,7 +2617,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2720,7 +2720,7 @@ bool odbccursor::inputBindBlob(const char *variable,
 
 	// FIXME: This code is known to work with Teradata...
 	// (Ideally we should get one body of code working for all dbs)
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2745,7 +2745,7 @@ bool odbccursor::outputBind(const char *variable,
 				uint32_t valuesize, 
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2807,7 +2807,7 @@ bool odbccursor::outputBind(const char *variable,
 				int64_t *value,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2839,7 +2839,7 @@ bool odbccursor::outputBind(const char *variable,
 				uint32_t *scale,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2879,7 +2879,7 @@ bool odbccursor::outputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2922,7 +2922,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				uint32_t valuesize, 
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -3031,7 +3031,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				int64_t *value,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -3064,7 +3064,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				uint32_t *scale,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -3102,7 +3102,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;

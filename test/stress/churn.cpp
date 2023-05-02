@@ -34,11 +34,11 @@ int main(int argc, const char **argv) {
 	}
 
 	host=cmdl.getValue("host");
-	port=charstring::toUnsignedInteger(cmdl.getValue("port"));
+	port=charstring::convertToUnsignedInteger(cmdl.getValue("port"));
 	sock=cmdl.getValue("socket");
 	user=cmdl.getValue("user");
 	password=cmdl.getValue("password");
-	concount=charstring::toUnsignedInteger(cmdl.getValue("concount"));
+	concount=charstring::convertToUnsignedInteger(cmdl.getValue("concount"));
 
 	sqlrconnection	**cons=new sqlrconnection *[concount];
 

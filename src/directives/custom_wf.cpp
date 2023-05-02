@@ -131,10 +131,10 @@ void sqlrdirective_custom_wf::parseDirective(
 			if (debug) {
 				stdoutput.printf("%s%lld...\n",
 					KEYWORD_QUERYTIMEOUT,
-					charstring::toInteger(argument));
+					charstring::convertToInteger(argument));
 			}
 			sqlrcur->setQueryTimeout(
-					charstring::toInteger(argument));
+					charstring::convertToInteger(argument));
 		} else if (debug) {
 			stdoutput.printf("%s...bad argument...\n",
 					KEYWORD_QUERYTIMEOUT);

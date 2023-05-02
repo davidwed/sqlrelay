@@ -422,7 +422,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	// Handle port and socket.
 	int		portval=
 			(!charstring::isNullOrEmpty(port))?
-					charstring::toInteger(port):0;
+					charstring::convertToInteger(port):0;
 	const char	*socketval=
 			(!charstring::isNullOrEmpty(socket))?socket:NULL;
 	unsigned long	clientflag=0;
@@ -593,9 +593,9 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 				".",true,&list,&listlen);
 
 	if (listlen==3) {
-		uint64_t	major=charstring::toUnsignedInteger(list[0]);
-		uint64_t	minor=charstring::toUnsignedInteger(list[1]);
-		uint64_t	patch=charstring::toUnsignedInteger(list[2]);
+		uint64_t	major=charstring::convertToUnsignedInteger(list[0]);
+		uint64_t	minor=charstring::convertToUnsignedInteger(list[1]);
+		uint64_t	patch=charstring::convertToUnsignedInteger(list[2]);
 		if (major>4 || (major==4 && minor>1) ||
 				(major==4 && minor==1 && patch>=2)) {
 			cont->setFakeInputBinds(true);
@@ -1183,7 +1183,7 @@ bool mysqlcursor::inputBind(const char *variable,
 	// If it's something like :var1,:var2,:var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1222,7 +1222,7 @@ bool mysqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1256,7 +1256,7 @@ bool mysqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1299,7 +1299,7 @@ bool mysqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1369,7 +1369,7 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {

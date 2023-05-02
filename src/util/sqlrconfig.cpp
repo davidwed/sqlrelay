@@ -16,7 +16,7 @@ sqlrconfig::~sqlrconfig() {
 connectstringcontainer::connectstringcontainer() {
 	connectionid=NULL;
 	string=NULL;
-	metric=charstring::toInteger(DEFAULT_METRIC);
+	metric=charstring::convertToInteger(DEFAULT_METRIC);
 	behindloadbalancer=charstring::isYes(DEFAULT_BEHINDLOADBALANCER);
 	pwdenc=NULL;
 }

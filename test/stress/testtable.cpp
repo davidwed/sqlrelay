@@ -24,14 +24,14 @@ int main(int argc, const char **argv) {
 	}
 
 	const char	*host=cmdl.getValue("host");
-	uint16_t	port=charstring::toUnsignedInteger(
+	uint16_t	port=charstring::convertToUnsignedInteger(
 					cmdl.getValue("port"));
 	const char	*sock=cmdl.getValue("socket");
 	const char	*user=cmdl.getValue("user");
 	const char	*password=cmdl.getValue("password");
-	int32_t		colcount=charstring::toInteger(
+	int32_t		colcount=charstring::convertToInteger(
 					cmdl.getValue("colcount"));
-	int32_t		rowcount=charstring::toInteger(
+	int32_t		rowcount=charstring::convertToInteger(
 					cmdl.getValue("rowcount"));
 	const char	*table=cmdl.getValue("table");
 	if (charstring::isNullOrEmpty(table)) {

@@ -167,7 +167,7 @@ int main(int argc, const char **argv) {
 	const char	*configurl=sqlrpth.getConfigUrl();
 	const char	*id=cmdline.getValue("id");
 	const char	*host=cmdline.getValue("host");
-	uint16_t	port=charstring::toInteger(
+	uint16_t	port=charstring::convertToInteger(
 				(cmdline.getWasFound("port"))?
 				cmdline.getValue("port"):DEFAULT_PORT);
 	const char	*socket=cmdline.getValue("socket");
@@ -187,7 +187,7 @@ int main(int argc, const char **argv) {
 		tlsvalidate=cmdline.getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline.getValue("tlsca");
-	uint16_t	tlsdepth=charstring::toUnsignedInteger(
+	uint16_t	tlsdepth=charstring::convertToUnsignedInteger(
 					cmdline.getValue("tlsdepth"));
 	const char	*table=cmdline.getValue("table");
 	const char	*sequence=cmdline.getValue("sequence");
@@ -195,7 +195,7 @@ int main(int argc, const char **argv) {
 	if (charstring::isNullOrEmpty(format)) {
 		format="xml";
 	}
-	uint64_t	rsbs=charstring::toInteger(
+	uint64_t	rsbs=charstring::convertToInteger(
 				cmdline.getValue("resultsetbuffersize"));
 	if (!rsbs) {
 		rsbs=100;

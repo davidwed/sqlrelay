@@ -87,7 +87,7 @@ int main(int argc, const char **argv) {
 	const char	*configurl=sqlrpth.getConfigUrl();
 	const char	*id=cmdline.getValue("id");
 	const char	*host=cmdline.getValue("host");
-	uint16_t	port=charstring::toInteger(
+	uint16_t	port=charstring::convertToInteger(
 				(cmdline.getWasFound("port"))?
 				cmdline.getValue("port"):DEFAULT_PORT);
 	const char	*socket=cmdline.getValue("socket");
@@ -107,7 +107,7 @@ int main(int argc, const char **argv) {
 		tlsvalidate=cmdline.getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline.getValue("tlsca");
-	uint16_t	tlsdepth=charstring::toUnsignedInteger(
+	uint16_t	tlsdepth=charstring::convertToUnsignedInteger(
 					cmdline.getValue("tlsdepth"));
 	const char	*file=cmdline.getValue("file");
 	const char	*commitcountstr=cmdline.getValue("commitcount");
@@ -122,7 +122,7 @@ int main(int argc, const char **argv) {
 	const char	*primarykeyname=
 				cmdline.getValue("primarykeyname");
 	uint32_t	primarykeyposition=
-				charstring::toUnsignedInteger(
+				charstring::convertToUnsignedInteger(
 					cmdline.getValue("primarykeyposition"));
 	const char	*primarykeysequence=
 				cmdline.getValue("primarykeysequence");
@@ -215,7 +215,7 @@ int main(int argc, const char **argv) {
 	// (if not specified at all, default to 100)
 	uint64_t	commitcount=
 			(charstring::isNullOrEmpty(commitcountstr))?
-				100:charstring::toInteger(commitcountstr);
+				100:charstring::convertToInteger(commitcountstr);
 
 	// set up logging
 	logger	lg;

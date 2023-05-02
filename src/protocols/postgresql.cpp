@@ -997,8 +997,8 @@ bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
 			ptr+=2;
 			patch=charstring::duplicate(ptr,2);
 			sv.append(major)->append('.');
-			sv.append(charstring::toInteger(minor))->append('.');
-			sv.append(charstring::toInteger(patch));
+			sv.append(charstring::convertToInteger(minor))->append('.');
+			sv.append(charstring::convertToInteger(patch));
 
 			// get other variables
 			const char	*vars[]={
@@ -1452,7 +1452,7 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 			// tablemangling=lookup is set.  If we get a number
 			// for the table name, then assume the backend is
 			// returning oid's.
-			tableoid=charstring::toInteger(tablename);
+			tableoid=charstring::convertToInteger(tablename);
 		}
 		writeBE(&resppacket,tableoid);
 
@@ -1472,7 +1472,7 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 			// typemangling=yes/lookup is set.  If we get a number
 			// for the type name, then assume the backend is
 			// returning oid's.
-			coltypeoid=charstring::toInteger(coltypename);
+			coltypeoid=charstring::convertToInteger(coltypename);
 		} else {
 			coltypeoid=getColumnTypeOid(
 					cont->getColumnType(cursor,i));

@@ -93,7 +93,7 @@ void sqlrserverconnection::handleConnectString() {
 	uint32_t	fetchatonce=FETCH_AT_ONCE;
 	const char	*fao=cont->getConnectStringValue("fetchatonce");
 	if (fao) {
-		fetchatonce=charstring::toUnsignedInteger(fao);
+		fetchatonce=charstring::convertToUnsignedInteger(fao);
 		if (fetchatonce<1) {
 			fetchatonce=1;
 		}
@@ -107,7 +107,7 @@ void sqlrserverconnection::handleConnectString() {
 		mcc=cont->getConnectStringValue("maxselectlistsize");
 	}
 	if (mcc) {
-		maxcolumncount=charstring::toInteger(mcc);
+		maxcolumncount=charstring::convertToInteger(mcc);
 		if (maxcolumncount<0) {
 			maxcolumncount=0;
 		}
@@ -121,7 +121,7 @@ void sqlrserverconnection::handleConnectString() {
 		mfl=cont->getConnectStringValue("maxitembuffersize");
 	}
 	if (mfl) {
-		maxfieldlength=charstring::toInteger(mfl);
+		maxfieldlength=charstring::convertToInteger(mfl);
 		if (maxfieldlength<0) {
 			maxfieldlength=0;
 		}
@@ -135,7 +135,7 @@ void sqlrserverconnection::handleConnectString() {
 		cto=cont->getConnectStringValue("timeout");
 	}
 	if (cto) {
-		connecttimeout=charstring::toInteger(cto);
+		connecttimeout=charstring::convertToInteger(cto);
 		if (connecttimeout<0) {
 			connecttimeout=0;
 		}
@@ -146,7 +146,7 @@ void sqlrserverconnection::handleConnectString() {
 	int64_t		querytimeout=0;
 	const char	*qto=cont->getConnectStringValue("querytimeout");
 	if (qto) {
-		querytimeout=charstring::toInteger(qto);
+		querytimeout=charstring::convertToInteger(qto);
 		if (querytimeout<0) {
 			querytimeout=0;
 		}
@@ -490,7 +490,7 @@ bool sqlrserverconnection::getLastInsertId(uint64_t *id) {
 			bool		blob=false;
 			bool		null=false;
 			liicur->getField(0,&field,&fieldlength,&blob,&null);
-			*id=charstring::toInteger(field);
+			*id=charstring::convertToInteger(field);
 			retval=true;
 
 		}  else {
@@ -651,7 +651,7 @@ const char *sqlrserverconnection::dbHostName() {
 		const char	*ipaddr=dbIpAddress();
 		char		ip[4];
 		for (uint8_t i=0; i<4; i++) {
-			ip[i]=charstring::toInteger(ipaddr);
+			ip[i]=charstring::convertToInteger(ipaddr);
 			ipaddr=charstring::findFirst(ipaddr,'.');
 			if (ipaddr) {
 				ipaddr++;

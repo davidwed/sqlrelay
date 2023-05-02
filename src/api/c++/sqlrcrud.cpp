@@ -350,7 +350,7 @@ void sqlrcrud::bind(const char *bindformat,
 				charstring::compareIgnoringCase(
 							*c,primarykey)) {
 				uint16_t	len=
-						charstring::integerLength(i);
+						charstring::getIntegerLength(i);
 				char		*b=(char *)m.allocate(len+1);
 				charstring::printf(b,len,"%lld",i);
 				cur->inputBind(b,*v);
@@ -422,7 +422,7 @@ bool sqlrcrud::doRead(jsondom *j) {
 	domnode		*skipnode=j->getRootNode()->
 					getFirstTagChild("r")->
 					getFirstTagChild("skip");
-	uint64_t	skip=charstring::toInteger(
+	uint64_t	skip=charstring::convertToInteger(
 					skipnode->getAttributeValue("v"));
 
 	// read

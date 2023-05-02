@@ -840,7 +840,7 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 
 	// get addresses/inet port and unix port to listen on
 	const char	*addresses=ln->getAttributeValue("addresses");
-	uint16_t	port=charstring::toUnsignedInteger(
+	uint16_t	port=charstring::convertToUnsignedInteger(
 					ln->getAttributeValue("port"));
 
 	// split addresses

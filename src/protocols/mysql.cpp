@@ -895,14 +895,14 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 
 	clientsock=NULL;
 
-	handshake=charstring::toInteger(
+	handshake=charstring::convertToInteger(
 				parameters->getAttributeValue(
 						"handshake"));
 	if (!handshake) {
 		handshake=10;
 	}
 
-	clientprotocol=charstring::toInteger(
+	clientprotocol=charstring::convertToInteger(
 				parameters->getAttributeValue(
 						"clientprotocol"));
 	if (!clientprotocol) {
@@ -3654,29 +3654,29 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 
 		case MYSQL_TYPE_LONGLONG:
 			writeLE(&resppacket,
-				(uint64_t)charstring::toInteger(field));
+				(uint64_t)charstring::convertToInteger(field));
 			break;
 
 		case MYSQL_TYPE_LONG:
 		case MYSQL_TYPE_INT24:
 			writeLE(&resppacket,
-				(uint32_t)charstring::toInteger(field));
+				(uint32_t)charstring::convertToInteger(field));
 			break;
 
 		case MYSQL_TYPE_SHORT:
 		case MYSQL_TYPE_YEAR:
 			writeLE(&resppacket,
-				(uint16_t)charstring::toInteger(field));
+				(uint16_t)charstring::convertToInteger(field));
 			break;
 		
 		case MYSQL_TYPE_TINY:
 			write(&resppacket,
-				(char)charstring::toInteger(field));
+				(char)charstring::convertToInteger(field));
 			break;
 		
 		case MYSQL_TYPE_DOUBLE:
 			{
-			double		fval=charstring::toFloat(field);
+			double		fval=charstring::convertToFloat(field);
 			uint64_t	ival;
 			bytestring::copy(&ival,&fval,sizeof(double));
 			writeLE(&resppacket,ival);
@@ -3685,7 +3685,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 		
 		case MYSQL_TYPE_FLOAT:
 			{
-			float		fval=charstring::toFloat(field);
+			float		fval=charstring::convertToFloat(field);
 			uint32_t	ival;
 			bytestring::copy(&ival,&fval,sizeof(float));
 			writeLE(&resppacket,ival);
@@ -3748,7 +3748,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 			uint32_t	days=0;
 			const char	*d=charstring::findFirst(field,"d ");
 			if (d) {
-				days=charstring::toInteger(field);
+				days=charstring::convertToInteger(field);
 				field=d+2;
 			}
 
@@ -4208,14 +4208,14 @@ bool sqlrprotocol_mysql::sendFieldListResponse(sqlrservercursor *cursor) {
 				&extra,&fieldlength,
 				&blob,&null);
 
-		uint32_t	prec=charstring::toInteger(precstring);
-		uint32_t	scale=charstring::toInteger(scalestring);
+		uint32_t	prec=charstring::convertToInteger(precstring);
+		uint32_t	scale=charstring::convertToInteger(scalestring);
 		char		type=getColumnType(typestring,
 						charstring::getLength(typestring),
 						scale);
 		uint32_t	length=0;
 		if (!charstring::isNullOrEmpty(lengthstring)) {
-			length=charstring::toInteger(lengthstring);
+			length=charstring::convertToInteger(lengthstring);
 		} else {
 			switch ((byte_t)type) {
 				case MYSQL_TYPE_DECIMAL:

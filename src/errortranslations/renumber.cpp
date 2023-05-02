@@ -48,8 +48,8 @@ sqlrerrortranslation_renumber::sqlrerrortranslation_renumber(
 		const char	*to=node->getAttributeValue("to");
 		if (!charstring::isNullOrEmpty(from) &&
 				!charstring::isNullOrEmpty(to)) {
-			map.setValue(charstring::toInteger(from),
-					charstring::toInteger(to));
+			map.setValue(charstring::convertToInteger(from),
+					charstring::convertToInteger(to));
 		}
 	}
 }

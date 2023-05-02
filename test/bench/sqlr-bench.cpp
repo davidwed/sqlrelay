@@ -73,22 +73,22 @@ int main(int argc, const char **argv) {
 		}
 	}
 	if (cmdl.getWasFound("queries")) {
-		queries=charstring::toInteger(cmdl.getValue("queries"));
+		queries=charstring::convertToInteger(cmdl.getValue("queries"));
 	}
 	if (cmdl.getWasFound("rows")) {
-		rows=charstring::toInteger(cmdl.getValue("rows"));
+		rows=charstring::convertToInteger(cmdl.getValue("rows"));
 	}
 	if (cmdl.getWasFound("cols")) {
-		cols=charstring::toInteger(cmdl.getValue("cols"));
+		cols=charstring::convertToInteger(cmdl.getValue("cols"));
 	}
 	if (cmdl.getWasFound("colsize")) {
-		colsize=charstring::toInteger(cmdl.getValue("colsize"));
+		colsize=charstring::convertToInteger(cmdl.getValue("colsize"));
 	}
 	if (cmdl.getWasFound("samples")) {
-		samples=charstring::toInteger(cmdl.getValue("samples"));
+		samples=charstring::convertToInteger(cmdl.getValue("samples"));
 	}
 	if (cmdl.getWasFound("rsbs")) {
-		rsbs=charstring::toInteger(cmdl.getValue("rsbs"));
+		rsbs=charstring::convertToInteger(cmdl.getValue("rsbs"));
 	}
 	if (cmdl.getWasFound("bench")) {
 		const char	*bench=cmdl.getValue("bench");

@@ -170,7 +170,7 @@ mvccrud *factory::allocateSqlrCrud(mvcproperties *prop, mvcresult *response) {
 	// create connection, cursor, and crud
 	sqlrconnection	*con=new sqlrconnection(
 				prop->getValue("sqlr.host"),
-				charstring::toInteger(
+				charstring::convertToInteger(
 					prop->getValue("sqlr.port")),
 				prop->getValue("sqlr.socket"),
 				prop->getValue("sqlr.user"),

@@ -115,7 +115,7 @@ mysqlbenchconnection::mysqlbenchconnection(
 				const char *db) :
 				sqlrbenchconnection(connectstring,db) {
 	host=getParam("host");
-	port=charstring::toInteger(getParam("port"));
+	port=charstring::convertToInteger(getParam("port"));
 	socket=getParam("socket");
 	dbname=getParam("db");
 	user=getParam("user");

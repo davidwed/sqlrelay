@@ -318,7 +318,7 @@ void routerconnection::handleConnectString() {
 	uint32_t	fetchatonce=10;
 	const char	*fao=cont->getConnectStringValue("fetchatonce");
 	if (fao) {
-		fetchatonce=charstring::toUnsignedInteger(fao);
+		fetchatonce=charstring::convertToUnsignedInteger(fao);
 	}
 	cont->setFetchAtOnce(fetchatonce);
 
@@ -347,7 +347,7 @@ void routerconnection::handleConnectString() {
 
 		cons[index]=new sqlrconnection(
 				csc->getConnectStringValue("server"),
-				charstring::toUnsignedInteger(
+				charstring::convertToUnsignedInteger(
 					csc->getConnectStringValue("port")),
 				csc->getConnectStringValue("socket"),
 				csc->getConnectStringValue("user"),

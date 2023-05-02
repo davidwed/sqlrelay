@@ -3663,7 +3663,7 @@ void sqlrprotocol_teradata::parseUsing() {
 				break;
 			}
 
-			inbind->valuesize=charstring::toInteger(bv);
+			inbind->valuesize=charstring::convertToInteger(bv);
 
 			while (bv!=queryend && *bv!=')') {
 				bv++;
@@ -7117,7 +7117,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 		if (null) {
 			write(&req->rowbuffer,(byte_t)0);
 		} else {
-			uint16_t	val=charstring::toInteger(field);
+			uint16_t	val=charstring::convertToInteger(field);
 			write(&req->rowbuffer,(byte_t)val);
 		}
 
@@ -7126,7 +7126,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 		if (null) {
 			write(&req->rowbuffer,(uint16_t)0);
 		} else {
-			uint16_t	val=charstring::toInteger(field);
+			uint16_t	val=charstring::convertToInteger(field);
 			write(&req->rowbuffer,val);
 		}
 
@@ -7135,7 +7135,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 		if (null) {
 			write(&req->rowbuffer,(uint32_t)0);
 		} else {
-			uint32_t	val=charstring::toInteger(field);
+			uint32_t	val=charstring::convertToInteger(field);
 			write(&req->rowbuffer,val);
 		}
 
@@ -7144,7 +7144,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 		if (null) {
 			write(&req->rowbuffer,(uint64_t)0);
 		} else {
-			uint64_t	val=charstring::toInteger(field);
+			uint64_t	val=charstring::convertToInteger(field);
 			write(&req->rowbuffer,val);
 		}
 
@@ -7189,7 +7189,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 			char	*temp=charstring::duplicate(field,fieldlength);
 			charstring::bothTrim(temp);
 			charstring::strip(temp,'.');
-			int64_t		val=charstring::toInteger(temp);
+			int64_t		val=charstring::convertToInteger(temp);
 			delete[] temp;
 			uint16_t	prec=cont->getColumnPrecision(
 								req->cur,col);
@@ -7209,7 +7209,7 @@ void sqlrprotocol_teradata::appendRecordModeField(uint16_t col,
 		if (null) {
 			write(&req->rowbuffer,(uint64_t)0);
 		} else {
-			double		val=charstring::toFloat(field);
+			double		val=charstring::convertToFloat(field);
 			uint64_t	bytes;
 			bytestring::copy(&bytes,&val,sizeof(bytes));
 			write(&req->rowbuffer,bytes);

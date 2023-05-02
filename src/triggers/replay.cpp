@@ -115,7 +115,7 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 			parameters->getAttributeValue("includeselects"));
 
 	// get the max retries
-	maxretries=charstring::toInteger(
+	maxretries=charstring::convertToInteger(
 				parameters->getAttributeValue("maxretries"));
 
 	// get the replay conditions...
@@ -129,7 +129,7 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 		const char	*err=cond->getAttributeValue("error");
 		if (charstring::isNumber(err)) {
 			c->cond=CONDITION_ERRORCODE;
-			c->errorcode=charstring::toInteger(err);
+			c->errorcode=charstring::convertToInteger(err);
 		} else {
 			c->cond=CONDITION_ERROR;
 			c->error=err;

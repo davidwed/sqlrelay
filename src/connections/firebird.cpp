@@ -316,7 +316,7 @@ void firebirdconnection::handleConnectString() {
 
 	const char	*dialectstr=cont->getConnectStringValue("dialect");
 	if (dialectstr) {
-		dialect=charstring::toInteger(dialectstr);
+		dialect=charstring::convertToInteger(dialectstr);
 		if (dialect<1) {
 			dialect=1;
 		}
@@ -915,7 +915,7 @@ bool firebirdcursor::inputBind(const char *variable,
 					int16_t *isnull) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -942,7 +942,7 @@ bool firebirdcursor::inputBind(const char *variable,
 					int64_t *value) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -971,7 +971,7 @@ bool firebirdcursor::inputBind(const char *variable,
 					uint32_t scale) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1019,7 +1019,7 @@ bool firebirdcursor::inputBind(const char *variable,
 	isc_encode_timestamp(&t,(ISC_TIMESTAMP *)buffer);
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1048,7 +1048,7 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 					int16_t *isnull) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1122,7 +1122,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1152,7 +1152,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1184,7 +1184,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1234,7 +1234,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1264,7 +1264,7 @@ bool firebirdcursor::outputBindBlob(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;

@@ -712,7 +712,7 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"setresultsetbuffersize ",23)) {	
 		ptr=ptr+23;
-		env->rsbs=charstring::toInteger(ptr);
+		env->rsbs=charstring::convertToInteger(ptr);
 		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"lazyfetch ",10)) {
 		ptr=ptr+10;
@@ -1919,11 +1919,11 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		delete[] value;
 	} else if (charstring::isInteger(value)) {
 		bv->type=SQLRCLIENTBINDVARTYPE_INTEGER;
-		bv->integerval=charstring::toInteger(value);
+		bv->integerval=charstring::convertToInteger(value);
 		delete[] value;
 	} else if (charstring::isNumber(value)) {
 		bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-		bv->doubleval.value=charstring::toFloatC(value);
+		bv->doubleval.value=charstring::convertToFloatC(value);
 		bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
 		bv->doubleval.scale=
 			charstring::findFirst(value,'.')-value+
@@ -2044,7 +2044,7 @@ bool sqlrsh::outputbind(sqlrcursor *sqlrcur,
 			bv->type=SQLRCLIENTBINDVARTYPE_STRING;
 			bv->stringval=NULL;
 			bv->outputstringbindlength=
-				charstring::toInteger(parts[3]);
+				charstring::convertToInteger(parts[3]);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"integer") &&
 						partcount==3) {
@@ -2056,9 +2056,9 @@ bool sqlrsh::outputbind(sqlrcursor *sqlrcur,
 			bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
 			bv->doubleval.value=0.0;
 			bv->doubleval.precision=
-				charstring::toInteger(parts[3]);
+				charstring::convertToInteger(parts[3]);
 			bv->doubleval.scale=
-				charstring::toInteger(parts[4]);
+				charstring::convertToInteger(parts[4]);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"date") &&
 						partcount==3) {
@@ -2144,24 +2144,24 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 			// inputoutputbind 1 string length = 'string'
 			bv->type=SQLRCLIENTBINDVARTYPE_STRING;
 			bv->outputstringbindlength=
-				charstring::toInteger(parts[3]);
+				charstring::convertToInteger(parts[3]);
 			bv->stringval=charstring::unescape(value);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"integer") &&
 						partcount==5) {
 			// inputoutputbind 1 integer = value
 			bv->type=SQLRCLIENTBINDVARTYPE_INTEGER;
-			bv->integerval=charstring::toInteger(value);
+			bv->integerval=charstring::convertToInteger(value);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"double") &&
 						partcount==7) {
 			// inputoutputbind 1 double prec scale = value
 			bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-			bv->doubleval.value=charstring::toFloatC(value);
+			bv->doubleval.value=charstring::convertToFloatC(value);
 			bv->doubleval.precision=
-				charstring::toInteger(parts[3]);
+				charstring::convertToInteger(parts[3]);
 			bv->doubleval.scale=
-				charstring::toInteger(parts[4]);
+				charstring::convertToInteger(parts[4]);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"date") &&
 						partcount>=5) {
@@ -2281,7 +2281,7 @@ void sqlrsh::responseTimeout(sqlrconnection *sqlrcon, const char *command) {
 	}
 
 	// get seconds
-	uint32_t	sec=charstring::toInteger(value);
+	uint32_t	sec=charstring::convertToInteger(value);
 
 	// get milliseconds
 	char	msecbuf[5];
@@ -2295,7 +2295,7 @@ void sqlrsh::responseTimeout(sqlrconnection *sqlrcon, const char *command) {
 			value++;
 		}
 	}
-	uint32_t	msec=charstring::toInteger(msecbuf);
+	uint32_t	msec=charstring::convertToInteger(msecbuf);
 
 	// set timeout
 	sqlrcon->setResponseTimeout(sec,msec);
@@ -2341,7 +2341,7 @@ bool sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
 	}
 	uint32_t	cachettl=600;
 	if (*ptr) {
-		cachettl=charstring::toInteger(ptr);
+		cachettl=charstring::convertToInteger(ptr);
 	}
 
 	stdoutput.printf("	Caching To       : %s\n",env->cacheto);
@@ -2572,7 +2572,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	const char	*configurl=sqlrpth->getConfigUrl();
 	const char	*id=cmdline->getValue("id");
 	const char	*host=cmdline->getValue("host");
-	uint16_t	port=charstring::toInteger(
+	uint16_t	port=charstring::convertToInteger(
 				(cmdline->getWasFound("port"))?
 				cmdline->getValue("port"):DEFAULT_PORT);
 	const char	*socket=cmdline->getValue("socket");
@@ -2592,7 +2592,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 		tlsvalidate=cmdline->getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline->getValue("tlsca");
-	uint16_t	tlsdepth=charstring::toUnsignedInteger(
+	uint16_t	tlsdepth=charstring::convertToUnsignedInteger(
 					cmdline->getValue("tlsdepth"));
 	const char	*localeargument=cmdline->getValue("locale");
 	const char	*script=cmdline->getValue("script");
@@ -2714,7 +2714,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 
 	// handle the result set buffer size
 	if (cmdline->getWasFound("resultsetbuffersize")) {
-		env.rsbs=charstring::toInteger(
+		env.rsbs=charstring::convertToInteger(
 				cmdline->getValue("resultsetbuffersize"));
 	}
 

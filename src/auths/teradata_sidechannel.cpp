@@ -124,7 +124,7 @@ sqlrauth_teradata_sidechannel::sqlrauth_teradata_sidechannel(
 	debug=cont->getConfig()->getDebugAuths();
 
 	host=parameters->getAttributeValue("host");
-	port=charstring::toInteger(parameters->getAttributeValue("port"));
+	port=charstring::convertToInteger(parameters->getAttributeValue("port"));
 
 	clientsock=NULL;
 

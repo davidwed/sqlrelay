@@ -1553,7 +1553,7 @@ sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	uint64_t	lastid=((sqlrconnection *)sqlrdbh->sqlrcon)->
 							getLastInsertId();
-	uint16_t	idlen=charstring::integerLength(lastid)+1;
+	uint16_t	idlen=charstring::getIntegerLength(lastid)+1;
 	char		*id=(char *)safe_emalloc(idlen,sizeof(char),0);
 	charstring::printf(id,idlen,"%lld",lastid);
 #if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
@@ -1969,10 +1969,10 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 					options,
 					sizeof(options)/sizeof(options[0]));
 	const char	*host=options[0].optval;
-	uint16_t	port=charstring::toInteger(options[1].optval);
+	uint16_t	port=charstring::convertToInteger(options[1].optval);
 	const char	*socket=options[2].optval;
-	int32_t		tries=charstring::toInteger(options[3].optval);
-	int32_t		retrytime=charstring::toInteger(options[4].optval);
+	int32_t		tries=charstring::convertToInteger(options[3].optval);
+	int32_t		retrytime=charstring::convertToInteger(options[4].optval);
 	const char	*debug=options[5].optval;
 	bool		lazyconnect=!charstring::isNo(options[6].optval);
 	const char	*krb=options[10].optval;
@@ -1986,7 +1986,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char	*tlsciphers=options[18].optval;
 	const char	*tlsvalidate=options[19].optval;
 	const char	*tlsca=options[20].optval;
-	uint16_t	tlsdepth=charstring::toInteger(options[21].optval);
+	uint16_t	tlsdepth=charstring::convertToInteger(options[21].optval);
 	const char	*db=options[22].optval;
 	const char      *connecttime=options[23].optval;
 	bool		autocommit=!charstring::isNo(options[24].optval);
@@ -2027,8 +2027,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 
 	// set connect timeout
 	if (charstring::isNumber(connecttime)) {
-		int32_t		timeoutsec=charstring::toInteger(connecttime);
-		long double	dbl=charstring::toFloatC(connecttime)-
+		int32_t		timeoutsec=charstring::convertToInteger(connecttime);
+		long double	dbl=charstring::convertToFloatC(connecttime)-
 						(long double)timeoutsec;
 		int32_t		timeoutusec=(int32_t)(dbl*1000000.0);
 		if (timeoutsec>=0) {
@@ -2105,7 +2105,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		sqlrdbh->sqlrcon->selectDatabase(db);
 	}
 
-	sqlrdbh->resultsetbuffersize=charstring::toInteger(options[6].optval);
+	sqlrdbh->resultsetbuffersize=charstring::convertToInteger(options[6].optval);
 	sqlrdbh->dontgetcolumninfo=charstring::isYes(options[7].optval);
 	sqlrdbh->nullsasnulls=charstring::isYes(options[8].optval);
 

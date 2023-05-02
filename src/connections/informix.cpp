@@ -336,7 +336,7 @@ void informixconnection::handleConnectString() {
 	// clob/blob on the first row, so override it to 1
 	cont->setFetchAtOnce(1);
 
-	maxoutbindlobsize=charstring::toInteger(
+	maxoutbindlobsize=charstring::convertToInteger(
 			cont->getConnectStringValue("maxoutbindlobsize"));
 	if (maxoutbindlobsize<1) {
 		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
@@ -924,7 +924,7 @@ bool informixcursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -964,7 +964,7 @@ bool informixcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -989,7 +989,7 @@ bool informixcursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1023,7 +1023,7 @@ bool informixcursor::inputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1081,7 +1081,7 @@ bool informixcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1107,7 +1107,7 @@ bool informixcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1137,7 +1137,7 @@ bool informixcursor::outputBind(const char *variable,
 					uint32_t valuesize, 
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1165,7 +1165,7 @@ bool informixcursor::outputBind(const char *variable,
 					int64_t *value,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1197,7 +1197,7 @@ bool informixcursor::outputBind(const char *variable,
 					uint32_t *scale,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1237,7 +1237,7 @@ bool informixcursor::outputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1276,7 +1276,7 @@ bool informixcursor::outputBindBlob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1303,7 +1303,7 @@ bool informixcursor::outputBindClob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;

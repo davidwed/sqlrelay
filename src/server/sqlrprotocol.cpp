@@ -149,7 +149,7 @@ sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 
 			// get the validation depth
 			pvt->_tctx.setValidationDepth(
-				charstring::toUnsignedInteger(
+				charstring::convertToUnsignedInteger(
 				parameters->getAttributeValue("tlsdepth")));
 
 		} else {

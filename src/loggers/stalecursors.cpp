@@ -46,7 +46,7 @@ sqlrlogger_stalecursors::sqlrlogger_stalecursors(sqlrloggers *ls,
 						sqlrlogger(ls,parameters) {
 
 	host=parameters->getAttributeValue("host");
-	port=charstring::toInteger(parameters->getAttributeValue("port"));
+	port=charstring::convertToInteger(parameters->getAttributeValue("port"));
 	socket=parameters->getAttributeValue("socket");
 	user=parameters->getAttributeValue("user");
 	password=parameters->getAttributeValue("password");

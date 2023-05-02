@@ -329,7 +329,7 @@ int main(int argc, char **argv) {
 		// validate updates to the row
 		checkSuccess(
 			cur->sendQuery("select count(*) from testtable"),true);
-		checkSuccess(charstring::toInteger(
+		checkSuccess(charstring::convertToInteger(
 			cur->getField(0,(uint32_t)0)),4-i);
 		stdoutput.printf("\n");
 

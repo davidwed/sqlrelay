@@ -489,7 +489,7 @@ void oracleconnection::handleConnectString() {
 	#endif
 
 	#ifdef OCI_STMT_CACHE
-	stmtcachesize=charstring::toUnsignedInteger(
+	stmtcachesize=charstring::convertToUnsignedInteger(
 				cont->getConnectStringValue("stmtcachesize"));
 	if (!stmtcachesize) {
 		stmtcachesize=STMT_CACHE_SIZE;
@@ -871,8 +871,8 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 				minorstr=minorstr+1;
 			}
 		}
-		int64_t	major=charstring::toInteger(majorstr);
-		int64_t	minor=charstring::toInteger(minorstr);
+		int64_t	major=charstring::convertToInteger(majorstr);
+		int64_t	minor=charstring::convertToInteger(minorstr);
 	
 		// 8.1 and up supports proxy credentials and syscontext
 		if (major>8 || (major==8 && minor>0)) {
@@ -2807,7 +2807,7 @@ bool oraclecursor::inputBind(const char *variable,
 
 	// the size of the value must include the terminating NULL
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -2850,7 +2850,7 @@ bool oraclecursor::inputBind(const char *variable,
 	inintbindstring[orainbindcount]=charstring::parseNumber(*value);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -2893,7 +2893,7 @@ bool oraclecursor::inputBind(const char *variable,
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -2945,7 +2945,7 @@ bool oraclecursor::inputBind(const char *variable,
 	OCIDateSetTime(indatebind[orainbindcount],hour,minute,second);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -2989,7 +2989,7 @@ bool oraclecursor::outputBind(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3035,7 +3035,7 @@ bool oraclecursor::outputBind(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3081,7 +3081,7 @@ bool oraclecursor::outputBind(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3143,7 +3143,7 @@ bool oraclecursor::outputBind(const char *variable,
 	outdatebind[oraoutbindcount]=db;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3197,7 +3197,7 @@ bool oraclecursor::outputBindCursor(const char *variable,
 	((oraclecursor *)cursor)->bound=true;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3313,7 +3313,7 @@ bool oraclecursor::inputBindGenericLob(const char *variable,
 
 	// bind the temporary lob
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3378,7 +3378,7 @@ bool oraclecursor::outputBindGenericLob(const char *variable,
 
 	// bind the lob descriptor
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;

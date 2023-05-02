@@ -52,7 +52,7 @@ void sqlrfilter::getError(const char **err, int64_t *errn) {
 	}
 	if (errn) {
 		if (!charstring::isNullOrEmpty(errnum)) {
-			*errn=charstring::toInteger(errnum);
+			*errn=charstring::convertToInteger(errnum);
 		} else {
 			*errn=0;
 		}

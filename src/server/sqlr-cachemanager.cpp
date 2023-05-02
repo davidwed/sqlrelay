@@ -66,7 +66,7 @@ sqlrcachemanager::sqlrcachemanager(int argc, const char **argv) {
 	// get the scaninterval
 	const char	*scanint=cmdl->getValue("-scaninterval");
 	if (!charstring::isNullOrEmpty(scanint)) {
-		scaninterval=charstring::toInteger(scanint);
+		scaninterval=charstring::convertToInteger(scanint);
 	} else {
 		scaninterval=DEFAULT_INTERVAL;
 	}

@@ -1295,10 +1295,10 @@ static PyObject *getField(PyObject *self, PyObject *args) {
       PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", rc, rl));
       return PyObject_CallObject(decimal, tuple);
     } else {
-      return Py_BuildValue("f",(double)charstring::toFloatC(rc));
+      return Py_BuildValue("f",(double)charstring::convertToFloatC(rc));
     }
   } else if (usenumeric && isNumberTypeChar(type)) {
-    return Py_BuildValue("L",charstring::toInteger(rc));
+    return Py_BuildValue("L",charstring::convertToInteger(rc));
   } else if (isBitTypeChar(type)) {
     return Py_BuildValue("l",bitStringToLong(rc));
   } else if (isBoolTypeChar(type)) {
@@ -1428,11 +1428,11 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
         PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", row_data[counter], rl));
         obj=PyObject_CallObject(decimal, tuple);
       } else {
-        obj=Py_BuildValue("f", (double)charstring::toFloatC(row_data[counter]));
+        obj=Py_BuildValue("f", (double)charstring::convertToFloatC(row_data[counter]));
       }
       PyList_SetItem(my_list, counter, obj);
     } else if (usenumeric && isNumberTypeChar(type)) {
-      PyList_SetItem(my_list, counter, Py_BuildValue("L", charstring::toInteger(row_data[counter])));
+      PyList_SetItem(my_list, counter, Py_BuildValue("L", charstring::convertToInteger(row_data[counter])));
     } else if (isBitTypeChar(type)) {
       PyList_SetItem(my_list, counter, Py_BuildValue("l", bitStringToLong(row_data[counter])));
     } else if (isBoolTypeChar(type)) {
@@ -1499,10 +1499,10 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
           PyTuple_SetItem(tuple, 0, Py_BuildValue("s", field));
           PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), PyObject_CallObject(decimal, tuple));
         } else {
-          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",(double)charstring::toFloatC(field)));
+          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",(double)charstring::convertToFloatC(field)));
         }
     } else if (usenumeric && isNumberTypeChar(type)) {
-      PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::toInteger(field)));
+      PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::convertToInteger(field)));
     } else if (isBitTypeChar(type)) {
       PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("l", bitStringToLong(field)));
     } else if (isBoolTypeChar(type)) {

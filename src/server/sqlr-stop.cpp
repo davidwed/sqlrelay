@@ -142,7 +142,7 @@ int main(int argc, const char **argv) {
 			char		*pidstr=
 					file::getContents(fqp.getString());
 			uint64_t	pid=
-					charstring::toInteger(pidstr);
+					charstring::convertToInteger(pidstr);
 
 			if (pid) {
 

@@ -37,8 +37,8 @@ sqlrlogger_slowqueries::sqlrlogger_slowqueries(sqlrloggers *ls,
 						domnode *parameters) :
 						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
-	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
-	usec=charstring::toInteger(parameters->getAttributeValue("usec"));
+	sec=charstring::convertToInteger(parameters->getAttributeValue("sec"));
+	usec=charstring::convertToInteger(parameters->getAttributeValue("usec"));
 	totalusec=sec*1000000+usec;
 	usecommand=!charstring::compareIgnoringCase(
 			parameters->getAttributeValue("timer"),"command");

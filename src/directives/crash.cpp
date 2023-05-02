@@ -97,7 +97,7 @@ void sqlrdirective_crash::parseDirective(
 
 		int32_t		iargument=0;
 		if (charstring::isInteger(argument,argumentsize)) {
-			iargument=charstring::toInteger(argument);
+			iargument=charstring::convertToInteger(argument);
 		}
 		crashmeTest(iargument);
 		return;

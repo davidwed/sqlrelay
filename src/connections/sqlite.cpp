@@ -544,7 +544,7 @@ bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
 int32_t sqlitecursor::getBindVariableIndex(const char *variable,
 						uint16_t variablesize) {
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		return charstring::toInteger(variable+1);
+		return charstring::convertToInteger(variable+1);
 	}
 	return sqlite3_bind_parameter_index(stmt,variable);
 }

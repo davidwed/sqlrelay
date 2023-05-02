@@ -102,7 +102,7 @@ bool sqlrimportxml::attributeValue(const char *value) {
 			break;
 		case COLUMNSTAG:
 			if (!charstring::compare(currentattribute,"count")) {
-				colcount=charstring::toUnsignedInteger(value);
+				colcount=charstring::convertToUnsignedInteger(value);
 				columns.clear();
 				delete[] numbercolumn;
 				numbercolumn=new bool[colcount];

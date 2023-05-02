@@ -62,7 +62,7 @@ bool sqlrresultsetrowblocktranslations::load(domnode *parameters) {
 
 	unload();
 
-	pvt->_rowblocksize=charstring::toInteger(
+	pvt->_rowblocksize=charstring::convertToInteger(
 				parameters->getAttributeValue("rowblocksize"));
 	if (!pvt->_rowblocksize) {
 		pvt->_rowblocksize=10;

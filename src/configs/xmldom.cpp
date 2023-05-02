@@ -336,21 +336,21 @@ void sqlrconfig_xmldom::init() {
 	listenoninet=false;
 	listenonunix=false;
 	dbase=DEFAULT_DBASE;
-	connections=charstring::toInteger(DEFAULT_CONNECTIONS);
+	connections=charstring::convertToInteger(DEFAULT_CONNECTIONS);
 	maxconnections=0;
-	maxqueuelength=charstring::toInteger(DEFAULT_MAXQUEUELENGTH);
-	growby=charstring::toInteger(DEFAULT_GROWBY);
-	ttl=charstring::toInteger(DEFAULT_TTL);
-	softttl=charstring::toInteger(DEFAULT_SOFTTTL);
-	maxsessioncount=charstring::toInteger(DEFAULT_MAXSESSIONCOUNT);
+	maxqueuelength=charstring::convertToInteger(DEFAULT_MAXQUEUELENGTH);
+	growby=charstring::convertToInteger(DEFAULT_GROWBY);
+	ttl=charstring::convertToInteger(DEFAULT_TTL);
+	softttl=charstring::convertToInteger(DEFAULT_SOFTTTL);
+	maxsessioncount=charstring::convertToInteger(DEFAULT_MAXSESSIONCOUNT);
 	endofsession=DEFAULT_ENDOFSESSION;
 	endofsessioncommit=!charstring::compare(endofsession,"commit");
-	sessiontimeout=charstring::toUnsignedInteger(DEFAULT_SESSIONTIMEOUT);
+	sessiontimeout=charstring::convertToUnsignedInteger(DEFAULT_SESSIONTIMEOUT);
 	runasuser=DEFAULT_RUNASUSER;
 	runasgroup=DEFAULT_RUNASGROUP;
-	cursors=charstring::toInteger(DEFAULT_CURSORS);
-	maxcursors=charstring::toInteger(DEFAULT_MAXCURSORS);
-	cursorsgrowby=charstring::toInteger(DEFAULT_CURSORS_GROWBY);
+	cursors=charstring::convertToInteger(DEFAULT_CURSORS);
+	maxcursors=charstring::convertToInteger(DEFAULT_MAXCURSORS);
+	cursorsgrowby=charstring::convertToInteger(DEFAULT_CURSORS_GROWBY);
 	authtier=DEFAULT_AUTHTIER;
 	authonconnection=true;
 	authondatabase=false;
@@ -389,19 +389,19 @@ void sqlrconfig_xmldom::init() {
 	debugrouters=hasDebug(debug,"routers");
 	debugqueries=hasDebug(debug,"queries");
 	debugmoduledatas=hasDebug(debug,"moduledatas");
-	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
-	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
-	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
-	maxbindnamelength=charstring::toInteger(DEFAULT_MAXBINDNAMELENGTH);
-	maxstringbindvaluelength=charstring::toInteger(
+	maxclientinfolength=charstring::convertToInteger(DEFAULT_MAXCLIENTINFOLENGTH);
+	maxquerysize=charstring::convertToInteger(DEFAULT_MAXQUERYSIZE);
+	maxbindcount=charstring::convertToInteger(DEFAULT_MAXBINDCOUNT);
+	maxbindnamelength=charstring::convertToInteger(DEFAULT_MAXBINDNAMELENGTH);
+	maxstringbindvaluelength=charstring::convertToInteger(
 					DEFAULT_MAXSTRINGBINDVALUELENGTH);
-	maxlobbindvaluelength=charstring::toInteger(
+	maxlobbindvaluelength=charstring::convertToInteger(
 					DEFAULT_MAXLOBBINDVALUELENGTH);
-	maxerrorlength=charstring::toInteger(DEFAULT_MAXERRORLENGTH);
-	idleclienttimeout=charstring::toInteger(DEFAULT_IDLECLIENTTIMEOUT);
+	maxerrorlength=charstring::convertToInteger(DEFAULT_MAXERRORLENGTH);
+	idleclienttimeout=charstring::convertToInteger(DEFAULT_IDLECLIENTTIMEOUT);
 	metrictotal=0;
-	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
-	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
+	maxlisteners=charstring::convertToInteger(DEFAULT_MAXLISTENERS);
+	listenertimeout=charstring::convertToUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
 	reloginatstart=charstring::isYes(DEFAULT_RELOGINATSTART);
 	fakeinputbindvariables=charstring::isYes(
 					DEFAULT_FAKEINPUTBINDVARIABLES);
@@ -1798,7 +1798,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 		}
 	}
 	if (!maxconnections) {
-		maxconnections=charstring::toInteger(DEFAULT_CONNECTIONS);
+		maxconnections=charstring::convertToInteger(DEFAULT_CONNECTIONS);
 	}
 	attr=instance->getAttribute("maxqueuelength");
 	if (!attr->isNullNode()) {
@@ -1914,44 +1914,44 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 	attr=instance->getAttribute("maxclientinfolength");
 	if (!attr->isNullNode()) {
-		maxclientinfolength=charstring::toInteger(attr->getValue());
+		maxclientinfolength=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxquerysize");
 	if (!attr->isNullNode()) {
-		maxquerysize=charstring::toInteger(attr->getValue());
+		maxquerysize=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxbindcount");
 	if (!attr->isNullNode()) {
-		maxbindcount=charstring::toInteger(attr->getValue());
+		maxbindcount=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxbindnamelength");
 	if (!attr->isNullNode()) {
-		maxbindnamelength=charstring::toInteger(attr->getValue());
+		maxbindnamelength=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxstringbindvaluelength");
 	if (!attr->isNullNode()) {
 		maxstringbindvaluelength=
-				charstring::toInteger(attr->getValue());
+				charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxlobbindvaluelength");
 	if (!attr->isNullNode()) {
-		maxlobbindvaluelength=charstring::toInteger(attr->getValue());
+		maxlobbindvaluelength=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxerrorlength");
 	if (!attr->isNullNode()) {
-		maxerrorlength=charstring::toInteger(attr->getValue());
+		maxerrorlength=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("idleclienttimeout");
 	if (!attr->isNullNode()) {
-		idleclienttimeout=charstring::toInteger(attr->getValue());
+		idleclienttimeout=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxlisteners");
 	if (!attr->isNullNode()) {
-		maxlisteners=charstring::toInteger(attr->getValue());
+		maxlisteners=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("listenertimeout");
 	if (!attr->isNullNode()) {
-		listenertimeout=charstring::toUnsignedInteger(attr->getValue());
+		listenertimeout=charstring::convertToUnsignedInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("reloginatstart");
 	if (!attr->isNullNode()) {
@@ -2064,7 +2064,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 
 	// default listener parameters
 	defaultaddresses=defaultlistener->getAttributeValue("addresses");
-	defaultport=charstring::toUnsignedInteger(
+	defaultport=charstring::convertToUnsignedInteger(
 			defaultlistener->getAttributeValue("port"));
 	defaultsocket=defaultlistener->getAttributeValue("socket");
 	defaultkrb=charstring::isYes(defaultlistener->getAttributeValue("krb"));
@@ -2213,19 +2213,19 @@ void sqlrconfig_xmldom::moveRegexList(routecontainer *cur,
 
 uint32_t sqlrconfig_xmldom::atouint32_t(const char *value,
 				const char *defaultvalue, uint32_t minvalue) {
-	uint32_t	retval=charstring::toUnsignedInteger(
+	uint32_t	retval=charstring::convertToUnsignedInteger(
 						(value)?value:defaultvalue);
 	if (retval<minvalue) {
-		retval=charstring::toUnsignedInteger(defaultvalue);
+		retval=charstring::convertToUnsignedInteger(defaultvalue);
 	}
 	return retval;
 }
 
 int32_t sqlrconfig_xmldom::atoint32_t(const char *value,
 				const char *defaultvalue, int32_t minvalue) {
-	int32_t	retval=charstring::toInteger((value)?value:defaultvalue);
+	int32_t	retval=charstring::convertToInteger((value)?value:defaultvalue);
 	if (retval<minvalue) {
-		retval=charstring::toInteger(defaultvalue);
+		retval=charstring::convertToInteger(defaultvalue);
 	}
 	return retval;
 }

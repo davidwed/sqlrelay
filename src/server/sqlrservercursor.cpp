@@ -940,7 +940,7 @@ bool sqlrservercursor::fakeInputBinds() {
 				//      select 3,35 from mytable
 				if (
 					(*ptr=='?' && 
-					charstring::toInteger(
+					charstring::convertToInteger(
 						pvt->_inbindvars[i].
 							variable+1)==bindindex) 
 

@@ -310,7 +310,7 @@ bool sqlrtrigger_upsert::errorEncountered(sqlrservercursor *icur) {
 		const char	*number=node->getAttributeValue("number");
 		if ((string && charstring::contains(err.getString(),string)) ||
 			(number && cont->getErrorNumber(icur)==
-					charstring::toInteger(number))) {
+					charstring::convertToInteger(number))) {
 			return true;
 		}
 	}
@@ -512,7 +512,7 @@ void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 
 		// if we only support numeric binds or bind-by-position,
 		// then use the bind number that we were passed in
-		ubind->variablesize=1+charstring::integerLength(bindnumber);
+		ubind->variablesize=1+charstring::getIntegerLength(bindnumber);
 		ubind->variable=(char *)pool->allocate(ubind->variablesize+1);
 		charstring::printf(ubind->variable,
 					ubind->variablesize+1,

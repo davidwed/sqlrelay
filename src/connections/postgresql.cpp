@@ -300,7 +300,7 @@ void postgresqlconnection::handleConnectString() {
 	// selects if you're using a non-zero result set buffer size on the
 	// client-side.
 	const char	*fao=cont->getConnectStringValue("fetchatonce");
-	cont->setFetchAtOnce(fao && charstring::toUnsignedInteger(fao));
+	cont->setFetchAtOnce(fao && charstring::convertToUnsignedInteger(fao));
 
 	cont->setMaxFieldLength(0);
 }
@@ -386,7 +386,7 @@ bool postgresqlconnection::logIn(const char **error,
 		}
 		for (int i=0; i<PQntuples(result); i++) {
 			datatypes.setValue(
-				charstring::toInteger(PQgetvalue(result,i,0)),
+				charstring::convertToInteger(PQgetvalue(result,i,0)),
 				charstring::duplicate(PQgetvalue(result,i,1)));
 		}
 		PQclear(result);
@@ -402,7 +402,7 @@ bool postgresqlconnection::logIn(const char **error,
 		}
 		for (int i=0; i<PQntuples(result); i++) {
 			tables.setValue(
-				charstring::toInteger(PQgetvalue(result,i,0)),
+				charstring::convertToInteger(PQgetvalue(result,i,0)),
 				charstring::duplicate(PQgetvalue(result,i,1)));
 		}
 		PQclear(result);
@@ -518,8 +518,8 @@ const char *postgresqlconnection::dbVersion() {
 	uint64_t	partslength;
 	charstring::split(dbversion,".",true,&parts,&partslength);
 	if (partslength==3) {
-		int64_t	minor=charstring::toInteger(parts[1]);
-		int64_t	patch=charstring::toInteger(parts[2]);
+		int64_t	minor=charstring::convertToInteger(parts[1]);
+		int64_t	patch=charstring::convertToInteger(parts[2]);
 		charstring::printf(dbversion,
 					charstring::getLength(dbversion)+1,
 					"%s%02lld%02lld",
@@ -866,7 +866,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -894,7 +894,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -919,7 +919,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -944,7 +944,7 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -975,7 +975,7 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1154,7 +1154,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	const char	*affrows=PQcmdTuples(pgresult);
 	affectedrows=0;
 	if (!charstring::isNullOrEmpty(affrows)) {
-		affectedrows=charstring::toInteger(affrows);
+		affectedrows=charstring::convertToInteger(affrows);
 	}
 
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE

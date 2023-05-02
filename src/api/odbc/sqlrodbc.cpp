@@ -2256,7 +2256,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Port","",
 					portbuf,sizeof(portbuf),
 					ODBC_INI);
-	conn->port=(uint16_t)charstring::toUnsignedInteger(portbuf);
+	conn->port=(uint16_t)charstring::convertToUnsignedInteger(portbuf);
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Socket","",
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
@@ -2300,12 +2300,12 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	SQLGetPrivateProfileString((const char *)conn->dsn,"RetryTime","0",
 					retrytimebuf,sizeof(retrytimebuf),
 					ODBC_INI);
-	conn->retrytime=(int32_t)charstring::toInteger(retrytimebuf);
+	conn->retrytime=(int32_t)charstring::convertToInteger(retrytimebuf);
 	char	triesbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Tries","1",
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
-	conn->tries=(int32_t)charstring::toInteger(triesbuf);
+	conn->tries=(int32_t)charstring::convertToInteger(triesbuf);
 
 	// krb options
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","0",
@@ -2357,7 +2357,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					tlsdepthbuf,
 					sizeof(tlsdepthbuf),
 					ODBC_INI);
-	conn->tlsdepth=(uint16_t)charstring::toUnsignedInteger(tlsdepthbuf);
+	conn->tlsdepth=(uint16_t)charstring::convertToUnsignedInteger(tlsdepthbuf);
 
 	// db
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Db","",
@@ -2381,7 +2381,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					sizeof(resultsetbuffersizebuf),
 					ODBC_INI);
 	conn->resultsetbuffersize=
-		(uint64_t)charstring::toInteger(resultsetbuffersizebuf);
+		(uint64_t)charstring::convertToInteger(resultsetbuffersizebuf);
 	char	dontgetcolumninfobuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,
 					"DontGetColumnInfo","no",
@@ -2430,7 +2430,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 		const char	*connport=connparams->getValue("Port");
 		if (connport!=NULL) {
 			conn->port=(uint16_t)
-				charstring::toUnsignedInteger(connport);
+				charstring::convertToUnsignedInteger(connport);
 		}
 		const char	*connsocket=connparams->getValue("Socket");
 		if (connsocket!=NULL) {
@@ -2442,11 +2442,11 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 				connparams->getValue("RetryTime");
 		if (connretrytime!=NULL) {
 			conn->retrytime=(int32_t)
-				charstring::toInteger(connretrytime);
+				charstring::convertToInteger(connretrytime);
 		}
 		const char	*conntries=connparams->getValue("Tries");
 		if (conntries!=NULL) {
-			conn->tries=(int32_t)charstring::toInteger(conntries);
+			conn->tries=(int32_t)charstring::convertToInteger(conntries);
 		}
 		// FIXME: krb options
 		// FIXME: tls options
@@ -2922,7 +2922,7 @@ static void SQLR_ParseNumeric(SQL_NUMERIC_STRUCT *ns,
 		newnumber[index]=*ptr;
 	}
 	newnumber[index]='\0';
-	int64_t	newinteger=charstring::toInteger(newnumber);
+	int64_t	newinteger=charstring::convertToInteger(newnumber);
 	delete[] newnumber;
 	
 	// convert to hex, LSB first
@@ -3345,7 +3345,7 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 								parametername);
 				((byte_t *)ob->parametervalue)[0]=
 					(charstring::contains("YyTt",val) ||
-					charstring::toInteger(val))?'1':'0';
+					charstring::convertToInteger(val))?'1':'0';
 				}
 				break;
 			case SQL_C_SBIGINT:
@@ -3691,7 +3691,7 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 								parametername);
 				((byte_t *)ob->parametervalue)[0]=
 					(charstring::contains("YyTt",val) ||
-					charstring::toInteger(val))?'1':'0';
+					charstring::convertToInteger(val))?'1':'0';
 				}
 				break;
 			case SQL_C_SBIGINT:
@@ -4729,7 +4729,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLSMALLINT *)targetvalue)=
 					(SQLSMALLINT)
-						charstring::toInteger(field);
+						charstring::convertToInteger(field);
 				debugPrintf("  value: %d\n",
 						*((SQLSMALLINT *)targetvalue));
 			}
@@ -4739,7 +4739,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLUSMALLINT *)targetvalue)=
 					(SQLUSMALLINT)
-						charstring::toInteger(field);
+						charstring::convertToInteger(field);
 				debugPrintf("  value: %d\n",
 						*((SQLUSMALLINT *)targetvalue));
 			}
@@ -4750,7 +4750,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLINTEGER *)targetvalue)=
 					(SQLINTEGER)
-						charstring::toInteger(field);
+						charstring::convertToInteger(field);
 				debugPrintf("  value: %ld\n",
 						*((SQLINTEGER *)targetvalue));
 			}
@@ -4762,7 +4762,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLUINTEGER *)targetvalue)=
 					(SQLUINTEGER)
-						charstring::toInteger(field);
+						charstring::convertToInteger(field);
 				debugPrintf("  value: %ld\n",
 						*((SQLUINTEGER *)targetvalue));
 			}
@@ -4771,7 +4771,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_FLOAT\n");
 			if (targetvalue) {
 				*((SQLREAL *)targetvalue)=
-					(SQLREAL)charstring::toFloatC(field);
+					(SQLREAL)charstring::convertToFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((SQLREAL *)targetvalue));
 			}
@@ -4780,7 +4780,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_DOUBLE\n");
 			if (targetvalue) {
 				*((SQLDOUBLE *)targetvalue)=
-					(SQLDOUBLE)charstring::toFloatC(field);
+					(SQLDOUBLE)charstring::convertToFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((SQLDOUBLE *)targetvalue));
 			}
@@ -4790,7 +4790,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				((byte_t *)targetvalue)[0]=
 					(charstring::contains("YyTt",field) ||
-					charstring::toInteger(field))?'1':'0';
+					charstring::convertToInteger(field))?'1':'0';
 				debugPrintf("  value: %c\n",
 					*((byte_t *)targetvalue));
 			}
@@ -4800,7 +4800,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_(S)TINYINT\n");
 			if (targetvalue) {
 				*((SQLSCHAR *)targetvalue)=
-					charstring::toInteger(field);
+					charstring::convertToInteger(field);
 				debugPrintf("  value: %d\n",
 						*((SQLSCHAR *)targetvalue));
 			}
@@ -4809,7 +4809,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_UTINYINT\n");
 			if (targetvalue) {
 				*((SQLCHAR *)targetvalue)=
-					charstring::toInteger(field);
+					charstring::convertToInteger(field);
 				debugPrintf("  value: %d\n",
 					*((SQLCHAR *)targetvalue));
 			}
@@ -4818,7 +4818,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_SBIGINT\n");
 			if (targetvalue) {
 				*((SQLBIGINT *)targetvalue)=
-					charstring::toInteger(field);
+					charstring::convertToInteger(field);
 				debugPrintf("  value: %lld\n",
 						*((SQLBIGINT *)targetvalue));
 			}
@@ -4827,7 +4827,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_UBIGINT\n");
 			if (targetvalue) {
 				*((SQLUBIGINT *)targetvalue)=
-					charstring::toInteger(field);
+					charstring::convertToInteger(field);
 				debugPrintf("  value: %lld\n",
 						*((SQLUBIGINT *)targetvalue));
 			}
@@ -10562,7 +10562,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			stmt->cur->inputBind(parametername,
 				(charstring::contains("YyTt",
 					(const char *)parametervalue) ||
-				charstring::toInteger(
+				charstring::convertToInteger(
 					(const char *)parametervalue))?"1":"0");
 			break;
 		case SQL_C_SBIGINT:
