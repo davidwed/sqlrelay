@@ -45,7 +45,7 @@ sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 
 	if (pvt->_usekrb) {
 
-		if (gss::supported()) {
+		if (gss::isSupported()) {
 
 			// set the keytab file to use
 			const char	*keytab=
@@ -95,7 +95,7 @@ sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
 
 	} else if (pvt->_usetls) {
 
-		if (tls::supported()) {
+		if (tls::isSupported()) {
 
 			// get the protocol version to use
 			pvt->_tctx.setProtocolVersion(

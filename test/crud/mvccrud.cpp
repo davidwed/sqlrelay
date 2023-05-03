@@ -242,7 +242,7 @@ bool ajaxtestview::run(bool *handled) {
 
 		// ... reformat response as appropriate for the frontend ...
 
-		getResponse()->textHtml();
+		getResponse()->sendTextHtmlHeader();
 		response.writeJson(getResponse());
 	}
 
@@ -426,7 +426,7 @@ bool httpModuleMain(httpserverapi *sapi) {
 	}
 	if (!handled) {
 		// normally an errorview would handle this
-		resp.textHtml();
+		resp.sendTextHtmlHeader();
 		resp.write("URL unhandled!\n");
 	}
 	return true;

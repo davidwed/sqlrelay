@@ -363,7 +363,7 @@ void sqlrconnection::enableKerberos(const char *service,
 		disableEncryption();
 	}
 
-	if (!gss::supported()) {
+	if (!gss::isSupported()) {
 		return;
 	}
 
@@ -408,7 +408,7 @@ void sqlrconnection::enableTls(const char *version,
 		disableEncryption();
 	}
 
-	if (!tls::supported()) {
+	if (!tls::isSupported()) {
 		return;
 	}
 

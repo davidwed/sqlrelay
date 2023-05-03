@@ -513,7 +513,7 @@ void sqlrlistener::setSessionHandlerMethod() {
 	pvt->_usethreads=false;
 	if (!charstring::compare(pvt->_cfg->getSessionHandler(),"thread")) {
 
-		if (!thread::supported() || !thread::isReliable()) {
+		if (!thread::isSupported() || !thread::isReliable()) {
 			stderror.printf("Warning: sessionhandler=\"thread\" "
 					"not supported, falling back to "
 					"sessionhandler=\"process\".  "
@@ -543,7 +543,7 @@ void sqlrlistener::setHandoffMethod() {
 	if (!charstring::compare(pvt->_cfg->getHandoff(),"pass")) {
 
         	// force proxy on platforms that don't support passing sockets
-        	if (!filedescriptor::supportsPassReceiveSocket()) {
+        	if (!filedescriptor::supportsPassAndReceiveSocket()) {
 			pvt->_handoffmode=HANDOFF_PROXY;
 			stderror.printf("Warning: handoff=\"pass\" not "
 					"supported, falling back to "
@@ -707,7 +707,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// issue warning about listener timeout if necessary
 	if (pvt->_cfg->getListenerTimeout()>0 &&
 		!charstring::compare(pvt->_cfg->getSessionHandler(),"thread") &&
-		thread::supported() && thread::isReliable() &&
+		thread::isSupported() && thread::isReliable() &&
 		!pvt->_semset->supportsTimedSemaphoreOperations()) {
 		stderror.printf("Warning: listenertimeout disabled...\n"
 				"         sessionhandler=\"thread\" requested "

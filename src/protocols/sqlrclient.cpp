@@ -601,13 +601,13 @@ bool sqlrprotocol_sqlrclient::acceptSecurityContext() {
 
 	cont->raiseDebugMessageEvent("accepting security context");
 
-	if (useKrb() && !gss::supported()) {
+	if (useKrb() && !gss::isSupported()) {
 		cont->raiseInternalErrorEvent(NULL,
 				"failed to accept gss security "
 				"context (kerberos requested but "
 				"not supported)");
 		return false;
-	} else if (useTls() && !tls::supported()) {
+	} else if (useTls() && !tls::isSupported()) {
 		cont->raiseInternalErrorEvent(NULL,
 				"failed to accept tls security "
 				"context (tls requested but "
