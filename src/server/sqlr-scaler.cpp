@@ -784,7 +784,7 @@ void scaler::loop() {
 		if (f.create(filename.getString(),
 				permissions::evalPermString("rw-------"))) {
 			f.printf("signal: %d\n\n",process::getShutDownSignal());
-			process::backtrace(&f);
+			process::writeBacktrace(&f);
 		}
 	}
 }

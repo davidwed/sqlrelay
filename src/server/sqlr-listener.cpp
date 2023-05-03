@@ -51,7 +51,7 @@ static void shutDown(int32_t signum) {
 		if (f.create(filename.getString(),
 				permissions::evalPermString("rw-------"))) {
 			f.printf("signal: %d\n\n",signum);
-			process::backtrace(&f);
+			process::writeBacktrace(&f);
 		}
 	}
 
@@ -116,9 +116,9 @@ int main(int argc, const char **argv) {
 	}
 #else
 	// handle kill and crash signals
-	process::handleShutDown(shutDown);
+	process::setShutDownHandler(shutDown);
 	if (!cmdl.getWasFound("-disable-crash-handler")) {
-		process::handleCrash(shutDown);
+		process::setCrashHandler(shutDown);
 	}
 #endif
 
@@ -163,7 +163,7 @@ int main(int argc, const char **argv) {
 			if (f.create(filename.getString(),
 				permissions::evalPermString("rw-------"))) {
 				f.printf("signal: %d\n\n",signum);
-				process::backtrace(&f);
+				process::writeBacktrace(&f);
 			}
 		}
 

@@ -513,7 +513,7 @@ void sqlrlistener::setSessionHandlerMethod() {
 	pvt->_usethreads=false;
 	if (!charstring::compare(pvt->_cfg->getSessionHandler(),"thread")) {
 
-		if (!thread::supported() || !thread::reliable()) {
+		if (!thread::supported() || !thread::isReliable()) {
 			stderror.printf("Warning: sessionhandler=\"thread\" "
 					"not supported, falling back to "
 					"sessionhandler=\"process\".  "
@@ -707,7 +707,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// issue warning about listener timeout if necessary
 	if (pvt->_cfg->getListenerTimeout()>0 &&
 		!charstring::compare(pvt->_cfg->getSessionHandler(),"thread") &&
-		thread::supported() && thread::reliable() &&
+		thread::supported() && thread::isReliable() &&
 		!pvt->_semset->supportsTimedSemaphoreOperations()) {
 		stderror.printf("Warning: listenertimeout disabled...\n"
 				"         sessionhandler=\"thread\" requested "

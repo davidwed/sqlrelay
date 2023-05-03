@@ -261,6 +261,6 @@ int main(int argc, const char **argv) {
 	process::exitOnCrashOrShutDown();
 
 	cacheman=new sqlrcachemanager(argc,argv);
-	process::handleShutDown(shutDown);
+	process::setShutDownHandler(shutDown);
 	cacheman->scan();
 }

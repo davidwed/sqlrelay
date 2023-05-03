@@ -24,7 +24,7 @@ int main(int argc, const char **argv) {
 
 	terminated=false;
 
-	process::handleShutDown(shutDown);
+	process::setShutDownHandler(shutDown);
 
 	commandline	cmdl(argc,argv);
 

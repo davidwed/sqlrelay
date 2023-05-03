@@ -149,8 +149,8 @@ int main(int argc, const char **argv) {
 	// handle signals
 	bm=NULL;
 	stop=false;
-	process::handleShutDown(shutDown);
-	process::handleCrash(shutDown);
+	process::setShutDownHandler(shutDown);
+	process::setCrashHandler(shutDown);
 
 	// init stats
 	dictionary< float, linkedlist< float > *>	selectstats;
