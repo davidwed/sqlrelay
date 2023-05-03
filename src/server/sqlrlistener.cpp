@@ -383,7 +383,7 @@ bool sqlrlistener::init(int argc, const char **argv) {
 		process::detach();
 	}
 
-	process::createPidFile(pvt->_pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pvt->_pidfile,permissions::getOwnerReadWrite());
 
 	setMaxListeners(pvt->_maxlisteners);
 
@@ -603,7 +603,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	}
 
 	// make sure that the file exists and is read/writeable
-	if (!file::createFile(pvt->_idfilename,permissions::ownerReadWrite())) {
+	if (!file::createFile(pvt->_idfilename,permissions::getOwnerReadWrite())) {
 		ipcFileError(pvt->_idfilename);
 		return false;
 	}
@@ -685,7 +685,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	//
 	int32_t	vals[13]={1,1,0,0,1,1,0,0,0,1,0,0,0};
 	pvt->_semset=new semaphoreset();
-	if (!pvt->_semset->create(key,permissions::ownerReadWrite(),13,vals)) {
+	if (!pvt->_semset->create(key,permissions::getOwnerReadWrite(),13,vals)) {
 		semError(id,pvt->_semset->getId());
 		pvt->_semset->attach(key,13);
 		return false;

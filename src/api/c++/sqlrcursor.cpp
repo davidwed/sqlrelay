@@ -605,18 +605,18 @@ void sqlrcursor::startCaching() {
 		// FIXME: these can fail
 		pvt->_cachedest->open(pvt->_cachedestname,
 					O_RDWR|O_TRUNC|O_CREAT,
-					permissions::ownerReadWrite());
+					permissions::getOwnerReadWrite());
 		pvt->_cachedestind->open(pvt->_cachedestindname,
 					O_RDWR|O_TRUNC|O_CREAT,
-					permissions::ownerReadWrite());
+					permissions::getOwnerReadWrite());
 	} else {
 		// FIXME: these can fail
 		pvt->_cachedest->open(pvt->_cachedestname,
 					O_RDWR|O_CREAT,
-					permissions::ownerReadWrite());
+					permissions::getOwnerReadWrite());
 		pvt->_cachedestind->open(pvt->_cachedestindname,
 					O_RDWR|O_CREAT,
-					permissions::ownerReadWrite());
+					permissions::getOwnerReadWrite());
 	}
 
 	if (pvt->_cachedest && pvt->_cachedestind) {

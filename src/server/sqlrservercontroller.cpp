@@ -842,7 +842,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 				pvt->_pth->getPidDir(),
 				pvt->_cmdl->getId(),
 				(long)pid);
-	process::createPidFile(pvt->_pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pvt->_pidfile,permissions::getOwnerReadWrite());
 
 	// increment connection counter
 	if (pvt->_cfg->getDynamicScaling()) {
@@ -1283,7 +1283,7 @@ void sqlrservercontroller::markDatabaseAvailable() {
 	// the database is up if the file is there, 
 	// opening and closing it will create it
 	file	fd;
-	fd.create(pvt->_updown,permissions::ownerReadWrite());
+	fd.create(pvt->_updown,permissions::getOwnerReadWrite());
 }
 
 void sqlrservercontroller::markDatabaseUnavailable() {
@@ -7447,7 +7447,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 						pvt->_pth->getIpcDir(),id);
 	delete[] md5str;
 	if (!file::createFile(pvt->_bulkserveridfilename,
-				permissions::ownerReadWrite())) {
+				permissions::getOwnerReadWrite())) {
 		setError(SQLR_ERROR_BULKLOADBEGIN_IPC_FILE_STRING,
 				SQLR_ERROR_BULKLOADBEGIN_IPC_FILE,true);
 		bulkLoadEnd();

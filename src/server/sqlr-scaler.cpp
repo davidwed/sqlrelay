@@ -376,7 +376,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	}
 
 	// create the pid file
-	process::createPidFile(pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pidfile,permissions::getOwnerReadWrite());
 
 	return true;
 }

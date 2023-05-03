@@ -105,7 +105,7 @@ void sqlrcachemanager::scan() {
 	charstring::printf(&pidfile,"%ssqlr-cachemanager.%ld.pid",
 					sqlrpth->getPidDir(),(long)pid);
 
-	process::createPidFile(pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pidfile,permissions::getOwnerReadWrite());
 
 	// scan...
 	directory	dir;

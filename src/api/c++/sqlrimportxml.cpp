@@ -423,7 +423,7 @@ void sqlrimportxml::massageField(stringbuffer *strb, const char *field) {
 			// expand xml entities...
 
 			char	ch=(char)charstring::
-					toUnsignedInteger(field+index);
+					convertToUnsignedInteger(field+index);
 
 			// double-up any single-quotes
 			if (ch=='\'') {

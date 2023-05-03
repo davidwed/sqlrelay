@@ -3737,7 +3737,7 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 	for (uint16_t i=0; i<oraoutbindcount; i++) {
 		if (outintbindstring[i]) {
 			*outintbind[i]=charstring::
-					toInteger(outintbindstring[i]);
+					convertToInteger(outintbindstring[i]);
 		}
 	}
 
