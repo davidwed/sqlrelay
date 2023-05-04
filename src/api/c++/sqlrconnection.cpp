@@ -158,7 +158,7 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_copyrefs=copyreferences;
 
 	// retry reads if they get interrupted by signals
-	pvt->_ucs.translateByteOrder();
+	pvt->_ucs.setTranslateByteOrder(true);
 	pvt->_ucs.setRetryInterruptedReads(true);
 	pvt->_ics.setRetryInterruptedReads(true);
 	pvt->_cs=&pvt->_ucs;
@@ -647,7 +647,7 @@ bool sqlrconnection::openSession() {
 			pvt->_ics.setSocketReadBufferSize(65536);
 			pvt->_ics.setSocketWriteBufferSize(65536);
 
-			pvt->_ics.dontUseNaglesAlgorithm();
+			pvt->_ics.setNaglesAlgorithmEnabled(false);
 
 			pvt->_cs=&pvt->_ics;
 		}

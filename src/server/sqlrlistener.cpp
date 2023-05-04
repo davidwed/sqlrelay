@@ -1199,8 +1199,8 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 			return true;
 		}
 
-		clientsock->dontUseNaglesAlgorithm();
-		clientsock->translateByteOrder();
+		clientsock->setNaglesAlgorithmEnabled(false);
+		clientsock->setTranslateByteOrder(true);
 
 	} else if (uss) {
 
@@ -1208,7 +1208,7 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 		if (!clientsock) {
 			return false;
 		}
-		clientsock->translateByteOrder();
+		clientsock->setTranslateByteOrder(true);
 
 	} else {
 		return true;
@@ -1480,8 +1480,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		// since this is the forked off listener, we don't
 		// want to actually remove the semaphore set or shared
 		// memory segment when it exits
-		pvt->_shmem->dontRemove();
-		pvt->_semset->dontRemove();
+		pvt->_shmem->setRemove(false);
+		pvt->_semset->setRemove(false);
 
 		// re-init loggers
 		if (pvt->_sqlrlg) {
@@ -2178,10 +2178,10 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	if (endsession) {
 		raiseDebugMessageEvent("ending the session");
 		// translate byte order for this, as the client would
-		serversock->translateByteOrder();
+		serversock->setTranslateByteOrder(true);
 		serversock->write((uint16_t)END_SESSION);
 		serversock->flushWriteBuffer(-1,-1);
-		serversock->dontTranslateByteOrder();
+		serversock->setTranslateByteOrder(false);
 	}
 
 	// set everything back to normal

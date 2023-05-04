@@ -1044,7 +1044,7 @@ clientsessionexitstatus_t sqlrprotocol_mysql::clientSession(
 	clientsock=cs;
 
 	// set up the socket
-	clientsock->dontUseNaglesAlgorithm();
+	clientsock->setNaglesAlgorithmEnabled(false);
 	clientsock->setSocketReadBufferSize(65536);
 	clientsock->setSocketWriteBufferSize(65536);
 	clientsock->setReadBufferSize(65536);

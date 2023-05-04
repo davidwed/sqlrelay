@@ -1090,7 +1090,7 @@ clientsessionexitstatus_t sqlrprotocol_teradata::clientSession(
 	}
 
 	clientsock=cs;
-	clientsock->dontUseNaglesAlgorithm();
+	clientsock->setNaglesAlgorithmEnabled(false);
 	clientsock->setSocketReadBufferSize(65536);
 	clientsock->setSocketWriteBufferSize(65536);
 	clientsock->setReadBufferSize(65536);
