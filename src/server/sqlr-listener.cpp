@@ -123,7 +123,7 @@ int main(int argc, const char **argv) {
 #endif
 
 	// handle child processes
-	process::waitForChildren();
+	process::setWaitForChildren(true);
 
 	// ignore various signals
 	signalset	set;

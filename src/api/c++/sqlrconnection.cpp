@@ -159,8 +159,8 @@ void sqlrconnection::init(const char *server, uint16_t port,
 
 	// retry reads if they get interrupted by signals
 	pvt->_ucs.translateByteOrder();
-	pvt->_ucs.retryInterruptedReads();
-	pvt->_ics.retryInterruptedReads();
+	pvt->_ucs.setRetryInterruptedReads(true);
+	pvt->_ics.setRetryInterruptedReads(true);
 	pvt->_cs=&pvt->_ucs;
 
 	// connection

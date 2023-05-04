@@ -403,7 +403,7 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromBackend() {
 	// high order message length
 	bytestring::copy(&highordermessagelength,ptr,sizeof(uint16_t));
 	highordermessagelength=
-		filedescriptor::netToHost(highordermessagelength);
+		filedescriptor::convertNetToHost(highordermessagelength);
 	// skip high order message length, bytevar, wordvar
 	ptr=ptr+sizeof(uint16_t)+
 		sizeof(byte_t)+
@@ -411,7 +411,7 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromBackend() {
 	// low order message length
 	bytestring::copy(&lowordermessagelength,ptr,sizeof(uint16_t));
 	lowordermessagelength=
-		filedescriptor::netToHost(lowordermessagelength);
+		filedescriptor::convertNetToHost(lowordermessagelength);
 
 	// build the total length
 	sidechannelrecvdatalength=(((uint32_t)highordermessagelength)<<16)|
@@ -535,7 +535,7 @@ void sqlrauth_teradata_sidechannel::copyOutLE(byte_t *rp,
 						uint16_t *value,
 						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint16_t));
-	*value=filedescriptor::littleEndianToHost(*value);
+	*value=filedescriptor::convertLittleEndianToHost(*value);
 	*rpout=rp+sizeof(uint16_t);
 }
 
@@ -543,7 +543,7 @@ void sqlrauth_teradata_sidechannel::copyOutBE(byte_t *rp,
 						uint16_t *value,
 						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint16_t));
-	*value=filedescriptor::netToHost(*value);
+	*value=filedescriptor::convertNetToHost(*value);
 	*rpout=rp+sizeof(uint16_t);
 }
 
@@ -551,7 +551,7 @@ void sqlrauth_teradata_sidechannel::copyOutLE(byte_t *rp,
 						uint32_t *value,
 						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint32_t));
-	*value=filedescriptor::littleEndianToHost(*value);
+	*value=filedescriptor::convertLittleEndianToHost(*value);
 	*rpout=rp+sizeof(uint32_t);
 }
 
@@ -559,7 +559,7 @@ void sqlrauth_teradata_sidechannel::copyOutBE(byte_t *rp,
 						uint32_t *value,
 						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint32_t));
-	*value=filedescriptor::netToHost(*value);
+	*value=filedescriptor::convertNetToHost(*value);
 	*rpout=rp+sizeof(uint32_t);
 }
 
@@ -567,7 +567,7 @@ void sqlrauth_teradata_sidechannel::copyOutLE(byte_t *rp,
 						uint64_t *value,
 						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint64_t));
-	*value=filedescriptor::littleEndianToHost(*value);
+	*value=filedescriptor::convertLittleEndianToHost(*value);
 	*rpout=rp+sizeof(uint64_t);
 }
 
@@ -575,7 +575,7 @@ void sqlrauth_teradata_sidechannel::copyOutBE(byte_t *rp,
 						uint64_t *value,
 						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint64_t));
-	*value=filedescriptor::netToHost(*value);
+	*value=filedescriptor::convertNetToHost(*value);
 	*rpout=rp+sizeof(uint64_t);
 }
 

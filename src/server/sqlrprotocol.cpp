@@ -602,27 +602,27 @@ uint64_t sqlrprotocol::toHost(uint64_t value) {
 }
 
 uint16_t sqlrprotocol::leToHost(uint16_t value) {
-	return filedescriptor::littleEndianToHost(value);
+	return filedescriptor::convertLittleEndianToHost(value);
 }
 
 uint32_t sqlrprotocol::leToHost(uint32_t value) {
-	return filedescriptor::littleEndianToHost(value);
+	return filedescriptor::convertLittleEndianToHost(value);
 }
 
 uint64_t sqlrprotocol::leToHost(uint64_t value) {
-	return filedescriptor::littleEndianToHost(value);
+	return filedescriptor::convertLittleEndianToHost(value);
 }
 
 uint16_t sqlrprotocol::beToHost(uint16_t value) {
-	return filedescriptor::netToHost(value);
+	return filedescriptor::convertNetToHost(value);
 }
 
 uint32_t sqlrprotocol::beToHost(uint32_t value) {
-	return filedescriptor::netToHost(value);
+	return filedescriptor::convertNetToHost(value);
 }
 
 uint64_t sqlrprotocol::beToHost(uint64_t value) {
-	return filedescriptor::netToHost(value);
+	return filedescriptor::convertNetToHost(value);
 }
 
 uint16_t sqlrprotocol::hostTo(uint16_t value) {
@@ -638,27 +638,27 @@ uint64_t sqlrprotocol::hostTo(uint64_t value) {
 }
 
 uint16_t sqlrprotocol::hostToLE(uint16_t value) {
-	return filedescriptor::hostToLittleEndian(value);
+	return filedescriptor::convertHostToLittleEndian(value);
 }
 
 uint32_t sqlrprotocol::hostToLE(uint32_t value) {
-	return filedescriptor::hostToLittleEndian(value);
+	return filedescriptor::convertHostToLittleEndian(value);
 }
 
 uint64_t sqlrprotocol::hostToLE(uint64_t value) {
-	return filedescriptor::hostToLittleEndian(value);
+	return filedescriptor::convertHostToLittleEndian(value);
 }
 
 uint16_t sqlrprotocol::hostToBE(uint16_t value) {
-	return filedescriptor::hostToNet(value);
+	return filedescriptor::convertHostToNet(value);
 }
 
 uint32_t sqlrprotocol::hostToBE(uint32_t value) {
-	return filedescriptor::hostToNet(value);
+	return filedescriptor::convertHostToNet(value);
 }
 
 uint64_t sqlrprotocol::hostToBE(uint64_t value) {
-	return filedescriptor::hostToNet(value);
+	return filedescriptor::convertHostToNet(value);
 }
 
 bool sqlrprotocol::getDebug() {

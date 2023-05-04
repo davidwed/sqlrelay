@@ -1660,7 +1660,7 @@ bool sqlrlistener::semWait(int32_t index, thread *thr,
 		// alarm doesn't reliably interrupt the wait() when it's called
 		// from a thread, at least not on Linux.  Hopefully platforms
 		// that supports threads also supports timed semaphore ops.
-		pvt->_semset->dontRetryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(false);
 		alarmrang=0;
 		signalmanager::alarm(pvt->_listenertimeout);
 		do {
@@ -1674,7 +1674,7 @@ bool sqlrlistener::semWait(int32_t index, thread *thr,
 						alarmrang!=1);
 		*timeout=(alarmrang==1);
 		signalmanager::alarm(0);
-		pvt->_semset->retryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(true);
 	} else {
 		if (withundo) {
 			result=pvt->_semset->waitWithUndo(index);
@@ -2046,7 +2046,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	// possibly other systems, it ends up in non-blocking mode
 	// in this process, independent of its mode in the other
 	// process.  So, we force it to blocking mode here.
-	connectionsock->setUseNonBlockingMode(false);
+	connectionsock->setNonBlockingMode(false);
 
 	raiseDebugMessageEvent("received socket of newly spawned connection");
 	return true;
@@ -2077,10 +2077,10 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	}
 
 	// allow short reads and use non blocking mode
-	serversock->allowShortReads();
-	serversock->setUseNonBlockingMode(true);
-	clientsock->allowShortReads();
-	clientsock->setUseNonBlockingMode(true);
+	serversock->setAllowShortReads(true);
+	serversock->setNonBlockingMode(true);
+	clientsock->setAllowShortReads(true);
+	clientsock->setNonBlockingMode(true);
 
 	// set up read and write listeners
 	listener	readlistener;
@@ -2185,10 +2185,10 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	}
 
 	// set everything back to normal
-	serversock->dontAllowShortReads();
-	serversock->setUseNonBlockingMode(false);
-	clientsock->dontAllowShortReads();
-	clientsock->setUseNonBlockingMode(false);
+	serversock->setAllowShortReads(false);
+	serversock->setNonBlockingMode(false);
+	clientsock->setAllowShortReads(false);
+	clientsock->setNonBlockingMode(false);
 
 	raiseDebugMessageEvent("finished proxying client");
 
@@ -2225,7 +2225,7 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 		// number of bytes that could be sent.
 
 		uint32_t	counter=0;
-		clientsock->setUseNonBlockingMode(true);
+		clientsock->setNonBlockingMode(true);
 		while (clientsock->read(&dummy,pvt->_idleclienttimeout,0)>0 &&
 					counter<
 					// sending auth
@@ -2261,7 +2261,7 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 					)/2) {
 			counter++;
 		}
-		clientsock->setUseNonBlockingMode(false);
+		clientsock->setNonBlockingMode(false);
 	}
 }
 

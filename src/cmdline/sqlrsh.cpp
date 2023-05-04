@@ -2515,7 +2515,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	// Blocking mode is apparently not the default on some systems
 	// (Syllable for sure, maybe others) and this causes hilariously
 	// odd behavior when reading standard input.
-	stdinput.setUseNonBlockingMode(false);
+	stdinput.setNonBlockingMode(false);
 
 	while (!exitprogram) {
 

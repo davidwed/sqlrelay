@@ -1934,7 +1934,7 @@ int32_t sqlrservercontroller::waitForClient() {
 		// possibly other systems, it ends up in non-blocking mode
 		// in this process, independent of its mode in the other
 		// process.  So, we force it to blocking mode here.
-		pvt->_clientsock->setUseNonBlockingMode(false);
+		pvt->_clientsock->setNonBlockingMode(false);
 
 		raiseDebugMessageEvent("done waiting for client");
 
@@ -6949,12 +6949,12 @@ void sqlrservercontroller::closeClientConnection(uint32_t bytes) {
 	raiseDebugMessageEvent("waiting for client to close the connection...");
 	uint16_t	dummy;
 	uint32_t	counter=0;
-	pvt->_clientsock->setUseNonBlockingMode(true);
+	pvt->_clientsock->setNonBlockingMode(true);
 	while (pvt->_clientsock->read(&dummy,pvt->_idleclienttimeout,0)>0 &&
 								counter<bytes) {
 		counter++;
 	}
-	pvt->_clientsock->setUseNonBlockingMode(false);
+	pvt->_clientsock->setNonBlockingMode(false);
 	
 	raiseDebugMessageEvent("done waiting for client to "
 					"close the connection");
@@ -7203,7 +7203,7 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 	if (pvt->_ttl>0 && pvt->_semset->supportsTimedSemaphoreOperations()) {
 		result=pvt->_semset->waitWithUndo(0,pvt->_ttl,0);
 	} else if (pvt->_ttl>0 && sys::getSignalsInterruptSystemCalls()) {
-		pvt->_semset->dontRetryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(false);
 		alarmrang=0;
 		signalmanager::alarm(pvt->_ttl);
 		do {
@@ -7213,7 +7213,7 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 					!process::getShutDownFlag() &&
 					!alarmrang);
 		signalmanager::alarm(0);
-		pvt->_semset->retryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(true);
 	} else {
 		result=pvt->_semset->waitWithUndo(0);
 	}
@@ -7251,7 +7251,7 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	if (pvt->_ttl>0 && pvt->_semset->supportsTimedSemaphoreOperations()) {
 		result=pvt->_semset->wait(3,pvt->_ttl,0);
 	} else if (pvt->_ttl>0 && sys::getSignalsInterruptSystemCalls()) {
-		pvt->_semset->dontRetryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(false);
 		alarmrang=0;
 		signalmanager::alarm(pvt->_ttl);
 		do {
@@ -7261,7 +7261,7 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 					!process::getShutDownFlag() &&
 					!alarmrang);
 		signalmanager::alarm(0);
-		pvt->_semset->retryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(true);
 	} else {
 		result=pvt->_semset->wait(3);
 	}

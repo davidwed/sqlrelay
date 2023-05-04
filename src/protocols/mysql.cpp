@@ -4794,7 +4794,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 							rp,sizeof(int32_t));
 					bv->value.dateval.day=
 						filedescriptor::
-						littleEndianToHost(
+						convertLittleEndianToHost(
 							(uint32_t)days);
 					rp+=sizeof(int32_t);
 					
@@ -4814,7 +4814,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 						bv->value.dateval.
 							microsecond=
 						filedescriptor::
-						littleEndianToHost(
+						convertLittleEndianToHost(
 							(uint32_t)ms);
 						rp+=sizeof(int32_t);
 					}
@@ -4849,7 +4849,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 					// FIXME: convert LE to host
 					bv->value.dateval.year=
 						filedescriptor::
-						littleEndianToHost(
+						convertLittleEndianToHost(
 							(uint16_t)year);
 					rp+=sizeof(int16_t);
 					bv->value.dateval.month=*((char *)rp);
@@ -4896,7 +4896,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 					// FIXME: convert LE to host
 					bv->value.dateval.year=
 						filedescriptor::
-						littleEndianToHost(
+						convertLittleEndianToHost(
 							(uint16_t)year);
 					rp+=sizeof(int16_t);
 					bv->value.dateval.month=*((char *)rp);
@@ -4922,7 +4922,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 							bv->value.dateval.
 								microsecond=
 							filedescriptor::
-							littleEndianToHost(
+							convertLittleEndianToHost(
 								(uint32_t)ms);
 							rp+=sizeof(int32_t);
 						}

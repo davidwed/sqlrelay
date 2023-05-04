@@ -761,10 +761,10 @@ void sqlrprotocol_sqlrclient::noAvailableCursors(uint16_t command) {
 	debugstr.append("absorbing ")->append(size)->append(" bytes");
 	cont->raiseDebugMessageEvent(debugstr.getString());
 
-	clientsock->setUseNonBlockingMode(true);
+	clientsock->setNonBlockingMode(true);
 	byte_t	*dummy=new byte_t[size];
 	ssize_t	bytesread=clientsock->read(dummy,size,idleclienttimeout,0);
-	clientsock->setUseNonBlockingMode(false);
+	clientsock->setNonBlockingMode(false);
 	delete[] dummy;
 
 	debugstr.clear();
