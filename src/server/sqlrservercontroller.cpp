@@ -1545,7 +1545,7 @@ void sqlrservercontroller::waitForAvailableDatabase() {
 
 	setState(WAIT_FOR_AVAIL_DB);
 
-	if (!file::getExists(pvt->_updown)) {
+	if (!file::exists(pvt->_updown)) {
 		raiseDebugMessageEvent("database is not available");
 		reLogIn();
 		markDatabaseAvailable();

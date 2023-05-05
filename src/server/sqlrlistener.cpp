@@ -281,14 +281,14 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	const char	*slash="/";
 #endif
 	const char	*tmpdir=pvt->_sqlrpth->getTmpDir();
-	if (!file::getExists(tmpdir)) {
+	if (!file::exists(tmpdir)) {
 		char		**parts=NULL;
 		uint64_t	partcount=0;
 		charstring::split(tmpdir,slash,true,&parts,&partcount);
 		stringbuffer	path;
 		for (uint64_t i=0; i<partcount; i++) {
 			path.append(slash)->append(parts[i]);
-			if (!file::getExists(path.getString())) {
+			if (!file::exists(path.getString())) {
 				mode_t	mode=(i==partcount-1)?
 					permissions::evalPermString(
 							"rwxrwxrwx"):
@@ -1901,7 +1901,7 @@ bool sqlrlistener::connectionIsUp(const char *connectionid) {
 	charstring::printf(&updown,"%s%s-%s.up",
 				pvt->_sqlrpth->getIpcDir(),
 				pvt->_cmdl->getId(),connectionid);
-	bool	retval=file::getExists(updown);
+	bool	retval=file::exists(updown);
 	delete[] updown;
 	return retval;
 }
