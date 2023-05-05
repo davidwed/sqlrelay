@@ -631,7 +631,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
 		}
 
 		// copy out input binds
-		uint16_t	incount=qd->inbindvars.getLength();
+		uint16_t	incount=qd->inbindvars.getCount();
 		sqlrcur->setInputBindCount(incount);
 		sqlrserverbindvar	*invars=
 					sqlrcur->getInputBinds();
@@ -656,7 +656,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
 		}
 
 		// copy out output binds
-		uint16_t	outcount=qd->outbindvars.getLength();
+		uint16_t	outcount=qd->outbindvars.getCount();
 		sqlrcur->setInputBindCount(outcount);
 		sqlrserverbindvar	*outvars=
 					sqlrcur->getOutputBinds();
@@ -682,7 +682,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
 
 		// copy out input-output binds
 		uint16_t		inoutcount=
-					qd->inoutbindvars.getLength();
+					qd->inoutbindvars.getCount();
 		sqlrcur->setInputBindCount(inoutcount);
 		sqlrserverbindvar	*inoutvars=
 					sqlrcur->getInputOutputBinds();

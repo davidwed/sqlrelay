@@ -113,7 +113,7 @@ const char *sqlrauth_userlist::auth(sqlrcredentials *cred) {
 				return initiator;
 			}
 		} else if (tls) {
-			if (sans && sans->getLength()) {
+			if (sans && sans->getCount()) {
 
 				// if subject alternate names were
 				// present then validate against those

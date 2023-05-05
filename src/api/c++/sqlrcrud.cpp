@@ -279,8 +279,8 @@ bool sqlrcrud::doCreate(dictionary<const char *, const char *> *kvp) {
 
 	// build columns/values
 	linkedlist<const char *>	*keys=kvp->getKeys();
-	const char	**columns=new const char *[keys->getLength()+1];
-	const char	**values=new const char *[keys->getLength()+1];
+	const char	**columns=new const char *[keys->getCount()+1];
+	const char	**values=new const char *[keys->getCount()+1];
 	uint64_t	i=0;
 	for (listnode<const char *> *node=keys->getFirst();
 					node; node=node->getNext()) {
@@ -734,8 +734,8 @@ bool sqlrcrud::doUpdate(dictionary<const char *, const char *> *kvp,
 
 	// build columns/values
 	linkedlist<const char *>	*keys=kvp->getKeys();
-	const char	**columns=new const char *[keys->getLength()+1];
-	const char	**values=new const char *[keys->getLength()+1];
+	const char	**columns=new const char *[keys->getCount()+1];
+	const char	**values=new const char *[keys->getCount()+1];
 	uint64_t	i=0;
 	for (listnode<const char *> *node=keys->getFirst();
 					node; node=node->getNext()) {

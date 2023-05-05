@@ -1217,7 +1217,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->clearBinds();
 
-	if (env->inputbinds.getLength()) {
+	if (env->inputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->inputbinds.getKeys()->getFirst();
@@ -1254,7 +1254,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->outputbinds.getLength()) {
+	if (env->outputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->outputbinds.getKeys()->getFirst();
@@ -1277,7 +1277,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->inputoutputbinds.getLength()) {
+	if (env->inputoutputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->inputoutputbinds.getKeys()->getFirst();
@@ -1316,7 +1316,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->executeQuery();
 
-	if (env->outputbinds.getLength()) {
+	if (env->outputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->outputbinds.getKeys()->getFirst();
@@ -1350,7 +1350,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->inputoutputbinds.getLength()) {
+	if (env->inputoutputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->inputoutputbinds.getKeys()->getFirst();

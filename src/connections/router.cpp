@@ -330,7 +330,7 @@ void routerconnection::handleConnectString() {
 	// (this is just a convenient place to do it)
 	linkedlist< connectstringcontainer * >	*cslist=
 				cont->getConfig()->getConnectStringList();
-	concount=cslist->getLength();
+	concount=cslist->getCount();
 
 	conids=new const char *[concount];
 	cons=new sqlrconnection *[concount];

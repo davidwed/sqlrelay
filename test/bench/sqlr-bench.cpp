@@ -464,7 +464,7 @@ void graphStats(const char *graph, const char *db,
 						node; node=node->getNext()) {
 		f.printf("%f",node->getValue());
 		linkedlist< float >	*l=stats->getValue(node->getValue());
-		count=l->getLength();
+		count=l->getCount();
 		for (listnode< float > *lnode=l->getFirst();
 						lnode; lnode=lnode->getNext()) {
 			f.printf(",%f",lnode->getValue());

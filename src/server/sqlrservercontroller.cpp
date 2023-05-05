@@ -3675,7 +3675,7 @@ bool sqlrservercontroller::parseInsert(const char *query,
 			// if the query didn't contain a list of columns,
 			// then derive the columns from the number of values
 			// and the columns from allcolumns...
-			if (!localcolumns->getLength()) {
+			if (!localcolumns->getCount()) {
 				deriveColumnsFromInsertQuery(
 							localvalues,
 							localallcolumns,
@@ -6438,7 +6438,7 @@ uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
 }
 
 uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
-	return (pvt->_columnmap)?pvt->_columnmap->getLength():colcount;
+	return (pvt->_columnmap)?pvt->_columnmap->getCount():colcount;
 }
 
 bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,
@@ -7855,7 +7855,7 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load execute query - %d rows\n",
 						process::getProcessId(),
-						pvt->_bulkdata.getLength());
+						pvt->_bulkdata.getCount());
 	}
 
 	// init the bulk cursor
@@ -7939,7 +7939,7 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 	// map columns to binds (if we actually have columns)
 	dictionary<char *, char *>	bindtocol;
 	bool				havecols=false;
-	if (cols.getLength()) {
+	if (cols.getCount()) {
 		havecols=true;
 		listnode<char *> *bind=binds.getFirst();
 		listnode<char *> *col=cols.getFirst();

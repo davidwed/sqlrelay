@@ -7407,7 +7407,7 @@ void sqlrprotocol_teradata::appendRecordParcel() {
 	if (getDebug()) {
 		if (req->requestmode=='I' || req->requestmode=='M') {
 			stdoutput.printf("		null indicator:\n");
-			for (uint16_t i=0; i<req->nibuffer.getLength(); i++) {
+			for (uint16_t i=0; i<req->nibuffer.getCount(); i++) {
 				stdoutput.printf("			");
 				stdoutput.printBits(req->nibuffer[i]);
 				stdoutput.printf(" (%02x)\n",req->nibuffer[i]);
@@ -7420,12 +7420,12 @@ void sqlrprotocol_teradata::appendRecordParcel() {
 	}
 	debugParcelEnd();
 
-	appendParcelHeader(parcelflavor,req->nibuffer.getLength()+
+	appendParcelHeader(parcelflavor,req->nibuffer.getCount()+
 						req->rowbuffer.getSize());
 
 	// null indicator
 	if (req->requestmode=='I' || req->requestmode=='M') {
-		for (uint16_t i=0; i<req->nibuffer.getLength(); i++) {
+		for (uint16_t i=0; i<req->nibuffer.getCount(); i++) {
 			write(&respdata,req->nibuffer[i]);
 		}
 	}

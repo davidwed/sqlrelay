@@ -721,7 +721,7 @@ bool sqlrconnection::validateCertificate() {
 
 	// if there are any subject alternate
 	// names then validate against those
-	if (sans && sans->getLength()) {
+	if (sans && sans->getCount()) {
 
 		for (listnode< char * > *node=sans->getFirst();
 					node; node=node->getNext()) {

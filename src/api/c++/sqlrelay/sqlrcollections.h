@@ -102,7 +102,7 @@ class SQLRCLIENT_DLLSPEC sqlrrowlist : public listcollection<const char *> {
 		uint64_t	getBlockSize();
 
 		/** Returns the number of nodes in the sqlrrowlist. */
-		uint64_t	getLength();
+		uint64_t	getCount();
 
 		/** Returns the first node in the sqlrrowlist. */
 		listnode<const char *>	*getFirst();
@@ -187,7 +187,7 @@ class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 
 		/** Returns the number of key/value (column name/field) pairs
 		 *  in the dictionary. */
-		uint64_t	getLength();
+		uint64_t	getCount();
 	
 		#include <sqlrelay/private/sqlrrowdictionary.h>
 };
@@ -231,7 +231,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlist :
 		uint64_t	getBlockSize();
 
 		/** Returns the number of nodes in the sqlrresultsetlist. */
-		uint64_t	getLength();
+		uint64_t	getCount();
 
 		/** Returns the first node in the sqlrresultsetlist. */
 		listnode<const char *>	*getFirst();

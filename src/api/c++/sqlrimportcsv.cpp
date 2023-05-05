@@ -112,14 +112,14 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 		if (!ignorecolumns) {
 
 			// append the primary key name
-			columns[columns.getLength()]=
+			columns[columns.getCount()]=
 				charstring::duplicate(primarykeycolumnname);
 		}
 		currentcol++;
 	}
 
 	// if there are any static columns...
-	if (staticvaluecolumnnames.getLength()) {
+	if (staticvaluecolumnnames.getCount()) {
 
 		// loop, handling them
 		for (;;) {
@@ -137,7 +137,7 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 			if (!ignorecolumns) {
 
 				// append the column name
-				columns[columns.getLength()]=
+				columns[columns.getCount()]=
 					charstring::duplicate(colname);
 			}
 			currentcol++;
@@ -169,7 +169,7 @@ bool sqlrimportcsv::column(const char *name, bool quoted) {
 	if (!ignorecolumns && includecolumn) {
 
 		// append the column name to the list of column names
-		columns[columns.getLength()]=charstring::duplicate(name);
+		columns[columns.getCount()]=charstring::duplicate(name);
 	}
 
 	// next...
@@ -184,7 +184,7 @@ bool sqlrimportcsv::headerEnd() {
 
 	// bail if there were no columns
 	// (eg. if the csv file was completely empty)
-	if (!columns.getLength()) {
+	if (!columns.getCount()) {
 		return true;
 	}
 
@@ -202,7 +202,7 @@ bool sqlrimportcsv::headerEnd() {
 		//
 		// NOTE: columns[] should contain the full list of columns,
 		// including any inserted primary key or static columns
-		for (uint64_t i=0; i<columns.getLength(); i++) {
+		for (uint64_t i=0; i<columns.getCount(); i++) {
 			if (i) {
 				query.append(',');
 			}
@@ -261,9 +261,9 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		if (primarykeysequence) {
 			stringbuffer	tmp;
 			tmp.printf(sqlrcon->nextvalFormat(),primarykeysequence);
-			fields[fields.getLength()]=tmp.detachString();
+			fields[fields.getCount()]=tmp.detachString();
 		} else {
-			fields[fields.getLength()]=
+			fields[fields.getCount()]=
 					charstring::duplicate("null");
 		}
 
@@ -275,7 +275,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 
 	// if there are any static columns...
 	// (don't count these when determining if a row was empty or not)
-	if (staticvaluecolumnnames.getLength()) {
+	if (staticvaluecolumnnames.getCount()) {
 
 		// loop, handling them
 		for (;;) {
@@ -294,7 +294,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 			// append the field
 			stringbuffer	tmp;
 			appendField(&tmp,colvalue,0,true);
-			fields[fields.getLength()]=tmp.detachString();
+			fields[fields.getCount()]=tmp.detachString();
 
 			// next...
 			currentcol++;
@@ -332,7 +332,7 @@ bool sqlrimportcsv::field(const char *value, bool quoted) {
 		// append the field
 		stringbuffer	tmp;
 		appendField(&tmp,value,currenttablecol,false);
-		fields[fields.getLength()]=tmp.detachString();
+		fields[fields.getCount()]=tmp.detachString();
 
 		// next...
 		currentcol++;
@@ -439,7 +439,7 @@ bool sqlrimportcsv::rowEnd() {
 	query.append("insert into ")->append(objectname);
 	if (!ignorecolumns) {
 		query.append(" (");
-		for (uint64_t i=0; i<columns.getLength(); i++) {
+		for (uint64_t i=0; i<columns.getCount(); i++) {
 			if (i) {
 				query.append(',');
 			}
@@ -460,7 +460,7 @@ bool sqlrimportcsv::rowEnd() {
 		query.append(")");
 	}
 	query.append(" values (");
-	for (uint64_t i=0; i<fields.getLength(); i++) {
+	for (uint64_t i=0; i<fields.getCount(); i++) {
 		if (i) {
 			query.append(',');
 		}
@@ -549,7 +549,7 @@ bool sqlrimportcsv::bodyEnd() {
 	}
 
 	// clean up column names
-	for (uint64_t i=0; i<columns.getLength(); i++) {
+	for (uint64_t i=0; i<columns.getCount(); i++) {
 		delete[] columns[i];
 	}
 

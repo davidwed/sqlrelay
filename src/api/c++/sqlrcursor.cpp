@@ -310,7 +310,7 @@ class sqlrcursorprivate {
 // that, it's part of sqlrcursorprivate.
 sqlrclientbindvar *sqlrcursorprivate::findVar(const char *variable,
 					dynamicarray<sqlrclientbindvar> *vars) {
-	for (uint16_t i=0; i<vars->getLength(); i++) {
+	for (uint16_t i=0; i<vars->getCount(); i++) {
 		if (!charstring::compare((*vars)[i].variable,variable)) {
 			return &((*vars)[i]);
 		}
@@ -1399,7 +1399,7 @@ void sqlrcursor::deleteVariables() {
 void sqlrcursor::deleteSubstitutionVariables() {
 
 	if (pvt->_copyrefs) {
-		for (uint64_t i=0; i<pvt->_subvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_subvars->getCount(); i++) {
 			delete[] (*pvt->_subvars)[i].variable;
 			if ((*pvt->_subvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_STRING) {
@@ -1416,7 +1416,7 @@ void sqlrcursor::deleteSubstitutionVariables() {
 void sqlrcursor::deleteInputBindVariables() {
 
 	if (pvt->_copyrefs) {
-		for (uint64_t i=0; i<pvt->_inbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_inbindvars->getCount(); i++) {
 			delete[] (*pvt->_inbindvars)[i].variable;
 			if ((*pvt->_inbindvars)[i].type==
 					SQLRCLIENTBINDVARTYPE_STRING) {
@@ -1439,7 +1439,7 @@ void sqlrcursor::deleteInputBindVariables() {
 
 void sqlrcursor::deleteOutputBindVariables() {
 
-	for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+	for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 		if (pvt->_copyrefs) {
 			delete[] (*pvt->_outbindvars)[i].variable;
 		}
@@ -1462,7 +1462,7 @@ void sqlrcursor::deleteOutputBindVariables() {
 
 void sqlrcursor::deleteInputOutputBindVariables() {
 
-	for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+	for (uint64_t i=0; i<pvt->_inoutbindvars->getCount(); i++) {
 		if (pvt->_copyrefs) {
 			delete[] (*pvt->_inoutbindvars)[i].variable;
 		}
@@ -1490,7 +1490,7 @@ void sqlrcursor::substitution(const char *variable, const char *value) {
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_subvars);
 	if (!bv) {
-		bv=&(*pvt->_subvars)[pvt->_subvars->getLength()];
+		bv=&(*pvt->_subvars)[pvt->_subvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1505,7 +1505,7 @@ void sqlrcursor::substitution(const char *variable, int64_t value) {
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_subvars);
 	if (!bv) {
-		bv=&(*pvt->_subvars)[pvt->_subvars->getLength()];
+		bv=&(*pvt->_subvars)[pvt->_subvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1521,7 +1521,7 @@ void sqlrcursor::substitution(const char *variable, double value,
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_subvars);
 	if (!bv) {
-		bv=&(*pvt->_subvars)[pvt->_subvars->getLength()];
+		bv=&(*pvt->_subvars)[pvt->_subvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1549,7 +1549,7 @@ void sqlrcursor::inputBindBlob(const char *variable, const char *value,
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
-		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
+		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1566,7 +1566,7 @@ void sqlrcursor::inputBindClob(const char *variable, const char *value,
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
-		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
+		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1582,7 +1582,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value) {
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
-		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
+		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1599,7 +1599,7 @@ void sqlrcursor::inputBind(const char *variable, const char *value,
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
-		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
+		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1615,7 +1615,7 @@ void sqlrcursor::inputBind(const char *variable, int64_t value) {
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
-		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
+		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1632,7 +1632,7 @@ void sqlrcursor::inputBind(const char *variable, double value,
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
-		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
+		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1652,7 +1652,7 @@ void sqlrcursor::inputBind(const char *variable,
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inbindvars);
 	if (!bv) {
-		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getLength()];
+		bv=&(*pvt->_inbindvars)[pvt->_inbindvars->getCount()];
 		preexisting=false;
 	}
 	initVar(bv,variable,preexisting);
@@ -1869,7 +1869,7 @@ void sqlrcursor::defineOutputBindGeneric(const char *variable,
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_outbindvars);
 	if (!bv) {
-		bv=&(*pvt->_outbindvars)[pvt->_outbindvars->getLength()];
+		bv=&(*pvt->_outbindvars)[pvt->_outbindvars->getCount()];
 		preexisting=false;
 		pvt->_dirtybinds=true;
 	}
@@ -1989,7 +1989,7 @@ void sqlrcursor::defineInputOutputBindGeneric(const char *variable,
 	bool			preexisting=true;
 	sqlrclientbindvar	*bv=pvt->findVar(variable,pvt->_inoutbindvars);
 	if (!bv) {
-		bv=&(*pvt->_inoutbindvars)[pvt->_inoutbindvars->getLength()];
+		bv=&(*pvt->_inoutbindvars)[pvt->_inoutbindvars->getCount()];
 		preexisting=false;
 		pvt->_dirtybinds=true;
 	}
@@ -2050,7 +2050,7 @@ void sqlrcursor::defineInputOutputBindGeneric(const char *variable,
 const char *sqlrcursor::getOutputBindString(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable) &&
 				((*pvt->_outbindvars)[i].type==
@@ -2067,7 +2067,7 @@ const char *sqlrcursor::getOutputBindString(const char *variable) {
 uint32_t sqlrcursor::getOutputBindLength(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable)) {
 				return (*pvt->_outbindvars)[i].resultvaluesize;
@@ -2080,7 +2080,7 @@ uint32_t sqlrcursor::getOutputBindLength(const char *variable) {
 const char *sqlrcursor::getOutputBindBlob(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable) &&
 				(*pvt->_outbindvars)[i].type==
@@ -2095,7 +2095,7 @@ const char *sqlrcursor::getOutputBindBlob(const char *variable) {
 const char *sqlrcursor::getOutputBindClob(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable) &&
 				(*pvt->_outbindvars)[i].type==
@@ -2110,7 +2110,7 @@ const char *sqlrcursor::getOutputBindClob(const char *variable) {
 int64_t sqlrcursor::getOutputBindInteger(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable) &&
 				(*pvt->_outbindvars)[i].type==
@@ -2125,7 +2125,7 @@ int64_t sqlrcursor::getOutputBindInteger(const char *variable) {
 double sqlrcursor::getOutputBindDouble(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable) &&
 				(*pvt->_outbindvars)[i].type==
@@ -2145,7 +2145,7 @@ bool sqlrcursor::getOutputBindDate(const char *variable,
 			bool *isnegative) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable) &&
 				(*pvt->_outbindvars)[i].type==
@@ -2194,7 +2194,7 @@ sqlrcursor *sqlrcursor::getOutputBindCursor(const char *variable,
 const char *sqlrcursor::getInputOutputBindString(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_inoutbindvars)[i].variable,variable) &&
 				((*pvt->_inoutbindvars)[i].type==
@@ -2212,7 +2212,7 @@ const char *sqlrcursor::getInputOutputBindString(const char *variable) {
 uint32_t sqlrcursor::getInputOutputBindLength(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_inoutbindvars)[i].variable,variable)) {
 				return (*pvt->_inoutbindvars)[i].
@@ -2226,7 +2226,7 @@ uint32_t sqlrcursor::getInputOutputBindLength(const char *variable) {
 int64_t sqlrcursor::getInputOutputBindInteger(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_inoutbindvars)[i].variable,variable) &&
 				(*pvt->_inoutbindvars)[i].type==
@@ -2242,7 +2242,7 @@ int64_t sqlrcursor::getInputOutputBindInteger(const char *variable) {
 double sqlrcursor::getInputOutputBindDouble(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_inoutbindvars)[i].variable,variable) &&
 				(*pvt->_inoutbindvars)[i].type==
@@ -2262,7 +2262,7 @@ bool sqlrcursor::getInputOutputBindDate(const char *variable,
 			bool *isnegative) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_inoutbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_inoutbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_inoutbindvars)[i].variable,variable) &&
 				(*pvt->_inoutbindvars)[i].type==
@@ -2304,7 +2304,7 @@ const char *sqlrcursor::getInputOutputBindClob(const char *variable) {
 
 bool sqlrcursor::outputBindCursorIdIsValid(const char *variable) {
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable)) {
 				return true;
@@ -2317,7 +2317,7 @@ bool sqlrcursor::outputBindCursorIdIsValid(const char *variable) {
 uint16_t sqlrcursor::getOutputBindCursorId(const char *variable) {
 
 	if (variable) {
-		for (uint64_t i=0; i<pvt->_outbindvars->getLength(); i++) {
+		for (uint64_t i=0; i<pvt->_outbindvars->getCount(); i++) {
 			if (!charstring::compare(
 				(*pvt->_outbindvars)[i].variable,variable)) {
 				return (*pvt->_outbindvars)[i].value.cursorid;
@@ -2334,19 +2334,19 @@ void sqlrcursor::validateBinds() {
 bool sqlrcursor::validBind(const char *variable) {
 	performSubstitutions();
 	validateBindsInternal();
-	for (uint64_t in=0; in<pvt->_inbindvars->getLength(); in++) {
+	for (uint64_t in=0; in<pvt->_inbindvars->getCount(); in++) {
 		if (!charstring::compare(
 			(*pvt->_inbindvars)[in].variable,variable)) {
 			return (*pvt->_inbindvars)[in].send;
 		}
 	}
-	for (uint64_t out=0; out<pvt->_outbindvars->getLength(); out++) {
+	for (uint64_t out=0; out<pvt->_outbindvars->getCount(); out++) {
 		if (!charstring::compare(
 			(*pvt->_outbindvars)[out].variable,variable)) {
 			return (*pvt->_outbindvars)[out].send;
 		}
 	}
-	for (uint64_t out=0; out<pvt->_inoutbindvars->getLength(); out++) {
+	for (uint64_t out=0; out<pvt->_inoutbindvars->getCount(); out++) {
 		if (!charstring::compare(
 			(*pvt->_inoutbindvars)[out].variable,variable)) {
 			return (*pvt->_inoutbindvars)[out].send;
@@ -2381,7 +2381,7 @@ bool sqlrcursor::executeQuery() {
 
 void sqlrcursor::performSubstitutions() {
 
-	if (!pvt->_subvars->getLength() || !pvt->_dirtysubs) {
+	if (!pvt->_subvars->getCount() || !pvt->_dirtysubs) {
 		return;
 	}
 
@@ -2393,7 +2393,7 @@ void sqlrcursor::performSubstitutions() {
 
 	// mark all vars that were substituted in as "done" so the next time
 	// this method gets called, they won't be processed.
-	for (uint64_t i=0; i<pvt->_subvars->getLength(); i++) {
+	for (uint64_t i=0; i<pvt->_subvars->getCount(); i++) {
 		(*pvt->_subvars)[i].donesubstituting=
 					(*pvt->_subvars)[i].substituted;
 	}
@@ -2486,7 +2486,7 @@ bool sqlrcursor::performSubstitutionsInternal() {
 			// first iterate through the arrays passed in
 			found=false;
 			for (uint64_t i=0;
-				i<pvt->_subvars->getLength() && !found; i++) {
+				i<pvt->_subvars->getCount() && !found; i++) {
 
 	
 				// if we find a match, write the 
@@ -2552,7 +2552,7 @@ void sqlrcursor::validateBindsInternal() {
 	}
 
 	// check each input bind
-	for (uint64_t in=0; in<pvt->_inbindvars->getLength(); in++) {
+	for (uint64_t in=0; in<pvt->_inbindvars->getCount(); in++) {
 
 		// don't check bind-by-position variables
 		if (charstring::isInteger(
@@ -2565,7 +2565,7 @@ void sqlrcursor::validateBindsInternal() {
 	}
 
 	// check each output bind
-	for (uint64_t out=0; out<pvt->_outbindvars->getLength(); out++) {
+	for (uint64_t out=0; out<pvt->_outbindvars->getCount(); out++) {
 
 		// don't check bind-by-position variables
 		if (charstring::isInteger(
@@ -2579,7 +2579,7 @@ void sqlrcursor::validateBindsInternal() {
 
 	// check each input/output bind
 	for (uint64_t inout=0;
-		inout<pvt->_inoutbindvars->getLength(); inout++) {
+		inout<pvt->_inoutbindvars->getCount(); inout++) {
 
 		// don't check bind-by-position variables
 		if (charstring::isInteger(
@@ -2883,7 +2883,7 @@ void sqlrcursor::sendInputBinds() {
 	uint16_t	i=0;
 
 	// count number of vars to send
-	uint16_t	count=pvt->_inbindvars->getLength();
+	uint16_t	count=pvt->_inbindvars->getCount();
 	uint16_t	total=count;
 	for (i=0; i<total; i++) {
 		if (!(*pvt->_inbindvars)[i].send) {
@@ -3118,7 +3118,7 @@ void sqlrcursor::sendOutputBinds() {
 	uint16_t	i=0;
 
 	// count number of vars to send
-	uint16_t	count=pvt->_outbindvars->getLength();
+	uint16_t	count=pvt->_outbindvars->getCount();
 	uint16_t	total=count;
 	for (i=0; i<total; i++) {
 		if (!(*pvt->_outbindvars)[i].send) {
@@ -3221,7 +3221,7 @@ void sqlrcursor::sendInputOutputBinds() {
 	uint16_t	i=0;
 
 	// count number of vars to send
-	uint16_t	count=pvt->_inoutbindvars->getLength();
+	uint16_t	count=pvt->_inoutbindvars->getCount();
 	uint16_t	total=count;
 	for (i=0; i<total; i++) {
 		if (!(*pvt->_inoutbindvars)[i].send) {

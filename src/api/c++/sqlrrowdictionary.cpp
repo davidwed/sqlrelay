@@ -115,7 +115,7 @@ linkedlist<const char *> *sqlrrowdictionary::getKeys() {
 	return pvt->_keys;
 }
 
-uint64_t sqlrrowdictionary::getLength() {
+uint64_t sqlrrowdictionary::getCount() {
 	return pvt->_cursor->colCount();
 }
 

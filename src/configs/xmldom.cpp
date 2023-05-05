@@ -897,7 +897,7 @@ connectstringcontainer *sqlrconfig_xmldom::getConnectString(
 }
 
 uint32_t sqlrconfig_xmldom::getConnectionCount() {
-	return connectstringlist.getLength();
+	return connectstringlist.getCount();
 }
 
 uint32_t sqlrconfig_xmldom::getMetricTotal() {

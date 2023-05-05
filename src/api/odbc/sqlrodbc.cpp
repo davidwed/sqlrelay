@@ -3990,7 +3990,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
 	stmt->currentstartrow=stmt->currentfetchrow;
 
 	// update column binds (if we have any)
-	if (stmt->fieldlist.getLength()) {
+	if (stmt->fieldlist.getCount()) {
 
 		for (uint64_t row=0; row<rowsfetched; row++) {
 
@@ -8476,7 +8476,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 
 	// if there's a data-at-exec buffer then return it,
 	// and remove it from the dictionary
-	if (stmt->dataatexeckeys->getLength()) {
+	if (stmt->dataatexeckeys->getCount()) {
 
 		// get the first bind number
 		listnode<SQLUSMALLINT>	*keynode=

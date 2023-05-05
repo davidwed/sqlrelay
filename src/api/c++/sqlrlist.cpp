@@ -218,7 +218,7 @@ bool sqlrrowlist::remove(listnode<const char *> *node) {
 	return true;
 }
 
-uint64_t sqlrrowlist::getLength() {
+uint64_t sqlrrowlist::getCount() {
 	return pvt->_node.getCursor()->colCount();
 }
 
@@ -388,7 +388,7 @@ bool sqlrresultsetlist::remove(listnode<const char *> *node) {
 	return true;
 }
 
-uint64_t sqlrresultsetlist::getLength() {
+uint64_t sqlrresultsetlist::getCount() {
 	return pvt->_node.getCursor()->colCount();
 }
 
