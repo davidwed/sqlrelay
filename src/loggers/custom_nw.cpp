@@ -63,7 +63,7 @@ bool sqlrlogger_custom_nw::init(sqlrlistener *sqlrl,
 	delete[] querylogname;
 	charstring::printf(&querylogname,"%s/%s",logdir,id);
 	directory::create(querylogname,
-			permissions::evalPermString("rwxrwxrwx"));
+			permissions::parsePermString("rwxrwxrwx"));
 
 	// create the log file name
 	delete[] querylogname;
@@ -72,7 +72,7 @@ bool sqlrlogger_custom_nw::init(sqlrlistener *sqlrl,
 	// create the new log file
 	querylog.close();
 	return querylog.open(querylogname,O_WRONLY|O_CREAT|O_APPEND,
-				permissions::evalPermString("rw-------"));
+				permissions::parsePermString("rw-------"));
 }
 
 bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,

@@ -7475,7 +7475,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// create shared memory
 	pvt->_bulkservershmem=new sharedmemory;
 	if (!pvt->_bulkservershmem->create(key,shmsize,
-				permissions::evalPermString("rw-r-----"))) {
+				permissions::parsePermString("rw-r-----"))) {
 		setError(SQLR_ERROR_BULKLOADBEGIN_SHM_STRING,
 				SQLR_ERROR_BULKLOADBEGIN_SHM,true);
 		bulkLoadEnd();

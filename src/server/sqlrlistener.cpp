@@ -290,9 +290,9 @@ bool sqlrlistener::init(int argc, const char **argv) {
 			path.append(slash)->append(parts[i]);
 			if (!file::exists(path.getString())) {
 				mode_t	mode=(i==partcount-1)?
-					permissions::evalPermString(
+					permissions::parsePermString(
 							"rwxrwxrwx"):
-					permissions::evalPermString(
+					permissions::parsePermString(
 							"rwxr-xr-x");
 				mode_t	oldumask=
 					process::setFileCreationMask(0000);
@@ -621,7 +621,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	pvt->_shmem=new sharedmemory;
 	if (!pvt->_shmem->create(key,sizeof(sqlrshm),
-				permissions::evalPermString("rw-r-----"))) {
+				permissions::parsePermString("rw-r-----"))) {
 		shmError(id,pvt->_shmem->getId());
 		pvt->_shmem->attach(key,sizeof(sqlrshm));
 		return false;

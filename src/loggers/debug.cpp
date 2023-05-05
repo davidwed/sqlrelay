@@ -45,7 +45,7 @@ sqlrlogger_debug::sqlrlogger_debug(sqlrloggers *ls,
 	if (!charstring::getLength(permstring)) {
 		permstring="rw-------";
 	}
-	dbgfileperms=permissions::evalPermString(permstring);
+	dbgfileperms=permissions::parsePermString(permstring);
 	name=NULL;
 	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	loglistener=!charstring::isNo(

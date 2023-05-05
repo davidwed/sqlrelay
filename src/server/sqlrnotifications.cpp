@@ -262,7 +262,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		charstring::copy(pvt->_tmpfilename,pvt->_tmpdir);
 		charstring::append(pvt->_tmpfilename,"XXXXXX");
 		int32_t	tfd=file::createTemporaryFile(pvt->_tmpfilename,
-				permissions::evalPermString("rw-------"));
+				permissions::parsePermString("rw-------"));
 		if (tfd==-1) {
 			delete[] subj;
 			delete[] msg;

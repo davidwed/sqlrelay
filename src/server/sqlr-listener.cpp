@@ -49,7 +49,7 @@ static void shutDown(int32_t signum) {
 		filename.append(".bt");
 		file	f;
 		if (f.create(filename.getString(),
-				permissions::evalPermString("rw-------"))) {
+				permissions::parsePermString("rw-------"))) {
 			f.printf("signal: %d\n\n",signum);
 			process::writeBacktrace(&f);
 		}
@@ -161,7 +161,7 @@ int main(int argc, const char **argv) {
 			filename.append(".bt");
 			file	f;
 			if (f.create(filename.getString(),
-				permissions::evalPermString("rw-------"))) {
+				permissions::parsePermString("rw-------"))) {
 				f.printf("signal: %d\n\n",signum);
 				process::writeBacktrace(&f);
 			}

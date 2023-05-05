@@ -15,7 +15,7 @@ int	main(int argc, char **argv) {
 	// create the key file
 	file::remove("semkey");
 	file	fd;
-	if (!fd.create("semkey",permissions::evalPermString("rw-------"))) {
+	if (!fd.create("semkey",permissions::parsePermString("rw-------"))) {
 		stdoutput.printf("failed to create semkey file\n");
 		process::exit(1);
 	}
@@ -24,7 +24,7 @@ int	main(int argc, char **argv) {
 	// create the semaphore
 	int32_t	vals[3]={0,0,0};
 	if (!sem.create(file::generateKey("semkey",1),
-			permissions::evalPermString("rw-------"),
+			permissions::parsePermString("rw-------"),
 			3,vals)) {
 		stdoutput.printf("failed to create semaphoreset\n");
 		process::exit(1);

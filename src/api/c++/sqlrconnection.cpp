@@ -1952,7 +1952,7 @@ void sqlrconnection::setDebugFile(const char *filename) {
 		!pvt->_debugfile.open(filename,O_WRONLY|O_APPEND) &&
 				error::getErrorNumber()==ENOENT) {
 		pvt->_debugfile.create(filename,
-				permissions::evalPermString("rw-r--r--"));
+				permissions::parsePermString("rw-r--r--"));
 	}
 }
 

@@ -77,7 +77,7 @@ bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
 
 	// create the new log file
 	if (!querylog.create(querylogname,
-				permissions::evalPermString("rw-------"))) {
+				permissions::parsePermString("rw-------"))) {
 		return false;
 	}
 

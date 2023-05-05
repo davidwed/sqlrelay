@@ -28,7 +28,7 @@ bool sqlrexportxml::exportToFile(const char *filename, const char *table) {
 	file	f;
 	if (!charstring::isNullOrEmpty(filename)) {
 		if (!f.create(filename,
-				permissions::evalPermString("rw-r--r--"))) {
+				permissions::parsePermString("rw-r--r--"))) {
 			// FIXME: report error
 			return false;
 		}

@@ -457,7 +457,7 @@ void graphStats(const char *graph, const char *db,
 	// write out the stats to temp.csv
 	file	f;
 	f.open("temp.csv",O_WRONLY|O_TRUNC|O_CREAT,
-			permissions::evalPermString("rw-r--r--"));
+			permissions::parsePermString("rw-r--r--"));
 
 	uint32_t	count=0;
 	for (listnode< float > *node=stats->getKeys()->getFirst();

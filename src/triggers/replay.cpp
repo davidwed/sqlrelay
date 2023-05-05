@@ -995,7 +995,7 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 	file	logfile;
 	if (!logfile.open(cond->logfile,
 				O_WRONLY|O_APPEND|O_CREAT,
-				permissions::evalPermString("rw-r--r--"))) {
+				permissions::parsePermString("rw-r--r--"))) {
 		if (debug) {
 			char	*err=error::getErrorString();
 			stdoutput.printf("failed to open %s\n%s\n",
