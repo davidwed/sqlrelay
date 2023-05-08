@@ -6,7 +6,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=win7x64;password=testpassword"/>
 		</connections>
 	</instance>
 
@@ -15,7 +15,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle12c)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle12c)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=win7x64;password=testpassword"/>
 		</connections>
 	</instance>
 
@@ -24,7 +24,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle11g)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle11g)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=win7x64;password=testpassword"/>
 		</connections>
 	</instance>
 
@@ -33,7 +33,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle10g)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle10g)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=win7x64;password=testpassword"/>
 		</connections>
 	</instance>
 

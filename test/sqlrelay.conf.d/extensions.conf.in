@@ -188,7 +188,7 @@
 			<logger module="slowqueries"/>
 		</loggers>
 		<connections>
-                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=[testuser.pwd];lastinsertidfunction=last_insert_id();droptemptables=yes;faketransactionblocks=yes;autocommit=yes;fetchatonce=5;maxselectlistsize=-1;maxitembuffersize=6000" passwordencryptionid="rot16"/>
+                        <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=win7x64;password=[testuser.pwd];lastinsertidfunction=last_insert_id();droptemptables=yes;faketransactionblocks=yes;autocommit=yes;fetchatonce=5;maxselectlistsize=-1;maxitembuffersize=6000" passwordencryptionid="rot16"/>
 		</connections>
 	</instance>
 

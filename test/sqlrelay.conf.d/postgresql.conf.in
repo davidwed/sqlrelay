@@ -6,7 +6,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=postgresql;user=testuser;password=testpassword;db=@HOSTNAME@;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
+			<connection string="host=postgresql;user=testuser;password=testpassword;db=win7x64;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
 		</connections>
 	</instance>
 
@@ -15,7 +15,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=postgresql12;user=testuser;password=testpassword;db=@HOSTNAME@;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
+			<connection string="host=postgresql12;user=testuser;password=testpassword;db=win7x64;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
 		</connections>
 	</instance>
 

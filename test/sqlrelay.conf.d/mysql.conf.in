@@ -6,7 +6,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
+			<connection string="host=mysql;user=testuser;password=testpassword;db=win7x64;foundrows=yes"/>
 		</connections>
 	</instance>
 
@@ -15,7 +15,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=mysql8;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
+			<connection string="host=mysql8;user=testuser;password=testpassword;db=win7x64;foundrows=yes"/>
 		</connections>
 	</instance>
 
@@ -24,7 +24,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=mysql5;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
+			<connection string="host=mysql5;user=testuser;password=testpassword;db=win7x64;foundrows=yes"/>
 		</connections>
 	</instance>
 
@@ -33,7 +33,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=mysql3;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
+			<connection string="host=mysql3;user=testuser;password=testpassword;db=win7x64;foundrows=yes"/>
 		</connections>
 	</instance>
 
@@ -42,7 +42,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=mariadb10;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
+			<connection string="host=mariadb10;user=testuser;password=testpassword;db=win7x64;foundrows=yes"/>
 		</connections>
 	</instance>
 

@@ -11,7 +11,7 @@
 			</auth>
 		</auths>
 		<connections>
-			<connection string="lastinsertidfunction=testfunc();user=testuser;password=testpassword;db=@HOSTNAME@;host=postgresql;typemangling=lookup;tablemangling=no"/>
+			<connection string="lastinsertidfunction=testfunc();user=testuser;password=testpassword;db=win7x64;host=postgresql;typemangling=lookup;tablemangling=no"/>
 
 		</connections>
 	</instance>
