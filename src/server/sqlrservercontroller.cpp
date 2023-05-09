@@ -562,7 +562,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get whether this connection was spawned by the scaler
-	pvt->_scalerspawned=pvt->_cmdl->getWasFound("-scaler");
+	pvt->_scalerspawned=pvt->_cmdl->isFound("-scaler");
 
 	// get the connection id from the command line
 	pvt->_connectionid=pvt->_cmdl->getValue("-connectionid");
@@ -577,7 +577,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 				charstring::convertToInteger(ttlstr):-1;
 
 	// should we run quietly?
-	pvt->_silent=pvt->_cmdl->getWasFound("-silent");
+	pvt->_silent=pvt->_cmdl->isFound("-silent");
 
 	// load the configuration
 	pvt->_sqlrcfgs=new sqlrconfigs(pvt->_pth);
@@ -676,7 +676,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 
 	// log in and detach
 	if (pvt->_conn->mustDetachBeforeLogIn() &&
-			!pvt->_cmdl->getWasFound("-nodetach")) {
+			!pvt->_cmdl->isFound("-nodetach")) {
 		process::detach();
 	}
 	bool	reloginatstart=pvt->_cfg->getReLoginAtStart();
@@ -686,7 +686,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		}
 	}
 	if (!pvt->_conn->mustDetachBeforeLogIn() &&
-			!pvt->_cmdl->getWasFound("-nodetach")) {
+			!pvt->_cmdl->isFound("-nodetach")) {
 		process::detach();
 	}
 	if (reloginatstart) {

@@ -441,21 +441,21 @@ int main(int argc, const char **argv) {
 
 	// get the command line args
 	const char	*localstatedir=sqlrpth.getLocalStateDir();
-	bool		strace=cmdl.getWasFound("-strace");
+	bool		strace=cmdl.isFound("-strace");
 	const char	*id=cmdl.getValue("-id");
 	const char	*configurl=sqlrpth.getConfigUrl();
 	const char	*config=cmdl.getValue("-config");
 	const char	*backtrace=cmdl.getValue("-backtrace");
 	bool		disablecrashhandler=
-				cmdl.getWasFound("-disable-crash-handler");
+				cmdl.isFound("-disable-crash-handler");
 	#ifndef _WIN32
-	bool		wait=cmdl.getWasFound("-wait");
+	bool		wait=cmdl.isFound("-wait");
 	#endif
 
 	// on Windows, open a new console window and redirect everything to it
 	// (unless that's specifically disabled)
 	#ifdef _WIN32
-	if (!cmdl.getWasFound("-disable-new-window")) {
+	if (!cmdl.isFound("-disable-new-window")) {
 		fclose(stdin);
 		fclose(stdout);
 		fclose(stderr);

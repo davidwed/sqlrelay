@@ -168,22 +168,22 @@ int main(int argc, const char **argv) {
 	const char	*id=cmdline.getValue("id");
 	const char	*host=cmdline.getValue("host");
 	uint16_t	port=charstring::convertToInteger(
-				(cmdline.getWasFound("port"))?
+				(cmdline.isFound("port"))?
 				cmdline.getValue("port"):DEFAULT_PORT);
 	const char	*socket=cmdline.getValue("socket");
 	const char	*user=cmdline.getValue("user");
 	const char	*password=cmdline.getValue("password");
-	bool		usekrb=cmdline.getWasFound("krb");
+	bool		usekrb=cmdline.isFound("krb");
 	const char	*krbservice=cmdline.getValue("krb");
 	const char	*krbmech=cmdline.getValue("krbmech");
 	const char	*krbflags=cmdline.getValue("krbflags");
-	bool		usetls=cmdline.getWasFound("tls");
+	bool		usetls=cmdline.isFound("tls");
 	const char	*tlsversion=cmdline.getValue("tlsversion");
 	const char	*tlscert=cmdline.getValue("tlscert");
 	const char	*tlspassword=cmdline.getValue("tlspassword");
 	const char	*tlsciphers=cmdline.getValue("tlsciphers");
 	const char	*tlsvalidate="no";
-	if (cmdline.getWasFound("tlsvalidate")) {
+	if (cmdline.isFound("tlsvalidate")) {
 		tlsvalidate=cmdline.getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline.getValue("tlsca");
@@ -200,7 +200,7 @@ int main(int argc, const char **argv) {
 	if (!rsbs) {
 		rsbs=100;
 	}
-	bool		debug=cmdline.getWasFound("debug");
+	bool		debug=cmdline.isFound("debug");
 	const char	*debugfile=NULL;
 	if (debug) {
 		debugfile=cmdline.getValue("debug");
@@ -240,34 +240,34 @@ int main(int argc, const char **argv) {
 	if (!charstring::isNullOrEmpty(id)) {
 		sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
 		if (cfg) {
-			if (!cmdline.getWasFound("host")) {
+			if (!cmdline.isFound("host")) {
 				host="localhost";
 			}
-			if (!cmdline.getWasFound("port")) {
+			if (!cmdline.isFound("port")) {
 				port=cfg->getDefaultPort();
 			}
-			if (!cmdline.getWasFound("socket")) {
+			if (!cmdline.isFound("socket")) {
 				socket=cfg->getDefaultSocket();
 			}
-			if (!cmdline.getWasFound("krb")) {
+			if (!cmdline.isFound("krb")) {
 				usekrb=cfg->getDefaultKrb();
 			}
-			if (!cmdline.getWasFound("krbservice")) {
+			if (!cmdline.isFound("krbservice")) {
 				krbservice=cfg->getDefaultKrbService();
 			}
-			if (!cmdline.getWasFound("krbmech")) {
+			if (!cmdline.isFound("krbmech")) {
 				krbmech=cfg->getDefaultKrbMech();
 			}
-			if (!cmdline.getWasFound("krbflags")) {
+			if (!cmdline.isFound("krbflags")) {
 				krbflags=cfg->getDefaultKrbFlags();
 			}
-			if (!cmdline.getWasFound("tls")) {
+			if (!cmdline.isFound("tls")) {
 				usetls=cfg->getDefaultTls();
 			}
 			if (!cmdline.getValue("tlsciphers")) {
 				tlsciphers=cfg->getDefaultTlsCiphers();
 			}
-			if (!cmdline.getWasFound("user")) {
+			if (!cmdline.isFound("user")) {
 				user=cfg->getDefaultUser();
 				password=cfg->getDefaultPassword();
 			}

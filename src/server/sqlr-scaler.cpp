@@ -123,7 +123,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// read the commandline
 	cmdl=new sqlrcmdline(argc,argv);
 
-	disablecrashhandler=cmdl->getWasFound("-disable-crash-handler");
+	disablecrashhandler=cmdl->isFound("-disable-crash-handler");
 	backtrace=cmdl->getValue("-backtrace");
 
 	// handle kill and crash signals
@@ -370,7 +370,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	dt.initFromSystemDateTime();
 	currentseed=dt.getEpoch();
 
-	if (!cmdl->getWasFound("-nodetach")) {
+	if (!cmdl->isFound("-nodetach")) {
 		// detach from the controlling tty
 		process::detach();
 	}
@@ -816,7 +816,7 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.getWasFound("-id")) {
+	if (!cmdl.isFound("-id")) {
 		stdoutput.printf("usage: \n"
 			" %s-scaler [-config config] -id id "
 			"[-localstatedir dir] [-nodetach]\n",

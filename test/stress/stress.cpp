@@ -211,9 +211,9 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.getWasFound("host") ||
-			!cmdl.getWasFound("port") ||
-			!cmdl.getWasFound("concount")) {
+	if (!cmdl.isFound("host") ||
+			!cmdl.isFound("port") ||
+			!cmdl.isFound("concount")) {
 		stdoutput.printf("usage: stress -host host -port port -socket socket [-user user] [-password password] -concount concount -curcount curcount [-heartbeat|-garbage [size]]\n");
 		process::exit(1);
 	}
@@ -226,13 +226,13 @@ int main(int argc, const char **argv) {
 	concount=charstring::convertToUnsignedInteger(cmdl.getValue("concount"));
 	curcount=charstring::convertToUnsignedInteger(cmdl.getValue("curcount"));
 	garbage=0;
-	if (cmdl.getWasFound("garbage")) {
+	if (cmdl.isFound("garbage")) {
 		garbage=charstring::convertToUnsignedInteger(cmdl.getValue("garbage"));
 		if (garbage==0) {
 			garbage=100;
 		}
 	}
-	bool	heartbeat=(garbage || cmdl.getWasFound("heartbeat"));
+	bool	heartbeat=(garbage || cmdl.isFound("heartbeat"));
 
 	thread	*th=new thread[concount];
 

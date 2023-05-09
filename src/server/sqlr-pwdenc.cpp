@@ -56,7 +56,7 @@ int main(int argc, const char **argv) {
 	const char	*id=cmdline.getValue("-id");
 	const char	*pwdencid=cmdline.getValue("-pwdencid");
 	const char	*password=cmdline.getValue("-password");
-	bool		binary=cmdline.getWasFound("-binary");
+	bool		binary=cmdline.isFound("-binary");
 
 	// sanity check and usage message
 	if (charstring::isNullOrEmpty(id) ||

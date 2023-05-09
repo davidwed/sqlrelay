@@ -143,7 +143,7 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.getWasFound("-id") || !cmdl.getWasFound("-connectionid")) {
+	if (!cmdl.isFound("-id") || !cmdl.isFound("-connectionid")) {
 		stdoutput.printf("usage: \n"
 			" %s-connection [-config config] "
 			"-id id -connectionid connectionid\n"
@@ -158,7 +158,7 @@ int main(int argc, const char **argv) {
 
 	// set up default signal handling
 	process::exitOnShutDown();
-	if (!cmdl.getWasFound("-disable-crash-handler")) {
+	if (!cmdl.isFound("-disable-crash-handler")) {
 		process::exitOnCrash();
 	}
 
@@ -168,13 +168,13 @@ int main(int argc, const char **argv) {
 #ifdef SHUTDOWNFLAG
 	// handle kill and crash signals
 	process::setShutDownFlagOnShutDown();
-	if (!cmdl.getWasFound("-disable-crash-handler")) {
+	if (!cmdl.isFound("-disable-crash-handler")) {
 		process::setShutDownFlagOnCrash();
 	}
 #else
 	// handle kill and crash signals
 	process::setShutDownHandler(shutDown);
-	if (!cmdl.getWasFound("-disable-crash-handler")) {
+	if (!cmdl.isFound("-disable-crash-handler")) {
 		process::setCrashHandler(shutDown);
 	}
 #endif

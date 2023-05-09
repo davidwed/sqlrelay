@@ -52,19 +52,19 @@ int main(int argc, const char **argv) {
 	bool		nosettle=false;
 
 	// override defaults with command line parameters
-	if (cmdl.getWasFound("db")) {
+	if (cmdl.isFound("db")) {
 		db=cmdl.getValue("db");
 	}
-	if (cmdl.getWasFound("dbconnectstring")) {
+	if (cmdl.isFound("dbconnectstring")) {
 		dbconnectstring=cmdl.getValue("dbconnectstring");
 	}
-	if (cmdl.getWasFound("proxyconnectstring")) {
+	if (cmdl.isFound("proxyconnectstring")) {
 		proxyconnectstring=cmdl.getValue("proxyconnectstring");
 	}
-	if (cmdl.getWasFound("sqlrconnectstring")) {
+	if (cmdl.isFound("sqlrconnectstring")) {
 		sqlrconnectstring=cmdl.getValue("sqlrconnectstring");
 	}
-	if (cmdl.getWasFound("sqlr")) {
+	if (cmdl.isFound("sqlr")) {
 		sqlr=cmdl.getValue("sqlr");
 		if (charstring::compare(sqlr,"local") &&
 			charstring::compare(sqlr,"remote") &&
@@ -72,43 +72,43 @@ int main(int argc, const char **argv) {
 			usage=true;
 		}
 	}
-	if (cmdl.getWasFound("queries")) {
+	if (cmdl.isFound("queries")) {
 		queries=charstring::convertToInteger(cmdl.getValue("queries"));
 	}
-	if (cmdl.getWasFound("rows")) {
+	if (cmdl.isFound("rows")) {
 		rows=charstring::convertToInteger(cmdl.getValue("rows"));
 	}
-	if (cmdl.getWasFound("cols")) {
+	if (cmdl.isFound("cols")) {
 		cols=charstring::convertToInteger(cmdl.getValue("cols"));
 	}
-	if (cmdl.getWasFound("colsize")) {
+	if (cmdl.isFound("colsize")) {
 		colsize=charstring::convertToInteger(cmdl.getValue("colsize"));
 	}
-	if (cmdl.getWasFound("samples")) {
+	if (cmdl.isFound("samples")) {
 		samples=charstring::convertToInteger(cmdl.getValue("samples"));
 	}
-	if (cmdl.getWasFound("rsbs")) {
+	if (cmdl.isFound("rsbs")) {
 		rsbs=charstring::convertToInteger(cmdl.getValue("rsbs"));
 	}
-	if (cmdl.getWasFound("bench")) {
+	if (cmdl.isFound("bench")) {
 		const char	*bench=cmdl.getValue("bench");
 		benchsqlrelay=charstring::contains(bench,"sqlrelay");
 		benchproxy=charstring::contains(bench,"proxy");
 		benchdb=charstring::contains(bench,"db");
 	}
-	if (cmdl.getWasFound("querytypes")) {
+	if (cmdl.isFound("querytypes")) {
 		const char	*queries=cmdl.getValue("querytypes");
 		selectqueries=charstring::contains(queries,"selects");
 		dmlqueries=charstring::contains(queries,"dml");
 	}
-	if (cmdl.getWasFound("debug")) {
+	if (cmdl.isFound("debug")) {
 		debug=true;
 	}
-	if (cmdl.getWasFound("nosettle")) {
+	if (cmdl.isFound("nosettle")) {
 		nosettle=true;
 	}
 	stringbuffer	graphname;
-	if (cmdl.getWasFound("graph")) {
+	if (cmdl.isFound("graph")) {
 		graph=cmdl.getValue("graph");
 		graphname.append(graph);
 		if (charstring::compare(
@@ -119,7 +119,7 @@ int main(int argc, const char **argv) {
 		graphname.append(db)->append("-bench.png");
 	}
 	graph=graphname.getString();
-	if (cmdl.getWasFound("help","h")) {
+	if (cmdl.isFound("help","h")) {
 		usage=true;
 	}
 
