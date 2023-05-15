@@ -16,6 +16,7 @@
 #include <rudiments/character.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/prompt.h>
+#include <rudiments/locale.h>
 #include <config.h>
 #include <defaults.h>
 #define NEED_IS_BIT_TYPE_CHAR 1
@@ -25,8 +26,6 @@
 #include <datatypes.h>
 #include <defines.h>
 #include <version.h>
-// FIXME: use rudiments locale class instead
-#include <locale.h>
 #include <math.h>
 
 class sqlrshbindvalue {
@@ -2677,11 +2676,10 @@ bool sqlrsh::execute(int argc, const char **argv) {
 		// This is useful for making sure that decimals still work
 		// when the locale is changed to say, de_DE that has different
 		// number formats.
-		char	*localeresult=setlocale(LC_ALL,
+		if (!locale::setValue("LC_ALL",
 				(!charstring::compare(localeargument,"env"))?
-							"":localeargument);
-		if (!localeresult) {
-			stderror.printf("ERROR: setlocale failed\n");
+							"":localeargument)) {
+			stderror.printf("ERROR: set locale failed\n");
 			return false;
 		}
 	}
