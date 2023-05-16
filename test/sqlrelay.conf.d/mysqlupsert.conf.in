@@ -23,7 +23,7 @@
 			</trigger>
 		</triggers>
 		<connections>
-			<connection string="host=mysql;user=testuser;password=testpassword;db=win7x64;foundrows=yes"/>
+			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>
 	</instance>
 

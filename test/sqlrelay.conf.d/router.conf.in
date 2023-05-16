@@ -6,7 +6,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=mysqlmaster;user=testuser;password=testpassword;db=win7x64"/>
+			<connection string="host=mysqlmaster;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
@@ -15,7 +15,7 @@
 			<user user="test" password="test"/>
 		</users>
 		<connections>
-			<connection string="host=mysqlslave;user=testuser;password=testpassword;db=win7x64"/>
+			<connection string="host=mysqlslave;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
