@@ -2676,8 +2676,8 @@ bool sqlrsh::execute(int argc, const char **argv) {
 		// This is useful for making sure that decimals still work
 		// when the locale is changed to say, de_DE that has different
 		// number formats.
-		if (!locale::setValue("LC_ALL",
-				(!charstring::compare(localeargument,"env"))?
+		if (!locale::setAll(
+			(!charstring::compare(localeargument,"env"))?
 							"":localeargument)) {
 			stderror.printf("ERROR: set locale failed\n");
 			return false;
