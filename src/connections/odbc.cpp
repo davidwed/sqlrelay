@@ -16,6 +16,8 @@
 // get around a problem with CHAR/xmlChar in gnome-xml
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
+#include <rudiments/ucs2charstring.h>
+#include <rudiments/ucs2character.h>
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
@@ -412,30 +414,19 @@ void printerror(const char *error) {
 	delete[] err;
 }
 
-size_t isFixed4Byte(const char *encoding) {
-	// FIXME: support other encodings
-	return (charstring::contains(encoding,"UCS4") ||
-			charstring::contains(encoding,"UCS-4") ||
-			charstring::contains(encoding,"UTF32") ||
-			charstring::contains(encoding,"UTF-32"));
-}
-
-size_t isFixed2Byte(const char *encoding) {
-	// FIXME: support other encodings
+size_t isUcs2(const char *encoding) {
 	return (charstring::contains(encoding,"UCS2") ||
 			charstring::contains(encoding,"UCS-2"));
 }
 
-size_t isVariable2Byte(const char *encoding) {
-	// FIXME: support other encodings
+size_t isUtf16(const char *encoding) {
 	return (charstring::contains(encoding,"UTF16") ||
 			charstring::contains(encoding,"UTF-16"));
 }
 
-size_t isVariable1Byte(const char *encoding) {
-	return (!isFixed4Byte(encoding) &&
-		!isFixed2Byte(encoding) &&
-		!isVariable2Byte(encoding));
+size_t isUtf8(const char *encoding) {
+	return (charstring::contains(encoding,"UTF8") ||
+			charstring::contains(encoding,"UTF-8"));
 }
 
 // returns number of characters in the (null-terminated) string
@@ -444,10 +435,9 @@ size_t len(const char *str, const char *encoding) {
 	const char	*ptr=str;
 	size_t		res=0;
 
-	if (isFixed2Byte(encoding)) {
+	if (isUcs2(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: assumes encoding supports a byte order mark
 		// FIXME: handle nulls
 		if (*ptr==(char)0xEF &&
 			*(ptr+1)==(char)0xBB &&
@@ -455,34 +445,13 @@ size_t len(const char *str, const char *encoding) {
 			ptr+=3;
 		}
 
-		while (*ptr || *(ptr+1)) {
-			res++;
-			ptr+=2;
-		}
+		res=ucs2charstring::getLength((ucs2_t *)ptr);
 
-	} else if (isFixed4Byte(encoding)) {
-
-		// skip any byte-order mark
-		// FIXME: assumes encoding supports a byte order mark
-		// FIXME: handle nulls
-		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
-			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
-			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
-			*(ptr+2)=='\0' && *(ptr+3)=='\0')) {
-			ptr+=4;
-		}
-
-		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
-			res++;
-			ptr+=4;
-		}
-
-	} else if (isVariable2Byte(encoding)) {
+	} else if (isUtf16(encoding)) {
 
 		size_t	offset=0;
 
-		// look for byte-order mark and update offset if necessary
-		// FIXME: assumes encoding supports a byte order mark
+		// skip any byte-order mark
 		// FIXME: handle nulls
 		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
 			ptr+=2;
@@ -493,7 +462,6 @@ size_t len(const char *str, const char *encoding) {
 
 		while (*ptr || *(ptr+1)) {
 			res++;
-			// FIXME: assumes UTF-16
 			if (*(ptr+offset)>=(char)0xD8 &&
 				*(ptr+offset)<=(char)0xDF) {
 				ptr+=4;
@@ -502,11 +470,18 @@ size_t len(const char *str, const char *encoding) {
 			}
 		}
 
-	} else if (isVariable1Byte(encoding)) {
+	} else if (isUtf8(encoding)) {
+
+		// skip any byte-order mark
+		// FIXME: handle nulls
+		if (*ptr==(char)0xEF &&
+			*(ptr+1)==(char)0xBB &&
+			*(ptr+2)==(char)0xBF) {
+			ptr+=3;
+		}
 
 		while (*ptr) {
 			res++;
-			// FIXME: assumes UTF-8
 			if (*ptr<192) {
 				ptr++;
 			} else if (*ptr<224) {
@@ -530,10 +505,9 @@ size_t size(const char *str, const char *encoding) {
 	const char	*ptr=str;
 	size_t		res=0;
 
-	if (isFixed2Byte(encoding)) {
+	if (isUcs2(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: assumes encoding supports a byte order mark
 		// FIXME: handle nulls
 		if (*ptr==(char)0xEF &&
 			*(ptr+1)==(char)0xBB &&
@@ -541,34 +515,13 @@ size_t size(const char *str, const char *encoding) {
 			ptr+=3;
 		}
 
-		while (*ptr || *(ptr+1)) {
-			res+=2;
-			ptr+=2;
-		}
+		res=ucs2charstring::getSize((ucs2_t *)ptr);
 
-	} else if (isFixed4Byte(encoding)) {
-
-		// skip any byte-order mark
-		// FIXME: assumes encoding supports a byte order mark
-		// FIXME: handle nulls
-		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
-			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
-			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
-			*(ptr+2)=='\0' && *(ptr+3)=='\0')) {
-			ptr+=4;
-		}
-
-		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
-			res+=4;
-			ptr+=4;
-		}
-
-	} else if (isVariable2Byte(encoding)) {
+	} else if (isUtf16(encoding)) {
 
 		size_t	offset=0;
 
-		// look for byte-order mark and update offset if necessary
-		// FIXME: assumes encoding supports a byte order mark
+		// skip any byte-order mark
 		// FIXME: handle nulls
 		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
 			res+=2;
@@ -580,7 +533,6 @@ size_t size(const char *str, const char *encoding) {
 		}
 
 		while (*ptr || *(ptr+1)) {
-			// FIXME: assumes UTF-16
 			if (*(ptr+offset)>=(char)0xD8 &&
 				*(ptr+offset)<=(char)0xDF) {
 				res+=4;
@@ -591,10 +543,17 @@ size_t size(const char *str, const char *encoding) {
 			}
 		}
 
-	} else if (isVariable1Byte(encoding)) {
+	} else if (isUtf8(encoding)) {
+
+		// skip any byte-order mark
+		// FIXME: handle nulls
+		if (*ptr==(char)0xEF &&
+			*(ptr+1)==(char)0xBB &&
+			*(ptr+2)==(char)0xBF) {
+			ptr+=3;
+		}
 
 		while (*ptr) {
-			// FIXME: assumes UTF-8
 			if (*ptr<192) {
 				res++;
 				ptr++;
@@ -617,24 +576,14 @@ size_t size(const char *str, const char *encoding) {
 }
 
 size_t nullSize(const char *encoding) {
-	if (isFixed2Byte(encoding) || isVariable2Byte(encoding)) {
+	if (isUcs2(encoding)) {
+		return ucs2character::getNullSize();
+	} else if (isUtf16(encoding)) {
 		return 2;
-	} else if (isFixed4Byte(encoding)) {
-		return 4;
-	} else {
+	} else if (isUtf8(encoding)) {
 		return 1;
-	}
-}
-
-size_t byteOrderMarkSize(const char *encoding) {
-	if (isVariable1Byte(encoding)) {
-		return 3;
-	} else if (isVariable2Byte(encoding)) {
-		return 2;
-	} else if (isFixed4Byte(encoding)) {
-		return 4;
 	} else {
-		return 0;
+		return character::getNullSize();
 	}
 }
 
@@ -652,19 +601,13 @@ char *convertCharset(const char *inbuf,
 	// get size of null terminator
 	size_t	nullsize=nullSize(outenc);
 
-	// get size of byte order mark
-	size_t	bosize=byteOrderMarkSize(outenc);
+	// max size of byte order mark
+	size_t	bosize=3;
 
 	// calculate size of output buffer (in bytes)
 	size_t	multiplier=4;
-	if (isFixed4Byte(inenc)) {
+	if (isUcs2(inenc) && isUcs2(outenc)) {
 		multiplier=1;
-	} else if (isFixed2Byte(inenc)) {
-		if (isFixed2Byte(inenc)) {
-			multiplier=1;
-		} else if (isFixed4Byte(inenc)) {
-			multiplier=2;
-		}
 	}
 	size_t	outsize=len(inbuf,inenc)*multiplier+bosize+nullsize;
 
@@ -705,7 +648,7 @@ char *convertCharset(const char *inbuf,
 	// SQL Server doesn't like UTF-16 values to have a byte-order mark
 	// (and it wants them to be big-endian)
 	// FIXME: make this configurable somehow...
-	if (isVariable2Byte(outenc) &&
+	if (isUtf16(outenc) &&
 		((outbuf[0]==(char)0xFF && outbuf[1]==(char)0xFE) ||
 		(outbuf[0]==(char)0xFE && outbuf[1]==(char)0xFF))) {
 		bytestring::copyWithOverlap(outbuf,outbuf+2,outptr-outbuf-2);
@@ -779,7 +722,11 @@ void odbcconnection::handleConnectString() {
 
 	unicode=!charstring::isNo(cont->getConnectStringValue("unicode"));
 	ncharencoding=cont->getConnectStringValue("ncharencoding");
-	if (charstring::isNullOrEmpty(ncharencoding)) {
+	if (charstring::isNullOrEmpty(ncharencoding) ||
+		(charstring::compare(ncharencoding,"UCS2",4) &&
+		charstring::compare(ncharencoding,"UCS-2",5) &&
+		charstring::compare(ncharencoding,"UTF16",5) &&
+		charstring::compare(ncharencoding,"UTF-16",6))) {
 		ncharencoding="UCS-2//TRANSLIT";
 	}
 
