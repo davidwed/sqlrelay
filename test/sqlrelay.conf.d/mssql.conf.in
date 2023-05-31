@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="mssqltest" port="9000" socket="/tmp/test.socket" dbase="odbc">
+	<instance id="mssqltest" port="9000" socket="/tmp/test.socket" dbase="odbc" translatebindvariables="yes">
 		<users>
 			<user user="test" password="test"/>
 		</users>

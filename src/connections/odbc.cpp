@@ -278,7 +278,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		stringbuffer	errormsg;
 
 		#ifdef HAVE_SQLCONNECTW
-		singlylinkedlist<char *>	ucsinbindstrings;
+		singlylinkedlist<byte_t *>	ucsinbindstrings;
 		#endif
 
 		bool		columninfoisvalidafterprepare;
@@ -430,9 +430,9 @@ size_t isUtf8(const char *encoding) {
 }
 
 // returns number of characters in the (null-terminated) string
-size_t len(const char *str, const char *encoding) {
+size_t len(const byte_t *str, const char *encoding) {
 
-	const char	*ptr=str;
+	const byte_t	*ptr=str;
 	size_t		res=0;
 
 	if (isUcs2(encoding)) {
@@ -494,15 +494,15 @@ size_t len(const char *str, const char *encoding) {
 		}
 		
 	} else {
-		res=charstring::getLength(str);
+		res=charstring::getLength((const char *)str);
 	}
 	return res;
 }
 
 // returns number of bytes in the (null-terminated) string
-size_t size(const char *str, const char *encoding) {
+size_t size(const byte_t *str, const char *encoding) {
 
-	const char	*ptr=str;
+	const byte_t	*ptr=str;
 	size_t		res=0;
 
 	if (isUcs2(encoding)) {
@@ -570,7 +570,7 @@ size_t size(const char *str, const char *encoding) {
 		}
 		
 	} else {
-		res=charstring::getLength(str);
+		res=charstring::getLength((const char *)str);
 	}
 	return res;
 }
@@ -587,7 +587,7 @@ size_t nullSize(const char *encoding) {
 	}
 }
 
-char *convertCharset(const char *inbuf,
+byte_t *convertCharset(const byte_t *inbuf,
 				size_t insize,
 				const char *inenc,
 				const char *outenc,
@@ -614,20 +614,14 @@ char *convertCharset(const char *inbuf,
 	// allocate the output buffer
 	byte_t	*outbuf=new byte_t[outsize];
 
-	// capture initial buffer positions and sizes
-	const byte_t	*inptr=(const byte_t *)inbuf;
-	byte_t		*outptr=outbuf;
-	size_t		insizebefore=insize;
-	size_t		outsizebefore=outsize;
-
 	// open converter
 	// FIXME: reuse this rather than re-creating it over and over
 	iconvert	ic;
 	ic.setFromEncoding(inenc);
-	ic.setFromBuffer(inptr);
+	ic.setFromBuffer(inbuf);
 	ic.setFromBufferSize(insize);
 	ic.setToEncoding(outenc);
-	ic.setToBuffer(outptr);
+	ic.setToBuffer(outbuf);
 	ic.setToBufferSize(outsize);
 
 	// convert
@@ -637,13 +631,16 @@ char *convertCharset(const char *inbuf,
 			charstring::printf(error,
 				"iconvert::convert(): %s "
 				"(in=%ld/%ld out=%ld/%ld)",
-				err,insizebefore,insize,outsizebefore,outsize);
+				err,
+				insize,ic.getFromBufferPosition()-inbuf,
+				outsize,ic.getToBufferPosition()-outbuf);
 			delete[] err;
 		}
 		// null-terminate the output
-		bytestring::zero(outptr,nullsize);
-		return (char *)outbuf;
+		bytestring::zero(outbuf,nullsize);
+		return outbuf;
 	}
+	byte_t	*outptr=(byte_t *)ic.getToBufferPosition();
 
 	// SQL Server doesn't like UTF-16 values to have a byte-order mark
 	// (and it wants them to be big-endian)
@@ -658,10 +655,10 @@ char *convertCharset(const char *inbuf,
 	// null-terminate the output
 	bytestring::zero(outptr,nullsize);
 
-	return (char *)outbuf;
+	return outbuf;
 }
 
-char *convertCharset(const char *inbuf,
+byte_t *convertCharset(const byte_t *inbuf,
 				const char *inenc,
 				const char *outenc,
 				char **error) {
@@ -868,18 +865,21 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 
 		#ifdef HAVE_SQLCONNECTW
 		if (unicode) {
-			char	*dsnucs=(dsnasc)?
-					convertCharset(dsnasc,
+			byte_t	*dsnucs=(dsnasc)?
+					convertCharset((const byte_t *)
+							dsnasc,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL):NULL;
-			char	*userucs=(userasc)?
-					convertCharset(userasc,
+			byte_t	*userucs=(userasc)?
+					convertCharset((const byte_t *)
+							userasc,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL):NULL;
-			char	*passworducs=(passwordasc)?
-					convertCharset(passwordasc,
+			byte_t	*passworducs=(passwordasc)?
+					convertCharset((const byte_t *)
+							passwordasc,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL):NULL;
@@ -2239,9 +2239,11 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		}
 
 		char	*err=NULL;
-		char	*queryucs=convertCharset(query,length,
-						"UTF-8","UCS-2//TRANSLIT",
-						&err);
+		byte_t	*queryucs=convertCharset((const byte_t *)query,
+							length,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							&err);
 		if (err) {
 			delete[] queryucs;
 			setConvCharError("prepare query",err);
@@ -2295,7 +2297,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 			ucsinbindstrings.clear();
 
-			char *queryucs=convertCharset(query,length,
+			byte_t *queryucs=convertCharset((const byte_t *)query,
+							length,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL);
@@ -2433,8 +2436,9 @@ bool odbccursor::inputBind(const char *variable,
 
 			const char	*encoding=odbcconn->ncharencoding;
 			char	*err=NULL;
-			char	*valueucs=convertCharset(
-						value,valuesize,
+			byte_t	*valueucs=convertCharset(
+						(const byte_t *)value,
+						valuesize,
 						"UTF-8",encoding,
 						&err);
 			if (err) {
@@ -2883,8 +2887,9 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 		const char	*encoding=odbcconn->ncharencoding;
 		char	*err=NULL;
-		char	*valueucs=convertCharset(
-					value,size(value,"UTF-8"),
+		byte_t	*valueucs=convertCharset(
+					(const byte_t *)value,
+					size((const byte_t *)value,"UTF-8"),
 					"UTF-8",encoding,
 					&err);
 		if (err) {
@@ -3132,7 +3137,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
 			char	*err=NULL;
-			char	*queryucs=convertCharset(query,length,
+			byte_t	*queryucs=convertCharset((const byte_t *)query,
+							length,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							&err);
@@ -3214,7 +3220,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			char		*value=outcharbind[i]->value;
 			uint32_t	valuesize=outcharbind[i]->valuesize;
 			char		*err=NULL;
-			char		*u=convertCharset(value,
+			byte_t		*u=convertCharset(
+						(const byte_t *)value,
 						odbcconn->ncharencoding,
 						"UTF-8",&err);
 			if (err) {
@@ -3277,7 +3284,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			char		*value=inoutcharbind[i]->value;
 			uint32_t	valuesize=inoutcharbind[i]->valuesize;
 			char		*err=NULL;
-			char		*u=convertCharset(value,
+			byte_t		*u=convertCharset(
+						(const byte_t *)value,
 						odbcconn->ncharencoding,
 						"UTF-8",&err);
 			if (err) {
@@ -3889,8 +3897,8 @@ bool odbccursor::fetchRow(bool *error) {
 					column[i].type==SQL_WCHAR) {
 				if (indicator[i]!=SQL_NULL_DATA && field[i]) {
 					char	*err=NULL;
-					char	*u=convertCharset(
-						field[i],
+					byte_t	*u=convertCharset(
+						(const byte_t *)field[i],
 						odbcconn->ncharencoding,
 						"UTF-8",&err);
 					if (err) {
