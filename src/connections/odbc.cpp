@@ -439,9 +439,7 @@ size_t len(const byte_t *str, const char *encoding) {
 
 		// skip any byte-order mark
 		// FIXME: handle nulls
-		if (*ptr==(char)0xEF &&
-			*(ptr+1)==(char)0xBB &&
-			*(ptr+2)==(char)0xBF) {
+		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
 			ptr+=3;
 		}
 
@@ -453,17 +451,16 @@ size_t len(const byte_t *str, const char *encoding) {
 
 		// skip any byte-order mark
 		// FIXME: handle nulls
-		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
+		if (*ptr==0xFE && *(ptr+1)==0xFF) {
 			ptr+=2;
-		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
+		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
 			offset=1;
 			ptr+=2;
 		}
 
 		while (*ptr || *(ptr+1)) {
 			res++;
-			if (*(ptr+offset)>=(char)0xD8 &&
-				*(ptr+offset)<=(char)0xDF) {
+			if (*(ptr+offset)>=0xD8 && *(ptr+offset)<=0xDF) {
 				ptr+=4;
 			} else {
 				ptr+=2;
@@ -474,9 +471,7 @@ size_t len(const byte_t *str, const char *encoding) {
 
 		// skip any byte-order mark
 		// FIXME: handle nulls
-		if (*ptr==(char)0xEF &&
-			*(ptr+1)==(char)0xBB &&
-			*(ptr+2)==(char)0xBF) {
+		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
 			ptr+=3;
 		}
 
@@ -509,9 +504,7 @@ size_t size(const byte_t *str, const char *encoding) {
 
 		// skip any byte-order mark
 		// FIXME: handle nulls
-		if (*ptr==(char)0xEF &&
-			*(ptr+1)==(char)0xBB &&
-			*(ptr+2)==(char)0xBF) {
+		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
 			ptr+=3;
 		}
 
@@ -523,18 +516,17 @@ size_t size(const byte_t *str, const char *encoding) {
 
 		// skip any byte-order mark
 		// FIXME: handle nulls
-		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
+		if (*ptr==0xFE && *(ptr+1)==0xFF) {
 			res+=2;
 			ptr+=2;
-		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
+		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
 			offset=1;
 			res+=2;
 			ptr+=2;
 		}
 
 		while (*ptr || *(ptr+1)) {
-			if (*(ptr+offset)>=(char)0xD8 &&
-				*(ptr+offset)<=(char)0xDF) {
+			if (*(ptr+offset)>=0xD8 && *(ptr+offset)<=0xDF) {
 				res+=4;
 				ptr+=4;
 			} else {
@@ -547,9 +539,7 @@ size_t size(const byte_t *str, const char *encoding) {
 
 		// skip any byte-order mark
 		// FIXME: handle nulls
-		if (*ptr==(char)0xEF &&
-			*(ptr+1)==(char)0xBB &&
-			*(ptr+2)==(char)0xBF) {
+		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
 			ptr+=3;
 		}
 
@@ -601,15 +591,13 @@ byte_t *convertCharset(const byte_t *inbuf,
 	// get size of null terminator
 	size_t	nullsize=nullSize(outenc);
 
-	// max size of byte order mark
-	size_t	bosize=3;
-
 	// calculate size of output buffer (in bytes)
+	// (3 is max size of byte order mark)
 	size_t	multiplier=4;
 	if (isUcs2(inenc) && isUcs2(outenc)) {
 		multiplier=1;
 	}
-	size_t	outsize=len(inbuf,inenc)*multiplier+bosize+nullsize;
+	size_t	outsize=len(inbuf,inenc)*multiplier+3+nullsize;
 
 	// allocate the output buffer
 	byte_t	*outbuf=new byte_t[outsize];
@@ -630,30 +618,30 @@ byte_t *convertCharset(const byte_t *inbuf,
 			char	*err=error::getErrorString();
 			charstring::printf(error,
 				"iconvert::convert(): %s "
-				"(in=%ld/%ld out=%ld/%ld)",
+				"(in=%s/%ld/%ld out=%s/%ld/%ld)",
 				err,
-				insize,ic.getFromBufferPosition()-inbuf,
-				outsize,ic.getToBufferPosition()-outbuf);
+				inenc,insize,ic.getFromBufferPosition()-inbuf,
+				outenc,outsize,ic.getToBufferPosition()-outbuf);
 			delete[] err;
 		}
 		// null-terminate the output
 		bytestring::zero(outbuf,nullsize);
 		return outbuf;
 	}
-	byte_t	*outptr=(byte_t *)ic.getToBufferPosition();
+	byte_t	*outbufend=(byte_t *)ic.getToBufferPosition();
 
 	// SQL Server doesn't like UTF-16 values to have a byte-order mark
 	// (and it wants them to be big-endian)
 	// FIXME: make this configurable somehow...
 	if (isUtf16(outenc) &&
-		((outbuf[0]==(char)0xFF && outbuf[1]==(char)0xFE) ||
-		(outbuf[0]==(char)0xFE && outbuf[1]==(char)0xFF))) {
-		bytestring::copyWithOverlap(outbuf,outbuf+2,outptr-outbuf-2);
-		outptr-=2;
+		((outbuf[0]==0xFF && outbuf[1]==0xFE) ||
+		(outbuf[0]==0xFE && outbuf[1]==0xFF))) {
+		bytestring::copyWithOverlap(outbuf,outbuf+2,outbufend-outbuf-2);
+		outbufend-=2;
 	}
 
 	// null-terminate the output
-	bytestring::zero(outptr,nullsize);
+	bytestring::zero(outbufend,nullsize);
 
 	return outbuf;
 }
@@ -3892,7 +3880,7 @@ bool odbccursor::fetchRow(bool *error) {
 	if (odbcconn->unicode) {
 		// convert wvarchar/wchar fields to user coding
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
-		for (int i=0; i<ncols; i++) {
+		for (SQLSMALLINT i=0; i<ncols; i++) {
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
 				if (indicator[i]!=SQL_NULL_DATA && field[i]) {
