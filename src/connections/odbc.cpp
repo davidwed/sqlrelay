@@ -432,11 +432,8 @@ size_t len(const byte_t *str, const char *encoding) {
 	if (isUcs2(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: handle nulls
-		if (*ptr==0xFE && *(ptr+1)==0xFF) {
-			ptr+=2;
-		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
-			ptr+=2;
+		if (ucs2charstring::isByteOrderMark((const ucs2_t *)str)) {
+			ptr+=ucs2character::getBomSize();
 		}
 
 		res=ucs2charstring::getLength((ucs2_t *)ptr);
@@ -498,13 +495,9 @@ size_t size(const byte_t *str, const char *encoding) {
 	if (isUcs2(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: handle nulls
-		if (*ptr==0xFE && *(ptr+1)==0xFF) {
-			res+=2;
-			ptr+=2;
-		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
-			res+=2;
-			ptr+=2;
+		if (ucs2charstring::isByteOrderMark((const ucs2_t *)str)) {
+			res+=ucs2character::getBomSize();
+			ptr+=ucs2character::getBomSize();
 		}
 
 		res+=ucs2charstring::getSize((ucs2_t *)ptr);
