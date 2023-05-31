@@ -408,12 +408,6 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 #ifdef HAVE_SQLCONNECTW
 #include <rudiments/iconvert.h>
 
-void printerror(const char *error) {
-	char	*err=error::getErrorString();
-	stderror.printf("%s: %d - %s\n",error,error::getErrorNumber(),err);
-	delete[] err;
-}
-
 size_t isUcs2(const char *encoding) {
 	return (charstring::contains(encoding,"UCS2") ||
 			charstring::contains(encoding,"UCS-2"));
@@ -439,18 +433,19 @@ size_t len(const byte_t *str, const char *encoding) {
 
 		// skip any byte-order mark
 		// FIXME: handle nulls
-		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
-			ptr+=3;
+		if (*ptr==0xFE && *(ptr+1)==0xFF) {
+			ptr+=2;
+		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
+			ptr+=2;
 		}
 
 		res=ucs2charstring::getLength((ucs2_t *)ptr);
 
 	} else if (isUtf16(encoding)) {
 
-		size_t	offset=0;
-
 		// skip any byte-order mark
 		// FIXME: handle nulls
+		size_t	offset=0;
 		if (*ptr==0xFE && *(ptr+1)==0xFF) {
 			ptr+=2;
 		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
@@ -504,11 +499,15 @@ size_t size(const byte_t *str, const char *encoding) {
 
 		// skip any byte-order mark
 		// FIXME: handle nulls
-		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
-			ptr+=3;
+		if (*ptr==0xFE && *(ptr+1)==0xFF) {
+			res+=2;
+			ptr+=2;
+		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
+			res+=2;
+			ptr+=2;
 		}
 
-		res=ucs2charstring::getSize((ucs2_t *)ptr);
+		res+=ucs2charstring::getSize((ucs2_t *)ptr);
 
 	} else if (isUtf16(encoding)) {
 
@@ -540,6 +539,7 @@ size_t size(const byte_t *str, const char *encoding) {
 		// skip any byte-order mark
 		// FIXME: handle nulls
 		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
+			res+=3;
 			ptr+=3;
 		}
 
