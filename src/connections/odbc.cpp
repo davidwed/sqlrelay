@@ -16,8 +16,12 @@
 // get around a problem with CHAR/xmlChar in gnome-xml
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
-#include <rudiments/ucs2charstring.h>
 #include <rudiments/ucs2character.h>
+#include <rudiments/ucs2charstring.h>
+#include <rudiments/utf8character.h>
+#include <rudiments/utf8charstring.h>
+#include <rudiments/utf16character.h>
+#include <rudiments/utf16charstring.h>
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
@@ -441,44 +445,24 @@ size_t len(const byte_t *str, const char *encoding) {
 	} else if (isUtf16(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: handle nulls
-		size_t	offset=0;
-		if (*ptr==0xFE && *(ptr+1)==0xFF) {
-			ptr+=2;
-		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
-			offset=1;
-			ptr+=2;
+		bool bigendian=false;
+		if (utf16charstring::isByteOrderMark(
+						(const utf16_t *)str)) {
+			bigendian=utf16charstring::isBigEndian(
+						(const utf16_t *)str);
+			ptr+=utf16character::getBomSize();
 		}
 
-		while (*ptr || *(ptr+1)) {
-			res++;
-			if (*(ptr+offset)>=0xD8 && *(ptr+offset)<=0xDF) {
-				ptr+=4;
-			} else {
-				ptr+=2;
-			}
-		}
+		res=utf16charstring::getLength((utf16_t *)ptr,bigendian);
 
 	} else if (isUtf8(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: handle nulls
-		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
-			ptr+=3;
+		if (utf8charstring::isByteOrderMark((const utf8_t *)str)) {
+			ptr+=utf8character::getBomSize();
 		}
 
-		while (*ptr) {
-			res++;
-			if (*ptr<192) {
-				ptr++;
-			} else if (*ptr<224) {
-				ptr+=2;
-			} else if (*ptr<240) {
-				ptr+=3;
-			} else {
-				ptr+=4;
-			}
-		}
+		res=utf8charstring::getLength((utf8_t *)ptr);
 		
 	} else {
 		res=charstring::getLength((const char *)str);
@@ -504,53 +488,27 @@ size_t size(const byte_t *str, const char *encoding) {
 
 	} else if (isUtf16(encoding)) {
 
-		size_t	offset=0;
-
 		// skip any byte-order mark
-		// FIXME: handle nulls
-		if (*ptr==0xFE && *(ptr+1)==0xFF) {
-			res+=2;
-			ptr+=2;
-		} else if (*ptr==0xFF && *(ptr+1)==0xFE) {
-			offset=1;
-			res+=2;
-			ptr+=2;
+		bool bigendian=false;
+		if (utf16charstring::isByteOrderMark(
+						(const utf16_t *)str)) {
+			bigendian=utf16charstring::isBigEndian(
+						(const utf16_t *)str);
+			res+=utf16character::getBomSize();
+			ptr+=utf16character::getBomSize();
 		}
 
-		while (*ptr || *(ptr+1)) {
-			if (*(ptr+offset)>=0xD8 && *(ptr+offset)<=0xDF) {
-				res+=4;
-				ptr+=4;
-			} else {
-				res+=2;
-				ptr+=2;
-			}
-		}
+		res+=utf16charstring::getSize((utf16_t *)ptr,bigendian);
 
 	} else if (isUtf8(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: handle nulls
-		if (*ptr==0xEF && *(ptr+1)==0xBB && *(ptr+2)==0xBF) {
-			res+=3;
-			ptr+=3;
+		if (utf8charstring::isByteOrderMark((const utf8_t *)str)) {
+			res+=utf8character::getBomSize();
+			ptr+=utf8character::getBomSize();
 		}
 
-		while (*ptr) {
-			if (*ptr<192) {
-				res++;
-				ptr++;
-			} else if (*ptr<224) {
-				res+=2;
-				ptr+=2;
-			} else if (*ptr<240) {
-				res+=3;
-				ptr+=3;
-			} else {
-				res+=4;
-				ptr+=4;
-			}
-		}
+		res+=utf8charstring::getSize((utf8_t *)ptr);
 		
 	} else {
 		res=charstring::getLength((const char *)str);
