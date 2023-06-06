@@ -416,9 +416,18 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 						return true;
 					}
 				} else {
-					ch=*string;
+					if (!*string) {
+						if (stringpos) {
+							*stringpos=string;
+						}
+						return true;
+					}
 					string++;
+					ch=*string;
 				}
+				// if we didn't get 2 single-quotes in a row
+				// while already inside of single-quotes, then
+				// we're no longer inside of single-quotes
 				if (ch!='\'') {
 					insinglequotes=false;
 				}
@@ -436,9 +445,18 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 						return true;
 					}
 				} else {
+					if (!*string) {
+						if (stringpos) {
+							*stringpos=string;
+						}
+						return true;
+					}
 					ch=*string;
 					string++;
 				}
+				// if we didn't get 2 double-quotes in a row
+				// while already inside of double-quotes, then
+				// we're no longer inside of double-quotes
 				if (ch!='"') {
 					indoublequotes=false;
 				}
