@@ -42,6 +42,7 @@
 
 		bool	beginFakeTransactionBlock();
 		void	endTransaction(bool commit);
+		void	clearColumnCaches();
 		bool	endFakeTransactionBlock();
 		bool	checkInterceptQuery(sqlrservercursor *cursor);
 		bool	interceptQuery(sqlrservercursor *cursor);
@@ -55,6 +56,7 @@
 		bool	isAutoCommitQuery(const char *query, bool on);
 		bool	isSetIncludingAutoCommitQuery(const char *query,
 								bool *on);
+		bool	isDropQuery(const char *query);
 
 		void	translateBindVariablesFromMappings(
 						sqlrservercursor *cursor);

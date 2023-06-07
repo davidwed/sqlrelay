@@ -2483,6 +2483,16 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	}
 
 	// clear column caches
+	clearColumnCaches();
+
+	// clear per-session pool
+	pvt->_txpool.clear();
+
+	// set in-tx flag
+	pvt->_intransaction=!pvt->_autocommitforthissession;
+}
+
+void sqlrservercontroller::clearColumnCaches() {
 	for (listnode<char *> *colcachenode=
 			pvt->_colcache.getKeys()->getFirst();
 			colcachenode; colcachenode=colcachenode->getNext()) {
@@ -2491,12 +2501,6 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	pvt->_colcache.clear();
 	pvt->_autoinccolcache.clear();
 	pvt->_primarykeycolcache.clear();
-
-	// clear per-session pool
-	pvt->_txpool.clear();
-
-	// set in-tx flag
-	pvt->_intransaction=!pvt->_autocommitforthissession;
 }
 
 bool sqlrservercontroller::rollback() {
@@ -3298,6 +3302,10 @@ bool sqlrservercontroller::isRollbackQuery(const char *query) {
 	return !charstring::compareIgnoringCase(query,"rollback",8);
 }
 
+bool sqlrservercontroller::isDropQuery(const char *query) {
+	return !charstring::compareIgnoringCase(query,"drop",4);
+}
+
 bool sqlrservercontroller::skipComment(const char **ptr,
 						const char *endptr) {
 	while (*ptr<endptr && !charstring::compare(*ptr,"--",2)) {
@@ -3626,7 +3634,7 @@ bool sqlrservercontroller::parseInsert(const char *query,
 		if (*ptr=='(') {
 			ptr++;
 			const char	*colsend=
-					charstring::findFirst(ptr,')')+2;
+					charstring::findFirst(ptr,')');
 			getColumnsFromInsertQuery(ptr,colsend,localcolumns);
 			ptr=colsend;
 		}
@@ -3684,8 +3692,8 @@ bool sqlrservercontroller::parseInsert(const char *query,
 
 			// determine if the list of columns contains the
 			// autoincrement or primary key columns
-			bool	localcolsincludeautoinccol=true;
-			bool	localcolsincludeprimarykeycol=true;
+			bool	localcolsincludeautoinccol=false;
+			bool	localcolsincludeprimarykeycol=false;
 			for (listnode<char *> *node=localcolumns->getFirst();
 						node; node=node->getNext()) {
 				const char	*col=node->getValue();
@@ -3763,7 +3771,6 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 					const char **autoinccolumn,
 					const char **primarykeycolumn) {
 
-#if 0
 	// attempt to get the columns from various caches
 	*columns=pvt->_colcache.getValue((char *)table);
 	*autoinccolumn=pvt->_autoinccolcache.getValue((char *)table);
@@ -3771,10 +3778,6 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 	if (*columns) {
 		return;
 	}
-#else
-	*autoinccolumn=NULL;
-	*primarykeycolumn=NULL;
-#endif
 
 	// failing that, look them up in the database (and cache them)...
 
@@ -3841,19 +3844,19 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 				// FIXME: kludgy
 				nextRow(gclcur);
 			}
+
+			setColumnListColumnMap(SQLRSERVERLISTFORMAT_NULL);
 		}
 	}
 	closeResultSet(gclcur);
 	close(gclcur);
 	deleteCursor(gclcur);
 
-#if 0
 	// cache table -> columns/autoinccolumns mappings
 	char	*tablecopy=charstring::duplicate(table);
 	pvt->_colcache.setValue(tablecopy,*columns);
 	pvt->_autoinccolcache.setValue(tablecopy,*autoinccolumn);
 	pvt->_primarykeycolcache.setValue(tablecopy,*primarykeycolumn);
-#endif
 }
 
 void sqlrservercontroller::getColumnsFromInsertQuery(
@@ -5501,6 +5504,15 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	incrementQueryCounts(cursor->queryType(query,querylen));
 	if (!success) {
 		incrementTotalErrors();
+	}
+
+	// If the query was successful, and the column cache isn't empty,
+	// and the query was a drop, then clear the column caches.  Do this
+	// before running after-triggers as they may use the column caches.
+	if (success && pvt->_colcache.getCount() &&
+			isDropQuery(skipWhitespaceAndComments(
+					cursor->getQueryBuffer()))) {
+		clearColumnCaches();
 	}
 
 	// handle after-triggers

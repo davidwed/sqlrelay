@@ -766,7 +766,7 @@ bool mysqlconnection::getLastInsertId(uint64_t *id) {
 }
 
 const char *mysqlconnection::noopQuery() {
-	return "begin; end;";
+	return "set @noop=null";
 }
 
 bool mysqlconnection::isTransactional() {

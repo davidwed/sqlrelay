@@ -340,13 +340,16 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	// log copied query and binds
 	log.append(qd);
 
-	/*if (debug) {
+#if 1
+	if (debug) {
 		stdoutput.printf("-----------------------\n");
 		for (listnode<querydetails *> *node=log.getFirst();
 						node; node=node->getNext()) {
 			stdoutput.printf("%s\n",node->getValue()->query);
 		}
-	}*/
+		stdoutput.printf("-----------------------\n");
+	}
+#endif
 
 	delete columns;
 	return true;

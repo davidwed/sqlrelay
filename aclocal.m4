@@ -10540,6 +10540,21 @@ AC_SUBST(IRIX)
 ])
 
 
+dnl checks for illumos platform
+dnl if it is, then _ILLUMOS=1 is defined
+AC_DEFUN([FW_CHECK_ILLUMOS],
+[
+AC_MSG_CHECKING(for illumos)
+if ( test -n "`uname -v 2> /dev/null | grep -v illumos`" )
+then
+	AC_DEFINE(_ILLUMOS,1,IllumOS)
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+])
+
+
 dnl check for x64 platform
 dnl if it is, then X64="x64" is set
 dnl if it is not, then X64="" is set
