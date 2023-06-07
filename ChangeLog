@@ -64,6 +64,7 @@
 	pwdenc_crypt -> pwdenc_des
 	in sqlrimportcsv, calling setIgnoreColumnsWithEmptyNames(true) and
 		mapColumnName("foo","") causes column "foo" to be ignored now
+	fixed some subtle bugs in the replay module
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
