@@ -17327,8 +17327,7 @@ WNOOVERLOADEDVIRTUAL=""
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-overloaded-virtual option" >&5
 $as_echo_n "checking for -Wno-overloaded-virtual option... " >&6; }
 
-# clang's -Wall includes -Woverloaded-virtual, which we don't want
-if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
+if ( test -n "`$CC --version 2> /dev/null | grep clang`" -o -n "`$CC --version 2> /dev/null | grep gcc`" )
 then
 	WNOOVERLOADEDVIRTUAL="-Wno-overloaded-virtual"
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
@@ -39836,7 +39835,7 @@ else
 	then
 		echo "cross compiling"
 	else
-		# Extract the first word of "apr-1-mt-config", so it can be a program name with args.
+																				# Extract the first word of "apr-1-mt-config", so it can be a program name with args.
 set dummy apr-1-mt-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
@@ -39849,7 +39848,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin"
+as_dummy="/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin"
 for as_dir in $as_dummy
 do
   IFS=$as_save_IFS
@@ -39893,7 +39892,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin"
+as_dummy="/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin"
 for as_dir in $as_dummy
 do
   IFS=$as_save_IFS
@@ -39937,7 +39936,7 @@ else
   ;;
   *)
   as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-as_dummy="/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin"
+as_dummy="/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin"
 for as_dir in $as_dummy
 do
   IFS=$as_save_IFS
