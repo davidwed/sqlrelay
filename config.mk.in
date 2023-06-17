@@ -253,7 +253,7 @@ PYTHONUSERPATH = @PYTHONUSERPATH@
 PYTHONLIB = @PYTHONLIB@
 PYTHON = @PYTHON@
 PYTHONCPPFLAGS = -DHAVE_CONFIG $(BASECPPFLAGS) $(PYTHONINCLUDES) -I$(top_builddir)/src/common -I$(top_builddir)/src/api/c++ $(RUDIMENTSINCLUDES)
-PYTHONLIBS = $(PYTHONLIB) -rpath $(PYTHONDIR)/$(PYTHONSITEDIR)/SQLRelay -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
+PYTHONLIBS = $(PYTHONLIB) -rpath $(PYTHONSITEDIR)/SQLRelay -L$(top_builddir)/src/api/c++ -l$(SQLR)client $(RUDIMENTSLIBS) $(LIBDMALLOC) $(LIBEFENCE)
 ifneq ($(strip $(libdir)),)
 ifeq ($(PYTHONUSERPATH),yes)
 PYTHONLIBS += @DISABLE_NEW_DTAGS@ -R $(libdir)

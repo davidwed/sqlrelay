@@ -2267,22 +2267,42 @@ then
 		then
 			HAVE_PYTHON="yes"
 
-			dnl dist-packages or site-packages?  Ubuntu/Debian
-			dnl use dist-packages.  Others use site-packages.
-			if ( test -d "$PYTHONDIR/dist-packages" )
+			dnl Ubuntu/Debian platforms (generally) have
+			dnl dist-packages in an a "major" python dir like:
+			dnl /usr/lib/python3/dist-packages
+			dnl rather than in the full python dir like:
+			dnl /usr/lib/python3.9/dist-packages
+			dnl which makes it possible for packages to work across
+			dnl minor versions.  Use that if we can.
+			PYTHONMAJDIR=`echo "$PYTHONDIR" | cut -d'.' -f1`
+
+			dnl Ubuntu/Debian use dist-packages.  Others use
+			dnl site-packages.  Prefer dist-packages
+			if ( test -d "$PYTHONMAJDIR/dist-packages" )
 			then
-				PYTHONSITEDIR="dist-packages"
+				PYTHONSITEDIR="$PYTHONMAJDIR/dist-packages"
+			elif ( test -d "$PYTHONMAJDIR/site-packages" )
+			then
+				PYTHONSITEDIR="$PYTHONMAJDIR/site-packages"
+			elif ( test -d "$PYTHONDIR/dist-packages" )
+			then
+				PYTHONSITEDIR="$PYTHONDIR/dist-packages"
 			elif ( test -d "$PYTHONDIR/site-packages" )
 			then
-				PYTHONSITEDIR="site-packages"
+				PYTHONSITEDIR="$PYTHONDIR/site-packages"
 			fi
+
+			dnl if we didn't find any dist-packages or
+			dnl site-packages directory, then force
+			dnl $PYTHONDIR/dist-packages on Ubuntu/Debian and
+			dnl $PYTHONDIR/site-packages on other platforms
 			if ( test -z "$PYTHONSITEDIR" )
 			then
 				if ( test -r "/etc/debian_version" )
 				then
-					PYTHONSITEDIR="dist-packages"
+					PYTHONSITEDIR="$PYTHONDIR/dist-packages"
 				else
-					PYTHONSITEDIR="site-packages"
+					PYTHONSITEDIR="$PYTHONDIR/site-packages"
 				fi
 			fi
 		fi

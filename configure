@@ -37578,20 +37578,29 @@ CPPFLAGS="$SAVECPPFLAGS"
 		then
 			HAVE_PYTHON="yes"
 
-									if ( test -d "$PYTHONDIR/dist-packages" )
+																								PYTHONMAJDIR=`echo "$PYTHONDIR" | cut -d'.' -f1`
+
+									if ( test -d "$PYTHONMAJDIR/dist-packages" )
 			then
-				PYTHONSITEDIR="dist-packages"
+				PYTHONSITEDIR="$PYTHONMAJDIR/dist-packages"
+			elif ( test -d "$PYTHONMAJDIR/site-packages" )
+			then
+				PYTHONSITEDIR="$PYTHONMAJDIR/site-packages"
+			elif ( test -d "$PYTHONDIR/dist-packages" )
+			then
+				PYTHONSITEDIR="$PYTHONDIR/dist-packages"
 			elif ( test -d "$PYTHONDIR/site-packages" )
 			then
-				PYTHONSITEDIR="site-packages"
+				PYTHONSITEDIR="$PYTHONDIR/site-packages"
 			fi
-			if ( test -z "$PYTHONSITEDIR" )
+
+															if ( test -z "$PYTHONSITEDIR" )
 			then
 				if ( test -r "/etc/debian_version" )
 				then
-					PYTHONSITEDIR="dist-packages"
+					PYTHONSITEDIR="$PYTHONDIR/dist-packages"
 				else
-					PYTHONSITEDIR="site-packages"
+					PYTHONSITEDIR="$PYTHONDIR/site-packages"
 				fi
 			fi
 		fi
