@@ -44,3 +44,5 @@ installlib:
 
 uninstall:
 	$(RMTREE) $(PYTHONSITEDIR)/SQLRelay
+	$(RMTREE) $(PYTHONDIR)/site-packages/SQLRelay
+	$(RMTREE) $(PYTHONDIR)/dist-packages/SQLRelay
