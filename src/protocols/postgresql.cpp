@@ -588,10 +588,9 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 		// protocol version
 		readBE(rp,&protocolversion,&rp);
 
-		// if the client requested SSL, then deny it
 		if (protocolversion==80877103) {
 
-			// FIXME: support SSL
+			// handle SSL request...
 
 			// close the connection if this is the second time
 			// we've gotten an ssl request in the same session
@@ -632,8 +631,12 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 				usingtls=true;
 			}
 
-		} else {
+		} else if (protocolversion==196608) {
 
+			// handle protocol 3.0 request
+
+			// bail if we're configured to require tls or mutual
+			// auth, but the client didn't request it
 			if (useTls() && !usingtls) {
 				sendErrorResponse(
 					"SSL Error","88P01",
@@ -643,15 +646,20 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 				return false;
 			}
 
-			if (protocolversion!=196608) {
-				// FIXME: NegotiateProtocolVersion
-				sendErrorResponse("FATAL",
-							"88P01",
-							"Invalid protocol");
-				return false;
-			}
-
 			break;
+
+		} else if (protocolversion==131072) {
+
+			// FIXME: support protocol 2.0
+			sendErrorResponse("FATAL","88P01",
+					"unsupported frontend protocol 2.0: "
+					"server supports 3.0 to 3.0");
+			return false;
+
+		} else {
+
+			sendErrorResponse("FATAL","88P01","Invalid protocol");
+			return false;
 		}
 
 		first=false;
