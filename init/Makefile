@@ -25,7 +25,7 @@ endif
 all:
 
 install:
-	if ( test -x "/usr/bin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" ); \
+	if ( test -x "/usr/bin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" -a -z "`grep ID_LIKE=debian /etc/os-release 2> /dev/null`" ); \
 	then \
 		if ( test -d "/usr/lib/systemd/system" ); \
 		then \
@@ -33,7 +33,7 @@ install:
 			$(CP) sqlrelay.service $(initroot)/usr/lib/systemd/system; \
 			$(CP) sqlrcachemanager.service $(initroot)/usr/lib/systemd/system; \
 		fi; \
-	elif ( test -x "/usr/sbin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" ); \
+	elif ( test -x "/usr/sbin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" -a -z "`grep ID_LIKE=debian /etc/os-release 2> /dev/null`" ); \
 	then \
 		if ( test -d "/usr/lib/systemd/system" ); \
 		then \
@@ -106,13 +106,13 @@ install:
 		$(CHMOD) 644 $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
 	fi
 ifeq ($(initroot),)
-	if ( test -x "/usr/bin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" ); \
+	if ( test -x "/usr/bin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" -a -z "`grep ID_LIKE=debian /etc/os-release 2> /dev/null`" ); \
 	then \
 		if ( test -d "/usr/lib/systemd/system" ); \
 		then \
 			/usr/bin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/bin/systemctl enable sqlrelay.service; \
 		fi; \
-	elif ( test -x "/usr/sbin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" ); \
+	elif ( test -x "/usr/sbin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" -a -z "`grep ID_LIKE=debian /etc/os-release 2> /dev/null`" ); \
 	then \
 		if ( test -d "/usr/lib/systemd/system" ); \
 		then \
