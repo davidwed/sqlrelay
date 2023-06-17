@@ -39567,12 +39567,17 @@ $as_echo "no" >&6; }
 	then
 		HAVE_NODEJS="yes"
 
-						{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node major version" >&5
+								{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node major version" >&5
 $as_echo_n "checking for node major version... " >&6; }
 		NODEMAJORVERSION=`$NODE --version 2> /dev/null | tr -d 'v' | cut -d'.' -f1`
 		if ( test "$NODEMAJORVERSION" -ge "6" )
 		then
-			NODEJSCXXFLAGS="-std=c++11"
+			if ( test "$NODEMAJORVERSION" -ge "16" )
+			then
+				NODEJSCXXFLAGS="-std=c++17"
+			else
+				NODEJSCXXFLAGS="-std=c++11"
+			fi
 		fi
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $NODEMAJORVERSION" >&5
 $as_echo "$NODEMAJORVERSION" >&6; }

@@ -3486,13 +3486,19 @@ then
 	then
 		HAVE_NODEJS="yes"
 
-		dnl node >= 6.x requires -std=c++11 and sometimes
-		dnl node-gyp doesn't enable it automatically
+		dnl node >= 6.x requires -std=c++11
+		dnl node >= 16.x requires -std=c++17
+		dnl sometimes node-gyp doesn't enable these automatically
 		AC_MSG_CHECKING(for node major version)
 		NODEMAJORVERSION=`$NODE --version 2> /dev/null | tr -d 'v' | cut -d'.' -f1`
 		if ( test "$NODEMAJORVERSION" -ge "6" )
 		then
-			NODEJSCXXFLAGS="-std=c++11"
+			if ( test "$NODEMAJORVERSION" -ge "16" )
+			then
+				NODEJSCXXFLAGS="-std=c++17"
+			else
+				NODEJSCXXFLAGS="-std=c++11"
+			fi
 		fi
 		AC_MSG_RESULT($NODEMAJORVERSION)
 		
