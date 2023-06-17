@@ -25,18 +25,37 @@ endif
 all:
 
 install:
-	if ( test -x "/bin/systemctl" -o -x "/usr/bin/systemctl" -o -x "/sbin/systemctl" -o -x "/usr/sbin/systemctl" ); \
+	if ( test -x "/usr/bin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" ); \
+	then \
+		if ( test -d "/usr/lib/systemd/system" ); \
+		then \
+			$(MKINSTALLDIRS) $(initroot)/usr/lib/systemd/system; \
+			$(CP) sqlrelay.service $(initroot)/usr/lib/systemd/system; \
+			$(CP) sqlrcachemanager.service $(initroot)/usr/lib/systemd/system; \
+		fi; \
+	elif ( test -x "/usr/sbin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" ); \
+	then \
+		if ( test -d "/usr/lib/systemd/system" ); \
+		then \
+			$(MKINSTALLDIRS) $(initroot)/usr/lib/systemd/system; \
+			$(CP) sqlrelay.service $(initroot)/usr/lib/systemd/system; \
+			$(CP) sqlrcachemanager.service $(initroot)/usr/lib/systemd/system; \
+		fi; \
+	elif ( test -x "/bin/systemctl" ); \
 	then \
 		if ( test -d "/lib/systemd/system" ); \
 		then \
 			$(MKINSTALLDIRS) $(initroot)/lib/systemd/system; \
 			$(CP) sqlrelay.service $(initroot)/lib/systemd/system; \
 			$(CP) sqlrcachemanager.service $(initroot)/lib/systemd/system; \
-		elif ( test -d "/usr/lib/systemd/system" ); \
+		fi; \
+	elif ( test -x "/sbin/systemctl" ); \
+	then \
+		if ( test -d "/lib/systemd/system" ); \
 		then \
-			$(MKINSTALLDIRS) $(initroot)/usr/lib/systemd/system; \
-			$(CP) sqlrelay.service $(initroot)/usr/lib/systemd/system; \
-			$(CP) sqlrcachemanager.service $(initroot)/usr/lib/systemd/system; \
+			$(MKINSTALLDIRS) $(initroot)/lib/systemd/system; \
+			$(CP) sqlrelay.service $(initroot)/lib/systemd/system; \
+			$(CP) sqlrcachemanager.service $(initroot)/lib/systemd/system; \
 		fi; \
 	elif ( test -d "/etc/init.d" ); \
 	then \
@@ -87,41 +106,29 @@ install:
 		$(CHMOD) 644 $(initroot)/Library/LaunchDaemons/com.firstworks.sqlrcachemanager.plist; \
 	fi
 ifeq ($(initroot),)
-	if ( test -x "/bin/systemctl" ); \
+	if ( test -x "/usr/bin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" ); \
+	then \
+		if ( test -d "/usr/lib/systemd/system" ); \
+		then \
+			/usr/bin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/bin/systemctl enable sqlrelay.service; \
+		fi; \
+	elif ( test -x "/usr/sbin/systemctl" -a -z "`grep ID=debian /etc/os-release 2> /dev/null`" ); \
+	then \
+		if ( test -d "/usr/lib/systemd/system" ); \
+		then \
+			/usr/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/sbin/systemctl enable sqlrelay.service; \
+		fi; \
+	elif ( test -x "/bin/systemctl" ); \
 	then \
 		if ( test -d "/lib/systemd/system" ); \
 		then \
 			/bin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service || /bin/systemctl enable sqlrelay.service; \
-		elif ( test -d "/usr/lib/systemd/system" ); \
-		then \
-			/bin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /bin/systemctl enable sqlrelay.service; \
-		fi; \
-	elif ( test -x "/usr/bin/systemctl" ); \
-	then \
-		if ( test -d "/lib/systemd/system" ); \
-		then \
-			/usr/bin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service || /usr/bin/systemctl enable sqlrelay.service; \
-		elif ( test -d "/usr/lib/systemd/system" ); \
-		then \
-			/usr/bin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/bin/systemctl enable sqlrelay.service; \
 		fi; \
 	elif ( test -x "/sbin/systemctl" ); \
 	then \
 		if ( test -d "/lib/systemd/system" ); \
 		then \
 			/sbin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service || /sbin/systemctl enable sqlrelay.service; \
-		elif ( test -d "/usr/lib/systemd/system" ); \
-		then \
-			/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /sbin/systemctl enable sqlrelay.service; \
-		fi; \
-	elif ( test -x "/usr/sbin/systemctl" ); \
-	then \
-		if ( test -d "/lib/systemd/system" ); \
-		then \
-			/usr/sbin/systemctl enable $(initroot)/lib/systemd/system/sqlrelay.service || /usr/sbin/systemctl enable sqlrelay.service; \
-		elif ( test -d "/usr/lib/systemd/system" ); \
-		then \
-			/usr/sbin/systemctl enable $(initroot)/usr/lib/systemd/system/sqlrelay.service || /usr/sbin/systemctl enable sqlrelay.service; \
 		fi; \
 	elif ( test -x "/sbin/chkconfig" -a "$(UNAME)" != "IRIX" ); \
 	then \
@@ -183,22 +190,22 @@ ifeq ($(initroot),)
 endif
 
 uninstall:
-	if ( test -x "/bin/systemctl" ); \
-	then \
-		/bin/systemctl disable sqlrelay.service; \
-		/bin/systemctl disable sqlrcachemanager.service; \
-	elif ( test -x "/usr/bin/systemctl" ); \
+	if ( test -x "/usr/bin/systemctl" ); \
 	then \
 		/usr/bin/systemctl disable sqlrelay.service; \
 		/usr/bin/systemctl disable sqlrcachemanager.service; \
-	elif ( test -x "/sbin/systemctl" ); \
-	then \
-		/sbin/systemctl disable sqlrelay.service; \
-		/sbin/systemctl disable sqlrcachemanager.service; \
 	elif ( test -x "/usr/sbin/systemctl" ); \
 	then \
 		/usr/sbin/systemctl disable sqlrelay.service; \
 		/usr/sbin/systemctl disable sqlrcachemanager.service; \
+	elif ( test -x "/bin/systemctl" ); \
+	then \
+		/bin/systemctl disable sqlrelay.service; \
+		/bin/systemctl disable sqlrcachemanager.service; \
+	elif ( test -x "/sbin/systemctl" ); \
+	then \
+		/sbin/systemctl disable sqlrelay.service; \
+		/sbin/systemctl disable sqlrcachemanager.service; \
 	elif ( test -x "/sbin/chkconfig" -a "$(UNAME)" != "IRIX" ); \
 	then \
 		if ( test -n "`/sbin/chkconfig --list sqlrelay 2> /dev/null`"); \
@@ -211,10 +218,10 @@ uninstall:
 		fi; \
 	fi
 	$(RM) \
-		$(initroot)/lib/systemd/system/sqlrelay.service \
-		$(initroot)/lib/systemd/system/sqlrcachemanager.service \
 		$(initroot)/usr/lib/systemd/system/sqlrelay.service \
 		$(initroot)/usr/lib/systemd/system/sqlrcachemanager.service \
+		$(initroot)/lib/systemd/system/sqlrelay.service \
+		$(initroot)/lib/systemd/system/sqlrcachemanager.service \
 		$(initroot)/etc/rc.d/init.d/sqlrelay \
 		$(initroot)/etc/rc.d/init.d/sqlrcachemanager \
 		$(initroot)/etc/rc.d/rc.sqlrelay \

@@ -400,7 +400,7 @@ make install DESTDIR=%{buildroot}
 
 # move systemd files to (_unitdir)
 mkdir -p %{buildroot}%{_unitdir}
-mv %{buildroot}/lib/systemd/system/* %{buildroot}%{_unitdir}
+mv %{buildroot}/usr/lib/systemd/system/* %{buildroot}%{_unitdir}
 
 # create tmpfiles.d directories and config file
 mkdir -p %{buildroot}/run/%{name}
