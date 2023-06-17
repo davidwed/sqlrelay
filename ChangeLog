@@ -65,6 +65,8 @@
 	in sqlrimportcsv, calling setIgnoreColumnsWithEmptyNames(true) and
 		mapColumnName("foo","") causes column "foo" to be ignored now
 	fixed some subtle bugs in the replay module
+	fixed issue causing sqlr-connection not to shut down promptly when
+		waiting for a suspended client to reconnect
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient

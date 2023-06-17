@@ -501,7 +501,7 @@
 	$port=$dbh->getConnectionPort();
 	$socket=$dbh->getConnectionSocket();
 	$dbh=new PDO($dsn,$user,$password);
-	$stmt=$dbh->prepare(null);
+	$stmt=$dbh->prepare("placeholder");
 	checkSuccess($dbh->resumeSession($port,$socket),1);
 	$stmt->resumeResultSet($id);
 	$result=$stmt->fetch(PDO::FETCH_NUM);

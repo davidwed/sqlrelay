@@ -145,7 +145,7 @@ class sqlrservercontrollerprivate {
 
 	uint16_t	_sendcolumninfo;
 
-	int32_t		_accepttimeout;
+	uint32_t	_accepttimeout;
 
 	bool		_suspendedsession;
 
@@ -1942,11 +1942,46 @@ int32_t sqlrservercontroller::waitForClient() {
 
 		// If we're in the middle of a suspended session, wait for
 		// a client to reconnect...
+		uint32_t	totalseconds=0;
+		int32_t		sec=(pvt->_accepttimeout)?1:0;
+		for (;;) {
 
-		if (pvt->_lsnr.listen(pvt->_accepttimeout,0)<1) {
-			raiseInternalErrorEvent(NULL,
+			// If accepttimeout is anthing but 0, then wait 1
+			// second for the client to connect.  If accepttimeout
+			// is 0 then fall through immediately unless the client
+			// is already connected.
+			int32_t	result=pvt->_lsnr.listen(sec,0);
+
+			// bail on error
+			if (result==RESULT_ERROR) {
+				raiseInternalErrorEvent(NULL,
 					"wait for client connect failed");
-			return 0;
+				return 0;
+			}
+
+			// if we didn't get a timeout, then break out of this
+			// loop and handle the client connection
+			if (result!=RESULT_TIMEOUT) {
+				break;
+			}
+
+			// bail if the shutdown flag got set
+			if (process::getShutDownFlag()) {
+				return 0;
+			}
+
+			// increment the number of seconds we've been waiting
+			// (if accepttimeout is 0 then technically we've waited
+			// 0 seconds, but close enough)
+			totalseconds++;
+
+			// bail if we've been waiting more seconds than the
+			// accepttimeout or if we made it here and the accept
+			if (totalseconds>=pvt->_accepttimeout) {
+				raiseInternalErrorEvent(NULL,
+					"wait for client connect failed");
+				return 0;
+			}
 		}
 
 		// get the first socket that had data available...
