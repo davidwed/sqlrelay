@@ -95,23 +95,20 @@ void checkSuccess(double value, double success) {
 
 int	main(int argc, char **argv) {
 
-	// The extensionstest instance uses connections="0", so the
-	// sqlr-connection process exits after each client session.  When the
-	// client sends its final endSession(), and the server can receive it,
-	// process it, and exit, before the client's final write() system call
-	// returns, causing the client to receive a SIGPIPE.  It all depends on
-	// timing though, and doesn't happen every time.  We'll ignore SIGPIPE
-	// here to manage this.
-	#ifdef SIGPIPE
-	signalset	set;
-	set.removeAllSignals();
-	set.addSignal(SIGPIPE);
-	signalmanager::ignoreSignals(&set);
-	#endif
-
 	stdoutput.printf("UPSERT:\n");
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
 							"test","test",0,1);
+
+        // get the db version and bail for < 5, as the query to get the column
+        // info doesn't work for < 5, making upserts also not work
+        const char      *dbversion=con->dbVersion();
+        uint32_t        majorversion=dbversion[0]-'0';
+	if (majorversion<5) {
+		stdoutput.printf("MySQL version < 5, skipping tests\n\n");
+		delete con;
+		return 0;
+	}
+
 	cur=new sqlrcursor(con);
 	secondcur=new sqlrcursor(con);
 	cur->sendQuery("drop table student");

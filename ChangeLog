@@ -69,6 +69,7 @@
 		waiting for a suspended client to reconnect
 	configure looks for python-major-dir in addition to python-dir when
 		looking for dist/site-packages now
+	added upsert trigger
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
