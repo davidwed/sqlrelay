@@ -593,13 +593,15 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 				".",true,&list,&listlen);
 
 	if (listlen==3) {
-		uint64_t	major=charstring::convertToUnsignedInteger(list[0]);
-		uint64_t	minor=charstring::convertToUnsignedInteger(list[1]);
-		uint64_t	patch=charstring::convertToUnsignedInteger(list[2]);
-		if (major>4 || (major==4 && minor>1) ||
-				(major==4 && minor==1 && patch>=2)) {
+		uint64_t	major=
+				charstring::convertToUnsignedInteger(list[0]);
+		uint64_t	minor=
+				charstring::convertToUnsignedInteger(list[1]);
+		uint64_t	patch=
+				charstring::convertToUnsignedInteger(list[2]);
+		if (major<4 || (major==4 && minor<1) ||
+				(major==4 && minor==1 && patch<2)) {
 			cont->setFakeInputBinds(true);
-		}  else {
 			escapeblobs=true;
 		}
 		for (uint64_t index=0; index<listlen; index++) {
