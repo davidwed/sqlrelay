@@ -1124,10 +1124,10 @@ for (uint16_t a=0; a<50; a++) {
 		// return no values
 		cur->sendQuery("drop procedure if exists testproc");
 		checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 float, in in3 char(20)) begin select in1, in2, in3; end;"),1);
-		cur->prepareQuery("call testproc(:in1,:in2,:in3)");
-		cur->inputBind("in1",1);
-		cur->inputBind("in2",1.1,4,2);
-		cur->inputBind("in3","hello");
+		cur->prepareQuery("call testproc(?,?,?)");
+		cur->inputBind("1",1);
+		cur->inputBind("2",1.1,4,2);
+		cur->inputBind("3","hello");
 		checkSuccess(cur->executeQuery(),1);
 		checkSuccess(cur->getField(0,(uint32_t)0),"1");
 		checkSuccess(cur->getField(0,(uint32_t)1),"1.1");
