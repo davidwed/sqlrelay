@@ -208,7 +208,7 @@
 #define HAVE_RUBY_THREAD_H 1
 
 /* Some systems have SQLConnectW */
-/* #define HAVE_SQLCONNECTW 1 */
+#define HAVE_SQLCONNECTW 1
 
 /* Some systems have SQLLEN/SQLULEN parameters for SQLExtendedFetch */
 #define HAVE_SQLEXTENDEDFETCH_LEN 1
