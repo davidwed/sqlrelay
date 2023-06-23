@@ -159,6 +159,10 @@ const char *sqlrcon_bindFormat(sqlrcon sqlrconref) {
 	return sqlrconref->bindFormat();
 }
 
+const char *sqlrcon_nextvalFormat(sqlrcon sqlrconref) {
+	return sqlrconref->nextvalFormat();
+}
+
 int sqlrcon_selectDatabase(sqlrcon sqlrconref, const char *database) {
 	return sqlrconref->selectDatabase(database);
 }

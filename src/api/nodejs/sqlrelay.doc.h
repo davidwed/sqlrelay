@@ -237,6 +237,10 @@ class SQLRConnection {
 		 *  of the bind variables used in the db. */
 		function bindFormat();
 
+		/** Returns a string representing the format of the
+		 *  sequence nextval command used in the db. */
+		function nextvalFormat();
+
 
 
 		/** Sets the current database/schema to "database" */

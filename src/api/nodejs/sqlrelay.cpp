@@ -172,6 +172,7 @@ class SQLRConnection : public ObjectWrap {
 		static RET	serverVersion(const ARGS &args);
 		static RET	clientVersion(const ARGS &args);
 		static RET	bindFormat(const ARGS &args);
+		static RET	nextvalFormat(const ARGS &args);
 		static RET	selectDatabase(const ARGS &args);
 		static RET	getCurrentDatabase(const ARGS &args);
 		static RET	getLastInsertId(const ARGS &args);
@@ -343,6 +344,7 @@ void SQLRConnection::Init(Handle<Object> exports) {
 	NODE_SET_PROTOTYPE_METHOD(tpl,"serverVersion",serverVersion);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"clientVersion",clientVersion);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"bindFormat",bindFormat);
+	NODE_SET_PROTOTYPE_METHOD(tpl,"nextvalFormat",nextvalFormat);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"selectDatabase",selectDatabase);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getCurrentDatabase",getCurrentDatabase);
 	NODE_SET_PROTOTYPE_METHOD(tpl,"getLastInsertId",getLastInsertId);
@@ -667,6 +669,17 @@ RET SQLRConnection::bindFormat(const ARGS &args) {
 	checkArgCount(args,0);
 
 	const char	*result=sqlrcon(args)->bindFormat();
+
+	returnString(result);
+}
+
+RET SQLRConnection::nextvalFormat(const ARGS &args) {
+
+	initLocalScope();
+
+	checkArgCount(args,0);
+
+	const char	*result=sqlrcon(args)->nextvalFormat();
 
 	returnString(result);
 }

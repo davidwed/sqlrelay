@@ -8,7 +8,7 @@
 -export([start/0, start/1, stop/0]).
 
 -export([alloc/7, connectionFree/0, cursorFree/0, setBindVariableDelimiters/1, getBindVariableDelimiterQuestionMarkSupported/0, getBindVariableDelimiterColonSupported/0, getBindVariableDelimiterAtSignSupported/0, getBindVariableDelimiterDollarSignSupported/0, enableKerberos/3, enableTls/7, disableEncryption/0, endSession/0, suspendSession/0, resumeSession/2]).
--export([ping/0, identify/0, dbVersion/0, dbHostName/0, dbIpAddress/0, bindFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
+-export([ping/0, identify/0, dbVersion/0, dbHostName/0, dbIpAddress/0, bindFormat/0, nextvalFormat/0, connectionErrorMessage/0, connectionErrorNumber/0, errorMessage/0, errorNumber/0]).
 -export([selectDatabase/1, getCurrentDatabase/0]).
 -export([getConnectionPort/0, getConnectionSocket/0]).
 -export([autoCommitOn/0, autoCommitOff/0, beginTransaction/0, commit/0, rollback/0]).
@@ -159,6 +159,9 @@ dbIpAddress() -> call_port({dbIpAddress}).
 
 %% @doc Returns a string representing the format of the bind variables used in the db.
 bindFormat() -> call_port({bindFormat}).
+
+%% @doc Returns a string representing the format of the sequence nextval command used in the db.
+nextvalFormat() -> call_port({nextvalFormat}).
 
 %% @doc Sets the current database/schema to "database".
 selectDatabase(Database) when is_list(Database) -> call_port({selectDatabase, Database}).

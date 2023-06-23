@@ -3765,6 +3765,32 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_bindformat) {
 	RETURN_FALSE;
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcon_nextvalformat) {
+	ZVAL sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		GET_PARAMETERS(
+				ZEND_NUM_ARGS() TSRMLS_CC,
+				PARAMS("z")
+				&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,
+				sqlrconnection *,
+				sqlrcon,
+				-1,
+				"sqlrelay connection",
+				sqlrelay_connection);
+	if (connection) {
+		r=connection->nextvalFormat();
+		if (r) {
+			RET_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcon_dbversion) {
 	ZVAL sqlrcon;
 	const char *r;
@@ -4261,6 +4287,9 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_bindformat,0,0,0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_nextvalformat,0,0,0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_dbversion,0,0,0)
 ZEND_END_ARG_INFO()
 
@@ -4520,6 +4549,8 @@ zend_function_entry sql_relay_functions[] = {
 		ARGINFO(arginfo_sqlrcon_rollback))
 	ZEND_FE(sqlrcon_bindformat,
 		ARGINFO(arginfo_sqlrcon_bindformat))
+	ZEND_FE(sqlrcon_nextvalformat,
+		ARGINFO(arginfo_sqlrcon_nextvalformat))
 	ZEND_FE(sqlrcon_dbversion,
 		ARGINFO(arginfo_sqlrcon_dbversion))
 	ZEND_FE(sqlrcon_dbhostname,

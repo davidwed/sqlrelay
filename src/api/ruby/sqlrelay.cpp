@@ -708,6 +708,23 @@ static VALUE sqlrcon_bindFormat(VALUE self) {
 	}
 }
 
+static void nextvalFormat(params *p) {
+	p->result.ccpr=p->sqlrc.sqlrcon->nextvalFormat();
+}
+/** Returns a string representing the format of the
+ *  sequence nextval command used in the db. */
+static VALUE sqlrcon_nextvalFormat(VALUE self) {
+	sqlrconnection	*sqlrcon;
+	const char	*result;
+	Data_Get_Struct(self,sqlrconnection,sqlrcon);
+	RCON(result,ccpr,sqlrcon,nextvalFormat);
+	if (result) {
+		return rb_str_new2(result);
+	} else {
+		return Qnil;
+	}
+}
+
 static void selectDatabase(params *p) {
 	p->result.br=p->sqlrc.sqlrcon->selectDatabase(STR2CSTR(p->one));
 }

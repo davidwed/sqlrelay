@@ -235,6 +235,10 @@ proc clientVersion {}
 # of the bind variables used in the db.
 proc bindFormat {} 
 
+# Returns a string representing the format of the
+# sequence nextval command used in the db.
+proc nextvalFormat {} 
+
 
 
 # Sets the current database/schema to "database"

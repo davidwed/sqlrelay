@@ -216,6 +216,9 @@ const char *
 sqlrconnection::bindFormat()
 
 const char *
+sqlrconnection::nextvalFormat()
+
+const char *
 sqlrconnection::errorMessage()
 
 int64_t

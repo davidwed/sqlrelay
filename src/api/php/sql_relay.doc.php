@@ -234,6 +234,11 @@ function sqlrcon_clientVersion($sqlrconref){}
  *  of the bind variables used in the db. */
 function sqlrcon_bindFormat($sqlrconref){}
 
+/**
+ *  Returns a string representing the format of the
+ *  sequence nextval command used in the db. */
+function sqlrcon_nextvalFormat($sqlrconref){}
+
 
 
 /** 

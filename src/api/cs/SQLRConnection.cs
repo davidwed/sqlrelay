@@ -317,6 +317,13 @@ public class SQLRConnection : IDisposable
     {
         return sqlrcon_bindFormat(sqlrconref);
     }
+
+    /** Returns a string representing the format of the
+     *  sequence nextval command used in the db. */
+    public String nextvalFormat()
+    {
+        return sqlrcon_nextvalFormat(sqlrconref);
+    }
     
     
     
@@ -532,6 +539,9 @@ public class SQLRConnection : IDisposable
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern String sqlrcon_bindFormat(IntPtr sqlrconref);
+    
+    [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
+    private static extern String sqlrcon_nextvalFormat(IntPtr sqlrconref);
     
     [DllImport("libsqlrclientwrapper.dll", CallingConvention = CallingConvention.Cdecl)]
     private static extern Int32 sqlrcon_selectDatabase(IntPtr sqlrconref, String database);

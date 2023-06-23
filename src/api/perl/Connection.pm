@@ -257,6 +257,10 @@ __END__
             # Returns a string representing the format
             # of the bind variables used in the db.
 
+        nextvalFormat();
+            # Returns a string representing the format of the
+            # sequence nextval command used in the db.
+
 
         selectDatabase(database);
             # Sets the current database/schema to "database"

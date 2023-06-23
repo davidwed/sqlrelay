@@ -244,6 +244,9 @@ public class SQLRConnection {
 	/** Returns a string representing the format
 	 *  of the bind variables used in the db. */
 	public native String	bindFormat();
+	/** Returns a string representing the format of the
+	 *  sequence nextval command used in the db. */
+	public native String	nextvalFormat();
 
 
 	/** Sets the current database/schema to "database" */

@@ -1842,6 +1842,7 @@ void sqlrconDelete(ClientData data) {
  *  $con serverVersion
  *  $con clientVersion
  *  $con bindFormat
+ *  $con nextvalFormat
  *  $con selectDatabase db
  *  $con getCurrentDatabase
  *  $con getLastInsertId
@@ -1886,6 +1887,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     "serverVersion",
     "clientVersion",
     "bindFormat",
+    "nextvalFormat",
     "selectDatabase",
     "getCurrentDatabase",
     "getLastInsertId",
@@ -1926,6 +1928,7 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     SQLR_SERVERVERSION,
     SQLR_CLIENTVERSION,
     SQLR_BINDFORMAT,
+    SQLR_NEXTVALFORMAT,
     SQLR_SELECTDATABASE,
     SQLR_GETCURRENTDATABASE,
     SQLR_GETLASTINSERTID,
@@ -2211,6 +2214,15 @@ int sqlrconObjCmd(ClientData data, Tcl_Interp *interp,
     }
     Tcl_SetObjResult(interp,
 		     _Tcl_NewStringObj(con->bindFormat(), -1));
+    break;
+  }
+  case SQLR_NEXTVALFORMAT: {
+    if (objc > 2) {
+      Tcl_WrongNumArgs(interp, 2, objv, NULL);
+      return TCL_ERROR;
+    }
+    Tcl_SetObjResult(interp,
+		     _Tcl_NewStringObj(con->nextvalFormat(), -1));
     break;
   }
   case SQLR_SELECTDATABASE: {
