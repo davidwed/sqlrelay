@@ -42,6 +42,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild,
 						uint16_t objecttypes);
+		sqlrserverlistformat_t	*getColumnListFormat();
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		bool		selectDatabase(const char *database);
@@ -579,6 +580,10 @@ const char *postgresqlconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
 	return sqlrserverconnection::getTableListQuery(wild,objecttypes,
 					" and table_schema = 'public' ");
+}
+
+sqlrserverlistformat_t postgresqlconnection::getColumnListFormat() {
+	return SQLRSERVERLISTFORMAT_POSTGRESQL;
 }
 
 const char *postgresqlconnection::getColumnListQuery(

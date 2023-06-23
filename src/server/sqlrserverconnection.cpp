@@ -720,6 +720,57 @@ bool sqlrserverconnection::getListsByApiCalls() {
 	return false;
 }
 
+sqlrserverlistformat_t sqlrserverconnection::getDatabaseListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::getSchemaListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::getTableListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::getTableTypeListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::getColumnListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::getPrimaryKeyListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::getKeyAndIndexListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::
+				getProcedureBindAndColumnListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::getTypeInfoListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
+sqlrserverlistformat_t sqlrserverconnection::getProcedureListFormat() {
+	return (getListsByApiCalls())?
+		SQLRSERVERLISTFORMAT_ODBC:SQLRSERVERLISTFORMAT_MYSQL;
+}
+
 bool sqlrserverconnection::getDatabaseList(sqlrservercursor *cursor,
 						const char *wild) {
 	cont->setError(cursor,SQLR_ERROR_NOTIMPLEMENTED_STRING,

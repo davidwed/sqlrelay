@@ -73,6 +73,7 @@ enum sqlrserverbindvartype_t {
 enum sqlrserverlistformat_t {
 	SQLRSERVERLISTFORMAT_NULL=0,
 	SQLRSERVERLISTFORMAT_MYSQL,
+	SQLRSERVERLISTFORMAT_POSTGRESQL,
 	SQLRSERVERLISTFORMAT_ODBC,
 	SQLRSERVERLISTFORMAT_JDBC
 };
@@ -917,6 +918,26 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual bool		cacheDbHostInfo();
 
 		virtual bool		getListsByApiCalls();
+		virtual	sqlrserverlistformat_t
+					getDatabaseListFormat();
+		virtual	sqlrserverlistformat_t
+					getSchemaListFormat();
+		virtual	sqlrserverlistformat_t
+					getTableListFormat();
+		virtual	sqlrserverlistformat_t
+					getTableTypeListFormat();
+		virtual	sqlrserverlistformat_t
+					getColumnListFormat();
+		virtual	sqlrserverlistformat_t
+					getPrimaryKeyListFormat();
+		virtual	sqlrserverlistformat_t
+					getKeyAndIndexListFormat();
+		virtual	sqlrserverlistformat_t
+					getProcedureBindAndColumnListFormat();
+		virtual	sqlrserverlistformat_t
+					getTypeInfoListFormat();
+		virtual	sqlrserverlistformat_t
+					getProcedureListFormat();
 		virtual bool		getDatabaseList(
 						sqlrservercursor *cursor,
 						const char *wild);
