@@ -587,7 +587,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		return false;
 	}
 
-	buildColumnMaps();
 	setUserAndGroup();
 
 	// update various configurable parameters
@@ -618,6 +617,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (!pvt->_conn) {
 		return false;
 	}
+
+	buildColumnMaps();
 
 	// get loggers
 	domnode	*loggers=pvt->_cfg->getLoggers();
