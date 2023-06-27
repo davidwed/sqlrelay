@@ -1353,7 +1353,6 @@ static PyObject *getField(PyObject *self, PyObject *args) {
       return Py_None;
     }
   }
-stdoutput.printf("type=%s\n",type);
   return buildConstPyStringT(rc, rl, type);
 }
 

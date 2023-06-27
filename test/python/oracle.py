@@ -17,6 +17,14 @@ def checkSuccess(value,success):
 		print("failure")
 		sys.exit(1)
 
+if sys.version < '3':
+    def btos(x):
+        return x
+else:
+    import codecs
+    def btos(x):
+        return codecs.latin_1_encode(x)[0]
+
 def main():
 
 	PySQLRClient.getNumericFieldsAsNumbers()
@@ -273,7 +281,7 @@ def main():
 	checkSuccess(cur.getField(0,3),"01-JAN-01")
 	checkSuccess(cur.getField(0,4),"testlong1")
 	checkSuccess(cur.getField(0,5),"testclob1")
-	checkSuccess(cur.getField(0,6),"")
+	checkSuccess(cur.getField(0,6),btos(""))
 	print()
 	checkSuccess(cur.getField(7,0),8)
 	checkSuccess(cur.getField(7,1),"testchar8                               ")
@@ -281,7 +289,7 @@ def main():
 	checkSuccess(cur.getField(7,3),"01-JAN-08")
 	checkSuccess(cur.getField(7,4),"testlong8")
 	checkSuccess(cur.getField(7,5),"testclob8")
-	checkSuccess(cur.getField(7,6),"testblob8")
+	checkSuccess(cur.getField(7,6),btos("testblob8"))
 	print()
 
 	print("FIELD LENGTHS BY INDEX: ")
@@ -309,7 +317,7 @@ def main():
 	checkSuccess(cur.getField(0,"TESTDATE"),"01-JAN-01")
 	checkSuccess(cur.getField(0,"TESTLONG"),"testlong1")
 	checkSuccess(cur.getField(0,"TESTCLOB"),"testclob1")
-	checkSuccess(cur.getField(0,"TESTBLOB"),"")
+	checkSuccess(cur.getField(0,"TESTBLOB"),btos(""))
 	print()
 	checkSuccess(cur.getField(7,"TESTNUMBER"),8)
 	checkSuccess(cur.getField(7,"TESTCHAR"),"testchar8                               ")
@@ -317,7 +325,7 @@ def main():
 	checkSuccess(cur.getField(7,"TESTDATE"),"01-JAN-08")
 	checkSuccess(cur.getField(7,"TESTLONG"),"testlong8")
 	checkSuccess(cur.getField(7,"TESTCLOB"),"testclob8")
-	checkSuccess(cur.getField(7,"TESTBLOB"),"testblob8")
+	checkSuccess(cur.getField(7,"TESTBLOB"),btos("testblob8"))
 	print()
 
 	print("FIELD LENGTHS BY NAME: ")
@@ -346,7 +354,7 @@ def main():
 	checkSuccess(fields[3],"01-JAN-01")
 	checkSuccess(fields[4],"testlong1")
 	checkSuccess(fields[5],"testclob1")
-	checkSuccess(fields[6],"")
+	checkSuccess(fields[6],btos(""))
 	print()
 
 	print("FIELD LENGTHS BY ARRAY: ")
@@ -368,7 +376,7 @@ def main():
 	checkSuccess(fields["TESTDATE"],"01-JAN-01")
 	checkSuccess(fields["TESTLONG"],"testlong1")
 	checkSuccess(fields["TESTCLOB"],"testclob1")
-	checkSuccess(fields["TESTBLOB"],"")
+	checkSuccess(fields["TESTBLOB"],btos(""))
 	print()
 	fields=cur.getRowDictionary(7)
 	checkSuccess(fields["TESTNUMBER"],8)
@@ -377,7 +385,7 @@ def main():
 	checkSuccess(fields["TESTDATE"],"01-JAN-08")
 	checkSuccess(fields["TESTLONG"],"testlong8")
 	checkSuccess(fields["TESTCLOB"],"testclob8")
-	checkSuccess(fields["TESTBLOB"],"testblob8")
+	checkSuccess(fields["TESTBLOB"],btos("testblob8"))
 	print()
 
 	print("FIELD LENGTHS BY DICTIONARY: ")
@@ -752,7 +760,7 @@ def main():
 	blobvarlength=cur.getOutputBindLength("blobvar")
 	checkSuccess(clobvar,"hello")
 	checkSuccess(clobvarlength,5)
-	checkSuccess(blobvar,"hello")
+	checkSuccess(blobvar,btos("hello"))
 	checkSuccess(blobvarlength,5)
 	cur.sendQuery("drop table testtable1")
 	print()
