@@ -2880,39 +2880,19 @@ void sqlrservercontroller::setLiveConnection(bool liveconnection) {
 
 bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 
-	// find the start of the actual query
-	const char	*ptr=skipWhitespaceAndComments(
-					cursor->getQueryBuffer());
-
 	// for now, we only intercept transaction queries
-	if (isBeginTransactionQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_BEGIN);
-		return true;
-	} else if (isCommitQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_COMMIT);
-		return true;
-	} else if (isRollbackQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_ROLLBACK);
-		return true;
-	} else if (isAutoCommitOnQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_ON);
-		return true;
-	} else if (isAutoCommitOffQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_OFF);
-		return true;
-	} else {
-		bool	on=false;
-		if (isSetIncludingAutoCommitQuery(ptr,&on)) {
-			// For these, set the query type, but don't actually
-			// return true.  That way they won't actually be
-			// intercepted by interceptQuery().  Instead they'll be
-			// handled as special cases by executeQuery().
-			cursor->setQueryType((on)?
-				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON:
-				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF);
-		}
+	switch (cursor->getQueryType()) {
+		case SQLRQUERYTYPE_BEGIN:
+		case SQLRQUERYTYPE_COMMIT:
+		case SQLRQUERYTYPE_ROLLBACK:
+		case SQLRQUERYTYPE_AUTOCOMMIT_ON:
+		case SQLRQUERYTYPE_AUTOCOMMIT_OFF:
+		case SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON:
+		case SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF:
+			return true;
+		default:
+			return false;
 	}
-	return false;
 }
 
 bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
@@ -3007,339 +2987,6 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			break;
 	}
 	return retval;
-}
-
-bool sqlrservercontroller::isAutoCommitOnQuery(const char *query) {
-	return isAutoCommitQuery(query,true);
-}
-
-bool sqlrservercontroller::isAutoCommitOffQuery(const char *query) {
-	return isAutoCommitQuery(query,false);
-}
-
-bool sqlrservercontroller::isAutoCommitQuery(const char *query, bool on) {
-
-	// look for "autocommit"
-	if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
-
-		query+=10;
-
-	}  else {
-
-		// look for "set"
-		if (!charstring::compareIgnoringCase(query,"set",3)) {
-			query+=3;
-		} else {
-			return false;
-		}
-
-		// skip whitespace
-		query=skipWhitespaceAndComments(query);
-
-		// look for "autocommit"/"auto"/"implicit_transactions"
-		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
-			query+=10;
-		} else if (!charstring::compareIgnoringCase(query,"auto",4)) {
-			query+=4;
-		} else if (!charstring::compareIgnoringCase(
-					query,"implicit_transactions",21)) {
-			query+=21;
-		} else {
-			return false;
-		}
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// look for "="/"to"
-	if (*query=='=') {
-		query++;
-	} else if (!charstring::compareIgnoringCase(query,"to",2)) {
-		query+=2;
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	if (on) {
-		// look for 1/on/yes/immediate
-		if (*query=='1') {
-			query++;
-		} else if (!charstring::compareIgnoringCase(query,"on",2)) {
-			query+=2;
-		} else if (!charstring::compareIgnoringCase(query,"yes",3)) {
-			query+=3;
-		} else if (!charstring::compareIgnoringCase(
-							query,"immediate",9)) {
-			query+=9;
-		} else {
-			return false;
-		}
-	} else {
-		// look for 0/off/no
-		if (*query=='0') {
-			query++;
-		} else if (!charstring::compareIgnoringCase(query,"off",3)) {
-			query+=3;
-		} else if (!charstring::compareIgnoringCase(query,"no",2)) {
-			query+=2;
-		} else {
-			return false;
-		}
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// look for end of query
-	if (*query) {
-		return false;
-	}
-
-	return true;
-}
-
-bool sqlrservercontroller::isSetIncludingAutoCommitQuery(
-						const char *query, bool *on) {
-
-	*on=false;
-
-	// look for "set"
-	if (!charstring::compareIgnoringCase(query,"set",3)) {
-		query+=3;
-	} else {
-		return false;
-	}
-
-	for (;;) {
-
-		// skip whitespace
-		query=skipWhitespaceAndComments(query);
-
-		// look for "autocommit"
-		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
-			query+=10;
-			break;
-		}
-
-		// look for a comma or end of query
-		while (*query && *query!=',') {
-			query++;
-		}
-		if (!*query) {
-			return false;
-		}
-
-		// skip comma
-		query++;
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// look for "="/"to"
-	if (*query=='=') {
-		query++;
-	} else {
-		return false;
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// look for 1/0
-	if (*query=='1') {
-		*on=true;
-		query++;
-	} else if (*query=='0') {
-		*on=false;
-		query++;
-	} else {
-		return false;
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// success if we hit a comma, or are at the end of the query
-	return (*query!=',' || *query);
-}
-
-bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
-	return isBeginTransactionQuery(skipWhitespaceAndComments(
-						cursor->getQueryBuffer()));
-}
-
-bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
-
-	// See if it was any of the different queries used to start a
-	// transaction.  IMPORTANT: don't just look for the first 5 characters
-	// to be "begin", make sure it's the entire query.  Many db's use
-	// "begin" to start a stored procedure block, but in those cases,
-	// something will follow it.
-	if (!charstring::compareIgnoringCase(query,"begin",5)) {
-
-		// make sure there are only spaces, comments or one of the words
-		// "work" or "transaction" after the begin
-		const char	*spaceptr=skipWhitespaceAndComments(query+5);
-
-		if (*spaceptr=='\0') {
-			return true;
-		} else if ((!charstring::compareIgnoringCase(
-						spaceptr,"work",4) &&
-				blockCanBeIntercepted(spaceptr+4)) ||
-				(!charstring::compareIgnoringCase(
-						spaceptr,"transaction",11) &&
-				blockCanBeIntercepted(spaceptr+11))) {
-			return true;
-		}
-		return false;
-	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
-		return true;
-	} else if (!charstring::compareIgnoringCase(query,"bt",2) &&
-							*(query+2)=='\0') {
-		return true;
-	}
-	return false;
-}
-
-bool sqlrservercontroller::blockCanBeIntercepted(const char *block) {
-
-	// FIXME:
-	// I'm not really sure which of these implementations to use...
-	//
-	// 1) Any block of queries that contain their own commit/rollback
-	// should be passed through, and not intercepted.
-	//
-	// 2) However, really we ought to skip commit/rollbacks in comments, in
-	// (any kind of) quotes, or that aren't preceeded by and followed by
-	// whitespace (or the beginning/end of the string).  The other
-	// implementation does that, though currently lacks support for double
-	// quoting, back-tick quoting, and [] quoting.
-	//
-	// 3) Arguably though, if it's a block at all, then it shouldn't be
-	// intercepted, as this will prevent the non-begin statements from
-	// being executed.
-	//
-	//
-	// Currently 3 is selected.  This eventually seemed intuitive, but
-	// wasn't originally, before I wrote the others.
-	//
-	//
-	// What really happens in these cases though...
-	//
-	// If we're faking transaction blocks, and we pass a balanced block
-	// like:
-	//
-	// begin transaction
-	// select 1
-	// commit
-	// select 1
-	// begin transaction
-	// select 1
-	// commit
-	//
-	// through, does the db really end up back in autocommit mode like it
-	// started?
-	//
-	// If we're faking transaction blocks, and we pass an unbalanced block
-	// like:
-	//
-	// begin transaction
-	// select 1
-	// commit
-	// select 1
-	// begin transaction
-	// select 1
-	//
-	// through, does the db really end up in non-autocommit mode unlike it
-	// started?
-	//
-	// Should I not intercept, but then set
-	// pvt->_infaketransactionblock=true in the second case?
-	//
-	// Sort this out...
-
-#if 1
-	return !(charstring::containsIgnoringCase(block,"commit") ||
-		charstring::containsIgnoringCase(block,"rollback"));
-
-#elif 0
-	// FIXME: handle other types of quoting - ", `, and []
-
-	bool		inquotes=false;
-	const char	*ptr=block;
-	const char	*prevptr=" ";
-	do {
-
-		if (!inquotes) {
-
-			ptr=skipWhitespaceAndComments(ptr);
-			if (!*ptr) {
-				return true;
-			}
-
-			if (ptr!=block) {
-				prevptr=ptr-1;
-			}
-
-			if (
-				// if the previous character is whitespace
-				// (note that it was initialized to whitespace
-				// so this also works if we're at the beginning
-				// of the block) and...
-				character::isWhitespace(*prevptr) &&
-
-				// we find a commit, followed by the
-				// end of the block, or whitespace or...
-				((!charstring::compareIgnoringCase(
-							ptr,"commit",6) &&
-				(!*(ptr+6) ||
-					character::isWhitespace(*(ptr+6)))) ||
-
-				// we find a rollback, followed by the
-				// end of the block, or whitespace
-				(!charstring::compareIgnoringCase(
-							ptr,"rollback",8) &&
-				(!*(ptr+8) ||
-					character::isWhitespace(*(ptr+8)))))) {
-
-				// then we have a qualifying commit or
-				// rollback in the block
-				return false;
-			}
-		}
-		
-		// if we found a quote, flip our in-quotes flag
-		if (*ptr=='\'') {
-			inquotes=!inquotes;
-		}
-		ptr++;
-
-	} while (*ptr);
-
-	// if we got here, then we hit the end of the block without finding
-	// a qualifying commit or rollback
-	return true;
-#elif 0
-	return (*skipWhitespaceAndComments(block))=='\0';
-#endif
-}
-
-bool sqlrservercontroller::isCommitQuery(const char *query) {
-
-	return (!charstring::compareIgnoringCase(query,"commit",6) ||
-		(!charstring::compareIgnoringCase(query,"et",2) &&
-						*(query+2)=='\0'));
-}
-
-bool sqlrservercontroller::isRollbackQuery(const char *query) {
-	return !charstring::compareIgnoringCase(query,"rollback",8);
-}
-
-bool sqlrservercontroller::isDropQuery(const char *query) {
-	return !charstring::compareIgnoringCase(query,"drop",4);
 }
 
 bool sqlrservercontroller::skipComment(const char **ptr,
@@ -5064,6 +4711,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 		return true;
 	}
 
+	// determine the query type
+	cursor->setQueryType(cursor->determineQueryType(
+					cursor->getQueryBuffer(),
+					cursor->getQueryLength()));
+
 	// do this here instead of inside translateBindVariables
 	// because translateQuery might use it
 	cursor->getBindMappingsPool()->clear();
@@ -5103,7 +4755,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// translate "begin" queries
 	// FIXME: can we just let interceptQuery below handle this?
 	if (pvt->_conn->supportsTransactionBlocks() &&
-			isBeginTransactionQuery(cursor)) {
+			cursor->getQueryType()==SQLRQUERYTYPE_BEGIN) {
 		translateBeginTransaction(cursor);
 	}
 
@@ -5179,7 +4831,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 		cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 		// update query and error counts
-		incrementQueryCounts(cursor->queryType(query,querylen));
+		incrementQueryCounts(cursor->getQueryType());
 		incrementTotalErrors();
 
 		// save the error
@@ -5240,6 +4892,12 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// filters, translations, and checks
 	if (!cursor->getQueryHasBeenPreProcessed()) {
 
+		// determine the query type
+		cursor->setQueryType(
+			cursor->determineQueryType(
+					cursor->getQueryBuffer(),
+					cursor->getQueryLength()));
+
 		// do this here instead of inside translateBindVariables
 		// because translateQuery might use it
 		cursor->getBindMappingsPool()->clear();
@@ -5279,7 +4937,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// translate "begin" queries
 		// FIXME: can we just let interceptQuery below handle this?
 		if (pvt->_conn->supportsTransactionBlocks() &&
-				isBeginTransactionQuery(cursor)) {
+				cursor->getQueryType()==SQLRQUERYTYPE_BEGIN) {
 			translateBeginTransaction(cursor);
 		}
 
@@ -5401,7 +5059,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			// update query and error counts
-			incrementQueryCounts(cursor->queryType(query,querylen));
+			incrementQueryCounts(cursor->getQueryType());
 			incrementTotalErrors();
 
 			// save the error
@@ -5444,7 +5102,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			// update query and error counts
-			incrementQueryCounts(cursor->queryType(query,querylen));
+			incrementQueryCounts(cursor->getQueryType());
 			incrementTotalErrors();
 
 			// get the error
@@ -5537,7 +5195,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	cursor->clearTotalRowsFetched();
 
 	// update query and error counts
-	incrementQueryCounts(cursor->queryType(query,querylen));
+	incrementQueryCounts(cursor->getQueryType());
 	if (!success) {
 		incrementTotalErrors();
 	}
@@ -5546,8 +5204,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// and the query was a drop, then clear the column caches.  Do this
 	// before running after-triggers as they may use the column caches.
 	if (success && pvt->_colcache.getCount() &&
-			isDropQuery(skipWhitespaceAndComments(
-					cursor->getQueryBuffer()))) {
+			cursor->getQueryType()==SQLRQUERYTYPE_DROP) {
 		clearColumnCaches();
 	}
 

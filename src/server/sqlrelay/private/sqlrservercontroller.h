@@ -46,17 +46,6 @@
 		bool	endFakeTransactionBlock();
 		bool	checkInterceptQuery(sqlrservercursor *cursor);
 		bool	interceptQuery(sqlrservercursor *cursor);
-		bool	isBeginTransactionQuery(sqlrservercursor *cursor);
-		bool	isBeginTransactionQuery(const char *query);
-		bool	blockCanBeIntercepted(const char *block);
-		bool	isCommitQuery(const char *query);
-		bool	isRollbackQuery(const char *query);
-		bool	isAutoCommitOnQuery(const char *query);
-		bool	isAutoCommitOffQuery(const char *query);
-		bool	isAutoCommitQuery(const char *query, bool on);
-		bool	isSetIncludingAutoCommitQuery(const char *query,
-								bool *on);
-		bool	isDropQuery(const char *query);
 
 		void	translateBindVariablesFromMappings(
 						sqlrservercursor *cursor);

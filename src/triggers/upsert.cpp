@@ -81,15 +81,16 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// after the query has been run...
 
 	// get the query and query type
-	// NOTE: for now queryType() groups simple insert, multi-insert,
-	// insert/select and select-into into SQLRQUERYTYPE_INSERT
+	// NOTE: for now determineQueryType() groups simple insert,
+	// multi-insert, insert/select and select-into into SQLRQUERYTYPE_INSERT
 	const char		*query=cont->getQueryBuffer(icur);
 	uint32_t		querylen=cont->getQueryLength(icur);
-	sqlrquerytype_t		querytype=icur->queryType(query,querylen);
+	sqlrquerytype_t		querytype=icur->getQueryType();
 	if (debug) {
 		stdoutput.printf("upsert {\n");
 		stdoutput.printf("	triggering query:\n%.*s\n",
 							querylen,query);
+		stdoutput.printf("	query type: %d\n",querytype);
 	}
 
 	// bail if the query wasn't an insert

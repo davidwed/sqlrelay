@@ -1040,8 +1040,9 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual	bool	open();
 		virtual	bool	close();
 
-		virtual sqlrquerytype_t	queryType(const char *query,
-							uint32_t length);
+		virtual sqlrquerytype_t	determineQueryType(
+						const char *query,
+						uint32_t length);
 		virtual	bool	isCustomQuery();
 		virtual	bool	prepareQuery(const char *query,
 							uint32_t length);
@@ -2710,8 +2711,9 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 					domnode *parameters,
 					uint16_t id);
 		virtual	~sqlrquerycursor();
-		virtual sqlrquerytype_t	queryType(const char *query,
-							uint32_t length);
+		virtual sqlrquerytype_t	determineQueryType(
+						const char *query,
+						uint32_t length);
 		bool	isCustomQuery();
 
 	protected:
