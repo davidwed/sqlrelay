@@ -38,6 +38,7 @@ extern "C" {
 #define NEED_IS_BIT_TYPE_CHAR 1
 #define NEED_BIT_STRING_TO_LONG 1
 #define NEED_IS_BOOL_TYPE_CHAR 1
+#define NEED_IS_BINARY_TYPE_CHAR 1
 #include <datatypes.h>
 
 bool usenumeric=false;
@@ -52,6 +53,24 @@ static PyObject *getNumericFieldsAsStrings(PyObject *self, PyObject *args) {
 static PyObject *getNumericFieldsAsNumbers(PyObject *self, PyObject *args) {
   usenumeric=true;
   return Py_BuildValue("h", 0);
+}
+
+static PyObject *buildConstPyString(const char *str,
+#ifdef PY_SSIZE_T_CLEAN
+ssize_t len,
+#else
+uint32_t len,
+#endif
+bool binary) {
+#if PY_MAJOR_VERSION >= 3
+  if (binary) {
+    return Py_BuildValue("y#", str, len);
+  } else {
+    return Py_BuildValue("s#", str, len);
+  }
+#else
+  return Py_BuildValue("s#", str, len);
+#endif
 }
 
 static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
@@ -911,6 +930,8 @@ static PyObject *inputBindBlob(PyObject *self, PyObject *args) {
     ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, NULL, size);
   } else if (PyString_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, PyString_AsString(value), size);
+  } else if (PyBytes_Check(value)) {
+    ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, PyBytes_AsString(value), size);
   } else {
     success=0;
   }
@@ -1110,7 +1131,7 @@ static PyObject *getOutputBindBlob(PyObject *self, PyObject *args) {
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getOutputBindBlob(variable);
   rl=((sqlrcursor *)sqlrcur)->getOutputBindLength(variable);
-  return Py_BuildValue("s#", rc, rl);
+  return buildConstPyString(rc, rl, true);
 }
 
 static PyObject *getOutputBindClob(PyObject *self, PyObject *args) {
@@ -1324,7 +1345,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
       return Py_None;
     }
   }
-  return Py_BuildValue("s#", rc, rl);
+  return buildConstPyString(rc, rl, isBinaryTypeChar(type));
 }
 
 static PyObject *getFieldAsInteger(PyObject *self, PyObject *args) {
@@ -1458,7 +1479,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
         PyList_SetItem(my_list, counter, Py_None);
       }
     } else {
-      PyList_SetItem(my_list, counter, Py_BuildValue("s#", row_data[counter], rl));
+      PyList_SetItem(my_list, counter, buildConstPyString(row_data[counter], row_lengths[counter], isBinaryTypeChar(type)));
     }
   }
   return my_list;
@@ -1530,11 +1551,12 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     } else {
       if (field) {
         PyDict_SetItem(my_dictionary, Py_BuildValue("s", name),
-                Py_BuildValue("s#", field,
+                buildConstPyString(field,
                         #ifdef PY_SSIZE_T_CLEAN
                         (ssize_t)
                         #endif
-                        (((sqlrcursor *)sqlrcur)->getFieldLength(row, counter))
+                        (((sqlrcursor *)sqlrcur)->getFieldLength(row, counter)),
+			isBinaryTypeChar(type)
                 )
         );
       } else {

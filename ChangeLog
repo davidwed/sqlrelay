@@ -71,6 +71,7 @@
 		looking for dist/site-packages now
 	added upsert trigger
 	fixed bind leak in postgresql connection
+	applied Dmitry Kasyanov's patch for python binary blobs
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
@@ -635,8 +636,8 @@
 	configure option --disable-odbc-driver actually works now
 	filters can specify an error string and error number now
 	added support for systemd
-	fixed a memory leak by applying and updating a patch from Kasyanov
-		Dmitry to deallocate the error message in C++ API destructor
+	fixed a memory leak by applying and updating a patch from Dmitry
+		Kasyanov to deallocate the error message in C++ API destructor
 	legacy_stdio_definitions.lib is now included when building ODBC with
 		VS2015
 	added support for PHP7
@@ -1628,7 +1629,7 @@
 	added mysql_config sanity test to configure script
 	NULL's are escaped in fake input BLOB binds now
 	query router works pretty well now
-	applied Sharpinskiy Dmitry's odbc unicode patch
+	applied Dmitry Sharpinskiy's odbc unicode patch
 	integrated Devananda's statistics gathering code
 	added support for mysql stored procedures
 	integrated Devananda's mysql result set updates
