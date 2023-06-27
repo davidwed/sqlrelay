@@ -4,7 +4,7 @@
 
 	function checkSuccess($value,$success) {
 
-		if ($value==$success) {
+		if ($value===$success) {
 			echo("success ");
 		} else {
 			echo("$value != $success ");
@@ -34,7 +34,9 @@
 	}
 
 	echo("CREATE TEMPTABLE: \n");
-	$dbh->exec("create table testtable (testfloat float, testdouble double)");
+	if (!$dbh->exec("create table testtable (testfloat float, testdouble double)")) {
+		$dbh->exec("create table testtable (testfloat float, testdouble float)");
+	}
 	echo("\n");
 
 	echo("INSERT: \n");
@@ -49,21 +51,21 @@
 	
 	echo("FIELDS BY INDEX: \n");
 	$result=$stmt->fetch(PDO::FETCH_NUM);
-	checkSuccess($result[0],"3.14");
-	checkSuccess($result[1],"3.14");
+	checkSuccess($result[0],3.14);
+	checkSuccess($result[1],3.14);
 	echo("\n");
 
 	echo("FIELDS BY NAME: \n");
 	$result=$stmt->fetch(PDO::FETCH_ASSOC);
-	checkSuccess($result["testfloat"],"6.28");
-	checkSuccess($result["testdouble"],"6.28");
+	checkSuccess($result["testfloat"],6.28);
+	checkSuccess($result["testdouble"],6.28);
 	var_dump($result);
 	echo("\n");
 
 	echo("FIELDS BY NAME AND INDEX: \n");
 	$result=$stmt->fetch();
-	checkSuccess($result[0],"9.42");
-	checkSuccess($result[1],"9.42");
+	checkSuccess($result[0],9.42);
+	checkSuccess($result[1],9.42);
 	echo("\n");
 
 	$dbh->exec("drop table testtable");
