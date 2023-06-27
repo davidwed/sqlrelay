@@ -40470,7 +40470,7 @@ if ( test -n "$MYSQLLIBS" ); then
 	if ( test -n "$MYSQLSTATIC" ); then
 		MYSQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS mysql mysqlupsert"
+	TESTDBS="$TESTDBS mysql mysqlupsert mysqldeadlockreplay"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
 	POSTGRESQLBUILD="dynamic   "

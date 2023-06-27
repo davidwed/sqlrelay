@@ -28,10 +28,11 @@ all: db2 \
 	krb \
 	tls \
 	mysqlupsert \
+	mysqldeadlockreplay \
 	postgresqlupsert
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) db27$(EXE) db26$(EXE) freetds$(EXE) firebird$(EXE) informix$(EXE) mysql$(EXE) oracleclobfetch$(EXE) oracleclobinsert$(EXE) oracle$(EXE) oracle8$(EXE) oracle7$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) router$(EXE) extensions$(EXE) krb$(EXE) tls$(EXE) deadlockreplay$(EXE) emoji$(EXE) mysqlupsert$(EXE) postgresqlupsert$(EXE) cachefile* sqlnet.log
+	$(LTCLEAN) $(RM) *.lo *.o *.obj db2$(EXE) db27$(EXE) db26$(EXE) freetds$(EXE) firebird$(EXE) informix$(EXE) mysql$(EXE) oracleclobfetch$(EXE) oracleclobinsert$(EXE) oracle$(EXE) oracle8$(EXE) oracle7$(EXE) postgresql$(EXE) sqlite$(EXE) sap$(EXE) router$(EXE) extensions$(EXE) krb$(EXE) tls$(EXE) mysqldeadlockreplay$(EXE) emoji$(EXE) mysqlupsert$(EXE) postgresqlupsert$(EXE) cachefile* sqlnet.log
 	$(RMTREE) .libs
 
 db2: db2.cpp db2.$(OBJ)
@@ -90,8 +91,8 @@ krb: krb.cpp krb.$(OBJ)
 tls: tls.cpp tls.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tls.$(OBJ) $(CPPTESTLIBS)
 
-deadlockreplay: deadlockreplay.cpp deadlockreplay.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) deadlockreplay.$(OBJ) $(CPPTESTLIBS)
+mysqldeadlockreplay: mysqldeadlockreplay.cpp mysqldeadlockreplay.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysqldeadlockreplay.$(OBJ) $(CPPTESTLIBS)
 
 emoji: emoji.cpp emoji.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) emoji.$(OBJ) $(CPPTESTLIBS)
