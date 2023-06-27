@@ -2972,6 +2972,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			// FIXME: fake tx block issues here???
+			// FIXME: should we also handle
+			// SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON
+			// somehow
 			retval=autoCommitOn();
 			break;
 		case SQLRQUERYTYPE_AUTOCOMMIT_OFF:
@@ -2981,6 +2984,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			// FIXME: fake tx block issues here???
+			// FIXME: should we also handle
+			// SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF
+			// somehow
 			retval=autoCommitOff();
 			break;
 		default:
@@ -8437,6 +8443,9 @@ void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 			pvt->_shm->qps_select[index]++;
 			break;
 		case SQLRQUERYTYPE_INSERT:
+		case SQLRQUERYTYPE_INSERTSELECT:
+		case SQLRQUERYTYPE_SELECTINTO:
+		case SQLRQUERYTYPE_MULTIINSERT:
 			pvt->_shm->qps_insert[index]++;
 			break;
 		case SQLRQUERYTYPE_UPDATE:
@@ -8457,8 +8466,9 @@ void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 		case SQLRQUERYTYPE_CUSTOM:
 			pvt->_shm->qps_custom[index]++;
 			break;
-		case SQLRQUERYTYPE_ETC:
 		default:
+			// catches BEGIN, COMMIT, ROLLBACK, AUTOCOMMIT ON/OFF,
+			// SET INCLUDING AUTOCOMMIT ON/OFF, and ETC
 			pvt->_shm->qps_etc[index]++;
 			break;
 	}

@@ -256,6 +256,7 @@ bool sqlrservercursor::close() {
 
 sqlrquerytype_t sqlrservercursor::determineQueryType(const char *query,
 							uint32_t length) {
+stdoutput.printf("determineQueryType(%s)\n",query);
 
 	// skip past leading garbage
 	const char	*ptr=conn->cont->skipWhitespaceAndComments(query);
@@ -298,10 +299,8 @@ sqlrquerytype_t sqlrservercursor::determineQueryType(const char *query,
 	} else if (isAutoCommitOffQuery(ptr)) {
 		return SQLRQUERYTYPE_AUTOCOMMIT_OFF;
 	} else {
-		bool	autocommit=false;
 		bool	on=false;
-		if (isSetIncludingAutoCommitQuery(ptr,&autocommit,&on) &&
-								autocommit) {
+		if (isSetIncludingAutoCommitQuery(ptr,&on)) {
 			return (on)?
 				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON:
 				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF;
@@ -568,7 +567,6 @@ bool sqlrservercursor::isAutoCommitQuery(const char *query, bool on) {
 
 bool sqlrservercursor::isSetIncludingAutoCommitQuery(
 						const char *query,
-						bool *autocommit,
 						bool *on) {
 
 	*on=false;
@@ -616,7 +614,7 @@ bool sqlrservercursor::isSetIncludingAutoCommitQuery(
 	// skip whitespace
 	query=conn->cont->skipWhitespaceAndComments(query);
 
-	// look for 1/0
+	// look for 1/0 and on/off
 	if (*query=='1') {
 		*on=true;
 		query++;

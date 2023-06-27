@@ -10,7 +10,6 @@
 		bool	isAutoCommitOffQuery(const char *query);
 		bool	isAutoCommitQuery(const char *query, bool on);
 		bool	isSetIncludingAutoCommitQuery(const char *query,
-							bool *autocommit,
-							bool *on);
+								bool *on);
 
 		sqlrservercursorprivate	*pvt;
