@@ -205,7 +205,8 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		char		**bindvalues;
 		int		*bindlengths;
 		int		*bindformats;
-		int		bindcounter;
+		int		bindcount;
+		int		usedbindcount;
 
 		bool		bindformaterror;
 #endif
@@ -757,7 +758,8 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	bytestring::zero(bindvalues,maxbindcount*sizeof(char *));
 	bindlengths=new int[maxbindcount];
 	bindformats=new int[maxbindcount];
-	bindcounter=0;
+	bindcount=0;
+	usedbindcount=0;
 	bindformaterror=false;
 #endif
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
@@ -775,7 +777,7 @@ postgresqlcursor::~postgresqlcursor() {
 		defined(HAVE_POSTGRESQL_PQEXECPREPARED)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
-	for (uint16_t i=0; i<bindcounter; i++) {
+	for (uint16_t i=0; i<bindcount; i++) {
 		delete[] bindvalues[i];
 	}
 	delete[] bindvalues;
@@ -800,7 +802,7 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	ncols=0;
 
 	// reset bind counter
-	bindcounter=0;
+	usedbindcount=0;
 
 	// reset the bind format error flag
 	bindformaterror=false;
@@ -887,7 +889,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 		bindlengths[pos]=valuesize;
 	}
 	bindformats[pos]=0;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 
@@ -910,7 +913,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 	bindvalues[pos]=charstring::parseNumber(*value);
 	bindlengths[pos]=charstring::getLength(bindvalues[pos]);
 	bindformats[pos]=0;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 
@@ -935,7 +939,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 	bindvalues[pos]=charstring::parseNumber(*value,precision,scale);
 	bindlengths[pos]=charstring::getLength(bindvalues[pos]);
 	bindformats[pos]=0;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 
@@ -966,7 +971,8 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 		bindlengths[pos]=valuesize;
 	}
 	bindformats[pos]=1;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 
@@ -996,7 +1002,8 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 		bindlengths[pos]=valuesize;
 	}
 	bindformats[pos]=0;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 #endif
@@ -1065,12 +1072,12 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	if (getFetchAtOnce()) {
 		int	result=1;
-		if (bindcounter) {
+		if (usedbindcount) {
 			result=PQsendQueryPrepared(postgresqlconn->pgconn,
 						cursorid,
-						bindcounter,bindvalues,
+						usedbindcount,bindvalues,
 						bindlengths,bindformats,0);
-			bindcounter=0;
+			usedbindcount=0;
 		} else {
 			result=PQsendQuery(postgresqlconn->pgconn,query);
 		}
@@ -1094,11 +1101,11 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 #endif
 #if defined(HAVE_POSTGRESQL_PQPREPARE) && \
 	defined(HAVE_POSTGRESQL_PQEXECPREPARED)
-		if (bindcounter) {
+		if (usedbindcount) {
 			pgresult=PQexecPrepared(postgresqlconn->pgconn,cursorid,
-						bindcounter,bindvalues,
+						usedbindcount,bindvalues,
 						bindlengths,bindformats,0);
-			bindcounter=0;
+			usedbindcount=0;
 		} else {
 #endif
 			pgresult=PQexec(postgresqlconn->pgconn,query);
@@ -1633,10 +1640,11 @@ void postgresqlcursor::closeResultSet() {
 		defined(HAVE_POSTGRESQL_PQEXECPREPARED)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
-	for (uint16_t i=0; i<bindcounter; i++) {
+	for (uint16_t i=0; i<bindcount; i++) {
 		delete[] bindvalues[i];
 		bindvalues[i]=NULL;
 	}
+	bindcount=0;
 #endif
 
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
