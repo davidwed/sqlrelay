@@ -39,6 +39,7 @@ extern "C" {
 #define NEED_BIT_STRING_TO_LONG 1
 #define NEED_IS_BOOL_TYPE_CHAR 1
 #define NEED_IS_BINARY_TYPE_CHAR 1
+#define NEED_IS_DATETIME_TYPE_CHAR 1
 #include <datatypes.h>
 
 bool usenumeric=false;
@@ -62,15 +63,22 @@ ssize_t len,
 uint32_t len,
 #endif
 bool binary) {
+  return Py_BuildValue(
 #if PY_MAJOR_VERSION >= 3
-  if (binary) {
-    return Py_BuildValue("y#", str, len);
-  } else {
-    return Py_BuildValue("s#", str, len);
-  }
-#else
-  return Py_BuildValue("s#", str, len);
+            (binary)?"y#":
 #endif
+            "s#",
+            str, len);
+}
+
+static PyObject *buildConstPyStringT(const char *str,
+#ifdef PY_SSIZE_T_CLEAN
+ssize_t len,
+#else
+uint32_t len,
+#endif
+const char *type) {
+  return buildConstPyString(str,len,isBinaryTypeChar(type) && !isDateTimeTypeChar(type));
 }
 
 static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
@@ -1345,7 +1353,8 @@ static PyObject *getField(PyObject *self, PyObject *args) {
       return Py_None;
     }
   }
-  return buildConstPyString(rc, rl, isBinaryTypeChar(type));
+stdoutput.printf("type=%s\n",type);
+  return buildConstPyStringT(rc, rl, type);
 }
 
 static PyObject *getFieldAsInteger(PyObject *self, PyObject *args) {
@@ -1479,7 +1488,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
         PyList_SetItem(my_list, counter, Py_None);
       }
     } else {
-      PyList_SetItem(my_list, counter, buildConstPyString(row_data[counter], row_lengths[counter], isBinaryTypeChar(type)));
+      PyList_SetItem(my_list, counter, buildConstPyStringT(row_data[counter], row_lengths[counter], type));
     }
   }
   return my_list;
@@ -1551,12 +1560,12 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     } else {
       if (field) {
         PyDict_SetItem(my_dictionary, Py_BuildValue("s", name),
-                buildConstPyString(field,
+                buildConstPyStringT(field,
                         #ifdef PY_SSIZE_T_CLEAN
                         (ssize_t)
                         #endif
                         (((sqlrcursor *)sqlrcur)->getFieldLength(row, counter)),
-			isBinaryTypeChar(type)
+			type
                 )
         );
       } else {
