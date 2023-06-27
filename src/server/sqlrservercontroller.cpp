@@ -4745,12 +4745,22 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	}
 
 	// translate query
-	if (enabletranslations && pvt->_sqlrt &&
-				!translateQuery(cursor)) {
+	if (enabletranslations && pvt->_sqlrt) {
 
-		// log the query
-		raiseQueryEvent(cursor);
-		return false;
+		if (translateQuery(cursor)) {
+
+			// re-determine the query type
+			cursor->setQueryType(
+				cursor->determineQueryType(
+					cursor->getQueryBuffer(),
+					cursor->getQueryLength()));
+
+		} else {
+
+			// log the query
+			raiseQueryEvent(cursor);
+			return false;
+		}
 	}
 
 	// translate bind variables
@@ -4927,12 +4937,22 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		}
 
 		// translate query
-		if (enabletranslations && pvt->_sqlrt &&
-					!translateQuery(cursor)) {
+		if (enabletranslations && pvt->_sqlrt) {
 
-			// log the query
-			raiseQueryEvent(cursor);
-			return false;
+			if (translateQuery(cursor)) {
+
+				// re-determine the query type
+				cursor->setQueryType(
+					cursor->determineQueryType(
+						cursor->getQueryBuffer(),
+						cursor->getQueryLength()));
+
+			} else {
+
+				// log the query
+				raiseQueryEvent(cursor);
+				return false;
+			}
 		}
 
 		// translate bind variables

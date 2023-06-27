@@ -256,7 +256,6 @@ bool sqlrservercursor::close() {
 
 sqlrquerytype_t sqlrservercursor::determineQueryType(const char *query,
 							uint32_t length) {
-stdoutput.printf("determineQueryType(%s)\n",query);
 
 	// skip past leading garbage
 	const char	*ptr=conn->cont->skipWhitespaceAndComments(query);
