@@ -212,14 +212,17 @@ bool sqlrcrud::doCreate(const char * const *columns,
 	if (columns && values) {
 
 		// build $(COLUMNS)
-		bool	first=true;
+		bool		first=true;
+		const char	*col;
+		size_t		collen;
 		for (const char * const *c=columns; *c; c++) {
 			if (first) {
 				first=false;
 			} else {
 				colstr.append(',');
 			}
-			colstr.append(*c);
+			getValidColumnName(*c,&col,&collen);
+			colstr.append(col,collen);
 		}
 
 		// build $(VALUES)
@@ -329,6 +332,61 @@ bool sqlrcrud::doCreate(jsondom *j) {
 	return result;
 }
 
+void sqlrcrud::getValidColumnName(const char *c,
+					const char **col,
+					size_t *collen) {
+
+	// init return values...
+
+	// col returns the actual start of the given column name
+	*col=c;
+
+	// collen returns the number of valid characters
+	// after the start of the given column name
+	*collen=0;
+
+	// skip leading whitespace
+	while (character::isWhitespace(*c)) {
+		col++;
+	}
+
+	// run through the given column name
+	for (;;) {
+
+		// skip quoted strings
+		if (*c=='\'') {
+			while (*c && *c!='\'') {
+				c++;
+				(*collen)++;
+			}
+		} else if (*c=='"') {
+			while (*c && *c!='"') {
+				c++;
+				(*collen)++;
+			}
+		} else if (*c=='`') {
+			while (*c && *c!='`') {
+				c++;
+				(*collen)++;
+			}
+		}
+
+		// bail if we encountered the end of the string
+		if (!*c) {
+			return;
+		}
+
+		// bail if we encounter an invalid character
+		if (!(character::isAlphanumeric(*c) || *c=='_' || *c=='$')) {
+			return;
+		}
+
+		// move on
+		c++;
+		(*collen)++;
+	}
+}
+
 void sqlrcrud::bind(const char *bindformat,
 				const char * const *columns,
 				const char * const *values) {
@@ -341,7 +399,7 @@ void sqlrcrud::bind(const char *bindformat,
 
 	const char * const *c=columns;
 	const char * const *v=values;
-	memorypool	m;
+	m.clear();
 	if (bindformat[0]=='?'|| bindformat[0]=='$') {
 		uint64_t	i=1;
 		while (*v) {
@@ -354,6 +412,7 @@ void sqlrcrud::bind(const char *bindformat,
 				char		*b=(char *)m.allocate(len+1);
 				charstring::printf(b,len,"%lld",i);
 				cur->inputBind(b,*v);
+				i++;
 			}
 			v++;
 		}
@@ -685,14 +744,13 @@ bool sqlrcrud::buildJsonOrderBy(domnode *sort,
 					orderbystr,containspartial);
 	}
 
-	bool	first=true;
+	bool		first=true;
+	const char	*col;
+	size_t		collen;
 	for (domnode *node=sort->getFirstTagChild();
 				!node->isNullNode();
 				node=node->getNextTagSibling()) {
 
-		const char	*var=node->getName();
-		const char	*order=node->getAttributeValue("v");
-		// FIXME: validate var
 		if (first) {
 			orderbystr->append((containspartial)?
 						", ":" order by ");
@@ -700,7 +758,9 @@ bool sqlrcrud::buildJsonOrderBy(domnode *sort,
 		} else {
 			orderbystr->append(", ");
 		}
-		orderbystr->append(var)->append(' ')->append(order);
+		getValidColumnName(node->getName(),&col,&collen);
+		orderbystr->append(col,collen)->append(' ')->
+				append(node->getAttributeValue("v"));
 	}
 	return true;
 }
@@ -809,6 +869,9 @@ bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 
 	if (columns && values) {
 
+		const char	*col;
+		size_t		collen;
+
 		// build $(SET)
 		bindformat=con->bindFormat();
 		if (!charstring::isNullOrEmpty(bindformat)) {
@@ -823,21 +886,23 @@ bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 					} else {
 						setstr.append(',');
 					}
-					setstr.append(*c)->append('=');
+					getValidColumnName(*c,&col,&collen);
+					setstr.append(col,collen)->append('=');
 					setstr.append('?');
 				}
 			} else if (bindformat[0]=='$') {
-				uint64_t	col=1;
+				uint64_t	colind=1;
 				for (const char * const *c=columns; *c; c++) {
 					if (!charstring::compare(*c,autoinc)) {
 						continue;
 					}
-					if (col>1) {
+					if (colind>1) {
 						setstr.append(',');
 					}
-					setstr.append(*c)->append('=');
-					setstr.append('$')->append(col);
-					col++;
+					getValidColumnName(*c,&col,&collen);
+					setstr.append(col,collen)->append('=');
+					setstr.append('$')->append(colind);
+					colind++;
 				}
 			} else if (bindformat[0]=='@' || bindformat[0]==':') {
 				bool	first=true;
@@ -850,7 +915,8 @@ bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 					} else {
 						setstr.append(',');
 					}
-					setstr.append(*c)->append('=');
+					getValidColumnName(*c,&col,&collen);
+					setstr.append(col,collen)->append('=');
 					setstr.append(bindformat[0]);
 					setstr.append(*c);
 				}

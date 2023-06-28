@@ -6,7 +6,10 @@
 		uint64_t	countColumns(const char * const *columns);
 		void		copyColumns(const char * const *columns);
 
-		void		bind(const char *bindformat,
+		void	getValidColumnName(const char *c,
+						const char **col,
+						size_t *collen);
+		void	bind(const char *bindformat,
 					const char * const *columns,
 					const char * const *values);
 
@@ -73,6 +76,8 @@
 		sqlrrowdictionary	frd;
 		sqlrresultsetlist	fcl;
 		sqlrresultsettable	rst;
+
+		memorypool	m;
 
 		xmldom	x;
 		jsondom	j;
