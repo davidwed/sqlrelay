@@ -7698,7 +7698,8 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 				sqlrserverbindvar	*inbind=
 							&(inbinds[inbindcount]);
 				char		*var=bind->getValue();
-				uint16_t	varsize=charstring::getLength(var);
+				uint16_t	varsize=
+						charstring::getLength(var);
 				inbind->variable=
 					(char *)bindpool->allocate(varsize+1);
 				charstring::copy(inbind->variable,var);

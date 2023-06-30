@@ -77,31 +77,22 @@ bool sqlrcrud::buildQueries() {
 	}
 
 	// find the primary key and autoincrement column
-	cur->lowerCaseColumnNames();
+	stringbuffer	columnsquery;
+	columnsquery.append("select * from ");
+	columnsquery.append(tbl);
+	columnsquery.append(" where 1=0");
 	if (!cur->getColumnList(tbl,NULL)) {
 		return false;
 	}
-	for (uint64_t i=0; i<cur->rowCount(); i++) {
-
-		// get the column name, "key", and "extra"
-		const char	*colname=cur->getField(0,"column_name");
-		const char	*colkey=cur->getField(0,"column_key");
-		const char	*extra=cur->getField(0,"extra");
-
-		// copy the primary key and autoincrement column
-		// FIXME: this is valid for mysql, but maybe not for other dbs,
-		// we need a standardized way of doing this, like
-		// cur->getPrimaryKey() or something
-		if (!charstring::compare(colkey,"PRI")) {
+	for (uint32_t i=0; i<cur->colCount(); i++) {
+		const char	*colname=cur->getColumnName(i);
+		if (cur->getColumnIsPrimaryKey(i)) {
 			setPrimaryKeyColumn(colname);
 		}
-		if (!charstring::compare(extra,"auto_increment")) {
+		if (cur->getColumnIsAutoIncrement(i)) {
 			setAutoIncrementColumn(colname);
 		}
 	}
-	// FIXME: set this back to whatever it was, which might not be mixed,
-	// but there's currently no way to find out what it's currently set to
-	cur->mixedCaseColumnNames();
 
 	// build create (insert) query
 	createquery.clear();
@@ -245,16 +236,14 @@ bool sqlrcrud::doCreate(const char * const *columns,
 						con->nextvalFormat(),
 						idsequence);
 				} else {
-					if (bindformat[0]=='?') {
+					char	bf=bindformat[0];
+					if (bf=='?') {
 						valstr.append('?');
-					} else if (bindformat[0]=='$') {
+					} else if (bf=='$') {
 						valstr.append('$')->append(col);
 						col++;
-					} else if (bindformat[0]=='@' ||
-							bindformat[0]==':') {
-						valstr.append(
-							bindformat[0])->
-								append(*c);
+					} else if (bf=='@' || bf==':') {
+						valstr.append(bf)-> append(*c);
 					}
 				}
 			}
@@ -399,8 +388,9 @@ void sqlrcrud::bind(const char *bindformat,
 
 	const char * const *c=columns;
 	const char * const *v=values;
+	char	bf=bindformat[0];
 	m.clear();
-	if (bindformat[0]=='?'|| bindformat[0]=='$') {
+	if (bf=='?'|| bf=='$') {
 		uint64_t	i=1;
 		while (*v) {
 			if (charstring::compareIgnoringCase(
@@ -416,7 +406,7 @@ void sqlrcrud::bind(const char *bindformat,
 			}
 			v++;
 		}
-	} else if (bindformat[0]=='@' || bindformat[0]==':') {
+	} else if (bf=='@' || bf==':') {
 		while (*c && *v) {
 			if (charstring::compareIgnoringCase(
 							*c,autoinc) &&
@@ -875,7 +865,8 @@ bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 		// build $(SET)
 		bindformat=con->bindFormat();
 		if (!charstring::isNullOrEmpty(bindformat)) {
-			if (bindformat[0]=='?') {
+			char	bf=bindformat[0];
+			if (bf=='?') {
 				bool	first=true;
 				for (const char * const *c=columns; *c; c++) {
 					if (!charstring::compare(*c,autoinc)) {
@@ -890,7 +881,7 @@ bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 					setstr.append(col,collen)->append('=');
 					setstr.append('?');
 				}
-			} else if (bindformat[0]=='$') {
+			} else if (bf=='$') {
 				uint64_t	colind=1;
 				for (const char * const *c=columns; *c; c++) {
 					if (!charstring::compare(*c,autoinc)) {
@@ -904,7 +895,7 @@ bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 					setstr.append('$')->append(colind);
 					colind++;
 				}
-			} else if (bindformat[0]=='@' || bindformat[0]==':') {
+			} else if (bf=='@' || bf==':') {
 				bool	first=true;
 				for (const char * const *c=columns; *c; c++) {
 					if (!charstring::compare(*c,autoinc)) {
@@ -917,7 +908,7 @@ bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 					}
 					getValidColumnName(*c,&col,&collen);
 					setstr.append(col,collen)->append('=');
-					setstr.append(bindformat[0]);
+					setstr.append(bf);
 					setstr.append(*c);
 				}
 			}
