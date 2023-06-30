@@ -564,7 +564,8 @@ STATICUTILPLUGINSRCS += sqlrconfigdeclarations.cpp \
 			sqlrconfigassignments.cpp \
 			sqlrpwdencdeclarations.cpp \
 			sqlrpwdencassignments.cpp
-STATICUTILPLUGINLOBJS = $(shell ls ../configs/*.$(OBJ))
+STATICUTILPLUGINLOBJS = $(shell ls ../configs/*.$(OBJ)) \
+			$(shell ls ../pwdencs/*.$(OBJ))
 endif
 UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
 UTILLIBS = $(RUDIMENTSLIBS)
@@ -608,8 +609,8 @@ STATICPLUGINSRCS += sqlrserverconnectiondeclarations.cpp \
 		sqlrauthassignments.cpp \
 		sqlrdirectivedeclarations.cpp \
 		sqlrdirectiveassignments.cpp \
-		sqlrtranslationdeclarations.cpp \
-		sqlrtranslationassignments.cpp \
+		sqlrquerytranslationdeclarations.cpp \
+		sqlrquerytranslationassignments.cpp \
 		sqlrbindvariabletranslationdeclarations.cpp \
 		sqlrbindvariabletranslationassignments.cpp \
 		sqlrresultsettranslationdeclarations.cpp \
@@ -620,6 +621,8 @@ STATICPLUGINSRCS += sqlrserverconnectiondeclarations.cpp \
 		sqlrresultsetrowblocktranslationassignments.cpp \
 		sqlrresultsetheadertranslationdeclarations.cpp \
 		sqlrresultsetheadertranslationassignments.cpp \
+		sqlrerrortranslationdeclarations.cpp \
+		sqlrerrortranslationassignments.cpp \
 		sqlrfilterdeclarations.cpp \
 		sqlrfilterassignments.cpp \
 		sqlrtriggerdeclarations.cpp \
@@ -635,15 +638,15 @@ STATICPLUGINLOBJS = $(shell ls ../connections/*.$(OBJ)) \
 		$(shell ls ../notifications/*.$(OBJ)) \
 		$(shell ls ../schedules/*.$(OBJ)) \
 		$(shell ls ../routers/*.$(OBJ)) \
-		$(shell ls ../pwdencs/*.$(OBJ)) \
 		$(shell ls ../auths/*.$(OBJ)) \
 		$(shell ls ../directives/*.$(OBJ)) \
-		$(shell ls ../translations/*.$(OBJ)) \
+		$(shell ls ../querytranslations/*.$(OBJ)) \
 		$(shell ls ../bindvariabletranslations/*.$(OBJ)) \
 		$(shell ls ../resultsettranslations/*.$(OBJ)) \
 		$(shell ls ../resultsetrowtranslations/*.$(OBJ)) \
 		$(shell ls ../resultsetrowblocktranslations/*.$(OBJ)) \
 		$(shell ls ../resultsetheadertranslations/*.$(OBJ)) \
+		$(shell ls ../errortranslations/*.$(OBJ)) \
 		$(shell ls ../filters/*.$(OBJ)) \
 		$(shell ls ../triggers/*.$(OBJ)) \
 		$(shell ls ../queries/*.$(OBJ)) \
@@ -862,23 +865,23 @@ ifeq ($(SQLRELAY_ENABLE_SHARED),yes)
 SRCALLSUBDIRS = all-api
 SRCINSTALLSUBDIRS = install-api
 ifeq ($(ENABLE_UTIL),yes)
-SRCALLSUBDIRS += all-util all-configs
-SRCINSTALLSUBDIRS += install-util install-configs
+SRCALLSUBDIRS += all-util all-configs all-pwdencs
+SRCINSTALLSUBDIRS += install-util install-configs install-pwdencs
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-querytranslations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-errortranslations all-filters all-triggers all-moduledatas all-connections
-SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-querytranslations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-errortranslations install-filters install-triggers install-moduledatas install-connections
+SRCALLSUBDIRS += all-server all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-auths all-directives all-querytranslations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-errortranslations all-filters all-triggers all-moduledatas all-connections
+SRCINSTALLSUBDIRS += install-server install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-auths install-directives install-querytranslations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-errortranslations install-filters install-triggers install-moduledatas install-connections
 endif
 else
 SRCALLSUBDIRS = all-api
 SRCINSTALLSUBDIRS = install-api
 ifeq ($(ENABLE_UTIL),yes)
-SRCALLSUBDIRS += all-configs all-util
-SRCINSTALLSUBDIRS += install-configs install-util
+SRCALLSUBDIRS += all-configs all-pwdencs all-util
+SRCINSTALLSUBDIRS += install-configs install-pwdencs install-util
 endif
 ifeq ($(ENABLE_SERVER),yes)
-SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-pwdencs all-auths all-directives all-querytranslations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-filters all-triggers all-moduledatas all-connections all-server
-SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-pwdencs install-auths install-directives install-querytranslations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-filters install-triggers install-moduledatas install-connections install-server
+SRCALLSUBDIRS += all-parsers all-queries all-loggers all-notifications all-schedules all-routers all-protocols all-auths all-directives all-querytranslations all-bindvariabletranslations all-resultsettranslations all-resultsetrowtranslations all-resultsetrowblocktranslations all-resultsetheadertranslations all-errortranslations all-filters all-triggers all-moduledatas all-connections all-server
+SRCINSTALLSUBDIRS += install-parsers install-queries install-loggers install-notifications install-schedules install-routers install-protocols install-auths install-directives install-querytranslations install-bindvariabletranslations install-resultsettranslations install-resultsetrowtranslations install-resultsetrowblocktranslations install-resultsetheadertranslations install-errortranslations install-filters install-triggers install-moduledatas install-connections install-server
 endif
 endif
 ifeq ($(ENABLE_CMDLINE),yes)

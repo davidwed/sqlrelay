@@ -283,7 +283,7 @@ sqlrdirectiveassignments.cpp: sqlrdirectiveassignments.cpp.in
 
 sqlrquerytranslationdeclarations.cpp: sqlrquerytranslationdeclarations.cpp.in
 	$(RM) $@
-	for file in `ls ../translations/*.$(OBJ) 2> /dev/null`; \
+	for file in `ls ../querytranslations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -291,7 +291,7 @@ sqlrquerytranslationdeclarations.cpp: sqlrquerytranslationdeclarations.cpp.in
 
 sqlrquerytranslationassignments.cpp: sqlrquerytranslationassignments.cpp.in
 	$(RM) $@
-	for file in `ls ../translations/*.$(OBJ) 2> /dev/null`; \
+	for file in `ls ../querytranslations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -388,6 +388,22 @@ sqlrfilterdeclarations.cpp: sqlrfilterdeclarations.cpp.in
 sqlrfilterassignments.cpp: sqlrfilterassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../filters/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrerrortranslationdeclarations.cpp: sqlrerrortranslationdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../errortranslations/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrerrortranslationassignments.cpp: sqlrerrortranslationassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../errortranslations/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
