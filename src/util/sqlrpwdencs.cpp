@@ -1,10 +1,11 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserver.h>
+#include <sqlrelay/sqlrutil.h>
 
 #include <rudiments/domnode.h>
 #include <rudiments/process.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>

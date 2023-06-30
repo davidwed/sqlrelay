@@ -1,1 +1,2 @@
 usr/lib/*/libsqlrutil.so.*
+usr/lib/*/sqlrelay/sqlrpwdenc_*

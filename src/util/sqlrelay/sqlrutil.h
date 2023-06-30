@@ -287,4 +287,33 @@ class SQLRUTIL_DLLSPEC sqlrconfigs {
 		dynamiclib	*dl;
 };
 
+
+
+class SQLRUTIL_DLLSPEC sqlrpwdenc {
+	public:
+		sqlrpwdenc(domnode *parameters, bool debug);
+		virtual	~sqlrpwdenc();
+		virtual const char	*getId();
+		virtual	bool	oneWay();
+		virtual	char	*encrypt(const char *value);
+		virtual	char	*decrypt(const char *value);
+
+	protected:
+		domnode	*getParameters();
+		bool		getDebug();
+
+	#include <sqlrelay/private/sqlrpwdenc.h>
+};
+
+class SQLRUTIL_DLLSPEC sqlrpwdencs {
+	public:
+		sqlrpwdencs(sqlrpaths *sqlrpth, bool debug);
+		~sqlrpwdencs();
+
+		bool		load(domnode *parameters);
+		sqlrpwdenc	*getPasswordEncryptionById(const char *id);
+
+	#include <sqlrelay/private/sqlrpwdencs.h>
+};
+
 #endif

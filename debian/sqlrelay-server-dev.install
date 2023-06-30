@@ -18,8 +18,6 @@ usr/include/sqlrelay/private/sqlrnotifications.h
 usr/include/sqlrelay/private/sqlrparser.h
 usr/include/sqlrelay/private/sqlrprotocol.h
 usr/include/sqlrelay/private/sqlrprotocols.h
-usr/include/sqlrelay/private/sqlrpwdenc.h
-usr/include/sqlrelay/private/sqlrpwdencs.h
 usr/include/sqlrelay/private/sqlrqueries.h
 usr/include/sqlrelay/private/sqlrquerycursor.h
 usr/include/sqlrelay/private/sqlrquery.h

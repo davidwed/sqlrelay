@@ -5,7 +5,6 @@ usr/bin/sqlr-connection
 usr/bin/sqlr-scaler
 usr/bin/sqlr-start
 usr/bin/sqlr-stop
-usr/bin/sqlr-pwdenc
 usr/lib/*/libsqlrserver.so.*
 usr/lib/*/sqlrelay/sqlrauth_*
 usr/lib/*/sqlrelay/sqlrbindvariabletranslation_*
@@ -15,7 +14,6 @@ usr/lib/*/sqlrelay/sqlrtrigger_*
 usr/lib/*/sqlrelay/sqlrnotification_*
 usr/lib/*/sqlrelay/sqlrparser_*
 usr/lib/*/sqlrelay/sqlrprotocol_*
-usr/lib/*/sqlrelay/sqlrpwdenc_*
 usr/lib/*/sqlrelay/sqlrlogger_*
 usr/lib/*/sqlrelay/sqlrmoduledata_*
 usr/lib/*/sqlrelay/sqlrquery_*
@@ -28,7 +26,6 @@ usr/share/man/man8/sqlr-connection.8
 usr/share/man/man8/sqlr-scaler.8
 usr/share/man/man8/sqlr-start.8
 usr/share/man/man8/sqlr-stop.8
-usr/share/man/man8/sqlr-pwdenc.8
 var/run/sqlrelay/
 var/cache/sqlrelay/
 var/log/sqlrelay/

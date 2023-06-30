@@ -1,3 +1,5 @@
 usr/include/sqlrelay/sqlrutil.h
+usr/include/sqlrelay/private/sqlrpwdenc.h
+usr/include/sqlrelay/private/sqlrpwdencs.h
 usr/include/sqlrelay/private/sqlrutilincludes.h
 usr/lib/*/libsqlrutil.so

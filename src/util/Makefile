@@ -6,12 +6,16 @@ SRCS = sqlrcmdline.cpp \
 	sqlrpaths.cpp \
 	sqlrconfig.cpp \
 	sqlrconfigs.cpp \
+	sqlrpwdenc.cpp \
+	sqlrpwdencs.cpp \
 	$(STATICUTILPLUGINSRCS)
 
 LOBJS = sqlrcmdline.$(OBJ) \
 	sqlrpaths.$(OBJ) \
 	sqlrconfig.$(OBJ) \
-	sqlrconfigs.$(OBJ)
+	sqlrconfigs.$(OBJ) \
+	sqlrpwdenc.$(OBJ) \
+	sqlrpwdencs.$(OBJ)
 
 .SUFFIXES: .lo .obj .cpp
 
@@ -46,6 +50,22 @@ sqlrconfigassignments.cpp: sqlrconfigassignments.cpp.in
 		sed -e "s|@module@|$$module|g" $< >> $@; \
 	done
 
+sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
+	$(RM) $@
+	for file in `ls ../pwdencs/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
+sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
+	$(RM) $@
+	for file in `ls ../pwdencs/*.$(OBJ) 2> /dev/null`; \
+	do \
+		module=`basename $$file .$(OBJ)`; \
+		sed -e "s|@module@|$$module|g" $< >> $@; \
+	done
+
 install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(CP) sqlrelay/sqlrutil.h $(includedir)/sqlrelay
@@ -53,6 +73,8 @@ install: $(INSTALLLIB)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay/private
 	$(CP) sqlrelay/private/sqlrutilincludes.h $(includedir)/sqlrelay/private
 	$(CP) sqlrelay/private/sqlrconfig.h $(includedir)/sqlrelay/private
+	$(CP) sqlrelay/private/sqlrpwdenc.h $(includedir)/sqlrelay/private/sqlrpwdenc.h
+	$(CP) sqlrelay/private/sqlrpwdencs.h $(includedir)/sqlrelay/private/sqlrpwdencs.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrutilincludes.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrconfig.h
 
@@ -70,7 +92,9 @@ installlib:
 uninstall: $(UNINSTALLLIB)
 	$(RM) $(includedir)/sqlrelay/sqlrutil.h \
 		$(includedir)/sqlrelay/private/sqlrutilincludes.h \
-		$(includedir)/sqlrelay/private/sqlrutildll.h
+		$(includedir)/sqlrelay/private/sqlrutildll.h \
+		$(includedir)/sqlrelay/private/sqlrpwdenc.h \
+		$(includedir)/sqlrelay/private/sqlrpwdencs.h
 
 uninstalldll:
 	$(RM) $(bindir)/lib$(SQLR)util.$(LIBEXT) \

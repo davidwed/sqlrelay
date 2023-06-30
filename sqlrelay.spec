@@ -457,10 +457,8 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlr-start
 %{_bindir}/sqlr-stop
 %{_bindir}/sqlr-status
-%{_bindir}/sqlr-pwdenc
 %{_libdir}/libsqlrserver.so.12
 %{_libdir}/libsqlrserver.so.12.*
-%dir %{_libexecdir}/%{name}
 %{_libexecdir}/%{name}/sqlrauth_*
 %{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
 %{_libexecdir}/%{name}/sqlrconfig_*
@@ -469,7 +467,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_libexecdir}/%{name}/sqlrnotification_*
 %{_libexecdir}/%{name}/sqlrparser_*
 %{_libexecdir}/%{name}/sqlrprotocol_*
-%{_libexecdir}/%{name}/sqlrpwdenc_*
 %{_libexecdir}/%{name}/sqlrlogger_*
 %{_libexecdir}/%{name}/sqlrmoduledata_*
 %{_libexecdir}/%{name}/sqlrquery_*
@@ -483,7 +480,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/sqlr-start.*
 %{_mandir}/*/sqlr-stop.*
 %{_mandir}/*/sqlr-status.*
-%{_mandir}/*/sqlr-pwdenc.*
 %doc AUTHORS ChangeLog
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
 %attr(755, sqlrelay, sqlrelay) %dir /run/%{name}
@@ -521,8 +517,6 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrparser.h
 %{_includedir}/%{name}/private/sqlrprotocol.h
 %{_includedir}/%{name}/private/sqlrprotocols.h
-%{_includedir}/%{name}/private/sqlrpwdenc.h
-%{_includedir}/%{name}/private/sqlrpwdencs.h
 %{_includedir}/%{name}/private/sqlrqueries.h
 %{_includedir}/%{name}/private/sqlrquerycursor.h
 %{_includedir}/%{name}/private/sqlrquery.h
@@ -560,9 +554,11 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_bindir}/sqlrsh
 %{_bindir}/sqlr-export
 %{_bindir}/sqlr-import
+%{_bindir}/sqlr-pwdenc
 %{_mandir}/*/sqlrsh.*
 %{_mandir}/*/sqlr-export.*
 %{_mandir}/*/sqlr-import.*
+%{_mandir}/*/sqlr-pwdenc.*
 
 %files cachemanager
 %{_unitdir}/sqlrcachemanager.service
@@ -579,12 +575,16 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %files common
 %{_libdir}/libsqlrutil.so.12
 %{_libdir}/libsqlrutil.so.12.*
+%dir %{_libexecdir}/%{name}
+%{_libexecdir}/%{name}/sqlrpwdenc_*
 
 %files common-devel
 %dir %{_includedir}/%{name}
 %dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrutil.h
 %{_includedir}/%{name}/private/sqlrutilincludes.h
+%{_includedir}/%{name}/private/sqlrpwdenc.h
+%{_includedir}/%{name}/private/sqlrpwdencs.h
 %{_libdir}/libsqlrutil.so
 %{_datadir}/sqlrelay
 
@@ -776,11 +776,13 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Aug 12 2022 David Muse <david.muse@firstworks.com> - 2.0.0-1
+* Fri Jun 30 2023 David Muse <david.muse@firstworks.com> - 2.0.0-1
 - Updated to version 2.0.0.
 - Removed support for mdbtools.
 - Updated to build python 3 packages for rhel > 6.
 - Removed sqlrresultsetdomnode.
+- Moved sqlr-pwdenc to clients package.
+- Moved pwdenc-related libraries and header files to common package.
 
 * Thu Mar 04 2021 David Muse <david.muse@firstworks.com> - 1.9.0-1
 - Updated to version 1.9.0.

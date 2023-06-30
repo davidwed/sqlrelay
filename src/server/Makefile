@@ -38,8 +38,6 @@ LIBSQLRSERVERSRCS = \
 	sqlrrouter.cpp \
 	sqlrqueries.cpp \
 	sqlrquery.cpp \
-	sqlrpwdencs.cpp \
-	sqlrpwdenc.cpp \
 	sqlrcredentials.cpp \
 	sqlrauths.cpp \
 	sqlrauth.cpp \
@@ -85,8 +83,6 @@ LIBSQLRSERVERLOBJS = \
 	sqlrrouter.$(OBJ) \
 	sqlrqueries.$(OBJ) \
 	sqlrquery.$(OBJ) \
-	sqlrpwdencs.$(OBJ) \
-	sqlrpwdenc.$(OBJ) \
 	sqlrcredentials.$(OBJ) \
 	sqlrauths.$(OBJ) \
 	sqlrauth.$(OBJ) \
@@ -111,11 +107,10 @@ all: $(STATICPLUGINSRCS) \
 	$(SQLR)-connection$(EXE) \
 	$(SQLR)-scaler$(EXE) \
 	$(SQLR)-cachemanager$(EXE) \
-	$(SQLR)-pwdenc$(EXE) \
 	$(SQLR)-status$(EXE)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii $(SQLR)-start$(EXE) $(SQLR)-stop$(EXE) $(SQLR)-listener$(EXE) $(SQLR)-connection$(EXE) $(SQLR)-scaler$(EXE) $(SQLR)-cachemanager$(EXE) $(SQLR)-pwdenc$(EXE) $(SQLR)-status$(EXE) $(STATICPLUGINSRCS)
+	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii $(SQLR)-start$(EXE) $(SQLR)-stop$(EXE) $(SQLR)-listener$(EXE) $(SQLR)-connection$(EXE) $(SQLR)-scaler$(EXE) $(SQLR)-cachemanager$(EXE) $(SQLR)-status$(EXE) $(STATICPLUGINSRCS)
 	$(RMTREE) .libs
 
 lib$(SQLR)server.$(LIBEXT): $(LIBSQLRSERVERSRCS) $(LIBSQLRSERVERLOBJS)
@@ -138,9 +133,6 @@ $(SQLR)-scaler$(EXE): sqlr-scaler.cpp sqlr-scaler.$(OBJ)
 
 $(SQLR)-cachemanager$(EXE): sqlr-cachemanager.cpp sqlr-cachemanager.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-cachemanager.$(OBJ) $(CACHEMANAGERLIBS)
-
-$(SQLR)-pwdenc$(EXE): sqlr-pwdenc.cpp sqlr-pwdenc.$(OBJ)
-	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-pwdenc.$(OBJ) $(SERVERLIBS)
 
 $(SQLR)-status$(EXE): sqlr-status.cpp sqlr-status.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlr-status.$(OBJ) $(SERVERLIBS)
@@ -252,22 +244,6 @@ sqlrrouterdeclarations.cpp: sqlrrouterdeclarations.cpp.in
 sqlrrouterassignments.cpp: sqlrrouterassignments.cpp.in
 	$(RM) $@
 	for file in `ls ../routers/*.$(OBJ) 2> /dev/null`; \
-	do \
-		module=`basename $$file .$(OBJ)`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrpwdencdeclarations.cpp: sqlrpwdencdeclarations.cpp.in
-	$(RM) $@
-	for file in `ls ../pwdencs/*.$(OBJ) 2> /dev/null`; \
-	do \
-		module=`basename $$file .$(OBJ)`; \
-		sed -e "s|@module@|$$module|g" $< >> $@; \
-	done
-
-sqlrpwdencassignments.cpp: sqlrpwdencassignments.cpp.in
-	$(RM) $@
-	for file in `ls ../pwdencs/*.$(OBJ) 2> /dev/null`; \
 	do \
 		module=`basename $$file .$(OBJ)`; \
 		sed -e "s|@module@|$$module|g" $< >> $@; \
@@ -473,7 +449,6 @@ install: $(INSTALLLIB)
 	$(LTINSTALL) $(CP) $(SQLR)-connection$(EXE) $(bindir)
 	$(LTINSTALL) $(CP) $(SQLR)-scaler$(EXE) $(bindir)
 	$(LTINSTALL) $(CP) $(SQLR)-cachemanager$(EXE) $(bindir)
-	$(LTINSTALL) $(CP) $(SQLR)-pwdenc$(EXE) $(bindir)
 	$(LTINSTALL) $(CP) $(SQLR)-status$(EXE) $(bindir)
 	$(MKINSTALLDIRS) $(includedir)/sqlrelay
 	$(CP) sqlrelay/sqlrserver.h $(includedir)/sqlrelay
@@ -492,8 +467,6 @@ install: $(INSTALLLIB)
 	$(CP) sqlrelay/private/sqlrparser.h $(includedir)/sqlrelay/private/sqlrparser.h
 	$(CP) sqlrelay/private/sqlrprotocol.h $(includedir)/sqlrelay/private/sqlrprotocol.h
 	$(CP) sqlrelay/private/sqlrprotocols.h $(includedir)/sqlrelay/private/sqlrprotocols.h
-	$(CP) sqlrelay/private/sqlrpwdenc.h $(includedir)/sqlrelay/private/sqlrpwdenc.h
-	$(CP) sqlrelay/private/sqlrpwdencs.h $(includedir)/sqlrelay/private/sqlrpwdencs.h
 	$(CP) sqlrelay/private/sqlrqueries.h $(includedir)/sqlrelay/private/sqlrqueries.h
 	$(CP) sqlrelay/private/sqlrquerycursor.h $(includedir)/sqlrelay/private/sqlrquerycursor.h
 	$(CP) sqlrelay/private/sqlrquery.h $(includedir)/sqlrelay/private/sqlrquery.h
@@ -547,8 +520,6 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrnotifications.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrparser.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrprotocols.h
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrpwdenc.h
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrpwdencs.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrqueries.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrquerycursor.h
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrquery.h
@@ -619,8 +590,6 @@ uninstall: $(UNINSTALLLIB)
 		$(includedir)/sqlrelay/private/sqlrnotifications.h \
 		$(includedir)/sqlrelay/private/sqlrparser.h \
 		$(includedir)/sqlrelay/private/sqlrprotocols.h \
-		$(includedir)/sqlrelay/private/sqlrpwdenc.h \
-		$(includedir)/sqlrelay/private/sqlrpwdencs.h \
 		$(includedir)/sqlrelay/private/sqlrqueries.h \
 		$(includedir)/sqlrelay/private/sqlrquerycursor.h \
 		$(includedir)/sqlrelay/private/sqlrquery.h \
@@ -665,7 +634,6 @@ uninstall: $(UNINSTALLLIB)
 		$(bindir)/$(SQLR)-connection$(EXE) \
 		$(bindir)/$(SQLR)-scaler$(EXE) \
 		$(bindir)/$(SQLR)-cachemanager$(EXE) \
-		$(bindir)/$(SQLR)-pwdenc$(EXE) \
 		$(bindir)/$(SQLR)-status$(EXE) \
 		$(bindir)/sqlr-start$(EXE) \
 		$(bindir)/sqlr-stop$(EXE) \
@@ -673,7 +641,6 @@ uninstall: $(UNINSTALLLIB)
 		$(bindir)/sqlr-connection$(EXE) \
 		$(bindir)/sqlr-scaler$(EXE) \
 		$(bindir)/sqlr-cachemanager$(EXE) \
-		$(bindir)/sqlr-pwdenc$(EXE) \
 		$(bindir)/sqlr-status$(EXE)
 	$(RMTREE) $(tmpdir) \
 		$(logdir) \

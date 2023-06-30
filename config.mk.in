@@ -561,7 +561,9 @@ endif
 STATICUTILPLUGINSRCS = 
 ifeq ($(SQLRELAY_ENABLE_SHARED),no)
 STATICUTILPLUGINSRCS += sqlrconfigdeclarations.cpp \
-			sqlrconfigassignments.cpp
+			sqlrconfigassignments.cpp \
+			sqlrpwdencdeclarations.cpp \
+			sqlrpwdencassignments.cpp
 STATICUTILPLUGINLOBJS = $(shell ls ../configs/*.$(OBJ))
 endif
 UTILCPPFLAGS = $(WERROR) $(BASECPPFLAGS) $(DIRCPPFLAG) -I./ -I$(top_builddir)/ -I$(top_builddir)/src/common $(RUDIMENTSINCLUDES)
@@ -602,8 +604,6 @@ STATICPLUGINSRCS += sqlrserverconnectiondeclarations.cpp \
 		sqlrscheduleassignments.cpp \
 		sqlrrouterdeclarations.cpp \
 		sqlrrouterassignments.cpp \
-		sqlrpwdencdeclarations.cpp \
-		sqlrpwdencassignments.cpp \
 		sqlrauthdeclarations.cpp \
 		sqlrauthassignments.cpp \
 		sqlrdirectivedeclarations.cpp \
