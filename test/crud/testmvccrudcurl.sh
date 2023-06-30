@@ -9,8 +9,8 @@ fi
 URL=http://localhost/mvccrud.$EXT
 
 
-sqlrsh -config ../sqlrelay.conf.d/postgresql.conf -id postgresqltest -command "drop table testtable"
-sqlrsh -config ../sqlrelay.conf.d/postgresql.conf -id postgresqltest -command "create table testtable (col1 varchar(128), col2 varchar(128), col3 varchar(128))"
+sqlrsh -host localhost -user test -password test -command "drop table testtable"
+sqlrsh -host localhost -user test -password test -command "create table testtable (col1 varchar(128), col2 varchar(128), col3 varchar(128))"
 
 
 # create test
@@ -137,4 +137,4 @@ EOF
 echo
 
 echo "======================================================================"
-sqlrsh -config ../sqlrelay.conf.d/postgresql.conf -id postgresqltest -command "drop table testtable"
+sqlrsh -host localhost -user test -password test -command "drop table testtable"
