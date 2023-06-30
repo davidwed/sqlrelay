@@ -17,6 +17,7 @@
 #include <rudiments/memorypool.h>
 #include <rudiments/prompt.h>
 #include <rudiments/locale.h>
+#include <rudiments/sensitivevalue.h>
 #include <config.h>
 #include <defaults.h>
 #define NEED_IS_BIT_TYPE_CHAR 1
@@ -2584,6 +2585,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	cmdline=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdline);
 	sqlrconfigs	sqlrcfgs(sqlrpth);
+	sqlrconfig	*cfg=NULL;
 
 	// get command-line options
 	const char	*configurl=sqlrpth->getConfigUrl();
@@ -2595,6 +2597,8 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	const char	*socket=cmdline->getValue("socket");
 	const char	*user=cmdline->getValue("user");
 	const char	*password=cmdline->getValue("password");
+	const char	*passwordencryptionid=NULL;
+	char		*decryptedpassword=NULL;
 	bool		usekrb=cmdline->isFound("krb");
 	const char	*krbservice=cmdline->getValue("krbservice");
 	const char	*krbmech=cmdline->getValue("krbmech");
@@ -2654,7 +2658,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 
 	// if an id was specified, then get various values from the config file
 	if (!charstring::isNullOrEmpty(id)) {
-		sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
+		cfg=sqlrcfgs.load(configurl,id);
 		if (cfg) {
 			if (!cmdline->isFound("host")) {
 				host="localhost";
@@ -2684,8 +2688,31 @@ bool sqlrsh::execute(int argc, const char **argv) {
 				tlsciphers=cfg->getDefaultTlsCiphers();
 			}
 			if (!cmdline->isFound("user")) {
+
+				// get the default user
 				user=cfg->getDefaultUser();
-				password=cfg->getDefaultPassword();
+
+				// get the default password and
+				// de-sensitiveize it if necessary
+				sensitivevalue	passwordvalue;
+				passwordvalue.setPath(cfg->getPasswordPath());
+				passwordvalue.parse(cfg->getDefaultPassword());
+				password=passwordvalue.detachTextValue();
+
+				// decrypt the password if necessary
+				passwordencryptionid=
+					cfg->getDefaultPasswordEncryptionId();
+				if (passwordencryptionid) {
+					sqlrpwdencs	sqlrpe(sqlrpth,false);
+					sqlrpe.load(
+						cfg->getPasswordEncryptions());
+					decryptedpassword=
+						sqlrpe.
+						getPasswordEncryptionById(
+							passwordencryptionid)->
+							decrypt(password);
+					password=decryptedpassword;
+				}
 			}
 		}
 	}
@@ -2769,6 +2796,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 
 	// clean up
 	pr.flushHistory();
+	delete[] decryptedpassword;
 
 	return retval;
 }

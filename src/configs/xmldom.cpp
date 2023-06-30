@@ -45,6 +45,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 
 		const char	*getDefaultUser();
 		const char	*getDefaultPassword();
+		const char	*getDefaultPasswordEncryptionId();
 
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
@@ -304,6 +305,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*defaulttlsciphers;
 		const char	*defaultuser;
 		const char	*defaultpassword;
+		const char	*defaultpasswordencryptionid;
 
 		bool		ininstancetag;
 		bool		inidattribute;
@@ -438,6 +440,7 @@ void sqlrconfig_xmldom::init() {
 	defaulttlsciphers=NULL;
 	defaultuser=NULL;
 	defaultpassword=NULL;
+	defaultpasswordencryptionid=NULL;
 }
 
 bool sqlrconfig_xmldom::clear() {
@@ -496,6 +499,10 @@ const char *sqlrconfig_xmldom::getDefaultUser() {
 
 const char *sqlrconfig_xmldom::getDefaultPassword() {
 	return defaultpassword;
+}
+
+const char *sqlrconfig_xmldom::getDefaultPasswordEncryptionId() {
+	return defaultpasswordencryptionid;
 }
 
 bool sqlrconfig_xmldom::getListenOnInet() {
@@ -2178,6 +2185,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 						getFirstTagChild("user");
 	defaultuser=defaultusertag->getAttributeValue("user");
 	defaultpassword=defaultusertag->getAttributeValue("password");
+	defaultpasswordencryptionid=
+		defaultusertag->getAttributeValue("passwordencryptionid");
 }
 
 routecontainer *sqlrconfig_xmldom::routeAlreadyExists(routecontainer *cur) {

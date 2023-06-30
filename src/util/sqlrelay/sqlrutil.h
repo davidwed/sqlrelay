@@ -141,6 +141,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual const char	*getDefaultUser()=0;
 		virtual const char	*getDefaultPassword()=0;
+		virtual const char	*getDefaultPasswordEncryptionId()=0;
 
 		virtual bool		getListenOnInet()=0;
 		virtual bool		getListenOnUnix()=0;
