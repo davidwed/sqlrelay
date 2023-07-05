@@ -9,7 +9,6 @@
 		void	getValidColumnName(const char *c,
 						const char **col,
 						size_t *collen);
-		const char	*deriveType(const char *value);
 		void	bind(const char *bindformat,
 					const char * const *columns,
 					const char * const *values,

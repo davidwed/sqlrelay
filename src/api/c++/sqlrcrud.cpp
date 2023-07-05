@@ -281,7 +281,7 @@ bool sqlrcrud::doCreate(dictionary<const char *, const char *> *kvp) {
 					node; node=node->getNext()) {
 		columns[i]=node->getValue();
 		values[i]=kvp->getValue(node->getValue());
-		types[i]=deriveType(values[i]);
+		types[i]=deriveDataType(values[i]);
 		i++;
 	}
 	columns[i]=NULL;
@@ -387,24 +387,6 @@ void sqlrcrud::getValidColumnName(const char *c,
 	}
 }
 
-const char *sqlrcrud::deriveType(const char *value) {
-	if (!value) {
-		return "u";
-	}
-	if (charstring::isInteger(value)) {
-		return "n";
-	}
-	if (!charstring::compareIgnoringCase(value,"t") ||
-		!charstring::compareIgnoringCase(value,"true")) {
-		return "t";
-	}
-	if (!charstring::compareIgnoringCase(value,"f") ||
-		!charstring::compareIgnoringCase(value,"false")) {
-		return "f";
-	}
-	return "s";
-}
-
 void sqlrcrud::bind(const char *bindformat,
 				const char * const *columns,
 				const char * const *values,
@@ -421,7 +403,7 @@ void sqlrcrud::bind(const char *bindformat,
 	m.clear();
 	if (bf=='?'|| bf=='$') {
 		uint64_t	i=1;
-		while (*c && *t) {
+		while (*c) {
 			if (charstring::compareIgnoringCase(
 							*c,autoinc) &&
 				charstring::compareIgnoringCase(
@@ -430,7 +412,7 @@ void sqlrcrud::bind(const char *bindformat,
 						charstring::getIntegerLength(i);
 				char		*b=(char *)m.allocate(len+1);
 				charstring::printf(b,len,"%lld",i);
-				if ((*t)[0]=='s') {
+				if (!types || !*t || (*t)[0]=='s') {
 					cur->inputBind(b,*v);
 				} else if ((*t)[0]=='n') {
 					cur->inputBind(b,
@@ -442,6 +424,8 @@ void sqlrcrud::bind(const char *bindformat,
 					cur->inputBind(b,(int64_t)0);
 				} else if ((*t)[0]=='u') {
 					cur->inputBind(b,(const char *)NULL);
+				} else {
+					cur->inputBind(b,*v);
 				}
 				i++;
 			}
@@ -450,12 +434,12 @@ void sqlrcrud::bind(const char *bindformat,
 			t++;
 		}
 	} else if (bf=='@' || bf==':') {
-		while (*c && *t) {
+		while (*c) {
 			if (charstring::compareIgnoringCase(
 							*c,autoinc) &&
 				charstring::compareIgnoringCase(
 							*c,primarykey)) {
-				if ((*t)[0]=='s') {
+				if (!types || !*t || (*t)[0]=='s') {
 					cur->inputBind(*c,*v);
 				} else if ((*t)[0]=='n') {
 					cur->inputBind(*c,
@@ -467,6 +451,8 @@ void sqlrcrud::bind(const char *bindformat,
 					cur->inputBind(*c,(int64_t)0);
 				} else if ((*t)[0]=='u') {
 					cur->inputBind(*c,(const char *)NULL);
+				} else {
+					cur->inputBind(*c,*v);
 				}
 			}
 			c++;
@@ -850,7 +836,7 @@ bool sqlrcrud::doUpdate(dictionary<const char *, const char *> *kvp,
 					node; node=node->getNext()) {
 		columns[i]=node->getValue();
 		values[i]=kvp->getValue(node->getValue());
-		types[i]=deriveType(values[i]);
+		types[i]=deriveDataType(values[i]);
 		i++;
 	}
 	columns[i]=NULL;
