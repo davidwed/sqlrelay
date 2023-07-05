@@ -1,5 +1,5 @@
 sqlrsh -host localhost -user test -password test -command "drop table testtable"
-sqlrsh -host localhost -user test -password test -command "create table testtable (col1 varchar(128), col2 varchar(128), col3 varchar(128))"
+sqlrsh -host localhost -user test -password test -command "create table testtable (colstr varchar(128), colint int, coltrue boolean, colfalse boolean, colnull varchar(128))"
 
 
 
@@ -18,9 +18,11 @@ export CONTENT_TYPE
 ./mvccrud.cgi << EOF
 {
 	"data": {
-		"col1": "val1",
-		"col2": "val2",
-		"col3": "val3"
+		"colstr": "val1",
+		"colint": 1,
+		"coltrue": true,
+		"colfalse": false,
+		"colnull": null
 	}
 }
 EOF
@@ -44,23 +46,32 @@ export CONTENT_TYPE
 	"criteria" : {
 		"and" : [
 			{ "=" : [
-				{ "var": "col1" },
+				{ "var": "colstr" },
 				"val1"
 			] },
 			{ "=" : [
-				{ "var": "col2" },
-				"val2"
+				{ "var": "colint" },
+				1
 			] },
 			{ "=" : [
-				{ "var": "col3" },
-				"val3"
+				{ "var": "coltrue" },
+				true
+			] },
+			{ "=" : [
+				{ "var": "colfalse" },
+				false
+			] },
+			{ "isnull" : [
+				{ "var": "colnull" }
 			] }
 		]
 	},
 	"sort": {
-		"col1" : "asc",
-		"col2" : "asc",
-		"col3" : "asc"
+		"colstr" : "asc",
+		"colint" : "asc",
+		"coltrue" : "asc"
+		"colfalse" : "asc"
+		"colnull" : "asc"
 	}
 }
 EOF
@@ -83,14 +94,16 @@ export CONTENT_TYPE
 {
 	"criteria" : {
 		"=" : [
-			{ "var": "col1" },
+			{ "var": "colstr" },
 			"val1"
 		]
 	},
 	"data": {
-		"col1": "newval1",
-		"col2": "newval2",
-		"col3": "newval3"
+		"colstr": "val2",
+		"colint": 2,
+		"coltrue": false,
+		"colfalse": true,
+		"colnull": "not-null"
 	}
 }
 EOF
@@ -127,8 +140,8 @@ export CONTENT_TYPE
 {
 	"criteria" : {
 		"=" : [
-			{ "var": "col1" },
-			"newval1"
+			{ "var": "colstr" },
+			"val2"
 		]
 	},
 }

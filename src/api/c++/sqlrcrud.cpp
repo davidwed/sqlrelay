@@ -421,8 +421,7 @@ void sqlrcrud::bind(const char *bindformat,
 	m.clear();
 	if (bf=='?'|| bf=='$') {
 		uint64_t	i=1;
-		while (*c && *v && *t) {
-			// FIXME: should we really not bind to these?
+		while (*c && *t) {
 			if (charstring::compareIgnoringCase(
 							*c,autoinc) &&
 				charstring::compareIgnoringCase(
@@ -438,9 +437,9 @@ void sqlrcrud::bind(const char *bindformat,
 						charstring::
 							convertToInteger(*v));
 				} else if ((*t)[0]=='t') {
-					cur->inputBind(b,true);
+					cur->inputBind(b,(int64_t)1);
 				} else if ((*t)[0]=='f') {
-					cur->inputBind(b,false);
+					cur->inputBind(b,(int64_t)0);
 				} else if ((*t)[0]=='u') {
 					cur->inputBind(b,(const char *)NULL);
 				}
@@ -451,8 +450,7 @@ void sqlrcrud::bind(const char *bindformat,
 			t++;
 		}
 	} else if (bf=='@' || bf==':') {
-		while (*c && *v && *t) {
-			// FIXME: should we really not bind to these?
+		while (*c && *t) {
 			if (charstring::compareIgnoringCase(
 							*c,autoinc) &&
 				charstring::compareIgnoringCase(
@@ -464,9 +462,9 @@ void sqlrcrud::bind(const char *bindformat,
 						charstring::
 							convertToInteger(*v));
 				} else if ((*t)[0]=='t') {
-					cur->inputBind(*c,true);
+					cur->inputBind(*c,(int64_t)1);
 				} else if ((*t)[0]=='f') {
-					cur->inputBind(*c,false);
+					cur->inputBind(*c,(int64_t)0);
 				} else if ((*t)[0]=='u') {
 					cur->inputBind(*c,(const char *)NULL);
 				}
