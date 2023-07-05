@@ -9,15 +9,18 @@
 		void	getValidColumnName(const char *c,
 						const char **col,
 						size_t *collen);
+		const char	*deriveType(const char *value);
 		void	bind(const char *bindformat,
 					const char * const *columns,
-					const char * const *values);
+					const char * const *values,
+					const char * const *types);
 
 		bool	doReadDelegate(const char *where,
 					const char *orderby,
 					uint64_t skip);
 		bool	doUpdateDelegate(const char * const *columns,
 					const char * const *values,
+					const char * const *types,
 					const char *where);
 		bool	doDeleteDelegate(const char *where);
 

@@ -191,7 +191,8 @@ bool sqlrcrud::getDeleteQueryContainsPartialWhere() {
 }
 
 bool sqlrcrud::doCreate(const char * const *columns,
-			const char * const *values) {
+			const char * const *values,
+			const char * const *types) {
 
 	// clear any previous error
 	error.clear();
@@ -260,7 +261,7 @@ bool sqlrcrud::doCreate(const char * const *columns,
 
 	// bind
 	if (columns && values) {
-		bind(bindformat,columns,values);
+		bind(bindformat,columns,values,types);
 	}
 
 	// execute
@@ -271,24 +272,29 @@ bool sqlrcrud::doCreate(dictionary<const char *, const char *> *kvp) {
 
 	// build columns/values
 	linkedlist<const char *>	*keys=kvp->getKeys();
-	const char	**columns=new const char *[keys->getCount()+1];
-	const char	**values=new const char *[keys->getCount()+1];
+	uint64_t	keycount=keys->getCount();
+	const char	**columns=new const char *[keycount+1];
+	const char	**values=new const char *[keycount+1];
+	const char	**types=new const char *[keycount+1];
 	uint64_t	i=0;
 	for (listnode<const char *> *node=keys->getFirst();
 					node; node=node->getNext()) {
 		columns[i]=node->getValue();
 		values[i]=kvp->getValue(node->getValue());
+		types[i]=deriveType(values[i]);
 		i++;
 	}
 	columns[i]=NULL;
 	values[i]=NULL;
+	types[i]=NULL;
 
 	// create
-	bool	result=doCreate(columns,values);
+	bool	result=doCreate(columns,values,types);
 
 	// clean up
 	delete[] columns;
 	delete[] values;
+	delete[] types;
 
 	return result;
 }
@@ -299,24 +305,29 @@ bool sqlrcrud::doCreate(jsondom *j) {
 	domnode		*datanode=j->getRootNode()->
 					getFirstTagChild("r")->
 					getFirstTagChild("data");
-	const char	**columns=new const char *[datanode->getChildCount()+1];
-	const char	**values=new const char *[datanode->getChildCount()+1];
+	uint64_t	childcount=datanode->getChildCount();
+	const char	**columns=new const char *[childcount+1];
+	const char	**values=new const char *[childcount+1];
+	const char	**types=new const char *[childcount+1];
 	uint64_t	i=0;
 	for (domnode *node=datanode->getFirstTagChild();
 			!node->isNullNode(); node=node->getNextTagSibling()) {
 		columns[i]=node->getName();
 		values[i]=node->getAttributeValue("v");
+		types[i]=node->getAttributeValue("t");
 		i++;
 	}
 	columns[i]=NULL;
 	values[i]=NULL;
+	types[i]=NULL;
 
 	// create
-	bool	result=doCreate(columns,values);
+	bool	result=doCreate(columns,values,types);
 
 	// clean up
 	delete[] columns;
 	delete[] values;
+	delete[] types;
 
 	return result;
 }
@@ -376,23 +387,42 @@ void sqlrcrud::getValidColumnName(const char *c,
 	}
 }
 
+const char *sqlrcrud::deriveType(const char *value) {
+	if (!value) {
+		return "u";
+	}
+	if (charstring::isInteger(value)) {
+		return "n";
+	}
+	if (!charstring::compareIgnoringCase(value,"t") ||
+		!charstring::compareIgnoringCase(value,"true")) {
+		return "t";
+	}
+	if (!charstring::compareIgnoringCase(value,"f") ||
+		!charstring::compareIgnoringCase(value,"false")) {
+		return "f";
+	}
+	return "s";
+}
+
 void sqlrcrud::bind(const char *bindformat,
 				const char * const *columns,
-				const char * const *values) {
+				const char * const *values,
+				const char * const *types) {
 
 	if (charstring::isNullOrEmpty(bindformat)) {
 		return;
 	}
 
-	// FIXME: there's no way to bind a NULL or non-string with this...
-
 	const char * const *c=columns;
 	const char * const *v=values;
+	const char * const *t=types;
 	char	bf=bindformat[0];
 	m.clear();
 	if (bf=='?'|| bf=='$') {
 		uint64_t	i=1;
-		while (*v) {
+		while (*c && *v && *t) {
+			// FIXME: should we really not bind to these?
 			if (charstring::compareIgnoringCase(
 							*c,autoinc) &&
 				charstring::compareIgnoringCase(
@@ -401,21 +431,49 @@ void sqlrcrud::bind(const char *bindformat,
 						charstring::getIntegerLength(i);
 				char		*b=(char *)m.allocate(len+1);
 				charstring::printf(b,len,"%lld",i);
-				cur->inputBind(b,*v);
+				if ((*t)[0]=='s') {
+					cur->inputBind(b,*v);
+				} else if ((*t)[0]=='n') {
+					cur->inputBind(b,
+						charstring::
+							convertToInteger(*v));
+				} else if ((*t)[0]=='t') {
+					cur->inputBind(b,true);
+				} else if ((*t)[0]=='f') {
+					cur->inputBind(b,false);
+				} else if ((*t)[0]=='u') {
+					cur->inputBind(b,(const char *)NULL);
+				}
 				i++;
 			}
+			c++;
 			v++;
+			t++;
 		}
 	} else if (bf=='@' || bf==':') {
-		while (*c && *v) {
+		while (*c && *v && *t) {
+			// FIXME: should we really not bind to these?
 			if (charstring::compareIgnoringCase(
 							*c,autoinc) &&
 				charstring::compareIgnoringCase(
 							*c,primarykey)) {
-				cur->inputBind(*c,*v);
+				if ((*t)[0]=='s') {
+					cur->inputBind(*c,*v);
+				} else if ((*t)[0]=='n') {
+					cur->inputBind(*c,
+						charstring::
+							convertToInteger(*v));
+				} else if ((*t)[0]=='t') {
+					cur->inputBind(*c,true);
+				} else if ((*t)[0]=='f') {
+					cur->inputBind(*c,false);
+				} else if ((*t)[0]=='u') {
+					cur->inputBind(*c,(const char *)NULL);
+				}
 			}
 			c++;
 			v++;
+			t++;
 		}
 	}
 }
@@ -764,6 +822,7 @@ bool sqlrcrud::buildXmlOrderBy(domnode *sort,
 
 bool sqlrcrud::doUpdate(const char * const *columns,
 			const char * const *values,
+			const char * const *types,
 			const char *criteria) {
 
 	// clear any previous error
@@ -776,7 +835,7 @@ bool sqlrcrud::doUpdate(const char * const *columns,
 	}
 
 	// update
-	return doUpdateDelegate(columns,values,wherestr.getString());
+	return doUpdateDelegate(columns,values,types,wherestr.getString());
 }
 
 bool sqlrcrud::doUpdate(dictionary<const char *, const char *> *kvp,
@@ -784,24 +843,29 @@ bool sqlrcrud::doUpdate(dictionary<const char *, const char *> *kvp,
 
 	// build columns/values
 	linkedlist<const char *>	*keys=kvp->getKeys();
-	const char	**columns=new const char *[keys->getCount()+1];
-	const char	**values=new const char *[keys->getCount()+1];
+	uint64_t			keycount=keys->getCount();
+	const char	**columns=new const char *[keycount+1];
+	const char	**values=new const char *[keycount+1];
+	const char	**types=new const char *[keycount+1];
 	uint64_t	i=0;
 	for (listnode<const char *> *node=keys->getFirst();
 					node; node=node->getNext()) {
 		columns[i]=node->getValue();
 		values[i]=kvp->getValue(node->getValue());
+		types[i]=deriveType(values[i]);
 		i++;
 	}
 	columns[i]=NULL;
 	values[i]=NULL;
+	types[i]=NULL;
 
 	// update
-	bool	result=doUpdate(columns,values,criteria);
+	bool	result=doUpdate(columns,values,types,criteria);
 
 	// clean up
 	delete[] columns;
 	delete[] values;
+	delete[] types;
 
 	return result;
 }
@@ -815,17 +879,21 @@ bool sqlrcrud::doUpdate(jsondom *j) {
 	domnode		*datanode=j->getRootNode()->
 					getFirstTagChild("r")->
 					getFirstTagChild("data");
-	const char	**columns=new const char *[datanode->getChildCount()+1];
-	const char	**values=new const char *[datanode->getChildCount()+1];
+	uint64_t	childcount=datanode->getChildCount();
+	const char	**columns=new const char *[childcount+1];
+	const char	**values=new const char *[childcount+1];
+	const char	**types=new const char *[childcount+1];
 	uint64_t	i=0;
 	for (domnode *node=datanode->getFirstTagChild();
 			!node->isNullNode(); node=node->getNextTagSibling()) {
 		columns[i]=node->getName();
 		values[i]=node->getAttributeValue("v");
+		types[i]=node->getAttributeValue("t");
 		i++;
 	}
 	columns[i]=NULL;
 	values[i]=NULL;
+	types[i]=NULL;
 
 	// build $(WHERE)
 	domnode		*criterianode=j->getRootNode()->
@@ -837,21 +905,25 @@ bool sqlrcrud::doUpdate(jsondom *j) {
 					updatecontainspartialwhere)) {
 		delete[] columns;
 		delete[] values;
+		delete[] types;
 		return false;
 	}
 
 	// update
-	bool	result=doUpdateDelegate(columns,values,wherestr.getString());
+	bool	result=doUpdateDelegate(columns,values,types,
+						wherestr.getString());
 
 	// clean up
 	delete[] columns;
 	delete[] values;
+	delete[] types;
 
 	return result;
 }
 
 bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 				const char * const *values,
+				const char * const *types,
 				const char *where) {
 
 	stringbuffer	setstr;
@@ -924,7 +996,7 @@ bool sqlrcrud::doUpdateDelegate(const char * const *columns,
 
 	// bind
 	if (columns && values) {
-		bind(bindformat,columns,values);
+		bind(bindformat,columns,values,types);
 	}
 
 	// execute
