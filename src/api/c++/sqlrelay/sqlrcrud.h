@@ -271,13 +271,16 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *
 		 *  "columns" should contain the set of columns that
 		 *  corresponding elements of "values" will be inserted into.
-		 *  "types" should contain the corresponding type for each
+		 *
+		 *  "types" should contain the corresponding data type for each
 		 *  value:
-		 *  * "s" for string
 		 *  * "n" for numeric
 		 *  * "t" for true
 		 *  * "f" for false
 		 *  * "u" for null
+		 *  * "s" (or any other value) for string
+		 *  Otherwise "types" may be null, and the data type will be 
+		 *  derived as "s", "n", or "u" from the value.
 		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
@@ -289,7 +292,9 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		/** Executes the create (insert) query as either built by
 		 *  buildQueries() or overridden by setCreateQuery().
 		 *
-		 * "kvp" should contain the column/value pairs to be inserted.
+		 *  Keys of "kvp" and values of "kvp" should be set to the
+		 *  column/value pairs to be inserted.  The data type of each
+		 *  value will be derived as "s", "n", or "u" from the value.
 		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
@@ -356,12 +361,14 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *
 		 *  "columns" and "values" should be set to the column/value
 		 *  pairs to be updated.  "types" should be set to the
-		 *  corresponding type for each value:
-		 *  * "s" for string
+		 *  corresponding data type for each value:
 		 *  * "n" for numeric
 		 *  * "t" for true
 		 *  * "f" for false
 		 *  * "u" for null
+		 *  * "s" (or any other value) for string
+		 *  Otherwise "types" may be null, and the data type will be
+		 *  derived as "s", "n", or "u" from the value.
 		 *
 		 *  "criteria" should be a JSON string representing the
 		 *  criteria that will be used to build the where clause,
@@ -379,7 +386,8 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  or overridden by setUpdateQuery().
 		 *
 		 *  Keys of "kvp" and values of "kvp" should be set to the
-		 *  column/value pairs to be updated.
+		 *  column/value pairs to be updated.  The data type of each
+		 *  value will be derived as "s", "n", or "u" from the value.
 		 *
 		 *  "criteria" should be a JSON string representing the
 		 *  criteria that will be used to build the where clause,
@@ -389,7 +397,7 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  code and message can be retrieved using getErrorCode() and
 		 *  getErrorMessage(). */
 		bool	doUpdate(dictionary<const char *, const char *> *kvp,
-					const char *criteria);
+							const char *criteria);
 
 		/** Executes the update query as either built by buildQueries()
 		 *  or overridden by setUpdateQuery().
