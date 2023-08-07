@@ -10556,14 +10556,41 @@ dnl checks for illumos platform
 dnl if it is, then _ILLUMOS=1 is defined
 AC_DEFUN([FW_CHECK_ILLUMOS],
 [
+ILLUMOS=""
 AC_MSG_CHECKING(for illumos)
-if ( test -n "`uname -v 2> /dev/null | grep -v illumos`" )
+if ( test -n "`uname -v 2> /dev/null | grep -i illumos`" )
 then
+	ILLUMOS="yes"
 	AC_DEFINE(_ILLUMOS,1,IllumOS)
 	AC_MSG_RESULT(yes)
 else
 	AC_MSG_RESULT(no)
 fi
+AC_SUBST(ILLUMOS)
+])
+
+
+dnl checks for HP-UX platform
+dnl if it is, then it adds -D_XOPEN_SOURCE=500 to CPPFLAGS and disables -Werror
+AC_DEFUN([FW_CHECK_HPUX],
+[
+HPUX=""
+AC_MSG_CHECKING(for hp-ux)
+case $host_os in
+	*hpux* )
+		HPUX="yes"
+		CPPFLAGS="$CPPFLAGS -D_XOPEN_SOURCE=500"
+		ENABLE_WERROR=""
+		AC_MSG_RESULT(yes)
+		AC_MSG_CHECKING([for -Wa,-w36])
+		FW_TRY_COMPILE([#include <stdio.h>],[printf("hello");],[-Wa,-w36],[CXXFLAGS="$CXXFLAGS -Wa,-w36"; AC_MSG_RESULT(yes)],[ AC_MSG_RESULT(no)])
+		AC_DEFINE(_HPUX,1,HP-UX OS)
+		;;
+	* )
+		AC_MSG_RESULT(no)
+		;;
+esac
+AC_SUBST(HPUX)
 ])
 
 

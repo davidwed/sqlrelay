@@ -794,6 +794,7 @@ PIPE
 JNISUFFIX
 MODULESUFFIX
 SOSUFFIX
+HPUX
 IRIX
 MACOSXDEPLOYMENTTARGET
 WNOLONGDOUBLE
@@ -17046,6 +17047,54 @@ $as_echo "#define _IRIX 1" >>confdefs.h
 		fi
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
+		;;
+	* )
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+		;;
+esac
+
+
+
+HPUX=""
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for hp-ux" >&5
+$as_echo_n "checking for hp-ux... " >&6; }
+case $host_os in
+	*hpux* )
+		HPUX="yes"
+		CPPFLAGS="$CPPFLAGS -D_XOPEN_SOURCE=500"
+		ENABLE_WERROR=""
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wa,-w36" >&5
+$as_echo_n "checking for -Wa,-w36... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+CPPFLAGS="-Wa,-w36"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+int
+main ()
+{
+printf("hello");
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  CXXFLAGS="$CXXFLAGS -Wa,-w36"; { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+
+
+$as_echo "#define _HPUX 1" >>confdefs.h
+
 		;;
 	* )
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
