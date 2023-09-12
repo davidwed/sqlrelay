@@ -232,7 +232,8 @@ bool sqlrcrud::doCreate(const char * const *columns,
 							*c,autoinc)) {
 					valstr.append("null");
 				} else if (!charstring::compareIgnoringCase(
-							*c,primarykey)) {
+							*c,primarykey) &&
+							idsequence) {
 					valstr.printf(
 						con->nextvalFormat(),
 						idsequence);
@@ -404,10 +405,11 @@ void sqlrcrud::bind(const char *bindformat,
 	if (bf=='?'|| bf=='$') {
 		uint64_t	i=1;
 		while (*c) {
-			if (charstring::compareIgnoringCase(
-							*c,autoinc) &&
-				charstring::compareIgnoringCase(
-							*c,primarykey)) {
+			if (!(!charstring::compareIgnoringCase(
+							*c,autoinc) ||
+				(!charstring::compareIgnoringCase(
+							*c,primarykey) &&
+							idsequence))) {
 				uint16_t	len=
 						charstring::getIntegerLength(i);
 				char		*b=(char *)m.allocate(len+1);
@@ -435,10 +437,11 @@ void sqlrcrud::bind(const char *bindformat,
 		}
 	} else if (bf=='@' || bf==':') {
 		while (*c) {
-			if (charstring::compareIgnoringCase(
-							*c,autoinc) &&
-				charstring::compareIgnoringCase(
-							*c,primarykey)) {
+			if (!(!charstring::compareIgnoringCase(
+							*c,autoinc) ||
+				(!charstring::compareIgnoringCase(
+							*c,primarykey) &&
+							idsequence))) {
 				if (!types || !*t || (*t)[0]=='s') {
 					cur->inputBind(*c,*v);
 				} else if ((*t)[0]=='n') {

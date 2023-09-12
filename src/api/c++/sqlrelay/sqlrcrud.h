@@ -82,7 +82,12 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		void	setSqlrCursor(sqlrcursor *cur);
 
 
-		/** Sets the table that this instance operates on. */
+		/** Sets the table that this instance operates on.
+		 *
+		 *  Also sets the sequence to generate new ids from during
+		 *  create operations to "table"_ids, if the id sequence is
+		 *  NULL, either because setIdSequence() hasn't been called,
+		 *  or was called with NULL. */
 		void	setTable(const char *table);
 
 		/** Sets the sequence to generate new ids from during create
@@ -92,7 +97,13 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		/** Returns the table set by setTable(). */
 		const char	*getTable();
 
-		/** Returns the sequence set by setSequence(). */
+		/** Returns the sequence set by setSequence() or setTable().
+		 *
+		 *  Note that this may return NULL if:
+		 *  * neither setIdSequence() nor setTable() were ever called
+		 *  * setTable() was called, but then setIdSequence(NULL)
+		 *    was called later
+		 */
 		const char	*getIdSequence();
 
 
@@ -135,11 +146,33 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		void	setAutoIncrementColumn(const char *autoinc);
 
 		/** Returns the primary key column as either determined by
-		 *  buildQueries() or overridden by setPrimaryKeyColumn(). */
+		 *  buildQueries() or overridden by setPrimaryKeyColumn().
+		 *
+		 *  Note that this may return NULL if:
+		 *  * neither buildQueries() nor setPrimaryKeyColumn() was ever
+		 *    called
+		 *  * buildQueries() was called, but didn't detect a
+		 *    primary key column and setPrimaryKeyColumn() was never
+		 *    called
+		 *  * buildQueries() was called, and it detected a primary key
+		 *    column, but then setPrimaryKeyColumn(NULL) was called
+		 *    later
+		 */
 		const char	*getPrimaryKeyColumn();
 
 		/** Returns the autoincrement column as either determined by
-		 *  buildQueries() or overridden by setAutoIncrementColumn(). */
+		 *  buildQueries() or overridden by setAutoIncrementColumn().
+		 *
+		 *  Note that this may return NULL if:
+		 *  * neither buildQueries() nor setAutoincrementColumn() was
+		 *    ever called
+		 *  * buildQueries() was called, but didn't detect an
+		 *    autoincrement column and setAutoIncrementColumn() was
+		 *    never called
+		 *  * buildQueries() was called, and it detected an
+		 *    autoincrement column, but then
+		 *    setAutoIncrementColumn(NULL) was called later
+		 */
 		const char	*getAutoIncrementColumn();
 
 		/** Sets the create (insert) query template to "createquery".
@@ -282,6 +315,25 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  Otherwise "types" may be null, and the data type will be 
 		 *  derived as "s", "n", or "u" from the value.
 		 *
+		 *  Note that if getAutoIncrementColumn() returns non-NULL
+		 *  (see getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for that column will be overridden, such
+		 *  that the column will auto-increment.  If
+		 *  getAutoIncrementColumn() returns NULL (see
+		 *  getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for the autoincrement column will not be
+		 *  overridden.
+		 *
+		 *  Note that if getPrimaryKeyColumn() and getIdSequence() both
+		 *  return non-NULL (see getPrimaryKeyColumn() and
+		 *  getIdSequence() for why this may be) then any value
+		 *  specified for that column will be overridden, such that the
+		 *  column will be populated from the id sequence.  If either of
+		 *  getPrimaryKeyColumn() or getIdSequence() return NULL (see
+		 *  getPrimaryKeyColumn() and getIdSequence() for why this may
+		 *  be) then any value specified for the primary column will not
+		 *  be overridden.
+		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
 		 *  getErrorMessage(). */
@@ -296,6 +348,25 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  column/value pairs to be inserted.  The data type of each
 		 *  value will be derived as "s", "n", or "u" from the value.
 		 *
+		 *  Note that if getAutoIncrementColumn() returns non-NULL
+		 *  (see getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for that column will be overridden, such
+		 *  that the column will auto-increment.  If
+		 *  getAutoIncrementColumn() returns NULL (see
+		 *  getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for the autoincrement column will not be
+		 *  overridden.
+		 *
+		 *  Note that if getPrimaryKeyColumn() and getIdSequence() both
+		 *  return non-NULL (see getPrimaryKeyColumn() and
+		 *  getIdSequence() for why this may be) then any value
+		 *  specified for that column will be overridden, such that the
+		 *  column will be populated from the id sequence.  If either of
+		 *  getPrimaryKeyColumn() or getIdSequence() return NULL (see
+		 *  getPrimaryKeyColumn() and getIdSequence() for why this may
+		 *  be) then any value specified for the primary column will not
+		 *  be overridden.
+		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
 		 *  getErrorMessage(). */
@@ -308,6 +379,25 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *
 		 *  "data" should be a JSON object consisting of the
 		 *  column/value pairs to be inserted.
+		 *
+		 *  Note that if getAutoIncrementColumn() returns non-NULL
+		 *  (see getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for that column will be overridden, such
+		 *  that the column will auto-increment.  If
+		 *  getAutoIncrementColumn() returns NULL (see
+		 *  getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for the autoincrement column will not be
+		 *  overridden.
+		 *
+		 *  Note that if getPrimaryKeyColumn() and getIdSequence() both
+		 *  return non-NULL (see getPrimaryKeyColumn() and
+		 *  getIdSequence() for why this may be) then any value
+		 *  specified for that column will be overridden, such that the
+		 *  column will be populated from the id sequence.  If either of
+		 *  getPrimaryKeyColumn() or getIdSequence() return NULL (see
+		 *  getPrimaryKeyColumn() and getIdSequence() for why this may
+		 *  be) then any value specified for the primary column will not
+		 *  be overridden.
 		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
@@ -374,6 +464,25 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  criteria that will be used to build the where clause,
 		 *  conforming to the format described in the class description.
 		 *
+		 *  Note that if getAutoIncrementColumn() returns non-NULL
+		 *  (see getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for that column will be overridden, such
+		 *  that the column will auto-increment.  If
+		 *  getAutoIncrementColumn() returns NULL (see
+		 *  getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for the autoincrement column will not be
+		 *  overridden.
+		 *
+		 *  Note that if getPrimaryKeyColumn() and getIdSequence() both
+		 *  return non-NULL (see getPrimaryKeyColumn() and
+		 *  getIdSequence() for why this may be) then any value
+		 *  specified for that column will be overridden, such that the
+		 *  column will be populated from the id sequence.  If either of
+		 *  getPrimaryKeyColumn() or getIdSequence() return NULL (see
+		 *  getPrimaryKeyColumn() and getIdSequence() for why this may
+		 *  be) then any value specified for the primary column will not
+		 *  be overridden.
+		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
 		 *  getErrorMessage(). */
@@ -393,6 +502,25 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *  criteria that will be used to build the where clause,
 		 *  conforming to the format described in the class description.
 		 *
+		 *  Note that if getAutoIncrementColumn() returns non-NULL
+		 *  (see getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for that column will be overridden, such
+		 *  that the column will auto-increment.  If
+		 *  getAutoIncrementColumn() returns NULL (see
+		 *  getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for the autoincrement column will not be
+		 *  overridden.
+		 *
+		 *  Note that if getPrimaryKeyColumn() and getIdSequence() both
+		 *  return non-NULL (see getPrimaryKeyColumn() and
+		 *  getIdSequence() for why this may be) then any value
+		 *  specified for that column will be overridden, such that the
+		 *  column will be populated from the id sequence.  If either of
+		 *  getPrimaryKeyColumn() or getIdSequence() return NULL (see
+		 *  getPrimaryKeyColumn() and getIdSequence() for why this may
+		 *  be) then any value specified for the primary column will not
+		 *  be overridden.
+		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
 		 *  getErrorMessage(). */
@@ -410,6 +538,25 @@ class SQLRCLIENT_DLLSPEC sqlrcrud : public mvccrud {
 		 *
 		 *  "data" should be a JSON object consisting of the
 		 *  column/value pairs to be updated.
+		 *
+		 *  Note that if getAutoIncrementColumn() returns non-NULL
+		 *  (see getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for that column will be overridden, such
+		 *  that the column will auto-increment.  If
+		 *  getAutoIncrementColumn() returns NULL (see
+		 *  getAutoIncrementColumn() for why this may be) then any
+		 *  value specified for the autoincrement column will not be
+		 *  overridden.
+		 *
+		 *  Note that if getPrimaryKeyColumn() and getIdSequence() both
+		 *  return non-NULL (see getPrimaryKeyColumn() and
+		 *  getIdSequence() for why this may be) then any value
+		 *  specified for that column will be overridden, such that the
+		 *  column will be populated from the id sequence.  If either of
+		 *  getPrimaryKeyColumn() or getIdSequence() return NULL (see
+		 *  getPrimaryKeyColumn() and getIdSequence() for why this may
+		 *  be) then any value specified for the primary column will not
+		 *  be overridden.
 		 *
 		 *  Returns true on success and false on error.  On error, the
 		 *  code and message can be retrieved using getErrorCode() and
