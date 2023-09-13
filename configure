@@ -25249,7 +25249,7 @@ fi
 
 
 SEARCHPATH=$POSTGRESQLPATH
-NAME=iexpress/postgres
+NAME=iexpress/postgresql
 HEADER=libpq-fe.h
 LIBNAME=pq
 LINKSTATIC=$STATICFLAG
