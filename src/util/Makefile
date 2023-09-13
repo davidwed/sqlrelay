@@ -28,7 +28,7 @@ LOBJS = sqlrcmdline.$(OBJ) \
 all: $(STATICUTILPLUGINSRCS) lib$(SQLR)util.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii $(STATICUTILPLUGINSRCS)
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii $(STATICUTILPLUGINSRCS)
 	$(RMTREE) .libs
 
 lib$(SQLR)util.$(LIBEXT): $(SRCS) $(LOBJS)

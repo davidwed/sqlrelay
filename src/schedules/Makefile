@@ -13,7 +13,7 @@ include ../../config.mk
 all: $(SQLR)schedule_cron_userlist.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)schedule_cron_userlist.$(LIBEXT): cron_userlist.cpp cron_userlist.$(OBJ)

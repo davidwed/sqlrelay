@@ -13,7 +13,7 @@ include ../../config.mk
 all: $(SQLR)resultsetrowblocktranslation_test.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)resultsetrowblocktranslation_test.$(LIBEXT): test.cpp test.$(OBJ)

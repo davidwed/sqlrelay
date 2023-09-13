@@ -16,7 +16,8 @@ all: $(SQLR)sh$(EXE) \
 	$(SQLR)-pwdenc$(EXE)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.ii $(SQLR)sh$(EXE) $(SQLR)-export$(EXE) $(SQLR)-import$(EXE) $(SQLR)-pwdenc$(EXE)
+	$(RM) *.lo *.o *.obj *.ii $(SQLR)sh$(EXE) $(SQLR)-export$(EXE) $(SQLR)-import$(EXE) $(SQLR)-pwdenc$(EXE)
+	$(RMTREE) .libs
 
 $(SQLR)sh$(EXE): sqlrsh.cpp sqlrsh.$(OBJ) 
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@ sqlrsh.$(OBJ) $(CMDLINELIBS)

@@ -18,7 +18,7 @@ all: $(SQLR)logger_debug.$(LIBEXT) \
 	$(SQLR)logger_custom_sc.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)logger_debug.$(LIBEXT): debug.cpp debug.$(OBJ)

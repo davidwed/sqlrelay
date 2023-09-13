@@ -25,5 +25,5 @@ churn: churn.cpp churn.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) churn.$(OBJ) $(STRESSLIBS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest socketeater$(EXE) stress$(EXE) churn$(EXE) testtable$(EXE)
+	$(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest socketeater$(EXE) stress$(EXE) churn$(EXE) testtable$(EXE)
 	$(RMTREE) .libs

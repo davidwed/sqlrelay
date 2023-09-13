@@ -13,7 +13,7 @@ include ../../../config.mk
 all: sql_relay.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 sql_relay.$(LIBEXT): sql_relay.cpp sql_relay.$(OBJ)

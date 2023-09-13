@@ -14,7 +14,7 @@ all: $(SQLR)trigger_replay.$(LIBEXT) \
 	$(SQLR)trigger_upsert.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)trigger_replay.$(LIBEXT): replay.cpp replay.$(OBJ)

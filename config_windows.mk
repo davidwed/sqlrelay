@@ -98,7 +98,6 @@ REPLACE = cscript /nologo @top_builddir@\replace.vbs
 
 #uninstall/clean commands
 LTUNINSTALL =
-LTCLEAN =
 RM = cscript /nologo @top_builddir@\rm.vbs
 RMTREE = cscript /nologo @top_builddir@\rmtree.vbs
 RMDIR = cscript /nologo @top_builddir@\rmdir.vbs

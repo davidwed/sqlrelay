@@ -105,7 +105,6 @@ REPLACE = $(top_builddir)/replace.sh
 
 #uninstall/clean commands
 LTUNINSTALL = $(LIBTOOL) --mode=uninstall
-LTCLEAN = $(LIBTOOL) --mode=clean
 RM = rm -f
 RMTREE = rm -rf
 RMDIR = rmdir

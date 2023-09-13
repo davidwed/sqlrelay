@@ -14,7 +14,7 @@ all: $(SQLR)errortranslation_patterns.$(LIBEXT) \
 	$(SQLR)errortranslation_renumber.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)errortranslation_patterns.$(LIBEXT): patterns.cpp patterns.$(OBJ)

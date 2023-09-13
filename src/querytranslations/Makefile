@@ -14,7 +14,7 @@ all: $(SQLR)querytranslation_normalize.$(LIBEXT) \
 	$(SQLR)querytranslation_patterns.$(LIBEXT) \
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)querytranslation_normalize.$(LIBEXT): normalize.cpp normalize.$(OBJ)
