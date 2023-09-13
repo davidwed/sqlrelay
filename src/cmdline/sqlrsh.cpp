@@ -423,8 +423,8 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 						}
 						return true;
 					}
-					string++;
 					ch=*string;
+					string++;
 				}
 				// if we didn't get 2 single-quotes in a row
 				// while already inside of single-quotes, then
