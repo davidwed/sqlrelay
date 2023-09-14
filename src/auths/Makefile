@@ -12,7 +12,8 @@ include ../../config.mk
 
 all: all-base $(AUTHALLOPTIONALTARGETS)
 
-all-base: $(SQLR)auth_userlist.$(LIBEXT) \
+all-base: $(SQLR)auth_connectstrings.$(LIBEXT) \
+		$(SQLR)auth_userlist.$(LIBEXT) \
 		$(SQLR)auth_database.$(LIBEXT) \
 		$(SQLR)auth_proxied.$(LIBEXT) \
 		$(SQLR)auth_mysql_userlist.$(LIBEXT) \
@@ -26,6 +27,9 @@ all-sqlrelay: $(SQLR)auth_sqlrelay.$(LIBEXT)
 clean:
 	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
+
+$(SQLR)auth_connectstrings.$(LIBEXT): connectstrings.cpp connectstrings.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ connectstrings.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)auth_userlist.$(LIBEXT): userlist.cpp userlist.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
@@ -58,6 +62,7 @@ install: $(INSTALLLIB)
 
 installdll:
 	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_connectstrings.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_userlist.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_database.$(LIBEXT) $(libexecdir)
 	$(LTINSTALL) $(CP) $(SQLR)auth_proxied.$(LIBEXT) $(libexecdir)
@@ -70,6 +75,10 @@ installlib: $(INSTALLSHAREDLIB) $(AUTHINSTALLSHAREDLIBOPTIONALTARGETS)
 
 installsharedlib:
 	$(MKINSTALLDIRS) $(libexecdir)
+	$(LTINSTALL) $(CP) $(SQLR)auth_connectstrings.$(LIBEXT) $(libexecdir)
+	$(RM) $(libexecdir)/$(SQLR)auth_connectstrings.a
+	$(RM) $(libexecdir)/$(SQLR)auth_connectstrings.$(LIBEXT)
+	$(MODULERENAME) $(libexecdir)/$(SQLR)auth_connectstrings.so so $(MODULESUFFIX)
 	$(LTINSTALL) $(CP) $(SQLR)auth_userlist.$(LIBEXT) $(libexecdir)
 	$(RM) $(libexecdir)/$(SQLR)auth_userlist.a
 	$(RM) $(libexecdir)/$(SQLR)auth_userlist.$(LIBEXT)
@@ -104,6 +113,7 @@ installsharedlib-sqlrelay:
 
 uninstall:
 	$(RM) $(libexecdir)/$(SQLR)auth_default.* \
+		$(libexecdir)/$(SQLR)auth_connectstrings.* \
 		$(libexecdir)/$(SQLR)auth_userlist.* \
 		$(libexecdir)/$(SQLR)auth_database.* \
 		$(libexecdir)/$(SQLR)auth_proxied.* \
