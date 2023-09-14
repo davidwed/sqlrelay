@@ -84,7 +84,7 @@ int	main(int argc, char **argv) {
 
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-						"testuser","testpassword",0,1);
+						"db2inst1","testpassword",0,1);
 	cur=new sqlrcursor(con);
 
 	// get database type

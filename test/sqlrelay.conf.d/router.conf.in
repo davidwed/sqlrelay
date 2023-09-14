@@ -30,8 +30,8 @@
 			</router>
 		</routers>
 		<connections>
-			<connection connectionid="master" string="socket=/tmp/routermaster.socket;user=test;password=test;fetchatonce=100"/>
-			<connection connectionid="slave" string="socket=/tmp/routerslave.socket;user=test;password=test"/>
+			<connection connectionid="master" string="socket=/tmp/routermaster.socket;user=testuser;password=testpassword;fetchatonce=100"/>
+			<connection connectionid="slave" string="socket=/tmp/routerslave.socket;user=testuser;password=testpassword"/>
 		</connections>
 	</instance>
 

@@ -171,15 +171,19 @@ It can be accessed locally using:
 
 {{{#!blockquote
 {{{
-sqlrsh -host localhost -user sqlruser -password sqlrpassword
+sqlrsh -host localhost -user scott -password tiger
 }}}
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
 }}}
 
 By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
+sqlrsh -host sqlrserver -user scott -password tiger
 }}}
 }}}
 
@@ -206,7 +210,7 @@ sqlr-stop
 [[br]][=#basic]
 = Basic Configuration =
 
-The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are you'll want to configure it further.
+The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are good that you'll want to configure it further.
 
 
 [[br]][=#database]
@@ -293,8 +297,6 @@ Driver=ODBC Driver 11 for SQL Server
 Server=examplehost
 Port=1433
 Database=
-User=exampleuser
-Password=examplepassword
 }}}
 }}}
 
@@ -550,6 +552,8 @@ In this example, SQL Relay is configured to connect to a SQLite database.
 The db option indicates that SQL Relay should connect to the database /var/sqlite/exampledb.
 
 Note that the database file (exampledb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay runs as.
+
+Also note the user and password parameters in the connection string.  SQLite doesn't require these for SQL Relay to access the database, but they are included to define a user and password for accessing SQL Relay itself.
 
 SQLite also supports a high-performance in-memory mode where tables are maintained in memory and nothing is written to permanent storage.  To use this mode with SQL Relay, set the db option to :memory:.
 
@@ -894,7 +898,7 @@ See the [configreference.html#odbc SQL Relay Configuration Reference] for other 
 [[br]][=#db-odbc]
 === Generic ODBC ===
 
-SQL Relay supports many popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.
+ODBC can be used to access many databases for which SQL Relay has no native support.
 
 Accessing a database via an ODBC driver usually involves:
 
@@ -1010,7 +1014,7 @@ It can be configured to listen on a different port though...
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -port 9001 -user sqlruser -password sqlrpassword
+sqlrsh -host sqlrserver -port 9001 -user scott -password tiger
 }}}
 }}}
 
@@ -1028,7 +1032,7 @@ It can also be configured to listen on a unix socket...
 
 {{{#!blockquote
 {{{
-sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
+sqlrsh -socket /tmp/example.socket -user scott -password tiger
 }}}
 }}}
 
@@ -1184,8 +1188,6 @@ In this configuration:
 
 * The connection tag instructs the instance to log in to the //orcl// database as user //scott// with password //tiger//.
 * By default, SQL Relay loads the //sqlrclient// protocol module, and listens on port 9000.
-* The users tag instructs SQL Relay to load the //userlist// auth module.
-* The user tag defines the user //sqlruser// with password //sqlrpassword//.
 
 The instance can be started using:
 
@@ -1199,7 +1201,7 @@ and accessed from the local machine using:
 
 {{{#!blockquote
 {{{#!code
-sqlrsh -host localhost -user sqlruser -password sqlrpassword
+sqlrsh -host localhost -user scott -password tiger
 }}}
 }}}
 
@@ -1485,7 +1487,7 @@ The instance may be accessed as follows:
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate no
+sqlrsh -host sqlrserver -user scott -password tiger -tls -tlsvalidate no
 }}}
 }}}
 
@@ -1497,7 +1499,7 @@ For a more secure session, the client may validate that the server's certificate
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca
+sqlrsh -host sqlrserver -user scott -password tiger -tls -tlsvalidate ca
 }}}
 }}}
 
@@ -1505,7 +1507,7 @@ If the server's certificate is self-signed, then the certificate authority won't
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/myca.pem
+sqlrsh -host sqlrserver -user scott -password tiger -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1519,7 +1521,7 @@ For a more secure session, the client may validate that the host name provided b
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem
+sqlrsh -host sqlrserver.firstworks.com -user scott -password tiger -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1533,7 +1535,7 @@ Unless self-signed, certificates can be expensive, so certificates are often sha
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/myca.pem
+sqlrsh -host sqlrserver.firstworks.com -user scott -password tiger -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 

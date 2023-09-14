@@ -18,7 +18,7 @@
 	$host="sqlrelay";
 	$port=9000;
 	$socket="/tmp/test.socket";
-	$user="testuser";
+	$user="db2inst1";
 	$password="testpassword";
 
 	# instantiation
