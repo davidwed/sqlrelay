@@ -90,7 +90,7 @@ for (uint16_t a=0; a<50; a++) {
 
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	cur=new sqlrcursor(con);
 
 	// get database type
@@ -1052,7 +1052,7 @@ for (uint16_t a=0; a<50; a++) {
 	// not read-committed like most other db's.  Both sessions must
 	// commit to see the changes that each other has made.
 	secondcon=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	if (majorversion>3) {

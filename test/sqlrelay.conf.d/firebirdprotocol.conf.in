@@ -5,11 +5,11 @@
 		<listeners>
 			<listener protocol="firebird" port="3050"/>
 		</listeners>
-		<!--<auths>
+		<auths>
 			<auth module="firebird_userlist">
 				<user user="testuser" password="testpassword"/>
 			</auth>
-		</auths>-->
+		</auths>
 		<connections>
 			<connection string="user=testuser;password=testpassword;db=firebird:/u02/@HOSTNAME@.gdb;dialect=3"/>
 		</connections>

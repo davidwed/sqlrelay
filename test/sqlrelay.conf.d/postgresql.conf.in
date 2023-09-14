@@ -2,36 +2,24 @@
 <instances>
 
 	<instance id="postgresqltest" port="9000" socket="/tmp/test.socket" dbase="postgresql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
 		<connections>
 			<connection string="host=postgresql;user=testuser;password=testpassword;db=@HOSTNAME@;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
 		</connections>
 	</instance>
 
 	<instance id="postgresql7test" port="9000" socket="/tmp/test.socket" dbase="postgresql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
 		<connections>
 			<connection string="host=postgresql7;user=testuser;password=testpassword;db=@HOSTNAME@;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
 		</connections>
 	</instance>
 
 	<instance id="postgresql12test" port="9000" socket="/tmp/test.socket" dbase="postgresql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
 		<connections>
 			<connection string="host=postgresql12;user=testuser;password=testpassword;db=@HOSTNAME@;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
 		</connections>
 	</instance>
 
 	<instance id="postgresql15test" port="9000" socket="/tmp/test.socket" dbase="postgresql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
 		<connections>
 			<connection string="host=postgresql15;user=testuser;password=testpassword;db=@HOSTNAME@;lastinsertidfunction=testfunc();typemangling=lookup;tablemangling=lookup"/>
 		</connections>

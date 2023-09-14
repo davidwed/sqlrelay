@@ -78,7 +78,7 @@ class db2 {
 		SQLRConnection con=new SQLRConnection("sqlrelay",
 						(short)9000,
 						"/tmp/test.socket",
-						"test","test",0,1);
+						"testuser","testpassword",0,1);
 		SQLRCursor cur=new SQLRCursor(con);
 	
 		// get database type

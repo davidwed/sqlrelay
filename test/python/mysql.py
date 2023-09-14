@@ -32,7 +32,7 @@ def main():
 	# instantiation
 	con=PySQLRClient.sqlrconnection("sqlrelay",9000,
 						"/tmp/test.socket",
-						"test","test")
+						"testuser","testpassword")
 	cur=PySQLRClient.sqlrcursor(con)
 
 	# get database type
@@ -933,7 +933,7 @@ def main():
 	# commit to see the changes that each other has made.
 	secondcon=PySQLRClient.sqlrconnection("sqlrelay",9000,
 						"/tmp/test.socket",
-						"test","test")
+						"testuser","testpassword")
 	secondcur=PySQLRClient.sqlrcursor(secondcon)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	if majorversion>3:

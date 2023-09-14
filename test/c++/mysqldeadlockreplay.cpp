@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
 
 		// connect to relay
 		sqlrconnection	sqlrcon("sqlrelay",9000,
-				"/tmp/test.socket","test","test",0,1);
+			"/tmp/test.socket","testuser","testpassword",0,1);
 		sqlrcursor	sqlrcur(&sqlrcon);
 
 		stdoutput.printf("SESSION 1...\n");
@@ -160,7 +160,7 @@ int main(int argc, char **argv) {
 
 		// connect to relay
 		sqlrconnection	sqlrcon("sqlrelay",9000,
-				"/tmp/test.socket","test","test",0,1);
+			"/tmp/test.socket","testuser","testpassword",0,1);
 		sqlrcursor	sqlrcur(&sqlrcon);
 
 		// wait for the first session to let us go
@@ -200,7 +200,7 @@ int main(int argc, char **argv) {
 
 	// connect to relay
 	sqlrconnection	sqlrcon("sqlrelay",9000,
-				"/tmp/test.socket","test","test",0,1);
+			"/tmp/test.socket","testuser","testpassword",0,1);
 	sqlrcursor	sqlrcur(&sqlrcon);
 
 	stdoutput.printf("RESULTS: \n");

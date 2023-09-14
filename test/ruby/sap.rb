@@ -23,7 +23,7 @@ end
 
 # instantiation
 con=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket",
-						"test","test",0,1);
+						"testuser","testpassword",0,1);
 cur=SQLRCursor.new(con)
 
 # get database type

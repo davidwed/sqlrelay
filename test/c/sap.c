@@ -70,7 +70,7 @@ int	main(int argc, char **argv) {
 
 	// instantiation
 	con=sqlrcon_alloc("sqlrelay",9000,
-				"/tmp/test.socket","test","test",0,1);
+			"/tmp/test.socket","testuser","testpassword",0,1);
 	cur=sqlrcur_alloc(con);
 
 	// get database type

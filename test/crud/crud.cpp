@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 
 	// init connection/cursor
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	cur=new sqlrcursor(con);
 
 	// drop existing table and sequence

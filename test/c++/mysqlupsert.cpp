@@ -97,7 +97,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("UPSERT:\n");
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 
         // get the db version and bail for < 5, as the query to get the column
         // info doesn't work for < 5, making upserts also not work

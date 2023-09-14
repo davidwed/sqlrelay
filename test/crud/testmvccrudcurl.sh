@@ -9,8 +9,8 @@ fi
 URL=http://localhost/mvccrud.$EXT
 
 
-sqlrsh -host localhost -user test -password test -command "drop table testtable"
-sqlrsh -host localhost -user test -password test -command "create table testtable (col1 varchar(128), col2 varchar(128), col3 varchar(128))"
+sqlrsh -host localhost -user testuser -password testpassword -command "drop table testtable"
+sqlrsh -host localhost -user testuser -password testpassword -command "create table testtable (col1 varchar(128), col2 varchar(128), col3 varchar(128))"
 
 
 # create test
@@ -137,4 +137,4 @@ EOF
 echo
 
 echo "======================================================================"
-sqlrsh -host localhost -user test -password test -command "drop table testtable"
+sqlrsh -host localhost -user testuser -password testpassword -command "drop table testtable"

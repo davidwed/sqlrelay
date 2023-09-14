@@ -15,7 +15,7 @@ def main():
 
 	# instantiation
 	print("INSTANTIATION")
-	con=PySQLRDB.connect("sqlrelay",9000,"/tmp/test.socket","test","test",0,1,krb='yes')
+	con=PySQLRDB.connect("sqlrelay",9000,"/tmp/test.socket","testuser","testpassword",0,1,krb='yes')
 	cur=con.cursor()
 	print()
 	print()

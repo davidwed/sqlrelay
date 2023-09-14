@@ -1,5 +1,5 @@
-sqlrsh -host localhost -user test -password test -command "drop table testtable"
-sqlrsh -host localhost -user test -password test -command "create table testtable (colstr varchar(128), colint int, coltrue boolean, colfalse boolean, colnull varchar(128))"
+sqlrsh -host localhost -user testuser -password testpassword -command "drop table testtable"
+sqlrsh -host localhost -user testuser -password testpassword -command "create table testtable (colstr varchar(128), colint int, coltrue boolean, colfalse boolean, colnull varchar(128))"
 
 
 
@@ -162,4 +162,4 @@ EOF
 echo
 
 echo "======================================================================"
-sqlrsh -host localhost -user test -password test -command "drop table testtable"
+sqlrsh -host localhost -user testuser -password testpassword -command "drop table testtable"

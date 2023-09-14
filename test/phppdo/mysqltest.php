@@ -45,8 +45,8 @@ if (defined('SQLRELAY_TEST'))
 {
 	// for pdo_sqlrelay
 	echo "SQLRELAY_TEST",PHP_EOL;
-	$user = "test";
-	$pass = "test";
+	$user = "testuser";
+	$pass = "testpassword";
 	$dsn = "sqlrelay:host=sqlrelay;port=9000;socket=/tmp/test.socket;tries=0;retrytime=1;debug=0";
 }
 

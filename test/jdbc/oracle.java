@@ -119,8 +119,8 @@ class oracle {
 		String	host="localhost";
 		short	port=9000;
 		String	socket=null;
-		String	user="test";
-		String	password="test";
+		String	user="testuser";
+		String	password="testpassword";
 		String	url="jdbc:sqlrelay://"+
 				user+":"+password+"@"+host+":"+port;
 
@@ -128,7 +128,7 @@ class oracle {
 		System.out.println("CONNECTION...");
 		Class.forName("com.firstworks.sql.SQLRelayDriver");
 		Connection	con=DriverManager.getConnection(
-							url,"test","test");
+						url,"testuser","testpassword");
 
 		// close, isClosed, isValid
 		System.out.println("CONNECTION - close");
@@ -137,7 +137,7 @@ class oracle {
 		con.close();
 		checkSuccess(con.isClosed(),1);
 		checkSuccess(con.isValid(0),0);
-		con=DriverManager.getConnection(url,"test","test");
+		con=DriverManager.getConnection(url,"testuser","testpassword");
 		System.out.println();
 
 		// setNetworkTimeout, getNetworkTimeout

@@ -71,7 +71,7 @@ int	main(int argc, char **argv) {
 
 	// instantiation
 	con=sqlrcon_alloc("sqlrelay",9000,
-				"/tmp/test.socket","test","test",0,1);
+			"/tmp/test.socket","testuser","testpassword",0,1);
 	cur=sqlrcur_alloc(con);
 
 	// get database type
@@ -931,7 +931,7 @@ int	main(int argc, char **argv) {
 	// not read-committed like most other db's.  Both sessions must
 	// commit to see the changes that each other has made.
 	secondcon=sqlrcon_alloc("sqlrelay",9000,
-				"/tmp/test.socket","test","test",0,1);
+			"/tmp/test.socket","testuser","testpassword",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	if (majorversion>3) {

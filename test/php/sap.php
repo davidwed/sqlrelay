@@ -18,8 +18,8 @@
 	$host="sqlrelay";
 	$port=9000;
 	$socket="/tmp/test.socket";
-	$user="test";
-	$password="test";
+	$user="testuser";
+	$password="testpassword";
 
 	$bindvars=array("1","2","3","4","5","6","7","8","9",
 				"10","11","12","13");

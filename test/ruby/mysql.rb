@@ -24,7 +24,7 @@ end
 
 # instantiation
 con=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket",
-						"test","test",0,1)
+						"testuser","testpassword",0,1)
 cur=SQLRCursor.new(con)
 
 # get database type
@@ -928,7 +928,7 @@ print "COMMIT AND ROLLBACK: \n"
 # not read-committed like most other db's.  Both sessions must
 # commit to see the changes that each other has made.
 secondcon=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket",
-						"test","test",0,1)
+						"testuser","testpassword",0,1)
 secondcur=SQLRCursor.new(secondcon)
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 if majorversion>3

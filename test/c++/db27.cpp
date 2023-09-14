@@ -83,7 +83,7 @@ int	main(int argc, char **argv) {
 
 	// instantiation
 	con=new sqlrconnection("redhat62",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	cur=new sqlrcursor(con);
 
 	// get database type

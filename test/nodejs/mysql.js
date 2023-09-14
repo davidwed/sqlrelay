@@ -30,7 +30,7 @@ var	fieldlens;
 
 
 // instantiation
-var	con=new sqlrelay.SQLRConnection("sqlrelay",9000,"/tmp/test.socket","test","test",0,1);
+var	con=new sqlrelay.SQLRConnection("sqlrelay",9000,"/tmp/test.socket","testuser","testpassword",0,1);
 var	cur=new sqlrelay.SQLRCursor(con);
 
 // get database type
@@ -880,7 +880,7 @@ console.log("COMMIT AND ROLLBACK: ");
 // Note: Mysql's default isolation level is repeatable-read,
 // not read-committed like most other db's.  Both sessions must
 // commit to see the changes that each other has made.
-var	secondcon=new sqlrelay.SQLRConnection("sqlrelay",9000,"/tmp/test.socket","test","test",0,1);
+var	secondcon=new sqlrelay.SQLRConnection("sqlrelay",9000,"/tmp/test.socket","testuser","testpassword",0,1);
 var	 secondcur=new sqlrelay.SQLRCursor(secondcon);
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 if (majorversion>3) {

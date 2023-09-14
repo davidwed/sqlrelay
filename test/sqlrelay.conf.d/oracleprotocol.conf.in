@@ -6,7 +6,7 @@
 			<listener protocol="oracle" port="1521"/>
 		</listeners>
 		<auths>
-			<auth module="userlist">
+			<auth module="oracle_userlist">
 				<user user="scott" password="tiger"/>
 			</auth>
 		</auths>

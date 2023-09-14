@@ -70,7 +70,7 @@ int	main(int argc, char **argv) {
 
 	// instantiation
 	con=sqlrcon_alloc("sqlrelay",9000,
-				"/tmp/test.socket","test","test",0,1);
+			"/tmp/test.socket","testuser","testpassword",0,1);
 	cur=sqlrcur_alloc(con);
 
 	// get database type
@@ -593,7 +593,7 @@ int	main(int argc, char **argv) {
 
 	printf("COMMIT AND ROLLBACK: \n");
 	secondcon=sqlrcon_alloc("sqlrelay",9000,
-				"/tmp/test.socket","test","test",0,1);
+			"/tmp/test.socket","testuser","testpassword",0,1);
 	secondcur=sqlrcur_alloc(secondcon);
 	checkSuccessInt(sqlrcur_sendQuery(secondcur,"select count(*) from testtable"),1);
 	checkSuccessString(sqlrcur_getFieldByIndex(secondcur,0,0),"0");

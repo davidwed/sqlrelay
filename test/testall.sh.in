@@ -117,7 +117,7 @@ do
 			PING=`$PREFIX/bin/sqlrsh -host localhost -tls -tlscert @abs_top_builddir@/test/sqlrelay.conf.d/tls/client.pem -tlsca @abs_top_builddir@/test/sqlrelay.conf.d/tls/ca.pem -tlsvalidate ca -command ping 2>&1`
 		elif ( test "$DB" = "extensions" )
 		then
-			PING=`$PREFIX/bin/sqlrsh -host localhost -user test -password test -command ping 2>&1`
+			PING=`$PREFIX/bin/sqlrsh -host localhost -user testuser -password testpassword -command ping 2>&1`
 		elif ( test "$DB" = "mysqlprotocol" )
 		then
 			PING="0: Couldn't connect to the listener."
