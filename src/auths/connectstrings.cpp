@@ -65,9 +65,6 @@ sqlrauth_connectstrings::sqlrauth_connectstrings(sqlrservercontroller *cont,
 
 		passwordencryptions[i]=node->getValue()->
 						getPasswordEncryption();
-stdoutput.printf("users[%d]=%s\n",i,users[i]);
-stdoutput.printf("passwords[%d]=%s\n",i,passwords[i]);
-stdoutput.printf("passwordencryptions[%d]=%s\n",i,passwordencryptions[i]);
 
 		i++;
 	}
