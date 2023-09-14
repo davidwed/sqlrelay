@@ -2793,18 +2793,19 @@ void sqlrservercontroller::errorMessage(const char **errorbuffer,
 
 	if (pvt->_sqlret) {
 		int64_t		tec=*errorcode;
-		const char	*teb=*errorbuffer;
-		uint32_t	tel=*errorlength;
+		stringbuffer	translatederror;
 		if (pvt->_sqlret->run(pvt->_conn,NULL,
 						*errorcode,
 						*errorbuffer,
 						*errorlength,
 						&tec,
-						&teb,
-						&tel)) {
+						&translatederror)) {
 			*errorcode=tec;
-			*errorbuffer=teb;
-			*errorlength=tel;
+			charstring::safeCopy(pvt->_conn->getErrorBuffer(),
+					pvt->_conn->getErrorBufferSize(),
+					translatederror.getString(),
+					translatederror.getStringLength());
+			*errorlength=translatederror.getStringLength();
 		}
 		// FIXME: report error if this fails?
 	}
@@ -2852,6 +2853,10 @@ void sqlrservercontroller::setError(const char *err,
 
 char *sqlrservercontroller::getErrorBuffer() {
 	return pvt->_conn->getErrorBuffer();
+}
+
+uint32_t sqlrservercontroller::getErrorBufferSize() {
+	return pvt->_conn->getErrorBufferSize();
 }
 
 uint32_t sqlrservercontroller::getErrorLength() {
@@ -9514,6 +9519,25 @@ void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
 	*errorlength=cursor->getErrorLength();
 	*errorcode=cursor->getErrorNumber();
 	*liveconnection=cursor->getLiveConnection();
+
+	if (pvt->_sqlret) {
+		int64_t		tec=*errorcode;
+		stringbuffer	translatederror;
+		if (pvt->_sqlret->run(pvt->_conn,cursor,
+						*errorcode,
+						*errorbuffer,
+						*errorlength,
+						&tec,
+						&translatederror)) {
+			*errorcode=tec;
+			charstring::safeCopy(cursor->getErrorBuffer(),
+					cursor->getErrorBufferSize(),
+					translatederror.getString(),
+					translatederror.getStringLength());
+			*errorlength=translatederror.getStringLength();
+		}
+		// FIXME: report error if this fails?
+	}
 }
 
 void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
@@ -10422,6 +10446,10 @@ void sqlrservercontroller::setError(sqlrservercursor *cursor,
 
 char *sqlrservercontroller::getErrorBuffer(sqlrservercursor *cursor) {
 	return cursor->getErrorBuffer();
+}
+
+uint32_t sqlrservercontroller::getErrorBufferSize(sqlrservercursor *cursor) {
+	return cursor->getErrorBufferSize();
 }
 
 uint32_t sqlrservercontroller::getErrorLength(sqlrservercursor *cursor) {

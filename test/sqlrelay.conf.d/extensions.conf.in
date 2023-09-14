@@ -146,17 +146,19 @@
 		</triggers>
 		<errortranslations>
 			<errortranslation module="renumber">
-				<renumber from="123" to="345"/>
-				<renumber from="234" to="456"/>
-				<renumber from="345" to="789"/>
+				<!-- FROM keyword not found where expected -->
+				<renumber from="923" to="10923"/>
 			</errortranslation>
 			<errortranslation module="patterns">
-				<pattern type="string" from="foo" to="bar" scope="outsidequotes"/>
-				<pattern type="cistring" from="foo" to="bar" scope="outsidequotes"/>
-				<pattern type="regex" from="foo" to="bar"/>
-				<pattern type="regex" match="foo.">
-					<pattern type="regex" from="foo1" to="foo2"/>
-					<pattern type="regex" from="foo3" to="foo4"/>
+				<pattern type="cistring" from="from" to="fRoM" scope="outsidequotes"/>
+				<pattern type="cistring" from="keyword" to="kEyWoRd" scope="outsidequotes"/>
+				<pattern type="string" from="not" to="nOt" scope="outsidequotes"/>
+				<pattern type="string" from="found" to="fOuNd" scope="outsidequotes"/>
+				<pattern type="regex" from="where" to="wHeRe"/>
+				<pattern type="regex" from="expected" to="eXpEcTeD"/>
+				<pattern type="regex" match="ORA.*">
+					<pattern type="regex" from="ORA-00923" to="ORA-01923"/>
+					<pattern type="regex" from="ORA-01923" to="ORA-10923"/>
 				</pattern>
 			</errortranslation>
 		</errortranslations>

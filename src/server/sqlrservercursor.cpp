@@ -61,7 +61,8 @@ class sqlrservercursorprivate {
 
 		uint32_t	_maxerrorlength;
 
-		char		*_error;
+		char		*_errorbuffer;
+		uint32_t	_errorbuffersize;
 		uint32_t	_errorlength;
 		int64_t		_errnum;
 		bool		_liveconnection;
@@ -166,7 +167,8 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	setQueryTree(NULL);
 
-	pvt->_error=new char[pvt->_maxerrorlength+1];
+	pvt->_errorbuffersize=pvt->_maxerrorlength+1;
+	pvt->_errorbuffer=new char[pvt->_errorbuffersize];
 	pvt->_errorlength=0;
 	pvt->_errnum=0;
 	pvt->_liveconnection=true;
@@ -239,7 +241,7 @@ sqlrservercursor::~sqlrservercursor() {
 	delete[] pvt->_outbindvars;
 	delete[] pvt->_inoutbindvars;
 	delete pvt->_customquerycursor;
-	delete[] pvt->_error;
+	delete[] pvt->_errorbuffer;
 	deallocateColumnPointers();
 	deallocateFieldPointers();
 	delete pvt;
@@ -973,7 +975,7 @@ void sqlrservercursor::errorMessage(char *errorbuffer,
 	// if the cursor happens to have an error, then return that
 	if (pvt->_errorlength) {
 		charstring::safeCopy(errorbuffer,errorbuffersize,
-					pvt->_error,pvt->_errorlength);
+					pvt->_errorbuffer,pvt->_errorlength);
 		*errorlength=pvt->_errorlength;
 		if (*errorlength>errorbuffersize) {
 			*errorlength=errorbuffersize;
@@ -1644,7 +1646,11 @@ bool sqlrservercursor::getCurrentRowReformatted() {
 }
 
 char *sqlrservercursor::getErrorBuffer() {
-	return pvt->_error;
+	return pvt->_errorbuffer;
+}
+
+uint32_t sqlrservercursor::getErrorBufferSize() {
+	return pvt->_maxerrorlength+1;
 }
 
 uint32_t sqlrservercursor::getErrorLength() {

@@ -553,11 +553,18 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("drop table student"),1);
 	checkSuccess(cur->sendQuery("drop sequence student_id"),1);
 	delete secondcur;
-	delete cur;
-	delete con;
+	stdoutput.printf("\n\n");
+
+	stdoutput.printf("ERROR TRANSLATION:\n");
+	checkSuccess(cur->sendQuery("select 1"),0);
+	checkSuccess(cur->errorNumber(),10923);
+	checkSuccess(cur->errorMessage(),
+			"ORA-10923: fRoM kEyWoRd nOt fOuNd wHeRe eXpEcTeD");
 	stdoutput.printf("\n\n");
 
 	stdoutput.printf("done\n");
+	delete cur;
+	delete con;
 	stdoutput.printf("\n\n");
 
 	return 0;

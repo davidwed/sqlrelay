@@ -18,7 +18,8 @@ class sqlrserverconnectionprivate {
 		uint32_t	_maxquerysize;
 		uint32_t	_maxerrorlength;
 
-		char		*_error;
+		char		*_errorbuffer;
+		uint32_t	_errorbuffersize;
 		uint32_t	_errorlength;
 		int64_t		_errnum;
 		bool		_liveconnection;
@@ -41,7 +42,8 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 	pvt->_maxquerysize=cont->getConfig()->getMaxQuerySize();
 	pvt->_maxerrorlength=cont->getConfig()->getMaxErrorLength();
 
-	pvt->_error=new char[pvt->_maxerrorlength+1];
+	pvt->_errorbuffersize=pvt->_maxerrorlength+1;
+	pvt->_errorbuffer=new char[pvt->_errorbuffersize];
 	pvt->_errorlength=0;
 	pvt->_errnum=0;
 	pvt->_liveconnection=false;
@@ -54,7 +56,7 @@ sqlrserverconnection::sqlrserverconnection(sqlrservercontroller *cont) {
 }
 
 sqlrserverconnection::~sqlrserverconnection() {
-	delete[] pvt->_error;
+	delete[] pvt->_errorbuffer;
 	delete[] pvt->_dbhostname;
 	delete[] pvt->_dbipaddress;
 	delete pvt;
@@ -1024,7 +1026,11 @@ void sqlrserverconnection::endSession() {
 }
 
 char *sqlrserverconnection::getErrorBuffer() {
-	return pvt->_error;
+	return pvt->_errorbuffer;
+}
+
+uint32_t sqlrserverconnection::getErrorBufferSize() {
+	return pvt->_errorbuffersize;
 }
 
 uint32_t sqlrserverconnection::getErrorLength() {

@@ -244,6 +244,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setError(const char *err,
 					int64_t errn, bool liveconn);
 		char		*getErrorBuffer();
+		uint32_t	getErrorBufferSize();
 		uint32_t	getErrorLength();
 		void		setErrorLength(uint32_t errorlength);
 		uint32_t	getErrorNumber();
@@ -707,6 +708,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						int64_t errn,
 						bool liveconn);
 		char		*getErrorBuffer(sqlrservercursor *cursor);
+		uint32_t	getErrorBufferSize(sqlrservercursor *cursor);
 		uint32_t	getErrorLength(sqlrservercursor *cursor);
 		void		setErrorLength(sqlrservercursor *cursor,
 							uint32_t errorlength);
@@ -1020,6 +1022,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual void		endSession();
 
 		char		*getErrorBuffer();
+		uint32_t	getErrorBufferSize();
 		uint32_t	getErrorLength();
 		void		setErrorLength(uint32_t errorlength);
 		uint32_t	getErrorNumber();
@@ -1339,6 +1342,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		bool		getCurrentRowReformatted();
 
 		char		*getErrorBuffer();
+		uint32_t	getErrorBufferSize();
 		uint32_t	getErrorLength();
 		void		setErrorLength(uint32_t errorlength);
 		uint32_t	getErrorNumber();
@@ -2576,8 +2580,7 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslation {
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					const char **translatederror,
-					uint32_t *translatederrorlength);
+					stringbuffer *translatederror);
 
 		virtual const char	*getError();
 
@@ -2603,8 +2606,7 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslations {
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					const char **translatederror,
-					uint32_t *translatederrorlength);
+					stringbuffer *translatederror);
 
 		const char	*getError();
 

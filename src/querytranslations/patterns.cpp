@@ -187,12 +187,14 @@ bool sqlrquerytranslation_patterns::run(sqlrserverconnection *sqlrcon,
 	debugFunction();
 
 	if (!enabled) {
-		translatedquery->append(query);
+		translatedquery->append(query,querylength);
 		return true;
 	}
 
 	if (debug) {
-		stdoutput.printf("original query:\n\"%s\"\n\n",query);
+		stdoutput.write("original query:\n\"");
+		stdoutput.safePrint(query,querylength);
+		stdoutput.write("\"\n\n");
 	}
 
 	applyPatterns(query,patterns,patterncount,translatedquery);
@@ -318,7 +320,7 @@ void sqlrquerytranslation_patterns::applyPattern(const char *str,
 					p->to,
 					p->replaceglobal);
 		outb->append(convstr);
-	} else if (!p->ignorecase) {
+	} else {
 		if (debug) {
 			stdoutput.printf("applying string "
 					"from:\n\"%.*s%s\"\n"
@@ -335,24 +337,13 @@ void sqlrquerytranslation_patterns::applyPattern(const char *str,
 			}
 			stdoutput.write("\n");
 		}
-		convstr=charstring::replace(str,p->from,p->to);
-		outb->append(convstr);
-	} else {
-		if (debug) {
-			stdoutput.printf("applying case-insensitive string "
-					"from:\n\"%.*s%s\"\n"
-					"to:\n\"%.*s%s\"\n\n",
-					pfromlen,p->from,fromellipses,
-					ptolen,p->to,toellipses);
+		if (p->ignorecase) {
+			convstr=charstring::replaceIgnoringCase(
+							str,p->from,p->to);
+		} else {
+			convstr=charstring::replace(str,p->from,p->to);
 		}
-		char	*lowstr=charstring::duplicate(str);
-		charstring::lower(lowstr);
-		char	*lowfrom=charstring::duplicate(p->from);
-		charstring::lower(lowfrom);
-		convstr=charstring::replace(lowstr,lowfrom,p->to);
 		outb->append(convstr);
-		delete[] lowstr;
-		delete[] lowfrom;
 	}
 
 	delete[] convstr;
