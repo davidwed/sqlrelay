@@ -1472,13 +1472,13 @@ void sqlrconfig_xmldom::normalizeTree() {
 		auth->setName("auth");
 	}
 
-	// users -> auth_userlist
+	// users -> sqlrclient_userlist
 	bool	addeduserlist=false;
 	domnode	*users=instance->getFirstTagChild("users");
 	if (!users->isNullNode()) {
 
 		domnode	*auth=auths->insertTag("auth",0);
-		auth->setAttributeValue("module","userlist");
+		auth->setAttributeValue("module","sqlrclient_userlist");
 
 		for (domnode *user=users->getFirstTagChild("user");
 				!user->isNullNode();
@@ -1548,7 +1548,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 			setAttributeValue("module","connectstrings");
 	}
 
-	// krb_userlist/tls_userlist -> userlist
+	// krb_userlist/tls_userlist -> sqlrclient_userlist
 	for (domnode *auth=instance->getFirstTagChild("auths")->
 						getFirstTagChild("auth");
 				!auth->isNullNode();
@@ -1559,7 +1559,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!charstring::compare(
 				auth->getAttributeValue("module"),
 				"tls_userlist")) {
-			auth->setAttributeValue("module","userlist");
+			auth->setAttributeValue("module","sqlrclient_userlist");
 		}
 	}
 
@@ -2194,10 +2194,11 @@ void sqlrconfig_xmldom::getTreeValues() {
 
 	// get default user/password...
 
-	// if there's a userlist auth module, then get the first credentials
-	// from the first user
+	// if there's a sqlrclient_userlist auth module, then get the first
+	// credentials from the first user
 	domnode	*defaultusertag=instance->getFirstTagChild("auths")->
-				getFirstTagChild("auth","module","userlist")->
+				getFirstTagChild("auth","module",
+						"sqlrclient_userlist")->
 				getFirstTagChild("user");
 	if (!defaultusertag->isNullNode()) {
 		defaultuser=defaultusertag->
