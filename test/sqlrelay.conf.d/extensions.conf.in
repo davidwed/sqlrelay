@@ -2,9 +2,6 @@
 <instances>
 
 	<instance id="extensionstest"
-			addresses="0.0.0.0"
-			port="9000"
-			socket="/tmp/test.socket"
 			dbase="oracle8"
 			connections="0"
 			maxconnections="15"
@@ -28,6 +25,11 @@
 			ignoreselectdatabase="yes"
 			isolationlevel="read committed"
 			passwordpath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc">
+		<listeners>
+			<listener port="9000"
+				addresses="0.0.0.0"
+				socket="/tmp/test.socket"/>
+		</listeners>
 		<auths>
 			<auth module="sqlrclient_userlist">
 				<user user="test"

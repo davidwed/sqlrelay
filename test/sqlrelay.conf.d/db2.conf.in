@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="db2test" port="9000" socket="/tmp/test.socket" dbase="db2">
+	<instance id="db2test" dbase="db2">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="user=db2inst1;password=testpassword;db=@SHORTHOSTNAME@;lang=C;timeout=120"/>
 		</connections>

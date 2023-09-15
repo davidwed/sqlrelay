@@ -1,13 +1,15 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="tlstest" port="9000"
-		socket="/tmp/test.socket"
+	<instance id="tlstest"
 		tls="yes"
 		tlscert="@abs_top_builddir@/test/sqlrelay.conf.d/tls/server.pem"
 		tlspassword="password"
 		tlsvalidate="yes"
 		tlsca="@abs_top_builddir@/test/sqlrelay.conf.d/tls/ca.pem">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<users>
 			<user user="client.localdomain"/>
 		</users>

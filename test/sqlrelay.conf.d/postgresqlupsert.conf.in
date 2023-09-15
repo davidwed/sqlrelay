@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="postgresqlupserttest" port="9000" socket="/tmp/test.socket" dbase="postgresql">
+	<instance id="postgresqlupserttest" dbase="postgresql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<translations>
 			<translation module="normalize"/>
 		</translations>

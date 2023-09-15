@@ -33,7 +33,6 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">enabled</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font>
-		<font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/example.socket"</font>
 		<font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">maxconnections</font><font color="#990000">=</font><font color="#FF0000">"15"</font> <font color="#009900">maxqueuelength</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">growby</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="#009900">ttl</font><font color="#990000">=</font><font color="#FF0000">"60"</font> <font color="#009900">softttl</font><font color="#990000">=</font><font color="#FF0000">"0"</font>
 		<font color="#009900">maxsessioncount</font><font color="#990000">=</font><font color="#FF0000">"1000"</font> <font color="#009900">endofsession</font><font color="#990000">=</font><font color="#FF0000">"commit"</font> <font color="#009900">sessiontimeout</font><font color="#990000">=</font><font color="#FF0000">"600"</font>
 		<font color="#009900">runasuser</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> <font color="#009900">runasgroup</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> <font color="#009900">cursors</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">maxcursors</font><font color="#990000">=</font><font color="#FF0000">"10"</font> <font color="#009900">cursors_growby</font><font color="#990000">=</font><font color="#FF0000">"1"</font>
@@ -42,6 +41,9 @@ http://www.gnu.org/software/src-highlite -->
 		<font color="#009900">idleclienttimeout</font><font color="#990000">=</font><font color="#FF0000">"-1"</font> <font color="#009900">maxlisteners</font><font color="#990000">=</font><font color="#FF0000">"-1"</font> <font color="#009900">listenertimeout</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="#009900">reloginatstart</font><font color="#990000">=</font><font color="#FF0000">"no"</font>
 		<font color="#009900">fakeinputbindvariables</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">translatebindvariables</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">isolationlevel</font><font color="#990000">=</font><font color="#FF0000">"read committed"</font>
 		<font color="#009900">ignoreselectdatabase</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">waitfordowndatabase</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/example.socket"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
 		<b><font color="#0000FF">&lt;session&gt;</font></b>
 			<b><font color="#0000FF">&lt;start&gt;</font></b>
 				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='MM-DD-YYYY HH24:MI:SS'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
@@ -75,6 +77,7 @@ http://www.gnu.org/software/src-highlite -->
   <li>The <b>instances</b> tag is just the root tag.  Each configuration file should have only one of these tags surrounding all other tags.</li>
   <ul>
     <li>Each <b>instance</b> tag defines an instance of SQL Relay.  You can define as many of these as you like in each configuration file.</li>
+    <li>The <b>listener</b> tag defines the listener configuration.</li>
     <li>The <b>session</b> tag surrounds a set of queries to be run at the start and end of each session.  The entire <b>session</b> block is optional.</li>
     <ul>
       <li>The <b>start</b> tag surrounds a set of queries to be run at the the start of each session and the <b>end</b> tag surrounds a set of qeries to be run at the end of each session.  Both are optional.</li>
@@ -103,8 +106,6 @@ http://www.gnu.org/software/src-highlite -->
     <li><b>id</b> - The ID of this instance.</li>
     <li><b>enabled</b> - Whether to auto-start this instance.  Defaults to "no".  If set to "yes", then this instance will be started when sqlr-start is run with no arguments (as it is in the init scripts which run at boot).</li>
     <li><b>addresses</b> - A comma-delimited list of addresses that the instance should bind to.  If absent or set to 0.0.0.0, it will bind to all addresses.  Defaults to 0.0.0.0.</li>
-    <li><b>port</b> - The port to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.</li>
-    <li><b>socket</b> - The unix socket (filename) to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket</li>
     <li>Kerberos options - Use these options to configure Kerberos encryption and authentication.</li>
     <ul>
       <li><b>krb</b> - Set to "yes" to enable Kerberos encryption and authentication.  Set to "no" to disable Kerberos encryption and authentication.  Defaults to "no".</li>
@@ -181,13 +182,10 @@ http://www.gnu.org/software/src-highlite -->
     <li><b>ignorenondatetime</b> - When date/time translation is enabled (one or more of datetimeformat, dateformat or timeformat are set), the server attempts to interpret each field in the result set as a date/time to determine whether it needs to be translated or not.  If this parameter is set to "yes" then fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.</li>
   </ul>
 
-</ul>
-
-<br/><ul>
-  <li><b>user</b></li>
+  <li><b>listener</b></li>
   <ul>
-    <li><b>user</b> - The user name required to connect to SQL Relay.</li>
-    <li><b>password</b> - The password required to connect to SQL Relay.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
+    <li><b>port</b> - The port to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.</li>
+    <li><b>socket</b> - The unix socket (filename) to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket</li>
   </ul>
 
 </ul>

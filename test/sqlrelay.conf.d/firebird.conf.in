@@ -1,19 +1,28 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="firebirdtest" port="9000" socket="/tmp/test.socket" dbase="firebird">
+	<instance id="firebirdtest" dbase="firebird">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="user=testuser;password=testpassword;db=firebird:/u02/@HOSTNAME@.gdb;dialect=3"/>
 		</connections>
 	</instance>
 
-	<instance id="firebird3test" port="9000" socket="/tmp/test.socket" dbase="firebird">
+	<instance id="firebird3test" dbase="firebird">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="user=testuser;password=testpassword;db=firebird3:/u02/@HOSTNAME@.gdb;dialect=3"/>
 		</connections>
 	</instance>
 
-	<instance id="firebird2test" port="9000" socket="/tmp/test.socket" dbase="firebird">
+	<instance id="firebird2test" dbase="firebird">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="user=testuser;password=testpassword;db=firebird2:/u02/@HOSTNAME@.gdb;dialect=3"/>
 		</connections>

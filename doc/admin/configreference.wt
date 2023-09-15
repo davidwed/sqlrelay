@@ -29,6 +29,7 @@ A fairly comprehensive example follows.
 
 * The '''instances''' tag is just the root tag.  Each configuration file should have only one of these tags surrounding all other tags.
  * Each '''instance''' tag defines an instance of SQL Relay.  You can define as many of these as you like in each configuration file.
+ * The '''listener''' tag defines the listener configuration.
  * The '''session''' tag surrounds a set of queries to be run at the start and end of each session.  The entire '''session''' block is optional.
   * The '''start''' tag surrounds a set of queries to be run at the the start of each session and the '''end''' tag surrounds a set of qeries to be run at the end of each session.  Both are optional.
    * The '''runquery''' tag surrounds a query to be run at the beginning or end of a session.  Any number (including 0) of these may be specified.
@@ -44,8 +45,6 @@ Below is a description of the attributes for each tag.
  * '''id''' - The ID of this instance.
  * '''enabled''' - Whether to auto-start this instance.  Defaults to "no".  If set to "yes", then this instance will be started when sqlr-start is run with no arguments (as it is in the init scripts which run at boot).
  * '''addresses''' - A comma-delimited list of addresses that the instance should bind to.  If absent or set to 0.0.0.0, it will bind to all addresses.  Defaults to 0.0.0.0.
- * '''port''' - The port to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.
- * '''socket''' - The unix socket (filename) to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket
  * Kerberos options - Use these options to configure Kerberos encryption and authentication.
   * '''krb''' - Set to "yes" to enable Kerberos encryption and authentication.  Set to "no" to disable Kerberos encryption and authentication.  Defaults to "no".
   * '''krbservice''' - Specifies the kerberos service to run this instance as.  Defaults to "sqlrelay".
@@ -112,10 +111,9 @@ Below is a description of the attributes for each tag.
  * '''datedelimiters''' - When date/time translation is enabled (one or more of datetimeformat, dateformat or timeformat are set), the server attempts to interpret each field in the result set as a date/time to determine whether it needs to be translated or not.  Different cultures and systems delimit dates with different characteres, including slashes, dashes, colons and periods.  This parameter enables you to specify which of these to pay attention to.  For example, if your database contains both slash-delimited and dash-delimited dates, but also contains dot-delimited data that could be misinterpreted as a date, then you'd want to set this to "/-".  Defaults to "/-:."  Characters other than slash, dash, colon and dot are ignored.
  * '''ignorenondatetime''' - When date/time translation is enabled (one or more of datetimeformat, dateformat or timeformat are set), the server attempts to interpret each field in the result set as a date/time to determine whether it needs to be translated or not.  If this parameter is set to "yes" then fields with date/time datatypes will be examined.  Char, and varchar fields, for example, will be ignored.
 
-
-* '''user'''
- * '''user''' - The user name required to connect to SQL Relay.
- * '''password''' - The password required to connect to SQL Relay.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See [configguide.html#pwdenc Password Encryption]
+* '''listener'''
+ * '''port''' - The port to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to 9000.
+ * '''socket''' - The unix socket (filename) to listen for client connections on (note, if multiple instances are configured with the same port or socket, they cannot be run at the same time).  Defaults to /tmp/sqlrelay.socket
 
 
 * '''connection'''

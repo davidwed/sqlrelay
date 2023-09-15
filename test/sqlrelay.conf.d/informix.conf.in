@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="informixtest" port="9000" socket="/tmp/test.socket" dbase="informix">
+	<instance id="informixtest" dbase="informix">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="informixdir=/opt/informix;servername=ol_informix1210;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>

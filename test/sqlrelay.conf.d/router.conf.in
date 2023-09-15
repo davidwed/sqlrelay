@@ -1,19 +1,28 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="routermaster" port="" socket="/tmp/routermaster.socket" dbase="mysql">
+	<instance id="routermaster" dbase="mysql">
+		<listeners>
+			<listener socket="/tmp/routermaster.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mysqlmaster;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
-	<instance id="routerslave" port="" socket="/tmp/routerslave.socket" dbase="mysql">
+	<instance id="routerslave" dbase="mysql">
+		<listeners>
+			<listener socket="/tmp/routerslave.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mysqlslave;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
-	<instance id="routertest" port="9000" socket="/tmp/test.socket" dbase="router">
+	<instance id="routertest" dbase="router">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<filters>
 			<filter module="regex" pattern=".*junktable"/>
 		</filters>

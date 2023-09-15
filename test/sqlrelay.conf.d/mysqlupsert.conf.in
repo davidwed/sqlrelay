@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="mysqlupserttest" port="9000" socket="/tmp/test.socket" dbase="mysql">
+	<instance id="mysqlupserttest" dbase="mysql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<translations>
 			<translation module="normalize"/>
 		</translations>
