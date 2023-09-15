@@ -1545,7 +1545,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	if (instance->getFirstTagChild("users")->isNullNode() &&
 						!auths->getChildCount()) {
 		auths->appendTag("auth")->
-			setAttributeValue("module","connectstrings");
+			setAttributeValue("module","sqlrclient_connectstrings");
 	}
 
 	// krb_userlist/tls_userlist -> sqlrclient_userlist
@@ -2212,7 +2212,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 	// otherwise, if there's a connectstrings auth module then get the
 	// first credentials from the first connection
 	if (!instance->getFirstTagChild("auths")->
-			getFirstTagChild("auth","module","connectstrings")->
+			getFirstTagChild("auth","module",
+					"sqlrclient_connectstrings")->
 			isNullNode()) {
 		listnode< connectstringcontainer * >	*node=
 					getConnectStringList()->getFirst();
