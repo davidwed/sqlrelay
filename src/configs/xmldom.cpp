@@ -1549,6 +1549,10 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// krb_userlist/tls_userlist -> sqlrclient_userlist
+	// userlist -> sqlrclient_userlist
+	// database -> sqlrclient_database
+	// proxied -> sqlrclient_proxied
+	// sqlrelay -> sqlrclient_sqlrelay
 	for (domnode *auth=instance->getFirstTagChild("auths")->
 						getFirstTagChild("auth");
 				!auth->isNullNode();
@@ -1560,6 +1564,26 @@ void sqlrconfig_xmldom::normalizeTree() {
 				auth->getAttributeValue("module"),
 				"tls_userlist")) {
 			auth->setAttributeValue("module","sqlrclient_userlist");
+		}
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"userlist")) {
+			auth->setAttributeValue("module","sqlrclient_userlist");
+		}
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"database")) {
+			auth->setAttributeValue("module","sqlrclient_database");
+		}
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"proxied")) {
+			auth->setAttributeValue("module","sqlrclient_proxied");
+		}
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"sqlrelay")) {
+			auth->setAttributeValue("module","sqlrclient_sqlrelay");
 		}
 	}
 
