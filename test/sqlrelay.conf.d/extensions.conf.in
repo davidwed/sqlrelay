@@ -29,7 +29,7 @@
 			isolationlevel="read committed"
 			passwordpath="@abs_top_builddir@/test/sqlrelay.conf.d/pwdenc">
 		<auths>
-			<auth module="userlist">
+			<auth module="sqlrclient_userlist">
 				<user user="test"
 					password="[test.pwd]"/>
 				<user user="rot16test"

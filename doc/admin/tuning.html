@@ -52,12 +52,12 @@ edit the configuration file and make sure that the connectstring for the
 MySQL/MariaDB instance uses the socket parameter, as follows:</p>
 
 <blockquote>
-user=exampleuser;password=examplepassword;db=exampledb;socket=/var/lib/mysql/mysql.sock
+user=mysqluser;password=mysqlpassword;db=mysqldb;socket=/var/lib/mysql/mysql.sock
 </blockquote>
 <p>as opposed to:</p>
 
 <blockquote>
-user=exampleuser;password=examplepassword;db=exampledb;host=localhost;port=5432
+user=mysqluser;password=mysqlpassword;db=mysqldb;host=localhost;port=5432
 </blockquote>
 <h3>PostgreSQL</h3>
 
@@ -101,12 +101,12 @@ edit the configuration file and make sure that the connectstring for the
 PostgreSQL instance uses the host and port parameters as follows:</p>
 
 <blockquote>
-user=exampleuser;password=examplepassword;host=/tmp;port=5432;
+user=postgresqluser;password=postgresqlpassword;host=/tmp;port=5432;
 </blockquote>
 <p>as opposed to:</p>
 
 <blockquote>
-user=exampleuser;password=examplepassword;host=localhost;port=5432;
+user=postgresqluser;password=postgresqlpassword;host=localhost;port=5432;
 </blockquote>
 <p>Ordinarily, the host parameter tells SQL Relay what host to connect to, but
 if it starts with a / then it indicates what directory to look for the socket
@@ -191,7 +191,7 @@ IPC instead of an inet socket.  Just configure the connect string to use an SID
 that uses IPC to connect to the database.  For example:</p>
 
 <blockquote>
-user=exampleuser;password=examplepassword;oracle_sid=ora1;
+user=oracleuser;password=oraclepassword;oracle_sid=ora1;
 </blockquote>
 <h3>SQLite</h3>
 
@@ -213,7 +213,7 @@ which relays to the remote instance and connect to the local instance.</p>
 Just configure the connect string to use the local database.  For example:</p>
 
 <blockquote>
-db=exampledb
+db=db2db
 </blockquote>
 <h3>Informix</h3>
 
@@ -232,7 +232,7 @@ connection, use the onipcshm protocol.</p>
 For example:</p>
 
 <blockquote>
-db=exampledb
+db=informixdb
 </blockquote>
 <h3>SAP/Sybase</h3>
 

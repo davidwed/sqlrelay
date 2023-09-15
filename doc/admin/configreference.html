@@ -37,39 +37,34 @@ http://www.gnu.org/software/src-highlite -->
 		<font color="#009900">connections</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">maxconnections</font><font color="#990000">=</font><font color="#FF0000">"15"</font> <font color="#009900">maxqueuelength</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">growby</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="#009900">ttl</font><font color="#990000">=</font><font color="#FF0000">"60"</font> <font color="#009900">softttl</font><font color="#990000">=</font><font color="#FF0000">"0"</font>
 		<font color="#009900">maxsessioncount</font><font color="#990000">=</font><font color="#FF0000">"1000"</font> <font color="#009900">endofsession</font><font color="#990000">=</font><font color="#FF0000">"commit"</font> <font color="#009900">sessiontimeout</font><font color="#990000">=</font><font color="#FF0000">"600"</font>
 		<font color="#009900">runasuser</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> <font color="#009900">runasgroup</font><font color="#990000">=</font><font color="#FF0000">"nobody"</font> <font color="#009900">cursors</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">maxcursors</font><font color="#990000">=</font><font color="#FF0000">"10"</font> <font color="#009900">cursors_growby</font><font color="#990000">=</font><font color="#FF0000">"1"</font>
-		<font color="#009900">authtier</font><font color="#990000">=</font><font color="#FF0000">"connection"</font> <font color="#009900">sessionhandler</font><font color="#990000">=</font><font color="#FF0000">"process"</font> <font color="#009900">handoff</font><font color="#990000">=</font><font color="#FF0000">"pass"</font> <font color="#009900">deniedips</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">allowedips</font><font color="#990000">=</font><font color="#FF0000">""</font>
+		<font color="#009900">sessionhandler</font><font color="#990000">=</font><font color="#FF0000">"process"</font> <font color="#009900">handoff</font><font color="#990000">=</font><font color="#FF0000">"pass"</font> <font color="#009900">deniedips</font><font color="#990000">=</font><font color="#FF0000">""</font> <font color="#009900">allowedips</font><font color="#990000">=</font><font color="#FF0000">""</font>
 		<font color="#009900">maxquerysize</font><font color="#990000">=</font><font color="#FF0000">"65536"</font> <font color="#009900">maxbindvars</font><font color="#990000">=</font><font color="#FF0000">"256"</font> <font color="#009900">maxstringbindvaluelength</font><font color="#990000">=</font><font color="#FF0000">"4000"</font> <font color="#009900">maxlobbindvaluelength</font><font color="#990000">=</font><font color="#FF0000">"71680"</font>
 		<font color="#009900">idleclienttimeout</font><font color="#990000">=</font><font color="#FF0000">"-1"</font> <font color="#009900">maxlisteners</font><font color="#990000">=</font><font color="#FF0000">"-1"</font> <font color="#009900">listenertimeout</font><font color="#990000">=</font><font color="#FF0000">"0"</font> <font color="#009900">reloginatstart</font><font color="#990000">=</font><font color="#FF0000">"no"</font>
 		<font color="#009900">fakeinputbindvariables</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">translatebindvariables</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">isolationlevel</font><font color="#990000">=</font><font color="#FF0000">"read committed"</font>
 		<font color="#009900">ignoreselectdatabase</font><font color="#990000">=</font><font color="#FF0000">"no"</font> <font color="#009900">waitfordowndatabase</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">&gt;</font></b>
-	       <b><font color="#0000FF">&lt;users&gt;</font></b>
-		      <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password1"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password2"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password3"</font><b><font color="#0000FF">/&gt;</font></b>
-	       <b><font color="#0000FF">&lt;/users&gt;</font></b>
-	       <b><font color="#0000FF">&lt;session&gt;</font></b>
-		      <b><font color="#0000FF">&lt;start&gt;</font></b>
-			     <b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='MM-DD-YYYY HH24:MI:SS'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
-		      <b><font color="#0000FF">&lt;/start&gt;</font></b>
-		      <b><font color="#0000FF">&lt;end&gt;</font></b>
-			     <b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='DD-MON-YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
-		      <b><font color="#0000FF">&lt;/end&gt;</font></b>
-	       <b><font color="#0000FF">&lt;/session&gt;</font></b>
-	       <b><font color="#0000FF">&lt;connections&gt;</font></b>
-		      <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db1"</font>
-			<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser1;password=examplepassword1;oracle_sid=EXAMPLE1;"</font>
-			<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db2"</font>
-			<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser2;password=examplepassword2;oracle_sid=EXAMPLE2;"</font>
-			<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db3"</font>
-			<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser3;password=examplepassword3;oracle_sid=EXAMPLE3;"</font>
-			<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
-		      <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db4"</font>
-			<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser4;password=examplepassword4;oracle_sid=EXAMPLE4;"</font>
-			<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
-	       <b><font color="#0000FF">&lt;/connections&gt;</font></b>
-        <b><font color="#0000FF">&lt;/instance&gt;</font></b>
+		<b><font color="#0000FF">&lt;session&gt;</font></b>
+			<b><font color="#0000FF">&lt;start&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='MM-DD-YYYY HH24:MI:SS'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+			<b><font color="#0000FF">&lt;/start&gt;</font></b>
+			<b><font color="#0000FF">&lt;end&gt;</font></b>
+				<b><font color="#0000FF">&lt;runquery&gt;</font></b>alter session set nls_date_format='DD-MON-YYYY'<b><font color="#0000FF">&lt;/runquery&gt;</font></b>
+			<b><font color="#0000FF">&lt;/end&gt;</font></b>
+		<b><font color="#0000FF">&lt;/session&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db1"</font>
+				<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser1;password=examplepassword1;oracle_sid=orcl1;"</font>
+				<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"1"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db2"</font>
+				<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser2;password=examplepassword2;oracle_sid=orcl2;"</font>
+				<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"3"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db3"</font>
+				<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser3;password=examplepassword3;oracle_sid=orcl3;"</font>
+				<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"5"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">connectionid</font><font color="#990000">=</font><font color="#FF0000">"db4"</font>
+				<font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=exampleuser4;password=examplepassword4;oracle_sid=orcl4;"</font>
+				<font color="#009900">metric</font><font color="#990000">=</font><font color="#FF0000">"6"</font> <font color="#009900">behindloadbalancer</font><font color="#990000">=</font><font color="#FF0000">"no"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
 <b><font color="#0000FF">&lt;/instances&gt;</font></b>
 </tt></pre>
 
@@ -80,11 +75,6 @@ http://www.gnu.org/software/src-highlite -->
   <li>The <b>instances</b> tag is just the root tag.  Each configuration file should have only one of these tags surrounding all other tags.</li>
   <ul>
     <li>Each <b>instance</b> tag defines an instance of SQL Relay.  You can define as many of these as you like in each configuration file.</li>
-    <li>The <b>users</b> tag surrounds the list of users that may connect to the instance.</li>
-    <ul>
-      <li>Each <b>user</b> tag defines a user/password combination that may be used to connect to the instance.  The password is generally stored in plain text but it is possible to encrypt the password using a loadable module.  See <a href="configguide.html#pwdenc">Password Encryption</a></li>
-    </ul>
-
     <li>The <b>session</b> tag surrounds a set of queries to be run at the start and end of each session.  The entire <b>session</b> block is optional.</li>
     <ul>
       <li>The <b>start</b> tag surrounds a set of queries to be run at the the start of each session and the <b>end</b> tag surrounds a set of qeries to be run at the end of each session.  Both are optional.</li>
@@ -151,7 +141,6 @@ http://www.gnu.org/software/src-highlite -->
     <li><b>cursors</b> - The number of database cursors to open and maintain for each database connection.  More cursors may be opened if needed, but the pool of cursors will shrink back down to this size at the end of each client session.  This may be set to any positive number or 0.  Defaults to 1.</li>
     <li><b>maxcursors</b> - The maximum number of database cursors that may be opened for a single client session.  If this is set to a number lower than the value for the <b>cursors</b> parameter then it will be automatically bumped up to the value set for <b>cursors</b>.  Defaults to 5, or the same value as <b>cursors</b>, whichever is greater.</li>
     <li><b>cursors_growby</b> - The number of new cursors that will be opened at a time when new cursors are required.  Defaults to 1.</li>
-    <li><b>authtier</b> - Where to authenticate.  Can be set to "connection", "database", or "proxied".  Defaults to connection, which implements <a href="configguide.html#">User List Auth</a>.  See <a href="configguide.html@userlistauth">User List Auth</a>, <a href="configguide.html#dbauth">Database Auth</a> and <a href="configguide.html#proxiedauth">Proxied Auth</a> in the configuration guide for more information.</li>
     <li><b>sessionhandler</b> - Method used by the listener to handle a client session.  Options are either "thread" (the default as of version 0.58) or "process".  When a client connects to the listener, a child is forked to handle the connection.  The child can be either a process or a thread.  Threads should perform better but aren't supported on all platforms.  Defaults to "thread" (as of version 0.58).</li>
     <li><b>handoff</b> - Method for handing off a client from listener to connection, can be one of: "pass" or "proxy".  When an <b>SQL Relay</b> client needs to talk to the database, it connects to a listener process which queues it up until a database connection daemon is available.  When a daemon is available, the client is "handed off" to it.  This "handoff" can be done in one of two ways.  The file descriptor of the connected client can be passed from the listener to the connection daemon, or the listener can proxy the client, ferrying data back and forth between it and the connection daemon.  These two methods are referred to as "pass" and "proxy".  "proxy" works on every platform.  "pass" works on most platforms but not all.  "pass" is faster and lighter than "proxy" and should be used if possible.  Cygwin and Linux kernels prior to 2.2 don't support "pass" though, and on those platforms, even if you specify "pass", "proxy" will be used instead and a warning will be displayed.  Other platforms may not support "pass" as well but those are the only known ones and the only ones where "proxy" is forced.</li>
     <li><b>deinedips</b> - A <a target="_blank" href="http://www.regular-expressions.info">regular expression</a> indicating which IP addresses will be denied access (for example, to deny access to all clients: deniedips=".*")  By default, no IP addresses are denied.</li>

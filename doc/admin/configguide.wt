@@ -35,6 +35,7 @@
   * [#sqlrclientconfiguration Basic Configuration]
   * [#sqlrclientlistener Listener Options]
   * [#sqlrclientauth Authentication/Authorization/Encryption Options]
+   * [#sqlrclientconnectstringsauth Connect String Auth]
    * [#sqlrclientuserlistauth User List Auth]
    * [#sqlrclientdbauth Database Auth]
    * [#sqlrclientproxiedauth Proxied Auth]
@@ -335,7 +336,7 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost
 	port = 1433
 	tds version = 7.0
@@ -372,7 +373,7 @@ On Linux/Unix platforms, the server option refers to an entry in the interfaces 
 
 {{{#!blockquote
 {{{#!code
-EXAMPLEDB
+SAPSERVER
 	master tcp ether examplehost 5000
 	query tcp ether examplehost 5000
 }}}
@@ -405,7 +406,7 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost
 	port = 5000
 	tds version = 5.0
@@ -1257,12 +1258,37 @@ If the socket option is specified but the port option is not, then SQL Relay wil
 
 There are several options for controlling which users are allowed to access an instance of SQL Relay.
 
+[=#sqlrclientconnectstringsauth]
+=== Connect Strings Auth ===
+
+The default authentication/authorization option is //connect strings// auth.
+
+When connect strings auth is used, a user is authenticated/authorized against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.
+
+In the following exmaple, SQL Relay is configured to access the database using scott/tiger credentials.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-minimal.conf@
+}}}
+}}}
+
+In this case, SQL Relay clients would also use scott/tiger credentials to access SQL Relay.
+
+Though it is not necessary, it is possible to explicitly configure SQL Relay to load the //connect strings// auth module as follows:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-connectstrings.conf@
+}}}
+}}}
+
 [=#sqlrclientuserlistauth]
 === User List Auth ===
 
-The standard authentication/authorization option is //user list// auth.
+Another popular authentication/authorization option is //user list// auth.
 
-When user list auth is used, a user is authenticated/authorized against a static list of valid user/password combinations.  This is the method used in all of the examples above.
+When user list auth is used, a user is authenticated/authorized against a static list of valid user/password combinations, which may be different than the user/password used that SQL Relay uses to access the database.
 
 To enable user list auth, you must provide a list of valid user/password combinations, as follows:
 
@@ -1327,11 +1353,11 @@ Another popular authentication/authorization option is //database// auth.
 
 When database auth is used, a user is authenticated/authorized against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.
 
-To enable database auth, omit the list of user/passwords and configure authtier="database" as follows.
+To enable database auth, configure SQL Relay to load the //database// auth module as follows.
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-auths-authtier-database.conf@
+@parts/sqlrelay-auths-database.conf@
 }}}
 }}}
 
@@ -1350,11 +1376,11 @@ When proxied auth is used, a user is authenticated/authorized against the databa
 
 This is currently only supported with Oracle (version 8i or higher) and requires database configuration.  See [oraclentier.html this document] for more information including instructions for configuring Oracle.
 
-To enable proxied auth, omit the list of user/passwords and configure authtier="proxied" as follows.
+To enable proxied auth, configure SQL Relay to load the //proxied// auth module as follows.
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-auths-authtier-proxied.conf@
+@parts/sqlrelay-auths-proxied.conf@
 }}}
 }}}
 
@@ -2586,7 +2612,7 @@ In this example, !FreeTDS is configured to require an encrypted connection to th
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost
 	port = 1433
 	tds version = 7.1
@@ -2601,7 +2627,7 @@ In this example, !FreeTDS is also configured to validate the database server's c
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost
 	port = 1433
 	tds version = 7.1
@@ -2616,7 +2642,7 @@ In this example, !FreeTDS is also configured to validate that the common name in
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost.yourdomain.com
 	port = 1433
 	tds version = 7.1
@@ -2629,7 +2655,7 @@ In this example, !FreeTDS is also configured to validate that the common name in
 
 Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
 
-The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, EXAMPLEDB refers to the !FreeTDS EXAMPLEDB entry configured above:
+The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, FREETDSSERVER refers to the !FreeTDS FREETDSSERVER entry configured above:
 
 {{{#!blockquote
 {{{#!code
@@ -2846,7 +2872,7 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 In this example, the //id// and //count// attributes configure the //rot// module.  "13" tells the module to rotate by 13 characters.  The //id// attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The //id// attribute is mandatory.
 
-Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "examplepassword").  A command line program (described below) is provided to encrypt passwords.
+Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "oraclepassword").  A command line program (described below) is provided to encrypt passwords.
 
 Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// attribute in the passwordencryption tag ( //rot13enc// ), not the module name ( //rot// ).
 
@@ -2879,12 +2905,12 @@ For example:
 
 {{{#!blockquote
 {{{
-$ sqlr-pwdenc -id example -pwdencid rot13enc -password examplepassword
-rknzcyrcnffjbeq
+$ sqlr-pwdenc -id example -pwdencid rot13enc -password oraclepassword
+benpyrcnffjbeq
 }}}
 }}}
 
-The resulting string "rknzcyrcnffjbeq" can now be put in the configuration file as the password.
+The resulting string "benpyrcnffjbeq" can now be put in the configuration file as the password.
 
 There is one final thing to note.  Command line client programs like sqlrsh and sqlr-import take a -id option.  The -id option causes the program to open the configuration file and extract the host, port, socket, user and password from the specified instance.  If the password is encrypted, then the encrypted password will be extracted and passed to the server.  This will fail.  So, when using the -id option with an encrypted password, you must also use the -user and -password option, to override the user/password that are extracted from the configuration file.
 
