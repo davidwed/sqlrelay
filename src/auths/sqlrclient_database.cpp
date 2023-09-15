@@ -5,9 +5,10 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
 
-class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_sqlrclient_database : public sqlrauth {
 	public:
-			sqlrauth_database(sqlrservercontroller *cont,
+			sqlrauth_sqlrclient_database(
+						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters);
@@ -18,7 +19,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_database : public sqlrauth {
 		stringbuffer	lastpassword;
 };
 
-sqlrauth_database::sqlrauth_database(sqlrservercontroller *cont,
+sqlrauth_sqlrclient_database::sqlrauth_sqlrclient_database(
+					sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					domnode *parameters) :
@@ -26,7 +28,7 @@ sqlrauth_database::sqlrauth_database(sqlrservercontroller *cont,
 	first=true;
 }
 
-const char *sqlrauth_database::auth(sqlrcredentials *cred) {
+const char *sqlrauth_sqlrclient_database::auth(sqlrcredentials *cred) {
 
 	// this module only supports user/password credentials
 	if (charstring::compare(cred->getType(),"userpassword")) {
@@ -72,11 +74,12 @@ const char *sqlrauth_database::auth(sqlrcredentials *cred) {
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_database(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrclient_database(
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_database(cont,auths,sqlrpe,parameters);
+		return new sqlrauth_sqlrclient_database(
+						cont,auths,sqlrpe,parameters);
 	}
 }

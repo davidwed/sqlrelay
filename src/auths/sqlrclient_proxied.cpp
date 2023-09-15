@@ -5,9 +5,9 @@
 #include <rudiments/stringbuffer.h>
 #include <rudiments/charstring.h>
 
-class SQLRSERVER_DLLSPEC sqlrauth_proxied : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_sqlrclient_proxied : public sqlrauth {
 	public:
-			sqlrauth_proxied(sqlrservercontroller *cont,
+			sqlrauth_sqlrclient_proxied(sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters);
@@ -17,14 +17,15 @@ class SQLRSERVER_DLLSPEC sqlrauth_proxied : public sqlrauth {
 		stringbuffer	lastpassword;
 };
 
-sqlrauth_proxied::sqlrauth_proxied(sqlrservercontroller *cont,
+sqlrauth_sqlrclient_proxied::sqlrauth_sqlrclient_proxied(
+					sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					domnode *parameters) :
 					sqlrauth(cont,auths,sqlrpe,parameters) {
 }
 
-const char *sqlrauth_proxied::auth(sqlrcredentials *cred) {
+const char *sqlrauth_sqlrclient_proxied::auth(sqlrcredentials *cred) {
 
 	// this module only supports user/password credentials
 	if (charstring::compare(cred->getType(),"userpassword")) {
@@ -61,11 +62,12 @@ const char *sqlrauth_proxied::auth(sqlrcredentials *cred) {
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_proxied(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrclient_proxied(
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_proxied(cont,auths,sqlrpe,parameters);
+		return new sqlrauth_sqlrclient_proxied(
+						cont,auths,sqlrpe,parameters);
 	}
 }

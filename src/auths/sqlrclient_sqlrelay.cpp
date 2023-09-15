@@ -5,13 +5,13 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/charstring.h>
 
-class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_sqlrclient_sqlrelay : public sqlrauth {
 	public:
-			sqlrauth_sqlrelay(sqlrservercontroller *cont,
+			sqlrauth_sqlrclient_sqlrelay(sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters);
-			~sqlrauth_sqlrelay();
+			~sqlrauth_sqlrclient_sqlrelay();
 		const char	*auth(sqlrcredentials *cred);
 	private:
 		const char	*host;
@@ -31,7 +31,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_sqlrelay : public sqlrauth {
 		sqlrcursor	*sqlrcur;
 };
 
-sqlrauth_sqlrelay::sqlrauth_sqlrelay(sqlrservercontroller *cont,
+sqlrauth_sqlrclient_sqlrelay::sqlrauth_sqlrclient_sqlrelay(
+					sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					domnode *parameters) :
@@ -94,12 +95,12 @@ sqlrauth_sqlrelay::sqlrauth_sqlrelay(sqlrservercontroller *cont,
 	sqlrcur->prepareQuery(query.getString());
 }
 
-sqlrauth_sqlrelay::~sqlrauth_sqlrelay() {
+sqlrauth_sqlrclient_sqlrelay::~sqlrauth_sqlrclient_sqlrelay() {
 	delete sqlrcur;
 	delete sqlrcon;
 }
 
-const char *sqlrauth_sqlrelay::auth(sqlrcredentials *cred) {
+const char *sqlrauth_sqlrclient_sqlrelay::auth(sqlrcredentials *cred) {
 
 	// this module only supports user/password credentials
 	if (charstring::compare(cred->getType(),"userpassword")) {
@@ -123,11 +124,12 @@ const char *sqlrauth_sqlrelay::auth(sqlrcredentials *cred) {
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrelay(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrclient_sqlrelay(
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_sqlrelay(cont,auths,sqlrpe,parameters);
+		return new sqlrauth_sqlrclient_sqlrelay(
+						cont,auths,sqlrpe,parameters);
 	}
 }

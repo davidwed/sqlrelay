@@ -5,13 +5,14 @@
 #include <rudiments/charstring.h>
 #include <rudiments/sensitivevalue.h>
 
-class SQLRSERVER_DLLSPEC sqlrauth_connectstrings : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_sqlrclient_connectstrings : public sqlrauth {
 	public:
-			sqlrauth_connectstrings(sqlrservercontroller *cont,
+			sqlrauth_sqlrclient_connectstrings(
+						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters);
-			~sqlrauth_connectstrings();
+			~sqlrauth_sqlrclient_connectstrings();
 
 		const char	*auth(sqlrcredentials *cred);
 	private:
@@ -26,7 +27,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_connectstrings : public sqlrauth {
 		sensitivevalue	passwordvalue;
 };
 
-sqlrauth_connectstrings::sqlrauth_connectstrings(sqlrservercontroller *cont,
+sqlrauth_sqlrclient_connectstrings::sqlrauth_sqlrclient_connectstrings(
+					sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					domnode *parameters) :
@@ -70,7 +72,7 @@ sqlrauth_connectstrings::sqlrauth_connectstrings(sqlrservercontroller *cont,
 	}
 }
 
-sqlrauth_connectstrings::~sqlrauth_connectstrings() {
+sqlrauth_sqlrclient_connectstrings::~sqlrauth_sqlrclient_connectstrings() {
 	delete[] users;
 	for (uint64_t i=0; i<usercount; i++) {
 		delete[] passwords[i];
@@ -79,7 +81,7 @@ sqlrauth_connectstrings::~sqlrauth_connectstrings() {
 	delete[] passwordencryptions;
 }
 
-const char *sqlrauth_connectstrings::auth(sqlrcredentials *cred) {
+const char *sqlrauth_sqlrclient_connectstrings::auth(sqlrcredentials *cred) {
 
 	// this module only supports user/password credentials
 	if (charstring::compare(cred->getType(),"userpassword")) {
@@ -102,7 +104,8 @@ const char *sqlrauth_connectstrings::auth(sqlrcredentials *cred) {
 	return NULL;
 }
 
-const char *sqlrauth_connectstrings::userPassword(const char *user,
+const char *sqlrauth_sqlrclient_connectstrings::userPassword(
+						const char *user,
 						const char *password,
 						uint64_t index) {
 
@@ -165,12 +168,12 @@ const char *sqlrauth_connectstrings::userPassword(const char *user,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_connectstrings(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrclient_connectstrings(
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_connectstrings(
+		return new sqlrauth_sqlrclient_connectstrings(
 					cont,auths,sqlrpe,parameters);
 	}
 }

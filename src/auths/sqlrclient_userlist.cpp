@@ -5,13 +5,14 @@
 #include <rudiments/charstring.h>
 #include <rudiments/sensitivevalue.h>
 
-class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_sqlrclient_userlist : public sqlrauth {
 	public:
-			sqlrauth_userlist(sqlrservercontroller *cont,
+			sqlrauth_sqlrclient_userlist(
+						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters);
-			~sqlrauth_userlist();
+			~sqlrauth_sqlrclient_userlist();
 
 		const char	*auth(sqlrcredentials *cred);
 	private:
@@ -26,7 +27,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 		sensitivevalue	passwordvalue;
 };
 
-sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
+sqlrauth_sqlrclient_userlist::sqlrauth_sqlrclient_userlist(
+					sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					domnode *parameters) :
@@ -69,7 +71,7 @@ sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
 	}
 }
 
-sqlrauth_userlist::~sqlrauth_userlist() {
+sqlrauth_sqlrclient_userlist::~sqlrauth_sqlrclient_userlist() {
 	delete[] users;
 	for (uint64_t i=0; i<usercount; i++) {
 		delete[] passwords[i];
@@ -78,7 +80,7 @@ sqlrauth_userlist::~sqlrauth_userlist() {
 	delete[] passwordencryptions;
 }
 
-const char *sqlrauth_userlist::auth(sqlrcredentials *cred) {
+const char *sqlrauth_sqlrclient_userlist::auth(sqlrcredentials *cred) {
 
 	// this module supports userpassword, gss, and tls credentials
 	bool		up=!charstring::compare(cred->getType(),"userpassword");
@@ -139,7 +141,7 @@ const char *sqlrauth_userlist::auth(sqlrcredentials *cred) {
 	return NULL;
 }
 
-const char *sqlrauth_userlist::userPassword(const char *user,
+const char *sqlrauth_sqlrclient_userlist::userPassword(const char *user,
 						const char *password,
 						uint64_t index) {
 
@@ -202,11 +204,12 @@ const char *sqlrauth_userlist::userPassword(const char *user,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_userlist(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrclient_userlist(
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_userlist(cont,auths,sqlrpe,parameters);
+		return new sqlrauth_sqlrclient_userlist(
+						cont,auths,sqlrpe,parameters);
 	}
 }
