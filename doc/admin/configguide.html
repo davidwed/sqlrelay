@@ -52,9 +52,9 @@
     <ul>
       <li><a href="#sqlrclientconfiguration">Basic Configuration</a></li>
       <li><a href="#sqlrclientlistener">Listener Options</a></li>
-      <li><a href="#sqlrclientauth">Authentication/Authorization/Encryption Options</a></li>
+      <li><a href="#sqlrclientauth">Authentication/Encryption Options</a></li>
       <ul>
-        <li><a href="#sqlrclientconnectstringsauth">Connect String Auth</a></li>
+        <li><a href="#sqlrclientconnectstringsauth">Connect Strings Auth</a></li>
         <li><a href="#sqlrclientuserlistauth">User List Auth</a></li>
         <li><a href="#sqlrclientdbauth">Database Auth</a></li>
         <li><a href="#sqlrclientproxiedauth">Proxied Auth</a></li>
@@ -69,8 +69,9 @@
     <ul>
       <li><a href="#mysqlconfiguration">Basic Configuration</a></li>
       <li><a href="#mysqllistener">Listener Options</a></li>
-      <li><a href="#mysqlauth">Authentication/Authorization/Encryption Options</a></li>
+      <li><a href="#mysqlauth">Authentication/Encryption Options</a></li>
       <ul>
+        <li><a href="#mysqlconnectstringsauth">Connect Strings Auth</a></li>
         <li><a href="#mysqluserlistauth">User List Auth</a></li>
         <li><a href="#mysqldbauth">Database Auth</a></li>
         <li><a href="#mysqltls">TLS/SSL Encryption and Authentication</a></li>
@@ -85,8 +86,9 @@
     <ul>
       <li><a href="#postgresqlconfiguration">Basic Configuration</a></li>
       <li><a href="#postgresqllistener">Listener Options</a></li>
-      <li><a href="#postgresqlauth">Authentication/Authorization/Encryption Options</a></li>
+      <li><a href="#postgresqlauth">Authentication/Encryption Options</a></li>
       <ul>
+        <li><a href="#postgresqlconnectstringsauth">Connect Strings Auth</a></li>
         <li><a href="#postgresqluserlistauth">User List Auth</a></li>
         <li><a href="#postgresqltls">TLS/SSL Encryption and Authentication</a></li>
       </ul>
@@ -1757,15 +1759,15 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.</p>
 
-<a name="sqlrclientauth"/><h3>Authentication/Authorization/Encryption Options</h3>
+<a name="sqlrclientauth"/><h3>Authentication/Encryption Options</h3>
 
-<p>There are several options for controlling which users are allowed to access an instance of SQL Relay.</p>
+<p>When using the SQLRClient protocol, there are several options for controlling which users are allowed to access an instance of SQL Relay.</p>
 
 <a name="sqlrclientconnectstringsauth"/><h3>Connect Strings Auth</h3>
 
-<p>The default authentication/authorization option is <i>connect strings</i> auth.</p>
+<p>The default authentication option is <i>connect strings</i> auth.</p>
 
-<p>When connect strings auth is used, a user is authenticated/authorized against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.</p>
+<p>When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.</p>
 
 <p>In the following exmaple, SQL Relay is configured to access the database using scott/tiger credentials.</p>
 
@@ -1785,7 +1787,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>In this case, SQL Relay clients would also use scott/tiger credentials to access SQL Relay.</p>
+<p>In this case, clients would also use scott/tiger credentials to access SQL Relay.</p>
 
 <p>Though it is not necessary, it is possible to explicitly configure SQL Relay to load the <i>connect strings</i> auth module as follows:</p>
 
@@ -1798,7 +1800,7 @@ http://www.gnu.org/software/src-highlite -->
 <b><font color="#0000FF">&lt;instances&gt;</font></b>
 	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font><b><font color="#0000FF">&gt;</font></b>
 		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"connectstrings"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"sqlrelay_connectstrings"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
                         <b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
@@ -1810,11 +1812,11 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <a name="sqlrclientuserlistauth"/><h3>User List Auth</h3>
 
-<p>Another popular authentication/authorization option is <i>user list</i> auth.</p>
+<p>Another popular authentication option is <i>user list</i> auth.</p>
 
-<p>When user list auth is used, a user is authenticated/authorized against a static list of valid user/password combinations, which may be different than the user/password used that SQL Relay uses to access the database.</p>
+<p>When user list authentication is used, a user is authenticated against a static list of user/password combinations, which may be different than the user/password used that SQL Relay uses to access the database.</p>
 
-<p>To enable user list auth, you must provide a list of valid user/password combinations, as follows:</p>
+<p>To enable user list auth, you must provide a list of user/password combinations, as follows:</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -1828,9 +1830,9 @@ http://www.gnu.org/software/src-highlite -->
 		...
 		<b><font color="#0000FF">&lt;auths&gt;</font></b>
 			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password1"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password2"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"password3"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oneuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"onepassword"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"anotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"anotherpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"yetanotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"yetanotherpassword"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
 		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		...
@@ -1854,9 +1856,9 @@ http://www.gnu.org/software/src-highlite -->
 		...
 		<b><font color="#0000FF">&lt;auths&gt;</font></b>
 			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/user1.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/user2.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/user3.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oneuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/oneuser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"anotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/anotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"yetanotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[/usr/local/firstworks/etc/yetanotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
 		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		...
@@ -1868,24 +1870,24 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>In this example...</p>
 
-<p>The contents of the file /usr/local/firsworks/etc/user1.pwd would be used to authenticate user1, and would contain the text:</p>
+<p>The contents of the file /usr/local/firsworks/etc/oneuser.pwd would be used to authenticate oneuser, and would contain the text:</p>
 
 <blockquote>
-  <pre>password1
+  <pre>onepassword
 </pre>
 
 </blockquote>
-<p>The contents of the file /usr/local/firsworks/etc/user2.pwd would be used to authenticate user2, and would contain the text:</p>
+<p>The contents of the file /usr/local/firsworks/etc/anotheruser.pwd would be used to authenticate anotheruser, and would contain the text:</p>
 
 <blockquote>
-  <pre>password2
+  <pre>anotherpassword
 </pre>
 
 </blockquote>
-<p>The contents of the file /usr/local/firsworks/etc/user3.pwd would be used to authenticate user3, and would contain the text:</p>
+<p>The contents of the file /usr/local/firsworks/etc/yetanotheruser.pwd would be used to authenticate yetanotheruser, and would contain the text:</p>
 
 <blockquote>
-  <pre>password3
+  <pre>yetanotherpassword
 </pre>
 
 </blockquote>
@@ -1907,9 +1909,9 @@ http://www.gnu.org/software/src-highlite -->
 		...
 		<b><font color="#0000FF">&lt;auths&gt;</font></b>
 			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user1"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[user1.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user2"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[user2.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"user3"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[user3.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"oneuser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[oneuser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"anotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[anotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"yetanotheruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"[yetanotheruser.pwd]"</font><b><font color="#0000FF">/&gt;</font></b>
 			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
 		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		...
@@ -1919,13 +1921,13 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>In this case, the path /usr/local/firstworks/etc will be searched for the files user1.pwd, user2.pwd, and user3.pwd.</p>
+<p>In this case, the path /usr/local/firstworks/etc will be searched for the files oneuser.pwd, anotheruser.pwd, and yetanotheruser.pwd.</p>
 
 <a name="sqlrclientdbauth"/><h3>Database Auth</h3>
 
-<p>Another popular authentication/authorization option is <i>database</i> auth.</p>
+<p>Another popular authentication option is <i>database</i> auth.</p>
 
-<p>When database auth is used, a user is authenticated/authorized against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.</p>
+<p>When database authentication is used, a user is authenticated against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.</p>
 
 <p>To enable database auth, configure SQL Relay to load the <i>database</i> auth module as follows.</p>
 
@@ -1950,15 +1952,15 @@ http://www.gnu.org/software/src-highlite -->
 
 </blockquote>
 <blockquote>
-( <b>NOTE:</b> Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database auth is used for that instance, then auth will fail.)
+( <b>NOTE:</b> Database authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database authentication is used for that instance, then authentication will fail.)
 <br/><br/>
-( <b>NOTE:</b> Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.)
+( <b>NOTE:</b> Prior to version 0.65.0, the "database" authentication method defaulted to the behavior of the "proxied" authentication method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.)
 </blockquote>
 <a name="sqlrclientproxiedauth"/><h3>Proxied Auth</h3>
 
-<p>Another authentication/authorization option is <i>proxied</i> auth.</p>
+<p>Another authentication option is <i>proxied</i> auth.</p>
 
-<p>When proxied auth is used, a user is authenticated/authorized against the database itself, though in a different manner than datbase auth described above.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.</p>
+<p>When proxied authentication is used, a user is authenticated against the database itself, though in a different manner than datbase authentication described above.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.</p>
 
 <p>This is currently only supported with Oracle (version 8i or higher) and requires database configuration.  See <a href="oraclentier.html">this document</a> for more information including instructions for configuring Oracle.</p>
 
@@ -1985,7 +1987,7 @@ http://www.gnu.org/software/src-highlite -->
 
 </blockquote>
 <blockquote>
-( <b>NOTE:</b> Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.)
+( <b>NOTE:</b> Proxied authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied authentication is used for that instance, then authentication will fail.)
 </blockquote>
 <a name="sqlrclientkrb"/><h3>Kerberos and Active Directory Encryption and Authentication</h3>
 
@@ -2037,7 +2039,7 @@ http://www.gnu.org/software/src-highlite -->
   <li>The <b>krb</b> attribute enables (or disables) Kerberos authentication and encryption.</li>
   <li>The <b>krbservice</b> attribute specifies which Kerberos service to use.  This attribute is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.</li>
   <li>The <b>krbkeytab</b> attribute specifies the location of the keytab file containing the key for the specified Kerberos service.  This attribute is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab</li>
-  <li>User list auth is also used.  Database and proxied auth are not currently supported with Kerberos.</li>
+  <li>User list authentication is also used.  Other authentication methods are not currently supported with Kerberos.</li>
 </ul>
 
 <p>Note that no passwords are required in the user list.  Note also that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.</p>
@@ -2083,7 +2085,7 @@ http://www.gnu.org/software/src-highlite -->
   <li>If the security context can be successfully established, then the SQL Relay server can trust that the client program is being run by the user that it says it is.</li>
 </ul>
 
-<p>Once the SQL Relay server trusts that the client is being run by the user that it says it is, the user is authorized against the list of valid users.</p>
+<p>Once the SQL Relay server trusts that the client is being run by the user that it says it is, the user is authenticated against the list of users.</p>
 
 <p>While Kerberos authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:</p>
 
@@ -2139,7 +2141,7 @@ http://www.gnu.org/software/src-highlite -->
     <li>(a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See <a href="tlscert.html">The tlscert Parameter</a> for details.)</li>
   </ul>
 
-  <li>User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.</li>
+  <li>User list authentication is also used.  Other authentication methods are not currently supported with TLS/SSL.</li>
 </ul>
 
 <p>To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:</p>
@@ -2209,7 +2211,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <h3>Mutual Authentication</h3>
 
-<p>For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.</p>
+<p>For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authenticate the client based on the host name provided by the certificate.</p>
 
 <p>The following configuration enables these checks for an instance of SQL Relay:</p>
 
@@ -2250,12 +2252,12 @@ http://www.gnu.org/software/src-highlite -->
     <li>(a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See <a href="tlsca.html">The tlsca Parameter</a> for details.)</li>
   </ul>
 
-  <li>User list auth is also used.</li>
+  <li>User list authentication is also used.</li>
 </ul>
 
-<p>Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authorized against the list of valid names.</p>
+<p>Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authenticate against the list of valid names.</p>
 
-<p>Note also that when <b>tlsvalidate</b> is set to "yes", database and proxied auth cannot currently be used.  This is because database and proxied auth both require a user name and password but the client certificate doesn't provide either.</p>
+<p>Note also that when <b>tlsvalidate</b> is set to "yes", database and proxied authentication cannot currently be used.  This is because database and proxied authentication both require a user name and password but the client certificate doesn't provide either.</p>
 
 <p>To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:</p>
 
@@ -2266,7 +2268,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>(.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See <a href="tlscert.html">The tlscert Parameter</a> for details.)</p>
 
-<p>Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authorized against the list of valid names.</p>
+<p>Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authenticated against the list of valid names.</p>
 
 <p>In a more likely use case though, mutual authentication occurs - the client validates the server's certificate and the server validates the client's certificate, as follows:</p>
 
@@ -2312,11 +2314,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3307"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2395,11 +2392,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2421,11 +2413,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">addresses</font><font color="#990000">=</font><font color="#FF0000">"192.168.1.50,192.168.1.51"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2449,11 +2436,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/var/lib/mysql/mysql.sock"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2466,13 +2448,70 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.</p>
 
-<a name="mysqlauth"/><h3>Authentication/Authorization/Encryption Options</h3>
+<a name="mysqlauth"/><h3>Authentication/Encryption Options</h3>
 
+<p>When using the MySQL protocol, there are several options for controlling which users are allowed to access an instance of SQL Relay.</p>
+
+<a name="mysqlconnectstringsauth"/><h3>Connect Strings Auth</h3>
+
+<p>The default authentication option is <i>connect strings</i> auth.</p>
+
+<p>When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.</p>
+
+<p>In the following exmaple, SQL Relay is configured to access the database using mysqlsuer/mysqlpassword credentials.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this case, clients would also use mysqluser/mysqlpassword credentials to access SQL Relay.</p>
+
+<p>Though it is not necessary, it is possible to explicitly configure SQL Relay to load the <i>connect strings</i> auth module as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_connectstrings"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
 <a name="mysqluserlistauth"/><h3>User List Auth</h3>
 
-<p>In the examples above, the instance is configured to load the <i>mysql_userlist</i> auth module and defines a user <i>sqlruser</i> with password <i>sqlrpassword</i>.</p>
+<p>Another popular authentication option is <i>user list</i> auth.</p>
 
-<p>In this configuration, a client must present <i>sqlruser/sqlrpassword</i> credentials.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.</p>
+<p>When user list authentication is used, a user is authenticated against a static list of user/password combinations, which may be different than the user/password used that SQL Relay uses to access the database.</p>
+
+<p>To enable user list auth, you must provide a list of user/password combinations, as follows:</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -2589,7 +2628,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <a name="mysqldbauth"/><h3>Database Auth</h3>
 
-<p>If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the <i>mysql_database</i> module can be used to auth users directly against the database.</p>
+<p>If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the <i>mysql_database</i> module can be used to authentication users directly against the database.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -2688,11 +2727,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3307"</font> <font color="#009900">tls</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">tlscert</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/sqlrserver.pem"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2708,7 +2742,7 @@ http://www.gnu.org/software/src-highlite -->
     <li>(a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See <a href="tlscert.html">The tlscert Parameter</a> for details.)</li>
   </ul>
 
-  <li>User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.</li>
+  <li>User list authentication is also used.  Other authentication methods are not currently supported with TLS/SSL.</li>
 </ul>
 
 <p>To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:</p>
@@ -2777,11 +2811,6 @@ http://www.gnu.org/software/src-highlite -->
 				<font color="#009900">tlsvalidate</font><font color="#990000">=</font><font color="#FF0000">"yes"</font>
 				<font color="#009900">tlsca</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/myca.pem"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2819,7 +2848,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.</p>
 
-<p>SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a MySQL/MariaDB username.  As such, a username and password must still be supplied for authentication/authorization in this configuration.</p>
+<p>SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a MySQL/MariaDB username.  As such, a username and password must still be supplied for authentication in this configuration.</p>
 
 <h3>Performance Considerations</h3>
 
@@ -2850,11 +2879,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2890,11 +2914,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font> <font color="#009900">zeroscaledecimaltobigint</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2924,11 +2943,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font> <font color="#009900">datetodatetime</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2956,11 +2970,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font> <font color="#009900">oldmariadbjdbcservercapabilitieshack</font><font color="#990000">=</font><font color="#FF0000">"yes"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=mysqluser;password=mysqlpassword;db=mysqldb;host=mysqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -2975,13 +2984,13 @@ http://www.gnu.org/software/src-highlite -->
 
 <ul>
   <li>Only LATIN1_SWEDISH_CI and UTF8_GENERAL_CI character sets are supported.</li>
-  <li>Only the mysql_native_password and mysql_clear_password auth methods are supported.  Notably, mysql_old_password and authentication_windows_client are not supported.</li>
+  <li>Only the mysql_native_password and mysql_clear_password authentication methods are supported.  Notably, mysql_old_password and authentication_windows_client are not supported.</li>
   <li>Multi-statement queries are not supported.</li>
   <li>mysql_change_user() is not supported.</li>
   <li>mysql_send_long_data() is not supported.</li>
   <li>mysql_info() will always returns NULL when used with SQL Relay.</li>
   <li>MYSQL_FIELD.org_name/org_name_length and MYSQL_FIELD.org_table/org_table_length are not supported.</li>
-  <li>Kerberos auth and encryption are not supported.</li>
+  <li>Kerberos authentication and encryption are not supported.</li>
 </ul>
 
 <p>Most of SQL Relay's core features are available when it is configured to speak the MySQL protocol, but there are a few incompatible configurations:</p>
@@ -2989,7 +2998,7 @@ http://www.gnu.org/software/src-highlite -->
 <ul>
   <li>Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any <i>addresses</i>, <i>port</i>, and <i>socket</i> attributes in the instance tag.</li>
   <li>Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an <i>authtier</i> attribute in the instance tag.</li>
-  <li>As Kerberos auth and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.</li>
+  <li>As Kerberos authentication and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.</li>
 </ul>
 
 <p>Otherwise, all other tags and attributes are compatbile.</p>
@@ -3015,11 +3024,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5433"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -3096,11 +3100,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -3122,11 +3121,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">addresses</font><font color="#990000">=</font><font color="#FF0000">"192.168.1.50,192.168.1.51"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -3150,11 +3144,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font> <font color="#009900">socket</font><font color="#990000">=</font><font color="#FF0000">"/tmp/.s.PGSQL.5432"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -3167,13 +3156,70 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.</p>
 
-<a name="postgresqlauth"/><h3>Authentication/Authorization/Encryption Options</h3>
+<a name="postgresqlauth"/><h3>Authentication/Encryption Options</h3>
 
+<p>When using the PostgreSQL protocol, there are several options for controlling which users are allowed to access an instance of SQL Relay.</p>
+
+<a name="postgresqlconnectstringsauth"/><h3>Connect Strings Auth</h3>
+
+<p>The default authentication option is <i>connect strings</i> auth.</p>
+
+<p>When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.</p>
+
+<p>In the following exmaple, SQL Relay is configured to access the database using postgresqlsuer/postgresqlpassword credentials.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this case, clients would also use postgresqluser/postgresqlpassword credentials to access SQL Relay.</p>
+
+<p>Though it is not necessary, it is possible to explicitly configure SQL Relay to load the <i>connect strings</i> auth module as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_connectstrings"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
 <a name="postgresqluserlistauth"/><h3>User List Auth</h3>
 
-<p>In the examples above, the instance is configured to load the <i>postgresql_userlist</i> auth module and defines a user <i>sqlruser</i> with password <i>sqlrpassword</i>.</p>
+<p>Another popular authentication option is <i>user list</i> auth.</p>
 
-<p>In this configuration, a client must present <i>sqlruser/sqlrpassword</i> credentials.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.</p>
+<p>When user list authentication is used, a user is authenticated against a static list of user/password combinations, which may be different than the user/password used that SQL Relay uses to access the database.</p>
+
+<p>To enable user list auth, you must provide a list of user/password combinations, as follows:</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -3292,13 +3338,13 @@ http://www.gnu.org/software/src-highlite -->
 
 <a name="postgresqltls"/><h3>TLS/SSL Encryption and Authentication</h3>
 
-<p>SQL Relay supports TLS/SSL encryption and authentication between the MySQL/MariaDB client and SQL Relay Server.</p>
+<p>SQL Relay supports TLS/SSL encryption and authentication between the PostgreSQL client and SQL Relay Server.</p>
 
 <p>When TLS/SSL encryption and authentication is used:</p>
 
 <ul>
-  <li>All communications between the MySQL/MariaDB client and SQL Relay server are encrypted.</li>
-  <li>MySQL/MariaDB clients and servers may optionally validate each other's certificates and identities.</li>
+  <li>All communications between the PostgreSQL client and SQL Relay server are encrypted.</li>
+  <li>PostgreSQL clients and servers may optionally validate each other's certificates and identities.</li>
 </ul>
 
 <p>When using TLS/SSL encryption and authentication, at minimum, the SQL Relay server must be configured to load a certificate.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.</p>
@@ -3318,11 +3364,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5433"</font> <font color="#009900">tls</font><font color="#990000">=</font><font color="#FF0000">"yes"</font> <font color="#009900">tlscert</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/sqlrserver.pem"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -3338,7 +3379,7 @@ http://www.gnu.org/software/src-highlite -->
     <li>(a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See <a href="tlscert.html">The tlscert Parameter</a> for details.)</li>
   </ul>
 
-  <li>User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.</li>
+  <li>User list authentication is also used.  Other authentication methods are not currently supported with TLS/SSL.</li>
 </ul>
 
 <p>To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:</p>
@@ -3397,7 +3438,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <h3>Mutual Authentication</h3>
 
-<p>For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.</p>
+<p>For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authenticate the client based on the host name provided by the certificate.</p>
 
 <p>The following configuration enables these checks for an instance of SQL Relay:</p>
 
@@ -3416,11 +3457,6 @@ http://www.gnu.org/software/src-highlite -->
 				<font color="#009900">tlsvalidate</font><font color="#990000">=</font><font color="#FF0000">"yes"</font>
 				<font color="#009900">tlsca</font><font color="#990000">=</font><font color="#FF0000">"/usr/local/firstworks/etc/myca.pem"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=postgresqluser;password=postgresqlpassword;db=postgresqldb;host=postgresqlhost"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -3436,12 +3472,12 @@ http://www.gnu.org/software/src-highlite -->
     <li>(a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See <a href="tlsca.html">The tlsca Parameter</a> for details.)</li>
   </ul>
 
-  <li>User list auth is also used.</li>
+  <li>User list authentication is also used.</li>
 </ul>
 
-<p>Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authorized against the list of valid names.</p>
+<p>Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authenticated against the list of valid names.</p>
 
-<p>Note also that when <b>tlsvalidate</b> is set to "yes", database and proxied auth cannot currently be used.  This is because database and proxied auth both require a user name and password but the client certificate doesn't provide either.</p>
+<p>Note also that when <b>tlsvalidate</b> is set to "yes", database and proxied authentication cannot currently be used.  This is because database and proxied authentication both require a user name and password but the client certificate doesn't provide either.</p>
 
 <p>To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:</p>
 
@@ -3465,7 +3501,7 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.</p>
 
-<p>SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a PostgreSQL username.  As such, a username and password must still be supplied for authentication/authorization in this configuration.</p>
+<p>SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a PostgreSQL username.  As such, a username and password must still be supplied for authentication in this configuration.</p>
 
 <h3>Performance Considerations</h3>
 
@@ -3496,11 +3532,6 @@ http://www.gnu.org/software/src-highlite -->
 		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
 			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
-		<b><font color="#0000FF">&lt;auths&gt;</font></b>
-			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
-				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
-			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
-		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
 		<b><font color="#0000FF">&lt;connections&gt;</font></b>
 			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
 		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
@@ -3518,7 +3549,7 @@ http://www.gnu.org/software/src-highlite -->
 <p>The implementation of the PostgreSQL protocol is likely sufficient for most applications, but it isn't 100% complete.  Some notable limitations follow:</p>
 
 <ul>
-  <li>Kerberos auth and encryption are not supported.</li>
+  <li>Kerberos authentication and encryption are not supported.</li>
   <li>Multi-statement queries are not supported.</li>
 </ul>
 
@@ -3527,8 +3558,8 @@ http://www.gnu.org/software/src-highlite -->
 <ul>
   <li>Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any <i>addresses</i>, <i>port</i>, and <i>socket</i> attributes in the instance tag.</li>
   <li>Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an <i>authtier</i> attribute in the instance tag.</li>
-  <li>Database-auth (authenticating/authorizing users directly against the database) is not currently supported.</li>
-  <li>As Kerberos auth and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.</li>
+  <li>Database-authentication (authenticating users directly against the database) is not currently supported.</li>
+  <li>As Kerberos authentication and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.</li>
 </ul>
 
 <p>Otherwise, all other tags and attributes are compatbile.</p>
