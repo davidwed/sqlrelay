@@ -14,7 +14,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_postgresql_userlist : public sqlrauth {
 							sqlrpwdencs *sqlrpe,
 							domnode *parameters);
 		const char	*auth(sqlrcredentials *cred);
-		bool	compare(const char *suppliedresponse,
+		bool		compare(const char *suppliedresponse,
 					uint64_t suppliedresponselength,
 					const char *user,
 					const char *validpassword,
