@@ -15,7 +15,7 @@
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
-#define DEBUG_MESSAGES
+//#define DEBUG_MESSAGES
 #include <rudiments/debugprint.h>
 
 #include <defines.h>
