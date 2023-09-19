@@ -77,6 +77,7 @@
 	sqlrsh -id can decrypt two-way encrypted passwords now
 	fixed bug in cistring patterns translation that caused strings to be
 		lower-cased
+	added connectstring auth modules
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
