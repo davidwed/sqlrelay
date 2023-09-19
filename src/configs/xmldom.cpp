@@ -15,7 +15,7 @@
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
-//#define DEBUG_MESSAGES
+#define DEBUG_MESSAGES
 #include <rudiments/debugprint.h>
 
 #include <defines.h>
@@ -1206,11 +1206,6 @@ bool sqlrconfig_xmldom::load(const char *urlname, const char *id) {
 		getRootNode()->write(&stdoutput);
 		debugPrintf("\n");
 	#endif
-	#if 0
-		stdoutput.printf("normalized tree:\n");
-		getRootNode()->write(&stdoutput);
-		stdoutput.printf("\n");
-	#endif
 
 	// get values from the tree
 	getTreeValues();
@@ -1265,13 +1260,18 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
-	// add missing listeners tag
+	// if there is no listeners tag then add one
 	domnode	*listeners=instance->getFirstTagChild("listeners");
 	if (listeners->isNullNode()) {
-		listeners=instance->insertTag("listeners",0);
+		listeners=instance->appendTag("listeners");
 	}
 
-	// addresses/port/socket/etc. in instance -> listener
+	// if there is no listener tag then add one
+	if (listeners->getFirstTagChild("listener")->isNullNode()) {
+		listeners->appendTag("listener");
+	}
+
+	// get addresses/port/socket/etc. from instance
 	domnode	*addresses=instance->getAttribute("addresses");
 	domnode	*port=instance->getAttribute("port");
 	domnode	*socket=instance->getAttribute("socket");
@@ -1289,119 +1289,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	domnode	*tlsca=instance->getAttribute("tlsca");
 	domnode	*tlsciphers=instance->getAttribute("tlsciphers");
 	domnode	*tlsdepth=instance->getAttribute("tlsdepth");
-	if (!addresses->isNullNode() ||
-			!port->isNullNode() ||
-			!socket->isNullNode() ||
-			!krb->isNullNode() ||
-			!krbservice->isNullNode() ||
-			!krbkeytab->isNullNode() ||
-			!krbmech->isNullNode() ||
-			!krbflags->isNullNode() ||
-			!tls->isNullNode() ||
-			!tlsversion->isNullNode() ||
-			!tlscert->isNullNode() ||
-			!tlskey->isNullNode() ||
-			!tlspassword->isNullNode() ||
-			!tlsvalidate->isNullNode() ||
-			!tlsca->isNullNode() ||
-			!tlsciphers->isNullNode() ||
-			!tlsdepth->isNullNode()) {
 
-		domnode	*listener=listeners->insertTag("listener",0);
-		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
-
-		if (!addresses->isNullNode()) {
-			listener->setAttributeValue("addresses",
-							addresses->getValue());
-			instance->deleteAttribute(addresses);
-		}
-		if (!port->isNullNode()) {
-			listener->setAttributeValue("port",
-							port->getValue());
-			instance->deleteAttribute(port);
-		}
-		if (!socket->isNullNode()) {
-			listener->setAttributeValue("socket",
-							socket->getValue());
-			instance->deleteAttribute(socket);
-		}
-		if (!krb->isNullNode()) {
-			listener->setAttributeValue("krb",
-							krb->getValue());
-			instance->deleteAttribute(krb);
-		}
-		if (!krbservice->isNullNode()) {
-			listener->setAttributeValue("krbservice",
-							krbservice->getValue());
-			instance->deleteAttribute(krbservice);
-		}
-		if (!krbkeytab->isNullNode()) {
-			listener->setAttributeValue("krbkeytab",
-							krbkeytab->getValue());
-			instance->deleteAttribute(krbkeytab);
-		}
-		if (!krbmech->isNullNode()) {
-			listener->setAttributeValue("krbmech",
-							krbmech->getValue());
-			instance->deleteAttribute(krbmech);
-		}
-		if (!krbflags->isNullNode()) {
-			listener->setAttributeValue("krbflags",
-							krbflags->getValue());
-			instance->deleteAttribute(krbflags);
-		}
-		if (!tls->isNullNode()) {
-			listener->setAttributeValue("tls",
-							tls->getValue());
-			instance->deleteAttribute(tls);
-		}
-		if (!tlsversion->isNullNode()) {
-			listener->setAttributeValue("tlsversion",
-							tlsversion->getValue());
-			instance->deleteAttribute(tlsversion);
-		}
-		if (!tlscert->isNullNode()) {
-			listener->setAttributeValue("tlscert",
-							tlscert->getValue());
-			instance->deleteAttribute(tlscert);
-		}
-		if (!tlskey->isNullNode()) {
-			listener->setAttributeValue("tlskey",
-							tlskey->getValue());
-			instance->deleteAttribute(tlskey);
-		}
-		if (!tlspassword->isNullNode()) {
-			listener->setAttributeValue("tlspassword",
-						tlspassword->getValue());
-			instance->deleteAttribute(tlspassword);
-		}
-		if (!tlsvalidate->isNullNode()) {
-			listener->setAttributeValue("tlsvalidate",
-						tlsvalidate->getValue());
-			instance->deleteAttribute(tlsvalidate);
-		}
-		if (!tlsca->isNullNode()) {
-			listener->setAttributeValue("tlsca",
-						tlsca->getValue());
-			instance->deleteAttribute(tlsca);
-		}
-		if (!tlsciphers->isNullNode()) {
-			listener->setAttributeValue("tlsciphers",
-						tlsciphers->getValue());
-			instance->deleteAttribute(tlsciphers);
-		}
-		if (!tlsdepth->isNullNode()) {
-			listener->setAttributeValue("tlsdepth",
-						tlsdepth->getValue());
-			instance->deleteAttribute(tlsdepth);
-		}
-	}
-
-	// empty listeners tag
-	if (listeners->getFirstTagChild("listener")->isNullNode()) {
-		domnode	*listener=listeners->appendTag("listener");
-		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
-	}
 	
 	// normalize listeners
 	for (domnode *listener=listeners->getFirstTagChild("listener");
@@ -1421,6 +1309,91 @@ void sqlrconfig_xmldom::normalizeTree() {
 		if (!hasprotocol) {
 			listener->setAttributeValue(
 					"protocol",DEFAULT_PROTOCOL);
+		}
+
+		// if various params are missing, but existed in the instance
+		// tag, then copy them into the listener tag
+		if (!hasaddresses && !addresses->isNullNode()) {
+			listener->setAttributeValue("addresses",
+						addresses->getValue());
+		}
+		if (!hassocket && !socket->isNullNode()) {
+			listener->setAttributeValue("socket",
+						socket->getValue());
+		}
+		if (!hasport && !port->isNullNode()) {
+			listener->setAttributeValue("port",
+						port->getValue());
+		}
+		if (listener->getAttribute("krb")->isNullNode() &&
+						!krb->isNullNode()) {
+			listener->setAttributeValue("krb",
+						krb->getValue());
+		}
+		if (listener->getAttribute("krbservice")->isNullNode() &&
+						!krbservice->isNullNode()) {
+			listener->setAttributeValue("krbservice",
+						krbservice->getValue());
+		}
+		if (listener->getAttribute("krbkeytab")->isNullNode() &&
+						!krbkeytab->isNullNode()) {
+			listener->setAttributeValue("krbkeytab",
+						krbkeytab->getValue());
+		}
+		if (listener->getAttribute("krbmech")->isNullNode() &&
+						!krbmech->isNullNode()) {
+			listener->setAttributeValue("krbmech",
+						krbmech->getValue());
+		}
+		if (listener->getAttribute("krbflags")->isNullNode() &&
+						!krbflags->isNullNode()) {
+			listener->setAttributeValue("krbflags",
+						krbflags->getValue());
+		}
+		if (listener->getAttribute("tls")->isNullNode() &&
+						!tls->isNullNode()) {
+			listener->setAttributeValue("tls",
+						tls->getValue());
+		}
+		if (listener->getAttribute("tlsversion")->isNullNode() &&
+						!tlsversion->isNullNode()) {
+			listener->setAttributeValue("tlsversion",
+						tlsversion->getValue());
+		}
+		if (listener->getAttribute("tlscert")->isNullNode() &&
+						!tlscert->isNullNode()) {
+			listener->setAttributeValue("tlscert",
+						tlscert->getValue());
+		}
+		if (listener->getAttribute("tlskey")->isNullNode() &&
+						!tlskey->isNullNode()) {
+			listener->setAttributeValue("tlskey",
+						tlskey->getValue());
+		}
+		if (listener->getAttribute("tlspassword")->isNullNode() &&
+						!tlspassword->isNullNode()) {
+			listener->setAttributeValue("tlspassword",
+						tlspassword->getValue());
+		}
+		if (listener->getAttribute("tlsvalidate")->isNullNode() &&
+						!tlsvalidate->isNullNode()) {
+			listener->setAttributeValue("tlsvalidate",
+						tlsvalidate->getValue());
+		}
+		if (listener->getAttribute("tlsca")->isNullNode() &&
+						!tlsca->isNullNode()) {
+			listener->setAttributeValue("tlsca",
+						tlsca->getValue());
+		}
+		if (listener->getAttribute("tlsciphers")->isNullNode() &&
+						!tlsciphers->isNullNode()) {
+			listener->setAttributeValue("tlsciphers",
+						tlsciphers->getValue());
+		}
+		if (listener->getAttribute("tlsdepth")->isNullNode() &&
+						!tlsdepth->isNullNode()) {
+			listener->setAttributeValue("tlsdepth",
+						tlsdepth->getValue());
 		}
 
 		// nothing specified -> default address, default port, no socket
@@ -1453,16 +1426,71 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
+	// remove addresses/port/socket/etc. from instance
+	if (!addresses->isNullNode()) {
+		instance->deleteAttribute(addresses);
+	}
+	if (!port->isNullNode()) {
+		instance->deleteAttribute(port);
+	}
+	if (!socket->isNullNode()) {
+		instance->deleteAttribute(socket);
+	}
+	if (!krb->isNullNode()) {
+		instance->deleteAttribute(krb);
+	}
+	if (!krbservice->isNullNode()) {
+		instance->deleteAttribute(krbservice);
+	}
+	if (!krbkeytab->isNullNode()) {
+		instance->deleteAttribute(krbkeytab);
+	}
+	if (!krbmech->isNullNode()) {
+		instance->deleteAttribute(krbmech);
+	}
+	if (!krbflags->isNullNode()) {
+		instance->deleteAttribute(krbflags);
+	}
+	if (!tls->isNullNode()) {
+		instance->deleteAttribute(tls);
+	}
+	if (!tlsversion->isNullNode()) {
+		instance->deleteAttribute(tlsversion);
+	}
+	if (!tlscert->isNullNode()) {
+		instance->deleteAttribute(tlscert);
+	}
+	if (!tlskey->isNullNode()) {
+		instance->deleteAttribute(tlskey);
+	}
+	if (!tlspassword->isNullNode()) {
+		instance->deleteAttribute(tlspassword);
+	}
+	if (!tlsvalidate->isNullNode()) {
+		instance->deleteAttribute(tlsvalidate);
+	}
+	if (!tlsca->isNullNode()) {
+		instance->deleteAttribute(tlsca);
+	}
+	if (!tlsciphers->isNullNode()) {
+		instance->deleteAttribute(tlsciphers);
+	}
+	if (!tlsdepth->isNullNode()) {
+		instance->deleteAttribute(tlsdepth);
+	}
+
 	// authentications -> auths
 	domnode	*auths=instance->getFirstTagChild("authentications");
 	if (!auths->isNullNode()) {
 		auths->setName("auths");
 	}
 
-	// add missing auths tag
+	// if there is no auths tag then add one
 	auths=instance->getFirstTagChild("auths");
 	if (auths->isNullNode()) {
-		auths=instance->insertTag("auths",1);
+		auths=instance->insertTag("auths",
+				instance->getFirstTagChild("listener")->
+							getPosition()+1);
 	}
 
 	// authentication -> auth
@@ -1542,8 +1570,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 
 	// if there are no auths or users defined, then fall back to
 	// a connectstrings auth module
-	if (instance->getFirstTagChild("users")->isNullNode() &&
-						!auths->getChildCount()) {
+	if (!auths->getChildCount()) {
 		auths->appendTag("auth")->
 			setAttributeValue("module","sqlrclient_connectstrings");
 	}
