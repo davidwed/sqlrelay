@@ -8,12 +8,13 @@
 #include <rudiments/sha256.h>
 #include <rudiments/sensitivevalue.h>
 
-class SQLRSERVER_DLLSPEC sqlrauth_mysql_userlist : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_mysql_connectstrings : public sqlrauth {
 	public:
-			sqlrauth_mysql_userlist(sqlrservercontroller *cont,
-							sqlrauths *auths,
-							sqlrpwdencs *sqlrpe,
-							domnode *parameters);
+			sqlrauth_mysql_connectstrings(
+						sqlrservercontroller *cont,
+						sqlrauths *auths,
+						sqlrpwdencs *sqlrpe,
+						domnode *parameters);
 		const char	*auth(sqlrcredentials *cred);
 		bool		compare(const char *suppliedresponse,
 					uint64_t suppliedresponselength,
@@ -31,7 +32,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_mysql_userlist : public sqlrauth {
 		bool	debug;
 };
 
-sqlrauth_mysql_userlist::sqlrauth_mysql_userlist(
+sqlrauth_mysql_connectstrings::sqlrauth_mysql_connectstrings(
 					sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
@@ -40,10 +41,13 @@ sqlrauth_mysql_userlist::sqlrauth_mysql_userlist(
 
 	debug=cont->getConfig()->getDebugAuths();
 
+	linkedlist< connectstringcontainer * >	*connectstrings=
+				cont->getConfig()->getConnectStringList();
+
 	users=NULL;
 	passwords=NULL;
 	passwordencryptions=NULL;
-	usercount=parameters->getChildCount();
+	usercount=connectstrings->getCount();
 	if (!usercount) {
 		return;
 	}
@@ -57,24 +61,20 @@ sqlrauth_mysql_userlist::sqlrauth_mysql_userlist(
 
 	passwordvalue.setPath(cont->getConfig()->getPasswordPath());
 
-	domnode *user=parameters->getFirstTagChild("user");
-	for (uint64_t i=0; i<usercount; i++) {
+	uint64_t	i=0;
+	for (listnode< connectstringcontainer * > *node=
+				connectstrings->getFirst();
+				node; node=node->getNext()) {
 
-		users[i]=user->getAttributeValue("user");
-		// FIXME: options?
-		passwordvalue.parse(user->getAttributeValue("password"));
+		users[i]=node->getValue()->
+				getConnectStringValue("user");
+		passwordvalue.parse(node->getValue()->
+				getConnectStringValue("password"));
 		passwords[i]=passwordvalue.detachTextValue();
 
-		// support modern "passwordencryptionid" and fall back to
-		// older "passwordencryption" attribute
-		const char	*pwdencid=
-				user->getAttributeValue("passwordencryptionid");
-		if (!pwdencid) {
-			pwdencid=user->getAttributeValue("passwordencryption");
-		}
-		passwordencryptions[i]=pwdencid;
-
-		user=user->getNextTagSibling("user");
+		passwordencryptions[i]=node->getValue()->
+						getPasswordEncryption();
+		i++;
 	}
 }
 
@@ -88,7 +88,7 @@ static const char *supportedauthplugins[]={
 	NULL
 };
 
-const char *sqlrauth_mysql_userlist::auth(sqlrcredentials *cred) {
+const char *sqlrauth_mysql_connectstrings::auth(sqlrcredentials *cred) {
 
 	// this module only supports mysql credentials
 	if (charstring::compare(cred->getType(),"mysql")) {
@@ -183,7 +183,7 @@ const char *sqlrauth_mysql_userlist::auth(sqlrcredentials *cred) {
 	return NULL;
 }
 
-bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
+bool sqlrauth_mysql_connectstrings::compare(const char *suppliedresponse,
 						uint64_t suppliedresponselength,
 						const char *validpassword,
 						const char *method,
@@ -318,12 +318,12 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_mysql_userlist(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_mysql_connectstrings(
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_mysql_userlist(cont,auths,
+		return new sqlrauth_mysql_connectstrings(cont,auths,
 							sqlrpe,parameters);
 	}
 }
