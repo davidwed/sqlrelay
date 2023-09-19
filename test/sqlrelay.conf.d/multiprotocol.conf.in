@@ -7,17 +7,6 @@
 			<listener protocol="mysql" port="3306"/>
 			<listener protocol="postgresql" port="5432"/>
 		</listeners>
-		<auths>
-			<auth module="userlist">
-				<user user="testuser" password="testpassword"/>
-			</auth>
-			<auth module="mysql_userlist">
-				<user user="testuser" password="testpassword"/>
-			</auth>
-			<auth module="postgresql_userlist">
-				<user user="testuser" password="testpassword"/>
-			</auth>
-		</auths>
 		<connections>
 			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>

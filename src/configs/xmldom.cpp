@@ -1569,10 +1569,24 @@ void sqlrconfig_xmldom::normalizeTree() {
 	}
 
 	// if there are no auths or users defined, then fall back to
-	// a connectstrings auth module
+	// a connectstrings auth module...
 	if (!auths->getChildCount()) {
-		auths->appendTag("auth")->
-			setAttributeValue("module","sqlrclient_connectstrings");
+
+		// for each protocol, add a "protocol_connectstrings"
+		// auth module...
+		stringbuffer	cs;
+		for (domnode *listener=listeners->getFirstTagChild("listener");
+			!listener->isNullNode();
+			listener=listener->getNextTagSibling("listener")) {
+
+			const char	*protocol=
+					listener->getAttributeValue("protocol");
+			cs.clear();
+			cs.append(protocol)->append("_connectstrings");
+			auths->appendTag("auth")->
+				setAttributeValue("module",cs.getString());
+			
+		}
 	}
 
 	// krb_userlist/tls_userlist -> sqlrclient_userlist
