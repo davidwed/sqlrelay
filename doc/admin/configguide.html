@@ -97,6 +97,13 @@
       <li><a href="#postgresqllimitations">Limitations</a></li>
     </ul>
 
+    <li><a href="#multipleprotocols">Multiple Protocols</a></li>
+    <ul>
+      <li><a href="#multiprotocolconfiguration">Basic Configuration</a></li>
+      <li><a href="#multiprotocollistener">Listener Options</a></li>
+      <li><a href="#multiprotocolauth">Authentication/Encryption Options</a></li>
+    </ul>
+
   </ul>
 
   <li><a href="#ha">High Availability</a></li>
@@ -281,7 +288,7 @@ http://www.gnu.org/software/src-highlite -->
 <blockquote>
 ( <b>NOTE:</b> By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
 </blockquote>
-<p>By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
+<p>By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
 <blockquote>
   <pre>sqlrsh -host sqlrserver -user scott -password tiger
@@ -1667,7 +1674,7 @@ http://www.gnu.org/software/src-highlite -->
 <blockquote>
 ( <b>NOTE:</b> By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
 </blockquote>
-<p>By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
+<p>By default, SQL Relay listens on all available network interfaces, on port 9000, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
 <blockquote>
   <pre>sqlrsh -host sqlrserver -user scott -password tiger
@@ -2297,11 +2304,11 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>SQL Relay can be configured to speak the native MySQL protocol, enabling client programs for MySQL/MariaDB (eg. the mysql command line program and MySQL Workbench) to access SQL Relay directly.</p>
 
-<p>If an instance speaks the MySQL client-server protocol, then any client that wishes to use it must also speak the MySQL client-server protocol.  This means that most software written using the MySQL API, or written using a database abstraction layer which loads a driver for MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+<p>If an instance speaks the MySQL client-server protocol, then any client that wishes to use it must also speak the MySQL client-server protocol.  This means that most software written using the MySQL API, or written using a database abstraction layer which loads a driver for MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <a name="mysqlconfiguration"/><h3>Basic Configuration</h3>
 
-<p>To enable SQL Relay to speak the MySQL protocol, add the appropriate listener and auth tags:</p>
+<p>To enable SQL Relay to speak the MySQL protocol, add the appropriate listener tag:</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -2327,8 +2334,6 @@ http://www.gnu.org/software/src-highlite -->
 <ul>
   <li>The connection tag instructs the instance to log in to the <i>mysqldb</i> database on host <i>mysqlhost</i> as user <i>mysqluser</i> with password <i>mysqlpassword</i>.</li>
   <li>The listener tag instructs SQL Relay to load the <i>mysql</i> protocol module, and listen on port 3307.</li>
-  <li>The auth tag instructs SQL Relay to load the <i>mysql_userlist</i> auth module.</li>
-  <li>The user tag defines the user <i>sqlruser</i> with password <i>sqlrpassword</i>.</li>
 </ul>
 
 <p>The instance can be started using:</p>
@@ -2353,7 +2358,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>( <b>NOTE:</b> 127.0.0.1 is used instead of "localhost" because "localhost" instructs the mysql client to use a predefined unix socket.)</p>
 
-<p>By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
+<p>By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -2373,7 +2378,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>sqlr<font color="#990000">-</font>stop <font color="#990000">-</font>id example</tt></pre>
 
 </blockquote>
-<p>Since this instance speaks the MySQL client-server protocol, any client that wishes to use it must also speak the MySQL client-server protocol.  This means that most software written using the MySQL API, or written using a database abstraction layer which loads a driver for MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+<p>Since this instance speaks the MySQL client-server protocol, any client that wishes to use it must also speak the MySQL client-server protocol.  This means that most software written using the MySQL API, or written using a database abstraction layer which loads a driver for MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <a name="mysqllistener"/><h3>Listener Options</h3>
 
@@ -2889,7 +2894,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>In this example, a MySQL frontend provides MySQL/MariaDB applications access to an Oracle backend database.</p>
 
-<p>When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.</p>
+<p>When targeting a foreign backend, some queries may have to be modified to use the syntax of the foreign database and some code may need to be changed, but a full rewrite of the app should not be necessary.</p>
 
 <a name="mysqlspecialpurpose"/><h3>Special-Purpose Options</h3>
 
@@ -3007,11 +3012,11 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>SQL Relay can be configured to speak the native PostgreSQL protocol, enabling client programs for PostgreSQL (eg. the psql command line program) to access SQL Relay directly.</p>
 
-<p>If an instance speaks the PostgreSQL client-server protocol, then any client that wishes to use it must also speak the PostgreSQL client-server protocol.  This means that most software written using the PostgreSQL API, or written using a database abstraction layer which loads a driver for PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+<p>If an instance speaks the PostgreSQL client-server protocol, then any client that wishes to use it must also speak the PostgreSQL client-server protocol.  This means that most software written using the PostgreSQL API, or written using a database abstraction layer which loads a driver for PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <a name="postgresqlconfiguration"/><h3>Basic Configuration</h3>
 
-<p>To enable SQL Relay to speak the PostgreSQL protocol, add the appropriate listener and auth tags:</p>
+<p>To enable SQL Relay to speak the PostgreSQL protocol, add the appropriate listener tag:</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -3037,8 +3042,6 @@ http://www.gnu.org/software/src-highlite -->
 <ul>
   <li>The connection tag instructs the instance to log in to the <i>postgresqldb</i> database on host <i>postgresqlhost</i> as user <i>postgresqluser</i> with password <i>postgresqlpassword</i>.</li>
   <li>The listener tag instructs SQL Relay to load the <i>postgresql</i> protocol module, and listen on port 5433.</li>
-  <li>The auth tag instructs SQL Relay to load the <i>postgresql_userlist</i> auth module.</li>
-  <li>The user tag defines the user <i>sqlruser</i> with password <i>sqlrpassword</i>.</li>
 </ul>
 
 <p>The instance can be started using:</p>
@@ -3061,7 +3064,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>psql <font color="#990000">-</font><font color="#008080">h</font> localhost <font color="#990000">-</font>p <font color="#993399">5433</font> <font color="#990000">-</font>U sqlruser</tt></pre>
 
 </blockquote>
-<p>By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
+<p>By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -3081,7 +3084,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>sqlr<font color="#990000">-</font>stop <font color="#990000">-</font>id example</tt></pre>
 
 </blockquote>
-<p>Since this instance speaks the PostgreSQL client-server protocol, any client that wishes to use it must also speak the PostgreSQL client-server protocol.  This means that most software written using the PostgreSQL API, or written using a database abstraction layer which loads a driver for PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the mysql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+<p>Since this instance speaks the PostgreSQL client-server protocol, any client that wishes to use it must also speak the PostgreSQL client-server protocol.  This means that most software written using the PostgreSQL API, or written using a database abstraction layer which loads a driver for PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the mysql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <a name="postgresqllistener"/><h3>Listener Options</h3>
 
@@ -3542,7 +3545,7 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>In this example, a PostgreSQL frontend provides PostgreSQL applications access to an Oracle backend database.</p>
 
-<p>When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.</p>
+<p>When targeting a foreign backend, some queries may have to be modified to use the syntax of the foreign database and some code may need to be changed, but a full rewrite of the app should not be necessary.</p>
 
 <a name="postgresqllimitations"/><h3>Limitations</h3>
 
@@ -3564,6 +3567,216 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>Otherwise, all other tags and attributes are compatbile.</p>
 
+<br/><a name="multipleprotocols"/><h2>Multiple Protocols</h2>
+
+<p>A single instance of SQL Relay can also be configured to speak multiple protocols, granting access to the same database to applications which speak SQLRClient, MySQL, and/or PostgreSQL.</p>
+
+<a name="multiprotocolconfiguration"/><h3>Basic Configuration</h3>
+
+<p>To enable SQL Relay to speak multiple protocols, add the appropriate listener tags:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this configuration:</p>
+
+<ul>
+  <li>The connection tag instructs the instance to log in to the <i>orcl</i> <i>oracle</i> database as user <i>scott</i> with password <i>tiger</i>.</li>
+  <li>The first listener tag instructs SQL Relay to load the <i>sqlrclient</i> and listen on port 9000 (the default SQL Relay port) for native SQL Relay clients.</li>
+  <li>The second listener tag instructs SQL Relay to load the <i>mysql</i> and listen on port 3306 (the default MySQL port) for MySQL clients.</li>
+  <li>The third listener tag instructs SQL Relay to load the <i>postgresql</i> and listen on port 5432 (the default PostgreSQL port) for PostgreSQL clients.</li>
+</ul>
+
+<p>The instance can be started using:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlr<font color="#990000">-</font>start <font color="#990000">-</font>id example</tt></pre>
+
+</blockquote>
+<p>and accessed from the local machine using the native SQL Relay command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrsh <font color="#990000">-</font><font color="#008080">host</font> localhost <font color="#990000">-</font><font color="#008080">user</font> scott <font color="#990000">-</font>password tiger</tt></pre>
+
+</blockquote>
+<p>or from the local machine using the MySQL command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>mysql <font color="#990000">--</font>host<font color="#990000">=</font><font color="#993399">127.0</font><font color="#990000">.</font><font color="#993399">0.1</font> <font color="#990000">--</font>user<font color="#990000">=</font>scott <font color="#990000">--</font>password<font color="#990000">=</font>tiger</tt></pre>
+
+</blockquote>
+<p>or from the local machine using the PostgreSQL command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>psql <font color="#990000">-</font><font color="#008080">h</font> localhost <font color="#990000">-</font>U scott</tt></pre>
+
+</blockquote>
+<p>By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using the native SQL Relay command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrsh <font color="#990000">-</font><font color="#008080">host</font> sqlrserver <font color="#990000">-</font><font color="#008080">user</font> scott <font color="#990000">-</font>password tiger</tt></pre>
+
+</blockquote>
+<p>or using the MySQL command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>mysql <font color="#990000">--</font>host<font color="#990000">=</font>sqlrserver <font color="#990000">--</font>user<font color="#990000">=</font>scott <font color="#990000">--</font>password<font color="#990000">=</font>tiger</tt></pre>
+
+</blockquote>
+<p>or using the PostgreSQL command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>psql <font color="#990000">-</font><font color="#008080">h</font> sqlrserver <font color="#990000">-</font>U scott</tt></pre>
+
+</blockquote>
+<p>The instance can be stopped using:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlr<font color="#990000">-</font>stop <font color="#990000">-</font>id example</tt></pre>
+
+</blockquote>
+<p>Since this instance speaks the SQLRClient, MySQL, and PostgreSQL client-server protocols, clients that wish to use it may speak any of those client-server protocol.  This means that most software written using the SQL Relay, MySQL, or PostgreSQL APIs, or written using a database abstraction layer which loads a driver for SQL Relay, MySQL, or PostgreSQL can access this instance.  However, client programs for other databases (eg. the sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+
+<p>In this example, a frontend that supports MySQL and PostgreSQL protocols provides access to an Oracle backend database.  As such some queries may have to be modified from their native MySQL and PostgreSQL syntax to use the syntax of the Oracle database.</p>
+
+<a name="multiprotocollistener"/><h3>Listener Options</h3>
+
+<p>When configured to support multiple protocols, each listener may be configured with the full set of attributes available for that protocol module.</p>
+
+<p>For example:</p>
+
+<ul>
+  <li>All modules support the host, port, and addresses attributes.</li>
+  <li>All modules support the various tls attributes.</li>
+  <li>The sqlrclient module supports the various krb attributes, but other modules do not.</li>
+</ul>
+
+<a name="multiprotocolauth"/><h3>Authentication/Encryption Options</h3>
+
+<p>The default authentication option is <i>connect strings</i> auth.  This option works the same as it does when SQL Relay is configured to use a single protocol - a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.</p>
+
+<p>However, other auth modules can also be used.  Each auth module knows to work with the corresponding protocol module.</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt><b><font color="#000080">&lt;?xml</font></b> <font color="#009900">version</font><font color="#990000">=</font><font color="#FF0000">"1.0"</font><b><font color="#000080">?&gt;</font></b>
+<b><font color="#0000FF">&lt;instances&gt;</font></b>
+	<b><font color="#0000FF">&lt;instance</font></b> <font color="#009900">id</font><font color="#990000">=</font><font color="#FF0000">"example"</font> <font color="#009900">dbase</font><font color="#990000">=</font><font color="#FF0000">"oracle"</font><b><font color="#0000FF">&gt;</font></b>
+		<b><font color="#0000FF">&lt;listeners&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"9000"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"mysql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"3306"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;listener</font></b> <font color="#009900">protocol</font><font color="#990000">=</font><font color="#FF0000">"postgresql"</font> <font color="#009900">port</font><font color="#990000">=</font><font color="#FF0000">"5432"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/listeners&gt;</font></b>
+		<b><font color="#0000FF">&lt;auths&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"sqlrclient_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"sqlruser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"sqlrpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"mysql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"mysqluser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"mysqlpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+			<b><font color="#0000FF">&lt;auth</font></b> <font color="#009900">module</font><font color="#990000">=</font><font color="#FF0000">"postgresql_userlist"</font><b><font color="#0000FF">&gt;</font></b>
+				<b><font color="#0000FF">&lt;user</font></b> <font color="#009900">user</font><font color="#990000">=</font><font color="#FF0000">"postgresluser"</font> <font color="#009900">password</font><font color="#990000">=</font><font color="#FF0000">"postgresqlpassword"</font><b><font color="#0000FF">/&gt;</font></b>
+			<b><font color="#0000FF">&lt;/auth&gt;</font></b>
+		<b><font color="#0000FF">&lt;/auths&gt;</font></b>
+		<b><font color="#0000FF">&lt;connections&gt;</font></b>
+			<b><font color="#0000FF">&lt;connection</font></b> <font color="#009900">string</font><font color="#990000">=</font><font color="#FF0000">"user=scott;password=tiger;oracle_sid=orcl"</font><b><font color="#0000FF">/&gt;</font></b>
+		<b><font color="#0000FF">&lt;/connections&gt;</font></b>
+	<b><font color="#0000FF">&lt;/instance&gt;</font></b>
+<b><font color="#0000FF">&lt;/instances&gt;</font></b>
+</tt></pre>
+
+</blockquote>
+<p>In this exmaple:</p>
+
+<ul>
+  <li>Native SQL Relay clients will be authenticated using the the sqlrclient_userlist auth module.</li>
+  <li>MySQL clients will be authenticated using the the mysql_userlist auth module.</li>
+  <li>PostgreSQL clients will be authenticated using the the postgresql_userlist auth module.</li>
+</ul>
+
+<p>It can accessed from the local machine using the native SQL Relay command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>sqlrsh <font color="#990000">-</font><font color="#008080">host</font> localhost <font color="#990000">-</font><font color="#008080">user</font> sqlruser <font color="#990000">-</font>password sqlrpassword</tt></pre>
+
+</blockquote>
+<p>or from the local machine using the MySQL command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>mysql <font color="#990000">--</font>host<font color="#990000">=</font><font color="#993399">127.0</font><font color="#990000">.</font><font color="#993399">0.1</font> <font color="#990000">--</font>user<font color="#990000">=</font>mysqluser <font color="#990000">--</font>password<font color="#990000">=</font>mysqlpassword</tt></pre>
+
+</blockquote>
+<p>or from the local machine using the PostgreSQL command line client, as follows:</p>
+
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>psql <font color="#990000">-</font><font color="#008080">h</font> localhost <font color="#990000">-</font>U postgresqluser</tt></pre>
+
+</blockquote>
 <hr/>
 
 <br/><a name="ha"/><h1>High Availabiltiy</h1>

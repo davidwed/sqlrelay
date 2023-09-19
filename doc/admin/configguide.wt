@@ -62,6 +62,10 @@
    * [#postgresqltls TLS/SSL Encryption and Authentication]
   * [#postgresqlforeignbackend Foreign Backend]
   * [#postgresqllimitations Limitations]
+ * [#multipleprotocols Multiple Protocols]
+  * [#multiprotocolconfiguration Basic Configuration]
+  * [#multiprotocollistener Listener Options]
+  * [#multiprotocolauth Authentication/Encryption Options]
 * [#ha High Availability]
  * [#cluster Load-Balancing and Fail-Over With Replicated Databases or Database Clusters]
  * [#rac Already-Load-Balanced Databases]
@@ -182,7 +186,7 @@ sqlrsh -host localhost -user scott -password tiger
 ( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
 }}}
 
-By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
 
 {{{#!blockquote
 {{{
@@ -1212,7 +1216,7 @@ sqlrsh -host localhost -user scott -password tiger
 ( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
 }}}
 
-By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+By default, SQL Relay listens on all available network interfaces, on port 9000, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
 
 {{{#!blockquote
 {{{
@@ -1641,12 +1645,12 @@ Any kind of full session encryption should be used with caution in performance-s
 
 SQL Relay can be configured to speak the native !MySQL protocol, enabling client programs for !MySQL/MariaDB (eg. the mysql command line program and !MySQL Workbench) to access SQL Relay directly.
 
-If an instance speaks the !MySQL client-server protocol, then any client that wishes to use it must also speak the !MySQL client-server protocol.  This means that most software written using the !MySQL API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+If an instance speaks the !MySQL client-server protocol, then any client that wishes to use it must also speak the !MySQL client-server protocol.  This means that most software written using the !MySQL API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#mysqlconfiguration]
 === Basic Configuration ===
 
-To enable SQL Relay to speak the !MySQL protocol, add the appropriate listener and auth tags:
+To enable SQL Relay to speak the !MySQL protocol, add the appropriate listener tag:
 
 {{{#!blockquote
 {{{#!code
@@ -1658,8 +1662,6 @@ In this configuration:
 
 * The connection tag instructs the instance to log in to the //mysqldb// database on host //mysqlhost// as user //mysqluser// with password //mysqlpassword//.
 * The listener tag instructs SQL Relay to load the //mysql// protocol module, and listen on port 3307.
-* The auth tag instructs SQL Relay to load the //mysql_userlist// auth module.
-* The user tag defines the user //sqlruser// with password //sqlrpassword//.
 
 The instance can be started using:
 
@@ -1679,7 +1681,7 @@ mysql --host=127.0.0.1 --port=3307 --user=sqlruser --password=sqlrpassword
 
 ( '''NOTE:''' 127.0.0.1 is used instead of "localhost" because "localhost" instructs the mysql client to use a predefined unix socket.)
 
-By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
 
 {{{#!blockquote
 {{{#!code
@@ -1695,7 +1697,7 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the !MySQL client-server protocol, any client that wishes to use it must also speak the !MySQL client-server protocol.  This means that most software written using the !MySQL API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+Since this instance speaks the !MySQL client-server protocol, any client that wishes to use it must also speak the !MySQL client-server protocol.  This means that most software written using the !MySQL API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#mysqllistener]
 === Listener Options ===
@@ -2020,7 +2022,7 @@ This is as simple as specifying a different database using the //dbase// attribu
 
 In this example, a !MySQL frontend provides !MySQL/MariaDB applications access to an Oracle backend database.
 
-When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+When targeting a foreign backend, some queries may have to be modified to use the syntax of the foreign database and some code may need to be changed, but a full rewrite of the app should not be necessary.
 
 [=#mysqlspecialpurpose]
 === Special-Purpose Options ===
@@ -2098,12 +2100,12 @@ Otherwise, all other tags and attributes are compatbile.
 
 SQL Relay can be configured to speak the native !PostgreSQL protocol, enabling client programs for !PostgreSQL (eg. the psql command line program) to access SQL Relay directly.
 
-If an instance speaks the !PostgreSQL client-server protocol, then any client that wishes to use it must also speak the !PostgreSQL client-server protocol.  This means that most software written using the !PostgreSQL API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+If an instance speaks the !PostgreSQL client-server protocol, then any client that wishes to use it must also speak the !PostgreSQL client-server protocol.  This means that most software written using the !PostgreSQL API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#postgresqlconfiguration]
 === Basic Configuration ===
 
-To enable SQL Relay to speak the !PostgreSQL protocol, add the appropriate listener and auth tags:
+To enable SQL Relay to speak the !PostgreSQL protocol, add the appropriate listener tag:
 
 {{{#!blockquote
 {{{#!code
@@ -2115,8 +2117,6 @@ In this configuration:
 
 * The connection tag instructs the instance to log in to the //postgresqldb// database on host //postgresqlhost// as user //postgresqluser// with password //postgresqlpassword//.
 * The listener tag instructs SQL Relay to load the //postgresql// protocol module, and listen on port 5433.
-* The auth tag instructs SQL Relay to load the //postgresql_userlist// auth module.
-* The user tag defines the user //sqlruser// with password //sqlrpassword//.
 
 The instance can be started using:
 
@@ -2134,7 +2134,7 @@ psql -h localhost -p 5433 -U sqlruser
 }}}
 }}}
 
-By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
 
 {{{#!blockquote
 {{{#!code
@@ -2150,7 +2150,7 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the !PostgreSQL client-server protocol, any client that wishes to use it must also speak the !PostgreSQL client-server protocol.  This means that most software written using the !PostgreSQL API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the mysql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+Since this instance speaks the !PostgreSQL client-server protocol, any client that wishes to use it must also speak the !PostgreSQL client-server protocol.  This means that most software written using the !PostgreSQL API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the mysql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#postgresqllistener]
 === Listener Options ===
@@ -2444,7 +2444,7 @@ This is as simple as specifying a different database using the //dbase// attribu
 
 In this example, a !PostgreSQL frontend provides !PostgreSQL applications access to an Oracle backend database.
 
-When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+When targeting a foreign backend, some queries may have to be modified to use the syntax of the foreign database and some code may need to be changed, but a full rewrite of the app should not be necessary.
 
 [=#postgresqllimitations]
 === Limitations ===
@@ -2462,6 +2462,151 @@ Most of SQL Relay's core features are available when it is configured to speak t
 * As Kerberos authentication and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
 
 Otherwise, all other tags and attributes are compatbile.
+
+[[br]][=#multipleprotocols]
+== Multiple Protocols ==
+
+A single instance of SQL Relay can also be configured to speak multiple protocols, granting access to the same database to applications which speak SQLRClient, !MySQL, and/or !PostgreSQL.
+
+[=#multiprotocolconfiguration]
+=== Basic Configuration ===
+
+To enable SQL Relay to speak multiple protocols, add the appropriate listener tags:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-multipleprotocols.conf@
+}}}
+}}}
+
+In this configuration:
+
+* The connection tag instructs the instance to log in to the //orcl// //oracle// database as user //scott// with password //tiger//.
+* The first listener tag instructs SQL Relay to load the //sqlrclient// and listen on port 9000 (the default SQL Relay port) for native SQL Relay clients.
+* The second listener tag instructs SQL Relay to load the //mysql// and listen on port 3306 (the default !MySQL port) for !MySQL clients.
+* The third listener tag instructs SQL Relay to load the //postgresql// and listen on port 5432 (the default !PostgreSQL port) for !PostgreSQL clients.
+
+The instance can be started using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-start -id example
+}}}
+}}}
+
+and accessed from the local machine using the native SQL Relay command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host localhost -user scott -password tiger
+}}}
+}}}
+
+or from the local machine using the !MySQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=127.0.0.1 --user=scott --password=tiger
+}}}
+}}}
+
+or from the local machine using the !PostgreSQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+psql -h localhost -U scott
+}}}
+}}}
+
+By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using the native SQL Relay command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host sqlrserver -user scott -password tiger
+}}}
+}}}
+
+or using the !MySQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=sqlrserver --user=scott --password=tiger
+}}}
+}}}
+
+or using the !PostgreSQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+psql -h sqlrserver -U scott
+}}}
+}}}
+
+The instance can be stopped using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-stop -id example
+}}}
+}}}
+
+Since this instance speaks the SQLRClient, !MySQL, and !PostgreSQL client-server protocols, clients that wish to use it may speak any of those client-server protocol.  This means that most software written using the SQL Relay, !MySQL, or !PostgreSQL APIs, or written using a database abstraction layer which loads a driver for SQL Relay, !MySQL, or !PostgreSQL can access this instance.  However, client programs for other databases (eg. the sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+
+In this example, a frontend that supports !MySQL and !PostgreSQL protocols provides access to an Oracle backend database.  As such some queries may have to be modified from their native !MySQL and !PostgreSQL syntax to use the syntax of the Oracle database.
+
+[=#multiprotocollistener]
+=== Listener Options ===
+
+When configured to support multiple protocols, each listener may be configured with the full set of attributes available for that protocol module.
+
+For example:
+
+* All modules support the host, port, and addresses attributes.
+* All modules support the various tls attributes.
+* The sqlrclient module supports the various krb attributes, but other modules do not.
+
+[=#multiprotocolauth]
+=== Authentication/Encryption Options ===
+
+The default authentication option is //connect strings// auth.  This option works the same as it does when SQL Relay is configured to use a single protocol - a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.
+
+However, other auth modules can also be used.  Each auth module knows to work with the corresponding protocol module.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-multipleprotocols-multipleauths.conf@
+}}}
+}}}
+
+In this exmaple:
+
+* Native SQL Relay clients will be authenticated using the the sqlrclient_userlist auth module.
+* !MySQL clients will be authenticated using the the mysql_userlist auth module.
+* !PostgreSQL clients will be authenticated using the the postgresql_userlist auth module.
+
+It can accessed from the local machine using the native SQL Relay command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host localhost -user sqlruser -password sqlrpassword
+}}}
+}}}
+
+or from the local machine using the !MySQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=127.0.0.1 --user=mysqluser --password=mysqlpassword
+}}}
+}}}
+
+or from the local machine using the !PostgreSQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+psql -h localhost -U postgresqluser
+}}}
+}}}
 
 ----
 
