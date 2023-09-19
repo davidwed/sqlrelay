@@ -1281,7 +1281,7 @@ The default authentication option is //connect strings// auth.
 
 When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.
 
-In the following exmaple, SQL Relay is configured to access the database using scott/tiger credentials.
+In the following example, SQL Relay is configured to access the database using scott/tiger credentials.
 
 {{{#!blockquote
 {{{#!code
@@ -1746,7 +1746,7 @@ The default authentication option is //connect strings// auth.
 
 When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.
 
-In the following exmaple, SQL Relay is configured to access the database using mysqlsuer/mysqlpassword credentials.
+In the following example, SQL Relay is configured to access the database using mysqlsuer/mysqlpassword credentials.
 
 {{{#!blockquote
 {{{#!code
@@ -2199,7 +2199,7 @@ The default authentication option is //connect strings// auth.
 
 When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.
 
-In the following exmaple, SQL Relay is configured to access the database using postgresqlsuer/postgresqlpassword credentials.
+In the following example, SQL Relay is configured to access the database using postgresqlsuer/postgresqlpassword credentials.
 
 {{{#!blockquote
 {{{#!code
@@ -2578,7 +2578,7 @@ However, other auth modules can also be used.  Each auth module knows to work wi
 }}}
 }}}
 
-In this exmaple:
+In this example:
 
 * Native SQL Relay clients will be authenticated using the the sqlrclient_userlist auth module.
 * !MySQL clients will be authenticated using the the mysql_userlist auth module.
