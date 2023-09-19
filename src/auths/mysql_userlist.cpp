@@ -61,7 +61,6 @@ sqlrauth_mysql_userlist::sqlrauth_mysql_userlist(
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
-		// FIXME: options?
 		passwordvalue.parse(user->getAttributeValue("password"));
 		passwords[i]=passwordvalue.detachTextValue();
 
