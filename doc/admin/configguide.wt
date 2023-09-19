@@ -180,7 +180,7 @@ sqlrsh -host localhost -user scott -password tiger
 ( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
 }}}
 
-By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
 
 {{{#!blockquote
 {{{
@@ -1172,7 +1172,7 @@ In these configurations, SQL Relay becomes a transparent proxy.  !MySQL/MariaDB 
 
 SQLRClient is the native SQL Relay protocol, enabled by default.  The example configurations above and throughout most of the rest of the guide configure SQL Relay to speak this protocol.
 
-If an instance speaks the SQLRClient client-server protocol, and supports the native SQL Relay authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQL Relay format.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+If an instance speaks the SQLRClient client-server protocol, then any client that wishes to use it must also speak the SQLRClient client-server protocol.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#sqlrclientconfiguration]
 === Basic Configuration ===
@@ -1206,7 +1206,17 @@ sqlrsh -host localhost -user scott -password tiger
 }}}
 }}}
 
-It can also be accessed from the mysql command line program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.
+{{{#!blockquote
+( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
+}}}
+
+By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -user scott -password tiger
+}}}
+}}}
 
 The instance can be stopped using:
 
@@ -1216,7 +1226,7 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the SQLRClient client-server protocol, and supports the native SQLRClient authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQLRClient format.  This means that software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+Since this instance speaks the SQLRClient client-server protocol, any client that wishes to use it must also speak the SQLRClient client-server protocol.  This means that software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#sqlrclientlistener]
 === Listener Options ===
@@ -1239,9 +1249,9 @@ If the server has multiple network interfaces, SQL Relay can also be configured 
 }}}
 }}}
 
-In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
 
-It can also be configured to listen on a unix socket by adding a socket attribute to the instance tag.
+It can also be configured to listen on a unix socket by adding a //socket// attribute to the listener tag.
 
 {{{#!blockquote
 {{{#!code
@@ -1629,6 +1639,8 @@ Any kind of full session encryption should be used with caution in performance-s
 
 SQL Relay can be configured to speak the native !MySQL protocol, enabling client programs for !MySQL/MariaDB (eg. the mysql command line program and !MySQL Workbench) to access SQL Relay directly.
 
+If an instance speaks the !MySQL client-server protocol, then any client that wishes to use it must also speak the !MySQL client-server protocol.  This means that most software written using the !MySQL API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+
 [=#mysqlconfiguration]
 === Basic Configuration ===
 
@@ -1665,7 +1677,13 @@ mysql --host=127.0.0.1 --port=3307 --user=sqlruser --password=sqlrpassword
 
 ( '''NOTE:''' 127.0.0.1 is used instead of "localhost" because "localhost" instructs the mysql client to use a predefined unix socket.)
 
-It can also be accessed from the mysql command line program running on a remote machine by replacing 127.0.0.1 with the hostname of the machine running SQL Relay.
+By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=sqlrserver --port=3307 --user=sqlruser --password=sqlrpassword
+}}}
+}}}
 
 The instance can be stopped using:
 
@@ -1675,7 +1693,7 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the !MySQL client-server protocol, and supports the native !MySQL authorization/authentication procedure, any client that wishes to use it must also speak the !MySQL client-server protocol and present credentials in the native !MySQL format.  This means that most software written using the !MySQL native API, or written using a database abstraction layer which loads a driver for !MySQL/MariaDB can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.
+Since this instance speaks the !MySQL client-server protocol, any client that wishes to use it must also speak the !MySQL client-server protocol.  This means that most software written using the !MySQL API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#mysqllistener]
 === Listener Options ===
@@ -1698,7 +1716,7 @@ If the server has multiple network interfaces, SQL Relay can also be configured 
 }}}
 }}}
 
-In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
 
 It can also be configured to listen on a unix socket by adding a //socket// attribute to the listener tag.
 
@@ -2049,6 +2067,8 @@ Otherwise, all other tags and attributes are compatbile.
 
 SQL Relay can be configured to speak the native !PostgreSQL protocol, enabling client programs for !PostgreSQL (eg. the psql command line program) to access SQL Relay directly.
 
+If an instance speaks the !PostgreSQL client-server protocol, then any client that wishes to use it must also speak the !PostgreSQL client-server protocol.  This means that most software written using the !PostgreSQL API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+
 [=#postgresqlconfiguration]
 === Basic Configuration ===
 
@@ -2083,7 +2103,13 @@ psql -h localhost -p 5433 -U sqlruser
 }}}
 }}}
 
-It can also be accessed from the psql command line program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.
+By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+
+{{{#!blockquote
+{{{#!code
+psql -h sqlrserver -p 5433 -U sqlruser
+}}}
+}}}
 
 The instance can be stopped using:
 
@@ -2093,7 +2119,7 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the !PostgreSQL client-server protocol, and supports the native !PostgreSQL authorization/authentication procedure, any client that wishes to use it must also speak the !PostgreSQL client-server protocol and present credentials in the native !PostgreSQL format.  This means that most software written using the !PostgreSQL native API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.
+Since this instance speaks the !PostgreSQL client-server protocol, any client that wishes to use it must also speak the !PostgreSQL client-server protocol.  This means that most software written using the !PostgreSQL API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the mysql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#postgresqllistener]
 === Listener Options ===
@@ -2116,7 +2142,7 @@ If the server has multiple network interfaces, SQL Relay can also be configured 
 }}}
 }}}
 
-In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
 
 It can also be configured to listen on a unix socket by adding a //socket// attribute to the listener tag.
 

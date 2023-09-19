@@ -279,7 +279,7 @@ http://www.gnu.org/software/src-highlite -->
 <blockquote>
 ( <b>NOTE:</b> By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
 </blockquote>
-<p>By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
+<p>By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
 <blockquote>
   <pre>sqlrsh -host sqlrserver -user scott -password tiger
@@ -1613,7 +1613,7 @@ sqlrelay_flags=""
 
 <p>SQLRClient is the native SQL Relay protocol, enabled by default.  The example configurations above and throughout most of the rest of the guide configure SQL Relay to speak this protocol.</p>
 
-<p>If an instance speaks the SQLRClient client-server protocol, and supports the native SQL Relay authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQL Relay format.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+<p>If an instance speaks the SQLRClient client-server protocol, then any client that wishes to use it must also speak the SQLRClient client-server protocol.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <a name="sqlrclientconfiguration"/><h3>Basic Configuration</h3>
 
@@ -1662,8 +1662,16 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>sqlrsh <font color="#990000">-</font><font color="#008080">host</font> localhost <font color="#990000">-</font><font color="#008080">user</font> scott <font color="#990000">-</font>password tiger</tt></pre>
 
 </blockquote>
-<p>It can also be accessed from the mysql command line program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.</p>
+<blockquote>
+( <b>NOTE:</b> By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
+</blockquote>
+<p>By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
+<blockquote>
+  <pre>sqlrsh -host sqlrserver -user scott -password tiger
+</pre>
+
+</blockquote>
 <p>The instance can be stopped using:</p>
 
 <blockquote>
@@ -1674,7 +1682,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>sqlr<font color="#990000">-</font>stop <font color="#990000">-</font>id example</tt></pre>
 
 </blockquote>
-<p>Since this instance speaks the SQLRClient client-server protocol, and supports the native SQLRClient authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQLRClient format.  This means that software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+<p>Since this instance speaks the SQLRClient client-server protocol, any client that wishes to use it must also speak the SQLRClient client-server protocol.  This means that software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <a name="sqlrclientlistener"/><h3>Listener Options</h3>
 
@@ -1722,9 +1730,9 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
+<p>In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
 
-<p>It can also be configured to listen on a unix socket by adding a socket attribute to the instance tag.</p>
+<p>It can also be configured to listen on a unix socket by adding a <i>socket</i> attribute to the listener tag.</p>
 
 <blockquote>
 <!-- Generator: GNU source-highlight 3.1.9
@@ -2287,6 +2295,8 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>SQL Relay can be configured to speak the native MySQL protocol, enabling client programs for MySQL/MariaDB (eg. the mysql command line program and MySQL Workbench) to access SQL Relay directly.</p>
 
+<p>If an instance speaks the MySQL client-server protocol, then any client that wishes to use it must also speak the MySQL client-server protocol.  This means that most software written using the MySQL API, or written using a database abstraction layer which loads a driver for MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+
 <a name="mysqlconfiguration"/><h3>Basic Configuration</h3>
 
 <p>To enable SQL Relay to speak the MySQL protocol, add the appropriate listener and auth tags:</p>
@@ -2346,8 +2356,16 @@ http://www.gnu.org/software/src-highlite -->
 </blockquote>
 <p>( <b>NOTE:</b> 127.0.0.1 is used instead of "localhost" because "localhost" instructs the mysql client to use a predefined unix socket.)</p>
 
-<p>It can also be accessed from the mysql command line program running on a remote machine by replacing 127.0.0.1 with the hostname of the machine running SQL Relay.</p>
+<p>By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>mysql <font color="#990000">--</font>host<font color="#990000">=</font>sqlrserver <font color="#990000">--</font>port<font color="#990000">=</font><font color="#993399">3307</font> <font color="#990000">--</font>user<font color="#990000">=</font>sqlruser <font color="#990000">--</font>password<font color="#990000">=</font>sqlrpassword</tt></pre>
+
+</blockquote>
 <p>The instance can be stopped using:</p>
 
 <blockquote>
@@ -2358,7 +2376,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>sqlr<font color="#990000">-</font>stop <font color="#990000">-</font>id example</tt></pre>
 
 </blockquote>
-<p>Since this instance speaks the MySQL client-server protocol, and supports the native MySQL authorization/authentication procedure, any client that wishes to use it must also speak the MySQL client-server protocol and present credentials in the native MySQL format.  This means that most software written using the MySQL native API, or written using a database abstraction layer which loads a driver for MySQL/MariaDB can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.</p>
+<p>Since this instance speaks the MySQL client-server protocol, any client that wishes to use it must also speak the MySQL client-server protocol.  This means that most software written using the MySQL API, or written using a database abstraction layer which loads a driver for MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <a name="mysqllistener"/><h3>Listener Options</h3>
 
@@ -2416,7 +2434,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
+<p>In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
 
 <p>It can also be configured to listen on a unix socket by adding a <i>socket</i> attribute to the listener tag.</p>
 
@@ -2980,6 +2998,8 @@ http://www.gnu.org/software/src-highlite -->
 
 <p>SQL Relay can be configured to speak the native PostgreSQL protocol, enabling client programs for PostgreSQL (eg. the psql command line program) to access SQL Relay directly.</p>
 
+<p>If an instance speaks the PostgreSQL client-server protocol, then any client that wishes to use it must also speak the PostgreSQL client-server protocol.  This means that most software written using the PostgreSQL API, or written using a database abstraction layer which loads a driver for PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the psql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
+
 <a name="postgresqlconfiguration"/><h3>Basic Configuration</h3>
 
 <p>To enable SQL Relay to speak the PostgreSQL protocol, add the appropriate listener and auth tags:</p>
@@ -3037,8 +3057,16 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>psql <font color="#990000">-</font><font color="#008080">h</font> localhost <font color="#990000">-</font>p <font color="#993399">5433</font> <font color="#990000">-</font>U sqlruser</tt></pre>
 
 </blockquote>
-<p>It can also be accessed from the psql command line program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.</p>
+<p>By default, SQL Relay listens on all available network interfaces, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named <i>sqlrserver</i> then it can be accessed from another system using:</p>
 
+<blockquote>
+<!-- Generator: GNU source-highlight 3.1.9
+by Lorenzo Bettini
+http://www.lorenzobettini.it
+http://www.gnu.org/software/src-highlite -->
+<pre><tt>psql <font color="#990000">-</font><font color="#008080">h</font> sqlrserver <font color="#990000">-</font>p <font color="#993399">5433</font> <font color="#990000">-</font>U sqlruser</tt></pre>
+
+</blockquote>
 <p>The instance can be stopped using:</p>
 
 <blockquote>
@@ -3049,7 +3077,7 @@ http://www.gnu.org/software/src-highlite -->
 <pre><tt>sqlr<font color="#990000">-</font>stop <font color="#990000">-</font>id example</tt></pre>
 
 </blockquote>
-<p>Since this instance speaks the PostgreSQL client-server protocol, and supports the native PostgreSQL authorization/authentication procedure, any client that wishes to use it must also speak the PostgreSQL client-server protocol and present credentials in the native PostgreSQL format.  This means that most software written using the PostgreSQL native API, or written using a database abstraction layer which loads a driver for PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.</p>
+<p>Since this instance speaks the PostgreSQL client-server protocol, any client that wishes to use it must also speak the PostgreSQL client-server protocol.  This means that most software written using the PostgreSQL API, or written using a database abstraction layer which loads a driver for PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client progam and client programs for other databases (eg. the mysql, and sqlplus command line programs, MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.</p>
 
 <a name="postgresqllistener"/><h3>Listener Options</h3>
 
@@ -3107,7 +3135,7 @@ http://www.gnu.org/software/src-highlite -->
 </tt></pre>
 
 </blockquote>
-<p>In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
+<p>In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).</p>
 
 <p>It can also be configured to listen on a unix socket by adding a <i>socket</i> attribute to the listener tag.</p>
 
