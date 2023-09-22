@@ -65,7 +65,7 @@ int main(int argc, const char **argv) {
 
 	// get the id
 	const char	*id=cmdl.getValue("-id");
-	size_t		idlen=charstring::length(id);
+	size_t		idlen=charstring::getLength(id);
 
 	// get the pid directory
 	sqlrpaths	sqlrpth(&cmdl);
@@ -134,7 +134,7 @@ int main(int argc, const char **argv) {
 			fqp.append(file);
 
 			// skip the pid file if it's not readable
-			if (!file::readable(fqp.getString())) {
+			if (!file::isReadable(fqp.getString())) {
 				continue;
 			}
 			
@@ -142,7 +142,7 @@ int main(int argc, const char **argv) {
 			char		*pidstr=
 					file::getContents(fqp.getString());
 			uint64_t	pid=
-					charstring::toInteger(pidstr);
+					charstring::convertToInteger(pidstr);
 
 			if (pid) {
 

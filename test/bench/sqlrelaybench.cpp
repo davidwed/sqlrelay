@@ -77,7 +77,7 @@ sqlrelaybenchconnection::sqlrelaybenchconnection(
 				const char *db) :
 				sqlrbenchconnection(connectstring,db) {
 	host=getParam("host");
-	port=charstring::toInteger(getParam("port"));
+	port=charstring::convertToInteger(getParam("port"));
 	socket=getParam("socket");
 	user=getParam("user");
 	password=getParam("password");

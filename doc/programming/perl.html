@@ -938,8 +938,6 @@ $cur<font color="#990000">-&gt;</font><b><font color="#000000">executeQuery</fon
 </tt></pre>
 
 </blockquote>
-<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
-
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>
@@ -1296,8 +1294,6 @@ my $result<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b
 </tt></pre>
 
 </blockquote>
-<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
-
 <p>To drop the function, run a query like the following.</p>
 
 <blockquote>
@@ -1696,10 +1692,10 @@ following.</p>
 by Lorenzo Bettini
 http://www.lorenzobettini.it
 http://www.gnu.org/software/src-highlite -->
-<pre><tt>$cur<font color="#990000">-&gt;</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(:in1,:in2,:in3)"</font><font color="#990000">);</font>
-$cur<font color="#990000">-&gt;</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
-$cur<font color="#990000">-&gt;</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
-$cur<font color="#990000">-&gt;</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"in3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
+<pre><tt>$cur<font color="#990000">-&gt;</font><b><font color="#000000">prepareQuery</font></b><font color="#990000">(</font><font color="#FF0000">"call exampleproc(?,?,?)"</font><font color="#990000">);</font>
+$cur<font color="#990000">-&gt;</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"1"</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
+$cur<font color="#990000">-&gt;</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"2"</font><font color="#990000">,</font><font color="#993399">1.1</font><font color="#990000">,</font><font color="#993399">4</font><font color="#990000">,</font><font color="#993399">2</font><font color="#990000">);</font>
+$cur<font color="#990000">-&gt;</font><b><font color="#000000">inputBind</font></b><font color="#990000">(</font><font color="#FF0000">"3"</font><font color="#990000">,</font><font color="#FF0000">"hello"</font><font color="#990000">);</font>
 $cur<font color="#990000">-&gt;</font><b><font color="#000000">executeQuery</font></b><font color="#990000">();</font>
 my $out1<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">0</font><font color="#990000">);</font>
 my $out2<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><font color="#000000">getField</font></b><font color="#990000">(</font><font color="#993399">0</font><font color="#990000">,</font><font color="#993399">1</font><font color="#990000">);</font>
@@ -1707,8 +1703,6 @@ my $out3<font color="#990000">=</font>$cur<font color="#990000">-&gt;</font><b><
 </tt></pre>
 
 </blockquote>
-<p>Note: Versions of MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.</p>
-
 <p>To drop the stored procedure, run a query like the following.</p>
 
 <blockquote>

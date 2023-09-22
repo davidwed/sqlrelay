@@ -102,10 +102,10 @@ void sqlrfilters::loadFilter(domnode *filter,
 
 	// get the filter name
 	const char	*module=filter->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=filter->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

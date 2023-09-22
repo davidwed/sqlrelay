@@ -83,10 +83,10 @@ void sqlrqueries::loadQuery(domnode *query) {
 
 	// get the query name
 	const char	*module=query->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=query->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

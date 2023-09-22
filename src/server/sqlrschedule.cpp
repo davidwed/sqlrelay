@@ -82,7 +82,7 @@ bool sqlrschedulerule::allowed(datetime *dt, bool currentlyallowed) {
 		inPeriods(&pvt->_months,dt->getMonth()) &&
 		inPeriods(&pvt->_daysofmonth,dt->getDayOfMonth()) &&
 		inPeriods(&pvt->_daysofweek,dt->getDayOfWeek()) &&
-		inDayParts(dt->getHour(),dt->getMinutes())) {
+		inDayParts(dt->getHour(),dt->getMinute())) {
 
 		// if the rule contradicts the current state then
 		// return the opposite of the current state
@@ -219,9 +219,9 @@ void sqlrschedulerule::splitTimePart(
 		// create a new period, set the start/end
 		// and add it to the list of periods
 		sqlrscheduleperiod	*p=new sqlrscheduleperiod;
-		p->start=charstring::toInteger(timepartparts[0]);
+		p->start=charstring::convertToInteger(timepartparts[0]);
 		if (timepartpartscount>1) {
-			p->end=charstring::toInteger(timepartparts[1]);
+			p->end=charstring::convertToInteger(timepartparts[1]);
 		} else {
 			p->end=p->start;
 		}
@@ -270,7 +270,7 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 		// create a new daypart, set the start/end
 		// hour/minute and add it to the list of periods
 		sqlrscheduledaypart	*dp=new sqlrscheduledaypart;
-		dp->starthour=charstring::toInteger(daypartparts[0]);
+		dp->starthour=charstring::convertToInteger(daypartparts[0]);
 		const char	*minute=
 				charstring::findFirst(daypartparts[0],":");
 		if (minute) {
@@ -278,17 +278,17 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 		} else {
 			minute="0";
 		}
-		dp->startminute=charstring::toInteger(minute);
+		dp->startminute=charstring::convertToInteger(minute);
 
 		if (daypartpartscount>1) {
-			dp->endhour=charstring::toInteger(daypartparts[1]);
+			dp->endhour=charstring::convertToInteger(daypartparts[1]);
 			minute=charstring::findFirst(daypartparts[1],":");
 			if (minute) {
 				minute++;
 			} else {
 				minute="0";
 			}
-			dp->endminute=charstring::toInteger(minute);
+			dp->endminute=charstring::convertToInteger(minute);
 		} else {
 			dp->endhour=dp->starthour;
 			dp->endminute=dp->startminute;

@@ -29,7 +29,7 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
-stdoutput.printf("%d!=%d\n",charstring::length(value),charstring::length(success));
+stdoutput.printf("%d!=%d\n",charstring::getLength(value),charstring::getLength(success));
 		stdoutput.printf("failure ");
 		delete cur;
 		delete con;
@@ -84,7 +84,7 @@ int	main(int argc, char **argv) {
 
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"db2inst1","testpassword",0,1);
 	cur=new sqlrcursor(con);
 
 	// get database type

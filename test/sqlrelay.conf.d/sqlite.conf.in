@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="sqlitetest" port="9000" socket="/tmp/test.socket" dbase="sqlite">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="sqlitetest" dbase="sqlite">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
-			<connection string="db=@abs_top_builddir@/test/sqlrelay.conf.d/sqlite/sqlite.db;"/>
+			<connection string="db=@abs_top_builddir@/test/sqlrelay.conf.d/sqlite/sqlite.db;user=testuser;password=testpassword"/>
 		</connections>
 	</instance>
 

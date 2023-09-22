@@ -102,7 +102,7 @@ bool sqlrimportxml::attributeValue(const char *value) {
 			break;
 		case COLUMNSTAG:
 			if (!charstring::compare(currentattribute,"count")) {
-				colcount=charstring::toUnsignedInteger(value);
+				colcount=charstring::convertToUnsignedInteger(value);
 				columns.clear();
 				delete[] numbercolumn;
 				numbercolumn=new bool[colcount];
@@ -423,7 +423,7 @@ void sqlrimportxml::massageField(stringbuffer *strb, const char *field) {
 			// expand xml entities...
 
 			char	ch=(char)charstring::
-					toUnsignedInteger(field+index);
+					convertToUnsignedInteger(field+index);
 
 			// double-up any single-quotes
 			if (ch=='\'') {

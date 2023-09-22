@@ -55,16 +55,16 @@ void queriesTest(void *id) {
 			}
 		}
 
-		seed=randomnumber::generateNumber(seed);
+		seed=randomnumber::generate(seed);
 
-		int32_t	loopcount=randomnumber::scaleNumber(seed,1,20);
+		int32_t	loopcount=randomnumber::scale(seed,1,20);
 		stdoutput.printf("%lld: looping %d times\n",threadid,loopcount);
 
 		for (int32_t l=0; l<loopcount; l++) {
 
 			// create a table with a random number of fields
-			seed=randomnumber::generateNumber(seed);
-			colcount=randomnumber::scaleNumber(seed,1,15);
+			seed=randomnumber::generate(seed);
+			colcount=randomnumber::scale(seed,1,15);
 			stdoutput.printf("%lld: creating table with %d cols\n",
 							threadid,colcount);
 			query.clear();
@@ -84,13 +84,13 @@ void queriesTest(void *id) {
 			}
 
 			// populate it with a random number of rows
-			seed=randomnumber::generateNumber(seed);
-			rowcount=randomnumber::scaleNumber(seed,1,100);
+			seed=randomnumber::generate(seed);
+			rowcount=randomnumber::scale(seed,1,100);
 			stdoutput.printf("%lld: populating with %d rows\n",
 							threadid,rowcount);
 			for (int32_t i=0; i<rowcount; i++) {
-				seed=randomnumber::generateNumber(seed);
-				value=randomnumber::scaleNumber(seed,1,100000);
+				seed=randomnumber::generate(seed);
+				value=randomnumber::scale(seed,1,100000);
 				query.clear();
 				query.append("insert into test");
 				query.append(threadid)->append(" values (");
@@ -110,8 +110,8 @@ void queriesTest(void *id) {
 
 			// select those rows a random number of times,
 			// use a new cursor for each time
-			seed=randomnumber::generateNumber(seed);
-			times=randomnumber::scaleNumber(seed,1,4);
+			seed=randomnumber::generate(seed);
+			times=randomnumber::scale(seed,1,4);
 			stdoutput.printf("%lld: selecting %d times with "
 					"%lld nested cursors\n",
 					threadid,times,curcount);
@@ -158,27 +158,27 @@ void heartbeatTest(void *id) {
 	uint32_t	seed=threadid;
 
 	inetsocketclient	isc;
+	isc.setHost(host);
+	isc.setPort(port);
 
 	uint64_t	i=0;
 	while (!terminated) {
 
-		if (isc.connect(host,port,-1,-1,0,1)==RESULT_SUCCESS) {
+		if (isc.connect()==RESULT_SUCCESS) {
 
 			stdoutput.printf(
 				"%lld: %d: connect success\n",threadid,i);
 
 			if (garbage) {
 
-				seed=randomnumber::generateNumber(seed);
+				seed=randomnumber::generate(seed);
 				int32_t	garbagesize=
-					randomnumber::scaleNumber(
-							seed,1,garbage);
+					randomnumber::scale(seed,1,garbage);
 
 				char	*gbg=new char[garbagesize];
 				for (int32_t i=0; i<garbagesize; i++) {
-					seed=randomnumber::generateNumber(seed);
-					gbg[i]=randomnumber::scaleNumber(
-								seed,0,255);
+					seed=randomnumber::generate(seed);
+					gbg[i]=randomnumber::scale(seed,0,255);
 				}
 
 				stdoutput.printf("%lld: sending %d "
@@ -207,32 +207,32 @@ int main(int argc, const char **argv) {
 
 	terminated=false;
 
-	process::handleShutDown(shutDown);
+	process::setShutDownHandler(shutDown);
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.found("host") ||
-			!cmdl.found("port") ||
-			!cmdl.found("concount")) {
+	if (!cmdl.isFound("host") ||
+			!cmdl.isFound("port") ||
+			!cmdl.isFound("concount")) {
 		stdoutput.printf("usage: stress -host host -port port -socket socket [-user user] [-password password] -concount concount -curcount curcount [-heartbeat|-garbage [size]]\n");
 		process::exit(1);
 	}
 
 	host=cmdl.getValue("host");
-	port=charstring::toUnsignedInteger(cmdl.getValue("port"));
+	port=charstring::convertToUnsignedInteger(cmdl.getValue("port"));
 	sock=cmdl.getValue("socket");
 	user=cmdl.getValue("user");
 	password=cmdl.getValue("password");
-	concount=charstring::toUnsignedInteger(cmdl.getValue("concount"));
-	curcount=charstring::toUnsignedInteger(cmdl.getValue("curcount"));
+	concount=charstring::convertToUnsignedInteger(cmdl.getValue("concount"));
+	curcount=charstring::convertToUnsignedInteger(cmdl.getValue("curcount"));
 	garbage=0;
-	if (cmdl.found("garbage")) {
-		garbage=charstring::toUnsignedInteger(cmdl.getValue("garbage"));
+	if (cmdl.isFound("garbage")) {
+		garbage=charstring::convertToUnsignedInteger(cmdl.getValue("garbage"));
 		if (garbage==0) {
 			garbage=100;
 		}
 	}
-	bool	heartbeat=(garbage || cmdl.found("heartbeat"));
+	bool	heartbeat=(garbage || cmdl.isFound("heartbeat"));
 
 	thread	*th=new thread[concount];
 

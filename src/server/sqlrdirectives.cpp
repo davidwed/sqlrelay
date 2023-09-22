@@ -85,10 +85,10 @@ void sqlrdirectives::loadDirective(domnode *directive) {
 
 	// get the directive name
 	const char	*module=directive->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=directive->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

@@ -54,7 +54,7 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 		re->study();
 		relist.append(re);
 	}
-	if (debug && !relist.getLength()) {
+	if (debug && !relist.getCount()) {
 		stdoutput.printf("	WARNING! no patterns found\n");
 	}
 }

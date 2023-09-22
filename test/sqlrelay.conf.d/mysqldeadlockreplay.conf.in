@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<instances>
+
+	<instance id="mysqldeadlockreplaytest" dbase="mysql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
+                <translations>
+                        <translation module="normalize"/>
+                </translations>
+                <triggers>
+                        <trigger module="replay" when="after">
+                                <!-- deadlock -->
+                                <condition error="1213" scope="transaction"/>
+                                <!-- lock wait timeout -->
+                                <condition error="1205" scope="query"/>
+                        </trigger>
+                </triggers>
+		<connections>
+			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes;autocommit=yes"/>
+		</connections>
+	</instance>
+
+</instances>

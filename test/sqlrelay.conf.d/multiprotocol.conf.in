@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<instances>
+
+	<instance id="multiprotocoltest" dbase="mysql">
+		<listeners>
+			<listener protocol="sqlrclient" port="9000"/>
+			<listener protocol="mysql" port="3306"/>
+			<listener protocol="postgresql" port="5432"/>
+		</listeners>
+		<connections>
+			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
+		</connections>
+	</instance>
+
+</instances>

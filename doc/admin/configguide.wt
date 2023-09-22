@@ -34,7 +34,8 @@
  * [#sqlrclientprotocol SQLRClient Protocol]
   * [#sqlrclientconfiguration Basic Configuration]
   * [#sqlrclientlistener Listener Options]
-  * [#sqlrclientauth Authentication/Authorization/Encryption Options]
+  * [#sqlrclientauth Authentication/Encryption Options]
+   * [#sqlrclientconnectstringsauth Connect Strings Auth]
    * [#sqlrclientuserlistauth User List Auth]
    * [#sqlrclientdbauth Database Auth]
    * [#sqlrclientproxiedauth Proxied Auth]
@@ -44,7 +45,8 @@
  * [#mysqlprotocol MySQL Protocol]
   * [#mysqlconfiguration Basic Configuration]
   * [#mysqllistener Listener Options]
-  * [#mysqlauth Authentication/Authorization/Encryption Options]
+  * [#mysqlauth Authentication/Encryption Options]
+   * [#mysqlconnectstringsauth Connect Strings Auth]
    * [#mysqluserlistauth User List Auth]
    * [#mysqldbauth Database Auth]
    * [#mysqltls TLS/SSL Encryption and Authentication]
@@ -54,11 +56,16 @@
  * [#postgresqlprotocol PostgreSQL Protocol]
   * [#postgresqlconfiguration Basic Configuration]
   * [#postgresqllistener Listener Options]
-  * [#postgresqlauth Authentication/Authorization/Encryption Options]
+  * [#postgresqlauth Authentication/Encryption Options]
+   * [#postgresqlconnectstringsauth Connect Strings Auth]
    * [#postgresqluserlistauth User List Auth]
    * [#postgresqltls TLS/SSL Encryption and Authentication]
   * [#postgresqlforeignbackend Foreign Backend]
   * [#postgresqllimitations Limitations]
+ * [#multipleprotocols Multiple Protocols]
+  * [#multiprotocolconfiguration Basic Configuration]
+  * [#multiprotocollistener Listener Options]
+  * [#multiprotocolauth Authentication/Encryption Options]
 * [#ha High Availability]
  * [#cluster Load-Balancing and Fail-Over With Replicated Databases or Database Clusters]
  * [#rac Already-Load-Balanced Databases]
@@ -78,7 +85,7 @@
   * [#md5 md5]
   * [#sha1 sha1]
   * [#sha256 sha256]
-  * [#crypt crypt]
+  * [#des des]
   * [#aes128 aes128]
  * [#schedules Connection Schedules]
   * [#cron_userlist cron_userlist]
@@ -171,15 +178,19 @@ It can be accessed locally using:
 
 {{{#!blockquote
 {{{
-sqlrsh -host localhost -user sqlruser -password sqlrpassword
+sqlrsh -host localhost -user scott -password tiger
 }}}
 }}}
 
-By default, SQL Relay listens on all available network interfaces, on port 9000, and it can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+{{{#!blockquote
+( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
+}}}
+
+By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword
+sqlrsh -host sqlrserver -user scott -password tiger
 }}}
 }}}
 
@@ -206,7 +217,7 @@ sqlr-stop
 [[br]][=#basic]
 = Basic Configuration =
 
-The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are you'll want to configure it further.
+The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are good that you'll want to configure it further.
 
 
 [[br]][=#database]
@@ -293,8 +304,6 @@ Driver=ODBC Driver 11 for SQL Server
 Server=examplehost
 Port=1433
 Database=
-User=exampleuser
-Password=examplepassword
 }}}
 }}}
 
@@ -333,7 +342,7 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost
 	port = 1433
 	tds version = 7.0
@@ -370,7 +379,7 @@ On Linux/Unix platforms, the server option refers to an entry in the interfaces 
 
 {{{#!blockquote
 {{{#!code
-EXAMPLEDB
+SAPSERVER
 	master tcp ether examplehost 5000
 	query tcp ether examplehost 5000
 }}}
@@ -403,7 +412,7 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost
 	port = 5000
 	tds version = 5.0
@@ -550,6 +559,8 @@ In this example, SQL Relay is configured to connect to a SQLite database.
 The db option indicates that SQL Relay should connect to the database /var/sqlite/exampledb.
 
 Note that the database file (exampledb in this case) and the directory that its located in (/var/sqlite in this case) must both be readable and writable by the user that the instance of SQL Relay runs as.
+
+Also note the user and password parameters in the connection string.  SQLite doesn't require these for SQL Relay to access the database, but they are included to define a user and password for accessing SQL Relay itself.
 
 SQLite also supports a high-performance in-memory mode where tables are maintained in memory and nothing is written to permanent storage.  To use this mode with SQL Relay, set the db option to :memory:.
 
@@ -894,7 +905,7 @@ See the [configreference.html#odbc SQL Relay Configuration Reference] for other 
 [[br]][=#db-odbc]
 === Generic ODBC ===
 
-SQL Relay supports many popular databases natively, but ODBC can be used to access databases for which SQL Relay has no native support.
+ODBC can be used to access many databases for which SQL Relay has no native support.
 
 Accessing a database via an ODBC driver usually involves:
 
@@ -1010,7 +1021,7 @@ It can be configured to listen on a different port though...
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -port 9001 -user sqlruser -password sqlrpassword
+sqlrsh -host sqlrserver -port 9001 -user scott -password tiger
 }}}
 }}}
 
@@ -1028,7 +1039,7 @@ It can also be configured to listen on a unix socket...
 
 {{{#!blockquote
 {{{
-sqlrsh -socket /tmp/example.socket -user sqlruser -password sqlrpassword
+sqlrsh -socket /tmp/example.socket -user scott -password tiger
 }}}
 }}}
 
@@ -1167,7 +1178,7 @@ In these configurations, SQL Relay becomes a transparent proxy.  !MySQL/MariaDB 
 
 SQLRClient is the native SQL Relay protocol, enabled by default.  The example configurations above and throughout most of the rest of the guide configure SQL Relay to speak this protocol.
 
-If an instance speaks the SQLRClient client-server protocol, and supports the native SQL Relay authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQL Relay format.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+If an instance speaks the SQLRClient client-server protocol, then any client that wishes to use it must also speak the SQLRClient client-server protocol.  This means that most software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#sqlrclientconfiguration]
 === Basic Configuration ===
@@ -1184,8 +1195,6 @@ In this configuration:
 
 * The connection tag instructs the instance to log in to the //orcl// database as user //scott// with password //tiger//.
 * By default, SQL Relay loads the //sqlrclient// protocol module, and listens on port 9000.
-* The users tag instructs SQL Relay to load the //userlist// auth module.
-* The user tag defines the user //sqlruser// with password //sqlrpassword//.
 
 The instance can be started using:
 
@@ -1199,11 +1208,21 @@ and accessed from the local machine using:
 
 {{{#!blockquote
 {{{#!code
-sqlrsh -host localhost -user sqlruser -password sqlrpassword
+sqlrsh -host localhost -user scott -password tiger
 }}}
 }}}
 
-It can also be accessed from the mysql command line program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.
+{{{#!blockquote
+( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag. )
+}}}
+
+By default, SQL Relay listens on all available network interfaces, on port 9000, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+
+{{{#!blockquote
+{{{
+sqlrsh -host sqlrserver -user scott -password tiger
+}}}
+}}}
 
 The instance can be stopped using:
 
@@ -1213,7 +1232,7 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the SQLRClient client-server protocol, and supports the native SQLRClient authorization/authentication procedure, any client that wishes to use it must also speak the SQLRClient client-server protocol and present credentials in the native SQLRClient format.  This means that software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+Since this instance speaks the SQLRClient client-server protocol, any client that wishes to use it must also speak the SQLRClient client-server protocol.  This means that software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#sqlrclientlistener]
 === Listener Options ===
@@ -1236,9 +1255,9 @@ If the server has multiple network interfaces, SQL Relay can also be configured 
 }}}
 }}}
 
-In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
 
-It can also be configured to listen on a unix socket by adding a socket attribute to the instance tag.
+It can also be configured to listen on a unix socket by adding a //socket// attribute to the listener tag.
 
 {{{#!blockquote
 {{{#!code
@@ -1251,18 +1270,43 @@ It can also be configured to listen on a unix socket by adding a socket attribut
 If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
 
 [=#sqlrclientauth]
-=== Authentication/Authorization/Encryption Options ===
+=== Authentication/Encryption Options ===
 
-There are several options for controlling which users are allowed to access an instance of SQL Relay.
+When using the SQLRClient protocol, there are several options for controlling which users are allowed to access an instance of SQL Relay.
+
+[=#sqlrclientconnectstringsauth]
+=== Connect Strings Auth ===
+
+The default authentication option is //connect strings// auth.
+
+When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.
+
+In the following example, SQL Relay is configured to access the database using scott/tiger credentials.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-minimal.conf@
+}}}
+}}}
+
+In this case, clients would also use scott/tiger credentials to access SQL Relay.
+
+Though it is not necessary, it is possible to explicitly configure SQL Relay to load the //connect strings// auth module as follows:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-connectstrings.conf@
+}}}
+}}}
 
 [=#sqlrclientuserlistauth]
 === User List Auth ===
 
-The standard authentication/authorization option is //user list// auth.
+Another popular authentication option is //user list// auth.
 
-When user list auth is used, a user is authenticated/authorized against a static list of valid user/password combinations.  This is the method used in all of the examples above.
+When user list authentication is used, a user is authenticated against a static list of user/password combinations, which may be different than the user/password used that SQL Relay uses to access the database.
 
-To enable user list auth, you must provide a list of valid user/password combinations, as follows:
+To enable user list auth, you must provide a list of user/password combinations, as follows:
 
 {{{#!blockquote
 {{{#!code
@@ -1280,27 +1324,27 @@ If you would prefer not to include passwords directly in the config file, then y
 
 In this example...
 
-The contents of the file /usr/local/firsworks/etc/user1.pwd would be used to authenticate user1, and would contain the text:
+The contents of the file /usr/local/firsworks/etc/oneuser.pwd would be used to authenticate oneuser, and would contain the text:
 
 {{{#!blockquote
 {{{
-password1
+onepassword
 }}}
 }}}
 
-The contents of the file /usr/local/firsworks/etc/user2.pwd would be used to authenticate user2, and would contain the text:
-
-{{{#!blockquote
-{{{
-password2
-}}}
-}}}
-
-The contents of the file /usr/local/firsworks/etc/user3.pwd would be used to authenticate user3, and would contain the text:
+The contents of the file /usr/local/firsworks/etc/anotheruser.pwd would be used to authenticate anotheruser, and would contain the text:
 
 {{{#!blockquote
 {{{
-password3
+anotherpassword
+}}}
+}}}
+
+The contents of the file /usr/local/firsworks/etc/yetanotheruser.pwd would be used to authenticate yetanotheruser, and would contain the text:
+
+{{{#!blockquote
+{{{
+yetanotherpassword
 }}}
 }}}
 
@@ -1316,48 +1360,48 @@ If you would prefer not to use full pathnames inside of each set of square brack
 }}}
 }}}
 
-In this case, the path /usr/local/firstworks/etc will be searched for the files user1.pwd, user2.pwd, and user3.pwd.
+In this case, the path /usr/local/firstworks/etc will be searched for the files oneuser.pwd, anotheruser.pwd, and yetanotheruser.pwd.
 
 [=#sqlrclientdbauth]
 === Database Auth ===
 
-Another popular authentication/authorization option is //database// auth.
+Another popular authentication option is //database// auth.
 
-When database auth is used, a user is authenticated/authorized against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.
+When database authentication is used, a user is authenticated against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.
 
-To enable database auth, omit the list of user/passwords and configure authtier="database" as follows.
+To enable database auth, configure SQL Relay to load the //database// auth module as follows.
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-auths-authtier-database.conf@
+@parts/sqlrelay-auths-database.conf@
 }}}
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' Database auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database auth is used for that instance, then auth will fail.)
+( '''NOTE:''' Database authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database authentication is used for that instance, then authentication will fail.)
 [[br]][[br]]
-( '''NOTE:''' Prior to version 0.65.0, the "database" auth method defaulted to the behavior of the "proxied" auth method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.)
+( '''NOTE:''' Prior to version 0.65.0, the "database" authentication method defaulted to the behavior of the "proxied" authentication method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.)
 }}}
 
 [=#sqlrclientproxiedauth]
 === Proxied Auth ===
 
-Another authentication/authorization option is //proxied// auth.
+Another authentication option is //proxied// auth.
 
-When proxied auth is used, a user is authenticated/authorized against the database itself, though in a different manner than datbase auth described above.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.
+When proxied authentication is used, a user is authenticated against the database itself, though in a different manner than datbase authentication described above.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.
 
 This is currently only supported with Oracle (version 8i or higher) and requires database configuration.  See [oraclentier.html this document] for more information including instructions for configuring Oracle.
 
-To enable proxied auth, omit the list of user/passwords and configure authtier="proxied" as follows.
+To enable proxied auth, configure SQL Relay to load the //proxied// auth module as follows.
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-auths-authtier-proxied.conf@
+@parts/sqlrelay-auths-proxied.conf@
 }}}
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' Proxied auth should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied auth is used for that instance, then auth will fail.)
+( '''NOTE:''' Proxied authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If proxied authentication is used for that instance, then authentication will fail.)
 }}}
 
 [=#sqlrclientkrb]
@@ -1383,7 +1427,7 @@ The following configuration configures an instance of SQL Relay to use Kerberos 
 * The '''krb''' attribute enables (or disables) Kerberos authentication and encryption.
 * The '''krbservice''' attribute specifies which Kerberos service to use.  This attribute is optional and defaults to "sqlrelay".  It is only shown here for illustrative purposes.
 * The '''krbkeytab''' attribute specifies the location of the keytab file containing the key for the specified Kerberos service.  This attribute is not required on Windows.  On Linux or Unix systems if this paramter is omitted, then it defaults to the system keytab, usually /etc/krb5.keytab
-* User list auth is also used.  Database and proxied auth are not currently supported with Kerberos.
+* User list authentication is also used.  Other authentication methods are not currently supported with Kerberos.
 
 Note that no passwords are required in the user list.  Note also that users are specified in both user@REALM (Kerberos) format and REALM\user (Active Directory) format to support users authenticated against both systems.
 
@@ -1430,7 +1474,7 @@ Kerberos authentication establishes trust between the user who acquired the tick
 * During this process the client program sends the SQL Relay server the user name that was used to acquire the original ticket-granting ticket.
 * If the security context can be successfully established, then the SQL Relay server can trust that the client program is being run by the user that it says it is.
 
-Once the SQL Relay server trusts that the client is being run by the user that it says it is, the user is authorized against the list of valid users.
+Once the SQL Relay server trusts that the client is being run by the user that it says it is, the user is authenticated against the list of users.
 
 While Kerberos authenticated and encrypted sessions are substantially more secure than standard SQL Relay sessions, several factors contribute to a performance penalty:
 
@@ -1467,7 +1511,7 @@ The following configuration enables TLS/SSL encryption for an instance of SQL Re
 * The '''tls''' attribute enables (or disables) TLS/SSL encryption.
 * The '''tlscert''' attribute specifies the TLS/SSL certificate chain to use.
  * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlscert.html The tlscert Parameter] for details.)
-* User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
+* User list authentication is also used.  Other authentication methods are not currently supported with TLS/SSL.
 
 To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:
 
@@ -1485,7 +1529,7 @@ The instance may be accessed as follows:
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate no
+sqlrsh -host sqlrserver -user scott -password tiger -tls -tlsvalidate no
 }}}
 }}}
 
@@ -1497,7 +1541,7 @@ For a more secure session, the client may validate that the server's certificate
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca
+sqlrsh -host sqlrserver -user scott -password tiger -tls -tlsvalidate ca
 }}}
 }}}
 
@@ -1505,7 +1549,7 @@ If the server's certificate is self-signed, then the certificate authority won't
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -user sqlruser -password sqlrpassword -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/myca.pem
+sqlrsh -host sqlrserver -user scott -password tiger -tls -tlsvalidate ca -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1519,7 +1563,7 @@ For a more secure session, the client may validate that the host name provided b
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem
+sqlrsh -host sqlrserver.firstworks.com -user scott -password tiger -tls -tlsvalidate ca+host -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1533,7 +1577,7 @@ Unless self-signed, certificates can be expensive, so certificates are often sha
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver.firstworks.com -user sqlruser -password sqlrpassword -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/myca.pem
+sqlrsh -host sqlrserver.firstworks.com -user scott -password tiger -tls -tlsvalidate ca+domain -tlsca /usr/local/firstworks/etc/myca.pem
 }}}
 }}}
 
@@ -1543,7 +1587,7 @@ Note that the fully qualified host name was provided.  Note also the use of the 
 
 === Mutual Authentication ===
 
-For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.
+For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authenticate the client based on the host name provided by the certificate.
 
 The following configuration enables these checks for an instance of SQL Relay:
 
@@ -1556,11 +1600,11 @@ The following configuration enables these checks for an instance of SQL Relay:
 * The '''tlsvalidate''' attribute enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca attribute.
 * The '''tlsca''' attribute specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
  * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlsca.html The tlsca Parameter] for details.)
-* User list auth is also used.
+* User list authentication is also used.
 
-Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authorized against the list of valid names.
+Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authenticate against the list of valid names.
 
-Note also that when '''tlsvalidate''' is set to "yes", database and proxied auth cannot currently be used.  This is because database and proxied auth both require a user name and password but the client certificate doesn't provide either.
+Note also that when '''tlsvalidate''' is set to "yes", database and proxied authentication cannot currently be used.  This is because database and proxied authentication both require a user name and password but the client certificate doesn't provide either.
 
 To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:
 
@@ -1572,7 +1616,7 @@ sqlrsh -host sqlrserver -tls -tlsvalidate no -tlscert /usr/local/firstworks/etc/
 
 (.pem files are specified in this example, but on Windows systems, .pfx file or Windows Certificate Store references must be used.  See [tlscert.html The tlscert Parameter] for details.)
 
-Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authorized against the list of valid names.
+Note the absence of user and password parameters.  Rather than passing a user and password, the client passes the specified certificate to the server.  The server trusts that the client is who they say they are by virtue of having a valid certificate and the name provided by the certificate is authenticated against the list of valid names.
 
 In a more likely use case though, mutual authentication occurs - the client validates the server's certificate and the server validates the client's certificate, as follows:
 
@@ -1601,10 +1645,12 @@ Any kind of full session encryption should be used with caution in performance-s
 
 SQL Relay can be configured to speak the native !MySQL protocol, enabling client programs for !MySQL/MariaDB (eg. the mysql command line program and !MySQL Workbench) to access SQL Relay directly.
 
+If an instance speaks the !MySQL client-server protocol, then any client that wishes to use it must also speak the !MySQL client-server protocol.  This means that most software written using the !MySQL API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+
 [=#mysqlconfiguration]
 === Basic Configuration ===
 
-To enable SQL Relay to speak the !MySQL protocol, add the appropriate listener and auth tags:
+To enable SQL Relay to speak the !MySQL protocol, add the appropriate listener tag:
 
 {{{#!blockquote
 {{{#!code
@@ -1616,8 +1662,6 @@ In this configuration:
 
 * The connection tag instructs the instance to log in to the //mysqldb// database on host //mysqlhost// as user //mysqluser// with password //mysqlpassword//.
 * The listener tag instructs SQL Relay to load the //mysql// protocol module, and listen on port 3307.
-* The auth tag instructs SQL Relay to load the //mysql_userlist// auth module.
-* The user tag defines the user //sqlruser// with password //sqlrpassword//.
 
 The instance can be started using:
 
@@ -1637,7 +1681,13 @@ mysql --host=127.0.0.1 --port=3307 --user=sqlruser --password=sqlrpassword
 
 ( '''NOTE:''' 127.0.0.1 is used instead of "localhost" because "localhost" instructs the mysql client to use a predefined unix socket.)
 
-It can also be accessed from the mysql command line program running on a remote machine by replacing 127.0.0.1 with the hostname of the machine running SQL Relay.
+By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=sqlrserver --port=3307 --user=sqlruser --password=sqlrpassword
+}}}
+}}}
 
 The instance can be stopped using:
 
@@ -1647,7 +1697,7 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the !MySQL client-server protocol, and supports the native !MySQL authorization/authentication procedure, any client that wishes to use it must also speak the !MySQL client-server protocol and present credentials in the native !MySQL format.  This means that most software written using the !MySQL native API, or written using a database abstraction layer which loads a driver for !MySQL/MariaDB can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.
+Since this instance speaks the !MySQL client-server protocol, any client that wishes to use it must also speak the !MySQL client-server protocol.  This means that most software written using the !MySQL API, or written using a database abstraction layer which loads a driver for !MySQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#mysqllistener]
 === Listener Options ===
@@ -1670,7 +1720,7 @@ If the server has multiple network interfaces, SQL Relay can also be configured 
 }}}
 }}}
 
-In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
 
 It can also be configured to listen on a unix socket by adding a //socket// attribute to the listener tag.
 
@@ -1685,14 +1735,43 @@ It can also be configured to listen on a unix socket by adding a //socket// attr
 If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
 
 [=#mysqlauth]
-=== Authentication/Authorization/Encryption Options ===
+=== Authentication/Encryption Options ===
+
+When using the !MySQL protocol, there are several options for controlling which users are allowed to access an instance of SQL Relay.
+
+[=#mysqlconnectstringsauth]
+=== Connect Strings Auth ===
+
+The default authentication option is //connect strings// auth.
+
+When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.
+
+In the following example, SQL Relay is configured to access the database using mysqlsuer/mysqlpassword credentials.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlfedbport.conf@
+}}}
+}}}
+
+In this case, clients would also use mysqluser/mysqlpassword credentials to access SQL Relay.
+
+Though it is not necessary, it is possible to explicitly configure SQL Relay to load the //connect strings// auth module as follows:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-mysqlconnectstrings.conf@
+}}}
+}}}
 
 [=#mysqluserlistauth]
 === User List Auth ===
 
-In the examples above, the instance is configured to load the //mysql_userlist// auth module and defines a user //sqlruser// with password //sqlrpassword//.
+Another popular authentication option is //user list// auth.
 
-In this configuration, a client must present //sqlruser/sqlrpassword// credentials.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.
+When user list authentication is used, a user is authenticated against a static list of user/password combinations, which may be different than the user/password used that SQL Relay uses to access the database.
+
+To enable user list auth, you must provide a list of user/password combinations, as follows:
 
 {{{#!blockquote
 {{{#!code
@@ -1753,7 +1832,7 @@ When using SQL Relay as a transparent proxy, it is desirable to define the same 
 [=#mysqldbauth]
 === Database Auth ===
 
-If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the //mysql_database// module can be used to auth users directly against the database.
+If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the //mysql_database// module can be used to authentication users directly against the database.
 
 {{{#!blockquote
 {{{#!code
@@ -1826,7 +1905,7 @@ The following configuration enables TLS/SSL encryption for an instance of SQL Re
 * The '''tls''' attribute enables (or disables) TLS/SSL encryption.
 * The '''tlscert''' attribute specifies the TLS/SSL certificate chain to use.
  * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlscert.html The tlscert Parameter] for details.)
-* User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
+* User list authentication is also used.  Other authentication methods are not currently supported with TLS/SSL.
 
 To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:
 
@@ -1916,7 +1995,7 @@ mysql --host=sqlrserver --user=sqlruser --password=sqlrpassword --ssl-cert=/usr/
 
 In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.
 
-SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a !MySQL/MariaDB username.  As such, a username and password must still be supplied for authentication/authorization in this configuration.
+SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a !MySQL/MariaDB username.  As such, a username and password must still be supplied for authentication in this configuration.
 
 === Performance Considerations ===
 
@@ -1943,7 +2022,7 @@ This is as simple as specifying a different database using the //dbase// attribu
 
 In this example, a !MySQL frontend provides !MySQL/MariaDB applications access to an Oracle backend database.
 
-When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+When targeting a foreign backend, some queries may have to be modified to use the syntax of the foreign database and some code may need to be changed, but a full rewrite of the app should not be necessary.
 
 [=#mysqlspecialpurpose]
 === Special-Purpose Options ===
@@ -2000,19 +2079,19 @@ The //oldmariadbjdbcservercapabilitieshack// option instructs the module to retu
 The implementation of the !MySQL protocol is likely sufficient for most applications, but it isn't 100% complete.  Some notable limitations follow:
 
 * Only LATIN1_SWEDISH_CI and UTF8_GENERAL_CI character sets are supported.
-* Only the mysql_native_password and mysql_clear_password auth methods are supported.  Notably, mysql_old_password and authentication_windows_client are not supported.
+* Only the mysql_native_password and mysql_clear_password authentication methods are supported.  Notably, mysql_old_password and authentication_windows_client are not supported.
 * Multi-statement queries are not supported.
 * mysql_change_user() is not supported.
 * mysql_send_long_data() is not supported.
 * mysql_info() will always returns NULL when used with SQL Relay.
 * MYSQL_FIELD.org_name/org_name_length and MYSQL_FIELD.org_table/org_table_length are not supported.
-* Kerberos auth and encryption are not supported.
+* Kerberos authentication and encryption are not supported.
 
 Most of SQL Relay's core features are available when it is configured to speak the !MySQL protocol, but there are a few incompatible configurations:
 
 * Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any //addresses//, //port//, and //socket// attributes in the instance tag.
 * Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an //authtier// attribute in the instance tag.
-* As Kerberos auth and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
+* As Kerberos authentication and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
 
 Otherwise, all other tags and attributes are compatbile.
 
@@ -2021,10 +2100,12 @@ Otherwise, all other tags and attributes are compatbile.
 
 SQL Relay can be configured to speak the native !PostgreSQL protocol, enabling client programs for !PostgreSQL (eg. the psql command line program) to access SQL Relay directly.
 
+If an instance speaks the !PostgreSQL client-server protocol, then any client that wishes to use it must also speak the !PostgreSQL client-server protocol.  This means that most software written using the !PostgreSQL API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+
 [=#postgresqlconfiguration]
 === Basic Configuration ===
 
-To enable SQL Relay to speak the !PostgreSQL protocol, add the appropriate listener and auth tags:
+To enable SQL Relay to speak the !PostgreSQL protocol, add the appropriate listener tag:
 
 {{{#!blockquote
 {{{#!code
@@ -2036,8 +2117,6 @@ In this configuration:
 
 * The connection tag instructs the instance to log in to the //postgresqldb// database on host //postgresqlhost// as user //postgresqluser// with password //postgresqlpassword//.
 * The listener tag instructs SQL Relay to load the //postgresql// protocol module, and listen on port 5433.
-* The auth tag instructs SQL Relay to load the //postgresql_userlist// auth module.
-* The user tag defines the user //sqlruser// with password //sqlrpassword//.
 
 The instance can be started using:
 
@@ -2055,7 +2134,13 @@ psql -h localhost -p 5433 -U sqlruser
 }}}
 }}}
 
-It can also be accessed from the psql command line program running on a remote machine by replacing localhost with the hostname of the machine running SQL Relay.
+By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
+
+{{{#!blockquote
+{{{#!code
+psql -h sqlrserver -p 5433 -U sqlruser
+}}}
+}}}
 
 The instance can be stopped using:
 
@@ -2065,7 +2150,7 @@ sqlr-stop -id example
 }}}
 }}}
 
-Since this instance speaks the !PostgreSQL client-server protocol, and supports the native !PostgreSQL authorization/authentication procedure, any client that wishes to use it must also speak the !PostgreSQL client-server protocol and present credentials in the native !PostgreSQL format.  This means that most software written using the !PostgreSQL native API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program cannot access this instance.
+Since this instance speaks the !PostgreSQL client-server protocol, any client that wishes to use it must also speak the !PostgreSQL client-server protocol.  This means that most software written using the !PostgreSQL API, or written using a database abstraction layer which loads a driver for !PostgreSQL can access this instance.  However, it also means that SQL Relay's standard sqlrsh client program and client programs for other databases (eg. the mysql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#postgresqllistener]
 === Listener Options ===
@@ -2088,7 +2173,7 @@ If the server has multiple network interfaces, SQL Relay can also be configured 
 }}}
 }}}
 
-In this example, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
+In the example above, it can be accessed on 192.168.1.50 and 192.168.1.51 but not on 127.0.0.1 (localhost).
 
 It can also be configured to listen on a unix socket by adding a //socket// attribute to the listener tag.
 
@@ -2103,14 +2188,43 @@ It can also be configured to listen on a unix socket by adding a //socket// attr
 If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
 
 [=#postgresqlauth]
-=== Authentication/Authorization/Encryption Options ===
+=== Authentication/Encryption Options ===
+
+When using the !PostgreSQL protocol, there are several options for controlling which users are allowed to access an instance of SQL Relay.
+
+[=#postgresqlconnectstringsauth]
+=== Connect Strings Auth ===
+
+The default authentication option is //connect strings// auth.
+
+When connect strings authentication is used, a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.  That is, they are the values of the user and password parameters of the string attribute of the connection tag.
+
+In the following example, SQL Relay is configured to access the database using postgresqlsuer/postgresqlpassword credentials.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqlfedbport.conf@
+}}}
+}}}
+
+In this case, clients would also use postgresqluser/postgresqlpassword credentials to access SQL Relay.
+
+Though it is not necessary, it is possible to explicitly configure SQL Relay to load the //connect strings// auth module as follows:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-postgresqlconnectstrings.conf@
+}}}
+}}}
 
 [=#postgresqluserlistauth]
 === User List Auth ===
 
-In the examples above, the instance is configured to load the //postgresql_userlist// auth module and defines a user //sqlruser// with password //sqlrpassword//.
+Another popular authentication option is //user list// auth.
 
-In this configuration, a client must present //sqlruser/sqlrpassword// credentials.  However, any number of user tags may be specified inside of the auth tag, defining any number of users and passwords.
+When user list authentication is used, a user is authenticated against a static list of user/password combinations, which may be different than the user/password used that SQL Relay uses to access the database.
+
+To enable user list auth, you must provide a list of user/password combinations, as follows:
 
 {{{#!blockquote
 {{{#!code
@@ -2173,12 +2287,12 @@ If the database has a lot of users, or users are added, deleted, or updated regu
 [=#postgresqltls]
 === TLS/SSL Encryption and Authentication ===
 
-SQL Relay supports TLS/SSL encryption and authentication between the !MySQL/MariaDB client and SQL Relay Server.
+SQL Relay supports TLS/SSL encryption and authentication between the !PostgreSQL client and SQL Relay Server.
 
 When TLS/SSL encryption and authentication is used:
 
-* All communications between the !MySQL/MariaDB client and SQL Relay server are encrypted.
-* !MySQL/MariaDB clients and servers may optionally validate each other's certificates and identities.
+* All communications between the !PostgreSQL client and SQL Relay server are encrypted.
+* !PostgreSQL clients and servers may optionally validate each other's certificates and identities.
 
 When using TLS/SSL encryption and authentication, at minimum, the SQL Relay server must be configured to load a certificate.  For highly secure production environments, this certificate should come from a trusted certificate authority.  In other environments the certificate may be self-signed, or even be borrowed from another server.
 
@@ -2196,7 +2310,7 @@ The following configuration enables TLS/SSL encryption for an instance of SQL Re
 * The '''tls''' attribute enables (or disables) TLS/SSL encryption.
 * The '''tlscert''' attribute specifies the TLS/SSL certificate chain to use.
  * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlscert.html The tlscert Parameter] for details.)
-* User list auth is also used.  Database and proxied auth are not currently supported with TLS/SSL.
+* User list authentication is also used.  Other authentication methods are not currently supported with TLS/SSL.
 
 To start the instance on a Linux or Unix system, you must be logged in as a user that can read the file specified by the tlscert attribute.  If that criterium is met then the instance can be started using:
 
@@ -2260,7 +2374,7 @@ The !PostgreSQL client only appears to support fully qualified host name validat
 
 === Mutual Authentication ===
 
-For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authorize the client based on the host name provided by the certificate.
+For an even more secure session, the server may also request a certificate from the client, validate the certificate, and optionally authenticate the client based on the host name provided by the certificate.
 
 The following configuration enables these checks for an instance of SQL Relay:
 
@@ -2273,11 +2387,11 @@ The following configuration enables these checks for an instance of SQL Relay:
 * The '''tlsvalidate''' attribute enables (or disables) validation that client's certificate was signed by a trusted certificate authority, known to the system, or as provided by the tlsca attribute.
 * The '''tlsca''' attribute specifies a certificate authority to include when validating the client's certificate.  This is useful when validating self-signed certificates.
  * (a .pem file is specified in this example, but on Windows systems, a .pfx file or Windows Certificate Store reference must be used. See [tlsca.html The tlsca Parameter] for details.)
-* User list auth is also used.
+* User list authentication is also used.
 
-Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authorized against the list of valid names.
+Note that no passwords are required in the user list.  In this configuration, the Subject Alternative Names in the client's certificate (or Common Name if no SAN's are present) are authenticated against the list of valid names.
 
-Note also that when '''tlsvalidate''' is set to "yes", database and proxied auth cannot currently be used.  This is because database and proxied auth both require a user name and password but the client certificate doesn't provide either.
+Note also that when '''tlsvalidate''' is set to "yes", database and proxied authentication cannot currently be used.  This is because database and proxied authentication both require a user name and password but the client certificate doesn't provide either.
 
 To access the instance, the client must provide, at minimum, a certificate chain file (containing the client's certificate, private key, and signing certificates, as appropriate), as follows:
 
@@ -2303,7 +2417,7 @@ PGSSLMODE=verify-full PGSSLCERT=/usr/local/firstworks/etc/sqlrclient.pem PGSSLKE
 
 In this example, the client provides a certificate for the server to validate, validates the host's certificate against the provided certificate authority, and validates the host's identity against the provided host name.
 
-SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a !PostgreSQL username.  As such, a username and password must still be supplied for authentication/authorization in this configuration.
+SQL Relay can validate the client's certificate, and reject clients which present invalid certificates, but cannot yet authenticate the user via the Subject Alternative Name or Common Name presented in the certificate in lieu of a !PostgreSQL username.  As such, a username and password must still be supplied for authentication in this configuration.
 
 === Performance Considerations ===
 
@@ -2330,24 +2444,169 @@ This is as simple as specifying a different database using the //dbase// attribu
 
 In this example, a !PostgreSQL frontend provides !PostgreSQL applications access to an Oracle backend database.
 
-When targeting a foreign backend, some queries may have to be modified to use the syntax of the new database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+When targeting a foreign backend, some queries may have to be modified to use the syntax of the foreign database and some code may need to be changed, but a full rewrite of the app should not be necessary.
 
 [=#postgresqllimitations]
 === Limitations ===
 
 The implementation of the !PostgreSQL protocol is likely sufficient for most applications, but it isn't 100% complete.  Some notable limitations follow:
 
-* Kerberos auth and encryption are not supported.
+* Kerberos authentication and encryption are not supported.
 * Multi-statement queries are not supported.
 
 Most of SQL Relay's core features are available when it is configured to speak the !PostgreSQL protocol, but there are a few incompatible configurations:
 
 * Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any //addresses//, //port//, and //socket// attributes in the instance tag.
 * Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an //authtier// attribute in the instance tag.
-* Database-auth (authenticating/authorizing users directly against the database) is not currently supported.
-* As Kerberos auth and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
+* Database-authentication (authenticating users directly against the database) is not currently supported.
+* As Kerberos authentication and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
 
 Otherwise, all other tags and attributes are compatbile.
+
+[[br]][=#multipleprotocols]
+== Multiple Protocols ==
+
+A single instance of SQL Relay can also be configured to speak multiple protocols, granting access to the same database to applications which speak SQLRClient, !MySQL, and/or !PostgreSQL.
+
+[=#multiprotocolconfiguration]
+=== Basic Configuration ===
+
+To enable SQL Relay to speak multiple protocols, add the appropriate listener tags:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-multipleprotocols.conf@
+}}}
+}}}
+
+In this configuration:
+
+* The connection tag instructs the instance to log in to the //orcl// //oracle// database as user //scott// with password //tiger//.
+* The first listener tag instructs SQL Relay to load the //sqlrclient// and listen on port 9000 (the default SQL Relay port) for native SQL Relay clients.
+* The second listener tag instructs SQL Relay to load the //mysql// and listen on port 3306 (the default !MySQL port) for !MySQL clients.
+* The third listener tag instructs SQL Relay to load the //postgresql// and listen on port 5432 (the default !PostgreSQL port) for !PostgreSQL clients.
+
+The instance can be started using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-start -id example
+}}}
+}}}
+
+and accessed from the local machine using the native SQL Relay command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host localhost -user scott -password tiger
+}}}
+}}}
+
+or from the local machine using the !MySQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=127.0.0.1 --user=scott --password=tiger
+}}}
+}}}
+
+or from the local machine using the !PostgreSQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+psql -h localhost -U scott
+}}}
+}}}
+
+By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using the native SQL Relay command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host sqlrserver -user scott -password tiger
+}}}
+}}}
+
+or using the !MySQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=sqlrserver --user=scott --password=tiger
+}}}
+}}}
+
+or using the !PostgreSQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+psql -h sqlrserver -U scott
+}}}
+}}}
+
+The instance can be stopped using:
+
+{{{#!blockquote
+{{{#!code
+sqlr-stop -id example
+}}}
+}}}
+
+Since this instance speaks the SQLRClient, !MySQL, and !PostgreSQL client-server protocols, clients that wish to use it may speak any of those client-server protocol.  This means that most software written using the SQL Relay, !MySQL, or !PostgreSQL APIs, or written using a database abstraction layer which loads a driver for SQL Relay, !MySQL, or !PostgreSQL can access this instance.  However, client programs for other databases (eg. the sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
+
+In this example, a frontend that supports !MySQL and !PostgreSQL protocols provides access to an Oracle backend database.  As such some queries may have to be modified from their native !MySQL and !PostgreSQL syntax to use the syntax of the Oracle database.
+
+[=#multiprotocollistener]
+=== Listener Options ===
+
+When configured to support multiple protocols, each listener may be configured with the full set of attributes available for that protocol module.
+
+For example:
+
+* All modules support the host, port, and addresses attributes.
+* All modules support the various tls attributes.
+* The sqlrclient module supports the various krb attributes, but other modules do not.
+
+[=#multiprotocolauth]
+=== Authentication/Encryption Options ===
+
+The default authentication option is //connect strings// auth.  This option works the same as it does when SQL Relay is configured to use a single protocol - a user is authenticated against the set of user/password combinations that SQL Relay is configured to use to access the database.
+
+However, other auth modules can also be used.  Each auth module knows to work with the corresponding protocol module.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-multipleprotocols-multipleauths.conf@
+}}}
+}}}
+
+In this example:
+
+* Native SQL Relay clients will be authenticated using the the sqlrclient_userlist auth module.
+* !MySQL clients will be authenticated using the the mysql_userlist auth module.
+* !PostgreSQL clients will be authenticated using the the postgresql_userlist auth module.
+
+It can accessed from the local machine using the native SQL Relay command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host localhost -user sqlruser -password sqlrpassword
+}}}
+}}}
+
+or from the local machine using the !MySQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+mysql --host=127.0.0.1 --user=mysqluser --password=mysqlpassword
+}}}
+}}}
+
+or from the local machine using the !PostgreSQL command line client, as follows:
+
+{{{#!blockquote
+{{{#!code
+psql -h localhost -U postgresqluser
+}}}
+}}}
 
 ----
 
@@ -2584,7 +2843,7 @@ In this example, !FreeTDS is configured to require an encrypted connection to th
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost
 	port = 1433
 	tds version = 7.1
@@ -2599,7 +2858,7 @@ In this example, !FreeTDS is also configured to validate the database server's c
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost
 	port = 1433
 	tds version = 7.1
@@ -2614,7 +2873,7 @@ In this example, !FreeTDS is also configured to validate that the common name in
 
 {{{#!blockquote
 {{{#!code
-[EXAMPLEDB]
+[FREETDSSERVER]
 	host = examplehost.yourdomain.com
 	port = 1433
 	tds version = 7.1
@@ -2627,7 +2886,7 @@ In this example, !FreeTDS is also configured to validate that the common name in
 
 Note that the host parameter has been updated to specify a fully qualified domain name.  This is the value that the common name will be compared to.
 
-The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, EXAMPLEDB refers to the !FreeTDS EXAMPLEDB entry configured above:
+The SQL Relay configuration is no different than the configuration for an insecure connection.  In this example, FREETDSSERVER refers to the !FreeTDS FREETDSSERVER entry configured above:
 
 {{{#!blockquote
 {{{#!code
@@ -2844,7 +3103,7 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 In this example, the //id// and //count// attributes configure the //rot// module.  "13" tells the module to rotate by 13 characters.  The //id// attribute assigns this particular module configuration an id that will be referenced by user and connection tags.  The //id// attribute is mandatory.
 
-Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "examplepassword").  A command line program (described below) is provided to encrypt passwords.
+Note that the password in the user tag is encrypted (unencrypted, it would just be "sqlrpassword") and that the password in the string attribute of the connection tag is also encrypted (unencrypted, it would just be "oraclepassword").  A command line program (described below) is provided to encrypt passwords.
 
 Note also that the passwordencryptionid attribute in both tags refers to the id of the module as set using the //id// attribute in the passwordencryption tag ( //rot13enc// ), not the module name ( //rot// ).
 
@@ -2877,12 +3136,12 @@ For example:
 
 {{{#!blockquote
 {{{
-$ sqlr-pwdenc -id example -pwdencid rot13enc -password examplepassword
-rknzcyrcnffjbeq
+$ sqlr-pwdenc -id example -pwdencid rot13enc -password oraclepassword
+benpyrcnffjbeq
 }}}
 }}}
 
-The resulting string "rknzcyrcnffjbeq" can now be put in the configuration file as the password.
+The resulting string "benpyrcnffjbeq" can now be put in the configuration file as the password.
 
 There is one final thing to note.  Command line client programs like sqlrsh and sqlr-import take a -id option.  The -id option causes the program to open the configuration file and extract the host, port, socket, user and password from the specified instance.  If the password is encrypted, then the encrypted password will be extracted and passed to the server.  This will fail.  So, when using the -id option with an encrypted password, you must also use the -user and -password option, to override the user/password that are extracted from the configuration file.
 
@@ -2908,7 +3167,7 @@ Currently, the following password encryption modules are available in the standa
 * md5
 * sha1
 * sha256
-* crypt
+* des
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
@@ -2969,14 +3228,14 @@ The '''sha256''' module is a one-way encryption module that encrypts the passwor
 Since the SHA-256 algorithm is one-way, it can be used to encrypt passwords for SQL Relay users, but not database users.
 
 
-[[br]][=#crypt]
-=== crypt ===
+[[br]][=#des]
+=== des ===
 
-The '''crypt''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
+The '''des''' module is a one-way encryption module that encrypts the password using the [http://en.wikipedia.org/wiki/Data_Encryption_Standard DES] algorithm using a salt specified in the //salt// attribute.  The salt is required and must be a 2 digit alphanumeric code.
 
 {{{#!blockquote
 {{{#!code
-@parts/sqlrelay-pwdencs-crypt.conf@
+@parts/sqlrelay-pwdencs-des.conf@
 }}}
 }}}
 

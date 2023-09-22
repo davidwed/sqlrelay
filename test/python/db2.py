@@ -23,7 +23,7 @@ def main():
 
 	# instantiation
 	con=PySQLRClient.sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-								"test","test")
+								"db2inst1","testpassword")
 	cur=PySQLRClient.sqlrcursor(con)
 
 	# get database type

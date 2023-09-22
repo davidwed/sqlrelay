@@ -97,12 +97,12 @@ int	main(int argc, char **argv) {
 		#if MYSQL_VERSION_ID>=32200
 			checkSuccess((long)mysql_real_connect(
 						&mysql,host,user,password,db,
-						charstring::toInteger(port),
+						charstring::convertToInteger(port),
 						socket,0),(long)&mysql);
 		#else
 			checkSuccess((long)mysql_real_connect(
 						&mysql,host,user,password,
-						charstring::toInteger(port),
+						charstring::convertToInteger(port),
 						socket,0),(long)&mysql);
 			if (!charstring::isNullOrEmpty(db)) {
 				checkSuccess(mysql_select_db(&mysql,db),0);
@@ -124,7 +124,7 @@ int	main(int argc, char **argv) {
 #else
 	const char	*query="select ?,?";
 #endif
-	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::length(query)),0);
+	checkSuccess(mysql_stmt_prepare(stmt,query,charstring::getLength(query)),0);
 #ifdef FULL
 	MYSQL_BIND	bind[14];
 	unsigned long	bindlength[14];

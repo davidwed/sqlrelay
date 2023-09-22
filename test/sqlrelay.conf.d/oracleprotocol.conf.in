@@ -5,11 +5,6 @@
 		<listeners>
 			<listener protocol="oracle" port="1521"/>
 		</listeners>
-		<auths>
-			<auth module="userlist">
-				<user user="scott" password="tiger"/>
-			</auth>
-		</auths>
 		<connections>
                         <connection string="user=scott;password=tiger;oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle11g)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));"/>
 		</connections>

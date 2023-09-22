@@ -5,11 +5,6 @@
 		<listeners>
 			<listener protocol="tds" port="1433"/>
 		</listeners>
-		<auths>
-			<auth module="userlist">
-				<user user="testuser" password="testpassword"/>
-			</auth>
-		</auths>
 		<connections>
 			<connection string="dsn=mssqlodbc;user=testuser;password=testpassword"/>
 		</connections>

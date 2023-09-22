@@ -219,7 +219,7 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 			// internally defined status
 			if (cs->state<=WAIT_SEMAPHORE) {
 				*field=statenames[cs->state];
-				*fieldlength=charstring::length(*field);
+				*fieldlength=charstring::getLength(*field);
 				return;
 			}
 			*null=true;
@@ -229,11 +229,11 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 			// state_time -
 			// seconds the connection has been in its current state
 			datetime	dt;
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			double	statetime=
-				((double)(dt.getSeconds()-
+				((double)(dt.getSecond()-
 					cs->statestartsec))+
-				((double)(dt.getMicroseconds()-
+				((double)(dt.getMicrosecond()-
 					cs->statestartusec))/1000000.0;
 			fieldbuffer[col]=charstring::parseNumber(statetime,
 					colinfo[5].precision,colinfo[5].scale);
@@ -243,19 +243,19 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 			// client_addr -
 			// address of currently connected client
 			*field=cs->clientaddr;
-			*fieldlength=charstring::length(*field);
+			*fieldlength=charstring::getLength(*field);
 			return;
 		case 7:
 			// client info -
 			// client info string
 			*field=cs->clientinfo;
-			*fieldlength=charstring::length(*field);
+			*fieldlength=charstring::getLength(*field);
 			return;
 		case 8:
 			// sql_text -
 			// query currently being executed
 			*field=cs->sqltext;
-			*fieldlength=charstring::length(*field);
+			*fieldlength=charstring::getLength(*field);
 			return;
 		default:
 			*null=true;
@@ -263,7 +263,7 @@ void sqlrquery_sqlrcmdcstatcursor::getField(uint32_t col,
 	}
 
 	*field=fieldbuffer[col];
-	*fieldlength=charstring::length(fieldbuffer[col]);
+	*fieldlength=charstring::getLength(fieldbuffer[col]);
 }
 
 extern "C" {

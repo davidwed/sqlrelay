@@ -38,6 +38,8 @@ extern "C" {
 #define NEED_IS_BIT_TYPE_CHAR 1
 #define NEED_BIT_STRING_TO_LONG 1
 #define NEED_IS_BOOL_TYPE_CHAR 1
+#define NEED_IS_BINARY_TYPE_CHAR 1
+#define NEED_IS_DATETIME_TYPE_CHAR 1
 #include <datatypes.h>
 
 bool usenumeric=false;
@@ -52,6 +54,31 @@ static PyObject *getNumericFieldsAsStrings(PyObject *self, PyObject *args) {
 static PyObject *getNumericFieldsAsNumbers(PyObject *self, PyObject *args) {
   usenumeric=true;
   return Py_BuildValue("h", 0);
+}
+
+static PyObject *buildConstPyString(const char *str,
+#ifdef PY_SSIZE_T_CLEAN
+ssize_t len,
+#else
+uint32_t len,
+#endif
+bool binary) {
+  return Py_BuildValue(
+#if PY_MAJOR_VERSION >= 3
+            (binary)?"y#":
+#endif
+            "s#",
+            str, len);
+}
+
+static PyObject *buildConstPyStringT(const char *str,
+#ifdef PY_SSIZE_T_CLEAN
+ssize_t len,
+#else
+uint32_t len,
+#endif
+const char *type) {
+  return buildConstPyString(str,len,isBinaryTypeChar(type) && !isDateTimeTypeChar(type));
 }
 
 static PyObject *sqlrcon_alloc(PyObject *self, PyObject *args) {
@@ -335,6 +362,17 @@ static PyObject *bindFormat(PyObject *self, PyObject *args) {
     return NULL;
   Py_BEGIN_ALLOW_THREADS
   rc=((sqlrconnection *)sqlrcon)->bindFormat();
+  Py_END_ALLOW_THREADS
+  return Py_BuildValue("s", rc);
+}
+
+static PyObject *nextvalFormat(PyObject *self, PyObject *args) {
+  long sqlrcon;
+  const char *rc;
+  if (!PyArg_ParseTuple(args, "l", &sqlrcon))
+    return NULL;
+  Py_BEGIN_ALLOW_THREADS
+  rc=((sqlrconnection *)sqlrcon)->nextvalFormat();
   Py_END_ALLOW_THREADS
   return Py_BuildValue("s", rc);
 }
@@ -900,6 +938,8 @@ static PyObject *inputBindBlob(PyObject *self, PyObject *args) {
     ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, NULL, size);
   } else if (PyString_Check(value)) {
     ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, PyString_AsString(value), size);
+  } else if (PyBytes_Check(value)) {
+    ((sqlrcursor *)sqlrcur)->inputBindBlob(variable, PyBytes_AsString(value), size);
   } else {
     success=0;
   }
@@ -1099,7 +1139,7 @@ static PyObject *getOutputBindBlob(PyObject *self, PyObject *args) {
     return NULL;
   rc=((sqlrcursor *)sqlrcur)->getOutputBindBlob(variable);
   rl=((sqlrcursor *)sqlrcur)->getOutputBindLength(variable);
-  return Py_BuildValue("s#", rc, rl);
+  return buildConstPyString(rc, rl, true);
 }
 
 static PyObject *getOutputBindClob(PyObject *self, PyObject *args) {
@@ -1295,17 +1335,17 @@ static PyObject *getField(PyObject *self, PyObject *args) {
       PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", rc, rl));
       return PyObject_CallObject(decimal, tuple);
     } else {
-      return Py_BuildValue("f",(double)charstring::toFloatC(rc));
+      return Py_BuildValue("f",(double)charstring::convertToFloatC(rc));
     }
   } else if (usenumeric && isNumberTypeChar(type)) {
-    return Py_BuildValue("L",charstring::toInteger(rc));
+    return Py_BuildValue("L",charstring::convertToInteger(rc));
   } else if (isBitTypeChar(type)) {
     return Py_BuildValue("l",bitStringToLong(rc));
   } else if (isBoolTypeChar(type)) {
-    if (rc && character::toLowerCase(rc[0]) == 't') {
+    if (rc && character::lower(rc[0]) == 't') {
       Py_INCREF(Py_True);
       return Py_True;
-    } else if (rc && character::toLowerCase(rc[0]) == 'f') {
+    } else if (rc && character::lower(rc[0]) == 'f') {
       Py_INCREF(Py_False);
       return Py_False;
     } else {
@@ -1313,7 +1353,7 @@ static PyObject *getField(PyObject *self, PyObject *args) {
       return Py_None;
     }
   }
-  return Py_BuildValue("s#", rc, rl);
+  return buildConstPyStringT(rc, rl, type);
 }
 
 static PyObject *getFieldAsInteger(PyObject *self, PyObject *args) {
@@ -1428,18 +1468,18 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
         PyTuple_SetItem(tuple, 0, Py_BuildValue("s#", row_data[counter], rl));
         obj=PyObject_CallObject(decimal, tuple);
       } else {
-        obj=Py_BuildValue("f", (double)charstring::toFloatC(row_data[counter]));
+        obj=Py_BuildValue("f", (double)charstring::convertToFloatC(row_data[counter]));
       }
       PyList_SetItem(my_list, counter, obj);
     } else if (usenumeric && isNumberTypeChar(type)) {
-      PyList_SetItem(my_list, counter, Py_BuildValue("L", charstring::toInteger(row_data[counter])));
+      PyList_SetItem(my_list, counter, Py_BuildValue("L", charstring::convertToInteger(row_data[counter])));
     } else if (isBitTypeChar(type)) {
       PyList_SetItem(my_list, counter, Py_BuildValue("l", bitStringToLong(row_data[counter])));
     } else if (isBoolTypeChar(type)) {
-      if (row_data[counter] && character::toLowerCase(row_data[counter][0]) == 't') {
+      if (row_data[counter] && character::lower(row_data[counter][0]) == 't') {
         Py_INCREF(Py_True);
         PyList_SetItem(my_list, counter, Py_True);
-      } else if (row_data[counter] && character::toLowerCase(row_data[counter][0]) == 'f') {
+      } else if (row_data[counter] && character::lower(row_data[counter][0]) == 'f') {
         Py_INCREF(Py_False);
         PyList_SetItem(my_list, counter, Py_False);
       } else {
@@ -1447,7 +1487,7 @@ _get_row(sqlrcursor *sqlrcur, uint64_t row)
         PyList_SetItem(my_list, counter, Py_None);
       }
     } else {
-      PyList_SetItem(my_list, counter, Py_BuildValue("s#", row_data[counter], rl));
+      PyList_SetItem(my_list, counter, buildConstPyStringT(row_data[counter], row_lengths[counter], type));
     }
   }
   return my_list;
@@ -1499,17 +1539,17 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
           PyTuple_SetItem(tuple, 0, Py_BuildValue("s", field));
           PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), PyObject_CallObject(decimal, tuple));
         } else {
-          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",(double)charstring::toFloatC(field)));
+          PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("f",(double)charstring::convertToFloatC(field)));
         }
     } else if (usenumeric && isNumberTypeChar(type)) {
-      PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::toInteger(field)));
+      PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("L", charstring::convertToInteger(field)));
     } else if (isBitTypeChar(type)) {
       PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_BuildValue("l", bitStringToLong(field)));
     } else if (isBoolTypeChar(type)) {
-      if (field && character::toLowerCase(field[0]) == 't') {
+      if (field && character::lower(field[0]) == 't') {
         Py_INCREF(Py_True);
         PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_True);
-      } else if (field && character::toLowerCase(field[0]) == 'f') {
+      } else if (field && character::lower(field[0]) == 'f') {
         Py_INCREF(Py_False);
         PyDict_SetItem(my_dictionary, Py_BuildValue("s", name), Py_False);
       } else {
@@ -1519,11 +1559,12 @@ static PyObject *getRowDictionary(PyObject *self, PyObject *args) {
     } else {
       if (field) {
         PyDict_SetItem(my_dictionary, Py_BuildValue("s", name),
-                Py_BuildValue("s#", field,
+                buildConstPyStringT(field,
                         #ifdef PY_SSIZE_T_CLEAN
                         (ssize_t)
                         #endif
-                        (((sqlrcursor *)sqlrcur)->getFieldLength(row, counter))
+                        (((sqlrcursor *)sqlrcur)->getFieldLength(row, counter)),
+			type
                 )
         );
       } else {
@@ -2020,6 +2061,7 @@ static PyMethodDef SQLRMethods[] = {
   {"serverVersion", serverVersion, METH_VARARGS},
   {"clientVersion", clientVersion, METH_VARARGS},
   {"bindFormat", bindFormat, METH_VARARGS},
+  {"nextvalFormat", nextvalFormat, METH_VARARGS},
   {"selectDatabase", selectDatabase, METH_VARARGS},
   {"getCurrentDatabase", getCurrentDatabase, METH_VARARGS},
   {"getLastInsertId", getLastInsertId, METH_VARARGS},

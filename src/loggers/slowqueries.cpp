@@ -37,8 +37,8 @@ sqlrlogger_slowqueries::sqlrlogger_slowqueries(sqlrloggers *ls,
 						domnode *parameters) :
 						sqlrlogger(ls,parameters) {
 	querylogname=NULL;
-	sec=charstring::toInteger(parameters->getAttributeValue("sec"));
-	usec=charstring::toInteger(parameters->getAttributeValue("usec"));
+	sec=charstring::convertToInteger(parameters->getAttributeValue("sec"));
+	usec=charstring::convertToInteger(parameters->getAttributeValue("usec"));
 	totalusec=sec*1000000+usec;
 	usecommand=!charstring::compareIgnoringCase(
 			parameters->getAttributeValue("timer"),"command");
@@ -77,7 +77,7 @@ bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
 
 	// create the new log file
 	if (!querylog.create(querylogname,
-				permissions::evalPermString("rw-------"))) {
+				permissions::parsePermString("rw-------"))) {
 		return false;
 	}
 
@@ -142,7 +142,7 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 	if (queryusec>=totalusec) {
 
 		datetime	dt;
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		char	datebuffer[26];
 		charstring::printf(datebuffer,sizeof(datebuffer),
 					"%s %d %s % 2d  %02d:%02d:%02d",
@@ -151,8 +151,8 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 					dt.getMonthAbbreviation(),
 					dt.getDayOfMonth(),
 					dt.getHour(),
-					dt.getMinutes(),
-					dt.getSeconds());
+					dt.getMinute(),
+					dt.getSecond());
 		
 		stringbuffer	logentry;
 		logentry.append(datebuffer)->append(" :\n");

@@ -407,19 +407,19 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("SESSION QUERIES: Date Format\n");
 	checkSuccess(cur->sendQuery("select sysdate from dual"),1);
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	const char	*field=cur->getField(0,(uint32_t)0);
-	char	*day=charstring::subString(field,0,1);
-	char	*month=charstring::subString(field,3,4);
-	char	*year=charstring::subString(field,6,9);
-	char	*hour=charstring::subString(field,11,12);
-	char	*minute=charstring::subString(field,14,15);
-	checkSuccess((int)charstring::toInteger(day),(int)dt.getDayOfMonth());
-	checkSuccess((int)charstring::toInteger(month),(int)dt.getMonth());
-	checkSuccess((int)charstring::toInteger(year),(int)dt.getYear());
-	checkSuccess((int)charstring::toInteger(hour),(int)dt.getHour());
-	int	dbmin=(int)charstring::toInteger(minute);
-	int	min=(int)dt.getMinutes();
+	char	*day=charstring::getSubString(field,0,1);
+	char	*month=charstring::getSubString(field,3,4);
+	char	*year=charstring::getSubString(field,6,9);
+	char	*hour=charstring::getSubString(field,11,12);
+	char	*minute=charstring::getSubString(field,14,15);
+	checkSuccess((int)charstring::convertToInteger(day),(int)dt.getDayOfMonth());
+	checkSuccess((int)charstring::convertToInteger(month),(int)dt.getMonth());
+	checkSuccess((int)charstring::convertToInteger(year),(int)dt.getYear());
+	checkSuccess((int)charstring::convertToInteger(hour),(int)dt.getHour());
+	int	dbmin=(int)charstring::convertToInteger(minute);
+	int	min=(int)dt.getMinute();
 	bool	success=((dbmin==min) || (dbmin==min-1) || (dbmin-1==min));
 	checkSuccess(success,1);
 	delete[] year;
@@ -553,11 +553,18 @@ int	main(int argc, char **argv) {
 	checkSuccess(cur->sendQuery("drop table student"),1);
 	checkSuccess(cur->sendQuery("drop sequence student_id"),1);
 	delete secondcur;
-	delete cur;
-	delete con;
+	stdoutput.printf("\n\n");
+
+	stdoutput.printf("ERROR TRANSLATION:\n");
+	checkSuccess(cur->sendQuery("select 1"),0);
+	checkSuccess(cur->errorNumber(),10923);
+	checkSuccess(cur->errorMessage(),
+			"ORA-10923: fRoM kEyWoRd nOt fOuNd wHeRe eXpEcTeD");
 	stdoutput.printf("\n\n");
 
 	stdoutput.printf("done\n");
+	delete cur;
+	delete con;
 	stdoutput.printf("\n\n");
 
 	return 0;

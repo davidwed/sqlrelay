@@ -80,15 +80,15 @@ if ($DBI::VERSION>=1.43) {
 
 # connect
 print("CONNECT: \n");
-my $dbh=DBI->connect($dsn,"test","test") or die DBI->errstr;
+my $dbh=DBI->connect($dsn,"testuser","testpassword") or die DBI->errstr;
 checkSuccessString($dbh->{Type},"db");
 if ($DBI::VERSION>=1.40) {
-	checkSuccessString($dbh->{Username},"test");
+	checkSuccessString($dbh->{Username},"testuser");
 }
 checkDefined($dbh);
 $dbh->disconnect();
 $ENV{"DBI_DSN"}=$dsn;
-my $dbh=DBI->connect(undef,"test","test",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
+my $dbh=DBI->connect(undef,"testuser","testpassword",{AutoCommit=>0,PrintError=>0}) or die DBI->errstr;
 checkDefined($dbh);
 checkSuccessString($dbh->{Name},$connectstring);
 print("\n");
@@ -603,7 +603,7 @@ checkSuccessString($$rows[6][1],"testchar7                               ");
 print("\n");
 
 print("COMMIT AND ROLLBACK: \n");
-my $dbh2=DBI->connect($dsn,"test","test",{AutoCommit=>0}) or die DBI->errstr;
+my $dbh2=DBI->connect($dsn,"testuser","testpassword",{AutoCommit=>0}) or die DBI->errstr;
 my @row=$dbh2->selectrow_array("select count(*) from testtable");
 checkSuccess($row[0],0);
 if ($DBI::VERSION>=1.41) {
@@ -753,7 +753,7 @@ print("GET INFO: \n");
 #checkSuccessString($dbh->get_info($GetInfoType{SQL_DATA_SOURCE_NAME}),"TESTUSER");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_NAME}),"oracle");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_DBMS_VER}),"Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production");
-checkSuccessString($dbh->get_info($GetInfoType{SQL_USER_NAME}),"test");
+checkSuccessString($dbh->get_info($GetInfoType{SQL_USER_NAME}),"testuser");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_IDENTIFIER_QUOTE_CHAR}),"\"");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_CATALOG_NAME_SEPARATOR}),"@");
 checkSuccessString($dbh->get_info($GetInfoType{SQL_CATALOG_LOCATION}),2);
@@ -772,7 +772,7 @@ print("\n");
 
 print("NON-LAZY CONNECT: \n");
 $dsn = $prefix."sqlrelay:host=invalidhost;port=0;socket=/invalidsocket;tries=1;retrytime=1;debug=0;lazyconnect=0";
-checkUndef(DBI->connect($dsn,"test","test"));
+checkUndef(DBI->connect($dsn,"testuser","testpassword"));
 print("\n");
 
 # invalid queries...

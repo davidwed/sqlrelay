@@ -141,11 +141,11 @@ void sqlrrowlist::setRow(uint64_t row) {
 	pvt->_node.setRow(row);
 }
 
-bool sqlrrowlist::getIsReadOnly() {
+bool sqlrrowlist::isReadOnly() {
 	return true;
 }
 
-bool sqlrrowlist::getIsBlockBased() {
+bool sqlrrowlist::isBlockBased() {
 	return true;
 }
 
@@ -218,7 +218,7 @@ bool sqlrrowlist::remove(listnode<const char *> *node) {
 	return true;
 }
 
-uint64_t sqlrrowlist::getLength() {
+uint64_t sqlrrowlist::getCount() {
 	return pvt->_node.getCursor()->colCount();
 }
 
@@ -256,16 +256,17 @@ listnode<const char *> *sqlrrowlist::find(
 	return NULL;
 }
 
-void sqlrrowlist::insertionSort() {
+void sqlrrowlist::sortInexpensively() {
 	// do nothing
 }
 
-void sqlrrowlist::heapSort() {
+void sqlrrowlist::sortQuickly() {
 	// do nothing
 }
 
-void sqlrrowlist::clear() {
+bool sqlrrowlist::clear() {
 	// do nothing
+	return true;
 }
 
 class sqlrresultsetlistprivate {
@@ -310,11 +311,11 @@ void sqlrresultsetlist::setColumn(uint32_t col) {
 	pvt->_node.setColumn(col);
 }
 
-bool sqlrresultsetlist::getIsReadOnly() {
+bool sqlrresultsetlist::isReadOnly() {
 	return true;
 }
 
-bool sqlrresultsetlist::getIsBlockBased() {
+bool sqlrresultsetlist::isBlockBased() {
 	return true;
 }
 
@@ -387,7 +388,7 @@ bool sqlrresultsetlist::remove(listnode<const char *> *node) {
 	return true;
 }
 
-uint64_t sqlrresultsetlist::getLength() {
+uint64_t sqlrresultsetlist::getCount() {
 	return pvt->_node.getCursor()->colCount();
 }
 
@@ -425,14 +426,15 @@ listnode<const char *> *sqlrresultsetlist::find(
 	return NULL;
 }
 
-void sqlrresultsetlist::insertionSort() {
+void sqlrresultsetlist::sortInexpensively() {
 	// do nothing
 }
 
-void sqlrresultsetlist::heapSort() {
+void sqlrresultsetlist::sortQuickly() {
 	// do nothing
 }
 
-void sqlrresultsetlist::clear() {
+bool sqlrresultsetlist::clear() {
 	// do nothing
+	return true;
 }

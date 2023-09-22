@@ -14,7 +14,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_postgresql_userlist : public sqlrauth {
 							sqlrpwdencs *sqlrpe,
 							domnode *parameters);
 		const char	*auth(sqlrcredentials *cred);
-		bool	compare(const char *suppliedresponse,
+		bool		compare(const char *suppliedresponse,
 					uint64_t suppliedresponselength,
 					const char *user,
 					const char *validpassword,
@@ -61,7 +61,6 @@ sqlrauth_postgresql_userlist::sqlrauth_postgresql_userlist(
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
-		// FIXME: options?
 		passwordvalue.parse(user->getAttributeValue("password"));
 		passwords[i]=passwordvalue.detachTextValue();
 
@@ -114,7 +113,7 @@ const char *sqlrauth_postgresql_userlist::auth(sqlrcredentials *cred) {
 	}
 
 	// sanity check on method
-	if (!charstring::inSet(method,supportedmethods)) {
+	if (!charstring::isInSet(method,supportedmethods)) {
 		return NULL;
 	}
 
@@ -125,7 +124,7 @@ const char *sqlrauth_postgresql_userlist::auth(sqlrcredentials *cred) {
 		if (!charstring::compare(user,users[i])) {
 
 			if (getPasswordEncryptions() &&
-				charstring::length(passwordencryptions[i])) {
+				charstring::getLength(passwordencryptions[i])) {
 
 				// if password encryption is being used...
 
@@ -214,24 +213,24 @@ bool sqlrauth_postgresql_userlist::compare(const char *suppliedresponse,
 
 		// md5(concat(password,user))
 		md5	md1;
-		md1.append((unsigned char *)validpassword,
-				charstring::length(validpassword));
-		md1.append((unsigned char *)user,
-				charstring::length(user));
+		md1.append((byte_t *)validpassword,
+				charstring::getLength(validpassword));
+		md1.append((byte_t *)user,
+				charstring::getLength(user));
 		char	*md1str=charstring::hexEncode(md1.getHash(),
 							md1.getHashSize());
 
 		// md5(concat(...above...,salt))
 		md5	md2;
-		md2.append((unsigned char *)md1str,charstring::length(md1str));
-		md2.append((unsigned char *)&salt,sizeof(salt));
+		md2.append((byte_t *)md1str,charstring::getLength(md1str));
+		md2.append((byte_t *)&salt,sizeof(salt));
 		char	*md2str=charstring::hexEncode(md2.getHash(),
 							md2.getHashSize());
 		
 		// concat('md5',...above...)
 		stringbuffer	result;
 		result.append("md5",3);
-		result.append(md2str,charstring::length(md2str));
+		result.append(md2str,charstring::getLength(md2str));
 		delete[] md2str;
 
 		return (result.getSize()==suppliedresponselength) &&

@@ -39,7 +39,7 @@ var	fieldlens;
 var	con=new sqlrelay.SQLRConnection("sqlrelay",
 					9000,
 					"/tmp/test.socket",
-					"test","test",0,1);
+					"db2inst1","testpassword",0,1);
 var	cur=new sqlrelay.SQLRCursor(con);
 	
 // get database type

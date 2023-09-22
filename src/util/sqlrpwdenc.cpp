@@ -1,14 +1,14 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserver.h>
+#include <sqlrelay/sqlrutil.h>
 #include <rudiments/charstring.h>
 
 class sqlrpwdencprivate {
 	friend class sqlrpwdenc;
 	private:
 		domnode	*_parameters;
-		bool		_debug;
+		bool	_debug;
 };
 
 sqlrpwdenc::sqlrpwdenc(domnode *parameters, bool debug) {

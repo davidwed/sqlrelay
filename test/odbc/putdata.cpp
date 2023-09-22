@@ -107,8 +107,8 @@ int	main(int argc, char **argv) {
 	// connect
 	printf("CONNECT: \n");
 	dsn=(SQLCHAR *)"sqlrodbc";
-	user=(SQLCHAR *)"test";
-	password=(SQLCHAR *)"test";
+	user=(SQLCHAR *)"testuser";
+	password=(SQLCHAR *)"testpassword";
 	erg=SQLConnect(dbc,dsn,SQL_NTS,user,SQL_NTS,password,SQL_NTS);
 	checkSuccessInt((erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO)?1:0,1);
 	printf("\n");

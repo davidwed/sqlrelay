@@ -307,7 +307,7 @@ void sqlrquery_sqlrcmdgstatcursor::getField(uint32_t col,
 	} else {
 		*field=NULL;
 	}
-	*fieldlength=charstring::length(*field);
+	*fieldlength=charstring::getLength(*field);
 	*blob=false;
 	*null=false;
 }

@@ -16,4 +16,5 @@ tds: tds.cpp tds.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) tds.$(OBJ) $(FREETDSLIBS) $(RUDIMENTSLIBS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class tds$(EXE)
+	$(RM) *.lo *.o *.obj *.class tds$(EXE)
+	$(RMTREE) .libs

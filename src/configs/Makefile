@@ -13,11 +13,11 @@ include ../../config.mk
 all: $(SQLR)config_xmldom.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)config_xmldom.$(LIBEXT): xmldom.cpp xmldom.$(OBJ)
-	$(LTLINK) $(LINK) $(OUT)$@ xmldom.$(OBJ) $(LDFLAGS) $(CONFIGPLUGINLIBS) $(MODLINKFLAGS)
+	$(LTLINK) $(LINK) $(OUT)$@ xmldom.$(OBJ) $(LDFLAGS) $(UTILPLUGINLIBS) $(MODLINKFLAGS)
 
 install: $(INSTALLLIB)
 

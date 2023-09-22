@@ -24,7 +24,7 @@ end
 
 # instantiation
 con=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket",
-						"test","test",0,1)
+						"testuser","testpassword",0,1)
 cur=SQLRCursor.new(con)
 
 print "IDENTIFY: \n"
@@ -633,7 +633,7 @@ print "\n"
 
 print "COMMIT AND ROLLBACK: \n"
 secondcon=SQLRConnection.new("sqlrelay",9000,"/tmp/test.socket",
-						"test","test",0,1)
+						"testuser","testpassword",0,1)
 secondcur=SQLRCursor.new(secondcon)
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 checkSuccess(secondcur.getField(0,0),"0")

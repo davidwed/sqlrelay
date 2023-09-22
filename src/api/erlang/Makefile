@@ -16,7 +16,7 @@ LOBJS = erl_comm.$(OBJ) relay_driver.$(OBJ)
 all: sqlrelay.beam sqlrelay
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj sqlrelay.erl sqlrelay *.beam *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj sqlrelay.erl sqlrelay *.beam *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 sqlrelay.erl: sqlrelay.erl.in

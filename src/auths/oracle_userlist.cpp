@@ -5,6 +5,7 @@
 #include <rudiments/charstring.h>
 #include <rudiments/bytebuffer.h>
 #include <rudiments/sha1.h>
+#include <rudiments/sensitivevalue.h>
 
 class SQLRSERVER_DLLSPEC sqlrauth_oracle_userlist : public sqlrauth {
 	public:
@@ -13,7 +14,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_oracle_userlist : public sqlrauth {
 							sqlrpwdencs *sqlrpe,
 							domnode *parameters);
 		const char	*auth(sqlrcredentials *cred);
-		bool	compare(const char *suppliedresponse,
+		bool		compare(const char *suppliedresponse,
 					uint64_t suppliedresponselength,
 					const char *validpassword,
 					const char *method,
@@ -23,6 +24,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_oracle_userlist : public sqlrauth {
 		const char	**passwords;
 		const char	**passwordencryptions;
 		uint64_t	usercount;
+
+		sensitivevalue	passwordvalue;
 
 		bool	debug;
 };
@@ -55,7 +58,8 @@ sqlrauth_oracle_userlist::sqlrauth_oracle_userlist(
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
-		passwords[i]=user->getAttributeValue("password");
+		passwordvalue.parse(user->getAttributeValue("password"));
+		passwords[i]=passwordvalue.detachTextValue();
 
 		// support modern "passwordencryptionid" and fall back to
 		// older "passwordencryption" attribute
@@ -104,7 +108,7 @@ const char *sqlrauth_oracle_userlist::auth(sqlrcredentials *cred) {
 	}
 
 	// sanity check on method
-	if (!charstring::inSet(method,supportedauthplugins)) {
+	if (!charstring::isInSet(method,supportedauthplugins)) {
 		return NULL;
 	}
 
@@ -115,7 +119,7 @@ const char *sqlrauth_oracle_userlist::auth(sqlrcredentials *cred) {
 		if (!charstring::compare(user,users[i])) {
 
 			if (getPasswordEncryptions() &&
-				charstring::length(passwordencryptions[i])) {
+				charstring::getLength(passwordencryptions[i])) {
 
 				// if password encryption is being used...
 
@@ -202,8 +206,8 @@ bool sqlrauth_oracle_userlist::compare(const char *suppliedresponse,
 
 	// sha1(password)
 	sha1	s1;
-	s1.append((const unsigned char *)validpassword,
-			charstring::length(validpassword));
+	s1.append((const byte_t *)validpassword,
+			charstring::getLength(validpassword));
 	bytebuffer	sha1pass;
 	sha1pass.append(s1.getHash(),s1.getHashSize());
 
@@ -215,7 +219,7 @@ bool sqlrauth_oracle_userlist::compare(const char *suppliedresponse,
 
 	// concat(randombytes,sha1(sha1(password)))
 	bytebuffer	rbsha1sha1pass;
-	rbsha1sha1pass.append(extra,charstring::length(extra));
+	rbsha1sha1pass.append(extra,charstring::getLength(extra));
 	rbsha1sha1pass.append(sha1sha1pass.getBuffer(),sha1sha1pass.getSize());
 
 	// sha1(concat(randombytes,sha1(sha1(password))))
@@ -226,10 +230,10 @@ bool sqlrauth_oracle_userlist::compare(const char *suppliedresponse,
 	
 	// sha1(password) xor sha1(concat(randombytes,sha1(sha1(password))))
 	bytebuffer	expectedresponse;
-	const unsigned char	*bytes1=sha1pass.getBuffer();
-	const unsigned char	*bytes2=sha1rbsha1sha1pass.getBuffer();
+	const byte_t	*bytes1=sha1pass.getBuffer();
+	const byte_t	*bytes2=sha1rbsha1sha1pass.getBuffer();
 	for (uint64_t i=0; i<sha1pass.getSize(); i++) {
-		expectedresponse.append((unsigned char)(bytes1[i]^bytes2[i]));
+		expectedresponse.append((byte_t)(bytes1[i]^bytes2[i]));
 	}
 
 	if (debug) {

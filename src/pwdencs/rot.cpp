@@ -18,12 +18,12 @@ sqlrpwenc_rot::sqlrpwenc_rot(domnode *parameters, bool debug) :
 }
 
 char *sqlrpwenc_rot::encrypt(const char *value) {
-	return rotate(value,charstring::toInteger(
+	return rotate(value,charstring::convertToInteger(
 				getParameters()->getAttributeValue("count")));
 }
 
 char *sqlrpwenc_rot::decrypt(const char *value) {
-	return rotate(value,-charstring::toInteger(
+	return rotate(value,-charstring::convertToInteger(
 				getParameters()->getAttributeValue("count")));
 }
 
@@ -31,7 +31,7 @@ char *sqlrpwenc_rot::rotate(const char *value, int64_t count) {
 
 	// get the size of the value passed in and
 	// allocate space for the return value
-	size_t	len=charstring::length(value);
+	size_t	len=charstring::getLength(value);
 	char	*retval=new char[len+1];
 
 	// normalize the counts

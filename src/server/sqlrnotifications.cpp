@@ -43,7 +43,7 @@ sqlrnotifications::sqlrnotifications(sqlrpaths *sqlrpth) {
 	pvt=new sqlrnotificationsprivate;
 	pvt->_libexecdir=sqlrpth->getLibExecDir();
 	pvt->_tmpdir=sqlrpth->getTmpDir();
-	pvt->_tmpfilename=new char[charstring::length(
+	pvt->_tmpfilename=new char[charstring::getLength(
 					sqlrpth->getTmpDir())+6+1];
 }
 
@@ -98,10 +98,10 @@ void sqlrnotifications::loadNotification(domnode *notification) {
 
 	// get the notification name
 	const char	*module=notification->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=notification->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}
@@ -262,7 +262,7 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		charstring::copy(pvt->_tmpfilename,pvt->_tmpdir);
 		charstring::append(pvt->_tmpfilename,"XXXXXX");
 		int32_t	tfd=file::createTemporaryFile(pvt->_tmpfilename,
-				permissions::evalPermString("rw-------"));
+				permissions::parsePermString("rw-------"));
 		if (tfd==-1) {
 			delete[] subj;
 			delete[] msg;
@@ -274,8 +274,8 @@ bool sqlrnotifications::sendNotification(sqlrlistener *sqlrl,
 		// write the message to the temp file
 		file	tf;
 		tf.setFileDescriptor(tfd);
-		if (tf.write(msg,charstring::length(msg))!=
-					(ssize_t)charstring::length(msg)) {
+		if (tf.write(msg,charstring::getLength(msg))!=
+					(ssize_t)charstring::getLength(msg)) {
 			tf.close();
 			file::remove(pvt->_tmpfilename);
 			delete[] subj;
@@ -370,7 +370,7 @@ char *sqlrnotifications::substitutions(sqlrlistener *sqlrl,
 
 	// get various bits of data for substitutions
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	char	*hostname=NULL;
 	char	*pid=NULL;
 

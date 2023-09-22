@@ -10,7 +10,7 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(STRESSCPPFLAGS) $(COMPILE) $<
 
-all: socketeater stress testtable
+all: socketeater stress testtable churn
 
 socketeater: socketeater.cpp socketeater.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) socketeater.$(OBJ) $(STRESSLIBS)
@@ -21,6 +21,9 @@ stress: stress.cpp stress.$(OBJ)
 testtable: testtable.cpp testtable.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) testtable.$(OBJ) $(STRESSLIBS)
 
+churn: churn.cpp churn.$(OBJ)
+	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) churn.$(OBJ) $(STRESSLIBS)
+
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest socketeater$(EXE) stress$(EXE) testtable$(EXE)
+	$(RM) *.lo *.o *.obj *.lib *.exp *.pdb *.manifest socketeater$(EXE) stress$(EXE) churn$(EXE) testtable$(EXE)
 	$(RMTREE) .libs

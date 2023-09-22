@@ -9369,12 +9369,8 @@ dnl		flags - can be yes or no
 dnl		eg. if yes, then $8 set to: -L/usr/local/lib -lsomelib
 dnl		    if no, then $8 set to:  -Wl,/usr/local/lib/libsomelib.so
 dnl
-dnl If LIBDIR and/or LIBARCHDIR are set, then they are appended, as
-dnl appropriate, to the various paths when searching for libraries
-dnl	eg. if LIBDIR=lib and LIBARCHDIR=lib32 then /opt/sfw/lib and
-dnl		/usr/freeware/lib32 are searched
-dnl If either is not set, then "lib" is appended
-dnl	eg. /opt/sfw/lib and /usr/freeware/lib are searched
+dnl If LIBARCHDIR is set, then it is appended, as appropriate, to the various
+dnl paths when searching for libraries.  If it's not set then "lib" is appended.
 AC_DEFUN([FW_CHECK_HEADERS_AND_LIBS],
 [
 
@@ -9403,65 +9399,124 @@ fi
 FW_SEARCH_PATHS([$SEARCHPATH],[$NAME],[],[SEARCHPATHS])
 for path in $SEARCHPATHS
 do
-	if ( test -n "$path" -a -d "$path" )
-	then
 
-		TEMPLIBDIR=$LIBDIR
-		if ( test "$path" = "/usr/freeware" )
-		then
-			TEMPLIBDIR=$LIBARCHDIR
-		fi
-		if ( test -z "$TEMPLIBDIR" )
-		then
-			TEMPLIBDIR=lib
-		fi
+	dnl loop back if the path is empty or doesn't exist
+	if ( test -z "$path" -o ! -d "$path" )
+	then
+		continue
+	fi
+
+	dnl if LIBARCHDIR is set then search $path/$LIBARCHDIR
+	if ( test -n "$LIBARCHDIR" )
+	then
 
 		if ( test "$path" = "/" )
 		then
+
+			dnl when searching in / we need to search in
+			dnl /usr/include, not in /include, and in
+			dnl /$LIBARCHDIR, not //$LIBARCHDIR, so lets
+			dnl handle / a little differently...
+
 			if ( test "$USEFULLLIBPATH" = "yes" )
 			then
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$TEMPLIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$TEMPLIBDIR\"; LIBSTRING=\"-Wl,/$TEMPLIBDIR/lib$LIBNAME.$SOSUFFIX\"],[/$TEMPLIBDIR/lib$LIBNAME.a],[LIBSTRING=\"/$TEMPLIBDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBARCHDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBARCHDIR\"; LIBSTRING=\"-Wl,/$LIBARCHDIR/lib$LIBNAME.$SOSUFFIX\"],[/$LIBARCHDIR/lib$LIBNAME.a],[LIBSTRING=\"/$LIBARCHDIR/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
 			else
-				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$TEMPLIBDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$TEMPLIBDIR\"; LIBSTRING=\"-l$LIBNAME\"],[/$TEMPLIBDIR/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				FW_CHECK_HEADER_LIB([/usr/include/$HEADER],[],[/$LIBARCHDIR/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"/$LIBARCHDIR\"; LIBSTRING=\"-l$LIBNAME\"],[/$LIBARCHDIR/lib$LIBNAME.a],[LIBSTRING=\"-l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
 			fi
-			dnl set path to "" so we won't get //'s from here on
-			path=""
-		fi
-		if ( test -n "$LIBSTRING" )
-		then
-			HEADERSANDLIBSPATH="$path"
-			break
-		fi
-		for libpath in \
-			"$path/$TEMPLIBDIR" \
-			"$path/$TEMPLIBDIR/$NAME" \
-			"$path/$TEMPLIBDIR/opt" \
-			"$path/$TEMPLIBDIR/$MULTIARCHDIR"
-		do
-			if ( test -n "$LIBSTRING" )
-			then
-				break
-			fi
-			for includepath in "$path/include" "$path/include/$NAME"
+
+		else
+	
+			dnl search various dirs under $path
+			for libpath in \
+				"$path/$LIBARCHDIR" \
+				"$path/$LIBARCHDIR/$NAME" \
+				"$path/$LIBARCHDIR/opt" \
+				"$path/$LIBARCHDIR/$MULTIARCHDIR"
 			do
+				for includepath in "$path/include" "$path/include/$NAME"
+				do
+					if ( test "$USEFULLLIBPATH" = "yes" )
+					then
+						FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+					else
+						FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+					fi
+					if ( test -n "$LIBSTRING" )
+					then
+						break
+					fi
+				done
 				if ( test -n "$LIBSTRING" )
 				then
 					break
 				fi
-				if ( test "$USEFULLLIBPATH" = "yes" )
-				then
-					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
-				else
-					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
-				fi
 			done
-		done
+		fi
+
+		dnl break if we found the library and headers
 		if ( test -n "$LIBSTRING" )
 		then
 			HEADERSANDLIBSPATH="$path"
 			break
 		fi
 	fi
+
+	dnl if that fails then we should search $path/lib...
+	if ( test -z "$LIBSTRING" )
+	then
+
+		dnl however, if LIBARCHDIR is "lib" then we can skip this
+		dnl step, as $path/lib will have been already been searched
+		dnl above
+		if ( test "$LIBARCHDIR" = "lib" )
+		then
+			continue
+		fi
+
+		dnl Also, if the path is / or /usr then we shouldn't search
+		dnl in $path/lib.  We only want to search /$LIBARCHDIR and
+		dnl /usr/$LIBARCHDIR.  If LIBARCHDIR happened to be "lib" then
+		dnl we will already have searched /lib and /usr/lib above.
+		if ( test "$path" = "/" -o "$path" = "/usr" )
+		then
+			continue
+		fi
+
+		dnl search various dirs under $path
+		for libpath in \
+			"$path/lib" \
+			"$path/lib/$NAME" \
+			"$path/lib/opt" \
+			"$path/lib/$MULTIARCHDIR"
+		do
+			for includepath in "$path/include" "$path/include/$NAME"
+			do
+				if ( test "$USEFULLLIBPATH" = "yes" )
+				then
+					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-Wl,$libpath/lib$LIBNAME.$SOSUFFIX\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"$libpath/lib$LIBNAME.a\"; STATIC=\"$LINKSTATIC\"])
+				else
+					FW_CHECK_HEADER_LIB([$includepath/$HEADER],[INCLUDESTRING=\"-I$includepath\"],[$libpath/lib$LIBNAME.$SOSUFFIX],[LIBPATH=\"$libpath\"; LIBSTRING=\"-L$libpath -l$LIBNAME\"],[$libpath/lib$LIBNAME.a],[LIBSTRING=\"-L$libpath -l$LIBNAME\"; STATIC=\"$LINKSTATIC\"])
+				fi
+				if ( test -n "$LIBSTRING" )
+				then
+					break
+				fi
+			done
+			if ( test -n "$LIBSTRING" )
+			then
+				break
+			fi
+		done
+
+		dnl break if we found the library and headers
+		if ( test -n "$LIBSTRING" )
+		then
+			HEADERSANDLIBSPATH="$path"
+			break
+		fi
+	fi
+
 done
 
 dnl remove -I/usr/include, -L/lib, -L/usr/lib, -L/lib64 and -L/usr/lib64
@@ -9610,7 +9665,7 @@ then
 		if ( test -n "$CXX_VERSION" -a -z "`echo $CXX_VERSION | grep g++`" )
 		then
 			dnl older versions output something like 27, 28, 29, etc.
-			if (  test "`echo $CXX_VERSION | tr -d'.' | cut -c1-2`" -lt "27" )
+			if (  test "`echo $CXX_VERSION | tr -d '.' | cut -c1-2`" -lt "27" )
 			then
 				WERROR=""
 			fi
@@ -9737,8 +9792,11 @@ AC_DEFUN([FW_CHECK_WNOOVERLOADEDVIRTUAL],
 WNOOVERLOADEDVIRTUAL=""
 AC_MSG_CHECKING(for -Wno-overloaded-virtual option)
 
-# clang's -Wall includes -Woverloaded-virtual, which we don't want
-if ( test -n "`$CC --version 2> /dev/null | grep clang`" )
+dnl clang's and gcc 13+'s -Wall includes -Woverloaded-virtual, which we don't
+dnl want. It looks like all versions of clang and gcc are tolerant to passing
+dnl in this parameter, whether they really support it or not, so we'll just
+dnl always use it for clang and gcc
+if ( test -n "`$CC --version 2> /dev/null | grep clang`" -o -n "`$CC --version 2> /dev/null | grep gcc`" )
 then
 	WNOOVERLOADEDVIRTUAL="-Wno-overloaded-virtual"
 	AC_MSG_RESULT(yes)
@@ -9905,40 +9963,10 @@ AC_SUBST(JNISUFFIX)
 ])
 
 
-dnl determines the directory that libraries are usually found in (eg. lib or
-dnl lib64) and the arch-spcific directory (eg. lib or lib32) for odd multiarch
-dnl systems (eg. Irix)
-dnl sets LIBDIR and LIBARCHDIR as appropriate
-AC_DEFUN([FW_CHECK_LIBDIR],
-[
-AC_MSG_CHECKING(for library directory)
-LIBDIR="lib"
-LIBARCHDIR="lib"
-if ( test -z "$MULTIARCHDIR" )
-then
-	case $host_cpu in
-		x86_64 )
-			LIBDIR="lib64"
-			LIBARCHDIR="lib64"
-			;;
-		mips64 )
-			LIBDIR="lib64"
-			LIBARCHDIR="lib64"
-			;;
-		mips )
-			LIBARCHDIR="lib32"
-			;;
-	esac
-fi
-if ( test "$LIBDIR" = "lib64" -a ! -d "/lib64" )
-then
-	LIBDIR="lib"
-fi
-AC_MSG_RESULT($LIBDIR and $LIBARCHDIR)
-])
-
-
 dnl checks for multiarch platform and sets MULTIARCHDIR to the multiarch name
+dnl
+dnl also determines the arch-specific directory that libraries are usually
+dnl found in, dnl eg. lib, lib64, or lib32 and sets LIBARCHDIR as appropriate
 AC_DEFUN([FW_CHECK_MULTIARCH],
 [
 AC_MSG_CHECKING(for multiarch platform)
@@ -9949,6 +9977,24 @@ then
 else
 	AC_MSG_RESULT(no)
 fi
+
+AC_MSG_CHECKING(for arch-specific library directory)
+LIBARCHDIR="lib"
+if ( test -z "$MULTIARCHDIR" )
+then
+	case $host_cpu in
+		x86_64 )
+			LIBARCHDIR="lib64"
+			;;
+		mips64 )
+			LIBARCHDIR="lib64"
+			;;
+		mips )
+			LIBARCHDIR="lib32"
+			;;
+	esac
+fi
+AC_MSG_RESULT($LIBARCHDIR)
 ])
 
 
@@ -10165,13 +10211,22 @@ else
 	then
 		echo "cross compiling"
 	else
-		AC_PATH_PROG(APR_1_MT_CONFIG,apr-1-mt-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin)
+		dnl NOTE that we prefer /usr/bin and /usr/sbin to /bin and
+		dnl /sbin for these.  On fedora37+ (and maybe other platforms)
+		dnl these scripts are found in /usr/bin and in /bin but if you
+		dnl run /bin/apr-1-config it thinks you're cross compiling
+		dnl because you called it by "absolute path, but not installed
+		dnl path".  It then prepends the APR_TARGET_DIR (which it
+		dnl appears to miscalculate) to the includedir.  So, we'll
+		dnl prefer /usr/bin and /usr/sbin to /bin and /sbin for these
+		dnl scripts.  This doesn't appear to break older platforms.
+		AC_PATH_PROG(APR_1_MT_CONFIG,apr-1-mt-config,"",/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin)
 		if ( test -z "$APR_1_MT_CONFIG" )
 		then
-			AC_PATH_PROG(APR_1_CONFIG,apr-1-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+			AC_PATH_PROG(APR_1_CONFIG,apr-1-config,"",/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
 			if ( test -z "$APR_1_CONFIG" )
 			then
-				AC_PATH_PROG(APR_CONFIG,apr-config,"",/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
+				AC_PATH_PROG(APR_CONFIG,apr-config,"",/usr/bin:/usr/sbin:/bin:/sbin:/usr/local/bin:/usr/local/sbin:/usr/local/apache/bin:/usr/local/apache/sbin:/usr/pkg/bin:/usr/pkg/sbin:/boot/common/bin:/resources/index/bin)
 			fi
 		fi
 		if ( test -n "$APR_1_CONFIG" )
@@ -10407,11 +10462,16 @@ dnl if it's 6.0.0 then:
 dnl 	sets SCO_OSR6="yes"
 dnl 	adds -D__STDC__=0 to CPPFLAGS
 dnl 	sets CRTLIB="-lcrt"
+dnl 	defines _SCO_OSR6
 dnl if it's < 6.0.0 then:
 dnl 	sets SCO_OSR5="yes"
 dnl	defines RUDIMENTS_HAVE_BAD_SCO_MSGHDR=1
 dnl	if it's 5.0.0 then:
 dnl 		adds -D_SVID3 to CPPFLAGS
+dnl 	defines _SCO_OSR5
+dnl if it's UnixWare then:
+dnl 	sets SCO_UW="yes"
+dnl 	defines _SCO_UW
 AC_DEFUN([FW_CHECK_SCO],
 [
 SCO_OSR5=""
@@ -10489,6 +10549,48 @@ case $host_os in
 		;;
 esac
 AC_SUBST(IRIX)
+])
+
+
+dnl checks for illumos platform
+dnl if it is, then _ILLUMOS=1 is defined
+AC_DEFUN([FW_CHECK_ILLUMOS],
+[
+ILLUMOS=""
+AC_MSG_CHECKING(for illumos)
+if ( test -n "`uname -v 2> /dev/null | grep -i illumos`" )
+then
+	ILLUMOS="yes"
+	AC_DEFINE(_ILLUMOS,1,IllumOS)
+	AC_MSG_RESULT(yes)
+else
+	AC_MSG_RESULT(no)
+fi
+AC_SUBST(ILLUMOS)
+])
+
+
+dnl checks for HP-UX platform
+dnl if it is, then it adds -D_XOPEN_SOURCE=500 to CPPFLAGS and disables -Werror
+AC_DEFUN([FW_CHECK_HPUX],
+[
+HPUX=""
+AC_MSG_CHECKING(for hp-ux)
+case $host_os in
+	*hpux* )
+		HPUX="yes"
+		CPPFLAGS="$CPPFLAGS -D_XOPEN_SOURCE=500"
+		ENABLE_WERROR=""
+		AC_MSG_RESULT(yes)
+		AC_MSG_CHECKING([for -Wa,-w36])
+		FW_TRY_COMPILE([#include <stdio.h>],[printf("hello");],[-Wa,-w36],[CXXFLAGS="$CXXFLAGS -Wa,-w36"; AC_MSG_RESULT(yes)],[ AC_MSG_RESULT(no)])
+		AC_DEFINE(_HPUX,1,HP-UX OS)
+		;;
+	* )
+		AC_MSG_RESULT(no)
+		;;
+esac
+AC_SUBST(HPUX)
 ])
 
 

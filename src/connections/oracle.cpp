@@ -489,7 +489,7 @@ void oracleconnection::handleConnectString() {
 	#endif
 
 	#ifdef OCI_STMT_CACHE
-	stmtcachesize=charstring::toUnsignedInteger(
+	stmtcachesize=charstring::convertToUnsignedInteger(
 				cont->getConnectStringValue("stmtcachesize"));
 	if (!stmtcachesize) {
 		stmtcachesize=STMT_CACHE_SIZE;
@@ -569,16 +569,16 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		// allow empty TWO_TASK when using OS-authentication
 		// allow it in all cases?
 		if (!environment::getValue("TWO_TASK") &&
-				charstring::length(user) &&
-				charstring::length(password)) {
+				charstring::getLength(user) &&
+				charstring::getLength(password)) {
 			*error="No TWO_TASK environment variable set or specified in connect string.";
 			return false;
 		}
 	}
 
 	// see if the specified sid is in tnsnames.ora format
-	bool	sidtnsnameformat=(charstring::length(sid) &&
-					sid[charstring::length(sid)-1]==')');
+	bool	sidtnsnameformat=(charstring::getLength(sid) &&
+					sid[charstring::getLength(sid)-1]==')');
 
 	// handle ORACLE_HOME
 	if (home) {
@@ -596,7 +596,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 
 	// handle error reading tnsnames.ora
 	if (!sidtnsnameformat) {
-		if (!charstring::length(home)) {
+		if (!charstring::getLength(home)) {
 			home=environment::getValue("ORACLE_HOME");
 		}
 		char	*tnsnamesora=NULL;
@@ -606,7 +606,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 				sys::getDirectorySeparator(),
 				sys::getDirectorySeparator(),
 				sys::getDirectorySeparator());
-		if (!file::readable(tnsnamesora)) {
+		if (!file::isReadable(tnsnamesora)) {
 			stderror.printf(
 				"Warning: %s is not readable by %s:%s\n",
 				tnsnamesora,
@@ -682,7 +682,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 
 	// attach to the server
 	if (OCIServerAttach(srv,err,(text *)sid,
-				charstring::length(sid),0)!=OCI_SUCCESS) {
+				charstring::getLength(sid),0)!=OCI_SUCCESS) {
 		*error=logInError("OCIServerAttach() failed");
 		OCIHandleFree(svc,OCI_HTYPE_SVCCTX);
 		OCIHandleFree(srv,OCI_HTYPE_SERVER);
@@ -715,10 +715,10 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set username and password
-	if (charstring::length(user) &&
+	if (charstring::getLength(user) &&
 		OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)user,
-				(ub4)charstring::length(user),
+				(ub4)charstring::getLength(user),
 				(ub4)OCI_ATTR_USERNAME,err)!=OCI_SUCCESS) {
 		*error=logInError("Set username failed");
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
@@ -729,10 +729,10 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-	if (charstring::length(password) &&
+	if (charstring::getLength(password) &&
 		OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)password,
-				(ub4)charstring::length(password),
+				(ub4)charstring::getLength(password),
 				(ub4)OCI_ATTR_PASSWORD,err)!=OCI_SUCCESS) {
 		*error=logInError("Set password failed");
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
@@ -746,7 +746,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 
 	// decide what credentials to use
 	sword	cred=OCI_CRED_RDBMS;
-	if (!charstring::length(user) && !charstring::length(password)) {
+	if (!charstring::getLength(user) && !charstring::getLength(password)) {
 		cred=OCI_CRED_EXT;
 	}
 
@@ -871,8 +871,8 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 				minorstr=minorstr+1;
 			}
 		}
-		int64_t	major=charstring::toInteger(majorstr);
-		int64_t	minor=charstring::toInteger(minorstr);
+		int64_t	major=charstring::convertToInteger(majorstr);
+		int64_t	minor=charstring::convertToInteger(minorstr);
 	
 		// 8.1 and up supports proxy credentials and syscontext
 		if (major>8 || (major==8 && minor>0)) {
@@ -902,7 +902,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 
 		const char	*alter="alter session set cursor_sharing=exact";
 		if (OCIStmtPrepare2(svc,&stmt,err,
-				(text *)alter,charstring::length(alter),
+				(text *)alter,charstring::getLength(alter),
 				NULL,0,
 				(ub4)OCI_NTV_SYNTAX,
 				(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -1029,7 +1029,7 @@ bool oracleconnection::changeProxiedUser(const char *newuser,
 	// set the user name
 	OCIAttrSet((dvoid *)newsession,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)newuser,
-				(ub4)charstring::length(newuser),
+				(ub4)charstring::getLength(newuser),
 				(ub4)OCI_ATTR_USERNAME,err);
 
 	// set the password
@@ -1038,7 +1038,7 @@ bool oracleconnection::changeProxiedUser(const char *newuser,
 	// want to validate the password, so we'll include it)
 	OCIAttrSet((dvoid *)newsession,(ub4)OCI_HTYPE_SESSION,
 				(dvoid *)newpassword,
-				(ub4)charstring::length(newpassword),
+				(ub4)charstring::getLength(newpassword),
 				(ub4)OCI_ATTR_PASSWORD,err);
 
 	// use the proxy
@@ -1110,7 +1110,7 @@ void oracleconnection::errorMessage(char *errorbuffer,
 	errorbuffer[errorbufferlength-1]='\0';
 
 	// truncate the trailing \n
-	*errorlength=charstring::length((char *)errorbuffer);
+	*errorlength=charstring::getLength((char *)errorbuffer);
 	char	*last=errorbuffer+(*errorlength)-1;
 	if (*last=='\n') {
 		*last='\0';
@@ -2807,7 +2807,7 @@ bool oraclecursor::inputBind(const char *variable,
 
 	// the size of the value must include the terminating NULL
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -2850,7 +2850,7 @@ bool oraclecursor::inputBind(const char *variable,
 	inintbindstring[orainbindcount]=charstring::parseNumber(*value);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -2858,7 +2858,7 @@ bool oraclecursor::inputBind(const char *variable,
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
 				oracleconn->err,pos,
 				(dvoid *)inintbindstring[orainbindcount],
-				(sb4)charstring::length(
+				(sb4)charstring::getLength(
 					inintbindstring[orainbindcount])+1,
 				SQLT_STR,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -2871,7 +2871,7 @@ bool oraclecursor::inputBind(const char *variable,
 				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
 				(dvoid *)inintbindstring[orainbindcount],
-				(sb4)charstring::length(
+				(sb4)charstring::getLength(
 					inintbindstring[orainbindcount])+1,
 				SQLT_STR,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -2893,7 +2893,7 @@ bool oraclecursor::inputBind(const char *variable,
 	checkRePrepare();
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -2945,7 +2945,7 @@ bool oraclecursor::inputBind(const char *variable,
 	OCIDateSetTime(indatebind[orainbindcount],hour,minute,second);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -2989,7 +2989,7 @@ bool oraclecursor::outputBind(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3035,7 +3035,7 @@ bool oraclecursor::outputBind(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3081,7 +3081,7 @@ bool oraclecursor::outputBind(const char *variable,
 	outdatebind[oraoutbindcount]=NULL;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3143,7 +3143,7 @@ bool oraclecursor::outputBind(const char *variable,
 	outdatebind[oraoutbindcount]=db;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3197,7 +3197,7 @@ bool oraclecursor::outputBindCursor(const char *variable,
 	((oraclecursor *)cursor)->bound=true;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3313,7 +3313,7 @@ bool oraclecursor::inputBindGenericLob(const char *variable,
 
 	// bind the temporary lob
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3378,7 +3378,7 @@ bool oraclecursor::outputBindGenericLob(const char *variable,
 
 	// bind the lob descriptor
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		ub4	pos=charstring::toInteger(variable+1);
+		ub4	pos=charstring::convertToInteger(variable+1);
 		if (!pos) {
 			bindformaterror=true;
 			return false;
@@ -3737,7 +3737,7 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 	for (uint16_t i=0; i<oraoutbindcount; i++) {
 		if (outintbindstring[i]) {
 			*outintbind[i]=charstring::
-					toInteger(outintbindstring[i]);
+					convertToInteger(outintbindstring[i]);
 		}
 	}
 
@@ -3853,7 +3853,7 @@ void oraclecursor::errorMessage(char *errorbuffer,
 	if (bindformaterror) {
 
 		// handle bind format errors
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,
@@ -3875,7 +3875,7 @@ void oraclecursor::errorMessage(char *errorbuffer,
 	#ifdef OCI_STMT_CACHE
 	// set the statement release mode such that this query will be
 	// removed from the statement cache on the next iteration
-	if (charstring::length(errorbuffer)) {
+	if (charstring::getLength(errorbuffer)) {
 		stmtreleasemode=OCI_STRLS_CACHE_DELETE;
 	}
 	#endif

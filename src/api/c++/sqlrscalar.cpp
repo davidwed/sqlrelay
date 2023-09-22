@@ -40,7 +40,7 @@ sqlrscalar::sqlrscalar(sqlrcursor *cursor, uint64_t row, uint64_t col) :
 sqlrscalar::~sqlrscalar() {
 }
 
-bool sqlrscalar::getIsReadOnly() {
+bool sqlrscalar::isReadOnly() {
 	return true;
 }
 
@@ -70,6 +70,7 @@ const char * &sqlrscalar::getReference() {
 	return pvt->_null;
 }
 
-void sqlrscalar::clear() {
+bool sqlrscalar::clear() {
 	// do nothing
+	return true;
 }

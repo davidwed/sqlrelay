@@ -45,9 +45,9 @@ static void shutDown(int32_t signum) {
 		filename.append(".bt");
 		file	f;
 		if (f.create(filename.getString(),
-				permissions::evalPermString("rw-------"))) {
+				permissions::parsePermString("rw-------"))) {
 			f.printf("signal: %d\n\n",signum);
-			process::backtrace(&f);
+			process::writeBacktrace(&f);
 		}
 	}
 
@@ -143,7 +143,7 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.found("-id") || !cmdl.found("-connectionid")) {
+	if (!cmdl.isFound("-id") || !cmdl.isFound("-connectionid")) {
 		stdoutput.printf("usage: \n"
 			" %s-connection [-config config] "
 			"-id id -connectionid connectionid\n"
@@ -158,7 +158,7 @@ int main(int argc, const char **argv) {
 
 	// set up default signal handling
 	process::exitOnShutDown();
-	if (!cmdl.found("-disable-crash-handler")) {
+	if (!cmdl.isFound("-disable-crash-handler")) {
 		process::exitOnCrash();
 	}
 
@@ -168,14 +168,14 @@ int main(int argc, const char **argv) {
 #ifdef SHUTDOWNFLAG
 	// handle kill and crash signals
 	process::setShutDownFlagOnShutDown();
-	if (!cmdl.found("-disable-crash-handler")) {
+	if (!cmdl.isFound("-disable-crash-handler")) {
 		process::setShutDownFlagOnCrash();
 	}
 #else
 	// handle kill and crash signals
-	process::handleShutDown(shutDown);
-	if (!cmdl.found("-disable-crash-handler")) {
-		process::handleCrash(shutDown);
+	process::setShutDownHandler(shutDown);
+	if (!cmdl.isFound("-disable-crash-handler")) {
+		process::setCrashHandler(shutDown);
 	}
 #endif
 
@@ -210,9 +210,9 @@ int main(int argc, const char **argv) {
 			filename.append(".bt");
 			file	f;
 			if (f.create(filename.getString(),
-				permissions::evalPermString("rw-------"))) {
+				permissions::parsePermString("rw-------"))) {
 				f.printf("signal: %d\n\n",signum);
-				process::backtrace(&f);
+				process::writeBacktrace(&f);
 			}
 		}
 

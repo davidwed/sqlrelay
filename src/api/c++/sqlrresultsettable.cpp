@@ -30,15 +30,15 @@ void sqlrresultsettable::setCursor(sqlrcursor *cursor) {
 	pvt->_cursor=cursor;
 }
 
-bool sqlrresultsettable::getIsReadOnly() {
+bool sqlrresultsettable::isReadOnly() {
 	return true;
 }
 
-bool sqlrresultsettable::getIsBlockBased() {
+bool sqlrresultsettable::isBlockBased() {
 	return true;
 }
 
-bool sqlrresultsettable::getIsSequentialAccess() {
+bool sqlrresultsettable::isSequentialAccess() {
 	return true;
 }
 
@@ -83,6 +83,7 @@ bool sqlrresultsettable::getAllRowsAvailable() {
 	return (pvt->_cursor)?pvt->_cursor->endOfResultSet():true;
 }
 
-void sqlrresultsettable::clear() {
+bool sqlrresultsettable::clear() {
 	// do nothing
+	return true;
 }

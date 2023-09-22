@@ -441,6 +441,16 @@ JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_bindFormat
 
 /*
  * Class:     com_firstworks_sqlrelay_SQLRConnection
+ * Method:    nextvalFormat
+ * Signature: ()Ljava/lang/String;
+ */
+JNIEXPORT jstring JNICALL Java_com_firstworks_sqlrelay_SQLRConnection_nextvalFormat
+  (JNIEnv *env, jobject self) {
+	return conNewStringUTF(env,getSqlrConnection(env,self)->nextvalFormat());
+}
+
+/*
+ * Class:     com_firstworks_sqlrelay_SQLRConnection
  * Method:    errorMessage
  * Signature: ()Ljava/lang/String;
  */

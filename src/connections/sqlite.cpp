@@ -407,7 +407,7 @@ void sqliteconnection::errorMessage(char *errorbuffer,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	// set return values
-	*errorlength=charstring::length(errmesg);
+	*errorlength=charstring::getLength(errmesg);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errmesg,*errorlength);
 	*errorcode=errcode;
@@ -544,7 +544,7 @@ bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
 int32_t sqlitecursor::getBindVariableIndex(const char *variable,
 						uint16_t variablesize) {
 	if (charstring::isInteger(variable+1,variablesize-1)) {
-		return charstring::toInteger(variable+1);
+		return charstring::convertToInteger(variable+1);
 	}
 	return sqlite3_bind_parameter_index(stmt,variable);
 }
@@ -915,7 +915,7 @@ void sqlitecursor::getField(uint32_t col,
 	// handle lastinsertrowid specially
 	if (lastinsertrowid) {
 		*field=lastinsertrowidstr;
-		*fieldlength=charstring::length(*field);
+		*fieldlength=charstring::getLength(*field);
 		*blob=false;
 		*null=false;
 		return;
@@ -942,7 +942,7 @@ void sqlitecursor::getField(uint32_t col,
 	// track of which column you're on.
 	if (result[rowindex]) {
 		*field=result[rowindex];
-		*fieldlength=charstring::length(result[rowindex]);
+		*fieldlength=charstring::getLength(result[rowindex]);
 	} else {
 		*null=true;
 	}
@@ -977,7 +977,7 @@ char *sqliteconnection::duplicate(const char *str) {
 	if (!str) {
 		return NULL;
 	}
-	size_t	length=charstring::length(str);
+	size_t	length=charstring::getLength(str);
 	char	*buffer=(char *)sqlite3_malloc(length+1);
 	charstring::copy(buffer,str,length);
 	buffer[length]='\0';

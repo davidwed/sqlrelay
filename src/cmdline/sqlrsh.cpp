@@ -16,6 +16,8 @@
 #include <rudiments/character.h>
 #include <rudiments/memorypool.h>
 #include <rudiments/prompt.h>
+#include <rudiments/locale.h>
+#include <rudiments/sensitivevalue.h>
 #include <config.h>
 #include <defaults.h>
 #define NEED_IS_BIT_TYPE_CHAR 1
@@ -25,8 +27,6 @@
 #include <datatypes.h>
 #include <defines.h>
 #include <version.h>
-// FIXME: use rudiments locale class instead
-#include <locale.h>
 #include <math.h>
 
 class sqlrshbindvalue {
@@ -273,7 +273,7 @@ void sqlrsh::userRcFile(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	}
 
 	// build rcfilename
-	size_t	userrcfilelen=charstring::length(home)+10+1;
+	size_t	userrcfilelen=charstring::getLength(home)+10+1;
 	char	*userrcfile=new char[userrcfilelen];
 	charstring::copy(userrcfile,home);
 	charstring::append(userrcfile,"/.sqlrshrc");
@@ -417,9 +417,18 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 						return true;
 					}
 				} else {
+					if (!*string) {
+						if (stringpos) {
+							*stringpos=string;
+						}
+						return true;
+					}
 					ch=*string;
 					string++;
 				}
+				// if we didn't get 2 single-quotes in a row
+				// while already inside of single-quotes, then
+				// we're no longer inside of single-quotes
 				if (ch!='\'') {
 					insinglequotes=false;
 				}
@@ -437,9 +446,18 @@ bool sqlrsh::getCommandFromFileOrString(file *fl,
 						return true;
 					}
 				} else {
+					if (!*string) {
+						if (stringpos) {
+							*stringpos=string;
+						}
+						return true;
+					}
 					ch=*string;
 					string++;
 				}
+				// if we didn't get 2 double-quotes in a row
+				// while already inside of double-quotes, then
+				// we're no longer inside of double-quotes
 				if (ch!='"') {
 					indoublequotes=false;
 				}
@@ -712,7 +730,7 @@ bool sqlrsh::internalCommand(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	} else if (!charstring::compareIgnoringCase(
 					ptr,"setresultsetbuffersize ",23)) {	
 		ptr=ptr+23;
-		env->rsbs=charstring::toInteger(ptr);
+		env->rsbs=charstring::convertToInteger(ptr);
 		return true;
 	} else if (!charstring::compareIgnoringCase(ptr,"lazyfetch ",10)) {
 		ptr=ptr+10;
@@ -1217,7 +1235,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->clearBinds();
 
-	if (env->inputbinds.getLength()) {
+	if (env->inputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->inputbinds.getKeys()->getFirst();
@@ -1247,14 +1265,14 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 						bv->dateval.isnegative);
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB) {
 				sqlrcur->inputBindBlob(name,bv->stringval,
-					charstring::length(bv->stringval));
+					charstring::getLength(bv->stringval));
 			} else if (bv->type==SQLRCLIENTBINDVARTYPE_NULL) {
 				sqlrcur->inputBind(name,(const char *)NULL);
 			}
 		}
 	}
 
-	if (env->outputbinds.getLength()) {
+	if (env->outputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->outputbinds.getKeys()->getFirst();
@@ -1277,7 +1295,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->inputoutputbinds.getLength()) {
+	if (env->inputoutputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->inputoutputbinds.getKeys()->getFirst();
@@ -1316,7 +1334,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	sqlrcur->executeQuery();
 
-	if (env->outputbinds.getLength()) {
+	if (env->outputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->outputbinds.getKeys()->getFirst();
@@ -1350,7 +1368,7 @@ void sqlrsh::executeQuery(sqlrcursor *sqlrcur, sqlrshenv *env) {
 		}
 	}
 
-	if (env->inputoutputbinds.getLength()) {
+	if (env->inputoutputbinds.getCount()) {
 
 		for (listnode<char *> *node=
 				env->inputoutputbinds.getKeys()->getFirst();
@@ -1464,7 +1482,7 @@ void sqlrsh::initStats(sqlrshenv *env) {
 		return;
 	}
 
-	start.getSystemDateAndTime();
+	start.initFromSystemDateTime();
 }
 
 void sqlrsh::displayError(sqlrshenv *env,
@@ -1512,7 +1530,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 		// write the column name
 		name=sqlrcur->getColumnName(ci);
-		namelen=charstring::length(name);
+		namelen=charstring::getLength(name);
 		if (env->format==SQLRSH_FORMAT_PLAIN) {
 			stdoutput.write(name);
 		} else {
@@ -1522,7 +1540,7 @@ void sqlrsh::displayHeader(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			// spreadsheet apps) likes to convert 12+
 			// digit numbers to scientific notation.
 			bool	quote=(!charstring::isNumber(name) ||
-					charstring::length(name)>=12);
+					charstring::getLength(name)>=12);
 			if (quote) {
 				stdoutput.write('"');
 			}
@@ -1632,7 +1650,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 					charstring::printf(&numberfieldbuffer[0], sizeof(numberfieldbuffer), "%ld", fi);
 				}
 				field=numberfieldbuffer;
-				fieldlength=charstring::length(field);
+				fieldlength=charstring::getLength(field);
 			}
 
 			// check for end-of-result-set condition
@@ -1666,7 +1684,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 				// spreadsheet apps) likes to convert 12+
 				// digit numbers to scientific notation.
 				bool	quote=(!charstring::isNumber(field) ||
-						charstring::length(field)>=12);
+						charstring::getLength(field)>=12);
 				if (quote) {
 					stdoutput.write('"');
 				}
@@ -1680,7 +1698,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 			if (env->format==SQLRSH_FORMAT_PLAIN) {
 				longest=sqlrcur->getLongest(col);
 				if (env->headers) {
-					namelen=charstring::length(
+					namelen=charstring::getLength(
 						sqlrcur->getColumnName(col));
 					if (namelen>longest) {
 						longest=namelen;
@@ -1702,11 +1720,11 @@ void sqlrsh::displayStats(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 	// calculate elapsed time
 	datetime	end;
-	end.getSystemDateAndTime();
+	end.initFromSystemDateTime();
 	uint64_t	startusec=start.getEpoch()*1000000+
-					start.getMicroseconds();
+					start.getMicrosecond();
 	uint64_t	endusec=end.getEpoch()*1000000+
-					end.getMicroseconds();
+					end.getMicrosecond();
 	double		time=((double)(endusec-startusec))/1000000;
 
 	// display stats
@@ -1858,7 +1876,7 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 	// get the value
 	char	*value=charstring::duplicate(ptr);
 	charstring::bothTrim(value);
-	size_t	valuelen=charstring::length(value);
+	size_t	valuelen=charstring::getLength(value);
 
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
@@ -1919,11 +1937,11 @@ bool sqlrsh::inputbind(sqlrcursor *sqlrcur,
 		delete[] value;
 	} else if (charstring::isInteger(value)) {
 		bv->type=SQLRCLIENTBINDVARTYPE_INTEGER;
-		bv->integerval=charstring::toInteger(value);
+		bv->integerval=charstring::convertToInteger(value);
 		delete[] value;
 	} else if (charstring::isNumber(value)) {
 		bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-		bv->doubleval.value=charstring::toFloatC(value);
+		bv->doubleval.value=charstring::convertToFloatC(value);
 		bv->doubleval.precision=valuelen-((value[0]=='-')?2:1);
 		bv->doubleval.scale=
 			charstring::findFirst(value,'.')-value+
@@ -1969,7 +1987,7 @@ bool sqlrsh::inputbindblob(sqlrcursor *sqlrcur,
 	// get the value
 	char	*value=charstring::duplicate(ptr);
 	charstring::bothTrim(value);
-	size_t	valuelen=charstring::length(value);
+	size_t	valuelen=charstring::getLength(value);
 
 	// if the bind variable is already defined, clear it...
 	sqlrshbindvalue	*bv=NULL;
@@ -2044,7 +2062,7 @@ bool sqlrsh::outputbind(sqlrcursor *sqlrcur,
 			bv->type=SQLRCLIENTBINDVARTYPE_STRING;
 			bv->stringval=NULL;
 			bv->outputstringbindlength=
-				charstring::toInteger(parts[3]);
+				charstring::convertToInteger(parts[3]);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"integer") &&
 						partcount==3) {
@@ -2056,9 +2074,9 @@ bool sqlrsh::outputbind(sqlrcursor *sqlrcur,
 			bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
 			bv->doubleval.value=0.0;
 			bv->doubleval.precision=
-				charstring::toInteger(parts[3]);
+				charstring::convertToInteger(parts[3]);
 			bv->doubleval.scale=
-				charstring::toInteger(parts[4]);
+				charstring::convertToInteger(parts[4]);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"date") &&
 						partcount==3) {
@@ -2112,7 +2130,7 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 		charstring::bothTrim(value);
 		charstring::bothTrim(value,'\'');
 	} else if (charstring::compare(
-			command+charstring::length(command)-8," is null")) {
+			command+charstring::getLength(command)-8," is null")) {
 		// FIXME: usage...
 		return false;
 	}
@@ -2144,24 +2162,24 @@ bool sqlrsh::inputoutputbind(sqlrcursor *sqlrcur,
 			// inputoutputbind 1 string length = 'string'
 			bv->type=SQLRCLIENTBINDVARTYPE_STRING;
 			bv->outputstringbindlength=
-				charstring::toInteger(parts[3]);
+				charstring::convertToInteger(parts[3]);
 			bv->stringval=charstring::unescape(value);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"integer") &&
 						partcount==5) {
 			// inputoutputbind 1 integer = value
 			bv->type=SQLRCLIENTBINDVARTYPE_INTEGER;
-			bv->integerval=charstring::toInteger(value);
+			bv->integerval=charstring::convertToInteger(value);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"double") &&
 						partcount==7) {
 			// inputoutputbind 1 double prec scale = value
 			bv->type=SQLRCLIENTBINDVARTYPE_DOUBLE;
-			bv->doubleval.value=charstring::toFloatC(value);
+			bv->doubleval.value=charstring::convertToFloatC(value);
 			bv->doubleval.precision=
-				charstring::toInteger(parts[3]);
+				charstring::convertToInteger(parts[3]);
 			bv->doubleval.scale=
-				charstring::toInteger(parts[4]);
+				charstring::convertToInteger(parts[4]);
 		} else if (!charstring::compareIgnoringCase(
 						parts[2],"date") &&
 						partcount>=5) {
@@ -2255,7 +2273,7 @@ void sqlrsh::printbinds(const char *type,
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_BLOB) {
 			stdoutput.printf("(BLOB) = ");
 			stdoutput.safePrint(bv->stringval,
-					charstring::length(bv->stringval));
+					charstring::getLength(bv->stringval));
 			stdoutput.printf("\n");
 		} else if (bv->type==SQLRCLIENTBINDVARTYPE_NULL) {
 			stdoutput.printf("NULL\n");
@@ -2281,7 +2299,7 @@ void sqlrsh::responseTimeout(sqlrconnection *sqlrcon, const char *command) {
 	}
 
 	// get seconds
-	uint32_t	sec=charstring::toInteger(value);
+	uint32_t	sec=charstring::convertToInteger(value);
 
 	// get milliseconds
 	char	msecbuf[5];
@@ -2295,7 +2313,7 @@ void sqlrsh::responseTimeout(sqlrconnection *sqlrcon, const char *command) {
 			value++;
 		}
 	}
-	uint32_t	msec=charstring::toInteger(msecbuf);
+	uint32_t	msec=charstring::convertToInteger(msecbuf);
 
 	// set timeout
 	sqlrcon->setResponseTimeout(sec,msec);
@@ -2341,7 +2359,7 @@ bool sqlrsh::cache(sqlrshenv *env, sqlrcursor *sqlrcur, const char *command) {
 	}
 	uint32_t	cachettl=600;
 	if (*ptr) {
-		cachettl=charstring::toInteger(ptr);
+		cachettl=charstring::convertToInteger(ptr);
 	}
 
 	stdoutput.printf("	Caching To       : %s\n",env->cacheto);
@@ -2515,7 +2533,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	// Blocking mode is apparently not the default on some systems
 	// (Syllable for sure, maybe others) and this causes hilariously
 	// odd behavior when reading standard input.
-	stdinput.useBlockingMode();
+	stdinput.setNonBlockingMode(false);
 
 	while (!exitprogram) {
 
@@ -2538,7 +2556,7 @@ void sqlrsh::interactWithUser(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 				return;
 			}
 
-			size_t	len=charstring::length(cmd);
+			size_t	len=charstring::getLength(cmd);
 
 			// len=0 and cmd="" if you just hit return
 			if (len) {
@@ -2567,32 +2585,35 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	cmdline=new sqlrcmdline(argc,argv);
 	sqlrpth=new sqlrpaths(cmdline);
 	sqlrconfigs	sqlrcfgs(sqlrpth);
+	sqlrconfig	*cfg=NULL;
 
 	// get command-line options
 	const char	*configurl=sqlrpth->getConfigUrl();
 	const char	*id=cmdline->getValue("id");
 	const char	*host=cmdline->getValue("host");
-	uint16_t	port=charstring::toInteger(
-				(cmdline->found("port"))?
+	uint16_t	port=charstring::convertToInteger(
+				(cmdline->isFound("port"))?
 				cmdline->getValue("port"):DEFAULT_PORT);
 	const char	*socket=cmdline->getValue("socket");
 	const char	*user=cmdline->getValue("user");
 	const char	*password=cmdline->getValue("password");
-	bool		usekrb=cmdline->found("krb");
+	const char	*passwordencryptionid=NULL;
+	char		*decryptedpassword=NULL;
+	bool		usekrb=cmdline->isFound("krb");
 	const char	*krbservice=cmdline->getValue("krbservice");
 	const char	*krbmech=cmdline->getValue("krbmech");
 	const char	*krbflags=cmdline->getValue("krbflags");
-	bool		usetls=cmdline->found("tls");
+	bool		usetls=cmdline->isFound("tls");
 	const char	*tlsversion=cmdline->getValue("tlsversion");
 	const char	*tlscert=cmdline->getValue("tlscert");
 	const char	*tlspassword=cmdline->getValue("tlspassword");
 	const char	*tlsciphers=cmdline->getValue("tlsciphers");
 	const char	*tlsvalidate="no";
-	if (cmdline->found("tlsvalidate")) {
+	if (cmdline->isFound("tlsvalidate")) {
 		tlsvalidate=cmdline->getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline->getValue("tlsca");
-	uint16_t	tlsdepth=charstring::toUnsignedInteger(
+	uint16_t	tlsdepth=charstring::convertToUnsignedInteger(
 					cmdline->getValue("tlsdepth"));
 	const char	*localeargument=cmdline->getValue("locale");
 	const char	*script=cmdline->getValue("script");
@@ -2637,38 +2658,61 @@ bool sqlrsh::execute(int argc, const char **argv) {
 
 	// if an id was specified, then get various values from the config file
 	if (!charstring::isNullOrEmpty(id)) {
-		sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
+		cfg=sqlrcfgs.load(configurl,id);
 		if (cfg) {
-			if (!cmdline->found("host")) {
+			if (!cmdline->isFound("host")) {
 				host="localhost";
 			}
-			if (!cmdline->found("port")) {
+			if (!cmdline->isFound("port")) {
 				port=cfg->getDefaultPort();
 			}
-			if (!cmdline->found("socket")) {
+			if (!cmdline->isFound("socket")) {
 				socket=cfg->getDefaultSocket();
 			}
-			if (!cmdline->found("krb")) {
+			if (!cmdline->isFound("krb")) {
 				usekrb=cfg->getDefaultKrb();
 			}
-			if (!cmdline->found("krbservice")) {
+			if (!cmdline->isFound("krbservice")) {
 				krbservice=cfg->getDefaultKrbService();
 			}
-			if (!cmdline->found("krbmech")) {
+			if (!cmdline->isFound("krbmech")) {
 				krbmech=cfg->getDefaultKrbMech();
 			}
-			if (!cmdline->found("krbflags")) {
+			if (!cmdline->isFound("krbflags")) {
 				krbflags=cfg->getDefaultKrbFlags();
 			}
-			if (!cmdline->found("tls")) {
+			if (!cmdline->isFound("tls")) {
 				usetls=cfg->getDefaultTls();
 			}
 			if (!cmdline->getValue("tlsciphers")) {
 				tlsciphers=cfg->getDefaultTlsCiphers();
 			}
-			if (!cmdline->found("user")) {
+			if (!cmdline->isFound("user")) {
+
+				// get the default user
 				user=cfg->getDefaultUser();
-				password=cfg->getDefaultPassword();
+
+				// get the default password and
+				// de-sensitiveize it if necessary
+				sensitivevalue	passwordvalue;
+				passwordvalue.setPath(cfg->getPasswordPath());
+				passwordvalue.parse(cfg->getDefaultPassword());
+				password=passwordvalue.detachTextValue();
+
+				// decrypt the password if necessary
+				passwordencryptionid=
+					cfg->getDefaultPasswordEncryptionId();
+				if (passwordencryptionid) {
+					sqlrpwdencs	sqlrpe(sqlrpth,false);
+					sqlrpe.load(
+						cfg->getPasswordEncryptions());
+					decryptedpassword=
+						sqlrpe.
+						getPasswordEncryptionById(
+							passwordencryptionid)->
+							decrypt(password);
+					password=decryptedpassword;
+				}
 			}
 		}
 	}
@@ -2677,11 +2721,10 @@ bool sqlrsh::execute(int argc, const char **argv) {
 		// This is useful for making sure that decimals still work
 		// when the locale is changed to say, de_DE that has different
 		// number formats.
-		char	*localeresult=setlocale(LC_ALL,
-				(!charstring::compare(localeargument,"env"))?
-							"":localeargument);
-		if (!localeresult) {
-			stderror.printf("ERROR: setlocale failed\n");
+		if (!locale::setAll(
+			(!charstring::compare(localeargument,"env"))?
+							"":localeargument)) {
+			stderror.printf("ERROR: set locale failed\n");
 			return false;
 		}
 	}
@@ -2702,7 +2745,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	sqlrshenv	env;
 
 	// handle quiet flag
-	if (cmdline->found("quiet")) {
+	if (cmdline->isFound("quiet")) {
 		env.headers=false;
 		env.stats=false;
 	}
@@ -2713,15 +2756,15 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	}
 
 	// handle the result set buffer size
-	if (cmdline->found("resultsetbuffersize")) {
-		env.rsbs=charstring::toInteger(
+	if (cmdline->isFound("resultsetbuffersize")) {
+		env.rsbs=charstring::convertToInteger(
 				cmdline->getValue("resultsetbuffersize"));
 	}
 
 	// FIXME: make these commands instead of commandline args
-	env.getasnumber=cmdline->found("getasnumber");
-	env.noelapsed=cmdline->found("noelapsed");
-	env.nextresultset=cmdline->found("nextresultset");
+	env.getasnumber=cmdline->isFound("getasnumber");
+	env.noelapsed=cmdline->isFound("noelapsed");
+	env.nextresultset=cmdline->isFound("nextresultset");
 
 	// process RC files
 	userRcFile(&sqlrcon,&sqlrcur,&env);
@@ -2730,7 +2773,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 	// handle the history file
 	const char	*home=environment::getValue("HOME");
 	if (!charstring::isNullOrEmpty(home)) {
-		char	*filename=new char[charstring::length(home)+16+1];
+		char	*filename=new char[charstring::getLength(home)+16+1];
 		charstring::copy(filename,home);
 		charstring::append(filename,"/.sqlrsh_history");
 		pr.setHistoryFile(filename);
@@ -2753,6 +2796,7 @@ bool sqlrsh::execute(int argc, const char **argv) {
 
 	// clean up
 	pr.flushHistory();
+	delete[] decryptedpassword;
 
 	return retval;
 }

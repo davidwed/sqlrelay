@@ -87,42 +87,42 @@ int main(int argc, const char **argv) {
 	const char	*configurl=sqlrpth.getConfigUrl();
 	const char	*id=cmdline.getValue("id");
 	const char	*host=cmdline.getValue("host");
-	uint16_t	port=charstring::toInteger(
-				(cmdline.found("port"))?
+	uint16_t	port=charstring::convertToInteger(
+				(cmdline.isFound("port"))?
 				cmdline.getValue("port"):DEFAULT_PORT);
 	const char	*socket=cmdline.getValue("socket");
 	const char	*user=cmdline.getValue("user");
 	const char	*password=cmdline.getValue("password");
-	bool		usekrb=cmdline.found("krb");
+	bool		usekrb=cmdline.isFound("krb");
 	const char	*krbservice=cmdline.getValue("krbservice");
 	const char	*krbmech=cmdline.getValue("krbmech");
 	const char	*krbflags=cmdline.getValue("krbflags");
-	bool		usetls=cmdline.found("tls");
+	bool		usetls=cmdline.isFound("tls");
 	const char	*tlscert=cmdline.getValue("tlscert");
 	const char	*tlsversion=cmdline.getValue("tlsversion");
 	const char	*tlspassword=cmdline.getValue("tlspassword");
 	const char	*tlsciphers=cmdline.getValue("tlsciphers");
 	const char	*tlsvalidate="no";
-	if (cmdline.found("tlsvalidate")) {
+	if (cmdline.isFound("tlsvalidate")) {
 		tlsvalidate=cmdline.getValue("tlsvalidate");
 	}
 	const char	*tlsca=cmdline.getValue("tlsca");
-	uint16_t	tlsdepth=charstring::toUnsignedInteger(
+	uint16_t	tlsdepth=charstring::convertToUnsignedInteger(
 					cmdline.getValue("tlsdepth"));
 	const char	*file=cmdline.getValue("file");
 	const char	*commitcountstr=cmdline.getValue("commitcount");
-	bool		debug=cmdline.found("debug");
+	bool		debug=cmdline.isFound("debug");
 	const char	*debugfile=NULL;
 	if (debug) {
 		debugfile=cmdline.getValue("debug");
 	}
-	bool		verbose=cmdline.found("verbose");
+	bool		verbose=cmdline.isFound("verbose");
 	const char	*table=cmdline.getValue("table");
-	bool 		ignorecolumns=cmdline.found("ignorecolumns");
+	bool 		ignorecolumns=cmdline.isFound("ignorecolumns");
 	const char	*primarykeyname=
 				cmdline.getValue("primarykeyname");
 	uint32_t	primarykeyposition=
-				charstring::toUnsignedInteger(
+				charstring::convertToUnsignedInteger(
 					cmdline.getValue("primarykeyposition"));
 	const char	*primarykeysequence=
 				cmdline.getValue("primarykeysequence");
@@ -157,34 +157,34 @@ int main(int argc, const char **argv) {
 	if (!charstring::isNullOrEmpty(id)) {
 		sqlrconfig	*cfg=sqlrcfgs.load(configurl,id);
 		if (cfg) {
-			if (!cmdline.found("host")) {
+			if (!cmdline.isFound("host")) {
 				host="localhost";
 			}
-			if (!cmdline.found("port")) {
+			if (!cmdline.isFound("port")) {
 				port=cfg->getDefaultPort();
 			}
-			if (!cmdline.found("socket")) {
+			if (!cmdline.isFound("socket")) {
 				socket=cfg->getDefaultSocket();
 			}
-			if (!cmdline.found("krb")) {
+			if (!cmdline.isFound("krb")) {
 				usekrb=cfg->getDefaultKrb();
 			}
-			if (!cmdline.found("krbservice")) {
+			if (!cmdline.isFound("krbservice")) {
 				krbservice=cfg->getDefaultKrbService();
 			}
-			if (!cmdline.found("krbmech")) {
+			if (!cmdline.isFound("krbmech")) {
 				krbmech=cfg->getDefaultKrbMech();
 			}
-			if (!cmdline.found("krbflags")) {
+			if (!cmdline.isFound("krbflags")) {
 				krbflags=cfg->getDefaultKrbFlags();
 			}
-			if (!cmdline.found("tls")) {
+			if (!cmdline.isFound("tls")) {
 				usetls=cfg->getDefaultTls();
 			}
 			if (!cmdline.getValue("tlsciphers")) {
 				tlsciphers=cfg->getDefaultTlsCiphers();
 			}
-			if (!cmdline.found("user")) {
+			if (!cmdline.isFound("user")) {
 				user=cfg->getDefaultUser();
 				password=cfg->getDefaultPassword();
 			}
@@ -215,7 +215,7 @@ int main(int argc, const char **argv) {
 	// (if not specified at all, default to 100)
 	uint64_t	commitcount=
 			(charstring::isNullOrEmpty(commitcountstr))?
-				100:charstring::toInteger(commitcountstr);
+				100:charstring::convertToInteger(commitcountstr);
 
 	// set up logging
 	logger	lg;

@@ -66,7 +66,8 @@ sqlrquerycursor::~sqlrquerycursor() {
 	delete pvt;
 }
 
-sqlrquerytype_t	sqlrquerycursor::queryType(const char *query, uint32_t length) {
+sqlrquerytype_t	sqlrquerycursor::determineQueryType(const char *query,
+							uint32_t length) {
 	return SQLRQUERYTYPE_CUSTOM;
 }
 

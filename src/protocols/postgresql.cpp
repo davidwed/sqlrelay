@@ -85,7 +85,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 
 		bool	recvPacket();
 		bool	recvPacket(bool gettype);
-		bool	sendPacket(unsigned char type);
+		bool	sendPacket(byte_t type);
 
 		bool	initialHandshake();
 		bool	recvStartupMessage();
@@ -135,17 +135,17 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 
 		bool	parse();
 		bool	bind();
-		void	bindTextParameter(const unsigned char *rp,
+		void	bindTextParameter(const byte_t *rp,
 						uint32_t paramlength,
 						memorypool *bindpool,
 						sqlrserverbindvar *bv,
-						const unsigned char **rpout);
-		bool	bindBinaryParameter(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	bindBinaryParameter(const byte_t *rp,
 						uint32_t oid,
 						uint32_t paramlength,
 						memorypool *bindpool,
 						sqlrserverbindvar *bv,
-						const unsigned char **rpout);
+						const byte_t **rpout);
 		bool	describe();
 		bool	sendNoData();
 		bool	execute();
@@ -162,18 +162,18 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_postgresql : public sqlrprotocol {
 		void	debugRecvTypeError();
 		void	debugSystemError();
 
-		void	readString(const unsigned char *rp,
-					const unsigned char *rpend,
+		void	readString(const byte_t *rp,
+					const byte_t *rpend,
 					stringbuffer *strb,
-					const unsigned char **rpout);
+					const byte_t **rpout);
 
 		filedescriptor	*clientsock;
 
 		bytebuffer	resppacket;
 
 		uint32_t	reqpacketsize;
-		unsigned char	*reqpacket;
-		unsigned char	reqtype;
+		byte_t		*reqpacket;
+		byte_t		reqtype;
 
 		uint32_t	protocolversion;
 
@@ -283,7 +283,7 @@ sqlrprotocol_postgresql::sqlrprotocol_postgresql(sqlrservercontroller *cont,
 	bindvarnamesizes=new int16_t[maxbindcount];
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		charstring::printf(&bindvarnames[i],"$%d",i+1);
-		bindvarnamesizes[i]=charstring::length(bindvarnames[i]);
+		bindvarnamesizes[i]=charstring::getLength(bindvarnames[i]);
 	}
 
 	init();
@@ -335,8 +335,8 @@ clientsessionexitstatus_t sqlrprotocol_postgresql::clientSession(
 	clientsock=cs;
 
 	// Set up the socket...
-	clientsock->translateByteOrder();
-	clientsock->dontUseNaglesAlgorithm();
+	clientsock->setTranslateByteOrder(true);
+	clientsock->setNaglesAlgorithmEnabled(false);
 	clientsock->setSocketReadBufferSize(65536);
 	clientsock->setSocketWriteBufferSize(65536);
 	clientsock->setReadBufferSize(65536);
@@ -429,14 +429,14 @@ bool sqlrprotocol_postgresql::recvPacket(bool gettype) {
 	// request packet structure:
 	//
 	// data {
-	// 	unsigned char	type
+	// 	byte_t		type
 	//	uint32_t	size (of data, including itself)
-	// 	unsigned char[]	data
+	// 	byte_t[]	data
 	// }
 
 	// packet header
 	if (gettype) {
-		if (clientsock->read(&reqtype)!=sizeof(unsigned char)) {
+		if (clientsock->read(&reqtype)!=sizeof(byte_t)) {
 			if (getDebug()) {
 				stdoutput.write("read packet type failed\n");
 				debugSystemError();
@@ -459,7 +459,7 @@ bool sqlrprotocol_postgresql::recvPacket(bool gettype) {
 
 	// packet
 	delete[] reqpacket;
-	reqpacket=new unsigned char[reqpacketsize];
+	reqpacket=new byte_t[reqpacketsize];
 	if (clientsock->read(reqpacket,reqpacketsize)!=(ssize_t)reqpacketsize) {
 		if (getDebug()) {
 			stdoutput.write("read packet data failed\n");
@@ -480,16 +480,16 @@ bool sqlrprotocol_postgresql::recvPacket(bool gettype) {
 	return true;
 }
 
-bool sqlrprotocol_postgresql::sendPacket(unsigned char type) {
+bool sqlrprotocol_postgresql::sendPacket(byte_t type) {
 
 	// Read a response packet to the client...
 
 	// response packet structure:
 	// 
 	// data {
-	// 	unsigned char	type
+	// 	byte_t		type
 	//	uint32_t	size (of data, including itself)
-	// 	unsigned char[]	data
+	// 	byte_t[]	data
 	// }
 
 	// debug
@@ -506,7 +506,7 @@ bool sqlrprotocol_postgresql::sendPacket(unsigned char type) {
 	}
 
 	// packet header
-	if (clientsock->write(type)!=sizeof(unsigned char)) {
+	if (clientsock->write(type)!=sizeof(byte_t)) {
 		if (getDebug()) {
 			stdoutput.write("write packet type failed\n");
 			debugSystemError();
@@ -566,8 +566,8 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 	// 	...
 	// }
 
-	const unsigned char	*rp=NULL;
-	const unsigned char	*rpend=NULL;
+	const byte_t	*rp=NULL;
+	const byte_t	*rpend=NULL;
 
 	bool	usingtls=false;
 
@@ -588,10 +588,9 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 		// protocol version
 		readBE(rp,&protocolversion,&rp);
 
-		// if the client requested SSL, then deny it
 		if (protocolversion==80877103) {
 
-			// FIXME: support SSL
+			// handle SSL request...
 
 			// close the connection if this is the second time
 			// we've gotten an ssl request in the same session
@@ -632,8 +631,12 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 				usingtls=true;
 			}
 
-		} else {
+		} else if (protocolversion==196608) {
 
+			// handle protocol 3.0 request
+
+			// bail if we're configured to require tls or mutual
+			// auth, but the client didn't request it
 			if (useTls() && !usingtls) {
 				sendErrorResponse(
 					"SSL Error","88P01",
@@ -643,15 +646,20 @@ bool sqlrprotocol_postgresql::recvStartupMessage() {
 				return false;
 			}
 
-			if (protocolversion!=196608) {
-				// FIXME: NegotiateProtocolVersion
-				sendErrorResponse("FATAL",
-							"88P01",
-							"Invalid protocol");
-				return false;
-			}
-
 			break;
+
+		} else if (protocolversion==131072) {
+
+			// FIXME: support protocol 2.0
+			sendErrorResponse("FATAL","88P01",
+					"unsupported frontend protocol 2.0: "
+					"server supports 3.0 to 3.0");
+			return false;
+
+		} else {
+
+			sendErrorResponse("FATAL","88P01","Invalid protocol");
+			return false;
 		}
 
 		first=false;
@@ -826,7 +834,7 @@ bool sqlrprotocol_postgresql::sendAuthenticationMD5Password() {
 
 	// set values to send
 	uint32_t	authtype=AUTH_MD5;
-	rand.generateNumber(&salt);
+	rand.generate(&salt);
 
 	// debug
 	if (getDebug()) {
@@ -839,7 +847,7 @@ bool sqlrprotocol_postgresql::sendAuthenticationMD5Password() {
 	// build response packet
 	resppacket.clear();
 	writeBE(&resppacket,authtype);
-	write(&resppacket,(unsigned char *)&salt,sizeof(salt));
+	write(&resppacket,(byte_t *)&salt,sizeof(salt));
 
 	// send response packet
 	return sendPacket(MESSAGE_AUTHENTICATION);
@@ -863,7 +871,7 @@ bool sqlrprotocol_postgresql::recvPasswordMessage() {
 	}
 
 	// parse request packet
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 
 	password=new char[reqpacketsize+1];
 	read(rp,password,reqpacketsize,&rp);
@@ -885,7 +893,7 @@ bool sqlrprotocol_postgresql::authenticate() {
 	sqlrpostgresqlcredentials	cred;
 	cred.setUser(user);
 	cred.setPassword(password);
-	cred.setPasswordLength(charstring::length(password));
+	cred.setPasswordLength(charstring::getLength(password));
 	cred.setMethod(authmethod);
 	cred.setSalt(salt);
 
@@ -953,7 +961,7 @@ bool sqlrprotocol_postgresql::sendBackendKeyData() {
 
 	// set values to send
 	uint32_t	pid=process::getProcessId();
-	rand.generateNumber(&secretkey);
+	rand.generate(&secretkey);
 
 	// debug
 	if (getDebug()) {
@@ -986,7 +994,7 @@ bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
 			char		*major=NULL;
 			char		*minor=NULL;
 			char		*patch=NULL;
-			if (charstring::length(dbversion)==5) {
+			if (charstring::getLength(dbversion)==5) {
 				major=charstring::duplicate(ptr,1);
 				ptr++;
 			} else {
@@ -997,8 +1005,8 @@ bool sqlrprotocol_postgresql::sendStartupParameterStatuses() {
 			ptr+=2;
 			patch=charstring::duplicate(ptr,2);
 			sv.append(major)->append('.');
-			sv.append(charstring::toInteger(minor))->append('.');
-			sv.append(charstring::toInteger(patch));
+			sv.append(charstring::convertToInteger(minor))->append('.');
+			sv.append(charstring::convertToInteger(patch));
 
 			// get other variables
 			const char	*vars[]={
@@ -1152,7 +1160,7 @@ bool sqlrprotocol_postgresql::sendReadyForQuery() {
 bool sqlrprotocol_postgresql::sendErrorResponse(const char *errorstring) {
 	return sendErrorResponse("ERROR","",
 				errorstring,
-				charstring::length(errorstring));
+				charstring::getLength(errorstring));
 }
 
 bool sqlrprotocol_postgresql::sendErrorResponse(const char *errorstring,
@@ -1165,7 +1173,7 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 						const char *errorstring) {
 	return sendErrorResponse(severity,sqlstate,
 				errorstring,
-				charstring::length(errorstring));
+				charstring::getLength(errorstring));
 }
 
 bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
@@ -1180,10 +1188,10 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 	// data {
 	//
 	// 	// fields...
-	// 	unsigned char	field type
-	// 	char[]		error string
-	// 	unsigned char	field type
-	// 	char[]		error string
+	// 	byte_t	field type
+	// 	char[]	error string
+	// 	byte_t	field type
+	// 	char[]	error string
 	// 	...
 	// }
 
@@ -1210,19 +1218,19 @@ bool sqlrprotocol_postgresql::sendErrorResponse(const char *severity,
 	// build response packet
 	resppacket.clear();
 
-	write(&resppacket,(unsigned char)FIELD_TYPE_SEVERITY);
+	write(&resppacket,(byte_t)FIELD_TYPE_SEVERITY);
 	write(&resppacket,severity);
-	write(&resppacket,(unsigned char)'\0');
+	write(&resppacket,(byte_t)'\0');
 
-	write(&resppacket,(unsigned char)FIELD_TYPE_CODE);
+	write(&resppacket,(byte_t)FIELD_TYPE_CODE);
 	write(&resppacket,sqlstate);
-	write(&resppacket,(unsigned char)'\0');
+	write(&resppacket,(byte_t)'\0');
 
-	write(&resppacket,(unsigned char)FIELD_TYPE_MESSAGE);
+	write(&resppacket,(byte_t)FIELD_TYPE_MESSAGE);
 	write(&resppacket,errorstring,errorstringlength);
-	write(&resppacket,(unsigned char)'\0');
+	write(&resppacket,(byte_t)'\0');
 
-	write(&resppacket,(unsigned char)'\0');
+	write(&resppacket,(byte_t)'\0');
 
 	// send response packet
 	return sendPacket(MESSAGE_ERRORRESPONSE);
@@ -1243,7 +1251,7 @@ bool sqlrprotocol_postgresql::query() {
 	// }
 
 	// parse request packet
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 
 	const char	*query=(const char *)rp;
 	uint32_t	querylength=reqpacketsize;
@@ -1452,7 +1460,7 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 			// tablemangling=lookup is set.  If we get a number
 			// for the table name, then assume the backend is
 			// returning oid's.
-			tableoid=charstring::toInteger(tablename);
+			tableoid=charstring::convertToInteger(tablename);
 		}
 		writeBE(&resppacket,tableoid);
 
@@ -1472,7 +1480,7 @@ bool sqlrprotocol_postgresql::sendRowDescription(sqlrservercursor *cursor,
 			// typemangling=yes/lookup is set.  If we get a number
 			// for the type name, then assume the backend is
 			// returning oid's.
-			coltypeoid=charstring::toInteger(coltypename);
+			coltypeoid=charstring::convertToInteger(coltypename);
 		} else {
 			coltypeoid=getColumnTypeOid(
 					cont->getColumnType(cursor,i));
@@ -1917,8 +1925,8 @@ bool sqlrprotocol_postgresql::parse() {
 	// }
 
 	// parse request packet
-	const unsigned char	*rp=reqpacket;
-	const unsigned char	*rpend=rp+reqpacketsize;
+	const byte_t	*rp=reqpacket;
+	const byte_t	*rpend=rp+reqpacketsize;
 
 	// get stmt name
 	const char	*stmtname=(const char *)rp;
@@ -2047,8 +2055,8 @@ bool sqlrprotocol_postgresql::bind() {
 	debugStart("Bind");
 
 	// parse request packet
-	const unsigned char	*rp=reqpacket;
-	const unsigned char	*rpend=rp+reqpacketsize;
+	const byte_t	*rp=reqpacket;
+	const byte_t	*rpend=rp+reqpacketsize;
 
 	stringbuffer	portal;
 	stringbuffer	stmtname;
@@ -2223,11 +2231,11 @@ bool sqlrprotocol_postgresql::bind() {
 	return sendPacket(MESSAGE_BINDCOMPLETE);
 }
 
-void sqlrprotocol_postgresql::bindTextParameter(const unsigned char *rp,
+void sqlrprotocol_postgresql::bindTextParameter(const byte_t *rp,
 						uint32_t paramlength,
 						memorypool *bindpool,
 						sqlrserverbindvar *bv,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 
 	// bind string
 	bv->type=SQLRSERVERBINDVARTYPE_STRING;
@@ -2243,12 +2251,12 @@ void sqlrprotocol_postgresql::bindTextParameter(const unsigned char *rp,
 	}
 }
 
-bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
+bool sqlrprotocol_postgresql::bindBinaryParameter(const byte_t *rp,
 						uint32_t oid,
 						uint32_t paramlength,
 						memorypool *bindpool,
 						sqlrserverbindvar *bv,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 
 	if (getDebug()) {
 		stdoutput.printf("		oid: %d\n",oid);
@@ -2261,7 +2269,7 @@ bool sqlrprotocol_postgresql::bindBinaryParameter(const unsigned char *rp,
 		case 16: //bool
 		case 1000: //_bool
 			{
-			unsigned char	value=0;
+			byte_t	value=0;
 			bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
 			read(rp,&value,rpout);
 			bv->value.integerval=value;
@@ -2567,8 +2575,8 @@ bool sqlrprotocol_postgresql::describe() {
 	// }
 
 	// parse request packet
-	const unsigned char	*rp=reqpacket;
-	const unsigned char	*rpend=rp+reqpacketsize;
+	const byte_t	*rp=reqpacket;
+	const byte_t	*rpend=rp+reqpacketsize;
 
 	char	sorp;
 	read(rp,&sorp,&rp);
@@ -2630,8 +2638,8 @@ bool sqlrprotocol_postgresql::execute() {
 	// }
 
 	// parse request packet
-	const unsigned char	*rp=reqpacket;
-	const unsigned char	*rpend=rp+reqpacketsize;
+	const byte_t	*rp=reqpacket;
+	const byte_t	*rpend=rp+reqpacketsize;
 
 	stringbuffer	portal;
 	readString(rp,rpend,&portal,&rp);
@@ -2731,8 +2739,8 @@ bool sqlrprotocol_postgresql::close() {
 	// }
 
 	// parse request packet
-	const unsigned char	*rp=reqpacket;
-	const unsigned char	*rpend=rp+reqpacketsize;
+	const byte_t	*rp=reqpacket;
+	const byte_t	*rpend=rp+reqpacketsize;
 
 	char	sorp;
 	read(rp,&sorp,&rp);
@@ -2821,10 +2829,10 @@ void sqlrprotocol_postgresql::debugSystemError() {
 	delete[] err;
 }
 
-void sqlrprotocol_postgresql::readString(const unsigned char *rp,
-					const unsigned char *rpend,
+void sqlrprotocol_postgresql::readString(const byte_t *rp,
+					const byte_t *rpend,
 					stringbuffer *strb,
-					const unsigned char **rpout) {
+					const byte_t **rpout) {
 
 	// read until we hit a null or the end of the request
 	while (*rp && rp!=rpend) {

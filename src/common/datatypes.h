@@ -507,7 +507,7 @@ static bool isFloatTypeInt(int16_t type) {
 #ifdef NEED_BIT_STRING_TO_LONG
 static int32_t bitStringToLong(const char *str) {
 	uint32_t	result=0;
-	size_t		length=charstring::length(str);
+	size_t		length=charstring::getLength(str);
 	for (size_t i=0; i<length; i++) {
 		result=(result<<1)|(str[i]=='1');
 	}

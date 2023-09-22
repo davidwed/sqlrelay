@@ -239,7 +239,7 @@ int	main(int argc, char **argv) {
 	q.append("use ")->append(db);
 	const char	*query=q.getString();
 	checkSuccess(ct_command(cmd,CS_LANG_CMD,
-					query,charstring::length(query),
+					query,charstring::getLength(query),
 					CS_UNUSED),CS_SUCCEED);
 	checkSuccess(ct_send(cmd),CS_SUCCEED);
 	CS_INT	results=ct_results(cmd,&resultstype);
@@ -254,7 +254,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("\n");
 
 	query="drop table testtable";
-	ct_command(cmd,CS_LANG_CMD,query,charstring::length(query),CS_UNUSED);
+	ct_command(cmd,CS_LANG_CMD,query,charstring::getLength(query),CS_UNUSED);
 	ct_send(cmd);
 	while (ct_results(cmd,&resultstype)==CS_SUCCEED) {}
 	ct_cancel(NULL,cmd,CS_CANCEL_ALL);
@@ -292,7 +292,7 @@ int	main(int argc, char **argv) {
 				"testntext ntext"
 				")";
 	checkSuccess(ct_command(cmd,CS_LANG_CMD,
-				query,charstring::length(query),
+				query,charstring::getLength(query),
 				CS_UNUSED),CS_SUCCEED);
 	checkSuccess(ct_send(cmd),CS_SUCCEED);
 	results=ct_results(cmd,&resultstype);
@@ -339,7 +339,7 @@ int	main(int argc, char **argv) {
 				"'ntext1'"
 				")";
 	checkSuccess(ct_command(cmd,CS_LANG_CMD,
-					query,charstring::length(query),
+					query,charstring::getLength(query),
 					CS_UNUSED),CS_SUCCEED);
 	checkSuccess(ct_send(cmd),CS_SUCCEED);
 	results=ct_results(cmd,&resultstype);
@@ -391,7 +391,7 @@ int	main(int argc, char **argv) {
 				"'ntext2'"
 				")";
 	checkSuccess(ct_command(cmd,CS_LANG_CMD,
-					query,charstring::length(query),
+					query,charstring::getLength(query),
 					CS_UNUSED),CS_SUCCEED);
 	checkSuccess(ct_send(cmd),CS_SUCCEED);
 	results=ct_results(cmd,&resultstype);
@@ -413,7 +413,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("ct_command: select\n");
 	query="select * from testtable";
 	checkSuccess(ct_command(cmd,CS_LANG_CMD,
-					query,charstring::length(query),
+					query,charstring::getLength(query),
 					CS_UNUSED),CS_SUCCEED);
 	checkSuccess(ct_send(cmd),CS_SUCCEED);
 	stdoutput.printf("\n");
@@ -991,7 +991,7 @@ int	main(int argc, char **argv) {
 	stdoutput.printf("ct_command: drop\n");
 	query="drop table testtable";
 	checkSuccess(ct_command(cmd,CS_LANG_CMD,
-					query,charstring::length(query),
+					query,charstring::getLength(query),
 					CS_UNUSED),CS_SUCCEED);
 	checkSuccess(ct_send(cmd),CS_SUCCEED);
 	results=ct_results(cmd,&resultstype);

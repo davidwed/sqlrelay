@@ -63,7 +63,7 @@ bool sqlrlogger_custom_nw::init(sqlrlistener *sqlrl,
 	delete[] querylogname;
 	charstring::printf(&querylogname,"%s/%s",logdir,id);
 	directory::create(querylogname,
-			permissions::evalPermString("rwxrwxrwx"));
+			permissions::parsePermString("rwxrwxrwx"));
 
 	// create the log file name
 	delete[] querylogname;
@@ -72,7 +72,7 @@ bool sqlrlogger_custom_nw::init(sqlrlistener *sqlrl,
 	// create the new log file
 	querylog.close();
 	return querylog.open(querylogname,O_WRONLY|O_CREAT|O_APPEND,
-				permissions::evalPermString("rw-------"));
+				permissions::parsePermString("rw-------"));
 }
 
 bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
@@ -133,7 +133,7 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 	
 	// get the current date/time
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 
 	// write everything into an output buffer, pipe-delimited
 	charstring::printf(querylogbuf,sizeof(querylogbuf)-1,
@@ -142,8 +142,8 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 		dt.getMonth(),
 		dt.getDayOfMonth(),
 		dt.getHour(),
-		dt.getMinutes(),
-		dt.getSeconds(),
+		dt.getMinute(),
+		dt.getSecond(),
 		sqlrcon->cont->getStatisticsIndex(),
 		((double)(sec*1000000+usec))/1000000.0,
 		errorcodebuf,
@@ -157,13 +157,13 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 
 	// write that buffer to the log file
 	return ((size_t)querylog.write(querylogbuf)==
-				charstring::length(querylogbuf));
+				charstring::getLength(querylogbuf));
 }
 
 int sqlrlogger_custom_nw::strescape(const char *str, char *buf, int limit) {
 	// from oracpool my_strescape()
 	char		*q=buf;
-	const char	*strend=str+charstring::length(str);
+	const char	*strend=str+charstring::getLength(str);
 	for (const char *p=str; p<strend; p++) {
 		if (q-buf>=limit-1) {
 			break;

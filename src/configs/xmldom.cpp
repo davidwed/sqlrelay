@@ -45,6 +45,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 
 		const char	*getDefaultUser();
 		const char	*getDefaultPassword();
+		const char	*getDefaultPasswordEncryptionId();
 
 		bool		getListenOnInet();
 		bool		getListenOnUnix();
@@ -162,7 +163,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		done;
 
 		void	init();
-		void	clear();
+		bool	clear();
 
 		void	parseUrl(const char *urlname);
 		void	normalizeTree();
@@ -304,6 +305,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*defaulttlsciphers;
 		const char	*defaultuser;
 		const char	*defaultpassword;
+		const char	*defaultpasswordencryptionid;
 
 		bool		ininstancetag;
 		bool		inidattribute;
@@ -336,21 +338,22 @@ void sqlrconfig_xmldom::init() {
 	listenoninet=false;
 	listenonunix=false;
 	dbase=DEFAULT_DBASE;
-	connections=charstring::toInteger(DEFAULT_CONNECTIONS);
+	connections=charstring::convertToInteger(DEFAULT_CONNECTIONS);
 	maxconnections=0;
-	maxqueuelength=charstring::toInteger(DEFAULT_MAXQUEUELENGTH);
-	growby=charstring::toInteger(DEFAULT_GROWBY);
-	ttl=charstring::toInteger(DEFAULT_TTL);
-	softttl=charstring::toInteger(DEFAULT_SOFTTTL);
-	maxsessioncount=charstring::toInteger(DEFAULT_MAXSESSIONCOUNT);
+	maxqueuelength=charstring::convertToInteger(DEFAULT_MAXQUEUELENGTH);
+	growby=charstring::convertToInteger(DEFAULT_GROWBY);
+	ttl=charstring::convertToInteger(DEFAULT_TTL);
+	softttl=charstring::convertToInteger(DEFAULT_SOFTTTL);
+	maxsessioncount=charstring::convertToInteger(DEFAULT_MAXSESSIONCOUNT);
 	endofsession=DEFAULT_ENDOFSESSION;
 	endofsessioncommit=!charstring::compare(endofsession,"commit");
-	sessiontimeout=charstring::toUnsignedInteger(DEFAULT_SESSIONTIMEOUT);
+	sessiontimeout=charstring::convertToUnsignedInteger(
+						DEFAULT_SESSIONTIMEOUT);
 	runasuser=DEFAULT_RUNASUSER;
 	runasgroup=DEFAULT_RUNASGROUP;
-	cursors=charstring::toInteger(DEFAULT_CURSORS);
-	maxcursors=charstring::toInteger(DEFAULT_MAXCURSORS);
-	cursorsgrowby=charstring::toInteger(DEFAULT_CURSORS_GROWBY);
+	cursors=charstring::convertToInteger(DEFAULT_CURSORS);
+	maxcursors=charstring::convertToInteger(DEFAULT_MAXCURSORS);
+	cursorsgrowby=charstring::convertToInteger(DEFAULT_CURSORS_GROWBY);
 	authtier=DEFAULT_AUTHTIER;
 	authonconnection=true;
 	authondatabase=false;
@@ -389,19 +392,23 @@ void sqlrconfig_xmldom::init() {
 	debugrouters=hasDebug(debug,"routers");
 	debugqueries=hasDebug(debug,"queries");
 	debugmoduledatas=hasDebug(debug,"moduledatas");
-	maxclientinfolength=charstring::toInteger(DEFAULT_MAXCLIENTINFOLENGTH);
-	maxquerysize=charstring::toInteger(DEFAULT_MAXQUERYSIZE);
-	maxbindcount=charstring::toInteger(DEFAULT_MAXBINDCOUNT);
-	maxbindnamelength=charstring::toInteger(DEFAULT_MAXBINDNAMELENGTH);
-	maxstringbindvaluelength=charstring::toInteger(
+	maxclientinfolength=charstring::convertToInteger(
+						DEFAULT_MAXCLIENTINFOLENGTH);
+	maxquerysize=charstring::convertToInteger(DEFAULT_MAXQUERYSIZE);
+	maxbindcount=charstring::convertToInteger(DEFAULT_MAXBINDCOUNT);
+	maxbindnamelength=charstring::convertToInteger(
+						DEFAULT_MAXBINDNAMELENGTH);
+	maxstringbindvaluelength=charstring::convertToInteger(
 					DEFAULT_MAXSTRINGBINDVALUELENGTH);
-	maxlobbindvaluelength=charstring::toInteger(
+	maxlobbindvaluelength=charstring::convertToInteger(
 					DEFAULT_MAXLOBBINDVALUELENGTH);
-	maxerrorlength=charstring::toInteger(DEFAULT_MAXERRORLENGTH);
-	idleclienttimeout=charstring::toInteger(DEFAULT_IDLECLIENTTIMEOUT);
+	maxerrorlength=charstring::convertToInteger(DEFAULT_MAXERRORLENGTH);
+	idleclienttimeout=charstring::convertToInteger(
+						DEFAULT_IDLECLIENTTIMEOUT);
 	metrictotal=0;
-	maxlisteners=charstring::toInteger(DEFAULT_MAXLISTENERS);
-	listenertimeout=charstring::toUnsignedInteger(DEFAULT_LISTENERTIMEOUT);
+	maxlisteners=charstring::convertToInteger(DEFAULT_MAXLISTENERS);
+	listenertimeout=charstring::convertToUnsignedInteger(
+						DEFAULT_LISTENERTIMEOUT);
 	reloginatstart=charstring::isYes(DEFAULT_RELOGINATSTART);
 	fakeinputbindvariables=charstring::isYes(
 					DEFAULT_FAKEINPUTBINDVARIABLES);
@@ -438,15 +445,17 @@ void sqlrconfig_xmldom::init() {
 	defaulttlsciphers=NULL;
 	defaultuser=NULL;
 	defaultpassword=NULL;
+	defaultpasswordencryptionid=NULL;
 }
 
-void sqlrconfig_xmldom::clear() {
+bool sqlrconfig_xmldom::clear() {
 	debugFunction();
 
 	connectstringlist.clear();
 	routelist.clear();
 	sessionstartqueries.clear();
 	sessionendqueries.clear();
+	return true;
 }
 
 const char *sqlrconfig_xmldom::getDefaultAddresses() {
@@ -495,6 +504,10 @@ const char *sqlrconfig_xmldom::getDefaultUser() {
 
 const char *sqlrconfig_xmldom::getDefaultPassword() {
 	return defaultpassword;
+}
+
+const char *sqlrconfig_xmldom::getDefaultPasswordEncryptionId() {
+	return defaultpasswordencryptionid;
 }
 
 bool sqlrconfig_xmldom::getListenOnInet() {
@@ -896,7 +909,7 @@ connectstringcontainer *sqlrconfig_xmldom::getConnectString(
 }
 
 uint32_t sqlrconfig_xmldom::getConnectionCount() {
-	return connectstringlist.getLength();
+	return connectstringlist.getCount();
 }
 
 uint32_t sqlrconfig_xmldom::getMetricTotal() {
@@ -1120,8 +1133,8 @@ bool sqlrconfig_xmldom::comment(const char *value) {
 
 bool sqlrconfig_xmldom::hasDebug(const char *str, const char *debugstr) {
 
-	const char	*end=str+charstring::length(str);
-	size_t		debugstrlen=charstring::length(debugstr);
+	const char	*end=str+charstring::getLength(str);
+	size_t		debugstrlen=charstring::getLength(debugstr);
 
 	while(str<end) {
 
@@ -1193,11 +1206,6 @@ bool sqlrconfig_xmldom::load(const char *urlname, const char *id) {
 		getRootNode()->write(&stdoutput);
 		debugPrintf("\n");
 	#endif
-	#if 0
-		stdoutput.printf("normalized tree:\n");
-		getRootNode()->write(&stdoutput);
-		stdoutput.printf("\n");
-	#endif
 
 	// get values from the tree
 	getTreeValues();
@@ -1252,13 +1260,18 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
-	// add missing listeners tag
+	// if there is no listeners tag then add one
 	domnode	*listeners=instance->getFirstTagChild("listeners");
 	if (listeners->isNullNode()) {
-		listeners=instance->insertTag("listeners",0);
+		listeners=instance->appendTag("listeners");
 	}
 
-	// addresses/port/socket/etc. in instance -> listener
+	// if there is no listener tag then add one
+	if (listeners->getFirstTagChild("listener")->isNullNode()) {
+		listeners->appendTag("listener");
+	}
+
+	// get addresses/port/socket/etc. from instance
 	domnode	*addresses=instance->getAttribute("addresses");
 	domnode	*port=instance->getAttribute("port");
 	domnode	*socket=instance->getAttribute("socket");
@@ -1276,119 +1289,7 @@ void sqlrconfig_xmldom::normalizeTree() {
 	domnode	*tlsca=instance->getAttribute("tlsca");
 	domnode	*tlsciphers=instance->getAttribute("tlsciphers");
 	domnode	*tlsdepth=instance->getAttribute("tlsdepth");
-	if (!addresses->isNullNode() ||
-			!port->isNullNode() ||
-			!socket->isNullNode() ||
-			!krb->isNullNode() ||
-			!krbservice->isNullNode() ||
-			!krbkeytab->isNullNode() ||
-			!krbmech->isNullNode() ||
-			!krbflags->isNullNode() ||
-			!tls->isNullNode() ||
-			!tlsversion->isNullNode() ||
-			!tlscert->isNullNode() ||
-			!tlskey->isNullNode() ||
-			!tlspassword->isNullNode() ||
-			!tlsvalidate->isNullNode() ||
-			!tlsca->isNullNode() ||
-			!tlsciphers->isNullNode() ||
-			!tlsdepth->isNullNode()) {
 
-		domnode	*listener=listeners->insertTag("listener",0);
-		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
-
-		if (!addresses->isNullNode()) {
-			listener->setAttributeValue("addresses",
-							addresses->getValue());
-			instance->deleteAttribute(addresses);
-		}
-		if (!port->isNullNode()) {
-			listener->setAttributeValue("port",
-							port->getValue());
-			instance->deleteAttribute(port);
-		}
-		if (!socket->isNullNode()) {
-			listener->setAttributeValue("socket",
-							socket->getValue());
-			instance->deleteAttribute(socket);
-		}
-		if (!krb->isNullNode()) {
-			listener->setAttributeValue("krb",
-							krb->getValue());
-			instance->deleteAttribute(krb);
-		}
-		if (!krbservice->isNullNode()) {
-			listener->setAttributeValue("krbservice",
-							krbservice->getValue());
-			instance->deleteAttribute(krbservice);
-		}
-		if (!krbkeytab->isNullNode()) {
-			listener->setAttributeValue("krbkeytab",
-							krbkeytab->getValue());
-			instance->deleteAttribute(krbkeytab);
-		}
-		if (!krbmech->isNullNode()) {
-			listener->setAttributeValue("krbmech",
-							krbmech->getValue());
-			instance->deleteAttribute(krbmech);
-		}
-		if (!krbflags->isNullNode()) {
-			listener->setAttributeValue("krbflags",
-							krbflags->getValue());
-			instance->deleteAttribute(krbflags);
-		}
-		if (!tls->isNullNode()) {
-			listener->setAttributeValue("tls",
-							tls->getValue());
-			instance->deleteAttribute(tls);
-		}
-		if (!tlsversion->isNullNode()) {
-			listener->setAttributeValue("tlsversion",
-							tlsversion->getValue());
-			instance->deleteAttribute(tlsversion);
-		}
-		if (!tlscert->isNullNode()) {
-			listener->setAttributeValue("tlscert",
-							tlscert->getValue());
-			instance->deleteAttribute(tlscert);
-		}
-		if (!tlskey->isNullNode()) {
-			listener->setAttributeValue("tlskey",
-							tlskey->getValue());
-			instance->deleteAttribute(tlskey);
-		}
-		if (!tlspassword->isNullNode()) {
-			listener->setAttributeValue("tlspassword",
-						tlspassword->getValue());
-			instance->deleteAttribute(tlspassword);
-		}
-		if (!tlsvalidate->isNullNode()) {
-			listener->setAttributeValue("tlsvalidate",
-						tlsvalidate->getValue());
-			instance->deleteAttribute(tlsvalidate);
-		}
-		if (!tlsca->isNullNode()) {
-			listener->setAttributeValue("tlsca",
-						tlsca->getValue());
-			instance->deleteAttribute(tlsca);
-		}
-		if (!tlsciphers->isNullNode()) {
-			listener->setAttributeValue("tlsciphers",
-						tlsciphers->getValue());
-			instance->deleteAttribute(tlsciphers);
-		}
-		if (!tlsdepth->isNullNode()) {
-			listener->setAttributeValue("tlsdepth",
-						tlsdepth->getValue());
-			instance->deleteAttribute(tlsdepth);
-		}
-	}
-
-	// empty listeners tag
-	if (listeners->getFirstTagChild("listener")->isNullNode()) {
-		domnode	*listener=listeners->appendTag("listener");
-		listener->setAttributeValue("protocol",DEFAULT_PROTOCOL);
-	}
 	
 	// normalize listeners
 	for (domnode *listener=listeners->getFirstTagChild("listener");
@@ -1408,6 +1309,91 @@ void sqlrconfig_xmldom::normalizeTree() {
 		if (!hasprotocol) {
 			listener->setAttributeValue(
 					"protocol",DEFAULT_PROTOCOL);
+		}
+
+		// if various params are missing, but existed in the instance
+		// tag, then copy them into the listener tag
+		if (!hasaddresses && !addresses->isNullNode()) {
+			listener->setAttributeValue("addresses",
+						addresses->getValue());
+		}
+		if (!hassocket && !socket->isNullNode()) {
+			listener->setAttributeValue("socket",
+						socket->getValue());
+		}
+		if (!hasport && !port->isNullNode()) {
+			listener->setAttributeValue("port",
+						port->getValue());
+		}
+		if (listener->getAttribute("krb")->isNullNode() &&
+						!krb->isNullNode()) {
+			listener->setAttributeValue("krb",
+						krb->getValue());
+		}
+		if (listener->getAttribute("krbservice")->isNullNode() &&
+						!krbservice->isNullNode()) {
+			listener->setAttributeValue("krbservice",
+						krbservice->getValue());
+		}
+		if (listener->getAttribute("krbkeytab")->isNullNode() &&
+						!krbkeytab->isNullNode()) {
+			listener->setAttributeValue("krbkeytab",
+						krbkeytab->getValue());
+		}
+		if (listener->getAttribute("krbmech")->isNullNode() &&
+						!krbmech->isNullNode()) {
+			listener->setAttributeValue("krbmech",
+						krbmech->getValue());
+		}
+		if (listener->getAttribute("krbflags")->isNullNode() &&
+						!krbflags->isNullNode()) {
+			listener->setAttributeValue("krbflags",
+						krbflags->getValue());
+		}
+		if (listener->getAttribute("tls")->isNullNode() &&
+						!tls->isNullNode()) {
+			listener->setAttributeValue("tls",
+						tls->getValue());
+		}
+		if (listener->getAttribute("tlsversion")->isNullNode() &&
+						!tlsversion->isNullNode()) {
+			listener->setAttributeValue("tlsversion",
+						tlsversion->getValue());
+		}
+		if (listener->getAttribute("tlscert")->isNullNode() &&
+						!tlscert->isNullNode()) {
+			listener->setAttributeValue("tlscert",
+						tlscert->getValue());
+		}
+		if (listener->getAttribute("tlskey")->isNullNode() &&
+						!tlskey->isNullNode()) {
+			listener->setAttributeValue("tlskey",
+						tlskey->getValue());
+		}
+		if (listener->getAttribute("tlspassword")->isNullNode() &&
+						!tlspassword->isNullNode()) {
+			listener->setAttributeValue("tlspassword",
+						tlspassword->getValue());
+		}
+		if (listener->getAttribute("tlsvalidate")->isNullNode() &&
+						!tlsvalidate->isNullNode()) {
+			listener->setAttributeValue("tlsvalidate",
+						tlsvalidate->getValue());
+		}
+		if (listener->getAttribute("tlsca")->isNullNode() &&
+						!tlsca->isNullNode()) {
+			listener->setAttributeValue("tlsca",
+						tlsca->getValue());
+		}
+		if (listener->getAttribute("tlsciphers")->isNullNode() &&
+						!tlsciphers->isNullNode()) {
+			listener->setAttributeValue("tlsciphers",
+						tlsciphers->getValue());
+		}
+		if (listener->getAttribute("tlsdepth")->isNullNode() &&
+						!tlsdepth->isNullNode()) {
+			listener->setAttributeValue("tlsdepth",
+						tlsdepth->getValue());
 		}
 
 		// nothing specified -> default address, default port, no socket
@@ -1440,16 +1426,71 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
+	// remove addresses/port/socket/etc. from instance
+	if (!addresses->isNullNode()) {
+		instance->deleteAttribute(addresses);
+	}
+	if (!port->isNullNode()) {
+		instance->deleteAttribute(port);
+	}
+	if (!socket->isNullNode()) {
+		instance->deleteAttribute(socket);
+	}
+	if (!krb->isNullNode()) {
+		instance->deleteAttribute(krb);
+	}
+	if (!krbservice->isNullNode()) {
+		instance->deleteAttribute(krbservice);
+	}
+	if (!krbkeytab->isNullNode()) {
+		instance->deleteAttribute(krbkeytab);
+	}
+	if (!krbmech->isNullNode()) {
+		instance->deleteAttribute(krbmech);
+	}
+	if (!krbflags->isNullNode()) {
+		instance->deleteAttribute(krbflags);
+	}
+	if (!tls->isNullNode()) {
+		instance->deleteAttribute(tls);
+	}
+	if (!tlsversion->isNullNode()) {
+		instance->deleteAttribute(tlsversion);
+	}
+	if (!tlscert->isNullNode()) {
+		instance->deleteAttribute(tlscert);
+	}
+	if (!tlskey->isNullNode()) {
+		instance->deleteAttribute(tlskey);
+	}
+	if (!tlspassword->isNullNode()) {
+		instance->deleteAttribute(tlspassword);
+	}
+	if (!tlsvalidate->isNullNode()) {
+		instance->deleteAttribute(tlsvalidate);
+	}
+	if (!tlsca->isNullNode()) {
+		instance->deleteAttribute(tlsca);
+	}
+	if (!tlsciphers->isNullNode()) {
+		instance->deleteAttribute(tlsciphers);
+	}
+	if (!tlsdepth->isNullNode()) {
+		instance->deleteAttribute(tlsdepth);
+	}
+
 	// authentications -> auths
 	domnode	*auths=instance->getFirstTagChild("authentications");
 	if (!auths->isNullNode()) {
 		auths->setName("auths");
 	}
 
-	// add missing auths tag
+	// if there is no auths tag then add one
 	auths=instance->getFirstTagChild("auths");
 	if (auths->isNullNode()) {
-		auths=instance->insertTag("auths",1);
+		auths=instance->insertTag("auths",
+				instance->getFirstTagChild("listener")->
+							getPosition()+1);
 	}
 
 	// authentication -> auth
@@ -1459,13 +1500,13 @@ void sqlrconfig_xmldom::normalizeTree() {
 		auth->setName("auth");
 	}
 
-	// users -> auth_userlist
-	bool		addeduserlist=false;
+	// users -> sqlrclient_userlist
+	bool	addeduserlist=false;
 	domnode	*users=instance->getFirstTagChild("users");
 	if (!users->isNullNode()) {
 
 		domnode	*auth=auths->insertTag("auth",0);
-		auth->setAttributeValue("module","userlist");
+		auth->setAttributeValue("module","sqlrclient_userlist");
 
 		for (domnode *user=users->getFirstTagChild("user");
 				!user->isNullNode();
@@ -1527,7 +1568,32 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 	}
 
-	// krb_userlist/tls_userlist -> userlist
+	// if there are no auths or users defined, then fall back to
+	// a connectstrings auth module...
+	if (!auths->getChildCount()) {
+
+		// for each protocol, add a "protocol_connectstrings"
+		// auth module...
+		stringbuffer	cs;
+		for (domnode *listener=listeners->getFirstTagChild("listener");
+			!listener->isNullNode();
+			listener=listener->getNextTagSibling("listener")) {
+
+			const char	*protocol=
+					listener->getAttributeValue("protocol");
+			cs.clear();
+			cs.append(protocol)->append("_connectstrings");
+			auths->appendTag("auth")->
+				setAttributeValue("module",cs.getString());
+			
+		}
+	}
+
+	// krb_userlist/tls_userlist -> sqlrclient_userlist
+	// userlist -> sqlrclient_userlist
+	// database -> sqlrclient_database
+	// proxied -> sqlrclient_proxied
+	// sqlrelay -> sqlrclient_sqlrelay
 	for (domnode *auth=instance->getFirstTagChild("auths")->
 						getFirstTagChild("auth");
 				!auth->isNullNode();
@@ -1538,7 +1604,27 @@ void sqlrconfig_xmldom::normalizeTree() {
 			!charstring::compare(
 				auth->getAttributeValue("module"),
 				"tls_userlist")) {
-			auth->setAttributeValue("module","userlist");
+			auth->setAttributeValue("module","sqlrclient_userlist");
+		}
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"userlist")) {
+			auth->setAttributeValue("module","sqlrclient_userlist");
+		}
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"database")) {
+			auth->setAttributeValue("module","sqlrclient_database");
+		}
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"proxied")) {
+			auth->setAttributeValue("module","sqlrclient_proxied");
+		}
+		if (!charstring::compare(
+				auth->getAttributeValue("module"),
+				"sqlrelay")) {
+			auth->setAttributeValue("module","sqlrclient_sqlrelay");
 		}
 	}
 
@@ -1752,6 +1838,18 @@ void sqlrconfig_xmldom::normalizeTree() {
 		}
 		instance->setAttributeValue("debug",dstr.getString());
 	}
+
+	// passwordencryptions crypt -> des
+	for (domnode *pwdenc=instance->
+				getFirstTagChild("passwordencryptions")->
+				getFirstTagChild("passwordencryption");
+		!pwdenc->isNullNode();
+		pwdenc=pwdenc->getNextTagSibling("passwordencryption")) {
+		if (!charstring::compare(
+				pwdenc->getAttributeValue("module"),"crypt")) {
+			pwdenc->setAttributeValue("module","des");
+		}
+	}
 }
 
 void sqlrconfig_xmldom::getTreeValues() {
@@ -1783,6 +1881,9 @@ void sqlrconfig_xmldom::getTreeValues() {
 		if (maxconnections<connections) {
 			maxconnections=connections;
 		}
+	}
+	if (!maxconnections) {
+		maxconnections=charstring::convertToInteger(DEFAULT_CONNECTIONS);
 	}
 	attr=instance->getAttribute("maxqueuelength");
 	if (!attr->isNullNode()) {
@@ -1898,44 +1999,44 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 	attr=instance->getAttribute("maxclientinfolength");
 	if (!attr->isNullNode()) {
-		maxclientinfolength=charstring::toInteger(attr->getValue());
+		maxclientinfolength=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxquerysize");
 	if (!attr->isNullNode()) {
-		maxquerysize=charstring::toInteger(attr->getValue());
+		maxquerysize=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxbindcount");
 	if (!attr->isNullNode()) {
-		maxbindcount=charstring::toInteger(attr->getValue());
+		maxbindcount=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxbindnamelength");
 	if (!attr->isNullNode()) {
-		maxbindnamelength=charstring::toInteger(attr->getValue());
+		maxbindnamelength=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxstringbindvaluelength");
 	if (!attr->isNullNode()) {
 		maxstringbindvaluelength=
-				charstring::toInteger(attr->getValue());
+				charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxlobbindvaluelength");
 	if (!attr->isNullNode()) {
-		maxlobbindvaluelength=charstring::toInteger(attr->getValue());
+		maxlobbindvaluelength=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxerrorlength");
 	if (!attr->isNullNode()) {
-		maxerrorlength=charstring::toInteger(attr->getValue());
+		maxerrorlength=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("idleclienttimeout");
 	if (!attr->isNullNode()) {
-		idleclienttimeout=charstring::toInteger(attr->getValue());
+		idleclienttimeout=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxlisteners");
 	if (!attr->isNullNode()) {
-		maxlisteners=charstring::toInteger(attr->getValue());
+		maxlisteners=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("listenertimeout");
 	if (!attr->isNullNode()) {
-		listenertimeout=charstring::toUnsignedInteger(attr->getValue());
+		listenertimeout=charstring::convertToUnsignedInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("reloginatstart");
 	if (!attr->isNullNode()) {
@@ -2048,7 +2149,7 @@ void sqlrconfig_xmldom::getTreeValues() {
 
 	// default listener parameters
 	defaultaddresses=defaultlistener->getAttributeValue("addresses");
-	defaultport=charstring::toUnsignedInteger(
+	defaultport=charstring::convertToUnsignedInteger(
 			defaultlistener->getAttributeValue("port"));
 	defaultsocket=defaultlistener->getAttributeValue("socket");
 	defaultkrb=charstring::isYes(defaultlistener->getAttributeValue("krb"));
@@ -2156,12 +2257,38 @@ void sqlrconfig_xmldom::getTreeValues() {
 		connectstringlist.append(c);
 	}
 
-	// default user/password
-	domnode	*defaultusertag=instance->getFirstTagChild("auths")->							getFirstTagChild(
-						"auth","module","userlist")->
-						getFirstTagChild("user");
-	defaultuser=defaultusertag->getAttributeValue("user");
-	defaultpassword=defaultusertag->getAttributeValue("password");
+	// get default user/password...
+
+	// if there's a sqlrclient_userlist auth module, then get the first
+	// credentials from the first user
+	domnode	*defaultusertag=instance->getFirstTagChild("auths")->
+				getFirstTagChild("auth","module",
+						"sqlrclient_userlist")->
+				getFirstTagChild("user");
+	if (!defaultusertag->isNullNode()) {
+		defaultuser=defaultusertag->
+				getAttributeValue("user");
+		defaultpassword=defaultusertag->
+				getAttributeValue("password");
+		defaultpasswordencryptionid=defaultusertag->
+				getAttributeValue("passwordencryptionid");
+	} else
+
+	// otherwise, if there's a connectstrings auth module then get the
+	// first credentials from the first connection
+	if (!instance->getFirstTagChild("auths")->
+			getFirstTagChild("auth","module",
+					"sqlrclient_connectstrings")->
+			isNullNode()) {
+		listnode< connectstringcontainer * >	*node=
+					getConnectStringList()->getFirst();
+		defaultuser=node->getValue()->
+				getConnectStringValue("user");
+		defaultpassword=node->getValue()->
+				getConnectStringValue("password");
+		defaultpasswordencryptionid=node->getValue()->
+						getPasswordEncryption();
+	}
 }
 
 routecontainer *sqlrconfig_xmldom::routeAlreadyExists(routecontainer *cur) {
@@ -2197,19 +2324,19 @@ void sqlrconfig_xmldom::moveRegexList(routecontainer *cur,
 
 uint32_t sqlrconfig_xmldom::atouint32_t(const char *value,
 				const char *defaultvalue, uint32_t minvalue) {
-	uint32_t	retval=charstring::toUnsignedInteger(
+	uint32_t	retval=charstring::convertToUnsignedInteger(
 						(value)?value:defaultvalue);
 	if (retval<minvalue) {
-		retval=charstring::toUnsignedInteger(defaultvalue);
+		retval=charstring::convertToUnsignedInteger(defaultvalue);
 	}
 	return retval;
 }
 
 int32_t sqlrconfig_xmldom::atoint32_t(const char *value,
 				const char *defaultvalue, int32_t minvalue) {
-	int32_t	retval=charstring::toInteger((value)?value:defaultvalue);
+	int32_t	retval=charstring::convertToInteger((value)?value:defaultvalue);
 	if (retval<minvalue) {
-		retval=charstring::toInteger(defaultvalue);
+		retval=charstring::convertToInteger(defaultvalue);
 	}
 	return retval;
 }
@@ -2330,8 +2457,8 @@ void sqlrconfig_xmldom::parseLinkFile(const char *urlname) {
 		if (fs.open(urlname)) {
 			fl.setReadBufferSize(fs.getOptimumTransferBlockSize());
 		}
-		fl.sequentialAccess(0,fl.getSize());
-		fl.onlyOnce(0,fl.getSize());
+		fl.adviseSequentialAccess(0,fl.getSize());
+		fl.adviseOnlyOnce(0,fl.getSize());
 
 		// set fd
 		fd=&fl;

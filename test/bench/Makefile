@@ -24,7 +24,7 @@ all: sqlrbench_db2.$(LIBEXT) \
 	sqlr-bench
 
 clean:
-	$(LTCLEAN) $(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.png *.csv
+	$(RM) sqlr-bench$(EXE) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.png *.csv
 	$(RMTREE) .libs
 
 db2bench.lo: db2bench.cpp

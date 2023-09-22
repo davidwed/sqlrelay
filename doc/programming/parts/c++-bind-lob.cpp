@@ -7,13 +7,13 @@ main() {
 
         cur->executeQuery("create table images (image blob, description clob)");
 
-        unsigned char   imagedata[40000];
+        byte_t	   	imagedata[40000];
         unsigned long   imagelength;
 
         ... read an image from a file into imagedata and the length of the
                 file into imagelength ...
 
-        unsigned char   description[40000];
+        byte_t	   	description[40000];
         unsigned long   desclength;
 
         ... read a description from a file into description and the length of

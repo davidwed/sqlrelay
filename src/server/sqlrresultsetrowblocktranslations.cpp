@@ -62,7 +62,7 @@ bool sqlrresultsetrowblocktranslations::load(domnode *parameters) {
 
 	unload();
 
-	pvt->_rowblocksize=charstring::toInteger(
+	pvt->_rowblocksize=charstring::convertToInteger(
 				parameters->getAttributeValue("rowblocksize"));
 	if (!pvt->_rowblocksize) {
 		pvt->_rowblocksize=10;
@@ -110,10 +110,10 @@ void sqlrresultsetrowblocktranslations::loadResultSetRowBlockTranslation(
 	// get the result set translation name
 	const char	*module=
 		resultsetrowblocktranslation->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=resultsetrowblocktranslation->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

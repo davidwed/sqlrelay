@@ -7,10 +7,12 @@ int main() {
 	uint16_t	port=9000;
 
 	inetsocketclient	cl;
+	cl.setHost(host);
+	cl.setPort(port);
 	uint32_t i=0;
 	while (true) {
 		stdoutput.printf("%d: ",i);
-		if (!cl.connect(host,port,-1,-1,0,0)) {
+		if (!cl.connect()) {
 			stdoutput.printf("failed\n");
 			break;
 		}

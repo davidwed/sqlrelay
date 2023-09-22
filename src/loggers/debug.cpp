@@ -42,10 +42,10 @@ sqlrlogger_debug::sqlrlogger_debug(sqlrloggers *ls,
 	debuglogger=NULL;
 	dbgfilename=NULL;
 	const char	*permstring=parameters->getAttributeValue("perms");
-	if (!charstring::length(permstring)) {
+	if (!charstring::getLength(permstring)) {
 		permstring="rw-------";
 	}
-	dbgfileperms=permissions::evalPermString(permstring);
+	dbgfileperms=permissions::parsePermString(permstring);
 	name=NULL;
 	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	loglistener=!charstring::isNo(
@@ -106,7 +106,7 @@ bool sqlrlogger_debug::run(sqlrlistener *sqlrl,
 		return false;
 	}
 	if (!charstring::isNullOrEmpty(info)) {
-		char	*header=debuglogger->logHeader(name);
+		char	*header=debuglogger->getLogHeader(name);
 		debuglogger->write(0,header,0,"%s",info);
 		delete[] header;
 	}

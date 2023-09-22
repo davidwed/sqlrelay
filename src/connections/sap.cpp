@@ -371,7 +371,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	const char	*user=cont->getUser();
 	if (ct_con_props(dbconn,CS_SET,CS_USERNAME,
 		(CS_VOID *)((!charstring::isNullOrEmpty(user))?user:""),
-		(CS_INT)charstring::length(user),
+		(CS_INT)charstring::getLength(user),
 		(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the user",5);
 		return false;
@@ -382,7 +382,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	const char	*password=cont->getPassword();
 	if (ct_con_props(dbconn,CS_SET,CS_PASSWORD,
 		(CS_VOID *)((!charstring::isNullOrEmpty(password))?password:""),
-		(CS_INT)charstring::length(password),
+		(CS_INT)charstring::getLength(password),
 		(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the password",5);
 		return false;
@@ -400,14 +400,14 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	if (!charstring::isNullOrEmpty(hostname) &&
 		ct_con_props(dbconn,CS_SET,CS_HOSTNAME,
 			(CS_VOID *)hostname,
-			(CS_INT)charstring::length(hostname),
+			(CS_INT)charstring::getLength(hostname),
 			(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the hostname",5);
 		return false;
 	}
 
 	// set packetsize
-	uint16_t	ps=charstring::toInteger(packetsize);
+	uint16_t	ps=charstring::convertToInteger(packetsize);
 	if (!charstring::isNullOrEmpty(packetsize) &&
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 			(CS_VOID *)&ps,sizeof(ps),
@@ -442,7 +442,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	if (!charstring::isNullOrEmpty(language) &&
 		cs_locale(context,CS_SET,locale,CS_SYB_LANG,
 			(CS_CHAR *)language,
-			(CS_INT)charstring::length(language),
+			(CS_INT)charstring::getLength(language),
 			(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the language",6);
 		return false;
@@ -452,7 +452,7 @@ bool sapconnection::logIn(const char **error, const char **warning) {
 	if (!charstring::isNullOrEmpty(charset) &&
 		cs_locale(context,CS_SET,locale,CS_SYB_CHARSET,
 			(CS_CHAR *)charset,
-			(CS_INT)charstring::length(charset),
+			(CS_INT)charstring::getLength(charset),
 			(CS_INT *)NULL)!=CS_SUCCEED) {
 		*error=logInError("Failed to set the charset",6);
 		return false;
@@ -687,7 +687,7 @@ sapcursor::sapcursor(sqlrserverconnection *conn, uint16_t id) :
 	languagecmd=NULL;
 	cursorcmd=NULL;
 
-	cursornamelength=charstring::integerLength(id);
+	cursornamelength=charstring::getIntegerLength(id);
 	cursorname=charstring::parseNumber(id);
 
 	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
@@ -790,7 +790,7 @@ bool sapcursor::open() {
 	// (only do this once per connection)
 	bool	retval=true;
 	if (!charstring::isNullOrEmpty(sapconn->db) && !sapconn->dbused) {
-		int32_t	len=charstring::length(sapconn->db)+4;
+		int32_t	len=charstring::getLength(sapconn->db)+4;
 		char	*query=new char[len+1];
 		charstring::printf(query,len+1,"use %s",sapconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
@@ -823,7 +823,7 @@ bool sapcursor::open() {
 		for (uint32_t i=0; query[i] && !sapconn->dbversion; i++) {
 
 			const char	*q=query[i];
-			int32_t		len=charstring::length(q);
+			int32_t		len=charstring::getLength(q);
 			bool		error=false;
 
 			if (prepareQuery(q,len) &&
@@ -1099,7 +1099,7 @@ bool sapcursor::inputBind(const char *variable,
 	charstring::append(buffer,(int64_t)microsecond);
 	charstring::append(buffer,ampm);
 	return inputBind(variable,variablesize,
-				buffer,charstring::length(buffer),isnull);
+				buffer,charstring::getLength(buffer),isnull);
 }
 
 bool sapcursor::outputBind(const char *variable, 
@@ -1442,10 +1442,10 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 							data[i],length);
 			} else if (outbindtype[i]==CS_INT_TYPE) {
 				*outbindints[i]=
-					charstring::toInteger(data[i]);
+					charstring::convertToInteger(data[i]);
 			} else if (outbindtype[i]==CS_FLOAT_TYPE) {
 				*outbinddoubles[i]=
-					charstring::toFloatC(data[i]);
+					charstring::convertToFloatC(data[i]);
 			} else if (outbindtype[i]==CS_DATETIME_TYPE) {
 
 				// convert to a CS_DATEREC

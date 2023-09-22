@@ -1,10 +1,11 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserver.h>
+#include <sqlrelay/sqlrutil.h>
 
 #include <rudiments/domnode.h>
 #include <rudiments/process.h>
+#include <rudiments/singlylinkedlist.h>
 #include <rudiments/stdio.h>
 //#define DEBUG_MESSAGES 1
 #include <rudiments/debugprint.h>
@@ -85,16 +86,16 @@ void sqlrpwdencs::loadPasswordEncryption(domnode *pwdenc) {
 
 	// get the password encryption name
 	const char	*module=pwdenc->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=pwdenc->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}
 
 	// make sure it has an id
-	if (!charstring::length(pwdenc->getAttributeValue("id"))) {
+	if (!charstring::getLength(pwdenc->getAttributeValue("id"))) {
 		return;
 	}
 

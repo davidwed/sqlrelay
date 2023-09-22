@@ -308,6 +308,11 @@ const char	*sqlrcon_clientVersion(sqlrcon sqlrconref);
 SQLRCLIENT_DLLSPEC
 const char	*sqlrcon_bindFormat(sqlrcon sqlrconref);
 
+/** @ingroup sqlrclientwrapper
+ *  Returns a string representing the format of the
+ *  sequence nextval command used in the db. */
+const char	*sqlrcon_nextvalFormat(sqlrcon sqlrconref);
+
 
 
 /** @ingroup sqlrclientwrapper

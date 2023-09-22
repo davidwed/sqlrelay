@@ -90,7 +90,7 @@ for (uint16_t a=0; a<50; a++) {
 
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	cur=new sqlrcursor(con);
 
 	// get database type
@@ -1052,7 +1052,7 @@ for (uint16_t a=0; a<50; a++) {
 	// not read-committed like most other db's.  Both sessions must
 	// commit to see the changes that each other has made.
 	secondcon=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	if (majorversion>3) {
@@ -1124,10 +1124,10 @@ for (uint16_t a=0; a<50; a++) {
 		// return no values
 		cur->sendQuery("drop procedure if exists testproc");
 		checkSuccess(cur->sendQuery("create procedure testproc(in in1 int, in in2 float, in in3 char(20)) begin select in1, in2, in3; end;"),1);
-		cur->prepareQuery("call testproc(:in1,:in2,:in3)");
-		cur->inputBind("in1",1);
-		cur->inputBind("in2",1.1,4,2);
-		cur->inputBind("in3","hello");
+		cur->prepareQuery("call testproc(?,?,?)");
+		cur->inputBind("1",1);
+		cur->inputBind("2",1.1,4,2);
+		cur->inputBind("3","hello");
 		checkSuccess(cur->executeQuery(),1);
 		checkSuccess(cur->getField(0,(uint32_t)0),"1");
 		checkSuccess(cur->getField(0,(uint32_t)1),"1.1");
@@ -1175,7 +1175,7 @@ for (uint16_t a=0; a<50; a++) {
 	if (majorversion>3) {
 		stdoutput.printf("BINARY DATA: \n");
 		checkSuccess(cur->sendQuery("create table testtable (col1 longblob)"),true);
-		unsigned char	buffer[256];
+		byte_t	buffer[256];
 		for (uint16_t i=0; i<256; i++) {
 			buffer[i]=i;
 		}

@@ -91,10 +91,10 @@ void sqlrerrortranslations::loadErrorTranslation(domnode *errortranslation) {
 
 	// get the error translation name
 	const char	*module=errortranslation->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=errortranslation->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}
@@ -173,12 +173,17 @@ bool sqlrerrortranslations::run(sqlrserverconnection *sqlrcon,
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					const char **translatederror,
-					uint32_t *translatederrorlength) {
+					stringbuffer *translatederror) {
 	debugFunction();
 
 	pvt->_error=NULL;
 
+	int64_t		temperrornumber1;
+	int64_t		temperrornumber2;
+	stringbuffer	temperrorstr1;
+	stringbuffer	temperrorstr2;
+	int64_t		*temperrornumber=&temperrornumber1;
+	stringbuffer	*temperrorstr=&temperrorstr1;
 	for (listnode< sqlrerrortranslationplugin * > *node=
 						pvt->_tlist.getFirst();
 						node; node=node->getNext()) {
@@ -188,17 +193,34 @@ bool sqlrerrortranslations::run(sqlrserverconnection *sqlrcon,
 						node->getValue()->module);
 		}
 
+		temperrorstr->clear();
+
 		if (!node->getValue()->etr->run(sqlrcon,sqlrcur,
 						errornumber,
 						error,
 						errorlength,
-						translatederrornumber,
-						translatederror,
-						translatederrorlength)) {
+						temperrornumber,
+						temperrorstr)) {
 			pvt->_error=node->getValue()->etr->getError();
+			if (pvt->_debug) {
+				stdoutput.printf("\n%s\n\n",pvt->_error);
+			}
 			return false;
 		}
+
+		error=temperrorstr->getString();
+		errorlength=temperrorstr->getSize();
+		errornumber=*temperrornumber;
+
+		temperrorstr=(temperrorstr==&temperrorstr1)?
+					&temperrorstr2:&temperrorstr1;
+		temperrornumber=(temperrornumber==&temperrornumber1)?
+					&temperrornumber2:&temperrornumber1;
 	}
+
+	translatederror->append(error,errorlength);
+	*translatederrornumber=errornumber;
+
 	return true;
 }
 

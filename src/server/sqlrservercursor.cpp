@@ -61,7 +61,8 @@ class sqlrservercursorprivate {
 
 		uint32_t	_maxerrorlength;
 
-		char		*_error;
+		char		*_errorbuffer;
+		uint32_t	_errorbuffersize;
 		uint32_t	_errorlength;
 		int64_t		_errnum;
 		bool		_liveconnection;
@@ -113,7 +114,7 @@ class sqlrservercursorprivate {
 
 		bool		_resultsetheaderhasbeenhandled;
 
-		unsigned char	_moduledata[1024];
+		byte_t		_moduledata[1024];
 };
 
 sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
@@ -166,7 +167,8 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	setQueryTree(NULL);
 
-	pvt->_error=new char[pvt->_maxerrorlength+1];
+	pvt->_errorbuffersize=pvt->_maxerrorlength+1;
+	pvt->_errorbuffer=new char[pvt->_errorbuffersize];
 	pvt->_errorlength=0;
 	pvt->_errnum=0;
 	pvt->_liveconnection=true;
@@ -239,7 +241,7 @@ sqlrservercursor::~sqlrservercursor() {
 	delete[] pvt->_outbindvars;
 	delete[] pvt->_inoutbindvars;
 	delete pvt->_customquerycursor;
-	delete[] pvt->_error;
+	delete[] pvt->_errorbuffer;
 	deallocateColumnPointers();
 	deallocateFieldPointers();
 	delete pvt;
@@ -254,8 +256,8 @@ bool sqlrservercursor::close() {
 	return true;
 }
 
-sqlrquerytype_t sqlrservercursor::queryType(const char *query,
-						uint32_t length) {
+sqlrquerytype_t sqlrservercursor::determineQueryType(const char *query,
+							uint32_t length) {
 
 	// skip past leading garbage
 	const char	*ptr=conn->cont->skipWhitespaceAndComments(query);
@@ -279,22 +281,32 @@ sqlrquerytype_t sqlrservercursor::queryType(const char *query,
 	} else if (!charstring::compare(ptr,"create",6)) {
 		retval=SQLRQUERYTYPE_CREATE;
 		ptr=ptr+6;
-	} else if (!charstring::compare(ptr,"drop",4)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"drop",4)) {
 		retval=SQLRQUERYTYPE_DROP;
 		ptr=ptr+4;
 	} else if (!charstring::compare(ptr,"alter",5)) {
 		retval=SQLRQUERYTYPE_ALTER;
 		ptr=ptr+5;
-	} else if (!charstring::compare(ptr,"begin") ||
-			!charstring::compare(ptr,"begin work")) {
+	} else if (isBeginTransactionQuery(ptr)) {
 		return SQLRQUERYTYPE_BEGIN;
-	} else if (!charstring::compare(ptr,"start",5)) {
-		retval=SQLRQUERYTYPE_BEGIN;
-		ptr=ptr+5;
-	} else if (!charstring::compare(ptr,"commit",6)) {
+	} else if ((!charstring::compareIgnoringCase(ptr,"commit",6) ||
+			(!charstring::compareIgnoringCase(ptr,"et",2) &&
+							*(ptr+2)=='\0'))) {
 		return SQLRQUERYTYPE_COMMIT;
-	} else if (!charstring::compare(ptr,"rollback",8)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"rollback",8)) {
 		return SQLRQUERYTYPE_ROLLBACK;
+	} else if (isAutoCommitOnQuery(ptr)) {
+		return SQLRQUERYTYPE_AUTOCOMMIT_ON;
+	} else if (isAutoCommitOffQuery(ptr)) {
+		return SQLRQUERYTYPE_AUTOCOMMIT_OFF;
+	} else {
+		bool	on=false;
+		if (isSetIncludingAutoCommitQuery(ptr,&on)) {
+			return (on)?
+				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON:
+				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF;
+		}
+		return SQLRQUERYTYPE_ETC;
 	}
 
 	// for some query types, verify that whitespace follows
@@ -304,6 +316,321 @@ sqlrquerytype_t sqlrservercursor::queryType(const char *query,
 		}
 	}
 	return retval;
+}
+
+bool sqlrservercursor::isBeginTransactionQuery(const char *query) {
+
+	// See if it was any of the different queries used to start a
+	// transaction.  IMPORTANT: don't just look for the first 5 characters
+	// to be "begin", make sure it's the entire query.  Many db's use
+	// "begin" to start a stored procedure block, but in those cases,
+	// something will follow it.
+	if (!charstring::compareIgnoringCase(query,"begin",5)) {
+
+		// make sure there are only spaces, comments or one of the words
+		// "work" or "transaction" after the begin
+		const char	*spaceptr=
+				conn->cont->skipWhitespaceAndComments(query+5);
+
+		if (*spaceptr=='\0') {
+			return true;
+		} else if ((!charstring::compareIgnoringCase(
+						spaceptr,"work",4) &&
+				blockCanBeIntercepted(spaceptr+4)) ||
+				(!charstring::compareIgnoringCase(
+						spaceptr,"transaction",11) &&
+				blockCanBeIntercepted(spaceptr+11))) {
+			return true;
+		}
+		return false;
+	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
+		return true;
+	} else if (!charstring::compareIgnoringCase(query,"bt",2) &&
+							*(query+2)=='\0') {
+		return true;
+	}
+	return false;
+}
+
+bool sqlrservercursor::blockCanBeIntercepted(const char *block) {
+
+	// FIXME:
+	// I'm not really sure which of these implementations to use...
+	//
+	// 1) Any block of queries that contain their own commit/rollback
+	// should be passed through, and not intercepted.
+	//
+	// 2) However, really we ought to skip commit/rollbacks in comments, in
+	// (any kind of) quotes, or that aren't preceeded by and followed by
+	// whitespace (or the beginning/end of the string).  The other
+	// implementation does that, though currently lacks support for double
+	// quoting, back-tick quoting, and [] quoting.
+	//
+	// 3) Arguably though, if it's a block at all, then it shouldn't be
+	// intercepted, as this will prevent the non-begin statements from
+	// being executed.
+	//
+	//
+	// Currently 3 is selected.  This eventually seemed intuitive, but
+	// wasn't originally, before I wrote the others.
+	//
+	//
+	// What really happens in these cases though...
+	//
+	// If we're faking transaction blocks, and we pass a balanced block
+	// like:
+	//
+	// begin transaction
+	// select 1
+	// commit
+	// select 1
+	// begin transaction
+	// select 1
+	// commit
+	//
+	// through, does the db really end up back in autocommit mode like it
+	// started?
+	//
+	// If we're faking transaction blocks, and we pass an unbalanced block
+	// like:
+	//
+	// begin transaction
+	// select 1
+	// commit
+	// select 1
+	// begin transaction
+	// select 1
+	//
+	// through, does the db really end up in non-autocommit mode unlike it
+	// started?
+	//
+	// Should I not intercept, but then set
+	// pvt->_infaketransactionblock=true in the second case?
+	//
+	// Sort this out...
+
+#if 1
+	return !(charstring::containsIgnoringCase(block,"commit") ||
+		charstring::containsIgnoringCase(block,"rollback"));
+
+#elif 0
+	// FIXME: handle other types of quoting - ", `, and []
+
+	bool		inquotes=false;
+	const char	*ptr=block;
+	const char	*prevptr=" ";
+	do {
+
+		if (!inquotes) {
+
+			ptr=conn->cont->skipWhitespaceAndComments(ptr);
+			if (!*ptr) {
+				return true;
+			}
+
+			if (ptr!=block) {
+				prevptr=ptr-1;
+			}
+
+			if (
+				// if the previous character is whitespace
+				// (note that it was initialized to whitespace
+				// so this also works if we're at the beginning
+				// of the block) and...
+				character::isWhitespace(*prevptr) &&
+
+				// we find a commit, followed by the
+				// end of the block, or whitespace or...
+				((!charstring::compareIgnoringCase(
+							ptr,"commit",6) &&
+				(!*(ptr+6) ||
+					character::isWhitespace(*(ptr+6)))) ||
+
+				// we find a rollback, followed by the
+				// end of the block, or whitespace
+				(!charstring::compareIgnoringCase(
+							ptr,"rollback",8) &&
+				(!*(ptr+8) ||
+					character::isWhitespace(*(ptr+8)))))) {
+
+				// then we have a qualifying commit or
+				// rollback in the block
+				return false;
+			}
+		}
+		
+		// if we found a quote, flip our in-quotes flag
+		if (*ptr=='\'') {
+			inquotes=!inquotes;
+		}
+		ptr++;
+
+	} while (*ptr);
+
+	// if we got here, then we hit the end of the block without finding
+	// a qualifying commit or rollback
+	return true;
+#elif 0
+	return (*conn->cont->skipWhitespaceAndComments(block))=='\0';
+#endif
+}
+
+bool sqlrservercursor::isAutoCommitOnQuery(const char *query) {
+	return isAutoCommitQuery(query,true);
+}
+
+bool sqlrservercursor::isAutoCommitOffQuery(const char *query) {
+	return isAutoCommitQuery(query,false);
+}
+
+bool sqlrservercursor::isAutoCommitQuery(const char *query, bool on) {
+
+	// look for "autocommit"
+	if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
+
+		query+=10;
+
+	}  else {
+
+		// look for "set"
+		if (!charstring::compareIgnoringCase(query,"set",3)) {
+			query+=3;
+		} else {
+			return false;
+		}
+
+		// skip whitespace
+		query=conn->cont->skipWhitespaceAndComments(query);
+
+		// look for "autocommit"/"auto"/"implicit_transactions"
+		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
+			query+=10;
+		} else if (!charstring::compareIgnoringCase(query,"auto",4)) {
+			query+=4;
+		} else if (!charstring::compareIgnoringCase(
+					query,"implicit_transactions",21)) {
+			query+=21;
+		} else {
+			return false;
+		}
+	}
+
+	// skip whitespace
+	query=conn->cont->skipWhitespaceAndComments(query);
+
+	// look for "="/"to"
+	if (*query=='=') {
+		query++;
+	} else if (!charstring::compareIgnoringCase(query,"to",2)) {
+		query+=2;
+	}
+
+	// skip whitespace
+	query=conn->cont->skipWhitespaceAndComments(query);
+
+	if (on) {
+		// look for 1/on/yes/immediate
+		if (*query=='1') {
+			query++;
+		} else if (!charstring::compareIgnoringCase(query,"on",2)) {
+			query+=2;
+		} else if (!charstring::compareIgnoringCase(query,"yes",3)) {
+			query+=3;
+		} else if (!charstring::compareIgnoringCase(
+							query,"immediate",9)) {
+			query+=9;
+		} else {
+			return false;
+		}
+	} else {
+		// look for 0/off/no
+		if (*query=='0') {
+			query++;
+		} else if (!charstring::compareIgnoringCase(query,"off",3)) {
+			query+=3;
+		} else if (!charstring::compareIgnoringCase(query,"no",2)) {
+			query+=2;
+		} else {
+			return false;
+		}
+	}
+
+	// skip whitespace
+	query=conn->cont->skipWhitespaceAndComments(query);
+
+	// look for end of query
+	if (*query) {
+		return false;
+	}
+
+	return true;
+}
+
+bool sqlrservercursor::isSetIncludingAutoCommitQuery(
+						const char *query,
+						bool *on) {
+
+	*on=false;
+
+	// look for "set"
+	if (!charstring::compareIgnoringCase(query,"set",3)) {
+		query+=3;
+	} else {
+		return false;
+	}
+
+	for (;;) {
+
+		// skip whitespace
+		query=conn->cont->skipWhitespaceAndComments(query);
+
+		// look for "autocommit"
+		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
+			query+=10;
+			break;
+		}
+
+		// look for a comma or end of query
+		while (*query && *query!=',') {
+			query++;
+		}
+		if (!*query) {
+			return false;
+		}
+
+		// skip comma
+		query++;
+	}
+
+	// skip whitespace
+	query=conn->cont->skipWhitespaceAndComments(query);
+
+	// look for "="/"to"
+	if (*query=='=') {
+		query++;
+	} else {
+		return false;
+	}
+
+	// skip whitespace
+	query=conn->cont->skipWhitespaceAndComments(query);
+
+	// look for 1/0 and on/off
+	if (*query=='1') {
+		*on=true;
+		query++;
+	} else if (*query=='0') {
+		*on=false;
+		query++;
+	} else {
+		return false;
+	}
+
+	// skip whitespace
+	query=conn->cont->skipWhitespaceAndComments(query);
+
+	// success if we hit a comma, or are at the end of the query
+	return (*query!=',' || *query);
 }
 
 bool sqlrservercursor::isCustomQuery() {
@@ -648,7 +975,7 @@ void sqlrservercursor::errorMessage(char *errorbuffer,
 	// if the cursor happens to have an error, then return that
 	if (pvt->_errorlength) {
 		charstring::safeCopy(errorbuffer,errorbuffersize,
-					pvt->_error,pvt->_errorlength);
+					pvt->_errorbuffer,pvt->_errorlength);
 		*errorlength=pvt->_errorlength;
 		if (*errorlength>errorbuffersize) {
 			*errorlength=errorbuffersize;
@@ -691,7 +1018,7 @@ const char *sqlrservercursor::getColumnName(uint32_t col) {
 }
 
 uint16_t sqlrservercursor::getColumnNameLength(uint32_t col) {
-	return charstring::length(getColumnName(col));
+	return charstring::getLength(getColumnName(col));
 }
 
 uint16_t sqlrservercursor::getColumnType(uint32_t col) {
@@ -703,7 +1030,7 @@ const char *sqlrservercursor::getColumnTypeName(uint32_t col) {
 }
 
 uint16_t sqlrservercursor::getColumnTypeNameLength(uint32_t col) {
-	return charstring::length(getColumnTypeName(col));
+	return charstring::getLength(getColumnTypeName(col));
 }
 
 uint32_t sqlrservercursor::getColumnLength(uint32_t col) {
@@ -755,7 +1082,7 @@ const char *sqlrservercursor::getColumnTable(uint32_t col) {
 }
 
 uint16_t sqlrservercursor::getColumnTableLength(uint32_t col) {
-	return charstring::length(getColumnTable(col));
+	return charstring::getLength(getColumnTable(col));
 }
 
 bool sqlrservercursor::ignoreDateDdMmParameter(uint32_t col,
@@ -940,7 +1267,7 @@ bool sqlrservercursor::fakeInputBinds() {
 				//      select 3,35 from mytable
 				if (
 					(*ptr=='?' && 
-					charstring::toInteger(
+					charstring::convertToInteger(
 						pvt->_inbindvars[i].
 							variable+1)==bindindex) 
 
@@ -1319,7 +1646,11 @@ bool sqlrservercursor::getCurrentRowReformatted() {
 }
 
 char *sqlrservercursor::getErrorBuffer() {
-	return pvt->_error;
+	return pvt->_errorbuffer;
+}
+
+uint32_t sqlrservercursor::getErrorBufferSize() {
+	return pvt->_maxerrorlength+1;
 }
 
 uint32_t sqlrservercursor::getErrorLength() {
@@ -1698,6 +2029,6 @@ bool sqlrservercursor::getResultSetHeaderHasBeenHandled() {
 	return pvt->_resultsetheaderhasbeenhandled;
 }
 
-unsigned char *sqlrservercursor::getModuleData() {
+byte_t *sqlrservercursor::getModuleData() {
 	return pvt->_moduledata;
 }

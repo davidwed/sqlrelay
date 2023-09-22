@@ -52,7 +52,7 @@ void sqlrrowdictionary::setRow(uint64_t row) {
 	pvt->_row=row;
 }
 
-bool sqlrrowdictionary::getIsReadOnly() {
+bool sqlrrowdictionary::isReadOnly() {
 	return true;
 }
 
@@ -115,7 +115,7 @@ linkedlist<const char *> *sqlrrowdictionary::getKeys() {
 	return pvt->_keys;
 }
 
-uint64_t sqlrrowdictionary::getLength() {
+uint64_t sqlrrowdictionary::getCount() {
 	return pvt->_cursor->colCount();
 }
 
@@ -124,6 +124,7 @@ bool sqlrrowdictionary::remove(const char *key) {
 	return true;
 }
 
-void sqlrrowdictionary::clear() {
+bool sqlrrowdictionary::clear() {
 	// do nothing
+	return true;
 }

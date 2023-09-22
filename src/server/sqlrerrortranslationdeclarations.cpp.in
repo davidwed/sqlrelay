@@ -1,0 +1,4 @@
+sqlrerrortranslation	*new_sqlrerrortranslation_@module@(
+						sqlrservercontroller *cont,
+						sqlrerrortranslations *sqlts,
+						domnode *parameters);

@@ -128,7 +128,7 @@ Gavan Fantom - gavan@netbsd.org, gavan@coolfactor.org
 	various Makefile patches (0.37)
 	see https://mail-index.netbsd.org/pkgsrc-changes/2006/03/29/0001.html
 
-Sharpinskiy Dmitry - d-sh1@yandex.ru, dmitry.shrp@gmail.com
+Dmitry Sharpinskiy - d-sh1@yandex.ru, dmitry.shrp@gmail.com
 	added unicode support to odbc connection (0.38)
 
 Devananda - karnah805@yahoo.com
@@ -236,3 +236,6 @@ Igor - laigor@mail.ru
 
 Kyle Franklin - fanyikang1992@foxmail.com
 	fakeinputbindvariablesdateformat patch
+
+Dmitry Kasyanov - kadim@stacksoft.ru
+	python binary blobs patch

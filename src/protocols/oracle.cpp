@@ -568,38 +568,38 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		void	free();
 		void	reInit();
 
-		void	resetSendPacketBuffer(unsigned char packettype);
+		void	resetSendPacketBuffer(byte_t packettype);
 		bool	sendPacket();
 		bool	sendPacket(bool flush);
 		bool	recvPacket();
-		void	readHost(const unsigned char *rp,
+		void	readHost(const byte_t *rp,
 					uint16_t *value,
-					const unsigned char **rpout);
-		void	readHost(const unsigned char *rp,
+					const byte_t **rpout);
+		void	readHost(const byte_t *rp,
 					uint32_t *value,
-					const unsigned char **rpout);
-		bool	readMarker8(const unsigned char *rp,
-					unsigned char expected,
-					const unsigned char **rpout);
-		bool	readMarker16(const unsigned char *rp,
+					const byte_t **rpout);
+		bool	readMarker8(const byte_t *rp,
+					byte_t expected,
+					const byte_t **rpout);
+		bool	readMarker16(const byte_t *rp,
 					uint16_t expected,
-					const unsigned char **rpout);
-		bool	readMarker32(const unsigned char *rp,
+					const byte_t **rpout);
+		bool	readMarker32(const byte_t *rp,
 					uint32_t expected,
-					const unsigned char **rpout);
-		bool	getNullTerminatedArray(const unsigned char *rp,
-						const unsigned char *end,
-						unsigned char **array,
+					const byte_t **rpout);
+		bool	getNullTerminatedArray(const byte_t *rp,
+						const byte_t *end,
+						byte_t **array,
 						uint32_t *arraycount,
-						const unsigned char **rpout);
-		bool	getString(const unsigned char *rp,
-						const unsigned char *end,
+						const byte_t **rpout);
+		bool	getString(const byte_t *rp,
+						const byte_t *end,
 						char **string,
-						const unsigned char **rpout);
-		bool	getString(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getString(const byte_t *rp,
 						char **string,
 						uint32_t length,
-						const unsigned char **rpout);
+						const byte_t **rpout);
 
 		void	writeHost(bytebuffer *buffer, uint16_t value);
 		void	writeHost(bytebuffer *buffer, uint32_t value);
@@ -613,52 +613,51 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		bool	recvConnectRequest();
 		bool	sendConnectResponse();
 		bool	sendAccept();
-		bool	sendAccept(const unsigned char *data,
-						uint16_t datalength);
+		bool	sendAccept(const byte_t *data, uint16_t datalength);
 		bool	sendResend();
 		bool	sendRedirect();
 		bool	sendRefuse();
 
 		bool	anoNegotiation();
 		bool	recvAnoRequest();
-		bool	getAnoServiceHeader(const unsigned char *rp,
+		bool	getAnoServiceHeader(const byte_t *rp,
 						uint16_t *service,
 						uint16_t *fieldcount,
-						const unsigned char **rpout);
-		bool	getSupervisorService(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getSupervisorService(const byte_t *rp,
 						uint16_t fieldcount,
-						const unsigned char **rpout);
-		bool	getAuthenticationService(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getAuthenticationService(const byte_t *rp,
 						uint16_t fieldcount,
-						const unsigned char **rpout);
-		bool	getEncryptionService(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getEncryptionService(const byte_t *rp,
 						uint16_t fieldcount,
-						const unsigned char **rpout);
-		bool	getCryptoChecksummingService(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getCryptoChecksummingService(const byte_t *rp,
 						uint16_t fieldcount,
-						const unsigned char **rpout);
-		bool	getAnoVersionField(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getAnoVersionField(const byte_t *rp,
 						uint32_t *version,
-						const unsigned char **rpout);
-		bool	getAnoConnectionInfoField(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getAnoConnectionInfoField(const byte_t *rp,
 						uint32_t *pid,
 						uint32_t *connectiontype,
-						const unsigned char **rpout);
-		bool	getAnoArrayField(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getAnoArrayField(const byte_t *rp,
 						uint16_t **array,
 						uint32_t *arraycount,
-						const unsigned char **rpout);
-		bool	getAnoConstantField(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getAnoConstantField(const byte_t *rp,
 						uint16_t *constant,
-						const unsigned char **rpout);
-		bool	getAnoConstantField(const unsigned char *rp,
-						unsigned char *constant,
-						const unsigned char **rpout);
-		bool	getAnoStatusField(const unsigned char *rp,
+						const byte_t **rpout);
+		bool	getAnoConstantField(const byte_t *rp,
+						byte_t *constant,
+						const byte_t **rpout);
+		bool	getAnoStatusField(const byte_t *rp,
 						uint16_t *status,
-						const unsigned char **rpout);
-		bool	getAnoUnknownField(const unsigned char *rp,
-						const unsigned char **rpout);
+						const byte_t **rpout);
+		bool	getAnoUnknownField(const byte_t *rp,
+						const byte_t **rpout);
 		bool		sendAnoResponse();
 		uint16_t	putSupervisorService();
 		uint16_t	putAuthenticationService();
@@ -668,7 +667,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 							uint16_t fieldcount);
 		uint16_t	putAnoVersionField(uint32_t version);
 		uint16_t	putAnoStatusField(uint16_t status);
-		uint16_t	putAnoConstant(unsigned char constant);
+		uint16_t	putAnoConstant(byte_t constant);
 		uint16_t	putAnoArrayField(uint16_t *array,
 							uint32_t arraycount);
 
@@ -692,43 +691,43 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		void	putAuthField(const char *fieldname, const char *field);
 		bool	sendAuthenticationResponse();
 
-		void	debugTtcCode(unsigned char ttccode);
-		void	debugTtiFunction(unsigned char ttifunction);
+		void	debugTtcCode(byte_t ttccode);
+		void	debugTtiFunction(byte_t ttifunction);
 		void	debugOptions(uint16_t options, uint16_t moreoptions);
 		void	debugOptions(uint16_t options);
-		void	debugCharacterSet(unsigned char characterset);
+		void	debugCharacterSet(byte_t characterset);
 		void	debugStatusFlags(uint16_t statusflags);
 		void	debugColumnType(const char *name, uint16_t columntype);
 		void	debugColumnType(uint16_t columntype);
 		void	debugSystemError();
 
-		bool	getTtiFunction(const unsigned char *rp,
-						unsigned char *ttifunction,
-						const unsigned char **rpout);
+		bool	getTtiFunction(const byte_t *rp,
+						byte_t *ttifunction,
+						const byte_t **rpout);
 
 		// open...
-		bool	open(const unsigned char *rp);
+		bool	open(const byte_t *rp);
 		bool	sendOpenResponse(sqlrservercursor *cursor);
 
 		// query...
-		bool	query(const unsigned char *rp);
+		bool	query(const byte_t *rp);
 		bool	sendQueryResponse(sqlrservercursor *cursor);
-		bool	query2(const unsigned char *rp);
+		bool	query2(const byte_t *rp);
 		bool	sendQuery2Response(sqlrservercursor *cursor,
 							bool binds);
 		bool	bindParameters(sqlrservercursor *cursor,
 							uint16_t pcount,
 							uint16_t *ptypes);
-		bool	query3(const unsigned char *rp);
+		bool	query3(const byte_t *rp);
 		bool	sendQuery3Response(sqlrservercursor *cursor,
 							uint16_t options);
 
 		// execute...
-		bool	execute(const unsigned char *rp);
+		bool	execute(const byte_t *rp);
 		bool	sendExecuteResponse(sqlrservercursor *cursor);
 
 		// fetch...
-		bool	fetch(const unsigned char *rp);
+		bool	fetch(const byte_t *rp);
 		bool	sendFetchResponse(sqlrservercursor *cursor,
 							bool parse,
 							bool define,
@@ -774,27 +773,26 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		void	putError(const char *error, uint32_t errorlength);
 
 		// close...
-		bool	close(const unsigned char *rp);
+		bool	close(const byte_t *rp);
 		void	clearParams(sqlrservercursor *cursor);
 		bool	sendCloseResponse(sqlrservercursor *cursor);
 
 		// disconnect...
-		bool	disconnect(const unsigned char *rp);
+		bool	disconnect(const byte_t *rp);
 		bool	sendDisconnectResponse();
 
 		// cancel...
-		bool	cancel(const unsigned char *rp);
+		bool	cancel(const byte_t *rp);
 
 		// version
-		bool	version(const unsigned char *rp);
+		bool	version(const byte_t *rp);
 		bool	sendVersionResponse();
 
 		// occa
-		bool	occa(const unsigned char *rp,
-				const unsigned char **rpout);
+		bool	occa(const byte_t *rp, const byte_t **rpout);
 
 		// logon unknown
-		bool	logonUnknown(const unsigned char *rp);
+		bool	logonUnknown(const byte_t *rp);
 		bool	sendLogonUnknownResponse();
 
 		void	putGenericFooter();
@@ -817,25 +815,25 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		uint32_t	encryptionversion;
 		uint32_t	cryptochecksummingversion;
 
-		unsigned char	*ttiversions;
+		byte_t		*ttiversions;
 		uint32_t	ttiversioncount;
-		unsigned char	ttiversion;
+		byte_t		ttiversion;
 
 		char		*clientstring;
 		const char	*serverstring;
 
-		const unsigned char	*datatypes;
-		uint16_t		datatypeslength;
+		const byte_t	*datatypes;
+		uint16_t	datatypeslength;
 
 		filedescriptor	*clientsock;
 
 		bytebuffer	reqpacket;
-		unsigned char	reqpackettype;
+		byte_t		reqpackettype;
 
 		memorypool	*resppacketpool;
-		unsigned char	*resppacket;
+		byte_t		*resppacket;
 		uint16_t	resppacketsize;
-		unsigned char	resppackettype;
+		byte_t		resppackettype;
 
 		randomnumber	r;
 		//uint32_t	seed;
@@ -980,7 +978,7 @@ clientsessionexitstatus_t sqlrprotocol_oracle::clientSession(
 	clientsock=cs;
 
 	// set up the socket
-	clientsock->dontUseNaglesAlgorithm();
+	clientsock->setNaglesAlgorithmEnabled(false);
 	clientsock->setSocketReadBufferSize(65536);
 	clientsock->setSocketWriteBufferSize(65536);
 	clientsock->setReadBufferSize(65536);
@@ -994,12 +992,12 @@ clientsessionexitstatus_t sqlrprotocol_oracle::clientSession(
 	if (initialHandshake()) {
 
 		// loop, getting and executing commands
-		bool	loop=true;
-		const unsigned char	*rp=NULL;
+		bool		loop=true;
+		const byte_t	*rp=NULL;
 		do {
 
 			// get the tti function...
-			unsigned char		ttifunction;
+			byte_t		ttifunction;
 			if (!getTtiFunction(rp,&ttifunction,&rp)) {
 				break;
 			}
@@ -1151,7 +1149,7 @@ clientsessionexitstatus_t sqlrprotocol_oracle::clientSession(
 	return status;
 }
 
-void sqlrprotocol_oracle::resetSendPacketBuffer(unsigned char packettype) {
+void sqlrprotocol_oracle::resetSendPacketBuffer(byte_t packettype) {
 	reqpacket.clear();
 	reqpacket.append((uint64_t)0);
 	reqpackettype=packettype;
@@ -1165,11 +1163,11 @@ bool sqlrprotocol_oracle::sendPacket(bool flush) {
 
 	uint16_t	reqpacketsize=(uint16_t)reqpacket.getSize();
 	uint16_t	packetchecksum=0;
-	unsigned char	packetflags=0;
+	byte_t		packetflags=0;
 	uint16_t	headerchecksum=0;
 
 	// overwrite the first 8 bytes of the reqpacket with the packet header
-	reqpacket.setPosition(0);
+	reqpacket.setPositionRelativeToBeginning(0);
 	reqpacket.write(hostToBE(reqpacketsize));
 	reqpacket.write(hostToBE(packetchecksum));
 	reqpacket.write(reqpackettype);
@@ -1249,7 +1247,7 @@ bool sqlrprotocol_oracle::recvPacket() {
 
 	// packet type
 	// 1 byte
-	if (clientsock->read(&resppackettype)!=sizeof(unsigned char)) {
+	if (clientsock->read(&resppackettype)!=sizeof(byte_t)) {
 		if (getDebug()) {
 			stdoutput.write("read packet type failed\n");
 			debugSystemError();
@@ -1259,8 +1257,8 @@ bool sqlrprotocol_oracle::recvPacket() {
 
 	// packet flags
 	// 1 byte
-	unsigned char	packetflags;
-	if (clientsock->read(&packetflags)!=sizeof(unsigned char)) {
+	byte_t	packetflags;
+	if (clientsock->read(&packetflags)!=sizeof(byte_t)) {
 		if (getDebug()) {
 			stdoutput.write("read packet flags failed\n");
 			debugSystemError();
@@ -1310,51 +1308,51 @@ bool sqlrprotocol_oracle::recvPacket() {
 	return true;
 }
 
-void sqlrprotocol_oracle::readHost(const unsigned char *rp,
+void sqlrprotocol_oracle::readHost(const byte_t *rp,
 					uint16_t *value,
-					const unsigned char **rpout) {
+					const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint16_t));
 	*rpout=rp+sizeof(uint16_t);
 }
 
-void sqlrprotocol_oracle::readHost(const unsigned char *rp,
+void sqlrprotocol_oracle::readHost(const byte_t *rp,
 					uint32_t *value,
-					const unsigned char **rpout) {
+					const byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint32_t));
 	*rpout=rp+sizeof(uint32_t);
 }
 
-bool sqlrprotocol_oracle::readMarker8(const unsigned char *rp,
-					unsigned char expected,
-					const unsigned char **rpout) {
-	unsigned char	marker;
+bool sqlrprotocol_oracle::readMarker8(const byte_t *rp,
+					byte_t expected,
+					const byte_t **rpout) {
+	byte_t	marker;
 	return read(rp,&marker,"marker",expected,rpout);
 }
 
-bool sqlrprotocol_oracle::readMarker16(const unsigned char *rp,
+bool sqlrprotocol_oracle::readMarker16(const byte_t *rp,
 					uint16_t expected,
-					const unsigned char **rpout) {
+					const byte_t **rpout) {
 	uint16_t	marker;
 	return readBE(rp,&marker,"marker",expected,rpout);
 }
 
-bool sqlrprotocol_oracle::readMarker32(const unsigned char *rp,
+bool sqlrprotocol_oracle::readMarker32(const byte_t *rp,
 					uint32_t expected,
-					const unsigned char **rpout) {
+					const byte_t **rpout) {
 	uint32_t	marker;
 	return readBE(rp,&marker,"marker",expected,rpout);
 }
 
-bool sqlrprotocol_oracle::getNullTerminatedArray(const unsigned char *rp,
-						const unsigned char *end,
-						unsigned char **array,
+bool sqlrprotocol_oracle::getNullTerminatedArray(const byte_t *rp,
+						const byte_t *end,
+						byte_t **array,
 						uint32_t *arraycount,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 	*array=NULL;
 	*arraycount=0;
 
 	// count the array items
-	const unsigned char	*start=rp;
+	const byte_t	*start=rp;
 	for (;;) {
 		if (!(*rp)) {
 			break;
@@ -1374,7 +1372,7 @@ bool sqlrprotocol_oracle::getNullTerminatedArray(const unsigned char *rp,
 	rp=start;
 
 	// get the array items
-	*array=new unsigned char[*arraycount];
+	*array=new byte_t[*arraycount];
 	for (uint32_t i=0; i<*arraycount; i++) {
 		read(rp,&((*array)[i]),&rp);
 	}
@@ -1387,15 +1385,15 @@ bool sqlrprotocol_oracle::getNullTerminatedArray(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::getString(const unsigned char *rp,
-					const unsigned char *end,
+bool sqlrprotocol_oracle::getString(const byte_t *rp,
+					const byte_t *end,
 					char **string,
-					const unsigned char **rpout) {
+					const byte_t **rpout) {
 	*string=NULL;
 	uint32_t	stringlength=0;
 
 	// count the characters
-	const unsigned char	*start=rp;
+	const byte_t	*start=rp;
 	for (;;) {
 		if (!(*rp)) {
 			break;
@@ -1429,10 +1427,10 @@ bool sqlrprotocol_oracle::getString(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::getString(const unsigned char *rp,
+bool sqlrprotocol_oracle::getString(const byte_t *rp,
 					char **string,
 					uint32_t length,
-					const unsigned char **rpout) {
+					const byte_t **rpout) {
 	*string=charstring::duplicate((const char *)rp,length);
 	*rpout=rp+length;
 	return true;
@@ -1452,8 +1450,8 @@ void sqlrprotocol_oracle::generateAuthSessionKey(uint16_t bytes) {
 	stringbuffer	str;
 	uint32_t	number;
 	for (uint16_t i=0; i<bytes; i++) {
-		r.generateNumber(&number);
-		int32_t	scalednumber=randomnumber::scaleNumber(number,0,16);
+		r.generate(&number);
+		int32_t	scalednumber=randomnumber::scale(number,0,16);
 		str.append((char)(scalednumber+((scalednumber<10)?'0':'A'-10)));
 	}
 	delete[] authsessionkey;
@@ -1490,7 +1488,7 @@ bool sqlrprotocol_oracle::recvConnectRequest() {
 		return false;
 	}
 
-	const unsigned char	*rp=resppacket;
+	const byte_t	*rp=resppacket;
 
 	uint16_t	protocolcharacteristics;
 	uint16_t	maxpacketsbeforeack;
@@ -1586,7 +1584,7 @@ bool sqlrprotocol_oracle::sendAccept() {
 	return sendAccept(NULL,0);
 }
 
-bool sqlrprotocol_oracle::sendAccept(const unsigned char *data,
+bool sqlrprotocol_oracle::sendAccept(const byte_t *data,
 						uint16_t datalength) {
 
 	// data offset:
@@ -1691,14 +1689,14 @@ bool sqlrprotocol_oracle::recvAnoRequest() {
 		return false;
 	}
 
-	const unsigned char	*rp=resppacket;
-	//const unsigned char	*end=rp+resppacketsize;
+	const byte_t	*rp=resppacket;
+	//const byte_t	*end=rp+resppacketsize;
 
 	// ano request header...
 	uint16_t	dataflags;
 	uint16_t	overalllength;
 	uint16_t	servicecount;
-	unsigned char	desiredoptionsflag;
+	byte_t		desiredoptionsflag;
 
 	readBE(rp,&dataflags,&rp);
 	if (!readMarker32(rp,0xdeadbeef,&rp)) {
@@ -1774,10 +1772,10 @@ bool sqlrprotocol_oracle::recvAnoRequest() {
 	return true;
 }
 
-bool sqlrprotocol_oracle::getAnoServiceHeader(const unsigned char *rp,
+bool sqlrprotocol_oracle::getAnoServiceHeader(const byte_t *rp,
 						uint16_t *service,
 						uint16_t *fieldcount,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 
 	readBE(rp,service,&rp);
 	readBE(rp,fieldcount,&rp);
@@ -1798,9 +1796,9 @@ bool sqlrprotocol_oracle::getAnoServiceHeader(const unsigned char *rp,
 }
 
 
-bool sqlrprotocol_oracle::getSupervisorService(const unsigned char *rp,
+bool sqlrprotocol_oracle::getSupervisorService(const byte_t *rp,
 						uint16_t fieldcount,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 
 	if (getDebug()) {
 		stdoutput.write("	supervisor {\n");
@@ -1827,9 +1825,9 @@ bool sqlrprotocol_oracle::getSupervisorService(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::getAuthenticationService(const unsigned char *rp,
+bool sqlrprotocol_oracle::getAuthenticationService(const byte_t *rp,
 						uint16_t fieldcount,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 
 	if (getDebug()) {
 		stdoutput.write("	authentication {\n");
@@ -1852,9 +1850,9 @@ bool sqlrprotocol_oracle::getAuthenticationService(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::getEncryptionService(const unsigned char *rp,
+bool sqlrprotocol_oracle::getEncryptionService(const byte_t *rp,
 						uint16_t fieldcount,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 
 	if (getDebug()) {
 		stdoutput.write("	encryption {\n");
@@ -1862,7 +1860,7 @@ bool sqlrprotocol_oracle::getEncryptionService(const unsigned char *rp,
 
 	uint16_t	*drivers=NULL;
 	uint32_t	drivercount;
-	unsigned char	constant;
+	byte_t		constant;
 	if (!getAnoVersionField(rp,&encryptionversion,&rp) ||
 		!getAnoArrayField(rp,&drivers,&drivercount,&rp)) {
 		delete[] drivers;
@@ -1886,9 +1884,9 @@ bool sqlrprotocol_oracle::getEncryptionService(const unsigned char *rp,
 }
 
 bool sqlrprotocol_oracle::getCryptoChecksummingService(
-						const unsigned char *rp,
+						const byte_t *rp,
 						uint16_t fieldcount,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 
 	if (getDebug()) {
 		stdoutput.write("	crypto-checksumming {\n");
@@ -1912,9 +1910,9 @@ bool sqlrprotocol_oracle::getCryptoChecksummingService(
 	return true;
 }
 
-bool sqlrprotocol_oracle::getAnoVersionField(const unsigned char *rp,
+bool sqlrprotocol_oracle::getAnoVersionField(const byte_t *rp,
 						uint32_t *version,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 	uint16_t	size;
 	uint16_t	type;
 	if (!readBE(rp,&size,"size",4,&rp) ||
@@ -1934,10 +1932,10 @@ bool sqlrprotocol_oracle::getAnoVersionField(const unsigned char *rp,
 }
 
 bool sqlrprotocol_oracle::getAnoConnectionInfoField(
-						const unsigned char *rp,
+						const byte_t *rp,
 						uint32_t *pid,
 						uint32_t *connectiontype,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 	uint16_t	size;
 	uint16_t	type;
 	if (!readBE(rp,&size,"size",8,&rp) ||
@@ -1962,10 +1960,10 @@ bool sqlrprotocol_oracle::getAnoConnectionInfoField(
 	return true;
 }
 
-bool sqlrprotocol_oracle::getAnoArrayField(const unsigned char *rp,
+bool sqlrprotocol_oracle::getAnoArrayField(const byte_t *rp,
 						uint16_t **array,
 						uint32_t *arraycount,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 
 	*array=NULL;
 	*arraycount=0;
@@ -2030,9 +2028,9 @@ bool sqlrprotocol_oracle::getAnoArrayField(const unsigned char *rp,
 }
 
 
-bool sqlrprotocol_oracle::getAnoConstantField(const unsigned char *rp,
+bool sqlrprotocol_oracle::getAnoConstantField(const byte_t *rp,
 						uint16_t *constant,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 	uint16_t	size;
 	uint16_t	type;
 	if (!readBE(rp,&size,"size",2,&rp) ||
@@ -2050,9 +2048,9 @@ bool sqlrprotocol_oracle::getAnoConstantField(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::getAnoConstantField(const unsigned char *rp,
-						unsigned char *constant,
-						const unsigned char **rpout) {
+bool sqlrprotocol_oracle::getAnoConstantField(const byte_t *rp,
+						byte_t *constant,
+						const byte_t **rpout) {
 	uint16_t	size;
 	uint16_t	type;
 	if (!readBE(rp,&size,"size",1,&rp) ||
@@ -2070,9 +2068,9 @@ bool sqlrprotocol_oracle::getAnoConstantField(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::getAnoStatusField(const unsigned char *rp,
+bool sqlrprotocol_oracle::getAnoStatusField(const byte_t *rp,
 						uint16_t *status,
-						const unsigned char **rpout) {
+						const byte_t **rpout) {
 	uint16_t	size;
 	uint16_t	type;
 	if (!readBE(rp,&size,"size",2,&rp) ||
@@ -2090,8 +2088,8 @@ bool sqlrprotocol_oracle::getAnoStatusField(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::getAnoUnknownField(const unsigned char *rp,
-						const unsigned char **rpout) {
+bool sqlrprotocol_oracle::getAnoUnknownField(const byte_t *rp,
+						const byte_t **rpout) {
 	uint16_t	size;
 	uint16_t	type;
 	readBE(rp,&size,&rp);
@@ -2114,7 +2112,7 @@ bool sqlrprotocol_oracle::sendAnoResponse() {
 	uint32_t	version=anorequestversion;
 	uint16_t	servicecount=0;
 	uint64_t	servicecountpos=0;
-	unsigned char	servicestobeused=0;
+	byte_t		servicestobeused=0;
 
 	writeBE(&reqpacket,dataflags);
 	writeBE(&reqpacket,(uint32_t)0xdeadbeef);
@@ -2146,9 +2144,9 @@ bool sqlrprotocol_oracle::sendAnoResponse() {
 
 
 	// backpatch the overall length and servicecount
-	reqpacket.setPosition(overalllengthpos);
+	reqpacket.setPositionRelativeToBeginning(overalllengthpos);
 	reqpacket.write(hostToBE(overalllength));
-	reqpacket.setPosition(servicecountpos);
+	reqpacket.setPositionRelativeToBeginning(servicecountpos);
 	reqpacket.write(hostToBE(servicecount));
 
 	if (getDebug()) {
@@ -2203,7 +2201,7 @@ uint16_t sqlrprotocol_oracle::putEncryptionService() {
 
 	uint16_t	length=putAnoServiceHeader(2,2)+
 				putAnoVersionField(encryptionversion)+
-				putAnoConstant((unsigned char)0);
+				putAnoConstant((byte_t)0);
 
 	if (getDebug()) {
 		stdoutput.write("	}\n");
@@ -2219,7 +2217,7 @@ uint16_t sqlrprotocol_oracle::putCryptoChecksummingService() {
 
 	uint16_t	length=putAnoServiceHeader(3,2)+
 				putAnoVersionField(cryptochecksummingversion)+
-				putAnoConstant((unsigned char)0);
+				putAnoConstant((byte_t)0);
 
 	if (getDebug()) {
 		stdoutput.write("	}\n");
@@ -2272,7 +2270,7 @@ uint16_t sqlrprotocol_oracle::putAnoStatusField(uint16_t status) {
 	return 6;
 }
 
-uint16_t sqlrprotocol_oracle::putAnoConstant(unsigned char constant) {
+uint16_t sqlrprotocol_oracle::putAnoConstant(byte_t constant) {
 
 	if (getDebug()) {
 		stdoutput.printf("		constant: 0x%02x\n",constant);
@@ -2314,7 +2312,7 @@ uint16_t sqlrprotocol_oracle::putAnoArrayField(uint16_t *array,
 
 	} else {
 		// null terminator
-		write(&reqpacket,(unsigned char)0x00);
+		write(&reqpacket,(byte_t)0x00);
 	}
 
 	// return total length
@@ -2339,11 +2337,11 @@ bool sqlrprotocol_oracle::recvTtiRequest() {
 		return false;
 	}
 
-	const unsigned char	*rp=resppacket;
-	const unsigned char	*end=rp+resppacketsize;
+	const byte_t	*rp=resppacket;
+	const byte_t	*end=rp+resppacketsize;
 
 	uint16_t	dataflags;
-	unsigned char	ttccode;
+	byte_t		ttccode;
 	delete[] clientstring;
 
 	readBE(rp,&dataflags,&rp);
@@ -2427,7 +2425,7 @@ void sqlrprotocol_oracle::putTti5Response() {
 	// oracle 8.0 supports TTI 5 (and lower)
 
 	uint16_t	dataflags=0;
-	unsigned char	ttccode=TTC_PROTOCOL_NEGOTIATION;
+	byte_t		ttccode=TTC_PROTOCOL_NEGOTIATION;
 
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
@@ -2456,7 +2454,7 @@ void sqlrprotocol_oracle::putTti5Response() {
 	serverstring=clientstring;
 
 	write(&reqpacket,ttiversion);
-	write(&reqpacket,(unsigned char)0);
+	write(&reqpacket,(byte_t)0);
 	write(&reqpacket,serverstring);
 	write(&reqpacket,'\0');
 
@@ -2468,7 +2466,7 @@ void sqlrprotocol_oracle::putTti5Response() {
 	uint16_t	charsetgraphelementcount=0;
 
 	writeLE(&reqpacket,charset);
-	write(&reqpacket,(unsigned char)0);
+	write(&reqpacket,(byte_t)0);
 	writeLE(&reqpacket,charsetgraphelementcount);
 	// FIXME: each charset graph element consists of 5 bytes...
 
@@ -2477,23 +2475,23 @@ void sqlrprotocol_oracle::putTti5Response() {
 	uint16_t	fdolength=100;
 	uint32_t	fdodatalength=fdolength-4;
 	// no idea what this means...
-	unsigned char	part1[]={
+	byte_t	part1[]={
 		0x05, 0x0b, 0x0c, 0x03, 0x0c, 0x0c, 0x05, 0x04,
 		0x05, 0x0d, 0x06, 0x09, 0x07, 0x08, 0x05, 0x0e,
 		0x05, 0x06, 0x05, 0x0f, 0x02, 0xec, 0xeb, 0xed,
 		0x05, 0x0a, 0x05, 0x05, 0x05, 0x05, 0x05
 	};
-	unsigned char	part1length=sizeof(part1);
+	byte_t	part1length=sizeof(part1);
 	// no idea what this means...
-	unsigned char	part2[]={
+	byte_t	part2[]={
 		0x08, 0x23, 0x43, 0x23, 0x23, 0x08, 0x11, 0x23,
 		0x08, 0x11, 0x41, 0xb0, 0x23, 0x00, 0x83
 	};
-	unsigned char	part2length=sizeof(part2);
+	byte_t	part2length=sizeof(part2);
 
 	writeBE(&reqpacket,fdolength);
 	writeBE(&reqpacket,fdodatalength);
-	write(&reqpacket,(unsigned char)1);
+	write(&reqpacket,(byte_t)1);
 	write(&reqpacket,part1length);
 	write(&reqpacket,part2length);
 	reqpacket.append(part1,part1length);
@@ -2501,7 +2499,7 @@ void sqlrprotocol_oracle::putTti5Response() {
 
 
 	// some charset related thing, or something...
-	unsigned char	charsetthing[]={
+	byte_t	charsetthing[]={
 		0x00, 0x01, 0x00,
 		0x01, 0x03,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -2567,11 +2565,11 @@ bool sqlrprotocol_oracle::recvDataTypeRequest() {
 		return false;
 	}
 
-	const unsigned char	*rp=resppacket;
-	const unsigned char	*end=rp+resppacketsize;
+	const byte_t	*rp=resppacket;
+	const byte_t	*end=rp+resppacketsize;
 
 	uint16_t	dataflags;
-	unsigned char	ttccode;
+	byte_t		ttccode;
 
 	readBE(rp,&dataflags,&rp);
 	if (!read(rp,&ttccode,"ttccode",TTC_DATATYPE_NEGOTIATION,&rp) ||
@@ -2612,7 +2610,7 @@ bool sqlrprotocol_oracle::sendDataTypeResponse() {
 	resetSendPacketBuffer(PACKET_DATA);
 
 	uint16_t	dataflags=0;
-	unsigned char	ttccode=TTC_DATATYPE_NEGOTIATION;
+	byte_t		ttccode=TTC_DATATYPE_NEGOTIATION;
 
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
@@ -2652,14 +2650,14 @@ bool sqlrprotocol_oracle::recvAuthenticationRequest(bool secondphase) {
 		return false;
 	}
 
-	const unsigned char	*rp=resppacket;
-	const unsigned char	*end=rp+resppacketsize;
+	const byte_t	*rp=resppacket;
+	const byte_t	*end=rp+resppacketsize;
 
 	uint16_t	dataflags;
-	unsigned char	ttccode;
-	unsigned char	ttifunction;
-	unsigned char	seqnumber;
-	unsigned char	unknown;
+	byte_t		ttccode;
+	byte_t		ttifunction;
+	byte_t		seqnumber;
+	byte_t		unknown;
 
 	readBE(rp,&dataflags,&rp);
 	if (!read(rp,&ttccode,"ttccode",TTC_TTI_FUNCTION,&rp)) {
@@ -2688,8 +2686,8 @@ bool sqlrprotocol_oracle::recvAuthenticationRequest(bool secondphase) {
 	// different versions, or something...
 	bool	stringsmatch=!charstring::compare(clientstring,serverstring);
 
-	unsigned char	userlength;
-	char		*user;
+	byte_t	userlength;
+	char	*user;
 
 	// no idea...
 	for (uint16_t i=0; i<((stringsmatch)?4:2); i++) {
@@ -2719,10 +2717,10 @@ bool sqlrprotocol_oracle::recvAuthenticationRequest(bool secondphase) {
 
 	do {
 
-		unsigned char	fieldnamelength;
+		byte_t		fieldnamelength;
 		uint32_t	fieldnamelengthlong;
 		char		*fieldname;
-		unsigned char	fieldlength;
+		byte_t		fieldlength;
 		uint32_t	fieldlengthlong;
 		char		*field;
 
@@ -2783,8 +2781,8 @@ bool sqlrprotocol_oracle::sendAuthenticationChallenge() {
 	// different response if auth failed
 
 	uint16_t	dataflags=0;
-	unsigned char	ttccode=TTC_OK;
-	unsigned char	unknown1[]={
+	byte_t		ttccode=TTC_OK;
+	byte_t		unknown1[]={
 		0x04,
 
 		// varies, sometimes 0x01
@@ -2817,8 +2815,8 @@ bool sqlrprotocol_oracle::sendAuthenticationChallenge() {
 	}
 
 	// no idea
-	write(&reqpacket,(unsigned char)1);
-	write(&reqpacket,(unsigned char)0);
+	write(&reqpacket,(byte_t)1);
+	write(&reqpacket,(byte_t)0);
 
 	// session key...
 	generateAuthSessionKey(16);
@@ -2840,15 +2838,15 @@ authsessionkey=charstring::duplicate("64760F3160DCEF82");
 void sqlrprotocol_oracle::putAuthField(const char *fieldname,
 						const char *field) {
 
-	unsigned char	fieldnamelength=charstring::length(fieldname);
-	unsigned char	fieldlength=charstring::length(field);
+	byte_t	fieldnamelength=charstring::getLength(fieldname);
+	byte_t	fieldlength=charstring::getLength(field);
 
 	// field name...
 	write(&reqpacket,fieldnamelength);
 	// no idea...
-	write(&reqpacket,(unsigned char)0);
-	write(&reqpacket,(unsigned char)0);
-	write(&reqpacket,(unsigned char)0);
+	write(&reqpacket,(byte_t)0);
+	write(&reqpacket,(byte_t)0);
+	write(&reqpacket,(byte_t)0);
 	// again...
 	write(&reqpacket,fieldnamelength);
 	write(&reqpacket,fieldname,fieldnamelength);
@@ -2856,19 +2854,19 @@ void sqlrprotocol_oracle::putAuthField(const char *fieldname,
 	// field...
 	write(&reqpacket,fieldlength);
 	// no idea...
-	write(&reqpacket,(unsigned char)0);
-	write(&reqpacket,(unsigned char)0);
-	write(&reqpacket,(unsigned char)0);
+	write(&reqpacket,(byte_t)0);
+	write(&reqpacket,(byte_t)0);
+	write(&reqpacket,(byte_t)0);
 	// again...
 	if (fieldlength) {
 		write(&reqpacket,fieldlength);
 		write(&reqpacket,field,fieldlength);
 	}
 	// no idea...
-	write(&reqpacket,(unsigned char)0);
-	write(&reqpacket,(unsigned char)0);
-	write(&reqpacket,(unsigned char)0);
-	write(&reqpacket,(unsigned char)0);
+	write(&reqpacket,(byte_t)0);
+	write(&reqpacket,(byte_t)0);
+	write(&reqpacket,(byte_t)0);
+	write(&reqpacket,(byte_t)0);
 
 	if (getDebug()) {
 			stdoutput.printf("	%s: %s\n",fieldname,field);
@@ -2886,7 +2884,7 @@ bool sqlrprotocol_oracle::sendAuthenticationResponse() {
 
 	writeBE(&reqpacket,dataflags);
 
-	unsigned char	unknownheader[]={
+	byte_t	unknownheader[]={
 		0x08, 0x08, 0x00
 	};
 	reqpacket.append(unknownheader,sizeof(unknownheader));
@@ -2900,7 +2898,7 @@ bool sqlrprotocol_oracle::sendAuthenticationResponse() {
 	putAuthField("AUTH_SESSION_ID","9");
 	putAuthField("AUTH_SERIAL_NUM","1981");
 
-	unsigned char	unknownfooter[]={
+	byte_t	unknownfooter[]={
 		0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -2922,7 +2920,7 @@ bool sqlrprotocol_oracle::sendAuthenticationResponse() {
 	return sendPacket(true);
 }
 
-bool sqlrprotocol_oracle::open(const unsigned char *rp) {
+bool sqlrprotocol_oracle::open(const byte_t *rp) {
 
 	// sqlplus 8.0.5, 8i, 9i
 	// call this to open a cursor
@@ -2955,8 +2953,8 @@ bool sqlrprotocol_oracle::sendOpenResponse(sqlrservercursor *cursor) {
 	resetSendPacketBuffer(PACKET_DATA);
 
 	uint16_t	dataflags=0;
-	unsigned char	ttccode=TTC_OK;
-	unsigned char	unknown[]={
+	byte_t		ttccode=TTC_OK;
+	byte_t		unknown[]={
 		0x01, 0x00, 0x00, 0x00, 0x09
 	};
 
@@ -2974,7 +2972,7 @@ bool sqlrprotocol_oracle::sendOpenResponse(sqlrservercursor *cursor) {
 	return sendPacket(true);
 }
 
-void sqlrprotocol_oracle::debugTtcCode(unsigned char ttccode) {
+void sqlrprotocol_oracle::debugTtcCode(byte_t ttccode) {
 	stdoutput.write("	ttc code: ");
 	switch (ttccode) {
 		case TTC_PROTOCOL_NEGOTIATION:
@@ -3005,7 +3003,7 @@ void sqlrprotocol_oracle::debugTtcCode(unsigned char ttccode) {
 	stdoutput.printf(" (0x%02x)\n",ttccode);
 }
 
-void sqlrprotocol_oracle::debugTtiFunction(unsigned char ttifunction) {
+void sqlrprotocol_oracle::debugTtiFunction(byte_t ttifunction) {
 	stdoutput.write("	tti function: ");
 	switch (ttifunction) {
 		case TTI_OPEN:
@@ -3174,7 +3172,7 @@ void sqlrprotocol_oracle::debugOptions(uint16_t options) {
 	}
 }
 
-void sqlrprotocol_oracle::debugCharacterSet(unsigned char characterset) {
+void sqlrprotocol_oracle::debugCharacterSet(byte_t characterset) {
 	stdoutput.printf("	character set: 0x%02x\n",
 				(uint32_t)(0x000000ff&characterset));
 }
@@ -3280,9 +3278,9 @@ void sqlrprotocol_oracle::debugSystemError() {
 	delete[] err;
 }
 
-bool sqlrprotocol_oracle::getTtiFunction(const unsigned char *rp,
-						unsigned char *ttifunction,
-						const unsigned char **rpout) {
+bool sqlrprotocol_oracle::getTtiFunction(const byte_t *rp,
+						byte_t *ttifunction,
+						const byte_t **rpout) {
 
 	if (!rp) {
 		if (!recvPacket()) {
@@ -3301,10 +3299,10 @@ bool sqlrprotocol_oracle::getTtiFunction(const unsigned char *rp,
 		rp=resppacket;
 	}
 
-	const unsigned char	*rpin=rp;
+	const byte_t	*rpin=rp;
 
 	uint16_t	dataflags;
-	unsigned char	ttccode;
+	byte_t		ttccode;
 
 	readBE(rp,&dataflags,&rp);
 	if (!read(rp,&ttccode,"ttccode",TTC_TTI_FUNCTION,&rp) &&
@@ -3326,7 +3324,7 @@ bool sqlrprotocol_oracle::getTtiFunction(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::query(const unsigned char *rp) {
+bool sqlrprotocol_oracle::query(const byte_t *rp) {
 
 	// sqlplus 8.0.5, 8i, 9i
 	// call this to prepare some initial queries
@@ -3338,12 +3336,12 @@ bool sqlrprotocol_oracle::query(const unsigned char *rp) {
 	uint16_t	options;
 	uint16_t	moreoptions;
 	uint16_t	cursorid;
-	unsigned char	unknown3;
-	unsigned char	unknown4;
-	unsigned char	unknown5;
+	byte_t		unknown3;
+	byte_t		unknown4;
+	byte_t		unknown5;
 	uint16_t	querylen;
-	unsigned char	unknown6;
-	unsigned char	unknown7;
+	byte_t		unknown6;
+	byte_t		unknown7;
 	const char	*query;
 
 	readBE(rp,&options,&rp);
@@ -3416,16 +3414,16 @@ bool sqlrprotocol_oracle::sendQueryResponse(sqlrservercursor *cursor) {
 
 	uint16_t	dataflags=0;
 	// FIXME: not a valid ttccode type...
-	unsigned char	ttccode=4;
-	unsigned char unknown1[]={
+	byte_t	ttccode=4;
+	byte_t unknown1[]={
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00
 	};
-	unsigned char unknown2[]={
+	byte_t unknown2[]={
 		// not cursor id
 		0x01, 0x00
 	};
-	unsigned char unknown3[]={
+	byte_t unknown3[]={
 		0x11, 0x00, 0x03, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -3451,7 +3449,7 @@ bool sqlrprotocol_oracle::sendQueryResponse(sqlrservercursor *cursor) {
 	return sendPacket(true);
 }
 
-bool sqlrprotocol_oracle::query2(const unsigned char *rp) {
+bool sqlrprotocol_oracle::query2(const byte_t *rp) {
 
 	// sqlplus 8.0.5, 8i, 9i
 	// call this to prepare/execute some initial queries
@@ -3472,13 +3470,13 @@ cursorid=hackcursorid;
 	if (options&OPTION_PARSE) {
 		// no idea...
 		for (uint16_t i=0; i<7; i++) {
-			unsigned char	unknown;
+			byte_t	unknown;
 			read(rp,&unknown,&rp);
 		}
 		readLE(rp,&querylen,&rp);
 		// no idea...
 		for (uint16_t i=0; i<44; i++) {
-			unsigned char	unknown;
+			byte_t	unknown;
 			read(rp,&unknown,&rp);
 		}
 		query=(char *)rp;
@@ -3577,7 +3575,7 @@ bool sqlrprotocol_oracle::sendQuery2Response(sqlrservercursor *cursor,
 	resetSendPacketBuffer(PACKET_DATA);
 
 	uint16_t	dataflags;
-	unsigned char	ttccode;
+	byte_t		ttccode;
 
 	if (binds) {
 
@@ -3587,7 +3585,7 @@ bool sqlrprotocol_oracle::sendQuery2Response(sqlrservercursor *cursor,
 
 		// FIXME: decode this...
 
-		unsigned char unknown[]={
+		byte_t unknown[]={
 			0x05, 0xFE, 0x01, 0x00, 0x00,
 			0x00, 0x01, 0x00, 0x00, 0x00, 0x20
 		};
@@ -3603,7 +3601,7 @@ bool sqlrprotocol_oracle::sendQuery2Response(sqlrservercursor *cursor,
 
 		// FIXME: decode this...
 
-		unsigned char unknown[]={
+		byte_t unknown[]={
 
 			// varies...
 			0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -3673,10 +3671,10 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 			continue;
 		}
 
-		const unsigned char	*rp=resppacket;
+		const byte_t	*rp=resppacket;
 
 		uint16_t	dataflags;
-		unsigned char	unknown;
+		byte_t		unknown;
 
 		readBE(rp,&dataflags,&rp);
 		read(rp,&unknown,&rp);
@@ -3686,7 +3684,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 
 		// the bind variable name should be something like :1, :2, etc.
 		bv->variable=bindvarnames[i];
-		bv->variablesize=charstring::length(bv->variable);
+		bv->variablesize=charstring::getLength(bv->variable);
 
 		if (getDebug()) {
 			stdoutput.printf("bind %d {\n",i);
@@ -3933,7 +3931,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 			// (for all other types, assume varchar)
 			default:
 				{
-				unsigned char	len;
+				byte_t	len;
 				read(rp,&len,&rp);
 
 				bv->type=SQLRSERVERBINDVARTYPE_STRING;
@@ -3976,7 +3974,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 	return true;
 }
 
-bool sqlrprotocol_oracle::query3(const unsigned char *rp) {
+bool sqlrprotocol_oracle::query3(const byte_t *rp) {
 
 	// all versions call this to open/prepare/describe/execute most queries
 	// can apparently be used for fetch too
@@ -3993,13 +3991,13 @@ bool sqlrprotocol_oracle::query3(const unsigned char *rp) {
 cursorid=hackcursorid;
 	// no idea...
 	for (uint16_t i=0; i<9; i++) {
-		unsigned char	unknown;
+		byte_t	unknown;
 		read(rp,&unknown,&rp);
 	}
 	readLE(rp,&querylen,&rp);
 	// no idea...
 	for (uint16_t i=0; i<56; i++) {
-		unsigned char	unknown;
+		byte_t	unknown;
 		read(rp,&unknown,&rp);
 	}
 	query=(char *)rp;
@@ -4100,7 +4098,7 @@ bool sqlrprotocol_oracle::sendQuery3Response(sqlrservercursor *cursor,
 	cacheColumnDefinitions(cursor,colcount);
 
 	uint16_t	dataflags=0;
-	unsigned char	ttccode;
+	byte_t		ttccode;
 
 	bool	putfooter=true;
 
@@ -4119,13 +4117,13 @@ bool sqlrprotocol_oracle::sendQuery3Response(sqlrservercursor *cursor,
 
 			putIov();
 
-			const unsigned char	unknown3[]={
+			const byte_t	unknown3[]={
 				0x06, 0x02, 0x8C
 			};
 			reqpacket.append(unknown3,sizeof(unknown3));
 
 			// column count
-			write(&reqpacket,(unsigned char)colcount);
+			write(&reqpacket,(byte_t)colcount);
 
 			// no idea
 			writeBE(&reqpacket,(uint32_t)1);
@@ -4186,7 +4184,7 @@ bool sqlrprotocol_oracle::sendQuery3Response(sqlrservercursor *cursor,
 		writeBE(&reqpacket,dataflags);
 		write(&reqpacket,ttccode);
 
-		const unsigned char	unknown1[]={
+		const byte_t	unknown1[]={
 			0x04, 0x00, 0x01, 0x5D, 0x16,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -4201,9 +4199,9 @@ bool sqlrprotocol_oracle::sendQuery3Response(sqlrservercursor *cursor,
 		reqpacket.append(unknown1,sizeof(unknown1));
 
 		// ???
-		write(&reqpacket,(unsigned char)((colcount)?3:47));
+		write(&reqpacket,(byte_t)((colcount)?3:47));
 
-		const unsigned char	unknown2[]={
+		const byte_t	unknown2[]={
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -4217,7 +4215,7 @@ bool sqlrprotocol_oracle::sendQuery3Response(sqlrservercursor *cursor,
 		reqpacket.append(unknown2,sizeof(unknown2));
 
 		if (!colcount) {
-			const unsigned char	unknown3[]={
+			const byte_t	unknown3[]={
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 			};
 			reqpacket.append(unknown3,sizeof(unknown3));
@@ -4235,7 +4233,7 @@ bool sqlrprotocol_oracle::sendQuery3Response(sqlrservercursor *cursor,
 	return sendPacket(true);
 }
 
-bool sqlrprotocol_oracle::execute(const unsigned char *rp) {
+bool sqlrprotocol_oracle::execute(const byte_t *rp) {
 
 	// sqlplus 8.0.5 (at least)
 	// call this to execute a commit at the end of initialization
@@ -4286,8 +4284,8 @@ bool sqlrprotocol_oracle::sendExecuteResponse(sqlrservercursor *cursor) {
 
 	uint16_t	dataflags=0;
 	// FIXME: not a valid ttccode type...
-	unsigned char	ttccode=4;
-	unsigned char	unknown[]={
+	byte_t	ttccode=4;
+	byte_t	unknown[]={
 		0x00, 0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 		0x00, 0x2C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -4311,7 +4309,7 @@ bool sqlrprotocol_oracle::sendExecuteResponse(sqlrservercursor *cursor) {
 	return sendPacket(true);
 }
 
-bool sqlrprotocol_oracle::fetch(const unsigned char *rp) {
+bool sqlrprotocol_oracle::fetch(const byte_t *rp) {
 
 	// all versions call this to fetch
 
@@ -4387,7 +4385,7 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 
 				uint16_t	dataflags=0;
 				// FIXME: not a valid ttccode type...
-				unsigned char	ttccode=16;
+				byte_t		ttccode=16;
 
 				writeBE(&reqpacket,dataflags);
 				write(&reqpacket,ttccode);
@@ -4411,28 +4409,28 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 			if (sndiov) {
 				putIov();
 			} else {
-				const unsigned char	unknown[]={
+				const byte_t	unknown[]={
 					0x00, 0x00,
 				};
 				reqpacket.append(unknown,sizeof(unknown));
 			}
 
 			// always appears to be the same...
-			const unsigned char	unknown2[]={
+			const byte_t	unknown2[]={
 				0x06, 0x02,
 			};
 			reqpacket.append(unknown2,sizeof(unknown2));
 
 			// FIXME: this varies, but it's not clear with what
-			const unsigned char	unknown3[]={
+			const byte_t	unknown3[]={
 				0x8C
 			};
 			reqpacket.append(unknown3,sizeof(unknown3));
 
-			write(&reqpacket,(unsigned char)colcount);
+			write(&reqpacket,(byte_t)colcount);
 
 			// always appears to be the same...
-			const unsigned char	unknown4[]={
+			const byte_t	unknown4[]={
 				0x00, 0x00, 0x00,
 				0x01, 0x00, 0x00, 0x00
 			};
@@ -4440,7 +4438,7 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 		}
 
 		// no idea...
-		write(&reqpacket,(unsigned char)7);
+		write(&reqpacket,(byte_t)7);
 
 		if (getDebug()) {
 			stdoutput.printf("fetch response row {\n");
@@ -4462,19 +4460,19 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 	if (rowsfetched) {
 
 		if (exactfetch) {
-			const unsigned char	unknown5[]={
+			const byte_t	unknown5[]={
 				// ???
 				0x08, 0x04, 0x00
 			};
 
-			const unsigned char	unknown6[][1]={
+			const byte_t	unknown6[][1]={
 				// 1 columns
 				{0xA6},
 				// 2 columns
 				{0xA5}
 			};
 
-			const unsigned char	unknown7[]={
+			const byte_t	unknown7[]={
 				0x5C,
 	
 				// error code?
@@ -4491,14 +4489,14 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 				0x00, 0x00, 0x01, 0x00
 			};
 	
-			const unsigned char	unknown8[][4]={
+			const byte_t	unknown8[][4]={
 				// 1 column
 				{0x11, 0x00, 0x03, 0x00},
 				// 2 columns
 				{0x0E, 0x00, 0x03, 0x00}
 			};
 	
-			const unsigned char	unknown9[]={
+			const byte_t	unknown9[]={
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
 				0x00,
@@ -4511,11 +4509,11 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 			};
 	
 			// this apears to increment with each response
-			const unsigned char	unknown10[]={
+			const byte_t	unknown10[]={
 				0x27
 			};
 	
-			const unsigned char	unknown11[]={
+			const byte_t	unknown11[]={
  				0x00, 0x00, 0x01,
 				0x00, 0x00, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00,
@@ -4534,7 +4532,7 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 	
 		} else {
 	
-			const unsigned char	unknown[]={
+			const byte_t	unknown[]={
 				0x04, 0x01, 0x00, 0x00,
 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
 				0x00, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x00,
@@ -4610,7 +4608,7 @@ void sqlrprotocol_oracle::putColumnDefinitions(sqlrservercursor *cursor,
 							uint32_t colcount,
 							bool query3) {
 
-	unsigned char	lengthtotal=0;
+	byte_t	lengthtotal=0;
 	for (uint32_t i=0; i<colcount; i++) {
 		lengthtotal+=cont->getColumnLength(cursor,i);
 	}
@@ -4653,14 +4651,14 @@ void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
 							columntypestring);*/
 
 	// no idea
-	unsigned char	marker1=1;
+	byte_t	marker1=1;
 	// no idea - 128 for char/varchar, 00 for numeric
-	unsigned char	marker2=128;
-	unsigned char	precision=cont->getColumnPrecision(cursor,column);
-	unsigned char	scale=cont->getColumnScale(cursor,column);
+	byte_t	marker2=128;
+	byte_t	precision=cont->getColumnPrecision(cursor,column);
+	byte_t	scale=cont->getColumnScale(cursor,column);
 	// 16 for non-integer decimal, otherwise actual length
-	unsigned char	length=cont->getColumnLength(cursor,column);
-	unsigned char	unknown1[]={
+	byte_t	length=cont->getColumnLength(cursor,column);
+	byte_t	unknown1[]={
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
@@ -4674,7 +4672,7 @@ void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
 	// 2 for select from table with alias
 	// 3 for select from dual
 	// 4 for select from dual with alias
-	unsigned char	alias=1;
+	byte_t		alias=1;
 	const char	*name=cont->getColumnName(cursor,column);
 	uint32_t	namelength=cont->getColumnNameLength(cursor,column);
 	// no idea
@@ -4683,7 +4681,7 @@ void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
 	uint32_t	marker5=0;
 
 	write(&reqpacket,marker1);
-	write(&reqpacket,(unsigned char)columntype);
+	write(&reqpacket,(byte_t)columntype);
 	write(&reqpacket,marker2);
 	write(&reqpacket,precision);
 	write(&reqpacket,scale);
@@ -4695,8 +4693,8 @@ void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
 	writeBE(&reqpacket,nullable);
 	// yes, twice
 	if (query3) {
-		write(&reqpacket,(unsigned char)namelength);
-		write(&reqpacket,(unsigned char)namelength);
+		write(&reqpacket,(byte_t)namelength);
+		write(&reqpacket,(byte_t)namelength);
 	} else {
 		write(&reqpacket,alias);
 		write(&reqpacket,alias);
@@ -4867,7 +4865,7 @@ uint16_t sqlrprotocol_oracle::getColumnFlags(sqlrservercursor *cursor,
 void sqlrprotocol_oracle::putIov() {
 
 	// always appears to be the same...
-	const unsigned char	unknown[]={
+	const byte_t	unknown[]={
 		0x07, 0x00, 0x00, 0x00,
 		// timestamp?  if so, it's
 		// 12/21/1973 10:13:14 EST
@@ -4881,9 +4879,9 @@ void sqlrprotocol_oracle::putIov() {
 	// software/db install date,
 	// which was Oct 4, 2012.
 	datetime	dtsince;
-	dtsince.initialize("12/15/2012 11:15:00 EST");
+	dtsince.init("12/15/2012 11:15:00 EST");
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	uint32_t	timestamp=dt.getEpoch()-dtsince.getEpoch();
 	writeBE(&reqpacket,timestamp);
 }
@@ -4954,7 +4952,7 @@ void sqlrprotocol_oracle::putField(const char *field,
 		case ORACLE_TYPE_CHAR:
 		case ORACLE_TYPE_VARCHAR:
 			// what about fields longer than 255 chars?
-			write(&reqpacket,(unsigned char)fieldlength);
+			write(&reqpacket,(byte_t)fieldlength);
 			write(&reqpacket,field,fieldlength);
 			break;
 		case ORACLE_TYPE_NUMBER:
@@ -5090,7 +5088,7 @@ void sqlrprotocol_oracle::putLobField(sqlrservercursor *cursor, uint32_t col) {
 }
 
 void sqlrprotocol_oracle::putError(const char *error) {
-	putError(error,charstring::length(error));
+	putError(error,charstring::getLength(error));
 }
 
 void sqlrprotocol_oracle::putError(const char *error, uint32_t errorlength) {
@@ -5099,9 +5097,9 @@ void sqlrprotocol_oracle::putError(const char *error, uint32_t errorlength) {
 	// ORA-01403; no data found
 
 	uint16_t	dataflags=0;
-	unsigned char	ttccode=TTI_EXECUTE;
+	byte_t		ttccode=TTI_EXECUTE;
 
-	const unsigned char	unknown1[]={
+	const byte_t	unknown1[]={
 		0x00, 0x00, 0x00, 0x00, 0x7B,
 		0x05, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
 		0x00, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -5115,14 +5113,14 @@ void sqlrprotocol_oracle::putError(const char *error, uint32_t errorlength) {
 		0x00, 0x00, 0x01, 0x00, 0x00, 0x00
 	};
 
-	const unsigned char	unknown2[]={
+	const byte_t	unknown2[]={
 		0x0A
 	};
 
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
 	reqpacket.append(unknown1,sizeof(unknown1));
-	write(&reqpacket,(unsigned char)errorlength);
+	write(&reqpacket,(byte_t)errorlength);
 	reqpacket.append(error,errorlength);
 	reqpacket.append(unknown2,sizeof(unknown2));
 
@@ -5135,7 +5133,7 @@ void sqlrprotocol_oracle::putError(const char *error, uint32_t errorlength) {
 	}
 }
 
-bool sqlrprotocol_oracle::close(const unsigned char *rp) {
+bool sqlrprotocol_oracle::close(const byte_t *rp) {
 
 	uint16_t	cursorid;
 
@@ -5188,7 +5186,7 @@ bool sqlrprotocol_oracle::sendCloseResponse(sqlrservercursor *cursor) {
 
 	uint16_t	dataflags=0;
 	// FIXME: not a valid ttccode type...
-	unsigned char	ttccode=9;
+	byte_t		ttccode=9;
 
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
@@ -5203,10 +5201,10 @@ bool sqlrprotocol_oracle::sendCloseResponse(sqlrservercursor *cursor) {
 	return sendPacket(true);
 }
 
-bool sqlrprotocol_oracle::disconnect(const unsigned char *rp) {
+bool sqlrprotocol_oracle::disconnect(const byte_t *rp) {
 
 	// no idea
-	unsigned char	unknown;
+	byte_t	unknown;
 	read(rp,&unknown,&rp);
 
 	if (getDebug()) {
@@ -5230,7 +5228,7 @@ bool sqlrprotocol_oracle::sendDisconnectResponse() {
 
 	uint16_t	dataflags=0;
 	// FIXME: not a valid ttccode type...
-	unsigned char	ttccode=9;
+	byte_t		ttccode=9;
 
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
@@ -5245,12 +5243,12 @@ bool sqlrprotocol_oracle::sendDisconnectResponse() {
 	return sendPacket(true);
 }
 
-bool sqlrprotocol_oracle::cancel(const unsigned char *rp) {
+bool sqlrprotocol_oracle::cancel(const byte_t *rp) {
 	// FIXME: implement this
 	return false;
 }
 
-bool sqlrprotocol_oracle::version(const unsigned char *rp) {
+bool sqlrprotocol_oracle::version(const byte_t *rp) {
 	
 	// FIXME: decode this...
 
@@ -5267,19 +5265,19 @@ bool sqlrprotocol_oracle::sendVersionResponse() {
 	resetSendPacketBuffer(PACKET_DATA);
 
 	uint16_t	dataflags=0;
-	unsigned char	ttccode=TTC_OK;
+	byte_t		ttccode=TTC_OK;
 	// FIXME: get this from the db
 	const char	*serverversion=
 			"Oracle8 Release 8.0.5.0.0 - Production\n"
 			"PL/SQL Release 8.0.5.0.0 - Production";
-	unsigned char	unknown[]={
+	byte_t		unknown[]={
 		0x50, 0x00, 0x08, 0x09
 	};
 
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
 	// writeLE?
-	writeHost(&reqpacket,(uint16_t)charstring::length(serverversion));
+	writeHost(&reqpacket,(uint16_t)charstring::getLength(serverversion));
 	write(&reqpacket,serverversion);
 	reqpacket.append(unknown,sizeof(unknown));
 
@@ -5294,14 +5292,13 @@ bool sqlrprotocol_oracle::sendVersionResponse() {
 	return sendPacket(true);
 }
 
-bool sqlrprotocol_oracle::occa(const unsigned char *rp,
-				const unsigned char **rpout) {
+bool sqlrprotocol_oracle::occa(const byte_t *rp, const byte_t **rpout) {
 
 	// no idea what this is at all,
 	// and it doesn't appear to have a response
 	
 	// FIXME: decode this...
-	unsigned char	unknown[11];
+	byte_t	unknown[11];
 	for (uint16_t i=0; i<sizeof(unknown); i++) {
 		read(rp,&(unknown[i]),&rp);
 	}
@@ -5317,7 +5314,7 @@ bool sqlrprotocol_oracle::occa(const unsigned char *rp,
 	return true;
 }
 
-bool sqlrprotocol_oracle::logonUnknown(const unsigned char *rp) {
+bool sqlrprotocol_oracle::logonUnknown(const byte_t *rp) {
 
 	// no idea
 
@@ -5336,10 +5333,10 @@ bool sqlrprotocol_oracle::sendLogonUnknownResponse() {
 	resetSendPacketBuffer(PACKET_DATA);
 
 	uint16_t	dataflags=0;
-	unsigned char	ttccode=TTC_OK;
+	byte_t		ttccode=TTC_OK;
 
 	// no idea
-	unsigned char	unknown[]={
+	byte_t	unknown[]={
 		0x0C,
 		0x00, 0x00, 0x00, 0x67,
 		0x70, 0x00,
@@ -5369,7 +5366,7 @@ void sqlrprotocol_oracle::putGenericFooter() {
 	//
 	// 8.0.5 server doesn't send it to 8.0.5 client,
 	// but 8.0.5 client tolerates it
-	unsigned char	footer[]={
+	byte_t	footer[]={
 		0x00,
 		0x36, 0x01, 0x00, 0x00, 0xA0, 0x0D, 0x6C, 0x09,
 		0xC0, 0x54, 0x6C, 0x09, 0x00, 0x00, 0x00, 0x00,

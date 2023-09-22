@@ -99,7 +99,7 @@ bool sqlitebenchcursor::query(const char *query, bool getcolumns) {
 
 	if (sqlite3_prepare_v2(sbcon->sqlitecon,
 					query,
-					charstring::length(query),
+					charstring::getLength(query),
 					&sqlitestmt,
 					NULL)==SQLITE_OK) {
 

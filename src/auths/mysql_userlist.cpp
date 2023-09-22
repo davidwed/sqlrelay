@@ -15,7 +15,7 @@ class SQLRSERVER_DLLSPEC sqlrauth_mysql_userlist : public sqlrauth {
 							sqlrpwdencs *sqlrpe,
 							domnode *parameters);
 		const char	*auth(sqlrcredentials *cred);
-		bool	compare(const char *suppliedresponse,
+		bool		compare(const char *suppliedresponse,
 					uint64_t suppliedresponselength,
 					const char *validpassword,
 					const char *method,
@@ -61,7 +61,6 @@ sqlrauth_mysql_userlist::sqlrauth_mysql_userlist(
 	for (uint64_t i=0; i<usercount; i++) {
 
 		users[i]=user->getAttributeValue("user");
-		// FIXME: options?
 		passwordvalue.parse(user->getAttributeValue("password"));
 		passwords[i]=passwordvalue.detachTextValue();
 
@@ -114,7 +113,7 @@ const char *sqlrauth_mysql_userlist::auth(sqlrcredentials *cred) {
 	}
 
 	// sanity check on method
-	if (!charstring::inSet(method,supportedauthplugins)) {
+	if (!charstring::isInSet(method,supportedauthplugins)) {
 		return NULL;
 	}
 
@@ -125,7 +124,7 @@ const char *sqlrauth_mysql_userlist::auth(sqlrcredentials *cred) {
 		if (!charstring::compare(user,users[i])) {
 
 			if (getPasswordEncryptions() &&
-				charstring::length(passwordencryptions[i])) {
+				charstring::getLength(passwordencryptions[i])) {
 
 				// if password encryption is being used...
 
@@ -205,8 +204,8 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 
 		// sha1(password)
 		sha1	s1;
-		s1.append((const unsigned char *)validpassword,
-				charstring::length(validpassword));
+		s1.append((const byte_t *)validpassword,
+				charstring::getLength(validpassword));
 		bytebuffer	sha1pass;
 		sha1pass.append(s1.getHash(),s1.getHashSize());
 
@@ -218,7 +217,7 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 
 		// concat(randombytes,sha1(sha1(password)))
 		bytebuffer	rbsha1sha1pass;
-		rbsha1sha1pass.append(extra,charstring::length(extra));
+		rbsha1sha1pass.append(extra,charstring::getLength(extra));
 		rbsha1sha1pass.append(sha1sha1pass.getBuffer(),
 						sha1sha1pass.getSize());
 
@@ -230,11 +229,10 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 	
 		// sha1(password) xor
 		// sha1(concat(randombytes,sha1(sha1(password))))
-		const unsigned char	*bytes1=sha1pass.getBuffer();
-		const unsigned char	*bytes2=sha1rbsha1sha1pass.getBuffer();
+		const byte_t	*bytes1=sha1pass.getBuffer();
+		const byte_t	*bytes2=sha1rbsha1sha1pass.getBuffer();
 		for (uint64_t i=0; i<sha1pass.getSize(); i++) {
-			expectedresponse.append(
-				(unsigned char)(bytes1[i]^bytes2[i]));
+			expectedresponse.append((byte_t)(bytes1[i]^bytes2[i]));
 		}
 	} else
 
@@ -249,8 +247,8 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 
 			// sha256(password)
 			sha256	s256;
-			s256.append((const unsigned char *)validpassword,
-					charstring::length(validpassword));
+			s256.append((const byte_t *)validpassword,
+					charstring::getLength(validpassword));
 			bytebuffer	sha256pass;
 			sha256pass.append(s256.getHash(),s256.getHashSize());
 
@@ -263,7 +261,7 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 			// concat(randombytes,sha256(sha256(password)))
 			bytebuffer	rbsha256sha256pass;
 			rbsha256sha256pass.append(extra,
-						charstring::length(extra));
+						charstring::getLength(extra));
 			rbsha256sha256pass.append(sha256sha256pass.getBuffer(),
 						sha256sha256pass.getSize());
 
@@ -278,13 +276,13 @@ bool sqlrauth_mysql_userlist::compare(const char *suppliedresponse,
 			// sha256(password) xor
 			// sha256(concat(randombytes,sha256(sha256(password))))
 			bytebuffer	scramblebuffer;
-			const unsigned char	*bytes1=
+			const byte_t	*bytes1=
 					sha256pass.getBuffer();
-			const unsigned char	*bytes2=
+			const byte_t	*bytes2=
 					sha256rbsha256sha256pass.getBuffer();
 			for (uint64_t i=0; i<sha256pass.getSize(); i++) {
 				scramblebuffer.append(
-					(unsigned char)(bytes1[i]^bytes2[i]));
+					(byte_t)(bytes1[i]^bytes2[i]));
 			}
 
 			// expectedresponse = rsa(scramblebuffer,

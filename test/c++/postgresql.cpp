@@ -81,7 +81,7 @@ int	main(int argc, char **argv) {
 
 	// instantiation
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	cur=new sqlrcursor(con);
 
 	stdoutput.printf("IDENTIFY: \n");
@@ -726,7 +726,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("COMMIT AND ROLLBACK: \n");
 	secondcon=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	secondcur=new sqlrcursor(secondcon);
 	checkSuccess(secondcur->sendQuery("select count(*) from testtable"),1);
 	checkSuccess(secondcur->getField(0,(uint32_t)0),"0");
@@ -808,7 +808,7 @@ int	main(int argc, char **argv) {
 	cur->inputBind("3","hello");
 	checkSuccess(cur->executeQuery(),1);
 	checkSuccess(cur->getField(0,(uint32_t)0),"1");
-	//checkSuccess(charstring::toFloatC(cur->getField(0,1)),1.1);
+	//checkSuccess(charstring::convertToFloatC(cur->getField(0,1)),1.1);
 	checkSuccess(cur->getField(0,2),"hello");
 	cur->sendQuery("drop function testfunc(int,float,char(20))");
 	stdoutput.printf("\n");

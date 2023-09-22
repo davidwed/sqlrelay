@@ -478,7 +478,7 @@ SQLRETURN SQL_API SQLAllocStmt(SQLHDBC connectionhandle,
 static SQLLEN SQLR_GetCColumnTypeSize(SQLSMALLINT targettype) {
 	switch (targettype) {
 		case SQL_C_BIT:
-			return sizeof(unsigned char);
+			return sizeof(byte_t);
 		case SQL_C_SHORT:
 		case SQL_C_SSHORT:
 			return sizeof(SQLSMALLINT);
@@ -488,7 +488,7 @@ static SQLLEN SQLR_GetCColumnTypeSize(SQLSMALLINT targettype) {
 		case SQL_C_STINYINT:
 			return sizeof(SQLCHAR);
 		case SQL_C_UTINYINT:
-			return sizeof(unsigned char);
+			return sizeof(byte_t);
 		case SQL_C_LONG:
 		case SQL_C_SLONG:
 			return sizeof(SQLINTEGER);
@@ -1633,7 +1633,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				*stringlength=charstring::length(name);
+				*stringlength=charstring::getLength(name);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
 			} else {
@@ -1772,7 +1772,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  label: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				*stringlength=charstring::length(name);
+				*stringlength=charstring::getLength(name);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
 			} else {
@@ -1878,7 +1878,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  local type name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				*stringlength=charstring::length(name);
+				*stringlength=charstring::getLength(name);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
 			} else {
@@ -1939,7 +1939,7 @@ static SQLRETURN SQLR_SQLColAttribute(SQLHSTMT statementhandle,
 			debugPrintf("  type name: \"%s\"\n",
 					(const char *)characterattribute);
 			if (stringlength) {
-				*stringlength=charstring::length(name);
+				*stringlength=charstring::getLength(name);
 				debugPrintf("  length: %d\n",
 						(int)*stringlength);
 			} else {
@@ -2138,7 +2138,7 @@ SQLRETURN SQL_API SQLColumns(SQLHSTMT statementhandle,
 					tablename,namelength3);
 
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length((const char *)columnname);
+		namelength4=charstring::getLength((const char *)columnname);
 	}
 	char	*wild=charstring::duplicate(
 				(const char *)columnname,namelength4);
@@ -2212,7 +2212,7 @@ static int SQLGetPrivateProfileString(const char *section,
 	charstring::safeCopy(retbuffer,retbufferlen,value);
 
 	// return number of characters copied oud
-	int	len=(int)charstring::length(value)+1;
+	int	len=(int)charstring::getLength(value)+1;
 	return (retbufferlen>len)?len:retbufferlen;
 }
 #endif
@@ -2235,7 +2235,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 
 	// copy the dsn, sometimes it's not NULL-terminated
 	if (dsnlength==SQL_NTS) {
-		dsnlength=charstring::length((const char *)dsn);
+		dsnlength=charstring::getLength((const char *)dsn);
 	}
 	if ((size_t)dsnlength>=sizeof(conn->dsn)) {
 		dsnlength=sizeof(conn->dsn)-1;
@@ -2256,13 +2256,13 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Port","",
 					portbuf,sizeof(portbuf),
 					ODBC_INI);
-	conn->port=(uint16_t)charstring::toUnsignedInteger(portbuf);
+	conn->port=(uint16_t)charstring::convertToUnsignedInteger(portbuf);
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Socket","",
 					conn->socket,sizeof(conn->socket),
 					ODBC_INI);
 	if (!charstring::isNullOrEmpty((const char *)user)) {
 		if (userlength==SQL_NTS) {
-			userlength=charstring::length((const char *)user);
+			userlength=charstring::getLength((const char *)user);
 		}
 		if ((size_t)userlength>=sizeof(conn->user)) {
 			userlength=sizeof(conn->user)-1;
@@ -2280,7 +2280,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	parameterstring	pstr;
 	if (!charstring::isNullOrEmpty((const char *)password)) {
 		if (passwordlength==SQL_NTS) {
-			passwordlength=charstring::length(
+			passwordlength=charstring::getLength(
 					(const char *)password);
 		}
 	} else {
@@ -2288,7 +2288,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 		// extract Passwords on all platforms.
 		pstr.parse(conn->dsn);
 		password=(SQLCHAR *)pstr.getValue("Password");
-		passwordlength=charstring::length((const char *)password);
+		passwordlength=charstring::getLength((const char *)password);
 	}
 	if ((size_t)passwordlength>=sizeof(conn->password)) {
 		passwordlength=sizeof(conn->password)-1;
@@ -2300,12 +2300,12 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 	SQLGetPrivateProfileString((const char *)conn->dsn,"RetryTime","0",
 					retrytimebuf,sizeof(retrytimebuf),
 					ODBC_INI);
-	conn->retrytime=(int32_t)charstring::toInteger(retrytimebuf);
+	conn->retrytime=(int32_t)charstring::convertToInteger(retrytimebuf);
 	char	triesbuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Tries","1",
 					triesbuf,sizeof(triesbuf),
 					ODBC_INI);
-	conn->tries=(int32_t)charstring::toInteger(triesbuf);
+	conn->tries=(int32_t)charstring::convertToInteger(triesbuf);
 
 	// krb options
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Krb","0",
@@ -2357,7 +2357,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					tlsdepthbuf,
 					sizeof(tlsdepthbuf),
 					ODBC_INI);
-	conn->tlsdepth=(uint16_t)charstring::toUnsignedInteger(tlsdepthbuf);
+	conn->tlsdepth=(uint16_t)charstring::convertToUnsignedInteger(tlsdepthbuf);
 
 	// db
 	SQLGetPrivateProfileString((const char *)conn->dsn,"Db","",
@@ -2381,7 +2381,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 					sizeof(resultsetbuffersizebuf),
 					ODBC_INI);
 	conn->resultsetbuffersize=
-		(uint64_t)charstring::toInteger(resultsetbuffersizebuf);
+		(uint64_t)charstring::convertToInteger(resultsetbuffersizebuf);
 	char	dontgetcolumninfobuf[6];
 	SQLGetPrivateProfileString((const char *)conn->dsn,
 					"DontGetColumnInfo","no",
@@ -2430,7 +2430,7 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 		const char	*connport=connparams->getValue("Port");
 		if (connport!=NULL) {
 			conn->port=(uint16_t)
-				charstring::toUnsignedInteger(connport);
+				charstring::convertToUnsignedInteger(connport);
 		}
 		const char	*connsocket=connparams->getValue("Socket");
 		if (connsocket!=NULL) {
@@ -2442,11 +2442,11 @@ static SQLRETURN SQLR_SQLConnect(SQLHDBC connectionhandle,
 				connparams->getValue("RetryTime");
 		if (connretrytime!=NULL) {
 			conn->retrytime=(int32_t)
-				charstring::toInteger(connretrytime);
+				charstring::convertToInteger(connretrytime);
 		}
 		const char	*conntries=connparams->getValue("Tries");
 		if (conntries!=NULL) {
-			conn->tries=(int32_t)charstring::toInteger(conntries);
+			conn->tries=(int32_t)charstring::convertToInteger(conntries);
 		}
 		// FIXME: krb options
 		// FIXME: tls options
@@ -2697,7 +2697,7 @@ SQLRETURN SQL_API SQLDescribeCol(SQLHSTMT statementhandle,
 		debugPrintf("  columnname   : %s\n",columnname);
 	}
 	if (namelength) {
-		*namelength=charstring::length((const char *)columnname);
+		*namelength=charstring::getLength((const char *)columnname);
 		debugPrintf("  namelength   : %d\n",*namelength);
 	}
 	if (datatype) {
@@ -2922,7 +2922,7 @@ static void SQLR_ParseNumeric(SQL_NUMERIC_STRUCT *ns,
 		newnumber[index]=*ptr;
 	}
 	newnumber[index]='\0';
-	int64_t	newinteger=charstring::toInteger(newnumber);
+	int64_t	newinteger=charstring::convertToInteger(newnumber);
 	delete[] newnumber;
 	
 	// convert to hex, LSB first
@@ -2992,7 +2992,7 @@ static void SQLR_ParseInterval(SQL_INTERVAL_STRUCT *is,
 static char SQLR_CharToHex(const char input) {
 	debugFunction();
 	char	ch=input;
-	character::toUpperCase(ch);
+	character::upper(ch);
 	if (ch>='0' && ch<='9') {
 		ch=ch-'0';
 	} else if (ch>='A' && ch<='F') {
@@ -3041,13 +3041,13 @@ static void SQLR_ParseGuid(SQLGUID *guid,
 
 	// dash
 
-	// 4 hex digits (unsigned char)
+	// 4 hex digits (byte_t)
 	guid->Data4[0]=SQLR_CharToHex(value[19])*16+SQLR_CharToHex(value[20]);
 	guid->Data4[1]=SQLR_CharToHex(value[21])*16+SQLR_CharToHex(value[22]);
 
 	// dash
 
-	// 12 hex digits (unsigned char)
+	// 12 hex digits (byte_t)
 	guid->Data4[2]=SQLR_CharToHex(value[24])*16+SQLR_CharToHex(value[25]);
 	guid->Data4[3]=SQLR_CharToHex(value[26])*16+SQLR_CharToHex(value[27]);
 	guid->Data4[4]=SQLR_CharToHex(value[28])*16+SQLR_CharToHex(value[29]);
@@ -3343,9 +3343,9 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				const char	*val=
 					stmt->cur->getOutputBindString(
 								parametername);
-				((unsigned char *)ob->parametervalue)[0]=
+				((byte_t *)ob->parametervalue)[0]=
 					(charstring::contains("YyTt",val) ||
-					charstring::toInteger(val))?'1':'0';
+					charstring::convertToInteger(val))?'1':'0';
 				}
 				break;
 			case SQL_C_SBIGINT:
@@ -3374,8 +3374,8 @@ static void SQLR_FetchOutputBinds(SQLHSTMT statementhandle) {
 				break;
 			case SQL_C_UTINYINT:
 				debugPrintf("  valuetype: SQL_C_UTINYINT\n");
-				*((unsigned char *)ob->parametervalue)=
-				(unsigned char)stmt->cur->getOutputBindInteger(
+				*((byte_t *)ob->parametervalue)=
+				(byte_t)stmt->cur->getOutputBindInteger(
 								parametername);
 				break;
 			case SQL_C_GUID:
@@ -3689,9 +3689,9 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 				const char	*val=
 					stmt->cur->getInputOutputBindString(
 								parametername);
-				((unsigned char *)ob->parametervalue)[0]=
+				((byte_t *)ob->parametervalue)[0]=
 					(charstring::contains("YyTt",val) ||
-					charstring::toInteger(val))?'1':'0';
+					charstring::convertToInteger(val))?'1':'0';
 				}
 				break;
 			case SQL_C_SBIGINT:
@@ -3720,8 +3720,8 @@ static void SQLR_FetchInputOutputBinds(SQLHSTMT statementhandle) {
 				break;
 			case SQL_C_UTINYINT:
 				debugPrintf("  valuetype: SQL_C_UTINYINT\n");
-				*((unsigned char *)ob->parametervalue)=
-				(unsigned char)stmt->cur->
+				*((byte_t *)ob->parametervalue)=
+				(byte_t)stmt->cur->
 						getInputOutputBindInteger(
 								parametername);
 				break;
@@ -3749,7 +3749,7 @@ static uint32_t SQLR_TrimQuery(SQLCHAR *statementtext, SQLINTEGER textlength) {
 	// find the length of the string
 	uint32_t	length=0;
 	if (textlength==SQL_NTS) {
-		length=charstring::length((const char *)statementtext);
+		length=charstring::getLength((const char *)statementtext);
 	} else {
 		length=textlength;
 	}
@@ -3990,7 +3990,7 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
 	stmt->currentstartrow=stmt->currentfetchrow;
 
 	// update column binds (if we have any)
-	if (stmt->fieldlist.getLength()) {
+	if (stmt->fieldlist.getCount()) {
 
 		for (uint64_t row=0; row<rowsfetched; row++) {
 
@@ -4008,9 +4008,9 @@ static SQLRETURN SQLR_Fetch(SQLHSTMT statementhandle,
 				}
 
 				// handle the targetvalue
-				unsigned char	*targetvalue=NULL;
+				byte_t	*targetvalue=NULL;
 				if (field->targetvalue) {
-					targetvalue=((unsigned char *)
+					targetvalue=((byte_t *)
 						field->targetvalue)+
 						(field->bufferlength*row);
 				}
@@ -4360,7 +4360,7 @@ static SQLRETURN SQLR_SQLGetConnectAttr(SQLHDBC connectionhandle,
 			break;
 		case 0:
 			debugPrintf("  strval: %s\n",val.strval);
-			valuelength=charstring::length(val.strval);
+			valuelength=charstring::getLength(val.strval);
 			debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 			if (value && bufferlength) {
 
@@ -4447,7 +4447,7 @@ SQLRETURN SQL_API SQLGetCursorName(SQLHSTMT statementhandle,
 					bufferlength,stmt->name);
 	}
 	if (namelength) {
-		*namelength=charstring::length(stmt->name);
+		*namelength=charstring::getLength(stmt->name);
 	}
 
 	return SQL_SUCCESS;
@@ -4729,7 +4729,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLSMALLINT *)targetvalue)=
 					(SQLSMALLINT)
-						charstring::toInteger(field);
+						charstring::convertToInteger(field);
 				debugPrintf("  value: %d\n",
 						*((SQLSMALLINT *)targetvalue));
 			}
@@ -4739,7 +4739,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLUSMALLINT *)targetvalue)=
 					(SQLUSMALLINT)
-						charstring::toInteger(field);
+						charstring::convertToInteger(field);
 				debugPrintf("  value: %d\n",
 						*((SQLUSMALLINT *)targetvalue));
 			}
@@ -4750,7 +4750,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLINTEGER *)targetvalue)=
 					(SQLINTEGER)
-						charstring::toInteger(field);
+						charstring::convertToInteger(field);
 				debugPrintf("  value: %ld\n",
 						*((SQLINTEGER *)targetvalue));
 			}
@@ -4762,7 +4762,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			if (targetvalue) {
 				*((SQLUINTEGER *)targetvalue)=
 					(SQLUINTEGER)
-						charstring::toInteger(field);
+						charstring::convertToInteger(field);
 				debugPrintf("  value: %ld\n",
 						*((SQLUINTEGER *)targetvalue));
 			}
@@ -4771,7 +4771,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_FLOAT\n");
 			if (targetvalue) {
 				*((SQLREAL *)targetvalue)=
-					(SQLREAL)charstring::toFloatC(field);
+					(SQLREAL)charstring::convertToFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((SQLREAL *)targetvalue));
 			}
@@ -4780,7 +4780,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_DOUBLE\n");
 			if (targetvalue) {
 				*((SQLDOUBLE *)targetvalue)=
-					(SQLDOUBLE)charstring::toFloatC(field);
+					(SQLDOUBLE)charstring::convertToFloatC(field);
 				debugPrintf("  value: %f\n",
 						*((SQLDOUBLE *)targetvalue));
 			}
@@ -4788,11 +4788,11 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 		case SQL_C_BIT:
 			debugPrintf("  targettype: SQL_C_BIT\n");
 			if (targetvalue) {
-				((unsigned char *)targetvalue)[0]=
+				((byte_t *)targetvalue)[0]=
 					(charstring::contains("YyTt",field) ||
-					charstring::toInteger(field))?'1':'0';
+					charstring::convertToInteger(field))?'1':'0';
 				debugPrintf("  value: %c\n",
-					*((unsigned char *)targetvalue));
+					*((byte_t *)targetvalue));
 			}
 			break;
 		case SQL_C_STINYINT:
@@ -4800,7 +4800,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_(S)TINYINT\n");
 			if (targetvalue) {
 				*((SQLSCHAR *)targetvalue)=
-					charstring::toInteger(field);
+					charstring::convertToInteger(field);
 				debugPrintf("  value: %d\n",
 						*((SQLSCHAR *)targetvalue));
 			}
@@ -4809,7 +4809,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_UTINYINT\n");
 			if (targetvalue) {
 				*((SQLCHAR *)targetvalue)=
-					charstring::toInteger(field);
+					charstring::convertToInteger(field);
 				debugPrintf("  value: %d\n",
 					*((SQLCHAR *)targetvalue));
 			}
@@ -4818,7 +4818,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_SBIGINT\n");
 			if (targetvalue) {
 				*((SQLBIGINT *)targetvalue)=
-					charstring::toInteger(field);
+					charstring::convertToInteger(field);
 				debugPrintf("  value: %lld\n",
 						*((SQLBIGINT *)targetvalue));
 			}
@@ -4827,7 +4827,7 @@ static SQLRETURN SQLR_SQLGetData(SQLHSTMT statementhandle,
 			debugPrintf("  targettype: SQL_C_UBIGINT\n");
 			if (targetvalue) {
 				*((SQLUBIGINT *)targetvalue)=
-					charstring::toInteger(field);
+					charstring::convertToInteger(field);
 				debugPrintf("  value: %lld\n",
 						*((SQLUBIGINT *)targetvalue));
 			}
@@ -5097,7 +5097,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 						"SQL_DIAG_SUBCLASS_ORIGIN\n");
 					debugPrintf("  sqlstate: %s\n",
 							conn->sqlstate);
-					if (charstring::inSet(
+					if (charstring::isInSet(
 							conn->sqlstate,
 							odbc3states)) {
 						val.strval="ODBC 3.0";
@@ -5191,7 +5191,7 @@ SQLRETURN SQL_API SQLGetDiagField(SQLSMALLINT handletype,
 			break;
 		case 0:
 			debugPrintf("  strval: %s\n",val.strval);
-			valuelength=charstring::length(val.strval);
+			valuelength=charstring::getLength(val.strval);
 			if (diaginfo && bufferlength) {
 
 				charstring::safeCopy((char *)diaginfo,
@@ -5338,13 +5338,13 @@ static SQLRETURN SQLR_SQLGetDiagRec(SQLSMALLINT handletype,
 				"(not copying out: %s)\n",(sqlst)?sqlst:"");
 	}
 
-	SQLSMALLINT	valuelength=charstring::length(error);
+	SQLSMALLINT	valuelength=charstring::getLength(error);
 	if (messagetext && bufferlength) {
 
 		charstring::safeCopy((char *)messagetext,
 					(size_t)bufferlength,
 					error);
-		valuelength=charstring::length((const char *)messagetext);
+		valuelength=charstring::getLength((const char *)messagetext);
 
 		// make sure to null-terminate
 		// (even if data has to be truncated)
@@ -7775,7 +7775,7 @@ SQLRETURN SQL_API SQLGetInfo(SQLHDBC connectionhandle,
 			break;
 		case 0:
 			debugPrintf("  strval: %s\n",val.strval);
-			valuelength=charstring::length(val.strval);
+			valuelength=charstring::getLength(val.strval);
 			debugPrintf("  bufferlength: %d\n",(int)bufferlength);
 			if (infovalue && bufferlength) {
 
@@ -8476,7 +8476,7 @@ SQLRETURN SQL_API SQLParamData(SQLHSTMT statementhandle,
 
 	// if there's a data-at-exec buffer then return it,
 	// and remove it from the dictionary
-	if (stmt->dataatexeckeys->getLength()) {
+	if (stmt->dataatexeckeys->getCount()) {
 
 		// get the first bind number
 		listnode<SQLUSMALLINT>	*keynode=
@@ -8596,7 +8596,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 
 	// handle null-terminated strings
 	if (strlen_or_ind==SQL_NTS) {
-		strlen_or_ind=charstring::length((const char *)data);
+		strlen_or_ind=charstring::getLength((const char *)data);
 	}
 
 	// handle null/empty data
@@ -8613,7 +8613,7 @@ SQLRETURN SQL_API SQLPutData(SQLHSTMT statementhandle,
 	debugPrintf("  copying out data: \"%.*s\"\n",strlen_or_ind,data);
 
 	// copy data to putdata
-	stmt->putdatabuffer.append((unsigned char *)data,strlen_or_ind);
+	stmt->putdatabuffer.append((byte_t *)data,strlen_or_ind);
 
 	return SQL_SUCCESS;
 }
@@ -9406,16 +9406,16 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 
 	// normalize the names
 	if (namelength1==SQL_NTS) {
-		namelength1=charstring::length((const char *)catalogname);
+		namelength1=charstring::getLength((const char *)catalogname);
 	}
 	if (namelength2==SQL_NTS) {
-		namelength2=charstring::length((const char *)schemaname);
+		namelength2=charstring::getLength((const char *)schemaname);
 	}
 	if (namelength3==SQL_NTS) {
-		namelength3=charstring::length((const char *)tablename);
+		namelength3=charstring::getLength((const char *)tablename);
 	}
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length((const char *)tabletype);
+		namelength4=charstring::getLength((const char *)tabletype);
 	}
 	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
@@ -9583,7 +9583,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 
 	// the connect string may not be null terminated, so make a copy that is
 	if (cbconnstrin==SQL_NTS) {
-		cbconnstrin=charstring::length((const char *)szconnstrin);
+		cbconnstrin=charstring::getLength((const char *)szconnstrin);
 	}
 	char	*nulltermconnstr=charstring::duplicate(
 					(const char *)szconnstrin,
@@ -9639,7 +9639,7 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	// output the updated connect string
 	if (pcbconnstrout) {
 		if (cbconnstrin==SQL_NTS) {
-			*pcbconnstrout=charstring::length(
+			*pcbconnstrout=charstring::getLength(
 						(const char *)szconnstrin);
 		} else {
 			*pcbconnstrout=cbconnstrin;
@@ -9714,11 +9714,11 @@ SQLRETURN SQL_API SQLDriverConnect(SQLHDBC hdbc,
 	return SQLR_SQLConnect(hdbc,
 				&pstr,
 				(SQLCHAR *)dsn,
-				charstring::length(dsn),
+				charstring::getLength(dsn),
 				(SQLCHAR *)uid,
-				charstring::length(uid),
+				charstring::getLength(uid),
 				(SQLCHAR *)pwd,
-				charstring::length(pwd));
+				charstring::getLength(pwd));
 }
 
 SQLRETURN SQL_API SQLBulkOperations(SQLHSTMT statementhandle,
@@ -10014,7 +10014,7 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 					procedurename,namelength3);
 
 	if (namelength4==SQL_NTS) {
-		namelength4=charstring::length((const char *)columnname);
+		namelength4=charstring::getLength((const char *)columnname);
 	}
 	char	*wild=charstring::duplicate(
 				(const char *)columnname,namelength4);
@@ -10072,13 +10072,13 @@ SQLRETURN SQL_API SQLProcedures(SQLHSTMT statementhandle,
 
 	// normalize the names
 	if (namelength1==SQL_NTS) {
-		namelength1=charstring::length((const char *)catalogname);
+		namelength1=charstring::getLength((const char *)catalogname);
 	}
 	if (namelength2==SQL_NTS) {
-		namelength2=charstring::length((const char *)schemaname);
+		namelength2=charstring::getLength((const char *)schemaname);
 	}
 	if (namelength3==SQL_NTS) {
-		namelength3=charstring::length((const char *)procname);
+		namelength3=charstring::getLength((const char *)procname);
 	}
 	char	*catname=charstring::duplicate((char *)catalogname,namelength1);
 	char	*schname=charstring::duplicate((char *)schemaname,namelength2);
@@ -10358,7 +10358,7 @@ static const char *SQLR_BuildGuid(STMT *stmt,
 
 	uint16_t	byte=0;
 	for (uint16_t index=20; index<36; index=index+2) {
-		unsigned char	data=guid->Data4[byte];
+		byte_t	data=guid->Data4[byte];
 		string[index+1]=SQLR_HexToChar(data%16);
 		data=data/16;
 		string[index]=SQLR_HexToChar(data%16);
@@ -10383,6 +10383,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 					SQLULEN lengthprecision,
 					SQLSMALLINT parameterscale,
 					SQLPOINTER parametervalue,
+					SQLLEN bufferlength,
 					SQLLEN *strlen_or_ind) {
 	debugFunction();
 
@@ -10441,7 +10442,8 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 				debugPrintf("  value: \"%s\"\n",
 							parametervalue);
 				stmt->cur->inputBind(parametername,
-					(const char *)parametervalue);
+					(const char *)parametervalue,
+					bufferlength);
 			}
 			break;
 		case SQL_C_LONG:
@@ -10560,7 +10562,7 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 			stmt->cur->inputBind(parametername,
 				(charstring::contains("YyTt",
 					(const char *)parametervalue) ||
-				charstring::toInteger(
+				charstring::convertToInteger(
 					(const char *)parametervalue))?"1":"0");
 			break;
 		case SQL_C_SBIGINT:
@@ -10619,9 +10621,9 @@ static SQLRETURN SQLR_InputBindParameter(SQLHSTMT statementhandle,
 		case SQL_C_UTINYINT:
 			debugPrintf("  valuetype: SQL_C_UTINYINT\n");
 			debugPrintf("  value: \"%lld\"\n",
-				(int64_t)(*((unsigned char *)parametervalue)));
+				(int64_t)(*((byte_t *)parametervalue)));
 			stmt->cur->inputBind(parametername,
-				(int64_t)(*((unsigned char *)parametervalue)));
+				(int64_t)(*((byte_t *)parametervalue)));
 			break;
 		case SQL_C_GUID:
 			{
@@ -10777,9 +10779,9 @@ static SQLRETURN SQLR_InputOutputBindParameter(
 		case SQL_C_UTINYINT:
 			debugPrintf("  valuetype: SQL_C_UTINYINT\n");
 			debugPrintf("  value: \"%lld\"\n",
-				(int64_t)(*((unsigned char *)parametervalue)));
+				(int64_t)(*((byte_t *)parametervalue)));
 			stmt->cur->defineInputOutputBindInteger(parametername,
-				(int64_t)(*((unsigned char *)parametervalue)));
+				(int64_t)(*((byte_t *)parametervalue)));
 			break;
 		case SQL_C_FLOAT:
 			debugPrintf("  valuetype: SQL_C_FLOAT\n");
@@ -11052,6 +11054,7 @@ static SQLRETURN SQLR_SQLBindParameter(SQLHSTMT statementhandle,
 							lengthprecision,
 							parameterscale,
 							parametervalue,
+							bufferlength,
 							strlen_or_ind);
 		case SQL_PARAM_INPUT_OUTPUT:
 			debugPrintf("  inputoutputtype: "
@@ -11560,7 +11563,7 @@ static void parseDsn(const char *dsn) {
 
 	// dsn is formatted like:
 	// DSN=xxx\0Server=xxx\0Port=xxx\0\0
-	for (const char *c=dsn; c && *c; c=c+charstring::length(c)+1) {
+	for (const char *c=dsn; c && *c; c=c+charstring::getLength(c)+1) {
 		char		**parts;
 		uint64_t	partcount;
 		charstring::split(c,"=",true,&parts,&partcount);

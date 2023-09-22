@@ -1,28 +1,28 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="routermaster" port="" socket="/tmp/routermaster.socket" dbase="mysql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="routermaster" dbase="mysql">
+		<listeners>
+			<listener socket="/tmp/routermaster.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mysqlmaster;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
-	<instance id="routerslave" port="" socket="/tmp/routerslave.socket" dbase="mysql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="routerslave" dbase="mysql">
+		<listeners>
+			<listener socket="/tmp/routerslave.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mysqlslave;user=testuser;password=testpassword;db=@HOSTNAME@"/>
 		</connections>
 	</instance>
 
-	<instance id="routertest" port="9000" socket="/tmp/test.socket" dbase="router">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="routertest" dbase="router">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<filters>
 			<filter module="regex" pattern=".*junktable"/>
 		</filters>
@@ -39,8 +39,8 @@
 			</router>
 		</routers>
 		<connections>
-			<connection connectionid="master" string="socket=/tmp/routermaster.socket;user=test;password=test;fetchatonce=100"/>
-			<connection connectionid="slave" string="socket=/tmp/routerslave.socket;user=test;password=test"/>
+			<connection connectionid="master" string="socket=/tmp/routermaster.socket;user=testuser;password=testpassword;fetchatonce=100"/>
+			<connection connectionid="slave" string="socket=/tmp/routerslave.socket;user=testuser;password=testpassword"/>
 		</connections>
 	</instance>
 

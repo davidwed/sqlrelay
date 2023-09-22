@@ -320,7 +320,7 @@ void db2connection::handleConnectString() {
 
 	lang=cont->getConnectStringValue("lang");
 
-	maxoutbindlobsize=charstring::toInteger(
+	maxoutbindlobsize=charstring::convertToInteger(
 			cont->getConnectStringValue("maxoutbindlobsize"));
 	if (maxoutbindlobsize<1) {
 		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
@@ -338,7 +338,7 @@ bool db2connection::mustDetachBeforeLogIn() {
 bool db2connection::logIn(const char **error, const char **warning) {
 
 	// set the LANG environment variable
-	if (charstring::length(lang) && !environment::setValue("LANG",lang)) {
+	if (charstring::getLength(lang) && !environment::setValue("LANG",lang)) {
 		*error="Failed to set LANG environment variable";
 		return false;
 	}
@@ -430,7 +430,7 @@ void db2connection::dbVersionSpecificTasks() {
 			(SQLPOINTER)dbversion,
 			(SQLSMALLINT)sizeof(dbversion),
 			&dbversionlen);
-	dbmajorversion=charstring::toInteger(dbversion);
+	dbmajorversion=charstring::convertToInteger(dbversion);
 
 	// set queries to use based on version
 	if (dbmajorversion>7) {
@@ -933,7 +933,7 @@ bool db2cursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -971,7 +971,7 @@ bool db2cursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -996,7 +996,7 @@ bool db2cursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1030,7 +1030,7 @@ bool db2cursor::inputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1088,7 +1088,7 @@ bool db2cursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1119,7 +1119,7 @@ bool db2cursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1145,7 +1145,7 @@ bool db2cursor::outputBind(const char *variable,
 					uint32_t valuesize, 
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1173,7 +1173,7 @@ bool db2cursor::outputBind(const char *variable,
 					int64_t *value,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1205,7 +1205,7 @@ bool db2cursor::outputBind(const char *variable,
 					uint32_t *scale,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1245,7 +1245,7 @@ bool db2cursor::outputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1284,7 +1284,7 @@ bool db2cursor::outputBindBlob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1312,7 +1312,7 @@ bool db2cursor::outputBindClob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1494,7 +1494,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 				return false;
 			}
 			column[i].tablelength=
-				charstring::length(column[i].table);
+				charstring::getLength(column[i].table);
 		}
 
 		// bind the column to a lob locator or buffer
@@ -1557,7 +1557,7 @@ void db2cursor::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,

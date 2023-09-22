@@ -143,10 +143,10 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 			const char	*start=chunk;
 			const char	*end=dash+1;
 
-			uint64_t	i=charstring::toUnsignedInteger(ip);
+			uint64_t	i=charstring::convertToUnsignedInteger(ip);
 			bool		inrange=
-				(charstring::toUnsignedInteger(start)<=i &&
-					charstring::toUnsignedInteger(end)>=i);
+				(charstring::convertToUnsignedInteger(start)<=i &&
+					charstring::convertToUnsignedInteger(end)>=i);
 
 			delete[] chunk;
 
@@ -176,8 +176,8 @@ bool sqlrrouter_clientiplist::match(const char *ip, const char *pattern) {
 		delete[] chunk;
 
 		// handle individual numbers
-		if (charstring::toUnsignedInteger(pattern)==
-				charstring::toUnsignedInteger(ip)) {
+		if (charstring::convertToUnsignedInteger(pattern)==
+				charstring::convertToUnsignedInteger(ip)) {
 
 			if (debug) {
 				stdoutput.printf("		"

@@ -16,6 +16,12 @@
 // get around a problem with CHAR/xmlChar in gnome-xml
 #include <sqlrelay/sqlrserver.h>
 #include <rudiments/charstring.h>
+#include <rudiments/ucs2character.h>
+#include <rudiments/ucs2charstring.h>
+#include <rudiments/utf8character.h>
+#include <rudiments/utf8charstring.h>
+#include <rudiments/utf16character.h>
+#include <rudiments/utf16charstring.h>
 #include <rudiments/error.h>
 #include <rudiments/stdio.h>
 #include <rudiments/process.h>
@@ -276,7 +282,7 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		stringbuffer	errormsg;
 
 		#ifdef HAVE_SQLCONNECTW
-		singlylinkedlist<char *>	ucsinbindstrings;
+		singlylinkedlist<byte_t *>	ucsinbindstrings;
 		#endif
 
 		bool		columninfoisvalidafterprepare;
@@ -404,241 +410,125 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 };
 
 #ifdef HAVE_SQLCONNECTW
-#include <iconv.h>
+#include <rudiments/iconvert.h>
 
-void printerror(const char *error) {
-	char	*err=error::getErrorString();
-	stderror.printf("%s: %d - %s\n",error,error::getErrorNumber(),err);
-	delete[] err;
-}
-
-size_t isFixed4Byte(const char *encoding) {
-	// FIXME: support other encodings
-	return (charstring::contains(encoding,"UCS4") ||
-			charstring::contains(encoding,"UCS-4") ||
-			charstring::contains(encoding,"UTF32") ||
-			charstring::contains(encoding,"UTF-32"));
-}
-
-size_t isFixed2Byte(const char *encoding) {
-	// FIXME: support other encodings
+size_t isUcs2(const char *encoding) {
 	return (charstring::contains(encoding,"UCS2") ||
 			charstring::contains(encoding,"UCS-2"));
 }
 
-size_t isVariable2Byte(const char *encoding) {
-	// FIXME: support other encodings
+size_t isUtf16(const char *encoding) {
 	return (charstring::contains(encoding,"UTF16") ||
 			charstring::contains(encoding,"UTF-16"));
 }
 
-size_t isVariable1Byte(const char *encoding) {
-	return (!isFixed4Byte(encoding) &&
-		!isFixed2Byte(encoding) &&
-		!isVariable2Byte(encoding));
+size_t isUtf8(const char *encoding) {
+	return (charstring::contains(encoding,"UTF8") ||
+			charstring::contains(encoding,"UTF-8"));
 }
 
 // returns number of characters in the (null-terminated) string
-size_t len(const char *str, const char *encoding) {
+size_t len(const byte_t *str, const char *encoding) {
 
-	const char	*ptr=str;
+	const byte_t	*ptr=str;
 	size_t		res=0;
 
-	if (isFixed2Byte(encoding)) {
+	if (isUcs2(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: assumes encoding supports a byte order mark
-		// FIXME: handle nulls
-		if (*ptr==(char)0xEF &&
-			*(ptr+1)==(char)0xBB &&
-			*(ptr+2)==(char)0xBF) {
-			ptr+=3;
+		if (ucs2charstring::isByteOrderMark((const ucs2_t *)str)) {
+			ptr+=ucs2character::getBomSize();
 		}
 
-		while (*ptr || *(ptr+1)) {
-			res++;
-			ptr+=2;
-		}
+		res=ucs2charstring::getLength((ucs2_t *)ptr);
 
-	} else if (isFixed4Byte(encoding)) {
+	} else if (isUtf16(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: assumes encoding supports a byte order mark
-		// FIXME: handle nulls
-		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
-			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
-			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
-			*(ptr+2)=='\0' && *(ptr+3)=='\0')) {
-			ptr+=4;
+		bool bigendian=false;
+		if (utf16charstring::isByteOrderMark(
+						(const utf16_t *)str)) {
+			bigendian=utf16charstring::isBigEndian(
+						(const utf16_t *)str);
+			ptr+=utf16character::getBomSize();
 		}
 
-		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
-			res++;
-			ptr+=4;
+		res=utf16charstring::getLength((utf16_t *)ptr,bigendian);
+
+	} else if (isUtf8(encoding)) {
+
+		// skip any byte-order mark
+		if (utf8charstring::isByteOrderMark((const utf8_t *)str)) {
+			ptr+=utf8character::getBomSize();
 		}
 
-	} else if (isVariable2Byte(encoding)) {
-
-		size_t	offset=0;
-
-		// look for byte-order mark and update offset if necessary
-		// FIXME: assumes encoding supports a byte order mark
-		// FIXME: handle nulls
-		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
-			ptr+=2;
-		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
-			offset=1;
-			ptr+=2;
-		}
-
-		while (*ptr || *(ptr+1)) {
-			res++;
-			// FIXME: assumes UTF-16
-			if (*(ptr+offset)>=(char)0xD8 &&
-				*(ptr+offset)<=(char)0xDF) {
-				ptr+=4;
-			} else {
-				ptr+=2;
-			}
-		}
-
-	} else if (isVariable1Byte(encoding)) {
-
-		while (*ptr) {
-			res++;
-			// FIXME: assumes UTF-8
-			if (*ptr<192) {
-				ptr++;
-			} else if (*ptr<224) {
-				ptr+=2;
-			} else if (*ptr<240) {
-				ptr+=3;
-			} else {
-				ptr+=4;
-			}
-		}
+		res=utf8charstring::getLength((utf8_t *)ptr);
 		
 	} else {
-		res=charstring::length(str);
+		res=charstring::getLength((const char *)str);
 	}
 	return res;
 }
 
 // returns number of bytes in the (null-terminated) string
-size_t size(const char *str, const char *encoding) {
+size_t size(const byte_t *str, const char *encoding) {
 
-	const char	*ptr=str;
+	const byte_t	*ptr=str;
 	size_t		res=0;
 
-	if (isFixed2Byte(encoding)) {
+	if (isUcs2(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: assumes encoding supports a byte order mark
-		// FIXME: handle nulls
-		if (*ptr==(char)0xEF &&
-			*(ptr+1)==(char)0xBB &&
-			*(ptr+2)==(char)0xBF) {
-			ptr+=3;
+		if (ucs2charstring::isByteOrderMark((const ucs2_t *)str)) {
+			res+=ucs2character::getBomSize();
+			ptr+=ucs2character::getBomSize();
 		}
 
-		while (*ptr || *(ptr+1)) {
-			res+=2;
-			ptr+=2;
-		}
+		res+=ucs2charstring::getSize((ucs2_t *)ptr);
 
-	} else if (isFixed4Byte(encoding)) {
+	} else if (isUtf16(encoding)) {
 
 		// skip any byte-order mark
-		// FIXME: assumes encoding supports a byte order mark
-		// FIXME: handle nulls
-		if ((*ptr=='\0' && *(ptr+1)=='\0' &&
-			*(ptr+2)==(char)0xFE && *(ptr+3)==(char)0xFF) ||
-			(*ptr==(char)0xFF && *(ptr+1)==(char)0xFE &&
-			*(ptr+2)=='\0' && *(ptr+3)=='\0')) {
-			ptr+=4;
+		bool bigendian=false;
+		if (utf16charstring::isByteOrderMark(
+						(const utf16_t *)str)) {
+			bigendian=utf16charstring::isBigEndian(
+						(const utf16_t *)str);
+			res+=utf16character::getBomSize();
+			ptr+=utf16character::getBomSize();
 		}
 
-		while (*ptr || *(ptr+1) || *(ptr+2) || *(ptr+3)) {
-			res+=4;
-			ptr+=4;
+		res+=utf16charstring::getSize((utf16_t *)ptr,bigendian);
+
+	} else if (isUtf8(encoding)) {
+
+		// skip any byte-order mark
+		if (utf8charstring::isByteOrderMark((const utf8_t *)str)) {
+			res+=utf8character::getBomSize();
+			ptr+=utf8character::getBomSize();
 		}
 
-	} else if (isVariable2Byte(encoding)) {
-
-		size_t	offset=0;
-
-		// look for byte-order mark and update offset if necessary
-		// FIXME: assumes encoding supports a byte order mark
-		// FIXME: handle nulls
-		if (*ptr==(char)0xFE && *(ptr+1)==(char)0xFF) {
-			res+=2;
-			ptr+=2;
-		} else if (*ptr==(char)0xFF && *(ptr+1)==(char)0xFE) {
-			offset=1;
-			res+=2;
-			ptr+=2;
-		}
-
-		while (*ptr || *(ptr+1)) {
-			// FIXME: assumes UTF-16
-			if (*(ptr+offset)>=(char)0xD8 &&
-				*(ptr+offset)<=(char)0xDF) {
-				res+=4;
-				ptr+=4;
-			} else {
-				res+=2;
-				ptr+=2;
-			}
-		}
-
-	} else if (isVariable1Byte(encoding)) {
-
-		while (*ptr) {
-			// FIXME: assumes UTF-8
-			if (*ptr<192) {
-				res++;
-				ptr++;
-			} else if (*ptr<224) {
-				res+=2;
-				ptr+=2;
-			} else if (*ptr<240) {
-				res+=3;
-				ptr+=3;
-			} else {
-				res+=4;
-				ptr+=4;
-			}
-		}
+		res+=utf8charstring::getSize((utf8_t *)ptr);
 		
 	} else {
-		res=charstring::length(str);
+		res=charstring::getLength((const char *)str);
 	}
 	return res;
 }
 
 size_t nullSize(const char *encoding) {
-	if (isFixed2Byte(encoding) || isVariable2Byte(encoding)) {
+	if (isUcs2(encoding)) {
+		return ucs2character::getNullSize();
+	} else if (isUtf16(encoding)) {
 		return 2;
-	} else if (isFixed4Byte(encoding)) {
-		return 4;
-	} else {
+	} else if (isUtf8(encoding)) {
 		return 1;
-	}
-}
-
-size_t byteOrderMarkSize(const char *encoding) {
-	if (isVariable1Byte(encoding)) {
-		return 3;
-	} else if (isVariable2Byte(encoding)) {
-		return 2;
-	} else if (isFixed4Byte(encoding)) {
-		return 4;
 	} else {
-		return 0;
+		return character::getNullSize();
 	}
 }
 
-char *convertCharset(const char *inbuf,
+byte_t *convertCharset(const byte_t *inbuf,
 				size_t insize,
 				const char *inenc,
 				const char *outenc,
@@ -652,89 +542,62 @@ char *convertCharset(const char *inbuf,
 	// get size of null terminator
 	size_t	nullsize=nullSize(outenc);
 
-	// get size of byte order mark
-	size_t	bosize=byteOrderMarkSize(outenc);
-
 	// calculate size of output buffer (in bytes)
+	// (3 is max size of byte order mark)
 	size_t	multiplier=4;
-	if (isFixed4Byte(inenc)) {
+	if (isUcs2(inenc) && isUcs2(outenc)) {
 		multiplier=1;
-	} else if (isFixed2Byte(inenc)) {
-		if (isFixed2Byte(inenc)) {
-			multiplier=1;
-		} else if (isFixed4Byte(inenc)) {
-			multiplier=2;
-		}
 	}
-	size_t	outsize=len(inbuf,inenc)*multiplier+bosize+nullsize;
+	size_t	outsize=len(inbuf,inenc)*multiplier+3+nullsize;
 
 	// allocate the output buffer
-	char	*outbuf=new char[outsize];
-
-	// capture initial buffer positions and sizes
-	const char	*inptr=inbuf;
-	char		*outptr=outbuf;
-	size_t		insizebefore=insize;
-	size_t		outsizebefore=outsize;
+	byte_t	*outbuf=new byte_t[outsize];
 
 	// open converter
 	// FIXME: reuse this rather than re-creating it over and over
-	iconv_t	cd=iconv_open(outenc,inenc);
-	if (cd==(iconv_t)-1) {
-		if (error) {
-			char	*err=error::getErrorString();
-			charstring::printf(error,"iconv_open(): %s",err);
-			delete[] err;
-		}
-		// null-terminate the output
-		bytestring::zero(outptr,nullsize);
-		return outbuf;
-	}
+	iconvert	ic;
+	ic.setFromEncoding(inenc);
+	ic.setFromBuffer(inbuf);
+	ic.setFromBufferSize(insize);
+	ic.setToEncoding(outenc);
+	ic.setToBuffer(outbuf);
+	ic.setToBufferSize(outsize);
 
 	// convert
-	if (iconv(cd,
-			#ifndef ICONV_CONST_CHAR
-			(char **)
-			#endif
-			&inptr,
-			&insize,
-			&outptr,
-			&outsize)==(size_t)-1) {
+	if (!ic.convert()) {
 		if (error) {
 			char	*err=error::getErrorString();
 			charstring::printf(error,
-				"iconv(): %s (in=%ld/%ld out=%ld/%ld)",
-				err,insizebefore,insize,outsizebefore,outsize);
+				"iconvert::convert(): %s "
+				"(in=%s/%ld/%ld out=%s/%ld/%ld)",
+				err,
+				inenc,insize,ic.getFromBufferPosition()-inbuf,
+				outenc,outsize,ic.getToBufferPosition()-outbuf);
 			delete[] err;
 		}
+		// null-terminate the output
+		bytestring::zero(outbuf,nullsize);
+		return outbuf;
 	}
+	byte_t	*outbufend=(byte_t *)ic.getToBufferPosition();
 
 	// SQL Server doesn't like UTF-16 values to have a byte-order mark
 	// (and it wants them to be big-endian)
 	// FIXME: make this configurable somehow...
-	if (isVariable2Byte(outenc) &&
-		((outbuf[0]==(char)0xFF && outbuf[1]==(char)0xFE) ||
-		(outbuf[0]==(char)0xFE && outbuf[1]==(char)0xFF))) {
-		bytestring::copyWithOverlap(outbuf,outbuf+2,outptr-outbuf-2);
-		outptr-=2;
+	if (isUtf16(outenc) &&
+		((outbuf[0]==0xFF && outbuf[1]==0xFE) ||
+		(outbuf[0]==0xFE && outbuf[1]==0xFF))) {
+		bytestring::copyWithOverlap(outbuf,outbuf+2,outbufend-outbuf-2);
+		outbufend-=2;
 	}
 
 	// null-terminate the output
-	bytestring::zero(outptr,nullsize);
+	bytestring::zero(outbufend,nullsize);
 
-	// close converter
-	if (iconv_close(cd)!=0) {
-		// don't override any previously set error here
-		if (error && !*error) {
-			char	*err=error::getErrorString();
-			charstring::printf(error,"iconv_open(): %s",err);
-			delete[] err;
-		}
-	}
 	return outbuf;
 }
 
-char *convertCharset(const char *inbuf,
+byte_t *convertCharset(const byte_t *inbuf,
 				const char *inenc,
 				const char *outenc,
 				char **error) {
@@ -795,7 +658,11 @@ void odbcconnection::handleConnectString() {
 
 	unicode=!charstring::isNo(cont->getConnectStringValue("unicode"));
 	ncharencoding=cont->getConnectStringValue("ncharencoding");
-	if (charstring::isNullOrEmpty(ncharencoding)) {
+	if (charstring::isNullOrEmpty(ncharencoding) ||
+		(charstring::compare(ncharencoding,"UCS2",4) &&
+		charstring::compare(ncharencoding,"UCS-2",5) &&
+		charstring::compare(ncharencoding,"UTF16",5) &&
+		charstring::compare(ncharencoding,"UTF-16",6))) {
 		ncharencoding="UCS-2//TRANSLIT";
 	}
 
@@ -922,7 +789,7 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		erg=SQLDriverConnect(dbc,
 				(SQLHWND)NULL,
 				(SQLCHAR *)sqlconnectdriverstring,
-				(SQLSMALLINT)charstring::length(
+				(SQLSMALLINT)charstring::getLength(
 						sqlconnectdriverstring),
 				outconnectionstring,
 				(SQLSMALLINT)sizeof(outconnectionstring),
@@ -937,18 +804,21 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 
 		#ifdef HAVE_SQLCONNECTW
 		if (unicode) {
-			char	*dsnucs=(dsnasc)?
-					convertCharset(dsnasc,
+			byte_t	*dsnucs=(dsnasc)?
+					convertCharset((const byte_t *)
+							dsnasc,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL):NULL;
-			char	*userucs=(userasc)?
-					convertCharset(userasc,
+			byte_t	*userucs=(userasc)?
+					convertCharset((const byte_t *)
+							userasc,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL):NULL;
-			char	*passworducs=(passwordasc)?
-					convertCharset(passwordasc,
+			byte_t	*passworducs=(passwordasc)?
+					convertCharset((const byte_t *)
+							passwordasc,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL):NULL;
@@ -1117,15 +987,15 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 	pid_t	pid=process::getProcessId();
 
 	datetime dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	time_t	now=dt.getEpoch();
 
 	char	*hostname=sys::getHostName();
 
-	size_t	tracefilenamebuffersize=charstring::length(tracefilenameformat);
-	tracefilenamebuffersize+=charstring::integerLength((int64_t)pid);
-	tracefilenamebuffersize+=charstring::integerLength((int64_t)now);
-	tracefilenamebuffersize+=charstring::length(hostname);
+	size_t	tracefilenamebuffersize=charstring::getLength(tracefilenameformat);
+	tracefilenamebuffersize+=charstring::getIntegerLength((int64_t)pid);
+	tracefilenamebuffersize+=charstring::getIntegerLength((int64_t)now);
+	tracefilenamebuffersize+=charstring::getLength(hostname);
 	tracefilenamebuffersize+=1;
 
 	char		*tracefilename=new char[tracefilenamebuffersize];
@@ -1153,7 +1023,7 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 					outptr,outptrsize,"%ld",insertnumber);
 			}
 			ptr++;
-			size_t	outptrinc=charstring::length(outptr);
+			size_t	outptrinc=charstring::getLength(outptr);
 			outptrsize-=outptrinc;
 			outptr+=outptrinc;
 		} else {
@@ -1195,7 +1065,7 @@ char *odbcconnection::odbcDriverConnectionString(const char *userasc,
 		// we push this extra info right after the DSN or DRIVER
 		// so that we can clearly see it in the unixODBC trace which
 		// tends to truncate at about 130 characters.
-		unsigned char	*rawdriverconnect=
+		byte_t	*rawdriverconnect=
 				charstring::base64Decode(driverconnect);
 		pushConnstrValue(&ptr,&buffavail,NULL,
 				(const char *)rawdriverconnect);
@@ -1243,7 +1113,7 @@ void odbcconnection::pushConnstrValue(char **pptr, size_t *pbuffavail,
 		charstring::printf(ptr,buffavail,"%s=%s%s%s;",
 				keyword,openbracket,value,closebracket);
 	}
-	size_t	ptrinc=charstring::length(ptr);
+	size_t	ptrinc=charstring::getLength(ptr);
 	ptr+=ptrinc;
 	buffavail-=ptrinc;
 	*pptr=ptr;
@@ -1264,9 +1134,11 @@ const char *odbcconnection::logInError(const char *errmsg) {
 	SQLSMALLINT	errlength;
 
 	bytestring::zero(state,sizeof(state));
+	bytestring::zero(errorbuffer,sizeof(errorbuffer));
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
-					errorbuffer,1024,&errlength);
+				errorbuffer,sizeof(errorbuffer),&errlength);
+
 	errormessage.append(errorbuffer,errlength);
 	return errormessage.getString();
 }
@@ -1821,13 +1693,13 @@ bool odbcconnection::getProcedureBindAndColumnList(
 	// get the column list
 	erg=SQLProcedureColumns(odbccur->stmt,
 			(SQLCHAR *)catalog,
-			charstring::length(catalog),
+			charstring::getLength(catalog),
 			(SQLCHAR *)schema,
-			charstring::length(schema),
+			charstring::getLength(schema),
 			(SQLCHAR *)proc,
-			charstring::length(proc),
+			charstring::getLength(proc),
 			(SQLCHAR *)wildcopy,
-			charstring::length(wildcopy)
+			charstring::getLength(wildcopy)
 			);
 	bool	retval=(erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 
@@ -2306,9 +2178,11 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		}
 
 		char	*err=NULL;
-		char	*queryucs=convertCharset(query,length,
-						"UTF-8","UCS-2//TRANSLIT",
-						&err);
+		byte_t	*queryucs=convertCharset((const byte_t *)query,
+							length,
+							"UTF-8",
+							"UCS-2//TRANSLIT",
+							&err);
 		if (err) {
 			delete[] queryucs;
 			setConvCharError("prepare query",err);
@@ -2362,7 +2236,8 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 			ucsinbindstrings.clear();
 
-			char *queryucs=convertCharset(query,length,
+			byte_t *queryucs=convertCharset((const byte_t *)query,
+							length,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL);
@@ -2404,7 +2279,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint32_t valuesize,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2500,8 +2375,9 @@ bool odbccursor::inputBind(const char *variable,
 
 			const char	*encoding=odbcconn->ncharencoding;
 			char	*err=NULL;
-			char	*valueucs=convertCharset(
-						value,valuesize,
+			byte_t	*valueucs=convertCharset(
+						(const byte_t *)value,
+						valuesize,
 						"UTF-8",encoding,
 						&err);
 			if (err) {
@@ -2572,7 +2448,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t variablesize,
 				int64_t *value) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2597,7 +2473,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint32_t precision,
 				uint32_t scale) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2631,7 +2507,7 @@ bool odbccursor::inputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2734,7 +2610,7 @@ bool odbccursor::inputBindBlob(const char *variable,
 
 	// FIXME: This code is known to work with Teradata...
 	// (Ideally we should get one body of code working for all dbs)
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2759,7 +2635,7 @@ bool odbccursor::outputBind(const char *variable,
 				uint32_t valuesize, 
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2821,7 +2697,7 @@ bool odbccursor::outputBind(const char *variable,
 				int64_t *value,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2853,7 +2729,7 @@ bool odbccursor::outputBind(const char *variable,
 				uint32_t *scale,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2893,7 +2769,7 @@ bool odbccursor::outputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2936,7 +2812,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				uint32_t valuesize, 
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -2950,8 +2826,9 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 		const char	*encoding=odbcconn->ncharencoding;
 		char	*err=NULL;
-		char	*valueucs=convertCharset(
-					value,size(value,"UTF-8"),
+		byte_t	*valueucs=convertCharset(
+					(const byte_t *)value,
+					size((const byte_t *)value,"UTF-8"),
 					"UTF-8",encoding,
 					&err);
 		if (err) {
@@ -2982,7 +2859,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 	inoutisnullptr[pos-1]=isnull;
 
 	inoutisnull[pos-1]=(*isnull==SQL_NULL_DATA)?
-				sqlnulldata:charstring::length(value);
+				sqlnulldata:charstring::getLength(value);
 
 	// FIXME: original code...
 	/*erg=SQLBindParameter(stmt,
@@ -3045,7 +2922,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				int64_t *value,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -3078,7 +2955,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				uint32_t *scale,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -3116,7 +2993,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				uint16_t buffersize,
 				int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -3199,7 +3076,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
 			char	*err=NULL;
-			char	*queryucs=convertCharset(query,length,
+			byte_t	*queryucs=convertCharset((const byte_t *)query,
+							length,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							&err);
@@ -3281,7 +3159,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			char		*value=outcharbind[i]->value;
 			uint32_t	valuesize=outcharbind[i]->valuesize;
 			char		*err=NULL;
-			char		*u=convertCharset(value,
+			byte_t		*u=convertCharset(
+						(const byte_t *)value,
 						odbcconn->ncharencoding,
 						"UTF-8",&err);
 			if (err) {
@@ -3344,7 +3223,8 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			char		*value=inoutcharbind[i]->value;
 			uint32_t	valuesize=inoutcharbind[i]->valuesize;
 			char		*err=NULL;
-			char		*u=convertCharset(value,
+			byte_t		*u=convertCharset(
+						(const byte_t *)value,
 						odbcconn->ncharencoding,
 						"UTF-8",&err);
 			if (err) {
@@ -3443,7 +3323,7 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					return false;
 				}
 				column[i].namelength=
-					charstring::length(column[i].name);
+					charstring::getLength(column[i].name);
 
 				// column length
 				erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
@@ -3553,11 +3433,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					charstring::copy(column[i].name,
 							columnnamescratch);
 					column[i].namelength=
-						charstring::length(
+						charstring::getLength(
 							column[i].name);
 				}
 				column[i].tablelength=
-					charstring::length(column[i].table);
+					charstring::getLength(column[i].table);
 
 #else
 				// column name
@@ -3684,11 +3564,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					charstring::copy(column[i].name,
 							columnnamescratch);
 					column[i].namelength=
-						charstring::length(
+						charstring::getLength(
 							column[i].name);
 				}
 				column[i].tablelength=
-					charstring::length(column[i].table);
+					charstring::getLength(column[i].table);
 #endif
 			}
 		}
@@ -3752,7 +3632,7 @@ void odbccursor::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,
@@ -3951,13 +3831,13 @@ bool odbccursor::fetchRow(bool *error) {
 	if (odbcconn->unicode) {
 		// convert wvarchar/wchar fields to user coding
 		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
-		for (int i=0; i<ncols; i++) {
+		for (SQLSMALLINT i=0; i<ncols; i++) {
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
 				if (indicator[i]!=SQL_NULL_DATA && field[i]) {
 					char	*err=NULL;
-					char	*u=convertCharset(
-						field[i],
+					byte_t	*u=convertCharset(
+						(const byte_t *)field[i],
 						odbcconn->ncharencoding,
 						"UTF-8",&err);
 					if (err) {

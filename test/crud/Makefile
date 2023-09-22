@@ -10,7 +10,7 @@ include ../../config.mk
 .cpp.obj:
 	$(CXX) $(CXXFLAGS) $(CPPTESTCPPFLAGS) $(COMPILE) $<
 
-all: crud mvccrud.cgi mod_mvccrud.$(LIBEXT)
+all: crud mvccrud.cgi $(MODMVCCRUD)
 
 crud: crud.cpp crud.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) crud.$(OBJ) $(CPPTESTLIBS)
@@ -25,7 +25,7 @@ mod_mvccrud.$(LIBEXT): mvccrud.cpp mvccrud-apache.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ mvccrud-apache.$(OBJ) $(LDFLAGS) $(CPPTESTLIBS) -lrudiments-apache $(APACHELINKFLAGS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii crud$(EXE) mvccrud.cgi
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii crud$(EXE) mvccrud.cgi
 	$(RMTREE) .libs
 
 install: installcgi installmod

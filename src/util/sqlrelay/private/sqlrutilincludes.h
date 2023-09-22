@@ -20,3 +20,8 @@
 		#define SQLRUTIL_DLLSPEC
 	#endif
 #endif
+
+class sqlrpwdenc;
+class sqlrpwdencprivate;
+class sqlrpwdencs;
+class sqlrpwdencsprivate;

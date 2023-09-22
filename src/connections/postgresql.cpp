@@ -42,6 +42,7 @@ class SQLRSERVER_DLLSPEC postgresqlconnection : public sqlrserverconnection {
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild,
 						uint16_t objecttypes);
+		sqlrserverlistformat_t	getColumnListFormat();
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		bool		selectDatabase(const char *database);
@@ -204,7 +205,8 @@ class SQLRSERVER_DLLSPEC postgresqlcursor : public sqlrservercursor {
 		char		**bindvalues;
 		int		*bindlengths;
 		int		*bindformats;
-		int		bindcounter;
+		int		bindcount;
+		int		usedbindcount;
 
 		bool		bindformaterror;
 #endif
@@ -300,7 +302,7 @@ void postgresqlconnection::handleConnectString() {
 	// selects if you're using a non-zero result set buffer size on the
 	// client-side.
 	const char	*fao=cont->getConnectStringValue("fetchatonce");
-	cont->setFetchAtOnce(fao && charstring::toUnsignedInteger(fao));
+	cont->setFetchAtOnce(fao && charstring::convertToUnsignedInteger(fao));
 
 	cont->setMaxFieldLength(0);
 }
@@ -371,7 +373,7 @@ bool postgresqlconnection::logIn(const char **error,
 #endif
 
 #if defined(HAVE_POSTGRESQL_PQSETCLIENTENCODING)
-	if (charstring::length(charset)) {
+	if (charstring::getLength(charset)) {
 		PQsetClientEncoding(pgconn,charset);
 	}
 #endif
@@ -386,7 +388,7 @@ bool postgresqlconnection::logIn(const char **error,
 		}
 		for (int i=0; i<PQntuples(result); i++) {
 			datatypes.setValue(
-				charstring::toInteger(PQgetvalue(result,i,0)),
+				charstring::convertToInteger(PQgetvalue(result,i,0)),
 				charstring::duplicate(PQgetvalue(result,i,1)));
 		}
 		PQclear(result);
@@ -402,7 +404,7 @@ bool postgresqlconnection::logIn(const char **error,
 		}
 		for (int i=0; i<PQntuples(result); i++) {
 			tables.setValue(
-				charstring::toInteger(PQgetvalue(result,i,0)),
+				charstring::convertToInteger(PQgetvalue(result,i,0)),
 				charstring::duplicate(PQgetvalue(result,i,1)));
 		}
 		PQclear(result);
@@ -469,7 +471,7 @@ void postgresqlconnection::errorMessage(char *errorbuffer,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	const char	*errorstring=PQerrorMessage(pgconn);
-	*errorlength=charstring::length(errorstring);
+	*errorlength=charstring::getLength(errorstring);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errorstring,*errorlength);
 	// PostgreSQL doesn't have an error number per-se.  We'll set it
@@ -518,10 +520,10 @@ const char *postgresqlconnection::dbVersion() {
 	uint64_t	partslength;
 	charstring::split(dbversion,".",true,&parts,&partslength);
 	if (partslength==3) {
-		int64_t	minor=charstring::toInteger(parts[1]);
-		int64_t	patch=charstring::toInteger(parts[2]);
+		int64_t	minor=charstring::convertToInteger(parts[1]);
+		int64_t	patch=charstring::convertToInteger(parts[2]);
 		charstring::printf(dbversion,
-					charstring::length(dbversion)+1,
+					charstring::getLength(dbversion)+1,
 					"%s%02lld%02lld",
 					parts[0],
 					(long long)minor,(long long)patch);
@@ -536,7 +538,7 @@ const char *postgresqlconnection::dbVersion() {
 
 const char *postgresqlconnection::dbHostName() {
 	const char	*dbhostname=sqlrserverconnection::dbHostName();
-	if (charstring::length(dbhostname)) {
+	if (charstring::getLength(dbhostname)) {
 		return dbhostname;
 	}
 	if (!hostname) {
@@ -551,7 +553,7 @@ const char *postgresqlconnection::dbIpAddressQuery() {
 
 const char *postgresqlconnection::dbIpAddress() {
 	const char	*ipaddress=sqlrserverconnection::dbIpAddress();
-	return (charstring::length(ipaddress))?ipaddress:"127.0.0.1";
+	return (charstring::getLength(ipaddress))?ipaddress:"127.0.0.1";
 }
 
 const char *postgresqlconnection::getDatabaseListQuery(bool wild) {
@@ -579,6 +581,10 @@ const char *postgresqlconnection::getTableListQuery(bool wild,
 						uint16_t objecttypes) {
 	return sqlrserverconnection::getTableListQuery(wild,objecttypes,
 					" and table_schema = 'public' ");
+}
+
+sqlrserverlistformat_t postgresqlconnection::getColumnListFormat() {
+	return SQLRSERVERLISTFORMAT_POSTGRESQL;
 }
 
 const char *postgresqlconnection::getColumnListQuery(
@@ -752,7 +758,8 @@ postgresqlcursor::postgresqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	bytestring::zero(bindvalues,maxbindcount*sizeof(char *));
 	bindlengths=new int[maxbindcount];
 	bindformats=new int[maxbindcount];
-	bindcounter=0;
+	bindcount=0;
+	usedbindcount=0;
 	bindformaterror=false;
 #endif
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
@@ -770,7 +777,7 @@ postgresqlcursor::~postgresqlcursor() {
 		defined(HAVE_POSTGRESQL_PQEXECPREPARED)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
-	for (uint16_t i=0; i<bindcounter; i++) {
+	for (uint16_t i=0; i<bindcount; i++) {
 		delete[] bindvalues[i];
 	}
 	delete[] bindvalues;
@@ -795,7 +802,7 @@ bool postgresqlcursor::prepareQuery(const char *query, uint32_t length) {
 	ncols=0;
 
 	// reset bind counter
-	bindcounter=0;
+	usedbindcount=0;
 
 	// reset the bind format error flag
 	bindformaterror=false;
@@ -866,7 +873,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -882,7 +889,8 @@ bool postgresqlcursor::inputBind(const char *variable,
 		bindlengths[pos]=valuesize;
 	}
 	bindformats[pos]=0;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 
@@ -894,7 +902,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -903,9 +911,10 @@ bool postgresqlcursor::inputBind(const char *variable,
 	}
 
 	bindvalues[pos]=charstring::parseNumber(*value);
-	bindlengths[pos]=charstring::length(bindvalues[pos]);
+	bindlengths[pos]=charstring::getLength(bindvalues[pos]);
 	bindformats[pos]=0;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 
@@ -919,7 +928,7 @@ bool postgresqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -928,9 +937,10 @@ bool postgresqlcursor::inputBind(const char *variable,
 	}
 
 	bindvalues[pos]=charstring::parseNumber(*value,precision,scale);
-	bindlengths[pos]=charstring::length(bindvalues[pos]);
+	bindlengths[pos]=charstring::getLength(bindvalues[pos]);
 	bindformats[pos]=0;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 
@@ -944,7 +954,7 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -961,7 +971,8 @@ bool postgresqlcursor::inputBindBlob(const char *variable,
 		bindlengths[pos]=valuesize;
 	}
 	bindformats[pos]=1;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 
@@ -975,7 +986,7 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -991,7 +1002,8 @@ bool postgresqlcursor::inputBindClob(const char *variable,
 		bindlengths[pos]=valuesize;
 	}
 	bindformats[pos]=0;
-	bindcounter++;
+	bindcount++;
+	usedbindcount++;
 	return true;
 }
 #endif
@@ -1060,12 +1072,12 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE)
 	if (getFetchAtOnce()) {
 		int	result=1;
-		if (bindcounter) {
+		if (usedbindcount) {
 			result=PQsendQueryPrepared(postgresqlconn->pgconn,
 						cursorid,
-						bindcounter,bindvalues,
+						usedbindcount,bindvalues,
 						bindlengths,bindformats,0);
-			bindcounter=0;
+			usedbindcount=0;
 		} else {
 			result=PQsendQuery(postgresqlconn->pgconn,query);
 		}
@@ -1089,11 +1101,11 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 #endif
 #if defined(HAVE_POSTGRESQL_PQPREPARE) && \
 	defined(HAVE_POSTGRESQL_PQEXECPREPARED)
-		if (bindcounter) {
+		if (usedbindcount) {
 			pgresult=PQexecPrepared(postgresqlconn->pgconn,cursorid,
-						bindcounter,bindvalues,
+						usedbindcount,bindvalues,
 						bindlengths,bindformats,0);
-			bindcounter=0;
+			usedbindcount=0;
 		} else {
 #endif
 			pgresult=PQexec(postgresqlconn->pgconn,query);
@@ -1154,7 +1166,7 @@ bool postgresqlcursor::executeQuery(const char *query, uint32_t length) {
 	const char	*affrows=PQcmdTuples(pgresult);
 	affectedrows=0;
 	if (!charstring::isNullOrEmpty(affrows)) {
-		affectedrows=charstring::toInteger(affrows);
+		affectedrows=charstring::convertToInteger(affrows);
 	}
 
 #ifdef HAVE_POSTGRESQL_PQOIDVALUE
@@ -1184,7 +1196,7 @@ void postgresqlcursor::errorMessage(char *errorbuffer,
 			(bindformaterror)?
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING:
 				PQerrorMessage(postgresqlconn->pgconn);
-	*errorlength=charstring::length(errorstring);
+	*errorlength=charstring::getLength(errorstring);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errorstring,*errorlength);
 	// PostgreSQL doesn't have an error number per-se.  We'll set it
@@ -1628,10 +1640,11 @@ void postgresqlcursor::closeResultSet() {
 		defined(HAVE_POSTGRESQL_PQEXECPREPARED)) || \
 		(defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \
 		defined(HAVE_POSTGRESQL_PQSETSINGLEROWMODE))
-	for (uint16_t i=0; i<bindcounter; i++) {
+	for (uint16_t i=0; i<bindcount; i++) {
 		delete[] bindvalues[i];
 		bindvalues[i]=NULL;
 	}
+	bindcount=0;
 #endif
 
 #if defined(HAVE_POSTGRESQL_PQSENDQUERYPREPARED) && \

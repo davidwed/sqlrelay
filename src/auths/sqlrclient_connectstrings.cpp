@@ -5,13 +5,14 @@
 #include <rudiments/charstring.h>
 #include <rudiments/sensitivevalue.h>
 
-class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
+class SQLRSERVER_DLLSPEC sqlrauth_sqlrclient_connectstrings : public sqlrauth {
 	public:
-			sqlrauth_userlist(sqlrservercontroller *cont,
+			sqlrauth_sqlrclient_connectstrings(
+						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters);
-			~sqlrauth_userlist();
+			~sqlrauth_sqlrclient_connectstrings();
 
 		const char	*auth(sqlrcredentials *cred);
 	private:
@@ -26,16 +27,20 @@ class SQLRSERVER_DLLSPEC sqlrauth_userlist : public sqlrauth {
 		sensitivevalue	passwordvalue;
 };
 
-sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
+sqlrauth_sqlrclient_connectstrings::sqlrauth_sqlrclient_connectstrings(
+					sqlrservercontroller *cont,
 					sqlrauths *auths,
 					sqlrpwdencs *sqlrpe,
 					domnode *parameters) :
 					sqlrauth(cont,auths,sqlrpe,parameters) {
 
+	linkedlist< connectstringcontainer * >	*connectstrings=
+				cont->getConfig()->getConnectStringList();
+
 	users=NULL;
 	passwords=NULL;
 	passwordencryptions=NULL;
-	usercount=parameters->getChildCount();
+	usercount=connectstrings->getCount();
 	if (!usercount) {
 		return;
 	}
@@ -49,27 +54,25 @@ sqlrauth_userlist::sqlrauth_userlist(sqlrservercontroller *cont,
 
 	passwordvalue.setPath(cont->getConfig()->getPasswordPath());
 
-	domnode *user=parameters->getFirstTagChild("user");
-	for (uint64_t i=0; i<usercount; i++) {
+	uint64_t	i=0;
+	for (listnode< connectstringcontainer * > *node=
+				connectstrings->getFirst();
+				node; node=node->getNext()) {
 
-		users[i]=user->getAttributeValue("user");
-		passwordvalue.parse(user->getAttributeValue("password"));
+		users[i]=node->getValue()->
+				getConnectStringValue("user");
+		passwordvalue.parse(node->getValue()->
+				getConnectStringValue("password"));
 		passwords[i]=passwordvalue.detachTextValue();
 
-		// support modern "passwordencryptionid" and fall back to
-		// older "passwordencryption" attribute
-		const char	*pwdencid=
-				user->getAttributeValue("passwordencryptionid");
-		if (!pwdencid) {
-			pwdencid=user->getAttributeValue("passwordencryption");
-		}
-		passwordencryptions[i]=pwdencid;
+		passwordencryptions[i]=node->getValue()->
+						getPasswordEncryption();
 
-		user=user->getNextTagSibling("user");
+		i++;
 	}
 }
 
-sqlrauth_userlist::~sqlrauth_userlist() {
+sqlrauth_sqlrclient_connectstrings::~sqlrauth_sqlrclient_connectstrings() {
 	delete[] users;
 	for (uint64_t i=0; i<usercount; i++) {
 		delete[] passwords[i];
@@ -78,68 +81,31 @@ sqlrauth_userlist::~sqlrauth_userlist() {
 	delete[] passwordencryptions;
 }
 
-const char *sqlrauth_userlist::auth(sqlrcredentials *cred) {
+const char *sqlrauth_sqlrclient_connectstrings::auth(sqlrcredentials *cred) {
 
-	// this module supports userpassword, gss, and tls credentials
-	bool		up=!charstring::compare(cred->getType(),"userpassword");
-	bool		gss=!charstring::compare(cred->getType(),"gss");
-	bool		tls=!charstring::compare(cred->getType(),"tls");
-	const char	*user=NULL;
-	const char	*password=NULL;
-	const char	*initiator=NULL;
-	linkedlist< char * >	*sans=NULL;
-	const char		*commonname=NULL;
-	if (up) {
-		user=((sqlruserpasswordcredentials *)cred)->getUser();
-		password=((sqlruserpasswordcredentials *)cred)->getPassword();
-	} else if (gss) {
-		initiator=((sqlrgsscredentials *)cred)->getInitiator();
-	} else if (tls) {
-		sans=((sqlrtlscredentials *)cred)->getSubjectAlternateNames();
-		commonname=((sqlrtlscredentials *)cred)->getCommonName();
-	} else {
+	// this module only supports user/password credentials
+	if (charstring::compare(cred->getType(),"userpassword")) {
 		return NULL;
 	}
 
+	// get the user/password from the creds
+	const char	*user=
+			((sqlruserpasswordcredentials *)cred)->getUser();
+	const char	*password=
+			((sqlruserpasswordcredentials *)cred)->getPassword();
+
 	// run through the user/password arrays...
 	for (uint64_t i=0; i<usercount; i++) {
-		if (up) {
-			const char	*result=userPassword(user,password,i);
-			if (result) {
-				return result;
-			}
-		} else if (gss) {
-			if (!charstring::compare(initiator,users[i])) {
-				return initiator;
-			}
-		} else if (tls) {
-			if (sans && sans->getLength()) {
-
-				// if subject alternate names were
-				// present then validate against those
-				for (listnode< char * > *node=sans->getFirst();
-						node; node=node->getNext()) {
-					if (!charstring::compare(
-						node->getValue(),users[i])) {
-						return node->getValue();
-					}
-				}
-
-			} else {
-
-				// if no subject alternate names were present
-				// then validate against the common name
-				if (!charstring::compare(
-						commonname,users[i])) {
-					return commonname;
-				}
-			}
+		const char	*result=userPassword(user,password,i);
+		if (result) {
+			return result;
 		}
 	}
 	return NULL;
 }
 
-const char *sqlrauth_userlist::userPassword(const char *user,
+const char *sqlrauth_sqlrclient_connectstrings::userPassword(
+						const char *user,
 						const char *password,
 						uint64_t index) {
 
@@ -150,7 +116,7 @@ const char *sqlrauth_userlist::userPassword(const char *user,
 
 	// if password encryption is being used...
 	if (getPasswordEncryptions() &&
-		charstring::length(passwordencryptions[index])) {
+		charstring::getLength(passwordencryptions[index])) {
 
 		// get the module
 		sqlrpwdenc	*pe=getPasswordEncryptions()->
@@ -202,11 +168,12 @@ const char *sqlrauth_userlist::userPassword(const char *user,
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_userlist(
+	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrclient_connectstrings(
 						sqlrservercontroller *cont,
 						sqlrauths *auths,
 						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_userlist(cont,auths,sqlrpe,parameters);
+		return new sqlrauth_sqlrclient_connectstrings(
+					cont,auths,sqlrpe,parameters);
 	}
 }

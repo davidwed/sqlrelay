@@ -158,9 +158,9 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_copyrefs=copyreferences;
 
 	// retry reads if they get interrupted by signals
-	pvt->_ucs.translateByteOrder();
-	pvt->_ucs.retryInterruptedReads();
-	pvt->_ics.retryInterruptedReads();
+	pvt->_ucs.setTranslateByteOrder(true);
+	pvt->_ucs.setRetryInterruptedReads(true);
+	pvt->_ics.setRetryInterruptedReads(true);
 	pvt->_cs=&pvt->_ucs;
 
 	// connection
@@ -187,8 +187,8 @@ void sqlrconnection::init(const char *server, uint16_t port,
 	pvt->_password=(pvt->_copyrefs)?
 			charstring::duplicate(password):
 			(char *)password;
-	pvt->_userlen=charstring::length(user);
-	pvt->_passwordlen=charstring::length(password);
+	pvt->_userlen=charstring::getLength(user);
+	pvt->_passwordlen=charstring::getLength(password);
 	pvt->_usekrb=false;
 	pvt->_krbservice=NULL;
 	pvt->_krbmech=NULL;
@@ -363,7 +363,7 @@ void sqlrconnection::enableKerberos(const char *service,
 		disableEncryption();
 	}
 
-	if (!gss::supported()) {
+	if (!gss::isSupported()) {
 		return;
 	}
 
@@ -408,7 +408,7 @@ void sqlrconnection::enableTls(const char *version,
 		disableEncryption();
 	}
 
-	if (!tls::supported()) {
+	if (!tls::isSupported()) {
 		return;
 	}
 
@@ -484,8 +484,8 @@ void sqlrconnection::setTimeoutFromEnv(const char *var,
 					int32_t *timeoutusec) {
 	const char	*timeout=environment::getValue(var);
 	if (charstring::isNumber(timeout)) {
-		*timeoutsec=charstring::toInteger(timeout);
-		long double	dbl=charstring::toFloatC(timeout);
+		*timeoutsec=charstring::convertToInteger(timeout);
+		long double	dbl=charstring::convertToFloatC(timeout);
 		dbl=dbl-(long double)(*timeoutsec);
 		*timeoutusec=(int32_t)(dbl*1000000.0);
 	} else {
@@ -607,10 +607,12 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
-		openresult=pvt->_ucs.connect(pvt->_listenerunixport,
-						pvt->_connecttimeoutsec,
-						pvt->_connecttimeoutusec,
-						pvt->_retrytime,pvt->_tries);
+		pvt->_ucs.setFileName(pvt->_listenerunixport);
+		pvt->_ucs.setTimeoutSeconds(pvt->_connecttimeoutsec);
+		pvt->_ucs.setTimeoutMicroseconds(pvt->_connecttimeoutusec);
+		pvt->_ucs.setRetryWait(pvt->_retrytime);
+		pvt->_ucs.setTries(pvt->_tries);
+		openresult=pvt->_ucs.connect();
 		if (openresult==RESULT_SUCCESS) {
 
 			pvt->_ucs.setSocketReadBufferSize(65536);
@@ -633,17 +635,19 @@ bool sqlrconnection::openSession() {
 			debugPreEnd();
 		}
 
-		openresult=pvt->_ics.connect(pvt->_server,
-						pvt->_listenerinetport,
-						pvt->_connecttimeoutsec,
-						pvt->_connecttimeoutusec,
-						pvt->_retrytime,pvt->_tries);
+		pvt->_ics.setHost(pvt->_server);
+		pvt->_ics.setPort(pvt->_listenerinetport);
+		pvt->_ics.setTimeoutSeconds(pvt->_connecttimeoutsec);
+		pvt->_ics.setTimeoutMicroseconds(pvt->_connecttimeoutusec);
+		pvt->_ics.setRetryWait(pvt->_retrytime);
+		pvt->_ics.setTries(pvt->_tries);
+		openresult=pvt->_ics.connect();
 		if (openresult==RESULT_SUCCESS) {
 
 			pvt->_ics.setSocketReadBufferSize(65536);
 			pvt->_ics.setSocketWriteBufferSize(65536);
 
-			pvt->_ics.dontUseNaglesAlgorithm();
+			pvt->_ics.setNaglesAlgorithmEnabled(false);
 
 			pvt->_cs=&pvt->_ics;
 		}
@@ -717,7 +721,7 @@ bool sqlrconnection::validateCertificate() {
 
 	// if there are any subject alternate
 	// names then validate against those
-	if (sans && sans->getLength()) {
+	if (sans && sans->getCount()) {
 
 		for (listnode< char * > *node=sans->getFirst();
 					node; node=node->getNext()) {
@@ -810,13 +814,12 @@ bool sqlrconnection::reConfigureSockets() {
 			debugPreEnd();
 		}
 
-		pvt->_gmech.clear();
-		pvt->_gmech.initialize(pvt->_krbmech);
+		pvt->_gmech.open(pvt->_krbmech);
 
 		pvt->_gcred.clearDesiredMechanisms();
 		pvt->_gcred.addDesiredMechanism(&pvt->_gmech);
 
-		if (!pvt->_gcred.acquired() &&
+		if (!pvt->_gcred.getAreAcquired() &&
 				!charstring::isNullOrEmpty(pvt->_user)) {
 
 			if (pvt->_gcred.acquireForUser(pvt->_user)) {
@@ -1083,7 +1086,7 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// set the connectionunixport and connectioninetport values
 	if (pvt->_copyrefs) {
-		if (charstring::length(socket)<=MAXPATHLEN) {
+		if (charstring::getLength(socket)<=MAXPATHLEN) {
 			charstring::copy(pvt->_connectionunixportbuffer,socket);
 			pvt->_connectionunixport=pvt->_connectionunixportbuffer;
 		} else {
@@ -1101,10 +1104,12 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// first, try for the unix port
 	if (!charstring::isNullOrEmpty(socket)) {
-		pvt->_connected=(pvt->_ucs.connect(
-					socket,-1,-1,
-					pvt->_retrytime,
-					pvt->_tries)==RESULT_SUCCESS);
+		pvt->_ucs.setFileName(socket);
+		pvt->_ucs.setTimeoutSeconds(-1);
+		pvt->_ucs.setTimeoutMicroseconds(-1);
+		pvt->_ucs.setRetryWait(pvt->_retrytime);
+		pvt->_ucs.setTries(pvt->_tries);
+		pvt->_connected=(pvt->_ucs.connect()==RESULT_SUCCESS);
 		if (pvt->_connected) {
 			pvt->_cs=&pvt->_ucs;
 		}
@@ -1112,10 +1117,13 @@ bool sqlrconnection::resumeSession(uint16_t port, const char *socket) {
 
 	// then try for the inet port
 	if (!pvt->_connected) {
-		pvt->_connected=(pvt->_ics.connect(
-					pvt->_server,port,-1,-1,
-					pvt->_retrytime,
-					pvt->_tries)==RESULT_SUCCESS);
+		pvt->_ics.setHost(pvt->_server);
+		pvt->_ics.setPort(port);
+		pvt->_ics.setTimeoutSeconds(-1);
+		pvt->_ics.setTimeoutMicroseconds(-1);
+		pvt->_ics.setRetryWait(pvt->_retrytime);
+		pvt->_ics.setTries(pvt->_tries);
+		pvt->_connected=(pvt->_ics.connect()==RESULT_SUCCESS);
 		if (pvt->_connected) {
 			pvt->_cs=&pvt->_ics;
 		}
@@ -1544,7 +1552,7 @@ const char *sqlrconnection::nextvalFormat() {
 
 bool sqlrconnection::selectDatabase(const char *database) {
 
-	if (!charstring::length(database)) {
+	if (!charstring::getLength(database)) {
 		return true;
 	}
 
@@ -1566,7 +1574,7 @@ bool sqlrconnection::selectDatabase(const char *database) {
 	pvt->_cs->write((uint16_t)SELECT_DATABASE);
 
 	// send the database name
-	uint32_t	len=charstring::length(database);
+	uint32_t	len=charstring::getLength(database);
 	pvt->_cs->write(len);
 	if (len) {
 		pvt->_cs->write(database,len);
@@ -1944,7 +1952,7 @@ void sqlrconnection::setDebugFile(const char *filename) {
 		!pvt->_debugfile.open(filename,O_WRONLY|O_APPEND) &&
 				error::getErrorNumber()==ENOENT) {
 		pvt->_debugfile.create(filename,
-				permissions::evalPermString("rw-r--r--"));
+				permissions::parsePermString("rw-r--r--"));
 	}
 }
 
@@ -2050,7 +2058,7 @@ void sqlrconnection::debugPrintClob(const char *clob, uint32_t length) {
 void sqlrconnection::setClientInfo(const char *clientinfo) {
 	delete[] pvt->_clientinfo;
 	pvt->_clientinfo=charstring::duplicate(clientinfo);
-	pvt->_clientinfolen=charstring::length(clientinfo);
+	pvt->_clientinfolen=charstring::getLength(clientinfo);
 }
 
 const char *sqlrconnection::getClientInfo() {

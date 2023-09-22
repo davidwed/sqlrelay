@@ -93,10 +93,10 @@ void sqlrrouters::loadRouter(domnode *router) {
 
 	// get the router name
 	const char	*module=router->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=router->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}

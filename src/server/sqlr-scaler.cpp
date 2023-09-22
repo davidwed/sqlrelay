@@ -123,7 +123,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 	// read the commandline
 	cmdl=new sqlrcmdline(argc,argv);
 
-	disablecrashhandler=cmdl->found("-disable-crash-handler");
+	disablecrashhandler=cmdl->isFound("-disable-crash-handler");
 	backtrace=cmdl->getValue("-backtrace");
 
 	// handle kill and crash signals
@@ -367,16 +367,16 @@ bool scaler::initScaler(int argc, const char **argv) {
 
 	// set up random number generator
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	currentseed=dt.getEpoch();
 
-	if (!cmdl->found("-nodetach")) {
+	if (!cmdl->isFound("-nodetach")) {
 		// detach from the controlling tty
 		process::detach();
 	}
 
 	// create the pid file
-	process::createPidFile(pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pidfile,permissions::getOwnerReadWrite());
 
 	return true;
 }
@@ -664,7 +664,7 @@ void scaler::killConnection(pid_t connpid) {
 	// signal on sem(8) and must be killed.
 
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	stderror.printf("%s Connection (pid=%ld) failed to get ready\n",
 						dt.getString(),(long)connpid);
 
@@ -673,7 +673,7 @@ void scaler::killConnection(pid_t connpid) {
 	bool	dead=false;
 	for (int tries=0; tries<3 && !dead; tries++) {
 		if (tries) {
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			stderror.printf("%s %s connection (pid=%ld)\n",
 				dt.getString(),
 				(tries==1)?"Terminating":"Killing",
@@ -695,8 +695,8 @@ void scaler::killConnection(pid_t connpid) {
 void scaler::getRandomConnectionId() {
 
 	// get a scaled random number
-	currentseed=randomnumber::generateNumber(currentseed);
-	int32_t	scalednum=randomnumber::scaleNumber(currentseed,0,metrictotal);
+	currentseed=randomnumber::generate(currentseed);
+	int32_t	scalednum=randomnumber::scale(currentseed,0,metrictotal);
 
 	// run through list, decrementing scalednum by the metric
 	// for each, when scalednum is 0, pick that connection id
@@ -782,9 +782,9 @@ void scaler::loop() {
 		filename.append(".bt");
 		file	f;
 		if (f.create(filename.getString(),
-				permissions::evalPermString("rw-------"))) {
+				permissions::parsePermString("rw-------"))) {
 			f.printf("signal: %d\n\n",process::getShutDownSignal());
-			process::backtrace(&f);
+			process::writeBacktrace(&f);
 		}
 	}
 }
@@ -816,7 +816,7 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.found("-id")) {
+	if (!cmdl.isFound("-id")) {
 		stdoutput.printf("usage: \n"
 			" %s-scaler [-config config] -id id "
 			"[-localstatedir dir] [-nodetach]\n",

@@ -29,8 +29,7 @@ bool sqlrerrortranslation::run(sqlrserverconnection *sqlrcon,
 				const char *error,
 				uint32_t errorlength,
 				int64_t *translatederrornumber,
-				const char **translatederror,
-				uint32_t *translatederrorlength) {
+				stringbuffer *translatederror) {
 	return true;
 }
 

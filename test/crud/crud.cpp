@@ -115,7 +115,7 @@ int main(int argc, char **argv) {
 
 	// init connection/cursor
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	cur=new sqlrcursor(con);
 
 	// drop existing table and sequence
@@ -159,8 +159,15 @@ int main(int argc, char **argv) {
 		v[2]=vals[i][1];
 		v[3]=vals[i][2];
 		v[4]=NULL;
-		checkSuccess(crud->doCreate(cols,v),true);
+		const char	**t=new const char *[5];
+		t[0]="s";
+		t[1]="s";
+		t[2]="s";
+		t[3]="s";
+		t[4]=NULL;
+		checkSuccess(crud->doCreate(cols,v,t),true);
 		delete[] v;
+		delete[] t;
 	}
 	stdoutput.printf("\n\n");
 
@@ -191,11 +198,11 @@ int main(int argc, char **argv) {
 			}
 			sort.append("{\n");
 			for (uint16_t k=1; k<=j; k++) {
-				criteria.appendFormatted(
+				criteria.printf(
 					"{ \"=\" : [ { \"var\" : \"%s\" }, "
 					"\"%s\" ] }",
 					cols[k],vals[i][k-1]);
-				sort.appendFormatted(
+				sort.printf(
 					"	\"%s\": \"asc\"",
 					cols[k]);
 				if (j>1 && k<j) {
@@ -248,6 +255,7 @@ int main(int argc, char **argv) {
 	c[2]=cols[3];
 	c[3]=NULL;
 	const char	**v=new const char *[4];
+	const char	**t=new const char *[4];
 	for (uint16_t i=0; i<5; i++) {
 
 		// build criteria:
@@ -255,7 +263,7 @@ int main(int argc, char **argv) {
 		// 	2) testtable_id=2
 		// 	3) testtable_id=3
 		// 	etc.
-		criteria.appendFormatted(
+		criteria.printf(
 			"{ \"=\" : [ { \"var\" : "
 			"\"testtable_id\" }, \"%d\" ] }\n",
 			i+1);
@@ -272,10 +280,14 @@ int main(int argc, char **argv) {
 			v[1]=(j>1)?"0":vals[i][1];
 			v[2]=(j>2)?"12-DEC-00":vals[i][2];
 			v[3]=NULL;
+			t[0]="s";
+			t[1]="s";
+			t[2]="s";
+			t[3]=NULL;
 
 			// run the query
 			checkSuccess(crud->doUpdate(
-					c,v,criteria.getString()),true);
+					c,v,t,criteria.getString()),true);
 
 			// check affected rows
 			checkSuccess(crud->getAffectedRows(),1);
@@ -304,6 +316,7 @@ int main(int argc, char **argv) {
 	// clean up
 	delete[] c;
 	delete[] v;
+	delete[] t;
 
 	// delete
 	stdoutput.printf("DELETE: \n");
@@ -315,7 +328,7 @@ int main(int argc, char **argv) {
 		// 	2) testtable_id=2
 		// 	3) testtable_id=3
 		// 	etc.
-		criteria.appendFormatted(
+		criteria.printf(
 			"{ \"=\" : [ { \"var\" : "
 			"\"testtable_id\" }, \"%d\" ] }\n",
 			i+1);
@@ -329,7 +342,7 @@ int main(int argc, char **argv) {
 		// validate updates to the row
 		checkSuccess(
 			cur->sendQuery("select count(*) from testtable"),true);
-		checkSuccess(charstring::toInteger(
+		checkSuccess(charstring::convertToInteger(
 			cur->getField(0,(uint32_t)0)),4-i);
 		stdoutput.printf("\n");
 

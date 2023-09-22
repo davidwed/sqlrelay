@@ -366,6 +366,9 @@
 /* Haiku OS */
 #undef _HAIKU
 
+/* HP-UX OS */
+#undef _HPUX
+
 /* Irix OS */
 #undef _IRIX
 

@@ -207,7 +207,7 @@ char *sqlrbench::insertQuery(uint32_t cols, uint32_t colsize) {
 void sqlrbench::appendRandomString(stringbuffer *str, uint32_t colsize) {
 	for (uint32_t j=0; j<colsize; j++) {
 		int32_t	result;
-		rnd.generateScaledNumber('a','z',&result);
+		rnd.generate(&result,'a','z');
 		str->append((char)result);
 	}
 }
@@ -250,7 +250,7 @@ void sqlrbench::benchSelect(
 
 		// get start time
 		datetime	start;
-		start.getSystemDateAndTime();
+		start.initFromSystemDateTime();
 
 		// run all of this some number of times and average the results
 		for (uint16_t iter=0; iter<samples && !shutdown; iter++) {
@@ -323,12 +323,12 @@ void sqlrbench::benchSelect(
 
 		// get end time
 		datetime	end;
-		end.getSystemDateAndTime();
+		end.initFromSystemDateTime();
 
 		// calculate total time
 		uint32_t	sec=end.getEpoch()-start.getEpoch();
-		int32_t		usec=end.getMicroseconds()-
-					start.getMicroseconds();
+		int32_t		usec=end.getMicrosecond()-
+					start.getMicrosecond();
  		if (usec<0) {
 			sec--;
 			usec=usec+1000000;
@@ -419,7 +419,7 @@ void sqlrbench::benchDML(
 
 		// get start time
 		datetime	start;
-		start.getSystemDateAndTime();
+		start.initFromSystemDateTime();
 
 		// run all of this some number of times and average the results
 		for (uint16_t iter=0; iter<samples && !shutdown; iter++) {
@@ -503,12 +503,12 @@ void sqlrbench::benchDML(
 
 		// get end time
 		datetime	end;
-		end.getSystemDateAndTime();
+		end.initFromSystemDateTime();
 
 		// calculate total time
 		uint32_t	sec=end.getEpoch()-start.getEpoch();
-		int32_t		usec=end.getMicroseconds()-
-					start.getMicroseconds();
+		int32_t		usec=end.getMicrosecond()-
+					start.getMicrosecond();
  		if (usec<0) {
 			sec--;
 			usec=usec+1000000;

@@ -126,401 +126,401 @@
 #define MYSQL_TYPE_STRING	0xfe
 #define MYSQL_TYPE_GEOMETRY	0xff
 
-static unsigned char	mysqltypemap[]={
+static byte_t	mysqltypemap[]={
 	// "UNKNOWN"
-	(unsigned char)MYSQL_TYPE_NULL,
+	(byte_t)MYSQL_TYPE_NULL,
 	// addded by freetds
 	// "CHAR"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "INT"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "SMALLINT"
-	(unsigned char)MYSQL_TYPE_SHORT,
+	(byte_t)MYSQL_TYPE_SHORT,
 	// "TINYINT"
-	(unsigned char)MYSQL_TYPE_TINY,
+	(byte_t)MYSQL_TYPE_TINY,
 	// "MONEY"
-	(unsigned char)MYSQL_TYPE_NEWDECIMAL,
+	(byte_t)MYSQL_TYPE_NEWDECIMAL,
 	// "DATETIME"
-	(unsigned char)MYSQL_TYPE_DATETIME,
+	(byte_t)MYSQL_TYPE_DATETIME,
 	// "NUMERIC"
-	(unsigned char)MYSQL_TYPE_NEWDECIMAL,
+	(byte_t)MYSQL_TYPE_NEWDECIMAL,
 	// "DECIMAL"
-	(unsigned char)MYSQL_TYPE_NEWDECIMAL,
+	(byte_t)MYSQL_TYPE_NEWDECIMAL,
 	// "SMALLDATETIME"
-	(unsigned char)MYSQL_TYPE_DATETIME,
+	(byte_t)MYSQL_TYPE_DATETIME,
 	// "SMALLMONEY"
-	(unsigned char)MYSQL_TYPE_NEWDECIMAL,
+	(byte_t)MYSQL_TYPE_NEWDECIMAL,
 	// "IMAGE"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "BINARY"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "BIT"
-	(unsigned char)MYSQL_TYPE_TINY,
+	(byte_t)MYSQL_TYPE_TINY,
 	// "REAL"
-	(unsigned char)MYSQL_TYPE_DECIMAL,
+	(byte_t)MYSQL_TYPE_DECIMAL,
 	// "FLOAT"
-	(unsigned char)MYSQL_TYPE_FLOAT,
+	(byte_t)MYSQL_TYPE_FLOAT,
 	// "TEXT"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "VARCHAR"
-	(unsigned char)MYSQL_TYPE_VAR_STRING,
+	(byte_t)MYSQL_TYPE_VAR_STRING,
 	// "VARBINARY"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "LONGCHAR"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "LONGBINARY"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "LONG"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "ILLEGAL"
-	(unsigned char)MYSQL_TYPE_NULL,
+	(byte_t)MYSQL_TYPE_NULL,
 	// "SENSITIVITY"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "BOUNDARY"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "VOID"
-	(unsigned char)MYSQL_TYPE_NULL,
+	(byte_t)MYSQL_TYPE_NULL,
 	// "USHORT"
-	(unsigned char)MYSQL_TYPE_SHORT,
+	(byte_t)MYSQL_TYPE_SHORT,
 	// added by lago
 	// "UNDEFINED"
-	(unsigned char)MYSQL_TYPE_NULL,
+	(byte_t)MYSQL_TYPE_NULL,
 	// "DOUBLE"
-	(unsigned char)MYSQL_TYPE_DOUBLE,
+	(byte_t)MYSQL_TYPE_DOUBLE,
 	// "DATE"
-	(unsigned char)MYSQL_TYPE_DATE,
+	(byte_t)MYSQL_TYPE_DATE,
 	// "TIME"
-	(unsigned char)MYSQL_TYPE_TIME,
+	(byte_t)MYSQL_TYPE_TIME,
 	// "TIMESTAMP"
-	(unsigned char)MYSQL_TYPE_TIMESTAMP,
+	(byte_t)MYSQL_TYPE_TIMESTAMP,
 	// added by msql
 	// "UINT"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "LASTREAL"
-	(unsigned char)MYSQL_TYPE_DECIMAL,
+	(byte_t)MYSQL_TYPE_DECIMAL,
 	// added by mysql
 	// "STRING"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "VARSTRING"
-	(unsigned char)MYSQL_TYPE_VAR_STRING,
+	(byte_t)MYSQL_TYPE_VAR_STRING,
 	// "LONGLONG"
-	(unsigned char)MYSQL_TYPE_LONGLONG,
+	(byte_t)MYSQL_TYPE_LONGLONG,
 	// "MEDIUMINT"
-	(unsigned char)MYSQL_TYPE_INT24,
+	(byte_t)MYSQL_TYPE_INT24,
 	// "YEAR"
-	(unsigned char)MYSQL_TYPE_YEAR,
+	(byte_t)MYSQL_TYPE_YEAR,
 	// "NEWDATE"
-	(unsigned char)MYSQL_TYPE_NEWDATE,
+	(byte_t)MYSQL_TYPE_NEWDATE,
 	// "NULL"
-	(unsigned char)MYSQL_TYPE_NULL,
+	(byte_t)MYSQL_TYPE_NULL,
 	// "ENUM"
-	(unsigned char)MYSQL_TYPE_ENUM,
+	(byte_t)MYSQL_TYPE_ENUM,
 	// "SET"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "TINYBLOB"
-	(unsigned char)MYSQL_TYPE_TINY_BLOB,
+	(byte_t)MYSQL_TYPE_TINY_BLOB,
 	// "MEDIUMBLOB"
-	(unsigned char)MYSQL_TYPE_MEDIUM_BLOB,
+	(byte_t)MYSQL_TYPE_MEDIUM_BLOB,
 	// "LONGBLOB"
-	(unsigned char)MYSQL_TYPE_LONG_BLOB,
+	(byte_t)MYSQL_TYPE_LONG_BLOB,
 	// "BLOB"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// added by oracle
 	// "VARCHAR2"
-	(unsigned char)MYSQL_TYPE_VAR_STRING,
+	(byte_t)MYSQL_TYPE_VAR_STRING,
 	// "NUMBER"
-	(unsigned char)MYSQL_TYPE_NEWDECIMAL,
+	(byte_t)MYSQL_TYPE_NEWDECIMAL,
 	// "ROWID"
-	(unsigned char)MYSQL_TYPE_LONGLONG,
+	(byte_t)MYSQL_TYPE_LONGLONG,
 	// "RAW"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "LONG_RAW"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "MLSLABEL"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "CLOB"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "BFILE"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// added by odbc
 	// "BIGINT"
-	(unsigned char)MYSQL_TYPE_LONGLONG,
+	(byte_t)MYSQL_TYPE_LONGLONG,
 	// "INTEGER"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "LONGVARBINARY"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "LONGVARCHAR"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// added by db2
 	// "GRAPHIC"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "VARGRAPHIC"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "LONGVARGRAPHIC"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "DBCLOB"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "DATALINK"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "USER_DEFINED_TYPE"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "SHORT_DATATYPE"
-	(unsigned char)MYSQL_TYPE_SHORT,
+	(byte_t)MYSQL_TYPE_SHORT,
 	// "TINY_DATATYPE"
-	(unsigned char)MYSQL_TYPE_TINY,
+	(byte_t)MYSQL_TYPE_TINY,
 	// added by firebird
 	// "D_FLOAT"
-	(unsigned char)MYSQL_TYPE_DOUBLE,
+	(byte_t)MYSQL_TYPE_DOUBLE,
 	// "ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "QUAD"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "INT64"
-	(unsigned char)MYSQL_TYPE_LONGLONG,
+	(byte_t)MYSQL_TYPE_LONGLONG,
 	// "DOUBLE PRECISION"
-	(unsigned char)MYSQL_TYPE_DOUBLE,
+	(byte_t)MYSQL_TYPE_DOUBLE,
 	// added by postgresql
 	// "BOOL"
-	(unsigned char)MYSQL_TYPE_TINY,
+	(byte_t)MYSQL_TYPE_TINY,
 	// "BYTEA"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "NAME"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "INT8"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "INT2"
-	(unsigned char)MYSQL_TYPE_SHORT,
+	(byte_t)MYSQL_TYPE_SHORT,
 	// "INT2VECTOR"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "INT4"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "REGPROC"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "OID"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "TID"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "XID"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "CID"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "OIDVECTOR"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "SMGR"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "POINT"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "LSEG"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "PATH"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "BOX"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "POLYGON"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "LINE"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "LINE_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "FLOAT4"
-	(unsigned char)MYSQL_TYPE_FLOAT,
+	(byte_t)MYSQL_TYPE_FLOAT,
 	// "FLOAT8"
-	(unsigned char)MYSQL_TYPE_DOUBLE,
+	(byte_t)MYSQL_TYPE_DOUBLE,
 	// "ABSTIME"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "RELTIME"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "TINTERVAL"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "CIRCLE"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "CIRCLE_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "MONEY_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "MACADDR"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "INET"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "CIDR"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "BOOL_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "BYTEA_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "CHAR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "NAME_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "INT2_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "INT2VECTOR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "INT4_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "REGPROC_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "TEXT_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "OID_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "TID_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "XID_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "CID_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "OIDVECTOR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "BPCHAR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "VARCHAR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "INT8_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "POINT_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "LSEG_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "PATH_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "BOX_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "FLOAT4_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "FLOAT8_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "ABSTIME_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "RELTIME_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "TINTERVAL_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "POLYGON_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "ACLITEM"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "ACLITEM_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "MACADDR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "INET_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "CIDR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "BPCHAR"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "TIMESTAMP_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "DATE_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "TIME_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "TIMESTAMPTZ"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "TIMESTAMPTZ_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "INTERVAL"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "INTERVAL_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "NUMERIC_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "TIMETZ"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "TIMETZ_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "BIT_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "VARBIT"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "VARBIT_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "REFCURSOR"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "REFCURSOR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "REGPROCEDURE"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "REGOPER"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "REGOPERATOR"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "REGCLASS"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "REGTYPE"
-	(unsigned char)MYSQL_TYPE_LONG,
+	(byte_t)MYSQL_TYPE_LONG,
 	// "REGPROCEDURE_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "REGOPER_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "REGOPERATOR_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "REGCLASS_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "REGTYPE_ARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "RECORD"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "CSTRING"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "ANY"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "ANYARRAY"
-	(unsigned char)MYSQL_TYPE_SET,
+	(byte_t)MYSQL_TYPE_SET,
 	// "TRIGGER"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "LANGUAGE_HANDLER"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "INTERNAL"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "OPAQUE"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "ANYELEMENT"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "PG_TYPE"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "PG_ATTRIBUTE"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "PG_PROC"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "PG_CLASS"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// none added by sqlite
 	// added by sqlserver
 	// "UBIGINT"
-	(unsigned char)MYSQL_TYPE_LONGLONG,
+	(byte_t)MYSQL_TYPE_LONGLONG,
 	// "UNIQUEIDENTIFIER"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// added by informix
 	// "SMALLFLOAT"
-	(unsigned char)MYSQL_TYPE_FLOAT,
+	(byte_t)MYSQL_TYPE_FLOAT,
 	// "BYTE"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "BOOLEAN"
-	(unsigned char)MYSQL_TYPE_TINY,
+	(byte_t)MYSQL_TYPE_TINY,
 	// "TINYTEXT"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "MEDIUMTEXT"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "LONGTEXT"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "JSON"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "GEOMETRY"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "SDO_GEOMETRY"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "NCHAR"
-	(unsigned char)MYSQL_TYPE_STRING,
+	(byte_t)MYSQL_TYPE_STRING,
 	// "NVARCHAR"
-	(unsigned char)MYSQL_TYPE_VAR_STRING,
+	(byte_t)MYSQL_TYPE_VAR_STRING,
 	// "NTEXT"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "XML"
-	(unsigned char)MYSQL_TYPE_BLOB,
+	(byte_t)MYSQL_TYPE_BLOB,
 	// "DATETIMEOFFSET"
-	(unsigned char)MYSQL_TYPE_DATETIME
+	(byte_t)MYSQL_TYPE_DATETIME
 
 };
 
@@ -606,10 +606,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		void	buildHandshake9();
 		bool	recvHandshakeResponse();
 		bool	parseHandshakeResponse41(
-					const unsigned char *rp,
+					const byte_t *rp,
 					uint64_t rplen);
 		bool	parseHandshakeResponse320(
-					const unsigned char *rp,
+					const byte_t *rp,
 					uint64_t rplen);
 		bool	handleTlsRequest();
 		bool	noClientTls();
@@ -641,16 +641,16 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		bool	selectDatabase();
 
 		void	debugCapabilityFlags(uint32_t capabilityflags);
-		void	debugCharacterSet(unsigned char characterset);
+		void	debugCharacterSet(byte_t characterset);
 		void	debugStatusFlags(uint16_t statusflags);
 		void	debugColumnType(const char *name,
-					unsigned char columntype);
-		void	debugColumnType(unsigned char columntype);
+					byte_t columntype);
+		void	debugColumnType(byte_t columntype);
 		void	debugColumnFlags(uint16_t statusflags);
 		void	debugSystemError();
-		void	debugRefreshCommand(unsigned char command);
-		void	debugShutdownCommand(unsigned char command);
-		void	debugStmtExecuteFlags(unsigned char flags);
+		void	debugRefreshCommand(byte_t command);
+		void	debugShutdownCommand(byte_t command);
+		void	debugStmtExecuteFlags(byte_t flags);
 		void	debugMultiStatementOption(uint16_t multistmtoption);
 
 		bool	getRequest(char *request);
@@ -739,21 +739,21 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 						uint32_t length,
 						const char *columntypestring,
 						uint32_t scale,
-						unsigned char columntype,
+						byte_t columntype,
 						uint16_t flags,
 						const char *defaults,
 						bool fieldlistcommand);
-		unsigned char	getColumnType(const char *columntypestring,
+		byte_t		getColumnType(const char *columntypestring,
 						uint16_t columntypelen,
 						uint32_t scale);
 		uint16_t	getColumnFlags(sqlrservercursor *cursor,
 						uint32_t column,
 						uint16_t sqlrcolumntype,
-						unsigned char columntype,
+						byte_t columntype,
 						const char *columntypestring);
 		uint16_t	getColumnFlags(sqlrservercursor *cursor,
 						uint16_t sqlrcolumntype,
-						unsigned char columntype,
+						byte_t columntype,
 						const char *columntypestring,
 						bool isnullable,
 						bool isprimarykey,
@@ -771,7 +771,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 						uint32_t colcount);
 		void	buildBinaryField(const char *field,
 						uint64_t fieldlength,
-						unsigned char columntype);
+						byte_t columntype);
 		bool	buildTextRow(sqlrservercursor *cursor,
 						uint32_t colcount);
 		void	buildLobField(sqlrservercursor *cursor, uint32_t col);
@@ -815,9 +815,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		void	bindParameters(sqlrservercursor *cursor,
 					uint16_t pcount,
 					uint16_t *ptypes,
-					const unsigned char *nullbitmap,
-					const unsigned char *in,
-					const unsigned char **out);
+					const byte_t *nullbitmap,
+					const byte_t *in,
+					const byte_t **out);
 		void	clearParams(sqlrservercursor *cursor);
 
 		// com_stmt_send_long_data
@@ -850,10 +850,10 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		bool		oldmariadbjdbcservercapabilitieshack;
 
 		bytebuffer	resppacket;
-		unsigned char	seq;
+		byte_t		seq;
 
 		memorypool	reqpacketpool;
-		unsigned char	*reqpacket;
+		byte_t		*reqpacket;
 		uint64_t	reqpacketsize;
 
 		randomnumber	r;
@@ -884,8 +884,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_mysql : public sqlrprotocol {
 		uint16_t	*pcounts;
 		uint16_t	**ptypes;
 		bool		*columntypescached;
-		unsigned char	**columntypes;
-		unsigned char	**nullbitmap;
+		byte_t		**columntypes;
+		byte_t		**nullbitmap;
 };
 
 sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
@@ -895,14 +895,14 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 
 	clientsock=NULL;
 
-	handshake=charstring::toInteger(
+	handshake=charstring::convertToInteger(
 				parameters->getAttributeValue(
 						"handshake"));
 	if (!handshake) {
 		handshake=10;
 	}
 
-	clientprotocol=charstring::toInteger(
+	clientprotocol=charstring::convertToInteger(
 				parameters->getAttributeValue(
 						"clientprotocol"));
 	if (!clientprotocol) {
@@ -964,22 +964,22 @@ sqlrprotocol_mysql::sqlrprotocol_mysql(sqlrservercontroller *cont,
 	bindvarnamesizes=new int16_t[maxbindcount];
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		charstring::printf(&bindvarnames[i],"?%d",i+1);
-		bindvarnamesizes[i]=charstring::length(bindvarnames[i]);
+		bindvarnamesizes[i]=charstring::getLength(bindvarnames[i]);
 	}
 
 	pcounts=new uint16_t[maxcursorcount];
 	ptypes=new uint16_t *[maxcursorcount];
 	columntypescached=new bool[maxcursorcount];
-	columntypes=new unsigned char *[maxcursorcount];
-	nullbitmap=new unsigned char *[maxcursorcount];
+	columntypes=new byte_t *[maxcursorcount];
+	nullbitmap=new byte_t *[maxcursorcount];
 	for (uint16_t i=0; i<maxcursorcount; i++) {
 		pcounts[i]=0;
 		ptypes[i]=new uint16_t[maxbindcount];
 		columntypescached[i]=false;
 		if (cont->getMaxColumnCount()) {
-			columntypes[i]=new unsigned char[
+			columntypes[i]=new byte_t[
 					cont->getMaxColumnCount()];
-			nullbitmap[i]=new unsigned char[
+			nullbitmap[i]=new byte_t[
 					(cont->getMaxColumnCount()+7+2)/8];
 		} else {
 			columntypes[i]=NULL;
@@ -1044,7 +1044,7 @@ clientsessionexitstatus_t sqlrprotocol_mysql::clientSession(
 	clientsock=cs;
 
 	// set up the socket
-	clientsock->dontUseNaglesAlgorithm();
+	clientsock->setNaglesAlgorithmEnabled(false);
 	clientsock->setSocketReadBufferSize(65536);
 	clientsock->setSocketWriteBufferSize(65536);
 	clientsock->setReadBufferSize(65536);
@@ -1257,12 +1257,12 @@ bool sqlrprotocol_mysql::sendPacket(bool flush) {
 	// FIXME: what if resppacket.getSize() > maxpacketlength?
 
 	// overwrite the first 4 bytes of the resppacket
-	resppacket.setPosition(0);
+	resppacket.setPositionRelativeToBeginning(0);
 
 	// size
 	// 3 bytes
 	uint32_t	size=hostToBE((uint32_t)resppacket.getSize()-4);
-	unsigned char	*sizebytes=(unsigned char *)&size;
+	byte_t		*sizebytes=(byte_t *)&size;
 	resppacket.write(sizebytes[3]);
 	resppacket.write(sizebytes[2]);
 	resppacket.write(sizebytes[1]);
@@ -1318,11 +1318,11 @@ bool sqlrprotocol_mysql::recvPacket() {
 	// size
 	// 3 bytes
 	uint32_t	size;
-	unsigned char	*sizebytes=(unsigned char *)&size;
+	byte_t		*sizebytes=(byte_t *)&size;
 	sizebytes[0]=0;
-	if (clientsock->read(&sizebytes[3])!=sizeof(unsigned char) ||
-		clientsock->read(&sizebytes[2])!=sizeof(unsigned char) ||
-		clientsock->read(&sizebytes[1])!=sizeof(unsigned char)) {
+	if (clientsock->read(&sizebytes[3])!=sizeof(byte_t) ||
+		clientsock->read(&sizebytes[2])!=sizeof(byte_t) ||
+		clientsock->read(&sizebytes[1])!=sizeof(byte_t)) {
 		if (getDebug()) {
 			stdoutput.write("read packet size failed\n");
 			debugSystemError();
@@ -1333,7 +1333,7 @@ bool sqlrprotocol_mysql::recvPacket() {
 
 	// sequence
 	// 1 byte
-	if (clientsock->read(&seq)!=sizeof(unsigned char)) {
+	if (clientsock->read(&seq)!=sizeof(byte_t)) {
 		if (getDebug()) {
 			stdoutput.write("read packet sequence failed\n");
 			debugSystemError();
@@ -1397,8 +1397,8 @@ void sqlrprotocol_mysql::generateChallenge() {
 	stringbuffer	str;
 	uint32_t	number;
 	for (uint16_t i=0; i<bytes; i++) {
-		r.generateNumber(&number);
-		str.append((char)randomnumber::scaleNumber(number,' ','~'));
+		r.generate(&number);
+		str.append((char)randomnumber::scale(number,' ','~'));
 	}
 	delete[] challenge;
 	challenge=str.detachString();
@@ -1494,7 +1494,7 @@ void sqlrprotocol_mysql::buildHandshake10() {
 
 	// build packet
 	write(&resppacket,protocolversion);
-	write(&resppacket,serverversion,charstring::length(serverversion)+1);
+	write(&resppacket,serverversion,charstring::getLength(serverversion)+1);
 	writeLE(&resppacket,connectionid);
 	write(&resppacket,challenge,8);
 	write(&resppacket,(char)0x00);
@@ -1511,19 +1511,18 @@ void sqlrprotocol_mysql::buildHandshake10() {
 		writeLE(&resppacket,highservercapabilityflags);
 	}
 	if (servercapabilityflags&CLIENT_PLUGIN_AUTH) {
-		write(&resppacket,
-			(unsigned char)(charstring::length(challenge)+1));
+		write(&resppacket,(byte_t)(charstring::getLength(challenge)+1));
 	} else {
 		write(&resppacket,(char)0x00);
 	}
 	write(&resppacket,reserved,sizeof(reserved));
 	if (servercapabilityflags&CLIENT_SECURE_CONNECTION) {
 		write(&resppacket,challenge+8,
-				charstring::length(challenge+8)+1);
+				charstring::getLength(challenge+8)+1);
 	}
 	if (servercapabilityflags&CLIENT_PLUGIN_AUTH) {
 		write(&resppacket,serverauthpluginname,
-				charstring::length(serverauthpluginname)+1);
+				charstring::getLength(serverauthpluginname)+1);
 	}
 }
 
@@ -1554,9 +1553,9 @@ void sqlrprotocol_mysql::buildHandshake9() {
 
 	// build packet
 	write(&resppacket,protocolversion);
-	write(&resppacket,serverversion,charstring::length(serverversion)+1);
+	write(&resppacket,serverversion,charstring::getLength(serverversion)+1);
 	writeLE(&resppacket,connectionid);
-	write(&resppacket,challenge,charstring::length(challenge)+1);
+	write(&resppacket,challenge,charstring::getLength(challenge)+1);
 }
 
 bool sqlrprotocol_mysql::recvHandshakeResponse() {
@@ -1565,7 +1564,7 @@ bool sqlrprotocol_mysql::recvHandshakeResponse() {
 		return false;
 	}
 
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 
 	uint32_t	capabilityflags;
 	readLE(rp,&capabilityflags,&rp);
@@ -1578,10 +1577,10 @@ bool sqlrprotocol_mysql::recvHandshakeResponse() {
 }
 
 bool sqlrprotocol_mysql::parseHandshakeResponse41(
-					const unsigned char *rp,
+					const byte_t *rp,
 					uint64_t rplen) {
 
-	const unsigned char	*end=rp+rplen;
+	const byte_t	*end=rp+rplen;
 
 	debugStart("handshake response 41");
 
@@ -1630,7 +1629,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 	// username
 	delete[] username;
 	username=charstring::duplicate((const char *)rp);
-	rp+=charstring::length(username)+1;
+	rp+=charstring::getLength(username)+1;
 	if (getDebug()) {
 		stdoutput.printf("	username: \"%s\"\n",username);
 	}
@@ -1653,7 +1652,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 		response=(char *)bytestring::duplicate(rp,responselength);
 		rp+=responselength;
 	} else {
-		for (const unsigned char *r=rp; *r && r!=end; r++) {
+		for (const byte_t *r=rp; *r && r!=end; r++) {
 			responselength++;
 		}
 		delete[] response;
@@ -1696,7 +1695,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 	database=NULL;
 	if (rp<end && clientcapabilityflags&CLIENT_CONNECT_WITH_DB) {
 		database=charstring::duplicate((const char *)rp);
-		rp+=charstring::length(database)+1;
+		rp+=charstring::getLength(database)+1;
 		if (getDebug()) {
 			stdoutput.printf("	database: \"%s\"\n",database);
 		}
@@ -1705,7 +1704,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 	// auth plugin name
 	if (rp<end && clientcapabilityflags&CLIENT_PLUGIN_AUTH) {
 		clientauthpluginname=(const char *)rp;
-		rp+=charstring::length(clientauthpluginname)+1;
+		rp+=charstring::getLength(clientauthpluginname)+1;
 		if (getDebug()) {
 			stdoutput.printf("	auth plugin name: \"%s\"\n",
 							clientauthpluginname);
@@ -1719,8 +1718,8 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 		}
 
 		// length of all key-values
-		uint64_t		alllen=readLenEncInt(rp,&rp);
-		const unsigned char	*start=rp;
+		uint64_t	alllen=readLenEncInt(rp,&rp);
+		const byte_t	*start=rp;
 		while ((uint64_t)(rp-start)<alllen) {
 
 			// key
@@ -1759,12 +1758,12 @@ bool sqlrprotocol_mysql::parseHandshakeResponse41(
 }
 
 bool sqlrprotocol_mysql::parseHandshakeResponse320(
-					const unsigned char *rp,
+					const byte_t *rp,
 					uint64_t rplen) {
 
 	debugStart("handshake response 320");
 
-	const unsigned char	*end=rp+rplen;
+	const byte_t	*end=rp+rplen;
 
 	// capability flags
 	uint16_t	shortcapabilityflags;
@@ -1807,7 +1806,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 	// username
 	delete[] username;
 	username=charstring::duplicate((const char *)rp);
-	rp+=charstring::length(username)+1;
+	rp+=charstring::getLength(username)+1;
 	if (getDebug()) {
 		stdoutput.printf("	username: \"%s\"\n",username);
 	}
@@ -1815,8 +1814,8 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 	// challenge response
 	delete[] response;
 	response=charstring::duplicate((const char *)rp);
-	responselength=charstring::length(response);
-	rp+=charstring::length(response)+1;
+	responselength=charstring::getLength(response);
+	rp+=charstring::getLength(response)+1;
 	if (getDebug()) {
 		stdoutput.write("	challenge response: ");
 		stdoutput.safePrint(response);
@@ -1828,7 +1827,7 @@ bool sqlrprotocol_mysql::parseHandshakeResponse320(
 	database=NULL;
 	if (clientcapabilityflags&CLIENT_CONNECT_WITH_DB) {
 		database=charstring::duplicate((const char *)rp);
-		rp+=charstring::length(database)+1;
+		rp+=charstring::getLength(database)+1;
 		if (getDebug()) {
 			stdoutput.printf("	database: \"%s\"\n",database);
 		}
@@ -1956,7 +1955,7 @@ bool sqlrprotocol_mysql::negotiateAuthMethod() {
 	}
 
 	// if the client requested an auth that we support, then offer it
-	if (charstring::inSet(clientauthpluginname,supportedauthplugins)) {
+	if (charstring::isInSet(clientauthpluginname,supportedauthplugins)) {
 
 		// generate challenge...
 		for (const char * const *plugin=supportedauthplugins;
@@ -2048,8 +2047,8 @@ bool sqlrprotocol_mysql::sendAuthSwitchRequest() {
 
 	write(&resppacket,(char)0xFE);
 	write(&resppacket,serverauthpluginname,
-			charstring::length(serverauthpluginname)+1);
-	write(&resppacket,challenge,charstring::length(challenge)+1);
+			charstring::getLength(serverauthpluginname)+1);
+	write(&resppacket,challenge,charstring::getLength(challenge)+1);
 
 	return sendPacket(true);
 }
@@ -2074,7 +2073,7 @@ bool sqlrprotocol_mysql::recvAuthResponse() {
 		return false;
 	}
 
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 	delete[] response;
 	response=charstring::duplicate((const char *)rp,reqpacketsize);
 	responselength=reqpacketsize;
@@ -2255,7 +2254,7 @@ bool sqlrprotocol_mysql::sendOkPacket(bool noteof,
 			writeLenEncStr(&resppacket,sessionstatechangedata);
 		}
 	} else {
-		write(&resppacket,info,charstring::length(info));
+		write(&resppacket,info,charstring::getLength(info));
 	}
 
 	return sendPacket(true);
@@ -2265,7 +2264,7 @@ bool sqlrprotocol_mysql::sendErrPacket(uint16_t errorcode,
 					const char *errormessage,
 					const char *sqlstate) {
 	return sendErrPacket(errorcode,errormessage,
-				charstring::length(errormessage),sqlstate);
+				charstring::getLength(errormessage),sqlstate);
 }
 
 bool sqlrprotocol_mysql::sendErrPacket(uint16_t errorcode,
@@ -2442,7 +2441,7 @@ void sqlrprotocol_mysql::debugCapabilityFlags(uint32_t capabilityflags) {
 	}
 }
 
-void sqlrprotocol_mysql::debugCharacterSet(unsigned char characterset) {
+void sqlrprotocol_mysql::debugCharacterSet(byte_t characterset) {
 	stdoutput.printf("	character set: 0x%02x\n",
 				(uint32_t)(0x000000ff&characterset));
 }
@@ -2512,14 +2511,13 @@ void sqlrprotocol_mysql::debugStatusFlags(uint16_t statusflags) {
 	}
 }
 
-void sqlrprotocol_mysql::debugColumnType(const char *name,
-						unsigned char columntype) {
+void sqlrprotocol_mysql::debugColumnType(const char *name, byte_t columntype) {
 	stdoutput.printf("	type: %s (0x%02x)\n",name,
 				(uint32_t)(0x000000ff&columntype));
 	debugColumnType(columntype);
 }
 
-void sqlrprotocol_mysql::debugColumnType(unsigned char columntype) {
+void sqlrprotocol_mysql::debugColumnType(byte_t columntype) {
 	stdoutput.write("		");
 	switch (columntype) {
 		case MYSQL_TYPE_DECIMAL:
@@ -2685,7 +2683,7 @@ void sqlrprotocol_mysql::debugSystemError() {
 	delete[] err;
 }
 
-void sqlrprotocol_mysql::debugRefreshCommand(unsigned char command) {
+void sqlrprotocol_mysql::debugRefreshCommand(byte_t command) {
 	stdoutput.write("	refresh command:\n");
 	stdoutput.printf("		%08x\n",command);
 	switch (command) {
@@ -2724,7 +2722,7 @@ void sqlrprotocol_mysql::debugRefreshCommand(unsigned char command) {
 	}
 }
 
-void sqlrprotocol_mysql::debugShutdownCommand(unsigned char command) {
+void sqlrprotocol_mysql::debugShutdownCommand(byte_t command) {
 	stdoutput.write("	shutdown command:\n");
 	stdoutput.printf("		%08x\n",command);
 	if (command==SHUTDOWN_DEFAULT) {
@@ -2761,7 +2759,7 @@ void sqlrprotocol_mysql::debugShutdownCommand(unsigned char command) {
 	}
 }
 
-void sqlrprotocol_mysql::debugStmtExecuteFlags(unsigned char flags) {
+void sqlrprotocol_mysql::debugStmtExecuteFlags(byte_t flags) {
 	stdoutput.write("	flags:\n");
 	if (flags&CURSOR_TYPE_NO_CURSOR) {
 		stdoutput.write("		"
@@ -2847,7 +2845,7 @@ bool sqlrprotocol_mysql::comStatistics() {
 		debugEnd();
 	}
 	resetSendPacketBuffer();
-	write(&resppacket,statistics,charstring::length(statistics));
+	write(&resppacket,statistics,charstring::getLength(statistics));
 	return sendPacket(true);
 }
 
@@ -3070,7 +3068,7 @@ bool sqlrprotocol_mysql::comQuery(sqlrservercursor *cursor) {
 
 bool sqlrprotocol_mysql::sendQuery(sqlrservercursor *cursor,
 						const char *query) {
-	return sendQuery(cursor,query,charstring::length(query));
+	return sendQuery(cursor,query,charstring::getLength(query));
 }
 
 bool sqlrprotocol_mysql::sendQuery(sqlrservercursor *cursor,
@@ -3133,13 +3131,13 @@ void sqlrprotocol_mysql::cacheColumnDefinitions(sqlrservercursor *cursor,
 	if (!cont->getMaxColumnCount()) {
 		delete[] columntypes[curid];
 		if (colcount) {
-			columntypes[curid]=new unsigned char[colcount];
+			columntypes[curid]=new byte_t[colcount];
 		} else {
 			columntypes[curid]=NULL;
 		}
 	}
 
-	unsigned char	*ct=columntypes[curid];
+	byte_t	*ct=columntypes[curid];
 
 	for (uint32_t i=0; i<colcount; i++) {
 		ct[i]=getColumnType(cont->getColumnTypeName(cursor,i),
@@ -3196,7 +3194,7 @@ bool sqlrprotocol_mysql::sendColumnDefinition(sqlrservercursor *cursor,
 	uint16_t	sqlrcolumntype=cont->getColumnType(cursor,column);
 	const char	*columntypestring=
 				cont->getColumnTypeName(cursor,column);
-	unsigned char	columntype=columntypes[curid][column];
+	byte_t		columntype=columntypes[curid][column];
 	uint16_t	columnflags=getColumnFlags(cursor,column,
 							sqlrcolumntype,
 							columntype,
@@ -3236,7 +3234,7 @@ bool sqlrprotocol_mysql::sendColumnDefinition(sqlrservercursor *cursor,
 						uint32_t length,
 						const char *columntypestring,
 						uint32_t scale,
-						unsigned char columntype,
+						byte_t columntype,
 						uint16_t flags,
 						const char *defaults,
 						bool fieldlistcommand) {
@@ -3316,14 +3314,14 @@ bool sqlrprotocol_mysql::sendColumnDefinition(sqlrservercursor *cursor,
 			writeLE(&resppacket,flags);
   		} else {
 			writeLenEncInt(&resppacket,2);
-			write(&resppacket,(unsigned char)(flags&0x00FF));
+			write(&resppacket,(byte_t)(flags&0x00FF));
 		}
 		write(&resppacket,(char)decimals);
 	}
 
 	if (fieldlistcommand) {
 		if (!charstring::isNullOrEmpty(defaults)) {
-			uint64_t	len=charstring::length(defaults);
+			uint64_t	len=charstring::getLength(defaults);
 			writeLenEncInt(&resppacket,len);
 			write(&resppacket,defaults,len);
 		} else {
@@ -3335,7 +3333,7 @@ bool sqlrprotocol_mysql::sendColumnDefinition(sqlrservercursor *cursor,
 	return sendPacket();
 }
 
-unsigned char sqlrprotocol_mysql::getColumnType(const char *columntypestring,
+byte_t sqlrprotocol_mysql::getColumnType(const char *columntypestring,
 						uint16_t columntypelen,
 						uint32_t scale) {
 
@@ -3358,7 +3356,7 @@ unsigned char sqlrprotocol_mysql::getColumnType(const char *columntypestring,
 					columntypelen) &&
 				datatypestring[index][columntypelen]=='\0') {
 
-			unsigned char	retval=mysqltypemap[index];
+			byte_t	retval=mysqltypemap[index];
 
 			// Some DB's, like oracle, don't distinguish between
 			// decimal and integer types, they just have a numeric
@@ -3392,7 +3390,7 @@ unsigned char sqlrprotocol_mysql::getColumnType(const char *columntypestring,
 uint16_t sqlrprotocol_mysql::getColumnFlags(sqlrservercursor *cursor,
 						uint32_t column,
 						uint16_t sqlrcolumntype,
-						unsigned char columntype,
+						byte_t columntype,
 						const char *columntypestring) {
 	return getColumnFlags(cursor,
 				sqlrcolumntype,
@@ -3410,7 +3408,7 @@ uint16_t sqlrprotocol_mysql::getColumnFlags(sqlrservercursor *cursor,
 
 uint16_t sqlrprotocol_mysql::getColumnFlags(sqlrservercursor *cursor,
 						uint16_t sqlrcolumntype,
-						unsigned char columntype,
+						byte_t columntype,
 						const char *columntypestring,
 						bool isnullable,
 						bool isprimarykey,
@@ -3547,15 +3545,15 @@ bool sqlrprotocol_mysql::buildBinaryRow(sqlrservercursor *cursor,
 	bool		null;
 
 	// get the column type
-	unsigned char	*ct=columntypes[curid];
+	byte_t		*ct=columntypes[curid];
 
 	// prepare the null bitmap
 	uint16_t	nullbitmapsize=(colcount+7+2)/8;
 	if (!cont->getMaxColumnCount()) {
 		delete[] nullbitmap[curid];
-		nullbitmap[curid]=new unsigned char[nullbitmapsize];
+		nullbitmap[curid]=new byte_t[nullbitmapsize];
 	}
-	unsigned char	*nb=nullbitmap[curid];
+	byte_t	*nb=nullbitmap[curid];
 	bytestring::zero(nb,nullbitmapsize);
 
 	// get the fields
@@ -3569,7 +3567,7 @@ bool sqlrprotocol_mysql::buildBinaryRow(sqlrservercursor *cursor,
 		}
 
 		// append to the null bitmap
-		nb[(i+2)/8]|=(((unsigned char)null)<<((i+2)%8));
+		nb[(i+2)/8]|=(((byte_t)null)<<((i+2)%8));
 	}
 
 	if (getDebug()) {
@@ -3626,7 +3624,7 @@ bool sqlrprotocol_mysql::buildBinaryRow(sqlrservercursor *cursor,
 
 void sqlrprotocol_mysql::buildBinaryField(const char *field,
 						uint64_t fieldlength,
-						unsigned char columntype) {
+						byte_t columntype) {
 
 	switch (columntype) {
 		case MYSQL_TYPE_STRING:
@@ -3656,29 +3654,29 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 
 		case MYSQL_TYPE_LONGLONG:
 			writeLE(&resppacket,
-				(uint64_t)charstring::toInteger(field));
+				(uint64_t)charstring::convertToInteger(field));
 			break;
 
 		case MYSQL_TYPE_LONG:
 		case MYSQL_TYPE_INT24:
 			writeLE(&resppacket,
-				(uint32_t)charstring::toInteger(field));
+				(uint32_t)charstring::convertToInteger(field));
 			break;
 
 		case MYSQL_TYPE_SHORT:
 		case MYSQL_TYPE_YEAR:
 			writeLE(&resppacket,
-				(uint16_t)charstring::toInteger(field));
+				(uint16_t)charstring::convertToInteger(field));
 			break;
 		
 		case MYSQL_TYPE_TINY:
 			write(&resppacket,
-				(char)charstring::toInteger(field));
+				(char)charstring::convertToInteger(field));
 			break;
 		
 		case MYSQL_TYPE_DOUBLE:
 			{
-			double		fval=charstring::toFloat(field);
+			double		fval=charstring::convertToFloat(field);
 			uint64_t	ival;
 			bytestring::copy(&ival,&fval,sizeof(double));
 			writeLE(&resppacket,ival);
@@ -3687,7 +3685,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 		
 		case MYSQL_TYPE_FLOAT:
 			{
-			float		fval=charstring::toFloat(field);
+			float		fval=charstring::convertToFloat(field);
 			uint32_t	ival;
 			bytestring::copy(&ival,&fval,sizeof(float));
 			writeLE(&resppacket,ival);
@@ -3713,17 +3711,17 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 					&usec,&isnegative);
 			// FIXME: this can be compressed if some parts are 0
 			if (columntype==MYSQL_TYPE_DATE) {
-				write(&resppacket,(unsigned char)4);
+				write(&resppacket,(byte_t)4);
 			} else {
-				write(&resppacket,(unsigned char)11);
+				write(&resppacket,(byte_t)11);
 			}
 			writeLE(&resppacket,(uint16_t)year);
-			write(&resppacket,(unsigned char)month);
-			write(&resppacket,(unsigned char)day);
+			write(&resppacket,(byte_t)month);
+			write(&resppacket,(byte_t)day);
 			if (columntype!=MYSQL_TYPE_DATE) {
-				write(&resppacket,(unsigned char)hour);
-				write(&resppacket,(unsigned char)minute);
-				write(&resppacket,(unsigned char)second);
+				write(&resppacket,(byte_t)hour);
+				write(&resppacket,(byte_t)minute);
+				write(&resppacket,(byte_t)second);
 				writeLE(&resppacket,(uint32_t)usec);
 			}
 			}
@@ -3740,7 +3738,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 			// 	"01:00:00"
 
 			// get the -
-			unsigned char	isneg=0;
+			byte_t	isneg=0;
 			if (field[0]=='-') {
 				isneg=1;
 				field++;
@@ -3750,7 +3748,7 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 			uint32_t	days=0;
 			const char	*d=charstring::findFirst(field,"d ");
 			if (d) {
-				days=charstring::toInteger(field);
+				days=charstring::convertToInteger(field);
 				field=d+2;
 			}
 
@@ -3769,12 +3767,12 @@ void sqlrprotocol_mysql::buildBinaryField(const char *field,
 					&usec,&isnegative);
 
 			// FIXME: this can be compressed if some parts are 0
-			write(&resppacket,(unsigned char)12);
+			write(&resppacket,(byte_t)12);
 			write(&resppacket,isneg);
 			writeLE(&resppacket,days);
-			write(&resppacket,(unsigned char)hour);
-			write(&resppacket,(unsigned char)minute);
-			write(&resppacket,(unsigned char)second);
+			write(&resppacket,(byte_t)hour);
+			write(&resppacket,(byte_t)minute);
+			write(&resppacket,(byte_t)second);
 			writeLE(&resppacket,(uint32_t)usec);
 			}
 			break;
@@ -3977,15 +3975,15 @@ bool sqlrprotocol_mysql::comFieldList(sqlrservercursor *cursor) {
 
 	// get the column list for the specified table
 
-	const unsigned char	*rp=reqpacket;
-	uint64_t		rplen=reqpacketsize;
+	const byte_t	*rp=reqpacket;
+	uint64_t	rplen=reqpacketsize;
 	rp++;
 	rplen--;
 
 	// get the table
 	char	*table=charstring::duplicate((const char *)rp);
-	rp+=charstring::length(table);
-	rplen-=charstring::length(table);
+	rp+=charstring::getLength(table);
+	rplen-=charstring::getLength(table);
 
 	// get the wildcard
 	char	*wild=charstring::duplicate((const char *)rp,rplen);
@@ -4067,7 +4065,7 @@ bool sqlrprotocol_mysql::getListByQuery(sqlrservercursor *cursor,
 	// build the appropriate query
 	const char	*query=NULL;
 	uint32_t	querylen=0;
-	bool		havewild=charstring::length(wild);
+	bool		havewild=charstring::getLength(wild);
 	switch (listtype) {
 		case MYSQLLISTTYPE_DATABASE_LIST:
 			query=cont->getDatabaseListQuery(havewild);
@@ -4117,7 +4115,7 @@ bool sqlrprotocol_mysql::buildListQuery(sqlrservercursor *cursor,
 	escapeParameter(&tablebuf,table);
 
 	// bounds checking
-	cont->setQueryLength(cursor,charstring::length(query)+
+	cont->setQueryLength(cursor,charstring::getLength(query)+
 					wildbuf.getStringLength()+
 					tablebuf.getStringLength());
 	if (cont->getQueryLength(cursor)>maxquerysize) {
@@ -4140,7 +4138,7 @@ bool sqlrprotocol_mysql::buildListQuery(sqlrservercursor *cursor,
 		charstring::printf(querybuffer,maxquerysize+1,
 						query,wildbuf.getString());
 	}
-	cont->setQueryLength(cursor,charstring::length(querybuffer));
+	cont->setQueryLength(cursor,charstring::getLength(querybuffer));
 	return true;
 }
 
@@ -4210,16 +4208,16 @@ bool sqlrprotocol_mysql::sendFieldListResponse(sqlrservercursor *cursor) {
 				&extra,&fieldlength,
 				&blob,&null);
 
-		uint32_t	prec=charstring::toInteger(precstring);
-		uint32_t	scale=charstring::toInteger(scalestring);
+		uint32_t	prec=charstring::convertToInteger(precstring);
+		uint32_t	scale=charstring::convertToInteger(scalestring);
 		char		type=getColumnType(typestring,
-						charstring::length(typestring),
+						charstring::getLength(typestring),
 						scale);
 		uint32_t	length=0;
 		if (!charstring::isNullOrEmpty(lengthstring)) {
-			length=charstring::toInteger(lengthstring);
+			length=charstring::convertToInteger(lengthstring);
 		} else {
-			switch ((unsigned char)type) {
+			switch ((byte_t)type) {
 				case MYSQL_TYPE_DECIMAL:
 					length=prec+2;
 					break;
@@ -4337,7 +4335,7 @@ bool sqlrprotocol_mysql::comRefresh(sqlrservercursor *cursor) {
 
 	// refresh the server's view of the specified entity
 
-	unsigned char	command=*(reqpacket+1);
+	byte_t	command=*(reqpacket+1);
 
 	if (getDebug()) {
 		debugStart("com_refresh");
@@ -4373,7 +4371,7 @@ bool sqlrprotocol_mysql::comShutdown(sqlrservercursor *cursor) {
 
 	// ask the server to shutdown in the specified manner
 
-	unsigned char	command=*(reqpacket+1);
+	byte_t	command=*(reqpacket+1);
 
 	if (getDebug()) {
 		debugStart("com_shutdown");
@@ -4400,7 +4398,7 @@ bool sqlrprotocol_mysql::comProcessKill(sqlrservercursor *cursor) {
 
 	// asks the server to kill the specified server thread
 
-	const unsigned char	*rp=reqpacket+1;
+	const byte_t	*rp=reqpacket+1;
 
 	uint32_t	connid;
 	readLE(rp,&connid,&rp);
@@ -4582,7 +4580,7 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 
 	// executes the previously prepared query
 
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 	rp++;
 
 	// get statement id
@@ -4596,7 +4594,7 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 	}
 
 	// get flags
-	unsigned char	flags=*rp;
+	byte_t	flags=*rp;
 	rp++;
 
 	// get iteration count
@@ -4613,8 +4611,8 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 	// get the parameters
 	uint16_t	pcount=pcounts[cont->getId(cursor)];
 
-	const unsigned char	*nullbitmap=NULL;
-	unsigned char		newparamsbound=0;
+	const byte_t	*nullbitmap=NULL;
+	byte_t		newparamsbound=0;
 
 	if (pcount) {
 
@@ -4665,15 +4663,15 @@ bool sqlrprotocol_mysql::comStmtExecute() {
 void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 					uint16_t pcount,
 					uint16_t *ptypes,
-					const unsigned char *nullbitmap,
-					const unsigned char *in,
-					const unsigned char **out) {
+					const byte_t *nullbitmap,
+					const byte_t *in,
+					const byte_t **out) {
 
 	if (pcount>maxbindcount) {
 		pcount=maxbindcount;
 	}
 
-	const unsigned char	*rp=in;
+	const byte_t	*rp=in;
 
 	if (getDebug()) {
 		stdoutput.write("	bind {\n");
@@ -4694,8 +4692,8 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 		bv->variablesize=bindvarnamesizes[i];
 
 		// handle nulls
-		unsigned char	nullbitmapindex=nullbitmap[(i)/8];
-		unsigned char	nullbitmapmask=(1<<(i%8));
+		byte_t	nullbitmapindex=nullbitmap[(i)/8];
+		byte_t	nullbitmapmask=(1<<(i%8));
 		if (nullbitmapindex&nullbitmapmask) {
 			bv->type=SQLRSERVERBINDVARTYPE_NULL;
 			bv->isnull=cont->nullBindValue();
@@ -4796,7 +4794,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 							rp,sizeof(int32_t));
 					bv->value.dateval.day=
 						filedescriptor::
-						littleEndianToHost(
+						convertLittleEndianToHost(
 							(uint32_t)days);
 					rp+=sizeof(int32_t);
 					
@@ -4816,7 +4814,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 						bv->value.dateval.
 							microsecond=
 						filedescriptor::
-						littleEndianToHost(
+						convertLittleEndianToHost(
 							(uint32_t)ms);
 						rp+=sizeof(int32_t);
 					}
@@ -4851,7 +4849,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 					// FIXME: convert LE to host
 					bv->value.dateval.year=
 						filedescriptor::
-						littleEndianToHost(
+						convertLittleEndianToHost(
 							(uint16_t)year);
 					rp+=sizeof(int16_t);
 					bv->value.dateval.month=*((char *)rp);
@@ -4898,7 +4896,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 					// FIXME: convert LE to host
 					bv->value.dateval.year=
 						filedescriptor::
-						littleEndianToHost(
+						convertLittleEndianToHost(
 							(uint16_t)year);
 					rp+=sizeof(int16_t);
 					bv->value.dateval.month=*((char *)rp);
@@ -4924,7 +4922,7 @@ void sqlrprotocol_mysql::bindParameters(sqlrservercursor *cursor,
 							bv->value.dateval.
 								microsecond=
 							filedescriptor::
-							littleEndianToHost(
+							convertLittleEndianToHost(
 								(uint32_t)ms);
 							rp+=sizeof(int32_t);
 						}
@@ -5020,8 +5018,8 @@ bool sqlrprotocol_mysql::comStmtSendLongData() {
 
 	// sends long data to the server
 
-	const unsigned char	*rp=reqpacket;
-	uint64_t		rplen=reqpacketsize;
+	const byte_t	*rp=reqpacket;
+	uint64_t	rplen=reqpacketsize;
 	rp++;
 	rplen--;
 
@@ -5036,8 +5034,8 @@ bool sqlrprotocol_mysql::comStmtSendLongData() {
 	rplen-=sizeof(uint16_t);
 
 	// get the data
-	const unsigned char	*data=rp;
-	uint64_t		datalen=rplen;
+	const byte_t	*data=rp;
+	uint64_t	datalen=rplen;
 
 	if (getDebug()) {
 		debugStart("com_stmt_long_data");
@@ -5072,7 +5070,7 @@ bool sqlrprotocol_mysql::comStmtClose() {
 
 	// deallocates the specified prepared statement
 
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 	rp++;
 
 	// get statement id
@@ -5104,7 +5102,7 @@ bool sqlrprotocol_mysql::comStmtReset() {
 
 	// resets the data of the specified prepared statement
 
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 	rp++;
 
 	// get statement id
@@ -5134,7 +5132,7 @@ bool sqlrprotocol_mysql::comSetOption(sqlrservercursor *cursor) {
 
 	// enables/disables multi-statement
 
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 	rp++;
 
 	// get multi-statement option
@@ -5158,7 +5156,7 @@ bool sqlrprotocol_mysql::comStmtFetch() {
 
 	// fetches the specified number of rows
 
-	const unsigned char	*rp=reqpacket;
+	const byte_t	*rp=reqpacket;
 	rp++;
 
 	// get statement id

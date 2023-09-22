@@ -36,7 +36,7 @@ var	fieldlens;
 var	con=new sqlrelay.SQLRConnection("sqlrelay",
 				9000,
 				"/tmp/test.socket",
-				"test","test",0,1);
+				"testuser","testpassword",0,1);
 var	cur=new sqlrelay.SQLRCursor(con);
 	
 // get database type
@@ -539,7 +539,7 @@ console.log("COMMIT AND ROLLBACK: \n");
 var	secondcon=new sqlrelay.SQLRConnection("sqlrelay",
 				9000,
 				"/tmp/test.socket",
-				"test","test",0,1);
+				"testuser","testpassword",0,1);
 var	secondcur=new sqlrelay.SQLRCursor(secondcon);
 checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 checkSuccess(secondcur.getField(0,0),"0");

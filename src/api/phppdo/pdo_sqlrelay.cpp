@@ -66,11 +66,11 @@ extern "C" {
 	#define MY_ZVAL_STRING(a,b,c) ZVAL_STRING(a,b)
 
 	#define RET_STRING(a,b) \
-		RETURN_STR(zend_string_init(a,charstring::length(a),0))
+		RETURN_STR(zend_string_init(a,charstring::getLength(a),0))
 
 	#define ADD_ASSOC_STRING(a,b,c,d) \
 		add_assoc_string(a,b,\
-			zend_string_init(c,charstring::length(c),0)->val)
+			zend_string_init(c,charstring::getLength(c),0)->val)
 
 	#define CONVERT_TO_STRING(a) convert_to_string(&(a))
 	#define CONVERT_TO_STRING_EX(a) convert_to_string_ex(&(a))
@@ -355,11 +355,11 @@ static int sqlrcursorDescribe(pdo_stmt_t *stmt, int colno TSRMLS_DC) {
 	sqlrcursor	*sqlrcur=sqlrstmt->sqlrcur;
 	const char	*n=sqlrcur->getColumnName(colno);
 #if PHP_MAJOR_VERSION >= 7
-	stmt->columns[colno].name=zend_string_init(n,charstring::length(n),0);
+	stmt->columns[colno].name=zend_string_init(n,charstring::getLength(n),0);
 #else
 	char		*name=estrdup((n)?n:"");
 	stmt->columns[colno].name=name;
-	stmt->columns[colno].namelen=charstring::length(name);
+	stmt->columns[colno].namelen=charstring::getLength(name);
 #endif
 	stmt->columns[colno].maxlen=sqlrcur->getColumnLength(colno);
 #if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
@@ -837,7 +837,7 @@ static int sqlrcursorBind(pdo_stmt_t *stmt,
 	// Chop any :, @ or $'s off of the front of the name.  We have to
 	// iterate because PDO itself prepends a : if the name doesn't already
 	// have one.
-	while (character::inSet(*name,":@$")) {
+	while (character::isInSet(*name,":@$")) {
 		name++;
 	}
 
@@ -1553,14 +1553,14 @@ sqlrconnectionLastInsertId(pdo_dbh_t *dbh,
 	sqlrdbhandle	*sqlrdbh=(sqlrdbhandle *)dbh->driver_data;
 	uint64_t	lastid=((sqlrconnection *)sqlrdbh->sqlrcon)->
 							getLastInsertId();
-	uint16_t	idlen=charstring::integerLength(lastid)+1;
+	uint16_t	idlen=charstring::getIntegerLength(lastid)+1;
 	char		*id=(char *)safe_emalloc(idlen,sizeof(char),0);
 	charstring::printf(id,idlen,"%lld",lastid);
 #if PHP_MAJOR_VERSION < 8 || (PHP_MAJOR_VERSION == 8 && PHP_MINOR_VERSION < 1)
 	*len=idlen;
 	return id;
 #else
-	return zend_string_init(id,charstring::length(id),0);
+	return zend_string_init(id,charstring::getLength(id),0);
 #endif
 }
 
@@ -1969,10 +1969,10 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 					options,
 					sizeof(options)/sizeof(options[0]));
 	const char	*host=options[0].optval;
-	uint16_t	port=charstring::toInteger(options[1].optval);
+	uint16_t	port=charstring::convertToInteger(options[1].optval);
 	const char	*socket=options[2].optval;
-	int32_t		tries=charstring::toInteger(options[3].optval);
-	int32_t		retrytime=charstring::toInteger(options[4].optval);
+	int32_t		tries=charstring::convertToInteger(options[3].optval);
+	int32_t		retrytime=charstring::convertToInteger(options[4].optval);
 	const char	*debug=options[5].optval;
 	bool		lazyconnect=!charstring::isNo(options[6].optval);
 	const char	*krb=options[10].optval;
@@ -1986,7 +1986,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 	const char	*tlsciphers=options[18].optval;
 	const char	*tlsvalidate=options[19].optval;
 	const char	*tlsca=options[20].optval;
-	uint16_t	tlsdepth=charstring::toInteger(options[21].optval);
+	uint16_t	tlsdepth=charstring::convertToInteger(options[21].optval);
 	const char	*db=options[22].optval;
 	const char      *connecttime=options[23].optval;
 	bool		autocommit=!charstring::isNo(options[24].optval);
@@ -2027,8 +2027,8 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 
 	// set connect timeout
 	if (charstring::isNumber(connecttime)) {
-		int32_t		timeoutsec=charstring::toInteger(connecttime);
-		long double	dbl=charstring::toFloatC(connecttime)-
+		int32_t		timeoutsec=charstring::convertToInteger(connecttime);
+		long double	dbl=charstring::convertToFloatC(connecttime)-
 						(long double)timeoutsec;
 		int32_t		timeoutusec=(int32_t)(dbl*1000000.0);
 		if (timeoutsec>=0) {
@@ -2105,7 +2105,7 @@ static int sqlrelayHandleFactory(pdo_dbh_t *dbh,
 		sqlrdbh->sqlrcon->selectDatabase(db);
 	}
 
-	sqlrdbh->resultsetbuffersize=charstring::toInteger(options[6].optval);
+	sqlrdbh->resultsetbuffersize=charstring::convertToInteger(options[6].optval);
 	sqlrdbh->dontgetcolumninfo=charstring::isYes(options[7].optval);
 	sqlrdbh->nullsasnulls=charstring::isYes(options[8].optval);
 

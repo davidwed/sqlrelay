@@ -15,23 +15,23 @@ int main(int argc, const char **argv) {
 
 	commandline	cmdl(argc,argv);
 
-	if (!cmdl.found("host") ||
-			!cmdl.found("port") ||
-			!cmdl.found("colcount") ||
-			!cmdl.found("rowcount")) {
+	if (!cmdl.isFound("host") ||
+			!cmdl.isFound("port") ||
+			!cmdl.isFound("colcount") ||
+			!cmdl.isFound("rowcount")) {
 		stdoutput.printf("usage: testtable -host host -port port -socket socket [-user user] [-password password] [-table tablename] -colcount count -rowcount count\n");
 		process::exit(1);
 	}
 
 	const char	*host=cmdl.getValue("host");
-	uint16_t	port=charstring::toUnsignedInteger(
+	uint16_t	port=charstring::convertToUnsignedInteger(
 					cmdl.getValue("port"));
 	const char	*sock=cmdl.getValue("socket");
 	const char	*user=cmdl.getValue("user");
 	const char	*password=cmdl.getValue("password");
-	int32_t		colcount=charstring::toInteger(
+	int32_t		colcount=charstring::convertToInteger(
 					cmdl.getValue("colcount"));
-	int32_t		rowcount=charstring::toInteger(
+	int32_t		rowcount=charstring::convertToInteger(
 					cmdl.getValue("rowcount"));
 	const char	*table=cmdl.getValue("table");
 	if (charstring::isNullOrEmpty(table)) {
@@ -78,11 +78,11 @@ int main(int argc, const char **argv) {
 		query.append(table);
 		query.append(" values (");
 		for (int32_t j=0; j<colcount; j++) {
-			seed=randomnumber::generateNumber(seed);
+			seed=randomnumber::generate(seed);
 			if (j) {
 				query.append(", ");
 			}
-			query.append(randomnumber::scaleNumber(seed,1,100000));
+			query.append(randomnumber::scale(seed,1,100000));
 		}
 		query.append(")");
 		if (!sqlrcur.sendQuery(query.getString())) {

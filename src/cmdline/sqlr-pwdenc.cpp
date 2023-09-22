@@ -56,7 +56,7 @@ int main(int argc, const char **argv) {
 	const char	*id=cmdline.getValue("-id");
 	const char	*pwdencid=cmdline.getValue("-pwdencid");
 	const char	*password=cmdline.getValue("-password");
-	bool		binary=cmdline.found("-binary");
+	bool		binary=cmdline.isFound("-binary");
 
 	// sanity check and usage message
 	if (charstring::isNullOrEmpty(id) ||
@@ -98,10 +98,10 @@ int main(int argc, const char **argv) {
 	// encrypt the password and print the result
 	char	*encryptedpassword=sqlrp->encrypt(password);
 	if (binary) {
-		unsigned char	*bin;
+		byte_t		*bin;
 		uint64_t	binlen;
 		charstring::hexDecode(encryptedpassword,
-					charstring::length(encryptedpassword),
+					charstring::getLength(encryptedpassword),
 					&bin,&binlen);
 		stdoutput.write(bin,binlen);
 	} else {

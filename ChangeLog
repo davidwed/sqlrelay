@@ -56,6 +56,28 @@
 		fakeinputbindvariablesdateformat string
 	removed sqlrresultsetdomnode class
 	de-consted some things
+	added detection of newer java versions
+	if connections=0 and maxconnections is unspecified then it defaults
+		to 5 now
+	implemented workaround for broken last-insert-id in libmariadbclient 18
+	added --with-node-gyp-python configure option
+	pwdenc_crypt -> pwdenc_des
+	in sqlrimportcsv, calling setIgnoreColumnsWithEmptyNames(true) and
+		mapColumnName("foo","") causes column "foo" to be ignored now
+	fixed some subtle bugs in the replay module
+	fixed issue causing sqlr-connection not to shut down promptly when
+		waiting for a suspended client to reconnect
+	configure looks for python-major-dir in addition to python-dir when
+		looking for dist/site-packages now
+	added upsert trigger
+	fixed bind leak in postgresql connection
+	applied Dmitry Kasyanov's patch for python binary blobs
+	moved pwdenc-related stuff into libsqlrutil
+	moved sqlr-pwdenc from server to cmdline
+	sqlrsh -id can decrypt two-way encrypted passwords now
+	fixed bug in cistring patterns translation that caused strings to be
+		lower-cased
+	added connectstring auth modules
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
@@ -620,8 +642,8 @@
 	configure option --disable-odbc-driver actually works now
 	filters can specify an error string and error number now
 	added support for systemd
-	fixed a memory leak by applying and updating a patch from Kasyanov
-		Dmitry to deallocate the error message in C++ API destructor
+	fixed a memory leak by applying and updating a patch from Dmitry
+		Kasyanov to deallocate the error message in C++ API destructor
 	legacy_stdio_definitions.lib is now included when building ODBC with
 		VS2015
 	added support for PHP7
@@ -1613,7 +1635,7 @@
 	added mysql_config sanity test to configure script
 	NULL's are escaped in fake input BLOB binds now
 	query router works pretty well now
-	applied Sharpinskiy Dmitry's odbc unicode patch
+	applied Dmitry Sharpinskiy's odbc unicode patch
 	integrated Devananda's statistics gathering code
 	added support for mysql stored procedures
 	integrated Devananda's mysql result set updates

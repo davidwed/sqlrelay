@@ -290,9 +290,9 @@ bool freetdsbenchcursor::runQuery(const char *query, bool getcolumns) {
 		// initiate a cursor command
 		if (ct_cursor(cmd,CS_CURSOR_DECLARE,
 					(CS_CHAR *)"1",
-					(CS_INT)charstring::length("1"),
+					(CS_INT)charstring::getLength("1"),
 					(CS_CHAR *)query,
-					charstring::length(query),
+					charstring::getLength(query),
 					CS_READ_ONLY)!=CS_SUCCEED) {
 			stdoutput.printf("ct_cursor (declare) failed\n");
 			return false;
@@ -323,7 +323,7 @@ bool freetdsbenchcursor::runQuery(const char *query, bool getcolumns) {
 		// initiate a language command
 		if (ct_command(cmd,CS_LANG_CMD,
 					(CS_CHAR *)query,
-					charstring::length(query),
+					charstring::getLength(query),
 					CS_UNUSED)!=CS_SUCCEED) {
 			stdoutput.printf("ct_command failed\n");
 			return false;

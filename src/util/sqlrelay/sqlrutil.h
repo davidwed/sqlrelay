@@ -141,6 +141,7 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 		virtual const char	*getDefaultUser()=0;
 		virtual const char	*getDefaultPassword()=0;
+		virtual const char	*getDefaultPasswordEncryptionId()=0;
 
 		virtual bool		getListenOnInet()=0;
 		virtual bool		getListenOnUnix()=0;
@@ -285,6 +286,35 @@ class SQLRUTIL_DLLSPEC sqlrconfigs {
 		const char	*libexecdir;
 		sqlrconfig	*cfg;
 		dynamiclib	*dl;
+};
+
+
+
+class SQLRUTIL_DLLSPEC sqlrpwdenc {
+	public:
+		sqlrpwdenc(domnode *parameters, bool debug);
+		virtual	~sqlrpwdenc();
+		virtual const char	*getId();
+		virtual	bool	oneWay();
+		virtual	char	*encrypt(const char *value);
+		virtual	char	*decrypt(const char *value);
+
+	protected:
+		domnode	*getParameters();
+		bool		getDebug();
+
+	#include <sqlrelay/private/sqlrpwdenc.h>
+};
+
+class SQLRUTIL_DLLSPEC sqlrpwdencs {
+	public:
+		sqlrpwdencs(sqlrpaths *sqlrpth, bool debug);
+		~sqlrpwdencs();
+
+		bool		load(domnode *parameters);
+		sqlrpwdenc	*getPasswordEncryptionById(const char *id);
+
+	#include <sqlrelay/private/sqlrpwdencs.h>
 };
 
 #endif

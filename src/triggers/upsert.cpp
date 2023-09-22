@@ -81,15 +81,16 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// after the query has been run...
 
 	// get the query and query type
-	// NOTE: for now queryType() groups simple insert, multi-insert,
-	// insert/select and select-into into SQLRQUERYTYPE_INSERT
+	// NOTE: for now determineQueryType() groups simple insert,
+	// multi-insert, insert/select and select-into into SQLRQUERYTYPE_INSERT
 	const char		*query=cont->getQueryBuffer(icur);
 	uint32_t		querylen=cont->getQueryLength(icur);
-	sqlrquerytype_t		querytype=icur->queryType(query,querylen);
+	sqlrquerytype_t		querytype=icur->getQueryType();
 	if (debug) {
 		stdoutput.printf("upsert {\n");
 		stdoutput.printf("	triggering query:\n%.*s\n",
 							querylen,query);
+		stdoutput.printf("	query type: %d\n",querytype);
 	}
 
 	// bail if the query wasn't an insert
@@ -158,14 +159,18 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 	// debug
 	if (debug) {
 		stdoutput.printf("	columns:\n");
-		for (listnode<char *> *node=cols->getFirst();
+		if (cols) {
+			for (listnode<char *> *node=cols->getFirst();
 						node; node=node->getNext()) {
-			stdoutput.printf("		%s\n",node->getValue());
+				stdoutput.printf("		%s\n",
+							node->getValue());
+			}
+			stdoutput.printf("	auto-increment column: %s\n",
+				(autoinccolumn)?autoinccolumn:"(null");
+			stdoutput.printf("	primary key column "
+					"(from db): %s\n",
+				(primarykeycolumn)?primarykeycolumn:"(null)");
 		}
-		stdoutput.printf("	auto-increment column: %s\n",
-							autoinccolumn);
-		stdoutput.printf("	primary key column (from db): %s\n",
-							primarykeycolumn);
 	}
 
 	// if parseInsert didn't find a primary key
@@ -177,16 +182,19 @@ bool sqlrtrigger_upsert::run(sqlrserverconnection *sqlrcon,
 		if (debug) {
 			stdoutput.printf("	primary key column "
 						"(from config): %s\n",
-						primarykeycolumn);
+				(primarykeycolumn)?primarykeycolumn:"(null)");
 		}
 	}
 
 	// debug
 	if (debug) {
 		stdoutput.printf("	values:\n");
-		for (listnode<char *> *node=vals->getFirst();
+		if (vals) {
+			for (listnode<char *> *node=vals->getFirst();
 						node; node=node->getNext()) {
-			stdoutput.printf("		%s\n",node->getValue());
+				stdoutput.printf("		%s\n",
+							node->getValue());
+			}
 		}
 		stdoutput.printf("	where-clause columns:\n");
 		for (domnode *node=tablenode->getFirstTagChild("column");
@@ -310,7 +318,7 @@ bool sqlrtrigger_upsert::errorEncountered(sqlrservercursor *icur) {
 		const char	*number=node->getAttributeValue("number");
 		if ((string && charstring::contains(err.getString(),string)) ||
 			(number && cont->getErrorNumber(icur)==
-					charstring::toInteger(number))) {
+					charstring::convertToInteger(number))) {
 			return true;
 		}
 	}
@@ -512,7 +520,7 @@ void sqlrtrigger_upsert::copyInputBind(memorypool *pool, bool where,
 
 		// if we only support numeric binds or bind-by-position,
 		// then use the bind number that we were passed in
-		ubind->variablesize=1+charstring::integerLength(bindnumber);
+		ubind->variablesize=1+charstring::getIntegerLength(bindnumber);
 		ubind->variable=(char *)pool->allocate(ubind->variablesize+1);
 		charstring::printf(ubind->variable,
 					ubind->variablesize+1,

@@ -19,4 +19,5 @@ oracle: oracle.cpp oracle.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) oracle.$(OBJ) $(ORACLELIBS) $(RUDIMENTSLIBS)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class oracle$(EXE)
+	$(RM) *.lo *.o *.obj *.class oracle$(EXE)
+	$(RMTREE) .libs

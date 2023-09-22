@@ -25,7 +25,7 @@ class SQLRCLIENT_DLLSPEC sqlrscalar : public scalarcollection<const char *> {
 		~sqlrscalar();
 
 		/** Returns true. */
-		bool	getIsReadOnly();
+		bool	isReadOnly();
 
 		/** Sets the cursor used by this instance to "cursor". */
 		void	setCursor(sqlrcursor *cursor);
@@ -93,16 +93,16 @@ class SQLRCLIENT_DLLSPEC sqlrrowlist : public listcollection<const char *> {
 		void	setRow(uint64_t row);
 
 		/** Returns true. */
-		bool	getIsReadOnly();
+		bool	isReadOnly();
 
 		/** Returns true. */
-		bool	getIsBlockBased();
+		bool	isBlockBased();
 
 		/** Returns 1. */
 		uint64_t	getBlockSize();
 
 		/** Returns the number of nodes in the sqlrrowlist. */
-		uint64_t	getLength();
+		uint64_t	getCount();
 
 		/** Returns the first node in the sqlrrowlist. */
 		listnode<const char *>	*getFirst();
@@ -152,7 +152,7 @@ class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 		void	setRow(uint64_t row);
 
 		/** Returns true. */
-		bool	getIsReadOnly();
+		bool	isReadOnly();
 
 		/** Sets "value" to the value (field) associated with
 		 *  "key" (column name).
@@ -187,7 +187,7 @@ class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 
 		/** Returns the number of key/value (column name/field) pairs
 		 *  in the dictionary. */
-		uint64_t	getLength();
+		uint64_t	getCount();
 	
 		#include <sqlrelay/private/sqlrrowdictionary.h>
 };
@@ -220,10 +220,10 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlist :
 		void	setColumn(uint32_t col);
 
 		/** Returns true. */
-		bool	getIsReadOnly();
+		bool	isReadOnly();
 
 		/** Returns true. */
-		bool	getIsBlockBased();
+		bool	isBlockBased();
 
 		/** Returns the result set buffer size of the cursor used by
  		 *  this intance.  Returns 0 if the cursor is configured to
@@ -231,7 +231,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlist :
 		uint64_t	getBlockSize();
 
 		/** Returns the number of nodes in the sqlrresultsetlist. */
-		uint64_t	getLength();
+		uint64_t	getCount();
 
 		/** Returns the first node in the sqlrresultsetlist. */
 		listnode<const char *>	*getFirst();
@@ -273,10 +273,10 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 		void	setCursor(sqlrcursor *cursor);
 
 		/** Returns true. */
-		bool	getIsReadOnly();
+		bool	isReadOnly();
 
 		/** Returns true. */
-		bool	getIsBlockBased();
+		bool	isBlockBased();
 
 		/** Returns the result set buffer size of the cursor used by
  		 *  this intance.  Returns 0 if the cursor is configured to
@@ -284,7 +284,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 		uint64_t	getBlockSize();
 
 		/** Returns true. */
-		bool	getIsSequentialAccess();
+		bool	isSequentialAccess();
 
 		/** Returns the name of column "col". */
 		const char	*getColumnName(uint64_t col);

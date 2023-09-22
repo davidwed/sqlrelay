@@ -28,7 +28,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 	file	f;
 	if (!charstring::isNullOrEmpty(filename)) {
 		if (!f.create(filename,
-				permissions::evalPermString("rw-r--r--"))) {
+				permissions::parsePermString("rw-r--r--"))) {
 			// FIXME: report error
 			return false;
 		}
@@ -57,7 +57,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 						getCurrentColumn())));
 
 		setCurrentField(sqlrcur->getColumnName(getCurrentColumn()));
-		if (charstring::inSet(getCurrentField(),fieldstoignore)) {
+		if (charstring::isInSet(getCurrentField(),fieldstoignore)) {
 			continue;
 		}
 
@@ -129,7 +129,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 
 				// ignore particular fields
 				if (fieldstoignore) {
-					if (charstring::inSet(
+					if (charstring::isInSet(
 						sqlrcur->getColumnName(
 							getCurrentColumn()),
 						fieldstoignore)) {
@@ -164,7 +164,7 @@ bool sqlrexportcsv::exportToFile(const char *filename, const char *table) {
 				// digit numbers to scientific notation.
 				bool	quote=
 					(!getNumberColumn(getCurrentColumn()) ||
-					charstring::length(
+					charstring::getLength(
 						getCurrentField())>=12);
 
 				// export the field
@@ -248,7 +248,7 @@ bool sqlrexportcsv::exportToJsonDomNode(domnode *jsondomnode) {
 						getCurrentColumn())));
 
 		setCurrentField(sqlrcur->getColumnName(getCurrentColumn()));
-		if (charstring::inSet(getCurrentField(),fieldstoignore)) {
+		if (charstring::isInSet(getCurrentField(),fieldstoignore)) {
 			continue;
 		}
 
@@ -314,7 +314,7 @@ bool sqlrexportcsv::exportToJsonDomNode(domnode *jsondomnode) {
 
 				// ignore particular fields
 				if (fieldstoignore) {
-					if (charstring::inSet(
+					if (charstring::isInSet(
 						sqlrcur->getColumnName(
 							getCurrentColumn()),
 						fieldstoignore)) {

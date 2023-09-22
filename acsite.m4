@@ -774,6 +774,11 @@ then
 
 		if ( test -z "$POSTGRESQLLIBS" )
 		then
+			FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[iexpress/postgresql],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBSPATH],[POSTGRESQLSTATIC])
+		fi
+
+		if ( test -z "$POSTGRESQLLIBS" )
+		then
 			for dir in `ls /Library/PostgreSQL 2> /dev/null`
 			do
 				FW_CHECK_HEADERS_AND_LIBS([$POSTGRESQLPATH],[PostgreSQL/$dir],[libpq-fe.h],[pq],[$STATICFLAG],[$RPATHFLAG],[POSTGRESQLINCLUDES],[POSTGRESQLLIBS],[POSTGRESQLLIBSPATH],[POSTGRESQLSTATIC])
@@ -2267,22 +2272,42 @@ then
 		then
 			HAVE_PYTHON="yes"
 
-			dnl dist-packages or site-packages?  Ubuntu/Debian
-			dnl use dist-packages.  Others use site-packages.
-			if ( test -d "$PYTHONDIR/dist-packages" )
+			dnl Ubuntu/Debian platforms (generally) have
+			dnl dist-packages in an a "major" python dir like:
+			dnl /usr/lib/python3/dist-packages
+			dnl rather than in the full python dir like:
+			dnl /usr/lib/python3.9/dist-packages
+			dnl which makes it possible for packages to work across
+			dnl minor versions.  Use that if we can.
+			PYTHONMAJDIR=`echo "$PYTHONDIR" | cut -d'.' -f1`
+
+			dnl Ubuntu/Debian use dist-packages.  Others use
+			dnl site-packages.  Prefer dist-packages
+			if ( test -d "$PYTHONMAJDIR/dist-packages" )
 			then
-				PYTHONSITEDIR="dist-packages"
+				PYTHONSITEDIR="$PYTHONMAJDIR/dist-packages"
+			elif ( test -d "$PYTHONMAJDIR/site-packages" )
+			then
+				PYTHONSITEDIR="$PYTHONMAJDIR/site-packages"
+			elif ( test -d "$PYTHONDIR/dist-packages" )
+			then
+				PYTHONSITEDIR="$PYTHONDIR/dist-packages"
 			elif ( test -d "$PYTHONDIR/site-packages" )
 			then
-				PYTHONSITEDIR="site-packages"
+				PYTHONSITEDIR="$PYTHONDIR/site-packages"
 			fi
+
+			dnl if we didn't find any dist-packages or
+			dnl site-packages directory, then force
+			dnl $PYTHONDIR/dist-packages on Ubuntu/Debian and
+			dnl $PYTHONDIR/site-packages on other platforms
 			if ( test -z "$PYTHONSITEDIR" )
 			then
 				if ( test -r "/etc/debian_version" )
 				then
-					PYTHONSITEDIR="dist-packages"
+					PYTHONSITEDIR="$PYTHONDIR/dist-packages"
 				else
-					PYTHONSITEDIR="site-packages"
+					PYTHONSITEDIR="$PYTHONDIR/site-packages"
 				fi
 			fi
 		fi
@@ -2610,6 +2635,12 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.20* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.19* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.18* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.17* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.16* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.15* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.14* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.12* 2> /dev/null` \
@@ -2628,6 +2659,12 @@ then
 `ls -d /usr/lib64/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-14-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.20* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.19* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.18* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.17* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.16* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.15* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.14* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.13* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.12* 2> /dev/null` \
@@ -2645,6 +2682,12 @@ then
 `ls -d /usr/lib/jvm/jdk-12-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/jdk-14-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-15-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-16-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-17-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-18-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-19-* 2> /dev/null` \
+`ls -d /usr/lib/jvm/jdk-20-* 2> /dev/null` \
 /usr \
 /usr/local
 			do
@@ -3448,13 +3491,19 @@ then
 	then
 		HAVE_NODEJS="yes"
 
-		dnl node >= 6.x requires -std=c++11 and sometimes
-		dnl node-gyp doesn't enable it automatically
+		dnl node >= 6.x requires -std=c++11
+		dnl node >= 16.x requires -std=c++17
+		dnl sometimes node-gyp doesn't enable these automatically
 		AC_MSG_CHECKING(for node major version)
 		NODEMAJORVERSION=`$NODE --version 2> /dev/null | tr -d 'v' | cut -d'.' -f1`
 		if ( test "$NODEMAJORVERSION" -ge "6" )
 		then
-			NODEJSCXXFLAGS="-std=c++11"
+			if ( test "$NODEMAJORVERSION" -ge "16" )
+			then
+				NODEJSCXXFLAGS="-std=c++17"
+			else
+				NODEJSCXXFLAGS="-std=c++11"
+			fi
 		fi
 		AC_MSG_RESULT($NODEMAJORVERSION)
 		

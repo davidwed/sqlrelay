@@ -16,7 +16,7 @@ all: $(SQLR)filter_regex.$(LIBEXT) \
 	$(SQLR)filter_tag.$(LIBEXT)
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
+	$(RM) *.lo *.o *.obj *.$(LIBEXT) *.lib *.exp *.idb *.pdb *.manifest *.ii
 	$(RMTREE) .libs
 
 $(SQLR)filter_regex.$(LIBEXT): regex.cpp regex.$(OBJ)

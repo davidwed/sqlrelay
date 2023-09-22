@@ -1,36 +1,48 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="oracletest" port="9000" socket="/tmp/test.socket" dbase="oracle">
+	<instance id="oracletest" dbase="oracle">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<users>
-			<user user="test" password="test"/>
+			<user user="testuser" password="testpassword"/>
 		</users>
 		<connections>
                         <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
 		</connections>
 	</instance>
 
-	<instance id="oracle12ctest" port="9000" socket="/tmp/test.socket" dbase="oracle">
+	<instance id="oracle12ctest" dbase="oracle">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<users>
-			<user user="test" password="test"/>
+			<user user="testuser" password="testpassword"/>
 		</users>
 		<connections>
                         <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle12c)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
 		</connections>
 	</instance>
 
-	<instance id="oracle11gtest" port="9000" socket="/tmp/test.socket" dbase="oracle">
+	<instance id="oracle11gtest" dbase="oracle">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<users>
-			<user user="test" password="test"/>
+			<user user="testuser" password="testpassword"/>
 		</users>
 		<connections>
                         <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle11g)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
 		</connections>
 	</instance>
 
-	<instance id="oracle10gtest" port="9000" socket="/tmp/test.socket" dbase="oracle">
+	<instance id="oracle10gtest" dbase="oracle">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<users>
-			<user user="test" password="test"/>
+			<user user="testuser" password="testpassword"/>
 		</users>
 		<connections>
                         <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle10g)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>

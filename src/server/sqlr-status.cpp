@@ -145,9 +145,9 @@ int main(int argc, const char **argv) {
 			"[-connection-detail [-query]]\n",SQLR);
 		process::exit(1);
 	}
-	bool		shortoutput=cmdl.found("-short");
-	bool		connoutput=cmdl.found("-connection-detail");
-	bool		queryoutput=cmdl.found("-query");
+	bool		shortoutput=cmdl.isFound("-short");
+	bool		connoutput=cmdl.isFound("-connection-detail");
+	bool		queryoutput=cmdl.isFound("-query");
 	
 	// get the id filename and key
 	sqlrpaths	sqlrp(&cmdl);
@@ -264,35 +264,41 @@ int main(int argc, const char **argv) {
 		);
 
 	stdoutput.printf("Mutexes:\n");
-	stdoutput.printf("  Connection Announce               : ");
+	stdoutput.printf("  Connection Announce               (0) : ");
 	printAcquisitionStatus(sem[0]);
-	stdoutput.printf("  Shared Memory Access              : ");
+	stdoutput.printf("  Shared Memory Access              (1) : ");
 	printAcquisitionStatus(sem[1]);
-	stdoutput.printf("  Connection Count                  : ");
+	stdoutput.printf("  Connection Count                  (4) : ");
 	printAcquisitionStatus(sem[4]);
-	stdoutput.printf("  Session Count                     : ");
+	stdoutput.printf("  Session Count                     (5) : ");
 	printAcquisitionStatus(sem[5]);
-	stdoutput.printf("  Open Connections/Forked Listeners : ");
+	stdoutput.printf("  Open Connections/Forked Listeners (9) : ");
 	printAcquisitionStatus(sem[9]);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("Triggers:\n");
-	stdoutput.printf("  Accept Available Connection (l-w, c-s)         : ");
+	stdoutput.printf(
+		"  Accept Available Connection (l-w, c-s)         (2) : ");
 	printTriggeredStatus(sem[2]);
-	stdoutput.printf("  Done Accepting Available Connection (c-w, l-s) : ");
+	stdoutput.printf(
+		"  Done Accepting Available Connection (c-w, l-s) (3) : ");
 	printTriggeredStatus(sem[3]);
-	stdoutput.printf("  Connection Ready For Handoff (l-w, c-s)        : ");
+	stdoutput.printf(
+		"  Connection Ready For Handoff (l-w, c-s)       (12) : ");
 	printTriggeredStatus(sem[12]);
-	stdoutput.printf("  Evaluate Connection Count (s-w, l-s)           : ");
+	stdoutput.printf(
+		"  Evaluate Connection Count (s-w, l-s)           (6) : ");
 	printTriggeredStatus(sem[6]);
-	stdoutput.printf("  Done Evaluating Connection Count (l-w, s-s)    : ");
+	stdoutput.printf(
+		"  Done Evaluating Connection Count (l-w, s-s)    (7) : ");
 	printTriggeredStatus(sem[7]);
-	stdoutput.printf("  Connection Has Started (s-w, c-s)              : ");
+	stdoutput.printf(
+		"  Connection Has Started (s-w, c-s)              (8) : ");
 	printTriggeredStatus(sem[8]);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("Counts:\n");
-	stdoutput.printf("  Busy Listener Count : %d\n",sem[10]);
+	stdoutput.printf("  Busy Listener Count (10) : %d\n",sem[10]);
 
 	stdoutput.printf("\n");
 

@@ -1,46 +1,46 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="mysqltest" port="9000" socket="/tmp/test.socket" dbase="mysql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="mysqltest" dbase="mysql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>
 	</instance>
 
-	<instance id="mysql8test" port="9000" socket="/tmp/test.socket" dbase="mysql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="mysql8test" dbase="mysql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mysql8;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>
 	</instance>
 
-	<instance id="mysql5test" port="9000" socket="/tmp/test.socket" dbase="mysql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="mysql5test" dbase="mysql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mysql5;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>
 	</instance>
 
-	<instance id="mysql3test" port="9000" socket="/tmp/test.socket" dbase="mysql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="mysql3test" dbase="mysql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mysql3;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>
 	</instance>
 
-	<instance id="mariadb10test" port="9000" socket="/tmp/test.socket" dbase="mysql">
-		<users>
-			<user user="test" password="test"/>
-		</users>
+	<instance id="mariadb10test" dbase="mysql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
 		<connections>
 			<connection string="host=mariadb10;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>

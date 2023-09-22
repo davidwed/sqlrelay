@@ -6,15 +6,20 @@
 		uint64_t	countColumns(const char * const *columns);
 		void		copyColumns(const char * const *columns);
 
-		void		bind(const char *bindformat,
+		void	getValidColumnName(const char *c,
+						const char **col,
+						size_t *collen);
+		void	bind(const char *bindformat,
 					const char * const *columns,
-					const char * const *values);
+					const char * const *values,
+					const char * const *types);
 
 		bool	doReadDelegate(const char *where,
 					const char *orderby,
 					uint64_t skip);
 		bool	doUpdateDelegate(const char * const *columns,
 					const char * const *values,
+					const char * const *types,
 					const char *where);
 		bool	doDeleteDelegate(const char *where);
 
@@ -73,6 +78,8 @@
 		sqlrrowdictionary	frd;
 		sqlrresultsetlist	fcl;
 		sqlrresultsettable	rst;
+
+		memorypool	m;
 
 		xmldom	x;
 		jsondom	j;

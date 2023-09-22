@@ -18,8 +18,8 @@
 	$host="sqlrelay";
 	$port=9000;
 	$socket="/tmp/test.socket";
-	$user="test";
-	$password="test";
+	$user="db2inst1";
+	$password="testpassword";
 
 	# instantiation
 	$con=sqlrcon_alloc($host,$port,$socket,$user,$password,0,1);

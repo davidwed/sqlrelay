@@ -325,17 +325,21 @@ static bool waitForInstance(sqlrpaths *sqlrpth,
 		// try to connect
 		if (cfg->getListenOnUnix()) {
 			unixsocketclient	s;
-			if (s.connect(cfg->getDefaultSocket(),1,0,0,1)==
-							RESULT_SUCCESS) {
+			s.setFileName(cfg->getDefaultSocket());
+			s.setTimeoutSeconds(1);
+			s.setTimeoutMicroseconds(0);
+			if (s.connect()==RESULT_SUCCESS) {
 				retval=true;
 				break;
 			}
 
 		} else if (cfg->getListenOnInet()) {
 			inetsocketclient	s;
-			if (s.connect("localhost",
-					cfg->getDefaultPort(),1,0,0,1)==
-							RESULT_SUCCESS) {
+			s.setHost("localhost");
+			s.setPort(cfg->getDefaultPort());
+			s.setTimeoutSeconds(1);
+			s.setTimeoutMicroseconds(0);
+			if (s.connect()==RESULT_SUCCESS) {
 				retval=true;
 				break;
 			}
@@ -437,21 +441,21 @@ int main(int argc, const char **argv) {
 
 	// get the command line args
 	const char	*localstatedir=sqlrpth.getLocalStateDir();
-	bool		strace=cmdl.found("-strace");
+	bool		strace=cmdl.isFound("-strace");
 	const char	*id=cmdl.getValue("-id");
 	const char	*configurl=sqlrpth.getConfigUrl();
 	const char	*config=cmdl.getValue("-config");
 	const char	*backtrace=cmdl.getValue("-backtrace");
 	bool		disablecrashhandler=
-				cmdl.found("-disable-crash-handler");
+				cmdl.isFound("-disable-crash-handler");
 	#ifndef _WIN32
-	bool		wait=cmdl.found("-wait");
+	bool		wait=cmdl.isFound("-wait");
 	#endif
 
 	// on Windows, open a new console window and redirect everything to it
 	// (unless that's specifically disabled)
 	#ifdef _WIN32
-	if (!cmdl.found("-disable-new-window")) {
+	if (!cmdl.isFound("-disable-new-window")) {
 		fclose(stdin);
 		fclose(stdout);
 		fclose(stderr);

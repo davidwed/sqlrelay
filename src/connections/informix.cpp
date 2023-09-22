@@ -336,7 +336,7 @@ void informixconnection::handleConnectString() {
 	// clob/blob on the first row, so override it to 1
 	cont->setFetchAtOnce(1);
 
-	maxoutbindlobsize=charstring::toInteger(
+	maxoutbindlobsize=charstring::convertToInteger(
 			cont->getConnectStringValue("maxoutbindlobsize"));
 	if (maxoutbindlobsize<1) {
 		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
@@ -347,14 +347,14 @@ void informixconnection::handleConnectString() {
 bool informixconnection::logIn(const char **error, const char **warning) {
 
 	// set the INFORMIX environment variable
-	if (charstring::length(informixdir) &&
+	if (charstring::getLength(informixdir) &&
 		!environment::setValue("INFORMIXDIR",informixdir)) {
 		*error="Failed to set INFORMIXDIR environment variable";
 		return false;
 	}
 
 	// set the LANG environment variable
-	if (charstring::length(lang) &&
+	if (charstring::getLength(lang) &&
 		!environment::setValue("LANG",lang)) {
 		*error="Failed to set LANG environment variable";
 		return false;
@@ -924,7 +924,7 @@ bool informixcursor::inputBind(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -964,7 +964,7 @@ bool informixcursor::inputBind(const char *variable,
 					uint16_t variablesize,
 					int64_t *value) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -989,7 +989,7 @@ bool informixcursor::inputBind(const char *variable,
 					uint32_t precision,
 					uint32_t scale) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1023,7 +1023,7 @@ bool informixcursor::inputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1081,7 +1081,7 @@ bool informixcursor::inputBindBlob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1107,7 +1107,7 @@ bool informixcursor::inputBindClob(const char *variable,
 					uint32_t valuesize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1137,7 +1137,7 @@ bool informixcursor::outputBind(const char *variable,
 					uint32_t valuesize, 
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1165,7 +1165,7 @@ bool informixcursor::outputBind(const char *variable,
 					int64_t *value,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1197,7 +1197,7 @@ bool informixcursor::outputBind(const char *variable,
 					uint32_t *scale,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1237,7 +1237,7 @@ bool informixcursor::outputBind(const char *variable,
 					uint16_t buffersize,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1276,7 +1276,7 @@ bool informixcursor::outputBindBlob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1303,7 +1303,7 @@ bool informixcursor::outputBindClob(const char *variable,
 					uint16_t index,
 					int16_t *isnull) {
 
-	uint16_t	pos=charstring::toInteger(variable+1);
+	uint16_t	pos=charstring::convertToInteger(variable+1);
 	if (!pos || pos>maxbindcount) {
 		bindformaterror=true;
 		return false;
@@ -1472,7 +1472,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 				return false;
 			}
 			column[i].tablelength=
-				charstring::length(column[i].table);
+				charstring::getLength(column[i].table);
 		}
 
 		if (column[i].type==SQL_LONGVARBINARY ||
@@ -1531,7 +1531,7 @@ void informixcursor::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,

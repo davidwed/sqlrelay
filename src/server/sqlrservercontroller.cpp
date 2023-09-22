@@ -145,7 +145,7 @@ class sqlrservercontrollerprivate {
 
 	uint16_t	_sendcolumninfo;
 
-	int32_t		_accepttimeout;
+	uint32_t	_accepttimeout;
 
 	bool		_suspendedsession;
 
@@ -285,11 +285,11 @@ class sqlrservercontrollerprivate {
 
 	char			*_bulkserveridfilename;
 	sharedmemory		*_bulkservershmem;
-	unsigned char 		*_bulkservershm;
-	unsigned char 		*_bulkservershmquery;
-	unsigned char 		*_bulkservershmdataformat;
+	byte_t	 		*_bulkservershm;
+	byte_t	 		*_bulkservershmquery;
+	byte_t	 		*_bulkservershmdataformat;
 	sharedmemory		*_bulkclientshmem;
-	unsigned char		*_bulkclientshm;
+	byte_t			*_bulkclientshm;
 	sqlrservercursor	*_bulkcursor;
 	const char		*_bulkerrorfieldtable;
 	const char		*_bulkerrorrowtable;
@@ -297,8 +297,8 @@ class sqlrservercontrollerprivate {
 	uint64_t		_bulkdroperrortables;
 	uint64_t		_bulkquerylen;
 	const char		*_bulkquery;
-	const unsigned char	*_bulkdataformat;
-	singlylinkedlist<const unsigned char *>	_bulkdata;
+	const byte_t		*_bulkdataformat;
+	singlylinkedlist<const byte_t *>	_bulkdata;
 	singlylinkedlist<uint64_t>		_bulkdatalen;
 
 	char	*_db;
@@ -562,7 +562,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	}
 
 	// get whether this connection was spawned by the scaler
-	pvt->_scalerspawned=pvt->_cmdl->found("-scaler");
+	pvt->_scalerspawned=pvt->_cmdl->isFound("-scaler");
 
 	// get the connection id from the command line
 	pvt->_connectionid=pvt->_cmdl->getValue("-connectionid");
@@ -574,10 +574,10 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// get the time to live from the command line
 	const char	*ttlstr=pvt->_cmdl->getValue("-ttl");
 	pvt->_ttl=(!charstring::isNullOrEmpty(ttlstr))?
-				charstring::toInteger(ttlstr):-1;
+				charstring::convertToInteger(ttlstr):-1;
 
 	// should we run quietly?
-	pvt->_silent=pvt->_cmdl->found("-silent");
+	pvt->_silent=pvt->_cmdl->isFound("-silent");
 
 	// load the configuration
 	pvt->_sqlrcfgs=new sqlrconfigs(pvt->_pth);
@@ -587,7 +587,6 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		return false;
 	}
 
-	buildColumnMaps();
 	setUserAndGroup();
 
 	// update various configurable parameters
@@ -618,6 +617,8 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	if (!pvt->_conn) {
 		return false;
 	}
+
+	buildColumnMaps();
 
 	// get loggers
 	domnode	*loggers=pvt->_cfg->getLoggers();
@@ -670,13 +671,13 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	// then force the ttl to zero
 	if (pvt->_ttl>0 &&
 			!pvt->_semset->supportsTimedSemaphoreOperations() &&
-			!sys::signalsInterruptSystemCalls()) {
+			!sys::getSignalsInterruptSystemCalls()) {
 		pvt->_ttl=0;
 	}
 
 	// log in and detach
 	if (pvt->_conn->mustDetachBeforeLogIn() &&
-			!pvt->_cmdl->found("-nodetach")) {
+			!pvt->_cmdl->isFound("-nodetach")) {
 		process::detach();
 	}
 	bool	reloginatstart=pvt->_cfg->getReLoginAtStart();
@@ -686,7 +687,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 		}
 	}
 	if (!pvt->_conn->mustDetachBeforeLogIn() &&
-			!pvt->_cmdl->found("-nodetach")) {
+			!pvt->_cmdl->isFound("-nodetach")) {
 		process::detach();
 	}
 	if (reloginatstart) {
@@ -842,7 +843,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 				pvt->_pth->getPidDir(),
 				pvt->_cmdl->getId(),
 				(long)pid);
-	process::createPidFile(pvt->_pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pvt->_pidfile,permissions::getOwnerReadWrite());
 
 	// increment connection counter
 	if (pvt->_cfg->getDynamicScaling()) {
@@ -874,7 +875,7 @@ bool sqlrservercontroller::init(int argc, const char **argv) {
 	#ifdef SIGALRM
 	if (pvt->_ttl>0 &&
 			!pvt->_semset->supportsTimedSemaphoreOperations() &&
-			sys::signalsInterruptSystemCalls()) {
+			sys::getSignalsInterruptSystemCalls()) {
 		alarmhandler.setHandler(alarmHandler);
 		alarmhandler.handleSignal(SIGALRM);
 	}
@@ -1046,9 +1047,9 @@ bool sqlrservercontroller::attemptLogIn(bool printerrors) {
 
 	// get stats
 	datetime	dt;
-	dt.getSystemDateAndTime();
-	pvt->_loggedinsec=dt.getSeconds();
-	pvt->_loggedinusec=dt.getMicroseconds();
+	dt.initFromSystemDateTime();
+	pvt->_loggedinsec=dt.getSecond();
+	pvt->_loggedinusec=dt.getMicrosecond();
 
 	raiseDebugMessageEvent("done logging in");
 	return true;
@@ -1120,7 +1121,7 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 	// Determine when to re-login next.
 	if (pvt->_constr->getBehindLoadBalancer()) {
 		datetime	dt;
-		if (dt.getSystemDateAndTime()) {
+		if (dt.initFromSystemDateTime()) {
 			if (!pvt->_reloginseed) {
 				// Ideally we'd use randomnumber:getSeed for
 				// this, but on some platforms that's generated
@@ -1129,9 +1130,9 @@ bool sqlrservercontroller::logIn(bool printerrors) {
 				// id is guaranteed unique.
 				pvt->_reloginseed=process::getProcessId();
 			}
-			pvt->_reloginseed=randomnumber::generateNumber(
+			pvt->_reloginseed=randomnumber::generate(
 							pvt->_reloginseed);
-			int32_t	seconds=randomnumber::scaleNumber(
+			int32_t	seconds=randomnumber::scale(
 							pvt->_reloginseed,
 							600,900);
 			pvt->_relogintime=dt.getEpoch()+seconds;
@@ -1283,7 +1284,7 @@ void sqlrservercontroller::markDatabaseAvailable() {
 	// the database is up if the file is there, 
 	// opening and closing it will create it
 	file	fd;
-	fd.create(pvt->_updown,permissions::ownerReadWrite());
+	fd.create(pvt->_updown,permissions::getOwnerReadWrite());
 }
 
 void sqlrservercontroller::markDatabaseUnavailable() {
@@ -1423,7 +1424,7 @@ bool sqlrservercontroller::listen() {
 
 	int32_t		softttl=pvt->_cfg->getSoftTtl();
 	datetime	startdt;
-	startdt.getSystemDateAndTime();
+	startdt.initFromSystemDateTime();
 
 	bool		clientconnectfailed=false;
 
@@ -1528,7 +1529,7 @@ bool sqlrservercontroller::listen() {
 				// if we've been alive for too long...
 				if (softttl>0) {
 					datetime	currentdt;
-					currentdt.getSystemDateAndTime();
+					currentdt.initFromSystemDateTime();
 					if (currentdt.getEpoch()-
 						startdt.getEpoch()>=softttl) {
 						return true;
@@ -1652,7 +1653,7 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	time_t	before=0;
 	if (originalttl>0) {
 		datetime	dt;
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		before=dt.getEpoch();
 	}
 
@@ -1678,21 +1679,21 @@ bool sqlrservercontroller::announceAvailability(const char *connectionid) {
 	// get the time after announcing and update the ttl
 	if (originalttl>0) {
 		datetime	dt;
-		dt.getSystemDateAndTime();
+		dt.initFromSystemDateTime();
 		pvt->_ttl=pvt->_ttl-(dt.getEpoch()-before);
 	}
 
-	// This will fall through if the ttl was reached while waiting.
-	// Since we acquired the announce mutex earlier though, we need to
-	// release it in either case.
+	// this will fall through if the ttl was reached while waiting
 	bool	success=false;
 	if (originalttl<=0 || pvt->_ttl) {
 		success=waitForListenerToFinishReading();
 	}
 
+	// release the announce mutex earlier
 	releaseAnnounceMutex();
 
 	if (success) {
+
 		// reset ttl
 		pvt->_ttl=originalttl;
 
@@ -1756,9 +1757,9 @@ bool sqlrservercontroller::registerForHandoff() {
 
 		raiseDebugMessageEvent("trying...");
 
-		if (pvt->_handoffsockun.connect(handoffsockname,
-							-1,-1,1,0)==
-							RESULT_SUCCESS) {
+		pvt->_handoffsockun.setFileName(handoffsockname);
+		pvt->_handoffsockun.setRetryWait(1);
+		if (pvt->_handoffsockun.connect()==RESULT_SUCCESS) {
 			if (pvt->_handoffsockun.write(
 				(uint32_t)process::getProcessId())==
 							sizeof(uint32_t)) {
@@ -1796,7 +1797,8 @@ void sqlrservercontroller::deRegisterForHandoff() {
 
 	// attach to the socket and write the process id
 	unixsocketclient	removehandoffsockun;
-	removehandoffsockun.connect(removehandoffsockname,-1,-1,0,1);
+	removehandoffsockun.setFileName(removehandoffsockname);
+	removehandoffsockun.connect();
 	removehandoffsockun.write((uint32_t)process::getProcessId());
 	removehandoffsockun.flushWriteBuffer(-1,-1);
 
@@ -1910,7 +1912,7 @@ int32_t sqlrservercontroller::waitForClient() {
 
 			// acknowledge
 			#define ACK	6
-			pvt->_handoffsockun.write((unsigned char)ACK);
+			pvt->_handoffsockun.write((byte_t)ACK);
 			pvt->_handoffsockun.flushWriteBuffer(-1,-1);
 
 			descriptor=pvt->_handoffsockun.getFileDescriptor();
@@ -1933,7 +1935,7 @@ int32_t sqlrservercontroller::waitForClient() {
 		// possibly other systems, it ends up in non-blocking mode
 		// in this process, independent of its mode in the other
 		// process.  So, we force it to blocking mode here.
-		pvt->_clientsock->useBlockingMode();
+		pvt->_clientsock->setNonBlockingMode(false);
 
 		raiseDebugMessageEvent("done waiting for client");
 
@@ -1941,11 +1943,46 @@ int32_t sqlrservercontroller::waitForClient() {
 
 		// If we're in the middle of a suspended session, wait for
 		// a client to reconnect...
+		uint32_t	totalseconds=0;
+		int32_t		sec=(pvt->_accepttimeout)?1:0;
+		for (;;) {
 
-		if (pvt->_lsnr.listen(pvt->_accepttimeout,0)<1) {
-			raiseInternalErrorEvent(NULL,
+			// If accepttimeout is anthing but 0, then wait 1
+			// second for the client to connect.  If accepttimeout
+			// is 0 then fall through immediately unless the client
+			// is already connected.
+			int32_t	result=pvt->_lsnr.listen(sec,0);
+
+			// bail on error
+			if (result==RESULT_ERROR) {
+				raiseInternalErrorEvent(NULL,
 					"wait for client connect failed");
-			return 0;
+				return 0;
+			}
+
+			// if we didn't get a timeout, then break out of this
+			// loop and handle the client connection
+			if (result!=RESULT_TIMEOUT) {
+				break;
+			}
+
+			// bail if the shutdown flag got set
+			if (process::getShutDownFlag()) {
+				return 0;
+			}
+
+			// increment the number of seconds we've been waiting
+			// (if accepttimeout is 0 then technically we've waited
+			// 0 seconds, but close enough)
+			totalseconds++;
+
+			// bail if we've been waiting more seconds than the
+			// accepttimeout or if we made it here and the accept
+			if (totalseconds>=pvt->_accepttimeout) {
+				raiseInternalErrorEvent(NULL,
+					"wait for client connect failed");
+				return 0;
+			}
 		}
 
 		// get the first socket that had data available...
@@ -2205,7 +2242,7 @@ bool sqlrservercontroller::auth(sqlrcredentials *cred) {
 	if (autheduser) {
 
 		raiseDebugMessageEvent("auth success");
-		setCurrentUser(autheduser,charstring::length(autheduser));
+		setCurrentUser(autheduser,charstring::getLength(autheduser));
 
 		// consult connection schedules
 		if (pvt->_sqlrs &&
@@ -2482,6 +2519,16 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	}
 
 	// clear column caches
+	clearColumnCaches();
+
+	// clear per-session pool
+	pvt->_txpool.clear();
+
+	// set in-tx flag
+	pvt->_intransaction=!pvt->_autocommitforthissession;
+}
+
+void sqlrservercontroller::clearColumnCaches() {
 	for (listnode<char *> *colcachenode=
 			pvt->_colcache.getKeys()->getFirst();
 			colcachenode; colcachenode=colcachenode->getNext()) {
@@ -2490,12 +2537,6 @@ void sqlrservercontroller::endTransaction(bool commit) {
 	pvt->_colcache.clear();
 	pvt->_autoinccolcache.clear();
 	pvt->_primarykeycolcache.clear();
-
-	// clear per-session pool
-	pvt->_txpool.clear();
-
-	// set in-tx flag
-	pvt->_intransaction=!pvt->_autocommitforthissession;
 }
 
 bool sqlrservercontroller::rollback() {
@@ -2752,18 +2793,19 @@ void sqlrservercontroller::errorMessage(const char **errorbuffer,
 
 	if (pvt->_sqlret) {
 		int64_t		tec=*errorcode;
-		const char	*teb=*errorbuffer;
-		uint32_t	tel=*errorlength;
+		stringbuffer	translatederror;
 		if (pvt->_sqlret->run(pvt->_conn,NULL,
 						*errorcode,
 						*errorbuffer,
 						*errorlength,
 						&tec,
-						&teb,
-						&tel)) {
+						&translatederror)) {
 			*errorcode=tec;
-			*errorbuffer=teb;
-			*errorlength=tel;
+			charstring::safeCopy(pvt->_conn->getErrorBuffer(),
+					pvt->_conn->getErrorBufferSize(),
+					translatederror.getString(),
+					translatederror.getStringLength());
+			*errorlength=translatederror.getStringLength();
 		}
 		// FIXME: report error if this fails?
 	}
@@ -2796,7 +2838,7 @@ void sqlrservercontroller::setError(const char *err,
 					bool liveconn) {
 
 	char		*errorbuffer=pvt->_conn->getErrorBuffer();
-	uint32_t	errorlength=charstring::length(err);
+	uint32_t	errorlength=charstring::getLength(err);
 	if (errorlength>pvt->_maxerrorlength) {
 		errorlength=pvt->_maxerrorlength;
 	}
@@ -2811,6 +2853,10 @@ void sqlrservercontroller::setError(const char *err,
 
 char *sqlrservercontroller::getErrorBuffer() {
 	return pvt->_conn->getErrorBuffer();
+}
+
+uint32_t sqlrservercontroller::getErrorBufferSize() {
+	return pvt->_conn->getErrorBufferSize();
 }
 
 uint32_t sqlrservercontroller::getErrorLength() {
@@ -2839,39 +2885,19 @@ void sqlrservercontroller::setLiveConnection(bool liveconnection) {
 
 bool sqlrservercontroller::checkInterceptQuery(sqlrservercursor *cursor) {
 
-	// find the start of the actual query
-	const char	*ptr=skipWhitespaceAndComments(
-					cursor->getQueryBuffer());
-
 	// for now, we only intercept transaction queries
-	if (isBeginTransactionQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_BEGIN);
-		return true;
-	} else if (isCommitQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_COMMIT);
-		return true;
-	} else if (isRollbackQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_ROLLBACK);
-		return true;
-	} else if (isAutoCommitOnQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_ON);
-		return true;
-	} else if (isAutoCommitOffQuery(ptr)) {
-		cursor->setQueryType(SQLRQUERYTYPE_AUTOCOMMIT_OFF);
-		return true;
-	} else {
-		bool	on=false;
-		if (isSetIncludingAutoCommitQuery(ptr,&on)) {
-			// For these, set the query type, but don't actually
-			// return true.  That way they won't actually be
-			// intercepted by interceptQuery().  Instead they'll be
-			// handled as special cases by executeQuery().
-			cursor->setQueryType((on)?
-				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON:
-				SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF);
-		}
+	switch (cursor->getQueryType()) {
+		case SQLRQUERYTYPE_BEGIN:
+		case SQLRQUERYTYPE_COMMIT:
+		case SQLRQUERYTYPE_ROLLBACK:
+		case SQLRQUERYTYPE_AUTOCOMMIT_ON:
+		case SQLRQUERYTYPE_AUTOCOMMIT_OFF:
+		case SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON:
+		case SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF:
+			return true;
+		default:
+			return false;
 	}
-	return false;
 }
 
 bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
@@ -2951,6 +2977,9 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			// FIXME: fake tx block issues here???
+			// FIXME: should we also handle
+			// SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_ON
+			// somehow
 			retval=autoCommitOn();
 			break;
 		case SQLRQUERYTYPE_AUTOCOMMIT_OFF:
@@ -2960,341 +2989,15 @@ bool sqlrservercontroller::interceptQuery(sqlrservercursor *cursor) {
 			cursor->setInputOutputBindCount(0);
 			pvt->_sendcolumninfo=DONT_SEND_COLUMN_INFO;
 			// FIXME: fake tx block issues here???
+			// FIXME: should we also handle
+			// SQLRQUERYTYPE_SET_INCLUDING_AUTOCOMMIT_OFF
+			// somehow
 			retval=autoCommitOff();
 			break;
 		default:
 			break;
 	}
 	return retval;
-}
-
-bool sqlrservercontroller::isAutoCommitOnQuery(const char *query) {
-	return isAutoCommitQuery(query,true);
-}
-
-bool sqlrservercontroller::isAutoCommitOffQuery(const char *query) {
-	return isAutoCommitQuery(query,false);
-}
-
-bool sqlrservercontroller::isAutoCommitQuery(const char *query, bool on) {
-
-	// look for "autocommit"
-	if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
-
-		query+=10;
-
-	}  else {
-
-		// look for "set"
-		if (!charstring::compareIgnoringCase(query,"set",3)) {
-			query+=3;
-		} else {
-			return false;
-		}
-
-		// skip whitespace
-		query=skipWhitespaceAndComments(query);
-
-		// look for "autocommit"/"auto"/"implicit_transactions"
-		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
-			query+=10;
-		} else if (!charstring::compareIgnoringCase(query,"auto",4)) {
-			query+=4;
-		} else if (!charstring::compareIgnoringCase(
-					query,"implicit_transactions",21)) {
-			query+=21;
-		} else {
-			return false;
-		}
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// look for "="/"to"
-	if (*query=='=') {
-		query++;
-	} else if (!charstring::compareIgnoringCase(query,"to",2)) {
-		query+=2;
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	if (on) {
-		// look for 1/on/yes/immediate
-		if (*query=='1') {
-			query++;
-		} else if (!charstring::compareIgnoringCase(query,"on",2)) {
-			query+=2;
-		} else if (!charstring::compareIgnoringCase(query,"yes",3)) {
-			query+=3;
-		} else if (!charstring::compareIgnoringCase(
-							query,"immediate",9)) {
-			query+=9;
-		} else {
-			return false;
-		}
-	} else {
-		// look for 0/off/no
-		if (*query=='0') {
-			query++;
-		} else if (!charstring::compareIgnoringCase(query,"off",3)) {
-			query+=3;
-		} else if (!charstring::compareIgnoringCase(query,"no",2)) {
-			query+=2;
-		} else {
-			return false;
-		}
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// look for end of query
-	if (*query) {
-		return false;
-	}
-
-	return true;
-}
-
-bool sqlrservercontroller::isSetIncludingAutoCommitQuery(
-						const char *query, bool *on) {
-
-	*on=false;
-
-	// look for "set"
-	if (!charstring::compareIgnoringCase(query,"set",3)) {
-		query+=3;
-	} else {
-		return false;
-	}
-
-	for (;;) {
-
-		// skip whitespace
-		query=skipWhitespaceAndComments(query);
-
-		// look for "autocommit"
-		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
-			query+=10;
-			break;
-		}
-
-		// look for a comma or end of query
-		while (*query && *query!=',') {
-			query++;
-		}
-		if (!*query) {
-			return false;
-		}
-
-		// skip comma
-		query++;
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// look for "="/"to"
-	if (*query=='=') {
-		query++;
-	} else {
-		return false;
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// look for 1/0
-	if (*query=='1') {
-		*on=true;
-		query++;
-	} else if (*query=='0') {
-		*on=false;
-		query++;
-	} else {
-		return false;
-	}
-
-	// skip whitespace
-	query=skipWhitespaceAndComments(query);
-
-	// success if we hit a comma, or are at the end of the query
-	return (*query!=',' || *query);
-}
-
-bool sqlrservercontroller::isBeginTransactionQuery(sqlrservercursor *cursor) {
-	return isBeginTransactionQuery(skipWhitespaceAndComments(
-						cursor->getQueryBuffer()));
-}
-
-bool sqlrservercontroller::isBeginTransactionQuery(const char *query) {
-
-	// See if it was any of the different queries used to start a
-	// transaction.  IMPORTANT: don't just look for the first 5 characters
-	// to be "begin", make sure it's the entire query.  Many db's use
-	// "begin" to start a stored procedure block, but in those cases,
-	// something will follow it.
-	if (!charstring::compareIgnoringCase(query,"begin",5)) {
-
-		// make sure there are only spaces, comments or one of the words
-		// "work" or "transaction" after the begin
-		const char	*spaceptr=skipWhitespaceAndComments(query+5);
-
-		if (*spaceptr=='\0') {
-			return true;
-		} else if ((!charstring::compareIgnoringCase(
-						spaceptr,"work",4) &&
-				blockCanBeIntercepted(spaceptr+4)) ||
-				(!charstring::compareIgnoringCase(
-						spaceptr,"transaction",11) &&
-				blockCanBeIntercepted(spaceptr+11))) {
-			return true;
-		}
-		return false;
-	} else if (!charstring::compareIgnoringCase(query,"start ",6)) {
-		return true;
-	} else if (!charstring::compareIgnoringCase(query,"bt",2) &&
-							*(query+2)=='\0') {
-		return true;
-	}
-	return false;
-}
-
-bool sqlrservercontroller::blockCanBeIntercepted(const char *block) {
-
-	// FIXME:
-	// I'm not really sure which of these implementations to use...
-	//
-	// 1) Any block of queries that contain their own commit/rollback
-	// should be passed through, and not intercepted.
-	//
-	// 2) However, really we ought to skip commit/rollbacks in comments, in
-	// (any kind of) quotes, or that aren't preceeded by and followed by
-	// whitespace (or the beginning/end of the string).  The other
-	// implementation does that, though currently lacks support for double
-	// quoting, back-tick quoting, and [] quoting.
-	//
-	// 3) Arguably though, if it's a block at all, then it shouldn't be
-	// intercepted, as this will prevent the non-begin statements from
-	// being executed.
-	//
-	//
-	// Currently 3 is selected.  This eventually seemed intuitive, but
-	// wasn't originally, before I wrote the others.
-	//
-	//
-	// What really happens in these cases though...
-	//
-	// If we're faking transaction blocks, and we pass a balanced block
-	// like:
-	//
-	// begin transaction
-	// select 1
-	// commit
-	// select 1
-	// begin transaction
-	// select 1
-	// commit
-	//
-	// through, does the db really end up back in autocommit mode like it
-	// started?
-	//
-	// If we're faking transaction blocks, and we pass an unbalanced block
-	// like:
-	//
-	// begin transaction
-	// select 1
-	// commit
-	// select 1
-	// begin transaction
-	// select 1
-	//
-	// through, does the db really end up in non-autocommit mode unlike it
-	// started?
-	//
-	// Should I not intercept, but then set
-	// pvt->_infaketransactionblock=true in the second case?
-	//
-	// Sort this out...
-
-#if 1
-	return !(charstring::containsIgnoringCase(block,"commit") ||
-		charstring::containsIgnoringCase(block,"rollback"));
-
-#elif 0
-	// FIXME: handle other types of quoting - ", `, and []
-
-	bool		inquotes=false;
-	const char	*ptr=block;
-	const char	*prevptr=" ";
-	do {
-
-		if (!inquotes) {
-
-			ptr=skipWhitespaceAndComments(ptr);
-			if (!*ptr) {
-				return true;
-			}
-
-			if (ptr!=block) {
-				prevptr=ptr-1;
-			}
-
-			if (
-				// if the previous character is whitespace
-				// (note that it was initialized to whitespace
-				// so this also works if we're at the beginning
-				// of the block) and...
-				character::isWhitespace(*prevptr) &&
-
-				// we find a commit, followed by the
-				// end of the block, or whitespace or...
-				((!charstring::compareIgnoringCase(
-							ptr,"commit",6) &&
-				(!*(ptr+6) ||
-					character::isWhitespace(*(ptr+6)))) ||
-
-				// we find a rollback, followed by the
-				// end of the block, or whitespace
-				(!charstring::compareIgnoringCase(
-							ptr,"rollback",8) &&
-				(!*(ptr+8) ||
-					character::isWhitespace(*(ptr+8)))))) {
-
-				// then we have a qualifying commit or
-				// rollback in the block
-				return false;
-			}
-		}
-		
-		// if we found a quote, flip our in-quotes flag
-		if (*ptr=='\'') {
-			inquotes=!inquotes;
-		}
-		ptr++;
-
-	} while (*ptr);
-
-	// if we got here, then we hit the end of the block without finding
-	// a qualifying commit or rollback
-	return true;
-#elif 0
-	return (*skipWhitespaceAndComments(block))=='\0';
-#endif
-}
-
-bool sqlrservercontroller::isCommitQuery(const char *query) {
-
-	return (!charstring::compareIgnoringCase(query,"commit",6) ||
-		(!charstring::compareIgnoringCase(query,"et",2) &&
-						*(query+2)=='\0'));
-}
-
-bool sqlrservercontroller::isRollbackQuery(const char *query) {
-	return !charstring::compareIgnoringCase(query,"rollback",8);
 }
 
 bool sqlrservercontroller::skipComment(const char **ptr,
@@ -3403,7 +3106,7 @@ static const char *asciitohex[]={
 	"F8","F9","FA","FB","FC","FD","FE","FF"
 };
 
-const char *sqlrservercontroller::asciiToHex(unsigned char ch) {
+const char *sqlrservercontroller::asciiToHex(byte_t ch) {
 	return asciitohex[ch];
 }
 
@@ -3442,7 +3145,7 @@ static const char *asciitooctal[]={
 	"370","371","372","373","374","375","376","377"
 };
 
-const char *sqlrservercontroller::asciiToOctal(unsigned char ch) {
+const char *sqlrservercontroller::asciiToOctal(byte_t ch) {
 	return asciitooctal[ch];
 }
 
@@ -3625,7 +3328,7 @@ bool sqlrservercontroller::parseInsert(const char *query,
 		if (*ptr=='(') {
 			ptr++;
 			const char	*colsend=
-					charstring::findFirst(ptr,')')+2;
+					charstring::findFirst(ptr,')');
 			getColumnsFromInsertQuery(ptr,colsend,localcolumns);
 			ptr=colsend;
 		}
@@ -3674,7 +3377,7 @@ bool sqlrservercontroller::parseInsert(const char *query,
 			// if the query didn't contain a list of columns,
 			// then derive the columns from the number of values
 			// and the columns from allcolumns...
-			if (!localcolumns->getLength()) {
+			if (!localcolumns->getCount()) {
 				deriveColumnsFromInsertQuery(
 							localvalues,
 							localallcolumns,
@@ -3683,8 +3386,8 @@ bool sqlrservercontroller::parseInsert(const char *query,
 
 			// determine if the list of columns contains the
 			// autoincrement or primary key columns
-			bool	localcolsincludeautoinccol=true;
-			bool	localcolsincludeprimarykeycol=true;
+			bool	localcolsincludeautoinccol=false;
+			bool	localcolsincludeprimarykeycol=false;
 			for (listnode<char *> *node=localcolumns->getFirst();
 						node; node=node->getNext()) {
 				const char	*col=node->getValue();
@@ -3793,7 +3496,7 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 					getConfig()->getMaxQuerySize()+1,
 					q,table);
 			setQueryLength(gclcur,
-					charstring::length(querybuffer));
+					charstring::getLength(querybuffer));
 			retval=prepareQuery(gclcur,
 					getQueryBuffer(gclcur),
 					getQueryLength(gclcur),
@@ -3835,6 +3538,8 @@ void sqlrservercontroller::getColumnsInTable(const char *table,
 				// FIXME: kludgy
 				nextRow(gclcur);
 			}
+
+			setColumnListColumnMap(SQLRSERVERLISTFORMAT_NULL);
 		}
 	}
 	closeResultSet(gclcur);
@@ -3923,7 +3628,7 @@ void sqlrservercontroller::deriveColumnsFromInsertQuery(
 	// with the corresponding column from allcolumns
 	listnode<char *>	*vnode=values->getFirst();
 	listnode<char *>	*acnode=allcolumns->getFirst();
-	while (vnode){
+	while (vnode && acnode) {
 		columns->append(charstring::duplicate(acnode->getValue()));
 		vnode=vnode->getNext();
 		acnode=acnode->getNext();
@@ -4300,7 +4005,7 @@ void sqlrservercontroller::translateBindVariables(sqlrservercursor *cursor) {
 bool sqlrservercontroller::matchesNativeBindFormat(const char *bind) {
 
 	const char	*bindformat=pvt->_conn->bindFormat();
-	size_t		bindformatlen=charstring::length(bindformat);
+	size_t		bindformatlen=charstring::getLength(bindformat);
 
 	// the bind variable name matches the format if...
 	// * the first character of the bind variable name matches the 
@@ -4332,7 +4037,7 @@ void sqlrservercontroller::translateBindVariableInStringAndMap(
 
 	// replace the bind variable delimiter with whatever we would expect to
 	// find for this database
-	currentbind->setPosition(0);
+	currentbind->setPositionRelativeToBeginning(0);
 	currentbind->write(bindformat[0]);
 
 	// append the first character of the bind format to the new query
@@ -4400,7 +4105,7 @@ void sqlrservercontroller::mapBindVariable(sqlrservercursor *cursor,
 
 	// create the new bind var name and get its length
 	char		*tempnumber=charstring::parseNumber(bindindex);
-	uint16_t	tempnumberlen=charstring::length(tempnumber);
+	uint16_t	tempnumberlen=charstring::getLength(tempnumber);
 
 	char	*oldvariable=(char *)cursor->getBindMappingsPool()->
 						allocate(bindvariablelen+1);
@@ -4498,7 +4203,7 @@ void sqlrservercontroller::translateBindVariablesFromMappings(
 			char	*newvariable;
 			if (mappings->getValue(b->variable,&newvariable)) {
 				b->variable=newvariable;
-				b->variablesize=charstring::length(b->variable);
+				b->variablesize=charstring::getLength(b->variable);
 				remapped=true;
 			}
 		}
@@ -4563,7 +4268,7 @@ void sqlrservercontroller::translateBeginTransaction(sqlrservercursor *cursor) {
 
 	// translate query
 	const char	*beginquery=pvt->_conn->beginTransactionQuery();
-	uint32_t	querylength=charstring::length(beginquery);
+	uint32_t	querylength=charstring::getLength(beginquery);
 	charstring::copy(querybuffer,beginquery,querylength);
 	querybuffer[querylength]='\0';
 	cursor->setQueryLength(querylength);
@@ -5017,6 +4722,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 		return true;
 	}
 
+	// determine the query type
+	cursor->setQueryType(cursor->determineQueryType(
+					cursor->getQueryBuffer(),
+					cursor->getQueryLength()));
+
 	// do this here instead of inside translateBindVariables
 	// because translateQuery might use it
 	cursor->getBindMappingsPool()->clear();
@@ -5040,12 +4750,22 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	}
 
 	// translate query
-	if (enabletranslations && pvt->_sqlrt &&
-				!translateQuery(cursor)) {
+	if (enabletranslations && pvt->_sqlrt) {
 
-		// log the query
-		raiseQueryEvent(cursor);
-		return false;
+		if (translateQuery(cursor)) {
+
+			// re-determine the query type
+			cursor->setQueryType(
+				cursor->determineQueryType(
+					cursor->getQueryBuffer(),
+					cursor->getQueryLength()));
+
+		} else {
+
+			// log the query
+			raiseQueryEvent(cursor);
+			return false;
+		}
 	}
 
 	// translate bind variables
@@ -5056,7 +4776,7 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	// translate "begin" queries
 	// FIXME: can we just let interceptQuery below handle this?
 	if (pvt->_conn->supportsTransactionBlocks() &&
-			isBeginTransactionQuery(cursor)) {
+			cursor->getQueryType()==SQLRQUERYTYPE_BEGIN) {
 		translateBeginTransaction(cursor);
 	}
 
@@ -5114,8 +4834,8 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 
 	// set the query start time (in case the prepare fails)
 	datetime	dt;
-	dt.getSystemDateAndTime();
-	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+	dt.initFromSystemDateTime();
+	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	// prepare the query
 	bool	success=cursor->prepareQuery(query,querylen);
@@ -5128,12 +4848,11 @@ bool sqlrservercontroller::prepareQuery(sqlrservercursor *cursor,
 	if (!success) {
 
 		// set the query end time
-		dt.getSystemDateAndTime();
-		cursor->setQueryEnd(dt.getSeconds(),
-					dt.getMicroseconds());
+		dt.initFromSystemDateTime();
+		cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 		// update query and error counts
-		incrementQueryCounts(cursor->queryType(query,querylen));
+		incrementQueryCounts(cursor->getQueryType());
 		incrementTotalErrors();
 
 		// save the error
@@ -5194,6 +4913,12 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// filters, translations, and checks
 	if (!cursor->getQueryHasBeenPreProcessed()) {
 
+		// determine the query type
+		cursor->setQueryType(
+			cursor->determineQueryType(
+					cursor->getQueryBuffer(),
+					cursor->getQueryLength()));
+
 		// do this here instead of inside translateBindVariables
 		// because translateQuery might use it
 		cursor->getBindMappingsPool()->clear();
@@ -5217,12 +4942,22 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		}
 
 		// translate query
-		if (enabletranslations && pvt->_sqlrt &&
-					!translateQuery(cursor)) {
+		if (enabletranslations && pvt->_sqlrt) {
 
-			// log the query
-			raiseQueryEvent(cursor);
-			return false;
+			if (translateQuery(cursor)) {
+
+				// re-determine the query type
+				cursor->setQueryType(
+					cursor->determineQueryType(
+						cursor->getQueryBuffer(),
+						cursor->getQueryLength()));
+
+			} else {
+
+				// log the query
+				raiseQueryEvent(cursor);
+				return false;
+			}
 		}
 
 		// translate bind variables
@@ -5233,7 +4968,7 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		// translate "begin" queries
 		// FIXME: can we just let interceptQuery below handle this?
 		if (pvt->_conn->supportsTransactionBlocks() &&
-				isBeginTransactionQuery(cursor)) {
+				cursor->getQueryType()==SQLRQUERYTYPE_BEGIN) {
 			translateBeginTransaction(cursor);
 		}
 
@@ -5293,8 +5028,8 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	// (which may have been set earlier during prepare,
 	// in case the prepare failed)
 	datetime	dt;
-	dt.getSystemDateAndTime();
-	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+	dt.initFromSystemDateTime();
+	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	// init result
 	bool	success=false;
@@ -5306,9 +5041,8 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		if (cursor->getQueryWasIntercepted()) {
 
 			// set the query end time
-			dt.getSystemDateAndTime();
-			cursor->setQueryEnd(dt.getSeconds(),
-						dt.getMicroseconds());
+			dt.initFromSystemDateTime();
+			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			if (success) {
 				cursor->setQueryStatus(SQLRQUERYSTATUS_SUCCESS);
@@ -5338,8 +5072,8 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		raiseDebugMessageEvent("preparing query...");
 
 		// set the query start time (in case the prepare fails)
-		dt.getSystemDateAndTime();
-		cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+		dt.initFromSystemDateTime();
+		cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 		// prepare the query
 		success=cursor->prepareQuery(query,querylen);
@@ -5352,12 +5086,11 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 		if (!success) {
 
 			// set the query end time
-			dt.getSystemDateAndTime();
-			cursor->setQueryEnd(dt.getSeconds(),
-						dt.getMicroseconds());
+			dt.initFromSystemDateTime();
+			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			// update query and error counts
-			incrementQueryCounts(cursor->queryType(query,querylen));
+			incrementQueryCounts(cursor->getQueryType());
 			incrementTotalErrors();
 
 			// save the error
@@ -5390,18 +5123,17 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	if (!cursor->getBindsWereFaked()) {
 
 		// set the query start time (in case handleBinds fails)
-		dt.getSystemDateAndTime();
-		cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+		dt.initFromSystemDateTime();
+		cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 		if (!handleBinds(cursor)) {
 
 			// set the query end time
-			dt.getSystemDateAndTime();
-			cursor->setQueryEnd(dt.getSeconds(),
-						dt.getMicroseconds());
+			dt.initFromSystemDateTime();
+			cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 			// update query and error counts
-			incrementQueryCounts(cursor->queryType(query,querylen));
+			incrementQueryCounts(cursor->getQueryType());
 			incrementTotalErrors();
 
 			// get the error
@@ -5428,8 +5160,8 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	}
 
 	// (re)set the query start time
-	dt.getSystemDateAndTime();
-	cursor->setQueryStart(dt.getSeconds(),dt.getMicroseconds());
+	dt.initFromSystemDateTime();
+	cursor->setQueryStart(dt.getSecond(),dt.getMicrosecond());
 
 	if (pvt->_debugsql) {
 		stdoutput.printf("\n===================="
@@ -5453,8 +5185,8 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	cursor->setQueryHasBeenExecuted(true);
 
 	// set the query end time
-	dt.getSystemDateAndTime();
-	cursor->setQueryEnd(dt.getSeconds(),dt.getMicroseconds());
+	dt.initFromSystemDateTime();
+	cursor->setQueryEnd(dt.getSecond(),dt.getMicrosecond());
 
 	// special case intercepts...
 	// rather than actually intercepting these, we
@@ -5494,9 +5226,17 @@ bool sqlrservercontroller::executeQuery(sqlrservercursor *cursor,
 	cursor->clearTotalRowsFetched();
 
 	// update query and error counts
-	incrementQueryCounts(cursor->queryType(query,querylen));
+	incrementQueryCounts(cursor->getQueryType());
 	if (!success) {
 		incrementTotalErrors();
+	}
+
+	// If the query was successful, and the column cache isn't empty,
+	// and the query was a drop, then clear the column caches.  Do this
+	// before running after-triggers as they may use the column caches.
+	if (success && pvt->_colcache.getCount() &&
+			cursor->getQueryType()==SQLRQUERYTYPE_DROP) {
+		clearColumnCaches();
 	}
 
 	// handle after-triggers
@@ -6066,50 +5806,46 @@ void sqlrservercontroller::buildColumnMaps() {
 	pvt->_mysqltablescolumnnamemap.setValue(0,"Tables_in_xxx");
 
 	// MySQL getColumnList:
-	//
-// FIXME: fudged...
-// The postgresql connection returns additional columns.
-// Really, all connection modules should return the same as postgresql,
-// but they currently return the same as mysql.
-if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
-	// column_name
-	pvt->_mysqlcolumnscolumnmap.setValue(0,3);
-	// data_type
-	pvt->_mysqlcolumnscolumnmap.setValue(1,5);
-	// character_maximum_length
-	pvt->_mysqlcolumnscolumnmap.setValue(2,6);
-	// numeric_precision
-	pvt->_mysqlcolumnscolumnmap.setValue(3,6);
-	// numeric_scale
-	pvt->_mysqlcolumnscolumnmap.setValue(4,8);
-	// is_nullable
-	pvt->_mysqlcolumnscolumnmap.setValue(5,10);
-	// column_key
-	pvt->_mysqlcolumnscolumnmap.setValue(6,18);
-	// column_default
-	pvt->_mysqlcolumnscolumnmap.setValue(7,12);
-	// extra
-	pvt->_mysqlcolumnscolumnmap.setValue(8,18);
-} else {
-	// column_name
-	pvt->_mysqlcolumnscolumnmap.setValue(0,0);
-	// data_type
-	pvt->_mysqlcolumnscolumnmap.setValue(1,1);
-	// character_maximum_length
-	pvt->_mysqlcolumnscolumnmap.setValue(2,2);
-	// numeric_precision
-	pvt->_mysqlcolumnscolumnmap.setValue(3,3);
-	// numeric_scale
-	pvt->_mysqlcolumnscolumnmap.setValue(4,4);
-	// is_nullable
-	pvt->_mysqlcolumnscolumnmap.setValue(5,5);
-	// column_key
-	pvt->_mysqlcolumnscolumnmap.setValue(6,6);
-	// column_default
-	pvt->_mysqlcolumnscolumnmap.setValue(7,7);
-	// extra
-	pvt->_mysqlcolumnscolumnmap.setValue(8,8);
-}
+	if (pvt->_conn->getColumnListFormat()==
+				SQLRSERVERLISTFORMAT_POSTGRESQL) {
+		// column_name
+		pvt->_mysqlcolumnscolumnmap.setValue(0,3);
+		// data_type
+		pvt->_mysqlcolumnscolumnmap.setValue(1,5);
+		// character_maximum_length
+		pvt->_mysqlcolumnscolumnmap.setValue(2,6);
+		// numeric_precision
+		pvt->_mysqlcolumnscolumnmap.setValue(3,6);
+		// numeric_scale
+		pvt->_mysqlcolumnscolumnmap.setValue(4,8);
+		// is_nullable
+		pvt->_mysqlcolumnscolumnmap.setValue(5,10);
+		// column_key
+		pvt->_mysqlcolumnscolumnmap.setValue(6,18);
+		// column_default
+		pvt->_mysqlcolumnscolumnmap.setValue(7,12);
+		// extra
+		pvt->_mysqlcolumnscolumnmap.setValue(8,18);
+	} else {
+		// column_name
+		pvt->_mysqlcolumnscolumnmap.setValue(0,0);
+		// data_type
+		pvt->_mysqlcolumnscolumnmap.setValue(1,1);
+		// character_maximum_length
+		pvt->_mysqlcolumnscolumnmap.setValue(2,2);
+		// numeric_precision
+		pvt->_mysqlcolumnscolumnmap.setValue(3,3);
+		// numeric_scale
+		pvt->_mysqlcolumnscolumnmap.setValue(4,4);
+		// is_nullable
+		pvt->_mysqlcolumnscolumnmap.setValue(5,5);
+		// column_key
+		pvt->_mysqlcolumnscolumnmap.setValue(6,6);
+		// column_default
+		pvt->_mysqlcolumnscolumnmap.setValue(7,7);
+		// extra
+		pvt->_mysqlcolumnscolumnmap.setValue(8,8);
+	}
 	pvt->_mysqlcolumnscolumnnamemap.setValue(0,"column_name");
 	pvt->_mysqlcolumnscolumnnamemap.setValue(1,"data_type");
 	pvt->_mysqlcolumnscolumnnamemap.setValue(2,"character_maximum_length");
@@ -6158,86 +5894,82 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_odbctablescolumnnamemap.setValue(4,"REMARKS");
 
 	// ODBC getColumnList:
-	//
-// FIXME: fudged...
-// The postgresql connection returns additional columns.
-// Really, all connection modules should return the same as postgresql,
-// but they currently return the same as mysql.
-if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
-	// TABLE_CAT
-	pvt->_odbccolumnscolumnmap.setValue(0,0);
-	// TABLE_SCHEM
-	pvt->_odbccolumnscolumnmap.setValue(1,1);
-	// TABLE_NAME
-	pvt->_odbccolumnscolumnmap.setValue(2,2);
-	// COLUMN_NAME
-	pvt->_odbccolumnscolumnmap.setValue(3,3);
-	// DATA_TYPE (numeric)
-	pvt->_odbccolumnscolumnmap.setValue(4,4);
-	// TYPE_NAME
-	pvt->_odbccolumnscolumnmap.setValue(5,5);
-	// COLUMN_SIZE
-	pvt->_odbccolumnscolumnmap.setValue(6,6);
-	// BUFFER_LENGTH
-	pvt->_odbccolumnscolumnmap.setValue(7,7);
-	// DECIMAL_DIGITS - smallint - scale
-	pvt->_odbccolumnscolumnmap.setValue(8,8);
-	// NUM_PREC_RADIX - smallint - precision
-	pvt->_odbccolumnscolumnmap.setValue(9,9);
-	// NULLABLE
-	pvt->_odbccolumnscolumnmap.setValue(10,10);
-	// REMARKS
-	pvt->_odbccolumnscolumnmap.setValue(11,11);
-	// COLUMN_DEF
-	pvt->_odbccolumnscolumnmap.setValue(12,12);
-	// SQL_DATA_TYPE
-	pvt->_odbccolumnscolumnmap.setValue(13,13);
-	// SQL_DATETIME_SUB
-	pvt->_odbccolumnscolumnmap.setValue(14,14);
-	// CHAR_OCTET_LENGTH
-	pvt->_odbccolumnscolumnmap.setValue(15,15);
-	// ORDINAL_POSITION
-	pvt->_odbccolumnscolumnmap.setValue(16,16);
-	// IS_NULLABLE
-	pvt->_odbccolumnscolumnmap.setValue(17,17);
-} else {
-	// TABLE_CAT -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(0,9);
-	// TABLE_SCHEM -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(1,9);
-	// TABLE_NAME -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(2,9);
-	// COLUMN_NAME -> column_name
-	pvt->_odbccolumnscolumnmap.setValue(3,0);
-	// DATA_TYPE (numeric) -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(4,9);
-	// TYPE_NAME -> data_type
-	pvt->_odbccolumnscolumnmap.setValue(5,1);
-	// COLUMN_SIZE -> character_maximum_length
-	pvt->_odbccolumnscolumnmap.setValue(6,2);
-	// BUFFER_LENGTH -> character_maximum_length
-	pvt->_odbccolumnscolumnmap.setValue(7,2);
-	// DECIMAL_DIGITS - smallint - scale
-	pvt->_odbccolumnscolumnmap.setValue(8,4);
-	// NUM_PREC_RADIX - smallint - precision
-	pvt->_odbccolumnscolumnmap.setValue(9,3);
-	// NULLABLE -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(10,9);
-	// REMARKS -> extra
-	pvt->_odbccolumnscolumnmap.setValue(11,8);
-	// COLUMN_DEF -> column_default
-	pvt->_odbccolumnscolumnmap.setValue(12,7);
-	// SQL_DATA_TYPE -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(13,9);
-	// SQL_DATETIME_SUB -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(14,9);
-	// CHAR_OCTET_LENGTH -> character_maximum_length
-	pvt->_odbccolumnscolumnmap.setValue(15,2);
-	// ORDINAL_POSITION -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(16,9);
-	// IS_NULLABLE -> NULL
-	pvt->_odbccolumnscolumnmap.setValue(17,5);
-}
+	if (pvt->_conn->getColumnListFormat()==
+				SQLRSERVERLISTFORMAT_POSTGRESQL) {
+		// TABLE_CAT
+		pvt->_odbccolumnscolumnmap.setValue(0,0);
+		// TABLE_SCHEM
+		pvt->_odbccolumnscolumnmap.setValue(1,1);
+		// TABLE_NAME
+		pvt->_odbccolumnscolumnmap.setValue(2,2);
+		// COLUMN_NAME
+		pvt->_odbccolumnscolumnmap.setValue(3,3);
+		// DATA_TYPE (numeric)
+		pvt->_odbccolumnscolumnmap.setValue(4,4);
+		// TYPE_NAME
+		pvt->_odbccolumnscolumnmap.setValue(5,5);
+		// COLUMN_SIZE
+		pvt->_odbccolumnscolumnmap.setValue(6,6);
+		// BUFFER_LENGTH
+		pvt->_odbccolumnscolumnmap.setValue(7,7);
+		// DECIMAL_DIGITS - smallint - scale
+		pvt->_odbccolumnscolumnmap.setValue(8,8);
+		// NUM_PREC_RADIX - smallint - precision
+		pvt->_odbccolumnscolumnmap.setValue(9,9);
+		// NULLABLE
+		pvt->_odbccolumnscolumnmap.setValue(10,10);
+		// REMARKS
+		pvt->_odbccolumnscolumnmap.setValue(11,11);
+		// COLUMN_DEF
+		pvt->_odbccolumnscolumnmap.setValue(12,12);
+		// SQL_DATA_TYPE
+		pvt->_odbccolumnscolumnmap.setValue(13,13);
+		// SQL_DATETIME_SUB
+		pvt->_odbccolumnscolumnmap.setValue(14,14);
+		// CHAR_OCTET_LENGTH
+		pvt->_odbccolumnscolumnmap.setValue(15,15);
+		// ORDINAL_POSITION
+		pvt->_odbccolumnscolumnmap.setValue(16,16);
+		// IS_NULLABLE
+		pvt->_odbccolumnscolumnmap.setValue(17,17);
+	} else {
+		// TABLE_CAT -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(0,9);
+		// TABLE_SCHEM -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(1,9);
+		// TABLE_NAME -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(2,9);
+		// COLUMN_NAME -> column_name
+		pvt->_odbccolumnscolumnmap.setValue(3,0);
+		// DATA_TYPE (numeric) -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(4,9);
+		// TYPE_NAME -> data_type
+		pvt->_odbccolumnscolumnmap.setValue(5,1);
+		// COLUMN_SIZE -> character_maximum_length
+		pvt->_odbccolumnscolumnmap.setValue(6,2);
+		// BUFFER_LENGTH -> character_maximum_length
+		pvt->_odbccolumnscolumnmap.setValue(7,2);
+		// DECIMAL_DIGITS - smallint - scale
+		pvt->_odbccolumnscolumnmap.setValue(8,4);
+		// NUM_PREC_RADIX - smallint - precision
+		pvt->_odbccolumnscolumnmap.setValue(9,3);
+		// NULLABLE -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(10,9);
+		// REMARKS -> extra
+		pvt->_odbccolumnscolumnmap.setValue(11,8);
+		// COLUMN_DEF -> column_default
+		pvt->_odbccolumnscolumnmap.setValue(12,7);
+		// SQL_DATA_TYPE -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(13,9);
+		// SQL_DATETIME_SUB -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(14,9);
+		// CHAR_OCTET_LENGTH -> character_maximum_length
+		pvt->_odbccolumnscolumnmap.setValue(15,2);
+		// ORDINAL_POSITION -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(16,9);
+		// IS_NULLABLE -> NULL
+		pvt->_odbccolumnscolumnmap.setValue(17,5);
+	}
 	pvt->_odbccolumnscolumnnamemap.setValue(0,"TABLE_CAT");
 	pvt->_odbccolumnscolumnnamemap.setValue(1,"TABLE_SCHEM");
 	pvt->_odbccolumnscolumnnamemap.setValue(2,"TABLE_NAME");
@@ -6299,110 +6031,106 @@ if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
 	pvt->_jdbctablescolumnnamemap.setValue(9,"REF_GENERATION");
 
 	// JDBC getColumnList:
-	//
-// FIXME: fudged
-// The postgresql connection returns additional columns.
-// Really, all connection modules should return the same as postgresql,
-// but they currently return the same as mysql.
-if (!charstring::compare(pvt->_cfg->getDbase(),"postgresql")) {
-	// TABLE_CAT
-	pvt->_jdbccolumnscolumnmap.setValue(0,0);
-	// TABLE_SCHEM
-	pvt->_jdbccolumnscolumnmap.setValue(1,1);
-	// TABLE_NAME
-	pvt->_jdbccolumnscolumnmap.setValue(2,2);
-	// COLUMN_NAME
-	pvt->_jdbccolumnscolumnmap.setValue(3,3);
-	// DATA_TYPE (numeric)
-	pvt->_jdbccolumnscolumnmap.setValue(4,4);
-	// TYPE_NAME
-	pvt->_jdbccolumnscolumnmap.setValue(5,5);
-	// COLUMN_SIZE
-	pvt->_jdbccolumnscolumnmap.setValue(6,6);
-	// BUFFER_LENGTH
-	pvt->_jdbccolumnscolumnmap.setValue(7,7);
-	// DECIMAL_DIGITS - smallint - scale
-	pvt->_jdbccolumnscolumnmap.setValue(8,8);
-	// NUM_PREC_RADIX - smallint - precision
-	pvt->_jdbccolumnscolumnmap.setValue(9,9);
-	// NULLABLE
-	pvt->_jdbccolumnscolumnmap.setValue(10,10);
-	// REMARKS
-	pvt->_jdbccolumnscolumnmap.setValue(11,11);
-	// COLUMN_DEF
-	pvt->_jdbccolumnscolumnmap.setValue(12,12);
-	// SQL_DATA_TYPE
-	pvt->_jdbccolumnscolumnmap.setValue(13,13);
-	// SQL_DATETIME_SUB
-	pvt->_jdbccolumnscolumnmap.setValue(14,14);
-	// CHAR_OCTET_LENGTH
-	pvt->_jdbccolumnscolumnmap.setValue(15,15);
-	// ORDINAL_POSITION
-	pvt->_jdbccolumnscolumnmap.setValue(16,16);
-	// IS_NULLABLE
-	pvt->_jdbccolumnscolumnmap.setValue(17,17);
-	// SCOPE_CATALOG -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(18,18);
-	// SCOPE_SCHEMA -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(19,18);
-	// SCOPE_TABLE -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(20,18);
-	// SOURCE_DATA_TYPE -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(21,18);
-	// IS_AUTOINCREMENT -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(22,18);
-	// IS_GENERATEDCOLUMN -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(23,18);
-} else {
-	// TABLE_CAT -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(0,9);
-	// TABLE_SCHEM -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(1,9);
-	// TABLE_NAME -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(2,9);
-	// COLUMN_NAME -> column_name
-	pvt->_jdbccolumnscolumnmap.setValue(3,0);
-	// DATA_TYPE (numeric) -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(4,9);
-	// TYPE_NAME -> data_type
-	pvt->_jdbccolumnscolumnmap.setValue(5,1);
-	// COLUMN_SIZE -> character_maximum_length
-	pvt->_jdbccolumnscolumnmap.setValue(6,2);
-	// BUFFER_LENGTH -> character_maximum_length
-	pvt->_jdbccolumnscolumnmap.setValue(7,2);
-	// DECIMAL_DIGITS - smallint - scale
-	pvt->_jdbccolumnscolumnmap.setValue(8,4);
-	// NUM_PREC_RADIX - smallint - precision
-	pvt->_jdbccolumnscolumnmap.setValue(9,3);
-	// NULLABLE -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(10,9);
-	// REMARKS -> extra
-	pvt->_jdbccolumnscolumnmap.setValue(11,8);
-	// COLUMN_DEF -> column_default
-	pvt->_jdbccolumnscolumnmap.setValue(12,7);
-	// SQL_DATA_TYPE -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(13,9);
-	// SQL_DATETIME_SUB -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(14,9);
-	// CHAR_OCTET_LENGTH -> character_maximum_length
-	pvt->_jdbccolumnscolumnmap.setValue(15,2);
-	// ORDINAL_POSITION -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(16,9);
-	// IS_NULLABLE -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(17,5);
-	// SCOPE_CATALOG -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(18,9);
-	// SCOPE_SCHEMA -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(19,9);
-	// SCOPE_TABLE -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(20,9);
-	// SOURCE_DATA_TYPE -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(21,9);
-	// IS_AUTOINCREMENT -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(22,9);
-	// IS_GENERATEDCOLUMN -> NULL
-	pvt->_jdbccolumnscolumnmap.setValue(23,9);
-}
+	if (pvt->_conn->getColumnListFormat()==
+				SQLRSERVERLISTFORMAT_POSTGRESQL) {
+		// TABLE_CAT
+		pvt->_jdbccolumnscolumnmap.setValue(0,0);
+		// TABLE_SCHEM
+		pvt->_jdbccolumnscolumnmap.setValue(1,1);
+		// TABLE_NAME
+		pvt->_jdbccolumnscolumnmap.setValue(2,2);
+		// COLUMN_NAME
+		pvt->_jdbccolumnscolumnmap.setValue(3,3);
+		// DATA_TYPE (numeric)
+		pvt->_jdbccolumnscolumnmap.setValue(4,4);
+		// TYPE_NAME
+		pvt->_jdbccolumnscolumnmap.setValue(5,5);
+		// COLUMN_SIZE
+		pvt->_jdbccolumnscolumnmap.setValue(6,6);
+		// BUFFER_LENGTH
+		pvt->_jdbccolumnscolumnmap.setValue(7,7);
+		// DECIMAL_DIGITS - smallint - scale
+		pvt->_jdbccolumnscolumnmap.setValue(8,8);
+		// NUM_PREC_RADIX - smallint - precision
+		pvt->_jdbccolumnscolumnmap.setValue(9,9);
+		// NULLABLE
+		pvt->_jdbccolumnscolumnmap.setValue(10,10);
+		// REMARKS
+		pvt->_jdbccolumnscolumnmap.setValue(11,11);
+		// COLUMN_DEF
+		pvt->_jdbccolumnscolumnmap.setValue(12,12);
+		// SQL_DATA_TYPE
+		pvt->_jdbccolumnscolumnmap.setValue(13,13);
+		// SQL_DATETIME_SUB
+		pvt->_jdbccolumnscolumnmap.setValue(14,14);
+		// CHAR_OCTET_LENGTH
+		pvt->_jdbccolumnscolumnmap.setValue(15,15);
+		// ORDINAL_POSITION
+		pvt->_jdbccolumnscolumnmap.setValue(16,16);
+		// IS_NULLABLE
+		pvt->_jdbccolumnscolumnmap.setValue(17,17);
+		// SCOPE_CATALOG -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(18,18);
+		// SCOPE_SCHEMA -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(19,18);
+		// SCOPE_TABLE -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(20,18);
+		// SOURCE_DATA_TYPE -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(21,18);
+		// IS_AUTOINCREMENT -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(22,18);
+		// IS_GENERATEDCOLUMN -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(23,18);
+	} else {
+		// TABLE_CAT -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(0,9);
+		// TABLE_SCHEM -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(1,9);
+		// TABLE_NAME -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(2,9);
+		// COLUMN_NAME -> column_name
+		pvt->_jdbccolumnscolumnmap.setValue(3,0);
+		// DATA_TYPE (numeric) -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(4,9);
+		// TYPE_NAME -> data_type
+		pvt->_jdbccolumnscolumnmap.setValue(5,1);
+		// COLUMN_SIZE -> character_maximum_length
+		pvt->_jdbccolumnscolumnmap.setValue(6,2);
+		// BUFFER_LENGTH -> character_maximum_length
+		pvt->_jdbccolumnscolumnmap.setValue(7,2);
+		// DECIMAL_DIGITS - smallint - scale
+		pvt->_jdbccolumnscolumnmap.setValue(8,4);
+		// NUM_PREC_RADIX - smallint - precision
+		pvt->_jdbccolumnscolumnmap.setValue(9,3);
+		// NULLABLE -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(10,9);
+		// REMARKS -> extra
+		pvt->_jdbccolumnscolumnmap.setValue(11,8);
+		// COLUMN_DEF -> column_default
+		pvt->_jdbccolumnscolumnmap.setValue(12,7);
+		// SQL_DATA_TYPE -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(13,9);
+		// SQL_DATETIME_SUB -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(14,9);
+		// CHAR_OCTET_LENGTH -> character_maximum_length
+		pvt->_jdbccolumnscolumnmap.setValue(15,2);
+		// ORDINAL_POSITION -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(16,9);
+		// IS_NULLABLE -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(17,5);
+		// SCOPE_CATALOG -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(18,9);
+		// SCOPE_SCHEMA -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(19,9);
+		// SCOPE_TABLE -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(20,9);
+		// SOURCE_DATA_TYPE -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(21,9);
+		// IS_AUTOINCREMENT -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(22,9);
+		// IS_GENERATEDCOLUMN -> NULL
+		pvt->_jdbccolumnscolumnmap.setValue(23,9);
+	}
 	pvt->_jdbccolumnscolumnnamemap.setValue(0,"TABLE_CAT");
 	pvt->_jdbccolumnscolumnnamemap.setValue(1,"TABLE_SCHEM");
 	pvt->_jdbccolumnscolumnnamemap.setValue(2,"TABLE_NAME");
@@ -6434,7 +6162,7 @@ uint32_t sqlrservercontroller::mapColumn(uint32_t col) {
 }
 
 uint32_t sqlrservercontroller::mapColumnCount(uint32_t colcount) {
-	return (pvt->_columnmap)?pvt->_columnmap->getLength():colcount;
+	return (pvt->_columnmap)?pvt->_columnmap->getCount():colcount;
 }
 
 bool sqlrservercontroller::reformatField(sqlrservercursor *cursor,
@@ -6567,7 +6295,7 @@ bool sqlrservercontroller::reformatDateTimes(sqlrservercursor *cursor,
 						year,month,day,
 						hour,minute,second,
 						microsecond,isnegative);
-	pvt->_reformattedfieldlength=charstring::length(pvt->_reformattedfield);
+	pvt->_reformattedfieldlength=charstring::getLength(pvt->_reformattedfield);
 
 	if (pvt->_debugsqlrresultsettranslation) {
 		stdoutput.printf("\nconverted date "
@@ -6806,7 +6534,7 @@ void sqlrservercontroller::endSession() {
 		raiseDebugMessageEvent("relogging in to "
 				"redistribute connections");
 		datetime	dt;
-		if (dt.getSystemDateAndTime()) {
+		if (dt.initFromSystemDateTime()) {
 			if (dt.getEpoch()>=pvt->_relogintime) {
 				reLogIn();
 			}
@@ -6883,7 +6611,7 @@ void sqlrservercontroller::truncateTempTables(sqlrservercursor *cursor) {
 
 		sqlrservercursor	*gttcur=newCursor();
 		if (open(gttcur) &&
-			prepareQuery(gttcur,query,charstring::length(query)) &&
+			prepareQuery(gttcur,query,charstring::getLength(query)) &&
 			executeQuery(gttcur)) {
 
 			bool	error;
@@ -6945,12 +6673,12 @@ void sqlrservercontroller::closeClientConnection(uint32_t bytes) {
 	raiseDebugMessageEvent("waiting for client to close the connection...");
 	uint16_t	dummy;
 	uint32_t	counter=0;
-	pvt->_clientsock->useNonBlockingMode();
+	pvt->_clientsock->setNonBlockingMode(true);
 	while (pvt->_clientsock->read(&dummy,pvt->_idleclienttimeout,0)>0 &&
 								counter<bytes) {
 		counter++;
 	}
-	pvt->_clientsock->useBlockingMode();
+	pvt->_clientsock->setNonBlockingMode(false);
 	
 	raiseDebugMessageEvent("done waiting for client to "
 					"close the connection");
@@ -7141,7 +6869,8 @@ bool sqlrservercontroller::createSharedMemoryAndSemaphores(const char *id) {
 		return false;
 	}
 
-	raiseDebugMessageEvent("done attaching to shared memory and semaphores");
+	raiseDebugMessageEvent("done attaching to "
+				"shared memory and semaphores");
 
 	delete[] idfilename;
 
@@ -7168,7 +6897,7 @@ void sqlrservercontroller::decrementConnectedClientCount() {
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	if (pvt->_shm->connectedclients>
 			pvt->_shm->peak_connectedclients_1min ||
 		dt.getEpoch()/60>
@@ -7197,8 +6926,8 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 	bool	result=false;
 	if (pvt->_ttl>0 && pvt->_semset->supportsTimedSemaphoreOperations()) {
 		result=pvt->_semset->waitWithUndo(0,pvt->_ttl,0);
-	} else if (pvt->_ttl>0 && sys::signalsInterruptSystemCalls()) {
-		pvt->_semset->dontRetryInterruptedOperations();
+	} else if (pvt->_ttl>0 && sys::getSignalsInterruptSystemCalls()) {
+		pvt->_semset->setRetryInterruptedOperations(false);
 		alarmrang=0;
 		signalmanager::alarm(pvt->_ttl);
 		do {
@@ -7208,7 +6937,7 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 					!process::getShutDownFlag() &&
 					!alarmrang);
 		signalmanager::alarm(0);
-		pvt->_semset->retryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(true);
 	} else {
 		result=pvt->_semset->waitWithUndo(0);
 	}
@@ -7216,7 +6945,7 @@ bool sqlrservercontroller::acquireAnnounceMutex() {
 		raiseDebugMessageEvent("done acquiring announce mutex");
 	} else {
 		raiseDebugMessageEvent("ttl reached, aborting "
-				"acquiring announce mutex");
+					"acquiring announce mutex");
 	}
 	return result;
 }
@@ -7245,8 +6974,8 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 	bool	result=false;
 	if (pvt->_ttl>0 && pvt->_semset->supportsTimedSemaphoreOperations()) {
 		result=pvt->_semset->wait(3,pvt->_ttl,0);
-	} else if (pvt->_ttl>0 && sys::signalsInterruptSystemCalls()) {
-		pvt->_semset->dontRetryInterruptedOperations();
+	} else if (pvt->_ttl>0 && sys::getSignalsInterruptSystemCalls()) {
+		pvt->_semset->setRetryInterruptedOperations(false);
 		alarmrang=0;
 		signalmanager::alarm(pvt->_ttl);
 		do {
@@ -7256,14 +6985,15 @@ bool sqlrservercontroller::waitForListenerToFinishReading() {
 					!process::getShutDownFlag() &&
 					!alarmrang);
 		signalmanager::alarm(0);
-		pvt->_semset->retryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(true);
 	} else {
 		result=pvt->_semset->wait(3);
 	}
 	if (result) {
 		raiseDebugMessageEvent("done waiting for listener");
 	} else {
-		raiseDebugMessageEvent("ttl reached, aborting waiting for listener");
+		raiseDebugMessageEvent("ttl reached, "
+					"aborting waiting for listener");
 	}
 
 	// Reset this semaphore to 0.  It can get left incremented if another
@@ -7431,7 +7161,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// * the id could be sensitive information
 	// * the id might not conform to valid file naming conventions
 	md5	m;
-	m.append((const unsigned char *)id,charstring::length(id));
+	m.append((const byte_t *)id,charstring::getLength(id));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
@@ -7441,7 +7171,7 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 						pvt->_pth->getIpcDir(),id);
 	delete[] md5str;
 	if (!file::createFile(pvt->_bulkserveridfilename,
-				permissions::ownerReadWrite())) {
+				permissions::getOwnerReadWrite())) {
 		setError(SQLR_ERROR_BULKLOADBEGIN_IPC_FILE_STRING,
 				SQLR_ERROR_BULKLOADBEGIN_IPC_FILE,true);
 		bulkLoadEnd();
@@ -7456,8 +7186,8 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	}
 
 	// calculate shared memory segment size
-	uint64_t	shmsize=charstring::length(errorfieldtable)+1+
-				charstring::length(errorrowtable)+1+
+	uint64_t	shmsize=charstring::getLength(errorfieldtable)+1+
+				charstring::getLength(errorrowtable)+1+
 				sizeof(uint64_t)+
 				sizeof(bool)+
 				pvt->_maxquerysize+1+
@@ -7469,28 +7199,27 @@ bool sqlrservercontroller::bulkLoadBegin(const char *id,
 	// create shared memory
 	pvt->_bulkservershmem=new sharedmemory;
 	if (!pvt->_bulkservershmem->create(key,shmsize,
-				permissions::evalPermString("rw-r-----"))) {
+				permissions::parsePermString("rw-r-----"))) {
 		setError(SQLR_ERROR_BULKLOADBEGIN_SHM_STRING,
 				SQLR_ERROR_BULKLOADBEGIN_SHM,true);
 		bulkLoadEnd();
 		return false;
 	}
-	pvt->_bulkservershm=
-		(unsigned char *)pvt->_bulkservershmem->getPointer();
+	pvt->_bulkservershm=(byte_t *)pvt->_bulkservershmem->getPointer();
 	bytestring::zero(pvt->_bulkservershm,pvt->_maxquerysize+1);
 
 	// put error tables, maxerrorcount,
 	// and drop error tables flag in shared memory
-	unsigned char	*ptr=pvt->_bulkservershm;
+	byte_t	*ptr=pvt->_bulkservershm;
 
-	uint64_t	len=charstring::length(errorfieldtable);
+	uint64_t	len=charstring::getLength(errorfieldtable);
 	pvt->_bulkerrorfieldtable=(const char *)ptr;
 	bytestring::copy(ptr,errorfieldtable,len);
 	ptr+=len;
 	*ptr='\0';
 	ptr++;
 
-	len=charstring::length(errorrowtable);
+	len=charstring::getLength(errorrowtable);
 	pvt->_bulkerrorrowtable=(const char *)ptr;
 	bytestring::copy(ptr,errorrowtable,len);
 	ptr+=len;
@@ -7551,7 +7280,7 @@ bool sqlrservercontroller::bulkLoadPrepareQuery(const char *query,
 	}
 
 	// put the query length and query in shared memory
-	unsigned char	*qptr=pvt->_bulkservershmquery;
+	byte_t	*qptr=pvt->_bulkservershmquery;
 	*((uint64_t *)qptr)=querylen;
 	qptr+=sizeof(uint64_t);
 	bytestring::copy(qptr,query,querylen);
@@ -7749,7 +7478,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 
 	// get an md5 sum of the id (see bulkLoadBegin for why)
 	md5	m;
-	m.append((const unsigned char *)id,charstring::length(id));
+	m.append((const byte_t *)id,charstring::getLength(id));
 	char	*md5str=charstring::hexEncode(m.getHash(),m.getHashSize());
 	id=md5str;
 
@@ -7778,18 +7507,17 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 				SQLR_ERROR_BULKLOADJOIN_SHM,true);
 		return false;
 	}
-	pvt->_bulkclientshm=
-		(unsigned char *)pvt->_bulkclientshmem->getPointer();
+	pvt->_bulkclientshm=(byte_t *)pvt->_bulkclientshmem->getPointer();
 
 	// get error tables
-	const unsigned char	*ptr=pvt->_bulkclientshm;
+	const byte_t	*ptr=pvt->_bulkclientshm;
 
 	pvt->_bulkerrorfieldtable=(const char *)ptr;
-	ptr+=charstring::length((const char *)ptr);
+	ptr+=charstring::getLength((const char *)ptr);
 	ptr++;
 
 	pvt->_bulkerrorrowtable=(const char *)ptr;
-	ptr+=charstring::length((const char *)ptr);
+	ptr+=charstring::getLength((const char *)ptr);
 	ptr++;
 
 	// get max error count
@@ -7807,7 +7535,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	ptr+=pvt->_maxquerysize+1;
 
 	// get data format definitions
-	pvt->_bulkdataformat=(const unsigned char *)ptr;
+	pvt->_bulkdataformat=(const byte_t *)ptr;
 
 	// clear bulk data lists
 	pvt->_bulkdata.clear();
@@ -7830,7 +7558,7 @@ bool sqlrservercontroller::bulkLoadJoin(const char *id) {
 	return true;
 }
 
-bool sqlrservercontroller::bulkLoadInputBind(const unsigned char *data,
+bool sqlrservercontroller::bulkLoadInputBind(const byte_t *data,
 							uint64_t datalen) {
 
 	if (pvt->_debugbulkload) {
@@ -7851,7 +7579,7 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 	if (pvt->_debugbulkload) {
 		stdoutput.printf("%d: bulk load execute query - %d rows\n",
 						process::getProcessId(),
-						pvt->_bulkdata.getLength());
+						pvt->_bulkdata.getCount());
 	}
 
 	// init the bulk cursor
@@ -7880,7 +7608,7 @@ bool sqlrservercontroller::bulkLoadExecuteQuery() {
 
 		// run through the bulk data, binding and executing each row
 		uint64_t		errorcount=0;
-		listnode<const unsigned char *>
+		listnode<const byte_t *>
 				*datanode=pvt->_bulkdata.getFirst();
 		listnode<uint64_t>
 				*datalennode=pvt->_bulkdatalen.getFirst();
@@ -7935,7 +7663,7 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 	// map columns to binds (if we actually have columns)
 	dictionary<char *, char *>	bindtocol;
 	bool				havecols=false;
-	if (cols.getLength()) {
+	if (cols.getCount()) {
 		havecols=true;
 		listnode<char *> *bind=binds.getFirst();
 		listnode<char *> *col=cols.getFirst();
@@ -7975,7 +7703,8 @@ void sqlrservercontroller::bulkLoadInitBinds() {
 				sqlrserverbindvar	*inbind=
 							&(inbinds[inbindcount]);
 				char		*var=bind->getValue();
-				uint16_t	varsize=charstring::length(var);
+				uint16_t	varsize=
+						charstring::getLength(var);
 				inbind->variable=
 					(char *)bindpool->allocate(varsize+1);
 				charstring::copy(inbind->variable,var);
@@ -8202,7 +7931,7 @@ void sqlrservercontroller::bulkLoadParseInsert(const char *query,
 	}
 }
 
-void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
+void sqlrservercontroller::bulkLoadBindRow(const byte_t *data,
 							uint64_t datalen) {
 
 	if (pvt->_debugbulkload) {
@@ -8210,8 +7939,8 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 	}
 
 	// get the number of data format elements...
-	const unsigned char	*ptr=pvt->_bulkdataformat;
-	uint16_t		formatcount=*((uint16_t *)ptr);
+	const byte_t	*ptr=pvt->_bulkdataformat;
+	uint16_t	formatcount=*((uint16_t *)ptr);
 	ptr+=sizeof(uint16_t);
 
 	// get the input bind count and input binds
@@ -8257,7 +7986,7 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 
 		// get the bind value
 		sqlrserverbindvar	*inbind=&(inbinds[inbindindex]);
-		const unsigned char	*val=data;
+		const byte_t		*val=data;
 		inbind->valuesize=size;
 		data+=size;
 
@@ -8287,7 +8016,7 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 
 			case SQLRSERVERBINDVARTYPE_INTEGER:
 				inbind->value.integerval=
-					charstring::toInteger((char *)val);
+					charstring::convertToInteger((char *)val);
 				inbind->isnull=nonNullBindValue();
 				if (pvt->_debugbulkload) {
 					stdoutput.printf("%d\n",
@@ -8300,7 +8029,7 @@ void sqlrservercontroller::bulkLoadBindRow(const unsigned char *data,
 				temp=charstring::duplicate(
 					(char *)val,inbind->valuesize);
 				inbind->value.doubleval.value=
-					charstring::toFloat(temp);
+					charstring::convertToFloat(temp);
 				inbind->value.doubleval.precision=
 					inbind->valuesize-
 					((inbind->value.
@@ -8542,9 +8271,9 @@ void sqlrservercontroller::setState(enum sqlrconnectionstate_t state) {
 	}
 	pvt->_connstats->state=state;
 	datetime	dt;
-	dt.getSystemDateAndTime();
-	pvt->_connstats->statestartsec=dt.getSeconds();
-	pvt->_connstats->statestartusec=dt.getMicroseconds();
+	dt.initFromSystemDateTime();
+	pvt->_connstats->statestartsec=dt.getSecond();
+	pvt->_connstats->statestartusec=dt.getMicrosecond();
 }
 
 enum sqlrconnectionstate_t sqlrservercontroller::getState() {
@@ -8559,9 +8288,9 @@ void sqlrservercontroller::setClientSessionStartTime() {
 		return;
 	}
 	datetime	dt;
-	dt.getSystemDateAndTime();
-	pvt->_connstats->clientsessionsec=dt.getSeconds();
-	pvt->_connstats->clientsessionusec=dt.getMicroseconds();
+	dt.initFromSystemDateTime();
+	pvt->_connstats->clientsessionsec=dt.getSecond();
+	pvt->_connstats->clientsessionusec=dt.getMicrosecond();
 }
 
 void sqlrservercontroller::setCurrentUser(const char *user,
@@ -8718,7 +8447,7 @@ void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 
 	// re-init stats if necessary
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	time_t	now=dt.getEpoch();
 	int	index=now%STATQPSKEEP;
 	if (pvt->_shm->timestamp[index]!=now) {
@@ -8740,6 +8469,9 @@ void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 			pvt->_shm->qps_select[index]++;
 			break;
 		case SQLRQUERYTYPE_INSERT:
+		case SQLRQUERYTYPE_INSERTSELECT:
+		case SQLRQUERYTYPE_SELECTINTO:
+		case SQLRQUERYTYPE_MULTIINSERT:
 			pvt->_shm->qps_insert[index]++;
 			break;
 		case SQLRQUERYTYPE_UPDATE:
@@ -8760,8 +8492,9 @@ void sqlrservercontroller::incrementQueryCounts(sqlrquerytype_t querytype) {
 		case SQLRQUERYTYPE_CUSTOM:
 			pvt->_shm->qps_custom[index]++;
 			break;
-		case SQLRQUERYTYPE_ETC:
 		default:
+			// catches BEGIN, COMMIT, ROLLBACK, AUTOCOMMIT ON/OFF,
+			// SET INCLUDING AUTOCOMMIT ON/OFF, and ETC
 			pvt->_shm->qps_etc[index]++;
 			break;
 	}
@@ -9029,7 +8762,7 @@ void sqlrservercontroller::sessionEndQueries() {
 void sqlrservercontroller::sessionQuery(const char *query) {
 
 	// create the select database query
-	size_t	querylen=charstring::length(query);
+	size_t	querylen=charstring::getLength(query);
 
 	sqlrservercursor	*cur=newCursor();
 	if (open(cur) &&
@@ -9047,7 +8780,7 @@ const char *sqlrservercontroller::getConnectStringValue(const char *variable) {
 	// then return the decrypted version of the password, otherwise just
 	// return the value as-is.
 	const char	*peid=pvt->_constr->getPasswordEncryption();
-	if (pvt->_sqlrpe && charstring::length(peid) &&
+	if (pvt->_sqlrpe && charstring::getLength(peid) &&
 			!charstring::compare(variable,"password")) {
 
 		// handle password files
@@ -9191,7 +8924,7 @@ bool sqlrservercontroller::getColumnNames(const char *query,
 		return false;
 	}
 
-	size_t		querylen=charstring::length(query);
+	size_t		querylen=charstring::getLength(query);
 
 	sqlrservercursor	*gcncur=newCursor();
 	if (open(gcncur) &&
@@ -9786,6 +9519,25 @@ void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
 	*errorlength=cursor->getErrorLength();
 	*errorcode=cursor->getErrorNumber();
 	*liveconnection=cursor->getLiveConnection();
+
+	if (pvt->_sqlret) {
+		int64_t		tec=*errorcode;
+		stringbuffer	translatederror;
+		if (pvt->_sqlret->run(pvt->_conn,cursor,
+						*errorcode,
+						*errorbuffer,
+						*errorlength,
+						&tec,
+						&translatederror)) {
+			*errorcode=tec;
+			charstring::safeCopy(cursor->getErrorBuffer(),
+					cursor->getErrorBufferSize(),
+					translatederror.getString(),
+					translatederror.getStringLength());
+			*errorlength=translatederror.getStringLength();
+		}
+		// FIXME: report error if this fails?
+	}
 }
 
 void sqlrservercontroller::errorMessage(sqlrservercursor *cursor,
@@ -9903,7 +9655,7 @@ uint16_t sqlrservercontroller::getColumnNameLength(sqlrservercursor *cursor,
 	}
 	if (pvt->_columnnamemap) {
 		// FIXME: use a static map for these
-		return charstring::length(pvt->_columnnamemap->getValue(col));
+		return charstring::getLength(pvt->_columnnamemap->getValue(col));
 	}
 	return cursor->getColumnNameLengthFromBuffer(mapColumn(col));
 }
@@ -10689,11 +10441,15 @@ void sqlrservercontroller::setError(sqlrservercursor *cursor,
 						const char *err,
 						int64_t errn,
 						bool liveconn) {
-	setError(cursor,err,charstring::length(err),errn,liveconn);
+	setError(cursor,err,charstring::getLength(err),errn,liveconn);
 }
 
 char *sqlrservercontroller::getErrorBuffer(sqlrservercursor *cursor) {
 	return cursor->getErrorBuffer();
+}
+
+uint32_t sqlrservercontroller::getErrorBufferSize(sqlrservercursor *cursor) {
+	return cursor->getErrorBufferSize();
 }
 
 uint32_t sqlrservercontroller::getErrorLength(sqlrservercursor *cursor) {
@@ -10761,10 +10517,10 @@ sqlrmoduledata *sqlrservercontroller::getModuleData(const char *id) {
 	return (pvt->_sqlrmd)?pvt->_sqlrmd->getModuleData(id):NULL;
 }
 
-bool sqlrservercontroller::send(unsigned char *data, size_t size) {
+bool sqlrservercontroller::send(byte_t *data, size_t size) {
 	return pvt->_conn->send(data,size);
 }
 
-bool sqlrservercontroller::recv(unsigned char **data, size_t *size) {
+bool sqlrservercontroller::recv(byte_t **data, size_t *size) {
 	return pvt->_conn->recv(data,size);
 }

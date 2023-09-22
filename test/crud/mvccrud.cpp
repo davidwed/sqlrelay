@@ -170,7 +170,7 @@ mvccrud *factory::allocateSqlrCrud(mvcproperties *prop, mvcresult *response) {
 	// create connection, cursor, and crud
 	sqlrconnection	*con=new sqlrconnection(
 				prop->getValue("sqlr.host"),
-				charstring::toInteger(
+				charstring::convertToInteger(
 					prop->getValue("sqlr.port")),
 				prop->getValue("sqlr.socket"),
 				prop->getValue("sqlr.user"),
@@ -208,8 +208,10 @@ bool ajaxtestview::run(bool *handled) {
 	testcontroller	*tc=factory::allocateTestController(getProperties());
 
 	// verify that we were posted json
-	if (!getRequest()->methodAllowed(NULL,"POST") ||
-		!getRequest()->contentTypeAllowed(NULL,"application/json")) {
+	if (!getRequest()->getMethodIsAllowed(
+					NULL,"POST") ||
+		!getRequest()->getContentTypeIsAllowed(
+					NULL,"application/json")) {
 		*handled=false;
 		return true;
 	}
@@ -240,7 +242,7 @@ bool ajaxtestview::run(bool *handled) {
 
 		// ... reformat response as appropriate for the frontend ...
 
-		getResponse()->textHtml();
+		getResponse()->sendTextHtmlHeader();
 		response.writeJson(getResponse());
 	}
 
@@ -379,13 +381,13 @@ bool httpModuleInit(httpserverapi *sapi) {
 
 	// initialize pools
 	testcontrollerpool.setMin(threadsperprocess);
-	testcontrollerpool.initialize();
+	testcontrollerpool.create();
 	ajaxtestviewpool.setMin(threadsperprocess);
-	ajaxtestviewpool.initialize();
+	ajaxtestviewpool.create();
 	defaulttestservicepool.setMin(threadsperprocess);
-	defaulttestservicepool.initialize();
+	defaulttestservicepool.create();
 	sqlrtestdaopool.setMin(threadsperprocess);
-	sqlrtestdaopool.initialize();
+	sqlrtestdaopool.create();
 
 	return true;
 }
@@ -424,7 +426,7 @@ bool httpModuleMain(httpserverapi *sapi) {
 	}
 	if (!handled) {
 		// normally an errorview would handle this
-		resp.textHtml();
+		resp.sendTextHtmlHeader();
 		resp.write("URL unhandled!\n");
 	}
 	return true;

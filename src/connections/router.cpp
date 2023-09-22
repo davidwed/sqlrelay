@@ -318,7 +318,7 @@ void routerconnection::handleConnectString() {
 	uint32_t	fetchatonce=10;
 	const char	*fao=cont->getConnectStringValue("fetchatonce");
 	if (fao) {
-		fetchatonce=charstring::toUnsignedInteger(fao);
+		fetchatonce=charstring::convertToUnsignedInteger(fao);
 	}
 	cont->setFetchAtOnce(fetchatonce);
 
@@ -330,7 +330,7 @@ void routerconnection::handleConnectString() {
 	// (this is just a convenient place to do it)
 	linkedlist< connectstringcontainer * >	*cslist=
 				cont->getConfig()->getConnectStringList();
-	concount=cslist->getLength();
+	concount=cslist->getCount();
 
 	conids=new const char *[concount];
 	cons=new sqlrconnection *[concount];
@@ -347,7 +347,7 @@ void routerconnection::handleConnectString() {
 
 		cons[index]=new sqlrconnection(
 				csc->getConnectStringValue("server"),
-				charstring::toUnsignedInteger(
+				charstring::convertToUnsignedInteger(
 					csc->getConnectStringValue("port")),
 				csc->getConnectStringValue("socket"),
 				csc->getConnectStringValue("user"),
@@ -736,8 +736,8 @@ void routerconnection::errorMessage(char *errorbuffer,
 
 	for (uint16_t index=0; index<concount; index++) {
 		const char	*errormessage=cons[index]->errorMessage();
-		if (!charstring::length(errormessage)) {
-			*errorlength=charstring::length(errormessage);
+		if (!charstring::getLength(errormessage)) {
+			*errorlength=charstring::getLength(errormessage);
 			charstring::safeCopy(errorbuffer,errorbufferlength,
 						errormessage,*errorlength);
 			*errorcode=cons[index]->errorNumber();
@@ -1215,7 +1215,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 			if (character::isWhitespace(c)) {
 				nquery[i]=' ';
 			} else {
-				nquery[i]=character::toLowerCase(c);
+				nquery[i]=character::lower(c);
 			}
 		}
 	}
@@ -1663,7 +1663,7 @@ void routercursor::errorMessage(char *errorbuffer,
 					bool *liveconnection) {
 	const char	*errormessage=
 			(currentcur)?currentcur->errorMessage():"";
-	*errorlength=charstring::length(errormessage);
+	*errorlength=charstring::getLength(errormessage);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errormessage,*errorlength);
 	*errorcode=(currentcur)?currentcur->errorNumber():0;

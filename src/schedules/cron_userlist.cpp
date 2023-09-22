@@ -84,7 +84,7 @@ bool sqlrschedule_cron_userlist::allowed(sqlrserverconnection *sqlrcon,
 
 	// compare date/time to schedule rules
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	return rulesAllow(&dt,defaultallow);
 }
 

@@ -24,7 +24,7 @@ def main():
 	# instantiation
 	con=PySQLRClient.sqlrconnection("sqlrelay",9000,
 						"/tmp/test.socket",
-						"test","test")
+						"testuser","testpassword")
 	cur=PySQLRClient.sqlrcursor(con)
 
 	# get database type
@@ -560,7 +560,7 @@ def main():
 	print("COMMIT AND ROLLBACK: ")
 	secondcon=PySQLRClient.sqlrconnection("sqlrelay",9000,
 						"/tmp/test.socket",
-						"test","test")
+						"testuser","testpassword")
 	secondcur=PySQLRClient.sqlrcursor(secondcon)
 	checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1)
 	checkSuccess(secondcur.getField(0,0),0)

@@ -64,11 +64,11 @@ bool sqlrlogger_custom_sc::init(sqlrlistener *sqlrl,
 
 	// get log path and name
 	const char	*path=getParameters()->getAttributeValue("path");
-	if (!charstring::length(path)) {
+	if (!charstring::getLength(path)) {
 		path=(sqlrcon)?sqlrcon->cont->getLogDir():sqlrl->getLogDir();
 	}
 	const char	*name=getParameters()->getAttributeValue("name");
-	if (!charstring::length(name)) {
+	if (!charstring::getLength(name)) {
 		name="sqlrelay.log";
 	}
 
@@ -79,7 +79,7 @@ bool sqlrlogger_custom_sc::init(sqlrlistener *sqlrl,
 	// create the new log file
 	querylog.close();
 	return querylog.open(querylogname,O_WRONLY|O_CREAT|O_APPEND,
-				permissions::evalPermString("rw-------"));
+				permissions::parsePermString("rw-------"));
 }
 
 bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
@@ -112,7 +112,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 	// get the current date
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 
 	// clear log buffer
 	logbuffer.clear();
@@ -122,7 +122,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 	charstring::printf(datebuffer,sizeof(datebuffer),
 				"%04d-%02d-%02d %02d:%02d:%02d",
 				dt.getYear(),dt.getMonth(),dt.getDayOfMonth(),
-				dt.getHour(),dt.getMinutes(),dt.getSeconds());
+				dt.getHour(),dt.getMinute(),dt.getSecond());
 	logbuffer.append(datebuffer)->append(' ');
 
 	// append the event type and log level
@@ -203,7 +203,7 @@ bool sqlrlogger_custom_sc::run(sqlrlistener *sqlrl,
 
 	// append info, if there was any
 	// (except for db errors/warnings which are handled specially)
-	if (charstring::length(info) &&
+	if (charstring::getLength(info) &&
 		(event!=SQLREVENT_DB_ERROR && event!=SQLREVENT_DB_WARNING)) {
 		logbuffer.append(": ");
 		logbuffer.append(info);

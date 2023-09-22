@@ -103,7 +103,7 @@ extern "C" {
 	#define TYPE(a) Z_TYPE_P(a)
 
 	#define RET_STRING(a,b) \
-		RETURN_STR(zend_string_init(a,charstring::length(a),0))
+		RETURN_STR(zend_string_init(a,charstring::getLength(a),0))
 	#define RET_STRINGL(a,b,c) \
 		RETURN_STR(zend_string_init(a,b,0))
 
@@ -112,7 +112,7 @@ extern "C" {
 		add_assoc_stringl(a,b,zend_string_init(c,d,0)->val,d)
 	#define ADD_NEXT_INDEX_STRING(a,b,c) \
 		add_next_index_string( \
-			a,zend_string_init(b,charstring::length(b),0)->val)
+			a,zend_string_init(b,charstring::getLength(b),0)->val)
 	#define ADD_NEXT_INDEX_STRINGL(a,b,c,d) \
 		add_next_index_stringl(a,zend_string_init(b,c,0)->val,c)
 
@@ -3765,6 +3765,32 @@ DLEXPORT ZEND_FUNCTION(sqlrcon_bindformat) {
 	RETURN_FALSE;
 }
 
+DLEXPORT ZEND_FUNCTION(sqlrcon_nextvalformat) {
+	ZVAL sqlrcon;
+	const char *r;
+	if (ZEND_NUM_ARGS() != 1 || 
+		GET_PARAMETERS(
+				ZEND_NUM_ARGS() TSRMLS_CC,
+				PARAMS("z")
+				&sqlrcon) == FAILURE) {
+		WRONG_PARAM_COUNT;
+	}
+	sqlrconnection *connection=NULL;
+	ZEND_FETCH_RESOURCE(connection,
+				sqlrconnection *,
+				sqlrcon,
+				-1,
+				"sqlrelay connection",
+				sqlrelay_connection);
+	if (connection) {
+		r=connection->nextvalFormat();
+		if (r) {
+			RET_STRING(const_cast<char *>(r),1);
+		}
+	}
+	RETURN_FALSE;
+}
+
 DLEXPORT ZEND_FUNCTION(sqlrcon_dbversion) {
 	ZVAL sqlrcon;
 	const char *r;
@@ -4261,6 +4287,9 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_bindformat,0,0,0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_nextvalformat,0,0,0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_sqlrcon_dbversion,0,0,0)
 ZEND_END_ARG_INFO()
 
@@ -4520,6 +4549,8 @@ zend_function_entry sql_relay_functions[] = {
 		ARGINFO(arginfo_sqlrcon_rollback))
 	ZEND_FE(sqlrcon_bindformat,
 		ARGINFO(arginfo_sqlrcon_bindformat))
+	ZEND_FE(sqlrcon_nextvalformat,
+		ARGINFO(arginfo_sqlrcon_nextvalformat))
 	ZEND_FE(sqlrcon_dbversion,
 		ARGINFO(arginfo_sqlrcon_dbversion))
 	ZEND_FE(sqlrcon_dbhostname,

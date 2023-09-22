@@ -73,6 +73,7 @@ enum sqlrserverbindvartype_t {
 enum sqlrserverlistformat_t {
 	SQLRSERVERLISTFORMAT_NULL=0,
 	SQLRSERVERLISTFORMAT_MYSQL,
+	SQLRSERVERLISTFORMAT_POSTGRESQL,
 	SQLRSERVERLISTFORMAT_ODBC,
 	SQLRSERVERLISTFORMAT_JDBC
 };
@@ -107,7 +108,7 @@ class SQLRSERVER_DLLSPEC sqlrserverbindvar {
 		uint32_t		valuesize;
 		uint32_t		resultvaluesize;
 		sqlrserverbindvartype_t	type;
-		unsigned char		nativetype;
+		byte_t			nativetype;
 		int16_t			isnull;
 };
 
@@ -138,8 +139,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*getDebugDir();
 
 		// passthrough
-		bool	send(unsigned char *data, size_t size);
-		bool	recv(unsigned char **data, size_t *size);
+		bool	send(byte_t *data, size_t size);
+		bool	recv(byte_t **data, size_t *size);
 
 		// re-login to the database
 		void	reLogIn();
@@ -243,6 +244,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		void		setError(const char *err,
 					int64_t errn, bool liveconn);
 		char		*getErrorBuffer();
+		uint32_t	getErrorBufferSize();
 		uint32_t	getErrorLength();
 		void		setErrorLength(uint32_t errorlength);
 		uint32_t	getErrorNumber();
@@ -706,6 +708,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						int64_t errn,
 						bool liveconn);
 		char		*getErrorBuffer(sqlrservercursor *cursor);
+		uint32_t	getErrorBufferSize(sqlrservercursor *cursor);
 		uint32_t	getErrorLength(sqlrservercursor *cursor);
 		void		setErrorLength(sqlrservercursor *cursor,
 							uint32_t errorlength);
@@ -740,7 +743,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 						uint64_t querylen,
 						const char *errorrowtable);
 		bool	bulkLoadJoin(const char *id);
-		bool	bulkLoadInputBind(const unsigned char *data,
+		bool	bulkLoadInputBind(const byte_t *data,
 						uint64_t datalen);
 		void	bulkLoadParseInsert(const char *query,
 						uint64_t querylen,
@@ -749,7 +752,7 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
                                                 linkedlist<char *> *binds);
 		bool	bulkLoadExecuteQuery();
 		void	bulkLoadInitBinds();
-		void	bulkLoadBindRow(const unsigned char *data,
+		void	bulkLoadBindRow(const byte_t *data,
 						uint64_t datalen);
 		void	bulkLoadError();
 		bool	bulkLoadStoreError(int64_t errorcode,
@@ -798,8 +801,8 @@ class SQLRSERVER_DLLSPEC sqlrservercontroller {
 		const char	*skipComments(const char *query);
 		const char	*skipWhitespaceAndComments(const char *query);
 
-		const char	*asciiToHex(unsigned char ch);
-		const char	*asciiToOctal(unsigned char ch);
+		const char	*asciiToHex(byte_t ch);
+		const char	*asciiToOctal(byte_t ch);
 
 		bool		hasBindVariables(const char *query,
 							uint32_t querylen);
@@ -856,8 +859,8 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual bool	supportsAuthOnDatabase();
 		virtual	void	handleConnectString();
 
-		virtual	bool	send(unsigned char *data, size_t size);
-		virtual	bool	recv(unsigned char **data, size_t *size);
+		virtual	bool	send(byte_t *data, size_t size);
+		virtual	bool	recv(byte_t **data, size_t *size);
 
 		virtual	bool	logIn(const char **error,
 					const char **warning)=0;
@@ -917,6 +920,26 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual bool		cacheDbHostInfo();
 
 		virtual bool		getListsByApiCalls();
+		virtual	sqlrserverlistformat_t
+					getDatabaseListFormat();
+		virtual	sqlrserverlistformat_t
+					getSchemaListFormat();
+		virtual	sqlrserverlistformat_t
+					getTableListFormat();
+		virtual	sqlrserverlistformat_t
+					getTableTypeListFormat();
+		virtual	sqlrserverlistformat_t
+					getColumnListFormat();
+		virtual	sqlrserverlistformat_t
+					getPrimaryKeyListFormat();
+		virtual	sqlrserverlistformat_t
+					getKeyAndIndexListFormat();
+		virtual	sqlrserverlistformat_t
+					getProcedureBindAndColumnListFormat();
+		virtual	sqlrserverlistformat_t
+					getTypeInfoListFormat();
+		virtual	sqlrserverlistformat_t
+					getProcedureListFormat();
 		virtual bool		getDatabaseList(
 						sqlrservercursor *cursor,
 						const char *wild);
@@ -999,6 +1022,7 @@ class SQLRSERVER_DLLSPEC sqlrserverconnection {
 		virtual void		endSession();
 
 		char		*getErrorBuffer();
+		uint32_t	getErrorBufferSize();
 		uint32_t	getErrorLength();
 		void		setErrorLength(uint32_t errorlength);
 		uint32_t	getErrorNumber();
@@ -1019,8 +1043,9 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		virtual	bool	open();
 		virtual	bool	close();
 
-		virtual sqlrquerytype_t	queryType(const char *query,
-							uint32_t length);
+		virtual sqlrquerytype_t	determineQueryType(
+						const char *query,
+						uint32_t length);
 		virtual	bool	isCustomQuery();
 		virtual	bool	prepareQuery(const char *query,
 							uint32_t length);
@@ -1317,6 +1342,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 		bool		getCurrentRowReformatted();
 
 		char		*getErrorBuffer();
+		uint32_t	getErrorBufferSize();
 		uint32_t	getErrorLength();
 		void		setErrorLength(uint32_t errorlength);
 		uint32_t	getErrorNumber();
@@ -1419,7 +1445,7 @@ class SQLRSERVER_DLLSPEC sqlrservercursor {
 					bool resultsetheaderhasbeenhandled);
 		bool		getResultSetHeaderHasBeenHandled();
 
-		unsigned char	*getModuleData();
+		byte_t		*getModuleData();
 
 		sqlrserverconnection	*conn;
 
@@ -1459,108 +1485,109 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		void	setProtocolIsBigEndian(bool bigendian);
 		bool	getProtocolIsBigEndian();
 
-		void	read(const unsigned char *rp,
+		void	read(const byte_t *rp,
 					char *value,
-					const unsigned char **rpout);
-		bool	read(const unsigned char *rp,
+					const byte_t **rpout);
+		bool	read(const byte_t *rp,
 					char *value,
 					const char *name,
 					char expected,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
-					unsigned char *value,
-					const unsigned char **rpout);
-		bool	read(const unsigned char *rp,
-					unsigned char *value,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
+					byte_t *value,
+					const byte_t **rpout);
+		bool	read(const byte_t *rp,
+					byte_t *value,
 					const char *name,
-					unsigned char expected,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
+					byte_t expected,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
 					char *value,
 					size_t length,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
-					unsigned char *value,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
+					byte_t *value,
 					size_t length,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
-					char16_t *value,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
+					ucs2_t *value,
 					size_t length,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
 					float *value,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
 					double *value,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
 					uint16_t *value,
-					const unsigned char **rpout);
-		void	readLE(const unsigned char *rp,
+					const byte_t **rpout);
+		void	readLE(const byte_t *rp,
 					uint16_t *value,
-					const unsigned char **rpout);
-		bool	readLE(const unsigned char *rp,
-					uint16_t *value,
-					const char *name,
-					uint16_t expected,
-					const unsigned char **rpout);
-		void	readBE(const unsigned char *rp,
-					uint16_t *value,
-					const unsigned char **rpout);
-		bool	readBE(const unsigned char *rp,
+					const byte_t **rpout);
+		bool	readLE(const byte_t *rp,
 					uint16_t *value,
 					const char *name,
 					uint16_t expected,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
+					const byte_t **rpout);
+		void	readBE(const byte_t *rp,
+					uint16_t *value,
+					const byte_t **rpout);
+		bool	readBE(const byte_t *rp,
+					uint16_t *value,
+					const char *name,
+					uint16_t expected,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
 					uint32_t *value,
-					const unsigned char **rpout);
-		void	readLE(const unsigned char *rp,
+					const byte_t **rpout);
+		void	readLE(const byte_t *rp,
 					uint32_t *value,
-					const unsigned char **rpout);
-		bool	readLE(const unsigned char *rp,
+					const byte_t **rpout);
+		bool	readLE(const byte_t *rp,
 					uint32_t *value,
 					const char *name,
 					uint32_t expected,
-					const unsigned char **rpout);
-		void	readBE(const unsigned char *rp,
+					const byte_t **rpout);
+		void	readBE(const byte_t *rp,
 					uint32_t *value,
-					const unsigned char **rpout);
-		bool	readBE(const unsigned char *rp,
+					const byte_t **rpout);
+		bool	readBE(const byte_t *rp,
 					uint32_t *value,
 					const char *name,
 					uint32_t expected,
-					const unsigned char **rpout);
-		void	read(const unsigned char *rp,
+					const byte_t **rpout);
+		void	read(const byte_t *rp,
 					uint64_t *value,
-					const unsigned char **rpout);
-		void	readLE(const unsigned char *rp,
+					const byte_t **rpout);
+		void	readLE(const byte_t *rp,
 					uint64_t *value,
-					const unsigned char **rpout);
-		bool	readLE(const unsigned char *rp,
-					uint64_t *value,
-					const char *name,
-					uint64_t expected,
-					const unsigned char **rpout);
-		void	readBE(const unsigned char *rp,
-					uint64_t *value,
-					const unsigned char **rpout);
-		bool	readBE(const unsigned char *rp,
+					const byte_t **rpout);
+		bool	readLE(const byte_t *rp,
 					uint64_t *value,
 					const char *name,
 					uint64_t expected,
-					const unsigned char **rpout);
-		uint64_t	readLenEncInt(const unsigned char *in,
-						const unsigned char **out);
+					const byte_t **rpout);
+		void	readBE(const byte_t *rp,
+					uint64_t *value,
+					const byte_t **rpout);
+		bool	readBE(const byte_t *rp,
+					uint64_t *value,
+					const char *name,
+					uint64_t expected,
+					const byte_t **rpout);
+		uint64_t	readLenEncInt(const byte_t *in,
+						const byte_t **out);
 
 		void	write(bytebuffer *buffer, char value);
-		void	write(bytebuffer *buffer, unsigned char value);
+		void	write(bytebuffer *buffer, byte_t value);
 		void	write(bytebuffer *buffer, const char *value);
 		void	write(bytebuffer *buffer, const char *value,
 								size_t length);
-		void	write(bytebuffer *buffer, const unsigned char *value,
+		void	write(bytebuffer *buffer, const byte_t *value,
 								size_t length);
-		void	write(bytebuffer *buffer, char16_t *str, size_t length);
+		void	write(bytebuffer *buffer, const ucs2_t *str,
+								size_t length);
 		void	write(bytebuffer *buffer, float value);
 		void	write(bytebuffer *buffer, double value);
 		void	write(bytebuffer *buffer, uint16_t value);
@@ -1608,9 +1635,9 @@ class SQLRSERVER_DLLSPEC sqlrprotocol {
 		void	debugEnd();
 		void	debugEnd(uint16_t indent);
 
-		void	debugHexDump(const unsigned char *data,
+		void	debugHexDump(const byte_t *data,
 						uint64_t size);
-		void	debugHexDump(const unsigned char *data,
+		void	debugHexDump(const byte_t *data,
 						uint64_t size,
 						uint16_t indent);
 
@@ -1790,33 +1817,6 @@ class SQLRSERVER_DLLSPEC sqlrauths {
 		void	endSession();
 
 	#include <sqlrelay/private/sqlrauths.h>
-};
-
-class SQLRSERVER_DLLSPEC sqlrpwdenc {
-	public:
-		sqlrpwdenc(domnode *parameters, bool debug);
-		virtual	~sqlrpwdenc();
-		virtual const char	*getId();
-		virtual	bool	oneWay();
-		virtual	char	*encrypt(const char *value);
-		virtual	char	*decrypt(const char *value);
-
-	protected:
-		domnode	*getParameters();
-		bool		getDebug();
-
-	#include <sqlrelay/private/sqlrpwdenc.h>
-};
-
-class SQLRSERVER_DLLSPEC sqlrpwdencs {
-	public:
-		sqlrpwdencs(sqlrpaths *sqlrpth, bool debug);
-		~sqlrpwdencs();
-
-		bool		load(domnode *parameters);
-		sqlrpwdenc	*getPasswordEncryptionById(const char *id);
-
-	#include <sqlrelay/private/sqlrpwdencs.h>
 };
 
 enum sqlrevent_t {
@@ -2580,8 +2580,7 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslation {
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					const char **translatederror,
-					uint32_t *translatederrorlength);
+					stringbuffer *translatederror);
 
 		virtual const char	*getError();
 
@@ -2607,8 +2606,7 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslations {
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					const char **translatederror,
-					uint32_t *translatederrorlength);
+					stringbuffer *translatederror);
 
 		const char	*getError();
 
@@ -2688,8 +2686,9 @@ class SQLRSERVER_DLLSPEC sqlrquerycursor : public sqlrservercursor {
 					domnode *parameters,
 					uint16_t id);
 		virtual	~sqlrquerycursor();
-		virtual sqlrquerytype_t	queryType(const char *query,
-							uint32_t length);
+		virtual sqlrquerytype_t	determineQueryType(
+						const char *query,
+						uint32_t length);
 		bool	isCustomQuery();
 
 	protected:

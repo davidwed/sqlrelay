@@ -178,7 +178,7 @@ bool db2benchcursor::open() {
 
 bool db2benchcursor::query(const char *query, bool getcolumns) {
 
-	erg=SQLPrepare(stmt,(SQLCHAR *)query,charstring::length(query));
+	erg=SQLPrepare(stmt,(SQLCHAR *)query,charstring::getLength(query));
 	if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 		stdoutput.printf("SQLPrepare failed\n");
 		return false;

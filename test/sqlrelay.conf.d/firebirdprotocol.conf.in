@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<instances>
+
+	<instance id="firebirdprotocoltest" dbase="firebird" debug="protocols">
+		<listeners>
+			<listener protocol="firebird" port="3050"/>
+		</listeners>
+		<connections>
+			<connection string="user=testuser;password=testpassword;db=firebird:/u02/@HOSTNAME@.gdb;dialect=3"/>
+		</connections>
+	</instance>
+
+</instances>

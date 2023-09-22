@@ -46,13 +46,13 @@ edit the configuration file and make sure that the connectstring for the
 !MySQL/MariaDB instance uses the socket parameter, as follows:
 
 {{{#!blockquote
-user=exampleuser;password=examplepassword;db=exampledb;socket=/var/lib/mysql/mysql.sock
+user=mysqluser;password=mysqlpassword;db=mysqldb;socket=/var/lib/mysql/mysql.sock
 }}}
 
 as opposed to:
 
 {{{#!blockquote
-user=exampleuser;password=examplepassword;db=exampledb;host=localhost;port=5432
+user=mysqluser;password=mysqlpassword;db=mysqldb;host=localhost;port=5432
 }}}
 
 === !PostgreSQL ===
@@ -98,13 +98,13 @@ edit the configuration file and make sure that the connectstring for the
 !PostgreSQL instance uses the host and port parameters as follows:
 
 {{{#!blockquote
-user=exampleuser;password=examplepassword;host=/tmp;port=5432;
+user=postgresqluser;password=postgresqlpassword;host=/tmp;port=5432;
 }}}
 
 as opposed to:
 
 {{{#!blockquote
-user=exampleuser;password=examplepassword;host=localhost;port=5432;
+user=postgresqluser;password=postgresqlpassword;host=localhost;port=5432;
 }}}
 
 Ordinarily, the host parameter tells SQL Relay what host to connect to, but
@@ -194,7 +194,7 @@ IPC instead of an inet socket.  Just configure the connect string to use an SID
 that uses IPC to connect to the database.  For example:
 
 {{{#!blockquote
-user=exampleuser;password=examplepassword;oracle_sid=ora1;
+user=oracleuser;password=oraclepassword;oracle_sid=ora1;
 }}}
 
 === SQLite ===
@@ -217,7 +217,7 @@ SQL Relay requires no specific modifications to connect to the database.
 Just configure the connect string to use the local database.  For example:
 
 {{{#!blockquote
-db=exampledb
+db=db2db
 }}}
 
 === Informix ===
@@ -237,7 +237,7 @@ Once sqlhosts is configured, just configure SQL Relay to use that database.
 For example:
 
 {{{#!blockquote
-db=exampledb
+db=informixdb
 }}}
 
 === SAP/Sybase ===
@@ -264,7 +264,7 @@ socket.  In the configuration file, the instance that is talking to mysql
 should have a socket attribute:
 
 {{{#!blockquote
-&lt;instance id="mysqlexample" port="8006" socket="/tmp/mysqlexample.socket" ... &gt;
+&lt;listener port="8006" socket="/tmp/mysqlexample.socket" ... &gt;
 }}}
 
 In the above example, the SQL Relay server will listen on inet port 8006 and

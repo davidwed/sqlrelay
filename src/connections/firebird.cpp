@@ -316,7 +316,7 @@ void firebirdconnection::handleConnectString() {
 
 	const char	*dialectstr=cont->getConnectStringValue("dialect");
 	if (dialectstr) {
-		dialect=charstring::toInteger(dialectstr);
+		dialect=charstring::convertToInteger(dialectstr);
 		if (dialect<1) {
 			dialect=1;
 		}
@@ -377,13 +377,13 @@ bool firebirdconnection::logIn(const char **err, const char **warning) {
 	dpbptr++;
 
 	// set the character set
-	if (charstring::length(charset)) {
+	if (charstring::getLength(charset)) {
 		*dpbptr=isc_dpb_lc_ctype;
 		dpbptr++;
-		*dpbptr=charstring::length(charset);
+		*dpbptr=charstring::getLength(charset);
 		dpbptr++;
 		charstring::copy(dpbptr,charset);
-		dpbptr+=charstring::length(charset);
+		dpbptr+=charstring::getLength(charset);
 	}
 
 	// determine the parameter buffer length
@@ -402,7 +402,7 @@ bool firebirdconnection::logIn(const char **err, const char **warning) {
 	// attach to the database
 	db=0L;
 	tr=0L;
-	if (isc_attach_database(error,charstring::length(database),
+	if (isc_attach_database(error,charstring::getLength(database),
 					const_cast<char *>(database),&db,
 					dpblength,dpb)) {
 		db=0L;
@@ -492,7 +492,7 @@ void firebirdconnection::errorMessage(char *errorbuffer,
 	isc_sql_interprete(sqlcode,errorbuffer,errorbufferlength);
 
 	// set return values
-	*errorlength=charstring::length(errorbuffer);
+	*errorlength=charstring::getLength(errorbuffer);
 	*errorcode=sqlcode;
 	*liveconnection=!(charstring::contains(
 				errormsg.getString(),
@@ -774,8 +774,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	outbindcount=0;
 
 	// set up input binds
-	inbindsqlda=(XSQLDA ISC_FAR *)new unsigned char[
-					XSQLDA_LENGTH(maxbindcount)];
+	inbindsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(maxbindcount)];
 	inbindsqlda->version=SQLDA_VERSION1;
 	inbindsqlda->sqln=maxbindcount;
 	inbindblobid=new ISC_QUAD[maxbindcount];
@@ -783,8 +782,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 
 
 	// set up output binds
-	outbindsqlda=(XSQLDA ISC_FAR *)new unsigned char[
-					XSQLDA_LENGTH(maxbindcount)];
+	outbindsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(maxbindcount)];
 	outbindsqlda->version=SQLDA_VERSION1;
 	outbindsqlda->sqln=maxbindcount;
 	outbindblobid=new ISC_QUAD[maxbindcount];
@@ -822,7 +820,7 @@ firebirdcursor::~firebirdcursor() {
 void firebirdcursor::allocateResultSetBuffers(int32_t columncount) {
 
 	if (!columncount) {
-		outsqlda=(XSQLDA ISC_FAR *)new unsigned char[XSQLDA_LENGTH(1)];
+		outsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(1)];
 		outsqlda->version=SQLDA_VERSION1;
 		outsqlda->sqln=1;
 		field=NULL;
@@ -830,7 +828,7 @@ void firebirdcursor::allocateResultSetBuffers(int32_t columncount) {
 		if (outsqlda) {
 			delete[] outsqlda;
 		}
-		outsqlda=(XSQLDA ISC_FAR *)new unsigned char[
+		outsqlda=(XSQLDA ISC_FAR *)new byte_t[
 						XSQLDA_LENGTH(columncount)];
 		outsqlda->version=SQLDA_VERSION1;
 		outsqlda->sqln=columncount;
@@ -845,7 +843,7 @@ void firebirdcursor::allocateResultSetBuffers(int32_t columncount) {
 void firebirdcursor::deallocateResultSetBuffers() {
 
 	delete[] outsqlda;
-	outsqlda=(XSQLDA ISC_FAR *)new unsigned char[XSQLDA_LENGTH(1)];
+	outsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(1)];
 	outsqlda->version=SQLDA_VERSION1;
 	outsqlda->sqln=1;
 
@@ -917,7 +915,7 @@ bool firebirdcursor::inputBind(const char *variable,
 					int16_t *isnull) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -944,7 +942,7 @@ bool firebirdcursor::inputBind(const char *variable,
 					int64_t *value) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -973,7 +971,7 @@ bool firebirdcursor::inputBind(const char *variable,
 					uint32_t scale) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1021,7 +1019,7 @@ bool firebirdcursor::inputBind(const char *variable,
 	isc_encode_timestamp(&t,(ISC_TIMESTAMP *)buffer);
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1050,7 +1048,7 @@ bool firebirdcursor::inputBindBlob(const char *variable,
 					int16_t *isnull) {
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1124,7 +1122,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1154,7 +1152,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1186,7 +1184,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1236,7 +1234,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1266,7 +1264,7 @@ bool firebirdcursor::outputBindBlob(const char *variable,
 	outbindcount++;
 
 	// make bind vars 1 based like all other db's
-	long	index=charstring::toInteger(variable+1)-1;
+	long	index=charstring::convertToInteger(variable+1)-1;
 	if (index<0) {
 		bindformaterror=true;
 		return false;
@@ -1634,7 +1632,7 @@ void firebirdcursor::errorMessage(char *errorbuffer,
 
 	// handle bind format errors
 	if (bindformaterror) {
-		*errorlength=charstring::length(
+		*errorlength=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
 				errorbufferlength,
@@ -1827,7 +1825,7 @@ void firebirdcursor::getField(uint32_t col,
 			outsqlda->sqlvar[col].sqltype==SQL_TEXT+1) {
 
 		size_t	maxlen=outsqlda->sqlvar[col].sqllen;
-		size_t	reallen=charstring::length(field[col].textbuffer);
+		size_t	reallen=charstring::getLength(field[col].textbuffer);
 		if (reallen>maxlen) {
 			reallen=maxlen;
 		}

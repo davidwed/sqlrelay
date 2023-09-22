@@ -52,19 +52,19 @@ int main(int argc, const char **argv) {
 	bool		nosettle=false;
 
 	// override defaults with command line parameters
-	if (cmdl.found("db")) {
+	if (cmdl.isFound("db")) {
 		db=cmdl.getValue("db");
 	}
-	if (cmdl.found("dbconnectstring")) {
+	if (cmdl.isFound("dbconnectstring")) {
 		dbconnectstring=cmdl.getValue("dbconnectstring");
 	}
-	if (cmdl.found("proxyconnectstring")) {
+	if (cmdl.isFound("proxyconnectstring")) {
 		proxyconnectstring=cmdl.getValue("proxyconnectstring");
 	}
-	if (cmdl.found("sqlrconnectstring")) {
+	if (cmdl.isFound("sqlrconnectstring")) {
 		sqlrconnectstring=cmdl.getValue("sqlrconnectstring");
 	}
-	if (cmdl.found("sqlr")) {
+	if (cmdl.isFound("sqlr")) {
 		sqlr=cmdl.getValue("sqlr");
 		if (charstring::compare(sqlr,"local") &&
 			charstring::compare(sqlr,"remote") &&
@@ -72,43 +72,43 @@ int main(int argc, const char **argv) {
 			usage=true;
 		}
 	}
-	if (cmdl.found("queries")) {
-		queries=charstring::toInteger(cmdl.getValue("queries"));
+	if (cmdl.isFound("queries")) {
+		queries=charstring::convertToInteger(cmdl.getValue("queries"));
 	}
-	if (cmdl.found("rows")) {
-		rows=charstring::toInteger(cmdl.getValue("rows"));
+	if (cmdl.isFound("rows")) {
+		rows=charstring::convertToInteger(cmdl.getValue("rows"));
 	}
-	if (cmdl.found("cols")) {
-		cols=charstring::toInteger(cmdl.getValue("cols"));
+	if (cmdl.isFound("cols")) {
+		cols=charstring::convertToInteger(cmdl.getValue("cols"));
 	}
-	if (cmdl.found("colsize")) {
-		colsize=charstring::toInteger(cmdl.getValue("colsize"));
+	if (cmdl.isFound("colsize")) {
+		colsize=charstring::convertToInteger(cmdl.getValue("colsize"));
 	}
-	if (cmdl.found("samples")) {
-		samples=charstring::toInteger(cmdl.getValue("samples"));
+	if (cmdl.isFound("samples")) {
+		samples=charstring::convertToInteger(cmdl.getValue("samples"));
 	}
-	if (cmdl.found("rsbs")) {
-		rsbs=charstring::toInteger(cmdl.getValue("rsbs"));
+	if (cmdl.isFound("rsbs")) {
+		rsbs=charstring::convertToInteger(cmdl.getValue("rsbs"));
 	}
-	if (cmdl.found("bench")) {
+	if (cmdl.isFound("bench")) {
 		const char	*bench=cmdl.getValue("bench");
 		benchsqlrelay=charstring::contains(bench,"sqlrelay");
 		benchproxy=charstring::contains(bench,"proxy");
 		benchdb=charstring::contains(bench,"db");
 	}
-	if (cmdl.found("querytypes")) {
+	if (cmdl.isFound("querytypes")) {
 		const char	*queries=cmdl.getValue("querytypes");
 		selectqueries=charstring::contains(queries,"selects");
 		dmlqueries=charstring::contains(queries,"dml");
 	}
-	if (cmdl.found("debug")) {
+	if (cmdl.isFound("debug")) {
 		debug=true;
 	}
-	if (cmdl.found("nosettle")) {
+	if (cmdl.isFound("nosettle")) {
 		nosettle=true;
 	}
 	stringbuffer	graphname;
-	if (cmdl.found("graph")) {
+	if (cmdl.isFound("graph")) {
 		graph=cmdl.getValue("graph");
 		graphname.append(graph);
 		if (charstring::compare(
@@ -119,7 +119,7 @@ int main(int argc, const char **argv) {
 		graphname.append(db)->append("-bench.png");
 	}
 	graph=graphname.getString();
-	if (cmdl.found("help","h")) {
+	if (cmdl.isFound("help","h")) {
 		usage=true;
 	}
 
@@ -149,12 +149,14 @@ int main(int argc, const char **argv) {
 	// handle signals
 	bm=NULL;
 	stop=false;
-	process::handleShutDown(shutDown);
-	process::handleCrash(shutDown);
+	process::setShutDownHandler(shutDown);
+	process::setCrashHandler(shutDown);
 
 	// init stats
 	dictionary< float, linkedlist< float > *>	selectstats;
 	dictionary< float, linkedlist< float > *>	dmlstats;
+	selectstats.setManageValues(true);
+	dmlstats.setManageValues(true);
 
 	// for each database...
 	dynamiclib	sqlrdl;
@@ -405,10 +407,6 @@ int main(int argc, const char **argv) {
 		// FIXME: graph dml stats
 	}
 
-	// clean up
-	selectstats.clearAndDeleteValues();
-	dmlstats.clearAndDeleteValues();
-
 	// exit
 	process::exit(0);
 }
@@ -459,14 +457,14 @@ void graphStats(const char *graph, const char *db,
 	// write out the stats to temp.csv
 	file	f;
 	f.open("temp.csv",O_WRONLY|O_TRUNC|O_CREAT,
-			permissions::evalPermString("rw-r--r--"));
+			permissions::parsePermString("rw-r--r--"));
 
 	uint32_t	count=0;
 	for (listnode< float > *node=stats->getKeys()->getFirst();
 						node; node=node->getNext()) {
 		f.printf("%f",node->getValue());
 		linkedlist< float >	*l=stats->getValue(node->getValue());
-		count=l->getLength();
+		count=l->getCount();
 		for (listnode< float > *lnode=l->getFirst();
 						lnode; lnode=lnode->getNext()) {
 			f.printf(",%f",lnode->getValue());
@@ -490,7 +488,7 @@ void graphStats(const char *graph, const char *db,
 
 	// move temp.csv to a similar file name as the graph
 	stringbuffer	tempcsv;
-	char	*base=file::basename(graph,".png");
+	char	*base=file::getBaseName(graph,".png");
 	tempcsv.append(base)->append(".csv");
 	delete[] base;
 	file::rename("temp.csv",tempcsv.getString());

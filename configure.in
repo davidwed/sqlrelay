@@ -356,6 +356,10 @@ AC_ARG_ENABLE(nodejs,
 	[  --disable-nodejs              Don't build node.js api],
 	ENABLE_NODEJS="",
 	ENABLE_NODEJS="yes")
+AC_ARG_WITH(node-gyp-python,
+	[  --with-node-gyp-python        Location of alternative python to use with node-gyp],
+	NODEGYPPYTHON="--python $withval",
+	NODEGYPPYTHON="")
 AC_ARG_ENABLE(c-rpath,
 	[  --enable-c-rpath              Use -rpath when linking the C library against the SQL Relay client library],
 	CUSERPATH="yes",
@@ -498,6 +502,7 @@ AC_SUBST(JAVAUSERPATH)
 AC_SUBST(PHPUSERPATH)
 AC_SUBST(TCLUSERPATH)
 AC_SUBST(ERLANGUSERPATH)
+AC_SUBST(NODEGYPPYTHON)
 AC_SUBST(CUSERPATH)
 AC_SUBST(LIBDMALLOC)
 AC_SUBST(LIBEFENCE)
@@ -614,7 +619,6 @@ echo
 echo "***** Platform ***************"
 FW_CHECK_UNAME
 FW_CHECK_MULTIARCH
-FW_CHECK_LIBDIR
 FW_CHECK_OVERRIDE_MULTIARCH
 FW_CHECK_X64
 FW_CHECK_MICROSOFT
@@ -624,6 +628,7 @@ FW_CHECK_SYLLABLE
 FW_CHECK_SCO
 FW_CHECK_OSX
 FW_CHECK_IRIX
+FW_CHECK_HPUX
 FW_CHECK_SO_EXT
 AC_DEFINE_UNQUOTED(SQLRELAY_MODULESUFFIX,"$MODULESUFFIX",Suffix for loadable modules)
 FW_CHECK_LD_RPATH
@@ -1003,7 +1008,7 @@ if ( test -n "$MYSQLLIBS" ); then
 	if ( test -n "$MYSQLSTATIC" ); then
 		MYSQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS mysql mysqlupsert"
+	TESTDBS="$TESTDBS mysql mysqlupsert mysqldeadlockreplay"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
 	POSTGRESQLBUILD="dynamic   "
@@ -1113,7 +1118,7 @@ AC_SUBST(HOSTNAME)
 AC_SUBST(SHORTHOSTNAME)
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf test/sqlrelay.conf.d/postgresqlupsert.conf test/sqlrelay.conf.d/mysqlupsert.conf doc/admin/installingpkg.wt"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/firebirdprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf test/sqlrelay.conf.d/postgresqlupsert.conf test/sqlrelay.conf.d/mysqlupsert.conf test/sqlrelay.conf.d/mysqldeadlockreplay.conf test/sqlrelay.conf.d/multiprotocol.conf doc/admin/installingpkg.wt"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config

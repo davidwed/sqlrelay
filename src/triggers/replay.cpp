@@ -115,7 +115,7 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 			parameters->getAttributeValue("includeselects"));
 
 	// get the max retries
-	maxretries=charstring::toInteger(
+	maxretries=charstring::convertToInteger(
 				parameters->getAttributeValue("maxretries"));
 
 	// get the replay conditions...
@@ -129,7 +129,7 @@ sqlrtrigger_replay::sqlrtrigger_replay(sqlrservercontroller *cont,
 		const char	*err=cond->getAttributeValue("error");
 		if (charstring::isNumber(err)) {
 			c->cond=CONDITION_ERRORCODE;
-			c->errorcode=charstring::toInteger(err);
+			c->errorcode=charstring::convertToInteger(err);
 		} else {
 			c->cond=CONDITION_ERROR;
 			c->error=err;
@@ -340,13 +340,16 @@ bool sqlrtrigger_replay::logQuery(sqlrservercursor *sqlrcur) {
 	// log copied query and binds
 	log.append(qd);
 
-	/*if (debug) {
+#if 1
+	if (debug) {
 		stdoutput.printf("-----------------------\n");
 		for (listnode<querydetails *> *node=log.getFirst();
 						node; node=node->getNext()) {
 			stdoutput.printf("%s\n",node->getValue()->query);
 		}
-	}*/
+		stdoutput.printf("-----------------------\n");
+	}
+#endif
 
 	delete columns;
 	return true;
@@ -554,7 +557,7 @@ void sqlrtrigger_replay::copyBind(memorypool *pool,
 	} else if (source->type==SQLRSERVERBINDVARTYPE_DATE) {
 		dest->value.dateval.tz=
 			(char *)pool->allocate(
-				charstring::length(source->value.dateval.tz)+1);
+				charstring::getLength(source->value.dateval.tz)+1);
 		charstring::copy(dest->value.dateval.tz,
 					source->value.dateval.tz);
 		dest->value.dateval.buffer=
@@ -631,7 +634,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
 		}
 
 		// copy out input binds
-		uint16_t	incount=qd->inbindvars.getLength();
+		uint16_t	incount=qd->inbindvars.getCount();
 		sqlrcur->setInputBindCount(incount);
 		sqlrserverbindvar	*invars=
 					sqlrcur->getInputBinds();
@@ -656,7 +659,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
 		}
 
 		// copy out output binds
-		uint16_t	outcount=qd->outbindvars.getLength();
+		uint16_t	outcount=qd->outbindvars.getCount();
 		sqlrcur->setInputBindCount(outcount);
 		sqlrserverbindvar	*outvars=
 					sqlrcur->getOutputBinds();
@@ -682,7 +685,7 @@ bool sqlrtrigger_replay::replay(sqlrservercursor *sqlrcur, bool replaytx) {
 
 		// copy out input-output binds
 		uint16_t		inoutcount=
-					qd->inoutbindvars.getLength();
+					qd->inoutbindvars.getCount();
 		sqlrcur->setInputBindCount(inoutcount);
 		sqlrserverbindvar	*inoutvars=
 					sqlrcur->getInputOutputBinds();
@@ -884,7 +887,7 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 
 	// delimiter and timestamp
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	stringbuffer	str;
 	str.append("========================================"
 			"=======================================\n");
@@ -901,7 +904,7 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 	}
 	if (success) {
 		success=cont->prepareQuery(logcur,cond->query,
-					charstring::length(cond->query));
+					charstring::getLength(cond->query));
 		if (!success && debug) {
         		const char      *errorstring;
         		uint32_t        errorlength;
@@ -995,7 +998,7 @@ void sqlrtrigger_replay::logReplayCondition(condition *cond) {
 	file	logfile;
 	if (!logfile.open(cond->logfile,
 				O_WRONLY|O_APPEND|O_CREAT,
-				permissions::evalPermString("rw-r--r--"))) {
+				permissions::parsePermString("rw-r--r--"))) {
 		if (debug) {
 			char	*err=error::getErrorString();
 			stdoutput.printf("failed to open %s\n%s\n",

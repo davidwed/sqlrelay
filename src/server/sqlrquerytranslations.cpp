@@ -112,10 +112,10 @@ void sqlrquerytranslations::loadTranslation(domnode *translation) {
 
 	// get the translation name
 	const char	*module=translation->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=translation->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}
@@ -390,22 +390,22 @@ sqlrdatabaseobject *sqlrquerytranslations::createDatabaseObject(
 	// create buffers and copy data into them
 	if (database) {
 		databasecopy=(char *)pool->allocate(
-				charstring::length(database)+1);
+				charstring::getLength(database)+1);
 		charstring::copy(databasecopy,database);
 	}
 	if (schema) {
 		schemacopy=(char *)pool->allocate(
-				charstring::length(schema)+1);
+				charstring::getLength(schema)+1);
 		charstring::copy(schemacopy,schema);
 	}
 	if (object) {
 		objectcopy=(char *)pool->allocate(
-				charstring::length(object)+1);
+				charstring::getLength(object)+1);
 		charstring::copy(objectcopy,object);
 	}
 	if (dependency) {
 		dependencycopy=(char *)pool->allocate(
-				charstring::length(dependency)+1);
+				charstring::getLength(dependency)+1);
 		charstring::copy(dependencycopy,dependency);
 	}
 

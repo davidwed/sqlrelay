@@ -8,4 +8,5 @@ teradata.class: teradata.java
 	$(JAVAC) $<
 
 clean:
-	$(LTCLEAN) $(RM) *.lo *.o *.obj *.class
+	$(RM) *.lo *.o *.obj *.class
+	$(RMTREE) .libs

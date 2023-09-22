@@ -290,9 +290,9 @@ bool sqlrlistener::init(int argc, const char **argv) {
 			path.append(slash)->append(parts[i]);
 			if (!file::exists(path.getString())) {
 				mode_t	mode=(i==partcount-1)?
-					permissions::evalPermString(
+					permissions::parsePermString(
 							"rwxrwxrwx"):
-					permissions::evalPermString(
+					permissions::parsePermString(
 							"rwxr-xr-x");
 				mode_t	oldumask=
 					process::setFileCreationMask(0000);
@@ -379,11 +379,11 @@ bool sqlrlistener::init(int argc, const char **argv) {
 		return false;
 	}
 
-	if (!pvt->_cmdl->found("-nodetach")) {
+	if (!pvt->_cmdl->isFound("-nodetach")) {
 		process::detach();
 	}
 
-	process::createPidFile(pvt->_pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pvt->_pidfile,permissions::getOwnerReadWrite());
 
 	setMaxListeners(pvt->_maxlisteners);
 
@@ -513,7 +513,7 @@ void sqlrlistener::setSessionHandlerMethod() {
 	pvt->_usethreads=false;
 	if (!charstring::compare(pvt->_cfg->getSessionHandler(),"thread")) {
 
-		if (!thread::supported() || !thread::reliable()) {
+		if (!thread::isSupported() || !thread::isReliable()) {
 			stderror.printf("Warning: sessionhandler=\"thread\" "
 					"not supported, falling back to "
 					"sessionhandler=\"process\".  "
@@ -543,7 +543,7 @@ void sqlrlistener::setHandoffMethod() {
 	if (!charstring::compare(pvt->_cfg->getHandoff(),"pass")) {
 
         	// force proxy on platforms that don't support passing sockets
-        	if (!filedescriptor::supportsPassReceiveSocket()) {
+        	if (!filedescriptor::supportsPassAndReceiveSocket()) {
 			pvt->_handoffmode=HANDOFF_PROXY;
 			stderror.printf("Warning: handoff=\"pass\" not "
 					"supported, falling back to "
@@ -603,7 +603,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	}
 
 	// make sure that the file exists and is read/writeable
-	if (!file::createFile(pvt->_idfilename,permissions::ownerReadWrite())) {
+	if (!file::createFile(pvt->_idfilename,permissions::getOwnerReadWrite())) {
 		ipcFileError(pvt->_idfilename);
 		return false;
 	}
@@ -621,7 +621,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 
 	pvt->_shmem=new sharedmemory;
 	if (!pvt->_shmem->create(key,sizeof(sqlrshm),
-				permissions::evalPermString("rw-r-----"))) {
+				permissions::parsePermString("rw-r-----"))) {
 		shmError(id,pvt->_shmem->getId());
 		pvt->_shmem->attach(key,sizeof(sqlrshm));
 		return false;
@@ -685,7 +685,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	//
 	int32_t	vals[13]={1,1,0,0,1,1,0,0,0,1,0,0,0};
 	pvt->_semset=new semaphoreset();
-	if (!pvt->_semset->create(key,permissions::ownerReadWrite(),13,vals)) {
+	if (!pvt->_semset->create(key,permissions::getOwnerReadWrite(),13,vals)) {
 		semError(id,pvt->_semset->getId());
 		pvt->_semset->attach(key,13);
 		return false;
@@ -694,7 +694,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// issue warning about ttl if necessary
 	if (pvt->_cfg->getTtl()>0 &&
 		!pvt->_semset->supportsTimedSemaphoreOperations() &&
-		!sys::signalsInterruptSystemCalls()) {
+		!sys::getSignalsInterruptSystemCalls()) {
 		stderror.printf("Warning: ttl forced to 0...\n"
 				"         semaphore waits cannot be "
 				"interrupted:\n"
@@ -707,7 +707,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// issue warning about listener timeout if necessary
 	if (pvt->_cfg->getListenerTimeout()>0 &&
 		!charstring::compare(pvt->_cfg->getSessionHandler(),"thread") &&
-		thread::supported() && thread::reliable() &&
+		thread::isSupported() && thread::isReliable() &&
 		!pvt->_semset->supportsTimedSemaphoreOperations()) {
 		stderror.printf("Warning: listenertimeout disabled...\n"
 				"         sessionhandler=\"thread\" requested "
@@ -840,7 +840,7 @@ bool sqlrlistener::listenOnClientSocket(uint16_t protocolindex,
 
 	// get addresses/inet port and unix port to listen on
 	const char	*addresses=ln->getAttributeValue("addresses");
-	uint16_t	port=charstring::toUnsignedInteger(
+	uint16_t	port=charstring::convertToUnsignedInteger(
 					ln->getAttributeValue("port"));
 
 	// split addresses
@@ -1199,8 +1199,8 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 			return true;
 		}
 
-		clientsock->dontUseNaglesAlgorithm();
-		clientsock->translateByteOrder();
+		clientsock->setNaglesAlgorithmEnabled(false);
+		clientsock->setTranslateByteOrder(true);
 
 	} else if (uss) {
 
@@ -1208,7 +1208,7 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 		if (!clientsock) {
 			return false;
 		}
-		clientsock->translateByteOrder();
+		clientsock->setTranslateByteOrder(true);
 
 	} else {
 		return true;
@@ -1397,7 +1397,7 @@ void sqlrlistener::errorClientSession(filedescriptor *clientsock,
 	// get auth and ignore the result
 	clientsock->write((uint16_t)ERROR_OCCURRED);
 	clientsock->write((uint64_t)errnum);
-	clientsock->write((uint16_t)charstring::length(err));
+	clientsock->write((uint16_t)charstring::getLength(err));
 	clientsock->write(err);
 	clientsock->flushWriteBuffer(-1,-1);
 	// FIXME: hmm, if the client is just spewing
@@ -1480,8 +1480,8 @@ void sqlrlistener::forkChild(filedescriptor *clientsock,
 		// since this is the forked off listener, we don't
 		// want to actually remove the semaphore set or shared
 		// memory segment when it exits
-		pvt->_shmem->dontRemove();
-		pvt->_semset->dontRemove();
+		pvt->_shmem->setRemove(false);
+		pvt->_semset->setRemove(false);
 
 		// re-init loggers
 		if (pvt->_sqlrlg) {
@@ -1641,14 +1641,6 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 bool sqlrlistener::semWait(int32_t index, thread *thr,
 					bool withundo, bool *timeout) {
 
-	// If dynamic scaling is enabled then we need to adjust the
-	// listenertimeout.  In all cases where semWait() is called, the scaler
-	// could be off trying to start connections, or connections could be
-	// slow to start.  So, we must wait long enough to accommodate that,
-	// plus a little grace.  If listenertimeout is too short, then it needs
-	// to be made longer.
-	// FIXME: arguably, this should just be done at startup...
-
 	bool	result=true;
 	*timeout=false;
 	if (pvt->_listenertimeout>0 &&
@@ -1662,13 +1654,13 @@ bool sqlrlistener::semWait(int32_t index, thread *thr,
 		}
 		*timeout=(!result && error::getErrorNumber()==EAGAIN);
 	} else if (pvt->_listenertimeout>0 &&
-			!thr && sys::signalsInterruptSystemCalls()) {
+			!thr && sys::getSignalsInterruptSystemCalls()) {
 		// We can't use this when using threads because alarmrang isn't
 		// thread-local and there's no way to make it be.  Also, the
 		// alarm doesn't reliably interrupt the wait() when it's called
 		// from a thread, at least not on Linux.  Hopefully platforms
 		// that supports threads also supports timed semaphore ops.
-		pvt->_semset->dontRetryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(false);
 		alarmrang=0;
 		signalmanager::alarm(pvt->_listenertimeout);
 		do {
@@ -1682,7 +1674,7 @@ bool sqlrlistener::semWait(int32_t index, thread *thr,
 						alarmrang!=1);
 		*timeout=(alarmrang==1);
 		signalmanager::alarm(0);
-		pvt->_semset->retryInterruptedOperations();
+		pvt->_semset->setRetryInterruptedOperations(true);
 	} else {
 		if (withundo) {
 			result=pvt->_semset->waitWithUndo(index);
@@ -1791,9 +1783,11 @@ bool sqlrlistener::doneAcceptingAvailableConnection() {
 }
 
 void sqlrlistener::waitForConnectionToBeReadyForHandoff() {
-	raiseDebugMessageEvent("waiting for connection to be ready for handoff");
+	raiseDebugMessageEvent(
+		"waiting for connection to be ready for handoff");
 	pvt->_semset->wait(12);
-	raiseDebugMessageEvent("done waiting for connection to be ready for handoff");
+	raiseDebugMessageEvent(
+		"done waiting for connection to be ready for handoff");
 }
 
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
@@ -1844,6 +1838,11 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		// execute this only if code above executed without errors...
 		if (ok) {
 
+			// FIXME: If a connection was spawned and has signaled
+			// on semaphore 12, but some step above failed, then
+			// waitForConnectionToBeReadyForHandoff below won't
+			// be called, and semaphore 12 will grow and grow.
+
 			// wait for the connection to let us know that it's
 			// ready to have a client handed off to it
 			waitForConnectionToBeReadyForHandoff();
@@ -1873,7 +1872,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					"a connection: timeout");
 			sock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
 			sock->write((uint64_t)SQLR_ERROR_HANDOFFFAILED);
-			sock->write((uint16_t)charstring::length(
+			sock->write((uint16_t)charstring::getLength(
 					SQLR_ERROR_HANDOFFFAILED_STRING));
 			sock->write(SQLR_ERROR_HANDOFFFAILED_STRING);
 			sock->flushWriteBuffer(-1,-1);
@@ -1886,7 +1885,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					"a connection: all dbs were down");
 			sock->write((uint16_t)ERROR_OCCURRED);
 			sock->write((uint64_t)SQLR_ERROR_DBSDOWN);
-			sock->write((uint16_t)charstring::length(
+			sock->write((uint16_t)charstring::getLength(
 						SQLR_ERROR_DBSDOWN_STRING));
 			sock->write(SQLR_ERROR_DBSDOWN_STRING);
 			sock->flushWriteBuffer(-1,-1);
@@ -2021,8 +2020,8 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 
 	// connect to the fixup socket of the parent listener
 	unixsocketclient	fixupclientsockun;
-	if (fixupclientsockun.connect(pvt->_fixupsockname,-1,-1,0,1)
-							!=RESULT_SUCCESS) {
+	fixupclientsockun.setFileName(pvt->_fixupsockname);
+	if (fixupclientsockun.connect()!=RESULT_SUCCESS) {
 		raiseInternalErrorEvent("fixup failed to connect");
 		return false;
 	}
@@ -2047,7 +2046,7 @@ bool sqlrlistener::requestFixup(uint32_t connectionpid,
 	// possibly other systems, it ends up in non-blocking mode
 	// in this process, independent of its mode in the other
 	// process.  So, we force it to blocking mode here.
-	connectionsock->useBlockingMode();
+	connectionsock->setNonBlockingMode(false);
 
 	raiseDebugMessageEvent("received socket of newly spawned connection");
 	return true;
@@ -2064,8 +2063,8 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	serversock->flushWriteBuffer(-1,-1);
 
 	// wait up to 5 seconds for a response
-	unsigned char	ack=0;
-	if (serversock->read(&ack,5,0)!=sizeof(unsigned char)) {
+	byte_t	ack=0;
+	if (serversock->read(&ack,5,0)!=sizeof(byte_t)) {
 		raiseDebugMessageEvent("proxying client failed: "
 					"failed to receive ack");
 		return false;
@@ -2078,10 +2077,10 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	}
 
 	// allow short reads and use non blocking mode
-	serversock->allowShortReads();
-	serversock->useNonBlockingMode();
-	clientsock->allowShortReads();
-	clientsock->useNonBlockingMode();
+	serversock->setAllowShortReads(true);
+	serversock->setNonBlockingMode(true);
+	clientsock->setAllowShortReads(true);
+	clientsock->setNonBlockingMode(true);
 
 	// set up read and write listeners
 	listener	readlistener;
@@ -2096,7 +2095,7 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	filedescriptor	*wfd=NULL;
 
 	// set up a read buffer
-	unsigned char	readbuffer[8192];
+	byte_t	readbuffer[8192];
 
 	// should we send an end session command to the connection?
 	bool	endsession=false;
@@ -2179,17 +2178,17 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 	if (endsession) {
 		raiseDebugMessageEvent("ending the session");
 		// translate byte order for this, as the client would
-		serversock->translateByteOrder();
+		serversock->setTranslateByteOrder(true);
 		serversock->write((uint16_t)END_SESSION);
 		serversock->flushWriteBuffer(-1,-1);
-		serversock->dontTranslateByteOrder();
+		serversock->setTranslateByteOrder(false);
 	}
 
 	// set everything back to normal
-	serversock->dontAllowShortReads();
-	serversock->useBlockingMode();
-	clientsock->dontAllowShortReads();
-	clientsock->useBlockingMode();
+	serversock->setAllowShortReads(false);
+	serversock->setNonBlockingMode(false);
+	clientsock->setAllowShortReads(false);
+	clientsock->setNonBlockingMode(false);
 
 	raiseDebugMessageEvent("finished proxying client");
 
@@ -2226,7 +2225,7 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 		// number of bytes that could be sent.
 
 		uint32_t	counter=0;
-		clientsock->useNonBlockingMode();
+		clientsock->setNonBlockingMode(true);
 		while (clientsock->read(&dummy,pvt->_idleclienttimeout,0)>0 &&
 					counter<
 					// sending auth
@@ -2262,13 +2261,13 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 					)/2) {
 			counter++;
 		}
-		clientsock->useBlockingMode();
+		clientsock->setNonBlockingMode(false);
 	}
 }
 
 void sqlrlistener::setStartTime() {
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	pvt->_shm->starttime=dt.getEpoch();
 }
 
@@ -2298,7 +2297,7 @@ void sqlrlistener::incrementConnectedClientCount() {
 
 	// update the peak connections-in-use over the previous minute count
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	if (pvt->_shm->connectedclients>
 			pvt->_shm->peak_connectedclients_1min ||
 		dt.getEpoch()/60>
@@ -2385,7 +2384,7 @@ void sqlrlistener::incrementBusyListeners() {
 
 	// update the peak listeners over the previous minute count
 	datetime	dt;
-	dt.getSystemDateAndTime();
+	dt.initFromSystemDateTime();
 	if (busylisteners>pvt->_shm->peak_listeners_1min ||
 		dt.getEpoch()/60>pvt->_shm->peak_listeners_1min_time/60) {
 		pvt->_shm->peak_listeners_1min=busylisteners;

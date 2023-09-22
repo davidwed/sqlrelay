@@ -106,8 +106,8 @@ int	main(int argc, char **argv) {
 	printf("CONNECT: \n");
 #ifdef USEDSN
 	SQLCHAR	*dsn=(SQLCHAR *)"sqlrodbc";
-	SQLCHAR	*user=(SQLCHAR *)"test";
-	SQLCHAR	*password=(SQLCHAR *)"test";
+	SQLCHAR	*user=(SQLCHAR *)"testuser";
+	SQLCHAR	*password=(SQLCHAR *)"testpassword";
 	erg=SQLConnect(dbc,dsn,SQL_NTS,user,SQL_NTS,password,SQL_NTS);
 #else
 	SQLCHAR		*incstring=(SQLCHAR *)"Driver={SQL Relay};Server=localhost;Port=8000;User=test;Password=test;LazyConnect=0;Debug=1;";

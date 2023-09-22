@@ -85,19 +85,19 @@ void sqlrdirective_crash::parseDirective(
 		return;
 	}
 
-	if ((length>charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)) &&
+	if ((length>charstring::getLength(KEYWORD_SQLRELAY_CRASH_ARG)) &&
 		(!charstring::compare(directivestart,
 			KEYWORD_SQLRELAY_CRASH_ARG,
-			charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)))) {
+			charstring::getLength(KEYWORD_SQLRELAY_CRASH_ARG)))) {
 
 		int32_t		argumentsize=length-
-				charstring::length(KEYWORD_SQLRELAY_CRASH_ARG);
+				charstring::getLength(KEYWORD_SQLRELAY_CRASH_ARG);
 		const char	*argument=&directivestart[
-				charstring::length(KEYWORD_SQLRELAY_CRASH_ARG)];
+				charstring::getLength(KEYWORD_SQLRELAY_CRASH_ARG)];
 
 		int32_t		iargument=0;
 		if (charstring::isInteger(argument,argumentsize)) {
-			iargument=charstring::toInteger(argument);
+			iargument=charstring::convertToInteger(argument);
 		}
 		crashmeTest(iargument);
 		return;

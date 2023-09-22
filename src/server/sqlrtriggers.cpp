@@ -128,10 +128,10 @@ sqlrtriggerplugin *sqlrtriggers::loadTrigger(domnode *trigger) {
 
 	// get the trigger name
 	const char	*module=trigger->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=trigger->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return NULL;
 		}
 	}

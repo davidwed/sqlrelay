@@ -479,7 +479,7 @@ bool freetdsconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set packetsize
-	uint16_t	ps=charstring::toInteger(packetsize);
+	uint16_t	ps=charstring::convertToInteger(packetsize);
 	if (!charstring::isNullOrEmpty(packetsize) &&
 		ct_con_props(dbconn,CS_SET,CS_PACKETSIZE,
 			(CS_VOID *)&ps,sizeof(ps),
@@ -873,16 +873,16 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	char	*v=charstring::findFirst(versionstring,'v');
 	if (v) {
 		*v='\0';
-		majorversion=charstring::toInteger(v+1);
+		majorversion=charstring::convertToInteger(v+1);
 		char	*firstdot=charstring::findFirst(v+1,'.');
 		if (firstdot) {
 			*firstdot='\0';
-			minorversion=charstring::toInteger(firstdot+1);
+			minorversion=charstring::convertToInteger(firstdot+1);
 			char	*seconddot=
 				charstring::findFirst(firstdot+1,'.');
 			if (seconddot) {
 				*seconddot='\0';
-				patchlevel=charstring::toInteger(seconddot+1);
+				patchlevel=charstring::convertToInteger(seconddot+1);
 			} else {
 				patchlevel=0;
 			}
@@ -908,7 +908,7 @@ freetdscursor::freetdscursor(sqlrserverconnection *conn, uint16_t id) :
 	languagecmd=NULL;
 	cursorcmd=NULL;
 
-	cursornamelength=charstring::integerLength(id);
+	cursornamelength=charstring::getIntegerLength(id);
 	cursorname=charstring::parseNumber(id);
 
 	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
@@ -1011,7 +1011,7 @@ bool freetdscursor::open() {
 	bool	retval=true;
 	if (!charstring::isNullOrEmpty(freetdsconn->db) &&
 					!freetdsconn->dbused) {
-		uint32_t	len=charstring::length(freetdsconn->db)+4;
+		uint32_t	len=charstring::getLength(freetdsconn->db)+4;
 		char		*query=new char[len+1];
 		charstring::printf(query,len+1,"use %s",freetdsconn->db);
 		if (!(prepareQuery(query,len) && executeQuery(query,len))) {
@@ -1044,7 +1044,7 @@ bool freetdscursor::open() {
 		for (uint32_t i=0; query[i] && !freetdsconn->dbversion; i++) {
 
 			const char	*q=query[i];
-			int32_t		len=charstring::length(q);
+			int32_t		len=charstring::getLength(q);
 			bool		error=false;
 
 			if (prepareQuery(q,len) &&
@@ -1349,7 +1349,7 @@ bool freetdscursor::inputBind(const char *variable,
 	charstring::append(buffer,(int64_t)microsecond);
 	charstring::append(buffer,ampm);
 	return inputBind(variable,variablesize,
-				buffer,charstring::length(buffer),isnull);
+				buffer,charstring::getLength(buffer),isnull);
 }
 
 bool freetdscursor::outputBind(const char *variable, 
@@ -1752,10 +1752,10 @@ bool freetdscursor::executeQuery(const char *query, uint32_t length) {
 						data[i],length);
 			} else if (outbindtype[i]==CS_INT_TYPE) {
 				*outbindints[i]=
-					charstring::toInteger(data[i]);
+					charstring::convertToInteger(data[i]);
 			} else if (outbindtype[i]==CS_FLOAT_TYPE) {
 				*outbinddoubles[i]=
-					charstring::toFloatC(data[i]);
+					charstring::convertToFloatC(data[i]);
 			} else if (outbindtype[i]==CS_DATETIME_TYPE) {
 
 				// convert to a CS_DATEREC

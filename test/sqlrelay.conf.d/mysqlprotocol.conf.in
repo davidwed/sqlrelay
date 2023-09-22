@@ -5,11 +5,6 @@
 		<listeners>
 			<listener protocol="mysql" port="3306"/>
 		</listeners>
-		<auths>
-			<auth module="mysql_userlist">
-				<user user="testuser" password="testpassword"/>
-			</auth>
-		</auths>
 		<connections>
 			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
 		</connections>

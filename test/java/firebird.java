@@ -80,7 +80,7 @@ class firebird {
 		SQLRConnection con=new SQLRConnection("sqlrelay",
 						(short)9000,
 						"/tmp/test.socket",
-						"test","test",0,1);
+						"testuser","testpassword",0,1);
 		SQLRCursor cur=new SQLRCursor(con);
 	
 		// get database type
@@ -723,7 +723,7 @@ class firebird {
 		SQLRConnection secondcon=new SQLRConnection("sqlrelay",
 						(short)9000,
 						"/tmp/test.socket",
-						"test","test",0,1);
+						"testuser","testpassword",0,1);
 		SQLRCursor secondcur=new SQLRCursor(secondcon);
 		checkSuccess(secondcur.sendQuery("select count(*) from testtable"),1);
 		checkSuccess(secondcur.getField(0,0),"0");

@@ -5,8 +5,8 @@
 	$host="sqlrelay";
 	$port=9000;
 	$socket="/tmp/test.socket";
-	$user="test";
-	$password="test";
+	$user="testuser";
+	$password="testpassword";
 	$dsn="sqlrelay:host=$host;port=$port;socket=$socket;tries=0;retrytime=1;debug=0";
 
 

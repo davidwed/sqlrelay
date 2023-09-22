@@ -119,7 +119,7 @@ int	main(int argc, char **argv) {
 		OCIHandleAlloc(env,(void **)&svc,OCI_HTYPE_SVCCTX,0,NULL),
 		OCI_SUCCESS);
 	checkSuccess(
-		OCIServerAttach(srv,err,(text *)sid,charstring::length(sid),0),
+		OCIServerAttach(srv,err,(text *)sid,charstring::getLength(sid),0),
 		OCI_SUCCESS);
 	checkSuccess(
 		OCIAttrSet(svc,OCI_HTYPE_SVCCTX,srv,0,OCI_ATTR_SERVER,err),
@@ -129,12 +129,12 @@ int	main(int argc, char **argv) {
 		OCI_SUCCESS);
 	checkSuccess(
 		OCIAttrSet(session,OCI_HTYPE_SESSION,
-				(void *)user,charstring::length(user),
+				(void *)user,charstring::getLength(user),
 				OCI_ATTR_USERNAME,err),
 		OCI_SUCCESS);
 	checkSuccess(
 		OCIAttrSet(session,OCI_HTYPE_SESSION,
-				(void *)password,charstring::length(password),
+				(void *)password,charstring::getLength(password),
 				OCI_ATTR_PASSWORD,err),
 		OCI_SUCCESS);
 	checkSuccess(
@@ -174,7 +174,7 @@ int	main(int argc, char **argv) {
 	query="select 'hello' as hello from dual";
 	checkSuccess(
 		OCIStmtPrepare(stmt,err,
-				(text *)query,charstring::length(query),
+				(text *)query,charstring::getLength(query),
 				OCI_NTV_SYNTAX,
 				//OCI_V7_SYNTAX,
 				OCI_DEFAULT),

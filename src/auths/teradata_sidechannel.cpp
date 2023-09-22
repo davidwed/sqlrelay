@@ -44,47 +44,47 @@ class SQLRSERVER_DLLSPEC sqlrauth_teradata_sidechannel : public sqlrauth {
 		bool	recvMessageFromBackend();
 		bool	forwardBackendMessageToClient();
 
-		void	copyOut(unsigned char *rp,
-					unsigned char *value,
-					unsigned char **rpout);
-		void	copyOut(unsigned char *rp,
+		void	copyOut(byte_t *rp,
+					byte_t *value,
+					byte_t **rpout);
+		void	copyOut(byte_t *rp,
 					char *value,
 					size_t length,
-					unsigned char **rpout);
-		void	copyOut(unsigned char *rp,
-					unsigned char *value,
+					byte_t **rpout);
+		void	copyOut(byte_t *rp,
+					byte_t *value,
 					size_t length,
-					unsigned char **rpout);
-		void	copyOut(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOut(byte_t *rp,
 					char16_t *value,
 					size_t length,
-					unsigned char **rpout);
-		void	copyOut(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOut(byte_t *rp,
 					float *value,
-					unsigned char **rpout);
-		void	copyOut(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOut(byte_t *rp,
 					double *value,
-					unsigned char **rpout);
-		void	copyOutLE(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOutLE(byte_t *rp,
 					uint16_t *value,
-					unsigned char **rpout);
-		void	copyOutBE(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOutBE(byte_t *rp,
 					uint16_t *value,
-					unsigned char **rpout);
-		void	copyOutLE(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOutLE(byte_t *rp,
 					uint32_t *value,
-					unsigned char **rpout);
-		void	copyOutBE(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOutBE(byte_t *rp,
 					uint32_t *value,
-					unsigned char **rpout);
-		void	copyOutLE(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOutLE(byte_t *rp,
 					uint64_t *value,
-					unsigned char **rpout);
-		void	copyOutBE(unsigned char *rp,
+					byte_t **rpout);
+		void	copyOutBE(byte_t *rp,
 					uint64_t *value,
-					unsigned char **rpout);
+					byte_t **rpout);
 
-		void	debugHexDump(const unsigned char *data, uint64_t size);
+		void	debugHexDump(const byte_t *data, uint64_t size);
 
 		const char	*host;
 		uint16_t	port;
@@ -97,18 +97,18 @@ class SQLRSERVER_DLLSPEC sqlrauth_teradata_sidechannel : public sqlrauth {
 		bytebuffer	senddata;
 
 		memorypool	*clientrecvmessagepool;
-		unsigned char	*clientrecvheader;
-		unsigned char	*clientrecvdata;
+		byte_t		*clientrecvheader;
+		byte_t		*clientrecvdata;
 		uint32_t	clientrecvdatalength;
 
 		memorypool	*sidechannelrecvmessagepool;
-		unsigned char	*sidechannelrecvheader;
-		unsigned char	*sidechannelrecvdata;
+		byte_t		*sidechannelrecvheader;
+		byte_t		*sidechannelrecvdata;
 		uint32_t	sidechannelrecvdatalength;
 
-		unsigned char	messagekind;
+		byte_t		messagekind;
 		uint32_t	sessionno;
-		unsigned char	requestauth[8];
+		byte_t		requestauth[8];
 		uint32_t	requestno;
 
 		inetsocketclient	isc;
@@ -124,7 +124,7 @@ sqlrauth_teradata_sidechannel::sqlrauth_teradata_sidechannel(
 	debug=cont->getConfig()->getDebugAuths();
 
 	host=parameters->getAttributeValue("host");
-	port=charstring::toInteger(parameters->getAttributeValue("port"));
+	port=charstring::convertToInteger(parameters->getAttributeValue("port"));
 
 	clientsock=NULL;
 
@@ -153,8 +153,10 @@ const char *sqlrauth_teradata_sidechannel::auth(sqlrcredentials *cred) {
 	clientsock=((sqlrteradatacredentials *)cred)->getClientFileDescriptor();
 
 	isc.close();
+	isc.setHost(host);
+	isc.setPort(port);
 	// FIXME: buffering
-	if (!isc.connect(host,port,-1,-1,0,0)) {
+	if (!isc.connect()) {
 		// FIXME: display/report error
 		return NULL;
 	}
@@ -242,20 +244,20 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromClient() {
 	}
 
 	// lan header fields
-	unsigned char	version;
-	unsigned char	messageclass;
+	byte_t		version;
+	byte_t		messageclass;
 	uint16_t	highordermessagelength;
-	unsigned char	bytevar;
+	byte_t		bytevar;
 	uint16_t	wordvar;
 	uint16_t	lowordermessagelength;
 	uint16_t 	resforexpan[3];
 	uint16_t	corrtag[2];
-	unsigned char	gtwbyte;
-	unsigned char	hostcharset;
-	unsigned char	spare[14];
+	byte_t		gtwbyte;
+	byte_t		hostcharset;
+	byte_t		spare[14];
 
 	// copy out values from lan header
-	unsigned char	*ptr=clientrecvheader;
+	byte_t	*ptr=clientrecvheader;
 	copyOut(ptr,&version,&ptr);
 	copyOut(ptr,&messageclass,&ptr);
 	copyOut(ptr,&messagekind,&ptr);
@@ -264,15 +266,15 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromClient() {
 	copyOutBE(ptr,&wordvar,&ptr);
 	copyOutBE(ptr,&lowordermessagelength,&ptr);
 	// FIXME: net-to-host these?
-	copyOut(ptr,(unsigned char *)resforexpan,sizeof(resforexpan),&ptr);
+	copyOut(ptr,(byte_t *)resforexpan,sizeof(resforexpan),&ptr);
 	// FIXME: net-to-host these?
-	copyOut(ptr,(unsigned char *)corrtag,sizeof(corrtag),&ptr);
+	copyOut(ptr,(byte_t *)corrtag,sizeof(corrtag),&ptr);
 	copyOutBE(ptr,&sessionno,&ptr);
-	copyOut(ptr,(unsigned char *)requestauth,sizeof(requestauth),&ptr);
+	copyOut(ptr,(byte_t *)requestauth,sizeof(requestauth),&ptr);
 	copyOutBE(ptr,&requestno,&ptr);
 	copyOut(ptr,&gtwbyte,&ptr);
 	copyOut(ptr,&hostcharset,&ptr);
-	copyOut(ptr,(unsigned char *)spare,sizeof(spare),&ptr);
+	copyOut(ptr,(byte_t *)spare,sizeof(spare),&ptr);
 
 	clientrecvdatalength=(((uint32_t)highordermessagelength)<<16)|
 					((uint32_t)lowordermessagelength);
@@ -289,11 +291,10 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromClient() {
 		stdoutput.printf("	low order message length: %d\n",
 						(int)lowordermessagelength);
 		stdoutput.write("	res for expan: ");
-		stdoutput.safePrint((unsigned char *)resforexpan,
-						sizeof(resforexpan));
+		stdoutput.safePrint((byte_t *)resforexpan,sizeof(resforexpan));
 		stdoutput.write('\n');
 		stdoutput.write("	correleation tag: ");
-		stdoutput.safePrint((unsigned char *)corrtag,sizeof(corrtag));
+		stdoutput.safePrint((byte_t *)corrtag,sizeof(corrtag));
 		stdoutput.write('\n');
 		stdoutput.printf("	session no: %d\n",(int)sessionno);
 		stdoutput.printf("	request auth: "
@@ -392,25 +393,25 @@ bool sqlrauth_teradata_sidechannel::recvMessageFromBackend() {
 	// copy out values from lan header
 	uint16_t	lowordermessagelength;
 	uint16_t	highordermessagelength;
-	unsigned char	*ptr=sidechannelrecvheader;
+	byte_t		*ptr=sidechannelrecvheader;
 	// skip version, message class
-	ptr=ptr+sizeof(unsigned char)+
-		sizeof(unsigned char);
+	ptr=ptr+sizeof(byte_t)+
+		sizeof(byte_t);
 	messagekind=*ptr;
 	// skip message kind
-	ptr=ptr+sizeof(unsigned char);
+	ptr=ptr+sizeof(byte_t);
 	// high order message length
 	bytestring::copy(&highordermessagelength,ptr,sizeof(uint16_t));
 	highordermessagelength=
-		filedescriptor::netToHost(highordermessagelength);
+		filedescriptor::convertNetToHost(highordermessagelength);
 	// skip high order message length, bytevar, wordvar
 	ptr=ptr+sizeof(uint16_t)+
-		sizeof(unsigned char)+
+		sizeof(byte_t)+
 		sizeof(uint16_t);
 	// low order message length
 	bytestring::copy(&lowordermessagelength,ptr,sizeof(uint16_t));
 	lowordermessagelength=
-		filedescriptor::netToHost(lowordermessagelength);
+		filedescriptor::convertNetToHost(lowordermessagelength);
 
 	// build the total length
 	sidechannelrecvdatalength=(((uint32_t)highordermessagelength)<<16)|
@@ -484,102 +485,102 @@ bool sqlrauth_teradata_sidechannel::forwardBackendMessageToClient() {
 	return true;
 }
 
-void sqlrauth_teradata_sidechannel::copyOut(unsigned char *rp,
-						unsigned char *value,
-						unsigned char **rpout) {
+void sqlrauth_teradata_sidechannel::copyOut(byte_t *rp,
+						byte_t *value,
+						byte_t **rpout) {
 	*value=*rp;
-	*rpout=rp+sizeof(unsigned char);
+	*rpout=rp+sizeof(byte_t);
 }
 
-void sqlrauth_teradata_sidechannel::copyOut(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOut(byte_t *rp,
 						char *value,
 						size_t length,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,length);
 	*rpout=rp+length;
 }
 
-void sqlrauth_teradata_sidechannel::copyOut(unsigned char *rp,
-						unsigned char *value,
+void sqlrauth_teradata_sidechannel::copyOut(byte_t *rp,
+						byte_t *value,
 						size_t length,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,length);
 	*rpout=rp+length;
 }
 
-void sqlrauth_teradata_sidechannel::copyOut(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOut(byte_t *rp,
 						char16_t *value,
 						size_t length,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,length*sizeof(char16_t));
 	*rpout=rp+length*sizeof(char16_t);
 }
 
-void sqlrauth_teradata_sidechannel::copyOut(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOut(byte_t *rp,
 						float *value,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(float));
 	*rpout=rp+sizeof(float);
 }
 
-void sqlrauth_teradata_sidechannel::copyOut(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOut(byte_t *rp,
 						double *value,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(double));
 	*rpout=rp+sizeof(double);
 }
 
 
-void sqlrauth_teradata_sidechannel::copyOutLE(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOutLE(byte_t *rp,
 						uint16_t *value,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint16_t));
-	*value=filedescriptor::littleEndianToHost(*value);
+	*value=filedescriptor::convertLittleEndianToHost(*value);
 	*rpout=rp+sizeof(uint16_t);
 }
 
-void sqlrauth_teradata_sidechannel::copyOutBE(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOutBE(byte_t *rp,
 						uint16_t *value,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint16_t));
-	*value=filedescriptor::netToHost(*value);
+	*value=filedescriptor::convertNetToHost(*value);
 	*rpout=rp+sizeof(uint16_t);
 }
 
-void sqlrauth_teradata_sidechannel::copyOutLE(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOutLE(byte_t *rp,
 						uint32_t *value,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint32_t));
-	*value=filedescriptor::littleEndianToHost(*value);
+	*value=filedescriptor::convertLittleEndianToHost(*value);
 	*rpout=rp+sizeof(uint32_t);
 }
 
-void sqlrauth_teradata_sidechannel::copyOutBE(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOutBE(byte_t *rp,
 						uint32_t *value,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint32_t));
-	*value=filedescriptor::netToHost(*value);
+	*value=filedescriptor::convertNetToHost(*value);
 	*rpout=rp+sizeof(uint32_t);
 }
 
-void sqlrauth_teradata_sidechannel::copyOutLE(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOutLE(byte_t *rp,
 						uint64_t *value,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint64_t));
-	*value=filedescriptor::littleEndianToHost(*value);
+	*value=filedescriptor::convertLittleEndianToHost(*value);
 	*rpout=rp+sizeof(uint64_t);
 }
 
-void sqlrauth_teradata_sidechannel::copyOutBE(unsigned char *rp,
+void sqlrauth_teradata_sidechannel::copyOutBE(byte_t *rp,
 						uint64_t *value,
-						unsigned char **rpout) {
+						byte_t **rpout) {
 	bytestring::copy(value,rp,sizeof(uint64_t));
-	*value=filedescriptor::netToHost(*value);
+	*value=filedescriptor::convertNetToHost(*value);
 	*rpout=rp+sizeof(uint64_t);
 }
 
-void sqlrauth_teradata_sidechannel::debugHexDump(
-			const unsigned char *data, uint64_t size) {
+void sqlrauth_teradata_sidechannel::debugHexDump(const byte_t *data,
+							uint64_t size) {
 	if (!size) {
 		return;
 	}

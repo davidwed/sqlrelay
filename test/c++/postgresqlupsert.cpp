@@ -111,7 +111,7 @@ int	main(int argc, char **argv) {
 
 	stdoutput.printf("UPSERT:\n");
 	con=new sqlrconnection("sqlrelay",9000,"/tmp/test.socket",
-							"test","test",0,1);
+						"testuser","testpassword",0,1);
 	cur=new sqlrcursor(con);
 	secondcur=new sqlrcursor(con);
 	cur->sendQuery("drop table student");

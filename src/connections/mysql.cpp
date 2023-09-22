@@ -289,6 +289,8 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		stringbuffer	loginerror;
 
 		bool		escapeblobs;
+
+		uint64_t	lastinsertid;
 };
 
 extern "C" {
@@ -318,6 +320,8 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 #ifdef HAVE_MYSQL_OPT_SSL_MODE
 	sslmode=0;
 #endif
+
+	lastinsertid=0;
 }
 
 mysqlconnection::~mysqlconnection() {
@@ -418,7 +422,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	// Handle port and socket.
 	int		portval=
 			(!charstring::isNullOrEmpty(port))?
-					charstring::toInteger(port):0;
+					charstring::convertToInteger(port):0;
 	const char	*socketval=
 			(!charstring::isNullOrEmpty(socket))?socket:NULL;
 	unsigned long	clientflag=0;
@@ -589,13 +593,15 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 				".",true,&list,&listlen);
 
 	if (listlen==3) {
-		uint64_t	major=charstring::toUnsignedInteger(list[0]);
-		uint64_t	minor=charstring::toUnsignedInteger(list[1]);
-		uint64_t	patch=charstring::toUnsignedInteger(list[2]);
-		if (major>4 || (major==4 && minor>1) ||
-				(major==4 && minor==1 && patch>=2)) {
+		uint64_t	major=
+				charstring::convertToUnsignedInteger(list[0]);
+		uint64_t	minor=
+				charstring::convertToUnsignedInteger(list[1]);
+		uint64_t	patch=
+				charstring::convertToUnsignedInteger(list[2]);
+		if (major<4 || (major==4 && minor<1) ||
+				(major==4 && minor==1 && patch<2)) {
 			cont->setFakeInputBinds(true);
-		}  else {
 			escapeblobs=true;
 		}
 		for (uint64_t index=0; index<listlen; index++) {
@@ -616,7 +622,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 
 #ifdef HAVE_MYSQL_SET_CHARACTER_SET
 	// set the character set
-	if (charstring::length(charset)) {
+	if (charstring::getLength(charset)) {
 		mysql_set_character_set(mysqlptr,charset);
 	}
 #endif
@@ -748,12 +754,21 @@ const char *mysqlconnection::setIsolationLevelQuery() {
 }
 
 bool mysqlconnection::getLastInsertId(uint64_t *id) {
-	*id=mysql_insert_id(mysqlptr);
+	// Some versions of mariadb client (10.1) incorrectly reset the last
+	// insert id after each query instead of hanging on to it until another
+	// insert overrides it, or until end-of-session.
+	//
+	// To enforce the correct behavior we'll:
+	// * keep our own last insert id
+	// * call mysql_insert_id() after each execute and update our last
+	//   insert id if it returns non-zero
+	// * reset our last insert id to 0 at end-of-session
+	*id=lastinsertid;
 	return true;
 }
 
 const char *mysqlconnection::noopQuery() {
-	return "begin; end;";
+	return "set @noop=null";
 }
 
 bool mysqlconnection::isTransactional() {
@@ -866,7 +881,7 @@ void mysqlconnection::errorMessage(char *errorbuffer,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	const char	*errorstring=mysql_error(mysqlptr);
-	*errorlength=charstring::length(errorstring);
+	*errorlength=charstring::getLength(errorstring);
 	charstring::safeCopy(errorbuffer,errorbufferlength,
 					errorstring,*errorlength);
 	*errorcode=mysql_errno(mysqlptr);
@@ -893,6 +908,7 @@ int16_t mysqlconnection::nullBindValue() {
 
 void mysqlconnection::endSession() {
 	firstquery=true;
+	lastinsertid=0;
 }
 
 mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
@@ -1169,7 +1185,7 @@ bool mysqlcursor::inputBind(const char *variable,
 	// If it's something like :var1,:var2,:var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1208,7 +1224,7 @@ bool mysqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1242,7 +1258,7 @@ bool mysqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1285,7 +1301,7 @@ bool mysqlcursor::inputBind(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1355,7 +1371,7 @@ bool mysqlcursor::inputBindBlob(const char *variable,
 	// If it's something like ?var1,?var2,?var3, etc. then it'll be
 	// converted to 0.  1 will be subtracted and after the cast it will
 	// be converted to 65535 and will cause the if below to fail.
-	uint16_t	pos=charstring::toInteger(variable+1)-1;
+	uint16_t	pos=charstring::convertToInteger(variable+1)-1;
 
 	// validate bind index
 	if (pos>=maxbindcount) {
@@ -1405,7 +1421,15 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		}
 
 		// execute the query
-		if ((queryresult=mysql_stmt_execute(stmt))) {
+		queryresult=mysql_stmt_execute(stmt);
+
+		// see note inside of getLastInsertId() for why we do this here
+		uint64_t	id=mysql_insert_id(mysqlconn->mysqlptr);
+		if (id) {
+			mysqlconn->lastinsertid=id;
+		}
+
+		if (queryresult) {
 			return false;
 		}
 
@@ -1425,8 +1449,15 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		mysqlresult=NULL;
 
 		// execute the query
-		if ((queryresult=mysql_real_query(mysqlconn->mysqlptr,
-							query,length))) {
+		queryresult=mysql_real_query(mysqlconn->mysqlptr,query,length);
+
+		// see note inside of getLastInsertId() for why we do this here
+		uint64_t	id=mysql_insert_id(mysqlconn->mysqlptr);
+		if (id) {
+			mysqlconn->lastinsertid=id;
+		}
+
+		if (queryresult) {
 			return false;
 		}
 
@@ -1567,7 +1598,7 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 	}
 
 	// set return values
-	*errorlength=charstring::length(err);
+	*errorlength=charstring::getLength(err);
 	charstring::safeCopy(errorbuffer,errorbufferlength,err,*errorlength);
 	*errorcode=errn;
 }
@@ -2010,8 +2041,7 @@ bool mysqlcursor::getLobFieldSegment(uint32_t col,
 	}
 
 	// copy out the data
-	bytestring::copy(buffer,
-		(unsigned char *)lobfield.buffer+offset,*charsread);
+	bytestring::copy(buffer,(byte_t *)lobfield.buffer+offset,*charsread);
 
 	return true;
 }

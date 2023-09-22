@@ -605,8 +605,6 @@ following.
 }}}
 }}}
 
-Note: Versions of !MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of !MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.
-
 To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
@@ -835,8 +833,6 @@ following.
 @parts/cs-mysql-testproc-1value.cs@
 }}}
 }}}
-
-Note: Versions of !MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of !MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.
 
 To drop the function, run a query like the following.
 
@@ -1087,8 +1083,6 @@ following.
 }}}
 }}}
 
-Note: Versions of !MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of !MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.
-
 To drop the stored procedure, run a query like the following.
 
 {{{#!blockquote
@@ -1259,8 +1253,6 @@ following.
 @parts/cs-mysql-testproc-result-set.cs@
 }}}
 }}}
-
-Note: Versions of !MySQL prior to 5.0 had trouble calling stored procedures using bind variables.  If you are using a version of !MySQL prior to 5.0 then SQL relay must fake the bind variables and you must use colon-delimited variables (:1, :2, :3, etc.) in your queries rather than the native-mysql queston marks.
 
 To drop the stored procedure, run a query like the following.
 

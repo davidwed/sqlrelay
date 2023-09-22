@@ -18,8 +18,7 @@ class SQLRSERVER_DLLSPEC sqlrerrortranslation_renumber :
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					const char **translatederror,
-					uint32_t *translatederrorlength);
+					stringbuffer *translatederror);
 	private:
 		dictionary<int64_t,int64_t>	map;
 
@@ -48,8 +47,8 @@ sqlrerrortranslation_renumber::sqlrerrortranslation_renumber(
 		const char	*to=node->getAttributeValue("to");
 		if (!charstring::isNullOrEmpty(from) &&
 				!charstring::isNullOrEmpty(to)) {
-			map.setValue(charstring::toInteger(from),
-					charstring::toInteger(to));
+			map.setValue(charstring::convertToInteger(from),
+					charstring::convertToInteger(to));
 		}
 	}
 }
@@ -60,13 +59,11 @@ bool sqlrerrortranslation_renumber::run(sqlrserverconnection *sqlrcon,
 					const char *error,
 					uint32_t errorlength,
 					int64_t *translatederrornumber,
-					const char **translatederror,
-					uint32_t *translatederrorlength) {
+					stringbuffer *translatederror) {
 	debugFunction();
 
 	*translatederrornumber=errornumber;
-	*translatederror=error;
-	*translatederrorlength=errorlength;
+	translatederror->append(error,errorlength);
 
 	if (!enabled) {
 		return true;

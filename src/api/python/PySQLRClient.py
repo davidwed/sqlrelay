@@ -313,6 +313,13 @@ class sqlrconnection:
         """
         return CSQLRelay.bindFormat(self.connection)
 
+    def nextvalFormat(self):
+        """
+        Returns a string representing the format of the
+        sequence nextval command used in the db.
+        """
+        return CSQLRelay.nextvalFormat(self.connection)
+
     def selectDatabase(self,database):
         """
         Sets the current database/schema to "database"

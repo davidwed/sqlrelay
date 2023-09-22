@@ -66,7 +66,7 @@ sqlrcachemanager::sqlrcachemanager(int argc, const char **argv) {
 	// get the scaninterval
 	const char	*scanint=cmdl->getValue("-scaninterval");
 	if (!charstring::isNullOrEmpty(scanint)) {
-		scaninterval=charstring::toInteger(scanint);
+		scaninterval=charstring::convertToInteger(scanint);
 	} else {
 		scaninterval=DEFAULT_INTERVAL;
 	}
@@ -105,7 +105,7 @@ void sqlrcachemanager::scan() {
 	charstring::printf(&pidfile,"%ssqlr-cachemanager.%ld.pid",
 					sqlrpth->getPidDir(),(long)pid);
 
-	process::createPidFile(pidfile,permissions::ownerReadWrite());
+	process::createPidFile(pidfile,permissions::getOwnerReadWrite());
 
 	// scan...
 	directory	dir;
@@ -172,7 +172,7 @@ void sqlrcachemanager::erase(const char *dirname, const char *filename) {
 	
 			// delete the file if the ttl has expired
 			datetime	dt;
-			dt.getSystemDateAndTime();
+			dt.initFromSystemDateTime();
 			if (ttl<dt.getEpoch()) {
 				file::remove(fullpathname);
 			}
@@ -261,6 +261,6 @@ int main(int argc, const char **argv) {
 	process::exitOnCrashOrShutDown();
 
 	cacheman=new sqlrcachemanager(argc,argv);
-	process::handleShutDown(shutDown);
+	process::setShutDownHandler(shutDown);
 	cacheman->scan();
 }

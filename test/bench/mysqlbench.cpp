@@ -115,7 +115,7 @@ mysqlbenchconnection::mysqlbenchconnection(
 				const char *db) :
 				sqlrbenchconnection(connectstring,db) {
 	host=getParam("host");
-	port=charstring::toInteger(getParam("port"));
+	port=charstring::convertToInteger(getParam("port"));
 	socket=getParam("socket");
 	dbname=getParam("db");
 	user=getParam("user");
@@ -234,7 +234,7 @@ bool mysqlbenchcursor::query(const char *query, bool getcolumns) {
 		charstring::compare(query,"drop",4)) {
 
 		// prepare the query
-		if (mysql_stmt_prepare(stmt,query,charstring::length(query))) {
+		if (mysql_stmt_prepare(stmt,query,charstring::getLength(query))) {
 stdoutput.printf("prepare: %s\n",mysql_stmt_error(stmt));
 			return false;
 		}
@@ -294,7 +294,7 @@ stdoutput.printf("execute: %s\n",mysql_stmt_error(stmt));
 	}
 #endif
 	// execute the query
-	if (mysql_real_query(&mbcon->mysql,query,charstring::length(query))) {
+	if (mysql_real_query(&mbcon->mysql,query,charstring::getLength(query))) {
 		return false;
 	}
 

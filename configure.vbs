@@ -959,7 +959,7 @@ if disableoracle=false then
 end if
 if disablemysql=false then
 	MYSQLBUILD="yes    "
-	TESTDBS=TESTDBs&"""mysql"",""mysqlupsert"","
+	TESTDBS=TESTDBs&"""mysql"",""mysqlupsert"",""mysqldeadlockreplay"","
 end if
 if disablepostgresql=false then
 	POSTGRESQLBUILD="yes    "
@@ -1022,6 +1022,7 @@ infiles=Array(_
 	"test\\sqlrelay.conf.d\\mysql.conf.in",_
 	"test\\sqlrelay.conf.d\\mysqlprotocol.conf.in",_
 	"test\\sqlrelay.conf.d\\mysqlupsert.conf.in",_
+	"test\\sqlrelay.conf.d\\mysqldeadlockreplay.conf.in",_
 	"test\\sqlrelay.conf.d\\oracle.conf.in",_
 	"test\\sqlrelay.conf.d\\oracleprotocol.conf.in",_
 	"test\\sqlrelay.conf.d\\postgresql.conf.in",_
@@ -1047,26 +1048,27 @@ outfiles=Array(_
 	"sqlrelay-c++.pc",_
 	"msvc\\setupx64\\setupx64.vdproj",_
 	"msvc\\setupx86\\setupx86.vdproj",_
-	"test\\sqlrelay.conf.d\\db2.conf.in",_
-	"test\\sqlrelay.conf.d\\extensions.conf.in",_
-	"test\\sqlrelay.conf.d\\firebird.conf.in",_
-	"test\\sqlrelay.conf.d\\freetds.conf.in",_
-	"test\\sqlrelay.conf.d\\informix.conf.in",_
-	"test\\sqlrelay.conf.d\\mssql.conf.in",_
-	"test\\sqlrelay.conf.d\\mysql.conf.in",_
-	"test\\sqlrelay.conf.d\\mysqlprotocol.conf.in",_
-	"test\\sqlrelay.conf.d\\mysqlupsert.conf.in",_
-	"test\\sqlrelay.conf.d\\oracle.conf.in",_
-	"test\\sqlrelay.conf.d\\oracleprotocol.conf.in",_
-	"test\\sqlrelay.conf.d\\postgresql.conf.in",_
-	"test\\sqlrelay.conf.d\\postgresqlprotocol.conf.in",_
-	"test\\sqlrelay.conf.d\\postgresqlupsert.conf.in",_
-	"test\\sqlrelay.conf.d\\router.conf.in",_
-	"test\\sqlrelay.conf.d\\sap.conf.in",_
-	"test\\sqlrelay.conf.d\\sqlite.conf.in",_
-	"test\\sqlrelay.conf.d\\tdsprotocol.conf.in",_
-	"test\\sqlrelay.conf.d\\teradataprotocol.conf.in",_
-	"test\\sqlrelay.conf.d\\tls.conf.in"_
+	"test\\sqlrelay.conf.d\\db2.conf",_
+	"test\\sqlrelay.conf.d\\extensions.conf",_
+	"test\\sqlrelay.conf.d\\firebird.conf",_
+	"test\\sqlrelay.conf.d\\freetds.conf",_
+	"test\\sqlrelay.conf.d\\informix.conf",_
+	"test\\sqlrelay.conf.d\\mssql.conf",_
+	"test\\sqlrelay.conf.d\\mysql.conf",_
+	"test\\sqlrelay.conf.d\\mysqlprotocol.conf",_
+	"test\\sqlrelay.conf.d\\mysqlupsert.conf",_
+	"test\\sqlrelay.conf.d\\mysqldeadlockreplay.conf",_
+	"test\\sqlrelay.conf.d\\oracle.conf",_
+	"test\\sqlrelay.conf.d\\oracleprotocol.conf",_
+	"test\\sqlrelay.conf.d\\postgresql.conf",_
+	"test\\sqlrelay.conf.d\\postgresqlprotocol.conf",_
+	"test\\sqlrelay.conf.d\\postgresqlupsert.conf",_
+	"test\\sqlrelay.conf.d\\router.conf",_
+	"test\\sqlrelay.conf.d\\sap.conf",_
+	"test\\sqlrelay.conf.d\\sqlite.conf",_
+	"test\\sqlrelay.conf.d\\tdsprotocol.conf",_
+	"test\\sqlrelay.conf.d\\teradataprotocol.conf",_
+	"test\\sqlrelay.conf.d\\tls.conf"_
 	)
 
 

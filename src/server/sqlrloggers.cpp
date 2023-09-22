@@ -83,10 +83,10 @@ void sqlrloggers::loadLogger(domnode *logger) {
 
 	// get the logger name
 	const char	*module=logger->getAttributeValue("module");
-	if (!charstring::length(module)) {
+	if (!charstring::getLength(module)) {
 		// try "file", that's what it used to be called
 		module=logger->getAttributeValue("file");
-		if (!charstring::length(module)) {
+		if (!charstring::getLength(module)) {
 			return;
 		}
 	}
