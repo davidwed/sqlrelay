@@ -101,8 +101,11 @@ int	main(int argc, char **argv) {
 	con->commit();
 	stdoutput.printf("\n");
 
-	stdoutput.printf("INSERT: \n");
+	stdoutput.printf("BEGIN TRANACTION: \n");
 	cur->sendQuery("begin transaction");
+	stdoutput.printf("\n");
+
+	stdoutput.printf("INSERT: \n");
 	checkSuccess(cur->sendQuery("insert into testtable values (1,1.1,'testchar1','testvarchar1','testclob1','testblob1')"),1);
 	checkSuccess(cur->sendQuery("insert into testtable values (2,2.2,'testchar2','testvarchar2','testclob2','testblob2')"),1);
 	checkSuccess(cur->sendQuery("insert into testtable values (3,3.3,'testchar3','testvarchar3','testclob3','testblob3')"),1);

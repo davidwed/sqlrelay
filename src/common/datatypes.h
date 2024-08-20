@@ -623,7 +623,6 @@ static bool isBlobTypeChar(const char *type) {
 	return (!charstring::compareIgnoringCase(type,"IMAGE") ||
 		!charstring::compareIgnoringCase(type,"BINARY") ||
 		!charstring::compareIgnoringCase(type,"VARBINARY") ||
-		!charstring::compareIgnoringCase(type,"LONGCHAR") ||
 		!charstring::compareIgnoringCase(type,"LONGBINARY") ||
 		!charstring::compareIgnoringCase(type,"LONG") ||
 		!charstring::compareIgnoringCase(type,"TINYBLOB") ||
@@ -631,24 +630,14 @@ static bool isBlobTypeChar(const char *type) {
 		!charstring::compareIgnoringCase(type,"LONGBLOB") ||
 		!charstring::compareIgnoringCase(type,"BLOB") ||
 		!charstring::compareIgnoringCase(type,"LONGVARBINARY") ||
-		!charstring::compareIgnoringCase(type,"LONGVARCHAR") ||
 		!charstring::compareIgnoringCase(type,"RAW") ||
 		!charstring::compareIgnoringCase(type,"LONG_RAW") ||
-		!charstring::compareIgnoringCase(type,"CLOB") ||
 		!charstring::compareIgnoringCase(type,"BFILE") ||
-		!charstring::compareIgnoringCase(type,"DBCLOB") ||
-		!charstring::compareIgnoringCase(type,"TINYTEXT") ||
-		!charstring::compareIgnoringCase(type,"MEDIUMTEXT") ||
-		!charstring::compareIgnoringCase(type,"LONGTEXT") ||
-		!charstring::compareIgnoringCase(type,"JSON") ||
 		!charstring::compareIgnoringCase(type,"GEOMETRY") ||
 		!charstring::compareIgnoringCase(type,"SDO_GEOMETRY") ||
-		!charstring::compareIgnoringCase(type,"NTEXT") ||
-		!charstring::compareIgnoringCase(type,"XML") ||
 		!charstring::compareIgnoringCase(type,"GRAPHIC") ||
 		!charstring::compareIgnoringCase(type,"VARGRAPHIC") ||
-		!charstring::compareIgnoringCase(type,"LONGVARGRAPHIC") ||
-		!charstring::compareIgnoringCase(type,"DBCLOB"));
+		!charstring::compareIgnoringCase(type,"LONGVARGRAPHIC"));
 }
 #endif
 
@@ -657,24 +646,51 @@ static bool isBlobTypeInt(int16_t type) {
 	return (type==IMAGE_DATATYPE ||
 		type==BINARY_DATATYPE ||
 		type==VARBINARY_DATATYPE ||
-		type==LONGCHAR_DATATYPE ||
 		type==LONGBINARY_DATATYPE ||
 		type==LONG_DATATYPE ||
 		type==TINY_BLOB_DATATYPE ||
 		type==MEDIUM_BLOB_DATATYPE ||
 		type==LONG_BLOB_DATATYPE ||
 		type==BLOB_DATATYPE ||
+		type==LONGVARBINARY_DATATYPE ||
 		type==RAW_DATATYPE ||
 		type==LONG_RAW_DATATYPE ||
-		type==CLOB_DATATYPE ||
 		type==BFILE_DATATYPE ||
+		type==GEOMETRY_DATATYPE ||
+		type==SDO_GEOMETRY_DATATYPE ||
+		type==GRAPHIC_DATATYPE ||
+		type==VARGRAPHIC_DATATYPE ||
+		type==LONGVARGRAPHIC_DATATYPE);
+}
+#endif
+
+#ifdef NEED_IS_CLOB_TYPE_CHAR
+static bool isClobTypeChar(const char *type) { 
+	return (!charstring::compareIgnoringCase(type,"LONGCHAR") ||
+		!charstring::compareIgnoringCase(type,"LONGVARCHAR") ||
+		!charstring::compareIgnoringCase(type,"CLOB") ||
+		!charstring::compareIgnoringCase(type,"DBCLOB") ||
+		!charstring::compareIgnoringCase(type,"TINYTEXT") ||
+		!charstring::compareIgnoringCase(type,"MEDIUMTEXT") ||
+		!charstring::compareIgnoringCase(type,"LONGTEXT") ||
+		!charstring::compareIgnoringCase(type,"JSON") ||
+		!charstring::compareIgnoringCase(type,"NTEXT") ||
+		!charstring::compareIgnoringCase(type,"XML"));
+}
+#endif
+
+#ifdef NEED_IS_CLOB_TYPE_INT
+static bool isClobTypeInt(int16_t type) { 
+	return (type==LONGCHAR_DATATYPE ||
+		type==LONGVARCHAR_DATATYPE ||
+		type==CLOB_DATATYPE ||
 		type==DBCLOB_DATATYPE ||
 		type==TINYTEXT_DATATYPE ||
 		type==MEDIUMTEXT_DATATYPE ||
 		type==LONGTEXT_DATATYPE ||
 		type==JSON_DATATYPE ||
-		type==GEOMETRY_DATATYPE ||
-		type==SDO_GEOMETRY_DATATYPE);
+		type==NTEXT_DATATYPE ||
+		type==XML_DATATYPE);
 }
 #endif
 

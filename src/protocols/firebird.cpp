@@ -395,8 +395,7 @@
 
 class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 	public:
-			sqlrprotocol_firebird(sqlrservercontroller *cont,
-							sqlrprotocols *ps,
+		sqlrprotocol_firebird(sqlrservercontroller *cont,
 							domnode *parameters);
 		virtual	~sqlrprotocol_firebird();
 
@@ -552,9 +551,8 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_firebird : public sqlrprotocol {
 
 
 sqlrprotocol_firebird::sqlrprotocol_firebird(sqlrservercontroller *cont,
-					sqlrprotocols *ps,
 					domnode *parameters) :
-					sqlrprotocol(cont,ps,parameters) {
+					sqlrprotocol(cont,parameters) {
 
 	clientsock=NULL;
 
@@ -1538,7 +1536,7 @@ bool sqlrprotocol_firebird::authenticate() {
 	sqlrfirebirdcredentials	cred;
 	cred.setUser(user);
 	cred.setPassword(password);
-	cred.setPasswordLength(charstring::getLength(password));
+	cred.setPasswordSize(charstring::getLength(password));
 	cred.setMethod(authmethod);
 	cred.setSalt(salt);
 
@@ -1559,7 +1557,7 @@ bool sqlrprotocol_firebird::authenticate() {
 		err.append(user);
 		err.append("\"");
 		sendErrorResponse("FATAL","28P01",
-					err.getString(),err.getStringLength());
+					err.getString(),err.getSize());
 		return false;
 	}
 
@@ -3819,8 +3817,7 @@ void sqlrprotocol_firebird::debugStatusVector(uint64_t *sv, uint8_t svlen) {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_firebird(
 						sqlrservercontroller *cont,
-						sqlrprotocols *ps,
 						domnode *parameters) {
-		return new sqlrprotocol_firebird(cont,ps,parameters);
+		return new sqlrprotocol_firebird(cont,parameters);
 	}
 }

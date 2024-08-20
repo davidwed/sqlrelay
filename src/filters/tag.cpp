@@ -23,10 +23,9 @@ struct pattern_t {
 
 class SQLRSERVER_DLLSPEC sqlrfilter_tag : public sqlrfilter {
 	public:
-			sqlrfilter_tag(sqlrservercontroller *cont,
-						sqlrfilters *fs,
+		sqlrfilter_tag(sqlrservercontroller *cont,
 						domnode *parameters);
-			~sqlrfilter_tag();
+		~sqlrfilter_tag();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query);
@@ -35,25 +34,17 @@ class SQLRSERVER_DLLSPEC sqlrfilter_tag : public sqlrfilter {
 		uint32_t	patterncount;
 		bool		hasscope;
 
-		bool	enabled;
-
 		sqlrmoduledata_tag	*md;
 };
 
 sqlrfilter_tag::sqlrfilter_tag(sqlrservercontroller *cont,
-						sqlrfilters *fs,
 						domnode *parameters) :
-						sqlrfilter(cont,fs,parameters) {
+						sqlrfilter(cont,parameters) {
 	debugFunction();
 
 	p=NULL;
 	patterncount=0;
 	hasscope=false;
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled) {
-		return;
-	}
 
 	// count patterns
 	patterncount=0;
@@ -118,10 +109,6 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query) {
 	debugFunction();
-
-	if (!enabled) {
-		return true;
-	}
 
 	if (!md) {
 		return true;
@@ -259,8 +246,7 @@ bool sqlrfilter_tag::run(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter
 			*new_sqlrfilter_tag(sqlrservercontroller *cont,
-						sqlrfilters *fs,
 						domnode *parameters) {
-		return new sqlrfilter_tag(cont,fs,parameters);
+		return new sqlrfilter_tag(cont,parameters);
 	}
 }

@@ -12,9 +12,10 @@
 # package maintainers to append LDFLAGS
 #export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
 
-# FIXME: temporary kludges
 export PERL_VERSION = $(shell eval `perl -V:version`; echo $$version)
 export RUBY_VERSION = $(shell ruby -v | cut -d' ' -f2 | sed -e "s|p.*||")
+export NAME = $(shell . /etc/os-release; echo $$NAME)
+export VERSION_ID = $(shell . /etc/os-release; echo $$VERSION_ID)
 
 clean:
 	dh_testdir
@@ -24,6 +25,9 @@ clean:
 
 %:
 	dh $@  --with autotools_dev
+
+override_dh_autoreconf:
+	./autogen.sh
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
@@ -37,3 +41,13 @@ override_dh_auto_configure:
 		--with-ruby-site-arch-dir=/usr/lib/$(DEB_HOST_MULTIARCH)/ruby/$(RUBY_VERSION) \
 		--with-default-runasuser=sqlrelay \
 		--with-default-runasgroup=sqlrelay
+
+override_dh_install:
+	if ( test "$(NAME)" = "Ubuntu" -a "`echo $(VERSION_ID) | cut -d'.' -f1`" -ge "24" ); \
+	then \
+		echo /usr/lib/`gcc -print-multiarch`/node_modules/sqlrelay > debian/node-sqlrelay.install; \
+	fi
+	dh_install
+
+override_dh_builddeb:
+	dh_builddeb -- -Zgzip

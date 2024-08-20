@@ -641,6 +641,7 @@ FW_CHECK_WNOOVERLOADEDVIRTUAL
 FW_CHECK_WNOMISMATCHEDTAGS
 FW_CHECK_WNOUNKNOWNPRAGMAS
 FW_CHECK_WNOERRORDATETIME
+FW_CHECK_WNOERRORNONNULL
 FW_CHECK_DEBUG
 FW_CHECK_NEW_DTAGS
 FW_CHECK_F_NO_BUILTIN
@@ -1008,7 +1009,7 @@ if ( test -n "$MYSQLLIBS" ); then
 	if ( test -n "$MYSQLSTATIC" ); then
 		MYSQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS mysql mysqlupsert mysqldeadlockreplay"
+	TESTDBS="$TESTDBS mysql mysqlupsert mysqldeadlockreplay mysqlsplitmultiinsert mysqlimportexport"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
 	POSTGRESQLBUILD="dynamic   "
@@ -1100,12 +1101,11 @@ sed -e "s|^centos|co|" \
 -e "s|^freebsd|fb|" \
 -e "s|^haiku|hk|" \
 -e "s|^openbsd|ob|" \
--e "s|^netbsd|bb|" \
+-e "s|^netbsd|nb|" \
 -e "s|^opensuse|os|" \
 -e "s|^solaris|sl|" \
 -e "s|^syllable|sb|" \
 -e "s|^ubuntu|u|" \
--e "s|^win|w|" \
 -e "s|alpha$|a|" \
 -e "s|mipsel$|m32|" \
 -e "s|mips64el$|m64|" \
@@ -1118,7 +1118,7 @@ AC_SUBST(HOSTNAME)
 AC_SUBST(SHORTHOSTNAME)
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/firebirdprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf test/sqlrelay.conf.d/postgresqlupsert.conf test/sqlrelay.conf.d/mysqlupsert.conf test/sqlrelay.conf.d/mysqldeadlockreplay.conf test/sqlrelay.conf.d/multiprotocol.conf doc/admin/installingpkg.wt"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/firebirdprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf test/sqlrelay.conf.d/postgresqlupsert.conf test/sqlrelay.conf.d/mysqlupsert.conf test/sqlrelay.conf.d/mysqldeadlockreplay.conf test/sqlrelay.conf.d/mysqlsplitmultiinsert.conf test/sqlrelay.conf.d/mysqlimportexport.conf test/sqlrelay.conf.d/multiprotocol.conf doc/admin/installingpkg.wt"
 AC_OUTPUT($MAKELIST)
 chmod 755 bin/sqlrclient-config
 chmod 755 bin/sqlrclientwrapper-config

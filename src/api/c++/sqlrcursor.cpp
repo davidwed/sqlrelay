@@ -622,14 +622,11 @@ void sqlrcursor::startCaching() {
 	if (pvt->_cachedest && pvt->_cachedestind) {
 
 		// calculate and set write buffer size
-		filesystem	fs;
-		if (fs.open(pvt->_cachedestname)) {
-			off64_t	optblocksize=fs.getOptimumTransferBlockSize();
-			pvt->_cachedest->setWriteBufferSize(
-					(optblocksize)?optblocksize:1024);
-			pvt->_cachedestind->setWriteBufferSize(
-					(optblocksize)?optblocksize:1024);
-		}
+		off64_t	optblocksize=
+			filesystem::getOptimumTransferBlockSize(
+						pvt->_cachedestname);
+		pvt->_cachedest->setWriteBufferSize(optblocksize);
+		pvt->_cachedestind->setWriteBufferSize(optblocksize);
 
 		if (!pvt->_resumed) {
 
@@ -1074,14 +1071,14 @@ bool sqlrcursor::getKeyAndIndexList(const char *table,
 					(table)?table:"",qualifier,0);
 }
 
-bool sqlrcursor::getProcedureBindAndColumnList(
+bool sqlrcursor::getProcedureParameterList(
 				const char *procedure,
 				const char *wild) {
-	return getProcedureBindAndColumnList(procedure,wild,
+	return getProcedureParameterList(procedure,wild,
 					SQLRCLIENTLISTFORMAT_MYSQL);
 }
 
-bool sqlrcursor::getProcedureBindAndColumnList(
+bool sqlrcursor::getProcedureParameterList(
 				const char *procedure,
 				const char *wild,
 				sqlrclientlistformat_t listformat) {
@@ -2814,7 +2811,13 @@ bool sqlrcursor::sendQueryInternal() {
 			pvt->_sqlrc->debugPrint("Length: ");
 			pvt->_sqlrc->debugPrint((int64_t)pvt->_querylen);
 			pvt->_sqlrc->debugPrint("\n");
-			pvt->_sqlrc->debugPrint(pvt->_queryptr);
+			if (charstring::contains(pvt->_queryptr,"_binary ")) {
+				pvt->_sqlrc->debugPrintBlob(pvt->_queryptr,
+								pvt->_querylen);
+			} else {
+				pvt->_sqlrc->debugPrintClob(pvt->_queryptr,
+								pvt->_querylen);
+			}
 			pvt->_sqlrc->debugPrint("\n");
 			pvt->_sqlrc->debugPreEnd();
 		}
@@ -5850,14 +5853,10 @@ bool sqlrcursor::openCachedResultSet(const char *filename) {
 		pvt->_cachesourceind->open(indexfilename,O_RDWR)) {
 
 		// calculate and set write buffer size
-		filesystem	fs;
-		if (fs.open(filename)) {
-			off64_t	optblocksize=fs.getOptimumTransferBlockSize();
-			pvt->_cachesource->setReadBufferSize(
-					(optblocksize)?optblocksize:1024);
-			pvt->_cachesourceind->setReadBufferSize(
-					(optblocksize)?optblocksize:1024);
-		}
+		off64_t	optblocksize=
+			filesystem::getOptimumTransferBlockSize(filename);
+		pvt->_cachesource->setReadBufferSize(optblocksize);
+		pvt->_cachesourceind->setReadBufferSize(optblocksize);
 
 		delete[] indexfilename;
 

@@ -13,15 +13,14 @@
 
 class SQLRSERVER_DLLSPEC sqlrlogger_custom_nw : public sqlrlogger {
 	public:
-			sqlrlogger_custom_nw(sqlrloggers *ls,
-						domnode *parameters);
-			~sqlrlogger_custom_nw();
+		sqlrlogger_custom_nw(domnode *parameters);
+		~sqlrlogger_custom_nw();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
+					sqlrloglevel_t level,
 					sqlrevent_t event,
 					const char *info);
 	private:
@@ -32,14 +31,11 @@ class SQLRSERVER_DLLSPEC sqlrlogger_custom_nw : public sqlrlogger {
 		file	querylog;
 		char	*querylogname;
 		char	querylogbuf[102400];
-		bool	enabled;
 };
 
-sqlrlogger_custom_nw::sqlrlogger_custom_nw(sqlrloggers *ls,
-						domnode *parameters) :
-						sqlrlogger(ls,parameters) {
+sqlrlogger_custom_nw::sqlrlogger_custom_nw(domnode *parameters) :
+						sqlrlogger(parameters) {
 	querylogname=NULL;
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 }
 
 sqlrlogger_custom_nw::~sqlrlogger_custom_nw() {
@@ -50,12 +46,9 @@ bool sqlrlogger_custom_nw::init(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon) {
 	debugFunction();
 
-	if (!enabled) {
-		return true;
-	}
-
 	const char	*logdir=
-			(sqlrcon)?sqlrcon->cont->getLogDir():sqlrl->getLogDir();
+			(sqlrcon)?sqlrcon->cont->getPaths()->getLogDir():
+						sqlrl->getPaths()->getLogDir();
 	const char	*id=
 			(sqlrcon)?sqlrcon->cont->getId():sqlrl->getId();
 
@@ -78,17 +71,14 @@ bool sqlrlogger_custom_nw::init(sqlrlistener *sqlrl,
 bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
-				sqlrlogger_loglevel_t level,
+				sqlrloglevel_t level,
 				sqlrevent_t event,
 				const char *info) {
 	debugFunction();
 
-	if (!enabled) {
-		return true;
-	}
-
 	// don't do anything unless we got INFO/QUERY
-	if (level!=SQLRLOGGER_LOGLEVEL_INFO || event!=SQLREVENT_QUERY) {
+	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
+			event!=SQLREVENT_QUERY_EXECUTED) {
 		return true;
 	}
 
@@ -106,7 +96,7 @@ bool sqlrlogger_custom_nw::run(sqlrlistener *sqlrl,
 	// get error, if there was one
 	static char	errorcodebuf[100+1];
 	errorcodebuf[0]='\0';
-	if (!sqlrcur->getErrorLength()) {
+	if (!sqlrcur->getErrorSize()) {
 		charstring::copy(errorcodebuf,"0");
 	} else {
 		charstring::printf(errorcodebuf,100,"%s",
@@ -245,8 +235,7 @@ bool sqlrlogger_custom_nw::descInputBinds(sqlrserverconnection *sqlrcon,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_custom_nw(
-						sqlrloggers *ls,
 						domnode *parameters) {
-		return new sqlrlogger_custom_nw(ls,parameters);
+		return new sqlrlogger_custom_nw(parameters);
 	}
 }

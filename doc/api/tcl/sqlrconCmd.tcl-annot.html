@@ -28,8 +28,8 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <tr><td><code><a href="#begin">begin</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Begins a transaction.</td></tr>
 <tr><td><code><a href="#bindFormat">bindFormat</a> {  }</code><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a string representing the format
- of the bind variables used in the</td></tr>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a string representing the bind variable format used
+ by the database.</td></tr>
 <tr><td><code><a href="#clientVersion">clientVersion</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the version of the sqlrelay client</td></tr>
 <tr><td><code><a href="#commit">commit</a> {  }</code><br>
@@ -91,8 +91,8 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns the type of database: 
  oracle postgresql mysql</td></tr>
 <tr><td><code><a href="#nextvalFormat">nextvalFormat</a> {  }</code><br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a string representing the format of the
- sequence nextval command used in the</td></tr>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns a string representing the format of the sequence
+ nextval command used in the database.</td></tr>
 <tr><td><code><a href="#ping">ping</a> {  }</code><br>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Returns true if the database is up and false
  if it's</td></tr>
@@ -146,7 +146,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Instructs the database to wait for the 
  client to tell it when to commit.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOff_264">sqlrconCmd.tcl, line 264</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOff_281">sqlrconCmd.tcl, line 281</a>
 </dl></dl>
 
 <hr>
@@ -155,7 +155,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Instructs the database to perform a commit
  after every successful query.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOn_260">sqlrconCmd.tcl, line 260</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#autoCommitOn_277">sqlrconCmd.tcl, line 277</a>
 </dl></dl>
 
 <hr>
@@ -168,16 +168,24 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  commit or rollback is issued then this doesn't
  do anything unless SQL Relay is faking transaction
  blocks.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_274">sqlrconCmd.tcl, line 274</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#begin_291">sqlrconCmd.tcl, line 291</a>
 </dl></dl>
 
 <hr>
 <h3><a name="bindFormat">bindFormat</a></h3>
 <pre>proc bindFormat {  }</pre>
 <dl>
-<dd>Returns a string representing the format
- of the bind variables used in the db.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#bindFormat_236">sqlrconCmd.tcl, line 236</a>
+<dd>Returns a string representing the bind variable format used
+ by the database.  For example:
+
+ ?  - database uses a ? to represent a bind variable
+ @* - database uses a @ followed by any characters to
+      represent a bind variable
+ $1 - database uses a $ followed by a number to represent a
+      bind variable
+ :* - database uses a : followed by any characters to
+      represent a bind variable<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#bindFormat_244">sqlrconCmd.tcl, line 244</a>
 </dl></dl>
 
 <hr>
@@ -194,7 +202,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Issues a commit.  Returns true if the commit
  succeeded false if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_278">sqlrconCmd.tcl, line 278</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#commit_295">sqlrconCmd.tcl, line 295</a>
 </dl></dl>
 
 <hr>
@@ -226,7 +234,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc debugOff {  }</pre>
 <dl>
 <dd>Turns debugging off.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_310">sqlrconCmd.tcl, line 310</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOff_327">sqlrconCmd.tcl, line 327</a>
 </dl></dl>
 
 <hr>
@@ -238,7 +246,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  this is to start a query with "-- debug\n".
  Another way is to set the environment variable
  SQLR_CLIENT_DEBUG to "ON"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_307">sqlrconCmd.tcl, line 307</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#debugOn_324">sqlrconCmd.tcl, line 324</a>
 </dl></dl>
 
 <hr>
@@ -383,7 +391,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error the error message is available here.
  If there is no error then this method 
  returns NULL.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_290">sqlrconCmd.tcl, line 290</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorMessage_307">sqlrconCmd.tcl, line 307</a>
 </dl></dl>
 
 <hr>
@@ -394,7 +402,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  error, the error number is available here.
  If there is no error then this method 
  returns 0.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_298">sqlrconCmd.tcl, line 298</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#errorNumber_315">sqlrconCmd.tcl, line 315</a>
 </dl></dl>
 
 <hr>
@@ -438,7 +446,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getClientInfo {  }</pre>
 <dl>
 <dd>Returns the string that was set by setClientInfo().<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_328">sqlrconCmd.tcl, line 328</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getClientInfo_345">sqlrconCmd.tcl, line 345</a>
 </dl></dl>
 
 <hr>
@@ -472,7 +480,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc getCurrentDatabase {  }</pre>
 <dl>
 <dd>Returns the database/schema that is currently in use.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getCurrentDatabase_248">sqlrconCmd.tcl, line 248</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getCurrentDatabase_265">sqlrconCmd.tcl, line 265</a>
 </dl></dl>
 
 <hr>
@@ -481,7 +489,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns false if debugging is off and true
  if debugging is on.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_314">sqlrconCmd.tcl, line 314</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getDebug_331">sqlrconCmd.tcl, line 331</a>
 </dl></dl>
 
 <hr>
@@ -490,7 +498,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Returns the value of the autoincrement
  column for the last insert<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getLastInsertId_254">sqlrconCmd.tcl, line 254</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#getLastInsertId_271">sqlrconCmd.tcl, line 271</a>
 </dl></dl>
 
 <hr>
@@ -506,9 +514,18 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <h3><a name="nextvalFormat">nextvalFormat</a></h3>
 <pre>proc nextvalFormat {  }</pre>
 <dl>
-<dd>Returns a string representing the format of the
- sequence nextval command used in the db.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#nextvalFormat_240">sqlrconCmd.tcl, line 240</a>
+<dd>Returns a string representing the format of the sequence
+ nextval command used in the database.  The format will
+ contain a %s in place of the sequence name.  For example:
+
+ (nextval for %s)
+ next value for %s
+ nextval('%s')
+ %s.nextval
+
+ Returns an empty string if the database does not support
+ sequences.<dl>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#nextvalFormat_257">sqlrconCmd.tcl, line 257</a>
 </dl></dl>
 
 <hr>
@@ -536,7 +553,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dl>
 <dd>Issues a rollback.  Returns true if the rollback
  succeeded false if it failed.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_282">sqlrconCmd.tcl, line 282</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#rollback_299">sqlrconCmd.tcl, line 299</a>
 </dl></dl>
 
 <hr>
@@ -544,7 +561,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <pre>proc selectDatabase { database }</pre>
 <dl>
 <dd>Sets the current database/schema to "database"<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#selectDatabase_245">sqlrconCmd.tcl, line 245</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#selectDatabase_262">sqlrconCmd.tcl, line 262</a>
 </dl></dl>
 
 <hr>
@@ -573,7 +590,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
  server and ultimately included in server-side logging
  along with queries that were run by this instance of
  the client.<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_325">sqlrconCmd.tcl, line 325</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setClientInfo_342">sqlrconCmd.tcl, line 342</a>
 </dl></dl>
 
 <hr>
@@ -594,7 +611,7 @@ Created from <strong><code>../../../src/api/tcl/sqlrconCmd.tcl</strong></code>
 <dd>Allows you to specify a file to write debug to.
  Setting "debugfilename" to NULL or an empty string causes debug
  to be written to standard output (the default).<dl>
-<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setDebugFile_319">sqlrconCmd.tcl, line 319</a>
+<dt><strong>Defined in:</strong><dd><a href="sqlrconCmd.tcl.html#setDebugFile_336">sqlrconCmd.tcl, line 336</a>
 </dl></dl>
 
 <hr>
@@ -657,7 +674,7 @@ Index by:  <a href="index_main.html#byfilename">file name</a> |
 <a href="index_main.html#byprocname">procedure name</a> |
 <a href="index_main.html#bycall">procedure call</a> |
 <a href="index_annot_full.html">annotation</a><br>
-<cite>File generated 2023-06-23 at 17:36.</cite>
+<cite>File generated 2023-10-19 at 11:19.</cite>
 </font>
 </body>
 </html>

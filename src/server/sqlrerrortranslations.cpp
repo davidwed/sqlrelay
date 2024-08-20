@@ -6,8 +6,6 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -17,97 +15,42 @@
 	}
 #endif
 
-class sqlrerrortranslationplugin {
-	public:
-		sqlrerrortranslation	*etr;
-		dynamiclib		*dl;
-		const char		*module;
-};
-
 class sqlrerrortranslationsprivate {
 	friend class sqlrerrortranslations;
 	private:
-		sqlrservercontroller	*_cont;
-		
-		bool		_debug;
-
-		singlylinkedlist< sqlrerrortranslationplugin * >	_tlist;
-
 		const char	*_error;
 };
 
-sqlrerrortranslations::sqlrerrortranslations(sqlrservercontroller *cont) {
-	debugFunction();
+sqlrerrortranslations::sqlrerrortranslations(sqlrservercontroller *cont) :
+						sqlrservermodules(cont) {
 	pvt=new sqlrerrortranslationsprivate;
-	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugErrorTranslations();
+	setDebug(cont->getConfig()->getDebugErrorTranslations());
 	pvt->_error=NULL;
 }
 
 sqlrerrortranslations::~sqlrerrortranslations() {
-	debugFunction();
-	unload();
 	delete pvt;
 }
 
-bool sqlrerrortranslations::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the error translation list
-	for (domnode *errortranslation=parameters->getFirstTagChild();
-		!errortranslation->isNullNode();
-		errortranslation=errortranslation->getNextTagSibling()) {
-
-		// load error translation
-		loadErrorTranslation(errortranslation);
-	}
-
-	return true;
-}
-
-void sqlrerrortranslations::unload() {
-	debugFunction();
-	for (listnode< sqlrerrortranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		sqlrerrortranslationplugin	*sqlt=node->getValue();
-		delete sqlt->etr;
-		delete sqlt->dl;
-		delete sqlt;
-	}
-	pvt->_tlist.clear();
-}
-
-void sqlrerrortranslations::loadErrorTranslation(domnode *errortranslation) {
-	debugFunction();
+void sqlrerrortranslations::loadModule(domnode *parameters) {
 
 	// ignore non-errortranslations
-	if (charstring::compare(errortranslation->getName()
-					,"errortranslation")) {
+	if (charstring::compare(parameters->getName(),"errortranslation")) {
 		return;
 	}
 
-	// get the error translation name
-	const char	*module=errortranslation->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=errortranslation->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	if (pvt->_debug) {
-		stdoutput.printf("loading error "
-					"translation module: %s\n",module);
-	}
+	debugWrite("loading error translation module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the error translation module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("errortranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -126,10 +69,8 @@ void sqlrerrortranslations::loadErrorTranslation(domnode *errortranslation) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrerrortranslation_")->append(module);
 	sqlrerrortranslation *(*newErrorTranslation)(sqlrservercontroller *,
-						sqlrerrortranslations *,
 						domnode *)=
 		(sqlrerrortranslation *(*)(sqlrservercontroller *,
-						sqlrerrortranslations *,
 						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newErrorTranslation) {
@@ -142,9 +83,7 @@ void sqlrerrortranslations::loadErrorTranslation(domnode *errortranslation) {
 		delete dl;
 		return;
 	}
-	sqlrerrortranslation	*tr=
-		(*newErrorTranslation)
-			(pvt->_cont,this,errortranslation);
+	sqlrerrortranslation	*tr=(*newErrorTranslation)(cont,parameters);
 
 #else
 	dynamiclib		*dl=NULL;
@@ -155,26 +94,23 @@ void sqlrerrortranslations::loadErrorTranslation(domnode *errortranslation) {
 	}
 #endif
 
-	if (pvt->_debug) {
-		stdoutput.printf("success\n");
-	}
+	debugWrite("success");
 
 	// add the plugin to the list
-	sqlrerrortranslationplugin	*sqltp=new sqlrerrortranslationplugin;
-	sqltp->etr=tr;
-	sqltp->dl=dl;
-	sqltp->module=module;
-	pvt->_tlist.append(sqltp);
+	sqlrmoduleplugin	*sqlrmp=new sqlrmoduleplugin;
+	sqlrmp->m=tr;
+	sqlrmp->dl=dl;
+	sqlrmp->module=module;
+	blist.append(sqlrmp);
 }
 
 bool sqlrerrortranslations::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					int64_t errornumber,
 					const char *error,
-					uint32_t errorlength,
+					uint32_t errorsize,
 					int64_t *translatederrornumber,
 					stringbuffer *translatederror) {
-	debugFunction();
 
 	pvt->_error=NULL;
 
@@ -184,32 +120,28 @@ bool sqlrerrortranslations::run(sqlrserverconnection *sqlrcon,
 	stringbuffer	temperrorstr2;
 	int64_t		*temperrornumber=&temperrornumber1;
 	stringbuffer	*temperrorstr=&temperrorstr1;
-	for (listnode< sqlrerrortranslationplugin * > *node=
-						pvt->_tlist.getFirst();
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
 
-		if (pvt->_debug) {
-			stdoutput.printf("\nrunning translation:  %s...\n\n",
+		debugWrite("running error translation: %s...",
 						node->getValue()->module);
-		}
 
 		temperrorstr->clear();
 
-		if (!node->getValue()->etr->run(sqlrcon,sqlrcur,
-						errornumber,
-						error,
-						errorlength,
-						temperrornumber,
-						temperrorstr)) {
-			pvt->_error=node->getValue()->etr->getError();
-			if (pvt->_debug) {
-				stdoutput.printf("\n%s\n\n",pvt->_error);
-			}
+		sqlrerrortranslation	*etr=
+			(sqlrerrortranslation *)node->getValue()->m;
+		if (!etr->run(sqlrcon,sqlrcur,
+					errornumber,
+					error,
+					errorsize,
+					temperrornumber,
+					temperrorstr)) {
+			pvt->_error=etr->getError();
 			return false;
 		}
 
 		error=temperrorstr->getString();
-		errorlength=temperrorstr->getSize();
+		errorsize=temperrorstr->getSize();
 		errornumber=*temperrornumber;
 
 		temperrorstr=(temperrorstr==&temperrorstr1)?
@@ -218,7 +150,7 @@ bool sqlrerrortranslations::run(sqlrserverconnection *sqlrcon,
 					&temperrornumber2:&temperrornumber1;
 	}
 
-	translatederror->append(error,errorlength);
+	translatederror->append(error,errorsize);
 	*translatederrornumber=errornumber;
 
 	return true;
@@ -226,20 +158,4 @@ bool sqlrerrortranslations::run(sqlrserverconnection *sqlrcon,
 
 const char *sqlrerrortranslations::getError() {
 	return pvt->_error;
-}
-
-void sqlrerrortranslations::endTransaction(bool commit) {
-	for (listnode< sqlrerrortranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->etr->endTransaction(commit);
-	}
-}
-
-void sqlrerrortranslations::endSession() {
-	for (listnode< sqlrerrortranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->etr->endSession();
-	}
 }

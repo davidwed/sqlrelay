@@ -7,20 +7,18 @@
 #include <rudiments/file.h>
 #include <rudiments/permissions.h>
 #include <rudiments/filesystem.h>
-#include <rudiments/stringbuffer.h>
 
 class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 	public:
-			sqlrlogger_slowqueries(sqlrloggers *ls,
-						domnode *parameters);
-			~sqlrlogger_slowqueries();
+		sqlrlogger_slowqueries(domnode *parameters);
+		~sqlrlogger_slowqueries();
 
 		bool	init(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
+					sqlrloglevel_t level,
 					sqlrevent_t event,
 					const char *info);
 	private:
@@ -30,19 +28,24 @@ class SQLRSERVER_DLLSPEC sqlrlogger_slowqueries : public sqlrlogger {
 		uint64_t	usec;
 		uint64_t	totalusec;
 		bool		usecommand;
-		bool		enabled;
+		bool		sync;
+
+		datetime	dt;
+		char		datebuffer[27];
+		char		querysecbuffer[7];
 };
 
-sqlrlogger_slowqueries::sqlrlogger_slowqueries(sqlrloggers *ls,
-						domnode *parameters) :
-						sqlrlogger(ls,parameters) {
+sqlrlogger_slowqueries::sqlrlogger_slowqueries(domnode *parameters) :
+						sqlrlogger(parameters) {
 	querylogname=NULL;
-	sec=charstring::convertToInteger(parameters->getAttributeValue("sec"));
-	usec=charstring::convertToInteger(parameters->getAttributeValue("usec"));
+	sec=charstring::convertToInteger(
+				parameters->getAttributeValue("sec"));
+	usec=charstring::convertToInteger(
+				parameters->getAttributeValue("usec"));
 	totalusec=sec*1000000+usec;
 	usecommand=!charstring::compareIgnoringCase(
 			parameters->getAttributeValue("timer"),"command");
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
+	sync=charstring::isYes(parameters->getAttributeValue("sync"));
 }
 
 sqlrlogger_slowqueries::~sqlrlogger_slowqueries() {
@@ -52,10 +55,6 @@ sqlrlogger_slowqueries::~sqlrlogger_slowqueries() {
 
 bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon) {
-
-	if (!enabled) {
-		return true;
-	}
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
@@ -69,7 +68,7 @@ bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
 	delete[] querylogname;
 	charstring::printf(&querylogname,
 				"%s/sqlr-connection-%s-querylog.%ld",
-				sqlrcon->cont->getLogDir(),
+				sqlrcon->cont->getPaths()->getLogDir(),
 				sqlrcon->cont->getId(),(long)pid);
 
 	// remove any old log file
@@ -82,9 +81,8 @@ bool sqlrlogger_slowqueries::init(sqlrlistener *sqlrl,
 	}
 
 	// optimize
-	filesystem	fs;
-	fs.open(querylogname);
-	querylog.setWriteBufferSize(fs.getOptimumTransferBlockSize());
+	querylog.setWriteBufferSize(
+			filesystem::getOptimumTransferBlockSize(querylogname));
 	return true;
 }
 
@@ -93,13 +91,9 @@ static const char *days[]={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
 bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
+					sqlrloglevel_t level,
 					sqlrevent_t event,
 					const char *info) {
-
-	if (!enabled) {
-		return true;
-	}
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
@@ -107,7 +101,8 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 	}
 
 	// don't do anything unless we got INFO/QUERY
-	if (level!=SQLRLOGGER_LOGLEVEL_INFO || event!=SQLREVENT_QUERY) {
+	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
+			event!=SQLREVENT_QUERY_EXECUTED) {
 		return true;
 	}
 
@@ -141,9 +136,8 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 	// log times
 	if (queryusec>=totalusec) {
 
-		datetime	dt;
+		// get the date/time as a string
 		dt.initFromSystemDateTime();
-		char	datebuffer[26];
 		charstring::printf(datebuffer,sizeof(datebuffer),
 					"%s %d %s % 2d  %02d:%02d:%02d",
 					days[dt.getDayOfWeek()-1],
@@ -153,27 +147,38 @@ bool sqlrlogger_slowqueries::run(sqlrlistener *sqlrl,
 					dt.getHour(),
 					dt.getMinute(),
 					dt.getSecond());
+
+		// get the query duration as a string
+		charstring::printf(querysecbuffer,sizeof(querysecbuffer),
+					"%.*f",6,querysec);
 		
-		stringbuffer	logentry;
-		logentry.append(datebuffer)->append(" :\n");
-		logentry.append(sqlrcur->getQueryBuffer());
-		logentry.append("\n");
-		logentry.append("execution time: ")->append(querysec,6);
-		logentry.append("\n");
-		if ((size_t)querylog.write(logentry.getString(),
-					logentry.getStringLength())!=
-						logentry.getStringLength()) {
+		// write the log entry
+		if (querylog.write(datebuffer)!=
+				(ssize_t)charstring::getLength(datebuffer) ||
+			querylog.write(" :\n",3)!=3 ||
+			querylog.write(sqlrcur->getQueryBuffer(),
+					sqlrcur->getQuerySize())!=
+				(ssize_t)sqlrcur->getQuerySize() ||
+			querylog.write('\n')!=1 ||
+			querylog.write("execution time: ",16)!= 16 ||
+			querylog.write(querysecbuffer)!=
+				(ssize_t)charstring::getLength(
+							querysecbuffer) ||
+			querylog.write('\n')!=1) {
 			return false;
 		}
-		//querylog.flushWriteBuffer(-1,-1);
+
+		// flush, if we need to
+		if (sync) {
+			querylog.flushWriteBuffer(-1,-1);
+		}
 	}
 	return true;
 }
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_slowqueries(
-						sqlrloggers *ls,
 						domnode *parameters) {
-		return new sqlrlogger_slowqueries(ls,parameters);
+		return new sqlrlogger_slowqueries(parameters);
 	}
 }

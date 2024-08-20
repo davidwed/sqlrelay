@@ -245,7 +245,7 @@ bool sqlrcrud::doCreate(const char * const *columns,
 						valstr.append('$')->append(col);
 						col++;
 					} else if (bf=='@' || bf==':') {
-						valstr.append(bf)-> append(*c);
+						valstr.append(bf)->append(*c);
 					}
 				}
 			}

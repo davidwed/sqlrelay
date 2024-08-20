@@ -6,8 +6,6 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -17,100 +15,44 @@
 	}
 #endif
 
-class sqlrresultsetrowtranslationplugin {
-	public:
-		sqlrresultsetrowtranslation	*rstr;
-		dynamiclib			*dl;
-		const char			*module;
-};
-
 class sqlrresultsetrowtranslationsprivate {
 	friend class sqlrresultsetrowtranslations;
 	private:
-		sqlrservercontroller	*_cont;
-
-		bool		_debug;
-
-		singlylinkedlist< sqlrresultsetrowtranslationplugin * >	_tlist;
-
 		const char	*_error;
 };
 
 sqlrresultsetrowtranslations::sqlrresultsetrowtranslations(
-						sqlrservercontroller *cont) {
-	debugFunction();
+						sqlrservercontroller *cont) :
+						sqlrservermodules(cont) {
 	pvt=new sqlrresultsetrowtranslationsprivate;
-	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugResultSetRowTranslations();
+	setDebug(cont->getConfig()->getDebugResultSetRowTranslations());
 	pvt->_error=NULL;
 }
 
 sqlrresultsetrowtranslations::~sqlrresultsetrowtranslations() {
-	debugFunction();
-	unload();
 	delete pvt;
 }
 
-bool sqlrresultsetrowtranslations::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the result set translation list
-	for (domnode *resultsetrowtranslation=parameters->getFirstTagChild();
-			!resultsetrowtranslation->isNullNode();
-			resultsetrowtranslation=
-				resultsetrowtranslation->getNextTagSibling()) {
-
-		// load result set translation
-		loadResultSetRowTranslation(resultsetrowtranslation);
-	}
-
-	return true;
-}
-
-void sqlrresultsetrowtranslations::unload() {
-	debugFunction();
-	for (listnode< sqlrresultsetrowtranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		sqlrresultsetrowtranslationplugin	*sqlt=node->getValue();
-		delete sqlt->rstr;
-		delete sqlt->dl;
-		delete sqlt;
-	}
-	pvt->_tlist.clear();
-}
-
-void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
-				domnode *resultsetrowtranslation) {
-	debugFunction();
+void sqlrresultsetrowtranslations::loadModule(domnode *parameters) {
 
 	// ignore non-resultsetrowtranslations
-	if (charstring::compare(resultsetrowtranslation->getName(),
-						"resultsetrowtranslation")) {
+	if (charstring::compare(parameters->getName(),
+					"resultsetrowtranslation")) {
 		return;
 	}
 
-	// get the result set translation name
-	const char	*module=
-			resultsetrowtranslation->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=resultsetrowtranslation->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	if (pvt->_debug) {
-		stdoutput.printf("loading result set row translation: %s\n",module);
-	}
+	debugWrite("loading result set row translation: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the result set translation module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("resultsetrowtranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -131,11 +73,9 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 	functionname.append("new_sqlrresultsetrowtranslation_")->append(module);
 	sqlrresultsetrowtranslation *(*newResultSetTranslation)
 					(sqlrservercontroller *,
-					sqlrresultsetrowtranslations *,
 					domnode *)=
 		(sqlrresultsetrowtranslation *(*)
 					(sqlrservercontroller *,
-					sqlrresultsetrowtranslations *,
 					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
@@ -149,8 +89,7 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 		return;
 	}
 	sqlrresultsetrowtranslation	*rstr=
-		(*newResultSetTranslation)
-			(pvt->_cont,this,resultsetrowtranslation);
+		(*newResultSetTranslation)(cont,parameters);
 
 #else
 	dynamiclib			*dl=NULL;
@@ -161,17 +100,14 @@ void sqlrresultsetrowtranslations::loadResultSetRowTranslation(
 	}
 #endif
 
-	if (pvt->_debug) {
-		stdoutput.printf("success\n");
-	}
+	debugWrite("success");
 
 	// add the plugin to the list
-	sqlrresultsetrowtranslationplugin	*sqlrrstp=
-				new sqlrresultsetrowtranslationplugin;
-	sqlrrstp->rstr=rstr;
-	sqlrrstp->dl=dl;
-	sqlrrstp->module=module;
-	pvt->_tlist.append(sqlrrstp);
+	sqlrmoduleplugin	*sqlrmp=new sqlrmoduleplugin;
+	sqlrmp->m=rstr;
+	sqlrmp->dl=dl;
+	sqlrmp->module=module;
+	blist.append(sqlrmp);
 }
 
 bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
@@ -179,23 +115,22 @@ bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
 						uint32_t colcount,
 						const char * const *fieldnames,
 						const char ***fields,
-						uint64_t **fieldlengths) {
-	debugFunction();
+						uint64_t **fieldsizes) {
 
 	pvt->_error=NULL;
 
-	for (listnode< sqlrresultsetrowtranslationplugin * > *node=
-						pvt->_tlist.getFirst();
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
-		if (pvt->_debug) {
-			stdoutput.printf("\nrunning translation:  %s...\n\n",
-						node->getValue()->module);
-		}
 
-		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
-						colcount,fieldnames,
-						fields,fieldlengths)) {
-			pvt->_error=node->getValue()->rstr->getError();
+		debugWrite("running result set row translation:  %s...",
+						node->getValue()->module);
+
+		sqlrresultsetrowtranslation	*rstr=
+			(sqlrresultsetrowtranslation *)node->getValue()->m;
+		if (!rstr->run(sqlrcon,sqlrcur,
+					colcount,fieldnames,
+					fields,fieldsizes)) {
+			pvt->_error=rstr->getError();
 			return false;
 		}
 	}
@@ -204,20 +139,4 @@ bool sqlrresultsetrowtranslations::run(sqlrserverconnection *sqlrcon,
 
 const char *sqlrresultsetrowtranslations::getError() {
 	return pvt->_error;
-}
-
-void sqlrresultsetrowtranslations::endTransaction(bool commit) {
-	for (listnode< sqlrresultsetrowtranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->rstr->endTransaction(commit);
-	}
-}
-
-void sqlrresultsetrowtranslations::endSession() {
-	for (listnode< sqlrresultsetrowtranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->rstr->endSession();
-	}
 }

@@ -28,7 +28,7 @@ Input bind variables may appear as values in the WHERE clause of a SELECT, UPDAT
 
 Output bind variables may appear in the RETURNING clause of a SELECT or as variables in a block of procedural code.
 
-Substitution variables may appear anywhere in the query.  They are frequently used to ammend WHERE clauses with additional constraints and specify schemas or databases.  A substitution value may even contain bind variables.
+Substitution variables may appear anywhere in the query.  They are frequently used to ammend WHERE clauses with additional constraints and specify schemas or databases.  A substitution value may even contain bind variables or other substitution variables.
 
 == Bind Variable Syntax ==
 

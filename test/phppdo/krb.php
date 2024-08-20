@@ -42,7 +42,7 @@
 	echo("\n");
 
 	echo("LAST INSERT ID: \n");
-	checkSuccess($dbh->lastInsertId(),0);
+	checkSuccess(intval($dbh->lastInsertId()),0);
 	echo("\n");
 
 	# doesn't work with oracle unless translatebindvariables="yes" is set

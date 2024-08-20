@@ -25,8 +25,8 @@
 class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 	friend class sapcursor;
 	public:
-			sapconnection(sqlrservercontroller *cont);
-			~sapconnection();
+		sapconnection(sqlrservercontroller *cont);
+		~sapconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
@@ -34,26 +34,27 @@ class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*dbHostNameQuery();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getDbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild,
-						uint16_t objecttypes);
+						uint16_t objecttypes,
+						bool currentschemaonly);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
-		const char	*noopQuery();
-		const char	*bindFormat();
+		const char	*getNoopQuery();
+		const char	*getBindFormat();
 		const char	*beginTransactionQuery();
-		const char	*tempTableDropPrefix();
+		const char	*tempTablePrefix();
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
 
@@ -69,8 +70,6 @@ class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 		const char	*language;
 		const char	*hostname;
 		const char	*packetsize;
-
-		const char	*identity;
 
 		bool		dbused;
 
@@ -90,6 +89,8 @@ class SQLRSERVER_DLLSPEC sapconnection : public sqlrserverconnection {
 						CS_SERVERMSG *msgp);
 
 		stringbuffer	loginerror;
+
+		stringbuffer	tablelistquery;
 };
 
 struct datebind {
@@ -107,15 +108,14 @@ struct datebind {
 class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 	friend class sapconnection;
 	private:
-				sapcursor(sqlrserverconnection *conn,
-								uint16_t id);
-				~sapcursor();
+		sapcursor(sqlrserverconnection *conn, uint16_t id);
+		~sapcursor();
 		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		void		encodeBlob(stringbuffer *buffer,
 						const char *data,
 						uint32_t datasize);
@@ -143,8 +143,6 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 						int32_t microsecond,
 						const char *tz,
 						bool isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
@@ -172,16 +170,14 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		executeQuery(const char *query,
-						uint32_t length);
-		uint64_t	affectedRows();
+						uint32_t size);
+		uint64_t	getAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
-		uint32_t	getColumnLength(uint32_t col);
+		uint32_t	getColumnSize(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
 		uint16_t	getColumnIsNullable(uint32_t col);
@@ -194,8 +190,8 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
+					uint64_t *fieldsize,
+					bool *lob,
 					bool *null);
 		void		nextRow();
 		void		closeResultSet();
@@ -203,7 +199,7 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 		void		discardCursor();
 
 		char		*cursorname;
-		size_t		cursornamelength;
+		size_t		cursornamesize;
 
 		void		checkRePrepare();
 
@@ -220,11 +216,13 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 		CS_INT		maxrow;
 		CS_INT		totalrows;
 
+		uint16_t	maxbindcount;
 		CS_DATAFMT	*parameter;
 		uint16_t	paramindex;
+		char		**inbindts;
 		CS_INT		*outbindtype;
 		char		**outbindstrings;
-		uint32_t	*outbindstringlengths;
+		uint32_t	*outbindstringsizes;
 		int64_t		**outbindints;
 		double		**outbinddoubles;
 		datebind	*outbinddates;
@@ -234,11 +232,11 @@ class SQLRSERVER_DLLSPEC sapcursor : public sqlrservercursor {
 		CS_DATAFMT	templatecolumn;
 		CS_DATAFMT	*column;
 		char		**data;
-		CS_INT		**datalength;
+		CS_INT		**datasize;
 		CS_SMALLINT	**nullindicator;
 
 		const char	*query;
-		uint32_t	length;
+		uint32_t	size;
 		bool		prepared;
 		bool		clean;
 
@@ -255,8 +253,6 @@ sapconnection::sapconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 	dbused=false;
 	dbversion=NULL;
-
-	identity=NULL;
 }
 
 sapconnection::~sapconnection() {
@@ -281,8 +277,6 @@ void sapconnection::handleConnectString() {
 		// to 2 so the db version detection doesn't crash
 		cont->setMaxColumnCount(2);
 	}
-
-	identity=cont->getConnectStringValue("identity");
 }
 
 bool sapconnection::logIn(const char **error, const char **warning) {
@@ -506,8 +500,9 @@ const char *sapconnection::logInError(const char *error, uint16_t stage) {
 	if (error) {
 		loginerror.append(error)->append(": ");
 	}
-	if (errorstring.getStringLength()) {
-		loginerror.append(errorstring.getString());
+	if (errorstring.getSize()) {
+		loginerror.append(errorstring.getString(),
+					errorstring.getSize());
 	}
 
 	if (stage>5) {
@@ -543,15 +538,15 @@ void sapconnection::logOut() {
 	cs_ctx_drop(context);
 }
 
-const char *sapconnection::identify() {
-	return (identity)?identity:"sap";
+const char *sapconnection::getDbType() {
+	return "sap";
 }
 
-const char *sapconnection::dbVersion() {
+const char *sapconnection::getDbVersion() {
 	return dbversion;
 }
 
-const char *sapconnection::dbHostNameQuery() {
+const char *sapconnection::getDbHostNameQuery() {
 	return "select asehostname()";
 }
 
@@ -560,29 +555,27 @@ const char *sapconnection::getDatabaseListQuery(bool wild) {
 }
 
 const char *sapconnection::getTableListQuery(bool wild,
-						uint16_t objecttypes) {
-	return (wild)?
-		"select "
-		"	NULL as table_cat, "
-		"	NULL as table_schem, "
-		"	name as table_name, "
-		"	'TABLE' as table_type, "
-		"	NULL as remarks, "
-		"	NULL as extra "
-		"from "
-		"	sysobjects "
-		"where "
-		"	loginame is not NULL "
-		"	and "
-		"	type in ('U','V') "
-		"	and "
-		"	name like '%s' "
-		"order by "
-		"	name":
+						uint16_t objecttypes,
+						bool currentschemaonly) {
 
+	stringbuffer	otypes;
+	otypes.append("	(");
+	if (objecttypes&DB_OBJECT_TABLE) {
+		otypes.append("	type='U' ");
+	}
+	if (objecttypes&DB_OBJECT_VIEW) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	type = 'V' ");
+	}
+	otypes.append(") ");
+
+	tablelistquery.clear();
+	tablelistquery.append(
 		"select "
 		"	NULL as table_cat, "
-		"	NULL as table_schem, "
+		"	loginame as table_schem, "
 		"	name as table_name, "
 		"	'TABLE' as table_type, "
 		"	NULL as remarks, "
@@ -590,11 +583,27 @@ const char *sapconnection::getTableListQuery(bool wild,
 		"from "
 		"	sysobjects "
 		"where "
-		"	loginame is not NULL "
-		"	and "
-		"	type in ('U','V') "
+		"	loginame is not NULL ");
+	if (currentschemaonly) {
+		tablelistquery.append(
+			"	and "
+			"	upper(loginame)=upper('");
+		tablelistquery.append(cont->getUser());
+		tablelistquery.append("') ");
+	}
+	tablelistquery.append(
+		"	and ");
+	tablelistquery.append(otypes.getString());
+	if (wild) {
+		tablelistquery.append(
+			"	and "
+			"	name like '%s' ");
+	}
+	tablelistquery.append(
 		"order by "
-		"	name";
+		"	name");
+
+	return tablelistquery.getString();
 }
 
 const char *sapconnection::getColumnListQuery(
@@ -667,11 +676,11 @@ const char *sapconnection::getLastInsertIdQuery() {
 	return "select @@identity";
 }
 
-const char *sapconnection::noopQuery() {
+const char *sapconnection::getNoopQuery() {
 	return "waitfor delay '0:0'";
 }
 
-const char *sapconnection::bindFormat() {
+const char *sapconnection::getBindFormat() {
 	return "@*";
 }
 
@@ -687,17 +696,21 @@ sapcursor::sapcursor(sqlrserverconnection *conn, uint16_t id) :
 	languagecmd=NULL;
 	cursorcmd=NULL;
 
-	cursornamelength=charstring::getIntegerLength(id);
+	cursornamesize=charstring::getIntegerLength(id);
 	cursorname=charstring::parseNumber(id);
 
-	uint16_t	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
+	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	parameter=new CS_DATAFMT[maxbindcount];
+	inbindts=new char *[maxbindcount];
 	outbindtype=new CS_INT[maxbindcount];
 	outbindstrings=new char *[maxbindcount];
-	outbindstringlengths=new uint32_t[maxbindcount];
+	outbindstringsizes=new uint32_t[maxbindcount];
 	outbindints=new int64_t *[maxbindcount];
 	outbinddoubles=new double *[maxbindcount];
 	outbinddates=new datebind[maxbindcount];
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		inbindts[i]=new char[27];
+	}
 
 	// replace the regular expression used to detect creation of a
 	// temporary table
@@ -712,7 +725,7 @@ sapcursor::sapcursor(sqlrserverconnection *conn, uint16_t id) :
 	// no longer than MAX_ITEM_BUFFER_SIZE, override some
 	templatecolumn.datatype=CS_CHAR_TYPE;
 	templatecolumn.format=CS_FMT_NULLTERM;
-	templatecolumn.maxlength=conn->cont->getMaxFieldLength();
+	templatecolumn.maxlength=conn->cont->getMaxFieldSize();
 	templatecolumn.scale=CS_UNUSED;
 	templatecolumn.precision=CS_UNUSED;
 	templatecolumn.status=CS_UNUSED;
@@ -725,9 +738,13 @@ sapcursor::~sapcursor() {
 	close();
 	delete[] cursorname;
 	delete[] parameter;
+	for (uint16_t i=0; i<maxbindcount; i++) {
+		delete[] inbindts[i];
+	}
+	delete[] inbindts;
 	delete[] outbindtype;
 	delete[] outbindstrings;
-	delete[] outbindstringlengths;
+	delete[] outbindstringsizes;
 	delete[] outbindints;
 	delete[] outbinddoubles;
 	delete[] outbinddates;
@@ -741,19 +758,19 @@ void sapcursor::allocateResultSetBuffers(int32_t columncount) {
 		this->columncount=0;
 		column=NULL;
 		data=NULL;
-		datalength=NULL;
+		datasize=NULL;
 		nullindicator=NULL;
 	} else {
 		this->columncount=columncount;
 		column=new CS_DATAFMT[columncount];
 		data=new char *[columncount];
-		datalength=new CS_INT *[columncount];
+		datasize=new CS_INT *[columncount];
 		nullindicator=new CS_SMALLINT *[columncount];
 		uint32_t	fetchatonce=getFetchAtOnce();
-		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
 		for (int32_t i=0; i<columncount; i++) {
-			data[i]=new char[fetchatonce*maxfieldlength];
-			datalength[i]=new CS_INT[fetchatonce];
+			data[i]=new char[fetchatonce*maxfieldsize];
+			datasize[i]=new CS_INT[fetchatonce];
 			nullindicator[i]=new CS_SMALLINT[fetchatonce];
 		}
 	}
@@ -764,11 +781,11 @@ void sapcursor::deallocateResultSetBuffers() {
 		delete[] column;
 		for (int32_t i=0; i<columncount; i++) {
 			delete[] data[i];
-			delete[] datalength[i];
+			delete[] datasize[i];
 			delete[] nullindicator[i];
 		}
 		delete[] data;
-		delete[] datalength;
+		delete[] datasize;
 		delete[] nullindicator;
 		columncount=0;
 	}
@@ -798,7 +815,7 @@ bool sapcursor::open() {
 			uint32_t	errlen;
 			int64_t		errn;
 			bool		live;
-			errorMessage(err,sizeof(err),&errlen,&errn,&live);
+			getError(err,sizeof(err),&errlen,&errn,&live);
 			stderror.printf("%s\n",err);
 			retval=false;
 		} else {
@@ -860,7 +877,7 @@ bool sapcursor::close() {
 	return retval;
 }
 
-bool sapcursor::prepareQuery(const char *query, uint32_t length) {
+bool sapcursor::prepareQuery(const char *query, uint32_t size) {
 
 	// initialize column count
 	ncols=0;
@@ -868,7 +885,7 @@ bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 	clean=true;
 
 	this->query=(char *)query;
-	this->length=length;
+	this->size=size;
 
 	paramindex=0;
 	outbindindex=0;
@@ -884,9 +901,9 @@ bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 		if (ct_cursor(cursorcmd,
 				CS_CURSOR_DECLARE,
 				(CS_CHAR *)cursorname,
-				(CS_INT)cursornamelength,
+				(CS_INT)cursornamesize,
 				(CS_CHAR *)query,
-				length,
+				size,
 				CS_READ_ONLY)!=CS_SUCCEED) {
 			return false;
 		}
@@ -900,7 +917,7 @@ bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 		if (ct_command(languagecmd,
 				CS_RPC_CMD,
 				(CS_CHAR *)query+5,
-				length-5,
+				size-5,
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
@@ -914,7 +931,7 @@ bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 		if (ct_command(languagecmd,
 				CS_RPC_CMD,
 				(CS_CHAR *)query+8,
-				length-8,
+				size-8,
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
@@ -926,7 +943,7 @@ bool sapcursor::prepareQuery(const char *query, uint32_t length) {
 		if (ct_command(languagecmd,
 				CS_LANG_CMD,
 				(CS_CHAR *)query,
-				length,
+				size,
 				CS_UNUSED)!=CS_SUCCEED) {
 			return false;
 		}
@@ -957,7 +974,7 @@ void sapcursor::checkRePrepare() {
 	// to the user.
 	// FIXME: skip if cmd==cursorcmd?
 	if (!prepared) {
-		prepareQuery(query,length);
+		prepareQuery(query,size);
 	}
 }
 
@@ -1062,8 +1079,6 @@ bool sapcursor::inputBind(const char *variable,
 				int32_t microsecond,
 				const char *tz,
 				bool isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 
 	checkRePrepare();
@@ -1084,6 +1099,7 @@ bool sapcursor::inputBind(const char *variable,
 		hour=hour-12;
 		ampm="PM";
 	}
+	char	*buffer=inbindts[paramindex];
 	charstring::copy(buffer,monthname[month-1]);
 	charstring::append(buffer," ");
 	charstring::append(buffer,(int64_t)day);
@@ -1112,7 +1128,7 @@ bool sapcursor::outputBind(const char *variable,
 
 	outbindtype[outbindindex]=CS_CHAR_TYPE;
 	outbindstrings[outbindindex]=value;
-	outbindstringlengths[outbindindex]=valuesize;
+	outbindstringsizes[outbindindex]=valuesize;
 	outbindindex++;
 
 	bytestring::zero(&parameter[paramindex],sizeof(parameter[paramindex]));
@@ -1213,8 +1229,6 @@ bool sapcursor::outputBind(const char *variable,
 				int32_t *microsecond,
 				const char **tz,
 				bool *isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 	checkRePrepare();
 
@@ -1251,7 +1265,7 @@ bool sapcursor::outputBind(const char *variable,
 	return true;
 }
 
-bool sapcursor::executeQuery(const char *query, uint32_t length) {
+bool sapcursor::executeQuery(const char *query, uint32_t size) {
 
 	// clear out any errors
 	sapconn->errorcode=0;
@@ -1351,7 +1365,7 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 		}
 	}
 
-	checkForTempTable(query,length);
+	checkForTempTable(query,size);
 
 	// reset the prepared flag
 	prepared=false;
@@ -1398,13 +1412,13 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 			if (ct_bind(cmd,i+1,
 					&column[i],
 					(CS_VOID *)data[i],
-					datalength[i],
+					datasize[i],
 					nullindicator[i])!=CS_SUCCEED) {
 				break;
 			}
 
 			// describe the columns
-			if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
+			if (conn->cont->getSendColumnInfo()) {
 				if (ct_describe(cmd,i+1,
 						&column[i])!=CS_SUCCEED) {
 					break;
@@ -1434,12 +1448,12 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 		}
 		for (CS_INT i=0; i<maxindex; i++) {
 			if (outbindtype[i]==CS_CHAR_TYPE) {
-				CS_INT	length=outbindstringlengths[i];
-				if (datalength[i][0]<length) {
-					length=datalength[i][0];
+				CS_INT	size=outbindstringsizes[i];
+				if (datasize[i][0]<size) {
+					size=datasize[i][0];
 				}
 				bytestring::copy(outbindstrings[i],
-							data[i],length);
+							data[i],size);
 			} else if (outbindtype[i]==CS_INT_TYPE) {
 				*outbindints[i]=
 					charstring::convertToInteger(data[i]);
@@ -1476,7 +1490,7 @@ bool sapcursor::executeQuery(const char *query, uint32_t length) {
 	return (!sapconn->errorcode);
 }
 
-uint64_t sapcursor::affectedRows() {
+uint64_t sapcursor::getAffectedRows() {
 	return affectedrows;
 }
 
@@ -1555,11 +1569,11 @@ uint16_t sapcursor::getColumnType(uint32_t col) {
 	}
 }
 
-uint32_t sapcursor::getColumnLength(uint32_t col) {
+uint32_t sapcursor::getColumnSize(uint32_t col) {
 	// limit the column size
-	uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
-	if ((uint32_t)column[col].maxlength>maxfieldlength) {
-		column[col].maxlength=maxfieldlength;
+	uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
+	if ((uint32_t)column[col].maxlength>maxfieldsize) {
+		column[col].maxlength=maxfieldsize;
 	}
 	return column[col].maxlength;
 }
@@ -1636,8 +1650,8 @@ bool sapcursor::fetchRow(bool *error) {
 }
 
 void sapcursor::getField(uint32_t col,
-				const char **field, uint64_t *fieldlength,
-				bool *blob, bool *null) {
+				const char **field, uint64_t *fieldsize,
+				bool *lob, bool *null) {
 
 	// handle NULLs
 	if (nullindicator[col][row]==-1) {
@@ -1646,8 +1660,8 @@ void sapcursor::getField(uint32_t col,
 	}
 
 	// handle normal datatypes
-	*field=&data[col][row*conn->cont->getMaxFieldLength()];
-	*fieldlength=datalength[col][row]-1;
+	*field=&data[col][row*conn->cont->getMaxFieldSize()];
+	*fieldsize=datasize[col][row]-1;
 }
 
 void sapcursor::nextRow() {
@@ -1831,7 +1845,7 @@ CS_RETCODE sapconnection::serverMessageCallback(CS_CONTEXT *ctxt,
 	return CS_SUCCEED;
 }
 
-const char *sapconnection::tempTableDropPrefix() {
+const char *sapconnection::tempTablePrefix() {
 	return "#";
 }
 
@@ -1845,14 +1859,14 @@ bool sapconnection::rollback() {
 	return sqlrserverconnection::rollback();
 }
 
-void sapconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
-	*errorlength=this->errorstring.getStringLength();
-	charstring::safeCopy(errorbuffer,errorbufferlength,
-				this->errorstring.getString(),*errorlength);
+void sapconnection::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
+	*errorsize=this->errorstring.getSize();
+	charstring::safeCopy(errorbuffer,errorbuffersize,
+				this->errorstring.getString(),*errorsize);
 	*liveconnection=this->liveconnection;
 	*errorcode=this->errorcode;
 }

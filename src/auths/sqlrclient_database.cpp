@@ -7,11 +7,8 @@
 
 class SQLRSERVER_DLLSPEC sqlrauth_sqlrclient_database : public sqlrauth {
 	public:
-			sqlrauth_sqlrclient_database(
-						sqlrservercontroller *cont,
-						sqlrauths *auths,
-						sqlrpwdencs *sqlrpe,
-						domnode *parameters);
+		sqlrauth_sqlrclient_database(sqlrservercontroller *cont,
+							domnode *parameters);
 		const char	*auth(sqlrcredentials *cred);
 	private:
 		bool		first;
@@ -21,10 +18,8 @@ class SQLRSERVER_DLLSPEC sqlrauth_sqlrclient_database : public sqlrauth {
 
 sqlrauth_sqlrclient_database::sqlrauth_sqlrclient_database(
 					sqlrservercontroller *cont,
-					sqlrauths *auths,
-					sqlrpwdencs *sqlrpe,
 					domnode *parameters) :
-					sqlrauth(cont,auths,sqlrpe,parameters) {
+					sqlrauth(cont,parameters) {
 	first=true;
 }
 
@@ -53,8 +48,8 @@ const char *sqlrauth_sqlrclient_database::auth(sqlrcredentials *cred) {
 	// if the user we want to change to is different from the user
 	// that's currently logged in, then try to change to that user
 	bool	success=true;
-	if ((lastuser.getStringLength()==0 &&
-		lastpassword.getStringLength()==0) ||
+	if ((lastuser.getSize()==0 &&
+		lastpassword.getSize()==0) ||
 		charstring::compare(lastuser.getString(),user) ||
 		charstring::compare(lastpassword.getString(),password)) {
 
@@ -76,10 +71,7 @@ const char *sqlrauth_sqlrclient_database::auth(sqlrcredentials *cred) {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_sqlrclient_database(
 						sqlrservercontroller *cont,
-						sqlrauths *auths,
-						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_sqlrclient_database(
-						cont,auths,sqlrpe,parameters);
+		return new sqlrauth_sqlrclient_database(cont,parameters);
 	}
 }

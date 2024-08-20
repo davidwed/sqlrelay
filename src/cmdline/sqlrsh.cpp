@@ -297,11 +297,9 @@ bool sqlrsh::runScript(sqlrconnection *sqlrcon, sqlrcursor *sqlrcur,
 	if (scriptfile.open(trimmedfilename,O_RDONLY)) {
 
 		// optimize
-		filesystem	fs;
-		if (fs.open(trimmedfilename)) {
-			scriptfile.setReadBufferSize(
-				fs.getOptimumTransferBlockSize());
-		}
+		scriptfile.setReadBufferSize(
+			filesystem::getOptimumTransferBlockSize(
+							trimmedfilename));
 
 		for (;;) {
 		
@@ -1158,10 +1156,10 @@ bool sqlrsh::externalCommand(sqlrconnection *sqlrcon,
 			delete[] table;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
-				"show procedure binds and columns",32)) {
+					"show procedure parameters",25)) {
 			char	*procedure=getProcedure(command);
 			char	*wild=getWild(command);
-			sqlrcur->getProcedureBindAndColumnList(procedure,wild);
+			sqlrcur->getProcedureParameterList(procedure,wild);
 			delete[] procedure;
 			delete[] wild;
 		} else if (!charstring::compareIgnoringCase(command,
@@ -1676,7 +1674,7 @@ void sqlrsh::displayResultSet(sqlrcursor *sqlrcur, sqlrshenv *env) {
 
 			// write the field
 			if (env->format==SQLRSH_FORMAT_PLAIN) {
-				stdoutput.write(field);
+				stdoutput.write(field,fieldlength);
 			} else {
 				// we need to quote the field if it's not a
 				// number, or if it is a number, but has more

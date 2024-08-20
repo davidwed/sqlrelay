@@ -9,8 +9,7 @@
 
 class SQLRSERVER_DLLSPEC sqlrdirective_custom_wf : public sqlrdirective {
 	public:
-			sqlrdirective_custom_wf(sqlrservercontroller *cont,
-							sqlrdirectives *sqlds,
+		sqlrdirective_custom_wf(sqlrservercontroller *cont,
 							domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -19,25 +18,13 @@ class SQLRSERVER_DLLSPEC sqlrdirective_custom_wf : public sqlrdirective {
 		void	parseDirective(sqlrservercursor *sqlrcur,
 					const char *directivestart,
 					uint32_t length);
-
-		sqlrservercontroller	*cont;
-
-		bool	debug;
-		bool	enabled;
 };
 
 sqlrdirective_custom_wf::sqlrdirective_custom_wf(
 					sqlrservercontroller *cont,
-					sqlrdirectives *sqlds,
 					domnode *parameters) :
-				sqlrdirective(cont,sqlds,parameters) {
+				sqlrdirective(cont,parameters) {
 	debugFunction();
-
-	this->cont=cont;
-
-	debug=cont->getConfig()->getDebugDirectives();
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 }
 
 #define KEYWORD_SQLEXECDIRECT "sqlexecdirect"
@@ -49,10 +36,6 @@ bool sqlrdirective_custom_wf::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query) {
 	debugFunction();
-
-	if (!enabled) {
-		return true;
-	}
 
 	// reset directives
 	sqlrcur->setQueryTimeout(cont->getQueryTimeout());
@@ -69,9 +52,7 @@ bool sqlrdirective_custom_wf::run(sqlrserverconnection *sqlrcon,
 
 	// check for rpc markers (which might follow the comments)
 	if (*line==MARKER_ODBC_RPC) {
-		if (debug) {
-			stdoutput.printf("%s...\n",MARKER_ODBC_RPC);
-		}
+		debugWrite("%s...",MARKER_ODBC_RPC);
 		sqlrcur->setExecuteDirect(true);
 		sqlrcur->setExecuteRpc(true);
 	}
@@ -97,9 +78,7 @@ void sqlrdirective_custom_wf::parseDirective(
 	if (!charstring::compare(directivestart,
 				KEYWORD_SQLEXECDIRECT,
 				length)) {
-		if (debug) {
-			stdoutput.printf("%s...\n",KEYWORD_SQLEXECDIRECT);
-		}
+		debugWrite("%s...",KEYWORD_SQLEXECDIRECT);
 		sqlrcur->setExecuteDirect(true);
 		return;
 	}
@@ -107,9 +86,7 @@ void sqlrdirective_custom_wf::parseDirective(
 	if (!charstring::compare(directivestart,
 				KEYWORD_SQLPREPARE,
 				length)) {
-		if (debug) {
-			stdoutput.printf("%s...\n",KEYWORD_SQLPREPARE);
-		}
+		debugWrite("%s...",KEYWORD_SQLPREPARE);
 		sqlrcur->setExecuteDirect(false);
 	}
 
@@ -128,15 +105,13 @@ void sqlrdirective_custom_wf::parseDirective(
 			// terminated someplace, and I already know this it
 			// appears to be an integer, so let it rip even though
 			// we would like to use the argumentsize.
-			if (debug) {
-				stdoutput.printf("%s%lld...\n",
+			debugWrite("%s%lld...",
 					KEYWORD_QUERYTIMEOUT,
 					charstring::convertToInteger(argument));
-			}
 			sqlrcur->setQueryTimeout(
 					charstring::convertToInteger(argument));
-		} else if (debug) {
-			stdoutput.printf("%s...bad argument...\n",
+		} else {
+			debugWrite("%s...bad argument...",
 					KEYWORD_QUERYTIMEOUT);
 		}
 		return;
@@ -146,8 +121,7 @@ void sqlrdirective_custom_wf::parseDirective(
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrdirective *new_sqlrdirective_custom_wf(
 						sqlrservercontroller *cont,
-						sqlrdirectives *sqlds,
 						domnode *parameters) {
-		return new sqlrdirective_custom_wf(cont,sqlds,parameters);
+		return new sqlrdirective_custom_wf(cont,parameters);
 	}
 }

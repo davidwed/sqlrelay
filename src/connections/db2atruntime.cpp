@@ -365,7 +365,7 @@ static bool loadLibraries(stringbuffer *errormessage, const char *db2path) {
 	while (*path) {
 		libfilename.clear();
 		libfilename.append(*path)->append('/')->append(libname);
-		if (file::readable(libfilename.getString())) {
+		if (file::isReadable(libfilename.getString())) {
 			break;
 		}
 		path++;

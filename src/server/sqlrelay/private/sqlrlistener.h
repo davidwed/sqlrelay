@@ -1,6 +1,13 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
+	public:
+		sqlrlistener();
+		~sqlrlistener();
+
+		bool	init(int argc, const char **argv);
+		bool	listen();
+
 	private:
 		void	cleanUp();
 		void	setUserAndGroup();
@@ -36,22 +43,19 @@
 					thread *thr);
 		void    errorClientSession(filedescriptor *clientsock,
 					int64_t errnum, const char *err);
-		bool	semWait(int32_t index, thread *thr,
-					bool withundo, bool *timeout);
-		bool	acquireShmAccess(thread *thr, bool *timeout);
+		bool	acquireShmAccess(thread *thr, bool *timedout);
 		bool	releaseShmAccess();
 		bool	acceptAvailableConnection(thread *thr,
 							bool *alldbsdown,
-							bool *timeout);
+							bool *timedout);
 		bool	doneAcceptingAvailableConnection();
-		void	waitForConnectionToBeReadyForHandoff();
 		bool	handOffOrProxyClient(filedescriptor *sock,
 					uint16_t protocolindex,
 					thread *thr);
 		bool	getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
-					uint16_t *unixportstrlen,
+					uint16_t *unixportstrsize,
 					filedescriptor *sock,
 					thread *thr);
 		bool	findMatchingSocket(uint32_t connectionpid,
@@ -87,7 +91,5 @@
 							ssize_t result);
 		void	raiseClientConnectionRefusedEvent(const char *info);
 		void	raiseInternalErrorEvent(const char *info);
-
-		static void	alarmHandler(int32_t signum);
 
 		sqlrlistenerprivate	*pvt;

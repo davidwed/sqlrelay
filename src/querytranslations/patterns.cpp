@@ -31,9 +31,7 @@ struct pattern_t {
 class SQLRSERVER_DLLSPEC sqlrquerytranslation_patterns :
 					public sqlrquerytranslation {
 	public:
-			sqlrquerytranslation_patterns(
-						sqlrservercontroller *cont,
-						sqlrquerytranslations *sqlts,
+		sqlrquerytranslation_patterns(sqlrservercontroller *cont,
 						domnode *parameters);
 			~sqlrquerytranslation_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
@@ -61,28 +59,16 @@ class SQLRSERVER_DLLSPEC sqlrquerytranslation_patterns :
 
 		pattern_t	*patterns;
 		uint32_t	patterncount;
-
-		bool	enabled;
-
-		bool	debug;
 };
 
 sqlrquerytranslation_patterns::sqlrquerytranslation_patterns(
 						sqlrservercontroller *cont,
-						sqlrquerytranslations *sqlts,
 						domnode *parameters) :
-				sqlrquerytranslation(cont,sqlts,parameters) {
+				sqlrquerytranslation(cont,parameters) {
 	debugFunction();
-
-	debug=cont->getConfig()->getDebugQueryTranslations();
 
 	patterns=NULL;
 	patterncount=0;
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled) {
-		return;
-	}
 
 	buildPatternsTree(parameters,&patterns,&patterncount,true);
 }
@@ -186,15 +172,11 @@ bool sqlrquerytranslation_patterns::run(sqlrserverconnection *sqlrcon,
 					stringbuffer *translatedquery) {
 	debugFunction();
 
-	if (!enabled) {
-		translatedquery->append(query,querylength);
-		return true;
-	}
-
-	if (debug) {
-		stdoutput.write("original query:\n\"");
-		stdoutput.safePrint(query,querylength);
-		stdoutput.write("\"\n\n");
+	if (getDebug()) {
+		debugWrite("original query:");
+		stringbuffer	b;
+		b.safePrint(query,querylength);
+		debugWrite("\"%s\"",b.getString());
 	}
 
 	applyPatterns(query,patterns,patterncount,translatedquery);
@@ -267,10 +249,8 @@ void sqlrquerytranslation_patterns::applyPatterns(const char *str,
 				delete[] parts[j];
 			}
 
-			if (debug) {
-				stdoutput.printf("translated to:\n\"%s\"\n\n",
-							outbuffer->getString());
-			}
+			debugWrite("translated to:");
+			debugWrite("\"%s\"",outbuffer->getString());
 
 			// clean up
 			delete[] parts;
@@ -285,13 +265,13 @@ void sqlrquerytranslation_patterns::applyPattern(const char *str,
 							pattern_t *p,
 							stringbuffer *outb) {
 
-	ssize_t		pfromlen=(debug)?charstring::getLength(p->from):0;
+	ssize_t		pfromlen=(getDebug())?charstring::getLength(p->from):0;
 	const char	*fromellipses="";
 	if (pfromlen>77) {
 		pfromlen=74;
 		fromellipses="...";
 	}
-	ssize_t		ptolen=(debug)?charstring::getLength(p->to):0;
+	ssize_t		ptolen=(getDebug())?charstring::getLength(p->to):0;
 	const char	*toellipses="";
 	if (ptolen>77) {
 		ptolen=74;
@@ -301,57 +281,56 @@ void sqlrquerytranslation_patterns::applyPattern(const char *str,
 	char	*convstr=NULL;
 
 	if (p->matchre) {
-		if (debug) {
-			stdoutput.printf("applying "
-					"match:\n\"%s\"\n",
-					p->match);
-		}
+
+		debugWrite("applying match:");
+		debugWrite("\"%s\"",p->match);
+
 		matchAndReplace(str,p,outb);
+
 	} else if (p->fromre) {
-		if (debug) {
-			stdoutput.printf("applying regex "
-					"from:\n\"%.*s%s\"\n"
-					"to:\n\"%.*s%s\"\n\n",
-					pfromlen,p->from,fromellipses,
-					ptolen,p->to,toellipses);
-		}
+
+		debugWrite("applying regex from:");
+		debugWrite("\"%.*s%s\"",pfromlen,p->from,fromellipses);
+		debugWrite("to:");
+		debugWrite("\"%.*s%s\"",ptolen,p->to,toellipses);
+
 		convstr=charstring::replace(str,
 					p->fromre,
 					p->to,
 					p->replaceglobal);
 		outb->append(convstr);
+
 	} else {
-		if (debug) {
-			stdoutput.printf("applying string "
-					"from:\n\"%.*s%s\"\n"
-					"to:\n\"%.*s%s\"\n",
-					pfromlen,p->from,fromellipses,
-					ptolen,p->to,toellipses);
-			if (p->scope==SCOPE_INSIDE_QUOTES) {
-				stdoutput.printf("inside quotes on chunk:\n"
-							"\"%s\"\n",str);
-			}
-			if (p->scope==SCOPE_OUTSIDE_QUOTES) {
-				stdoutput.printf("outside quotes on chunk:\n"
-							"\"%s\"\n",str);
-			}
-			stdoutput.write("\n");
+
+		debugWrite("applying string from:");
+		debugWrite("\"%.*s%s\"",pfromlen,p->from,fromellipses);
+		debugWrite("to:");
+		debugWrite("\"%.*s%s\"",ptolen,p->to,toellipses);
+		if (p->scope==SCOPE_INSIDE_QUOTES) {
+			debugWrite("inside quotes on chunk:");
+			debugWrite("\"%s\"",str);
 		}
+		if (p->scope==SCOPE_OUTSIDE_QUOTES) {
+			debugWrite("outside quotes on chunk:");
+			debugWrite("\"%s\"",str);
+		}
+
 		if (p->ignorecase) {
 			convstr=charstring::replaceIgnoringCase(
 							str,p->from,p->to);
 		} else {
 			convstr=charstring::replace(str,p->from,p->to);
 		}
+
 		outb->append(convstr);
 	}
 
 	delete[] convstr;
 
-	if (debug && p->scope!=SCOPE_INSIDE_QUOTES &&
-			p->scope!=SCOPE_OUTSIDE_QUOTES) {
-		stdoutput.printf("translated to:\n\"%s\"\n\n",
-						outb->getString());
+	if (getDebug() && p->scope!=SCOPE_INSIDE_QUOTES &&
+				p->scope!=SCOPE_OUTSIDE_QUOTES) {
+		debugWrite("translated to:");
+		debugWrite("\"%s\"",outb->getString());
 	}
 }
 
@@ -409,8 +388,7 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrquerytranslation
 			*new_sqlrquerytranslation_patterns(
 						sqlrservercontroller *cont,
-						sqlrquerytranslations *ts,
 						domnode *parameters) {
-		return new sqlrquerytranslation_patterns(cont,ts,parameters);
+		return new sqlrquerytranslation_patterns(cont,parameters);
 	}
 }

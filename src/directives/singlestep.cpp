@@ -9,8 +9,7 @@
 
 class SQLRSERVER_DLLSPEC sqlrdirective_singlestep : public sqlrdirective {
 	public:
-			sqlrdirective_singlestep(sqlrservercontroller *cont,
-							sqlrdirectives *sqlds,
+		sqlrdirective_singlestep(sqlrservercontroller *cont,
 							domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -19,25 +18,13 @@ class SQLRSERVER_DLLSPEC sqlrdirective_singlestep : public sqlrdirective {
 		void	parseDirective(sqlrservercursor *sqlrcur,
 					const char *directivestart,
 					uint32_t length);
-
-		sqlrservercontroller	*cont;
-
-		bool	debug;
-		bool	enabled;
 };
 
 sqlrdirective_singlestep::sqlrdirective_singlestep(
 					sqlrservercontroller *cont,
-					sqlrdirectives *sqlds,
 					domnode *parameters) :
-				sqlrdirective(cont,sqlds,parameters) {
+				sqlrdirective(cont,parameters) {
 	debugFunction();
-
-	this->cont=cont;
-
-	debug=cont->getConfig()->getDebugDirectives();
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 }
 
 bool sqlrdirective_singlestep::run(sqlrserverconnection *sqlrcon,
@@ -45,12 +32,8 @@ bool sqlrdirective_singlestep::run(sqlrserverconnection *sqlrcon,
 					const char *query) {
 	debugFunction();
 
-	if (!enabled) {
-		return true;
-	}
-
 	// bail if not postgresql
-	if (charstring::compare(sqlrcon->identify(),"postgresql")) {
+	if (charstring::compare(cont->getDbType(),"postgresql")) {
 		return true;
 	}
 
@@ -86,8 +69,7 @@ bool sqlrdirective_singlestep::run(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrdirective *new_sqlrdirective_singlestep(
 						sqlrservercontroller *cont,
-						sqlrdirectives *sqlds,
 						domnode *parameters) {
-		return new sqlrdirective_singlestep(cont,sqlds,parameters);
+		return new sqlrdirective_singlestep(cont,parameters);
 	}
 }

@@ -16,7 +16,12 @@
 sqlrservercontroller	*cont=NULL;
 const char		*backtrace=NULL;
 
-#define SHUTDOWNFLAG 1
+// On Windows, wait()s don't fall through if the semaphore is destroyed,
+// which causes various problems for using the shutdown flag to exit.
+// For now, we'll fall back to the old way on windows.
+#ifndef _WIN32
+	#define SHUTDOWNFLAG 1
+#endif
 
 #ifndef SHUTDOWNFLAG
 volatile sig_atomic_t	shutdowninprogress=0;

@@ -68,8 +68,16 @@ commit&nbsp;or&nbsp;rollback&nbsp;is&nbsp;issued&nbsp;then&nbsp;this&nbsp;doesn'
 do&nbsp;anything&nbsp;unless&nbsp;SQL&nbsp;Relay&nbsp;is&nbsp;faking&nbsp;transaction<br>
 blocks.</tt></dd></dl>
 
-<dl><dt><a name="sqlrconnection-bindFormat"><strong>bindFormat</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;string&nbsp;representing&nbsp;the&nbsp;format<br>
-of&nbsp;the&nbsp;bind&nbsp;variables&nbsp;used&nbsp;in&nbsp;the&nbsp;db.</tt></dd></dl>
+<dl><dt><a name="sqlrconnection-bindFormat"><strong>bindFormat</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;string&nbsp;representing&nbsp;the&nbsp;bind&nbsp;variable&nbsp;format&nbsp;used<br>
+by&nbsp;the&nbsp;database.&nbsp;&nbsp;For&nbsp;example:<br>
+&nbsp;<br>
+&nbsp;&nbsp;?&nbsp;&nbsp;-&nbsp;database&nbsp;uses&nbsp;a&nbsp;?&nbsp;to&nbsp;represent&nbsp;a&nbsp;bind&nbsp;variable<br>
+&nbsp;&nbsp;@*&nbsp;-&nbsp;database&nbsp;uses&nbsp;a&nbsp;@&nbsp;followed&nbsp;by&nbsp;any&nbsp;characters&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;represent&nbsp;a&nbsp;bind&nbsp;variable<br>
+&nbsp;&nbsp;$1&nbsp;-&nbsp;database&nbsp;uses&nbsp;a&nbsp;$&nbsp;followed&nbsp;by&nbsp;a&nbsp;number&nbsp;to&nbsp;represent&nbsp;a<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;bind&nbsp;variable<br>
+&nbsp;&nbsp;:*&nbsp;-&nbsp;database&nbsp;uses&nbsp;a&nbsp;:&nbsp;followed&nbsp;by&nbsp;any&nbsp;characters&nbsp;to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;represent&nbsp;a&nbsp;bind&nbsp;variable</tt></dd></dl>
 
 <dl><dt><a name="sqlrconnection-clientVersion"><strong>clientVersion</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;version&nbsp;of&nbsp;the&nbsp;SQL&nbsp;Relay&nbsp;client&nbsp;version</tt></dd></dl>
 
@@ -245,8 +253,17 @@ only&nbsp;valid&nbsp;after&nbsp;a&nbsp;call&nbsp;to&nbsp;<a href="#sqlrconnectio
 <dl><dt><a name="sqlrconnection-identify"><strong>identify</strong></a>(self)</dt><dd><tt>Returns&nbsp;the&nbsp;type&nbsp;of&nbsp;database:&nbsp;<br>
 &nbsp;&nbsp;oracle,&nbsp;postgresql,&nbsp;mysql,&nbsp;etc.</tt></dd></dl>
 
-<dl><dt><a name="sqlrconnection-nextvalFormat"><strong>nextvalFormat</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;string&nbsp;representing&nbsp;the&nbsp;format&nbsp;of&nbsp;the<br>
-sequence&nbsp;nextval&nbsp;command&nbsp;used&nbsp;in&nbsp;the&nbsp;db.</tt></dd></dl>
+<dl><dt><a name="sqlrconnection-nextvalFormat"><strong>nextvalFormat</strong></a>(self)</dt><dd><tt>Returns&nbsp;a&nbsp;string&nbsp;representing&nbsp;the&nbsp;format&nbsp;of&nbsp;the&nbsp;sequence<br>
+nextval&nbsp;command&nbsp;used&nbsp;in&nbsp;the&nbsp;database.&nbsp;&nbsp;The&nbsp;format&nbsp;will<br>
+contain&nbsp;a&nbsp;%s&nbsp;in&nbsp;place&nbsp;of&nbsp;the&nbsp;sequence&nbsp;name.&nbsp;&nbsp;For&nbsp;example:<br>
+&nbsp;<br>
+&nbsp;&nbsp;(nextval&nbsp;for&nbsp;%s)<br>
+&nbsp;&nbsp;next&nbsp;value&nbsp;for&nbsp;%s<br>
+&nbsp;&nbsp;nextval('%s')<br>
+&nbsp;&nbsp;%s.nextval<br>
+&nbsp;<br>
+Returns&nbsp;an&nbsp;empty&nbsp;string&nbsp;if&nbsp;the&nbsp;database&nbsp;does&nbsp;not&nbsp;support<br>
+sequences.</tt></dd></dl>
 
 <dl><dt><a name="sqlrconnection-ping"><strong>ping</strong></a>(self)</dt><dd><tt>Returns&nbsp;1&nbsp;if&nbsp;the&nbsp;database&nbsp;is&nbsp;up&nbsp;and&nbsp;0<br>
 if&nbsp;it's&nbsp;down.</tt></dd></dl>

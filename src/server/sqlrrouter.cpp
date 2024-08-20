@@ -7,15 +7,14 @@ class sqlrrouterprivate {
 	friend class sqlrrouter;
 	private:
 		sqlrrouters	*_rs;
-		domnode	*_parameters;
 };
 
 sqlrrouter::sqlrrouter(sqlrservercontroller *cont,
 				sqlrrouters *rs,
-				domnode *parameters) {
+				domnode *parameters) :
+				sqlrservermodule(cont,parameters) {
 	pvt=new sqlrrouterprivate;
 	pvt->_rs=rs;
-	pvt->_parameters=parameters;
 }
 
 sqlrrouter::~sqlrrouter() {
@@ -35,14 +34,4 @@ bool sqlrrouter::routeEntireSession() {
 
 sqlrrouters *sqlrrouter::getRouters() {
 	return pvt->_rs;
-}
-
-domnode *sqlrrouter::getParameters() {
-	return pvt->_parameters;
-}
-
-void sqlrrouter::endTransaction(bool commit) {
-}
-
-void sqlrrouter::endSession() {
 }

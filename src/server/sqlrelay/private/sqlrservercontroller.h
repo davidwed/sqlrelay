@@ -1,12 +1,67 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
+	public:
+		sqlrservercontroller();
+		~sqlrservercontroller();
+
+		bool	init(int argc, const char **argv);
+		bool	listen();
+
+		void	reLogIn();
+
+		bool	bulkLoadBegin(const char *id,
+					const char *errorfieldtable,
+					const char *errorrowtable,
+					uint64_t maxerrorcount,
+					bool droperrortables);
+		bool	bulkLoadCheckpoint(const char *id);
+		bool	bulkLoadPrepareQuery(const char *query,
+						uint64_t querysize,
+						uint16_t inbindcount,
+						sqlrserverbindvar *inbinds);
+		bool	bulkLoadCreateErrorTables(const char *query,
+						uint64_t querysize,
+						const char *errorfieldtable,
+						const char *errorrowtable);
+		bool	bulkLoadCreateErrorTable1(sqlrservercursor *cursor,
+						const char *query,
+						uint64_t querysize,
+						const char *errorfieldtable);
+		bool	bulkLoadCreateErrorTable2(sqlrservercursor *cursor,
+						const char *query,
+						uint64_t querysize,
+						const char *errorrowtable);
+		bool	bulkLoadJoin(const char *id);
+		bool	bulkLoadInputBind(const byte_t *data,
+						uint64_t datasize);
+		void	bulkLoadParseInsert(const char *query,
+						uint64_t querysize,
+						char **table,
+                                                linkedlist<char *> *cols,
+                                                linkedlist<char *> *binds);
+		bool	bulkLoadExecuteQuery();
+		void	bulkLoadInitBinds();
+		void	bulkLoadBindRow(const byte_t *data,
+						uint64_t datasize);
+		void	bulkLoadError();
+		bool	bulkLoadStoreError(int64_t errorcode,
+						const char *error,
+						uint32_t errorsize,
+						const char *errorfieldtable,
+						const char *errorrowtable);
+		bool	bulkLoadEnd();
+		bool	bulkLoadDropErrorTables(const char *errorfieldtable,
+						const char *errorrowtable);
+
 	private:
+		void	createPidFile();
+
 		void	setUserAndGroup();
 
 		sqlrserverconnection	*initConnection(const char *dbase);
 
-		bool	handlePidFile();
+		bool	waitForListenerStartup();
 
 		void	initDatabaseAvailableFileName();
 
@@ -31,7 +86,7 @@
 
 		void	initSession();
 
-		bool	announceAvailability(const char *connectionid);
+		bool	getAListener(const char *connectionid);
 
 		bool	registerForHandoff();
 		void	deRegisterForHandoff();
@@ -40,10 +95,8 @@
 		bool	getProtocol();
 		void	clientSession();
 
-		bool	beginFakeTransactionBlock();
 		void	endTransaction(bool commit);
 		void	clearColumnCaches();
-		bool	endFakeTransactionBlock();
 		bool	checkInterceptQuery(sqlrservercursor *cursor);
 		bool	interceptQuery(sqlrservercursor *cursor);
 
@@ -64,7 +117,7 @@
 					stringbuffer *newquery);
 		void	mapBindVariable(sqlrservercursor *cursor,
 					const char *variablename,
-					uint64_t variablenamelen,
+					uint64_t variablenamesize,
 					uint16_t bindindex);
 
 		void	translateBeginTransaction(sqlrservercursor *cursor);
@@ -74,8 +127,22 @@
 		bool	handleBinds(sqlrservercursor *cursor);
 
 		void		buildColumnMaps();
+		void		setColumnMap();
 		uint32_t	mapColumn(uint32_t col);
 		uint32_t	mapColumnCount(uint32_t colcount);
+
+		bool	handleResultSetHeader(sqlrservercursor *cursor);
+
+		bool	reformatField(sqlrservercursor *cursor,
+						const char *name,
+						uint32_t index,
+						const char **field,
+						uint64_t *fieldsize);
+		bool	reformatRow(sqlrservercursor *cursor,
+						uint32_t colcount,
+						const char * const *names,
+						const char ***fields,
+						uint64_t **fieldsizes);
 
 		void	commitOrRollback(sqlrservercursor *cursor);
 
@@ -96,13 +163,11 @@
 
 		void	decrementConnectedClientCount();
 
-		bool	acquireAnnounceMutex();
-		void	releaseAnnounceMutex();
-
+		bool	acquireShmAccess();
+		bool	resetSemaphores();
 		void	signalListenerToRead();
-		void	unSignalListenerToRead();
 		bool	waitForListenerToFinishReading();
-		void	signalListenerToHandoff();
+		void	releaseShmAccess();
 
 		void	acquireConnectionCountMutex();
 		void	releaseConnectionCountMutex();
@@ -115,6 +180,7 @@
 		sqlrparser	*newParser();
 
 		void	setClientSessionStartTime();
+		void	setCurrentUser(const char *user, uint32_t usersize);
 		void	setClientAddr();
 
 
@@ -128,10 +194,11 @@
 					const char **primarykeycolumn);
 		void	getColumnsFromInsertQuery(
 					const char *start,
-					const char *end,
+					const char *queryend,
 					linkedlist<char *> *columns);
 		void	getFirstValuesFromInsertQuery(
 					const char *start,
+					const char *queryend,
 					linkedlist<char *> *values,
 					bool *mutiinsert);
 		void	deriveColumnsFromInsertQuery(
@@ -139,6 +206,28 @@
 					linkedlist<char *> *allcolumns,
 					linkedlist<char *> *columns);
 
-		static void     alarmHandler(int32_t signum);
+		sqlrdatabaseobject *createDatabaseObject(
+						const char *database,
+						const char *schema,
+						const char *name,
+						const char *dependency);
+		void	setReplacementName(
+				dictionary< sqlrdatabaseobject *, char *> *dict,
+				sqlrdatabaseobject *oldobject,
+				const char *newobject);
+		bool	getReplacementName(
+				dictionary< sqlrdatabaseobject *, char *> *dict,
+				const char *database,
+				const char *schema,
+				const char *oldobject,
+				const char **newobject);
+		bool	removeReplacement(
+				dictionary< sqlrdatabaseobject *, char *> *dict,
+				const char *database,
+				const char *schema,
+				const char *object);
+
+		bool	fakePrepareAndExecuteForApiCall(
+						sqlrservercursor *cursor);
 
 		sqlrservercontrollerprivate	*pvt;

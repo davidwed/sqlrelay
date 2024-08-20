@@ -21,7 +21,7 @@ void checkSuccessString(const char *value, const char *success) {
 			return;
 		} else {
 			printf("\"%s\"!=\"%s\"",value,success);
-			printf("failure ");
+			printf("failure: %s",sqlrcur_errorMessage(cur));
 			sqlrcur_free(cur);
 			sqlrcon_free(con);
 			exit(1);
@@ -32,7 +32,7 @@ void checkSuccessString(const char *value, const char *success) {
 		printf("success ");
 	} else {
 		printf("\"%s\"!=\"%s\"",value,success);
-		printf("failure ");
+		printf("failure: %s",sqlrcur_errorMessage(cur));
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
 		exit(1);
@@ -48,7 +48,7 @@ void checkSuccessStringWithLength(const char *value, const char *success,
 			return;
 		} else {
 			printf("\"%s\"!=\"%s\"",value,success);
-			printf("failure ");
+			printf("failure: %s",sqlrcur_errorMessage(cur));
 			sqlrcur_free(cur);
 			sqlrcon_free(con);
 			exit(1);
@@ -59,7 +59,7 @@ void checkSuccessStringWithLength(const char *value, const char *success,
 		printf("success ");
 	} else {
 		printf("\"%s\"!=\"%s\"",value,success);
-		printf("failure ");
+		printf("failure: %s",sqlrcur_errorMessage(cur));
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
 		exit(1);
@@ -72,7 +72,7 @@ void checkSuccessInt(int value, int success) {
 		printf("success ");
 	} else {
 		printf("\"%d\"!=\"%d\"",value,success);
-		printf("failure ");
+		printf("failure: %s",sqlrcur_errorMessage(cur));
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
 		exit(1);
@@ -85,7 +85,7 @@ void checkSuccessDouble(double value, double success) {
 		printf("success ");
 	} else {
 		printf("\"%f\"!=\"%f\"",value,success);
-		printf("failure ");
+		printf("failure: %s",sqlrcur_errorMessage(cur));
 		sqlrcur_free(cur);
 		sqlrcon_free(con);
 		exit(1);

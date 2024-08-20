@@ -32,6 +32,8 @@
 	#define MAXPATHLEN	256
 #endif
 
+#define ACK	6
+
 class SQLRSERVER_DLLSPEC handoffsocketnode {
 	friend class sqlrlistener;
 	private:
@@ -92,7 +94,7 @@ class sqlrlistenerprivate {
 
 		uint32_t	_maxquerysize;
 		uint16_t	_maxbindcount;
-		uint16_t	_maxbindnamelength;
+		uint16_t	_maxbindnamesize;
 		int32_t		_idleclienttimeout;
 
 		bool	_isforkedchild;
@@ -100,10 +102,7 @@ class sqlrlistenerprivate {
 		bool	_usethreads;
 };
 
-static signalhandler		alarmhandler;
-static volatile sig_atomic_t	alarmrang=0;
-
-sqlrlistener::sqlrlistener() {
+sqlrlistener::sqlrlistener() : sqlrserverbase() {
 
 	pvt=new sqlrlistenerprivate;
 
@@ -147,7 +146,7 @@ sqlrlistener::sqlrlistener() {
 
 	pvt->_maxquerysize=0;
 	pvt->_maxbindcount=0;
-	pvt->_maxbindnamelength=0;
+	pvt->_maxbindnamesize=0;
 	pvt->_idleclienttimeout=-1;
 
 	pvt->_isforkedchild=false;
@@ -275,7 +274,7 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	// The tmpdir his is often in /run or /var/run, which is often a tmpfs,
 	// at least on Linux.  So, it's blown away with each reboot.  Re-create
 	// it if it doesn't exist.
-#ifdef WIN32
+#ifdef _WIN32
 	const char	*slash="\\";
 #else
 	const char	*slash="/";
@@ -344,7 +343,7 @@ bool sqlrlistener::init(int argc, const char **argv) {
 	pvt->_idleclienttimeout=pvt->_cfg->getIdleClientTimeout();
 	pvt->_maxquerysize=pvt->_cfg->getMaxQuerySize();
 	pvt->_maxbindcount=pvt->_cfg->getMaxBindCount();
-	pvt->_maxbindnamelength=pvt->_cfg->getMaxBindNameLength();
+	pvt->_maxbindnamesize=pvt->_cfg->getMaxBindNameSize();
 	pvt->_maxlisteners=pvt->_cfg->getMaxListeners();
 	pvt->_listenertimeout=pvt->_cfg->getListenerTimeout();
 
@@ -387,11 +386,7 @@ bool sqlrlistener::init(int argc, const char **argv) {
 
 	setMaxListeners(pvt->_maxlisteners);
 
-	// set a handler for SIGALRMs
-	#ifdef SIGALRM
-	alarmhandler.setHandler(alarmHandler);
-	alarmhandler.handleSignal(SIGALRM);
-	#endif
+	sqlrserverbase::init();
 
 	return true;
 }
@@ -425,7 +420,7 @@ void sqlrlistener::setUserAndGroup() {
 	}
 
 	// write the error, if there was one
-	stderror.write(errorstr.getString(),errorstr.getStringLength());
+	stderror.write(errorstr.getString(),errorstr.getSize());
 
 	// clean up
 	delete[] currentuser;
@@ -642,6 +637,7 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	//
 	// 0 - connection: connection registration mutex
 	// 1 - listener:   connection registration mutex
+	// 12 - connection/listener: semaphore reset mutex
 	//
 	// connection/listener registration interlocks:
 	// 2 - connection/listener: 
@@ -650,9 +646,6 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// 3 - connection/listener:
 	//       * connection waits
 	//       * listener signals when it's done reading the registration
-	// 12 - connection/listener:
-	//       * listener waits
-	//       * connection signals when it's ready to be handed a client
 	//
 	// connection/listener/scaler interlocks:
 	// 6 - scaler/listener: used to decide whether to scale or not
@@ -683,9 +676,10 @@ bool sqlrlistener::createSharedMemoryAndSemaphores(const char *id) {
 	// main listenter process/listener children:
 	// 10 - listener: number of busy listeners
 	//
-	int32_t	vals[13]={1,1,0,0,1,1,0,0,0,1,0,0,0};
+	int32_t	vals[13]={1,1,0,0,1,1,0,0,0,1,0,0,1};
 	pvt->_semset=new semaphoreset();
-	if (!pvt->_semset->create(key,permissions::getOwnerReadWrite(),13,vals)) {
+	if (!pvt->_semset->create(key,permissions::getOwnerReadWrite(),
+								13,vals)) {
 		semError(id,pvt->_semset->getId());
 		pvt->_semset->attach(key,13);
 		return false;
@@ -1233,7 +1227,7 @@ bool sqlrlistener::handleTraffic(filedescriptor *fd) {
 	// there would need to be another main sqlr-listener process out there.
 	// This should never happen, the listener would have to have the same
 	// id as this one and that is checked at startup.  However, if it did
-	// happen, getValue(10) would return something greater than 0 and we
+	// happen, getValue(2) would return something greater than 0 and we
 	// would have forked anyway.
 	if (pvt->_handoffmode==HANDOFF_PROXY ||
 			pvt->_dynamicscaling ||
@@ -1563,7 +1557,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 	uint32_t		connectionpid;
 	uint16_t		inetport;
 	char 			unixportstr[MAXPATHLEN+1];
-	uint16_t		unixportstrlen;
+	uint16_t		unixportstrsize;
 	bool			retval=false;
 
 	// loop in case client doesn't get handed off successfully
@@ -1574,7 +1568,7 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 		}
 
 		if (!getAConnection(&connectionpid,&inetport,
-					unixportstr,&unixportstrlen,
+					unixportstr,&unixportstrsize,
 					sock,thr)) {
 			// fatal error occurred while getting a connection
 			retval=false;
@@ -1590,10 +1584,11 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 		}
 
 		// Pass the client to the connection or proxy it.
-		// If any of this fails, the connection may have crashed or
-		// been killed.  Loop back and get another connection...
+		// If any of this fails, the connection may have crashed, been
+		// killed, or its ttl may have expired.  In any of those cases,
+		// loop back and get another connection...
 
-		// tell the connection what handoff mode to expect
+		// tell the connection which handoff mode to use (pass or proxy)
 		connectionsock.write(pvt->_handoffmode);
 
 		// tell the connection which protocol to use
@@ -1604,12 +1599,22 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 			// pass the file descriptor
 			if (!connectionsock.passSocket(
 					sock->getFileDescriptor())) {
-
-				// this could fail if a connection
-				// died because its ttl expired...
-
-				raiseInternalErrorEvent("failed to pass "
+				raiseInternalErrorEvent("handoff failed: "
+							"failed to pass "
 							"file descriptor");
+				continue;
+			}
+
+			// read the ack
+			byte_t	ack=0;
+			if (connectionsock.read(&ack,1,0)!=sizeof(byte_t)) {
+				raiseInternalErrorEvent("handof failed: "
+							"failed to receive ack");
+				continue;
+			}
+			if (ack!=ACK) {
+				raiseInternalErrorEvent("handoff failed: "
+							"received bad ack");
 				continue;
 			}
 
@@ -1617,9 +1622,6 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 
 			// proxy the client
 			if (!proxyClient(connectionpid,&connectionsock,sock)) {
-
-				// this could fail if a connection
-				// died because its ttl expired...
 				continue;
 			}
 		}
@@ -1638,60 +1640,12 @@ bool sqlrlistener::handOffOrProxyClient(filedescriptor *sock,
 	return retval;
 }
 
-bool sqlrlistener::semWait(int32_t index, thread *thr,
-					bool withundo, bool *timeout) {
-
-	bool	result=true;
-	*timeout=false;
-	if (pvt->_listenertimeout>0 &&
-			pvt->_semset->supportsTimedSemaphoreOperations()) {
-		if (withundo) {
-			result=pvt->_semset->waitWithUndo(
-					index,pvt->_listenertimeout,0);
-		} else {
-			result=pvt->_semset->wait(
-					index,pvt->_listenertimeout,0);
-		}
-		*timeout=(!result && error::getErrorNumber()==EAGAIN);
-	} else if (pvt->_listenertimeout>0 &&
-			!thr && sys::getSignalsInterruptSystemCalls()) {
-		// We can't use this when using threads because alarmrang isn't
-		// thread-local and there's no way to make it be.  Also, the
-		// alarm doesn't reliably interrupt the wait() when it's called
-		// from a thread, at least not on Linux.  Hopefully platforms
-		// that supports threads also supports timed semaphore ops.
-		pvt->_semset->setRetryInterruptedOperations(false);
-		alarmrang=0;
-		signalmanager::alarm(pvt->_listenertimeout);
-		do {
-			if (withundo) {
-				result=pvt->_semset->waitWithUndo(index);
-			} else {
-				result=pvt->_semset->wait(index);
-			}
-		} while (!result && error::getErrorNumber()==EINTR &&
-						!process::getShutDownFlag() &&
-						alarmrang!=1);
-		*timeout=(alarmrang==1);
-		signalmanager::alarm(0);
-		pvt->_semset->setRetryInterruptedOperations(true);
-	} else {
-		if (withundo) {
-			result=pvt->_semset->waitWithUndo(index);
-		} else {
-			result=pvt->_semset->wait(index);
-		}
-	}
-
-	return result;
-}
-
-bool sqlrlistener::acquireShmAccess(thread *thr, bool *timeout) {
+bool sqlrlistener::acquireShmAccess(thread *thr, bool *timedout) {
 
 	raiseDebugMessageEvent("acquiring exclusive shm access");
 
-	if (!semWait(1,thr,true,timeout)) {
-		if (*timeout) {
+	if (!semWait(pvt->_semset,1,thr,true,pvt->_listenertimeout,timedout)) {
+		if (*timedout) {
 			raiseDebugMessageEvent("timeout occured");
 		} else {
 			raiseDebugMessageEvent("failed to acquire "
@@ -1710,7 +1664,8 @@ bool sqlrlistener::releaseShmAccess() {
 	raiseDebugMessageEvent("releasing exclusive shm access");
 
 	if (!pvt->_semset->signalWithUndo(1)) {
-		raiseDebugMessageEvent("failed to release exclusive shm access");
+		raiseDebugMessageEvent("failed to release "
+					"exclusive shm access");
 		return false;
 	}
 
@@ -1720,7 +1675,7 @@ bool sqlrlistener::releaseShmAccess() {
 
 bool sqlrlistener::acceptAvailableConnection(thread *thr,
 						bool *alldbsdown,
-						bool *timeout) {
+						bool *timedout) {
 
 	// If we don't want to wait for down databases, then check to see if
 	// any of the db's are up.  If none are, then don't even wait for an
@@ -1745,8 +1700,8 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 
 	raiseDebugMessageEvent("waiting for an available connection");
 
-	if (!semWait(2,thr,false,timeout)) {
-		if (*timeout) {
+	if (!semWait(pvt->_semset,2,thr,false,pvt->_listenertimeout,timedout)) {
+		if (*timedout) {
 			raiseDebugMessageEvent("timeout occured");
 		} else {
 			raiseInternalErrorEvent("general failure waiting "
@@ -1756,14 +1711,6 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 	}
 
 	// success...
-
-	// Reset this semaphore to 0.
-	// It can get left incremented if a sqlr-connection process is killed
-	// between calls to signalListenerToRead() and
-	// waitForListenerToFinishReading().  It's safe to reset it here
-	// because of the lock on semaphore 1.
-	pvt->_semset->setValue(2,0);
-
 	raiseDebugMessageEvent("succeeded in waiting for "
 				"an available connection");
 	return true;
@@ -1771,29 +1718,21 @@ bool sqlrlistener::acceptAvailableConnection(thread *thr,
 
 bool sqlrlistener::doneAcceptingAvailableConnection() {
 
-	raiseDebugMessageEvent("signalling accepted connection");
+	raiseDebugMessageEvent("signaling accepted connection");
 
 	if (!pvt->_semset->signal(3)) {
 		raiseDebugMessageEvent("failed to signal accepted connection");
 		return false;
 	}
 
-	raiseDebugMessageEvent("succeeded signalling accepted connection");
+	raiseDebugMessageEvent("succeeded signaling accepted connection");
 	return true;
-}
-
-void sqlrlistener::waitForConnectionToBeReadyForHandoff() {
-	raiseDebugMessageEvent(
-		"waiting for connection to be ready for handoff");
-	pvt->_semset->wait(12);
-	raiseDebugMessageEvent(
-		"done waiting for connection to be ready for handoff");
 }
 
 bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 					uint16_t *inetport,
 					char *unixportstr,
-					uint16_t *unixportstrlen,
+					uint16_t *unixportstrsize,
 					filedescriptor *sock,
 					thread *thr) {
 
@@ -1809,8 +1748,8 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 		bool	alldbsdown=false;
 
 		// acquire access to the shared memory	
-		bool	timeout=false;
-		bool	ok=acquireShmAccess(thr,&timeout);
+		bool	timedout=false;
+		bool	ok=acquireShmAccess(thr,&timedout);
 
 		if (ok) {
 
@@ -1819,7 +1758,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			// at the end, no matter what...
 
 			// wait for an available connection
-			ok=acceptAvailableConnection(thr,&alldbsdown,&timeout);
+			ok=acceptAvailableConnection(thr,&alldbsdown,&timedout);
 
 			if (ok) {
 
@@ -1837,15 +1776,6 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 
 		// execute this only if code above executed without errors...
 		if (ok) {
-
-			// FIXME: If a connection was spawned and has signaled
-			// on semaphore 12, but some step above failed, then
-			// waitForConnectionToBeReadyForHandoff below won't
-			// be called, and semaphore 12 will grow and grow.
-
-			// wait for the connection to let us know that it's
-			// ready to have a client handed off to it
-			waitForConnectionToBeReadyForHandoff();
 
 			// make sure the connection is actually up...
 			if (connectionIsUp(pvt->_shm->connectionid)) {
@@ -1867,7 +1797,7 @@ bool sqlrlistener::getAConnection(uint32_t *connectionpid,
 			pingDatabase(*connectionpid,unixportstr,*inetport);
 		}
 
-		if (timeout) {
+		if (timedout) {
 			raiseDebugMessageEvent("failed to get "
 					"a connection: timeout");
 			sock->write((uint16_t)ERROR_OCCURRED_DISCONNECT);
@@ -2069,7 +1999,6 @@ bool sqlrlistener::proxyClient(pid_t connectionpid,
 					"failed to receive ack");
 		return false;
 	}
-	#define ACK	6
 	if (ack!=ACK) {
 		raiseDebugMessageEvent("proxying client failed: "
 					"received bad ack");
@@ -2245,13 +2174,13 @@ void sqlrlistener::waitForClientClose(bool passstatus,
 					// input bind vars
 					pvt->_maxbindcount*
 						(2*sizeof(uint16_t)+
-						pvt->_maxbindnamelength)+
+						pvt->_maxbindnamesize)+
 					// output bind var count
 					sizeof(uint16_t)+
 					// output bind vars
 					pvt->_maxbindcount*
 						(2*sizeof(uint16_t)+
-						pvt->_maxbindnamelength)+
+						pvt->_maxbindnamesize)+
 					// get column info
 					sizeof(uint16_t)+
 					// skip/fetch
@@ -2320,11 +2249,11 @@ void sqlrlistener::incrementConnectedClientCount() {
 
 		// signal the scaler to evaluate the connection count
 		// and start more connections if necessary
-		raiseDebugMessageEvent("signalling the scaler...");
+		raiseDebugMessageEvent("signaling the scaler...");
 		if (!pvt->_semset->signal(6)) {
 			// FIXME: bail somehow
 		}
-		raiseDebugMessageEvent("finished signalling the scaler...");
+		raiseDebugMessageEvent("finished signaling the scaler...");
 	}
 
 	raiseDebugMessageEvent("finished incrementing connected client count");
@@ -2492,21 +2421,66 @@ void sqlrlistener::raiseInternalErrorEvent(const char *info) {
 	}
 }
 
-void sqlrlistener::alarmHandler(int32_t signum) {
-	alarmrang=1;
-	#ifdef SIGALRM
-	alarmhandler.handleSignal(SIGALRM);
-	#endif
-}
-
 const char *sqlrlistener::getId() {
 	return pvt->_cmdl->getId();
 }
 
-const char *sqlrlistener::getLogDir() {
-	return pvt->_sqlrpth->getLogDir();
+sqlrpaths *sqlrlistener::getPaths() {
+	return pvt->_sqlrpth;
 }
 
-const char *sqlrlistener::getDebugDir() {
-	return pvt->_sqlrpth->getDebugDir();
+// FIXME: push loglevel/eventtype up and consolidate somehow
+static const char *loglevels[]={"DEBUG","INFO","WARNING","ERROR"};
+
+const char *sqlrlistener::getLogLevel(sqlrloglevel_t level) {
+	return loglevels[(uint8_t)level];
+}
+
+sqlrloglevel_t sqlrlistener::getLogLevel(const char *level) {
+	uint16_t	retval=SQLRLOGGER_LOGLEVEL_DEBUG;
+	for (const char * const *ll=loglevels; *ll; ll++) {
+		if (!charstring::compareIgnoringCase(level,*ll)) {
+			break;
+		}
+		retval++;
+	}
+	return (sqlrloglevel_t)retval;
+}
+
+static const char *eventtypes[]={
+	"CLIENT_CONNECTED",
+	"CLIENT_CONNECTION_REFUSED",
+	"CLIENT_DISCONNECTED",
+	"CLIENT_PROTOCOL_ERROR",
+	"DB_LOGIN",
+	"DB_LOGOUT",
+	"DB_ERROR",
+	"DB_WARNING",
+	"QUERY_RECEIVED",
+	"QUERY_PREPARED",
+	"QUERY_EXECUTED",
+	"FILTER_VIOLATION",
+	"INTERNAL_ERROR",
+	"INTERNAL_WARNING",
+	"DEBUG_MESSAGE",
+	"SCHEDULE_VIOLATION",
+	"INTEGRITY_VIOLATION",
+	"TRANSLATION_FAILURE",
+	"PARSE_FAILURE",
+	NULL
+};
+
+const char *sqlrlistener::getEventType(sqlrevent_t event) {
+	return eventtypes[(uint16_t)event];
+}
+
+sqlrevent_t sqlrlistener::getEventType(const char *event) {
+	uint16_t	retval=SQLREVENT_CLIENT_CONNECTED;
+	for (const char * const *ev=eventtypes; *ev; ev++) {
+		if (!charstring::compareIgnoringCase(event,*ev)) {
+			break;
+		}
+		retval++;
+	}
+	return (sqlrevent_t)retval;
 }

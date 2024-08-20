@@ -11,28 +11,45 @@
 
 class SQLRSERVER_DLLSPEC sqlrlogger_sql : public sqlrlogger {
 	public:
-			sqlrlogger_sql(sqlrloggers *ls, domnode *parameters);
-			~sqlrlogger_sql();
+		sqlrlogger_sql(domnode *parameters);
+		~sqlrlogger_sql();
 
 		bool	init(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
+					sqlrloglevel_t level,
 					sqlrevent_t event,
 					const char *info);
 	private:
 		char		*querylogname;
 		file		querylog;
-		bool		enabled;
+		bool		sync;
+		sqlrevent_t	queryevent;
+		bool		logpidchange;
+		bool		logerrors;
 		pid_t		pid;
 };
 
-sqlrlogger_sql::sqlrlogger_sql(sqlrloggers *ls, domnode *parameters) :
-						sqlrlogger(ls,parameters) {
+sqlrlogger_sql::sqlrlogger_sql(domnode *parameters) : sqlrlogger(parameters) {
 	querylogname=NULL;
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
+	sync=charstring::isYes(parameters->getAttributeValue("sync"));
+	const char	*qestr=parameters->getAttributeValue("queryevent");
+	if (charstring::isNullOrEmpty(qestr)) {
+		qestr="executed";
+	}
+	if (!charstring::compare(qestr,"received")) {
+		queryevent=SQLREVENT_QUERY_RECEIVED;
+	} else if (!charstring::compare(qestr,"prepared")) {
+		queryevent=SQLREVENT_QUERY_PREPARED;
+	} else if (!charstring::compare(qestr,"executed")) {
+		queryevent=SQLREVENT_QUERY_EXECUTED;
+	}
+	logpidchange=!charstring::isNo(
+			parameters->getAttributeValue("logpidchange"));
+	logerrors=!charstring::isNo(
+			parameters->getAttributeValue("logerrors"));
 }
 
 sqlrlogger_sql::~sqlrlogger_sql() {
@@ -42,10 +59,6 @@ sqlrlogger_sql::~sqlrlogger_sql() {
 
 bool sqlrlogger_sql::init(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon) {
-
-	if (!enabled) {
-		return true;
-	}
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
@@ -59,7 +72,7 @@ bool sqlrlogger_sql::init(sqlrlistener *sqlrl,
 	delete[] querylogname;
 	charstring::printf(&querylogname,
 				"%s/sqlr-connection-%s-querylog.%ld",
-				sqlrcon->cont->getLogDir(),
+				sqlrcon->cont->getPaths()->getLogDir(),
 				sqlrcon->cont->getId(),(long)pid);
 
 	// remove any old log file
@@ -72,22 +85,17 @@ bool sqlrlogger_sql::init(sqlrlistener *sqlrl,
 	}
 
 	// optimize
-	filesystem	fs;
-	fs.open(querylogname);
-	querylog.setWriteBufferSize(fs.getOptimumTransferBlockSize());
+	querylog.setWriteBufferSize(
+			filesystem::getOptimumTransferBlockSize(querylogname));
 	return true;
 }
 
 bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
+					sqlrloglevel_t level,
 					sqlrevent_t event,
 					const char *info) {
-
-	if (!enabled) {
-		return true;
-	}
 
 	// don't log anything for the listener
 	if (!sqlrcon) {
@@ -96,7 +104,7 @@ bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 
 	// don't do anything unless we got INFO/QUERY/TX
 	if (level!=SQLRLOGGER_LOGLEVEL_INFO ||
-		(event!=SQLREVENT_QUERY &&
+		(event!=queryevent &&
 		event!=SQLREVENT_BEGIN_TRANSACTION &&
 		event!=SQLREVENT_ROLLBACK &&
 		event!=SQLREVENT_COMMIT)) {
@@ -116,52 +124,71 @@ bool sqlrlogger_sql::run(sqlrlistener *sqlrl,
 		}
 	}
 
-	stringbuffer	logentry;
-
 	// log pid changes
-	if (process::getProcessId()!=pid) {
+	if (logpidchange && process::getProcessId()!=pid) {
 		pid=process::getProcessId();
-		logentry.append("-- pid changed to ");
-		logentry.append((uint64_t)pid);
-		logentry.append('\n');
+		if (querylog.write("-- pid changed to ",18)!=18) {
+			return false;
+		}
+		querylog.printf("%lld",(uint64_t)pid);
+		if (querylog.write('\n')!=1) {
+			return false;
+		}
 	}
 
 	// log query (and error, if there was one)
-	if (event==SQLREVENT_QUERY) {
-		logentry.append(sqlrcon->cont->getQueryBuffer(sqlrcur));
-		logentry.append(";\n");
-		if (sqlrcon->cont->getErrorLength(sqlrcur)) {
-			logentry.append("-- ERROR: ");
-			logentry.append(sqlrcon->cont->getErrorBuffer(sqlrcur));
-			logentry.append("\n");
+	if (event==queryevent) {
+		if ((uint32_t)querylog.write(sqlrcur->getQueryBuffer(),
+						sqlrcur->getQuerySize())!=
+						sqlrcur->getQuerySize() ||
+			querylog.write(";\n",2)!=2) {
+			return false;
+		}
+		if (logerrors && sqlrcur->getErrorSize()) {
+			if (querylog.write("-- ERROR: ",10)!=10 ||
+				(uint32_t)querylog.write(
+						sqlrcur->getErrorBuffer(),
+						sqlrcur->getErrorSize())!=
+						sqlrcur->getErrorSize() ||
+				querylog.write('\n')!=1) {
+				return false;
+			}
 		}
 	} else {
 		if (event==SQLREVENT_BEGIN_TRANSACTION) {
-			logentry.append("begin;\n");
+			if (querylog.write("begin;\n",7)!=7) {
+				return false;
+			}
 		} else if (event==SQLREVENT_ROLLBACK) {
-			logentry.append("rollback;\n");
+			if (querylog.write("rollback;\n")!=10) {
+				return false;
+			}
 		} else if (event==SQLREVENT_COMMIT) {
-			logentry.append("commit;\n");
+			if (querylog.write("commit;\n")!=8) {
+				return false;
+			}
 		}
-		if (sqlrcon->cont->getErrorLength()) {
-			logentry.append("-- ERROR: ");
-			logentry.append(sqlrcon->cont->getErrorBuffer());
-			logentry.append("\n");
+		if (logerrors && sqlrcon->cont->getErrorSize()) {
+			if (querylog.write("-- ERROR: ",10)!=10 ||
+				(uint32_t)querylog.write(
+						sqlrcon->getErrorBuffer(),
+						sqlrcon->getErrorSize())!=
+						sqlrcon->getErrorSize() ||
+				querylog.write('\n')!=1) {
+				return false;
+			}
 		}
 	}
-	if ((size_t)querylog.write(logentry.getString(),
-				logentry.getStringLength())!=
-				logentry.getStringLength()) {
-		return false;
+
+	// flush, if we need to
+	if (sync) {
+		querylog.flushWriteBuffer(-1,-1);
 	}
-	//querylog.flushWriteBuffer(-1,-1);
 	return true;
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_sql(
-						sqlrloggers *ls,
-						domnode *parameters) {
-		return new sqlrlogger_sql(ls,parameters);
+	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_sql(domnode *parameters) {
+		return new sqlrlogger_sql(parameters);
 	}
 }

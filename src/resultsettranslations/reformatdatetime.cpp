@@ -8,21 +8,16 @@
 class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 					public sqlrresultsettranslation {
 	public:
-			sqlrresultsettranslation_reformatdatetime(
+		sqlrresultsettranslation_reformatdatetime(
 					sqlrservercontroller *cont,
-					sqlrresultsettranslations *rs,
 					domnode *parameters);
-			~sqlrresultsettranslation_reformatdatetime();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
 					uint32_t fieldindex,
 					const char **field,
-					uint64_t *fieldlength);
+					uint64_t *fieldsize);
 	private:
-		char		*reformattedfield;
-		uint64_t	reformattedfieldlength;
-
 		bool		ddmm;
 		bool		yyyyddmm;
 		bool		ignorenondatetime;
@@ -30,28 +25,13 @@ class SQLRSERVER_DLLSPEC sqlrresultsettranslation_reformatdatetime :
 		const char	*datetimeformat;
 		const char	*dateformat;
 		const char	*timeformat;
-
-		bool	enabled;
-
-		bool	debug;
 };
 
 sqlrresultsettranslation_reformatdatetime::
 	sqlrresultsettranslation_reformatdatetime(
 				sqlrservercontroller *cont,
-				sqlrresultsettranslations *rs,
 				domnode *parameters) :
-				sqlrresultsettranslation(cont,rs,parameters) {
-
-	debug=cont->getConfig()->getDebugResultSetTranslations();
-
-	reformattedfield=NULL;
-	reformattedfieldlength=0;
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled) {
-		return;
-	}
+				sqlrresultsettranslation(cont,parameters) {
 
 	// get the parameters
 	const char	*dateddmm=
@@ -80,40 +60,45 @@ sqlrresultsettranslation_reformatdatetime::
 
 }
 
-sqlrresultsettranslation_reformatdatetime::
-	~sqlrresultsettranslation_reformatdatetime() {
-	delete[] reformattedfield;
-}
-
 bool sqlrresultsettranslation_reformatdatetime::run(
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *fieldname,
 					uint32_t fieldindex,
 					const char **field,
-					uint64_t *fieldlength) {
+					uint64_t *fieldsize) {
 	debugFunction();
 
-	if (!enabled) {
+	// ignore non-date fields, if specified
+	if (ignorenondatetime &&
+		!sqlrcon->cont->isDateTimeType(
+			sqlrcon->cont->getColumnType(sqlrcur,fieldindex))) {
 		return true;
 	}
 
-	// For now, call the sqlrservercontroller method.
-	// Eventually that code should be moved here.
-	sqlrcon->cont->reformatDateTimes(sqlrcur,fieldindex,
-					*field,*fieldlength,
-					field,fieldlength,
-					ddmm,yyyyddmm,
-					ignorenondatetime,
+	// This weirdness is mainly to address a FreeTDS/MSSQL
+	// issue.  See the code for the method
+	// freetdscursor::ignoreDateDdMmParameter() for more info.
+	bool	localddmm=ddmm;
+	bool	localyyyyddmm=yyyyddmm;
+	if (sqlrcur->ignoreDateDdMmParameter(*field,*fieldsize)) {
+		localddmm=false;
+		localyyyyddmm=false;
+	}
+
+	// reformat the date/time
+	sqlrcon->cont->reformatDateTime(*field,
+					*fieldsize,
+					field,
+					fieldsize,
+					localddmm,
+					localyyyyddmm,
 					datedelimiters,
 					datetimeformat,
 					dateformat,
 					timeformat);
 
-	if (debug) {
-		stdoutput.printf("using ddmm=%d and yyyyddmm=%d\n",
-							ddmm,yyyyddmm);
-	}
+	debugWrite("using ddmm=%d and yyyyddmm=%d",ddmm,yyyyddmm);
 
 	return true;
 }
@@ -122,9 +107,8 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrresultsettranslation
 			*new_sqlrresultsettranslation_reformatdatetime(
 					sqlrservercontroller *cont,
-					sqlrresultsettranslations *rs,
 					domnode *parameters) {
 		return new sqlrresultsettranslation_reformatdatetime(
-							cont,rs,parameters);
+							cont,parameters);
 	}
 }

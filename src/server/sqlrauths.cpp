@@ -6,8 +6,6 @@
 #include <rudiments/domnode.h>
 #include <rudiments/process.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -17,83 +15,53 @@
 	}
 #endif
 
-class sqlrauthplugin {
-	public:
-		sqlrauth	*au;
-		dynamiclib	*dl;
-};
-
-class sqlrauthsprivate {
-	friend class sqlrauths;
-	private:
-		sqlrservercontroller	*_cont;
-
-		singlylinkedlist< sqlrauthplugin * >	_llist;
-};
-
-sqlrauths::sqlrauths(sqlrservercontroller *cont) {
-	debugFunction();
-	pvt=new sqlrauthsprivate;
-	pvt->_cont=cont;
+sqlrauths::sqlrauths(sqlrservercontroller *cont) : sqlrservermodules(cont) {
+	pvt=NULL;
+	setDebug(cont->getConfig()->getDebugAuths());
 }
 
 sqlrauths::~sqlrauths() {
-	debugFunction();
-	unload();
-	delete pvt;
 }
 
-bool sqlrauths::load(domnode *parameters, sqlrpwdencs *sqlrpe) {
-	debugFunction();
+bool sqlrauths::load(domnode *parameters) {
 
 	unload();
 
-	// run through each set of auths
-	for (domnode *auth=parameters->getFirstTagChild("auth");
-			!auth->isNullNode();
-			auth=auth->getNextTagSibling("auth")) {
+	// run through the module tags
+	for (domnode *moduledata=parameters->getFirstTagChild();
+				!moduledata->isNullNode();
+				moduledata=moduledata->getNextTagSibling()) {
 
-		debugPrintf("loading auth ...\n");
+		// skip disabled modules
+		if (isModuleDisabled(moduledata)) {
+			continue;
+		}
 
-		// load password encryption
-		loadAuth(auth,sqlrpe);
+		// load the module
+		loadModule(moduledata);
 	}
 	return true;
 }
 
-void sqlrauths::unload() {
-	debugFunction();
-	for (listnode< sqlrauthplugin * > *node=
-						pvt->_llist.getFirst();
-						node; node=node->getNext()) {
-		sqlrauthplugin	*sqlrap=node->getValue();
-		delete sqlrap->au;
-		delete sqlrap->dl;
-		delete sqlrap;
-	}
-	pvt->_llist.clear();
-}
+void sqlrauths::loadModule(domnode *parameters) {
 
-void sqlrauths::loadAuth(domnode *auth, sqlrpwdencs *sqlrpe) {
-	debugFunction();
-
-	// get the auth name
-	const char	*module=auth->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=auth->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			// fall back to default if no module is specified
-			module="default";
-		}
+	// ignore non-auths
+	if (charstring::compare(parameters->getName(),"auth")) {
+		return;
 	}
 
-	debugPrintf("loading auth: %s\n",module);
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
+	}
+
+	debugWrite("loading auth module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the password encryption module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("auth_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -111,12 +79,8 @@ void sqlrauths::loadAuth(domnode *auth, sqlrpwdencs *sqlrpe) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrauth_")->append(module);
 	sqlrauth *(*newAuth)(sqlrservercontroller *,
-					sqlrauths *,
-					sqlrpwdencs *,
 					domnode *)=
 			(sqlrauth *(*)(sqlrservercontroller *,
-					sqlrauths *,
-					sqlrpwdencs *,
 					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newAuth) {
@@ -128,7 +92,7 @@ void sqlrauths::loadAuth(domnode *auth, sqlrpwdencs *sqlrpe) {
 		delete dl;
 		return;
 	}
-	sqlrauth	*au=(*newAuth)(pvt->_cont,this,sqlrpe,auth);
+	sqlrauth	*au=(*newAuth)(cont,parameters);
 
 #else
 
@@ -140,29 +104,30 @@ void sqlrauths::loadAuth(domnode *auth, sqlrpwdencs *sqlrpe) {
 	}
 #endif
 
+	debugWrite("success");
+
 	// add the plugin to the list
-	sqlrauthplugin	*sqlrap=new sqlrauthplugin;
-	sqlrap->au=au;
-	sqlrap->dl=dl;
-	pvt->_llist.append(sqlrap);
+	sqlrmoduleplugin	*sqlrmp=new sqlrmoduleplugin;
+	sqlrmp->m=au;
+	sqlrmp->dl=dl;
+	sqlrmp->module=module;
+	blist.append(sqlrmp);
 }
 
 const char *sqlrauths::auth(sqlrcredentials *cred) {
-	debugFunction();
 	if (!cred) {
 		return NULL;
 	}
-	for (listnode< sqlrauthplugin * > *node=
-						pvt->_llist.getFirst();
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
-		const char	*autheduser=node->getValue()->au->auth(cred);
+
+		debugWrite("running auth: %s...",node->getValue()->module);
+		
+		sqlrauth	*m=(sqlrauth *)node->getValue()->m;
+		const char	*autheduser=m->auth(cred);
 		if (autheduser) {
 			return autheduser;
 		}
 	}
 	return NULL;
-}
-
-void sqlrauths::endSession() {
-	// nothing for now, maybe in the future
 }

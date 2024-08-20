@@ -23,7 +23,7 @@ class sqlrservercursorprivate {
 		uint16_t	_id;
 
 		char			*_querybuffer;
-		uint32_t		_querylength;
+		uint32_t		_querysize;
 		sqlrquerystatus_t	_querystatus;
 		stringbuffer		_querywithfakeinputbinds;
 
@@ -59,11 +59,11 @@ class sqlrservercursorprivate {
 		uint64_t	_fetchendusec;
 		uint64_t	_fetchusec;
 
-		uint32_t	_maxerrorlength;
+		uint32_t	_maxerrorsize;
 
 		char		*_errorbuffer;
 		uint32_t	_errorbuffersize;
-		uint32_t	_errorlength;
+		uint32_t	_errorsize;
 		int64_t		_errnum;
 		bool		_liveconnection;
 
@@ -83,11 +83,11 @@ class sqlrservercursorprivate {
 		sqlrquerytype_t	_querytype;
 
 		const char	**_columnnames;
-		uint16_t	*_columnnamelengths;
+		uint16_t	*_columnnamesizes;
 		uint16_t	*_columntypes;
 		const char	**_columntypenames;
-		uint16_t	*_columntypenamelengths;
-		uint32_t	*_columnlengths;
+		uint16_t	*_columntypenamesizes;
+		uint32_t	*_columnsizes;
 		uint32_t	*_columnprecisions;
 		uint32_t	*_columnscales;
 		uint16_t	*_columnisnullables;
@@ -99,12 +99,12 @@ class sqlrservercursorprivate {
 		uint16_t	*_columnisbinarys;
 		uint16_t	*_columnisautoincrements;
 		const char	**_columntables;
-		uint16_t	*_columntablelengths;
+		uint16_t	*_columntablesizes;
 
 		const char	**_fieldnames;
 		const char	**_fields;
-		uint64_t	*_fieldlengths;
-		bool		*_blobs;
+		uint64_t	*_fieldsizes;
+		bool		*_lobs;
 		bool		*_nulls;
 
 		uint64_t	_querytimeout;
@@ -114,16 +114,17 @@ class sqlrservercursorprivate {
 
 		bool		_resultsetheaderhasbeenhandled;
 
-		byte_t		_moduledata[1024];
+		bool		_querysuppressed;
 };
 
-sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
+sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) :
+							sqlrserverbase() {
 
 	pvt=new sqlrservercursorprivate;
 
 	this->conn=conn;
 
-	pvt->_maxerrorlength=conn->cont->getConfig()->getMaxErrorLength();
+	pvt->_maxerrorsize=conn->cont->getConfig()->getMaxErrorSize();
 
 	pvt->_bindmappings=new dictionary<char *, char *>();
 
@@ -161,15 +162,15 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 
 	pvt->_querybuffer=
 		new char[conn->cont->getConfig()->getMaxQuerySize()+1];
-	setQueryLength(0);
+	setQuerySize(0);
 
 	setQueryStatus(SQLRQUERYSTATUS_ERROR);
 
 	setQueryTree(NULL);
 
-	pvt->_errorbuffersize=pvt->_maxerrorlength+1;
+	pvt->_errorbuffersize=pvt->_maxerrorsize+1;
 	pvt->_errorbuffer=new char[pvt->_errorbuffersize];
-	pvt->_errorlength=0;
+	pvt->_errorsize=0;
 	pvt->_errnum=0;
 	pvt->_liveconnection=true;
 
@@ -196,11 +197,11 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_querytype=SQLRQUERYTYPE_ETC;
 
 	pvt->_columnnames=NULL;
-	pvt->_columnnamelengths=NULL;
+	pvt->_columnnamesizes=NULL;
 	pvt->_columntypes=NULL;
 	pvt->_columntypenames=NULL;
-	pvt->_columntypenamelengths=NULL;
-	pvt->_columnlengths=NULL;
+	pvt->_columntypenamesizes=NULL;
+	pvt->_columnsizes=NULL;
 	pvt->_columnprecisions=NULL;
 	pvt->_columnscales=NULL;
 	pvt->_columnisnullables=NULL;
@@ -212,12 +213,12 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_columnisbinarys=NULL;
 	pvt->_columnisautoincrements=NULL;
 	pvt->_columntables=NULL;
-	pvt->_columntablelengths=NULL;
+	pvt->_columntablesizes=NULL;
 
 	pvt->_fieldnames=NULL;
 	pvt->_fields=NULL;
-	pvt->_fieldlengths=NULL;
-	pvt->_blobs=NULL;
+	pvt->_fieldsizes=NULL;
+	pvt->_lobs=NULL;
 	pvt->_nulls=NULL;
 	uint32_t	colcount=conn->cont->getMaxColumnCount();
 	if (colcount) {
@@ -231,6 +232,8 @@ sqlrservercursor::sqlrservercursor(sqlrserverconnection *conn, uint16_t id) {
 	pvt->_fetchatonce=conn->cont->getFetchAtOnce();
 
 	pvt->_resultsetheaderhasbeenhandled=false;
+
+	pvt->_querysuppressed=false;
 }
 
 sqlrservercursor::~sqlrservercursor() {
@@ -248,6 +251,7 @@ sqlrservercursor::~sqlrservercursor() {
 }
 
 bool sqlrservercursor::open() {
+	// by default do nothing
 	return true;
 }
 
@@ -257,7 +261,7 @@ bool sqlrservercursor::close() {
 }
 
 sqlrquerytype_t sqlrservercursor::determineQueryType(const char *query,
-							uint32_t length) {
+							uint32_t size) {
 
 	// skip past leading garbage
 	const char	*ptr=conn->cont->skipWhitespaceAndComments(query);
@@ -266,25 +270,25 @@ sqlrquerytype_t sqlrservercursor::determineQueryType(const char *query,
 	sqlrquerytype_t	retval=SQLRQUERYTYPE_ETC;
 
 	// look for specific query types
-	if (!charstring::compare(ptr,"select",6)) {
+	if (!charstring::compareIgnoringCase(ptr,"select",6)) {
 		retval=SQLRQUERYTYPE_SELECT;
 		ptr=ptr+6;
-	} else if (!charstring::compare(ptr,"insert",6)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"insert",6)) {
 		retval=SQLRQUERYTYPE_INSERT;
 		ptr=ptr+6;
-	} else if (!charstring::compare(ptr,"update",6)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"update",6)) {
 		retval=SQLRQUERYTYPE_UPDATE;
 		ptr=ptr+6;
-	} else if (!charstring::compare(ptr,"delete",6)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"delete",6)) {
 		retval=SQLRQUERYTYPE_DELETE;
 		ptr=ptr+6;
-	} else if (!charstring::compare(ptr,"create",6)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"create",6)) {
 		retval=SQLRQUERYTYPE_CREATE;
 		ptr=ptr+6;
 	} else if (!charstring::compareIgnoringCase(ptr,"drop",4)) {
 		retval=SQLRQUERYTYPE_DROP;
 		ptr=ptr+4;
-	} else if (!charstring::compare(ptr,"alter",5)) {
+	} else if (!charstring::compareIgnoringCase(ptr,"alter",5)) {
 		retval=SQLRQUERYTYPE_ALTER;
 		ptr=ptr+5;
 	} else if (isBeginTransactionQuery(ptr)) {
@@ -415,6 +419,7 @@ bool sqlrservercursor::blockCanBeIntercepted(const char *block) {
 
 #elif 0
 	// FIXME: handle other types of quoting - ", `, and []
+	// FIXME: use findEndOfQuotedString()
 
 	bool		inquotes=false;
 	const char	*ptr=block;
@@ -490,7 +495,9 @@ bool sqlrservercursor::isAutoCommitQuery(const char *query, bool on) {
 
 		query+=10;
 
-	}  else {
+	}
+#if 0
+	 else {
 
 		// look for "set"
 		if (!charstring::compareIgnoringCase(query,"set",3)) {
@@ -514,6 +521,11 @@ bool sqlrservercursor::isAutoCommitQuery(const char *query, bool on) {
 			return false;
 		}
 	}
+#else
+	else {
+		return false;
+	}
+#endif
 
 	// skip whitespace
 	query=conn->cont->skipWhitespaceAndComments(query);
@@ -584,9 +596,16 @@ bool sqlrservercursor::isSetIncludingAutoCommitQuery(
 		// skip whitespace
 		query=conn->cont->skipWhitespaceAndComments(query);
 
-		// look for "autocommit"
+		// look for "autocommit"/"auto"/"implicit_transactions"
 		if (!charstring::compareIgnoringCase(query,"autocommit",10)) {
 			query+=10;
+			break;
+		} else if (!charstring::compareIgnoringCase(query,"auto",4)) {
+			query+=4;
+			break;
+		} else if (!charstring::compareIgnoringCase(
+					query,"implicit_transactions",21)) {
+			query+=21;
 			break;
 		}
 
@@ -637,13 +656,12 @@ bool sqlrservercursor::isCustomQuery() {
 	return false;
 }
 
-bool sqlrservercursor::prepareQuery(const char *query, uint32_t length) {
+bool sqlrservercursor::prepareQuery(const char *query, uint32_t size) {
 	// by default, do nothing...
 	return true;
 }
 
-bool sqlrservercursor::supportsNativeBinds(const char *query,
-						uint32_t length) {
+bool sqlrservercursor::supportsNativeBinds(const char *query, uint32_t size) {
 	return true;
 }
 
@@ -705,15 +723,14 @@ bool sqlrservercursor::inputBind(const char *variable,
 					int32_t microsecond,
 					const char *tz,
 					bool isnegative,
-					char *buffer,
-					uint16_t buffersize,
 					int16_t *isnull) {
-	dateToString(buffer,buffersize,year,month,day,
+	char	*buffer=(char *)pvt->_bindpool.allocate(64);
+	dateToString(buffer,64,year,month,day,
 			hour,minute,second,microsecond,tz,isnegative);
 	if (buffer[0]=='\0') {
-		*isnull=conn->nullBindValue();
+		*isnull=conn->getNullBindValue();
 	}
-	return inputBind(variable,variablesize,buffer,buffersize,isnull);
+	return inputBind(variable,variablesize,buffer,64,isnull);
 }
 
 bool sqlrservercursor::inputBindBlob(const char *variable,
@@ -772,8 +789,6 @@ bool sqlrservercursor::outputBind(const char *variable,
 					int32_t *microsecond,
 					const char **tz,
 					bool *isnegative,
-					char *buffer,
-					uint16_t buffersize,
 					int16_t *isnull) {
 	// by default, do nothing...
 	return true;
@@ -802,7 +817,8 @@ bool sqlrservercursor::outputBindCursor(const char *variable,
 	return true;
 }
 
-bool sqlrservercursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+bool sqlrservercursor::getLobOutputBindLength(uint16_t index,
+						uint64_t *length) {
 	*length=0;
 	return true;
 }
@@ -857,8 +873,6 @@ bool sqlrservercursor::inputOutputBind(const char *variable,
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull) {
 	// by default, do nothing...
 	return true;
@@ -898,7 +912,7 @@ void sqlrservercursor::closeLobInputOutputBind(uint16_t index) {
 	// by default, do nothing
 }
 
-void sqlrservercursor::checkForTempTable(const char *query, uint32_t length) {
+void sqlrservercursor::checkForTempTable(const char *query, uint32_t size) {
 
 	// see if the query matches the pattern for a temporary query that
 	// creates a temporary table
@@ -909,21 +923,21 @@ void sqlrservercursor::checkForTempTable(const char *query, uint32_t length) {
 
 	// get the table name
 	stringbuffer	tablename;
-	const char	*endptr=query+length;
+	const char	*endptr=query+size;
 	while (*ptr && !character::isWhitespace(*ptr) && ptr<endptr) {
 		tablename.append(*ptr);
 		ptr++;
 	}
 
 	// append to list of temp tables
-	conn->cont->addSessionTempTableForDrop(tablename.getString());
+	conn->cont->addTempTableForDrop(tablename.getString());
 }
 
 const char *sqlrservercursor::truncateTableQuery() {
 	return "delete from";
 }
 
-bool sqlrservercursor::executeQuery(const char *query, uint32_t length) {
+bool sqlrservercursor::executeQuery(const char *query, uint32_t size) {
 	// by default, do nothing...
 	return true;
 }
@@ -966,27 +980,27 @@ bool sqlrservercursor::queryIsCommitOrRollback() {
 			!charstring::compareIgnoringCase(ptr,"rollback",8));
 }
 
-void sqlrservercursor::errorMessage(char *errorbuffer,
+void sqlrservercursor::getError(char *errorbuffer,
 					uint32_t errorbuffersize,
-					uint32_t *errorlength,
+					uint32_t *errorsize,
 					int64_t *errorcode,
 					bool *liveconnection) {
 
 	// if the cursor happens to have an error, then return that
-	if (pvt->_errorlength) {
+	if (pvt->_errorsize) {
 		charstring::safeCopy(errorbuffer,errorbuffersize,
-					pvt->_errorbuffer,pvt->_errorlength);
-		*errorlength=pvt->_errorlength;
-		if (*errorlength>errorbuffersize) {
-			*errorlength=errorbuffersize;
+					pvt->_errorbuffer,pvt->_errorsize);
+		*errorsize=pvt->_errorsize;
+		if (*errorsize>errorbuffersize) {
+			*errorsize=errorbuffersize;
 		}
 		*errorcode=pvt->_errnum;
 		*liveconnection=pvt->_liveconnection;
 	}
 
 	// otherwise return the connection's error
-	conn->errorMessage(errorbuffer,errorbuffersize,
-				errorlength,errorcode,liveconnection);
+	conn->getError(errorbuffer,errorbuffersize,
+				errorsize,errorcode,liveconnection);
 }
 
 bool sqlrservercursor::knowsRowCount() {
@@ -1001,7 +1015,7 @@ bool sqlrservercursor::knowsAffectedRows() {
 	return true;
 }
 
-uint64_t sqlrservercursor::affectedRows() {
+uint64_t sqlrservercursor::getAffectedRows() {
 	return 0;
 }
 
@@ -1017,7 +1031,7 @@ const char *sqlrservercursor::getColumnName(uint32_t col) {
 	return NULL;
 }
 
-uint16_t sqlrservercursor::getColumnNameLength(uint32_t col) {
+uint16_t sqlrservercursor::getColumnNameSize(uint32_t col) {
 	return charstring::getLength(getColumnName(col));
 }
 
@@ -1029,11 +1043,11 @@ const char *sqlrservercursor::getColumnTypeName(uint32_t col) {
 	return datatypestring[getColumnType(col)];
 }
 
-uint16_t sqlrservercursor::getColumnTypeNameLength(uint32_t col) {
+uint16_t sqlrservercursor::getColumnTypeNameSize(uint32_t col) {
 	return charstring::getLength(getColumnTypeName(col));
 }
 
-uint32_t sqlrservercursor::getColumnLength(uint32_t col) {
+uint32_t sqlrservercursor::getColumnSize(uint32_t col) {
 	return 0;
 }
 
@@ -1081,12 +1095,12 @@ const char *sqlrservercursor::getColumnTable(uint32_t col) {
 	return NULL;
 }
 
-uint16_t sqlrservercursor::getColumnTableLength(uint32_t col) {
+uint16_t sqlrservercursor::getColumnTableSize(uint32_t col) {
 	return charstring::getLength(getColumnTable(col));
 }
 
-bool sqlrservercursor::ignoreDateDdMmParameter(uint32_t col,
-					const char *data, uint32_t size) {
+bool sqlrservercursor::ignoreDateDdMmParameter(const char *data,
+							uint32_t size) {
 	return false;
 }
 
@@ -1109,12 +1123,12 @@ void sqlrservercursor::nextRow() {
 }
 
 void sqlrservercursor::getField(uint32_t col,
-				const char **field, uint64_t *fieldlength,
-				bool *blob, bool *null) {
+				const char **field, uint64_t *fieldsize,
+				bool *lob, bool *null) {
 	// by default, do nothing
 	*field=NULL;
-	*fieldlength=0;
-	*blob=false;
+	*fieldsize=0;
+	*lob=false;
 	*null=false;
 }
 
@@ -1162,7 +1176,7 @@ bool sqlrservercursor::fakeInputBinds() {
 
 	// run through the querybuffer...
 	char		*ptr=pvt->_querybuffer;
-	const char	*endptr=pvt->_querybuffer+pvt->_querylength;
+	const char	*endptr=pvt->_querybuffer+pvt->_querysize;
 	char		prev='\0';
 	do {
 
@@ -1320,9 +1334,9 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 
 		buffer->append('\'');
 
-		size_t	length=pvt->_inbindvars[index].valuesize;
+		size_t	size=pvt->_inbindvars[index].valuesize;
 
-		for (size_t ind=0; ind<length; ind++) {
+		for (size_t ind=0; ind<size; ind++) {
 
 			char	ch=pvt->_inbindvars[index].value.stringval[ind];
 
@@ -1402,9 +1416,9 @@ void sqlrservercursor::performSubstitution(stringbuffer *buffer,
 void sqlrservercursor::encodeBlob(stringbuffer *buffer,
 				const char *data, uint32_t datasize) {
 
-	// by default, follow the SQL Standard:
-	// X'...' where ... is the blob data and each byte of blob data is
-	// converted to two hex characters..
+	// by default, follow the SQL standard:
+	// X'...' where ... is the lob data and each byte of lob data is
+	// converted to two hex characters.
 	// eg: hello -> X'68656C6C6F'
 
 	buffer->append("X\'");
@@ -1463,12 +1477,7 @@ sqlrserverbindvar *sqlrservercursor::getInputOutputBinds() {
 }
 
 void sqlrservercursor::abort() {
-	// I was once concerned that calling this here would prevent suspended
-	// result sets from being able to return column data upon resume if the
-	// entire result set had already been sent, but I don't think that's an
-	// issue any more.
 	closeResultSet();
-	setState(SQLRCURSORSTATE_AVAILABLE);
 	clearCustomQueryCursor();
 }
 
@@ -1476,12 +1485,12 @@ char *sqlrservercursor::getQueryBuffer() {
 	return pvt->_querybuffer;
 }
 
-uint32_t sqlrservercursor::getQueryLength() {
-	return pvt->_querylength;
+uint32_t sqlrservercursor::getQuerySize() {
+	return pvt->_querysize;
 }
 
-void sqlrservercursor::setQueryLength(uint32_t querylength) {
-	pvt->_querylength=querylength;
+void sqlrservercursor::setQuerySize(uint32_t querysize) {
+	pvt->_querysize=querysize;
 }
 
 void sqlrservercursor::setQueryStatus(sqlrquerystatus_t status) {
@@ -1650,15 +1659,15 @@ char *sqlrservercursor::getErrorBuffer() {
 }
 
 uint32_t sqlrservercursor::getErrorBufferSize() {
-	return pvt->_maxerrorlength+1;
+	return pvt->_maxerrorsize+1;
 }
 
-uint32_t sqlrservercursor::getErrorLength() {
-	return pvt->_errorlength;
+uint32_t sqlrservercursor::getErrorSize() {
+	return pvt->_errorsize;
 }
 
-void sqlrservercursor::setErrorLength(uint32_t errorlength) {
-	pvt->_errorlength=errorlength;
+void sqlrservercursor::setErrorSize(uint32_t errorsize) {
+	pvt->_errorsize=errorsize;
 }
 
 uint32_t sqlrservercursor::getErrorNumber() {
@@ -1772,11 +1781,11 @@ stringbuffer *sqlrservercursor::getQueryWithFakeInputBindsBuffer() {
 
 void sqlrservercursor::allocateColumnPointers(uint32_t colcount) {
 	pvt->_columnnames=new const char *[colcount];
-	pvt->_columnnamelengths=new uint16_t[colcount];
+	pvt->_columnnamesizes=new uint16_t[colcount];
 	pvt->_columntypes=new uint16_t[colcount];
 	pvt->_columntypenames=new const char *[colcount];
-	pvt->_columntypenamelengths=new uint16_t[colcount];
-	pvt->_columnlengths=new uint32_t[colcount];
+	pvt->_columntypenamesizes=new uint16_t[colcount];
+	pvt->_columnsizes=new uint32_t[colcount];
 	pvt->_columnprecisions=new uint32_t[colcount];
 	pvt->_columnscales=new uint32_t[colcount];
 	pvt->_columnisnullables=new uint16_t[colcount];
@@ -1788,16 +1797,16 @@ void sqlrservercursor::allocateColumnPointers(uint32_t colcount) {
 	pvt->_columnisbinarys=new uint16_t[colcount];
 	pvt->_columnisautoincrements=new uint16_t[colcount];
 	pvt->_columntables=new const char *[colcount];
-	pvt->_columntablelengths=new uint16_t[colcount];
+	pvt->_columntablesizes=new uint16_t[colcount];
 }
 
 void sqlrservercursor::deallocateColumnPointers() {
 	delete[] pvt->_columnnames;
-	delete[] pvt->_columnnamelengths;
+	delete[] pvt->_columnnamesizes;
 	delete[] pvt->_columntypes;
 	delete[] pvt->_columntypenames;
-	delete[] pvt->_columntypenamelengths;
-	delete[] pvt->_columnlengths;
+	delete[] pvt->_columntypenamesizes;
+	delete[] pvt->_columnsizes;
 	delete[] pvt->_columnprecisions;
 	delete[] pvt->_columnscales;
 	delete[] pvt->_columnisnullables;
@@ -1809,15 +1818,15 @@ void sqlrservercursor::deallocateColumnPointers() {
 	delete[] pvt->_columnisbinarys;
 	delete[] pvt->_columnisautoincrements;
 	delete[] pvt->_columntables;
-	delete[] pvt->_columntablelengths;
+	delete[] pvt->_columntablesizes;
 }
 
 void sqlrservercursor::getColumnPointers(const char ***columnnames,
-					uint16_t **columnnamelengths,
+					uint16_t **columnnamesizes,
 					uint16_t **columntypes,
 					const char ***columntypenames,
-					uint16_t **columntypenamelengths,
-					uint32_t **columnlengths,
+					uint16_t **columntypenamesizes,
+					uint32_t **columnsizes,
 					uint32_t **columnprecisions,
 					uint32_t **columnscales,
 					uint16_t **columnisnullables,
@@ -1829,12 +1838,12 @@ void sqlrservercursor::getColumnPointers(const char ***columnnames,
 					uint16_t **columnisbinarys,
 					uint16_t **columnisautoincrements,
 					const char ***columntables,
-					uint16_t **columntablelengths) {
+					uint16_t **columntablesizes) {
 
 	// get the max column count
 	uint32_t	colcount=conn->cont->getMaxColumnCount();
 
-	// decide if we need to allocate field pointers here,
+	// decide if we need to allocate column pointers here,
 	// and if so, how many columns
 	bool	allocate=false;
 	if (!colcount) {
@@ -1842,7 +1851,7 @@ void sqlrservercursor::getColumnPointers(const char ***columnnames,
 		allocate=true;
 	}
 
-	// allocate the field pointers, if necessary
+	// allocate the column pointers, if necessary
 	if (allocate) {
 		deallocateColumnPointers();
 		allocateColumnPointers(colcount);
@@ -1850,11 +1859,11 @@ void sqlrservercursor::getColumnPointers(const char ***columnnames,
 
 	// return the column pointers
 	*columnnames=pvt->_columnnames;
-	*columnnamelengths=pvt->_columnnamelengths;
+	*columnnamesizes=pvt->_columnnamesizes;
 	*columntypes=pvt->_columntypes;
 	*columntypenames=pvt->_columntypenames;
-	*columntypenamelengths=pvt->_columntypenamelengths;
-	*columnlengths=pvt->_columnlengths;
+	*columntypenamesizes=pvt->_columntypenamesizes;
+	*columnsizes=pvt->_columnsizes;
 	*columnprecisions=pvt->_columnprecisions;
 	*columnscales=pvt->_columnscales;
 	*columnisnullables=pvt->_columnisnullables;
@@ -1866,15 +1875,15 @@ void sqlrservercursor::getColumnPointers(const char ***columnnames,
 	*columnisbinarys=pvt->_columnisbinarys;
 	*columnisautoincrements=pvt->_columnisautoincrements;
 	*columntables=pvt->_columntables;
-	*columntablelengths=pvt->_columntablelengths;
+	*columntablesizes=pvt->_columntablesizes;
 }
 
 const char *sqlrservercursor::getColumnNameFromBuffer(uint32_t col) {
 	return pvt->_columnnames[col];
 }
 
-uint16_t sqlrservercursor::getColumnNameLengthFromBuffer(uint32_t col) {
-	return pvt->_columnnamelengths[col];
+uint16_t sqlrservercursor::getColumnNameSizeFromBuffer(uint32_t col) {
+	return pvt->_columnnamesizes[col];
 }
 
 uint16_t sqlrservercursor::getColumnTypeFromBuffer(uint32_t col) {
@@ -1885,12 +1894,12 @@ const char *sqlrservercursor::getColumnTypeNameFromBuffer(uint32_t col) {
 	return pvt->_columntypenames[col];
 }
 
-uint16_t sqlrservercursor::getColumnTypeNameLengthFromBuffer(uint32_t col) {
-	return pvt->_columntypenamelengths[col];
+uint16_t sqlrservercursor::getColumnTypeNameSizeFromBuffer(uint32_t col) {
+	return pvt->_columntypenamesizes[col];
 }
 
-uint32_t sqlrservercursor::getColumnLengthFromBuffer(uint32_t col) {
-	return pvt->_columnlengths[col];
+uint32_t sqlrservercursor::getColumnSizeFromBuffer(uint32_t col) {
+	return pvt->_columnsizes[col];
 }
 
 uint32_t sqlrservercursor::getColumnPrecisionFromBuffer(uint32_t col) {
@@ -1937,30 +1946,30 @@ const char *sqlrservercursor::getColumnTableFromBuffer(uint32_t col) {
 	return pvt->_columntables[col];
 }
 
-uint16_t sqlrservercursor::getColumnTableLengthFromBuffer(uint32_t col) {
-	return pvt->_columntablelengths[col];
+uint16_t sqlrservercursor::getColumnTableSizeFromBuffer(uint32_t col) {
+	return pvt->_columntablesizes[col];
 }
 
 void sqlrservercursor::allocateFieldPointers(uint32_t colcount) {
 	pvt->_fieldnames=new const char *[colcount];
 	pvt->_fields=new const char *[colcount];
-	pvt->_fieldlengths=new uint64_t[colcount];
-	pvt->_blobs=new bool[colcount];
+	pvt->_fieldsizes=new uint64_t[colcount];
+	pvt->_lobs=new bool[colcount];
 	pvt->_nulls=new bool[colcount];
 }
 
 void sqlrservercursor::deallocateFieldPointers() {
 	delete[] pvt->_fieldnames;
 	delete[] pvt->_fields;
-	delete[] pvt->_fieldlengths;
-	delete[] pvt->_blobs;
+	delete[] pvt->_fieldsizes;
+	delete[] pvt->_lobs;
 	delete[] pvt->_nulls;
 }
 
 void sqlrservercursor::getFieldPointers(const char ***fieldnames,
 					const char ***fields,
-					uint64_t **fieldlengths,
-					bool **blobs,
+					uint64_t **fieldsizes,
+					bool **lobs,
 					bool **nulls) {
 
 	// get the max column count
@@ -1983,8 +1992,8 @@ void sqlrservercursor::getFieldPointers(const char ***fieldnames,
 	// return the field pointers
 	*fieldnames=pvt->_fieldnames;
 	*fields=pvt->_fields;
-	*fieldlengths=pvt->_fieldlengths;
-	*blobs=pvt->_blobs;
+	*fieldsizes=pvt->_fieldsizes;
+	*lobs=pvt->_lobs;
 	*nulls=pvt->_nulls;
 }
 
@@ -2029,6 +2038,10 @@ bool sqlrservercursor::getResultSetHeaderHasBeenHandled() {
 	return pvt->_resultsetheaderhasbeenhandled;
 }
 
-byte_t *sqlrservercursor::getModuleData() {
-	return pvt->_moduledata;
+void sqlrservercursor::setQuerySuppressed(bool querysuppressed) {
+	pvt->_querysuppressed=querysuppressed;
+}
+
+bool sqlrservercursor::getQuerySuppressed() {
+	return pvt->_querysuppressed;
 }

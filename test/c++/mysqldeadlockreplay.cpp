@@ -112,11 +112,11 @@ int main(int argc, char **argv) {
 		// set things up
 		sqlrcur.sendQuery("drop table testtable");
 		checkSuccess(sqlrcur.sendQuery("create table testtable "
-			"(col1 int primary key auto_increment, col2 int)"),1);
+			"(col1 int primary key auto_increment, col2 int, col3 varchar(20), col4 varchar(20))"),1);
 		checkSuccess(sqlrcur.sendQuery(
-			"insert into testtable values (1,1)"),1);
+			"insert into testtable (col2,col3,col4) values (1,'hello','hello')"),1);
 		checkSuccess(sqlrcur.sendQuery(
-			"insert into testtable values (2,1)"),1);
+			"insert into testtable (col2,col3,col4) values (1,'hello','hello')"),1);
 		stdoutput.printf("\n");
 
 		// execute the initial update

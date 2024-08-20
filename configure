@@ -783,6 +783,7 @@ PTHREADLIB
 PTHREADINCLUDES
 FDECLSPEC
 DISABLE_NEW_DTAGS
+WNOERRORNONNULL
 WNOERRORDATETIME
 WNOUNKNOWNPRAGMAS
 WNOMISMATCHEDTAGS
@@ -17148,6 +17149,20 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for -pipe option" >&5
 $as_echo_n "checking for -pipe option... " >&6; }
 
+PIPECHECK="yes"
+OS="`uname -s 2> /dev/null`"
+VERSION="`uname -r 2> /dev/null`"
+if ( test "$OS" = "SunOS" )
+then
+	if ( test "$VERSION" = "5.8" -o "$VERSION" = "5.9" )
+	then
+		PIPECHECK="no"
+	fi
+fi
+
+if ( test "$PIPECHECK" = "yes" )
+then
+
 SAVECPPFLAGS="$CPPFLAGS"
 SAVELIBS="$LIBS"
 SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
@@ -17178,13 +17193,17 @@ LIBS="$SAVELIBS"
 LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
-if ( test -n "$PIPE" )
-then
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+	if ( test -n "$PIPE" )
+	then
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-else
-	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+	else
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
+	fi
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no - disabled on Solaris 8/9" >&5
+$as_echo "no - disabled on Solaris 8/9" >&6; }
 fi
 
 
@@ -17486,6 +17505,50 @@ LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
 export LD_LIBRARY_PATH
 
 if ( test -n "$WNOERRORDATETIME" )
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for -Wno-error=nonnull option" >&5
+$as_echo_n "checking for -Wno-error=nonnull option... " >&6; }
+
+SAVECPPFLAGS="$CPPFLAGS"
+SAVELIBS="$LIBS"
+SAVE_LD_LIBRARY_PATH="$LD_LIBRARY_PATH"
+CPPFLAGS="-Wall -Werror -Wno-error=nonnull"
+LIBS=""
+LD_LIBRARY_PATH=""
+export LD_LIBRARY_PATH
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <stdio.h>
+int
+main ()
+{
+printf("%s %s\n",__DATE__,__TIME__);
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  WNOERRORNONNULL="-Wno-error=nonnull"
+else
+  WNOERRORNONNULL=""
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+CPPFLAGS="$SAVECPPFLAGS"
+LIBS="$SAVELIBS"
+LD_LIBRARY_PATH="$SAVE_LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH
+
+if ( test -n "$WNOERRORNONNULL" )
 then
 	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -38502,6 +38565,16 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.30* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.29* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.28* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.27* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.26* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.25* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.24* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.23* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.22* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.21* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.20* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.19* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.18* 2> /dev/null` \
@@ -38526,6 +38599,16 @@ then
 `ls -d /usr/lib64/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-14-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.30* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.29* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.28* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.27* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.26* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.25* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.24* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.23* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.22* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.21* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.20* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.19* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.18* 2> /dev/null` \
@@ -40099,11 +40182,48 @@ $as_echo "$NODEMAJORVERSION" >&6; }
 
 		{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for node module directory" >&5
 $as_echo_n "checking for node module directory... " >&6; }
-		for file in "$NODEDIR/lib64/node_modules" "$NODEDIR/lib64/nodejs" "$NODEDIR/lib/node_modules" "$NODEDIR/lib/nodejs"
+		DIRS=""
+		if ( test -n "$LIBARCHDIR" )
+		then
+			DIRS="$DIRS \
+				$NODEDIR/$LIBARCHDIR/node_modules_25 \
+				$NODEDIR/$LIBARCHDIR/node_modules_24 \
+				$NODEDIR/$LIBARCHDIR/node_modules_22 \
+				$NODEDIR/$LIBARCHDIR/node_modules_21 \
+				$NODEDIR/$LIBARCHDIR/node_modules_20 \
+				$NODEDIR/$LIBARCHDIR/node_modules_19 \
+				$NODEDIR/$LIBARCHDIR/node_modules_18 \
+				$NODEDIR/$LIBARCHDIR/node_modules \
+				$NODEDIR/$LIBARCHDIR/nodejs"
+		fi
+		if ( test -n "$MULTIARCHDIR" )
+		then
+			DIRS="$DIRS \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_25 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_24 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_22 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_21 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_20 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_19 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_18 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules \
+				$NODEDIR/lib/$MULTIARCHDIR/nodejs"
+		fi
+		DIRS="$DIRS \
+			$NODEDIR/lib/node_modules_25 \
+			$NODEDIR/lib/node_modules_24 \
+			$NODEDIR/lib/node_modules_22 \
+			$NODEDIR/lib/node_modules_21 \
+			$NODEDIR/lib/node_modules_20 \
+			$NODEDIR/lib/node_modules_19 \
+			$NODEDIR/lib/node_modules_18 \
+			$NODEDIR/lib/node_modules \
+			$NODEDIR/lib/nodejs "
+		for dir in $DIRS
 		do
-			if ( test -d "$file" )
+			if ( test -d "$dir" )
 			then
-				NODEMODULEDIR="$file"
+				NODEMODULEDIR="$dir"
 				break
 			fi
 		done
@@ -40114,7 +40234,24 @@ $as_echo "$NODEMODULEDIR" >&6; }
 $as_echo_n "checking for node-gyp... " >&6; }
 		if ( test -r "$NODEMODULEDIR" )
 		then
-			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm6/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm6/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm7/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm7/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm8/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm8/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm9/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm9/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm10/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm10/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/../../share/node-gyp/bin/node-gyp.js"
+			for file in \
+			"$NODEMODULEDIR/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm6/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm6/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm7/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm7/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm8/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm8/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm9/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm9/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm10/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm10/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/../../share/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/../../../share/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/../../share/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/../../../share/node-gyp/bin/node-gyp.js"
 			do
 				if ( test -r "$file" )
 				then
@@ -40984,7 +41121,7 @@ if ( test -n "$MYSQLLIBS" ); then
 	if ( test -n "$MYSQLSTATIC" ); then
 		MYSQLBUILD="static    "
 	fi
-	TESTDBS="$TESTDBS mysql mysqlupsert mysqldeadlockreplay"
+	TESTDBS="$TESTDBS mysql mysqlupsert mysqldeadlockreplay mysqlsplitmultiinsert mysqlimportexport"
 fi
 if ( test -n "$POSTGRESQLLIBS" ); then
 	POSTGRESQLBUILD="dynamic   "
@@ -41076,12 +41213,11 @@ sed -e "s|^centos|co|" \
 -e "s|^freebsd|fb|" \
 -e "s|^haiku|hk|" \
 -e "s|^openbsd|ob|" \
--e "s|^netbsd|bb|" \
+-e "s|^netbsd|nb|" \
 -e "s|^opensuse|os|" \
 -e "s|^solaris|sl|" \
 -e "s|^syllable|sb|" \
 -e "s|^ubuntu|u|" \
--e "s|^win|w|" \
 -e "s|alpha$|a|" \
 -e "s|mipsel$|m32|" \
 -e "s|mips64el$|m64|" \
@@ -41094,7 +41230,7 @@ sed -e "s|^centos|co|" \
 
 
 
-MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/firebirdprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf test/sqlrelay.conf.d/postgresqlupsert.conf test/sqlrelay.conf.d/mysqlupsert.conf test/sqlrelay.conf.d/mysqldeadlockreplay.conf test/sqlrelay.conf.d/multiprotocol.conf doc/admin/installingpkg.wt"
+MAKELIST="config.mk src/common/defines.h src/server/sqlrelay/private/sqlrshm.h bin/sqlrclient-config bin/sqlrclientwrapper-config bin/sqlrserver-config init/rc.sqlrelay init/rc.sqlrcachemanager init/com.firstworks.sqlrelay.plist init/com.firstworks.sqlrcachemanager.plist sqlrelay-c++.pc sqlrelay-c.pc test/testall.sh test/test.sh test/sqlrelay.conf.d/db2.conf test/sqlrelay.conf.d/firebird.conf test/sqlrelay.conf.d/freetds.conf test/sqlrelay.conf.d/informix.conf test/sqlrelay.conf.d/mssql.conf test/sqlrelay.conf.d/mysql.conf test/sqlrelay.conf.d/oracle.conf test/sqlrelay.conf.d/postgresql.conf test/sqlrelay.conf.d/router.conf test/sqlrelay.conf.d/sap.conf test/sqlrelay.conf.d/sqlite.conf test/sqlrelay.conf.d/tls.conf test/sqlrelay.conf.d/extensions.conf test/sqlrelay.conf.d/mysqlprotocol.conf test/sqlrelay.conf.d/oracleprotocol.conf test/sqlrelay.conf.d/postgresqlprotocol.conf test/sqlrelay.conf.d/firebirdprotocol.conf test/sqlrelay.conf.d/tdsprotocol.conf test/sqlrelay.conf.d/teradataprotocol.conf test/sqlrelay.conf.d/postgresqlupsert.conf test/sqlrelay.conf.d/mysqlupsert.conf test/sqlrelay.conf.d/mysqldeadlockreplay.conf test/sqlrelay.conf.d/mysqlsplitmultiinsert.conf test/sqlrelay.conf.d/mysqlimportexport.conf test/sqlrelay.conf.d/multiprotocol.conf doc/admin/installingpkg.wt"
 ac_config_files="$ac_config_files $MAKELIST"
 
 cat >confcache <<\_ACEOF

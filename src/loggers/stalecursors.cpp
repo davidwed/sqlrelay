@@ -10,15 +10,14 @@
 
 class SQLRSERVER_DLLSPEC sqlrlogger_stalecursors : public sqlrlogger {
 	public:
-			sqlrlogger_stalecursors(sqlrloggers *ls,
-						domnode *parameters);
-			~sqlrlogger_stalecursors();
+		sqlrlogger_stalecursors(domnode *parameters);
+		~sqlrlogger_stalecursors();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
+					sqlrloglevel_t level,
 					sqlrevent_t event,
 					const char *info);
 	private:
@@ -33,25 +32,20 @@ class SQLRSERVER_DLLSPEC sqlrlogger_stalecursors : public sqlrlogger {
 		sqlrcursor	*updatesqlrcur;
 		sqlrcursor	*deletesqlrcur;
 
-		bool		enabled;
-
 		pid_t		pid;
 
 		datetime	dt;
 		stringbuffer	dtstr;
 };
 
-sqlrlogger_stalecursors::sqlrlogger_stalecursors(sqlrloggers *ls,
-						domnode *parameters) :
-						sqlrlogger(ls,parameters) {
+sqlrlogger_stalecursors::sqlrlogger_stalecursors(domnode *parameters) :
+						sqlrlogger(parameters) {
 
 	host=parameters->getAttributeValue("host");
 	port=charstring::convertToInteger(parameters->getAttributeValue("port"));
 	socket=parameters->getAttributeValue("socket");
 	user=parameters->getAttributeValue("user");
 	password=parameters->getAttributeValue("password");
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 
 	sqlrclientcon=NULL;
 	insertsqlrcur=NULL;
@@ -68,10 +62,6 @@ sqlrlogger_stalecursors::~sqlrlogger_stalecursors() {
 
 bool sqlrlogger_stalecursors::init(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon) {
-
-	if (!enabled) {
-		return true;
-	}
 
 	// don't do anything for the listener
 	if (!sqlrcon) {
@@ -144,13 +134,9 @@ bool sqlrlogger_stalecursors::init(sqlrlistener *sqlrl,
 bool sqlrlogger_stalecursors::run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
+					sqlrloglevel_t level,
 					sqlrevent_t event,
 					const char *info) {
-
-	if (!enabled) {
-		return true;
-	}
 
 	// don't do anything for the listener
 	if (!sqlrcon) {
@@ -172,7 +158,7 @@ bool sqlrlogger_stalecursors::run(sqlrlistener *sqlrl,
 
 		sqlrclientcon->commit();
 
-	} else if (event==SQLREVENT_QUERY) {
+	} else if (event==SQLREVENT_QUERY_EXECUTED) {
 
 		sqlrclientcon->begin();
 
@@ -219,8 +205,7 @@ bool sqlrlogger_stalecursors::run(sqlrlistener *sqlrl,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_stalecursors(
-						sqlrloggers *ls,
 						domnode *parameters) {
-		return new sqlrlogger_stalecursors(ls,parameters);
+		return new sqlrlogger_stalecursors(parameters);
 	}
 }

@@ -7,23 +7,19 @@
 class sqlrqueryprivate {
 	friend class sqlrquery;
 	private:
-		sqlrqueries	*_qs;
-		domnode	*_parameters;
 };
 
 sqlrquery::sqlrquery(sqlrservercontroller *cont,
-				sqlrqueries *qs,
-				domnode *parameters) {
+				domnode *parameters) :
+				sqlrservermodule(cont,parameters) {
 	pvt=new sqlrqueryprivate;
-	pvt->_qs=qs;
-	pvt->_parameters=parameters;
 }
 
 sqlrquery::~sqlrquery() {
 	delete pvt;
 }
 
-bool sqlrquery::match(const char *querystring, uint32_t querylength) {
+bool sqlrquery::match(const char *querystring, uint32_t querysize) {
 	return false;
 }
 
@@ -31,32 +27,18 @@ sqlrquerycursor *sqlrquery::newCursor(sqlrserverconnection *conn, uint16_t id) {
 	return NULL;
 }
 
-sqlrqueries *sqlrquery::getQueries() {
-	return pvt->_qs;
-}
-
-domnode *sqlrquery::getParameters() {
-	return pvt->_parameters;
-}
-
-void sqlrquery::endTransaction(bool commit) {
-}
-
-void sqlrquery::endSession() {
-}
-
 class sqlrquerycursorprivate {
 	friend class sqlrquerycursor;
 	private:
 		sqlrquery	*_q;
-		domnode	*_parameters;
+		domnode		*_parameters;
 };
 
 sqlrquerycursor::sqlrquerycursor(sqlrserverconnection *conn,
 					sqlrquery *q,
 					domnode *parameters,
 					uint16_t id) :
-						sqlrservercursor(conn,id) {
+					sqlrservercursor(conn,id) {
 	pvt=new sqlrquerycursorprivate;
 	pvt->_q=q;
 	pvt->_parameters=parameters;
@@ -67,7 +49,7 @@ sqlrquerycursor::~sqlrquerycursor() {
 }
 
 sqlrquerytype_t	sqlrquerycursor::determineQueryType(const char *query,
-							uint32_t length) {
+							uint32_t size) {
 	return SQLRQUERYTYPE_CUSTOM;
 }
 
@@ -77,10 +59,6 @@ bool sqlrquerycursor::isCustomQuery() {
 
 sqlrquery *sqlrquerycursor::getQuery() {
 	return pvt->_q;
-}
-
-sqlrqueries *sqlrquerycursor::getQueries() {
-	return pvt->_q->getQueries();
 }
 
 domnode *sqlrquerycursor::getParameters() {

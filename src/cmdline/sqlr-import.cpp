@@ -223,17 +223,17 @@ int main(int argc, const char **argv) {
 	lg.addLogDestination(&std);
 
 	// xml or csv
-	sqlrimport	*sqlri;
+	sqlrimportfile	*sqlri;
 	if (!charstring::compareIgnoringCase(
 			charstring::findLast(file,'.'),".csv")) {
-		sqlri=new sqlrimportcsv();
+		sqlrimportcsv	*sqlric=new sqlrimportcsv();
 		if (!charstring::isNullOrEmpty(primarykeyname) &&
 			!charstring::isNullOrEmpty(primarykeysequence)) {
-			((sqlrimportcsv *)sqlri)->insertPrimaryKey(
-							primarykeyname,
+			sqlric->insertPrimaryKey(primarykeyname,
 							primarykeyposition,
 							primarykeysequence);
 		}
+		sqlri=sqlric;
 	} else {
 		sqlri=new sqlrimportxml();
 	}
@@ -251,7 +251,8 @@ int main(int argc, const char **argv) {
 		sqlri->setFineLogLevel(1);
 		sqlri->setLogIndent(1);
 	}
-	bool	success=sqlri->importFromFile(file);
+	sqlri->setFileName(file);
+	bool	success=sqlri->importData();
 	delete sqlri;
 	process::exit(!success);
 }

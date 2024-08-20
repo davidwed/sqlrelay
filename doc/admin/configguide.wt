@@ -1,7 +1,9 @@
 = SQL Relay Configuration Guide =
 
 * [#quick Quick Start]
+* [#modules Modules]
 * [#basic Basic Configuration]
+ * [#modules Modules]
  * [#database Database Configuration]
   * [#db-oracle Oracle]
   * [#db-mssql-odbc Microsoft SQL Server (via ODBC)]
@@ -22,10 +24,10 @@
   * [#db-postgresql-redshift Amazon Redshift (via PostgreSQL)]
   * [#db-odbc-athena Amazon Athena (via ODBC)]
   * [#db-odbc Generic ODBC]
- * [#dbconnections Database Connections]
+ * [#dbconnections Database Connection Count]
   * [#dbconnections-performance For Performance]
   * [#dbconnections-throttling For Throttling]
- * [#dbcursors Database Cursors]
+ * [#dbcursors Database Cursor Count]
  * [#dynamicscaling Dynamic Scaling]
  * [#listener Listener Configuration]
  * [#instances Multiple Instances]
@@ -80,6 +82,7 @@
   * [#backendenc-postgresql PostgreSQL]
  * [#runas Run-As User and Group]
  * [#deniedallowedips Denied/Allowed IP Addresses]
+ * [#pwdfiles Password Files]
  * [#pwdenc Password Encryption]
   * [#rot rot]
   * [#md5 md5]
@@ -100,11 +103,14 @@
   * [#normalize normalize]
   * [#patterns patterns]
  * [#bindvariabletranslation Bind Variable Translation]
- * [#resultsetheaderranslation Result Set Header Translation]
+ * [#resultsetheadertranslation Result Set Header Translation]
  * [#resultsettranslation Result Set Translation]
   * [#reformatdatetime reformatdatetime]
  * [#resultsetrowtranslation Result Set Row Translation]
  * [#resultsetrowtranslation Result Set Row Block Translation]
+ * [#errortranslation Error Translation]
+  * [#error-renumber renumber]
+  * [#error-patterns patterns]
  * [#moduledata Module Data]
 * [#directives Query Directives]
  * [#custom_wf custom_wf]
@@ -121,8 +127,11 @@
  * [#sqlrcmdgstat sqlrcmdgstat]
 * [#triggers Triggers]
  * [#replay replay]
+ * [#splitmultiinsert splitmultiinsert]
+ * [#upsert upsert]
 * [#logging Logging]
  * [#debug debug]
+ * [#sql sql]
  * [#slowqueries slowqueries]
  * [#stalecursors stalecursors]
 * [#notifications Notifications]
@@ -140,7 +149,7 @@
 [[br]][=#quick]
 = Quick Start =
 
-When SQL Relay is first installed, no configuration file exists.  You must create one in the appropriate location.  This location depends on the platform and on how you installed SQL Relay.
+In order to run, the SQL Relay server requires a configuration file.  However, When SQL Relay is first installed, no such configuration file exists.  You must create one in the appropriate location.  This location depends on the platform and on how you installed SQL Relay.
 
 * Unix and Linux
  * Built from source - '''/usr/local/firstworks/etc/sqlrelay.conf''' (unless you specified a non-standard --prefix or --sysconfdir during the build)
@@ -160,7 +169,7 @@ The most minimal sqlrelay.conf would be something like:
 }}}
 }}}
 
-This configuration defines an instance of SQL Relay named //example//, secured by a user and password, that opens and maintains a pool of 5 persistent connections to the //orcl// instance of an Oracle database using //scott/////tiger// credentials.
+This configuration defines an instance of SQL Relay named //example// that opens and maintains a pool of 5 persistent connections to the //ora1// instance of an Oracle database using //scott/////tiger// credentials.
 
 The instance can be started using:
 
@@ -171,10 +180,10 @@ sqlr-start -id example
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
-It can be accessed locally using:
+and can be accessed from the local machine using:
 
 {{{#!blockquote
 {{{
@@ -217,13 +226,23 @@ sqlr-stop
 [[br]][=#basic]
 = Basic Configuration =
 
-The example above may be sufficient for many use cases, but SQL Relay has many options and for a production deployment, odds are good that you'll want to configure it further.
+The example above may be sufficient for many use cases, but SQL Relay has many configuration options.  For a production deployment, you will alomst certainly want to configure it further.
+
+
+[[br]][=#modules]
+== Modules ==
+
+The SQL Relay server is highly modular.  Configuring it largely consists of telling it which modules to load, and which options to use for each module.  There are database connection modules, protocol modules, authentication modules, modules related to security, data translation modules, logging and notification modules, and others.
+
+The module that you'll most likely need to configure first is a database connection module.
 
 
 [[br]][=#database]
 == Database Configuration ==
 
-By default, SQL Relay assumes that it's connecting to an Oracle database, but many other databases are supported.  The dbase attribute of the instance tag specifies the database type and the connect string options (options in the string attribute of the connection tag) specify the parameters used to connect to the database.  The connect string options are different for each database.
+By default, SQL Relay assumes that it's connecting to an Oracle database, but database connection modules for many other databases are provided.
+
+The dbase attribute of the instance tag specifies which database connection module to load and the connect string options (options in the string attribute of the connection tag) specify which parameters to use when connecting to the database.  Connect string options are different for each database.
 
 Examples follow.
 
@@ -257,13 +276,13 @@ ORCL =
     (ADDRESS = (PROTOCOL = TCP)(HOST = examplehost)(PORT = 1521))
     (CONNECT_DATA =
       (SERVER = DEDICATED)
-      (SERVICE_NAME = orcl)
+      (SERVICE_NAME = ora1)
     )
   )
 }}}
 }}}
 
-(Note that the tnsnames.ora file must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The tnsnames.ora file must be readable by the user that the instance of SQL Relay runs as.)
 
 If you are using Oracle Instant Client, then it's likely that you don't have an $ORACLE_HOME or a tnsnames.ora file.  In that case, the oracle_sid can be set directly to a tnsnames-style expression and the oracle_home option can be omitted.
 
@@ -319,7 +338,7 @@ UsageCount=1
 }}}
 }}}
 
-(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
 
@@ -350,7 +369,7 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 }}}
 }}}
 
-(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The freetds.conf file must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#freetds SQL Relay Configuration Reference] for other valid !FreeTDS connect string options.
 
@@ -385,7 +404,7 @@ SAPSERVER
 }}}
 }}}
 
-(Note that the interfaces file must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The interfaces file must be readable by the user that the instance of SQL Relay runs as.)
 
 On Windows platforms, the server option refers to a similar entry created in an opaque location with the Open Client Directory Services Editor (dsedit).
 
@@ -419,7 +438,7 @@ The server option refers to an entry in the freetds.conf file (usually /etc/free
 }}}
 }}}
 
-(Note that the freetds.conf file must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The freetds.conf file must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#freetds SQL Relay Configuration Reference] for other valid !FreeTDS connect string options.
 
@@ -481,7 +500,7 @@ ol_informix1210 29756/tcp
 }}}
 }}}
 
-(Note that the sqlhosts and /etc/services files must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The sqlhosts and /etc/services files must be readable by the user that the instance of SQL Relay runs as.)
 
 On Windows platforms, the servername option refers to a similar entry created in an opaque location with the Setnet32 program.
 
@@ -638,7 +657,7 @@ UseDateDataForTimeStampParams=0
 }}}
 }}}
 
-(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
 
@@ -672,7 +691,7 @@ EXAPWD=exasol
 }}}
 }}}
 
-(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
 
@@ -712,7 +731,7 @@ Port=10000
 }}}
 }}}
 
-(Note that the odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The odbc.ini file must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
 
@@ -775,7 +794,7 @@ Driver=/opt/cloudera/impalaodbc/lib/64/libclouderaimpalaodbc64.so
 }}}
 }}}
 
-(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
 
@@ -824,7 +843,7 @@ Driver=/opt/amazon/redshiftodbc/lib/64/libamazonredshiftodbc64.so
 }}}
 }}}
 
-(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
 
@@ -897,7 +916,7 @@ Driver=/opt/simba/athenaodbc/lib/64/libathenaodbc_sb64.so
 }}}
 }}}
 
-(Note that the odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)
+( '''NOTE:''' The odbc.ini and odbcinst.ini files must be readable by the user that the instance of SQL Relay runs as.)
 
 See the [configreference.html#odbc SQL Relay Configuration Reference] for other valid ODBC connect string options.
 
@@ -921,7 +940,7 @@ Note that many ODBC drivers have quirks.  Many of the examples above demonstrate
 
 
 [[br]][=#dbconnections]
-== Database Connections ==
+== Database Connection Count ==
 
 By default, SQL Relay opens and maintains a pool of 5 [../features/connectionpooling.html persistent database connections], but the number of connections can be configured using the connections attribute.
 
@@ -958,7 +977,7 @@ If you intend to [../features/throttling.html throttle] database access to a par
 
 
 [[br]][=#dbcursors]
-== Database Cursors ==
+== Database Cursor Count ==
 
 Database cursors are used to execute queries and step through result sets.  Most applications only need to use one cursor at a time.  Some apps require more though, either because they run nested queries, or sometimes because they just don't properly free them.
 
@@ -1033,7 +1052,7 @@ It can also be configured to listen on a unix socket...
 }}}
 }}}
 
-(Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)
+( '''NOTE:''' The user that SQL Relay runs as must be able to read and write to the path of the socket.)
 
 ...and accessed from the local server using:
 
@@ -1080,16 +1099,16 @@ sqlr-start -id db2example
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 ...and accessed using:
 
 {{{#!blockquote
 {{{
-sqlrsh -host sqlrserver -port 9000
-sqlrsh -host sqlrserver -port 9001
-sqlrsh -host sqlrserver -port 9002
+sqlrsh -host sqlrserver -port 9000 -user scott -password tiger
+sqlrsh -host sqlrserver -port 9001 -user sapuser -password sappassword
+sqlrsh -host sqlrserver -port 9002 -user db2inst1 -password db2inst1pass
 }}}
 }}}
 
@@ -1193,7 +1212,7 @@ SQLRClient is the native SQL Relay protocol, no special tags or attributes are r
 
 In this configuration:
 
-* The connection tag instructs the instance to log in to the //orcl// database as user //scott// with password //tiger//.
+* The connection tag instructs the instance to log in to the //ora1// database as user //scott// with password //tiger//.
 * By default, SQL Relay loads the //sqlrclient// protocol module, and listens on port 9000.
 
 The instance can be started using:
@@ -1232,6 +1251,14 @@ sqlr-stop -id example
 }}}
 }}}
 
+Though it is not necessary, it is possible to explicitly configure SQL Relay to load the //sqlrclient// protocol module as follows:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-explicit.conf@
+}}}
+}}}
+
 Since this instance speaks the SQLRClient client-server protocol, any client that wishes to use it must also speak the SQLRClient client-server protocol.  This means that software written using the SQL Relay native API, or written using a database abstraction layer which loads a driver for SQL Relay can access this instance.  However, it also means that client programs for other databases (eg. the mysql, psql, and sqlplus command line programs, !MySQL Workbench, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
 [=#sqlrclientlistener]
@@ -1265,7 +1292,7 @@ It can also be configured to listen on a unix socket by adding a //socket// attr
 }}}
 }}}
 
-(Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)
+( '''NOTE:''' The user that SQL Relay runs as must be able to read and write to the path of the socket.)
 
 If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
 
@@ -1314,62 +1341,17 @@ To enable user list auth, you must provide a list of user/password combinations,
 }}}
 }}}
 
-If you would prefer not to include passwords directly in the config file, then you can put them in external files, and enclose the full path of each file in square brackets as follows:
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-auths-users-passwordfiles.conf@
-}}}
-}}}
-
-In this example...
-
-The contents of the file /usr/local/firsworks/etc/oneuser.pwd would be used to authenticate oneuser, and would contain the text:
-
-{{{#!blockquote
-{{{
-onepassword
-}}}
-}}}
-
-The contents of the file /usr/local/firsworks/etc/anotheruser.pwd would be used to authenticate anotheruser, and would contain the text:
-
-{{{#!blockquote
-{{{
-anotherpassword
-}}}
-}}}
-
-The contents of the file /usr/local/firsworks/etc/yetanotheruser.pwd would be used to authenticate yetanotheruser, and would contain the text:
-
-{{{#!blockquote
-{{{
-yetanotherpassword
-}}}
-}}}
-
-This approach is useful if you want to give the files containing the passwords more restrictive permissions than the config file itself, or possibly for other reasons.
-
-( '''NOTE:''' Trailing whitespace is ignored when passwords are stored in external files.)
-
-If you would prefer not to use full pathnames inside of each set of square brackets, then you can  specify a //passwordpath// attribute in the instance tag, as follows:
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-auths-users-passwordfiles-passwordpath.conf@
-}}}
-}}}
-
-In this case, the path /usr/local/firstworks/etc will be searched for the files oneuser.pwd, anotheruser.pwd, and yetanotheruser.pwd.
 
 [=#sqlrclientdbauth]
 === Database Auth ===
 
 Another popular authentication option is //database// auth.
 
-When database authentication is used, a user is authenticated against the database itself.  SQL Relay does this by checking the provided credentials against the credentials that are currently in use.  If they differ, then it logs out of the database and logs back in using the provided credentials.
+The //sqlrclient_database// module can be used to authentication users directly against the database itself.  This is useful when you want the credentials used to access SQL Relay to be the same as the credentials used to access the database, but it's inconvenient to maintain a duplicate list of users in the configuration file.
 
-To enable database auth, configure SQL Relay to load the //database// auth module as follows.
+SQL Relay authenticates users against the database by checking the provided credentials against the credentials that are currently in use, and then, if they differ, logging out of the database and back in using the provided credentials.
+
+To enable database auth, configure SQL Relay to load the //sqlrclient_database// auth module as follows.
 
 {{{#!blockquote
 {{{#!code
@@ -1379,16 +1361,40 @@ To enable database auth, configure SQL Relay to load the //database// auth modul
 
 {{{#!blockquote
 ( '''NOTE:''' Database authentication should not be used in an instance where dbase="router".  It's OK for the instances that the router routes to to use it, but the router instance itself should not.  If database authentication is used for that instance, then authentication will fail.)
-[[br]][[br]]
-( '''NOTE:''' Prior to version 0.65.0, the "database" authentication method defaulted to the behavior of the "proxied" authentication method and fell back to the current behavior if the proxied behavior was unsupported.  There was no way to force this behavior.  As of 0.65.0 the funcationality is split into two separate modules.)
 }}}
+
+In this configuration, SQL Relay initially logs in to the database as //scott/tiger// as specified in the connection tag.  But each time a client connects, SQL Relay logs out and attempts to log back in as the user specified by the client, unless the user/password are the same as the current user.
+
+For example, if a client initially connects using:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host localhost -user scott -password tiger
+}}}
+}}}
+
+...then SQL Relay doesn't need to log out and log back in.
+
+But if the client then tries to connect using:
+
+{{{#!blockquote
+{{{#!code
+sqlrsh -host localhost -user anotheruser -password anotherpassword
+}}}
+}}}
+
+..then SQL Relay does need to log out and log back in.
+
+A subsequent connection using //anotheruser/anotherpassword// won't require a re-login, but a subsequent connection using any other user/password will.
+
+Though this module is convenient, it has the disadvantage that logging in and out of the database over and over partially defeats SQL Relay's persistent connection pooling.
 
 [=#sqlrclientproxiedauth]
 === Proxied Auth ===
 
 Another authentication option is //proxied// auth.
 
-When proxied authentication is used, a user is authenticated against the database itself, though in a different manner than datbase authentication described above.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.
+When proxied authentication is used, a user is authenticated against the database itself, though in a different manner than database authentication described above.  SQL Relay logs into the database as a user with permissions to proxy other users.  For each client session, SQL Relay checks the provided credentials against the credentials that are currently in use.  If they differ, then it asks the proxy user to switch the user it's proxying to the provided user.
 
 This is currently only supported with Oracle (version 8i or higher) and requires database configuration.  See [oraclentier.html this document] for more information including instructions for configuring Oracle.
 
@@ -1444,7 +1450,7 @@ sqlr-start -id example
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 To access the instance, you must acquire a Kerberos ticket-granting ticket.  On a Linux or Unix system, this typically involves running //kinit//, though a fully Kerberized environment may acquire this during login.  On a Windows system, you must log in as an Active Directory domain user.
@@ -1522,7 +1528,7 @@ sqlr-start -id example
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 The instance may be accessed as follows:
@@ -1679,7 +1685,13 @@ mysql --host=127.0.0.1 --port=3307 --user=sqlruser --password=sqlrpassword
 }}}
 }}}
 
+{{{#!blockquote
 ( '''NOTE:''' 127.0.0.1 is used instead of "localhost" because "localhost" instructs the mysql client to use a predefined unix socket.)
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database. That is, they are the values of the user and password parameters of the string attribute of the connection tag. ) 
+}}}
 
 By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
 
@@ -1730,7 +1742,7 @@ It can also be configured to listen on a unix socket by adding a //socket// attr
 }}}
 }}}
 
-(Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)
+( '''NOTE:''' The user that SQL Relay runs as must be able to read and write to the path of the socket.)
 
 If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
 
@@ -1779,60 +1791,18 @@ To enable user list auth, you must provide a list of user/password combinations,
 }}}
 }}}
 
-If you would prefer not to include passwords directly in the config file, then you can put them in external files, and enclose the full path of each file in square brackets as follows:
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-mysqlfeuserlistmultiple-passwordfiles.conf@
-}}}
-}}}
-
-In this example...
-
-The contents of the file /usr/local/firsworks/etc/oneuser.pwd would be used to authenticate oneuser, and would contain the text:
-
-{{{#!blockquote
-{{{
-onepassword
-}}}
-}}}
-
-The contents of the file /usr/local/firsworks/etc/anotheruser.pwd would be used to authenticate anotheruser, and would contain the text:
-
-{{{#!blockquote
-{{{
-anotherpassword
-}}}
-}}}
-
-The contents of the file /usr/local/firsworks/etc/yetanotheruser.pwd would be used to authenticate yetanotheruser, and would contain the text:
-
-{{{#!blockquote
-{{{
-yetanotherpassword
-}}}
-}}}
-
-This approach is useful if you want to give the files containing the passwords more restrictive permissions than the config file itself, or possibly for other reasons.
-
-( '''NOTE:''' Trailing whitespace is ignored when passwords are stored in external files.)
-
-If you would prefer not to use full pathnames inside of each set of square brackets, then you can  specify a //passwordpath// attribute in the instance tag, as follows:
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-mysqlfeuserlistmultiple-passwordfiles-passwordpath.conf@
-}}}
-}}}
-
-In this case, the path /usr/local/firstworks/etc will be searched for the files oneuser.pwd, anotheruser.pwd, and yetanotheruser.pwd.
-
 When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.
 
 [=#mysqldbauth]
 === Database Auth ===
 
-If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  In this case, the //mysql_database// module can be used to authentication users directly against the database.
+Another popular authentication option is //database// auth.
+
+The //mysql_database// module can be used to authentication users directly against the database itself.  This is useful when you want the credentials used to access SQL Relay to be the same as the credentials used to access the database, but it's inconvenient to maintain a duplicate list of users in the configuration file.
+
+SQL Relay authenticates users against the database by checking the provided credentials against the credentials that are currently in use, and then, if they differ, logging out of the database and back in using the provided credentials.
+
+To enable database auth, configure SQL Relay to load the //mysql_database// auth module as follows.
 
 {{{#!blockquote
 {{{#!code
@@ -1846,7 +1816,7 @@ For example, if a client initially connects using:
 
 {{{#!blockquote
 {{{#!code
-mysql --host=127.0.0.1 --port=3307 --user=mysqluser --password=mysqlpassword
+mysql --host=127.0.0.1 --user=mysqluser --password=mysqlpassword --default-auth=mysql_clear_password
 }}}
 }}}
 
@@ -1856,7 +1826,7 @@ But if the client then tries to connect using:
 
 {{{#!blockquote
 {{{#!code
-mysql --host=127.0.0.1 --port=3307 --user=anotheruser --password=anotherpassword
+mysql --host=127.0.0.1 --user=anotheruser --password=anotherpassword --default-auth=mysql_clear_password
 }}}
 }}}
 
@@ -1867,17 +1837,9 @@ A subsequent connection using //anotheruser/anotherpassword// won't require a re
 Though this module is convenient, it has two disadvantages.
 
 * Logging in and out of the database over and over partially defeats SQL Relay's persistent connection pooling.
-* The mysql_database module requires that the !MySQL/MariaDB client send it an unencrypted password.
+* The mysql_database module requires that the !MySQL/MariaDB client send it an unencrypted password.  In the examples above, the --default-auth=mysql_clear_password option is used to send an unencrypted password from the mysql command line program.
 
-The second disadvantage may or may not be a problem, depending on how secure communications on your network need to be.  However, it may require reconfiguration (or modification) of your app to use the mysql_clear_password auth plugin.  For example, to send an unencrypted password from the mysql command line program:
-
-{{{#!blockquote
-{{{#!code
-mysql --host=127.0.0.1 --port=3307 --user=anotheruser --password=anotherpassword --default-auth=mysql_clear_password
-}}}
-}}}
-
-Another issue is that some !MySQL and !MariaDB distributions omit the necessary mysql_clear_password module.  For example, the distributions available in the default !CentOS 6 and 7 repositories omit the module.  On these platforms, an alternative distribution of !MySQL/MariaDB would have to be installed or built from source.
+The second disadvantage may or may not be a problem, depending on how secure communications on your network need to be.  Note that some !MySQL and !MariaDB distributions omit the necessary mysql_clear_password module.  For example, the distributions available in the default !CentOS 6 and 7 repositories omit the module.  On these platforms, an alternative distribution of !MySQL/MariaDB would have to be installed or built from source.
 
 [=#mysqltls]
 === TLS/SSL Encryption and Authentication ===
@@ -1916,7 +1878,7 @@ sqlr-start -id example
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 The instance may be accessed as follows:
@@ -2020,9 +1982,28 @@ This is as simple as specifying a different database using the //dbase// attribu
 }}}
 }}}
 
-In this example, a !MySQL frontend provides !MySQL/MariaDB applications access to an Oracle backend database.
+In this example, a !MySQL front-end provides !MySQL/MariaDB applications access to an Oracle backend database.
 
-When targeting a foreign backend, some queries may have to be modified to use the syntax of the foreign database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+Depending on the backend, it might also be necessary to make some other configuration changes, as well, for example:
+
+* In the instance tag:
+ * set translatebindvariables="yes"
+ * set the isolationlevel attribute
+* In the string attribute of the connection tag:
+ * set autocommit=yes or autocommit=no
+ * set faketransactionblocks=yes
+ * implement a function that returns the last insert id and specify it using the lastinsertidfunction parameter
+ * set the identity parameter to override the database type
+ * set ignorespace=yes
+ * set the overrideschema parameter
+ * set the typemangling and/or tablemangling parameters
+* use [#querytranslation Query Translation] modules
+* use [#resultsettranslation Result Set Translation] modules
+* use [#errortranslation Error Translation] modules
+* use [#sessionqueries Session Queries]
+* use one of the Special-Purpose Options described below
+
+In your app, it might stil be necessary to modify some queries to use the syntax of the foreign database, or even update some code, but a full rewrite of the app should not be necessary.
 
 [=#mysqlspecialpurpose]
 === Special-Purpose Options ===
@@ -2033,7 +2014,7 @@ When targeting a foreign backend...
 
 Some backend databases, like Oracle, don't have integer types.  An integer type is really just a DECIMAL with a scale of 0.
 
-By default, the !MySQL frontend module maps zero-scale DECIMAL types to the !MySQL DECIMAL type.  Buy you might want to map them to the !MySQL BIGINT type instead.
+By default, the !MySQL protocol module maps zero-scale DECIMAL types to the !MySQL DECIMAL type.  Buy you might want to map them to the !MySQL BIGINT type instead.
 
 The //zeroscaledecimaltobigint// option instructs the module to do this mapping.
 
@@ -2049,7 +2030,7 @@ When targeting a foreign backend...
 
 Some backend databases, like Oracle, don't have separate DATE and DATETIME types.  Instead, they just have a DATE type, which can store date and time parts, and which parts are returned depend on a parameter like NLS_DATE_FORMAT.
 
-By default, the !MySQL frontend module maps the DATE type to the !MySQL DATE type.  But, if you are using DATE type fields to store date/times and have the database configured to return date and time parts, then you might want the DATE type mapped to the !MySQL DATETIME type.
+By default, the !MySQL protocol module maps the DATE type to the !MySQL DATE type.  But, if you are using DATE type fields to store date/times and have the database configured to return date and time parts, then you might want the DATE type mapped to the !MySQL DATETIME type.
 
 The //datetodatetime// option instructs the module to do this mapping.
 
@@ -2086,14 +2067,6 @@ The implementation of the !MySQL protocol is likely sufficient for most applicat
 * mysql_info() will always returns NULL when used with SQL Relay.
 * MYSQL_FIELD.org_name/org_name_length and MYSQL_FIELD.org_table/org_table_length are not supported.
 * Kerberos authentication and encryption are not supported.
-
-Most of SQL Relay's core features are available when it is configured to speak the !MySQL protocol, but there are a few incompatible configurations:
-
-* Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any //addresses//, //port//, and //socket// attributes in the instance tag.
-* Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an //authtier// attribute in the instance tag.
-* As Kerberos authentication and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
-
-Otherwise, all other tags and attributes are compatbile.
 
 [[br]][=#postgresqlprotocol]
 == !PostgreSQL Protocol ==
@@ -2132,6 +2105,10 @@ and accessed from the local machine using:
 {{{#!code
 psql -h localhost -p 5433 -U sqlruser
 }}}
+}}}
+
+{{{#!blockquote
+( '''NOTE:''' By default, the user and password used to access SQL Relay are the same as the user and password that SQL Relay is configured to use to access the database. That is, they are the values of the user and password parameters of the string attribute of the connection tag. ) 
 }}}
 
 By default, SQL Relay listens on all available network interfaces, and can be accessed remotely by hostname.  For example, if the server running SQL Relay is named //sqlrserver// then it can be accessed from another system using:
@@ -2183,7 +2160,7 @@ It can also be configured to listen on a unix socket by adding a //socket// attr
 }}}
 }}}
 
-(Note that the user that SQL Relay runs as must be able to read and write to the path of the socket.)
+( '''NOTE:''' The user that SQL Relay runs as must be able to read and write to the path of the socket.)
 
 If the socket option is specified but the port option is not, then SQL Relay will only listen on the socket.  If port and socket options are both specified then it listens on both.
 
@@ -2232,54 +2209,6 @@ To enable user list auth, you must provide a list of user/password combinations,
 }}}
 }}}
 
-If you would prefer not to include passwords directly in the config file, then you can put them in external files, and enclose the full path of each file in square brackets as follows:
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-postgresqlfeuserlistmultiple-passwordfiles.conf@
-}}}
-}}}
-
-In this example...
-
-The contents of the file /usr/local/firsworks/etc/oneuser.pwd would be used to authenticate oneuser, and would contain the text:
-
-{{{#!blockquote
-{{{
-onepassword
-}}}
-}}}
-
-The contents of the file /usr/local/firsworks/etc/anotheruser.pwd would be used to authenticate anotheruser, and would contain the text:
-
-{{{#!blockquote
-{{{
-anotherpassword
-}}}
-}}}
-
-The contents of the file /usr/local/firsworks/etc/yetanotheruser.pwd would be used to authenticate yetanotheruser, and would contain the text:
-
-{{{#!blockquote
-{{{
-yetanotherpassword
-}}}
-}}}
-
-This approach is useful if you want to give the files containing the passwords more restrictive permissions than the config file itself, or possibly for other reasons.
-
-( '''NOTE:''' Trailing whitespace is ignored when passwords are stored in external files.)
-
-If you would prefer not to use full pathnames inside of each set of square brackets, then you can  specify a //passwordpath// attribute in the instance tag, as follows:
-
-{{{#!blockquote
-{{{#!code
-@parts/sqlrelay-postgresqlfeuserlistmultiple-passwordfiles-passwordpath.conf@
-}}}
-}}}
-
-In this case, the path /usr/local/firstworks/etc will be searched for the files oneuser.pwd, anotheruser.pwd, and yetanotheruser.pwd.
-
 When using SQL Relay as a transparent proxy, it is desirable to define the same set of users that are defined in the database itself.  While this may sound inconvenient, in practice, most apps use a single user to access the database, and it's not uncommon for multiple apps to share a user.  So, the list is typically short.
 
 If the database has a lot of users, or users are added, deleted, or updated regularly, then it might be inconvenient to maintain a duplicate list of users in the configuration file.  Unfortunately there isn't currently a //postgresql_database// auth module that can be used to auth users directly against the database, so for now this is the only option.
@@ -2321,7 +2250,7 @@ sqlr-start -id example
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 The instance may be accessed as follows:
@@ -2442,9 +2371,27 @@ This is as simple as specifying a different database using the //dbase// attribu
 }}}
 }}}
 
-In this example, a !PostgreSQL frontend provides !PostgreSQL applications access to an Oracle backend database.
+In this example, a !PostgreSQL front-end provides !PostgreSQL applications access to an Oracle backend database.
 
-When targeting a foreign backend, some queries may have to be modified to use the syntax of the foreign database and some code may need to be changed, but a full rewrite of the app should not be necessary.
+Depending on the backend, it might also be necessary to make some other configuration changes, as well, for example:
+
+* In the instance tag:
+ * set translatebindvariables="yes"
+ * set the isolationlevel attribute
+* In the string attribute of the connection tag:
+ * set autocommit=yes or autocommit=no
+ * set faketransactionblocks=yes
+ * implement a function that returns the last insert id and specify it using the lastinsertidfunction parameter
+ * set the identity parameter to override the database type
+ * set ignorespace=yes
+ * set the overrideschema parameter
+ * set the typemangling and/or tablemangling parameters
+* use [#querytranslation Query Translation] modules
+* use [#resultsettranslation Result Set Translation] modules
+* use [#errortranslation Error Translation] modules
+* use [#sessionqueries Session Queries]
+
+In your app, it might stil be necessary to modify some queries to use the syntax of the foreign database, or even update some code, but a full rewrite of the app should not be necessary.
 
 [=#postgresqllimitations]
 === Limitations ===
@@ -2453,15 +2400,6 @@ The implementation of the !PostgreSQL protocol is likely sufficient for most app
 
 * Kerberos authentication and encryption are not supported.
 * Multi-statement queries are not supported.
-
-Most of SQL Relay's core features are available when it is configured to speak the !PostgreSQL protocol, but there are a few incompatible configurations:
-
-* Since the listener tag is used to define which addresses, port, and socket to listen on, you should not configure any //addresses//, //port//, and //socket// attributes in the instance tag.
-* Since the auth and user tags are used to load the authentication module and define users, you should not configure a users tag at all.  Nor should you configure an //authtier// attribute in the instance tag.
-* Database-authentication (authenticating users directly against the database) is not currently supported.
-* As Kerberos authentication and encryption are not supported, you should not configure any attributes related to Kerberos in the instance tag.
-
-Otherwise, all other tags and attributes are compatbile.
 
 [[br]][=#multipleprotocols]
 == Multiple Protocols ==
@@ -2481,7 +2419,7 @@ To enable SQL Relay to speak multiple protocols, add the appropriate listener ta
 
 In this configuration:
 
-* The connection tag instructs the instance to log in to the //orcl// //oracle// database as user //scott// with password //tiger//.
+* The connection tag instructs the instance to log in to the //ora1// //oracle// database as user //scott// with password //tiger//.
 * The first listener tag instructs SQL Relay to load the //sqlrclient// and listen on port 9000 (the default SQL Relay port) for native SQL Relay clients.
 * The second listener tag instructs SQL Relay to load the //mysql// and listen on port 3306 (the default !MySQL port) for !MySQL clients.
 * The third listener tag instructs SQL Relay to load the //postgresql// and listen on port 5432 (the default !PostgreSQL port) for !PostgreSQL clients.
@@ -2552,7 +2490,7 @@ sqlr-stop -id example
 
 Since this instance speaks the SQLRClient, !MySQL, and !PostgreSQL client-server protocols, clients that wish to use it may speak any of those client-server protocol.  This means that most software written using the SQL Relay, !MySQL, or !PostgreSQL APIs, or written using a database abstraction layer which loads a driver for SQL Relay, !MySQL, or !PostgreSQL can access this instance.  However, client programs for other databases (eg. the sqlplus command line programs, Oracle SQL Developer, SQL Server Management Studio, etc.) cannot access this instance.
 
-In this example, a frontend that supports !MySQL and !PostgreSQL protocols provides access to an Oracle backend database.  As such some queries may have to be modified from their native !MySQL and !PostgreSQL syntax to use the syntax of the Oracle database.
+In this example, a front-end that supports !MySQL and !PostgreSQL protocols provides access to an Oracle backend database.  As such some queries may have to be modified from their native !MySQL and !PostgreSQL syntax to use the syntax of the Oracle database.
 
 [=#multiprotocollistener]
 === Listener Options ===
@@ -2628,7 +2566,7 @@ In a database cluster or replication environment, SQL Relay can be configured to
 [[Image(../images/replicated.png,padding-left=40px,nolink)]]
 }}}
 
-In the configuration file, each connection tag defines a node to maintain connections to.  In the following example, SQL Relay is configured to distribute over three Oracle nodes - orcl1, orcl2, and orcl3
+In the configuration file, each connection tag defines a node to maintain connections to.  In the following example, SQL Relay is configured to distribute over three Oracle nodes - ora1, ora2, and ora3
 
 {{{#!blockquote
 {{{#!code
@@ -2652,7 +2590,7 @@ SQL Relay uses the connection tag's metric attribute to decide how many connecti
 
 The metric attribute doesn't specify the number of connections to open to each node, but the higher the metric relative to the other metrics, the more connections to that node will be opened and maintained.  For example, if the metric for the first node is twice as large as the metric for the second node, then SQL Relay will open twice as many connections to the first node as the second.
 
-In the example above, 15 is 3 times 5, so 3 times as many connections will be opened to orcl2 as to orcl1.  30 is 6 times 5, so 6 times as many connections will be opened to orcl3 as orcl1.  Since a total of 10 connections will be opened, 1 will be opened to orcl1, 3 to orcl2, and 6 to orcl2.
+In the example above, 15 is 3 times 5, so 3 times as many connections will be opened to ora3 as to ora1.  30 is 6 times 5, so 6 times as many connections will be opened to ora3 as ora1.  Since a total of 10 connections will be opened, 1 will be opened to ora1, 3 to ora2, and 6 to ora2.
 
 
 [[br]][=#rac]
@@ -2709,7 +2647,7 @@ sqlr-start -id router
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 Client applications should connect to the router instance rather than the master or slave instances.
@@ -2752,9 +2690,9 @@ SQL Relay offers several features to enhance security.
 [[br]][=#frontendencryption]
 == Front-End Encryption and Secure Authentication ==
 
-When configured to use the SQLRClient front-end protocol (the default), SQL Relay supports [#sqlrclientkrb Kerberos and Active Directory Encryption and Authentication] and [#sqlrclienttls TLS/SSL Encryption and Authentication] between the SQL Relay client and SQL Relay server.
+When configured to use the SQLRClient protocol (the default), SQL Relay supports [#sqlrclientkrb Kerberos and Active Directory Encryption and Authentication] and [#sqlrclienttls TLS/SSL Encryption and Authentication] between the SQL Relay client and SQL Relay server.
 
-When configured to use the !MySQL or !PostgreSQL front-end protocols, SQL Relay supports TLS/SSL encryption and authentication between the SQL Relay client and SQL Relay server.  See [#mysqltls MySQL TLS/SSL Encryption and Authentication] and [#postgresqltls PostgreSQL TLS/SSL Encryption and Authentication] for details.
+When configured to use the !MySQL or !PostgreSQL protocols, SQL Relay supports TLS/SSL encryption and authentication between the SQL Relay client and SQL Relay server.  See [#mysqltls MySQL TLS/SSL Encryption and Authentication] and [#postgresqltls PostgreSQL TLS/SSL Encryption and Authentication] for details.
 
 [[br]][=#backendencryption]
 == Back-End Encryption and Secure Authentication ==
@@ -2783,7 +2721,7 @@ Most of the configuration on the SQL Relay server is done outside of SQL Relay i
 
 Configuring SQL*Net involves setting up Oracle Wallets, which is a relatively complex process.  See [http://software.firstworks.com/p/oracle-tlsssl-encryption-tutorials.html Oracle TLS/SSL Encryption Tutorials] for more information.  Once that is done though, the SQL Relay configuration is relatively simple.
 
-In this example, orcltls refers to a TLS/SSL-secured entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora):
+In this example, oratls refers to a TLS/SSL-secured entry in the tnsnames.ora file (usually $ORACLE_HOME/network/admin/tnsnames.ora):
 
 {{{#!blockquote
 {{{#!code
@@ -2799,7 +2737,7 @@ In this example, there is no tnsnames.ora file, so the oracle_sid is set directl
 }}}
 }}}
 
-Note the TCPS protocol and port 2848.  Also note that the SERVICE_NAME is still set to orcl, rather than orcltls.
+Note the TCPS protocol and port 2848.  Also note that the SERVICE_NAME is still set to ora1, rather than oratls.
 
 This example adds distinguished name validation:
 
@@ -3063,7 +3001,7 @@ There are several important considerations when setting runasuser/runasgroup:
 * runasuser is only effective if sqlr-start runs as root.
 * runasgroup only effective if sqlr-start runs as a member of the group, or by root.
 * All SQL Relay configuration files, and any appropriate database configuration files (such as Oracle's tnsnames.ora and SAP/Sybase's interfaces file) must be readable by the runasuser/runasgroup.  Otherwise various things will fail, most notably, dynamic scaling.
-* SQL Relay must be able to write to "run" and "log" directories.  However, when installed from RPM packages, the /var/run/sqlrelay and /var/log/sqlrelay directories are owned by sqlrelay/sqlrelay and have fairly restrictive 755 permissions.  Thus, the permissions on these directories must be manually changed if runasuser or runasgroup are set to any value other than "sqlrelay".  This is not an issue if SQL Relay is built from source, and is not an issue on Windows.
+* SQL Relay must be able to write to "run" and "log" directories.  However, when installed from packages, the /var/run/sqlrelay and /var/log/sqlrelay directories are owned by sqlrelay/sqlrelay and have fairly restrictive 755 permissions.  Thus, the permissions on these directories must be manually changed if runasuser or runasgroup are set to any value other than "sqlrelay".  This is not an issue if SQL Relay is built from source, and is not an issue on Windows.
 
 
 [[br]][=#deniedallowedips]
@@ -3080,6 +3018,88 @@ For example, to deny all clients except clients connecting from the 192.168.2.0 
 @parts/sqlrelay-deniedallowedips.conf@
 }}}
 }}}
+
+
+[[br]][=#pwdfiles]
+== Password Files ==
+
+Password files enable you to store passwords in external files, rather than directly in the config file.  Passwords can then be secured by setting a more restrictive set of permissions on the files containing the passwords than on the config file itself.
+
+{{{#!blockquote
+( '''NOTE:''' If [#runas runasuser/runasgroup] are used, then password files must be readable by the runasuser/runasgroup.  Otherwise various things will fail, most notably, dynamic scaling.)
+}}}
+
+Password files are supported by all userlist auth modules, including sqlrclient_userlist, mysql_userlist and postgresql_userlist, as well as in database connect strings. 
+
+To use password files, put each password in an external file, and enclose the full path of the file in square brackets as follows:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-passwordfiles.conf@
+}}}
+}}}
+
+In this example...
+
+The contents of the file /usr/local/firstworks/etc/oneuser.pwd would be used to authenticate oneuser, and could contain the text:
+
+{{{#!blockquote
+{{{
+onepassword
+}}}
+}}}
+
+The contents of the file /usr/local/firstworks/etc/anotheruser.pwd would be used to authenticate anotheruser, and could contain the text:
+
+{{{#!blockquote
+{{{
+anotherpassword
+}}}
+}}}
+
+The contents of the file /usr/local/firstworks/etc/yetanotheruser.pwd would be used to authenticate yetanotheruser, and could contain the text:
+
+{{{#!blockquote
+{{{
+yetanotherpassword
+}}}
+}}}
+
+The contents of the file /usr/local/firstworks/etc/ora1user.pwd would contain the password for ora1user, perhaps containing the text:
+
+{{{#!blockquote
+{{{
+ora1password
+}}}
+}}}
+
+The contents of the file /usr/local/firstworks/etc/ora2user.pwd would contain the password for ora2user, perhaps containing the text:
+
+{{{#!blockquote
+{{{
+ora2password
+}}}
+}}}
+
+The contents of the file /usr/local/firstworks/etc/ora3user.pwd would contain the password for ora3user, perhaps containing the text:
+
+{{{#!blockquote
+{{{
+ora3password
+}}}
+}}}
+
+( '''NOTE:''' Trailing whitespace is ignored when passwords are stored in external files.)
+
+If you would prefer not to use full pathnames inside of each set of square brackets, then you can  specify a //passwordpath// attribute in the instance tag, as follows:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-passwordfiles-passwordpath.conf@
+}}}
+}}}
+
+In this case, the path /usr/local/firstworks/etc will be searched for the files oneuser.pwd, anotheruser.pwd, yetanotheruser.pwd, ora1user.pwd, ora2user.pwd, and ora3user.pwd.
 
 
 [[br]][=#pwdenc]
@@ -3143,7 +3163,7 @@ benpyrcnffjbeq
 
 The resulting string "benpyrcnffjbeq" can now be put in the configuration file as the password.
 
-There is one final thing to note.  Command line client programs like sqlrsh and sqlr-import take a -id option.  The -id option causes the program to open the configuration file and extract the host, port, socket, user and password from the specified instance.  If the password is encrypted, then the encrypted password will be extracted and passed to the server.  This will fail.  So, when using the -id option with an encrypted password, you must also use the -user and -password option, to override the user/password that are extracted from the configuration file.
+There is one final thing to note.  SQL Relay command line client programs like sqlrsh and sqlr-import take an -id option.  The -id option causes the program to open the configuration file and extract the port, socket, user and password from the specified instance.  If the password is two-way encrypted then this will still work.  However, if the password is one-way encrypted, then this will fail.  So, when using the -id option with a one-way encrypted password, you must also use the -user and -password option.
 
 For example, rather than just using:
 
@@ -3278,6 +3298,8 @@ The //module// attribute specifies which module to load.
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
 All schedule modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+All schedule modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
 
 Connection schedule modules can be "stacked".  Multiple different modules may be loaded, and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -3457,6 +3479,8 @@ The //module// attribute specifies which module to load.
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
 All filter modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+All filter modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
 
 All filter modules have an //when// attribute as well, which determines when the filter is applied.  If set to "before" then the module is executed before any query translations are executed.  If set to "after", or omitted, then the module is executed  after all query translations have been executed.  See [#querytranslations Query Translations] below for more information.
 
@@ -3664,7 +3688,9 @@ The //module// attribute specifies which module to load.
 
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
-All translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+All query translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+All query translation modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
 
 Query translation modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -3871,6 +3897,8 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 All bind variable translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
+All bind variable translation modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
+
 Bind variable translation modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 At startup, the SQL Relay server creates instances of the specified bind variable translations modules and initializes them.  When a query is run, the server passes the bind variables to each module, in the order that they were specified in the config file.  If a module modifies a bind variable, then that modified variable is passed on to the next module.
@@ -3878,7 +3906,7 @@ At startup, the SQL Relay server creates instances of the specified bind variabl
 Currently, no open source bind variable translation modules are available, however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 
-[[br]][=#resultsetheaderranslation]
+[[br]][=#resultsetheadertranslation]
 == Result Set Header Translation ==
 
 Result set header translation enables the SQL Relay server to modify column information in the result set before returning it to the client.  Result set header translation is most often used in conjunction with result set translation.
@@ -3896,6 +3924,8 @@ The //module// attribute specifies which module to load.
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
 All result set header translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+All result set header translation modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
 
 Result set header translation modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -3923,6 +3953,8 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 All result set translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
+All result set translation modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
+
 Result set translation modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 At startup, the SQL Relay server creates instances of the specified result set translation modules and initializes them.  As each field of the result set is returned, the server passes the field to each module, in the order that they were specified in the config file.  If a module modifies a field, then that modified field is passed on to the next module.
@@ -3941,17 +3973,23 @@ The '''reformatdatetime''' module examines the field, decides if it's a date/tim
 The following attributes are currently supported:
 
 * '''datetimeformat''' - Specifies the format to convert date/time fields to.  May be any combination of the following format characters.  Non-format characters will be inserted as-is.
- * '''DD''' - day of the month
- * '''MM''' - numeric month
- * '''MON''' - 3-character text abbreviation for the month
- * '''Month''' - full text month
- * '''YYYY''' - year including century
- * '''YY''' - year excluding century
- * '''HH24''' - hour (0-23)
- * '''HH''' - hour (1-12)
- * '''MI''' - minute
- * '''SS''' - second
- * '''FFF''' - fraction of a second
+ * '''DD''' - 2 digit day, left padded with 0
+ * '''D''' - 1 or 2 digit day, not left padded with 0
+ * '''MM''' - 2 digit month, left padded with 0
+ * '''MON''' - uppercase, 3-character month abbreviation
+ * '''Month''' - mixed-case full name of the month
+ * '''YYYY''' - 4 digit year, left padded with 0
+ * '''YY''' - 2 digit year, left padded with 0
+ * '''HH24''' - 2 digit hour, in 24-hour format, left padded with 0
+ * '''HH''' - 2 digit hour, in 12-hour format, left padded with 0
+ * '''MI''' - 2 digit minute, left padded with 0
+ * '''SS''' - 2 digit second, left padded with 0
+ * '''FFFFFF''' -  6 digit fractional second, left padded with 0
+ * '''FFFFF''' -  5 digit fractional second, left padded with 0
+ * '''FFFF''' -  4 digit fractional second, left padded with 0
+ * '''FFF''' -  3 digit fractional second, left padded with 0
+ * '''FF''' -  2 digit fractional second, left padded with 0
+ * '''F''' -  1 digit fractional second
  * '''AM''' - AM or PM
 * '''dateformat''' - Similar to datetimeformat but if a date without the time component is detected, the supplied format will be used instead of the format supplied in the datetimeformat attribute.  Defaults to whatever value was supplied in the datetimeformat attribute.
 * '''timeformat''' - Similar to datetimeformat but if a time without the date component is detected, the supplied format will be used instead of the format supplied in the datetimeformat attribute.  Defaults to whatever value was supplied in the datetimeformat attribute.
@@ -4017,6 +4055,129 @@ This is useful for the same reasons as result set row translation, and tends to 
 Currently, no open source result set row block translation modules are available, however custom modules may be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
 
+[[br]][=#errortranslation]
+== Error Translation ==
+
+Error translation enables the SQL Relay server to modify errors before passing them back to the client.
+
+Error translation is implemented by loadable modules. The errortranslations section of the configuration file indicates which error translation modules to load and what parameters to use when executing them.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-renumber.conf@
+}}}
+}}}
+
+The //module// attribute specifies which module to load.
+
+Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
+
+All error translation modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+All error translation modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
+
+Error translation modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
+
+At startup, the SQL Relay server creates instances of the specified error translations modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  If a module modifies the query, then that modified query is passed on to the next module.
+
+Currently, the following error translation modules are available in the standard SQL Relay distribution:
+
+* '''renumber'''
+* '''patterns'''
+
+Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
+
+
+[[br]][=#error-renumber]
+=== renumber ===
+
+The '''renumber''' module enables you to replace one error number with another.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-renumber.conf@
+}}}
+}}}
+
+In this example:
+
+* Oracle error number 955 (ORA-00955: name is already used by an existing object) is replaced with !MySQL error number 1050 (Table already exists)
+* Oracle error number 942 (ORA-00942: table or view does not exist) is replaced with !MySQL error number 1051 (Unknown table)
+
+
+[[br]][=#error-patterns]
+=== patterns ===
+
+The '''patterns''' module enables you to match the entire error string, or parts of it, against a pattern, and then replace the matching part.
+
+The module is highly configurable, and capable of doing some fairly complex substitutions.  For example:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-errortranslations-patterns.conf@
+}}}
+}}}
+
+In this example, several pattern-translations are defined, instructing the module to:
+
+* Convert the error string "ORA-00955: name is already in use by an existing object" to "Table already exists".
+* Convert the error string "ORA-00942: table or view does not exist" to "Unknown table".
+* Convert //old_tablename// to //new_tablename//, but only inside of quoted strings. (Some errors containg quoted table names)
+* Convert //Old_Tablename// to //new_tablename//, but only inside of quoted strings, and using case-insensitive matching. (Some errors contain quoted table names)
+* Convert ORA-00955: or ORA-00942: to ORA-99999:, but only outside of quoted strings.
+* Convert only the first instance of //ORA-// to //ora-//, but only outside of quoted strings.
+* Convert ORA- to ora- if the error string begins with ORA-.
+
+( '''NOTE:''' Some of the configurations above are nonsensical or redundant, but are included for the sake of illustration.)
+
+This example illustrates the use of several attributes of the pattern tag:
+
+* '''type''' - The type of matching to do.  Options include:
+ * //string// - basic string matching - the default
+ * //cistring// - case-insensitive string matching
+ * //regex// - regular-expression matching
+* '''from''' - The pattern to match.
+* '''to''' - The string to convert matching parts of the query to.
+* '''scope''' - Where to match and translate.  Options include:
+ * //anywhere// - anywhere in the query - the default
+ * //outsidequotes// - only outside of quoted strings
+ * //insidequotes// - only inside of quoted strings
+* '''global''' - Only valid when type="regex".  Options include:
+ * //yes// - find all matches - the default
+ * //no// - only find the first match
+
+Another powerful feature of the patterns translation module is nested matching:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-errortranslations-patterns-nested.conf@
+}}}
+}}}
+
+In this example...
+
+The first pattern-translation replaces "name is already in use by an existing object" with "Table already exists" but onle when the error begins with "ORA-00955:", resulting in: "ORA-00955: Table already exists".
+
+The second pattern-translation replaces "table or view does not exist" with "Unknown table" but onle when the error begins with "ORA-00942:", resulting in "ORA-00942: Unknown table".
+
+( '''NOTE:''' There are easier ways to perform this replacement, but this way is included for the sake of illustration.)
+
+Note that in these examples, the outer pattern tags have a match attribute rather than from/to attributes.  When doing nested matching, outer tags use the match attribute to grab pieces of the query, and pass them down to nested tags.
+
+The type, scope, and global attributes are valid for outer pattern tags, but the from and to attributes are ignored in any pattern tag with a match attribute.
+
+Note also that in these examples, the nested pattern tags use type="string", but type="regex" and type="cistring" are supported, as is the global attribute for type="regex".  However, the scope attribute is only valid at the top level and is ignored in nested pattern tags.
+
+Though more than 2 levels is rarely necessary, any level of nesting is supported:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-errortranslations-patterns-nested-multi.conf@
+}}}
+}}}
+
+
+
 [[br]][=#moduledata]
 == Module Data ==
 
@@ -4072,6 +4233,8 @@ The //module// attribute specifies which module to load.
 Module configurations may have attributes and/or nested tags.  How these are interpreted is module-specific.
 
 All directive modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+All directive modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
 
 Directive modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -4221,6 +4384,8 @@ The //module// attribute specifies which module to load.
 Module configurations may have attributes and/or nested tags.  How these elements are interpreted is module-specific.
 
 All router modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
+
+All router modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
 
 Router modules can be "stacked".  Multiple modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
@@ -4372,7 +4537,7 @@ In this example, 3 SQL Relay instances are defined:
 * one to maintain connections to a SAP database
 * one to route queries to the other two instances
 
-In this configuration, queries made by users who send client info which contains the string "oracle" or "orcl" to the connectionid "oracle", and queries made by users sending any other client info the connectionid "sap".
+In this configuration, queries made by users who send client info which contains the string "oracle" or "ora1" to the connectionid "oracle", and queries made by users sending any other client info the connectionid "sap".
 
 The '''string''' attribute in each connection tag provides the parameters necessary to connect to the other instances.  Valid parameters include:
 
@@ -4639,6 +4804,8 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 All query modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
+All query modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
+
 Custom query modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 At startup, the SQL Relay server creates instances of the specified query modules and initializes them.  When a query is run, the server passes the query to each module, in the order that they were specified in the config file.  Each module may evaluate the query and decide whether to respond or not.  If none of the query modules respond, then the query is passed along to the database.
@@ -4848,6 +5015,8 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 All trigger modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
+All trigger modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
+
 All trigger modules also have a //when// attribute which can be set to "before", "after", or "both", indicating whether to run the trigger before the query is executed, after the query has been executed, or both.
 
 Trigger modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
@@ -4857,6 +5026,8 @@ At startup, the SQL Relay server creates instances of the specified trigger modu
 Currently, the following trigger modules are available in the standard SQL Relay distribution:
 
 * '''replay'''
+* '''splitmultiinsert'''
+* '''upsert'''
 
 Custom modules may also be developed.  For more information, please contact [mailto:dev@firstworks.com dev@firstworks.com]. [[Image(http://sqlrelay.sourceforge.net/images/us.png)]] [[Image(http://sqlrelay.sourceforge.net/images/br.png)]]
 
@@ -4884,7 +5055,7 @@ If an error code 1213 occurs (a !MySQL deadlock), then the entire transaction is
 
 Note that the normalize translation is also configured.  This helps the trigger parse and rewrite queries more accurately.  See the section on Auto-Increment Columns below for details.
 
-Deadlocks aren't completely preventable, but if you know which queries caused the deadlock, then you can usually modify them (or the app) to mitigate the problem.  The replay module allows you to specify a query to run and a location to log the output of the query to, for each condition.  For example:
+Deadlocks aren't completely preventable, but if you know which queries caused the deadlock, then you can usually modify them (or the app) to mitigate the problem.  The replay module allows you to specify a file to log to and a query to run and log the output of, for each condition.  For example:
 
 {{{#!blockquote
 {{{#!code
@@ -4894,7 +5065,7 @@ Deadlocks aren't completely preventable, but if you know which queries caused th
 
 In this example...
 
-If an error code 1213 occurs (a !MySQL deadlock), then the query "show engine innodb status" is executed, and the results logged to /tmp/example-deadlocks.log  Then, the entire transaction is replayed.
+If an error code 1213 occurs (a !MySQL deadlock), then the module logs various bits of information to the log, runs the query "show engine innodb status" and outputs the results of the query to /tmp/example-deadlocks.log as well.  Then, the entire transaction is replayed and details about that are logged to the file too.
 
 If an error code 1205 occurs (a !MySQL lock wait timeout), then the previous query is replayed, but no logging occurs.
 
@@ -4918,13 +5089,13 @@ The '''condition''' tag supports the following attributes:
  * transaction - replay the entire transaction if this condition occurs
  * transaction - replay the previous query if this condition occurs
 
-The '''log''' tag doesn't support any attributes.
+The '''log''' tag supports the following attributes:
 
-The '''query''' tag contains the query to be run, and supports the following attributes:
-
-* '''log'''
- * the name of the file to log the output of the query to
+* '''file'''
+ * the name of the file to log information to, including the output of the query specified in the query tag
  * each log entry consists of a divider, timestamp, and result set
+
+The '''query''' tag contains the query to be run
 
 Sample (partial) log entries follow:
 
@@ -5026,6 +5197,7 @@ If, while replaying a query, or transaction, another replay condition is encount
 To avoid hammering the system, the module delays between retries.  The delay is initially 10 milliseconds.  This doubles with each retry until the delay reaches 1 second.  Then that doubles until it reaches 10 seconds.  From then on, the delay between retries is 10 seconds.  This algorithm isn't currently configurable.  It also isn't backed by any particular science.  It just seems to work reasonably well.
 
 
+[=#replayautoinc]
 ==== Auto-Increment Columns ====
 
 Auto-increment column values survive rollbacks.  If an insert into a table with an auto-increment column generates the value 300, and that query is rolled back then the row will be removed.  But, if the insert is run again, then it will generate the value 301 instead of 300.
@@ -5034,12 +5206,221 @@ To handle this, the replay module parses and rewrites insert queries to contain 
 
 There are some limitations to this.
 
-* Multi-row inserts are supported unless they generate auto-increment column values.  These are impossible to support, as post-insert, the last-insert-id only returns the very last value that was generated.  It's not possible to collect the others.
+* Multi-row inserts aren't directly supported if they generate auto-increment column values.  These are impossible to support directly, as post-insert, the last-insert-id only returns the very last value that was generated, and it's not possible to collect the others.  If your application does multi-row inserts into tables with auto-increment columns, then try loading the [#splitmultiinsert splitmultiinsert] module prior to the replay module to split your multi-row inserts into a set of individual insert queries, which can be replayed.
 * Insert-Select queries (eg. insert into onetable select from anothertable) and Select-Into queries (eg. select * from onetable into anothertable) are similarly not supported.
 
 If any of those are detected, then the query log is cleared and the module is disabled until the beginning of the next transaction.  If a replay condition occurs, then the error is just returned as it would have been if the module were not in use.
 
 The module also has to do a bit of work to determine whether the insert contains an auto-increment column, including query the database for the last-insert-id, and potentially column info.  Column info is cached, but the cache isn't shared across sqlr-connection processes, and is (currently) cleared at the end of each transaction.  So, the module should be used with caution in performance-sensitive applications.
+
+
+[[br]][=#splitmultiinsert]
+== splitmultiinsert ==
+
+The splitmultiinsert module splits each multi-row insert query into a set of individual insert queries.
+
+This is useful when using the [#replay replay] module, if your application does multi-row inserts into tables with auto-increment columns.  See [#replayautoinc replay - Auto-Increment Columns] above for details.  This module can, of course, be used without the replay module, but the typical use case is to use the two of them together.
+
+An example configuration:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-splitmultiinsert.conf@
+}}}
+}}}
+
+In this example...
+
+The splitmultiinsert trigger is configured to run before the query has been executed.  This is the only valid configuration for the splitmultiinsert trigger.  If when="after" or when="both" is set then the trigger will be ignored.
+
+The replay trigger is also configured.  In this configuration, the splitmultiinsert trigger supports the replay trigger by splitting multi-row inserts into a set of single-row inserts, for which it is possible to get the last-insert-id of each, if necessary.
+
+Note that the normalize translation is also configured.  This helps the splitmultiinsert and replay triggers parse and rewrite queries more accurately.
+
+In this configuration, if a //students// table exists like:
+
+{{{#!blockquote
+{{{#!code
+create table students (
+	id int primary key auto_increment,
+	firstname varchar2(128) not null,
+	lastname varchar2(128) not null,
+	major varchar2(128)
+)
+}}}
+}}}
+
+...and the following multi-row insert was performed:
+
+{{{#!blockquote
+{{{#!code
+insert into
+	students (firstname,lastname,major)
+values
+	('Richard','Muse','Mechanical Engineering'),
+	('David','Muse','Computer Science')
+}}}
+}}}
+
+...then it would be split into the following two individual inserts:
+
+{{{#!blockquote
+{{{#!code
+insert into students (firstname,lastname,major) values ('Richard','Muse','Mechanical Engineering')
+insert into students (firstname,lastname,major) values ('David','Muse','Computer Science')
+}}}
+}}}
+
+The replay module would then be able to fetch the last-insert-id for each, and rewrite them, for replay, as:
+
+{{{#!blockquote
+{{{#!code
+insert into students (id,firstname,lastname,major) values (1,'Richard','Muse','Mechanical Engineering')
+insert into students (id,firstname,lastname,major) values (2,'David','Muse','Computer Science')
+}}}
+}}}
+
+
+=== Considerations ===
+
+The splitmultiinsert trigger imposes a performance penalty.  Not only is there work involved in splitting the original query, but also, a set of individual inserts runs more slowly than a single multi-row insert.
+
+The splitmultiinsert trigger also, currently, struggles with bind variables that are split across rows in the multi-insert query.
+
+For example, consider a multi-row insert like the following:
+
+{{{#!blockquote
+{{{#!code
+insert into students (firstname,lastname,major) values (:1,:2,:3),(:4,:2,:3)
+}}}
+}}}
+
+With the following bind variables:
+
+{{{#!blockquote
+{{{#!code
+1 - "David"
+2 - "Muse"
+3 - "Computer Science"
+4 - "Richard"
+}}}
+}}}
+
+Variables 2 and 3 apply to both rows, but variable 1 only applies to the first row and variable 4 only applies to the second row.
+
+This query would be split into:
+
+{{{#!blockquote
+{{{#!code
+insert into students (firstname,lastname,major) values (:1,:2,:3)
+insert into students (firstname,lastname,major) values (:4,:2,:3)
+}}}
+}}}
+
+But, currently, all 4 bind variables would be bound when executing both queries.  This causes problems for most databases, as most databases refuse to execute queries with superfluous bind variables.
+
+This will be remedied in the future, but is currently a shortcoming of this module.
+
+
+[[br]][=#upsert]
+== upsert ==
+
+The upsert module enables an insert query to be transparently interpreted as an update query, if the insert failed.
+
+Both the set of errors that trigger the upsert, as well as the set of tables that can be upserted into are configurable.
+
+An example configuration:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-upsert.conf@
+}}}
+}}}
+
+In this example...
+
+The trigger is configured to run after the query has been executed. This is the only valid configuration for the upsert trigger. If when="before" or when="both" is set then the trigger will be ignored.
+
+If an insert into the table //students// results in an error string containing "ORA-00001" (an Oracle unique constraint violated), then the insert that generated the error will be converted to an update.
+
+The where clause of the update will only contain columns //FIRSTNAME// and //LASTNAME//.
+
+The trigger will also attempt to identify primary key and autoincrement columns and exclude them from the table update.
+
+For example, if the //students// table exists like:
+
+{{{#!blockquote
+{{{#!code
+create table students (
+	id int primary key,
+	firstname varchar2(128) not null,
+	lastname varchar2(128) not null,
+	major varchar2(128),
+	year int,
+	gpa number(2,1),
+	unique (firstname,lastname)
+)
+}}}
+}}}
+
+And two inserts are run like:
+
+{{{#!blockquote
+{{{#!code
+insert into students values (student_ids.nextval,'David','Muse','Mechanical Engineering',1,4.0);
+insert into students values (student_ids.nextval,'David','Muse','Computer Science',2,3.2);
+}}}
+}}}
+
+Then the first insert will succeed, but the second will fail because the values of 'David' and 'Muse' for the firstname and lastname columns violate the unique constraint.
+
+In this case, the second insert will throw an ORA-00001 error, and the trigger will be converted to the following update:
+
+{{{#!blockquote
+{{{#!code
+update students set firstname='David', lastname='Muse', major='Computer Science', year=2, gpa=3.2 where firstname='David' and lastname='Muse'
+}}}
+}}}
+
+Note that the primary key is omitted from the set clause of the update, and that the where clause only contains the firstname and lastname columns.
+
+Note also that, in the configuration, the columns are uppercased: FIRSTNAME and LASTNAME.  This is because, in this example, we're using an Oracle database and Oracle column names are uppercased by default.  For other databases, you should use lowercased column names.
+
+Also note that, in the configuration, the normalize translation is included.  This helps the trigger parse and rewrite queries more accurately.
+
+Other configuration options are also available.
+
+You can specify the error by number instead of by string:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-upsert-errorcode.conf@
+}}}
+}}}
+
+If, for some reason, the trigger is unable to identify the primary key of the table, you can manually specify the primary key:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-upsert-primarykey.conf@
+}}}
+}}}
+
+You can also specify multiple tables:
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-upsert-multitable.conf@
+}}}
+}}}
+
+In the example configuration above, inserts into any of the students, processors, or courses tables, which fail with ORA-00001, will be converted to updates.
+
+There are some considerations that need to be taken into account when using the upsert trigger.
+
+* Currently, only single-row inserts are supported.  Multi-row inserts, select-into, and insert-select queries will not be converted to update queries, and will just fail.
+* If you don't specify any columns in the table tag, then the where clause of the generated update will be empty, and the update query will fail.
+* If the insert doesn't contain values for the columns specified in the table tag, then the conversion to update will fail.
 
 
 ----
@@ -5065,6 +5446,8 @@ Different modules may have different parameters.  In this example, listener="yes
 
 All logger modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
+All logger modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
+
 Logger modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 At startup, the SQL Relay server processes create instances of the specified logger modules and initialize them.  As events occur, the server passes the event, log level, and optionally, a string of information about the event to each module, in the order that they were specified in the config file.  If a module is listening for that event, at that log level, then it logs information about the event to a log file.
@@ -5072,6 +5455,7 @@ At startup, the SQL Relay server processes create instances of the specified log
 Currently, the following logger modules are available in the standard SQL Relay distribution:
 
 * '''debug'''
+* '''sql'''
 * '''slowqueries'''
 * '''stalecursors'''
 
@@ -5081,7 +5465,7 @@ Custom modules may also be developed.  For more information, please contact [mai
 [[br]][=#debug]
 === debug ===
 
-The '''debug''' module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/log/sqlrelay/debug or /usr/local/firstworks/var/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.
+The '''debug''' module logs a great deal of information to about the internal operation of the SQL Relay server to log files in the "debug directory", usually /usr/local/firstworks/var/log/sqlrelay/debug, /usr/local/firstworks/var/sqlrelay/debug, or /var/log/sqlrelay/debug.  It creates files named sqlr-listener."pid" and sqlr-connection."pid" where "pid" is replaced with the process id of the process that is being logged.  As new processes are forked, new files are created with debug information about those processes.
 
 {{{#!blockquote
 {{{#!code
@@ -5104,10 +5488,63 @@ Sample log for child listener process: [sqlr-listener.1886.html sqlr-listener.18
 Sample log for connecton process: [sqlr-connection.1871.html sqlr-connection.1871][[br]]
 
 
+[[br]][=#sql]
+=== sql ===
+
+The '''sql''' module logs all queries to log files in the "log directory", usually /usr/local/firstworks/var/log/sqlrelay, /usr/local/firstworks/var/sqlrelay/log, or /var/log/sqlrelay.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.
+
+{{{#!blockquote
+{{{#!code
+@parts/sqlrelay-sql.conf@
+}}}
+}}}
+
+This module takes four attributes: '''sync''', '''queryevent''', '''logerrors''', and '''logpidchange'''.
+
+If '''sync''' is set to "yes" then data will be written to the log synchronously, that is, data will be written to the log immediately and completely after each query has been executed.  This degrades performance, sometimes significantly, but makes it easier to monitor the log.  If '''sync''' is set to "no" (the default) then data will be written to the log asynchronously, that is, data may not be written to the log immediately or completely after each query has been executed.  This improves performance, sometimes significantly, but makes it it more difficult to monitor the log, and may require an sqlr-stop to be executed for the final bit of data to be written to the log.
+
+The '''queryevent''' parameter may be set to '''received''', '''prepared''', or '''executed'''.  The behavior of each is summarized as follows:
+
+* '''received''' - Each query is logged as soon as it is received by SQL Relay.  All queries are logged.  No errors can be logged.
+* '''prepared''' - Each query is logged after it has been prepared.  Queries filtered out by a filter module are not logged.  If an error occurs during preparation, then the error may be logged.
+* '''executed''' - The default.  Each query is logged after it has been executed.  Queries filtered out by a filter module or that failed to prepare are not logged.  Queries may be logged multiple times if they are prepared once and executed over and over.  If an error occurs during exceution, then the error may be logged.
+
+* '''logerrors''' - In addition to the query, log prepare/execute errors, if they occur.
+
+* '''logpidchange''' - Log process id changes.
+
+The general format is:
+
+{{{#!blockquote
+{{{
+select 1 from dual;
+select 2 from dual;
+select 3 from dual;
+}}}
+}}}
+
+Errors are logged like:
+
+{{{#!blockquote
+{{{
+-- ERROR: ORA-00942: table or view does not exist
+}}}
+}}}
+
+Process ID changes are logged like:
+
+{{{#!blockquote
+{{{
+-- pid changed to 12423
+}}}
+}}}
+
+
+
 [[br]][=#slowqueries]
 === slowqueries ===
 
-The '''slowqueries''' module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/log/sqlrelay or /usr/local/firstworks/var/sqlrelay/log.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.
+The '''slowqueries''' module logs queries that take longer to run than a specified threshold to log files in the "log directory", usually /usr/local/firstworks/var/log/sqlrelay, /usr/local/firstworks/var/sqlrelay/log, or /var/log/sqlrelay.  It creates files named sqlr-connection-"id"-querylog."pid" for each sqlr-connection process where "id" is replaced with the id of the instance from the configuration file and "pid" is replaced with the process id.
 
 {{{#!blockquote
 {{{#!code
@@ -5115,13 +5552,17 @@ The '''slowqueries''' module logs queries that take longer to run than a specifi
 }}}
 }}}
 
-This module takes two attributes: '''sec''' and '''usec'''.  Queries that take longer than '''sec''' seconds and '''usec''' microseconds will be logged.  Both attributes default to 0 and omitting them causes all queries to be logged.
+This module takes three attributes: '''sec''', '''usec''', and '''sync'''.
+
+Queries that take longer than '''sec''' seconds and '''usec''' microseconds will be logged.  Both attributes default to 0 and omitting them causes all queries to be logged.
+
+If '''sync''' is set to "yes" then data will be written to the log synchronously, that is, data will be written to the log immediately and completely after each query has been executed.  This degrades performance, sometimes significantly, but makes it easier to monitor the log.  If '''sync''' is set to "no" (the default) then data will be written to the log asynchronously, that is, data may not be written to the log immediately or completely after each query has been executed.  This improves performance, sometimes significantly, but makes it it more difficult to monitor the log, and may require an sqlr-stop to be executed for the final bit of data to be written to the log.
 
 The general format is:
 
 {{{#!blockquote
 {{{
-Mon 2014 Apr  6 15:58:17 :
+Mon 2014 Apr  6  15:58:17 :
 select 1 from dual
 time: 0.000001
 }}}
@@ -5221,6 +5662,8 @@ Module configurations may have attributes and/or nested tags.  How these are int
 
 All notification modules have an //enabled// attribute, allowing the module to be temporarily disabled.  If enabled="no" is configured, then the module is disabled.  If set to any other value, or omitted, then the module is enabled.
 
+All notification modules have a //debug// attribute.  If debug="yes" is configured then debugging information is written to standard output.  If debug="no" is configured, or if the //debug// attribute is omitted, then no debugging information is written.
+
 Notification modules can be "stacked".  Multiple different modules may be loaded and multiple instances of the same type of module, with different configurations, may also be loaded.
 
 {{{#!blockquote
@@ -5263,7 +5706,7 @@ The '''events''' tag defines the set of events to listen for.  Valid events are:
 * '''db_logout''' - The SQL Relay server closed a connection to the database.
 * '''db_error''' - A query generated an error.
 * '''db_warning''' - A query generated a warning.
-* '''query''' - A query was executed.
+* '''query_executed''' - A query was executed.
 * '''filter_violation''' - A [#filtering query filter module] prevented a query from being executed.
 * '''internal_error''' - An internal error occurred.
 * '''internal_warning''' - An internal warning occurred.
@@ -5433,7 +5876,7 @@ sqlr-start -id oracleexample -config dir:///home/myuser/sqlrelay.conf.d
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 (the file:// prefix is optional when specifying a file, but the dir:// prefix must be included when specifying a directory)
@@ -5451,7 +5894,7 @@ sqlr-start -id oracleexample -config /home/myuser/sqlrelay-1.conf,/home/myuser/s
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 }}}
 
 Files and directories are processed in the order that they are specified.
@@ -5482,7 +5925,7 @@ sqlr-start -id oracleexample -config scp://[/usr/local/firstworks/etc/sqlruserpw
 }}}
 
 {{{#!blockquote
-( '''NOTE:''' When installed from RPM packages, SQL Relay may have to be started and stopped as root.)
+( '''NOTE:''' When installed from packages, SQL Relay may have to be started and stopped as root.)
 [[br]][[br]]
 ( '''NOTE:''' The https and scp examples only work if Rudiments was compiled with support for libcurl.)
 }}}

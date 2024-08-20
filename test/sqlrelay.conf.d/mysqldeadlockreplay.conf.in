@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <instances>
 
-	<instance id="mysqldeadlockreplaytest" dbase="mysql">
+	<instance id="mysqldeadlockreplaytest" dbase="mysql" connections="2">
 		<listeners>
 			<listener port="9000" socket="/tmp/test.socket"/>
 		</listeners>

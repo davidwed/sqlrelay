@@ -5,8 +5,6 @@
 
 #include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -16,88 +14,33 @@
 	}
 #endif
 
-class sqlrscheduleplugin {
-	public:
-		sqlrschedule	*s;
-		dynamiclib	*dl;
-};
-
-class sqlrschedulesprivate {
-	friend class sqlrschedules;
-	private:
-		sqlrservercontroller	*_cont;
-
-		singlylinkedlist< sqlrscheduleplugin * >	_llist;
-};
-
-sqlrschedules::sqlrschedules(sqlrservercontroller *cont) {
-	debugFunction();
-	pvt=new sqlrschedulesprivate;
-	pvt->_cont=cont;
+sqlrschedules::sqlrschedules(sqlrservercontroller *cont) :
+					sqlrservermodules(cont) {
+	pvt=NULL;
 }
 
 sqlrschedules::~sqlrschedules() {
-	debugFunction();
-	unload();
-	delete pvt;
 }
 
-bool sqlrschedules::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the schedule list
-	for (domnode *schedule=parameters->getFirstTagChild();
-			!schedule->isNullNode();
-			schedule=schedule->getNextTagSibling()) {
-
-		debugPrintf("loading schedule ...\n");
-
-		// load schedule
-		loadSchedule(schedule);
-	}
-	return true;
-}
-
-void sqlrschedules::unload() {
-	debugFunction();
-	for (listnode< sqlrscheduleplugin * > *node=
-						pvt->_llist.getFirst();
-						node; node=node->getNext()) {
-		sqlrscheduleplugin	*sqlrsp=node->getValue();
-		delete sqlrsp->s;
-		delete sqlrsp->dl;
-		delete sqlrsp;
-	}
-	pvt->_llist.clear();
-}
-
-void sqlrschedules::loadSchedule(domnode *schedule) {
-
-	debugFunction();
+void sqlrschedules::loadModule(domnode *parameters) {
 
 	// ignore non-schedules
-	if (charstring::compare(schedule->getName(),"schedule")) {
+	if (charstring::compare(parameters->getName(),"schedule")) {
 		return;
 	}
 
-	// get the schedule name
-	const char	*module=schedule->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=schedule->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	debugPrintf("loading schedule: %s\n",module);
+	debugWrite("loading schedule module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the schedule module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("schedule_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -116,10 +59,8 @@ void sqlrschedules::loadSchedule(domnode *schedule) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrschedule_")->append(module);
 	sqlrschedule *(*newSchedule)(sqlrservercontroller *,
-						sqlrschedules *,
 						domnode *)=
 			(sqlrschedule *(*)(sqlrservercontroller *,
-							sqlrschedules *,
 							domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newSchedule) {
@@ -131,7 +72,7 @@ void sqlrschedules::loadSchedule(domnode *schedule) {
 		delete dl;
 		return;
 	}
-	sqlrschedule	*s=(*newSchedule)(pvt->_cont,this,schedule);
+	sqlrschedule	*s=(*newSchedule)(cont,parameters);
 
 #else
 
@@ -143,25 +84,27 @@ void sqlrschedules::loadSchedule(domnode *schedule) {
 	}
 #endif
 
+	debugWrite("success");
+
 	// add the plugin to the list
-	sqlrscheduleplugin	*sqlrsp=new sqlrscheduleplugin;
-	sqlrsp->s=s;
-	sqlrsp->dl=dl;
-	pvt->_llist.append(sqlrsp);
+	sqlrmoduleplugin	*sqlrmp=new sqlrmoduleplugin;
+	sqlrmp->m=s;
+	sqlrmp->dl=dl;
+	sqlrmp->module=module;
+	blist.append(sqlrmp);
 }
 
 bool sqlrschedules::allowed(sqlrserverconnection *sqlrcon, const char *user) {
-	debugFunction();
-	for (listnode< sqlrscheduleplugin * > *node=
-						pvt->_llist.getFirst();
+
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
-		if (!node->getValue()->s->allowed(sqlrcon,user)) {
+
+		debugWrite("checking schedule: %s...",node->getValue()->module);
+
+		sqlrschedule	*s=(sqlrschedule *)node->getValue()->m;
+		if (!s->allowed(sqlrcon,user)) {
 			return false;
 		}
 	}
 	return true;
-}
-
-void sqlrschedules::endSession() {
-	// nothing for now, maybe in the future
 }

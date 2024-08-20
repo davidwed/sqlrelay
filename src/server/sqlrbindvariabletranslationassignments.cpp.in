@@ -1,4 +1,3 @@
 	if (!charstring::compare(module,"@module@")) {
-		bvtr=new_sqlrbindvariabletranslation_@module@(pvt->_cont,this,
-						bindvariabletranslation);
+		bvtr=new_sqlrbindvariabletranslation_@module@(cont,parameters);
 	} else

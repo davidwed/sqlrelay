@@ -224,11 +224,7 @@ Java bindings for the SQL Relay client API.
 License: LGPLv2
 Summary: TCL bindings for the SQL Relay client API
 BuildRequires: tcl-devel
-%if 0%{?fedora}
 Requires: tcl(abi) = 8.6
-%else
-Requires: tcl(abi) = 8.5
-%endif
 
 %description -n tcl-%{name}
 TCL bindings for the SQL Relay client API.
@@ -276,7 +272,7 @@ Oracle back-end module for SQL Relay.
 %package mysql
 License: GPLv2 with exceptions
 Summary: MySQL back-end module for SQL Relay
-BuildRequires: mariadb-devel
+BuildRequires: mariadb-connector-c-devel
 
 %description mysql
 MySQL back-end module for SQL Relay.
@@ -398,10 +394,6 @@ make
 %install
 make install DESTDIR=%{buildroot}
 
-# move systemd files to (_unitdir)
-mkdir -p %{buildroot}%{_unitdir}
-mv %{buildroot}/usr/lib/systemd/system/* %{buildroot}%{_unitdir}
-
 # create tmpfiles.d directories and config file
 mkdir -p %{buildroot}/run/%{name}
 mkdir -p %{buildroot}%{_tmpfilesdir}
@@ -460,20 +452,24 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_libdir}/libsqlrserver.so.12
 %{_libdir}/libsqlrserver.so.12.*
 %{_libexecdir}/%{name}/sqlrauth_*
-%{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
 %{_libexecdir}/%{name}/sqlrconfig_*
+%{_libexecdir}/%{name}/sqlrbindvariabletranslation_*
+%{_libexecdir}/%{name}/sqlrdirective_*
+%{_libexecdir}/%{name}/sqlrerrortranslation_*
 %{_libexecdir}/%{name}/sqlrfilter_*
-%{_libexecdir}/%{name}/sqlrtrigger_*
+%{_libexecdir}/%{name}/sqlrlogger_*
 %{_libexecdir}/%{name}/sqlrnotification_*
 %{_libexecdir}/%{name}/sqlrparser_*
 %{_libexecdir}/%{name}/sqlrprotocol_*
-%{_libexecdir}/%{name}/sqlrlogger_*
-%{_libexecdir}/%{name}/sqlrmoduledata_*
 %{_libexecdir}/%{name}/sqlrquery_*
+%{_libexecdir}/%{name}/sqlrquerytranslation_*
+%{_libexecdir}/%{name}/sqlrmoduledata_*
 %{_libexecdir}/%{name}/sqlrresultsettranslation_*
+%{_libexecdir}/%{name}/sqlrresultsetheadertranslation_*
+%{_libexecdir}/%{name}/sqlrresultsetrowblocktranslation_*
+%{_libexecdir}/%{name}/sqlrresultsetrowtranslation_*
 %{_libexecdir}/%{name}/sqlrschedule_*
-%{_libexecdir}/%{name}/sqlrtranslation_*
-%{_libexecdir}/%{name}/sqlrdirective_*
+%{_libexecdir}/%{name}/sqlrtrigger_*
 %{_mandir}/*/sqlr-listener.*
 %{_mandir}/*/sqlr-connection.*
 %{_mandir}/*/sqlr-scaler.*
@@ -482,6 +478,7 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_mandir}/*/sqlr-status.*
 %doc AUTHORS ChangeLog
 %attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}
+%attr(755, sqlrelay, sqlrelay) %dir %{_localstatedir}/log/%{name}/debug
 %attr(755, sqlrelay, sqlrelay) %dir /run/%{name}
 %{_tmpfilesdir}/%{name}.conf
 %exclude %{_libdir}/lib*.la
@@ -498,55 +495,35 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %dir %{_includedir}/%{name}
 %dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrserver.h
-%{_includedir}/%{name}/private/sqlrauth.h
-%{_includedir}/%{name}/private/sqlrauths.h
-%{_includedir}/%{name}/private/sqlrbindvariabletranslation.h
-%{_includedir}/%{name}/private/sqlrbindvariabletranslations.h
-%{_includedir}/%{name}/private/sqlrfilter.h
-%{_includedir}/%{name}/private/sqlrfilters.h
-%{_includedir}/%{name}/private/sqlrgsscredentials.h
+%{_includedir}/%{name}/private/sqlrauth*.h
+%{_includedir}/%{name}/private/sqlrbindvariabletranslation*.h
+%{_includedir}/%{name}/private/sqlrdirective*.h
+%{_includedir}/%{name}/private/sqlrerrortranslation*.h
+%{_includedir}/%{name}/private/sqlrfilter*.h
+%{_includedir}/%{name}/private/sqlr*credentials.h
 %{_includedir}/%{name}/private/sqlrlistener.h
-%{_includedir}/%{name}/private/sqlrlogger.h
-%{_includedir}/%{name}/private/sqlrloggers.h
-%{_includedir}/%{name}/private/sqlrmysqlcredentials.h
-%{_includedir}/%{name}/private/sqlrpostgresqlcredentials.h
-%{_includedir}/%{name}/private/sqlrmoduledata.h
-%{_includedir}/%{name}/private/sqlrmoduledatas.h
-%{_includedir}/%{name}/private/sqlrnotification.h
-%{_includedir}/%{name}/private/sqlrnotifications.h
+%{_includedir}/%{name}/private/sqlrlogger*.h
+%{_includedir}/%{name}/private/sqlrmoduledata*.h
+%{_includedir}/%{name}/private/sqlrnotification*.h
 %{_includedir}/%{name}/private/sqlrparser.h
-%{_includedir}/%{name}/private/sqlrprotocol.h
-%{_includedir}/%{name}/private/sqlrprotocols.h
-%{_includedir}/%{name}/private/sqlrqueries.h
+%{_includedir}/%{name}/private/sqlrprotocol*.h
 %{_includedir}/%{name}/private/sqlrquerycursor.h
 %{_includedir}/%{name}/private/sqlrquery.h
-%{_includedir}/%{name}/private/sqlrresultsetrowblocktranslation.h
-%{_includedir}/%{name}/private/sqlrresultsetrowblocktranslations.h
-%{_includedir}/%{name}/private/sqlrresultsetrowtranslation.h
-%{_includedir}/%{name}/private/sqlrresultsetrowtranslations.h
-%{_includedir}/%{name}/private/sqlrresultsettranslation.h
-%{_includedir}/%{name}/private/sqlrresultsettranslations.h
-%{_includedir}/%{name}/private/sqlrrouter.h
-%{_includedir}/%{name}/private/sqlrrouters.h
-%{_includedir}/%{name}/private/sqlrschedule.h
-%{_includedir}/%{name}/private/sqlrschedulerule.h
-%{_includedir}/%{name}/private/sqlrschedules.h
+%{_includedir}/%{name}/private/sqlrquerytranslation*.h
+%{_includedir}/%{name}/private/sqlrresultsetheadertranslation*.h
+%{_includedir}/%{name}/private/sqlrresultsetrowblocktranslation*.h
+%{_includedir}/%{name}/private/sqlrresultsetrowtranslation*.h
+%{_includedir}/%{name}/private/sqlrresultsettranslation*.h
+%{_includedir}/%{name}/private/sqlrrouter*.h
+%{_includedir}/%{name}/private/sqlrschedule*.h
+%{_includedir}/%{name}/private/sqlrserverbase.h
 %{_includedir}/%{name}/private/sqlrserverconnection.h
 %{_includedir}/%{name}/private/sqlrservercontroller.h
 %{_includedir}/%{name}/private/sqlrservercursor.h
 %{_includedir}/%{name}/private/sqlrserverincludes.h
+%{_includedir}/%{name}/private/sqlrservermodule*.h
 %{_includedir}/%{name}/private/sqlrshm.h
-%{_includedir}/%{name}/private/sqlrtlscredentials.h
-%{_includedir}/%{name}/private/sqlrtranslation.h
-%{_includedir}/%{name}/private/sqlrtranslations.h
-%{_includedir}/%{name}/private/sqlrtrigger.h
-%{_includedir}/%{name}/private/sqlrtriggers.h
-%{_includedir}/%{name}/private/sqlruserpasswordcredentials.h
-%{_includedir}/%{name}/private/sqlrdirective.h
-%{_includedir}/%{name}/private/sqlrdirectives.h
-%{_includedir}/%{name}/private/sqlrresultsetheadertranslation.h
-%{_includedir}/%{name}/private/sqlrresultsetheadertranslations.h
-%{_includedir}/%{name}/private/sqlrmoduledata*.h
+%{_includedir}/%{name}/private/sqlrtrigger*.h
 %{_libdir}/libsqlrserver.so
 %exclude %{_libdir}/lib*.la
 
@@ -582,9 +559,10 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %dir %{_includedir}/%{name}
 %dir %{_includedir}/%{name}/private
 %{_includedir}/%{name}/sqlrutil.h
-%{_includedir}/%{name}/private/sqlrutilincludes.h
+%{_includedir}/%{name}/private/sqlrconfig.h
 %{_includedir}/%{name}/private/sqlrpwdenc.h
 %{_includedir}/%{name}/private/sqlrpwdencs.h
+%{_includedir}/%{name}/private/sqlrutilincludes.h
 %{_libdir}/libsqlrutil.so
 %{_datadir}/sqlrelay
 
@@ -604,24 +582,20 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_includedir}/%{name}/private/sqlrclientincludes.h
 %{_includedir}/%{name}/private/sqlrconnection.h
 %{_includedir}/%{name}/private/sqlrcursor.h
-%{_includedir}/%{name}/sqlrimport.h
-%{_includedir}/%{name}/sqlrimportcsv.h
-%{_includedir}/%{name}/sqlrimportxml.h
-%{_includedir}/%{name}/private/sqlrimport.h
-%{_includedir}/%{name}/private/sqlrimportincludes.h
-%{_includedir}/%{name}/private/sqlrimportcsv.h
-%{_includedir}/%{name}/private/sqlrimportcsvincludes.h
-%{_includedir}/%{name}/private/sqlrimportxml.h
-%{_includedir}/%{name}/private/sqlrimportxmlincludes.h
-%{_includedir}/%{name}/sqlrexport.h
-%{_includedir}/%{name}/sqlrexportcsv.h
-%{_includedir}/%{name}/sqlrexportxml.h
-%{_includedir}/%{name}/private/sqlrexport.h
-%{_includedir}/%{name}/private/sqlrexportincludes.h
-%{_includedir}/%{name}/private/sqlrexportcsv.h
-%{_includedir}/%{name}/private/sqlrexportcsvincludes.h
-%{_includedir}/%{name}/private/sqlrexportxml.h
-%{_includedir}/%{name}/private/sqlrexportxmlincludes.h
+%{_includedir}/%{name}/sqlrimport*.h
+%{_includedir}/%{name}/private/sqlrimport*.h
+%{_includedir}/%{name}/sqlrexport*.h
+%{_includedir}/%{name}/private/sqlrexport*.h
+%{_includedir}/%{name}/sqlrcollections.h
+%{_includedir}/%{name}/private/sqlrcollectionsincludes.h
+%{_includedir}/%{name}/private/sqlrlistnode.h
+%{_includedir}/%{name}/private/sqlrresultsetlist.h
+%{_includedir}/%{name}/private/sqlrresultsettable.h
+%{_includedir}/%{name}/private/sqlrrowdictionary.h
+%{_includedir}/%{name}/private/sqlrrowlist.h
+%{_includedir}/%{name}/private/sqlrscalar.h
+%{_includedir}/%{name}/sqlrcrud.h
+%{_includedir}/%{name}/private/sqlrcrud*.h
 %{_libdir}/libsqlrclient.so
 %{_libdir}/pkgconfig/%{name}-c++.pc
 %exclude %{_libdir}/lib*.la
@@ -776,13 +750,18 @@ cp -r %{buildroot}%{_docdir}/%{name}/api/java %{buildroot}%{_javadocdir}/%{name}
 %{_javadocdir}/%{name}
 
 %changelog
-* Fri Jun 30 2023 David Muse <david.muse@firstworks.com> - 2.0.0-1
+* Tue May 28 2024 David Muse <david.muse@firstworks.com> - 2.0.0-1
 - Updated to version 2.0.0.
 - Removed support for mdbtools.
 - Updated to build python 3 packages for rhel > 6.
 - Removed sqlrresultsetdomnode.
 - Moved sqlr-pwdenc to clients package.
 - Moved pwdenc-related libraries and header files to common package.
+- Removed movement of service files.
+- Added new modules and includes.
+- Removed tcl(abi) = 8.5 for non-fedora platforms.
+- Added log/debug directory.
+- Replaced mariadb-devel build dependency with mariadb-connector-c-devel.
 
 * Thu Mar 04 2021 David Muse <david.muse@firstworks.com> - 1.9.0-1
 - Updated to version 1.9.0.

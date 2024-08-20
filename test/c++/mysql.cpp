@@ -4,7 +4,10 @@
 #include <sqlrelay/sqlrclient.h>
 #include <rudiments/process.h>
 #include <rudiments/bytestring.h>
+#include <rudiments/randomnumber.h>
 #include <rudiments/stdio.h>
+
+#include "../../config.h"
 
 //#define PROFILING 1
 
@@ -109,7 +112,11 @@ for (uint16_t a=0; a<50; a++) {
 
 	// bind format
 	stdoutput.printf("BIND FORMAT: \n");
+#ifdef HAVE_MYSQL_STMT_PREPARE
 	checkSuccess(con->bindFormat(),"?");
+#else
+	checkSuccess(con->bindFormat(),":*");
+#endif
 	stdoutput.printf("\n");
 
 	// nextval format
@@ -123,6 +130,10 @@ for (uint16_t a=0; a<50; a++) {
 	// create a new table
 	stdoutput.printf("CREATE TEMPTABLE: \n");
 	checkSuccess(cur->sendQuery("create table testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testvarchar varchar(40), testtext text, testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testblob blob, testtinyblob tinyblob, testmediumblob mediumblob, testlongblob longblob, testtimestamp timestamp)"),1);
+	stdoutput.printf("\n");
+
+	stdoutput.printf("BEGIN TRANSACTION: \n");
+	checkSuccess(cur->sendQuery("begin"),1);
 	stdoutput.printf("\n");
 
 	stdoutput.printf("INSERT: \n");
@@ -1173,8 +1184,12 @@ for (uint16_t a=0; a<50; a++) {
 
 	// binary data
 	if (majorversion>3) {
-		stdoutput.printf("BINARY DATA: \n");
-		checkSuccess(cur->sendQuery("create table testtable (col1 longblob)"),true);
+		stdoutput.printf("BINARY DATA - all chars - \\-escaped: \n");
+
+		checkSuccess(cur->sendQuery(
+			"create table testtable (col1 longblob)"),true);
+
+		// binary 0-255 (slash-escaped)
 		byte_t	buffer[256];
 		for (uint16_t i=0; i<256; i++) {
 			buffer[i]=i;
@@ -1183,7 +1198,7 @@ for (uint16_t a=0; a<50; a++) {
 		query.append("insert into testtable values (_binary'");
 		for (uint64_t i=0; i<sizeof(buffer); i++) {
 			if (buffer[i]=='\'') {
-				query.append('\'');
+				query.append('\\');
 			}
 			if (buffer[i]=='\\') {
 				query.append('\\');
@@ -1191,42 +1206,153 @@ for (uint16_t a=0; a<50; a++) {
 			query.append(buffer[i]);
 		}
 		query.append("')");
-		checkSuccess(cur->sendQuery(query.getString(),query.getSize()),true);
+		checkSuccess(cur->sendQuery(
+				query.getString(),query.getSize()),true);
 		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
 		checkSuccess(cur->getFieldLength(0,(uint32_t)0),sizeof(buffer));
-		checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),
-							buffer,sizeof(buffer)),0);
+		checkSuccess(bytestring::compare(
+					cur->getField(0,(uint32_t)0),
+					buffer,sizeof(buffer)),0);
 		checkSuccess(cur->sendQuery("delete from testtable"),true);
 		stdoutput.printf("\n");
-		checkSuccess(cur->sendQuery("insert into testtable values (_binary'''''')"),true);
+
+		// '' (double-single-quote escaped)
+		stdoutput.printf("BINARY DATA - '' - ''-escaped: \n");
+		checkSuccess(cur->sendQuery(
+			"insert into testtable values (_binary'''''')"),true);
 		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
 		checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
-		checkSuccess(charstring::compare(cur->getField(0,(uint32_t)0),"''"),0);
+		checkSuccess(charstring::compare(
+					cur->getField(0,(uint32_t)0),
+					"''"),0);
 		checkSuccess(cur->sendQuery("delete from testtable"),true);
 		stdoutput.printf("\n");
-		checkSuccess(cur->sendQuery("insert into testtable values (_binary'\"\"')"),true);
+
+		// '' (double-single-quote and slash escaped)
+		stdoutput.printf("BINARY DATA - '' - '',\\-escaped: \n");
+		checkSuccess(cur->sendQuery(
+			"insert into testtable values (_binary'''\\'')"),true);
 		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
 		checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
-		checkSuccess(charstring::compare(cur->getField(0,(uint32_t)0),"\"\""),0);
+		checkSuccess(charstring::compare(
+					cur->getField(0,(uint32_t)0),
+					"''"),0);
 		checkSuccess(cur->sendQuery("delete from testtable"),true);
 		stdoutput.printf("\n");
-		checkSuccess(cur->sendQuery("insert into testtable values (_binary'\0\"\"')",43),true);
+
+		// '' (slah and double-single-quote slash escaped)
+		stdoutput.printf("BINARY DATA - '' - \\,''-escaped: \n");
+		checkSuccess(cur->sendQuery(
+			"insert into testtable values (_binary'\\'''')"),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
+		checkSuccess(charstring::compare(
+					cur->getField(0,(uint32_t)0),
+					"''"),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		stdoutput.printf("\n");
+
+		// "" (unescaped)
+		stdoutput.printf("BINARY DATA - \"\" - unescaped: \n");
+		checkSuccess(cur->sendQuery(
+			"insert into testtable values (_binary'\"\"')"),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
+		checkSuccess(charstring::compare(
+					cur->getField(0,(uint32_t)0),
+					"\"\""),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		stdoutput.printf("\n");
+
+		// (null)"" (unescaped)
+		stdoutput.printf("BINARY DATA - (null)\"\" - unescaped: \n");
+		checkSuccess(cur->sendQuery(
+			"insert into testtable values "
+			"(_binary'\0\"\"')",43),true);
 		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
 		checkSuccess(cur->getFieldLength(0,(uint32_t)0),3);
-		checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\0\"\"",3),0);
+		checkSuccess(bytestring::compare(
+					cur->getField(0,(uint32_t)0),
+					"\0\"\"",3),0);
 		checkSuccess(cur->sendQuery("delete from testtable"),true);
 		stdoutput.printf("\n");
-		checkSuccess(cur->sendQuery("insert into testtable values (_binary'\\\0\\\"\\\"')",46),true);
+
+		// \(null)\"\" (slash-escaped)
+		stdoutput.printf(
+			"BINARY DATA - \\(null)\\\"\\\" - \\-escaped: \n");
+		checkSuccess(cur->sendQuery(
+			"insert into testtable values (_binary'\\\0\\\"\\\"')",
+			46),true);
 		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
 		checkSuccess(cur->getFieldLength(0,(uint32_t)0),3);
-		checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\0\"\"",3),0);
+		checkSuccess(bytestring::compare(
+					cur->getField(0,(uint32_t)0),
+					"\0\"\"",3),0);
 		checkSuccess(cur->sendQuery("delete from testtable"),true);
 		stdoutput.printf("\n");
-		checkSuccess(cur->sendQuery("insert into testtable values (_binary'\\\\\\'')",44),true);
+
+		// \\' (slash-escaped)
+		stdoutput.printf("BINARY DATA - \\\\' - \\-escaped: \n");
+		checkSuccess(cur->sendQuery(
+			"insert into testtable values (_binary'\\\\\\'')",
+			44),true);
 		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
 		checkSuccess(cur->getFieldLength(0,(uint32_t)0),2);
-		checkSuccess(bytestring::compare(cur->getField(0,(uint32_t)0),"\\\'",2),0);
+		checkSuccess(bytestring::compare(
+					cur->getField(0,(uint32_t)0),
+					"\\\'",2),0);
 		checkSuccess(cur->sendQuery("delete from testtable"),true);
+		stdoutput.printf("\n");
+
+		// random ',",\,(null) (slash-and-double-single-quote-escaped)
+		stdoutput.printf("BINARY DATA - random - '',\\-escaped: \n");
+		randomnumber	r1;
+		randomnumber	r2;
+		r1.setSeed(r1.getSeed());
+		r2.setSeed(r2.getSeed());
+		char	ch[]={'\'','"','\\','\0'};
+		for (uint16_t i=0; i<sizeof(buffer); i++) {
+			uint32_t	result1;
+			r1.generate(&result1);
+			r1.setSeed(result1);
+			buffer[i]=ch[r1.scale(result1,0,3)];
+		}
+		query.clear();
+		query.append("insert into testtable values (_binary'");
+		for (uint64_t i=0; i<sizeof(buffer); i++) {
+			uint32_t	result2;
+			r2.generate(&result2);
+			r2.setSeed(result2);
+			if (buffer[i]=='\'') {
+				// randomly escape with \ or ''
+				if (r2.scale(result2,0,1)) {
+					query.append('\'');
+				} else {
+					query.append('\\');
+				}
+			}
+			if (buffer[i]=='"') {
+				// randomly escape with \ or don't escape
+				if (r2.scale(result2,0,1)) {
+					query.append('\\');
+				}
+			}
+			if (buffer[i]=='\\') {
+				// escape with backslash
+				query.append('\\');
+			}
+			query.append(buffer[i]);
+		}
+		query.append("')");
+		checkSuccess(cur->sendQuery(
+				query.getString(),query.getSize()),true);
+		checkSuccess(cur->sendQuery("select col1 from testtable"),true);
+		checkSuccess(cur->getFieldLength(0,(uint32_t)0),sizeof(buffer));
+		checkSuccess(bytestring::compare(
+					cur->getField(0,(uint32_t)0),
+					buffer,sizeof(buffer)),0);
+		checkSuccess(cur->sendQuery("delete from testtable"),true);
+
 		cur->sendQuery("drop table testtable");
 		stdoutput.printf("\n");
 	}

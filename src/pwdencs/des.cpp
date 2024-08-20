@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserver.h>
+#include <sqlrelay/sqlrutil.h>
 #include <rudiments/charstring.h>
 #include <rudiments/des.h>
 
-class SQLRSERVER_DLLSPEC sqlrpwdenc_des : public sqlrpwdenc {
+class SQLRUTIL_DLLSPEC sqlrpwdenc_des : public sqlrpwdenc {
 	public:
-			sqlrpwdenc_des(domnode *parameters, bool debug);
+		sqlrpwdenc_des(domnode *parameters, bool debug);
 		bool	oneWay();
 		char	*encrypt(const char *value);
 
@@ -40,7 +40,7 @@ char *sqlrpwdenc_des::encrypt(const char *value) {
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_des(
+	SQLRUTIL_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_des(
 						domnode *parameters,
 						bool debug) {
 		return new sqlrpwdenc_des(parameters,debug);

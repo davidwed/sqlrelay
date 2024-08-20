@@ -262,7 +262,22 @@
         </div>
 
         <div class="method-description">
-          <p>Returns a string representing the format of the bind variables used in the db.</p>
+          <p>Returns a string representing the bind variable format used by the database.  For example:</p>
+
+<p>?  - database uses a ? to represent a bind variable @* - database uses a @ followed by any characters to</p>
+
+<pre class="ruby"><span class="ruby-identifier">represent</span> <span class="ruby-identifier">a</span> <span class="ruby-identifier">bind</span> <span class="ruby-identifier">variable</span>
+</pre>
+
+<p>$1 - database uses a $ followed by a number to represent a</p>
+
+<pre class="ruby"><span class="ruby-identifier">bind</span> <span class="ruby-identifier">variable</span>
+</pre>
+
+<p>:* - database uses a : followed by any characters to</p>
+
+<pre class="ruby"><span class="ruby-identifier">represent</span> <span class="ruby-identifier">a</span> <span class="ruby-identifier">bind</span> <span class="ruby-identifier">variable</span>
+</pre>
 
           <div class="method-source-code" id="bindFormat-source">
             <pre>static VALUE sqlrcon_bindFormat(VALUE self) {

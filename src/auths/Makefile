@@ -23,6 +23,7 @@ all-base: $(SQLR)auth_sqlrclient_connectstrings.$(LIBEXT) \
 		$(SQLR)auth_postgresql_userlist.$(LIBEXT) \
 		$(SQLR)auth_oracle_connectstrings.$(LIBEXT) \
 		$(SQLR)auth_oracle_userlist.$(LIBEXT) \
+		$(SQLR)auth_oracle_database.$(LIBEXT) \
 		$(SQLR)auth_teradata_sidechannel.$(LIBEXT) \
 
 all-sqlrelay: $(SQLR)auth_sqlrclient_sqlrelay.$(LIBEXT)
@@ -66,6 +67,9 @@ $(SQLR)auth_oracle_connectstrings.$(LIBEXT): oracle_connectstrings.cpp oracle_co
 
 $(SQLR)auth_oracle_userlist.$(LIBEXT): oracle_userlist.cpp oracle_userlist.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ oracle_userlist.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
+
+$(SQLR)auth_oracle_database.$(LIBEXT): oracle_database.cpp oracle_database.$(OBJ)
+	$(LTLINK) $(LINK) $(OUT)$@ oracle_database.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)
 
 $(SQLR)auth_teradata_sidechannel.$(LIBEXT): teradata_sidechannel.cpp teradata_sidechannel.$(OBJ)
 	$(LTLINK) $(LINK) $(OUT)$@ teradata_sidechannel.$(OBJ) $(LDFLAGS) $(PLUGINLIBS) $(MODLINKFLAGS)

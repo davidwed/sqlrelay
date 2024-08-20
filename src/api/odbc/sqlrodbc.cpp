@@ -2072,7 +2072,7 @@ static void SQLR_BuildObjectName(stringbuffer *object,
 						(char *)catalogname,
 						namelength1)) {
 
-			if (object->getStringLength()) {
+			if (object->getSize()) {
 				object->append('.');
 			}
 			if (namelength2==SQL_NTS) {
@@ -2095,7 +2095,7 @@ static void SQLR_BuildObjectName(stringbuffer *object,
 	}
 
 	if (namelength3) {
-		if (object->getStringLength()) {
+		if (object->getSize()) {
 			object->append('.');
 		}
 		if (namelength3==SQL_NTS) {
@@ -9485,7 +9485,7 @@ SQLRETURN SQL_API SQLTables(SQLHSTMT statementhandle,
 			}
 			if (!charstring::isNullOrEmpty(schname)) {
 				wildstr.append(schname)->append('.');
-			} else if (wildstr.getStringLength()) {
+			} else if (wildstr.getSize()) {
 				wildstr.append("%.");
 			}
 			if (!charstring::isNullOrEmpty(tblname)) {
@@ -10035,7 +10035,7 @@ SQLRETURN SQL_API SQLProcedureColumns(SQLHSTMT statementhandle,
 	SQLR_STMTClearError(stmt);
 
 	SQLRETURN	retval=
-		(stmt->cur->getProcedureBindAndColumnList(
+		(stmt->cur->getProcedureParameterList(
 						procedure.getString(),wild,
 						SQLRCLIENTLISTFORMAT_ODBC))?
 							SQL_SUCCESS:SQL_ERROR;

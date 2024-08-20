@@ -22,10 +22,9 @@ struct pattern_t {
 
 class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 	public:
-			sqlrfilter_patterns(sqlrservercontroller *cont,
-						sqlrfilters *fs,
+		sqlrfilter_patterns(sqlrservercontroller *cont,
 						domnode *parameters);
-			~sqlrfilter_patterns();
+		~sqlrfilter_patterns();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query);
@@ -33,24 +32,16 @@ class SQLRSERVER_DLLSPEC sqlrfilter_patterns : public sqlrfilter {
 		pattern_t	*p;
 		uint32_t	patterncount;
 		bool		hasscope;
-
-		bool	enabled;
 };
 
 sqlrfilter_patterns::sqlrfilter_patterns(sqlrservercontroller *cont,
-						sqlrfilters *fs,
 						domnode *parameters) :
-						sqlrfilter(cont,fs,parameters) {
+						sqlrfilter(cont,parameters) {
 	debugFunction();
 
 	p=NULL;
 	patterncount=0;
 	hasscope=false;
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled) {
-		return;
-	}
 
 	// count patterns
 	patterncount=0;
@@ -106,10 +97,6 @@ bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query) {
 	debugFunction();
-
-	if (!enabled) {
-		return true;
-	}
 
 	// split the string on single-quotes if necessary
 	// (NOTE: this presumes that backslash-escaped quotes
@@ -233,8 +220,7 @@ bool sqlrfilter_patterns::run(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter
 			*new_sqlrfilter_patterns(sqlrservercontroller *cont,
-						sqlrfilters *fs,
 						domnode *parameters) {
-		return new sqlrfilter_patterns(cont,fs,parameters);
+		return new sqlrfilter_patterns(cont,parameters);
 	}
 }

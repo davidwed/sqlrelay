@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<instances>
+
+	<instance id="mysqlimportexporttest" dbase="mysql">
+		<listeners>
+			<listener port="9000" socket="/tmp/test.socket"/>
+		</listeners>
+		<connections>
+			<connection string="host=mysql;user=testuser;password=testpassword;db=@HOSTNAME@;foundrows=yes"/>
+		</connections>
+	</instance>
+
+</instances>

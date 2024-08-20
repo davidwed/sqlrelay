@@ -10,10 +10,10 @@
 
 class conndb {
 	public:
-		conndb(const char *dbname,
+	conndb(const char *dbname,
 			const char *connid,
 			sqlrconnection *sqlrcon);
-		~conndb();
+	~conndb();
 	char		*dbname;
 	const char	*connid;
 	sqlrconnection	*sqlrcon;
@@ -34,10 +34,9 @@ conndb::~conndb() {
 
 class SQLRSERVER_DLLSPEC sqlrrouter_usedatabase : public sqlrrouter {
 	public:
-			sqlrrouter_usedatabase(sqlrservercontroller *cont,
+		sqlrrouter_usedatabase(sqlrservercontroller *cont,
 						sqlrrouters *rs,
 						domnode *parameters);
-			~sqlrrouter_usedatabase();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
@@ -48,11 +47,8 @@ class SQLRSERVER_DLLSPEC sqlrrouter_usedatabase : public sqlrrouter {
 		const char	*mapDbName(const char *sqlrconid,
 						const char *dbname);
 
-		bool	enabled;
-
-		bool	debug;
-
 		dictionary<char *,conndb *>	dbs;
+
 		bool	initialized;
 };
 
@@ -61,19 +57,10 @@ sqlrrouter_usedatabase::sqlrrouter_usedatabase(sqlrservercontroller *cont,
 						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 
-	debug=cont->getConfig()->getDebugRouters();
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled && debug) {
-		stdoutput.printf("	disabled\n");
-		return;
-	}
-
 	initialized=false;
-}
 
-sqlrrouter_usedatabase::~sqlrrouter_usedatabase() {
-	// FIXME: clean up dictionary
+	dbs.setManageArrayKeys(true);
+	dbs.setManageValues(true);
 }
 
 const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
@@ -84,7 +71,7 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 	// initialze the return value to the current connection
 	const char	*retval=getRouters()->getCurrentConnectionId();
 
-	if (!enabled || !sqlrcon || !sqlrcur) {
+	if (!sqlrcon || !sqlrcur) {
 		return NULL;
 	}
 
@@ -103,62 +90,45 @@ const char *sqlrrouter_usedatabase::route(sqlrserverconnection *sqlrcon,
 		initialized=true;
 	}
 
-	if (debug) {
-		stdoutput.printf("		route {\n"
-				"			%s\n",query);
-	}
+	debugStart("route");
+	debugWrite("%s",query);
 
 	// get the id of the connection that hosts the db
 	conndb		*cdb=NULL;
 	if (dbs.getValue((char *)dbalias,&cdb)) {
 
-		if (debug) {
-			stdoutput.printf("			"
-					"%s to %s at %s ",
-					dbalias,cdb->dbname,cdb->connid);
-		}
+		stdoutput.printf("%s to %s at %s ",
+				dbalias,cdb->dbname,cdb->connid);
 
 		// select the specified db
 		if (cdb->sqlrcon->selectDatabase(cdb->dbname)) {
-			if (debug) {
-				stdoutput.printf("(success)\n");
-			}
+			debugWrite("(success)");
 			retval=cdb->connid;
 		} else {
 			*err=cdb->sqlrcon->errorMessage();
 			*errn=cdb->sqlrcon->errorNumber();
-			if (debug) {
-				stdoutput.printf("(failed)\n");
-			}
+			debugWrite("(failed)");
 			retval=NULL;
 		}
 	} else {
 		*err=SQLR_ERROR_DBNOTFOUND_STRING;
 		*errn=SQLR_ERROR_DBNOTFOUND;
-		if (debug) {
-			stdoutput.printf("			"
-						"%s not found\n",
-						dbalias);
-		}
+		debugWrite("%s not found",dbalias);
 		retval=NULL;
 	}
 
-	if (debug) {
-		stdoutput.printf("		}\n");
-	}
+	debugEnd();
 
 	// the original "use database" query shouldn't actually be run now,
-	// so disable it by setting the length of the query to 0
-	sqlrcur->setQueryLength(0);
+	// so disable it by setting the size of the query to 0
+	sqlrcur->setQuerySize(0);
 
 	return retval;
 }
 
 void sqlrrouter_usedatabase::buildDictionary() {
 
-	if (debug) {
-		stdoutput.printf("		build dictionary {\n");
-	}
+	debugStart("build dictionary");
 
 	// run through the connections...
 	for (uint16_t i=0; i<getRouters()->getConnectionCount(); i++) {
@@ -181,17 +151,12 @@ void sqlrrouter_usedatabase::buildDictionary() {
 			conndb	*cdb=new conndb(dbname,sqlrconid,sqlrcon);
 			dbs.setValue(charstring::duplicate(dbalias),cdb);
 
-			if (debug) {
-				stdoutput.printf("			"
-						"%s -> %s@%s\n",
-						dbalias,dbname,sqlrconid);
-			}
+			stdoutput.printf("%s -> %s@%s\n",
+					dbalias,dbname,sqlrconid);
 		}
 	}
 
-	if (debug) {
-		stdoutput.printf("		}\n");
-	}
+	debugEnd();
 }
 
 const char *sqlrrouter_usedatabase::mapDbName(const char *sqlrconid,

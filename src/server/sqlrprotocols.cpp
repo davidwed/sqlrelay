@@ -4,8 +4,6 @@
 #include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -15,83 +13,61 @@
 	}
 #endif
 
-class sqlrprotocolplugin {
-	public:
-		sqlrprotocol	*pr;
-		dynamiclib	*dl;
-};
-
 class sqlrprotocolsprivate {
 	friend class sqlrprotocols;
 	private:
-		sqlrservercontroller	*_cont;
-
-		dictionary< uint16_t , sqlrprotocolplugin * >	_protos;
+		dictionary< uint16_t , sqlrmoduleplugin * >	_protos;
 };
 
-sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont) {
-	debugFunction();
+sqlrprotocols::sqlrprotocols(sqlrservercontroller *cont) :
+						sqlrservermodules(cont) {
 	pvt=new sqlrprotocolsprivate;
-	pvt->_cont=cont;
 }
 
 sqlrprotocols::~sqlrprotocols() {
-	debugFunction();
-	unload();
 	delete pvt;
 }
 
 bool sqlrprotocols::load(domnode *parameters) {
-	debugFunction();
 
 	unload();
 
-	// run through the listeners
+	// run through the module tags
 	uint16_t	i=0;
-	for (domnode *listener=parameters->getFirstTagChild();
-			!listener->isNullNode();
-			listener=listener->getNextTagSibling()) {
+	for (domnode *moduledata=parameters->getFirstTagChild();
+				!moduledata->isNullNode();
+				moduledata=moduledata->getNextTagSibling()) {
 
-		debugPrintf("loading protocol ...\n");
+		// skip disabled moudles
+		if (isModuleDisabled(moduledata)) {
+			continue;
+		}
 
-		// load protocol
-		loadProtocol(i,listener);
+		// load the module
+		loadModule(moduledata,i);
 
+		// next...
 		i++;
 	}
 	return true;
 }
 
-void sqlrprotocols::unload() {
-	debugFunction();
-	for (listnode<uint16_t> *node=pvt->_protos.getKeys()->getFirst();
-						node; node=node->getNext()) {
-		sqlrprotocolplugin	*sqlrpp=
-					pvt->_protos.getValue(node->getValue());
-		delete sqlrpp->pr;
-		delete sqlrpp->dl;
-		delete sqlrpp;
-	}
-	pvt->_protos.clear();
-}
-
-void sqlrprotocols::loadProtocol(uint16_t index, domnode *listener) {
-	debugFunction();
+void sqlrprotocols::loadModule(domnode *parameters, uint16_t index) {
 
 	// ignore any non-listener entries
-	if (charstring::compare(listener->getName(),"listener")) {
+	if (charstring::compare(parameters->getName(),"listener")) {
 		return;
 	}
 
 	// get the protocol name
-	const char	*module=listener->getAttributeValue("protocol");
+	const char	*module=parameters->getAttributeValue("protocol");
 
-	debugPrintf("loading protocol: %s\n",module);
+	debugWrite("loading protocol module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the protocol module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("protocol_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -109,10 +85,8 @@ void sqlrprotocols::loadProtocol(uint16_t index, domnode *listener) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrprotocol_")->append(module);
 	sqlrprotocol *(*newProtocol)(sqlrservercontroller *,
-					sqlrprotocols *,
 					domnode *)=
 			(sqlrprotocol *(*)(sqlrservercontroller *,
-						sqlrprotocols *,
 						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newProtocol) {
@@ -124,7 +98,7 @@ void sqlrprotocols::loadProtocol(uint16_t index, domnode *listener) {
 		delete dl;
 		return;
 	}
-	sqlrprotocol	*pr=(*newProtocol)(pvt->_cont,this,listener);
+	sqlrprotocol	*pr=(*newProtocol)(cont,parameters);
 
 #else
 
@@ -136,33 +110,20 @@ void sqlrprotocols::loadProtocol(uint16_t index, domnode *listener) {
 	}
 #endif
 
+	debugWrite("success");
+
 	// add the plugin to the list
-	sqlrprotocolplugin	*sqlrpp=new sqlrprotocolplugin;
-	sqlrpp->pr=pr;
-	sqlrpp->dl=dl;
-	pvt->_protos.setValue(index,sqlrpp);
+	sqlrmoduleplugin	*sqlrmp=new sqlrmoduleplugin;
+	sqlrmp->m=pr;
+	sqlrmp->dl=dl;
+	blist.append(sqlrmp);
+	pvt->_protos.setValue(index,sqlrmp);
 }
 
 sqlrprotocol *sqlrprotocols::getProtocol(uint16_t index) {
-	debugFunction();
-	sqlrprotocolplugin	*pp=NULL;
+	sqlrmoduleplugin	*pp=NULL;
 	if (!pvt->_protos.getValue(index,&pp)) {
 		return NULL;
 	}
-	return pp->pr;
-}
-
-void sqlrprotocols::endTransaction(bool commit) {
-	for (listnode<uint16_t> *node=pvt->_protos.getKeys()->getFirst();
-						node; node=node->getNext()) {
-		pvt->_protos.getValue(node->getValue())->
-					pr->endTransaction(commit);
-	}
-}
-
-void sqlrprotocols::endSession() {
-	for (listnode<uint16_t> *node=pvt->_protos.getKeys()->getFirst();
-						node; node=node->getNext()) {
-		pvt->_protos.getValue(node->getValue())->pr->endSession();
-	}
+	return (sqlrprotocol *)pp->m;
 }

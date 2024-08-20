@@ -6,6 +6,7 @@
 #include <rudiments/character.h>
 #include <rudiments/snooze.h>
 #include <rudiments/regularexpression.h>
+#include <rudiments/process.h>
 
 #include <datatypes.h>
 #include <defines.h>
@@ -46,30 +47,28 @@ class routercursor;
 class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 	friend class routercursor;
 	public:
-			routerconnection(sqlrservercontroller *cont);
-			~routerconnection();
+		routerconnection(sqlrservercontroller *cont);
+		~routerconnection();
 	private:
-		bool		supportsAuthOnDatabase();
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
 		sqlrservercursor	*newCursor(uint16_t id);
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
-		bool		autoCommitOn();
-		bool		autoCommitOff();
-		bool		supportsAutoCommit();
+		bool		setAutoCommitOn();
+		bool		setAutoCommitOff();
 		bool		begin();
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*dbHostName();
-		const char	*dbIpAddress();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getDbHostName();
+		const char	*getDbIpAddress();
 		bool		cacheDbHostInfo();
 		bool		getListsByApiCalls();
 		bool		getDatabaseList(sqlrservercursor *cursor,
@@ -88,15 +87,14 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 
 		void	route(bool *routed, bool *err);
 
-		void	autoCommitOnFailed(uint16_t index);
-		void	autoCommitOffFailed(uint16_t index);
+		void	setAutoCommitOnFailed(uint16_t index);
+		void	setAutoCommitOffFailed(uint16_t index);
 		void	beginFailed(uint16_t index);
 		void	commitFailed(uint16_t index);
 		void	rollbackFailed(uint16_t index);
 		void	beginQueryFailed(uint16_t index);
 		void	raiseIntegrityViolationEvent(const char *command,
 								uint16_t index);
-		const char	*identity;
 
 		const char	**conids;
 		sqlrconnection	**cons;
@@ -124,16 +122,15 @@ class SQLRSERVER_DLLSPEC routerconnection : public sqlrserverconnection {
 class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 	friend class routerconnection;
 	private:
-				routercursor(sqlrserverconnection *conn,
-								uint16_t id);
+		routercursor(sqlrserverconnection *conn, uint16_t id);
 	public:
-				~routercursor();
+		~routercursor();
 	private:
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		void		route(bool *routed, bool *err);
 		bool		supportsNativeBinds(const char *query,
-							uint32_t length);
+							uint32_t size);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -158,8 +155,6 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 						int32_t microsecond,
 						const char *tz,
 						bool isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		inputBindBlob(const char *variable, 
 						uint16_t variablesize,
@@ -197,8 +192,6 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		outputBindBlob(const char *variable, 
 						uint16_t variablesize,
@@ -220,20 +213,20 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 						uint64_t charstoread,
 						uint64_t *charsread);
 		bool		executeQuery(const char *query,
-						uint32_t length);
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+						uint32_t size);
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
-		uint64_t	affectedRows();
+		uint64_t	getAffectedRows();
 		uint32_t	colCount();
 		uint16_t	columnTypeFormat();
 		const char	*getColumnName(uint32_t col);
 		const char	*getColumnTypeName(uint32_t col);
-		uint32_t	getColumnLength(uint32_t col);
+		uint32_t	getColumnSize(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
 		uint16_t	getColumnIsNullable(uint32_t col);
@@ -249,8 +242,8 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
+					uint64_t *fieldsize,
+					bool *lob,
 					bool *null);
 		void		closeResultSet();
 
@@ -276,8 +269,6 @@ class SQLRSERVER_DLLSPEC routercursor : public sqlrservercursor {
 
 routerconnection::routerconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
-	identity=NULL;
-
 	conids=NULL;
 	cons=NULL;
 	concount=0;
@@ -286,8 +277,8 @@ routerconnection::routerconnection(sqlrservercontroller *cont) :
 	beginquery=NULL;
 	anymustbegin=false;
 	justloggedin=false;
-	nullbindvalue=nullBindValue();
-	nonnullbindvalue=nonNullBindValue();
+	nullbindvalue=getNullBindValue();
+	nonnullbindvalue=getNonNullBindValue();
 
 	sqlrr=NULL;
 	routeentiresession=false;
@@ -306,13 +297,9 @@ routerconnection::~routerconnection() {
 	delete sqlrr;
 }
 
-bool routerconnection::supportsAuthOnDatabase() {
-	return false;
-}
-
 void routerconnection::handleConnectString() {
 
-	identity=cont->getConnectStringValue("identity");
+	sqlrserverconnection::handleConnectString();
 
 	// re-get fetchatonce, defaulting to 10, and allowing it to be set to 0
 	uint32_t	fetchatonce=10;
@@ -323,7 +310,7 @@ void routerconnection::handleConnectString() {
 	cont->setFetchAtOnce(fetchatonce);
 
 	cont->setMaxColumnCount(0);
-	cont->setMaxFieldLength(0);
+	cont->setMaxFieldSize(0);
 
 
 	// build the connections that we'll route to
@@ -380,7 +367,7 @@ void routerconnection::handleConnectString() {
 	// (this is just a convenient place to do it)
 	domnode	*routers=cont->getConfig()->getRouters();
 	if (!routers->isNullNode()) {
-		sqlrr=new sqlrrouters(cont,conids,cons,concount);
+		sqlrr=new sqlrrouters(cont,cons,conids,concount);
 		sqlrr->load(routers);
 		routeentiresession=sqlrr->routeEntireSession();
 	}
@@ -391,6 +378,9 @@ bool routerconnection::logIn(const char **error, const char **warning) {
 	justloggedin=true;
 
 	while (!ping()) {
+		if (process::getShutDownFlag()) {
+			return false;
+		}
 		snooze::macrosnooze(1);
 	}
 	endSession();
@@ -409,10 +399,10 @@ void routerconnection::deleteCursor(sqlrservercursor *curs) {
 void routerconnection::logOut() {
 }
 
-bool routerconnection::autoCommitOn() {
+bool routerconnection::setAutoCommitOn() {
 
 	if (debug) {
-		stdoutput.printf("autoCommitOn {\n");
+		stdoutput.printf("setAutoCommitOn {\n");
 	}
 
 	if (justloggedin) {
@@ -455,7 +445,7 @@ bool routerconnection::autoCommitOn() {
 			if (debug) {
 				stdoutput.printf("	failed\n");
 			}
-			autoCommitOnFailed(index);
+			setAutoCommitOnFailed(index);
 		}
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
@@ -485,10 +475,10 @@ bool routerconnection::autoCommitOn() {
 	return result;
 }
 
-bool routerconnection::autoCommitOff() {
+bool routerconnection::setAutoCommitOff() {
 
 	if (debug) {
-		stdoutput.printf("autoCommitOff {\n");
+		stdoutput.printf("setAutoCommitOff {\n");
 	}
 
 	if (justloggedin) {
@@ -531,7 +521,7 @@ bool routerconnection::autoCommitOff() {
 			if (debug) {
 				stdoutput.printf("	failed\n");
 			}
-			autoCommitOffFailed(index);
+			setAutoCommitOffFailed(index);
 		}
 		// The connection class calls autoCommitOn or autoCommitOff
 		// immediately after logging in, which will cause the 
@@ -560,10 +550,6 @@ bool routerconnection::autoCommitOff() {
 		stdoutput.printf("}\n");
 	}
 	return result;
-}
-
-bool routerconnection::supportsAutoCommit() {
-	return true;
 }
 
 bool routerconnection::begin() {
@@ -728,18 +714,18 @@ bool routerconnection::rollback() {
 	return result;
 }
 
-void routerconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+void routerconnection::getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t *errorcode,
 					bool *liveconnection) {
 
 	for (uint16_t index=0; index<concount; index++) {
 		const char	*errormessage=cons[index]->errorMessage();
 		if (!charstring::getLength(errormessage)) {
-			*errorlength=charstring::getLength(errormessage);
-			charstring::safeCopy(errorbuffer,errorbufferlength,
-						errormessage,*errorlength);
+			*errorsize=charstring::getLength(errormessage);
+			charstring::safeCopy(errorbuffer,errorbuffersize,
+						errormessage,*errorsize);
 			*errorcode=cons[index]->errorNumber();
 			break;
 		}
@@ -747,15 +733,15 @@ void routerconnection::errorMessage(char *errorbuffer,
 	*liveconnection=true;
 }
 
-const char *routerconnection::identify() {
+const char *routerconnection::getDbType() {
 	// FIXME: maybe this should only return router if there's no currentcon
-	return (identity)?identity:"router";
+	return "router";
 }
 
-const char *routerconnection::dbVersion() {
+const char *routerconnection::getDbVersion() {
 
 	if (debug) {
-		stdoutput.printf("dbVersion {\n");
+		stdoutput.printf("getDbVersion {\n");
 	}
 
 	// route
@@ -799,10 +785,10 @@ const char *routerconnection::dbVersion() {
 	return retval;
 }
 
-const char *routerconnection::dbHostName() {
+const char *routerconnection::getDbHostName() {
 
 	if (debug) {
-		stdoutput.printf("dbHostName {\n");
+		stdoutput.printf("getDbHostName {\n");
 	}
 
 	// route
@@ -846,10 +832,10 @@ const char *routerconnection::dbHostName() {
 	return retval;
 }
 
-const char *routerconnection::dbIpAddress() {
+const char *routerconnection::getDbIpAddress() {
 
 	if (debug) {
-		stdoutput.printf("dbIpAddress {\n");
+		stdoutput.printf("getDbIpAddress {\n");
 	}
 
 	// route
@@ -1125,11 +1111,11 @@ void routerconnection::route(bool *routed, bool *err) {
 	}
 }
 
-void routerconnection::autoCommitOnFailed(uint16_t index) {
+void routerconnection::setAutoCommitOnFailed(uint16_t index) {
 	raiseIntegrityViolationEvent("autocommit-on",index);
 }
 
-void routerconnection::autoCommitOffFailed(uint16_t index) {
+void routerconnection::setAutoCommitOffFailed(uint16_t index) {
 	raiseIntegrityViolationEvent("autocommit-off",index);
 }
 
@@ -1199,7 +1185,7 @@ routercursor::~routercursor() {
 	routerconn->routercursors.remove(this);
 }
 
-bool routercursor::prepareQuery(const char *query, uint32_t length) {
+bool routercursor::prepareQuery(const char *query, uint32_t size) {
 
 	if (routerconn->debug) {
 		stdoutput.printf("prepareQuery {\n");
@@ -1208,9 +1194,9 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// FIXME: remove this and use a translation
 
 	// convert to lowercase and normalize whitespace, for regex matching
-	char	*nquery=new char[length+1];
+	char	*nquery=new char[size+1];
 	if (query) {
-		for (uint32_t i=0; i<length; ++i) {
+		for (uint32_t i=0; i<size; ++i) {
 			char	c=query[i];
 			if (character::isWhitespace(c)) {
 				nquery[i]=' ';
@@ -1219,7 +1205,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 			}
 		}
 	}
-	nquery[length]='\0';
+	nquery[size]='\0';
 
 	// reset bind cursor
 	if (isbindcur) {
@@ -1264,7 +1250,7 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// Did a module make the query empty?  If so, then we won't actually
 	// prepare/execute it, just return true.  The usedatabase module does
 	// this.
-	emptyquery=!getQueryLength();
+	emptyquery=!getQuerySize();
 	if (routerconn->debug) {
 		stdoutput.printf("%s",(emptyquery)?"	query set empty\n":"");
 	}
@@ -1273,9 +1259,9 @@ bool routercursor::prepareQuery(const char *query, uint32_t length) {
 	// connection turned out to be the right one
 	if (!emptyquery) {
 		if (routerconn->debug) {
-			stdoutput.printf("	query: %.*s\n",length,query);
+			stdoutput.printf("	query: %.*s\n",size,query);
 		}
-		currentcur->prepareQuery(query,length);
+		currentcur->prepareQuery(query,size);
 	}
 
 	if (routerconn->debug) {
@@ -1380,7 +1366,7 @@ void routercursor::route(bool *routed, bool *err) {
 	}
 }
 
-bool routercursor::supportsNativeBinds(const char *query, uint32_t length) {
+bool routercursor::supportsNativeBinds(const char *query, uint32_t size) {
 	return true;
 }
 
@@ -1420,8 +1406,6 @@ bool routercursor::inputBind(const char *variable,
 				int32_t microsecond,
 				const char *tz,
 				bool isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 	currentcur->inputBind(variable+1,year,month,day,
 			hour,minute,second,microsecond,tz,isnegative);
@@ -1500,8 +1484,6 @@ bool routercursor::outputBind(const char *variable,
 				int32_t *microsecond,
 				const char **tz,
 				bool *isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 	currentcur->defineOutputBindDouble(variable+1);
 	obv[obcount].variable=variable+1;
@@ -1569,22 +1551,22 @@ bool routercursor::getLobOutputBindSegment(uint16_t index,
 	if (!var) {
 		var=currentcur->getOutputBindBlob(varname);
 	}
-	uint32_t	length=currentcur->getOutputBindLength(varname);
-	if (offset+charstoread>length) {
-		charstoread=length-offset;
+	uint32_t	size=currentcur->getOutputBindLength(varname);
+	if (offset+charstoread>size) {
+		charstoread=size-offset;
 	}
 	bytestring::copy(buffer,var,charstoread);
 	*charsread=charstoread;
 	return true;
 }
 
-bool routercursor::executeQuery(const char *query, uint32_t length) {
+bool routercursor::executeQuery(const char *query, uint32_t size) {
 
 	// FIXME: if routing entire sessions, then compare and just do this for
 	// the appropriate connection
 
 	if (!currentcur) {
-		if (!prepareQuery(query,length)) {
+		if (!prepareQuery(query,size)) {
 			return false;
 		}
 	}
@@ -1656,16 +1638,16 @@ bool routercursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void routercursor::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void routercursor::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	const char	*errormessage=
 			(currentcur)?currentcur->errorMessage():"";
-	*errorlength=charstring::getLength(errormessage);
-	charstring::safeCopy(errorbuffer,errorbufferlength,
-					errormessage,*errorlength);
+	*errorsize=charstring::getLength(errormessage);
+	charstring::safeCopy(errorbuffer,errorbuffersize,
+					errormessage,*errorsize);
 	*errorcode=(currentcur)?currentcur->errorNumber():0;
 	*liveconnection=true;
 }
@@ -1678,7 +1660,7 @@ uint64_t routercursor::rowCount() {
 	return (currentcur)?currentcur->rowCount():0;
 }
 
-uint64_t routercursor::affectedRows() {
+uint64_t routercursor::getAffectedRows() {
 	return (currentcur)?currentcur->affectedRows():0;
 }
 
@@ -1698,7 +1680,7 @@ const char *routercursor::getColumnTypeName(uint32_t col) {
 	return (currentcur)?currentcur->getColumnType(col):NULL;
 }
 
-uint32_t routercursor::getColumnLength(uint32_t col) {
+uint32_t routercursor::getColumnSize(uint32_t col) {
 	return (currentcur)?currentcur->getColumnLength(col):0;
 }
 
@@ -1768,13 +1750,13 @@ bool routercursor::fetchRow(bool *error) {
 }
 
 void routercursor::getField(uint32_t col,
-				const char **field, uint64_t *fieldlength,
-				bool *blob, bool *null) {
+				const char **field, uint64_t *fieldsize,
+				bool *lob, bool *null) {
 	const char	*fld=currentcur->getField(nextrow-1,col);
 	uint32_t	len=currentcur->getFieldLength(nextrow-1,col);
 	if (len) {
 		*field=fld;
-		*fieldlength=len;
+		*fieldsize=len;
 	} else {
 		*null=true;
 	}

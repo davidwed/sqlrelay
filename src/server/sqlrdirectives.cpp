@@ -4,8 +4,6 @@
 #include <sqlrelay/sqlrserver.h>
 
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -15,92 +13,34 @@
 	}
 #endif
 
-class sqlrdirectiveplugin {
-	public:
-		sqlrdirective	*dr;
-		dynamiclib	*dl;
-		const char	*module;
-};
-
-class sqlrdirectivesprivate {
-	friend class sqlrdirectives;
-	private:
-		sqlrservercontroller	*_cont;
-		
-		bool	_debug;
-
-		singlylinkedlist< sqlrdirectiveplugin * >	_dlist;
-};
-
-sqlrdirectives::sqlrdirectives(sqlrservercontroller *cont) {
-	debugFunction();
-	pvt=new sqlrdirectivesprivate;
-	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugDirectives();
+sqlrdirectives::sqlrdirectives(sqlrservercontroller *cont) :
+						sqlrservermodules(cont) {
+	pvt=NULL;
+	setDebug(cont->getConfig()->getDebugDirectives());
 }
 
 sqlrdirectives::~sqlrdirectives() {
-	debugFunction();
-	unload();
-	delete pvt;
 }
 
-bool sqlrdirectives::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the directive list
-	for (domnode *directive=parameters->getFirstTagChild();
-				!directive->isNullNode();
-				directive=directive->getNextTagSibling()) {
-
-		// load directive
-		loadDirective(directive);
-	}
-
-	return true;
-}
-
-void sqlrdirectives::unload() {
-	debugFunction();
-	for (listnode< sqlrdirectiveplugin * > *node=
-						pvt->_dlist.getFirst();
-						node; node=node->getNext()) {
-		sqlrdirectiveplugin	*sqlt=node->getValue();
-		delete sqlt->dr;
-		delete sqlt->dl;
-		delete sqlt;
-	}
-	pvt->_dlist.clear();
-}
-
-void sqlrdirectives::loadDirective(domnode *directive) {
-	debugFunction();
+void sqlrdirectives::loadModule(domnode *parameters) {
 
 	// ignore non-directives
-	if (charstring::compare(directive->getName(),"directive")) {
+	if (charstring::compare(parameters->getName(),"directive")) {
 		return;
 	}
 
-	// get the directive name
-	const char	*module=directive->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=directive->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	if (pvt->_debug) {
-		stdoutput.printf("loading directive module: %s\n",module);
-	}
+	debugWrite("loading directive module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the directive module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("directive_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -119,10 +59,8 @@ void sqlrdirectives::loadDirective(domnode *directive) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrdirective_")->append(module);
 	sqlrdirective *(*newDirective)(sqlrservercontroller *,
-						sqlrdirectives *,
 						domnode *)=
 		(sqlrdirective *(*)(sqlrservercontroller *,
-						sqlrdirectives *,
 						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newDirective) {
@@ -134,7 +72,7 @@ void sqlrdirectives::loadDirective(domnode *directive) {
 		delete dl;
 		return;
 	}
-	sqlrdirective	*dr=(*newDirective)(pvt->_cont,this,directive);
+	sqlrdirective	*dr=(*newDirective)(cont,parameters);
 
 #else
 	dynamiclib	*dl=NULL;
@@ -145,40 +83,29 @@ void sqlrdirectives::loadDirective(domnode *directive) {
 	}
 #endif
 
-	if (pvt->_debug) {
-		stdoutput.printf("success\n");
-	}
+	debugWrite("success");
 
 	// add the plugin to the list
-	sqlrdirectiveplugin	*sqltp=new sqlrdirectiveplugin;
-	sqltp->dr=dr;
-	sqltp->dl=dl;
-	sqltp->module=module;
-	pvt->_dlist.append(sqltp);
+	sqlrmoduleplugin	*sqlrmp=new sqlrmoduleplugin;
+	sqlrmp->m=dr;
+	sqlrmp->dl=dl;
+	sqlrmp->module=module;
+	blist.append(sqlrmp);
 }
 
 bool sqlrdirectives::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query) {
-	debugFunction();
-
 	if (!query) {
 		return false;
 	}
-
-	for (listnode< sqlrdirectiveplugin * > *node=
-						pvt->_dlist.getFirst();
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
 
-		if (pvt->_debug) {
-			stdoutput.printf("\nrunning directive:  %s...\n\n",
-						node->getValue()->module);
-		}
+		debugWrite("running directive: %s...",node->getValue()->module);
 
-		sqlrdirective	*dr=node->getValue()->dr;
-
-		bool	success=dr->run(sqlrcon,sqlrcur,query);
-		if (!success) {
+		sqlrdirective	*dr=(sqlrdirective *)node->getValue()->m;
+		if (!dr->run(sqlrcon,sqlrcur,query)) {
 			return false;
 		}
 	}

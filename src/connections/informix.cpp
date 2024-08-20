@@ -20,7 +20,7 @@
 
 struct informixcolumn {
 	char		*name;
-	SQLSMALLINT	namelength;
+	SQLSMALLINT	namesize;
 	SQLLEN		type;
 	SQLLEN		precision;
 	SQLLEN		scale;
@@ -33,19 +33,19 @@ struct informixcolumn {
 	SQLLEN		binary;
 	SQLLEN		autoincrement;
 	char		table[4096];
-	uint16_t	tablelength;
+	uint16_t	tablesize;
 };
 
 struct datebind {
-	int16_t		*year;
-	int16_t		*month;
-	int16_t		*day;
-	int16_t		*hour;
-	int16_t		*minute;
-	int16_t		*second;
-	int32_t		*microsecond;
-	const char	**tz;
-	char		*buffer;
+	int16_t			*year;
+	int16_t			*month;
+	int16_t			*day;
+	int16_t			*hour;
+	int16_t			*minute;
+	int16_t			*second;
+	int32_t			*microsecond;
+	const char		**tz;
+	SQL_TIMESTAMP_STRUCT	buffer;
 };
 
 class informixconnection;
@@ -53,15 +53,15 @@ class informixconnection;
 class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 	friend class informixconnection;
 	public:
-			informixcursor(sqlrserverconnection *conn, uint16_t id);
-			~informixcursor();
+		informixcursor(sqlrserverconnection *conn, uint16_t id);
+		~informixcursor();
 	private:
 		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -86,8 +86,6 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						int32_t microsecond,
 						const char *tz,
 						bool isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		inputBindBlob(const char *variable,
 						uint16_t variablesize,
@@ -125,8 +123,6 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		outputBindBlob(const char *variable, 
 						uint16_t variablesize,
@@ -145,18 +141,18 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 							uint64_t charstoread,
 							uint64_t *charsread);
 		bool		executeQuery(const char *query,
-						uint32_t length);
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+						uint32_t size);
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
-		uint64_t	affectedRows();
+		uint64_t	getAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t i);
-		uint16_t	getColumnNameLength(uint32_t i);
+		uint16_t	getColumnNameSize(uint32_t i);
 		uint16_t	getColumnType(uint32_t i);
-		uint32_t	getColumnLength(uint32_t i);
+		uint32_t	getColumnSize(uint32_t i);
 		uint32_t	getColumnPrecision(uint32_t i);
 		uint32_t	getColumnScale(uint32_t i);
 		uint16_t	getColumnIsNullable(uint32_t i);
@@ -164,14 +160,14 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
 		const char	*getColumnTable(uint32_t i);
-		uint16_t	getColumnTableLength(uint32_t i);
+		uint16_t	getColumnTableSize(uint32_t i);
 		bool		noRowsToReturn();
 		bool		skipRow(bool *error);
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **fld,
-					uint64_t *fldlength,
-					bool *blob,
+					uint64_t *fldsize,
+					bool *lob,
 					bool *null);
 		void		nextRow();
 		bool		getLobFieldLength(uint32_t col,
@@ -193,15 +189,17 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 		SQLLEN		**indicator;
 		informixcolumn	*column;
 
-		uint16_t	maxbindcount;
-		SQLLEN		*lobbindsize;
-		datebind	**outdatebind;
-		char		**outlobbind;
-		SQLLEN 		*outlobbindlen;
-		int16_t		**outisnullptr;
-		SQLLEN		*outisnull;
-		SQLLEN		sqlnulldata;
-		BOOL		truevalue;
+		uint16_t		maxbindcount;
+		SQLLEN			*lobbindsize;
+		SQL_DATE_STRUCT		*indatebind;
+		SQL_TIMESTAMP_STRUCT	*intsbind;
+		datebind		**outdatebind;
+		char			**outlobbind;
+		SQLLEN			*outlobbindlen;
+		int16_t			**outisnullptr;
+		SQLLEN			*outisnull;
+		SQLLEN			sqlnulldata;
+		BOOL			truevalue;
 
 		uint64_t	rowgroupindex;
 		uint64_t	totalinrowgroup;
@@ -220,7 +218,7 @@ class SQLRSERVER_DLLSPEC informixcursor : public sqlrservercursor {
 class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 	friend class informixcursor;
 	public:
-			informixconnection(sqlrservercontroller *cont);
+		informixconnection(sqlrservercontroller *cont);
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error, const char **warning);
@@ -228,37 +226,36 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 		sqlrservercursor	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
-		int16_t	nullBindValue();
-		bool	bindValueIsNull(int16_t isnull);
-		bool	autoCommitOn();
-		bool	autoCommitOff();
+		int16_t	getNullBindValue();
+		bool	setAutoCommitOn();
+		bool	setAutoCommitOff();
 		bool	supportsTransactionBlocks();
-		bool	supportsAutoCommit();
 		bool	commit();
 		bool	rollback();
-		void	errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+		void	getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t	*errorcode,
 					bool *liveconnection);
 		bool	liveConnection(SQLINTEGER nativeerror,
 					const char *errorbuffer,
-					SQLSMALLINT errlength);
+					SQLSMALLINT errsize);
 		const char	*pingQuery();
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*dbHostNameQuery();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getDbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild,
-						uint16_t objecttypes);
+						uint16_t objecttypes,
+						bool currentschemaonly);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
 		const char	*setIsolationLevelQuery();
-		const char	*noopQuery();
-		const char	*bindFormat();
+		const char	*getNoopQuery();
+		const char	*getBindFormat();
 
 		SQLHENV		env;
 		SQLRETURN	erg;
@@ -274,9 +271,9 @@ class SQLRSERVER_DLLSPEC informixconnection : public sqlrserverconnection {
 
 		int32_t		maxoutbindlobsize;
 
-		const char	*identity;
-
 		char		dbversion[512];
+
+		stringbuffer	tablelistquery;
 
 		stringbuffer	errormsg;
 };
@@ -285,7 +282,6 @@ informixconnection::informixconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 
 	maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
-	identity=NULL;
 }
 
 void informixconnection::handleConnectString() {
@@ -308,21 +304,21 @@ void informixconnection::handleConnectString() {
 		dsn.append("Servername=")->append(servername);
 	}
 	if (!charstring::isNullOrEmpty(db)) {
-		if (dsn.getStringLength()) {
+		if (dsn.getSize()) {
 			dsn.append(";");
 		}
 		dsn.append("Database=")->append(db);
 	}
 	const char	*user=cont->getUser();
 	if (!charstring::isNullOrEmpty(user)) {
-		if (dsn.getStringLength()) {
+		if (dsn.getSize()) {
 			dsn.append(";");
 		}
 		dsn.append("LogonID=")->append(user);
 	}
 	const char	*pass=cont->getPassword();
 	if (!charstring::isNullOrEmpty(pass)) {
-		if (dsn.getStringLength()) {
+		if (dsn.getSize()) {
 			dsn.append(";");
 		}
 		dsn.append("pwd=")->append(pass);
@@ -341,7 +337,6 @@ void informixconnection::handleConnectString() {
 	if (maxoutbindlobsize<1) {
 		maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
 	}
-	identity=cont->getConnectStringValue("identity");
 }
 
 bool informixconnection::logIn(const char **error, const char **warning) {
@@ -405,7 +400,7 @@ bool informixconnection::logIn(const char **error, const char **warning) {
 	// connect to the database
 	erg=SQLDriverConnect(dbc,NULL,
 				(SQLCHAR *)dsn.getString(),
-				dsn.getStringLength(),
+				dsn.getSize(),
 				NULL,0,NULL,SQL_DRIVER_COMPLETE);
 	if (erg==SQL_SUCCESS_WITH_INFO) {
 		*warning=logInError(NULL);
@@ -437,11 +432,11 @@ const char *informixconnection::logInError(const char *errmsg) {
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
 	SQLCHAR		errorbuffer[1024];
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
-					errorbuffer,1024,&errlength);
-	errormessage.append(errorbuffer,errlength);
+					errorbuffer,1024,&errsize);
+	errormessage.append(errorbuffer,errsize);
 	return errormessage.getString();
 }
 
@@ -460,24 +455,17 @@ void informixconnection::logOut() {
 	SQLFreeHandle(SQL_HANDLE_ENV,env);
 }
 
-int16_t informixconnection::nullBindValue() {
+int16_t informixconnection::getNullBindValue() {
 	return SQL_NULL_DATA;
 }
 
-bool informixconnection::bindValueIsNull(int16_t isnull) {
-	if (isnull==SQL_NULL_DATA) {
-		return true;
-	}
-	return false;
-}
-
-bool informixconnection::autoCommitOn() {
+bool informixconnection::setAutoCommitOn() {
 	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_ON,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
 }
 
-bool informixconnection::autoCommitOff() {
+bool informixconnection::setAutoCommitOff() {
 	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_OFF,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
@@ -485,10 +473,6 @@ bool informixconnection::autoCommitOff() {
 
 bool informixconnection::supportsTransactionBlocks() {
 	return false;
-}
-
-bool informixconnection::supportsAutoCommit() {
-	return true;
 }
 
 bool informixconnection::commit() {
@@ -499,28 +483,28 @@ bool informixconnection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-void informixconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+void informixconnection::getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
-				(SQLCHAR *)errorbuffer,errorbufferlength,
-				&errlength);
+				(SQLCHAR *)errorbuffer,errorbuffersize,
+				&errsize);
 
 	// set return values
-	*errorlength=errlength;
+	*errorsize=errsize;
 	*errorcode=nativeerrnum;
-	*liveconnection=liveConnection(nativeerrnum,errorbuffer,errlength);
+	*liveconnection=liveConnection(nativeerrnum,errorbuffer,errsize);
 }
 
 bool informixconnection::liveConnection(SQLINTEGER nativeerrnum,
 					const char *errorbuffer,
-					SQLSMALLINT errlength) {
+					SQLSMALLINT errsize) {
 
 	// When the DB goes down, Informix reports:
 	// -11020: [Informix][Informix ODBC Driver]Communication link failure.
@@ -533,15 +517,15 @@ const char *informixconnection::pingQuery() {
 	return "select 1 from sysmaster:sysdual";
 }
 
-const char *informixconnection::identify() {
-	return (identity)?identity:"informix";
+const char *informixconnection::getDbType() {
+	return "informix";
 }
 
-const char *informixconnection::dbVersion() {
+const char *informixconnection::getDbVersion() {
 	return dbversion;
 }
 
-const char *informixconnection::dbHostNameQuery() {
+const char *informixconnection::getDbHostNameQuery() {
 	return "select dbinfo('dbhostname') from sysmaster:sysdual";
 	//return "select os_nodename from sysmaster:sysmachineinfo";
 }
@@ -564,28 +548,30 @@ const char *informixconnection::getDatabaseListQuery(bool wild) {
 }
 
 const char *informixconnection::getTableListQuery(bool wild,
-						uint16_t objecttypes) {
-	return (wild)?
-		"select distinct "
-		"	dbname as table_cat, "
-		"	owner as table_schem, "
-		"	tabname as table_name, "
-		"	'TABLE' as table_type, "
-		"	'' as remarks, "
-		"	'' as extra "
-		"from "
-		"	systables "
-		"where "
-		"	tabid > 99 "
-		"	and "
-		"	tabname like '%s' "
-		"	and "
-		"	tabtype in ('T','S','P','V') "
-		"order by "
-		"	dbname, "
-		"	owner, "
-		"	tabname":
+						uint16_t objecttypes,
+						bool currentschemaonly) {
 
+	stringbuffer	otypes;
+	otypes.append("	(");
+	if (objecttypes&DB_OBJECT_TABLE) {
+		otypes.append("	tabtype = 'T' or tabtype='E' ");
+	}
+	if (objecttypes&DB_OBJECT_VIEW) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	tabtype = 'V' ");
+	}
+	if (objecttypes&DB_OBJECT_SYNONYM) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	tabtype = 'S' or tabtype = 'P'");
+	}
+	otypes.append(") ");
+
+	tablelistquery.clear();
+	tablelistquery.append(
 		"select distinct "
 		"	dbname as table_cat, "
 		"	owner as table_schem, "
@@ -596,13 +582,30 @@ const char *informixconnection::getTableListQuery(bool wild,
 		"from "
 		"	systables "
 		"where "
-		"	tabid > 99 "
-		"	and "
-		"	tabtype in ('T','S','P','V') "
+		"	tabid > 99 ");
+	if (currentschemaonly) {
+		tablelistquery.append(
+			"	and "
+			"	upper(owner)=upper('");
+		tablelistquery.append(cont->getUser());
+		tablelistquery.append(
+			"') ");
+	}
+	tablelistquery.append(
+		"	and ");
+	tablelistquery.append(otypes.getString());
+	if (wild) {
+		tablelistquery.append(
+			"	and "
+			"	tabname like '%s' ");
+	}
+	tablelistquery.append(
 		"order by "
 		"	dbname, "
 		"	owner, "
-		"	tabname";
+		"	tabname");
+
+	return tablelistquery.getString();
 }
 
 const char *informixconnection::getColumnListQuery(
@@ -615,7 +618,7 @@ const char *informixconnection::getColumnListQuery(
 	// * for decimal and money:
 	//  * collength/256 is the precision
 	//  * collength mod 256 is the scale
-	// * the length of datetimes can vary widely depending on the interval
+	// * the size of datetimes can vary widely depending on the interval
 	//   but 8 is the max (I think)
 	// * text and byte types can store 2^31 bytes but
 	//   collength is given as 56
@@ -757,7 +760,7 @@ const char *informixconnection::getColumnListQuery(
 		"	syscolumns.colno";
 }
 
-const char *informixconnection::bindFormat() {
+const char *informixconnection::getBindFormat() {
 	return "?";
 }
 
@@ -779,7 +782,7 @@ const char *informixconnection::setIsolationLevelQuery() {
         return "set isolation %s";
 }
 
-const char *informixconnection::noopQuery() {
+const char *informixconnection::getNoopQuery() {
         return "noop";
 }
 
@@ -789,6 +792,8 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 	stmt=0;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	lobbindsize=new SQLLEN[maxbindcount];
+	indatebind=new SQL_DATE_STRUCT[maxbindcount];
+	intsbind=new SQL_TIMESTAMP_STRUCT[maxbindcount];
 	outdatebind=new datebind *[maxbindcount];
 	outlobbind=new char *[maxbindcount];
 	outlobbindlen=new SQLLEN[maxbindcount];
@@ -809,6 +814,8 @@ informixcursor::informixcursor(sqlrserverconnection *conn, uint16_t id) :
 
 informixcursor::~informixcursor() {
 	delete[] lobbindsize;
+	delete[] indatebind;
+	delete[] intsbind;
 	delete[] outdatebind;
 	delete[] outlobbind;
 	delete[] outlobbindlen;
@@ -832,10 +839,10 @@ void informixcursor::allocateResultSetBuffers(int32_t columncount) {
 		indicator=new SQLLEN *[columncount];
 		column=new informixcolumn[columncount];
 		uint32_t	fetchatonce=getFetchAtOnce();
-		int32_t		maxfieldlength=conn->cont->getMaxFieldLength();
+		int32_t		maxfieldsize=conn->cont->getMaxFieldSize();
 		for (int32_t i=0; i<columncount; i++) {
 			column[i].name=new char[4096];
-			field[i]=new char[fetchatonce*maxfieldlength];
+			field[i]=new char[fetchatonce*maxfieldsize];
 			loblength[i]=new SQLLEN[fetchatonce];
 			indicator[i]=new SQLLEN[fetchatonce];
 		}
@@ -894,7 +901,7 @@ bool informixcursor::close() {
 	return true;
 }
 
-bool informixcursor::prepareQuery(const char *query, uint32_t length) {
+bool informixcursor::prepareQuery(const char *query, uint32_t size) {
 
 	bindformaterror=false;
 
@@ -914,7 +921,7 @@ bool informixcursor::prepareQuery(const char *query, uint32_t length) {
 	}
 
 	// prepare the query
-	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
+	erg=SQLPrepare(stmt,(SQLCHAR *)query,size);
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -1019,8 +1026,6 @@ bool informixcursor::inputBind(const char *variable,
 					int32_t microsecond,
 					const char *tz,
 					bool isnegative,
-					char *buffer,
-					uint16_t buffersize,
 					int16_t *isnull) {
 
 	uint16_t	pos=charstring::convertToInteger(variable+1);
@@ -1034,7 +1039,7 @@ bool informixcursor::inputBind(const char *variable,
 
 	if (validdate && !validtime) {
 
-		SQL_DATE_STRUCT	*ts=(SQL_DATE_STRUCT *)buffer;
+		SQL_DATE_STRUCT	*ts=&(indatebind[pos-1]);
 		ts->year=year;
 		ts->month=month;
 		ts->day=day;
@@ -1046,13 +1051,13 @@ bool informixcursor::inputBind(const char *variable,
 				SQL_DATE,
 				0,
 				0,
-				buffer,
+				ts,
 				0,
 				NULL);
 
 	} else {
 
-		SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
+		SQL_TIMESTAMP_STRUCT	*ts=&(intsbind[pos-1]);
 		ts->year=year;
 		ts->month=month;
 		ts->day=day;
@@ -1068,7 +1073,7 @@ bool informixcursor::inputBind(const char *variable,
 				SQL_TIMESTAMP,
 				0,
 				0,
-				buffer,
+				ts,
 				0,
 				NULL);
 	}
@@ -1233,8 +1238,6 @@ bool informixcursor::outputBind(const char *variable,
 					int32_t *microsecond,
 					const char **tz,
 					bool *isnegative,
-					char *buffer,
-					uint16_t buffersize,
 					int16_t *isnull) {
 
 	uint16_t	pos=charstring::convertToInteger(variable+1);
@@ -1252,8 +1255,9 @@ bool informixcursor::outputBind(const char *variable,
 	db->second=second;
 	db->microsecond=microsecond;
 	db->tz=tz;
+
 	*isnegative=false;
-	db->buffer=buffer;
+
 	outdatebind[pos-1]=db;
 	outisnullptr[pos-1]=isnull;
 
@@ -1264,7 +1268,7 @@ bool informixcursor::outputBind(const char *variable,
 				SQL_TIMESTAMP,
 				0,
 				0,
-				buffer,
+				&(db->buffer),
 				0,
 				&(outisnull[pos-1])
 				);
@@ -1326,6 +1330,7 @@ bool informixcursor::outputBindClob(const char *variable,
 }
 
 bool informixcursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+	// FIXME: this code assumes that the lob characters are 1 byte long
 	if (outlobbindlen[index]>informixconn->maxoutbindlobsize) {
 		outlobbindlen[index]=informixconn->maxoutbindlobsize;
 	}
@@ -1337,6 +1342,7 @@ bool informixcursor::getLobOutputBindSegment(uint16_t index,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread) {
+	// FIXME: this code assumes that the lob characters are 1 byte long
 	uint64_t	len=outlobbindlen[index];
 	if (offset>len) {
 		return false;
@@ -1349,7 +1355,7 @@ bool informixcursor::getLobOutputBindSegment(uint16_t index,
 	return true;
 }
 
-bool informixcursor::executeQuery(const char *query, uint32_t length) {
+bool informixcursor::executeQuery(const char *query, uint32_t size) {
 
 	// initialize row counts
 	rowgroupindex=0;
@@ -1369,7 +1375,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-	checkForTempTable(query,length);
+	checkForTempTable(query,size);
 
 	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
@@ -1388,18 +1394,18 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 	// run through the columns
 	for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
+		if (conn->cont->getSendColumnInfo()) {
 
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
 					column[i].name,4096,
-					&(column[i].namelength),
+					&(column[i].namesize),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
-			// column length
+			// column size
 			// SQL_COLUMN_LENGTH isn't reliable in informix.  It
 			// usually returns -1 or 0.  Just copy the result of
 			// SQL_COLUMN_PRECISION below...
@@ -1411,7 +1417,7 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 				return false;
 			}
 
-			// informix doesn't support column length,
+			// informix doesn't support column size,
 			// so we'll just use the precision
 
 			// column precision
@@ -1466,12 +1472,12 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			erg=SQLColAttribute(stmt,i+1,
 				SQL_COLUMN_TABLE_NAME,
 				column[i].table,4096,
-				(SQLSMALLINT *)&(column[i].tablelength),
+				(SQLSMALLINT *)&(column[i].tablesize),
 				NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
-			column[i].tablelength=
+			column[i].tablesize=
 				charstring::getLength(column[i].table);
 		}
 
@@ -1479,12 +1485,12 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 			column[i].type==SQL_INFX_UDT_BLOB) {
 			erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
 					field[i],
-					conn->cont->getMaxFieldLength(),
+					conn->cont->getMaxFieldSize(),
 					indicator[i]);
 		} else {
 			erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 					field[i],
-					conn->cont->getMaxFieldLength(),
+					conn->cont->getMaxFieldSize(),
 					indicator[i]);
 		}
 		if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
@@ -1505,15 +1511,13 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
-			SQL_TIMESTAMP_STRUCT	*ts=
-				(SQL_TIMESTAMP_STRUCT *)db->buffer;
-			*(db->year)=ts->year;
-			*(db->month)=ts->month;
-			*(db->day)=ts->day;
-			*(db->hour)=ts->hour;
-			*(db->minute)=ts->minute;
-			*(db->second)=ts->second;
-			*(db->microsecond)=ts->fraction/1000;
+			*(db->year)=db->buffer.year;
+			*(db->month)=db->buffer.month;
+			*(db->day)=db->buffer.day;
+			*(db->hour)=db->buffer.hour;
+			*(db->minute)=db->buffer.minute;
+			*(db->second)=db->buffer.second;
+			*(db->microsecond)=db->buffer.fraction/1000;
 			*(db->tz)=NULL;
 		}
 		if (outisnullptr[i]) {
@@ -1524,19 +1528,19 @@ bool informixcursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void informixcursor::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void informixcursor::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::getLength(
+		*errorsize=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
-				errorbufferlength,
+				errorbuffersize,
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
-				*errorlength);
+				*errorsize);
 		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
 		*liveconnection=true;
 		return;
@@ -1544,22 +1548,22 @@ void informixcursor::errorMessage(char *errorbuffer,
 
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,state,&nativeerrnum,
-				(SQLCHAR *)errorbuffer,errorbufferlength,
-				&errlength);
+				(SQLCHAR *)errorbuffer,errorbuffersize,
+				&errsize);
 
 	// set return values
-	*errorlength=errlength;
+	*errorsize=errsize;
 	// leave it to informix to have negative numbers for error codes...
 	// the best we can do for now is turn it into a positive number
 	*errorcode=-nativeerrnum;
 	*liveconnection=informixconn->liveConnection(nativeerrnum,
-							errorbuffer,errlength);
+							errorbuffer,errsize);
 }
 
-uint64_t informixcursor::affectedRows() {
+uint64_t informixcursor::getAffectedRows() {
 	return affectedrows;
 }
 
@@ -1571,8 +1575,8 @@ const char *informixcursor::getColumnName(uint32_t i) {
 	return column[i].name;
 }
 
-uint16_t informixcursor::getColumnNameLength(uint32_t i) {
-	return column[i].namelength;
+uint16_t informixcursor::getColumnNameSize(uint32_t i) {
+	return column[i].namesize;
 }
 
 uint16_t informixcursor::getColumnType(uint32_t i) {
@@ -1673,8 +1677,8 @@ uint16_t informixcursor::getColumnType(uint32_t i) {
 	}
 }
 
-uint32_t informixcursor::getColumnLength(uint32_t i) {
-	// informix doesn't support column length,
+uint32_t informixcursor::getColumnSize(uint32_t i) {
+	// informix doesn't support column size,
 	// so we'll just use the precision
 	return column[i].precision;
 }
@@ -1714,8 +1718,8 @@ const char *informixcursor::getColumnTable(uint32_t i) {
 	return column[i].table;
 }
 
-uint16_t informixcursor::getColumnTableLength(uint32_t i) {
-	return column[i].tablelength;
+uint16_t informixcursor::getColumnTableSize(uint32_t i) {
+	return column[i].tablesize;
 }
 
 bool informixcursor::noRowsToReturn() {
@@ -1780,8 +1784,8 @@ bool informixcursor::fetchRow(bool *error) {
 }
 
 void informixcursor::getField(uint32_t col,
-				const char **fld, uint64_t *fldlength,
-				bool *blob, bool *null) {
+				const char **fld, uint64_t *fldsize,
+				bool *lob, bool *null) {
 
 	// handle NULLs
 	if (indicator[col][rowgroupindex]==SQL_NULL_DATA) {
@@ -1792,13 +1796,13 @@ void informixcursor::getField(uint32_t col,
 	// handle lobs
 	if (column[col].type==SQL_INFX_UDT_CLOB ||
 		column[col].type==SQL_INFX_UDT_BLOB) {
-		*blob=true;
+		*lob=true;
 		return;
 	}
 
 	// handle normal datatypes
-	*fld=&field[col][rowgroupindex*conn->cont->getMaxFieldLength()];
-	*fldlength=indicator[col][rowgroupindex];
+	*fld=&field[col][rowgroupindex*conn->cont->getMaxFieldSize()];
+	*fldsize=indicator[col][rowgroupindex];
 }
 
 void informixcursor::nextRow() {
@@ -1839,7 +1843,7 @@ bool informixcursor::getLobFieldSegment(uint32_t col,
 			((offset+charstoread)-loblength[col][rowgroupindex]);
 	}
 
-	// read a blob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
+	// read a lob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
 	uint64_t	totalbytesread=0;
 	SQLLEN		bytestoread=0;
 	uint64_t	remainingbytestoread=charstoread;

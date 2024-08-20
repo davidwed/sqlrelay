@@ -29,8 +29,8 @@
 class SQLRSERVER_DLLSPEC scaler {
 
 	public:
-			scaler();
-			~scaler();
+		scaler();
+		~scaler();
 		bool	initScaler(int argc, const char **argv);
 		void	loop();
 
@@ -258,8 +258,7 @@ bool scaler::initScaler(int argc, const char **argv) {
 			}
 
 			// write the error, if there was one
-			stderror.write(errorstr.getString(),
-					errorstr.getStringLength());
+			stderror.write(errorstr.getString(),errorstr.getSize());
 
 			// clean up
 			delete[] currentuser;

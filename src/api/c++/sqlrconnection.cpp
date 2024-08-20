@@ -619,6 +619,28 @@ bool sqlrconnection::openSession() {
 			pvt->_ucs.setSocketWriteBufferSize(65536);
 
 			pvt->_cs=&pvt->_ucs;
+
+		} else if (pvt->_debug) {
+
+			debugPreStart();
+			char	*err=error::getErrorString();
+			if (err) {
+				debugPrint("System error: ");
+				debugPrint(err);
+				debugPrint("\n");
+				delete[] err;
+			}
+			if (pvt->_usekrb && pvt->_gctx.getMajorStatus()) {
+				debugPrint("KRB error: ");
+				debugPrint(pvt->_gctx.
+						getMechanismMinorStatus());
+				debugPrint("\n");
+			} else if (pvt->_usetls && pvt->_tctx.getError()) {
+				debugPrint("TLS error: ");
+				debugPrint(pvt->_tctx.getErrorString());
+				debugPrint("\n");
+			}
+			debugPreEnd();
 		}
 	}
 
@@ -650,6 +672,28 @@ bool sqlrconnection::openSession() {
 			pvt->_ics.setNaglesAlgorithmEnabled(false);
 
 			pvt->_cs=&pvt->_ics;
+
+		} else if (pvt->_debug) {
+
+			debugPreStart();
+			char	*err=error::getErrorString();
+			if (err) {
+				debugPrint("System error: ");
+				debugPrint(err);
+				debugPrint("\n");
+				delete[] err;
+			}
+			if (pvt->_usekrb && pvt->_gctx.getMajorStatus()) {
+				debugPrint("KRB error: ");
+				debugPrint(pvt->_gctx.
+						getMechanismMinorStatus());
+				debugPrint("\n");
+			} else if (pvt->_usetls && pvt->_tctx.getError()) {
+				debugPrint("TLS error: ");
+				debugPrint(pvt->_tctx.getErrorString());
+				debugPrint("\n");
+			}
+			debugPreEnd();
 		}
 	}
 
@@ -926,7 +970,10 @@ bool sqlrconnection::reConfigureSockets() {
 
 void sqlrconnection::setConnectFailedError() {
 	if (pvt->_usekrb && pvt->_gctx.getMajorStatus()) {
-		setError(pvt->_gctx.getMechanismMinorStatus());
+		stringbuffer	err;
+		err.append("KRB error: ");
+		err.append(pvt->_gctx.getMechanismMinorStatus());
+		setError(err.getString());
 	} else if (pvt->_usetls && pvt->_tctx.getError()) {
 		stringbuffer	err;
 		err.append("TLS error: ");

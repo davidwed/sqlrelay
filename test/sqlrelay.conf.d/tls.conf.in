@@ -11,9 +11,11 @@
 				tlsvalidate="yes"
 				tlsca="@abs_top_builddir@/test/sqlrelay.conf.d/tls/ca.pem"/>
 		</listeners>
-		<users>
-			<user user="client.localdomain"/>
-		</users>
+		<auths>
+			<auth module="sqlrclient_userlist">
+				<user user="client.localdomain"/>
+			</auth>
+		</auths>
 		<connections>
                         <connection string="oracle_sid=(DESCRIPTION = (ADDRESS = (PROTOCOL = TCP)(HOST = oracle)(PORT = 1521)) (CONNECT_DATA = (SERVER = DEDICATED) (SERVICE_NAME = ora1)));user=@HOSTNAME@;password=testpassword"/>
 		</connections>

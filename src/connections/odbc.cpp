@@ -12,6 +12,13 @@
 #include <sqlucode.h>
 #include <sqltypes.h>
 
+// more gyrations to avoid macro redefinition warnings
+#undef PACKAGE_BUGREPORT
+#undef PACKAGE_NAME
+#undef PACKAGE_STRING
+#undef PACKAGE_TARNAME
+#undef PACKAGE_VERSION
+
 // note that sqlrserver.h must be included after sqltypes.h to
 // get around a problem with CHAR/xmlChar in gnome-xml
 #include <sqlrelay/sqlrserver.h>
@@ -38,10 +45,10 @@
 
 struct odbccolumn {
 	char		name[4096];
-	uint16_t	namelength;
+	uint16_t	namesize;
 #if (ODBCVER >= 0x0300) && defined(SQLCOLATTRIBUTE_SQLLEN)
 	SQLLEN		type;
-	SQLLEN		length;
+	SQLLEN		size;
 	SQLLEN		precision;
 	SQLLEN		scale;
 	SQLLEN		nullable;
@@ -49,7 +56,7 @@ struct odbccolumn {
 	SQLLEN		autoincrement;
 #else
 	SQLINTEGER	type;
-	SQLINTEGER	length;
+	SQLINTEGER	size;
 	SQLINTEGER	precision;
 	SQLINTEGER	scale;
 	SQLINTEGER	nullable;
@@ -57,19 +64,19 @@ struct odbccolumn {
 	SQLINTEGER	autoincrement;
 #endif
 	char		table[4096];
-	uint16_t	tablelength;
+	uint16_t	tablesize;
 };
 
 struct datebind {
-	int16_t		*year;
-	int16_t		*month;
-	int16_t		*day;
-	int16_t		*hour;
-	int16_t		*minute;
-	int16_t		*second;
-	int32_t		*microsecond;
-	const char	**tz;
-	char		*buffer;
+	int16_t			*year;
+	int16_t			*month;
+	int16_t			*day;
+	int16_t			*hour;
+	int16_t			*minute;
+	int16_t			*second;
+	int32_t			*microsecond;
+	const char		**tz;
+	SQL_TIMESTAMP_STRUCT	buffer;
 };
 
 struct charbind {
@@ -82,13 +89,12 @@ class odbcconnection;
 class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 	friend class odbcconnection;
 	private:
-				odbccursor(sqlrserverconnection *conn,
-							uint16_t id);
-				~odbccursor();
+		odbccursor(sqlrserverconnection *conn, uint16_t id);
+		~odbccursor();
 		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		bool		allocateStatementHandle();
 		void		initializeColCounts();
 		void		initializeRowCounts();
@@ -116,8 +122,6 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						int32_t microsecond,
 						const char *tz,
 						bool isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		inputBindBlob(const char *variable,
 						uint16_t variablesize,
@@ -150,8 +154,6 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		inputOutputBind(const char *variable, 
 						uint16_t variablesize,
@@ -179,27 +181,24 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
-		int16_t		nonNullBindValue();
-		int16_t		nullBindValue();
-		bool		bindValueIsNull(uint16_t isnull);
+		int16_t		getNonNullBindValue();
+		int16_t		getNullBindValue();
 		bool		executeQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		bool		handleColumns(bool getcolumninfo,
 						bool bindcolumns);
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
-		uint64_t	affectedRows();
+		uint64_t	getAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t i);
-		uint16_t	getColumnNameLength(uint32_t i);
+		uint16_t	getColumnNameSize(uint32_t i);
 		uint16_t	getColumnType(uint32_t i);
-		uint32_t	getColumnLength(uint32_t i);
+		uint32_t	getColumnSize(uint32_t i);
 		uint32_t	getColumnPrecision(uint32_t i);
 		uint32_t	getColumnScale(uint32_t i);
 		uint16_t	getColumnIsNullable(uint32_t i);
@@ -207,16 +206,15 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
 		const char	*getColumnTable(uint32_t i);
-		uint16_t	getColumnTableLength(uint32_t i);
+		uint16_t	getColumnTableSize(uint32_t i);
 		bool		noRowsToReturn();
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
+					uint64_t *fieldsize,
+					bool *lob,
 					bool *null);
-		bool		getLobFieldLength(uint32_t col,
-							uint64_t *length);
+		bool		getLobFieldLength(uint32_t col, uint64_t *size);
 		bool		getLobFieldSegment(uint32_t col,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
@@ -256,21 +254,24 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 		#endif
 		odbccolumn 	*column;
 
-		uint16_t	maxbindcount;
-		datebind	**outdatebind;
-		charbind	**outcharbind;
-		int16_t		**outisnullptr;
-		datebind	**inoutdatebind;
-		charbind	**inoutcharbind;
-		int16_t		**inoutisnullptr;
+		uint16_t		maxbindcount;
+		SQL_DATE_STRUCT		*indatebind;
+		SQL_TIME_STRUCT		*intimebind;
+		SQL_TIMESTAMP_STRUCT	*intsbind;
+		datebind		**outdatebind;
+		charbind		**outcharbind;
+		int16_t			**outisnullptr;
+		datebind		**inoutdatebind;
+		charbind		**inoutcharbind;
+		int16_t			**inoutisnullptr;
 		#ifdef SQLBINDPARAMETER_SQLLEN
-		SQLLEN		*outisnull;
-		SQLLEN		*inoutisnull;
-		SQLLEN		sqlnulldata;
+		SQLLEN			*outisnull;
+		SQLLEN			*inoutisnull;
+		SQLLEN			sqlnulldata;
 		#else
-		SQLINTEGER	*outisnull;
-		SQLINTEGER	*inoutisnull;
-		SQLINTEGER	sqlnulldata;
+		SQLINTEGER		*outisnull;
+		SQLINTEGER		*inoutisnull;
+		SQLINTEGER		sqlnulldata;
 		#endif
 
 		bool		bindformaterror;
@@ -295,8 +296,8 @@ class SQLRSERVER_DLLSPEC odbccursor : public sqlrservercursor {
 class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 	friend class odbccursor;
 	public:
-			odbcconnection(sqlrservercontroller *cont);
-			~odbcconnection();
+		odbcconnection(sqlrservercontroller *cont);
+		~odbcconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
@@ -313,26 +314,35 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 		#if (ODBCVER>=0x0300)
-		bool		autoCommitOn();
-		bool		autoCommitOff();
-		bool		supportsAutoCommit();
+		bool		setAutoCommitOn();
+		bool		setAutoCommitOff();
 		const char	*beginTransactionQuery();
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		#endif
 		bool		isLiveConnection(SQLCHAR *state);
 		bool		ping();
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*bindFormat();
-		const char	*nextvalFormat();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getBindFormat();
+		const char	*getNextvalFormat();
 		const char	*getLastInsertIdQuery();
 		bool		getListsByApiCalls();
+		sqlrserverlistformat_t	getNativeDatabaseListFormat();
+		sqlrserverlistformat_t	getNativeSchemaListFormat();
+		sqlrserverlistformat_t	getNativeTableListFormat();
+		sqlrserverlistformat_t	getNativeTableTypeListFormat();
+		sqlrserverlistformat_t	getNativeColumnListFormat();
+		sqlrserverlistformat_t	getNativePrimaryKeyListFormat();
+		sqlrserverlistformat_t	getNativeKeyAndIndexListFormat();
+		sqlrserverlistformat_t	getNativeProcedureParameterListFormat();
+		sqlrserverlistformat_t	getNativeTypeInfoListFormat();
+		sqlrserverlistformat_t	getNativeProcedureListFormat();
 		bool		getDatabaseList(sqlrservercursor *cursor,
 						const char *wild);
 		bool		getSchemaList(sqlrservercursor *cursor,
@@ -352,7 +362,7 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		bool		getKeyAndIndexList(sqlrservercursor *cursor,
 						const char *table,
 						const char *wild);
-		bool		getProcedureBindAndColumnList(
+		bool		getProcedureParameterList(
 						sqlrservercursor *cursor,
 						const char *procedure,
 						const char *wild);
@@ -365,8 +375,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		char		*getCurrentDatabase();
 		char		*getCurrentSchema();
 		bool		setIsolationLevel(const char *isolevel);
-		const char	*dbHostNameQuery();
-		const char	*dbIpAddressQuery();
+		const char	*getDbHostNameQuery();
+		const char	*getDbIpAddressQuery();
 
 
 		SQLRETURN	erg;
@@ -380,7 +390,6 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		const char	*db;
 		const char	*trace;
 		const char	*tracefile;
-		const char	*identity;
 		const char	*odbcversion;
 		const char	*lastinsertidquery;
 		bool		mars;
@@ -398,8 +407,8 @@ class SQLRSERVER_DLLSPEC odbcconnection : public sqlrserverconnection {
 		SQLSMALLINT	fractionscale;
 		bool		supportsfraction;
 		bool		timestampfortime;
-		uint32_t	maxallowedvarcharbindlength;
-		uint32_t	maxvarcharbindlength;
+		uint32_t	maxallowedvarcharbindsize;
+		uint32_t	maxvarcharbindsize;
 		SQLINTEGER	*columninfonotvalidyeterror;
 		bool		sqltypedatetosqlcbinary;
 		bool		fetchlobsasstrings;
@@ -471,7 +480,7 @@ size_t len(const byte_t *str, const char *encoding) {
 }
 
 // returns number of bytes in the (null-terminated) string
-size_t size(const byte_t *str, const char *encoding) {
+size_t stringSize(const byte_t *str, const char *encoding) {
 
 	const byte_t	*ptr=str;
 	size_t		res=0;
@@ -601,7 +610,7 @@ byte_t *convertCharset(const byte_t *inbuf,
 				const char *inenc,
 				const char *outenc,
 				char **error) {
-	return convertCharset(inbuf,size(inbuf,inenc),inenc,outenc,error);
+	return convertCharset(inbuf,stringSize(inbuf,inenc),inenc,outenc,error);
 }
 #endif
 
@@ -614,7 +623,6 @@ odbcconnection::odbcconnection(sqlrservercontroller *cont) :
 	db=NULL;
 	trace=NULL;
 	tracefile=NULL;
-	identity=NULL;
 	odbcversion=NULL;
 	lastinsertidquery=NULL;
 	mars=false;
@@ -641,8 +649,6 @@ void odbcconnection::handleConnectString() {
 
 	trace=cont->getConnectStringValue("trace");
 	tracefile=cont->getConnectStringValue("tracefile");
-
-	identity=cont->getConnectStringValue("identity");
 
 	odbcversion=cont->getConnectStringValue("odbcversion");
 
@@ -876,8 +882,8 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 	fractionscale=9;
 	supportsfraction=true;
 	timestampfortime=true;
-	maxallowedvarcharbindlength=0;
-	maxvarcharbindlength=0;
+	maxallowedvarcharbindsize=0;
+	maxvarcharbindsize=0;
 	columninfonotvalidyeterror=NULL;
 	sqltypedatetosqlcbinary=true;
 	fetchlobsasstrings=false;
@@ -903,8 +909,8 @@ bool odbcconnection::logIn(const char **error, const char **warning) {
 		// However, if you send a valuesize > 4000 characters during
 		// a bind, then something in the chain doesn't like it.  To
 		// work around this, you have to send 0.  Go figure...
-		maxallowedvarcharbindlength=4000;
-		maxvarcharbindlength=0;
+		maxallowedvarcharbindsize=4000;
+		maxvarcharbindsize=0;
 
 		// With MS SQL Server, there are various cases where column
 		// metadata can't be fetched until post-execute.  For example:
@@ -992,7 +998,8 @@ char *odbcconnection::traceFileName(const char *tracefilenameformat) {
 
 	char	*hostname=sys::getHostName();
 
-	size_t	tracefilenamebuffersize=charstring::getLength(tracefilenameformat);
+	size_t	tracefilenamebuffersize=charstring::getLength(
+							tracefilenameformat);
 	tracefilenamebuffersize+=charstring::getIntegerLength((int64_t)pid);
 	tracefilenamebuffersize+=charstring::getIntegerLength((int64_t)now);
 	tracefilenamebuffersize+=charstring::getLength(hostname);
@@ -1131,15 +1138,15 @@ const char *odbcconnection::logInError(const char *errmsg) {
 	SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 	SQLINTEGER	nativeerrnum;
 	SQLCHAR		errorbuffer[1024];
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	bytestring::zero(state,sizeof(state));
 	bytestring::zero(errorbuffer,sizeof(errorbuffer));
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
-				errorbuffer,sizeof(errorbuffer),&errlength);
+				errorbuffer,sizeof(errorbuffer),&errsize);
 
-	errormessage.append(errorbuffer,errlength);
+	errormessage.append(errorbuffer,errsize);
 	return errormessage.getString();
 }
 
@@ -1168,11 +1175,11 @@ bool odbcconnection::ping() {
 	return true;
 }
 
-const char *odbcconnection::identify() {
-	return (identity)?identity:"odbc";
+const char *odbcconnection::getDbType() {
+	return "odbc";
 }
 
-const char *odbcconnection::dbVersion() {
+const char *odbcconnection::getDbVersion() {
 	SQLSMALLINT	dbversionlen;
 	SQLGetInfo(dbc,SQL_DBMS_VER,
 			(SQLPOINTER)dbversion,
@@ -1181,12 +1188,12 @@ const char *odbcconnection::dbVersion() {
 	return dbversion;
 }
 
-const char *odbcconnection::bindFormat() {
+const char *odbcconnection::getBindFormat() {
 	// FIXME: not true for all db's
 	return "?";
 }
 
-const char *odbcconnection::nextvalFormat() {
+const char *odbcconnection::getNextvalFormat() {
 	// FIXME: not true for all db's
 	return "";
 }
@@ -1197,6 +1204,46 @@ const char *odbcconnection::getLastInsertIdQuery() {
 
 bool odbcconnection::getListsByApiCalls() {
 	return true;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeDatabaseListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeSchemaListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeTableListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeTableTypeListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeColumnListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativePrimaryKeyListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeKeyAndIndexListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeProcedureParameterListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeTypeInfoListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
+}
+
+sqlrserverlistformat_t odbcconnection::getNativeProcedureListFormat() {
+	return SQLRSERVERLISTFORMAT_ODBC;
 }
 
 bool odbcconnection::getDatabaseList(sqlrservercursor *cursor,
@@ -1603,7 +1650,7 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 		accuracy=SQL_ENSURE;
 	}
 
-	// get the primary key list
+	// get the key and index list
 	erg=SQLStatistics(odbccur->stmt,
 			(SQLCHAR *)catalog,SQL_NTS,
 			(SQLCHAR *)schema,SQL_NTS,
@@ -1616,7 +1663,7 @@ bool odbcconnection::getKeyAndIndexList(sqlrservercursor *cursor,
 	return (retval)?odbccur->handleColumns(true,true):false;
 }
 
-bool odbcconnection::getProcedureBindAndColumnList(
+bool odbcconnection::getProcedureParameterList(
 					sqlrservercursor *cursor,
 					const char *procedure,
 					const char *wild) {
@@ -1963,7 +2010,7 @@ char *odbcconnection::getCurrentSchema() {
 }
 
 #if (ODBCVER >= 0x0300)
-bool odbcconnection::autoCommitOn() {
+bool odbcconnection::setAutoCommitOn() {
 	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
 	cont->closeAllResultSets();
 	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
@@ -1972,17 +2019,13 @@ bool odbcconnection::autoCommitOn() {
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
-bool odbcconnection::autoCommitOff() {
+bool odbcconnection::setAutoCommitOff() {
 	// FIXME: I'm not sure this is necessary for non-sqlserver/sap/sybase
 	cont->closeAllResultSets();
 	erg=SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_OFF,
 				sizeof(SQLINTEGER));
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
-}
-
-bool odbcconnection::supportsAutoCommit() {
-	return true;
 }
 
 const char *odbcconnection::beginTransactionQuery() {
@@ -2001,23 +2044,23 @@ bool odbcconnection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-void odbcconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void odbcconnection::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	bytestring::zero(state,sizeof(state));
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
-				(SQLCHAR *)errorbuffer,errorbufferlength,
-				&errlength);
+				(SQLCHAR *)errorbuffer,errorbuffersize,
+				&errsize);
 
 	// set return values
-	*errorlength=errlength;
+	*errorsize=errsize;
 	*errorcode=nativeerrnum;
 	*liveconnection=isLiveConnection(state);
 }
@@ -2035,12 +2078,12 @@ bool odbcconnection::setIsolationLevel(const char *isolevel) {
 	return true;
 }
 
-const char *odbcconnection::dbHostNameQuery() {
+const char *odbcconnection::getDbHostNameQuery() {
 	// FIXME: only works with MS SQL Server
 	return "SELECT cast(@@SERVERNAME as varchar(64))";
 }
 
-const char *odbcconnection::dbIpAddressQuery() {
+const char *odbcconnection::getDbIpAddressQuery() {
 	// FIXME: only works with MS SQL Server
 	return "SELECT CAST(SERVERPROPERTY('ComputerNamePhysicalNetBIOS') as varchar(64))";
 }
@@ -2050,6 +2093,9 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 	odbcconn=(odbcconnection *)conn;
 	stmt=NULL;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
+	indatebind=new SQL_DATE_STRUCT[maxbindcount];
+	intimebind=new SQL_TIME_STRUCT[maxbindcount];
+	intsbind=new SQL_TIMESTAMP_STRUCT[maxbindcount];
 	outdatebind=new datebind *[maxbindcount];
 	outcharbind=new charbind *[maxbindcount];
 	outisnullptr=new int16_t *[maxbindcount];
@@ -2084,6 +2130,9 @@ odbccursor::odbccursor(sqlrserverconnection *conn, uint16_t id) :
 }
 
 odbccursor::~odbccursor() {
+	delete[] indatebind;
+	delete[] intimebind;
+	delete[] intsbind;
 	delete[] outdatebind;
 	delete[] outcharbind;
 	delete[] outisnullptr;
@@ -2116,10 +2165,10 @@ void odbccursor::allocateResultSetBuffers(int32_t columncount) {
 		loblength=new SQLINTEGER[columncount];
 		indicator=new SQLINTEGER[columncount];
 		#endif
-		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
 		column=new odbccolumn[columncount];
 		for (int32_t i=0; i<columncount; i++) {
-			field[i]=new char[maxfieldlength];
+			field[i]=new char[maxfieldsize];
 		}
 	}
 }
@@ -2137,7 +2186,7 @@ void odbccursor::deallocateResultSetBuffers() {
 	}
 }
 
-bool odbccursor::prepareQuery(const char *query, uint32_t length) {
+bool odbccursor::prepareQuery(const char *query, uint32_t size) {
 
 	bindformaterror=false;
 
@@ -2179,7 +2228,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 
 		char	*err=NULL;
 		byte_t	*queryucs=convertCharset((const byte_t *)query,
-							length,
+							size,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							&err);
@@ -2195,7 +2244,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 		if (getExecuteDirect()) {
 			return true;
 		}
-		erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
+		erg=SQLPrepare(stmt,(SQLCHAR *)query,size);
 	#ifdef HAVE_SQLCONNECTW
 	}
 	#endif
@@ -2237,7 +2286,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			ucsinbindstrings.clear();
 
 			byte_t *queryucs=convertCharset((const byte_t *)query,
-							length,
+							size,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							NULL);
@@ -2245,7 +2294,7 @@ bool odbccursor::prepareQuery(const char *query, uint32_t length) {
 			delete[] queryucs;
 		} else {
 		#endif
-			erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
+			erg=SQLPrepare(stmt,(SQLCHAR *)query,size);
 		#ifdef HAVE_SQLCONNECTW
 		}
 		#endif
@@ -2297,10 +2346,10 @@ bool odbccursor::inputBind(const char *variable,
 		//			1,		// in characters
 		//			0,
 		//			val,
-		//			bufferlength,	// in bytes
+		//			buffersize,	// in bytes
 		//			&sqlnulldata);
 		//
-		// (code to set val and bufferlength used to be above this if)
+		// (code to set val and buffersize used to be above this if)
 		// (see #975 and the next "see #975" comment below
 		// for why there was a 1 for the 6th (ColumnSize) parameter)
 		//
@@ -2308,7 +2357,7 @@ bool odbccursor::inputBind(const char *variable,
 		// other versions, and other drivers) the above fails.
 		//
 		// It's not exactly clear what fails.  It's experimentally
-		// verifiable that, in this case, val="" and bufferlength=0.
+		// verifiable that, in this case, val="" and buffersize=0.
 		// Somehow though, val gets interpreted as "*".
 		//
 		// It's also seemingly random what works.  Eg.
@@ -2369,7 +2418,7 @@ bool odbccursor::inputBind(const char *variable,
 		SQLPOINTER	val=NULL;
 		SQLSMALLINT	valtype=SQL_C_CHAR;
 		SQLSMALLINT	paramtype=SQL_CHAR;
-		SQLLEN		bufferlength=valuesize;
+		SQLLEN		buffersize=valuesize;
 		#ifdef HAVE_SQLCONNECTW
 		if (odbcconn->unicode) {
 
@@ -2386,7 +2435,7 @@ bool odbccursor::inputBind(const char *variable,
 				return false;
 			}
 			valuesize=len(valueucs,encoding);
-			bufferlength=size(valueucs,encoding);
+			buffersize=stringSize(valueucs,encoding);
 			ucsinbindstrings.append(valueucs);
 			val=(SQLPOINTER)valueucs;
 			valtype=SQL_C_WCHAR;
@@ -2425,9 +2474,9 @@ bool odbccursor::inputBind(const char *variable,
 			// ParameterType of SQL_CHAR.  Using SQL_VARCHAR
 			// instead might be another solution to this problem.
 			valuesize=1;
-		} else if (odbcconn->maxallowedvarcharbindlength &&
-			valuesize>odbcconn->maxallowedvarcharbindlength) {
-			valuesize=odbcconn->maxvarcharbindlength;
+		} else if (odbcconn->maxallowedvarcharbindsize &&
+			valuesize>odbcconn->maxallowedvarcharbindsize) {
+			valuesize=odbcconn->maxvarcharbindsize;
 		}
 
 		erg=SQLBindParameter(stmt,
@@ -2438,7 +2487,7 @@ bool odbccursor::inputBind(const char *variable,
 				valuesize,	// in characters
 				0,
 				val,
-				bufferlength,	// in bytes
+				buffersize,	// in bytes
 				NULL);
 	}
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
@@ -2503,8 +2552,6 @@ bool odbccursor::inputBind(const char *variable,
 				int32_t microsecond,
 				const char *tz,
 				bool isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 
 	uint16_t	pos=charstring::convertToInteger(variable+1);
@@ -2518,7 +2565,7 @@ bool odbccursor::inputBind(const char *variable,
 
 	if (validdate && !validtime) {
 
-		SQL_DATE_STRUCT	*ts=(SQL_DATE_STRUCT *)buffer;
+		SQL_DATE_STRUCT	*ts=&(indatebind[pos-1]);
 		ts->year=year;
 		ts->month=month;
 		ts->day=day;
@@ -2530,13 +2577,13 @@ bool odbccursor::inputBind(const char *variable,
 				SQL_DATE,
 				0,
 				0,
-				buffer,
+				ts,
 				0,
 				NULL);
 
 	} else if (!validdate && validtime && !odbcconn->timestampfortime) {
 
-		SQL_TIME_STRUCT	*ts=(SQL_TIME_STRUCT *)buffer;
+		SQL_TIME_STRUCT	*ts=&(intimebind[pos-1]);
 		ts->hour=hour;
 		ts->minute=minute;
 		ts->second=second;
@@ -2548,13 +2595,13 @@ bool odbccursor::inputBind(const char *variable,
 				SQL_TIME,
 				0,
 				odbcconn->fractionscale,
-				buffer,
+				ts,
 				0,
 				NULL);
 
 	} else {
 
-		SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
+		SQL_TIMESTAMP_STRUCT	*ts=&(intsbind[pos-1]);
 		ts->year=year;
 		ts->month=month;
 		ts->day=day;
@@ -2585,7 +2632,7 @@ bool odbccursor::inputBind(const char *variable,
 				SQL_TIMESTAMP,
 				0,
 				odbcconn->fractionscale,
-				buffer,
+				ts,
 				0,
 				NULL);
 	}
@@ -2641,12 +2688,12 @@ bool odbccursor::outputBind(const char *variable,
 		return false;
 	}
 
-	SQLLEN		bufferlength=valuesize;
+	SQLLEN		buffersize=valuesize;
 
-	if (odbcconn->maxallowedvarcharbindlength &&
-		valuesize>odbcconn->maxallowedvarcharbindlength) {
-		valuesize=odbcconn->maxvarcharbindlength;
-		// FIXME: should bufferlength also be reduced here
+	if (odbcconn->maxallowedvarcharbindsize &&
+		valuesize>odbcconn->maxallowedvarcharbindsize) {
+		valuesize=odbcconn->maxvarcharbindsize;
+		// FIXME: should buffersize also be reduced here
 	}
 
 	charbind	*cb=new charbind;
@@ -2668,7 +2715,7 @@ bool odbccursor::outputBind(const char *variable,
 				valuesize,		// in characters
 				0,
 				(SQLPOINTER)value,
-				bufferlength,		// in bytes
+				buffersize,		// in bytes
 				&(outisnull[pos-1]));
 
 	} else {
@@ -2682,7 +2729,7 @@ bool odbccursor::outputBind(const char *variable,
 				valuesize,		// in characters
 				0,
 				(SQLPOINTER)value,
-				bufferlength,		// in bytes
+				buffersize,		// in bytes
 				&(outisnull[pos-1]));
 
 	#ifdef HAVE_SQLCONNECTW
@@ -2765,8 +2812,6 @@ bool odbccursor::outputBind(const char *variable,
 				int32_t *microsecond,
 				const char **tz,
 				bool *isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 
 	uint16_t	pos=charstring::convertToInteger(variable+1);
@@ -2784,8 +2829,8 @@ bool odbccursor::outputBind(const char *variable,
 	db->second=second;
 	db->microsecond=microsecond;
 	db->tz=tz;
+
 	*isnegative=false;
-	db->buffer=buffer;
 
 	outdatebind[pos-1]=db;
 	outcharbind[pos-1]=NULL;
@@ -2800,9 +2845,10 @@ bool odbccursor::outputBind(const char *variable,
 				// like an input/output bind?
 				0,
 				0,
-				buffer,
+				&(db->buffer),
 				0,
-				&(outisnull[pos-1]));
+				&(outisnull[pos-1])
+				);
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -2820,23 +2866,24 @@ bool odbccursor::inputOutputBind(const char *variable,
 
 	SQLSMALLINT	valtype=SQL_C_CHAR;
 	SQLSMALLINT	paramtype=SQL_CHAR;
-	SQLLEN		bufferlength=valuesize;
+	SQLLEN		buffersize=valuesize;
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
 
 		const char	*encoding=odbcconn->ncharencoding;
 		char	*err=NULL;
 		byte_t	*valueucs=convertCharset(
-					(const byte_t *)value,
-					size((const byte_t *)value,"UTF-8"),
-					"UTF-8",encoding,
-					&err);
+				(const byte_t *)value,
+				stringSize((const byte_t *)value,"UTF-8"),
+				"UTF-8",encoding,
+				&err);
 		if (err) {
 			delete[] valueucs;
 			setConvCharError("input-output bind",err);
 			return false;
 		}
-		size_t	sizetocopy=size(valueucs,encoding)+nullSize(encoding);
+		size_t	sizetocopy=stringSize(valueucs,encoding)+
+							nullSize(encoding);
 		if (sizetocopy<=valuesize) {
 			bytestring::copy(value,valueucs,sizetocopy);
 		} else {
@@ -2885,7 +2932,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				1,
 				0,
 				(SQLPOINTER)value,
-				bufferlength,
+				buffersize,
 				&(inoutisnull[pos-1]));
 	} else {
 
@@ -2897,10 +2944,10 @@ bool odbccursor::inputOutputBind(const char *variable,
 			// works with all ODBC-modes.  Hopefully it works with
 			// all drivers.
 			valuesize=1;
-		} else if (odbcconn->maxallowedvarcharbindlength &&
-			valuesize>odbcconn->maxallowedvarcharbindlength) {
-			valuesize=odbcconn->maxvarcharbindlength;
-			// FIXME: should bufferlength also be reduced here
+		} else if (odbcconn->maxallowedvarcharbindsize &&
+			valuesize>odbcconn->maxallowedvarcharbindsize) {
+			valuesize=odbcconn->maxvarcharbindsize;
+			// FIXME: should buffersize also be reduced here
 		}
 
 		erg=SQLBindParameter(stmt,
@@ -2911,7 +2958,7 @@ bool odbccursor::inputOutputBind(const char *variable,
 				valuesize,	// in characters
 				0,
 				(SQLPOINTER)value,
-				bufferlength,	// in bytes
+				buffersize,	// in bytes
 				&(inoutisnull[pos-1]));
 	}
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
@@ -2989,8 +3036,6 @@ bool odbccursor::inputOutputBind(const char *variable,
 				int32_t *microsecond,
 				const char **tz,
 				bool *isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 
 	uint16_t	pos=charstring::convertToInteger(variable+1);
@@ -2998,15 +3043,6 @@ bool odbccursor::inputOutputBind(const char *variable,
 		bindformaterror=true;
 		return false;
 	}
-
-	SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
-	ts->year=*year;
-	ts->month=*month;
-	ts->day=*day;
-	ts->hour=*hour;
-	ts->minute=*minute;
-	ts->second=*second;
-	ts->fraction=(*microsecond)*1000;
 
 	datebind	*db=new datebind;
 	db->year=year;
@@ -3017,8 +3053,16 @@ bool odbccursor::inputOutputBind(const char *variable,
 	db->second=second;
 	db->microsecond=microsecond;
 	db->tz=tz;
+
+	db->buffer.year=*year;
+	db->buffer.month=*month;
+	db->buffer.day=*day;
+	db->buffer.hour=*hour;
+	db->buffer.minute=*minute;
+	db->buffer.second=*second;
+	db->buffer.fraction=(*microsecond)*1000;
+
 	*isnegative=false;
-	db->buffer=buffer;
 
 	inoutdatebind[pos-1]=db;
 	inoutcharbind[pos-1]=NULL;
@@ -3031,25 +3075,21 @@ bool odbccursor::inputOutputBind(const char *variable,
 				SQL_TIMESTAMP,
 				29,
 				9,
-				buffer,
+				&(db->buffer),
 				0,
 				&(outisnull[pos-1]));
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
-int16_t odbccursor::nonNullBindValue() {
+int16_t odbccursor::getNonNullBindValue() {
 	return 0;
 }
 
-int16_t odbccursor::nullBindValue() {
+int16_t odbccursor::getNullBindValue() {
 	return SQL_NULL_DATA;
 }
 
-bool odbccursor::bindValueIsNull(uint16_t isnull) {
-	return ((int16_t)isnull==SQL_NULL_DATA);
-}
-
-bool odbccursor::executeQuery(const char *query, uint32_t length) {
+bool odbccursor::executeQuery(const char *query, uint32_t size) {
 
 	// initialize counts
 	initializeRowCounts();
@@ -3077,7 +3117,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		if (odbcconn->unicode) {
 			char	*err=NULL;
 			byte_t	*queryucs=convertCharset((const byte_t *)query,
-							length,
+							size,
 							"UTF-8",
 							"UCS-2//TRANSLIT",
 							&err);
@@ -3090,7 +3130,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 			delete[] queryucs;
 		} else {
 		#endif
-			erg=SQLExecDirect(stmt,(SQLCHAR *)query,length);
+			erg=SQLExecDirect(stmt,(SQLCHAR *)query,size);
 		#ifdef HAVE_SQLCONNECTW
 		}
 		#endif
@@ -3114,7 +3154,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-	checkForTempTable(query,length);
+	checkForTempTable(query,size);
 
 	// if we're not exec-direct'ing, and if column info is valid after
 	// prepare, then we must have already done the first half of this in
@@ -3142,15 +3182,13 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
-			SQL_TIMESTAMP_STRUCT	*ts=
-				(SQL_TIMESTAMP_STRUCT *)db->buffer;
-			*(db->year)=ts->year;
-			*(db->month)=ts->month;
-			*(db->day)=ts->day;
-			*(db->hour)=ts->hour;
-			*(db->minute)=ts->minute;
-			*(db->second)=ts->second;
-			*(db->microsecond)=ts->fraction/1000;
+			*(db->year)=db->buffer.year;
+			*(db->month)=db->buffer.month;
+			*(db->day)=db->buffer.day;
+			*(db->hour)=db->buffer.hour;
+			*(db->minute)=db->buffer.minute;
+			*(db->second)=db->buffer.second;
+			*(db->microsecond)=db->buffer.fraction/1000;
 			*(db->tz)=NULL;
 		}
 		#ifdef HAVE_SQLCONNECTW
@@ -3168,7 +3206,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 				setConvCharError("output bind",err);
 				return false;
 			}
-			size_t	s=size(u,"UTF-8");
+			size_t	s=stringSize(u,"UTF-8");
 			if (s>=valuesize) {
 				// FIXME: this could make s<0
 				s=valuesize-nullSize("UTF-8");
@@ -3206,15 +3244,13 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 	for (uint16_t i=0; i<maxbindcount; i++) {
 		if (inoutdatebind[i]) {
 			datebind	*db=inoutdatebind[i];
-			SQL_TIMESTAMP_STRUCT	*ts=
-				(SQL_TIMESTAMP_STRUCT *)db->buffer;
-			*(db->year)=ts->year;
-			*(db->month)=ts->month;
-			*(db->day)=ts->day;
-			*(db->hour)=ts->hour;
-			*(db->minute)=ts->minute;
-			*(db->second)=ts->second;
-			*(db->microsecond)=ts->fraction/1000;
+			*(db->year)=db->buffer.year;
+			*(db->month)=db->buffer.month;
+			*(db->day)=db->buffer.day;
+			*(db->hour)=db->buffer.hour;
+			*(db->minute)=db->buffer.minute;
+			*(db->second)=db->buffer.second;
+			*(db->microsecond)=db->buffer.fraction/1000;
 			*(db->tz)=NULL;
 		}
 		#ifdef HAVE_SQLCONNECTW
@@ -3232,7 +3268,7 @@ bool odbccursor::executeQuery(const char *query, uint32_t length) {
 				setConvCharError("input-output bind",err);
 				return false;
 			}
-			size_t	s=size(u,"UTF-8");
+			size_t	s=stringSize(u,"UTF-8");
 			if (s>=valuesize) {
 				// FIXME: this could make s<0
 				s=valuesize-nullSize("UTF-8");
@@ -3276,11 +3312,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 		if (odbcconn->columninfonotvalidyeterror) {
 			SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 			SQLINTEGER	nativeerrnum=0;
-			SQLSMALLINT	errlength=0;
+			SQLSMALLINT	errsize=0;
 			bytestring::zero(state,sizeof(state));
 			SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,
 							state,&nativeerrnum,
-							NULL,0,&errlength);
+							NULL,0,&errsize);
 			for (SQLINTEGER *ptr=
 					odbcconn->columninfonotvalidyeterror;
 					*ptr; ptr++) {
@@ -3310,25 +3346,25 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 		// run through the columns
 		for (SQLSMALLINT i=0; i<ncols; i++) {
 
-			if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
+			if (conn->cont->getSendColumnInfo()) {
 #if (ODBCVER >= 0x0300)
 				// column name
 				erg=SQLColAttribute(stmt,i+1,SQL_DESC_LABEL,
 						column[i].name,4096,
 						(SQLSMALLINT *)
-						&(column[i].namelength),
+						&(column[i].namesize),
 						NULL);
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
 				}
-				column[i].namelength=
+				column[i].namesize=
 					charstring::getLength(column[i].name);
 
-				// column length
+				// column size
 				erg=SQLColAttribute(stmt,i+1,SQL_DESC_LENGTH,
 						NULL,0,NULL,
-						&(column[i].length));
+						&(column[i].size));
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
@@ -3351,9 +3387,9 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 				// for the precision of some (TEXT/NTEXT)
 				// columns.  This wreaks havoc on the client
 				// side, as the value is interpreted as 2^32-1.
-				// Override the -1 with the length.
+				// Override the -1 with the size.
 				if (column[i].precision==-1) {
-					column[i].precision=column[i].length;
+					column[i].precision=column[i].size;
 				}
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
@@ -3412,7 +3448,7 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 						SQL_DESC_BASE_TABLE_NAME,
 						column[i].table,4096,
 						(SQLSMALLINT *)
-						&(column[i].tablelength),
+						&(column[i].tablesize),
 						NULL);
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
@@ -3432,11 +3468,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					charstring::copy(columnnamescratch,col);
 					charstring::copy(column[i].name,
 							columnnamescratch);
-					column[i].namelength=
+					column[i].namesize=
 						charstring::getLength(
 							column[i].name);
 				}
-				column[i].tablelength=
+				column[i].tablesize=
 					charstring::getLength(column[i].table);
 
 #else
@@ -3445,20 +3481,20 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 						SQL_COLUMN_LABEL,
 						column[i].name,4096,
 						(SQLSMALLINT *)
-						&(column[i].namelength),
+						&(column[i].namesize),
 						NULL);
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
 				}
-				// FIXME: above we reset namelength
-				// to length(name)...
+				// FIXME: above we reset namesize
+				// to stringSize(name)...
 
-				// column length
+				// column size
 				erg=SQLColAttributes(stmt,i+1,
 						SQL_COLUMN_LENGTH,
 						NULL,0,NULL,
-						&(column[i].length));
+						&(column[i].size));
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
 					return false;
@@ -3543,7 +3579,7 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 						SQL_COLUMN_TABLE_NAME,
 						column[i].table,4096,
 						(SQLSMALLINT *)
-						&(column[i].tablelength),
+						&(column[i].tablesize),
 						NULL);
 				if (erg!=SQL_SUCCESS &&
 					erg!=SQL_SUCCESS_WITH_INFO) {
@@ -3563,11 +3599,11 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 					charstring::copy(columnnamescratch,col);
 					charstring::copy(column[i].name,
 							columnnamescratch);
-					column[i].namelength=
+					column[i].namesize=
 						charstring::getLength(
 							column[i].name);
 				}
-				column[i].tablelength=
+				column[i].tablesize=
 					charstring::getLength(column[i].table);
 #endif
 			}
@@ -3581,7 +3617,7 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 			allocateResultSetBuffers(ncols);
 		}*/
 
-		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
 
 		// run through the columns
 		for (SQLSMALLINT i=0; i<ncols; i++) {
@@ -3592,24 +3628,24 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 				if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_WCHAR,
-							field[i],maxfieldlength,
+							field[i],maxfieldsize,
 							&(indicator[i]));
 				} else if (column[i].type==SQL_TYPE_TIMESTAMP ||
 					(odbcconn->sqltypedatetosqlcbinary &&
 					column[i].type==SQL_TYPE_DATE)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_BINARY,
-							field[i],maxfieldlength,
+							field[i],maxfieldsize,
 							&(indicator[i]));
 				} else if (!isLob(column[i].type)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-							field[i],maxfieldlength,
+							field[i],maxfieldsize,
 							&(indicator[i]));
 				}
 			} else {
 			#endif
 				if (!isLob(column[i].type)) {
 					erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
-							field[i],maxfieldlength,
+							field[i],maxfieldsize,
 							&(indicator[i]));
 				}
 			#ifdef HAVE_SQLCONNECTW
@@ -3625,19 +3661,19 @@ bool odbccursor::handleColumns(bool getcolumninfo, bool bindcolumns) {
 	return true;
 }
 
-void odbccursor::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void odbccursor::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::getLength(
+		*errorsize=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
-				errorbufferlength,
+				errorbuffersize,
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
-				*errorlength);
+				*errorsize);
 		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
 		*liveconnection=true;
 		return;
@@ -3645,21 +3681,21 @@ void odbccursor::errorMessage(char *errorbuffer,
 
 	SQLCHAR		state[SQL_SQLSTATE_SIZE+1];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	bytestring::zero(state,sizeof(state));
 
 	SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,state,&nativeerrnum,
-				(SQLCHAR *)errorbuffer,errorbufferlength,
-				&errlength);
+				(SQLCHAR *)errorbuffer,errorbuffersize,
+				&errsize);
 
 	// set return values
-	*errorlength=errlength;
+	*errorsize=errsize;
 	*errorcode=nativeerrnum;
 	*liveconnection=odbcconn->isLiveConnection(state);
 }
 
-uint64_t odbccursor::affectedRows() {
+uint64_t odbccursor::getAffectedRows() {
 	return affectedrows;
 }
 
@@ -3671,8 +3707,8 @@ const char *odbccursor::getColumnName(uint32_t i) {
 	return column[i].name;
 }
 
-uint16_t odbccursor::getColumnNameLength(uint32_t i) {
-	return column[i].namelength;
+uint16_t odbccursor::getColumnNameSize(uint32_t i) {
+	return column[i].namesize;
 }
 
 uint16_t odbccursor::getColumnType(uint32_t i) {
@@ -3771,8 +3807,8 @@ uint16_t odbccursor::getColumnType(uint32_t i) {
 	}
 }
 
-uint32_t odbccursor::getColumnLength(uint32_t i) {
-	return column[i].length;
+uint32_t odbccursor::getColumnSize(uint32_t i) {
+	return column[i].size;
 }
 
 uint32_t odbccursor::getColumnPrecision(uint32_t i) {
@@ -3806,8 +3842,8 @@ const char *odbccursor::getColumnTable(uint32_t i) {
 	return column[i].table;
 }
 
-uint16_t odbccursor::getColumnTableLength(uint32_t i) {
-	return column[i].tablelength;
+uint16_t odbccursor::getColumnTableSize(uint32_t i) {
+	return column[i].tablesize;
 }
 
 bool odbccursor::noRowsToReturn() {
@@ -3830,7 +3866,7 @@ bool odbccursor::fetchRow(bool *error) {
 	#ifdef HAVE_SQLCONNECTW
 	if (odbcconn->unicode) {
 		// convert wvarchar/wchar fields to user coding
-		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
 		for (SQLSMALLINT i=0; i<ncols; i++) {
 			if (column[i].type==SQL_WVARCHAR ||
 					column[i].type==SQL_WCHAR) {
@@ -3845,10 +3881,10 @@ bool odbccursor::fetchRow(bool *error) {
 						setConvCharError("fetch",err);
 						return false;
 					}
-					size_t	s=size(u,"UTF-8");
-					if (s>=maxfieldlength) {
+					size_t	s=stringSize(u,"UTF-8");
+					if (s>=maxfieldsize) {
 						// FIXME: this could make s<0
-						s=maxfieldlength-
+						s=maxfieldsize-
 							nullSize("UTF-8");
 					}
 					bytestring::zero(field[i]+s,
@@ -3866,8 +3902,8 @@ bool odbccursor::fetchRow(bool *error) {
 }
 
 void odbccursor::getField(uint32_t col,
-				const char **fld, uint64_t *fldlength,
-				bool *blob, bool *null) {
+				const char **fld, uint64_t *fldsize,
+				bool *lob, bool *null) {
 
 	// handle NULLs
 	if (indicator[col]==SQL_NULL_DATA) {
@@ -3877,13 +3913,13 @@ void odbccursor::getField(uint32_t col,
 
 	// handle lobs
 	if (isLob(column[col].type)) {
-		*blob=true;
+		*lob=true;
 		return;
 	}
 
 	// handle normal datatypes
 	*fld=field[col];
-	*fldlength=indicator[col];
+	*fldsize=indicator[col];
 }
 
 bool odbccursor::getLobFieldLength(uint32_t col, uint64_t *length) {
@@ -3925,7 +3961,7 @@ bool odbccursor::getLobFieldSegment(uint32_t col,
 		charstoread=charstoread-((offset+charstoread)-loblength[col]);
 	}
 
-	// read a blob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
+	// read a lob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
 	uint64_t	totalbytesread=0;
 	SQLLEN		bytestoread=0;
 	uint64_t	remainingbytestoread=charstoread;
@@ -4056,8 +4092,8 @@ bool odbccursor::isLob(SQLINTEGER type) {
 	}
 
 	// FIXME: -152 (SQL Server XML) types are kind-of also LOBs, but
-	// attempts to get their lengths reliably result in SQL_NO_TOTAL.
-	// We don't (currently) have a way of determining their lengths,
+	// attempts to get their sizes reliably result in SQL_NO_TOTAL.
+	// We don't (currently) have a way of determining their sizes,
 	// so, for now, we'll handle them as non-LOBs.
 	return (type==SQL_LONGVARCHAR ||
 		type==SQL_LONGVARBINARY ||

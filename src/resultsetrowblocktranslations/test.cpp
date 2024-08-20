@@ -6,18 +6,17 @@
 class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation_test :
 				public sqlrresultsetrowblocktranslation {
 	public:
-			sqlrresultsetrowblocktranslation_test(
+		sqlrresultsetrowblocktranslation_test(
 					sqlrservercontroller *cont,
-					sqlrresultsetrowblocktranslations *rs,
 					domnode *parameters);
-			~sqlrresultsetrowblocktranslation_test();
+		~sqlrresultsetrowblocktranslation_test();
 		bool	setRow(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						uint32_t colcount,
 						const char * const *fieldnames,
 						const char **fields,
 						uint64_t *fieldlengths,
-						bool *blobs,
+						bool *lobs,
 						bool *nulls);
 		bool	run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
@@ -28,16 +27,15 @@ class SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation_test :
 						uint32_t colcount,
 						const char ***fields,
 						uint64_t **fieldlengths,
-						bool **blobs,
+						bool **lobs,
 						bool **nulls);
 };
 
 sqlrresultsetrowblocktranslation_test::
 	sqlrresultsetrowblocktranslation_test(
 				sqlrservercontroller *cont,
-				sqlrresultsetrowblocktranslations *rs,
 				domnode *parameters) :
-		sqlrresultsetrowblocktranslation(cont,rs,parameters) {
+		sqlrresultsetrowblocktranslation(cont,parameters) {
 }
 
 sqlrresultsetrowblocktranslation_test::
@@ -51,7 +49,7 @@ bool sqlrresultsetrowblocktranslation_test::setRow(
 					const char * const *fieldnames,
 					const char **fields,
 					uint64_t *fieldlengths,
-					bool *blobs,
+					bool *lobs,
 					bool *nulls) {
 	return true;
 }
@@ -70,7 +68,7 @@ bool sqlrresultsetrowblocktranslation_test::getRow(
 					uint32_t colcount,
 					const char ***fields,
 					uint64_t **fieldlengths,
-					bool **blobs,
+					bool **lobs,
 					bool **nulls) {
 	return true;
 }
@@ -79,9 +77,8 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrresultsetrowblocktranslation
 			*new_sqlrresultsetrowblocktranslation_test(
 					sqlrservercontroller *cont,
-					sqlrresultsetrowblocktranslations *rs,
 					domnode *parameters) {
 		return new sqlrresultsetrowblocktranslation_test(
-							cont,rs,parameters);
+							cont,parameters);
 	}
 }

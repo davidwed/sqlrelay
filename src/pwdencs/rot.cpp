@@ -1,12 +1,12 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserver.h>
+#include <sqlrelay/sqlrutil.h>
 #include <rudiments/character.h>
 
-class SQLRSERVER_DLLSPEC sqlrpwenc_rot : public sqlrpwdenc {
+class SQLRUTIL_DLLSPEC sqlrpwenc_rot : public sqlrpwdenc {
 	public:
-			sqlrpwenc_rot(domnode *parameters, bool debug);
+		sqlrpwenc_rot(domnode *parameters, bool debug);
 		char	*encrypt(const char *value);
 		char	*decrypt(const char *value);
 	private:
@@ -66,7 +66,7 @@ char *sqlrpwenc_rot::rotate(const char *value, int64_t count) {
 }
 
 extern "C" {
-	 SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_rot(
+	 SQLRUTIL_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_rot(
 						domnode *parameters,
 						bool debug) {
 		return new sqlrpwenc_rot(parameters,debug);

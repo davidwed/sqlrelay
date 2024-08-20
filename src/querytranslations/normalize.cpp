@@ -10,9 +10,7 @@
 class SQLRSERVER_DLLSPEC sqlrquerytranslation_normalize :
 					public sqlrquerytranslation {
 	public:
-			sqlrquerytranslation_normalize(
-						sqlrservercontroller *cont,
-						sqlrquerytranslations *sqlts,
+		sqlrquerytranslation_normalize(sqlrservercontroller *cont,
 						domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -47,7 +45,6 @@ class SQLRSERVER_DLLSPEC sqlrquerytranslation_normalize :
 		stringbuffer	pass2;
 		stringbuffer	pass3;
 
-		bool	enabled;
 		bool	foreigndecimals;
 		bool	uppercase;
 		bool	lowercase;
@@ -59,20 +56,13 @@ class SQLRSERVER_DLLSPEC sqlrquerytranslation_normalize :
 		bool	removebq;
 		bool	doubleescape;
 		bool	slashescape;
-
-		bool	debug;
 };
 
 sqlrquerytranslation_normalize::sqlrquerytranslation_normalize(
 					sqlrservercontroller *cont,
-					sqlrquerytranslations *sqlts,
 					domnode *parameters) :
-				sqlrquerytranslation(cont,sqlts,parameters) {
+				sqlrquerytranslation(cont,parameters) {
 	debugFunction();
-
-	debug=cont->getConfig()->getDebugQueryTranslations();
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 
 	foreigndecimals=charstring::isYes(
 			parameters->getAttributeValue("foreigndecimals"));
@@ -139,15 +129,11 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 					stringbuffer *translatedquery) {
 	debugFunction();
 
-	if (!enabled) {
-		translatedquery->append(query,querylength);
-		return true;
-	}
-
-	if (debug) {
-		stdoutput.write("original query:\n\"");
-		stdoutput.safePrint(query,querylength);
-		stdoutput.write("\"\n\n");
+	if (getDebug()) {
+		debugWrite("original query:");
+		stringbuffer	b;
+		b.safePrint(query,querylength);
+		debugWrite("\"%s\"",b.getString());
 	}
 
 	// clear the normalized query buffers
@@ -183,7 +169,7 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 			do {
 				ptr++;
 			} while (character::isWhitespace(*ptr));
-			if (ptr!=end && pass1.getStringLength()) {
+			if (ptr!=end && pass1.getSize()) {
 				pass1.append(' ');
 			}
 			continue;
@@ -252,10 +238,11 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (debug) {
-		stdoutput.write("normalized query (pass 1):\n\"");
-		stdoutput.safePrint(pass1.getString(),pass1.getSize());
-		stdoutput.write("\"\n\n");
+	if (getDebug()) {
+		debugWrite("normalized query (pass 1):");
+		stringbuffer	b;
+		b.safePrint(pass1.getString(),pass1.getSize());
+		debugWrite("\"%s\"",b.getString());
 	}
 
 	// normalize the query, second pass...
@@ -368,10 +355,11 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		}
 	}
 
-	if (debug) {
-		stdoutput.write("normalized query (pass 2):\n\"");
-		stdoutput.safePrint(pass2.getString(),pass2.getSize());
-		stdoutput.write("\"\n\n");
+	if (getDebug()) {
+		debugWrite("normalized query (pass 2):");
+		stringbuffer	b;
+		b.safePrint(pass2.getString(),pass2.getSize());
+		debugWrite("\"%s\"",b.getString());
 	}
 
 	// normalize the query, third pass...
@@ -510,10 +498,11 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (debug) {
-		stdoutput.write("normalized query (pass 3):\n\"");
-		stdoutput.safePrint(pass3.getString(),pass3.getSize());
-		stdoutput.write("\"\n\n");
+	if (getDebug()) {
+		debugWrite("normalized query (pass 3):");
+		stringbuffer	b;
+		b.safePrint(pass3.getString(),pass3.getSize());
+		debugWrite("\"%s\"",b.getString());
 	}
 
 	// normalize the query, fourth pass...
@@ -554,11 +543,12 @@ bool sqlrquerytranslation_normalize::run(sqlrserverconnection *sqlrcon,
 		ptr++;
 	}
 
-	if (debug) {
-		stdoutput.write("normalized query (pass 4):\n\"");
-		stdoutput.safePrint(translatedquery->getString(),
-					translatedquery->getSize());
-		stdoutput.write("\"\n\n");
+	if (getDebug()) {
+		debugWrite("normalized query (pass 4):");
+		stringbuffer	b;
+		b.safePrint(translatedquery->getString(),
+				translatedquery->getSize());
+		debugWrite("\"%s\"",b.getString());
 	}
 
 	return true;
@@ -786,9 +776,8 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrquerytranslation
 				*new_sqlrquerytranslation_normalize(
 						sqlrservercontroller *cont,
-						sqlrquerytranslations *sqlts,
 						domnode *parameters) {
 		return new sqlrquerytranslation_normalize(
-						cont,sqlts,parameters);
+						cont,parameters);
 	}
 }

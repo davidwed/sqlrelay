@@ -23,7 +23,7 @@
 
 class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 	public:
-			sqlrconfig_xmldom();
+		sqlrconfig_xmldom();
 
 		void	getEnabledIds(const char *urlname,
 					linkedlist< char * > *idlist);
@@ -76,12 +76,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*getDebug();
 		bool		getDebugSql();
 		bool		getDebugBulkLoad();
+		bool		getDebugBindTranslations();
 		bool		getDebugParser();
 		bool		getDebugDirectives();
 		bool		getDebugQueryTranslations();
 		bool		getDebugFilters();
 		bool		getDebugTriggers();
-		bool		getDebugBindTranslations();
 		bool		getDebugBindVariableTranslations();
 		bool		getDebugResultSetTranslations();
 		bool		getDebugResultSetRowTranslations();
@@ -97,13 +97,13 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		getDebugRouters();
 		bool		getDebugQueries();
 		bool		getDebugModuleDatas();
-		uint64_t	getMaxClientInfoLength();
+		uint64_t	getMaxClientInfoSize();
 		uint32_t	getMaxQuerySize();
 		uint16_t	getMaxBindCount();
-		uint16_t	getMaxBindNameLength();
-		uint32_t	getMaxStringBindValueLength();
-		uint32_t	getMaxLobBindValueLength();
-		uint32_t	getMaxErrorLength();
+		uint16_t	getMaxBindNameSize();
+		uint32_t	getMaxStringBindValueSize();
+		uint32_t	getMaxLobBindValueSize();
+		uint32_t	getMaxErrorSize();
 		int32_t		getIdleClientTimeout();
 		int64_t		getMaxListeners();
 		uint32_t	getListenerTimeout();
@@ -217,12 +217,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		const char	*debug;
 		bool		debugsql;
 		bool		debugbulkload;
+		bool		debugbindtranslations;
 		bool		debugparser;
 		bool		debugdirectives;
 		bool		debugquerytranslations;
 		bool		debugfilters;
 		bool		debugtriggers;
-		bool		debugbindtranslations;
 		bool		debugbindvariabletranslations;
 		bool		debugresultsettranslations;
 		bool		debugresultsetrowtranslations;
@@ -238,13 +238,13 @@ class SQLRUTIL_DLLSPEC sqlrconfig_xmldom : public sqlrconfig, public xmldom {
 		bool		debugrouters;
 		bool		debugqueries;
 		bool		debugmoduledatas;
-		uint64_t	maxclientinfolength;
+		uint64_t	maxclientinfosize;
 		uint32_t	maxquerysize;
 		uint16_t	maxbindcount;
-		uint16_t	maxbindnamelength;
-		uint32_t	maxstringbindvaluelength;
-		uint32_t	maxlobbindvaluelength;
-		uint32_t	maxerrorlength;
+		uint16_t	maxbindnamesize;
+		uint32_t	maxstringbindvaluesize;
+		uint32_t	maxlobbindvaluesize;
+		uint32_t	maxerrorsize;
 		int32_t		idleclienttimeout;
 		int64_t		maxlisteners;
 		uint32_t	listenertimeout;
@@ -364,45 +364,39 @@ void sqlrconfig_xmldom::init() {
 	debug=DEFAULT_DEBUG;
 	debugsql=hasDebug(debug,"sql");
 	debugbulkload=hasDebug(debug,"bulkload");
-	debugparser=hasDebug(debug,"parser");
-	debugdirectives=hasDebug(debug,"directives");
-	debugquerytranslations=hasDebug(debug,"querytranslations");
-	debugfilters=hasDebug(debug,"filters");
-	debugtriggers=hasDebug(debug,"triggers");
-	debugbindtranslations=
-		hasDebug(debug,"bindtranslations");
-	debugbindvariabletranslations=
-		hasDebug(debug,"bindvariabletranslations");
-	debugresultsettranslations=
-		hasDebug(debug,"resultsettranslations");
-	debugresultsetrowtranslations=
-		hasDebug(debug,"resultsetrowtranslations");
+	debugbindtranslations=hasDebug(debug,"bindtranslations");
+	debugparser=DEFAULT_DEBUG_PARSER;
+	debugdirectives=DEFAULT_DEBUG_DIRECTIVES;
+	debugquerytranslations=DEFAULT_DEBUG_QUERYTRANSLATIONS;
+	debugfilters=DEFAULT_DEBUG_FILTERS;
+	debugtriggers=DEFAULT_DEBUG_TRIGGERS;
+	debugbindvariabletranslations=DEFAULT_DEBUG_BINDVARIABLETRANSLATIONS;
+	debugresultsettranslations=DEFAULT_DEBUG_RESULTSETTRANSLATIONS;
+	debugresultsetrowtranslations=DEFAULT_DEBUG_RESULTSETROWTRANSLATIONS;
 	debugresultsetrowblocktranslations=
-		hasDebug(debug,"resultsetrowblocktranslations");
+				DEFAULT_DEBUG_RESULTSETROWBLOCKTRANSLATIONS;
 	debugresultsetheadertranslations=
-		hasDebug(debug,"resultsetheadertranslations");
-	debugerrortranslations=
-		hasDebug(debug,"errortranslations");
-	debugprotocols=hasDebug(debug,"protocols");
-	debugauths=hasDebug(debug,"auths");
-	debugpwdencs=hasDebug(debug,"passwordencrypytions");
-	debugloggers=hasDebug(debug,"loggers");
-	debugnotifications=hasDebug(debug,"notifications");
-	debugschedules=hasDebug(debug,"schedules");
-	debugrouters=hasDebug(debug,"routers");
-	debugqueries=hasDebug(debug,"queries");
-	debugmoduledatas=hasDebug(debug,"moduledatas");
-	maxclientinfolength=charstring::convertToInteger(
-						DEFAULT_MAXCLIENTINFOLENGTH);
+				DEFAULT_DEBUG_RESULTSETHEADERTRANSLATIONS;
+	debugerrortranslations=DEFAULT_DEBUG_ERRORTRANSLATIONS;
+	debugprotocols=DEFAULT_DEBUG_PROTOCOLS;
+	debugauths=DEFAULT_DEBUG_AUTHS;
+	debugpwdencs=DEFAULT_DEBUG_PWDENCS;
+	debugloggers=DEFAULT_DEBUG_LOGGERS;
+	debugnotifications=DEFAULT_DEBUG_NOTIFICATIONS;
+	debugschedules=DEFAULT_DEBUG_SCHEDULES;
+	debugrouters=DEFAULT_DEBUG_ROUTERS;
+	debugqueries=DEFAULT_DEBUG_QUERIES;
+	debugmoduledatas=DEFAULT_DEBUG_MODULEDATAS;
+	maxclientinfosize=charstring::convertToInteger(
+						DEFAULT_MAXCLIENTINFOSIZE);
 	maxquerysize=charstring::convertToInteger(DEFAULT_MAXQUERYSIZE);
 	maxbindcount=charstring::convertToInteger(DEFAULT_MAXBINDCOUNT);
-	maxbindnamelength=charstring::convertToInteger(
-						DEFAULT_MAXBINDNAMELENGTH);
-	maxstringbindvaluelength=charstring::convertToInteger(
-					DEFAULT_MAXSTRINGBINDVALUELENGTH);
-	maxlobbindvaluelength=charstring::convertToInteger(
-					DEFAULT_MAXLOBBINDVALUELENGTH);
-	maxerrorlength=charstring::convertToInteger(DEFAULT_MAXERRORLENGTH);
+	maxbindnamesize=charstring::convertToInteger(DEFAULT_MAXBINDNAMESIZE);
+	maxstringbindvaluesize=charstring::convertToInteger(
+					DEFAULT_MAXSTRINGBINDVALUESIZE);
+	maxlobbindvaluesize=charstring::convertToInteger(
+					DEFAULT_MAXLOBBINDVALUESIZE);
+	maxerrorsize=charstring::convertToInteger(DEFAULT_MAXERRORSIZE);
 	idleclienttimeout=charstring::convertToInteger(
 						DEFAULT_IDLECLIENTTIMEOUT);
 	metrictotal=0;
@@ -627,6 +621,10 @@ bool sqlrconfig_xmldom::getDebugBulkLoad() {
 	return debugbulkload;
 }
 
+bool sqlrconfig_xmldom::getDebugBindTranslations() {
+	return debugbindtranslations;
+}
+
 bool sqlrconfig_xmldom::getDebugParser() {
 	return debugparser;
 }
@@ -645,10 +643,6 @@ bool sqlrconfig_xmldom::getDebugFilters() {
 
 bool sqlrconfig_xmldom::getDebugTriggers() {
 	return debugtriggers;
-}
-
-bool sqlrconfig_xmldom::getDebugBindTranslations() {
-	return debugbindtranslations;
 }
 
 bool sqlrconfig_xmldom::getDebugBindVariableTranslations() {
@@ -711,8 +705,8 @@ bool sqlrconfig_xmldom::getDebugModuleDatas() {
 	return debugmoduledatas;
 }
 
-uint64_t sqlrconfig_xmldom::getMaxClientInfoLength() {
-	return maxclientinfolength;
+uint64_t sqlrconfig_xmldom::getMaxClientInfoSize() {
+	return maxclientinfosize;
 }
 
 uint32_t sqlrconfig_xmldom::getMaxQuerySize() {
@@ -723,20 +717,20 @@ uint16_t sqlrconfig_xmldom::getMaxBindCount() {
 	return maxbindcount;
 }
 
-uint16_t sqlrconfig_xmldom::getMaxBindNameLength() {
-	return maxbindnamelength;
+uint16_t sqlrconfig_xmldom::getMaxBindNameSize() {
+	return maxbindnamesize;
 }
 
-uint32_t sqlrconfig_xmldom::getMaxStringBindValueLength() {
-	return maxstringbindvaluelength;
+uint32_t sqlrconfig_xmldom::getMaxStringBindValueSize() {
+	return maxstringbindvaluesize;
 }
 
-uint32_t sqlrconfig_xmldom::getMaxLobBindValueLength() {
-	return maxlobbindvaluelength;
+uint32_t sqlrconfig_xmldom::getMaxLobBindValueSize() {
+	return maxlobbindvaluesize;
 }
 
-uint32_t sqlrconfig_xmldom::getMaxErrorLength() {
-	return maxerrorlength;
+uint32_t sqlrconfig_xmldom::getMaxErrorSize() {
+	return maxerrorsize;
 }
 
 int32_t sqlrconfig_xmldom::getIdleClientTimeout() {
@@ -1246,6 +1240,24 @@ void sqlrconfig_xmldom::normalizeTree() {
 	attr=instance->getAttribute("authentication");
 	if (!attr->isNullNode()) {
 		attr->setName("authtier");
+	}
+
+	// maxclientinfolength -> maxclientinfosize
+	attr=instance->getAttribute("maxclientinfolength");
+	if (!attr->isNullNode()) {
+		attr->setName("maxclientinfosize");
+	}
+
+	// maxbindnamelength -> maxbindnamesize
+	attr=instance->getAttribute("maxbindnamelength");
+	if (!attr->isNullNode()) {
+		attr->setName("maxbindnamesize");
+	}
+
+	// maxstringbindvaluelength -> maxstringbindvaluesize
+	attr=instance->getAttribute("maxstringbindvaluelength");
+	if (!attr->isNullNode()) {
+		attr->setName("maxstringbindvaluesize");
 	}
 
 	// oracle8 -> oracle, sybase -> sap, mariadb -> mysql
@@ -1850,6 +1862,41 @@ void sqlrconfig_xmldom::normalizeTree() {
 			pwdenc->setAttributeValue("module","des");
 		}
 	}
+
+	// debug="..." to <... debug="yes/no">
+	const char	*debuggables[]={
+		"parser",
+		"directives",
+		"querytranslations",
+		"filters",
+		"triggers",
+		"bindvariabletranslations",
+		"resultsettranslations",
+		"resultsetrowtranslations",
+		"resultsetrowblocktranslations",
+		"resultsetheadertranslations",
+		"errortranslations",
+		"auths",
+		"passwordencryptions",
+		"loggers",
+		"notifications",
+		"schedules",
+		"routers",
+		"queries",
+		NULL
+	};
+	for (const char * const *d=debuggables; *d; d++) {
+		if (hasDebug(debug,*d)) {
+			instance->getFirstTagChild(*d)->
+					setAttributeValue("debug","yes");
+		}
+	}
+	// handle protocols specially - it's the listeners tag that needs
+	// debug="yes" for it
+	if (hasDebug(debug,"protocols")) {
+		instance->getFirstTagChild("listeners")->
+					setAttributeValue("debug","yes");
+	}
 }
 
 void sqlrconfig_xmldom::getTreeValues() {
@@ -1964,42 +2011,10 @@ void sqlrconfig_xmldom::getTreeValues() {
 	if (!attr->isNullNode()) {
 		deniedips=attr->getValue();
 	}
-	attr=instance->getAttribute("debug");
+	attr=instance->getAttribute("maxclientinfosize");
 	if (!attr->isNullNode()) {
-		debug=attr->getValue();
-		debugsql=hasDebug(debug,"sql");
-		debugbulkload=hasDebug(debug,"bulkload");
-		debugparser=hasDebug(debug,"parser");
-		debugdirectives=hasDebug(debug,"directives");
-		debugquerytranslations=hasDebug(debug,"querytranslations");
-		debugfilters=hasDebug(debug,"filters");
-		debugtriggers=hasDebug(debug,"triggers");
-		debugbindtranslations=hasDebug(debug,"bindtranslations");
-		debugbindvariabletranslations=
-			hasDebug(debug,"bindvariabletranslations");
-		debugresultsettranslations=
-			hasDebug(debug,"resultsettranslations");
-		debugresultsetrowtranslations=
-			hasDebug(debug,"resultsetrowtranslations");
-		debugresultsetrowblocktranslations=
-			hasDebug(debug,"resultsetrowblocktranslations");
-		debugresultsetheadertranslations=
-			hasDebug(debug,"resultsetheadertranslations");
-		debugerrortranslations=
-			hasDebug(debug,"errortranslations");
-		debugprotocols=hasDebug(debug,"protocols");
-		debugauths=hasDebug(debug,"auths");
-		debugpwdencs=hasDebug(debug,"passwordencryptions");
-		debugloggers=hasDebug(debug,"loggers");
-		debugnotifications=hasDebug(debug,"notifications");
-		debugschedules=hasDebug(debug,"schedules");
-		debugrouters=hasDebug(debug,"routers");
-		debugqueries=hasDebug(debug,"queries");
-		debugmoduledatas=hasDebug(debug,"moduledatas");
-	}
-	attr=instance->getAttribute("maxclientinfolength");
-	if (!attr->isNullNode()) {
-		maxclientinfolength=charstring::convertToInteger(attr->getValue());
+		maxclientinfosize=
+			charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("maxquerysize");
 	if (!attr->isNullNode()) {
@@ -2009,22 +2024,23 @@ void sqlrconfig_xmldom::getTreeValues() {
 	if (!attr->isNullNode()) {
 		maxbindcount=charstring::convertToInteger(attr->getValue());
 	}
-	attr=instance->getAttribute("maxbindnamelength");
+	attr=instance->getAttribute("maxbindnamelsize");
 	if (!attr->isNullNode()) {
-		maxbindnamelength=charstring::convertToInteger(attr->getValue());
+		maxbindnamesize=charstring::convertToInteger(attr->getValue());
 	}
-	attr=instance->getAttribute("maxstringbindvaluelength");
+	attr=instance->getAttribute("maxstringbindvaluesize");
 	if (!attr->isNullNode()) {
-		maxstringbindvaluelength=
+		maxstringbindvaluesize=
 				charstring::convertToInteger(attr->getValue());
 	}
-	attr=instance->getAttribute("maxlobbindvaluelength");
+	attr=instance->getAttribute("maxlobbindvaluesize");
 	if (!attr->isNullNode()) {
-		maxlobbindvaluelength=charstring::convertToInteger(attr->getValue());
+		maxlobbindvaluesize=
+			charstring::convertToInteger(attr->getValue());
 	}
-	attr=instance->getAttribute("maxerrorlength");
+	attr=instance->getAttribute("maxerrorsize");
 	if (!attr->isNullNode()) {
-		maxerrorlength=charstring::convertToInteger(attr->getValue());
+		maxerrorsize=charstring::convertToInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("idleclienttimeout");
 	if (!attr->isNullNode()) {
@@ -2036,7 +2052,8 @@ void sqlrconfig_xmldom::getTreeValues() {
 	}
 	attr=instance->getAttribute("listenertimeout");
 	if (!attr->isNullNode()) {
-		listenertimeout=charstring::convertToUnsignedInteger(attr->getValue());
+		listenertimeout=
+			charstring::convertToUnsignedInteger(attr->getValue());
 	}
 	attr=instance->getAttribute("reloginatstart");
 	if (!attr->isNullNode()) {
@@ -2116,6 +2133,76 @@ void sqlrconfig_xmldom::getTreeValues() {
 	pwdencsxml=instance->getFirstTagChild("passwordencryptions");
 	authsxml=instance->getFirstTagChild("auths");
 	moduledatasxml=instance->getFirstTagChild("moduledatas");
+
+
+	// debug...
+	attr=instance->getAttribute("debug");
+	if (!attr->isNullNode()) {
+		debug=attr->getValue();
+		debugsql=hasDebug(debug,"sql");
+		debugbulkload=hasDebug(debug,"bulkload");
+		debugbindtranslations=hasDebug(debug,"bindtranslations");
+		debugparser=charstring::isYes(
+					parserxml->
+					getAttributeValue("debug"));
+		debugdirectives=charstring::isYes(
+					directivesxml->
+					getAttributeValue("debug"));
+		debugquerytranslations=charstring::isYes(
+					querytranslationsxml->
+					getAttributeValue("debug"));
+		debugfilters=charstring::isYes(
+					filtersxml->
+					getAttributeValue("debug"));
+		debugtriggers=charstring::isYes(
+					triggersxml->
+					getAttributeValue("debug"));
+		debugbindvariabletranslations=charstring::isYes(
+					bindvariabletranslationsxml->
+					getAttributeValue("debug"));
+		debugresultsettranslations=charstring::isYes(
+					resultsettranslationsxml->
+					getAttributeValue("debug"));
+		debugresultsetrowtranslations=charstring::isYes(
+					resultsetrowtranslationsxml->
+					getAttributeValue("debug"));
+		debugresultsetrowblocktranslations=charstring::isYes(
+					resultsetrowblocktranslationsxml->
+					getAttributeValue("debug"));
+		debugresultsetheadertranslations=charstring::isYes(
+					resultsetheadertranslationsxml->
+					getAttributeValue("debug"));
+		debugerrortranslations=charstring::isYes(
+					errortranslationsxml->
+					getAttributeValue("debug"));
+		debugprotocols=charstring::isYes(
+					listenersxml->
+					getAttributeValue("debug"));
+		debugauths=charstring::isYes(
+					authsxml->
+					getAttributeValue("debug"));
+		debugpwdencs=charstring::isYes(
+					pwdencsxml->
+					getAttributeValue("debug"));
+		debugloggers=charstring::isYes(
+					loggersxml->
+					getAttributeValue("debug"));
+		debugnotifications=charstring::isYes(
+					notificationsxml->
+					getAttributeValue("debug"));
+		debugschedules=charstring::isYes(
+					schedulesxml->
+					getAttributeValue("debug"));
+		debugrouters=charstring::isYes(
+					routersxml->
+					getAttributeValue("debug"));
+		debugqueries=charstring::isYes(
+					queriesxml->
+					getAttributeValue("debug"));
+		debugmoduledatas=charstring::isYes(
+					moduledatasxml->
+					getAttributeValue("debug"));
+	}
 
 
 	// listeners tag...
@@ -2453,10 +2540,8 @@ void sqlrconfig_xmldom::parseLinkFile(const char *urlname) {
 		}
 
 		// optimize
-		filesystem	fs;
-		if (fs.open(urlname)) {
-			fl.setReadBufferSize(fs.getOptimumTransferBlockSize());
-		}
+		fl.setReadBufferSize(
+			filesystem::getOptimumTransferBlockSize(urlname));
 		fl.adviseSequentialAccess(0,fl.getSize());
 		fl.adviseOnlyOnce(0,fl.getSize());
 

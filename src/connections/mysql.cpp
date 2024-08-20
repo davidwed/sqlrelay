@@ -40,9 +40,8 @@ class mysqlconnection;
 class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 	friend class mysqlconnection;
 	private:
-				mysqlcursor(sqlrserverconnection *conn,
-							uint16_t id);
-				~mysqlcursor();
+		mysqlcursor(sqlrserverconnection *conn, uint16_t id);
+		~mysqlcursor();
 
 		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
@@ -51,9 +50,9 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		bool		close();
 #endif
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		bool		supportsNativeBinds(const char *query,
-							uint32_t length);
+							uint32_t size);
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
@@ -79,8 +78,6 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 						int32_t microsecond,
 						const char *tz,
 						bool isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		inputBindBlob(const char *variable, 
 						uint16_t variablesize,
@@ -94,25 +91,25 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 						int16_t *isnull);
 #endif
 		bool		executeQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 #ifdef HAVE_MYSQL_COMMIT
 		bool		queryIsNotSelect();
 #endif
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		bool		knowsRowCount();
 		uint64_t	rowCount();
-		uint64_t	affectedRows();
+		uint64_t	getAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
 #ifdef HAVE_MYSQL_FIELD_NAME_LENGTH
-		uint16_t	getColumnNameLength(uint32_t col);
+		uint16_t	getColumnNameSize(uint32_t col);
 #endif
 		uint16_t	getColumnType(uint32_t col);
-		uint32_t	getColumnLength(uint32_t col);
+		uint32_t	getColumnSize(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
 		uint16_t	getColumnIsNullable(uint32_t col);
@@ -127,19 +124,19 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		const char	*getColumnTable(uint32_t col);
 #endif
 #ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
-		uint16_t	getColumnTableLength(uint32_t col);
+		uint16_t	getColumnTableSize(uint32_t col);
 #endif
 		bool		noRowsToReturn();
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
+					uint64_t *fieldsize,
+					bool *lob,
 					bool *null);
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 		bool		getLobFieldLength(uint32_t col,
-						uint64_t *length);
+						uint64_t *size);
 		bool		getLobFieldSegment(uint32_t col,
 						char *buffer,
 						uint64_t buffersize,
@@ -170,15 +167,18 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		bool		stmtfreeresult;
 		bool		stmtpreparefailed;
 
+		MYSQL_RES	*mysqlmetadata;
+
 		MYSQL_BIND	*fieldbind;
 		char		*field;
 		my_bool		*isnull;
-		unsigned long	*fieldlength;
+		unsigned long	*fieldsize;
 
 		bool		boundvariables;
 		uint16_t	maxbindcount;
 		MYSQL_BIND	*bind;
 		unsigned long	*bindvaluesize;
+		MYSQL_TIME	*bindtime;
 
 		MYSQL_BIND	lobfield;
 		unsigned long	lobfieldlength;
@@ -189,7 +189,7 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 		regularexpression	unsupportedbystmt;
 #endif
 		MYSQL_ROW	mysqlrow;
-		unsigned long	*mysqlrowlengths;
+		unsigned long	*mysqlrowsizes;
 
 		mysqlconnection	*mysqlconn;
 };
@@ -197,8 +197,8 @@ class SQLRSERVER_DLLSPEC mysqlcursor : public sqlrservercursor {
 class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 	friend class mysqlcursor;
 	public:
-				mysqlconnection(sqlrservercontroller *cont);
-				~mysqlconnection();
+		mysqlconnection(sqlrservercontroller *cont);
+		~mysqlconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
@@ -209,34 +209,36 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 #ifdef HAVE_MYSQL_PING
 		bool		ping();
 #endif
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*dbHostName();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getDbHostName();
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		const char	*bindFormat();
+		const char	*getBindFormat();
 #endif
-		const char	*nextvalFormat();
+		const char	*getNextvalFormat();
 		const char	*getDatabaseListQuery(bool wild);
+		const char	*getTableListQuery(bool wild,
+						uint16_t objecttypes,
+						bool currentschemaonly);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*setIsolationLevelQuery();
 		bool		getLastInsertId(uint64_t *id);
-		const char	*noopQuery();
-		bool		autoCommitOn();
-		bool		autoCommitOff();
-		bool		supportsAutoCommit();
+		const char	*getNoopQuery();
+		bool		setAutoCommitOn();
+		bool		setAutoCommitOff();
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		int16_t		nonNullBindValue();
-		int16_t		nullBindValue();
+		int16_t		getNonNullBindValue();
+		int16_t		getNullBindValue();
 #endif
 		void		endSession();
 
@@ -273,12 +275,12 @@ class SQLRSERVER_DLLSPEC mysqlconnection : public sqlrserverconnection {
 		bool		foundrows;
 		bool		ignorespace;
 
-		const char	*identity;
 		bool		usestmtapi;
 
 		char	*dbversion;
 		char	*dbhostname;
 
+		stringbuffer	tablelistquery;
 		stringbuffer	columnlistquery;
 
 		static const my_bool	mytrue;
@@ -312,8 +314,6 @@ mysqlconnection::mysqlconnection(sqlrservercontroller *cont) :
 	// start this at false because we don't need to do a commit before
 	// the first query when we very first start up
 	firstquery=false;
-
-	identity=NULL;
 
 	mysqlptr=NULL;
 
@@ -388,7 +388,6 @@ void mysqlconnection::handleConnectString() {
 	foundrows=charstring::isYes(cont->getConnectStringValue("foundrows"));
 	ignorespace=charstring::isYes(
 			cont->getConnectStringValue("ignorespace"));
-	identity=cont->getConnectStringValue("identity");
 
 	usestmtapi=charstring::compare(
 			cont->getConnectStringValue("api"),"classic");
@@ -588,11 +587,11 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 	}
 #else
 	char		**list;
-	uint64_t	listlen;
+	uint64_t	listsize;
 	charstring::split(mysql_get_server_info(mysqlptr),
-				".",true,&list,&listlen);
+				".",true,&list,&listsize);
 
-	if (listlen==3) {
+	if (listsize==3) {
 		uint64_t	major=
 				charstring::convertToUnsignedInteger(list[0]);
 		uint64_t	minor=
@@ -604,7 +603,7 @@ bool mysqlconnection::logIn(const char **error, const char **warning) {
 			cont->setFakeInputBinds(true);
 			escapeblobs=true;
 		}
-		for (uint64_t index=0; index<listlen; index++) {
+		for (uint64_t index=0; index<listsize; index++) {
 			delete[] list[index];
 		}
 		delete[] list;
@@ -649,27 +648,27 @@ bool mysqlconnection::ping() {
 }
 #endif
 
-const char *mysqlconnection::identify() {
-	return (identity)?identity:"mysql";
+const char *mysqlconnection::getDbType() {
+	return "mysql";
 }
 
-const char *mysqlconnection::dbVersion() {
+const char *mysqlconnection::getDbVersion() {
 	delete[] dbversion;
 	dbversion=charstring::duplicate(mysql_get_server_info(mysqlptr));
 	return dbversion;
 }
 
-const char *mysqlconnection::dbHostName() {
+const char *mysqlconnection::getDbHostName() {
 	return dbhostname;
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-const char *mysqlconnection::bindFormat() {
+const char *mysqlconnection::getBindFormat() {
 	return "?";
 }
 #endif
 
-const char *mysqlconnection::nextvalFormat() {
+const char *mysqlconnection::getNextvalFormat() {
 	return "";
 }
 
@@ -687,6 +686,76 @@ const char *mysqlconnection::getDatabaseListQuery(bool wild) {
 			"	NULL "
 			"from "
 			"	information_schema.schemata";
+}
+
+const char *mysqlconnection::getTableListQuery(bool wild,
+						uint16_t objecttypes,
+						bool currentschemaonly) {
+
+	stringbuffer	otypes;
+	otypes.append("	(");
+	if (objecttypes&DB_OBJECT_TABLE) {
+		otypes.append("	table_type = 'BASE TABLE' ");
+	}
+	if (objecttypes&DB_OBJECT_VIEW) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	table_type = 'VIEW' ");
+	}
+	if (objecttypes&DB_OBJECT_ALIAS) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	table_type = 'ALIAS' ");
+	}
+	if (objecttypes&DB_OBJECT_SYNONYM) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	table_type = 'SYNONYM' ");
+	}
+	otypes.append(") ");
+
+	tablelistquery.clear();
+	tablelistquery.append(
+		"select "
+		"	table_catalog as table_cat, "
+		"	table_schema as table_schem, "
+		"	table_name, "
+		"	case "
+		"		when table_type = "
+		"'BASE TABLE' then 'TABLE' "
+		"		else table_type "
+		"	end as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
+		"from "
+		"	information_schema.tables "
+		"where ");
+	if (currentschemaonly) {
+		tablelistquery.append(
+			" table_catalog='def' "
+			" and "
+			" table_schema='");
+		tablelistquery.append(getCurrentDatabase());
+		tablelistquery.append(
+			"' "
+			"	and ");
+	}
+	if (wild) {
+		tablelistquery.append(
+			"	table_name like '%s' "
+			"	and ");
+	}
+	tablelistquery.append(otypes.getString());
+	tablelistquery.append(
+		"order by "
+		"	table_cat, "
+		"	table_schem, "
+		"	table_name");
+
+	return tablelistquery.getString();
 }
 
 const char *mysqlconnection::getColumnListQuery(
@@ -767,7 +836,7 @@ bool mysqlconnection::getLastInsertId(uint64_t *id) {
 	return true;
 }
 
-const char *mysqlconnection::noopQuery() {
+const char *mysqlconnection::getNoopQuery() {
 	return "set @noop=null";
 }
 
@@ -775,7 +844,7 @@ bool mysqlconnection::isTransactional() {
 	return true;
 }
 
-bool mysqlconnection::autoCommitOn() {
+bool mysqlconnection::setAutoCommitOn() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
 	return !mysql_autocommit(mysqlptr,true);
 #elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
@@ -785,13 +854,13 @@ bool mysqlconnection::autoCommitOn() {
 
 	// init some variables
 	const char	*query="set autocommit=1";
-	int		querylen=16;
+	int		querysize=16;
 
 	// run the query...
 	sqlrservercursor	*cur=cont->newCursor();
 	bool	retval=(cur->open() &&
-			cur->prepareQuery(query,querylen) &&
-			cur->executeQuery(query,querylen));
+			cur->prepareQuery(query,querysize) &&
+			cur->executeQuery(query,querysize));
 
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
@@ -811,7 +880,7 @@ bool mysqlconnection::autoCommitOn() {
 #endif
 }
 
-bool mysqlconnection::autoCommitOff() {
+bool mysqlconnection::setAutoCommitOff() {
 #ifdef HAVE_MYSQL_AUTOCOMMIT
 	return !mysql_autocommit(mysqlptr,false);
 #elif defined(MYSQL_VERSION_ID) && MYSQL_VERSION_ID>=40000
@@ -821,13 +890,13 @@ bool mysqlconnection::autoCommitOff() {
 
 	// init some variables
 	const char	*query="set autocommit=0";
-	int		querylen=16;
+	int		querysize=16;
 
 	// run the query...
 	sqlrservercursor	*cur=cont->newCursor();
 	bool	retval=(cur->open() &&
-			cur->prepareQuery(query,querylen) &&
-			cur->executeQuery(query,querylen));
+			cur->prepareQuery(query,querysize) &&
+			cur->executeQuery(query,querysize));
 
 	// If there was an error, copy it out.  We'll be destroying the
 	// cursor in a moment and the error will be lost otherwise.
@@ -845,10 +914,6 @@ bool mysqlconnection::autoCommitOff() {
 	// do nothing
 	return true;
 #endif
-}
-
-bool mysqlconnection::supportsAutoCommit() {
-	return true;
 }
 
 bool mysqlconnection::commit() {
@@ -875,15 +940,15 @@ bool mysqlconnection::rollback() {
 #endif
 }
 
-void mysqlconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+void mysqlconnection::getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	const char	*errorstring=mysql_error(mysqlptr);
-	*errorlength=charstring::getLength(errorstring);
-	charstring::safeCopy(errorbuffer,errorbufferlength,
-					errorstring,*errorlength);
+	*errorsize=charstring::getLength(errorstring);
+	charstring::safeCopy(errorbuffer,errorbuffersize,
+					errorstring,*errorsize);
 	*errorcode=mysql_errno(mysqlptr);
 	*liveconnection=(!charstring::compare(errorstring,"") ||
 		!charstring::compareIgnoringCase(errorstring,
@@ -897,11 +962,11 @@ void mysqlconnection::errorMessage(char *errorbuffer,
 }
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
-int16_t mysqlconnection::nonNullBindValue() {
+int16_t mysqlconnection::getNonNullBindValue() {
 	return 0;
 }
 
-int16_t mysqlconnection::nullBindValue() {
+int16_t mysqlconnection::getNullBindValue() {
 	return 1;
 }
 #endif
@@ -924,12 +989,15 @@ mysqlcursor::mysqlcursor(sqlrserverconnection *conn, uint16_t id) :
 	stmtreset=false;
 	stmtfreeresult=false;
 
+	mysqlmetadata=NULL;
+
 	boundvariables=false;
 
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	bind=new MYSQL_BIND[maxbindcount];
 	bindvaluesize=new unsigned long[maxbindcount];
 	bytestring::zero(bind,maxbindcount*sizeof(MYSQL_BIND));
+	bindtime=new MYSQL_TIME[maxbindcount];
 
 	usestmtprepare=true;
 	stmtpreparefailed=false;
@@ -969,6 +1037,7 @@ mysqlcursor::~mysqlcursor() {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	delete[] bind;
 	delete[] bindvaluesize;
+	delete[] bindtime;
 #endif
 	deallocateResultSetBuffers();
 }
@@ -981,23 +1050,23 @@ void mysqlcursor::allocateResultSetBuffers(int32_t columncount) {
 		fieldbind=NULL;
 		field=NULL;
 		isnull=NULL;
-		fieldlength=NULL;
+		fieldsize=NULL;
 #endif
 	} else {
 		mysqlfields=new MYSQL_FIELD *[columncount];
 #ifdef HAVE_MYSQL_STMT_PREPARE
-		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
 		fieldbind=new MYSQL_BIND[columncount];
-		field=new char[columncount*maxfieldlength];
+		field=new char[columncount*maxfieldsize];
 		isnull=new my_bool[columncount];
-		fieldlength=new unsigned long[columncount];
+		fieldsize=new unsigned long[columncount];
 		bytestring::zero(fieldbind,columncount*sizeof(MYSQL_BIND));
 		for (unsigned short index=0; index<columncount; index++) {
 			fieldbind[index].buffer_type=MYSQL_TYPE_STRING;
-			fieldbind[index].buffer=&field[index*maxfieldlength];
-			fieldbind[index].buffer_length=maxfieldlength;
+			fieldbind[index].buffer=&field[index*maxfieldsize];
+			fieldbind[index].buffer_length=maxfieldsize;
 			fieldbind[index].is_null=&isnull[index];
-			fieldbind[index].length=&fieldlength[index];
+			fieldbind[index].length=&fieldsize[index];
 		}
 #endif
 	}
@@ -1013,11 +1082,11 @@ void mysqlcursor::deallocateResultSetBuffers() {
 	delete[] fieldbind;
 	delete[] field;
 	delete[] isnull;
-	delete[] fieldlength;
+	delete[] fieldsize;
 	fieldbind=NULL;
 	field=NULL;
 	isnull=NULL;
-	fieldlength=NULL;
+	fieldsize=NULL;
 #endif
 	delete[] mysqlfields;
 	mysqlfields=NULL;
@@ -1047,6 +1116,12 @@ bool mysqlcursor::close() {
 		}
 #endif
 	}
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (mysqlmetadata) {
+		mysql_free_result(mysqlmetadata);
+		mysqlmetadata=NULL;
+	}
+#endif
 	if (stmt) {
 		mysql_stmt_close(stmt);
 		stmt=NULL;
@@ -1055,7 +1130,7 @@ bool mysqlcursor::close() {
 }
 #endif
 
-bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
+bool mysqlcursor::prepareQuery(const char *query, uint32_t size) {
 
 	// initialize column count
 	ncols=0;
@@ -1088,7 +1163,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	// fake binds.  Unfortunately it doesn't call it for things like
 	// pings or "use xxx" or other internal queries.  It might be good
 	// to sort all of that out at some point.)
-	if (!supportsNativeBinds(query,length)) {
+	if (!supportsNativeBinds(query,size)) {
 		return true;
 	}
 
@@ -1102,7 +1177,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	freeResult();
 
 	// prepare the statement
-	if (mysql_stmt_prepare(stmt,query,length)) {
+	if (mysql_stmt_prepare(stmt,query,size)) {
 		stmtpreparefailed=true;
 		return false;
 	}
@@ -1124,11 +1199,11 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 		// So, bail with an error if we don't have enough
 		// columns.
 		stringbuffer	err;
-		err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
+		err.append(SQLR_ERROR_MAXCOLUMNCOUNTTOOSMALL_STRING);
 		err.append(" (")->append(maxcolumncount);
 		err.append('<')->append(ncols)->append(')');
 		conn->cont->setError(this,err.getString(),
-				SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
+				SQLR_ERROR_MAXCOLUMNCOUNTTOOSMALL,true);
 		return false;
 	}
 
@@ -1138,15 +1213,15 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	}
 
 	// get the metadata
-	mysqlresult=NULL;
+	mysqlmetadata=NULL;
 	if (ncols) {
-		mysqlresult=mysql_stmt_result_metadata(stmt);
+		mysqlmetadata=mysql_stmt_result_metadata(stmt);
 
 		// grab the field info
-		if (mysqlresult) {
-			mysql_field_seek(mysqlresult,0);
+		if (mysqlmetadata) {
+			mysql_field_seek(mysqlmetadata,0);
 			for (unsigned int i=0; i<ncols; i++) {
-				mysqlfields[i]=mysql_fetch_field(mysqlresult);
+				mysqlfields[i]=mysql_fetch_field(mysqlmetadata);
 			}
 		}
 
@@ -1160,7 +1235,7 @@ bool mysqlcursor::prepareQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-bool mysqlcursor::supportsNativeBinds(const char *query, uint32_t length) {
+bool mysqlcursor::supportsNativeBinds(const char *query, uint32_t size) {
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	usestmtprepare=mysqlconn->usestmtapi &&
 			!unsupportedbystmt.match(query);
@@ -1289,8 +1364,6 @@ bool mysqlcursor::inputBind(const char *variable,
 				int32_t microsecond,
 				const char *tz,
 				bool isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 
 	if (!usestmtprepare) {
@@ -1323,7 +1396,7 @@ bool mysqlcursor::inputBind(const char *variable,
 
 	} else {
 
-		MYSQL_TIME	*t=(MYSQL_TIME *)buffer;
+		MYSQL_TIME	*t=&(bindtime[pos]);
 
 		// MySQL supports date, time and datetime types.
 		// Decide which to use.
@@ -1347,7 +1420,7 @@ bool mysqlcursor::inputBind(const char *variable,
 		t->second_part=(microsecond>=0)?microsecond:0;
 		t->neg=(!validdate && isnegative)?TRUE:FALSE;
 
-		bind[pos].buffer=(void *)buffer;
+		bind[pos].buffer=(void *)t;
 		bind[pos].buffer_length=sizeof(MYSQL_TIME);
 		bind[pos].length=&bindvaluesize[pos];
 	}
@@ -1407,7 +1480,7 @@ bool mysqlcursor::inputBindClob(const char *variable,
 }
 #endif
 
-bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
+bool mysqlcursor::executeQuery(const char *query, uint32_t size) {
 
 	// initialize row count
 	nrows=0;
@@ -1433,7 +1506,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 			return false;
 		}
 
-		checkForTempTable(query,length);
+		checkForTempTable(query,size);
 
 		// get the affected row count
 		affectedrows=mysql_stmt_affected_rows(stmt);
@@ -1449,7 +1522,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		mysqlresult=NULL;
 
 		// execute the query
-		queryresult=mysql_real_query(mysqlconn->mysqlptr,query,length);
+		queryresult=mysql_real_query(mysqlconn->mysqlptr,query,size);
 
 		// see note inside of getLastInsertId() for why we do this here
 		uint64_t	id=mysql_insert_id(mysqlconn->mysqlptr);
@@ -1461,7 +1534,7 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 			return false;
 		}
 
-		checkForTempTable(query,length);
+		checkForTempTable(query,size);
 
 		// store the result set
 		mysqlresult=mysql_store_result(mysqlconn->mysqlptr);
@@ -1489,11 +1562,11 @@ bool mysqlcursor::executeQuery(const char *query, uint32_t length) {
 		uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
 		if (maxcolumncount && ncols>maxcolumncount) {
 			stringbuffer	err;
-			err.append(SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL_STRING);
+			err.append(SQLR_ERROR_MAXCOLUMNCOUNTTOOSMALL_STRING);
 			err.append(" (")->append(maxcolumncount);
 			err.append('<')->append(ncols)->append(')');
 			conn->cont->setError(this,err.getString(),
-				SQLR_ERROR_MAXSELECTLISTSIZETOOSMALL,true);
+				SQLR_ERROR_MAXCOLUMNCOUNTTOOSMALL,true);
 			return false;
 		}
 
@@ -1538,11 +1611,11 @@ bool mysqlcursor::queryIsNotSelect() {
 }
 #endif
 
-void mysqlcursor::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void mysqlcursor::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 
 	*liveconnection=true;
 
@@ -1598,8 +1671,8 @@ void mysqlcursor::errorMessage(char *errorbuffer,
 	}
 
 	// set return values
-	*errorlength=charstring::getLength(err);
-	charstring::safeCopy(errorbuffer,errorbufferlength,err,*errorlength);
+	*errorsize=charstring::getLength(err);
+	charstring::safeCopy(errorbuffer,errorbuffersize,err,*errorsize);
 	*errorcode=errn;
 }
 
@@ -1619,7 +1692,7 @@ uint64_t mysqlcursor::rowCount() {
 	return nrows;
 }
 
-uint64_t mysqlcursor::affectedRows() {
+uint64_t mysqlcursor::getAffectedRows() {
 	return affectedrows;
 }
 
@@ -1628,7 +1701,7 @@ const char *mysqlcursor::getColumnName(uint32_t col) {
 }
 
 #ifdef HAVE_MYSQL_FIELD_NAME_LENGTH
-uint16_t mysqlcursor::getColumnNameLength(uint32_t col) {
+uint16_t mysqlcursor::getColumnNameSize(uint32_t col) {
 	return mysqlfields[col]->name_length;
 }
 #endif
@@ -1696,14 +1769,15 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 		// For some versions of mysql, tinyblobs, mediumblobs and
 		// longblobs all show up as FIELD_TYPE_BLOB despite field types
 		// being defined for those types.  The different types have
-		// predictable lengths though, so we'll use those to
+		// predictable sizes though, so we'll use those to
 		// differentiate them. 
 		case FIELD_TYPE_BLOB:
 			#if defined(MYSQL_VERSION_ID) && \
-					MYSQL_VERSION_ID>=100600
+					MYSQL_VERSION_ID>100505
 				if (mysqlfields[col]->flags&BINARY_FLAG) {
-					// MariaDB 10.6+ appears to use
-					// these lengths for blobs
+					// MariaDB 10.6+ and some versions of
+					// 10.5 appear to use these sizes for
+					// blobs
 					if (mysqlfields[col]->length<=255) {
 						return TINY_BLOB_DATATYPE;
 					} else if (mysqlfields[col]->
@@ -1744,7 +1818,7 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 				}
 			#elif defined(MYSQL_VERSION_ID) && \
 					MYSQL_VERSION_ID>=50000
-				// MySQL 5/8 appears to use these lengths
+				// MySQL 5/8 appears to use these sizes
 				// for both blobs and texts
 				if (mysqlfields[col]->length<=765) {
 					return TINY_BLOB_DATATYPE;
@@ -1756,9 +1830,9 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 					return LONG_BLOB_DATATYPE;
 				}
 			#else
-				// MySQL 3/4 uses these lengths for tiny and
+				// MySQL 3/4 uses these sizes for tiny and
 				// blob datatypes.  Medium and long both use
-				// the same length but are distinguishable by
+				// the same size but are distinguishable by
 				// their max_lengths of 11 and 9 respectively.
 				// No idea what the 11 and 9 actually mean.
 				// Text types are the same.
@@ -1782,7 +1856,7 @@ uint16_t mysqlcursor::getColumnType(uint32_t col) {
 	}
 }
 
-uint32_t mysqlcursor::getColumnLength(uint32_t col) {
+uint32_t mysqlcursor::getColumnSize(uint32_t col) {
 
 	switch (getColumnType(col)) {
 		case STRING_DATATYPE:
@@ -1791,15 +1865,15 @@ uint32_t mysqlcursor::getColumnLength(uint32_t col) {
 			return (uint32_t)mysqlfields[col]->length+1;
 		case DECIMAL_DATATYPE:
 			{
-			uint32_t	length=mysqlfields[col]->length+1;
+			uint32_t	size=mysqlfields[col]->length+1;
 			unsigned int	decimals=mysqlfields[col]->decimals;
 			if (decimals>0) {
-				length++;
+				size++;
 			}
 			if (mysqlfields[col]->length<decimals) {
-				length=decimals+2;
+				size=decimals+2;
 			}
-			return length;
+			return size;
 			}
 		case TINYINT_DATATYPE:
 			return 1;
@@ -1911,13 +1985,18 @@ const char *mysqlcursor::getColumnTable(uint32_t col) {
 #endif
 
 #ifdef HAVE_MYSQL_FIELD_ORG_TABLE_LENGTH
-uint16_t mysqlcursor::getColumnTableLength(uint32_t col) {
+uint16_t mysqlcursor::getColumnTableSize(uint32_t col) {
 	return mysqlfields[col]->org_table_length;
 }
 #endif
 
 bool mysqlcursor::noRowsToReturn() {
 	// for DML or DDL queries, return no data
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (usestmtprepare) {
+		return (!mysqlmetadata);
+	}
+#endif
 	return (!mysqlresult);
 }
 
@@ -1945,8 +2024,8 @@ bool mysqlcursor::fetchRow(bool *error) {
 			}
 			return false;
 		}
-		mysqlrowlengths=mysql_fetch_lengths(mysqlresult);
-		if (!mysqlrowlengths) {
+		mysqlrowsizes=mysql_fetch_lengths(mysqlresult);
+		if (!mysqlrowsizes) {
 			if (*mysql_error(mysqlconn->mysqlptr)) {
 				*error=true;
 			}
@@ -1959,8 +2038,8 @@ bool mysqlcursor::fetchRow(bool *error) {
 }
 
 void mysqlcursor::getField(uint32_t col,
-				const char **fld, uint64_t *fldlength,
-				bool *blob, bool *null) {
+				const char **fld, uint64_t *fldsize,
+				bool *lob, bool *null) {
 
 #ifdef HAVE_MYSQL_STMT_PREPARE
 	if (usestmtprepare) {
@@ -1974,12 +2053,12 @@ void mysqlcursor::getField(uint32_t col,
 				coltype==BLOB_DATATYPE ||
 				coltype==MEDIUM_BLOB_DATATYPE ||
 				coltype==LONG_BLOB_DATATYPE) {
-				*blob=true;
+				*lob=true;
 				return;
 			} else {
 				*fld=&field[col*
-					conn->cont->getMaxFieldLength()];
-				*fldlength=fieldlength[col];
+					conn->cont->getMaxFieldSize()];
+				*fldsize=fieldsize[col];
 			}
 		} else {
 			*null=true;
@@ -1988,7 +2067,7 @@ void mysqlcursor::getField(uint32_t col,
 #endif
 		if (mysqlrow[col]) {
 			*fld=mysqlrow[col];
-			*fldlength=mysqlrowlengths[col];
+			*fldsize=mysqlrowsizes[col];
 		} else {
 			*null=true;
 		}
@@ -2006,10 +2085,10 @@ bool mysqlcursor::getLobFieldLength(uint32_t col, uint64_t *length)  {
 	// values (especially pointers) lingering across uses
 	bytestring::zero(&lobfield,sizeof(MYSQL_BIND));
 	lobfield.buffer_type=MYSQL_TYPE_STRING;
-	lobfield.buffer_length=fieldlength[col];
+	lobfield.buffer_length=fieldsize[col];
 	*length=lobfield.buffer_length;
 
-	// mariadb-client-lgpl_2.0.0 crashes if the length pointer isn't set
+	// mariadb-client-lgpl_2.0.0 crashes if the size pointer isn't set
 	lobfield.length=&lobfieldlength;
 
 	return true;
@@ -2095,6 +2174,12 @@ void mysqlcursor::freeResult() {
 		}
 #endif
 	}
+#ifdef HAVE_MYSQL_STMT_PREPARE
+	if (mysqlmetadata) {
+		mysql_free_result(mysqlmetadata);
+		mysqlmetadata=NULL;
+	}
+#endif
 	if (!conn->cont->getMaxColumnCount()) {
 		deallocateResultSetBuffers();
 	}

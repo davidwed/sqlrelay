@@ -8,35 +8,22 @@
 
 class SQLRSERVER_DLLSPEC sqlrfilter_string : public sqlrfilter {
 	public:
-			sqlrfilter_string(sqlrservercontroller *cont,
-						sqlrfilters *fs,
+		sqlrfilter_string(sqlrservercontroller *cont,
 						domnode *parameters);
-			~sqlrfilter_string();
+		~sqlrfilter_string();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char *query);
 	private:
-		const char		*pattern;
-		char			*lowerpattern;
-		bool			ignorecase;
-
-		bool	enabled;
-
-		bool	debug;
+		const char	*pattern;
+		char		*lowerpattern;
+		bool		ignorecase;
 };
 
 sqlrfilter_string::sqlrfilter_string(sqlrservercontroller *cont,
-						sqlrfilters *fs,
 						domnode *parameters) :
-						sqlrfilter(cont,fs,parameters) {
+						sqlrfilter(cont,parameters) {
 	debugFunction();
-
-	debug=cont->getConfig()->getDebugFilters();
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled) {
-		return;
-	}
 
 	pattern=parameters->getAttributeValue("pattern");
 
@@ -62,10 +49,6 @@ bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
 					const char *query) {
 	debugFunction();
 
-	if (!enabled) {
-		return true;
-	}
-
 	char	*lowered=NULL;
 	if (ignorecase) {
 		lowered=charstring::duplicate(query);
@@ -77,8 +60,8 @@ bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
 
 	bool	result=!charstring::contains(query,pattern);
 
-	if (result && debug) {
-		stdoutput.printf("string: matches pattern \"%s\"\n\n",pattern);
+	if (!result) {
+		debugWrite("string: matches pattern \"%s\"",pattern);
 	}
 
 	delete[] lowered;
@@ -88,8 +71,7 @@ bool sqlrfilter_string::run(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter
 			*new_sqlrfilter_string(sqlrservercontroller *cont,
-						sqlrfilters *fs,
 						domnode *parameters) {
-		return new sqlrfilter_string(cont,fs,parameters);
+		return new sqlrfilter_string(cont,parameters);
 	}
 }

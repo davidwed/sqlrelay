@@ -1,4 +1,3 @@
 sqlrbindvariabletranslation	*new_sqlrbindvariabletranslation_@module@(
 					sqlrservercontroller *cont,
-					sqlrbindvariabletranslations *rs,
 					domnode *parameters);

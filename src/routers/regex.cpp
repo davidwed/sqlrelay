@@ -7,7 +7,7 @@
 
 class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 	public:
-			sqlrrouter_regex(sqlrservercontroller *cont,
+		sqlrrouter_regex(sqlrservercontroller *cont,
 						sqlrrouters *rs,
 						domnode *parameters);
 
@@ -19,10 +19,6 @@ class SQLRSERVER_DLLSPEC sqlrrouter_regex : public sqlrrouter {
 		linkedlist< regularexpression * >	relist;
 
 		const char	*connid;
-
-		bool	enabled;
-
-		bool	debug;
 };
 
 sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
@@ -31,32 +27,25 @@ sqlrrouter_regex::sqlrrouter_regex(sqlrservercontroller *cont,
 					sqlrrouter(cont,rs,parameters) {
 	relist.setManageValues(true);
 
-	debug=cont->getConfig()->getDebugRouters();
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled && debug) {
-		stdoutput.printf("	disabled\n");
-		return;
-	}
-
 	connid=parameters->getAttributeValue("connectionid");
 
+	debugStart("patterns");
 	for (domnode *pn=parameters->getFirstTagChild("pattern");
 				!pn->isNullNode();
 				pn=pn->getNextTagSibling("pattern")) {
 
 		const char	*pattern=pn->getAttributeValue("pattern");
-		if (debug) {
-			stdoutput.printf("	pattern: \"%s\"\n",pattern);
-		}
+		debugWrite("pattern: \"%s\"",pattern);
 
 		regularexpression	*re=new regularexpression;
 		re->setPattern(pattern);
 		re->study();
 		relist.append(re);
 	}
-	if (debug && !relist.getCount()) {
-		stdoutput.printf("	WARNING! no patterns found\n");
+	if (!relist.getCount()) {
+		debugWrite("WARNING! no patterns found");
 	}
+	debugEnd();
 }
 
 const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
@@ -64,35 +53,25 @@ const char *sqlrrouter_regex::route(sqlrserverconnection *sqlrcon,
 					const char **err,
 					int64_t *errn) {
 
-	if (!enabled || !sqlrcon || !sqlrcur) {
+	if (!sqlrcon || !sqlrcur) {
 		return NULL;
 	}
 
-	if (debug) {
-		stdoutput.printf("		route {\n");
-	}
+	debugWrite("route");
 
 	const char	*query=sqlrcur->getQueryBuffer();
 	for (listnode< regularexpression *> *rn=relist.getFirst();
 							rn; rn=rn->getNext()) {
 		if (rn->getValue()->match(query)) {
-			if (debug) {
-				stdoutput.printf("			"
-							"routing query:\n"
-							"		"
-							"	%s\n"
-							"		"
-							"	to: %s\n"
-							"		}\n",
-							query,connid);
-			}
+			debugWrite("routing query:");
+			debugWrite("%s",query);
+			debugWrite("to: %s",connid);
 			return connid;
 		}
 	}
 
-	if (debug) {
-		stdoutput.printf("		}\n");
-	}
+	debugEnd();
+
 	return NULL;
 }
 

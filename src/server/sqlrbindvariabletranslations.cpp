@@ -6,8 +6,6 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -17,102 +15,44 @@
 	}
 #endif
 
-class sqlrbindvariabletranslationplugin {
-	public:
-		sqlrbindvariabletranslation	*bvtr;
-		dynamiclib			*dl;
-		const char			*module;
-};
-
 class sqlrbindvariabletranslationsprivate {
 	friend class sqlrbindvariabletranslations;
 	private:
-		sqlrservercontroller	*_cont;
-
-		bool		_debug;
-
-		singlylinkedlist< sqlrbindvariabletranslationplugin * >	_tlist;
-
 		const char	*_error;
 };
 
 sqlrbindvariabletranslations::sqlrbindvariabletranslations(
-					sqlrservercontroller *cont) {
-
-	debugFunction();
+					sqlrservercontroller *cont) :
+					sqlrservermodules(cont) {
 	pvt=new sqlrbindvariabletranslationsprivate;
-	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugBindVariableTranslations();
+	setDebug(cont->getConfig()->getDebugBindVariableTranslations());
 	pvt->_error=NULL;
 }
 
 sqlrbindvariabletranslations::~sqlrbindvariabletranslations() {
-	debugFunction();
-	unload();
 	delete pvt;
 }
 
-bool sqlrbindvariabletranslations::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the bind variable translation list
-	for (domnode *bindvariabletranslation=parameters->getFirstTagChild();
-			!bindvariabletranslation->isNullNode();
-			bindvariabletranslation=
-				bindvariabletranslation->getNextTagSibling()) {
-
-		// load bind variable translation
-		loadBindVariableTranslation(bindvariabletranslation);
-	}
-
-	return true;
-}
-
-void sqlrbindvariabletranslations::unload() {
-	debugFunction();
-	for (listnode< sqlrbindvariabletranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		sqlrbindvariabletranslationplugin	*sqlt=node->getValue();
-		delete sqlt->bvtr;
-		delete sqlt->dl;
-		delete sqlt;
-	}
-	pvt->_tlist.clear();
-}
-
-void sqlrbindvariabletranslations::loadBindVariableTranslation(
-					domnode *bindvariabletranslation) {
-	debugFunction();
+void sqlrbindvariabletranslations::loadModule(domnode *parameters) {
 
 	// ignore non-bindvariabletranslations
-	if (charstring::compare(bindvariabletranslation->getName(),
-						"bindvariabletranslation")) {
+	if (charstring::compare(parameters->getName(),
+					"bindvariabletranslation")) {
 		return;
 	}
 
-	// get the bind variable translation name
-	const char	*module=
-			bindvariabletranslation->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=bindvariabletranslation->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	if (pvt->_debug) {
-		stdoutput.printf("loading bind variable translation: %s\n",
-									module);
-	}
+	debugWrite("loading bind variable translation module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the bind variable translation module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("bindvariabletranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -132,11 +72,9 @@ void sqlrbindvariabletranslations::loadBindVariableTranslation(
 	functionname.append("new_sqlrbindvariabletranslation_")->append(module);
 	sqlrbindvariabletranslation *(*newBindVariableTranslation)
 					(sqlrservercontroller *,
-					sqlrbindvariabletranslations *,
 					domnode *)=
 		(sqlrbindvariabletranslation *(*)
 					(sqlrservercontroller *,
-					sqlrbindvariabletranslations *,
 					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newBindVariableTranslation) {
@@ -150,8 +88,7 @@ void sqlrbindvariabletranslations::loadBindVariableTranslation(
 		return;
 	}
 	sqlrbindvariabletranslation	*bvtr=
-		(*newBindVariableTranslation)
-			(pvt->_cont,this,bindvariabletranslation);
+		(*newBindVariableTranslation)(cont,parameters);
 
 #else
 	dynamiclib			*dl=NULL;
@@ -162,35 +99,31 @@ void sqlrbindvariabletranslations::loadBindVariableTranslation(
 	}
 #endif
 
-	if (pvt->_debug) {
-		stdoutput.printf("success\n");
-	}
+	debugWrite("success");
 
 	// add the plugin to the list
-	sqlrbindvariabletranslationplugin	*sqlrrstp=
-				new sqlrbindvariabletranslationplugin;
-	sqlrrstp->bvtr=bvtr;
+	sqlrmoduleplugin	*sqlrrstp=new sqlrmoduleplugin;
+	sqlrrstp->m=bvtr;
 	sqlrrstp->dl=dl;
 	sqlrrstp->module=module;
-	pvt->_tlist.append(sqlrrstp);
+	blist.append(sqlrrstp);
 }
 
 bool sqlrbindvariabletranslations::run(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur) {
-	debugFunction();
 
 	pvt->_error=NULL;
 
-	for (listnode< sqlrbindvariabletranslationplugin * > *node=
-						pvt->_tlist.getFirst();
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
-		if (pvt->_debug) {
-			stdoutput.printf("\nrunning translation:  %s...\n\n",
-						node->getValue()->module);
-		}
 
-		if (!node->getValue()->bvtr->run(sqlrcon,sqlrcur)) {
-			pvt->_error=node->getValue()->bvtr->getError();
+		debugWrite("running bind variable translation: %s...",
+						node->getValue()->module);
+
+		sqlrbindvariabletranslation	*bvtr=
+			(sqlrbindvariabletranslation *)node->getValue()->m;
+		if (!bvtr->run(sqlrcon,sqlrcur)) {
+			pvt->_error=bvtr->getError();
 			return false;
 		}
 	}
@@ -199,20 +132,4 @@ bool sqlrbindvariabletranslations::run(sqlrserverconnection *sqlrcon,
 
 const char *sqlrbindvariabletranslations::getError() {
 	return pvt->_error;
-}
-
-void sqlrbindvariabletranslations::endTransaction(bool commit) {
-	for (listnode< sqlrbindvariabletranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->bvtr->endTransaction(commit);
-	}
-}
-
-void sqlrbindvariabletranslations::endSession() {
-	for (listnode< sqlrbindvariabletranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->bvtr->endSession();
-	}
 }

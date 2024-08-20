@@ -6,11 +6,10 @@
 class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation_test :
 					public sqlrresultsetheadertranslation {
 	public:
-			sqlrresultsetheadertranslation_test(
+		sqlrresultsetheadertranslation_test(
 					sqlrservercontroller *cont,
-					sqlrresultsetheadertranslations *rs,
 					domnode *parameters);
-			~sqlrresultsetheadertranslation_test();
+		~sqlrresultsetheadertranslation_test();
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
@@ -22,9 +21,8 @@ class SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation_test :
 sqlrresultsetheadertranslation_test::
 	sqlrresultsetheadertranslation_test(
 				sqlrservercontroller *cont,
-				sqlrresultsetheadertranslations *rs,
 				domnode *parameters) :
-		sqlrresultsetheadertranslation(cont,rs,parameters) {
+		sqlrresultsetheadertranslation(cont,parameters) {
 }
 
 sqlrresultsetheadertranslation_test::
@@ -44,9 +42,8 @@ extern "C" {
 	SQLRSERVER_DLLSPEC sqlrresultsetheadertranslation
 			*new_sqlrresultsetheadertranslation_test(
 					sqlrservercontroller *cont,
-					sqlrresultsetheadertranslations *rs,
 					domnode *parameters) {
 		return new sqlrresultsetheadertranslation_test(
-						cont,rs,parameters);
+						cont,parameters);
 	}
 }

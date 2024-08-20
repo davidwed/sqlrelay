@@ -3,8 +3,3 @@
 
 	private:
 		sqlrquerytranslationprivate	*pvt;
-
-	public:
-		sqlrquerytranslations	*getTranslations() {
-			return getQueryTranslations();
-		}

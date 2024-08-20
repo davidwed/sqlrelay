@@ -469,17 +469,17 @@ Some database API's allocate memory internally to buffer result sets.  How much 
 
 There are three connect string options that can be used to tune the size of the result set buffer:
 
-* maxselectlistsize - the maximum number of columns in the result set.
+* maxcolumncount - the maximum number of columns in the result set.
  * Defaults to 256
  * Setting to -1 causes buffers to be allocated dynamically
-* maxitembuffersize - the maximum size of an individual non-LOB field.
+* maxfieldsize - the maximum size of an individual non-LOB field.
  * Defaults to 32768, the maximum size of a varchar and varbinary types
 * fetchatonce - the number of rows of the result set to fetch at once.
  * Defaults to 10 (for databases that support it and 1 otherwise)
 
 The third option might be a little confusing.  Some databases only support single-row fetches; you run a query, then fetch 1 row at a time from the database.  Oracle, DB2 and SAP/Sybase support array fetches; you can run a query and then fetch any number of rows from the database in a single round-trip.
 
-The result set buffer size is determined (in bytes) by the formula: maxselectlistsize * maxitembuffersize * fetchatonce.
+The result set buffer size is determined (in bytes) by the formula: maxcolumncount * maxfieldsize * fetchatonce.
 
 The default result set buffer size for Oracle, DB2, Informix, and SAP/Sybase is 80mb (256 fields per row * 32768 bytes per field * 10 rows to fetch at once).
 
@@ -487,13 +487,13 @@ Informix, !FreeTDS, !MySQL/MariaDB, Firebird, and ODBC don't support multi-row f
 
 It is important to note that each cursor contains a result set buffer and each connection opens a configurable number of cursors.  For example, if you configure SQL Relay to open 5 connections with 2 cursors each, then if each cursor consumes 80mb, each connection will consume about 160mb, and all 5 connections will consume about 800mb.  If that seems like more memory than you'd like to allocate to SQL Relay then you can tune it down.
 
-For the best performance/memory-usage trade-off, the maxselectlistsize option should be set to the largest number of columns that a query run by your apps could return.  However, this option can also be set to -1, causing column buffers to be allocated dynamically for each result set.  This won't perform as well but will conserve memory.
+For the best performance/memory-usage trade-off, the maxcolumncount option should be set to the largest number of columns that a query run by your apps could return.  However, this option can also be set to -1, causing column buffers to be allocated dynamically for each result set.  This won't perform as well but will conserve memory.
 
-The maxitembuffersize option should be set to the longest non-LOB field that your app could fetch.
+The maxfieldsize option should be set to the longest non-LOB field that your app could fetch.
 
 There is no rule of thumb for the fetchatonce option.  More tends to be better, but not always.  You may have to tune this by trial and error.
 
-For Oracle, DB2, and SAP/Sybase, the maxselectlistsize, maxitembuffersize and fetchatonce connect string options may be set to control these values at run time.  For Informix, !MySQL/MariaDB, Firebird, !FreeTDS, and ODBC, the maxselectlistsize and maxitembuffersize options are available but the fetchatonce option is not.  When routing queries or sessions, only the fetchatonce option is available.
+For Oracle, DB2, and SAP/Sybase, the maxcolumncount, maxfieldsize and fetchatonce connect string options may be set to control these values at run time.  For Informix, !MySQL/MariaDB, Firebird, !FreeTDS, and ODBC, the maxcolumncount and maxfieldsize options are available but the fetchatonce option is not.  When routing queries or sessions, only the fetchatonce option is available.
 
 See the [configreference.html SQL Relay Configuration Reference] for details.
 
@@ -530,7 +530,7 @@ the kind of load your applications might place on SQL Relay and the database.
 should modify the queries that it runs to more accurately simulate your
 applications.
 
-If you are concerned about memory usage, consider allowing connections to scale up and down as necessary by using the connections, maxconnections, maxqueuelength and growby parameters in the configuration file.  See the [configreference.html SQL Relay Configuration Reference] for detailed information on these parameters.
+If you are concerned about memory usage, consider allowing connections to scale up and down as necessary by using the connections, maxconnections, maxqueuesize and growby parameters in the configuration file.  See the [configreference.html SQL Relay Configuration Reference] for detailed information on these parameters.
 
 [=#howmanycursors"]
 == How Many Cursors Should I Allocate? ==

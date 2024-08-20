@@ -78,6 +78,25 @@
 	fixed bug in cistring patterns translation that caused strings to be
 		lower-cased
 	added connectstring auth modules
+	lots of length -> size conversions
+	renamed various server-side methods to start with verbs
+	added sqlrexporttable class
+	moved table/index-translation into controller
+	improved replay trigger logging
+	fixed bug that could cause upserts to be confused with multi-inserts
+	improved trigger framework
+	improved affected rows framework
+	added splitmultiinsert trigger
+	added event methods to sqlrimport
+	changed SQLREVENT_QUERY to SQLREVENT_QUERY_EXECUTED
+	changed SQLREVENT_QUERY_RECEIVED and SQLREVENT_QUERY_PREPARED
+	updated sql logger with queryevent option
+	refactored sqlrimport/export class heirarchy
+	refactored module class heirarchy
+	refactored parser query/metadata tree methods
+	fixed "show tables" behavior
+	.spec file creates log/sqlrelay/debug directory now
+	refactored autocommit and fake transaction blocks
 
 1.9.2 - ruby cursor constructor marks associated ruby connection object now
 	updated bad-command and no-cursor-available handling in sqlrclient
@@ -458,7 +477,7 @@
 		true/false indicating whether we're in a transaction or not
 	pushed processing of various connect-string parameters up to
 		sqlrserverconnection class
-	renamed maxselectlist and maxitembuffersize to maxcolumncount and
+	renamed maxselectlistsize and maxitembuffersize to maxcolumncount and
 		maxfieldlength (old parameter names still work though)
 	fetch-at-once, max column count, and max field length are now available
 		via server API

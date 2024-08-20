@@ -268,6 +268,8 @@ int main(int argc, const char **argv) {
 	printAcquisitionStatus(sem[0]);
 	stdoutput.printf("  Shared Memory Access              (1) : ");
 	printAcquisitionStatus(sem[1]);
+	stdoutput.printf("  Semaphore Reset                  (12) : ");
+	printAcquisitionStatus(sem[12]);
 	stdoutput.printf("  Connection Count                  (4) : ");
 	printAcquisitionStatus(sem[4]);
 	stdoutput.printf("  Session Count                     (5) : ");
@@ -283,9 +285,6 @@ int main(int argc, const char **argv) {
 	stdoutput.printf(
 		"  Done Accepting Available Connection (c-w, l-s) (3) : ");
 	printTriggeredStatus(sem[3]);
-	stdoutput.printf(
-		"  Connection Ready For Handoff (l-w, c-s)       (12) : ");
-	printTriggeredStatus(sem[12]);
 	stdoutput.printf(
 		"  Evaluate Connection Count (s-w, l-s)           (6) : ");
 	printTriggeredStatus(sem[6]);

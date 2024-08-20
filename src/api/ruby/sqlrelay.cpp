@@ -17,8 +17,18 @@
 #endif
 
 #include <rudiments/bytestring.h>
-#include <ruby.h>
 #include "../c++/sqlrelay/sqlrclient.h"
+
+// include ruby.h after sqlrclient.h...
+// * winsock.h or bytestring.h somehow pulls in filedescriptor.h which defines:
+// 	ssize_t lowLevelRead()
+// * on some platforms (windows x86) ruby.h redefines ssize_t
+// * sqlrclient.h pulls in socketclient.h which overrides:
+// 	ssize_t lowLevelRead()
+// If ruby.h redefines ssize_t before socketclient.h overrides lowLevelRead()
+// then it will seem that the virtual method was overridden with a different
+// return type and the compile will fail.
+#include <ruby.h>
 
 #include "rubyincludes.h"
 
@@ -694,8 +704,17 @@ static VALUE sqlrcon_clientVersion(VALUE self) {
 static void bindFormat(params *p) {
 	p->result.ccpr=p->sqlrc.sqlrcon->bindFormat();
 }
-/** Returns a string representing the format
- *  of the bind variables used in the db. */
+/** Returns a string representing the bind variable format used
+ *  by the database.  For example:
+ *
+ *  ?  - database uses a ? to represent a bind variable
+ *  @* - database uses a @ followed by any characters to
+ *       represent a bind variable
+ *  $1 - database uses a $ followed by a number to represent a
+ *       bind variable
+ *  :* - database uses a : followed by any characters to
+ *       represent a bind variable
+ */
 static VALUE sqlrcon_bindFormat(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	const char	*result;
@@ -711,8 +730,17 @@ static VALUE sqlrcon_bindFormat(VALUE self) {
 static void nextvalFormat(params *p) {
 	p->result.ccpr=p->sqlrc.sqlrcon->nextvalFormat();
 }
-/** Returns a string representing the format of the
- *  sequence nextval command used in the db. */
+/** Returns a string representing the format of the sequence
+ *  nextval command used in the database.  The format will
+ *  contain a %s in place of the sequence name.  For example:
+ *
+ *  (nextval for %s)
+ *  next value for %s
+ *  nextval('%s')
+ *  %s.nextval
+ *
+ *  Returns an empty string if the database does not support
+ *  sequences. */
 static VALUE sqlrcon_nextvalFormat(VALUE self) {
 	sqlrconnection	*sqlrcon;
 	const char	*result;

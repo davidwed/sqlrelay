@@ -120,7 +120,7 @@ linkedlist< char * > *sqlrtlscredentials::getSubjectAlternateNames() {
 sqlrmysqlcredentials::sqlrmysqlcredentials() : sqlrcredentials() {
 	user=NULL;
 	password=NULL;
-	passwordlength=0;
+	passwordsize=0;
 	method=NULL;
 	extra=NULL;
 }
@@ -140,8 +140,8 @@ void sqlrmysqlcredentials::setPassword(const char *password) {
 	this->password=password;
 }
 
-void sqlrmysqlcredentials::setPasswordLength(uint64_t passwordlength) {
-	this->passwordlength=passwordlength;
+void sqlrmysqlcredentials::setPasswordSize(uint64_t passwordsize) {
+	this->passwordsize=passwordsize;
 }
 
 void sqlrmysqlcredentials::setMethod(const char *method) {
@@ -160,8 +160,8 @@ const char *sqlrmysqlcredentials::getPassword() {
 	return password;
 }
 
-uint64_t sqlrmysqlcredentials::getPasswordLength() {
-	return passwordlength;
+uint64_t sqlrmysqlcredentials::getPasswordSize() {
+	return passwordsize;
 }
 
 const char *sqlrmysqlcredentials::getMethod() {
@@ -175,7 +175,7 @@ const char *sqlrmysqlcredentials::getExtra() {
 sqlrpostgresqlcredentials::sqlrpostgresqlcredentials() : sqlrcredentials() {
 	user=NULL;
 	password=NULL;
-	passwordlength=0;
+	passwordsize=0;
 	method=NULL;
 	salt=0;
 }
@@ -195,8 +195,8 @@ void sqlrpostgresqlcredentials::setPassword(const char *password) {
 	this->password=password;
 }
 
-void sqlrpostgresqlcredentials::setPasswordLength(uint64_t passwordlength) {
-	this->passwordlength=passwordlength;
+void sqlrpostgresqlcredentials::setPasswordSize(uint64_t passwordsize) {
+	this->passwordsize=passwordsize;
 }
 
 void sqlrpostgresqlcredentials::setMethod(const char *method) {
@@ -215,8 +215,8 @@ const char *sqlrpostgresqlcredentials::getPassword() {
 	return password;
 }
 
-uint64_t sqlrpostgresqlcredentials::getPasswordLength() {
-	return passwordlength;
+uint64_t sqlrpostgresqlcredentials::getPasswordSize() {
+	return passwordsize;
 }
 
 const char *sqlrpostgresqlcredentials::getMethod() {
@@ -230,7 +230,7 @@ uint32_t sqlrpostgresqlcredentials::getSalt() {
 sqlroraclecredentials::sqlroraclecredentials() : sqlrcredentials() {
 	user=NULL;
 	password=NULL;
-	passwordlength=0;
+	passwordsize=0;
 	method=NULL;
 	extra=NULL;
 }
@@ -250,8 +250,8 @@ void sqlroraclecredentials::setPassword(const char *password) {
 	this->password=password;
 }
 
-void sqlroraclecredentials::setPasswordLength(uint64_t passwordlength) {
-	this->passwordlength=passwordlength;
+void sqlroraclecredentials::setPasswordSize(uint64_t passwordsize) {
+	this->passwordsize=passwordsize;
 }
 
 void sqlroraclecredentials::setMethod(const char *method) {
@@ -270,8 +270,8 @@ const char *sqlroraclecredentials::getPassword() {
 	return password;
 }
 
-uint64_t sqlroraclecredentials::getPasswordLength() {
-	return passwordlength;
+uint64_t sqlroraclecredentials::getPasswordSize() {
+	return passwordsize;
 }
 
 const char *sqlroraclecredentials::getMethod() {

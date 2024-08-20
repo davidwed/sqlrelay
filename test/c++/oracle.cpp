@@ -21,7 +21,7 @@ void checkSuccess(const char *value, const char *success) {
 			return;
 		} else {
 			stdoutput.printf("%s!=%s\n",value,success);
-			stdoutput.printf("failure ");
+			stdoutput.printf("failure: %s",cur->errorMessage());
 			delete cur;
 			delete con;
 			process::exit(1);
@@ -32,7 +32,7 @@ void checkSuccess(const char *value, const char *success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%s!=%s\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure: %s",cur->errorMessage());
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -47,7 +47,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 			return;
 		} else {
 			stdoutput.printf("%s!=%s\n",value,success);
-			stdoutput.printf("failure ");
+			stdoutput.printf("failure: %s",cur->errorMessage());
 			delete cur;
 			delete con;
 			process::exit(1);
@@ -58,7 +58,7 @@ void checkSuccess(const char *value, const char *success, size_t length) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%s!=%s\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure: %s",cur->errorMessage());
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -71,7 +71,7 @@ void checkSuccess(int value, int success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%d!=%d\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure: %s",cur->errorMessage());
 		delete cur;
 		delete con;
 		process::exit(1);
@@ -84,7 +84,7 @@ void checkSuccess(double value, double success) {
 		stdoutput.printf("success ");
 	} else {
 		stdoutput.printf("%f!=%f\n",value,success);
-		stdoutput.printf("failure ");
+		stdoutput.printf("failure: %s",cur->errorMessage());
 		delete cur;
 		delete con;
 		process::exit(1);

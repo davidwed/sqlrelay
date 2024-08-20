@@ -100,6 +100,10 @@ class mysql {
 		System.out.println("CREATE TEMPTABLE: ");
 		checkSuccess(cur.sendQuery("create table testtable (testtinyint tinyint, testsmallint smallint, testmediumint mediumint, testint int, testbigint bigint, testfloat float, testreal real, testdecimal decimal(2,1), testdate date, testtime time, testdatetime datetime, testyear year, testchar char(40), testtext text, testvarchar varchar(40), testtinytext tinytext, testmediumtext mediumtext, testlongtext longtext, testtimestamp timestamp)"),1);
 		System.out.println();
+
+		System.out.println("BEGIN TRANSACTION:");
+		checkSuccess(cur.sendQuery("begin"),1);
+		System.out.println();
 	
 		System.out.println("INSERT: ");
 		checkSuccess(cur.sendQuery("insert into testtable values (1,1,1,1,1,1.1,1.1,1.1,'2001-01-01','01:00:00','2001-01-01 01:00:00','2001','char1','text1','varchar1','tinytext1','mediumtext1','longtext1',null)"),1);

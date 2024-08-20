@@ -5,8 +5,6 @@
 
 #include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -16,87 +14,32 @@
 	}
 #endif
 
-class sqlrqueryplugin {
-	public:
-		sqlrquery	*qr;
-		dynamiclib	*dl;
-};
-
-class sqlrqueriesprivate {
-	friend class sqlrqueries;
-	private:
-		sqlrservercontroller	*_cont;
-
-		singlylinkedlist< sqlrqueryplugin * >	_llist;
-};
-
-sqlrqueries::sqlrqueries(sqlrservercontroller *cont) {
-	debugFunction();
-	pvt=new sqlrqueriesprivate;
-	pvt->_cont=cont;
+sqlrqueries::sqlrqueries(sqlrservercontroller *cont) : sqlrservermodules(cont) {
+	pvt=NULL;
 }
 
 sqlrqueries::~sqlrqueries() {
-	debugFunction();
-	unload();
-	delete pvt;
 }
 
-bool sqlrqueries::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the query list
-	for (domnode *query=parameters->getFirstTagChild();
-		!query->isNullNode(); query=query->getNextTagSibling()) {
-
-		debugPrintf("loading query ...\n");
-
-		// load query
-		loadQuery(query);
-	}
-	return true;
-}
-
-void sqlrqueries::unload() {
-	debugFunction();
-	for (listnode< sqlrqueryplugin * > *node=
-						pvt->_llist.getFirst();
-						node; node=node->getNext()) {
-		sqlrqueryplugin	*sqlrlp=node->getValue();
-		delete sqlrlp->qr;
-		delete sqlrlp->dl;
-		delete sqlrlp;
-	}
-	pvt->_llist.clear();
-}
-
-void sqlrqueries::loadQuery(domnode *query) {
-
-	debugFunction();
+void sqlrqueries::loadModule(domnode *parameters) {
 
 	// ignore non-queries
-	if (charstring::compare(query->getName(),"query")) {
+	if (charstring::compare(parameters->getName(),"query")) {
 		return;
 	}
 
-	// get the query name
-	const char	*module=query->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=query->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	debugPrintf("loading query: %s\n",module);
+	debugWrite("loading query module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the query module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("query_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -114,10 +57,8 @@ void sqlrqueries::loadQuery(domnode *query) {
 	stringbuffer	functionname;
 	functionname.append("new_sqlrquery_")->append(module);
 	sqlrquery *(*newQuery)(sqlrservercontroller *,
-					sqlrqueries *,
 					domnode *)=
 			(sqlrquery *(*)(sqlrservercontroller *,
-						sqlrqueries *,
 						domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newQuery) {
@@ -129,7 +70,7 @@ void sqlrqueries::loadQuery(domnode *query) {
 		delete dl;
 		return;
 	}
-	sqlrquery	*qr=(*newQuery)(pvt->_cont,this,query);
+	sqlrquery	*qr=(*newQuery)(cont,parameters);
 
 #else
 
@@ -141,41 +82,31 @@ void sqlrqueries::loadQuery(domnode *query) {
 	}
 #endif
 
+	debugWrite("success");
+
 	// add the plugin to the list
-	sqlrqueryplugin	*sqlrlp=new sqlrqueryplugin;
-	sqlrlp->qr=qr;
-	sqlrlp->dl=dl;
-	pvt->_llist.append(sqlrlp);
+	sqlrmoduleplugin	*sqlrmp=new sqlrmoduleplugin;
+	sqlrmp->m=qr;
+	sqlrmp->dl=dl;
+	sqlrmp->module=module;
+	blist.append(sqlrmp);
 }
 
 sqlrquerycursor *sqlrqueries::match(sqlrserverconnection *sqlrcon,
 					const char *querystring,
-					uint32_t querylength,
+					uint32_t querysize,
 					uint16_t id) {
-	debugFunction();
-	for (listnode< sqlrqueryplugin * > *node=
-						pvt->_llist.getFirst();
+
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
-		sqlrquery	*qr=node->getValue()->qr;
-		if (qr->match(querystring,querylength)) {
+
+		debugWrite("matching against query: %s...",
+					node->getValue()->module);
+
+		sqlrquery	*qr=(sqlrquery *)node->getValue()->m;
+		if (qr->match(querystring,querysize)) {
 			return qr->newCursor(sqlrcon,id);
 		}
 	}
 	return NULL;
-}
-
-void sqlrqueries::endTransaction(bool commit) {
-	for (listnode< sqlrqueryplugin * > *node=
-						pvt->_llist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->qr->endTransaction(commit);
-	}
-}
-
-void sqlrqueries::endSession() {
-	for (listnode< sqlrqueryplugin * > *node=
-						pvt->_llist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->qr->endSession();
-	}
 }

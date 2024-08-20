@@ -6,16 +6,12 @@
 class sqlrdirectiveprivate {
 	friend class sqlrdirective;
 	private:
-		sqlrdirectives	*_sqlds;
-		domnode	*_parameters;
 };
 
 sqlrdirective::sqlrdirective(sqlrservercontroller *cont,
-					sqlrdirectives *sqlds,
-					domnode *parameters) {
+					domnode *parameters) :
+					sqlrservermodule(cont,parameters) {
 	pvt=new sqlrdirectiveprivate;
-	pvt->_sqlds=sqlds;
-	pvt->_parameters=parameters;
 }
 
 sqlrdirective::~sqlrdirective() {
@@ -28,17 +24,9 @@ bool sqlrdirective::run(sqlrserverconnection *sqlrcon,
 	return true;
 }
 
-sqlrdirectives *sqlrdirective::getDirectives() {
-	return pvt->_sqlds;
-}
-
-domnode *sqlrdirective::getParameters() {
-	return pvt->_parameters;
-}
-
 bool sqlrdirective::getDirective(const char *line,
 					const char **directivestart,
-					uint32_t *directivelength,
+					uint32_t *directivesize,
 					const char **newline) {
 
 	const char	*ptr=line;
@@ -55,7 +43,7 @@ bool sqlrdirective::getDirective(const char *line,
 		start=ptr;
 	} else {
 		*directivestart=NULL;
-		*directivelength=0;
+		*directivesize=0;
 		*newline=start;
 		return false;
 	}
@@ -64,16 +52,16 @@ bool sqlrdirective::getDirective(const char *line,
 	for (;;) {
 		if (*ptr=='\n' || !*ptr) {
 			*directivestart=start;
-			*directivelength=ptr-start;
+			*directivesize=ptr-start;
 			if (*(ptr-1)=='\r') {
-				(*directivelength)--;
+				(*directivesize)--;
 			}
 			if (!*ptr) {
 				*newline=ptr;
 			} else {
 				ptr++;
 				if (*ptr=='\r') {
-					(*directivelength)++;
+					(*directivesize)++;
 				}
 				*newline=ptr;
 			}

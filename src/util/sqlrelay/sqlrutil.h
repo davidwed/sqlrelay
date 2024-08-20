@@ -9,7 +9,7 @@
 class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
 	friend class sqlrpaths;
 	public:
-			sqlrcmdline(int argc, const char **argv);
+		sqlrcmdline(int argc, const char **argv);
 
 		const char	*getId() const;
 	private:
@@ -18,8 +18,8 @@ class SQLRUTIL_DLLSPEC sqlrcmdline : public commandline {
 
 class SQLRUTIL_DLLSPEC sqlrpaths {
 	public:
-				sqlrpaths(sqlrcmdline *cmdl);
-				~sqlrpaths();
+		sqlrpaths(sqlrcmdline *cmdl);
+		~sqlrpaths();
 		const char	*getBinDir();
 		const char	*getLocalStateDir();
 		const char	*getTmpDir();
@@ -58,8 +58,8 @@ class SQLRUTIL_DLLSPEC sqlrpaths {
 
 class SQLRUTIL_DLLSPEC connectstringcontainer {
 	public:
-				connectstringcontainer();
-				~connectstringcontainer();
+		connectstringcontainer();
+		~connectstringcontainer();
 		void		parseConnectString();
 		void		setConnectionId(const char *connectionid);
 		void		setString(const char *string);
@@ -87,8 +87,8 @@ typedef listnode< connectstringcontainer * >	connectstringnode;
 
 class SQLRUTIL_DLLSPEC routecontainer {
 	public:
-			routecontainer();
-			~routecontainer();
+		routecontainer();
+		~routecontainer();
 
 		void	setIsFilter(bool isfilter);
 		void	setHost(const char *host);
@@ -118,7 +118,7 @@ typedef listnode< routecontainer * >	routenode;
 
 class SQLRUTIL_DLLSPEC sqlrconfig {
 	public:
-			sqlrconfig();
+		sqlrconfig();
 		virtual ~sqlrconfig();
 
 		virtual void	getEnabledIds(const char *url,
@@ -182,12 +182,12 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual const char	*getDebug()=0;
 		virtual bool		getDebugSql()=0;
 		virtual bool		getDebugBulkLoad()=0;
+		virtual bool		getDebugBindTranslations()=0;
 		virtual bool		getDebugParser()=0;
 		virtual bool		getDebugDirectives()=0;
 		virtual bool		getDebugQueryTranslations()=0;
 		virtual bool		getDebugFilters()=0;
 		virtual bool		getDebugTriggers()=0;
-		virtual bool		getDebugBindTranslations()=0;
 		virtual bool		getDebugBindVariableTranslations()=0;
 		virtual bool		getDebugResultSetTranslations()=0;
 		virtual bool		getDebugResultSetRowTranslations()=0;
@@ -204,13 +204,13 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 		virtual bool		getDebugQueries()=0;
 		virtual bool		getDebugModuleDatas()=0;
 
-		virtual uint64_t	getMaxClientInfoLength()=0;
+		virtual uint64_t	getMaxClientInfoSize()=0;
 		virtual uint32_t	getMaxQuerySize()=0;
 		virtual uint16_t	getMaxBindCount()=0;
-		virtual uint16_t	getMaxBindNameLength()=0;
-		virtual uint32_t	getMaxStringBindValueLength()=0;
-		virtual uint32_t	getMaxLobBindValueLength()=0;
-		virtual uint32_t	getMaxErrorLength()=0;
+		virtual uint16_t	getMaxBindNameSize()=0;
+		virtual uint32_t	getMaxStringBindValueSize()=0;
+		virtual uint32_t	getMaxLobBindValueSize()=0;
+		virtual uint32_t	getMaxErrorSize()=0;
 
 		virtual int32_t		getIdleClientTimeout()=0;
 
@@ -275,8 +275,8 @@ class SQLRUTIL_DLLSPEC sqlrconfig {
 
 class SQLRUTIL_DLLSPEC sqlrconfigs {
 	public:
-			sqlrconfigs(sqlrpaths *sqlrpth);
-			~sqlrconfigs();
+		sqlrconfigs(sqlrpaths *sqlrpth);
+		~sqlrconfigs();
 		void		getEnabledIds(const char *urls,
 						linkedlist< char * > *idlist);
 		sqlrconfig	*load(const char *urls, const char *id);
@@ -301,7 +301,7 @@ class SQLRUTIL_DLLSPEC sqlrpwdenc {
 
 	protected:
 		domnode	*getParameters();
-		bool		getDebug();
+		bool	getDebug();
 
 	#include <sqlrelay/private/sqlrpwdenc.h>
 };

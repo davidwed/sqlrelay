@@ -10,14 +10,11 @@
 
 class SQLRSERVER_DLLSPEC sqlrauth_mysql_connectstrings : public sqlrauth {
 	public:
-			sqlrauth_mysql_connectstrings(
-						sqlrservercontroller *cont,
-						sqlrauths *auths,
-						sqlrpwdencs *sqlrpe,
-						domnode *parameters);
+		sqlrauth_mysql_connectstrings(sqlrservercontroller *cont,
+							domnode *parameters);
 		const char	*auth(sqlrcredentials *cred);
 		bool		compare(const char *suppliedresponse,
-					uint64_t suppliedresponselength,
+					uint64_t suppliedresponsesize,
 					const char *validpassword,
 					const char *method,
 					const char *extra);
@@ -28,18 +25,12 @@ class SQLRSERVER_DLLSPEC sqlrauth_mysql_connectstrings : public sqlrauth {
 		uint64_t	usercount;
 
 		sensitivevalue	passwordvalue;
-
-		bool	debug;
 };
 
 sqlrauth_mysql_connectstrings::sqlrauth_mysql_connectstrings(
 					sqlrservercontroller *cont,
-					sqlrauths *auths,
-					sqlrpwdencs *sqlrpe,
 					domnode *parameters) :
-					sqlrauth(cont,auths,sqlrpe,parameters) {
-
-	debug=cont->getConfig()->getDebugAuths();
+					sqlrauth(cont,parameters) {
 
 	linkedlist< connectstringcontainer * >	*connectstrings=
 				cont->getConfig()->getConnectStringList();
@@ -97,20 +88,22 @@ const char *sqlrauth_mysql_connectstrings::auth(sqlrcredentials *cred) {
 
 	const char	*user=((sqlrmysqlcredentials *)cred)->getUser();
 	const char	*password=((sqlrmysqlcredentials *)cred)->getPassword();
-	uint64_t	passwordlength=((sqlrmysqlcredentials *)cred)->
-							getPasswordLength();
+	uint64_t	passwordsize=((sqlrmysqlcredentials *)cred)->
+							getPasswordSize();
 	const char	*method=((sqlrmysqlcredentials *)cred)->getMethod();
 	const char	*extra=((sqlrmysqlcredentials *)cred)->getExtra();
 
-	if (debug) {
-		stdoutput.printf("auth %s {\n",method);
-		stdoutput.printf("	user: \"%s\"\n",user);
-		stdoutput.printf("	password: \"");
-		stdoutput.safePrint(password,passwordlength);
-		stdoutput.printf("\"\n");
-		stdoutput.printf("	method: \"%s\"\n",method);
-		stdoutput.printf("	extra: \"%s\"\n",extra);
-		stdoutput.printf("}\n");
+	if (getDebug()) {
+		debugStart("auth %s",method);
+		debugWrite("user: \"%s\"",user);
+		stringbuffer	b;
+		b.append("password: \"");
+		b.safePrint(password,passwordsize);
+		b.append("\"");
+		debugWrite(b.getString());
+		debugWrite("method: \"%s\"",method);
+		debugWrite("extra: \"%s\"",extra);
+		debugEnd();
 	}
 
 	// sanity check on method
@@ -124,15 +117,13 @@ const char *sqlrauth_mysql_connectstrings::auth(sqlrcredentials *cred) {
 		// if the user matches...
 		if (!charstring::compare(user,users[i])) {
 
-			if (getPasswordEncryptions() &&
-				charstring::getLength(passwordencryptions[i])) {
+			if (charstring::getLength(passwordencryptions[i])) {
 
 				// if password encryption is being used...
 
 				// get the module
 				sqlrpwdenc	*pe=
-					getPasswordEncryptions()->
-						getPasswordEncryptionById(
+					cont->getPasswordEncryptionById(
 							passwordencryptions[i]);
 				if (!pe) {
 					return NULL;
@@ -157,7 +148,7 @@ const char *sqlrauth_mysql_connectstrings::auth(sqlrcredentials *cred) {
 					// compare it to the password
 					// that was passed in
 					retval=compare(password,
-							passwordlength,
+							passwordsize,
 							pwd,
 							method,extra);
 
@@ -173,7 +164,7 @@ const char *sqlrauth_mysql_connectstrings::auth(sqlrcredentials *cred) {
 				// if password encryption isn't being used,
 				// return the user if the passwords match
 				return (compare(password,
-						passwordlength,
+						passwordsize,
 						passwords[i],
 						method,
 						extra))?user:NULL;
@@ -184,7 +175,7 @@ const char *sqlrauth_mysql_connectstrings::auth(sqlrcredentials *cred) {
 }
 
 bool sqlrauth_mysql_connectstrings::compare(const char *suppliedresponse,
-						uint64_t suppliedresponselength,
+						uint64_t suppliedresponsesize,
 						const char *validpassword,
 						const char *method,
 						const char *extra) {
@@ -194,7 +185,7 @@ bool sqlrauth_mysql_connectstrings::compare(const char *suppliedresponse,
 	// mysql_clear_password is really simple
 	if (!charstring::compare(method,"mysql_clear_password")) {
 		expectedresponse.append(suppliedresponse,
-					suppliedresponselength);
+					suppliedresponsesize);
 	} else
 
 	// mysql_native_password is more complicated...
@@ -241,7 +232,7 @@ bool sqlrauth_mysql_connectstrings::compare(const char *suppliedresponse,
 	if (!charstring::compare(method,"sha256_password") ||
 		!charstring::compare(method,"caching_sha2_password")) {
 
-		if (suppliedresponselength) {
+		if (suppliedresponsesize) {
 
 			// scramblebuffer = sha256(password) xor
 			// sha256(concat(randombytes,sha256(sha256(password))))
@@ -297,33 +288,31 @@ bool sqlrauth_mysql_connectstrings::compare(const char *suppliedresponse,
 		return false;
 	}
 
-	if (debug) {
-		stdoutput.printf("auth compare {\n");
-		stdoutput.printf("	expected response: ");
-		stdoutput.safePrint(expectedresponse.getBuffer(),
+	if (getDebug()) {
+		debugStart("auth compare");
+		stringbuffer	b;
+		b.append("expected response: ");
+		b.safePrint(expectedresponse.getBuffer(),
 					expectedresponse.getSize());
-		stdoutput.printf("\n");
-		stdoutput.printf("	supplied response: ");
-		stdoutput.safePrint(suppliedresponse,
-					suppliedresponselength);
-		stdoutput.printf("\n");
-		stdoutput.printf("}\n");
+		debugWrite(b.getString());
+		b.clear();
+		b.append("supplied response: ");
+		b.safePrint(suppliedresponse,suppliedresponsesize);
+		debugWrite(b.getString());
+		debugEnd();
 	}
 
 	// compare the expected and supplied response sizes and values
-	return (expectedresponse.getSize()==suppliedresponselength) &&
+	return (expectedresponse.getSize()==suppliedresponsesize) &&
 		!bytestring::compare(expectedresponse.getBuffer(),
 						suppliedresponse,
-						suppliedresponselength);
+						suppliedresponsesize);
 }
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrauth *new_sqlrauth_mysql_connectstrings(
 						sqlrservercontroller *cont,
-						sqlrauths *auths,
-						sqlrpwdencs *sqlrpe,
 						domnode *parameters) {
-		return new sqlrauth_mysql_connectstrings(cont,auths,
-							sqlrpe,parameters);
+		return new sqlrauth_mysql_connectstrings(cont,parameters);
 	}
 }

@@ -1,4 +1,3 @@
 	if (!charstring::compare(module,"@module@")) {
-		rstr=new_sqlrresultsetrowtranslation_@module@(
-				pvt->_cont,this,resultsetrowtranslation);
+		rstr=new_sqlrresultsetrowtranslation_@module@(cont,parameters);
 	} else

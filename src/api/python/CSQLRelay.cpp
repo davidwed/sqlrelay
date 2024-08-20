@@ -28,6 +28,9 @@
 #endif
         #define PyInt_Check PyLong_Check
         #define PyInt_AsLong PyLong_AsLong
+#else
+	#define PyBytes_Check PyString_Check
+	#define PyBytes_AsString PyString_AsString
 #endif
 
 

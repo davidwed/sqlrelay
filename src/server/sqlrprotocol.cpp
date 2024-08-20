@@ -16,8 +16,6 @@
 class sqlrprotocolprivate {
 	friend class sqlrprotocol;
 	private:
-		sqlrprotocols		*_ps;
-		domnode			*_parameters;
 		bool			_bigendian;
 		bool			_debug;
 		bool			_usekrb;
@@ -28,14 +26,10 @@ class sqlrprotocolprivate {
 		tlscontext		_tctx;
 };
 
-sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont,
-				sqlrprotocols *ps,
-				domnode *parameters) {
+sqlrprotocol::sqlrprotocol(sqlrservercontroller *cont, domnode *parameters) :
+					sqlrservermodule(cont,parameters) {
 
 	pvt=new sqlrprotocolprivate;
-	this->cont=cont;
-	pvt->_ps=ps;
-	pvt->_parameters=parameters;
 	pvt->_bigendian=false;
 	pvt->_debug=cont->getConfig()->getDebugProtocols();
 
@@ -183,20 +177,6 @@ bool sqlrprotocol::useTls() {
 	return pvt->_usetls;
 }
 
-void sqlrprotocol::endTransaction(bool commit) {
-}
-
-void sqlrprotocol::endSession() {
-}
-
-sqlrprotocols *sqlrprotocol::getProtocols() {
-	return pvt->_ps;
-}
-
-domnode *sqlrprotocol::getParameters() {
-	return pvt->_parameters;
-}
-
 void sqlrprotocol::setProtocolIsBigEndian(bool bigendian) {
 	bigendian=pvt->_bigendian;
 }
@@ -249,24 +229,24 @@ bool sqlrprotocol::read(const byte_t *rp, byte_t *value,
 }
 
 void sqlrprotocol::read(const byte_t *rp, char *value,
-						size_t length,
+						size_t size,
 						const byte_t **rpout) {
-	bytestring::copy(value,rp,length);
-	*rpout=rp+length;
+	bytestring::copy(value,rp,size);
+	*rpout=rp+size;
 }
 
 void sqlrprotocol::read(const byte_t *rp, byte_t *value,
-						size_t length,
+						size_t size,
 						const byte_t **rpout) {
-	bytestring::copy(value,rp,length);
-	*rpout=rp+length;
+	bytestring::copy(value,rp,size);
+	*rpout=rp+size;
 }
 
 void sqlrprotocol::read(const byte_t *rp, ucs2_t *value,
-						size_t length,
+						size_t size,
 						const byte_t **rpout) {
-	bytestring::copy(value,rp,length*sizeof(ucs2_t));
-	*rpout=rp+length*sizeof(ucs2_t);
+	bytestring::copy(value,rp,size*sizeof(ucs2_t));
+	*rpout=rp+size*sizeof(ucs2_t);
 }
 
 void sqlrprotocol::read(const byte_t *rp, float *value,
@@ -495,18 +475,16 @@ void sqlrprotocol::write(bytebuffer *buffer, const char *value) {
 	write(buffer,value,charstring::getLength(value));
 }
 
-void sqlrprotocol::write(bytebuffer *buffer, const char *value,
-							size_t length) {
-	buffer->append(value,length);
+void sqlrprotocol::write(bytebuffer *buffer, const char *value, size_t size) {
+	buffer->append(value,size);
 }
 
-void sqlrprotocol::write(bytebuffer *buffer, const byte_t *value,
-							size_t length) {
-	buffer->append(value,length);
+void sqlrprotocol::write(bytebuffer *buffer, const byte_t *value, size_t size) {
+	buffer->append(value,size);
 }
 
-void sqlrprotocol::write(bytebuffer *buffer, const ucs2_t *str, size_t length) {
-	buffer->appendUcs2(str,length);
+void sqlrprotocol::write(bytebuffer *buffer, const ucs2_t *str, size_t size) {
+	buffer->appendUcs2(str,size);
 }
 
 void sqlrprotocol::write(bytebuffer *buffer, float value) {
@@ -584,9 +562,9 @@ void sqlrprotocol::writeLenEncStr(bytebuffer *buffer,
 
 void sqlrprotocol::writeLenEncStr(bytebuffer *buffer,
 						const char *string,
-						uint64_t length) {
-	writeLenEncInt(buffer,length);
-	buffer->append(string,length);
+						uint64_t size) {
+	writeLenEncInt(buffer,size);
+	buffer->append(string,size);
 }
 
 uint16_t sqlrprotocol::toHost(uint16_t value) {
@@ -659,51 +637,4 @@ uint32_t sqlrprotocol::hostToBE(uint32_t value) {
 
 uint64_t sqlrprotocol::hostToBE(uint64_t value) {
 	return filedescriptor::convertHostToNet(value);
-}
-
-bool sqlrprotocol::getDebug() {
-	return pvt->_debug;
-}
-
-void sqlrprotocol::debugStart(const char *title) {
-	debugStart(title,0);
-}
-
-void sqlrprotocol::debugStart(const char *title, uint16_t indent) {
-	if (pvt->_debug) {
-		for (uint16_t i=0; i<indent; i++) {
-			stdoutput.write('	');
-		}
-		if (!indent) {
-			stdoutput.printf("%d: ",process::getProcessId());
-		}
-		stdoutput.write(title);
-		stdoutput.write(" {\n");
-	}
-}
-
-void sqlrprotocol::debugEnd() {
-	debugEnd(0);
-}
-
-void sqlrprotocol::debugEnd(uint16_t indent) {
-	if (pvt->_debug) {
-		for (uint16_t i=0; i<indent; i++) {
-			stdoutput.write('	');
-		}
-		stdoutput.write("}\n");
-	}
-}
-
-void sqlrprotocol::debugHexDump(const byte_t *data, uint64_t size) {
-	debugHexDump(data,size,1);
-}
-
-void sqlrprotocol::debugHexDump(const byte_t *data,
-						uint64_t size,
-						uint16_t indent) {
-	if (!pvt->_debug) {
-		return;
-	}
-	stdoutput.printHex(data,size,indent);
 }

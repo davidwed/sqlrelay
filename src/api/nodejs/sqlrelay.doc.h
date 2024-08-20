@@ -233,12 +233,30 @@ class SQLRConnection {
 		/** Returns the version of the sqlrelay client software. */
 		function clientVersion();
 
-		/** Returns a string representing the format
-		 *  of the bind variables used in the db. */
+		/** Returns a string representing the bind variable format used
+		 *  by the database.  For example:
+		 *
+		 *  ?  - database uses a ? to represent a bind variable
+		 *  @* - database uses a @ followed by any characters to
+		 *       represent a bind variable
+		 *  $1 - database uses a $ followed by a number to represent a
+		 *       bind variable
+		 *  :* - database uses a : followed by any characters to
+		 *       represent a bind variable
+		 */
 		function bindFormat();
 
-		/** Returns a string representing the format of the
-		 *  sequence nextval command used in the db. */
+		/** Returns a string representing the format of the sequence
+		 *  nextval command used in the database.  The format will
+		 *  contain a %s in place of the sequence name.  For example:
+		 *
+		 *  (nextval for %s)
+		 *  next value for %s
+		 *  nextval('%s')
+		 *  %s.nextval
+		 *
+		 *  Returns an empty string if the database does not support
+		 *  sequences. */
 		function nextvalFormat();
 
 

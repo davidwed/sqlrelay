@@ -174,10 +174,10 @@
 		bool		getKeyAndIndexList(const char *table,
 					const char *wild,
 					sqlrclientlistformat_t listformat);
-		bool		getProcedureBindAndColumnList(
+		bool		getProcedureParameterList(
 					const char *procedure,
 					const char *wild);
-		bool		getProcedureBindAndColumnList(
+		bool		getProcedureParameterList(
 					const char *procedure,
 					const char *wild,
 					sqlrclientlistformat_t listformat);

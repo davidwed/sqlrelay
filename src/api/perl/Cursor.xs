@@ -9,6 +9,11 @@
 #endif
 
 #include "../c++/sqlrelay/sqlrclient.h"
+
+// Some verions of perl (5.38) define a "struct object" which collides with
+// the rudiments object class.  Do this trickery to work around that.
+#define object perlobject
+
 #include <EXTERN.h>
 #define explicit
 

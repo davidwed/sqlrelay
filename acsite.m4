@@ -2635,6 +2635,16 @@ then
 /usr/local/java \
 `ls -d /usr/local/openjdk* /usr/pkg/java/openjdk* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.30* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.29* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.28* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.27* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.26* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.25* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.24* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.23* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.22* 2> /dev/null` \
+`ls -d /usr/lib64/jvm/java-1.21* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.20* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.19* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/java-1.18* 2> /dev/null` \
@@ -2659,6 +2669,16 @@ then
 `ls -d /usr/lib64/jvm/jdk-13-* 2> /dev/null` \
 `ls -d /usr/lib64/jvm/jdk-14-* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.30* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.29* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.28* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.27* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.26* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.25* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.24* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.23* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.22* 2> /dev/null` \
+`ls -d /usr/lib/jvm/java-1.21* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.20* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.19* 2> /dev/null` \
 `ls -d /usr/lib/jvm/java-1.18* 2> /dev/null` \
@@ -3509,11 +3529,48 @@ then
 		
 
 		AC_MSG_CHECKING(for node module directory)
-		for file in "$NODEDIR/lib64/node_modules" "$NODEDIR/lib64/nodejs" "$NODEDIR/lib/node_modules" "$NODEDIR/lib/nodejs"
+		DIRS=""
+		if ( test -n "$LIBARCHDIR" )
+		then
+			DIRS="$DIRS \
+				$NODEDIR/$LIBARCHDIR/node_modules_25 \
+				$NODEDIR/$LIBARCHDIR/node_modules_24 \
+				$NODEDIR/$LIBARCHDIR/node_modules_22 \
+				$NODEDIR/$LIBARCHDIR/node_modules_21 \
+				$NODEDIR/$LIBARCHDIR/node_modules_20 \
+				$NODEDIR/$LIBARCHDIR/node_modules_19 \
+				$NODEDIR/$LIBARCHDIR/node_modules_18 \
+				$NODEDIR/$LIBARCHDIR/node_modules \
+				$NODEDIR/$LIBARCHDIR/nodejs"
+		fi
+		if ( test -n "$MULTIARCHDIR" )
+		then
+			DIRS="$DIRS \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_25 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_24 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_22 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_21 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_20 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_19 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules_18 \
+				$NODEDIR/lib/$MULTIARCHDIR/node_modules \
+				$NODEDIR/lib/$MULTIARCHDIR/nodejs"
+		fi
+		DIRS="$DIRS \
+			$NODEDIR/lib/node_modules_25 \
+			$NODEDIR/lib/node_modules_24 \
+			$NODEDIR/lib/node_modules_22 \
+			$NODEDIR/lib/node_modules_21 \
+			$NODEDIR/lib/node_modules_20 \
+			$NODEDIR/lib/node_modules_19 \
+			$NODEDIR/lib/node_modules_18 \
+			$NODEDIR/lib/node_modules \
+			$NODEDIR/lib/nodejs "
+		for dir in $DIRS
 		do
-			if ( test -d "$file" )
+			if ( test -d "$dir" )
 			then
-				NODEMODULEDIR="$file"
+				NODEMODULEDIR="$dir"
 				break
 			fi
 		done
@@ -3522,7 +3579,24 @@ then
 		AC_MSG_CHECKING(for node-gyp)
 		if ( test -r "$NODEMODULEDIR" )
 		then
-			for file in "$NODEMODULEDIR/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm6/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm6/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm7/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm7/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm8/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm8/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm9/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm9/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm10/node_modules/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/npm10/nodejs/node-gyp/bin/node-gyp.js" "$NODEMODULEDIR/../../share/node-gyp/bin/node-gyp.js"
+			for file in \
+			"$NODEMODULEDIR/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm6/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm6/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm7/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm7/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm8/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm8/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm9/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm9/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm10/node_modules/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/npm10/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/../../share/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/../../../share/nodejs/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/../../share/node-gyp/bin/node-gyp.js" \
+			"$NODEMODULEDIR/../../../share/node-gyp/bin/node-gyp.js"
 			do
 				if ( test -r "$file" )
 				then

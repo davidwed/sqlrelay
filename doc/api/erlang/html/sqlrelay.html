@@ -19,7 +19,7 @@
 <tr><td valign="top"><a href="#autoCommitOff-0">autoCommitOff/0</a></td><td>Instructs the database to wait for the client to tell it when to commit.</td></tr>
 <tr><td valign="top"><a href="#autoCommitOn-0">autoCommitOn/0</a></td><td>Instructs the database to perform a commit after every successful query.</td></tr>
 <tr><td valign="top"><a href="#beginTransaction-0">beginTransaction/0</a></td><td>Begins a transaction.</td></tr>
-<tr><td valign="top"><a href="#bindFormat-0">bindFormat/0</a></td><td>Returns a string representing the format of the bind variables used in the db.</td></tr>
+<tr><td valign="top"><a href="#bindFormat-0">bindFormat/0</a></td><td>Returns a string representing the bind variable format used by the database.</td></tr>
 <tr><td valign="top"><a href="#cacheOff-0">cacheOff/0</a></td><td>Sets query caching off.</td></tr>
 <tr><td valign="top"><a href="#cacheToFile-1">cacheToFile/1</a></td><td>Sets query caching on.</td></tr>
 <tr><td valign="top"><a href="#clearBinds-0">clearBinds/0</a></td><td>Clears all bind variables.</td></tr>
@@ -121,6 +121,7 @@
 <tr><td valign="top"><a href="#inputBindString-2">inputBindString/2</a></td><td>Defines a string input bind variable.</td></tr>
 <tr><td valign="top"><a href="#lowerCaseColumnNames-0">lowerCaseColumnNames/0</a></td><td>Columns names are converted to lower case.</td></tr>
 <tr><td valign="top"><a href="#mixedCaseColumnNames-0">mixedCaseColumnNames/0</a></td><td>Columns names are returned in the same case as they are defined in the database.</td></tr>
+<tr><td valign="top"><a href="#nextvalFormat-0">nextvalFormat/0</a></td><td>Returns a string representing the format of the sequence nextval command used in the database.</td></tr>
 <tr><td valign="top"><a href="#openCachedResultSet-1">openCachedResultSet/1</a></td><td>Opens a cached result set.</td></tr>
 <tr><td valign="top"><a href="#ping-0">ping/0</a></td><td>Returns true if the database is up and false if it's down.</td></tr>
 <tr><td valign="top"><a href="#prepareFileQuery-2">prepareFileQuery/2</a></td><td>Prepare to execute the contents of "path"/"filename".</td></tr>
@@ -187,7 +188,7 @@
 <div class="spec">
 <p><tt>bindFormat() -&gt; any()</tt></p>
 <p> </p>
-</div><p>Returns a string representing the format of the bind variables used in the db.</p>
+</div><p>Returns a string representing the bind variable format used by the database.  For example: ?  - database uses a ? to represent a bind variable  @* - database uses a @ followed by any characters to represent a bind variable  $1 - database uses a $ followed by a number to represent a bind variable  :* - database uses a : followed by any characters to represent a bind variable</p>
 
 <h3 class="function"><a name="cacheOff-0">cacheOff/0</a></h3>
 <div class="spec">
@@ -794,6 +795,12 @@
 <p><tt>mixedCaseColumnNames() -&gt; any()</tt></p>
 <p> </p>
 </div><p>Columns names are returned in the same case as they are defined in the database.  This is the default.</p>
+
+<h3 class="function"><a name="nextvalFormat-0">nextvalFormat/0</a></h3>
+<div class="spec">
+<p><tt>nextvalFormat() -&gt; any()</tt></p>
+<p> </p>
+</div><p>Returns a string representing the format of the sequence nextval command used in the database.  The format will contain a %s in place of the sequence name.  For example:  (nextval for %s)  next value for %s  nextval('%s')  %s.nextval  Returns an empty string if the database does not support sequences.</p>
 
 <h3 class="function"><a name="openCachedResultSet-1">openCachedResultSet/1</a></h3>
 <div class="spec">

@@ -879,6 +879,54 @@ TESTDBS=""
 TESTAPIS=""
 
 HOSTNAME=LCase(WScript.CreateObject("WScript.Network").ComputerName)
+Set RegExp=CreateObject("VBScript.RegExp")
+patterns=Array(_
+		"^centos",_
+		"^debian",_
+		"^fedora",_
+		"^freebsd",_
+		"^haiku",_
+		"^openbsd",_
+		"^netbsd",_
+		"^opensuse",_
+		"^solaris",_
+		"^syllable",_
+		"^ubuntu",_
+		"^win",_
+		"alpha$",_
+		"mipsel$",_
+		"mips64el$",_
+		"hppa$",_
+		"i386$",_
+		"sparc$",_
+		"sparc64$"_
+		)
+replacements=Array(_
+		"co",_
+		"db",_
+		"fc",_
+		"fb",_
+		"hk",_
+		"ob",_
+		"nb",_
+		"os",_
+		"sl",_
+		"sb",_
+		"u",_
+		"w",_
+		"a",_
+		"m32",_
+		"m64",_
+		"hp",_
+		"x86",_
+		"s32",_
+		"s64"_
+		)
+SHORTHOSTNAME=HOSTNAME
+for i=lbound(patterns) to ubound(patterns)
+	RegExp.Pattern=patterns(i)
+	SHORTHOSTNAME = RegExp.Replace(SHORTHOSTNAME,replacements(i))
+next
 
 CMDLINEBUILD="no "
 CPPBUILD="no "
@@ -959,7 +1007,7 @@ if disableoracle=false then
 end if
 if disablemysql=false then
 	MYSQLBUILD="yes    "
-	TESTDBS=TESTDBs&"""mysql"",""mysqlupsert"",""mysqldeadlockreplay"","
+	TESTDBS=TESTDBs&"""mysql"",""mysqlupsert"",""mysqldeadlockreplay"",""mysqlsplitmultiinsert"","
 end if
 if disablepostgresql=false then
 	POSTGRESQLBUILD="yes    "
@@ -1237,6 +1285,7 @@ for i=lbound(infiles) to ubound(infiles)
 
 	' hostname
 	content=replace(content,"@HOSTNAME@",HOSTNAME,1,-1,0)
+	content=replace(content,"@SHORTHOSTNAME@",SHORTHOSTNAME,1,-1,0)
 
 	' write output file
 	set outfile=fso.OpenTextFile(outfiles(i),2,true)

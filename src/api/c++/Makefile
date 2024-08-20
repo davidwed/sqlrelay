@@ -9,11 +9,16 @@ SRCS = sqlrconnection.cpp \
 	sqlrrowdictionary.cpp \
 	sqlrresultsettable.cpp \
 	sqlrimport.cpp \
+	sqlrimportfile.cpp \
 	sqlrimportxml.cpp \
 	sqlrimportcsv.cpp \
 	sqlrexport.cpp \
+	sqlrexportfile.cpp \
 	sqlrexportxml.cpp \
 	sqlrexportcsv.cpp \
+	sqlrexportdomnode.cpp \
+	sqlrexportcsvjsondomnode.cpp \
+	sqlrexporttable.cpp \
 	sqlrcrud.cpp
 LOBJS = sqlrconnection.$(OBJ) \
 	sqlrcursor.$(OBJ) \
@@ -22,11 +27,16 @@ LOBJS = sqlrconnection.$(OBJ) \
 	sqlrrowdictionary.$(OBJ) \
 	sqlrresultsettable.$(OBJ) \
 	sqlrimport.$(OBJ) \
+	sqlrimportfile.$(OBJ) \
 	sqlrimportxml.$(OBJ) \
 	sqlrimportcsv.$(OBJ) \
 	sqlrexport.$(OBJ) \
+	sqlrexportfile.$(OBJ) \
 	sqlrexportxml.$(OBJ) \
 	sqlrexportcsv.$(OBJ) \
+	sqlrexportdomnode.$(OBJ) \
+	sqlrexportcsvjsondomnode.$(OBJ) \
+	sqlrexporttable.$(OBJ) \
 	sqlrcrud.$(OBJ)
 
 .SUFFIXES: .lo .obj .cpp
@@ -59,16 +69,26 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrcrud.h
 	$(CP) sqlrelay/sqlrimport.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimport.h
-	$(CP) sqlrelay/sqlrimportcsv.h $(includedir)/sqlrelay
-	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimportcsv.h
+	$(CP) sqlrelay/sqlrimportfile.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimportfile.h
 	$(CP) sqlrelay/sqlrimportxml.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimportxml.h
+	$(CP) sqlrelay/sqlrimportcsv.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrimportcsv.h
 	$(CP) sqlrelay/sqlrexport.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrexport.h
-	$(CP) sqlrelay/sqlrexportcsv.h $(includedir)/sqlrelay
-	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrexportcsv.h
+	$(CP) sqlrelay/sqlrexportfile.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrexportfile.h
 	$(CP) sqlrelay/sqlrexportxml.h $(includedir)/sqlrelay
 	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrexportxml.h
+	$(CP) sqlrelay/sqlrexportcsv.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrexportcsv.h
+	$(CP) sqlrelay/sqlrexportdomnode.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrexportdomnode.h
+	$(CP) sqlrelay/sqlrexportcsvjsondomnode.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrexportcsvjsondomnode.h
+	$(CP) sqlrelay/sqlrexporttable.h $(includedir)/sqlrelay
+	$(CHMOD) 644 $(includedir)/sqlrelay/sqlrexporttable.h
 	$(CP) sqlrelay/private/sqlrclientincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrclientincludes.h
 	$(CP) sqlrelay/private/sqlrconnection.h $(includedir)/sqlrelay/private
@@ -97,26 +117,46 @@ install: $(INSTALLLIB)
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportincludes.h
 	$(CP) sqlrelay/private/sqlrimport.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimport.h
-	$(CP) sqlrelay/private/sqlrimportcsvincludes.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportcsvincludes.h
-	$(CP) sqlrelay/private/sqlrimportcsv.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportcsv.h
+	$(CP) sqlrelay/private/sqlrimportfileincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportfileincludes.h
+	$(CP) sqlrelay/private/sqlrimportfile.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportfile.h
 	$(CP) sqlrelay/private/sqlrimportxmlincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportxmlincludes.h
 	$(CP) sqlrelay/private/sqlrimportxml.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportxml.h
+	$(CP) sqlrelay/private/sqlrimportcsvincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportcsvincludes.h
+	$(CP) sqlrelay/private/sqlrimportcsv.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrimportcsv.h
 	$(CP) sqlrelay/private/sqlrexportincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportincludes.h
 	$(CP) sqlrelay/private/sqlrexport.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexport.h
-	$(CP) sqlrelay/private/sqlrexportcsvincludes.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportcsvincludes.h
-	$(CP) sqlrelay/private/sqlrexportcsv.h $(includedir)/sqlrelay/private
-	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportcsv.h
 	$(CP) sqlrelay/private/sqlrexportxmlincludes.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportxmlincludes.h
 	$(CP) sqlrelay/private/sqlrexportxml.h $(includedir)/sqlrelay/private
 	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportxml.h
+	$(CP) sqlrelay/private/sqlrexportfileincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportfileincludes.h
+	$(CP) sqlrelay/private/sqlrexportfile.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportfile.h
+	$(CP) sqlrelay/private/sqlrexportcsvincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportcsvincludes.h
+	$(CP) sqlrelay/private/sqlrexportcsv.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportcsv.h
+	$(CP) sqlrelay/private/sqlrexportdomnodeincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportdomnodeincludes.h
+	$(CP) sqlrelay/private/sqlrexportdomnode.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportdomnode.h
+	$(CP) sqlrelay/private/sqlrexportcsvjsondomnode.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportcsvjsondomnode.h
+	$(CP) sqlrelay/private/sqlrexportcsvjsondomnodeincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexportcsvjsondomnodeincludes.h
+	$(CP) sqlrelay/private/sqlrexporttable.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexporttable.h
+	$(CP) sqlrelay/private/sqlrexporttableincludes.h $(includedir)/sqlrelay/private
+	$(CHMOD) 644 $(includedir)/sqlrelay/private/sqlrexporttableincludes.h
 
 installdll::
 	$(MKINSTALLDIRS) $(bindir)

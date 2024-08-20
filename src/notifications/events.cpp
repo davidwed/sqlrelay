@@ -5,8 +5,7 @@
 
 class SQLRSERVER_DLLSPEC sqlrnotification_events : public sqlrnotification {
 	public:
-			sqlrnotification_events(sqlrnotifications *ns,
-						domnode *parameters);
+		sqlrnotification_events(domnode *parameters);
 
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
@@ -14,15 +13,12 @@ class SQLRSERVER_DLLSPEC sqlrnotification_events : public sqlrnotification {
 					sqlrevent_t event,
 					const char *info);
 	private:
-		bool		enabled;
 		domnode	*eventsnode;
 		domnode	*recipientsnode;
 };
 
-sqlrnotification_events::sqlrnotification_events(sqlrnotifications *ns,
-						domnode *parameters) :
-					sqlrnotification(ns,parameters) {
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
+sqlrnotification_events::sqlrnotification_events(domnode *parameters) :
+					sqlrnotification(parameters) {
 	eventsnode=parameters->getFirstTagChild("events");
 	recipientsnode=parameters->getFirstTagChild("recipients");
 }
@@ -32,23 +28,26 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 					sqlrservercursor *sqlrcur,
 					sqlrevent_t event,
 					const char *info) {
-	if (!enabled) {
-		return true;
-	}
 
 	// for each event...
 	for (domnode *enode=eventsnode->getFirstTagChild("event");
 			!enode->isNullNode();
 			enode=enode->getNextTagSibling("event")) {
 
+		// get the event string (and fudge it if necessary)
+		const char	*eventstr=enode->getAttributeValue("event");
+		if (!charstring::compare(eventstr,"query")) {
+			eventstr="query_executed";
+		}
+
 		// do we care about this event?
-		if (event!=getNotifications()->
-				eventType(enode->getAttributeValue("event"))) {
+		if (event!=((sqlrl)?sqlrl->getEventType(eventstr):
+				sqlrcon->cont->getEventType(eventstr))) {
 			continue;
 		}
 
 		// do we care about this query
-		if (event==SQLREVENT_QUERY) {
+		if (event==SQLREVENT_QUERY_EXECUTED) {
 			const char	*pattern=
 					enode->getAttributeValue("pattern");
 			if (!charstring::isNullOrEmpty(pattern)) {
@@ -69,9 +68,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 
 			// send the notification
 			// FIXME: this can fail...
-			getNotifications()->
-				sendNotification(
-					sqlrl,sqlrcon,sqlrcur,
+			sendNotification(sqlrl,sqlrcon,sqlrcur,
 					rnode->getAttributeValue("address"),
 					rnode->getAttributeValue("transportid"),
 					enode->getAttributeValue("subject"),
@@ -84,8 +81,7 @@ bool sqlrnotification_events::run(sqlrlistener *sqlrl,
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrnotification *new_sqlrnotification_events(
-							sqlrnotifications *ns,
 							domnode *parameters) {
-		return new sqlrnotification_events(ns,parameters);
+		return new sqlrnotification_events(parameters);
 	}
 }

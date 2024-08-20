@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserver.h>
+#include <sqlrelay/sqlrutil.h>
 #include <rudiments/sha1.h>
 #include <rudiments/charstring.h>
 
-class SQLRSERVER_DLLSPEC sqlrpwenc_sha1 : public sqlrpwdenc {
+class SQLRUTIL_DLLSPEC sqlrpwenc_sha1 : public sqlrpwdenc {
 	public:
-			sqlrpwenc_sha1(domnode *parameters, bool debug);
+		sqlrpwenc_sha1(domnode *parameters, bool debug);
 		bool	oneWay();
 		char	*encrypt(const char *value);
 };
@@ -27,7 +27,7 @@ char *sqlrpwenc_sha1::encrypt(const char *value) {
 }
 
 extern "C" {
-	SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_sha1(
+	SQLRUTIL_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_sha1(
 						domnode *parameters,
 						bool debug) {
 		return new sqlrpwenc_sha1(parameters,debug);

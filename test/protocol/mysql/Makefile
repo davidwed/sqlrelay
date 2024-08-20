@@ -22,4 +22,5 @@ mysqldatetodatetime: mysqldatetodatetime.cpp mysqldatetodatetime.$(OBJ)
 	$(LTLINK) $(LINK) $(LDFLAGS) $(OUT)$@$(EXE) mysqldatetodatetime.$(OBJ) $(MYSQLLIBS) $(RUDIMENTSLIBS)
 
 clean:
-	$(RM) *.lo *.o *.obj *.class mysql$(EXE) mysqldatetodatetime$(EXE) bind$(EXE)	$(RMTREE) .libs
+	$(RM) *.lo *.o *.obj *.class mysql$(EXE) mysqldatetodatetime$(EXE) bind$(EXE)
+	$(RMTREE) .libs

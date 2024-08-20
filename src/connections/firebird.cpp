@@ -54,6 +54,7 @@ struct datebind {
         int16_t         *second;
         const char      **tz;
 	bool		*isnegative;
+	ISC_TIMESTAMP	buffer;
 };
 
 class firebirdconnection;
@@ -61,13 +62,12 @@ class firebirdconnection;
 class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 	friend class firebirdconnection;
 	private:
-				firebirdcursor(sqlrserverconnection *conn,
-								uint16_t id);
-				~firebirdcursor();
+		firebirdcursor(sqlrserverconnection *conn, uint16_t id);
+		~firebirdcursor();
 		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -92,8 +92,6 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
                                         	int32_t microsecond,
                                         	const char *tz,
 						bool isnegative,
-                                        	char *buffer,
-                                        	uint16_t buffersize,
                                         	int16_t *isnull);
 		bool		inputBindBlob(const char *variable,
 						uint16_t variablesize,
@@ -131,8 +129,6 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		outputBindBlob(const char *variable,
 						uint16_t variablesize,
@@ -152,35 +148,35 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 							uint64_t *charsread);
 		void		closeLobOutputBind(uint16_t index);
 		bool		executeQuery(const char *query,
-						uint32_t length);
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+						uint32_t size);
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		void		checkForTempTable(const char *query,
-							uint32_t length);
+							uint32_t size);
 		bool		queryIsNotSelect();
 		bool		queryIsCommitOrRollback();
 		bool		knowsAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
-		uint16_t	getColumnNameLength(uint32_t col);
+		uint16_t	getColumnNameSize(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
-		uint32_t	getColumnLength(uint32_t col);
+		uint32_t	getColumnSize(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
 		const char	*getColumnTable(uint32_t col);
-		uint16_t	getColumnTableLength(uint32_t col);
+		uint16_t	getColumnTableSize(uint32_t col);
 		bool		noRowsToReturn();
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
+					uint64_t *fieldsize,
+					bool *lob,
 					bool *null);
 		bool		getLobFieldLength(uint32_t col,
-					uint64_t *length);
+						uint64_t *length);
 		bool		getLobFieldSegment(uint32_t col,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
@@ -194,6 +190,7 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 		uint16_t	maxbindcount;
 
 		XSQLDA	ISC_FAR	*inbindsqlda;
+		ISC_TIMESTAMP	*inbindts;
 		ISC_QUAD	*inbindblobid;
 		isc_blob_handle	*inbindblobhandle;
 
@@ -205,6 +202,7 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 		datebind	*outdatebind;
 		
 		XSQLDA	ISC_FAR	*outsqlda;
+		byte_t		*outsqldabuffer;
 		fieldstruct	*field;
 
 		ISC_LONG	querytype;
@@ -221,8 +219,8 @@ class SQLRSERVER_DLLSPEC firebirdcursor : public sqlrservercursor {
 class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 	friend class firebirdcursor;
 	public:
-			firebirdconnection(sqlrservercontroller *cont);
-			~firebirdconnection();
+		firebirdconnection(sqlrservercontroller *cont);
+		~firebirdconnection();
 	private:
 		void	handleConnectString();
 		bool	logIn(const char **error, const char **warning);
@@ -230,32 +228,36 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
 		bool	supportsTransactionBlocks();
+		bool	setAutoCommitOn();
+		bool	setAutoCommitOff();
 		bool	commit();
 		bool	rollback();
 		bool	ping();
-		void	errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+		void	getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t	*errorcode,
 					bool *liveconnection);
 		bool		selectDatabase(const char *database);
 		char		*getCurrentDatabase();
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*dbHostName();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getDbHostName();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild,
-						uint16_t objecttypes);
-		const char	*getGlobalTempTableListQuery();
+						uint16_t objecttypes,
+						bool currentschemaonly);
+		const char	*getGlobalTempTableListQuery(
+						bool currentschemaonly);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
-		const char	*bindFormat();
-		const char	*nextvalFormat();
+		const char	*getBindFormat();
+		const char	*getNextvalFormat();
 		const char	*getLastInsertIdQuery();
-		const char	*noopQuery();
+		const char	*getNoopQuery();
 
 		char		dpb[256];
-		short		dpblength;
+		short		dpbsize;
 		isc_db_handle	db;
 		isc_tr_handle	tr;
 
@@ -267,15 +269,17 @@ class SQLRSERVER_DLLSPEC firebirdconnection : public sqlrserverconnection {
 
 		bool		droptemptables;
 
-		const char	*identity;
-
 		char		*dbversion;
 
 		char		*lastinsertidquery;
 
+		stringbuffer	tablelistquery;
+
 		ISC_STATUS	error[20];
 
 		stringbuffer	errormsg;
+
+		bool		autocommit;
 };
 
 static char tpb[] = {
@@ -287,13 +291,23 @@ static char tpb[] = {
 	isc_tpb_wait
 };
 
+static char tpbac[] = {
+	isc_tpb_version3,
+	isc_tpb_write,
+	isc_tpb_read_committed,
+	isc_tpb_rec_version,
+	// FIXME: vladimir changed this to isc_tpb_nowait.  why?
+	isc_tpb_wait,
+	isc_tpb_autocommit
+};
+
 firebirdconnection::firebirdconnection(sqlrservercontroller *cont) :
 						sqlrserverconnection(cont) {
 	dbversion=NULL;
 	lastinsertidquery=NULL;
 	database=NULL;
 	host=NULL;
-	identity=NULL;
+	autocommit=false;
 }
 
 firebirdconnection::~firebirdconnection() {
@@ -344,8 +358,6 @@ void firebirdconnection::handleConnectString() {
 		lastinsertidquery=liiquery.detachString();
 	}
 
-	identity=cont->getConnectStringValue("identity");
-
 	// firebird doesn't support multi-row fetches
 	cont->setFetchAtOnce(1);
 }
@@ -386,8 +398,8 @@ bool firebirdconnection::logIn(const char **err, const char **warning) {
 		dpbptr+=charstring::getLength(charset);
 	}
 
-	// determine the parameter buffer length
-	dpblength=dpbptr-dpb;
+	// determine the parameter buffer size
+	dpbsize=dpbptr-dpb;
 
 	// handle user/password parameters
 	const char	*user=cont->getUser();
@@ -403,8 +415,7 @@ bool firebirdconnection::logIn(const char **err, const char **warning) {
 	db=0L;
 	tr=0L;
 	if (isc_attach_database(error,charstring::getLength(database),
-					const_cast<char *>(database),&db,
-					dpblength,dpb)) {
+						database,&db,dpbsize,dpb)) {
 		db=0L;
 
 		errormsg.clear();
@@ -425,6 +436,8 @@ bool firebirdconnection::logIn(const char **err, const char **warning) {
 
 	// start a transaction
 	if (isc_start_transaction(error,&tr,1,&db,(uint16_t)sizeof(tpb),&tpb)) {
+
+		tr=0L;
 
 		errormsg.clear();
 
@@ -462,17 +475,43 @@ bool firebirdconnection::supportsTransactionBlocks() {
 	return false;
 }
 
+bool firebirdconnection::setAutoCommitOn() {
+	autocommit=true;
+	return !isc_commit_transaction(error,&tr) &&
+		!isc_start_transaction(error,&tr,1,&db,
+					(uint16_t)sizeof(tpbac),&tpbac);
+}
+
+bool firebirdconnection::setAutoCommitOff() {
+	autocommit=false;
+	return !isc_commit_transaction(error,&tr) &&
+		!isc_start_transaction(error,&tr,1,&db,
+					(uint16_t)sizeof(tpb),&tpb);
+}
+
 bool firebirdconnection::commit() {
-	return (!isc_commit_retaining(error,&tr));
+	if (autocommit) {
+		return !isc_commit_retaining(error,&tr);
+	} else {
+		return !isc_commit_transaction(error,&tr) &&
+			!isc_start_transaction(error,&tr,1,&db,
+					(uint16_t)sizeof(tpb),&tpb);
+	}
 }
 
 bool firebirdconnection::rollback() {
-	return (!isc_rollback_retaining(error,&tr));
+	if (autocommit) {
+		return !isc_rollback_retaining(error,&tr);
+	} else {
+		return !isc_rollback_transaction(error,&tr) &&
+			!isc_start_transaction(error,&tr,1,&db,
+					(uint16_t)sizeof(tpb),&tpb);
+	}
 }
 
-void firebirdconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+void firebirdconnection::getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t *errorcode,
 					bool *liveconnection) {
 
@@ -489,10 +528,10 @@ void firebirdconnection::errorMessage(char *errorbuffer,
 
 	// get the error message
 	ISC_LONG	sqlcode=isc_sqlcode(error);
-	isc_sql_interprete(sqlcode,errorbuffer,errorbufferlength);
+	isc_sql_interprete(sqlcode,errorbuffer,errorbuffersize);
 
 	// set return values
-	*errorlength=charstring::getLength(errorbuffer);
+	*errorsize=charstring::getLength(errorbuffer);
 	*errorcode=sqlcode;
 	*liveconnection=!(charstring::contains(
 				errormsg.getString(),
@@ -564,11 +603,11 @@ char *firebirdconnection::getCurrentDatabase() {
 	return charstring::duplicate(database);
 }
 
-const char *firebirdconnection::identify() {
-	return (identity)?identity:"firebird";
+const char *firebirdconnection::getDbType() {
+	return "firebird";
 }
 
-const char *firebirdconnection::dbVersion() {
+const char *firebirdconnection::getDbVersion() {
 	ISC_STATUS	status[20];
 	char		dbitems[]={isc_info_version,
 					isc_info_end};
@@ -582,7 +621,7 @@ const char *firebirdconnection::dbVersion() {
 		// first byte is isc_info_version
 		ptr++;
 
-		// next 2 bytes are length of the isc_info_version data
+		// next 2 bytes are size of the isc_info_version data
 		ptr=ptr+sizeof(uint16_t);
 
 		// the next byte is the number of lines of text
@@ -591,7 +630,7 @@ const char *firebirdconnection::dbVersion() {
 		ptr++;
 		for (char lineindex=0; lineindex<linecount; lineindex++) {
 
-			// the first byte of each line is the length of the line
+			// the first byte of each line is the size of the line
 			char	linelen=*ptr;
 			ptr++;
 
@@ -609,7 +648,7 @@ const char *firebirdconnection::dbVersion() {
 	return "";
 }
 
-const char *firebirdconnection::dbHostName() {
+const char *firebirdconnection::getDbHostName() {
 	return host;
 }
 
@@ -618,8 +657,10 @@ const char *firebirdconnection::getDatabaseListQuery(bool wild) {
 }
 
 const char *firebirdconnection::getTableListQuery(bool wild,
-						uint16_t objecttypes) {
-	return (wild)?
+						uint16_t objecttypes,
+						bool currentschemaonly) {
+	tablelistquery.clear();
+	tablelistquery.append(
 		"select "
 		"	NULL as table_cat, "
 		"	rdb$owner_name as table_schem, "
@@ -630,30 +671,30 @@ const char *firebirdconnection::getTableListQuery(bool wild,
 		"from "
 		"	rdb$relations "
 		"where "
-		"	rdb$system_flag=0 "
-		"	and "
-		"	rdb$relation_name like '%s' "
+		"	rdb$system_flag=0 ");
+	if (currentschemaonly) {
+		tablelistquery.append(
+			"	and "
+			"	upper(rdb$owner_name)=upper('");
+		tablelistquery.append(cont->getUser());
+		tablelistquery.append(
+			"') ");
+	}
+	if (wild) {
+		tablelistquery.append(
+			"	and "
+			"	rdb$relation_name like '%s' ");
+	}
+	tablelistquery.append(
 		"order by "
 		"	rdb$owner_name, "
-		"	rdb$relation_name":
+		"	rdb$relation_name");
 
-		"select "
-		"	NULL as table_cat, "
-		"	rdb$owner_name as table_schem, "
-		"	rdb$relation_name as table_name, "
-		"	'TABLE' as table_type, "
-		"	NULL as remarks, "
-		"	NULL as extra "
-		"from "
-		"	rdb$relations "
-		"where "
-		"	rdb$system_flag=0 "
-		"order by "
-		"	rdb$owner_name, "
-		"	rdb$relation_name";
+	return tablelistquery.getString();
 }
 
-const char *firebirdconnection::getGlobalTempTableListQuery() {
+const char *firebirdconnection::getGlobalTempTableListQuery(
+						bool currentschemaonly) {
 	return "select "
 		"	rdb$relation_name "
 		"from "
@@ -746,11 +787,11 @@ const char *firebirdconnection::getColumnListQuery(
 		"	r.rdb$field_position";
 }
 
-const char *firebirdconnection::bindFormat() {
+const char *firebirdconnection::getBindFormat() {
 	return "?";
 }
 
-const char *firebirdconnection::nextvalFormat() {
+const char *firebirdconnection::getNextvalFormat() {
 	return "next value for %s";
 }
 
@@ -758,7 +799,7 @@ const char *firebirdconnection::getLastInsertIdQuery() {
 	return lastinsertidquery;
 }
 
-const char *firebirdconnection::noopQuery() {
+const char *firebirdconnection::getNoopQuery() {
 	return "execute block as begin end";
 }
 
@@ -768,6 +809,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	firebirdconn=(firebirdconnection *)conn;
 
 	outsqlda=NULL;
+	outsqldabuffer=NULL;
 	allocateResultSetBuffers(conn->cont->getMaxColumnCount());
 
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
@@ -777,6 +819,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	inbindsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(maxbindcount)];
 	inbindsqlda->version=SQLDA_VERSION1;
 	inbindsqlda->sqln=maxbindcount;
+	inbindts=new ISC_TIMESTAMP[maxbindcount];
 	inbindblobid=new ISC_QUAD[maxbindcount];
 	inbindblobhandle=new isc_blob_handle[maxbindcount];
 
@@ -790,8 +833,8 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 	outbindblobisopen=new bool[maxbindcount];
 	outdatebind=new datebind[maxbindcount];
 
-	querytype=0;
-	stmt=0;
+	querytype=0L;
+	stmt=0L;
 
 	queryisexecsp=false;
 	bindformaterror=false;
@@ -805,6 +848,7 @@ firebirdcursor::firebirdcursor(sqlrserverconnection *conn, uint16_t id) :
 
 firebirdcursor::~firebirdcursor() {
 	delete[] inbindsqlda;
+	delete[] inbindts;
 	delete[] inbindblobid;
 	delete[] inbindblobhandle;
 
@@ -814,36 +858,41 @@ firebirdcursor::~firebirdcursor() {
 	delete[] outbindblobisopen;
 	delete[] outdatebind;
 
-	deallocateResultSetBuffers();
+	delete[] outsqldabuffer;
+	delete[] field;
 }
 
 void firebirdcursor::allocateResultSetBuffers(int32_t columncount) {
 
+	delete[] outsqldabuffer;
+
 	if (!columncount) {
-		outsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(1)];
+		outsqldabuffer=new byte_t[XSQLDA_LENGTH(1)];
+		bytestring::zero(outsqldabuffer,XSQLDA_LENGTH(1));
+		outsqlda=(XSQLDA ISC_FAR *)outsqldabuffer;
 		outsqlda->version=SQLDA_VERSION1;
 		outsqlda->sqln=1;
 		field=NULL;
 	} else {
-		if (outsqlda) {
-			delete[] outsqlda;
-		}
-		outsqlda=(XSQLDA ISC_FAR *)new byte_t[
-						XSQLDA_LENGTH(columncount)];
+		outsqldabuffer=new byte_t[XSQLDA_LENGTH(columncount)];
+		bytestring::zero(outsqldabuffer,XSQLDA_LENGTH(columncount));
+		outsqlda=(XSQLDA ISC_FAR *)outsqldabuffer;
 		outsqlda->version=SQLDA_VERSION1;
 		outsqlda->sqln=columncount;
 		field=new fieldstruct[columncount];
 		for (int32_t i=0; i<columncount; i++) {
 			field[i].textbuffer=new char[
-					conn->cont->getMaxFieldLength()+1];
+					conn->cont->getMaxFieldSize()+1];
 		}
 	}
 }
 
 void firebirdcursor::deallocateResultSetBuffers() {
 
-	delete[] outsqlda;
-	outsqlda=(XSQLDA ISC_FAR *)new byte_t[XSQLDA_LENGTH(1)];
+	delete[] outsqldabuffer;
+	outsqldabuffer=new byte_t[XSQLDA_LENGTH(1)];
+	bytestring::zero(outsqldabuffer,XSQLDA_LENGTH(1));
+	outsqlda=(XSQLDA ISC_FAR *)outsqldabuffer;
 	outsqlda->version=SQLDA_VERSION1;
 	outsqlda->sqln=1;
 
@@ -851,7 +900,7 @@ void firebirdcursor::deallocateResultSetBuffers() {
 	field=NULL;
 }
 
-bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
+bool firebirdcursor::prepareQuery(const char *query, uint32_t size) {
 
 	// initialize column count
 	outsqlda->sqld=0;
@@ -866,10 +915,10 @@ bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 	if (stmt) {
 		isc_dsql_free_statement(firebirdconn->error,
 						&stmt,DSQL_drop);
+		stmt=0L;
 	}
 
 	// allocate a cursor handle
-	stmt=0;
 	if (isc_dsql_allocate_statement(firebirdconn->error,
 					&firebirdconn->db,&stmt)) {
 		return false;
@@ -878,7 +927,7 @@ bool firebirdcursor::prepareQuery(const char *query, uint32_t length) {
 	// prepare the cursor
 	if (isc_dsql_prepare(firebirdconn->error,
 				&firebirdconn->tr,
-				&stmt,length,(char *)query,
+				&stmt,size,(char *)query,
 				firebirdconn->dialect,
 				(queryisexecsp)?outbindsqlda:outsqlda)) {
 		return false;
@@ -1004,9 +1053,14 @@ bool firebirdcursor::inputBind(const char *variable,
 					int32_t microsecond,
 					const char *tz,
 					bool isnegative,
-					char *buffer,
-					uint16_t buffersize,
 					int16_t *isnull) {
+
+	// make bind vars 1 based like all other db's
+	long	index=charstring::convertToInteger(variable+1)-1;
+	if (index<0) {
+		bindformaterror=true;
+		return false;
+	}
 
 	// build an ISC_TIMESTAMP
 	tm	t;
@@ -1016,19 +1070,13 @@ bool firebirdcursor::inputBind(const char *variable,
 	t.tm_mday=day;
 	t.tm_mon=month-1;
 	t.tm_year=year-1900;
-	isc_encode_timestamp(&t,(ISC_TIMESTAMP *)buffer);
+	isc_encode_timestamp(&t,&(inbindts[index]));
 
-	// make bind vars 1 based like all other db's
-	long	index=charstring::convertToInteger(variable+1)-1;
-	if (index<0) {
-		bindformaterror=true;
-		return false;
-	}
 	inbindsqlda->sqlvar[index].sqltype=SQL_TIMESTAMP;
 	inbindsqlda->sqlvar[index].sqlscale=0;
 	inbindsqlda->sqlvar[index].sqlsubtype=0;
 	inbindsqlda->sqlvar[index].sqllen=sizeof(ISC_TIMESTAMP);
-	inbindsqlda->sqlvar[index].sqldata=buffer;
+	inbindsqlda->sqlvar[index].sqldata=(char *)&(inbindts[index]);
 	inbindsqlda->sqlvar[index].sqlind=(short *)NULL;
 	inbindsqlda->sqlvar[index].sqlname_length=0;
 	inbindsqlda->sqlvar[index].sqlname[0]='\0';
@@ -1217,8 +1265,6 @@ bool firebirdcursor::outputBind(const char *variable,
 				int32_t *microsecond,
 				const char **tz,
 				bool *isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 
 	// store the pointers
@@ -1230,6 +1276,8 @@ bool firebirdcursor::outputBind(const char *variable,
 	outdatebind[outbindcount].second=second;
 	outdatebind[outbindcount].tz=tz;
 	outdatebind[outbindcount].isnegative=isnegative;
+
+	char	*value=(char *)&(outdatebind[outbindcount].buffer);
 
 	outbindcount++;
 
@@ -1243,7 +1291,7 @@ bool firebirdcursor::outputBind(const char *variable,
 	outbindsqlda->sqlvar[index].sqlscale=0;
 	outbindsqlda->sqlvar[index].sqlsubtype=0;
 	outbindsqlda->sqlvar[index].sqllen=sizeof(ISC_TIMESTAMP);
-	outbindsqlda->sqlvar[index].sqldata=buffer;
+	outbindsqlda->sqlvar[index].sqldata=value;
 	outbindsqlda->sqlvar[index].sqlind=isnull;
 	outbindsqlda->sqlvar[index].sqlname_length=0;
 	outbindsqlda->sqlvar[index].sqlname[0]='\0';
@@ -1322,18 +1370,19 @@ bool firebirdcursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
 		retval=false;
 	}
 
-	// get the blob size from the result buffer
+	// get the blob length from the result buffer
 	for (const char *p=resultbuffer; *p!=isc_info_end;) {
 
 		// get the item type
 		char	itemtype=*p;
 		p++;
 
-		// get the item size
+		// get the item length
 		// (modern versions of isc_vax_integer take a const char *
 		// parameter, but old versions take char * and this cast works
 		// with both)
-		uint16_t	itemsize=(uint16_t)isc_vax_integer((char *)p,2);
+		uint16_t	itemlength=
+				(uint16_t)isc_vax_integer((char *)p,2);
 		p=p+2;
 
 		// get the lob length
@@ -1341,11 +1390,11 @@ bool firebirdcursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
 			// (modern versions of isc_vax_integer take a
 			// const char * parameter, but old versions take a
 			// char * and this cast works with both)
-			*length=isc_vax_integer((char *)p,itemsize);
+			*length=isc_vax_integer((char *)p,itemlength);
 		}
  
 		// move on
-		p=p+itemsize;
+		p=p+itemlength;
 	}
 				
 	// close the blob
@@ -1424,15 +1473,13 @@ void firebirdcursor::closeLobOutputBind(uint16_t index) {
 	}
 }
 
-bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
+bool firebirdcursor::executeQuery(const char *query, uint32_t size) {
 
 	// for commit or rollback, execute the API call and return
 	if (querytype==isc_info_sql_stmt_commit) {
-		return !isc_commit_retaining(firebirdconn->error,
-							&firebirdconn->tr);
+		return conn->commit();
 	} else if (querytype==isc_info_sql_stmt_rollback) {
-		return !isc_rollback_retaining(firebirdconn->error,
-							&firebirdconn->tr);
+		return conn->rollback();
 	} else if (queryisexecsp) {
 
 		// handle stored procedures...
@@ -1474,13 +1521,13 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 
 	// handle non-stored procedures...
 
-	// get the max column count and field length
+	// get the max column count and field size
 	uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
-	uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+	uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
 
 	// check for create temp table query
 	if (querytype==isc_info_sql_stmt_ddl) {
-		checkForTempTable(query,length);
+		checkForTempTable(query,size);
 	}
 
 	if (!maxcolumncount) {
@@ -1509,16 +1556,16 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 			outsqlda->sqlvar[i].sqldata=field[i].textbuffer;
 			field[i].sqlrtype=CHAR_DATATYPE;
 			if ((uint32_t)outsqlda->sqlvar[i].sqllen>
-							maxfieldlength) {
-				outsqlda->sqlvar[i].sqllen=maxfieldlength;
+							maxfieldsize) {
+				outsqlda->sqlvar[i].sqllen=maxfieldsize;
 			}
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_VARYING ||
 				outsqlda->sqlvar[i].sqltype==SQL_VARYING+1) {
 			outsqlda->sqlvar[i].sqldata=field[i].textbuffer;
 			field[i].sqlrtype=VARCHAR_DATATYPE;
 			if ((uint32_t)outsqlda->sqlvar[i].sqllen>
-							maxfieldlength) {
-				outsqlda->sqlvar[i].sqllen=maxfieldlength;
+							maxfieldsize) {
+				outsqlda->sqlvar[i].sqllen=maxfieldsize;
 			}
 		} else if (outsqlda->sqlvar[i].sqltype==SQL_SHORT ||
 				outsqlda->sqlvar[i].sqltype==SQL_SHORT+1) {
@@ -1613,8 +1660,8 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 			outsqlda->sqlvar[i].sqldata=field[i].textbuffer;
 			field[i].sqlrtype=UNKNOWN_DATATYPE;
 			if ((uint32_t)outsqlda->sqlvar[i].sqllen>
-							maxfieldlength) {
-				outsqlda->sqlvar[i].sqllen=maxfieldlength;
+							maxfieldsize) {
+				outsqlda->sqlvar[i].sqllen=maxfieldsize;
 			}
 		}
 	}
@@ -1624,34 +1671,34 @@ bool firebirdcursor::executeQuery(const char *query, uint32_t length) {
 							&stmt,1,inbindsqlda);
 }
 
-void firebirdcursor::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void firebirdcursor::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 
 	// handle bind format errors
 	if (bindformaterror) {
-		*errorlength=charstring::getLength(
+		*errorsize=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
-				errorbufferlength,
+				errorbuffersize,
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
-				*errorlength);
+				*errorsize);
 		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
 		*liveconnection=true;
 		return;
 	}
 
 	// otherwise fall back to default implementation
-	sqlrservercursor::errorMessage(errorbuffer,
-					errorbufferlength,
-					errorlength,
+	sqlrservercursor::getError(errorbuffer,
+					errorbuffersize,
+					errorsize,
 					errorcode,
 					liveconnection);
 }
 
-void firebirdcursor::checkForTempTable(const char *query, uint32_t length) {
+void firebirdcursor::checkForTempTable(const char *query, uint32_t size) {
 
 	// see if the query matches the pattern for a temporary query that
 	// creates a temporary table
@@ -1662,7 +1709,7 @@ void firebirdcursor::checkForTempTable(const char *query, uint32_t length) {
 
 	// get the table name
 	stringbuffer	tablename;
-	const char	*endptr=query+length;
+	const char	*endptr=query+size;
 	while (ptr && *ptr && *ptr!=' ' &&
 		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
 		tablename.append(*ptr);
@@ -1675,7 +1722,7 @@ void firebirdcursor::checkForTempTable(const char *query, uint32_t length) {
 	if (firebirdconn->droptemptables) {
 
 		// if "droptemptables" was specified...
-		conn->cont->addSessionTempTableForDrop(tablename.getString());
+		conn->cont->addTempTableForDrop(tablename.getString());
 
 	} else if (preserverowsoncommit) {
 
@@ -1683,7 +1730,7 @@ void firebirdcursor::checkForTempTable(const char *query, uint32_t length) {
 		// the commit/rollback is executed at the end of the
 		// session, the data won't be truncated.  It needs to
 		// be though, so we'll set it up to be truncated manually.
-		conn->cont->addSessionTempTableForTrunc(tablename.getString());
+		conn->cont->addTempTableForTrunc(tablename.getString());
 	}
 }
 
@@ -1711,7 +1758,7 @@ const char *firebirdcursor::getColumnName(uint32_t col) {
 	return outsqlda->sqlvar[col].aliasname;
 }
 
-uint16_t firebirdcursor::getColumnNameLength(uint32_t col) {
+uint16_t firebirdcursor::getColumnNameSize(uint32_t col) {
 	return outsqlda->sqlvar[col].aliasname_length;
 }
 
@@ -1719,7 +1766,7 @@ uint16_t firebirdcursor::getColumnType(uint32_t col) {
 	return field[col].sqlrtype;
 }
 
-uint32_t firebirdcursor::getColumnLength(uint32_t col) {
+uint32_t firebirdcursor::getColumnSize(uint32_t col) {
 	return outsqlda->sqlvar[col].sqllen;
 }
 
@@ -1776,7 +1823,7 @@ const char *firebirdcursor::getColumnTable(uint32_t col) {
 	return outsqlda->sqlvar[col].relname;
 }
 
-uint16_t firebirdcursor::getColumnTableLength(uint32_t col) {
+uint16_t firebirdcursor::getColumnTableSize(uint32_t col) {
 	return outsqlda->sqlvar[col].relname_length;
 }
 
@@ -1809,8 +1856,8 @@ bool firebirdcursor::fetchRow(bool *error) {
 }
 
 void firebirdcursor::getField(uint32_t col,
-				const char **fld, uint64_t *fldlength,
-				bool *blob, bool *null) {
+				const char **fld, uint64_t *fldsize,
+				bool *lob, bool *null) {
 
 	// handle a null field
 	if ((outsqlda->sqlvar[col].sqltype & 1) && 
@@ -1830,15 +1877,15 @@ void firebirdcursor::getField(uint32_t col,
 			reallen=maxlen;
 		}
 		*fld=field[col].textbuffer;
-		*fldlength=reallen;
+		*fldsize=reallen;
 
 	} else if (outsqlda->sqlvar[col].
 				sqltype==SQL_SHORT ||
 			outsqlda->sqlvar[col].
 				sqltype==SQL_SHORT+1) {
 
-		*fldlength=charstring::printf(field[col].textbuffer,
-						conn->cont->getMaxFieldLength(),
+		*fldsize=charstring::printf(field[col].textbuffer,
+						conn->cont->getMaxFieldSize(),
 						"%hd",field[col].shortbuffer);
 		*fld=field[col].textbuffer;
 
@@ -1847,8 +1894,8 @@ void firebirdcursor::getField(uint32_t col,
 			outsqlda->sqlvar[col].
 				sqltype==SQL_FLOAT+1) {
 
-		*fldlength=charstring::printf(field[col].textbuffer,
-					conn->cont->getMaxFieldLength(),
+		*fldsize=charstring::printf(field[col].textbuffer,
+					conn->cont->getMaxFieldSize(),
 					"%.4f",(double)field[col].floatbuffer);
 		*fld=field[col].textbuffer;
 
@@ -1861,8 +1908,8 @@ void firebirdcursor::getField(uint32_t col,
 			outsqlda->sqlvar[col].
 				sqltype==SQL_D_FLOAT+1) {
 
-		*fldlength=charstring::printf(field[col].textbuffer,
-					conn->cont->getMaxFieldLength(),
+		*fldsize=charstring::printf(field[col].textbuffer,
+					conn->cont->getMaxFieldSize(),
 					"%.4f",field[col].doublebuffer);
 		*fld=field[col].textbuffer;
 
@@ -1871,14 +1918,14 @@ void firebirdcursor::getField(uint32_t col,
 			outsqlda->sqlvar[col].
 				sqltype==SQL_VARYING+1) {
 
-		// the first 2 bytes are the length in 
+		// the first 2 bytes are the size in 
 		// an SQL_VARYING field
 		int16_t	size;
 		bytestring::copy((void *)&size,
 				(void *)field[col].textbuffer,
 				sizeof(int16_t));
 		*fld=field[col].textbuffer+sizeof(int16_t);
-		*fldlength=size;
+		*fldsize=size;
 
 	// Looks like sometimes firebird returns INT64's as
 	// SQL_LONG type.  These can be identified because
@@ -1890,8 +1937,8 @@ void firebirdcursor::getField(uint32_t col,
 				sqltype==SQL_LONG+1) &&
 			!outsqlda->sqlvar[col].sqlscale) {
 
-		*fldlength=charstring::printf(field[col].textbuffer,
-					conn->cont->getMaxFieldLength(),
+		*fldsize=charstring::printf(field[col].textbuffer,
+					conn->cont->getMaxFieldSize(),
 					"%d",field[col].longbuffer);
 		*fld=field[col].textbuffer;
 
@@ -1915,15 +1962,15 @@ void firebirdcursor::getField(uint32_t col,
 		if (outsqlda->sqlvar[col].sqlscale) {
 			ISC_SHORT	scale=-outsqlda->sqlvar[col].sqlscale;
 			int		p=(int)pow(10.0,(double)scale);
-			*fldlength=charstring::printf(
+			*fldsize=charstring::printf(
 					field[col].textbuffer,
-					conn->cont->getMaxFieldLength(),
+					conn->cont->getMaxFieldSize(),
 					"%lld.%0*lld",
 					(int64_t)(v/p),scale,(int64_t)(v%p));
 		} else {
-			*fldlength=charstring::printf(
+			*fldsize=charstring::printf(
 					field[col].textbuffer,
-					conn->cont->getMaxFieldLength(),
+					conn->cont->getMaxFieldSize(),
 					"%lld",(int64_t)v);
 		}
 		*fld=field[col].textbuffer;
@@ -1955,8 +2002,8 @@ void firebirdcursor::getField(uint32_t col,
 	#endif
 
 		// build a string of "yyyy-mm-dd hh:mm:ss" format
-		*fldlength=charstring::printf(field[col].textbuffer,
-					conn->cont->getMaxFieldLength(),
+		*fldsize=charstring::printf(field[col].textbuffer,
+					conn->cont->getMaxFieldSize(),
 					"%d-%02d-%02d %02d:%02d:%02d",
 					entry_timestamp.tm_year+1900,
 					entry_timestamp.tm_mon+1,
@@ -1975,8 +2022,8 @@ void firebirdcursor::getField(uint32_t col,
 		isc_decode_sql_time(&field[col].timebuffer,
 						&entry_time);
 		// build a string of "hh:mm:ss" format
-		*fldlength=charstring::printf(field[col].textbuffer,
-					conn->cont->getMaxFieldLength(),
+		*fldsize=charstring::printf(field[col].textbuffer,
+					conn->cont->getMaxFieldSize(),
 					"%02d:%02d:%02d",
 					entry_time.tm_hour,
 					entry_time.tm_min,
@@ -1991,8 +2038,8 @@ void firebirdcursor::getField(uint32_t col,
 		isc_decode_sql_date(&field[col].datebuffer,
 						&entry_date);
 		// build a string of "yyyy-mm-dd" format
-		*fldlength=charstring::printf(field[col].textbuffer,
-					conn->cont->getMaxFieldLength(),
+		*fldsize=charstring::printf(field[col].textbuffer,
+					conn->cont->getMaxFieldSize(),
 					"%d:%02d:%02d",
 					entry_date.tm_year+1900,
 					entry_date.tm_mon+1,
@@ -2002,7 +2049,7 @@ void firebirdcursor::getField(uint32_t col,
 	#endif
 	} else if (outsqlda->sqlvar[col].sqltype==SQL_BLOB ||
 			outsqlda->sqlvar[col].sqltype==SQL_BLOB+1) {
-		*blob=true;
+		*lob=true;
 	}
 }
 
@@ -2037,18 +2084,19 @@ bool firebirdcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 		retval=false;
 	}
 
-	// get the blob size from the result buffer
+	// get the blob length from the result buffer
 	for (const char *p=resultbuffer; *p!=isc_info_end;) {
 
 		// get the item type
 		char	itemtype=*p;
 		p++;
 
-		// get the item size
+		// get the item length
 		// (modern versions of isc_vax_integer take a const char *
 		// parameter, but old versions take a char * and this cast
 		// works with both)
-		uint16_t	itemsize=(uint16_t)isc_vax_integer((char *)p,2);
+		uint16_t	itemlength=
+				(uint16_t)isc_vax_integer((char *)p,2);
 		p=p+2;
 
 		// get the lob length
@@ -2056,11 +2104,11 @@ bool firebirdcursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 			// (modern versions of isc_vax_integer take a
 			// const char * parameter, but old versions take a
 			// char * and this cast works with both)
-			*length=isc_vax_integer((char *)p,itemsize);
+			*length=isc_vax_integer((char *)p,itemlength);
 		}
  
 		// move on
-		p=p+itemsize;
+		p=p+itemlength;
 	}
 
 	// close the blob

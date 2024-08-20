@@ -35,8 +35,8 @@ extern "C" {
 class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 	friend class sqlitecursor;
 	public:
-				sqliteconnection(sqlrservercontroller *cont);
-				~sqliteconnection();
+		sqliteconnection(sqlrservercontroller *cont);
+		~sqliteconnection();
 	private:
 		void		handleConnectString();
 		bool		logIn(const char **error, const char **warning);
@@ -44,21 +44,23 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 		void		deleteCursor(sqlrservercursor *curs);
 		void		logOut();
 		bool		ping();
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*dbHostName();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getDbHostName();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild,
-						uint16_t objecttypes);
+						uint16_t objecttypes,
+						bool currentschemaonly);
 		const char	*getColumnListQuery(
 						const char *table, bool wild);
 		#ifdef SQLITE_TRANSACTIONAL
 		const char	*setIsolationLevelQuery();
+		const char	*beginTransactionQuery();
 		#endif
 		bool		selectDatabase(const char *database);
 		char		*getCurrentDatabase();
 		bool		getLastInsertId(uint64_t *id);
-		const char	*noopQuery();
+		const char	*getNoopQuery();
 		#ifdef SQLITE3
 		char		*duplicate(const char *str);
 		#endif
@@ -67,19 +69,17 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 		bool		commit();
 		bool		rollback();
 		#endif
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
 
 		void		clearErrors();
 
-		const char	*nextvalFormat();
+		const char	*getNextvalFormat();
 
 		char		*db;
-
-		const char	*identity;
 
 		#ifdef SQLITE3
 		sqlite3	*sqliteptr;
@@ -90,21 +90,22 @@ class SQLRSERVER_DLLSPEC sqliteconnection : public sqlrserverconnection {
 		int64_t	errcode;
 
 		char	*hostname;
+
+		stringbuffer	tablelistquery;
 };
 
 class SQLRSERVER_DLLSPEC sqlitecursor : public sqlrservercursor {
 	friend class sqliteconnection;
 	private:
-				sqlitecursor(sqlrserverconnection *conn,
-								uint16_t id);
-				~sqlitecursor();
+		sqlitecursor(sqlrserverconnection *conn, uint16_t id);
+		~sqlitecursor();
 
 		bool		supportsNativeBinds(const char *query,
-							uint32_t length);
+							uint32_t size);
 
 		#ifdef HAVE_SQLITE3_STMT
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		int32_t		getBindVariableIndex(
 						const char *variable,
 						uint16_t variablesize);
@@ -128,7 +129,7 @@ class SQLRSERVER_DLLSPEC sqlitecursor : public sqlrservercursor {
 						int16_t *isnull);
 		#endif
 		bool		executeQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		int		runQuery(const char *query);
 		void		selectLastInsertRowId();
 		bool		knowsRowCount();
@@ -145,8 +146,8 @@ class SQLRSERVER_DLLSPEC sqlitecursor : public sqlrservercursor {
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
+					uint64_t *fieldsize,
+					bool *lob,
 					bool *null);
 		void		closeResultSet();
 
@@ -174,7 +175,6 @@ class SQLRSERVER_DLLSPEC sqlitecursor : public sqlrservercursor {
 
 sqliteconnection::sqliteconnection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
-	identity=NULL;
 	sqliteptr=NULL;
 	errmesg=NULL;
 	errcode=0;
@@ -189,12 +189,14 @@ sqliteconnection::~sqliteconnection() {
 }
 
 void sqliteconnection::handleConnectString() {
+
+	sqlrserverconnection::handleConnectString();
+
 	db=charstring::duplicate(cont->getConnectStringValue("db"));
-	identity=cont->getConnectStringValue("identity");
 
 	cont->setFetchAtOnce(1);
 	cont->setMaxColumnCount(0);
-	cont->setMaxFieldLength(0);
+	cont->setMaxFieldSize(0);
 }
 
 bool sqliteconnection::logIn(const char **error, const char **warning) {
@@ -240,11 +242,11 @@ bool sqliteconnection::ping() {
 	return true;
 }
 
-const char *sqliteconnection::identify() {
-	return (identity)?identity:"sqlite";
+const char *sqliteconnection::getDbType() {
+	return "sqlite";
 }
 
-const char *sqliteconnection::dbVersion() {
+const char *sqliteconnection::getDbVersion() {
 	#ifdef SQLITE_VERSION
 	return SQLITE_VERSION;
 	#else
@@ -252,7 +254,7 @@ const char *sqliteconnection::dbVersion() {
 	#endif
 }
 
-const char *sqliteconnection::dbHostName() {
+const char *sqliteconnection::getDbHostName() {
 	if (!hostname) {
 		hostname=sys::getHostName();
 	}
@@ -265,34 +267,24 @@ const char *sqliteconnection::getDatabaseListQuery(bool wild) {
 }
 
 const char *sqliteconnection::getTableListQuery(bool wild,
-						uint16_t objecttypes) {
-	return (wild)?
-		"select "
-		"	NULL as table_cat, "
-		"	NULL as table_schem, "
-		"	tbl_name as table_name, "
-		"	'TABLE' as table_type, "
-		"	NULL as remarks, "
-		"	NULL as extra "
-		"from "
-		"(select "
-		"	tbl_name "
-		"from "
-		"	sqlite_master "
-		"where "
-		"	type in ('table','view') "
-		"union all "
-		"select "
-		"	tbl_name "
-		"from "
-		"	sqlite_temp_master "
-		"where "
-		"	type in ('table','view')) "
-		"where "
-		"	tbl_name like '%s' "
-		"order by "
-		"	tbl_name":
+						uint16_t objecttypes,
+						bool currentschemaonly) {
 
+	stringbuffer	otypes;
+	otypes.append("	(");
+	if (objecttypes&DB_OBJECT_TABLE) {
+		otypes.append("	type = 'table' ");
+	}
+	if (objecttypes&DB_OBJECT_VIEW) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	type = 'view' ");
+	}
+	otypes.append(") ");
+
+	tablelistquery.clear();
+	tablelistquery.append(
 		"select "
 		"	NULL as table_cat, "
 		"	NULL as table_schem, "
@@ -301,21 +293,33 @@ const char *sqliteconnection::getTableListQuery(bool wild,
 		"	NULL as remarks, "
 		"	NULL as extra "
 		"from "
-		"(select "
+		"( "
+		"select "
 		"	tbl_name "
 		"from "
 		"	sqlite_master "
-		"where "
-		"	type in ('table','view') "
+		"where ");
+	tablelistquery.append(otypes.getString());
+	tablelistquery.append(
 		"union all "
 		"select "
 		"	tbl_name "
 		"from "
 		"	sqlite_temp_master "
-		"where "
-		"	type in ('table','view')) "
+		"where ");
+	tablelistquery.append(otypes.getString());
+	tablelistquery.append(
+		") ");
+	if (wild) {
+		tablelistquery.append(
+			"where "
+			"	tbl_name like '%s' ");
+	}
+	tablelistquery.append(
 		"order by "
-		"	tbl_name";
+		"	tbl_name");
+
+	return tablelistquery.getString();
 }
 
 const char *sqliteconnection::getColumnListQuery(
@@ -336,6 +340,10 @@ const char *sqliteconnection::getColumnListQuery(
 #ifdef SQLITE_TRANSACTIONAL
 const char *sqliteconnection::setIsolationLevelQuery() {
 	return "pragma %s";
+}
+
+const char *sqliteconnection::beginTransactionQuery() {
+	return "begin transaction";
 }
 #endif
 
@@ -383,7 +391,7 @@ bool sqliteconnection::getLastInsertId(uint64_t *id) {
 	return true;
 }
 
-const char *sqliteconnection::noopQuery() {
+const char *sqliteconnection::getNoopQuery() {
 	return "pragma noop";
 }
 
@@ -401,15 +409,15 @@ bool sqliteconnection::rollback() {
 }
 #endif
 
-void sqliteconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+void sqliteconnection::getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t *errorcode,
 					bool *liveconnection) {
 	// set return values
-	*errorlength=charstring::getLength(errmesg);
-	charstring::safeCopy(errorbuffer,errorbufferlength,
-					errmesg,*errorlength);
+	*errorsize=charstring::getLength(errmesg);
+	charstring::safeCopy(errorbuffer,errorbuffersize,
+					errmesg,*errorsize);
 	*errorcode=errcode;
 	*liveconnection=true;
 	if (errmesg &&
@@ -431,7 +439,7 @@ void sqliteconnection::clearErrors() {
 	}
 }
 
-const char *sqliteconnection::nextvalFormat() {
+const char *sqliteconnection::getNextvalFormat() {
 	return "";
 }
 
@@ -493,7 +501,7 @@ sqlitecursor::~sqlitecursor() {
 	#endif
 }
 
-bool sqlitecursor::supportsNativeBinds(const char *query, uint32_t length) {
+bool sqlitecursor::supportsNativeBinds(const char *query, uint32_t size) {
 	#ifdef HAVE_SQLITE3_STMT
 	return true;
 	#else
@@ -502,7 +510,7 @@ bool sqlitecursor::supportsNativeBinds(const char *query, uint32_t length) {
 }
 
 #ifdef HAVE_SQLITE3_STMT
-bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
+bool sqlitecursor::prepareQuery(const char *query, uint32_t size) {
 
 	// reinit justexecuted flag
 	justexecuted=false;
@@ -530,7 +538,7 @@ bool sqlitecursor::prepareQuery(const char *query, uint32_t length) {
 		#else
 			res=sqlite3_prepare
 		#endif
-			(sqliteconn->sqliteptr,query,length,&stmt,NULL);
+			(sqliteconn->sqliteptr,query,size,&stmt,NULL);
 	}
 	if (res==SQLITE_OK) {
 		return true;
@@ -588,7 +596,7 @@ bool sqlitecursor::inputBindBlob(const char *variable,
 }
 #endif
 
-bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
+bool sqlitecursor::executeQuery(const char *query, uint32_t size) {
 
 	// execute the query
 	int	success=0;
@@ -616,7 +624,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 			// This appears to be generally true, but with 
 			// version 3.6.20 it does.
 			#if defined(HAVE_SQLITE3_STMT)
-				if (!prepareQuery(query,length)) {
+				if (!prepareQuery(query,size)) {
 					break;
 				}
 			#endif
@@ -666,7 +674,7 @@ bool sqlitecursor::executeQuery(const char *query, uint32_t length) {
 	success=runQuery(query);
 #endif
 
-	checkForTempTable(query,length);
+	checkForTempTable(query,size);
 
 	// cache off the columns so they can be returned later if the result
 	// set is suspended/resumed
@@ -907,16 +915,16 @@ bool sqlitecursor::fetchRow(bool *error) {
 }
 
 void sqlitecursor::getField(uint32_t col,
-				const char **field, uint64_t *fieldlength,
-				bool *blob, bool *null) {
+				const char **field, uint64_t *fieldsize,
+				bool *lob, bool *null) {
 
 #ifdef HAVE_SQLITE3_STMT
 
 	// handle lastinsertrowid specially
 	if (lastinsertrowid) {
 		*field=lastinsertrowidstr;
-		*fieldlength=charstring::getLength(*field);
-		*blob=false;
+		*fieldsize=charstring::getLength(*field);
+		*lob=false;
 		*null=false;
 		return;
 	}
@@ -928,13 +936,13 @@ void sqlitecursor::getField(uint32_t col,
 	*field=(const char *)((dtype==SQLITE_BLOB)?
 				sqlite3_column_blob(stmt,col):
 				sqlite3_column_text(stmt,col));
-	*fieldlength=sqlite3_column_bytes(stmt,col);
+	*fieldsize=sqlite3_column_bytes(stmt,col);
 	*null=(*field==NULL);
 
-	// set the blob indiciator false, otherwise we'll have to implement
-	// methods for fetching the blob in chunks and there's no need to
+	// set the lob indiciator false, otherwise we'll have to implement
+	// methods for fetching the lob in chunks and there's no need to
 	// do that, for now at least
-	*blob=false;
+	*lob=false;
 #else
 	// sqlite is kind of strange, the result set is not returned
 	// in a 2-d array of pointers to rows/columns, but rather
@@ -942,7 +950,7 @@ void sqlitecursor::getField(uint32_t col,
 	// track of which column you're on.
 	if (result[rowindex]) {
 		*field=result[rowindex];
-		*fieldlength=charstring::getLength(result[rowindex]);
+		*fieldsize=charstring::getLength(result[rowindex]);
 	} else {
 		*null=true;
 	}
@@ -977,10 +985,10 @@ char *sqliteconnection::duplicate(const char *str) {
 	if (!str) {
 		return NULL;
 	}
-	size_t	length=charstring::getLength(str);
-	char	*buffer=(char *)sqlite3_malloc(length+1);
-	charstring::copy(buffer,str,length);
-	buffer[length]='\0';
+	size_t	size=charstring::getLength(str);
+	char	*buffer=(char *)sqlite3_malloc(size+1);
+	charstring::copy(buffer,str,size);
+	buffer[size]='\0';
 	return buffer;
 }
 #endif

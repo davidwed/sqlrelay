@@ -424,7 +424,7 @@ static bool loadLibraries(stringbuffer *errormessage) {
 	for (uint16_t i=0; i<5; i++) {
 		for (listnode<char *> *n=l[i].getFirst(); n; n=n->getNext()) {
 			const char *libname=n->getValue();
-			if (file::readable(libname)) {
+			if (file::isReadable(libname)) {
 				libnames.append(libname);
 			}
 		}
@@ -847,7 +847,7 @@ error:
 	errormessage->append(error)->append('\n');
 	#ifndef _WIN32
 	if (charstring::contains(error,"No such file or directory")) {
-		char		*path=file::dirname(libname);
+		char		*path=file::getDirName(libname);
 		const char	*lib=libname+charstring::getLength(path)+1;
 		errormessage->append("\n(NOTE: The error message above may "
 					"be misleading.  Most likely it means "

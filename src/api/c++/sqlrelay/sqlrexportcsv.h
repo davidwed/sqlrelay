@@ -6,12 +6,36 @@
 
 #include <sqlrelay/private/sqlrexportcsvincludes.h>
 
-class SQLRCLIENT_DLLSPEC sqlrexportcsv : public sqlrexport {
+/** The sqlrexportcsv class implements sqlrexport for CSV files. */
+class SQLRCLIENT_DLLSPEC sqlrexportcsv : virtual public sqlrexportfile {
 	public:
-			sqlrexportcsv();
-			~sqlrexportcsv();
+		/** Creates an instance of the sqlrexportcsv class. */
+		sqlrexportcsv();
 
-		bool	exportToFile(const char *filename, const char *table);
+		/** Destroys this instance of the sqlrexportcsv class. */
+		virtual	~sqlrexportcsv();
+
+		/** Exports the result set of the cursor currently in use as
+		 *  set by the most recent call to setSqlrCursor() to the file
+		 *  set by the most recent call to setFileName(), or to
+		 *  standard output if setFileName() was never called, or if
+		 *  setFileName(NULL) was called.
+		 *
+		 *  The following result set:
+		 *
+		 *  col1,col2,col3,col4
+		 *  =====================
+		 *  0,0.0,field00,field01
+		 *  1,1.1,field10,field11
+		 *
+		 *  would be exported as:
+		 *
+		 *  "col1","col2","col3","col4"
+		 *  0,0.0,"field00","field01"
+		 *  1,1.1,"field10","field11"
+		 *
+		 *  Returns true on success and false if an error occurred. */
+		virtual	bool	exportData();
 
 	#include <sqlrelay/private/sqlrexportcsv.h>
 };

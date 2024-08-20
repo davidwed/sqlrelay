@@ -8,8 +8,7 @@
 
 class SQLRSERVER_DLLSPEC sqlrfilter_regex : public sqlrfilter {
 	public:
-			sqlrfilter_regex(sqlrservercontroller *cont,
-						sqlrfilters *fs,
+		sqlrfilter_regex(sqlrservercontroller *cont,
 						domnode *parameters);
 		bool	run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
@@ -17,24 +16,12 @@ class SQLRSERVER_DLLSPEC sqlrfilter_regex : public sqlrfilter {
 	private:
 		regularexpression	re;
 		const char		*pattern;
-
-		bool	enabled;
-
-		bool	debug;
 };
 
 sqlrfilter_regex::sqlrfilter_regex(sqlrservercontroller *cont,
-						sqlrfilters *fs,
 						domnode *parameters) :
-						sqlrfilter(cont,fs,parameters) {
+						sqlrfilter(cont,parameters) {
 	debugFunction();
-
-	debug=cont->getConfig()->getDebugFilters();
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled) {
-		return;
-	}
 
 	pattern=parameters->getAttributeValue("pattern");
 	re.setPattern(pattern);
@@ -46,15 +33,8 @@ bool sqlrfilter_regex::run(sqlrserverconnection *sqlrcon,
 				const char *query) {
 	debugFunction();
 
-	if (!enabled) {
-		return true;
-	}
-
 	if (re.match(query)) {
-		if (debug) {
-			stdoutput.printf("regex: matches pattern \"%s\"\n\n",
-								pattern);
-		}
+		debugWrite("regex: matches pattern \"%s\"",pattern);
 		return false;
 	}
 	return true;
@@ -63,8 +43,7 @@ bool sqlrfilter_regex::run(sqlrserverconnection *sqlrcon,
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrfilter *new_sqlrfilter_regex(
 						sqlrservercontroller *cont,
-						sqlrfilters *fs,
 						domnode *parameters) {
-		return new sqlrfilter_regex(cont,fs,parameters);
+		return new sqlrfilter_regex(cont,parameters);
 	}
 }

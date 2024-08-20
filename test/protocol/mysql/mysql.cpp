@@ -28,7 +28,7 @@ void checkSuccess(const char *value, const char *success) {
 		} else {
 			stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
 			stdoutput.printf("failure ");
-stdoutput.printf("\n%s\n",mysql_error(&mysql));
+stdoutput.printf("error:\n%s\n",mysql_error(&mysql));
 			process::exit(1);
 		}
 	}
@@ -38,6 +38,7 @@ stdoutput.printf("\n%s\n",mysql_error(&mysql));
 	} else {
 		stdoutput.printf("\"%s\"!=\"%s\"\n",value,success);
 		stdoutput.printf("failure ");
+stdoutput.printf("error:\n%s\n",mysql_error(&mysql));
 		process::exit(1);
 	}
 }
@@ -49,7 +50,7 @@ void checkSuccess(int value, int success) {
 	} else {
 		stdoutput.printf("\"%d\"!=\"%d\"\n",value,success);
 		stdoutput.printf("failure ");
-stdoutput.printf("\n%s\n",mysql_error(&mysql));
+stdoutput.printf("error:\n%s\n",mysql_error(&mysql));
 		process::exit(1);
 	}
 }
@@ -1412,9 +1413,23 @@ int	main(int argc, char **argv) {
 	checkSuccess(mysql_stmt_execute(stmt),0);
 	stdoutput.printf("\n");
 
+
 	stdoutput.printf("mysql_stmt_close:\n");
 	checkSuccess(mysql_stmt_close(stmt),0);
 	stdoutput.printf("\n");
+
+
+#if 0
+	stdoutput.printf("multi-packet query\n");
+	q.clear();
+	q.append("select '");
+	for (uint32_t i=0; i<(16*1024*1024)+50; i++) {
+		q.append('A');
+	}
+	q.append('\'');
+	checkSuccess(mysql_real_query(&mysql,q.getString(),q.getSize()),0);
+	stdoutput.printf("\n");
+#endif
 
 
 	stdoutput.printf("\n============ Info ============\n\n");

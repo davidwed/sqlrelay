@@ -3,134 +3,104 @@
 
 #include <sqlrelay/sqlrimportxml.h>
 #include <rudiments/stdio.h>
-#define NEED_IS_NUMBER_TYPE_CHAR 1
-#include <datatypes.h>
 
 const unsigned short sqlrimportxml::NULLTAG=0;
 const unsigned short sqlrimportxml::TABLETAG=1;
-const unsigned short sqlrimportxml::SEQUENCETAG=2;
-const unsigned short sqlrimportxml::COLUMNSTAG=3;
-const unsigned short sqlrimportxml::COLUMNTAG=4;
-const unsigned short sqlrimportxml::ROWSTAG=5;
-const unsigned short sqlrimportxml::ROWTAG=6;
-const unsigned short sqlrimportxml::FIELDTAG=7;
+const unsigned short sqlrimportxml::COLUMNSTAG=2;
+const unsigned short sqlrimportxml::COLUMNTAG=3;
+const unsigned short sqlrimportxml::ROWSTAG=4;
+const unsigned short sqlrimportxml::ROWTAG=5;
+const unsigned short sqlrimportxml::FIELDTAG=6;
+const unsigned short sqlrimportxml::SEQUENCETAG=7;
 
-const unsigned short sqlrimportxml::NULLATTR=0;
-const unsigned short sqlrimportxml::NAMEATTR=1;
-const unsigned short sqlrimportxml::TYPEATTR=3;
-const unsigned short sqlrimportxml::LENGTHATTR=4;
-const unsigned short sqlrimportxml::PRECISIONATTR=5;
-const unsigned short sqlrimportxml::SCALEATTR=6;
-const unsigned short sqlrimportxml::NULLABLEATTR=7;
-const unsigned short sqlrimportxml::PRIMARYKEYATTR=8;
-const unsigned short sqlrimportxml::UNIQUEATTR=9;
-const unsigned short sqlrimportxml::PARTOFKEYATTR=10;
-const unsigned short sqlrimportxml::UNSIGNEDATTR=11;
-const unsigned short sqlrimportxml::ZEROFILLEDATTR=12;
-const unsigned short sqlrimportxml::BINARYATTR=13;
-const unsigned short sqlrimportxml::AUTOINCREMENTATTR=14;
-
-sqlrimportxml::sqlrimportxml() : sqlrimport(), xmlsax() {
+sqlrimportxml::sqlrimportxml() : sqlrimportfile(), xmlsax() {
 	currenttag=NULLTAG;
 	currentattribute=NULL;
-	table=NULL;
-	sequence=NULL;
-	sequencevalue=NULL;
-	colcount=0;
-	currentcol=0;
-	numbercolumn=NULL;
 	infield=false;
-	foundfieldtext=false;
-	fieldcount=0;
-	rowcount=0;
-	committedcount=0;
+	sequencevalue=NULL;
+	setExtension(".xml");
 }
 
 sqlrimportxml::~sqlrimportxml() {
 	delete[] currentattribute;
-	delete[] sequence;
 	delete[] sequencevalue;
-	delete[] numbercolumn;
 }
 
-bool sqlrimportxml::importFromFile(const char *filename) {
-	return xmlsax::parseFile(filename);
+bool sqlrimportxml::importData() {
+
+	if (!sqlrimportfile::importData()) {
+		return false;
+	}
+
+	// NOTE: startProcessingImport() calls the import-start event
+	// NOTE: endProcessingImport() calls the import-end event
+	return startProcessingImport() &&
+		xmlsax::parseFile(getFileName()) &&
+		endProcessingImport();
 }
 
 bool sqlrimportxml::tagStart(const char *ns, const char *name) {
+
 	if (!charstring::compare(name,"table")) {
-		return tableTagStart();
-	} else if (!charstring::compare(name,"sequence")) {
-		return sequenceTagStart();
+		currenttag=TABLETAG;
+		return true;
 	} else if (!charstring::compare(name,"columns")) {
-		return columnsTagStart();
+		currenttag=COLUMNSTAG;
+		// NOTE: startProcessingColumns() calls the columns-start event;
+		return startProcessingColumns();
 	} else if (!charstring::compare(name,"column")) {
-		return columnTagStart();
+		currenttag=COLUMNTAG;
+		// clear the column name buffer
+		clearColumnNameBuffer();
+		// don't call the column-start event yet, we need
+		// the attributes to have been processed first
+		return true;
 	} else if (!charstring::compare(name,"rows")) {
-		return rowsTagStart();
+		currenttag=ROWSTAG;
+		// NOTE: startProcessingRows() calls the rows-start event
+		return startProcessingRows();
 	} else if (!charstring::compare(name,"row")) {
-		return rowTagStart();
+		currenttag=ROWTAG;
+		// NOTE: startProcessingRow() calls the row-start event
+		return startProcessingRow();
 	} else if (!charstring::compare(name,"field")) {
-		return fieldTagStart();
+		currenttag=FIELDTAG;
+		// we're in a field
+		infield=true;
+		// clear the field buffer
+		clearFieldBuffer();
+		// don't call the column-start event yet, we need
+		// the attributes to have been processed first
+		return true;
+	} else if (!charstring::compare(name,"sequence")) {
+		currenttag=SEQUENCETAG;
+		return true;
 	}
 	return true;
 }
 
 bool sqlrimportxml::attributeName(const char *name) {
+
+	// set the current attribute
 	delete[] currentattribute;
 	currentattribute=charstring::duplicate(name);
+
 	return true;
 }
 
 bool sqlrimportxml::attributeValue(const char *value) {
+
 	switch (currenttag) {
 		case TABLETAG:
 			if (!charstring::compare(currentattribute,"name")) {
-				delete[] table;
-				table=charstring::duplicate(value);
-			}
-			break;
-		case SEQUENCETAG:
-			if (!charstring::compare(currentattribute,"name")) {
-				delete[] sequence;
-				sequence=charstring::duplicate(value);
-			}
-			if (!charstring::compare(currentattribute,"value")) {
-				delete[] sequencevalue;
-				sequencevalue=charstring::duplicate(value);
+				setObjectName(value);
 			}
 			break;
 		case COLUMNSTAG:
-			if (!charstring::compare(currentattribute,"count")) {
-				colcount=charstring::convertToUnsignedInteger(value);
-				columns.clear();
-				delete[] numbercolumn;
-				numbercolumn=new bool[colcount];
-				currentcol=0;
-			}
 			break;
 		case COLUMNTAG:
 			if (!charstring::compare(currentattribute,"name")) {
-				const char	*c=value;
-				const char	*m=columnmap.getValue(c);
-				if (m) {
-					c=m;
-				}
-				char	*cm=charstring::duplicate(c);
-				if (lowercasecolumnnames) {
-					charstring::lower(cm);
-				} else if (uppercasecolumnnames) {
-					charstring::upper(cm);
-				}
-				query.append(cm);
-				delete[] cm;
-				if (currentcol<colcount-1) {
-					columns.append(',');
-				}
-			} else if (!charstring::compare(currentattribute,
-								"type")) {
-				numbercolumn[currentcol]=
-					isNumberTypeChar(value);
+				setColumnNameBuffer(value);
 			}
 			break;
 		case ROWSTAG:
@@ -139,324 +109,199 @@ bool sqlrimportxml::attributeValue(const char *value) {
 			break;
 		case FIELDTAG:
 			break;
-	}
-	return true;
-}
-
-bool sqlrimportxml::tagEnd(const char *ns, const char *name) {
-	if (!charstring::compare(name,"table")) {
-		return tableTagEnd();
-	} else if (!charstring::compare(name,"sequence")) {
-		return sequenceTagEnd();
-	} else if (!charstring::compare(name,"columns")) {
-		return columnsTagEnd();
-	} else if (!charstring::compare(name,"column")) {
-		return columnTagEnd();
-	} else if (!charstring::compare(name,"rows")) {
-		return rowsTagEnd();
-	} else if (!charstring::compare(name,"row")) {
-		return rowTagEnd();
-	} else if (!charstring::compare(name,"field")) {
-		return fieldTagEnd();
-	}
-	return true;
-}
-
-bool sqlrimportxml::tableTagStart() {
-	currenttag=TABLETAG;
-	rowcount=0;
-	committedcount=0;
-	return true;
-}
-
-bool sqlrimportxml::sequenceTagStart() {
-	currenttag=SEQUENCETAG;
-	return true;
-}
-
-bool sqlrimportxml::columnsTagStart() {
-	currenttag=COLUMNSTAG;
-	return true;
-}
-
-bool sqlrimportxml::columnTagStart() {
-	currenttag=COLUMNTAG;
-	return true;
-}
-
-bool sqlrimportxml::rowsTagStart() {
-	currenttag=ROWSTAG;
-	return true;
-}
-
-bool sqlrimportxml::rowTagStart() {
-	query.clear();
-	query.append("insert into ")->append(table)->append(" (");
-	query.append(columns.getString())->append(") values (");
-	currenttag=ROWTAG;
-	currentcol=0;
-	fieldcount=0;
-	return true;
-}
-
-bool sqlrimportxml::fieldTagStart() {
-	currenttag=FIELDTAG;
-	infield=true;
-	foundfieldtext=false;
-	return true;
-}
-
-
-bool sqlrimportxml::tableTagEnd() {
-
-	if (lg) {
-		lg->write(coarseloglevel,NULL,logindent,
-				"imported %lld rows",
-				(unsigned long long)rowcount);
-	}
-
-	if (commitcount) {
-		sqlrcon->commit();
-		if (lg) {
-			lg->write(coarseloglevel,NULL,logindent,
-					"committed %lld rows (to %s)",
-					(unsigned long long)rowcount,table);
-		}
-	}
-	return true;
-}
-
-bool sqlrimportxml::sequenceTagEnd() {
-
-	query.clear();
-
-	// sqlite, mysql, sap/sybase and mssql have autoincrementing fields
-	// odbc can't tell what kind of underlying db we're using
-	if (charstring::contains(dbtype,"firebird") ||
-		charstring::contains(dbtype,"interbase")) {
-		query.append("set generator ")->append(sequence);
-		query.append(" to ")->append(sequencevalue);
-		if (!sqlrcur->sendQuery(query.getString())) {
-			if (lg) {
-				lg->write(coarseloglevel,NULL,logindent,
-						"%s",sqlrcur->errorMessage());
+		case SEQUENCETAG:
+			if (!charstring::compare(currentattribute,"name")) {
+				setObjectName(value);
 			}
-		}
-		return true;
-	} else if (charstring::contains(dbtype,"oracle")) {
-		sqlrcursor	sqlrcur2(sqlrcon);
-		char	*uppersequence=charstring::duplicate(sequence);
-		charstring::upper(uppersequence);
-		query.append("select * from all_sequences where "
-				"sequence_name='");
-		query.append(uppersequence)->append("'");
-		delete[] uppersequence;
-		if (!sqlrcur2.sendQuery(query.getString())) {
-			if (lg) {
-				lg->write(coarseloglevel,NULL,logindent,
-						"%s",sqlrcur->errorMessage());
+			if (!charstring::compare(currentattribute,"value")) {
+				delete[] sequencevalue;
+				sequencevalue=charstring::duplicate(value);
 			}
-			return true;
-		}
-		query.clear();
-		query.append("drop sequence ")->append(sequence);
-		if (!sqlrcur->sendQuery(query.getString())) {
-			if (lg) {
-				lg->write(coarseloglevel,NULL,logindent,
-						"%s",sqlrcur->errorMessage());
-			}
-			return true;
-		}
-		query.clear();
-		query.append("create sequence ")->append(sequence);
-		query.append(" start with ")->append(sequencevalue);
-		query.append(" maxvalue ");
-		query.append(sqlrcur2.getField(0,"MAX_VALUE"));
-		query.append(" minvalue ");
-		query.append(sqlrcur2.getField(0,"MIN_VALUE"));
-		if (!charstring::compare(
-				sqlrcur2.getField(0,"CYCLE_FLAG"),"N")) {
-			query.append(" nocycle ");
-		} else {
-			query.append(" cycle ");
-		}
-		if (!charstring::compare(
-				sqlrcur2.getField(0,"ORDER_FLAG"),"N")) {
-			query.append(" noorder ");
-		} else {
-			query.append(" order ");
-		}
-		if (!charstring::compare(
-				sqlrcur2.getField(0,"CACHE_SIZE"),"0")) {
-			query.append(" nocache ");
-		} else {
-			query.append(" cache ");
-			query.append(sqlrcur2.getField(0,"CACHE_SIZE"));
-		}
-		if (!sqlrcur->sendQuery(query.getString())) {
-			if (lg) {
-				lg->write(coarseloglevel,NULL,logindent,
-						"%s",sqlrcur->errorMessage());
-			}
-		}
-		return true;
-	} else if (charstring::contains(dbtype,"postgresql") ||
-			charstring::contains(dbtype,"db2") ||
-			charstring::contains(dbtype,"informix")) {
-		query.append("alter sequence ")->append(sequence);
-		query.append(" restart with ")->append(sequencevalue);
-		if (!sqlrcur->sendQuery(query.getString())) {
-			if (lg) {
-				lg->write(coarseloglevel,NULL,logindent,
-						"%s",sqlrcur->errorMessage());
-			}
-		}
-		return true;
+			break;
 	}
-
-	if (lg) {
-		lg->write(coarseloglevel,NULL,logindent,
-				"%s doesn't support sequences",dbtype);
-	}
-	return true;
-}
-
-bool sqlrimportxml::columnsTagEnd() {
-	if (lg) {
-		lg->write(coarseloglevel,NULL,logindent,
-				"%ld columns",(unsigned long)currentcol);
-	}
-	return true;
-}
-
-bool sqlrimportxml::columnTagEnd() {
-	currentcol++;
-	return true;
-}
-
-bool sqlrimportxml::rowsTagEnd() {
-	return true;
-}
-
-bool sqlrimportxml::rowTagEnd() {
-	query.append(')');
-	if (fieldcount) {
-		if (commitcount && !rowcount) {
-			sqlrcon->begin();
-		}
-		if (!sqlrcur->sendQuery(query.getString())) {
-			if (lg && logerrors) {
-				lg->write(coarseloglevel,NULL,logindent,
-						"%s",sqlrcur->errorMessage());
-			}
-		}
-		rowcount++;
-		if (lg && !(rowcount%100)) {
-			lg->write(fineloglevel,NULL,logindent,
-					"imported %lld rows",
-					(unsigned long long)rowcount);
-		}
-		if (commitcount && !(rowcount%commitcount)) {
-			sqlrcon->commit();
-			committedcount++;
-			if (lg) {
-				if (!(committedcount%10)) {
-					lg->write(fineloglevel,NULL,logindent,
-						"committed %lld rows "
-						"(to %s)...",
-						(unsigned long long)rowcount);
-				} else {
-					lg->write(fineloglevel,NULL,logindent,
-						"committed %lld rows",
-						(unsigned long long)rowcount);
-				}
-			}
-			sqlrcon->begin();
-		}
-	}
-	return true;
-}
-
-bool sqlrimportxml::fieldTagEnd() {
-	if (!foundfieldtext) {
-		query.append("NULL");
-		if (currentcol<colcount-1) {
-			query.append(",");
-		}
-	}
-	infield=false;
-	currentcol++;
-	fieldcount++;
 	return true;
 }
 
 bool sqlrimportxml::text(const char *string) {
 	if (infield) {
-		const char	*s=fieldmap.getValue(string);
-		if (s) {
-			string=s;
-		}
-		foundfieldtext=true;
-		if (!charstring::isNullOrEmpty(string)) {
-			if (!numbercolumn[currentcol]) {
-				query.append('\'');
-			}
-			massageField(&query,string);
-			if (!numbercolumn[currentcol]) {
-				query.append('\'');
-			}
-		} else {
-			query.append("NULL");
-		}
-		if (currentcol<colcount-1) {
-			query.append(",");
-		}
+		setFieldBuffer(string);
 	}
 	return true;
 }
 
-void sqlrimportxml::massageField(stringbuffer *strb, const char *field) {
+char *sqlrimportxml::unescapeValue(const char *value) {
 
-	for (uint32_t index=0; field[index]; index++) {
-		if (field[index]=='&') {
+	stringbuffer	strb;
+
+	for (const char *v=value; *v; v++) {
+
+		if (*v=='&') {
 
 			// expand xml entities...
 
+			// skip past the &
+			v++;
+
+			// get the number and convert
+			// it to a character
 			char	ch=(char)charstring::
-					convertToUnsignedInteger(field+index);
-
-			// double-up any single-quotes
-			if (ch=='\'') {
-				strb->append('\'');
-			}
-
-			index++;
-			strb->append(ch);
-			while (field[index] && field[index]!=';') {
-				index++;
-			}
-			if (!field[index]) {
-				break;
-			}
-
-		} else if (field[index]=='\\' &&
-				(!charstring::compare(dbtype,"postgresql") ||
-				!charstring::compare(dbtype,"mysql"))) {
-
-			// for postgres and mysql, escape \'s
-			strb->append("\\\\");
-
-		} else {
-
-			char	ch=field[index];
-
-			// double-up any single-quotes
-			if (ch=='\'') {
-				strb->append('\'');
-			}
+					convertToUnsignedInteger(v);
 
 			// append the character
-			strb->append(ch);
+			strb.append(ch);
+
+			// skip past the entity
+			while (*v && *v!=';') {
+				v++;
+			}
+		} else {
+			strb.append(*v);
 		}
 	}
+
+	return strb.detachString();
+}
+
+bool sqlrimportxml::tagEnd(const char *ns, const char *name) {
+
+	if (!charstring::compare(name,"column")) {
+		// NOTE: atttributeValue() should have set
+		// the column name buffer by now
+		// NOTE: processColumnName() calls the
+		// column-start and column-end events
+		return processColumnName();
+	} else if (!charstring::compare(name,"columns")) {
+		// NOTE: endProcessingColumns() calls the columns-end event
+		return endProcessingColumns();
+	} else if (!charstring::compare(name,"field")) {
+		// we're not in a field any more
+		infield=false;
+		// NOTE: text() should have set the field buffer by now
+		// NOTE: processField() calls the
+		// field-start and field-end events
+		return processField();
+	} else if (!charstring::compare(name,"row")) {
+		// NOTE: endProcessingRow() calls the row-end event
+		return endProcessingRow();
+	} else if (!charstring::compare(name,"rows")) {
+		// NOTE: endProcessingRows() calls the rows-end event
+		return endProcessingRows();
+	} else if (!charstring::compare(name,"table")) {
+		return true;
+	} else if (!charstring::compare(name,"sequence")) {
+		return resetSequence();
+	}
+	return true;
+}
+
+bool sqlrimportxml::resetSequence() {
+
+	// reset the sequence...
+	clearQueryBuffer();
+
+	// FIXME: arguably restarting a sequence should be an API call, and
+	// there should be a backend method like restartSequence() implemented
+	// by the connection modules
+
+	// for firebird and interbase...
+	if (charstring::contains(getDbType(),"firebird") ||
+		charstring::contains(getDbType(),"interbase")) {
+
+		// restart the sequence (generator) with the provided value
+		appendToQueryBuffer("set generator ");
+		appendToQueryBuffer(getObjectName());
+		appendToQueryBuffer(" to ");
+		appendToQueryBuffer(sequencevalue);
+		if (!getSqlrCursor()->sendQuery(getQueryBufferString())) {
+			return error(getSqlrConnection()->errorNumber(),
+					getSqlrConnection()->errorMessage());
+		}
+		return true;
+
+	} else
+
+	// for oracle...
+	if (charstring::contains(getDbType(),"oracle")) {
+
+		// get existing configuration for the sequence
+		sqlrcursor	sqlrcur2(getSqlrConnection());
+		char		*uppersequence=
+				charstring::duplicate(getObjectName());
+		charstring::upper(uppersequence);
+		appendToQueryBuffer("select * from all_sequences where "
+				"sequence_name='");
+		appendToQueryBuffer(uppersequence);
+		appendToQueryBuffer("'");
+		delete[] uppersequence;
+		if (!sqlrcur2.sendQuery(getQueryBufferString())) {
+			return error(sqlrcur2.errorNumber(),
+					sqlrcur2.errorMessage());
+		}
+
+		// drop the sequence
+		clearQueryBuffer();
+		appendToQueryBuffer("drop sequence ");
+		appendToQueryBuffer(getObjectName());
+		if (!getSqlrCursor()->sendQuery(getQueryBufferString())) {
+			return error(getSqlrConnection()->errorNumber(),
+					getSqlrConnection()->errorMessage());
+		}
+
+		// recreate the sequence to start with the provided value, but
+		// also using configuration parameters that we fetched above
+		clearQueryBuffer();
+		appendToQueryBuffer("create sequence ");
+		appendToQueryBuffer(getObjectName());
+		appendToQueryBuffer(" start with ");
+		appendToQueryBuffer(sequencevalue);
+		appendToQueryBuffer(" maxvalue ");
+		appendToQueryBuffer(sqlrcur2.getField(0,"MAX_VALUE"));
+		appendToQueryBuffer(" minvalue ");
+		appendToQueryBuffer(sqlrcur2.getField(0,"MIN_VALUE"));
+		if (!charstring::compare(
+				sqlrcur2.getField(0,"CYCLE_FLAG"),"N")) {
+			appendToQueryBuffer(" nocycle ");
+		} else {
+			appendToQueryBuffer(" cycle ");
+		}
+		if (!charstring::compare(
+				sqlrcur2.getField(0,"ORDER_FLAG"),"N")) {
+			appendToQueryBuffer(" noorder ");
+		} else {
+			appendToQueryBuffer(" order ");
+		}
+		if (!charstring::compare(
+				sqlrcur2.getField(0,"CACHE_SIZE"),"0")) {
+			appendToQueryBuffer(" nocache ");
+		} else {
+			appendToQueryBuffer(" cache ");
+			appendToQueryBuffer(sqlrcur2.getField(0,"CACHE_SIZE"));
+		}
+		if (!getSqlrCursor()->sendQuery(getQueryBufferString())) {
+			return error(getSqlrConnection()->errorNumber(),
+					getSqlrConnection()->errorMessage());
+		}
+		return true;
+
+	// for postgreql, db2, and informix...
+	} else if (charstring::contains(getDbType(),"postgresql") ||
+			charstring::contains(getDbType(),"db2") ||
+			charstring::contains(getDbType(),"informix")) {
+
+		// restart the sequence with the provided value
+		appendToQueryBuffer("alter sequence ");
+		appendToQueryBuffer(getObjectName());
+		appendToQueryBuffer(" restart with ");
+		appendToQueryBuffer(sequencevalue);
+		if (!getSqlrCursor()->sendQuery(getQueryBufferString())) {
+			return error(getSqlrConnection()->errorNumber(),
+					getSqlrConnection()->errorMessage());
+		}
+		return true;
+	}
+
+	// sqlite, mysql, sap/sybase and mssql have autoincrementing fields
+	// odbc can't tell what kind of underlying db we're using, so don't
+	// do anything for those databases
+	return true;
 }

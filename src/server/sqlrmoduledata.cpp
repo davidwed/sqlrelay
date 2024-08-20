@@ -7,14 +7,13 @@
 class sqlrmoduledataprivate {
 	friend class sqlrmoduledata;
 	private:
-		domnode		*_parameters;
 		const char	*_moduletype;
 		const char	*_id;
 };
 
-sqlrmoduledata::sqlrmoduledata(domnode *parameters) {
+sqlrmoduledata::sqlrmoduledata(domnode *parameters) :
+				sqlrservermodule(NULL,parameters) {
 	pvt=new sqlrmoduledataprivate;
-	pvt->_parameters=parameters;
 	pvt->_moduletype=parameters->getAttributeValue("module");
 	if (charstring::isNullOrEmpty(pvt->_moduletype)) {
 		pvt->_moduletype=parameters->getAttributeValue("file");
@@ -34,17 +33,7 @@ const char *sqlrmoduledata::getId() {
 	return pvt->_id;
 }
 
-domnode *sqlrmoduledata::getParameters() {
-	return pvt->_parameters;
-}
-
 void sqlrmoduledata::closeResultSet(sqlrservercursor *sqlrcur) {
-}
-
-void sqlrmoduledata::endTransaction(bool commit) {
-}
-
-void sqlrmoduledata::endSession() {
 }
 
 sqlrmoduledata_tag::sqlrmoduledata_tag(domnode *parameters) :

@@ -1,13 +1,13 @@
 // Copyright (c) 1999-2018 David Muse
 // See the file COPYING for more information
 
-#include <sqlrelay/sqlrserver.h>
+#include <sqlrelay/sqlrutil.h>
 #include <rudiments/aes128.h>
 #include <rudiments/sensitivevalue.h>
 
-class SQLRSERVER_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
+class SQLRUTIL_DLLSPEC sqlrpwenc_aes128 : public sqlrpwdenc {
 	public:
-			sqlrpwenc_aes128(domnode *parameters, bool debug);
+		sqlrpwenc_aes128(domnode *parameters, bool debug);
 		char	*encrypt(const char *value);
 		char	*decrypt(const char *value);
 	private:
@@ -134,7 +134,7 @@ char *sqlrpwenc_aes128::convert(const char *value, bool dec) {
 }
 
 extern "C" {
-	 SQLRSERVER_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_aes128(
+	 SQLRUTIL_DLLSPEC sqlrpwdenc *new_sqlrpwdenc_aes128(
 						domnode *parameters,
 						bool debug) {
 		return new sqlrpwenc_aes128(parameters,debug);

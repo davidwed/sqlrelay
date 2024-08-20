@@ -5,8 +5,6 @@
 
 #include <rudiments/domnode.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -16,99 +14,51 @@
 	}
 #endif
 
-class sqlrrouterplugin {
-	public:
-		sqlrrouter	*r;
-		dynamiclib	*dl;
-};
-
 class sqlrroutersprivate {
 	friend class sqlrrouters;
 	private:
-		const char		*_connid;
-		sqlrservercontroller	*_cont;
-		const char		**_connids;
 		sqlrconnection		**_conns;
+		const char		**_connids;
 		uint16_t		_conncount;
-
-		singlylinkedlist< sqlrrouterplugin * >	_llist;
+		const char		*_connid;
 };
 
 sqlrrouters::sqlrrouters(sqlrservercontroller *cont,
-				const char **connectionids,
 				sqlrconnection **connections,
-				uint16_t connectioncount) {
-	debugFunction();
+				const char **connectionids,
+				uint16_t connectioncount) :
+				sqlrservermodules(cont) {
 	pvt=new sqlrroutersprivate;
-	pvt->_connid=NULL;
-	pvt->_cont=cont;
-	pvt->_connids=connectionids;
+	setDebug(cont->getConfig()->getDebugRouters());
 	pvt->_conns=connections;
+	pvt->_connids=connectionids;
 	pvt->_conncount=connectioncount;
+	pvt->_connid=NULL;
 }
 
 sqlrrouters::~sqlrrouters() {
-	debugFunction();
-	unload();
 	delete pvt;
 }
 
-bool sqlrrouters::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the router list
-	for (domnode *router=parameters->getFirstTagChild();
-			!router->isNullNode();
-			router=router->getNextTagSibling()) {
-
-		// load router
-		loadRouter(router);
-	}
-	return true;
-}
-
-void sqlrrouters::unload() {
-	debugFunction();
-	for (listnode< sqlrrouterplugin * > *node=
-						pvt->_llist.getFirst();
-						node; node=node->getNext()) {
-		sqlrrouterplugin	*sqlrsp=node->getValue();
-		delete sqlrsp->r;
-		delete sqlrsp->dl;
-		delete sqlrsp;
-	}
-	pvt->_llist.clear();
-}
-
-void sqlrrouters::loadRouter(domnode *router) {
-
-	debugFunction();
+void sqlrrouters::loadModule(domnode *parameters) {
 
 	// ignore non-routers
-	if (charstring::compare(router->getName(),"router")) {
+	if (charstring::compare(parameters->getName(),"router")) {
 		return;
 	}
 
-	// get the router name
-	const char	*module=router->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=router->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	if (pvt->_cont->getConfig()->getDebugRouters()) {
-		stdoutput.printf("loading router: %s\n",module);
-	}
+	debugWrite("loading router module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the router module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("router_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -142,7 +92,7 @@ void sqlrrouters::loadRouter(domnode *router) {
 		delete dl;
 		return;
 	}
-	sqlrrouter	*r=(*newRouter)(pvt->_cont,this,router);
+	sqlrrouter	*r=(*newRouter)(cont,this,parameters);
 
 #else
 
@@ -154,23 +104,28 @@ void sqlrrouters::loadRouter(domnode *router) {
 	}
 #endif
 
+	debugWrite("success");
+
 	// add the plugin to the list
-	sqlrrouterplugin	*sqlrsp=new sqlrrouterplugin;
-	sqlrsp->r=r;
-	sqlrsp->dl=dl;
-	pvt->_llist.append(sqlrsp);
+	sqlrmoduleplugin	*sqlrmp=new sqlrmoduleplugin;
+	sqlrmp->m=r;
+	sqlrmp->dl=dl;
+	sqlrmp->module=module;
+	blist.append(sqlrmp);
 }
 
 const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					const char **err,
 					int64_t *errn) {
-	debugFunction();
-	for (listnode< sqlrrouterplugin * > *node=
-						pvt->_llist.getFirst();
+
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
-		const char	*connid=node->getValue()->r->route(
-						sqlrcon,sqlrcur,err,errn);
+
+		debugWrite("checking route: %s...",node->getValue()->module);
+
+		sqlrrouter	*r=(sqlrrouter *)node->getValue()->m;
+		const char	*connid=r->route(sqlrcon,sqlrcur,err,errn);
 		if (connid) {
 			return connid;
 		}
@@ -179,31 +134,14 @@ const char *sqlrrouters::route(sqlrserverconnection *sqlrcon,
 }
 
 bool sqlrrouters::routeEntireSession() {
-	debugFunction();
-	for (listnode< sqlrrouterplugin * > *node=
-						pvt->_llist.getFirst();
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
-		if (!node->getValue()->r->routeEntireSession()) {
+		sqlrrouter	*r=(sqlrrouter *)node->getValue()->m;
+		if (!r->routeEntireSession()) {
 			return false;
 		}
 	}
 	return true;
-}
-
-void sqlrrouters::endTransaction(bool commit) {
-	for (listnode< sqlrrouterplugin * > *node=
-						pvt->_llist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->r->endTransaction(commit);
-	}
-}
-
-void sqlrrouters::endSession() {
-	for (listnode< sqlrrouterplugin * > *node=
-						pvt->_llist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->r->endSession();
-	}
 }
 
 void sqlrrouters::setCurrentConnectionId(const char *connid) {

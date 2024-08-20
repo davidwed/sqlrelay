@@ -20,10 +20,10 @@
 
 struct db2column {
 	char		*name;
-	uint16_t	namelength;
+	uint16_t	namesize;
 	// SQLColAttribute requires that these are signed, 32 bit integers
 	int32_t		type;
-	int32_t		length;
+	int32_t		size;
 	int32_t		precision;
 	int32_t		scale;
 	int32_t		nullable;
@@ -35,19 +35,19 @@ struct db2column {
 	uint16_t	binary;
 	uint16_t	autoincrement;
 	char		table[4096];
-	uint16_t	tablelength;
+	uint16_t	tablesize;
 };
 
 struct datebind {
-	int16_t		*year;
-	int16_t		*month;
-	int16_t		*day;
-	int16_t		*hour;
-	int16_t		*minute;
-	int16_t		*second;
-	int32_t		*microsecond;
-	const char	**tz;
-	char		*buffer;
+	int16_t			*year;
+	int16_t			*month;
+	int16_t			*day;
+	int16_t			*hour;
+	int16_t			*minute;
+	int16_t			*second;
+	int32_t			*microsecond;
+	const char		**tz;
+	SQL_TIMESTAMP_STRUCT	buffer;
 };
 
 class db2connection;
@@ -55,15 +55,15 @@ class db2connection;
 class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 	friend class db2connection;
 	public:
-			db2cursor(sqlrserverconnection *conn, uint16_t id);
-			~db2cursor();
+		db2cursor(sqlrserverconnection *conn, uint16_t id);
+		~db2cursor();
 	private:
 		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		void		encodeBlob(stringbuffer *buffer,
 						const char *data,
 						uint32_t datasize);
@@ -91,8 +91,6 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 						int32_t microsecond,
 						const char *tz,
 						bool isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		inputBindBlob(const char *variable,
 						uint16_t variablesize,
@@ -132,8 +130,6 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		outputBindBlob(const char *variable, 
 						uint16_t variablesize,
@@ -152,18 +148,18 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 							uint64_t charstoread,
 							uint64_t *charsread);
 		bool		executeQuery(const char *query,
-						uint32_t length);
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+						uint32_t size);
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
-		uint64_t	affectedRows();
+		uint64_t	getAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t i);
-		uint16_t	getColumnNameLength(uint32_t i);
+		uint16_t	getColumnNameSize(uint32_t i);
 		uint16_t	getColumnType(uint32_t i);
-		uint32_t	getColumnLength(uint32_t i);
+		uint32_t	getColumnSize(uint32_t i);
 		uint32_t	getColumnPrecision(uint32_t i);
 		uint32_t	getColumnScale(uint32_t i);
 		uint16_t	getColumnIsNullable(uint32_t i);
@@ -171,14 +167,14 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		uint16_t	getColumnIsBinary(uint32_t i);
 		uint16_t	getColumnIsAutoIncrement(uint32_t i);
 		const char	*getColumnTable(uint32_t i);
-		uint16_t	getColumnTableLength(uint32_t i);
+		uint16_t	getColumnTableSize(uint32_t i);
 		bool		noRowsToReturn();
 		bool		skipRow(bool *error);
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **fld,
-					uint64_t *fldlength,
-					bool *blob,
+					uint64_t *fldsize,
+					bool *lob,
 					bool *null);
 		void		nextRow();
 		bool		getLobFieldLength(uint32_t col,
@@ -205,14 +201,16 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 		#endif
 		db2column	*column;
 
-		uint16_t	maxbindcount;
-		SQLINTEGER	*blobbindsize;
-		datebind	**outdatebind;
-		char		**outlobbind;
-		SQLINTEGER 	*outlobbindlen;
-		int16_t		**outisnullptr;
-		SQLINTEGER	*outisnull;
-		SQLINTEGER	sqlnulldata;
+		uint16_t		maxbindcount;
+		SQLINTEGER		*blobbindsize;
+		SQL_DATE_STRUCT		*indatebind;
+		SQL_TIMESTAMP_STRUCT	*intsbind;
+		datebind		**outdatebind;
+		char			**outlobbind;
+		SQLINTEGER 		*outlobbindlen;
+		int16_t			**outisnullptr;
+		SQLINTEGER		*outisnull;
+		SQLINTEGER		sqlnulldata;
 
 		uint64_t	rowgroupindex;
 		uint64_t	totalinrowgroup;
@@ -229,7 +227,7 @@ class SQLRSERVER_DLLSPEC db2cursor : public sqlrservercursor {
 class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 	friend class db2cursor;
 	public:
-			db2connection(sqlrservercontroller *cont);
+		db2connection(sqlrservercontroller *cont);
 	private:
 		void	handleConnectString();
 		bool	mustDetachBeforeLogIn();
@@ -239,38 +237,37 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 		sqlrservercursor	*newCursor(uint16_t id);
 		void	deleteCursor(sqlrservercursor *curs);
 		void	logOut();
-		int16_t	nullBindValue();
-		bool	bindValueIsNull(int16_t isnull);
-		bool	autoCommitOn();
-		bool	autoCommitOff();
+		int16_t	getNullBindValue();
+		bool	setAutoCommitOn();
+		bool	setAutoCommitOff();
 		bool	supportsTransactionBlocks();
-		bool	supportsAutoCommit();
 		bool	commit();
 		bool	rollback();
-		void	errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+		void	getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t	*errorcode,
 					bool *liveconnection);
 		bool	liveConnection(SQLINTEGER nativeerror,
 					const char *errorbuffer,
-					SQLSMALLINT errlength);
+					SQLSMALLINT errsize);
 		const char	*pingQuery();
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*dbHostNameQuery();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getDbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
 		const char	*getTableListQuery(bool wild,
-						uint16_t objecttypes);
+						uint16_t objecttypes,
+						bool currentschemaonly);
 		const char	*getColumnListQuery(
 					const char *table, bool wild);
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
 		const char	*setIsolationLevelQuery();
-		const char	*noopQuery();
-		const char	*bindFormat();
-		const char	*nextvalFormat();
+		const char	*getNoopQuery();
+		const char	*getBindFormat();
+		const char	*getNextvalFormat();
 
 		SQLHENV		env;
 		SQLRETURN	erg;
@@ -284,13 +281,10 @@ class SQLRSERVER_DLLSPEC db2connection : public sqlrserverconnection {
 
 		int32_t		maxoutbindlobsize;
 
-		const char	*identity;
-
 		char		dbversion[512];
 		uint16_t	dbmajorversion;
 
-		const char	*gettablelistquery;
-		const char	*gettablelistquerywild;
+		stringbuffer	tablelistquery;
 		const char	*dbhostnamequery;
 
 		stringbuffer	errormsg;
@@ -300,7 +294,6 @@ db2connection::db2connection(sqlrservercontroller *cont) :
 					sqlrserverconnection(cont) {
 
 	maxoutbindlobsize=MAX_OUT_BIND_LOB_SIZE;
-	identity=NULL;
 }
 
 void db2connection::handleConnectString() {
@@ -315,8 +308,6 @@ void db2connection::handleConnectString() {
 	if (!charstring::isNullOrEmpty(tmp)) {
 		server=tmp;
 	}
-
-	identity=cont->getConnectStringValue("identity");
 
 	lang=cont->getConnectStringValue("lang");
 
@@ -414,68 +405,26 @@ const char *db2connection::logInError(const char *errmsg) {
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
 	SQLCHAR		errorbuffer[1024];
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
-					errorbuffer,1024,&errlength);
-	errormessage.append(errorbuffer,errlength);
+					errorbuffer,1024,&errsize);
+	errormessage.append(errorbuffer,errsize);
 	return errormessage.getString();
 }
 
 void db2connection::dbVersionSpecificTasks() {
 
 	// get the db version
-	SQLSMALLINT	dbversionlen;
+	SQLSMALLINT	dbversionsize;
 	SQLGetInfo(dbc,SQL_DBMS_VER,
 			(SQLPOINTER)dbversion,
 			(SQLSMALLINT)sizeof(dbversion),
-			&dbversionlen);
+			&dbversionsize);
 	dbmajorversion=charstring::convertToInteger(dbversion);
 
 	// set queries to use based on version
 	if (dbmajorversion>7) {
-
-		gettablelistquery=
-			"select distinct "
-			"	NULL as table_cat, "
-			"	tabschema as table_schem, "
-			"	tabname as table_name, "
-			"	'TABLE' as table_type, "
-			"	NULL as remarks, "
-			"	NULL as extra "
-			"from "
-			"	syscat.tables "
-			"where "
-			"	ownertype='U' "
-			"	and "
-			"	tabschema!='SYSTOOLS' "
-			"	and "
-			"	type in ('T','U','V','W') "
-			"	and "
-			"	tabname like '%s' "
-			"order by "
-			"	tabschema, "
-			"	tabname";
-
-		gettablelistquerywild=
-			"select distinct "
-			"	NULL as table_cat, "
-			"	tabschema as table_schem, "
-			"	tabname as table_name, "
-			"	'TABLE' as table_type, "
-			"	NULL as remarks, "
-			"	NULL as extra "
-			"from "
-			"	syscat.tables "
-			"where "
-			"	ownertype='U' "
-			"	and "
-			"	tabschema!='SYSTOOLS' "
-			"	and "
-			"	type in ('T','U','V','W') "
-			"order by "
-			"	tabschema, "
-			"	tabname";
 
 		dbhostnamequery=
 			"select "
@@ -483,48 +432,6 @@ void db2connection::dbVersionSpecificTasks() {
 			"from "
 			"	table(sysproc.env_get_sys_info())";
 	} else {
-
-		gettablelistquery=
-			"select distinct "
-			"	NULL as table_cat, "
-			"	tabschema as table_schem, "
-			"	tabname as table_name, "
-			"	'TABLE' as table_type, "
-			"	NULL as remarks, "
-			"	NULL as extra "
-			"from "
-			"	syscat.tables "
-			"where "
-			"	definer!='SYSIBM' "
-			"	and "
-			"	tabschema!='SYSTOOLS' "
-			"	and "
-			"	type in ('T','U','V','W') "
-			"	and "
-			"	tabname like '%s' "
-			"order by "
-			"	tabschema, "
-			"	tabname";
-
-		gettablelistquerywild=
-			"select distinct "
-			"	NULL as table_cat, "
-			"	tabschema as table_schem, "
-			"	tabname as table_name, "
-			"	'TABLE' as table_type, "
-			"	NULL as remarks, "
-			"	NULL as extra "
-			"from "
-			"	syscat.tables "
-			"where "
-			"	definer!='SYSIBM' "
-			"	and "
-			"	tabschema!='SYSTOOLS' "
-			"	and "
-			"	type in ('T','U','V','W') "
-			"order by "
-			"	tabschema, "
-			"	tabname";
 
 		// there is no obvious way to get this prior to 8.0
 		dbhostnamequery=
@@ -549,24 +456,17 @@ void db2connection::logOut() {
 	SQLFreeHandle(SQL_HANDLE_ENV,env);
 }
 
-int16_t db2connection::nullBindValue() {
+int16_t db2connection::getNullBindValue() {
 	return SQL_NULL_DATA;
 }
 
-bool db2connection::bindValueIsNull(int16_t isnull) {
-	if (isnull==SQL_NULL_DATA) {
-		return true;
-	}
-	return false;
-}
-
-bool db2connection::autoCommitOn() {
+bool db2connection::setAutoCommitOn() {
 	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_ON,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
 }
 
-bool db2connection::autoCommitOff() {
+bool db2connection::setAutoCommitOff() {
 	return (SQLSetConnectAttr(dbc,SQL_ATTR_AUTOCOMMIT,
 				(SQLPOINTER)SQL_AUTOCOMMIT_OFF,
 				sizeof(SQLINTEGER))==SQL_SUCCESS);
@@ -574,10 +474,6 @@ bool db2connection::autoCommitOff() {
 
 bool db2connection::supportsTransactionBlocks() {
 	return false;
-}
-
-bool db2connection::supportsAutoCommit() {
-	return true;
 }
 
 bool db2connection::commit() {
@@ -588,39 +484,39 @@ bool db2connection::rollback() {
 	return (SQLEndTran(SQL_HANDLE_ENV,env,SQL_ROLLBACK)==SQL_SUCCESS);
 }
 
-void db2connection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void db2connection::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	SQLGetDiagRec(SQL_HANDLE_DBC,dbc,1,state,&nativeerrnum,
-				(SQLCHAR *)errorbuffer,errorbufferlength,
-				&errlength);
+				(SQLCHAR *)errorbuffer,errorbuffersize,
+				&errsize);
 
 	// set return values
-	*errorlength=errlength;
+	*errorsize=errsize;
 	*errorcode=nativeerrnum;
-	*liveconnection=liveConnection(nativeerrnum,errorbuffer,errlength);
+	*liveconnection=liveConnection(nativeerrnum,errorbuffer,errsize);
 }
 
 bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
 					const char *errorbuffer,
-					SQLSMALLINT errlength) {
+					SQLSMALLINT errsize) {
 
 	// When the DB goes down, DB2 first reports one error:
 	// 	[IBM][CLI Driver] SQL1224N  A database agent could not be
 	//	started to service a request, or was terminated as a result of
 	//	a database system shutdown or a force command.  SQLSTATE=55032
-	//	(in this case nativeerrnum==-1224 and errlength==184)
+	//	(in this case nativeerrnum==-1224 and errsize==184)
 	// then upon repeated attempts to run a query, it reports:
 	//	[IBM][CLI Driver] CLI0106E  Connection is closed. SQLSTATE=08003
-	//	(in this case nativeerrnum==-99999 and errlength==64)
+	//	(in this case nativeerrnum==-99999 and errsize==64)
 	//	(unforutnately other errors have the same error number and
-	//	length, such as "Invalid cursor state." so we have to
+	//	size, such as "Invalid cursor state." so we have to
 	//	discriminate a bit for this one)
 	// here's another one for -1224
 	//	[IBM][CLI Driver] SQL1224N  The database manager is not able to
@@ -632,13 +528,13 @@ bool db2connection::liveConnection(SQLINTEGER nativeerrnum,
 	// the server side, the DB2 client reports:
 	//	[IBM][CLI Driver] SQL30081N  A communication error has been
 	//	detected...
-	//	(in this case nativeerrnum==-30081 and the error length is
+	//	(in this case nativeerrnum==-30081 and the error size is
 	//	variable depending on the host name/ip address of the server
 	//	and other things, so we'll only test for the error number)
-	return !((nativeerrnum==-1224 && errlength==184) ||
-		(nativeerrnum==-99999 && errlength==64 &&
+	return !((nativeerrnum==-1224 && errsize==184) ||
+		(nativeerrnum==-99999 && errsize==64 &&
 		charstring::contains(errorbuffer,"Connection is closed")) ||
-		(nativeerrnum==-1224 && errlength==220) ||
+		(nativeerrnum==-1224 && errsize==220) ||
 		(nativeerrnum==-30081));
 }
 
@@ -647,15 +543,15 @@ const char *db2connection::pingQuery() {
 	return "values 1";
 }
 
-const char *db2connection::identify() {
-	return (identity)?identity:"db2";
+const char *db2connection::getDbType() {
+	return "db2";
 }
 
-const char *db2connection::dbVersion() {
+const char *db2connection::getDbVersion() {
 	return dbversion;
 }
 
-const char *db2connection::dbHostNameQuery() {
+const char *db2connection::getDbHostNameQuery() {
 	return dbhostnamequery;
 }
 
@@ -676,8 +572,79 @@ const char *db2connection::getDatabaseListQuery(bool wild) {
 		"	syscat.schemata ";
 }
 
-const char *db2connection::getTableListQuery(bool wild, uint16_t objecttypes) {
-	return (wild)?gettablelistquery:gettablelistquerywild;
+const char *db2connection::getTableListQuery(bool wild,
+						uint16_t objecttypes,
+						bool currentschemaonly) {
+
+	stringbuffer	otypes;
+	otypes.append("	(");
+	if (objecttypes&DB_OBJECT_TABLE) {
+		otypes.append("	type = 'T' or type='U' ");
+	}
+	if (objecttypes&DB_OBJECT_VIEW) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	type = 'V' or type='W' ");
+	}
+	if (objecttypes&DB_OBJECT_ALIAS) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	type = 'A' ");
+	}
+	if (objecttypes&DB_OBJECT_SYNONYM) {
+		if (otypes.getSize()) {
+			otypes.append("	or ");
+		}
+		otypes.append("	type = 'N' ");
+	}
+	otypes.append(") ");
+
+	tablelistquery.clear();
+	tablelistquery.append(
+		"select distinct "
+		"	NULL as table_cat, "
+		"	tabschema as table_schem, "
+		"	tabname as table_name, "
+		"	'TABLE' as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
+		"from "
+		"	syscat.tables "
+		"where ");
+	if (dbmajorversion>7) {
+		tablelistquery.append(
+			"	ownertype='U' ");
+	} else {
+		tablelistquery.append(
+			"	definer!='SYSIBM' ");
+	}
+	tablelistquery.append(
+		"	and "
+		"	tabschema!='SYSTOOLS' ");
+	if (currentschemaonly) {
+		tablelistquery.append(
+			"	and "
+			"	tabschema='");
+		tablelistquery.append(getCurrentDatabase());
+		tablelistquery.append(
+			"' ");
+	}
+	tablelistquery.append(
+			"	and ");
+	tablelistquery.append(otypes.getString());
+	if (wild) {
+		tablelistquery.append(
+			"	and "
+			"	tabname like '%s' ");
+	}
+	tablelistquery.append(
+		"order by "
+		"	tabschema, "
+		"	tabname");
+
+	return tablelistquery.getString();
 }
 
 const char *db2connection::getColumnListQuery(const char *table, bool wild) {
@@ -721,11 +688,11 @@ const char *db2connection::getColumnListQuery(const char *table, bool wild) {
 		"	colno";
 }
 
-const char *db2connection::bindFormat() {
+const char *db2connection::getBindFormat() {
 	return "?";
 }
 
-const char *db2connection::nextvalFormat() {
+const char *db2connection::getNextvalFormat() {
 	return "(nextval for %s)";
 }
 
@@ -745,7 +712,7 @@ const char *db2connection::setIsolationLevelQuery() {
         return "set current isolation %s";
 }
 
-const char *db2connection::noopQuery() {
+const char *db2connection::getNoopQuery() {
 	return "begin end;";
 }
 
@@ -756,6 +723,8 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 	lobstmt=0;
 	maxbindcount=conn->cont->getConfig()->getMaxBindCount();
 	blobbindsize=new SQLINTEGER[maxbindcount];
+	indatebind=new SQL_DATE_STRUCT[maxbindcount];
+	intsbind=new SQL_TIMESTAMP_STRUCT[maxbindcount];
 	outdatebind=new datebind *[maxbindcount];
 	outlobbind=new char *[maxbindcount];
 	outlobbindlen=new SQLINTEGER[maxbindcount];
@@ -775,6 +744,8 @@ db2cursor::db2cursor(sqlrserverconnection *conn, uint16_t id) :
 
 db2cursor::~db2cursor() {
 	delete[] blobbindsize;
+	delete[] indatebind;
+	delete[] intsbind;
 	delete[] outdatebind;
 	delete[] outlobbind;
 	delete[] outlobbindlen;
@@ -802,14 +773,14 @@ void db2cursor::allocateResultSetBuffers(int32_t columncount) {
 		loblength=new SQLINTEGER *[columncount];
 		indicator=new SQLINTEGER *[columncount];
 		uint32_t	fetchatonce=getFetchAtOnce();
-		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
 		#if (DB2VERSION>7)
 		rowstat=new SQLUSMALLINT[fetchatonce];
 		#endif
 		column=new db2column[columncount];
 		for (int32_t i=0; i<columncount; i++) {
 			column[i].name=new char[4096];
-			field[i]=new char[fetchatonce*maxfieldlength];
+			field[i]=new char[fetchatonce*maxfieldsize];
 			loblocator[i]=new SQLINTEGER[fetchatonce];
 			loblength[i]=new SQLINTEGER[fetchatonce];
 			indicator[i]=new SQLINTEGER[fetchatonce];
@@ -899,7 +870,7 @@ bool db2cursor::close() {
 	return true;
 }
 
-bool db2cursor::prepareQuery(const char *query, uint32_t length) {
+bool db2cursor::prepareQuery(const char *query, uint32_t size) {
 
 	bindformaterror=false;
 
@@ -907,7 +878,7 @@ bool db2cursor::prepareQuery(const char *query, uint32_t length) {
 	ncols=0;
 
 	// prepare the query
-	erg=SQLPrepare(stmt,(SQLCHAR *)query,length);
+	erg=SQLPrepare(stmt,(SQLCHAR *)query,size);
 	return (erg==SQL_SUCCESS || erg==SQL_SUCCESS_WITH_INFO);
 }
 
@@ -1026,8 +997,6 @@ bool db2cursor::inputBind(const char *variable,
 					int32_t microsecond,
 					const char *tz,
 					bool isnegative,
-					char *buffer,
-					uint16_t buffersize,
 					int16_t *isnull) {
 
 	uint16_t	pos=charstring::convertToInteger(variable+1);
@@ -1041,7 +1010,7 @@ bool db2cursor::inputBind(const char *variable,
 
 	if (validdate && !validtime) {
 
-		SQL_DATE_STRUCT	*ts=(SQL_DATE_STRUCT *)buffer;
+		SQL_DATE_STRUCT	*ts=&(indatebind[pos-1]);
 		ts->year=year;
 		ts->month=month;
 		ts->day=day;
@@ -1053,13 +1022,13 @@ bool db2cursor::inputBind(const char *variable,
 				SQL_DATE,
 				0,
 				0,
-				buffer,
+				ts,
 				0,
 				NULL);
 
 	} else {
 
-		SQL_TIMESTAMP_STRUCT	*ts=(SQL_TIMESTAMP_STRUCT *)buffer;
+		SQL_TIMESTAMP_STRUCT	*ts=&(intsbind[pos-1]);
 		ts->year=year;
 		ts->month=month;
 		ts->day=day;
@@ -1075,7 +1044,7 @@ bool db2cursor::inputBind(const char *variable,
 				SQL_TIMESTAMP,
 				0,
 				0,
-				buffer,
+				ts,
 				0,
 				NULL);
 	}
@@ -1241,8 +1210,6 @@ bool db2cursor::outputBind(const char *variable,
 					int32_t *microsecond,
 					const char **tz,
 					bool *isnegative,
-					char *buffer,
-					uint16_t buffersize,
 					int16_t *isnull) {
 
 	uint16_t	pos=charstring::convertToInteger(variable+1);
@@ -1260,8 +1227,9 @@ bool db2cursor::outputBind(const char *variable,
 	db->second=second;
 	db->microsecond=microsecond;
 	db->tz=tz;
+
 	*isnegative=false;
-	db->buffer=buffer;
+
 	outdatebind[pos-1]=db;
 	outisnullptr[pos-1]=isnull;
 
@@ -1272,7 +1240,7 @@ bool db2cursor::outputBind(const char *variable,
 				SQL_TIMESTAMP,
 				0,
 				0,
-				buffer,
+				&(db->buffer),
 				0,
 				&(outisnull[pos-1])
 				);
@@ -1344,6 +1312,7 @@ bool db2cursor::outputBindClob(const char *variable,
 }
 
 bool db2cursor::getLobOutputBindLength(uint16_t index, uint64_t *length) {
+	// FIXME: this code assumes that the lob characters are 1 byte long
 	if (outlobbindlen[index]>db2conn->maxoutbindlobsize) {
 		outlobbindlen[index]=db2conn->maxoutbindlobsize;
 	}
@@ -1355,19 +1324,20 @@ bool db2cursor::getLobOutputBindSegment(uint16_t index,
 					char *buffer, uint64_t buffersize,
 					uint64_t offset, uint64_t charstoread,
 					uint64_t *charsread) {
-	uint64_t	len=outlobbindlen[index];
-	if (offset>len) {
+	// FIXME: this code assumes that the lob characters are 1 byte long
+	uint64_t	length=outlobbindlen[index];
+	if (offset>length) {
 		return false;
 	}
-	if (offset+charstoread>len) {
-		charstoread=charstoread-((offset+charstoread)-len);
+	if (offset+charstoread>length) {
+		charstoread=charstoread-((offset+charstoread)-length);
 	}
 	bytestring::copy(buffer,outlobbind[index]+offset,charstoread);
 	*charsread=charstoread;
 	return true;
 }
 
-bool db2cursor::executeQuery(const char *query, uint32_t length) {
+bool db2cursor::executeQuery(const char *query, uint32_t size) {
 
 	// initialize row counts
 	rowgroupindex=0;
@@ -1382,7 +1352,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 		return false;
 	}
 
-	checkForTempTable(query,length);
+	checkForTempTable(query,size);
 
 	// get the column count
 	erg=SQLNumResultCols(stmt,&ncols);
@@ -1413,20 +1383,20 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	// run through the columns
 	for (SQLSMALLINT i=0; i<ncols; i++) {
 
-		if (conn->cont->getSendColumnInfo()==SEND_COLUMN_INFO) {
+		if (conn->cont->getSendColumnInfo()) {
 
 			// column name
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LABEL,
 					column[i].name,4096,
-					(SQLSMALLINT *)&(column[i].namelength),
+					(SQLSMALLINT *)&(column[i].namesize),
 					NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
 
-			// column length
+			// column size
 			erg=SQLColAttribute(stmt,i+1,SQL_COLUMN_LENGTH,
-					NULL,0,NULL,&(column[i].length));
+					NULL,0,NULL,&(column[i].size));
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
@@ -1488,12 +1458,12 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 			erg=SQLColAttribute(stmt,i+1,
 				SQL_COLUMN_TABLE_NAME,
 				column[i].table,4096,
-				(SQLSMALLINT *)&(column[i].tablelength),
+				(SQLSMALLINT *)&(column[i].tablesize),
 				NULL);
 			if (erg!=SQL_SUCCESS && erg!=SQL_SUCCESS_WITH_INFO) {
 				return false;
 			}
-			column[i].tablelength=
+			column[i].tablesize=
 				charstring::getLength(column[i].table);
 		}
 
@@ -1512,7 +1482,7 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 			default:
 				erg=SQLBindCol(stmt,i+1,SQL_C_CHAR,
 					field[i],
-					conn->cont->getMaxFieldLength(),
+					conn->cont->getMaxFieldSize(),
 					indicator[i]);
 				break;
 		}
@@ -1531,15 +1501,13 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	for (uint16_t i=0; i<getOutputBindCount(); i++) {
 		if (outdatebind[i]) {
 			datebind	*db=outdatebind[i];
-			SQL_TIMESTAMP_STRUCT	*ts=
-				(SQL_TIMESTAMP_STRUCT *)db->buffer;
-			*(db->year)=ts->year;
-			*(db->month)=ts->month;
-			*(db->day)=ts->day;
-			*(db->hour)=ts->hour;
-			*(db->minute)=ts->minute;
-			*(db->second)=ts->second;
-			*(db->microsecond)=ts->fraction/1000;
+			*(db->year)=db->buffer.year;
+			*(db->month)=db->buffer.month;
+			*(db->day)=db->buffer.day;
+			*(db->hour)=db->buffer.hour;
+			*(db->minute)=db->buffer.minute;
+			*(db->second)=db->buffer.second;
+			*(db->microsecond)=db->buffer.fraction/1000;
 			*(db->tz)=NULL;
 		}
 		if (outisnullptr[i]) {
@@ -1550,19 +1518,19 @@ bool db2cursor::executeQuery(const char *query, uint32_t length) {
 	return true;
 }
 
-void db2cursor::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void db2cursor::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 	if (bindformaterror) {
 		// handle bind format errors
-		*errorlength=charstring::getLength(
+		*errorsize=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
-				errorbufferlength,
+				errorbuffersize,
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
-				*errorlength);
+				*errorsize);
 		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
 		*liveconnection=true;
 		return;
@@ -1570,20 +1538,20 @@ void db2cursor::errorMessage(char *errorbuffer,
 
 	SQLCHAR		state[10];
 	SQLINTEGER	nativeerrnum;
-	SQLSMALLINT	errlength;
+	SQLSMALLINT	errsize;
 
 	SQLGetDiagRec(SQL_HANDLE_STMT,stmt,1,state,&nativeerrnum,
-				(SQLCHAR *)errorbuffer,errorbufferlength,
-				&errlength);
+				(SQLCHAR *)errorbuffer,errorbuffersize,
+				&errsize);
 
 	// set return values
-	*errorlength=errlength;
+	*errorsize=errsize;
 	*errorcode=nativeerrnum;
 	*liveconnection=db2conn->liveConnection(nativeerrnum,
-						errorbuffer,errlength);
+						errorbuffer,errsize);
 }
 
-uint64_t db2cursor::affectedRows() {
+uint64_t db2cursor::getAffectedRows() {
 	return affectedrows;
 }
 
@@ -1595,8 +1563,8 @@ const char *db2cursor::getColumnName(uint32_t i) {
 	return column[i].name;
 }
 
-uint16_t db2cursor::getColumnNameLength(uint32_t i) {
-	return column[i].namelength;
+uint16_t db2cursor::getColumnNameSize(uint32_t i) {
+	return column[i].namesize;
 }
 
 uint16_t db2cursor::getColumnType(uint32_t i) {
@@ -1661,8 +1629,8 @@ uint16_t db2cursor::getColumnType(uint32_t i) {
 	}
 }
 
-uint32_t db2cursor::getColumnLength(uint32_t i) {
-	return column[i].length;
+uint32_t db2cursor::getColumnSize(uint32_t i) {
+	return column[i].size;
 }
 
 uint32_t db2cursor::getColumnPrecision(uint32_t i) {
@@ -1700,8 +1668,8 @@ const char *db2cursor::getColumnTable(uint32_t i) {
 	return column[i].table;
 }
 
-uint16_t db2cursor::getColumnTableLength(uint32_t i) {
-	return column[i].tablelength;
+uint16_t db2cursor::getColumnTableSize(uint32_t i) {
+	return column[i].tablesize;
 }
 
 bool db2cursor::noRowsToReturn() {
@@ -1775,8 +1743,8 @@ bool db2cursor::fetchRow(bool *error) {
 }
 
 void db2cursor::getField(uint32_t col,
-				const char **fld, uint64_t *fldlength,
-				bool *blob, bool *null) {
+				const char **fld, uint64_t *fldsize,
+				bool *lob, bool *null) {
 
 	// handle NULLs
 	if (indicator[col][rowgroupindex]==SQL_NULL_DATA) {
@@ -1784,15 +1752,15 @@ void db2cursor::getField(uint32_t col,
 		return;
 	}
 
-	// handle blobs
+	// handle lobs
 	if (column[col].type==SQL_CLOB || column[col].type==SQL_BLOB) {
-		*blob=true;
+		*lob=true;
 		return;
 	}
 
 	// handle normal datatypes
-	*fld=&field[col][rowgroupindex*conn->cont->getMaxFieldLength()];
-	*fldlength=indicator[col][rowgroupindex];
+	*fld=&field[col][rowgroupindex*conn->cont->getMaxFieldSize()];
+	*fldsize=indicator[col][rowgroupindex];
 }
 
 void db2cursor::nextRow() {
@@ -1842,7 +1810,7 @@ bool db2cursor::getLobFieldSegment(uint32_t col,
 			((offset+charstoread)-loblength[col][rowgroupindex]);
 	}
 
-	// read a blob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
+	// read a lob segment, at most MAX_LOB_CHUNK_SIZE bytes at a time
 	uint64_t	totalbytesread=0;
 	SQLUINTEGER	bytestoread=0;
 	uint64_t	remainingbytestoread=charstoread;

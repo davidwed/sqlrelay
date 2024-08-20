@@ -23,14 +23,16 @@ static bool exportTable(sqlrcursor *sqlrcur,
 	}
 
 	// xml or csv
-	sqlrexport	*sqlre;
+	sqlrexportfile	*sqlre;
 	if (!charstring::compareIgnoringCase(format,"csv")) {
 		sqlre=new sqlrexportcsv();
 	} else {
 		sqlre=new sqlrexportxml();
 	}
 	sqlre->setSqlrCursor(sqlrcur);
-	bool	success=sqlre->exportToFile(NULL,table);
+	sqlre->setFileName(NULL);
+	sqlre->setTable(table);
+	bool	success=sqlre->exportData();
 	delete sqlre;
 	return success;
 }

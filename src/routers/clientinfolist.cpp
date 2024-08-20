@@ -6,10 +6,10 @@
 
 class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {
 	public:
-			sqlrrouter_clientinfolist(sqlrservercontroller *cont,
+		sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 						sqlrrouters *rs,
 						domnode *parameters);
-			~sqlrrouter_clientinfolist();
+		~sqlrrouter_clientinfolist();
 
 		const char	*route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
@@ -21,10 +21,6 @@ class SQLRSERVER_DLLSPEC sqlrrouter_clientinfolist : public sqlrrouter {
 
 		regularexpression	**clientinfos;
 		uint64_t		clientinfocount;
-
-		bool	enabled;
-
-		bool	debug;
 };
 
 sqlrrouter_clientinfolist::sqlrrouter_clientinfolist(sqlrservercontroller *cont,
@@ -32,13 +28,6 @@ sqlrrouter_clientinfolist::sqlrrouter_clientinfolist(sqlrservercontroller *cont,
 						domnode *parameters) :
 					sqlrrouter(cont,rs,parameters) {
 	clientinfos=NULL;
-
-	debug=cont->getConfig()->getDebugRouters();
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	if (!enabled && debug) {
-		stdoutput.printf("	disabled\n");
-		return;
-	}
 
 	connid=parameters->getAttributeValue("connectionid");
 
@@ -65,21 +54,14 @@ const char *sqlrrouter_clientinfolist::route(sqlrserverconnection *sqlrcon,
 						sqlrservercursor *sqlrcur,
 						const char **err,
 						int64_t *errn) {
-	if (!enabled) {
-		return NULL;
-	}
 
-	if (debug) {
-		stdoutput.printf("		route {\n");
-	}
+	debugStart("route");
 
 	// get the clientinfo
 	const char	*clientinfo=sqlrcon->cont->getClientInfo();
 	if (charstring::isNullOrEmpty(clientinfo)) {
-		if (debug) {
-			stdoutput.printf("			"
-					"routing null/empty client info\n");
-		}
+		debugWrite("routing null/empty client info");
+		debugEnd();
 		return NULL;
 	}
 
@@ -88,19 +70,15 @@ const char *sqlrrouter_clientinfolist::route(sqlrserverconnection *sqlrcon,
 
 		// if the clientinfo matches...
 		if (clientinfos[i]->match(clientinfo)) {
-			if (debug) {
-				stdoutput.printf("			"
-						"routing client info "
-						"\"%s\" to %s\n	}\n",
-						clientinfo,connid);
-			}
+			debugWrite("routing client info \"%s\" to %s",
+							clientinfo,connid);
+			debugEnd();
 			return connid;
 		}
 	}
 
-	if (debug) {
-		stdoutput.printf("		}\n");
-	}
+	debugEnd();
+
 	return NULL;
 }
 

@@ -68,11 +68,71 @@
 // default regular expression for IP's that are not allowed to connect
 #define DEFAULT_DENIEDIPS ""
 
-// default tiers to debug on
+// default things to debug
 #define DEFAULT_DEBUG "none"
 
-// default max client info length
-#define DEFAULT_MAXCLIENTINFOLENGTH "512"
+// default parser debug
+#define DEFAULT_DEBUG_PARSER false
+
+// default directives
+#define DEFAULT_DEBUG_DIRECTIVES false
+
+// default query translations
+#define DEFAULT_DEBUG_QUERYTRANSLATIONS false
+
+// default filters
+#define DEFAULT_DEBUG_FILTERS false
+
+// default triggers
+#define DEFAULT_DEBUG_TRIGGERS false
+
+// default bind variable translations
+#define DEFAULT_DEBUG_BINDVARIABLETRANSLATIONS false
+
+// default result set translations
+#define DEFAULT_DEBUG_RESULTSETTRANSLATIONS false
+
+// default result set row translations
+#define DEFAULT_DEBUG_RESULTSETROWTRANSLATIONS false
+
+// default result set row block translations
+#define DEFAULT_DEBUG_RESULTSETROWBLOCKTRANSLATIONS false
+
+// default result set header translations
+#define DEFAULT_DEBUG_RESULTSETHEADERTRANSLATIONS false
+
+// default erorr translations
+#define DEFAULT_DEBUG_ERRORTRANSLATIONS false
+
+// default protocols
+#define DEFAULT_DEBUG_PROTOCOLS false
+
+// default auths
+#define DEFAULT_DEBUG_AUTHS false
+
+// default password encryptions
+#define DEFAULT_DEBUG_PWDENCS false
+
+// default loggers
+#define DEFAULT_DEBUG_LOGGERS false
+
+// default notifications
+#define DEFAULT_DEBUG_NOTIFICATIONS false
+
+// default schedules
+#define DEFAULT_DEBUG_SCHEDULES false
+
+// default routers
+#define DEFAULT_DEBUG_ROUTERS false
+
+// default queries
+#define DEFAULT_DEBUG_QUERIES false
+
+// default moduledatas
+#define DEFAULT_DEBUG_MODULEDATAS false
+
+// default max client info size
+#define DEFAULT_MAXCLIENTINFOSIZE "512"
 
 // default max query size
 #define DEFAULT_MAXQUERYSIZE "65536"
@@ -80,17 +140,17 @@
 // default max bind variable count
 #define DEFAULT_MAXBINDCOUNT "256"
 
-// default max bind variable length
-#define DEFAULT_MAXBINDNAMELENGTH "64"
+// default max bind variable size
+#define DEFAULT_MAXBINDNAMESIZE "64"
 
-// default max string bind value length
-#define DEFAULT_MAXSTRINGBINDVALUELENGTH "32768"
+// default max string bind value size
+#define DEFAULT_MAXSTRINGBINDVALUESIZE "32768"
 
-// default lob bind value length
-#define DEFAULT_MAXLOBBINDVALUELENGTH "71680"
+// default lob bind value size
+#define DEFAULT_MAXLOBBINDVALUESIZE "71680"
 
 // default error size
-#define DEFAULT_MAXERRORLENGTH "2048"
+#define DEFAULT_MAXERRORSIZE "2048"
 
 // default idle client timeout
 #define DEFAULT_IDLECLIENTTIMEOUT "-1"

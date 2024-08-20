@@ -6,6 +6,15 @@
 
 #include <sqlrelay/private/sqlrcollectionsincludes.h>
 
+/** The sqlrscalar class is a read-only implementation of the rudiments
+ *  scalarcollection<const char *> class.
+ *
+ *  After setting the cursor, row, and column, it provides read-only access to
+ *  the value of a single field in the result set.
+ *
+ *  The instance can be passed into any method that operates on a read-only
+ *  rudiments scalar<const char *>, or otherwise used in the same manner that a
+ *  read-only rudiments scaler<const char *> would be. */
 class SQLRCLIENT_DLLSPEC sqlrscalar : public scalarcollection<const char *> {
 	public:
 		/** Creates an empty instance of the sqlrscalar class. */
@@ -21,7 +30,7 @@ class SQLRCLIENT_DLLSPEC sqlrscalar : public scalarcollection<const char *> {
 		 *  column that the instance returns fields from to "column". */
 		sqlrscalar(sqlrcursor *cursor, uint64_t row, uint64_t column);
 
-		/** Deletes this intance of the sqlrscalar class. */
+		/** Deletes this instance of the sqlrscalar class. */
 		~sqlrscalar();
 
 		/** Returns true. */
@@ -38,16 +47,25 @@ class SQLRCLIENT_DLLSPEC sqlrscalar : public scalarcollection<const char *> {
 		 *  to "col". */
 		void	setColumn(uint32_t col);
 
-		/** Returns the value stored in this intance.  Returns NULL or
+		/** Returns the value stored in this instance.  Returns NULL or
 		 *  0 if no value has been stored. */
 		const char	*getValue();
 
-		/** Returns a reference to the value stored in this intance. */
+		/** Returns a reference to the value stored in this instance. */
 		const char *	&getReference();
 
 		#include <sqlrelay/private/sqlrscalar.h>
 };
 
+/** The sqlrlistnode class is a read-only implementation of the rudiments
+ *  listnode<const char *> class.
+ *
+ *  Used with sqlrrowlist or sqlrresultsetlist, it provides read-only access to
+ *  the value of a single field in the result set.
+ *
+ *  The instance can be passed into any method that operates on a read-only
+ *  rudiments listnode<const char *>, or otherwise used in the same manner that
+ *  a read-only rudiments listnode<const char *> would be. */
 class SQLRCLIENT_DLLSPEC sqlrlistnode : public listnode<const char *> {
 	public:
 		/** Returns the value (field) stored in the node. */
@@ -68,6 +86,16 @@ class SQLRCLIENT_DLLSPEC sqlrlistnode : public listnode<const char *> {
 		#include <sqlrelay/private/sqlrlistnode.h>
 };
 
+/** The sqlrrowlist class is a read-only, block-based implementation of the
+ *  rudiments listcollection<const char *> class.
+ *
+ *  After setting the cursor and row, it provides read-only, block-based access
+ *  to the values of a single row in the result set.
+ *
+ *  The instance can be passed into any method that operates on a read-only,
+ *  block-based rudiments listcollection<const char *>, or otherwise used in
+ *  the same manner that a read-only, block-based rudiments
+ *  listcollection<const char *> would be. */
 class SQLRCLIENT_DLLSPEC sqlrrowlist : public listcollection<const char *> {
 	public:
 		/** Creates an empty instance of the sqlrrowlist class. */
@@ -82,7 +110,7 @@ class SQLRCLIENT_DLLSPEC sqlrrowlist : public listcollection<const char *> {
 		 *  the instance returns fields from to "row". */
 		sqlrrowlist(sqlrcursor *cursor, uint64_t row);
 
-		/** Deletes this intance of the sqlrrowlist class. */
+		/** Deletes this instance of the sqlrrowlist class. */
 		~sqlrrowlist();
 
 		/** Sets the cursor used by this instance to "cursor". */
@@ -126,6 +154,16 @@ class SQLRCLIENT_DLLSPEC sqlrrowlist : public listcollection<const char *> {
 		#include <sqlrelay/private/sqlrrowlist.h>
 };
 
+/** The sqlrrowdictionary class is a read-only implementation of the rudiments
+ *  dictionarycollection<const char *, const char *> class.
+ *
+ *  After setting the cursor and row, it provides read-only access to the
+ *  values of a single row in the result set, by column name.
+ *
+ *  The instance can be passed into any method that operates on a read-only
+ *  rudiments dictionarycollection<const char *, const char *>, or otherwise
+ *  used in the same manner that a read-only rudiments
+ *  dictionarycollection<const char *, const char *> would be. */
 class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 		public dictionarycollection<const char *, const char *> {
 	public:
@@ -141,7 +179,7 @@ class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 		 *  row that the instance returns fields from to "row". */
 		sqlrrowdictionary(sqlrcursor *cursor, uint64_t row);
 
-		/** Deletes this intance of the sqlrrowdictionary class. */
+		/** Deletes this instance of the sqlrrowdictionary class. */
 		~sqlrrowdictionary();
 
 		/** Sets the cursor used by this instance to "cursor". */
@@ -192,6 +230,16 @@ class SQLRCLIENT_DLLSPEC sqlrrowdictionary :
 		#include <sqlrelay/private/sqlrrowdictionary.h>
 };
 
+/** The sqlrrowlist class is a read-only, block-based implementation of the
+ *  rudiments listcollection<const char *> class.
+ *
+ *  After setting the cursor and column, it provides read-only, block-based
+ *  access to the values in that column of each row in the result set.
+ *
+ *  The instance can be passed into any method that operates on a read-only,
+ *  block-based rudiments listcollection<const char *>, or otherwise used in
+ *  the same manner that a read-only, block-based rudiments
+ *  listcollection<const char *> would be. */
 class SQLRCLIENT_DLLSPEC sqlrresultsetlist :
 				public listcollection<const char *> {
 	public:
@@ -208,7 +256,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlist :
 		 *  column that the instance returns fields from to "col". */
 		sqlrresultsetlist(sqlrcursor *cursor, uint64_t col);
 
-		/** Deletes this intance of the sqlrresultsetlist
+		/** Deletes this instance of the sqlrresultsetlist
 		 *  class. */
 		~sqlrresultsetlist();
 
@@ -226,7 +274,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlist :
 		bool	isBlockBased();
 
 		/** Returns the result set buffer size of the cursor used by
- 		 *  this intance.  Returns 0 if the cursor is configured to
+ 		 *  this instance.  Returns 0 if the cursor is configured to
  		 *  fetch all rows at once. */
 		uint64_t	getBlockSize();
 
@@ -255,7 +303,16 @@ class SQLRCLIENT_DLLSPEC sqlrresultsetlist :
 		#include <sqlrelay/private/sqlrresultsetlist.h>
 };
 
-/** Read-only, block-based, sequential-access. */
+/** The sqlrrowlist class is a read-only, block-based, sequential
+ *  implementation of the rudiments tablecollection<const char *> class.
+ *
+ *  After setting the cursor, it provides read-only, block-based, sequential
+ *  access to the values of the fields in the result set.
+ *
+ *  The instance can be passed into any method that operates on a read-only,
+ *  block-based, sequential rudiments tablecollection<const char *>, or
+ *  otherwise used in the same manner that a read-only, block-based, sequential
+ *  rudiments tablecollection<const char *> would be. */
 class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 				public tablecollection<const char *> {
 	public:
@@ -266,7 +323,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 		 *  sets the cursor used by the instance to "cursor". */
 		sqlrresultsettable(sqlrcursor *cursor);
 
-		/** Deletes this intance of the sqlrresultsettable class. */
+		/** Deletes this instance of the sqlrresultsettable class. */
 		~sqlrresultsettable();
 
 		/** Sets the cursor used by this instance to "cursor". */
@@ -279,7 +336,7 @@ class SQLRCLIENT_DLLSPEC sqlrresultsettable :
 		bool	isBlockBased();
 
 		/** Returns the result set buffer size of the cursor used by
- 		 *  this intance.  Returns 0 if the cursor is configured to
+ 		 *  this instance.  Returns 0 if the cursor is configured to
  		 *  fetch all rows at once. */
 		uint64_t	getBlockSize();
 

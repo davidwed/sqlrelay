@@ -6,8 +6,6 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -17,105 +15,44 @@
 	}
 #endif
 
-class sqlrresultsetheadertranslationplugin {
-	public:
-		sqlrresultsetheadertranslation	*rstr;
-		dynamiclib			*dl;
-		const char			*module;
-};
-
 class sqlrresultsetheadertranslationsprivate {
 	friend class sqlrresultsetheadertranslations;
 	private:
-		sqlrservercontroller	*_cont;
-
-		bool		_debug;
-
-		singlylinkedlist
-			< sqlrresultsetheadertranslationplugin * >	_tlist;
-
 		const char	*_error;
 };
 
 sqlrresultsetheadertranslations::sqlrresultsetheadertranslations(
-						sqlrservercontroller *cont) {
-	debugFunction();
+						sqlrservercontroller *cont) :
+						sqlrservermodules(cont) {
 	pvt=new sqlrresultsetheadertranslationsprivate;
-	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugResultSetHeaderTranslations();
+	setDebug(cont->getConfig()->getDebugResultSetHeaderTranslations());
 	pvt->_error=NULL;
 }
 
 sqlrresultsetheadertranslations::~sqlrresultsetheadertranslations() {
-	debugFunction();
-	unload();
 	delete pvt;
 }
 
-bool sqlrresultsetheadertranslations::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the result set translation list
-	for (domnode *resultsetheadertranslation=
-					parameters->getFirstTagChild();
-			!resultsetheadertranslation->isNullNode();
-			resultsetheadertranslation=
-				resultsetheadertranslation->
-						getNextTagSibling()) {
-
-		// load result set translation
-		loadResultSetHeaderTranslation(resultsetheadertranslation);
-	}
-
-	return true;
-}
-
-void sqlrresultsetheadertranslations::unload() {
-	debugFunction();
-	for (listnode
-		< sqlrresultsetheadertranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		sqlrresultsetheadertranslationplugin	*sqlt=node->getValue();
-		delete sqlt->rstr;
-		delete sqlt->dl;
-		delete sqlt;
-	}
-	pvt->_tlist.clear();
-}
-
-void sqlrresultsetheadertranslations::loadResultSetHeaderTranslation(
-				domnode *resultsetheadertranslation) {
-	debugFunction();
+void sqlrresultsetheadertranslations::loadModule(domnode *parameters) {
 
 	// ignore non-resultsetheadertranslations
-	if (charstring::compare(resultsetheadertranslation->getName(),
-						"resultsetheadertranslation")) {
+	if (charstring::compare(parameters->getName(),
+					"resultsetheadertranslation")) {
 		return;
 	}
 
-	// get the result set translation name
-	const char	*module=
-			resultsetheadertranslation->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=resultsetheadertranslation->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	if (pvt->_debug) {
-		stdoutput.printf("loading result set "
-					"header translation: %s\n",module);
-	}
+	debugWrite("loading result set header translation: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the result set translation module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("resultsetheadertranslation_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -137,11 +74,9 @@ void sqlrresultsetheadertranslations::loadResultSetHeaderTranslation(
 							append(module);
 	sqlrresultsetheadertranslation *(*newResultSetTranslation)
 					(sqlrservercontroller *,
-					sqlrresultsetheadertranslations *,
 					domnode *)=
 		(sqlrresultsetheadertranslation *(*)
 					(sqlrservercontroller *,
-					sqlrresultsetheadertranslations *,
 					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newResultSetTranslation) {
@@ -155,8 +90,7 @@ void sqlrresultsetheadertranslations::loadResultSetHeaderTranslation(
 		return;
 	}
 	sqlrresultsetheadertranslation	*rstr=
-		(*newResultSetTranslation)
-			(pvt->_cont,this,resultsetheadertranslation);
+		(*newResultSetTranslation)(cont,parameters);
 
 #else
 	dynamiclib			*dl=NULL;
@@ -167,28 +101,25 @@ void sqlrresultsetheadertranslations::loadResultSetHeaderTranslation(
 	}
 #endif
 
-	if (pvt->_debug) {
-		stdoutput.printf("success\n");
-	}
+	debugWrite("success");
 
 	// add the plugin to the list
-	sqlrresultsetheadertranslationplugin	*sqlrrstp=
-				new sqlrresultsetheadertranslationplugin;
-	sqlrrstp->rstr=rstr;
+	sqlrmoduleplugin	*sqlrrstp=new sqlrmoduleplugin;
+	sqlrrstp->m=rstr;
 	sqlrrstp->dl=dl;
 	sqlrrstp->module=module;
-	pvt->_tlist.append(sqlrrstp);
+	blist.append(sqlrrstp);
 }
 
 bool sqlrresultsetheadertranslations::run(sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
 					uint32_t colcount,
 					const char ***columnnames,
-					uint16_t **columnnamelengths,
+					uint16_t **columnnamesizes,
 					uint16_t **columntypes,
 					const char ***columntypenames,
-					uint16_t **columntypenamelengths,
-					uint32_t **columnlengths,
+					uint16_t **columntypenamesizes,
+					uint32_t **columnsizes,
 					uint32_t **columnprecisions,
 					uint32_t **columnscales,
 					uint16_t **columnisnullables,
@@ -200,41 +131,40 @@ bool sqlrresultsetheadertranslations::run(sqlrserverconnection *sqlrcon,
 					uint16_t **columnisbinarys,
 					uint16_t **columnisautoincrements,
 					const char ***columntables,
-					uint16_t **columntablelengths) {
-	debugFunction();
+					uint16_t **columntablesizes) {
 
 	pvt->_error=NULL;
 
-	for (listnode
-		< sqlrresultsetheadertranslationplugin * > *node=
-						pvt->_tlist.getFirst();
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
 						node; node=node->getNext()) {
-		if (pvt->_debug) {
-			stdoutput.printf("\nrunning translation:  %s...\n\n",
-						node->getValue()->module);
-		}
 
-		if (!node->getValue()->rstr->run(sqlrcon,sqlrcur,
-						colcount,
-						columnnames,
-						columnnamelengths,
-						columntypes,
-						columntypenames,
-						columntypenamelengths,
-						columnlengths,
-						columnprecisions,
-						columnscales,
-						columnisnullables,
-						columnisprimarykeys,
-						columnisuniques,
-						columnispartofkeys,
-						columnisunsigneds,
-						columniszerofilleds,
-						columnisbinarys,
-						columnisautoincrements,
-						columntables,
-						columntablelengths)) {
-			pvt->_error=node->getValue()->rstr->getError();
+		debugWrite("running result set header translation: %s...",
+						node->getValue()->module);
+
+		sqlrresultsetheadertranslation	*rstr=
+				(sqlrresultsetheadertranslation *)
+						node->getValue()->m;
+		if (!rstr->run(sqlrcon,sqlrcur,
+					colcount,
+					columnnames,
+					columnnamesizes,
+					columntypes,
+					columntypenames,
+					columntypenamesizes,
+					columnsizes,
+					columnprecisions,
+					columnscales,
+					columnisnullables,
+					columnisprimarykeys,
+					columnisuniques,
+					columnispartofkeys,
+					columnisunsigneds,
+					columniszerofilleds,
+					columnisbinarys,
+					columnisautoincrements,
+					columntables,
+					columntablesizes)) {
+			pvt->_error=rstr->getError();
 			return false;
 		}
 	}
@@ -243,22 +173,4 @@ bool sqlrresultsetheadertranslations::run(sqlrserverconnection *sqlrcon,
 
 const char *sqlrresultsetheadertranslations::getError() {
 	return pvt->_error;
-}
-
-void sqlrresultsetheadertranslations::endTransaction(bool commit) {
-	for (listnode
-		< sqlrresultsetheadertranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->rstr->endTransaction(commit);
-	}
-}
-
-void sqlrresultsetheadertranslations::endSession() {
-	for (listnode
-		< sqlrresultsetheadertranslationplugin * > *node=
-						pvt->_tlist.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->rstr->endSession();
-	}
 }

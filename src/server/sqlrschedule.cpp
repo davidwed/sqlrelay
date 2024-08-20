@@ -20,6 +20,11 @@ class sqlrscheduleruleprivate {
 sqlrschedulerule::sqlrschedulerule(bool allow, const char *when) {
 
 	pvt=new sqlrscheduleruleprivate;
+	pvt->_years.setManageValues(true);
+	pvt->_months.setManageValues(true);
+	pvt->_daysofmonth.setManageValues(true);
+	pvt->_daysofweek.setManageValues(true);
+	pvt->_dayparts.setManageValues(true);
 
 	char		**whenparts;
 	uint64_t	whenpartscount;
@@ -43,35 +48,15 @@ sqlrschedulerule::sqlrschedulerule(bool allow,
 					const char *daysofweek,
 					const char *dayparts) {
 	pvt=new sqlrscheduleruleprivate;
+	pvt->_years.setManageValues(true);
+	pvt->_months.setManageValues(true);
+	pvt->_daysofmonth.setManageValues(true);
+	pvt->_daysofweek.setManageValues(true);
+	pvt->_dayparts.setManageValues(true);
 	init(allow,years,months,daysofmonth,daysofweek,dayparts);
 }
 
 sqlrschedulerule::~sqlrschedulerule() {
-	for (listnode< sqlrscheduleperiod * > *n=
-						pvt->_years.getFirst();
-						n; n=n->getNext()) {
-		delete n->getValue();
-	}
-	for (listnode< sqlrscheduleperiod * > *n=
-						pvt->_months.getFirst();
-						n; n=n->getNext()) {
-		delete n->getValue();
-	}
-	for (listnode< sqlrscheduleperiod * > *n=
-						pvt->_daysofmonth.getFirst();
-						n; n=n->getNext()) {
-		delete n->getValue();
-	}
-	for (listnode< sqlrscheduleperiod * > *n=
-						pvt->_daysofweek.getFirst();
-						n; n=n->getNext()) {
-		delete n->getValue();
-	}
-	for (listnode< sqlrscheduledaypart * > *n=
-						pvt->_dayparts.getFirst();
-						n; n=n->getNext()) {
-		delete n->getValue();
-	}
 	delete pvt;
 }
 
@@ -281,7 +266,8 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 		dp->startminute=charstring::convertToInteger(minute);
 
 		if (daypartpartscount>1) {
-			dp->endhour=charstring::convertToInteger(daypartparts[1]);
+			dp->endhour=
+				charstring::convertToInteger(daypartparts[1]);
 			minute=charstring::findFirst(daypartparts[1],":");
 			if (minute) {
 				minute++;
@@ -311,30 +297,50 @@ void sqlrschedulerule::splitDayParts(const char *daypartlist) {
 class sqlrscheduleprivate {
 	friend class sqlrschedule;
 	private:
-		sqlrschedules	*_ss;
-		domnode	*_parameters;
-
 		linkedlist< sqlrschedulerule * >	_rules;
+
+		bool	_defaultallow;
 };
 
 sqlrschedule::sqlrschedule(sqlrservercontroller *cont,
-				sqlrschedules *ss,
-				domnode *parameters) {
+					domnode *parameters) :
+					sqlrservermodule(cont,parameters) {
 	pvt=new sqlrscheduleprivate;
-	pvt->_ss=ss;
-	pvt->_parameters=parameters;
+	pvt->_rules.setManageValues(true);
+
+	pvt->_defaultallow=charstring::compareIgnoringCase(parameters->
+					getAttributeValue("default"),"deny");
+
+	// parse the rules
+	for (domnode *r=parameters->
+				getFirstTagChild("rules")->
+				getFirstTagChild();
+			!r->isNullNode();
+			r=r->getNextTagSibling()) {
+
+		if (!charstring::compare(r->getName(),"allow") ||
+			!charstring::compare(r->getName(),"deny")) {
+
+			addRule(charstring::compareIgnoringCase(
+						r->getName(),"deny"),
+						r->getAttributeValue("when"));
+		}
+	}
 }
 
 sqlrschedule::~sqlrschedule() {
-	for (listnode< sqlrschedulerule * > *r=pvt->_rules.getFirst();
-							r; r=r->getNext()) {
-		delete r->getValue();
-	}
 	delete pvt;
 }
 
+bool sqlrschedule::getDefaultAllow() {
+	return pvt->_defaultallow;
+}
+
 bool sqlrschedule::allowed(sqlrserverconnection *sqlrcon, const char *user) {
-	return true;
+	// compare date/time to schedule rules
+	datetime	dt;
+	dt.initFromSystemDateTime();
+	return rulesAllow(&dt,getDefaultAllow());
 }
 
 void sqlrschedule::addRule(bool allow, const char *when) {
@@ -349,18 +355,14 @@ void sqlrschedule::addRule(bool allow,
 					daysofmonth,daysofweek,dayparts));
 }
 
+void sqlrschedule::clearRules() {
+	pvt->_rules.clear();
+}
+
 bool sqlrschedule::rulesAllow(datetime *dt, bool currentlyallowed) {
 	for (listnode< sqlrschedulerule * > *r=pvt->_rules.getFirst();
 							r; r=r->getNext()) {
 		currentlyallowed=r->getValue()->allowed(dt,currentlyallowed);
 	}
 	return currentlyallowed;
-}
-
-sqlrschedules *sqlrschedule::getSchedules() {
-	return pvt->_ss;
-}
-
-domnode *sqlrschedule::getParameters() {
-	return pvt->_parameters;
 }

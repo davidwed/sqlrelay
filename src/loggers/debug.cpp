@@ -10,15 +10,14 @@
 
 class SQLRSERVER_DLLSPEC sqlrlogger_debug : public sqlrlogger {
 	public:
-			sqlrlogger_debug(sqlrloggers *ls,
-						domnode *parameters);
-			~sqlrlogger_debug();
+		sqlrlogger_debug(domnode *parameters);
+		~sqlrlogger_debug();
 
 		bool	init(sqlrlistener *sqlrl, sqlrserverconnection *sqlrcon);
 		bool	run(sqlrlistener *sqlrl,
 					sqlrserverconnection *sqlrcon,
 					sqlrservercursor *sqlrcur,
-					sqlrlogger_loglevel_t level,
+					sqlrloglevel_t level,
 					sqlrevent_t event,
 					const char *info);
 	private:
@@ -30,14 +29,12 @@ class SQLRSERVER_DLLSPEC sqlrlogger_debug : public sqlrlogger {
 		char			*dbgfilename;
 		mode_t			dbgfileperms;
 		const char		*name;
-		bool			enabled;
 		bool			loglistener;
 		bool			logconnection;
 };
 
-sqlrlogger_debug::sqlrlogger_debug(sqlrloggers *ls,
-					domnode *parameters) :
-					sqlrlogger(ls,parameters) {
+sqlrlogger_debug::sqlrlogger_debug(domnode *parameters) :
+					sqlrlogger(parameters) {
 	dbgfile=NULL;
 	debuglogger=NULL;
 	dbgfilename=NULL;
@@ -47,7 +44,6 @@ sqlrlogger_debug::sqlrlogger_debug(sqlrloggers *ls,
 	}
 	dbgfileperms=permissions::parsePermString(permstring);
 	name=NULL;
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
 	loglistener=!charstring::isNo(
 			parameters->getAttributeValue("listener"));
 	logconnection=!charstring::isNo(
@@ -61,10 +57,6 @@ sqlrlogger_debug::~sqlrlogger_debug() {
 
 bool sqlrlogger_debug::init(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon) {
-
-	if (!enabled) {
-		return true;
-	}
 
 	closeDebugFile();
 	delete[] dbgfilename;
@@ -80,8 +72,9 @@ bool sqlrlogger_debug::init(sqlrlistener *sqlrl,
 
 	// set the debug file name
 	name=(sqlrl)?"listener":"connection";
-	const char	*debugdir=(sqlrcon)?sqlrcon->cont->getDebugDir():
-							sqlrl->getDebugDir();
+	const char	*debugdir=
+			(sqlrcon)?sqlrcon->cont->getPaths()->getDebugDir():
+					sqlrl->getPaths()->getDebugDir();
 	charstring::printf(&dbgfilename,"%s/sqlr-%s.%ld",
 				debugdir,name,(long)process::getProcessId());
 	return true;
@@ -90,12 +83,9 @@ bool sqlrlogger_debug::init(sqlrlistener *sqlrl,
 bool sqlrlogger_debug::run(sqlrlistener *sqlrl,
 				sqlrserverconnection *sqlrcon,
 				sqlrservercursor *sqlrcur,
-				sqlrlogger_loglevel_t level,
+				sqlrloglevel_t level,
 				sqlrevent_t event,
 				const char *info) {
-	if (!enabled) {
-		return true;
-	}
 	if (sqlrl && !loglistener) {
 		return true;
 	}
@@ -151,8 +141,7 @@ void sqlrlogger_debug::closeDebugFile() {
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrlogger *new_sqlrlogger_debug(
-						sqlrloggers *ls,
 						domnode *parameters) {
-		return new sqlrlogger_debug(ls,parameters);
+		return new sqlrlogger_debug(parameters);
 	}
 }

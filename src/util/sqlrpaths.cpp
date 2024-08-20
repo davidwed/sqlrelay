@@ -141,6 +141,7 @@ sqlrpaths::~sqlrpaths() {
 	delete[] cachedir;
 	delete[] defaultconfigfile;
 	delete[] defaultconfigdir;
+	delete[] defaultconfigurl;
 	delete[] libexecdir;
 	delete[] sysconfdir;
 }

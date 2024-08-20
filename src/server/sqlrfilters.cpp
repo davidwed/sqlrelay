@@ -6,8 +6,6 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES 1
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -17,109 +15,67 @@
 	}
 #endif
 
-class sqlrfilterplugin {
-	public:
-		sqlrfilter	*f;
-		dynamiclib	*dl;
-		const char	*module;
-};
-
-class sqlrfiltersprivate {
-	friend class sqlrfilters;
-	private:
-		sqlrservercontroller	*_cont;
-
-		bool	_debug;
-
-		singlylinkedlist< sqlrfilterplugin * >	_beforefilters;
-		singlylinkedlist< sqlrfilterplugin * >	_afterfilters;
-};
-
-sqlrfilters::sqlrfilters(sqlrservercontroller *cont) {
-	debugFunction();
-	pvt=new sqlrfiltersprivate;
-	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugFilters();
+sqlrfilters::sqlrfilters(sqlrservercontroller *cont) : sqlrservermodules(cont) {
+	pvt=NULL;
+	setDebug(cont->getConfig()->getDebugFilters());
 }
 
 sqlrfilters::~sqlrfilters() {
-	debugFunction();
-	unload();
-	delete pvt;
 }
 
 bool sqlrfilters::load(domnode *parameters) {
-	debugFunction();
 
 	unload();
 
-	// run through the filter list
-	for (domnode *filter=parameters->getFirstTagChild();
-				!filter->isNullNode();
-				filter=filter->getNextTagSibling()) {
+	// run through the module tags
+	for (domnode *moduledata=parameters->getFirstTagChild();
+				!moduledata->isNullNode();
+				moduledata=moduledata->getNextTagSibling()) {
 
+		// skip disabled modules
+		if (isModuleDisabled(parameters)) {
+			continue;
+		}
+
+		// load the module
 		if (charstring::contains(
-				filter->getAttributeValue("when"),
+				moduledata->getAttributeValue("when"),
 				"before")) {
-			loadFilter(filter,&pvt->_beforefilters);
+
+			// before-filter
+			loadModule(moduledata,&blist);
+
 		} else {
-			loadFilter(filter,&pvt->_afterfilters);
+
+			// after-filter
+			loadModule(moduledata,&alist);
 		}
 	}
 	return true;
 }
 
-void sqlrfilters::unload() {
-	debugFunction();
-	for (listnode< sqlrfilterplugin * > *node=
-						pvt->_beforefilters.getFirst();
-						node; node=node->getNext()) {
-		sqlrfilterplugin	*sqlrfp=node->getValue();
-		delete sqlrfp->f;
-		delete sqlrfp->dl;
-		delete sqlrfp;
-	}
-	pvt->_beforefilters.clear();
-	for (listnode< sqlrfilterplugin * > *node=
-						pvt->_afterfilters.getFirst();
-						node; node=node->getNext()) {
-		sqlrfilterplugin	*sqlrfp=node->getValue();
-		delete sqlrfp->f;
-		delete sqlrfp->dl;
-		delete sqlrfp;
-	}
-	pvt->_afterfilters.clear();
-}
-
-void sqlrfilters::loadFilter(domnode *filter, 
-				singlylinkedlist< sqlrfilterplugin * > *list) {
-	debugFunction();
+void sqlrfilters::loadModule(domnode *parameters,
+				singlylinkedlist< sqlrmoduleplugin * > *list) {
 
 	// ignore non-filters
-	if (charstring::compare(filter->getName(),"filter")) {
+	if (charstring::compare(parameters->getName(),"filter")) {
 		return;
 	}
 
-	// get the filter name
-	const char	*module=filter->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=filter->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	if (pvt->_debug) {
-		stdoutput.printf("loading %s-filter module: %s\n",
-				(list==&pvt->_beforefilters)?"before":"after",
+	debugWrite("loading (%s) filter module: %s",
+				(list==&blist)?"before":"after",
 				module);
-	}
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the filter module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("filter_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -138,10 +94,8 @@ void sqlrfilters::loadFilter(domnode *filter,
 	stringbuffer	functionname;
 	functionname.append("new_sqlrfilter_")->append(module);
 	sqlrfilter *(*newFilter)(sqlrservercontroller *,
-					sqlrfilters *,
 					domnode *)=
 		(sqlrfilter *(*)(sqlrservercontroller *,
-					sqlrfilters *,
 					domnode *))
 				dl->getSymbol(functionname.getString());
 	if (!newFilter) {
@@ -153,7 +107,7 @@ void sqlrfilters::loadFilter(domnode *filter,
 		delete dl;
 		return;
 	}
-	sqlrfilter	*f=(*newFilter)(pvt->_cont,this,filter);
+	sqlrfilter	*f=(*newFilter)(cont,parameters);
 
 #else
 	dynamiclib	*dl=NULL;
@@ -164,13 +118,11 @@ void sqlrfilters::loadFilter(domnode *filter,
 	}
 #endif
 
-	if (pvt->_debug) {
-		stdoutput.printf("success\n");
-	}
+	debugWrite("success");
 
 	// add the plugin to the list
-	sqlrfilterplugin	*sqlrfp=new sqlrfilterplugin;
-	sqlrfp->f=f;
+	sqlrmoduleplugin	*sqlrfp=new sqlrmoduleplugin;
+	sqlrfp->m=f;
 	sqlrfp->dl=dl;
 	sqlrfp->module=module;
 	list->append(sqlrfp);
@@ -182,8 +134,7 @@ bool sqlrfilters::runBeforeFilters(sqlrserverconnection *sqlrcon,
 					const char *query,
 					const char **err,
 					int64_t *errn) {
-	debugFunction();
-	return run(sqlrcon,sqlrcur,sqlrp,query,err,errn,&pvt->_beforefilters);
+	return run(sqlrcon,sqlrcur,sqlrp,query,err,errn,&blist);
 }
 
 bool sqlrfilters::runAfterFilters(sqlrserverconnection *sqlrcon,
@@ -192,8 +143,7 @@ bool sqlrfilters::runAfterFilters(sqlrserverconnection *sqlrcon,
 					const char *query,
 					const char **err,
 					int64_t *errn) {
-	debugFunction();
-	return run(sqlrcon,sqlrcur,sqlrp,query,err,errn,&pvt->_afterfilters);
+	return run(sqlrcon,sqlrcur,sqlrp,query,err,errn,&alist);
 }
 
 bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
@@ -202,8 +152,7 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 				const char *query,
 				const char **err,
 				int64_t *errn,
-				singlylinkedlist< sqlrfilterplugin * > *list) {
-	debugFunction();
+				singlylinkedlist< sqlrmoduleplugin * > *list) {
 
 	if (!query) {
 		return false;
@@ -211,46 +160,36 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 
 	xmldom	*tree=NULL;
 
-	for (listnode< sqlrfilterplugin * > *node=list->getFirst();
+	for (listnode< sqlrmoduleplugin * > *node=list->getFirst();
 						node; node=node->getNext()) {
 
-		if (pvt->_debug) {
-			stdoutput.printf("\nrunning %s-filter: %s...\n\n",
-				(list==&pvt->_beforefilters)?"before":"after",
+		debugWrite("running (%s) filter: %s...",
+				(list==&blist)?"before":"after",
 				node->getValue()->module);
-		}
 
-		sqlrfilter	*f=node->getValue()->f;
+		sqlrfilter	*f=(sqlrfilter *)node->getValue()->m;
 
-		if (f->usesTree()) {
+		if (f->requiresTree()) {
 
 			if (!sqlrp) {
-				if (pvt->_debug) {
-					stdoutput.printf("\nfilter "
-							"requires query tree "
-							"but no parser "
-							"available...\n\n");
-				}
+				debugWrite("filter requires query tree "
+						"but no parser available...");
 				return true;
 			}
 
 			if (!tree) {
 				if (!sqlrp->parse(query)) {
-					if (pvt->_debug) {
-						stdoutput.printf("\nfilter "
-							"requires query tree "
-							"but query failed to "
-							"parse ...\n\n");
-					}
+					debugWrite(
+						"filter requires query tree "
+						"but query failed to parse...");
 					return true;
 				}
-				tree=sqlrp->getTree();
-				if (pvt->_debug) {
-					stdoutput.printf(
-						"query tree:\n");
-					tree->getRootNode()->
-						write(&stdoutput,true);
-					stdoutput.printf("\n");
+				tree=sqlrp->getQueryTree();
+				if (getDebug()) {
+					debugWrite("query tree:");
+					stringbuffer	b;
+					tree->getRootNode()->write(&b,true);
+					debugWrite(b.getString());
 				}
 			}
 
@@ -268,30 +207,4 @@ bool sqlrfilters::run(sqlrserverconnection *sqlrcon,
 		}
 	}
 	return true;
-}
-
-void sqlrfilters::endTransaction(bool commit) {
-	for (listnode< sqlrfilterplugin * > *node=
-						pvt->_beforefilters.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->f->endTransaction(commit);
-	}
-	for (listnode< sqlrfilterplugin * > *node=
-						pvt->_afterfilters.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->f->endTransaction(commit);
-	}
-}
-
-void sqlrfilters::endSession() {
-	for (listnode< sqlrfilterplugin * > *node=
-						pvt->_beforefilters.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->f->endSession();
-	}
-	for (listnode< sqlrfilterplugin * > *node=
-						pvt->_afterfilters.getFirst();
-						node; node=node->getNext()) {
-		node->getValue()->f->endSession();
-	}
 }

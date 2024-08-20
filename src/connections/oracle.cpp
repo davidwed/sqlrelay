@@ -83,14 +83,14 @@ struct datebind {
 	int16_t		*second;
 	const char	**tz;
 	bool		*isnegative;
-	OCIDate		*ocidate;
+	OCIDate		ocidate;
 };
 
 class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 	friend class oraclecursor;
 	public:
-				oracleconnection(sqlrservercontroller *cont);
-				~oracleconnection();
+		oracleconnection(sqlrservercontroller *cont);
+		~oracleconnection();
 	private:
 		void		handleConnectString();
 		#ifdef HAVE_ORACLE_8i
@@ -106,25 +106,27 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 						const char *newpassword);
 		#endif
 		bool		supportsTransactionBlocks();
-		bool		supportsAutoCommit();
-		bool		autoCommitOn();
-		bool		autoCommitOff();
+		bool		setAutoCommitOn();
+		bool		setAutoCommitOff();
 		bool		commit();
 		bool		rollback();
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
 		const char	*pingQuery();
-		const char	*identify();
-		const char	*dbVersion();
-		const char	*dbHostNameQuery();
+		const char	*getDbType();
+		const char	*getDbVersion();
+		const char	*getDbHostNameQuery();
 		const char	*getDatabaseListQuery(bool wild);
-		const char	*getSchemaListQuery(bool wild);
+		const char	*getSchemaListQuery(bool wild,
+						bool currentdbonly);
 		const char	*getTableListQuery(bool wild,
-						uint16_t objecttypes);
-		const char	*getGlobalTempTableListQuery();
+						uint16_t objecttypes,
+						bool currentschemaonly);
+		const char	*getGlobalTempTableListQuery(
+						bool currentschemaonly);
 		const char	*getColumnListQuery(
 						const char *table,
 						bool wild);
@@ -141,7 +143,7 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 		const char	*selectDatabaseQuery();
 		const char	*getCurrentDatabaseQuery();
 		const char	*getLastInsertIdQuery();
-		const char	*noopQuery();
+		const char	*getNoopQuery();
 
 		ub4		stmtmode;
 
@@ -164,6 +166,8 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 		const char	*home;
 		const char	*sid;
 		const char	*nlslang;
+		ucs2_t		*ucs2user;
+		ucs2_t		*ucs2password;
 
 		char		*lastinsertidquery;
 
@@ -179,7 +183,7 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 		bool		rejectduplicatebinds;
 		bool		disablekeylookup;
 
-		const char	*identity;
+		stringbuffer	tablelistquery;
 
 		stringbuffer	alltypeinfoquery;
 };
@@ -187,15 +191,14 @@ class SQLRSERVER_DLLSPEC oracleconnection : public sqlrserverconnection {
 class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 	friend class oracleconnection;
 	private:
-				oraclecursor(sqlrserverconnection *conn,
-								uint16_t id);
+		oraclecursor(sqlrserverconnection *conn, uint16_t id);
 				~oraclecursor();
 		void		allocateResultSetBuffers(int32_t columncount);
 		void		deallocateResultSetBuffers();
 		bool		open();
 		bool		close();
 		bool		prepareQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		bool		inputBind(const char *variable, 
 						uint16_t variablesize,
 						const char *value, 
@@ -220,8 +223,6 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 						int32_t microsecond,
 						const char *tz,
 						bool isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		outputBind(const char *variable, 
 						uint16_t variablesize,
@@ -249,8 +250,6 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 						int32_t *microsecond,
 						const char **tz,
 						bool *isnegative,
-						char *buffer,
-						uint16_t buffersize,
 						int16_t *isnull);
 		bool		outputBindCursor(const char *variable,
 						uint16_t variablesize,
@@ -294,30 +293,30 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 					uint64_t *charsread);
 		#endif
 		bool		executeQuery(const char *query,
-						uint32_t length);
+						uint32_t size);
 		bool		fetchFromBindCursor();
 		bool		executeQueryOrFetchFromBindCursor(
 						const char *query,
-						uint32_t length,
+						uint32_t size,
 						bool execute);
 		bool		validBinds();
 		#ifdef HAVE_ORACLE_8i
 		void		checkForTempTable(const char *query,
-							uint32_t length);
+							uint32_t size);
 		const char	*truncateTableQuery();
 		#endif
 		bool		queryIsNotSelect();
-		void		errorMessage(char *errorbuffer,
-						uint32_t errorbufferlength,
-						uint32_t *errorlength,
+		void		getError(char *errorbuffer,
+						uint32_t errorbuffersize,
+						uint32_t *errorsize,
 						int64_t	*errorcode,
 						bool *liveconnection);
-		uint64_t	affectedRows();
+		uint64_t	getAffectedRows();
 		uint32_t	colCount();
 		const char	*getColumnName(uint32_t col);
-		uint16_t	getColumnNameLength(uint32_t col);
+		uint16_t	getColumnNameSize(uint32_t col);
 		uint16_t	getColumnType(uint32_t col);
-		uint32_t	getColumnLength(uint32_t col);
+		uint32_t	getColumnSize(uint32_t col);
 		uint32_t	getColumnPrecision(uint32_t col);
 		uint32_t	getColumnScale(uint32_t col);
 		uint16_t	getColumnIsNullable(uint32_t col);
@@ -327,8 +326,8 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 		bool		fetchRow(bool *error);
 		void		getField(uint32_t col,
 					const char **field,
-					uint64_t *fieldlength,
-					bool *blob,
+					uint64_t *fieldsize,
+					bool *lob,
 					bool *null);
 		void		nextRow();
 		bool		getLobFieldLength(uint32_t col,
@@ -379,7 +378,7 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 		OCIBind		**outbindpp;
 		OCIBind		**curbindpp;
 		char		**inintbindstring;
-		OCIDate		**indatebind;
+		OCIDate		*indatebind;
 		char		**outintbindstring;
 		datebind	**outdatebind;
 		int64_t		**outintbind;
@@ -410,7 +409,7 @@ class SQLRSERVER_DLLSPEC oraclecursor : public sqlrservercursor {
 		uint64_t	totalrows;
 
 		char		*query;
-		uint32_t	length;
+		uint32_t	size;
 		bool		prepared;
 
 		bool		bound;
@@ -445,6 +444,8 @@ oracleconnection::oracleconnection(sqlrservercontroller *cont) :
 	home=NULL;
 	sid=NULL;
 	nlslang=NULL;
+	ucs2user=NULL;
+	ucs2password=NULL;
 
 	lastinsertidquery=NULL;
 
@@ -457,11 +458,12 @@ oracleconnection::oracleconnection(sqlrservercontroller *cont) :
 	#endif
 	rejectduplicatebinds=false;
 	disablekeylookup=false;
-	identity=NULL;
 }
 
 oracleconnection::~oracleconnection() {
 	delete[] lastinsertidquery;
+	delete[] ucs2user;
+	delete[] ucs2password;
 }
 
 void oracleconnection::handleConnectString() {
@@ -473,9 +475,9 @@ void oracleconnection::handleConnectString() {
 
 	nlslang=cont->getConnectStringValue("nls_lang");
 
-	// override max field length if it was set too small
-	if (cont->getMaxFieldLength()<MAX_BYTES_PER_CHAR) {
-		cont->setMaxFieldLength(MAX_BYTES_PER_CHAR);
+	// override max field size if it was set too small
+	if (cont->getMaxFieldSize()<MAX_BYTES_PER_CHAR) {
+		cont->setMaxFieldSize(MAX_BYTES_PER_CHAR);
 	}
 
 	// When using OCI from 8.0, if the fetch buffer is bigger than 32767,
@@ -483,8 +485,8 @@ void oracleconnection::handleConnectString() {
 	// ORA-01801: date format is too long for internal buffer
 	// at least with 8.0.5 on Redhat 5.2.
 	#ifndef HAVE_ORACLE_8i
-		if (cont->getMaxFieldLength()>32767) {
-			cont->setMaxFieldLength(32767);
+		if (cont->getMaxFieldSize()>32767) {
+			cont->setMaxFieldSize(32767);
 		}
 	#endif
 
@@ -519,8 +521,6 @@ void oracleconnection::handleConnectString() {
 		liiquery.append(" from dual");
 		lastinsertidquery=liiquery.detachString();
 	}
-
-	identity=cont->getConnectStringValue("identity");
 }
 
 #ifdef HAVE_ORACLE_8i
@@ -715,10 +715,29 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 	}
 
 	// set username and password
-	if (charstring::getLength(user) &&
+	dvoid	*userptr=(dvoid *)user;
+	ub4	usersize=(ub4)charstring::getLength(user);
+	dvoid	*passwordptr=(dvoid *)password;
+	ub4	passwordsize=(ub4)charstring::getLength(password);
+#if 0
+	if (charstring::contains(nlslang,"UTF16")) {
+		if (usersize) {
+			delete[] ucs2user;
+			ucs2user=ucs2charstring::duplicate(user);
+			userptr=(dvoid *)ucs2user;
+			usersize=ucs2charstring::getLength(ucs2user);
+		}
+		if (passwordsize) {
+			delete[] ucs2password;
+			ucs2password=ucs2charstring::duplicate(password);
+			passwordptr=(dvoid *)ucs2password;
+			passwordsize=ucs2charstring::getLength(ucs2password);
+		}
+	}
+#endif
+	if (usersize &&
 		OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
-				(dvoid *)user,
-				(ub4)charstring::getLength(user),
+				userptr,usersize,
 				(ub4)OCI_ATTR_USERNAME,err)!=OCI_SUCCESS) {
 		*error=logInError("Set username failed");
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
@@ -729,10 +748,9 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-	if (charstring::getLength(password) &&
+	if (passwordsize &&
 		OCIAttrSet((dvoid *)session,(ub4)OCI_HTYPE_SESSION,
-				(dvoid *)password,
-				(ub4)charstring::getLength(password),
+				passwordptr,passwordsize,
 				(ub4)OCI_ATTR_PASSWORD,err)!=OCI_SUCCESS) {
 		*error=logInError("Set password failed");
 		OCIHandleFree(err,OCI_HTYPE_SESSION);
@@ -746,7 +764,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 
 	// decide what credentials to use
 	sword	cred=OCI_CRED_RDBMS;
-	if (!charstring::getLength(user) && !charstring::getLength(password)) {
+	if (!usersize && !passwordsize) {
 		cred=OCI_CRED_EXT;
 	}
 
@@ -806,7 +824,7 @@ bool oracleconnection::logIn(const char **error, const char **warning) {
 		OCIHandleFree(env,OCI_HTYPE_ENV);
 		return false;
 	}
-	if (cont->logEnabled() || cont->notificationsEnabled()) {
+	if (cont->getLoggingEnabled() || cont->getNotificationsEnabled()) {
 		if (OCIAttrGet((dvoid *)svc,OCI_HTYPE_SVCCTX,
 				(dvoid *)&stmtcachesize,(ub4)0,
 				(ub4)OCI_ATTR_STMTCACHESIZE,
@@ -964,7 +982,17 @@ const char *oracleconnection::logInError(const char *errmsg) {
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
 			message,sizeof(message),OCI_HTYPE_ERROR);
 	message[1023]='\0';
+#if 0
+	if (charstring::contains(nlslang,"UTF16")) {
+		char	*m=charstring::duplicateUcs2((ucs2_t *)message);
+		errormessage.append(m);
+		delete[] m;
+	} else {
+		errormessage.append(message);
+	}
+#else
 	errormessage.append(message);
+#endif
 	return errormessage.getString();
 }
 
@@ -1070,22 +1098,18 @@ bool oracleconnection::changeProxiedUser(const char *newuser,
 }
 #endif
 
-bool oracleconnection::autoCommitOn() {
+bool oracleconnection::setAutoCommitOn() {
 	stmtmode=OCI_COMMIT_ON_SUCCESS;
 	return true;
 }
 
-bool oracleconnection::autoCommitOff() {
+bool oracleconnection::setAutoCommitOff() {
 	stmtmode=OCI_DEFAULT;
 	return true;
 }
 
 bool oracleconnection::supportsTransactionBlocks() {
 	return false;
-}
-
-bool oracleconnection::supportsAutoCommit() {
-	return true;
 }
 
 bool oracleconnection::commit() {
@@ -1096,22 +1120,22 @@ bool oracleconnection::rollback() {
 	return (OCITransRollback(svc,err,OCI_DEFAULT)==OCI_SUCCESS);
 }
 
-void oracleconnection::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
+void oracleconnection::getError(char *errorbuffer,
+					uint32_t errorbuffersize,
+					uint32_t *errorsize,
 					int64_t *errorcode,
 					bool *liveconnection) {
 
 	// get the message from oracle
-	bytestring::zero(errorbuffer,errorbufferlength);
+	bytestring::zero(errorbuffer,errorbuffersize);
 	sb4	errcode=0;
 	OCIErrorGet((dvoid *)err,1,(text *)0,&errcode,
-			(text *)errorbuffer,errorbufferlength,OCI_HTYPE_ERROR);
-	errorbuffer[errorbufferlength-1]='\0';
+			(text *)errorbuffer,errorbuffersize,OCI_HTYPE_ERROR);
+	errorbuffer[errorbuffersize-1]='\0';
 
 	// truncate the trailing \n
-	*errorlength=charstring::getLength((char *)errorbuffer);
-	char	*last=errorbuffer+(*errorlength)-1;
+	*errorsize=charstring::getLength((char *)errorbuffer);
+	char	*last=errorbuffer+(*errorsize)-1;
 	if (*last=='\n') {
 		*last='\0';
 	}
@@ -1146,11 +1170,11 @@ const char *oracleconnection::pingQuery() {
 	return "select 1 from dual";
 }
 
-const char *oracleconnection::identify() {
-	return (identity)?identity:"oracle";
+const char *oracleconnection::getDbType() {
+	return "oracle";
 }
 
-const char *oracleconnection::dbVersion() {
+const char *oracleconnection::getDbVersion() {
 	if (OCIServerVersion((dvoid *)svc,err,
 				(text *)versionbuf,sizeof(versionbuf),
 				OCI_HTYPE_SVCCTX)==OCI_SUCCESS) {
@@ -1159,7 +1183,7 @@ const char *oracleconnection::dbVersion() {
 	return NULL;
 }
 
-const char *oracleconnection::dbHostNameQuery() {
+const char *oracleconnection::getDbHostNameQuery() {
 	if (supportssyscontext) {
 		return "select sys_context('USERENV','SERVER_HOST') from dual";
 	}
@@ -1184,78 +1208,64 @@ const char *oracleconnection::getDatabaseListQuery(bool wild) {
 			"order by username";
 }
 
-const char *oracleconnection::getSchemaListQuery(bool wild) {
+const char *oracleconnection::getSchemaListQuery(bool wild,
+						bool currentdbonly) {
 	return "select test from dual";
 }
 
 const char *oracleconnection::getTableListQuery(bool wild,
-						uint16_t objecttypes) {
-	if (supportssyscontext) {
-		return (wild)?
-			"select "
-			"	NULL as table_cat, "
-			"	owner as table_schem, "
-			"	table_name as table_name, "
-			"	'TABLE' as table_type, "
-			"	NULL as remarks, "
-			"	NULL as extra "
-			"from "
-			"	all_tables "
-			"where "
-			"	table_name like upper('%s') "
-			"	and "
-			"	owner=sys_context('userenv','current_schema') "
-			"order by "
-			"	owner, "
-			"	table_name":
+						uint16_t objecttypes,
+						bool currentschemaonly) {
 
-			"select "
-			"	NULL as table_cat, "
-			"	owner as table_schem, "
-			"	table_name as table_name, "
-			"	'TABLE' as table_type, "
-			"	NULL as remarks, "
-			"	NULL as extra "
-			"from "
-			"	all_tables "
-			"where "
-			"	owner=sys_context('userenv','current_schema') "
-			"order by "
-			"	owner, "
-			"	table_name";
-	} else {
-		return (wild)?
-			"select "
-			"	NULL as table_cat, "
-			"	owner as table_schem, "
-			"	table_name as table_name, "
-			"	'TABLE' as table_type, "
-			"	NULL as remarks, "
-			"	NULL as extra "
-			"from "
-			"	user_tables "
-			"where "
-			"	table_name like upper('%s') "
-			"order by "
-			"	owner, "
-			"	table_name":
-
-			"select "
-			"	NULL as table_cat, "
-			"	owner as table_schem, "
-			"	table_name as table_name, "
-			"	'TABLE' as table_type, "
-			"	NULL as remarks, "
-			"	NULL as extra "
-			"from "
-			"	user_tables "
-			"order by "
-			"	owner, "
-			"	table_name";
+	tablelistquery.clear();
+	tablelistquery.append(
+		"select "
+		"	NULL as table_cat, "
+		"	owner as table_schem, "
+		"	table_name as table_name, "
+		"	'TABLE' as table_type, "
+		"	NULL as remarks, "
+		"	NULL as extra "
+		"from "
+		"	all_tables "
+		"where ");
+	bool	prevclause=false;
+	if (currentschemaonly) {
+		tablelistquery.append(
+			"	upper(owner)=upper('");
+		tablelistquery.append(cont->getUser());
+		tablelistquery.append(
+			"') ");
+		prevclause=true;
 	}
+	if (wild) {
+		if (prevclause) {
+			tablelistquery.append(
+				"	and ");
+		}
+		tablelistquery.append(
+			"	table_name like upper('%s') ");
+		prevclause=true;
+	}
+	if (supportssyscontext) {
+		if (prevclause) {
+			tablelistquery.append(
+				"	and ");
+		}
+		tablelistquery.append(
+			"	owner=sys_context("
+					"'userenv','current_schema') ");
+	}
+	tablelistquery.append(
+		"order by "
+		"	owner, "
+		"	table_name");
+
+	return tablelistquery.getString();
 }
 
-const char *oracleconnection::getGlobalTempTableListQuery() {
+const char *oracleconnection::getGlobalTempTableListQuery(
+						bool currentschemaonly) {
 	if (supportssyscontext) {
 		return "select "
 			"	table_name "
@@ -2285,7 +2295,7 @@ const char *oracleconnection::getTypeInfoListQuery(const char *type,
 							bool wild) {
 
 	if (!charstring::compare(type,"*")) {
-		if (!alltypeinfoquery.getStringLength()) {
+		if (!alltypeinfoquery.getSize()) {
 			alltypeinfoquery.append(chartype);
 			alltypeinfoquery.append("union ");
 			alltypeinfoquery.append(nchartype);
@@ -2386,7 +2396,7 @@ const char *oracleconnection::getLastInsertIdQuery() {
 	return lastinsertidquery;
 }
 
-const char *oracleconnection::noopQuery() {
+const char *oracleconnection::getNoopQuery() {
 	return "begin null; end;";
 }
 
@@ -2408,7 +2418,7 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 	outbindpp=new OCIBind *[maxbindcount];
 	curbindpp=new OCIBind *[maxbindcount];
 	inintbindstring=new char *[maxbindcount];
-	indatebind=new OCIDate *[maxbindcount];
+	indatebind=new OCIDate[maxbindcount];
 	outintbindstring=new char *[maxbindcount];
 	outdatebind=new datebind *[maxbindcount];
 	outintbind=new int64_t *[maxbindcount];
@@ -2425,7 +2435,6 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 		outbindpp[i]=NULL;
 		curbindpp[i]=NULL;
 		inintbindstring[i]=NULL;
-		indatebind[i]=NULL;
 		outintbindstring[i]=NULL;
 		outdatebind[i]=NULL;
 		outintbind[i]=NULL;
@@ -2454,7 +2463,7 @@ oraclecursor::oraclecursor(sqlrserverconnection *conn, uint16_t id) :
 	totalrows=0;
 
 	query=NULL;
-	length=0;
+	size=0;
 	prepared=false;
 	bound=false;
 
@@ -2471,13 +2480,9 @@ oraclecursor::~oraclecursor() {
 
 	for (uint16_t i=0; i<orainbindcount; i++) {
 		delete[] inintbindstring[i];
-		delete indatebind[i];
 	}
 	for (uint16_t i=0; i<oraoutbindcount; i++) {
 		delete[] outintbindstring[i];
-		if (outdatebind[i]) {
-			delete outdatebind[i]->ocidate;
-		}
 		delete outdatebind[i];
 	}
 
@@ -2527,13 +2532,13 @@ void oraclecursor::allocateResultSetBuffers(int32_t columncount) {
 		def_col_retlen=new ub2 *[columncount];
 		def_col_retcode=new ub2 *[columncount];
 		uint32_t	fetchatonce=getFetchAtOnce();
-		uint32_t	maxfieldlength=conn->cont->getMaxFieldLength();
+		uint32_t	maxfieldsize=conn->cont->getMaxFieldSize();
 		for (int32_t i=0; i<columncount; i++) {
 			def_lob[i]=new OCILobLocator *[fetchatonce];
 			for (uint32_t j=0; j<fetchatonce; j++) {
 				def_lob[i][j]=NULL;
 			}
-			def_buf[i]=new ub1[fetchatonce*maxfieldlength];
+			def_buf[i]=new ub1[fetchatonce*maxfieldsize];
 			def_indp[i]=new sb2[fetchatonce];
 			def_col_retlen[i]=new ub2[fetchatonce];
 			def_col_retcode[i]=new ub2[fetchatonce];
@@ -2610,15 +2615,15 @@ bool oraclecursor::close() {
 	return (OCIHandleFree(stmt,OCI_HTYPE_STMT)==OCI_SUCCESS);
 }
 
-bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
+bool oraclecursor::prepareQuery(const char *query, uint32_t size) {
 
 	// initialize column count
 	ncols=0;
 
-	// keep a pointer to the query and length in case it needs to be 
+	// keep a pointer to the query and size in case it needs to be 
 	// reprepared later
 	this->query=(char *)query;
-	this->length=length;
+	this->size=size;
 
 	// if the query is being prepared then apparently this isn't an
 	// output bind cursor
@@ -2657,13 +2662,13 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 
 		// prepare the query...
 		bool	prepare=true;
-		if (oracleconn->cont->logEnabled() ||
-			oracleconn->cont->notificationsEnabled()) {
+		if (oracleconn->cont->getLoggingEnabled() ||
+			oracleconn->cont->getNotificationsEnabled()) {
 			// check for a statment cache hit
 			// and report our findings
 			if (OCIStmtPrepare2(oracleconn->svc,&stmt,
 					oracleconn->err,
-					(text *)query,(ub4)length,
+					(text *)query,(ub4)size,
 					NULL,0,
 					(ub4)OCI_NTV_SYNTAX,
 					(ub4)OCI_PREP2_CACHE_SEARCHONLY)==
@@ -2684,7 +2689,7 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 			// prepare the query
 			if (OCIStmtPrepare2(oracleconn->svc,&stmt,
 					oracleconn->err,
-					(text *)query,(ub4)length,
+					(text *)query,(ub4)size,
 					NULL,0,
 					(ub4)OCI_NTV_SYNTAX,
 					(ub4)OCI_DEFAULT)!=OCI_SUCCESS) {
@@ -2708,7 +2713,7 @@ bool oraclecursor::prepareQuery(const char *query, uint32_t length) {
 
 	// prepare the query
 	return (OCIStmtPrepare(stmt,oracleconn->err,
-				(text *)query,(ub4)length,
+				(text *)query,(ub4)size,
 				(ub4)OCI_NTV_SYNTAX,
 				(ub4)OCI_DEFAULT)==OCI_SUCCESS);
 }
@@ -2727,7 +2732,7 @@ void oraclecursor::checkRePrepare() {
 	if (oracleconn->requiresreprepare && !prepared &&
 			stmttype && stmttype!=OCI_STMT_SELECT) {
 		closeResultSet();
-		prepareQuery(query,length);
+		prepareQuery(query,size);
 		prepared=true;
 	}
 }
@@ -2935,14 +2940,11 @@ bool oraclecursor::inputBind(const char *variable,
 				int32_t microsecond,
 				const char *tz,
 				bool isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 	checkRePrepare();
 
-	indatebind[orainbindcount]=new OCIDate;
-	OCIDateSetDate(indatebind[orainbindcount],year,month,day);
-	OCIDateSetTime(indatebind[orainbindcount],hour,minute,second);
+	OCIDateSetDate(&(indatebind[orainbindcount]),year,month,day);
+	OCIDateSetTime(&(indatebind[orainbindcount]),hour,minute,second);
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
 		ub4	pos=charstring::convertToInteger(variable+1);
@@ -2952,7 +2954,7 @@ bool oraclecursor::inputBind(const char *variable,
 		}
 		if (OCIBindByPos(stmt,&inbindpp[orainbindcount],
 				oracleconn->err,pos,
-				(dvoid *)indatebind[orainbindcount],
+				(dvoid *)&(indatebind[orainbindcount]),
 				(sb4)sizeof(OCIDate),
 				SQLT_ODT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -2964,7 +2966,7 @@ bool oraclecursor::inputBind(const char *variable,
 		if (OCIBindByName(stmt,&inbindpp[orainbindcount],
 				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)indatebind[orainbindcount],
+				(dvoid *)&(indatebind[orainbindcount]),
 				(sb4)sizeof(OCIDate),
 				SQLT_ODT,
 				(dvoid *)0,(ub2 *)0,(ub2 *)0,0,(ub4 *)0,
@@ -3124,8 +3126,6 @@ bool oraclecursor::outputBind(const char *variable,
 				int32_t *microsecond,
 				const char **tz,
 				bool *isnegative,
-				char *buffer,
-				uint16_t buffersize,
 				int16_t *isnull) {
 	checkRePrepare();
 
@@ -3139,7 +3139,6 @@ bool oraclecursor::outputBind(const char *variable,
 	db->second=second;
 	db->tz=tz;
 	db->isnegative=isnegative;
-	db->ocidate=new OCIDate;
 	outdatebind[oraoutbindcount]=db;
 
 	if (charstring::isInteger(variable+1,variablesize-1)) {
@@ -3150,7 +3149,7 @@ bool oraclecursor::outputBind(const char *variable,
 		}
 		if (OCIBindByPos(stmt,&outbindpp[oraoutbindcount],
 				oracleconn->err,pos,
-				(dvoid *)db->ocidate,
+				(dvoid *)&(db->ocidate),
 				(sb4)sizeof(OCIDate),
 				SQLT_ODT,
 				(dvoid *)isnull,(ub2 *)0,
@@ -3163,7 +3162,7 @@ bool oraclecursor::outputBind(const char *variable,
 		if (OCIBindByName(stmt,&outbindpp[oraoutbindcount],
 				oracleconn->err,
 				(text *)variable,(sb4)variablesize,
-				(dvoid *)db->ocidate,
+				(dvoid *)&(db->ocidate),
 				(sb4)sizeof(OCIDate),
 				SQLT_ODT,
 				(dvoid *)isnull,(ub2 *)0,
@@ -3451,7 +3450,7 @@ bool oraclecursor::getLobOutputBindSegment(uint16_t index,
 	return (result!=OCI_INVALID_HANDLE);
 }
 
-void oraclecursor::checkForTempTable(const char *query, uint32_t length) {
+void oraclecursor::checkForTempTable(const char *query, uint32_t size) {
 
 	// see if the query matches the pattern for a temporary query that
 	// creates a temporary table
@@ -3462,7 +3461,7 @@ void oraclecursor::checkForTempTable(const char *query, uint32_t length) {
 
 	// get the table name
 	stringbuffer	tablename;
-	const char	*endptr=query+length;
+	const char	*endptr=query+size;
 	while (ptr && *ptr && *ptr!=' ' &&
 		*ptr!='\n' && *ptr!='	' && ptr<endptr) {
 		tablename.append(*ptr);
@@ -3487,7 +3486,7 @@ void oraclecursor::checkForTempTable(const char *query, uint32_t length) {
 		oracleconn->temptabletruncatebeforedrop=preserverowsoncommit;
 
 		// if "droptemptables" was specified...
-		conn->cont->addSessionTempTableForDrop(tablename.getString());
+		conn->cont->addTempTableForDrop(tablename.getString());
 
 	} else if (preserverowsoncommit) {
 
@@ -3495,7 +3494,7 @@ void oraclecursor::checkForTempTable(const char *query, uint32_t length) {
 		// the commit/rollback is executed at the end of the
 		// session, the data won't be truncated.  It needs to
 		// be though, so we'll set it up to be truncated manually.
-		conn->cont->addSessionTempTableForTrunc(tablename.getString());
+		conn->cont->addTempTableForTrunc(tablename.getString());
 	}
 }
 
@@ -3504,8 +3503,8 @@ const char *oraclecursor::truncateTableQuery() {
 }
 #endif
 
-bool oraclecursor::executeQuery(const char *query, uint32_t length) {
-	return executeQueryOrFetchFromBindCursor(query,length,true);
+bool oraclecursor::executeQuery(const char *query, uint32_t size) {
+	return executeQueryOrFetchFromBindCursor(query,size,true);
 }
 
 bool oraclecursor::fetchFromBindCursor() {
@@ -3513,7 +3512,7 @@ bool oraclecursor::fetchFromBindCursor() {
 }
 
 bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
-							uint32_t length,
+							uint32_t size,
 							bool execute) {
 
 	// initialize the row and column counters
@@ -3534,7 +3533,7 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 		#ifdef HAVE_ORACLE_8i
 		// check for create temp table query
 		if (stmttype==OCI_STMT_CREATE) {
-			checkForTempTable(query,length);
+			checkForTempTable(query,size);
 		}
 		#endif
 
@@ -3587,12 +3586,12 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 		uint32_t	maxcolumncount=conn->cont->getMaxColumnCount();
 		if (maxcolumncount && (uint32_t)ncols>maxcolumncount) {
 			stringbuffer	err;
-			err.append(SQLR_ERROR_MAXSELECTLIST_STRING);
+			err.append(SQLR_ERROR_MAXCOLUMNCOUNTEXCEEDED_STRING);
 			err.append(" (")->append(ncols)->append('>');
 			err.append(maxcolumncount);
 			err.append(')');
 			conn->cont->setError(this,err.getString(),
-						SQLR_ERROR_MAXSELECTLIST,true);
+					SQLR_ERROR_MAXCOLUMNCOUNTEXCEEDED,true);
 			return false;
 		}
 
@@ -3716,7 +3715,7 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 					oracleconn->err,
 					i+1,
 					(dvoid *)def_buf[i],
-					(sb4)conn->cont->getMaxFieldLength(),
+					(sb4)conn->cont->getMaxFieldSize(),
 					SQLT_STR,
 					(dvoid *)def_indp[i],
 					(ub2 *)def_col_retlen[i],
@@ -3751,8 +3750,8 @@ bool oraclecursor::executeQueryOrFetchFromBindCursor(const char *query,
 			ub1	hour;
 			ub1	minute;
 			ub1	second;
-			OCIDateGetDate(db->ocidate,&year,&month,&day);
-			OCIDateGetTime(db->ocidate,&hour,&minute,&second);
+			OCIDateGetDate(&(db->ocidate),&year,&month,&day);
+			OCIDateGetTime(&(db->ocidate),&hour,&minute,&second);
 			*db->year=year;
 			*db->month=month;
 			*db->day=day;
@@ -3844,30 +3843,30 @@ bool oraclecursor::queryIsNotSelect() {
 	return (stmttype!=OCI_STMT_SELECT);
 }
 
-void oraclecursor::errorMessage(char *errorbuffer,
-					uint32_t errorbufferlength,
-					uint32_t *errorlength,
-					int64_t *errorcode,
-					bool *liveconnection) {
+void oraclecursor::getError(char *errorbuffer,
+				uint32_t errorbuffersize,
+				uint32_t *errorsize,
+				int64_t *errorcode,
+				bool *liveconnection) {
 
 	if (bindformaterror) {
 
 		// handle bind format errors
-		*errorlength=charstring::getLength(
+		*errorsize=charstring::getLength(
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING);
 		charstring::safeCopy(errorbuffer,
-				errorbufferlength,
+				errorbuffersize,
 				SQLR_ERROR_INVALIDBINDVARIABLEFORMAT_STRING,
-				*errorlength);
+				*errorsize);
 		*errorcode=SQLR_ERROR_INVALIDBINDVARIABLEFORMAT;
 		*liveconnection=true;
 
 	} else {
 
 		// otherwise fall back to default implementation
-		sqlrservercursor::errorMessage(errorbuffer,
-						errorbufferlength,
-						errorlength,
+		sqlrservercursor::getError(errorbuffer,
+						errorbuffersize,
+						errorsize,
 						errorcode,
 						liveconnection);
 	}
@@ -3881,7 +3880,7 @@ void oraclecursor::errorMessage(char *errorbuffer,
 	#endif
 }
 
-uint64_t oraclecursor::affectedRows() {
+uint64_t oraclecursor::getAffectedRows() {
 
 	// get the affected row count
 	ub4	rows;
@@ -3901,7 +3900,7 @@ const char *oraclecursor::getColumnName(uint32_t col) {
 	return (const char *)desc[col].buf;
 }
 
-uint16_t oraclecursor::getColumnNameLength(uint32_t col) {
+uint16_t oraclecursor::getColumnNameSize(uint32_t col) {
 	return (uint16_t)desc[col].buflen;
 }
 
@@ -3936,7 +3935,7 @@ uint16_t oraclecursor::getColumnType(uint32_t col) {
 	}
 }
 
-uint32_t oraclecursor::getColumnLength(uint32_t col) {
+uint32_t oraclecursor::getColumnSize(uint32_t col) {
 	return (uint32_t)desc[col].dbsize;
 }
 
@@ -4004,8 +4003,8 @@ bool oraclecursor::fetchRow(bool *error) {
 }
 
 void oraclecursor::getField(uint32_t col,
-				const char **field, uint64_t *fieldlength,
-				bool *blob, bool *null) {
+				const char **field, uint64_t *fieldsize,
+				bool *lob, bool *null) {
 
 	// handle NULLs
 	if (def_indp[col][row]) {
@@ -4013,17 +4012,17 @@ void oraclecursor::getField(uint32_t col,
 		return;
 	}
 
-	// handle blobs
+	// handle lobs
 	if (desc[col].dbtype==BLOB_TYPE ||
 		desc[col].dbtype==CLOB_TYPE ||
 		desc[col].dbtype==BFILE_TYPE) {
-		*blob=true;
+		*lob=true;
 		return;
 	}
 
 	// handle normal datatypes
-	*field=(const char *)&def_buf[col][row*conn->cont->getMaxFieldLength()];
-	*fieldlength=def_col_retlen[col][row];
+	*field=(const char *)&def_buf[col][row*conn->cont->getMaxFieldSize()];
+	*fieldsize=def_col_retlen[col][row];
 }
 
 void oraclecursor::nextRow() {
@@ -4033,9 +4032,9 @@ void oraclecursor::nextRow() {
 bool oraclecursor::getLobFieldLength(uint32_t col, uint64_t *length) {
 	ub4	loblength=0;
 	bool	retval=(OCILobGetLength(oracleconn->svc,
-				oracleconn->err,
-				def_lob[col][row],
-				&loblength)==OCI_SUCCESS);
+					oracleconn->err,
+					def_lob[col][row],
+					&loblength)==OCI_SUCCESS);
 	*length=loblength;
 	return retval;
 }
@@ -4181,16 +4180,11 @@ void oraclecursor::closeResultSet() {
 	for (uint16_t i=0; i<orainbindcount; i++) {
 		delete[] inintbindstring[i];
 		inintbindstring[i]=NULL;
-		delete indatebind[i];
-		indatebind[i]=NULL;
 	}
 	for (uint16_t i=0; i<oraoutbindcount; i++) {
 		delete[] outintbindstring[i];
 		outintbindstring[i]=NULL;
 		outintbind[i]=NULL;
-		if (outdatebind[i]) {
-			delete outdatebind[i]->ocidate;
-		}
 		delete outdatebind[i];
 		outdatebind[i]=NULL;
 	}

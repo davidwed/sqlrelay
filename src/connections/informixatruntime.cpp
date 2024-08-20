@@ -284,7 +284,7 @@ static bool loadLibraries(stringbuffer *errormessage) {
 	while (*path) {
 		libfilename.clear();
 		libfilename.append(*path)->append('/')->append(libname);
-		if (file::readable(libfilename.getString())) {
+		if (file::isReadable(libfilename.getString())) {
 			break;
 		}
 		path++;

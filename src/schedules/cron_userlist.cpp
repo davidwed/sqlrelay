@@ -7,51 +7,21 @@
 
 class SQLRSERVER_DLLSPEC sqlrschedule_cron_userlist : public sqlrschedule {
 	public:
-			sqlrschedule_cron_userlist(sqlrservercontroller *cont,
-							sqlrschedules *ss,
+		sqlrschedule_cron_userlist(sqlrservercontroller *cont,
 							domnode *parameters);
 
 		bool	allowed(sqlrserverconnection *sqlrcon,
 						const char *user);
-	private:
-		bool	enabled;
-		bool	defaultallow;
 };
 
 sqlrschedule_cron_userlist::sqlrschedule_cron_userlist(
 						sqlrservercontroller *cont,
-						sqlrschedules *ss,
 						domnode *parameters) :
-					sqlrschedule(cont,ss,parameters) {
-
-	enabled=!charstring::isNo(parameters->getAttributeValue("enabled"));
-	defaultallow=charstring::compareIgnoringCase(
-			parameters->getAttributeValue("default"),"deny");
-
-	// parse the rules
-	for (domnode *r=parameters->
-				getFirstTagChild("rules")->
-				getFirstTagChild();
-			!r->isNullNode();
-			r=r->getNextTagSibling()) {
-
-		if (!charstring::compare(r->getName(),"allow") ||
-			!charstring::compare(r->getName(),"deny")) {
-
-			addRule(charstring::compareIgnoringCase(
-						r->getName(),"deny"),
-						r->getAttributeValue("when"));
-		}
-	}
+					sqlrschedule(cont,parameters) {
 }
 
 bool sqlrschedule_cron_userlist::allowed(sqlrserverconnection *sqlrcon,
 							const char *user) {
-
-	if (!enabled) {
-		debugPrintf("module disabled\n");
-		return true;
-	}
 
 	// do we care about this user?
 	debugPrintf("user...\n");
@@ -83,16 +53,13 @@ bool sqlrschedule_cron_userlist::allowed(sqlrserverconnection *sqlrcon,
 	}
 
 	// compare date/time to schedule rules
-	datetime	dt;
-	dt.initFromSystemDateTime();
-	return rulesAllow(&dt,defaultallow);
+	return sqlrschedule::allowed(sqlrcon,user);
 }
 
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrschedule *new_sqlrschedule_cron_userlist(
 						sqlrservercontroller *cont,
-						sqlrschedules *ss,
 						domnode *parameters) {
-		return new sqlrschedule_cron_userlist(cont,ss,parameters);
+		return new sqlrschedule_cron_userlist(cont,parameters);
 	}
 }

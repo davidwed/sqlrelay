@@ -555,8 +555,7 @@ enum oraclelisttype_t {
 
 class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 	public:
-			sqlrprotocol_oracle(sqlrservercontroller *cont,
-							sqlrprotocols *ps,
+		sqlrprotocol_oracle(sqlrservercontroller *cont,
 							domnode *parameters);
 		virtual	~sqlrprotocol_oracle();
 
@@ -598,7 +597,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 						const byte_t **rpout);
 		bool	getString(const byte_t *rp,
 						char **string,
-						uint32_t length,
+						uint32_t size,
 						const byte_t **rpout);
 
 		void	writeHost(bytebuffer *buffer, uint16_t value);
@@ -613,7 +612,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		bool	recvConnectRequest();
 		bool	sendConnectResponse();
 		bool	sendAccept();
-		bool	sendAccept(const byte_t *data, uint16_t datalength);
+		bool	sendAccept(const byte_t *data, uint16_t datasize);
 		bool	sendResend();
 		bool	sendRedirect();
 		bool	sendRefuse();
@@ -742,7 +741,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 							uint32_t column,
 							bool query3);
 		uint16_t	getColumnType(const char *columntypestring,
-						uint16_t columntypelen,
+						uint16_t columntypesize,
 						uint32_t scale);
 		uint16_t	getColumnFlags(sqlrservercursor *cursor,
 						uint32_t column,
@@ -766,11 +765,11 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 						uint32_t colcount,
 						bool terminator);
 		void	putField(const char *field,
-						uint64_t fieldlength,
+						uint64_t fieldsize,
 						uint16_t columntype);
 		void	putLobField(sqlrservercursor *cursor, uint32_t col);
 		void	putError(const char *error);
-		void	putError(const char *error, uint32_t errorlength);
+		void	putError(const char *error, uint32_t errorsize);
 
 		// close...
 		bool	close(const byte_t *rp);
@@ -823,7 +822,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		const char	*serverstring;
 
 		const byte_t	*datatypes;
-		uint16_t	datatypeslength;
+		uint16_t	datatypessize;
 
 		filedescriptor	*clientsock;
 
@@ -841,7 +840,7 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 		char		*username;
 		char		*authsessionkey;
 		char		*response;
-		//uint64_t	responselength;
+		//uint64_t	responsesize;
 
 		uint16_t	maxcursorcount;
 		uint32_t	maxquerysize;
@@ -858,15 +857,14 @@ class SQLRSERVER_DLLSPEC sqlrprotocol_oracle : public sqlrprotocol {
 };
 
 sqlrprotocol_oracle::sqlrprotocol_oracle(sqlrservercontroller *cont,
-					sqlrprotocols *ps,
 					domnode *parameters) :
-					sqlrprotocol(cont,ps,parameters) {
+					sqlrprotocol(cont,parameters) {
 
 	clientsock=NULL;
 
 	if (getDebug()) {
-		stdoutput.write("parameters {\n");
-		stdoutput.write("}\n");
+		debugStart("parameters");
+		debugEnd();
 	}
 
 	r.setSeed(randomnumber::getSeed());
@@ -943,7 +941,7 @@ void sqlrprotocol_oracle::init() {
 	serverstring=NULL;
 
 	datatypes=NULL;
-	datatypeslength=0;
+	datatypessize=0;
 
 	resppacket=NULL;
 	resppacketsize=0;
@@ -1133,7 +1131,7 @@ clientsessionexitstatus_t sqlrprotocol_oracle::clientSession(
 
 			// release the cursor
 			// FIXME: kludgy
-			//cont->setState(cursor,SQLRCURSORSTATE_AVAILABLE);
+			//cont->release(cursor);
 
 		} while (loop);
 	}
@@ -1175,36 +1173,30 @@ bool sqlrprotocol_oracle::sendPacket(bool flush) {
 	reqpacket.write(hostToBE(headerchecksum));
 
 	if (getDebug()) {
-		stdoutput.write("send {\n");
-		stdoutput.printf("	packet size: %d\n",reqpacketsize);
-		stdoutput.printf("	packet checksum: %d\n",packetchecksum);
-		stdoutput.printf("	packet type: %d\n",reqpackettype);
-		stdoutput.printf("	packet flags: 0x%04x\n",packetflags);
-		stdoutput.printf("	header checksum: %d\n",headerchecksum);
+		debugStart("send");
+		debugWrite("packet size: %d",reqpacketsize);
+		debugWrite("packet checksum: %d",packetchecksum);
+		debugWrite("packet type: %d",reqpackettype);
+		debugWrite("packet flags: 0x%04x",packetflags);
+		debugWrite("header checksum: %d",headerchecksum);
 		debugHexDump(reqpacket.getBuffer()+8,reqpacketsize-8);
-		stdoutput.write("}\n");
+		debugEnd();
 	}
 
 	// send the packet
 	if (clientsock->write(reqpacket.getBuffer(),
 				reqpacket.getSize())!=
 				(ssize_t)reqpacket.getSize()) {
-		if (getDebug()) {
-			stdoutput.write("write packet data failed\n");
-			debugSystemError();
-		}
+		debugWrite("write packet data failed");
+		debugSystemError();
 		return false;
 	}
 
 	if (flush) {
 		clientsock->flushWriteBuffer(-1,-1);
-		if (getDebug()) {
-			stdoutput.write("send packet flush...\n");
-		}
+		debugWrite("send packet flush...");
 	} else {
-		if (getDebug()) {
-			stdoutput.write("no flush...\n");
-		}
+		debugWrite("no flush...");
 	}
 
 	return true;
@@ -1215,21 +1207,16 @@ bool sqlrprotocol_oracle::recvPacket() {
 	// size
 	// 2 bytes (big endian)
 	if (clientsock->read(&resppacketsize)!=sizeof(uint16_t)) {
-		if (getDebug()) {
-			stdoutput.write("read packet size failed\n");
-			debugSystemError();
-		}
+		debugWrite("read packet size failed");
+		debugSystemError();
 		return false;
 	}
 	resppacketsize=beToHost(resppacketsize);
 
 	// sanity check
 	if (resppacketsize<8 || resppacketsize>sdu) {
-		if (getDebug()) {
-			stdoutput.printf("invalid packet size: %d\n",
-							resppacketsize);
-			debugSystemError();
-		}
+		debugWrite("invalid packet size: %d",resppacketsize);
+		debugSystemError();
 		return false;
 	}
 
@@ -1237,10 +1224,8 @@ bool sqlrprotocol_oracle::recvPacket() {
 	// 2 bytes (big endian) (always 0)
 	uint16_t	packetchecksum;
 	if (clientsock->read(&packetchecksum)!=sizeof(uint16_t)) {
-		if (getDebug()) {
-			stdoutput.write("read packet checksum failed\n");
-			debugSystemError();
-		}
+		debugWrite("read packet checksum failed");
+		debugSystemError();
 		return false;
 	}
 	packetchecksum=beToHost(packetchecksum);
@@ -1248,10 +1233,8 @@ bool sqlrprotocol_oracle::recvPacket() {
 	// packet type
 	// 1 byte
 	if (clientsock->read(&resppackettype)!=sizeof(byte_t)) {
-		if (getDebug()) {
-			stdoutput.write("read packet type failed\n");
-			debugSystemError();
-		}
+		debugWrite("read packet type failed");
+		debugSystemError();
 		return false;
 	}
 
@@ -1259,10 +1242,8 @@ bool sqlrprotocol_oracle::recvPacket() {
 	// 1 byte
 	byte_t	packetflags;
 	if (clientsock->read(&packetflags)!=sizeof(byte_t)) {
-		if (getDebug()) {
-			stdoutput.write("read packet flags failed\n");
-			debugSystemError();
-		}
+		debugWrite("read packet flags failed");
+		debugSystemError();
 		return false;
 	}
 
@@ -1270,10 +1251,8 @@ bool sqlrprotocol_oracle::recvPacket() {
 	// 2 bytes (big endian) (always 0)
 	uint16_t	headerchecksum;
 	if (clientsock->read(&headerchecksum)!=sizeof(uint16_t)) {
-		if (getDebug()) {
-			stdoutput.write("read header checksum failed\n");
-			debugSystemError();
-		}
+		debugWrite("read header checksum failed");
+		debugSystemError();
 		return false;
 	}
 	headerchecksum=beToHost(headerchecksum);
@@ -1287,22 +1266,20 @@ bool sqlrprotocol_oracle::recvPacket() {
 
 	// packet
 	if (clientsock->read(resppacket,resppacketsize)!=resppacketsize) {
-		if (getDebug()) {
-			stdoutput.write("read packet failed\n");
-			debugSystemError();
-		}
+		debugWrite("read packet failed");
+		debugSystemError();
 		return false;
 	}
 
 	if (getDebug()) {
-		stdoutput.write("recv {\n");
-		stdoutput.printf("	packet size: %d\n",resppacketsize+8);
-		stdoutput.printf("	packet checksum: %d\n",packetchecksum);
-		stdoutput.printf("	packet type: %d\n",resppackettype);
-		stdoutput.printf("	packet flags: %d\n",packetflags);
-		stdoutput.printf("	header checksum: %d\n",headerchecksum);
+		debugStart("recv");
+		debugWrite("packet size: %d",resppacketsize+8);
+		debugWrite("packet checksum: %d",packetchecksum);
+		debugWrite("packet type: %d",resppackettype);
+		debugWrite("packet flags: %d",packetflags);
+		debugWrite("header checksum: %d",headerchecksum);
 		debugHexDump(resppacket,resppacketsize);
-		stdoutput.write("}\n");
+		debugEnd();
 	}
 
 	return true;
@@ -1358,10 +1335,8 @@ bool sqlrprotocol_oracle::getNullTerminatedArray(const byte_t *rp,
 			break;
 		}
 		if (rp==end) {
-			if (getDebug()) {
-				stdoutput.printf("bad null terminated array, "
-						"no null terminator found\n");
-			}
+			debugWrite("bad null terminated array, "
+					"no null terminator found");
 			return false;
 		}
 		(*arraycount)++;
@@ -1390,22 +1365,20 @@ bool sqlrprotocol_oracle::getString(const byte_t *rp,
 					char **string,
 					const byte_t **rpout) {
 	*string=NULL;
-	uint32_t	stringlength=0;
+	uint32_t	stringsize=0;
 
-	// count the characters
+	// count the bytes
 	const byte_t	*start=rp;
 	for (;;) {
 		if (!(*rp)) {
 			break;
 		}
 		if (rp==end) {
-			if (getDebug()) {
-				stdoutput.printf("bad string, "
-						"no null terminator found\n");
-			}
+			debugWrite("bad string, "
+					"no null terminator found");
 			return false;
 		}
-		stringlength++;
+		stringsize++;
 		rp++;
 	}
 
@@ -1413,11 +1386,11 @@ bool sqlrprotocol_oracle::getString(const byte_t *rp,
 	rp=start;
 
 	// get the string
-	*string=new char[stringlength+1];
-	for (uint32_t i=0; i<stringlength; i++) {
+	*string=new char[stringsize+1];
+	for (uint32_t i=0; i<stringsize; i++) {
 		read(rp,&((*string)[i]),&rp);
 	}
-	(*string)[stringlength]='\0';
+	(*string)[stringsize]='\0';
 
 	// skip the null terminator
 	rp++;
@@ -1429,10 +1402,10 @@ bool sqlrprotocol_oracle::getString(const byte_t *rp,
 
 bool sqlrprotocol_oracle::getString(const byte_t *rp,
 					char **string,
-					uint32_t length,
+					uint32_t size,
 					const byte_t **rpout) {
-	*string=charstring::duplicate((const char *)rp,length);
-	*rpout=rp+length;
+	*string=charstring::duplicate((const char *)rp,size);
+	*rpout=rp+size;
 	return true;
 }
 
@@ -1481,10 +1454,8 @@ bool sqlrprotocol_oracle::recvConnectRequest() {
 	}
 
 	if (resppackettype!=PACKET_CONNECT) {
-		if (getDebug()) {
-			stdoutput.printf("bad packet type %d, expected %d\n",
-						resppackettype,PACKET_CONNECT);
-		}
+		debugWrite("bad packet type %d, expected %d",
+					resppackettype,PACKET_CONNECT);
 		return false;
 	}
 
@@ -1493,7 +1464,7 @@ bool sqlrprotocol_oracle::recvConnectRequest() {
 	uint16_t	protocolcharacteristics;
 	uint16_t	maxpacketsbeforeack;
 	uint16_t	one;
-	uint16_t	connectdatalength;
+	uint16_t	connectdatasize;
 	uint16_t	connectdataoffset;
 	uint32_t	maxconnectdatathatcanbereceived;
 	uint32_t	tracecrossfacilityitem1;
@@ -1509,7 +1480,7 @@ bool sqlrprotocol_oracle::recvConnectRequest() {
 	readBE(rp,&protocolcharacteristics,&rp);
 	readBE(rp,&maxpacketsbeforeack,&rp);
 	readHost(rp,&one,&rp);
-	readBE(rp,&connectdatalength,&rp);
+	readBE(rp,&connectdatasize,&rp);
 	readBE(rp,&connectdataoffset,&rp);
 	readBE(rp,&maxconnectdatathatcanbereceived,&rp);
 	readBE(rp,&anoflags,&rp);
@@ -1522,42 +1493,30 @@ bool sqlrprotocol_oracle::recvConnectRequest() {
 	const char	*connectdata=
 			(const char *)resppacket+(connectdataoffset-8);
 
-	if (getDebug()) {
-		stdoutput.write("connect {\n");
-		stdoutput.printf("	version: 0x%04x\n",connectversion);
-		stdoutput.printf("	lowest supported version: 0x%04x\n",
-							connectlowestversion);
-		stdoutput.printf("	gso: 0x%04x\n",gso);
-		stdoutput.printf("	sdu: %d\n",sdu);
-		stdoutput.printf("	tdu: %d\n",tdu);
-		stdoutput.printf("	protocol characteristics: 0x%04x\n",
-						protocolcharacteristics);
-		stdoutput.printf("	max packets before ack: %d\n",
-						maxpacketsbeforeack);
-		stdoutput.printf("	client is little endian: %d\n",
-						(one==1));
-		stdoutput.printf("	connect data length: %d\n",
-						connectdatalength);
-		stdoutput.printf("	connect data offset: %d\n",
-						connectdataoffset);
-		stdoutput.printf("	max connect data that "
-					"can be received: %d\n",
+	debugStart("connect");
+	debugWrite("version: 0x%04x",connectversion);
+	debugWrite("lowest supported version: 0x%04x",connectlowestversion);
+	debugWrite("gso: 0x%04x",gso);
+	debugWrite("sdu: %d",sdu);
+	debugWrite("tdu: %d",tdu);
+	debugWrite("protocol characteristics: 0x%04x",protocolcharacteristics);
+	debugWrite("max packets before ack: %d",maxpacketsbeforeack);
+	debugWrite("client is little endian: %d",(one==1));
+	debugWrite("connect data size: %d",connectdatasize);
+	debugWrite("connect data offset: %d",connectdataoffset);
+	debugWrite("max connect data that can be received: %d",
 					maxconnectdatathatcanbereceived);
-		stdoutput.printf("	ANO flags: 0x%04x\n",anoflags);
-		stdoutput.printf("	trace cross facility item 1: 0x%08x\n",
+	debugWrite("ANO flags: 0x%04x",anoflags);
+	debugWrite("trace cross facility item 1: 0x%08x",
 					tracecrossfacilityitem1);
-		stdoutput.printf("	trace cross facility item 2: 0x%08x\n",
+	debugWrite("trace cross facility item 2: 0x%08x",
 					tracecrossfacilityitem2);
-		stdoutput.printf("	trace unique connection id 1: "
-					"0x%016x\n",
+	debugWrite("trace unique connection id 1: 0x%016x",
 					traceuniqueconnectionid1);
-		stdoutput.printf("	trace unique connection id 2: "
-					"0x%016x\n",
+	debugWrite("trace unique connection id 2: 0x%016x",
 					traceuniqueconnectionid2);
-		stdoutput.printf("	connect data: %*s\n",
-					connectdatalength,connectdata);
-		stdoutput.write("}\n");
-	}
+	debugWrite("connect data: %*s",connectdatasize,connectdata);
+	debugEnd();
 
 	return true;
 }
@@ -1569,10 +1528,7 @@ bool sqlrprotocol_oracle::sendConnectResponse() {
 	if (connectlowestversion<=PROTOCOL_VERSION_8) {
 		connectversion=PROTOCOL_VERSION_8;
 	} else {
-		if (getDebug()) {
-			stdoutput.printf("no supported connect "
-						"protocol version found\n");
-		}
+		debugWrite("no supported connect protocol version found");
 		sendRefuse();
 		return false;
 	}
@@ -1584,8 +1540,7 @@ bool sqlrprotocol_oracle::sendAccept() {
 	return sendAccept(NULL,0);
 }
 
-bool sqlrprotocol_oracle::sendAccept(const byte_t *data,
-						uint16_t datalength) {
+bool sqlrprotocol_oracle::sendAccept(const byte_t *data, uint16_t datasize) {
 
 	// data offset:
 	// (8 bytes for the header +
@@ -1597,18 +1552,16 @@ bool sqlrprotocol_oracle::sendAccept(const byte_t *data,
 	uint64_t	padding=0;
 
 	// debug
-	if (getDebug()) {
-		stdoutput.write("accept {\n");
-		stdoutput.printf("	version: 0x%04x\n",connectversion);
-		stdoutput.printf("	gso: 0x%04x\n",gso);
-		stdoutput.printf("	sdu: %d\n",sdu);
-		stdoutput.printf("	tdu: %d\n",tdu);
-		stdoutput.printf("	data length: %d\n",datalength);
-		stdoutput.printf("	data offset: %d\n",dataoffset);
-		stdoutput.printf("	ANO flags: 0x%04x\n",anoflags);
-		debugHexDump(data,datalength);
-		stdoutput.write("}\n");
-	}
+	debugStart("accept");
+	debugWrite("version: 0x%04x",connectversion);
+	debugWrite("gso: 0x%04x",gso);
+	debugWrite("sdu: %d",sdu);
+	debugWrite("tdu: %d",tdu);
+	debugWrite("data size: %d",datasize);
+	debugWrite("data offset: %d",dataoffset);
+	debugWrite("ANO flags: 0x%04x",anoflags);
+	debugHexDump(data,datasize);
+	debugEnd();
 
 	// build packet
 	resetSendPacketBuffer(PACKET_ACCEPT);
@@ -1618,11 +1571,11 @@ bool sqlrprotocol_oracle::sendAccept(const byte_t *data,
 	writeBE(&reqpacket,tdu);
 	// writeLE?
 	writeHost(&reqpacket,(uint16_t)1);
-	writeBE(&reqpacket,datalength);
+	writeBE(&reqpacket,datasize);
 	writeBE(&reqpacket,dataoffset);
 	writeBE(&reqpacket,anoflags);
 	writeBE(&reqpacket,padding);
-	reqpacket.append(data,datalength);
+	reqpacket.append(data,datasize);
 
 	return sendPacket(true);
 }
@@ -1630,10 +1583,8 @@ bool sqlrprotocol_oracle::sendAccept(const byte_t *data,
 bool sqlrprotocol_oracle::sendResend() {
 
 	// debug
-	if (getDebug()) {
-		stdoutput.write("resend {\n");
-		stdoutput.write("}\n");
-	}
+	debugStart("resend");
+	debugEnd();
 
 	// build packet
 	resetSendPacketBuffer(PACKET_RESEND);
@@ -1644,10 +1595,8 @@ bool sqlrprotocol_oracle::sendResend() {
 bool sqlrprotocol_oracle::sendRedirect() {
 
 	// debug
-	if (getDebug()) {
-		stdoutput.write("redirect {\n");
-		stdoutput.write("}\n");
-	}
+	debugStart("redirect");
+	debugEnd();
 
 	// build packet
 	resetSendPacketBuffer(PACKET_REDIRECT);
@@ -1659,10 +1608,8 @@ bool sqlrprotocol_oracle::sendRedirect() {
 bool sqlrprotocol_oracle::sendRefuse() {
 
 	// debug
-	if (getDebug()) {
-		stdoutput.write("refuse {\n");
-		stdoutput.write("}\n");
-	}
+	debugStart("refuse");
+	debugEnd();
 
 	// build packet
 	resetSendPacketBuffer(PACKET_REFUSE);
@@ -1682,10 +1629,8 @@ bool sqlrprotocol_oracle::recvAnoRequest() {
 	}
 
 	if (resppackettype!=PACKET_DATA) {
-		if (getDebug()) {
-			stdoutput.printf("bad packet type %d, expected %d\n",
+		debugWrite("bad packet type %d, expected %d",
 						resppackettype,PACKET_DATA);
-		}
 		return false;
 	}
 
@@ -1694,7 +1639,7 @@ bool sqlrprotocol_oracle::recvAnoRequest() {
 
 	// ano request header...
 	uint16_t	dataflags;
-	uint16_t	overalllength;
+	uint16_t	overallsize;
 	uint16_t	servicecount;
 	byte_t		desiredoptionsflag;
 
@@ -1702,20 +1647,17 @@ bool sqlrprotocol_oracle::recvAnoRequest() {
 	if (!readMarker32(rp,0xdeadbeef,&rp)) {
 		return false;
 	}
-	readBE(rp,&overalllength,&rp);
+	readBE(rp,&overallsize,&rp);
 	readBE(rp,&anorequestversion,&rp);
 	readBE(rp,&servicecount,&rp);
 	read(rp,&desiredoptionsflag,&rp);
 
-	if (getDebug()) {
-		stdoutput.write("ano request header {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		stdoutput.printf("	overall length: %d\n",overalllength);
-		stdoutput.printf("	version: 0x%08x\n",anorequestversion);
-		stdoutput.printf("	service count %d\n",servicecount);
-		stdoutput.printf("	desired options flag: 0x%02x\n",
-							desiredoptionsflag);
-	}
+	debugStart("ano request header");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugWrite("overall size: %d",overallsize);
+	debugWrite("version: 0x%08x",anorequestversion);
+	debugWrite("service count %d",servicecount);
+	debugWrite("desired options flag: 0x%02x",desiredoptionsflag);
 
 	// service count ...
 	bool	success=true;
@@ -1748,11 +1690,7 @@ bool sqlrprotocol_oracle::recvAnoRequest() {
 							rp,fieldcount,&rp);
 				break;
 			default:
-				if (getDebug()) {
-					stdoutput.printf("bad ano service:"
-								" %d\n",
-								service);
-				}
+				debugWrite("bad ano service: %d",service);
 				break;
 		}
 		if (!success) {
@@ -1760,9 +1698,7 @@ bool sqlrprotocol_oracle::recvAnoRequest() {
 		}
 	}
 
-	if (getDebug()) {
-		stdoutput.write("}\n");
-	}
+	debugEnd();
 
 	// bail if something failed
 	if (!success) {
@@ -1783,12 +1719,10 @@ bool sqlrprotocol_oracle::getAnoServiceHeader(const byte_t *rp,
 		return false;
 	}
 
-	if (getDebug()) {
-		stdoutput.write("	ano service header {\n");
-		stdoutput.printf("		service: %d\n",*service);
-		stdoutput.printf("		field count: %d\n",*fieldcount);
-		stdoutput.write("	}\n");
-	}
+	debugStart("ano service header");
+	debugWrite("service: %d",*service);
+	debugWrite("field count: %d",*fieldcount);
+	debugEnd();
 
 	*rpout=rp;
 
@@ -1800,9 +1734,7 @@ bool sqlrprotocol_oracle::getSupervisorService(const byte_t *rp,
 						uint16_t fieldcount,
 						const byte_t **rpout) {
 
-	if (getDebug()) {
-		stdoutput.write("	supervisor {\n");
-	}
+	debugStart("supervisor");
 
 	uint32_t	pid;
 	uint32_t	connectiontype;
@@ -1812,13 +1744,13 @@ bool sqlrprotocol_oracle::getSupervisorService(const byte_t *rp,
 		!getAnoConnectionInfoField(rp,&pid,&connectiontype,&rp) ||
 		!getAnoArrayField(rp,&drivers,&drivercount,&rp)) {
 		delete[] drivers;
+		debugEnd();
 		return false;
 	}
 
-	if (getDebug()) {
-		stdoutput.write("	}\n");
-	}
 	delete[] drivers;
+
+	debugEnd();
 
 	*rpout=rp;
 	
@@ -1829,21 +1761,18 @@ bool sqlrprotocol_oracle::getAuthenticationService(const byte_t *rp,
 						uint16_t fieldcount,
 						const byte_t **rpout) {
 
-	if (getDebug()) {
-		stdoutput.write("	authentication {\n");
-	}
+	debugStart("authentication");
 
 	uint16_t	constant;
 	uint16_t	status;
 	if (!getAnoVersionField(rp,&authenticationversion,&rp) ||
 		!getAnoConstantField(rp,&constant,&rp) ||
 		!getAnoStatusField(rp,&status,&rp)) {
+		debugEnd();
 		return false;
 	}
 
-	if (getDebug()) {
-		stdoutput.write("	}\n");
-	}
+	debugEnd();
 
 	*rpout=rp;
 
@@ -1854,9 +1783,7 @@ bool sqlrprotocol_oracle::getEncryptionService(const byte_t *rp,
 						uint16_t fieldcount,
 						const byte_t **rpout) {
 
-	if (getDebug()) {
-		stdoutput.write("	encryption {\n");
-	}
+	debugWrite("encryption");
 
 	uint16_t	*drivers=NULL;
 	uint32_t	drivercount;
@@ -1864,19 +1791,20 @@ bool sqlrprotocol_oracle::getEncryptionService(const byte_t *rp,
 	if (!getAnoVersionField(rp,&encryptionversion,&rp) ||
 		!getAnoArrayField(rp,&drivers,&drivercount,&rp)) {
 		delete[] drivers;
+		debugEnd();
 		return false;
 	}
 	if (fieldcount>2) {
 		if (!getAnoConstantField(rp,&constant,&rp)) {
 			delete[] drivers;
+			debugEnd();
 			return false;
 		} 
 	}
 
-	if (getDebug()) {
-		stdoutput.write("	}\n");
-	}
 	delete[] drivers;
+
+	debugEnd();
 
 	*rpout=rp;
 
@@ -1888,22 +1816,20 @@ bool sqlrprotocol_oracle::getCryptoChecksummingService(
 						uint16_t fieldcount,
 						const byte_t **rpout) {
 
-	if (getDebug()) {
-		stdoutput.write("	crypto-checksumming {\n");
-	}
+	debugStart("crypto-checksumming");
 
 	uint16_t	*drivers=NULL;
 	uint32_t	drivercount;
 	if (!getAnoVersionField(rp,&cryptochecksummingversion,&rp) ||
 		!getAnoArrayField(rp,&drivers,&drivercount,&rp)) {
 		delete[] drivers;
+		debugEnd();
 		return false;
 	}
 
-	if (getDebug()) {
-		stdoutput.write("	}\n");
-	}
 	delete[] drivers;
+
+	debugEnd();
 
 	*rpout=rp;
 
@@ -1922,7 +1848,7 @@ bool sqlrprotocol_oracle::getAnoVersionField(const byte_t *rp,
 	readBE(rp,version,&rp);
 
 	if (getDebug()) {
-		stdoutput.printf("		version: 0x%08x\n",*version);
+		debugWrite("version: 0x%08x",*version);
 		// 8.0 -> 10g send a version string, 11i+ sends all 0's
 	}
 
@@ -1950,9 +1876,8 @@ bool sqlrprotocol_oracle::getAnoConnectionInfoField(
 	// to the real db.
 
 	if (getDebug()) {
-		stdoutput.printf("		pid: %d\n",*pid);
-		stdoutput.printf("		connection type: 0x%08x\n",
-							*connectiontype);
+		debugWrite("pid: %d",*pid);
+		debugWrite("connection type: 0x%08x",*connectiontype);
 	}
 
 	*rpout=rp;
@@ -1991,7 +1916,7 @@ bool sqlrprotocol_oracle::getAnoArrayField(const byte_t *rp,
 
 		// FIXME: Sometimes there's no deadbeef marker, just an array
 		// marker, and the next 4 bytes are definitely NOT the array
-		// length.  Other times there's no deadbeef marker, and no
+		// size.  Other times there's no deadbeef marker, and no
 		// array marker anywhere in the rest of the field.  In both
 		// cases, the rest of the field contains data, but I have no
 		// idea how to interpret it.
@@ -2004,9 +1929,7 @@ bool sqlrprotocol_oracle::getAnoArrayField(const byte_t *rp,
 	// get the array count
 	readBE(rp,arraycount,&rp);
 
-	if (getDebug()) {
-		stdoutput.printf("		array count: %d\n",*arraycount);
-	}
+	debugWrite("array count: %d",*arraycount);
 
 	// FIXME: sanity check on array count
 
@@ -2015,10 +1938,7 @@ bool sqlrprotocol_oracle::getAnoArrayField(const byte_t *rp,
 		*array=new uint16_t[*arraycount];
 		for (uint32_t i=0; i<*arraycount; i++) {
 			readBE(rp,&((*array)[i]),&rp);
-			if (getDebug()) {
-				stdoutput.printf("		array[%d]: "
-							"%d\n",i,(*array)[i]);
-			}
+			debugWrite("array[%d]: %d",i,(*array)[i]);
 		}
 	}
 
@@ -2039,9 +1959,7 @@ bool sqlrprotocol_oracle::getAnoConstantField(const byte_t *rp,
 	}
 	readBE(rp,constant,&rp);
 
-	if (getDebug()) {
-		stdoutput.printf("		constant: 0x%04x\n",*constant);
-	}
+	debugWrite("constant: 0x%04x",*constant);
 
 	*rpout=rp;
 
@@ -2059,9 +1977,7 @@ bool sqlrprotocol_oracle::getAnoConstantField(const byte_t *rp,
 	}
 	read(rp,constant,&rp);
 
-	if (getDebug()) {
-		stdoutput.printf("		constant: 0x%02x\n",*constant);
-	}
+	debugWrite("constant: 0x%02x",*constant);
 
 	*rpout=rp;
 
@@ -2079,9 +1995,7 @@ bool sqlrprotocol_oracle::getAnoStatusField(const byte_t *rp,
 	}
 	readBE(rp,status,&rp);
 
-	if (getDebug()) {
-		stdoutput.printf("		status: 0x%04x\n",*status);
-	}
+	debugWrite("status: 0x%04x",*status);
 
 	*rpout=rp;
 
@@ -2107,8 +2021,8 @@ bool sqlrprotocol_oracle::sendAnoResponse() {
 
 	// ano response header...
 	uint16_t	dataflags=0;
-	uint16_t	overalllength=13;
-	uint64_t	overalllengthpos=0;
+	uint16_t	overallsize=13;
+	uint64_t	overallsizepos=0;
 	uint32_t	version=anorequestversion;
 	uint16_t	servicecount=0;
 	uint64_t	servicecountpos=0;
@@ -2116,127 +2030,103 @@ bool sqlrprotocol_oracle::sendAnoResponse() {
 
 	writeBE(&reqpacket,dataflags);
 	writeBE(&reqpacket,(uint32_t)0xdeadbeef);
-	overalllengthpos=reqpacket.getPosition();
-	writeBE(&reqpacket,overalllength);
+	overallsizepos=reqpacket.getPosition();
+	writeBE(&reqpacket,overallsize);
 	writeBE(&reqpacket,version);
 	servicecountpos=reqpacket.getPosition();
 	writeBE(&reqpacket,servicecount);
 	write(&reqpacket,servicestobeused);
 
-	if (getDebug()) {
-		stdoutput.write("ano response header {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		stdoutput.printf("	version: 0x%08x\n",version);
-		stdoutput.printf("	services to be used: %d\n",
-							servicestobeused);
-	}
+	debugStart("ano response header");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugWrite("version: 0x%08x",version);
+	debugWrite("services to be used: %d",servicestobeused);
 
 
 	// services...
-	overalllength+=putSupervisorService();
+	overallsize+=putSupervisorService();
 	servicecount++;
-	overalllength+=putAuthenticationService();
+	overallsize+=putAuthenticationService();
 	servicecount++;
-	overalllength+=putEncryptionService();
+	overallsize+=putEncryptionService();
 	servicecount++;
-	overalllength+=putCryptoChecksummingService();
+	overallsize+=putCryptoChecksummingService();
 	servicecount++;
 
 
-	// backpatch the overall length and servicecount
-	reqpacket.setPositionRelativeToBeginning(overalllengthpos);
-	reqpacket.write(hostToBE(overalllength));
+	// backpatch the overall size and servicecount
+	reqpacket.setPositionRelativeToBeginning(overallsizepos);
+	reqpacket.write(hostToBE(overallsize));
 	reqpacket.setPositionRelativeToBeginning(servicecountpos);
 	reqpacket.write(hostToBE(servicecount));
 
-	if (getDebug()) {
-		stdoutput.printf("	overall length: %d\n",overalllength);
-		stdoutput.printf("	service count: %d\n",servicecount);
-		stdoutput.write("}\n");
-	}
+	debugWrite("overall size: %d",overallsize);
+	debugWrite("service count: %d",servicecount);
+	debugEnd();
 
 	return sendPacket(true);
 }
 
 uint16_t sqlrprotocol_oracle::putSupervisorService() {
 
-	if (getDebug()) {
-		stdoutput.write("	supervisor {\n");
-	}
+	debugStart("supervisor");
 
 	uint16_t drivers[]={0x0004,0x0001};
 
-	uint16_t	length=putAnoServiceHeader(4,3)+
+	uint16_t	size=putAnoServiceHeader(4,3)+
 				putAnoVersionField(supervisorversion)+
 				putAnoStatusField(0x001f)+
 				putAnoArrayField(drivers,2);
 
-	if (getDebug()) {
-		stdoutput.write("	}\n");
-	}
-	return length;
+	debugEnd();
+	return size;
 }
 
 uint16_t sqlrprotocol_oracle::putAuthenticationService() {
 
-	if (getDebug()) {
-		stdoutput.write("	authentication {\n");
-	}
+	debugStart("authentication");
 
-	uint16_t	length=putAnoServiceHeader(1,2)+
+	uint16_t	size=putAnoServiceHeader(1,2)+
 				putAnoVersionField(authenticationversion)+
 				putAnoStatusField(0xfbff);
 
-	if (getDebug()) {
-		stdoutput.write("	}\n");
-	}
-	return length;
+	debugEnd();
+	return size;
 }
 
 uint16_t sqlrprotocol_oracle::putEncryptionService() {
 
-	if (getDebug()) {
-		stdoutput.write("	encryption {\n");
-	}
+	debugStart("encryption");
 
-	uint16_t	length=putAnoServiceHeader(2,2)+
+	uint16_t	size=putAnoServiceHeader(2,2)+
 				putAnoVersionField(encryptionversion)+
 				putAnoConstant((byte_t)0);
 
-	if (getDebug()) {
-		stdoutput.write("	}\n");
-	}
-	return length;
+	debugEnd();
+	return size;
 }
 
 uint16_t sqlrprotocol_oracle::putCryptoChecksummingService() {
 
-	if (getDebug()) {
-		stdoutput.write("	crypto-checksumming {\n");
-	}
+	debugStart("crypto-checksumming");
 
-	uint16_t	length=putAnoServiceHeader(3,2)+
+	uint16_t	size=putAnoServiceHeader(3,2)+
 				putAnoVersionField(cryptochecksummingversion)+
 				putAnoConstant((byte_t)0);
 
-	if (getDebug()) {
-		stdoutput.write("	}\n");
-	}
-	return length;
+	debugEnd();
+	return size;
 }
 
 uint16_t sqlrprotocol_oracle::putAnoServiceHeader(uint16_t service,
 							uint16_t fieldcount) {
 
-	if (getDebug()) {
-		stdoutput.write("		ano service header {\n");
-		stdoutput.printf("			service: %d\n",service);
-		stdoutput.printf("			field count: %d\n",
-								fieldcount);
-		stdoutput.write("		}\n");
-	}
+	debugStart("ano service header");
+	debugWrite("service: %d",service);
+	debugWrite("field count: %d",fieldcount);
+	debugEnd();
 
-	// service, field count, marker, return total length
+	// service, field count, marker, return total size
 	writeBE(&reqpacket,service);
 	writeBE(&reqpacket,fieldcount);
 	// FIXME; send something other than 0x00000000 if there was an error...
@@ -2246,11 +2136,9 @@ uint16_t sqlrprotocol_oracle::putAnoServiceHeader(uint16_t service,
 
 uint16_t sqlrprotocol_oracle::putAnoVersionField(uint32_t version) {
 
-	if (getDebug()) {
-		stdoutput.printf("		version: 0x%08x\n",version);
-	}
+	debugWrite("version: 0x%08x",version);
 
-	// data length, field type, version, return total length
+	// data size, field type, version, return total size
 	writeBE(&reqpacket,(uint16_t)4);
 	writeBE(&reqpacket,(uint16_t)5);
 	writeBE(&reqpacket,version);
@@ -2259,11 +2147,9 @@ uint16_t sqlrprotocol_oracle::putAnoVersionField(uint32_t version) {
 
 uint16_t sqlrprotocol_oracle::putAnoStatusField(uint16_t status) {
 
-	if (getDebug()) {
-		stdoutput.printf("		status: 0x%04x\n",status);
-	}
+	debugWrite("status: 0x%04x",status);
 
-	// data length, field type, status, return total length
+	// data size, field type, status, return total size
 	writeBE(&reqpacket,(uint16_t)2);
 	writeBE(&reqpacket,(uint16_t)6);
 	writeBE(&reqpacket,status);
@@ -2272,11 +2158,9 @@ uint16_t sqlrprotocol_oracle::putAnoStatusField(uint16_t status) {
 
 uint16_t sqlrprotocol_oracle::putAnoConstant(byte_t constant) {
 
-	if (getDebug()) {
-		stdoutput.printf("		constant: 0x%02x\n",constant);
-	}
+	debugWrite("constant: 0x%02x",constant);
 
-	// data length, field type, constant, return total length
+	// data size, field type, constant, return total size
 	writeBE(&reqpacket,(uint16_t)1);
 	writeBE(&reqpacket,(uint16_t)2);
 	write(&reqpacket,constant);
@@ -2286,14 +2170,12 @@ uint16_t sqlrprotocol_oracle::putAnoConstant(byte_t constant) {
 uint16_t sqlrprotocol_oracle::putAnoArrayField(uint16_t *array,
 						uint32_t arraycount) {
 
-	// data length, field type
-	uint16_t datalength=((arraycount)?(4+2+4+arraycount*2):1);
+	// data size, field type
+	uint16_t datasize=((arraycount)?(4+2+4+arraycount*2):1);
 	writeBE(&reqpacket,(uint16_t)((arraycount)?(4+2+4+arraycount*2):1));
 	writeBE(&reqpacket,(uint16_t)1);
 
-	if (getDebug()) {
-		stdoutput.printf("		arraycount: %d\n",arraycount);
-	}
+	debugWrite("arraycount: %d",arraycount);
 
 	if (arraycount) {
 
@@ -2303,10 +2185,7 @@ uint16_t sqlrprotocol_oracle::putAnoArrayField(uint16_t *array,
 		writeBE(&reqpacket,(uint16_t)0x003);
 		writeBE(&reqpacket,arraycount);
 		for (uint32_t i=0; i<arraycount; i++) {
-			if (getDebug()) {
-				stdoutput.printf("		"
-						"array[%d]: %d\n",i,array[i]);
-			}
+			debugWrite("array[%d]: %d",i,array[i]);
 			writeBE(&reqpacket,array[i]);
 		}
 
@@ -2315,8 +2194,8 @@ uint16_t sqlrprotocol_oracle::putAnoArrayField(uint16_t *array,
 		write(&reqpacket,(byte_t)0x00);
 	}
 
-	// return total length
-	return 4+datalength;
+	// return total size
+	return 4+datasize;
 }
 
 bool sqlrprotocol_oracle::ttiNegotiation() {
@@ -2330,10 +2209,8 @@ bool sqlrprotocol_oracle::recvTtiRequest() {
 	}
 
 	if (resppackettype!=PACKET_DATA) {
-		if (getDebug()) {
-			stdoutput.printf("bad packet type %d, expected %d\n",
+		debugWrite("bad packet type %d, expected %d",
 						resppackettype,PACKET_DATA);
-		}
 		return false;
 	}
 
@@ -2354,15 +2231,14 @@ bool sqlrprotocol_oracle::recvTtiRequest() {
 	}
 
 	if (getDebug()) {
-		stdoutput.write("tti request {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
+		debugStart("tti request");
+		debugWrite("data flags: 0x%04x",dataflags);
 		debugTtcCode(ttccode);
 		for (uint32_t i=0; i<ttiversioncount; i++) {
-			stdoutput.printf("	version[%d]: %d\n",
-						i,ttiversions[i]);
+			debugWrite("version[%d]: %d",i,ttiversions[i]);
 		}
-		stdoutput.printf("	client string: \"%s\"\n",clientstring);
-		stdoutput.write("}\n");
+		debugWrite("client string: \"%s\"",clientstring);
+		debugEnd();
 	}
 
 	return true;
@@ -2380,10 +2256,7 @@ bool sqlrprotocol_oracle::sendTtiResponse() {
 		}
 	}
 	if (!ttiversion) {
-		if (getDebug()) {
-			stdoutput.printf("no supported tti "
-						"protocol version found\n");
-		}
+		debugWrite("no supported tti protocol version found");
 		// FIXME: send refuse?
 		return false;
 	}
@@ -2472,8 +2345,8 @@ void sqlrprotocol_oracle::putTti5Response() {
 
 
 	// fdo... (whatever that is)
-	uint16_t	fdolength=100;
-	uint32_t	fdodatalength=fdolength-4;
+	uint16_t	fdosize=100;
+	uint32_t	fdodatasize=fdosize-4;
 	// no idea what this means...
 	byte_t	part1[]={
 		0x05, 0x0b, 0x0c, 0x03, 0x0c, 0x0c, 0x05, 0x04,
@@ -2481,21 +2354,21 @@ void sqlrprotocol_oracle::putTti5Response() {
 		0x05, 0x06, 0x05, 0x0f, 0x02, 0xec, 0xeb, 0xed,
 		0x05, 0x0a, 0x05, 0x05, 0x05, 0x05, 0x05
 	};
-	byte_t	part1length=sizeof(part1);
+	byte_t	part1size=sizeof(part1);
 	// no idea what this means...
 	byte_t	part2[]={
 		0x08, 0x23, 0x43, 0x23, 0x23, 0x08, 0x11, 0x23,
 		0x08, 0x11, 0x41, 0xb0, 0x23, 0x00, 0x83
 	};
-	byte_t	part2length=sizeof(part2);
+	byte_t	part2size=sizeof(part2);
 
-	writeBE(&reqpacket,fdolength);
-	writeBE(&reqpacket,fdodatalength);
+	writeBE(&reqpacket,fdosize);
+	writeBE(&reqpacket,fdodatasize);
 	write(&reqpacket,(byte_t)1);
-	write(&reqpacket,part1length);
-	write(&reqpacket,part2length);
-	reqpacket.append(part1,part1length);
-	reqpacket.append(part2,part2length);
+	write(&reqpacket,part1size);
+	write(&reqpacket,part2size);
+	reqpacket.append(part1,part1size);
+	reqpacket.append(part2,part2size);
 
 
 	// some charset related thing, or something...
@@ -2512,14 +2385,13 @@ void sqlrprotocol_oracle::putTti5Response() {
 	reqpacket.append(charsetthing,sizeof(charsetthing));
 
 	if (getDebug()) {
-		stdoutput.write("tti response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",
-							dataflags);
+		debugStart("tti response");
+		debugWrite("data flags: 0x%04x",dataflags);
 		debugTtcCode(ttccode);
-		stdoutput.printf("	version: %d\n",ttiversion);
-		stdoutput.printf("	server string: \"%s\"\n",serverstring);
-		stdoutput.printf("	charset: 0x%02x\n",charset);
-		stdoutput.write("}\n");
+		debugWrite("version: %d",ttiversion);
+		debugWrite("server string: \"%s\"",serverstring);
+		debugWrite("charset: 0x%02x",charset);
+		debugEnd();
 	}
 }
 
@@ -2558,10 +2430,8 @@ bool sqlrprotocol_oracle::recvDataTypeRequest() {
 	}
 
 	if (resppackettype!=PACKET_DATA) {
-		if (getDebug()) {
-			stdoutput.printf("bad packet type %d, expected %d\n",
-						resppackettype,PACKET_DATA);
-		}
+		debugWrite("bad packet type %d, expected %d",
+					resppackettype,PACKET_DATA);
 		return false;
 	}
 
@@ -2588,15 +2458,15 @@ bool sqlrprotocol_oracle::recvDataTypeRequest() {
 	// nothing, but when talking to relay it sends/receives a ton of stuff.
 	// It's not exctly clear what triggers this.
 	datatypes=rp;
-	datatypeslength=end-rp;
+	datatypessize=end-rp;
 
 	if (getDebug()) {
-		stdoutput.write("datatype request {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
+		debugStart("datatype request");
+		debugWrite("data flags: 0x%04x",dataflags);
 		debugTtcCode(ttccode);
-		stdoutput.printf("	data types:\n");
-		debugHexDump(datatypes,datatypeslength);
-		stdoutput.write("}\n");
+		debugWrite("data types:");
+		debugHexDump(datatypes,datatypessize);
+		debugEnd();
 	}
 
 	return true;
@@ -2615,15 +2485,15 @@ bool sqlrprotocol_oracle::sendDataTypeResponse() {
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
 	// for now echo the requested data types
-	reqpacket.append(datatypes,datatypeslength);
+	reqpacket.append(datatypes,datatypessize);
 
 	if (getDebug()) {
-		stdoutput.write("datatype response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
+		debugStart("datatype response");
+		debugWrite("data flags: 0x%04x",dataflags);
 		debugTtcCode(ttccode);
-		stdoutput.printf("	data types:\n");
-		debugHexDump(datatypes,datatypeslength);
-		stdoutput.write("}\n");
+		debugWrite("data types:");
+		debugHexDump(datatypes,datatypessize);
+		debugEnd();
 	}
 
 	return sendPacket(true);
@@ -2643,10 +2513,8 @@ bool sqlrprotocol_oracle::recvAuthenticationRequest(bool secondphase) {
 	}
 
 	if (resppackettype!=PACKET_DATA) {
-		if (getDebug()) {
-			stdoutput.printf("bad packet type %d, expected %d\n",
+		debugWrite("bad packet type %d, expected %d",
 						resppackettype,PACKET_DATA);
-		}
 		return false;
 	}
 
@@ -2686,7 +2554,7 @@ bool sqlrprotocol_oracle::recvAuthenticationRequest(bool secondphase) {
 	// different versions, or something...
 	bool	stringsmatch=!charstring::compare(clientstring,serverstring);
 
-	byte_t	userlength;
+	byte_t	usersize;
 	char	*user;
 
 	// no idea...
@@ -2694,8 +2562,8 @@ bool sqlrprotocol_oracle::recvAuthenticationRequest(bool secondphase) {
 		read(rp,&unknown,&rp);
 	}
 
-	// user length...
-	read(rp,&userlength,&rp);
+	// user size...
+	read(rp,&usersize,&rp);
 
 	// no idea...
 	for (uint16_t i=0; i<((stringsmatch)?23:7); i++) {
@@ -2703,50 +2571,47 @@ bool sqlrprotocol_oracle::recvAuthenticationRequest(bool secondphase) {
 	}
 
 	// user name...
-	getString(rp,&user,userlength,&rp);
+	getString(rp,&user,usersize,&rp);
 
-	if (getDebug()) {
-		stdoutput.printf("authentication request (phase %d) {\n",
-							(secondphase)?2:1);
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		debugTtiFunction(ttifunction);
-		stdoutput.printf("	seq number: %d\n",seqnumber);
-		stdoutput.printf("	user: %s\n",user);
-	}
+	debugStart("authentication request (phase %d)",(secondphase)?2:1);
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugTtiFunction(ttifunction);
+	debugWrite("seq number: %d",seqnumber);
+	debugWrite("user: %s",user);
 
 	do {
 
-		byte_t		fieldnamelength;
-		uint32_t	fieldnamelengthlong;
+		byte_t		fieldnamesize;
+		uint32_t	fieldnamesizelong;
 		char		*fieldname;
-		byte_t		fieldlength;
-		uint32_t	fieldlengthlong;
+		byte_t		fieldsize;
+		uint32_t	fieldsizelong;
 		char		*field;
 
 		// field name...
 		if (!stringsmatch) {
 			read(rp,&unknown,&rp);
 		}
-		read(rp,&fieldnamelength,&rp);
+		read(rp,&fieldnamesize,&rp);
 		if (!stringsmatch) {
-			read(rp,&fieldnamelength,&rp);
+			read(rp,&fieldnamesize,&rp);
 		} else {
-			readBE(rp,&fieldnamelengthlong,&rp);
+			readBE(rp,&fieldnamesizelong,&rp);
 		}
-		getString(rp,&fieldname,fieldnamelength,&rp);
+		getString(rp,&fieldname,fieldnamesize,&rp);
 
 		// field...
 		if (!stringsmatch) {
 			read(rp,&unknown,&rp);
 		}
-		read(rp,&fieldlength,&rp);
+		read(rp,&fieldsize,&rp);
 		if (!stringsmatch) {
-			read(rp,&fieldlength,&rp);
+			read(rp,&fieldsize,&rp);
 		} else {
-			readBE(rp,&fieldlengthlong,&rp);
+			readBE(rp,&fieldsizelong,&rp);
 		}
-		getString(rp,&field,fieldlength,&rp);
+		getString(rp,&field,fieldsize,&rp);
 
 		// no idea...
 		if (!stringsmatch) {
@@ -2758,17 +2623,13 @@ bool sqlrprotocol_oracle::recvAuthenticationRequest(bool secondphase) {
 			read(rp,&unknown,&rp);
 		}
 
-		if (getDebug()) {
-			stdoutput.printf("	%s: %s\n",fieldname,field);
-		}
+		debugWrite("%s: %s",fieldname,field);
 
 		// FIXME: do something with these...
 
 	} while (rp<end);
 
-	if (getDebug()) {
-		stdoutput.write("}\n");
-	}
+	debugEnd();
 
 	return true;
 }
@@ -2808,11 +2669,9 @@ bool sqlrprotocol_oracle::sendAuthenticationChallenge() {
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
 
-	if (getDebug()) {
-		stdoutput.write("authentication challenge {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-	}
+	debugStart("authentication challenge");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
 
 	// no idea
 	write(&reqpacket,(byte_t)1);
@@ -2828,9 +2687,7 @@ authsessionkey=charstring::duplicate("64760F3160DCEF82");
 
 	putGenericFooter();
 
-	if (getDebug()) {
-		stdoutput.write("}\n");
-	}
+	debugEnd();
 
 	return sendPacket(true);
 }
@@ -2838,29 +2695,29 @@ authsessionkey=charstring::duplicate("64760F3160DCEF82");
 void sqlrprotocol_oracle::putAuthField(const char *fieldname,
 						const char *field) {
 
-	byte_t	fieldnamelength=charstring::getLength(fieldname);
-	byte_t	fieldlength=charstring::getLength(field);
+	byte_t	fieldnamesize=charstring::getLength(fieldname);
+	byte_t	fieldsize=charstring::getLength(field);
 
 	// field name...
-	write(&reqpacket,fieldnamelength);
+	write(&reqpacket,fieldnamesize);
 	// no idea...
 	write(&reqpacket,(byte_t)0);
 	write(&reqpacket,(byte_t)0);
 	write(&reqpacket,(byte_t)0);
 	// again...
-	write(&reqpacket,fieldnamelength);
-	write(&reqpacket,fieldname,fieldnamelength);
+	write(&reqpacket,fieldnamesize);
+	write(&reqpacket,fieldname,fieldnamesize);
 
 	// field...
-	write(&reqpacket,fieldlength);
+	write(&reqpacket,fieldsize);
 	// no idea...
 	write(&reqpacket,(byte_t)0);
 	write(&reqpacket,(byte_t)0);
 	write(&reqpacket,(byte_t)0);
 	// again...
-	if (fieldlength) {
-		write(&reqpacket,fieldlength);
-		write(&reqpacket,field,fieldlength);
+	if (fieldsize) {
+		write(&reqpacket,fieldsize);
+		write(&reqpacket,field,fieldsize);
 	}
 	// no idea...
 	write(&reqpacket,(byte_t)0);
@@ -2868,9 +2725,7 @@ void sqlrprotocol_oracle::putAuthField(const char *fieldname,
 	write(&reqpacket,(byte_t)0);
 	write(&reqpacket,(byte_t)0);
 
-	if (getDebug()) {
-			stdoutput.printf("	%s: %s\n",fieldname,field);
-	}
+	debugWrite("%s: %s",fieldname,field);
 }
 
 bool sqlrprotocol_oracle::sendAuthenticationResponse() {
@@ -2911,11 +2766,9 @@ bool sqlrprotocol_oracle::sendAuthenticationResponse() {
 
 	putGenericFooter();
 
-	if (getDebug()) {
-		stdoutput.write("authentication response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		stdoutput.write("}\n");
-	}
+	debugStart("authentication response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugEnd();
 
 	return sendPacket(true);
 }
@@ -2928,9 +2781,7 @@ bool sqlrprotocol_oracle::open(const byte_t *rp) {
 
 	sqlrservercursor	*cursor=cont->getCursor();
 	if (!cursor) {
-		if (getDebug()) {
-			stdoutput.printf("couldn't get cursor\n");
-		}
+		debugWrite("couldn't get cursor");
 		return sendCursorNotOpenError();
 	}
 
@@ -2939,11 +2790,9 @@ hackcursorid=cursorid;
 	
 	// FIXME: decode this...
 
-	if (getDebug()) {
-		stdoutput.write("open request {\n");
-		stdoutput.printf("	cursor id: %d\n",cursorid);
-		stdoutput.write("}\n");
-	}
+	debugStart("open request");
+	debugWrite("cursor id: %d",cursorid);
+	debugEnd();
 
 	return sendOpenResponse(cursor);
 }
@@ -2962,319 +2811,339 @@ bool sqlrprotocol_oracle::sendOpenResponse(sqlrservercursor *cursor) {
 	write(&reqpacket,ttccode);
 	reqpacket.append(unknown,sizeof(unknown));
 
-	if (getDebug()) {
-		stdoutput.write("open response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		stdoutput.write("}\n");
-	}
+	debugStart("open response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugEnd();
 
 	return sendPacket(true);
 }
 
 void sqlrprotocol_oracle::debugTtcCode(byte_t ttccode) {
-	stdoutput.write("	ttc code: ");
+	if (!getDebug()) {
+		return;
+	}
+	const char	*code=NULL;
 	switch (ttccode) {
 		case TTC_PROTOCOL_NEGOTIATION:
-			stdoutput.write("TTC_PROTOCOL_NEGOTIATION");
+			code="TTC_PROTOCOL_NEGOTIATION";
 			break;
 		case TTC_DATATYPE_NEGOTIATION:
-			stdoutput.write("TTC_DATATYPE_NEGOTIATION");
+			code="TTC_DATATYPE_NEGOTIATION";
 			break;
 		case TTC_TTI_FUNCTION:
-			stdoutput.write("TTC_TTI_FUNCTION");
+			code="TTC_TTI_FUNCTION";
 			break;
 		case TTC_OK:
-			stdoutput.write("TTC_OK");
+			code="TTC_OK";
 			break;
 		case TTC_EXTENDED_TTI_FUNCTION:
-			stdoutput.write("TTC_EXTENDED_TTI_FUNCTION");
+			code="TTC_EXTENDED_TTI_FUNCTION";
 			break;
 		case TTC_EXTPROC1:
-			stdoutput.write("TTC_EXTPROC1");
+			code="TTC_EXTPROC1";
 			break;
 		case TTC_EXTPROC2:
-			stdoutput.write("TTC_EXTPROC2");
+			code="TTC_EXTPROC2";
 			break;
 		default:
-			stdoutput.write("UNKNOWN");
+			code="UNKNOWN";
 			break;
 	}
-	stdoutput.printf(" (0x%02x)\n",ttccode);
+	debugWrite("ttc code: (0x%02x) %s",ttccode,code);
 }
 
 void sqlrprotocol_oracle::debugTtiFunction(byte_t ttifunction) {
-	stdoutput.write("	tti function: ");
+	if (!getDebug()) {
+		return;
+	}
+	const char	*func=NULL;
 	switch (ttifunction) {
 		case TTI_OPEN:
-			stdoutput.write("TTI_OPEN");
+			func="TTI_OPEN";
 			break;
 		case TTI_QUERY:
-			stdoutput.write("TTI_QUERY");
+			func="TTI_QUERY";
 			break;
 		case TTI_EXECUTE:
-			stdoutput.write("TTI_EXECUTE");
+			func="TTI_EXECUTE";
 			break;
 		case TTI_FETCH:
-			stdoutput.write("TTI_FETCH");
+			func="TTI_FETCH";
 			break;
 		case TTI_CLOSE:
-			stdoutput.write("TTI_CLOSE");
+			func="TTI_CLOSE";
 			break;
 		case TTI_DISCONNECT:
-			stdoutput.write("TTI_DISCONNECT");
+			func="TTI_DISCONNECT";
 			break;
 		case TTI_AUTOCOMMIT_ON:
-			stdoutput.write("TTI_AUTOCOMMIT_ON");
+			func="TTI_AUTOCOMMIT_ON";
 			break;
 		case TTI_AUTOCOMMIT_OFF:
-			stdoutput.write("TTI_AUTOCOMMIT_OFF");
+			func="TTI_AUTOCOMMIT_OFF";
 			break;
 		case TTI_COMMIT:
-			stdoutput.write("TTI_COMMIT");
+			func="TTI_COMMIT";
 			break;
 		case TTI_ROLLBACK:
-			stdoutput.write("TTI_ROLLBACK");
+			func="TTI_ROLLBACK";
 			break;
 		case TTI_CANCEL:
-			stdoutput.write("TTI_CANCEL");
+			func="TTI_CANCEL";
 			break;
 		case TTI_DESCRIBE:
-			stdoutput.write("TTI_DESCRIBE");
+			func="TTI_DESCRIBE";
 			break;
 		case TTI_STARTUP:
-			stdoutput.write("TTI_STARTUP");
+			func="TTI_STARTUP";
 			break;
 		case TTI_SHUTDOWN:
-			stdoutput.write("TTI_SHUTDOWN");
+			func="TTI_SHUTDOWN";
 			break;
 		case TTI_VERSION:
-			stdoutput.write("TTI_VERSION");
+			func="TTI_VERSION";
 			break;
 		case TTI_K2_TRANSACTIONS:
-			stdoutput.write("TTI_K2_TRANSACTIONS");
+			func="TTI_K2_TRANSACTIONS";
 			break;
 		case TTI_QUERY2:
-			stdoutput.write("TTI_QUERY2");
+			func="TTI_QUERY2";
 			break;
 		case TTI_OSQL7:
-			stdoutput.write("TTI_OSQL7");
+			func="TTI_OSQL7";
 			break;
 		case TTI_OKOD:
-			stdoutput.write("TTI_OKOD");
+			func="TTI_OKOD";
 			break;
 		case TTI_QUERY3:
-			stdoutput.write("TTI_QUERY3");
+			func="TTI_QUERY3";
 			break;
 		case TTI_LOB_OPERATIONS:
-			stdoutput.write("TTI_LOB_OPERATIONS");
+			func="TTI_LOB_OPERATIONS";
 			break;
 		case TTI_ODNY:
-			stdoutput.write("TTI_ODNY");
+			func="TTI_ODNY";
 			break;
 		case TTI_TRANSACTION_END:
-			stdoutput.write("TTI_TRANSACTION_END");
+			func="TTI_TRANSACTION_END";
 			break;
 		case TTI_TRANSACTION_BEGIN:
-			stdoutput.write("TTI_TRANSACTION_BEGIN");
+			func="TTI_TRANSACTION_BEGIN";
 			break;
 		case TTI_OCCA:
-			stdoutput.write("TTI_OCCA");
+			func="TTI_OCCA";
 			break;
 		case TTI_STARTUP2:
-			stdoutput.write("TTI_STARTUP2");
+			func="TTI_STARTUP2";
 			break;
 		case TTI_LOGON_PRESENT_PWD:
-			stdoutput.write("TTI_LOGON_PRESENT_PWD");
+			func="TTI_LOGON_PRESENT_PWD";
 			break;
 		case TTI_LOGON_PRESENT_USER:
-			stdoutput.write("TTI_LOGON_PRESENT_USER");
+			func="TTI_LOGON_PRESENT_USER";
 			break;
 		case TTI_LOGON_PRESENT_PWD_SEND_AUTH_PASSWORD:
-			stdoutput.write(
-				"TTI_LOGON_PRESENT_PWD_SEND_AUTH_PASSWORD");
+			func="TTI_LOGON_PRESENT_PWD_SEND_AUTH_PASSWORD";
 			break;
 		case TTI_LOGON_PRESENT_USER_REQ_AUTH_SESSKEY:
-			stdoutput.write(
-				"TTI_LOGON_PRESENT_USER_REQ_AUTH_SESSKEY");
+			func="TTI_LOGON_PRESENT_USER_REQ_AUTH_SESSKEY";
 			break;
 		case TTI_DESCRIBE2:
-			stdoutput.write("TTI_DESCRIBE2");
+			func="TTI_DESCRIBE2";
 			break;
 		case TTI_OOTCM:
-			stdoutput.write("TTI_OOTCM");
+			func="TTI_OOTCM";
 			break;
 		case TTI_OKPFC:
-			stdoutput.write("TTI_OKPFC");
+			func="TTI_OKPFC";
 			break;
 		case TTI_SWITCH_SESSION:
-			stdoutput.write("TTI_SWITCH_SESSION");
+			func="TTI_SWITCH_SESSION";
 			break;
 		case TTI_CLOSE2:
-			stdoutput.write("TTI_CLOSE2");
+			func="TTI_CLOSE2";
 			break;
 		case TTI_OSCID:
-			stdoutput.write("TTI_OSCID");
+			func="TTI_OSCID";
 			break;
 		case TTI_OSKEYVAL:
-			stdoutput.write("TTI_OSKEYVAL");
+			func="TTI_OSKEYVAL";
 			break;
 		default:
-			stdoutput.write("UNKNOWN");
+			func="UNKNOWN";
 			break;
 	}
-	stdoutput.printf(" (0x%02x)\n",ttifunction);
+	debugWrite("tti function: (0x%02x) %s",ttifunction,func);
 }
 
 void sqlrprotocol_oracle::debugOptions(uint16_t options,
 					uint16_t moreoptions) {
+	if (!getDebug()) {
+		return;
+	}
 
-	stdoutput.printf("	options: 0x%04x (",options);
-	stdoutput.printBits(hostToBE(options));
-	stdoutput.write(")\n");
+	debugStart("options");
+	debugWrite("0x%04x",options);
+	stringbuffer	b;
+	b.printBits(hostToBE(options));
+	debugWrite(b.getString());
 	debugOptions(options);
-	stdoutput.printf("	moreoptions: 0x%04x (",moreoptions);
-	stdoutput.printBits(hostToBE(moreoptions));
-	stdoutput.write(")\n");
+	debugEnd();
+
+	debugStart("moreoptions");
+	debugWrite("0x%04x",moreoptions);
+	b.clear();
+	b.printBits(hostToBE(moreoptions));
+	debugWrite(b.getString());
 	debugOptions(moreoptions);
+	debugEnd();
 }
 
 void sqlrprotocol_oracle::debugOptions(uint16_t options) {
 	if (options&OPTION_PARSE) {
-		stdoutput.write("		OPTION_PARSE\n");
+		debugWrite("OPTION_PARSE");
 	}
 	if (options&OPTION_BIND) {
-		stdoutput.write("		OPTION_BIND\n");
+		debugWrite("OPTION_BIND");
 	}
 	if (options&OPTION_DEFINE) {
-		stdoutput.write("		OPTION_DEFINE\n");
+		debugWrite("OPTION_DEFINE");
 	}
 	if (options&OPTION_EXECUTE) {
-		stdoutput.write("		OPTION_EXECUTE\n");
+		debugWrite("OPTION_EXECUTE");
 	}
 	if (options&OPTION_FETCH) {
-		stdoutput.write("		OPTION_FETCH\n");
+		debugWrite("OPTION_FETCH");
 	}
 	if (options&OPTION_CANCEL) {
-		stdoutput.write("		OPTION_CANCEL\n");
+		debugWrite("OPTION_CANCEL");
 	}
 	if (options&OPTION_COMMIT) {
-		stdoutput.write("		OPTION_COMMIT\n");
+		debugWrite("OPTION_COMMIT");
 	}
 	if (options&OPTION_EXACTFETCH) {
-		stdoutput.write("		OPTION_EXACTFETCH\n");
+		debugWrite("OPTION_EXACTFETCH");
 	}
 	if (options&OPTION_SNDIOV) {
-		stdoutput.write("		OPTION_SNDIOV\n");
+		debugWrite("OPTION_SNDIOV");
 	}
 	if (options&OPTION_NOPLSQL) {
-		stdoutput.write("		OPTION_NOPLSQL\n");
+		debugWrite("OPTION_NOPLSQL");
 	}
 }
 
 void sqlrprotocol_oracle::debugCharacterSet(byte_t characterset) {
-	stdoutput.printf("	character set: 0x%02x\n",
-				(uint32_t)(0x000000ff&characterset));
+	if (!getDebug()) {
+		return;
+	}
+	debugWrite("character set: 0x%02x",(uint32_t)(0x000000ff&characterset));
 }
 
 void sqlrprotocol_oracle::debugStatusFlags(uint16_t statusflags) {
-	stdoutput.write("	status flags:\n");
-	stdoutput.write("		");
-	stdoutput.printf("0x%04x\n",statusflags);
-	stdoutput.write("		");
-	stdoutput.printBits(statusflags);
-	stdoutput.write("\n");
+	if (!getDebug()) {
+		return;
+	}
+	debugStart("status flags");
+	debugWrite("0x%04x",statusflags);
+	stringbuffer	b;
+	b.printBits(statusflags);
+	debugWrite(b.getString());
 	/*if (statusflags&SERVER_STATUS_IN_TRANS) {
-		stdoutput.write("		"
-				"SERVER_STATUS_IN_TRANS\n");
+		debugWrite("SERVER_STATUS_IN_TRANS");
 	}*/
+	debugEnd();
 }
 
 void sqlrprotocol_oracle::debugColumnType(const char *name,
 						uint16_t columntype) {
-	stdoutput.printf("		type: %s (0x%02x)\n",
-				name,(uint32_t)(0x000000ff&columntype));
+	if (!getDebug()) {
+		return;
+	}
+	debugWrite("type: %s (0x%02x)",name,(uint32_t)(0x000000ff&columntype));
 	debugColumnType(columntype);
 }
 
 void sqlrprotocol_oracle::debugColumnType(uint16_t columntype) {
-	stdoutput.write("		");
+	if (!getDebug()) {
+		return;
+	}
 	switch (columntype) {
 		case ORACLE_TYPE_VARCHAR:
-			stdoutput.write("ORACLE_TYPE_VARCHAR\n");
+			debugWrite("ORACLE_TYPE_VARCHAR");
 			break;
 		case ORACLE_TYPE_NUMBER:
-			stdoutput.write("ORACLE_TYPE_NUMBER\n");
+			debugWrite("ORACLE_TYPE_NUMBER");
 			break;
 		case ORACLE_TYPE_VARNUM:
-			stdoutput.write("ORACLE_TYPE_VARNUM\n");
+			debugWrite("ORACLE_TYPE_VARNUM");
 			break;
 		case ORACLE_TYPE_LONG:
-			stdoutput.write("ORACLE_TYPE_LONG\n");
+			debugWrite("ORACLE_TYPE_LONG");
 			break;
 		case ORACLE_TYPE_ROWID_DEPRECATED:
-			stdoutput.write("ORACLE_TYPE_ROWID_DEPRECATED\n");
+			debugWrite("ORACLE_TYPE_ROWID_DEPRECATED");
 			break;
 		case ORACLE_TYPE_DATE:
-			stdoutput.write("ORACLE_TYPE_DATE\n");
+			debugWrite("ORACLE_TYPE_DATE");
 			break;
 		case ORACLE_TYPE_RAW:
-			stdoutput.write("ORACLE_TYPE_RAW\n");
+			debugWrite("ORACLE_TYPE_RAW");
 			break;
 		case ORACLE_TYPE_LONG_RAW:
-			stdoutput.write("ORACLE_TYPE_LONG_RAW\n");
+			debugWrite("ORACLE_TYPE_LONG_RAW");
 			break;
 		case ORACLE_TYPE_CHAR:
-			stdoutput.write("ORACLE_TYPE_CHAR\n");
+			debugWrite("ORACLE_TYPE_CHAR");
 			break;
 		case ORACLE_TYPE_RESULT_SET:
-			stdoutput.write("ORACLE_TYPE_RESULT_SET\n");
+			debugWrite("ORACLE_TYPE_RESULT_SET");
 			break;
 		case ORACLE_TYPE_ROWID:
-			stdoutput.write("ORACLE_TYPE_ROWID\n");
+			debugWrite("ORACLE_TYPE_ROWID");
 			break;
 		case ORACLE_TYPE_NAMED_TYPE:
-			stdoutput.write("ORACLE_TYPE_NAMED_TYPE\n");
+			debugWrite("ORACLE_TYPE_NAMED_TYPE");
 			break;
 		case ORACLE_TYPE_REF_TYPE:
-			stdoutput.write("ORACLE_TYPE_REF_TYPE\n");
+			debugWrite("ORACLE_TYPE_REF_TYPE");
 			break;
 		case ORACLE_TYPE_CLOB:
-			stdoutput.write("ORACLE_TYPE_CLOB\n");
+			debugWrite("ORACLE_TYPE_CLOB");
 			break;
 		case ORACLE_TYPE_BLOB:
-			stdoutput.write("ORACLE_TYPE_BLOB\n");
+			debugWrite("ORACLE_TYPE_BLOB");
 			break;
 		case ORACLE_TYPE_BFILE:
-			stdoutput.write("ORACLE_TYPE_BFILE\n");
+			debugWrite("ORACLE_TYPE_BFILE");
 			break;
 		case ORACLE_TYPE_TIMESTAMP:
-			stdoutput.write("ORACLE_TYPE_TIMESTAMP\n");
+			debugWrite("ORACLE_TYPE_TIMESTAMP");
 			break;
 		case ORACLE_TYPE_TIMESTAMPTZ:
-			stdoutput.write("ORACLE_TYPE_TIMESTAMPTZ\n");
+			debugWrite("ORACLE_TYPE_TIMESTAMPTZ");
 			break;
 		case ORACLE_TYPE_INTERVALYM:
-			stdoutput.write("ORACLE_TYPE_INTERVALYM\n");
+			debugWrite("ORACLE_TYPE_INTERVALYM");
 			break;
 		case ORACLE_TYPE_INTERVALDS:
-			stdoutput.write("ORACLE_TYPE_INTERVALDS\n");
+			debugWrite("ORACLE_TYPE_INTERVALDS");
 			break;
 		case ORACLE_TYPE_TIMESTAMPLTZ:
-			stdoutput.write("ORACLE_TYPE_TIMESTAMPLTZ\n");
+			debugWrite("ORACLE_TYPE_TIMESTAMPLTZ");
 			break;
 		case ORACLE_TYPE_PLSQL_INDEX_TABLE:
-			stdoutput.write("ORACLE_TYPE_PLSQL_INDEX_TABLE\n");
+			debugWrite("ORACLE_TYPE_PLSQL_INDEX_TABLE");
 			break;
 		default:
-			stdoutput.write("unknown ORACLE_TYPE\n");
+			debugWrite("unknown ORACLE_TYPE");
 			break;
 	}
 }
 
 void sqlrprotocol_oracle::debugSystemError() {
 	char	*err=error::getErrorString();
-	stdoutput.printf("%s\n",err);
+	debugWrite(err);
 	delete[] err;
 }
 
@@ -3288,11 +3157,8 @@ bool sqlrprotocol_oracle::getTtiFunction(const byte_t *rp,
 		}
 
 		if (resppackettype!=PACKET_DATA) {
-			if (getDebug()) {
-				stdoutput.printf(
-					"bad packet type %d, expected %d\n",
-					resppackettype,PACKET_DATA);
-			}
+			debugWrite("bad packet type %d, expected %d",
+						resppackettype,PACKET_DATA);
 			return false;
 		}
 
@@ -3314,11 +3180,11 @@ bool sqlrprotocol_oracle::getTtiFunction(const byte_t *rp,
 	*rpout=rp;
 
 	if (getDebug()) {
-		stdoutput.write("get tti function {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
+		debugStart("get tti function");
+		debugWrite("data flags: 0x%04x",dataflags);
 		debugTtcCode(ttccode);
 		debugTtiFunction(*ttifunction);
-		stdoutput.write("}\n");
+		debugEnd();
 	}
 	
 	return true;
@@ -3339,7 +3205,7 @@ bool sqlrprotocol_oracle::query(const byte_t *rp) {
 	byte_t		unknown3;
 	byte_t		unknown4;
 	byte_t		unknown5;
-	uint16_t	querylen;
+	uint16_t	querysize;
 	byte_t		unknown6;
 	byte_t		unknown7;
 	const char	*query;
@@ -3350,31 +3216,25 @@ bool sqlrprotocol_oracle::query(const byte_t *rp) {
 	read(rp,&unknown3,&rp);
 	read(rp,&unknown4,&rp);
 	read(rp,&unknown5,&rp);
-	readLE(rp,&querylen,&rp);
+	readLE(rp,&querysize,&rp);
 	read(rp,&unknown6,&rp);
 	read(rp,&unknown7,&rp);
 	query=(char *)rp;
 cursorid=hackcursorid;
 
-	if (getDebug()) {
-		stdoutput.write("query request {\n");
-		debugOptions(options,moreoptions);
-		stdoutput.printf("	cursor id: %d\n",cursorid);
-		stdoutput.printf("	unknown: %02x %02x %02x\n",
-						unknown3,unknown4,unknown5);
-		stdoutput.printf("	query length: %d\n",querylen);
-		stdoutput.printf("	unknown: %02x %02x\n",
-						unknown6,unknown7);
-		stdoutput.printf("	query: \"%*s\"\n",querylen,query);
-		stdoutput.write("}\n");
-	}
+	debugStart("query request");
+	debugOptions(options,moreoptions);
+	debugWrite("cursor id: %d",cursorid);
+	debugWrite("unknown: %02x %02x %02x",unknown3,unknown4,unknown5);
+	debugWrite("query size: %d",querysize);
+	debugWrite("unknown: %02x %02x",unknown6,unknown7);
+	debugWrite("query: \"%*s\"",querysize,query);
+	debugEnd();
 
 	// get the requested cursor
 	sqlrservercursor	*cursor=cont->getCursor(cursorid);
 	if (!cursor) {
-		if (getDebug()) {
-			stdoutput.printf("cursor id %d not found\n",cursorid);
-		}
+		debugWrite("cursor id %d not found",cursorid);
 		return sendCursorNotOpenError();
 	}
 
@@ -3382,7 +3242,7 @@ cursorid=hackcursorid;
 	columntypescached[cont->getId(cursor)]=false;
 
 	// bounds checking
-	if (querylen>maxquerysize) {
+	if (querysize>maxquerysize) {
 		// FIXME: implement this
 		//return sendErrPacket(1105,"Unknown error","24000");
 		return false;
@@ -3390,17 +3250,15 @@ cursorid=hackcursorid;
 
 	// copy the query into the cursor's query buffer
 	char	*querybuffer=cont->getQueryBuffer(cursor);
-	bytestring::copy(querybuffer,query,querylen);
-	querybuffer[querylen]='\0';
-	cont->setQueryLength(cursor,querylen);
+	bytestring::copy(querybuffer,query,querysize);
+	querybuffer[querysize]='\0';
+	cont->setQuerySize(cursor,querysize);
 
 	// prepare the query
 	if (!cont->prepareQuery(cursor,cont->getQueryBuffer(cursor),
-					cont->getQueryLength(cursor),
+					cont->getQuerySize(cursor),
 					true,true,true)) {
-		if (getDebug()) {
-			stdoutput.printf("prepare query failed\n");
-		}
+		debugWrite("prepare query failed");
 		return sendQueryError(cursor);
 	}
 	return sendQueryResponse(cursor);
@@ -3440,10 +3298,10 @@ bool sqlrprotocol_oracle::sendQueryResponse(sqlrservercursor *cursor) {
 	putGenericFooter();
 
 	if (getDebug()) {
-		stdoutput.write("query response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
+		debugStart("query response");
+		debugWrite("data flags: 0x%04x",dataflags);
 		debugTtcCode(ttccode);
-		stdoutput.write("}\n");
+		debugEnd();
 	}
 
 	return sendPacket(true);
@@ -3460,8 +3318,8 @@ bool sqlrprotocol_oracle::query2(const byte_t *rp) {
 	uint16_t	options;
 	uint16_t	moreoptions;
 	uint16_t	cursorid;
-	uint32_t	querylen;
-	const char	*query;
+	uint32_t	querysize=0;
+	const char	*query=NULL;
 
 	readBE(rp,&options,&rp);
 	readBE(rp,&moreoptions,&rp);
@@ -3473,36 +3331,32 @@ cursorid=hackcursorid;
 			byte_t	unknown;
 			read(rp,&unknown,&rp);
 		}
-		readLE(rp,&querylen,&rp);
+		readLE(rp,&querysize,&rp);
 		// no idea...
 		for (uint16_t i=0; i<44; i++) {
 			byte_t	unknown;
 			read(rp,&unknown,&rp);
 		}
 		query=(char *)rp;
-		rp+=querylen;
+		rp+=querysize;
 	}
 	// no idea...
 
 	if (getDebug()) {
-		stdoutput.write("query2 request {\n");
+		debugStart("query2 request");
 		debugOptions(options,moreoptions);
-		stdoutput.printf("	cursor id: %d\n",cursorid);
+		debugWrite("cursor id: %d",cursorid);
 		if (options&OPTION_PARSE) {
-			stdoutput.printf("	query length: %d\n",
-								querylen);
-			stdoutput.printf("	query: \"%*s\"\n",
-								querylen,query);
+			debugWrite("query size: %d",querysize);
+			debugWrite("query: \"%*s\"",querysize,query);
 		}
-		stdoutput.write("}\n");
+		debugEnd();
 	}
 
 	// get the requested cursor
 	sqlrservercursor	*cursor=cont->getCursor(cursorid);
 	if (!cursor) {
-		if (getDebug()) {
-			stdoutput.printf("cursor id %d not found\n",cursorid);
-		}
+		debugWrite("cursor id %d not found",cursorid);
 		return sendCursorNotOpenError();
 	}
 
@@ -3512,7 +3366,7 @@ cursorid=hackcursorid;
 		columntypescached[cont->getId(cursor)]=false;
 
 		// bounds checking
-		if (querylen>maxquerysize) {
+		if (querysize>maxquerysize) {
 			// FIXME: implement this
 			//return sendErrPacket(1105,"Unknown error","24000");
 			return false;
@@ -3520,18 +3374,16 @@ cursorid=hackcursorid;
 
 		// copy the query into the cursor's query buffer
 		char	*querybuffer=cont->getQueryBuffer(cursor);
-		bytestring::copy(querybuffer,query,querylen);
-		querybuffer[querylen]='\0';
-		cont->setQueryLength(cursor,querylen);
+		bytestring::copy(querybuffer,query,querysize);
+		querybuffer[querysize]='\0';
+		cont->setQuerySize(cursor,querysize);
 	
 		// prepare the query
 		if (!cont->prepareQuery(cursor,
 					cont->getQueryBuffer(cursor),
-					cont->getQueryLength(cursor),
+					cont->getQuerySize(cursor),
 					true,true,true)) {
-			if (getDebug()) {
-				stdoutput.printf("prepare query failed\n");
-			}
+			debugWrite("prepare query failed");
 			return sendQueryError(cursor);
 		}
 	}
@@ -3555,9 +3407,7 @@ cursorid=hackcursorid;
 
 		// execute the query
 		if (!cont->executeQuery(cursor,true,true,true,true)) {
-			if (getDebug()) {
-				stdoutput.printf("execute query failed\n");
-			}
+			debugWrite("execute query failed");
 			return sendQueryError(cursor);
 		}
 	}
@@ -3634,12 +3484,10 @@ bool sqlrprotocol_oracle::sendQuery2Response(sqlrservercursor *cursor,
 
 	putGenericFooter();
 
-	if (getDebug()) {
-		stdoutput.write("query2 response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		stdoutput.write("}\n");
-	}
+	debugStart("query2 response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugEnd();
 
 	return sendPacket(true);
 }
@@ -3659,11 +3507,8 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 		}
 
 		if (resppackettype!=PACKET_DATA) {
-			if (getDebug()) {
-				stdoutput.printf(
-					"bad packet type %d, expected %d\n",
-					resppackettype,PACKET_DATA);
-			}
+			debugWrite("bad packet type %d, expected %d",
+						resppackettype,PACKET_DATA);
 			return false;
 		}
 
@@ -3686,22 +3531,17 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 		bv->variable=bindvarnames[i];
 		bv->variablesize=charstring::getLength(bv->variable);
 
-		if (getDebug()) {
-			stdoutput.printf("bind %d {\n",i);
-			stdoutput.printf("	data flags: 0x%04x\n",
-								dataflags);
-			stdoutput.printf("	variable: %s\n",bv->variable);
-		}
+		debugStart("bind %d",i);
+		debugWrite("data flags: 0x%04x",dataflags);
+		debugWrite("variable: %s",bv->variable);
 
 		// FIXME: handle nulls
 		if (false) {
 			bv->type=SQLRSERVERBINDVARTYPE_NULL;
-			bv->isnull=cont->nullBindValue();
-			if (getDebug()) {
-				stdoutput.write("	type: NULL\n");
-				stdoutput.write("	isnull: true\n");
-				stdoutput.write("}\n");
-			}
+			bv->isnull=cont->getNullBindValue();
+			debugWrite("type: NULL");
+			debugWrite("isnull: true");
+			debugEnd();
 			continue;
 		}
 
@@ -3710,7 +3550,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 			/*case MYSQL_TYPE_TINY:
 				bv->type=SQLRSERVERBINDVARTYPE_INTEGER;
 				bv->value.integerval=*((char *)rp);
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				rp+=sizeof(char);
 				break;
 			case MYSQL_TYPE_SHORT:
@@ -3720,7 +3560,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 				bytestring::copy(&val,rp,sizeof(uint16_t));
 				val=leToHost((uint16_t)val);
 				bv->value.integerval=(int16_t)val;
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				rp+=sizeof(int16_t);
 				}
 				break;
@@ -3731,7 +3571,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 				bytestring::copy(&val,rp,sizeof(uint32_t));
 				val=leToHost((uint32_t)val);
 				bv->value.integerval=(int32_t)val;
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				rp+=sizeof(int32_t);
 				}
 				break;
@@ -3742,7 +3582,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 				bytestring::copy(&val,rp,sizeof(uint64_t));
 				val=leToHost((uint64_t)val);
 				bv->value.integerval=(int64_t)val;
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				rp+=sizeof(int64_t);
 				}
 				break;
@@ -3752,7 +3592,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 							rp,sizeof(float));
 				bv->value.doubleval.precision=0;
 				bv->value.doubleval.scale=0;
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				rp+=sizeof(float);
 				break;
 			case MYSQL_TYPE_DOUBLE:
@@ -3761,7 +3601,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 							rp,sizeof(double));
 				bv->value.doubleval.precision=0;
 				bv->value.doubleval.scale=0;
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				rp+=sizeof(double);
 				break;
 			case MYSQL_TYPE_TIME:
@@ -3776,15 +3616,15 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 				bv->value.dateval.microsecond=0;
 				bv->value.dateval.tz=NULL;
 				bv->value.dateval.isnegative=false;
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				bv->value.dateval.buffersize=64;
 				bv->value.dateval.buffer=
 					new char[bv->value.dateval.buffersize];
 
-				char	len=*((char *)rp);
+				char	size=*((char *)rp);
 				rp+=sizeof(char);
 
-				if (len) {
+				if (size) {
 					char	isneg=*((char *)rp);
 					bv->value.dateval.isnegative=isneg;
 					rp+=sizeof(char);
@@ -3805,7 +3645,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 					bv->value.dateval.second=
 							*((char *)rp);
 					rp+=sizeof(char);
-					if (len>8) {
+					if (size>8) {
 						int32_t	ms;
 						bytestring::copy(&ms,
 							rp,sizeof(int32_t));
@@ -3829,15 +3669,15 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 				bv->value.dateval.microsecond=-1;
 				bv->value.dateval.tz=NULL;
 				bv->value.dateval.isnegative=false;
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				bv->value.dateval.buffersize=64;
 				bv->value.dateval.buffer=
 					new char[bv->value.dateval.buffersize];
 
-				char	len=*((char *)rp);
+				char	size=*((char *)rp);
 				rp+=sizeof(char);
 
-				if (len) {
+				if (size) {
 					int16_t	year;
 					bytestring::copy(&year,
 							rp,sizeof(int16_t));
@@ -3850,9 +3690,9 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 					rp+=sizeof(char);
 
 					// ignore time parts
-					if (len>4) {
+					if (size>4) {
 						rp+=3*sizeof(char);
-						if (len>7) {
+						if (size>7) {
 							rp+=sizeof(int32_t);
 						}
 					}
@@ -3872,15 +3712,15 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 				bv->value.dateval.microsecond=0;
 				bv->value.dateval.tz=NULL;
 				bv->value.dateval.isnegative=false;
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				bv->value.dateval.buffersize=64;
 				bv->value.dateval.buffer=
 					new char[bv->value.dateval.buffersize];
 
-				char	len=*((char *)rp);
+				char	size=*((char *)rp);
 				rp+=sizeof(char);
 
-				if (len) {
+				if (size) {
 					int16_t	year;
 					bytestring::copy(&year,
 							rp,sizeof(int16_t));
@@ -3891,7 +3731,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 					rp+=sizeof(char);
 					bv->value.dateval.day=*((char *)rp);
 					rp+=sizeof(char);
-					if (len>4) {
+					if (size>4) {
 						bv->value.dateval.hour=
 								*((char *)rp);
 						rp+=sizeof(char);
@@ -3901,7 +3741,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 						bv->value.dateval.second=
 								*((char *)rp);
 						rp+=sizeof(char);
-						if (len>7) {
+						if (size>7) {
 							int32_t	ms;
 							bytestring::copy(&ms,
 							rp,sizeof(int32_t));
@@ -3923,7 +3763,7 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 				bv->value.stringval=charstring::duplicate(
 							(const char *)rp,
 							bv->valuesize);
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				rp+=bv->valuesize;
 				break;
 			*/
@@ -3931,43 +3771,41 @@ bool sqlrprotocol_oracle::bindParameters(sqlrservercursor *cursor,
 			// (for all other types, assume varchar)
 			default:
 				{
-				byte_t	len;
-				read(rp,&len,&rp);
+				byte_t	size;
+				read(rp,&size,&rp);
 
 				bv->type=SQLRSERVERBINDVARTYPE_STRING;
-				bv->valuesize=len;
+				bv->valuesize=size;
 				bv->value.stringval=charstring::duplicate(
 							(const char *)rp,
 							bv->valuesize);
-				bv->isnull=cont->nonNullBindValue();
+				bv->isnull=cont->getNonNullBindValue();
 				rp+=bv->valuesize;
 				break;
 				}
 		}
 
 		if (getDebug()) {
-			stdoutput.write("	");
 			if (bv->type==SQLRSERVERBINDVARTYPE_STRING) {
-				stdoutput.write("type: STRING\n");
-				stdoutput.printf("	value: %s\n",
+				debugWrite("type: STRING");
+				debugWrite("value: %s",
 						bv->value.stringval);
 			} else if (bv->type==SQLRSERVERBINDVARTYPE_INTEGER) {
-				stdoutput.write("type: INTEGER\n");
-				stdoutput.printf("	value: %lld\n",
+				debugWrite("type: INTEGER");
+				debugWrite("value: %lld",
 						bv->value.integerval);
 			} else if (bv->type==SQLRSERVERBINDVARTYPE_DOUBLE) {
-				stdoutput.write("type: DOUBLE\n");
-				stdoutput.printf("	value: %f (%d,%d)\n",
+				debugWrite("type: DOUBLE");
+				debugWrite("value: %f (%d,%d)",
 						bv->value.doubleval.value,
 						bv->value.doubleval.precision,
 						bv->value.doubleval.scale);
 			} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
 				// FIXME: print date...
 			}
-			stdoutput.printf("	value size: %d\n",
-							bv->valuesize);
-			stdoutput.write("	isnull: false\n");
-			stdoutput.write("}\n");
+			debugWrite("value size: %d",bv->valuesize);
+			debugWrite("isnull: false");
+			debugEnd();
 		}
 	}
 
@@ -3983,7 +3821,7 @@ bool sqlrprotocol_oracle::query3(const byte_t *rp) {
 	uint16_t	options;
 	uint16_t	moreoptions;
 	uint16_t	cursorid;
-	uint32_t	querylen;
+	uint32_t	querysize;
 	const char	*query;
 
 	readBE(rp,&options,&rp);
@@ -3994,23 +3832,23 @@ cursorid=hackcursorid;
 		byte_t	unknown;
 		read(rp,&unknown,&rp);
 	}
-	readLE(rp,&querylen,&rp);
+	readLE(rp,&querysize,&rp);
 	// no idea...
 	for (uint16_t i=0; i<56; i++) {
 		byte_t	unknown;
 		read(rp,&unknown,&rp);
 	}
 	query=(char *)rp;
-	rp+=querylen;
+	rp+=querysize;
 	// no idea...
 
 	if (getDebug()) {
-		stdoutput.write("query3 request {\n");
+		debugStart("query3 request");
 		debugOptions(options,moreoptions);
-		stdoutput.printf("	cursor id: %d\n",cursorid);
-		stdoutput.printf("	query length: %d\n",querylen);
-		stdoutput.printf("	query: \"%*s\"\n",querylen,query);
-		stdoutput.write("}\n");
+		debugWrite("cursor id: %d",cursorid);
+		debugWrite("query size: %dn",querysize);
+		debugWrite("query: \"%*s\"",querysize,query);
+		debugEnd();
 	}
 
 	// get the requested cursor
@@ -4018,25 +3856,18 @@ cursorid=hackcursorid;
 	if (cursorid==65535) {
 		cursor=cont->getCursor();
 		if (!cursor) {
-			if (getDebug()) {
-				stdoutput.printf("couldn't get cursor\n");
-			}
+			debugWrite("couldn't get cursor");
 			return sendCursorNotOpenError();
 		}
 		cursorid=cont->getId(cursor);
 hackcursorid=cursorid;
-		if (getDebug()) {
-			stdoutput.write("open request {\n");
-			stdoutput.printf("	cursor id: %d\n",cursorid);
-			stdoutput.write("}\n");
-		}
+		debugStart("open request");
+		debugWrite("cursor id: %d",cursorid);
+		debugEnd();
 	} else {
 		cursor=cont->getCursor(cursorid);
 		if (!cursor) {
-			if (getDebug()) {
-				stdoutput.printf(
-					"cursor id %d not found\n",cursorid);
-			}
+			debugWrite("cursor id %d not found",cursorid);
 			return sendCursorNotOpenError();
 		}
 	}
@@ -4047,7 +3878,7 @@ hackcursorid=cursorid;
 		columntypescached[cont->getId(cursor)]=false;
 
 		// bounds checking
-		if (querylen>maxquerysize) {
+		if (querysize>maxquerysize) {
 			// FIXME: implement this
 			//return sendErrPacket(1105,"Unknown error","24000");
 			return false;
@@ -4055,18 +3886,16 @@ hackcursorid=cursorid;
 
 		// copy the query into the cursor's query buffer
 		char	*querybuffer=cont->getQueryBuffer(cursor);
-		bytestring::copy(querybuffer,query,querylen);
-		querybuffer[querylen]='\0';
-		cont->setQueryLength(cursor,querylen);
+		bytestring::copy(querybuffer,query,querysize);
+		querybuffer[querysize]='\0';
+		cont->setQuerySize(cursor,querysize);
 	
 		// prepare the query
 		if (!cont->prepareQuery(cursor,
 					cont->getQueryBuffer(cursor),
-					cont->getQueryLength(cursor),
+					cont->getQuerySize(cursor),
 					true,true,true)) {
-			if (getDebug()) {
-				stdoutput.printf("prepare query failed\n");
-			}
+			debugWrite("prepare query failed");
 			return sendQueryError(cursor);
 		}
 	}
@@ -4075,9 +3904,7 @@ hackcursorid=cursorid;
 
 		// execute the query
 		if (!cont->executeQuery(cursor,true,true,true,true)) {
-			if (getDebug()) {
-				stdoutput.printf("execute query failed\n");
-			}
+			debugWrite("execute query failed");
 			return sendQueryError(cursor);
 		}
 	}
@@ -4148,16 +3975,11 @@ bool sqlrprotocol_oracle::sendQuery3Response(sqlrservercursor *cursor,
 					break;
 				}
 
-				if (getDebug()) {
-					stdoutput.write("query3 response "
-								"row {\n");
-				}
+				debugStart("query3 response row");
 
 				putRow(cursor,colcount,true);
 
-				if (getDebug()) {
-					stdoutput.write("}\n");
-				}
+				debugEnd();
 
 				// FIXME: kludgy
 				cont->nextRow(cursor);
@@ -4222,11 +4044,10 @@ bool sqlrprotocol_oracle::sendQuery3Response(sqlrservercursor *cursor,
 		}
 
 		if (getDebug()) {
-			stdoutput.write("query3 response (footer) {\n");
-			stdoutput.printf("	data flags: 0x%04x\n",
-								dataflags);
+			debugStart("query3 response (footer)");
+			debugWrite("data flags: 0x%04x",dataflags);
 			debugTtcCode(ttccode);
-			stdoutput.write("}\n");
+			debugEnd();
 		}
 	}
 
@@ -4250,26 +4071,22 @@ bool sqlrprotocol_oracle::execute(const byte_t *rp) {
 cursorid=hackcursorid;
 
 	if (getDebug()) {
-		stdoutput.write("execute request {\n");
+		debugStart("execute request");
 		debugOptions(options,moreoptions);
-		stdoutput.printf("	cursor id: %d\n",cursorid);
-		stdoutput.write("}\n");
+		debugWrite("cursor id: %d",cursorid);
+		debugEnd();
 	}
 
 	// get the requested cursor
 	sqlrservercursor	*cursor=cont->getCursor(cursorid);
 	if (!cursor) {
-		if (getDebug()) {
-			stdoutput.printf("cursor id %d not found\n",cursorid);
-		}
+		debugWrite("cursor id %d not found",cursorid);
 		return sendCursorNotOpenError();
 	}
 
 	// execute the query
 	if (!cont->executeQuery(cursor,true,true,true,true)) {
-		if (getDebug()) {
-			stdoutput.printf("execute query failed\n");
-		}
+		debugWrite("execute query failed");
 		return sendQueryError(cursor);
 	}
 
@@ -4299,12 +4116,10 @@ bool sqlrprotocol_oracle::sendExecuteResponse(sqlrservercursor *cursor) {
 	write(&reqpacket,ttccode);
 	reqpacket.append(unknown,sizeof(unknown));
 
-	if (getDebug()) {
-		stdoutput.write("execute response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		stdoutput.write("}\n");
-	}
+	debugStart("execute response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugEnd();
 
 	return sendPacket(true);
 }
@@ -4326,17 +4141,15 @@ bool sqlrprotocol_oracle::fetch(const byte_t *rp) {
 cursorid=hackcursorid;
 
 	if (getDebug()) {
-		stdoutput.printf("fetch request {\n");
+		debugStart("fetch request");
 		debugOptions(options,moreoptions);
-		stdoutput.printf("}\n");
+		debugEnd();
 	}
 
 	// get the requested cursor
 	sqlrservercursor	*cursor=cont->getCursor(cursorid);
 	if (!cursor) {
-		if (getDebug()) {
-			stdoutput.printf("cursor id %d not found\n",cursorid);
-		}
+		debugWrite("cursor id %d not found",cursorid);
 		return sendCursorNotOpenError();
 	}
 
@@ -4391,12 +4204,11 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 				write(&reqpacket,ttccode);
 
 				if (getDebug()) {
-					stdoutput.write("fetch response "
-							"header {\n");
-					stdoutput.printf("	data flags: "
-							"0x%04x\n",dataflags);
+					debugStart("fetch response header");
+					debugWrite("data flags: 0x%04x",
+								dataflags);
 					debugTtcCode(ttccode);
-					stdoutput.write("}\n");
+					debugEnd();
 				}
 			}
 
@@ -4440,15 +4252,11 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 		// no idea...
 		write(&reqpacket,(byte_t)7);
 
-		if (getDebug()) {
-			stdoutput.printf("fetch response row {\n");
-		}
+		debugStart("fetch response row");
 
 		putRow(cursor,colcount,exactfetch);
 
-		if (getDebug()) {
-			stdoutput.write("}\n");
-		}
+		debugEnd();
 
 		// FIXME: kludgy
 		cont->nextRow(cursor);
@@ -4559,20 +4367,16 @@ bool sqlrprotocol_oracle::sendFetchResponse(sqlrservercursor *cursor,
 
 void sqlrprotocol_oracle::cacheColumnDefinitions(sqlrservercursor *cursor,
 							uint32_t colcount) {
-	if (getDebug()) {
-		stdoutput.write("cache column definitions {\n");
-		if (!colcount) {
-			stdoutput.write("	no columns\n");
-		}
+	debugStart("cache column definitions");
+	if (!colcount) {
+		debugWrite("no columns");
 	}
 
 	uint16_t	curid=cont->getId(cursor);
 
 	if (columntypescached[curid]) {
-		if (getDebug()) {
-			stdoutput.write("	already cached\n");
-			stdoutput.write("}\n");
-		}
+		debugWrite("already cached");
+		debugEnd();
 		return;
 	}
 
@@ -4589,51 +4393,43 @@ void sqlrprotocol_oracle::cacheColumnDefinitions(sqlrservercursor *cursor,
 
 	for (uint32_t i=0; i<colcount; i++) {
 		ct[i]=getColumnType(cont->getColumnTypeName(cursor,i),
-					cont->getColumnTypeNameLength(cursor,i),
+					cont->getColumnTypeNameSize(cursor,i),
 					cont->getColumnScale(cursor,i));
-		if (getDebug()) {
-			stdoutput.printf("	%s: %d\n",
-				cont->getColumnTypeName(cursor,i),ct[i]);
-		}
+		debugWrite("%s: %d",cont->getColumnTypeName(cursor,i),ct[i]);
 	}
 
 	columntypescached[curid]=true;
 
-	if (getDebug()) {
-		stdoutput.write("}\n");
-	}
+	debugEnd();
 }
 
 void sqlrprotocol_oracle::putColumnDefinitions(sqlrservercursor *cursor,
 							uint32_t colcount,
 							bool query3) {
 
-	byte_t	lengthtotal=0;
+	byte_t	sizetotal=0;
 	for (uint32_t i=0; i<colcount; i++) {
-		lengthtotal+=cont->getColumnLength(cursor,i);
+		sizetotal+=cont->getColumnSize(cursor,i);
 	}
 	uint32_t	constant=51;
 
-	write(&reqpacket,lengthtotal);
+	write(&reqpacket,sizetotal);
 	writeBE(&reqpacket,colcount);
 	writeBE(&reqpacket,constant);
 
-	if (getDebug()) {
-		stdoutput.write("column definitions header {\n");
-		stdoutput.printf("	length total: %d\n",lengthtotal);
-		stdoutput.printf("	column count: %d\n",colcount);
-		stdoutput.printf("	constant: %d\n",constant);
-		stdoutput.write("}\n");
-		stdoutput.write("column definitions {\n");
-	}
+	debugStart("column definitions header");
+	debugWrite("size total: %d",sizetotal);
+	debugWrite("column count: %d",colcount);
+	debugWrite("constant: %d",constant);
+	debugEnd();
+
+	debugStart("column definitions");
 
 	for (uint32_t i=0; i<colcount; i++) {
 		putColumnDefinition(cursor,i,query3);
 	}
 
-	if (getDebug()) {
-		stdoutput.printf("}\n");
-	}
+	debugEnd();
 }
 
 void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
@@ -4656,8 +4452,8 @@ void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
 	byte_t	marker2=128;
 	byte_t	precision=cont->getColumnPrecision(cursor,column);
 	byte_t	scale=cont->getColumnScale(cursor,column);
-	// 16 for non-integer decimal, otherwise actual length
-	byte_t	length=cont->getColumnLength(cursor,column);
+	// 16 for non-integer decimal, otherwise actual size
+	byte_t	size=cont->getColumnSize(cursor,column);
 	byte_t	unknown1[]={
 		0x00, 0x00, 0x00, 0x00,
 		0x00, 0x00, 0x00, 0x00,
@@ -4674,7 +4470,7 @@ void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
 	// 4 for select from dual with alias
 	byte_t		alias=1;
 	const char	*name=cont->getColumnName(cursor,column);
-	uint32_t	namelength=cont->getColumnNameLength(cursor,column);
+	uint32_t	namesize=cont->getColumnNameSize(cursor,column);
 	// no idea
 	uint32_t	marker4=0;
 	// no idea
@@ -4685,7 +4481,7 @@ void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
 	write(&reqpacket,marker2);
 	write(&reqpacket,precision);
 	write(&reqpacket,scale);
-	write(&reqpacket,length);
+	write(&reqpacket,size);
 	reqpacket.append(unknown1,sizeof(unknown1));
 	// yes, twice
 	writeBE(&reqpacket,marker3);
@@ -4693,57 +4489,55 @@ void sqlrprotocol_oracle::putColumnDefinition(sqlrservercursor *cursor,
 	writeBE(&reqpacket,nullable);
 	// yes, twice
 	if (query3) {
-		write(&reqpacket,(byte_t)namelength);
-		write(&reqpacket,(byte_t)namelength);
+		write(&reqpacket,(byte_t)namesize);
+		write(&reqpacket,(byte_t)namesize);
 	} else {
 		write(&reqpacket,alias);
 		write(&reqpacket,alias);
 	}
-	writeBE(&reqpacket,namelength);
-	write(&reqpacket,name,namelength);
+	writeBE(&reqpacket,namesize);
+	write(&reqpacket,name,namesize);
 	writeBE(&reqpacket,marker4);
 	writeBE(&reqpacket,marker5);
 
-	if (getDebug()) {
-		stdoutput.printf("	column %d {\n",column);
-		stdoutput.printf("		marker1: %d\n",marker1);
-		debugColumnType(columntypestring,columntype);
-		stdoutput.printf("		marker2: %d\n",marker2);
-		stdoutput.printf("		precision: %d\n",precision);
-		stdoutput.printf("		scale: %d\n",scale);
-		stdoutput.printf("		length: %d\n",length);
-		stdoutput.printf("		marker3: %d\n",marker3);
-		stdoutput.printf("		nullable: %d\n",nullable);
-		stdoutput.printf("		name length: %ld\n",namelength);
-		stdoutput.printf("		name: %s\n",name);
-		stdoutput.printf("		marker4: %d\n",marker4);
-		stdoutput.printf("		marker5: %d\n",marker5);
-		stdoutput.printf("	}\n");
-	}
+	debugStart("column %d",column);
+	debugWrite("marker1: %d",marker1);
+	debugColumnType(columntypestring,columntype);
+	debugWrite("marker2: %d",marker2);
+	debugWrite("precision: %d",precision);
+	debugWrite("scale: %d",scale);
+	debugWrite("size: %d",size);
+	debugWrite("marker3: %d",marker3);
+	debugWrite("nullable: %d",nullable);
+	debugWrite("name size: %ld",namesize);
+	debugWrite("name: %s",name);
+	debugWrite("marker4: %d",marker4);
+	debugWrite("marker5: %d",marker5);
+	debugEnd();
 }
 
 uint16_t sqlrprotocol_oracle::getColumnType(const char *columntypestring,
-						uint16_t columntypelen,
+						uint16_t columntypesize,
 						uint32_t scale) {
 
 	// sometimes column types have parentheses, like CHAR(40)
 	const char	*leftparen=charstring::findFirst(columntypestring,"(");
 	if (leftparen) {
-		columntypelen=leftparen-columntypestring;
+		columntypesize=leftparen-columntypestring;
 	}
 
 	const char * const 	*datatypestring=cont->dataTypeStrings();
 
 	for (uint32_t index=0; datatypestring[index]; index++) {
 
-		// compare "columntypelen" bytes but also make sure that the
+		// compare "columntypesize" bytes but also make sure that the
 		// byte afterward is a NULL, we don't want "DATE" to match
 		// "DATETIME" for example
 		if (!charstring::compareIgnoringCase(
 					datatypestring[index],
 					columntypestring,
-					columntypelen) &&
-				datatypestring[index][columntypelen]=='\0') {
+					columntypesize) &&
+				datatypestring[index][columntypesize]=='\0') {
 
 			uint16_t	retval=oracletypemap[index];
 
@@ -4895,38 +4689,31 @@ void sqlrprotocol_oracle::putRow(sqlrservercursor *cursor,
 
 	// field pointers
 	const char	*field;
-	uint64_t	fieldlength;
-	bool		blob;
+	uint64_t	fieldsize;
+	bool		lob;
 	bool		null;
 
 	// put the fields
 	for (uint32_t i=0; i<colcount; i++) {
 
-		if (getDebug()) {
-			stdoutput.printf("	col %d {\n",i);
-			debugColumnType(ct[i]);
-		}
+		debugStart("col %d",i);
+		debugColumnType(ct[i]);
 
 		// get the field (again)
-		fieldlength=0;
-		blob=false;
+		fieldsize=0;
+		lob=false;
 		null=false;
-		if (!cont->getField(cursor,i,&field,&fieldlength,&blob,&null)) {
+		if (!cont->getField(cursor,i,&field,&fieldsize,&lob,&null)) {
 			// FIXME: handle error
 		}
 
 		// put the field
-		if (blob) {
-			if (getDebug()) {
-				stdoutput.write("		LOB\n");
-			}
+		if (lob) {
+			debugWrite("LOB");
 			putLobField(cursor,i);
 		} else if (!null) {
-			if (getDebug()) {
-				stdoutput.printf("		\"%s\" (%d)\n",
-							field,fieldlength);
-			}
-			putField(field,fieldlength,ct[i]);
+			debugWrite("\"%s\" (%d)",field,fieldsize);
+			putField(field,fieldsize,ct[i]);
 
 			// no idea
 			if (terminator) {
@@ -4938,22 +4725,20 @@ void sqlrprotocol_oracle::putRow(sqlrservercursor *cursor,
 			}
 		}
 
-		if (getDebug()) {
-			stdoutput.write("	}\n");
-		}
+		debugEnd();
 	}
 }
 
 void sqlrprotocol_oracle::putField(const char *field,
-					uint64_t fieldlength,
+					uint64_t fieldsize,
 					uint16_t columntype) {
 
 	switch (columntype) {
 		case ORACLE_TYPE_CHAR:
 		case ORACLE_TYPE_VARCHAR:
 			// what about fields longer than 255 chars?
-			write(&reqpacket,(byte_t)fieldlength);
-			write(&reqpacket,field,fieldlength);
+			write(&reqpacket,(byte_t)fieldsize);
+			write(&reqpacket,field,fieldsize);
 			break;
 		case ORACLE_TYPE_NUMBER:
 			// FIXME: implement this
@@ -5019,10 +4804,7 @@ void sqlrprotocol_oracle::putField(const char *field,
 			// FIXME: implement this
 			break;
 		default:
-			if (getDebug()) {
-				stdoutput.printf("unknown column type: %d\n",
-								columntype);
-			}
+			debugWrite("unknown column type: %d",columntype);
 			break;
 	}
 }
@@ -5031,7 +4813,7 @@ void sqlrprotocol_oracle::putField(const char *field,
 
 void sqlrprotocol_oracle::putLobField(sqlrservercursor *cursor, uint32_t col) {
 
-	// Get lob length.  If this fails, send a NULL field.
+	// Get lob size.  If this fails, send a NULL field.
 	uint64_t	loblength;
 	if (!cont->getLobFieldLength(cursor,col,&loblength)) {
 		// send NULL as 0xfb
@@ -5091,7 +4873,7 @@ void sqlrprotocol_oracle::putError(const char *error) {
 	putError(error,charstring::getLength(error));
 }
 
-void sqlrprotocol_oracle::putError(const char *error, uint32_t errorlength) {
+void sqlrprotocol_oracle::putError(const char *error, uint32_t errorsize) {
 
 	// if we hit the end of the result set then we need to send
 	// ORA-01403; no data found
@@ -5120,17 +4902,15 @@ void sqlrprotocol_oracle::putError(const char *error, uint32_t errorlength) {
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
 	reqpacket.append(unknown1,sizeof(unknown1));
-	write(&reqpacket,(byte_t)errorlength);
-	reqpacket.append(error,errorlength);
+	write(&reqpacket,(byte_t)errorsize);
+	reqpacket.append(error,errorsize);
 	reqpacket.append(unknown2,sizeof(unknown2));
 
-	if (getDebug()) {
-		stdoutput.write("error response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		stdoutput.printf("	error: %*s\n",errorlength,error);
-		stdoutput.write("}\n");
-	}
+	debugStart("error response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugWrite("error: %*s",errorsize,error);
+	debugEnd();
 }
 
 bool sqlrprotocol_oracle::close(const byte_t *rp) {
@@ -5140,24 +4920,21 @@ bool sqlrprotocol_oracle::close(const byte_t *rp) {
 	// FIXME: decode this...
 cursorid=hackcursorid;
 
-	if (getDebug()) {
-		stdoutput.printf("close request {\n");
-		stdoutput.printf("	cursor id: %d\n",cursorid);
-		stdoutput.printf("}\n");
-	}
+	debugStart("close request");
+	debugWrite("cursor id: %d",cursorid);
+	debugEnd();
 
 	// get the requested cursor
 	sqlrservercursor	*cursor=cont->getCursor(cursorid);
 	if (!cursor) {
-		if (getDebug()) {
-			stdoutput.printf("cursor id %d not found\n",cursorid);
-		}
+		debugWrite("cursor id %d not found",cursorid);
 		return sendCursorNotOpenError();
 	}
 
 	clearParams(cursor);
 	pcounts[cont->getId(cursor)]=0;
 	cont->abort(cursor);
+	cont->release(cursor);
 hackcursorid=65535;
 
 	return sendCloseResponse(cursor);
@@ -5173,8 +4950,6 @@ void sqlrprotocol_oracle::clearParams(sqlrservercursor *cursor) {
 		if (bv->type==SQLRSERVERBINDVARTYPE_STRING ||
 			bv->type==SQLRSERVERBINDVARTYPE_BLOB) {
 			delete[] bv->value.stringval;
-		} else if (bv->type==SQLRSERVERBINDVARTYPE_DATE) {
-			delete[] bv->value.dateval.buffer;
 		}
 	}
 	cont->setInputBindCount(cursor,0);
@@ -5191,12 +4966,10 @@ bool sqlrprotocol_oracle::sendCloseResponse(sqlrservercursor *cursor) {
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
 
-	if (getDebug()) {
-		stdoutput.printf("close response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		stdoutput.printf("}\n");
-	}
+	debugStart("close response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugEnd();
 
 	return sendPacket(true);
 }
@@ -5207,11 +4980,9 @@ bool sqlrprotocol_oracle::disconnect(const byte_t *rp) {
 	byte_t	unknown;
 	read(rp,&unknown,&rp);
 
-	if (getDebug()) {
-		stdoutput.printf("disconnect request {\n");
-		stdoutput.printf("	unknown: 0x%02x\n",unknown);
-		stdoutput.printf("}\n");
-	}
+	debugStart("disconnect request");
+	debugWrite("unknown: 0x%02x",unknown);
+	debugEnd();
 
 #if 0
 	// FIXME: do something?
@@ -5233,12 +5004,10 @@ bool sqlrprotocol_oracle::sendDisconnectResponse() {
 	writeBE(&reqpacket,dataflags);
 	write(&reqpacket,ttccode);
 
-	if (getDebug()) {
-		stdoutput.printf("disconnect response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		stdoutput.printf("}\n");
-	}
+	debugStart("disconnect response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugEnd();
 
 	return sendPacket(true);
 }
@@ -5252,10 +5021,8 @@ bool sqlrprotocol_oracle::version(const byte_t *rp) {
 	
 	// FIXME: decode this...
 
-	if (getDebug()) {
-		stdoutput.write("version request {\n");
-		stdoutput.write("}\n");
-	}
+	debugStart("version request");
+	debugEnd();
 
 	return sendVersionResponse();
 }
@@ -5281,13 +5048,12 @@ bool sqlrprotocol_oracle::sendVersionResponse() {
 	write(&reqpacket,serverversion);
 	reqpacket.append(unknown,sizeof(unknown));
 
-	if (getDebug()) {
-		stdoutput.write("version response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		stdoutput.printf("	server version:\n%s\n",serverversion);
-		stdoutput.write("}\n");
-	}
+	debugStart("version response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugWrite("server version:");
+	debugWrite("%s",serverversion);
+	debugEnd();
 
 	return sendPacket(true);
 }
@@ -5305,11 +5071,9 @@ bool sqlrprotocol_oracle::occa(const byte_t *rp, const byte_t **rpout) {
 
 	*rpout=rp;
 
-	if (getDebug()) {
-		stdoutput.write("occa {\n");
-		debugHexDump(unknown,sizeof(unknown));
-		stdoutput.write("}\n");
-	}
+	debugStart("occa");
+	debugHexDump(unknown,sizeof(unknown));
+	debugEnd();
 
 	return true;
 }
@@ -5320,10 +5084,8 @@ bool sqlrprotocol_oracle::logonUnknown(const byte_t *rp) {
 
 	// FIXME: decode this...
 
-	if (getDebug()) {
-		stdoutput.write("logon unknown request {\n");
-		stdoutput.write("}\n");
-	}
+	debugStart("logon unknown request");
+	debugEnd();
 
 	return sendLogonUnknownResponse();
 }
@@ -5347,12 +5109,10 @@ bool sqlrprotocol_oracle::sendLogonUnknownResponse() {
 	write(&reqpacket,ttccode);
 	reqpacket.append(unknown,sizeof(unknown));
 
-	if (getDebug()) {
-		stdoutput.write("logon unknown response {\n");
-		stdoutput.printf("	data flags: 0x%04x\n",dataflags);
-		debugTtcCode(ttccode);
-		stdoutput.write("}\n");
-	}
+	debugStart("logon unknown response");
+	debugWrite("data flags: 0x%04x",dataflags);
+	debugTtcCode(ttccode);
+	debugEnd();
 
 	return sendPacket(true);
 }
@@ -5383,15 +5143,15 @@ bool sqlrprotocol_oracle::sendQueryError(sqlrservercursor *cursor) {
 	// FIXME: implement this;
 
 	const char	*errorstring;
-	uint32_t	errorlength;
+	uint32_t	errorsize;
 	int64_t		errnum;
 	bool		liveconnection;
-	cont->errorMessage(cursor,
-				&errorstring,
-				&errorlength,
-				&errnum,
-				&liveconnection);
-stdoutput.printf("%*s\n",errorlength,errorstring);
+	cont->getError(cursor,
+			&errorstring,
+			&errorsize,
+			&errnum,
+			&liveconnection);
+	debugWrite("%*s",errorsize,errorstring);
 	return false;
 }
 
@@ -5408,8 +5168,7 @@ bool sqlrprotocol_oracle::sendNotImplementedError() {
 extern "C" {
 	SQLRSERVER_DLLSPEC sqlrprotocol	*new_sqlrprotocol_oracle(
 						sqlrservercontroller *cont,
-						sqlrprotocols *ps,
 						domnode *parameters) {
-		return new sqlrprotocol_oracle(cont,ps,parameters);
+		return new sqlrprotocol_oracle(cont,parameters);
 	}
 }

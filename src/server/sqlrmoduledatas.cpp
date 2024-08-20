@@ -6,8 +6,6 @@
 #include <rudiments/process.h>
 #include <rudiments/character.h>
 #include <rudiments/stdio.h>
-//#define DEBUG_MESSAGES
-#include <rudiments/debugprint.h>
 
 #include <config.h>
 
@@ -16,13 +14,6 @@
 		#include "sqlrmoduledatadeclarations.cpp"
 	}
 #endif
-
-class sqlrmoduledataplugin {
-	public:
-		sqlrmoduledata	*md;
-		dynamiclib	*dl;
-		const char	*module;
-};
 
 class sqlrdatabaseobject {
 	public:
@@ -35,83 +26,38 @@ class sqlrdatabaseobject {
 class sqlrmoduledatasprivate {
 	friend class sqlrmoduledatas;
 	private:
-		sqlrservercontroller	*_cont;
-		
-		bool		_debug;
-
-		singlylinkedlist< sqlrmoduledataplugin * >	_mlist;
 		dictionary< const char *, sqlrmoduledata * >	_mdict;
 };
 
-sqlrmoduledatas::sqlrmoduledatas(sqlrservercontroller *cont) {
-	debugFunction();
+sqlrmoduledatas::sqlrmoduledatas(sqlrservercontroller *cont) :
+						sqlrservermodules(cont) {
 	pvt=new sqlrmoduledatasprivate;
-	pvt->_cont=cont;
-	pvt->_debug=cont->getConfig()->getDebugModuleDatas();
+	setDebug(cont->getConfig()->getDebugModuleDatas());
 }
 
 sqlrmoduledatas::~sqlrmoduledatas() {
-	debugFunction();
-	unload();
 	delete pvt;
 }
 
-bool sqlrmoduledatas::load(domnode *parameters) {
-	debugFunction();
-
-	unload();
-
-	// run through the moduledata list
-	for (domnode *moduledata=parameters->getFirstTagChild();
-				!moduledata->isNullNode();
-				moduledata=moduledata->getNextTagSibling()) {
-
-		// load moduledata
-		loadModuleData(moduledata);
-	}
-
-	return true;
-}
-
-void sqlrmoduledatas::unload() {
-	debugFunction();
-	for (listnode< sqlrmoduledataplugin * > *node=
-						pvt->_mlist.getFirst();
-						node; node=node->getNext()) {
-		sqlrmoduledataplugin	*sqlt=node->getValue();
-		delete sqlt->md;
-		delete sqlt->dl;
-		delete sqlt;
-	}
-	pvt->_mlist.clear();
-}
-
-void sqlrmoduledatas::loadModuleData(domnode *moduledata) {
-	debugFunction();
+void sqlrmoduledatas::loadModule(domnode *parameters) {
 
 	// ignore non-moduledatas
-	if (charstring::compare(moduledata->getName(),"moduledata")) {
+	if (charstring::compare(parameters->getName(),"moduledata")) {
 		return;
 	}
 
-	// get the moduledata name
-	const char	*module=moduledata->getAttributeValue("module");
-	if (!charstring::getLength(module)) {
-		// try "file", that's what it used to be called
-		module=moduledata->getAttributeValue("file");
-		if (!charstring::getLength(module)) {
-			return;
-		}
+	// get the module name
+	const char	*module=getModuleName(parameters);
+	if (charstring::isNullOrEmpty(module)) {
+		return;
 	}
 
-	if (pvt->_debug) {
-		stdoutput.printf("loading moduledata module: %s\n",module);
-	}
+	debugWrite("loading moduledata module: %s",module);
 
 #ifdef SQLRELAY_ENABLE_SHARED
 	// load the moduledata module
 	stringbuffer	modulename;
-	modulename.append(pvt->_cont->getPaths()->getLibExecDir());
+	modulename.append(cont->getPaths()->getLibExecDir());
 	modulename.append(SQLR);
 	modulename.append("moduledata_");
 	modulename.append(module)->append(".")->append(SQLRELAY_MODULESUFFIX);
@@ -141,7 +87,7 @@ void sqlrmoduledatas::loadModuleData(domnode *moduledata) {
 		delete dl;
 		return;
 	}
-	sqlrmoduledata	*md=(*newModuleData)(moduledata);
+	sqlrmoduledata	*md=(*newModuleData)(parameters);
 
 #else
 	dynamiclib	*dl=NULL;
@@ -152,16 +98,14 @@ void sqlrmoduledatas::loadModuleData(domnode *moduledata) {
 	}
 #endif
 
-	if (pvt->_debug) {
-		stdoutput.printf("success\n");
-	}
+	debugWrite("success");
 
 	// add the plugin to the list
-	sqlrmoduledataplugin	*sqlmdp=new sqlrmoduledataplugin;
-	sqlmdp->md=md;
-	sqlmdp->dl=dl;
-	sqlmdp->module=module;
-	pvt->_mlist.append(sqlmdp);
+	sqlrmoduleplugin	*sqlmp=new sqlrmoduleplugin;
+	sqlmp->m=md;
+	sqlmp->dl=dl;
+	sqlmp->module=module;
+	blist.append(sqlmp);
 	pvt->_mdict.setValue(md->getId(),md);
 }
 
@@ -170,25 +114,9 @@ sqlrmoduledata *sqlrmoduledatas::getModuleData(const char *id) {
 }
 
 void sqlrmoduledatas::closeResultSet(sqlrservercursor *sqlrcur) {
-	for (listnode< sqlrmoduledataplugin * >
-				*node=pvt->_mlist.getFirst();
-				node; node=node->getNext()) {
-		node->getValue()->md->closeResultSet(sqlrcur);
-	}
-}
-
-void sqlrmoduledatas::endTransaction(bool commit) {
-	for (listnode< sqlrmoduledataplugin * >
-				*node=pvt->_mlist.getFirst();
-				node; node=node->getNext()) {
-		node->getValue()->md->endTransaction(commit);
-	}
-}
-
-void sqlrmoduledatas::endSession() {
-	for (listnode< sqlrmoduledataplugin * >
-				*node=pvt->_mlist.getFirst();
-				node; node=node->getNext()) {
-		node->getValue()->md->endSession();
+	for (listnode< sqlrmoduleplugin * > *node=blist.getFirst();
+						node; node=node->getNext()) {
+		sqlrmoduledata	*md=(sqlrmoduledata *)node->getValue()->m;
+		md->closeResultSet(sqlrcur);
 	}
 }

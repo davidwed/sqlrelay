@@ -228,29 +228,56 @@ public class SQLRConnection {
 	/** Returns 1 if the database is up and 0
 	 *  if it's down.  */
 	public native boolean	ping();
+
 	/** Returns the type of database: 
 	 *    oracle, postgresql, mysql, etc.  */
 	public native String	identify();
+
 	/** Returns the version of the database */
 	public native String	dbVersion();
+
 	/** Returns the host name of the database */
 	public native String	dbHostName();
+
 	/** Returns the ip address of the database */
 	public native String	dbIpAddress();
+
 	/** Returns the version of the sqlrelay server software */
 	public native String	serverVersion();
+
 	/** Returns the version of the sqlrelay client software */
 	public native String	clientVersion();
-	/** Returns a string representing the format
-	 *  of the bind variables used in the db. */
+
+	/** Returns a string representing the bind variable format used
+	 *  by the database.  For example:
+	 *
+	 *  ?  - database uses a ? to represent a bind variable
+	 *  @* - database uses a @ followed by any characters to
+	 *       represent a bind variable
+	 *  $1 - database uses a $ followed by a number to represent a
+	 *       bind variable
+	 *  :* - database uses a : followed by any characters to
+	 *       represent a bind variable
+	 */
 	public native String	bindFormat();
-	/** Returns a string representing the format of the
-	 *  sequence nextval command used in the db. */
+
+	/** Returns a string representing the format of the sequence
+	 *  nextval command used in the database.  The format will
+	 *  contain a %s in place of the sequence name.  For example:
+	 *
+	 *  (nextval for %s)
+	 *  next value for %s
+	 *  nextval('%s')
+	 *  %s.nextval
+	 *
+	 *  Returns an empty string if the database does not support
+	 *  sequences. */
 	public native String	nextvalFormat();
 
 
 	/** Sets the current database/schema to "database" */
 	public native boolean	selectDatabase(String database);
+
 	/** Returns the database/schema that is currently in use */
 	public native String	getCurrentDatabase();
 
@@ -265,6 +292,7 @@ public class SQLRConnection {
 	/** Instructs the database to perform a commit
 	 *  after every successful query. */
 	public native boolean	autoCommitOn();
+
 	/** Instructs the database to wait for the 
 	 *  client to tell it when to commit. */
 	public native boolean	autoCommitOff();
@@ -276,9 +304,11 @@ public class SQLRConnection {
 	 *  do anything unless SQL Relay is faking transaction
 	 *  blocks. */
 	public native boolean	begin();
+
 	/** Issues a commit. Returns true if the commit succeeded, false if it
 	 *  failed. */
 	public native boolean	commit();
+
 	/** Issues a rollback. Returns true if the rollback succeeded, false if
 	 *  it failed. */
 	public native boolean	rollback();
